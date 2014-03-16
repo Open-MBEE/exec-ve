@@ -1,0 +1,224 @@
+var proxySnippet = require('grunt-connect-proxy/lib/utils').proxyRequest;
+
+module.exports = function(grunt) {
+
+  // Project configuration.
+  grunt.initConfig({
+    
+    pkg: grunt.file.readJSON('package.json'),
+    
+    concat: {
+      options: {
+        //separator: ';',
+        banner: "'use strict';\n",
+        process: function(src, filepath) {
+          return '// Source: ' + filepath + '\n' +
+            src.replace(/(^|\n)[ \t]*('use strict'|"use strict");?\s*/g, '$1');
+        }
+      },
+      dist: {
+        src: ['src/mms.js', 'src/services/*.js', 'src/directives/*.js'],
+        dest: 'dist/mms.js',
+      }
+    },
+
+    uglify: {
+      options: {
+        banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd HH:MM:ss") %> */\n'
+      },
+      build: {
+        src: 'dist/mms.js',
+        dest: 'dist/mms.min.js'
+      }
+    },
+
+    jshint : {
+      beforeconcat: ['src/**/*.js'],
+      afterconcat: ['dist/mms.js'],
+      options: {
+        globalstrict: true,
+        globals: {
+          angular: true
+        }
+      }
+    },
+
+    ngdocs: {
+      options: {
+        dest: 'docs',
+        html5Mode: true,
+        title: 'MMS',
+        startPage: '/api'
+      },
+      api: {
+        src: ['src/**/*.js'],
+        title: 'MMS API'
+      }
+    },
+
+    stubby: {
+      stubsServer: {
+        // note the array collection instead of an object
+        options: {
+          stubs: 9002,
+          //callback: function (server, options) {
+          //server.get(1, function (err, endpoint) {
+          //     console.log(endpoint);
+          //  });
+          //},
+        },
+        files: [{
+          src: [ 'mocks/*.{json,yaml,js}' ]
+        }]
+      }
+    },
+
+    connect: {
+      'static': {
+        options: {
+          hostname: 'localhost',
+          port: 9001,
+          base: './build',
+        }
+      },
+      //restServer: {
+      //  options: {
+      //      hostname: 'localhost',
+      //      port: 9002,
+      //      base: './rest',
+      //    },
+      //},
+      mockServer: {
+        options: {
+          hostname: 'localhost',
+          port: 9000,
+          middleware: function(connect) {
+            return [proxySnippet];
+          }
+        },
+        proxies: [
+          {
+            context: '/alfresco/service/javawebscripts',  // '/api'
+            host: 'localhost',
+            port: 9002,
+            changeOrigin: true,
+            //https: true,
+            rewrite: {
+              '^/alfresco/service/javawebscripts': ''
+            }
+          },
+          {
+            context: '/',
+            host: 'localhost',
+            port: 9001
+          }
+        ]
+      },
+      server: {
+        options: {
+          hostname: 'localhost',
+          port: 9000,
+          middleware: function(connect) {
+            return [proxySnippet];
+          }
+        },
+        proxies: [
+          {
+            // /alfresco/service/javawebscripts
+            // https://sheldon.jpl.nasa.gov/alfresco/wcs/javawebscripts/element/_17_0_2_3_407019f_1386871336920_707205_26285
+            context: '/alfresco',  // '/api'
+            host: 'sheldon.jpl.nasa.gov',
+            port: 443,
+            changeOrigin: true,
+            https: true,
+            //rewrite: {
+            //  '^/api': '/alfresco/service/javawebscripts'
+            //}
+          },
+          {
+            context: '/',
+            host: 'localhost',
+            port: 9001
+          }
+        ]
+      }
+    },
+
+    watch: {
+      files: ["vendor/**/*", 'app/**/*', 'src/**/*'],
+      tasks: ['default']
+    },
+
+    qunit: {
+      all: ['build/qtest/*.html']
+    },
+
+    clean: ["build", "dist", "docs"],
+
+    copy: {
+      main: {
+        files:[
+          //{src: ['pages/**/*.html'], dest: 'build/', expand: true, flatten:true},
+          {expand: true, src: 'mms.js', cwd: 'dist', dest: 'build/'},
+          //{src: ['vendor/**'], dest: 'build/'},
+          //{src: ['qtest/**'], dest: 'build/'},
+          {expand: true, src: '**', cwd: 'app', dest: 'build/'},
+        ]
+      }
+    },
+    // Post to staging on sheldon
+    // https://sheldon/alfresco/scripts/vieweditor2/index.html
+    rsync: {
+      deploy: {
+        files: 'build/',
+        options: {
+          host      : "sheldon",
+          //port      : "1023",
+          //user      : "menzies",
+          //preservePermissions : false,
+          additionalOptions : "--chmod=a=rwx,g=rw,o=rx",
+          remoteBase: "/opt/local/alfresco-4.2.c/tomcat/webapps/alfresco/scripts/vieweditor2" //"~/vieweditor2"
+        }
+      }
+    }
+  });
+
+  // Load the plugin that provides the "uglify" task.
+  grunt.loadNpmTasks('grunt-contrib-uglify');
+  grunt.loadNpmTasks('grunt-contrib-jshint');
+  grunt.loadNpmTasks('grunt-contrib-connect');
+  grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-contrib-nodeunit');
+  grunt.loadNpmTasks('grunt-contrib-qunit');
+  grunt.loadNpmTasks('grunt-contrib-copy');
+  grunt.loadNpmTasks('grunt-contrib-concat');
+  grunt.loadNpmTasks('grunt-contrib-clean');
+  grunt.loadNpmTasks('grunt-rsync-2');
+  grunt.loadNpmTasks('grunt-connect-proxy');
+  grunt.loadNpmTasks('grunt-stubby');
+  grunt.loadNpmTasks('grunt-ngdocs');
+  //grunt.loadNpmTasks('assemble');
+
+  // Default task(s).  Must function before server has been stareted
+  grunt.registerTask('default', ['jshint:beforeconcat', 'concat', 'jshint:afterconcat', 'uglify', 'copy']);
+  //grunt.registerTask('stage', ['default', 'qunit', 'rsync']);
+
+  grunt.registerTask('server', function(arg1) {
+    grunt.task.run('default', 'connect:static');
+
+    if (arguments.length !== 0 && arg1 ==="stub") {
+      grunt.log.writeln("Launching server with mock REST API");
+      //grunt.task.run('connect:restServer', 'configureProxies:mockServer', 'connect:mockServer');
+      grunt.task.run('stubby', 'configureProxies:mockServer', 'connect:mockServer');
+    } else {
+      grunt.log.writeln("Launching server with proxy API");
+      grunt.task.run('configureProxies:server', 'connect:server');
+    }
+    grunt.task.run('watch');
+  });
+
+  //grunt.registerTask('dance', 'Dance for a bit.', function() {
+  //  grunt.log.write('Dancing...').ok();
+  //});
+  
+};

@@ -1,0 +1,14 @@
+
+
+<form ng-submit="new()">
+  <h5>Name:</h5> <input class="form-control" type="text" ng-model="newConfigName"/>
+  <h5>Description:</h5> <textarea class="form-control" ng-model="newConfigDesc"></textarea>
+  <h5>Documents to snapshot (if none is chosen, they'll all be created)</h5>
+  <div ng-repeat="doc in products">
+      <input type="checkbox" ng-model="doc.add" ng-change="toggleCheck(doc.id)"/> {{doc.name}}
+    </div>
+    <hr/>
+  <div><input class="btn btn-primary btn-sm" type="submit" value="Create"/>
+    
+  </div>
+</form>
