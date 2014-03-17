@@ -17,6 +17,10 @@ function CommentService($q, $http, URLService, ElementService) {
 
     };
 
+    var updateComment = function(comment) {
+
+    };
+
     return {
         addComment: addComment,
         addComments: addComments,

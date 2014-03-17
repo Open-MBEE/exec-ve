@@ -15,7 +15,7 @@ The mms module sources are in src/. app/ contains an application that uses mms m
 * npm install - install all node modules needed to run tasks
 * grunt - default task - this will do jshint on all sources inside src/, concat them into dist/mms.js, run jshint on that, minify into dist/mms.min.js, and copy whats in app/ and dist/ into build/
 * grunt server - does the default, plus runs a webserver at localhost:9000 and a proxy server that proxies to sheldon for any path starting with /alfresco. This allows us to test with real service endpoint
-* grunt server:stub - does the same thing as grunt server except the proxy is to a local stub server, can mock alfresco service api with stubby configurations in rest/
+* grunt server:stub - does the same thing as grunt server except the proxy is to a local stub server, can mock alfresco service api with stubby configurations in mocks/
 * grunt clean - deletes dist and build folders
 
 ## Testing

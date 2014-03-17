@@ -1,3 +1,4 @@
 'use strict';
 
-angular.module('mms', ['ng']);
+angular.module('mms', ['ng'])
+.constant('_', window._);

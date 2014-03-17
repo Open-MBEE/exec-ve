@@ -41,20 +41,14 @@ function ViewService($q, $http, URLService, ElementService) {
 
     };
 
-    var updateView = function(element) {
-
-    };
-
-    var updateViews = function(elements) {
-
-    };
-
     var getDocument = function(id) {
 
     };
 
     return {
-        
+        getView: getView,
+        getViews: getViews,
+        getDocument: getDocument
     };
 
 }

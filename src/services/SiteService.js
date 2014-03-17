@@ -18,11 +18,15 @@ function SiteService($q, $http, URLService) {
 
     };
 
-    var getDocuments = function() {
+    var getDocuments = function(site) {
 
     };
 
-    var getProjects = function() {
+    var getProjects = function(site) {
+
+    };
+
+    var getTags = function(site) {
 
     };
     
