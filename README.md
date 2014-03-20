@@ -22,7 +22,7 @@ The mms module sources are in src/. app/ contains an application that uses mms m
 TBD - the angular-seed project contains test scripts using karma, jasmine and protractor - need to figure out how to run tests on our src
 
 ## Generating Docs
-* grunt ngdocs - this would generate html docs based on code comments written in ngdocs style into docs/. Something's wrong right now with the main page but the individual service pages seem to be generated correctly
+* grunt ngdocs - this would generate html docs based on code comments written in ngdocs style into docs/. The generated files need to be served through a webserver to work.
 
 ## Links
 * grunt-stubby - [https://github.com/h2non/grunt-stubby](https://github.com/h2non/grunt-stubby)

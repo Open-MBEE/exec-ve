@@ -27,12 +27,12 @@ function ElementService($q, $http, URLService) {
      * @description
      * Gets an element object by id. If the element object is already in the cache,
      * resolve the existing reference, if not, request it from the repository, add 
-     * it to the cache, and resolve the new object
+     * it to the cache, and resolve the new object.
      * 
-     * @param {string} id The id of the element to get
+     * @param {string} id The id of the element to get.
      * @returns {Promise} The promise will be resolved with the element object, 
      *      multiple calls to this method with the same id would result in 
-     *      references to the same object
+     *      references to the same object.
      */
     var getElement = function(id) {
         var deferred = $q.defer();
@@ -71,12 +71,12 @@ function ElementService($q, $http, URLService) {
      * @methodOf mms.ElementService
      * 
      * @description
-     * Same as getElement, but for multiple ids
+     * Same as getElement, but for multiple ids.
      * 
-     * @param {Array.<string>} ids The id sof the elements to get
+     * @param {Array.<string>} ids The ids of the elements to get.
      * @returns {Promise} The promise will be resolved with an array of element objects, 
      *      multiple calls to this method with the same ids would result in an array of 
-     *      references to the same objects
+     *      references to the same objects.
      */
     var getElements = function(ids) {
         var promises = [];
@@ -92,12 +92,12 @@ function ElementService($q, $http, URLService) {
      * @methodOf mms.ElementService
      * 
      * @description
-     * Gets elements referenced in a view
+     * Gets elements referenced in a view.
      * 
-     * @param {string} viewid The id of the view
+     * @param {string} viewid The id of the view.
      * @returns {Promise} The promise will be resolved with an array of element objects, 
      *      multiple calls to this method may return with different elements depending
-     *      on if the view has changed on the server
+     *      on if the view has changed on the server.
      */
     var getViewElements = function(viewid) {
         var deferred = $q.defer();
@@ -133,11 +133,12 @@ function ElementService($q, $http, URLService) {
      * @methodOf mms.ElementService
      * 
      * @description
-     * Save element to alfresco and update the cache if successful
+     * Save element to alfresco and update the cache if successful, the element object
+     * must have an id, and whatever property that needs to be updated.
      * 
-     * @param {Object} elem An object that contains element id and any property changes to be saved
-     * @returns {Promise} The promise will be resolved with the updated element reference if 
-     *      update is successful
+     * @param {Object} elem An object that contains element id and any property changes to be saved.
+     * @returns {Promise} The promise will be resolved with the updated cache element reference if 
+     *      update is successful.
      */
     var updateElement = function(elem) {
         var deferred = $q.defer();
@@ -166,11 +167,11 @@ function ElementService($q, $http, URLService) {
      * @methodOf mms.ElementService
      * 
      * @description
-     * Save elements to alfresco and update the cache if successful
+     * Save elements to alfresco and update the cache if successful.
      * 
-     * @param {Array.<Object>} elems Array of element objects that contains element id and any property changes to be saved
+     * @param {Array.<Object>} elems Array of element objects that contains element id and any property changes to be saved.
      * @returns {Promise} The promise will be resolved with an array of updated element references if 
-     *      update is successful
+     *      update is successful.
      */
     var updateElements = function(elems) {
         var promises = [];
@@ -189,11 +190,11 @@ function ElementService($q, $http, URLService) {
      * Adds element objects to the element cache if it doesn't exist (by id), if
      * it's already in cache, ignore. This will not update alfresco. This is to allow
      * other services that receive element objects (like search) to make sure any
-     * new objects are added to the store
+     * new objects are added to the store.
      * 
-     * @param {Array.<Object>} ids Element objects
+     * @param {Array.<Object>} ids Element objects.
      * @returns {Array.<Object>} Array of store references to element objects that
-     * were merged
+     * were merged.
      */
     var mergeElements = function(elems) {
         var result = [];
