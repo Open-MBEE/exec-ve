@@ -8,7 +8,12 @@
 
   <!-- Bootstrap -->
   <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.0.3/css/font-awesome.min.css">
+  <!-- Froala -->
+  <link href="lib/froala/css/froala_editor.min.css" rel="stylesheet" type="text/css">
 
+  <link rel="stylesheet" href="css/froala-styles.css">
 
   <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
   <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -19,15 +24,20 @@
 </head>
 <body>
 
-  <div class="container">
-    <p class="demotext">
-      Some kind of editable text.
-    </p>
-  </div>
+  <p class="demotext">
+    Some kind of editable text.
+  </p>
 
   <!-- jQuery -->
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
   <!-- Bootstrap -->
   <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+  <!-- Froala -->
+  <script src="lib/froala/js/froala_editor.min.js"></script>
+  <script>
+    $(function() {
+        $('.demotext').editable();
+    });
+  </script>
 </body>
 </html>
