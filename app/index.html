@@ -6,21 +6,27 @@
   <title>Test MMS Module App</title>
 
 </head>
-<body>
+<body ng-init="elements = ['_17_0_2_3_407019f_1386871384972_702931_26371', '_17_0_2_3_407019f_1390507392384_798171_29256']">
   
-<div ng-controller="OneCtrl">
-  {{element.id}} <br/>
-  {{element.name}}
-
-<button ng-click="change()"> Change 1</button>
+<div ng-repeat="elementid in elements" ng-controller="ElementCtrl">
+  ID: {{element.id}} <br/>
+  Name: {{element.name}} <br/>
+  Doc: {{element.documentation}}<br/>
+  <button ng-click="changeElement()">Change Element</button>
+<br/><br/>
+<div>Transclusion showing name</div>
+    <mms-transclude id="{{element.id}}" property="name"></mms-transclude><br/><br/>
+    <div>Transclusion showing doc</div>
+    <mms-transclude id="{{element.id}}" property="documentation"></mms-transclude>
+<br/><br/>
+    <div>Spec editing</div>
+<mms-spec id="{{element.id}}"></mms-spec>
+<br/><br/><br/><br/>
 </div>
 
-<div ng-controller="TwoCtrl">
-  {{element.id}} <br/>
-  {{element.name}}
 
-<button ng-click="change()"> Change 2</button>
-</div>
+
+
 <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.14/angular.min.js"></script> 
 
 <!-- <script src="lib/angular/angular.js"></script> -->

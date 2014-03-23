@@ -172,7 +172,10 @@ function ElementService($q, $http, URLService) {
     var updateElement = function(elem) {
         var deferred = $q.defer();
         if (elements.hasOwnProperty(elem.id)) {
-            elements[elem.id].name = elem.name;
+            if (elem.hasOwnProperty('name'))
+                elements[elem.id].name = elem.name;
+            if (elem.hasOwnProperty('documentation'))
+                elements[elem.id].documentation = elem.documentation;
             deferred.resolve(elements[elem.id]);
             //alfresco service not implemented yet
             /*$http.post(URLService.getPostElementsURL(), {'elements': [elem]})
