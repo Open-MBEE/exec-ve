@@ -15,6 +15,34 @@ angular.module('mms')
  * This maintains a single source of truth for applications that use this service. Do not
  * directly modify the attributes of elements returned from this service but use the update
  * methods instead. Consider forking and edited element cache support in future.
+ *
+ * Current element object:
+ * ```
+ *      {
+ *          "id": element id as string,
+ *          "type": "Package" | "Property" | "Element" | "Dependency" | "Generalization" |
+ *                  "DirectedRelationship" | "Conform" | "Expose" | "Viewpoint",
+ *          "name": element name, empty string if no name,
+ *          "documentation": element documentation as string, can contain html,
+ *          "owner": owner element's id or null,
+ *
+ *          //if type is "Property"
+ *          "propertyType": element id or null,
+ *          "isDerived": true | false,
+ *          "isSlot": true | false,
+ *          "value": [string|boolean|number|elementIds], //based on valueType,
+ *          "valueType": "LiteralBoolean" | "LiteralInteger" | "LiteralString" | 
+ *                  "LiteralReal" | "ElementValue" | "Expression",
+ *          
+ *          //if type is DirectedRelationship or Generalization or Dependency
+ *          "source": source element id,
+ *          "target": target element id,
+ *
+ *          //if type is Comment
+ *          "body": comment body, can contain html,
+ *          "annotatedElements": [elementIds]
+ *      }
+ * ```
  */
 function ElementService($q, $http, URLService) {
     var elements = {};
@@ -39,7 +67,7 @@ function ElementService($q, $http, URLService) {
         if (elements.hasOwnProperty(id))
             deferred.resolve(elements[id]);
         else {
-            $http.get(URLService.getRoot() + '/elements/' + id)
+            $http.get(URLService.getElementURL(id))
             .success(function(data, status, headers, config) {
                 if (data.elements.length > 0) {
                     if (elements.hasOwnProperty(id))
@@ -97,11 +125,12 @@ function ElementService($q, $http, URLService) {
      * @param {string} viewid The id of the view.
      * @returns {Promise} The promise will be resolved with an array of element objects, 
      *      multiple calls to this method may return with different elements depending
-     *      on if the view has changed on the server.
+     *      on if the view has changed on the server. (consider removing this and only
+     *      use the ones in ViewService instead)
      */
     var getViewElements = function(viewid) {
         var deferred = $q.defer();
-        $http.get(URLService.getRoot() + '/views/' + viewid + '/elements')
+        $http.get(URLService.getViewURL(viewid) + '/elements')
         .success(function(data, status, headers, config) {
             var result = [];
             data.elements.forEach(function(element) {
@@ -146,7 +175,7 @@ function ElementService($q, $http, URLService) {
             elements[elem.id].name = elem.name;
             deferred.resolve(elements[elem.id]);
             //alfresco service not implemented yet
-            /*$http.post(URLService.getRoot() + '/elements', {'elements': [elem]})
+            /*$http.post(URLService.getPostElementsURL(), {'elements': [elem]})
             .success(function(data, status, headers, config) {
                 //todo: update all things in elem
                 elements[elem.id].name = elem.name;
@@ -190,7 +219,7 @@ function ElementService($q, $http, URLService) {
      * Adds element objects to the element cache if it doesn't exist (by id), if
      * it's already in cache, ignore. This will not update alfresco. This is to allow
      * other services that receive element objects (like search) to make sure any
-     * new objects are added to the store.
+     * new objects are added to the store. (maybe search should be in this service instead)
      * 
      * @param {Array.<Object>} ids Element objects.
      * @returns {Array.<Object>} Array of store references to element objects that

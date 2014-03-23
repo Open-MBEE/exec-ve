@@ -82,6 +82,13 @@ module.exports = function(grunt) {
           base: './build',
         }
       },
+      docs: {
+        options: {
+          hostname: 'localhost',
+          port: 10000,
+          base: './docs',
+        }
+      },
       //restServer: {
       //  options: {
       //      hostname: 'localhost',
@@ -201,7 +208,7 @@ module.exports = function(grunt) {
   //grunt.loadNpmTasks('assemble');
 
   // Default task(s).  Must function before server has been stareted
-  grunt.registerTask('default', ['jshint:beforeconcat', 'concat', 'jshint:afterconcat', 'uglify', 'copy']);
+  grunt.registerTask('default', ['jshint:beforeconcat', 'concat', 'jshint:afterconcat', 'uglify', 'copy', 'ngdocs']);
   //grunt.registerTask('stage', ['default', 'qunit', 'rsync']);
 
   grunt.registerTask('server', function(arg1) {
@@ -215,6 +222,12 @@ module.exports = function(grunt) {
       grunt.log.writeln("Launching server with proxy API");
       grunt.task.run('configureProxies:server', 'connect:server');
     }
+    grunt.task.run('watch');
+  });
+
+  grunt.registerTask('docServer', function() {
+    grunt.task.run('ngdocs');
+    grunt.task.run('connect:docs');
     grunt.task.run('watch');
   });
 

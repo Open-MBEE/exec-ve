@@ -15,6 +15,15 @@ angular.module('mms')
  * @description
  * This is a utility service for getting alfresco site information, such as 
  * list of all sites, their categories, documents, projects, tags, etc.
+ *
+ * Current site object:
+ * ```
+ *      {
+ *          "name": site name (like id),
+ *          "title": user friendly name,
+ *          "categories": [string]  
+ *      }
+ * ```
  */
 function SiteService($q, $http, URLService, ViewService, ProjectService) {
     var currentSite = 'europa';
@@ -58,6 +67,7 @@ function SiteService($q, $http, URLService, ViewService, ProjectService) {
      * 
      * @description
      * Gets site information - name, title, categories
+     *
      * @param {string} site The name of site to get.
      * @returns {Promise} Resolves to the site info object.
      */
@@ -103,10 +113,6 @@ function SiteService($q, $http, URLService, ViewService, ProjectService) {
      * @returns {Promise} Resolves into array of project objects.
      */
     var getSiteProjects = function(site) {
-
-    };
-
-    var getTags = function(site) {
 
     };
     
