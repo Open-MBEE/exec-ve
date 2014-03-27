@@ -167,6 +167,42 @@ function ViewService($q, $http, URLService, ElementService, CommentService) {
 
     /**
      * @ngdoc method
+     * @name mms.ViewService#updateView
+     * @methodOf mms.ViewService
+     * 
+     * @description
+     * Save view to alfresco and update the cache if successful, the view object
+     * must have an id, and some updated properties. Use this to update view structure
+     * or view to element reference caches.
+     * 
+     * @param {Object} view An object that contains view id and any changes to be saved.
+     * @returns {Promise} The promise will be resolved with the updated cache view reference if 
+     *      update is successful.
+     */
+    var updateView = function(view) {
+
+    };
+
+    /**
+     * @ngdoc method
+     * @name mms.ViewService#updateDocument
+     * @methodOf mms.ViewService
+     * 
+     * @description
+     * Save document to alfresco and update the cache if successful, the document object
+     * must have an id, and some updated properties. Use this to update a document's
+     * view hierarchy or nosections
+     * 
+     * @param {Object} document An object that contains doc id and any changes to be saved.
+     * @returns {Promise} The promise will be resolved with the updated cache doc reference if 
+     *      update is successful.
+     */
+    var updateDocument = function(document) {
+
+    };
+
+    /**
+     * @ngdoc method
      * @name mms.ViewService#getViewDisplayedElements
      * @methodOf mms.ViewService
      * 
@@ -238,10 +274,42 @@ function ViewService($q, $http, URLService, ElementService, CommentService) {
      * Add a comment to a view
      * 
      * @param {string} id The id of the view.
-     * @param {string} comment The comment to add
+     * @param {string} comment The comment to add, can contain html
      * @returns {Promise} The promise will be resolved the new comment object. 
      */
     var addViewComment = function(id, comment) {
+
+    };
+
+    /**
+     * @ngdoc method
+     * @name mms.ViewService#deleteViewComment
+     * @methodOf mms.ViewService
+     * 
+     * @description
+     * Add a comment to a view
+     * 
+     * @param {string} id The id of the view.
+     * @param {string} commentId The id of comment to delete
+     * @returns {Promise} The promise will be resolved true. 
+     */
+    var deleteViewComment = function(id, commentId) {
+
+    };
+
+    /**
+     * @ngdoc method
+     * @name mms.ViewService#updateViewElements
+     * @methodOf mms.ViewService
+     * 
+     * @description
+     * Do a bulk save of all edited elements in a view to server, this does not save any
+     * view structure changes
+     * 
+     * @param {string} id The id of the view.
+     * @returns {Promise} The promise will be resolved with saved element objects. 
+     */
+    var updateViewElements = function(id) {
 
     };
 
@@ -249,10 +317,14 @@ function ViewService($q, $http, URLService, ElementService, CommentService) {
         getView: getView,
         getViews: getViews,
         getDocument: getDocument,
+        updateView: updateView,
+        updateDocument: updateDocument,
         getViewDisplayedElements: getViewDisplayedElements,
         getViewAllowedElements: getViewAllowedElements,
         getViewComments: getViewComments,
-        addViewComment: addViewComment
+        addViewComment: addViewComment,
+        deleteViewComment: deleteViewComment,
+        updateViewElements: updateViewElements
     };
 
 }

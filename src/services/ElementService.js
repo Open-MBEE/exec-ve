@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms')
-.factory('ElementService', ['$q', '$http', 'URLService', ElementService]);
+.factory('ElementService', ['$q', '$http', 'URLService', '_', ElementService]);
 
 /**
  * @ngdoc service
@@ -14,7 +14,8 @@ angular.module('mms')
  * An element cache and CRUD service. Maintains a cache of element id to element objects.
  * This maintains a single source of truth for applications that use this service. Do not
  * directly modify the attributes of elements returned from this service but use the update
- * methods instead. Consider forking and edited element cache support in future.
+ * methods instead. Consider forking and edited element cache support in future, and saving
+ * to html5 local storage for edited things incase of crashes.
  *
  * Current element object:
  * ```
@@ -44,9 +45,9 @@ angular.module('mms')
  *      }
  * ```
  */
-function ElementService($q, $http, URLService) {
+function ElementService($q, $http, URLService, _) {
     var elements = {};
-
+    var edits = {};
     /**
      * @ngdoc method
      * @name mms.ElementService#getElement
@@ -58,11 +59,14 @@ function ElementService($q, $http, URLService) {
      * it to the cache, and resolve the new object.
      * 
      * @param {string} id The id of the element to get.
+     * @param {boolean} [updateFromServer=false] (optional) whether to always get the latest 
+     *      from server, even if it's already in cache (this will update everywhere
+     *      it's displayed, except for the editables)
      * @returns {Promise} The promise will be resolved with the element object, 
      *      multiple calls to this method with the same id would result in 
      *      references to the same object.
      */
-    var getElement = function(id) {
+    var getElement = function(id, updateFromServer) {
         var deferred = $q.defer();
         if (elements.hasOwnProperty(id))
             deferred.resolve(elements[id]);
@@ -102,16 +106,85 @@ function ElementService($q, $http, URLService) {
      * Same as getElement, but for multiple ids.
      * 
      * @param {Array.<string>} ids The ids of the elements to get.
+     * @param {boolean} [updateFromServer=false] (optional) whether to always get latest from server.
      * @returns {Promise} The promise will be resolved with an array of element objects, 
      *      multiple calls to this method with the same ids would result in an array of 
      *      references to the same objects.
      */
-    var getElements = function(ids) {
+    var getElements = function(ids, updateFromServer) {
         var promises = [];
         ids.forEach(function(id) {
-            promises.push(getElement(id));
+            promises.push(getElement(id, updateFromServer));
         });
         return $q.all(promises);
+    };
+
+    /**
+     * @ngdoc method
+     * @name mms.ElementService#getElementForEdit
+     * @methodOf mms.ElementService
+     * 
+     * @description
+     * Gets an element object to edit by id. 
+     * 
+     * @param {string} id The id of the element to get.
+     * @returns {Promise} The promise will be resolved with the element object, 
+     *      multiple calls to this method with the same id would result in 
+     *      references to the same object. This object can be edited without
+     *      affecting the same element object that's used for displays
+     */
+    var getElementForEdit = function(id) {
+        var deferred = $q.defer();
+        if (edits.hasOwnProperty(id))
+            deferred.resolve(edits[id]);
+        else {
+            getElement(id).then(function(data){
+                if (edits.hasOwnProperty(id))
+                    deferred.resolve(edits[id]);
+                else {
+                    var edit = _.cloneDeep(data);
+                    edits[id] = edit;
+                    deferred.resolve(edit);
+                }
+            });
+        }
+        return deferred.promise;
+    };
+
+    /**
+     * @ngdoc method
+     * @name mms.ElementService#getElementsForEdit
+     * @methodOf mms.ElementService
+     * 
+     * @description
+     * Gets element objects to edit by ids. 
+     * 
+     * @param {Array.<string>} ids The ids of the elements to get for edit.
+     * @returns {Promise} The promise will be resolved with an array of editable
+     * element objects that won't affect the corresponding displays
+     */
+    var getElementsForEdit = function(ids) {
+        var promises = [];
+        ids.forEach(function(id) {
+            promises.push(getElementForEdit(id));
+        });
+        return $q.all(promises);
+    };
+
+    /**
+     * @ngdoc method
+     * @name mms.ElementService#getOwnedElements
+     * @methodOf mms.ElementService
+     * 
+     * @description
+     * Gets element's owned element objects. 
+     * 
+     * @param {string} id The id of the elements to get owned elements for
+     * @returns {Promise} The promise will be resolved with an array of 
+     * element objects 
+     */
+    var getOwnedElements = function(id) {
+        
     };
 
     /**
@@ -120,7 +193,8 @@ function ElementService($q, $http, URLService) {
      * @methodOf mms.ElementService
      * 
      * @description
-     * Gets elements referenced in a view.
+     * Gets elements referenced in a view (this can be removed in preference of 
+     * getElements, since the view has the ids already).
      * 
      * @param {string} viewid The id of the view.
      * @returns {Promise} The promise will be resolved with an array of element objects, 
@@ -212,38 +286,44 @@ function ElementService($q, $http, URLService) {
 
     /**
      * @ngdoc method
-     * @name mms.ElementService#mergeElements
+     * @name mms.ElementService#isDirty
      * @methodOf mms.ElementService
      * 
      * @description
-     * Adds element objects to the element cache if it doesn't exist (by id), if
-     * it's already in cache, ignore. This will not update alfresco. This is to allow
-     * other services that receive element objects (like search) to make sure any
-     * new objects are added to the store. (maybe search should be in this service instead)
+     * Check if element has been edited and not saved to server
      * 
-     * @param {Array.<Object>} ids Element objects.
-     * @returns {Array.<Object>} Array of store references to element objects that
-     * were merged.
+     * @param {string|Array.<string>} id Element id or Array of ids
+     * @returns {boolean} Whether element(s) are dirty
      */
-    var mergeElements = function(elems) {
-        var result = [];
-        elems.forEach(function(elem) {
-            if (elements.hasOwnProperty(elem.id)) {
-                result.push(elements[elem.id]); //should this update the store with new property if different?
-            } else {
-                elements[elem.id] = elem;
-                result.push(elements[elem.id]);
-            }
-        });
-        return result; //change to promise?
+    var isDirty = function(id) {
+
+    };
+
+    /**
+     * @ngdoc method
+     * @name mms.ElementService#search
+     * @methodOf mms.ElementService
+     * 
+     * @description
+     * Search for elements based on some query
+     * 
+     * @param {string} query A query string (TBD)
+     * @returns {Promise} The promise will be resolved with an array of element objects
+     */
+    var search = function(query) {
+
     };
 
     return {
         getElement: getElement,
         getElements: getElements,
+        getElementForEdit: getElementForEdit,
+        getElementsForEdit: getElementsForEdit,
         getViewElements: getViewElements,
+        getOwnedElements: getOwnedElements,
         updateElement: updateElement,
         updateElements: updateElements,
-        mergeElements: mergeElements
+        isDirty: isDirty,
+        search: search
     };
 }
