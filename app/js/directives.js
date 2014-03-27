@@ -9,12 +9,32 @@ angular.module('myApp.directives', []).
     };
   }]);
 
+/**
+ * Creates the "froala" attribute that makes an HTML element editable with
+ * Froala.
+ */
 angular.module('Froala')
   .directive('froala', function() {
     return {
       restrict: 'A',
       link: function(scope, element, attrs) {
-        $(element).editable();
+        jQuery(element).editable({
+          buttons: ['undo', 'redo', 'sep', 'transclude'],
+
+          // Define custom buttons.
+          customButtons: {
+            transclude: {
+              title: 'Transclude',
+              icon: {
+                type: 'txt',
+                value: 't'
+              },
+              callback: function (editor) {
+                alert('Transclusion occurs')
+              }
+            }
+          }
+        });
       }
     };
   });
