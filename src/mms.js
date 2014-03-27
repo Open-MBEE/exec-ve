@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms', [])
-.config(function($sceProvider) {
+.config(['$sceProvider', function($sceProvider) {
     $sceProvider.enabled(false);
-})
+}])
 .constant('_', window._);

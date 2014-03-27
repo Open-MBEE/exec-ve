@@ -15,12 +15,12 @@ angular.module('mms')
  * Comment and discussion CRUD service for attaching comments to elements.
  * For now all view comments are model elements, but there's no reason why
  * they have to be. Comments and discussion threads should be able to be attached
- * to anything in alfresco.
+ * to anything in alfresco and use alfresco's comments.
  *
  * Current comment object:
  * ```
  *      {
- *          "id": comment id (also element id),
+ *          "id": comment id,
  *          "body": body of comment, can contain html,
  *          "author": username,
  *          "modified": ISO8601 formatted datetime
@@ -35,10 +35,10 @@ function CommentService($q, $http, URLService, ElementService) {
      * @methodOf mms.CommentService
      * 
      * @description
-     * Adds a new comment to an element
+     * Adds a new comment to an object
      * 
-     * @param {string} id The id of the element.
-     * @param {string} comment The comment
+     * @param {string} id The id of the object (element or alfresco).
+     * @param {string} comment The comment, can contain html
      * @returns {Promise} The promise will be resolved with the new comment object
      */
     var addComment = function(id, comment) {
@@ -51,9 +51,9 @@ function CommentService($q, $http, URLService, ElementService) {
      * @methodOf mms.CommentService
      * 
      * @description
-     * Gets the comments for an element, in reverse chronological time
+     * Gets the comments for an object, in reverse chronological time
      * 
-     * @param {string} id The id of the element.
+     * @param {string} id The id of the object.
      * @returns {Promise} The promise will be resolved with an array of comment
      *      objects
      */
