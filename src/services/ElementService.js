@@ -48,6 +48,7 @@ angular.module('mms')
 function ElementService($q, $http, URLService, _) {
     var elements = {};
     var edits = {};
+
     /**
      * @ngdoc method
      * @name mms.ElementService#getElement
@@ -251,14 +252,13 @@ function ElementService($q, $http, URLService, _) {
             //alfresco service not implemented yet
             /*$http.post(URLService.getPostElementsURL(), {'elements': [elem]})
             .success(function(data, status, headers, config) {
-                //todo: update all things in elem
-                elements[elem.id].name = elem.name;
+                //make some merging util function
+                var element = elements[elem.id];
+
                 deferred.resolve(elements[elem.id]);
             }).error(function(data, status, headers, config) {
                 deferred.reject('Error');
             });*/
-            //elements[elem.id].name = elem.name;
-            //deferred.resolve(elements[elem.id]);
         } else
             deferred.reject("Not in Cache");
         return deferred.promise;
@@ -292,11 +292,15 @@ function ElementService($q, $http, URLService, _) {
      * @description
      * Check if element has been edited and not saved to server
      * 
-     * @param {string|Array.<string>} id Element id or Array of ids
-     * @returns {boolean} Whether element(s) are dirty
+     * @param {string} id Element id
+     * @returns {boolean} Whether element is dirty
      */
     var isDirty = function(id) {
-
+        if (!edits.hasOwnProperty(id))
+            return false;
+        if (_.isEqual(elements[id], edits[id]))
+            return false;
+        return true;
     };
 
     /**

@@ -24,7 +24,9 @@ module.exports = function(grunt) {
 
     uglify: {
       options: {
-        banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd HH:MM:ss") %> */\n'
+        banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd HH:MM:ss") %> */\n',
+        mangle: true,
+        wrap: 'mms'
       },
       build: {
         src: 'dist/mms.js',
@@ -167,7 +169,7 @@ module.exports = function(grunt) {
       main: {
         files:[
           //{src: ['pages/**/*.html'], dest: 'build/', expand: true, flatten:true},
-          {expand: true, src: 'mms.js', cwd: 'dist', dest: 'build/'},
+          {expand: true, src: '**', cwd: 'dist', dest: 'build/'},
           //{src: ['vendor/**'], dest: 'build/'},
           //{src: ['qtest/**'], dest: 'build/'},
           {expand: true, src: '**', cwd: 'app', dest: 'build/'},
