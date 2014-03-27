@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" ng-app="Froala">
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -10,8 +10,7 @@
   <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
   <!-- Font Awesome -->
   <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.0.3/css/font-awesome.min.css">
-  <!-- Froala -->
-  <!-- TODO minify before deploying -->
+  <!-- Froala - TODO minify before deploying -->
   <link href="lib/froala/css/froala_editor.css" rel="stylesheet" type="text/css">
   <link rel="stylesheet" href="css/froala-styles.css">
 
@@ -24,21 +23,25 @@
 </head>
 <body>
 
-  <p class="demotext">
+<div ng-controller="FroalaCtrl">
+  <p class="demotext" froala>
     Some kind of editable text.
   </p>
+</div>
 
   <!-- jQuery -->
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
   <!-- Bootstrap -->
   <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
-  <!-- Froala -->
-  <!-- TODO minify before deploying -->
+  <!-- Angular -->
+  <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.14/angular.min.js"></script> 
+  <script src="lib/angular-ui-router.js"></script>
+  <script src="lib/lodash.js"></script>
+  <!-- Froala - TODO minify before deploying -->
   <script src="lib/froala/js/froala_editor.js"></script>
-  <script>
-    $(function() {
-        $('.demotext').editable();
-    });
-  </script>
-</body>
+  <!-- MMS -->
+  <script src="mms.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/directives.js"></script>
+  </body>
 </html>

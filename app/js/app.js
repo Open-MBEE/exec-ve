@@ -1,6 +1,5 @@
 'use strict';
 
-
 // Declare app level module which depends on filters, and services
 angular.module('myApp', ['ui.router', 'mms'])
   
@@ -24,4 +23,11 @@ angular.module('myApp', ['ui.router', 'mms'])
             //$scope.$apply();
         });
     };
+  }]);
+
+// Declare module for Froala
+angular.module('Froala', ['ui.router', 'mms'])
+  .controller('FroalaCtrl', ['$scope', 'ElementService', function($scope, ElementService) {
+    ElementService.getElement('_17_0_2_3_407019f_1386871384972_702931_26371').then(function(data) {
+    });
   }]);
