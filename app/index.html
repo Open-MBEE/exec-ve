@@ -15,9 +15,9 @@
   <button ng-click="changeElement()">Change Element</button>
 <br/><br/>
 <div>Transclusion showing name</div>
-    <mms-transclude eid="{{element.id}}" property="name"></mms-transclude><br/><br/>
+    <mms-transclude-name eid="{{element.id}}"></mms-transclude-name><br/><br/>
     <div>Transclusion showing doc</div>
-    <mms-transclude eid="{{element.id}}" property="documentation"></mms-transclude>
+    <mms-transclude-doc eid="{{element.id}}"></mms-transclude-doc>
 <br/><br/>
     <div>Spec editing</div>
 <mms-spec eid="{{element.id}}"></mms-spec>
