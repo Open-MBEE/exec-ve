@@ -20,7 +20,21 @@ angular.module('myApp', ['ui.router', 'mms'])
 angular.module('Froala', ['ui.router', 'mms'])
   .controller('FroalaCtrl', ['$scope', 'ElementService', function($scope, ElementService) {
     $scope.insertElement = function() {
-        ElementService.getElement(document.getElementById("element-id-input").value).then(function(data) {
+        var p = ElementService.getElement(document.getElementById("element-id-input").value);
+
+        // if success, insert the text then unwrap the content from the span tag
+        p.then(function(data) {
+            jQuery('#marker-true').text('<mms-transclude-name eid="' + data.id + '"></mms-transclude-name>');
+            jQuery('#marker-true').contents().unwrap();
         });
+
+        // if error, clean up all markers
+        p.catch(function(data) {
+            jQuery('span[id*=marker-true').remove();
+        });
+    };
+
+    $scope.cleanUp = function() {
+        jQuery('span[id*=marker-true').remove();
     };
   }]);

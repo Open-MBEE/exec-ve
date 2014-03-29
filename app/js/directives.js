@@ -32,7 +32,9 @@ angular.module('Froala')
                 type: 'txt',
                 value: 't'
               },
-              callback: function (editor) {
+              callback: function(editor) {
+                editor.placeMarker(editor.getRange(), true);
+                editor.hide();
                 jQuery('#menu').modal('show');
               }
             }
