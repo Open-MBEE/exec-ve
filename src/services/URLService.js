@@ -55,6 +55,17 @@ function URLService($q, $http, $location) {
 
     };
 
+    /**
+     * @ngdoc method
+     * @name mms.URLService#getImageURL
+     * @methodOf mms.URLService
+     * 
+     * @description
+     * Gets the path for querying the latest image url
+     * 
+     * @param {string} id The id of the image
+     * @returns {string} The path for image url queries.
+     */
     var getImageURL = function(id) {
 
     };
@@ -74,14 +85,6 @@ function URLService($q, $http, $location) {
         return "/share/page/site/" + site + "/dashboard";
     };
 
-    var getSiteDocWebURL = function(site) {
-
-    };
-
-    var getSiteViewEditorURL = function(site) {
-
-    };
-
     /**
      * @ngdoc method
      * @name mms.URLService#getElementURL
@@ -94,7 +97,7 @@ function URLService($q, $http, $location) {
      * @returns {string} The element json path.
      */
     var getElementURL = function(id) {
-        return root + "/elements/" + id;
+        return root + "/javawebscripts/elements/" + id;
     };
 
     /**
@@ -108,7 +111,7 @@ function URLService($q, $http, $location) {
      * @returns {string} The post elements path.
      */
     var getPostElementsURL = function() {
-        return root + "/elements";
+        return root + "/javawebscripts/elements";
     };
 
     /**
@@ -123,7 +126,22 @@ function URLService($q, $http, $location) {
      * @returns {string} The view json path.
      */
     var getViewURL = function(id) {
-        return root + "/views/" + id;
+        return root + "/javawebscripts/views/" + id;
+    };
+
+    /**
+     * @ngdoc method
+     * @name mms.URLService#getDocumentURL
+     * @methodOf mms.URLService
+     * 
+     * @description
+     * Gets the path for a document object json
+     * 
+     * @param {string} id The document id.
+     * @returns {string} The document json path.
+     */
+    var getDocumentURL = function(id) {
+        return root + "/javawebscripts/products/" + id;
     };
 
     return {
@@ -132,7 +150,8 @@ function URLService($q, $http, $location) {
         getSiteDashboardURL: getSiteDashboardURL,
         getElementURL: getElementURL,
         getPostElementsURL: getPostElementsURL,
-        getViewURL: getViewURL
+        getViewURL: getViewURL,
+        getDocumentURL: getDocumentURL
     };
 
 }

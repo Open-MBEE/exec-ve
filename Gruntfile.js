@@ -24,7 +24,9 @@ module.exports = function(grunt) {
 
     uglify: {
       options: {
-        banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd HH:MM:ss") %> */\n'
+        banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd HH:MM:ss") %> */\n',
+        mangle: true,
+        wrap: 'mms'
       },
       build: {
         src: 'dist/mms.js',
@@ -80,6 +82,13 @@ module.exports = function(grunt) {
           hostname: 'localhost',
           port: 9001,
           base: './build',
+        }
+      },
+      docs: {
+        options: {
+          hostname: 'localhost',
+          port: 10000,
+          base: './docs',
         }
       },
       //restServer: {
@@ -160,7 +169,7 @@ module.exports = function(grunt) {
       main: {
         files:[
           //{src: ['pages/**/*.html'], dest: 'build/', expand: true, flatten:true},
-          {expand: true, src: 'mms.js', cwd: 'dist', dest: 'build/'},
+          {expand: true, src: '**', cwd: 'dist', dest: 'build/'},
           //{src: ['vendor/**'], dest: 'build/'},
           //{src: ['qtest/**'], dest: 'build/'},
           {expand: true, src: '**', cwd: 'app', dest: 'build/'},
@@ -201,7 +210,7 @@ module.exports = function(grunt) {
   //grunt.loadNpmTasks('assemble');
 
   // Default task(s).  Must function before server has been stareted
-  grunt.registerTask('default', ['jshint:beforeconcat', 'concat', 'jshint:afterconcat', 'uglify', 'copy']);
+  grunt.registerTask('default', ['jshint:beforeconcat', 'concat', 'jshint:afterconcat', 'uglify', 'copy', 'ngdocs']);
   //grunt.registerTask('stage', ['default', 'qunit', 'rsync']);
 
   grunt.registerTask('server', function(arg1) {
@@ -215,6 +224,12 @@ module.exports = function(grunt) {
       grunt.log.writeln("Launching server with proxy API");
       grunt.task.run('configureProxies:server', 'connect:server');
     }
+    grunt.task.run('watch');
+  });
+
+  grunt.registerTask('docServer', function() {
+    grunt.task.run('ngdocs');
+    grunt.task.run('connect:docs');
     grunt.task.run('watch');
   });
 

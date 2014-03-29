@@ -23,6 +23,7 @@ TBD - the angular-seed project contains test scripts using karma, jasmine and pr
 
 ## Generating Docs
 * grunt ngdocs - this would generate html docs based on code comments written in ngdocs style into docs/. The generated files need to be served through a webserver to work.
+* grunt docServer - this would generate the docs and run the server at localhost:10000
 
 ## Links
 * grunt-stubby - [https://github.com/h2non/grunt-stubby](https://github.com/h2non/grunt-stubby)

@@ -16,12 +16,72 @@ angular.module('mms')
  * A view and document cache and CRUD service. Maintains a cache of view/document 
  * id to view objects. These objects include view hierarchies, the display structure,
  * and keeps track of what elements are referenced in each view. 
+ *
+ * Current View object:
+ * ```
+ *      {
+ *          "id": view id (element id),
+ *          "childrenViews": [viewIds],     //canonical hierarchy
+ *          "displayedElements": [elementIds],
+ *          "allowedElements": [elementIds],
+ *          "contains": [
+ *              {
+ *                  "type": "Paragraph" | "Table" | "List",
+ *                  
+ *                  //if type is Paragraph//
+ *                  "sourceType": "reference" | "text",
+ *                  //if sourceType is reference
+ *                  "source": element id,
+ *                  "sourceProperty": "documentation" | "name" | "value"
+ *                  //if sourceType is text
+ *                  "text": text string can have html
+ *
+ *                  //if type is Table//
+ *                  "title": title of table as string,
+ *                  "body": [               //array of rows
+ *                       [{                 //array of cells
+ *                          "content": [    //each cell can have multiple items
+ *                              {"type": "Paragraph" | "Table" | "List" ...}
+ *                          ],
+ *                          "colspan": integer,
+ *                          "rolspan": integer
+ *                       }]
+ *                  ],
+ *                  "header": same as body,
+ *
+ *                  //if type is List//
+ *                  "list": [               //array of list items
+ *                      [{                  //each list item can have multiple things
+ *                          "type": "Paragraph" | "Table" | "List" ...
+ *                      }]
+ *                  ],
+ *                  "ordered": true | false
+ *              }
+ *          ]
+ *      }
+ * ```
+ *
+ * Current Document object:
+ * ```
+ *      {
+ *          "id": document id (element and view id),
+ *          "noSections": [viewIds],
+ *          "view2view": [
+ *              {
+ *                  "id": document or view id,
+ *                  "childrenViews": [viewIds]
+ *              }
+ *          ]
+ *      }
+ * ```
  */
 function ViewService($q, $http, URLService, ElementService, CommentService) {
     var views = {};
     var allowedElements = {};
     var displayedElements = {};
-    var transcludedElements = {}; //view id to element objects from ElementService
+    var transcludedElements = {}; 
+    var comments = {};
+    var documents = {};
 
     /**
      * @ngdoc method
@@ -43,7 +103,7 @@ function ViewService($q, $http, URLService, ElementService, CommentService) {
         if (views.hasOwnProperty(id))
             deferred.resolve(views[id]);
         else {
-            $http.get(URLService.getRoot() + '/views/' + id)
+            $http.get(URLService.getViewURL(id))
             .success(function(data, status, headers, config) {
                 if (data.views.length > 0) {
                     if (views.hasOwnProperty(id))
@@ -107,6 +167,42 @@ function ViewService($q, $http, URLService, ElementService, CommentService) {
 
     /**
      * @ngdoc method
+     * @name mms.ViewService#updateView
+     * @methodOf mms.ViewService
+     * 
+     * @description
+     * Save view to alfresco and update the cache if successful, the view object
+     * must have an id, and some updated properties. Use this to update view structure
+     * or view to element reference caches.
+     * 
+     * @param {Object} view An object that contains view id and any changes to be saved.
+     * @returns {Promise} The promise will be resolved with the updated cache view reference if 
+     *      update is successful.
+     */
+    var updateView = function(view) {
+
+    };
+
+    /**
+     * @ngdoc method
+     * @name mms.ViewService#updateDocument
+     * @methodOf mms.ViewService
+     * 
+     * @description
+     * Save document to alfresco and update the cache if successful, the document object
+     * must have an id, and some updated properties. Use this to update a document's
+     * view hierarchy or nosections
+     * 
+     * @param {Object} document An object that contains doc id and any changes to be saved.
+     * @returns {Promise} The promise will be resolved with the updated cache doc reference if 
+     *      update is successful.
+     */
+    var updateDocument = function(document) {
+
+    };
+
+    /**
+     * @ngdoc method
      * @name mms.ViewService#getViewDisplayedElements
      * @methodOf mms.ViewService
      * 
@@ -154,12 +250,81 @@ function ViewService($q, $http, URLService, ElementService, CommentService) {
 
     };
 
+    /**
+     * @ngdoc method
+     * @name mms.ViewService#getViewComments
+     * @methodOf mms.ViewService
+     * 
+     * @description
+     * Gets the comemnts for the view, in reverse chronological time
+     * 
+     * @param {string} id The id of the view.
+     * @returns {Promise} The promise will be resolved with array of comment objects. 
+     */
+    var getViewComments = function(id) {
+
+    };
+
+    /**
+     * @ngdoc method
+     * @name mms.ViewService#addViewComments
+     * @methodOf mms.ViewService
+     * 
+     * @description
+     * Add a comment to a view
+     * 
+     * @param {string} id The id of the view.
+     * @param {string} comment The comment to add, can contain html
+     * @returns {Promise} The promise will be resolved the new comment object. 
+     */
+    var addViewComment = function(id, comment) {
+
+    };
+
+    /**
+     * @ngdoc method
+     * @name mms.ViewService#deleteViewComment
+     * @methodOf mms.ViewService
+     * 
+     * @description
+     * Add a comment to a view
+     * 
+     * @param {string} id The id of the view.
+     * @param {string} commentId The id of comment to delete
+     * @returns {Promise} The promise will be resolved true. 
+     */
+    var deleteViewComment = function(id, commentId) {
+
+    };
+
+    /**
+     * @ngdoc method
+     * @name mms.ViewService#updateViewElements
+     * @methodOf mms.ViewService
+     * 
+     * @description
+     * Do a bulk save of all edited elements in a view to server, this does not save any
+     * view structure changes
+     * 
+     * @param {string} id The id of the view.
+     * @returns {Promise} The promise will be resolved with saved element objects. 
+     */
+    var updateViewElements = function(id) {
+
+    };
+
     return {
         getView: getView,
         getViews: getViews,
         getDocument: getDocument,
+        updateView: updateView,
+        updateDocument: updateDocument,
         getViewDisplayedElements: getViewDisplayedElements,
-        getViewAllowedElements: getViewAllowedElements
+        getViewAllowedElements: getViewAllowedElements,
+        getViewComments: getViewComments,
+        addViewComment: addViewComment,
+        deleteViewComment: deleteViewComment,
+        updateViewElements: updateViewElements
     };
 
 }

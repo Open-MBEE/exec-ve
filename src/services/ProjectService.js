@@ -1,9 +1,20 @@
 'use strict';
 
 angular.module('mms')
-.factory('ProjectService', ['$q', '$http', 'URLService', 'ElementService', 'ViewService', ProjectService]);
+.factory('ProjectService', ['$q', '$http', 'URLService', ProjectService]);
 
-function ProjectService($q, $http, URLService, ElementService, ViewService) {
-    
+/**
+ * @ngdoc service
+ * @name mms.ProjectService
+ * @requires $q
+ * @requires $http
+ * @requires mms.URLService
+ * 
+ * @description
+ * This service gives information about model projects (TBD)
+ */
+function ProjectService($q, $http, URLService) {
+
+    return {};
     
 }
