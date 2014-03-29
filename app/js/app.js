@@ -28,6 +28,8 @@ angular.module('myApp', ['ui.router', 'mms'])
 // Declare module for Froala
 angular.module('Froala', ['ui.router', 'mms'])
   .controller('FroalaCtrl', ['$scope', 'ElementService', function($scope, ElementService) {
-    ElementService.getElement('_17_0_2_3_407019f_1386871384972_702931_26371').then(function(data) {
-    });
+    $scope.insertElement = function() {
+        ElementService.getElement(document.getElementById("element-id-input").value).then(function(data) {
+        });
+    };
   }]);

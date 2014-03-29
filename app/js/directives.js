@@ -19,7 +19,10 @@ angular.module('Froala')
       restrict: 'A',
       link: function(scope, element, attrs) {
         jQuery(element).editable({
-          buttons: ['undo', 'redo', 'sep', 'transclude'],
+          buttons: ['bold', 'italic', 'underline', 'strikethrough', 'fontsize', 'color', 'sep',
+                    'formatBlock', 'align', 'insertOrderedList', 'insertUnorderedList', 'outdent', 'indent', 'sep',
+                    'createLink', 'insertImage', 'insertVideo', 'undo', 'redo', 'html', 'sep',
+                    'transclude'],
 
           // Define custom buttons.
           customButtons: {
@@ -30,7 +33,7 @@ angular.module('Froala')
                 value: 't'
               },
               callback: function (editor) {
-                alert('Transclusion occurs')
+                jQuery('#menu').modal('show');
               }
             }
           }
