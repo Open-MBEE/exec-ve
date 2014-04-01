@@ -10,7 +10,7 @@ function mmsFroala(ElementService, $modal, _) { //depends on angular bootstrap
         scope: {},
         link: function(scope, element, attrs, ngModelCtrl) {
             function read() {
-                var html = element.editable("getHTML");
+                var html = element.editable("getHTML"); //if froala editor is in html mode, this becomes empty textarea
                 if (_.isArray(html))
                     html = html.join('');
                 ngModelCtrl.$setViewValue(html);
@@ -26,6 +26,7 @@ function mmsFroala(ElementService, $modal, _) { //depends on angular bootstrap
                 inlineMode: false,
                 contentChangedCallback: function() {
                     scope.$apply(read);
+                    //read();
                 },
                 imageUploadURL: '', //prevent default upload to public url
                 placeholder: 'Placeholder, currently empty',
@@ -50,7 +51,7 @@ function mmsFroala(ElementService, $modal, _) { //depends on angular bootstrap
                                 }],
                             });
                             instance.result.then(function(tag) {
-                                editor.insertHTML(tag); //froala strips unknown html tags, this doesn't work
+                                editor.insertHTML(tag); //froala strips unknown html tags (or to mms), this doesn't work
                             });
                         }
                     }

@@ -21,9 +21,9 @@ function mmsSpec(ElementService) {
                     return;
                 ElementService.getElement(scope.eid).then(function(data) {
                     scope.element = data;
-                    scope.edit = {id: scope.element.id, 
-                        name: scope.element.name,
-                        documentation: scope.element.documentation};
+                    ElementService.getElementForEdit(scope.eid).then(function(data) {
+                        scope.edit = data;
+                    });
                 });
             });
             scope.save = function() {
