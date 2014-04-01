@@ -1,8 +1,16 @@
 .demotext {
-  position: absolute;
-  left: 50%;
-  top: 40%;
-  width: 600px;
-  height: 150px;
-  margin: -75px 0 0 -300px;
+  float: left;
+  clear: both;
+  width: 700px;
+  margin-top: 20px;
+  margin-left: 20px;
+}
+
+.demotextarea {
+  float: left;
+  clear: both;
+  width: 700px;
+  height: 375px;
+  margin-top: 20px;
+  margin-left: 20px;
 }

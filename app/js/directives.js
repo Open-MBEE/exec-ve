@@ -17,7 +17,28 @@ angular.module('Froala')
   .directive('froala', function() {
     return {
       restrict: 'A',
-      link: function(scope, element, attrs) {
+      require: '?ngModel',
+      link: function(scope, element, attrs, ngModel) {
+        if (!ngModel) return;
+
+        ngModel.$render = function() {
+          element.html(ngModel.$viewValue || '');
+        }
+
+        element.on('blur keyup change', function() {
+          scope.$apply(read);
+        });
+        read();
+
+        function read() {
+          var html = element.html();
+
+          if (attrs.stripBr && html == '<br>') {
+            html = '';
+          }
+          ngModel.$setViewValue(html);
+        }
+
         jQuery(element).editable({
           buttons: ['bold', 'italic', 'underline', 'strikethrough', 'fontsize', 'color', 'sep',
                     'formatBlock', 'align', 'insertOrderedList', 'insertUnorderedList', 'outdent', 'indent', 'sep',
