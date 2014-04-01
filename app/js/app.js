@@ -37,4 +37,5 @@ angular.module('Froala', ['ui.router', 'mms'])
     $scope.cleanUp = function() {
         jQuery('span[id*=marker-true').remove();
     };
+
   }]);
