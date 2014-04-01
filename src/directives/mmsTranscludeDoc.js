@@ -18,13 +18,15 @@ function mmsTranscludeDoc(ElementService, $compile) {
                     return;
                 ElementService.getElement(scope.eid).then(function(data) {
                     scope.element = data;
-                    var el = $compile(scope.element.documentation)(scope);
+                    var doc = scope.element.documentation;
+                    var el = $compile(doc)(scope);
                     element.append(el);
                     //element.append(scope.element[scope.property]);
                     //$compile(element.contents())(scope);
                     scope.$watch('element.documentation', function(n, o) {
                         element.empty();
-                        var el = $compile(scope.element.documentation)(scope);
+                        doc = scope.element.documentation;
+                        var el = $compile(doc)(scope);
                         element.append(el);
                         //element.append(scope.element[scope.property]);
                         //$compile(element.contents())(scope);

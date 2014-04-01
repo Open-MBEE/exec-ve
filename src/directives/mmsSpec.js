@@ -5,9 +5,12 @@ angular.module('mms')
 
 function mmsSpec(ElementService) {
 
+    var template = '<div> Name: <input type="text" ng-model="edit.name"></input> <br/>' + 
+                'Documentation: <div ng-model="edit.documentation" mms-froala></div><br/> ' + 
+                '<button ng-click="save()">Save</button> </div> ';
     return {
         restrict: 'E',
-        template: ' <div> Name: <input type="text" ng-model="edit.name"></input> <br/> Documentation: <textarea ng-model="edit.documentation"></textarea><br/> <button ng-click="save()">Save</button> </div> ',
+        template: template,
         scope: {
             eid: '@'
         },

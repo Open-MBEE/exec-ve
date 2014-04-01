@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('mms', [])
+angular.module('mms', ['ui.bootstrap'])
 .config(['$sceProvider', function($sceProvider) {
     $sceProvider.enabled(false);
 }])
