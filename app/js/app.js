@@ -24,7 +24,7 @@ angular.module('Froala', ['ui.router', 'mms'])
 
         // if success, insert the text then unwrap the content from the span tag
         p.then(function(data) {
-            jQuery('#marker-true').text('<mms-transclude-name eid="' + data.id + '"></mms-transclude-name>');
+            jQuery('#marker-true').html('<mms-transclude-name eid="' + data.id + '"></mms-transclude-name>');
             jQuery('#marker-true').contents().unwrap();
         });
 
