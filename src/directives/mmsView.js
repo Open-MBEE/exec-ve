@@ -12,24 +12,37 @@ function mmsView(ViewService, ElementService) {
                     '<mms-view-list list="contain" ng-switch-when="List"></mms-view-list>' +
                 '</div>' +
             '</div>';
+
+    var mmsViewCtrl = function($scope, ViewService, ElementService) {
+        this.getViewAllowedElements = function() {
+            return ViewService.getViewAllowedElements($scope.vid);
+        };
+        this.isEditable = function() {
+            return $scope.editable;
+        };
+    };
+
+    var mmsViewLink = function(scope, element, attrs) {
+        scope.$watch('vid', function(newVal, oldVal) {
+            if (newVal === undefined || newVal === null || newVal === '')
+                return;
+            ViewService.getView(scope.vid).then(function(data) {
+                scope.view = data;
+            });
+            ElementService.getElement(scope.vid).then(function(data) {
+                scope.viewElement = data;
+            });
+        });
+        scope.editable = true;
+    };
+
     return {
         restrict: 'E',
         template: template,
         scope: {
             vid: '@',
         },
-        //controller: ['$scope', controller]
-        link: function(scope, element, attrs) {
-            scope.$watch('vid', function(newVal, oldVal) {
-                if (newVal === undefined || newVal === null || newVal === '')
-                    return;
-                ViewService.getView(scope.vid).then(function(data) {
-                    scope.view = data;
-                });
-                ElementService.getElement(scope.vid).then(function(data) {
-                    scope.viewElement = data;
-                });
-            });
-        }
+        controller: ['$scope', 'ViewService', 'ElementService', mmsViewCtrl],
+        link: mmsViewLink
     };
 }

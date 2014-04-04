@@ -230,7 +230,8 @@ function ViewService($q, $http, URLService, ElementService, CommentService) {
      * @returns {Promise} The promise will be resolved with array of element objects. 
      */
     var getViewAllowedElements = function(id) {
-
+        var deferred = $q.defer();
+        return deferred.promise;
     };
 
     /**

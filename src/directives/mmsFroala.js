@@ -7,7 +7,9 @@ function mmsFroala(ElementService, $modal, _) { //depends on angular bootstrap
     return {
         restrict: 'A',
         require: 'ngModel',
-        scope: {},
+        scope: {
+            transcludableElements: '='
+        },
         link: function(scope, element, attrs, ngModelCtrl) {
             function read() {
                 var html = element.editable("getHTML"); //if froala editor is in html mode, this becomes empty textarea
