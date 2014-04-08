@@ -12,7 +12,7 @@ function mmsFroala(ElementService, $modal, _) { //depends on angular bootstrap
         },
         link: function(scope, element, attrs, ngModelCtrl) {
             function read() {
-                var html = element.editable("getHTML"); //if froala editor is in html mode, this becomes empty textarea
+                var html = element.editable("getHTML"); 
                 if (_.isArray(html))
                     html = html.join('');
                 ngModelCtrl.$setViewValue(html);
@@ -26,6 +26,7 @@ function mmsFroala(ElementService, $modal, _) { //depends on angular bootstrap
                     'createLink', 'insertImage', 'insertVideo', 'undo', 'redo', 'html', 'sep',
                     'transclude'],
                 inlineMode: false,
+                autosaveInterval: 1000,
                 contentChangedCallback: function() {
                     scope.$apply(read);
                     //read();
@@ -41,19 +42,21 @@ function mmsFroala(ElementService, $modal, _) { //depends on angular bootstrap
                             value: 't'
                         },
                         callback: function(editor) {
+                            editor.saveSelection(); //this is needed to preserve editor selection used by insertHTML
                             var instance = $modal.open({
                                 template: 'Element id: <input type="text" ng-model="input.eid"/><br/>Property: <input type="text" ng-model="input.prop"/><br/><button ng-click="save()">Save</button>',
                                 scope: scope,
                                 controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
                                     $scope.input = {eid: '', prop: ''};
                                     $scope.save = function() {
-                                        var tag = '<mms-transclude-' + $scope.input.prop + ' eid="' + $scope.input.eid + '"></mms-transclude-' + $scope.input.prop + '>';
+                                        var tag = '<mms-transclude-' + $scope.input.prop + ' eid="' + $scope.input.eid + '">[transclude]</mms-transclude-' + $scope.input.prop + '>';
                                         $modalInstance.close(tag);
                                     };
                                 }],
                             });
                             instance.result.then(function(tag) {
-                                editor.insertHTML(tag); //froala strips unknown html tags (or to mms), this doesn't work
+                                editor.restoreSelection();
+                                editor.insertHTML(tag);
                             });
                         }
                     }
