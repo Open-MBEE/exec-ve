@@ -25,21 +25,25 @@ angular.module('Froala')
           element.html(ngModel.$viewValue || '');
         }
 
+        element.ready(function() {
+          scope.$apply(read);
+        });
         element.on('blur keyup change', function() {
           scope.$apply(read);
         });
+        
         read();
 
         function read() {
           var html = element.html();
-
           if (attrs.stripBr && html == '<br>') {
             html = '';
           }
           ngModel.$setViewValue(html);
         }
 
-        jQuery(element).editable({
+        // Set up Froala
+        angular.element(element).editable({
           buttons: ['bold', 'italic', 'underline', 'strikethrough', 'fontsize', 'color', 'sep',
                     'formatBlock', 'align', 'insertOrderedList', 'insertUnorderedList', 'outdent', 'indent', 'sep',
                     'createLink', 'insertImage', 'insertVideo', 'undo', 'redo', 'html', 'sep',
@@ -56,7 +60,7 @@ angular.module('Froala')
               callback: function(editor) {
                 editor.placeMarker(editor.getRange(), true);
                 editor.hide();
-                jQuery('#menu').modal('show');
+                angular.element('#menu').modal('show');
               }
             }
           }
