@@ -25,6 +25,9 @@ angular.module('Froala')
           element.html(ngModel.$viewValue || '');
         }
 
+        element.ready(function() {
+          scope.$apply(read);
+        });
         element.on('blur keyup change', function() {
           scope.$apply(read);
         });
@@ -32,7 +35,6 @@ angular.module('Froala')
 
         function read() {
           var html = element.html();
-
           if (attrs.stripBr && html == '<br>') {
             html = '';
           }

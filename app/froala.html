@@ -22,46 +22,49 @@
   <![endif]-->
 </head>
 <body>
+  <div class="container">
+    <h1>Two-way Data Binding with Angular & Froala</h1>
+    <div ng-controller="FroalaCtrl">
+      <div class="demotext">
+        <h3>Edit this content with Froala:</h3>
+        <p froala
+           ng-model="testModel"
+           strip-br="true"
+           class="demotext" >
+          Vestibulum id ligula porta felis euismod semper. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Vestibulum id ligula porta felis euismod semper. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum.
 
-  <div ng-controller="FroalaCtrl">
+          Aenean lacinia bibendum nulla sed consectetur. Etiam porta sem malesuada magna mollis euismod. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Donec id elit non mi porta gravida at eget metus. Nullam quis risus eget urna mollis ornare vel eu leo. Nullam quis risus eget urna mollis ornare vel eu leo.
 
-    <p froala
-       ng-model="testModel"
-       strip-br="true"
-       class="demotext" >
-      Vestibulum id ligula porta felis euismod semper. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Vestibulum id ligula porta felis euismod semper. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum.
+          Maecenas faucibus mollis interdum. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec sed odio dui. Donec ullamcorper nulla non metus auctor fringilla. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit.
 
-      Aenean lacinia bibendum nulla sed consectetur. Etiam porta sem malesuada magna mollis euismod. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Donec id elit non mi porta gravida at eget metus. Nullam quis risus eget urna mollis ornare vel eu leo. Nullam quis risus eget urna mollis ornare vel eu leo.
+          Nullam quis risus eget urna mollis ornare vel eu leo. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Curabitur blandit tempus porttitor. Etiam porta sem malesuada magna mollis euismod.
+        </p>
+      </div>
 
-      Maecenas faucibus mollis interdum. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec sed odio dui. Donec ullamcorper nulla non metus auctor fringilla. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit.
+      <div class="demotextarea">
+        <h3>This textarea has a two-way binding with the content above:</h3>
+        <textarea ng-model="testModel" spellcheck="false"></textarea>
+      </div>
 
-      Nullam quis risus eget urna mollis ornare vel eu leo. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Curabitur blandit tempus porttitor. Etiam porta sem malesuada magna mollis euismod.
-    </p>
-
-    <textarea
-       ng-model="testModel"
-       class="demotextarea" >
-    </textarea>
-
-    <div class="modal fade" id="menu" tabindex="-1" role="dialog" aria-labelledby="menuLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-            <h4 class="modal-title" id="menuLabel">Select an element</h4>
-          </div>
-          <div class="modal-body">
-            <label for="element-id-input">Element ID</label>
-            <input id="element-id-input" type="text" class="form-control" placeholder="Enter Element ID" \>
-          </div>
-          <div class="modal-footer">
-            <button ng-click="cleanUp()" type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-            <button ng-click="insertElement()" type="button" class="btn btn-primary" data-dismiss="modal">Submit</button>
+      <div class="modal fade" id="menu" tabindex="-1" role="dialog" aria-labelledby="menuLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+              <h4 class="modal-title" id="menuLabel">Select an element</h4>
+            </div>
+            <div class="modal-body">
+              <label for="element-id-input">Element ID</label>
+              <input id="element-id-input" type="text" class="form-control" placeholder="Enter Element ID" \>
+            </div>
+            <div class="modal-footer">
+              <button ng-click="cleanUp()" type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+              <button ng-click="insertElement()" type="button" class="btn btn-primary" data-dismiss="modal">Submit</button>
+            </div>
           </div>
         </div>
       </div>
     </div>
-
   </div>
 
   <!-- jQuery -->

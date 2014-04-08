@@ -9,6 +9,12 @@
 .demotextarea {
   float: left;
   clear: both;
+  margin-top: 20px;
+  margin-left: 20px;
+}
+
+.demotextarea > textarea {
+  font-family: monospace;
   width: 700px;
   height: 375px;
   margin-top: 20px;
