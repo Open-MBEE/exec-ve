@@ -31,6 +31,7 @@ angular.module('Froala')
         element.on('blur keyup change', function() {
           scope.$apply(read);
         });
+        
         read();
 
         function read() {
@@ -41,7 +42,8 @@ angular.module('Froala')
           ngModel.$setViewValue(html);
         }
 
-        jQuery(element).editable({
+        // Set up Froala
+        angular.element(element).editable({
           buttons: ['bold', 'italic', 'underline', 'strikethrough', 'fontsize', 'color', 'sep',
                     'formatBlock', 'align', 'insertOrderedList', 'insertUnorderedList', 'outdent', 'indent', 'sep',
                     'createLink', 'insertImage', 'insertVideo', 'undo', 'redo', 'html', 'sep',
@@ -58,7 +60,7 @@ angular.module('Froala')
               callback: function(editor) {
                 editor.placeMarker(editor.getRange(), true);
                 editor.hide();
-                jQuery('#menu').modal('show');
+                angular.element('#menu').modal('show');
               }
             }
           }
