@@ -38,13 +38,18 @@ function mmsTranscludeDoc(ElementService, $compile, $modal) {
             ElementService.getElement(scope.eid).then(function(data) {
                 scope.element = data;
                 var doc = scope.element.documentation;
-                var el = $compile(doc)(scope);
-                element.append(el);
+                element.append(doc);
+                $compile(element.contents())(scope);
+                //var el = $compile(doc)(scope);
+                //element.append(el);
                 scope.$watch('element.documentation', function(n, o) {
                     element.empty();
                     doc = scope.element.documentation;
-                    var el = $compile(doc)(scope);
-                    element.append(el);
+                    element.append(doc);
+                    $compile(element.contents())(scope); 
+                    //var el = $compile(doc)(scope); 
+                    //element.append(el); 
+                    //above prevents nested transclusions from getting view controller
                 });
             });
         });

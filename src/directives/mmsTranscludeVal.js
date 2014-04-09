@@ -24,16 +24,20 @@ function mmsTranscludeVal(ElementService, $compile) {
                         for (var i = 0; i < scope.element.value.length; i++) {
                             toCompile += '<div>' + scope.element.value[i] + '</div>';
                         }
-                        el = $compile(toCompile)(scope);
-                        element.append(el);
+                        element.append(toCompile);
+                        $compile(element.contents())(scope);
+                        //el = $compile(toCompile)(scope);
+                        //element.append(el);
                         scope.$watchCollection('element.value', function(n, o) {
                             element.empty();
                             toCompile = '';
                             for (var i = 0; i < scope.element.value.length; i++) {
                                 toCompile += '<div>' + scope.element.value[i] + '</div>';
                             }
-                            el = $compile(toCompile)(scope);
-                            element.append(el);
+                            element.append(toCompile);
+                            $compile(element.contents())(scope);
+                            //el = $compile(toCompile)(scope);
+                            //element.append(el);
                         });
                     } else {
                         el = $compile(template)(scope);
