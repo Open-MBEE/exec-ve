@@ -248,6 +248,7 @@ function ElementService($q, $http, URLService, _) {
         var deferred = $q.defer();
         if (elements.hasOwnProperty(elem.id)) {
             elements[elem.id].name = elem.name;
+            elements[elem.id].documentation = elem.documentation; //make a function to do deep copy
             deferred.resolve(elements[elem.id]);
             //alfresco service not implemented yet
             /*$http.post(URLService.getPostElementsURL(), {'elements': [elem]})
