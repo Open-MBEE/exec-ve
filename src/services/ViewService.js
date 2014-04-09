@@ -105,13 +105,11 @@ function ViewService($q, $http, URLService, ElementService, CommentService) {
         else {
             $http.get(URLService.getViewURL(id))
             .success(function(data, status, headers, config) {
-                if (data.views.length > 0) {
-                    if (views.hasOwnProperty(id))
-                        deferred.resolve(views[id]);
-                    else {
-                        views[id] = data.views[0];
-                        deferred.resolve(views[id]);
-                    }
+                if (views.hasOwnProperty(id))
+                    deferred.resolve(views[id]);
+                else if (data.views.length > 0) {
+                    views[id] = data.views[0];
+                    deferred.resolve(views[id]);
                 } else {
                     deferred.reject("Not Found");
                 }
@@ -162,7 +160,32 @@ function ViewService($q, $http, URLService, ElementService, CommentService) {
      *      references to the same object.
      */
     var getDocument = function(id) {
-
+        var deferred = $q.defer();
+        if (documents.hasOwnProperty(id))
+            deferred.resolve(documents[id]);
+        else {
+            $http.get(URLService.getDocumentURL(id))
+            .success(function(data, status, headers, config) {
+                if (documents.hasOwnProperty(id))
+                    deferred.resolve(documents[id]);
+                else if (data.products.length > 0) {
+                    documents[id] = data.views[0];
+                    deferred.resolve(documents[id]);
+                } else {
+                    deferred.reject("Not Found");
+                }
+            }).error(function(data, status, headers, config) {
+                if (status === 404)
+                    deferred.reject("Not Found");
+                else if (status === 500)
+                    deferred.reject("Server Error");
+                else if (status === 401 || status === 403)
+                    deferred.reject("Unauthorized");
+                else
+                    deferred.reject("Failed");
+            });
+        }
+        return deferred.promise;
     };
 
     /**
@@ -231,6 +254,17 @@ function ViewService($q, $http, URLService, ElementService, CommentService) {
      */
     var getViewAllowedElements = function(id) {
         var deferred = $q.defer();
+        if (allowedElements.hasOwnProperty(id))
+            deferred.resolve(allowedElements[id]);
+        else {
+            getView(id).then(function(data) {
+                var allowedIds = data.allowedElements;
+                ElementService.getElements(allowedIds).then(function(data2) {
+                    allowedElements[id] = data2;
+                    deferred.resolve(data2);
+                });
+            });
+        }
         return deferred.promise;
     };
 
