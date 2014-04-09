@@ -6,13 +6,15 @@ angular.module('mms')
 function mmsTranscludeDoc(ElementService, $compile, $modal) {
 
     var mmsTranscludeDocLink = function(scope, element, attrs, mmsViewCtrl) {
-        var modalTemplate = '<mms-spec eid="{{eid}}" editable-field="documentation"></mms-spec><button ng-click="close()">Close</button>';
-        if (mmsViewCtrl !== null) {
-            modalTemplate = '<mms-spec eid="{{eid}}" editable-field="documentation" transcludable-elements="viewElements"></mms-spec><button ng-click="close()">Close</button>';
-        }
+        var modalTemplate = '<div class="modal-header"><h3>Element</h3></div>';
+        if (mmsViewCtrl === undefined || mmsViewCtrl === null)
+            modalTemplate += '<div class="modal-body"><mms-spec eid="{{eid}}" editable-field="documentation"></mms-spec></div>';
+        else 
+            modalTemplate += '<div class="modal-body"><mms-spec eid="{{eid}}" editable-field="documentation" transcludable-elements="viewElements"></mms-spec></div>';
+        modalTemplate += '<div class="modal-footer"><button class="btn btn-primary" ng-click="close()">Close</button></div>';
 
-        element.on('click', function() {
-            if (mmsViewCtrl === null || !mmsViewCtrl.isEditable())
+        element.click(function(e) {
+            if (mmsViewCtrl === null || mmsViewCtrl === undefined || !mmsViewCtrl.isEditable())
                 return false;
             mmsViewCtrl.getViewAllowedElements().then(function(elems) {
                     scope.viewElements = elems;
@@ -26,6 +28,7 @@ function mmsTranscludeDoc(ElementService, $compile, $modal) {
                     };
                 }]
             });
+            //e.stopPropagation();
             return false;
         });
 

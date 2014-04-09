@@ -5,12 +5,13 @@ angular.module('mms')
 
 function mmsFroala(ElementService, $modal, _) { //depends on angular bootstrap
     
-    var link = function(scope, element, attrs, ngModelCtrl) {
-        var transcludeModalTemplate = '<div ng-repeat="elem in transcludableElements">' +
+    var mmsFroalaLink = function(scope, element, attrs, ngModelCtrl) {
+        var transcludeModalTemplate = '<div class="modal-header"><h3>Transclude</h3></div>' +
+                            '<div class="modal-body"><div ng-repeat="elem in transcludableElements">' +
                                 '{{elem.id}} {{elem.name}}</div>' + 
                                 'Element id: <input type="text" ng-model="input.eid"/><br/>' + 
-                                'Property: <input type="text" ng-model="input.prop"/><br/>' + 
-                                '<button ng-click="save()">Save</button>';
+                                'Property: <input type="text" ng-model="input.prop"/><br/></div>' + 
+                                '<div class="modal-footer"><button class="btn btn-primary" ng-click="save()">Save</button></div>';
 
         var transcludeCallback = function(editor) {
             editor.saveSelection(); //this is needed to preserve editor selection used by insertHTML
@@ -81,6 +82,6 @@ function mmsFroala(ElementService, $modal, _) { //depends on angular bootstrap
         scope: {
             transcludableElements: '='
         },
-        link: link
+        link: mmsFroalaLink
     };
 }

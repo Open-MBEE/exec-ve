@@ -6,10 +6,12 @@ angular.module('mms')
 function mmsTranscludeName(ElementService, $compile, $modal) {
 
     var mmsTranscludeNameLink = function(scope, element, attrs, mmsViewCtrl) {
-        var modalTemplate = '<mms-spec eid="{{eid}}" editable-field="name"></mms-spec><button ng-click="close()">Close</button>';
+        var modalTemplate = '<div class="modal-header"><h3>Element</h3></div>' +
+                    '<div class="modal-body"><mms-spec eid="{{eid}}" editable-field="name"></mms-spec></div>' +
+                    '<div class="modal-footer"><button class="btn btn-primary" ng-click="close()">Close</button></div>';
         
-        element.on('click', function() {
-            if (mmsViewCtrl === null || !mmsViewCtrl.isEditable())
+        element.click(function(e) {
+            if (mmsViewCtrl === null || mmsViewCtrl === undefined || !mmsViewCtrl.isEditable())
                 return false;
             $modal.open({
                 template: modalTemplate,
@@ -20,6 +22,7 @@ function mmsTranscludeName(ElementService, $compile, $modal) {
                     };
                 }]
             });
+            //e.stopPropagation();
             return false;
         });
 
