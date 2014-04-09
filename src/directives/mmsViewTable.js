@@ -4,7 +4,7 @@ angular.module('mms')
 .directive('mmsViewTable', ['$compile', mmsViewTable]);
 
 function mmsViewTable($compile) {
-    var template = '<table>' +
+    var template = '<table class="table table-bordered">' +
                 '<caption>{{table.title}}</caption>' +
                 '<tr ng-repeat="row in table.header">' +
                     '<th colspan="{{cell.colspan}}" rowspan="{{cell.rowspan}}" ng-repeat="cell in row">' +
