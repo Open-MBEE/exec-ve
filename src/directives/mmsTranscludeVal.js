@@ -19,6 +19,7 @@ function mmsTranscludeVal(ElementService, $compile) {
                 ElementService.getElement(scope.eid).then(function(data) {
                     scope.element = data;
                     var el;
+                    element.empty();
                     if (scope.element.valueType === "LiteralString") {
                         var toCompile = ''; //to account for transclusions inside string values
                         for (var i = 0; i < scope.element.value.length; i++) {
