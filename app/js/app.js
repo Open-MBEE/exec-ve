@@ -14,7 +14,68 @@ angular.module('myApp', ['ui.router', 'mms'])
             $scope.element = data;
         });
     };
-  }]);
+  }])
+  .config(function($stateProvider, $urlRouterProvider){
+    $stateProvider
+        .state('view', {
+            url: '/view/:viewId',
+            views: {
+                'center': {
+                    template: '<mms-view vid="{{vid}}" transclude-clicked="tscClicked(elementId)"></mms-view>',
+                    controller: function($scope, viewid, $state) {
+                        $scope.vid = viewid.viewid;
+                        $scope.tscClicked = function(elementId) {
+                            $state.go('element', {viewId: $scope.vid, elementId: elementId});
+                        };
+                    },
+                    resolve: {
+                        viewid: function($stateParams) {
+                            return {viewid: $stateParams.viewId};
+                        }
+                    }
+                }
+            }
+        })
+        .state('element', {
+            url: '/view/:viewId/element/:elementId',
+            views: {
+                'right': {
+                    template: '<h5>Element Spec</h5><mms-spec eid="{{eid}}" editable-field="all" transcludable-elements="viewElements"></mms-spec>',
+                    controller: function($scope, viewid, viewElements, elementId) {
+                        $scope.viewid = viewid.viewid;
+                        $scope.viewElements = viewElements;
+                        $scope.eid = elementId.elementid;
+                    },
+                    resolve: {
+                        viewid: function($stateParams) {
+                            return {viewid: $stateParams.viewId};
+                        },
+                        viewElements: function($stateParams, ViewService) {
+                            return ViewService.getViewAllowedElements($stateParams.viewId);
+                        },
+                        elementId: function($stateParams) {
+                            return {elementid: $stateParams.elementId};
+                        }
+                    }
+                },
+                'center': {
+                    template: '<mms-view vid="{{vid}}" transclude-clicked="tscClicked(elementId)"></mms-view>',
+                    controller: function($scope, viewid, $state) {
+                        $scope.vid = viewid.viewid;
+                        $scope.tscClicked = function(elementId) {
+                            $state.go('element', {viewId: $scope.vid, elementId: elementId});
+                        };
+                    },
+                    resolve: {
+                        viewid: function($stateParams) {
+                            return {viewid: $stateParams.viewId};
+                        }
+                    }
+                }
+            }
+        });
+
+  });
 
 // Declare module for Froala
 angular.module('Froala', ['ui.router', 'mms'])

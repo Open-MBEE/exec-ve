@@ -169,7 +169,7 @@ function ViewService($q, $http, URLService, ElementService, CommentService) {
                 if (documents.hasOwnProperty(id))
                     deferred.resolve(documents[id]);
                 else if (data.products.length > 0) {
-                    documents[id] = data.views[0];
+                    documents[id] = data.products[0];
                     deferred.resolve(documents[id]);
                 } else {
                     deferred.reject("Not Found");

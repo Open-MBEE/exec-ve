@@ -5,7 +5,7 @@ angular.module('mms')
 
 function mmsView(ViewService, ElementService) {
     var template = '<div>' +
-                '<h1>{{viewElement.name}}</h1>' +
+                '<h4>{{viewElement.name}}</h4>' +
                 '<div ng-repeat="contain in view.contains" ng-switch on="contain.type">' +
                     '<mms-view-para para="contain" ng-switch-when="Paragraph"></mms-view-para>' +
                     '<mms-view-table table="contain" ng-switch-when="Table"></mms-view-table>' +
@@ -19,6 +19,9 @@ function mmsView(ViewService, ElementService) {
         };
         this.isEditable = function() {
             return $scope.editable;
+        };
+        this.transcludeClicked = function(elementId) {
+            $scope.transcludeClicked({elementId: elementId});
         };
     };
 
@@ -41,6 +44,7 @@ function mmsView(ViewService, ElementService) {
         template: template,
         scope: {
             vid: '@',
+            transcludeClicked: '&'
         },
         controller: ['$scope', 'ViewService', 'ElementService', mmsViewCtrl],
         link: mmsViewLink

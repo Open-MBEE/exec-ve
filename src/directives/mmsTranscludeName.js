@@ -13,15 +13,7 @@ function mmsTranscludeName(ElementService, $compile, $modal) {
         element.click(function(e) {
             if (mmsViewCtrl === null || mmsViewCtrl === undefined || !mmsViewCtrl.isEditable())
                 return false;
-            $modal.open({
-                template: modalTemplate,
-                scope: scope,
-                controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
-                    $scope.close = function() {
-                        $modalInstance.close(true);
-                    };
-                }]
-            });
+            mmsViewCtrl.transcludeClicked(scope.eid);
             //e.stopPropagation();
             return false;
         });
