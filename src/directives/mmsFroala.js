@@ -46,7 +46,7 @@ function mmsFroala(ElementService, $modal, _) { //depends on angular bootstrap
                 'formatBlock', 'align', 'insertOrderedList', 'insertUnorderedList', 'outdent', 'indent', 'sep',
                 'createLink', 'insertImage', 'insertVideo', 'undo', 'redo', 'html', 'sep',
                 'transclude'],
-            inlineMode: true,
+            inlineMode: false,
             autosaveInterval: 1000,
             contentChangedCallback: function() {
                 scope.$apply(read);
