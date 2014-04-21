@@ -48,6 +48,25 @@ angular.module('mms')
 function ElementService($q, $http, URLService, _) {
     var elements = {};
     var edits = {};
+    /*function deepCopy(source, target) {
+        if (_.isPlainObject(source) && _.isPlainObject(target)) {
+            _.forOwn(source, function(value, key) {
+                if (target.hasOwnProperty(key)) {
+                    if (_.isPlainObject(value) || _.isArray(value)) {
+                        deepCopy(value, target[key])
+                    } else
+                        target[key] = value;
+                } else {
+                    if (_.isPlainObject(value) || _.isArray(value)) {
+                        target[key] = _.cloneDeep(value)
+                    } else
+                        target[key] = value;
+                }
+            });
+        } else if (_.isArray(source) && _.isArray(target)) {
+
+        }
+    };*/
 
     /**
      * @ngdoc method
@@ -247,19 +266,18 @@ function ElementService($q, $http, URLService, _) {
     var updateElement = function(elem) {
         var deferred = $q.defer();
         if (elements.hasOwnProperty(elem.id)) {
-            elements[elem.id].name = elem.name;
-            elements[elem.id].documentation = elem.documentation; //make a function to do deep copy
-            deferred.resolve(elements[elem.id]);
+            //elements[elem.id].name = elem.name;
+            //elements[elem.id].documentation = elem.documentation; //make a function to do deep copy
+            //deferred.resolve(elements[elem.id]);
             //alfresco service not implemented yet
-            /*$http.post(URLService.getPostElementsURL(), {'elements': [elem]})
+            $http.post(URLService.getPostElementsURL(), {'elements': [elem]})
             .success(function(data, status, headers, config) {
                 //make some merging util function
-                var element = elements[elem.id];
-
+                _.merge(elements[elem.id], elem);
                 deferred.resolve(elements[elem.id]);
             }).error(function(data, status, headers, config) {
                 deferred.reject('Error');
-            });*/
+            });
         } else
             deferred.reject("Not in Cache");
         return deferred.promise;
