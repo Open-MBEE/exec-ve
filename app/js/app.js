@@ -19,62 +19,35 @@ angular.module('myApp', ['ui.router', 'mms'])
     $stateProvider
         .state('view', {
             url: '/view/:viewId',
-            views: {
-                'center': {
-                    template: '<mms-view vid="{{vid}}" transclude-clicked="tscClicked(elementId)"></mms-view>',
-                    controller: function($scope, viewid, $state) {
-                        $scope.vid = viewid.viewid;
-                        $scope.tscClicked = function(elementId) {
-                            $state.go('element', {viewId: $scope.vid, elementId: elementId});
-                        };
-                    },
-                    resolve: {
-                        viewid: function($stateParams) {
-                            return {viewid: $stateParams.viewId};
-                        }
-                    }
+            template: '<div class="row"><div class="col-lg-8"><mms-view vid="{{vid}}" transclude-clicked="tscClicked(elementId)"></mms-view></div><div class="col-lg-4" ui-view></div></div>',
+            controller: function($scope, viewid, $state) {
+                $scope.vid = viewid.viewid;
+                $scope.tscClicked = function(elementId) {
+                    $state.go('view.element', {elementId: elementId});
+                };
+            },
+            resolve: {
+                viewid: function($stateParams) {
+                    return {viewid: $stateParams.viewId};
+                },
+                viewElements: function($stateParams, ViewService) {
+                    return ViewService.getViewAllowedElements($stateParams.viewId);
                 }
             }
         })
-        .state('element', {
-            url: '/view/:viewId/element/:elementId',
-            views: {
-                'right': {
-                    template: '<h5>Element Spec</h5><mms-spec eid="{{eid}}" editable-field="all" transcludable-elements="viewElements"></mms-spec>',
-                    controller: function($scope, viewid, viewElements, elementId) {
-                        $scope.viewid = viewid.viewid;
-                        $scope.viewElements = viewElements;
-                        $scope.eid = elementId.elementid;
-                    },
-                    resolve: {
-                        viewid: function($stateParams) {
-                            return {viewid: $stateParams.viewId};
-                        },
-                        viewElements: function($stateParams, ViewService) {
-                            return ViewService.getViewAllowedElements($stateParams.viewId);
-                        },
-                        elementId: function($stateParams) {
-                            return {elementid: $stateParams.elementId};
-                        }
-                    }
-                },
-                'center': {
-                    template: '<mms-view vid="{{vid}}" transclude-clicked="tscClicked(elementId)"></mms-view>',
-                    controller: function($scope, viewid, $state) {
-                        $scope.vid = viewid.viewid;
-                        $scope.tscClicked = function(elementId) {
-                            $state.go('element', {viewId: $scope.vid, elementId: elementId});
-                        };
-                    },
-                    resolve: {
-                        viewid: function($stateParams) {
-                            return {viewid: $stateParams.viewId};
-                        }
-                    }
+        .state('view.element', {
+            url: '/element/:elementId',
+            template: '<h5>Element Spec</h5><mms-spec eid="{{eid}}" editable-field="all" transcludable-elements="viewElements"></mms-spec>',
+            controller: function($scope, viewElements, elementId) {
+                $scope.viewElements = viewElements;
+                $scope.eid = elementId.elementid;
+            },
+            resolve: {
+                elementId: function($stateParams) {
+                    return {elementid: $stateParams.elementId};
                 }
-            }
+            }    
         });
-
   });
 
 // Declare module for Froala
