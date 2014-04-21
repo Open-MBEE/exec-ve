@@ -5,11 +5,11 @@ angular.module('mms')
 
 function mmsSpec(ElementService, $compile) {
     var nameTemplate = '<div>Name: {{edit.name}} </div>';
-    var nameEditTemplate = '<div>Name: <input type="text" ng-model="edit.name"></input></div>';
+    var nameEditTemplate = '<div>Name: <input class="form-control" type="text" ng-model="edit.name"></input></div>';
     var docTemplate = '<div>Documentation:</div><div ng-bind-html="edit.documentation"></div>';
     var docEditTemplate = '<div>Documentation:</div><div ng-model="edit.documentation" mms-froala transcludable-elements="transcludableElements"></div>';
     var docEditPlain = '<div>Documentation:</div><textarea ng-model="edit.documentation"></textarea>';
-    var saveTemplate = '<div><button ng-click="save()">Save</button></div>';
+    var saveTemplate = '<div><button class="btn btn-primary" ng-click="save()">Save</button></div>';
     var template = '';
     
     var mmsSpecLink = function(scope, element, attrs) {

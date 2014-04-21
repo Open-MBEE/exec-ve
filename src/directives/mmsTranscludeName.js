@@ -11,17 +11,9 @@ function mmsTranscludeName(ElementService, $compile, $modal) {
                     '<div class="modal-footer"><button class="btn btn-primary" ng-click="close()">Close</button></div>';
         
         element.click(function(e) {
-            if (mmsViewCtrl === null || mmsViewCtrl === undefined || !mmsViewCtrl.isEditable())
+            if (mmsViewCtrl === null || mmsViewCtrl === undefined)
                 return false;
-            $modal.open({
-                template: modalTemplate,
-                scope: scope,
-                controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
-                    $scope.close = function() {
-                        $modalInstance.close(true);
-                    };
-                }]
-            });
+            mmsViewCtrl.transcludeClicked(scope.eid);
             //e.stopPropagation();
             return false;
         });

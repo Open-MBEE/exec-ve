@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" type="text/css">
   <!-- Font Awesome -->
   <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.0.3/css/font-awesome.min.css" type="text/css">
+  <link rel="stylesheet" href="css/app.css">  
   <!-- Froala - TODO minify before deploying -->
   <link rel="stylesheet" href="lib/froala/css/froala_editor.css" type="text/css">
   <!-- Angular Bootsrap Nav Tree -->
@@ -27,18 +28,15 @@
       </div>
 
       <!-- Center (Main) View -->
-      <div class="col-lg-8">
-        <mms-view vid="{{viewid}}"></mms-view>
-      </div>
-
-      <!-- Right Side -->
-      <div class="col-lg-2">right side</div>
+          <div class="col-lg-10" ui-view>
+          </div>
 
     </div>
   </div>
 
 <!-- jQuery -->
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
 <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.14/angular.min.js"></script> 
 <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.14/angular-animate.min.js"></script> 
 
@@ -47,6 +45,7 @@
 
 <!-- <script src="lib/angular/angular.js"></script> -->
 <script src="lib/angular-ui-router.js"></script>
+<script src="lib/sortable.js"></script>
 <script src="lib/lodash.js"></script>
 <script src="lib/froala/js/froala_editor.js"></script>
 <script src="lib/ui-bootstrap-tpls-0.10.0.js"></script>
