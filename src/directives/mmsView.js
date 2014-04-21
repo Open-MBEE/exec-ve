@@ -5,11 +5,15 @@ angular.module('mms')
 
 function mmsView(ViewService, ElementService) {
     var template = '<div>' +
-                '<h4>{{viewElement.name}}</h4>' +
+                '<div><h4 class="inline"><mms-transclude-name eid="{{viewElement.id}}"></mms-transclude-name></h4>' + 
+                '<span class="pull-right"><button class="btn" ng-click="toggleTextEdit()">{{textEdit}}</button>' +
+                '<button class="btn" ng-click="toggleStructEdit()">{{structEdit}}</button></span></div>' +
+                '<div ui-sortable="sortableOptions" ng-model="view.contains">' +
                 '<div ng-repeat="contain in view.contains" ng-switch on="contain.type">' +
                     '<mms-view-para para="contain" ng-switch-when="Paragraph"></mms-view-para>' +
                     '<mms-view-table table="contain" ng-switch-when="Table"></mms-view-table>' +
                     '<mms-view-list list="contain" ng-switch-when="List"></mms-view-list>' +
+                '</div>' +
                 '</div>' +
             '</div>';
 
@@ -17,11 +21,17 @@ function mmsView(ViewService, ElementService) {
         this.getViewAllowedElements = function() {
             return ViewService.getViewAllowedElements($scope.vid);
         };
-        this.isEditable = function() {
-            return $scope.editable;
-        };
         this.transcludeClicked = function(elementId) {
-            $scope.transcludeClicked({elementId: elementId});
+            if ($scope.textEditable && $scope.transcludeClicked)
+                $scope.transcludeClicked({elementId: elementId});
+        };
+        $scope.toggleTextEdit = function() {
+            $scope.textEditable = !$scope.textEditable;
+            $scope.textEdit = $scope.textEditable ? 'Stop Text Edit' : 'Edit Text';
+        };
+        $scope.toggleStructEdit = function() {
+            $scope.structEditable = !$scope.structEditable;
+            $scope.structEdit = $scope.structEditable ? 'Stop Order Edit' : 'Edit Order';
         };
     };
 
@@ -36,7 +46,18 @@ function mmsView(ViewService, ElementService) {
                 scope.viewElement = data;
             });
         });
-        scope.editable = true;
+        scope.textEditable = false;
+        scope.structEditable = false;
+        scope.textEdit = 'Edit Text';
+        scope.structEdit = 'Edit Order';
+        scope.sortableOptions = {
+            stop: function(event, ui) {
+                if (!scope.structEditable) {
+                    element.find('.ui-sortable').sortable('cancel');
+                }
+            },
+            axis: 'y'
+        };
     };
 
     return {

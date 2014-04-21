@@ -14,7 +14,7 @@ function mmsTranscludeDoc(ElementService, $compile, $modal) {
         modalTemplate += '<div class="modal-footer"><button class="btn btn-primary" ng-click="close()">Close</button></div>';
 
         element.click(function(e) {
-            if (mmsViewCtrl === null || mmsViewCtrl === undefined || !mmsViewCtrl.isEditable())
+            if (mmsViewCtrl === null || mmsViewCtrl === undefined)
                 return false;
             mmsViewCtrl.transcludeClicked(scope.eid);
             //e.stopPropagation();
