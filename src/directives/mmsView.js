@@ -25,14 +25,6 @@ function mmsView(ViewService, ElementService) {
             if ($scope.textEditable && $scope.transcludeClicked)
                 $scope.transcludeClicked({elementId: elementId});
         };
-        $scope.toggleTextEdit = function() {
-            $scope.textEditable = !$scope.textEditable;
-            $scope.textEdit = $scope.textEditable ? 'Stop Text Edit' : 'Edit Text';
-        };
-        $scope.toggleStructEdit = function() {
-            $scope.structEditable = !$scope.structEditable;
-            $scope.structEdit = $scope.structEditable ? 'Stop Order Edit' : 'Edit Order';
-        };
     };
 
     var mmsViewLink = function(scope, element, attrs) {
@@ -51,12 +43,17 @@ function mmsView(ViewService, ElementService) {
         scope.textEdit = 'Edit Text';
         scope.structEdit = 'Edit Order';
         scope.sortableOptions = {
-            stop: function(event, ui) {
-                if (!scope.structEditable) {
-                    element.find('.ui-sortable').sortable('cancel');
-                }
-            },
+            cancel: 'div',
             axis: 'y'
+        };
+        scope.toggleTextEdit = function() {
+            scope.textEditable = !scope.textEditable;
+            scope.textEdit = scope.textEditable ? 'Stop Text Edit' : 'Edit Text';
+        };
+        scope.toggleStructEdit = function() {
+            scope.structEditable = !scope.structEditable;
+            scope.structEdit = scope.structEditable ? 'Stop Order Edit' : 'Edit Order';
+            element.find('.ui-sortable').sortable('option', 'cancel', scope.structEditable ? '' : 'div');
         };
     };
 
