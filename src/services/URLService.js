@@ -144,6 +144,17 @@ function URLService($q, $http, $location) {
         return root + "/javawebscripts/products/" + id;
     };
 
+    var handleHttpStatus = function(data, status, header, config, deferred) {
+        if (status === 404)
+            deferred.reject("Not Found");
+        else if (status === 500)
+            deferred.reject("Server Error");
+        else if (status === 401 || status === 403)
+            deferred.reject("Unauthorized");
+        else
+            deferred.reject("Failed");
+    };
+
     return {
         getRoot: getRoot,
         setRoot: setRoot,
@@ -151,7 +162,8 @@ function URLService($q, $http, $location) {
         getElementURL: getElementURL,
         getPostElementsURL: getPostElementsURL,
         getViewURL: getViewURL,
-        getDocumentURL: getDocumentURL
+        getDocumentURL: getDocumentURL,
+        handleHttpStatus: handleHttpStatus
     };
 
 }

@@ -17,17 +17,22 @@ angular.module('mms')
  * id to view objects. These objects include view hierarchies, the display structure,
  * and keeps track of what elements are referenced in each view. 
  *
- * Current View object:
+ * View object (includes common things from Element object):
  * ```
  *      {
  *          "id": view id (element id),
+ *          "name": name,
+ *          "type": "View",
+ *          "owner": element id,
+ *          "documentation": doc,
  *          "childrenViews": [viewIds],     //canonical hierarchy
  *          "displayedElements": [elementIds],
  *          "allowedElements": [elementIds],
  *          "contains": [
  *              {
- *                  "type": "Paragraph" | "Table" | "List",
- *                  
+ *                  "type": "Paragraph" | "Table" | "List" | "Image",
+ *                  "expressionId": element id
+
  *                  //if type is Paragraph//
  *                  "sourceType": "reference" | "text",
  *                  //if sourceType is reference
@@ -41,7 +46,7 @@ angular.module('mms')
  *                  "body": [               //array of rows
  *                       [{                 //array of cells
  *                          "content": [    //each cell can have multiple items
- *                              {"type": "Paragraph" | "Table" | "List" ...}
+ *                              {"type": "Paragraph" | "Table" | "List" | "Image" ...}
  *                          ],
  *                          "colspan": integer,
  *                          "rolspan": integer
@@ -52,20 +57,23 @@ angular.module('mms')
  *                  //if type is List//
  *                  "list": [               //array of list items
  *                      [{                  //each list item can have multiple things
- *                          "type": "Paragraph" | "Table" | "List" ...
+ *                          "type": "Paragraph" | "Table" | "List" | "Image" ...
  *                      }]
  *                  ],
  *                  "ordered": true | false
+ *
+ *                  //if type is Image//
+ *                  "image": elementId
  *              }
  *          ]
  *      }
  * ```
  *
- * Current Document object:
+ * Document object (same as view plus..):
  * ```
  *      {
  *          "id": document id (element and view id),
- *          "noSections": [viewIds],
+ *          "type": "Product",
  *          "view2view": [
  *              {
  *                  "id": document or view id,
@@ -79,7 +87,6 @@ function ViewService($q, $http, URLService, ElementService, CommentService) {
     var views = {};
     var allowedElements = {};
     var displayedElements = {};
-    var transcludedElements = {}; 
     var comments = {};
     var documents = {};
 
@@ -103,7 +110,15 @@ function ViewService($q, $http, URLService, ElementService, CommentService) {
         if (views.hasOwnProperty(id))
             deferred.resolve(views[id]);
         else {
-            $http.get(URLService.getViewURL(id))
+            ElementService.getElement(id).then(function(data) {
+                if (views.hasOwnProperty(id))
+                    deferred.resolve(views[id]);
+                else {
+                    views[id] = data;
+                    deferred.resolve(views[id]);
+                }
+            });
+           /* $http.get(URLService.getViewURL(id))
             .success(function(data, status, headers, config) {
                 if (views.hasOwnProperty(id))
                     deferred.resolve(views[id]);
@@ -122,7 +137,7 @@ function ViewService($q, $http, URLService, ElementService, CommentService) {
                     deferred.reject("Unauthorized");
                 else
                     deferred.reject("Failed");
-            });
+            });*/
         }
         return deferred.promise;
     };
@@ -164,7 +179,15 @@ function ViewService($q, $http, URLService, ElementService, CommentService) {
         if (documents.hasOwnProperty(id))
             deferred.resolve(documents[id]);
         else {
-            $http.get(URLService.getDocumentURL(id))
+            ElementService.getElement(id).then(function(data) {
+                if (documents.hasOwnProperty(id))
+                    deferred.resolve(documents[id]);
+                else {
+                    documents[id] = data;
+                    deferred.resolve(documents[id]);
+                }
+            });
+            /*$http.get(URLService.getDocumentURL(id))
             .success(function(data, status, headers, config) {
                 if (documents.hasOwnProperty(id))
                     deferred.resolve(documents[id]);
@@ -183,7 +206,7 @@ function ViewService($q, $http, URLService, ElementService, CommentService) {
                     deferred.reject("Unauthorized");
                 else
                     deferred.reject("Failed");
-            });
+            });*/
         }
         return deferred.promise;
     };
@@ -203,7 +226,11 @@ function ViewService($q, $http, URLService, ElementService, CommentService) {
      *      update is successful.
      */
     var updateView = function(view) {
-
+        var deferred = $q.defer();
+        ElementService.updateElement(view).then(function(data) {
+            deferred.resolve(data);
+        });
+        return deferred.promise;
     };
 
     /**
@@ -221,7 +248,11 @@ function ViewService($q, $http, URLService, ElementService, CommentService) {
      *      update is successful.
      */
     var updateDocument = function(document) {
-
+        var deferred = $q.defer();
+        ElementService.updateElement(document).then(function(data) {
+            deferred.resolve(data);
+        });
+        return deferred.promise;
     };
 
     /**
@@ -257,32 +288,19 @@ function ViewService($q, $http, URLService, ElementService, CommentService) {
         if (allowedElements.hasOwnProperty(id))
             deferred.resolve(allowedElements[id]);
         else {
-            getView(id).then(function(data) {
+            /*getView(id).then(function(data) {
                 var allowedIds = data.allowedElements;
                 ElementService.getElements(allowedIds).then(function(data2) {
                     allowedElements[id] = data2;
                     deferred.resolve(data2);
                 });
+            });*/
+            ElementService.getViewElements(id).then(function(data) {
+                allowedElements[id] = data;
+                deferred.resolve(data);
             });
         }
         return deferred.promise;
-    };
-
-    /**
-     * @ngdoc method
-     * @name mms.ViewService#getViewAllowedElements
-     * @methodOf mms.ViewService
-     * 
-     * @description
-     * Gets the element objects for elements transcluded in this view. The references are 
-     * the same as ones gotten from ElementService.
-     * Isn't this really the same as displayedElements?
-     * 
-     * @param {string} id The id of the view.
-     * @returns {Promise} The promise will be resolved with array of element objects. 
-     */
-    var getViewTranscludedElements = function(id) {
-
     };
 
     /**
@@ -348,6 +366,42 @@ function ViewService($q, $http, URLService, ElementService, CommentService) {
 
     };
 
+    /**
+     * @ngdoc method
+     * @name mms.ViewService#createView
+     * @methodOf mms.ViewService
+     * 
+     * @description
+     * Create a new view, owner must be specified (parent view), id cannot be specified,
+     * if name isn't specified, "Untitled" will be used, a default contains with 
+     * paragraph of the view documentation will be used. 
+     * 
+     * @param {Object} view A view object, id cannot be specified, owner must be specified
+     * @returns {Promise} The promise will be resolved with the new view. 
+     */
+    var createView = function(view) {
+        var deferred = $q.defer();
+        view.type = 'View';
+        if (!view.hasOwnProperty('name'))
+            view.name = 'Untitled View';
+        if (!view.hasOwnProperty('documentation'))
+            view.documentation = '';
+        ElementService.createElement(view).then(function(data) {
+            data.contains = [{'type': 'Paragraph', 
+                'sourceType': 'reference', 
+                'source': data.id, 
+                'sourceProperty': 'documentation'}];
+            data.allowedElements = [data.id];
+            data.displayedElements = [data.id];
+            data.childrenViews = [];
+            ElementService.updateElement(data).then(function(data2) {
+                views[data2.id] = data2;
+                deferred.resolve(data2);
+            });
+        });
+        return deferred.promise;
+    };
+
     return {
         getView: getView,
         getViews: getViews,
@@ -359,7 +413,8 @@ function ViewService($q, $http, URLService, ElementService, CommentService) {
         getViewComments: getViewComments,
         addViewComment: addViewComment,
         deleteViewComment: deleteViewComment,
-        updateViewElements: updateViewElements
+        updateViewElements: updateViewElements,
+        createView: createView
     };
 
 }
