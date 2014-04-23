@@ -71,25 +71,25 @@
             selected_branch = null;
             select_branch = function(branch) {
               if (!branch) {
-                if (selected_branch !== null) {
+                if (selected_branch !== null && selected_branch !== undefined) {
                   selected_branch.selected = false;
                 }
                 selected_branch = null;
                 return;
               }
               if (branch !== selected_branch) {
-                if (selected_branch !== null) {
+                if (selected_branch !== null && selected_branch !== undefined) {
                   selected_branch.selected = false;
                 }
                 branch.selected = true;
                 selected_branch = branch;
                 expand_all_parents(branch);
-                if (branch.onSelect !== null) {
+                if (branch.onSelect !== null && branch.onSelect !== undefined) {
                   return $timeout(function() {
                     return branch.onSelect(branch);
                   });
                 } else {
-                  if (scope.onSelect !== null) {
+                  if (scope.onSelect !== null && scope.onSelect !== undefined) {
                     return $timeout(function() {
                       return scope.onSelect({
                         branch: branch
@@ -120,7 +120,7 @@
             for_all_ancestors = function(child, fn) {
               var parent;
               parent = get_parent(child);
-              if (parent !== null) {
+              if (parent !== null && parent !== undefined) {
                 fn(parent);
                 return for_all_ancestors(parent, fn);
               }
@@ -187,7 +187,7 @@
               });
               add_branch_to_list = function(level, branch, visible) {
                 var child, child_visible, tree_icon, _i, _len, _ref, _results;
-                if (branch.expanded === null) {
+                if (branch.expanded === null || branch.expanded === undefined) {
                   branch.expanded = false;
                 }
                 if (!branch.children || branch.children.length === 0) {
@@ -206,7 +206,7 @@
                   tree_icon: tree_icon,
                   visible: visible
                 });
-                if (branch.children !== null) {
+                if (branch.children !== null && branch.children !== undefined) {
                   _ref = branch.children;
                   _results = [];
                   for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -242,7 +242,7 @@
               b.expanded = b.level < expand_level;
               return b.expanded;
             });
-            if (scope.treeControl !== null) {
+            if (scope.treeControl !== null && scope.treeControl !== undefined) {
               if (angular.isObject(scope.treeControl)) {
                 tree = scope.treeControl;
                 tree.expand_all = function() {
@@ -283,12 +283,12 @@
                 };
                 tree.select_parent_branch = function(b) {
                   var p;
-                  if (b === null) {
+                  if (b === null || b === undefined) {
                     b = tree.get_selected_branch();
                   }
-                  if (b !== null) {
+                  if (b !== null && b !== undefined) {
                     p = tree.get_parent_branch(b);
-                    if (p !== null) {
+                    if (p !== null && p !== undefined) {
                       tree.select_branch(p);
                       return p;
                     }
