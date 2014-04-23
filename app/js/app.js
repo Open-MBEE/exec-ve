@@ -96,7 +96,7 @@
         return tree.add_branch(branch, {
           label: 'New Branch',
           data: {
-            something: 42,
+            name: "New Branch",
             "else": 43
           }
         });
