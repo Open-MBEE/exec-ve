@@ -14,26 +14,26 @@ angular.module('mms')
  * An element cache and CRUD service. Maintains a cache of element id to element objects.
  * This maintains a single source of truth for applications that use this service. Do not
  * directly modify the attributes of elements returned from this service but use the update
- * methods instead. Consider forking and edited element cache support in future, and saving
- * to html5 local storage for edited things incase of crashes.
+ * methods instead. Consider saving to html5 local storage for edited things incase of crashes.
+ * The element objects will contain all its attributes including view and document keys.
  *
  * Current element object:
  * ```
  *      {
  *          "id": element id as string,
  *          "type": "Package" | "Property" | "Element" | "Dependency" | "Generalization" |
- *                  "DirectedRelationship" | "Conform" | "Expose" | "Viewpoint",
+ *                  "DirectedRelationship" | "Conform" | "Expose" | "Viewpoint" | 
+ *                  "LiteralReal" | "LiteralString" | "LiteralInteger" | "LiteralBoolean" |
+ *                  "LiteralUnlimitedNatural" | "ElementValue" | "Expression" | "OpaqueExpression",
  *          "name": element name, empty string if no name,
  *          "documentation": element documentation as string, can contain html,
- *          "owner": owner element's id or null,
+ *          "owner": owner element's id,
  *
  *          //if type is "Property"
  *          "propertyType": element id or null,
  *          "isDerived": true | false,
  *          "isSlot": true | false,
- *          "value": [string|boolean|number|elementIds], //based on valueType,
- *          "valueType": "LiteralBoolean" | "LiteralInteger" | "LiteralString" | 
- *                  "LiteralReal" | "ElementValue" | "Expression",
+ *          "value": [elementIds],
  *          
  *          //if type is DirectedRelationship or Generalization or Dependency
  *          "source": source element id,
@@ -42,13 +42,17 @@ angular.module('mms')
  *          //if type is Comment
  *          "body": comment body, can contain html,
  *          "annotatedElements": [elementIds]
+ *
+ *          //if type is the values
+ *          //keys can include: boolean, integer, string, double, elementValueElement
  *      }
  * ```
  */
 function ElementService($q, $http, URLService, _) {
     var elements = {};
     var edits = {};
-
+    var nonEditKeys = ['contains', 'view2view', 'childrenViews', 'displayedElements',
+        'allowedElements'];
     /**
      * @ngdoc method
      * @name mms.ElementService#getElement
@@ -85,14 +89,7 @@ function ElementService($q, $http, URLService, _) {
                     deferred.reject("Not Found");
                 }
             }).error(function(data, status, headers, config) {
-                if (status === 404)
-                    deferred.reject("Not Found");
-                else if (status === 500)
-                    deferred.reject("Server Error");
-                else if (status === 401 || status === 403)
-                    deferred.reject("Unauthorized");
-                else
-                    deferred.reject("Failed");
+                URLService.handleHttpStatus(data, status, headers, config, deferred);
             });
         }
         return deferred.promise;
@@ -139,12 +136,17 @@ function ElementService($q, $http, URLService, _) {
         if (edits.hasOwnProperty(id))
             deferred.resolve(edits[id]);
         else {
-            getElement(id).then(function(data){
+            getElement(id).then(function(data) {
                 if (edits.hasOwnProperty(id))
                     deferred.resolve(edits[id]);
                 else {
                     var edit = _.cloneDeep(data);
                     edits[id] = edit;
+                    for (var i = 0; i < nonEditKeys.length; i++) {
+                        if (edit.hasOwnProperty(nonEditKeys[i])) {
+                            delete edit[nonEditKeys[i]];
+                        }
+                    }
                     deferred.resolve(edit);
                 }
             });
@@ -218,14 +220,7 @@ function ElementService($q, $http, URLService, _) {
             });
             deferred.resolve(result); 
         }).error(function(data, status, headers, config) {
-            if (status === 404)
-                deferred.reject("Not Found");
-            else if (status === 500)
-                deferred.reject("Server Error");
-            else if (status === 401 || status === 403)
-                deferred.reject("Unauthorized");
-            else
-                deferred.reject("Failed");
+            URLService.handleHttpStatus(data, status, headers, config, deferred);
         });
         
         return deferred.promise;
@@ -247,21 +242,16 @@ function ElementService($q, $http, URLService, _) {
     var updateElement = function(elem) {
         var deferred = $q.defer();
         if (elements.hasOwnProperty(elem.id)) {
-            if (elem.hasOwnProperty('name'))
-                elements[elem.id].name = elem.name;
-            if (elem.hasOwnProperty('documentation'))
-                elements[elem.id].documentation = elem.documentation;
-            deferred.resolve(elements[elem.id]);
-            //alfresco service not implemented yet
-            /*$http.post(URLService.getPostElementsURL(), {'elements': [elem]})
+            //elements[elem.id].name = elem.name;
+            //elements[elem.id].documentation = elem.documentation; //make a function to do deep copy
+            //deferred.resolve(elements[elem.id]);
+            $http.put(URLService.getPostElementsURL(), {'elements': [elem]})
             .success(function(data, status, headers, config) {
-                //make some merging util function
-                var element = elements[elem.id];
-
+                _.merge(elements[elem.id], elem);
                 deferred.resolve(elements[elem.id]);
             }).error(function(data, status, headers, config) {
-                deferred.reject('Error');
-            });*/
+                URLService.handleHttpStatus(data, status, headers, config, deferred);
+            });
         } else
             deferred.reject("Not in Cache");
         return deferred.promise;
@@ -283,6 +273,63 @@ function ElementService($q, $http, URLService, _) {
         var promises = [];
         elems.forEach(function(elem) {
             promises.push(updateElement(elem));
+        });
+        return $q.all(promises);
+    };
+
+    /**
+     * @ngdoc method
+     * @name mms.ElementService#createElement
+     * @methodOf mms.ElementService
+     * 
+     * @description
+     * Create element on alfresco and update the cache if successful.
+     * 
+     * @param {Object} elem Element object that must have an owner id.
+     * @returns {Promise} The promise will be resolved with the created element references if 
+     *      create is successful.
+     */
+    var createElement = function(elem) {
+        var deferred = $q.defer();
+        if (!elem.hasOwnProperty('owner')) {
+            deferred.reject('Element create needs an owner');
+            return deferred.promise;
+        }
+        if (elem.hasOwnProperty('id')) {
+            deferred.reject('Element create cannot have id');
+            return deferred.promise;
+        }
+        $http.post(URLService.getPostElementsURL(), {'elements': [elem]})
+        .success(function(data, status, headers, config) {
+            if (data.elements.length > 0) {
+                var e = data.elements[0];
+                elements[e.id] = e;
+                deferred.resolve(e);
+            }
+            //elements[elem.id] = elem;
+            //deferred.resolve(elements[elem.id]);
+        }).error(function(data, status, headers, config) {
+            URLService.handleHttpStatus(data, status, headers, config, deferred);
+        });
+        return deferred.promise;
+    };
+
+    /**
+     * @ngdoc method
+     * @name mms.ElementService#createElements
+     * @methodOf mms.ElementService
+     * 
+     * @description
+     * Create elements to alfresco and update the cache if successful.
+     * 
+     * @param {Array.<Object>} elems Array of element objects that must contain owner id.
+     * @returns {Promise} The promise will be resolved with an array of created element references if 
+     *      create is successful.
+     */
+    var createElements = function(elems) {
+        var promises = [];
+        elems.forEach(function(elem) {
+            promises.push(createElement(elem));
         });
         return $q.all(promises);
     };
