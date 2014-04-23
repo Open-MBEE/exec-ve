@@ -21,9 +21,33 @@
       
       <!-- Left Side -->
       <div class="col-lg-2" ng-controller="AbnTestController">
-        <abn-tree tree-data="my_data" tree-control="my_tree" 
+        <div class="row">
+          <div class="btn-toolbar" role="toolbar">
+            <div class="btn-group btn-group-sm">
+              <button type="button" class="btn btn-default" ng-click="my_tree.expand_all()">
+                <span class="glyphicon glyphicon-collapse-down"></span>
+              </button>
+              <button type="button" class="btn btn-default" ng-click="my_tree.collapse_all()">
+                <span class="glyphicon glyphicon-collapse-up"></span>
+              </button>          
+            </div>
+            <div class="btn-group btn-group-sm">
+              <button type="button" class="btn btn-default" ng-click="try_adding_a_branch()">
+                <span class="glyphicon glyphicon-plus"></span> Add
+              </button>
+            </div>
+            <div class="btn-group btn-group-sm">
+              <button type="button" class="btn btn-default">
+                <span class="glyphicon glyphicon-th-list"></span> Reorder
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <mms-tree tree-data="my_data" tree-control="my_tree" 
               on-select="my_tree_handler(branch)" expand-level="2"> 
-        </abn-tree>
+          </mms-tree>
+        </div>
       </div>
 
       <!-- Center (Main) View -->
