@@ -19,8 +19,8 @@
     .controller('AbnTestController', function($scope, $state, ElementService, ViewService) {
 
       // $scope.documentid = "_17_0_2_3_407019f_1390507581047_689015_29384";
-      $scope.documentid = "_17_0_2_3_8660276_1389735483493_203695_64097";
-      
+      //$scope.documentid = "_17_0_2_3_8660276_1389735483493_203695_64097";
+      $scope.documentid = "_17_0_2_3_897027c_1380234582224_623869_33513";
       var tree;
 
       $scope.my_tree = tree = {};
@@ -107,7 +107,7 @@
       $stateProvider
           .state('view', {
               url: '/view/:viewId',
-              template: '<div class="row"><div class="col-lg-8"><mms-view vid="{{vid}}" transclude-clicked="tscClicked(elementId)"></mms-view></div><div class="col-lg-4" ui-view></div></div>',
+              template: '<div class="row"><div class="col-lg-8 main"><mms-view vid="{{vid}}" transclude-clicked="tscClicked(elementId)"></mms-view></div><div class="col-lg-4" ui-view></div></div>',
               controller: function($scope, viewid, $state) {
                   $scope.vid = viewid.viewid;
                   $scope.tscClicked = function(elementId) {

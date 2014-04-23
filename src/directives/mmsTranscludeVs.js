@@ -1,33 +1,25 @@
 'use strict';
 
 angular.module('mms')
-.directive('mmsTranscludeDoc', ['ElementService', '$compile', mmsTranscludeDoc]);
+.directive('mmsTranscludeVs', ['ElementService', '$compile', mmsTranscludeVs]);
 
-function mmsTranscludeDoc(ElementService, $compile) {
+function mmsTranscludeVs(ElementService, $compile) {
 
-    var mmsTranscludeDocLink = function(scope, element, attrs, mmsViewCtrl) {
-        element.click(function(e) {
-            if (mmsViewCtrl === null || mmsViewCtrl === undefined)
-                return false;
-            mmsViewCtrl.transcludeClicked(scope.eid);
-            //e.stopPropagation();
-            return false;
-        });
-
+    var mmsTranscludeVsLink = function(scope, element, attrs) {
         scope.$watch('eid', function(newVal, oldVal) {
             if (newVal === undefined || newVal === null || newVal === '')
                 return;
             ElementService.getElement(scope.eid).then(function(data) {
                 scope.element = data;
-                var doc = scope.element.documentation;
-                element.append(doc);
+                var s = scope.element.string;
+                element.append(s);
                 $compile(element.contents())(scope);
                 //var el = $compile(doc)(scope);
                 //element.append(el);
-                scope.$watch('element.documentation', function(n, o) {
+                scope.$watch('element.string', function(n, o) {
                     element.empty();
-                    doc = scope.element.documentation;
-                    element.append(doc);
+                    s = scope.element.string;
+                    element.append(s);
                     $compile(element.contents())(scope); 
                     //var el = $compile(doc)(scope); 
                     //element.append(el); 
@@ -42,8 +34,7 @@ function mmsTranscludeDoc(ElementService, $compile) {
         scope: {
             eid: '@',
         },
-        require: '?^mmsView',
         //controller: ['$scope', controller]
-        link: mmsTranscludeDocLink
+        link: mmsTranscludeVsLink
     };
 }
