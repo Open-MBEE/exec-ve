@@ -6,7 +6,16 @@
   function mmsTree($timeout, $log) {
         return {
           restrict: 'E',
-          template: "<ul class=\"nav nav-list nav-pills nav-stacked abn-tree\">\n  <li ng-repeat=\"row in tree_rows | filter:{visible:true} track by row.branch.uid\" ng-animate=\"'abn-tree-animate'\" ng-class=\"'level-' + {{ row.level }} + (row.branch.selected ? ' active':'')\" class=\"abn-tree-row\">\n    <a ng-click=\"user_clicks_branch(row.branch)\">\n      <i ng-class=\"row.tree_icon\" ng-click=\"row.branch.expanded = !row.branch.expanded\" class=\"indented tree-icon\"> </i>\n      <span class=\"indented tree-label\">{{ row.branch.data.name }} </span>\n    </a>\n  </li>\n</ul>",
+          template: '<ul class="nav nav-list nav-pills nav-stacked abn-tree">\n' +
+                      '<li ng-repeat="row in tree_rows | filter:{visible:true} track by row.branch.uid" ng-animate="\'abn-tree-animate\'" ng-class="\'level-\' + {{ row.level }} + (row.branch.selected ? \' active\':\'\')" class="abn-tree-row">\n' +
+                        '<a ng-click="user_clicks_branch(row.branch)">\n' +
+                          '<i ng-class="row.tree_icon" ng-click="row.branch.expanded = !row.branch.expanded" class="indented tree-icon"> </i>\n' +
+                          '<span class="indented tree-label">{{ row.section + " " + row.branch.data.name }}' +
+                          '</span>\n' +
+                        '</a>\n' +
+                      '</li>\n' +
+                    '</ul>',
+
           replace: true,
           scope: {
             treeData: '=',
@@ -185,7 +194,7 @@
                   return branch.children;
                 }
               });
-              add_branch_to_list = function(level, branch, visible) {
+              add_branch_to_list = function(level, section, branch, visible) {
                 var child, child_visible, tree_icon, _i, _len, _ref, _results;
                 if (branch.expanded === null || branch.expanded === undefined) {
                   branch.expanded = false;
@@ -201,6 +210,7 @@
                 }
                 scope.tree_rows.push({
                   level: level,
+                  section: section,
                   branch: branch,
                   label: branch.label,
                   tree_icon: tree_icon,
@@ -212,7 +222,7 @@
                   for (_i = 0, _len = _ref.length; _i < _len; _i++) {
                     child = _ref[_i];
                     child_visible = visible && branch.expanded;
-                    _results.push(add_branch_to_list(level + 1, child, child_visible));
+                    _results.push(add_branch_to_list(level + 1, section + '.' + (_i+1), child, child_visible));
                   }
                   return _results;
                 }
@@ -221,7 +231,7 @@
               _results = [];
               for (_i = 0, _len = _ref.length; _i < _len; _i++) {
                 root_branch = _ref[_i];
-                _results.push(add_branch_to_list(1, root_branch, true));
+                _results.push(add_branch_to_list(1, '1', root_branch, true));
               }
               return _results;
             };

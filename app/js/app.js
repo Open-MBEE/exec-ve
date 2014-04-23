@@ -56,13 +56,12 @@
           // Fill out all the view names first
           for (var i = 0; i < elements.length; i++)
           {
-            var viewTreeNode = { "label" : elements[i].name, 
-                                  "data" : elements[i], 
-                                  "children" : [] };
+            var viewTreeNode = { label : elements[i].name, 
+                                  data : elements[i], 
+                              children : [] };
 
             viewElementIds2TreeNodeMap[elements[i].id] = viewTreeNode;
           }
-
 
           for (var i = 0; i < data.view2view.length; i++) {
 
