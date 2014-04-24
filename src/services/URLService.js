@@ -111,9 +111,12 @@ function URLService($q, $http, $location) {
      * @returns {string} The post elements path.
      */
     var getPostElementsURL = function() {
-        return root + "/javawebscripts/elements";
+        return root + "/javawebscripts/sites/europa/projects/123456/elements";
     };
 
+    var getPostViewsURL = function() {
+        return root + "/javawebscripts/views";
+    };
     /**
      * @ngdoc method
      * @name mms.URLService#getViewURL
@@ -161,6 +164,7 @@ function URLService($q, $http, $location) {
         getSiteDashboardURL: getSiteDashboardURL,
         getElementURL: getElementURL,
         getPostElementsURL: getPostElementsURL,
+        getPostViewsURL: getPostViewsURL,
         getViewURL: getViewURL,
         getDocumentURL: getDocumentURL,
         handleHttpStatus: handleHttpStatus

@@ -394,9 +394,16 @@ function ViewService($q, $http, URLService, ElementService, CommentService) {
             data.allowedElements = [data.id];
             data.displayedElements = [data.id];
             data.childrenViews = [];
-            ElementService.updateElement(data).then(function(data2) {
+            /*ElementService.updateElement(data).then(function(data2) {
                 views[data2.id] = data2;
                 deferred.resolve(data2);
+            });*/
+            $http.post(URLService.getPostViewsURL(), {"views": [data]})
+            .success(function(data2, status, headers, config) {
+                views[data.id] = data;
+                deferred.resolve(views[data.id]);
+            }).error(function(data2, status, headers, config) {
+                URLService.handleHttpStatus(data2, status, headers, config, deferred);
             });
         });
         return deferred.promise;
