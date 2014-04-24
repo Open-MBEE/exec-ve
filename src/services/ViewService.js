@@ -249,8 +249,14 @@ function ViewService($q, $http, URLService, ElementService, CommentService) {
      */
     var updateDocument = function(document) {
         var deferred = $q.defer();
-        ElementService.updateElement(document).then(function(data) {
+        /*ElementService.updateElement(document).then(function(data) {
             deferred.resolve(data);
+        });*/
+        $http.post(URLService.getPostDocumentsURL(), {"products":[document]})
+        .success(function(data, status, headers, config) {
+            deferred.resolve(documents[document.id]);
+        }).error(function(data, status, headers, config) {
+            URLService.handleHttpStatus(data, status, headers, config, deferred);
         });
         return deferred.promise;
     };

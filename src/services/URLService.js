@@ -117,6 +117,11 @@ function URLService($q, $http, $location) {
     var getPostViewsURL = function() {
         return root + "/javawebscripts/views";
     };
+
+    var getPostDocumentsURL = function() {
+        return root + "/javawebscripts/products";
+    };
+
     /**
      * @ngdoc method
      * @name mms.URLService#getViewURL
@@ -165,6 +170,7 @@ function URLService($q, $http, $location) {
         getElementURL: getElementURL,
         getPostElementsURL: getPostElementsURL,
         getPostViewsURL: getPostViewsURL,
+        getPostDocumentsURL: getPostDocumentsURL,
         getViewURL: getViewURL,
         getDocumentURL: getDocumentURL,
         handleHttpStatus: handleHttpStatus
