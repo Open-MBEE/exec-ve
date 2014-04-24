@@ -377,6 +377,8 @@ function ElementService($q, $http, URLService, _) {
         getOwnedElements: getOwnedElements,
         updateElement: updateElement,
         updateElements: updateElements,
+        createElement: createElement,
+        createElements: createElements,
         isDirty: isDirty,
         search: search
     };
