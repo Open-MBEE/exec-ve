@@ -31,7 +31,7 @@ function mmsTranscludeVal(ElementService, $compile) {
                 }
             }
             element.empty();
-            var toCompile = ', '.join(toCompileList);
+            var toCompile = toCompileList.join(', ');
             element.append(toCompile);
             $compile(element.contents())(scope); 
         };

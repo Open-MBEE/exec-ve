@@ -254,7 +254,7 @@ function ViewService($q, $http, URLService, ElementService, CommentService) {
         });*/
         $http.post(URLService.getPostDocumentsURL(), {"products":[document]})
         .success(function(data, status, headers, config) {
-            deferred.resolve(documents[document.id]);
+            deferred.resolve(document);
         }).error(function(data, status, headers, config) {
             URLService.handleHttpStatus(data, status, headers, config, deferred);
         });
@@ -372,6 +372,22 @@ function ViewService($q, $http, URLService, ElementService, CommentService) {
 
     };
 
+    var addViewToDocument = function(viewId, documentId, parentViewId) {
+        var deferred = $q.defer();
+        getDocument(documentId).then(function(data) {   
+            for (var i = 0; i < data.view2view.length; i++) {
+                if (data.view2view[i].id === parentViewId) {
+                    data.view2view[i].childrenViews.unshift(viewId);
+                    break;
+                }
+            } 
+            updateDocument(data).then(function(data2) {
+                deferred.resolve(data);
+            });
+        });
+        return deferred.promise;
+    };
+
     /**
      * @ngdoc method
      * @name mms.ViewService#createView
@@ -385,13 +401,18 @@ function ViewService($q, $http, URLService, ElementService, CommentService) {
      * @param {Object} view A view object, id cannot be specified, owner must be specified
      * @returns {Promise} The promise will be resolved with the new view. 
      */
-    var createView = function(view) {
+    var createView = function(ownerId, name, documentId) {
         var deferred = $q.defer();
-        view.type = 'View';
-        if (!view.hasOwnProperty('name'))
+        var view = {
+            type: 'View',
+            owner: ownerId,
+            name: name === undefined ? 'Untitled View' : name,
+            documentation: ''
+        };
+        /*if (!view.hasOwnProperty('name'))
             view.name = 'Untitled View';
         if (!view.hasOwnProperty('documentation'))
-            view.documentation = '';
+            view.documentation = '';*/
         ElementService.createElement(view).then(function(data) {
             data.contains = [{'type': 'Paragraph', 
                 'sourceType': 'reference', 
@@ -407,7 +428,13 @@ function ViewService($q, $http, URLService, ElementService, CommentService) {
             $http.post(URLService.getPostViewsURL(), {"views": [data]})
             .success(function(data2, status, headers, config) {
                 views[data.id] = data;
-                deferred.resolve(views[data.id]);
+                if (documentId !== undefined) {
+                    addViewToDocument(data.id, documentId, ownerId).then(function(data3) {
+                        deferred.resolve(views[data.id]);
+                    });
+                } else
+                    deferred.resolve(views[data.id]);
+
             }).error(function(data2, status, headers, config) {
                 URLService.handleHttpStatus(data2, status, headers, config, deferred);
             });
@@ -427,7 +454,8 @@ function ViewService($q, $http, URLService, ElementService, CommentService) {
         addViewComment: addViewComment,
         deleteViewComment: deleteViewComment,
         updateViewElements: updateViewElements,
-        createView: createView
+        createView: createView,
+        addViewToDocument: addViewToDocument
     };
 
 }
