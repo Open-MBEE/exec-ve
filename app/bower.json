@@ -1,0 +1,32 @@
+{
+  "name": "mms",
+  "version": "0.2.0",
+  "authors": [
+    "Raffi P Tikidjian <raffi@jpl.nasa.gov>"
+  ],
+  "description": "Model Management System",
+  "main": "bower.json",
+  "moduleType": [
+    "globals"
+  ],
+  "keywords": [
+    "mms"
+  ],
+  "license": "MIT",
+  "homepage": "ems.jpl.nasa.gov",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular-ui-bootstrap": "v0.10.0",
+    "angular-ui-layout": "bower",
+    "angular-ui-router": "0.2.10",
+    "angular-ui-sortable": "bower",
+    "froala": "v1.1.3"
+  }
+}
