@@ -6,8 +6,8 @@ angular.module('mms')
 function mmsView(ViewService, ElementService) {
     var template = '<div>' +
                 '<div><h4 class="inline"><mms-transclude-name eid="{{viewElement.id}}"></mms-transclude-name></h4>' + 
-                '<span class="pull-right"><button class="btn" ng-click="toggleTextEdit()">{{textEdit}}</button>' +
-                '<button class="btn" ng-click="toggleStructEdit()">{{structEdit}}</button></span></div>' +
+                '<span class="pull-right"><button class="btn btn-sm" ng-click="toggleTextEdit()">{{textEdit}}</button>' +
+                '<button class="btn btn-sm" ng-click="toggleStructEdit()">{{structEdit}}</button></span></div>' +
                 '<div ui-sortable="sortableOptions" ng-model="view.contains">' +
                 '<div ng-repeat="contain in view.contains" ng-switch on="contain.type">' +
                     '<mms-view-para para="contain" ng-switch-when="Paragraph"></mms-view-para>' +

@@ -32,7 +32,7 @@
 .inline {display:inline;}
 
 mms-transclude-name {
-  border-style: dotted;
+  border-bottom: 1px dotted blue;
 }
 
-.main {overflow: auto;}
+.main {overflow-x: auto;}
