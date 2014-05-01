@@ -155,7 +155,7 @@ module.exports = function(grunt) {
     },
 
     watch: {
-      files: ["vendor/**/*", 'app/**/*', 'src/**/*'],
+      files: ['app/**/*', '!app/bower_components/**', 'src/**/*'],
       tasks: ['default']
     },
 
