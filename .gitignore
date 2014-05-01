@@ -6,3 +6,4 @@ tmp
 build
 dist
 docs
+app/bower_components
