@@ -8,6 +8,7 @@ function mmsView(ViewService, ElementService) {
                 '<div><h4 class="inline"><mms-transclude-name eid="{{viewElement.id}}"></mms-transclude-name></h4>' + 
                 '<span class="pull-right"><button class="btn btn-sm" ng-click="toggleTextEdit()">{{textEdit}}</button>' +
                 '<button class="btn btn-sm" ng-click="toggleStructEdit()">{{structEdit}}</button></span></div>' +
+                '<span>Last Modified: {{lastModified}} by {{author}}</span>' + 
                 '<div ui-sortable="sortableOptions" ng-model="view.contains">' +
                 '<div ng-repeat="contain in view.contains" ng-switch on="contain.type">' +
                     '<mms-view-para para="contain" ng-switch-when="Paragraph"></mms-view-para>' +
@@ -26,6 +27,11 @@ function mmsView(ViewService, ElementService) {
             if ($scope.textEditable && $scope.transcludeClicked)
                 $scope.transcludeClicked({elementId: elementId});
         };
+        this.elementTranscluded = function(elem) {
+            if (elem.lastModified > $scope.lastModified)
+                $scope.lastModified = elem.lastModified;
+            $scope.author = elem.author;
+        };
     };
 
     var mmsViewLink = function(scope, element, attrs) {
@@ -37,6 +43,8 @@ function mmsView(ViewService, ElementService) {
             });
             ElementService.getElement(scope.vid).then(function(data) {
                 scope.viewElement = data;
+                scope.lastModified = data.lastModified;
+                scope.author = data.author;
             });
         });
         scope.textEditable = false;

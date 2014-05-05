@@ -14,25 +14,23 @@ function mmsTranscludeDoc(ElementService, $compile) {
             return false;
         });
 
+        var recompile = function() {
+            element.empty();
+            var doc = scope.element.documentation;
+            element.append(doc);
+            $compile(element.contents())(scope); 
+            if (mmsViewCtrl) {
+                mmsViewCtrl.elementTranscluded(scope.element);
+            }
+        };
+
         scope.$watch('eid', function(newVal, oldVal) {
             if (newVal === undefined || newVal === null || newVal === '')
                 return;
             ElementService.getElement(scope.eid).then(function(data) {
                 scope.element = data;
-                var doc = scope.element.documentation;
-                element.append(doc);
-                $compile(element.contents())(scope);
-                //var el = $compile(doc)(scope);
-                //element.append(el);
-                scope.$watch('element.documentation', function(n, o) {
-                    element.empty();
-                    doc = scope.element.documentation;
-                    element.append(doc);
-                    $compile(element.contents())(scope); 
-                    //var el = $compile(doc)(scope); 
-                    //element.append(el); 
-                    //above prevents nested transclusions from getting view controller
-                });
+                recompile();
+                scope.$watch('element.documentation', recompile);
             });
         });
     };

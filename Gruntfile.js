@@ -48,7 +48,7 @@ module.exports = function(grunt) {
 
     jshint : {
       beforeconcat: ['src/**/*.js'],
-      afterconcat: ['dist/*.js'],
+      afterconcat: ['dist/mms.js', 'dist/mms.directives.js'],
       options: {
         globalstrict: true,
         globals: {

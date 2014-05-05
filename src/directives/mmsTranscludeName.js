@@ -18,6 +18,12 @@ function mmsTranscludeName(ElementService, $compile) {
                 return;
             ElementService.getElement(scope.eid).then(function(data) {
                 scope.element = data;
+                if (mmsViewCtrl) {
+                    mmsViewCtrl.elementTranscluded(scope.element);
+                    scope.watch('element.name', function() {
+                        mmsViewCtrl.elementTranscluded(scope.element);
+                    });
+                }
             });
         });
     };

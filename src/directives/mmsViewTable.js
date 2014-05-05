@@ -33,8 +33,10 @@ function mmsViewTable($compile) {
         },
         //controller: ['$scope', controller]
         link: function(scope, element, attrs) {
-            var el = $compile(template)(scope);
-            element.append(el);
+            element.append(template);
+            $compile(element.contents())(scope); 
+            //var el = $compile(template)(scope);
+            //element.append(el);
         }
     };
 }

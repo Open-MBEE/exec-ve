@@ -18,11 +18,14 @@ function mmsTranscludeVal(ElementService, $compile) {
             var toCompileList = [];
             for (var i = 0; i < scope.element.value.length; i++) {
                 toCompileList.append(scope.element.value[i]);
-            }
+            } 
             element.empty();
             var toCompile = toCompileList.join(', ');
             element.append(toCompile);
             $compile(element.contents())(scope); 
+            if (mmsViewCtrl) {
+                mmsViewCtrl.elementTranscluded(scope.element);
+            }
         };
 
         scope.$watch('eid', function(newVal, oldVal) {
