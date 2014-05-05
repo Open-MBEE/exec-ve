@@ -1,7 +1,7 @@
   'use strict';
 
   // Declare app level module which depends on filters, and services
-  angular.module('myApp', ['ui.router', 'mms', 'angularBootstrapNavTree'])
+  angular.module('myApp', ['ui.router', 'mms', 'mms.directives'])
 
     .controller('ElementCtrl', ["$scope", "ElementService", function($scope, ElementService) {
       ElementService.getElement($scope.elementid).then(function(data) {

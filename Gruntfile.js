@@ -16,9 +16,13 @@ module.exports = function(grunt) {
             src.replace(/(^|\n)[ \t]*('use strict'|"use strict");?\s*/g, '$1');
         }
       },
-      dist: {
-        src: ['src/mms.js', 'src/services/*.js', 'src/directives/*.js'],
-        dest: 'dist/mms.js',
+      mms: {
+        src: ['src/mms.js', 'src/services/*.js'],
+        dest: 'dist/mms.js'
+      },
+      mmsdirs: {
+        src: ['src/mms.directives.js', 'src/directives/*.js'],
+        dest: 'dist/mms.directives.js'
       }
     },
 
@@ -28,15 +32,23 @@ module.exports = function(grunt) {
         mangle: true,
         wrap: 'mms'
       },
-      build: {
-        src: 'dist/mms.js',
-        dest: 'dist/mms.min.js'
+      mms: {
+        options: {
+          wrap: 'mms'
+        },
+        files: {'dist/mms.min.js': ['dist/mms.js']}
+      },
+      mmsdirs: {
+        options: {
+          wrap: 'mmsdirs'
+        },
+        files: {'dist/mms.directives.min.js': ['dist/mms.directives.js']}
       }
     },
 
     jshint : {
       beforeconcat: ['src/**/*.js'],
-      afterconcat: ['dist/mms.js'],
+      afterconcat: ['dist/*.js'],
       options: {
         globalstrict: true,
         globals: {

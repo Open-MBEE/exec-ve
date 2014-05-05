@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('mms')
+angular.module('mms.directives')
 .directive('mmsViewImg', [mmsViewImg]);
 
 function mmsViewImg() {

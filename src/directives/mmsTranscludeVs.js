@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('mms')
+angular.module('mms.directives')
 .directive('mmsTranscludeVs', ['ElementService', '$compile', mmsTranscludeVs]);
 
 function mmsTranscludeVs(ElementService, $compile) {

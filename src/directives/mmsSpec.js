@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('mms')
+angular.module('mms.directives')
 .directive('mmsSpec', ['ElementService', '$compile', mmsSpec]);
 
 function mmsSpec(ElementService, $compile) {

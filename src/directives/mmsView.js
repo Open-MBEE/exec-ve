@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('mms')
+angular.module('mms.directives')
 .directive('mmsView', ['ViewService', 'ElementService', mmsView]);
 
 function mmsView(ViewService, ElementService) {

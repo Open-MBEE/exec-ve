@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('mms')
+angular.module('mms.directives')
 .directive('mmsViewTable', ['$compile', mmsViewTable]);
 
 function mmsViewTable($compile) {

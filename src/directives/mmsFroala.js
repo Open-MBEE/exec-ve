@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('mms')
+angular.module('mms.directives')
 .directive('mmsFroala', ['ElementService', '$modal', '_', mmsFroala]);
 
 function mmsFroala(ElementService, $modal, _) { //depends on angular bootstrap

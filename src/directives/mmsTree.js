@@ -1,6 +1,6 @@
   'use strict';
 
-  angular.module('mms')
+  angular.module('mms.directives')
   .directive('mmsTree', ["$timeout", "$log", mmsTree]);
 
   function mmsTree($timeout, $log) {
