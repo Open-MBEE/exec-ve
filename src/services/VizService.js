@@ -27,7 +27,8 @@ function VizService($q, $http, URLService) {
      * @returns {Promise} The promise will be resolved with the latest image url
      */
     var getImageURL = function(id) {
-        
+        var deferred = $q.defer();
+        return deferred.promise;
     };
 
     return {

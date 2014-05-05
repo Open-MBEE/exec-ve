@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms')
-.factory('ViewService', ['$q', '$http', 'URLService', 'ElementService', 'CommentService', ViewService]);
+.factory('ViewService', ['$q', '$http', 'URLService', 'ElementService', 'CommentService', 'VersionService', ViewService]);
 
 /**
  * @ngdoc service
@@ -83,7 +83,7 @@ angular.module('mms')
  *      }
  * ```
  */
-function ViewService($q, $http, URLService, ElementService, CommentService) {
+function ViewService($q, $http, URLService, ElementService, CommentService, VersionService) {
     var views = {};
     var allowedElements = {};
     var displayedElements = {};
@@ -105,39 +105,22 @@ function ViewService($q, $http, URLService, ElementService, CommentService) {
      *      multiple calls to this method with the same id would result in 
      *      references to the same object.
      */
-    var getView = function(id) { 
+    var getView = function(id, updateFromServer) { 
         var deferred = $q.defer();
-        if (views.hasOwnProperty(id))
+        var update = updateFromServer === undefined ? false : updateFromServer;
+        if (views.hasOwnProperty(id) && !update)
             deferred.resolve(views[id]);
         else {
-            ElementService.getElement(id).then(function(data) {
+            ElementService.getElement(id, update).then(function(data) {
                 if (views.hasOwnProperty(id))
                     deferred.resolve(views[id]);
                 else {
                     views[id] = data;
                     deferred.resolve(views[id]);
                 }
+            }, function(reason) {
+                deferred.reject(reason);
             });
-           /* $http.get(URLService.getViewURL(id))
-            .success(function(data, status, headers, config) {
-                if (views.hasOwnProperty(id))
-                    deferred.resolve(views[id]);
-                else if (data.views.length > 0) {
-                    views[id] = data.views[0];
-                    deferred.resolve(views[id]);
-                } else {
-                    deferred.reject("Not Found");
-                }
-            }).error(function(data, status, headers, config) {
-                if (status === 404)
-                    deferred.reject("Not Found");
-                else if (status === 500)
-                    deferred.reject("Server Error");
-                else if (status === 401 || status === 403)
-                    deferred.reject("Unauthorized");
-                else
-                    deferred.reject("Failed");
-            });*/
         }
         return deferred.promise;
     };
@@ -174,39 +157,22 @@ function ViewService($q, $http, URLService, ElementService, CommentService) {
      *      multiple calls to this method with the same id would result in 
      *      references to the same object.
      */
-    var getDocument = function(id) {
+    var getDocument = function(id, updateFromServer) {
         var deferred = $q.defer();
-        if (documents.hasOwnProperty(id))
+        var update = updateFromServer === undefined ? false : updateFromServer;
+        if (documents.hasOwnProperty(id) && !update)
             deferred.resolve(documents[id]);
         else {
-            ElementService.getElement(id).then(function(data) {
+            ElementService.getElement(id, update).then(function(data) {
                 if (documents.hasOwnProperty(id))
                     deferred.resolve(documents[id]);
                 else {
                     documents[id] = data;
                     deferred.resolve(documents[id]);
                 }
+            }, function(reason) {
+                deferred.reject(reason);
             });
-            /*$http.get(URLService.getDocumentURL(id))
-            .success(function(data, status, headers, config) {
-                if (documents.hasOwnProperty(id))
-                    deferred.resolve(documents[id]);
-                else if (data.products.length > 0) {
-                    documents[id] = data.products[0];
-                    deferred.resolve(documents[id]);
-                } else {
-                    deferred.reject("Not Found");
-                }
-            }).error(function(data, status, headers, config) {
-                if (status === 404)
-                    deferred.reject("Not Found");
-                else if (status === 500)
-                    deferred.reject("Server Error");
-                else if (status === 401 || status === 403)
-                    deferred.reject("Unauthorized");
-                else
-                    deferred.reject("Failed");
-            });*/
         }
         return deferred.promise;
     };
@@ -229,6 +195,8 @@ function ViewService($q, $http, URLService, ElementService, CommentService) {
         var deferred = $q.defer();
         ElementService.updateElement(view).then(function(data) {
             deferred.resolve(data);
+        }, function(reason) {
+            deferred.reject(reason);
         });
         return deferred.promise;
     };
@@ -289,19 +257,13 @@ function ViewService($q, $http, URLService, ElementService, CommentService) {
      * @param {string} id The id of the view.
      * @returns {Promise} The promise will be resolved with array of element objects. 
      */
-    var getViewAllowedElements = function(id) {
+    var getViewAllowedElements = function(id, updateFromServer) {
         var deferred = $q.defer();
-        if (allowedElements.hasOwnProperty(id))
+        var update = updateFromServer === undefined ? false : updateFromServer;
+        if (allowedElements.hasOwnProperty(id) && !update)
             deferred.resolve(allowedElements[id]);
         else {
-            /*getView(id).then(function(data) {
-                var allowedIds = data.allowedElements;
-                ElementService.getElements(allowedIds).then(function(data2) {
-                    allowedElements[id] = data2;
-                    deferred.resolve(data2);
-                });
-            });*/
-            ElementService.getViewElements(id).then(function(data) {
+            ElementService.getViewElements(id, update).then(function(data) {
                 allowedElements[id] = data;
                 deferred.resolve(data);
             });
@@ -383,7 +345,11 @@ function ViewService($q, $http, URLService, ElementService, CommentService) {
             } 
             updateDocument(data).then(function(data2) {
                 deferred.resolve(data);
+            }, function(reason) {
+                deferred.reject(reason);
             });
+        }, function(reason) {
+            deferred.reject(reason);
         });
         return deferred.promise;
     };
@@ -409,10 +375,6 @@ function ViewService($q, $http, URLService, ElementService, CommentService) {
             name: name === undefined ? 'Untitled View' : name,
             documentation: ''
         };
-        /*if (!view.hasOwnProperty('name'))
-            view.name = 'Untitled View';
-        if (!view.hasOwnProperty('documentation'))
-            view.documentation = '';*/
         ElementService.createElement(view).then(function(data) {
             data.contains = [{'type': 'Paragraph', 
                 'sourceType': 'reference', 
@@ -431,6 +393,8 @@ function ViewService($q, $http, URLService, ElementService, CommentService) {
                 if (documentId !== undefined) {
                     addViewToDocument(data.id, documentId, ownerId).then(function(data3) {
                         deferred.resolve(views[data.id]);
+                    }, function(reason) {
+                        deferred.reject(reason);
                     });
                 } else
                     deferred.resolve(views[data.id]);
@@ -438,6 +402,8 @@ function ViewService($q, $http, URLService, ElementService, CommentService) {
             }).error(function(data2, status, headers, config) {
                 URLService.handleHttpStatus(data2, status, headers, config, deferred);
             });
+        }, function(reason) {
+            deferred.reject(reason);
         });
         return deferred.promise;
     };

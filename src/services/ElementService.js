@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms')
-.factory('ElementService', ['$q', '$http', 'URLService', '_', ElementService]);
+.factory('ElementService', ['$q', '$http', 'URLService', 'VersionService', '_', ElementService]);
 
 /**
  * @ngdoc service
@@ -48,7 +48,7 @@ angular.module('mms')
  *      }
  * ```
  */
-function ElementService($q, $http, URLService, _) {
+function ElementService($q, $http, URLService, VersionService, _) {
     var elements = {};
     var edits = {};
     var nonEditKeys = ['contains', 'view2view', 'childrenViews', 'displayedElements',
@@ -72,16 +72,19 @@ function ElementService($q, $http, URLService, _) {
      *      references to the same object.
      */
     var getElement = function(id, updateFromServer) {
+        var update = updateFromServer === undefined ? false : updateFromServer;
         var deferred = $q.defer();
-        if (elements.hasOwnProperty(id))
+        if (elements.hasOwnProperty(id) && !update)
             deferred.resolve(elements[id]);
         else {
             $http.get(URLService.getElementURL(id))
             .success(function(data, status, headers, config) {
                 if (data.elements.length > 0) {
-                    if (elements.hasOwnProperty(id))
+                    if (elements.hasOwnProperty(id)) {
+                        if (update)
+                            _.merge(elements[id], data.elements[0]);
                         deferred.resolve(elements[id]);
-                    else {
+                    } else {
                         elements[id] = data.elements[0];
                         deferred.resolve(elements[id]);
                     }
@@ -205,15 +208,18 @@ function ElementService($q, $http, URLService, _) {
      *      on if the view has changed on the server. (consider removing this and only
      *      use the ones in ViewService instead)
      */
-    var getViewElements = function(viewid) {
+    var getViewElements = function(viewid, updateFromServer) {
         var deferred = $q.defer();
+        var update = updateFromServer === undefined ? false : updateFromServer;
         $http.get(URLService.getViewURL(viewid) + '/elements')
         .success(function(data, status, headers, config) {
             var result = [];
             data.elements.forEach(function(element) {
-                if (elements.hasOwnProperty(element.id))
+                if (elements.hasOwnProperty(element.id)) {
+                    if (update)
+                        _.merge(elements[element.id], element);
                     result.push(elements[element.id]);
-                else {
+                } else {
                     elements[element.id] = element;
                     result.push(elements[element.id]);
                 }
@@ -241,19 +247,23 @@ function ElementService($q, $http, URLService, _) {
      */
     var updateElement = function(elem) {
         var deferred = $q.defer();
-        if (elements.hasOwnProperty(elem.id)) {
+        if (!elem.hasOwnProperty('id'))
+            deferred.reject('Element id not found, create element first!');
+        else {
             //elements[elem.id].name = elem.name;
             //elements[elem.id].documentation = elem.documentation; //make a function to do deep copy
             //deferred.resolve(elements[elem.id]);
             $http.put(URLService.getPostElementsURL(), {'elements': [elem]})
             .success(function(data, status, headers, config) {
-                _.merge(elements[elem.id], elem);
+                if (elements.hasOwnProperty(elem.id))
+                    _.merge(elements[elem.id], elem);
+                else
+                    elements[elem.id] = elem;
                 deferred.resolve(elements[elem.id]);
             }).error(function(data, status, headers, config) {
                 URLService.handleHttpStatus(data, status, headers, config, deferred);
             });
-        } else
-            deferred.reject("Not in Cache");
+        } 
         return deferred.promise;
     };
 
@@ -306,8 +316,6 @@ function ElementService($q, $http, URLService, _) {
                 elements[e.id] = e;
                 deferred.resolve(e);
             }
-            //elements[elem.id] = elem;
-            //deferred.resolve(elements[elem.id]);
         }).error(function(data, status, headers, config) {
             URLService.handleHttpStatus(data, status, headers, config, deferred);
         });

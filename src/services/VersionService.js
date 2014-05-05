@@ -17,7 +17,7 @@ function VersionService($q, $http, URLService) {
 
     /**
      * @ngdoc method
-     * @name mms.VersionService#getElementVersion
+     * @name mms.VersionService#getElementVersionByTag
      * @methodOf mms.VersionService
      * 
      * @description
@@ -27,7 +27,23 @@ function VersionService($q, $http, URLService) {
      * @param {Date} date A js date object
      * @returns {Promise} The promise will be resolved with an element object.
      */
-    var getElementVersion = function(id, date) {
+    var getElementVersionByTag = function(id, tag) {
+
+    };
+
+    /**
+     * @ngdoc method
+     * @name mms.VersionService#getElementVersionByDate
+     * @methodOf mms.VersionService
+     * 
+     * @description
+     * Queries for an element version as of a certain time.
+     *
+     * @param {string} id The id of the element
+     * @param {Date} date A js date object
+     * @returns {Promise} The promise will be resolved with an element object.
+     */
+    var getElementVersionByDate = function(id, date) {
 
     };
 
@@ -47,7 +63,8 @@ function VersionService($q, $http, URLService) {
     };
 
     return {
-        getElementVersion: getElementVersion,
+        getElementVersionByTag: getElementVersionByTag,
+        getElementVersionByDate: getElementVersionByDate,
         getElementVersions: getElementVersions
     };
     

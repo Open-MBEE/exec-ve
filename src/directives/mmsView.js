@@ -13,6 +13,7 @@ function mmsView(ViewService, ElementService) {
                     '<mms-view-para para="contain" ng-switch-when="Paragraph"></mms-view-para>' +
                     '<mms-view-table table="contain" ng-switch-when="Table"></mms-view-table>' +
                     '<mms-view-list list="contain" ng-switch-when="List"></mms-view-list>' +
+                    '<mms-view-img image="contain" ng-switch-when="Image"></mms-view-img>' +
                 '</div>' +
                 '</div>' +
             '</div>';
