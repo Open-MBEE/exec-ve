@@ -3,6 +3,19 @@
 angular.module('mms.directives')
 .directive('mmsTranscludeImg', ['VizService', mmsTranscludeImg]);
 
+/**
+ * @ngdoc directive
+ * @name mms.directives.directive:mmsTranscludeImg
+ *
+ * @requires mms.VizService
+ *
+ * @restrict E
+ *
+ * @description
+ * Given an image id, puts in an img tag for the image url. 
+ *
+ * @param {string} eid The id of the image to transclude
+ */
 function mmsTranscludeImg(VizService) {
 
     var mmsTranscludeImgLink = function(scope, element, attrs, mmsViewCtrl) {

@@ -3,6 +3,28 @@
 angular.module('mms.directives')
 .directive('mmsSpec', ['ElementService', '$compile', mmsSpec]);
 
+/**
+ * @ngdoc directive
+ * @name mms.directives.directive:mmsSpec
+ *
+ * @requires mms.ViewService
+ * @requires mms.ElementService
+ *
+ * @restrict E
+ *
+ * @description
+ * Outputs a "spec window" of the element whose id is specified. Spec includes name,
+ * documentation, and value if the element is a property. Also last modified time, 
+ * last user, element id. Fields are editable and will be saved to server on clicking 
+ * save button. Documentation and string values can have html and can transclude other
+ * element properties.  
+ *
+ * @param {string} eid The id of the element
+ * @param {string} editableField One of ["all", "name", "doc", or "val" if property]
+ * @param {Array=} transcludableElements Array of element objects as returned by ElementService
+ *      that can be transcluded into documentation or string values. Regardless, transclusion
+ *      allows keyword searching elements to transclude from alfresco
+ */
 function mmsSpec(ElementService, $compile) {
     var nameTemplate = '<div>Name: {{edit.name}} </div>';
     var nameEditTemplate = '<div>Name: <input class="form-control" type="text" ng-model="edit.name"></input></div>';

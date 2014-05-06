@@ -3,6 +3,22 @@
 angular.module('mms.directives')
 .directive('mmsTranscludeDoc', ['ElementService', '$compile', mmsTranscludeDoc]);
 
+/**
+ * @ngdoc directive
+ * @name mms.directives.directive:mmsTranscludeDoc
+ *
+ * @requires mms.ElementService
+ * @requires $compile
+ *
+ * @restrict E
+ *
+ * @description
+ * Given an element id, puts in the element's documentation binding, if there's a parent 
+ * mmsView directive, will notify parent view of transclusion on init and doc change,
+ * and on click. Nested transclusions inside the documentation will also be registered.
+ *
+ * @param {string} eid The id of the element whose doc to transclude
+ */
 function mmsTranscludeDoc(ElementService, $compile) {
 
     var mmsTranscludeDocLink = function(scope, element, attrs, mmsViewCtrl) {

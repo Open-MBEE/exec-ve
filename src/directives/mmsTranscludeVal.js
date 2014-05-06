@@ -3,6 +3,23 @@
 angular.module('mms.directives')
 .directive('mmsTranscludeVal', ['ElementService', '$compile', mmsTranscludeVal]);
 
+/**
+ * @ngdoc directive
+ * @name mms.directives.directive:mmsTranscludeVal
+ *
+ * @requires mms.ElementService
+ * @requires $compile
+ *
+ * @restrict E
+ *
+ * @description
+ * Given an element id, puts in the element's value binding, if there's a parent 
+ * mmsView directive, will notify parent view of transclusion on init and val change,
+ * and on click. The element should be a Property. Nested transclusions within 
+ * string values will also be registered.
+ *
+ * @param {string} eid The id of the property whose value to transclude
+ */
 function mmsTranscludeVal(ElementService, $compile) {
     var template = '<span ng-repeat="value in element.value">{{value}}</span>';
     var mmsTranscludeValLink = function(scope, element, attrs, mmsViewCtrl) {
