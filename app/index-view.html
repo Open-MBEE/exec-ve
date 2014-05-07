@@ -9,10 +9,10 @@
   <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.0.3/css/font-awesome.min.css" type="text/css">
   <link rel="stylesheet" href="css/app.css">  
   <!-- Froala - TODO minify before deploying -->
-  <link rel="stylesheet" href="lib/froala/css/froala_editor.css" type="text/css">
+  <link rel="stylesheet" href="bower_components/froala/css/froala_editor.css" type="text/css">
   <!-- Angular Bootsrap Nav Tree -->
-  <link rel="stylesheet" href="lib/angular-bootstrap-nav-tree/abn_tree.css" type="text/css">
-   <link rel="stylesheet" href="bower_components/angular-borderlayout/src/borderLayout.css">
+  <link rel="stylesheet" href="bower_components/angular-bootstrap-nav-tree/dist/abn_tree.css" type="text/css">
+  <link rel="stylesheet" href="bower_components/angular-borderlayout/src/borderLayout.css">
 </head>
 
 <body>
@@ -34,17 +34,20 @@
 <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
 <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.14/angular.min.js"></script> 
 <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.14/angular-animate.min.js"></script> 
-<script src="bower_components/angular-borderlayout/src/borderLayout.js"></script>
-<script src="lib/angular-bootstrap-nav-tree/abn_tree_directive.js"></script>
 
-<!-- <script src="lib/angular/angular.js"></script> -->
+<!-- Bower Components (3rd party libraries) -->
+<script src="bower_components/angular-borderlayout/src/borderLayout.js"></script>
+<script src="bower_components/angular-ui-bootstrap-bower/ui-bootstrap-tpls.js"></script>
 <script src="bower_components/angular-ui-router/release/angular-ui-router.js"></script>
-<script src="lib/sortable.js"></script>
-<script src="lib/lodash.js"></script>
-<script src="lib/froala/js/froala_editor.js"></script>
-<script src="lib/ui-bootstrap-tpls-0.10.0.js"></script>
+<script src="bower_components/angular-ui-sortable/sortable.js"></script>
+<script src="bower_components/froala/js/froala_editor.min.js"></script>
+<script src="bower_components/lodash/dist/lodash.js"></script>
+
+<!-- MMS -->
 <script src="mms.js"></script>
 <script src="mms.directives.js"></script>
+
+<!-- MMS Application-->
 <script src="js/app.js"></script>
 <script src="js/controllers.js"></script>
 
