@@ -2,72 +2,90 @@
 
 /* Controllers */
 
-angular.module('myApp.controllers', [])
-  .controller('ConfigsCtrl', ["$scope", "$http", "$window", function($scope, $http, $window) {
-    $scope.messages = {message:""};
-    $scope.loading = true;
-    $http({method: 'GET', url: '/alfresco/service/javawebscripts/configurations/' + $scope.currentSite}).
-        success(function(data, status, headers, config) {
-            $scope.configurations = data.configurations;
-            $scope.loading = false;
-        }).
-        error(function(data, status, headers, config) {
-            //$window.alert("loading configs failed!");
+angular.module('myApp')
+.controller('NavTreeCtrl', function($scope, $state, $stateParams, ElementService, ViewService) {
+    $scope.documentid = $stateParams.docId;
+       //$scope.documentid = "_17_0_2_3_407019f_1390507581047_689015_29384";
+      //$scope.documentid = "_17_0_2_3_8660276_1389735483493_203695_64097";
+      //$scope.documentid = "_17_0_2_3_897027c_1380234582224_623869_33513";
+      var tree;
+
+      $scope.my_tree = tree = {};
+
+      // 1. Iterate over view2view and create an array of all element ids
+      // 2. Call get element ids and create a map of element id -> element name structure
+      // 3. Iterate over view2view and create a map of element id -> element tree node reference
+      
+      ViewService.getDocument($scope.documentid).then(function(data) {
+
+        // Array of all the view element ids
+        var viewElementIds = [];
+
+        // Map of view elements from view id -> tree node object
+        var viewElementIds2TreeNodeMap = {};
+        
+        // document id is the root the tree heirarchy
+        var rootElementId = data.id;
+
+        // Iterate through all the views in the view2view attribute
+        // view2view is a set of elements with related child views
+        // Note: The JSON format is NOT nested - it uses refrencing
+        for (var i = 0; i < data.view2view.length; i++) {
+
+          var viewId = data.view2view[i].id;
+          
+          viewElementIds.push(viewId);
+        }
+
+        // Call the get element service and pass in all the elements
+        ElementService.getElements(viewElementIds).then(function(elements) {
+
+          // Fill out all the view names first
+          for (var i = 0; i < elements.length; i++)
+          {
+            var viewTreeNode = { label : elements[i].name, 
+                                  data : elements[i], 
+                              children : [] };
+
+            viewElementIds2TreeNodeMap[elements[i].id] = viewTreeNode;
+          }
+
+          for (var i = 0; i < data.view2view.length; i++) {
+
+            var viewId = data.view2view[i].id;
+            
+            for (var j = 0; j < data.view2view[i].childrenViews.length; j++) {
+              
+              var childViewId = data.view2view[i].childrenViews[j];
+
+              viewElementIds2TreeNodeMap[viewId].children.push( viewElementIds2TreeNodeMap[childViewId] );
+
+            }
+          }
+
+          $scope.my_data = [ viewElementIds2TreeNodeMap[rootElementId] ];
+
         });
-    $scope.newFormButton = function() {
-        if ($scope.hideNewForm)
-            return "Create New Configuration";
-        else
-            return "Cancel";
-    };
-    $scope.hideNewForm = true;
-    $scope.toggleNewForm = function() {
-        $scope.hideNewForm = !$scope.hideNewForm;
-    };
-    $scope.createNew = function() {
-        //$window.alert("sending " + $scope.newConfigName + " " + $scope.newConfigDesc);
-        $http.post('/alfresco/service/javawebscripts/configurations/' + $scope.currentSite, 
-            {"name": $scope.newConfigName, "description": $scope.newConfigDesc}).
-            success(function(data, status, headers, config) {
-                //$window.alert("success, wait for email");
-                $scope.messages.message = "New Configuration Created! Please wait for an email notification.";
-                $scope.hideNewForm = true;
-            }).
-            error(function(data, status, headers, config) {
-                $scope.messages.message = "Creating new configuration failed!";
-            });
-    };
-  }])
-  .controller('ConfigCtrl', ["$scope", "$http", "$window", function($scope, $http, $window) {
-    $scope.nodeid = $scope.config.nodeid;
-    $scope.newConfigName = $scope.config.name;
-    $scope.newConfigDesc = $scope.config.description;
-    $scope.hide = true;
-    $scope.toggleChangeFormButton = function() {
-        if ($scope.hideChangeForm)
-            return 'Change name or description';
-        else
-            return 'Cancel';
-    };
-    $scope.toggle = function() {
-        $scope.hide = !$scope.hide;
-    };
-    $scope.hideChangeForm = true;
-    $scope.toggleChangeForm = function() {
-        $scope.hideChangeForm = !$scope.hideChangeForm;
-    };
-    $scope.change = function() {
-        //$window.alert("sending " + $scope.newConfigName + " " + $scope.newConfigDesc + " " + $scope.nodeid);
-        $http.post('/alfresco/service/javawebscripts/configurations/' + $scope.currentSite, 
-            {"name": $scope.newConfigName, "description": $scope.newConfigDesc, "nodeid": $scope.nodeid}).
-            success(function(data, status, headers, config) {
-                $scope.messages.message = "Change Successful";
-                $scope.config.name = $scope.newConfigName;
-                $scope.config.description = $scope.newConfigDesc;
-                $scope.hideChangeForm = true;
-            }).
-            error(function(data, status, headers, config) {
-                $scope.messages.message = "Change Failed!";
-            });
-    };
-  }]);
+      });
+        
+      $scope.my_data = [];
+
+      $scope.my_tree_handler = function(branch) {
+        var viewId = branch.data.id;
+
+        $state.go('doc.view', {viewId: viewId});
+
+      };
+
+      $scope.try_adding_a_branch = function() {
+        var branch = tree.get_selected_branch();
+        return tree.add_branch(branch, {
+          label: 'New Branch',
+          data: {
+            name: "New Branch",
+            "else": 43
+          }
+        });
+      };
+
+    });

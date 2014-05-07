@@ -23,7 +23,7 @@
     "tests"
   ],
   "dependencies": {
-    "angular-ui-bootstrap": "v0.10.0",
+    "angular-ui-bootstrap": "v0.11.0",
     "angular-ui-layout": "bower",
     "angular-ui-router": "0.2.10",
     "angular-ui-sortable": "bower",
