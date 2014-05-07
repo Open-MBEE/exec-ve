@@ -78,14 +78,21 @@ angular.module('myApp')
       };
 
       $scope.try_adding_a_branch = function() {
+
         var branch = tree.get_selected_branch();
-        return tree.add_branch(branch, {
+        ViewService.createView(branch.data.id, 'Untitled View', $scope.documentid).then(function(view) {
+          return tree.add_branch(branch, {
+            label: view.name,
+            data: view
+          });
+        });
+        /*return tree.add_branch(branch, {
           label: 'New Branch',
           data: {
             name: "New Branch",
             "else": 43
           }
-        });
+        });*/
       };
 
     });

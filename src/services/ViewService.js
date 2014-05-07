@@ -343,6 +343,7 @@ function ViewService($q, $http, URLService, ElementService, CommentService, Vers
                     break;
                 }
             } 
+            data.view2view.push({id: viewId, childrenViews: []});
             updateDocument(data).then(function(data2) {
                 deferred.resolve(data);
             }, function(reason) {
