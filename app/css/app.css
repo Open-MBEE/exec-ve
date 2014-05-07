@@ -35,4 +35,39 @@ mms-transclude-name {
   border-bottom: 1px dotted blue;
 }
 
+.fa-pane-orientation-vertical > .fa-pane-handle {
+  cursor: row-resize;
+  background-color: black;
+
+}
+.fa-pane-orientation-horizontal > .fa-pane-handle {
+  cursor: col-resize;
+  background-color: black;
+
+}
+.fa-pane-orientation-horizontal > .fa-pane-handle > .fa-pane-toggle {
+  margin: auto;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 100px;
+  max-height: 20%;
+  cursor: pointer;
+  background-color: red;
+}
+.fa-pane-orientation-vertical > .fa-pane-handle > .fa-pane-toggle {
+  margin: auto;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 100px;
+  max-width: 20%;
+  cursor: pointer;
+  background-color: red;
+}
+
 .main {overflow-x: auto;}
