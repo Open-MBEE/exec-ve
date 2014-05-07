@@ -136,9 +136,9 @@ module.exports = function(grunt) {
           }
         ]
       },
-      server: {
+      crushb: {
         options: {
-          hostname: 'localhost',
+          hostname: '*',
           port: 9000,
           middleware: function(connect) {
             return [proxySnippet];
@@ -150,6 +150,34 @@ module.exports = function(grunt) {
             // https://sheldon.jpl.nasa.gov/alfresco/wcs/javawebscripts/element/_17_0_2_3_407019f_1386871336920_707205_26285
             context: '/alfresco',  // '/api'
             host: '128.149.16.155',//128.149.16.152',
+            port: 8443,
+            changeOrigin: true,
+            https: true,
+            //rewrite: {
+            //  '^/api': '/alfresco/service/javawebscripts'
+            //}
+          },
+          {
+            context: '/',
+            host: 'localhost',
+            port: 9001
+          }
+        ]
+      },
+      crusha: {
+        options: {
+          hostname: '*',
+          port: 9000,
+          middleware: function(connect) {
+            return [proxySnippet];
+          }
+        },
+        proxies: [
+          {
+            // /alfresco/service/javawebscripts
+            // https://sheldon.jpl.nasa.gov/alfresco/wcs/javawebscripts/element/_17_0_2_3_407019f_1386871336920_707205_26285
+            context: '/alfresco',  // '/api'
+            host: '128.149.16.152',//128.149.16.152',
             port: 8443,
             changeOrigin: true,
             https: true,
@@ -228,13 +256,13 @@ module.exports = function(grunt) {
   grunt.registerTask('server', function(arg1) {
     grunt.task.run('default', 'connect:static');
 
-    if (arguments.length !== 0 && arg1 ==="stub") {
+    if (arguments.length !== 0) {
       grunt.log.writeln("Launching server with mock REST API");
       //grunt.task.run('connect:restServer', 'configureProxies:mockServer', 'connect:mockServer');
-      grunt.task.run('stubby', 'configureProxies:mockServer', 'connect:mockServer');
+      grunt.task.run('stubby', 'configureProxies:' + arg1, 'connect:' + arg1);
     } else {
       grunt.log.writeln("Launching server with proxy API");
-      grunt.task.run('configureProxies:server', 'connect:server');
+      grunt.task.run('configureProxies:crushb', 'connect:crushb');
     }
     grunt.task.run('watch');
   });
