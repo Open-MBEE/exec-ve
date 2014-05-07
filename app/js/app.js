@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.borderLayout'])
+angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.borderLayout', 'ui.bootstrap'])
 .config(function($stateProvider, $urlRouterProvider) {
     $stateProvider
     .state('doc', {

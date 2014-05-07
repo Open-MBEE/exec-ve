@@ -24,17 +24,27 @@ angular.module('mms.directives')
  */
 function mmsView(ViewService, ElementService) {
     var template = '<div>' +
-                '<div><h4 class="inline"><mms-transclude-name eid="{{viewElement.id}}"></mms-transclude-name></h4>' + 
-                '<span class="pull-right"><button class="btn btn-sm" ng-click="toggleTextEdit()">{{textEdit}}</button>' +
-                '<button class="btn btn-sm" ng-click="toggleStructEdit()">{{structEdit}}</button></span></div>' +
-                '<span>Last Modified: {{lastModified}} by {{author}}</span>' + 
+                '<div><div class="btn-toolbar pull-right" role="toolbar">' + 
+                    '<div class="btn-group btn-group-sm">' + 
+                        '<button type="button" class="btn btn-default" ng-click="toggleTextEdit()">' + 
+                            '<span class="glyphicon glyphicon-edit"></span> {{textEdit}}' +
+                        '</button>' +
+                        '<button type="button" class="btn btn-default" ng-click="toggleStructEdit()">' +
+                            '<span class="glyphicon glyphicon-th-list"></span> {{structEdit}}' +
+                        '</button>' +       
+                    '</div>' +
+                '</div></div>' + 
+                '<h4 class="inline"><mms-transclude-name eid="{{viewElement.id}}"></mms-transclude-name></h4>' + 
+                '<div>Last Modified: {{lastModified}} by {{author}}</div><br/>' +
                 '<div ui-sortable="sortableOptions" ng-model="view.contains">' +
-                '<div ng-repeat="contain in view.contains" ng-switch on="contain.type">' +
-                    '<mms-view-para para="contain" ng-switch-when="Paragraph"></mms-view-para>' +
-                    '<mms-view-table table="contain" ng-switch-when="Table"></mms-view-table>' +
-                    '<mms-view-list list="contain" ng-switch-when="List"></mms-view-list>' +
-                    '<mms-view-img image="contain" ng-switch-when="Image"></mms-view-img>' +
-                '</div>' +
+                    '<div ng-repeat="contain in view.contains" ng-switch on="contain.type">' + 
+                    '<div ng-class="structEditable ? \'panel panel-default\' : \'\'">'+
+                    '<div ng-class="structEditable ? \'panel-body\' : \'\'">' +
+                        '<mms-view-para para="contain" ng-switch-when="Paragraph"></mms-view-para>' +
+                        '<mms-view-table table="contain" ng-switch-when="Table"></mms-view-table>' +
+                        '<mms-view-list list="contain" ng-switch-when="List"></mms-view-list>' +
+                        '<mms-view-img image="contain" ng-switch-when="Image"></mms-view-img>' +
+                    '</div></div></div>' +
                 '</div>' +
             '</div>';
 

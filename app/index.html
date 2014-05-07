@@ -5,51 +5,13 @@
   <meta charset="utf-8">
   <title>Test MMS Module App</title>
   <!-- Bootstrap -->
-  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
-  <!-- Font Awesome -->
-  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.0.3/css/font-awesome.min.css">
-  <!-- Froala - TODO minify before deploying -->
-  <link href="lib/froala/css/froala_editor.css" rel="stylesheet" type="text/css">
-
 </head>
-<body ng-init="elements = ['_17_0_2_3_407019f_1386871384972_702931_26371', '_17_0_2_3_407019f_1390507392384_798171_29256']">
-  <div>{{elements[0]}}</div>
-<div ng-repeat="elementid in elements" ng-controller="ElementCtrl">
-  ID: {{element.id}} <br/>
-  Name: {{element.name}} <br/>
-  Doc: {{element.documentation}}<br/>
-  <button ng-click="changeElement()">Change Element</button>
-<br/><br/>
-<div>Transclusion showing name</div>
-    <mms-transclude-name eid="{{element.id}}"></mms-transclude-name><br/><br/>
-    <div>Transclusion showing doc</div>
-    <mms-transclude-doc eid="{{element.id}}"></mms-transclude-doc>
-<br/><br/>
-    <div>Spec editing</div>
-<mms-spec eid="{{element.id}}" editable-field="all"></mms-spec>
-<br/><br/><br/><br/>
-</div>
-
+<body>
+  <a href="index-view.html#/sites/europa/products/_17_0_2_3_407019f_1390507581047_689015_29384/latest">ve doc</a>
 
 <a href="froala.html"><br>Froala Demo</a>
 
-<!-- jQuery -->
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
-<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.14/angular.min.js"></script> 
-<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.14/angular-animate.min.js"></script> 
 
-<script src="lib/angular-bootstrap-nav-tree/abn_tree_directive.js"></script>
-<script src="lib/angular-bootstrap-nav-tree/test_page.js"></script>
-
-<!-- <script src="lib/angular/angular.js"></script> -->
-<script src="lib/angular-ui-router.js"></script>
-<script src="lib/sortable.js"></script>
-<script src="lib/lodash.js"></script>
-<script src="lib/froala/js/froala_editor.js"></script>
-<script src="lib/ui-bootstrap-tpls-0.10.0.js"></script>
-<script src="mms.js"></script>
-<script src="js/app.js"></script>
 
 </body>
 </html>

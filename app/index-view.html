@@ -16,15 +16,17 @@
 </head>
 
 <body>
+
     <div fa-pane>
         <div fa-pane="menu" pane-anchor="north" pane-size="51px">
+
             <div ui-view="menu"></div>
         </div>
         <div fa-pane pane-anchor="west" pane-size="20%" pane-handle="3">
-            <div class="container-fluid"><div ui-view="sidebar">loading</div> </div>
+            <div ui-view="sidebar"></div>
         </div>
         <div fa-pane pane-anchor="center">
-            <div ui-view="view">click on a view</div>
+            <div ui-view="view"></div>
         </div>
     </div>
 
