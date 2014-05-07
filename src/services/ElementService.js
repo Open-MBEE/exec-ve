@@ -253,7 +253,7 @@ function ElementService($q, $http, URLService, VersionService, _) {
             //elements[elem.id].name = elem.name;
             //elements[elem.id].documentation = elem.documentation; //make a function to do deep copy
             //deferred.resolve(elements[elem.id]);
-            $http.put(URLService.getPostElementsURL(), {'elements': [elem]})
+            $http.post(URLService.getPostElementsURL(), {'elements': [elem]})
             .success(function(data, status, headers, config) {
                 if (elements.hasOwnProperty(elem.id))
                     _.merge(elements[elem.id], elem);
