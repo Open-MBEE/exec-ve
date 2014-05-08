@@ -28,6 +28,7 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
                 controller: function($scope, $stateParams, $state, viewElements) {
                     $scope.vid = $stateParams.viewId;
                     $scope.viewElements = viewElements;
+                    $scope.eid = $scope.vid;
                     $scope.tscClicked = function(elementId) {
                         $scope.eid = elementId;      //$state.go('view.element', {elementId: elementId});
                         $scope.$apply();

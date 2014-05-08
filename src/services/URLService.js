@@ -163,6 +163,10 @@ function URLService($q, $http, $location) {
             deferred.reject("Failed");
     };
 
+    var getSitesURL = function() {
+        return root + "/rest/sites";
+    };
+
     return {
         getRoot: getRoot,
         setRoot: setRoot,
@@ -173,7 +177,8 @@ function URLService($q, $http, $location) {
         getPostDocumentsURL: getPostDocumentsURL,
         getViewURL: getViewURL,
         getDocumentURL: getDocumentURL,
-        handleHttpStatus: handleHttpStatus
+        handleHttpStatus: handleHttpStatus,
+        getSitesURL: getSitesURL
     };
 
 }

@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms')
-.factory('SiteService', ['$q', '$http', 'URLService', 'ViewService', 'ProjectService', SiteService]);
+.factory('SiteService', ['$q', '$http', 'URLService', 'ViewService', 'ProjectService', '_', SiteService]);
 
 /**
  * @ngdoc service
@@ -25,7 +25,7 @@ angular.module('mms')
  *      }
  * ```
  */
-function SiteService($q, $http, URLService, ViewService, ProjectService) {
+function SiteService($q, $http, URLService, ViewService, ProjectService, _) {
     var currentSite = 'europa';
     var sites = {};
     var siteDocuments = {};
@@ -72,7 +72,18 @@ function SiteService($q, $http, URLService, ViewService, ProjectService) {
      * @returns {Promise} Resolves to the site info object.
      */
     var getSite = function(site) {
-
+        var deferred = $q.defer();
+        if (sites.hasOwnProperty(site)) 
+            deferred.resolve(sites[site]);
+        else {
+            getSites().then(function(data) {
+                if (sites.hasOwnProperty(site))
+                    deferred.resolve(sites[site]);
+                else
+                    deferred.reject("Site not found");
+            });
+        }
+        return deferred.promise;
     };
 
     /**
@@ -85,7 +96,24 @@ function SiteService($q, $http, URLService, ViewService, ProjectService) {
      * @returns {Promise} Resolves into array of site info objects.
      */
     var getSites = function() {
-
+        var deferred = $q.defer();
+        if (!_.isEmpty(sites)) {
+            deferred.resolve(_.values(sites));
+        } else {
+            $http.get(URLService.getSitesURL())
+            .success(function(data, status, headers, config) {
+                _.forEach(data, function(site) {
+                    if (!sites.hasOwnProperty(site.name))
+                        sites[site.name] = site;
+                    else
+                        _.merge(sites[site.name], site);
+                });
+                deferred.resolve(_.values(sites));
+            }).error(function(data, status, headers, config) {
+                URLService.handleHttpStatus(data, status, headers, config, deferred);
+            });
+        }
+        return deferred.promise;
     };
 
     /**
