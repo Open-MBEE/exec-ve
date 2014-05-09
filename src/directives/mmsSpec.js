@@ -99,7 +99,9 @@ function mmsSpec(ElementService, $compile) {
         //template: template,
         scope: {
             eid: '@',
-            editableField: '@', //all or individual field
+            editableField: '@', //all or none or individual field
+            workspace: '@',
+            version: '@',
             transcludableElements: '=' //array of element objects
         },
         link: mmsSpecLink

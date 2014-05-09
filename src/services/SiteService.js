@@ -27,7 +27,9 @@ angular.module('mms')
  */
 function SiteService($q, $http, URLService, ViewService, ProjectService, _) {
     var currentSite = 'europa';
+    var currentWorkspace = 'master';
     var sites = {};
+    var workspaces = {};
     var siteDocuments = {};
 
     /**
@@ -58,6 +60,36 @@ function SiteService($q, $http, URLService, ViewService, ProjectService, _) {
      */
     var getCurrentSite = function() {
         return currentSite;
+    };
+
+    /**
+     * @ngdoc method
+     * @name mms.SiteService#setCurrentWorkspace
+     * @methodOf mms.SiteService
+     * 
+     * @description
+     * Sets the current workspace
+     *
+     * @param {string} site The new workspace name.
+     *
+     * @returns {string} The new workspace name.
+     */
+    var setCurrentWorkspace = function(workspace) {
+        currentWorkspace = workspace;
+    };
+
+    /**
+     * @ngdoc method
+     * @name mms.SiteService#getCurrentWorkspace
+     * @methodOf mms.SiteService
+     * 
+     * @description
+     * Gets the current workspace
+     *     
+     * @returns {string} The current workspace name.
+     */
+    var getCurrentWorkspace = function() {
+        return currentWorkspace;
     };
 
     /**
@@ -147,6 +179,8 @@ function SiteService($q, $http, URLService, ViewService, ProjectService, _) {
     return {
         getCurrentSite: getCurrentSite,
         setCurrentSite: setCurrentSite,
+        getCurrentWorkspace: getCurrentWorkspace,
+        setCurrentWorkspace: setCurrentWorkspace,
         getSites: getSites,
         getSite: getSite,
         getSiteDocuments: getSiteDocuments,

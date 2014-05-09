@@ -61,6 +61,12 @@ function mmsView(ViewService, ElementService) {
                 $scope.lastModified = elem.lastModified;
             $scope.author = elem.author;
         };
+        this.getWorkspaceAndVersion = function() {
+            return {
+                workspace: $scope.workspace, 
+                version: $scope.version
+            };
+        };
     };
 
     var mmsViewLink = function(scope, element, attrs) {
@@ -100,6 +106,8 @@ function mmsView(ViewService, ElementService) {
         template: template,
         scope: {
             vid: '@',
+            workspace: '@',
+            version: '@',
             transcludeClicked: '&'
         },
         controller: ['$scope', 'ViewService', 'ElementService', mmsViewCtrl],

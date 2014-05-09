@@ -105,7 +105,7 @@ function ViewService($q, $http, URLService, ElementService, CommentService, Vers
      *      multiple calls to this method with the same id would result in 
      *      references to the same object.
      */
-    var getView = function(id, updateFromServer) { 
+    var getView = function(id, updateFromServer, workspace, version) { 
         var deferred = $q.defer();
         var update = updateFromServer === undefined ? false : updateFromServer;
         if (views.hasOwnProperty(id) && !update)
@@ -138,7 +138,7 @@ function ViewService($q, $http, URLService, ElementService, CommentService, Vers
      *      multiple calls to this method with the same ids would result in an array of 
      *      references to the same objects.
      */
-    var getViews = function(ids) {
+    var getViews = function(ids, updateFromServer, workspace, version) {
 
     };
 
@@ -157,7 +157,7 @@ function ViewService($q, $http, URLService, ElementService, CommentService, Vers
      *      multiple calls to this method with the same id would result in 
      *      references to the same object.
      */
-    var getDocument = function(id, updateFromServer) {
+    var getDocument = function(id, updateFromServer, workspace, version) {
         var deferred = $q.defer();
         var update = updateFromServer === undefined ? false : updateFromServer;
         if (documents.hasOwnProperty(id) && !update)
@@ -191,7 +191,7 @@ function ViewService($q, $http, URLService, ElementService, CommentService, Vers
      * @returns {Promise} The promise will be resolved with the updated cache view reference if 
      *      update is successful.
      */
-    var updateView = function(view) {
+    var updateView = function(view, workspace) {
         var deferred = $q.defer();
         ElementService.updateElement(view).then(function(data) {
             deferred.resolve(data);
@@ -215,7 +215,7 @@ function ViewService($q, $http, URLService, ElementService, CommentService, Vers
      * @returns {Promise} The promise will be resolved with the updated cache doc reference if 
      *      update is successful.
      */
-    var updateDocument = function(document) {
+    var updateDocument = function(document, workspace) {
         var deferred = $q.defer();
         /*ElementService.updateElement(document).then(function(data) {
             deferred.resolve(data);
@@ -257,7 +257,7 @@ function ViewService($q, $http, URLService, ElementService, CommentService, Vers
      * @param {string} id The id of the view.
      * @returns {Promise} The promise will be resolved with array of element objects. 
      */
-    var getViewAllowedElements = function(id, updateFromServer) {
+    var getViewAllowedElements = function(id, updateFromServer, workspace, version) {
         var deferred = $q.defer();
         var update = updateFromServer === undefined ? false : updateFromServer;
         if (allowedElements.hasOwnProperty(id) && !update)
@@ -334,7 +334,7 @@ function ViewService($q, $http, URLService, ElementService, CommentService, Vers
 
     };
 
-    var addViewToDocument = function(viewId, documentId, parentViewId) {
+    var addViewToDocument = function(viewId, documentId, parentViewId, workspace) {
         var deferred = $q.defer();
         getDocument(documentId).then(function(data) {   
             for (var i = 0; i < data.view2view.length; i++) {
@@ -368,7 +368,7 @@ function ViewService($q, $http, URLService, ElementService, CommentService, Vers
      * @param {Object} view A view object, id cannot be specified, owner must be specified
      * @returns {Promise} The promise will be resolved with the new view. 
      */
-    var createView = function(ownerId, name, documentId) {
+    var createView = function(ownerId, name, documentId, workspace) {
         var deferred = $q.defer();
         var view = {
             type: 'View',

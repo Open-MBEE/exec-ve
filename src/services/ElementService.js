@@ -71,7 +71,7 @@ function ElementService($q, $http, URLService, VersionService, _) {
      *      multiple calls to this method with the same id would result in 
      *      references to the same object.
      */
-    var getElement = function(id, updateFromServer) {
+    var getElement = function(id, updateFromServer, workspace, version) {
         var update = updateFromServer === undefined ? false : updateFromServer;
         var deferred = $q.defer();
         if (elements.hasOwnProperty(id) && !update)
@@ -112,7 +112,7 @@ function ElementService($q, $http, URLService, VersionService, _) {
      *      multiple calls to this method with the same ids would result in an array of 
      *      references to the same objects.
      */
-    var getElements = function(ids, updateFromServer) {
+    var getElements = function(ids, updateFromServer, workspace, version) {
         var promises = [];
         ids.forEach(function(id) {
             promises.push(getElement(id, updateFromServer));
@@ -134,7 +134,7 @@ function ElementService($q, $http, URLService, VersionService, _) {
      *      references to the same object. This object can be edited without
      *      affecting the same element object that's used for displays
      */
-    var getElementForEdit = function(id) {
+    var getElementForEdit = function(id, workspace) {
         var deferred = $q.defer();
         if (edits.hasOwnProperty(id))
             deferred.resolve(edits[id]);
@@ -169,7 +169,7 @@ function ElementService($q, $http, URLService, VersionService, _) {
      * @returns {Promise} The promise will be resolved with an array of editable
      * element objects that won't affect the corresponding displays
      */
-    var getElementsForEdit = function(ids) {
+    var getElementsForEdit = function(ids, workspace) {
         var promises = [];
         ids.forEach(function(id) {
             promises.push(getElementForEdit(id));
@@ -208,7 +208,7 @@ function ElementService($q, $http, URLService, VersionService, _) {
      *      on if the view has changed on the server. (consider removing this and only
      *      use the ones in ViewService instead)
      */
-    var getViewElements = function(viewid, updateFromServer) {
+    var getViewElements = function(viewid, updateFromServer, workspace, version) {
         var deferred = $q.defer();
         var update = updateFromServer === undefined ? false : updateFromServer;
         $http.get(URLService.getViewURL(viewid) + '/elements')
@@ -245,7 +245,7 @@ function ElementService($q, $http, URLService, VersionService, _) {
      * @returns {Promise} The promise will be resolved with the updated cache element reference if 
      *      update is successful.
      */
-    var updateElement = function(elem) {
+    var updateElement = function(elem, workspace) {
         var deferred = $q.defer();
         if (!elem.hasOwnProperty('id'))
             deferred.reject('Element id not found, create element first!');
@@ -279,7 +279,7 @@ function ElementService($q, $http, URLService, VersionService, _) {
      * @returns {Promise} The promise will be resolved with an array of updated element references if 
      *      update is successful.
      */
-    var updateElements = function(elems) {
+    var updateElements = function(elems, workspace) {
         var promises = [];
         elems.forEach(function(elem) {
             promises.push(updateElement(elem));
@@ -299,7 +299,7 @@ function ElementService($q, $http, URLService, VersionService, _) {
      * @returns {Promise} The promise will be resolved with the created element references if 
      *      create is successful.
      */
-    var createElement = function(elem) {
+    var createElement = function(elem, workspace) {
         var deferred = $q.defer();
         if (!elem.hasOwnProperty('owner')) {
             deferred.reject('Element create needs an owner');
@@ -334,7 +334,7 @@ function ElementService($q, $http, URLService, VersionService, _) {
      * @returns {Promise} The promise will be resolved with an array of created element references if 
      *      create is successful.
      */
-    var createElements = function(elems) {
+    var createElements = function(elems, workspace) {
         var promises = [];
         elems.forEach(function(elem) {
             promises.push(createElement(elem));
@@ -372,7 +372,7 @@ function ElementService($q, $http, URLService, VersionService, _) {
      * @param {string} query A query string (TBD)
      * @returns {Promise} The promise will be resolved with an array of element objects
      */
-    var search = function(query) {
+    var search = function(query, workspace) {
 
     };
 
