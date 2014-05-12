@@ -31,15 +31,24 @@
 
 .inline {display:inline;}
 
-mms-transclude-name {
+mms-view.editing mms-transclude-name, mms-view.editing mms-transclude-doc {
   border-bottom: 1px dotted blue;
+}
+
+mms-spec mms-transclude-name, mms-spec mms-transclude-doc, mms-spec mms-transclude-val {
+  background-color: lightblue;
+}
+
+.transclude-modal .clickable:hover {
+  cursor: pointer;
+  background-color: yellow;
 }
 
 .fa-pane-orientation-vertical > .fa-pane-handle {
   cursor: row-resize;
   background-color: black;
-
 }
+
 .fa-pane-orientation-horizontal > .fa-pane-handle {
   cursor: col-resize;
   background-color: black;

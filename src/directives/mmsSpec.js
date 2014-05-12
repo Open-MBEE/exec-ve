@@ -26,10 +26,11 @@ angular.module('mms.directives')
  *      allows keyword searching elements to transclude from alfresco
  */
 function mmsSpec(ElementService, $compile) {
-    var nameTemplate = '<div>Name: {{edit.name}} </div>';
+    var heading = '<div>Last Modified: {{element.lastModified | date:\'M/d/yy h:mm a\'}} by {{element.author}}</div>';
+    var nameTemplate = '<div>Name: {{element.name}} </div>';
     var nameEditTemplate = '<div>Name: <input class="form-control" type="text" ng-model="edit.name"></input></div>';
     
-    var docTemplate = '<div>Documentation:</div><div ng-bind-html="edit.documentation"></div>';
+    var docTemplate = '<div>Documentation:</div><div ng-bind-html="element.documentation"></div>';
     var docEditTemplate = '<div>Documentation:</div><div ng-model="edit.documentation" mms-froala transcludable-elements="transcludableElements"></div>';
     var docEditPlain = '<div>Documentation:</div><textarea ng-model="edit.documentation"></textarea>';
     
@@ -42,41 +43,42 @@ function mmsSpec(ElementService, $compile) {
     
     var mmsSpecLink = function(scope, element, attrs) {
         scope.$watch('eid', function(newVal, oldVal) {
-            if (newVal === undefined || newVal === null || newVal === '')
+            if (newVal === undefined || newVal === null || newVal === '') {
+                element.empty();
                 return;
-            template = '';
-            if (scope.editableField === 'all') 
-                template = nameEditTemplate + docEditTemplate;
-            else if (scope.editableField === 'name')
-                template = nameEditTemplate + docTemplate;
-            else if (scope.editableField === 'documentation')
-                template = nameTemplate + docEditTemplate;
-            else
-                template = nameTemplate + docTemplate;
-            //template = template + saveTemplate;
+            }
             ElementService.getElement(scope.eid).then(function(data) {
                 scope.element = data;
-                ElementService.getElementForEdit(scope.eid).then(function(data) {
-                    scope.edit = data;
-                    if (scope.edit.type === 'Property' && angular.isArray(scope.edit.value)) {
-                        scope.values = [];
-                        for (var i = 0; i < scope.edit.value.length; i++) {
-                            scope.values.append({value: scope.edit.value[i]});
-                        }
-                        if (scope.edit.valueType === 'LiteralString')
-                            template += valueStringEdit;
-                        else if (scope.edit.valueType === 'LiteralBoolean')
-                            template += valueBooleanEdit;
-                        else if (scope.edit.valueType === 'LiteralInteger' || 
-                                scope.edit.valueType === 'LiteralUnlimitedNatural' ||
-                                scope.edit.valueType === 'LiteralReal')
-                            template += valueNumberEdit;
-                    }
-                    template += saveTemplate;
+                template = '' + heading;
+                if (scope.editableField === 'none' || !scope.element.editable) {
+                    template += nameTemplate + docTemplate;
                     element.empty();
-                    var el = $compile(template)(scope);
-                    element.append(el);
-                });
+                    element.append(template);
+                    $compile(element.contents())(scope); 
+                } else {
+                    ElementService.getElementForEdit(scope.eid).then(function(data) {
+                        scope.edit = data;
+                        template += nameEditTemplate + docEditTemplate;
+                        if (scope.edit.type === 'Property' && angular.isArray(scope.edit.value)) {
+                            scope.values = [];
+                            for (var i = 0; i < scope.edit.value.length; i++) {
+                                scope.values.append({value: scope.edit.value[i]});
+                            }
+                            if (scope.edit.valueType === 'LiteralString')
+                                template += valueStringEdit;
+                            else if (scope.edit.valueType === 'LiteralBoolean')
+                                template += valueBooleanEdit;
+                            else if (scope.edit.valueType === 'LiteralInteger' || 
+                                    scope.edit.valueType === 'LiteralUnlimitedNatural' ||
+                                    scope.edit.valueType === 'LiteralReal')
+                                template += valueNumberEdit;
+                        }
+                        template += saveTemplate;
+                        element.empty();
+                        element.append(template);
+                        $compile(element.contents())(scope); 
+                    });
+                }
             });
         });
         scope.save = function() {

@@ -35,7 +35,7 @@ function mmsView(ViewService, ElementService) {
                     '</div>' +
                 '</div></div>' + 
                 '<h4 class="inline"><mms-transclude-name eid="{{viewElement.id}}"></mms-transclude-name></h4>' + 
-                '<div>Last Modified: {{lastModified}} by {{author}}</div><br/>' +
+                '<div>Last Modified: {{viewElement.lastModified | date:\'M/d/yy h:mm a\'}} by {{viewElement.author}}</div><br/>' +
                 '<div ui-sortable="sortableOptions" ng-model="view.contains">' +
                     '<div ng-repeat="contain in view.contains" ng-switch on="contain.type">' + 
                     '<div ng-class="structEditable ? \'panel panel-default\' : \'\'">'+
@@ -93,6 +93,7 @@ function mmsView(ViewService, ElementService) {
         scope.toggleTextEdit = function() {
             scope.textEditable = !scope.textEditable;
             scope.textEdit = scope.textEditable ? 'Stop Text Edit' : 'Edit Text';
+            element.toggleClass('editing');
         };
         scope.toggleStructEdit = function() {
             scope.structEditable = !scope.structEditable;

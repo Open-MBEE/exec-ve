@@ -250,9 +250,6 @@ function ElementService($q, $http, URLService, VersionService, _) {
         if (!elem.hasOwnProperty('id'))
             deferred.reject('Element id not found, create element first!');
         else {
-            //elements[elem.id].name = elem.name;
-            //elements[elem.id].documentation = elem.documentation; //make a function to do deep copy
-            //deferred.resolve(elements[elem.id]);
             $http.post(URLService.getPostElementsURL(), {'elements': [elem]})
             .success(function(data, status, headers, config) {
                 if (elements.hasOwnProperty(elem.id))
@@ -373,7 +370,26 @@ function ElementService($q, $http, URLService, VersionService, _) {
      * @returns {Promise} The promise will be resolved with an array of element objects
      */
     var search = function(query, workspace) {
-
+        var deferred = $q.defer();
+        var update = false; //TODO
+        $http.get(URLService.getElementSearchURL(query)) 
+        .success(function(data, status, headers, config) {
+            var result = [];
+            data.elements.forEach(function(element) {
+                if (elements.hasOwnProperty(element.id)) {
+                    if (update)
+                        _.merge(elements[element.id], element);
+                    result.push(elements[element.id]);
+                } else {
+                    elements[element.id] = element;
+                    result.push(elements[element.id]);
+                }
+            });
+            deferred.resolve(result); 
+        }).error(function(data, status, headers, config) {
+            URLService.handleHttpStatus(data, status, headers, config, deferred);
+        });
+        return deferred.promise;
     };
 
     return {

@@ -167,6 +167,10 @@ function URLService($q, $http, $location) {
         return root + "/rest/sites";
     };
 
+    var getElementSearchURL = function(query) {
+        return root + "/javawebscripts/element/search?keyword=" + query;
+    };
+
     return {
         getRoot: getRoot,
         setRoot: setRoot,
@@ -178,7 +182,8 @@ function URLService($q, $http, $location) {
         getViewURL: getViewURL,
         getDocumentURL: getDocumentURL,
         handleHttpStatus: handleHttpStatus,
-        getSitesURL: getSitesURL
+        getSitesURL: getSitesURL,
+        getElementSearchURL: getElementSearchURL
     };
 
 }
