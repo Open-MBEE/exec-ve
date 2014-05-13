@@ -195,7 +195,7 @@
                 }
               });
               add_branch_to_list = function(level, section, branch, visible) {
-                var child, child_visible, tree_icon, _i, _len, _ref, _results;
+                var child, child_visible, tree_icon, _i, _j, _len, _ref, _results;
                 if (branch.expanded === null || branch.expanded === undefined) {
                   branch.expanded = false;
                 }
@@ -219,7 +219,7 @@
                 if (branch.children !== null && branch.children !== undefined) {
                   _ref = branch.children;
                   _results = [];
-                  for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+                  for (_i = 0, _j = 0, _len = _ref.length; _i < _len; _i++) {
                     child = _ref[_i];
                     child_visible = visible && branch.expanded;
                     
@@ -227,7 +227,11 @@
                     if (section === '')
                       sectionChar = '';
 
-                    _results.push(add_branch_to_list(level + 1, section + sectionChar + (_i+1), child, child_visible));
+                    if (child.type === "section") 
+                      _results.push(add_branch_to_list(level + 1, '§ ', child, child_visible));
+                    else {
+                      _results.push(add_branch_to_list(level + 1, section + sectionChar + (++_j), child, child_visible));
+                    }
                   }
                   return _results;
                 }

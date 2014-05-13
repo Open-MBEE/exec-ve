@@ -41,13 +41,27 @@ angular.module('myApp')
         ElementService.getElements(viewElementIds).then(function(elements) {
 
           // Fill out all the view names first
-          for (var i = 0; i < elements.length; i++)
-          {
+          for (var i = 0; i < elements.length; i++) {
             var viewTreeNode = { label : elements[i].name, 
+                                  type : "view",
                                   data : elements[i], 
                               children : [] };
 
             viewElementIds2TreeNodeMap[elements[i].id] = viewTreeNode;
+
+            for (var j = 0; j < elements[i].contains.length; j++) {
+              var containedElement = elements[i].contains[j];
+              if (containedElement.type === "Section") {
+                var sectionTreeNode = { label : containedElement.name, 
+                      type : "section",
+                      view : viewTreeNode.data.id,
+                      data : containedElement, 
+                  children : [] };
+
+                viewTreeNode.children.push(sectionTreeNode);
+
+              }
+            }
           }
 
           for (var i = 0; i < data.view2view.length; i++) {
@@ -71,7 +85,12 @@ angular.module('myApp')
       $scope.my_data = [];
 
       $scope.my_tree_handler = function(branch) {
-        var viewId = branch.data.id;
+        var viewId;
+
+        if (branch.type == "section")
+          viewId = branch.view;
+        else
+          viewId = branch.data.id;
 
         $state.go('doc.view', {viewId: viewId});
 
@@ -80,9 +99,14 @@ angular.module('myApp')
       $scope.try_adding_a_branch = function() {
 
         var branch = tree.get_selected_branch();
+
+        if (branch.type === "section")
+          return;
+
         ViewService.createView(branch.data.id, 'Untitled View', $scope.documentid).then(function(view) {
           return tree.add_branch(branch, {
             label: view.name,
+            type: "view",
             data: view
           });
         });
