@@ -44,6 +44,7 @@ function mmsView(ViewService, ElementService) {
                         '<mms-view-table table="contain" ng-switch-when="Table"></mms-view-table>' +
                         '<mms-view-list list="contain" ng-switch-when="List"></mms-view-list>' +
                         '<mms-view-img image="contain" ng-switch-when="Image"></mms-view-img>' +
+                        '<mms-view-section section="contain" ng-switch-when="Section"></mms-view-section>' +
                     '</div></div></div>' +
                 '</div>' +
             '</div>';
