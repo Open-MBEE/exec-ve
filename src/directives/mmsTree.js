@@ -222,7 +222,12 @@
                   for (_i = 0, _len = _ref.length; _i < _len; _i++) {
                     child = _ref[_i];
                     child_visible = visible && branch.expanded;
-                    _results.push(add_branch_to_list(level + 1, section + '.' + (_i+1), child, child_visible));
+                    
+                    var sectionChar = '.';
+                    if (section === '')
+                      sectionChar = '';
+
+                    _results.push(add_branch_to_list(level + 1, section + sectionChar + (_i+1), child, child_visible));
                   }
                   return _results;
                 }
@@ -231,7 +236,7 @@
               _results = [];
               for (_i = 0, _len = _ref.length; _i < _len; _i++) {
                 root_branch = _ref[_i];
-                _results.push(add_branch_to_list(1, '1', root_branch, true));
+                _results.push(add_branch_to_list(1, '', root_branch, true));
               }
               return _results;
             };
