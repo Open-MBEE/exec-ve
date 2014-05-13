@@ -24,7 +24,7 @@ angular.module('mms.directives')
  */
 function mmsViewSection($compile) {
     var template = '<div>' +
-                '<h4 class="inline">{{section.title}}</h4>' + 
+                '<h4 class="inline">{{section.name}}</h4>' + 
                 '<div ui-sortable="sortableOptions" ng-model="section.contains">' +
                     '<div ng-repeat="contain in section.contains" ng-switch on="contain.type">' + 
                     '<div ng-class="structEditable ? \'panel panel-default\' : \'\'">'+
