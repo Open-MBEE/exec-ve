@@ -8,13 +8,16 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
         resolve: {
             document: function($stateParams, ElementService) {
                 return ElementService.getElement($stateParams.docId);
+            },
+            site: function($stateParams, SiteService) {
+                return SiteService.getSite($stateParams.site);
             }
         },
         views: {
             'menu': {
                 template: '<mms-nav site="{{site}}" title="{{title}}"></mms-nav>',
-                controller: function($scope, $stateParams, document) {
-                    $scope.site = $stateParams.site;
+                controller: function($scope, $stateParams, document, site) {
+                    $scope.site = site.title;
                     $scope.title = document.name;
                 }
             },

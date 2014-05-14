@@ -5,10 +5,10 @@ angular.module('mms.directives')
 
 /**
  * @ngdoc directive
- * @name mms.directives.directive:mmsView
+ * @name mms.directives.directive:mmsViewSection
  *
- * @requires mms.ViewService
- * @requires mms.ElementService
+ * @requires $compile
+ * @requires $templateCache
  *
  * @restrict E
  *
