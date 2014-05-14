@@ -34,7 +34,7 @@ function mmsTranscludeVal(ElementService, $compile) {
         var recompile = function() {
             var toCompileList = [];
             for (var i = 0; i < scope.element.value.length; i++) {
-                toCompileList.append(scope.element.value[i]);
+                toCompileList.push(scope.element.value[i]);
             } 
             element.empty();
             var toCompile = toCompileList.join(', ');

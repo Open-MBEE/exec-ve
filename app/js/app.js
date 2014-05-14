@@ -15,10 +15,11 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
         },
         views: {
             'menu': {
-                template: '<mms-nav site="{{site}}" title="{{title}}"></mms-nav>',
+                template: '<mms-nav site="{{site}}" title="{{title}}" type="document"></mms-nav>',
                 controller: function($scope, $stateParams, document, site) {
                     $scope.site = site.title;
                     $scope.title = document.name;
+                    $scope.docweb = false;
                 }
             },
             'sidebar': {

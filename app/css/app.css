@@ -46,12 +46,12 @@ mms-spec mms-transclude-name, mms-spec mms-transclude-doc, mms-spec mms-transclu
 
 .fa-pane-orientation-vertical > .fa-pane-handle {
   cursor: row-resize;
-  background-color: black;
+  background-color: lightgray;
 }
 
 .fa-pane-orientation-horizontal > .fa-pane-handle {
   cursor: col-resize;
-  background-color: black;
+  background-color: lightgray;
 
 }
 .fa-pane-orientation-horizontal > .fa-pane-handle > .fa-pane-toggle {
@@ -64,7 +64,7 @@ mms-spec mms-transclude-name, mms-spec mms-transclude-doc, mms-spec mms-transclu
   height: 100px;
   max-height: 20%;
   cursor: pointer;
-  background-color: red;
+  background-color: gray;
 }
 .fa-pane-orientation-vertical > .fa-pane-handle > .fa-pane-toggle {
   margin: auto;
@@ -76,7 +76,7 @@ mms-spec mms-transclude-name, mms-spec mms-transclude-doc, mms-spec mms-transclu
   width: 100px;
   max-width: 20%;
   cursor: pointer;
-  background-color: red;
+  background-color: gray;
 }
 
 .main {overflow-x: auto;}

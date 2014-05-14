@@ -31,7 +31,8 @@ function mmsNav(SiteService, $templateCache) {
         template: template,
         scope: {
             site: '@', //current site name
-            title: '@' //current page title
+            title: '@', //current page title
+            type: '@' //current page type
         },
         link: mmsNavLink
     };
