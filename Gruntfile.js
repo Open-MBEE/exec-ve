@@ -7,6 +7,20 @@ module.exports = function(grunt) {
     
     pkg: grunt.file.readJSON('package.json'),
     
+    html2js: {
+      options: {
+        module: 'mms.directives.tpls',
+        rename: function(modulePath) {
+          var moduleName = modulePath.replace('directives/templates/', '');
+          return 'mms/templates/' + moduleName;
+        }
+      },
+      main: {
+        src: ['src/directives/templates/*.html'],
+        dest: 'dist/mms.directives.tpls.js'
+      }
+    },
+
     concat: {
       options: {
         //separator: ';',
@@ -25,6 +39,7 @@ module.exports = function(grunt) {
         dest: 'dist/mms.directives.js'
       }
     },
+
 
     uglify: {
       options: {
@@ -247,10 +262,11 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-connect-proxy');
   grunt.loadNpmTasks('grunt-stubby');
   grunt.loadNpmTasks('grunt-ngdocs');
+  grunt.loadNpmTasks('grunt-html2js');
   //grunt.loadNpmTasks('assemble');
 
   // Default task(s).  Must function before server has been stareted
-  grunt.registerTask('default', ['jshint:beforeconcat', 'concat', 'jshint:afterconcat', 'uglify', 'copy', 'ngdocs']);
+  grunt.registerTask('default', ['html2js', 'jshint:beforeconcat', 'concat', 'jshint:afterconcat', 'uglify', 'copy', 'ngdocs']);
   //grunt.registerTask('stage', ['default', 'qunit', 'rsync']);
 
   grunt.registerTask('server', function(arg1) {

@@ -5,12 +5,17 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
     $stateProvider
     .state('doc', {
         url: '/sites/:site/products/:docId/:time',
+        resolve: {
+            document: function($stateParams, ElementService) {
+                return ElementService.getElement($stateParams.docId);
+            }
+        },
         views: {
             'menu': {
                 template: '<mms-nav site="{{site}}" title="{{title}}"></mms-nav>',
-                controller: function($scope, $stateParams) {
+                controller: function($scope, $stateParams, document) {
                     $scope.site = $stateParams.site;
-                    $scope.title = $stateParams.docId;
+                    $scope.title = document.name;
                 }
             },
             'sidebar': {

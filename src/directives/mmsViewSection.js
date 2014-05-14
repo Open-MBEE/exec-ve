@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsViewSection', ['$compile', mmsViewSection]);
+.directive('mmsViewSection', ['$compile', '$templateCache', mmsViewSection]);
 
 /**
  * @ngdoc directive
@@ -22,21 +22,8 @@ angular.module('mms.directives')
  * @param {expression=} transcludeClicked The expression to handle transcluded elements 
  *     in the view being clicked, this should be a function whose argument is the element id
  */
-function mmsViewSection($compile) {
-    var template = '<div>' +
-                '<h4 class="inline">{{section.name}}</h4>' + 
-                '<div ui-sortable="sortableOptions" ng-model="section.contains">' +
-                    '<div ng-repeat="contain in section.contains" ng-switch on="contain.type">' + 
-                    '<div ng-class="structEditable ? \'panel panel-default\' : \'\'">'+
-                    '<div ng-class="structEditable ? \'panel-body\' : \'\'">' +
-                        '<mms-view-para para="contain" ng-switch-when="Paragraph"></mms-view-para>' +
-                        '<mms-view-table table="contain" ng-switch-when="Table"></mms-view-table>' +
-                        '<mms-view-list list="contain" ng-switch-when="List"></mms-view-list>' +
-                        '<mms-view-img image="contain" ng-switch-when="Image"></mms-view-img>' +
-                        '<mms-view-section section="contain" ng-switch-when="Section"></mms-view-section>' +
-                    '</div></div></div>' +
-                '</div>' +
-            '</div>';
+function mmsViewSection($compile, $templateCache) {
+    var template = $templateCache.get('mms/templates/mmsViewSection.html');
 
     var mmsViewSectionLink = function(scope, element, attrs) {
         element.append(template);

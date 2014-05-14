@@ -1,16 +1,31 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsNav', ['SiteService', mmsNav]);
+.directive('mmsNav', ['SiteService', '$templateCache', mmsNav]);
 
-function mmsNav(SiteService) {
-    var template = '<nav class="navbar navbar-default navbar-fixed-top" role="navigation">' + 
-            '<div class="container-fluid">' + 
-                '<a class="navbar-brand" href="/share/page/site/{{site}}/dashboard">{{site}}</a>' + 
-                '<ul class="nav navbar-nav">' + 
-                    '<li class="active"><a href="">{{title}}</a></li>' +
-                '</ul>' + 
-            '</div></nav>';
+function mmsNav(SiteService, $templateCache) {
+    var template = $templateCache.get('mms/templates/mmsNav.html');
+
+    var mmsNavLink = function(scope, element, attrs) {
+        SiteService.getSites().then(function(data){
+            var sites = {};
+            for (var i = 0; i < data.length; i++) {
+                var site = data[i];
+                if (site.categories.length === 0)
+                    site.categories.push("Uncategorized");
+                for (var j = 0; j < site.categories.length; j++) {
+                    var cat = site.categories[j];
+                    if (sites.hasOwnProperty(cat)) {
+                        sites[cat].push(site);
+                    } else {
+                        sites[cat] = [site];
+                    }
+                }
+            }
+            scope.categories = sites;
+        });
+    };
+
     return {
         restrict: 'E',
         template: template,
@@ -18,7 +33,6 @@ function mmsNav(SiteService) {
             site: '@', //current site name
             title: '@' //current page title
         },
-        link: function(scope, element, attrs) {
-        }
+        link: mmsNavLink
     };
 }

@@ -1,27 +1,11 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsViewList', ['$compile', mmsViewList]);
+.directive('mmsViewList', ['$compile', '$templateCache', mmsViewList]);
 
-function mmsViewList($compile) {
-    var template = '<ol ng-if="list.ordered">' + 
-            '<li ng-repeat="listitem in list">' + 
-                '<div ng-repeat="thing in listitem" ng-switch on="thing.type">' +
-                    '<mms-view-para para="thing" ng-switch-when="Paragraph"></mms-view-para>' +
-                    '<mms-view-table table="thing" ng-switch-when="Table"></mms-view-table>' +
-                    '<mms-view-list list="thing" ng-switch-when="List"></mms-view-list>' +
-                '</div>' +
-            '</li>' + 
-        '</ol>' + 
-        '<ul ng-if="!(list.ordered)">' + 
-            '<li ng-repeat="listitem in list">' + 
-                '<div ng-repeat="thing in listitem" ng-switch on="thing.type">' +
-                    '<mms-view-para para="thing" ng-switch-when="Paragraph"></mms-view-para>' +
-                    '<mms-view-table table="thing" ng-switch-when="Table"></mms-view-table>' +
-                    '<mms-view-list list="thing" ng-switch-when="List"></mms-view-list>' +
-                '</div>' +
-            '</li>' + 
-        '</ul>';
+function mmsViewList($compile, $templateCache) {
+    var template = $templateCache.get('mms/templates/mmsViewList.html');
+    
     return {
         restrict: 'E',
         //template: template,
