@@ -24,12 +24,13 @@
   ],
   "dependencies": {
     "angular-ui-layout": "bower",
-    "angular-ui-router": "0.2.10",
+    "angular-ui-router": "~0.2.10",
     "angular-ui-sortable": "bower",
     "froala": "v1.1.3",
     "angular-borderlayout": "master",
     "angular-ui-bootstrap-bower": "~0.11.0",
     "lodash": "~2.4.1",
-    "angular-bootstrap-nav-tree": "*"
+    "angular-bootstrap-nav-tree": "*",
+    "angular-ui-tree": "~2.1.2"
   }
 }

@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.borderLayout', 'ui.bootstrap'])
+angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.borderLayout', 'ui.bootstrap', 'ui.tree'])
 .config(function($stateProvider, $urlRouterProvider) {
     $stateProvider
     .state('doc', {
@@ -48,6 +48,17 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
             viewElements: function($stateParams, ViewService) {
                 return ViewService.getViewAllowedElements($stateParams.viewId);
             }
+        }
+    })
+    .state('doc.order', {
+        url: '/order',
+        views: {
+            'view@': {
+                templateUrl: 'partials/reorder-views.html',
+                controller: 'NavTreeCtrl'
+            }
+        },
+        resolve: {
         }
     })
 });

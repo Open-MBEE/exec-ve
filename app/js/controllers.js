@@ -95,6 +95,9 @@ angular.module('myApp')
         $state.go('doc.view', {viewId: viewId});
 
       };
+      $scope.reorder_tree_view = function() {
+        $state.go('doc.view');
+      };
 
       $scope.try_adding_a_branch = function() {
 
