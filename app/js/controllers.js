@@ -5,18 +5,15 @@
 angular.module('myApp')
 .controller('NavTreeCtrl', function($scope, $state, $stateParams, ElementService, ViewService) {
     $scope.documentid = $stateParams.docId;
-       //$scope.documentid = "_17_0_2_3_407019f_1390507581047_689015_29384";
-      //$scope.documentid = "_17_0_2_3_8660276_1389735483493_203695_64097";
-      //$scope.documentid = "_17_0_2_3_897027c_1380234582224_623869_33513";
-      var tree;
+    var tree = {};
 
-      $scope.my_tree = tree = {};
+    
 
       // 1. Iterate over view2view and create an array of all element ids
       // 2. Call get element ids and create a map of element id -> element name structure
       // 3. Iterate over view2view and create a map of element id -> element tree node reference
       
-      ViewService.getDocument($scope.documentid).then(function(data) {
+    ViewService.getDocument($scope.documentid).then(function(data) {
 
         // Array of all the view element ids
         var viewElementIds = [];
@@ -81,45 +78,84 @@ angular.module('myApp')
 
         });
       });
-        
-      $scope.my_data = [];
 
-      $scope.my_tree_handler = function(branch) {
+    $scope.my_tree = tree;
+    $scope.my_data = [];
+
+    $scope.my_tree_handler = function(branch) {
         var viewId;
 
         if (branch.type == "section")
-          viewId = branch.view;
+            viewId = branch.view;
         else
-          viewId = branch.data.id;
+            viewId = branch.data.id;
 
         $state.go('doc.view', {viewId: viewId});
 
-      };
-      $scope.reorder_tree_view = function() {
-        $state.go('doc.view');
-      };
+    };
 
-      $scope.try_adding_a_branch = function() {
+    $scope.reorder_tree_view = function() {
+        $state.go('doc.order');
+    };
+
+    $scope.try_adding_a_branch = function() {
 
         var branch = tree.get_selected_branch();
 
         if (branch.type === "section")
-          return;
+            return;
 
         ViewService.createView(branch.data.id, 'Untitled View', $scope.documentid).then(function(view) {
-          return tree.add_branch(branch, {
-            label: view.name,
-            type: "view",
-            data: view
-          });
+            return tree.add_branch(branch, {
+                label: view.name,
+                type: "view",
+                data: view
+            });
         });
-        /*return tree.add_branch(branch, {
-          label: 'New Branch',
-          data: {
-            name: "New Branch",
-            "else": 43
-          }
-        });*/
-      };
+    };
+})
+.controller('ReorderCtrl', function($scope, document, ElementService, ViewService, $state) {
+    $scope.doc = document;
+    var viewElementIds = [];
+    var viewElementIds2TreeNodeMap = {};
+    var rootElementId = $scope.doc.id;
 
+    for (var i = 0; i < document.view2view.length; i++) {
+        var viewId = document.view2view[i].id;
+        viewElementIds.push(viewId);
+    }
+    ElementService.getElements(viewElementIds).then(function(elements) {
+        for (var i = 0; i < elements.length; i++) {
+            var viewTreeNode = { 
+                id: elements[i].id, 
+                name: elements[i].name, 
+                children : [] 
+            };
+            viewElementIds2TreeNodeMap[elements[i].id] = viewTreeNode;    
+        }
+        for (var i = 0; i < document.view2view.length; i++) {
+            var viewId = document.view2view[i].id;
+            for (var j = 0; j < document.view2view[i].childrenViews.length; j++) {
+                var childViewId = document.view2view[i].childrenViews[j];
+                viewElementIds2TreeNodeMap[viewId].children.push(viewElementIds2TreeNodeMap[childViewId]);
+            }
+        }
+        $scope.tree = [viewElementIds2TreeNodeMap[rootElementId]];
     });
+
+    $scope.save = function() {
+        var newView2View = [];
+        for (var i = 0; i < viewElementIds.length; i++) {
+            var viewObject = {id: viewElementIds[i], childrenViews: []};
+            for (var j = 0; j < viewElementIds2TreeNodeMap[viewElementIds[i]].children.length; j++) {
+                viewObject.childrenViews.push(viewElementIds2TreeNodeMap[viewElementIds[i]].children[j].id);
+            }
+            newView2View.push(viewObject);
+        }
+        document.view2view = newView2View;
+        ViewService.updateDocument(document).then(function(data){
+            alert("success");
+            $state.go('doc'); //bug in ui router that doesn't reload the controller, need some workaround
+        });
+    };
+});

@@ -55,10 +55,8 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
         views: {
             'view@': {
                 templateUrl: 'partials/reorder-views.html',
-                controller: 'NavTreeCtrl'
+                controller: 'ReorderCtrl'
             }
-        },
-        resolve: {
         }
-    })
+    });
 });
