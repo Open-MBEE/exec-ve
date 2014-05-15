@@ -153,9 +153,9 @@ angular.module('myApp')
             newView2View.push(viewObject);
         }
         document.view2view = newView2View;
-        ViewService.updateDocument(document).then(function(data){
+        ViewService.updateDocument(document).then(function(data) {
             alert("success");
-            $state.go('doc'); //bug in ui router that doesn't reload the controller, need some workaround
+            $state.go('doc', {}, {reload:true});
         });
     };
 });
