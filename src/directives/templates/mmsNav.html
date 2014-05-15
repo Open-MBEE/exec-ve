@@ -1,4 +1,4 @@
-<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+<!-- <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
     <div class="container-fluid">
         <a class="navbar-brand" href="/share/page/site/{{site}}/dashboard">{{site}}</a>
         <ul class="nav navbar-nav">
@@ -27,6 +27,110 @@
                     </li>
                 </ul>
             </li>
+        </ul>
+        <ul class="nav navbar-nav pull-right">
+            <li><a href="/share/page/site/ems-training/dashboard">Support</a></li>
+            <li><a href="/alfresco/service/logout/info?next=/share/page">logout</a></li>
+        </ul>
+    </div>
+</nav> -->
+
+
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/share/page/site/{{site}}/dashboard">{{site}}</a>
+        <ul class="nav navbar-nav">
+            <li class="active"><a href="">{{title}}</a></li>
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Goto <b class="caret"></b></a>
+                <ul class="dropdown-menu">
+                    <li ng-if="type != 'docweb'"><a href="/alfresco/service/ve/configurations/{{site}}">DocWeb</a></li>
+                    <li><a href="/share/page/site/{{site}}/dashboard">Dashboard</a></li>
+                </ul>
+            </li>
+
+
+            
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Other Sites <b class="caret"></b></a>
+                <div id="accordian" class="dropdown-menu">
+                    <ul style="padding-left:0;">
+                        <li class="">
+                            <h3><a href="#"><span class="icon-dashboard"></span>Dashboard</a></h3>
+                            <ul style="display: none;">
+                                <li><a href="#">Reports</a></li>
+                                <li><a href="#">Search</a></li>
+                                <li><a href="#">Graphs</a></li>
+                                <li><a href="#">Settings</a></li>
+                            </ul>
+                        </li>
+                        <li class="">
+                            <h3><a href="#"><span class="icon-tasks"></span>Tasks</a></h3>
+                            <ul style="display: none;">
+                                <li><a href="#">Today's tasks</a></li>
+                                <li class="">
+                                    <a href="#">DrillDown</a>
+                                    <ul style="display: none;">
+                                        <li><a href="#">Today's tasks</a></li>
+                                        <li><a href="#">Urgent</a></li>
+                                        <li>
+                                            <a href="#">Overdues</a>
+                                            <ul>
+                                                <li><a href="#">Today's tasks</a></li>
+                                                <li><a href="#">Urgent</a></li>
+                                                <li><a href="#">Overdues</a></li>
+                                                <li><a href="#">Recurring</a></li>
+                                                <li><a href="#">Settings</a></li>
+                                            </ul>
+                                        </li>
+                                        <li><a href="#">Recurring</a></li>
+                                        <li><a href="#">Settings</a></li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <a href="#">Overdues</a>
+                                    <ul>
+                                        <li><a href="#">Today's tasks</a></li>
+                                        <li><a href="#">Urgent</a></li>
+                                        <li><a href="#">Overdues</a></li>
+                                        <li><a href="#">Recurring</a></li>
+                                        <li><a href="#">Settings</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#">Recurring</a></li>
+                                <li><a href="#">Settings</a></li>
+                            </ul>
+                        </li>
+                        <li class="active">
+                            <h3><a href="#"><span class="icon-calendar"></span>Calendar</a></h3>
+                            <ul style="display: block;">
+                                <li><a href="#">Current Month</a></li>
+                                <li><a href="#">Current Week</a></li>
+                                <li><a href="#">Previous Month</a></li>
+                                <li><a href="#">Previous Week</a></li>
+                                <li><a href="#">Next Month</a></li>
+                                <li><a href="#">Next Week</a></li>
+                                <li><a href="#">Team Calendar</a></li>
+                                <li><a href="#">Private Calendar</a></li>
+                                <li><a href="#">Settings</a></li>
+                            </ul>
+                        </li>
+                        <li class="">
+                            <h3><a href="#"><span class="icon-heart"></span>Favourites</a></h3>
+                            <ul style="display: none;">
+                                <li><a href="#">Global favs</a></li>
+                                <li><a href="#">My favs</a></li>
+                                <li><a href="#">Team favs</a></li>
+                                <li><a href="#">Settings</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+
+
+
+
         </ul>
         <ul class="nav navbar-nav pull-right">
             <li><a href="/share/page/site/ems-training/dashboard">Support</a></li>

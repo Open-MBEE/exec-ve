@@ -89,3 +89,82 @@ mms-spec mms-transclude-name, mms-spec mms-transclude-doc, mms-spec mms-transclu
 //.dropdown-submenu:hover>a:after{border-left-color:#ffffff;}
 .dropdown-submenu.pull-left{float:none;}.dropdown-submenu.pull-left>.dropdown-menu{left:-100%;margin-left:10px;-webkit-border-radius:6px 0 6px 6px;-moz-border-radius:6px 0 6px 6px;border-radius:6px 0 6px 6px;}
 
+
+@import url(http://fonts.googleapis.com/css?family=Nunito);
+@import url(http://thecodeplayer.com/uploads/fonts/fontawesome/css/font-awesome.min.css);
+
+#accordian {
+  background: #004050;
+  width: 250px;
+  margin: auto 0 auto;
+  color: white;
+  box-shadow: 
+    0 5px 15px 1px rgba(0, 0, 0, 0.6), 
+    0 0 200px 1px rgba(255, 255, 255, 0.5);
+}
+
+#accordian h3 {
+  background: #003040; 
+  background: linear-gradient(#003040, #002535);
+  margin-top: 0;
+  margin-bottom: 0;
+}
+#accordian h3 a {
+  padding: 0 10px;
+  font-size: 12px;
+  line-height: 34px;
+  display: block;
+  color: white;
+  text-decoration: none;
+}
+
+#accordian h3:hover {
+  text-shadow: 0 0 1px rgba(255, 255, 255, 0.7);
+}
+
+#accordian h3 span {
+  font-size: 16px;
+  margin-right: 10px;
+}
+
+#accordian li {
+  list-style-type: none;
+}
+
+#accordian ul ul li a, #accordian h4 {
+  color: white;
+  text-decoration: none;
+  font-size: 11px;
+  line-height: 27px;
+  display: block;
+  padding: 0 15px;
+
+  transition: all 0.15s;
+  position: relative;
+}
+
+#accordian ul ul li a:hover {
+  background: #003545;
+  border-left: 5px solid lightgreen;
+}
+
+#accordian ul ul {
+  display: none;
+}
+#accordian li.active>ul {
+  display: block;
+}
+
+#accordian ul ul ul{
+  margin-left: 15px; border-left: 1px dotted rgba(0, 0, 0, 0.5);
+}
+
+#accordian a:not(:only-child):after {
+  content: "\f104";
+  font-family: fontawesome;
+  position: absolute; right: 10px; top: 0;
+  font-size: 14px;
+}
+#accordian .active>a:not(:only-child):after {
+  content: "\f107";
+}
