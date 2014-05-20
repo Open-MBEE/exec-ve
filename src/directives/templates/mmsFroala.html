@@ -4,11 +4,11 @@
     <div>Filter: <input type="text" ng-model="filter"></div>
     <div>Propose New Element: <input type="text" ng-model="new"> <button class="btn btn-sm" ng-click="makeNew(new)">Submit</button></div>
     <table class="table table-bordered">
-        <tr><th>Qualified Name</th><th>Type</th><th>Name</th><th>Doc</th><th>Value (if applicable)</th></tr>
+        <tr><th>Name</th><th>Qualified Name</th><th>Type</th><th>Doc</th><th>Value (if applicable)</th></tr>
         <tr ng-repeat="elem in transcludableElements | filter:filter">
+            <td ng-click="choose(elem.id, 'name', elem.name)" class="clickable">{{elem.name}}</td>
             <td>{{elem.qualifiedName}}</td>
             <td>{{elem.type}}</td>
-            <td ng-click="choose(elem.id, 'name', elem.name)" class="clickable">{{elem.name}}</td>
             <td ng-click="choose(elem.id, 'doc', elem.name)" class="clickable">{{elem.documentation | limitTo:20}}</td>
             <td ng-click="choose(elem.id, 'val', elem.name)" class="clickable">tbd</td>
         </tr>
