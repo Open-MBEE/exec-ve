@@ -62,7 +62,7 @@ function mmsSpec(ElementService, $compile) {
                         if (scope.edit.type === 'Property' && angular.isArray(scope.edit.value)) {
                             scope.values = [];
                             for (var i = 0; i < scope.edit.value.length; i++) {
-                                scope.values.append({value: scope.edit.value[i]});
+                                scope.values.push({value: scope.edit.value[i]});
                             }
                             if (scope.edit.valueType === 'LiteralString')
                                 template += valueStringEdit;
@@ -86,7 +86,7 @@ function mmsSpec(ElementService, $compile) {
                 var i = 0;
                 for (i = 0; i < scope.values.length; i++) {
                     if (scope.edit.value.length < i+1) {
-                        scope.edit.value.append(scope.values[i].value);
+                        scope.edit.value.push(scope.values[i].value);
                     } else
                         scope.edit.value[i] = scope.values[i].value;
                 }

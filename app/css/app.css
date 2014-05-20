@@ -39,6 +39,10 @@ mms-spec mms-transclude-name, mms-spec mms-transclude-doc, mms-spec mms-transclu
   background-color: lightblue;
 }
 
+.navbar {
+  background-color: #6495ED;
+}
+
 .transclude-modal .clickable:hover {
   cursor: pointer;
   background-color: yellow;
