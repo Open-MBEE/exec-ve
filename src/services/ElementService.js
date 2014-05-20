@@ -234,6 +234,46 @@ function ElementService($q, $http, URLService, VersionService, _) {
 
     /**
      * @ngdoc method
+     * @name mms.ElementService#getGenericElements
+     * @methodOf mms.ElementService
+     *
+     * @description
+     * This ia a method to call a predefined url that returns elements json, so 
+     * the ElementService can cache those results. A key provies the key of the json
+     * that has the elements array. Workspace and version tells which workspace and
+     * version these elements come from. These 2 arguments doesn't change the url 
+     * that actually gets called but only affects where the returned elements are cached.
+     *
+     * @param {string} url the url to get
+     * @param {string} key json key
+     * @param {string} [workspace=master] tbd
+     * @param {string} [version=latest] tbd
+     */
+    var getGenericElements = function(url, key, updateFromServer, workspace, version) {
+        var deferred = $q.defer();
+        var update = updateFromServer === undefined ? false : updateFromServer;
+        $http.get(url)
+        .success(function(data, status, headers, config) {
+            var result = [];
+            data[key].forEach(function(element) {
+                if (elements.hasOwnProperty(element.id)) {
+                    if (update)
+                        _.merge(elements[element.id], element);
+                    result.push(elements[element.id]);
+                } else {
+                    elements[element.id] = element;
+                    result.push(elements[element.id]);
+                }
+            });
+            deferred.resolve(result); 
+        }).error(function(data, status, headers, config) {
+            URLService.handleHttpStatus(data, status, headers, config, deferred);
+        });
+        return deferred.promise;
+    };
+
+    /**
+     * @ngdoc method
      * @name mms.ElementService#updateElement
      * @methodOf mms.ElementService
      * 
@@ -403,6 +443,7 @@ function ElementService($q, $http, URLService, VersionService, _) {
         updateElements: updateElements,
         createElement: createElement,
         createElements: createElements,
+        getGenericElements: getGenericElements,
         isDirty: isDirty,
         search: search
     };

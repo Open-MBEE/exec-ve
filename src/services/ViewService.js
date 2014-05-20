@@ -271,6 +271,15 @@ function ViewService($q, $http, URLService, ElementService, CommentService, Vers
         return deferred.promise;
     };
 
+    var getDocumentViews = function(id, updateFromServer, workspace, version) {
+        var deferred = $q.defer();
+        var url = URLService.getDocumentURL(id) + '/views';
+        ElementService.getGenericElements(url, 'views').then(function(data) {
+            deferred.resolve(data);
+        });
+        return deferred.promise;
+    };
+
     /**
      * @ngdoc method
      * @name mms.ViewService#getViewComments
@@ -422,7 +431,8 @@ function ViewService($q, $http, URLService, ElementService, CommentService, Vers
         deleteViewComment: deleteViewComment,
         updateViewElements: updateViewElements,
         createView: createView,
-        addViewToDocument: addViewToDocument
+        addViewToDocument: addViewToDocument,
+        getDocumentViews: getDocumentViews
     };
 
 }

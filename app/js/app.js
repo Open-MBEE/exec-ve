@@ -11,12 +11,15 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
             },
             site: function($stateParams, SiteService) {
                 return SiteService.getSite($stateParams.site);
+            },
+            views: function($stateParams, ViewService) {
+                return ViewService.getDocumentViews($stateParams.docId);
             }
         },
         views: {
             'menu': {
                 template: '<mms-nav site="{{site}}" title="{{title}}" type="document"></mms-nav>',
-                controller: function($scope, $stateParams, document, site) {
+                controller: function($scope, $stateParams, document, site, views) {
                     $scope.site = site.title;
                     $scope.title = document.name;
                     $scope.docweb = false;
