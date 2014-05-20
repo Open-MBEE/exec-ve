@@ -72,7 +72,7 @@ function mmsFroala(ElementService, $modal, $templateCache, _) { //depends on ang
                 'formatBlock', 'align', 'insertOrderedList', 'insertUnorderedList', 'outdent', 'indent', 'sep',
                 'createLink', 'insertImage', 'insertVideo', 'undo', 'redo', 'html', 'sep',
                 'transclude'],
-            inlineMode: true,
+            inlineMode: false,
             autosaveInterval: 1000,
             contentChangedCallback: function() {
                 scope.$apply(read);

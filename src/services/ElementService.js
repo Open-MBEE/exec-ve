@@ -292,10 +292,11 @@ function ElementService($q, $http, URLService, VersionService, _) {
         else {
             $http.post(URLService.getPostElementsURL(), {'elements': [elem]})
             .success(function(data, status, headers, config) {
+                var resp = data.elements[0];
                 if (elements.hasOwnProperty(elem.id))
-                    _.merge(elements[elem.id], elem);
+                    _.merge(elements[elem.id], resp);
                 else
-                    elements[elem.id] = elem;
+                    elements[elem.id] = resp;
                 deferred.resolve(elements[elem.id]);
             }).error(function(data, status, headers, config) {
                 URLService.handleHttpStatus(data, status, headers, config, deferred);

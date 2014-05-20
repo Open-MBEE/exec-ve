@@ -36,11 +36,14 @@ function mmsTranscludeName(ElementService, $compile) {
                 scope.element = data;
                 if (mmsViewCtrl) {
                     mmsViewCtrl.elementTranscluded(scope.element);
-                    scope.watch('element.name', function() {
-                        mmsViewCtrl.elementTranscluded(scope.element);
-                    });
                 }
             });
+        });
+
+        scope.$watch('element.name', function(newVal) {
+            if (mmsViewCtrl && newVal) {
+                mmsViewCtrl.elementTranscluded(scope.element);
+            }
         });
     };
 
