@@ -73,27 +73,34 @@ function ElementService($q, $http, URLService, VersionService, _) {
      */
     var getElement = function(id, updateFromServer, workspace, version) {
         var update = updateFromServer === undefined ? false : updateFromServer;
+        var ws = workspace === undefined ? 'master' : workspace;
+        var ver = version === undefined ? 'latest' : version;
+
         var deferred = $q.defer();
-        if (elements.hasOwnProperty(id) && !update)
-            deferred.resolve(elements[id]);
-        else {
-            $http.get(URLService.getElementURL(id))
+        if (ver === 'latest') {
+            if (elements.hasOwnProperty(id)) {
+                if (!update) {
+                    deferred.resolve(elements[id]);
+                    return deferred.promise;
+                } 
+            }
+            $http.get(URLService.getElementURL(id, ws, ver))
             .success(function(data, status, headers, config) {
                 if (data.elements.length > 0) {
                     if (elements.hasOwnProperty(id)) {
-                        if (update)
-                            _.merge(elements[id], data.elements[0]);
-                        deferred.resolve(elements[id]);
+                        _.merge(elements[id], data.elements[0]);
                     } else {
                         elements[id] = data.elements[0];
-                        deferred.resolve(elements[id]);
                     }
+                    deferred.resolve(elements[id]);
                 } else {
                     deferred.reject("Not Found");
                 }
             }).error(function(data, status, headers, config) {
                 URLService.handleHttpStatus(data, status, headers, config, deferred);
             });
+        } else {
+            return VersionService.getElementByTimestamp(id, ws, ver);
         }
         return deferred.promise;
     };
@@ -115,7 +122,7 @@ function ElementService($q, $http, URLService, VersionService, _) {
     var getElements = function(ids, updateFromServer, workspace, version) {
         var promises = [];
         ids.forEach(function(id) {
-            promises.push(getElement(id, updateFromServer));
+            promises.push(getElement(id, updateFromServer, workspace, version));
         });
         return $q.all(promises);
     };
@@ -134,15 +141,20 @@ function ElementService($q, $http, URLService, VersionService, _) {
      *      references to the same object. This object can be edited without
      *      affecting the same element object that's used for displays
      */
-    var getElementForEdit = function(id, workspace) {
+    var getElementForEdit = function(id, updateFromServer, workspace) {
+        var update = updateFromServer === undefined ? false : updateFromServer;
+        var ws = workspace === undefined ? 'master' : workspace;
+
         var deferred = $q.defer();
-        if (edits.hasOwnProperty(id))
+        if (edits.hasOwnProperty(id) && !update)
             deferred.resolve(edits[id]);
         else {
-            getElement(id).then(function(data) {
-                if (edits.hasOwnProperty(id))
+            getElement(id, update, ws)
+            .then(function(data) {
+                if (edits.hasOwnProperty(id)) {
+                    //merge?
                     deferred.resolve(edits[id]);
-                else {
+                } else {
                     var edit = _.cloneDeep(data);
                     edits[id] = edit;
                     for (var i = 0; i < nonEditKeys.length; i++) {
@@ -152,6 +164,8 @@ function ElementService($q, $http, URLService, VersionService, _) {
                     }
                     deferred.resolve(edit);
                 }
+            }, function(reason) {
+                deferred.reject(reason);
             });
         }
         return deferred.promise;
@@ -169,10 +183,10 @@ function ElementService($q, $http, URLService, VersionService, _) {
      * @returns {Promise} The promise will be resolved with an array of editable
      * element objects that won't affect the corresponding displays
      */
-    var getElementsForEdit = function(ids, workspace) {
+    var getElementsForEdit = function(ids, updateFromServer, workspace) {
         var promises = [];
         ids.forEach(function(id) {
-            promises.push(getElementForEdit(id));
+            promises.push(getElementForEdit(id, updateFromServer, workspace));
         });
         return $q.all(promises);
     };
@@ -189,47 +203,8 @@ function ElementService($q, $http, URLService, VersionService, _) {
      * @returns {Promise} The promise will be resolved with an array of 
      * element objects 
      */
-    var getOwnedElements = function(id) {
+    var getOwnedElements = function(id, updateFromServer, workspace, version) {
         
-    };
-
-    /**
-     * @ngdoc method
-     * @name mms.ElementService#getViewElements
-     * @methodOf mms.ElementService
-     * 
-     * @description
-     * Gets elements referenced in a view (this can be removed in preference of 
-     * getElements, since the view has the ids already).
-     * 
-     * @param {string} viewid The id of the view.
-     * @returns {Promise} The promise will be resolved with an array of element objects, 
-     *      multiple calls to this method may return with different elements depending
-     *      on if the view has changed on the server. (consider removing this and only
-     *      use the ones in ViewService instead)
-     */
-    var getViewElements = function(viewid, updateFromServer, workspace, version) {
-        var deferred = $q.defer();
-        var update = updateFromServer === undefined ? false : updateFromServer;
-        $http.get(URLService.getViewURL(viewid) + '/elements')
-        .success(function(data, status, headers, config) {
-            var result = [];
-            data.elements.forEach(function(element) {
-                if (elements.hasOwnProperty(element.id)) {
-                    if (update)
-                        _.merge(elements[element.id], element);
-                    result.push(elements[element.id]);
-                } else {
-                    elements[element.id] = element;
-                    result.push(elements[element.id]);
-                }
-            });
-            deferred.resolve(result); 
-        }).error(function(data, status, headers, config) {
-            URLService.handleHttpStatus(data, status, headers, config, deferred);
-        });
-        
-        return deferred.promise;
     };
 
     /**
@@ -250,25 +225,32 @@ function ElementService($q, $http, URLService, VersionService, _) {
      * @param {string} [version=latest] tbd
      */
     var getGenericElements = function(url, key, updateFromServer, workspace, version) {
-        var deferred = $q.defer();
         var update = updateFromServer === undefined ? false : updateFromServer;
-        $http.get(url)
-        .success(function(data, status, headers, config) {
-            var result = [];
-            data[key].forEach(function(element) {
-                if (elements.hasOwnProperty(element.id)) {
-                    if (update)
-                        _.merge(elements[element.id], element);
+        var ws = workspace === undefined ? 'master' : workspace;
+        var ver = version === undefined ? 'latest' : version;
+
+        var deferred = $q.defer();
+        if (ver === 'latest') {
+            $http.get(url)
+            .success(function(data, status, headers, config) {
+                var result = [];
+                data[key].forEach(function(element) {
+                    if (elements.hasOwnProperty(element.id)) {
+                        if (update) {
+                            _.merge(elements[element.id], element);
+                        } 
+                    } else {
+                        elements[element.id] = element;
+                    }
                     result.push(elements[element.id]);
-                } else {
-                    elements[element.id] = element;
-                    result.push(elements[element.id]);
-                }
+                });
+                deferred.resolve(result); 
+            }).error(function(data, status, headers, config) {
+                URLService.handleHttpStatus(data, status, headers, config, deferred);
             });
-            deferred.resolve(result); 
-        }).error(function(data, status, headers, config) {
-            URLService.handleHttpStatus(data, status, headers, config, deferred);
-        });
+        } else {
+            return VersionService.getElements(url, key, ws, ver);
+        }
         return deferred.promise;
     };
 
@@ -286,17 +268,21 @@ function ElementService($q, $http, URLService, VersionService, _) {
      *      update is successful.
      */
     var updateElement = function(elem, workspace) {
+        var ws = workspace === undefined ? 'master' : workspace;
+
         var deferred = $q.defer();
         if (!elem.hasOwnProperty('id'))
             deferred.reject('Element id not found, create element first!');
         else {
-            $http.post(URLService.getPostElementsURL(), {'elements': [elem]})
+            $http.post(URLService.getPostElementsURL(ws), {'elements': [elem]})
             .success(function(data, status, headers, config) {
                 var resp = data.elements[0];
                 if (elements.hasOwnProperty(elem.id))
                     _.merge(elements[elem.id], resp);
                 else
                     elements[elem.id] = resp;
+                if (edits.hasOwnProperty(elem.id))
+                    _.merge(edits[elem.id], elements[elem.id]);
                 deferred.resolve(elements[elem.id]);
             }).error(function(data, status, headers, config) {
                 URLService.handleHttpStatus(data, status, headers, config, deferred);
@@ -320,7 +306,7 @@ function ElementService($q, $http, URLService, VersionService, _) {
     var updateElements = function(elems, workspace) {
         var promises = [];
         elems.forEach(function(elem) {
-            promises.push(updateElement(elem));
+            promises.push(updateElement(elem, workspace));
         });
         return $q.all(promises);
     };
@@ -338,21 +324,23 @@ function ElementService($q, $http, URLService, VersionService, _) {
      *      create is successful.
      */
     var createElement = function(elem, workspace) {
+        var ws = workspace === undefined ? 'master' : workspace;
+
         var deferred = $q.defer();
         if (!elem.hasOwnProperty('owner')) {
-            deferred.reject('Element create needs an owner');
+            deferred.reject('Element create needs an owner'); //relax this?
             return deferred.promise;
         }
         if (elem.hasOwnProperty('id')) {
             deferred.reject('Element create cannot have id');
             return deferred.promise;
         }
-        $http.post(URLService.getPostElementsURL(), {'elements': [elem]})
+        $http.post(URLService.getPostElementsURL(ws), {'elements': [elem]})
         .success(function(data, status, headers, config) {
             if (data.elements.length > 0) {
                 var e = data.elements[0];
                 elements[e.id] = e;
-                deferred.resolve(e);
+                deferred.resolve(elements[e.id]);
             }
         }).error(function(data, status, headers, config) {
             URLService.handleHttpStatus(data, status, headers, config, deferred);
@@ -375,7 +363,7 @@ function ElementService($q, $http, URLService, VersionService, _) {
     var createElements = function(elems, workspace) {
         var promises = [];
         elems.forEach(function(elem) {
-            promises.push(createElement(elem));
+            promises.push(createElement(elem, workspace));
         });
         return $q.all(promises);
     };
@@ -410,21 +398,22 @@ function ElementService($q, $http, URLService, VersionService, _) {
      * @param {string} query A query string (TBD)
      * @returns {Promise} The promise will be resolved with an array of element objects
      */
-    var search = function(query, workspace) {
+    var search = function(query, updateFromServer, workspace) {
+        var update = updateFromServer === undefined ? false : updateFromServer;
+        var ws = workspace === undefined ? 'master' : workspace;
+
         var deferred = $q.defer();
-        var update = false; //TODO
-        $http.get(URLService.getElementSearchURL(query)) 
+        $http.get(URLService.getElementSearchURL(query, ws)) 
         .success(function(data, status, headers, config) {
             var result = [];
             data.elements.forEach(function(element) {
                 if (elements.hasOwnProperty(element.id)) {
                     if (update)
                         _.merge(elements[element.id], element);
-                    result.push(elements[element.id]);
                 } else {
                     elements[element.id] = element;
-                    result.push(elements[element.id]);
                 }
+                result.push(elements[element.id]);
             });
             deferred.resolve(result); 
         }).error(function(data, status, headers, config) {
@@ -438,7 +427,6 @@ function ElementService($q, $http, URLService, VersionService, _) {
         getElements: getElements,
         getElementForEdit: getElementForEdit,
         getElementsForEdit: getElementsForEdit,
-        getViewElements: getViewElements,
         getOwnedElements: getOwnedElements,
         updateElement: updateElement,
         updateElements: updateElements,

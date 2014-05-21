@@ -49,7 +49,7 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
         },
         resolve: {
             viewElements: function($stateParams, ViewService) {
-                return ViewService.getViewAllowedElements($stateParams.viewId);
+                return ViewService.getViewElements($stateParams.viewId);
             }
         }
     })

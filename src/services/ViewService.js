@@ -84,11 +84,8 @@ angular.module('mms')
  * ```
  */
 function ViewService($q, $http, URLService, ElementService, CommentService, VersionService) {
-    var views = {};
-    var allowedElements = {};
-    var displayedElements = {};
-    var comments = {};
-    var documents = {};
+    var viewElements = {"latest": {}};
+    var productViews = {"latest": {}};
 
     /**
      * @ngdoc method
@@ -106,23 +103,7 @@ function ViewService($q, $http, URLService, ElementService, CommentService, Vers
      *      references to the same object.
      */
     var getView = function(id, updateFromServer, workspace, version) { 
-        var deferred = $q.defer();
-        var update = updateFromServer === undefined ? false : updateFromServer;
-        if (views.hasOwnProperty(id) && !update)
-            deferred.resolve(views[id]);
-        else {
-            ElementService.getElement(id, update).then(function(data) {
-                if (views.hasOwnProperty(id))
-                    deferred.resolve(views[id]);
-                else {
-                    views[id] = data;
-                    deferred.resolve(views[id]);
-                }
-            }, function(reason) {
-                deferred.reject(reason);
-            });
-        }
-        return deferred.promise;
+        return ElementService.getElement(id, updateFromServer, workspace, version);
     };
 
     /**
@@ -139,7 +120,7 @@ function ViewService($q, $http, URLService, ElementService, CommentService, Vers
      *      references to the same objects.
      */
     var getViews = function(ids, updateFromServer, workspace, version) {
-
+        return ElementService.getElements(ids, updateFromServer, workspace, version);
     };
 
     /**
@@ -158,23 +139,7 @@ function ViewService($q, $http, URLService, ElementService, CommentService, Vers
      *      references to the same object.
      */
     var getDocument = function(id, updateFromServer, workspace, version) {
-        var deferred = $q.defer();
-        var update = updateFromServer === undefined ? false : updateFromServer;
-        if (documents.hasOwnProperty(id) && !update)
-            deferred.resolve(documents[id]);
-        else {
-            ElementService.getElement(id, update).then(function(data) {
-                if (documents.hasOwnProperty(id))
-                    deferred.resolve(documents[id]);
-                else {
-                    documents[id] = data;
-                    deferred.resolve(documents[id]);
-                }
-            }, function(reason) {
-                deferred.reject(reason);
-            });
-        }
-        return deferred.promise;
+        return ElementService.getElement(id, updateFromServer, workspace, version);
     };
 
     /**
@@ -192,13 +157,7 @@ function ViewService($q, $http, URLService, ElementService, CommentService, Vers
      *      update is successful.
      */
     var updateView = function(view, workspace) {
-        var deferred = $q.defer();
-        ElementService.updateElement(view).then(function(data) {
-            deferred.resolve(data);
-        }, function(reason) {
-            deferred.reject(reason);
-        });
-        return deferred.promise;
+        return ElementService.updateElement(view, workspace);
     };
 
     /**
@@ -216,33 +175,7 @@ function ViewService($q, $http, URLService, ElementService, CommentService, Vers
      *      update is successful.
      */
     var updateDocument = function(document, workspace) {
-        var deferred = $q.defer();
-        /*ElementService.updateElement(document).then(function(data) {
-            deferred.resolve(data);
-        });*/
-        $http.post(URLService.getPostDocumentsURL(), {"products":[document]})
-        .success(function(data, status, headers, config) {
-            deferred.resolve(document);
-        }).error(function(data, status, headers, config) {
-            URLService.handleHttpStatus(data, status, headers, config, deferred);
-        });
-        return deferred.promise;
-    };
-
-    /**
-     * @ngdoc method
-     * @name mms.ViewService#getViewDisplayedElements
-     * @methodOf mms.ViewService
-     * 
-     * @description
-     * Gets the element objects for elements displayed in this view. The references are 
-     * the same as ones gotten from ElementService.
-     * 
-     * @param {string} id The id of the view.
-     * @returns {Promise} The promise will be resolved with array of element objects. 
-     */
-    var getViewDisplayedElements = function(id) {
-
+        return ElementService.updateElement(document, workspace);
     };
 
     /**
@@ -257,26 +190,55 @@ function ViewService($q, $http, URLService, ElementService, CommentService, Vers
      * @param {string} id The id of the view.
      * @returns {Promise} The promise will be resolved with array of element objects. 
      */
-    var getViewAllowedElements = function(id, updateFromServer, workspace, version) {
-        var deferred = $q.defer();
+    var getViewElements = function(id, updateFromServer, workspace, version) {
         var update = updateFromServer === undefined ? false : updateFromServer;
-        if (allowedElements.hasOwnProperty(id) && !update)
-            deferred.resolve(allowedElements[id]);
+        var ws = workspace === undefined ? 'master' : workspace;
+        var ver = version === undefined ? 'latest' : version;
+
+        var deferred = $q.defer();
+        var url = URLService.getViewURL(id, ws) + '/elements';
+        if (viewElements.hasOwnProperty(ver) && viewElements[ver].hasOwnProperty(id) && !update) 
+            deferred.resolve(viewElements[ver][id]);
         else {
-            ElementService.getViewElements(id, update).then(function(data) {
-                allowedElements[id] = data;
-                deferred.resolve(data);
+            ElementService.getGenericElements(url, 'elements', update, ws, ver).
+            then(function(data) {
+                if (viewElements.hasOwnProperty(ver)) {
+                    viewElements[ver][id] = data;
+                } else {
+                    viewElements[ver] = {};
+                    viewElements[ver][id] = data;
+                }
+                deferred.resolve(viewElements[ver][id]);
+            }, function(reason) {
+                deferred.reject(reason);
             });
         }
         return deferred.promise;
     };
 
     var getDocumentViews = function(id, updateFromServer, workspace, version) {
+        var update = updateFromServer === undefined ? false : updateFromServer;
+        var ws = workspace === undefined ? 'master' : workspace;
+        var ver = version === undefined ? 'latest' : version;
+
         var deferred = $q.defer();
         var url = URLService.getDocumentURL(id) + '/views';
-        ElementService.getGenericElements(url, 'views').then(function(data) {
-            deferred.resolve(data);
-        });
+        if (productViews.hasOwnProperty(ver) && productViews[ver].hasOwnProperty(id) && !update) 
+            deferred.resolve(productViews[ver][id]);
+        else {
+            ElementService.getGenericElements(url, 'views', update, ws, ver).
+            then(function(data) {
+                if (productViews.hasOwnProperty(ver)) {
+                    productViews[ver][id] = data;
+                } else {
+                    productViews[ver] = {};
+                    productViews[ver][id] = data;
+                }
+                deferred.resolve(productViews[ver][id]);
+            }, function(reason) {
+                deferred.reject(reason);
+            });
+        }
         return deferred.promise;
     };
 
@@ -345,15 +307,15 @@ function ViewService($q, $http, URLService, ElementService, CommentService, Vers
 
     var addViewToDocument = function(viewId, documentId, parentViewId, workspace) {
         var deferred = $q.defer();
-        getDocument(documentId).then(function(data) {   
+        getDocument(documentId, workspace).then(function(data) {   
             for (var i = 0; i < data.view2view.length; i++) {
                 if (data.view2view[i].id === parentViewId) {
-                    data.view2view[i].childrenViews.unshift(viewId);
+                    data.view2view[i].childrenViews.push(viewId);
                     break;
                 }
             } 
             data.view2view.push({id: viewId, childrenViews: []});
-            updateDocument(data).then(function(data2) {
+            updateDocument(data, workspace).then(function(data2) {
                 deferred.resolve(data);
             }, function(reason) {
                 deferred.reject(reason);
@@ -382,35 +344,35 @@ function ViewService($q, $http, URLService, ElementService, CommentService, Vers
         var view = {
             type: 'View',
             owner: ownerId,
-            name: name === undefined ? 'Untitled View' : name,
-            documentation: ''
+            name: (name === undefined || name === null) ? 'Untitled View' : name,
+            documentation: '',
         };
-        ElementService.createElement(view).then(function(data) {
-            data.contains = [{'type': 'Paragraph', 
-                'sourceType': 'reference', 
-                'source': data.id, 
-                'sourceProperty': 'documentation'}];
+        ElementService.createElement(view, workspace)
+        .then(function(data) {
+            data.contains = [
+                {
+                    'type': 'Paragraph', 
+                    'sourceType': 'reference', 
+                    'source': data.id, 
+                    'sourceProperty': 'documentation'
+                }
+            ];
             data.allowedElements = [data.id];
             data.displayedElements = [data.id];
             data.childrenViews = [];
-            /*ElementService.updateElement(data).then(function(data2) {
-                views[data2.id] = data2;
-                deferred.resolve(data2);
-            });*/
-            $http.post(URLService.getPostViewsURL(), {"views": [data]})
-            .success(function(data2, status, headers, config) {
-                views[data.id] = data;
+            ElementService.updateElement(data, workspace)
+            .then(function(data2) {
                 if (documentId !== undefined) {
-                    addViewToDocument(data.id, documentId, ownerId).then(function(data3) {
-                        deferred.resolve(views[data.id]);
+                    addViewToDocument(data.id, documentId, ownerId, workspace)
+                    .then(function(data3) {
+                        deferred.resolve(data2);
                     }, function(reason) {
                         deferred.reject(reason);
                     });
                 } else
-                    deferred.resolve(views[data.id]);
-
-            }).error(function(data2, status, headers, config) {
-                URLService.handleHttpStatus(data2, status, headers, config, deferred);
+                    deferred.resolve(data2);
+            }, function(reason) {
+                deferred.reject(reason);
             });
         }, function(reason) {
             deferred.reject(reason);
@@ -424,8 +386,7 @@ function ViewService($q, $http, URLService, ElementService, CommentService, Vers
         getDocument: getDocument,
         updateView: updateView,
         updateDocument: updateDocument,
-        getViewDisplayedElements: getViewDisplayedElements,
-        getViewAllowedElements: getViewAllowedElements,
+        getViewElements: getViewElements,
         getViewComments: getViewComments,
         addViewComment: addViewComment,
         deleteViewComment: deleteViewComment,

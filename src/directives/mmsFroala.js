@@ -75,8 +75,8 @@ function mmsFroala(ElementService, $modal, $templateCache, _) { //depends on ang
             inlineMode: true,
             autosaveInterval: 1000,
             contentChangedCallback: function() {
-                scope.$apply(read);
-                //read();
+                //scope.$apply(read);
+                read();
             },
             imageUploadURL: '', //prevent default upload to public url
             placeholder: 'Placeholder, currently empty',

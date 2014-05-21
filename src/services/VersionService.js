@@ -15,6 +15,8 @@ angular.module('mms')
  */
 function VersionService($q, $http, URLService) {
 
+    var elements = {};
+
     /**
      * @ngdoc method
      * @name mms.VersionService#getElementVersionByTag
@@ -27,8 +29,9 @@ function VersionService($q, $http, URLService) {
      * @param {Date} date A js date object
      * @returns {Promise} The promise will be resolved with an element object.
      */
-    var getElementVersionByTag = function(id, tag) {
-
+    var getElementByVersion = function(id, workspace, version) {
+        var deferred = $q.defer();
+        return deferred.promise;
     };
 
     /**
@@ -43,8 +46,9 @@ function VersionService($q, $http, URLService) {
      * @param {Date} date A js date object
      * @returns {Promise} The promise will be resolved with an element object.
      */
-    var getElementVersionByDate = function(id, date) {
-
+    var getElementByTimestamp = function(id, workspace, timestamp) {
+        var deferred = $q.defer();
+        return deferred.promise;
     };
 
     /**
@@ -58,14 +62,21 @@ function VersionService($q, $http, URLService) {
      * @param {string} id The id of the element
      * @returns {Promise} The promise will be resolved with an array of element objects.
      */
-    var getElementVersions = function(id) {
+    var getElementVersions = function(id, workspace) {
+        var deferred = $q.defer();
+        return deferred.promise;
+    };
 
+    var getElements = function(url, key, workspace, version) {
+        var deferred = $q.defer();
+        return deferred.promise;
     };
 
     return {
-        getElementVersionByTag: getElementVersionByTag,
-        getElementVersionByDate: getElementVersionByDate,
-        getElementVersions: getElementVersions
+        getElementByVersion: getElementByVersion,
+        getElementByTimestamp: getElementByTimestamp,
+        getElementVersions: getElementVersions,
+        getElements: getElements
     };
     
 }
