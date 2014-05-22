@@ -17,6 +17,10 @@ function VersionService($q, $http, URLService) {
 
     var elements = {};
 
+    var isTimestamp = function(version) {
+        return isNaN(version); //this may be unreliable
+    };
+
     /**
      * @ngdoc method
      * @name mms.VersionService#getElementVersionByTag
@@ -29,26 +33,20 @@ function VersionService($q, $http, URLService) {
      * @param {Date} date A js date object
      * @returns {Promise} The promise will be resolved with an element object.
      */
-    var getElementByVersion = function(id, workspace, version) {
+    var getElement = function(id, workspace, version) {
+        var ws = !workspace ? 'master' : workspace;
+
         var deferred = $q.defer();
+        if (isTimestamp(version)) {
+
+        } else {
+
+        }
         return deferred.promise;
     };
 
-    /**
-     * @ngdoc method
-     * @name mms.VersionService#getElementVersionByDate
-     * @methodOf mms.VersionService
-     * 
-     * @description
-     * Queries for an element version as of a certain time.
-     *
-     * @param {string} id The id of the element
-     * @param {Date} date A js date object
-     * @returns {Promise} The promise will be resolved with an element object.
-     */
-    var getElementByTimestamp = function(id, workspace, timestamp) {
-        var deferred = $q.defer();
-        return deferred.promise;
+    var getElements = function(ids, workspace, version) {
+
     };
 
     /**
@@ -63,20 +61,23 @@ function VersionService($q, $http, URLService) {
      * @returns {Promise} The promise will be resolved with an array of element objects.
      */
     var getElementVersions = function(id, workspace) {
+        var ws = !workspace ? 'master' : workspace;
         var deferred = $q.defer();
         return deferred.promise;
     };
 
-    var getElements = function(url, key, workspace, version) {
+    var getGenericElements = function(url, key, workspace, version) {
+        var ws = !workspace ? 'master' : workspace;
+        
         var deferred = $q.defer();
         return deferred.promise;
     };
 
     return {
-        getElementByVersion: getElementByVersion,
-        getElementByTimestamp: getElementByTimestamp,
+        getElement: getElement,
+        getElements: getElements,
         getElementVersions: getElementVersions,
-        getElements: getElements
+        getGenericElements: getGenericElements
     };
     
 }

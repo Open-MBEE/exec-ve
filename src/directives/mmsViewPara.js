@@ -10,7 +10,7 @@ function mmsViewPara($templateCache) {
         restrict: 'E',
         template: template,
         scope: {
-            para: '=',
+            para: '=mmsPara',
         },
         //controller: ['$scope', controller]
         link: function(scope, element, attrs) {

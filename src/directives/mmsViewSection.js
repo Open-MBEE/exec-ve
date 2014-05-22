@@ -33,7 +33,7 @@ function mmsViewSection($compile, $templateCache) {
     return {
         restrict: 'E',
         scope: {
-            section: '=',
+            section: '=mmsSection',
         },
         link: mmsViewSectionLink
     };

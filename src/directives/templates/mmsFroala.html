@@ -5,7 +5,7 @@
     <div>Propose New Element: <input type="text" ng-model="new"> <button class="btn btn-sm" ng-click="makeNew(new)">Submit</button></div>
     <table class="table table-bordered">
         <tr><th>Name</th><th>Qualified Name</th><th>Type</th><th>Doc</th><th>Value (if applicable)</th></tr>
-        <tr ng-repeat="elem in transcludableElements | filter:filter">
+        <tr ng-repeat="elem in mmsCfElements | filter:filter">
             <td ng-click="choose(elem.id, 'name', elem.name)" class="clickable">{{elem.name}}</td>
             <td>{{elem.qualifiedName}}</td>
             <td>{{elem.type}}</td>

@@ -72,9 +72,9 @@ function ElementService($q, $http, URLService, VersionService, _) {
      *      references to the same object.
      */
     var getElement = function(id, updateFromServer, workspace, version) {
-        var update = updateFromServer === undefined ? false : updateFromServer;
-        var ws = workspace === undefined ? 'master' : workspace;
-        var ver = version === undefined ? 'latest' : version;
+        var update = !updateFromServer ? false : updateFromServer;
+        var ws = !workspace ? 'master' : workspace;
+        var ver = !version ? 'latest' : version;
 
         var deferred = $q.defer();
         if (ver === 'latest') {
@@ -142,8 +142,8 @@ function ElementService($q, $http, URLService, VersionService, _) {
      *      affecting the same element object that's used for displays
      */
     var getElementForEdit = function(id, updateFromServer, workspace) {
-        var update = updateFromServer === undefined ? false : updateFromServer;
-        var ws = workspace === undefined ? 'master' : workspace;
+        var update = !updateFromServer ? false : updateFromServer;
+        var ws = !workspace ? 'master' : workspace;
 
         var deferred = $q.defer();
         if (edits.hasOwnProperty(id) && !update)
@@ -225,9 +225,9 @@ function ElementService($q, $http, URLService, VersionService, _) {
      * @param {string} [version=latest] tbd
      */
     var getGenericElements = function(url, key, updateFromServer, workspace, version) {
-        var update = updateFromServer === undefined ? false : updateFromServer;
-        var ws = workspace === undefined ? 'master' : workspace;
-        var ver = version === undefined ? 'latest' : version;
+        var update = !updateFromServer ? false : updateFromServer;
+        var ws = !workspace ? 'master' : workspace;
+        var ver = !version ? 'latest' : version;
 
         var deferred = $q.defer();
         if (ver === 'latest') {
@@ -268,7 +268,7 @@ function ElementService($q, $http, URLService, VersionService, _) {
      *      update is successful.
      */
     var updateElement = function(elem, workspace) {
-        var ws = workspace === undefined ? 'master' : workspace;
+        var ws = !workspace ? 'master' : workspace;
 
         var deferred = $q.defer();
         if (!elem.hasOwnProperty('id'))
@@ -324,7 +324,7 @@ function ElementService($q, $http, URLService, VersionService, _) {
      *      create is successful.
      */
     var createElement = function(elem, workspace) {
-        var ws = workspace === undefined ? 'master' : workspace;
+        var ws = !workspace ? 'master' : workspace;
 
         var deferred = $q.defer();
         if (!elem.hasOwnProperty('owner')) {
@@ -399,8 +399,8 @@ function ElementService($q, $http, URLService, VersionService, _) {
      * @returns {Promise} The promise will be resolved with an array of element objects
      */
     var search = function(query, updateFromServer, workspace) {
-        var update = updateFromServer === undefined ? false : updateFromServer;
-        var ws = workspace === undefined ? 'master' : workspace;
+        var update = !updateFromServer ? false : updateFromServer;
+        var ws = !workspace ? 'master' : workspace;
 
         var deferred = $q.defer();
         $http.get(URLService.getElementSearchURL(query, ws)) 

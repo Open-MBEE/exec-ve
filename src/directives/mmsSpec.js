@@ -31,10 +31,10 @@ function mmsSpec(ElementService, $compile) {
     var nameEditTemplate = '<div>Name: <input class="form-control" type="text" ng-model="edit.name"></input></div>';
     
     var docTemplate = '<div>Documentation:</div><div ng-bind-html="element.documentation"></div>';
-    var docEditTemplate = '<div>Documentation:</div><div ng-model="edit.documentation" mms-froala transcludable-elements="transcludableElements"></div>';
+    var docEditTemplate = '<div>Documentation:</div><div ng-model="edit.documentation" mms-froala mms-cf-elements="mmsCfElements"></div>';
     var docEditPlain = '<div>Documentation:</div><textarea ng-model="edit.documentation"></textarea>';
     
-    var valueStringEdit = '<div>Value:</div><div ng-repeat="val in values" ng-model="val.value" mms-froala transcluable-elements="transcludableElements"></div>';
+    var valueStringEdit = '<div>Value:</div><div ng-repeat="val in values" ng-model="val.value" mms-froala mms-cf-elements="mmsCfElements"></div>';
     var valueBooleanEdit = '<div>Value:</div><input ng-repeat="val in values" type="checkbox" ng-model="val.value"></input>';
     var valueNumberEdit = '<div>Value:</div><input ng-repeat="val in values" type="number" ng-model="val.value"></input>';
     
@@ -42,21 +42,22 @@ function mmsSpec(ElementService, $compile) {
     var template = '';
     
     var mmsSpecLink = function(scope, element, attrs) {
-        scope.$watch('eid', function(newVal, oldVal) {
-            if (newVal === undefined || newVal === null || newVal === '') {
+        scope.$watch('mmsEid', function(newVal, oldVal) {
+            if (!newVal) {
                 element.empty();
                 return;
             }
-            ElementService.getElement(scope.eid).then(function(data) {
+            ElementService.getElement(scope.mmsEid, false, scope.mmsWs, scope.mmsVersion)
+            .then(function(data) {
                 scope.element = data;
                 template = '' + heading;
-                if (scope.editableField === 'none' || !scope.element.editable) {
+                if (scope.mmsEditField === 'none' || !scope.element.editable) {
                     template += nameTemplate + docTemplate;
                     element.empty();
                     element.append(template);
                     $compile(element.contents())(scope); 
                 } else {
-                    ElementService.getElementForEdit(scope.eid).then(function(data) {
+                    ElementService.getElementForEdit(scope.mmsEid, false, scope.mmsWs).then(function(data) {
                         scope.edit = data;
                         template += nameEditTemplate + docEditTemplate;
                         if (scope.edit.type === 'Property' && angular.isArray(scope.edit.value)) {
@@ -92,7 +93,10 @@ function mmsSpec(ElementService, $compile) {
                 }
                 scope.edit.value.length = i;
             }
-            ElementService.updateElement(scope.edit).then(function(){});
+            ElementService.updateElement(scope.edit, scope.mmsWs)
+            .then(function() {
+                
+            });
         };
     };
 
@@ -100,11 +104,11 @@ function mmsSpec(ElementService, $compile) {
         restrict: 'E',
         //template: template,
         scope: {
-            eid: '@',
-            editableField: '@', //all or none or individual field
-            workspace: '@',
-            version: '@',
-            transcludableElements: '=' //array of element objects
+            mmsEid: '@',
+            mmsEditField: '@', //all or none or individual field
+            mmsWs: '@',
+            mmsVersion: '@',
+            mmsCfElements: '=' //array of element objects
         },
         link: mmsSpecLink
     };

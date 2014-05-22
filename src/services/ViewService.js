@@ -191,9 +191,9 @@ function ViewService($q, $http, URLService, ElementService, CommentService, Vers
      * @returns {Promise} The promise will be resolved with array of element objects. 
      */
     var getViewElements = function(id, updateFromServer, workspace, version) {
-        var update = updateFromServer === undefined ? false : updateFromServer;
-        var ws = workspace === undefined ? 'master' : workspace;
-        var ver = version === undefined ? 'latest' : version;
+        var update = !updateFromServer ? false : updateFromServer;
+        var ws = !workspace ? 'master' : workspace;
+        var ver = !version ? 'latest' : version;
 
         var deferred = $q.defer();
         var url = URLService.getViewURL(id, ws) + '/elements';
@@ -217,9 +217,9 @@ function ViewService($q, $http, URLService, ElementService, CommentService, Vers
     };
 
     var getDocumentViews = function(id, updateFromServer, workspace, version) {
-        var update = updateFromServer === undefined ? false : updateFromServer;
-        var ws = workspace === undefined ? 'master' : workspace;
-        var ver = version === undefined ? 'latest' : version;
+        var update = !updateFromServer ? false : updateFromServer;
+        var ws = !workspace ? 'master' : workspace;
+        var ver = !version ? 'latest' : version;
 
         var deferred = $q.defer();
         var url = URLService.getDocumentURL(id) + '/views';

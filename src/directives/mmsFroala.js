@@ -29,7 +29,7 @@ function mmsFroala(ElementService, $modal, $templateCache, _) { //depends on ang
             $scope.filter = '';
             $scope.searchText = '';
             $scope.choose = function(elementId, property, name) {
-                var tag = '<mms-transclude-' + property + ' eid="' + elementId + '">[cf:' + name + '.' + property + ']</mms-transclude-' + property + '>';
+                var tag = '<mms-transclude-' + property + ' mms-eid="' + elementId + '">[cf:' + name + '.' + property + ']</mms-transclude-' + property + '>';
                 $modalInstance.close(tag);
             };
             $scope.cancel = function() {
@@ -38,7 +38,7 @@ function mmsFroala(ElementService, $modal, $templateCache, _) { //depends on ang
             $scope.search = function(searchText) {
                 //var searchText = $scope.searchText; //TODO investigate why searchText isn't in $scope
                 ElementService.search(searchText).then(function(data) {
-                    $scope.transcludableElements = data;
+                    $scope.mmsCfElements = data;
                 });
             };
         };
@@ -106,7 +106,7 @@ function mmsFroala(ElementService, $modal, $templateCache, _) { //depends on ang
         restrict: 'A',
         require: 'ngModel',
         scope: {
-            transcludableElements: '='
+            mmsCfElements: '='
         },
         link: mmsFroalaLink
     };

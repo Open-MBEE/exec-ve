@@ -10,7 +10,7 @@ function mmsViewTable($compile, $templateCache) {
         restrict: 'E',
         //template: template,
         scope: {
-            table: '=',
+            table: '=mmsTable',
         },
         //controller: ['$scope', controller]
         link: function(scope, element, attrs) {

@@ -7,13 +7,13 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
         url: '/sites/:site/products/:docId/:time',
         resolve: {
             document: function($stateParams, ElementService) {
-                return ElementService.getElement($stateParams.docId);
+                return ElementService.getElement($stateParams.docId, false, 'master', $stateParams.time);
             },
             site: function($stateParams, SiteService) {
                 return SiteService.getSite($stateParams.site);
             },
             views: function($stateParams, ViewService) {
-                return ViewService.getDocumentViews($stateParams.docId);
+                return ViewService.getDocumentViews($stateParams.docId, false, 'master', $stateParams.time);
             }
         },
         views: {
@@ -49,7 +49,7 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
         },
         resolve: {
             viewElements: function($stateParams, ViewService) {
-                return ViewService.getViewElements($stateParams.viewId);
+                return ViewService.getViewElements($stateParams.viewId, false, 'master', $stateParams.time);
             }
         }
     })

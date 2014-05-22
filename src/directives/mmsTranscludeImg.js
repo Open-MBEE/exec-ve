@@ -20,16 +20,26 @@ function mmsTranscludeImg(VizService) {
 
     var mmsTranscludeImgLink = function(scope, element, attrs, mmsViewCtrl) {
         element.click(function(e) {
-            if (mmsViewCtrl === null || mmsViewCtrl === undefined)
+            if (!mmsViewCtrl)
                 return false;
-            mmsViewCtrl.transcludeClicked(scope.eid);
+            mmsViewCtrl.transcludeClicked(scope.mmsEid);
             return false;
         });
 
-        scope.$watch('eid', function(newVal, oldVal) {
-            if (newVal === undefined || newVal === null || newVal === '')
+        scope.$watch('mmsEid', function(newVal, oldVal) {
+            if (!newVal)
                 return;
-            VizService.getImageUrl(scope.eid).then(function(data) {
+            var ws = scope.mmsWs;
+            var version = scope.mmsVersion;
+            if (mmsViewCtrl) {
+                var viewVersion = mmsViewCtrl.getWsAndVersion();
+                if (!ws)
+                    ws = viewVersion.workspace;
+                if (!version)
+                    version = viewVersion.version;
+            }
+            VizService.getImageUrl(scope.mmsEid, false, ws, version)
+            .then(function(data) {
                 scope.imgUrl = data;
             });
         });
@@ -39,7 +49,9 @@ function mmsTranscludeImg(VizService) {
         restrict: 'E',
         template: '<img src="{{imgUrl}}"/>',
         scope: {
-            eid: '@',
+            mmsEid: '@',
+            mmsVersion: '@',
+            mmsWs: '@'
         },
         require: '?^mmsView',
         //controller: ['$scope', controller]

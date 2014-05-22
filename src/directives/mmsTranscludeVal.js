@@ -24,7 +24,7 @@ function mmsTranscludeVal(ElementService, $compile) {
     var template = '<span ng-repeat="value in element.value">{{value}}</span>';
     var mmsTranscludeValLink = function(scope, element, attrs, mmsViewCtrl) {
         element.click(function(e) {
-            if (mmsViewCtrl === null || mmsViewCtrl === undefined)
+            if (!mmsViewCtrl)
                 return false;
             mmsViewCtrl.transcludeClicked(scope.eid);
             //e.stopPropagation();
@@ -45,10 +45,20 @@ function mmsTranscludeVal(ElementService, $compile) {
             }
         };
 
-        scope.$watch('eid', function(newVal, oldVal) {
-            if (newVal === undefined || newVal === null || newVal === '')
+        scope.$watch('mmsEid', function(newVal, oldVal) {
+            if (!newVal)
                 return;
-            ElementService.getElement(scope.eid).then(function(data) {
+            var ws = scope.mmsWs;
+            var version = scope.mmsVersion;
+            if (mmsViewCtrl) {
+                var viewVersion = mmsViewCtrl.getWsAndVersion();
+                if (!ws)
+                    ws = viewVersion.workspace;
+                if (!version)
+                    version = viewVersion.version;
+            }
+            ElementService.getElement(scope.mmsEid, false, ws, version)
+            .then(function(data) {
                 scope.element = data;
                 if (scope.element.valueType === "LiteralString") {
                     recompile();
@@ -66,7 +76,9 @@ function mmsTranscludeVal(ElementService, $compile) {
         restrict: 'E',
         //template: template,
         scope: {
-            eid: '@',
+            mmsEid: '@',
+            mmsWs: '@',
+            mmsVersion: '@'
         },
         require: '?^mmsView',
         //controller: ['$scope', controller]

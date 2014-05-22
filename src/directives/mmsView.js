@@ -26,35 +26,34 @@ function mmsView(ViewService, ElementService, $templateCache) {
     var template = $templateCache.get('mms/templates/mmsView.html');
 
     var mmsViewCtrl = function($scope, ViewService, ElementService) {
-        this.getViewAllowedElements = function() {
-            return ViewService.getViewAllowedElements($scope.vid);
+        this.getViewElements = function() {
+            return ViewService.getViewElements($scope.mmsVid, false, $scope.mmsWs, $scope.mmsVersion);
         };
         this.transcludeClicked = function(elementId) {
-            if ($scope.textEditable && $scope.transcludeClicked)
-                $scope.transcludeClicked({elementId: elementId});
+            if ($scope.textEditable && $scope.mmsCfClicked)
+                $scope.mmsCfClicked({elementId: elementId});
         };
         this.elementTranscluded = function(elem) {
-            if (elem.lastModified > $scope.lastModified)
+            if (elem.lastModified > $scope.lastModified) { 
                 $scope.lastModified = elem.lastModified;
-            $scope.author = elem.author;
+                $scope.author = elem.author;
+            }
         };
-        this.getWorkspaceAndVersion = function() {
+        this.getWsAndVersion = function() {
             return {
-                workspace: $scope.workspace, 
-                version: $scope.version
+                workspace: $scope.mmsWs, 
+                version: $scope.mmsVersion
             };
         };
     };
 
     var mmsViewLink = function(scope, element, attrs) {
-        scope.$watch('vid', function(newVal, oldVal) {
-            if (newVal === undefined || newVal === null || newVal === '')
+        scope.$watch('mmsVid', function(newVal, oldVal) {
+            if (!newVal)
                 return;
-            ViewService.getView(scope.vid).then(function(data) {
+            ViewService.getView(scope.mmsVid, false, scope.mmsWs, scope.mmsVersion)
+            .then(function(data) {
                 scope.view = data;
-            });
-            ElementService.getElement(scope.vid).then(function(data) {
-                scope.viewElement = data;
                 scope.lastModified = data.lastModified;
                 scope.author = data.author;
             });
@@ -83,10 +82,10 @@ function mmsView(ViewService, ElementService, $templateCache) {
         restrict: 'E',
         template: template,
         scope: {
-            vid: '@',
-            workspace: '@',
-            version: '@',
-            transcludeClicked: '&'
+            mmsVid: '@',
+            mmsWs: '@',
+            mmsVersion: '@',
+            mmsCfClicked: '&'
         },
         controller: ['$scope', 'ViewService', 'ElementService', mmsViewCtrl],
         link: mmsViewLink

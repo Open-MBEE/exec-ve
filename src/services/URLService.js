@@ -96,7 +96,7 @@ function URLService($q, $http, $location) {
      * @param {string} id The element id.
      * @returns {string} The element json path.
      */
-    var getElementURL = function(id) {
+    var getElementURL = function(id, workspace, version) {
         return root + "/javawebscripts/elements/" + id;
     };
 
@@ -110,7 +110,7 @@ function URLService($q, $http, $location) {
      * 
      * @returns {string} The post elements path.
      */
-    var getPostElementsURL = function() {
+    var getPostElementsURL = function(workspace) {
         return root + "/javawebscripts/sites/europa/projects/123456/elements";
     };
 
@@ -133,7 +133,7 @@ function URLService($q, $http, $location) {
      * @param {string} id The view id.
      * @returns {string} The view json path.
      */
-    var getViewURL = function(id) {
+    var getViewURL = function(id, workspace, version) {
         return root + "/javawebscripts/views/" + id;
     };
 
@@ -148,7 +148,7 @@ function URLService($q, $http, $location) {
      * @param {string} id The document id.
      * @returns {string} The document json path.
      */
-    var getDocumentURL = function(id) {
+    var getDocumentURL = function(id, workspace, version) {
         return root + "/javawebscripts/products/" + id;
     };
 
@@ -167,7 +167,7 @@ function URLService($q, $http, $location) {
         return root + "/rest/sites";
     };
 
-    var getElementSearchURL = function(query) {
+    var getElementSearchURL = function(query, workspace) {
         return root + "/javawebscripts/element/search?keyword=" + query;
     };
 

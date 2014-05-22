@@ -23,16 +23,26 @@ function mmsTranscludeName(ElementService, $compile) {
 
     var mmsTranscludeNameLink = function(scope, element, attrs, mmsViewCtrl) {
         element.click(function(e) {
-            if (mmsViewCtrl === null || mmsViewCtrl === undefined)
+            if (!mmsViewCtrl)
                 return false;
-            mmsViewCtrl.transcludeClicked(scope.eid);
+            mmsViewCtrl.transcludeClicked(scope.mmsEid);
             return false;
         });
 
-        scope.$watch('eid', function(newVal, oldVal) {
-            if (newVal === undefined || newVal === null || newVal === '')
+        scope.$watch('mmsEid', function(newVal, oldVal) {
+            if (!newVal)
                 return;
-            ElementService.getElement(scope.eid).then(function(data) {
+            var ws = scope.mmsWs;
+            var version = scope.mmsVersion;
+            if (mmsViewCtrl) {
+                var viewVersion = mmsViewCtrl.getWsAndVersion();
+                if (!ws)
+                    ws = viewVersion.workspace;
+                if (!version)
+                    version = viewVersion.version;
+            }
+            ElementService.getElement(scope.mmsEid, false, ws, version)
+            .then(function(data) {
                 scope.element = data;
                 if (mmsViewCtrl) {
                     mmsViewCtrl.elementTranscluded(scope.element);
@@ -51,7 +61,9 @@ function mmsTranscludeName(ElementService, $compile) {
         restrict: 'E',
         template: '{{element.name}}',
         scope: {
-            eid: '@',
+            mmsEid: '@',
+            mmsWs: '@',
+            mmsVersion: '@'
         },
         require: '?^mmsView',
         //controller: ['$scope', controller]

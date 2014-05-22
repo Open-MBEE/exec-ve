@@ -10,7 +10,7 @@ function mmsViewList($compile, $templateCache) {
         restrict: 'E',
         //template: template,
         scope: {
-            list: '=',
+            list: '=mmsList',
         },
         //controller: ['$scope', controller]
         link: function(scope, element, attrs) {

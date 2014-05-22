@@ -4,11 +4,11 @@
         <div ng-repeat="contain in section.contains" ng-switch on="contain.type"> 
         <div ng-class="structEditable ? 'panel panel-default' : ''">
         <div ng-class="structEditable ? 'panel-body' : ''">
-            <mms-view-para para="contain" ng-switch-when="Paragraph"></mms-view-para>
-            <mms-view-table table="contain" ng-switch-when="Table"></mms-view-table>
-            <mms-view-list list="contain" ng-switch-when="List"></mms-view-list>
-            <mms-view-img image="contain" ng-switch-when="Image"></mms-view-img>
-            <mms-view-section section="contain" ng-switch-when="Section"></mms-view-section>
+            <mms-view-para mms-para="contain" ng-switch-when="Paragraph"></mms-view-para>
+            <mms-view-table mms-table="contain" ng-switch-when="Table"></mms-view-table>
+            <mms-view-list mms-list="contain" ng-switch-when="List"></mms-view-list>
+            <mms-view-img mms-image="contain" ng-switch-when="Image"></mms-view-img>
+            <mms-view-section mms-section="contain" ng-switch-when="Section"></mms-view-section>
         </div></div></div>
     </div>
 </div>
