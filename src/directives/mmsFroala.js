@@ -29,7 +29,7 @@ function mmsFroala(ElementService, $modal, $templateCache, _) { //depends on ang
             $scope.filter = '';
             $scope.searchText = '';
             $scope.choose = function(elementId, property, name) {
-                var tag = '<mms-transclude-' + property + ' mms-eid="' + elementId + '">[cf:' + name + '.' + property + ']</mms-transclude-' + property + '>';
+                var tag = '<mms-transclude-' + property + ' data-mms-eid="' + elementId + '">[cf:' + name + '.' + property + ']</mms-transclude-' + property + '>';
                 $modalInstance.close(tag);
             };
             $scope.cancel = function() {
@@ -55,6 +55,7 @@ function mmsFroala(ElementService, $modal, $templateCache, _) { //depends on ang
                 editor.saveUndoStep();
                 editor.insertHTML(tag);
                 editor.saveUndoStep();
+                editor.sync();
             });
         };
 
