@@ -331,7 +331,7 @@ function ViewService($q, $http, URLService, ElementService, CommentService) {
      * 
      * @param {string} ownerId Id of the parent view
      * @param {string} [name=Untitled] name for the view
-     * @param {string} [documentId=] optional document to add to
+     * @param {string} [documentId] optional document to add to
      * @param {string} [workspace=master] workspace to use 
      * @returns {Promise} The promise will be resolved with the new view. 
      */
