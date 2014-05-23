@@ -14,7 +14,9 @@ angular.module('mms.directives')
  * @description
  * Given an image id, puts in an img tag for the image url. 
  *
- * @param {string} eid The id of the image to transclude
+ * @param {string} mmsEid The id of the image to show
+ * @param {string=master} mmsWs Workspace to use, defaults to master
+ * @param {string=latest} mmsVersion Version can be alfresco version number or timestamp, default is latest
  */
 function mmsTranscludeImg(VizService) {
 

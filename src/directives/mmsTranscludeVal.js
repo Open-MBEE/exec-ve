@@ -18,7 +18,9 @@ angular.module('mms.directives')
  * and on click. The element should be a Property. Nested transclusions within 
  * string values will also be registered.
  *
- * @param {string} eid The id of the property whose value to transclude
+ * @param {string} mmsEid The id of the element whose value to transclude
+ * @param {string=master} mmsWs Workspace to use, defaults to master
+ * @param {string=latest} mmsVersion Version can be alfresco version number or timestamp, default is latest
  */
 function mmsTranscludeVal(ElementService, $compile) {
     var template = '<span ng-repeat="value in element.value">{{value}}</span>';

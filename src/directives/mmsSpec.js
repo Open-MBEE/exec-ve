@@ -7,8 +7,8 @@ angular.module('mms.directives')
  * @ngdoc directive
  * @name mms.directives.directive:mmsSpec
  *
- * @requires mms.ViewService
  * @requires mms.ElementService
+ * @requires $compile
  *
  * @restrict E
  *
@@ -19,9 +19,11 @@ angular.module('mms.directives')
  * save button. Documentation and string values can have html and can transclude other
  * element properties.  
  *
- * @param {string} eid The id of the element
- * @param {string} editableField One of ["all", "name", "doc", or "val" if property]
- * @param {Array=} transcludableElements Array of element objects as returned by ElementService
+ * @param {string} mmsEid The id of the element
+ * @param {string} mmsWs Workspace to use, defaults to master
+ * @param {string} mmsVersion Version can be alfresco version number or timestamp, default is latest
+ * @param {string} mmsEditField One of ["all", "none", "name", "doc", or "val" if property]
+ * @param {Array=} mmsCfElements Array of element objects as returned by ElementService
  *      that can be transcluded into documentation or string values. Regardless, transclusion
  *      allows keyword searching elements to transclude from alfresco
  */

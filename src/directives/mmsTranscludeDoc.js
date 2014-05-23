@@ -17,7 +17,9 @@ angular.module('mms.directives')
  * mmsView directive, will notify parent view of transclusion on init and doc change,
  * and on click. Nested transclusions inside the documentation will also be registered.
  *
- * @param {string} eid The id of the element whose doc to transclude
+ * @param {string} mmsEid The id of the element whose doc to transclude
+ * @param {string=master} mmsWs Workspace to use, defaults to master
+ * @param {string=latest} mmsVersion Version can be alfresco version number or timestamp, default is latest
  */
 function mmsTranscludeDoc(ElementService, $compile) {
 

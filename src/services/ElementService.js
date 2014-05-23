@@ -9,6 +9,8 @@ angular.module('mms')
  * @requires $q
  * @requires $http
  * @requires mms.URLService
+ * @requires mms.VersionService
+ * @requires _
  * 
  * @description
  * An element cache and CRUD service. Maintains a cache of element id to element objects.
@@ -17,36 +19,7 @@ angular.module('mms')
  * methods instead. Consider saving to html5 local storage for edited things incase of crashes.
  * The element objects will contain all its attributes including view and document keys.
  *
- * Current element object:
- * ```
- *      {
- *          "id": element id as string,
- *          "type": "Package" | "Property" | "Element" | "Dependency" | "Generalization" |
- *                  "DirectedRelationship" | "Conform" | "Expose" | "Viewpoint" | 
- *                  "LiteralReal" | "LiteralString" | "LiteralInteger" | "LiteralBoolean" |
- *                  "LiteralUnlimitedNatural" | "ElementValue" | "Expression" | "OpaqueExpression",
- *          "name": element name, empty string if no name,
- *          "documentation": element documentation as string, can contain html,
- *          "owner": owner element's id,
- *
- *          //if type is "Property"
- *          "propertyType": element id or null,
- *          "isDerived": true | false,
- *          "isSlot": true | false,
- *          "value": [elementIds],
- *          
- *          //if type is DirectedRelationship or Generalization or Dependency
- *          "source": source element id,
- *          "target": target element id,
- *
- *          //if type is Comment
- *          "body": comment body, can contain html,
- *          "annotatedElements": [elementIds]
- *
- *          //if type is the values
- *          //keys can include: boolean, integer, string, double, elementValueElement
- *      }
- * ```
+ * For element json example, see [here](https://github.jpl.nasa.gov/mbee-dev/alfresco-view-repo/tree/api/api)
  */
 function ElementService($q, $http, URLService, VersionService, _) {
     var elements = {};
@@ -67,9 +40,11 @@ function ElementService($q, $http, URLService, VersionService, _) {
      * @param {boolean} [updateFromServer=false] (optional) whether to always get the latest 
      *      from server, even if it's already in cache (this will update everywhere
      *      it's displayed, except for the editables)
+     * @param {string} [workspace=master] (optional) workspace to use
+     * @param {string} [version=latest] (optional) alfresco version number or timestamp
      * @returns {Promise} The promise will be resolved with the element object, 
-     *      multiple calls to this method with the same id would result in 
-     *      references to the same object.
+     *      multiple calls to this method with the same parameters would give the
+     *      same object
      */
     var getElement = function(id, updateFromServer, workspace, version) {
         var update = !updateFromServer ? false : updateFromServer;
@@ -115,6 +90,8 @@ function ElementService($q, $http, URLService, VersionService, _) {
      * 
      * @param {Array.<string>} ids The ids of the elements to get.
      * @param {boolean} [updateFromServer=false] (optional) whether to always get latest from server.
+     * @param {string} [workspace=master] (optional) workspace to use
+     * @param {string} [version=latest] (optional) alfresco version number or timestamp
      * @returns {Promise} The promise will be resolved with an array of element objects, 
      *      multiple calls to this method with the same ids would result in an array of 
      *      references to the same objects.
@@ -136,6 +113,9 @@ function ElementService($q, $http, URLService, VersionService, _) {
      * Gets an element object to edit by id. 
      * 
      * @param {string} id The id of the element to get.
+     * @param {boolean} [updateFromServer=false] Get the latest from server first, e
+     *      else just make a copy of what's in the element cache
+     * @param {string} [workspace=master] (optional) workspace to use
      * @returns {Promise} The promise will be resolved with the element object, 
      *      multiple calls to this method with the same id would result in 
      *      references to the same object. This object can be edited without
@@ -180,6 +160,7 @@ function ElementService($q, $http, URLService, VersionService, _) {
      * Gets element objects to edit by ids. 
      * 
      * @param {Array.<string>} ids The ids of the elements to get for edit.
+     * @param {string} [workspace=master] (optional) workspace to use
      * @returns {Promise} The promise will be resolved with an array of editable
      * element objects that won't affect the corresponding displays
      */
@@ -200,6 +181,8 @@ function ElementService($q, $http, URLService, VersionService, _) {
      * Gets element's owned element objects. 
      * 
      * @param {string} id The id of the elements to get owned elements for
+     * @param {string} [workspace=master] (optional) workspace to use
+     * @param {string} [version=latest] (optional) alfresco version number or timestamp
      * @returns {Promise} The promise will be resolved with an array of 
      * element objects 
      */
@@ -220,9 +203,9 @@ function ElementService($q, $http, URLService, VersionService, _) {
      * that actually gets called but only affects where the returned elements are cached.
      *
      * @param {string} url the url to get
-     * @param {string} key json key
-     * @param {string} [workspace=master] tbd
-     * @param {string} [version=latest] tbd
+     * @param {string} key json key that has the element array value
+     * @param {string} [workspace=master] workspace associated, this will not change the url
+     * @param {string} [version=latest] timestamp associated, this will not change the url
      */
     var getGenericElements = function(url, key, updateFromServer, workspace, version) {
         var update = !updateFromServer ? false : updateFromServer;
@@ -264,6 +247,7 @@ function ElementService($q, $http, URLService, VersionService, _) {
      * must have an id, and whatever property that needs to be updated.
      * 
      * @param {Object} elem An object that contains element id and any property changes to be saved.
+     * @param {string} [workspace=master] (optional) workspace to use
      * @returns {Promise} The promise will be resolved with the updated cache element reference if 
      *      update is successful.
      */
@@ -300,6 +284,7 @@ function ElementService($q, $http, URLService, VersionService, _) {
      * Save elements to alfresco and update the cache if successful.
      * 
      * @param {Array.<Object>} elems Array of element objects that contains element id and any property changes to be saved.
+     * @param {string} [workspace=master] (optional) workspace to use
      * @returns {Promise} The promise will be resolved with an array of updated element references if 
      *      update is successful.
      */
@@ -320,6 +305,7 @@ function ElementService($q, $http, URLService, VersionService, _) {
      * Create element on alfresco and update the cache if successful.
      * 
      * @param {Object} elem Element object that must have an owner id.
+     * @param {string} [workspace=master] (optional) workspace to use
      * @returns {Promise} The promise will be resolved with the created element references if 
      *      create is successful.
      */
@@ -357,6 +343,7 @@ function ElementService($q, $http, URLService, VersionService, _) {
      * Create elements to alfresco and update the cache if successful.
      * 
      * @param {Array.<Object>} elems Array of element objects that must contain owner id.
+     * @param {string} [workspace=master] (optional) workspace to use
      * @returns {Promise} The promise will be resolved with an array of created element references if 
      *      create is successful.
      */
@@ -396,6 +383,8 @@ function ElementService($q, $http, URLService, VersionService, _) {
      * Search for elements based on some query
      * 
      * @param {string} query A query string (TBD)
+     * @param {boolean} [updateFromServer=false] Whether to update cache of returned elements
+     * @param {string} [workspace=master] (optional) workspace to use
      * @returns {Promise} The promise will be resolved with an array of element objects
      */
     var search = function(query, updateFromServer, workspace) {

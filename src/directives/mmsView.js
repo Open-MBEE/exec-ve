@@ -1,14 +1,14 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsView', ['ViewService', 'ElementService', '$templateCache', mmsView]);
+.directive('mmsView', ['ViewService', '$templateCache', mmsView]);
 
 /**
  * @ngdoc directive
  * @name mms.directives.directive:mmsView
  *
  * @requires mms.ViewService
- * @requires mms.ElementService
+ * @requires $templateCache
  *
  * @restrict E
  *
@@ -18,14 +18,16 @@ angular.module('mms.directives')
  * edit mode, where the view "contains" list ordering can be modified. The view's last 
  * modified time and author is the latest of any transcluded element modified time. 
  *
- * @param {string} vid The id of the view
- * @param {expression=} transcludeClicked The expression to handle transcluded elements 
- *     in the view being clicked, this should be a function whose argument is the element id
+ * @param {string} mmsVid The id of the view
+ * @param {string=master} mmsWs Workspace to use, defaults to master
+ * @param {string=latest} mmsVersion Version can be alfresco version number or timestamp, default is latest
+ * @param {expression=} mmsCfClicked The expression to handle transcluded elements 
+ *     in the view being clicked, this should be a function whose argument is 'elementId'
  */
-function mmsView(ViewService, ElementService, $templateCache) {
+function mmsView(ViewService, $templateCache) {
     var template = $templateCache.get('mms/templates/mmsView.html');
 
-    var mmsViewCtrl = function($scope, ViewService, ElementService) {
+    var mmsViewCtrl = function($scope, ViewService) {
         this.getViewElements = function() {
             return ViewService.getViewElements($scope.mmsVid, false, $scope.mmsWs, $scope.mmsVersion);
         };
@@ -87,7 +89,7 @@ function mmsView(ViewService, ElementService, $templateCache) {
             mmsVersion: '@',
             mmsCfClicked: '&'
         },
-        controller: ['$scope', 'ViewService', 'ElementService', mmsViewCtrl],
+        controller: ['$scope', 'ViewService', mmsViewCtrl],
         link: mmsViewLink
     };
 }

@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsFroala', ['ElementService', '$modal', '$templateCache', '_', mmsFroala]);
+.directive('mmsFroala', ['ElementService', '$modal', '$templateCache', mmsFroala]);
 
 /**
  * @ngdoc directive
@@ -9,6 +9,7 @@ angular.module('mms.directives')
  *
  * @requires mms.ElementService
  * @requires $modal
+ * @requires $templateCache
  *
  * @restrict A
  *
@@ -16,11 +17,11 @@ angular.module('mms.directives')
  * Make any div with an ngModel attached to be a Froala content editable. This
  * requires the Froala library. Transclusion is supported. ngModel is required.
  *
- * @param {Array=} transcludableElements Array of element objects as returned by ElementService
+ * @param {Array=} mmsCfElements Array of element objects as returned by ElementService
  *      that can be transcluded. Regardless, transclusion allows keyword searching 
  *      elements to transclude from alfresco
  */
-function mmsFroala(ElementService, $modal, $templateCache, _) { //depends on angular bootstrap
+function mmsFroala(ElementService, $modal, $templateCache) { //depends on angular bootstrap
     
     var mmsFroalaLink = function(scope, element, attrs, ngModelCtrl) {
         var transcludeModalTemplate = $templateCache.get('mms/templates/mmsFroala.html');
@@ -61,7 +62,7 @@ function mmsFroala(ElementService, $modal, $templateCache, _) { //depends on ang
 
         function read() {
             var html = element.editable("getHTML"); 
-            if (_.isArray(html))
+            if (angular.isArray(html))
                 html = html.join('');
             ngModelCtrl.$setViewValue(html);
         }

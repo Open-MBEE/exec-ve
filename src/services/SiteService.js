@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms')
-.factory('SiteService', ['$q', '$http', 'URLService', 'ViewService', 'ProjectService', '_', SiteService]);
+.factory('SiteService', ['$q', '$http', 'URLService', 'ProjectService', '_', SiteService]);
 
 /**
  * @ngdoc service
@@ -9,7 +9,6 @@ angular.module('mms')
  * @requires $q
  * @requires $http
  * @requires mms.URLService
- * @requires mms.ViewService
  * @requires mms.ProjectService
  * 
  * @description
@@ -25,7 +24,7 @@ angular.module('mms')
  *      }
  * ```
  */
-function SiteService($q, $http, URLService, ViewService, ProjectService, _) {
+function SiteService($q, $http, URLService, ProjectService, _) {
     var currentSite = 'europa';
     var currentWorkspace = 'master';
     var sites = {};

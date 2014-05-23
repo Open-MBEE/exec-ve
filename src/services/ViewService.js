@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms')
-.factory('ViewService', ['$q', '$http', 'URLService', 'ElementService', 'CommentService', 'VersionService', ViewService]);
+.factory('ViewService', ['$q', '$http', 'URLService', 'ElementService', 'CommentService', ViewService]);
 
 /**
  * @ngdoc service
@@ -17,73 +17,9 @@ angular.module('mms')
  * id to view objects. These objects include view hierarchies, the display structure,
  * and keeps track of what elements are referenced in each view. 
  *
- * View object (includes common things from Element object):
- * ```
- *      {
- *          "id": view id (element id),
- *          "name": name,
- *          "type": "View",
- *          "owner": element id,
- *          "documentation": doc,
- *          "childrenViews": [viewIds],     //canonical hierarchy
- *          "displayedElements": [elementIds],
- *          "allowedElements": [elementIds],
- *          "contains": [
- *              {
- *                  "type": "Paragraph" | "Table" | "List" | "Image",
- *                  "expressionId": element id
-
- *                  //if type is Paragraph//
- *                  "sourceType": "reference" | "text",
- *                  //if sourceType is reference
- *                  "source": element id,
- *                  "sourceProperty": "documentation" | "name" | "value"
- *                  //if sourceType is text
- *                  "text": text string can have html
- *
- *                  //if type is Table//
- *                  "title": title of table as string,
- *                  "body": [               //array of rows
- *                       [{                 //array of cells
- *                          "content": [    //each cell can have multiple items
- *                              {"type": "Paragraph" | "Table" | "List" | "Image" ...}
- *                          ],
- *                          "colspan": integer,
- *                          "rolspan": integer
- *                       }]
- *                  ],
- *                  "header": same as body,
- *
- *                  //if type is List//
- *                  "list": [               //array of list items
- *                      [{                  //each list item can have multiple things
- *                          "type": "Paragraph" | "Table" | "List" | "Image" ...
- *                      }]
- *                  ],
- *                  "ordered": true | false
- *
- *                  //if type is Image//
- *                  "image": elementId
- *              }
- *          ]
- *      }
- * ```
- *
- * Document object (same as view plus..):
- * ```
- *      {
- *          "id": document id (element and view id),
- *          "type": "Product",
- *          "view2view": [
- *              {
- *                  "id": document or view id,
- *                  "childrenViews": [viewIds]
- *              }
- *          ]
- *      }
- * ```
+ * For View and Product json object schemas, see [here](https://github.jpl.nasa.gov/mbee-dev/alfresco-view-repo/tree/api/api)
  */
-function ViewService($q, $http, URLService, ElementService, CommentService, VersionService) {
+function ViewService($q, $http, URLService, ElementService, CommentService) {
     var viewElements = {"latest": {}};
     var productViews = {"latest": {}};
 
@@ -98,6 +34,11 @@ function ViewService($q, $http, URLService, ElementService, CommentService, Vers
      * it to the cache, and resolve the new object.
      * 
      * @param {string} id The id of the view to get.
+     * @param {boolean} [updateFromServer=false] (optional) whether to always get the latest 
+     *      from server, even if it's already in cache (this will update everywhere
+     *      it's displayed, except for the editables)
+     * @param {string} [workspace=master] (optional) workspace to use
+     * @param {string} [version=latest] (optional) alfresco version number or timestamp
      * @returns {Promise} The promise will be resolved with the view object, 
      *      multiple calls to this method with the same id would result in 
      *      references to the same object.
@@ -115,6 +56,11 @@ function ViewService($q, $http, URLService, ElementService, CommentService, Vers
      * Same as getView, but for multiple ids.
      * 
      * @param {Array.<string>} ids The ids of the views to get.
+     * @param {boolean} [updateFromServer=false] (optional) whether to always get the latest 
+     *      from server, even if it's already in cache (this will update everywhere
+     *      it's displayed, except for the editables)
+     * @param {string} [workspace=master] (optional) workspace to use
+     * @param {string} [version=latest] (optional) alfresco version number or timestamp
      * @returns {Promise} The promise will be resolved with an array of view objects, 
      *      multiple calls to this method with the same ids would result in an array of 
      *      references to the same objects.
@@ -134,6 +80,11 @@ function ViewService($q, $http, URLService, ElementService, CommentService, Vers
      * it to the cache, and resolve the new object.
      * 
      * @param {string} id The id of the document to get.
+     * @param {boolean} [updateFromServer=false] (optional) whether to always get the latest 
+     *      from server, even if it's already in cache (this will update everywhere
+     *      it's displayed, except for the editables)
+     * @param {string} [workspace=master] (optional) workspace to use
+     * @param {string} [version=latest] (optional) alfresco version number or timestamp
      * @returns {Promise} The promise will be resolved with the document object, 
      *      multiple calls to this method with the same id would result in 
      *      references to the same object.
@@ -153,6 +104,7 @@ function ViewService($q, $http, URLService, ElementService, CommentService, Vers
      * or view to element reference caches.
      * 
      * @param {Object} view An object that contains view id and any changes to be saved.
+     * @param {string} [workspace=master] (optional) workspace to use     
      * @returns {Promise} The promise will be resolved with the updated cache view reference if 
      *      update is successful.
      */
@@ -171,6 +123,7 @@ function ViewService($q, $http, URLService, ElementService, CommentService, Vers
      * view hierarchy or nosections
      * 
      * @param {Object} document An object that contains doc id and any changes to be saved.
+     * @param {string} [workspace=master] (optional) workspace to use
      * @returns {Promise} The promise will be resolved with the updated cache doc reference if 
      *      update is successful.
      */
@@ -180,7 +133,7 @@ function ViewService($q, $http, URLService, ElementService, CommentService, Vers
 
     /**
      * @ngdoc method
-     * @name mms.ViewService#getViewAllowedElements
+     * @name mms.ViewService#getViewElements
      * @methodOf mms.ViewService
      * 
      * @description
@@ -188,6 +141,11 @@ function ViewService($q, $http, URLService, ElementService, CommentService, Vers
      * the same as ones gotten from ElementService.
      * 
      * @param {string} id The id of the view.
+     * @param {boolean} [updateFromServer=false] (optional) whether to always get the latest 
+     *      from server, even if it's already in cache (this will update everywhere
+     *      it's displayed, except for the editables)
+     * @param {string} [workspace=master] (optional) workspace to use
+     * @param {string} [version=latest] (optional) alfresco version number or timestamp
      * @returns {Promise} The promise will be resolved with array of element objects. 
      */
     var getViewElements = function(id, updateFromServer, workspace, version) {
@@ -216,6 +174,23 @@ function ViewService($q, $http, URLService, ElementService, CommentService, Vers
         return deferred.promise;
     };
 
+    /**
+     * @ngdoc method
+     * @name mms.ViewService#getDocumentViews
+     * @methodOf mms.ViewService
+     * 
+     * @description
+     * Gets the view objects for a document. The references are 
+     * the same as ones gotten from ElementService.
+     * 
+     * @param {string} id The id of the document.
+     * @param {boolean} [updateFromServer=false] (optional) whether to always get the latest 
+     *      from server, even if it's already in cache (this will update everywhere
+     *      it's displayed, except for the editables)
+     * @param {string} [workspace=master] (optional) workspace to use
+     * @param {string} [version=latest] (optional) alfresco version number or timestamp
+     * @returns {Promise} The promise will be resolved with array of view objects. 
+     */
     var getDocumentViews = function(id, updateFromServer, workspace, version) {
         var update = !updateFromServer ? false : updateFromServer;
         var ws = !workspace ? 'master' : workspace;
@@ -305,6 +280,21 @@ function ViewService($q, $http, URLService, ElementService, CommentService, Vers
 
     };
 
+    /**
+     * @ngdoc method
+     * @name mms.ViewService#addViewToDocument
+     * @methodOf mms.ViewService
+     *
+     * @description
+     * This updates a document to include a new view, the new view must be a child
+     * of an existing view in the document
+     * 
+     * @param {string} viewid Id of the view to add
+     * @param {string} documentId Id of the document to add the view to
+     * @param {string} parentViewId Id of the parent view, this view should 
+     *      already be in the document
+     * @param {string} [workspace=master] workspace to use
+     */
     var addViewToDocument = function(viewId, documentId, parentViewId, workspace) {
         var deferred = $q.defer();
         getDocument(documentId, workspace).then(function(data) {   
@@ -334,9 +324,15 @@ function ViewService($q, $http, URLService, ElementService, CommentService, Vers
      * @description
      * Create a new view, owner must be specified (parent view), id cannot be specified,
      * if name isn't specified, "Untitled" will be used, a default contains with 
-     * paragraph of the view documentation will be used. 
+     * paragraph of the view documentation will be used. If a document is specified, 
+     * will also add the view to the document, in this case the parent view should 
+     * already be in the document. The new view will be added as the last child of the 
+     * parent view.
      * 
-     * @param {Object} view A view object, id cannot be specified, owner must be specified
+     * @param {string} ownerId Id of the parent view
+     * @param {string} [name=Untitled] name for the view
+     * @param {string} [documentId=] optional document to add to
+     * @param {string} [workspace=master] workspace to use 
      * @returns {Promise} The promise will be resolved with the new view. 
      */
     var createView = function(ownerId, name, documentId, workspace) {
