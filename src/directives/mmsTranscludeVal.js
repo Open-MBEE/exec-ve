@@ -28,7 +28,7 @@ function mmsTranscludeVal(ElementService, $compile) {
         element.click(function(e) {
             if (!mmsViewCtrl)
                 return false;
-            mmsViewCtrl.transcludeClicked(scope.eid);
+            mmsViewCtrl.transcludeClicked(scope.mmsEid);
             //e.stopPropagation();
             return false;
         });
