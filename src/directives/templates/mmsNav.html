@@ -10,23 +10,24 @@
                     <li><a href="/share/page/site/{{site}}/dashboard">Dashboard</a></li>
                 </ul>
             </li>
+
             <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Other Sites <b class="caret"></b></a>
                 <ul class="dropdown-menu">
-                    <li ng-repeat="(cat, sites) in categories" class="dropdown dropdown-submenu">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{cat}}</a>
-                        <ul class="dropdown-menu">
-                            <li ng-repeat="site in sites" class="dropdown-submenu">
-                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{site.title}}</a>
-                                <ul class="dropdown-menu">
-                                    <li><a href="/share/page/site/{{site.name}}/dashboard">Dashboard</a></li>
-                                    <li><a href="/alfresco/service/ve/configurations/{{site.name}}">DocWeb</a></li>
-                                </ul>
-                            </li>
-                        </ul>
-                    </li>
+                    <accordion>
+                        <accordion-group ng-repeat="(cat, sites) in categories" heading={{cat}}>
+                            <accordion>
+                                <accordion-group ng-repeat="site in sites" heading={{site.title}}>
+                                    <ul>
+                                        <li><a href="/share/page/site/{{site.name}}/dashboard">Dashboard</a></li>
+                                        <li><a href="/alfresco/service/ve/configurations/{{site.name}}">Docweb</a></li>
+                                    </ul>
+                                </accordion-group>
+                            </accordion>
+                        </accordion-group>
                 </ul>
             </li>
+            
         </ul>
         <ul class="nav navbar-nav pull-right">
             <li><a href="/share/page/site/ems-training/dashboard">Support</a></li>
