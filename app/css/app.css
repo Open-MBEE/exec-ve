@@ -40,10 +40,24 @@ mms-spec mms-transclude-name, mms-spec mms-transclude-doc, mms-spec mms-transclu
 }
 
 .navbar-inverse {
-  background-color: #3399FF;
+  background-color: #44749D;
 }
-.navbar-inverse .navbar-nav > li > a, a.navbar-brand {
+
+.navbar-inverse .navbar-brand {
   color: #FFF;
+}
+
+.navbar-inverse .navbar-nav > li > a {
+  color: #FFF;
+}
+
+.navbar-inverse .navbar-nav > .active > a,
+.navbar-inverse .navbar-nav > .active > a:hover,
+.navbar-inverse .navbar-nav > .active > a:focus,
+.navbar-inverse .navbar-nav > .open > a,
+.navbar-inverse .navbar-nav > .open > a:hover,
+.navbar-inverse .navbar-nav > .open > a:focus {
+  background-color: #404040;
 }
 
 .transclude-modal .clickable:hover {
