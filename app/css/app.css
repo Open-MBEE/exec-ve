@@ -176,3 +176,7 @@ div.accordion-links {
   text-align: center;
   height: 40px;
 }
+
+.nav-link {
+  font-family: 'FontAwesome';
+}
