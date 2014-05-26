@@ -51,6 +51,8 @@ mms-spec mms-transclude-val {
 
 .navbar-inverse .navbar-brand {
   color: #FFF;
+  text-align: center;
+  padding-right: 0;
 }
 
 .navbar-inverse .navbar-nav > li > a {
