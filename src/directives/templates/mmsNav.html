@@ -13,15 +13,14 @@
 
             <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Other Sites <b class="caret"></b></a>
-                <ul class="dropdown-menu">
+                <ul class="accordion-dropdown dropdown-menu">
                     <accordion>
                         <accordion-group ng-repeat="(cat, sites) in categories" heading={{cat}}>
                             <accordion>
                                 <accordion-group ng-repeat="site in sites" heading={{site.title}}>
-                                    <ul>
-                                        <li><a href="/share/page/site/{{site.name}}/dashboard">Dashboard</a></li>
-                                        <li><a href="/alfresco/service/ve/configurations/{{site.name}}">Docweb</a></li>
-                                    </ul>
+                                    <div class="accordion-links">
+                                        <a class="dash-link" href="/share/page/site/{{site.name}}/dashboard">DocWeb</a><a class="docweb-link" href="/alfresco/service/ve/configurations/{{site.name}}">Dashboard</a>
+                                    </div>
                                 </accordion-group>
                             </accordion>
                         </accordion-group>
