@@ -7,8 +7,6 @@ angular.module('myApp')
     $scope.documentid = $stateParams.docId;
     var tree = {};
 
-    
-
       // 1. Iterate over view2view and create an array of all element ids
       // 2. Call get element ids and create a map of element id -> element name structure
       // 3. Iterate over view2view and create a map of element id -> element tree node reference
@@ -34,6 +32,24 @@ angular.module('myApp')
           viewElementIds.push(viewId);
         }
 
+        function addSectionElements(element, viewNode, parentNode) {
+          for (var j = 0; j < element.contains.length; j++) {
+            var containedElement = element.contains[j];
+            if (containedElement.type === "Section") {
+              var sectionTreeNode = { label : containedElement.name, 
+                    type : "section",
+                    view : viewNode.data.id,
+                    data : containedElement, 
+                    children : [] };
+
+              parentNode.children.push(sectionTreeNode);
+
+              addSectionElements(containedElement, viewNode, sectionTreeNode);
+
+            }
+          }
+        };
+
         // Call the get element service and pass in all the elements
         ElementService.getElements(viewElementIds).then(function(elements) {
 
@@ -46,19 +62,7 @@ angular.module('myApp')
 
             viewElementIds2TreeNodeMap[elements[i].id] = viewTreeNode;
 
-            for (var j = 0; j < elements[i].contains.length; j++) {
-              var containedElement = elements[i].contains[j];
-              if (containedElement.type === "Section") {
-                var sectionTreeNode = { label : containedElement.name, 
-                      type : "section",
-                      view : viewTreeNode.data.id,
-                      data : containedElement, 
-                  children : [] };
-
-                viewTreeNode.children.push(sectionTreeNode);
-
-              }
-            }
+            addSectionElements(elements[i], viewTreeNode, viewTreeNode);
           }
 
           for (var i = 0; i < data.view2view.length; i++) {
