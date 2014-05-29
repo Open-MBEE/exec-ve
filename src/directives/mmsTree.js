@@ -19,6 +19,7 @@
           replace: true,
           scope: {
             treeData: '=',
+            sectionNumbering: '=',
             onSelect: '&',
             initialSelection: '@',
             treeControl: '='
@@ -224,13 +225,18 @@
                     child_visible = visible && branch.expanded;
                     
                     var sectionChar = '.';
+                    var sectionValue = '';
                     if (section === '')
                       sectionChar = '';
 
                     if (child.type === "section") 
                       _results.push(add_branch_to_list(level + 1, '§ ', child, child_visible));
                     else {
-                      _results.push(add_branch_to_list(level + 1, section + sectionChar + (++_j), child, child_visible));
+                      _j++;
+                      if (scope.sectionNumbering === undefined || scope.sectionNumbering === null || scope.sectionNumbering)
+                        sectionValue = section + sectionChar + _j;
+
+                      _results.push(add_branch_to_list(level + 1, sectionValue, child, child_visible));
                     }
                   }
                   return _results;
