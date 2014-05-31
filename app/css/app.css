@@ -113,8 +113,8 @@ mms-spec mms-transclude-val {
   overflow-x: auto;
 }
 
-.dropdown-submenu{
-  position:relative;
+.dropdown-submenu {
+  position: relative;
 }
 
 .dropdown-submenu > .dropdown-menu {
@@ -140,7 +140,7 @@ mms-spec mms-transclude-val {
   border-color: transparent;
   border-style: solid;
   border-width: 5px 0 5px 5px;
-  border-left-color: #CCCCCC;
+  border-left-color: #CCC;
   margin-top: 5px;
   margin-right: -10px;
 }
@@ -157,15 +157,17 @@ mms-spec mms-transclude-val {
   border-radius: 6px 0 6px 6px;
 }
 
-.accordion-dropdown {
-  min-width: 210px;
+ul.accordion-dropdown {
+  border-left-width: 0;
+  min-width: 240px;
 }
 
 accordion > .panel-group {
   margin-bottom: 0;
 }
 
-accordion .panel-body {
+accordion .panel-body,
+accordion .panel-heading {
   padding: 0;
 }
 
@@ -174,24 +176,39 @@ accordion .panel {
   border-radius: 0;
 }
 
-accordion .panel-default > .panel-heading {
-  background-color: #FFF;
-}
-
 accordion .panel-title {
   font-size: inherit;
   font-weight: 400;
 }
 
+accordion .panel-default > .panel-heading {
+  background-color: #404040;
+}
+
 accordion .panel-title > a:hover {
   cursor: pointer;
   text-decoration: none;
-  color: #262626;
-  background-color: #f5f5f5;
 }
 
-accordion .panel-heading {
-  padding: 0;
+accordion .site-level .panel-heading {
+  background-color: #505050;
+}
+
+accordion .site-level .panel-title > a:hover {
+  cursor: pointer;
+  text-decoration: none;
+}
+
+accordion a.dash-link:hover,
+accordion a.docweb-link:hover {
+  cursor: pointer;
+  background-color: #707070;
+}
+
+accordion div.accordion-links {
+  text-align: center;
+  height: 40px;
+  background-color: #606060;
 }
 
 accordion .panel-group .panel + .panel {
@@ -202,23 +219,11 @@ accordion a.dash-link,
 accordion a.docweb-link {
   display: inline-block;
   text-align: center;
-  color: #333;
+  color: #FFF;
   text-decoration: none;
   height: 100%;
   width: 50%;
   line-height: 40px;
-}
-
-accordion a.dash-link:hover,
-accordion a.docweb-link:hover {
-  cursor: pointer;
-  color: #262626;
-  background-color: #f5f5f5;
-}
-
-div.accordion-links {
-  text-align: center;
-  height: 40px;
 }
 
 .navbar .nav-link {
@@ -238,8 +243,30 @@ div.accordion-links {
   display: block;
   padding: 10px 20px;
   line-height: 1.42857143;
+  color: #FFF;
 }
 
 .navbar .dropdown-menu > li > a {
   padding: 10px 20px;
+  background-color: #404040;
+  color: #FFF;
+}
+
+.navbar .dropdown-menu > li > a:hover {
+  padding: 10px 20px;
+  background-color: #505050;
+  color: #FFF;
+}
+
+.navbar .panel-group .panel,
+.navbar .panel-heading {
+  border-radius: 0;
+}
+
+.navbar .panel-default > .panel-heading + .panel-collapse .panel-body {
+  border-top: 0px;
+}
+
+.navbar .dropdown-menu {
+  border: 0;
 }
