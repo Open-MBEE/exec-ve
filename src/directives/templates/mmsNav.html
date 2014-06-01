@@ -4,24 +4,24 @@
         <ul class="col-xs-6 col-md-8 col-lg-10 nav navbar-nav">
             <li class="active"><a href="">{{title}}</a></li>
             <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Goto <b class="caret"></b></a>
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span>Goto</span><i class="nav-dropdown-icon fa fa-caret-down"></i></a>
                 <ul class="dropdown-menu">
                     <li ng-if="type != 'docweb'"><a href="/alfresco/service/ve/configurations/{{site}}">DocWeb</a></li>
                     <li><a href="/share/page/site/{{site}}/dashboard">Dashboard</a></li>
                 </ul>
             </li>
             <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Other Sites <b class="caret"></b></a>
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span>Other Sites</span><i class="nav-dropdown-icon fa fa-caret-down"></i></a>
                 <ul class="accordion-dropdown dropdown-menu">
                     <accordion>
                         <accordion-group ng-repeat="(cat, sites) in categories" is-open="catOpen">
                             <accordion-heading>
-                                {{cat}} <i class="pull-right fa" ng-class="{'fa-caret-down': catOpen, 'fa-caret-right': !catOpen}"></i>
+                                <span>{{cat}}</span><i class="pull-right fa" ng-class="{'fa-caret-down': catOpen, 'fa-caret-right': !catOpen}"></i>
                             </accordion-heading>
                             <accordion>
                                 <accordion-group ng-repeat="site in sites" class="site-level" is-open="siteOpen">
                                     <accordion-heading>
-                                        {{site.title}} <i class="pull-right fa" ng-class="{'fa-caret-down': siteOpen, 'fa-caret-right': !siteOpen}"></i>
+                                        <span>{{site.title}}</span><i class="pull-right fa" ng-class="{'fa-caret-down': siteOpen, 'fa-caret-right': !siteOpen}"></i>
                                     </accordion-heading>
                                     <div class="accordion-links">
                                         <a class="dash-link" href="/share/page/site/{{site.name}}/dashboard">DocWeb</a><a class="docweb-link" href="/alfresco/service/ve/configurations/{{site.name}}">Dashboard</a>

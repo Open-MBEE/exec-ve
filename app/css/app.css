@@ -44,30 +44,6 @@ mms-spec mms-transclude-val {
   background-color: lightblue;
 }
 
-.navbar-inverse {
-  background-color: #44749D;
-  border: 0;
-}
-
-.navbar-inverse .navbar-brand {
-  color: #FFF;
-  text-align: center;
-  padding-right: 0;
-}
-
-.navbar-inverse .navbar-nav > li > a {
-  color: #FFF;
-}
-
-.navbar-inverse .navbar-nav > .active > a,
-.navbar-inverse .navbar-nav > .active > a:hover,
-.navbar-inverse .navbar-nav > .active > a:focus,
-.navbar-inverse .navbar-nav > .open > a,
-.navbar-inverse .navbar-nav > .open > a:hover,
-.navbar-inverse .navbar-nav > .open > a:focus {
-  background-color: #404040;
-}
-
 .transclude-modal .clickable:hover {
   cursor: pointer;
   background-color: yellow;
@@ -157,9 +133,13 @@ mms-spec mms-transclude-val {
   border-radius: 6px 0 6px 6px;
 }
 
-ul.accordion-dropdown {
+.accordion-dropdown {
   border-left-width: 0;
-  min-width: 240px;
+  min-width: 200px;
+}
+
+.accordion-toggle > .fa {
+  line-height: inherit;
 }
 
 accordion > .panel-group {
@@ -227,16 +207,11 @@ accordion a.docweb-link {
 }
 
 .navbar .nav-link {
-  font-family: 'FontAwesome';
+  font-family: "FontAwesome";
 }
 
 .navbar .title {
   font-variant: small-caps;
-}
-
-.navbar-nav > li > .dropdown-menu {
-  border-radius: 0;
-  padding: 0;
 }
 
 .navbar .panel-heading a {
@@ -271,6 +246,35 @@ accordion a.docweb-link {
   border: 0;
 }
 
-.accordion-toggle > .fa {
-  line-height: inherit;
+.navbar-inverse {
+  background-color: #44749D;
+  border: 0;
+}
+
+.navbar-inverse .navbar-brand {
+  color: #FFF;
+  text-align: center;
+  padding-right: 0;
+}
+
+.navbar-inverse .navbar-nav > li > a {
+  color: #FFF;
+}
+
+.navbar-inverse .navbar-nav > .active > a,
+.navbar-inverse .navbar-nav > .active > a:hover,
+.navbar-inverse .navbar-nav > .active > a:focus,
+.navbar-inverse .navbar-nav > .open > a,
+.navbar-inverse .navbar-nav > .open > a:hover,
+.navbar-inverse .navbar-nav > .open > a:focus {
+  background-color: #404040;
+}
+
+.navbar-nav > li > .dropdown-menu {
+  border-radius: 0;
+  padding: 0;
+}
+
+.nav-dropdown-icon {
+  padding-left: 10px; 
 }
