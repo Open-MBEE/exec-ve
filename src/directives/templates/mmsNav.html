@@ -16,12 +16,12 @@
                     <accordion>
                         <accordion-group ng-repeat="(cat, sites) in categories" is-open="catOpen">
                             <accordion-heading>
-                                {{cat}} <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': catOpen, 'glyphicon-chevron-right': !catOpen}"></i>
+                                {{cat}} <i class="pull-right fa" ng-class="{'fa-caret-down': catOpen, 'fa-caret-right': !catOpen}"></i>
                             </accordion-heading>
                             <accordion>
                                 <accordion-group ng-repeat="site in sites" class="site-level" is-open="siteOpen">
                                     <accordion-heading>
-                                        {{site.title}} <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': siteOpen, 'glyphicon-chevron-right': !siteOpen}"></i>
+                                        {{site.title}} <i class="pull-right fa" ng-class="{'fa-caret-down': siteOpen, 'fa-caret-right': !siteOpen}"></i>
                                     </accordion-heading>
                                     <div class="accordion-links">
                                         <a class="dash-link" href="/share/page/site/{{site.name}}/dashboard">DocWeb</a><a class="docweb-link" href="/alfresco/service/ve/configurations/{{site.name}}">Dashboard</a>

@@ -46,7 +46,7 @@ mms-spec mms-transclude-val {
 
 .navbar-inverse {
   background-color: #44749D;
-  border-color: #404040;
+  border: 0;
 }
 
 .navbar-inverse .navbar-brand {
@@ -269,4 +269,8 @@ accordion a.docweb-link {
 
 .navbar .dropdown-menu {
   border: 0;
+}
+
+.accordion-toggle > .fa {
+  line-height: inherit;
 }
