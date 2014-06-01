@@ -33,13 +33,28 @@
   display: inline;
 }
 
-mms-view.editing mms-transclude-name,
-mms-view.editing mms-transclude-doc {
-  border-bottom: 1px dotted blue;
+mms-view.editing * {
+  color: #A7A7A7;
+  cursor: default;
 }
 
-mms-spec mms-transclude-name,
+mms-view.editing mms-transclude-doc,
+mms-view.editing mms-transclude-doc *,
+mms-view.editing mms-transclude-img,
+mms-view.editing mms-transclude-img *,
+mms-view.editing mms-transclude-name,
+mms-view.editing mms-transclude-name *,
+mms-view.editing mms-transclude-val,
+mms-view.editing mms-transclude-val *,
+mms-view.editing button,
+mms-view.editing button * {
+  color: #333;
+  cursor: text;
+}
+
 mms-spec mms-transclude-doc,
+mms-spec mms-transclude-img,
+mms-spec mms-transclude-name,
 mms-spec mms-transclude-val {
   background-color: lightblue;
 }
