@@ -20,7 +20,7 @@ angular.module('mms.directives')
  * @param {string} title Title to display
  * @param {string} type The type of current page (docweb, product, snapshot, etc)
  */
-function mmsNav(SiteService, $templateCache) {
+function mmsNav(SiteService, $templateCache, $scope) {
     var template = $templateCache.get('mms/templates/mmsNav.html');
 
     var mmsNavLink = function(scope, element, attrs) {
