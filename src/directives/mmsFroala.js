@@ -50,6 +50,7 @@ function mmsFroala(ElementService, $modal, $templateCache) { //depends on angula
                 template: transcludeModalTemplate,
                 scope: scope,
                 controller: ['$scope', '$modalInstance', modalCtrl],
+                size: 'lg'
             });
             instance.result.then(function(tag) {
                 editor.restoreSelection();
@@ -74,7 +75,7 @@ function mmsFroala(ElementService, $modal, $templateCache) { //depends on angula
                 'formatBlock', 'align', 'insertOrderedList', 'insertUnorderedList', 'outdent', 'indent', 'sep',
                 'createLink', 'insertImage', 'insertVideo', 'undo', 'redo', 'html', 'sep',
                 'transclude'],
-            inlineMode: true,
+            inlineMode: false,
             autosaveInterval: 1000,
             contentChangedCallback: function() {
                 //scope.$apply(read);

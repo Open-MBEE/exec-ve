@@ -25,16 +25,16 @@ angular.module('myApp')
         // Iterate through all the views in the view2view attribute
         // view2view is a set of elements with related child views
         // Note: The JSON format is NOT nested - it uses refrencing
-        for (var i = 0; i < data.view2view.length; i++) {
+        for (var i = 0; i < data.specialization.view2view.length; i++) {
 
-          var viewId = data.view2view[i].id;
+          var viewId = data.specialization.view2view[i].id;
           
           viewElementIds.push(viewId);
         }
 
         function addSectionElements(element, viewNode, parentNode) {
-          for (var j = 0; j < element.contains.length; j++) {
-            var containedElement = element.contains[j];
+          for (var j = 0; j < element.specialization.contains.length; j++) {
+            var containedElement = element.specialization.contains[j];
             if (containedElement.type === "Section") {
               var sectionTreeNode = { label : containedElement.name, 
                     type : "section",
@@ -65,13 +65,13 @@ angular.module('myApp')
             addSectionElements(elements[i], viewTreeNode, viewTreeNode);
           }
 
-          for (var i = 0; i < data.view2view.length; i++) {
+          for (var i = 0; i < data.specialization.view2view.length; i++) {
 
-            var viewId = data.view2view[i].id;
+            var viewId = data.specialization.view2view[i].id;
             
-            for (var j = 0; j < data.view2view[i].childrenViews.length; j++) {
+            for (var j = 0; j < data.specialization.view2view[i].childrenViews.length; j++) {
               
-              var childViewId = data.view2view[i].childrenViews[j];
+              var childViewId = data.specialization.view2view[i].childrenViews[j];
 
               viewElementIds2TreeNodeMap[viewId].children.push( viewElementIds2TreeNodeMap[childViewId] );
 
@@ -124,8 +124,8 @@ angular.module('myApp')
     var viewElementIds2TreeNodeMap = {};
     var rootElementId = $scope.doc.sysmlid;
 
-    for (var i = 0; i < document.view2view.length; i++) {
-        var viewId = document.view2view[i].id;
+    for (var i = 0; i < document.specialization.view2view.length; i++) {
+        var viewId = document.specialization.view2view[i].id;
         viewElementIds.push(viewId);
     }
     ElementService.getElements(viewElementIds).then(function(elements) {
@@ -137,10 +137,10 @@ angular.module('myApp')
             };
             viewElementIds2TreeNodeMap[elements[i].sysmlid] = viewTreeNode;    
         }
-        for (var i = 0; i < document.view2view.length; i++) {
-            var viewId = document.view2view[i].id;
-            for (var j = 0; j < document.view2view[i].childrenViews.length; j++) {
-                var childViewId = document.view2view[i].childrenViews[j];
+        for (var i = 0; i < document.specialization.view2view.length; i++) {
+            var viewId = document.specialization.view2view[i].id;
+            for (var j = 0; j < document.specialization.view2view[i].childrenViews.length; j++) {
+                var childViewId = document.specialization.view2view[i].childrenViews[j];
                 viewElementIds2TreeNodeMap[viewId].children.push(viewElementIds2TreeNodeMap[childViewId]);
             }
         }
@@ -156,7 +156,7 @@ angular.module('myApp')
             }
             newView2View.push(viewObject);
         }
-        document.view2view = newView2View;
+        document.specialization.view2view = newView2View;
         ViewService.updateDocument(document).then(function(data) {
             alert("success");
             $state.go('doc', {}, {reload:true});

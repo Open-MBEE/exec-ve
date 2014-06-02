@@ -74,7 +74,7 @@ function mmsTranscludeVal(ElementService, $compile, $templateCache) {
             ElementService.getElement(scope.mmsEid, false, ws, version)
             .then(function(data) {
                 scope.element = data;
-                scope.values = element.specialization.value;
+                scope.values = scope.element.specialization.value;
                 recompile();
                 scope.$watch('values', recompile, true);
             });

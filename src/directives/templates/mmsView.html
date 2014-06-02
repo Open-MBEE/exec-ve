@@ -9,10 +9,10 @@
             </button>       
         </div>
     </div></div> 
-    <h4 class="inline"><mms-transclude-name data-mms-eid="{{view.id}}"></mms-transclude-name></h4> 
+    <h4 class="inline"><mms-transclude-name data-mms-eid="{{view.sysmlid}}"></mms-transclude-name></h4> 
     <div>Last Modified: {{lastModified | date:'M/d/yy h:mm a'}} by {{author}}</div><br/>
-    <div ui-sortable="sortableOptions" ng-model="view.contains">
-        <div ng-repeat="contain in view.contains" ng-switch on="contain.type"> 
+    <div ui-sortable="sortableOptions" ng-model="view.specialization.contains">
+        <div ng-repeat="contain in view.specialization.contains" ng-switch on="contain.type"> 
         <div ng-class="structEditable ? 'panel panel-default' : ''">
         <div ng-class="structEditable ? 'panel-body' : ''">
             <mms-view-para data-mms-para="contain" ng-switch-when="Paragraph"></mms-view-para>

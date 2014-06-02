@@ -298,13 +298,13 @@ function ViewService($q, $http, URLService, ElementService, CommentService) {
     var addViewToDocument = function(viewId, documentId, parentViewId, workspace) {
         var deferred = $q.defer();
         getDocument(documentId, workspace).then(function(data) {   
-            for (var i = 0; i < data.view2view.length; i++) {
-                if (data.view2view[i].id === parentViewId) {
-                    data.view2view[i].childrenViews.push(viewId);
+            for (var i = 0; i < data.specialization.view2view.length; i++) {
+                if (data.specialization.view2view[i].id === parentViewId) {
+                    data.specialization.view2view[i].childrenViews.push(viewId);
                     break;
                 }
             } 
-            data.view2view.push({id: viewId, childrenViews: []});
+            data.specialization.view2view.push({id: viewId, childrenViews: []});
             updateDocument(data, workspace).then(function(data2) {
                 deferred.resolve(data);
             }, function(reason) {
@@ -338,14 +338,14 @@ function ViewService($q, $http, URLService, ElementService, CommentService) {
     var createView = function(ownerId, name, documentId, workspace) {
         var deferred = $q.defer();
         var view = {
-            type: 'View',
+            specialization: {type: 'View', contains: []},
             owner: ownerId,
             name: (name === undefined || name === null) ? 'Untitled View' : name,
             documentation: '',
         };
         ElementService.createElement(view, workspace)
         .then(function(data) {
-            data.contains = [
+            data.specialization.contains = [
                 {
                     'type': 'Paragraph', 
                     'sourceType': 'reference', 
@@ -353,9 +353,9 @@ function ViewService($q, $http, URLService, ElementService, CommentService) {
                     'sourceProperty': 'documentation'
                 }
             ];
-            data.allowedElements = [data.sysmlid];
-            data.displayedElements = [data.sysmlid];
-            data.childrenViews = [];
+            data.specialization.allowedElements = [data.sysmlid];
+            data.specialization.displayedElements = [data.sysmlid];
+            data.specialization.childrenViews = [];
             ElementService.updateElement(data, workspace)
             .then(function(data2) {
                 if (documentId !== undefined) {

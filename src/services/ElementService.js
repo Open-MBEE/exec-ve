@@ -257,7 +257,7 @@ function ElementService($q, $http, URLService, VersionService, _) {
         var ws = !workspace ? 'master' : workspace;
 
         var deferred = $q.defer();
-        if (!elem.hasOwnProperty('id'))
+        if (!elem.hasOwnProperty('sysmlid'))
             deferred.reject('Element id not found, create element first!');
         else {
             $http.post(URLService.getPostElementsURL(ws), {'elements': [elem]})
@@ -319,7 +319,7 @@ function ElementService($q, $http, URLService, VersionService, _) {
             deferred.reject('Element create needs an owner'); //relax this?
             return deferred.promise;
         }
-        if (elem.hasOwnProperty('id')) {
+        if (elem.hasOwnProperty('sysmlid')) {
             deferred.reject('Element create cannot have id');
             return deferred.promise;
         }
