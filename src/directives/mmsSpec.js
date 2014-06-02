@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsSpec', ['ElementService', '$compile', '$templateCache', mmsSpec]);
+.directive('mmsSpec', ['ElementService', '$compile', '$templateCache', '$modal', mmsSpec]);
 
 /**
  * @ngdoc directive
@@ -27,10 +27,12 @@ angular.module('mms.directives')
  *      that can be transcluded into documentation or string values. Regardless, transclusion
  *      allows keyword searching elements to transclude from alfresco
  */
-function mmsSpec(ElementService, $compile, $templateCache) {
+function mmsSpec(ElementService, $compile, $templateCache, $modal) {
     var readTemplate = $templateCache.get('mms/templates/mmsSpec.html');
     var editTemplate = $templateCache.get('mms/templates/mmsSpecEdit.html');
     
+    
+
     var mmsSpecLink = function(scope, element, attrs) {
         scope.$watch('mmsEid', function(newVal, oldVal) {
             if (!newVal) {
@@ -47,7 +49,8 @@ function mmsSpec(ElementService, $compile, $templateCache) {
                     element.append(template);
                     $compile(element.contents())(scope); 
                 } else {
-                    ElementService.getElementForEdit(scope.mmsEid, false, scope.mmsWs).then(function(data) {
+                    ElementService.getElementForEdit(scope.mmsEid, false, scope.mmsWs)
+                    .then(function(data) {
                         scope.edit = data;
                         template = editTemplate;
                         if (scope.edit.specialization.type === 'Property' && 
@@ -61,10 +64,35 @@ function mmsSpec(ElementService, $compile, $templateCache) {
                 }
             });
         });
+
+        var conflictCtrl = function($scope, $modalInstance) {
+            $scope.ok = function() {
+                $modalInstance.close('ok');
+            };
+            $scope.cancel = function() {
+                $modalInstance.dismiss();
+            };
+        };
+
         scope.save = function() {
             ElementService.updateElement(scope.edit, scope.mmsWs)
-            .then(function() {
+            .then(function(data) {
                 
+            }, function(reason) {
+                if (reason === 'Conflict') {
+                    var instance = $modal.open({
+                        template: $templateCache.get('mms/templates/saveConflict.html'),
+                        controller: ['$scope', '$modalInstance', conflictCtrl],
+                    });
+                    instance.result.then(function() {
+                        ElementService.getElementForEdit(scope.mmsEid, true, scope.mmsWs)
+                        .then(function(data) {
+                            //scope.edit.read = data.read;
+                        }); 
+                    });
+                } else {
+
+                }
             });
         };
     };

@@ -159,6 +159,8 @@ function URLService($q, $http, $location) {
             deferred.reject("Server Error");
         else if (status === 401 || status === 403)
             deferred.reject("Unauthorized");
+        else if (status === 409)
+            deferred.reject("Conflict");
         else
             deferred.reject("Failed");
     };

@@ -131,14 +131,23 @@ function ElementService($q, $http, URLService, VersionService, _) {
         else {
             getElement(id, update, ws)
             .then(function(data) {
+                var edit = null, i;
                 if (edits.hasOwnProperty(id)) {
-                    //merge?
+                    _.merge(edits[id], data);
+                    edit = edits[id];
+                    if (edit.hasOwnProperty('specialization')) {
+                        for (i = 0; i < nonEditKeys.length; i++) {
+                            if (edit.specialization.hasOwnProperty(nonEditKeys[i])) {
+                                delete edit[nonEditKeys[i]];
+                            }
+                        }
+                    }
                     deferred.resolve(edits[id]);
                 } else {
-                    var edit = _.cloneDeep(data);
+                    edit = _.cloneDeep(data);
                     edits[id] = edit;
                     if (edit.hasOwnProperty('specialization')) {
-                        for (var i = 0; i < nonEditKeys.length; i++) {
+                        for (i = 0; i < nonEditKeys.length; i++) {
                             if (edit.specialization.hasOwnProperty(nonEditKeys[i])) {
                                 delete edit[nonEditKeys[i]];
                             }
