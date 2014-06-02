@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsTranscludeVal', ['ElementService', '$compile', mmsTranscludeVal]);
+.directive('mmsTranscludeVal', ['ElementService', '$compile', '$templateCache', mmsTranscludeVal]);
 
 /**
  * @ngdoc directive
@@ -22,8 +22,9 @@ angular.module('mms.directives')
  * @param {string=master} mmsWs Workspace to use, defaults to master
  * @param {string=latest} mmsVersion Version can be alfresco version number or timestamp, default is latest
  */
-function mmsTranscludeVal(ElementService, $compile) {
-    var template = '<span ng-repeat="value in element.value">{{value}}</span>';
+function mmsTranscludeVal(ElementService, $compile, $templateCache) {
+    var valTemplate = $templateCache.get('mms/templates/mmsTranscludeVal.html');
+
     var mmsTranscludeValLink = function(scope, element, attrs, mmsViewCtrl) {
         element.click(function(e) {
             if (!mmsViewCtrl)
@@ -35,13 +36,24 @@ function mmsTranscludeVal(ElementService, $compile) {
 
         var recompile = function() {
             var toCompileList = [];
-            for (var i = 0; i < scope.element.value.length; i++) {
-                toCompileList.push(scope.element.value[i]);
+            var areStrings = false;
+            for (var i = 0; i < scope.values.length; i++) {
+                if (scope.values[i].type === 'LiteralString') {
+                    areStrings = true;
+                    toCompileList.push(scope.values[i].string);
+                } else {
+                    break;
+                }
             } 
             element.empty();
-            var toCompile = toCompileList.join(', ');
-            element.append(toCompile);
-            $compile(element.contents())(scope); 
+            if (areStrings) {
+                var toCompile = toCompileList.join(', ');
+                element.append(toCompile);
+                $compile(element.contents())(scope); 
+            } else {
+                element.append(valTemplate);
+                $compile(element.contents())(scope);
+            }
             if (mmsViewCtrl) {
                 mmsViewCtrl.elementTranscluded(scope.element);
             }
@@ -62,14 +74,9 @@ function mmsTranscludeVal(ElementService, $compile) {
             ElementService.getElement(scope.mmsEid, false, ws, version)
             .then(function(data) {
                 scope.element = data;
-                if (scope.element.valueType === "LiteralString") {
-                    recompile();
-                    scope.$watchCollection('element.value', recompile);
-                } else {
-                    var el = $compile(template)(scope);
-                    element.empty();
-                    element.append(el);
-                }
+                scope.values = element.specialization.value;
+                recompile();
+                scope.$watch('values', recompile, true);
             });
         });
     };

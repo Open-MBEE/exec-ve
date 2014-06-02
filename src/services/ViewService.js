@@ -349,17 +349,17 @@ function ViewService($q, $http, URLService, ElementService, CommentService) {
                 {
                     'type': 'Paragraph', 
                     'sourceType': 'reference', 
-                    'source': data.id, 
+                    'source': data.sysmlid, 
                     'sourceProperty': 'documentation'
                 }
             ];
-            data.allowedElements = [data.id];
-            data.displayedElements = [data.id];
+            data.allowedElements = [data.sysmlid];
+            data.displayedElements = [data.sysmlid];
             data.childrenViews = [];
             ElementService.updateElement(data, workspace)
             .then(function(data2) {
                 if (documentId !== undefined) {
-                    addViewToDocument(data.id, documentId, ownerId, workspace)
+                    addViewToDocument(data.sysmlid, documentId, ownerId, workspace)
                     .then(function(data3) {
                         deferred.resolve(data2);
                     }, function(reason) {

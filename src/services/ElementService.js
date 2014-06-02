@@ -137,9 +137,11 @@ function ElementService($q, $http, URLService, VersionService, _) {
                 } else {
                     var edit = _.cloneDeep(data);
                     edits[id] = edit;
-                    for (var i = 0; i < nonEditKeys.length; i++) {
-                        if (edit.hasOwnProperty(nonEditKeys[i])) {
-                            delete edit[nonEditKeys[i]];
+                    if (edit.hasOwnProperty('specialization')) {
+                        for (var i = 0; i < nonEditKeys.length; i++) {
+                            if (edit.specialization.hasOwnProperty(nonEditKeys[i])) {
+                                delete edit[nonEditKeys[i]];
+                            }
                         }
                     }
                     deferred.resolve(edit);
@@ -218,14 +220,14 @@ function ElementService($q, $http, URLService, VersionService, _) {
             .success(function(data, status, headers, config) {
                 var result = [];
                 data[key].forEach(function(element) {
-                    if (elements.hasOwnProperty(element.id)) {
+                    if (elements.hasOwnProperty(element.sysmlid)) {
                         if (update) {
-                            _.merge(elements[element.id], element);
+                            _.merge(elements[element.sysmlid], element);
                         } 
                     } else {
-                        elements[element.id] = element;
+                        elements[element.sysmlid] = element;
                     }
-                    result.push(elements[element.id]);
+                    result.push(elements[element.sysmlid]);
                 });
                 deferred.resolve(result); 
             }).error(function(data, status, headers, config) {
@@ -261,13 +263,13 @@ function ElementService($q, $http, URLService, VersionService, _) {
             $http.post(URLService.getPostElementsURL(ws), {'elements': [elem]})
             .success(function(data, status, headers, config) {
                 var resp = data.elements[0];
-                if (elements.hasOwnProperty(elem.id))
-                    _.merge(elements[elem.id], resp);
+                if (elements.hasOwnProperty(elem.sysmlid))
+                    _.merge(elements[elem.sysmlid], resp);
                 else
-                    elements[elem.id] = resp;
-                if (edits.hasOwnProperty(elem.id))
-                    _.merge(edits[elem.id], elements[elem.id]);
-                deferred.resolve(elements[elem.id]);
+                    elements[elem.sysmlid] = resp;
+                if (edits.hasOwnProperty(elem.sysmlid))
+                    _.merge(edits[elem.sysmlid], elements[elem.sysmlid]);
+                deferred.resolve(elements[elem.sysmlid]);
             }).error(function(data, status, headers, config) {
                 URLService.handleHttpStatus(data, status, headers, config, deferred);
             });
@@ -325,8 +327,8 @@ function ElementService($q, $http, URLService, VersionService, _) {
         .success(function(data, status, headers, config) {
             if (data.elements.length > 0) {
                 var e = data.elements[0];
-                elements[e.id] = e;
-                deferred.resolve(elements[e.id]);
+                elements[e.sysmlid] = e;
+                deferred.resolve(elements[e.sysmlid]);
             }
         }).error(function(data, status, headers, config) {
             URLService.handleHttpStatus(data, status, headers, config, deferred);
@@ -396,13 +398,13 @@ function ElementService($q, $http, URLService, VersionService, _) {
         .success(function(data, status, headers, config) {
             var result = [];
             data.elements.forEach(function(element) {
-                if (elements.hasOwnProperty(element.id)) {
+                if (elements.hasOwnProperty(element.sysmlid)) {
                     if (update)
-                        _.merge(elements[element.id], element);
+                        _.merge(elements[element.sysmlid], element);
                 } else {
-                    elements[element.id] = element;
+                    elements[element.sysmlid] = element;
                 }
-                result.push(elements[element.id]);
+                result.push(elements[element.sysmlid]);
             });
             deferred.resolve(result); 
         }).error(function(data, status, headers, config) {

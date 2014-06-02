@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsSpec', ['ElementService', '$compile', mmsSpec]);
+.directive('mmsSpec', ['ElementService', '$compile', '$templateCache', mmsSpec]);
 
 /**
  * @ngdoc directive
@@ -27,21 +27,9 @@ angular.module('mms.directives')
  *      that can be transcluded into documentation or string values. Regardless, transclusion
  *      allows keyword searching elements to transclude from alfresco
  */
-function mmsSpec(ElementService, $compile) {
-    var heading = '<div>Last Modified: {{element.lastModified | date:\'M/d/yy h:mm a\'}} by {{element.author}}</div>';
-    var nameTemplate = '<div>Name: {{element.name}} </div>';
-    var nameEditTemplate = '<div>Name: <input class="form-control" type="text" ng-model="edit.name"></input></div>';
-    
-    var docTemplate = '<div>Documentation:</div><div ng-bind-html="element.documentation"></div>';
-    var docEditTemplate = '<div>Documentation:</div><div ng-model="edit.documentation" mms-froala mms-cf-elements="mmsCfElements"></div>';
-    var docEditPlain = '<div>Documentation:</div><textarea ng-model="edit.documentation"></textarea>';
-    
-    var valueStringEdit = '<div>Value:</div><div ng-repeat="val in values" ng-model="val.value" mms-froala mms-cf-elements="mmsCfElements"></div>';
-    var valueBooleanEdit = '<div>Value:</div><input ng-repeat="val in values" type="checkbox" ng-model="val.value"></input>';
-    var valueNumberEdit = '<div>Value:</div><input ng-repeat="val in values" type="number" ng-model="val.value"></input>';
-    
-    var saveTemplate = '<div><button class="btn btn-primary btn-sm" ng-click="save()">Save</button></div>';
-    var template = '';
+function mmsSpec(ElementService, $compile, $templateCache) {
+    var readTemplate = $templateCache.get('mms/templates/mmsSpec.html');
+    var editTemplate = $templateCache.get('mms/templates/mmsSpecEdit.html');
     
     var mmsSpecLink = function(scope, element, attrs) {
         scope.$watch('mmsEid', function(newVal, oldVal) {
@@ -51,32 +39,21 @@ function mmsSpec(ElementService, $compile) {
             }
             ElementService.getElement(scope.mmsEid, false, scope.mmsWs, scope.mmsVersion)
             .then(function(data) {
+                var template = null;
                 scope.element = data;
-                template = '' + heading;
                 if (scope.mmsEditField === 'none' || !scope.element.editable) {
-                    template += nameTemplate + docTemplate;
+                    template = readTemplate;
                     element.empty();
                     element.append(template);
                     $compile(element.contents())(scope); 
                 } else {
                     ElementService.getElementForEdit(scope.mmsEid, false, scope.mmsWs).then(function(data) {
                         scope.edit = data;
-                        template += nameEditTemplate + docEditTemplate;
-                        if (scope.edit.type === 'Property' && angular.isArray(scope.edit.value)) {
-                            scope.values = [];
-                            for (var i = 0; i < scope.edit.value.length; i++) {
-                                scope.values.push({value: scope.edit.value[i]});
-                            }
-                            if (scope.edit.valueType === 'LiteralString')
-                                template += valueStringEdit;
-                            else if (scope.edit.valueType === 'LiteralBoolean')
-                                template += valueBooleanEdit;
-                            else if (scope.edit.valueType === 'LiteralInteger' || 
-                                    scope.edit.valueType === 'LiteralUnlimitedNatural' ||
-                                    scope.edit.valueType === 'LiteralReal')
-                                template += valueNumberEdit;
+                        template = editTemplate;
+                        if (scope.edit.specialization.type === 'Property' && 
+                                angular.isArray(scope.edit.specialization.value)) {
+                            scope.values = scope.edit.specialization.value;
                         }
-                        template += saveTemplate;
                         element.empty();
                         element.append(template);
                         $compile(element.contents())(scope); 
@@ -85,16 +62,6 @@ function mmsSpec(ElementService, $compile) {
             });
         });
         scope.save = function() {
-            if (scope.edit.type === 'Property' && angular.isArray(scope.edit.value)) {
-                var i = 0;
-                for (i = 0; i < scope.values.length; i++) {
-                    if (scope.edit.value.length < i+1) {
-                        scope.edit.value.push(scope.values[i].value);
-                    } else
-                        scope.edit.value[i] = scope.values[i].value;
-                }
-                scope.edit.value.length = i;
-            }
             ElementService.updateElement(scope.edit, scope.mmsWs)
             .then(function() {
                 
