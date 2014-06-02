@@ -118,7 +118,7 @@ angular.module('myApp')
         });
     };
 })
-.controller('ReorderCtrl', function($scope, document, ElementService, ViewService, $state) {
+.controller('ReorderCtrl', function($scope, document, ElementService, ViewService, $state, growl) {
     $scope.doc = document;
     var viewElementIds = [];
     var viewElementIds2TreeNodeMap = {};
@@ -158,7 +158,7 @@ angular.module('myApp')
         }
         document.specialization.view2view = newView2View;
         ViewService.updateDocument(document).then(function(data) {
-            alert("success");
+            growl.success('Reorder Successful');
             $state.go('doc', {}, {reload:true});
         });
     };

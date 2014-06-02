@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsSpec', ['ElementService', '$compile', '$templateCache', '$modal', mmsSpec]);
+.directive('mmsSpec', ['ElementService', '$compile', '$templateCache', '$modal', 'growl', mmsSpec]);
 
 /**
  * @ngdoc directive
@@ -27,7 +27,7 @@ angular.module('mms.directives')
  *      that can be transcluded into documentation or string values. Regardless, transclusion
  *      allows keyword searching elements to transclude from alfresco
  */
-function mmsSpec(ElementService, $compile, $templateCache, $modal) {
+function mmsSpec(ElementService, $compile, $templateCache, $modal, growl) {
     var readTemplate = $templateCache.get('mms/templates/mmsSpec.html');
     var editTemplate = $templateCache.get('mms/templates/mmsSpecEdit.html');
     
@@ -77,7 +77,7 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal) {
         scope.save = function() {
             ElementService.updateElement(scope.edit, scope.mmsWs)
             .then(function(data) {
-                
+                growl.success("Save successful");
             }, function(reason) {
                 if (reason === 'Conflict') {
                     var instance = $modal.open({
