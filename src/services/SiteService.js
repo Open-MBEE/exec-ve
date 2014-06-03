@@ -168,7 +168,6 @@ function SiteService($q, $http, URLService, ProjectService, _) {
         setCurrentWorkspace: setCurrentWorkspace,
         getSites: getSites,
         getSite: getSite,
-        getSiteDocuments: getSiteDocuments,
         getSiteProjects: getSiteProjects
     };
 }
