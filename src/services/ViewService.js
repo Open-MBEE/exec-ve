@@ -376,6 +376,10 @@ function ViewService($q, $http, URLService, ElementService, CommentService) {
         return deferred.promise;
     };
 
+    var getDocuments = function(workspace, site) {
+
+    };
+
     return {
         getView: getView,
         getViews: getViews,
@@ -389,7 +393,8 @@ function ViewService($q, $http, URLService, ElementService, CommentService) {
         updateViewElements: updateViewElements,
         createView: createView,
         addViewToDocument: addViewToDocument,
-        getDocumentViews: getDocumentViews
+        getDocumentViews: getDocumentViews,
+        getDocuments: getDocuments
     };
 
 }

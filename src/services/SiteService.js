@@ -149,20 +149,6 @@ function SiteService($q, $http, URLService, ProjectService, _) {
 
     /**
      * @ngdoc method
-     * @name mms.SiteService#getSiteDocuments
-     * @methodOf mms.SiteService
-     * 
-     * @description
-     * Gets all documents on a site
-     * @param {string} site The site name to get documents for.
-     * @returns {Promise} Resolves into array of document objects.
-     */
-    var getSiteDocuments = function(site) {
-
-    };
-
-    /**
-     * @ngdoc method
      * @name mms.SiteService#getSiteProjects
      * @methodOf mms.SiteService
      * 
