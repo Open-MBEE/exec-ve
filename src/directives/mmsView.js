@@ -94,7 +94,8 @@ function mmsView(ViewService, $templateCache) {
             mmsVid: '@',
             mmsWs: '@',
             mmsVersion: '@',
-            mmsCfClicked: '&'
+            mmsCfClicked: '&',
+            mmsOrder: '='
         },
         controller: ['$scope', 'ViewService', mmsViewCtrl],
         link: mmsViewLink

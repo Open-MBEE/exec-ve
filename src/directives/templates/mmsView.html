@@ -7,7 +7,7 @@
             <button type="button" class="btn btn-default" ng-click="toggleTextEdit()"> 
                 <span class="glyphicon glyphicon-edit"></span> {{textEdit}}
             </button>
-            <button type="button" class="btn btn-default" ng-click="toggleStructEdit()">
+            <button ng-show="mmsOrder" type="button" class="btn btn-default" ng-click="toggleStructEdit()">
                 <span class="glyphicon glyphicon-th-list"></span> {{structEdit}}
             </button>       
         </div>

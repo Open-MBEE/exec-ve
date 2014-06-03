@@ -284,6 +284,6 @@ mms-view:not(.reviewing) mms-transclude-com {
   display: none;
 }
 
-mms-transclude-com {
+mms-transclude-com, mms-transclude-com * {
   background-color: lightgreen;
 }
