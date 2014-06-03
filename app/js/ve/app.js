@@ -30,14 +30,14 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
                 controller: 'NavTreeCtrl'
             }
         }
-
     })
     .state('doc.view', {
         url: '/view/:viewId',
         views: {
             'view@': {
                 templateUrl: 'partials/view.html',
-                controller: function($scope, $stateParams, $state, viewElements) {
+                controller: function($scope, $stateParams, $state, viewElements, ViewService) {
+                    ViewService.setCurrentViewId($stateParams.viewId);
                     $scope.vid = $stateParams.viewId;
                     $scope.viewElements = viewElements;
                     $scope.tscClicked = function(elementId) {

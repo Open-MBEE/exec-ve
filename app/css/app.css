@@ -278,3 +278,12 @@ accordion a.docweb-link {
 .nav-dropdown-icon {
   padding-left: 10px; 
 }
+
+
+mms-view:not(.reviewing) mms-transclude-com {
+  display: none;
+}
+
+mms-transclude-com {
+  background-color: lightgreen;
+}

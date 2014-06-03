@@ -44,6 +44,12 @@ function mmsFroala(ElementService, ViewService, $modal, $templateCache) { //depe
                     $scope.mmsCfElements = data;
                 });
             };
+            $scope.makeNew = function(newName) {
+                ElementService.createElement({name: newName, documentation: ''})
+                .then(function(data) {
+                    $scope.mmsCfElements = [data];
+                });
+            };
         };
 
         var commentCtrl = function($scope, $modalInstance) {
@@ -80,7 +86,7 @@ function mmsFroala(ElementService, ViewService, $modal, $templateCache) { //depe
         };
 
         var commentCallback = function(editor) {
-            editor.saveSelect();
+            editor.saveSelection();
             var instance = $modal.open({
                 template: commentModalTemplate,
                 scope: scope,
@@ -91,7 +97,7 @@ function mmsFroala(ElementService, ViewService, $modal, $templateCache) { //depe
                     comment.owner = ViewService.getCurrentViewId();
                 ElementService.createElement(comment)
                 .then(function(data) {
-                    var tag = '<mms-transclude-com data-mms-eid="' + data.sysmlid + '"></mms-transclude-com>';
+                    var tag = '<mms-transclude-com data-mms-eid="' + data.sysmlid + '">comment</mms-transclude-com>';
                     editor.restoreSelection();
                     editor.saveUndoStep();
                     editor.insertHTML(tag);
