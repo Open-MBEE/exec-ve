@@ -26,7 +26,7 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
                 }
             },
             'sidebar': {
-                templateUrl: 'partials/sidebar.html',
+                templateUrl: 'partials/ve/sidebar.html',
                 controller: 'NavTreeCtrl'
             }
         }
@@ -35,7 +35,7 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
         url: '/view/:viewId',
         views: {
             'view@': {
-                templateUrl: 'partials/view.html',
+                templateUrl: 'partials/ve/view.html',
                 controller: function($scope, $stateParams, $state, viewElements, ViewService) {
                     ViewService.setCurrentViewId($stateParams.viewId);
                     $scope.vid = $stateParams.viewId;
@@ -57,7 +57,7 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
         url: '/order',
         views: {
             'view@': {
-                templateUrl: 'partials/reorder-views.html',
+                templateUrl: 'partials/ve/reorder-views.html',
                 controller: 'ReorderCtrl'
             }
         }
