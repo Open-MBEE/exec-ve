@@ -1,13 +1,14 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsFroala', ['ElementService', '$modal', '$templateCache', mmsFroala]);
+.directive('mmsFroala', ['ElementService', 'ViewService', '$modal', '$templateCache', mmsFroala]);
 
 /**
  * @ngdoc directive
  * @name mms.directives.directive:mmsFroala
  *
  * @requires mms.ElementService
+ * @requires mms.ViewService
  * @requires $modal
  * @requires $templateCache
  *
@@ -21,10 +22,11 @@ angular.module('mms.directives')
  *      that can be transcluded. Regardless, transclusion allows keyword searching 
  *      elements to transclude from alfresco
  */
-function mmsFroala(ElementService, $modal, $templateCache) { //depends on angular bootstrap
+function mmsFroala(ElementService, ViewService, $modal, $templateCache) { //depends on angular bootstrap
     
     var mmsFroalaLink = function(scope, element, attrs, ngModelCtrl) {
-        var transcludeModalTemplate = $templateCache.get('mms/templates/mmsFroala.html');
+        var transcludeModalTemplate = $templateCache.get('mms/templates/mmsCfModal.html');
+        var commentModalTemplate = $templateCache.get('mms/templates/mmsCommentModal.html');
 
         var modalCtrl = function($scope, $modalInstance) {
             $scope.filter = '';
@@ -41,6 +43,22 @@ function mmsFroala(ElementService, $modal, $templateCache) { //depends on angula
                 ElementService.search(searchText).then(function(data) {
                     $scope.mmsCfElements = data;
                 });
+            };
+        };
+
+        var commentCtrl = function($scope, $modalInstance) {
+            $scope.comment = {
+                name: '', 
+                documentation: '', 
+                specialization: {
+                    type: 'Comment'
+                }
+            };
+            $scope.ok = function() {
+                $modalInstance.close($scope.comment);
+            };
+            $scope.cancel = function() {
+                $modalInstance.dismiss();
             };
         };
 
@@ -61,6 +79,28 @@ function mmsFroala(ElementService, $modal, $templateCache) { //depends on angula
             });
         };
 
+        var commentCallback = function(editor) {
+            editor.saveSelect();
+            var instance = $modal.open({
+                template: commentModalTemplate,
+                scope: scope,
+                controller: ['$scope', '$modalInstance', commentCtrl],
+            });
+            instance.result.then(function(comment) {
+                if (ViewService.getCurrentViewId())
+                    comment.owner = ViewService.getCurrentViewId();
+                ElementService.createElement(comment)
+                .then(function(data) {
+                    var tag = '<mms-transclude-com data-mms-eid="' + data.sysmlid + '"></mms-transclude-com>';
+                    editor.restoreSelection();
+                    editor.saveUndoStep();
+                    editor.insertHTML(tag);
+                    editor.saveUndoStep();
+                    editor.sync();
+                });
+            });
+        };
+
         function read() {
             var html = element.editable("getHTML"); 
             if (angular.isArray(html))
@@ -74,7 +114,7 @@ function mmsFroala(ElementService, $modal, $templateCache) { //depends on angula
             buttons: ['bold', 'italic', 'underline', 'strikethrough', 'fontsize', 'color', 'sep',
                 'formatBlock', 'align', 'insertOrderedList', 'insertUnorderedList', 'outdent', 'indent', 'sep',
                 'createLink', 'insertImage', 'insertVideo', 'undo', 'redo', 'html', 'sep',
-                'transclude'],
+                'transclude', 'comment'],
             inlineMode: false,
             autosaveInterval: 1000,
             contentChangedCallback: function() {
@@ -92,6 +132,14 @@ function mmsFroala(ElementService, $modal, $templateCache) { //depends on angula
                         value: 'cf'
                     },
                     callback: transcludeCallback
+                },
+                comment: {
+                    title: 'addComment',
+                    icon: {
+                        type: 'txt',
+                        value: 'c'
+                    },
+                    callback: commentCallback
                 }
             }
         });
@@ -109,7 +157,8 @@ function mmsFroala(ElementService, $modal, $templateCache) { //depends on angula
         restrict: 'A',
         require: 'ngModel',
         scope: {
-            mmsCfElements: '='
+            mmsCfElements: '=',
+            mmsEid: '@'
         },
         link: mmsFroalaLink
     };

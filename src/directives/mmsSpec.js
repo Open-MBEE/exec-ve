@@ -26,14 +26,23 @@ angular.module('mms.directives')
  * @param {Array=} mmsCfElements Array of element objects as returned by ElementService
  *      that can be transcluded into documentation or string values. Regardless, transclusion
  *      allows keyword searching elements to transclude from alfresco
+ * @param {Object=} mmsElement An element object, if this is provided, a read only 
+ *      element spec for it would be shown, this will not use mms services to get the element
  */
 function mmsSpec(ElementService, $compile, $templateCache, $modal, growl) {
     var readTemplate = $templateCache.get('mms/templates/mmsSpec.html');
     var editTemplate = $templateCache.get('mms/templates/mmsSpecEdit.html');
     
-    
-
     var mmsSpecLink = function(scope, element, attrs) {
+        if (scope.mmsElement) {
+            scope.element = scope.mmsElement;
+            if (scope.element.specialization.type === 'Property')
+                scope.values = scope.element.specialization.value;
+            element.empty();
+            element.append(readTemplate);
+            $compile(element.contents())(scope);
+            return;
+        }
         scope.$watch('mmsEid', function(newVal, oldVal) {
             if (!newVal) {
                 element.empty();
@@ -45,6 +54,8 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, growl) {
                 scope.element = data;
                 if (scope.mmsEditField === 'none' || !scope.element.editable) {
                     template = readTemplate;
+                    if (scope.element.specialization.type === 'Property')
+                        scope.values = scope.element.specialization.value;
                     element.empty();
                     element.append(template);
                     $compile(element.contents())(scope); 
@@ -72,6 +83,9 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, growl) {
             $scope.cancel = function() {
                 $modalInstance.dismiss();
             };
+            $scope.force = function() {
+                $modalInstance.close('force');
+            };
         };
 
         scope.save = function() {
@@ -79,19 +93,27 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, growl) {
             .then(function(data) {
                 growl.success("Save successful");
             }, function(reason) {
-                if (reason === 'Conflict') {
+                if (reason.status === 409) {
+                    scope.latest = reason.data.elements[0];
                     var instance = $modal.open({
                         template: $templateCache.get('mms/templates/saveConflict.html'),
                         controller: ['$scope', '$modalInstance', conflictCtrl],
+                        scope: scope,
+                        size: 'lg'
                     });
-                    instance.result.then(function() {
-                        ElementService.getElementForEdit(scope.mmsEid, true, scope.mmsWs)
-                        .then(function(data) {
+                    instance.result.then(function(choice) {
+                        if (choice === 'ok') {
+                            ElementService.getElementForEdit(scope.mmsEid, true, scope.mmsWs)
+                            .then(function(data) {
                             //scope.edit.read = data.read;
-                        }); 
+                            }); 
+                        } else {
+                            scope.edit.read = scope.latest.read;
+                            scope.save();
+                        }
                     });
                 } else {
-
+                    growl.error("Save Error: Status " + reason.status);
                 }
             });
         };
@@ -105,7 +127,8 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, growl) {
             mmsEditField: '@', //all or none or individual field
             mmsWs: '@',
             mmsVersion: '@',
-            mmsCfElements: '=' //array of element objects
+            mmsCfElements: '=', //array of element objects
+            mmsElement: '='
         },
         link: mmsSpecLink
     };

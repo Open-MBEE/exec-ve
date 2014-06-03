@@ -22,7 +22,9 @@ angular.module('mms')
 function ViewService($q, $http, URLService, ElementService, CommentService) {
     var viewElements = {"latest": {}};
     var productViews = {"latest": {}};
-
+    var currentViewId = '';
+    var currentDocumentId = '';
+    
     /**
      * @ngdoc method
      * @name mms.ViewService#getView
@@ -380,6 +382,22 @@ function ViewService($q, $http, URLService, ElementService, CommentService) {
 
     };
 
+    var setCurrentViewId = function(id) {
+        currentViewId = id;
+    };
+
+    var setCurrentDocumentId = function(id) {
+        currentDocumentId = id;
+    };
+
+    var getCurrentViewId = function() {
+        return currentViewId;
+    };
+
+    var getCurrentDocumentId = function() {
+        return currentDocumentId;
+    };
+
     return {
         getView: getView,
         getViews: getViews,
@@ -394,7 +412,11 @@ function ViewService($q, $http, URLService, ElementService, CommentService) {
         createView: createView,
         addViewToDocument: addViewToDocument,
         getDocumentViews: getDocumentViews,
-        getDocuments: getDocuments
+        getDocuments: getDocuments,
+        setCurrentViewId: setCurrentViewId,
+        setCurrentDocumentId: setCurrentDocumentId,
+        getCurrentViewId: getCurrentViewId,
+        getCurrentDocumentId: getCurrentDocumentId
     };
 
 }

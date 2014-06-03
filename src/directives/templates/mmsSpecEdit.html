@@ -1,7 +1,7 @@
 <div>Last Modified: {{element.lastModified | date:'M/d/yy h:mm a'}} by {{element.author}}</div>
 <div>Name: <input class="form-control" type="text" ng-model="edit.name"></input></div>
 <div>Documentation:</div>
-<div ng-model="edit.documentation" mms-froala mms-cf-elements="mmsCfElements"></div>
+<div ng-model="edit.documentation" mms-froala mms-cf-elements="mmsCfElements" mms-eid="{{element.sysmlid}}"></div>
 <div ng-if="edit.specialization.type === 'Property'">
     <div>Property Values:</div>
     <div ng-repeat="value in values" ng-switch on="value.type">

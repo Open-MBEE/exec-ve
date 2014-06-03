@@ -153,7 +153,8 @@ function URLService($q, $http, $location) {
     };
 
     var handleHttpStatus = function(data, status, header, config, deferred) {
-        if (status === 404)
+        deferred.reject({status: status, data: data});
+        /*if (status === 404)
             deferred.reject("Not Found");
         else if (status === 500)
             deferred.reject("Server Error");
@@ -162,7 +163,7 @@ function URLService($q, $http, $location) {
         else if (status === 409)
             deferred.reject("Conflict");
         else
-            deferred.reject("Failed");
+            deferred.reject("Failed");*/
     };
 
     var getSitesURL = function() {
