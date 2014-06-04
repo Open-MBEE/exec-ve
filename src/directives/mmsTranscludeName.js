@@ -61,7 +61,7 @@ function mmsTranscludeName(ElementService, $compile) {
 
     return {
         restrict: 'E',
-        template: '{{element.name}}',
+        template: '{{element.name || "name"}}',
         scope: {
             mmsEid: '@',
             mmsWs: '@',
