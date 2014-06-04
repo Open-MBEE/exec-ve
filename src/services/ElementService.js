@@ -26,6 +26,7 @@ function ElementService($q, $http, URLService, VersionService, _) {
     var edits = {};
     var nonEditKeys = ['contains', 'view2view', 'childrenViews', 'displayedElements',
         'allowedElements'];
+    var inProgress = {};
     /**
      * @ngdoc method
      * @name mms.ElementService#getElement
@@ -50,6 +51,10 @@ function ElementService($q, $http, URLService, VersionService, _) {
         var update = !updateFromServer ? false : updateFromServer;
         var ws = !workspace ? 'master' : workspace;
         var ver = !version ? 'latest' : version;
+        var key = 'getElement(' + id + update + ws + ver + ')';
+
+        if (inProgress.hasOwnProperty(key))
+            return inProgress[key];
 
         var deferred = $q.defer();
         if (ver === 'latest') {
@@ -59,6 +64,7 @@ function ElementService($q, $http, URLService, VersionService, _) {
                     return deferred.promise;
                 } 
             }
+            inProgress[key] = deferred.promise;
             $http.get(URLService.getElementURL(id, ws, ver))
             .success(function(data, status, headers, config) {
                 if (data.elements.length > 0) {
@@ -71,8 +77,10 @@ function ElementService($q, $http, URLService, VersionService, _) {
                 } else {
                     deferred.reject("Not Found");
                 }
+                delete inProgress[key];
             }).error(function(data, status, headers, config) {
                 URLService.handleHttpStatus(data, status, headers, config, deferred);
+                delete inProgress[key];
             });
         } else {
             return VersionService.getElementByTimestamp(id, ws, ver);
@@ -276,8 +284,17 @@ function ElementService($q, $http, URLService, VersionService, _) {
                     _.merge(elements[elem.sysmlid], resp);
                 else
                     elements[elem.sysmlid] = resp;
-                if (edits.hasOwnProperty(elem.sysmlid))
-                    _.merge(edits[elem.sysmlid], elements[elem.sysmlid]);
+                if (edits.hasOwnProperty(elem.sysmlid)) {
+                    var edit = edits[elem.sysmlid];
+                    _.merge(edit, elements[elem.sysmlid]);
+                    if (edit.hasOwnProperty('specialization')) {
+                        for (var i = 0; i < nonEditKeys.length; i++) {
+                            if (edit.specialization.hasOwnProperty(nonEditKeys[i])) {
+                                delete edit[nonEditKeys[i]];
+                            }
+                        }
+                    }
+                }
                 deferred.resolve(elements[elem.sysmlid]);
             }).error(function(data, status, headers, config) {
                 URLService.handleHttpStatus(data, status, headers, config, deferred);

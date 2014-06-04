@@ -50,13 +50,13 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, growl) {
             }
             ElementService.getElement(scope.mmsEid, false, scope.mmsWs, scope.mmsVersion)
             .then(function(data) {
+                element.empty();
                 var template = null;
                 scope.element = data;
                 if (scope.mmsEditField === 'none' || !scope.element.editable) {
                     template = readTemplate;
                     if (scope.element.specialization.type === 'Property')
                         scope.values = scope.element.specialization.value;
-                    element.empty();
                     element.append(template);
                     $compile(element.contents())(scope); 
                 } else {
@@ -68,7 +68,6 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, growl) {
                                 angular.isArray(scope.edit.specialization.value)) {
                             scope.values = scope.edit.specialization.value;
                         }
-                        element.empty();
                         element.append(template);
                         $compile(element.contents())(scope); 
                     });
