@@ -30,17 +30,20 @@ angular.module('mms.directives')
  *      element spec for it would be shown, this will not use mms services to get the element
  */
 function mmsSpec(ElementService, $compile, $templateCache, $modal, growl) {
-    var readTemplate = $templateCache.get('mms/templates/mmsSpec.html');
-    var editTemplate = $templateCache.get('mms/templates/mmsSpecEdit.html');
-    
+    //var readTemplate = $templateCache.get('mms/templates/mmsSpec.html');
+    //var editTemplate = $templateCache.get('mms/templates/mmsSpecEdit.html');
+    var template = $templateCache.get('mms/templates/mmsSpec.html');
+
     var mmsSpecLink = function(scope, element, attrs) {
+        scope.editing = false;
+        scope.editable = true;
         if (scope.mmsElement) {
             scope.element = scope.mmsElement;
             if (scope.element.specialization.type === 'Property')
                 scope.values = scope.element.specialization.value;
-            element.empty();
-            element.append(readTemplate);
-            $compile(element.contents())(scope);
+            //element.empty();
+            //element.append(readTemplate);
+            //$compile(element.contents())(scope);
             return;
         }
         scope.$watch('mmsEid', function(newVal, oldVal) {
@@ -51,25 +54,27 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, growl) {
             ElementService.getElement(scope.mmsEid, false, scope.mmsWs, scope.mmsVersion)
             .then(function(data) {
                 element.empty();
-                var template = null;
+                //var template = null;
                 scope.element = data;
+                if (scope.element.specialization.type === 'Property')
+                    scope.values = scope.element.specialization.value;
                 if (scope.mmsEditField === 'none' || !scope.element.editable) {
-                    template = readTemplate;
-                    if (scope.element.specialization.type === 'Property')
-                        scope.values = scope.element.specialization.value;
-                    element.append(template);
-                    $compile(element.contents())(scope); 
+                    scope.editable = false;
+                    //template = readTemplate;
+                    
+                    //element.append(template);
+                    //$compile(element.contents())(scope); 
                 } else {
                     ElementService.getElementForEdit(scope.mmsEid, false, scope.mmsWs)
                     .then(function(data) {
                         scope.edit = data;
-                        template = editTemplate;
+                        //template = editTemplate;
                         if (scope.edit.specialization.type === 'Property' && 
                                 angular.isArray(scope.edit.specialization.value)) {
-                            scope.values = scope.edit.specialization.value;
+                            scope.editValues = scope.edit.specialization.value;
                         }
-                        element.append(template);
-                        $compile(element.contents())(scope); 
+                        //element.append(template);
+                        //$compile(element.contents())(scope); 
                     });
                 }
             });
@@ -91,6 +96,7 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, growl) {
             ElementService.updateElement(scope.edit, scope.mmsWs)
             .then(function(data) {
                 growl.success("Save successful");
+                scope.editing = false;
             }, function(reason) {
                 if (reason.status === 409) {
                     scope.latest = reason.data.elements[0];
@@ -120,7 +126,7 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, growl) {
 
     return {
         restrict: 'E',
-        //template: template,
+        template: template,
         scope: {
             mmsEid: '@',
             mmsEditField: '@', //all or none or individual field
