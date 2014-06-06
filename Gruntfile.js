@@ -192,7 +192,7 @@ module.exports = function(grunt) {
             // /alfresco/service/javawebscripts
             // https://sheldon.jpl.nasa.gov/alfresco/wcs/javawebscripts/element/_17_0_2_3_407019f_1386871336920_707205_26285
             context: '/alfresco',  // '/api'
-            host: '128.149.16.152',//128.149.16.152',
+            host: 'europaems-dev-staging-b.jpl.nasa.gov',//128.149.16.152',
             port: 8443,
             changeOrigin: true,
             https: true,

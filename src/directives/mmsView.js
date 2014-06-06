@@ -63,7 +63,7 @@ function mmsView(ViewService, $templateCache) {
         scope.textEditable = false;
         scope.structEditable = false;
         scope.reviewing = false;
-        scope.textEdit = 'Edit Text';
+        scope.textEdit = 'Show Elements';
         scope.structEdit = 'Edit Order';
         scope.review = 'Show Comments';
         scope.sortableOptions = {
@@ -72,7 +72,7 @@ function mmsView(ViewService, $templateCache) {
         };
         scope.toggleTextEdit = function() {
             scope.textEditable = !scope.textEditable;
-            scope.textEdit = scope.textEditable ? 'Stop Text Edit' : 'Edit Text';
+            scope.textEdit = scope.textEditable ? 'Hide Elements' : 'Show Elements';
             element.toggleClass('editing');
         };
         scope.toggleStructEdit = function() {

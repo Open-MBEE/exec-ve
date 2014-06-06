@@ -33,8 +33,13 @@ angular.module('myApp')
         }
 
         function addSectionElements(element, viewNode, parentNode) {
-          for (var j = 0; j < element.specialization.contains.length; j++) {
-            var containedElement = element.specialization.contains[j];
+            var contains = null;
+            if (element.specialization)
+                contains = element.specialization.contains;
+            else
+                contains = element.contains;
+          for (var j = 0; j < contains.length; j++) {
+            var containedElement = contains[j];
             if (containedElement.type === "Section") {
               var sectionTreeNode = { label : containedElement.name, 
                     type : "section",
