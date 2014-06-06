@@ -47,13 +47,13 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, growl) {
             return;
         }
         scope.$watch('mmsEid', function(newVal, oldVal) {
-            if (!newVal) {
-                element.empty();
-                return;
-            }
+            //if (!newVal) {
+            //    element.empty();
+            //    return;
+            //}
             ElementService.getElement(scope.mmsEid, false, scope.mmsWs, scope.mmsVersion)
             .then(function(data) {
-                element.empty();
+                //element.empty();
                 //var template = null;
                 scope.element = data;
                 if (scope.element.specialization.type === 'Property')

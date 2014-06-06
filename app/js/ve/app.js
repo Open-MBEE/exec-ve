@@ -40,8 +40,10 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
                     ViewService.setCurrentViewId($stateParams.viewId);
                     $scope.vid = $stateParams.viewId;
                     $scope.viewElements = viewElements;
+                    $scope.showSpec = false;
                     $scope.tscClicked = function(elementId) {
                         $scope.eid = elementId;      //$state.go('view.element', {elementId: elementId});
+                        $scope.showSpec = true;
                         $scope.$apply();
                     };
                 }
