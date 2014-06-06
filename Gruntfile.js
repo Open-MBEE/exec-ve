@@ -7,6 +7,31 @@ module.exports = function(grunt) {
     
     pkg: grunt.file.readJSON('package.json'),
     
+    bowerInstall: {
+
+      target: {
+
+        // Point to the files that should be updated when
+        // you run `grunt bower-install`
+        src: [
+          'app/*.html'   // .html support...
+          // 'app/views/**/*.jade',   // .jade support...
+          // 'app/styles/main.scss',  // .scss & .sass support...
+          // 'app/config.yml'         // and .yml & .yaml support out of the box!
+        ],
+
+        // Optional:
+        // ---------
+        cwd: 'app',
+        dependencies: false,
+        devDependencies: false,
+        exclude: [],
+        fileTypes: {},
+        ignorePath: '',
+        overrides: {}
+      }
+    },
+
     html2js: {
       options: {
         module: 'mms.directives.tpls',
@@ -263,10 +288,11 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-stubby');
   grunt.loadNpmTasks('grunt-ngdocs');
   grunt.loadNpmTasks('grunt-html2js');
+  grunt.loadNpmTasks('grunt-bower-install');
   //grunt.loadNpmTasks('assemble');
 
   // Default task(s).  Must function before server has been stareted
-  grunt.registerTask('default', ['html2js', 'jshint:beforeconcat', 'concat', 'jshint:afterconcat', 'uglify', 'copy', 'ngdocs']);
+  grunt.registerTask('default', ['html2js', 'jshint:beforeconcat', 'concat', 'jshint:afterconcat', 'uglify', 'copy', 'ngdocs', 'bowerInstall']);
   //grunt.registerTask('stage', ['default', 'qunit', 'rsync']);
 
   grunt.registerTask('server', function(arg1) {
