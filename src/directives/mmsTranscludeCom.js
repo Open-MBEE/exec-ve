@@ -1,11 +1,11 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsTranscludeName', ['ElementService', '$compile', mmsTranscludeName]);
+.directive('mmsTranscludeCom', ['ElementService', '$compile', mmsTranscludeCom]);
 
 /**
  * @ngdoc directive
- * @name mms.directives.directive:mmsTranscludeName
+ * @name mms.directives.directive:mmsTranscludeCom
  *
  * @requires mms.ElementService
  * @requires $compile
@@ -13,23 +13,34 @@ angular.module('mms.directives')
  * @restrict E
  *
  * @description
- * Given an element id, puts in the element's name binding, if there's a parent 
- * mmsView directive, will notify parent view of transclusion on init and name change,
- * and on click
+ * Given an element id, puts in the element's documentation binding, if there's a parent 
+ * mmsView directive, will notify parent view of transclusion on init and doc change,
+ * and on click. Nested transclusions inside the documentation will also be registered.
  *
- * @param {string} mmsEid The id of the element whose name to transclude
+ * @param {string} mmsEid The id of the element whose doc to transclude
  * @param {string=master} mmsWs Workspace to use, defaults to master
  * @param {string=latest} mmsVersion Version can be alfresco version number or timestamp, default is latest
  */
-function mmsTranscludeName(ElementService, $compile) {
+function mmsTranscludeCom(ElementService, $compile) {
 
-    var mmsTranscludeNameLink = function(scope, element, attrs, mmsViewCtrl) {
+    var mmsTranscludeComLink = function(scope, element, attrs, mmsViewCtrl) {
         element.click(function(e) {
             if (!mmsViewCtrl)
                 return false;
             mmsViewCtrl.transcludeClicked(scope.mmsEid);
+            //e.stopPropagation();
             return false;
         });
+
+        var recompile = function() {
+            element.empty();
+            var doc = scope.element.documentation;
+            element.append(doc);
+            $compile(element.contents())(scope); 
+            //if (mmsViewCtrl) {
+            //    mmsViewCtrl.elementTranscluded(scope.element);
+            //}
+        };
 
         scope.$watch('mmsEid', function(newVal, oldVal) {
             if (!newVal)
@@ -46,22 +57,14 @@ function mmsTranscludeName(ElementService, $compile) {
             ElementService.getElement(scope.mmsEid, false, ws, version)
             .then(function(data) {
                 scope.element = data;
-                if (mmsViewCtrl) {
-                    mmsViewCtrl.elementTranscluded(scope.element);
-                }
+                recompile();
+                scope.$watch('element.documentation', recompile);
             });
-        });
-
-        scope.$watch('element.name', function(newVal) {
-            if (mmsViewCtrl && newVal) {
-                mmsViewCtrl.elementTranscluded(scope.element);
-            }
         });
     };
 
     return {
         restrict: 'E',
-        template: '{{element.name || "name"}}',
         scope: {
             mmsEid: '@',
             mmsWs: '@',
@@ -69,6 +72,6 @@ function mmsTranscludeName(ElementService, $compile) {
         },
         require: '?^mmsView',
         //controller: ['$scope', controller]
-        link: mmsTranscludeNameLink
+        link: mmsTranscludeComLink
     };
 }

@@ -26,6 +26,7 @@ function ElementService($q, $http, URLService, VersionService, _) {
     var edits = {};
     var nonEditKeys = ['contains', 'view2view', 'childrenViews', 'displayedElements',
         'allowedElements'];
+    var inProgress = {};
     /**
      * @ngdoc method
      * @name mms.ElementService#getElement
@@ -50,6 +51,10 @@ function ElementService($q, $http, URLService, VersionService, _) {
         var update = !updateFromServer ? false : updateFromServer;
         var ws = !workspace ? 'master' : workspace;
         var ver = !version ? 'latest' : version;
+        var key = 'getElement(' + id + update + ws + ver + ')';
+
+        if (inProgress.hasOwnProperty(key))
+            return inProgress[key];
 
         var deferred = $q.defer();
         if (ver === 'latest') {
@@ -59,6 +64,7 @@ function ElementService($q, $http, URLService, VersionService, _) {
                     return deferred.promise;
                 } 
             }
+            inProgress[key] = deferred.promise;
             $http.get(URLService.getElementURL(id, ws, ver))
             .success(function(data, status, headers, config) {
                 if (data.elements.length > 0) {
@@ -71,8 +77,10 @@ function ElementService($q, $http, URLService, VersionService, _) {
                 } else {
                     deferred.reject("Not Found");
                 }
+                delete inProgress[key];
             }).error(function(data, status, headers, config) {
                 URLService.handleHttpStatus(data, status, headers, config, deferred);
+                delete inProgress[key];
             });
         } else {
             return VersionService.getElementByTimestamp(id, ws, ver);
@@ -131,15 +139,26 @@ function ElementService($q, $http, URLService, VersionService, _) {
         else {
             getElement(id, update, ws)
             .then(function(data) {
+                var edit = null, i;
                 if (edits.hasOwnProperty(id)) {
-                    //merge?
+                    _.merge(edits[id], data);
+                    edit = edits[id];
+                    if (edit.hasOwnProperty('specialization')) {
+                        for (i = 0; i < nonEditKeys.length; i++) {
+                            if (edit.specialization.hasOwnProperty(nonEditKeys[i])) {
+                                delete edit[nonEditKeys[i]];
+                            }
+                        }
+                    }
                     deferred.resolve(edits[id]);
                 } else {
-                    var edit = _.cloneDeep(data);
+                    edit = _.cloneDeep(data);
                     edits[id] = edit;
-                    for (var i = 0; i < nonEditKeys.length; i++) {
-                        if (edit.hasOwnProperty(nonEditKeys[i])) {
-                            delete edit[nonEditKeys[i]];
+                    if (edit.hasOwnProperty('specialization')) {
+                        for (i = 0; i < nonEditKeys.length; i++) {
+                            if (edit.specialization.hasOwnProperty(nonEditKeys[i])) {
+                                delete edit[nonEditKeys[i]];
+                            }
                         }
                     }
                     deferred.resolve(edit);
@@ -218,14 +237,14 @@ function ElementService($q, $http, URLService, VersionService, _) {
             .success(function(data, status, headers, config) {
                 var result = [];
                 data[key].forEach(function(element) {
-                    if (elements.hasOwnProperty(element.id)) {
+                    if (elements.hasOwnProperty(element.sysmlid)) {
                         if (update) {
-                            _.merge(elements[element.id], element);
+                            _.merge(elements[element.sysmlid], element);
                         } 
                     } else {
-                        elements[element.id] = element;
+                        elements[element.sysmlid] = element;
                     }
-                    result.push(elements[element.id]);
+                    result.push(elements[element.sysmlid]);
                 });
                 deferred.resolve(result); 
             }).error(function(data, status, headers, config) {
@@ -255,19 +274,28 @@ function ElementService($q, $http, URLService, VersionService, _) {
         var ws = !workspace ? 'master' : workspace;
 
         var deferred = $q.defer();
-        if (!elem.hasOwnProperty('id'))
+        if (!elem.hasOwnProperty('sysmlid'))
             deferred.reject('Element id not found, create element first!');
         else {
             $http.post(URLService.getPostElementsURL(ws), {'elements': [elem]})
             .success(function(data, status, headers, config) {
                 var resp = data.elements[0];
-                if (elements.hasOwnProperty(elem.id))
-                    _.merge(elements[elem.id], resp);
+                if (elements.hasOwnProperty(elem.sysmlid))
+                    _.merge(elements[elem.sysmlid], resp);
                 else
-                    elements[elem.id] = resp;
-                if (edits.hasOwnProperty(elem.id))
-                    _.merge(edits[elem.id], elements[elem.id]);
-                deferred.resolve(elements[elem.id]);
+                    elements[elem.sysmlid] = resp;
+                if (edits.hasOwnProperty(elem.sysmlid)) {
+                    var edit = edits[elem.sysmlid];
+                    _.merge(edit, elements[elem.sysmlid]);
+                    if (edit.hasOwnProperty('specialization')) {
+                        for (var i = 0; i < nonEditKeys.length; i++) {
+                            if (edit.specialization.hasOwnProperty(nonEditKeys[i])) {
+                                delete edit[nonEditKeys[i]];
+                            }
+                        }
+                    }
+                }
+                deferred.resolve(elements[elem.sysmlid]);
             }).error(function(data, status, headers, config) {
                 URLService.handleHttpStatus(data, status, headers, config, deferred);
             });
@@ -313,11 +341,11 @@ function ElementService($q, $http, URLService, VersionService, _) {
         var ws = !workspace ? 'master' : workspace;
 
         var deferred = $q.defer();
-        if (!elem.hasOwnProperty('owner')) {
-            deferred.reject('Element create needs an owner'); //relax this?
-            return deferred.promise;
-        }
-        if (elem.hasOwnProperty('id')) {
+        //if (!elem.hasOwnProperty('owner')) {
+        //    deferred.reject('Element create needs an owner'); //relax this?
+        //    return deferred.promise;
+        //}
+        if (elem.hasOwnProperty('sysmlid')) {
             deferred.reject('Element create cannot have id');
             return deferred.promise;
         }
@@ -325,8 +353,8 @@ function ElementService($q, $http, URLService, VersionService, _) {
         .success(function(data, status, headers, config) {
             if (data.elements.length > 0) {
                 var e = data.elements[0];
-                elements[e.id] = e;
-                deferred.resolve(elements[e.id]);
+                elements[e.sysmlid] = e;
+                deferred.resolve(elements[e.sysmlid]);
             }
         }).error(function(data, status, headers, config) {
             URLService.handleHttpStatus(data, status, headers, config, deferred);
@@ -396,13 +424,13 @@ function ElementService($q, $http, URLService, VersionService, _) {
         .success(function(data, status, headers, config) {
             var result = [];
             data.elements.forEach(function(element) {
-                if (elements.hasOwnProperty(element.id)) {
+                if (elements.hasOwnProperty(element.sysmlid)) {
                     if (update)
-                        _.merge(elements[element.id], element);
+                        _.merge(elements[element.sysmlid], element);
                 } else {
-                    elements[element.id] = element;
+                    elements[element.sysmlid] = element;
                 }
-                result.push(elements[element.id]);
+                result.push(elements[element.sysmlid]);
             });
             deferred.resolve(result); 
         }).error(function(data, status, headers, config) {

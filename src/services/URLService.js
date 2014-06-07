@@ -153,14 +153,18 @@ function URLService($q, $http, $location) {
     };
 
     var handleHttpStatus = function(data, status, header, config, deferred) {
+        var result = {status: status, data: data};
         if (status === 404)
-            deferred.reject("Not Found");
+            result.message = "Not Found";
         else if (status === 500)
-            deferred.reject("Server Error");
+            result.message = "Server Error";
         else if (status === 401 || status === 403)
-            deferred.reject("Unauthorized");
+            result.message = "Permission Error";
+        else if (status === 409)
+            result.message = "Conflict";
         else
-            deferred.reject("Failed");
+            result.message = "Failed";
+        deferred.reject(result);
     };
 
     var getSitesURL = function() {

@@ -6,11 +6,15 @@
     <table class="table table-bordered">
         <tr><th>Name</th><th>Qualified Name</th><th>Type</th><th>Doc</th><th>Value (if applicable)</th></tr>
         <tr ng-repeat="elem in mmsCfElements | filter:filter">
-            <td ng-click="choose(elem.id, 'name', elem.name)" class="clickable">{{elem.name}}</td>
+            <td ng-click="choose(elem.sysmlid, 'name', elem.name)" class="clickable">{{elem.name}}</td>
             <td>{{elem.qualifiedName}}</td>
-            <td>{{elem.type}}</td>
-            <td ng-click="choose(elem.id, 'doc', elem.name)" class="clickable">{{elem.documentation | limitTo:20}}</td>
-            <td ng-click="choose(elem.id, 'val', elem.name)" class="clickable">tbd</td>
+            <td>{{elem.specialization.type || 'Element'}}</td>
+            <td ng-click="choose(elem.sysmlid, 'doc', elem.name)" class="clickable">{{elem.documentation | limitTo:20}}</td>
+            <td ng-click="choose(elem.sysmlid, 'val', elem.name)" class="clickable">
+                <span ng-repeat="val in elem.specialization.value">
+                    {{val.integer || val.double || val.boolean || val.string}}
+                </span>
+            </td>
         </tr>
     </table>
 </div>

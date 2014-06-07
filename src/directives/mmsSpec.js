@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsSpec', ['ElementService', '$compile', mmsSpec]);
+.directive('mmsSpec', ['ElementService', '$compile', '$templateCache', '$modal', 'growl', mmsSpec]);
 
 /**
  * @ngdoc directive
@@ -26,24 +26,23 @@ angular.module('mms.directives')
  * @param {Array=} mmsCfElements Array of element objects as returned by ElementService
  *      that can be transcluded into documentation or string values. Regardless, transclusion
  *      allows keyword searching elements to transclude from alfresco
+ * @param {Object=} mmsElement An element object, if this is provided, a read only 
+ *      element spec for it would be shown, this will not use mms services to get the element
  */
-function mmsSpec(ElementService, $compile) {
-    var heading = '<div>Last Modified: {{element.lastModified | date:\'M/d/yy h:mm a\'}} by {{element.author}}</div>';
-    var nameTemplate = '<div>Name: {{element.name}} </div>';
-    var nameEditTemplate = '<div>Name: <input class="form-control" type="text" ng-model="edit.name"></input></div>';
-    
-    var docTemplate = '<div>Documentation:</div><div ng-bind-html="element.documentation"></div>';
-    var docEditTemplate = '<div>Documentation:</div><div ng-model="edit.documentation" mms-froala mms-cf-elements="mmsCfElements"></div>';
-    var docEditPlain = '<div>Documentation:</div><textarea ng-model="edit.documentation"></textarea>';
-    
-    var valueStringEdit = '<div>Value:</div><div ng-repeat="val in values" ng-model="val.value" mms-froala mms-cf-elements="mmsCfElements"></div>';
-    var valueBooleanEdit = '<div>Value:</div><input ng-repeat="val in values" type="checkbox" ng-model="val.value"></input>';
-    var valueNumberEdit = '<div>Value:</div><input ng-repeat="val in values" type="number" ng-model="val.value"></input>';
-    
-    var saveTemplate = '<div><button class="btn btn-primary btn-sm" ng-click="save()">Save</button></div>';
-    var template = '';
+function mmsSpec(ElementService, $compile, $templateCache, $modal, growl) {
+    var readTemplate = $templateCache.get('mms/templates/mmsSpec.html');
+    var editTemplate = $templateCache.get('mms/templates/mmsSpecEdit.html');
     
     var mmsSpecLink = function(scope, element, attrs) {
+        if (scope.mmsElement) {
+            scope.element = scope.mmsElement;
+            if (scope.element.specialization.type === 'Property')
+                scope.values = scope.element.specialization.value;
+            element.empty();
+            element.append(readTemplate);
+            $compile(element.contents())(scope);
+            return;
+        }
         scope.$watch('mmsEid', function(newVal, oldVal) {
             if (!newVal) {
                 element.empty();
@@ -51,53 +50,70 @@ function mmsSpec(ElementService, $compile) {
             }
             ElementService.getElement(scope.mmsEid, false, scope.mmsWs, scope.mmsVersion)
             .then(function(data) {
+                element.empty();
+                var template = null;
                 scope.element = data;
-                template = '' + heading;
                 if (scope.mmsEditField === 'none' || !scope.element.editable) {
-                    template += nameTemplate + docTemplate;
-                    element.empty();
+                    template = readTemplate;
+                    if (scope.element.specialization.type === 'Property')
+                        scope.values = scope.element.specialization.value;
                     element.append(template);
                     $compile(element.contents())(scope); 
                 } else {
-                    ElementService.getElementForEdit(scope.mmsEid, false, scope.mmsWs).then(function(data) {
+                    ElementService.getElementForEdit(scope.mmsEid, false, scope.mmsWs)
+                    .then(function(data) {
                         scope.edit = data;
-                        template += nameEditTemplate + docEditTemplate;
-                        if (scope.edit.type === 'Property' && angular.isArray(scope.edit.value)) {
-                            scope.values = [];
-                            for (var i = 0; i < scope.edit.value.length; i++) {
-                                scope.values.push({value: scope.edit.value[i]});
-                            }
-                            if (scope.edit.valueType === 'LiteralString')
-                                template += valueStringEdit;
-                            else if (scope.edit.valueType === 'LiteralBoolean')
-                                template += valueBooleanEdit;
-                            else if (scope.edit.valueType === 'LiteralInteger' || 
-                                    scope.edit.valueType === 'LiteralUnlimitedNatural' ||
-                                    scope.edit.valueType === 'LiteralReal')
-                                template += valueNumberEdit;
+                        template = editTemplate;
+                        if (scope.edit.specialization.type === 'Property' && 
+                                angular.isArray(scope.edit.specialization.value)) {
+                            scope.values = scope.edit.specialization.value;
                         }
-                        template += saveTemplate;
-                        element.empty();
                         element.append(template);
                         $compile(element.contents())(scope); 
                     });
                 }
             });
         });
+
+        var conflictCtrl = function($scope, $modalInstance) {
+            $scope.ok = function() {
+                $modalInstance.close('ok');
+            };
+            $scope.cancel = function() {
+                $modalInstance.dismiss();
+            };
+            $scope.force = function() {
+                $modalInstance.close('force');
+            };
+        };
+
         scope.save = function() {
-            if (scope.edit.type === 'Property' && angular.isArray(scope.edit.value)) {
-                var i = 0;
-                for (i = 0; i < scope.values.length; i++) {
-                    if (scope.edit.value.length < i+1) {
-                        scope.edit.value.push(scope.values[i].value);
-                    } else
-                        scope.edit.value[i] = scope.values[i].value;
-                }
-                scope.edit.value.length = i;
-            }
             ElementService.updateElement(scope.edit, scope.mmsWs)
-            .then(function() {
-                
+            .then(function(data) {
+                growl.success("Save successful");
+            }, function(reason) {
+                if (reason.status === 409) {
+                    scope.latest = reason.data.elements[0];
+                    var instance = $modal.open({
+                        template: $templateCache.get('mms/templates/saveConflict.html'),
+                        controller: ['$scope', '$modalInstance', conflictCtrl],
+                        scope: scope,
+                        size: 'lg'
+                    });
+                    instance.result.then(function(choice) {
+                        if (choice === 'ok') {
+                            ElementService.getElementForEdit(scope.mmsEid, true, scope.mmsWs)
+                            .then(function(data) {
+                            //scope.edit.read = data.read;
+                            }); 
+                        } else {
+                            scope.edit.read = scope.latest.read;
+                            scope.save();
+                        }
+                    });
+                } else {
+                    growl.error("Save Error: Status " + reason.status);
+                }
             });
         };
     };
@@ -110,7 +126,8 @@ function mmsSpec(ElementService, $compile) {
             mmsEditField: '@', //all or none or individual field
             mmsWs: '@',
             mmsVersion: '@',
-            mmsCfElements: '=' //array of element objects
+            mmsCfElements: '=', //array of element objects
+            mmsElement: '='
         },
         link: mmsSpecLink
     };

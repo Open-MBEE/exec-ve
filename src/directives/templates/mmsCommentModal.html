@@ -1,0 +1,11 @@
+<div class="modal-header"><h4>Add Comment</h4></div>
+<div class="modal-body transclude-modal">
+    <div>Title: <input ng-model="comment.name" type="text"></input>
+    </div>
+    <div>Comment: <textarea ng-model="comment.documentation"></textarea>
+    </div>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-sm btn-primary" ng-click="ok(comment)">OK</button>
+    <button class="btn btn-sm btn-primary" ng-click="cancel()">Cancel</button>
+</div>

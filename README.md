@@ -1,4 +1,4 @@
-# angular-mms — angular module that contains core services, directives, filters
+# angular-mms : angular module that contains core services, directives, filters
 
 This is modified from the angular-seed project and added grunt tasks
 
@@ -17,6 +17,11 @@ The mms module sources are in src/. app/ contains an application that uses mms m
 * grunt server - does the default, plus runs a webserver at localhost:9000 and a proxy server that proxies to sheldon for any path starting with /alfresco. This allows us to test with real service endpoint
 * grunt server:stub - does the same thing as grunt server except the proxy is to a local stub server, can mock alfresco service api with stubby configurations in mocks/
 * grunt clean - deletes dist and build folders
+* The following steps will be automated soon
+  * cd into app
+   * run bower install
+  * cd into app/bower_components/angular-borderlayout/
+   * run npm install
 
 ## Testing
 TBD - the angular-seed project contains test scripts using karma, jasmine and protractor - need to figure out how to run tests on our src

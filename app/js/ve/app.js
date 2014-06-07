@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.borderLayout', 'ui.bootstrap', 'ui.tree'])
+angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.borderLayout', 'ui.bootstrap', 'ui.tree', 'angular-growl'])
 .config(function($stateProvider, $urlRouterProvider) {
     $stateProvider
     .state('doc', {
@@ -26,18 +26,18 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
                 }
             },
             'sidebar': {
-                templateUrl: 'partials/sidebar.html',
+                templateUrl: 'partials/ve/sidebar.html',
                 controller: 'NavTreeCtrl'
             }
         }
-
     })
     .state('doc.view', {
         url: '/view/:viewId',
         views: {
             'view@': {
-                templateUrl: 'partials/view.html',
-                controller: function($scope, $stateParams, $state, viewElements) {
+                templateUrl: 'partials/ve/view.html',
+                controller: function($scope, $stateParams, $state, viewElements, ViewService) {
+                    ViewService.setCurrentViewId($stateParams.viewId);
                     $scope.vid = $stateParams.viewId;
                     $scope.viewElements = viewElements;
                     $scope.tscClicked = function(elementId) {
@@ -57,7 +57,7 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
         url: '/order',
         views: {
             'view@': {
-                templateUrl: 'partials/reorder-views.html',
+                templateUrl: 'partials/ve/reorder-views.html',
                 controller: 'ReorderCtrl'
             }
         }

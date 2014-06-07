@@ -1,11 +1,11 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsFroala', ['ElementService', 'ViewService', '$modal', '$templateCache', mmsFroala]);
+.directive('mmsRedactor', ['ElementService', 'ViewService', '$modal', '$templateCache', mmsRedactor]);
 
 /**
  * @ngdoc directive
- * @name mms.directives.directive:mmsFroala
+ * @name mms.directives.directive:mmsRedactor
  *
  * @requires mms.ElementService
  * @requires mms.ViewService
@@ -22,9 +22,9 @@ angular.module('mms.directives')
  *      that can be transcluded. Regardless, transclusion allows keyword searching 
  *      elements to transclude from alfresco
  */
-function mmsFroala(ElementService, ViewService, $modal, $templateCache) { //depends on angular bootstrap
+function mmsRedactor(ElementService, ViewService, $modal, $templateCache) { //depends on angular bootstrap
     
-    var mmsFroalaLink = function(scope, element, attrs, ngModelCtrl) {
+    var mmsRedactorLink = function(scope, element, attrs, ngModelCtrl) {
         var transcludeModalTemplate = $templateCache.get('mms/templates/mmsCfModal.html');
         var commentModalTemplate = $templateCache.get('mms/templates/mmsCommentModal.html');
 
@@ -68,8 +68,8 @@ function mmsFroala(ElementService, ViewService, $modal, $templateCache) { //depe
             };
         };
 
-        var transcludeCallback = function(editor) {
-            editor.saveSelection(); //this is needed to preserve editor selection used by insertHTML
+        var transcludeCallback = function() {
+            element.redactor('selectionSave'); //this is needed to preserve element.redactor(selection used by insertHTML
             var instance = $modal.open({
                 template: transcludeModalTemplate,
                 scope: scope,
@@ -77,16 +77,16 @@ function mmsFroala(ElementService, ViewService, $modal, $templateCache) { //depe
                 size: 'lg'
             });
             instance.result.then(function(tag) {
-                editor.restoreSelection();
-                editor.saveUndoStep();
-                editor.insertHTML(tag);
-                editor.saveUndoStep();
-                editor.sync();
+                element.redactor('selectionRestore');
+                //element.redactor(saveUndoStep();
+                element.redactor('insertHtml', tag);
+                //element.redactor(saveUndoStep();
+                //element.redactor(sync();
             });
         };
 
-        var commentCallback = function(editor) {
-            editor.saveSelection();
+        var commentCallback = function() {
+            element.redactor('selectionSave');
             var instance = $modal.open({
                 template: commentModalTemplate,
                 scope: scope,
@@ -98,64 +98,46 @@ function mmsFroala(ElementService, ViewService, $modal, $templateCache) { //depe
                 ElementService.createElement(comment)
                 .then(function(data) {
                     var tag = '<mms-transclude-com data-mms-eid="' + data.sysmlid + '">comment</mms-transclude-com>';
-                    editor.restoreSelection();
-                    editor.saveUndoStep();
-                    editor.insertHTML(tag);
-                    editor.saveUndoStep();
-                    editor.sync();
+                    element.redactor('selectionRestore');
+                    //element.redactor(saveUndoStep();
+                    element.redactor('insertHtml', tag);
+                    //element.redactor(saveUndoStep();
+                    //element.redactor(sync();
                 });
             });
         };
 
-        function read() {
-            var html = element.editable("getHTML"); 
-            if (angular.isArray(html))
-                html = html.join('');
+        function read(html) {
+            //var html = element.editable("getHTML"); 
+            //if (angular.isArray(html))
+            //    html = html.join('');
             ngModelCtrl.$setViewValue(html);
         }
 
         element.html(ngModelCtrl.$viewValue);
 
-        element.editable({
-            buttons: ['bold', 'italic', 'underline', 'strikethrough', 'fontsize', 'color', 'sep',
-                'formatBlock', 'align', 'insertOrderedList', 'insertUnorderedList', 'outdent', 'indent', 'sep',
-                'createLink', 'insertImage', 'insertVideo', 'undo', 'redo', 'html', 'sep',
-                'transclude', 'comment'],
-            inlineMode: false,
-            autosaveInterval: 1000,
-            contentChangedCallback: function() {
-                //scope.$apply(read);
-                read();
-            },
+        element.redactor({
+            buttons: ['html', 'formatting',  'bold', 'italic', 'underline', 'deleted', 
+                        'unorderedlist', 'orderedlist', 'outdent', 'indent', 
+                        'image', 'video', 'file', 'table', 'link', 'alignment', 
+                        'horizontalrule'],
+            changeCallback: read,
+            maxHeight: 300,
             imageUploadURL: '', //prevent default upload to public url
-            placeholder: 'Placeholder, currently empty',
-            spellcheck: true,
-            customButtons: {
-                transclude: {
-                    title: 'crossReference',
-                    icon: {
-                        type: 'txt',
-                        value: 'cf'
-                    },
-                    callback: transcludeCallback
-                },
-                comment: {
-                    title: 'addComment',
-                    icon: {
-                        type: 'txt',
-                        value: 'c'
-                    },
-                    callback: commentCallback
-                }
-            }
+            placeholder: "Placeholder"
         });
 
+        element.redactor('buttonAdd', 'transclude', 'Cross-Reference', transcludeCallback);
+        element.redactor('buttonAwesome', 'transclude', 'fa-paperclip');
+        element.redactor('buttonAdd', 'comment', 'Comment', commentCallback);
+        element.redactor('buttonAwesome', 'comment', 'fa-file-text');
+
         ngModelCtrl.$render = function() {
-            element.editable("setHTML", ngModelCtrl.$viewValue || '');
+            element.redactor("set", ngModelCtrl.$viewValue || '');
         };
 
         scope.$on('$destroy', function() {
-            element.editable("destroy");
+            element.redactor("destroy");
         });
     };
 
@@ -166,6 +148,6 @@ function mmsFroala(ElementService, ViewService, $modal, $templateCache) { //depe
             mmsCfElements: '=',
             mmsEid: '@'
         },
-        link: mmsFroalaLink
+        link: mmsRedactorLink
     };
 }

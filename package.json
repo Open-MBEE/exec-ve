@@ -22,6 +22,7 @@
     "grunt-connect-proxy": "~0.1.10",
     "grunt-stubby": "~0.1.4",
     "grunt-ngdocs": "~0.2.2",
-    "grunt-html2js": "~0.2.5"
+    "grunt-html2js": "~0.2.5",
+    "grunt-bower-install": "^1.6.0"
   }
 }

@@ -18,7 +18,10 @@ function VersionService($q, $http, URLService) {
     var elements = {};
 
     var isTimestamp = function(version) {
-        return isNaN(version); //this may be unreliable
+        if (String(version).indexOf('-') >= 0)
+            return true;
+        return false;
+        //return isNaN(version); //this may be unreliable
     };
 
     /**

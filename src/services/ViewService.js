@@ -22,7 +22,9 @@ angular.module('mms')
 function ViewService($q, $http, URLService, ElementService, CommentService) {
     var viewElements = {"latest": {}};
     var productViews = {"latest": {}};
-
+    var currentViewId = '';
+    var currentDocumentId = '';
+    
     /**
      * @ngdoc method
      * @name mms.ViewService#getView
@@ -298,13 +300,13 @@ function ViewService($q, $http, URLService, ElementService, CommentService) {
     var addViewToDocument = function(viewId, documentId, parentViewId, workspace) {
         var deferred = $q.defer();
         getDocument(documentId, workspace).then(function(data) {   
-            for (var i = 0; i < data.view2view.length; i++) {
-                if (data.view2view[i].id === parentViewId) {
-                    data.view2view[i].childrenViews.push(viewId);
+            for (var i = 0; i < data.specialization.view2view.length; i++) {
+                if (data.specialization.view2view[i].id === parentViewId) {
+                    data.specialization.view2view[i].childrenViews.push(viewId);
                     break;
                 }
             } 
-            data.view2view.push({id: viewId, childrenViews: []});
+            data.specialization.view2view.push({id: viewId, childrenViews: []});
             updateDocument(data, workspace).then(function(data2) {
                 deferred.resolve(data);
             }, function(reason) {
@@ -338,28 +340,28 @@ function ViewService($q, $http, URLService, ElementService, CommentService) {
     var createView = function(ownerId, name, documentId, workspace) {
         var deferred = $q.defer();
         var view = {
-            type: 'View',
+            specialization: {type: 'View', contains: []},
             owner: ownerId,
             name: (name === undefined || name === null) ? 'Untitled View' : name,
             documentation: '',
         };
         ElementService.createElement(view, workspace)
         .then(function(data) {
-            data.contains = [
+            data.specialization.contains = [
                 {
                     'type': 'Paragraph', 
                     'sourceType': 'reference', 
-                    'source': data.id, 
+                    'source': data.sysmlid, 
                     'sourceProperty': 'documentation'
                 }
             ];
-            data.allowedElements = [data.id];
-            data.displayedElements = [data.id];
-            data.childrenViews = [];
+            data.specialization.allowedElements = [data.sysmlid];
+            data.specialization.displayedElements = [data.sysmlid];
+            data.specialization.childrenViews = [];
             ElementService.updateElement(data, workspace)
             .then(function(data2) {
                 if (documentId !== undefined) {
-                    addViewToDocument(data.id, documentId, ownerId, workspace)
+                    addViewToDocument(data.sysmlid, documentId, ownerId, workspace)
                     .then(function(data3) {
                         deferred.resolve(data2);
                     }, function(reason) {
@@ -376,6 +378,26 @@ function ViewService($q, $http, URLService, ElementService, CommentService) {
         return deferred.promise;
     };
 
+    var getDocuments = function(workspace, site) {
+
+    };
+
+    var setCurrentViewId = function(id) {
+        currentViewId = id;
+    };
+
+    var setCurrentDocumentId = function(id) {
+        currentDocumentId = id;
+    };
+
+    var getCurrentViewId = function() {
+        return currentViewId;
+    };
+
+    var getCurrentDocumentId = function() {
+        return currentDocumentId;
+    };
+
     return {
         getView: getView,
         getViews: getViews,
@@ -389,7 +411,12 @@ function ViewService($q, $http, URLService, ElementService, CommentService) {
         updateViewElements: updateViewElements,
         createView: createView,
         addViewToDocument: addViewToDocument,
-        getDocumentViews: getDocumentViews
+        getDocumentViews: getDocumentViews,
+        getDocuments: getDocuments,
+        setCurrentViewId: setCurrentViewId,
+        setCurrentDocumentId: setCurrentDocumentId,
+        getCurrentViewId: getCurrentViewId,
+        getCurrentDocumentId: getCurrentDocumentId
     };
 
 }

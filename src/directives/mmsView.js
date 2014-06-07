@@ -62,8 +62,10 @@ function mmsView(ViewService, $templateCache) {
         });
         scope.textEditable = false;
         scope.structEditable = false;
+        scope.reviewing = false;
         scope.textEdit = 'Edit Text';
         scope.structEdit = 'Edit Order';
+        scope.review = 'Show Comments';
         scope.sortableOptions = {
             cancel: 'div',
             axis: 'y'
@@ -78,6 +80,11 @@ function mmsView(ViewService, $templateCache) {
             scope.structEdit = scope.structEditable ? 'Stop Order Edit' : 'Edit Order';
             element.find('.ui-sortable').sortable('option', 'cancel', scope.structEditable ? '' : 'div');
         };
+        scope.toggleReview = function() {
+            scope.reviewing = !scope.reviewing;
+            scope.review = scope.reviewing ? 'Hide Comments' : 'Show Comments';
+            element.toggleClass('reviewing');
+        };
     };
 
     return {
@@ -87,7 +94,8 @@ function mmsView(ViewService, $templateCache) {
             mmsVid: '@',
             mmsWs: '@',
             mmsVersion: '@',
-            mmsCfClicked: '&'
+            mmsCfClicked: '&',
+            mmsOrder: '='
         },
         controller: ['$scope', 'ViewService', mmsViewCtrl],
         link: mmsViewLink

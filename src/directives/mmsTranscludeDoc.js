@@ -35,6 +35,8 @@ function mmsTranscludeDoc(ElementService, $compile) {
         var recompile = function() {
             element.empty();
             var doc = scope.element.documentation;
+            if (!doc)
+                doc = '<p class="placeholder">documentation placeholder</p>';
             element.append(doc);
             $compile(element.contents())(scope); 
             if (mmsViewCtrl) {
