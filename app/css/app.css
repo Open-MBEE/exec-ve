@@ -44,8 +44,8 @@ mms-view.editing mms-transclude-doc,
 mms-view.editing mms-transclude-name,
 mms-view.editing mms-transclude-val {
   color: #000;
-  background-color: #C5C5C5;
-  border-radius: 2px;
+  background-color: #C6C6C6;
+  border-radius: 3px;
   cursor: text;
 }
 
@@ -53,8 +53,8 @@ mms-view.editing mms-transclude-doc *,
 mms-view.editing mms-transclude-name *,
 mms-view.editing mms-transclude-val * {
   color: #000;
-  background-color: #E3E3E3;
-  border-radius: 2px;
+  background-color: #EAEAEA;
+  border-radius: 3px;
   cursor: text;
 }
 
