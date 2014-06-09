@@ -3,7 +3,8 @@
 /* Controllers */
 
 angular.module('myApp')
-.controller('NavTreeCtrl', function($scope, $state, $stateParams, ElementService, ViewService) {
+.controller('NavTreeCtrl', ['$scope', '$state', '$stateParams', 'ElementService', 'ViewService', 'growl',
+function($scope, $state, $stateParams, ElementService, ViewService, growl) {
     $scope.documentid = $stateParams.docId;
     var tree = {};
 
@@ -11,7 +12,8 @@ angular.module('myApp')
       // 2. Call get element ids and create a map of element id -> element name structure
       // 3. Iterate over view2view and create a map of element id -> element tree node reference
       
-    ViewService.getDocument($scope.documentid).then(function(data) {
+    ViewService.getDocument($scope.documentid)
+    .then(function(data) {
 
         // Array of all the view element ids
         var viewElementIds = [];
@@ -56,7 +58,8 @@ angular.module('myApp')
         };
 
         // Call the get element service and pass in all the elements
-        ElementService.getElements(viewElementIds).then(function(elements) {
+        ElementService.getElements(viewElementIds)
+        .then(function(elements) {
 
           // Fill out all the view names first
           for (var i = 0; i < elements.length; i++) {
@@ -122,8 +125,9 @@ angular.module('myApp')
             });
         });
     };
-})
-.controller('ReorderCtrl', function($scope, document, ElementService, ViewService, $state, growl) {
+}])
+.controller('ReorderCtrl', ['$scope', 'document', 'ElementService', 'ViewService', '$state', 'growl',
+function($scope, document, ElementService, ViewService, $state, growl) {
     $scope.doc = document;
     var viewElementIds = [];
     var viewElementIds2TreeNodeMap = {};
@@ -133,7 +137,8 @@ angular.module('myApp')
         var viewId = document.specialization.view2view[i].id;
         viewElementIds.push(viewId);
     }
-    ElementService.getElements(viewElementIds).then(function(elements) {
+    ElementService.getElements(viewElementIds)
+    .then(function(elements) {
         for (var i = 0; i < elements.length; i++) {
             var viewTreeNode = { 
                 id: elements[i].sysmlid, 
@@ -162,9 +167,12 @@ angular.module('myApp')
             newView2View.push(viewObject);
         }
         document.specialization.view2view = newView2View;
-        ViewService.updateDocument(document).then(function(data) {
+        ViewService.updateDocument(document)
+        .then(function(data) {
             growl.success('Reorder Successful');
             $state.go('doc', {}, {reload:true});
+        }, function(reason) {
+            growl.error('Reorder Save Error: ' + reason.message);
         });
     };
-});
+}]);
