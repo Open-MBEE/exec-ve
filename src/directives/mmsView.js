@@ -47,6 +47,9 @@ function mmsView(ViewService, $templateCache, growl) {
                 version: $scope.mmsVersion
             };
         };
+        this.getStructEditable = function() {
+            return $scope.structEditable;
+        };
     };
 
     var mmsViewLink = function(scope, element, attrs) {
