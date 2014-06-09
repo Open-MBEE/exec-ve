@@ -138,21 +138,21 @@ function mmsRedactor(ElementService, ViewService, $modal, $templateCache, growl)
         });
 
         element.redactor('buttonAdd', 'transclude', 'Cross-Reference', transcludeCallback);
-        element.redactor('buttonAwesome', 'transclude', 'fa-paperclip');
+        element.redactor('buttonAwesome', 'transclude', 'fa-asterisk');
         element.redactor('buttonAdd', 'comment', 'Comment', commentCallback);
-        element.redactor('buttonAwesome', 'comment', 'fa-file-text');
+        element.redactor('buttonAwesome', 'comment', 'fa-comment');
         element.redactor('buttonAdd', 'undo', 'Undo', function() {
             //element.redactor('execCommand', 'undo');
             element.redactor('bufferUndo');
             element.redactor('sync');
         });
-        element.redactor('buttonAwesome', 'undo', 'fa-undo');
+        //element.redactor('buttonAwesome', 'undo', 'fa-undo');
         element.redactor('buttonAdd', 'redo', 'Redo', function() {
             //element.redactor('execCommand', 'redo');
             element.redactor('bufferRedo');
             element.redactor('sync');
         });
-        element.redactor('buttonAwesome', 'redo', 'fa-repeat');
+        //element.redactor('buttonAwesome', 'redo', 'fa-repeat');
         ngModelCtrl.$render = function() {
             element.redactor("set", ngModelCtrl.$viewValue || '');
         };
