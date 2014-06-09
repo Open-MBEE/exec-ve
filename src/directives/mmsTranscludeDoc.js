@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsTranscludeDoc', ['ElementService', '$compile', mmsTranscludeDoc]);
+.directive('mmsTranscludeDoc', ['ElementService', '$compile', 'growl', mmsTranscludeDoc]);
 
 /**
  * @ngdoc directive
@@ -21,7 +21,7 @@ angular.module('mms.directives')
  * @param {string=master} mmsWs Workspace to use, defaults to master
  * @param {string=latest} mmsVersion Version can be alfresco version number or timestamp, default is latest
  */
-function mmsTranscludeDoc(ElementService, $compile) {
+function mmsTranscludeDoc(ElementService, $compile, growl) {
 
     var mmsTranscludeDocLink = function(scope, element, attrs, mmsViewCtrl) {
         element.click(function(e) {
@@ -61,6 +61,8 @@ function mmsTranscludeDoc(ElementService, $compile) {
                 scope.element = data;
                 recompile();
                 scope.$watch('element.documentation', recompile);
+            }, function(reason) {
+                growl.error('Cf Doc Error: ' + reason.message);
             });
         });
     };

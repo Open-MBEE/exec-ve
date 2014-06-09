@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsTranscludeName', ['ElementService', '$compile', mmsTranscludeName]);
+.directive('mmsTranscludeName', ['ElementService', '$compile', 'growl', mmsTranscludeName]);
 
 /**
  * @ngdoc directive
@@ -21,7 +21,7 @@ angular.module('mms.directives')
  * @param {string=master} mmsWs Workspace to use, defaults to master
  * @param {string=latest} mmsVersion Version can be alfresco version number or timestamp, default is latest
  */
-function mmsTranscludeName(ElementService, $compile) {
+function mmsTranscludeName(ElementService, $compile, growl) {
 
     var mmsTranscludeNameLink = function(scope, element, attrs, mmsViewCtrl) {
         element.click(function(e) {
@@ -49,6 +49,8 @@ function mmsTranscludeName(ElementService, $compile) {
                 if (mmsViewCtrl) {
                     mmsViewCtrl.elementTranscluded(scope.element);
                 }
+            }, function(reason) {
+                growl.error('Cf Name Error: ' + reason.message);
             });
         });
 

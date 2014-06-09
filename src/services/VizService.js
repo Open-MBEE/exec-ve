@@ -26,7 +26,7 @@ function VizService($q, $http, URLService) {
      * @param {string} id The id of the Magicdraw diagram.
      * @returns {Promise} The promise will be resolved with the latest image url
      */
-    var getImageURL = function(id) {
+    var getImageURL = function(id, version) {
         var deferred = $q.defer();
         return deferred.promise;
     };

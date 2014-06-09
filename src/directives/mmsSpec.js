@@ -41,21 +41,23 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, growl) {
             scope.element = scope.mmsElement;
             if (scope.element.specialization.type === 'Property')
                 scope.values = scope.element.specialization.value;
+            scope.editable = false;
             //element.empty();
             //element.append(readTemplate);
             //$compile(element.contents())(scope);
             return;
         }
         scope.$watch('mmsEid', function(newVal, oldVal) {
-            //if (!newVal) {
-            //    element.empty();
-            //    return;
-            //}
+            if (!newVal) {
+                //element.empty();
+                return;
+            }
             ElementService.getElement(scope.mmsEid, false, scope.mmsWs, scope.mmsVersion)
             .then(function(data) {
                 //element.empty();
                 //var template = null;
                 scope.element = data;
+                scope.editing = false;
                 if (scope.element.specialization.type === 'Property')
                     scope.values = scope.element.specialization.value;
                 if (scope.mmsEditField === 'none' || !scope.element.editable) {
@@ -68,6 +70,7 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, growl) {
                     ElementService.getElementForEdit(scope.mmsEid, false, scope.mmsWs)
                     .then(function(data) {
                         scope.edit = data;
+                        scope.editable = true;
                         //template = editTemplate;
                         if (scope.edit.specialization.type === 'Property' && 
                                 angular.isArray(scope.edit.specialization.value)) {
@@ -77,6 +80,8 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, growl) {
                         //$compile(element.contents())(scope); 
                     });
                 }
+            }, function(reason) {
+                growl.error("Getting Element Error: " + reason.message);
             });
         });
 
@@ -89,6 +94,9 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, growl) {
             };
             $scope.force = function() {
                 $modalInstance.close('force');
+            };
+            $scope.merge = function() {
+                $modalInstance.close('merge');
             };
         };
 
@@ -110,9 +118,24 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, growl) {
                         if (choice === 'ok') {
                             ElementService.getElementForEdit(scope.mmsEid, true, scope.mmsWs)
                             .then(function(data) {
-                            //scope.edit.read = data.read;
+                                growl.info("Element Updated to Latest");
+                            }, function(reason) {
+                                growl.error("Element Update Error: " + reason.message);
                             }); 
-                        } else {
+                        } else if (choice === 'merge') { 
+                            ElementService.getElement(scope.mmsEid, true, scope.mmsWs)
+                            .then(function(data) {
+                                var currentEdit = scope.edit;
+                                if (data.name !== currentEdit.name)
+                                    currentEdit.name = data.name + ' MERGE ' + currentEdit.name;
+                                if (data.documentation !== currentEdit.documentation)
+                                    currentEdit.documentation = data.documentation + '<p>MERGE</p>' + currentEdit.documentation;
+                                currentEdit.read = data.read;
+                                growl.info("Element name and doc merged");
+                            }, function(reason2) {
+                                growl.error("Merge error: " + reason2.message);
+                            });
+                        } else if (choice === 'force') {
                             scope.edit.read = scope.latest.read;
                             scope.save();
                         }

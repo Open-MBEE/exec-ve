@@ -100,6 +100,10 @@ function URLService($q, $http, $location) {
         return root + "/javawebscripts/elements/" + id;
     };
 
+    var getElementVersionsURL = function(id, workspace) {
+        return root + "/javawebscripts/elements/" + id + "/versions";
+    };
+
     /**
      * @ngdoc method
      * @name mms.URLService#getPostElementsURL
@@ -180,6 +184,7 @@ function URLService($q, $http, $location) {
         setRoot: setRoot,
         getSiteDashboardURL: getSiteDashboardURL,
         getElementURL: getElementURL,
+        getElementVersionsURL: getElementVersionsURL,
         getPostElementsURL: getPostElementsURL,
         getPostViewsURL: getPostViewsURL,
         getPostDocumentsURL: getPostDocumentsURL,

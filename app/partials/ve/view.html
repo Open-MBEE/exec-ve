@@ -2,7 +2,7 @@
     <tabset>
         <tab heading="Element">
             <div class="container-fluid" ng-show="showSpec">
-                <mms-spec mms-eid="{{eid}}" mms-cf-elements="viewElements" mms-edit-field="all"></mms-spec>
+                <mms-spec mms-eid="{{eid}}" mms-cf-elements="viewElements" mms-edit-field="all" mms-version="{{version}}"></mms-spec>
             </div>
         </tab>
        <!-- <tab heading="History">
@@ -17,7 +17,7 @@
     <tabset>
         <tab heading="View">
             <div class="container-fluid">
-                <mms-view mms-vid="{{vid}}" mms-cf-clicked="tscClicked(elementId)" mms-order="false"></mms-view>
+                <mms-view mms-vid="{{vid}}" mms-cf-clicked="tscClicked(elementId)" mms-order="false" mms-version="{{version}}"></mms-view>
             </div>
         </tab>
     </tabset>

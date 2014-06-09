@@ -14,6 +14,9 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
             },
             views: function($stateParams, ViewService) {
                 return ViewService.getDocumentViews($stateParams.docId, false, 'master', $stateParams.time);
+            },
+            time: function($stateParams) {
+                return $stateParams.time;
             }
         },
         views: {
@@ -36,11 +39,12 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
         views: {
             'view@': {
                 templateUrl: 'partials/ve/view.html',
-                controller: function($scope, $stateParams, $state, viewElements, ViewService) {
+                controller: function($scope, $stateParams, $state, viewElements, ViewService, time) {
                     ViewService.setCurrentViewId($stateParams.viewId);
                     $scope.vid = $stateParams.viewId;
                     $scope.viewElements = viewElements;
                     $scope.showSpec = false;
+                    $scope.version = time;
                     $scope.tscClicked = function(elementId) {
                         $scope.eid = elementId;      //$state.go('view.element', {elementId: elementId});
                         $scope.showSpec = true;
@@ -50,8 +54,8 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
             }
         },
         resolve: {
-            viewElements: function($stateParams, ViewService) {
-                return ViewService.getViewElements($stateParams.viewId, false, 'master', $stateParams.time);
+            viewElements: function($stateParams, ViewService, time) {
+                return ViewService.getViewElements($stateParams.viewId, false, 'master', time);
             }
         }
     })
