@@ -259,6 +259,12 @@
               b.expanded = b.level < expand_level;
               return b.expanded;
             });
+            scope.expand_all = function() {
+                  return for_each_branch(function(b, level) {
+                    b.expanded = true;
+                    return b.expanded;
+                  });
+                };
             if (scope.treeControl !== null && scope.treeControl !== undefined) {
               if (angular.isObject(scope.treeControl)) {
                 tree = scope.treeControl;

@@ -47,7 +47,7 @@ function mmsTranscludeVal(ElementService, $compile, $templateCache, growl) {
             } 
             element.empty();
             if (areStrings) {
-                var toCompile = toCompileList.join(', ');
+                var toCompile = toCompileList.join(' ');
                 element.append(toCompile);
                 $compile(element.contents())(scope); 
             } else {

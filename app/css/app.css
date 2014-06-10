@@ -279,6 +279,9 @@ accordion a.docweb-link {
   padding-left: 10px; 
 }
 
+mms-view:not(.editing) .placeholder {
+  display: none;
+}
 
 mms-view:not(.reviewing) mms-transclude-com {
   display: none;

@@ -132,7 +132,7 @@ function mmsRedactor(ElementService, ViewService, $modal, $templateCache, growl)
                         'horizontalrule'],
             plugins: ['fontcolor'],
             changeCallback: read,
-            maxHeight: 300,
+            maxHeight: 230,
             imageUploadURL: '', //prevent default upload to public url
             placeholder: "Placeholder"
         });
