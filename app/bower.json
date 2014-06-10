@@ -26,7 +26,7 @@
     "angular-ui-router": "~0.2.10",
     "angular-ui-sortable": "bower",
     "froala": "v1.1.5",
-    "angular-borderlayout": "master",
+    "angular-borderlayout": "https://github.com/dlamoris/angular-borderlayout.git",
     "angular-ui-bootstrap-bower": "~0.11.0",
     "lodash": "~2.4.1",
     "angular-bootstrap-nav-tree": "*",
