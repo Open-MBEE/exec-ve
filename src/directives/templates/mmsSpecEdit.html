@@ -8,7 +8,7 @@
         <div ng-switch-when="LiteralInteger"><input type="number" ng-model="value.integer"></input></div>
         <div ng-switch-when="LiteralBoolean"><input type="checkbox" ng-model="value.boolean"></input></div>
         <div ng-switch-when="LiteralReal"><input type="number" ng-model="value.double" step="any"></input></div>
-        <div ng-switch-when="LiteralString"><div mms-redactor mms-cf-elements="mmsCfElements" mms-eid="{{element.sysmlid}}"></div></div>
+        <div ng-switch-when="LiteralString"><div mms-redactor ng-model="value.string" mms-cf-elements="mmsCfElements" mms-eid="{{element.sysmlid}}"></div></div>
     </div>
 </div>
 <div>Type: {{element.specialization.type || 'Element'}}</div>

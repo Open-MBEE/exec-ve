@@ -32,7 +32,7 @@ function mmsRedactor(ElementService, ViewService, $modal, $templateCache, growl)
             $scope.filter = '';
             $scope.searchText = '';
             $scope.choose = function(elementId, property, name) {
-                var tag = '<mms-transclude-' + property + ' data-mms-eid="' + elementId + '">[cf:' + name + '.' + property + ']</mms-transclude-' + property + '>';
+                var tag = '<mms-transclude-' + property + ' data-mms-eid="' + elementId + '">[cf:' + name + '.' + property + ']</mms-transclude-' + property + '> ';
                 $modalInstance.close(tag);
             };
             $scope.cancel = function() {
@@ -103,7 +103,7 @@ function mmsRedactor(ElementService, ViewService, $modal, $templateCache, growl)
                     comment.owner = ViewService.getCurrentViewId();
                 ElementService.createElement(comment)
                 .then(function(data) {
-                    var tag = '<mms-transclude-com data-mms-eid="' + data.sysmlid + '">comment</mms-transclude-com>';
+                    var tag = '<mms-transclude-com data-mms-eid="' + data.sysmlid + '">comment</mms-transclude-com> ';
                     element.redactor('selectionRestore');
                     //element.redactor(saveUndoStep();
                     element.redactor('bufferSet');
