@@ -22,6 +22,7 @@ angular.module('mms')
 function ViewService($q, $http, URLService, ElementService, CommentService) {
     var viewElements = {"latest": {}};
     var productViews = {"latest": {}};
+    var products = {"latest": {}};
     var currentViewId = '';
     var currentDocumentId = '';
     
@@ -378,8 +379,30 @@ function ViewService($q, $http, URLService, ElementService, CommentService) {
         return deferred.promise;
     };
 
-    var getDocuments = function(workspace, site) {
+    var getDocuments = function(workspace, site, updateFromServer, version) {
+        var update = !updateFromServer ? false : updateFromServer;
+        var ws = !workspace ? 'master' : workspace;
+        var ver = !version ? 'latest' : version;
 
+        var deferred = $q.defer();
+        var url = URLService.getProductURL(workspace, site);
+        if (products.hasOwnProperty(ver) && products[ver].hasOwnProperty(site) && !update) 
+            deferred.resolve(products[ver][site]);
+        else {
+            ElementService.getGenericElements(url, 'products', update, ws, ver).
+            then(function(data) {
+                if (products.hasOwnProperty(ver)) {
+                    products[ver][site] = data;
+                } else {
+                    products[ver] = {};
+                    products[ver][site] = data;
+                }
+                deferred.resolve(products[ver][site]);
+            }, function(reason) {
+                deferred.reject(reason);
+            });
+        }
+        return deferred.promise;
     };
 
     var setCurrentViewId = function(id) {

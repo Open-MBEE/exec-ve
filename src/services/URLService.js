@@ -47,12 +47,24 @@ function URLService($q, $http, $location) {
         return root;
     };
 
-    var getSnapshotURL = function(id) {
-        
+    var getConfigSnapshotURL = function(workspace, site, configId) {
+        return root + "/workspaces/" + workspace + "/sites/" + site + "/configurations/" + configId + "/snapshots";                
     };
 
-    var getTagURL = function(id) {
+    var getProductSnapshotURL = function(workspace, site, prodId) {
+        return root + "/workspaces/" + workspace + "/sites/" + site + "/products/" + prodId + "/snapshots";                
+    };
 
+    var getConfigsURL = function(workspace, site) {
+        return root + "/workspaces/" + workspace + "/sites/" + site + "/configurations";
+    };
+
+    var getConfigURL = function(workspace, site, configId) {
+        return root + "/workspaces/" + workspace + "/sites/" + site + "/configurations/" + configId;
+    };
+
+    var getProductURL = function(workspace, site) {
+        return root + "/workspaces/" + workspace + "/sites/" + site + "/products";
     };
 
     /**
@@ -192,7 +204,12 @@ function URLService($q, $http, $location) {
         getDocumentURL: getDocumentURL,
         handleHttpStatus: handleHttpStatus,
         getSitesURL: getSitesURL,
-        getElementSearchURL: getElementSearchURL
+        getElementSearchURL: getElementSearchURL,
+        getProductSnapshotURL: getProductSnapshotURL,
+        getConfigSnapshotURL: getConfigSnapshotURL,
+        getProductURL: getProductURL,
+        getConfigURL: getConfigURL,
+        getConfigsURL: getConfigsURL
     };
 
 }
