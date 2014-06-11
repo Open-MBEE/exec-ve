@@ -7,8 +7,21 @@ module.exports = function(grunt) {
     
     pkg: grunt.file.readJSON('package.json'),
 
-    bower_install: {
-      cwd: 'app'
+    bower: {
+      install: {
+        options: {
+          targetDir: 'bower_components',
+          overrideBowerDirectory: true,
+          cwd: 'app',
+          layout: 'byType',
+          install: true,
+          verbose: false,
+          cleanTargetDir: false,
+          cleanBowerDir: false,
+          bowerOptions: {},
+          copy: false
+        }
+      }
     },
     
     bowerInstall: {
@@ -288,12 +301,11 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-ngdocs');
   grunt.loadNpmTasks('grunt-html2js');
   grunt.loadNpmTasks('grunt-bower-install');
-  grunt.loadNpmTasks('grunt-bower-install-task');
   grunt.loadNpmTasks('grunt-bower-installer');
   //grunt.loadNpmTasks('assemble');
 
   // Default task(s).  Must function before server has been stareted
-  grunt.registerTask('default', ['bower_install', 'html2js', 'jshint:beforeconcat', 'concat', 'jshint:afterconcat', 'uglify', 'copy', 'bowerInstall', 'ngdocs']);
+  grunt.registerTask('default', ['bower', 'html2js', 'jshint:beforeconcat', 'concat', 'jshint:afterconcat', 'uglify', 'copy', 'bowerInstall', 'ngdocs']);
   //grunt.registerTask('stage', ['default', 'qunit', 'rsync']);
 
   grunt.registerTask('server', function(arg1) {
