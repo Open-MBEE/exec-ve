@@ -15,6 +15,8 @@ angular.module('mms')
  */
 function VizService($q, $http, URLService) {
 
+    var urls = {};
+
     /**
      * @ngdoc method
      * @name mms.VizService#getImageURL
@@ -26,8 +28,33 @@ function VizService($q, $http, URLService) {
      * @param {string} id The id of the Magicdraw diagram.
      * @returns {Promise} The promise will be resolved with the latest image url
      */
-    var getImageURL = function(id, version) {
+    var getImageURL = function(id, updateFromServer, workspace, version) {
+        var update = !updateFromServer ? false : updateFromServer;
+        var ws = !workspace ? 'master' : workspace;
+        var ver = !version ? 'latest' : version;
+
         var deferred = $q.defer();
+        if (urls.hasOwnProperty(id)) {
+            if (urls[id].hasOwnProperty(ver)) {
+                if (version !== 'latest' || !update) {
+                    deferred.resolve(urls[id][ver]);
+                    return deferred.promise;
+                }
+            } 
+        } else {
+            urls[id] = {};
+        }
+        $http.get(URLService.getImageURL(id, ws, ver))
+        .success(function(data, status, headers, config) {
+            if (data.artifacts.length > 0) {
+                urls[id][ver] = '/alfresco' + data.artifacts[0].url;
+                deferred.resolve(urls[id][ver]);
+            } else {
+                deferred.reject({status: 200, data: data, message: 'Not Found'});
+            }
+        }).error(function(data, status, headers, config) {
+            URLService.handleHttpStatus(data, status, headers, config, deferred);
+        });
         return deferred.promise;
     };
 

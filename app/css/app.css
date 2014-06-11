@@ -65,6 +65,12 @@ mms-spec mms-transclude-val {
   background-color: lightblue;
 }
 
+.transclude-table {
+  max-height: 400px;
+  max-width: 98%;
+  overflow: auto;
+}
+
 .transclude-modal .clickable:hover {
   cursor: pointer;
   background-color: yellow;
