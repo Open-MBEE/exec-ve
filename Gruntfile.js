@@ -8,9 +8,7 @@ module.exports = function(grunt) {
     pkg: grunt.file.readJSON('package.json'),
 
     bower_install: {
-      target: {
-        cwd: 'app'
-      }
+      cwd: 'app'
     },
     
     bowerInstall: {
@@ -291,6 +289,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-html2js');
   grunt.loadNpmTasks('grunt-bower-install');
   grunt.loadNpmTasks('grunt-bower-install-task');
+  grunt.loadNpmTasks('grunt-bower-installer');
   //grunt.loadNpmTasks('assemble');
 
   // Default task(s).  Must function before server has been stareted
