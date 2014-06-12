@@ -54,12 +54,28 @@ function URLService($q, $http, $location) {
         return false;
     };
 
-    var getSnapshotURL = function(id) {
-        
+    var getConfigSnapshotURL = function(id, site, workspace) {
+        return root + "/workspaces/" + workspace + "/sites/" + site + "/configurations/" + id + "/snapshots";                
     };
 
-    var getTagURL = function(id) {
+    var getProductSnapshotURL = function(workspace, site, prodId) {
+        return root + "/workspaces/" + workspace + "/sites/" + site + "/products/" + prodId + "/snapshots";                
+    };
 
+    var getConfigsURL = function(workspace, site) {
+        return root + "/workspaces/" + workspace + "/sites/" + site + "/configurations";
+    };
+
+    var getConfigProductURL = function (configId, site, workspace) {
+        return root + "/workspaces/" + workspace + "/sites/" + site + "/configurations/" + configId + "/products";                        
+    };
+
+    var getConfigURL = function(workspace, site, configId) {
+        return root + "/workspaces/" + workspace + "/sites/" + site + "/configurations/" + configId;
+    };
+
+    var getProductURL = function(workspace, site) {
+        return root + "/workspaces/" + workspace + "/sites/" + site + "/products";
     };
 
     /**
@@ -210,7 +226,13 @@ function URLService($q, $http, $location) {
         handleHttpStatus: handleHttpStatus,
         getSitesURL: getSitesURL,
         getElementSearchURL: getElementSearchURL,
-        getImageURL: getImageURL
+        getImageURL: getImageURL,
+        getProductSnapshotURL: getProductSnapshotURL,
+        getConfigSnapshotURL: getConfigSnapshotURL,
+        getProductURL: getProductURL,
+        getConfigURL: getConfigURL,
+        getConfigsURL: getConfigsURL,
+        getConfigProductURL : getConfigProductURL
     };
 
 }

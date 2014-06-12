@@ -1,0 +1,19 @@
+<div class="container">
+  <div class="row">
+    <span class="h3">DocWeb Documents for site {{site}}</span> &nbsp;
+  </div>
+  <div class="row">
+  <hr/>
+    <div class="col-xs-4">
+      <div>
+        <span class="h5"><a ng-click="get_latest_drafts()">Latest Drafts</a></span>
+        <hr/>
+      </div>
+      <div ng-repeat="config in configs">
+        <span class="h5"><a ng-click="select_config_view(config.id)">{{config.name}} </a></span><span class="pull-right">{{config.modified | date:'medium'}} </span>
+        <hr/>
+      </div>
+      <a ng-click="create_new_config()" class="btn btn-primary btn-sm">Create New</a>
+    </div>
+  </div> 
+</div>
