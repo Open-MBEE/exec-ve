@@ -12,7 +12,8 @@ angular.module('mms')
  * 
  * @description
  * This utility service gives back url paths for use in other services in communicating
- * with the server
+ * with the server, arguments like workspace, version are expected to be strings and
+ * not null or undefined
  */
 function URLService($q, $http, $location) {
     var root = "/alfresco/service";
@@ -47,6 +48,12 @@ function URLService($q, $http, $location) {
         return root;
     };
 
+    var isTimestamp = function(version) {
+        if (String(version).indexOf('-') >= 0)
+            return true;
+        return false;
+    };
+
     var getSnapshotURL = function(id) {
         
     };
@@ -66,8 +73,9 @@ function URLService($q, $http, $location) {
      * @param {string} id The id of the image
      * @returns {string} The path for image url queries.
      */
-    var getImageURL = function(id) {
-
+    var getImageURL = function(id, workspace, version) {
+        var r = root + '/workspaces/' + workspace + '/artifacts/' + id;
+        return addVersion(r, version);
     };
 
     /**
@@ -179,6 +187,15 @@ function URLService($q, $http, $location) {
         return root + "/javawebscripts/element/search?keyword=" + query;
     };
 
+    var addVersion = function(url, version) {
+        if (version === 'latest')
+            return url;
+        if (isTimestamp(version))
+            return url + '?timestamp=' + version;
+        else
+            return url + '/versions/' + version;
+    };
+
     return {
         getRoot: getRoot,
         setRoot: setRoot,
@@ -192,7 +209,8 @@ function URLService($q, $http, $location) {
         getDocumentURL: getDocumentURL,
         handleHttpStatus: handleHttpStatus,
         getSitesURL: getSitesURL,
-        getElementSearchURL: getElementSearchURL
+        getElementSearchURL: getElementSearchURL,
+        getImageURL: getImageURL
     };
 
 }
