@@ -327,7 +327,7 @@ mms-transclude-com, mms-transclude-com * {
   background-color: #F5F5F5;
 }
 
-.pane-selector .nav-pills > li > a {
+/*.pane-selector .nav-pills > li > a {
   padding-left: 0;
   padding-right: 0;
   border-radius: 0;
@@ -339,4 +339,31 @@ mms-transclude-com, mms-transclude-com * {
 .pane-selector .nav-pills > li.active > a {
   color: #FFF;
   background-color: #404040;
+}
+*/
+
+.pane-selector ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.pane-selector ul li {
+  text-align: center;
+  font-size: 16px;
+  position: relative;
+  margin: 0;
+  padding: 0;
+}
+
+.pane-selector ul li a {
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  line-height: 40px;
+  vertical-align: middle;
+  color: #999;
+  text-decoration: none;
+  font-size: 20px;
+  padding: 0;
 }
