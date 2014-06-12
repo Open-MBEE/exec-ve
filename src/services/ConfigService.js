@@ -19,6 +19,7 @@ function ConfigService($q, $http, URLService, _) {
     var snapshots = {};
     var configSnapshots = {};
     var productSnapshots = {};
+    var configProducts = {};
 
     var getConfigs = function(workspace, site) {
 
@@ -48,20 +49,20 @@ function ConfigService($q, $http, URLService, _) {
         return deferred.promise;
     };
 
-    var getConfig = function(workspace, site, configId) {
+    var getConfig = function(id, site, workspace) {
 
         var ws = !workspace ? 'master' : workspace;
 
         var deferred = $q.defer();
 
-        if (configs.hasOwnProperty(configId)) {
-            deferred.resolve(configs[configId]);
+        if (configs.hasOwnProperty(id)) {
+            deferred.resolve(configs[id]);
             return deferred.promise;
         }
         
-        $http.get(URLService.getConfigURL(ws, site, configId))
+        $http.get(URLService.getConfigURL(ws, site, id))
         .success(function(data, status, headers, config) {
-            configs[configId] = data.configurations;
+            configs[id] = data.configurations;
 
             deferred.resolve(configs[site]);
             
@@ -74,22 +75,22 @@ function ConfigService($q, $http, URLService, _) {
         return deferred.promise;
     };
 
-    var getSnapshotsForConfig = function(workspace, site, configId) {
+    var getSnapshotsForConfig = function(id, site, workspace) {
 
         var ws = !workspace ? 'master' : workspace;
 
         var deferred = $q.defer();
 
-        if (configSnapshots.hasOwnProperty(configId)) {
-            deferred.resolve(configSnapshots[configId]);
+        if (configSnapshots.hasOwnProperty(id)) {
+            deferred.resolve(configSnapshots[id]);
             return deferred.promise;
         }
         
-        $http.get(URLService.getConfigSnapshotURL(ws, site))
+        $http.get(URLService.getConfigSnapshotURL(id, site, ws))
         .success(function(data, status, headers, config) {
-            configSnapshots[configId] = data.snapshots;
+            configSnapshots[id] = data.snapshots;
 
-            deferred.resolve(configSnapshots[configId]);
+            deferred.resolve(configSnapshots[id]);
             
         }).error(function(data, status, headers, config) {
             URLService.handleHttpStatus(data, status, headers, config, deferred);
@@ -141,26 +142,27 @@ function ConfigService($q, $http, URLService, _) {
             });
         } 
         return deferred.promise;
-
     };
 
-    var createConfig = function(config, workspace, site) {
+    var createConfig = function(config, site, workspace) {
         var ws = !workspace ? 'master' : workspace;
 
         var deferred = $q.defer();
 
-        /* if (configs.hasOwnProperty('sysmlid')) {
-            deferred.reject({status: 200, message: 'Element create cannot have id'});
+        if (config.hasOwnProperty('id')) {
+            deferred.reject({status: 200, message: 'Config create cannot have id'});
             return deferred.promise;
-        } */
+        } 
 
         $http.post(URLService.getConfigsURL(ws, site), {'configurations': [config]})
         .success(function(data, status, headers, config) {
-            if (data.length > 0) {
+            if (data.configurations.length > 0) {
                 var c = data.configurations[0];
                 configs[c.id] = c;
                 deferred.resolve(configs[c.id]);
-            }
+            } else
+                deferred.reject({status: 200, "message": "something bad happened"});
+
         }).error(function(data, status, headers, config) {
             URLService.handleHttpStatus(data, status, headers, config, deferred);
         });
@@ -171,6 +173,20 @@ function ConfigService($q, $http, URLService, _) {
 
     };
 
+    var updateConfigProducts = function(id, products, site, workspace) {
+        var ws = !workspace ? 'master' : workspace;
+
+        var deferred = $q.defer();
+
+        $http.post(URLService.getConfigProductURL(id, site, ws), {'elements': products})
+        .success(function(data, status, headers, config) {
+            deferred.resolve("ok");
+        }).error(function(data, status, headers, config) {
+            URLService.handleHttpStatus(data, status, headers, config, deferred);
+        });
+        return deferred.promise;
+    }; 
+
     return {
         getConfigs : getConfigs,
         getConfig : getConfig,
@@ -178,6 +194,7 @@ function ConfigService($q, $http, URLService, _) {
         getSnapshotsForProduct: getSnapshotsForProduct,
         updateConfig: updateConfig,
         createConfig: createConfig,
-        updateConfigSnapshots: updateConfigSnapshots
+        updateConfigSnapshots: updateConfigSnapshots,
+        updateConfigProducts: updateConfigProducts
     };
 }

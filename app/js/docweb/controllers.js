@@ -109,6 +109,7 @@ angular.module('myApp')
     $scope.newConfigName = "";
     $scope.newConfigDesc = "";
     $scope.selected = [];
+
     $scope.toggleCheck = function(id) {
         var index = $scope.selected.indexOf(id);
         if (index < 0)
@@ -116,13 +117,24 @@ angular.module('myApp')
         else
             $scope.selected.splice(index, 1);
     };
+
     $scope.new = function() {
         var send = {"name": $scope.newConfigName, "description": $scope.newConfigDesc};
-        if ($scope.selected.length > 1)
-            send.products = $scope.selected;
-        
-        ConfigService.createConfig(send, "master", $scope.site).then(function(view) {
 
+        ConfigService.createConfig(send, $scope.site, "master")
+        .then(function(config) {
+            var products = [];
+            if ($scope.selected.length > 0) {
+                $scope.selected.forEach(function(pid) {
+                    products.push({"sysmlid": pid});
+                });
+                ConfigService.updateConfigProducts(config.id, products, site, workspace)
+                .then(function(result) {
+                //growl.succes("wait for email");deferred.resolve(configs[c.id]);
+                });
+            } else {
+                //growl.success
+            }
         });
 
         //$window.alert("sending " + $scope.newConfigName + " " + $scope.newConfigDesc);

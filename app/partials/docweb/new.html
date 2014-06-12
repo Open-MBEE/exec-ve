@@ -4,7 +4,7 @@
   <h5>Description:</h5> <textarea class="form-control" ng-model="newConfigDesc"></textarea>
   <h5>Documents to snapshot (if none is chosen, they'll all be created)</h5>
   <div ng-repeat="doc in products | orderBy:'name'">
-      <input type="checkbox" ng-model="doc.add" ng-change="toggleCheck(doc.id)"/> {{doc.name}}
+      <input type="checkbox" ng-model="doc.add" ng-change="toggleCheck(doc.sysmlid)"/> {{doc.name}}
     </div>
     <hr/>
   <div><input class="btn btn-primary btn-sm" type="submit" value="Create"/>

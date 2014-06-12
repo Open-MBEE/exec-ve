@@ -62,11 +62,11 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
             url: '/config/:configId',
             resolve: {
                 config: function($stateParams, site, ConfigService) {
-                    return ConfigService.getConfig('master', site.name, $stateParams.configId);
+                    return ConfigService.getConfig($stateParams.configId, site.name, 'master');
+                },
+                snapshots: function($stateParams, site, ConfigService) {
+                    return ConfigService.getSnapshotsForConfig($stateParams.configId, site.name, 'master');
                 }
-                /*snapshots: function($stateParams, ConfigService) {
-                    return ConfigService.getSnapshotsForConfig('master', $stateParams.site, $stateParams.configId);
-                }*/
             },
             views: {
                 'view@': {
