@@ -17,6 +17,9 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
             },
             time: function($stateParams) {
                 return $stateParams.time;
+            },
+            snapshots: function($stateParams, ConfigService) {
+                return ConfigService.getSnapshotsForProduct($stateParams.docId, $stateParams.site, 'master');
             }
         },
         views: {
@@ -24,7 +27,10 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
                 template: '<mms-nav site="{{site}}" title="{{title}}" type="document"></mms-nav>',
                 controller: function($scope, $stateParams, document, site, views) {
                     $scope.site = site.title;
-                    $scope.title = document.name;
+                    if ($stateParams.time !== 'latest')
+                        $scope.title = document.name + ' (' + $stateParams.time + ')';
+                    else
+                        $scope.title = document.name;
                     $scope.docweb = false;
                 }
             },

@@ -3,9 +3,21 @@
 /* Controllers */
 
 angular.module('myApp')
-.controller('NavTreeCtrl', ['$scope', '$state', '$stateParams', 'ElementService', 'ViewService', 'growl',
-function($scope, $state, $stateParams, ElementService, ViewService, growl) {
+.controller('NavTreeCtrl', ['$scope', '$state', '$stateParams', 'snapshots', 'site', 'ElementService', 'ViewService', 'ConfigService', 'growl',
+function($scope, $state, $stateParams, snapshots, site, ElementService, ViewService, ConfigService, growl) {
     $scope.documentid = $stateParams.docId;
+    $scope.snapshots = snapshots;
+    $scope.site = site;
+
+    $scope.createNewSnapshot = function() {
+        ConfigService.createSnapshot($scope.documentid, $scope.site.name, 'master')
+        .then(function(result) {
+            growl.success("Create Successful: wait for email.");
+        }, function(reason) {
+            growl.error("Create Failed: " + reason.message);
+        });
+    };
+
     var tree = {};
 
       // 1. Iterate over view2view and create an array of all element ids

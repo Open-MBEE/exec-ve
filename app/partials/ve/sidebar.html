@@ -25,5 +25,9 @@
         </mms-tree>
     </tab>
     <tab heading="Snapshots">
+        <div ng-repeat="snapshot in snapshots">
+            <a ui-sref="doc({site: site.name, docId: documentid, time: snapshot.created})">{{snapshot.created | date:'M/d/yy h:mm a'}}</a>
+        </div>
+        <button class="btn btn-primary" ng-click="createNewSnapshot()">Create New</button>
     </tab>
 </tabset>

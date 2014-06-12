@@ -187,6 +187,18 @@ function ConfigService($q, $http, URLService, _) {
         return deferred.promise;
     }; 
 
+    var createSnapshot = function(id, site, workspace) {
+        var ws = !workspace ? 'master' : workspace;
+        var deferred = $q.defer();
+        $http.post(URLService.getProductSnapshotURL(id, site, ws))
+        .success(function(data, status, headers, config) {
+            deferred.resolve("ok");
+        }).error(function(data, status, headers, config) {
+            URLService.handleHttpStatus(data, status, headers, config, deferred);
+        });
+        return deferred.promise;
+    };
+
     return {
         getConfigs : getConfigs,
         getConfig : getConfig,
@@ -195,6 +207,7 @@ function ConfigService($q, $http, URLService, _) {
         updateConfig: updateConfig,
         createConfig: createConfig,
         updateConfigSnapshots: updateConfigSnapshots,
-        updateConfigProducts: updateConfigProducts
+        updateConfigProducts: updateConfigProducts,
+        createSnapshot: createSnapshot
     };
 }
