@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsNav', ['SiteService', '$templateCache', mmsNav]);
+.directive('mmsNav', ['SiteService', '$templateCache', 'growl', mmsNav]);
 
 /**
  * @ngdoc directive
@@ -20,11 +20,12 @@ angular.module('mms.directives')
  * @param {string} title Title to display
  * @param {string} type The type of current page (docweb, product, snapshot, etc)
  */
-function mmsNav(SiteService, $templateCache) {
+function mmsNav(SiteService, $templateCache, growl) {
     var template = $templateCache.get('mms/templates/mmsNav.html');
 
     var mmsNavLink = function(scope, element, attrs) {
-        SiteService.getSites().then(function(data){
+        SiteService.getSites()
+        .then(function(data) {
             var sites = {};
             for (var i = 0; i < data.length; i++) {
                 var site = data[i];
@@ -40,6 +41,8 @@ function mmsNav(SiteService, $templateCache) {
                 }
             }
             scope.categories = sites;
+        }, function(reason) {
+            growl.error("Getting Sites Error: " + reason.message);
         });
     };
 

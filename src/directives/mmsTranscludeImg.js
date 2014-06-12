@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsTranscludeImg', ['VizService', mmsTranscludeImg]);
+.directive('mmsTranscludeImg', ['VizService', 'growl', mmsTranscludeImg]);
 
 /**
  * @ngdoc directive
@@ -18,7 +18,7 @@ angular.module('mms.directives')
  * @param {string=master} mmsWs Workspace to use, defaults to master
  * @param {string=latest} mmsVersion Version can be alfresco version number or timestamp, default is latest
  */
-function mmsTranscludeImg(VizService) {
+function mmsTranscludeImg(VizService, growl) {
 
     var mmsTranscludeImgLink = function(scope, element, attrs, mmsViewCtrl) {
         element.click(function(e) {
@@ -40,16 +40,18 @@ function mmsTranscludeImg(VizService) {
                 if (!version)
                     version = viewVersion.version;
             }
-            VizService.getImageUrl(scope.mmsEid, false, ws, version)
+            VizService.getImageURL(scope.mmsEid, false, ws, version)
             .then(function(data) {
                 scope.imgUrl = data;
+            }, function(reason) {
+                growl.error('Cf Image Error: ' + reason.message);
             });
         });
     };
 
     return {
         restrict: 'E',
-        template: '<img src="{{imgUrl}}"/>',
+        template: '<img ng-src="{{imgUrl}}"></img>',
         scope: {
             mmsEid: '@',
             mmsVersion: '@',

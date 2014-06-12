@@ -75,7 +75,7 @@ function ElementService($q, $http, URLService, VersionService, _) {
                     }
                     deferred.resolve(elements[id]);
                 } else {
-                    deferred.reject("Not Found");
+                    deferred.reject({status: 200, data: data, message: 'Not Found'});
                 }
                 delete inProgress[key];
             }).error(function(data, status, headers, config) {
@@ -83,7 +83,7 @@ function ElementService($q, $http, URLService, VersionService, _) {
                 delete inProgress[key];
             });
         } else {
-            return VersionService.getElementByTimestamp(id, ws, ver);
+            return VersionService.getElement(id, ws, ver);
         }
         return deferred.promise;
     };
@@ -231,8 +231,13 @@ function ElementService($q, $http, URLService, VersionService, _) {
         var ws = !workspace ? 'master' : workspace;
         var ver = !version ? 'latest' : version;
 
+        var progress = 'getGenericElements(' + url + key + update + ws + ver + ')';
+        if (inProgress.hasOwnProperty(progress))
+            return inProgress[progress];
+
         var deferred = $q.defer();
         if (ver === 'latest') {
+            inProgress[progress] = deferred.promise;
             $http.get(url)
             .success(function(data, status, headers, config) {
                 var result = [];
@@ -246,12 +251,14 @@ function ElementService($q, $http, URLService, VersionService, _) {
                     }
                     result.push(elements[element.sysmlid]);
                 });
+                delete inProgress[progress];
                 deferred.resolve(result); 
             }).error(function(data, status, headers, config) {
                 URLService.handleHttpStatus(data, status, headers, config, deferred);
+                delete inProgress[progress];
             });
         } else {
-            return VersionService.getElements(url, key, ws, ver);
+            return VersionService.getGenericElements(url, key, ws, ver);
         }
         return deferred.promise;
     };
@@ -346,7 +353,7 @@ function ElementService($q, $http, URLService, VersionService, _) {
         //    return deferred.promise;
         //}
         if (elem.hasOwnProperty('sysmlid')) {
-            deferred.reject('Element create cannot have id');
+            deferred.reject({status: 200, message: 'Element create cannot have id'});
             return deferred.promise;
         }
         $http.post(URLService.getPostElementsURL(ws), {'elements': [elem]})

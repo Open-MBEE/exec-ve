@@ -68,6 +68,12 @@ mms-spec mms-transclude-val {
   background-color: lightblue;
 }
 
+.transclude-table {
+  max-height: 400px;
+  max-width: 98%;
+  overflow: auto;
+}
+
 .transclude-modal .clickable:hover {
   cursor: pointer;
   background-color: yellow;
@@ -303,6 +309,9 @@ accordion a.docweb-link {
   padding-left: 10px; 
 }
 
+mms-view:not(.editing) .placeholder {
+  display: none;
+}
 
 mms-view:not(.reviewing) mms-transclude-com {
   display: none;
