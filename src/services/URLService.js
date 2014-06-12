@@ -55,27 +55,42 @@ function URLService($q, $http, $location) {
     };
 
     var getConfigSnapshotURL = function(id, site, workspace) {
-        return root + "/workspaces/" + workspace + "/sites/" + site + "/configurations/" + id + "/snapshots";                
+        return root + "/workspaces/" + workspace +
+                      "/sites/" + site +
+                      "/configurations/" + id +
+                      "/snapshots";                
     };
 
-    var getProductSnapshotURL = function(workspace, site, prodId) {
-        return root + "/workspaces/" + workspace + "/sites/" + site + "/products/" + prodId + "/snapshots";                
+    var getProductSnapshotURL = function(id, site, workspace) {
+        return root + "/workspaces/" + workspace +
+                      "/sites/" + site +
+                      "/products/" + id +
+                      "/snapshots";                
     };
 
-    var getConfigsURL = function(workspace, site) {
-        return root + "/workspaces/" + workspace + "/sites/" + site + "/configurations";
+    var getConfigsURL = function(site, workspace) {
+        return root + "/workspaces/" + workspace +
+                      "/sites/" + site +
+                      "/configurations";
     };
 
-    var getConfigProductURL = function (configId, site, workspace) {
-        return root + "/workspaces/" + workspace + "/sites/" + site + "/configurations/" + configId + "/products";                        
+    var getConfigProductURL = function (id, site, workspace) {
+        return root + "/workspaces/" + workspace +
+                      "/sites/" + site +
+                      "/configurations/" + id +
+                      "/products";                        
     };
 
-    var getConfigURL = function(workspace, site, configId) {
-        return root + "/workspaces/" + workspace + "/sites/" + site + "/configurations/" + configId;
+    var getConfigURL = function(id, site, workspace) {
+        return root + "/workspaces/" + workspace + 
+                      "/sites/" + site + 
+                      "/configurations/" + id;
     };
 
-    var getProductURL = function(workspace, site) {
-        return root + "/workspaces/" + workspace + "/sites/" + site + "/products";
+    var getProductsURL = function(site, workspace) {
+        return root + "/workspaces/" + workspace + 
+                      "/sites/" + site + 
+                      "/products";
     };
 
     /**
@@ -229,7 +244,7 @@ function URLService($q, $http, $location) {
         getImageURL: getImageURL,
         getProductSnapshotURL: getProductSnapshotURL,
         getConfigSnapshotURL: getConfigSnapshotURL,
-        getProductURL: getProductURL,
+        getProductsURL: getProductsURL,
         getConfigURL: getConfigURL,
         getConfigsURL: getConfigsURL,
         getConfigProductURL : getConfigProductURL

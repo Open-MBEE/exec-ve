@@ -385,7 +385,7 @@ function ViewService($q, $http, URLService, ElementService, CommentService) {
         var ver = !version ? 'latest' : version;
 
         var deferred = $q.defer();
-        var url = URLService.getProductURL(workspace, site);
+        var url = URLService.getProductsURL(site, workspace);
         if (products.hasOwnProperty(ver) && products[ver].hasOwnProperty(site) && !update) 
             deferred.resolve(products[ver][site]);
         else {

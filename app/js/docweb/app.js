@@ -10,7 +10,7 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
                     return SiteService.getSite($stateParams.site);
                 },
                 configs: function($stateParams, ConfigService) {
-                    return ConfigService.getConfigs('master', $stateParams.site);
+                    return ConfigService.getConfigs($stateParams.site, 'master');
                 }
             },
             views: {
