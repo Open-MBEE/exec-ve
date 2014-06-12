@@ -33,15 +33,45 @@
   display: inline;
 }
 
-mms-view.editing mms-transclude-name,
-mms-view.editing mms-transclude-doc {
-  border-bottom: 1px dotted blue;
+mms-view.editing *,
+mms-view.editing button,
+mms-view.editing button * {
+  color: #333;
+  cursor: default;
 }
 
+/* first level transclusions */
+mms-view.editing mms-transclude-doc,
+mms-view.editing mms-transclude-doc *,
+mms-view.editing mms-transclude-val,
+mms-view.editing mms-transclude-val *,
+mms-view.editing mms-transclude-name {
+  color: #000;
+  background-color: #EAEAEA;
+  cursor: text;
+}
+
+/* second level transclusions */
+mms-view.editing mms-transclude-doc mms-transclude-name,
+mms-view.editing mms-transclude-doc mms-transclude-val,
+mms-view.editing mms-transclude-doc mms-transclude-val *,
+mms-view.editing mms-transclude-val mms-transclude-val,
+mms-view.editing mms-transclude-val mms-transclude-val * {
+  color: #000;
+  background-color: #C6C6C6;
+  cursor: text;
+}
+
+mms-spec mms-transclude-img,
 mms-spec mms-transclude-name,
-mms-spec mms-transclude-doc,
 mms-spec mms-transclude-val {
   background-color: lightblue;
+}
+
+.transclude-table {
+  max-height: 400px;
+  max-width: 98%;
+  overflow: auto;
 }
 
 .transclude-modal .clickable:hover {
@@ -280,6 +310,9 @@ accordion a.docweb-link {
   padding-left: 10px; 
 }
 
+mms-view:not(.editing) .placeholder {
+  display: none;
+}
 
 mms-view:not(.reviewing) mms-transclude-com {
   display: none;

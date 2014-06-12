@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsRedactor', ['ElementService', 'ViewService', '$modal', '$templateCache', mmsRedactor]);
+.directive('mmsRedactor', ['ElementService', 'ViewService', '$modal', '$templateCache', 'growl', mmsRedactor]);
 
 /**
  * @ngdoc directive
@@ -22,17 +22,17 @@ angular.module('mms.directives')
  *      that can be transcluded. Regardless, transclusion allows keyword searching 
  *      elements to transclude from alfresco
  */
-function mmsRedactor(ElementService, ViewService, $modal, $templateCache) { //depends on angular bootstrap
+function mmsRedactor(ElementService, ViewService, $modal, $templateCache, growl) { //depends on angular bootstrap
     
     var mmsRedactorLink = function(scope, element, attrs, ngModelCtrl) {
         var transcludeModalTemplate = $templateCache.get('mms/templates/mmsCfModal.html');
         var commentModalTemplate = $templateCache.get('mms/templates/mmsCommentModal.html');
 
-        var modalCtrl = function($scope, $modalInstance) {
+        var transcludeCtrl = function($scope, $modalInstance) {
             $scope.filter = '';
             $scope.searchText = '';
             $scope.choose = function(elementId, property, name) {
-                var tag = '<mms-transclude-' + property + ' data-mms-eid="' + elementId + '">[cf:' + name + '.' + property + ']</mms-transclude-' + property + '>';
+                var tag = '<mms-transclude-' + property + ' data-mms-eid="' + elementId + '">[cf:' + name + '.' + property + ']</mms-transclude-' + property + '> ';
                 $modalInstance.close(tag);
             };
             $scope.cancel = function() {
@@ -40,14 +40,19 @@ function mmsRedactor(ElementService, ViewService, $modal, $templateCache) { //de
             };
             $scope.search = function(searchText) {
                 //var searchText = $scope.searchText; //TODO investigate why searchText isn't in $scope
-                ElementService.search(searchText).then(function(data) {
+                ElementService.search(searchText)
+                .then(function(data) {
                     $scope.mmsCfElements = data;
+                }, function(reason) {
+                    growl.error("Search Error: " + reason.message);
                 });
             };
             $scope.makeNew = function(newName) {
                 ElementService.createElement({name: newName, documentation: ''})
                 .then(function(data) {
                     $scope.mmsCfElements = [data];
+                }, function(reason) {
+                    growl.error("Propose Error: " + reason.message);
                 });
             };
         };
@@ -73,12 +78,13 @@ function mmsRedactor(ElementService, ViewService, $modal, $templateCache) { //de
             var instance = $modal.open({
                 template: transcludeModalTemplate,
                 scope: scope,
-                controller: ['$scope', '$modalInstance', modalCtrl],
+                controller: ['$scope', '$modalInstance', transcludeCtrl],
                 size: 'lg'
             });
             instance.result.then(function(tag) {
                 element.redactor('selectionRestore');
                 //element.redactor(saveUndoStep();
+                element.redactor('bufferSet');
                 element.redactor('insertHtml', tag);
                 //element.redactor(saveUndoStep();
                 //element.redactor(sync();
@@ -97,12 +103,15 @@ function mmsRedactor(ElementService, ViewService, $modal, $templateCache) { //de
                     comment.owner = ViewService.getCurrentViewId();
                 ElementService.createElement(comment)
                 .then(function(data) {
-                    var tag = '<mms-transclude-com data-mms-eid="' + data.sysmlid + '">comment</mms-transclude-com>';
+                    var tag = '<mms-transclude-com data-mms-eid="' + data.sysmlid + '">comment</mms-transclude-com> ';
                     element.redactor('selectionRestore');
                     //element.redactor(saveUndoStep();
+                    element.redactor('bufferSet');
                     element.redactor('insertHtml', tag);
                     //element.redactor(saveUndoStep();
                     //element.redactor(sync();
+                }, function(reason) {
+                    growl.error("Comment Error: " + reason.message);
                 });
             });
         };
@@ -118,20 +127,32 @@ function mmsRedactor(ElementService, ViewService, $modal, $templateCache) { //de
 
         element.redactor({
             buttons: ['html', 'formatting',  'bold', 'italic', 'underline', 'deleted', 
-                        'unorderedlist', 'orderedlist', 'outdent', 'indent', 
+                        'fontcolor', 'unorderedlist', 'orderedlist', 'outdent', 'indent', 
                         'image', 'video', 'file', 'table', 'link', 'alignment', 
                         'horizontalrule'],
+            plugins: ['fontcolor'],
             changeCallback: read,
-            maxHeight: 300,
+            maxHeight: 230,
             imageUploadURL: '', //prevent default upload to public url
             placeholder: "Placeholder"
         });
 
         element.redactor('buttonAdd', 'transclude', 'Cross-Reference', transcludeCallback);
-        element.redactor('buttonAwesome', 'transclude', 'fa-paperclip');
+        element.redactor('buttonAwesome', 'transclude', 'fa-asterisk');
         element.redactor('buttonAdd', 'comment', 'Comment', commentCallback);
-        element.redactor('buttonAwesome', 'comment', 'fa-file-text');
-
+        element.redactor('buttonAwesome', 'comment', 'fa-comment');
+        element.redactor('buttonAdd', 'undo', 'Undo', function() {
+            //element.redactor('execCommand', 'undo');
+            element.redactor('bufferUndo');
+            element.redactor('sync');
+        });
+        //element.redactor('buttonAwesome', 'undo', 'fa-undo');
+        element.redactor('buttonAdd', 'redo', 'Redo', function() {
+            //element.redactor('execCommand', 'redo');
+            element.redactor('bufferRedo');
+            element.redactor('sync');
+        });
+        //element.redactor('buttonAwesome', 'redo', 'fa-repeat');
         ngModelCtrl.$render = function() {
             element.redactor("set", ngModelCtrl.$viewValue || '');
         };

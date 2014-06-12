@@ -4,6 +4,6 @@ angular.module('mms.directives', ['mms', 'mms.directives.tpls', 'ui.bootstrap', 
 .config(['$sceProvider', 'growlProvider', function($sceProvider, growlProvider) {
     $sceProvider.enabled(false);
     growlProvider.onlyUniqueMessages(false);
-    growlProvider.globalTimeToLive({success: 2000, error: 5000, warning: 5000, info: 5000});
+    growlProvider.globalTimeToLive({success: 5000, error: -1, warning: 5000, info: 5000});
     growlProvider.globalPosition('bottom-right');
 }]);

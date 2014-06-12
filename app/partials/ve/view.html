@@ -1,30 +1,24 @@
-<div fa-pane="pane-selector" pane-anchor="east" pane-size="41px" class="pane-selector">
-    <tabset vertical="true" type="pills">
-        <tab title="Element Data">
-            <tab-heading><i class="fa fa-lg fa-eye"></i></tab-heading>
+<div fa-pane="element" pane-anchor="east" pane-size="40%" pane-handle="4" pane-min="30px">
+    <tabset>
+        <tab heading="Element">
+            <div class="container-fluid" ng-show="showSpec">
+                <mms-spec mms-eid="{{eid}}" mms-cf-elements="viewElements" mms-edit-field="all" mms-version="{{version}}"></mms-spec>
+            </div>
         </tab>
-        <tab title="Element History"> 
-            <tab-heading><i class="fa fa-lg fa-history"></i></tab-heading>
+       <!-- <tab heading="History">
+            <div class="container-fluid"></div>
         </tab>
-        <tab title="Expression Editor">
-            <tab-heading><i class="fa fa-lg fa-terminal"></i></tab-heading>
-        </tab>
+        <tab heading="Comments">
+            <div class="container-fluid"></div>
+        </tab> -->
     </tabset>
 </div>
-<div fa-pane="main" pane-anchor="center">
-    <div fa-pane="element" pane-anchor="east" pane-size="40%" pane-handle="4" pane-min="30px">
-        <div class="container-fluid">
-            <h4>Element Data</h4> 
-            <mms-spec mms-eid="{{eid}}" mms-cf-elements="viewElements" mms-edit-field="all"></mms-spec>
-        </div>
-    </div>
-    <div fa-pane pane-anchor="center">
-        <tabset>
-            <tab heading="View">
-                <div class="container-fluid">
-                    <mms-view mms-vid="{{vid}}" mms-cf-clicked="tscClicked(elementId)" mms-order="false"></mms-view>
-                </div>
-            </tab>
-        </tabset>
-    </div>
+<div fa-pane pane-anchor="center">
+    <tabset>
+        <tab heading="View">
+            <div class="container-fluid">
+                <mms-view mms-vid="{{vid}}" mms-cf-clicked="tscClicked(elementId)" mms-order="true" mms-version="{{version}}"></mms-view>
+            </div>
+        </tab>
+    </tabset>
 </div>

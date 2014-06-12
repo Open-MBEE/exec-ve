@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsView', ['ViewService', '$templateCache', mmsView]);
+.directive('mmsView', ['ViewService', '$templateCache', 'growl', mmsView]);
 
 /**
  * @ngdoc directive
@@ -24,7 +24,7 @@ angular.module('mms.directives')
  * @param {expression=} mmsCfClicked The expression to handle transcluded elements 
  *     in the view being clicked, this should be a function whose argument is 'elementId'
  */
-function mmsView(ViewService, $templateCache) {
+function mmsView(ViewService, $templateCache, growl) {
     var template = $templateCache.get('mms/templates/mmsView.html');
 
     var mmsViewCtrl = function($scope, ViewService) {
@@ -32,7 +32,7 @@ function mmsView(ViewService, $templateCache) {
             return ViewService.getViewElements($scope.mmsVid, false, $scope.mmsWs, $scope.mmsVersion);
         };
         this.transcludeClicked = function(elementId) {
-            if ($scope.textEditable && $scope.mmsCfClicked)
+            if ($scope.mmsCfClicked)
                 $scope.mmsCfClicked({elementId: elementId});
         };
         this.elementTranscluded = function(elem) {
@@ -47,6 +47,9 @@ function mmsView(ViewService, $templateCache) {
                 version: $scope.mmsVersion
             };
         };
+        this.getStructEditable = function() {
+            return $scope.structEditable;
+        };
     };
 
     var mmsViewLink = function(scope, element, attrs) {
@@ -58,12 +61,14 @@ function mmsView(ViewService, $templateCache) {
                 scope.view = data;
                 scope.lastModified = data.lastModified;
                 scope.author = data.author;
+            }, function(reason) {
+                growl.error('Getting View Error: ' + reason.message);
             });
         });
         scope.textEditable = false;
         scope.structEditable = false;
         scope.reviewing = false;
-        scope.textEdit = 'Edit Text';
+        scope.textEdit = 'Show Elements';
         scope.structEdit = 'Edit Order';
         scope.review = 'Show Comments';
         scope.sortableOptions = {
@@ -72,7 +77,7 @@ function mmsView(ViewService, $templateCache) {
         };
         scope.toggleTextEdit = function() {
             scope.textEditable = !scope.textEditable;
-            scope.textEdit = scope.textEditable ? 'Stop Text Edit' : 'Edit Text';
+            scope.textEdit = scope.textEditable ? 'Hide Elements' : 'Show Elements';
             element.toggleClass('editing');
         };
         scope.toggleStructEdit = function() {

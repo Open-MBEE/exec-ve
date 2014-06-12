@@ -6,11 +6,12 @@
         <h6>Latest</h6>
         <mms-spec mms-element="latest"></mms-spec>
         <hr/>
-    <p> Do you want to discard your edits and update to the latest or force an overwrite?
+    <p> Do you want to discard your edits and update to the latest or force an overwrite, (or try to merge text edits)?
     </p>
 </div>
 <div class="modal-footer">
     <button class="btn btn-sm btn-primary" ng-click="ok()">Discard Edits</button>
     <button class="btn btn-sm btn-primary" ng-click="force()">Force Save</button>
+    <button class="btn btn-sm btn-primary" ng-click="merge()">Try Merge Edits</button>
     <button class="btn btn-sm" ng-click="cancel()">Cancel (Do nothing)</button>
 </div>

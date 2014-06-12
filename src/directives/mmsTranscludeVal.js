@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsTranscludeVal', ['ElementService', '$compile', '$templateCache', mmsTranscludeVal]);
+.directive('mmsTranscludeVal', ['ElementService', '$compile', '$templateCache', 'growl', mmsTranscludeVal]);
 
 /**
  * @ngdoc directive
@@ -22,7 +22,7 @@ angular.module('mms.directives')
  * @param {string=master} mmsWs Workspace to use, defaults to master
  * @param {string=latest} mmsVersion Version can be alfresco version number or timestamp, default is latest
  */
-function mmsTranscludeVal(ElementService, $compile, $templateCache) {
+function mmsTranscludeVal(ElementService, $compile, $templateCache, growl) {
     var valTemplate = $templateCache.get('mms/templates/mmsTranscludeVal.html');
 
     var mmsTranscludeValLink = function(scope, element, attrs, mmsViewCtrl) {
@@ -47,7 +47,7 @@ function mmsTranscludeVal(ElementService, $compile, $templateCache) {
             } 
             element.empty();
             if (areStrings) {
-                var toCompile = toCompileList.join(', ');
+                var toCompile = toCompileList.join(' ');
                 element.append(toCompile);
                 $compile(element.contents())(scope); 
             } else {
@@ -77,6 +77,8 @@ function mmsTranscludeVal(ElementService, $compile, $templateCache) {
                 scope.values = scope.element.specialization.value;
                 recompile();
                 scope.$watch('values', recompile, true);
+            }, function(reason) {
+                growl.error('Cf Val Error: ' + reason.message);
             });
         });
     };

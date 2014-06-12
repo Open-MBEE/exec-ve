@@ -6,9 +6,15 @@ angular.module('mms.directives')
 function mmsViewSection($compile, $templateCache) {
     var template = $templateCache.get('mms/templates/mmsViewSection.html');
 
-    var mmsViewSectionLink = function(scope, element, attrs) {
+    var mmsViewSectionLink = function(scope, element, attrs, mmsViewCtrl) {
         element.append(template);
         $compile(element.contents())(scope); 
+        scope.structEditable = function() {
+            if (mmsViewCtrl) {
+                return mmsViewCtrl.getStructEditable();
+            } else
+                return false;
+        };
     };
 
     return {
@@ -16,6 +22,7 @@ function mmsViewSection($compile, $templateCache) {
         scope: {
             section: '=mmsSection',
         },
+        require: '?^mmsView',
         link: mmsViewSectionLink
     };
 }

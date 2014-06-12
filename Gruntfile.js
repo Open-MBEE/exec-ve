@@ -217,7 +217,7 @@ module.exports = function(grunt) {
             // /alfresco/service/javawebscripts
             // https://sheldon.jpl.nasa.gov/alfresco/wcs/javawebscripts/element/_17_0_2_3_407019f_1386871336920_707205_26285
             context: '/alfresco',  // '/api'
-            host: '128.149.16.152',//128.149.16.152',
+            host: 'europaems-dev-staging-b.jpl.nasa.gov',//128.149.16.152',
             port: 8443,
             changeOrigin: true,
             https: true,
@@ -289,10 +289,11 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-ngdocs');
   grunt.loadNpmTasks('grunt-html2js');
   grunt.loadNpmTasks('grunt-bower-install');
+  grunt.loadNpmTasks('grunt-bower-install-task');
   //grunt.loadNpmTasks('assemble');
 
   // Default task(s).  Must function before server has been stareted
-  grunt.registerTask('default', ['html2js', 'jshint:beforeconcat', 'concat', 'jshint:afterconcat', 'uglify', 'copy', 'ngdocs', 'bowerInstall']);
+  grunt.registerTask('default', ['bower_install', 'bowerInstall', 'html2js', 'jshint:beforeconcat', 'concat', 'jshint:afterconcat', 'uglify', 'copy', 'ngdocs']);
   //grunt.registerTask('stage', ['default', 'qunit', 'rsync']);
 
   grunt.registerTask('server', function(arg1) {

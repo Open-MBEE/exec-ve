@@ -30,6 +30,7 @@ function SiteService($q, $http, URLService, ProjectService, _) {
     var sites = {};
     var workspaces = {};
     var siteDocuments = {};
+    var inProgress = null;
 
     /**
      * @ngdoc method
@@ -127,10 +128,13 @@ function SiteService($q, $http, URLService, ProjectService, _) {
      * @returns {Promise} Resolves into array of site info objects.
      */
     var getSites = function() {
+        if (inProgress)
+            return inProgress;
         var deferred = $q.defer();
         if (!_.isEmpty(sites)) {
             deferred.resolve(_.values(sites));
         } else {
+            inProgress = deferred.promise;
             $http.get(URLService.getSitesURL())
             .success(function(data, status, headers, config) {
                 _.forEach(data, function(site) {
@@ -140,8 +144,10 @@ function SiteService($q, $http, URLService, ProjectService, _) {
                         _.merge(sites[site.name], site);
                 });
                 deferred.resolve(_.values(sites));
+                inProgress = null;
             }).error(function(data, status, headers, config) {
                 URLService.handleHttpStatus(data, status, headers, config, deferred);
+                inProgress = null;
             });
         }
         return deferred.promise;
