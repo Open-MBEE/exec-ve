@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms')
-.factory('ConfigService', ['$q', '$http', 'URLService', ConfigService]);
+.factory('ConfigService', ['$q', '$http', 'URLService', '_', ConfigService]);
 
 /**
  * @ngdoc service
@@ -12,7 +12,7 @@ angular.module('mms')
  * 
  * @description
  */
-function ConfigService($q, $http, URLService) {
+function ConfigService($q, $http, URLService, _) {
     
     var siteConfigs = {};
     var configs = {};
@@ -121,12 +121,50 @@ function ConfigService($q, $http, URLService) {
         return deferred.promise;
     };
 
-    var updateConfig = function() {
+    var updateConfig = function(config, site, workspace) {
+        var ws = !workspace ? 'master' : workspace;
+
+        var deferred = $q.defer();
+        if (!config.hasOwnProperty('id'))
+            deferred.reject('Config id not found, create configuration first!');
+        else {
+            $http.post(URLService.getConfigsURL(workspace, site), {'configurations': [config]})
+            .success(function(data, status, headers, config) {
+                var resp = data.configurations[0];
+                if (configs.hasOwnProperty(config.id))
+                    _.merge(configs[config.id], resp);
+                else
+                    configs[config.id] = resp;                
+                deferred.resolve(configs[config.id]);
+            }).error(function(data, status, headers, config) {
+                URLService.handleHttpStatus(data, status, headers, config, deferred);
+            });
+        } 
+        return deferred.promise;
 
     };
 
-    var createConfig = function() {
+    var createConfig = function(config, workspace, site) {
+        var ws = !workspace ? 'master' : workspace;
 
+        var deferred = $q.defer();
+
+        /* if (configs.hasOwnProperty('sysmlid')) {
+            deferred.reject({status: 200, message: 'Element create cannot have id'});
+            return deferred.promise;
+        } */
+
+        $http.post(URLService.getConfigsURL(ws, site), {'configurations': [config]})
+        .success(function(data, status, headers, config) {
+            if (data.length > 0) {
+                var c = data.configurations[0];
+                configs[c.id] = c;
+                deferred.resolve(configs[c.id]);
+            }
+        }).error(function(data, status, headers, config) {
+            URLService.handleHttpStatus(data, status, headers, config, deferred);
+        });
+        return deferred.promise;
     };
 
     var updateConfigSnapshots = function() {

@@ -20,13 +20,14 @@ angular.module('myApp')
         $state.go('docweb.new');
     };
   }])
-  .controller('ConfigCtrl', ["$scope", "$http", "$state", "$stateParams", "config", function($scope, $http, $state, $stateParams, config) {
+  .controller('ConfigCtrl', ["$scope", "$http", "$state", "$stateParams", "ConfigService", "_", "config", "site", 
+        function($scope, $http, $state, $stateParams, ConfigService, _, config, site) {
+
     $scope.config = config;
-    $scope.configId = $scope.config.id;
+    $scope.configForEdit = _.cloneDeep(config);
     
-    $scope.newConfigName = $scope.config.name;
-    $scope.newConfigDesc = $scope.config.description;
     $scope.toggles = {hideChangeForm: true, hideAddRemoveForm: true};
+
     $scope.toggleChangeForm = function() {
         $scope.toggles.hideChangeForm = !$scope.toggles.hideChangeForm;
     };
@@ -34,6 +35,10 @@ angular.module('myApp')
         $scope.toggles.hideAddRemoveForm = !$scope.toggles.hideAddRemoveForm;
     };
     $scope.change = function() {
+
+        ConfigService.updateConfig($scope.configForEdit, site.name, "master").then(function() {
+            $scope.toggles.hideChangeForm = true;
+        });
         /* $http.post('/alfresco/service/javawebscripts/configurations/' + $scope.currentSite, 
             {"name": $scope.newConfigName, "description": $scope.newConfigDesc, "nodeid": $scope.nodeid}).
             success(function(data, status, headers, config) {
@@ -96,7 +101,11 @@ angular.module('myApp')
             $scope.selected.splice(index, 1);
     };
   }])
-  .controller('NewCtrl', ["$scope", "$http", function($scope, $http) {
+  .controller('NewCtrl', ["$scope", "$http", "site", "products", "ConfigService", 
+        function($scope, $http, site, products, ConfigService) {
+    $scope.products = products;
+    $scope.site = site.title;
+
     $scope.newConfigName = "";
     $scope.newConfigDesc = "";
     $scope.selected = [];
@@ -108,18 +117,23 @@ angular.module('myApp')
             $scope.selected.splice(index, 1);
     };
     $scope.new = function() {
-        /* var send = {"name": $scope.newConfigName, "description": $scope.newConfigDesc};
+        var send = {"name": $scope.newConfigName, "description": $scope.newConfigDesc};
         if ($scope.selected.length > 1)
             send.products = $scope.selected;
+        
+        ConfigService.createConfig(send, "master", $scope.site).then(function(view) {
+
+        });
+
         //$window.alert("sending " + $scope.newConfigName + " " + $scope.newConfigDesc);
-        $http.post('/alfresco/service/javawebscripts/configurations/' + $scope.currentSite, send).
+        /* $http.post('/alfresco/service/javawebscripts/configurations/' + $scope.currentSite, send).
             success(function(data, status, headers, config) {
                 //$window.alert("success, wait for email");
                 $scope.messages.message = "New Configuration Created! Please wait for an email notification.";
             }).
             error(function(data, status, headers, config) {
                 $scope.messages.message = "Creating new configuration failed!";
-            });*/
+            }); */
     };
 
   }]);

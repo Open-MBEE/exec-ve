@@ -10,8 +10,8 @@
   <hr/>
   <div ng-hide="toggles.hideChangeForm">
     <h4>Change Name or Description</h4>
-    <h5>Name:</h5> <input class="form-control" type="text" ng-model="newConfigName"/>
-    <h5>Description:</h5> <textarea class="form-control" ng-model="newConfigDesc"></textarea>
+    <h5>Name:</h5> <input class="form-control" type="text" ng-model="configForEdit.name"/>
+    <h5>Description:</h5> <textarea class="form-control" ng-model="configForEdit.description"></textarea>
     <br/>
     <div><button class="btn btn-primary btn-sm" ng-click="change()">Change</button>
       <button class="btn btn-primary btn-sm" ng-click="toggleChangeForm()">Cancel</button>
