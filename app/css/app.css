@@ -323,8 +323,8 @@ mms-transclude-com, mms-transclude-com * {
 }
 
 .pane-selector {
-  border-left: 1px solid #DDD;
-  background-color: #F5F5F5;
+  border-left: 1px solid #FFF;
+  background-color: #404040;
 }
 
 /*.pane-selector .nav-pills > li > a {
@@ -366,4 +366,13 @@ mms-transclude-com, mms-transclude-com * {
   text-decoration: none;
   font-size: 20px;
   padding: 0;
+}
+
+ul > span.divider {
+  height: 2px;
+  display: block;
+  font-size: 0;
+  line-height: 0;
+  background: #424242;
+  border-top: 1px solid #242424;
 }
