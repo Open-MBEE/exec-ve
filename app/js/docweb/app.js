@@ -10,7 +10,7 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
                     return SiteService.getSite($stateParams.site);
                 },
                 configs: function($stateParams, ConfigService) {
-                    return ConfigService.getConfigs($stateParams.site, 'master');
+                    return ConfigService.getSiteConfigs($stateParams.site, 'master');
                 }
             },
             views: {
@@ -31,7 +31,7 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
             url: '/latest',
             resolve: {
                 products: function(site, ViewService) {
-                    return ViewService.getDocuments('master', site.name, null, null);
+                    return ViewService.getSiteDocuments(site.name, null, 'master', null);
                 }
             },
             views: {
@@ -48,7 +48,7 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
             url: '/new',
             resolve: {
                 products: function(site, ViewService) {
-                    return ViewService.getDocuments('master', site.name, null, null);
+                    return ViewService.getSiteDocuments(site.name, null, 'master', null);
                 }
             },
             views: {
@@ -65,7 +65,7 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
                     return ConfigService.getConfig($stateParams.configId, site.name, 'master');
                 },
                 snapshots: function($stateParams, site, ConfigService) {
-                    return ConfigService.getSnapshotsForConfig($stateParams.configId, site.name, 'master');
+                    return ConfigService.getConfigSnapshots($stateParams.configId, site.name, 'master');
                 }
             },
             views: {

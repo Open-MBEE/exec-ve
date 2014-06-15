@@ -83,7 +83,7 @@ function ElementService($q, $http, URLService, VersionService, _) {
                 delete inProgress[key];
             });
         } else {
-            return VersionService.getElement(id, ws, ver);
+            return VersionService.getElement(id, ver, ws);
         }
         return deferred.promise;
     };
@@ -258,7 +258,7 @@ function ElementService($q, $http, URLService, VersionService, _) {
                 delete inProgress[progress];
             });
         } else {
-            return VersionService.getGenericElements(url, key, ws, ver);
+            return VersionService.getGenericElements(url, key, ver, ws);
         }
         return deferred.promise;
     };
