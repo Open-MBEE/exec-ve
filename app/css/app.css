@@ -278,6 +278,7 @@ accordion a.docweb-link {
 
 .navbar-inverse {
   background-color: #44749D;
+  box-shadow: 0px 1px 1px 0px #404040;
   border: 0;
 }
 
@@ -319,4 +320,72 @@ mms-view:not(.reviewing) mms-transclude-com {
 
 mms-transclude-com, mms-transclude-com * {
   background-color: lightgreen;
+}
+
+.pane-selector {
+  border-left: 1px solid #FFF;
+  background-color: #404040;
+}
+
+/*.pane-selector .nav-pills > li > a {
+  padding-left: 0;
+  padding-right: 0;
+  border-radius: 0;
+  text-align: center;
+  color: #404040;
+  cursor: pointer;
+}
+
+.pane-selector .nav-pills > li.active > a {
+  color: #FFF;
+  background-color: #404040;
+}
+*/
+
+.pane-selector ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.pane-selector ul li {
+  text-align: center;
+  font-size: 16px;
+  position: relative;
+  margin: 0;
+  padding: 0;
+}
+
+.pane-selector ul li a {
+  display: table-cell;
+  vertical-align: middle;
+  width: 40px;
+  height: 45px;
+  line-height: 45px;
+  color: #999;
+  text-decoration: none;
+  font-size: 20px;
+  padding: 0;
+  cursor: pointer;
+}
+
+.pane-selector ul li.active a {
+  color: #FFF;
+}
+
+.pane-selector ul li a:hover {
+  color: #FFF;
+  -webkit-transition: color .15s ease-in;
+  -moz-transition: color .15s ease-in;
+  -o-transition: color .15s ease-in;
+  transition: color .15s ease-in;
+}
+
+ul > span.divider {
+  height: 2px;
+  display: block;
+  font-size: 0;
+  line-height: 0;
+  background: #606060;
+  border-top: 1px solid #242424;
 }
