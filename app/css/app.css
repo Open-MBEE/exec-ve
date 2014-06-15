@@ -357,15 +357,28 @@ mms-transclude-com, mms-transclude-com * {
 }
 
 .pane-selector ul li a {
-  display: inline-block;
-  width: 40px;
-  height: 40px;
-  line-height: 40px;
+  display: table-cell;
   vertical-align: middle;
+  width: 40px;
+  height: 45px;
+  line-height: 45px;
   color: #999;
   text-decoration: none;
   font-size: 20px;
   padding: 0;
+  cursor: pointer;
+}
+
+.pane-selector ul li.active a {
+  color: #FFF;
+}
+
+.pane-selector ul li a:hover {
+  color: #FFF;
+  -webkit-transition: color .15s ease-in;
+  -moz-transition: color .15s ease-in;
+  -o-transition: color .15s ease-in;
+  transition: color .15s ease-in;
 }
 
 ul > span.divider {
