@@ -62,6 +62,10 @@ module.exports = function(grunt) {
       mmsdirs: {
         src: ['src/mms.directives.js', 'src/directives/*.js'],
         dest: 'dist/mms.directives.js'
+      },
+      css: {
+        src: ['dist/css/*.css'],
+        dest: 'dist/mms.min.css'
       }
     },
 
@@ -83,6 +87,16 @@ module.exports = function(grunt) {
           wrap: 'mmsdirs'
         },
         files: {'dist/mms.directives.min.js': ['dist/mms.directives.js']}
+      }
+    },
+
+    cssmin: {
+      minify: {
+        expand: true,
+        cwd: 'src/directives/templates/css/',
+        src: ['*.css', '!*.min.css'],
+        dest: 'dist/css/',
+        ext: '.min.css'
       }
     },
 
@@ -283,6 +297,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-clean');
+  grunt.loadNpmTasks('grunt-contrib-cssmin');
   grunt.loadNpmTasks('grunt-rsync-2');
   grunt.loadNpmTasks('grunt-connect-proxy');
   grunt.loadNpmTasks('grunt-stubby');
@@ -293,7 +308,7 @@ module.exports = function(grunt) {
   //grunt.loadNpmTasks('assemble');
 
   // Default task(s).  Must function before server has been stareted
-  grunt.registerTask('default', ['bower_install', 'bowerInstall', 'html2js', 'jshint:beforeconcat', 'concat', 'jshint:afterconcat', 'uglify', 'copy', 'ngdocs']);
+  grunt.registerTask('default', ['bower_install', 'bowerInstall', 'html2js', 'cssmin', 'jshint:beforeconcat', 'concat', 'jshint:afterconcat', 'uglify', 'copy', 'ngdocs']);
   //grunt.registerTask('stage', ['default', 'qunit', 'rsync']);
 
   grunt.registerTask('server', function(arg1) {
