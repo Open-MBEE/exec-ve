@@ -62,10 +62,6 @@ module.exports = function(grunt) {
       mmsdirs: {
         src: ['src/mms.directives.js', 'src/directives/*.js'],
         dest: 'dist/mms.directives.js'
-      },
-      css: {
-        src: ['dist/css/*.css'],
-        dest: 'dist/mms.min.css'
       }
     },
 
@@ -97,6 +93,11 @@ module.exports = function(grunt) {
         src: ['*.css', '!*.min.css'],
         dest: 'dist/css/',
         ext: '.min.css'
+      },
+      combine: {
+        files: {
+          'dist/mms.min.css': ['dist/css/*.css']
+        }
       }
     },
 
