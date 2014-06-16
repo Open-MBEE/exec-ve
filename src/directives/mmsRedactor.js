@@ -49,7 +49,7 @@ function mmsRedactor(ElementService, ViewService, $modal, $templateCache, growl)
                 });
             };
             $scope.makeNew = function(newName) {
-                ElementService.createElement({name: newName, documentation: ''})
+                ElementService.createElement({name: newName, documentation: '', specialization: {type: 'Element'}})
                 .then(function(data) {
                     $scope.mmsCfElements = [data];
                 }, function(reason) {
