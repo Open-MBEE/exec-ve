@@ -7,3 +7,4 @@ build
 dist
 docs
 app/bower_components
+app/bower_components_target

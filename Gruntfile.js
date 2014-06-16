@@ -10,16 +10,17 @@ module.exports = function(grunt) {
     bower: {
       install: {
         options: {
-          targetDir: 'bower_components',
-          overrideBowerDirectory: true,
+          targetDir: 'bower_components_target',
+          overrideBowerDirectory: false,
           cwd: 'app',
-          layout: 'byType',
+          layout: 'byComponent',
           install: true,
           verbose: false,
           cleanTargetDir: false,
           cleanBowerDir: false,
           bowerOptions: {},
-          copy: false
+          copy: true,
+          forcedCopyDir: 'app'
         }
       }
     },
