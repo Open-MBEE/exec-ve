@@ -319,10 +319,11 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-html2js');
   grunt.loadNpmTasks('grunt-bower-install');
   grunt.loadNpmTasks('grunt-bower-installer');
+  grunt.loadNpmTasks('grunt-npm-install');
   //grunt.loadNpmTasks('assemble');
 
   // Default task(s).  Must function before server has been stareted
-  grunt.registerTask('default', ['bower', 'html2js', 'cssmin', 'jshint:beforeconcat', 'concat', 'jshint:afterconcat', 'uglify', 'copy', 'bowerInstall', 'ngdocs']);
+  grunt.registerTask('default', ['npm-install', 'bower', 'html2js', 'cssmin', 'jshint:beforeconcat', 'concat', 'jshint:afterconcat', 'uglify', 'copy', 'bowerInstall', 'ngdocs']);
 
   //grunt.registerTask('stage', ['default', 'qunit', 'rsync']);
 
