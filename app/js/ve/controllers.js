@@ -3,16 +3,28 @@
 /* Controllers */
 
 angular.module('myApp')
-.controller('NavTreeCtrl', ['$scope', '$state', '$stateParams', 'ElementService', 'ViewService', 'growl',
-function($scope, $state, $stateParams, ElementService, ViewService, growl) {
+.controller('NavTreeCtrl', ['$scope', '$state', '$stateParams', 'snapshots', 'site', 'time', 'ElementService', 'ViewService', 'ConfigService', 'growl',
+function($scope, $state, $stateParams, snapshots, site, time, ElementService, ViewService, ConfigService, growl) {
     $scope.documentid = $stateParams.docId;
+    $scope.snapshots = snapshots;
+    $scope.site = site;
+    $scope.time = time;
+    $scope.createNewSnapshot = function() {
+        ConfigService.createSnapshot($scope.documentid)
+        .then(function(result) {
+            growl.success("Create Successful: wait for email.");
+        }, function(reason) {
+            growl.error("Create Failed: " + reason.message);
+        });
+    };
+
     var tree = {};
 
       // 1. Iterate over view2view and create an array of all element ids
       // 2. Call get element ids and create a map of element id -> element name structure
       // 3. Iterate over view2view and create a map of element id -> element tree node reference
       
-    ViewService.getDocument($scope.documentid)
+    ViewService.getDocument($scope.documentid, false, 'master', time)
     .then(function(data) {
 
         // Array of all the view element ids
@@ -58,7 +70,7 @@ function($scope, $state, $stateParams, ElementService, ViewService, growl) {
         };
 
         // Call the get element service and pass in all the elements
-        ElementService.getElements(viewElementIds)
+        ElementService.getElements(viewElementIds, false, 'master', time)
         .then(function(elements) {
 
           // Fill out all the view names first

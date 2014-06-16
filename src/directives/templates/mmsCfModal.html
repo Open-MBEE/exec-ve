@@ -3,6 +3,7 @@
     <div>Search: <input type="text" ng-model="searchText"> <button class="btn btn-sm" ng-click="search(searchText)">Search Server</button></div>
     <div>Filter: <input type="text" ng-model="filter"></div>
     <div>Propose New Element: <input type="text" ng-model="new"> <button class="btn btn-sm" ng-click="makeNew(new)">Submit</button></div>
+    <div class="container-fluid transclude-table">
     <table class="table table-bordered">
         <tr><th>Name</th><th>Qualified Name</th><th>Type</th><th>Doc</th><th>Value (if applicable)</th></tr>
         <tr ng-repeat="elem in mmsCfElements | filter:filter">
@@ -12,10 +13,11 @@
             <td ng-click="choose(elem.sysmlid, 'doc', elem.name)" class="clickable">{{elem.documentation | limitTo:20}}</td>
             <td ng-click="choose(elem.sysmlid, 'val', elem.name)" class="clickable">
                 <span ng-repeat="val in elem.specialization.value">
-                    {{val.integer || val.double || val.boolean || val.string}}
+                    {{val.integer || val.double || val.boolean + '' || val.string}}
                 </span>
             </td>
         </tr>
     </table>
+    </div>
 </div>
 <div class="modal-footer"><button class="btn btn-sm btn-primary" ng-click="cancel()">Cancel</button></div>

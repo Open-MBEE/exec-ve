@@ -60,7 +60,9 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, growl) {
                 scope.editing = false;
                 if (scope.element.specialization.type === 'Property')
                     scope.values = scope.element.specialization.value;
-                if (scope.mmsEditField === 'none' || !scope.element.editable) {
+                if (scope.mmsEditField === 'none' || 
+                        !scope.element.editable || 
+                        (scope.mmsVersion !== 'latest' && scope.mmsVersion)) {
                     scope.editable = false;
                     //template = readTemplate;
                     

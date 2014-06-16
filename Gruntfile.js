@@ -99,6 +99,21 @@ module.exports = function(grunt) {
       }
     },
 
+    cssmin: {
+      minify: {
+        expand: true,
+        cwd: 'src/directives/templates/css/',
+        src: ['*.css', '!*.min.css'],
+        dest: 'dist/css/',
+        ext: '.min.css'
+      },
+      combine: {
+        files: {
+          'dist/mms.min.css': ['dist/css/*.css']
+        }
+      }
+    },
+
     jshint : {
       beforeconcat: ['src/**/*.js'],
       afterconcat: ['dist/mms.js', 'dist/mms.directives.js'],
@@ -189,7 +204,7 @@ module.exports = function(grunt) {
           }
         ]
       },
-      crushb: {
+      a: {
         options: {
           hostname: '*',
           port: 9000,
@@ -217,7 +232,7 @@ module.exports = function(grunt) {
           }
         ]
       },
-      crusha: {
+      b: {
         options: {
           hostname: '*',
           port: 9000,
@@ -296,6 +311,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-clean');
+  grunt.loadNpmTasks('grunt-contrib-cssmin');
   grunt.loadNpmTasks('grunt-rsync-2');
   grunt.loadNpmTasks('grunt-connect-proxy');
   grunt.loadNpmTasks('grunt-stubby');
@@ -306,7 +322,8 @@ module.exports = function(grunt) {
   //grunt.loadNpmTasks('assemble');
 
   // Default task(s).  Must function before server has been stareted
-  grunt.registerTask('default', ['bower', 'html2js', 'jshint:beforeconcat', 'concat', 'jshint:afterconcat', 'uglify', 'copy', 'bowerInstall', 'ngdocs']);
+  grunt.registerTask('default', ['bower', 'html2js', 'cssmin', 'jshint:beforeconcat', 'concat', 'jshint:afterconcat', 'uglify', 'copy', 'bowerInstall', 'ngdocs']);
+
   //grunt.registerTask('stage', ['default', 'qunit', 'rsync']);
 
   grunt.registerTask('server', function(arg1) {
@@ -318,7 +335,7 @@ module.exports = function(grunt) {
       grunt.task.run('stubby', 'configureProxies:' + arg1, 'connect:' + arg1);
     } else {
       grunt.log.writeln("Launching server with proxy API");
-      grunt.task.run('configureProxies:crushb', 'connect:crushb');
+      grunt.task.run('configureProxies:b', 'connect:b');
     }
     grunt.task.run('watch');
   });

@@ -15,30 +15,24 @@ angular.module('mms')
  */
 function VersionService($q, $http, URLService) {
 
-    var elements = {};
-    var versions = {};
-    var inProgress = {};
-
-    var isTimestamp = function(version) {
-        if (String(version).indexOf('-') >= 0)
-            return true;
-        return false;
-        //return isNaN(version); //this may be unreliable
-    };
+    var elements = {};   //element id to dict of version key to element object
+    var versions = {};   //element id to array of version objects
+    var inProgress = {}; //function argument key to executing promises
 
     /**
      * @ngdoc method
-     * @name mms.VersionService#getElementVersionByTag
+     * @name mms.VersionService#getElement
      * @methodOf mms.VersionService
      * 
      * @description
      * Queries for an element version as of a certain time.
      *
      * @param {string} id The id of the element
-     * @param {Date} date A js date object
+     * @param {string} version A timestamp or version
+     * @param {string} [workspace=master] The workspace
      * @returns {Promise} The promise will be resolved with an element object.
      */
-    var getElement = function(id, workspace, version) {
+    var getElement = function(id, version, workspace) {
         var ws = !workspace ? 'master' : workspace;
         var key = 'getElement(' + id + ws + version + ')';
         if (inProgress.hasOwnProperty(key))
@@ -52,14 +46,9 @@ function VersionService($q, $http, URLService) {
         } else {
             elements[id] = {};
         }
-        var url = URLService.getElementURL(id, ws);
-        if (isTimestamp(version)) {
-            url += '?timestamp=' + version;
-        } else {
-            url += '/versions/' + version;
-        }
+        var url = URLService.getElementURL(id, ws, version);
         inProgress[key] = deferred.promise;
-        $http.get(url)
+        $http.get(url, {params: {timestamp: version}})
         .success(function(data, status, headers, config) {
             if (data.elements.length > 0) {
                 elements[id][version] = data.elements[0];
@@ -75,10 +64,23 @@ function VersionService($q, $http, URLService) {
         return deferred.promise;
     };
 
-    var getElements = function(ids, workspace, version) {
+    /**
+     * @ngdoc method
+     * @name mms.VersionService#getElements
+     * @methodOf mms.VersionService
+     * 
+     * @description
+     * Queries for element versions
+
+     * @param {string} ids The ids of elements
+     * @param {string} version A timestamp or version
+     * @param {string} [workspace=master] The workspace
+     * @returns {Promise} The promise will be resolved with array of element objects
+     */
+    var getElements = function(ids, version, workspace) {
         var promises = [];
         ids.forEach(function(id) {
-            promises.push(getElement(id, workspace, version));
+            promises.push(getElement(id, version, workspace));
         });
         return $q.all(promises);
     };
@@ -113,7 +115,21 @@ function VersionService($q, $http, URLService) {
         return deferred.promise;
     };
 
-    var getGenericElements = function(url, key, workspace, version) {
+    /**
+     * @ngdoc method
+     * @name mms.VersionService#getGenericElements
+     * @methodOf mms.VersionService
+     * 
+     * @description
+     * Gets element versions using given url
+     *
+     * @param {string} url The url to get
+     * @param {string} key The key in return value that has element array
+     * @param {string} version Timestamp or version
+     * @param {string} [workspace=master] Workspace name
+     * @returns {Promise} The promise will be resolved with an array of element objects.
+     */
+    var getGenericElements = function(url, key , version, workspace) {
         var ws = !workspace ? 'master' : workspace;
         var progress = 'getGenericElements(' + url + key + ws + version + ')';
         if (inProgress.hasOwnProperty(progress))
@@ -121,7 +137,7 @@ function VersionService($q, $http, URLService) {
 
         var deferred = $q.defer();
         inProgress[progress] = deferred.promise;
-        $http.get(url)
+        $http.get(url, {params: {timestamp: version}})
         .success(function(data, status, headers, config) {
             var result = [];
             data[key].forEach(function(element) {

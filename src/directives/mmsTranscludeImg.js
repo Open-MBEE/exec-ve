@@ -40,7 +40,7 @@ function mmsTranscludeImg(VizService, growl) {
                 if (!version)
                     version = viewVersion.version;
             }
-            VizService.getImageUrl(scope.mmsEid, false, ws, version)
+            VizService.getImageURL(scope.mmsEid, false, ws, version)
             .then(function(data) {
                 scope.imgUrl = data;
             }, function(reason) {
@@ -51,7 +51,7 @@ function mmsTranscludeImg(VizService, growl) {
 
     return {
         restrict: 'E',
-        template: '<img src="{{imgUrl}}"/>',
+        template: '<img ng-src="{{imgUrl}}"></img>',
         scope: {
             mmsEid: '@',
             mmsVersion: '@',

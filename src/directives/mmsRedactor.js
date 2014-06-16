@@ -40,6 +40,7 @@ function mmsRedactor(ElementService, ViewService, $modal, $templateCache, growl)
             };
             $scope.search = function(searchText) {
                 //var searchText = $scope.searchText; //TODO investigate why searchText isn't in $scope
+                growl.info("Searching...");
                 ElementService.search(searchText)
                 .then(function(data) {
                     $scope.mmsCfElements = data;

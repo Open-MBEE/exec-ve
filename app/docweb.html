@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en" ng-app="myApp">
+<head>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge;chrome=1" />
+  <meta charset="utf-8">
+  <title>Test MMS Module App</title>
+  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" type="text/css">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.1.0/css/font-awesome.min.css" type="text/css">
+  <link rel="stylesheet" href="css/app.css">  
+  <!-- Froala - TODO minify before deploying -->
+  <link rel="stylesheet" href="bower_components/froala/css/froala_editor.css" type="text/css">
+  <!-- Angular Bootsrap Nav Tree -->
+  <link rel="stylesheet" href="bower_components/angular-bootstrap-nav-tree/dist/abn_tree.css" type="text/css">
+  <link rel="stylesheet" href="bower_components/angular-borderlayout/src/borderLayout.css">
+  <link rel="stylesheet" href="bower_components/angular-ui-tree/dist/angular-ui-tree.min.css">
+  <link rel="stylesheet" href="bower_components/angular-growl-v2/build/angular-growl.css">
+  <link rel="stylesheet" href="mms.min.css">
+
+</head>
+
+<body>
+<div growl></div>
+    <div fa-pane>
+        <div fa-pane="menu" pane-anchor="north" pane-size="51px">
+            <div ui-view="menu">loading...</div>
+        </div>
+        <div fa-pane pane-anchor="west" pane-size="20%" pane-handle="4">
+            <div ui-view="config">loading...</div>
+        </div>
+        <div fa-pane pane-anchor="center">
+            <div ui-view="view"></div>
+        </div>
+    </div>
+
+<!-- jQuery -->
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.14/angular.min.js"></script> 
+<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.14/angular-animate.min.js"></script> 
+
+<!-- Bower Components (3rd party libraries) -->
+<script src="bower_components/angular-borderlayout/src/borderLayout.js"></script>
+<script src="bower_components/angular-ui-bootstrap-bower/ui-bootstrap-tpls.js"></script>
+<script src="bower_components/angular-ui-router/release/angular-ui-router.js"></script>
+<script src="bower_components/angular-ui-sortable/sortable.js"></script>
+<script src="bower_components/angular-ui-tree/dist/angular-ui-tree.js"></script>
+<script src="bower_components/froala/js/froala_editor.min.js"></script>
+<script src="bower_components/lodash/dist/lodash.js"></script>
+<script src="bower_components/angular-growl-v2/build/angular-growl.js"></script>
+
+<!-- MMS -->
+<script src="mms.js"></script>
+<script src="mms.directives.tpls.js"></script>
+<script src="mms.directives.js"></script>
+
+<!-- MMS Application-->
+<script src="js/docweb/app.js"></script>
+<script src="js/docweb/controllers.js"></script>
+
+</body>
+</html>

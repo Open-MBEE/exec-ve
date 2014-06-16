@@ -22,6 +22,7 @@ angular.module('mms')
 function ViewService($q, $http, URLService, ElementService, CommentService) {
     var viewElements = {"latest": {}};
     var productViews = {"latest": {}};
+    var siteDocuments = {};
     var currentViewId = '';
     var currentDocumentId = '';
     
@@ -156,7 +157,7 @@ function ViewService($q, $http, URLService, ElementService, CommentService) {
         var ver = !version ? 'latest' : version;
 
         var deferred = $q.defer();
-        var url = URLService.getViewURL(id, ws) + '/elements';
+        var url = URLService.getViewElementsURL(id, ws, ver);
         if (viewElements.hasOwnProperty(ver) && viewElements[ver].hasOwnProperty(id) && !update) 
             deferred.resolve(viewElements[ver][id]);
         else {
@@ -199,7 +200,7 @@ function ViewService($q, $http, URLService, ElementService, CommentService) {
         var ver = !version ? 'latest' : version;
 
         var deferred = $q.defer();
-        var url = URLService.getDocumentURL(id) + '/views';
+        var url = URLService.getDocumentViewsURL(id, ws, ver);
         if (productViews.hasOwnProperty(ver) && productViews[ver].hasOwnProperty(id) && !update) 
             deferred.resolve(productViews[ver][id]);
         else {
@@ -296,10 +297,12 @@ function ViewService($q, $http, URLService, ElementService, CommentService) {
      * @param {string} parentViewId Id of the parent view, this view should 
      *      already be in the document
      * @param {string} [workspace=master] workspace to use
+     * @returns {Promise} The promise would be resolved with updated document object
      */
     var addViewToDocument = function(viewId, documentId, parentViewId, workspace) {
         var deferred = $q.defer();
-        getDocument(documentId, workspace).then(function(data) {   
+        getDocument(documentId, workspace)
+        .then(function(data) {   
             for (var i = 0; i < data.specialization.view2view.length; i++) {
                 if (data.specialization.view2view[i].id === parentViewId) {
                     data.specialization.view2view[i].childrenViews.push(viewId);
@@ -307,7 +310,8 @@ function ViewService($q, $http, URLService, ElementService, CommentService) {
                 }
             } 
             data.specialization.view2view.push({id: viewId, childrenViews: []});
-            updateDocument(data, workspace).then(function(data2) {
+            updateDocument(data, workspace)
+            .then(function(data2) {
                 deferred.resolve(data);
             }, function(reason) {
                 deferred.reject(reason);
@@ -342,7 +346,7 @@ function ViewService($q, $http, URLService, ElementService, CommentService) {
         var view = {
             specialization: {type: 'View', contains: []},
             owner: ownerId,
-            name: (name === undefined || name === null) ? 'Untitled View' : name,
+            name: !name ? 'Untitled View' : name,
             documentation: '',
         };
         ElementService.createElement(view, workspace)
@@ -360,7 +364,7 @@ function ViewService($q, $http, URLService, ElementService, CommentService) {
             data.specialization.childrenViews = [];
             ElementService.updateElement(data, workspace)
             .then(function(data2) {
-                if (documentId !== undefined) {
+                if (documentId) {
                     addViewToDocument(data.sysmlid, documentId, ownerId, workspace)
                     .then(function(data3) {
                         deferred.resolve(data2);
@@ -378,8 +382,37 @@ function ViewService($q, $http, URLService, ElementService, CommentService) {
         return deferred.promise;
     };
 
-    var getDocuments = function(workspace, site) {
+    /**
+     * @ngdoc method
+     * @name mms.ViewService#getSiteDocuments
+     * @methodOf mms.ViewService
+     * 
+     * @description
+     * Gets all the documents in a site
+     * 
+     * @param {string} site Site name
+     * @param {boolean} [updateFromServer=Untitled] Update latest
+     * @param {string} [workspace=master] workspace to use 
+     * @returns {Promise} The promise will be resolved with array of document objects 
+     */
+    var getSiteDocuments = function(site, updateFromServer, workspace) {
+        var update = !updateFromServer ? false : updateFromServer;
+        var ws = !workspace ? 'master' : workspace;
 
+        var deferred = $q.defer();
+        var url = URLService.getSiteProductsURL(site, ws);
+        if (siteDocuments.hasOwnProperty(site) && !update) 
+            deferred.resolve(siteDocuments[site]);
+        else {
+            ElementService.getGenericElements(url, 'products', update, ws).
+            then(function(data) {
+                siteDocuments[site] = data;                
+                deferred.resolve(siteDocuments[site]);
+            }, function(reason) {
+                deferred.reject(reason);
+            });
+        }
+        return deferred.promise;
     };
 
     var setCurrentViewId = function(id) {
@@ -412,7 +445,7 @@ function ViewService($q, $http, URLService, ElementService, CommentService) {
         createView: createView,
         addViewToDocument: addViewToDocument,
         getDocumentViews: getDocumentViews,
-        getDocuments: getDocuments,
+        getSiteDocuments: getSiteDocuments,
         setCurrentViewId: setCurrentViewId,
         setCurrentDocumentId: setCurrentDocumentId,
         getCurrentViewId: getCurrentViewId,

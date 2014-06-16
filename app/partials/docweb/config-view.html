@@ -1,0 +1,49 @@
+<div><h4>{{config.name}} - {{config.modified | date:'medium'}}</h4></div>
+<div>{{config.description}}</div>
+<h5>Documents</h5>
+  <div ng-repeat="snapshot in config.snapshots | filter:snapshotName">
+      <a href="{{snapshot.url}}">{{snapshot.name}}</a>
+  </div>
+  <br/>
+  <button ng-show="toggles.hideChangeForm" class="btn btn-primary btn-sm" ng-click="toggleChangeForm()">Change Name or Description</button>
+  <button ng-show="toggles.hideAddRemoveForm" class="btn btn-primary btn-sm" ng-click="toggleAddRemoveForm()">Add or Remove Snapshots</button>
+  <hr/>
+  <div ng-hide="toggles.hideChangeForm">
+    <h4>Change Name or Description</h4>
+    <h5>Name:</h5> <input class="form-control" type="text" ng-model="configForEdit.name"/>
+    <h5>Description:</h5> <textarea class="form-control" ng-model="configForEdit.description"></textarea>
+    <br/>
+    <div><button class="btn btn-primary btn-sm" ng-click="change()">Change</button>
+      <button class="btn btn-primary btn-sm" ng-click="toggleChangeForm()">Cancel</button>
+    </div>
+    <hr/>
+  </div>
+  <div ng-controller="TagAddRemoveCtrl">
+    <div ng-hide="toggles.hideAddRemoveForm"><h4>Add or Remove Snapshots</h4>
+      <div class="row">
+        <div class="col-xs-6">
+          
+            <div ng-repeat="doc in products | orderBy:'name'" ng-controller="TagAddRemoveDocCtrl">
+              <a href="" ng-click="toggleShowSnapshots()"><h6><span ng-hide="showSnapshots">></span><span ng-show="showSnapshots">v</span> {{doc.name}}</h6></a>
+              <div ng-show="showSnapshots">
+                <div ng-repeat="snapshot in snapshots">
+                  <input type="checkbox" ng-model="snapshot.selected" ng-change="toggleCheck(snapshot.id)"/> <a href="{{snapshot.url}}">{{snapshot.created | date:'medium'}}</a>
+                </div>
+              </div>
+            </div>
+            
+            <div><button class="btn btn-primary btn-sm" ng-click="update()">Update</button>
+              <button class="btn btn-primary btn-sm" ng-click="toggleAddRemoveForm()">Cancel</button>
+            </div>
+      
+        </div>
+        <div class="col-xs-6">
+          <h6>Selected:</h6>
+          <div ng-repeat="id in selected">
+            {{snapshotMap[id].name}} - {{snapshotMap[id].created | date:'medium'}}
+          </div>
+        </div>
+      </div>
+      <hr/>
+    </div>
+  </div>
