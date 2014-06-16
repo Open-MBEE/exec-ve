@@ -191,7 +191,7 @@ module.exports = function(grunt) {
           }
         ]
       },
-      crushb: {
+      a: {
         options: {
           hostname: '*',
           port: 9000,
@@ -219,7 +219,7 @@ module.exports = function(grunt) {
           }
         ]
       },
-      crusha: {
+      b: {
         options: {
           hostname: '*',
           port: 9000,
@@ -321,7 +321,7 @@ module.exports = function(grunt) {
       grunt.task.run('stubby', 'configureProxies:' + arg1, 'connect:' + arg1);
     } else {
       grunt.log.writeln("Launching server with proxy API");
-      grunt.task.run('configureProxies:crushb', 'connect:crushb');
+      grunt.task.run('configureProxies:b', 'connect:b');
     }
     grunt.task.run('watch');
   });

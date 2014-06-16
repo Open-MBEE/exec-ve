@@ -266,7 +266,7 @@ function URLService($q, $http, $location) {
      * @returns {string} The post elements url.
      */
     var getPostElementsURL = function(workspace) {
-        return root + "/javawebscripts/sites/europa/projects/123456/elements";
+        return root + "/javawebscripts/sites/europa/projects/PROJECT-21bbdceb-a188-45d9-a585-b30bba346175/elements";
         //return root + '/workspaces/' + workspace + '/elements';
     };
 

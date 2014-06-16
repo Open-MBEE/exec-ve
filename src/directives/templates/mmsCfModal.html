@@ -13,7 +13,7 @@
             <td ng-click="choose(elem.sysmlid, 'doc', elem.name)" class="clickable">{{elem.documentation | limitTo:20}}</td>
             <td ng-click="choose(elem.sysmlid, 'val', elem.name)" class="clickable">
                 <span ng-repeat="val in elem.specialization.value">
-                    {{val.integer || val.double || val.boolean || val.string}}
+                    {{val.integer || val.double || val.boolean + '' || val.string}}
                 </span>
             </td>
         </tr>
