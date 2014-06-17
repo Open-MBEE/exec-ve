@@ -3,14 +3,14 @@
 /* Controllers */
 
 angular.module('myApp')
-.controller('NavTreeCtrl', ['$scope', '$state', '$stateParams', 'snapshots', 'site', 'time', 'ElementService', 'ViewService', 'ConfigService', 'growl',
-function($scope, $state, $stateParams, snapshots, site, time, ElementService, ViewService, ConfigService, growl) {
-    $scope.documentid = $stateParams.docId;
+.controller('NavTreeCtrl', ['$scope', '$state', 'document', 'snapshots', 'site', 'time', 'ElementService', 'ViewService', 'ConfigService', 'growl',
+function($scope, $state, document, snapshots, site, time, ElementService, ViewService, ConfigService, growl) {
+    $scope.document = document;
     $scope.snapshots = snapshots;
     $scope.site = site;
     $scope.time = time;
     $scope.createNewSnapshot = function() {
-        ConfigService.createSnapshot($scope.documentid)
+        ConfigService.createSnapshot($scope.document.sysmlid)
         .then(function(result) {
             growl.success("Create Successful: wait for email.");
         }, function(reason) {
@@ -24,8 +24,8 @@ function($scope, $state, $stateParams, snapshots, site, time, ElementService, Vi
       // 2. Call get element ids and create a map of element id -> element name structure
       // 3. Iterate over view2view and create a map of element id -> element tree node reference
       
-    ViewService.getDocument($scope.documentid, false, 'master', time)
-    .then(function(data) {
+    //ViewService.getDocument($scope.documentid, false, 'master', time)
+    //.then(function(data) {
 
         // Array of all the view element ids
         var viewElementIds = [];
@@ -34,14 +34,14 @@ function($scope, $state, $stateParams, snapshots, site, time, ElementService, Vi
         var viewElementIds2TreeNodeMap = {};
         
         // document id is the root the tree heirarchy
-        var rootElementId = data.sysmlid;
+        var rootElementId = document.sysmlid;
 
         // Iterate through all the views in the view2view attribute
         // view2view is a set of elements with related child views
         // Note: The JSON format is NOT nested - it uses refrencing
-        for (var i = 0; i < data.specialization.view2view.length; i++) {
+        for (var i = 0; i < document.specialization.view2view.length; i++) {
 
-          var viewId = data.specialization.view2view[i].id;
+          var viewId = document.specialization.view2view[i].id;
           
           viewElementIds.push(viewId);
         }
@@ -85,13 +85,13 @@ function($scope, $state, $stateParams, snapshots, site, time, ElementService, Vi
             addSectionElements(elements[i], viewTreeNode, viewTreeNode);
           }
 
-          for (var i = 0; i < data.specialization.view2view.length; i++) {
+          for (var i = 0; i < document.specialization.view2view.length; i++) {
 
-            var viewId = data.specialization.view2view[i].id;
+            var viewId = document.specialization.view2view[i].id;
             
-            for (var j = 0; j < data.specialization.view2view[i].childrenViews.length; j++) {
+            for (var j = 0; j < document.specialization.view2view[i].childrenViews.length; j++) {
               
-              var childViewId = data.specialization.view2view[i].childrenViews[j];
+              var childViewId = document.specialization.view2view[i].childrenViews[j];
 
               viewElementIds2TreeNodeMap[viewId].children.push( viewElementIds2TreeNodeMap[childViewId] );
 
@@ -101,7 +101,7 @@ function($scope, $state, $stateParams, snapshots, site, time, ElementService, Vi
           $scope.my_data = [ viewElementIds2TreeNodeMap[rootElementId] ];
 
         });
-      });
+      //});
 
     $scope.my_tree = tree;
     $scope.my_data = [];
