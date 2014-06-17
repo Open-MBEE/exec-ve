@@ -19,8 +19,8 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
                 return $stateParams.time;
             },
             snapshots: function($stateParams, ConfigService) {
-                return [];
-                //return ConfigService.getProductSnapshots($stateParams.docId, $stateParams.site, 'master');
+                //return [];
+                return ConfigService.getProductSnapshots($stateParams.docId, $stateParams.site, 'master');
             }
         },
         views: {
