@@ -6,24 +6,37 @@ module.exports = function(grunt) {
   grunt.initConfig({
     
     pkg: grunt.file.readJSON('package.json'),
+
+    bower: {
+      install: {
+        options: {
+          targetDir: 'bower_components_target',
+          overrideBowerDirectory: false,
+          cwd: 'app',
+          layout: 'byComponent',
+          install: true,
+          verbose: false,
+          cleanTargetDir: false,
+          cleanBowerDir: false,
+          bowerOptions: {},
+          copy: true,
+          forcedCopyDir: 'app'
+        }
+      }
+    },
     
     bowerInstall: {
 
       target: {
-
-        // Point to the files that should be updated when
-        // you run `grunt bower-install`
         src: [
-          'app/*.html'   // .html support...
-          // 'app/views/**/*.jade',   // .jade support...
-          // 'app/styles/main.scss',  // .scss & .sass support...
-          // 'app/config.yml'         // and .yml & .yaml support out of the box!
+          'build/*.html'
         ],
 
         // Optional:
         // ---------
-        cwd: 'app',
-        dependencies: false,
+        cwd: 'build',
+        directory:'',
+        dependencies: true,
         devDependencies: false,
         exclude: [],
         fileTypes: {},
@@ -205,7 +218,7 @@ module.exports = function(grunt) {
             // https://sheldon.jpl.nasa.gov/alfresco/wcs/javawebscripts/element/_17_0_2_3_407019f_1386871336920_707205_26285
             context: '/alfresco',  // '/api'
             host: '128.149.16.155',//128.149.16.152',
-            port: 8443,
+            port: 443,
             changeOrigin: true,
             https: true,
             //rewrite: {
@@ -233,7 +246,7 @@ module.exports = function(grunt) {
             // https://sheldon.jpl.nasa.gov/alfresco/wcs/javawebscripts/element/_17_0_2_3_407019f_1386871336920_707205_26285
             context: '/alfresco',  // '/api'
             host: 'europaems-dev-staging-b.jpl.nasa.gov',//128.149.16.152',
-            port: 8443,
+            port: 443,
             changeOrigin: true,
             https: true,
             //rewrite: {
@@ -305,11 +318,13 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-ngdocs');
   grunt.loadNpmTasks('grunt-html2js');
   grunt.loadNpmTasks('grunt-bower-install');
-  grunt.loadNpmTasks('grunt-bower-install-task');
+  grunt.loadNpmTasks('grunt-bower-installer');
+  grunt.loadNpmTasks('grunt-npm-install');
   //grunt.loadNpmTasks('assemble');
 
   // Default task(s).  Must function before server has been stareted
-  grunt.registerTask('default', ['bower_install', 'bowerInstall', 'html2js', 'cssmin', 'jshint:beforeconcat', 'concat', 'jshint:afterconcat', 'uglify', 'copy', 'ngdocs']);
+  grunt.registerTask('default', ['npm-install', 'bower', 'html2js', 'cssmin', 'jshint:beforeconcat', 'concat', 'jshint:afterconcat', 'uglify', 'copy', 'bowerInstall', 'ngdocs']);
+
   //grunt.registerTask('stage', ['default', 'qunit', 'rsync']);
 
   grunt.registerTask('server', function(arg1) {

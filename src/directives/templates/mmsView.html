@@ -7,7 +7,7 @@
             <button type="button" class="btn btn-default" ng-click="toggleTextEdit()"> 
                 <span class="fa fa-edit"></span> {{textEdit}}
             </button>
-            <button ng-show="mmsOrder" type="button" class="btn btn-default" ng-click="toggleStructEdit()">
+            <button ng-show="mmsOrder && view.editable" type="button" class="btn btn-default" ng-click="toggleStructEdit()">
                 <span class="fa fa-navicon"></span> {{structEdit}}
             </button>       
         </div>

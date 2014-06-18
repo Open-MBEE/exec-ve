@@ -15,23 +15,26 @@ mms-view.editing mms-transclude-val *,
 mms-view.editing mms-transclude-name {
   color: #000;
   background-color: #EAEAEA;
-  cursor: text;
+  cursor: pointer;
 }
 
 /* second level transclusions */
 mms-view.editing mms-transclude-doc mms-transclude-name,
 mms-view.editing mms-transclude-doc mms-transclude-val,
 mms-view.editing mms-transclude-doc mms-transclude-val *,
+mms-view.editing mms-transclude-doc mms-transclude-doc,
+mms-view.editing mms-transclude-doc mms-transclude-doc *,
 mms-view.editing mms-transclude-val mms-transclude-val,
 mms-view.editing mms-transclude-val mms-transclude-val * {
   color: #000;
   background-color: #C6C6C6;
-  cursor: text;
+  cursor: pointer;
 }
 
 mms-spec mms-transclude-img,
 mms-spec mms-transclude-name,
-mms-spec mms-transclude-val {
+mms-spec mms-transclude-val,
+mms-spec mms-transclude-doc {
   background-color: lightblue;
 }
 
@@ -46,6 +49,12 @@ mms-spec mms-transclude-val {
   background-color: yellow;
 }
 
-mms-transclude-com, mms-transclude-com * {
+mms-view mms-transclude-com, 
+mms-view mms-transclude-com * {
+  background-color: lightgreen;
+  cursor: pointer;
+}
+
+mms-spec mms-transclude-com {
   background-color: lightgreen;
 }

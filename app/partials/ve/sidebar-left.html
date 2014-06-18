@@ -10,12 +10,12 @@
                     <span class="fa fa-caret-square-o-up"></span>
                 </button>          
             </div>
-            <div class="btn-group btn-group-sm">
+            <div class="btn-group btn-group-sm" ng-show="document.editable">
                 <button type="button" class="btn btn-default" ng-click="try_adding_a_branch()">
                     <span class="fa fa-plus"></span> Add
                 </button>
             </div>
-            <div class="btn-group btn-group-sm">
+            <div class="btn-group btn-group-sm" ng-show="document.editable">
                 <button type="button" class="btn btn-default" ng-click="reorder_tree_view()">
                     <span class="fa fa-navicon"></span> Reorder
                 </button>
@@ -36,8 +36,9 @@
     <tab>
         <tab-heading>Snapshots</tab-heading>
         <div ng-repeat="snapshot in snapshots">
-            <a ui-sref="doc({site: site.name, docId: documentid, time: snapshot.created})">{{snapshot.created | date:'M/d/yy h:mm a'}}</a>
+            <a ui-sref="doc({site: site.name, docId: document.sysmlid, time: snapshot.created})" 
+                ui-sref-opts="{reload: true}">{{snapshot.created | date:'M/d/yy h:mm a'}}</a>
         </div>
-        <button class="btn btn-primary" ng-click="createNewSnapshot()">Create New</button>
+        <button ng-show="document.editable" class="btn btn-primary" ng-click="createNewSnapshot()">Create New</button>
     </tab>
 </tabset>
