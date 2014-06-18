@@ -64,8 +64,6 @@ function ConfigService($q, $http, URLService, _) {
             URLService.handleHttpStatus(data, status, headers, config, deferred);
         });
         
-        // deferred.resolve([{description:"something", name:"some name", id:"some id", modified:"2014-03-17T10:41:10.787-07:00"}]);
-        
         return deferred.promise;
     };
 
@@ -103,7 +101,42 @@ function ConfigService($q, $http, URLService, _) {
             URLService.handleHttpStatus(data, status, headers, config, deferred);
         });
         
-        // deferred.resolve({description:"something", name:"some name", id:"some id", modified:"2014-03-17T10:41:10.787-07:00"});
+        return deferred.promise;
+    };
+
+    /**
+     * @ngdoc method
+     * @name mms.ConfigService@getConfigProducts
+     * @methodOf mms.ConfigService
+     *
+     * @description
+     * Get a snapshots of a configuration
+     *
+     * @param {string} id Config id
+     * @param {string} site Site name
+     * @param {string} [workspace=master] Workspace name
+     * @returns {Promise} Promise would be resolved with array of product objects
+     */
+    var getConfigProducts = function(id, site, workspace) {
+
+        var ws = !workspace ? 'master' : workspace;
+
+        var deferred = $q.defer();
+
+        if (configProducts.hasOwnProperty(id)) {
+            deferred.resolve(configProducts[id]);
+            return deferred.promise;
+        }
+        
+        $http.get(URLService.getConfigProductsURL(id, site, ws))
+        .success(function(data, status, headers, config) {
+            configProducts[id] = data.products;
+
+            deferred.resolve(configProducts[id]);
+            
+        }).error(function(data, status, headers, config) {
+            URLService.handleHttpStatus(data, status, headers, config, deferred);
+        });
         
         return deferred.promise;
     };
@@ -153,7 +186,7 @@ function ConfigService($q, $http, URLService, _) {
      * @description
      * Get snapshots of a product
      *
-     * @param {string} id Config id
+     * @param {string} id Product id
      * @param {string} site Site name
      * @param {string} [workspace=master] Workspace name
      * @returns {Promise} Promise would be resolved with array of snapshot objects
@@ -202,8 +235,8 @@ function ConfigService($q, $http, URLService, _) {
             deferred.reject({status: 200, message: 'Config id not found, create configuration first!'});
         else {
             $http.post(URLService.getSiteConfigsURL(site, ws), {'configurations': [config]})
-            .success(function(data, status, headers, config) {
-                var resp = data.configurations[0];
+            .success(function(data, status, headers, c) {
+                var resp = data;
                 if (configs.hasOwnProperty(config.id))
                     _.merge(configs[config.id], resp);
                 else
@@ -241,15 +274,12 @@ function ConfigService($q, $http, URLService, _) {
 
         $http.post(URLService.getSiteConfigsURL(site, ws), {'configurations': [config]})
         .success(function(data, status, headers, config) {
-            if (data.configurations.length > 0) {
-                var c = data.configurations[0];
-                configs[c.id] = c;
-                deferred.resolve(configs[c.id]);
-                if (siteConfigs.hasOwnProperty(site)) {
-                    siteConfigs[site].push(configs[c.id]);
-                }
-            } else
-                deferred.reject({status: 200, "message": "something bad happened"});
+            var resp = data;
+            configs[resp.id] = resp;
+            deferred.resolve(configs[resp.id]);
+            if (siteConfigs.hasOwnProperty(site)) {
+                siteConfigs[site].push(configs[resp.id]);
+            }
 
         }).error(function(data, status, headers, config) {
             URLService.handleHttpStatus(data, status, headers, config, deferred);
@@ -272,7 +302,17 @@ function ConfigService($q, $http, URLService, _) {
      * @returns {Promise} Promise would be resolved with array of snapshot objects
      */
     var updateConfigSnapshots = function(id, snapshots, site, workspace) {
+        var ws = !workspace ? 'master' : workspace;
 
+        var deferred = $q.defer();
+
+        $http.post(URLService.getConfigSnapshotsURL(id, site, ws), {'snapshots': snapshots})
+        .success(function(data, status, headers, config) {
+            deferred.resolve("ok");
+        }).error(function(data, status, headers, config) {
+            URLService.handleHttpStatus(data, status, headers, config, deferred);
+        });
+        return deferred.promise;
     };
 
     /**
@@ -295,7 +335,7 @@ function ConfigService($q, $http, URLService, _) {
 
         var deferred = $q.defer();
 
-        $http.post(URLService.getConfigProductsURL(id, site, ws), {'elements': products})
+        $http.post(URLService.getConfigProductsURL(id, site, ws), {'products': products})
         .success(function(data, status, headers, config) {
             deferred.resolve("ok");
         }).error(function(data, status, headers, config) {
@@ -333,6 +373,7 @@ function ConfigService($q, $http, URLService, _) {
     return {
         getSiteConfigs : getSiteConfigs,
         getConfig : getConfig,
+        getConfigProducts: getConfigProducts,
         getConfigSnapshots: getConfigSnapshots,
         getProductSnapshots: getProductSnapshots,
         updateConfig: updateConfig,

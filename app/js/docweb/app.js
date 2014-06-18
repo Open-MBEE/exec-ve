@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.borderLayout', 'ui.bootstrap'])
+angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.borderLayout', 'ui.bootstrap', 'angular-growl'])
     .config(function($stateProvider, $urlRouterProvider) {
         $stateProvider
         .state('docweb', {
@@ -11,7 +11,10 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
                 },
                 configs: function($stateParams, ConfigService) {
                     return ConfigService.getSiteConfigs($stateParams.site, 'master');
-                }
+                },
+                products: function($stateParams, ViewService) {
+                    return ViewService.getSiteDocuments($stateParams.site, null, 'master', null);
+                }            
             },
             views: {
                 'menu': {
@@ -64,7 +67,7 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
                 config: function($stateParams, site, ConfigService) {
                     return ConfigService.getConfig($stateParams.configId, site.name, 'master');
                 },
-                snapshots: function($stateParams, site, ConfigService) {
+                configSnapshots: function($stateParams, site, ConfigService) {
                     return ConfigService.getConfigSnapshots($stateParams.configId, site.name, 'master');
                 }
             },
