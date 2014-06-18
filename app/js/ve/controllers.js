@@ -9,6 +9,7 @@ function($scope, $state, document, snapshots, site, time, ElementService, ViewSe
     $scope.snapshots = snapshots;
     $scope.site = site;
     $scope.time = time;
+    $scope.editable = $scope.document.editable && time === 'latest';
     $scope.createNewSnapshot = function() {
         ConfigService.createSnapshot($scope.document.sysmlid)
         .then(function(result) {
@@ -129,7 +130,8 @@ function($scope, $state, document, snapshots, site, time, ElementService, ViewSe
         if (branch.type === "section")
             return;
 
-        ViewService.createView(branch.data.sysmlid, 'Untitled View', $scope.documentid).then(function(view) {
+        ViewService.createView(branch.data.sysmlid, 'Untitled View', $scope.document.sysmlid)
+        .then(function(view) {
             return tree.add_branch(branch, {
                 label: view.name,
                 type: "view",
