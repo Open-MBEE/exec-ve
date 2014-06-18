@@ -9,6 +9,8 @@ function($scope, $state, $stateParams, snapshots, site, time, ElementService, Vi
     $scope.snapshots = snapshots;
     $scope.site = site;
     $scope.time = time;
+    $scope.filterOn = false;
+
     $scope.createNewSnapshot = function() {
         ConfigService.createSnapshot($scope.documentid)
         .then(function(result) {
@@ -105,6 +107,14 @@ function($scope, $state, $stateParams, snapshots, site, time, ElementService, Vi
 
     $scope.my_tree = tree;
     $scope.my_data = [];
+
+    $scope.expand_tree = function() {
+        $scope.my_tree.expand_all();
+    };
+
+    $scope.toggle_filter_on = function() {
+        $scope.filterOn = !$scope.filterOn;
+    }
 
     $scope.my_tree_handler = function(branch) {
         var viewId;
