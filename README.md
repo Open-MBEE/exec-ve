@@ -30,6 +30,12 @@ TBD - the angular-seed project contains test scripts using karma, jasmine and pr
 * grunt ngdocs - this would generate html docs based on code comments written in ngdocs style into docs/. The generated files need to be served through a webserver to work.
 * grunt docServer - this would generate the docs and run the server at localhost:10000
 
+## Clear bower cache
+If things aren't rendering properly, you may need to clear the bower cache.
+* Remove the app/bower_component* directories
+* Remove the build directory
+* In top level directory run _bower cache clean_
+
 ## Links
 * grunt-stubby - [https://github.com/h2non/grunt-stubby](https://github.com/h2non/grunt-stubby)
 * ngdocs - [https://github.com/idanush/ngdocs/wiki/API-Docs-Syntax](https://github.com/idanush/ngdocs/wiki/API-Docs-Syntax)
