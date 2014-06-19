@@ -1,8 +1,8 @@
 <div><h4>{{config.name}} - {{config.modified | date:'medium'}}</h4></div>
 <div>{{config.description}}</div>
 <h5>Documents</h5>
-  <div ng-repeat="snapshot in configsnapshots | orderBy:'sysmlname'">
-      <a href="ve.html#/sites/{{site}}/products/{{snapshot.sysmlid}}/{{snapshot.created}}">{{snapshot.sysmlname}}</a>
+  <div ng-repeat="snapshot in configSnapshots | orderBy:'sysmlname'">
+      <a href="ve.html#/sites/{{site}}/products/{{snapshot.sysmlid}}/{{snapshot.created}}">{{snapshot.sysmlname}} - {{snapshot.created | date:'medium'}}</a>
   </div>
   <br/>
   <button ng-show="toggles.hideChangeForm" class="btn btn-primary btn-sm" ng-click="toggleChangeForm()">Change Name or Description</button>
@@ -19,7 +19,7 @@
     <hr/>
   </div>
   <div ng-hide="toggles.hideAddRemoveForm"><h4>Add or Remove Snapshots</h4>
-    <!-- <div ng-controller="TagAddRemoveCtrl"> -->
+    <div ng-controller="TagAddRemoveCtrl">
       <div class="row">
         <div class="col-xs-6">
           
@@ -45,5 +45,5 @@
         </div>
       </div>
       <hr/>
-    <!-- </div> -->
+    </div>
   </div>

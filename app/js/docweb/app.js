@@ -20,7 +20,7 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
                 'menu': {
                     template: '<mms-nav site="{{site}}" title="{{title}}" type="docweb"></mms-nav>',
                     controller: function($scope, $stateParams, site) {
-                        $scope.site = site.title;
+                        $scope.site = site.name;
                         $scope.title = "DocWeb";
                     }
                 },
@@ -42,7 +42,7 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
                     templateUrl: 'partials/docweb/latest.html',
                     controller: function($scope, site, products) {
                         $scope.products = products;
-                        $scope.site = site.title;
+                        $scope.site = site.name;
                     }
                 }
             }

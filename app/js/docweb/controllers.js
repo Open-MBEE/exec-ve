@@ -26,16 +26,15 @@ angular.module('myApp')
     $scope.config = config;
     $scope.configForEdit = _.cloneDeep(config);
     $scope.configSnapshots = configSnapshots;
+    $scope.configSnapshotIds = [];
     $scope.products = products;
     $scope.site = site.name;
 
-    $scope.selectedSnapshots = [];
-    $scope.snapshotMap = {};
 
     $scope.snapshotMap = {};
+
     for (var i = 0; i < configSnapshots.length; i++) {
-        // $scope.selectedSnapshots.push(snapshots[i].sysmlid);
-        $scope.snapshotMap[configSnapshots[i].sysmlid] = configSnapshots[i];
+        $scope.configSnapshotIds.push(configSnapshots[i].id);
     }
     
     $scope.toggles = {hideChangeForm: true, hideAddRemoveForm: true};
@@ -46,56 +45,72 @@ angular.module('myApp')
     $scope.toggleAddRemoveForm = function() {
         $scope.toggles.hideAddRemoveForm = !$scope.toggles.hideAddRemoveForm;
     };
-
-    $scope.toggleCheck = function(id) {
-        var index = $scope.selectedSnapshots.indexOf(id);
-        if (index < 0)
-            $scope.selectedSnapshots.push(id);
-        else
-            $scope.selectedSnapshots.splice(index, 1);
-    }
-
-    $scope.update = function() { 
-        $scope.configForEdit['snapshots'] = $scope.selectedSnapshots;
-
-
-        ConfigService.updateConfig($scope.configForEdit, site.name, "master").then(function() {
-            $scope.toggles.hideAddRemoveForm = true;
-            growl.success('Change Successful');
-        });
-
-    };
     
     $scope.change = function() {
-
         ConfigService.updateConfig($scope.configForEdit, site.name, "master").then(function() {
             $scope.toggles.hideChangeForm = true;
              growl.success('Change Successful');
         });
     };
   }])
-  .controller('TagAddRemoveDocCtrl', ["$scope", "$http", "ConfigService", function($scope, $http, ConfigService) {
-        
-        $scope.showSnapshots = false;
+  .controller('TagAddRemoveCtrl', ["$scope", "$http", "ConfigService", "growl", 
+    function($scope, $http, ConfigService, growl) {
+    
+    $scope.selectedSnapshots = []; 
 
-        $scope.toggleShowSnapshots = function() {
-            $scope.showSnapshots = !$scope.showSnapshots;
-        };
-        
+    $scope.update = function() { 
+        $scope.configForEdit['snapshots'] = $scope.selectedSnapshots;
 
-        ConfigService.getProductSnapshots($scope.doc.sysmlid, $scope.site, 'master')
-        .then(
-            function(result) {
-                $scope.productSnapshots = result;
-                for (var i = 0; i < result.length; i++)
+
+        ConfigService.updateConfig($scope.configForEdit, $scope.site, "master").then(function() {
+            $scope.toggles.hideAddRemoveForm = true;
+            growl.success('Change Successful');
+        });
+
+    };
+
+    $scope.toggleCheck = function(id) {
+            var index = $scope.selectedSnapshots.indexOf(id);
+            if (index < 0)
+                $scope.selectedSnapshots.push(id);
+            else
+                $scope.selectedSnapshots.splice(index, 1);
+        }
+
+  }])
+  .controller('TagAddRemoveDocCtrl', ["$scope", "$http", "_", "ConfigService",
+            function($scope, $http, _, ConfigService) {
+        
+    $scope.showSnapshots = false;
+
+    $scope.toggleShowSnapshots = function() {
+        $scope.showSnapshots = !$scope.showSnapshots;
+    };
+            
+    ConfigService.getProductSnapshots($scope.doc.sysmlid, $scope.site, 'master')
+    .then(
+        function(result) {
+            $scope.productSnapshots = [];
+            for (var i = 0; i < result.length; i++)
+            {
+                $scope.productSnapshots[i] = _.cloneDeep(result[i]);
+                $scope.snapshotMap[result[i].id] = $scope.productSnapshots[i];
+
+                // Check to see if the product snapshot is part of the configuration
+                var index = $scope.configSnapshotIds.indexOf(result[i].id);
+                if (index >= 0)
                 {
-                    $scope.snapshotMap[result[i].sysmlid] = result[i];                  
+                    $scope.productSnapshots[i].selected = true;
+                    $scope.selectedSnapshots.push(result[i].id);
                 }
-            },
-            function(reason) {
-                // growl.error("Create Failed: " + reason.message);
+                else
+                    $scope.productSnapshots[i].selected = false;                
             }
-        );
+        },
+        function(reason) {
+            growl.error("Product Snapshots Get Failed: " + reason.message);
+        }
+    );
   }])
   .controller('NewCtrl', ["$scope", "$http", "$state", "site", "products", "ConfigService", "growl", 
         function($scope, $http, $state, site, products, ConfigService, growl) {
