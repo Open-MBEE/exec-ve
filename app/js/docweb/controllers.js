@@ -46,10 +46,15 @@ angular.module('myApp')
     };
     
     $scope.change = function() {
-        ConfigService.updateConfig($scope.configForEdit, site.name, "master").then(function() {
-            $scope.toggles.hideChangeForm = true;
-             growl.success('Change Successful');
-        });
+        ConfigService.updateConfig($scope.configForEdit, site.name, "master").then(
+            function(result) {
+                $scope.toggles.hideChangeForm = true;
+                growl.success('Change Successful');
+            },
+            function(reason) {
+                growl.error("Update Failed: " + reason.message);
+            }            
+        );
     };
   }])
   .controller('TagAddRemoveCtrl', ["$scope", "$http", "ConfigService", "growl", 
@@ -60,20 +65,25 @@ angular.module('myApp')
     $scope.update = function() { 
         $scope.configForEdit['snapshots'] = $scope.selectedSnapshots;
 
-        ConfigService.updateConfig($scope.configForEdit, $scope.site, "master").then(function(result) {
-            $scope.toggles.hideAddRemoveForm = true;
+        ConfigService.updateConfig($scope.configForEdit, $scope.site, "master").then(
+            function(result) {
+                $scope.toggles.hideAddRemoveForm = true;
 
-            // Update the config snapshots with what was selected, temporary fix until 
-            // post for configurations is fixed            
-            $scope.configSnapshots = result.snapshots;
+                // Update the config snapshots with what was selected, temporary fix until 
+                // post for configurations is fixed            
+                $scope.configSnapshots = result.snapshots;
 
-            $scope.configSnapshotIds = [];
-            for (var i = 0; i < $scope.configSnapshots.length; i++) {
-                $scope.configSnapshotIds.push($scope.configSnapshots[i].id);
+                $scope.configSnapshotIds = [];
+                for (var i = 0; i < $scope.configSnapshots.length; i++) {
+                    $scope.configSnapshotIds.push($scope.configSnapshots[i].id);
+                }
+
+                growl.success('Change Successful');
+            },
+            function(reason) {
+                growl.error("Update Failed: " + reason.message);
             }
-
-            growl.success('Change Successful');
-        });
+        );
 
     };
 
