@@ -30,7 +30,6 @@ angular.module('myApp')
     $scope.products = products;
     $scope.site = site.name;
 
-
     $scope.snapshotMap = {};
 
     for (var i = 0; i < configSnapshots.length; i++) {
@@ -61,9 +60,18 @@ angular.module('myApp')
     $scope.update = function() { 
         $scope.configForEdit['snapshots'] = $scope.selectedSnapshots;
 
-
-        ConfigService.updateConfig($scope.configForEdit, $scope.site, "master").then(function() {
+        ConfigService.updateConfig($scope.configForEdit, $scope.site, "master").then(function(result) {
             $scope.toggles.hideAddRemoveForm = true;
+
+            // Update the config snapshots with what was selected, temporary fix until 
+            // post for configurations is fixed            
+            $scope.configSnapshots = result.snapshots;
+
+            $scope.configSnapshotIds = [];
+            for (var i = 0; i < $scope.configSnapshots.length; i++) {
+                $scope.configSnapshotIds.push($scope.configSnapshots[i].id);
+            }
+
             growl.success('Change Successful');
         });
 

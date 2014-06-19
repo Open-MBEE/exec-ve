@@ -240,7 +240,11 @@ function ConfigService($q, $http, URLService, _) {
                 if (configs.hasOwnProperty(config.id))
                     _.merge(configs[config.id], resp);
                 else
-                    configs[config.id] = resp;                
+                    configs[config.id] = resp;
+
+                _.remove(configSnapshots[config.id]);
+                _.merge(configSnapshots[config.id], resp.snapshots); // TODO: Remove later    
+
                 deferred.resolve(configs[config.id]);
             }).error(function(data, status, headers, config) {
                 URLService.handleHttpStatus(data, status, headers, config, deferred);
