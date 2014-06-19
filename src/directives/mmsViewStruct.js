@@ -63,11 +63,12 @@ function mmsViewStruct(ViewService, $templateCache, growl, _) {
 
         scope.save = function() {
             ViewService.updateView(scope.edit)
-            .then(function() {
-                growl.success("Save successful");
-                scope.structEditable = false;
+            .then(function(result) {
+                growl.success("Save Successful.");
+                scope.edit.read = result.read;
+                scope.toggleStructEdit();
             }, function(reason) {
-                growl.error("Failed");
+                growl.error("Failed: " + reason.message);
             });
         };
     };
