@@ -57,7 +57,7 @@ function mmsViewStruct(ViewService, $templateCache, growl, _) {
         };
         scope.toggleStructEdit = function() {
             scope.structEditable = !scope.structEditable;
-            scope.structEdit = scope.structEditable ? 'Cancel' : 'Show Elements';
+            scope.structEdit = scope.structEditable ? 'Cancel' : 'Edit Order';
             element.find('.ui-sortable').sortable('option', 'cancel', scope.structEditable ? '' : 'div');
         };
 
