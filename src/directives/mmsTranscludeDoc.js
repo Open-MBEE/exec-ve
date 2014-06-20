@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsTranscludeDoc', ['ElementService', '$compile', 'growl', mmsTranscludeDoc]);
+.directive('mmsTranscludeDoc', ['ElementService', 'UtilsService', '$compile', '$log', 'growl', mmsTranscludeDoc]);
 
 /**
  * @ngdoc directive
@@ -21,9 +21,10 @@ angular.module('mms.directives')
  * @param {string=master} mmsWs Workspace to use, defaults to master
  * @param {string=latest} mmsVersion Version can be alfresco version number or timestamp, default is latest
  */
-function mmsTranscludeDoc(ElementService, $compile, growl) {
+function mmsTranscludeDoc(ElementService, UtilsService, $compile, $log, growl) {
 
     var mmsTranscludeDocLink = function(scope, element, attrs, mmsViewCtrl) {
+        scope.cfType = 'doc';
         element.click(function(e) {
             if (!mmsViewCtrl)
                 return false;
@@ -47,6 +48,11 @@ function mmsTranscludeDoc(ElementService, $compile, growl) {
         scope.$watch('mmsEid', function(newVal, oldVal) {
             if (!newVal)
                 return;
+            if (UtilsService.hasCircularReference(scope, scope.mmsEid, 'doc')) {
+                element.html('<span class="error">Circular Reference!</span>');
+                $log.log("prevent circular dereference!");
+                return;
+            }
             var ws = scope.mmsWs;
             var version = scope.mmsVersion;
             if (mmsViewCtrl) {
@@ -75,7 +81,7 @@ function mmsTranscludeDoc(ElementService, $compile, growl) {
             mmsVersion: '@'
         },
         require: '?^mmsView',
-        //controller: ['$scope', controller]
+        //controller: ['$scope', mmsTranscludeDocCtrl],
         link: mmsTranscludeDocLink
     };
 }

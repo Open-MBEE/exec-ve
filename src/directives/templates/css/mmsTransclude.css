@@ -58,3 +58,7 @@ mms-view mms-transclude-com * {
 mms-spec mms-transclude-com {
   background-color: lightgreen;
 }
+
+.error {
+  color: red;
+}
