@@ -6,12 +6,19 @@
     <div ng-model="edit.documentation" mms-redactor mms-cf-elements="mmsCfElements" mms-eid="{{element.sysmlid}}"></div>
     <div ng-if="edit.specialization.type === 'Property'">
         <div><b>Property Values:</b></div>
+        <div ng-if="!editValues">
+            <select ng-model="addValueType" ng-options="key for (key, value) in addValueTypes"></select>
+            <button class="btn btn-sm" ng-click="addValue(addValueType)">Add</button>
+        </div>
         <div ng-repeat="value in editValues" ng-switch on="value.type">
             <div ng-switch-when="LiteralInteger"><input type="number" ng-model="value.integer"></input></div>
             <div ng-switch-when="LiteralUnlimitedNatural"><input type="number" ng-model="value.naturalValue"></input></div>
             <div ng-switch-when="LiteralBoolean"><input type="checkbox" ng-model="value.boolean"></input></div>
             <div ng-switch-when="LiteralReal"><input type="number" ng-model="value.double" step="any"></input></div>
-            <div ng-switch-when="LiteralString"><div mms-redactor ng-model="value.string" mms-cf-elements="mmsCfElements" mms-eid="{{element.sysmlid}}"></div></div>
+            <div ng-switch-when="LiteralString">
+                <div ng-if="hasHtml(value.string)" mms-redactor ng-model="value.string" mms-cf-elements="mmsCfElements" mms-eid="{{element.sysmlid}}"></div>
+                <textarea ng-if="!hasHtml(value.string)" ng-model="value.string"></textarea>
+            </div>
         </div>
     </div>
     <div><b>Type:</b> {{element.specialization.type || 'Element'}}</div>
