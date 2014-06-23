@@ -1,41 +1,60 @@
-<nav class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
-    <div class="row">
-        <a class="col-xs-3 col-md-2 col-lg-1 title navbar-brand" href="/share/page/site/{{site}}/dashboard">{{site}}</a>
-        <ul class="col-xs-6 col-md-8 col-lg-10 nav navbar-nav">
-            <li class="active"><a href="">{{title}}</a></li>
-            <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span>Goto</span><i class="nav-dropdown-icon fa fa-caret-down"></i></a>
-                <ul class="dropdown-menu">
-                    <li ng-if="type != 'docweb'"><a href="docweb.html#/sites/{{site}}">DocWeb</a></li>
-                    <li><a href="/share/page/site/{{site}}/dashboard">Dashboard</a></li>
-                </ul>
-            </li>
-            <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span>Other Sites</span><i class="nav-dropdown-icon fa fa-caret-down"></i></a>
-                <ul class="accordion-dropdown dropdown-menu">
-                    <accordion>
-                        <accordion-group ng-repeat="(cat, sites) in categories" is-open="catOpen">
-                            <accordion-heading>
-                                <span>{{cat}}</span><i class="pull-right fa" ng-class="{'fa-caret-down': catOpen, 'fa-caret-right': !catOpen}"></i>
-                            </accordion-heading>
-                            <accordion>
-                                <accordion-group ng-repeat="site in sites" class="site-level" is-open="siteOpen">
-                                    <accordion-heading>
-                                        <span>{{site.title}}</span><i class="pull-right fa" ng-class="{'fa-caret-down': siteOpen, 'fa-caret-right': !siteOpen}"></i>
-                                    </accordion-heading>
-                                    <div class="accordion-links">
-                                        <a class="dash-link" href="/share/page/site/{{site.name}}/dashboard">Dashboard</a><a class="docweb-link" href="docweb.html#/sites/{{site.name}}">Docweb</a>
-                                    </div>
-                                </accordion-group>
-                            </accordion>
-                        </accordion-group>
-                    </accordion>
-                </ul>
-            </li>
+<header role="banner">
+  <div class="block">
+    <a ng-click="nav.toggleNav()" class="nav-btn" id="nav-open-btn" href="#nav">Navigation</a>
+  </div>
+</header>
+
+<nav class="navbar navbar-default navbar-inverse navbar-fixed-top" role="navigation">
+  <div class="block">
+
+    <ul>
+
+      <!-- Brand name and document -->
+      <li><a class="nav-title" href="#">View Editor</a></li>
+      <li><a href="#">{{title}}</a></li>
+
+      <!-- Goto dropdown -->
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{site}}<i class="nav-dropdown-icon fa fa-caret-down"></i></a>
+        <ul class="dropdown-menu" role="menu">
+          <li ng-if="type != 'docweb'"><a href="docweb.html#/sites/{{site}}">DocWeb</a></li>
+          <li><a href="/share/page/site/{{site}}/dashboard">Dashboard</a></li>
         </ul>
-        <ul class="col-xs-3 col-md-2 col-lg-1 nav navbar-nav pull-right">
-            <li><a tooltip="Support" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" class="nav-link" href="/share/page/site/ems-training/dashboard">&#xf1cd;</a></li>
-            <li><a tooltip="Logout" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" class="nav-link" href="/alfresco/service/logout/info?next=/share/page">&#xf08b;</a></li>
-        </ul>
-    </div>
+      </li>
+
+      <!-- Other sites dropdown -->
+      <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span>Other Sites</span><i class="nav-dropdown-icon fa fa-caret-down"></i></a>
+          <ul class="accordion-dropdown dropdown-menu">
+              <accordion>
+                  <accordion-group ng-repeat="(cat, sites) in categories" is-open="catOpen">
+                      <accordion-heading>
+                          <span>{{cat}}</span><i class="pull-right fa" ng-class="{'fa-caret-down': catOpen, 'fa-caret-right': !catOpen}"></i>
+                      </accordion-heading>
+                      <accordion>
+                          <accordion-group ng-repeat="site in sites" class="site-level" is-open="siteOpen">
+                              <accordion-heading>
+                                <span>{{site.title}}</span><i class="pull-right fa" ng-class="{'fa-caret-down': siteOpen, 'fa-caret-right': !siteOpen}"></i>
+                              </accordion-heading>
+                              <div class="accordion-links">
+                                  <a class="dash-link" href="/share/page/site/{{site.name}}/dashboard">Dashboard</a><a class="docweb-link" href="docweb.html#/sites/{{site.name}}">Docweb</a>
+                              </div>
+                          </accordion-group>
+                      </accordion>
+                  </accordion-group>
+              </accordion>
+          </ul>
+      </li>
+
+      <!-- Support and logout buttons -->
+      <ul class="pull-right">
+        <li><a tooltip="Support" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" class="nav-tool" href="/share/page/site/ems-training/dashboard">&#xf1cd;</a></li>
+        <li><a tooltip="Logout" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" class="nav-tool" href="/alfresco/service/logout/info?next=/share/page">&#xf08b;</a></li>
+      </ul>
+
+    </ul>
+
+    <a ng-click="nav.toggleNav()" class="close-btn" id="nav-close-btn" href="#top">Return to Content</a>
+
+  </div>
 </nav>

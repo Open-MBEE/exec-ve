@@ -1,5 +1,18 @@
 /* app css stylesheet */
 
+#outer-wrap {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  height: 100vh;
+}
+
+#inner-wrap {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
 .inline {
   display: inline;
 }
