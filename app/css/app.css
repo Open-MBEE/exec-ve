@@ -1,7 +1,19 @@
 /* app css stylesheet */
 
-#main-pane {
-  top: 40px;
+@media screen and (max-width: 45em) {
+  #main-pane {
+    top: 66px;
+  }
+
+  #main-pane > div {
+    z-index: 1000;
+  }
+}
+
+@media screen and (min-width: 45.0625em) {
+  #main-pane {
+    top: 40px;
+  }
 }
 
 #outer-wrap {

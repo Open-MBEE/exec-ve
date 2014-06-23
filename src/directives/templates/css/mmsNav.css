@@ -13,8 +13,8 @@ mms-nav header {
 
 mms-nav header .nav-btn {
   position: absolute;
-  top: 3em;
-  left: 1.875em;
+  top: 25%;
+  left: 1em;
 }
 
 mms-nav header .block-title {
@@ -267,7 +267,7 @@ accordion a.docweb-link {
   padding: 0;
   border: 0;
   outline: none;
-  background: #333333 url("../img/close-btn.svg") left center no-repeat;
+  background: #404040 url("../img/close-btn.svg") left center no-repeat;
   background-size: 1.875em 1.875em;
   overflow: hidden;
   white-space: nowrap;
@@ -293,7 +293,7 @@ accordion a.docweb-link {
   padding: 0;
   border: 0;
   outline: none;
-  background: #333 url("../img/nav-icon.svg") left center no-repeat;
+  background: #44749D url("../img/nav-icon.svg") left center no-repeat;
   background-size: 1.875em 1.5em;
   overflow: hidden;
   white-space: nowrap;
@@ -322,7 +322,11 @@ accordion a.docweb-link {
 }
 
 @media screen and (min-width: 45.0625em) {
-  mms-nav header .nav-btn {
+  header .banner-title {
+    display: none;
+  }
+
+  header .nav-btn {
     border: 0;
     clip: rect(0 0 0 0);
     height: 1px;
@@ -333,7 +337,7 @@ accordion a.docweb-link {
     width: 1px;
   }
 
-  mms-nav header .close-btn {
+  header .close-btn {
     border: 0;
     clip: rect(0 0 0 0);
     height: 1px;
@@ -344,8 +348,8 @@ accordion a.docweb-link {
     width: 1px;
   }
 
-  .navbar .block ul {
-    height: 100%;
+  .navbar .block ul:not(.nav-btns) {
+    height: 0;
     width: 100%;
   }
 
@@ -387,10 +391,27 @@ accordion a.docweb-link {
 }
 
 @media screen and (max-width: 45em) {
+  header {
+    box-shadow: 0 1px 1px 0 #404040;
+  }
+  
+  header .block {
+    height: 65px;
+    background-color: #44749D;
+  }
+
+  header .banner-title {
+    position: relative;
+    top: 25%;
+    font-weight: 100;
+    font-size: 26px;
+    text-align: center;
+  }
+
   .navbar {
     position: relative;
     top: -75px;
-    padding-top: 5.25em;
+    padding-top: 1em;
   }
 
   .navbar .block ul {
@@ -461,7 +482,7 @@ accordion a.docweb-link {
   .js-ready .navbar {
     height: 100%;
     width: 70%;
-    background: #333;
+    background: #404040;
     -webkit-box-shadow: inset -1.5em 0 1.5em -0.75em rgba(0, 0, 0, 0.25);
     -moz-box-shadow: inset -1.5em 0 1.5em -0.75em rgba(0, 0, 0, 0.25);
     box-shadow: inset -1.5em 0 1.5em -0.75em rgba(0, 0, 0, 0.25);
