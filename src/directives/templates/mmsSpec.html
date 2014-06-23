@@ -5,7 +5,7 @@
     <div><b>Documentation:</b></div>
     <div ng-model="edit.documentation" mms-redactor mms-cf-elements="mmsCfElements" mms-eid="{{element.sysmlid}}"></div>
     <div ng-if="edit.specialization.type === 'Property'">
-        <div><b>Property Values:</b></div>
+        <div><b>Property Value:</b></div>
         <div ng-if="editValues.length == 0">
             <select ng-model="addValueType" ng-options="key for (key, value) in addValueTypes"></select>
             <button class="btn btn-sm btn-primary" ng-click="addValue(addValueType)">Add</button>
@@ -32,7 +32,7 @@
     <div><b>Name:</b> {{element.name}}</div>
     <div><b>Documentation:</b></div><div ng-bind-html="element.documentation"></div>
     <div ng-if="element.specialization.type === 'Property'">
-        <div><b>Property Values:</b></div>
+        <div><b>Property Value:</b></div>
         <div ng-repeat="value in values" ng-switch on="value.type">
             <div ng-switch-when="LiteralInteger">{{value.integer}}</div>
             <div ng-switch-when="LiteralBoolean">{{value.boolean}}</div>
