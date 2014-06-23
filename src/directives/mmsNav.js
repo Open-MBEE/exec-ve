@@ -158,6 +158,8 @@ function mmsNav(SiteService, $templateCache, $log, growl) {
             var sites = {};
             for (var i = 0; i < data.length; i++) {
                 var site = data[i];
+                if (site.name === scope.site)
+                    scope.siteTitle = site.title;
                 if (site.categories.length === 0)
                     site.categories.push("Uncategorized");
                 for (var j = 0; j < site.categories.length; j++) {

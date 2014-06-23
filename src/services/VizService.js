@@ -44,7 +44,10 @@ function VizService($q, $http, URLService) {
         } else {
             urls[id] = {};
         }
-        $http.get(URLService.getImageURL(id, ws, ver))
+        var options = {params:{}};
+        if (URLService.isTimestamp(version))
+            options.params.timestamp = version;
+        $http.get(URLService.getImageURL(id, ws, ver), options)
         .success(function(data, status, headers, config) {
             if (data.artifacts.length > 0) {
                 urls[id][ver] = '/alfresco' + data.artifacts[0].url;

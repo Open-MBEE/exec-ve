@@ -1,30 +1,38 @@
 <div ng-show="editing">
-    <div>Last Modified: {{element.lastModified | date:'M/d/yy h:mm a'}} by {{element.author}}</div>
-    <div>Name: <input class="form-control" type="text" ng-model="edit.name"></input></div>
-    <div>Documentation:</div>
+    <div><button class="btn btn-primary btn-sm" ng-click="save()">Save</button><button class="btn btn-sm" ng-click="editing=false">Cancel</button></div>
+    <div><b>Last Modified:</b> {{element.lastModified | date:'M/d/yy h:mm a'}} by {{element.author}}</div>
+    <div><b>Name:</b> <input class="form-control" type="text" ng-model="edit.name"></input></div>
+    <div><b>Documentation:</b></div>
     <div ng-model="edit.documentation" mms-redactor mms-cf-elements="mmsCfElements" mms-eid="{{element.sysmlid}}"></div>
     <div ng-if="edit.specialization.type === 'Property'">
-        <div>Property Values:</div>
+        <div><b>Property Values:</b></div>
+        <div ng-if="!editValues">
+            <select ng-model="addValueType" ng-options="key for (key, value) in addValueTypes"></select>
+            <button class="btn btn-sm" ng-click="addValue(addValueType)">Add</button>
+        </div>
         <div ng-repeat="value in editValues" ng-switch on="value.type">
             <div ng-switch-when="LiteralInteger"><input type="number" ng-model="value.integer"></input></div>
             <div ng-switch-when="LiteralUnlimitedNatural"><input type="number" ng-model="value.naturalValue"></input></div>
             <div ng-switch-when="LiteralBoolean"><input type="checkbox" ng-model="value.boolean"></input></div>
             <div ng-switch-when="LiteralReal"><input type="number" ng-model="value.double" step="any"></input></div>
-            <div ng-switch-when="LiteralString"><div mms-redactor ng-model="value.string" mms-cf-elements="mmsCfElements" mms-eid="{{element.sysmlid}}"></div></div>
+            <div ng-switch-when="LiteralString">
+                <div ng-if="hasHtml(value.string)" mms-redactor ng-model="value.string" mms-cf-elements="mmsCfElements" mms-eid="{{element.sysmlid}}"></div>
+                <textarea ng-if="!hasHtml(value.string)" ng-model="value.string"></textarea>
+            </div>
         </div>
     </div>
-    <div>Type: {{element.specialization.type || 'Element'}}</div>
-    <div>Id: {{element.sysmlid}}</div>
-    <div>Qualified Name: {{element.qualifiedName}}</div>
-    <div><button class="btn btn-primary btn-sm" ng-click="save()">Save</button></div>
+    <div><b>Type:</b> {{element.specialization.type || 'Element'}}</div>
+    <div><b>Id:</b> {{element.sysmlid}}</div>
+    <div><b>Qualified Name:</b> {{element.qualifiedName}}</div>
 </div>
 
 <div ng-hide="editing">
-    <div>Last Modified: {{element.lastModified | date:'M/d/yy h:mm a'}} by {{element.author}}</div>
-    <div>Name: {{element.name}}</div>
-    <div>Documentation:</div><div ng-bind-html="element.documentation"></div>
+    <button ng-click="editing=true" ng-show="editable" class="btn btn-primary btn-sm">Edit</button>
+    <div><b>Last Modified:</b> {{element.lastModified | date:'M/d/yy h:mm a'}} by {{element.author}}</div>
+    <div><b>Name:</b> {{element.name}}</div>
+    <div><b>Documentation:</b></div><div ng-bind-html="element.documentation"></div>
     <div ng-if="element.specialization.type === 'Property'">
-        <div>Property Values:</div>
+        <div><b>Property Values:</b></div>
         <div ng-repeat="value in values" ng-switch on="value.type">
             <div ng-switch-when="LiteralInteger">{{value.integer}}</div>
             <div ng-switch-when="LiteralBoolean">{{value.boolean}}</div>
@@ -33,8 +41,8 @@
             <div ng-switch-when="LiteralString" ng-bind-html="value.string"></div>
         </div>
     </div>
-    <div>Type: {{element.specialization.type || 'Element'}}</div>
-    <div>Id: {{element.sysmlid}}</div>
-    <div>Qualified Name: {{element.qualifiedName}}</div>
-    <button ng-click="editing=true" ng-show="editable" class="btn btn-primary btn-sm">Edit</button>
+    <div><b>Type:</b> {{element.specialization.type || 'Element'}}</div>
+    <div><b>Id:</b> {{element.sysmlid}}</div>
+    <div><b>Qualified Name:</b> {{element.qualifiedName}}</div>
+    
 </div>

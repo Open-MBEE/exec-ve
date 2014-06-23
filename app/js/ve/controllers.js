@@ -9,8 +9,7 @@ function($scope, $state, document, snapshots, site, time, ElementService, ViewSe
     $scope.snapshots = snapshots;
     $scope.site = site;
     $scope.time = time;
-    $scope.filterOn = false;
-
+    $scope.editable = $scope.document.editable && time === 'latest';
     $scope.createNewSnapshot = function() {
         ConfigService.createSnapshot($scope.document.sysmlid)
         .then(function(result) {
@@ -108,14 +107,6 @@ function($scope, $state, document, snapshots, site, time, ElementService, ViewSe
     $scope.my_tree = tree;
     $scope.my_data = [];
 
-    $scope.expand_tree = function() {
-        $scope.my_tree.expand_all();
-    };
-
-    $scope.toggle_filter_on = function() {
-        $scope.filterOn = !$scope.filterOn;
-    }
-
     $scope.my_tree_handler = function(branch) {
         var viewId;
 
@@ -139,7 +130,8 @@ function($scope, $state, document, snapshots, site, time, ElementService, ViewSe
         if (branch.type === "section")
             return;
 
-        ViewService.createView(branch.data.sysmlid, 'Untitled View', $scope.documentid).then(function(view) {
+        ViewService.createView(branch.data.sysmlid, 'Untitled View', $scope.document.sysmlid)
+        .then(function(view) {
             return tree.add_branch(branch, {
                 label: view.name,
                 type: "view",

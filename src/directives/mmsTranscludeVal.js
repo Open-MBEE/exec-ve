@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsTranscludeVal', ['ElementService', '$compile', '$templateCache', 'growl', mmsTranscludeVal]);
+.directive('mmsTranscludeVal', ['ElementService', 'UtilsService', '$log', '$compile', '$templateCache', 'growl', mmsTranscludeVal]);
 
 /**
  * @ngdoc directive
@@ -22,10 +22,11 @@ angular.module('mms.directives')
  * @param {string=master} mmsWs Workspace to use, defaults to master
  * @param {string=latest} mmsVersion Version can be alfresco version number or timestamp, default is latest
  */
-function mmsTranscludeVal(ElementService, $compile, $templateCache, growl) {
+function mmsTranscludeVal(ElementService, UtilsService, $log, $compile, $templateCache, growl) {
     var valTemplate = $templateCache.get('mms/templates/mmsTranscludeVal.html');
 
     var mmsTranscludeValLink = function(scope, element, attrs, mmsViewCtrl) {
+        scope.cfType = 'val';
         element.click(function(e) {
             if (!mmsViewCtrl)
                 return false;
@@ -62,6 +63,11 @@ function mmsTranscludeVal(ElementService, $compile, $templateCache, growl) {
         scope.$watch('mmsEid', function(newVal, oldVal) {
             if (!newVal)
                 return;
+            if (UtilsService.hasCircularReference(scope, scope.mmsEid, 'val')) {
+                $log.log("prevent circular dereference!");
+                element.html('<span class="error">Circular Reference!</span>');
+                return;
+            }
             var ws = scope.mmsWs;
             var version = scope.mmsVersion;
             if (mmsViewCtrl) {

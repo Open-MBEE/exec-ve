@@ -188,11 +188,11 @@ function URLService($q, $http, $location) {
      * @returns {string} The url.
      */
     var getElementURL = function(id, workspace, version) {
-        return root + "/javawebscripts/elements/" + id;
-        /*
+        //return root + "/javawebscripts/elements/" + id;
+        
         var r = root + '/workspaces/' + workspace + '/elements/' + id;
         return addVersion(r, version);
-        */
+        
     };
 
     /**
@@ -234,7 +234,7 @@ function URLService($q, $http, $location) {
         /*
         var r = root + "/workspaces/" + workspace + "/views/" + id + "/elements";
         return addVersion(r, version);
-        */
+    */
     };
 
     /**
@@ -266,8 +266,8 @@ function URLService($q, $http, $location) {
      * @returns {string} The post elements url.
      */
     var getPostElementsURL = function(workspace) {
-        return root + "/javawebscripts/sites/europa/projects/PROJECT-21bbdceb-a188-45d9-a585-b30bba346175/elements";
-        //return root + '/workspaces/' + workspace + '/elements';
+        //return root + "/javawebscripts/sites/europa/projects/PROJECT-21bbdceb-a188-45d9-a585-b30bba346175/elements";
+        return root + '/workspaces/' + workspace + '/elements';
     };
 
     /**
@@ -370,7 +370,8 @@ function URLService($q, $http, $location) {
         getSiteConfigsURL: getSiteConfigsURL,
         getConfigProductsURL : getConfigProductsURL,
         getDocumentViewsURL: getDocumentViewsURL,
-        getViewElementsURL: getViewElementsURL
+        getViewElementsURL: getViewElementsURL,
+        isTimestamp: isTimestamp
     };
 
 }

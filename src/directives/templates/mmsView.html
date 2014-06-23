@@ -1,5 +1,5 @@
 <div>
-    <div><div class="btn-toolbar pull-right" role="toolbar"> 
+    <div><div class="btn-toolbar" role="toolbar"> 
         <div class="btn-group btn-group-sm"> 
             <button type="button" class="btn btn-default" ng-click="toggleReview()">
                 <span class="fa fa-comment"></span> {{review}}
@@ -7,12 +7,12 @@
             <button type="button" class="btn btn-default" ng-click="toggleTextEdit()"> 
                 <span class="fa fa-edit"></span> {{textEdit}}
             </button>
-            <button ng-show="mmsOrder && view.editable" type="button" class="btn btn-default" ng-click="toggleStructEdit()">
+           <!-- <button ng-show="mmsOrder && view.editable" type="button" class="btn btn-default" ng-click="toggleStructEdit()">
                 <span class="fa fa-navicon"></span> {{structEdit}}
-            </button>       
+            </button> -->      
         </div>
     </div></div> 
-    <h4 class="inline"><mms-transclude-name data-mms-eid="{{view.sysmlid}}"></mms-transclude-name></h4> 
+    <h4><mms-transclude-name data-mms-eid="{{view.sysmlid}}"></mms-transclude-name></h4> 
     <div>Last Modified: {{lastModified | date:'M/d/yy h:mm a'}} by {{author}}</div><br/>
     <div ui-sortable="sortableOptions" ng-model="view.specialization.contains">
         <div ng-repeat="contain in view.specialization.contains" ng-switch on="contain.type"> 

@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsRedactor', ['ElementService', 'ViewService', '$modal', '$templateCache', 'growl', mmsRedactor]);
+.directive('mmsRedactor', ['ElementService', 'ViewService', '$modal', '$templateCache', '$window', 'growl', mmsRedactor]);
 
 /**
  * @ngdoc directive
@@ -22,7 +22,7 @@ angular.module('mms.directives')
  *      that can be transcluded. Regardless, transclusion allows keyword searching 
  *      elements to transclude from alfresco
  */
-function mmsRedactor(ElementService, ViewService, $modal, $templateCache, growl) { //depends on angular bootstrap
+function mmsRedactor(ElementService, ViewService, $modal, $templateCache, $window, growl) { //depends on angular bootstrap
     
     var mmsRedactorLink = function(scope, element, attrs, ngModelCtrl) {
         var transcludeModalTemplate = $templateCache.get('mms/templates/mmsCfModal.html');
@@ -133,9 +133,11 @@ function mmsRedactor(ElementService, ViewService, $modal, $templateCache, growl)
                         'horizontalrule'],
             plugins: ['fontcolor'],
             changeCallback: read,
-            maxHeight: 230,
+            maxHeight: $window.innerHeight*0.75,
             imageUploadURL: '', //prevent default upload to public url
-            placeholder: "Placeholder"
+            placeholder: "Placeholder",
+            autoresize: true,
+            wym: true
         });
 
         element.redactor('buttonAdd', 'transclude', 'Cross-Reference', transcludeCallback);

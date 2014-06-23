@@ -1,4 +1,8 @@
-<div>    
+<div>   
+    <div ng-show="view.editable">
+        <button class="btn btn-sm btn-primary" ng-click="toggleStructEdit()">{{structEdit}}</button>  
+        <button class="btn btn-sm btn-primary" ng-show="structEditable" ng-click="save()">Save</button> 
+    </div> 
     <div ui-sortable="sortableOptions" ng-model="edit.specialization.contains">
         <div ng-repeat="contain in edit.specialization.contains" ng-switch on="contain.type"> 
         <div ng-class="structEditable ? 'panel panel-default' : ''">
@@ -10,8 +14,5 @@
             <mms-view-section-struct data-mms-section="contain" ng-switch-when="Section"></mms-view-section-struct>
         </div></div></div>
     </div>
-    <div ng-show="view.editable">
-    <button class="btn btn-sm btn-primary" ng-click="toggleStructEdit()">{{structEdit}}</button>  
-    <button class="btn btn-sm btn-primary" ng-click="save()">Save</button> 
-    </div>
+    
 </div>
