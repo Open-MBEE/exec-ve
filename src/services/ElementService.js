@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms')
-.factory('ElementService', ['$q', '$http', 'URLService', 'VersionService', '_', ElementService]);
+.factory('ElementService', ['$q', '$http', 'URLService', 'VersionService', 'UtilsService', '_', ElementService]);
 
 /**
  * @ngdoc service
@@ -21,7 +21,7 @@ angular.module('mms')
  *
  * For element json example, see [here](https://github.jpl.nasa.gov/mbee-dev/alfresco-view-repo/tree/api/api)
  */
-function ElementService($q, $http, URLService, VersionService, _) {
+function ElementService($q, $http, URLService, VersionService, UtilsService, _) {
     var elements = {};
     var edits = {};
     var nonEditKeys = ['contains', 'view2view', 'childrenViews', 'displayedElements',
@@ -73,6 +73,7 @@ function ElementService($q, $http, URLService, VersionService, _) {
                     } else {
                         elements[id] = data.elements[0];
                     }
+                    UtilsService.cleanElement(elements[id]);
                     deferred.resolve(elements[id]);
                 } else {
                     deferred.reject({status: 200, data: data, message: 'Not Found'});
@@ -249,6 +250,7 @@ function ElementService($q, $http, URLService, VersionService, _) {
                     } else {
                         elements[element.sysmlid] = element;
                     }
+                    UtilsService.cleanElement(elements[element.sysmlid]);
                     result.push(elements[element.sysmlid]);
                 });
                 delete inProgress[progress];
@@ -291,6 +293,7 @@ function ElementService($q, $http, URLService, VersionService, _) {
                     _.merge(elements[elem.sysmlid], resp);
                 else
                     elements[elem.sysmlid] = resp;
+                UtilsService.cleanElement(elements[elem.sysmlid]);
                 if (edits.hasOwnProperty(elem.sysmlid)) {
                     var edit = edits[elem.sysmlid];
                     _.merge(edit, elements[elem.sysmlid]);
@@ -362,6 +365,7 @@ function ElementService($q, $http, URLService, VersionService, _) {
             if (data.elements.length > 0) {
                 var e = data.elements[0];
                 elements[e.sysmlid] = e;
+                UtilsService.cleanElement(elements[e.sysmlid]);
                 deferred.resolve(elements[e.sysmlid]);
             }
         }).error(function(data, status, headers, config) {
@@ -438,6 +442,7 @@ function ElementService($q, $http, URLService, VersionService, _) {
                 } else {
                     elements[element.sysmlid] = element;
                 }
+                UtilsService.cleanElement(elements[element.sysmlid]);
                 result.push(elements[element.sysmlid]);
             });
             deferred.resolve(result); 

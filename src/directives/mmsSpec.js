@@ -74,8 +74,10 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, growl) {
                         scope.edit = data;
                         scope.editable = true;
                         //template = editTemplate;
-                        if (scope.edit.specialization.type === 'Property' && 
-                                angular.isArray(scope.edit.specialization.value)) {
+                        if (scope.edit.specialization.type === 'Property') { 
+                            if (!angular.isArray(scope.edit.specialization.value)) {
+                                scope.edit.specialization.value = [];
+                            }
                             scope.editValues = scope.edit.specialization.value;
                         }
                         //element.append(template);
@@ -165,6 +167,7 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, growl) {
             else if (type === 'LiteralReal')
                 scope.editValues.push({type: type, double: 0.0});
         };
+        scope.addValueType = 'LiteralString';
     };
 
     return {
