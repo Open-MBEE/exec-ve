@@ -24,17 +24,17 @@
 
       <!-- Other sites dropdown -->
       <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span>Other Sites</span><i class="nav-dropdown-icon fa fa-caret-down"></i></a>
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Other Sites<i class="nav-dropdown-icon fa fa-caret-down"></i></a>
           <ul class="accordion-dropdown dropdown-menu">
               <accordion>
                   <accordion-group ng-repeat="(cat, sites) in categories" is-open="catOpen">
                       <accordion-heading>
-                          <span>{{cat}}</span><i class="pull-right fa" ng-class="{'fa-caret-down': catOpen, 'fa-caret-right': !catOpen}"></i>
+                          {{cat}}<i class="pull-right fa" ng-class="{'fa-caret-down': catOpen, 'fa-caret-right': !catOpen}"></i>
                       </accordion-heading>
                       <accordion>
                           <accordion-group ng-repeat="site in sites" class="site-level" is-open="siteOpen">
                               <accordion-heading>
-                                <span>{{site.title}}</span><i class="pull-right fa" ng-class="{'fa-caret-down': siteOpen, 'fa-caret-right': !siteOpen}"></i>
+                                {{site.title}}<i class="pull-right fa" ng-class="{'fa-caret-down': siteOpen, 'fa-caret-right': !siteOpen}"></i>
                               </accordion-heading>
                               <div class="accordion-links">
                                   <a class="dash-link" href="/share/page/site/{{site.name}}/dashboard">Dashboard</a><a class="docweb-link" href="docweb.html#/sites/{{site.name}}">Docweb</a>
@@ -48,8 +48,8 @@
 
       <!-- Support and logout buttons -->
       <ul class="pull-right">
-        <li><a tooltip="Support" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" class="nav-tool" href="/share/page/site/ems-training/dashboard">&#xf1cd;</a></li>
-        <li><a tooltip="Logout" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" class="nav-tool" href="/alfresco/service/logout/info?next=/share/page">&#xf08b;</a></li>
+        <li><a class="support-btn" tooltip="Support" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" class="nav-tool" href="/share/page/site/ems-training/dashboard">&#xf1cd;</a></li>
+        <li><a class="logout-btn" tooltip="Logout" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" class="nav-tool" href="/alfresco/service/logout/info?next=/share/page">&#xf08b;</a></li>
       </ul>
 
     </ul>

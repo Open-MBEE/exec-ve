@@ -13,7 +13,7 @@ mms-nav header {
   z-index: 100;
   position: relative;
   color: #fff;
-  background: #333333;
+  background: #333;
 }
 
 mms-nav header .nav-btn {
@@ -98,8 +98,8 @@ mms-nav header .block-title {
 }
 
 .navbar li a {
-  color: #FFF;
-  font-size: 0.875em;
+  color: #fff;
+  font-weight: 300;
   line-height: 1.28571em;
   outline: none;
 }
@@ -112,27 +112,23 @@ mms-nav header .block-title {
   top: 40px;
 }
 
-.navbar .nav-tool {
-  font-family: "FontAwesome";
-}
-
 .navbar .panel-heading a {
   display: block;
   padding: 10px 20px;
   line-height: 1.42857143;
-  color: #FFF;
+  color: #fff;
 }
 
 .navbar .dropdown-menu > li > a {
   padding: 10px 20px;
   background-color: #404040;
-  color: #FFF;
+  color: #fff;
 }
 
 .navbar .dropdown-menu > li > a:hover {
   padding: 10px 20px;
   background-color: #505050;
-  color: #FFF;
+  color: #fff;
 }
 
 .navbar .panel-group .panel,
@@ -301,7 +297,7 @@ accordion a.docweb-link {
   padding: 0;
   border: 0;
   outline: none;
-  background: #333333 url("../img/nav-icon.svg") left center no-repeat;
+  background: #333 url("../img/nav-icon.svg") left center no-repeat;
   background-size: 1.875em 1.5em;
   overflow: hidden;
   white-space: nowrap;
@@ -309,6 +305,10 @@ accordion a.docweb-link {
   filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=70);
   opacity: 0.7;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+.logout-btn {
+  padding-left: .85714em;
 }
 
 .no-svg .nav-btn {
@@ -374,6 +374,11 @@ accordion a.docweb-link {
     padding-left: .85714em;
   }
 
+  .navbar li a.support-btn,
+  .navbar li a.logout-btn {
+    font-family: "FontAwesome";
+  }
+
   .navbar li a.app-title {
     font-size: 18px;
   }
@@ -430,7 +435,7 @@ accordion a.docweb-link {
   .js-ready .navbar {
     height: 100%;
     width: 70%;
-    background: #333333;
+    background: #333;
     -webkit-box-shadow: inset -1.5em 0 1.5em -0.75em rgba(0, 0, 0, 0.25);
     -moz-box-shadow: inset -1.5em 0 1.5em -0.75em rgba(0, 0, 0, 0.25);
     box-shadow: inset -1.5em 0 1.5em -0.75em rgba(0, 0, 0, 0.25);
