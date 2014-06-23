@@ -1,5 +1,9 @@
 /* app css stylesheet */
 
+#main-pane {
+  top: 40px;
+}
+
 #outer-wrap {
   position: relative;
   overflow: hidden;

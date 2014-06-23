@@ -4,11 +4,6 @@
   width: device-width;
 }
 
-.block {
-  position: relative;
-  margin: 0 auto;
-}
-
 mms-nav header {
   z-index: 100;
   position: relative;
@@ -44,12 +39,17 @@ mms-nav header .block-title {
 }
 
 .navbar .block {
-  z-index: 2;
   position: relative;
+  margin: 0 auto;
+  z-index: 2;
   top: 25%;
 }
 
-.navbar .nav-title {
+.navbar .block ul {
+  height: 100vh;
+}
+
+.navbar .nav-title-a {
   color: #fff;
   font-weight: 100;
   font-size: 16px;
@@ -106,10 +106,6 @@ mms-nav header .block-title {
 
 .navbar li.is-active a {
   color: #fff;
-}
-
-#main-pane {
-  top: 40px;
 }
 
 .navbar .panel-heading a {
@@ -320,6 +316,11 @@ accordion a.docweb-link {
   opacity: 1;
 }
 
+.support-btn,
+.logout-btn {
+  font-family: "FontAwesome";
+}
+
 @media screen and (min-width: 45.0625em) {
   mms-nav header .nav-btn {
     border: 0;
@@ -341,6 +342,11 @@ accordion a.docweb-link {
     padding: 0;
     position: absolute;
     width: 1px;
+  }
+
+  .navbar .block ul {
+    height: 100%;
+    width: 100%;
   }
 
   .navbar .block-title {
@@ -374,10 +380,6 @@ accordion a.docweb-link {
     padding-left: .85714em;
   }
 
-  .navbar li a.support-btn,
-  .navbar li a.logout-btn {
-    font-family: "FontAwesome";
-  }
 
   .navbar li a.app-title {
     font-size: 18px;
@@ -391,6 +393,19 @@ accordion a.docweb-link {
     padding-top: 5.25em;
   }
 
+  .navbar .block ul {
+    height: 100vh;
+    width: 100%;
+  }
+
+  .navbar li.nav-title-li {
+    display: none;
+  }
+
+  .navbar li.nav-doc-li {
+    border-top: 0;
+  }
+
   .navbar:not(:target) {
     z-index: 1;
     height: 0;
@@ -402,13 +417,20 @@ accordion a.docweb-link {
 
   .navbar .close-btn {
     position: absolute;
-    top: -3.75em;
-    left: 1.875em;
+    top: 1em;
+    left: 1em;
   }
 
   .navbar li {
     position: relative;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
+    top: 5em;
+    height: 3.5em;
+  }
+
+  .navbar li > a {
+    position: relative;
+    top: 25%;
   }
 
   .navbar li:last-child {
@@ -430,6 +452,10 @@ accordion a.docweb-link {
 
   .navbar li a {
     padding: 0.85714em 2.14286em;
+  }
+
+  .navbar .nav-btns {
+    float: left !important;
   }
 
   .js-ready .navbar {
@@ -529,7 +555,6 @@ accordion a.docweb-link {
   }
 
   .csstransforms3d.csstransitions.js-nav .navbar .block {
-    height: 100vh;
     filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=100);
     opacity: 1;
     -webkit-transform: translate3d(0, 0, 0);
