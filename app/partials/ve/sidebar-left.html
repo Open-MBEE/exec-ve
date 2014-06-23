@@ -1,5 +1,6 @@
 <tabset>
-    <tab heading="TOC">
+    <tab>
+        <tab-heading>Table of Contents</tab-heading>
         <div class="btn-toolbar" role="toolbar">
             <div class="btn-group btn-group-sm">
                 <button type="button" class="btn btn-default" ng-click="my_tree.expand_all()">
@@ -19,12 +20,21 @@
                     <span class="fa fa-navicon"></span> Reorder
                 </button>
             </div>
+            <div class="btn-group btn-group-sm">
+                <button type="button" class="btn btn-default" ng-click="toggle_filter_on()">
+                    <span class="fa fa-navicon"></span> Filter
+                </button>
+            </div>
+            <div>
+                <input class="form-control" ng-show="filterOn" ng-model="search" type="text" placeholder="filter" ng-change="expand_tree()">
+            </div>
         </div>
-        <mms-tree tree-data="my_data" section-numbering="true" tree-control="my_tree" 
+        <mms-tree search="search" tree-data="my_data" section-numbering="true" tree-control="my_tree" 
             on-select="my_tree_handler(branch)" expand-level="2"> 
         </mms-tree>
     </tab>
-    <tab heading="Snapshots">
+    <tab>
+        <tab-heading>Snapshots</tab-heading>
         <div ng-repeat="snapshot in snapshots">
             <a ui-sref="doc({site: site.name, docId: document.sysmlid, time: snapshot.created})" 
                 ui-sref-opts="{reload: true}">{{snapshot.created | date:'M/d/yy h:mm a'}}</a>

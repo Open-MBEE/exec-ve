@@ -35,8 +35,8 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
                     $scope.docweb = false;
                 }
             },
-            'sidebar': {
-                templateUrl: 'partials/ve/sidebar.html',
+            'sidebar-left': {
+                templateUrl: 'partials/ve/sidebar-left.html',
                 controller: 'NavTreeCtrl'
             }
         }

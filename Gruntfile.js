@@ -121,7 +121,8 @@ module.exports = function(grunt) {
         globalstrict: true,
         globals: {
           angular: true,
-          window: true
+          window: true,
+          console: true
         }
       }
     },

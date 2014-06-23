@@ -1,5 +1,18 @@
 /* app css stylesheet */
 
+#outer-wrap {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  height: 100vh;
+}
+
+#inner-wrap {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
 .inline {
   display: inline;
 }
@@ -94,4 +107,86 @@ mms-view:not(.editing) .placeholder {
 
 mms-view:not(.reviewing) mms-transclude-com {
   display: none;
+}
+
+mms-transclude-com, mms-transclude-com * {
+  background-color: lightgreen;
+}
+
+.pane-selector {
+  border-left: 1px solid #FFF;
+  background-color: #404040;
+}
+
+.pane-selector ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.pane-selector ul li {
+  text-align: center;
+  font-size: 16px;
+  position: relative;
+  margin: 0;
+  padding: 0;
+}
+
+.pane-selector ul li a {
+  display: table-cell;
+  vertical-align: middle;
+  width: 40px;
+  height: 45px;
+  line-height: 45px;
+  color: #999;
+  text-decoration: none;
+  font-size: 20px;
+  padding: 0;
+  cursor: pointer;
+}
+
+.pane-selector ul li.active a {
+  color: #FFF;
+}
+
+.pane-selector ul li a:hover {
+  color: #FFF;
+  -webkit-transition: color .15s ease-in;
+  -moz-transition: color .15s ease-in;
+  -o-transition: color .15s ease-in;
+  transition: color .15s ease-in;
+}
+
+ul > span.divider {
+  height: 2px;
+  display: block;
+  font-size: 0;
+  line-height: 0;
+  background: #606060;
+  border-top: 1px solid #242424;
+}
+
+.west-tabs .nav-tabs li {
+  width: 50%;
+  text-align: center;
+}
+
+.west-tabs .nav-tabs li a,
+.center-view .nav-tabs li a {
+  cursor: pointer;
+  color: #333;
+  border-radius: 0;
+}
+
+.center-view .nav-tabs li a,
+.center-view .nav-tabs li.active a {
+  border-left-color: transparent;
+}
+
+.west-tabs .nav-tabs li.active a {
+  border-bottom-color: #ddd;
+}
+
+.center-view .nav-tabs li.active a {
+  border-bottom-color: transparent;
 }
