@@ -24,7 +24,22 @@ function mmsNav(SiteService, $templateCache, $log, growl) {
     var template = $templateCache.get('mms/templates/mmsNav.html');
 
     var mmsNavLink = function(scope, element, attrs) {
-        
+        scope.obj = {
+            catOpen : false,
+            bgColor : {'background-color': 'none'}
+        };
+        // Change dropdown color if active
+        scope.setBG = function(){
+            scope.obj.bgColor = {'background-color': '#404040'};
+        };
+        scope.clearBG = function(){
+            scope.obj.bgColor = {'background-color': 'none'};
+        };
+
+        //Resets catagory accordions
+        scope.reset = function(){
+            scope.obj.catOpen = false;
+        };
         // Define a few helper functions
         var Helper = {
             trim: function(str) {

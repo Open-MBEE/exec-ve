@@ -9,6 +9,28 @@
   margin: 0 auto;
 }
 
+
+/*Comment out if not working*/
+/*a.dropdown-toggle:active, a.dropdown-toggle:hover, a.dropdown-toggle:focus{
+    background-color:#404040 !important;
+}*/
+
+li.dropdown.open > a { 
+  background-color: #404040;
+}
+
+.closed{
+  background-color:transparent;
+}
+
+.btn-color{
+  background-color:#404040;
+}
+
+.btn-clear{
+  background-color:transparent;
+}
+
 mms-nav header {
   z-index: 100;
   position: relative;
@@ -118,6 +140,19 @@ mms-nav header .block-title {
   line-height: 1.42857143;
   color: #fff;
 }
+/*changed padding*/
+.dropdown-toggle {
+  padding-top:20px;
+  padding-bottom:11px;
+  padding-right:10px;
+}
+
+
+ul > li > a {
+  padding-top:20px;
+  padding-bottom:13px;
+}
+
 
 .navbar .dropdown-menu > li > a {
   padding: 10px 20px;
@@ -139,9 +174,11 @@ mms-nav header .block-title {
 .navbar .panel-default > .panel-heading + .panel-collapse .panel-body {
   border-top: 0px;
 }
-
+/*changed for dropdown to line up*/
 .navbar .dropdown-menu {
   border: 0;
+  margin: 9px 0 0 0;
+  padding: 0px;
 }
 
 .navbar .navbar-nav > .active > a,
@@ -194,6 +231,10 @@ mms-nav header .block-title {
 .accordion-dropdown {
   border-left-width: 0;
   min-width: 200px;
+}
+
+.accordion-toggle {
+  width:270px;
 }
 
 .accordion-toggle > .fa {
@@ -538,4 +579,8 @@ accordion a.docweb-link {
     -o-transform: translate3d(0, 0, 0);
     transform: translate3d(0, 0, 0);
   }
+
+
+
+  
 }
