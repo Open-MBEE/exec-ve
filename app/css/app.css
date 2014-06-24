@@ -199,9 +199,7 @@ ul > span.divider {
   border-top: 1px solid #242424;
 }
 
-/*Removed width for tab consistency*/
 .west-tabs .nav-tabs li {
-  /*width: 50%;*/
   text-align: center;
 }
 
@@ -210,15 +208,6 @@ ul > span.divider {
   cursor: pointer;
   color: #333;
   border-radius: 0;
-}
-
-.center-view .nav-tabs li a,
-.center-view .nav-tabs li.active a {
-  border-left-color: transparent;
-}
-
-.west-tabs .nav-tabs li.active a {
-  border-bottom-color: #ddd;
 }
 
 .center-view .nav-tabs li.active a {
