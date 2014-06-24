@@ -10,7 +10,7 @@ function($rootScope, $scope, $state, document, snapshots, site, time, ElementSer
     $scope.site = site;
     $scope.time = time;
     $scope.editable = $scope.document.editable && time === 'latest';
-    $rootScope.tree_initial_selection = "";
+    //$rootScope.tree_initial_selection = "";
     $scope.createNewSnapshot = function() {
         ConfigService.createSnapshot($scope.document.sysmlid)
         .then(function(result) {
