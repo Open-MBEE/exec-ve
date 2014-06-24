@@ -102,7 +102,6 @@ function($scope, $state, document, snapshots, site, time, ElementService, ViewSe
           $scope.my_data = [ viewElementIds2TreeNodeMap[rootElementId] ];
 
         });
-      //});
 
     $scope.my_tree = tree;
     $scope.my_data = [];
