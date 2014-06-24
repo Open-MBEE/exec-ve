@@ -9,12 +9,6 @@
   margin: 0 auto;
 }
 
-
-/*Comment out if not working*/
-/*a.dropdown-toggle:active, a.dropdown-toggle:hover, a.dropdown-toggle:focus{
-    background-color:#404040 !important;
-}*/
-
 li.dropdown.open > a { 
   background-color: #404040;
 }
@@ -52,8 +46,9 @@ mms-nav header .block-title {
   white-space: nowrap;
 }
 
-.nav-btn i {
+.nav-btn {
   color: #fff;
+  cursor: pointer;
 }
 
 .navbar {
