@@ -26,7 +26,6 @@ mms-nav header .block-title {
 }
 
 .nav-btn i {
-  padding-top: 6px;
   color: #fff;
 }
 
@@ -364,6 +363,11 @@ accordion a.docweb-link {
     font-weight: 100;
     font-size: 19px;
     text-align: center;
+  }
+
+  .nav-btn i {
+    padding-top: 6px;
+    color: #fff;
   }
 
   .navbar {
