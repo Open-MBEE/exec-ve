@@ -19,7 +19,6 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
                 return $stateParams.time;
             },
             snapshots: function($stateParams, ConfigService) {
-                //return [];
                 return ConfigService.getProductSnapshots($stateParams.docId, $stateParams.site, 'master');
             }
         },
@@ -46,14 +45,15 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
         views: {
             'view@': {
                 templateUrl: 'partials/ve/view.html',
-                controller: function($scope, $stateParams, $state, viewElements, ViewService, time) {
+                controller: function($scope, $stateParams, $state, $rootScope, viewElements, ViewService, time) {
                     ViewService.setCurrentViewId($stateParams.viewId);
+                    $rootScope.tree_initial_selection = $stateParams.viewId;
                     $scope.vid = $stateParams.viewId;
                     $scope.viewElements = viewElements;
                     $scope.showSpec = false;
                     $scope.version = time;
                     $scope.tscClicked = function(elementId) {
-                        $scope.eid = elementId;      //$state.go('view.element', {elementId: elementId});
+                        $scope.eid = elementId;
                         $scope.showSpec = true;
                         $scope.$apply();
                     };

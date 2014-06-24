@@ -189,28 +189,28 @@ function ConfigService($q, $http, URLService, _) {
      * @param {string} id Product id
      * @param {string} site Site name
      * @param {string} [workspace=master] Workspace name
+     * @param {boolean} [updateFromServer=false] get from server
      * @returns {Promise} Promise would be resolved with array of snapshot objects
      */
-    var getProductSnapshots = function(id, site, workspace) {
+    var getProductSnapshots = function(id, site, workspace, updateFromServer) {
         var ws = !workspace ? 'master' : workspace;
+        var update = !updateFromServer ? false : updateFromServer;
 
         var deferred = $q.defer();
-
-        if (productSnapshots.hasOwnProperty(id)) {
+        if (productSnapshots.hasOwnProperty(id) && !update) {
             deferred.resolve(productSnapshots[id]);
             return deferred.promise;
         }
-        
         $http.get(URLService.getProductSnapshotsURL(id, site, ws))
         .success(function(data, status, headers, config) {
-            productSnapshots[id] = data.snapshots;
-
+            if (productSnapshots.hasOwnProperty(id))
+                _.merge(productSnapshots[id], data.snapshots);
+            else
+                productSnapshots[id] = data.snapshots;
             deferred.resolve(productSnapshots[id]);
-            
         }).error(function(data, status, headers, config) {
             URLService.handleHttpStatus(data, status, headers, config, deferred);
         });
-        
         return deferred.promise;
     };
 
