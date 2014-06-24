@@ -345,7 +345,9 @@ accordion a.docweb-link {
     height: 0;
   }
 
-  .navbar .block ul.nav-btns-flyover {
+  .navbar .block ul.nav-btns-flyover,
+  .navbar .block li.docweb-flyover,
+  .navbar .block li.dashboard-flyover {
     display: none;
   }
 
@@ -447,7 +449,7 @@ accordion a.docweb-link {
   .navbar li a {
     position: relative;
     top: 25%;
-    font-weight: 100;
+    font-weight: 200;
   }
 
   .navbar li a.dash-link,
@@ -487,11 +489,15 @@ accordion a.docweb-link {
     border-radius: 0;
   }
 
-  .navbar .block ul.nav-btns-main {
+  .navbar .block ul.nav-btns-main,
+  .navbar .block li.goto,
+  .navbar .block li.other-sites {
     display: none;
   }
 
-  .navbar .block ul.nav-btns-flyover {
+  .navbar .block ul.nav-btns-flyover,
+  .navbar .block li.docweb-flyover,
+  .navbar .block li.dashboard-flyover {
     display: block;
     float: left !important;
     padding-right: 0;
