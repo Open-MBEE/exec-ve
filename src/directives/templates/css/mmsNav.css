@@ -76,10 +76,6 @@ mms-nav header .block-title {
   top: 25%;
 }
 
-.navbar .block ul {
-  height: 100vh;
-}
-
 .navbar .nav-title-a {
   color: #fff;
   font-weight: 100;
@@ -422,8 +418,8 @@ accordion a.docweb-link {
     padding-top: 1em;
   }
 
-  .navbar .block ul {
-    height: 100vh;
+  .navbar .block > ul {
+    height: 10000px;
     width: 100%;
   }
 
@@ -454,6 +450,12 @@ accordion a.docweb-link {
     font-weight: 100;
   }
 
+  .navbar li a.dash-link,
+  .navbar li a.docweb-link {
+    top: 0%;
+    padding: 0;
+  }
+
   .navbar li:last-child {
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   }
@@ -475,6 +477,16 @@ accordion a.docweb-link {
     padding: 0.85714em 2.14286em;
   }
 
+  .navbar .goto-dropdown li {
+    top: 0;
+    height: inherit;
+    border: 0;
+  }
+
+  .navbar .goto-dropdown {
+    border-radius: 0;
+  }
+
   .navbar .block ul.nav-btns-main {
     display: none;
   }
@@ -483,6 +495,7 @@ accordion a.docweb-link {
     display: block;
     float: left !important;
     padding-right: 0;
+    width: 100%;
   }
 
   .js-ready .navbar {
