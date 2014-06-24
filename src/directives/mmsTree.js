@@ -17,7 +17,8 @@
             treeControl: '='
           },
           link: function(scope, element, attrs) {
-            var error, expand_all_parents, expand_level, for_all_ancestors, for_each_branch, get_parent, n, on_treeData_change, select_branch, selected_branch, tree;
+            var error, expand_all_parents, expand_level, for_all_ancestors, for_each_branch, get_parent, n, on_treeData_change, on_initialSelection_change, select_branch, selected_branch, tree;
+            var user_action = false;
             error = function(s) {
               $log.log('ERROR:' + s);
               return void 0;
@@ -102,9 +103,14 @@
               }
             };
             scope.user_clicks_branch = function(branch) {
+              user_action = true;
               if (branch !== selected_branch) {
                 return select_branch(branch);
               }
+            };
+             scope.user_expand_branch = function(branch) {
+                user_action = true;
+                branch.expanded = !branch.expanded;
             };
             get_parent = function(child) {
               var parent;
@@ -187,6 +193,17 @@
                   return branch.children;
                 }
               });
+
+              on_initialSelection_change = function(){
+                if (scope.initialSelection !== null) {
+                  for_each_branch(function(b) {
+                    if (b.label === scope.initialSelection) {
+                      return select_branch(b);
+                    }
+                  });
+                }
+              };
+
               add_branch_to_list = function(level, section, branch, visible) {
                 var child, child_visible, tree_icon, _i, _j, _len, _ref, _results;
                 if (branch.expanded === null || branch.expanded === undefined) {
@@ -240,9 +257,30 @@
                 root_branch = _ref[_i];
                 _results.push(add_branch_to_list(1, '', root_branch, true));
               }
+
+              if (! user_action) {
+                scope.tree_loaded = true;
+                /*for_each_branch(function(b, level) {
+                    b.level = level;
+                    return b.expanded == b.level < expand_level;
+                }); */
+                if (attrs.initialSelection !== null) {
+                    for_each_branch(function(b) {
+                        if (b.label === attrs.initialSelection) {
+                            return select_branch(b);
+                        }
+                    });       
+                }
+              }
+              else {
+                user_action = false;
+              }
+
               return _results;
+
             };
             scope.$watch('treeData', on_treeData_change, true);
+            scope.$watch('initialSelection', on_initialSelection_change, true);
             if (attrs.initialSelection !== null) {
               for_each_branch(function(b) {
                 if (b.label === attrs.initialSelection) {

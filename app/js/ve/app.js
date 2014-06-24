@@ -46,8 +46,9 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
         views: {
             'view@': {
                 templateUrl: 'partials/ve/view.html',
-                controller: function($scope, $stateParams, $state, viewElements, ViewService, time) {
+                controller: function($scope, $stateParams, $state, $rootScope, viewElements, ViewService, time) {
                     ViewService.setCurrentViewId($stateParams.viewId);
+                    $rootScope.tree_initial_selection = "sections";
                     $scope.vid = $stateParams.viewId;
                     $scope.viewElements = viewElements;
                     $scope.showSpec = false;
