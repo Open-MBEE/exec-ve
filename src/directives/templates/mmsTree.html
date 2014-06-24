@@ -4,7 +4,7 @@
     <li ng-repeat="row in tree_rows | filter:{visible:true} | filter:{label:search} track by row.branch.uid" 
         ng-animate="'abn-tree-animate'" ng-class="'level-' + {{row.level}} + (row.branch.selected ? ' active':'')" class="abn-tree-row"> 
         <a ng-click="user_clicks_branch(row.branch)">
-            <i ng-class="row.tree_icon" ng-click="user_expand_branch(row.branch); $event.stopPropagation();" class="indented tree-icon"></i>
+            <i ng-class="row.tree_icon" ng-click="row.branch.expanded = !row.branch.expanded; $event.stopPropagation();" class="indented tree-icon"></i>
             <span class="indented tree-label">{{row.section}} {{row.branch.data.name}}</span>
         </a>
     </li>
