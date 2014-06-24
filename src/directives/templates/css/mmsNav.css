@@ -399,6 +399,7 @@ accordion a.docweb-link {
     border-top: 1px solid rgba(255, 255, 255, 0.1);
     top: 5em;
     height: 3.5em;
+    width: 100%;
   }
 
   .navbar li a {
@@ -435,6 +436,7 @@ accordion a.docweb-link {
   .navbar .block ul.nav-btns-flyover {
     display: block;
     float: left !important;
+    padding-right: 0;
   }
 
   .js-ready .navbar {
