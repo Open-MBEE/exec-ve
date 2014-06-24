@@ -25,6 +25,11 @@ mms-nav header .block-title {
   white-space: nowrap;
 }
 
+.nav-btn i {
+  padding-top: 6px;
+  color: #fff;
+}
+
 .navbar {
   z-index: 200;
   position: relative;
@@ -59,10 +64,6 @@ mms-nav header .block-title {
 .navbar a:hover,
 .navbar a:focus {
   text-decoration: none;
-}
-
-.navbar .close-btn {
-  display: none;
 }
 
 .navbar .block-title {
@@ -260,49 +261,6 @@ accordion a.docweb-link {
   line-height: 40px;
 }
 
-.close-btn {
-  display: block;
-  width: 2.625em;
-  height: 2.25em;
-  padding: 0;
-  border: 0;
-  outline: none;
-  background: #404040 url("../img/close-btn.svg") left center no-repeat;
-  background-size: 1.875em 1.875em;
-  overflow: hidden;
-  white-space: nowrap;
-  text-indent: 100%;
-  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=100);
-  opacity: 1;
-  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-}
-
-.no-svg .close-btn {
-  background-image: url("../img/close-btn.png");
-}
-
-.close-btn:focus, .close-btn:hover {
-  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=100);
-  opacity: 1;
-}
-
-.nav-btn {
-  display: block;
-  width: 2.625em;
-  height: 2.25em;
-  padding: 0;
-  border: 0;
-  outline: none;
-  background: #44749D url("../img/nav-icon.svg") left center no-repeat;
-  background-size: 1.875em 1.5em;
-  overflow: hidden;
-  white-space: nowrap;
-  text-indent: 100%;
-  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=70);
-  opacity: 0.7;
-  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-}
-
 .logout-btn {
   padding-left: .85714em;
 }
@@ -316,9 +274,13 @@ accordion a.docweb-link {
   opacity: 1;
 }
 
-.support-btn,
+.support-btn {
+  padding-left: 0 !important;
+}
+
 .logout-btn {
-  font-family: "FontAwesome";
+  margin-left: 1em;
+  padding-left: 0 !important;
 }
 
 @media screen and (min-width: 45.0625em) {
@@ -337,20 +299,17 @@ accordion a.docweb-link {
     width: 1px;
   }
 
-  header .close-btn {
-    border: 0;
-    clip: rect(0 0 0 0);
-    height: 1px;
-    margin: -1px;
-    overflow: hidden;
-    padding: 0;
-    position: absolute;
-    width: 1px;
+  .navbar .block ul:not(.nav-btns-main),
+  .navbar .block ul:not(.nav-btns-flyover) {
+    height: 0;
   }
 
-  .navbar .block ul:not(.nav-btns) {
-    height: 0;
-    width: 100%;
+  .navbar .block ul.nav-btns-flyover {
+    display: none;
+  }
+
+  .navbar .block ul.nav-btns-main {
+    display: block;
   }
 
   .navbar .block-title {
@@ -384,7 +343,6 @@ accordion a.docweb-link {
     padding-left: .85714em;
   }
 
-
   .navbar li a.app-title {
     font-size: 18px;
   }
@@ -394,9 +352,9 @@ accordion a.docweb-link {
   header {
     box-shadow: 0 1px 1px 0 #404040;
   }
-  
+
   header .block {
-    height: 65px;
+    height: 45px;
     background-color: #44749D;
   }
 
@@ -404,7 +362,7 @@ accordion a.docweb-link {
     position: relative;
     top: 25%;
     font-weight: 100;
-    font-size: 26px;
+    font-size: 19px;
     text-align: center;
   }
 
@@ -432,16 +390,6 @@ accordion a.docweb-link {
     height: 0;
   }
 
-  .navbar:target .close-btn {
-    display: block;
-  }
-
-  .navbar .close-btn {
-    position: absolute;
-    top: 1em;
-    left: 1em;
-  }
-
   .navbar li {
     position: relative;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
@@ -449,9 +397,10 @@ accordion a.docweb-link {
     height: 3.5em;
   }
 
-  .navbar li > a {
+  .navbar li a {
     position: relative;
     top: 25%;
+    font-weight: 100;
   }
 
   .navbar li:last-child {
@@ -475,7 +424,12 @@ accordion a.docweb-link {
     padding: 0.85714em 2.14286em;
   }
 
-  .navbar .nav-btns {
+  .navbar .block ul.nav-btns-main {
+    display: none;
+  }
+
+  .navbar .block ul.nav-btns-flyover {
+    display: block;
     float: left !important;
   }
 
@@ -490,17 +444,6 @@ accordion a.docweb-link {
 
   .js-ready .navbar .block {
     background: transparent;
-  }
-
-  .js-ready .navbar .close-btn {
-    display: block;
-    filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=70);
-    opacity: 0.7;
-  }
-
-  .js-ready .navbar .close-btn:focus, .js-ready .navbar .close-btn:hover {
-    filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=100);
-    opacity: 1;
   }
 
   .js-ready .navbar {

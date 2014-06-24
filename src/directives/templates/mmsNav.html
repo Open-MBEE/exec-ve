@@ -1,7 +1,7 @@
 <header role="banner">
   <div class="block">
     <div class="banner-title">View Editor</div>
-    <a ng-click="nav.toggleNav()" class="nav-btn" id="nav-open-btn" href="#nav">Navigation</a>
+    <a ng-click="nav.toggleNav()" class="nav-btn" id="nav-open-btn" href="#nav"><i class="fa fa-lg fa-bars"></i></a>
   </div>
 </header>
 
@@ -11,7 +11,7 @@
     <ul>
       <!-- Brand name and document -->
       <li class="nav-title-li"><a class="nav-title-a" href="#">View Editor</a></li>
-      <li class="nav-doc-li"><a href="#">{{title}}</a></li>
+      <li class="nav-doc-li"><a class="nav-doc-a" href="#">{{title}}</a></li>
 
       <!-- Goto dropdown -->
       <li class="dropdown">
@@ -47,14 +47,17 @@
       </li>
 
       <!-- Support and logout buttons -->
-      <ul class="nav-btns pull-right">
-        <li><a class="support-btn" tooltip="Support" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" class="nav-tool" href="/share/page/site/ems-training/dashboard">&#xf1cd;</a></li>
-        <li><a class="logout-btn" tooltip="Logout" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" class="nav-tool" href="/alfresco/service/logout/info?next=/share/page">&#xf08b;</a></li>
+      <ul class="nav-btns-main pull-right">
+        <li><a class="nav-btn support-btn" tooltip="Support" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" href="/share/page/site/ems-training/dashboard"><i class="fa fa-support"></i></a></li>
+        <li><a class="nav-btn logout-btn" tooltip="Logout" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" href="/alfresco/service/logout/info?next=/share/page"><i class="fa fa-sign-out"></i></a></li>
+      </ul>
+
+      <ul class="nav-btns-flyover pull-right">
+        <li><a href="/share/page/site/ems-training/dashboard">Support</a></li>
+        <li><a href="/alfresco/service/logout/info?next=/share/page">Logout</a></li>
       </ul>
 
     </ul>
-
-    <a ng-click="nav.toggleNav()" class="close-btn" id="nav-close-btn" href="#top">Return to Content</a>
 
   </div>
 </nav>
