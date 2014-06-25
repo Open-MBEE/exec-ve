@@ -335,13 +335,14 @@ module.exports = function(grunt) {
   // grunt.registerTask('install', ['npm-install', 'bower']);
   grunt.registerTask('install', ['bower']);
   grunt.registerTask('compile', ['html2js']);
-  grunt.registerTask('lint',    ['jshint:afterconcat']);
+  grunt.registerTask('lint',    ['jshint:beforeconcat']);
   grunt.registerTask('minify',  ['cssmin', 'uglify']);
   grunt.registerTask('wire',    ['bowerInstall']);
 
   grunt.registerTask('dev-build',     ['install', 'compile', 'lint', 'concat', 'minify', 'copy', 'wire']);
   grunt.registerTask('release-build', ['install', 'compile', 'lint', 'concat', 'minify', 'copy', 'wire']);
   grunt.registerTask('docs-build',    ['ngdocs']);
+  grunt.registerTask('default', ['dev-build']);
 
   grunt.registerTask('dev', function(arg1) {
       grunt.task.run('dev-build', 'connect:static');
