@@ -13,7 +13,7 @@
         </div>
     </div></div> 
     <h4><mms-transclude-name data-mms-eid="{{view.sysmlid}}"></mms-transclude-name></h4> 
-    <div>Last Modified: {{lastModified | date:'M/d/yy h:mm a'}} by {{author}}</div><br/>
+    <div ng-show="textEditable">Last Modified: {{lastModified | date:'M/d/yy h:mm a'}} by {{author}}</div><br/>
     <div ui-sortable="sortableOptions" ng-model="view.specialization.contains">
         <div ng-repeat="contain in view.specialization.contains" ng-switch on="contain.type"> 
         <div ng-class="structEditable ? 'panel panel-default' : ''">

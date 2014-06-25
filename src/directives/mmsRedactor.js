@@ -121,9 +121,7 @@ function mmsRedactor(ElementService, ViewService, $modal, $templateCache, $windo
         };
 
         function read(html) {
-            //var html = element.editable("getHTML"); 
-            //if (angular.isArray(html))
-            //    html = html.join('');
+            var code = element.redactor('get');
             ngModelCtrl.$setViewValue(html);
         }
 
@@ -134,9 +132,9 @@ function mmsRedactor(ElementService, ViewService, $modal, $templateCache, $windo
                         'fontcolor', 'unorderedlist', 'orderedlist', 'outdent', 'indent', 
                         'image', 'video', 'file', 'table', 'link', 'alignment', 
                         'horizontalrule'],
-            plugins: ['fontcolor'],
+            plugins: ['fontcolor', 'fullscreen'],
             changeCallback: read,
-            maxHeight: $window.innerHeight*0.75,
+            maxHeight: $window.innerHeight*0.65,
             imageUploadURL: '', //prevent default upload to public url
             placeholder: "Placeholder",
             autoresize: true,
@@ -175,6 +173,7 @@ function mmsRedactor(ElementService, ViewService, $modal, $templateCache, $windo
             mmsCfElements: '=',
             mmsEid: '@'
         },
-        link: mmsRedactorLink
+        link: mmsRedactorLink,
+        priority: 1
     };
 }

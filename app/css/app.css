@@ -33,6 +33,10 @@
   display: inline;
 }
 
+img {
+  max-width: 100%;
+}
+
 .fa-pane-orientation-vertical > .fa-pane-handle {
   cursor: row-resize;
   background-color: lightgray;
@@ -115,18 +119,6 @@
   -webkit-border-radius: 6px 0 6px 6px;
   -moz-border-radius: 6px 0 6px 6px;
   border-radius: 6px 0 6px 6px;
-}
-
-mms-view:not(.editing) .placeholder {
-  display: none;
-}
-
-mms-view:not(.reviewing) mms-transclude-com {
-  display: none;
-}
-
-mms-transclude-com, mms-transclude-com * {
-  background-color: lightgreen;
 }
 
 .pane-selector {

@@ -3,7 +3,7 @@
     <div><b>Last Modified:</b> {{element.lastModified | date:'M/d/yy h:mm a'}} by {{element.author}}</div>
     <div><b>Name:</b> <input class="form-control" type="text" ng-model="edit.name"></input></div>
     <div><b>Documentation:</b></div>
-    <div ng-model="edit.documentation" mms-redactor mms-cf-elements="mmsCfElements" mms-eid="{{element.sysmlid}}"></div>
+    <textarea ng-model="edit.documentation" mms-redactor mms-cf-elements="mmsCfElements" mms-eid="{{element.sysmlid}}"></textarea>
     <div ng-if="edit.specialization.type === 'Property'">
         <div><b>Property Value:</b></div>
         <div ng-if="editValues.length == 0">
