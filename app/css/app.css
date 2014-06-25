@@ -199,6 +199,10 @@ ul > span.divider {
   border-left-color: transparent;
 }
 
+.center-view .nav-tabs li.active a {
+  border-left-color: #ddd;
+}
+
 .west-tabs .nav-tabs li.active a {
   border-bottom-color: transparent;
 }
