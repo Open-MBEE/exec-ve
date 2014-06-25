@@ -218,7 +218,7 @@ module.exports = function(grunt) {
             // /alfresco/service/javawebscripts
             // https://sheldon.jpl.nasa.gov/alfresco/wcs/javawebscripts/element/_17_0_2_3_407019f_1386871336920_707205_26285
             context: '/alfresco',  // '/api'
-            host: '128.149.16.155',//128.149.16.152',
+            host: 'europaems-dev-staging-a.jpl.nasa.gov',//128.149.16.155',
             port: 443,
             changeOrigin: true,
             https: true,
@@ -264,8 +264,18 @@ module.exports = function(grunt) {
     },
 
     watch: {
-      files: ['app/**/*', '!app/bower_components/**', 'src/**/*'],
-      tasks: ['default']
+      dev: {
+        files: ['app/**/*', '!app/bower_components/**', 'src/**/*'],
+        tasks: ['dev-build']
+      },
+      release: {
+        files: ['app/**/*', '!app/bower_components/**', 'src/**/*'],
+        tasks: ['release-build']
+      },
+      docs: {
+        files: ['app/**/*', '!app/bower_components/**', 'src/**/*'],
+        tasks: ['docs-build']
+      },
     },
 
     qunit: {
@@ -321,35 +331,61 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-bower-install');
   grunt.loadNpmTasks('grunt-bower-installer');
   grunt.loadNpmTasks('grunt-npm-install');
-  //grunt.loadNpmTasks('assemble');
 
-  // Default task(s).  Must function before server has been stareted
-  grunt.registerTask('default', ['npm-install', 'bower', 'html2js', 'cssmin', 'jshint:beforeconcat', 'concat', 'jshint:afterconcat', 'uglify', 'copy', 'bowerInstall', 'ngdocs']);
+  // grunt.registerTask('install', ['npm-install', 'bower']);
+  grunt.registerTask('install', ['bower']);
+  grunt.registerTask('compile', ['html2js']);
+  grunt.registerTask('lint',    ['jshint:afterconcat']);
+  grunt.registerTask('minify',  ['cssmin', 'uglify']);
+  grunt.registerTask('wire',    ['bowerInstall']);
 
-  //grunt.registerTask('stage', ['default', 'qunit', 'rsync']);
+  grunt.registerTask('dev-build',     ['install', 'compile', 'lint', 'concat', 'minify', 'copy', 'wire']);
+  grunt.registerTask('release-build', ['install', 'compile', 'lint', 'concat', 'minify', 'copy', 'wire']);
+  grunt.registerTask('docs-build',    ['ngdocs']);
+
+  grunt.registerTask('dev', function(arg1) {
+      grunt.task.run('dev-build', 'connect:static');
+      if (arguments.length !== 0)
+        grunt.task.run('launch:dev:' + arg1);
+      else
+        grunt.task.run('launch:dev');
+    }
+  );
+
+  grunt.registerTask('release', function(arg1) {
+      grunt.task.run('release-build', 'connect:static');
+      if (arguments.length !== 0)
+        grunt.task.run('launch:release:' + arg1);
+      else
+        grunt.task.run('launch:release');
+    }
+  );
 
   grunt.registerTask('server', function(arg1) {
-    grunt.task.run('default', 'connect:static');
-
-    if (arguments.length !== 0) {
-      grunt.log.writeln("Launching server with mock REST API");
-      //grunt.task.run('connect:restServer', 'configureProxies:mockServer', 'connect:mockServer');
-      grunt.task.run('stubby', 'configureProxies:' + arg1, 'connect:' + arg1);
-    } else {
-      grunt.log.writeln("Launching server with proxy API");
-      grunt.task.run('configureProxies:b', 'connect:b');
+      if (arguments.length !== 0)
+        grunt.task.run('dev:' + arg1);
+      else
+        grunt.task.run('dev');
     }
-    grunt.task.run('watch');
-  });
+  );
 
-  grunt.registerTask('docServer', function() {
-    grunt.task.run('ngdocs');
-    grunt.task.run('connect:docs');
-    grunt.task.run('watch');
-  });
+  grunt.registerTask('docs', function() {
+      grunt.task.run('ngdocs');
+      grunt.task.run('connect:docs');
+      grunt.task.run('watch:docs');
+    }
+  );
 
-  //grunt.registerTask('dance', 'Dance for a bit.', function() {
-  //  grunt.log.write('Dancing...').ok();
-  //});
-  
+  grunt.registerTask('launch', function(build, arg1) {
+      if (arguments.arg1) {
+        grunt.log.writeln("Launching server with mock REST API");
+        //grunt.task.run('connect:restServer', 'configureProxies:mockServer', 'connect:mockServer');
+        grunt.task.run('stubby', 'configureProxies:' + arg1, 'connect:' + arg1);
+      } else {
+        grunt.log.writeln("Launching server with proxy API");
+        grunt.task.run('configureProxies:b', 'connect:b');
+      }
+      grunt.task.run('watch:' + build);
+    }
+  );
 };
