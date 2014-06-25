@@ -18,12 +18,17 @@
 
 /*Added for toolbar*/
 .toolbar {
-  background-color: #404040;
+  /*background-color: #404040;*/
+  background-color:#FFF;
   padding: 0px;
 }
 
+.navTab {
+  width:175px;
+}
+
 .wrap {
-  min-width: 450px;
+  min-width: 350px;
   overflow: hidden;
 }
 /******* END *******/
@@ -194,8 +199,9 @@ ul > span.divider {
   border-top: 1px solid #242424;
 }
 
+/*Removed width for tab consistency*/
 .west-tabs .nav-tabs li {
-  width: 50%;
+  /*width: 50%;*/
   text-align: center;
 }
 
