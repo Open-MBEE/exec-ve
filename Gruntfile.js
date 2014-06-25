@@ -377,7 +377,7 @@ module.exports = function(grunt) {
   );
 
   grunt.registerTask('launch', function(build, arg1) {
-      if (arguments.arg1) {
+      if (arg1) {
         grunt.log.writeln("Launching server with mock REST API");
         //grunt.task.run('connect:restServer', 'configureProxies:mockServer', 'connect:mockServer');
         grunt.task.run('stubby', 'configureProxies:' + arg1, 'connect:' + arg1);
