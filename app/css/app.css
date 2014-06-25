@@ -21,6 +21,11 @@
   background-color: #404040;
   padding: 0px;
 }
+
+.wrap {
+  min-width: 450px;
+  overflow: hidden;
+}
 /******* END *******/
 
 #outer-wrap {
