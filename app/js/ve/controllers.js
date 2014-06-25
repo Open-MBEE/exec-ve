@@ -10,6 +10,7 @@ function($scope, $state, document, snapshots, site, time, ElementService, ViewSe
     $scope.site = site;
     $scope.time = time;
     $scope.editable = $scope.document.editable && time === 'latest';
+    $scope.filterOn = false;
     $scope.createNewSnapshot = function() {
         ConfigService.createSnapshot($scope.document.sysmlid)
         .then(function(result) {

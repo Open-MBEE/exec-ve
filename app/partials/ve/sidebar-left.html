@@ -21,13 +21,13 @@
                 </button>
             </div>
             <div class="btn-group btn-group-sm">
-                <button type="button" class="btn btn-default" ng-click="toggle_filter_on()">
+                <button type="button" class="btn btn-default" ng-click="filterOn = !filterOn">
                     <span class="fa fa-navicon"></span> Filter
                 </button>
             </div>
-            <div>
-                <input class="form-control" ng-show="filterOn" ng-model="search" type="text" placeholder="filter" ng-change="expand_tree()">
-            </div>
+        </div>
+        <div>
+            <input class="form-control" ng-show="filterOn" ng-model="search" type="text" placeholder="filter" ng-change="my_tree.expand_all()">
         </div>
         <mms-tree search="search" tree-data="my_data" section-numbering="true" tree-control="my_tree" 
             on-select="my_tree_handler(branch)" expand-level="2" initial-selection="{{tree_initial_selection}}">

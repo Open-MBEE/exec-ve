@@ -24,7 +24,7 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
         },
         views: {
             'menu': {
-                template: '<mms-nav site="{{site}}" title="{{title}}" type="document"></mms-nav>',
+                template: '<mms-nav site="{{site}}" title="{{title}}" type="View Editor"></mms-nav>',
                 controller: function($scope, $stateParams, document, site, views) {
                     $scope.site = site.name;
                     if ($stateParams.time !== 'latest')

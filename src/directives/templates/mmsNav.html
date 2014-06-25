@@ -1,6 +1,6 @@
 <header role="banner">
   <div class="block">
-    <div class="banner-title">View Editor</div>
+    <div class="banner-title">{{type}}</div>
     <a ng-click="nav.toggleNav()" class="nav-btn"><i class="fa fa-lg fa-bars"></i></a>
   </div>
 </header>
@@ -10,14 +10,14 @@
 
     <ul>
       <!-- Brand name and document -->
-      <li class="nav-title-li">View Editor</li>
+      <li class="nav-title-li">{{type}}</li>
       <li class="nav-doc-li">{{title}}</li>
 
       <!-- Goto dropdown -->
       <li class="goto dropdown">
-        <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{site}}<i class="nav-dropdown-icon fa fa-caret-down"></i></a>
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{siteTitle}}<i class="nav-dropdown-icon fa fa-caret-down"></i></a>
         <ul class="goto-dropdown dropdown-menu" role="menu">
-          <li ng-if="type != 'docweb'"><a href="docweb.html#/sites/{{site}}">DocWeb</a></li>
+          <li ng-if="type != 'DocWeb'"><a href="docweb.html#/sites/{{site}}">DocWeb</a></li>
           <li><a href="/share/page/site/{{site}}/dashboard">Dashboard</a></li>
         </ul>
       </li>
@@ -46,7 +46,7 @@
           </ul>
       </li>
 
-      <li class="docweb-flyover" ng-if="type != 'docweb'"><a href="docweb.html#/sites/{{site}}">DocWeb</a></li>
+      <li class="docweb-flyover" ng-if="type != 'DocWeb'"><a href="docweb.html#/sites/{{site}}">DocWeb</a></li>
       <li class="dashboard-flyover"><a href="/share/page/site/{{site}}/dashboard">Dashboard</a></li>
 
       <!-- Support and logout buttons -->
