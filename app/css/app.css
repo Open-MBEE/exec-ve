@@ -16,6 +16,13 @@
   }
 }
 
+/*Added for toolbar*/
+.toolbar {
+  background-color: #404040;
+  padding: 0px;
+}
+/******* END *******/
+
 #outer-wrap {
   position: relative;
   overflow: hidden;

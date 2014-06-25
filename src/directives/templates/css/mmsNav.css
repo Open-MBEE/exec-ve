@@ -9,6 +9,11 @@
   margin: 0 auto;
 }
 
+/*Added classes for navbar support icon bug*/
+/*ul.nav-btns-main{
+    margin-top: -20px;
+}*/
+
 
 /*Comment out if not working*/
 /*a.dropdown-toggle:active, a.dropdown-toggle:hover, a.dropdown-toggle:focus{
@@ -580,6 +585,11 @@ accordion a.docweb-link {
     transform: translate3d(0, 0, 0);
   }
 
+  /*Added classes for support buttons*/
+
+  ul.nav-btns-main{
+    margin-top: -20px;
+  }
 
 
   

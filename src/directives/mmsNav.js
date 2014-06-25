@@ -28,6 +28,7 @@ function mmsNav(SiteService, $templateCache, $log, growl) {
             catOpen : false,
             bgColor : {'background-color': 'none'}
         };
+
         // Change dropdown color if active
         scope.setBG = function(){
             scope.obj.bgColor = {'background-color': '#404040'};
