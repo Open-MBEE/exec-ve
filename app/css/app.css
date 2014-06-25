@@ -184,15 +184,15 @@ ul > span.divider {
   cursor: pointer;
   color: #333;
   border-radius: 0;
+  margin-right: 0;
 }
 
-.center-view .nav-tabs li a,
-.center-view .nav-tabs li.active a {
+.center-view .nav-tabs li a {
   border-left-color: transparent;
 }
 
 .west-tabs .nav-tabs li.active a {
-  border-bottom-color: #ddd;
+  border-bottom-color: transparent;
 }
 
 .center-view .nav-tabs li.active a {
