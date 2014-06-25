@@ -50,6 +50,10 @@
   display: inline;
 }
 
+img {
+  max-width: 100%;
+}
+
 .fa-pane-orientation-vertical > .fa-pane-handle {
   cursor: row-resize;
   background-color: lightgray;
@@ -134,18 +138,6 @@
   border-radius: 6px 0 6px 6px;
 }
 
-mms-view:not(.editing) .placeholder {
-  display: none;
-}
-
-mms-view:not(.reviewing) mms-transclude-com {
-  display: none;
-}
-
-mms-transclude-com, mms-transclude-com * {
-  background-color: lightgreen;
-}
-
 .pane-selector {
   border-left: 1px solid #FFF;
   background-color: #404040;
@@ -210,15 +202,19 @@ ul > span.divider {
   cursor: pointer;
   color: #333;
   border-radius: 0;
+  margin-right: 0;
 }
 
-.center-view .nav-tabs li a,
-.center-view .nav-tabs li.active a {
+.center-view .nav-tabs li a {
   border-left-color: transparent;
 }
 
+.center-view .nav-tabs li.active a {
+  border-left-color: #ddd;
+}
+
 .west-tabs .nav-tabs li.active a {
-  border-bottom-color: #ddd;
+  border-bottom-color: transparent;
 }
 
 .center-view .nav-tabs li.active a {

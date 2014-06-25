@@ -19,14 +19,12 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
                 return $stateParams.time;
             },
             snapshots: function($stateParams, ConfigService) {
-                //return [];
                 return ConfigService.getProductSnapshots($stateParams.docId, $stateParams.site, 'master');
             }
         },
         views: {
             'menu': {
-                template: '<mms-nav site="{{site}}" title="{{title}}" type="document"></mms-nav>',
-                //template: '<mms-nav site="{{site}}" type="document"></mms-nav>',
+                template: '<mms-nav site="{{site}}" title="{{title}}" type="View Editor"></mms-nav>',
                 controller: function($scope, $stateParams, document, site, views) {
                     $scope.site = site.name;
                     if ($stateParams.time !== 'latest')
@@ -47,14 +45,15 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
         views: {
             'view@': {
                 templateUrl: 'partials/ve/view.html',
-                controller: function($scope, $stateParams, $state, viewElements, ViewService, time) {
+                controller: function($scope, $stateParams, $state, $rootScope, viewElements, ViewService, time) {
                     ViewService.setCurrentViewId($stateParams.viewId);
+                    $rootScope.tree_initial_selection = $stateParams.viewId;
                     $scope.vid = $stateParams.viewId;
                     $scope.viewElements = viewElements;
                     $scope.showSpec = false;
                     $scope.version = time;
                     $scope.tscClicked = function(elementId) {
-                        $scope.eid = elementId;      //$state.go('view.element', {elementId: elementId});
+                        $scope.eid = elementId;
                         $scope.showSpec = true;
                         $scope.$apply();
                     };
