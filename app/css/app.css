@@ -16,6 +16,10 @@
   }
 }
 
+img {
+  max-width: 100%;
+}
+
 .nav-pills > li.active > a {
   background-color: #505050;
   color: #fff;
@@ -158,18 +162,6 @@
   -webkit-border-radius: 6px 0 6px 6px;
   -moz-border-radius: 6px 0 6px 6px;
   border-radius: 6px 0 6px 6px;
-}
-
-mms-view:not(.editing) .placeholder {
-  display: none;
-}
-
-mms-view:not(.reviewing) mms-transclude-com {
-  display: none;
-}
-
-mms-transclude-com, mms-transclude-com * {
-  background-color: lightgreen;
 }
 
 .pane-selector {
