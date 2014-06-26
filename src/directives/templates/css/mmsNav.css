@@ -9,36 +9,39 @@
   margin: 0 auto;
 }
 
-li.dropdown > a {
-  padding-left: 10px;
-}
+/*Added classes for navbar support icon bug*/
+/*ul.nav-btns-main{
+    margin-top: -20px;
+}*/
 
-li.dropdown > a > i{
-  padding-right: 10px;
-}
+
+/*Comment out if not working*/
+/*a.dropdown-toggle:active, a.dropdown-toggle:hover, a.dropdown-toggle:focus{
+    background-color:#404040 !important;
+}*/
 
 li.dropdown.open > a { 
   background-color: #404040;
 }
 
-.closed {
+.closed{
   background-color:transparent;
 }
 
-.btn-color {
+.btn-color{
   background-color:#404040;
 }
 
-.btn-clear {
+.btn-clear{
   background-color:transparent;
 }
 
 .navbar li.nav-title-li {
   color: #fff;
-  font-weight: 100;
+  font-weight: 200;
   font-size: 16px;
   padding-left: 1em;
-  padding-right: 1em;
+  padding-right: 3em;
   cursor: default;
 }
 
@@ -51,6 +54,7 @@ mms-nav header {
 
 mms-nav header .nav-btn {
   position: absolute;
+  cursor: pointer;
   top: 25%;
   left: 1em;
 }
@@ -60,12 +64,10 @@ mms-nav header .block-title {
   font-size: 1.875em;
   line-height: 1.2em;
   text-align: center;
-  white-space: nowrap;
 }
 
-.nav-btn {
+.nav-btn i {
   color: #fff;
-  cursor: pointer;
 }
 
 .navbar {
@@ -91,6 +93,7 @@ mms-nav header .block-title {
 .navbar li.nav-doc-li {
   cursor: default;
   padding-right: 10px;
+  font-weight: 500;
 }
 
 .navbar a:hover,
@@ -132,7 +135,7 @@ mms-nav header .block-title {
 
 .navbar li a {
   color: #fff;
-  font-weight: 400;
+  font-weight: 200;
   line-height: 1.28571em;
   outline: none;
 }
@@ -142,15 +145,15 @@ mms-nav header .block-title {
 }
 
 .navbar .panel-heading a {
+  padding: 12px;
   display: block;
-  padding: 10px 20px;
   line-height: 1.42857143;
   color: #fff;
 }
 
 .dropdown-toggle {
   padding-top: 20px;
-  padding-bottom: 10px;
+  padding-bottom: 11px;
 }
 
 ul > li > a {
@@ -158,14 +161,15 @@ ul > li > a {
   padding-bottom: 13px;
 }
 
+
 .navbar .dropdown-menu > li > a {
-  padding: 10px 20px;
+  padding: 12px;
   background-color: #404040;
   color: #fff;
 }
 
 .navbar .dropdown-menu > li > a:hover {
-  padding: 10px 20px;
+  padding: 12px;
   background-color: #505050;
   color: #fff;
 }
@@ -200,7 +204,8 @@ ul > li > a {
 }
 
 .nav-dropdown-icon {
-  padding-left: .5em;
+  padding-left: 10px;
+  padding-right: 10px;
 }
 
 .menu {
@@ -378,6 +383,7 @@ accordion a.docweb-link {
   }
 
   .navbar li {
+    font-weight: 200;
     display: inline-block;
   }
 
@@ -386,7 +392,7 @@ accordion a.docweb-link {
   }
 
   .navbar li a {
-    /*padding-left: .85714em;*/
+    padding-left: 10px;
   }
 
   .navbar li a.app-title {
@@ -423,8 +429,8 @@ accordion a.docweb-link {
     padding-top: 1em;
   }
 
-  .navbar .block > ul {
-    height: 10000px;
+  .navbar .block ul {
+    height: 100vh;
     width: 100%;
   }
 
@@ -434,11 +440,6 @@ accordion a.docweb-link {
 
   .navbar li.nav-doc-li {
     border-top: 0;
-    font-weight: 700;
-    padding: .85714em 2.14286em;
-    line-height: 1.28571em;
-    outline: 0;
-    cursor: default;
   }
 
   .navbar:not(:target) {
@@ -460,12 +461,6 @@ accordion a.docweb-link {
     font-weight: 200;
   }
 
-  .navbar li a.dash-link,
-  .navbar li a.docweb-link {
-    top: 0%;
-    padding: 0;
-  }
-
   .navbar li:last-child {
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   }
@@ -480,7 +475,7 @@ accordion a.docweb-link {
     margin-top: -0.625em;
     border-top: 0.625em transparent solid;
     border-bottom: 0.625em transparent solid;
-    border-right: 0.625em white solid;
+    border-right: 0.625em #fff solid;
   }
 
   .navbar li a {
@@ -509,7 +504,11 @@ accordion a.docweb-link {
     display: block;
     float: left !important;
     padding-right: 0;
-    width: 100%;
+  }
+
+  .navbar li.nav-doc-li {
+    padding: .85714em 2.14286em;
+    text-shadow: none;
   }
 
   .js-ready .navbar {
@@ -605,5 +604,9 @@ accordion a.docweb-link {
     -ms-transform: translate3d(0, 0, 0);
     -o-transform: translate3d(0, 0, 0);
     transform: translate3d(0, 0, 0);
-  }  
+  }
+
+  ul.nav-btns-main{
+    margin-top: -20px;
+  }
 }

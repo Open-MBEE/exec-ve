@@ -28,6 +28,7 @@ function mmsNav(SiteService, $templateCache, $log, growl) {
             catOpen : false,
             bgColor : {'background-color': 'none'}
         };
+
         // Change dropdown color if active
         scope.setBG = function(){
             scope.obj.bgColor = {'background-color': '#404040'};
@@ -95,6 +96,7 @@ function mmsNav(SiteService, $templateCache, $log, growl) {
             this.nav_class = 'js-nav';
 
             this.closeNavEnd = function(e) {
+                console.log("closeNavEnd");
                 if (e && e.target === this.inner) {
                     window.document.removeEventListener(transition_end, this.closeNavEnd, false);
                 }
@@ -102,6 +104,7 @@ function mmsNav(SiteService, $templateCache, $log, growl) {
             };
 
             this.closeNav = function() {
+                console.log("closeNav");
                 if (this.nav_open) {
                     // close navigation after transition or immediately
                     var duration = 0;
@@ -122,6 +125,8 @@ function mmsNav(SiteService, $templateCache, $log, growl) {
             };
 
             this.openNav = function() {
+                console.log("openNav");
+                console.log("this.nav_open = " + this.nav_open);
                 if (this.nav_open) {
                     return;
                 }
@@ -130,6 +135,7 @@ function mmsNav(SiteService, $templateCache, $log, growl) {
             };
 
             this.toggleNav = function(e) {
+                console.log("toggleNav");
                 if (this.nav_open && Helper.hasClass(doc, this.nav_class)) {
                     this.closeNav();
                 } else {
@@ -141,6 +147,7 @@ function mmsNav(SiteService, $templateCache, $log, growl) {
             };
 
             this.init = function() {
+                console.log("init");
                 if (this._init) {
                     return;
                 }

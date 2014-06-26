@@ -10,20 +10,12 @@ function($scope, $state, document, snapshots, site, time, ElementService, ViewSe
     $scope.site = site;
     $scope.time = time;
     $scope.editable = $scope.document.editable && time === 'latest';
-    $scope.filterOn = false;
     $scope.createNewSnapshot = function() {
         ConfigService.createSnapshot($scope.document.sysmlid)
         .then(function(result) {
             growl.success("Create Successful: wait for email.");
         }, function(reason) {
             growl.error("Create Failed: " + reason.message);
-        });
-    };
-    $scope.refreshSnapshots = function() {
-        ConfigService.getProductSnapshots($scope.document.sysmlid, $scope.site.name, 'master', true)
-        .then(function(result) {
-        }, function(reason) {
-            growl.error("Refresh Failed: " + reason.message);
         });
     };
 
@@ -110,6 +102,7 @@ function($scope, $state, document, snapshots, site, time, ElementService, ViewSe
           $scope.my_data = [ viewElementIds2TreeNodeMap[rootElementId] ];
 
         });
+      //});
 
     $scope.my_tree = tree;
     $scope.my_data = [];

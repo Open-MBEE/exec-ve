@@ -46,9 +46,7 @@ function mmsTranscludeVal(ElementService, UtilsService, $log, $compile, $templat
                 }
             } 
             element.empty();
-            if (scope.values.length === 0)
-                element.html('<span class="placeholder">value placeholder</p>');
-            else if (areStrings) {
+            if (areStrings) {
                 var toCompile = toCompileList.join(' ');
                 element.append(toCompile);
                 $compile(element.contents())(scope); 
