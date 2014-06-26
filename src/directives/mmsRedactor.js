@@ -32,7 +32,7 @@ function mmsRedactor(ElementService, ViewService, $modal, $templateCache, $windo
             $scope.filter = '';
             $scope.searchText = '';
             $scope.choose = function(elementId, property, name) {
-                var tag = '<mms-transclude-' + property + ' data-mms-eid="' + elementId + '">[cf:' + name + '.' + property + ']</mms-transclude-' + property + '> ';
+                var tag = '<mms-transclude-' + property + ' data-mms-eid="' + elementId + '">[cf:' + name + '.' + property + ']</mms-transclude-' + property + '>&nbsp;';
                 $modalInstance.close(tag);
             };
             $scope.cancel = function() {
@@ -104,7 +104,7 @@ function mmsRedactor(ElementService, ViewService, $modal, $templateCache, $windo
                     comment.owner = ViewService.getCurrentViewId();
                 ElementService.createElement(comment)
                 .then(function(data) {
-                    var tag = '<mms-transclude-com data-mms-eid="' + data.sysmlid + '">comment</mms-transclude-com> ';
+                    var tag = '<mms-transclude-com data-mms-eid="' + data.sysmlid + '">comment</mms-transclude-com>&nbsp;';
                     element.redactor('selectionRestore');
                     //element.redactor(saveUndoStep();
                     element.redactor('bufferSet');
@@ -133,7 +133,7 @@ function mmsRedactor(ElementService, ViewService, $modal, $templateCache, $windo
                         'horizontalrule'],
             plugins: ['fontcolor'],
             changeCallback: read,
-            maxHeight: $window.innerHeight*0.75,
+            maxHeight: $window.innerHeight*0.65,
             imageUploadURL: '', //prevent default upload to public url
             placeholder: "Placeholder",
             autoresize: true,
