@@ -36,6 +36,15 @@ li.dropdown.open > a {
   background-color:transparent;
 }
 
+.navbar li.nav-title-li {
+  color: #fff;
+  font-weight: 200;
+  font-size: 16px;
+  padding-left: 1em;
+  padding-right: 3em;
+  cursor: default;
+}
+
 mms-nav header {
   z-index: 100;
   position: relative;
@@ -45,6 +54,7 @@ mms-nav header {
 
 mms-nav header .nav-btn {
   position: absolute;
+  cursor: pointer;
   top: 25%;
   left: 1em;
 }
@@ -54,7 +64,6 @@ mms-nav header .block-title {
   font-size: 1.875em;
   line-height: 1.2em;
   text-align: center;
-  white-space: nowrap;
 }
 
 .nav-btn i {
@@ -81,15 +90,11 @@ mms-nav header .block-title {
   top: 25%;
 }
 
-.navbar .block ul {
-  height: 100vh;
-}
-
-.navbar .nav-title-a {
-  color: #fff;
-  font-weight: 100;
-  font-size: 16px;
-  padding-right: 1em;
+.navbar li.nav-doc-li {
+  cursor: default;
+  padding-right: 10px;
+  font-weight: 500;
+  text-shadow: rgb(54, 93, 126) 1px 1px, rgb(54, 93, 126) 2px 2px, rgb(54, 93, 126) 3px 3px, rgb(54, 93, 126) 4px 4px, rgb(68, 116, 157) 5px 5px;
 }
 
 .navbar a:hover,
@@ -131,7 +136,7 @@ mms-nav header .block-title {
 
 .navbar li a {
   color: #fff;
-  font-weight: 300;
+  font-weight: 200;
   line-height: 1.28571em;
   outline: none;
 }
@@ -373,15 +378,12 @@ accordion a.docweb-link {
     width: 1px;
   }
 
-  .navbar ul {
-    white-space: nowrap;
-  }
-
   .navbar li ul li {
     display: block;
   }
 
   .navbar li {
+    font-weight: 200;
     display: inline-block;
   }
 
@@ -473,7 +475,7 @@ accordion a.docweb-link {
     margin-top: -0.625em;
     border-top: 0.625em transparent solid;
     border-bottom: 0.625em transparent solid;
-    border-right: 0.625em white solid;
+    border-right: 0.625em #fff solid;
   }
 
   .navbar li a {
@@ -488,6 +490,11 @@ accordion a.docweb-link {
     display: block;
     float: left !important;
     padding-right: 0;
+  }
+
+  .navbar li.nav-doc-li {
+    padding: .85714em 2.14286em;
+    text-shadow: none;
   }
 
   .js-ready .navbar {
@@ -585,12 +592,7 @@ accordion a.docweb-link {
     transform: translate3d(0, 0, 0);
   }
 
-  /*Added classes for support buttons*/
-
   ul.nav-btns-main{
     margin-top: -20px;
   }
-
-
-  
 }

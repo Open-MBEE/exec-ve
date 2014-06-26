@@ -34,6 +34,7 @@
     </tab>
     <tab>
         <tab-heading>Snapshots</tab-heading>
+<<<<<<< HEAD
             <table class="table table-hover table-condensed">
                 <tr ng-repeat="snapshot in snapshots | orderBy:'-created'">
                     <td>
@@ -52,3 +53,13 @@
     </tab>
 </tabset>
 </div>
+=======
+        <div ng-repeat="snapshot in snapshots">
+            <a ui-sref="doc({site: site.name, docId: document.sysmlid, time: snapshot.created})" 
+                ui-sref-opts="{reload: true}">{{snapshot.created | date:'M/d/yy h:mm a'}}</a>
+        </div>
+        <button ng-show="editable" class="btn btn-primary" ng-click="createNewSnapshot()">Create New</button>  
+    </tab>
+</tabset>
+</div>
+>>>>>>> 0426257dc1f7c300bfd4d16ca2c55f55c34fc772

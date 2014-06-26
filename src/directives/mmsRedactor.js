@@ -32,9 +32,7 @@ function mmsRedactor(ElementService, ViewService, $modal, $templateCache, $windo
             $scope.filter = '';
             $scope.searchText = '';
             $scope.choose = function(elementId, property, name) {
-                var tag = '<mms-transclude-' + property + ' data-mms-eid="' + 
-                    elementId + '">[cf:' + name + '.' + property + ']</mms-transclude-' + 
-                    property + '>&nbsp;';
+                var tag = '<mms-transclude-' + property + ' data-mms-eid="' + elementId + '">[cf:' + name + '.' + property + ']</mms-transclude-' + property + '> ';
                 $modalInstance.close(tag);
             };
             $scope.cancel = function() {
@@ -106,8 +104,7 @@ function mmsRedactor(ElementService, ViewService, $modal, $templateCache, $windo
                     comment.owner = ViewService.getCurrentViewId();
                 ElementService.createElement(comment)
                 .then(function(data) {
-                    var tag = '<mms-transclude-com data-mms-eid="' + data.sysmlid + 
-                        '">comment</mms-transclude-com>&nbsp;';
+                    var tag = '<mms-transclude-com data-mms-eid="' + data.sysmlid + '">comment</mms-transclude-com> ';
                     element.redactor('selectionRestore');
                     //element.redactor(saveUndoStep();
                     element.redactor('bufferSet');
@@ -121,7 +118,9 @@ function mmsRedactor(ElementService, ViewService, $modal, $templateCache, $windo
         };
 
         function read(html) {
-            //var code = element.redactor('get');
+            //var html = element.editable("getHTML"); 
+            //if (angular.isArray(html))
+            //    html = html.join('');
             ngModelCtrl.$setViewValue(html);
         }
 
@@ -134,7 +133,7 @@ function mmsRedactor(ElementService, ViewService, $modal, $templateCache, $windo
                         'horizontalrule'],
             plugins: ['fontcolor'],
             changeCallback: read,
-            maxHeight: $window.innerHeight*0.65,
+            maxHeight: $window.innerHeight*0.75,
             imageUploadURL: '', //prevent default upload to public url
             placeholder: "Placeholder",
             autoresize: true,
@@ -173,7 +172,6 @@ function mmsRedactor(ElementService, ViewService, $modal, $templateCache, $windo
             mmsCfElements: '=',
             mmsEid: '@'
         },
-        link: mmsRedactorLink,
-        priority: 1
+        link: mmsRedactorLink
     };
 }
