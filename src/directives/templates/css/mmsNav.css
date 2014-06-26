@@ -54,6 +54,7 @@ mms-nav header {
 
 mms-nav header .nav-btn {
   position: absolute;
+  cursor: pointer;
   top: 25%;
   left: 1em;
 }
@@ -63,7 +64,6 @@ mms-nav header .block-title {
   font-size: 1.875em;
   line-height: 1.2em;
   text-align: center;
-  white-space: nowrap;
 }
 
 .nav-btn i {
@@ -378,10 +378,6 @@ accordion a.docweb-link {
     width: 1px;
   }
 
-  .navbar ul {
-    white-space: nowrap;
-  }
-
   .navbar li ul li {
     display: block;
   }
@@ -479,7 +475,7 @@ accordion a.docweb-link {
     margin-top: -0.625em;
     border-top: 0.625em transparent solid;
     border-bottom: 0.625em transparent solid;
-    border-right: 0.625em white solid;
+    border-right: 0.625em #fff solid;
   }
 
   .navbar li a {
@@ -497,6 +493,7 @@ accordion a.docweb-link {
   }
 
   .navbar li.nav-doc-li {
+    padding: .85714em 2.14286em;
     text-shadow: none;
   }
 
@@ -595,12 +592,7 @@ accordion a.docweb-link {
     transform: translate3d(0, 0, 0);
   }
 
-  /*Added classes for support buttons*/
-
   ul.nav-btns-main{
     margin-top: -20px;
   }
-
-
-  
 }
