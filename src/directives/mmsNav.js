@@ -197,9 +197,9 @@ function mmsNav(SiteService, $templateCache, $log, growl) {
         restrict: 'E',
         template: template,
         scope: {
-            site: '@', //current site name
-            title: '@', //current page title
-            type: '@' //current page type
+            site: '@mmsSite', //current site name
+            title: '@mmsTitle', //current page title
+            type: '@mmsType' //current page type
         },
         link: mmsNavLink
     };
