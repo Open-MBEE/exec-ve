@@ -25,7 +25,7 @@
   "dependencies": {
     "angular-ui-router": "~0.2.10",
     "angular-ui-sortable": "bower",
-    "angular-borderlayout": "https://github.com/dlamoris/angular-borderlayout.git",
+    "angular-borderlayout": "https://github.com/dlamoris/angular-borderlayout.git#0.4.1",
     "angular-ui-bootstrap-bower": "~0.11.0",
     "lodash": "~2.4.1",
     "angular-ui-tree": "~2.1.2",
