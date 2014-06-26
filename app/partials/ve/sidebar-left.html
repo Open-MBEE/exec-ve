@@ -29,7 +29,7 @@
             <input class="form-control" ng-show="filterOn" ng-model="search" type="text" placeholder="filter" ng-change="my_tree.expand_all()">
         </div>
         <mms-tree search="search" tree-data="my_data" section-numbering="true" tree-control="my_tree" 
-            on-select="my_tree_handler(branch)" expand-level="2"> 
+            on-select="my_tree_handler(branch)" expand-level="2" initial-selection="{{tree_initial_selection}}"> 
         </mms-tree>
     </tab>
     <tab>
