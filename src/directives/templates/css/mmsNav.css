@@ -337,6 +337,11 @@ accordion a.docweb-link {
 }
 
 @media screen and (min-width: 45.0625em) {
+/*** Added for borders on sidbar menu ***/
+  .navbar li{
+    display:none;
+  }
+/***************** End ******************/
   header .banner-title {
     display: none;
   }
@@ -609,4 +614,16 @@ accordion a.docweb-link {
   ul.nav-btns-main{
     margin-top: -20px;
   }
+/****** Sidebar menu ******/
+  .out-link:hover{
+    background-color: rgba(255, 255, 255, 0.1);
+    cursor:pointer;
+
+  }
+  .navbar li:last-child:hover{
+    border-bottom: 1px solid #404040 !important;
+  }
+/********** End ***********/
+
+
 }
