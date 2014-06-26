@@ -18,10 +18,10 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
             },
             views: {
                 'menu': {
-                    template: '<mms-nav site="{{site}}" title="{{title}}" type="DocWeb"></mms-nav>',
+                    template: '<mms-nav site="{{site}}" title="{{title}}" type="docweb"></mms-nav>',
                     controller: function($scope, $stateParams, site) {
                         $scope.site = site.name;
-                        $scope.title = "Configurations";
+                        $scope.title = "DocWeb";
                     }
                 },
                 'config': {

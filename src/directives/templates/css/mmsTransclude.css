@@ -25,28 +25,10 @@ mms-view.editing mms-transclude-doc mms-transclude-val *,
 mms-view.editing mms-transclude-doc mms-transclude-doc,
 mms-view.editing mms-transclude-doc mms-transclude-doc *,
 mms-view.editing mms-transclude-val mms-transclude-val,
-mms-view.editing mms-transclude-val mms-transclude-name,
 mms-view.editing mms-transclude-val mms-transclude-val * {
   color: #000;
   background-color: #C6C6C6;
   cursor: pointer;
-}
-
-/* comments */
-mms-view mms-transclude-com, 
-mms-view mms-transclude-com *,
-mms-view.editing mms-transclude-com,
-mms-view.editing mms-transclude-com * {
-  background-color: yellow;
-  cursor: pointer;
-}
-
-mms-view:not(.editing) .placeholder {
-  display: none;
-}
-
-mms-view:not(.reviewing) mms-transclude-com {
-  display: none;
 }
 
 mms-spec mms-transclude-img,
@@ -54,10 +36,6 @@ mms-spec mms-transclude-name,
 mms-spec mms-transclude-val,
 mms-spec mms-transclude-doc {
   background-color: lightblue;
-}
-
-mms-spec mms-transclude-com {
-  background-color: yellow;
 }
 
 .transclude-table {
@@ -69,6 +47,16 @@ mms-spec mms-transclude-com {
 .transclude-modal .clickable:hover {
   cursor: pointer;
   background-color: yellow;
+}
+
+mms-view mms-transclude-com, 
+mms-view mms-transclude-com * {
+  background-color: lightgreen;
+  cursor: pointer;
+}
+
+mms-spec mms-transclude-com {
+  background-color: lightgreen;
 }
 
 .error {
