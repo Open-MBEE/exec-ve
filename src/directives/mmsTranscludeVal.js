@@ -28,11 +28,10 @@ function mmsTranscludeVal(ElementService, UtilsService, $log, $compile, $templat
     var mmsTranscludeValLink = function(scope, element, attrs, mmsViewCtrl) {
         scope.cfType = 'val';
         element.click(function(e) {
-            if (!mmsViewCtrl)
+            if (mmsViewCtrl)
+                mmsViewCtrl.transcludeClicked(scope.mmsEid);
+            if (e.target.tagName !== 'A')
                 return false;
-            mmsViewCtrl.transcludeClicked(scope.mmsEid);
-            //e.stopPropagation();
-            return false;
         });
 
         var recompile = function() {

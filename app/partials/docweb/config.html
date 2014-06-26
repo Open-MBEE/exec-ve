@@ -3,16 +3,16 @@
   <br/>
 
   <div>
-    <span class="h5"><a ng-click="get_latest_drafts()">Latest Drafts</a></span>
+    <span class="h5"><a ui-sref="docweb">Latest Drafts</a></span>
     <hr/>
   </div>
 
-  <a ng-click="create_new_config()" class="btn btn-primary btn-sm">Create Configuration</a>
+  <a ui-sref="docweb.new" class="btn btn-primary btn-sm">Create Configuration</a>
   <br><br>
 
   <table class="table table-hover table-condensed">
       <tr ng-repeat="config in configs">
-        <td><a ng-click="select_config_view(config.id)">{{config.name}}</a></td>
+        <td><a ui-sref="docweb.config({configId: config.id})">{{config.name}}</a></td>
         <td>{{config.modified | date:'medium'}}</td>
       </tr>
   </table>

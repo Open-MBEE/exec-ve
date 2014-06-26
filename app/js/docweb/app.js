@@ -27,15 +27,19 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
                 'config': {
                     templateUrl: 'partials/docweb/config.html',
                     controller: 'ConfigsCtrl'
+                },
+                'view@': {
+                    templateUrl: 'partials/docweb/latest.html',
+                    controller: function($scope, site, products) {
+                        $scope.products = products;
+                        $scope.site = site.name;
+                    }
                 }
             }
         })
-        .state('docweb.latest', {
+        /* .state('docweb.latest', {
             url: '/latest',
             resolve: {
-                products: function(site, ViewService) {
-                    return ViewService.getSiteDocuments(site.name, null, 'master', null);
-                }
             },
             views: {
                 'view@': {
@@ -46,13 +50,10 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
                     }
                 }
             }
-        })
+        }) */
         .state('docweb.new', {
             url: '/new',
             resolve: {
-                products: function(site, ViewService) {
-                    return ViewService.getSiteDocuments(site.name, null, 'master', null);
-                }
             },
             views: {
                 'view@': {
