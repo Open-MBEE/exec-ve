@@ -618,8 +618,9 @@ accordion a.docweb-link {
   .out-link:hover{
     background-color: rgba(255, 255, 255, 0.1);
     cursor:pointer;
-
+    background-clip: padding-box;
   }
+
   .navbar li:last-child:hover{
     border-bottom: 1px solid #404040 !important;
   }
