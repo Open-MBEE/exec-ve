@@ -58,6 +58,11 @@ img {
   overflow: hidden;
 }
 
+.center-view ul.nav-tabs {
+  min-width: 350px;
+  overflow: hidden;
+}
+
 #outer-wrap {
   position: relative;
   overflow: hidden;
@@ -95,7 +100,7 @@ img {
   height: 100px;
   max-height: 20%;
   cursor: pointer;
-  background-color: #D3D3D3;
+  background-color: #808080;
 }
 
 .fa-pane-orientation-vertical > .fa-pane-handle > .fa-pane-toggle {
@@ -108,7 +113,7 @@ img {
   width: 100px;
   max-width: 20%;
   cursor: pointer;
-  background-color: #D3D3D3;
+  background-color: #808080;
 }
 
 .main {
