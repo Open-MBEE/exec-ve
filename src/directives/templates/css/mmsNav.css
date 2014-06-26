@@ -35,10 +35,10 @@ li.dropdown.open > a {
 
 .navbar li.nav-title-li {
   color: #fff;
-  font-weight: 100;
+  font-weight: 200;
   font-size: 16px;
   padding-left: 1em;
-  padding-right: 1em;
+  padding-right: 3em;
   cursor: default;
 }
 
@@ -91,6 +91,8 @@ mms-nav header .block-title {
 .navbar li.nav-doc-li {
   cursor: default;
   padding-right: 10px;
+  font-weight: 500;
+  text-shadow: rgb(54, 93, 126) 1px 1px, rgb(54, 93, 126) 2px 2px, rgb(54, 93, 126) 3px 3px, rgb(54, 93, 126) 4px 4px, rgb(68, 116, 157) 5px 5px;
 }
 
 .navbar a:hover,
@@ -132,7 +134,7 @@ mms-nav header .block-title {
 
 .navbar li a {
   color: #fff;
-  font-weight: 400;
+  font-weight: 200;
   line-height: 1.28571em;
   outline: none;
 }
@@ -378,6 +380,7 @@ accordion a.docweb-link {
   }
 
   .navbar li {
+    font-weight: 200;
     display: inline-block;
   }
 
@@ -510,6 +513,10 @@ accordion a.docweb-link {
     float: left !important;
     padding-right: 0;
     width: 100%;
+  }
+
+  .navbar li.nav-doc-li {
+    text-shadow: none;
   }
 
   .js-ready .navbar {
