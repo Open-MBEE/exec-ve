@@ -33,8 +33,11 @@
         </mms-tree>
     </tab>
     <tab>
-        <tab-heading>Snapshots</tab-heading>
+        <tab-heading>Versions</tab-heading>
+        <div class="container-fluid">
             <table class="table table-hover table-condensed">
+                <tr><td><a ui-sref="doc({site: site.name, docId: document.sysmlid, time: 'latest'})" 
+                    ui-sref-opts="{reload: true}">Latest</a></td></tr>
                 <tr ng-repeat="snapshot in snapshots | orderBy:'-created'">
                     <td>
                         <a ui-sref="doc({site: site.name, docId: document.sysmlid, time: snapshot.created})" 
@@ -48,7 +51,9 @@
                 </tr>
             </table>
 
-        <button ng-show="editable" class="btn btn-primary" ng-click="createNewSnapshot()">Create New</button>
+        <button ng-show="editable" class="btn btn-sm btn-primary" ng-click="createNewSnapshot()">Create New</button>
+        <button class="btn btn-sm btn-primary" ng-click="refreshSnapshots()">Refresh</button>
+        </div>  
     </tab>
 </tabset>
 </div>
