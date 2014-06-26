@@ -91,7 +91,7 @@
   height: 100px;
   max-height: 20%;
   cursor: pointer;
-  background-color: #D3D3D3;
+  background-color: #808080;
 }
 
 .fa-pane-orientation-vertical > .fa-pane-handle > .fa-pane-toggle {
@@ -104,7 +104,7 @@
   width: 100px;
   max-width: 20%;
   cursor: pointer;
-  background-color: #D3D3D3;
+  background-color: #808080;
 }
 
 .main {
