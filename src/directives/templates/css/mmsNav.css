@@ -421,6 +421,7 @@ accordion a.docweb-link {
     font-weight: 100;
     font-size: 19px;
     text-align: center;
+    pointer: default;
   }
 
   .nav-btn i {

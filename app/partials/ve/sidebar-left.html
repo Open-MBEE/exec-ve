@@ -18,15 +18,15 @@
                         <button type="button" class="btn btn-default" ng-click="reorder_tree_view()"  ng-show="editable">
                             <span class="fa fa-arrows-v"></span>
                         </button>
-                        <button type="button" class="btn btn-default" ng-click="toggle_filter_on()">
+                        <button type="button" class="btn btn-default" ng-click="filterOn = !filterOn">
                             <span class="fa fa-filter"></span>
                         </button>
-                    <div>
-                        <input class="form-control" ng-show="filterOn" ng-model="search" type="text" placeholder="filter" ng-change="expand_tree()">
                     </div>
                 </div>
             </div>
-            </div>
+        </div>
+        <div>
+            <input class="form-control" ng-show="filterOn" ng-model="search" type="text" placeholder="filter" ng-change="my_tree.expand_all()">
         </div>
         <mms-tree search="search" tree-data="my_data" section-numbering="true" tree-control="my_tree" 
             on-select="my_tree_handler(branch)" expand-level="2"> 
@@ -35,17 +35,18 @@
     <tab>
         <tab-heading>Snapshots</tab-heading>
             <table class="table table-hover table-condensed">
-                <div ng-repeat="snapshot in snapshots">
-                    <a ui-sref="doc({site: site.name, docId: document.sysmlid, time: snapshot.created})" 
-                        ui-sref-opts="{reload: true}">{{snapshot.created | date:'M/d/yy h:mm a'}}</a>
-                </div>
+                <tr ng-repeat="snapshot in snapshots | orderBy:'-created'">
+                    <td>
+                        <a ui-sref="doc({site: site.name, docId: document.sysmlid, time: snapshot.created})" 
+                            ui-sref-opts="{reload: true}">{{snapshot.created | date:'M/d/yy h:mm a'}}</a>
+                    </td>
                     <td>
                         <div ng-repeat="config in snapshot.configurations | orderBy:'name'">
                             <a href="docweb.html#/sites/{{site.name}}/config/{{config.id}}">{{config.name}}</a>
                         </div>
                     </td>
                 </tr>
-          </table>
+            </table>
 
         <button ng-show="editable" class="btn btn-primary" ng-click="createNewSnapshot()">Create New</button>
     </tab>
