@@ -16,11 +16,22 @@
   }
 }
 
-/*Added for toolbar*/
 .toolbar {
-  /*background-color: #404040;*/
   background-color:#FFF;
   padding: 0px;
+}
+
+.footer {
+  font-size: 9px;
+  font-weight: 200;
+  color: #404040;
+  bottom: 0px;
+  position: absolute;
+  background-color: #fff;
+  padding-left: 5px;
+  padding-bottom: 3px;
+  letter-spacing: 0.05em;
+  z-index: 1000;
 }
 
 .navTab {
@@ -31,7 +42,6 @@
   min-width: 350px;
   overflow: hidden;
 }
-/******* END *******/
 
 #outer-wrap {
   position: relative;
@@ -52,12 +62,12 @@
 
 .fa-pane-orientation-vertical > .fa-pane-handle {
   cursor: row-resize;
-  background-color: lightgray;
+  background-color: #D3D3D3;
 }
 
 .fa-pane-orientation-horizontal > .fa-pane-handle {
   cursor: col-resize;
-  background-color: lightgray;
+  background-color: #D3D3D3;
 }
 
 .fa-pane-orientation-horizontal > .fa-pane-handle > .fa-pane-toggle {
@@ -70,7 +80,7 @@
   height: 100px;
   max-height: 20%;
   cursor: pointer;
-  background-color: gray;
+  background-color: #D3D3D3;
 }
 
 .fa-pane-orientation-vertical > .fa-pane-handle > .fa-pane-toggle {
@@ -83,7 +93,7 @@
   width: 100px;
   max-width: 20%;
   cursor: pointer;
-  background-color: gray;
+  background-color: #D3D3D3;
 }
 
 .main {
@@ -197,6 +207,10 @@ ul > span.divider {
   line-height: 0;
   background: #606060;
   border-top: 1px solid #242424;
+}
+
+.west-tabs {
+  overflow-x: hidden;
 }
 
 .west-tabs .nav-tabs li {
