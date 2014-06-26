@@ -18,6 +18,13 @@ function($scope, $state, document, snapshots, site, time, ElementService, ViewSe
             growl.error("Create Failed: " + reason.message);
         });
     };
+    $scope.refreshSnapshots = function() {
+        ConfigService.getProductSnapshots($scope.document.sysmlid, $scope.site.name, 'master', true)
+        .then(function(result) {
+        }, function(reason) {
+            growl.error("Refresh Failed: " + reason.message);
+        });
+    };
 
     var tree = {};
 

@@ -165,6 +165,7 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, growl) {
             else if (type === 'LiteralReal')
                 scope.editValues.push({type: type, double: 0.0});
         };
+        scope.addValueType = 'LiteralString';
     };
 
     return {
