@@ -16,6 +16,17 @@
   }
 }
 
+.nav-pills > li.active > a {
+  background-color: #505050;
+  color: #fff;
+}
+
+.nav-pills>li.active>a:hover,
+.nav-pills>li.active>a:focus {
+  background-color: #505050;
+  color: #fff;
+}
+
 .toolbar {
   background-color:#FFF;
   padding: 0px;

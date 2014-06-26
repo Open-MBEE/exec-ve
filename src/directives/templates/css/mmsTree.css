@@ -4,6 +4,7 @@ ul.abn-tree li.abn-tree-row {
 }
 
 ul.abn-tree li.abn-tree-row a {
+  border-radius: 0;
   padding: 3px 10px;
 }
 
