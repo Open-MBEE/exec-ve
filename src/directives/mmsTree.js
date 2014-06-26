@@ -18,7 +18,7 @@
             search: '='
           },
           link: function(scope, element, attrs) {
-            var error, expand_all_parents, expand_level, for_all_ancestors, for_each_branch, get_parent, n, on_treeData_change, on_initialSelection_change, select_branch, selected_branch, tree;
+            var error, expand_all_parents, expand_level, for_all_ancestors, for_each_branch, get_parent, n, on_treeData_change, select_branch, selected_branch, tree;
             scope.filterOn = true;
             error = function(s) {
               $log.log('ERROR:' + s);
@@ -136,15 +136,6 @@
               });
             };
             scope.tree_rows = [];
-            on_initialSelection_change = function(){
-                if (scope.initialSelection !== null) {
-                  for_each_branch(function(b) {
-                    if (b.data.sysmlid === scope.initialSelection) {
-                      return select_branch(b);
-                    }
-                  });
-                }
-              };
             on_treeData_change = function() {
               var add_branch_to_list, root_branch, _i, _len, _ref, _results;
               for_each_branch(function(b, level) {
@@ -198,7 +189,6 @@
                   return branch.children;
                 }
               });
-
               add_branch_to_list = function(level, section, branch, visible) {
                 var child, child_visible, tree_icon, _i, _j, _len, _ref, _results;
                 if (branch.expanded === null || branch.expanded === undefined) {
@@ -252,15 +242,12 @@
                 root_branch = _ref[_i];
                 _results.push(add_branch_to_list(1, '', root_branch, true));
               }
-
               return _results;
-
             };
             scope.$watch('treeData', on_treeData_change, true);
-            scope.$watch('initialSelection', on_initialSelection_change);
             if (attrs.initialSelection !== null) {
               for_each_branch(function(b) {
-                if (b.data.sysmlid === attrs.initialSelection) {
+                if (b.label === attrs.initialSelection) {
                   return $timeout(function() {
                     return select_branch(b);
                   });

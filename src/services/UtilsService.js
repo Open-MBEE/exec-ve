@@ -24,20 +24,7 @@ function UtilsService(_) {
         return false;
     };
 
-    var cleanElement = function(elem) {
-        if (elem.hasOwnProperty('specialization') && elem.specialization.type === 'Property') {
-            var spec = elem.specialization;
-            if (!_.isArray(spec.value))
-                spec.value = [];
-            spec.value.forEach(function(val) {
-                if (val.hasOwnProperty('specialization'))
-                    delete val.specialization;
-            });
-        }
-    };
-
     return {
-        hasCircularReference: hasCircularReference,
-        cleanElement: cleanElement
+        hasCircularReference: hasCircularReference
     };
 }
