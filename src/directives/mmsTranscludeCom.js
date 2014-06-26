@@ -26,11 +26,10 @@ function mmsTranscludeCom(ElementService, UtilsService, $log, $compile, growl) {
     var mmsTranscludeComLink = function(scope, element, attrs, mmsViewCtrl) {
         scope.cfType = 'doc';
         element.click(function(e) {
-            if (!mmsViewCtrl)
+            if (mmsViewCtrl)
+                mmsViewCtrl.transcludeClicked(scope.mmsEid);
+            if (e.target.tagName !== 'A')
                 return false;
-            mmsViewCtrl.transcludeClicked(scope.mmsEid);
-            //e.stopPropagation();
-            return false;
         });
 
         var recompile = function() {

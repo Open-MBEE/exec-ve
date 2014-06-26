@@ -121,7 +121,7 @@ function mmsRedactor(ElementService, ViewService, $modal, $templateCache, $windo
         };
 
         function read(html) {
-            var code = element.redactor('get');
+            //var code = element.redactor('get');
             ngModelCtrl.$setViewValue(html);
         }
 
@@ -132,7 +132,7 @@ function mmsRedactor(ElementService, ViewService, $modal, $templateCache, $windo
                         'fontcolor', 'unorderedlist', 'orderedlist', 'outdent', 'indent', 
                         'image', 'video', 'file', 'table', 'link', 'alignment', 
                         'horizontalrule'],
-            plugins: ['fontcolor', 'fullscreen'],
+            plugins: ['fontcolor'],
             changeCallback: read,
             maxHeight: $window.innerHeight*0.65,
             imageUploadURL: '', //prevent default upload to public url

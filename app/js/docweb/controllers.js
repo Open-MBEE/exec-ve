@@ -4,21 +4,8 @@
 
 angular.module('myApp')
   .controller('ConfigsCtrl', ["$scope", "$http", "$state", "$stateParams",  "configs", function($scope, $http, $state, $stateParams, configs) {
-
   	$scope.configs = configs;
     $scope.site = $stateParams.site;
-
-    $scope.select_config_view = function(configId) {
-        $state.go('docweb.config', {configId: configId});
-    };
-
-    $scope.get_latest_drafts = function() {
-        $state.go('docweb.latest');
-    };
-
-    $scope.create_new_config = function() {
-        $state.go('docweb.new');
-    };
   }])
   .controller('ConfigCtrl', ["$scope", "$http", "$state", "$stateParams", "ConfigService", "_", "config", "configSnapshots", "products", "site", "growl", 
         function($scope, $http, $state, $stateParams, ConfigService, _, config, configSnapshots, products, site, growl) {
