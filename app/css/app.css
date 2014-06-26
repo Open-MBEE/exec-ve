@@ -54,6 +54,11 @@
   overflow: hidden;
 }
 
+.center-view ul.nav-tabs {
+  min-width: 350px;
+  overflow: hidden;
+}
+
 #outer-wrap {
   position: relative;
   overflow: hidden;
