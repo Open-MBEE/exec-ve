@@ -28,12 +28,12 @@
               <div ng-repeat="doc in products | orderBy:'name'" ng-controller="TagAddRemoveDocCtrl">
               <a href="" ng-click="toggleShowSnapshots()"><h6><span ng-hide="showSnapshots">></span><span ng-show="showSnapshots">v</span> {{doc.name}}</h6></a>
               <div ng-show="showSnapshots">
-                <div ng-repeat="snapshot in productSnapshots">
+                <div ng-repeat="snapshot in productSnapshots | orderBy:'-created'">
                   <input type="checkbox" ng-model="snapshot.selected" ng-change="toggleCheck(snapshot.id)"/> <a href="ve.html#/sites/{{site}}/products/{{doc.sysmlid}}/{{snapshot.created}}">{{snapshot.created | date:'medium'}}</a>
                 </div>
               </div>
             </div>
-            
+            <br/>
             <div><button class="btn btn-primary btn-sm" ng-click="update()">Update</button>
               <button class="btn btn-primary btn-sm" ng-click="toggleAddRemoveForm()">Cancel</button>
             </div>
