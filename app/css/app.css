@@ -51,13 +51,13 @@ img {
   font-size: 9px;
   font-weight: 200;
   color: #404040;
-  bottom: 0px;
   position: absolute;
-  background-color: #fff;
+  background-color: transparent;
   padding-left: 5px;
-  padding-bottom: 3px;
   letter-spacing: 0.05em;
   z-index: 1000;
+  cursor: default;
+  bottom: 2px;
 }
 
 .navTab {
@@ -230,10 +230,6 @@ ul > span.divider {
   line-height: 0;
   background: #606060;
   border-top: 1px solid #242424;
-}
-
-.west-tabs {
-  overflow-x: hidden;
 }
 
 .west-tabs .nav-tabs li {
