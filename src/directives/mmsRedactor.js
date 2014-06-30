@@ -104,7 +104,7 @@ function mmsRedactor(ElementService, ViewService, $modal, $templateCache, $windo
                     comment.owner = ViewService.getCurrentViewId();
                 ElementService.createElement(comment)
                 .then(function(data) {
-                    var tag = '<mms-transclude-com data-mms-eid="' + data.sysmlid + '">comment</mms-transclude-com>&nbsp;';
+                    var tag = '<mms-transclude-com data-mms-eid="' + data.sysmlid + '">comment:' + data.author + '</mms-transclude-com> ';
                     element.redactor('selectionRestore');
                     //element.redactor(saveUndoStep();
                     element.redactor('bufferSet');

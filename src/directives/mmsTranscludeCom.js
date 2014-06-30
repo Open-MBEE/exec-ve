@@ -35,6 +35,7 @@ function mmsTranscludeCom(ElementService, UtilsService, $log, $compile, growl) {
         var recompile = function() {
             element.empty();
             var doc = scope.element.documentation;
+            doc += ' - ' + scope.element.author;
             element.append(doc);
             $compile(element.contents())(scope); 
             //if (mmsViewCtrl) {
