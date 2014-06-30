@@ -16,6 +16,10 @@
   }
 }
 
+.west-tabs .table tbody tr:first-child td:first-child {
+  border-top: 0;
+}
+
 img {
   max-width: 100%;
 }
@@ -75,7 +79,6 @@ ul.nav-tabs > li > a{
 
 .center-view ul.nav-tabs {
   min-width: 350px;
-  overflow: hidden;
 }
 
 #outer-wrap {

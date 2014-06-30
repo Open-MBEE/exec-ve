@@ -1,11 +1,13 @@
 <div fa-pane="element" pane-anchor="east" pane-size="40%" pane-handle="4" pane-min="30px">
     <tabset>
-        <tab heading="Element">
+        <tab>
+            <tab-heading>Element</tab-heading>
             <div class="container-fluid" ng-show="showSpec">
                 <mms-spec mms-eid="{{eid}}" mms-cf-elements="viewElements" mms-edit-field="all" mms-version="{{version}}"></mms-spec>
             </div>
         </tab>
-        <tab heading="View Order">
+        <tab>
+            <tab-heading>View Order</tab-heading>
             <div class="container-fluid">
                 <mms-view-struct mms-vid="{{vid}}" mms-version="{{version}}" mms-order="true"></mms-view-struct>
             </div>
