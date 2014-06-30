@@ -313,7 +313,10 @@ function ConfigService($q, $http, URLService, _) {
 
         $http.post(URLService.getConfigSnapshotsURL(id, site, ws), {'snapshots': snapshots})
         .success(function(data, status, headers, config) {
-            deferred.resolve("ok");
+            configSnapshots[id] = data.snapshots;
+
+            deferred.resolve(configSnapshots[id]);
+            
         }).error(function(data, status, headers, config) {
             URLService.handleHttpStatus(data, status, headers, config, deferred);
         });
@@ -342,7 +345,9 @@ function ConfigService($q, $http, URLService, _) {
 
         $http.post(URLService.getConfigProductsURL(id, site, ws), {'products': products})
         .success(function(data, status, headers, config) {
-            deferred.resolve("ok");
+            configProducts[id] = data.snapshots;
+
+            deferred.resolve(configProducts[id]);
         }).error(function(data, status, headers, config) {
             URLService.handleHttpStatus(data, status, headers, config, deferred);
         });

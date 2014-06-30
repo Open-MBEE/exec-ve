@@ -6,23 +6,16 @@
             </button>
             <button type="button" class="btn btn-default" ng-click="toggleTextEdit()"> 
                 <span class="fa fa-edit"></span> {{textEdit}}
-            </button>
-           <!-- <button ng-show="mmsOrder && view.editable" type="button" class="btn btn-default" ng-click="toggleStructEdit()">
-                <span class="fa fa-navicon"></span> {{structEdit}}
-            </button> -->      
+            </button>     
         </div>
     </div></div> 
     <h4><mms-transclude-name data-mms-eid="{{view.sysmlid}}"></mms-transclude-name></h4> 
     <div ng-show="textEditable">Last Modified: {{lastModified | date:'M/d/yy h:mm a'}} by {{author}}</div><br/>
-    <div ui-sortable="sortableOptions" ng-model="view.specialization.contains">
-        <div ng-repeat="contain in view.specialization.contains" ng-switch on="contain.type"> 
-        <div ng-class="structEditable ? 'panel panel-default' : ''">
-        <div ng-class="structEditable ? 'panel-body' : ''">
-            <mms-view-para data-mms-para="contain" ng-switch-when="Paragraph"></mms-view-para>
-            <mms-view-table data-mms-table="contain" ng-switch-when="Table"></mms-view-table>
-            <mms-view-list data-mms-list="contain" ng-switch-when="List"></mms-view-list>
-            <mms-view-img data-mms-image="contain" ng-switch-when="Image"></mms-view-img>
-            <mms-view-section data-mms-section="contain" ng-switch-when="Section"></mms-view-section>
-        </div></div></div>
+    <div ng-repeat="contain in view.specialization.contains" ng-switch on="contain.type"> 
+        <mms-view-para data-mms-para="contain" ng-switch-when="Paragraph"></mms-view-para>
+        <mms-view-table data-mms-table="contain" ng-switch-when="Table"></mms-view-table>
+        <mms-view-list data-mms-list="contain" ng-switch-when="List"></mms-view-list>
+        <mms-view-img data-mms-image="contain" ng-switch-when="Image"></mms-view-img>
+        <mms-view-section data-mms-section="contain" ng-switch-when="Section"></mms-view-section>
     </div>
 </div>
