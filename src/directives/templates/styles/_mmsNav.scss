@@ -1,53 +1,3 @@
-/************************* Variables/mixins *************************/
-$white: #fff;
-$black: #000;
-$opaque_white: rgba(255, 255, 255, 0.1);
-$opaque_black: rgba(0, 0, 0, 0.25);
-$monolith: #404040;
-$cobalt: #44749d;
-$dark_grey: #505050;
-$medium_grey: #606060;
-$light_grey: #707070;
-
-@mixin border-radius($radius) {
-  -webkit-border-radius: $radius;
-  -moz-border-radius: $radius;
-  -ms-border-radius: $radius;
-  border-radius: $radius; 
-}
-
-@mixin transform($param) {
-  -webkit-transform: $param;
-  -moz-transform: $param;
-  -ms-transform: $param;
-  -o-transform: $param;
-  transform: $param; 
-}
-
-@mixin transition($transition-property, $transition-time, $method) {
-  -webkit-transition: $transition-property $transition-time $method;
-  -moz-transition: $transition-property $transition-time $method;
-  -ms-transition: $transition-property $transition-time $method;
-  -o-transition: $transition-property $transition-time $method;
-  transition: $transition-property $transition-time $method;
-}
-
-@mixin backface-visibility($param) {
-  -webkit-backface-visibility: $param;
-  -moz-backface-visibility: $param;
-  -ms-backface-visibility: $param;
-  -o-backface-visibility: $param;
-  backface-visibility: $param;
-}
-
-@mixin box-shadow($shadows...) {
-  -webkit-box-shadow: $shadows;
-  -moz-box-shadow: $shadows;
-  -ms-box-shadow: $shadows;
-  -o-box-shadow: $shadows;
-  box-shadow: $shadows;
-}
-
 /************************* Utilities/buttons *************************/
 @viewport {
   width: device-width;
@@ -129,7 +79,9 @@ mms-nav {
   border: 0;
   margin-bottom: 0;
   color: $white;
+}
 
+.navbar {
   li {
     display: block;
 
@@ -164,34 +116,6 @@ mms-nav {
     }
   }
 
-  .block {
-    position: relative;
-    margin: 0 auto;
-    z-index: 2;
-    top: 25%;
-  }
-
-  a {
-    &:hover {
-      text-decoration: none;
-    }
-
-    &:focus {
-      text-decoration: none;
-    }
-  }
-
-  .block-title {
-    border: 0;
-    clip: rect(0 0 0 0);
-    height: 1px;
-    margin: -1px;
-    overflow: hidden;
-    padding: 0;
-    position: absolute;
-    width: 1px;
-  }
-
   ul {
     &:before {
       content: "";
@@ -212,6 +136,36 @@ mms-nav {
       margin-bottom: 0;
     }
   }
+}
+
+.navbar {
+  .block {
+    position: relative;
+    margin: 0 auto;
+    z-index: 2;
+    top: 25%;
+  }
+
+  .block-title {
+    border: 0;
+    clip: rect(0 0 0 0);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px;
+  }
+
+  a {
+    &:hover {
+      text-decoration: none;
+    }
+
+    &:focus {
+      text-decoration: none;
+    }
+  }
 
   .dropdown-menu {
     border: 0;
@@ -230,7 +184,9 @@ mms-nav {
       }
     }
   }
+}
 
+.navbar {
   .panel-heading {
     @include border-radius(0);
   }
@@ -250,7 +206,9 @@ mms-nav {
   .panel-default > .panel-heading + .panel-collapse .panel-body {
     border-top: 0;
   }
+}
 
+.navbar {
   .navbar-nav > {
     .active > a {
       background-color: $monolith;
@@ -275,6 +233,11 @@ mms-nav {
         background-color: $monolith;
       }
     }
+
+    > li > .dropdown-menu {
+      @include border-radius(0);
+      padding: 0;
+    }
   }
 
   .nav-dropdown-icon {
@@ -285,11 +248,6 @@ mms-nav {
 
 .nav-btn i {
   color: $white;
-}
-
-.navbar-nav > li > .dropdown-menu {
-  @include border-radius(0);
-  padding: 0;
 }
 
 .menu {

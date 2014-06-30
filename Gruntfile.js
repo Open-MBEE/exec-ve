@@ -100,18 +100,14 @@ module.exports = function(grunt) {
 
     sass: {
       dist : {
-        files: [{
-          expand: true,
-          cwd: 'src/directives/templates/styles',
-          src: ['*.scss', '*.css'],
-          dest: 'dist/css/',
-          ext: '.css'
-        }]
+        files: {
+          'dist/css/mmsMain.css': 'src/directives/templates/styles/mmsMain.scss'
+        }
       },
       dist2 : {
         files: [{
           expand: true,
-          cwd: 'app/css',
+          cwd: 'app/styles',
           src: ['*.scss', '*.css'],
           dest: 'dist/css/',
           ext: '.css'
