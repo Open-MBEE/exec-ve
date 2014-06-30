@@ -6,7 +6,7 @@
     <textarea ng-model="edit.documentation" mms-redactor mms-cf-elements="mmsCfElements" mms-eid="{{element.sysmlid}}"></textarea>
     <div ng-if="edit.specialization.type === 'Property'">
         <div><b>Property Value:</b></div>
-        <div ng-if="!editValues">
+        <div ng-if="editValues.length == 0">
             <select ng-model="addValueType" ng-options="key for (key, value) in addValueTypes"></select>
             <button class="btn btn-sm" ng-click="addValue(addValueType)">Add</button>
         </div>
@@ -44,5 +44,4 @@
     <div><b>Type:</b> {{element.specialization.type || 'Element'}}</div>
     <div><b>Id:</b> {{element.sysmlid}}</div>
     <div><b>Qualified Name:</b> {{element.qualifiedName}}</div>
-    
 </div>
