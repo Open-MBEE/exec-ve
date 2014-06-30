@@ -64,21 +64,16 @@ img {
   bottom: 2px;
 }
 
-.navTab {
-  width:175px;
+.wrap {
+  min-width: 100vw;
 }
 
-.wrap {
-  min-width: 350px;
-  overflow: hidden;
+.center-view ul.nav-tabs {
+  min-width: 100vw;
 }
 
 ul.nav-tabs > li > a{
   height: 35px;
-}
-
-.center-view ul.nav-tabs {
-  min-width: 350px;
 }
 
 #outer-wrap {
