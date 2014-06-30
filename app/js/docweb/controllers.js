@@ -134,7 +134,10 @@ angular.module('myApp')
     $scope.newConfigName = "";
     $scope.newConfigDesc = "";
     $scope.selected = [];
-
+    $scope.products.forEach(function(doc) {
+        doc.add = false;
+    });
+    
     $scope.toggleCheck = function(id) {
         var index = $scope.selected.indexOf(id);
         if (index < 0)
