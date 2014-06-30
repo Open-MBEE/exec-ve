@@ -44,21 +44,29 @@ angular.module('myApp')
         );
     };
   }])
-  .controller('TagAddRemoveCtrl', ["$scope", "$http", "ConfigService", "growl", 
-    function($scope, $http, ConfigService, growl) {
+  .controller('TagAddRemoveCtrl', ["$scope", "$http", "_", "ConfigService", "growl", 
+    function($scope, $http, _, ConfigService, growl) {
     
     $scope.selectedSnapshots = []; 
 
     $scope.update = function() { 
-        $scope.configForEdit['snapshots'] = $scope.selectedSnapshots;
+        // $scope.configForEdit['snapshots'] = $scope.selectedSnapshots;
 
-        ConfigService.updateConfig($scope.configForEdit, $scope.site, "master").then(
+        var snapshots = [];
+        if ($scope.selectedSnapshots.length > 0) {
+            $scope.selectedSnapshots.forEach(function(sid) {
+                snapshots.push({"id" : sid});
+            });
+        }
+
+        ConfigService.updateConfigSnapshots($scope.configForEdit.id, snapshots, $scope.site, "master").then(
             function(result) {
                 $scope.toggles.hideAddRemoveForm = true;
-
-                // Update the config snapshots with what was selected, temporary fix until 
-                // post for configurations is fixed            
-                $scope.configSnapshots = result.snapshots;
+         
+                $scope.configSnapshots.length = 0;
+                for (var i = 0; i < result.length; i++) {
+                    $scope.configSnapshots.push(result[i]);
+                }
 
                 $scope.configSnapshotIds = [];
                 for (var i = 0; i < $scope.configSnapshots.length; i++) {
@@ -140,51 +148,33 @@ angular.module('myApp')
         var products = [];
         if ($scope.selected.length > 0) {
             $scope.selected.forEach(function(pid) {
-                products.push(pid);
+                products.push({"sysmlid" : pid});
             });
+        } else {
+            growl.error("Create Failed: No Selected Products");
+            return;
         }
 
-        var send = {"name": $scope.newConfigName, "description": $scope.newConfigDesc, "products": products};
+        var create = {"name": $scope.newConfigName, "description": $scope.newConfigDesc};
 
-        ConfigService.createConfig(send, $scope.site, "master")
-        .then(
-            function(result) {
-                growl.success("Create Successful: wait for email.");
-                $state.go('docweb');
-            },
-            function(reason) {
-                growl.error("Create Failed: " + reason.message);
-            }
-        );
-
-        // TODO: Need to post to products with 2nd post call when api is updated
-
-        /* ConfigService.createConfig(send, $scope.site, "master")
+        ConfigService.createConfig(create, $scope.site, "master")
         .then(
             function(config) {
-                var products = [];
-                if ($scope.selected.length > 0) {
-                    $scope.selected.forEach(function(pid) {
-                        products.push({"sysmlid": pid});
-                    });
-                    ConfigService.updateConfigProducts(config.id, products, $scope.site, "master")
-                    .then(
-                        function(result) {
-                            growl.success("Create Successful: wait for email.");
-                            $state.go('docweb');
-                        },
-                        function(reason) {
-                            growl.error("Create Failed: " + reason.message);
-                        }
-                    );
-                } else {
-                    //growl.success
-                }
+                ConfigService.updateConfigProducts(config.id, products, $scope.site, "master")
+                .then(
+                    function(result) {
+                        growl.success("Create Successful: wait for email.");
+                        $state.go('docweb');
+                    },
+                    function(reason) {
+                        growl.error("Update of Product Snapshots Failed: " + reason.message);
+                    }
+                );
             }, 
             function(reason) {
-                growl.error("Create Failed: " + reason.message);
+                growl.error("Create of Config Failed: " + reason.message);
             }
-        ); */
+        );
     };
 
   }]);
