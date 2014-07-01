@@ -288,6 +288,10 @@ function ElementService($q, $http, URLService, UtilsService, VersionService, _) 
         if (!elem.hasOwnProperty('sysmlid'))
             deferred.reject('Element id not found, create element first!');
         else {
+            if (elem.hasOwnProperty('owner'))
+                delete elem.owner; //hack for getting around a 400 error when owner
+                                    //isn't found on server - ok for now since
+                                    //owner can't be changed from the web
             $http.post(URLService.getPostElementsURL(ws), {'elements': [elem]})
             .success(function(data, status, headers, config) {
                 var resp = data.elements[0];
