@@ -36,9 +36,9 @@ angular.module('mms.directives')
     </pre>
  *
  * @param {string} mmsEid The id of the element
- * @param {string} mmsWs Workspace to use, defaults to master
- * @param {string} mmsVersion Version can be alfresco version number or timestamp, default is latest
- * @param {string} mmsEditField "all" or "none"
+ * @param {string=master} mmsWs Workspace to use, defaults to master
+ * @param {string=latest} mmsVersion Version can be alfresco version number or timestamp, default is latest
+ * @param {string=all} mmsEditField "all" or "none"
  * @param {Array=} mmsCfElements Array of element objects as returned by ElementService
  *      that can be transcluded into documentation or string values. Regardless, transclusion
  *      allows keyword searching elements to transclude from alfresco
