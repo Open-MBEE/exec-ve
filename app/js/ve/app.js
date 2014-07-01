@@ -51,8 +51,9 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
                     $rootScope.tree_initial_selection = $stateParams.viewId;
                     $scope.vid = $stateParams.viewId;
                     $scope.viewElements = viewElements;
-                    $scope.showSpec = false;
+                    $scope.showSpec = true;
                     $scope.version = time;
+                    $scope.eid = $scope.vid;
                     $scope.tscClicked = function(elementId) {
                         $scope.eid = elementId;      //$state.go('view.element', {elementId: elementId});
                         $scope.showSpec = true;
