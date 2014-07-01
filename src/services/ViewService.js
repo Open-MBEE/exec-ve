@@ -16,7 +16,7 @@ angular.module('mms')
  * Similar to the ElementService and proxies a lot of functions to it, this keeps track 
  * of views and documents 
  *
- * For View and Product json object schemas, see [here](https://github.jpl.nasa.gov/mbee-dev/alfresco-view-repo/tree/api/api)
+ * For View and Product json object schemas, see [here](https://ems.jpl.nasa.gov/alfresco/scripts/raml/index.html)
  */
 function ViewService($q, $http, URLService, ElementService, CommentService) {
     var viewElements = {"latest": {}};

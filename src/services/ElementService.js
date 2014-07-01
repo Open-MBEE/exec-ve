@@ -20,7 +20,7 @@ angular.module('mms')
  * methods instead. Consider saving to html5 local storage for edited things incase of crashes.
  * The element objects will contain all its attributes including view and document keys.
  *
- * For element json example, see [here](https://github.jpl.nasa.gov/mbee-dev/alfresco-view-repo/tree/api/api)
+ * For element json example, see [here](https://ems.jpl.nasa.gov/alfresco/scripts/raml/index.html)
  */
 function ElementService($q, $http, URLService, UtilsService, VersionService, _) {
     var elements = {};
