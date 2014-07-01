@@ -8,6 +8,7 @@ angular.module('mms.directives')
  * @name mms.directives.directive:mmsTranscludeCom
  *
  * @requires mms.ElementService
+ * @requires mms.UtilsService
  * @requires $compile
  *
  * @restrict E
@@ -47,7 +48,7 @@ function mmsTranscludeCom(ElementService, UtilsService, $log, $compile, growl) {
             if (!newVal)
                 return;
             if (UtilsService.hasCircularReference(scope, scope.mmsEid, 'doc')) {
-                $log.log("prevent circular dereference!");
+                //$log.log("prevent circular dereference!");
                 element.html('<span class="error">Circular Reference!</span>');
                 return;
             }

@@ -14,8 +14,7 @@ angular.module('mms.directives')
  *
  * @description
  * Given a view id, renders the view according to the json given by mms.ViewService
- * The view have a text edit mode, where transclusions can be clicked, and structure
- * edit mode, where the view "contains" list ordering can be modified. The view's last 
+ * The view have a text edit mode, where transclusions can be clicked. The view's last 
  * modified time and author is the latest of any transcluded element modified time. 
  *
  * @param {string} mmsVid The id of the view

@@ -9,6 +9,9 @@ angular.module('mms.directives')
  *
  * @requires mms.ElementService
  * @requires $compile
+ * @requires $templateCache
+ * @requires $modal
+ * @requires growl
  *
  * @restrict E
  *
@@ -17,12 +20,13 @@ angular.module('mms.directives')
  * documentation, and value if the element is a property. Also last modified time, 
  * last user, element id. Fields are editable and will be saved to server on clicking 
  * save button. Documentation and string values can have html and can transclude other
- * element properties.  
+ * element properties. Conflict can occur during save based on last server read time
+ * and offers choice of force save, discard edit or simple merge
  *
  * @param {string} mmsEid The id of the element
  * @param {string} mmsWs Workspace to use, defaults to master
  * @param {string} mmsVersion Version can be alfresco version number or timestamp, default is latest
- * @param {string} mmsEditField One of ["all", "none", "name", "doc", or "val" if property]
+ * @param {string} mmsEditField "all" or "none"
  * @param {Array=} mmsCfElements Array of element objects as returned by ElementService
  *      that can be transcluded into documentation or string values. Regardless, transclusion
  *      allows keyword searching elements to transclude from alfresco

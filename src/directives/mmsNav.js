@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsNav', ['SiteService', '$templateCache', 'growl', mmsNav]);
+.directive('mmsNav', ['SiteService', '$templateCache', '$log', 'growl', mmsNav]);
 
 /**
  * @ngdoc directive
@@ -13,12 +13,13 @@ angular.module('mms.directives')
  * @restrict E
  *
  * @description
- * Make any div with an ngModel attached to be a Froala content editable. This
- * requires the Froala library. Transclusion is supported. ngModel is required.
+ * A prebuilt nav bar that's customizable with current page title, current site,
+ * and the "type" of page/app. Will include navigation to other sites' dashboard
+ * and docweb pages.
  *
  * @param {string} site The current site name
  * @param {string} title Title to display
- * @param {string} type The type of current page (docweb, product, snapshot, etc)
+ * @param {string} type The type of current page (or app name like DocWeb)
  */
 function mmsNav(SiteService, $templateCache, $log, growl) {
     var template = $templateCache.get('mms/templates/mmsNav.html');

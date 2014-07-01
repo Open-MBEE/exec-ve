@@ -15,6 +15,7 @@ angular.module('mms.directives')
  * @restrict A
  *
  * @description
+ * # Deprecated, see mmsRedactor instead
  * Make any div with an ngModel attached to be a Froala content editable. This
  * requires the Froala library. Transclusion is supported. ngModel is required.
  *
