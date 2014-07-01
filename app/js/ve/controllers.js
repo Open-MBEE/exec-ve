@@ -25,7 +25,10 @@ function($scope, $state, document, snapshots, site, time, ElementService, ViewSe
             growl.error("Refresh Failed: " + reason.message);
         });
     };
-
+    $scope.filterOn = false;
+    $scope.toggleFilter = function() {
+        $scope.filterOn = !$scope.filterOn;
+    };
     var tree = {};
 
       // 1. Iterate over view2view and create an array of all element ids
@@ -132,9 +135,14 @@ function($scope, $state, document, snapshots, site, time, ElementService, ViewSe
     $scope.try_adding_a_branch = function() {
 
         var branch = tree.get_selected_branch();
-
-        if (branch.type === "section")
+        if (!branch) {
+            growl.error("Add View Error: Select parent view first");
             return;
+        }
+        if (branch.type === "section") {
+            growl.error("Add View Error: Cannot add a child view to a section");
+            return;
+        }
 
         ViewService.createView(branch.data.sysmlid, 'Untitled View', $scope.document.sysmlid)
         .then(function(view) {

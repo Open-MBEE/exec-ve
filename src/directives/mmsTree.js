@@ -25,13 +25,16 @@
               return void 0;
             };
             if (attrs.iconExpand === null || attrs.iconExpand === undefined) {
-              attrs.iconExpand = 'icon-plus  glyphicon glyphicon-plus  fa fa-plus';
+              attrs.iconExpand = 'fa fa-plus';
             }
             if (attrs.iconCollapse === null || attrs.iconCollapse === undefined) {
-              attrs.iconCollapse = 'icon-minus glyphicon glyphicon-minus fa fa-minus';
+              attrs.iconCollapse = 'fa fa-minus';
             }
             if (attrs.iconLeaf === null || attrs.iconLeaf === undefined) {
-              attrs.iconLeaf = 'icon-file  glyphicon glyphicon-file  fa fa-file';
+              attrs.iconLeaf = 'fa fa-file';
+            }
+            if (attrs.iconSection === null || attrs.iconSection === undefined) {
+              attrs.iconSection = 'fa fa-file-o';
             }
             if (attrs.expandLevel === null || attrs.expandLevel === undefined) {
               attrs.expandLevel = '3';
@@ -205,7 +208,10 @@
                   branch.expanded = false;
                 }
                 if (!branch.children || branch.children.length === 0) {
-                  tree_icon = attrs.iconLeaf;
+                  if (section === '§ ')
+                    tree_icon = attrs.iconSection;
+                  else
+                    tree_icon = attrs.iconLeaf;
                 } else {
                   if (branch.expanded) {
                     tree_icon = attrs.iconCollapse;
