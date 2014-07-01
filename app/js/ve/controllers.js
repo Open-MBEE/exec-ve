@@ -75,7 +75,7 @@ function($scope, $state, document, snapshots, site, time, ElementService, ViewSe
 
             }
           }
-        };
+        }
 
         // Call the get element service and pass in all the elements
         ElementService.getElements(viewElementIds, false, 'master', time)
@@ -93,7 +93,7 @@ function($scope, $state, document, snapshots, site, time, ElementService, ViewSe
             addSectionElements(elements[i], viewTreeNode, viewTreeNode);
           }
 
-          for (var i = 0; i < document.specialization.view2view.length; i++) {
+          for (i = 0; i < document.specialization.view2view.length; i++) {
 
             var viewId = document.specialization.view2view[i].id;
             
@@ -167,7 +167,7 @@ function($scope, document, ElementService, ViewService, $state, growl) {
             };
             viewElementIds2TreeNodeMap[elements[i].sysmlid] = viewTreeNode;    
         }
-        for (var i = 0; i < document.specialization.view2view.length; i++) {
+        for (i = 0; i < document.specialization.view2view.length; i++) {
             var viewId = document.specialization.view2view[i].id;
             for (var j = 0; j < document.specialization.view2view[i].childrenViews.length; j++) {
                 var childViewId = document.specialization.view2view[i].childrenViews[j];
