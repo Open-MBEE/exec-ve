@@ -17,6 +17,11 @@ angular.module('mms.directives')
  * Given an element id, puts in the element's documentation binding, if there's a parent 
  * mmsView directive, will notify parent view of transclusion on init and doc change,
  * and on click. Nested transclusions inside the documentation will also be registered.
+ * 
+ * ## Example
+ *  <pre>
+    <mms-transclude-doc mms-eid="element_id"></mms-transclude-doc>
+    </pre>
  *
  * @param {string} mmsEid The id of the element whose doc to transclude
  * @param {string=master} mmsWs Workspace to use, defaults to master

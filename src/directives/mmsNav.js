@@ -16,10 +16,23 @@ angular.module('mms.directives')
  * A prebuilt nav bar that's customizable with current page title, current site,
  * and the "type" of page/app. Will include navigation to other sites' dashboard
  * and docweb pages.
+ * ## Example
+ *  <pre>
+    <mms-nav mms-site="europa" mms-title="A Doc" mms-type="View Editor"></mms-nav>
+    </pre>
+ * ## Support for sliding pane on small browser
+ *  <pre>
+    <div id="outer-wrap">
+        <div id="inner-wrap">
+            <mms-nav mms-site="europa" mms-title="Doc" mms-type="View Editor"></mms-nav>
+            <!-- everything visible on the page should go in here -->
+        </div>
+    </div>
+    </pre>
  *
- * @param {string} site The current site name
- * @param {string} title Title to display
- * @param {string} type The type of current page (or app name like DocWeb)
+ * @param {string} mmsSite The current site name
+ * @param {string} mmsTitle Title to display
+ * @param {string} mmsType The type of current page (or app name like DocWeb)
  */
 function mmsNav(SiteService, $templateCache, $log, growl) {
     var template = $templateCache.get('mms/templates/mmsNav.html');

@@ -22,6 +22,18 @@ angular.module('mms.directives')
  * save button. Documentation and string values can have html and can transclude other
  * element properties. Conflict can occur during save based on last server read time
  * and offers choice of force save, discard edit or simple merge
+ * ## Example spec with full edit (given permission)
+ *  <pre>
+    <mms-spec mms-eid="element_id" mms-edit-field="all"></mms-spec>
+    </pre>
+ * ## Example for showing an element spec at a certain time
+ *  <pre>
+    <mms-spec mms-eid="element_id" mms-version="2014-07-01T08:57:36.915-0700"></mms-spec>
+    </pre>
+ * ## Example for showing a current element with nothing editable
+ *  <pre>
+    <mms-spec mms-eid="element_id" mms-edit-field="none"></mms-spec>
+    </pre>
  *
  * @param {string} mmsEid The id of the element
  * @param {string} mmsWs Workspace to use, defaults to master
