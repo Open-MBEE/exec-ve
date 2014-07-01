@@ -199,7 +199,7 @@ function ElementService($q, $http, URLService, UtilsService, VersionService, _) 
      * @methodOf mms.ElementService
      * 
      * @description
-     * Gets element's owned element objects. 
+     * Gets element's owned element objects. TBD (stub)
      * 
      * @param {string} id The id of the elements to get owned elements for
      * @param {string} [workspace=master] (optional) workspace to use
@@ -225,6 +225,7 @@ function ElementService($q, $http, URLService, UtilsService, VersionService, _) 
      *
      * @param {string} url the url to get
      * @param {string} key json key that has the element array value
+     * @param {boolean} [updateFromServer=false] update cache
      * @param {string} [workspace=master] workspace associated, this will not change the url
      * @param {string} [version=latest] timestamp associated, this will not change the url
      */

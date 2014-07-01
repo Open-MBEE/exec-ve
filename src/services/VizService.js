@@ -15,7 +15,7 @@ angular.module('mms')
  */
 function VizService($q, $http, URLService) {
 
-    var urls = {};
+    var urls = {}; //map of id to map of version to url
 
     /**
      * @ngdoc method
@@ -26,6 +26,9 @@ function VizService($q, $http, URLService) {
      * Gets the url for an image link based on the Magicdraw diagram id 
      * 
      * @param {string} id The id of the Magicdraw diagram.
+     * @param {boolean} [updateFromServer=false] update url cache
+     * @param {string} [workspace=master] the workspace
+     * @param {string} [version=latest] timestamp or version
      * @returns {Promise} The promise will be resolved with the latest image url
      */
     var getImageURL = function(id, updateFromServer, workspace, version) {

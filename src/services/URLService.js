@@ -19,6 +19,17 @@ angular.module('mms')
 function URLService($q, $http, $location) {
     var root = "/alfresco/service";
 
+    /**
+     * @ngdoc method
+     * @name mms.URLService#isTimestamp
+     * @methodOf mms.URLService
+     * 
+     * @description
+     * self explanatory
+     *
+     * @param {string} version A version string or timestamp
+     * @returns {boolean} Returns true if the string has '-' in it
+     */
     var isTimestamp = function(version) {
         if (String(version).indexOf('-') >= 0)
             return true;
@@ -355,10 +366,6 @@ function URLService($q, $http, $location) {
         getElementURL: getElementURL,
         getElementVersionsURL: getElementVersionsURL,
         getPostElementsURL: getPostElementsURL,
-        //getPostViewsURL: getPostViewsURL,
-        //getPostDocumentsURL: getPostDocumentsURL,
-        //getViewURL: getViewURL,
-        //getDocumentURL: getDocumentURL,
         handleHttpStatus: handleHttpStatus,
         getSitesURL: getSitesURL,
         getElementSearchURL: getElementSearchURL,
