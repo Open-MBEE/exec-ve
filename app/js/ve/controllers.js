@@ -3,13 +3,15 @@
 /* Controllers */
 
 angular.module('myApp')
-.controller('NavTreeCtrl', ['$scope', '$state', 'document', 'snapshots', 'site', 'time', 'ElementService', 'ViewService', 'ConfigService', 'growl',
-function($scope, $state, document, snapshots, site, time, ElementService, ViewService, ConfigService, growl) {
+.controller('NavTreeCtrl', ['$scope', '$rootScope', '$state', 'document', 'snapshots', 'site', 'time', 'ElementService', 'ViewService', 'ConfigService', 'growl',
+function($scope, $rootScope, $state, document, snapshots, site, time, ElementService, ViewService, ConfigService, growl) {
     $scope.document = document;
     $scope.snapshots = snapshots;
     $scope.site = site;
     $scope.time = time;
     $scope.editable = $scope.document.editable && time === 'latest';
+    $rootScope.tree_initial_selection = $scope.document.sysmlid;
+
     $scope.createNewSnapshot = function() {
         ConfigService.createSnapshot($scope.document.sysmlid)
         .then(function(result) {
