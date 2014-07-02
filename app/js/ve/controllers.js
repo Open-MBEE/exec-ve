@@ -3,8 +3,8 @@
 /* Controllers */
 
 angular.module('myApp')
-.controller('NavTreeCtrl', ['$scope', '$state', 'document', 'snapshots', 'site', 'time', 'ElementService', 'ViewService', 'ConfigService', 'growl',
-function($scope, $state, document, snapshots, site, time, ElementService, ViewService, ConfigService, growl) {
+.controller('NavTreeCtrl', ['$scope', '$rootScope', '$state', 'document', 'snapshots', 'site', 'time', 'ElementService', 'ViewService', 'ConfigService', 'growl',
+function($scope, $rootScope, $state, document, snapshots, site, time, ElementService, ViewService, ConfigService, growl) {
     $scope.document = document;
     $scope.snapshots = snapshots;
     $scope.site = site;
@@ -110,6 +110,7 @@ function($scope, $state, document, snapshots, site, time, ElementService, ViewSe
           }
 
           $scope.my_data = [ viewElementIds2TreeNodeMap[rootElementId] ];
+          $rootScope.tree_initial_selection = document.sysmlid;
 
         });
 
