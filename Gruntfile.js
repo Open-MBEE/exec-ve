@@ -132,7 +132,7 @@ module.exports = function(grunt) {
     ngdocs: {
       options: {
         dest: 'docs',
-        html5Mode: true,
+        html5Mode: false,
         title: 'MMS',
         startPage: '/api'
       },

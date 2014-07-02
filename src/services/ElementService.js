@@ -37,6 +37,31 @@ function ElementService($q, $http, URLService, UtilsService, VersionService, _) 
      * Gets an element object by id. If the element object is already in the cache,
      * resolve the existing reference, if not, request it from the repository, add 
      * it to the cache, and resolve the new object.
+     *
+     * ## Example
+     *  <pre>
+        ElementService.getElement('element_id').then(
+            function(element) { //element is an element object (see json schema)
+                alert('got ' + element.name);
+            }, 
+            function(reason) {
+                alert('get element failed: ' + reason.message); 
+                //see mms.URLService#handleHttpStatus for the reason object
+            }
+        );
+        </pre>
+     * ## Example with timestamp
+     *  <pre>
+        ElementService.getElement('element_id', false, 'master', '2014-07-01T08:57:36.915-0700').then(
+            function(element) { //element is an element object (see json schema)
+                alert('got ' + element.name);
+            }, 
+            function(reason) {
+                alert('get element failed: ' + reason.message); 
+                //see mms.URLService#handleHttpStatus for the reason object
+            }
+        );
+        </pre>
      * 
      * @param {string} id The id of the element to get.
      * @param {boolean} [updateFromServer=false] (optional) whether to always get the latest 
@@ -120,7 +145,30 @@ function ElementService($q, $http, URLService, UtilsService, VersionService, _) 
      * @methodOf mms.ElementService
      * 
      * @description
-     * Gets an element object to edit by id. 
+     * Gets an element object to edit by id. (this is different from getElement in 
+     * that the element is a clone and not the same reference. The rationale is to
+     * consider angular data bindings so editing an element does not cause unintentional
+     * updates to other parts of the view, separating reads and edits)
+     * 
+     * ## Example
+     *  <pre>
+        ElementService.getElementForEdit('element_id').then(
+            function(editableElement) {
+                editableElement.name = 'changed name'; //immediately change a name
+                ElementService.updateElement(editableElement).then(
+                    function(updatedElement) { //at this point the regular getElement would show the update
+                        alert('updated');
+                    },
+                    function(reason) {
+                        alert('update failed');
+                    }
+                );
+            },
+            function(reason) {
+                alert('get element failed: ' + reason.message);
+            }
+        );
+        </pre>
      * 
      * @param {string} id The id of the element to get.
      * @param {boolean} [updateFromServer=false] Get the latest from server first, e
@@ -217,11 +265,24 @@ function ElementService($q, $http, URLService, UtilsService, VersionService, _) 
      * @methodOf mms.ElementService
      *
      * @description
-     * This ia a method to call a predefined url that returns elements json, so 
+     * This is a method to call a predefined url that returns elements json, so 
      * the ElementService can cache those results. A key provies the key of the json
      * that has the elements array. Workspace and version tells which workspace and
      * version these elements come from. These 2 arguments doesn't change the url 
      * that actually gets called but only affects where the returned elements are cached.
+     *
+     * ## Example (used by ViewService to get products in a site)
+     *  <pre>
+        ElementService.getGenericElements('/alfresco/service/sites/europa/products', 'products')
+        .then(
+            function(products) {
+                alert('got ' + products.length + ' products');
+            },
+            function(reason) {
+                alert('failed: ' + reason.message);
+            }
+        );
+        </pre>
      *
      * @param {string} url the url to get
      * @param {string} key json key that has the element array value
@@ -275,6 +336,35 @@ function ElementService($q, $http, URLService, UtilsService, VersionService, _) 
      * @description
      * Save element to alfresco and update the cache if successful, the element object
      * must have an id, and whatever property that needs to be updated.
+     * 
+     * {@link mms.ElementService#methods_getElementForEdit see also getElementForEdit}
+     *
+     * ## Example
+     *  <pre>
+        var update = {
+            'sysmlid': 'element_id',
+            'read': '2014-07-01T08:57:36.915-0700', //time the element was last read from the server
+            'name': 'updated name',
+            'documentation': '<p>updated doc</p>',
+            'specialization': {
+                'type': 'Property',
+                'value': [
+                    {
+                        'type': 'LiteralString', 
+                        'string': 'updated string value'
+                    }
+                ]
+            }
+        };
+        ElementService.updateElement(update).then(
+            function(updatedElement) { //this element will have the latest info as well as read time
+                alert('update successful');
+            },
+            function(reason) {
+                alert('update failed: ' + reason.message);
+            }
+        );
+        </pre>
      * 
      * @param {Object} elem An object that contains element id and any property changes to be saved.
      * @param {string} [workspace=master] (optional) workspace to use
@@ -347,6 +437,32 @@ function ElementService($q, $http, URLService, UtilsService, VersionService, _) 
      * 
      * @description
      * Create element on alfresco and update the cache if successful.
+     *
+     * ## Example
+     *  <pre>
+        var create = {
+            'name': 'new name',
+            'owner': 'owner_id',
+            'documentation': '<p>new doc</p>',
+            'specialization': {
+                'type': 'Property',
+                'value': [
+                    {
+                        'type': 'LiteralString', 
+                        'string': 'new value'
+                    }
+                ]
+            }
+        };
+        ElementService.createElement(create).then(
+            function(createdElement) { //this element will have a generated id
+                alert('create successful with id: ' + createdElement.sysmlid);
+            },
+            function(reason) {
+                alert('create failed: ' + reason.message);
+            }
+        );
+        </pre>
      * 
      * @param {Object} elem Element object that must have an owner id.
      * @param {string} [workspace=master] (optional) workspace to use
