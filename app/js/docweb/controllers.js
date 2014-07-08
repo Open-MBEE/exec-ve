@@ -2,7 +2,7 @@
 
 /* Controllers */
 
-angular.module('myApp')
+angular.module('myApp', [])
   .controller('ConfigsCtrl', ["$scope", "$http", "$state", "$stateParams",  "configs", function($scope, $http, $state, $stateParams, configs) {
     $scope.configs = configs;
     $scope.site = $stateParams.site;
