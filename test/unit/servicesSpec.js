@@ -13,33 +13,60 @@ describe('service', function() {
   });
 });
 
-describe('VersionService', function() {
+// CommentService
+describe('CommentService', function() {
 	beforeEach(module('mms'));
 
-	var id = 'id';
-	var version = 'latest';
-	var workspace = 'master';
-
-	var Service;
-
-	it('can get an instance of VersionService', inject(function() {
-		expect(VersionService).toBeDefined();
-
-		Service = VersionService();
-		expect(Service.getElement).toBeDefined();
-		expect(Service.getElements).toBeDefined();
-		expect(Service.getElementVersions).toBeDefined();
-		expect(Service.getGenericElements).toBeDefined();
+	it('can get an instance of the CommentService', inject(function() {
+		expect(CommentService).toBeDefined();
 	}));
 
-	it('getElement', inject(function() {
-		var response;
-		//var getElementPromise = Service.getElement(id, 'latest', 'master');
+	it('should have an addComment function', inject(function() {
+		expect(CommentService.addComment).not.toBe(null);
+	}));
 
-		console.log(response);
+	it('should have a getComments function', inject(function() {
+		expect(CommentService.getComments).not.toBe(null);
+	}));
+
+	it('should have a updateComment function', inject(function() {
+		expect(CommentService.updateComment).not.toBe(null);
+	}));
+
+	it('should have a deleteComment function', inject(function() {
+		expect(CommentService.deleteComment).not.toBe(null);
 	}));
 });
 
+// ConfigService
+
+// ElementService
+describe('ElementService', function() {
+	beforeEach(module('mms'));
+
+	it('can get an instance of the ElementService and methods are valid', inject(function() {
+		expect(ElementService).toBeDefined();
+		expect(ElementService.getElements).not.toBe(null);
+	}));
+});
+
+// NotificationService
+
+// ProjectService
+describe('ProjectService', function() {
+	beforeEach(module('mms'));
+
+	it('can get an instance of the ProjectService', inject(function() {
+		expect(ProjectService).toBeDefined();
+		expect(ProjectService()).toEqual({});
+	}))
+});
+
+// SearchService
+
+// SiteService
+
+// URLService
 describe('URLService', function() {
 	beforeEach(module('mms'));
 
@@ -116,7 +143,7 @@ describe('URLService', function() {
 	}));
 
 	it('getElementURL', inject(function() {
-		var expectedReturn = root + '/javawebscripts/elements/' + id;
+		var expectedReturn = root + '/workspaces/' + workspace + '/elements/' + id;
 		// Another version dependent function
 		// But actually independent?
 		expect(Service.getElementURL(id, workspace, 'latest')).toBe(expectedReturn);
@@ -138,7 +165,7 @@ describe('URLService', function() {
 	}));
 
 	it('getPostElementsURL', inject(function() {
-		var expectedReturn = root + '/javawebscripts/sites/europa/projects/PROJECT-21bbdceb-a188-45d9-a585-b30bba346175/elements';
+		var expectedReturn = root + '/workspaces/' + workspace + '/elements';
 		expect(Service.getPostElementsURL(workspace)).toBe(expectedReturn);
 	}));
 
@@ -159,44 +186,36 @@ describe('URLService', function() {
 	*/
 });
 
-describe('CommentService', function() {
+// UtilsService
+
+// VersionService
+describe('VersionService', function() {
 	beforeEach(module('mms'));
 
-	it('can get an instance of the CommentService', inject(function() {
-		expect(CommentService).toBeDefined();
+	var id = 'id';
+	var version = 'latest';
+	var workspace = 'master';
+
+	var Service;
+
+	it('can get an instance of VersionService', inject(function() {
+		expect(VersionService).toBeDefined();
+
+		Service = VersionService();
+		expect(Service.getElement).toBeDefined();
+		expect(Service.getElements).toBeDefined();
+		expect(Service.getElementVersions).toBeDefined();
+		expect(Service.getGenericElements).toBeDefined();
 	}));
 
-	it('should have an addComment function', inject(function() {
-		expect(CommentService.addComment).not.toBe(null);
-	}));
+	it('getElement', inject(function() {
+		var response;
+		//var getElementPromise = Service.getElement(id, 'latest', 'master');
 
-	it('should have a getComments function', inject(function() {
-		expect(CommentService.getComments).not.toBe(null);
-	}));
-
-	it('should have a updateComment function', inject(function() {
-		expect(CommentService.updateComment).not.toBe(null);
-	}));
-
-	it('should have a deleteComment function', inject(function() {
-		expect(CommentService.deleteComment).not.toBe(null);
+		console.log(response);
 	}));
 });
 
-describe('ElementService', function() {
-	beforeEach(module('mms'));
+// ViewService
 
-	it('can get an instance of the ElementService and methods are valid', inject(function() {
-		expect(ElementService).toBeDefined();
-		expect(ElementService.getElements).not.toBe(null);
-	}));
-});
-
-describe('ProjectService', function() {
-	beforeEach(module('mms'));
-
-	it('can get an instance of the ProjectService', inject(function() {
-		expect(ProjectService).toBeDefined();
-		expect(ProjectService()).toEqual({});
-	}))
-});
+// VizService
