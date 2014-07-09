@@ -476,7 +476,7 @@ function ElementService($q, $http, URLService, UtilsService, VersionService, _) 
         if (!elem.hasOwnProperty('owner')) {
         //    deferred.reject('Element create needs an owner'); //relax this?
         //    return deferred.promise;
-            elem.owner = 'PROJECT-21bbdceb-a188-45d9-a585-b30bba346175'; //hardcode a holding bin for owner for propose element
+            elem.owner = 'holding_bin_project'; //hardcode a holding bin for owner for propose element
         }
         if (elem.hasOwnProperty('sysmlid')) {
             deferred.reject({status: 200, message: 'Element create cannot have id'});
