@@ -23,7 +23,7 @@ angular.module('Froala')
 
         ngModel.$render = function() {
           element.html(ngModel.$viewValue || '');
-        }
+        };
 
         element.ready(function() {
           scope.$apply(read);

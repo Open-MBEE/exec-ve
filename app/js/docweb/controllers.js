@@ -4,7 +4,7 @@
 
 angular.module('myApp')
   .controller('ConfigsCtrl', ["$scope", "$http", "$state", "$stateParams",  "configs", function($scope, $http, $state, $stateParams, configs) {
-  	$scope.configs = configs;
+    $scope.configs = configs;
     $scope.site = $stateParams.site;
   }])
   .controller('ConfigCtrl', ["$scope", "$http", "$state", "$stateParams", "ConfigService", "_", "config", "configSnapshots", "products", "site", "growl", 
@@ -69,7 +69,7 @@ angular.module('myApp')
                 }
 
                 $scope.configSnapshotIds = [];
-                for (var i = 0; i < $scope.configSnapshots.length; i++) {
+                for (i = 0; i < $scope.configSnapshots.length; i++) {
                     $scope.configSnapshotIds.push($scope.configSnapshots[i].id);
                 }
 
@@ -83,16 +83,16 @@ angular.module('myApp')
     };
 
     $scope.toggleCheck = function(id) {
-            var index = $scope.selectedSnapshots.indexOf(id);
-            if (index < 0)
-                $scope.selectedSnapshots.push(id);
-            else
-                $scope.selectedSnapshots.splice(index, 1);
-        }
+        var index = $scope.selectedSnapshots.indexOf(id);
+        if (index < 0)
+            $scope.selectedSnapshots.push(id);
+        else
+            $scope.selectedSnapshots.splice(index, 1);
+    };
 
   }])
-  .controller('TagAddRemoveDocCtrl', ["$scope", "$http", "_", "ConfigService",
-            function($scope, $http, _, ConfigService) {
+  .controller('TagAddRemoveDocCtrl', ["$scope", "$http", "_", "ConfigService", "growl",
+            function($scope, $http, _, ConfigService, growl) {
         
     $scope.showSnapshots = false;
 
@@ -134,7 +134,10 @@ angular.module('myApp')
     $scope.newConfigName = "";
     $scope.newConfigDesc = "";
     $scope.selected = [];
-
+    $scope.products.forEach(function(doc) {
+        doc.add = false;
+    });
+    
     $scope.toggleCheck = function(id) {
         var index = $scope.selected.indexOf(id);
         if (index < 0)

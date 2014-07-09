@@ -13,16 +13,11 @@ angular.module('mms.directives')
  * @restrict E
  *
  * @description
- * Given a view id, renders the view according to the json given by mms.ViewService
- * The view have a text edit mode, where transclusions can be clicked, and structure
- * edit mode, where the view "contains" list ordering can be modified. The view's last 
- * modified time and author is the latest of any transcluded element modified time. 
+ * Visualize and edit the structure of a view 
  *
  * @param {string} mmsVid The id of the view
  * @param {string=master} mmsWs Workspace to use, defaults to master
  * @param {string=latest} mmsVersion Version can be alfresco version number or timestamp, default is latest
- * @param {expression=} mmsCfClicked The expression to handle transcluded elements 
- *     in the view being clicked, this should be a function whose argument is 'elementId'
  */
 function mmsViewStruct(ViewService, $templateCache, growl, _) {
     var template = $templateCache.get('mms/templates/mmsViewStruct.html');

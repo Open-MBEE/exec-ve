@@ -2,6 +2,8 @@ var proxySnippet = require('grunt-connect-proxy/lib/utils').proxyRequest;
 
 module.exports = function(grunt) {
 
+  var jsFiles = ['app/js/**/*.js', 'src/**/*.js'];
+
   // Project configuration.
   grunt.initConfig({
     
@@ -131,7 +133,7 @@ module.exports = function(grunt) {
     },
 
     jshint : {
-      beforeconcat: ['src/**/*.js'],
+      beforeconcat: jsFiles,
       afterconcat: ['dist/mms.js', 'dist/mms.directives.js'],
       options: {
         globalstrict: true,
@@ -146,7 +148,7 @@ module.exports = function(grunt) {
     ngdocs: {
       options: {
         dest: 'docs',
-        html5Mode: true,
+        html5Mode: false,
         title: 'MMS',
         startPage: '/api'
       },

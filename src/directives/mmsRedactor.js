@@ -6,6 +6,7 @@ angular.module('mms.directives')
 /**
  * @ngdoc directive
  * @name mms.directives.directive:mmsRedactor
+ * @element textarea
  *
  * @requires mms.ElementService
  * @requires mms.ViewService
@@ -15,8 +16,12 @@ angular.module('mms.directives')
  * @restrict A
  *
  * @description
- * Make any div with an ngModel attached to be a Froala content editable. This
- * requires the Froala library. Transclusion is supported. ngModel is required.
+ * Make any textarea with an ngModel attached to be a redactor wysiwyg editor. This
+ * requires the Redactor library. Transclusion is supported. ngModel is required.
+ * ### Example
+ * <pre>
+   <textarea mms-redactor ng-model="element.documentation"></textarea>
+   </pre>
  *
  * @param {Array=} mmsCfElements Array of element objects as returned by ElementService
  *      that can be transcluded. Regardless, transclusion allows keyword searching 

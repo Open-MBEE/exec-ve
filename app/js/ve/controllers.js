@@ -3,13 +3,15 @@
 /* Controllers */
 
 angular.module('myApp')
-.controller('NavTreeCtrl', ['$scope', '$state', 'document', 'snapshots', 'site', 'time', 'ElementService', 'ViewService', 'ConfigService', 'growl',
-function($scope, $state, document, snapshots, site, time, ElementService, ViewService, ConfigService, growl) {
+.controller('NavTreeCtrl', ['$scope', '$rootScope', '$state', 'document', 'snapshots', 'site', 'time', 'ElementService', 'ViewService', 'ConfigService', 'growl',
+function($scope, $rootScope, $state, document, snapshots, site, time, ElementService, ViewService, ConfigService, growl) {
     $scope.document = document;
     $scope.snapshots = snapshots;
     $scope.site = site;
     $scope.time = time;
     $scope.editable = $scope.document.editable && time === 'latest';
+    $rootScope.tree_initial_selection = $scope.document.sysmlid;
+
     $scope.createNewSnapshot = function() {
         ConfigService.createSnapshot($scope.document.sysmlid)
         .then(function(result) {
@@ -25,7 +27,10 @@ function($scope, $state, document, snapshots, site, time, ElementService, ViewSe
             growl.error("Refresh Failed: " + reason.message);
         });
     };
-
+    $scope.filterOn = false;
+    $scope.toggleFilter = function() {
+        $scope.filterOn = !$scope.filterOn;
+    };
     var tree = {};
 
       // 1. Iterate over view2view and create an array of all element ids
@@ -75,7 +80,7 @@ function($scope, $state, document, snapshots, site, time, ElementService, ViewSe
 
             }
           }
-        };
+        }
 
         // Call the get element service and pass in all the elements
         ElementService.getElements(viewElementIds, false, 'master', time)
@@ -93,7 +98,7 @@ function($scope, $state, document, snapshots, site, time, ElementService, ViewSe
             addSectionElements(elements[i], viewTreeNode, viewTreeNode);
           }
 
-          for (var i = 0; i < document.specialization.view2view.length; i++) {
+          for (i = 0; i < document.specialization.view2view.length; i++) {
 
             var viewId = document.specialization.view2view[i].id;
             
@@ -132,9 +137,14 @@ function($scope, $state, document, snapshots, site, time, ElementService, ViewSe
     $scope.try_adding_a_branch = function() {
 
         var branch = tree.get_selected_branch();
-
-        if (branch.type === "section")
+        if (!branch) {
+            growl.error("Add View Error: Select parent view first");
             return;
+        }
+        if (branch.type === "section") {
+            growl.error("Add View Error: Cannot add a child view to a section");
+            return;
+        }
 
         ViewService.createView(branch.data.sysmlid, 'Untitled View', $scope.document.sysmlid)
         .then(function(view) {
@@ -167,7 +177,7 @@ function($scope, document, ElementService, ViewService, $state, growl) {
             };
             viewElementIds2TreeNodeMap[elements[i].sysmlid] = viewTreeNode;    
         }
-        for (var i = 0; i < document.specialization.view2view.length; i++) {
+        for (i = 0; i < document.specialization.view2view.length; i++) {
             var viewId = document.specialization.view2view[i].id;
             for (var j = 0; j < document.specialization.view2view[i].childrenViews.length; j++) {
                 var childViewId = document.specialization.view2view[i].childrenViews[j];

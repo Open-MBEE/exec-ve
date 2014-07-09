@@ -11,7 +11,7 @@ angular.module('mms')
  * @requires mms.URLService
  * 
  * @description
- * This service gives information about model projects (TBD)
+ * This service gives information about model projects (TBD, stub)
  */
 function ProjectService($q, $http, URLService) {
 
