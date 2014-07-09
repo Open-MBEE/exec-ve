@@ -29,7 +29,7 @@ function ConfigService($q, $http, URLService, _) {
 
     /**
      * @ngdoc method
-     * @name mms.ConfigService@getSiteConfigs
+     * @name mms.ConfigService#getSiteConfigs
      * @methodOf mms.ConfigService
      *
      * @description
@@ -69,7 +69,7 @@ function ConfigService($q, $http, URLService, _) {
 
     /**
      * @ngdoc method
-     * @name mms.ConfigService@getConfig
+     * @name mms.ConfigService#getConfig
      * @methodOf mms.ConfigService
      *
      * @description
@@ -106,7 +106,7 @@ function ConfigService($q, $http, URLService, _) {
 
     /**
      * @ngdoc method
-     * @name mms.ConfigService@getConfigProducts
+     * @name mms.ConfigService#getConfigProducts
      * @methodOf mms.ConfigService
      *
      * @description
@@ -143,7 +143,7 @@ function ConfigService($q, $http, URLService, _) {
 
     /**
      * @ngdoc method
-     * @name mms.ConfigService@getConfigSnapshots
+     * @name mms.ConfigService#getConfigSnapshots
      * @methodOf mms.ConfigService
      *
      * @description
@@ -180,7 +180,7 @@ function ConfigService($q, $http, URLService, _) {
 
     /**
      * @ngdoc method
-     * @name mms.ConfigService@getProductSnapshots
+     * @name mms.ConfigService#getProductSnapshots
      * @methodOf mms.ConfigService
      *
      * @description
@@ -217,7 +217,7 @@ function ConfigService($q, $http, URLService, _) {
 
     /**
      * @ngdoc method
-     * @name mms.ConfigService@updateConfig
+     * @name mms.ConfigService#updateConfig
      * @methodOf mms.ConfigService
      *
      * @description
@@ -243,8 +243,8 @@ function ConfigService($q, $http, URLService, _) {
                 else
                     configs[config.id] = resp;
 
-                _.remove(configSnapshots[config.id]);
-                _.merge(configSnapshots[config.id], resp.snapshots); // TODO: Remove later    
+                //_.remove(configSnapshots[config.id]);
+               // _.merge(configSnapshots[config.id], resp.snapshots); // TODO: Remove later    
 
                 deferred.resolve(configs[config.id]);
             }).error(function(data, status, headers, config) {
@@ -256,7 +256,7 @@ function ConfigService($q, $http, URLService, _) {
 
     /**
      * @ngdoc method
-     * @name mms.ConfigService@createConfig
+     * @name mms.ConfigService#createConfig
      * @methodOf mms.ConfigService
      *
      * @description
@@ -294,7 +294,7 @@ function ConfigService($q, $http, URLService, _) {
 
     /**
      * @ngdoc method
-     * @name mms.ConfigService@updateConfigSnapshots
+     * @name mms.ConfigService#updateConfigSnapshots
      * @methodOf mms.ConfigService
      *
      * @description
@@ -325,7 +325,7 @@ function ConfigService($q, $http, URLService, _) {
 
     /**
      * @ngdoc method
-     * @name mms.ConfigService@updateConfigProducts
+     * @name mms.ConfigService#updateConfigProducts
      * @methodOf mms.ConfigService
      *
      * @description
@@ -356,7 +356,7 @@ function ConfigService($q, $http, URLService, _) {
 
     /**
      * @ngdoc method
-     * @name mms.ConfigService@createSnapshot
+     * @name mms.ConfigService#createSnapshot
      * @methodOf mms.ConfigService
      *
      * @description

@@ -9,6 +9,9 @@ angular.module('mms.directives')
  *
  * @requires mms.ElementService
  * @requires $compile
+ * @requires $templateCache
+ * @requires $modal
+ * @requires growl
  *
  * @restrict E
  *
@@ -17,12 +20,25 @@ angular.module('mms.directives')
  * documentation, and value if the element is a property. Also last modified time, 
  * last user, element id. Fields are editable and will be saved to server on clicking 
  * save button. Documentation and string values can have html and can transclude other
- * element properties.  
+ * element properties. Conflict can occur during save based on last server read time
+ * and offers choice of force save, discard edit or simple merge
+ * ## Example spec with full edit (given permission)
+ *  <pre>
+    <mms-spec mms-eid="element_id" mms-edit-field="all"></mms-spec>
+    </pre>
+ * ## Example for showing an element spec at a certain time
+ *  <pre>
+    <mms-spec mms-eid="element_id" mms-version="2014-07-01T08:57:36.915-0700"></mms-spec>
+    </pre>
+ * ## Example for showing a current element with nothing editable
+ *  <pre>
+    <mms-spec mms-eid="element_id" mms-edit-field="none"></mms-spec>
+    </pre>
  *
  * @param {string} mmsEid The id of the element
- * @param {string} mmsWs Workspace to use, defaults to master
- * @param {string} mmsVersion Version can be alfresco version number or timestamp, default is latest
- * @param {string} mmsEditField One of ["all", "none", "name", "doc", or "val" if property]
+ * @param {string=master} mmsWs Workspace to use, defaults to master
+ * @param {string=latest} mmsVersion Version can be alfresco version number or timestamp, default is latest
+ * @param {string=all} mmsEditField "all" or "none"
  * @param {Array=} mmsCfElements Array of element objects as returned by ElementService
  *      that can be transcluded into documentation or string values. Regardless, transclusion
  *      allows keyword searching elements to transclude from alfresco

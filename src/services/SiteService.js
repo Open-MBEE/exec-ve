@@ -32,62 +32,22 @@ function SiteService($q, $http, URLService, ProjectService, _) {
     var siteDocuments = {};
     var inProgress = null;
 
-    /**
-     * @ngdoc method
-     * @name mms.SiteService#setCurrentSite
-     * @methodOf mms.SiteService
-     * 
-     * @description
-     * Sets the current site
-     *
-     * @param {string} site The new site name.
-     *
-     * @returns {string} The new site name.
-     */
+
     var setCurrentSite = function(site) {
         currentSite = site;
     };
 
-    /**
-     * @ngdoc method
-     * @name mms.SiteService#getCurrentSite
-     * @methodOf mms.SiteService
-     * 
-     * @description
-     * Gets the current site
-     *     
-     * @returns {string} The current site name.
-     */
+
     var getCurrentSite = function() {
         return currentSite;
     };
 
-    /**
-     * @ngdoc method
-     * @name mms.SiteService#setCurrentWorkspace
-     * @methodOf mms.SiteService
-     * 
-     * @description
-     * Sets the current workspace
-     *
-     * @param {string} site The new workspace name.
-     *
-     * @returns {string} The new workspace name.
-     */
+
     var setCurrentWorkspace = function(workspace) {
         currentWorkspace = workspace;
     };
 
-    /**
-     * @ngdoc method
-     * @name mms.SiteService#getCurrentWorkspace
-     * @methodOf mms.SiteService
-     * 
-     * @description
-     * Gets the current workspace
-     *     
-     * @returns {string} The current workspace name.
-     */
+
     var getCurrentWorkspace = function() {
         return currentWorkspace;
     };
@@ -153,16 +113,7 @@ function SiteService($q, $http, URLService, ProjectService, _) {
         return deferred.promise;
     };
 
-    /**
-     * @ngdoc method
-     * @name mms.SiteService#getSiteProjects
-     * @methodOf mms.SiteService
-     * 
-     * @description
-     * Gets all projects on a site
-     * @param {string} site The site name to get projects for.
-     * @returns {Promise} Resolves into array of project objects.
-     */
+
     var getSiteProjects = function(site) {
 
     };

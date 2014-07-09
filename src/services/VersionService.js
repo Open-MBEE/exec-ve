@@ -94,7 +94,9 @@ function VersionService($q, $http, URLService) {
      * Queries for an element's entire version history
      *
      * @param {string} id The id of the element
-     * @returns {Promise} The promise will be resolved with an array of element objects.
+     * @param {boolean} [updateFromServer=false] update element version cache
+     * @param {string} [workspace=master] workspace
+     * @returns {Promise} The promise will be resolved with an array of version objects.
      */
     var getElementVersions = function(id, updateFromServer, workspace) {
         var ws = !workspace ? 'master' : workspace;

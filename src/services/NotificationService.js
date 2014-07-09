@@ -13,6 +13,7 @@ angular.module('mms')
  * @description
  * This service handles following elements - user will get notification for things they 
  * follow that changed
+ * TBD (stub)
  */
 function NotificationService($q, $http, URLService) {
 

@@ -14,9 +14,18 @@ angular.module('mms.directives')
  *
  * @description
  * Given a view id, renders the view according to the json given by mms.ViewService
- * The view have a text edit mode, where transclusions can be clicked, and structure
- * edit mode, where the view "contains" list ordering can be modified. The view's last 
+ * The view have a text edit mode, where transclusions can be clicked. The view's last 
  * modified time and author is the latest of any transcluded element modified time. 
+ *
+ * ## Example
+ *  <pre>
+    <mms-view mms-vid="view_element_id" mms-cf-clicked="elementClickedHandler(elementId)"></mms-view>
+    <!-- the elementClickedHandler would be a function in your scope -->
+    </pre>
+ * ## Example view at a certain time
+ *  <pre>
+    <mms-view mms-vid="view_element_id" mms-version="2014-07-01T08:57:36.915-0700"></mms-view>
+    </pre>
  *
  * @param {string} mmsVid The id of the view
  * @param {string=master} mmsWs Workspace to use, defaults to master
@@ -100,7 +109,6 @@ function mmsView(ViewService, $templateCache, growl) {
             mmsWs: '@',
             mmsVersion: '@',
             mmsCfClicked: '&',
-            mmsOrder: '='
         },
         controller: ['$scope', 'ViewService', mmsViewCtrl],
         link: mmsViewLink

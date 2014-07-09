@@ -13,11 +13,10 @@ angular.module('mms')
  * @requires mms.CommentService
  * 
  * @description
- * A view and document cache and CRUD service. Maintains a cache of view/document 
- * id to view objects. These objects include view hierarchies, the display structure,
- * and keeps track of what elements are referenced in each view. 
+ * Similar to the ElementService and proxies a lot of functions to it, this keeps track 
+ * of views and documents 
  *
- * For View and Product json object schemas, see [here](https://github.jpl.nasa.gov/mbee-dev/alfresco-view-repo/tree/api/api)
+ * For View and Product json object schemas, see [here](https://ems.jpl.nasa.gov/alfresco/scripts/raml/index.html)
  */
 function ViewService($q, $http, URLService, ElementService, CommentService) {
     var viewElements = {"latest": {}};
@@ -220,65 +219,22 @@ function ViewService($q, $http, URLService, ElementService, CommentService) {
         return deferred.promise;
     };
 
-    /**
-     * @ngdoc method
-     * @name mms.ViewService#getViewComments
-     * @methodOf mms.ViewService
-     * 
-     * @description
-     * Gets the comemnts for the view, in reverse chronological time
-     * 
-     * @param {string} id The id of the view.
-     * @returns {Promise} The promise will be resolved with array of comment objects. 
-     */
+
     var getViewComments = function(id) {
 
     };
 
-    /**
-     * @ngdoc method
-     * @name mms.ViewService#addViewComments
-     * @methodOf mms.ViewService
-     * 
-     * @description
-     * Add a comment to a view
-     * 
-     * @param {string} id The id of the view.
-     * @param {string} comment The comment to add, can contain html
-     * @returns {Promise} The promise will be resolved the new comment object. 
-     */
+
     var addViewComment = function(id, comment) {
 
     };
 
-    /**
-     * @ngdoc method
-     * @name mms.ViewService#deleteViewComment
-     * @methodOf mms.ViewService
-     * 
-     * @description
-     * Add a comment to a view
-     * 
-     * @param {string} id The id of the view.
-     * @param {string} commentId The id of comment to delete
-     * @returns {Promise} The promise will be resolved true. 
-     */
+
     var deleteViewComment = function(id, commentId) {
 
     };
 
-    /**
-     * @ngdoc method
-     * @name mms.ViewService#updateViewElements
-     * @methodOf mms.ViewService
-     * 
-     * @description
-     * Do a bulk save of all edited elements in a view to server, this does not save any
-     * view structure changes
-     * 
-     * @param {string} id The id of the view.
-     * @returns {Promise} The promise will be resolved with saved element objects. 
-     */
+
     var updateViewElements = function(id) {
 
     };

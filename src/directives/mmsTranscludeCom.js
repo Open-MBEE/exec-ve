@@ -8,6 +8,7 @@ angular.module('mms.directives')
  * @name mms.directives.directive:mmsTranscludeCom
  *
  * @requires mms.ElementService
+ * @requires mms.UtilsService
  * @requires $compile
  *
  * @restrict E
@@ -16,6 +17,7 @@ angular.module('mms.directives')
  * Given an element id, puts in the element's documentation binding, if there's a parent 
  * mmsView directive, will notify parent view of transclusion on init and doc change,
  * and on click. Nested transclusions inside the documentation will also be registered.
+ * (This is different from mmsTranscludeDoc because of special styles applied to comments)
  *
  * @param {string} mmsEid The id of the element whose doc to transclude
  * @param {string=master} mmsWs Workspace to use, defaults to master
@@ -47,7 +49,7 @@ function mmsTranscludeCom(ElementService, UtilsService, $log, $compile, growl) {
             if (!newVal)
                 return;
             if (UtilsService.hasCircularReference(scope, scope.mmsEid, 'doc')) {
-                $log.log("prevent circular dereference!");
+                //$log.log("prevent circular dereference!");
                 element.html('<span class="error">Circular Reference!</span>');
                 return;
             }
