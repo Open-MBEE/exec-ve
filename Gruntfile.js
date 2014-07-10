@@ -80,7 +80,6 @@ module.exports = function(grunt) {
       }
     },
 
-
     uglify: {
       options: {
         banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd HH:MM:ss") %> */\n',
@@ -101,10 +100,27 @@ module.exports = function(grunt) {
       }
     },
 
+    sass: {
+      dist : {
+        files: {
+          'dist/css/mmsMain.css': 'src/directives/templates/styles/mmsMain.scss'
+        }
+      },
+      dist2 : {
+        files: [{
+          expand: true,
+          cwd: 'app/styles',
+          src: ['*.scss', '*.css'],
+          dest: 'dist/css/',
+          ext: '.css'
+        }]
+      }
+    },
+
     cssmin: {
       minify: {
         expand: true,
-        cwd: 'src/directives/templates/css/',
+        cwd: 'dist/css',
         src: ['*.css', '!*.min.css'],
         dest: 'dist/css/',
         ext: '.min.css'
@@ -325,6 +341,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-cssmin');
+  grunt.loadNpmTasks('grunt-contrib-sass');
   grunt.loadNpmTasks('grunt-rsync-2');
   grunt.loadNpmTasks('grunt-connect-proxy');
   grunt.loadNpmTasks('grunt-stubby');
@@ -336,7 +353,7 @@ module.exports = function(grunt) {
 
   // grunt.registerTask('install', ['npm-install', 'bower']);
   grunt.registerTask('install', ['bower']);
-  grunt.registerTask('compile', ['html2js']);
+  grunt.registerTask('compile', ['html2js', 'sass']);
   grunt.registerTask('lint',    ['jshint:beforeconcat']);
   grunt.registerTask('minify',  ['cssmin', 'uglify']);
   grunt.registerTask('wire',    ['bowerInstall']);

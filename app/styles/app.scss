@@ -1,4 +1,4 @@
-/* app css stylesheet */
+$tabWidth: 240px;
 
 @media screen and (max-width: 45em) {
   #main-pane {
@@ -52,33 +52,31 @@ img {
 }
 
 .footer {
-  font-size: 9px;
+  width: 100%;
+  border-top: 2px solid #dedede;
+  font-size: 7px;
   font-weight: 200;
-  color: #404040;
+  color: rgba(64,64,64,.7);
   position: absolute;
   background-color: transparent;
   padding-left: 5px;
+  text-align: center;
   letter-spacing: 0.05em;
   z-index: 1000;
   cursor: default;
-  bottom: 2px;
-}
-
-.navTab {
-  width:175px;
+  bottom: -12px;
 }
 
 .wrap {
-  min-width: 350px;
-  overflow: hidden;
+  min-width: $tabWidth;
+}
+
+.center-view ul.nav-tabs {
+  min-width: $tabWidth;
 }
 
 ul.nav-tabs > li > a{
   height: 35px;
-}
-
-.center-view ul.nav-tabs {
-  min-width: 350px;
 }
 
 #outer-wrap {
@@ -86,6 +84,7 @@ ul.nav-tabs > li > a{
   overflow: hidden;
   width: 100%;
   height: 100vh;
+  padding-bottom:14px;
 }
 
 #inner-wrap {
