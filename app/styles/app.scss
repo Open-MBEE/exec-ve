@@ -1,3 +1,5 @@
+$tabWidth: 16vw;
+
 @media screen and (max-width: 45em) {
   #main-pane {
     top: 46px;
@@ -49,18 +51,6 @@ img {
   border-radius: 0;
 }
 
-/*.footer {
-  font-size: 9px;
-  font-weight: 200;
-  color: #404040;
-  position: absolute;
-  background-color: transparent;
-  padding-left: 5px;
-  letter-spacing: 0.05em;
-  z-index: 1000;
-  cursor: default;
-  bottom: 2px;
-}*/
 .footer {
   width: 100%;
   border-top: 2px solid #dedede;
@@ -78,11 +68,11 @@ img {
 }
 
 .wrap {
-  min-width: 14vw;
+  min-width: $tabWidth;
 }
 
 .center-view ul.nav-tabs {
-  min-width: 15vw;
+  min-width: $tabWidth;
 }
 
 ul.nav-tabs > li > a{
