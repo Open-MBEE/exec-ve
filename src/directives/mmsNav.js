@@ -43,6 +43,8 @@ function mmsNav(SiteService, $templateCache, $log, growl) {
             bgColor : {'background-color': 'none'}
         };
 
+        console.log(angular.element('nav > div > ul > li.goto.dropdown').css("width"));
+
         // Change dropdown color if active
         scope.setBG = function(){
             scope.obj.bgColor = {'background-color': '#404040'};
