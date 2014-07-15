@@ -278,6 +278,35 @@ module.exports = function(grunt) {
             port: 9001
           }
         ]
+      }, 
+      js: {
+        options: {
+          hostname: '*',
+          port: 9000,
+          middleware: function(connect) {
+            return [proxySnippet];
+          }
+        },
+        proxies: [
+          {
+            // /alfresco/service/javawebscripts
+            // https://sheldon.jpl.nasa.gov/alfresco/wcs/javawebscripts/element/_17_0_2_3_407019f_1386871336920_707205_26285
+            context: '/alfresco',  // '/api'
+            host: 'ems.jpl.nasa.gov',//128.149.16.152',
+            port: 443,
+            changeOrigin: true,
+            https: true,
+            //rewrite: {
+            //  '^/api': '/alfresco/service/javawebscripts'
+            //}
+          },
+          {
+            context: '/',
+            host: 'localhost',
+            port: 9001
+          }
+        ]
+
       }
     },
 
