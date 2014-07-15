@@ -18,8 +18,11 @@
 <script src="mms.directives.tpls.js"></script>
 <script src="mms.directives.js"></script>
 
+<!-- MMS Application-->
+<script src="js/ve/app.js"></script>
+<script src="js/ve/controllers.js"></script>
 
-<script id="code">
+<!-- <script id="code">
   angular.module('minimal', ['mms.directives'])
     .controller('MinimalCtrl', function($scope) {
       $scope.model = new go.GraphLinksModel(
@@ -32,7 +35,7 @@
           { key: "2004CLCC-A1-P2", color: "lightgreen", group: "2004CLCC-A1" },
           { key: "2004CLCC-A1-P3", color: "lightgreen", group: "2004CLCC-A1" },
           { key: "2004CLCC-A1-P4", color: "lightgreen", group: "2004CLCC-A1" },
-          { key: "2004CLCC-A1" , isGroup: true },
+          { key: "2004CLCC-A1" ,  isGroup: true },
         ],
         [
           { from: "2004CLCC-A1-P1", to: "2004CLCC-A1-J1" },
@@ -58,7 +61,7 @@
           ]);
       }
     });
-</script>
+</script> -->
 </head>
 <body ng-controller="MinimalCtrl"
       onload="if (window.goSamples) goSamples()"> <!-- only needed for the goSamples framework -->
