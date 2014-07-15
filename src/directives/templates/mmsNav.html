@@ -27,14 +27,14 @@
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" ng-click="reset()">Other Sites<i class="nav-dropdown-icon fa fa-caret-down"></i></a>
           <ul class="accordion-dropdown dropdown-menu">
               <accordion>
-                  <accordion-group ng-repeat="(cat, sites) in categories" is-open="obj.catOpen">
+                  <accordion-group ng-repeat="(cat,sites) in categories" is-open="sites.open">
                       <accordion-heading>
-                          {{cat}}<i class="pull-right fa" ng-class="{'fa-caret-down': obj.catOpen, 'fa-caret-right': !obj.catOpen}"></i>
+                          {{cat}}<i class="pull-right fa" ng-class="{'fa-caret-down': sites.open, 'fa-caret-right': !sites.open}"></i>
                       </accordion-heading>
                       <accordion>
-                          <accordion-group ng-repeat="site in sites" class="site-level" is-open="siteOpen">
+                          <accordion-group ng-repeat="site in sites" class="site-level" is-open="site.isOpen">
                               <accordion-heading>
-                                {{site.title}}<i class="pull-right fa" ng-class="{'fa-caret-down': siteOpen, 'fa-caret-right': !siteOpen}"></i>
+                                {{site.title}}<i class="pull-right fa" ng-class="{'fa-caret-down': site.isOpen, 'fa-caret-right': !site.isOpen}"></i>
                               </accordion-heading>
                               <div class="accordion-links">
                                   <a class="dash-link" href="/share/page/site/{{site.name}}/dashboard">Dashboard</a><a class="docweb-link" href="docweb.html#/sites/{{site.name}}">Docweb</a>

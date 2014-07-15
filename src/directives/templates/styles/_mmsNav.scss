@@ -203,6 +203,14 @@ mms-nav {
     background-color: $monolith;
   }
 
+  .site-level > .panel-heading a {
+    padding: 12px;
+    display: block;
+    line-height: 1.42857143;
+    color: $white;
+    background-color: $dark_grey;
+  }
+
   .panel-group .panel {
     @include border-radius(0);
   }
@@ -365,6 +373,7 @@ accordion {
 .accordion-toggle > .fa {
   line-height: inherit;
 }
+
 
 /************************* Large displays *************************/
 @media screen and (min-width: 45.0625em) {
