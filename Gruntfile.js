@@ -279,7 +279,7 @@ module.exports = function(grunt) {
           }
         ]
       }, 
-      js: {
+      ems: {
         options: {
           hostname: '*',
           port: 9000,
