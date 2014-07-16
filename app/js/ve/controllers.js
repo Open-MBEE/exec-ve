@@ -113,6 +113,11 @@ function($scope, $rootScope, $state, document, snapshots, site, time, ElementSer
 
           $scope.my_data = [ viewElementIds2TreeNodeMap[rootElementId] ];
 
+        }, function(reason) {
+            if (reason.status === 404)
+                growl.error("Error: A view in this doc wasn't found");
+            else
+                growl.error(reason.data);
         });
 
     $scope.my_tree = tree;
