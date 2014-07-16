@@ -55,6 +55,10 @@ img {
   min-width: $tabWidth;
 }
 
+#main-pane > .center-view {
+  right: 41px !important;
+}
+
 .center-view ul.nav-tabs {
   min-width: $tabWidth;
 }

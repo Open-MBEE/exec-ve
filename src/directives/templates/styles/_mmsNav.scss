@@ -74,8 +74,8 @@ mms-nav {
   width: 100%;
   min-height: 40px;
   height: 40px;
-  background-color: $cobalt;
-  @include box-shadow(0 1px 1px 0 $monolith);
+  background-color: $monolith;
+  // @include box-shadow(0 1px 1px 0 $monolith);
   border: 0;
   margin-bottom: 0;
   color: $white;
@@ -112,7 +112,7 @@ mms-nav {
     }
 
     &.dropdown.open > a { 
-      background-color: $monolith;
+      background-color: $dark_grey;
     }
   }
 
@@ -132,7 +132,8 @@ mms-nav {
       *zoom: 1;
       display: block;
       padding-left: 0;
-      padding-right: .85714em;
+      // padding-right: .85714em;
+      padding-right: .7em;
       margin-bottom: 0;
     }
   }
@@ -178,7 +179,7 @@ mms-nav {
 
     > li > a {
       padding: 12px;
-      background-color: $monolith;
+      background-color: $dark_grey;
       color: $white;
 
       &:hover {
@@ -200,7 +201,7 @@ mms-nav {
     display: block;
     line-height: 1.42857143;
     color: $white;
-    background-color: $monolith;
+    background-color: $dark_grey;
   }
 
   .site-level > .panel-heading a {
@@ -208,7 +209,7 @@ mms-nav {
     display: block;
     line-height: 1.42857143;
     color: $white;
-    background-color: $dark_grey;
+    background-color: $medium_grey;
   }
 
   .panel-group .panel {
@@ -223,26 +224,26 @@ mms-nav {
 .navbar {
   .navbar-nav > {
     .active > a {
-      background-color: $monolith;
+      background-color: $light_grey;
 
       &:hover {
-        background-color: $monolith;
+        background-color: $light_grey;
       }
 
       &:focus {
-        background-color: $monolith;
+        background-color: $dark_grey;
       }
     }
 
     .open > a {
-      background-color: $monolith;
+      background-color: $dark_grey;
 
       &:hover {
-        background-color: $monolith;
+        background-color: $dark_grey;
       }
 
       &:focus {
-        background-color: $monolith;
+        background-color: $dark_grey;
       }
     }
 
@@ -299,7 +300,7 @@ accordion {
   }
 
   .panel-default {
-    background-color: $monolith;
+    background-color: $dark_grey;
   }
 
   > .panel-group {
@@ -350,14 +351,14 @@ accordion {
 
     &:hover {
       cursor: pointer;
-      background-color: #707070;
+      background-color: $highlight_grey;
     }
   }
 
   div.accordion-links {
     text-align: center;
     height: 40px;
-    background-color: #606060;
+    background-color: $light_grey;
   }
 }
 
@@ -465,11 +466,11 @@ accordion {
   }
 
   header {
-    @include box-shadow(0 1px 1px 0 $monolith);
+    // @include box-shadow(0 1px 1px 0 $monolith);
 
     .block {
-      height: 45px;
-      background-color: $cobalt;
+      height: 46px;
+      background-color: $monolith;
     }
 
     .banner-title {
@@ -518,7 +519,8 @@ accordion {
         position: relative;
         top: 25%;
         font-weight: 200;
-        padding: 0.85714em 2.14286em;
+        // padding: 0.85714em 2.14286em;
+        padding: 0.4em 2.14286em;
       }
 
       &.nav-title-li {
@@ -526,7 +528,8 @@ accordion {
       }
 
       &.nav-doc-li {
-        padding: .85714em 2.14286em;
+        // padding: .85714em 2.14286em;
+        padding: .4em 2.14286em;
         text-shadow: none;
         border-top: 0;
       }
