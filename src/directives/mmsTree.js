@@ -441,7 +441,7 @@
                 tree.get_closest_ancestor_next_sibling = function(b) {
                   var next, parent;
                   next = tree.get_next_sibling(b);
-                  if (next !== null) {
+                  if (next !== null && next !== undefined) {
                     return next;
                   } else {
                     parent = tree.get_parent_branch(b);
@@ -455,7 +455,7 @@
                   }
                   if (b !== null) {
                     next = tree.get_first_child(b);
-                    if (next !== null) {
+                    if (next !== null && next !== undefined) {
                       return next;
                     } else {
                       next = tree.get_closest_ancestor_next_sibling(b);
@@ -495,7 +495,7 @@
                   }
                   if (b !== null) {
                     prev_sibling = tree.get_prev_sibling(b);
-                    if (prev_sibling !== null) {
+                    if (prev_sibling !== null && prev_sibling !== undefined) {
                       return tree.last_descendant(prev_sibling);
                     } else {
                       parent = tree.get_parent_branch(b);

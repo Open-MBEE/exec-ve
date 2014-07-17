@@ -33,6 +33,8 @@ function($scope, $rootScope, $state, document, snapshots, site, time, ElementSer
     };
     var tree = {};
 
+    $rootScope.tree = tree;
+
       // 1. Iterate over view2view and create an array of all element ids
       // 2. Call get element ids and create a map of element id -> element name structure
       // 3. Iterate over view2view and create a map of element id -> element tree node reference
