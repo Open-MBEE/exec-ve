@@ -21,6 +21,7 @@
     "grunt-contrib-uglify": "~0.4.0",
     "grunt-contrib-watch": "~0.6.0",
     "grunt-html2js": "~0.2.5",
+    "grunt-karma": "^0.8.3",
     "grunt-ngdocs": "~0.2.2",
     "grunt-npm-install": "^0.1.0",
     "grunt-rsync-2": "~0.1.3",

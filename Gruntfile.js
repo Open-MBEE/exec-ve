@@ -311,6 +311,11 @@ module.exports = function(grunt) {
           remoteBase: "/opt/local/alfresco-4.2.c/tomcat/webapps/alfresco/scripts/vieweditor2" //"~/vieweditor2"
         }
       }
+    },
+    karma: {
+      unit: {
+        configFile: 'karma.conf.js'
+      }
     }
   });
 
@@ -333,6 +338,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-bower-install');
   grunt.loadNpmTasks('grunt-bower-installer');
   grunt.loadNpmTasks('grunt-npm-install');
+  grunt.loadNpmTasks('grunt-karma');
 
   // grunt.registerTask('install', ['npm-install', 'bower']);
   grunt.registerTask('install', ['bower']);
