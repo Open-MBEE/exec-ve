@@ -1,8 +1,13 @@
 <div class="right-toolbar">
 	<div class="toolbox">
 		<div ng-repeat="tool in tools">
-			<a href="#" class="tools"><i class="fa {{tool.icon}}"></i></a>
+			<a href="#" class="tools" ng-class="{selected: tool.selected}" ng-click="setVal(tool.tooltype)"><i class="fa {{tool.icon}}"></i></a>
 		</div>
-
 	</div>
 </div>
+
+<!-- <tabset class="right-toolbar" ng-repeat="tool in tools">
+	<tab class="tools">
+		<a href="#"><i class="fa {{tool.icon}}"></i></a>
+	</tab>
+</tabset> -->
