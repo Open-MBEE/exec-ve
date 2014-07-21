@@ -12,59 +12,96 @@ function mmsDiagramBlock(go, growl, ElementService) {
 
 
 
-    ElementService.getOwnedElements('_17_0_5_1_62a0209_1405023685821_452906_15774', false, 'master', 'latest')
+//    ElementService.getOwnedElements('_17_0_5_1_62a0209_1405023685821_452906_15774', false, 'master', 'latest')
+      ElementService.getOwnedElements('_17_0_5_1_62a0209_1405723648188_570902_16774', false, 'master', 'latest')
       .then(function(data) {
 
-        var modelComponents = [];
-        var modelRelationships = [];
-
         var ownedElementsMap = {};
-        var groupsMap = {};
 
         for (var i = 0; i < data.elements.length; i++) {
           ownedElementsMap[data.elements[i].sysmlid] = data.elements[i];
         }
 
+        // create a list of all the nodes
+        var nodesMap = {};
+
+        var elem;
+
         for (i = 0; i < data.elements.length; i++) {
-          var elem = data.elements[i];
+          elem = data.elements[i];
 
-          if (elem.hasOwnProperty('specialization')) {
-            // ELEMENTS
-            if (elem.specialization.type === 'Element') {
-              
-              var modelNode = { key: elem.name, color: "lightblue"};
+          if (elem.hasOwnProperty('specialization') && 
+              elem.specialization.type === 'Element') {
 
-              if (elem.hasOwnProperty('owner')) {
+            var node = { key: elem.sysmlid, label: elem.name, children: [] };
 
-                var elemOwner = ownedElementsMap[elem.owner];
-
-                // create group if first time
-                if (! (groupsMap[elemOwner.name])) {
-                  groupsMap[elemOwner.name] = elemOwner;
-
-                  var groupNode = { key: elemOwner.name, isGroup: true};
-
-                  modelComponents.push(groupNode);
-
-                }
-
-                modelNode.group = elemOwner.name;
-              }
-
-              modelComponents.push(modelNode);
-
-            } // RELATIONSHIPS
-            else if (elem.specialization.type === 'DirectedRelationship') {
-              
-              var sourceElement = ownedElementsMap[elem.specialization.source];
-              var targetElement = ownedElementsMap[elem.specialization.target];
-
-              var relationshipNode = { from: sourceElement.name, to: targetElement.name };
-
-              modelRelationships.push(relationshipNode);
+            // does it have an owner and is the owner a member of this model?
+            if (elem.hasOwnProperty('owner') && 
+                ownedElementsMap[elem.owner]) {
+              node.parent = elem.owner;
             }
 
+            nodesMap[node.key] = node;
           }
+        }
+
+        // associate children nodes with all the nodes and
+        // convert the list into a tree, by adding nodes without a parent (root nodes)
+        var tree = [];
+        var nodes = [];
+ 
+        for (var elem_sysmlid in nodesMap) {
+          var elem_node = nodesMap[elem_sysmlid];
+          nodes.push(elem_node);
+          if (elem_node.parent) {
+            nodesMap[elem_node.parent].children.push(elem_node);
+          }
+          else {
+            tree.push(nodesMap[elem_sysmlid]);
+          }
+        }
+
+        // create a list of all the edges / relationships
+        var edges = [];
+
+        for (i = 0; i < data.elements.length; i++) {
+          elem = data.elements[i];
+
+          if (elem.hasOwnProperty('specialization') && 
+              elem.specialization.type === 'DirectedRelationship') {
+              
+            var sourceElement = ownedElementsMap[elem.specialization.source];
+            var targetElement = ownedElementsMap[elem.specialization.target];
+
+            var edge = { from: sourceElement.sysmlid, to: targetElement.sysmlid };
+
+            edges.push(edge);
+          }
+        }
+
+        // a graph is a set of nodes, edges
+        var graph = { nodes: nodes, edges : edges };
+
+
+
+        // create a list of components to diagram from the graph
+        var components = [];
+
+        for (i = 0; i < graph.nodes.length; i++) {
+          elem = graph.nodes[i];
+
+          var diagramNode = { key: elem.key, text: elem.label, color: "lightblue"};
+
+          // if the element has children then it should be a group
+          if (elem.children.length > 0) {
+            diagramNode.isGroup = true;
+          }
+
+          if (elem.parent) {
+            diagramNode.group = elem.parent;
+          }
+
+          components.push(diagramNode);
         }
 
         var $ = go.GraphObject.make;
@@ -153,7 +190,7 @@ function mmsDiagramBlock(go, growl, ElementService) {
               $("SubGraphExpanderButton"),
               $(go.TextBlock,
                 { font: "Bold 18px Sans-Serif", margin: 4 },
-                new go.Binding("text", "key"))
+                new go.Binding("text", "text"))
             ),
             // create a placeholder to represent the area where the contents of the group are
             $(go.Placeholder,
@@ -208,14 +245,14 @@ function mmsDiagramBlock(go, growl, ElementService) {
           font: "bold 13px sans-serif",
           stroke: "#446700"
           },
-          new go.Binding("text", "key").makeTwoWay())
+          new go.Binding("text", "text").makeTwoWay())
       );
 
      
       // Link components to diagram
       myDiagram.model = new go.GraphLinksModel(
-          modelComponents,
-          modelRelationships
+          components,
+          graph.edges
       );
     
       myDiagram.model.selectedNodeData = null;
