@@ -10,10 +10,7 @@ function mmsDiagramBlock(go, growl, ElementService) {
 
   var mmsDiagramBlockLink = function(scope, element, attrs) {
 
-
-
-//    ElementService.getOwnedElements('_17_0_5_1_62a0209_1405023685821_452906_15774', false, 'master', 'latest')
-      ElementService.getOwnedElements('_17_0_5_1_62a0209_1405723648188_570902_16774', false, 'master', 'latest')
+      ElementService.getOwnedElements('_17_0_5_1_62a0209_1405965827907_577690_15997', false, 'master', 'latest')
       .then(function(data) {
 
         var ownedElementsMap = {};
@@ -46,8 +43,6 @@ function mmsDiagramBlock(go, growl, ElementService) {
         }
 
         // associate children nodes with all the nodes and
-        // convert the list into a tree, by adding nodes without a parent (root nodes)
-        var tree = [];
         var nodes = [];
  
         for (var elem_sysmlid in nodesMap) {
@@ -55,9 +50,6 @@ function mmsDiagramBlock(go, growl, ElementService) {
           nodes.push(elem_node);
           if (elem_node.parent) {
             nodesMap[elem_node.parent].children.push(elem_node);
-          }
-          else {
-            tree.push(nodesMap[elem_sysmlid]);
           }
         }
 
