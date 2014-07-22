@@ -30,8 +30,8 @@ function mmsDiagramBlock(go, growl, ElementService) {
           if (elem.hasOwnProperty('specialization') && 
               elem.specialization.type === 'Element') {
 
-            var node = { key: elem.sysmlid, label: elem.name, children: [] };
-
+            var node = { key: elem.sysmlid ,iskey: true, figure: "Decision", label: elem.name, children: [] };
+            
             // does it have an owner and is the owner a member of this model?
             if (elem.hasOwnProperty('owner') && 
                 ownedElementsMap[elem.owner]) {
@@ -82,7 +82,19 @@ function mmsDiagramBlock(go, growl, ElementService) {
         for (i = 0; i < graph.nodes.length; i++) {
           elem = graph.nodes[i];
 
-          var diagramNode = { key: elem.key, text: elem.label, color: "lightblue"};
+          //var diagramNode = { key: elem.key, text: elem.label, color: "lightblue"};
+
+          var diagramNode = 
+                    
+                    { 
+                        key: elem.key,
+                        items: [ 
+                         { name: "Name: ", key: "elem.key", iskey: false, figure: "Diamond", color: "purple" },
+                         { name: "Status: ", iskey: false, figure: "Diamond", color: "purple" } ],
+                         text: elem.label, color: "lightblue" 
+                       
+                    };
+
 
           // if the element has children then it should be a group
           if (elem.children.length > 0) {
@@ -191,17 +203,6 @@ function mmsDiagramBlock(go, growl, ElementService) {
         ); // end Group
 
 
-          //Links organization, keep links from crossing over nodes
-          myDiagram.linkTemplate =
-          $(go.Link,
-            { routing: go.Link.AvoidsNodes, corner: 5,
-            curve: go.Link.JumpGap },
-            $(go.Shape),
-            $(go.Shape, { toArrow: "Standard" })
-            );
-
-
-
 
         // whenever a GoJS transaction has finished modifying the model, update all Angular bindings
         function updateAngular(e) {
@@ -220,9 +221,50 @@ function mmsDiagramBlock(go, growl, ElementService) {
           }
         }); */
         // update the model when the selection changes
-      myDiagram.nodeTemplate =
-      $(go.Node, go.Panel.Auto,
+
+
+
+
+         //Assigning value to nodes
+      /* function theInfoTextConverter(info) {
+      var str = "";
+      //if (info.key) str += info.key;
+      if (info.text) str += "\n\nstatus: " + info.text;
+      if (info.text) str += "\n\npriority: " + info.text;
+      if (typeof info.boss === "number") {
+        var bossinfo = myDiagram.model.findNodeDataForKey(info.boss);
+        if (bossinfo !== null) {
+          str += "\n\nReporting to: " + bossinfo.name;
+        }
+      }
+      return str;
+    }  */
+ 
+
+       // the template for each attribute in a node's array of item data
+      var itemTempl =
+      $(go.Panel, "Horizontal",
+        $(go.Shape,                             //node's object rendering
+          { desiredSize: new go.Size(5, 5) },
+          new go.Binding("figure", "figure"),
+          new go.Binding("fill", "color")),
+        $(go.TextBlock,
+          { stroke: "#333333",
+            font: "bold 11px sans-serif" },
+          new go.Binding("text", "", go.Binding.toString))
+      ); 
+
+
+
+  myDiagram.nodeTemplate =
+        $(go.Node, go.Panel.Auto,
         {
+          selectionAdorned: true,
+          resizable: true,
+          layoutConditions: go.Part.LayoutStandard & ~go.Part.LayoutNodeSized,
+          fromSpot: go.Spot.Right,
+          toSpot: go.Spot.Left,
+          isShadowed: true,
           // highlight when dragging over a Node that is inside a Group
           mouseDragEnter: function(e, nod, prev) { highlightGroup(e, nod.containingGroup, true); },
           mouseDragLeave: function(e, nod, next) { highlightGroup(e, nod.containingGroup, false); },
@@ -230,17 +272,56 @@ function mmsDiagramBlock(go, growl, ElementService) {
           mouseDrop: function(e, nod) { finishDrop(e, nod.containingGroup); }
         },
         $(go.Shape, "RoundedRectangle",
-          { fill: "#ACE600", stroke: "#558000", strokeWidth: 2 },
+          { isPanelMain: true, fill: "#ACE600", stroke: "#558000", strokeWidth: 2 },
           new go.Binding("fill", "color")),
+        $(go.Panel, "Table",
+          { margin: 4, maxSize: new go.Size(150, NaN) },
+          // the two TextBlocks in column 0 both stretch in width
+          // but align on the left side
+          $(go.RowColumnDefinition,
+            {
+              column: 0,
+              stretch: go.GraphObject.Horizontal,
+              alignment: go.Spot.Left
+            }),
         $(go.TextBlock,
-          {   margin: 5, editable: true,
-          font: "bold 13px sans-serif",
-          stroke: "#446700"
+          {    row: 0, column: 0,
+              maxSize: new go.Size(120, NaN),
+              margin: 2,
+              font: "bold 10pt sans-serif",
+              alignment: go.Spot.Top
           },
-          new go.Binding("text", "text").makeTwoWay())
+          new go.Binding("text", "text")),//.makeTwoWay()),
+          /* $(go.TextBlock,
+            {
+              row: 1, column: 0, columnSpan: 2,
+              font: "8pt sans-serif"
+            },
+            new go.Binding("text", "", theInfoTextConverter)) */
+
+        //panel for displaying properties
+         $(go.Panel, "Vertical",
+            { row: 1,
+              padding: 3,
+              alignment: go.Spot.TopLeft,
+              defaultAlignment: go.Spot.Left,
+              stretch: go.GraphObject.Horizontal,
+              itemTemplate: itemTempl },
+            new go.Binding("itemArray", "items")) 
+         )
       );
 
+          //Links organization, keep links from crossing over nodes
+          myDiagram.linkTemplate =
+          $(go.Link,
+            { routing: go.Link.AvoidsNodes, corner: 5,
+            curve: go.Link.JumpGap },
+            $(go.Shape),
+            $(go.Shape, { toArrow: "Standard" })
+            );
+
      
+       
       // Link components to diagram
       myDiagram.model = new go.GraphLinksModel(
           components,
