@@ -5,14 +5,14 @@ angular.module('mms.directives')
 
 function mmsToolbar($templateCache, $rootScope, toolService, $stateParams, ConfigService){
 	var template = $templateCache.get('mms/templates/mmsToolbar.html');
-	$rootScope.elementIsOpen = true;
+	$rootScope.elementIsOpen = false;
 	$rootScope.editorIsOpen = false;
 	$rootScope.reorderIsOpen = false;
 	$rootScope.showVersionList = false;
 
 	var mmsToolbarLink = function(scope, element, attrs, rootScope, $stateParams, ConfigService){
 		scope.tools = [
-			{tooltype: "viewer", icon: "fa-eye", selected: true},
+			{tooltype: "viewer", icon: "fa-eye", selected: false},
 			{tooltype: "editor", icon: "fa-edit", selected: false},
 			{tooltype: "reorder", icon: "fa-arrows", selected: false},
 			{tooltype: "versions", icon: "fa-camera", selected: false}

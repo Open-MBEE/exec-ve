@@ -56,6 +56,14 @@ function($scope, $rootScope, $state, document, snapshots, site, time, ElementSer
     };
     var tree = {};
 
+    $scope.tooltipPlacement = function(arr) {
+        arr[0].placement = "bottom-left";
+        for(var i=1; i<arr.length; i++){
+            arr[i].placement = "bottom";
+        }
+    };
+    $scope.tooltipPlacement($scope.buttons);
+
       // 1. Iterate over view2view and create an array of all element ids
       // 2. Call get element ids and create a map of element id -> element name structure
       // 3. Iterate over view2view and create a map of element id -> element tree node reference

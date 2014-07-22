@@ -40,6 +40,36 @@ img {
   padding: 0px;
 }
 
+a.view-tools {
+  color: #333;
+  font-size: 19px;
+  padding: 5px 10px 5px 10px;
+  border-left: 2px solid #dedede;
+  border-right: 2px solid #dedede;
+  margin-left: -2px;
+  position: relative;
+
+  &:first-child {
+    margin-left: none; 
+  }
+
+  &:hover {
+    border-left: 2px solid #404040;
+    border-right: 2px solid #404040;
+    color: #333;
+    z-index: 100;
+  }
+
+  &:active {
+    color: #fff;
+    background-color: #333;   
+  }
+
+  &.center {
+    float: right;
+  }
+}
+
 .tab-pane .toolbar > .btn-group {
   margin-left: 5px;
 }
@@ -53,6 +83,23 @@ img {
 
 .wrap {
   min-width: $tabWidth;
+}
+
+#inside-wrap {
+  padding: 9px 0px 35px 0px;
+  // margin-left: -10px;
+}
+
+.tooltip.bottom-left {
+  padding: 5px 0;
+  margin-top: 3px;
+}
+
+.tooltip.bottom-left .tooltip-arrow {
+  top: 0;
+  left: 13px;
+  border-width: 0 5px 5px;
+  border-bottom-color: #000;
 }
 
 #main-pane > .center-view {
