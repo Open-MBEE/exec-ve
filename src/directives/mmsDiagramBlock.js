@@ -10,7 +10,7 @@ function mmsDiagramBlock(go, growl, ElementService) {
 
   var mmsDiagramBlockLink = function(scope, element, attrs) {
 
-      ElementService.getOwnedElements('_17_0_5_1_62a0209_1405965827907_577690_15997', false, 'master', 'latest')
+      ElementService.getOwnedElements(scope.mmsDid, false, 'master', 'latest')
       .then(function(data) {
 
         var ownedElementsMap = {};
@@ -60,12 +60,9 @@ function mmsDiagramBlock(go, growl, ElementService) {
           elem = data.elements[i];
 
           if (elem.hasOwnProperty('specialization') && 
-              elem.specialization.type === 'DirectedRelationship') {
-              
-            var sourceElement = ownedElementsMap[elem.specialization.source];
-            var targetElement = ownedElementsMap[elem.specialization.target];
+              elem.specialization.type === 'Dependency') {
 
-            var edge = { from: sourceElement.sysmlid, to: targetElement.sysmlid };
+            var edge = { from: elem.specialization.source, to: elem.specialization.target};
 
             edges.push(edge);
           }
@@ -82,9 +79,9 @@ function mmsDiagramBlock(go, growl, ElementService) {
         for (i = 0; i < graph.nodes.length; i++) {
           elem = graph.nodes[i];
 
-          //var diagramNode = { key: elem.key, text: elem.label, color: "lightblue"};
+          var diagramNode = { key: elem.key, text: elem.label, color: "lightblue"};
 
-          var diagramNode = 
+          /*var diagramNode = 
                     
                     { 
                         key: elem.key,
@@ -93,7 +90,7 @@ function mmsDiagramBlock(go, growl, ElementService) {
                          { name: "Status: ", iskey: false, figure: "Diamond", color: "purple" } ],
                          text: elem.label, color: "lightblue" 
                        
-                    };
+                    }; */
 
 
           // if the element has children then it should be a group
@@ -222,25 +219,6 @@ function mmsDiagramBlock(go, growl, ElementService) {
         }); */
         // update the model when the selection changes
 
-
-
-
-         //Assigning value to nodes
-      /* function theInfoTextConverter(info) {
-      var str = "";
-      //if (info.key) str += info.key;
-      if (info.text) str += "\n\nstatus: " + info.text;
-      if (info.text) str += "\n\npriority: " + info.text;
-      if (typeof info.boss === "number") {
-        var bossinfo = myDiagram.model.findNodeDataForKey(info.boss);
-        if (bossinfo !== null) {
-          str += "\n\nReporting to: " + bossinfo.name;
-        }
-      }
-      return str;
-    }  */
- 
-
        // the template for each attribute in a node's array of item data
       var itemTempl =
       $(go.Panel, "Horizontal",
@@ -320,8 +298,6 @@ function mmsDiagramBlock(go, growl, ElementService) {
             $(go.Shape, { toArrow: "Standard" })
             );
 
-     
-       
       // Link components to diagram
       myDiagram.model = new go.GraphLinksModel(
           components,
@@ -340,7 +316,9 @@ function mmsDiagramBlock(go, growl, ElementService) {
     restrict: 'E',
     template: '<div></div>',  // just a simple DIV element
     replace: true,
-    scope: { model: '=goModel' },
+    scope: { 
+      mmsDid : '@'
+    },
     controller: ['ElementService', mmsDiagramBlockCtrl],
     link: mmsDiagramBlockLink
   };
