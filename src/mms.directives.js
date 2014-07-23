@@ -83,4 +83,5 @@ angular.module('mms.directives', ['mms', 'mms.directives.tpls', 'ui.bootstrap', 
     growlProvider.onlyUniqueMessages(false);
     growlProvider.globalTimeToLive({success: 5000, error: -1, warning: 5000, info: 5000});
     growlProvider.globalPosition('bottom-right');
-}]);
+}])
+.constant('go', window.go);
