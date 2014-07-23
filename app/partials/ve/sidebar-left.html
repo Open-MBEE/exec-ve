@@ -3,9 +3,6 @@
             <div class="wrap" id="inside-wrap">
                 <div class="col-xs-12 toolbar">
                     <div class="btn-group" ng-repeat="button in buttons">
-                        <!-- <button type="button" class="btn btn-default" ng-click="button.action()" tooltip="{{button.tooltip}}" tooltip-append-to-body="true" tooltip-trigger="mouseenter" tooltip-popup-delay="100" tooltip-placement="bottom">
-                            <span class="fa {{button.icon}}"></span>
-                        </button> -->
                         <a type="button" class="view-tools" ng-click="button.action(); selectTool($index)" tooltip="{{button.tooltip}}" tooltip-append-to-body="true" tooltip-trigger="mouseenter" tooltip-popup-delay="100" tooltip-placement="{{button.placement}}">
                             <span class="fa {{button.icon}}"></span>
                         </a>

@@ -1,4 +1,6 @@
 $tabWidth: 240px;
+$toolHeight: 19px;
+$toolWidth: 32px;
 
 @media screen and (max-width: 45em) {
   #main-pane {
@@ -42,12 +44,14 @@ img {
 
 a.view-tools {
   color: #333;
-  font-size: 19px;
-  padding: 5px 10px 5px 10px;
+  font-size: 16px;
+  line-height: $toolHeight;
   border-left: 2px solid #dedede;
   border-right: 2px solid #dedede;
   margin-left: -2px;
   position: relative;
+  float: left;
+  width: $toolWidth;
 
   &:first-child {
     margin-left: none; 
@@ -67,7 +71,12 @@ a.view-tools {
 
   &.center {
     float: right;
+    text-align: center;
   }
+}
+
+.btn-group {
+  text-align: center;
 }
 
 .tab-pane .toolbar > .btn-group {
