@@ -1,0 +1,13 @@
+.footer {
+  width: 100%;
+  border-top: 1px solid #dedede;
+  font-size: 7px;
+  font-weight: 200;
+  color: rgba(64,64,64,.7);
+  position: absolute;
+  background-color: transparent;
+  text-align: center;
+  z-index: -1000;
+  cursor: default;
+  bottom: -11px;
+}

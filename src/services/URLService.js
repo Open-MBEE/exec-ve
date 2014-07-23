@@ -1,23 +1,42 @@
 'use strict';
 
 angular.module('mms')
-.factory('URLService', ['$q', '$http', '$location', URLService]);
+.provider('URLService', function URLServiceProvider() {
+    var baseUrl = '/alfresco/service';
+    
+    this.setBaseUrl = function(base) {
+        baseUrl = base;
+    };
+    
+    this.$get = [function URLServiceFactory() {
+        return urlService(baseUrl);
+    }];
+});
 
 /**
  * @ngdoc service
  * @name mms.URLService
- * @requires $q
- * @requires $http
- * @requires $location
  * 
  * @description
  * This utility service gives back url paths for use in other services in communicating
  * with the server, arguments like workspace, version are expected to be strings and
  * not null or undefined. This service is usually called by higher level services and
  * should rarely be used directly by applications.
+ *
+ * To configure the base url of the mms server, you can use the URLServiceProvider
+ * in your application module's config. By default, the baseUrl is '/alfresco/service' 
+ * which assumes your application is hosted on the same machine as the mms. 
+ *  <pre>
+        angular.module('myApp', ['mms'])
+        .config(function(URLServiceProvider) {
+            URLServiceProvider.setBaseUrl('https://ems.jpl.nasa.gov/alfresco/service');
+        });
+    </pre>
+ * (You may run into problems like cross origin security policy that prevents it from
+ *  actually getting the resources from a different server, solution TBD)
  */
-function URLService($q, $http, $location) {
-    var root = "/alfresco/service";
+function urlService(baseUrl) {
+    var root = baseUrl;
 
     /**
      * @ngdoc method

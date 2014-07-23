@@ -139,6 +139,9 @@ mms-nav {
 }
 
 .navbar {
+  .goto.dropdown ul{ 
+    width:100%;
+  }
   .block {
     position: relative;
     margin: 0 auto;
@@ -172,6 +175,7 @@ mms-nav {
     margin: 8px 0 0;
     padding: 0;
 
+
     > li > a {
       padding: 12px;
       background-color: $monolith;
@@ -197,6 +201,14 @@ mms-nav {
     line-height: 1.42857143;
     color: $white;
     background-color: $monolith;
+  }
+
+  .site-level > .panel-heading a {
+    padding: 12px;
+    display: block;
+    line-height: 1.42857143;
+    color: $white;
+    background-color: $dark_grey;
   }
 
   .panel-group .panel {
@@ -361,6 +373,7 @@ accordion {
 .accordion-toggle > .fa {
   line-height: inherit;
 }
+
 
 /************************* Large displays *************************/
 @media screen and (min-width: 45.0625em) {

@@ -33,6 +33,8 @@ function($scope, $rootScope, $state, document, snapshots, site, time, ElementSer
     };
     var tree = {};
 
+    $rootScope.tree = tree;
+
       // 1. Iterate over view2view and create an array of all element ids
       // 2. Call get element ids and create a map of element id -> element name structure
       // 3. Iterate over view2view and create a map of element id -> element tree node reference
@@ -113,6 +115,11 @@ function($scope, $rootScope, $state, document, snapshots, site, time, ElementSer
 
           $scope.my_data = [ viewElementIds2TreeNodeMap[rootElementId] ];
 
+        }, function(reason) {
+            if (reason.status === 404)
+                growl.error("Error: A view in this doc wasn't found");
+            else
+                growl.error(reason.data);
         });
 
     $scope.my_tree = tree;
