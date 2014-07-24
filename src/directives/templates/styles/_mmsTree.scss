@@ -78,11 +78,15 @@ ul.nav-tabs {
 
 .arrow {
   position: relative;
-  left: -8px;
   width: 100%;
   clear: left;
   overflow: hidden;
 }
+
+.arrow-active {
+  margin-left: -8px;
+}
+
 .shaft {
   display: block;
   float: left;
