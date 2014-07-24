@@ -256,7 +256,42 @@ function ElementService($q, $http, URLService, UtilsService, VersionService, _) 
      * element objects 
      */
     var getOwnedElements = function(id, updateFromServer, workspace, version) {
-        
+        var update = !updateFromServer ? false : updateFromServer;
+        var ws = !workspace ? 'master' : workspace;
+        var ver = !version ? 'latest' : version;
+
+        var progress = 'getOwnedElements(' + id + update + ws + ver + ')';
+        if (inProgress.hasOwnProperty(progress))
+            return inProgress[progress];
+
+        var deferred = $q.defer();
+        if (ver === 'latest') {
+            inProgress[progress] = deferred.promise;
+            $http.get(URLService.getOwnedElementURL(id, ws, ver))
+            .success(function(data, status, headers, config) {
+                /* var result = [];
+                data[id].forEach(function(element) {
+                    if (elements.hasOwnProperty(element.sysmlid)) {
+                        if (update) {
+                            _.merge(elements[element.sysmlid], element);
+                        } 
+                    } else {
+                        elements[element.sysmlid] = element;
+                    }
+                    UtilsService.cleanElement(elements[element.sysmlid]);
+                    result.push(elements[element.sysmlid]);
+                }); */
+                delete inProgress[progress];
+                deferred.resolve(data); 
+            }).error(function(data, status, headers, config) {
+                URLService.handleHttpStatus(data, status, headers, config, deferred);
+                delete inProgress[progress];
+            });
+        } else {
+            // TODO: Need owned elements for version service
+            return VersionService.getElement(id, ver, ws);
+        }
+        return deferred.promise;        
     };
 
     /**
