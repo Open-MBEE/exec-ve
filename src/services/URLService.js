@@ -225,6 +225,14 @@ function urlService(baseUrl) {
         
     };
 
+    var getOwnedElementURL = function(id, workspace, version) {
+        
+        var r = root + '/workspaces/' + workspace + '/elements/' + id + '?recurse=true';
+        // TODO return addVersion(r, version);
+        return r;
+        
+    };
+
     /**
      * @ngdoc method
      * @name mms.URLService#getDocumentViewsURL
@@ -383,6 +391,7 @@ function urlService(baseUrl) {
         //setRoot: setRoot,
         getSiteDashboardURL: getSiteDashboardURL,
         getElementURL: getElementURL,
+        getOwnedElementURL: getOwnedElementURL,
         getElementVersionsURL: getElementVersionsURL,
         getPostElementsURL: getPostElementsURL,
         handleHttpStatus: handleHttpStatus,
