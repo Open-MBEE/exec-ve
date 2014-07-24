@@ -8,9 +8,13 @@
   margin: 0 auto;
 }
 
-.dropdown-toggle {
+a.dropdown-toggle {
   padding-top: 20px;
-  padding-bottom: 11px;
+  padding-bottom: 10px;
+}
+
+a.dropdown-toggle:hover {
+  background-color: $dark_grey;
 }
 
 ul > li > a {
@@ -321,19 +325,21 @@ accordion {
 
     & > a:hover {
       cursor: pointer;
-      text-decoration: none; 
+      text-decoration: none;
+      background-color: $medium_grey;
     }
   }
 
   .site-level {
     .panel-heading {
-      background-color: #505050;
+      background-color: $dark_grey;
     }
 
     .panel-title {
       & > a:hover {
         cursor: pointer;
         text-decoration: none; 
+        background-color: $light_grey;
       }
     }
   }
@@ -412,6 +418,12 @@ accordion {
 
       &:last-child {
         border-right: none; 
+      }
+    }
+
+    li.goto {
+      .dropdown-menu a:hover {
+        background: $medium_grey;
       }
     }
 
