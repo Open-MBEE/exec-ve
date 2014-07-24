@@ -1,16 +1,26 @@
-<div>
 <ul class="nav nav-list nav-pills nav-stacked abn-tree">
-        <li ng-repeat="row in tree_rows | filter:{visible:true} | filter:{label:search} track by row.branch.uid" 
-        ng-class="'level-' + {{row.level}}" class="abn-tree-row">
+
+      <li ng-repeat="row in tree_rows | filter:{visible:true} | filter:{label:search} track by row.branch.uid" 
+      ng-class="'level-' + {{row.level}}" class="abn-tree-row">
+
         <div class="arrow" ng-click="user_clicks_branch(row.branch)" ng-class="{'active-text': true}">
-        	<div class="triangle-left" ng-class="{'triangle-left-hidden': !row.branch.selected}"></div>
-        	<div class="shaft" ng-class="{'shaft-hidden': !row.branch.selected}">
-		        <a ng-click="user_clicks_branch(row.branch)">
-	            <i ng-class="{'active-text': row.branch.selected}" ng-click="row.branch.expanded = !row.branch.expanded; $event.stopPropagation();" class="indented tree-icon {{row.tree_icon}}" ></i>
-		            <span class="indented tree-label" ng-class="{'active-text': row.branch.selected}">{{row.section}} {{row.branch.data.name}}</span>
-		        </a>
-		    </div><div class="triangle-right" ng-class="{'triangle-right-hidden': !row.branch.selected}"></div>
-		</div>
-    </li>
+          
+          <div class="triangle-left" ng-class="{'triangle-left-selected': row.branch.selected, 'triangle-left-hidden': !row.branch.selected}"></div>
+
+        	<div class="shaft" ng-class="{'shaft-selected': row.branch.selected, 'shaft-hidden': !row.branch.selected}">
+
+  	        <a ng-click="user_clicks_branch(row.branch)">
+
+              <i ng-class="{'active-text': row.branch.selected}" ng-click="row.branch.expanded = !row.branch.expanded; $event.stopPropagation();" class="indented tree-icon {{row.tree_icon}}" ></i>
+              <span class="indented tree-label" ng-class="{'active-text': row.branch.selected}">{{row.section}} {{row.branch.data.name}}</span>
+
+  	        </a>
+  		    </div>
+
+          <div class="triangle-right" ng-class="{'triangle-right-selected': row.branch.selected, 'triangle-right-hidden': !row.branch.selected}"></div>
+
+    		</div>
+
+  </li>
+
 </ul>
-</div>

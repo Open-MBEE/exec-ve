@@ -10,7 +10,8 @@
   text-align: center;
   z-index: -1000;
   cursor: default;
-  bottom: -11px;
+  bottom: -12px;
+  padding-top: 1px;
 }
 
 .toolbar-extension {
@@ -19,5 +20,6 @@
   background-color: #404040;
   color: #404040;
   position: relative;
+  top: -1px;
   float: right;
 }
