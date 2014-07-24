@@ -1,6 +1,6 @@
 ul.abn-tree li.abn-tree-row {  
   padding: 0px;
-  margin:0px;
+  margin-right: -10px;
 }
 
 ul.abn-tree li.abn-tree-row a {
@@ -65,11 +65,14 @@ ul.nav-tabs {
   position: relative;
   left: -8px;
   width: 100%;
+  clear: left;
+  overflow: hidden;
 }
 .shaft {
   display: block;
   float: left;
-  width: 90%;
+  // width: 90%;
+  width: calc(100% - 20px);
   height: 20px;
   background: $arrow_blue;
   color: #fff;
@@ -95,24 +98,12 @@ ul.nav-tabs {
   border-left: 12px solid $arrow_blue;
 }
 
-.shaft-selected {
-  background: $arrow_blue
-}
-
 .shaft-hidden {
   background: transparent;
 }
 
-.triangle-left-selected {
-  border-left: 8px solid #fff;
-}
-
 .triangle-left-hidden {
   border-left: none;
-}
-
-.triangle-right-selected {
-  border-left: 12px solid $arrow_blue;
 }
 
 .triangle-right-hidden {
