@@ -4,6 +4,7 @@
 	float: right;
 	background-color: $monolith;
 	padding-top: 75px;
+	// position: fixed;
 }
 
 .toolbox {
@@ -26,6 +27,10 @@
 	&:active {
 		background-color: white;
 		box-shadow: none;
+	}
+
+	&:hover {
+		cursor: pointer;
 	}
 }
 

@@ -1,5 +1,5 @@
 $tabWidth: 240px;
-$toolHeight: 19px;
+$toolHeight: 20px;
 $toolWidth: 32px;
 
 @media screen and (max-width: 45em) {
@@ -58,15 +58,10 @@ a.view-tools {
   }
 
   &:hover {
-    border-left: 2px solid #404040;
-    border-right: 2px solid #404040;
+    background-color: #dedede;
+    cursor: pointer;
     color: #333;
     z-index: 100;
-  }
-
-  &:active {
-    color: #fff;
-    background-color: #333;   
   }
 
   &.center {
@@ -95,7 +90,7 @@ a.view-tools {
 }
 
 #inside-wrap {
-  padding: 9px 0px 35px 0px;
+  padding: 9px 0px 35px 8px;
   // margin-left: -10px;
 }
 

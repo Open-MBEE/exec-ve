@@ -5,7 +5,7 @@ ul.abn-tree li.abn-tree-row {
 
 ul.abn-tree li.abn-tree-row a {
   border-radius: 0;
-  padding: 3px 10px;
+  padding: 3px 14px;
 }
 
 ul.abn-tree i.indented {
@@ -54,4 +54,67 @@ ul.nav.nav-list.abn-tree .level-9 .indented {
 
 ul.nav-tabs {
   background-color: $soft_grey;
+}
+
+.active-text {
+  background: transparent !important;
+  color: #fff !important;
+}
+
+.arrow {
+  position: relative;
+  left: -8px;
+  width: 100%;
+}
+.shaft {
+  display: block;
+  float: left;
+  width: 90%;
+  height: 20px;
+  background: $arrow_blue;
+  color: #fff;
+}
+.triangle-left {
+  display: block;
+  float: left;
+  position: relative;
+  left: 8px;
+  width: 0;
+  height: 0;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  border-left: 8px solid #fff;
+}
+.triangle-right {
+  display: block;
+  float: left;
+  width: 0;
+  height: 0;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  border-left: 12px solid $arrow_blue;
+}
+
+.shaft-selected {
+  background: $arrow_blue
+}
+
+.shaft-hidden {
+  background: transparent;
+}
+
+.triangle-left-selected {
+  border-left: 8px solid #fff;
+}
+
+.triangle-left-hidden {
+  border-left: none;
+}
+
+.triangle-right-selected {
+  border-left: 12px solid $arrow_blue;
+}
+
+.triangle-right-hidden {
+  border-left: none;
 }
