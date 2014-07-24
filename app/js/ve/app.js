@@ -24,7 +24,7 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
         },
         views: {
             'menu': {
-                template: '<mms-nav mms-site="{{site}}" mms-title="{{title}}" mms-type="View Editor"></mms-nav>',
+                template: '<mms-nav mms-site="{{site}}" mms-title="{{title}}" mms-type="View Editor" mms-go-to="true" mms-other-sites="true"></mms-nav>',
                 //template: '<mms-nav site="{{site}}" type="document"></mms-nav>',
                 controller: function($scope, $stateParams, document, site, views) {
                     $scope.site = site.name;

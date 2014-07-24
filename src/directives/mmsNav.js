@@ -33,6 +33,8 @@ angular.module('mms.directives')
  * @param {string} mmsSite The current site name
  * @param {string} mmsTitle Title to display
  * @param {string} mmsType The type of current page (or app name like DocWeb)
+ * @param {string} mmsGoTo True to display Go To dropdown, false otherwise
+ * @param {string} mmsOtherSites True to display Other Sites dropdown, false otherwise
  */
 function mmsNav(SiteService, $templateCache, $log, growl) {
     var template = $templateCache.get('mms/templates/mmsNav.html');
@@ -214,7 +216,9 @@ function mmsNav(SiteService, $templateCache, $log, growl) {
         scope: {
             site: '@mmsSite', //current site name
             title: '@mmsTitle', //current page title
-            type: '@mmsType' //current page type
+            type: '@mmsType', //current page type
+            goTo: '@mmsGoTo',
+            otherSites: '@mmsOtherSites'
         },
         link: mmsNavLink
     };
