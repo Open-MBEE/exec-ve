@@ -1,5 +1,11 @@
 $navHeight: 40px;
 
-.content {
+.content-container {
   top: $navHeight;
+}
+
+.main-view-container {
+  -webkit-box-shadow: 0 0 9px rgba(0,0,0,.26);
+  -moz-box-shadow: 0 0 9px rgba(0,0,0,.26);
+  box-shadow: 0 0 9px rgba(0,0,0,.26); 
 }
