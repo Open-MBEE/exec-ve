@@ -3,6 +3,7 @@ module.exports = function(config){
     basePath : '.',
 
     files : [
+      'build/bower_components/lodash/dist/lodash.js',
       'build/bower_components/angular/angular.js',
       'build/bower_components/angular-borderlayout/src/borderLayout.js',
       'build/bower_components/angular-growl-v2/build/angular-growl.js',
@@ -46,3 +47,24 @@ module.exports = function(config){
     }
 
 })}
+
+/*
+module.exports = function(config) {
+    config.set({
+        frameworks: ['jasmine'],
+        browsers: ['PhantomJS'],
+        files: [
+            'build/bower_components/lodash/dist/lodash.js',
+            'build/bower_components/angular/angular.js',
+            'build/bower_components/angular-mocks/angular-mocks.js',
+            'build/mms.js',
+            'test/unit/servicesSpec.js'
+        ],
+        plugins: [
+            'karma-jasmine',
+            'karma-firefox-launcher',
+            'karma-phantomjs-launcher'
+        ]
+    })
+}
+*/
