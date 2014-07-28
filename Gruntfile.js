@@ -306,7 +306,6 @@ module.exports = function(grunt) {
             port: 9001
           }
         ]
-
       }
     },
 

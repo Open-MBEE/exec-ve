@@ -1,53 +1,130 @@
 ul.abn-tree li.abn-tree-row {  
   padding: 0px;
-  margin:0px;
+  margin-right: -8px;
 }
 
 ul.abn-tree li.abn-tree-row a {
   border-radius: 0;
-  padding: 3px 10px;
+  padding: 3px 14px;
 }
 
 ul.abn-tree i.indented {
   padding: 2px;
 }
 
-.abn-tree {
+ul.abn-tree {
+  overflow: hidden;
   cursor: pointer;
 }
+
 ul.nav.abn-tree .level-1 .indented {
   position: relative;
   left: 0px;
 }
+
 ul.nav.abn-tree .level-2 .indented {
   position: relative;
   left: 20px;
 }
+
 ul.nav.abn-tree .level-3 .indented {
   position: relative;
   left: 40px;
 }
+
 ul.nav.abn-tree .level-4 .indented {
   position: relative;
   left: 60px;
 }
+
 ul.nav.abn-tree .level-5 .indented {
   position: relative;
   left: 80px;
 }
+
 ul.nav.abn-tree .level-6 .indented {
   position: relative;
   left: 100px;
 }
+
+ul.nav.abn-tree a {
+  color: #333;
+  text-decoration: none;
+}
+
 ul.nav.nav-list.abn-tree .level-7 .indented {
   position: relative;
   left: 120px;
 }
+
 ul.nav.nav-list.abn-tree .level-8 .indented {
   position: relative;
   left: 140px;
 }
+
 ul.nav.nav-list.abn-tree .level-9 .indented {
   position: relative;
   left: 160px;
+}
+
+ul.nav-tabs {
+  background-color: $soft_grey;
+}
+
+.active-text {
+  background: transparent !important;
+  color: #fff !important;
+}
+
+.arrow {
+  position: relative;
+  width: 100%;
+  clear: left;
+  overflow: hidden;
+}
+
+.arrow-active {
+  margin-left: -8px;
+}
+
+.shaft {
+  display: block;
+  float: left;
+  // width: 90%;
+  width: calc(100% - 20px);
+  height: 20px;
+  background: $arrow_blue;
+  color: #fff;
+}
+.triangle-left {
+  display: block;
+  float: left;
+  position: relative;
+  left: 8px;
+  width: 0;
+  height: 0;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  border-left: 8px solid #fff;
+}
+.triangle-right {
+  display: block;
+  float: left;
+  width: 0;
+  height: 0;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  border-left: 12px solid $arrow_blue;
+}
+
+.shaft-hidden {
+  background: transparent;
+}
+
+.triangle-left-hidden {
+  border-left: none;
+}
+
+.triangle-right-hidden {
+  border-left: none;
 }

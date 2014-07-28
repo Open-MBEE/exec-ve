@@ -1,17 +1,30 @@
 <div fa-pane="element" pane-anchor="east" pane-size="40%" pane-handle="4" pane-min="30px">
-    <tabset>
-        <tab>
-            <tab-heading>Element</tab-heading>
-            <div class="container-fluid">
-                <mms-spec mms-eid="{{eid}}" mms-cf-elements="viewElements" mms-edit-field="all" mms-version="{{version}}"></mms-spec>
-            </div>
-        </tab>
-        <tab>
-            <tab-heading>View Order</tab-heading>
-            <div class="container-fluid">
-                <mms-view-struct mms-vid="{{vid}}" mms-version="{{version}}" mms-order="true"></mms-view-struct>
-            </div>
-        </tab>
+        <div class="container-fluid" ng-show="elementIsOpen || editorIsOpen">
+            <mms-spec mms-eid="{{eid}}" mms-cf-elements="viewElements" mms-edit-field="all" mms-version="{{version}}"></mms-spec>
+        </div>
+        <div class="container-fluid" ng-show="reorderIsOpen">
+            <mms-view-struct mms-vid="{{vid}}" mms-version="{{version}}" mms-order="true"></mms-view-struct>
+        </div>
+        <div class="container-fluid" ng-show="showVersionList">
+            <table class="table table-hover table-condensed">
+                <tr><td><a ui-sref="doc({site: site.name, docId: document.sysmlid, time: 'latest'})" 
+                    ui-sref-opts="{reload: true}">Latest</a></td></tr>
+                <tr ng-repeat="snapshot in snapshots | orderBy:'-created'">
+                    <td>
+                        <a ui-sref="doc({site: site.name, docId: document.sysmlid, time: snapshot.created})" 
+                            ui-sref-opts="{reload: true}">{{snapshot.created | date:'M/d/yy h:mm a'}}</a>
+                    </td>
+                    <td>
+                        <div ng-repeat="config in snapshot.configurations | orderBy:'name'">
+                            <a href="docweb.html#/sites/{{site.name}}/config/{{config.id}}">{{config.name}}</a>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+
+        <button ng-show="editable" class="btn btn-sm btn-primary" ng-click="createNewSnapshot()">Create New</button>
+        <button class="btn btn-sm btn-primary" ng-click="refreshSnapshots()">Refresh</button>
+        </div>
        <!-- <tab heading="History">
             <div class="container-fluid"></div>
         </tab>
@@ -21,11 +34,7 @@
     </tabset>
 </div>
 <div fa-pane pane-anchor="center">
-    <tabset>
-        <tab heading="View">
             <div class="container-fluid">
                 <mms-view mms-vid="{{vid}}" mms-cf-clicked="tscClicked(elementId)" mms-order="false" mms-version="{{version}}"></mms-view>
             </div>
-        </tab>
-    </tabset>
 </div>

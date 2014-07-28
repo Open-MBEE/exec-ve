@@ -204,7 +204,7 @@ function mmsNav(SiteService, $templateCache, $log, growl) {
             scope.categories = sites;
             for(var k = 0; k < catNames.length; k++){
                 var str = catNames[k];
-                scope.categories[str].open = true;
+                scope.categories[str].open = false;
             }
         }, function(reason) {
             growl.error("Getting Sites Error: " + reason.message);

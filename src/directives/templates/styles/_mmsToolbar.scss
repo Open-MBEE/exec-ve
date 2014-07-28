@@ -1,0 +1,45 @@
+.right-toolbar {
+	width: 41px;
+	height: 100%;
+	float: right;
+	background-color: $monolith;
+	padding-top: 75px;
+	// position: fixed;
+}
+
+.toolbox {
+	width: 100%;
+	background-color: $monolith;
+}
+
+.tools {
+	display: block;
+	height: 45px;
+	margin-bottom: 3px;
+	color: black;
+	background-color: $soft_grey;
+	box-shadow: 5px 0px 20px -5px $shadow_grey inset;
+	text-align: center;
+	vertical-align: bottom;
+	font-size: 20px;
+	line-height: 45px;
+
+	&:active {
+		background-color: white;
+		box-shadow: none;
+	}
+
+	&:hover {
+		cursor: pointer;
+	}
+}
+
+a.tools:hover {
+	text-decoration: none;
+	color: black !important;	
+}
+
+.selected {
+	background-color: white;
+	box-shadow: none;
+}

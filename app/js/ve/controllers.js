@@ -11,7 +11,30 @@ function($scope, $rootScope, $state, document, snapshots, site, time, ElementSer
     $scope.time = time;
     $scope.editable = $scope.document.editable && time === 'latest';
     $rootScope.tree_initial_selection = $scope.document.sysmlid;
-
+    $scope.buttons = [{
+        action: function(){ $scope.my_tree.expand_all(); },        
+        tooltip: "Expand All",
+        icon: "fa-caret-square-o-down"
+    }, {
+        action: function(){ $scope.my_tree.collapse_all(); },
+        tooltip: "Collapse All",
+        icon: "fa-caret-square-o-up"
+    }, {
+        action: function(){ $scope.toggleFilter(); },
+        tooltip: "Filter",
+        icon: "fa-filter"
+    }, {
+        action: function(){ $scope.try_adding_a_branch(); },
+        tooltip: "Add View",
+        icon: "fa-plus"
+    }, {
+        action: function(){ $scope.reorder_tree_view(); },
+        tooltip: "Reorder",
+        icon: "fa-arrows-v"
+    }];
+    $scope.testFunc = function() {
+        console.log("function reached");
+    };
     $scope.createNewSnapshot = function() {
         ConfigService.createSnapshot($scope.document.sysmlid)
         .then(function(result) {
@@ -33,6 +56,13 @@ function($scope, $rootScope, $state, document, snapshots, site, time, ElementSer
     };
     var tree = {};
 
+    $scope.tooltipPlacement = function(arr) {
+        arr[0].placement = "bottom-left";
+        for(var i=1; i<arr.length; i++){
+            arr[i].placement = "bottom";
+        }
+    };
+    $scope.tooltipPlacement($scope.buttons);
     $rootScope.tree = tree;
 
       // 1. Iterate over view2view and create an array of all element ids
