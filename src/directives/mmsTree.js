@@ -212,11 +212,13 @@ function mmsTree($timeout, $log, $templateCache) {
                 for_each_branch(function(b, level) {
                     b.expanded = true;
                 });
+                on_treeData_change();
             };
             tree.collapse_all = function() {
                 for_each_branch(function(b, level) {
                     b.expanded = false;
                 });
+                on_treeData_change();
             };
             tree.get_first_branch = function() {
                 if (scope.treeData.length > 0)
@@ -267,12 +269,14 @@ function mmsTree($timeout, $log, $templateCache) {
                     b = tree.get_selected_branch();
                 if (b)
                     b.expanded = true;
+                on_treeData_change();
             };
             tree.collapse_branch = function(b) {
                 if (!b)
                     b = selected_branch;
                 if (b)
                     b.expanded = false;
+                on_treeData_change();
             };
             tree.get_siblings = function(b) {
                 var siblings;
