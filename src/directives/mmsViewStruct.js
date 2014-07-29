@@ -38,6 +38,7 @@ function mmsViewStruct(ViewService, $templateCache, $rootScope, growl, _) {
                 scope.lastModified = data.lastModified;
                 scope.author = data.author;
                 scope.edit = _.cloneDeep(scope.view);
+                scope.$emit('viewEditability', scope.edit.editable);
                 delete scope.edit.name;
                 delete scope.edit.documentation;
             }, function(reason) {
@@ -54,7 +55,6 @@ function mmsViewStruct(ViewService, $templateCache, $rootScope, growl, _) {
             scope.structEditable = !scope.structEditable;
             scope.structEdit = scope.structEditable ? 'Cancel' : 'Edit Order';
             element.find('.ui-sortable').sortable('option', 'cancel', scope.structEditable ? '' : 'div');
-            console.log("Reached");
         };
         scope.toggleStructEdit();
         scope.save = function() {
