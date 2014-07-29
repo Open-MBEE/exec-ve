@@ -29,10 +29,6 @@ function mmsToolbar($templateCache, $rootScope, toolService, $stateParams, Confi
 			scope.tools[2].permission = hasPermission; 
 		});
 
-		// $rootScope.$on('viewDataLoaded', function(){
-		//	console.log($rootScope.hasEditingPermission);
-		// });
-
 		scope.setVal = function(str){
 			toolService.selectTool(str);
 			switch(str){
