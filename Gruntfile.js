@@ -103,7 +103,7 @@ module.exports = function(grunt) {
     sass: {
       dist : {
         files: {
-          'dist/css/mmsMain.css': 'src/directives/templates/styles/mmsMain.scss'
+          'dist/css/mms.css': 'src/directives/templates/styles/mmsMain.scss'
         }
       },
       dist2 : {
@@ -127,7 +127,7 @@ module.exports = function(grunt) {
       },
       combine: {
         files: {
-          'dist/mms.min.css': ['dist/css/*.css']
+          'dist/styles.min.css': ['dist/css/*.min.css']
         }
       }
     },
