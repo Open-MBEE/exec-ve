@@ -20,10 +20,12 @@ function mmsToolbar($templateCache, $rootScope, toolService, $stateParams, Confi
 
 		scope.$on('elementEditability', function(event, elementPermission){
 			scope.tools[1].permission = elementPermission;
+			if(!elementPermission && scope.tools[1].selected === true) scope.tools[0].selected = true;
 		});
 
 		scope.$on('viewEditability', function(event, viewPermission){
 			scope.tools[2].permission = viewPermission; 
+			if(!viewPermission && scope.tools[2].selected === true) scope.tools[0].selected = true;
 		});
 
 		scope.setVal = function(str){
