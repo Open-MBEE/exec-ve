@@ -172,7 +172,8 @@ function mmsTree($timeout, $log, $templateCache) {
                             if (scope.sectionNumbering) {
                                 sectionValue = section + sectionChar + j;
                                 add_branch_to_list(level + 1, sectionValue, branch.children[i], child_visible);
-                            }
+                            } else
+                                add_branch_to_list(level + 1, '', branch.children[i], child_visible);
                         }
                     }
                 }
