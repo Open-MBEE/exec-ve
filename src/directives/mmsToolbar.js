@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsToolbar', ['$templateCache', '$rootScope', 'toolService', '$stateParams', 'ConfigService', mmsToolbar]);
+.directive('mmsToolbar', ['$templateCache', '$rootScope', 'toolService', '$stateParams', 'ConfigService', 'ElementService', mmsToolbar]);
 
 function mmsToolbar($templateCache, $rootScope, toolService, $stateParams, ConfigService){
 	var template = $templateCache.get('mms/templates/mmsToolbar.html');
@@ -9,16 +9,25 @@ function mmsToolbar($templateCache, $rootScope, toolService, $stateParams, Confi
 	$rootScope.editorIsOpen = false;
 	$rootScope.reorderIsOpen = false;
 	$rootScope.showVersionList = false;
+	var hasPermission;
+	
+	$rootScope.$on('viewDataLoaded', function(){
+		hasPermission = $rootScope.hasEditingPermission;
+		$rootScope.$broadcast('test', $rootScope.hasEditingPermission);
+	});
 
-	var mmsToolbarLink = function(scope, element, attrs, rootScope, $stateParams, ConfigService){
+	var mmsToolbarLink = function(scope, $rootScope, element, attrs, $stateParams, ConfigService, ElementService){
 		scope.tools = [
-			{tooltype: "viewer", icon: "fa-eye", selected: true},
-			{tooltype: "editor", icon: "fa-edit", selected: false},
-			{tooltype: "reorder", icon: "fa-arrows", selected: false},
-			{tooltype: "versions", icon: "fa-camera", selected: false}
+			{tooltype: "viewer", icon: "fa-eye", selected: true, permission: true},
+			{tooltype: "editor", icon: "fa-edit", selected: false, permission: hasPermission},
+			{tooltype: "reorder", icon: "fa-arrows", selected: false, permission: hasPermission},
+			{tooltype: "versions", icon: "fa-camera", selected: false, permission: true}
 		];
 
-	
+		scope.$on('test', function(){
+			scope.tools[1].permission = hasPermission;
+			scope.tools[2].permission = hasPermission; 
+		});
 
 		scope.setVal = function(str){
 			toolService.selectTool(str);

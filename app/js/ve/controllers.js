@@ -10,31 +10,35 @@ function($scope, $rootScope, $state, document, snapshots, site, time, ElementSer
     $scope.site = site;
     $scope.time = time;
     $scope.editable = $scope.document.editable && time === 'latest';
+    $rootScope.hasEditingPermission = $scope.editable;
+    $rootScope.$broadcast('viewDataLoaded', $scope.editable);
     $rootScope.tree_initial_selection = $scope.document.sysmlid;
     $scope.buttons = [{
         action: function(){ $scope.my_tree.expand_all(); },        
         tooltip: "Expand All",
-        icon: "fa-caret-square-o-down"
+        icon: "fa-caret-square-o-down",
+        permission: true
     }, {
         action: function(){ $scope.my_tree.collapse_all(); },
         tooltip: "Collapse All",
-        icon: "fa-caret-square-o-up"
+        icon: "fa-caret-square-o-up",
+        permission: true
     }, {
         action: function(){ $scope.toggleFilter(); },
         tooltip: "Filter",
-        icon: "fa-filter"
+        icon: "fa-filter",
+        permission: true
     }, {
         action: function(){ $scope.try_adding_a_branch(); },
         tooltip: "Add View",
-        icon: "fa-plus"
+        icon: "fa-plus",
+        permission: $scope.editable
     }, {
         action: function(){ $scope.reorder_tree_view(); },
         tooltip: "Reorder",
-        icon: "fa-arrows-v"
+        icon: "fa-arrows-v",
+        permission: $scope.editable
     }];
-    $scope.testFunc = function() {
-        console.log("function reached");
-    };
     $scope.createNewSnapshot = function() {
         ConfigService.createSnapshot($scope.document.sysmlid)
         .then(function(result) {

@@ -4,7 +4,8 @@
 	float: right;
 	background-color: $monolith;
 	padding-top: 75px;
-	// position: fixed;
+	position: fixed;
+	left: calc(100% - 41px);
 }
 
 .toolbox {
@@ -18,7 +19,7 @@
 	margin-bottom: 3px;
 	color: black;
 	background-color: $soft_grey;
-	box-shadow: 5px 0px 20px -5px $shadow_grey inset;
+	box-shadow: inset 7px 0 9px -7px rgba(0,0,0,0.7);
 	text-align: center;
 	vertical-align: bottom;
 	font-size: 20px;
