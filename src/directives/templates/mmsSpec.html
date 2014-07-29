@@ -27,20 +27,17 @@
 </div>
 
 <div ng-hide="$root.editorIsOpen">
-    <div><b>Last Modified:</b> {{element.lastModified | date:'M/d/yy h:mm a'}} by {{element.author}}</div>
-    <div><b>Name:</b> {{element.name}}</div>
-    <div><b>Documentation:</b></div><div ng-bind-html="element.documentation"></div>
-    <div ng-if="element.specialization.type === 'Property'">
-        <div><b>Property Value:</b></div>
-        <div ng-repeat="value in values" ng-switch on="value.type">
-            <div ng-switch-when="LiteralInteger">{{value.integer}}</div>
-            <div ng-switch-when="LiteralBoolean">{{value.boolean}}</div>
-            <div ng-switch-when="LiteralReal">{{value.double}}</div>
-            <div ng-switch-when="LiteralUnlimitedNatural">{{value.naturalValue}}</div>
-            <div ng-switch-when="LiteralString" ng-bind-html="value.string"></div>
-        </div>
-    </div>
-    <div><b>Type:</b> {{element.specialization.type || 'Element'}}</div>
-    <div><b>Id:</b> {{element.sysmlid}}</div>
-    <div><b>Qualified Name:</b> {{element.qualifiedName}}</div>
+    <h1>{{element.name}}</h1>
+        <h2>TYPE</h2>
+            <h3>{{element.specialization.type || 'Element'}}</h3>
+        <h2>QUALIFIED NAME</h2>
+            <h3>{{element.qualifiedName}}</h3>
+        <h2>ID</h2>
+            <h3>{{element.sysmlid}}</h3>
+        <h2>LAST MODIFICATION</h2>
+            <h3>{{element.lastModified | date:'M/d/yy h:mm a'}} by {{element.author}}</h3>
+        <br>
+        <h2>DOCUMENTATION</h2>
+            <p ng-bind-html="element.documentation" class="doc-text"></p>
+
 </div>
