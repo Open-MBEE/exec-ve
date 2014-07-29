@@ -4,10 +4,6 @@ angular.module('mms.directives')
 .directive('mmsTree', ["$timeout", "$log", '$templateCache', mmsTree]);
 
 function mmsTree($timeout, $log, $templateCache) {
-    var error = function(s) {
-        $log.log('ERROR:' + s);
-    };
-
     var mmsTreeLink = function(scope, element, attrs) {
         scope.filterOn = true;
         if (!attrs.iconExpand)
@@ -185,7 +181,8 @@ function mmsTree($timeout, $log, $templateCache) {
                 add_branch_to_list(1, '', scope.treeData[i], true);
             }
         };
-        scope.$watch('treeData', on_treeData_change, true);
+        scope.on_treeData_change = on_treeData_change;
+        scope.$watch('treeData', on_treeData_change, false);
         scope.$watch('initialSelection', on_initialSelection_change);
         scope.tree_rows = [];
 
@@ -260,6 +257,7 @@ function mmsTree($timeout, $log, $templateCache) {
                 } else {
                     scope.treeData.push(new_branch);
                 }
+                on_treeData_change();
             };
             tree.add_root_branch = function(new_branch) {
                 tree.add_branch(null, new_branch);
@@ -390,6 +388,9 @@ function mmsTree($timeout, $log, $templateCache) {
                     if (prev)
                         tree.select_branch(prev);
                 }
+            };
+            tree.refresh = function() {
+                on_treeData_change();
             };
         }
     };
