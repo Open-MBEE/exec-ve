@@ -80,7 +80,7 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, growl, $rootS
                         !scope.element.editable || 
                         (scope.mmsVersion !== 'latest' && scope.mmsVersion)) {
                     scope.editable = false;
-                    $rootScope.$broadcast('elementEditability', scope.element.editable);
+                    scope.$emit('elementEditability', scope.editable);
                     //template = readTemplate;
                     
                     //element.append(template);
@@ -91,7 +91,7 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, growl, $rootS
                         scope.edit = data;
                         scope.editable = true;
                         //template = editTemplate;
-                        scope.$emit('elementEditability', scope.element.editable);
+                        scope.$emit('elementEditability', scope.editable);
                         if (scope.edit.specialization.type === 'Property' && angular.isArray(scope.edit.specialization.value)) {
                             scope.editValues = scope.edit.specialization.value;
                         }

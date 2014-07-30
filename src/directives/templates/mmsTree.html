@@ -9,7 +9,7 @@
 
         	<div class="shaft" ng-class="{'shaft-selected': row.branch.selected, 'shaft-hidden': !row.branch.selected}">
 
-  	        <a ng-click="user_clicks_branch(row.branch)">
+  	        <a ng-click="user_clicks_branch(row.branch);  setDefaultTool($root)">
 
               <i ng-class="{'active-text': row.branch.selected}" ng-click="row.branch.expanded = !row.branch.expanded; $event.stopPropagation();" class="indented tree-icon {{row.tree_icon}}" ></i>
               <span class="indented tree-label" ng-class="{'active-text': row.branch.selected}">{{row.section}} {{row.branch.data.name}}</span>
