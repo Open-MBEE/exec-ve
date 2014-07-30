@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('mm', ['ui.router', 'mms', 'mms.directives', 'ui.bootstrap', 'ui.tree', 'fa.directive.borderLayout'])
+angular.module('mm', ['ui.router', 'mms', 'mms.directives', 'mms.directives.diff', 'ui.bootstrap', 'ui.tree', 'fa.directive.borderLayout'])
 .config(function($stateProvider, $urlRouterProvider) {
     $stateProvider
     .state('diff', {

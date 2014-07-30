@@ -1,0 +1,17 @@
+tr {
+  &.clean {
+    background-color: white;
+  }
+
+  &.addition {
+    background-color: green;
+  }
+
+  &.removal {
+    background-color: red;
+  }
+
+  &.conflict {
+    background-color: yellow;
+  }
+}

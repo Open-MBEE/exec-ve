@@ -1,4 +1,8 @@
-<h1>Addition</h1>
+<h1>
+  <span ng-repeat="differenceType in differenceTypes">
+    {{differenceType}}
+  </span>
+</h1>
 
 <table class="table">
 
@@ -11,25 +15,15 @@
   </thead>
 
   <tbody>
-    <tr>
+    <tr class="name-row" ng-class="{clean: nameDiff[0], addition: nameDiff[1], remove: nameDiff[2], conflict: nameDiff[3]}">
       <td>Name</td>
-      <td>Skewer</td>
-      <td>Skewer</td>
+      <td>{{original.name}}</td>
+      <td>{{delta.name}}</td>
     </tr>
-    <tr>
-      <td>Value</td>
-      <td>Chicken</td>
-      <td>Chicken</td>
-    </tr>
-    <tr>
-      <td>Source</td>
-      <td>N/A</td>
-      <td>N/A</td>
-    </tr>
-    <tr>
-      <td>Target</td>
-      <td>N/A</td>
-      <td>N/A</td>
+    <tr class="owner-row" ng-class="{clean: ownerDiff[0], addition: ownerDiff[1], remove: ownerDiff[2], conflict: ownerDiff[3]}">
+      <td>Owner</td>
+      <td>{{original.owner}}</td>
+      <td>{{delta.owner}}</td>
     </tr>
   </tbody>
 
