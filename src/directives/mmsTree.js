@@ -1,9 +1,9 @@
   'use strict';
 
   angular.module('mms.directives')
-  .directive('mmsTree', ["$timeout", "$log", '$templateCache', mmsTree]);
+  .directive('mmsTree', ["$timeout", "$log", '$templateCache', '$rootScope', mmsTree]);
 
-  function mmsTree($timeout, $log, $templateCache) {
+  function mmsTree($timeout, $log, $templateCache, $rootScope) {
         return {
           restrict: 'E',
           template: $templateCache.get('mms/templates/mmsTree.html'),
@@ -17,7 +17,7 @@
             treeControl: '=',
             search: '='
           },
-          link: function(scope, element, attrs) {
+          link: function(scope, element, attrs, $rootScope) {
             var error, expand_all_parents, expand_level, for_all_ancestors, for_each_branch, get_parent, n, on_treeData_change, on_initialSelection_change, select_branch, selected_branch, tree;
             scope.filterOn = true;
             error = function(s) {
@@ -111,6 +111,7 @@
                 return select_branch(branch);
               }
             };
+
             get_parent = function(child) {
               var parent;
               parent = void 0;

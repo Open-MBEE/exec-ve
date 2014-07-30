@@ -1,4 +1,4 @@
-<div ng-show="editing">
+<div ng-show="$root.editorIsOpen">
     <div><button class="btn btn-primary btn-sm" ng-click="save()">Save</button><button class="btn btn-sm" ng-click="editing=false">Cancel</button></div>
     <div><b>Last Modified:</b> {{element.lastModified | date:'M/d/yy h:mm a'}} by {{element.author}}</div>
     <div><b>Name:</b> <input class="form-control" type="text" ng-model="edit.name"></input></div>
@@ -26,8 +26,7 @@
     <div><b>Qualified Name:</b> {{element.qualifiedName}}</div>
 </div>
 
-<div ng-hide="editing">
-    <button ng-click="editing=true" ng-show="editable" class="btn btn-primary btn-sm">Edit</button>
+<div ng-hide="$root.editorIsOpen">
     <div><b>Last Modified:</b> {{element.lastModified | date:'M/d/yy h:mm a'}} by {{element.author}}</div>
     <div><b>Name:</b> {{element.name}}</div>
     <div><b>Documentation:</b></div><div ng-bind-html="element.documentation"></div>
