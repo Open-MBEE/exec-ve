@@ -4,6 +4,7 @@ angular.module('mms.directives')
 .directive('mmsTree', ["$timeout", "$log", '$templateCache', mmsTree]);
 
 function mmsTree($timeout, $log, $templateCache) {
+
     var mmsTreeLink = function(scope, element, attrs) {
         if (!attrs.iconExpand)
             attrs.iconExpand = 'fa fa-plus';
@@ -207,31 +208,20 @@ function mmsTree($timeout, $log, $templateCache) {
             };
             tree.select_first_branch = function() {
                 var b = tree.get_first_branch();
-                tree.select_branch(b);
+                select_branch(b);
             };
             tree.get_selected_branch = function() {
                 return selected_branch;
             };
-            tree.get_parent_branch = function(b) {
-                return get_parent(b);
-            };
-            tree.select_branch = function(b) {
-                select_branch(b);
-            };
+            tree.get_parent_branch = get_parent;
+            tree.select_branch = select_branch;
             tree.get_children = function(b) {
                 return b.children;
             };
             tree.select_parent_branch = function(b) {
-                var p;
-                if (!b)
-                    b = tree.get_selected_branch();
-                if (b) {
-                    p = tree.get_parent_branch(b);
-                    if (p) {
-                        tree.select_branch(p);
-                        return p;
-                    }
-                }
+                var p = tree.get_parent_branch(b);
+                if (p) 
+                    tree.select_branch(p);
             };
             tree.add_branch = function(parent, new_branch) {
                 if (parent) {
@@ -261,54 +251,38 @@ function mmsTree($timeout, $log, $templateCache) {
             };
             tree.get_siblings = function(b) {
                 var siblings;
-                if (!b)
-                    b = selected_branch;
-                if (b) {
-                    var p = tree.get_parent_branch(b);
-                    if (p)
-                        siblings = p.children;
-                    else
-                        siblings = scope.treeData;
-                }
+                var p = tree.get_parent_branch(b);
+                if (p)
+                    siblings = p.children;
+                else
+                    siblings = scope.treeData;
                 return siblings;
             };
             tree.get_next_sibling = function(b) {
-                if (!b)
-                    b = selected_branch;
-                if (b) {
-                    var siblings = tree.get_siblings(b);
+                var siblings = tree.get_siblings(b);
+                if (angular.isArray(siblings)) {
                     var i = siblings.indexOf(b);
                     if (i < siblings.length - 1)
                         return siblings[i + 1];
                 }
             };
             tree.get_prev_sibling = function(b) {
-                if (!b)
-                    b = selected_branch;
-                if (b) {
-                    var siblings = tree.get_siblings(b);
+                var siblings = tree.get_siblings(b);
+                if (angular.isArray(siblings)) {
                     var i = siblings.indexOf(b);
                     if (i > 0) 
                         return siblings[i - 1];
                 }
             };
             tree.select_next_sibling = function(b) {
-                if (!b)
-                    b = selected_branch;
-                if (b) {
-                    var next = tree.get_next_silbing(b);
-                    if (next)
-                        tree.select_branch(next);
-                }
+                var next = tree.get_next_silbing(b);
+                if (next)
+                    tree.select_branch(next);
             };
             tree.select_prev_sibling = function(b) {
-                if (!b)
-                    b = selected_branch;
-                if (b) {
-                    var prev = tree.get_prev_sibling(b);
-                    if (prev)
-                        tree.select_branch(prev);
-                }
+                var prev = tree.get_prev_sibling(b);
+                if (prev)
+                    tree.select_branch(prev);
             };
             tree.get_first_child = function(b) {
                 if (!b)
@@ -339,13 +313,9 @@ function mmsTree($timeout, $log, $templateCache) {
                 }
             };
             tree.select_next_branch = function(b) {
-                if (!b)
-                    b = selected_branch;
-                if (b) {
-                    var next = tree.get_next_branch(b);
-                    if (next)
-                        tree.select_branch(next);
-                }
+                var next = tree.get_next_branch(b);
+                if (next)
+                    tree.select_branch(next);
             };
             tree.last_descendant = function(b) {
                 if (b) {
@@ -356,23 +326,15 @@ function mmsTree($timeout, $log, $templateCache) {
                 }
             };
             tree.get_prev_branch = function(b) {
-                if (!b)
-                    b = selected_branch;
-                if (b) {
-                    var prev_sibling = tree.get_prev_sibling(b);
-                    if (prev_sibling)
-                        return tree.last_descendant(prev_sibling);
-                    return tree.get_parent_branch(b);
-                }
+                var prev_sibling = tree.get_prev_sibling(b);
+                if (prev_sibling)
+                    return tree.last_descendant(prev_sibling);
+                return tree.get_parent_branch(b);
             };
             tree.select_prev_branch = function(b) {
-                if (!b)
-                    b = selected_branch;
-                if (b) {
-                    var prev = tree.get_prev_branch(b);
-                    if (prev)
-                        tree.select_branch(prev);
-                }
+                var prev = tree.get_prev_branch(b);
+                if (prev)
+                    tree.select_branch(prev);
             };
             tree.refresh = function() {
                 on_treeData_change();
