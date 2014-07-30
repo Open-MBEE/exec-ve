@@ -29,6 +29,9 @@ function mmsViewStruct(ViewService, $templateCache, $rootScope, growl, _) {
     };
 
     var mmsViewStructLink = function(scope, element, attrs) {
+        scope.editingPermission = false;
+        scope.reorderingPermission = false;
+
         scope.$watch('mmsVid', function(newVal, oldVal) {
             if (!newVal)
                 return;
@@ -38,6 +41,7 @@ function mmsViewStruct(ViewService, $templateCache, $rootScope, growl, _) {
                 scope.lastModified = data.lastModified;
                 scope.author = data.author;
                 scope.edit = _.cloneDeep(scope.view);
+                scope.editingPermission = scope.edit.editable;
                 scope.$emit('viewEditability', scope.edit.editable);
                 delete scope.edit.name;
                 delete scope.edit.documentation;

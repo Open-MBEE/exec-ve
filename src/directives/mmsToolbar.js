@@ -18,6 +18,11 @@ function mmsToolbar($templateCache, $rootScope, toolService, $stateParams, Confi
 			{tooltype: "versions", icon: "fa-camera", selected: false, permission: true}
 		];
 
+		scope.reorderPermission = false;
+		scope.$on('versionPermission', function(event, version){
+			scope.reorderPermission = version;
+		});
+
 		scope.$on('elementEditability', function(event, elementPermission){
 			scope.tools[1].permission = elementPermission;
 			if(!elementPermission && scope.tools[1].selected === true) {
@@ -28,7 +33,7 @@ function mmsToolbar($templateCache, $rootScope, toolService, $stateParams, Confi
 		});
 
 		scope.$on('viewEditability', function(event, viewPermission){
-			scope.tools[2].permission = viewPermission; 
+			scope.tools[2].permission = viewPermission && scope.reorderPermission;
 			if(!viewPermission && scope.tools[2].selected === true) {
 				scope.tools[0].selected = true;
 				toolService.selectTool("viewer");
