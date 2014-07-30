@@ -84,517 +84,115 @@ describe('ConfigService', function() {
 	    "qualifiedName": "/////Architectural Patterns & Examples/_17_0_2_3_8660276_1391623405097_989020_66206/MDK Manual",
 	    "documentation": "<p><mms-transclude-com data-mms-eid=\"MMS_1405434431200_84583f43-955b-417f-890a-907b80b87161\">comment:cldelp<\/mms-transclude-com> <\/p>",
 	    "sysmlid": "_17_0_2_3_e9f034d_1384298224245_406810_82668",
-	    "owner": "_17_0_2_3_8660276_1391623405097_989020_66206",
+	    "owner": "_66206",
 	    "read": "2014-07-18T15:48:28.160-0700",
 	    "specialization": {
-	      "displayedElements": ["_17_0_2_3_e9f034d_1384298224245_406810_82668"],
+	      "displayedElements": ["_82668"],
 	      "view2view": [
-	        {
-	          "id": "_17_0_2_3_8660276_1391118051281_643259_64209",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_8660276_1386121079087_662054_85232",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_8660276_1389829239079_574229_68313",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_c0902ff_1397083442144_35084_63686",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_8660276_1391542427605_168205_65764",
-	          "childrenViews": ["MMS_1405373440109_7e6315b8-09ac-475e-b2eb-e295d79c5cfb"]
-	        },
-	        {
-	          "id": "_17_0_2_3_faa036e_1397518837356_424982_57979",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_c0902ff_1396909133552_170892_57876",
-	          "childrenViews": [
-	            "_17_0_2_3_c0902ff_1396909371550_332620_58325",
-	            "_17_0_2_3_8660276_1401232594990_180350_60135"
-	          ]
-	        },
-	        {
-	          "id": "_17_0_2_3_e9f034d_1386284293741_532771_64146",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_c0902ff_1396900178350_335263_58448",
-	          "childrenViews": [
-	            "_17_0_2_3_c0902ff_1396908807725_881294_57507",
-	            "_17_0_2_3_c0902ff_1396908848585_583057_57546",
-	            "_17_0_2_3_c0902ff_1396909133552_170892_57876"
-	          ]
-	        },
-	        {
-	          "id": "_17_0_2_3_8660276_1394733125360_268161_68542",
-	          "childrenViews": [
-	            "_17_0_2_3_e9f034d_1384298170561_728720_82613",
-	            "_17_0_2_3_e9f034d_1384302306631_591764_84397",
-	            "_17_0_2_3_8660276_1394734844442_201184_71850",
-	            "_17_0_2_3_8660276_1394734895675_183382_71922",
-	            "_17_0_2_3_8660276_1394734917275_153065_71966"
-	          ]
-	        },
-	        {
-	          "id": "_17_0_2_3_e9f034d_1386283174564_988137_63084",
-	          "childrenViews": [
-	            "_17_0_2_3_e9f034d_1386284293741_532771_64146",
-	            "_17_0_2_3_e9f034d_1386284367319_284780_64218"
-	          ]
-	        },
-	        {
-	          "id": "_17_0_2_3_c0902ff_1397083523057_750266_63842",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_8660276_1389821071980_888986_64595",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_e9f034d_1384365541894_746617_63766",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_8660276_1389831148387_61148_69116",
-	          "childrenViews": [
-	            "_17_0_2_3_8660276_1384915209668_776948_79604",
-	            "_17_0_2_3_8660276_1386121079087_662054_85232",
-	            "_17_0_2_3_e9f034d_1385422966050_9801_80021"
-	          ]
-	        },
-	        {
-	          "id": "_17_0_2_3_e9f034d_1385422966050_9801_80021",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_e9f034d_1384370369889_336346_64694",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_faa036e_1397518746363_164717_57916",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_c0902ff_1396909215790_810314_58019",
-	          "childrenViews": [
-	            "_17_0_2_3_faa036e_1397519263610_359618_58243",
-	            "_17_0_2_3_faa036e_1397519351902_689880_58306",
-	            "_17_0_2_3_faa036e_1397519411683_200499_58369"
-	          ]
-	        },
-	        {
-	          "id": "_17_0_2_3_e9f034d_1386284367319_284780_64218",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_f280366_1395329363629_245331_66680",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_faa036e_1397519263610_359618_58243",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_c0902ff_1396909371550_332620_58325",
-	          "childrenViews": [
-	            "_17_0_2_3_c0902ff_1396909184269_457130_57939",
-	            "_17_0_2_3_c0902ff_1396909210462_121086_57980",
-	            "_17_0_2_3_c0902ff_1396909215790_810314_58019"
-	          ]
-	        },
-	        {
-	          "id": "_17_0_2_3_c0902ff_1397083507050_780595_63803",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_8660276_1389820676338_288876_64122",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_8660276_1389894058553_546843_66812",
-	          "childrenViews": ["_17_0_2_3_8660276_1389892206218_894432_65193"]
-	        },
-	        {
-	          "id": "_17_0_2_3_e9f034d_1384298097479_684723_82574",
-	          "childrenViews": [
-	            "_17_0_2_3_e9f034d_1384303058899_500990_84485",
-	            "_17_0_2_3_e9f034d_1384365541894_746617_63766",
-	            "_17_0_2_3_8660276_1395106664281_814376_67950",
-	            "_17_0_2_3_e9f034d_1384384755210_265104_68051"
-	          ]
-	        },
-	        {
-	          "id": "_17_0_2_3_faa036e_1397519411683_200499_58369",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_8660276_1394734917275_153065_71966",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_8660276_1391046957889_602576_66253",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_8660276_1387326005150_388071_96446",
-	          "childrenViews": [
-	            "_17_0_2_3_8660276_1389820676338_288876_64122",
-	            "_17_0_2_3_8660276_1389820875487_689706_64383",
-	            "_17_0_2_3_8660276_1389821041600_119881_64519",
-	            "_17_0_2_3_8660276_1389821120889_700164_64633",
-	            "_17_0_2_3_8660276_1389829239079_574229_68313",
-	            "_17_0_2_3_8660276_1389821057250_613836_64557",
-	            "_17_0_2_3_8660276_1389821071980_888986_64595",
-	            "_17_0_2_3_f280366_1395329248105_85252_66620",
-	            "_17_0_2_3_f280366_1395329363629_245331_66680",
-	            "_17_0_2_3_f280366_1395329404651_682967_66740",
-	            "_17_0_2_3_f280366_1395936575237_980286_66517"
-	          ]
-	        },
-	        {
-	          "id": "_17_0_2_3_e9f034d_1384303058899_500990_84485",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_c0902ff_1397070965413_88861_57833",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_c0902ff_1396908960589_4216_57750",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_c0902ff_1396909292721_743711_58130",
-	          "childrenViews": [
-	            "_17_0_2_3_c0902ff_1396909806501_616704_58605",
-	            "_17_0_2_3_c0902ff_1396909812164_61274_58644"
-	          ]
-	        },
-	        {
-	          "id": "_17_0_2_3_e9f034d_1384382641868_579610_67487",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_e9f034d_1385079571724_174413_97891",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_e9f034d_1384384755210_265104_68051",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_8660276_1387325047321_762283_95516",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_c0902ff_1396908968249_349568_57789",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_8660276_1389892206218_894432_65193",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_e9f034d_1384381686222_52312_66992",
-	          "childrenViews": ["_17_0_2_3_e9f034d_1384382641868_579610_67487"]
-	        },
-	        {
-	          "id": "_17_0_2_3_8660276_1387325091432_452979_95607",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_8660276_1387326187768_702750_96498",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_8660276_1389821120889_700164_64633",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_8660276_1387325163545_568184_95650",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_c0902ff_1396909184269_457130_57939",
-	          "childrenViews": [
-	            "_17_0_2_3_c0902ff_1397070965413_88861_57833",
-	            "_17_0_2_3_c0902ff_1397081331828_749528_63257",
-	            "_17_0_2_3_c0902ff_1397083368650_521111_63569",
-	            "_17_0_2_3_c0902ff_1397083406754_932254_63608",
-	            "_17_0_2_3_c0902ff_1397083422019_434144_63647",
-	            "_17_0_2_3_c0902ff_1397083442144_35084_63686",
-	            "_17_0_2_3_c0902ff_1397083468712_950160_63725",
-	            "_17_0_2_3_c0902ff_1397083484890_415817_63764",
-	            "_17_0_2_3_c0902ff_1397083507050_780595_63803",
-	            "_17_0_2_3_c0902ff_1397083523057_750266_63842"
-	          ]
-	        },
-	        {
-	          "id": "_17_0_2_3_e9f034d_1386094298058_27440_63534",
-	          "childrenViews": [
-	            "_17_0_2_3_e9f034d_1386094655236_948477_63624",
-	            "_17_0_2_3_e9f034d_1386283174564_988137_63084"
-	          ]
-	        },
-	        {
-	          "id": "_17_0_2_3_8660276_1395106664281_814376_67950",
-	          "childrenViews": [
-	            "_17_0_2_3_e9f034d_1384370369889_336346_64694",
-	            "_17_0_2_3_e9f034d_1384381686222_52312_66992"
-	          ]
-	        },
-	        {
-	          "id": "_17_0_2_3_c0902ff_1397083422019_434144_63647",
-	          "childrenViews": ["_17_0_2_3_c0902ff_1399415671230_715545_62517"]
-	        },
-	        {
-	          "id": "_17_0_2_3_faa036e_1397518872385_474111_58113",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_8660276_1387325395161_284452_95855",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_8660276_1389735753455_365540_64517",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_e9f034d_1386094655236_948477_63624",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_c0902ff_1399415671230_715545_62517",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_8660276_1384915209668_776948_79604",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_8660276_1394732557276_183971_68132",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_8660276_1387325256943_181843_95710",
-	          "childrenViews": [
-	            "_17_0_2_3_8660276_1387325272266_489126_95754",
-	            "_17_0_2_3_8660276_1387325091432_452979_95607",
-	            "_17_0_2_3_8660276_1387326005150_388071_96446",
-	            "_17_0_2_3_8660276_1389823625085_150755_68430"
-	          ]
-	        },
-	        {
-	          "id": "_17_0_2_3_c0902ff_1396909806501_616704_58605",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_c0902ff_1396908807725_881294_57507",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_faa036e_1397518354420_74213_57792",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_c0902ff_1396909356075_335727_58286",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_c0902ff_1397083484890_415817_63764",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_c0902ff_1397083368650_521111_63569",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_8660276_1386114552716_627341_82958",
-	          "childrenViews": [
-	            "_17_0_2_3_8660276_1387325256943_181843_95710",
-	            "_17_0_2_3_8660276_1387325066198_377435_95560",
-	            "_17_0_2_3_8660276_1387325429092_205128_95944",
-	            "_17_0_2_3_8660276_1387325047321_762283_95516",
-	            "_17_0_2_3_8660276_1387325163545_568184_95650",
-	            "_17_0_2_3_8660276_1387326187768_702750_96498",
-	            "_17_0_2_3_8660276_1395268972605_59163_105372"
-	          ]
-	        },
-	        {
-	          "id": "_17_0_2_3_c0902ff_1397081331828_749528_63257",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_8660276_1389821041600_119881_64519",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_e9f034d_1384298170561_728720_82613",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_e9f034d_1384302306631_591764_84397",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_c0902ff_1396909210462_121086_57980",
-	          "childrenViews": [
-	            "_17_0_2_3_faa036e_1397518354420_74213_57792",
-	            "_17_0_2_3_faa036e_1397518746363_164717_57916",
-	            "_17_0_2_3_faa036e_1397518837356_424982_57979",
-	            "_17_0_2_3_faa036e_1397518872385_474111_58113",
-	            "_17_0_2_3_faa036e_1397518899208_736795_58176"
-	          ]
-	        },
-	        {
-	          "id": "_17_0_2_3_c0902ff_1396909316870_352537_58169",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_c0902ff_1396909812164_61274_58644",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_f280366_1395936575237_980286_66517",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_8660276_1389820875487_689706_64383",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_c0902ff_1396908848585_583057_57546",
-	          "childrenViews": [
-	            "_17_0_2_3_c0902ff_1396908960589_4216_57750",
-	            "_17_0_2_3_c0902ff_1396908968249_349568_57789"
-	          ]
-	        },
-	        {
-	          "id": "_17_0_2_3_faa036e_1397519351902_689880_58306",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_8660276_1389821057250_613836_64557",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_c0902ff_1396909349070_876460_58247",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_8660276_1401232594990_180350_60135",
-	          "childrenViews": [
-	            "_17_0_2_3_c0902ff_1396909292721_743711_58130",
-	            "_17_0_2_3_c0902ff_1396909316870_352537_58169",
-	            "_17_0_2_3_c0902ff_1396909356075_335727_58286",
-	            "_17_0_2_3_c0902ff_1396909349070_876460_58247"
-	          ]
-	        },
-	        {
-	          "id": "_17_0_2_3_f280366_1395329404651_682967_66740",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_e9f034d_1384298224245_406810_82668",
-	          "childrenViews": [
-	            "_17_0_2_3_8660276_1391542427605_168205_65764",
-	            "_17_0_2_3_e9f034d_1384298097479_684723_82574",
-	            "_17_0_2_3_c0902ff_1396900178350_335263_58448",
-	            "_17_0_2_3_8660276_1394732535509_307093_68087",
-	            "_17_0_2_3_8660276_1394733125360_268161_68542",
-	            "_17_0_2_3_8660276_1386114552716_627341_82958",
-	            "_17_0_2_3_e9f034d_1386094298058_27440_63534"
-	          ]
-	        },
-	        {
-	          "id": "_17_0_2_3_8660276_1394734844442_201184_71850",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_8660276_1389823625085_150755_68430",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_f280366_1395329248105_85252_66620",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_c0902ff_1397083406754_932254_63608",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_8660276_1387325299874_731132_95804",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_c0902ff_1397083468712_950160_63725",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_8660276_1387325272266_489126_95754",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_faa036e_1397518899208_736795_58176",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_8660276_1394732535509_307093_68087",
-	          "childrenViews": [
-	            "_17_0_2_3_8660276_1389735753455_365540_64517",
-	            "_17_0_2_3_8660276_1394732557276_183971_68132",
-	            "_17_0_2_3_8660276_1391046957889_602576_66253",
-	            "_17_0_2_3_8660276_1391118051281_643259_64209"
-	          ]
-	        },
-	        {
-	          "id": "_17_0_2_3_8660276_1395268972605_59163_105372",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_8660276_1387325066198_377435_95560",
-	          "childrenViews": [
-	            "_17_0_2_3_8660276_1387325406242_779669_95897",
-	            "_17_0_2_3_8660276_1387325395161_284452_95855",
-	            "_17_0_2_3_8660276_1387325299874_731132_95804"
-	          ]
-	        },
-	        {
-	          "id": "_17_0_2_3_8660276_1387325406242_779669_95897",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_8660276_1387325429092_205128_95944",
-	          "childrenViews": [
-	            "_17_0_2_3_8660276_1389831148387_61148_69116",
-	            "_17_0_2_3_e9f034d_1385079571724_174413_97891",
-	            "_17_0_2_3_8660276_1389894058553_546843_66812"
-	          ]
-	        },
-	        {
-	          "id": "_17_0_2_3_8660276_1394734895675_183382_71922",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "MMS_1405373440109_7e6315b8-09ac-475e-b2eb-e295d79c5cfb",
-	          "childrenViews": []
-	        }
+	        { "id": "_64209", "childrenViews": [] },
+	        { "id": "_85232", "childrenViews": [] },
+	        { "id": "_68313", "childrenViews": [] },
+	        { "id": "_63686", "childrenViews": [] },
+	        { "id": "_65764", "childrenViews": [ "MMS_1405373440109_7e6315b8-09ac-475e-b2eb-e295d79c5cfb" ] },
+	        { "id": "_57979", "childrenViews": [] },
+	        { "id": "_57876", "childrenViews": [ "_58325", "_60135" ] },
+	        { "id": "_64146", "childrenViews": [] },
+	        { "id": "_58448", "childrenViews": [ "_57507", "_57546", "_57876" ] },
+	        { "id": "_68542", "childrenViews": [ "_82613", "_84397", "_71850", "_71922", "_71966" ] },
+	        { "id": "_63084", "childrenViews": [ "_64146", "_64218" ] },
+	        { "id": "_63842", "childrenViews": [] },
+	        { "id": "_64595", "childrenViews": [] },
+	        { "id": "_63766", "childrenViews": [] },
+	        { "id": "_69116", "childrenViews": [ "_79604", "_85232", "_80021" ] },
+	        { "id": "_80021", "childrenViews": [] },
+	        { "id": "_64694", "childrenViews": [] },
+	        { "id": "_57916", "childrenViews": [] },
+	        { "id": "_58019", "childrenViews": [ "_58243", "_58306", "_58369" ] },
+	        { "id": "_64218", "childrenViews": [] },
+	        { "id": "_66680", "childrenViews": [] },
+	        { "id": "_58243", "childrenViews": [] },
+	        { "id": "_58325", "childrenViews": [ "_57939", "_57980", "_58019" ] },
+	        { "id": "_63803", "childrenViews": [] },
+	        { "id": "_64122", "childrenViews": [] },
+	        { "id": "_66812", "childrenViews": ["_65193"] },
+	        { "id": "_82574", "childrenViews": [ "_84485", "_63766", "_67950", "_68051" ] },
+	        { "id": "_58369", "childrenViews": [] },
+	        { "id": "_71966", "childrenViews": [] },
+	        { "id": "_66253", "childrenViews": [] },
+	        { "id": "_96446", "childrenViews": [ "_64122", "_64383", "_64519", "_64633", "_68313", "_64557", "_64595", "_66620", "_66680", "_66740", "_66517" ] },
+	        { "id": "_84485", "childrenViews": [] },
+	        { "id": "_57833", "childrenViews": [] }, { "id": "_57750", "childrenViews": [] },
+	        { "id": "_58130", "childrenViews": [ "_58605", "_58644" ] },
+	        { "id": "_67487", "childrenViews": [] },
+	        { "id": "_97891", "childrenViews": [] },
+	        { "id": "_68051", "childrenViews": [] },
+	        { "id": "_95516", "childrenViews": [] },
+	        { "id": "_57789", "childrenViews": [] },
+	        { "id": "_65193", "childrenViews": [] },
+	        { "id": "_66992", "childrenViews": ["_67487"] }, 
+	        { "id": "_95607", "childrenViews": [] },
+	        { "id": "_96498", "childrenViews": [] },
+	        { "id": "_64633", "childrenViews": [] },
+	        { "id": "_95650", "childrenViews": [] },
+	        { "id": "_57939", "childrenViews": [ "_57833", "_63257", "_63569", "_63608", "_63647", "_63686", "_63725", "_63764", "_63803", "_63842" ] },
+	        { "id": "_63534", "childrenViews": [ "_63624", "_63084" ] },
+	        { "id": "_67950", "childrenViews": [ "_64694", "_66992" ] },
+	        { "id": "_63647", "childrenViews": ["_62517"] },
+	        { "id": "_58113", "childrenViews": [] },
+	        { "id": "_95855", "childrenViews": [] },
+	        { "id": "_64517", "childrenViews": [] },
+	        { "id": "_63624", "childrenViews": [] },
+	        { "id": "_62517", "childrenViews": [] },
+	        { "id": "_79604", "childrenViews": [] },
+	        { "id": "_68132", "childrenViews": [] },
+	        { "id": "_95710", "childrenViews": [ "_95754", "_95607", "_96446", "_68430" ] },
+	        { "id": "_58605", "childrenViews": [] }, 
+	        { "id": "_57507", "childrenViews": [] },
+	        { "id": "_57792", "childrenViews": [] },
+	        { "id": "_58286", "childrenViews": [] },
+	        { "id": "_63764", "childrenViews": [] },
+	        { "id": "_63569", "childrenViews": [] },
+	        { "id": "_82958", "childrenViews": [ "_95710", "_95560", "_95944", "_95516", "_95650", "_96498", "_105372" ] },
+	        { "id": "_63257", "childrenViews": [] },
+	        { "id": "_64519", "childrenViews": [] },
+	        { "id": "_82613", "childrenViews": [] },
+	        { "id": "_84397", "childrenViews": [] },
+	        { "id": "_57980", "childrenViews": [ "_57792", "_57916", "_57979", "_58113", "_58176" ] },
+	        { "id": "_58169", "childrenViews": [] },
+	        { "id": "_58644", "childrenViews": [] },
+	        { "id": "_66517", "childrenViews": [] },
+	        { "id": "_64383", "childrenViews": [] },
+	        { "id": "_57546", "childrenViews": [ "_57750", "_57789" ] },
+	        { "id": "_58306", "childrenViews": [] },
+	        { "id": "_64557", "childrenViews": [] },
+	        { "id": "_58247", "childrenViews": [] },
+	        { "id": "_60135", "childrenViews": [ "_58130", "_58169", "_58286", "_58247" ] },
+	        { "id": "_66740", "childrenViews": [] },
+	        { "id": "_82668", "childrenViews": [ "_65764", "_82574", "_58448", "_68087", "_68542", "_82958", "_63534" ] },
+	        { "id": "_71850", "childrenViews": [] },
+	        { "id": "_68430", "childrenViews": [] },
+	        { "id": "_66620", "childrenViews": [] },
+	        { "id": "_63608", "childrenViews": [] },
+	        { "id": "_95804", "childrenViews": [] },
+	        { "id": "_63725", "childrenViews": [] },
+	        { "id": "_95754", "childrenViews": [] },
+	        { "id": "_58176", "childrenViews": [] },
+	        { "id": "_68087", "childrenViews": [ "_64517", "_68132", "_66253", "_64209" ] },
+	        { "id": "_105372", "childrenViews": [] },
+	        { "id": "_95560", "childrenViews": [ "_95897", "_95855", "_95804" ] },
+	        { "id": "_95897", "childrenViews": [] },
+	        { "id": "_95944", "childrenViews": [ "_69116", "_97891", "_66812" ] },
+	        { "id": "_71922", "childrenViews": [] },
+	        { "id": "MMS_1405373440109_7e6315b8-09ac-475e-b2eb-e295d79c5cfb", "childrenViews": [] }
 	      ],
-	      "allowedElements": ["_17_0_2_3_e9f034d_1384298224245_406810_82668"],
+	      "allowedElements": ["_82668"],
 	      "contains": [{
 	        "sourceType": "reference",
-	        "source": "_17_0_2_3_e9f034d_1384298224245_406810_82668",
+	        "source": "_82668",
 	        "sourceProperty": "documentation",
 	        "type": "Paragraph"
 	      }],
-	      "noSections": ["_17_0_2_3_e9f034d_1384382641868_579610_67487"],
+	      "noSections": ["_67487"],
 	      "type": "View"
 	    },
 	    "editable": false
@@ -603,156 +201,45 @@ describe('ConfigService', function() {
 	    "author": "dcoren",
 	    "lastModified": "2014-07-14T14:34:11.442-0700",
 	    "name": "EMS Application Manuals",
-	    "qualifiedName": "/////Architectural Patterns & Examples/_17_0_2_3_8660276_1391623405097_989020_66206/EMS Application Manuals",
+	    "qualifiedName": "/////Architectural Patterns & Examples/_66206/EMS Application Manuals",
 	    "documentation": "",
-	    "sysmlid": "_17_0_2_3_8660276_1391133273620_303350_69133",
-	    "owner": "_17_0_2_3_8660276_1391623405097_989020_66206",
+	    "sysmlid": "_69133",
+	    "owner": "_66206",
 	    "read": "2014-07-18T15:48:28.178-0700",
 	    "specialization": {
-	      "displayedElements": ["_17_0_2_3_8660276_1391133273620_303350_69133"],
+	      "displayedElements": ["_69133"],
 	      "view2view": [
-	        {
-	          "id": "_17_0_2_3_8660276_1393381021676_15399_114871",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_c0902ff_1395521704058_862881_66337",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_8660276_1390958281625_747273_64386",
-	          "childrenViews": [
-	            "_17_0_2_3_8660276_1391197105192_393486_68984",
-	            "_17_0_2_3_8660276_1391135738826_741360_71086",
-	            "_17_0_2_3_8660276_1391135755238_179812_71128",
-	            "_17_0_5_1_8bf0285_1403557665925_362603_47762",
-	            "_17_0_5_1_f280366_1403566633442_623483_56051",
-	            "_17_0_5_1_f280366_1403566647035_101692_56074"
-	          ]
-	        },
-	        {
-	          "id": "_17_0_2_3_8660276_1390958281620_64773_64383",
-	          "childrenViews": [
-	            "_17_0_2_3_8660276_1391133551962_594351_69801",
-	            "_17_0_2_3_8660276_1389735559339_83520_64303"
-	          ]
-	        },
-	        {
-	          "id": "_17_0_2_3_8660276_1396973181409_413744_74394",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_8660276_1393377591335_186016_112660",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_8660276_1391133551962_594351_69801",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_8660276_1389735559339_83520_64303",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_8660276_1391135755238_179812_71128",
-	          "childrenViews": [
-	            "_17_0_2_3_8660276_1393377591335_186016_112660",
-	            "_17_0_2_3_8660276_1393381021676_15399_114871"
-	          ]
-	        },
-	        {
-	          "id": "_17_0_2_3_8660276_1391135738826_741360_71086",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_5_1_8bf0285_1403557665925_362603_47762",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_8660276_1391197105192_393486_68984",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_c0902ff_1395529388798_376521_67194",
-	          "childrenViews": [
-	            "_17_0_2_3_c0902ff_1395521448356_249882_66319",
-	            "_17_0_2_3_c0902ff_1395521618178_247686_66322",
-	            "_17_0_2_3_c0902ff_1395521704058_862881_66337",
-	            "_17_0_2_3_c0902ff_1395521790720_193330_66340"
-	          ]
-	        },
-	        {
-	          "id": "_17_0_2_3_8660276_1390958281625_208230_64385",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_8660276_1391133633326_499253_69923",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_8660276_1391133718975_592409_69977",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_8660276_1391133273620_303350_69133",
-	          "childrenViews": [
-	            "_17_0_2_3_c0902ff_1395529388798_376521_67194",
-	            "_17_0_2_3_f280366_1396455740501_953157_59326"
-	          ]
-	        },
-	        {
-	          "id": "_17_0_5_1_f280366_1403566647035_101692_56074",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_8660276_1390958281624_353028_64384",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_c0902ff_1395521618178_247686_66322",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_8660276_1393558434279_197906_105062",
-	          "childrenViews": [
-	            "_17_0_2_3_8660276_1390958281624_353028_64384",
-	            "_17_0_2_3_8660276_1391133633326_499253_69923"
-	          ]
-	        },
-	        {
-	          "id": "_17_0_2_3_8660276_1391133301013_528454_69192",
-	          "childrenViews": [
-	            "_17_0_2_3_8660276_1390958281625_208230_64385",
-	            "_17_0_2_3_8660276_1390958281625_747273_64386"
-	          ]
-	        },
-	        {
-	          "id": "_17_0_2_3_f280366_1396455740501_953157_59326",
-	          "childrenViews": [
-	            "_17_0_2_3_8660276_1391133301013_528454_69192",
-	            "_17_0_2_3_8660276_1393558434279_197906_105062",
-	            "_17_0_2_3_8660276_1391133718975_592409_69977",
-	            "_17_0_2_3_8660276_1396973181409_413744_74394",
-	            "_17_0_2_3_8660276_1390958281620_64773_64383"
-	          ]
-	        },
-	        {
-	          "id": "_17_0_2_3_c0902ff_1395521790720_193330_66340",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_5_1_f280366_1403566633442_623483_56051",
-	          "childrenViews": []
-	        },
-	        {
-	          "id": "_17_0_2_3_c0902ff_1395521448356_249882_66319",
-	          "childrenViews": []
-	        }
+	        { "id": "_114871", "childrenViews": [] },
+	        { "id": "_66337", "childrenViews": [] },
+	        { "id": "_64386", "childrenViews": [ "_68984", "_71086", "_71128", "_47762", "_56051", "_56074" ] },
+	        { "id": "_64383", "childrenViews": [ "_69801", "_64303" ] },
+	        { "id": "_74394", "childrenViews": [] },
+	        { "id": "_112660", "childrenViews": [] },
+	        { "id": "_69801", "childrenViews": [] },
+	        { "id": "_64303", "childrenViews": [] },
+	        { "id": "_71128", "childrenViews": [ "_112660", "_114871" ] },
+	        { "id": "_71086", "childrenViews": [] },
+	        { "id": "_47762", "childrenViews": [] },
+	        { "id": "_68984", "childrenViews": [] },
+	        { "id": "_67194", "childrenViews": [ "_66319", "_66322", "_66337", "_66340" ] },
+	        { "id": "_64385", "childrenViews": [] },
+	        { "id": "_69923", "childrenViews": [] },
+	        { "id": "_69977", "childrenViews": [] },
+	        { "id": "_69133", "childrenViews": [ "_67194", "_59326" ] },
+	        { "id": "_56074", "childrenViews": [] },
+	        { "id": "_64384", "childrenViews": [] },
+	        { "id": "_66322", "childrenViews": [] },
+	        { "id": "_105062", "childrenViews": [ "_64384", "_69923" ] },
+	        { "id": "_69192", "childrenViews": [ "_64385", "_64386" ] },
+	        { "id": "_59326", "childrenViews": [ "_69192", "_105062", "_69977", "_74394", "_64383" ] },
+	        { "id": "_66340", "childrenViews": [] },
+	        { "id": "_56051", "childrenViews": [] },
+	        { "id": "_66319", "childrenViews": [] }
 	      ],
-	      "allowedElements": ["_17_0_2_3_8660276_1391133273620_303350_69133"],
+	      "allowedElements": ["_69133"],
 	      "contains": [{
 	        "sourceType": "reference",
-	        "source": "_17_0_2_3_8660276_1391133273620_303350_69133",
+	        "source": "_69133",
 	        "sourceProperty": "documentation",
 	        "type": "Paragraph"
 	      }],
@@ -942,7 +429,7 @@ describe('ConfigService', function() {
 describe('ElementService', function() {
 	beforeEach(module('mms'));
 
-	var myElementService, $httpBackend;
+	var myElementService, $httpBackend, $rootScope;
 
 
 	var element_17783 = {
@@ -1059,6 +546,8 @@ describe('ElementService', function() {
 	beforeEach(inject(function($injector) {
 		ElementService = $injector.get('ElementService');
 		$httpBackend = $injector.get('$httpBackend');
+		$rootScope = $injector.get('$rootScope');
+
 
 		$httpBackend.whenGET('/alfresco/service/workspaces/master/elements/_17783').respond({elements: [element_17783]});
 		$httpBackend.whenGET('/alfresco/service/workspaces/master/elements/_17784').respond(function(method, url, data) {
@@ -1067,16 +556,29 @@ describe('ElementService', function() {
 		});
 		$httpBackend.whenGET('/alfresco/service/workspaces/master/elements/_17448').respond({elements: [element_17448]});
 
-		// maybe look at string to JSON converter
 		$httpBackend.when('POST', '/alfresco/service/workspaces/master/elements').respond(function(method, url, data) {
 			var json = JSON.parse(data);
-
 			if (!json.elements[0].sysmlid) {
 				json.elements[0].sysmlid = json.elements[0].name;
 			}
 			return [200, json];
 		});
-	}))
+
+		$httpBackend.whenGET('/alfresco/service/workspaces/master/sites/siteId/products?timestamp=01-01-2014')
+		.respond({products:[{sysmlid:'PROJECT-123456', name:'Europa', projectVersion:'v1'},
+			{sysmlid:'PROJECT-2468', name:'Europa FS', projectVersion:'v34'}]});
+		$httpBackend.whenGET('/alfresco/service/workspaces/master/sites/siteId').respond(function(method, url) {
+			return [500, undefined, {status: {code:500, name:'Internal Error', 
+				description:'An error inside the HTTP server which prevented it from fulfilling the request.'}}];
+		});
+		$httpBackend.whenGET('/alfresco/service/workspaces/master/elements').respond({elements:[
+			{sysmlid:12345, name:'commentElement', documentation:'old documentation',
+				specialization:{type:'Comment'}}, 
+			{sysmlid:12346, name:'packageElement', specialization:{type:'Package'}}]});
+
+		$httpBackend.whenGET('/alfresco/service/workspaces/master/elements/emptyId').respond(emptyElements);
+
+	}));
 
 	it('can get an instance of the ElementService and methods are valid', inject(function() {
 		expect(ElementService).toBeDefined();
@@ -1488,8 +990,67 @@ describe('ElementService', function() {
 		}); $httpBackend.flush();
 	}));
 
-	// uncertain how to test
+	// !-- NOTE: when calling on elements that have sysmlid it will pass back copies of the first element
+	// that had no sysmlid --!
+	// 
 	it('getGenericElements', inject(function() {
+		// (!inProgress.hasOwnProperty(progress)), (ver !== 'latest') 
+		var siteProductsURL = '/alfresco/service/workspaces/master/sites/siteId/products';
+		ElementService.getGenericElements(siteProductsURL, 'products', undefined, undefined, '01-01-2014')
+		.then(function(response) {
+			expect(response.length).toEqual(2);
+			expect(response[0]).toEqual({sysmlid:'PROJECT-123456', name:'Europa', projectVersion:'v1'});
+			expect(response[1]).toEqual({sysmlid:'PROJECT-2468', name:'Europa FS', projectVersion:'v34'});
+		}); $httpBackend.flush();
+
+		// (!inProgress.hasOwnProperty(progress)), (ver === 'latest'), $http.get(url) - fail 
+		var badURL = '/alfresco/service/workspaces/master/sites/siteId';
+		ElementService.getGenericElements(badURL, 'sites', undefined, undefined, 'latest')
+		.then(function(response) { console.log('This should not be displayed'); }, function(failMes) {
+			expect(failMes.status).toEqual(500);
+			expect(failMes.message).toEqual('Server Error');
+		}); $httpBackend.flush();
+
+		// !(inProgress.hasOwnProperty(progress)), (ver === 'latest'), $http.get(url) - pass, 
+		// !(elements.hasOwnProperty(element.sysmlid))
+		var elementsURL = '/alfresco/service/workspaces/master/elements';
+		ElementService.getGenericElements(elementsURL, 'elements', false, undefined, 'latest')
+		.then(function(response) {
+			expect(response.length).toEqual(2);
+			expect(response[0]).toEqual({sysmlid:12345, name:'commentElement', documentation:'old documentation',
+				specialization:{type:'Comment'}});
+			expect(response[1]).toEqual({sysmlid:12346, name:'packageElement', specialization:{type:'Package'}});
+		}); $httpBackend.flush();
+		// elements[12345] and elements[12346] now exist
+
+
+		// !(inProgress.hasOwnProperty(progress)), (ver === 'latest'), $http.get(url) - pass, 
+		// (elements.hasOwnProperty(element.sysmlid)), !update
+		var new_12345 = {sysmlid:12345, name:'commentElement', documentation:'new documentation',
+		 specialization:{type:'Comment'}};
+		ElementService.updateElement(new_12345, 'master');
+		$httpBackend.flush();
+
+		ElementService.getGenericElements(elementsURL, 'elements', false, undefined, 'latest')
+		.then(function(response) {
+			expect(response.length).toEqual(2);
+			expect(response[0]).toEqual({sysmlid:12345, name:'commentElement', documentation:'new documentation',
+				specialization:{type:'Comment'}});
+			expect(response[1]).toEqual({sysmlid:12346, name:'packageElement', specialization:{type:'Package'}});
+		}); $rootScope.$apply();
+
+		// !(inProgress.hasOwnProperty(progress)), (ver === 'latest'), $http.get(url) - pass, 
+		// (elements.hasOwnProperty(element.sysmlid)), update
+		ElementService.getGenericElements(elementsURL, 'elements', true, undefined, 'latest')
+		.then(function(response) {
+			expect(response.length).toEqual(2);
+			expect(response[0]).toEqual({sysmlid:12345, name:'commentElement', documentation:'old documentation',
+				specialization:{type:'Comment'}});
+			expect(response[1]).toEqual({sysmlid:12346, name:'packageElement', specialization:{type:'Package'}});
+		}); $httpBackend.flush();
+
+
+		// (inProgress.hasOwnProperty(progress))
 
 	}));
 
@@ -2063,12 +1624,54 @@ describe('VersionService', function() {
 describe('ViewService', function() {
 	beforeEach(module('mms'));
 
+	var root = '/alfresco/service';
 	var ViewService, $httpBackend, $rootScope;
 
 	beforeEach(inject(function($injector) {
 		ViewService = $injector.get('ViewService');
 		$httpBackend = $injector.get('$httpBackend');
 		$rootScope = $injector.get('$rootScope');
+
+		$httpBackend.whenGET('/alfresco/service/workspaces/master/views/12345/elements?timestamp=01-01-2014').respond(
+			{elements: [{author:'muschek', name:'view\'s element', sysmlid:12346, owner:12345, lastModified:'01-01-2014'}, 
+			{author:'muschek', name:'view\'s 2nd element', sysmlid:12347, owner:12345, lastModified:'01-01-2014'}]});
+		$httpBackend.whenGET('/alfresco/service/workspaces/master/views/12345/elements').respond({elements:[
+			{author:'muschek', name:'view\'s element', sysmlid:12346, owner:12345, lastModified:'07-28-2014'},
+			{author:'muschek', name:'view\'s 2nd element', sysmlid:12347, owner:12345, lastModified:'07-28-2014'}]});
+	
+		$httpBackend.whenGET(root + '/workspaces/master/sites/siteId/products/54321/views?timestamp=01-01-2014').respond(
+			{elements:[{author:'muschek', name:'doc view', owner:54321, sysmlid:54322, lastModified:'01-01-2014'}]});
+		$httpBackend.whenGET(root + '/workspaces/master/sites/siteId/products/65432/views').respond(
+			{elements: [{author:'muschek', name:'other id view', owner:65432, sysmlid:65433, lastModified:'07-28-2014'}]});
+
+		$httpBackend.whenGET(root + '/workspaces/master/elements/badId').respond(function(method, url) {
+			var warning = '[ERROR]: Element with id, badId not found\n[WARNING]: No elements found';
+			return [404, warning];
+		});
+		$httpBackend.whenGET(root + '/workspaces/master/elements/noSpecDocId').respond(
+			{elements: [{author:'muschek', name:'doc with no spec', sysmlid:'noSpecDocId'}]});
+		$httpBackend.whenGET(root + '/workspaces/master/elements/emptyView2ViewDocId').respond(
+			{elements: [{author:'muschek', name:'doc with empty view2view', sysmlid:'emptyView2ViewDocId',
+			specialization: {type:'Product', view2view:[], noSections:[]}
+			}]});
+		$httpBackend.whenGET(root + '/workspaces/master/elements/noIdMatchDocId').respond(
+			{elements: [{author:'muschek', name:'do with non-empty view2view but no id match',
+			sysmlid:'noIdMatchDocId', specialization:{type:'Product', 
+			view2view:[{id:'notMatchingId', childrenViews:[]}]}}]});
+		$httpBackend.whenGET(root + '/workspaces/master/elements/idMatchDocId').respond(
+			{elements: [{name:'doc with matching id', sysmlid:'idMatchDocId', specialization:{type:'Product',
+			view2view:[{id:'nonMatchId', childrenViews:[]}, {id:'parentViewId', childrenViews:[]}]}}]});
+
+		$httpBackend.when('POST', root + '/workspaces/master/elements').respond(function(method, url, data) {
+
+			var json = JSON.parse(data);
+
+			if (!json.elements[0].sysmlid) {
+				json.elements[0].sysmlid = json.elements[0].name + 'Id';
+			}
+
+			return [200, json];
+		});
 	}));
 
 	it('can get an instance of the ViewService and methods are valid', inject(function() {
@@ -2119,14 +1722,86 @@ describe('ViewService', function() {
 
 	}));
 
-	// testable
+	// !-- NOTE: uses old web services API --!
+	// !-- NOTE: also loses track of version when retrieving from server --!
+	// done, expected to fail
 	it('getViewElements', inject(function() {
+		// (!viewElements.hasOwnProperty(ver) && * && *), fail
+		ViewService.getViewElements('badId', false, 'master', '01-01-2014').then(function(response) {
+			console.log('This should not be displayed');
+		}, function(failMes) {
+			expect(failMes.status).toEqual(200);
+		});
+		
+		// (!viewElements.hasOwnProperty(ver) && * && *), success, !viewElements.hasOwnProperty(ver)
+		ViewService.getViewElements('12345', false, 'master', '01-01-2014').then(function(response) {
+			expect(response.length).toEqual(2);
+			expect(response[0]).toEqual({author:'muschek', name:'view\'s element', sysmlid:12346, owner:12345, lastModified:'01-01-2014'});
+			expect(response[1]).toEqual({author:'muschek', name:'view\'s 2nd element', sysmlid:12347, owner:12345, lastModified:'01-01-2014'});
+		}); $httpBackend.flush();
+		// viewElements['01-01-2014']['12345'] now exists
 
+		// (viewElements.hasOwnProperty(ver) && !viewElements[ver].hasOwnProperty(id) && *), success, 
+		// viewElements.hasOwnProperty(ver)
+		ViewService.getViewElements('12345', false, 'master', 'latest').then(function(response) {
+			expect(response.length).toEqual(2);
+			expect(response[0]).toEqual({author:'muschek', name:'view\'s element', sysmlid:12346, owner:12345, lastModified:'07-28-2014'});
+			expect(response[1]).toEqual({author:'muschek', name:'view\'s 2nd element', sysmlid:12347, owner:12345, lastModified:'07-28-2014'});
+		}); $httpBackend.flush();
+		// viewElements['latest']['12345'] now exists
+
+		// (viewElements.hasOwnProperty(ver) && viewElements[ver].hasOwnProperty(id) && !update)
+		ViewService.getViewElements('12345', false, 'master', '01-01-2014').then(function(response) {
+			expect(response.length).toEqual(2);
+			expect(response[0]).toEqual({author:'muschek', name:'view\'s element', sysmlid:12346, owner:12345, lastModified:'01-01-2014'});
+			expect(response[1]).toEqual({author:'muschek', name:'view\'s 2nd element', sysmlid:12347, owner:12345, lastModified:'01-01-2014'});
+		}); $rootScope.$apply();
+
+		// (viewElements.hasOwnProperty(ver) && viewElements[ver].hasOwnProperty(id) && update),
+		// success, viewElements.hasOwnProperty(ver)
+		ViewService.getViewElements('12345', true, 'master', 'latest').then(function(response) {
+			expect(response.length).toEqual(2);
+			expect(response[0]).toEqual({author:'muschek', name:'view\'s element', sysmlid:12346, owner:12345, lastModified:'07-28-2014'});
+			expect(response[1]).toEqual({author:'muschek', name:'view\'s 2nd element', sysmlid:12347, owner:12345, lastModified:'07-28-2014'});
+		});
 	}));
 
-	// testable
+	// !-- NOTE: uses old web services API --!
+	// !-- NOTE: also uses a function that requires a site but none is given --!
+	// done, expected to fail
 	it('getDocumentViews', inject(function() {
+		// (!productViews.hasOwnProperty(ver) && * && *), fail
+		ViewService.getDocumentViews('badId', false, 'master', '01-01-2014').then(function(response) {
+			console.log('This should not be displayed');
+		}, function(failMes) {
+			expect(failMes.status).toEqual(200);
+		}); $httpBackend.flush();
 
+		// (!productViews.hasOwnProperty(ver) && * && *), success, !productViews.hasOwnProperty(ver)
+		ViewService.getDocumentViews(54321, false, 'master', '01-01-2014').then(function(response) {
+			expect(response.length).toEqual(1);
+			expect(response[0]).toEqual({author:'muschek', name:'doc view', owner:54321, sysmlid:54322, lastModified:'01-01-2014'});
+		}); $httpBackend.flush();
+
+		// (productViews.hasProperty(ver) && !productViews[ver].hasProperty(id) && *), success
+		// productViews.hasOwnProperty(ver)
+		ViewService.getDocumentViews(65432, false, 'master', 'latest').then(function(response) {
+			expect(response.length).toEqual(1);
+			expect(response[0]).toEqual({author:'muschek', name:'other id view', owner:65432, sysmlid:65433, lastModified:'07-28-2014'});
+		}); $httpBackend.flush();
+
+		// (productViews.hasOwnProperty(ver) && productViews[ver].hasOwnProperty(id) && !update)
+		ViewService.getDocumentViews(54321, false, 'master', '01-01-2014').then(function(response) {
+			expect(response.length).toEqual(1);
+			expect(response[0]).toEqual({author:'muschek', name:'doc view', owner:54321, sysmlid:54322, lastModified:'01-01-2014'});
+		}); $rootScope.$apply();
+
+		// (productViews.hasOwnProperty(ver) && productViews[ver].hasOwnProperty(id) && update)
+		// success, productViews.hasOwnProperty(ver)
+		ViewService.getDocumentViews(54321, true, 'master', 'latest').then(function(response) {
+			expect(response.length).toEqual(1);
+			expect(response[0]).toEqual({author:'muschek', name:'other id view', owner:65432, sysmlid:65433, lastModified:'07-28-2014'});
+		}); $httpBackend.flush();
 	}));
 
 	// done, empty
@@ -2141,18 +1816,97 @@ describe('ViewService', function() {
 	// done, empty
 	it('updateViewElements', inject(function() {}));
 
-	// testable
+	// done
 	it('addViewToDocument', inject(function() {
+		// fail
+		ViewService.addViewToDocument('viewId', 'badId', 'parentViewId', 'master').then(function(response) {
+			console.log('This should not be displayed');
+		}, function(failMes) {
+			expect(failMes.status).toEqual(404);
+			expect(failMes.data).toEqual('[ERROR]: Element with id, badId not found\n[WARNING]: No elements found');
+		}); $httpBackend.flush();
 
+		// success, data.specialization.view2view.length == 0, fail
+
+		// success, data has no specialization
+		expect(function() {
+			ViewService.addViewToDocument('viewId', 'noSpecDocId', 'parentViewId', 'master');
+			$httpBackend.flush();
+		}).toThrow(new Error('data.specialization is undefined'));
+
+		// success, data.specialization.view2view.length == 0, success
+		ViewService.addViewToDocument('viewId', 'emptyView2ViewDocId', 'parentViewId', 'master')
+		.then(function(response) {
+			expect(response.sysmlid).toEqual('emptyView2ViewDocId');
+			expect(response.specialization.view2view.length).not.toEqual(0);
+			expect(response.specialization.view2view[0]).toEqual({id: 'viewId', childrenViews:[]});
+		}); $httpBackend.flush();
+
+		// success, data.specialization.view2view.length > 0, fail
+
+		// success, data.specialization.view2view.length > 0, no id match, success
+		ViewService.addViewToDocument('viewId', 'noIdMatchDocId', 'parentViewId', 'master')
+		.then(function(response) {
+			expect(response.sysmlid).toEqual('noIdMatchDocId');
+			expect(response.specialization.view2view.length).toEqual(2);
+			expect(response.specialization.view2view[0]).toEqual({id:'notMatchingId', childrenViews:[]});
+			expect(response.specialization.view2view[1]).toEqual({id: 'viewId', childrenViews:[]});
+		}); $httpBackend.flush();
+
+		// success, data.specialization.view2vivew.length > 0, id match, success
+		ViewService.addViewToDocument('viewId', 'idMatchDocId', 'parentViewId', 'master')
+		.then(function(response) {
+			expect(response.sysmlid).toEqual('idMatchDocId');
+			expect(response.specialization.view2view.length).toEqual(3);
+			expect(response.specialization.view2view[0]).toEqual({id: 'nonMatchId', childrenViews:[]});
+			expect(response.specialization.view2view[1]).toEqual({id: 'parentViewId', childrenViews:['viewId']});
+			expect(response.specialization.view2view[2]).toEqual({id: 'viewId', childrenViews:[]});
+		}); $httpBackend.flush();
 	}));
 
-	// testable
+	// !-- NOTE: due to how ElementService.updateElement works the new view's owner property will be deleted --!
+	// Test cases assume that ElementService's method both pass correctly
+	// done - expect this to fail
 	it('createView', inject(function() {
+
+		// createElement - pass, updateElement - pass, !documentId
+		ViewService.createView('ownerId', undefined, undefined, 'master').then(function(response) {
+			expect(response.owner).toEqual('ownerId');
+			expect(response.name).toEqual('Untitled View');
+			expect(response.documentation).toEqual('');
+			expect(response.specialization.type).toEqual('View');
+			expect(response.specialization.contains).toEqual([{type:'Paragraph', sourceType:'reference',
+				source: response.sysmlid, sourceProperty:'documentation'}]);
+			expect(response.specialization.allowedElements).toEqual([response.sysmlid]);
+			expect(response.specialization.displayedElements).toEqual([response.sysmlid]);
+			expect(response.specialization.childrenViews).toEqual([]);
+		}); $httpBackend.flush();
+
+		// createElement - pass, updateElement - pass, documentId, addViewToDoc - fail
+
+		// createElement - pass, updateElement - pass, documentId, addViewToDoc - pass
+		ViewService.createView('ownerId', 'name', 'idMatchDocId', 'master').then(function(response) {
+			expect(response.owner).toEqual('ownerId');
+			expect(response.name).toEqual('name');
+			expect(response.documentation).toEqual('');
+			expect(response.specialization.type).toEqual('View');
+			expect(response.specialization.contains).toEqual([{type:'Paragraph', sourceType:'reference',
+				source: response.sysmlid, sourceProperty:'documentation'}]);
+			expect(response.specialization.allowedElements).toEqual([response.sysmlid]);
+			expect(response.specialization.displayedElements).toEqual([response.sysmlid]);
+			expect(response.specialization.childrenViews).toEqual([]);
+		}); $httpBackend.flush();
 
 	}));
 
 	// testable
 	it('getSiteDocuments', inject(function() {
+
+		// (!siteDocuments.hasOwnProperty(site) && *), getGenericElements - fail
+
+		// (!siteDocuments.hasOwnProperty(site) && *), getGenericElements - pass
+
+		// (siteDocuments.hasOwnProperty(site) && !update)
 
 	}));
 
