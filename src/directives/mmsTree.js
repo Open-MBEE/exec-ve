@@ -123,8 +123,8 @@ function mmsTree($timeout, $log, $templateCache) {
                         expand_icon = attrs.iconExpand;
                 } else
                     expand_icon = "fa fa-square-o";
-                if (scope.options && scope.options[branch.type])
-                    type_icon = scope.options[branch.type];
+                if (scope.options && scope.options.types && scope.options.types[branch.type])
+                    type_icon = scope.options.types[branch.type];
                 else
                     type_icon = attrs.iconDefault;
                 scope.tree_rows.push({
