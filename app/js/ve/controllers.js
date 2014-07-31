@@ -195,6 +195,12 @@ function($scope, $rootScope, $state, document, snapshots, site, time, ElementSer
             });
         });
     };
+    $scope.tree_options = {
+        types: {
+            "section": "fa fa-file-o fa-fw",
+            "view": "fa fa-file fa-fw"
+        }
+    };
 }])
 .controller('ReorderCtrl', ['$scope', 'document', 'ElementService', 'ViewService', '$state', 'growl',
 function($scope, document, ElementService, ViewService, $state, growl) {

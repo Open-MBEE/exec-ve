@@ -7,13 +7,11 @@ function mmsTree($timeout, $log, $templateCache) {
 
     var mmsTreeLink = function(scope, element, attrs) {
         if (!attrs.iconExpand)
-            attrs.iconExpand = 'fa fa-plus';
+            attrs.iconExpand = 'fa fa-plus fa-fw';
         if (!attrs.iconCollapse)
-            attrs.iconCollapse = 'fa fa-minus';
-        if (!attrs.iconLeaf)
-            attrs.iconLeaf = 'fa fa-file';
-        if (!attrs.iconSection)
-            attrs.iconSection = 'fa fa-file-o';
+            attrs.iconCollapse = 'fa fa-minus fa-fw';
+        if (!attrs.iconDefault)
+            attrs.iconDefault = 'fa fa-file fa-fw';
         if (!attrs.expandLevel)
             attrs.expandLevel = '3';
         var expand_level = parseInt(attrs.expandLevel, 10);
@@ -94,6 +92,7 @@ function mmsTree($timeout, $log, $templateCache) {
                     if (b.data.sysmlid === scope.initialSelection)
                         select_branch(b);
                 });
+                on_treeData_change();
             }
         };
 
@@ -113,31 +112,29 @@ function mmsTree($timeout, $log, $templateCache) {
             });
             scope.tree_rows = [];
             var add_branch_to_list = function(level, section, branch, visible) {
-                var tree_icon;
+                var expand_icon = "";
+                var type_icon = "";
                 if (!branch.expanded)
                     branch.expanded = false;
-                if (!branch.children || branch.children.length === 0) {
-                    if (section === '§ ')
-                        tree_icon = attrs.iconSection;
-                    else
-                        tree_icon = attrs.iconLeaf;
-                } else {
+                if (branch.children && branch.children.length > 0) {
                     if (branch.expanded) 
-                        tree_icon = attrs.iconCollapse;
+                        expand_icon = attrs.iconCollapse;
                     else
-                        tree_icon = attrs.iconExpand;
-                }
-                var type_class = '';
-                if (scope.options && scope.options[branch.type])
-                    type_class = scope.options[branch.type];
+                        expand_icon = attrs.iconExpand;
+                } else
+                    expand_icon = "fa fa-fw";
+                if (scope.options && scope.options.types && scope.options.types[branch.type])
+                    type_icon = scope.options.types[branch.type];
+                else
+                    type_icon = attrs.iconDefault;
                 scope.tree_rows.push({
                     level: level,
                     section: section,
                     branch: branch,
                     label: branch.label,
-                    tree_icon: tree_icon,
+                    expand_icon: expand_icon,
                     visible: visible,
-                    type_class: type_class
+                    type_icon: type_icon
                 });
                 if (branch.children) {
                     for (var i = 0, j = 0; i < branch.children.length; i++) {
@@ -176,12 +173,15 @@ function mmsTree($timeout, $log, $templateCache) {
                     });
                 }
             });
+
         }
 
         for_each_branch(function(b, level) {
             b.level = level;
-            b.expanded = b.level < expand_level;
+            b.expanded = b.level <= expand_level;
         });
+
+        on_treeData_change();
 
         scope.user_clicks_branch = function(branch) {
             if (branch !== selected_branch) 
