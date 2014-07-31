@@ -7,11 +7,11 @@ function mmsTree($timeout, $log, $templateCache) {
 
     var mmsTreeLink = function(scope, element, attrs) {
         if (!attrs.iconExpand)
-            attrs.iconExpand = 'fa fa-plus';
+            attrs.iconExpand = 'fa fa-plus fa-fw';
         if (!attrs.iconCollapse)
-            attrs.iconCollapse = 'fa fa-minus';
+            attrs.iconCollapse = 'fa fa-minus fa-fw';
         if (!attrs.iconDefault)
-            attrs.iconDefault = 'fa fa-file';
+            attrs.iconDefault = 'fa fa-file fa-fw';
         if (!attrs.expandLevel)
             attrs.expandLevel = '3';
         var expand_level = parseInt(attrs.expandLevel, 10);
@@ -122,7 +122,7 @@ function mmsTree($timeout, $log, $templateCache) {
                     else
                         expand_icon = attrs.iconExpand;
                 } else
-                    expand_icon = "fa fa-square-o";
+                    expand_icon = "fa fa-fw";
                 if (scope.options && scope.options.types && scope.options.types[branch.type])
                     type_icon = scope.options.types[branch.type];
                 else

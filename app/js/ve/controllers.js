@@ -197,8 +197,8 @@ function($scope, $rootScope, $state, document, snapshots, site, time, ElementSer
     };
     $scope.tree_options = {
         types: {
-            "section": "fa fa-file-o",
-            "view": "fa fa-file"
+            "section": "fa fa-file-o fa-fw",
+            "view": "fa fa-file fa-fw"
         }
     };
 }])
