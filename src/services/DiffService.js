@@ -1,8 +1,6 @@
 'use strict';
 
-angular.module('mms.directives.diff', ['mms', 'mms.directives']);
-
-angular.module('mms.directives.diff')
+angular.module('mms')
 .factory('DiffService', ['$rootScope', DiffService]);
 
 function DiffService($rootScope) {

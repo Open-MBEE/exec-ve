@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('mms.directives.diff')
+angular.module('mms.directives')
 .directive('mmsDiffTable', ['$templateCache', 'DiffService', mmsDiffTable]);
 
 function mmsDiffTable($templateCache, DiffService) {
