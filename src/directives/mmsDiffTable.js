@@ -5,22 +5,22 @@ angular.module('mms.directives.diff')
 
 function mmsDiffTable($templateCache, DiffService) {
   
-  var MMSDiffTableController = function($scope) {
+  var MMSDiffTableController = function($scope, $rootScope) {
     // Diff the two workspaces picked in the Workspace Picker
     var response = DiffService.diff('ws1', 'ws2');
     var originals = response.workspace1.elements;
     var deltas = response.workspace2;
 
     // Initializations
-    $scope.api = DiffService;
+    $rootScope.tableElement = null;
     $scope.original = {};
     $scope.delta = {};
 
     // Watch for user selections in the containment tree
-    $scope.$watch('api.tableElement', function() {
-      if ($scope.api.tableElement !== null) {
-        $scope.original.name = $scope.api.tableElement.name;
-        $scope.original.owner = $scope.api.tableElement.owner;
+    $rootScope.$watch('tableElement', function() {
+      if ($rootScope.tableElement !== null) {
+        $scope.original.name = $rootScope.tableElement.name;
+        $scope.original.owner = $rootScope.tableElement.owner;
 
         // TODO - set $scope.delta with proper values
       }
@@ -84,6 +84,6 @@ function mmsDiffTable($templateCache, DiffService) {
   return {
     restrict: 'E',
     template: MMSDiffTableTemplate,
-    controller: ['$scope', 'DiffService' , MMSDiffTableController]
+    controller: ['$scope', '$rootScope', 'DiffService' , MMSDiffTableController]
   };
 }
