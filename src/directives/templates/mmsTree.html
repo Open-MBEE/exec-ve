@@ -1,5 +1,4 @@
 <ul class="nav nav-list nav-pills nav-stacked abn-tree">
-
       <li ng-repeat="row in tree_rows | filter:{visible:true} | filter:{label:search} track by row.branch.uid" 
       ng-class="'level-' + {{row.level}}" class="abn-tree-row">
 
@@ -9,9 +8,9 @@
 
         	<div class="shaft" ng-class="{'shaft-selected': row.branch.selected, 'shaft-hidden': !row.branch.selected}">
 
-  	        <a ng-click="user_clicks_branch(row.branch)">
+  	        <a ng-click="user_clicks_branch(row.branch);  setDefaultTool($root)">
 
-              <i ng-class="{'active-text': row.branch.selected}" ng-click="row.branch.expanded = !row.branch.expanded; $event.stopPropagation();" class="indented tree-icon {{row.tree_icon}}" ></i>
+              <i ng-class="{'active-text': row.branch.selected}" ng-click="row.branch.expanded = !row.branch.expanded; $event.stopPropagation(); on_treeData_change();" class="indented tree-icon {{row.tree_icon}}" ></i>
               <span class="indented tree-label" ng-class="{'active-text': row.branch.selected}">{{row.section}} {{row.branch.data.name}}</span>
 
   	        </a>
@@ -20,7 +19,5 @@
           <div class="triangle-right" ng-class="{'triangle-right-selected': row.branch.selected, 'triangle-right-hidden': !row.branch.selected}"></div>
 
     		</div>
-
   </li>
-
 </ul>

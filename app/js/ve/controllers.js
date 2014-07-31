@@ -10,8 +10,7 @@ function($scope, $rootScope, $state, document, snapshots, site, time, ElementSer
     $scope.site = site;
     $scope.time = time;
     $scope.editable = $scope.document.editable && time === 'latest';
-    $rootScope.hasEditingPermission = $scope.editable;
-    $rootScope.$broadcast('viewDataLoaded', $scope.editable);
+    $rootScope.$broadcast('versionPermission', time === 'latest');
     $rootScope.tree_initial_selection = $scope.document.sysmlid;
     $scope.buttons = [{
         action: function(){ $scope.my_tree.expand_all(); },        

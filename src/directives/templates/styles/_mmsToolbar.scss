@@ -44,3 +44,11 @@ a.tools:hover {
 	background-color: white;
 	box-shadow: none;
 }
+
+@media screen and (max-width: 45em) {
+	@-moz-document url-prefix() {
+		.right-toolbar {
+			top: -40px;
+		}
+	}
+}

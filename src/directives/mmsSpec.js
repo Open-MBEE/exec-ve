@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsSpec', ['ElementService', '$compile', '$templateCache', '$modal', 'growl', mmsSpec]);
+.directive('mmsSpec', ['ElementService', '$compile', '$templateCache', '$modal', 'growl', '$rootScope', mmsSpec]);
 
 /**
  * @ngdoc directive
@@ -45,12 +45,12 @@ angular.module('mms.directives')
  * @param {Object=} mmsElement An element object, if this is provided, a read only 
  *      element spec for it would be shown, this will not use mms services to get the element
  */
-function mmsSpec(ElementService, $compile, $templateCache, $modal, growl) {
+function mmsSpec(ElementService, $compile, $templateCache, $modal, growl, $rootScope) {
     //var readTemplate = $templateCache.get('mms/templates/mmsSpec.html');
     //var editTemplate = $templateCache.get('mms/templates/mmsSpecEdit.html');
     var template = $templateCache.get('mms/templates/mmsSpec.html');
 
-    var mmsSpecLink = function(scope, element, attrs) {
+    var mmsSpecLink = function(scope, element, attrs, $rootScope) {
         scope.editing = false;
         scope.editable = true;
         if (scope.mmsElement) {
@@ -80,6 +80,7 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, growl) {
                         !scope.element.editable || 
                         (scope.mmsVersion !== 'latest' && scope.mmsVersion)) {
                     scope.editable = false;
+                    scope.$emit('elementEditability', scope.editable);
                     //template = readTemplate;
                     
                     //element.append(template);
@@ -90,8 +91,8 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, growl) {
                         scope.edit = data;
                         scope.editable = true;
                         //template = editTemplate;
-                        if (scope.edit.specialization.type === 'Property' && 
-                                angular.isArray(scope.edit.specialization.value)) {
+                        scope.$emit('elementEditability', scope.editable);
+                        if (scope.edit.specialization.type === 'Property' && angular.isArray(scope.edit.specialization.value)) {
                             scope.editValues = scope.edit.specialization.value;
                         }
                         //element.append(template);

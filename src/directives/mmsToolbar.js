@@ -9,24 +9,36 @@ function mmsToolbar($templateCache, $rootScope, toolService, $stateParams, Confi
 	$rootScope.editorIsOpen = false;
 	$rootScope.reorderIsOpen = false;
 	$rootScope.showVersionList = false;
-	var hasPermission;
-	
-	$rootScope.$on('viewDataLoaded', function(){
-		hasPermission = $rootScope.hasEditingPermission;
-		$rootScope.$broadcast('test', $rootScope.hasEditingPermission);
-	});
 
 	var mmsToolbarLink = function(scope, $rootScope, element, attrs, $stateParams, ConfigService, ElementService){
 		scope.tools = [
 			{tooltype: "viewer", icon: "fa-eye", selected: true, permission: true},
-			{tooltype: "editor", icon: "fa-edit", selected: false, permission: hasPermission},
-			{tooltype: "reorder", icon: "fa-arrows", selected: false, permission: hasPermission},
+			{tooltype: "editor", icon: "fa-edit", selected: false, permission: false},
+			{tooltype: "reorder", icon: "fa-arrows", selected: false, permission: false},
 			{tooltype: "versions", icon: "fa-camera", selected: false, permission: true}
 		];
 
-		scope.$on('test', function(){
-			scope.tools[1].permission = hasPermission;
-			scope.tools[2].permission = hasPermission; 
+		scope.reorderPermission = false;
+		scope.$on('versionPermission', function(event, version){
+			scope.reorderPermission = version;
+		});
+
+		scope.$on('elementEditability', function(event, elementPermission){
+			scope.tools[1].permission = elementPermission;
+			if(!elementPermission && scope.tools[1].selected === true) {
+				scope.tools[0].selected = true;
+				toolService.selectTool("viewer");
+				scope.setVal("viewer");
+			}
+		});
+
+		scope.$on('viewEditability', function(event, viewPermission){
+			scope.tools[2].permission = viewPermission && scope.reorderPermission;
+			if(!viewPermission && scope.tools[2].selected === true) {
+				scope.tools[0].selected = true;
+				toolService.selectTool("viewer");
+				scope.setVal("viewer");
+			}
 		});
 
 		scope.setVal = function(str){
