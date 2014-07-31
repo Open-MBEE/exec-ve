@@ -424,13 +424,16 @@ describe('ConfigService', function() {
 	}));
 });
 
-// ElementService - incomplete, 12 methods, [9 done, 1 empty, 2 untested] 
+// ElementService - incomplete, 12 methods, [10 done, 1 empty, 1 untested] 
 // !-- NOTE: still missing testing with inProgress --!
 describe('ElementService', function() {
 	beforeEach(module('mms'));
 
 	var myElementService, $httpBackend, $rootScope;
 
+	var root = '/alfresco/service';
+	var forceEmpty, forceFail;
+	var displayError = function() { console.log('This should not be displayed') };
 
 	var element_17783 = {
 		    "author": "jsalcedo",
@@ -541,22 +544,61 @@ describe('ElementService', function() {
 	    "editable": true
 	};
 
-	var emptyElements = {elements: []};
-
 	beforeEach(inject(function($injector) {
 		ElementService = $injector.get('ElementService');
 		$httpBackend = $injector.get('$httpBackend');
 		$rootScope = $injector.get('$rootScope');
 
+		forceEmpty = false;
+		forceFail = false;
 
-		$httpBackend.whenGET('/alfresco/service/workspaces/master/elements/_17783').respond({elements: [element_17783]});
-		$httpBackend.whenGET('/alfresco/service/workspaces/master/elements/_17784').respond(function(method, url, data) {
+		// GetElement responses
+		$httpBackend.whenGET(root + '/workspaces/master/elements/12345?timestamp=01-01-2014').respond(
+			{ elements: [ { sysmlid:12345, specialization: { type:'Comment' }, lastModified: '01-01-2014' } ] } );
+		$httpBackend.whenGET(root + '/workspaces/master/elements/12345').respond( function(method, url, data) {
+			var elements;
+			if (forceEmpty) 
+				elements = { elements: [] };
+			else {
+				elements = {elements: [ { sysmlid:12345, specialization: { type:'Comment' },
+					lastModified: '07-30-2014'} ] };
+			}
+			return [200, elements];});
+		$httpBackend.whenGET(root + '/workspaces/master/elements/12346').respond( function(method, url, data) {
+			if (forceFail) {
+				return [500, undefined, {status: {code:500, name:'Internal Error', 
+					description:'An error inside the HTTP server which prevented it from fulfilling the request.'}}];
+			} else {
+				return [200, { elements: [ { sysmlid: 12346, specialization: { type:'Package'} } ] } ];
+			}});
+	
+
+		// GetElement misc responses
+		$httpBackend.whenGET(root + '/workspaces/master/elements/badId').respond( function(method, url, data) {
+			var error = "[ERROR]: Element with id, badId not found\n[WARNING]: No elements found";
+			return [404, error];});
+		$httpBackend.whenGET(root + '/workspaces/master/elements/emptyId').respond( { elements: [] });
+		$httpBackend.whenGET(root + '/workspaces/master/elements').respond(
+			{elements:[ {sysmlid:12345, name:'commentElement', documentation:'old documentation',
+			specialization:{type:'Comment'}}, {sysmlid:12346, name:'packageElement', 
+			specialization:{type:'Package'}}]});
+		$httpBackend.whenGET(root + '/workspaces/master/elements/noSpecialization').respond(
+			{ elements: [ { sysmlid: 'noSpecialization', documentation: 'has no specialization' } ] } );
+		$httpBackend.whenGET(root + '/workspaces/master/elements/operationId').respond(
+			{ elements: [ { sysmlid: 'operationId', specialization: { type: 'Operation', 
+			parameters: [ 'paramId', 'paramId2' ], expresion: 'expressionId' } } ] } );
+		$httpBackend.whenGET(root + '/workspaces/master/elements/productId').respond(
+			{ elements: [ { sysmlid: 'productId', specialization: { type: 'Product', 
+			view2view: [ { sysmlid: 'viewId', childrenViews:[] } ], noSections: [] } } ] } );
+
+		$httpBackend.whenGET(root + '/workspaces/master/elements/_17783').respond({elements: [element_17783]});
+		$httpBackend.whenGET(root + '/workspaces/master/elements/_17784').respond(function(method, url, data) {
 			var response = "[ERROR]: Element with id, _17784 not found\n[WARNING]: No elements found";
 			return [404, response];
 		});
-		$httpBackend.whenGET('/alfresco/service/workspaces/master/elements/_17448').respond({elements: [element_17448]});
+		$httpBackend.whenGET(root + '/workspaces/master/elements/_17448').respond({elements: [element_17448]});
 
-		$httpBackend.when('POST', '/alfresco/service/workspaces/master/elements').respond(function(method, url, data) {
+		$httpBackend.whenPOST(root + '/workspaces/master/elements').respond(function(method, url, data) {
 			var json = JSON.parse(data);
 			if (!json.elements[0].sysmlid) {
 				json.elements[0].sysmlid = json.elements[0].name;
@@ -564,20 +606,13 @@ describe('ElementService', function() {
 			return [200, json];
 		});
 
-		$httpBackend.whenGET('/alfresco/service/workspaces/master/sites/siteId/products?timestamp=01-01-2014')
+		$httpBackend.whenGET(root + '/workspaces/master/sites/siteId/products?timestamp=01-01-2014')
 		.respond({products:[{sysmlid:'PROJECT-123456', name:'Europa', projectVersion:'v1'},
 			{sysmlid:'PROJECT-2468', name:'Europa FS', projectVersion:'v34'}]});
-		$httpBackend.whenGET('/alfresco/service/workspaces/master/sites/siteId').respond(function(method, url) {
+		$httpBackend.whenGET(root + '/workspaces/master/sites/siteId').respond(function(method, url) {
 			return [500, undefined, {status: {code:500, name:'Internal Error', 
 				description:'An error inside the HTTP server which prevented it from fulfilling the request.'}}];
 		});
-		$httpBackend.whenGET('/alfresco/service/workspaces/master/elements').respond({elements:[
-			{sysmlid:12345, name:'commentElement', documentation:'old documentation',
-				specialization:{type:'Comment'}}, 
-			{sysmlid:12346, name:'packageElement', specialization:{type:'Package'}}]});
-
-		$httpBackend.whenGET('/alfresco/service/workspaces/master/elements/emptyId').respond(emptyElements);
-
 	}));
 
 	it('can get an instance of the ElementService and methods are valid', inject(function() {
@@ -596,187 +631,371 @@ describe('ElementService', function() {
 		expect(ElementService.search).not.toBe(null);
 	}));
 
-	// done - minus version
+	// !-- NOTE: calls on the VersionService.getElement function --!
+	// done - 1 expected to fail
 	it('getElement', inject(function() {
 
-		// Default: elements of length >= 1
-		ElementService.getElement('_17783').then(function(element) {
-			expect(element.author).toEqual('jsalcedo');
-		});
-
+		// !-- NOTE: expects to fail --!
+		// !(inProgress.hasOwnProperty(key)), !(ver === 'latest'), VersionService.getElement...
+		expect( function() {
+			ElementService.getElement(12345, undefined, undefined, '01-01-2014').then(function(response) {
+				expect(response.sysmlid).toEqual( 12345 );
+				expect(response.specialization).toEqual( { type: 'Comment' } );
+				expect(response.lastModified).toEqual( '01-01-2014' );
+			}); $httpBackend.flush();
+		}).toThrow();
+		
+		// !(inProgress.hasOwnProperty(key)), (ver === 'latest'), !(elements.hasOwnProperty(id)),
+		// $http.get - fail
+		ElementService.getElement('badId', undefined, undefined, 'latest').then(function(response) { displayError(); },
+			function(failMessage) {
+				expect(failMessage.status).toEqual(404);
+				expect(failMessage.data).toEqual("[ERROR]: Element with id, badId not found\n[WARNING]: No elements found");
+				expect(failMessage.message).toEqual('Not Found');
+			});
 		$httpBackend.flush();
 
-		// Elements not found: elements of length == 0
-		ElementService.getElement('_17784').then(function(element) {
-			console.log('should not display');
-		}, function(failMes) {
-			expect(failMes.status).toEqual(404);
-			expect(failMes.message).toEqual('Not Found');
-			expect(failMes.data).toEqual('[ERROR]: Element with id, _17784 not found\n[WARNING]: No elements found');
-		});
-
+		// !(inProgress.hasOwnProperty(key)), (ver === 'latest'), !(elements.hasOwnProperty(id)),
+		// $http.get - pass, !(data.elements.length > 0)
+		ElementService.getElement('emptyId', undefined, undefined, 'latest').then(function(response) { displayError(); },
+			function(failMessage) {
+				expect(failMessage.status).toEqual(200);
+				expect(failMessage.message).toEqual('Not Found');
+			});
 		$httpBackend.flush();
 
-		// Different version from latest
+		// !(inProgress.hasOwnProperty(key)), (ver === 'latest'), !(elements.hasOwnProperty(id)),
+		// $http.get - pass, (data.elements.length > 0), !(elements.hasOwnProperty(id))
+		ElementService.getElement('12345', undefined, undefined, 'latest').then(function(response) {
+			expect(response.sysmlid).toEqual( 12345 );
+			expect(response.specialization).toEqual( { type: 'Comment' } );
+			expect(response.lastModified).toEqual( '07-30-2014' );
+		}); $httpBackend.flush();
+		// elements[12345] now exists
 
-		// Error
+		/*
+		Cannot exist because the 'elements' cache does not change between the two checks.
+		 !(inProgress.hasOwnProperty(key)), (ver === 'latest'), !(elements.hasOwnProperty(id)),
+		 $http.get - pass, (data.elements.length > 0), (elements.hasOwnProperty(id))
+		*/
+
+		// !(inProgress.hasOwnProperty(key)), (ver === 'latest'), (elements.hasOwnProperty(id)),
+		// !(!update), $http.get - fail
+		var twoElementURL = root + '/workspaces/master/elements';
+		ElementService.getGenericElements(twoElementURL, 'elements', true, 'master', 'latest');
+		// elements[12346] now exists
+		forceFail = true;
+		ElementService.getElement('12346', true, undefined, 'latest').then(function(response) { displayError(); },
+			function(failMessage) {
+				expect(failMessage.status).toEqual(500);
+				expect(failMessage.data).toEqual(undefined);
+				expect(failMessage.message).toEqual('Server Error');
+			});
+		$httpBackend.flush();
+		forceFail = false;
+
+		// !(inProgress.hasOwnProperty(key)), (ver === 'latest'), (elements.hasOwnProperty(id)),
+		// !(!update), $http.get - pass, !(data.elements.length > 0)
+		forceEmpty = true;
+		ElementService.getElement('12345', true, undefined, 'latest').then(function(response) { displayError(); },
+			function(failMessage) {
+				expect(failMessage.status).toEqual(200);
+				expect(failMessage.data).toEqual( { elements: [] } );
+				expect(failMessage.message).toEqual('Not Found');
+			});
+		$httpBackend.flush();
+		forceEmpty = false;
+
+		/*
+		Cannot exist because the 'elements' cache does not change between the two checks.
+		 !(inProgress.hasOwnProperty(key)), (ver === 'latest'), (elements.hasOwnProperty(id)),
+		 !(!update), $http.get - pass, (data.elements.length > 0), !(elements.hasOwnProperty(id))
+		*/
+
+		// !(inProgress.hasOwnProperty(key)), (ver === 'latest'), (elements.hasOwnProperty(id)),
+		// (!update)
+		ElementService.getElement('12345', false, undefined, 'latest').then(function(response) {
+			expect(response.sysmlid).toEqual(12345);
+			expect(response.specialization).toEqual( { type: 'Comment' } );
+			expect(response.lastModified).toEqual('07-30-2014');
+		}); $rootScope.$apply();
+
+		// (inProgress.hasOwnProperty(key))
+		var firstPromise = ElementService.getElement('12345', true, undefined, 'latest');
+		var secondPromise = ElementService.getElement('12345', true, undefined, 'latest');
+		expect(secondPromise).toEqual(firstPromise);
 	}));
 
-	// done - unless redundant testing is required
+	// done
 	it('getElements', inject(function() {
 
-		var ids = ['_17783', '_17448'];
-		
-		ElementService.getElements(ids).then(function(elements) {
-			expect(elements[0]).toEqual(element_17783);
-			expect(elements[1]).toEqual(element_17448);
+		// Empty ids
+		var ids = [];
+		ElementService.getElements(ids, undefined, undefined, undefined).then(function(response) {
+			expect(response).toEqual( [] );
+		}); $rootScope.$apply();
 
-		}, function(failMes) {
-			console.log('$q.all fail');
-		});
+		// One valid id
+		ids = ['12345'];
+		ElementService.getElements(ids, undefined, undefined, undefined).then(function(response) {
+			expect(response.length).toEqual(1);
+			expect(response[0].sysmlid).toEqual(12345);
+			expect(response[0].specialization).toEqual( { type: 'Comment' } );
+			expect(response[0].lastModified).toEqual( '07-30-2014' );
+		}); $httpBackend.flush();
+		// elements[12345] now exists
 
+		// Couple valid ids
+		ids = ['12345', '12346'];
+		ElementService.getElements(ids, undefined, undefined, undefined).then(function(response) {
+			expect(response.length).toEqual(2);
+
+			expect(response[0].sysmlid).toEqual(12345);
+			expect(response[0].specialization).toEqual( { type: 'Comment' } );
+			expect(response[0].lastModified).toEqual( '07-30-2014' );
+
+			expect(response[1].sysmlid).toEqual(12346);
+			expect(response[1].specialization).toEqual( { type: 'Package' } );
+		}); $httpBackend.flush();
+		// elements[12346] now exists
+
+		// Invalid id, but no update
+		forceFail = true;
+		ids = ['12346'];
+		ElementService.getElements(ids, false, undefined, undefined).then(function(response) {
+			expect(response.length).toEqual(1);
+
+			expect(response[0].sysmlid).toEqual(12346);
+			expect(response[0].specialization).toEqual( { type: 'Package' } );
+		}); $rootScope.$apply();
+
+		// Invalid id, but will update
+		ElementService.getElements(ids, true, undefined, undefined).then(function(response) { displayError(); },
+			function(failMessage) {
+				expect(failMessage.status).toEqual(500);
+				expect(failMessage.data).toEqual(undefined);
+				expect(failMessage.message).toEqual('Server Error');
+			});
 		$httpBackend.flush();
 
-		// Empty list of ids
-		ids = [];
-		ElementService.getElements(ids).then(function(elements) {
-			expect(elements).toEqual([]);
-		}, function(failMes) {
-			console.log('This should not fail.');
-		});
-
-
-		// Along with valid ids, one invalid id - 404
-		ids.push('_17784');
-
-		ElementService.getElements(ids).then(function(elements) {
-			console.log('This message should not be displayed.');
-		}, function(failMes) {
-			expect(failMes.status).toEqual(404);
-			expect(failMes.message).toEqual('Not Found');
-			expect(failMes.data).toEqual('[ERROR]: Element with id, _17784 not found\n[WARNING]: No elements found');
-		});
-
+		// Mixed (valid and invalid) ids
+		ids = ['12345', '12346'];
+		ElementService.getElements(ids, true, undefined, undefined).then(function(response) { displayError(); }, 
+			function(failMessage) {
+				expect(failMessage.status).toEqual(500);
+				expect(failMessage.data).toEqual(undefined);
+				expect(failMessage.message).toEqual('Server Error');
+			});
 		$httpBackend.flush();
-		
 	}));
 
-	// done - minus workspaces != master
+	// !-- NOTE: when trying to remove attributes from the specialization that should
+	// not be editable function actually removes nothing. --!
+	// done - 3 expected to fail
 	it('getElementForEdit', inject(function() {
 
-		// Default - no optional params
-		ElementService.getElementForEdit('_17783').then(function(element) {
-			expect(element.author).toEqual('jsalcedo');
-		});
-
-		// Default - updateFromServer = false
-		ElementService.getElementForEdit('_17783', false).then(function(element) {
-			expect(element.author).toEqual('jsalcedo');
-		});
-
-		// Default - [updateFromServer = false, workspaces = 'master']
-		ElementService.getElementForEdit('_17783', false, 'master').then(function(element) {
-			expect(element.author).toEqual('jsalcedo');
-		});
-
-		// workspaces != 'master'
-
-
-		// exists in edits and update = false
-		ElementService.getElementForEdit('_17783', false).then(function(element) {
-			var element4Edit = element;
-			element4Edit.author = 'muschek';
-
-			ElementService.getElementForEdit('_17783', false).then(function(element2) {
-				expect(element2.author).toEqual('muschek');
+		/*
+			!(edits.hasOwnProperty(id) && !update), getElement - fail
+				a. (edits.hasOwnProperty(id) && update)
+				b. (!edits.hasOwnProperty(id) && !update)
+		*/
+		ElementService.getElementForEdit('badId', true, undefined).then(function(response) { displayError(); },
+			function(failMessage) {
+				expect(failMessage.status).toEqual(404);
+				expect(failMessage.message).toEqual('Not Found');
 			});
-		});
-
-		// exists in edits and update = true
-		ElementService.getElementForEdit('_17783', false).then(function(element) {
-			var element4Edit = element;
-			element4Edit.author = 'muschek';
-
-			ElementService.getElementForEdit('_17783', true).then(function(element2) {
-				expect(element2.author).toEqual('jsalcedo');
-			});
-		});
-
-		// does not exist in edits and update = false
-		// See - (Default - updateFromServer = false)
-
-		// does not exist in edits and update = true
-		ElementService.getElementForEdit('_17783', true).then(function(element) {
-			expect(element.author).toEqual('jsalcedo');
-		});
-
-		// Bad sysmlid - 404
-		ElementService.getElementForEdit('_17784', true).then(function(response) {
-			console.log('This should not be displayed.');
-		}, function(failMes) {
-			expect(failMes.status).toEqual(404);
-			expect(failMes.message).toEqual('Not Found');
-			expect(failMes.data).toEqual('[ERROR]: Element with id, _17784 not found\n[WARNING]: No elements found');
-		});
-
-		// Error
-
 		$httpBackend.flush();
+
+		/*
+			!(edits.hasOwnProperty(id) && !update), getElement - pass, !(edits.hasOwnProperty(id)), 
+			!(edit.hasOwnProperty('specialization'))
+		*/
+		ElementService.getElementForEdit('noSpecialization', true, undefined).then(function(response) {
+			expect(response.sysmlid).toEqual('noSpecialization');
+			expect(response.documentation).toEqual('has no specialization');
+			expect(response.specialization).toEqual(undefined);
+		}); $httpBackend.flush();
+		// edits[noSpecialization] now exists
+
+		/*
+			!(edits.hasOwnProperty(id) && !update), getElement - pass, !(edits.hasOwnProperty(id)), 
+			(edit.hasOwnProperty('specialization')), !(edit.specialization.hasOwnProperty(nonEditKeys[i]))
+		*/
+		ElementService.getElementForEdit('operationId', true, undefined).then(function(response) {
+			expect(response.sysmlid).toEqual('operationId');
+			expect(response.specialization.type).toEqual('Operation');
+			expect(response.specialization.parameters.length).toEqual(2);
+			expect(response.specialization.expresion).toEqual('expressionId');
+		}); $httpBackend.flush();
+		// edits[operationId] now exists
+
+		/*
+			!(edits.hasOwnProperty(id) && !update), getElement - pass, !(edits.hasOwnProperty(id)), 
+			(edit.hasOwnProperty('specialization')), (edit.specialization.hasOwnProperty(nonEditKeys[i]))
+		*/
+		ElementService.getElementForEdit('productId', true, undefined).then(function(response) {
+			expect(response.sysmlid).toEqual('productId');
+			expect(response.specialization.type).toEqual('Product');
+			expect(response.specialization.noSections).toEqual( [] );
+			expect(response.specialization.view2view).toEqual( undefined );
+		}); $httpBackend.flush();
+		// edits[productId] now exists
+
+		/*
+			!(edits.hasOwnProperty(id) && !update), getElement - pass, (edits.hasOwnProperty(id)), 
+			!(edit.hasOwnProperty('specialization'))
+		*/
+		ElementService.getElementForEdit('noSpecialization', true, undefined).then(function(response) {
+			expect(response.sysmlid).toEqual('noSpecialization');
+			expect(response.documentation).toEqual('has no specialization');
+			expect(response.specialization).toEqual(undefined);
+
+			// edit the response
+			response.documentation = 'this element has no specialization';
+		}); $httpBackend.flush();
+		
+		// After edit
+		ElementService.getElementForEdit('noSpecialization', true, undefined).then(function(response) {
+			expect(response.sysmlid).toEqual('noSpecialization');
+			expect(response.documentation).toEqual('has no specialization');
+			expect(response.specialization).toEqual(undefined);
+		}); $httpBackend.flush();
+
+		/*
+			!(edits.hasOwnProperty(id) && !update), getElement - pass, (edits.hasOwnProperty(id)), 
+			(edit.hasOwnProperty('specialization')), !(edit.specialization.hasOwnProperty(nonEditKeys[i]))
+		*/
+		ElementService.getElementForEdit('operationId', true, undefined).then(function(response) {
+			expect(response.sysmlid).toEqual('operationId');
+			expect(response.specialization.type).toEqual('Operation');
+			expect(response.specialization.parameters.length).toEqual(2);
+			expect(response.specialization.expresion).toEqual('expressionId');
+
+			// now add documentation, to show for a change
+			response.documentation = 'operations do not have non-editable properties';
+		}); $httpBackend.flush();
+
+		/* 
+		 !-- NOTE: I'm not sure if the element for edit that has been updated from the server,
+		 ought to have the documentation property if it did not already exist, but currently,
+		 it does. -- !
+		*/
+		//After an edit has been made.
+		ElementService.getElementForEdit('operationId', true, undefined).then(function(response) {
+			expect(response.sysmlid).toEqual('operationId');
+			expect(response.specialization.type).toEqual('Operation');
+			expect(response.specialization.parameters.length).toEqual(2);
+			expect(response.specialization.expresion).toEqual('expressionId');
+			expect(response.documentation).toEqual('operations do not have non-editable properties');
+		}); $httpBackend.flush();
+
+		/*
+			!(edits.hasOwnProperty(id) && !update), getElement - pass, (edits.hasOwnProperty(id)), 
+			(edit.hasOwnProperty('specialization')), (edit.specialization.hasOwnProperty(nonEditKeys[i]))
+		*/
+		ElementService.getElementForEdit('productId', true, undefined).then(function(response) {
+			expect(response.sysmlid).toEqual('productId');
+			expect(response.specialization.type).toEqual('Product');
+			expect(response.specialization.noSections).toEqual( [] );
+			expect(response.specialization.view2view).toEqual( undefined );
+
+			// make an edit
+			response.documentation = 'products have non-editable properties';
+		}); $httpBackend.flush();
+
+		/* 
+		 !-- NOTE: I'm not sure if the element for edit that has been updated from the server,
+		 ought to have the documentation property if it did not already exist, but currently,
+		 it does. -- !
+		*/
+		//After an edit has been made.
+		ElementService.getElementForEdit('productId', true, undefined).then(function(response) {
+			expect(response.sysmlid).toEqual('productId');
+			expect(response.specialization.type).toEqual('Product');
+			expect(response.specialization.noSections).toEqual( [] );
+			expect(response.specialization.view2view).toEqual( undefined );
+			expect(response.documentation).toEqual('products have non-editable properties');
+		}); $httpBackend.flush();
+
+		//	(edits.hasOwnProperty(id) && !update)
+		ElementService.getElementForEdit('12345', true, undefined).then(function(response) {
+			expect(response.sysmlid).toEqual(12345);
+			expect(response.specialization.type).toEqual('Comment');
+			expect(response.lastModified).toEqual('07-30-2014');
+
+			// edit the response
+			response.lastModified = '07-31-2014';
+		}); $httpBackend.flush();
+
+		ElementService.getElementForEdit('12345', false, undefined).then(function(response) {
+			expect(response.sysmlid).toEqual(12345);
+			expect(response.specialization.type).toEqual('Comment');
+			expect(response.lastModified).toEqual('07-31-2014');
+		}); $rootScope.$apply();
 	}));
 
 	// done - unless redundant testing is required
 	it('getElementsForEdit', inject(function() {
 
+		/// Empty ids
+		var ids = [];
+		ElementService.getElementsForEdit(ids, undefined, undefined, undefined).then(function(response) {
+			expect(response).toEqual( [] );
+		}); $rootScope.$apply();
 
-		// Default
-		var ids = ['_17783', '_17448'];
-		ElementService.getElementsForEdit(ids).then(function(elements) {
-			expect(elements[0]).toEqual(element_17783);
-			expect(elements[1]).toEqual(element_17448);
+		// One valid id
+		ids = ['12345'];
+		ElementService.getElementsForEdit(ids, undefined, undefined, undefined).then(function(response) {
+			expect(response.length).toEqual(1);
+			expect(response[0].sysmlid).toEqual(12345);
+			expect(response[0].specialization).toEqual( { type: 'Comment' } );
+			expect(response[0].lastModified).toEqual( '07-30-2014' );
+		}); $httpBackend.flush();
+		// edits[12345] now exists
 
-			var mod_17783 = elements[0];
-			mod_17783.author = 'muschek';
-			mod_17783.documentation = 'the documentation has been modified';
+		// Couple valid ids
+		ids = ['12345', '12346'];
+		ElementService.getElementsForEdit(ids, undefined, undefined, undefined).then(function(response) {
+			expect(response.length).toEqual(2);
 
-			var mod_17448 = elements[1];
-			mod_17448.author = 'muschek';
-			mod_17448.documentation = 'the documentation has been modified';
+			expect(response[0].sysmlid).toEqual(12345);
+			expect(response[0].specialization).toEqual( { type: 'Comment' } );
+			expect(response[0].lastModified).toEqual( '07-30-2014' );
 
+			expect(response[1].sysmlid).toEqual(12346);
+			expect(response[1].specialization).toEqual( { type: 'Package' } );
+		}); $httpBackend.flush();
+		// edist[12346] now exists
 
-			// shows that the modifications exist in the edits cache
-			ElementService.getElementsForEdit(ids).then(function(elements2) {
-				expect(elements2[0]).toEqual(mod_17783);
-				expect(elements2[1]).toEqual(mod_17448);
+		// Invalid id, but no update
+		forceFail = true;
+		ids = ['12346'];
+		ElementService.getElementsForEdit(ids, false, undefined, undefined).then(function(response) {
+			expect(response.length).toEqual(1);
+
+			expect(response[0].sysmlid).toEqual(12346);
+			expect(response[0].specialization).toEqual( { type: 'Package' } );
+		}); $rootScope.$apply();
+
+		// Invalid id, but will update
+		ElementService.getElementsForEdit(ids, true, undefined, undefined).then(function(response) { displayError(); },
+			function(failMessage) {
+				expect(failMessage.status).toEqual(500);
+				expect(failMessage.data).toEqual(undefined);
+				expect(failMessage.message).toEqual('Server Error');
 			});
-
-			// shows that the modifications do not exist in the elements cache
-			ElementService.getElements(ids).then(function(elements3) {
-				expect(elements3[0]).toEqual(element_17783);
-				expect(elements3[1]).toEqual(element_17448);
-			})
-		});
 		$httpBackend.flush();
 
-
-		// Empty list of ids
-		ids = [];
-		ElementService.getElementsForEdit(ids).then(function(elements) {
-			expect(elements).toEqual([]);
-		}, function(failMes) {
-			console.log('This should not fail.');
-		});
-
-		// Bad sysmlid
-		ids.push('_17784');
-		ElementService.getElementsForEdit(ids).then(function(elements) {
-			console.log('This should not be displayed.');
-		}, function(failMes) {
-			expect(failMes.status).toEqual(404);
-			expect(failMes.message).toEqual('Not Found');
-			expect(failMes.data).toEqual('[ERROR]: Element with id, _17784 not found\n[WARNING]: No elements found');
-		});
+		// Mixed (valid and invalid) ids
+		ids = ['12345', '12346'];
+		ElementService.getElementsForEdit(ids, true, undefined, undefined).then(function(response) { displayError(); }, 
+			function(failMessage) {
+				expect(failMessage.status).toEqual(500);
+				expect(failMessage.data).toEqual(undefined);
+				expect(failMessage.message).toEqual('Server Error');
+			});
 		$httpBackend.flush();
-
+		forceFail = false;
 	}));
 
 	// is an empty function
@@ -992,7 +1211,7 @@ describe('ElementService', function() {
 
 	// !-- NOTE: when calling on elements that have sysmlid it will pass back copies of the first element
 	// that had no sysmlid --!
-	// 
+	// done
 	it('getGenericElements', inject(function() {
 		// (!inProgress.hasOwnProperty(progress)), (ver !== 'latest') 
 		var siteProductsURL = '/alfresco/service/workspaces/master/sites/siteId/products';
@@ -1049,9 +1268,11 @@ describe('ElementService', function() {
 			expect(response[1]).toEqual({sysmlid:12346, name:'packageElement', specialization:{type:'Package'}});
 		}); $httpBackend.flush();
 
-
 		// (inProgress.hasOwnProperty(progress))
-
+		var emptyURL = root + '/workspaces/master/elements/emptyId';
+		var firstPromise = ElementService.getGenericElements(emptyURL, 'elements', undefined, undefined, 'latest');
+		var secondPromise = ElementService.getGenericElements(emptyURL, 'elements', undefined, undefined, 'latest');
+		expect(secondPromise).toEqual(firstPromise);
 	}));
 
 	// done
@@ -1403,6 +1624,7 @@ describe('UtilsService', function() {
 	}));
 });
 
+/*
 // VersionService - incomplete, 4 methods, [4 $http]
 describe('VersionService', function() {
 	beforeEach(module('mms'));
@@ -1432,6 +1654,7 @@ describe('VersionService', function() {
 			$httpBackend.whenGET(/\/alfresco\/service\/workspaces\/master\/elements\/12346\?timestamp=01-01-2014+/).respond(
 			{elements: [{author:'muschek', name:'anotherBasicElement', sysmlid:12346, lastModified:'01-01-2014'}]});
 	*/
+	/*
 
 			$httpBackend.whenGET('/alfresco/service/workspaces/master/elements/12345?timestamp=01-01-2014').respond(
 			{elements: [{author:'muschek', name:'basicElement', sysmlid:12345, lastModified:'01-01-2014'}]});
@@ -1619,7 +1842,9 @@ describe('VersionService', function() {
 		// ..., ..., elements.hasProperty(element.sysmlid), elements[element.sysmlid].hasProperty(version)
 	}));
 });
+*/
 
+/*
 // ViewService - incomplete, 18 methods, [4 empty,  4 tested, 10 use $http]
 describe('ViewService', function() {
 	beforeEach(module('mms'));
@@ -1928,6 +2153,7 @@ describe('ViewService', function() {
 		expect(ViewService.getCurrentDocumentId()).toBe('newDocumentId');
 	}));
 });
+*/
 
 // VizService - incomplete, 1 method, [1 uses $http]
 describe('VizService', function() {
