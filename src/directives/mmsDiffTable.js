@@ -30,7 +30,7 @@ function mmsDiffTable($templateCache, $rootScope, DiffService) {
     scope.nameDiff = [];
     scope.ownerDiff = [];
 
-    generateDifferenceTypes(scope, deltas);
+    // generateDifferenceTypes(scope, deltas);
   };
 
   var generateDifferenceTypes = function(scope, deltas) {
