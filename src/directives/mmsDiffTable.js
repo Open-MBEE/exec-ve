@@ -16,19 +16,61 @@ function mmsDiffTable($templateCache, $rootScope, DiffService) {
     scope.original = {};
     scope.delta = {};
 
+    scope.ownerDiff = [];
     // Watch for user selections in the containment tree
     $rootScope.$watch('tableElement', function() {
       if ($rootScope.tableElement !== null) {
         scope.original.name = $rootScope.tableElement.name;
         scope.original.owner = $rootScope.tableElement.owner;
+        scope.original.documentation = $rootScope.tableElement.documentation;
+        scope.original.specialization = $rootScope.tableElement.specialization;
+        scope.original.specialization.value = $rootScope.tableElement.specialization.value;
+        
+        scope.delta.name = scope.original.name;
+        scope.delta.owner = scope.original.owner;
+        scope.delta.documentation = scope.original.documentation;
+        scope.delta.specialization = scope.original.specialization;
+        scope.delta.specialization.value = scope.original.specialization.value;
 
-        // TODO - set scope.delta with proper values
+        if($rootScope.mergeConflict){
+          for(var conflictKey in $rootScope.conflictElement){
+            if(scope.delta.hasOwnProperty(conflictKey)){
+              scope.delta[conflictKey] = $rootScope.conflictElement[conflictKey];
+            }
+          }
+        }
+
+        if($rootScope.elementMoved){
+          for(var movedKey in $rootScope.movedElement){
+            if(scope.delta.hasOwnProperty(movedKey)){
+              scope.delta[movedKey] = $rootScope.movedElement[movedKey];
+            } 
+          }
+        }
+
+        if($rootScope.elementUpdated){
+          for(var updateKey in $rootScope.updatedElement){
+            if(scope.delta.hasOwnProperty(updateKey)){
+              scope.delta[updateKey] = $rootScope.updatedElement[updateKey];
+            }
+          }
+        }
+
+        if($rootScope.elementAdded){
+          for(var addKey in $rootScope.updatedElement){
+            if(scope.delta.hasOwnProperty(addKey)){
+              scope.delta[addKey] = $rootScope.addedElement[addKey];
+            }
+          }
+        }
+
+
       }
     });
 
     scope.differenceTypes = [];
     scope.nameDiff = [];
-    scope.ownerDiff = [];
+    // scope.ownerDiff = [];
 
     generateDifferenceTypes(scope, deltas);
   };

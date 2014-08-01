@@ -14,9 +14,54 @@ function DiffService($rootScope) {
     loadTableWithElement: function(element) {
       if ($rootScope.workspaces !== null) {
         var originalElements = $rootScope.workspaces.workspace1.elements;
+        var conflicts = $rootScope.workspaces.workspace2.conflicts;
+        var movedElements = $rootScope.workspaces.workspace2.movedElements;
+        var updatedElements = $rootScope.workspaces.workspace2.updatedElements;
+        var addedElements = $rootScope.workspaces.workspace2.addedElements;
+
         $rootScope.tableElement = originalElements.filter(function(entry) {
             return entry && entry.name.indexOf(element) !== -1;
           })[0];
+
+        for(var i=0; i < conflicts.length; i++) {
+          if(conflicts[i].sysmlid === $rootScope.tableElement.sysmlid){
+             $rootScope.conflictElement = conflicts[i];
+             $rootScope.mergeConflict = true;
+          } else {
+            $rootScope.conflictElement = null;
+            $rootScope.mergeConflict = false;
+          }
+        }
+
+        for(var j=0; j < movedElements.length; j++) {
+          if(movedElements[j].sysmlid === $rootScope.tableElement.sysmlid) {
+            $rootScope.movedElement = movedElements[j];
+            $rootScope.elementMoved = true;
+          } else {
+            $rootScope.movedElement = null;
+            $rootScope.elementMoved = false;
+          }
+
+          for(var k=0; k < updatedElements.length; k++) {
+            if(updatedElements[k].sysmlid === $rootScope.tableElement.sysmlid) {
+              $rootScope.updatedElement = updatedElements[k];
+              $rootScope.elementUpdated = true;
+            } else {
+              $rootScope.updatedElement = null;
+              $rootScope.elementUpdated = false;
+            }
+          }
+
+          for(var m=0; m < addedElements.length; m++){
+            if(addedElements[m].sysmlid === $rootScope.tableElement.sysmlid) {
+              $rootScope.addedElement = addedElements[m];
+              $rootScope.elementAdded = true;
+            } else {
+              $rootScope.addedElement = null;
+              $rootScope.elementAdded = false;
+            }
+          }
+        }
       }
     }
   };
