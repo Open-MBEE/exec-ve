@@ -105,7 +105,6 @@ function mmsDiffTree($templateCache, $rootScope, DiffService) {
     };
   };
   
-
   /*
    * Returns an array of the deltas, if any exist.
    * Returns [], otherwise.

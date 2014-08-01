@@ -164,9 +164,11 @@ function mmsDiffTable($templateCache, $rootScope, DiffService) {
   };
 
   /*
-   * Evaluates the type(s) of difference(s) in the table and provides them ot the scope
+   * Evaluates the type(s) of difference(s) in the table and provides them to the scope
    */
   var loadTableHeading = function(scope) {
+    scope.differenceTypes = [];
+
     if (scope.nameAddition || scope.ownerAddition || scope.docAddition || scope.typeAddition) {
       scope.differenceTypes.push('Addition');
     }
