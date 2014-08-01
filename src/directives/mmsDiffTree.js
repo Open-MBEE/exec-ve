@@ -8,84 +8,15 @@ function mmsDiffTree($templateCache, $rootScope, DiffService) {
   var deltaElements = [];
   var deltaArrays = null;
 
+  var MMSDiffTreeTemplate = $templateCache.get('mms/templates/mmsDiffTree.html');
+  
   var MMSDiffTreeController = function($scope, $rootScope) {
     // Diff the two workspaces picked in the Workspace Picker
     var response = DiffService.diff('ws1', 'ws2');
     originalElements = response.workspace1.elements;
     deltaArrays = response.workspace2;
     
-    var id2node = {};
-
-    // Set up mms-tree
-    $scope.treeData = [];
-    $scope.options = {
-      types: {
-        "Element": "fa fa-square",
-        "Property": "fa fa-circle",
-        "View": "fa fa-square",
-        "Dependency": "fa fa-long-arrow-right",
-        "DirectedRelationship": "fa fa-long-arrow-right",
-        "Generalization": "fa fa-chevron-right",
-        "Package": "fa fa-folder",
-        "Connector": "fa fa-expand"
-      },
-      statuses: {
-        "moved": "",
-        "added": "",
-        "deleted": "",
-        "updated": "",
-        "conflict": "",
-        "resolved": ""
-      }
-    };
-
-    // Load up the tree with elements
-    originalElements.forEach(function(e) {
-      var node = {};
-      node.data = e;
-      id2node[e.sysmlid] = node;
-      node.label = e.name;
-      node.type = e.specialization.type;
-      node.children = [];
-    });
-
-    originalElements.forEach(function(e) {
-      if (!id2node.hasOwnProperty(e.owner))
-          $scope.treeData.push(id2node[e.sysmlid]);
-      else
-          id2node[e.owner].children.push(id2node[e.sysmlid]);
-    });
-
-    deltaArrays.addedElements.forEach(function(e) {
-      var node = {};
-      node.data = e;
-      id2node[e.sysmlid] = node;
-      node.label = e.name;
-      node.type = e.specialization.type;
-      node.children = [];
-      node.status = "added";
-    });
-
-    deltaArrays.addedElements.forEach(function(e) {
-      if (!id2node.hasOwnProperty(e.owner))
-          $scope.treeData.push(id2node[e.sysmlid]);
-      else
-          id2node[e.owner].children.push(id2node[e.sysmlid]);
-    });
-
-    deltaArrays.deletedElements.forEach(function(e) {
-      id2node[e.sysmlid].status = "deleted";
-    });
-
-    deltaArrays.updatedElements.forEach(function(e) {
-      id2node[e.sysmlid].status = "updated";
-    });
-
-    deltaArrays.movedElements.forEach(function(e) {
-      var ws1node = id2node[e.sysmlid];
-      ws1node.status = "moved";
-      //id2node[e.owner].children.push(ws1node);
-    });
+    setUpMMSTree($scope);
 
     // Sets an element (tableElement) for the table to load
     $scope.loadTableWithElement = function(sysmlid) {
@@ -174,8 +105,11 @@ function mmsDiffTree($templateCache, $rootScope, DiffService) {
     };
   };
   
-  var MMSDiffTreeTemplate = $templateCache.get('mms/templates/mmsDiffTree.html');
 
+  /*
+   * Returns an array of the deltas, if any exist.
+   * Returns [], otherwise.
+   */
   var getDeltas = function() {
     if (deltaArrays !== null) {
       angular.forEach(deltaArrays, function(diffType, key) {
@@ -187,6 +121,81 @@ function mmsDiffTree($templateCache, $rootScope, DiffService) {
     } else {
       return [];
     }
+  };
+
+  /*
+   * Preps mms-tree with data and display options.
+   */
+  var setUpMMSTree = function(scope) {
+    var id2node = {};
+    scope.treeData = [];
+    scope.options = {
+      types: {
+        "Element": "fa fa-square",
+        "Property": "fa fa-circle",
+        "View": "fa fa-square",
+        "Dependency": "fa fa-long-arrow-right",
+        "DirectedRelationship": "fa fa-long-arrow-right",
+        "Generalization": "fa fa-chevron-right",
+        "Package": "fa fa-folder",
+        "Connector": "fa fa-expand"
+      },
+      statuses: {
+        "moved": "",
+        "added": "",
+        "deleted": "",
+        "updated": "",
+        "conflict": "",
+        "resolved": ""
+      }
+    };
+
+    // Load up the tree with elements
+    originalElements.forEach(function(e) {
+      var node = {};
+      node.data = e;
+      id2node[e.sysmlid] = node;
+      node.label = e.name;
+      node.type = e.specialization.type;
+      node.children = [];
+    });
+
+    originalElements.forEach(function(e) {
+      if (!id2node.hasOwnProperty(e.owner))
+          scope.treeData.push(id2node[e.sysmlid]);
+      else
+          id2node[e.owner].children.push(id2node[e.sysmlid]);
+    });
+
+    deltaArrays.addedElements.forEach(function(e) {
+      var node = {};
+      node.data = e;
+      id2node[e.sysmlid] = node;
+      node.label = e.name;
+      node.type = e.specialization.type;
+      node.children = [];
+      node.status = "added";
+    });
+
+    deltaArrays.addedElements.forEach(function(e) {
+      if (!id2node.hasOwnProperty(e.owner))
+          scope.treeData.push(id2node[e.sysmlid]);
+      else
+          id2node[e.owner].children.push(id2node[e.sysmlid]);
+    });
+
+    deltaArrays.deletedElements.forEach(function(e) {
+      id2node[e.sysmlid].status = "deleted";
+    });
+
+    deltaArrays.updatedElements.forEach(function(e) {
+      id2node[e.sysmlid].status = "updated";
+    });
+
+    deltaArrays.movedElements.forEach(function(e) {
+      var ws1node = id2node[e.sysmlid];
+      ws1node.status = "moved";
+    });
   };
   
   return {

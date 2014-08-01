@@ -4,130 +4,173 @@ angular.module('mms.directives')
 .directive('mmsDiffTable', ['$templateCache', '$rootScope', 'DiffService', mmsDiffTable]);
 
 function mmsDiffTable($templateCache, $rootScope, DiffService) {
+
+  var MMSDiffTableTemplate = $templateCache.get('mms/templates/mmsDiffTable.html');
   
   var MMSDiffTableLink = function(scope, element, attrs) {
-    // Diff the two workspaces picked in the Workspace Picker
-    var response = DiffService.diff('ws1', 'ws2');
-    var originals = response.workspace1.elements;
-    var deltas = response.workspace2;
-
     // Initializations
-    $rootScope.tableElement = null;
     scope.original = {};
     scope.delta = {};
     scope.ownerDiff = [];
+    scope.differenceTypes = [];
 
     // Watch for user selections in the containment tree
     $rootScope.$watch('tableElement', function() {
-      if ($rootScope.tableElement !== null) {
-        scope.original.name = $rootScope.tableElement.name;
-        scope.original.owner = $rootScope.tableElement.owner;
-        scope.original.documentation = $rootScope.tableElement.documentation;
-        scope.original.specialization = $rootScope.tableElement.specialization;
-        scope.original.specialization.value = $rootScope.tableElement.specialization.value;
-        
-        scope.delta.name = scope.original.name;
-        scope.delta.owner = scope.original.owner;
-        scope.delta.documentation = scope.original.documentation;
-        scope.delta.specialization = scope.original.specialization;
-        scope.delta.specialization.value = scope.original.specialization.value;
-
-        if ($rootScope.conflict) {
-          for (var conflictKey in $rootScope.conflictElement) {
-            if (scope.delta.hasOwnProperty(conflictKey)) {
-              scope.delta[conflictKey] = $rootScope.conflictElement[conflictKey];
-            }
-          }
-        }
-
-        if ($rootScope.elementMoved) {
-          for (var movedKey in $rootScope.movedElement) {
-            if (scope.delta.hasOwnProperty(movedKey)) {
-              scope.delta[movedKey] = $rootScope.movedElement[movedKey];
-            } 
-          }
-        }
-
-        if ($rootScope.elementUpdated) {
-          for (var updateKey in $rootScope.updatedElement) {
-            if (scope.delta.hasOwnProperty(updateKey)) {
-              scope.delta[updateKey] = $rootScope.updatedElement[updateKey];
-            }
-          }
-        }
-
-        if ($rootScope.elementAdded) {
-          for (var addKey in $rootScope.updatedElement) {
-            if (scope.delta.hasOwnProperty(addKey)) {
-              scope.delta[addKey] = $rootScope.addedElement[addKey];
-            }
-          }
-          scope.original.name = null;
-          scope.original.owner = null;
-          scope.original.documentation = null;
-          scope.original.specialization = null;
-        }
-
-        if ($rootScope.elementDeleted){
-          scope.delta.name = null;
-          scope.delta.owner = null;
-          scope.delta.documentation = null;
-          scope.delta.specialization = null;
-        }
-
-        scope.nameAddition = (scope.original.name !== scope.delta.name) && (scope.original.name === null || scope.original.name === '');
-        scope.nameRemoval = (scope.original.name !== null && scope.original.name !== '') && (scope.delta.name === null || scope.delta.name === '');
-        scope.nameUpdate = scope.original.name !== scope.delta.name && (scope.original.name !== null && scope.original.name !== '') && (scope.delta.name !== null && scope.delta.name !== '');
-        scope.nameClean = scope.original.name === null && scope.delta.name === null;
-
-        scope.ownerAddition = scope.original.owner !== scope.delta.owner && (scope.original.owner === null || scope.original.owner === '');
-        scope.ownerRemoval = (scope.original.owner !== null && scope.original.owner !== '') && (scope.delta.owner === null || scope.delta.owner === '');
-        scope.ownerUpdate = scope.original.owner !== scope.delta.owner && (scope.original.owner !== null && scope.original.owner !== '') && (scope.delta.owner !== null && scope.delta.owner !== '');
-        scope.ownerClean = scope.original.owner === null && scope.delta.owner === null;
-
-        scope.docAddition = scope.original.documentation !== scope.delta.documentation && (scope.original.documentation === null || scope.original.documentation === '');
-        scope.docRemoval = (scope.original.documentation !== null && scope.original.documentation !== '') && (scope.delta.documentation === null || scope.delta.documentation === '');
-        scope.docUpdate = scope.original.documentation !== scope.delta.documentation && (scope.original.documentation !== null && scope.original.documentation !== '') && (scope.delta.documentation !== null && scope.delta.documentation !== '');
-        scope.docClean = scope.original.documentation === null && scope.delta.documentation === null;
-
-        scope.typeAddition = scope.original.specialization !== scope.delta.specialization && (scope.original.specialization === null || scope.original.specialization === '');
-        scope.typeRemoval = (scope.original.specialization !== null && scope.original.specialization !== '') && (scope.delta.specialization === null || scope.delta.specialization === '');
-        scope.typeUpdate = scope.original.specialization !== scope.delta.specialization && (scope.original.specialization !== null && scope.original.specialization !== '') && (scope.delta.specialization !== null && scope.delta.specialization !== '');
-        scope.typeClean = scope.original.specialization === null && scope.delta.specialization === null;
-
+      if (($rootScope.tableElement === null) || ($rootScope.tableElement === undefined)) {
+        return;
       }
+
+      // Load the table
+      loadTableDeltaAndOriginal(scope);
+      loadTableHighlighting(scope);
+      loadTableHeading(scope);
     });
-
-    scope.differenceTypes = [];
-    scope.nameDiff = [];
-    // scope.ownerDiff = [];
-
-    // generateDifferenceTypes(scope, deltas);
   };
 
-  var generateDifferenceTypes = function(scope, deltas) {
-    if (deltas.updatedElements.length > 0) {
-      scope.differenceTypes.push('Update');
+  /*
+   * Sets delta and original so the table can display values
+   */
+  var loadTableDeltaAndOriginal = function(scope) {
+    scope.original.name = $rootScope.tableElement.name;
+    scope.original.owner = $rootScope.tableElement.owner;
+    scope.original.documentation = $rootScope.tableElement.documentation;
+    scope.original.specialization = $rootScope.tableElement.specialization;
+    scope.original.specialization.value = $rootScope.tableElement.specialization.value;
+    
+    scope.delta.name = scope.original.name;
+    scope.delta.owner = scope.original.owner;
+    scope.delta.documentation = scope.original.documentation;
+    scope.delta.specialization = scope.original.specialization;
+    scope.delta.specialization.value = scope.original.specialization.value;
+
+    if ($rootScope.conflict) {
+      for (var conflictKey in $rootScope.conflictElement) {
+        if (scope.delta.hasOwnProperty(conflictKey)) {
+          scope.delta[conflictKey] = $rootScope.conflictElement[conflictKey];
+        }
+      }
     }
 
-    if (deltas.addedElements.length > 0) {
+    if ($rootScope.elementMoved) {
+      for (var movedKey in $rootScope.movedElement) {
+        if (scope.delta.hasOwnProperty(movedKey)) {
+          scope.delta[movedKey] = $rootScope.movedElement[movedKey];
+        } 
+      }
+    }
+
+    if ($rootScope.elementUpdated) {
+      for (var updateKey in $rootScope.updatedElement) {
+        if (scope.delta.hasOwnProperty(updateKey)) {
+          scope.delta[updateKey] = $rootScope.updatedElement[updateKey];
+        }
+      }
+    }
+
+    if ($rootScope.elementAdded) {
+      for (var addKey in $rootScope.updatedElement) {
+        if (scope.delta.hasOwnProperty(addKey)) {
+          scope.delta[addKey] = $rootScope.addedElement[addKey];
+        }
+      }
+      scope.original.name = null;
+      scope.original.owner = null;
+      scope.original.documentation = null;
+      scope.original.specialization = null;
+    }
+
+    if ($rootScope.elementDeleted) {
+      scope.delta.name = null;
+      scope.delta.owner = null;
+      scope.delta.documentation = null;
+      scope.delta.specialization = null;
+    }
+  };
+
+  /*
+   * Sets up CSS class truth values for table highlighting
+   */
+  var loadTableHighlighting = function(scope) {
+    var namesAreDifferent = scope.original.name !== scope.delta.name;
+    var originalNameIsNull = scope.original.name === null;
+    var originalNameIsEmpty = scope.original.name === '';
+    var deltaNameIsNull = scope.delta.name === null;
+    var deltaNameIsEmpty = scope.delta.name === '';
+
+    var ownersAreDifferent = scope.original.owner !== scope.delta.owner;
+    var originalOwnerIsNull = scope.original.owner === null;
+    var originalOwnerIsEmpty = scope.original.owner === '';
+    var deltaOwnerIsNull = scope.delta.owner === null;
+    var deltaOwnerIsEmpty = scope.delta.owner === '';
+
+    var docsAreDifferent = scope.original.documentation !== scope.delta.documentation;
+    var originalDocIsNull = scope.original.documentation === null;
+    var originalDocIsEmpty = scope.original.documentation === '';
+    var deltaDocIsNull = scope.delta.documentation === null;
+    var deltaDocIsEmpty = scope.delta.documentation === '';
+
+    var typesAreDifferent = scope.original.specialization !== scope.delta.specialization;
+    var originalTypeIsNull = scope.original.specialization === null;
+    var originalTypeIsEmpty = scope.original.specialization === '';
+    var deltaTypeIsNull = scope.delta.specialization === null;
+    var deltaTypeIsEmpty = scope.delta.specialization === '';
+
+    scope.nameAddition = namesAreDifferent && 
+                         (originalNameIsNull || originalNameIsEmpty);
+    scope.nameRemoval = (!originalNameIsNull && !originalNameIsEmpty) && 
+                        (deltaNameIsNull || deltaNameIsEmpty);
+    scope.nameUpdate = scope.original.name !== scope.delta.name && 
+                       (!originalNameIsNull && !originalNameIsEmpty) &&
+                       (!deltaNameIsNull && !deltaNameIsEmpty);
+    scope.nameClean = originalNameIsNull && deltaNameIsNull;
+
+
+    scope.ownerAddition = ownersAreDifferent && 
+                          (originalOwnerIsNull || originalOwnerIsEmpty);
+    scope.ownerRemoval = (!originalOwnerIsNull && !originalOwnerIsEmpty) && 
+                         (deltaOwnerIsNull || deltaOwnerIsEmpty);
+    scope.ownerUpdate = scope.original.owner !== scope.delta.owner && 
+                        (!originalOwnerIsNull && !originalOwnerIsEmpty) &&
+                        (!deltaOwnerIsNull && !deltaOwnerIsEmpty);
+    scope.ownerClean = originalOwnerIsNull && deltaOwnerIsNull;
+
+
+    scope.docAddition = docsAreDifferent && 
+                        (originalDocIsNull || originalDocIsEmpty);
+    scope.docRemoval = (!originalDocIsNull && !originalDocIsEmpty) && 
+                       (deltaDocIsNull || deltaDocIsEmpty);
+    scope.docUpdate = (scope.original.documentation !== scope.delta.documentation) && 
+                      (!originalDocIsNull && !originalDocIsEmpty) &&
+                      (deltaDocIsNull && deltaDocIsEmpty);
+    scope.docClean = originalDocIsNull && deltaDocIsNull;
+
+
+    scope.typeAddition = typesAreDifferent && 
+                         (originalTypeIsNull || originalTypeIsEmpty);
+    scope.typeRemoval = (!originalTypeIsNull && !originalTypeIsEmpty) && 
+                        (deltaTypeIsNull || deltaTypeIsEmpty);
+    scope.typeUpdate = (scope.original.specialization !== scope.delta.specialization) &&
+                       (!originalTypeIsNull && !originalTypeIsEmpty) &&
+                       (deltaTypeIsNull && deltaTypeIsEmpty);
+    scope.typeClean = originalTypeIsNull && deltaTypeIsNull;
+  };
+
+  /*
+   * Evaluates the type(s) of difference(s) in the table and provides them ot the scope
+   */
+  var loadTableHeading = function(scope) {
+    if (scope.nameAddition || scope.ownerAddition || scope.docAddition || scope.typeAddition) {
       scope.differenceTypes.push('Addition');
     }
-
-    if (deltas.deletedElements.length > 0) {
+    
+    if (scope.nameRemoval || scope.ownerRemoval || scope.docRemoval || scope.typeRemoval) {
       scope.differenceTypes.push('Deletion');
     }
 
-    if (deltas.movedElements.length > 0) {
-      scope.differenceTypes.push('Move');
-    }
-
-    if (deltas.conflicts.length > 0) {
-      scope.differenceTypes.push('Conflict');
+    if (scope.nameUpdate || scope.ownerUpdate || scope.docUpdate || scope.typeUpdate) {
+      scope.differenceTypes.push('Update');
     }
   };
-
-  var MMSDiffTableTemplate = $templateCache.get('mms/templates/mmsDiffTable.html');
 
   return {
     restrict: 'E',
