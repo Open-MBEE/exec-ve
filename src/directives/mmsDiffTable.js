@@ -75,33 +75,81 @@ function mmsDiffTable($templateCache, $rootScope, DiffService) {
           scope.delta.specialization = null;
         }
 
-        scope.nameAddition = scope.original.name !== scope.delta.name && (scope.original.name === null || scope.original.name === '');
-        scope.nameRemoval = (scope.original.name !== null && scope.original.name !== '') && (scope.delta.name === null || scope.delta.name === '');
-        scope.nameUpdate = scope.original.name !== scope.delta.name && (scope.original.name !== null && scope.original.name !== '') && (scope.delta.name !== null && scope.delta.name !== '');
-        scope.nameClean = scope.original.name === null && scope.delta.name === null;
+        var namesAreDifferent = scope.original.name !== scope.delta.name;
+        var originalNameIsNull = scope.original.name === null;
+        var originalNameIsEmpty = scope.original.name === '';
+        var deltaNameIsNull = scope.delta.name === null;
+        var deltaNameIsEmpty = scope.delta.name === '';
 
-        scope.ownerAddition = scope.original.owner !== scope.delta.owner && (scope.original.owner === null || scope.original.owner === '');
-        scope.ownerRemoval = (scope.original.owner !== null && scope.original.owner !== '') && (scope.delta.owner === null || scope.delta.owner === '');
-        scope.ownerUpdate = scope.original.owner !== scope.delta.owner && (scope.original.owner !== null && scope.original.owner !== '') && (scope.delta.owner !== null && scope.delta.owner !== '');
-        scope.ownerClean = scope.original.owner === null && scope.delta.owner === null;
+        var ownersAreDifferent = scope.original.owner !== scope.delta.owner;
+        var originalOwnerIsNull = scope.original.owner === null;
+        var originalOwnerIsEmpty = scope.original.owner === '';
+        var deltaOwnerIsNull = scope.delta.owner === null;
+        var deltaOwnerIsEmpty = scope.delta.owner === '';
 
-        scope.docAddition = scope.original.documentation !== scope.delta.documentation && (scope.original.documentation === null || scope.original.documentation === '');
-        scope.docRemoval = (scope.original.documentation !== null && scope.original.documentation !== '') && (scope.delta.documentation === null || scope.delta.documentation === '');
-        scope.docUpdate = scope.original.documentation !== scope.delta.documentation && (scope.original.documentation !== null && scope.original.documentation !== '') && (scope.delta.documentation !== null && scope.delta.documentation !== '');
-        scope.docClean = scope.original.documentation === null && scope.delta.documentation === null;
+        var docsAreDifferent = scope.original.documentation !== scope.delta.documentation;
+        var originalDocIsNull = scope.original.documentation === null;
+        var originalDocIsEmpty = scope.original.documentation === '';
+        var deltaDocIsNull = scope.delta.documentation === null;
+        var deltaDocIsEmpty = scope.delta.documentation === '';
 
-        scope.typeAddition = scope.original.specialization !== scope.delta.specialization && (scope.original.specialization === null || scope.original.specialization === '');
-        scope.typeRemoval = (scope.original.specialization !== null && scope.original.specialization !== '') && (scope.delta.specialization === null || scope.delta.specialization === '');
-        scope.typeUpdate = scope.original.specialization !== scope.delta.specialization && (scope.original.specialization !== null && scope.original.specialization !== '') && (scope.delta.specialization !== null && scope.delta.specialization !== '');
-        scope.typeClean = scope.original.specialization === null && scope.delta.specialization === null;
+        var typesAreDifferent = scope.original.specialization !== scope.delta.specialization;
+        var originalTypeIsNull = scope.original.specialization === null;
+        var originalTypeIsEmpty = scope.original.specialization === '';
+        var deltaTypeIsNull = scope.delta.specialization === null;
+        var deltaTypeIsEmpty = scope.delta.specialization === '';
 
+        scope.nameAddition = namesAreDifferent && 
+                             (originalNameIsNull || originalNameIsEmpty);
+        scope.nameRemoval = (!originalNameIsNull && !originalNameIsEmpty) && 
+                            (deltaNameIsNull || deltaNameIsEmpty);
+        scope.nameUpdate = scope.original.name !== scope.delta.name && 
+                          (!originalNameIsNull && !originalNameIsEmpty) && (!deltaNameIsNull && !deltaNameIsEmpty);
+        scope.nameClean = originalNameIsNull && deltaNameIsNull;
+
+
+        scope.ownerAddition = ownersAreDifferent && 
+                              (originalOwnerIsNull || originalOwnerIsEmpty);
+        scope.ownerRemoval = (!originalOwnerIsNull && !originalOwnerIsEmpty) && 
+                             (deltaOwnerIsNull || deltaOwnerIsEmpty);
+        scope.ownerUpdate = scope.original.owner !== scope.delta.owner && 
+                            (!originalOwnerIsNull && !originalOwnerIsEmpty) && (!deltaOwnerIsNull && !deltaOwnerIsEmpty);
+        scope.ownerClean = originalOwnerIsNull && deltaOwnerIsNull;
+
+
+        scope.docAddition = docsAreDifferent && 
+                            (originalDocIsNull || originalDocIsEmpty);
+        scope.docRemoval = (!originalDocIsNull && !originalDocIsEmpty) && 
+                           (deltaDocIsNull || deltaDocIsEmpty);
+        scope.docUpdate = scope.original.documentation !== scope.delta.documentation && 
+                          (!originalDocIsNull && !originalDocIsEmpty) && (deltaDocIsNull && deltaDocIsEmpty);
+        scope.docClean = originalDocIsNull && deltaDocIsNull;
+
+
+        scope.typeAddition = typesAreDifferent && 
+                             (originalTypeIsNull || originalTypeIsEmpty);
+        scope.typeRemoval = (!originalTypeIsNull && !originalTypeIsEmpty) && 
+                            (deltaTypeIsNull || deltaTypeIsEmpty);
+        scope.typeUpdate = scope.original.specialization !== scope.delta.specialization && 
+                           (!originalTypeIsNull && !originalTypeIsEmpty) && (deltaTypeIsNull && deltaTypeIsEmpty);
+        scope.typeClean = originalTypeIsNull && deltaTypeIsNull;
+
+        scope.differenceTypes = [];
+        scope.nameDiff = [];
+
+        if(scope.nameAddition || scope.ownerAddition || scope.docAddition || scope.typeAddition) scope.differenceTypes.push('Addition');
+        if(scope.nameRemoval || scope.ownerRemoval || scope.docRemoval || scope.typeRemoval) scope.differenceTypes.push('Deletion');
+        if(scope.nameUpdate || scope.ownerUpdate || scope.docUpdate || scope.typeUpdate) scope.differenceTypes.push('Update');
       }
     });
 
-    scope.differenceTypes = [];
-    scope.nameDiff = [];
+    // scope.differenceTypes = [];
+    // scope.nameDiff = [];
+
+    // if(scope.nameAddition)scope.differenceTypes.push("TEST");
     // scope.ownerDiff = [];
 
+    // generateDifferenceTypes2(scope);
     // generateDifferenceTypes(scope, deltas);
   };
 
@@ -126,6 +174,12 @@ function mmsDiffTable($templateCache, $rootScope, DiffService) {
       scope.differenceTypes.push('Conflict');
     }
   };
+
+  // var generateDifferenceTypes2 = function(scope){
+  //   if(scope.nameAddition || scope.ownerAddition || scope.docAddition || scope.typeAddition) scope.differenceTypes.push('Addition');
+  //   if(scope.nameRemoval || scope.ownerRemoval || scope.docRemoval || scope.typeRemoval) scope.differenceTypes.push('Deletion');
+  //   if(scope.nameUpdate || scope.ownerUpdate || scope.docUpdate || scope.typeUpdate) scope.differenceTypes.push('Update');
+  // };
 
   /*
    * Fills scope booleans for two elements.
