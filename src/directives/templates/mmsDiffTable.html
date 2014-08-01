@@ -32,8 +32,13 @@
     </tr>
     <tr class="type-row" ng-class="{addition: typeAddition, removal: typeRemoval, update: typeUpdate, clean: typeClean}">
       <td>Type</td>
-      <td>{{original.specialization.type}}</td>
-      <td>{{delta.specialization.type}}</td>
+      <td>{{original.specialization.valueArray[0]}}</td>
+      <td>{{delta.specialization.valueArray[0]}}</td>
+    </tr>
+    <tr class="value-row" ng-class="{}">
+    <td>Value</td>
+    <td>{{original.specialization.valueArray[1]}}</td>
+    <td>{{delta.specialization.valueArray[1]}}</td>
     </tr>
   </tbody>
 

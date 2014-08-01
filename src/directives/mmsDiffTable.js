@@ -25,6 +25,13 @@ function mmsDiffTable($templateCache, $rootScope, DiffService) {
         scope.original.documentation = $rootScope.tableElement.documentation;
         scope.original.specialization = $rootScope.tableElement.specialization;
         scope.original.specialization.value = $rootScope.tableElement.specialization.value;
+        scope.original.specialization.valueArray = [];
+        var keyIndex = 0;
+
+        for(var keyVar in $rootScope.tableElement.specialization.value[0]){
+          scope.original.specialization.valueArray[keyIndex] = $rootScope.tableElement.specialization.value[0][keyVar];
+          keyIndex++;
+        }
         
         scope.delta.name = scope.original.name;
         scope.delta.owner = scope.original.owner;
