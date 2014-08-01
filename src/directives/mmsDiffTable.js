@@ -15,8 +15,8 @@ function mmsDiffTable($templateCache, $rootScope, DiffService) {
     $rootScope.tableElement = null;
     scope.original = {};
     scope.delta = {};
-
     scope.ownerDiff = [];
+
     // Watch for user selections in the containment tree
     $rootScope.$watch('tableElement', function() {
       if ($rootScope.tableElement !== null) {
@@ -32,33 +32,33 @@ function mmsDiffTable($templateCache, $rootScope, DiffService) {
         scope.delta.specialization = scope.original.specialization;
         scope.delta.specialization.value = scope.original.specialization.value;
 
-        if($rootScope.mergeConflict){
-          for(var conflictKey in $rootScope.conflictElement){
-            if(scope.delta.hasOwnProperty(conflictKey)){
+        if ($rootScope.conflict) {
+          for (var conflictKey in $rootScope.conflictElement) {
+            if (scope.delta.hasOwnProperty(conflictKey)) {
               scope.delta[conflictKey] = $rootScope.conflictElement[conflictKey];
             }
           }
         }
 
-        if($rootScope.elementMoved){
-          for(var movedKey in $rootScope.movedElement){
-            if(scope.delta.hasOwnProperty(movedKey)){
+        if ($rootScope.elementMoved) {
+          for (var movedKey in $rootScope.movedElement) {
+            if (scope.delta.hasOwnProperty(movedKey)) {
               scope.delta[movedKey] = $rootScope.movedElement[movedKey];
             } 
           }
         }
 
-        if($rootScope.elementUpdated){
-          for(var updateKey in $rootScope.updatedElement){
-            if(scope.delta.hasOwnProperty(updateKey)){
+        if ($rootScope.elementUpdated) {
+          for (var updateKey in $rootScope.updatedElement) {
+            if (scope.delta.hasOwnProperty(updateKey)) {
               scope.delta[updateKey] = $rootScope.updatedElement[updateKey];
             }
           }
         }
 
-        if($rootScope.elementAdded){
-          for(var addKey in $rootScope.updatedElement){
-            if(scope.delta.hasOwnProperty(addKey)){
+        if ($rootScope.elementAdded) {
+          for (var addKey in $rootScope.updatedElement) {
+            if (scope.delta.hasOwnProperty(addKey)) {
               scope.delta[addKey] = $rootScope.addedElement[addKey];
             }
           }
@@ -68,14 +68,14 @@ function mmsDiffTable($templateCache, $rootScope, DiffService) {
           scope.original.specialization = null;
         }
 
-        if($rootScope.elementDeleted){
+        if ($rootScope.elementDeleted){
           scope.delta.name = null;
           scope.delta.owner = null;
           scope.delta.documentation = null;
           scope.delta.specialization = null;
         }
 
-        scope.nameAddition = scope.original.name !== scope.delta.name && (scope.original.name === null || scope.original.name === '');
+        scope.nameAddition = (scope.original.name !== scope.delta.name) && (scope.original.name === null || scope.original.name === '');
         scope.nameRemoval = (scope.original.name !== null && scope.original.name !== '') && (scope.delta.name === null || scope.delta.name === '');
         scope.nameUpdate = scope.original.name !== scope.delta.name && (scope.original.name !== null && scope.original.name !== '') && (scope.delta.name !== null && scope.delta.name !== '');
         scope.nameClean = scope.original.name === null && scope.delta.name === null;
@@ -126,28 +126,6 @@ function mmsDiffTable($templateCache, $rootScope, DiffService) {
       scope.differenceTypes.push('Conflict');
     }
   };
-
-  /*
-   * Fills scope booleans for two elements.
-   *
-   * scope.*Diff[0] is True, if element is in clean state. False, otherwise.
-   * scope.*Diff[1] is True, if element is in addition state. False, otherwise.
-   * scope.*Diff[2] is True, if element is in removal state. False, otherwise.
-   * scope.*Diff[3] is True, if element is in conflict state. False, otherwise.
-   */
-  /* TODO
-  generateTableClasses: function(original, delta) {
-    this.scope.nameDiff[0] = (this.scope.name[0] === this.scope.name[1]);
-    this.scope.nameDiff[1] = (this.scope.name[0] === '') && (this.scope.name[1].length > 0);
-    this.scope.nameDiff[2] = (this.scope.name[1] === '') && (this.scope.name[0].length > 0);
-    this.scope.nameDiff[3] = false;
-
-    this.scope.ownerDiff[0] = (this.scope.owner[0] === this.scope.owner[1]);
-    this.scope.ownerDiff[1] = (this.scope.owner[0] === '') && (this.scope.owner[1].length > 0);
-    this.scope.ownerDiff[2] = (this.scope.owner[1] === '') && (this.scope.owner[0].length > 0);
-    this.scope.ownerDiff[3] = false;
-  }
-  */
 
   var MMSDiffTableTemplate = $templateCache.get('mms/templates/mmsDiffTable.html');
 
