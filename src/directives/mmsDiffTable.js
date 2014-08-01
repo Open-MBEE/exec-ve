@@ -62,7 +62,19 @@ function mmsDiffTable($templateCache, $rootScope, DiffService) {
               scope.delta[addKey] = $rootScope.addedElement[addKey];
             }
           }
+          scope.original.name = null;
+          scope.original.owner = null;
+          scope.original.documentation = null;
+          scope.original.specialization = null;
         }
+
+        if($rootScope.elementDeleted){
+          scope.delta.name = null;
+          scope.delta.owner = null;
+          scope.delta.documentation = null;
+          scope.delta.specialization = null;
+        }
+
       }
     });
 
