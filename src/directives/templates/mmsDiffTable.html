@@ -15,22 +15,22 @@
   </thead>
 
   <tbody>
-    <tr class="name-row" ng-class="{clean: nameDiff[0], addition: nameDiff[1], remove: nameDiff[2], conflict: nameDiff[3]}">
+    <tr class="name-row" ng-class="{addition: nameAddition, removal: nameRemoval, update: nameUpdate, clean: nameClean}">
       <td>Name</td>
       <td>{{original.name}}</td>
       <td>{{delta.name}}</td>
     </tr>
-    <tr class="owner-row" ng-class="{clean: ownerDiff[0], addition: ownerDiff[1], remove: ownerDiff[2], conflict: ownerDiff[3]}">
+    <tr class="owner-row" ng-class="{addition: ownerAddition, removal: ownerRemoval, update: ownerUpdate, clean: ownerClean}">
       <td>Owner</td>
       <td>{{original.owner}}</td>
       <td>{{delta.owner}}</td>
     </tr>
-    <tr class="doc-row">
+    <tr class="doc-row" ng-class="{addition: docAddition, removal: docRemoval, update: docUpdate, clean: docClean}">
       <td>Documentation</td>
       <td>{{original.documentation}}</td>
       <td>{{delta.documentation}}</td>
     </tr>
-    <tr class="type-row">
+    <tr class="type-row" ng-class="{addition: typeAddition, removal: typeRemoval, update: typeUpdate, clean: typeClean}">
       <td>Type</td>
       <td>{{original.specialization.type}}</td>
       <td>{{delta.specialization.type}}</td>
