@@ -2,7 +2,7 @@
       <li ng-repeat="row in tree_rows | filter:{visible:true} | filter:{label:search} track by row.branch.uid" 
       ng-class="'level-' + {{row.level}}" class="abn-tree-row">
 
-        <div class="arrow added" ng-click="user_clicks_branch(row.branch)" ng-class="{'active-text': row.branch.selected, 'arrow-active': row.branch.selected}">
+        <div class="arrow" ng-click="user_clicks_branch(row.branch)" ng-class="{'active-text': row.branch.selected, 'arrow-active': row.branch.selected}">
           
           <div class="triangle-left" ng-class="{'triangle-left-selected': row.branch.selected, 'triangle-left-hidden': !row.branch.selected}"></div>
 

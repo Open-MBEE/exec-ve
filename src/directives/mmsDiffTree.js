@@ -1,9 +1,9 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsDiffTree', ['$templateCache', 'DiffService', mmsDiffTree]);
+.directive('mmsDiffTree', ['$templateCache', '$rootScope', 'DiffService', mmsDiffTree]);
 
-function mmsDiffTree($templateCache, DiffService) {
+function mmsDiffTree($templateCache, $rootScope, DiffService) {
 
   var MMSDiffTreeController = function ($scope, $rootScope) {
     // Diff the two workspaces picked in the Workspace Picker
@@ -34,6 +34,18 @@ function mmsDiffTree($templateCache, DiffService) {
             "resolved": ""
         }
     };
+
+    /*
+     * statuses: {
+        "moved": {style: "style1", action: "add" }
+        ...
+       },
+       buttons: {
+        ["add": { style: "button-style1", callback:function(branch)},
+         ...
+        ] 
+       }
+     */
 
     response.workspace1.elements.forEach(function(e) {
         var node = {};
@@ -76,7 +88,7 @@ function mmsDiffTree($templateCache, DiffService) {
         //id2node[e.owner].children.push(ws1node);
     });
 
-    $scope.loadTableWithElement = function(elem) {
+    $scope.loadTableWithElement = function(sysmlid) {
       if ($rootScope.workspaces !== null) {
         var originalElements = $rootScope.workspaces.workspace1.elements;
         var conflicts = $rootScope.workspaces.workspace2.conflicts;
@@ -85,7 +97,7 @@ function mmsDiffTree($templateCache, DiffService) {
         var addedElements = $rootScope.workspaces.workspace2.addedElements;
 
         $rootScope.tableElement = originalElements.filter(function(entry) {
-            return entry && entry.name.indexOf(elem) !== -1;
+            return entry && entry.name.indexOf(sysmlid) !== -1;
           })[0];
 
         for(var i=0; i < conflicts.length; i++) {
@@ -129,6 +141,36 @@ function mmsDiffTree($templateCache, DiffService) {
         }
       }
     };
+
+  };
+
+  var MMSDiffTreeLink = function (scope, element, attrs) {
+    scope.epsilon = [];
+
+    scope.stageChange = function(sysmlid) {
+      var deltas = [];
+      var workspace2 = $rootScope.workspaces.workspace2;
+      workspace2.forEach(function(diffType) {
+        diffType.forEach(function(elem) {
+          deltas.push(elem);
+        });
+      });
+
+      // Get the element ref'd by sysmlid in deltas
+      var elem = deltas.filter(function(entry) {
+            return entry && entry.name.indexOf(sysmlid) !== -1;
+          })[0];
+
+      scope.epsilon.push();
+    };
+
+    // Send epsilon to the server
+    scope.submitAllChanges = function() {
+    };
+
+    // Delete epsilon and return to workspace picker state
+    scope.cancelAllChanges = function() {
+    };
   };
   
   var MMSDiffTreeTemplate = $templateCache.get('mms/templates/mmsDiffTree.html');
@@ -136,6 +178,7 @@ function mmsDiffTree($templateCache, DiffService) {
   return {
     restrict: 'E',
     template: MMSDiffTreeTemplate,
+    link: MMSDiffTreeLink,
     controller: ['$scope', '$rootScope', MMSDiffTreeController]
   };
 }

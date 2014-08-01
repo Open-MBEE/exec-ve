@@ -63,8 +63,6 @@ function mmsDiffTable($templateCache, $rootScope, DiffService) {
             }
           }
         }
-
-
       }
     });
 
