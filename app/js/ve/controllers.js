@@ -243,10 +243,7 @@ function($scope, $rootScope, $stateParams, viewElements, ViewService, time, grow
     $rootScope.$broadcast('viewSelected', $scope.vid, viewElements);
     $scope.viewApi = {};
     $scope.tscClicked = function(elementId) {
-        $scope.eid = elementId;      //$state.go('view.element', {elementId: elementId});
         $rootScope.$broadcast('elementSelected', elementId);
-        $scope.showSpec = true;
-        $scope.$apply();
     };
     $scope.toggleShowElements = function() {
         $scope.viewApi.toggleShowElements();
