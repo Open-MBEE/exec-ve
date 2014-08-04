@@ -66,7 +66,7 @@ function CacheService(_, $log) {
                 put(ob.key, ob.value, ob.merge, ob.func);
             });
         }
-
+        return cache[realkey];
     };
 
     var exists = function(key) {
@@ -80,10 +80,17 @@ function CacheService(_, $log) {
         return keys.join('|');
     };
 
+    var makeElementKey = function(id, workspace, version) {
+        var ws = !workspace ? 'master' : workspace;
+        var ver = !version ? 'latest' : version;
+        return ['elements', ws, id, ver];
+    };
+
     return {
         get: get,
         put: put,
-        exists: exists
+        exists: exists,
+        makeElementKey: makeElementKey
     };
 
 }

@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms')
-.factory('ElementService', ['$q', '$http', 'URLService', 'UtilsService', 'VersionService', '_', ElementService]);
+.factory('ElementService', ['$q', '$http', 'URLService', 'UtilsService', 'CacheService', '_', ElementService]);
 
 /**
  * @ngdoc service
@@ -22,7 +22,7 @@ angular.module('mms')
  *
  * For element json example, see [here](https://ems.jpl.nasa.gov/alfresco/scripts/raml/index.html)
  */
-function ElementService($q, $http, URLService, UtilsService, VersionService, _) {
+function ElementService($q, $http, URLService, UtilsService, CacheService, _) {
     var elements = {};
     var edits = {};
     var nonEditKeys = ['contains', 'view2view', 'childrenViews', 'displayedElements',
@@ -74,44 +74,26 @@ function ElementService($q, $http, URLService, UtilsService, VersionService, _) 
      *      same object
      */
     var getElement = function(id, updateFromServer, workspace, version) {
-        var update = !updateFromServer ? false : updateFromServer;
-        var ws = !workspace ? 'master' : workspace;
-        var ver = !version ? 'latest' : version;
-        var key = 'getElement(' + id + update + ws + ver + ')';
+        var n = normalize(id, updateFromServer, workspace, version);
+        var key = 'getElement(' + id + n.update + n.ws + n.ver + ')';
 
         if (inProgress.hasOwnProperty(key))
             return inProgress[key];
 
         var deferred = $q.defer();
-        if (ver === 'latest') {
-            if (elements.hasOwnProperty(id)) {
-                if (!update) {
-                    deferred.resolve(elements[id]);
-                    return deferred.promise;
-                } 
-            }
-            inProgress[key] = deferred.promise;
-            $http.get(URLService.getElementURL(id, ws, ver))
-            .success(function(data, status, headers, config) {
-                if (data.elements.length > 0) {
-                    if (elements.hasOwnProperty(id)) {
-                        _.merge(elements[id], data.elements[0]);
-                    } else {
-                        elements[id] = data.elements[0];
-                    }
-                    UtilsService.cleanElement(elements[id]);
-                    deferred.resolve(elements[id]);
-                } else {
-                    deferred.reject({status: 200, data: data, message: 'Not Found'});
-                }
-                delete inProgress[key];
-            }).error(function(data, status, headers, config) {
-                URLService.handleHttpStatus(data, status, headers, config, deferred);
-                delete inProgress[key];
-            });
-        } else {
-            return VersionService.getElement(id, ver, ws);
+        if (CacheService.exists(n.cacheKey) && !n.update) {
+            deferred.resolve(CacheService.get(n.cacheKey));
+            return deferred.promise;
         }
+        inProgress[key] = deferred.promise;
+        $http.get(URLService.getElementURL(id, n.ws, n.ver))
+        .success(function(data, status, headers, config) {
+            deferred.resolve(CacheService.put(n.cacheKey, UtilsService.cleanElement(data.elements[0]), true));
+            delete inProgress[key];
+        }).error(function(data, status, headers, config) {
+            URLService.handleHttpStatus(data, status, headers, config, deferred);
+            delete inProgress[key];
+        });
         return deferred.promise;
     };
 
@@ -256,42 +238,8 @@ function ElementService($q, $http, URLService, UtilsService, VersionService, _) 
      * element objects 
      */
     var getOwnedElements = function(id, updateFromServer, workspace, version) {
-        var update = !updateFromServer ? false : updateFromServer;
-        var ws = !workspace ? 'master' : workspace;
-        var ver = !version ? 'latest' : version;
-
-        var progress = 'getOwnedElements(' + id + update + ws + ver + ')';
-        if (inProgress.hasOwnProperty(progress))
-            return inProgress[progress];
-
-        var deferred = $q.defer();
-        if (ver === 'latest') {
-            inProgress[progress] = deferred.promise;
-            $http.get(URLService.getOwnedElementURL(id, ws, ver))
-            .success(function(data, status, headers, config) {
-                /* var result = [];
-                data[id].forEach(function(element) {
-                    if (elements.hasOwnProperty(element.sysmlid)) {
-                        if (update) {
-                            _.merge(elements[element.sysmlid], element);
-                        } 
-                    } else {
-                        elements[element.sysmlid] = element;
-                    }
-                    UtilsService.cleanElement(elements[element.sysmlid]);
-                    result.push(elements[element.sysmlid]);
-                }); */
-                delete inProgress[progress];
-                deferred.resolve(data); 
-            }).error(function(data, status, headers, config) {
-                URLService.handleHttpStatus(data, status, headers, config, deferred);
-                delete inProgress[progress];
-            });
-        } else {
-            // TODO: Need owned elements for version service
-            return VersionService.getElement(id, ver, ws);
-        }
-        return deferred.promise;        
+        var n = normalize(id, updateFromServer, workspace, version);
+        return getGenericElements(URLService.getOwnedElementURL(id, n.ws, n.ver), 'elements', n.update, n.ws, n.ver);
     };
 
     /**
@@ -326,41 +274,30 @@ function ElementService($q, $http, URLService, UtilsService, VersionService, _) 
      * @param {string} [version=latest] timestamp associated, this will not change the url
      */
     var getGenericElements = function(url, key, updateFromServer, workspace, version) {
-        var update = !updateFromServer ? false : updateFromServer;
-        var ws = !workspace ? 'master' : workspace;
-        var ver = !version ? 'latest' : version;
+        var n = normalize(null, updateFromServer, workspace, version);
 
-        var progress = 'getGenericElements(' + url + key + update + ws + ver + ')';
+        var progress = 'getGenericElements(' + url + key + n.update + n.ws + n.ver + ')';
         if (inProgress.hasOwnProperty(progress))
             return inProgress[progress];
 
         var deferred = $q.defer();
-        if (ver === 'latest') {
-            inProgress[progress] = deferred.promise;
-            $http.get(url)
-            .success(function(data, status, headers, config) {
-                var result = [];
-                data[key].forEach(function(element) {
-                    if (elements.hasOwnProperty(element.sysmlid)) {
-                        if (update) {
-                            _.merge(elements[element.sysmlid], element);
-                        } 
-                    } else {
-                        elements[element.sysmlid] = element;
-                    }
-                    UtilsService.cleanElement(elements[element.sysmlid]);
-                    result.push(elements[element.sysmlid]);
-                });
-                delete inProgress[progress];
-                deferred.resolve(result); 
-            }).error(function(data, status, headers, config) {
-                URLService.handleHttpStatus(data, status, headers, config, deferred);
-                delete inProgress[progress];
-            });
-        } else {
-            return VersionService.getGenericElements(url, key, ver, ws);
-        }
-        return deferred.promise;
+       
+        inProgress[progress] = deferred.promise;
+        $http.get(url)
+        .success(function(data, status, headers, config) {
+            var result = [];
+            data[key].forEach(function(element) {
+                var ekey = CacheService.makeElementKey(element.sysmlid, n.ws, n.ver);
+                result.push(CacheService.put(ekey, UtilsService.cleanElement(element), true));
+            }); 
+            delete inProgress[progress];
+            deferred.resolve(result); 
+        }).error(function(data, status, headers, config) {
+            URLService.handleHttpStatus(data, status, headers, config, deferred);
+            delete inProgress[progress];
+        });
+       
+        return deferred.promise;        
     };
 
     /**
@@ -407,8 +344,6 @@ function ElementService($q, $http, URLService, UtilsService, VersionService, _) 
      *      update is successful.
      */
     var updateElement = function(elem, workspace) {
-        var ws = !workspace ? 'master' : workspace;
-
         var deferred = $q.defer();
         if (!elem.hasOwnProperty('sysmlid'))
             deferred.reject('Element id not found, create element first!');
@@ -417,15 +352,13 @@ function ElementService($q, $http, URLService, UtilsService, VersionService, _) 
                 delete elem.owner; //hack for getting around a 400 error when owner
                                     //isn't found on server - ok for now since
                                     //owner can't be changed from the web
-            $http.post(URLService.getPostElementsURL(ws), {'elements': [elem]})
+            var n = normalize(elem.sysmlid, null, workspace, null);
+            $http.post(URLService.getPostElementsURL(n.ws), {'elements': [elem]})
             .success(function(data, status, headers, config) {
-                var resp = data.elements[0];
-                if (elements.hasOwnProperty(elem.sysmlid))
-                    _.merge(elements[elem.sysmlid], resp);
-                else
-                    elements[elem.sysmlid] = resp;
-                UtilsService.cleanElement(elements[elem.sysmlid]);
-                if (edits.hasOwnProperty(elem.sysmlid)) {
+                var resp = CacheService.put(n.cacheKey, UtilsService.cleanElement(data.elements[0]), true);
+                deferred.resolve(resp);
+                //TODO
+                /*if (edits.hasOwnProperty(elem.sysmlid)) {
                     var edit = edits[elem.sysmlid];
                     _.merge(edit, elements[elem.sysmlid]);
                     if (edit.hasOwnProperty('specialization')) {
@@ -435,8 +368,7 @@ function ElementService($q, $http, URLService, UtilsService, VersionService, _) 
                             }
                         }
                     }
-                }
-                deferred.resolve(elements[elem.sysmlid]);
+                }*/
             }).error(function(data, status, headers, config) {
                 URLService.handleHttpStatus(data, status, headers, config, deferred);
             });
@@ -505,7 +437,7 @@ function ElementService($q, $http, URLService, UtilsService, VersionService, _) 
      *      create is successful.
      */
     var createElement = function(elem, workspace) {
-        var ws = !workspace ? 'master' : workspace;
+        var n = normalize(null, null, workspace, null);
 
         var deferred = $q.defer();
         if (!elem.hasOwnProperty('owner')) {
@@ -517,14 +449,11 @@ function ElementService($q, $http, URLService, UtilsService, VersionService, _) 
             deferred.reject({status: 200, message: 'Element create cannot have id'});
             return deferred.promise;
         }
-        $http.post(URLService.getPostElementsURL(ws), {'elements': [elem]})
+        $http.post(URLService.getPostElementsURL(n.ws), {'elements': [elem]})
         .success(function(data, status, headers, config) {
-            if (data.elements.length > 0) {
-                var e = data.elements[0];
-                elements[e.sysmlid] = e;
-                UtilsService.cleanElement(elements[e.sysmlid]);
-                deferred.resolve(elements[e.sysmlid]);
-            }
+            var resp = data.elements[0];
+            var key = CacheService.makeElementKey(resp.sysmlid, n.ws, 'latest');
+            deferred.resolve(CacheService.put(key, UtilsService.cleanElement(resp), true));
         }).error(function(data, status, headers, config) {
             URLService.handleHttpStatus(data, status, headers, config, deferred);
         });
@@ -564,10 +493,11 @@ function ElementService($q, $http, URLService, UtilsService, VersionService, _) 
      * @returns {boolean} Whether element is dirty
      */
     var isDirty = function(id) {
-        if (!edits.hasOwnProperty(id))
+        //TODO
+        /*if (!edits.hasOwnProperty(id))
             return false;
         if (_.isEqual(elements[id], edits[id]))
-            return false;
+            return false;*/
         return true;
     };
 
@@ -585,28 +515,20 @@ function ElementService($q, $http, URLService, UtilsService, VersionService, _) 
      * @returns {Promise} The promise will be resolved with an array of element objects
      */
     var search = function(query, updateFromServer, workspace) {
+        var n = normalize(null, updateFromServer, workspace, null);
+        return getGenericElements(URLService.getElementSearchURL(query, n.ws), 'elements', n.update, n.ws, n.ver);
+    };
+
+    var normalize = function(id, updateFromServer, workspace, version) {
         var update = !updateFromServer ? false : updateFromServer;
         var ws = !workspace ? 'master' : workspace;
-
-        var deferred = $q.defer();
-        $http.get(URLService.getElementSearchURL(query, ws)) 
-        .success(function(data, status, headers, config) {
-            var result = [];
-            data.elements.forEach(function(element) {
-                if (elements.hasOwnProperty(element.sysmlid)) {
-                    if (update)
-                        _.merge(elements[element.sysmlid], element);
-                } else {
-                    elements[element.sysmlid] = element;
-                }
-                UtilsService.cleanElement(elements[element.sysmlid]);
-                result.push(elements[element.sysmlid]);
-            });
-            deferred.resolve(result); 
-        }).error(function(data, status, headers, config) {
-            URLService.handleHttpStatus(data, status, headers, config, deferred);
-        });
-        return deferred.promise;
+        var ver = !version ? 'latest' : version;
+        return {
+            cacheKey: CacheService.makeElementKey(id, ws, ver),
+            update: update,
+            ws: ws,
+            ver: ver
+        };
     };
 
     return {

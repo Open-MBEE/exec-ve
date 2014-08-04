@@ -40,6 +40,7 @@ function UtilsService(_) {
                 //delete elem.specialization.allowedElements;
             }
         }
+        return elem;
     };
 
     return {
