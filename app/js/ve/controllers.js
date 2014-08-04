@@ -10,12 +10,12 @@ function($scope, $rootScope, $state, document, time, ElementService, ViewService
     $scope.editable = $scope.document.editable && time === 'latest';
     $rootScope.veCurrentView = $scope.document.sysmlid;
     $scope.buttons = [{
-        action: function(){ $scope.my_tree.expand_all(); },        
+        action: function(){ $scope.treeApi.expand_all(); },        
         tooltip: "Expand All",
         icon: "fa-caret-square-o-down",
         permission: true
     }, {
-        action: function(){ $scope.my_tree.collapse_all(); },
+        action: function(){ $scope.treeApi.collapse_all(); },
         tooltip: "Collapse All",
         icon: "fa-caret-square-o-up",
         permission: true
@@ -255,10 +255,10 @@ function($scope, $rootScope, $stateParams, viewElements, ViewService, time, grow
         $scope.viewApi.toggleShowComments();
     };
     $scope.nextSection = function() {
-        $rootScope.veTreeApi.select_next_branch();
+        $rootScope.veTreeApi.select_next_branch($rootScope.veTreeApi.get_selected_branch());
     };
     $scope.prevSection = function() {
-        $rootScope.veTreeApi.select_prev_branch();
+        $rootScope.veTreeApi.select_prev_branch($rootScope.veTreeApi.get_selected_branch());
     };
 }])
 .controller('ToolbarCtrl', ['$scope', '$rootScope',
@@ -271,7 +271,7 @@ function($scope, $rootScope) {
             onClick: function() {$rootScope.$broadcast('elementViewerSelected');}},
         {id: 'elementEditor', icon: 'fa fa-edit', selected: false, active: true, tooltip: 'Edit Element',
             onClick: function() {$rootScope.$broadcast('elementEditorSelected');}},
-        {id: 'viewStructEditor', icon: 'fa fa-bars', selected: false, active: true, tooltip: 'Edit View',
+        {id: 'viewStructEditor', icon: 'fa fa-arrows-v', selected: false, active: true, tooltip: 'Edit View',
             onClick: function() {$rootScope.$broadcast('viewStructEditorSelected');}},
         {id: 'documentSnapshots', icon: 'fa fa-camera', selected: false, active: true, tooltip: 'Snapshots',
             onClick: function() {$rootScope.$broadcast('snapshotsSelected');}},
