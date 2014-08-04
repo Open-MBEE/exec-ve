@@ -61,7 +61,7 @@
   </thead>
 
   <tbody>
-    <tr class="specialization-row" ng-class="{}">
+    <tr class="specialization-row" ng-class="{addition: specAddition, removal: specRemoval, update: specUpdate, clean: specClean}">
       <td>Specialization Type</td>
       <td>{{original.specialization.type}}</td>
       <td>{{delta.specialization.type}}</td>
@@ -73,7 +73,7 @@
       <td>{{delta.specialization.valueArray[0]}}</td>
     </tr>
 
-    <tr class="value-row" ng-class="{}">
+    <tr class="value-row" ng-class="{addition: valAddition, removal: valRemoval, update: valUpdate, clean: valClean}">
       <td>Value</td>
       <td>{{original.specialization.valueArray[1]}}</td>
       <td>{{delta.specialization.valueArray[1]}}</td>
