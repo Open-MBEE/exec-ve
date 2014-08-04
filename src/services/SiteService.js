@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms')
-.factory('SiteService', ['$q', '$http', 'URLService', 'ProjectService', '_', SiteService]);
+.factory('SiteService', ['$q', '$http', 'URLService', 'ProjectService', 'CacheService', '_', SiteService]);
 
 /**
  * @ngdoc service
@@ -24,32 +24,17 @@ angular.module('mms')
  *      }
  * ```
  */
-function SiteService($q, $http, URLService, ProjectService, _) {
+function SiteService($q, $http, URLService, ProjectService, CacheService, _) {
     var currentSite = 'europa';
-    var currentWorkspace = 'master';
-    var sites = {};
-    var workspaces = {};
-    var siteDocuments = {};
     var inProgress = null;
 
-
+    /* TODO remove */
     var setCurrentSite = function(site) {
         currentSite = site;
     };
 
-
     var getCurrentSite = function() {
         return currentSite;
-    };
-
-
-    var setCurrentWorkspace = function(workspace) {
-        currentWorkspace = workspace;
-    };
-
-
-    var getCurrentWorkspace = function() {
-        return currentWorkspace;
     };
 
     /**
@@ -65,16 +50,13 @@ function SiteService($q, $http, URLService, ProjectService, _) {
      */
     var getSite = function(site) {
         var deferred = $q.defer();
-        if (sites.hasOwnProperty(site)) 
-            deferred.resolve(sites[site]);
-        else {
-            getSites().then(function(data) {
-                if (sites.hasOwnProperty(site))
-                    deferred.resolve(sites[site]);
-                else
-                    deferred.reject("Site not found");
-            });
-        }
+        getSites().then(function(data) {
+            var result = CacheService.get(['sites', site]);
+            if (result)
+                deferred.resolve(result);
+            else
+                deferred.reject("Site not found");
+        });
         return deferred.promise;
     };
 
@@ -91,19 +73,16 @@ function SiteService($q, $http, URLService, ProjectService, _) {
         if (inProgress)
             return inProgress;
         var deferred = $q.defer();
-        if (!_.isEmpty(sites)) {
-            deferred.resolve(_.values(sites));
+        if (CacheService.exists('sites')) {
+            deferred.resolve(CacheService.get('sites'));
         } else {
             inProgress = deferred.promise;
             $http.get(URLService.getSitesURL())
             .success(function(data, status, headers, config) {
-                _.forEach(data, function(site) {
-                    if (!sites.hasOwnProperty(site.name))
-                        sites[site.name] = site;
-                    else
-                        _.merge(sites[site.name], site);
+                CacheService.put('sites', data, true, function(site, i) {
+                    return {key: ['sites', site.name], value: site, merge: true};
                 });
-                deferred.resolve(_.values(sites));
+                deferred.resolve(CacheService.get('sites'));
                 inProgress = null;
             }).error(function(data, status, headers, config) {
                 URLService.handleHttpStatus(data, status, headers, config, deferred);
@@ -121,8 +100,6 @@ function SiteService($q, $http, URLService, ProjectService, _) {
     return {
         getCurrentSite: getCurrentSite,
         setCurrentSite: setCurrentSite,
-        getCurrentWorkspace: getCurrentWorkspace,
-        setCurrentWorkspace: setCurrentWorkspace,
         getSites: getSites,
         getSite: getSite,
         getSiteProjects: getSiteProjects
