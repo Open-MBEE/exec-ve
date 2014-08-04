@@ -45,36 +45,72 @@ function mmsDiffTable($templateCache, $rootScope, DiffService) {
     scope.delta.specialization = scope.original.specialization;
     scope.delta.specialization.value = scope.original.specialization.value;
     var keyIndex = 0;
+    var valArrIndex = 0;
 
+    //loop iterates over value obj and places each value in valueArray
     for(var keyVar in $rootScope.tableElement.specialization.value[0]){
       scope.original.specialization.valueArray[keyIndex] = $rootScope.tableElement.specialization.value[0][keyVar];
       keyIndex++;
     }
 
+    //runs if selected element has a conflict
     if ($rootScope.conflict) {
       for (var conflictKey in $rootScope.conflictElement) {
         if (scope.delta.hasOwnProperty(conflictKey)) {
           scope.delta[conflictKey] = $rootScope.conflictElement[conflictKey];
         }
       }
+
+      //updates valueArray if new/updated element has changed values
+      if($rootScope.conflictElement.specialization !== undefined && $rootScope.conflictElement.specialization.value !== undefined){
+        valArrIndex = 0;
+        for (var valKey0 in $rootScope.conflictElement.specialization.value[0][valKey0]){
+          if(scope.delta.specialization.valueArray[valArrIndex] !== $rootScope.conflictElement.specialization.value[0][valKey0]){
+            scope.delta.specialization.valueArray[valArrIndex] = $rootScope.conflictElement.specialization.value[0][valKey0];
+          }
+        }
+      }
     }
 
+    //runs if selected element has been moved
     if ($rootScope.elementMoved) {
       for (var movedKey in $rootScope.movedElement) {
         if (scope.delta.hasOwnProperty(movedKey)) {
           scope.delta[movedKey] = $rootScope.movedElement[movedKey];
         } 
       }
+
+      //updates valueArray if new/updated element has changed values
+      if($rootScope.movedElement.specialization !== undefined && $rootScope.movedElement.specialization.value !== undefined){
+        valArrIndex = 0;
+        for (var valKey1 in $rootScope.movedElement.specialization.value[0][valKey1]){
+          if(scope.delta.specialization.valueArray[valArrIndex] !== $rootScope.movedElement.specialization.value[0][valKey1]){
+            scope.delta.specialization.valueArray[valArrIndex] = $rootScope.movedElement.specialization.value[0][valKey1];
+          }
+        }
+      }
     }
 
+    //runs if selected element has been updated
     if ($rootScope.elementUpdated) {
       for (var updateKey in $rootScope.updatedElement) {
         if (scope.delta.hasOwnProperty(updateKey)) {
           scope.delta[updateKey] = $rootScope.updatedElement[updateKey];
         }
       }
+
+      //updates valueArray if new/updated element has changed values
+      if($rootScope.updatedElement.specialization !== undefined && $rootScope.updatedElement.specialization.value !== undefined){
+        valArrIndex = 0;
+        for (var valKey2 in $rootScope.updatedElement.specialization.value[0][valKey2]){
+          if(scope.delta.specialization.valueArray[valArrIndex] !== $rootScope.updatedElement.specialization.value[0][valKey2]){
+            scope.delta.specialization.valueArray[valArrIndex] = $rootScope.updatedElement.specialization.value[0][valKey2];
+          }
+        }
+      }
     }
 
+    //runs if selected element is a new element; only appears as delta
     if ($rootScope.elementAdded) {
       for (var addKey in $rootScope.updatedElement) {
         if (scope.delta.hasOwnProperty(addKey)) {
@@ -87,6 +123,7 @@ function mmsDiffTable($templateCache, $rootScope, DiffService) {
       scope.original.specialization = null;
     }
 
+    //runs if selected element has been deleted by another user; only appears as "mine"
     if ($rootScope.elementDeleted) {
       scope.delta.name = null;
       scope.delta.owner = null;
@@ -99,6 +136,7 @@ function mmsDiffTable($templateCache, $rootScope, DiffService) {
    * Sets up CSS class truth values for table highlighting
    */
   var loadTableHighlighting = function(scope) {
+    //following variables are created to store logic and be more understandable for reading
     var namesAreDifferent = scope.original.name !== scope.delta.name;
     var originalNameIsNull = scope.original.name === null;
     var originalNameIsEmpty = scope.original.name === '';
@@ -123,6 +161,8 @@ function mmsDiffTable($templateCache, $rootScope, DiffService) {
     var deltaTypeIsNull = scope.delta.specialization === null;
     var deltaTypeIsEmpty = scope.delta.specialization === '';
 
+
+    //logic to set css classes
     scope.nameAddition = namesAreDifferent && 
                          (originalNameIsNull || originalNameIsEmpty);
     scope.nameRemoval = (!originalNameIsNull && !originalNameIsEmpty) && 
