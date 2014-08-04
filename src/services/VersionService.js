@@ -48,7 +48,7 @@ function VersionService($q, $http, URLService) {
         }
         var url = URLService.getElementURL(id, ws, version);
         inProgress[key] = deferred.promise;
-        $http.get(url, {params: {timestamp: version}})
+        $http.get(url)
         .success(function(data, status, headers, config) {
             if (data.elements.length > 0) {
                 elements[id][version] = data.elements[0];
@@ -139,7 +139,7 @@ function VersionService($q, $http, URLService) {
 
         var deferred = $q.defer();
         inProgress[progress] = deferred.promise;
-        $http.get(url, {params: {timestamp: version}})
+        $http.get(url)
         .success(function(data, status, headers, config) {
             var result = [];
             data[key].forEach(function(element) {
