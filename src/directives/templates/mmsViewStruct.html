@@ -1,18 +1,15 @@
 <div>
-    <div ng-show="$root.reorderIsOpen">
-        <button class="btn btn-sm btn-primary" ng-click="toggleStructEdit()">{{structEdit}}</button> 
-        <button class="btn btn-sm btn-primary" ng-click="save()">Save</button>
-    </div> 
-    </div>
     <div ui-sortable="sortableOptions" ng-model="edit.specialization.contains">
         <div ng-repeat="contain in edit.specialization.contains" ng-switch on="contain.type"> 
-        <div ng-class="structEditable ? 'panel panel-default' : ''">
-        <div ng-class="structEditable ? 'panel-body' : ''">
-            <div ng-switch-when="Paragraph">Paragraph</div>
-            <div ng-switch-when="Table">Table</div>
-            <div ng-switch-when="List">List</div>
-            <div ng-switch-when="Image">Image</div>
-            <mms-view-section-struct data-mms-section="contain" ng-switch-when="Section"></mms-view-section-struct>
-        </div></div></div>
+            <div ng-class="editing ? 'panel panel-default' : ''">
+                <div ng-class="editing ? 'panel-body' : ''">
+                    <div ng-switch-when="Paragraph">Paragraph</div>
+                    <div ng-switch-when="Table">Table</div>
+                    <div ng-switch-when="List">List</div>
+                    <div ng-switch-when="Image">Image</div>
+                    <mms-view-section-struct data-mms-section="contain" ng-switch-when="Section"></mms-view-section-struct>
+                </div>
+            </div>
+        </div>
     </div>
 </div>

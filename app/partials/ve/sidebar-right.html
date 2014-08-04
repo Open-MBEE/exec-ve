@@ -1,14 +1,26 @@
-<ul class="wrap">
-    <li ui-sref-active="active">
-      <a ui-sref="doc.view" tooltip="Element Data" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="left" tooltip-append-to-body="true" ><i class="fa fa-eye"></i></a>
-    </li>
-    <span class="divider"></span>
-    <li ui-sref-active="active">
-      <a ui-sref="doc.history" tooltip="Element History" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="left" tooltip-append-to-body="true"><i class="fa fa-history"></i></a>
-    </li>
-    <span class="divider"></span>
-    <li ui-sref-active="active">
-      <a ui-sref="doc.expr-editor" tooltip="Expression Editor" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="left" tooltip-append-to-body="true"><i class="fa fa-terminal"></i></a>
-    </li>
-    <span class="divider"></span>
-</ul>
+<div class="container-fluid" ng-show="show.element">
+    <mms-spec mms-eid="{{eid}}" mms-cf-elements="viewElements" mms-edit-field="all" mms-version="{{version}}" mms-spec-api="specApi"></mms-spec>
+</div>
+<div class="container-fluid" ng-show="show.reorder">
+    <mms-view-struct mms-vid="{{vid}}" mms-version="{{version}}" mms-order="true" mms-view-struct-api="viewOrderApi"></mms-view-struct>
+</div>
+<div class="container-fluid" ng-show="show.snapshots">
+    <table class="table table-hover table-condensed">
+        <tr><td><a ui-sref="doc({site: site.name, docId: document.sysmlid, time: 'latest'})" 
+            ui-sref-opts="{reload: true}">Latest</a></td></tr>
+        <tr ng-repeat="snapshot in snapshots | orderBy:'-created'">
+            <td>
+                <a ui-sref="doc({site: site.name, docId: document.sysmlid, time: snapshot.created})" 
+                    ui-sref-opts="{reload: true}">{{snapshot.created | date:'M/d/yy h:mm a'}}</a>
+            </td>
+            <td>
+                <div ng-repeat="config in snapshot.configurations | orderBy:'name'">
+                    <a href="docweb.html#/sites/{{site.name}}/config/{{config.id}}">{{config.name}}</a>
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    <button ng-show="editable" class="btn btn-sm btn-primary" ng-click="createNewSnapshot()">Create New</button>
+    <button class="btn btn-sm btn-primary" ng-click="refreshSnapshots()">Refresh</button>
+</div>

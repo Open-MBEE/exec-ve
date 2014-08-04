@@ -9,9 +9,9 @@ function mmsViewSectionStruct($compile, $templateCache) {
     var mmsViewSectionStructLink = function(scope, element, attrs, mmsViewStructCtrl) {
         element.append(template);
         $compile(element.contents())(scope); 
-        scope.structEditable = function() {
+        scope.editing = function() {
             if (mmsViewStructCtrl) {
-                return mmsViewStructCtrl.getStructEditable();
+                return mmsViewStructCtrl.getEditing();
             } else
                 return false;
         };

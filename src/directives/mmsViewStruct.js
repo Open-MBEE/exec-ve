@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsViewStruct', ['ViewService', '$templateCache', '$rootScope', 'growl', '_', mmsViewStruct]);
+.directive('mmsViewStruct', ['ViewService', '$templateCache', 'growl', '$q', '_', mmsViewStruct]);
 
 /**
  * @ngdoc directive
@@ -19,19 +19,17 @@ angular.module('mms.directives')
  * @param {string=master} mmsWs Workspace to use, defaults to master
  * @param {string=latest} mmsVersion Version can be alfresco version number or timestamp, default is latest
  */
-function mmsViewStruct(ViewService, $templateCache, $rootScope, growl, _) {
+function mmsViewStruct(ViewService, $templateCache, growl, $q, _) {
     var template = $templateCache.get('mms/templates/mmsViewStruct.html');
 
     var mmsViewStructCtrl = function($scope, ViewService) {
-        this.getStructEditable = function() {
-            return $scope.structEditable;
+        this.getEditing = function() {
+            return $scope.editing;
         };
     };
 
     var mmsViewStructLink = function(scope, element, attrs) {
-        scope.editingPermission = false;
-        scope.reorderingPermission = false;
-
+        scope.editable = false;
         scope.$watch('mmsVid', function(newVal, oldVal) {
             if (!newVal)
                 return;
@@ -41,8 +39,7 @@ function mmsViewStruct(ViewService, $templateCache, $rootScope, growl, _) {
                 scope.lastModified = data.lastModified;
                 scope.author = data.author;
                 scope.edit = _.cloneDeep(scope.view);
-                scope.editingPermission = scope.edit.editable;
-                scope.$emit('viewEditability', scope.edit.editable);
+                scope.editable = scope.edit.editable && scope.mmsVersion === 'latest';
                 delete scope.edit.name;
                 delete scope.edit.documentation;
             }, function(reason) {
@@ -50,27 +47,57 @@ function mmsViewStruct(ViewService, $templateCache, $rootScope, growl, _) {
             });
         });
 
-        scope.structEditable = false;
-        scope.structEdit = 'Edit Order';
+        scope.editing = false;
         scope.sortableOptions = {
             axis: 'y'
         };
-        scope.toggleStructEdit = function() {
-            scope.structEditable = !scope.structEditable;
-            scope.structEdit = scope.structEditable ? 'Cancel' : 'Edit Order';
-            element.find('.ui-sortable').sortable('option', 'cancel', scope.structEditable ? '' : 'div');
+        scope.toggleEditing = function() {
+            if (!scope.editable) 
+                return false;
+            scope.editing = !scope.editing;
+            element.find('.ui-sortable').sortable('option', 'cancel', scope.editing ? '' : 'div');
+            return true;
         };
-        scope.toggleStructEdit();
         scope.save = function() {
-            ViewService.updateView(scope.edit)
-            .then(function(result) {
-                growl.success("Save Successful.");
-                scope.edit.read = result.read;
-                scope.toggleStructEdit();
+            var deferred = $q.defer();
+            if (!scope.editable || !scope.editing) {
+                deferred.reject({type: 'error', message: "View isn't editable and can't be saved."});
+                return deferred.promise;
+            }
+            ViewService.updateView(scope.edit, scope.mmsWs)
+            .then(function(data) {
+                deferred.resolve(data);
             }, function(reason) {
-                growl.error("Failed: " + reason.message);
+                if (reason.status === 409) {
+                    scope.latest = reason.data.elements[0];
+                    scope.edit.read = scope.latest.read;
+                    scope.save().then(function(resolved) {
+                        deferred.resolve(resolved);
+                    }, function(rejected) {
+                        deferred.resolve(rejected);
+                    });
+                } else {
+                    deferred.reject({type: 'error', message: reason.message});
+                    //growl.error("Save Error: Status " + reason.status);
+                }
             });
+            return deferred.promise;
         };
+        scope.revert = function() {
+            scope.edit.specialization.contains = _.cloneDeep(scope.view.specialization.contains);
+        };
+        if (angular.isObject(scope.mmsViewStructApi)) {
+            var api = scope.mmsViewStructApi;
+            api.toggleEditing = scope.toggleEditing;
+            api.save = scope.save;
+            api.setEditing = function(mode) {
+                if (!scope.editable && mode)
+                    return false;
+                scope.editing = mode;
+                element.find('.ui-sortable').sortable('option', 'cancel', scope.editing ? '' : 'div');
+            };
+            api.revertEdits = scope.revert;
+        }
     };
 
     return {
@@ -80,7 +107,8 @@ function mmsViewStruct(ViewService, $templateCache, $rootScope, growl, _) {
             mmsVid: '@',
             mmsWs: '@',
             mmsVersion: '@',
-            mmsOrder: '='
+            mmsOrder: '=',
+            mmsViewStructApi: '='
         },
         controller: ['$scope', 'ViewService', mmsViewStructCtrl],
         link: mmsViewStructLink
