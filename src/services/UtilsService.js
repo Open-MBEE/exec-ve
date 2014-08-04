@@ -12,7 +12,9 @@ angular.module('mms')
  * Utilities
  */
 function UtilsService(_) {
-    
+    var nonEditKeys = ['contains', 'view2view', 'childrenViews', 'displayedElements',
+        'allowedElements'];
+
     var hasCircularReference = function(scope, curId, curType) {
         var curscope = scope;
         while (curscope.$parent) {
@@ -24,7 +26,7 @@ function UtilsService(_) {
         return false;
     };
 
-    var cleanElement = function(elem) {
+    var cleanElement = function(elem, forEdit) {
         if (elem.hasOwnProperty('specialization')) {
             if (elem.specialization.type === 'Property') {
                 var spec = elem.specialization;
@@ -38,6 +40,13 @@ function UtilsService(_) {
             if (elem.specialization.type === 'View') {
                 //delete elem.specialization.displayedElements;
                 //delete elem.specialization.allowedElements;
+            }
+            if (forEdit) {
+                for (var i = 0; i < nonEditKeys.length; i++) {
+                    if (elem.specialization.hasOwnProperty(nonEditKeys[i])) {
+                        delete elem.specialization[nonEditKeys[i]];
+                    }
+                }
             }
         }
         return elem;

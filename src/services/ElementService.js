@@ -23,10 +23,7 @@ angular.module('mms')
  * For element json example, see [here](https://ems.jpl.nasa.gov/alfresco/scripts/raml/index.html)
  */
 function ElementService($q, $http, URLService, UtilsService, CacheService, _) {
-    var elements = {};
-    var edits = {};
-    var nonEditKeys = ['contains', 'view2view', 'childrenViews', 'displayedElements',
-        'allowedElements'];
+    
     var inProgress = {};
     /**
      * @ngdoc method
@@ -162,39 +159,16 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, _) {
      *      affecting the same element object that's used for displays
      */
     var getElementForEdit = function(id, updateFromServer, workspace) {
-        var update = !updateFromServer ? false : updateFromServer;
-        var ws = !workspace ? 'master' : workspace;
+        var n = normalize(id, updateFromServer, workspace, null, true);
 
         var deferred = $q.defer();
-        if (edits.hasOwnProperty(id) && !update)
-            deferred.resolve(edits[id]);
+        if (CacheService.exists(n.cacheKey))
+            deferred.resolve(CacheService.get(n.cacheKey));
         else {
-            getElement(id, update, ws)
+            getElement(id, n.update, n.ws)
             .then(function(data) {
-                var edit = null, i;
-                if (edits.hasOwnProperty(id)) {
-                    _.merge(edits[id], data);
-                    edit = edits[id];
-                    if (edit.hasOwnProperty('specialization')) {
-                        for (i = 0; i < nonEditKeys.length; i++) {
-                            if (edit.specialization.hasOwnProperty(nonEditKeys[i])) {
-                                delete edit.specialization[nonEditKeys[i]];
-                            }
-                        }
-                    }
-                    deferred.resolve(edits[id]);
-                } else {
-                    edit = _.cloneDeep(data);
-                    edits[id] = edit;
-                    if (edit.hasOwnProperty('specialization')) {
-                        for (i = 0; i < nonEditKeys.length; i++) {
-                            if (edit.specialization.hasOwnProperty(nonEditKeys[i])) {
-                                delete edit.specialization[nonEditKeys[i]];
-                            }
-                        }
-                    }
-                    deferred.resolve(edit);
-                }
+                var edit = _.cloneDeep(data);
+                deferred.resolve(CacheService.put(n.cacheKey, UtilsService.cleanElement(edit, true), true));
             }, function(reason) {
                 deferred.reject(reason);
             });
@@ -357,18 +331,12 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, _) {
             .success(function(data, status, headers, config) {
                 var resp = CacheService.put(n.cacheKey, UtilsService.cleanElement(data.elements[0]), true);
                 deferred.resolve(resp);
-                //TODO
-                /*if (edits.hasOwnProperty(elem.sysmlid)) {
-                    var edit = edits[elem.sysmlid];
-                    _.merge(edit, elements[elem.sysmlid]);
-                    if (edit.hasOwnProperty('specialization')) {
-                        for (var i = 0; i < nonEditKeys.length; i++) {
-                            if (edit.specialization.hasOwnProperty(nonEditKeys[i])) {
-                                delete edit[nonEditKeys[i]];
-                            }
-                        }
-                    }
-                }*/
+                /* TODO better way to sync edits on update, maybe app level*/
+                var edit = CacheService.remove(CacheService.makeElementKey(elem.sysmlid, n.ws, null, true));
+                if (edit) {
+                    _.merge(edit, resp);
+                    UtilsService.cleanElement(edit, true);
+                }
             }).error(function(data, status, headers, config) {
                 URLService.handleHttpStatus(data, status, headers, config, deferred);
             });
@@ -492,13 +460,14 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, _) {
      * @param {string} id Element id
      * @returns {boolean} Whether element is dirty
      */
-    var isDirty = function(id) {
-        //TODO
-        /*if (!edits.hasOwnProperty(id))
-            return false;
-        if (_.isEqual(elements[id], edits[id]))
-            return false;*/
-        return true;
+    var isDirty = function(id, workspace) {
+        var editKey = CacheService.makeElementKey(id, workspace, null, true);
+        var normalKey = CacheService.makeElementKey(id, workspace);
+        var normal = CacheService.get(normalKey);
+        var edit = CacheService.get(editKey);
+        if (edit && !_.isEqual(normal, edit))
+            return true;
+        return false;
     };
 
     /**
@@ -519,12 +488,41 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, _) {
         return getGenericElements(URLService.getElementSearchURL(query, n.ws), 'elements', n.update, n.ws, n.ver);
     };
 
-    var normalize = function(id, updateFromServer, workspace, version) {
+    /**
+     * @ngdoc method
+     * @name mms.ElementService#getElementVersions
+     * @methodOf mms.ElementService
+     * 
+     * @description
+     * Queries for an element's entire version history
+     *
+     * @param {string} id The id of the element
+     * @param {boolean} [updateFromServer=false] update element version cache
+     * @param {string} [workspace=master] workspace
+     * @returns {Promise} The promise will be resolved with an array of version objects.
+     */
+    var getElementVersions = function(id, updateFromServer, workspace) {
+        var n = normalize(id, updateFromServer, workspace, 'versions');
+        var deferred = $q.defer();
+        if (CacheService.exists(n.cacheKey) && !n.update) {
+            deferred.resolve(CacheService.get(n.cacheKey));
+            return deferred.promise;
+        }
+        $http.get(URLService.getElementVersionsURL(id, n.ws))
+        .success(function(data, statas, headers, config){
+            deferred.resolve(CacheService.put(n.cacheKey, data.versions, true));
+        }).error(function(data, status, headers, config){
+            URLService.handleHttpStatus(data, status, headers, config, deferred);
+        });
+        return deferred.promise;
+    };
+
+    var normalize = function(id, updateFromServer, workspace, version, edit) {
         var update = !updateFromServer ? false : updateFromServer;
         var ws = !workspace ? 'master' : workspace;
         var ver = !version ? 'latest' : version;
         return {
-            cacheKey: CacheService.makeElementKey(id, ws, ver),
+            cacheKey: CacheService.makeElementKey(id, ws, ver, edit),
             update: update,
             ws: ws,
             ver: ver
@@ -542,6 +540,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, _) {
         createElement: createElement,
         createElements: createElements,
         getGenericElements: getGenericElements,
+        getElementVersions: getElementVersions,
         isDirty: isDirty,
         search: search
     };
