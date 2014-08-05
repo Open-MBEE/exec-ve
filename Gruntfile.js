@@ -127,7 +127,7 @@ module.exports = function(grunt) {
       },
       combine: {
         files: {
-          'dist/styles.min.css': ['dist/css/*.min.css']
+          'dist/ve.styles.min.css': ['dist/css/mms.min.css', 'dist/css/ve.min.css'],
         }
       }
     },
