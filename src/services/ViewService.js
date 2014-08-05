@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms')
-.factory('ViewService', ['$q', '$http', 'URLService', 'ElementService', 'CommentService', ViewService]);
+.factory('ViewService', ['$q', '$http', 'URLService', 'ElementService', 'UtilsService', 'CacheService', ViewService]);
 
 /**
  * @ngdoc service
@@ -18,10 +18,7 @@ angular.module('mms')
  *
  * For View and Product json object schemas, see [here](https://ems.jpl.nasa.gov/alfresco/scripts/raml/index.html)
  */
-function ViewService($q, $http, URLService, ElementService, CommentService) {
-    var viewElements = {"latest": {}};
-    var productViews = {"latest": {}};
-    var siteDocuments = {};
+function ViewService($q, $http, URLService, ElementService, UtilsService, CacheService) {
     var currentViewId = '';
     var currentDocumentId = '';
     
@@ -151,24 +148,16 @@ function ViewService($q, $http, URLService, ElementService, CommentService) {
      * @returns {Promise} The promise will be resolved with array of element objects. 
      */
     var getViewElements = function(id, updateFromServer, workspace, version) {
-        var update = !updateFromServer ? false : updateFromServer;
-        var ws = !workspace ? 'master' : workspace;
-        var ver = !version ? 'latest' : version;
-
+        var n = normalize(updateFromServer, workspace, version);
         var deferred = $q.defer();
-        var url = URLService.getViewElementsURL(id, ws, ver);
-        if (viewElements.hasOwnProperty(ver) && viewElements[ver].hasOwnProperty(id) && !update) 
-            deferred.resolve(viewElements[ver][id]);
+        var url = URLService.getViewElementsURL(id, n.ws, n.ver);
+        var cacheKey = ['views', n.ws, id, n.ver, 'elements'];
+        if (CacheService.exists(cacheKey) && !n.update) 
+            deferred.resolve(CacheService.get(cacheKey));
         else {
-            ElementService.getGenericElements(url, 'elements', update, ws, ver).
+            ElementService.getGenericElements(url, 'elements', n.update, n.ws, n.ver).
             then(function(data) {
-                if (viewElements.hasOwnProperty(ver)) {
-                    viewElements[ver][id] = data;
-                } else {
-                    viewElements[ver] = {};
-                    viewElements[ver][id] = data;
-                }
-                deferred.resolve(viewElements[ver][id]);
+                deferred.resolve(CacheService.put(cacheKey, data, false));
             }, function(reason) {
                 deferred.reject(reason);
             });
@@ -194,49 +183,21 @@ function ViewService($q, $http, URLService, ElementService, CommentService) {
      * @returns {Promise} The promise will be resolved with array of view objects. 
      */
     var getDocumentViews = function(id, updateFromServer, workspace, version) {
-        var update = !updateFromServer ? false : updateFromServer;
-        var ws = !workspace ? 'master' : workspace;
-        var ver = !version ? 'latest' : version;
-
+        var n = normalize(updateFromServer, workspace, version);
         var deferred = $q.defer();
-        var url = URLService.getDocumentViewsURL(id, ws, ver);
-        if (productViews.hasOwnProperty(ver) && productViews[ver].hasOwnProperty(id) && !update) 
-            deferred.resolve(productViews[ver][id]);
+        var url = URLService.getDocumentViewsURL(id, n.ws, n.ver);
+        var cacheKey = ['products', n.ws, id, n.ver, 'views'];
+        if (CacheService.exists(cacheKey) && !n.update) 
+            deferred.resolve(CacheService.get(cacheKey));
         else {
-            ElementService.getGenericElements(url, 'views', update, ws, ver).
+            ElementService.getGenericElements(url, 'views', n.update, n.ws, n.ver).
             then(function(data) {
-                if (productViews.hasOwnProperty(ver)) {
-                    productViews[ver][id] = data;
-                } else {
-                    productViews[ver] = {};
-                    productViews[ver][id] = data;
-                }
-                deferred.resolve(productViews[ver][id]);
+                deferred.resolve(CacheService.put(cacheKey, data, false));
             }, function(reason) {
                 deferred.reject(reason);
             });
         }
         return deferred.promise;
-    };
-
-
-    var getViewComments = function(id) {
-
-    };
-
-
-    var addViewComment = function(id, comment) {
-
-    };
-
-
-    var deleteViewComment = function(id, commentId) {
-
-    };
-
-
-    var updateViewElements = function(id) {
-
     };
 
     /**
@@ -352,18 +313,16 @@ function ViewService($q, $http, URLService, ElementService, CommentService) {
      * @returns {Promise} The promise will be resolved with array of document objects 
      */
     var getSiteDocuments = function(site, updateFromServer, workspace) {
-        var update = !updateFromServer ? false : updateFromServer;
-        var ws = !workspace ? 'master' : workspace;
-
+        var n = normalize(updateFromServer, workspace, null);
         var deferred = $q.defer();
-        var url = URLService.getSiteProductsURL(site, ws);
-        if (siteDocuments.hasOwnProperty(site) && !update) 
-            deferred.resolve(siteDocuments[site]);
+        var url = URLService.getSiteProductsURL(site, n.ws);
+        var cacheKey = ['sites', n.ws, site, 'products'];
+        if (CacheService.exists(cacheKey) && !n.update) 
+            deferred.resolve(CacheService.get(cacheKey));
         else {
-            ElementService.getGenericElements(url, 'products', update, ws).
-            then(function(data) {
-                siteDocuments[site] = data;                
-                deferred.resolve(siteDocuments[site]);
+            ElementService.getGenericElements(url, 'products', n.update, n.ws).
+            then(function(data) {              
+                deferred.resolve(CacheService.put(cacheKey, data, false));
             }, function(reason) {
                 deferred.reject(reason);
             });
@@ -387,6 +346,10 @@ function ViewService($q, $http, URLService, ElementService, CommentService) {
         return currentDocumentId;
     };
 
+    var normalize = function(updateFromServer, workspace, version) {
+        return UtilsService.normalize({update: updateFromServer, workspace: workspace, version: version});
+    };
+
     return {
         getView: getView,
         getViews: getViews,
@@ -394,10 +357,6 @@ function ViewService($q, $http, URLService, ElementService, CommentService) {
         updateView: updateView,
         updateDocument: updateDocument,
         getViewElements: getViewElements,
-        getViewComments: getViewComments,
-        addViewComment: addViewComment,
-        deleteViewComment: deleteViewComment,
-        updateViewElements: updateViewElements,
         createView: createView,
         addViewToDocument: addViewToDocument,
         getDocumentViews: getDocumentViews,

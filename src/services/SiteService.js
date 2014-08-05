@@ -51,7 +51,7 @@ function SiteService($q, $http, URLService, ProjectService, CacheService, _) {
     var getSite = function(site) {
         var deferred = $q.defer();
         getSites().then(function(data) {
-            var result = CacheService.get(['sites', site]);
+            var result = CacheService.get(['sites', 'master', site]);
             if (result)
                 deferred.resolve(result);
             else
@@ -73,16 +73,17 @@ function SiteService($q, $http, URLService, ProjectService, CacheService, _) {
         if (inProgress)
             return inProgress;
         var deferred = $q.defer();
-        if (CacheService.exists('sites')) {
-            deferred.resolve(CacheService.get('sites'));
+        var cacheKey = ['sites', 'master'];
+        if (CacheService.exists(cacheKey)) {
+            deferred.resolve(CacheService.get(cacheKey));
         } else {
             inProgress = deferred.promise;
             $http.get(URLService.getSitesURL())
             .success(function(data, status, headers, config) {
-                CacheService.put('sites', data, true, function(site, i) {
-                    return {key: ['sites', site.name], value: site, merge: true};
+                CacheService.put(cacheKey, data, true, function(site, i) {
+                    return {key: ['sites', 'master', site.name], value: site, merge: true};
                 });
-                deferred.resolve(CacheService.get('sites'));
+                deferred.resolve(CacheService.get(cacheKey));
                 inProgress = null;
             }).error(function(data, status, headers, config) {
                 URLService.handleHttpStatus(data, status, headers, config, deferred);
