@@ -1,11 +1,18 @@
 $navHeight: 40px;
+$mainViewShadowColor: rgba(0,0,0,.26);
 
 .content-container {
   top: $navHeight;
 }
 
 .main-view-container {
-  -webkit-box-shadow: 0 0 9px rgba(0,0,0,.26);
-  -moz-box-shadow: 0 0 9px rgba(0,0,0,.26);
-  box-shadow: 0 0 9px rgba(0,0,0,.26); 
+  -webkit-box-shadow: 0 0 9px $mainViewShadowColor;
+  -moz-box-shadow: 0 0 9px $mainViewShadowColor;
+  box-shadow: 0 0 9px $mainViewShadowColor; 
+}
+
+.abn-tree-row {
+  .shaft-selected {
+    background: transparent;
+  }
 }
