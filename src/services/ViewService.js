@@ -330,6 +330,7 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
         return deferred.promise;
     };
 
+    //TODO remove
     var setCurrentViewId = function(id) {
         currentViewId = id;
     };
