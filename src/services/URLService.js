@@ -217,12 +217,9 @@ function urlService(baseUrl) {
      * @param {string} version Timestamp or version number
      * @returns {string} The url.
      */
-    var getElementURL = function(id, workspace, version) {
-        //return root + "/javawebscripts/elements/" + id;
-        
+    var getElementURL = function(id, workspace, version) {        
         var r = root + '/workspaces/' + workspace + '/elements/' + id;
         return addVersion(r, version);
-        
     };
 
     var getOwnedElementURL = function(id, workspace, version) {
@@ -247,11 +244,9 @@ function urlService(baseUrl) {
      * @returns {string} The url.
      */
     var getDocumentViewsURL = function(id, workspace, version) {
-        return root + "/javawebscripts/products/" + id + "/views";
-        /*
-        var r = root + "/workspaces/" + workspace + "/products/" + id + "/views";
+        var r = root + "/javawebscripts/products/" + id + "/views";
+        //var r = root + "/workspaces/" + workspace + "/products/" + id + "/views";
         return addVersion(r, version);
-        */
     };
 
     /**
@@ -268,11 +263,9 @@ function urlService(baseUrl) {
      * @returns {string} The url.
      */
     var getViewElementsURL = function(id, workspace, version) {
-        return root + "/javawebscripts/views/" + id + "/elements";
-        /*
-        var r = root + "/workspaces/" + workspace + "/views/" + id + "/elements";
+        var r = root + "/javawebscripts/views/" + id + "/elements";
+        //var r = root + "/workspaces/" + workspace + "/views/" + id + "/elements";
         return addVersion(r, version);
-    */
     };
 
     /**
