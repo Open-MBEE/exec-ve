@@ -71,11 +71,6 @@ ul.nav-tabs {
   background-color: $soft_grey;
 }
 
-.active-text {
-  background: transparent !important;
-  color: #fff !important;
-}
-
 .arrow {
   position: relative;
   width: 100%;
@@ -83,48 +78,15 @@ ul.nav-tabs {
   overflow: hidden;
 }
 
-.arrow-active {
-  margin-left: -8px;
-}
-
 .shaft {
   display: block;
   float: left;
-  // width: 90%;
-  width: calc(100% - 20px);
+  width: calc(100%);
   height: 20px;
-  background: $arrow_blue;
+  background: $soft_grey;
   color: #fff;
-}
-.triangle-left {
-  display: block;
-  float: left;
-  position: relative;
-  left: 8px;
-  width: 0;
-  height: 0;
-  border-top: 10px solid transparent;
-  border-bottom: 10px solid transparent;
-  border-left: 8px solid #fff;
-}
-.triangle-right {
-  display: block;
-  float: left;
-  width: 0;
-  height: 0;
-  border-top: 10px solid transparent;
-  border-bottom: 10px solid transparent;
-  border-left: 12px solid $arrow_blue;
 }
 
 .shaft-hidden {
   background: transparent;
-}
-
-.triangle-left-hidden {
-  border-left: none;
-}
-
-.triangle-right-hidden {
-  border-left: none;
 }
