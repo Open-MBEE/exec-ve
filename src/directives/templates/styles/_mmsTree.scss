@@ -71,7 +71,7 @@ ul.nav-tabs {
   background-color: $soft_grey;
 }
 
-.arrow {
+.shaft-wrapper {
   position: relative;
   width: 100%;
   clear: left;
@@ -81,10 +81,9 @@ ul.nav-tabs {
 .shaft {
   display: block;
   float: left;
-  width: calc(100%);
+  width: 100%;
   height: 20px;
   background: $soft_grey;
-  color: #fff;
 }
 
 .shaft-hidden {
