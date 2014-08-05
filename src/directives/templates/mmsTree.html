@@ -13,7 +13,7 @@
               <i ng-class="{'active-text': row.branch.selected}" ng-click="row.branch.expanded = !row.branch.expanded; $event.stopPropagation(); on_treeData_change();" class="indented tree-icon {{row.expand_icon}}" ></i>
               <i ng-class="{'active-text': row.branch.selected}" class="indented tree-icon {{row.type_icon}}" ></i>
               <span class="indented tree-label" ng-class="{'active-text': row.branch.selected}">{{row.section}} {{row.branch.data.name}}
-              <span ng-show="{{row.status_properties && row.status_properties.button && row.button_properties}}" class="pull-right"><button class="{{row.button_properties.style}}" ng-click="row.button_properties.action(row.branch);">{{row.status_properties.button}}</button></span>
+              <span ng-show="{{row.status_properties && row.status_properties.button && row.button_properties}}" class="pull-right"><button class="{{row.button_properties.style}}" ng-click="row.button_properties.action(row.branch.data.sysmlid);">{{row.status_properties.button}}</button></span>
               </span>
 
   	        </a>

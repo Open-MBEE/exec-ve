@@ -87,14 +87,17 @@ function mmsDiffTree($templateCache, $rootScope, DiffService) {
   var MMSDiffTreeLink = function(scope, element, attrs) {
     scope.epsilon = [];
 
-    scope.stageChange = function(sysmlid) {
+    var stageChange = function(sysmlid) {
       // Get the element ref'd by sysmlid in deltaElements
       var elem = getDeltas().filter(function(entry) {
        return entry && entry.sysmlid.indexOf(sysmlid) !== -1;
       })[0];
 
       scope.epsilon.push(elem);
+
+      console.log("Reached");
     };
+
 
     // Send epsilon to the server
     scope.submitAllChanges = function() {
@@ -125,6 +128,7 @@ function mmsDiffTree($templateCache, $rootScope, DiffService) {
   /*
    * Preps mms-tree with data and display options.
    */
+
   var setUpMMSTree = function(scope) {
     var id2node = {};
     scope.treeData = [];
@@ -139,13 +143,51 @@ function mmsDiffTree($templateCache, $rootScope, DiffService) {
         "Package": "fa fa-folder",
         "Connector": "fa fa-expand"
       },
-      statuses: {
-        "moved": "",
-        "added": "",
-        "deleted": "",
-        "updated": "",
+      statuses: { //put css class in quotes, i.e. { style, " 'testClass' ", button: "exampleButton"}
+        "moved": { style: "'update'", button: "update" },
+        "added": { style: "'addition'", button: "add" },
+        "deleted": { style: "'removal'", button: "remove" },
+        "updated": { style: "'update'", button: "update" },
         "conflict": "",
         "resolved": ""
+      },
+      buttons: {
+        "update": { style: "btn btn-primary btn-xs", action: function(sysmlid) {
+          // Get the element ref'd by sysmlid in deltaElements
+          var getDeltasStore = getDeltas();
+          var elem = getDeltasStore.filter(function(entry) {
+           return entry && entry.sysmlid.indexOf(sysmlid) !== -1;
+          })[0];
+
+          scope.epsilon.push(elem);
+
+          console.log(scope.epsilon);
+          }
+        },
+        "remove": { style: "btn btn-danger btn-xs", action: function(sysmlid) {
+          // Get the element ref'd by sysmlid in deltaElements
+          var getDeltasStore = getDeltas();
+          var elem = getDeltasStore.filter(function(entry) {
+           return entry && entry.sysmlid.indexOf(sysmlid) !== -1;
+          })[0];
+
+          scope.epsilon.push(elem);
+
+          console.log(scope.epsilon);
+          }
+        },
+        "add": { style: "btn btn-success btn-xs", action: function(sysmlid) {
+          // Get the element ref'd by sysmlid in deltaElements
+          var getDeltasStore = getDeltas();
+          var elem = getDeltasStore.filter(function(entry) {
+           return entry && entry.sysmlid.indexOf(sysmlid) !== -1;
+          })[0];
+
+          scope.epsilon.push(elem);
+
+          console.log(scope.epsilon);
+          }
+        }
       }
     };
 

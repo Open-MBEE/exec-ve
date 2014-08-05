@@ -34,50 +34,42 @@
       <td>{{original.documentation}}</td>
       <td>{{delta.documentation}}</td>
     </tr>
-    <!-- <tr class="type-row" ng-class="{addition: typeAddition, removal: typeRemoval, update: typeUpdate, clean: typeClean}">
-      <td>Type</td>
-      <td>{{original.specialization.valueArray[0]}}</td>
-      <td>{{delta.specialization.valueArray[0]}}</td>
-    </tr>
-    <tr class="value-row" ng-class="{}">
-      <td>Value</td>
-      <td>{{original.specialization.valueArray[1]}}</td>
-      <td>{{delta.specialization.valueArray[1]}}</td>
-    </tr> -->
   </tbody>
 
 </table>
 
 <table class="table">
 
-<caption>Specializations</caption>
-
-  <thead>
-    <tr>
-      <th></th>
-      <th>Mine</th>
-      <th>Theirs</th>
-    </tr>
-  </thead>
-
-  <tbody>
-    <tr class="specialization-row" ng-class="{addition: specAddition, removal: specRemoval, update: specUpdate, clean: specClean}">
-      <td>Specialization Type</td>
-      <td>{{original.specialization.type}}</td>
-      <td>{{delta.specialization.type}}</td>
-    </tr>
-
-    <tr class="type-row" ng-class="{addition: typeAddition, removal: typeRemoval, update: typeUpdate, clean: typeClean}">
-      <td>Value Type</td>
-      <td>{{original.specialization.valueArray[0]}}</td>
-      <td>{{delta.specialization.valueArray[0]}}</td>
-    </tr>
-
-    <tr class="value-row" ng-class="{addition: valAddition, removal: valRemoval, update: valUpdate, clean: valClean}">
-      <td>Value</td>
-      <td>{{original.specialization.valueArray[1]}}</td>
-      <td>{{delta.specialization.valueArray[1]}}</td>
-    </tr>
-  </tbody>
+<div>
+  <caption>Specializations</caption>
+  
+    <thead>
+      <tr>
+        <th></th>
+        <th>Mine</th>
+        <th>Theirs</th>
+      </tr>
+    </thead>
+  
+    <tbody>
+      <tr class="specialization-row" ng-class="{addition: specAddition, removal: specRemoval, update: specUpdate, clean: specClean}">
+        <td>Specialization Type</td>
+        <td>{{original.specialization.type}}</td>
+        <td>{{delta.specialization.type}}</td>
+      </tr>
+  
+      <tr class="type-row" ng-class="{addition: typeAddition, removal: typeRemoval, update: typeUpdate, clean: typeClean}">
+        <td>Value Type</td>
+        <td>{{original.specialization.valueArray[0]}}</td>
+        <td>{{delta.specialization.valueArray[0]}}</td>
+      </tr>
+  
+      <tr class="value-row" ng-class="{addition: valAddition, removal: valRemoval, update: valUpdate, clean: valClean}">
+        <td>Value</td>
+        <td>{{original.specialization.valueArray[1]}}</td>
+        <td>{{delta.specialization.valueArray[1]}}</td>
+      </tr>
+    </tbody>
+</div>
 
 </table>
