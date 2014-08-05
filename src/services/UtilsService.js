@@ -52,8 +52,27 @@ function UtilsService(_) {
         return elem;
     };
 
+    var normalize = function(ob) {
+        var res = {};
+        res.update = !ob.update? false : ob.update;
+        res.ws = !ob.workspace ? 'master' : ob.workspace;
+        res.ver = !ob.version ? 'latest' : ob.version;
+        return res;
+    };
+
+    var makeElementKey = function(id, workspace, version, edited) {
+        var ws = !workspace ? 'master' : workspace;
+        var ver = !version ? 'latest' : version;
+        if (edited)
+            return ['elements', ws, id, ver, 'edit'];
+        else
+            return ['elements', ws, id, ver];
+    };
+
     return {
         hasCircularReference: hasCircularReference,
-        cleanElement: cleanElement
+        cleanElement: cleanElement,
+        normalize: normalize,
+        makeElementKey: makeElementKey
     };
 }

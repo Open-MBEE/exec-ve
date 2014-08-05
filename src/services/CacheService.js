@@ -89,21 +89,13 @@ function CacheService(_, $log) {
         return keys.join('|');
     };
 
-    var makeElementKey = function(id, workspace, version, edited) {
-        var ws = !workspace ? 'master' : workspace;
-        var ver = !version ? 'latest' : version;
-        if (edited)
-            return ['elements', ws, id, ver, 'edit'];
-        else
-            return ['elements', ws, id, ver];
-    };
+    
 
     return {
         get: get,
         put: put,
         exists: exists,
         remove: remove,
-        makeElementKey: makeElementKey
     };
 
 }

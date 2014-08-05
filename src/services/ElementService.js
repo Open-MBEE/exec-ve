@@ -261,7 +261,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, _) {
         .success(function(data, status, headers, config) {
             var result = [];
             data[key].forEach(function(element) {
-                var ekey = CacheService.makeElementKey(element.sysmlid, n.ws, n.ver);
+                var ekey = UtilsService.makeElementKey(element.sysmlid, n.ws, n.ver);
                 result.push(CacheService.put(ekey, UtilsService.cleanElement(element), true));
             }); 
             delete inProgress[progress];
@@ -332,7 +332,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, _) {
                 var resp = CacheService.put(n.cacheKey, UtilsService.cleanElement(data.elements[0]), true);
                 deferred.resolve(resp);
                 /* TODO better way to sync edits on update, maybe app level*/
-                var edit = CacheService.remove(CacheService.makeElementKey(elem.sysmlid, n.ws, null, true));
+                var edit = CacheService.remove(UtilsService.makeElementKey(elem.sysmlid, n.ws, null, true));
                 if (edit) {
                     _.merge(edit, resp);
                     UtilsService.cleanElement(edit, true);
@@ -420,7 +420,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, _) {
         $http.post(URLService.getPostElementsURL(n.ws), {'elements': [elem]})
         .success(function(data, status, headers, config) {
             var resp = data.elements[0];
-            var key = CacheService.makeElementKey(resp.sysmlid, n.ws, 'latest');
+            var key = UtilsService.makeElementKey(resp.sysmlid, n.ws, 'latest');
             deferred.resolve(CacheService.put(key, UtilsService.cleanElement(resp), true));
         }).error(function(data, status, headers, config) {
             URLService.handleHttpStatus(data, status, headers, config, deferred);
@@ -461,8 +461,8 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, _) {
      * @returns {boolean} Whether element is dirty
      */
     var isDirty = function(id, workspace) {
-        var editKey = CacheService.makeElementKey(id, workspace, null, true);
-        var normalKey = CacheService.makeElementKey(id, workspace);
+        var editKey = UtilsService.makeElementKey(id, workspace, null, true);
+        var normalKey = UtilsService.makeElementKey(id, workspace);
         var normal = CacheService.get(normalKey);
         var edit = CacheService.get(editKey);
         if (edit && !_.isEqual(normal, edit))
@@ -518,15 +518,9 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, _) {
     };
 
     var normalize = function(id, updateFromServer, workspace, version, edit) {
-        var update = !updateFromServer ? false : updateFromServer;
-        var ws = !workspace ? 'master' : workspace;
-        var ver = !version ? 'latest' : version;
-        return {
-            cacheKey: CacheService.makeElementKey(id, ws, ver, edit),
-            update: update,
-            ws: ws,
-            ver: ver
-        };
+        var res = UtilsService.normalize({update: updateFromServer, workspace: workspace, version: version});
+        res.cacheKey = UtilsService.makeElementKey(id, res.ws, res.ver, edit);
+        return res;
     };
 
     return {
