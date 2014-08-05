@@ -196,7 +196,7 @@ function ElementService($q, $http, URLService, UtilsService, VersionService, _) 
                     if (edit.hasOwnProperty('specialization')) {
                         for (i = 0; i < nonEditKeys.length; i++) {
                             if (edit.specialization.hasOwnProperty(nonEditKeys[i])) {
-                                delete edit[nonEditKeys[i]];
+                                delete edit.specialization[nonEditKeys[i]];
                             }
                         }
                     }
@@ -207,7 +207,7 @@ function ElementService($q, $http, URLService, UtilsService, VersionService, _) 
                     if (edit.hasOwnProperty('specialization')) {
                         for (i = 0; i < nonEditKeys.length; i++) {
                             if (edit.specialization.hasOwnProperty(nonEditKeys[i])) {
-                                delete edit[nonEditKeys[i]];
+                                delete edit.specialization[nonEditKeys[i]];
                             }
                         }
                     }
