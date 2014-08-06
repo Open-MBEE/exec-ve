@@ -1,17 +1,17 @@
 'use strict';
 
 angular.module('mms')
-.factory('CacheService', ['_', '$log', CacheService]);
+.factory('CacheService', ['_', CacheService]);
 
 /**
  * @ngdoc service
- * @name mms.CAcheService
+ * @name mms.CacheService
  * @requires _
  * 
  * @description
  * Generic Caching Service
  */
-function CacheService(_, $log) {
+function CacheService(_) {
     
     var cache = {};
 
@@ -30,7 +30,6 @@ function CacheService(_, $log) {
         var realkey = key;
         if (angular.isArray(key))
             realkey = makeKey(key);
-        $log.log(realkey);
         if (cache.hasOwnProperty(realkey))
             return cache[realkey];
         return null;
@@ -88,8 +87,6 @@ function CacheService(_, $log) {
     var makeKey = function(keys) {
         return keys.join('|');
     };
-
-    
 
     return {
         get: get,
