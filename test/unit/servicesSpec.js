@@ -1,35 +1,5 @@
-/*
-'use strict';
 
-//jasmine specs for services go here 
-
-describe('service', function() {
-    var URLService, SiteService, $httpBackend;
-
-    beforeEach(module('mms'));
-
-    beforeEach(inject(function($injector) {
-        URLService = $injector.get('URLService');
-        SiteService = $injector.get('SiteService');
-        $httpBackend = $injector.get('$httpBackend');
-
-    }));
-
-    it('isTimestamp', function() {
-        expect(URLService.isTimestamp('123')).toBe(false);
-    });
-
-    it('getSiteEuropa', function() {
-        $httpBackend.whenGET('/alfresco/service/rest/sites').respond([
-            {name: 'europa', title: 'Europa'}
-        ]);
-        SiteService.getSite('europa').then(function(site) {
-            expect(site).toEqual({name: 'europa', title: 'Europa'});
-        });
-        $httpBackend.flush();
-    });
-});
-*/
+// !-- NOTE: currently expecting a total of 21 to fail --!
 
 'use strict';
 
@@ -70,7 +40,8 @@ describe('CommentService', function() {
 	it('deleteComment', inject(function() {}));
 });
 
-// ConfigService - incomplete, 10 methods, [4 $http tested, 1 unknown, 5 $http untested]
+
+// ConfigService - done, 10 methods, [4 $http tested, 1 unknown, 5 $http untested], expects 4 to fail
 describe('ConfigService', function() {
 	beforeEach(module('mms'));
 
@@ -95,11 +66,9 @@ describe('ConfigService', function() {
         		return [200, configurations];
         	}
         });
-
         $httpBackend.whenGET(root + '/workspaces/master/sites/ems/configurations/badId').respond(function(method, url, data) {
         	return [404, 'ERROR: Configuration with id \'badId\' does not exist'];
         });
-       
         $httpBackend.whenGET(root + '/workspaces/master/sites/ems/configurations/configId1').respond(
         	{ configurations: [ { created: '08-01-2014', id: 'configId1', snapshots: [], products: [ 'commentId' ] } ] } );
         $httpBackend.whenGET(root + '/workspaces/master/sites/ems/configurations/configId2').respond(
@@ -151,6 +120,19 @@ describe('ConfigService', function() {
         	else {
         		var json = JSON.parse(data);
         		return [200, json];
+        	}
+        });
+        $httpBackend.whenPOST(root + '/workspaces/master/sites/ems/configurations/configName/products').respond(function(method, url, data) {
+        	if (forceFail) { return [500, 'Internal Server Error']; }
+        	else {
+        		var json = JSON.parse(data);
+        		return [200, json];
+        	}
+        });
+        $httpBackend.whenPOST(root + '/workspaces/master/sites/ems/products/productId1/snapshots').respond(function(method, url, data) {
+        	if (forceFail) { return [500, 'Internal Server Error']; }
+        	else {
+        		return [200];
         	}
         });
 
@@ -216,7 +198,6 @@ describe('ConfigService', function() {
 		$httpBackend.flush();
 
 		// !(configs.hasOwnProperty(id)), $http.get -- pass
-		
 		ConfigService.getConfig('configId1', 'ems', undefined).then(function(response) {
 			expect(response).toEqual( { created: '08-01-2014', id: 'configId1', snapshots: [], products: [ 'commentId' ] } );
 		}); $httpBackend.flush();
@@ -224,7 +205,7 @@ describe('ConfigService', function() {
 
 		// (configs.hasOwnProperty(id))
 		ConfigService.getConfig('configId1', 'ems', undefined).then(function(response) {
-			expect(response).toEqual( { created: '08-01-2014', id: 'configId1', snapshots: [ 'snapshotId' ], products: [] } );
+			expect(response).toEqual( { created: '08-01-2014', id: 'configId1', snapshots: [ ], products: [] } );
 		}); $rootScope.$apply();
 	}));
 
@@ -488,23 +469,56 @@ describe('ConfigService', function() {
 		}); $httpBackend.flush();
 	}));
 
-	// accesses $http - untested
+	// !-- NOTE: function is looking for the data's snapshot property which does not exist --!
+	// done, expect to fail
 	it('updateConfigProducts', inject(function() {
 
 		// $http.post -- fail
+		forceFail = true;
+		ConfigService.updateConfigProducts('configName', { }, 'ems', undefined).then(function(response) { displayError(); },
+			function(failMessage) {
+				expect(failMessage.status).toEqual(500);
+				expect(failMessage.data).toEqual('Internal Server Error');
+			});
+		$httpBackend.flush();
+		forceFail = false;
 
 		// $http.post -- pass
+		var products = [ { sysmlid: 'productId1', specialization: { type: 'Comment' } }, { sysmlid: 'productId2', specialization: {
+			type: 'Package' } } ];
+		ConfigService.updateConfigProducts('configName', products, 'ems', undefined).then(function(response) {
+			expect(response.elements.lenth).toEqual(2);
 
+			var configProducts = response.elements;
+			expect(configProducts[0]).toEqual( { sysmlid: 'productId1', specialization: { type: 'Comment' } } );
+			expect(configProducts[1]).toEqual( { sysmlid: 'productId2', specialization: { type: 'Package' } } );
+		}); $httpBackend.flush();
 	}));
 
-	// accesses $http - untested
-	it('createSnapshots', inject(function() {
+	// done
+	it('createSnapshot', inject(function() {
 
+		// $http.post -- fail
+		forceFail = true;
+		ConfigService.createSnapshot('productId1', 'ems', undefined).then(function(response) { displayError(); }, 
+			function(failMessage) {
+				expect(failMessage.status).toEqual(500);
+				expect(failMessage.data).toEqual('Internal Server Error');
+			});
+		$httpBackend.flush();
+		forceFail = false;
+
+		// $http.post -- pass
+		ConfigService.createSnapshot('productId1', 'ems', undefined).then(function(response) {
+			expect(response).toEqual('ok');
+		}); $httpBackend.flush();
 	}));
 });
 
- /*
-// ElementService - incomplete, 12 methods, [10 done, 1 empty, 1 untested] 
+
+
+
+// ElementService - incomplete, 12 methods, [10 done, 1 empty, 1 untested], expect 4 to fail
 describe('ElementService', function() {
 	beforeEach(module('mms'));
 
@@ -1591,9 +1605,10 @@ describe('ElementService', function() {
 
 	}));
 });
-// */
 
- /*
+
+
+/*
 // NotificationService - done, 3 methods, [3 empty]
 describe('NotificationService', function() {
 	beforeEach(module('mms'));
@@ -1618,7 +1633,8 @@ describe('NotificationService', function() {
 
 	}));
 });
-// */
+*/
+
 
  /*
 // ProjectService - done, [empty]
@@ -1632,10 +1648,10 @@ describe('ProjectService', function() {
 });
 // */
 
+/*
 // !-- NOTE: this function calls on depricated function 'getRoot' from the URLService --!
 // !-- NOTE: this function calls on depricated function 'mergeElements' from the ElementService --!
- /*
-// SearchService - (done), expect to fail [1 done]
+// SearchService - done, expect to fail [1 done], expect 1 to fail
 describe('SearchService', function() {
 	beforeEach(module('mms'));
 
@@ -1696,11 +1712,12 @@ describe('SearchService', function() {
 
 	}));
 });
-// */
+*/
 
+
+/*
 // !-- NOTE: getSites function needs an update parameter, tested as if one existed --!
- /*
-// SiteService - done, expects to fail [2 $http, 4 normal, 1 empty]
+// SiteService - done, expects to fail [2 $http, 4 normal, 1 empty], expect 2 to fail
 describe('SiteService', function() {
 	beforeEach(module('mms'));
 
@@ -1885,18 +1902,23 @@ describe('SiteService', function() {
 
 	}));
 });
-// */
+*/
 
- /*
-// URLService - (done), 16 methods, [16 normal]
+
+/*
+// !-- NOTE: need to test handleHttpStatus --!
+// URLService - incomplete, 16 methods, [15 normal, 1 untested], expect 4 to fail
 describe('URLService', function() {
 	beforeEach(module('mms'));
 
-	var URLService;
+	var URLService, $rootScope, $q;
 	var expectedReturn;
 
 	beforeEach(inject(function($injector) {
 		URLService = $injector.get('URLService');
+		$rootScope = $injector.get('$rootScope');
+		$q = $injector.get('$q');
+
 		expectedReturn = '';
 	}));
 
@@ -2039,6 +2061,28 @@ describe('URLService', function() {
 		expect(URLService.getPostElementsURL('master')).toEqual(expectedReturn);
 	}));
 
+	it('handleHttpStatus', inject(function() {
+
+		var deferred = $q.defer();
+
+		// 404
+		URLService.handleHttpStatus( {}, 404, undefined, undefined, deferred ).then(function(response) { displayError(); }, 
+			function(failMessage) {
+				expect(failMessage.status).toEqual(404);
+				expect(failMessage.data).toEqual( {} );
+				expect(failMessage.message).toEqual('Not Found');
+			});
+		$rootScope.$apply();
+
+		// 500
+
+		// 401 || 403
+
+		// 409
+
+		// else
+	}));
+
 	it('getSitesURL', inject(function() {
 		var expectedReturn = root + '/rest/sites';
 		expect(URLService.getSitesURL()).toEqual(expectedReturn);
@@ -2057,10 +2101,11 @@ describe('URLService', function() {
 	// Not tested
 	
 });
-// */
+*/
 
+
+/*
 // !-- NOTE: ask Doris how to test the hasCircularReference function --!
- /*
 // UtilsService - incomplete, 2 methods, [1 normal, 1 other]
 describe('UtilsService', function() {
 	beforeEach(module('mms'));
@@ -2131,21 +2176,24 @@ describe('UtilsService', function() {
 		expect(dirtyElement.specialization.value).toEqual([]);
 	}));
 });
-// */
+*/
 
- /*
-// VersionService - incomplete, 4 methods, [4 $http]
+/*
+// !-- NOTE: VersionService incorrectly adds the version timestamp --!
+// VersionService - done, 4 methods, [4 $http], expect 3 to fail
 describe('VersionService', function() {
 	beforeEach(module('mms'));
 
 	var basicFormat = '2014-07-21T15:04:46.336-0700';
-
+	var forceFail;
 	var VersionService, $httpBackend, $rootScope;
 
 	beforeEach(inject(function($injector) {
 		VersionService = $injector.get('VersionService');
 		$httpBackend = $injector.get('$httpBackend');
 		$rootScope = $injector.get('$rootScope');
+
+		forceFail = false;
 
 		$httpBackend.whenGET(/\/alfresco\/service\/workspaces\/master\/elements\/badId\?timestamp+/)
 		.respond(function(method, url) {
@@ -2155,15 +2203,6 @@ describe('VersionService', function() {
 
 		$httpBackend.whenGET(/\/alfresco\/service\/workspaces\/master\/elements\/emptyId+/)
 		.respond({elements:[]});
-	/*
-			$httpBackend.whenGET(/\/alfresco\/service\/workspaces\/master\/elements\/12345\?timestamp=01-01-2014+/).respond(
-			{elements: [{author:'muschek', name:'basicElement', sysmlid:12345, lastModified:'01-01-2014'}]});
-			$httpBackend.whenGET(/\/alfresco\/service\/workspaces\/master\/elements\/12345\?timestamp=02-01-2014+/).respond(
-			{elements: [{author:'muschek', name:'basicElement', sysmlid:12345, lastModified:'02-01-2014'}]});
-			$httpBackend.whenGET(/\/alfresco\/service\/workspaces\/master\/elements\/12346\?timestamp=01-01-2014+/).respond(
-			{elements: [{author:'muschek', name:'anotherBasicElement', sysmlid:12346, lastModified:'01-01-2014'}]});
-	*/
-	/*
 
 			$httpBackend.whenGET('/alfresco/service/workspaces/master/elements/12345?timestamp=01-01-2014').respond(
 			{elements: [{author:'muschek', name:'basicElement', sysmlid:12345, lastModified:'01-01-2014'}]});
@@ -2179,6 +2218,23 @@ describe('VersionService', function() {
 			{sysmlid:12345, timestamp:'02-01-2014', versionLabel:'14.2'}]});
 			$httpBackend.whenGET('/alfresco/service/workspaces/master/elements/12346/versions').respond(
 			{versions: [{sysmlid:12346, timestamp:'01-01-2014', versionLabel:'14.1'}]});
+
+			$httpBackend.whenGET('/alfresco/service/workspaces/master/elements?timestamp=01-01-2014').respond( function(method, url, data) {
+				if (forceFail) { return [500, 'Internal Server Error']; }
+				else {
+					var elements = { elements: [ { sysmlid:'commentId', specialization: { type: 'Comment' } }, { sysmlid:'packageId',
+						specialization: { type: 'Package' } } ] };
+					return [200, elements];
+				}
+			});
+			$httpBackend.whenGET('/alfresco/service/workspaces/master/elements?timestamp=02-01-2014').respond( function(method, url, data) {
+				if (forceFail) { return [500, 'Internal Server Error']; }
+				else {
+					var elements = { elements: [ { sysmlid:'commentId', specialization: { type: 'Comment' }, documentation: 'this is a comment'},
+					{ sysmlid:'packageId', specialization: { type: 'Package' } } ] };
+					return [200, elements];
+				}
+			});
 
 			// Version testing will be kept to timestamps for the time being
 	}));
@@ -2196,26 +2252,17 @@ describe('VersionService', function() {
 	// done
 	it('getElement', inject(function() {
 		
-		// !inProgress.hasProperty(key), !elements.hasProperty(id), error
-		VersionService.getElement('badId', '01-01-2014', 'master').then(function(response){
-			console.log('this should not be displayed');
-		}, function(failMes) {
-			expect(failMes.status).toEqual(404);
-			expect(failMes.data).toEqual('[ERROR]: Element with id, badId not found\n[WARNING]: No elements found');
-			expect(failMes.message).toEqual('Not Found');
-		}); $httpBackend.flush();
+		// !(inProgress.hasProperty(key)), !(elements.hasProperty(id)), $http.get -- fail
+		VersionService.getElement('badId', '01-01-2014', 'master').then(function(response){ displayError(); },
+			function(failMes) {
+				expect(failMes.status).toEqual(404);
+				expect(failMes.data).toEqual('[ERROR]: Element with id, badId not found\n[WARNING]: No elements found');
+				expect(failMes.message).toEqual('Not Found');
+			});
+		$httpBackend.flush();
 		// badId now exist in elements
 
-		// ..., elements.hasProperty(id), !elements[id].hasProperty(version), error
-		VersionService.getElement('badId', '01-01-2014', 'master').then(function(response){
-			console.log('this should not be displayed');
-		}, function(failMes) {
-			expect(failMes.status).toEqual(404);
-			expect(failMes.data).toEqual('[ERROR]: Element with id, badId not found\n[WARNING]: No elements found');
-			expect(failMes.message).toEqual('Not Found');
-		}); $httpBackend.flush();
-
-		// !inProgress.hasProperty(key), !elements.hasProperty(id), success, elements.length <= 0
+		// !(inProgress.hasProperty(key)), !(elements.hasProperty(id)), $http.get -- pass, !(data.elements.length > 0)
 		VersionService.getElement('emptyId', '01-01-2014', 'master').then(function(response){
 			console.log('this should not be displayed');
 		}, function(failMes) {
@@ -2225,16 +2272,7 @@ describe('VersionService', function() {
 		}); $httpBackend.flush();
 		// emptyId now exists in elements
 
-		// ..., elements.hasProperty(id), success, elements.length <= 0
-		VersionService.getElement('emptyId', '01-01-2014', 'master').then(function(response){
-			console.log('this should not be displayed');
-		}, function(failMes) {
-			expect(failMes.status).toEqual(200);
-			expect(failMes.data).toEqual({elements:[]});
-			expect(failMes.message).toEqual('Not Found');
-		}); $httpBackend.flush();
-
-		// !inProgress.hasProperty(key), !elements.hasProperty(id), success, elements.length > 0
+		// !(inProgress.hasProperty(key)), !(elements.hasProperty(id)), $http.get -- pass, (data.elements.length > 0)
 		VersionService.getElement('12345', '01-01-2014', 'master').then(function(response) {
 			expect(response.author).toEqual('muschek');
 			expect(response.name).toEqual('basicElement');
@@ -2243,7 +2281,29 @@ describe('VersionService', function() {
 		}); $httpBackend.flush();
 		// 12345 now exists in elements, and 01-01-2014 version exists in cache
 
-		// ..., elements.hasProperty(id), !elements[id].hasProperty(version), success, elements.length > 0
+		// !(inProgress.hasProperty(key)), (elements.hasProperty(id)), !(elements[id].hasProperty(version)), $http.get -- fail
+		VersionService.getElement('badId', '01-01-2014', 'master').then(function(response){
+			console.log('this should not be displayed');
+		}, function(failMes) {
+			expect(failMes.status).toEqual(404);
+			expect(failMes.data).toEqual('[ERROR]: Element with id, badId not found\n[WARNING]: No elements found');
+			expect(failMes.message).toEqual('Not Found');
+		}); $httpBackend.flush();
+
+		
+		// !(inProgress.hasProperty(key)), (elements.hasProperty(id)), $http.get -- pass, !(data.elements.length > 0)
+		VersionService.getElement('emptyId', '01-01-2014', 'master').then(function(response){
+			console.log('this should not be displayed');
+		}, function(failMes) {
+			expect(failMes.status).toEqual(200);
+			expect(failMes.data).toEqual({elements:[]});
+			expect(failMes.message).toEqual('Not Found');
+		}); $httpBackend.flush();
+
+		
+		// !(inProgress.hasProperty(key)), (elements.hasProperty(id)), !(elements[id].hasProperty(version)),
+		// $http.get -- pass, !(data.elements.length > 0)
+		// ..., elements.hasProperty(id), !, success, elements.length > 0
 		VersionService.getElement('12345', '02-01-2014', 'master').then(function(response) {
 			expect(response.author).toEqual('muschek');
 			expect(response.name).toEqual('basicElement');
@@ -2252,7 +2312,7 @@ describe('VersionService', function() {
 		}); $httpBackend.flush();
 		// 02-01-2014 version now exists in cache
 
-		// ..., ..., elements[id].hasProperty(version)
+		// !(inProgress.hasProperty(key)), (elements.hasProperty(id)), (elements[id].hasProperty(version)),
 		VersionService.getElement('12345', '01-01-2014', 'master').then(function(response) {
 			expect(response.author).toEqual('muschek');
 			expect(response.name).toEqual('basicElement');
@@ -2260,7 +2320,7 @@ describe('VersionService', function() {
 			expect(response.lastModified).toEqual('01-01-2014');
 		}); $rootScope.$apply();
 
-		// inProgress.hasProperty(key)
+		// (inProgress.hasProperty(key))
 		var firstPromise = VersionService.getElement('12346', '01-01-2014');
 		var secondPromise = VersionService.getElement('12346', '01-01-2014');
 		var thirdPromise = VersionService.getElement('12346', '02-01-2014');
@@ -2270,11 +2330,25 @@ describe('VersionService', function() {
 		expect(fourthPromise).not.toEqual(firstPromise);
 	}));
 
-	// 1 of 4 done
+	// done
 	it('getElements', inject(function() {
-		var ids = ['12345', '12346'];
+		var ids = [];
 
-		// Default
+		// Empty array of ids
+		VersionService.getElements(ids, '01-01-2014', 'master').then(function(response) {
+			expect(response).toEqual( {} );
+		}); $rootScope.$apply();
+
+		// One valid id
+		ids = ['12345'];
+		VersionService.getElements(ids, '01-01-2014', 'master').then(function(response) {
+			expect(response.length).toEqual(1);
+
+			expect(response[0]).toEqual( {author:'muschek', name:'basicElement', sysmlid:12345, lastModified:'01-01-2014'} );
+		}); $httpBackend.flush();
+
+		// Couple valid ids
+		ids = ['12345', '12346'];
 		VersionService.getElements(ids, '01-01-2014', 'master').then(function(response) {
 			var element1 = response[0];
 			var element2 = response[1];
@@ -2283,12 +2357,25 @@ describe('VersionService', function() {
 			expect(element2.name).toEqual('anotherBasicElement');
 		}); $httpBackend.flush();
 
+		// One invalid id
+		ids = [ 'badId' ];
+		VersionService.getElements(ids, '01-01-2014', 'master').then(function(response) { displayError(); }, 
+			function(failMessage) {
+				expect(failMessage.status).toEqual(404);
+				expect(failMessage.data).toEqual('[ERROR]: Element with id, badId not found\n[WARNING]: No elements found');
+				expect(failMessage.message).toEqual('Not Found');
+			});
+		$httpBackend.flush();
 
-		// Some or none of the elements have the given timestamp
-		
-		// Some or all of the ids are invalid
-
-		// Redundant testing similar to getElement
+		// Mix of valid and invalid ids
+		ids = ['12345', 'badId'];
+		VersionService.getElements(ids, '01-01-2014', 'master').then(function(response) { displayError(); }, 
+			function(failMessage) {
+				expect(failMessage.status).toEqual(404);
+				expect(failMessage.data).toEqual('[ERROR]: Element with id, badId not found\n[WARNING]: No elements found');
+				expect(failMessage.message).toEqual('Not Found');
+			});
+		$httpBackend.flush();
 	}));
 
 	// !-- NOTE: is using old API --!
@@ -2339,26 +2426,62 @@ describe('VersionService', function() {
 		}); $httpBackend.flush();
 	}));
 
-	// 0 of 4
+	// done
 	it('getGenericElements', inject(function() {
 
-		// !inProgress.hasProperty(progress), error
+		// !(inProgress.hasOwnProperty(progress)), $http.get -- fail
+		var url = '/alfresco/service/workspaces/master/elements';
+		forceFail = true;
+		VersionService.getGenericElements(url, 'elements', '01-01-2014', 'master').then(function(response) { displayError(); }, 
+			function(failMessage) {
+				expect(failMessage.status).toEqual(500);
+				expect(failMessage.data).toEqual('Internal Server Error');
+			});
+		$httpBackend.flush();
+		forceFail = false;
 
-		// !inProgress.hasProperty(progress), success, !elements.hasProperty(element.sysmlid)
+		// !(inProgress.hasOwnProperty(progress)), $http.get -- pass, !(elements.hasOwnProperty(element.sysmlid))
+		VersionService.getGenericElements(url, 'elements', '01-01-2014', 'master').then(function(response) {
+			expect(response.length).toEqual(2);
 
-		// ..., success, elements.hasProperty(element.sysmlid), !elements[element.sysmlid].hasProperty(version)
+			expect(response[0]).toEqual( { sysmlid:'commentId', specialization: { type: 'Comment' } } );
+			expect(response[1]).toEqual( { sysmlid:'packageId', specialization: { type: 'Package' } } );
+		}); $httpBackend.flush();
+		// elements['commentId']['01-01-2014'] and elements['packageId']['01-01-2014'] now exist
 
-		// ..., ..., elements.hasProperty(element.sysmlid), elements[element.sysmlid].hasProperty(version)
+		// !(inProgress.hasOwnProperty(progress)), $http.get -- pass, (elements.hasOwnProperty(element.sysmlid)), 
+		// !(elements[element.sysmlid].hasOwnProperty(version))
+		VersionService.getGenericElements(url, 'elements', '02-01-2014', 'master').then(function(response) {
+			expect(response.length).toEqual(2);
+
+			expect(response[0]).toEqual( { sysmlid:'commentId', specialization: { type: 'Comment' }, documentation: 'this is a comment' } );
+			expect(response[1]).toEqual( { sysmlid:'packageId', specialization: { type: 'Package' } } );
+		}); $httpBackend.flush();
+
+		// !(inProgress.hasOwnProperty(progress)), $http.get -- pass, (elements.hasOwnProperty(element.sysmlid)), 
+		// (elements[element.sysmlid].hasOwnProperty(version))
+		VersionService.getGenericElements(url, 'elements', '01-01-2014', 'master').then(function(response) {
+			expect(response.length).toEqual(2);
+
+			expect(response[0]).toEqual( { sysmlid:'commentId', specialization: { type: 'Comment' } } );
+			expect(response[1]).toEqual( { sysmlid:'packageId', specialization: { type: 'Package' } } );
+		}); $rootScope.$apply();
+
+		// (inProgress.hasOwnProperty(progress))
+		var firstPromise = VersionService.getGenericElements(url, 'elements', '01-01-2014', 'master');
+		var secondPromise = VersionService.getGenericElements(url, 'elements', '01-01-2014', undefined);
+		expect(secondPromise).toEqual(firstPromise);
 	}));
 });
 */
 
 /*
-// ViewService - incomplete, 18 methods, [4 empty,  4 tested, 10 use $http]
+// ViewService - done, 18 methods, [5 ElemeServ, 4 empty, 9 tested], expect 3 to fail
 describe('ViewService', function() {
 	beforeEach(module('mms'));
 
 	var root = '/alfresco/service';
+	var forceFail;
 	var ViewService, $httpBackend, $rootScope;
 
 	beforeEach(inject(function($injector) {
@@ -2406,6 +2529,15 @@ describe('ViewService', function() {
 
 			return [200, json];
 		});
+
+		$httpBackend.whenGET(root + '/workspaces/master/sites/ems/products').respond(function(method, url, data) {
+			if (forceFail) { return [500, 'Internal Server Error']; }
+			else {
+				var products = { products: [ { id: 'productId', name: 'Product Name', snapshots: [ { created: '01-01-2014', creator: 'muschek',
+				id: 'snapshotId' } ] } ] };
+				return [200, products];
+			}
+		});
 	}));
 
 	it('can get an instance of the ViewService and methods are valid', inject(function() {
@@ -2431,29 +2563,24 @@ describe('ViewService', function() {
 		expect(ViewService.getCurrentDocumentId).not.toBe(null);
 	}));
 
-	// just calls ElementService
+	// done, just calls ElementService
 	it('getView', inject(function() {
-
 	}));
 
-	// just calls ElementService
+	// done, just calls ElementService
 	it('getViews', inject(function() {
-
 	}));
 
-	// just calls ElementService
+	// done, just calls ElementService
 	it('getDocument', inject(function() {
-
 	}));
 
-	// just calls ElementService
+	// done, just calls ElementService
 	it('updateView', inject(function() {
-
 	}));
 
-	// just calls ElementService
+	// done, just calls ElementService
 	it('updateDocument', inject(function() {
-
 	}));
 
 	// !-- NOTE: uses old web services API --!
@@ -2633,36 +2760,72 @@ describe('ViewService', function() {
 
 	}));
 
-	// testable
+	// done
 	it('getSiteDocuments', inject(function() {
 
-		// (!siteDocuments.hasOwnProperty(site) && *), getGenericElements - fail
+		// !(siteDocuments.hasOwnProperty(site) && !update), getGenericElements - fail
+		forceFail = true;
+		ViewService.getSiteDocuments('ems', undefined, undefined).then(function(response) { displayError(); },
+			function(failMessage) {
+				expect(failMessage.status).toEqual(500);
+				expect(failMessage.data).toEqual('Internal Server Error');
+			});
+		$httpBackend.flush();
+		forceFail = false;
 
-		// (!siteDocuments.hasOwnProperty(site) && *), getGenericElements - pass
+		// !(siteDocuments.hasOwnProperty(site) && !update), getGenericElements - pass
+		ViewService.getSiteDocuments('ems', undefined, undefined).then(function(response) {
+			expect(response.length).toEqual(1);
+
+			expect(response[0].id).toEqual('productId');
+			expect(response[0].name).toEqual('Product Name');
+
+			expect(response[0].snapshots.length).toEqual(1);
+			expect(response[0].snapshots[0]).toEqual( { created: '01-01-2014', creator: 'muschek', id: 'snapshotId' } );
+		}); $httpBackend.flush();
 
 		// (siteDocuments.hasOwnProperty(site) && !update)
+		ViewService.getSiteDocuments('ems', false, undefined).then(function(response) {
+			expect(response.length).toEqual(1);
 
+			expect(response[0].id).toEqual('productId');
+			expect(response[0].name).toEqual('Product Name');
+
+			expect(response[0].snapshots.length).toEqual(1);
+			expect(response[0].snapshots[0]).toEqual( { created: '01-01-2014', creator: 'muschek', id: 'snapshotId' } );
+		}); $rootScope.$apply();
 	}));
 
+	// done
 	it('getCurrentViewId', inject(function() {
 		expect(ViewService.getCurrentViewId()).toBe('');
+
+		ViewService.setCurrentViewId('newViewId');
+		expect(ViewService.getCurrentViewId()).toBe('newViewId');
 	}));
 
+	// done
 	it('setCurrentViewId', inject(function() {
 		ViewService.setCurrentViewId('newViewId');
 		expect(ViewService.getCurrentViewId()).toBe('newViewId');
 	}));
 
+	// done
 	it('getCurrentDocumentId', inject(function() {
 		expect(ViewService.getCurrentDocumentId()).toBe('');
+
+		ViewService.setCurrentDocumentId('newDocumentId');
+		expect(ViewService.getCurrentDocumentId()).toBe('newDocumentId');
 	}));
 
+	// done
 	it('setCurrentDocumentId', inject(function() {
 		ViewService.setCurrentDocumentId('newDocumentId');
 		expect(ViewService.getCurrentDocumentId()).toBe('newDocumentId');
 	}));
 });
 */
+
 
 // !-- NOTE: Artifact JSON schema non-existant --!
 // VizService - incomplete, 1 method, [1 uses $http]
