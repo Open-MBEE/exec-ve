@@ -370,6 +370,22 @@ function urlService(baseUrl) {
         return root + "/javawebscripts/element/search?keyword=" + query;
     };
 
+    var getWorkspacesURL = function() {
+        return root + '/workspaces';
+    };
+
+    var getWorkspaceURL = function(ws) {
+        return root + '/workspaces/' + ws;
+    };
+
+    var getWsDiffURL = function(ws1, ws2, ws1time, ws2time) {
+        var r = root + '/diff?sourceWs=' + ws2 + '&targetWs=' + ws2;
+        if (ws1time && ws1time !== 'latest')
+            r += '&sourceTimestamp=' + ws1time;
+        if (ws2time && ws2time !== 'latest')
+            r += '&targetTimestamp=' + ws2time;
+    };
+
     var addVersion = function(url, version) {
         if (version === 'latest')
             return url;
@@ -399,6 +415,9 @@ function urlService(baseUrl) {
         getConfigProductsURL : getConfigProductsURL,
         getDocumentViewsURL: getDocumentViewsURL,
         getViewElementsURL: getViewElementsURL,
+        getWsDiffURL: getWsDiffURL,
+        getWorkspacesURL: getWorkspacesURL,
+        getWorkspaceURL: getWorkspaceURL,
         isTimestamp: isTimestamp
     };
 
