@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms')
-.factory('WorkspaceService', ['$http', '$q', 'ElementService', WorkspaceService]);
+.factory('WorkspaceService', ['$http', '$q', 'URLService', 'ElementService', 'CacheService', WorkspaceService]);
 
 /**
  * @ngdoc service
@@ -11,7 +11,7 @@ angular.module('mms')
  * 
  * @description
  */
-function WorkspaceService($http, $q, ElementService) {
+function WorkspaceService($http, $q, URLService, ElementService, CacheService) {
 
     var getAll = function() {
 
