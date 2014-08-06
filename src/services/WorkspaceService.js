@@ -18,7 +18,7 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService) {
             created: '2014-07-30T09:21:29.032-0700',
             id: 'master',
             name: 'base',
-            parent: null
+            parent: null,
             "elements":[ 
              { 
                 "documentation":"Lorem ipsum dolor set amit.",
@@ -121,11 +121,11 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService) {
           ]
        },
        "workspace2":{ 
-            creator: 'raffi',
-            created: '2014-07-31T09:21:29.032-0700',
-            id: 'test',
-            name: 'test',
-            parent: 'master'
+          creator: 'raffi',
+          created: '2014-07-31T09:21:29.032-0700',
+          id: 'test',
+          name: 'test',
+          parent: 'master',
           "updatedElements":[ 
              { 
                 "sysmlid":"_123_394241_12",

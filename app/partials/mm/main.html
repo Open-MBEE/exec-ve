@@ -1,2 +1,19 @@
-<div class="left-pane"></div>
-<div class="right-pane"></div>
+<div>
+
+	<h1>Branches</h1>
+	<br>
+
+	<table class="table table-hover">
+	    <caption>Workspaces</caption>
+	    <tr ng-repeat="workspace in workspaces">
+	        <td>{{workspace.name}}</td>
+	        <td>{{workspace.creator}}</td>
+	        <td>{{workspace.created}}</td>
+	        <td>{{workspace.parent}}</td>
+	        <td>
+	        	<a class="btn btn-default" ui-sref="main.diff({source: workspace.parent, target: workspace.id})">Compare</button>
+	        </td>
+	    </tr>
+	</table>
+
+</div>
