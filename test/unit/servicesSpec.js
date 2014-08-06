@@ -1,5 +1,5 @@
 
-// !-- NOTE: currently expecting a total of 21 to fail --!
+// !-- NOTE: currently expecting a total of 22 to fail --!
 
 'use strict';
 
@@ -17,6 +17,7 @@ describe('service', function() {
     }));
   });
 });
+
 
 // CommentService - done, [4 empty]
 describe('CommentService', function() {
@@ -39,6 +40,7 @@ describe('CommentService', function() {
 
 	it('deleteComment', inject(function() {}));
 });
+
 
 
 // ConfigService - done, 10 methods, [4 $http tested, 1 unknown, 5 $http untested], expects 4 to fail
@@ -517,15 +519,14 @@ describe('ConfigService', function() {
 
 
 
-
-// ElementService - incomplete, 12 methods, [10 done, 1 empty, 1 untested], expect 4 to fail
+// ElementService - done, 12 methods, [10 done, 1 empty, 1 untested], expect 4 to fail
 describe('ElementService', function() {
 	beforeEach(module('mms'));
 
 	var myElementService, $httpBackend, $rootScope;
 
 	var root = '/alfresco/service';
-	var forceEmpty, forceFail;
+	var forceEmpty, forceFail, modElements;
 	
 
 	beforeEach(inject(function($injector) {
@@ -535,6 +536,7 @@ describe('ElementService', function() {
 
 		forceEmpty = false;
 		forceFail = false;
+		modElements = false;
 
 		// GetElement responses
 		$httpBackend.whenGET(root + '/workspaces/master/elements/12345?timestamp=01-01-2014').respond(
@@ -596,7 +598,22 @@ describe('ElementService', function() {
 				}
 				return [200, json];
 			} });
-	
+
+		$httpBackend.whenGET(root + '/workspaces/master/elements?search=muschek').respond(function(method, url, data) {
+			if (forceFail) { return [500, 'Internal Server Error']; }
+			else {
+				var elements = { elements: [ { sysmlid: 'commentId', author: 'muschek', specialization: { type: 'muschek' } }, 
+				{ sysmlid: 'packageId', author: 'muschek', specialization: { type: 'muschek' } }, 
+				{ sysmlid: 'paramId', description: 'Chris Muschek want to use this parameter for blah, blah, blah...', specialization: 
+				{ type: 'Parameter', direction: 'one', parameterType: 'band name', defaultValue: undefined } } ] };
+
+				if (modElements) {
+					elements.push( { sysmlid: 'imageId', specialization: { type: 'Image', sysmlid: 'imageSpecId' }, name: 'muschek\'s image' } );
+				}
+
+				return [200, elements];
+			}
+		})
 	}));
 
 	it('can get an instance of the ElementService and methods are valid', inject(function() {
@@ -1584,31 +1601,55 @@ describe('ElementService', function() {
 	}));
 
 	// !-- NOTE: uses old API and is therefore, expected to fail. --!
-	// untested, uncertain which web service it ought to be calling on.
+	// done, uncertain which web service it ought to be calling on.
 	it('search', inject(function() {
 
-		
 		//	$http.get - fail
-		
-
+		forceFail = true;
+		ElementService.search('muschek', undefined, undefined).then(function (response) { displayError(); }, 
+			function(failMessage) {
+				expect(failMessage.status).toEqual(500);
+				expect(failMessage.data).toEqual('Internal Server Error');
+			});
+		$httpBackend.flush();
+		forceFail = false;
 		
 		//	$http.get - pass, !(elements.hasOwnProperty(element.sysmlid))
-		
+		ElementService.search('muschek', undefined, undefined).then(function(response) {
+			expect(response.length).toEqual(3);
 
+			expect(response[0]).toEqual( { sysmlid: 'commentId', author: 'muschek', specialization: { type: 'muschek' } } );
+			expect(response[1]).toEqual( { sysmlid: 'packageId', author: 'muschek', specialization: { type: 'muschek' } } );
+			expect(response[2]).toEqual( { sysmlid: 'paramId', description: 'Chris Muschek want to use this parameter for blah, blah, blah...',
+			specialization: { type: 'Parameter', direction: 'one', parameterType: 'band name', defaultValue: undefined } } );
+		}); $httpBackend.flush();
 		
 		//	$http.get - pass, (elements.hasOwnProperty(element.sysmlid)), !(update)
-		
+		ElementService.search('muschek', false, undefined).then(function(response) {
+			expect(response.length).toEqual(3);
 
+			expect(response[0]).toEqual( { sysmlid: 'commentId', author: 'muschek', specialization: { type: 'muschek' } } );
+			expect(response[1]).toEqual( { sysmlid: 'packageId', author: 'muschek', specialization: { type: 'muschek' } } );
+			expect(response[2]).toEqual( { sysmlid: 'paramId', description: 'Chris Muschek want to use this parameter for blah, blah, blah...',
+			specialization: { type: 'Parameter', direction: 'one', parameterType: 'band name', defaultValue: undefined } } );
+		}); $rootScope.$apply();
 		
 		//	$http.get - pass, (elements.hasOwnProperty(element.sysmlid)), (update)
-		
+		ElementService.search('muschek', true, undefined).then(function(response) {
+			expect(response.length).toEqual(4);
 
+			expect(response[0]).toEqual( { sysmlid: 'commentId', author: 'muschek', specialization: { type: 'muschek' } } );
+			expect(response[1]).toEqual( { sysmlid: 'packageId', author: 'muschek', specialization: { type: 'muschek' } } );
+			expect(response[2]).toEqual( { sysmlid: 'paramId', description: 'Chris Muschek want to use this parameter for blah, blah, blah...',
+			specialization: { type: 'Parameter', direction: 'one', parameterType: 'band name', defaultValue: undefined } } );
+			expect(response[3]).toEqual( { sysmlid: 'imageId', specialization: { type: 'Image', sysmlid: 'imageSpecId' },
+				name: 'muschek\'s image' } );
+		}); $httpBackend.flush();
 	}));
 });
 
 
 
-/*
 // NotificationService - done, 3 methods, [3 empty]
 describe('NotificationService', function() {
 	beforeEach(module('mms'));
@@ -1633,10 +1674,8 @@ describe('NotificationService', function() {
 
 	}));
 });
-*/
 
 
- /*
 // ProjectService - done, [empty]
 describe('ProjectService', function() {
 	beforeEach(module('mms'));
@@ -1646,9 +1685,7 @@ describe('ProjectService', function() {
 		expect(ProjectService()).toEqual({});
 	}))
 });
-// */
 
-/*
 // !-- NOTE: this function calls on depricated function 'getRoot' from the URLService --!
 // !-- NOTE: this function calls on depricated function 'mergeElements' from the ElementService --!
 // SearchService - done, expect to fail [1 done], expect 1 to fail
@@ -1712,10 +1749,8 @@ describe('SearchService', function() {
 
 	}));
 });
-*/
 
 
-/*
 // !-- NOTE: getSites function needs an update parameter, tested as if one existed --!
 // SiteService - done, expects to fail [2 $http, 4 normal, 1 empty], expect 2 to fail
 describe('SiteService', function() {
@@ -1902,12 +1937,10 @@ describe('SiteService', function() {
 
 	}));
 });
-*/
 
 
-/*
 // !-- NOTE: need to test handleHttpStatus --!
-// URLService - incomplete, 16 methods, [15 normal, 1 untested], expect 4 to fail
+// URLService - done, 16 methods, [16 normal], expect 3 to fail
 describe('URLService', function() {
 	beforeEach(module('mms'));
 
@@ -2063,10 +2096,10 @@ describe('URLService', function() {
 
 	it('handleHttpStatus', inject(function() {
 
-		var deferred = $q.defer();
-
 		// 404
-		URLService.handleHttpStatus( {}, 404, undefined, undefined, deferred ).then(function(response) { displayError(); }, 
+		var deferred = $q.defer();
+		URLService.handleHttpStatus( {}, 404, undefined, undefined, deferred );
+		deferred.promise.then(function(response) { displayError(); }, 
 			function(failMessage) {
 				expect(failMessage.status).toEqual(404);
 				expect(failMessage.data).toEqual( {} );
@@ -2075,12 +2108,68 @@ describe('URLService', function() {
 		$rootScope.$apply();
 
 		// 500
+		deferred = $q.defer();
+		URLService.handleHttpStatus( {}, 500, undefined, undefined, deferred );
+		deferred.promise.then(function(response) { displayError(); }, 
+			function(failMessage) {
+				expect(failMessage.status).toEqual(500);
+				expect(failMessage.data).toEqual( {} );
+				expect(failMessage.message).toEqual('Server Error');
+			});
+		$rootScope.$apply();
 
 		// 401 || 403
+		deferred = $q.defer();
+		URLService.handleHttpStatus( {}, 401, undefined, undefined, deferred );
+		deferred.promise.then(function(response) { displayError(); }, 
+			function(failMessage) {
+				expect(failMessage.status).toEqual(401);
+				expect(failMessage.data).toEqual( {} );
+				expect(failMessage.message).toEqual('Permission Error');
+			});
+		$rootScope.$apply();
+
+		deferred = $q.defer();
+		URLService.handleHttpStatus( {}, 403, undefined, undefined, deferred );
+		deferred.promise.then(function(response) { displayError(); }, 
+			function(failMessage) {
+				expect(failMessage.status).toEqual(403);
+				expect(failMessage.data).toEqual( {} );
+				expect(failMessage.message).toEqual('Permission Error');
+			});
+		$rootScope.$apply();
 
 		// 409
+		deferred = $q.defer();
+		URLService.handleHttpStatus( {}, 409, undefined, undefined, deferred );
+		deferred.promise.then(function(response) { displayError(); }, 
+			function(failMessage) {
+				expect(failMessage.status).toEqual(409);
+				expect(failMessage.data).toEqual( {} );
+				expect(failMessage.message).toEqual('Conflict');
+			});
+		$rootScope.$apply();
 
 		// else
+		deferred = $q.defer();
+		URLService.handleHttpStatus( {}, 600, undefined, undefined, deferred );
+		deferred.promise.then(function(response) { displayError(); }, 
+			function(failMessage) {
+				expect(failMessage.status).toEqual(600);
+				expect(failMessage.data).toEqual( {} );
+				expect(failMessage.message).toEqual('Failed');
+			});
+		$rootScope.$apply();
+
+		deferred = $q.defer();
+		URLService.handleHttpStatus( {}, 'string', undefined, undefined, deferred );
+		deferred.promise.then(function(response) { displayError(); }, 
+			function(failMessage) {
+				expect(failMessage.status).toEqual('string');
+				expect(failMessage.data).toEqual( {} );
+				expect(failMessage.message).toEqual('Failed');
+			});
+		$rootScope.$apply();
 	}));
 
 	it('getSitesURL', inject(function() {
@@ -2095,16 +2184,12 @@ describe('URLService', function() {
 		expectedReturn = root + '/javawebscripts/element/search?keyword=muschek';
 		expect(URLService.getElementSearchURL('muschek', 'master')).toBe(expectedReturn);
 	}));
-
 	
 	// Private methods: isTimestamp, addVersion, handleHttpStatus
 	// Not tested
-	
 });
-*/
 
 
-/*
 // !-- NOTE: ask Doris how to test the hasCircularReference function --!
 // UtilsService - incomplete, 2 methods, [1 normal, 1 other]
 describe('UtilsService', function() {
@@ -2176,9 +2261,8 @@ describe('UtilsService', function() {
 		expect(dirtyElement.specialization.value).toEqual([]);
 	}));
 });
-*/
 
-/*
+
 // !-- NOTE: VersionService incorrectly adds the version timestamp --!
 // VersionService - done, 4 methods, [4 $http], expect 3 to fail
 describe('VersionService', function() {
@@ -2473,9 +2557,8 @@ describe('VersionService', function() {
 		expect(secondPromise).toEqual(firstPromise);
 	}));
 });
-*/
 
-/*
+
 // ViewService - done, 18 methods, [5 ElemeServ, 4 empty, 9 tested], expect 3 to fail
 describe('ViewService', function() {
 	beforeEach(module('mms'));
@@ -2824,20 +2907,84 @@ describe('ViewService', function() {
 		expect(ViewService.getCurrentDocumentId()).toBe('newDocumentId');
 	}));
 });
-*/
 
 
-// !-- NOTE: Artifact JSON schema non-existant --!
-// VizService - incomplete, 1 method, [1 uses $http]
+
+// !-- NOTE: if more than one artifact is received then it will only accept 
+// the first one --!
+// !-- NOTE: timestamp-ing is done incorrectly --!
+// VizService - done,, 1 method, expect 1 to fail
 describe('VizService', function() {
 	beforeEach(module('mms'));
 
+	var forceFail, forceEmpty;
 	var VizService, $httpBackend, $rootScope;
 
 	beforeEach(inject(function($injector) {
 		VizService = $injector.get('VizService');
 		$httpBackend = $injector.get('$httpBackend');
 		$rootScope = $injector.get('$rootScope');
+
+		forceFail = false;
+		forceEmpty = false;
+
+		$httpBackend.whenGET('/alfresco/service/workspaces/master/artifacts/artifactId').respond(function(method, url, data) {
+			if (forceFail) { return [500, 'Internal Server Error']; }
+			else {
+				var artifacts = { artifacts: [ { id: 'imageId1', url: '/image/url/path/image.png' } ] };
+				return [200, artifacts];
+			}
+		});
+
+		$httpBackend.whenGET('/alfresco/service/workspaces/master/artifacts/artifactId2').respond(function(method, url, data) {
+			if (forceEmpty) { return [200, { artifacts: [ ] } ]; }
+			else {
+				var artifacts = { artifacts: [ { id: 'imageId2', url: '/image/url/path/image.gif' } ] };
+				return [200, artifacts];
+			}
+		});
+
+		$httpBackend.whenGET('/alfresco/service/workspaces/master/artifacts/artifactId3').respond(function(method, url, data) {
+			if (forceEmpty) { return [200, { artifacts: [ ] } ]; }
+			else {
+				var artifacts = { artifacts: [ { id: 'imageId3', url: '/image/url/path/image.jpg' },
+				{ id: 'imageId4', url: '/image/url/path/image.svg' } ] };
+				return [200, artifacts];
+			}
+		});
+
+		$httpBackend.whenGET('/alfresco/service/workspaces/master/artifacts/artifactId4?timestamp=01-01-2014').respond(function(method, url, data) {
+			if (forceFail) { return [500, 'Internal Server Error']; }
+			else {
+				var artifacts = { artifacts: [ { id: 'imageId1', url: '/image/url/path/image.png' } ] };
+				return [200, artifacts];
+			}
+		});
+
+		$httpBackend.whenGET('/alfresco/service/workspaces/master/artifacts/artifactId5?timestamp=01-01-2014').respond(function(method, url, data) {
+			if (forceEmpty) { return [200, { artifacts: [ ] } ]; }
+			else {
+				var artifacts = { artifacts: [ { id: 'imageId2', url: '/image/url/path/image.gif' } ] };
+				return [200, artifacts];
+			}
+		});
+
+		$httpBackend.whenGET('/alfresco/service/workspaces/master/artifacts/artifactId6?timestamp=01-01-2014').respond(function(method, url, data) {
+			if (forceEmpty) { return [200, { artifacts: [ ] } ]; }
+			else {
+				var artifacts = { artifacts: [ { id: 'imageId4', url: '/image/url/path/image.svg' } ] };
+				return [200, artifacts];
+			}
+		});
+
+
+		$httpBackend.whenGET('/alfresco/service/workspaces/master/artifacts/artifactId7/versions/version1').respond(function(method, url, data) {
+			if (forceFail) { return [500, 'Internal Server Error']; }
+			else {
+				var artifacts = { artifacts: [ { id: 'imageId1', url: '/image/url/path/image.png' } ] };
+				return [200, artifacts];
+			}
+		});
 
 	}));
 
@@ -2847,34 +2994,90 @@ describe('VizService', function() {
 		expect(VizService.getImageURL).not.toBe(null);
 	}));
 
-	// uses $http
+	// !-- NOTE: if more than one artifact is received then it will only accept 
+	// the first one --!
+	// !-- NOTE: timestamp-ing is done incorrectly --!
+	// done, expect to fail
 	it('getImageURL', inject(function() {
 
 		// !(urls.hasOwnProperty(id)), !(URLService.isTimestamp(version)), $http.get -- fail
+		forceFail = true;
+		VizService.getImageURL('artifactId', undefined, undefined, 'latest').then(function(response) { displayError(); },
+			function(failMessage) {
+				expect(failMessage.status).toEqual(500);
+				expect(failMessage.data).toEqual('Internal Server Error');
+				expect(failMessage.message).toEqual('Server Error');
+			});
+		$httpBackend.flush();
+		forceFail = false;
+		// urls['artifactId'] now exists
 
 		// !(urls.hasOwnProperty(id)), !(URLService.isTimestamp(version)), $http.get -- pass, !(data.artifacts.length > 0)
+		forceEmpty = true;
+		VizService.getImageURL('artifactId2', undefined, undefined, 'latest').then(function(response) { displayError(); },
+			function(failMessage) {
+				expect(failMessage.status).toEqual(200);
+				expect(failMessage.message).toEqual('Not Found');
+			});
+		$httpBackend.flush();
+		forceEmpty = false;
+		// urls['artifactId2'] now exists
 
 		// !(urls.hasOwnProperty(id)), !(URLService.isTimestamp(version)), $http.get -- pass, (data.artifacts.length > 0)
+		VizService.getImageURL('artifactId3', undefined, undefined, 'latest').then(function(response) {
+			expect(response).toEqual('/alfresco/image/url/path/image.jpg');
+		}); $httpBackend.flush();
+		// urls['artifactId3']['latest'] now exists
 
 		// !(urls.hasOwnProperty(id)), (URLService.isTimestamp(version)), $http.get -- fail
+		forceFail = true;
+		VizService.getImageURL('artifactId4', undefined, undefined, '01-01-2014').then(function(response) { displayError(); },
+			function(failMessage) {
+				expect(failMessage.status).toEqual(500);
+				expect(failMessage.data).toEqual('Internal Server Error');
+				expect(failMessage.message).toEqual('Server Error');
+			});
+		$httpBackend.flush();
+		forceFail = false;
+		// urls['artifactId4'] now exists
 
 		// !(urls.hasOwnProperty(id)), (URLService.isTimestamp(version)), $http.get -- pass, !(data.artifacts.length > 0)
+		forceEmpty = true;
+		VizService.getImageURL('artifactId5', undefined, undefined, '01-01-2014').then(function(response) { displayError(); },
+			function(failMessage) {
+				expect(failMessage.status).toEqual(200);
+				expect(failMessage.message).toEqual('Not Found');
+			});
+		$httpBackend.flush();
+		forceEmpty = false;
+		// urls['artifactId5'] now exists
 
 		// !(urls.hasOwnProperty(id)), (URLService.isTimestamp(version)), $http.get -- pass, (data.artifacts.length > 0)
+		VizService.getImageURL('artifactId6', undefined, undefined, '01-01-2014').then(function(response) {
+			expect(response).toEqual('/alfresco/image/url/path/image.svg');
+		}); $httpBackend.flush();
+		// urls['artifactId6']['01-01-2014'] now exists
 
-		/*	Only need to have one with !(urls[id].hasOwnProperty(ver)) to show that it has no effect.
-			(urls.hasOwnProperty(id)), !(urls[id].hasOwnProperty(ver)), !(URLService.isTimestamp(version)),
-			$http.get -- pass, (data.artifacts.length > 0)
-		*/
+		//	Only need to have one with !(urls[id].hasOwnProperty(ver)) to show that it has no effect.
+		//		(urls.hasOwnProperty(id)), !(urls[id].hasOwnProperty(ver)), !(URLService.isTimestamp(version)),
+		//		$http.get -- pass, (data.artifacts.length > 0)
+		VizService.getImageURL('artifactId7', undefined, undefined, 'version1').then(function(response) {
+			expect(response).toEqual( '/alfresco/image/url/path/image.png' );
+		}); $httpBackend.flush();
+		// urls['artifactId7']['version1'] now exists
 
-		/*	Only need to have one with !(version !== 'latest' || !update) to show that it has no effect.
-			(urls.hasOwnProperty(id)), (urls[id].hasOwnProperty(ver)), !(version !== 'latest' || !update),
-			!(URLService.isTimestamp(version)), $http.get -- pass, (data.artifacts.length > 0)
-		*/
+
+		//	Only need to have one with !(version !== 'latest' || !update) to show that it has no effect.
+		//		(urls.hasOwnProperty(id)), (urls[id].hasOwnProperty(ver)), !(version !== 'latest' || !update),
+		//		!(URLService.isTimestamp(version)), $http.get -- pass, (data.artifacts.length > 0)
+		VizService.getImageURL('artifactId3', true, undefined, 'latest').then(function(response) {
+			expect(response).toEqual('/alfresco/image/url/path/image.jpg');
+		}); $httpBackend.flush();
 
 			
-		//	(urls.hasOwnProperty(id)), (urls[id].hasOwnProperty(ver)), (version !== 'latest' || !update),
-		
-
+		//	(urls.hasOwnProperty(id)), (urls[id].hasOwnProperty(ver)), (version !== 'latest' || !update)
+		VizService.getImageURL('artifactId6', false, undefined, '01-01-2014').then(function(response) {
+			expect(response).toEqual('/alfresco/image/url/path/image.svg');
+		}); $rootScope.$apply();
 	}));
 });
