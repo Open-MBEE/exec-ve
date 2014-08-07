@@ -22,6 +22,7 @@ module.exports = function(config){
     ],
 
     exclude : [
+      'test/unit/ServiceSpecs/*.js',
       'build/js/ve/directives.js',
       'build/lib/angular/angular-loader.js',
       'build/lib/angular/*.min.js',
@@ -30,15 +31,20 @@ module.exports = function(config){
 
     autoWatch : true,
 
+    singleRun: false,
+
+    reporters: ['dots'],
+
     frameworks: ['jasmine'],
 
-    browsers : ['Firefox'],
+    browsers : ['PhantomJS'],
 
     plugins : [
             'karma-junit-reporter',
             'karma-chrome-launcher',
             'karma-firefox-launcher',
-            'karma-jasmine'
+            'karma-jasmine',
+            'karma-phantomjs-launcher'
             ],
 
     junitReporter : {

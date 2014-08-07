@@ -397,7 +397,7 @@ describe('ConfigService', function() {
 		// configs now includes 'configName2'
 		// confirm that config now exists in siteConfigs
 		ConfigService.getSiteConfigs('ems', 'master').then(function(response) {
-			console.log(response);
+
 			expect(response.length).toEqual(3);
 
 			expect(response[0].id).toEqual('configId1');
