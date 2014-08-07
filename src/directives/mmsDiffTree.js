@@ -7,6 +7,7 @@ function mmsDiffTree($templateCache, $rootScope, DiffService) {
   var originalElements = [];
   var deltaElements = [];
   var deltaArrays = null;
+  var epsilonCache = [];
 
   var MMSDiffTreeTemplate = $templateCache.get('mms/templates/mmsDiffTree.html');
   
@@ -16,6 +17,7 @@ function mmsDiffTree($templateCache, $rootScope, DiffService) {
     originalElements = response.workspace1.elements;
     deltaArrays = response.workspace2;
     
+    $scope.epsilon = [];
     setUpMMSTree($scope);
 
     // Sets an element (tableElement) for the table to load
@@ -82,29 +84,19 @@ function mmsDiffTree($templateCache, $rootScope, DiffService) {
         });
       }
     };
-  };
 
-  var MMSDiffTreeLink = function(scope, element, attrs) {
-    scope.epsilon = [];
-
-    var stageChange = function(sysmlid) {
-      // Get the element ref'd by sysmlid in deltaElements
-      var elem = getDeltas().filter(function(entry) {
-       return entry && entry.sysmlid.indexOf(sysmlid) !== -1;
-      })[0];
-
-      scope.epsilon.push(elem);
-
-      console.log("Reached");
+    // Submits the user's changes to the server
+    $scope.submitChanges = function() {
+      console.log('Submitting epsilon to server...');
+      console.log('Epsilon:');
+      console.log($scope.epsilon);
     };
 
-
-    // Send epsilon to the server
-    scope.submitAllChanges = function() {
-    };
-
-    // Delete epsilon and return to workspace picker state
-    scope.cancelAllChanges = function() {
+    // Returns the user to the workspace picker route
+    $scope.goBack = function() {
+      console.log('Cleaning up...');
+      $scope.epsilon = [];
+      console.log('Moving to previous route...');
     };
   };
   
@@ -128,65 +120,86 @@ function mmsDiffTree($templateCache, $rootScope, DiffService) {
   /*
    * Preps mms-tree with data and display options.
    */
-
   var setUpMMSTree = function(scope) {
+
+    var stageChange = function(branch) {
+      // Get the change ref'd by sysmlid in deltaElements
+      var change = getDeltas().filter(function(entry) {
+       return entry && entry.sysmlid.indexOf(branch.data.sysmlid) !== -1;
+      })[0];
+
+      epsilonCache.push({ 'sysmlid': branch.data.sysmlid, 'branch': angular.copy(branch) });
+
+      // Push the element onto epsilon, the array we send to the server
+      scope.epsilon.push(change);
+
+      // Replace the button with an undo button to revert the change
+      branch.status = 'undo';
+    };
+
+    var undoChange = function(branch) {
+      var changeToUndo = scope.epsilon.filter(function(entry) {
+        return entry && entry.sysmlid.indexOf(branch.data.sysmlid) !== -1;
+      })[0];
+
+      if (changeToUndo) {
+        // Iterate over each entry in epsilon to find and splice the change to undo
+        scope.epsilon.some(function(entry) {
+          if (entry) {
+            var index = scope.epsilon.indexOf(changeToUndo);
+            if (index > -1) {
+              console.log('Removing ' + changeToUndo.sysmlid + ' at index' + index + '...');
+              scope.epsilon.splice(index, 1);
+              return true;
+            }
+          }
+        });
+
+        // Get the element's original status to reset the button
+        branch.status = epsilonCache.filter(function(entry) {
+          return entry && entry.sysmlid.indexOf(branch.data.sysmlid) !== -1;
+        })[0].branch.status;
+      }
+    };
+
     var id2node = {};
     scope.treeData = [];
     scope.options = {
       types: {
-        "Element": "fa fa-square",
-        "Property": "fa fa-circle",
-        "View": "fa fa-square",
-        "Dependency": "fa fa-long-arrow-right",
-        "DirectedRelationship": "fa fa-long-arrow-right",
-        "Generalization": "fa fa-chevron-right",
-        "Package": "fa fa-folder",
-        "Connector": "fa fa-expand"
+        'Element': 'fa fa-square',
+        'Property': 'fa fa-circle',
+        'View': 'fa fa-square',
+        'Dependency': 'fa fa-long-arrow-right',
+        'DirectedRelationship': 'fa fa-long-arrow-right',
+        'Generalization': 'fa fa-chevron-right',
+        'Package': 'fa fa-folder',
+        'Connector': 'fa fa-expand'
       },
-      statuses: { //put css class in quotes, i.e. { style, " 'testClass' ", button: "exampleButton"}
-        "moved": { style: "'update'", button: "update" },
-        "added": { style: "'addition'", button: "add" },
-        "deleted": { style: "'removal'", button: "remove" },
-        "updated": { style: "'update'", button: "update" },
-        "conflict": "",
-        "resolved": ""
+      statuses: {
+        'move': { style: "'update'", button: 'update' },
+        'add': { style: "'addition'", button: 'add' },
+        'remove': { style: "'removal'", button: 'remove' },
+        'update': { style: "'update'", button: 'update' },
+        'conflict': "",
+        'resolve': "",
+        'undo': { style: "'undo'", button: 'undo' }
       },
       buttons: {
-        "update": { style: "btn btn-primary btn-xs", action: function(sysmlid) {
-          // Get the element ref'd by sysmlid in deltaElements
-          var getDeltasStore = getDeltas();
-          var elem = getDeltasStore.filter(function(entry) {
-           return entry && entry.sysmlid.indexOf(sysmlid) !== -1;
-          })[0];
-
-          scope.epsilon.push(elem);
-
-          console.log(scope.epsilon);
-          }
+        "update": {
+          style: "btn btn-primary btn-xs",
+          action: function(branch) { stageChange(branch); } 
         },
-        "remove": { style: "btn btn-danger btn-xs", action: function(sysmlid) {
-          // Get the element ref'd by sysmlid in deltaElements
-          var getDeltasStore = getDeltas();
-          var elem = getDeltasStore.filter(function(entry) {
-           return entry && entry.sysmlid.indexOf(sysmlid) !== -1;
-          })[0];
-
-          scope.epsilon.push(elem);
-
-          console.log(scope.epsilon);
-          }
+        "remove": {
+          style: "btn btn-danger btn-xs",
+          action: function(branch) { stageChange(branch); } 
         },
-        "add": { style: "btn btn-success btn-xs", action: function(sysmlid) {
-          // Get the element ref'd by sysmlid in deltaElements
-          var getDeltasStore = getDeltas();
-          var elem = getDeltasStore.filter(function(entry) {
-           return entry && entry.sysmlid.indexOf(sysmlid) !== -1;
-          })[0];
-
-          scope.epsilon.push(elem);
-
-          console.log(scope.epsilon);
-          }
+        "add": {
+          style: "btn btn-success btn-xs",
+          action: function(branch) { stageChange(branch); } 
+        },
+        "undo": {
+          style: "btn btn-danger btn-xs",
+          action: function(branch) { undoChange(branch); } 
         }
       }
     };
@@ -215,7 +228,7 @@ function mmsDiffTree($templateCache, $rootScope, DiffService) {
       node.label = e.name;
       node.type = e.specialization.type;
       node.children = [];
-      node.status = "added";
+      node.status = "add";
     });
 
     deltaArrays.addedElements.forEach(function(e) {
@@ -226,23 +239,22 @@ function mmsDiffTree($templateCache, $rootScope, DiffService) {
     });
 
     deltaArrays.deletedElements.forEach(function(e) {
-      id2node[e.sysmlid].status = "deleted";
+      id2node[e.sysmlid].status = "remove";
     });
 
     deltaArrays.updatedElements.forEach(function(e) {
-      id2node[e.sysmlid].status = "updated";
+      id2node[e.sysmlid].status = "update";
     });
 
     deltaArrays.movedElements.forEach(function(e) {
       var ws1node = id2node[e.sysmlid];
-      ws1node.status = "moved";
+      ws1node.status = "move";
     });
   };
   
   return {
     restrict: 'E',
     template: MMSDiffTreeTemplate,
-    link: MMSDiffTreeLink,
     controller: ['$scope', '$rootScope', MMSDiffTreeController]
   };
 }

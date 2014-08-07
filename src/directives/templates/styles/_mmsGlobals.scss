@@ -12,6 +12,8 @@ $highlight_grey: #808080;
 $shadow_grey: #909090;
 $soft_grey: #d3d3d3;
 
+$navHeight: 40px;
+
 /************************* Mixins *************************/
 @mixin border-radius($radius) {
   -webkit-border-radius: $radius;

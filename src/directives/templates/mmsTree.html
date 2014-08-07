@@ -8,7 +8,7 @@
               <i class="indented tree-icon {{row.type_icon}}"></i>
               <span class="indented tree-label">{{row.section}} {{row.branch.data.name}}
                 <span ng-show="{{row.status_properties && row.status_properties.button && row.button_properties}}" class="pull-right">
-                  <button class="{{row.button_properties.style}}" ng-click="row.button_properties.action(row.branch.data.sysmlid);">{{row.status_properties.button}}</button>
+                  <button class="{{row.button_properties.style}}" ng-click="row.button_properties.action(row.branch);">{{row.status_properties.button}}</button>
                 </span>
               </span>
   	        </a>
