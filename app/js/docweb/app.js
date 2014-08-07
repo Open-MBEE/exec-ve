@@ -4,24 +4,28 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
     .config(function($stateProvider, $urlRouterProvider) {
         $stateProvider
         .state('docweb', {
-            url: '/sites/:site',
+            url: '/workspaces/:ws/sites/:site',
             resolve: {
                 site: function($stateParams, SiteService) {
                     return SiteService.getSite($stateParams.site);
                 },
                 configs: function($stateParams, ConfigService) {
-                    return ConfigService.getSiteConfigs($stateParams.site, 'master');
+                    return ConfigService.getSiteConfigs($stateParams.site, $stateParams.ws);
                 },
                 products: function($stateParams, ViewService) {
-                    return ViewService.getSiteDocuments($stateParams.site, null, 'master', null);
-                }            
+                    return ViewService.getSiteDocuments($stateParams.site, null, $stateParams.ws, null);
+                },
+                ws: function($stateParams) {
+                    return $stateParams.ws;
+                }
             },
             views: {
                 'menu': {
-                    template: '<mms-nav mms-site="{{site}}" mms-title="{{title}}" mms-type="DocWeb"></mms-nav>',
-                    controller: function($scope, $stateParams, site) {
+                    template: '<mms-nav mms-site="{{site}}" mms-title="{{title}}" mms-type="DocWeb" mms-ws="{{ws}}"></mms-nav>',
+                    controller: function($scope, $stateParams, site, ws) {
                         $scope.site = site.name;
                         $scope.title = "Configurations";
+                        $scope.ws = ws;
                     }
                 },
                 'config': {
@@ -30,9 +34,10 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
                 },
                 'view@': {
                     templateUrl: 'partials/docweb/latest.html',
-                    controller: function($scope, site, products) {
+                    controller: function($scope, site, products, ws) {
                         $scope.products = products;
                         $scope.site = site.name;
+                        $scope.ws = ws;
                     }
                 }
             }
@@ -65,11 +70,11 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
         .state('docweb.config', {
             url: '/config/:configId',
             resolve: {
-                config: function($stateParams, site, ConfigService) {
-                    return ConfigService.getConfig($stateParams.configId, site.name, 'master');
+                config: function($stateParams, site, ConfigService, ws) {
+                    return ConfigService.getConfig($stateParams.configId, site.name, ws);
                 },
-                configSnapshots: function($stateParams, site, ConfigService) {
-                    return ConfigService.getConfigSnapshots($stateParams.configId, site.name, 'master');
+                configSnapshots: function($stateParams, site, ConfigService, ws) {
+                    return ConfigService.getConfigSnapshots($stateParams.configId, site.name, ws);
                 }
             },
             views: {

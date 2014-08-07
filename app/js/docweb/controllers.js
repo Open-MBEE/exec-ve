@@ -3,13 +3,15 @@
 /* Controllers */
 
 angular.module('myApp')
-  .controller('ConfigsCtrl', ["$scope", "$http", "$state", "$stateParams",  "configs", function($scope, $http, $state, $stateParams, configs) {
+  .controller('ConfigsCtrl', ["$scope", "$http", "$state", "$stateParams",  "configs", 'ws', 
+    function($scope, $http, $state, $stateParams, configs, ws) {
     $scope.configs = configs;
     $scope.site = $stateParams.site;
+    $scope.ws = ws;
   }])
-  .controller('ConfigCtrl', ["$scope", "$http", "$state", "$stateParams", "ConfigService", "_", "config", "configSnapshots", "products", "site", "growl", 
-        function($scope, $http, $state, $stateParams, ConfigService, _, config, configSnapshots, products, site, growl) {
-
+  .controller('ConfigCtrl', ["$scope", "$http", "$state", "$stateParams", "ConfigService", "_", "config", "configSnapshots", "products", "site", "growl", "ws",
+        function($scope, $http, $state, $stateParams, ConfigService, _, config, configSnapshots, products, site, growl, ws) {
+    $scope.ws = ws;
     $scope.config = config;
     $scope.configForEdit = _.cloneDeep(config);
     $scope.configSnapshots = configSnapshots;
@@ -33,7 +35,7 @@ angular.module('myApp')
     };
     
     $scope.change = function() {
-        ConfigService.updateConfig($scope.configForEdit, site.name, "master").then(
+        ConfigService.updateConfig($scope.configForEdit, site.name, ws).then(
             function(result) {
                 $scope.toggles.hideChangeForm = true;
                 growl.success('Change Successful');
@@ -48,7 +50,6 @@ angular.module('myApp')
     function($scope, $http, _, ConfigService, growl) {
     
     $scope.selectedSnapshots = []; 
-
     $scope.update = function() { 
         // $scope.configForEdit['snapshots'] = $scope.selectedSnapshots;
 
@@ -59,7 +60,7 @@ angular.module('myApp')
             });
         }
 
-        ConfigService.updateConfigSnapshots($scope.configForEdit.id, snapshots, $scope.site, "master").then(
+        ConfigService.updateConfigSnapshots($scope.configForEdit.id, snapshots, $scope.site, $scope.ws).then(
             function(result) {
                 $scope.toggles.hideAddRemoveForm = true;
          
@@ -91,16 +92,15 @@ angular.module('myApp')
     };
 
   }])
-  .controller('TagAddRemoveDocCtrl', ["$scope", "$http", "_", "ConfigService", "growl",
+  .controller('TagAddRemoveDocCtrl', ["$scope", "$http", "_", "ConfigService", "growl", 
             function($scope, $http, _, ConfigService, growl) {
         
     $scope.showSnapshots = false;
-
     $scope.toggleShowSnapshots = function() {
         $scope.showSnapshots = !$scope.showSnapshots;
     };
             
-    ConfigService.getProductSnapshots($scope.doc.sysmlid, $scope.site, 'master')
+    ConfigService.getProductSnapshots($scope.doc.sysmlid, $scope.site, $scope.ws)
     .then(
         function(result) {
             $scope.productSnapshots = [];
@@ -125,12 +125,12 @@ angular.module('myApp')
         }
     );
   }])
-  .controller('NewCtrl', ["$scope", "$http", "$state", "site", "products", "ConfigService", "growl", 
-        function($scope, $http, $state, site, products, ConfigService, growl) {
+  .controller('NewCtrl', ["$scope", "$http", "$state", "site", "products", "ConfigService", "growl", "ws",
+        function($scope, $http, $state, site, products, ConfigService, growl, ws) {
 
     $scope.products = products;
     $scope.site = site.name;
-
+    $scope.ws = ws;
     $scope.newConfigName = "";
     $scope.newConfigDesc = "";
     $scope.selected = [];
@@ -160,10 +160,10 @@ angular.module('myApp')
 
         var create = {"name": $scope.newConfigName, "description": $scope.newConfigDesc};
 
-        ConfigService.createConfig(create, $scope.site, "master")
+        ConfigService.createConfig(create, $scope.site, ws)
         .then(
             function(config) {
-                ConfigService.updateConfigProducts(config.id, products, $scope.site, "master")
+                ConfigService.updateConfigProducts(config.id, products, $scope.site, ws)
                 .then(
                     function(result) {
                         growl.success("Create Successful: wait for email.");

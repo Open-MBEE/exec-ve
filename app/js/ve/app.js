@@ -4,30 +4,34 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
 .config(function($stateProvider, $urlRouterProvider) {
     $stateProvider
     .state('doc', {
-        url: '/sites/:site/products/:docId/:time',
+        url: '/workspaces/:ws/sites/:site/products/:docId/:time',
         resolve: {
             document: function($stateParams, ElementService) {
-                return ElementService.getElement($stateParams.docId, false, 'master', $stateParams.time);
+                return ElementService.getElement($stateParams.docId, false, $stateParams.ws, $stateParams.time);
             },
             site: function($stateParams, SiteService) {
                 return SiteService.getSite($stateParams.site);
             },
             views: function($stateParams, ViewService) {
-                return ViewService.getDocumentViews($stateParams.docId, false, 'master', $stateParams.time);
+                return ViewService.getDocumentViews($stateParams.docId, false, $stateParams.ws, $stateParams.time);
             },
             time: function($stateParams) {
                 return $stateParams.time;
             },
             snapshots: function($stateParams, ConfigService) {
-                return ConfigService.getProductSnapshots($stateParams.docId, $stateParams.site, 'master');
+                return ConfigService.getProductSnapshots($stateParams.docId, $stateParams.site, $stateParams.ws);
+            },
+            ws: function($stateParams) {
+                return $stateParams.ws;
             }
         },
         views: {
             'menu': {
-                template: '<mms-nav mms-site="{{site}}" mms-title="{{title}}" mms-type="View Editor"></mms-nav>',
+                template: '<mms-nav mms-site="{{site}}" mms-title="{{title}}" mms-type="View Editor" mms-ws="{{ws}}"></mms-nav>',
                 //template: '<mms-nav site="{{site}}" type="document"></mms-nav>',
-                controller: function($scope, $stateParams, document, site) {
+                controller: function($scope, $stateParams, document, site, ws) {
                     $scope.site = site.name;
+                    $scope.ws = ws;
                     if ($stateParams.time !== 'latest')
                         $scope.title = document.name + ' (' + $stateParams.time + ')';
                     else
@@ -58,8 +62,8 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
             }
         },
         resolve: {
-            viewElements: function($stateParams, ViewService, time) {
-                return ViewService.getViewElements($stateParams.viewId, false, 'master', time);
+            viewElements: function($stateParams, ViewService, time, ws) {
+                return ViewService.getViewElements($stateParams.viewId, false, ws, time);
             }
         }
     })

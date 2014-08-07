@@ -4,7 +4,7 @@
 <div>{{config.description}}</div>
 <h5>Documents</h5>
   <div ng-repeat="snapshot in configSnapshots | orderBy:'sysmlname'">
-      <a href="ve.html#/sites/{{site}}/products/{{snapshot.sysmlid}}/{{snapshot.created}}">{{snapshot.sysmlname}} - {{snapshot.created | date:'medium'}}</a>
+      <a href="ve.html#/workspaces/{{ws}}/sites/{{site}}/products/{{snapshot.sysmlid}}/{{snapshot.created}}">{{snapshot.sysmlname}} - {{snapshot.created | date:'medium'}}</a>
   </div>
   <br/>
   <button ng-show="toggles.hideChangeForm" class="btn btn-primary btn-sm" ng-click="toggleChangeForm()">Change Name or Description</button>

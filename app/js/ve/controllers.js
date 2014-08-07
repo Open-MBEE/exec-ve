@@ -3,10 +3,11 @@
 /* Controllers */
 
 angular.module('myApp')
-.controller('NavTreeCtrl', ['$scope', '$rootScope', '$state', 'document', 'time', 'ElementService', 'ViewService', 'growl',
-function($scope, $rootScope, $state, document, time, ElementService, ViewService, growl) {
+.controller('NavTreeCtrl', ['$scope', '$rootScope', '$state', 'document', 'time', 'ElementService', 'ViewService', 'growl', 'ws',
+function($scope, $rootScope, $state, document, time, ElementService, ViewService, growl, ws) {
     $scope.document = document;
     $scope.time = time;
+    $scope.ws = ws;
     $scope.editable = $scope.document.editable && time === 'latest';
     $rootScope.veCurrentView = $scope.document.sysmlid;
     $scope.buttons = [{
@@ -100,7 +101,7 @@ function($scope, $rootScope, $state, document, time, ElementService, ViewService
         }
 
         // Call the get element service and pass in all the elements
-        ElementService.getElements(viewElementIds, false, 'master', time)
+        ElementService.getElements(viewElementIds, false, ws, time)
         .then(function(elements) {
 
           // Fill out all the view names first
@@ -168,7 +169,7 @@ function($scope, $rootScope, $state, document, time, ElementService, ViewService
             return;
         }
 
-        ViewService.createView(branch.data.sysmlid, 'Untitled View', $scope.document.sysmlid)
+        ViewService.createView(branch.data.sysmlid, 'Untitled View', $scope.document.sysmlid, ws)
         .then(function(view) {
             return treeApi.add_branch(branch, {
                 label: view.name,
@@ -184,9 +185,10 @@ function($scope, $rootScope, $state, document, time, ElementService, ViewService
         }
     };
 }])
-.controller('ReorderCtrl', ['$scope', 'document', 'ElementService', 'ViewService', '$state', 'growl',
-function($scope, document, ElementService, ViewService, $state, growl) {
+.controller('ReorderCtrl', ['$scope', 'document', 'ElementService', 'ViewService', '$state', 'growl', 'ws',
+function($scope, document, ElementService, ViewService, $state, growl, ws) {
     $scope.doc = document;
+    $scope.ws = ws;
     var viewElementIds = [];
     var viewElementIds2TreeNodeMap = {};
     var rootElementId = $scope.doc.sysmlid;
@@ -195,7 +197,7 @@ function($scope, document, ElementService, ViewService, $state, growl) {
         var viewId = document.specialization.view2view[i].id;
         viewElementIds.push(viewId);
     }
-    ElementService.getElements(viewElementIds)
+    ElementService.getElements(viewElementIds, false, ws)
     .then(function(elements) {
         for (var i = 0; i < elements.length; i++) {
             var viewTreeNode = { 
@@ -225,7 +227,7 @@ function($scope, document, ElementService, ViewService, $state, growl) {
             newView2View.push(viewObject);
         }
         document.specialization.view2view = newView2View;
-        ViewService.updateDocument(document)
+        ViewService.updateDocument(document, ws)
         .then(function(data) {
             growl.success('Reorder Successful');
             $state.go('doc', {}, {reload:true});
@@ -234,11 +236,12 @@ function($scope, document, ElementService, ViewService, $state, growl) {
         });
     };
 }])
-.controller('ViewCtrl', ['$scope', '$rootScope', '$stateParams', 'viewElements', 'ViewService', 'time', 'growl',
-function($scope, $rootScope, $stateParams, viewElements, ViewService, time, growl) {
+.controller('ViewCtrl', ['$scope', '$rootScope', '$stateParams', 'viewElements', 'ViewService', 'time', 'growl', 'ws',
+function($scope, $rootScope, $stateParams, viewElements, ViewService, time, growl, ws) {
     ViewService.setCurrentViewId($stateParams.viewId);
     $rootScope.veCurrentView = $stateParams.viewId;
     $scope.vid = $stateParams.viewId;
+    $scope.ws = ws;
     $scope.version = time;
     $rootScope.$broadcast('viewSelected', $scope.vid, viewElements);
     $scope.viewApi = {};
@@ -285,9 +288,10 @@ function($scope, $rootScope) {
     $scope.onClick = function(button) {
     };
 }])
-.controller('ToolCtrl', ['$scope', '$rootScope', 'document', 'snapshots', 'time', 'site', 'ConfigService', 'ElementService', 'growl',
-function($scope, $rootScope, document, snapshots, time, site, ConfigService, ElementService, growl) {
+.controller('ToolCtrl', ['$scope', '$rootScope', 'document', 'snapshots', 'time', 'site', 'ConfigService', 'ElementService', 'growl', 'ws',
+function($scope, $rootScope, document, snapshots, time, site, ConfigService, ElementService, growl, ws) {
     $scope.document = document;
+    $scope.ws = ws;
     $scope.editable = document.editable && time === 'latest';
     $scope.snapshots = snapshots;
     $scope.site = site;
@@ -319,7 +323,7 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
     };
 
     $scope.createNewSnapshot = function() {
-        ConfigService.createSnapshot($scope.document.sysmlid)
+        ConfigService.createSnapshot($scope.document.sysmlid, site.name, ws)
         .then(function(result) {
             growl.success("Create Successful: wait for email.");
         }, function(reason) {
@@ -327,7 +331,7 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
         });
     };
     $scope.refreshSnapshots = function() {
-        ConfigService.getProductSnapshots($scope.document.sysmlid, $scope.site.name, 'master', true)
+        ConfigService.getProductSnapshots($scope.document.sysmlid, $scope.site.name, $scope.ws, true)
         .then(function(result) {
         }, function(reason) {
             growl.error("Refresh Failed: " + reason.message);
@@ -343,7 +347,7 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
         $scope.eid = eid;
         $rootScope.veTbApi.select('elementViewer');
         showPane('element');
-        ElementService.getElement(eid, false, 'master', time).
+        ElementService.getElement(eid, false, ws, time).
         then(function(element) {
             var editable = element.editable && time === 'latest';
             $rootScope.veTbApi.setActive('elementEditor', editable);
@@ -369,7 +373,7 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
         $scope.viewElements = viewElements;
         $rootScope.veTbApi.select('elementViewer');
         showPane('element');
-        ElementService.getElement(vid, false, 'master', time).
+        ElementService.getElement(vid, false, ws, time).
         then(function(element) {
             var editable = element.editable && time === 'latest';
             $rootScope.veTbApi.setActive('elementEditor', editable);

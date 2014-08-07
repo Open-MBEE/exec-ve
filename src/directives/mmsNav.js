@@ -214,7 +214,8 @@ function mmsNav(SiteService, $templateCache, $log, growl) {
         scope: {
             site: '@mmsSite', //current site name
             title: '@mmsTitle', //current page title
-            type: '@mmsType' //current page type
+            type: '@mmsType', //current page type
+            ws: '@mmsWs'
         },
         link: mmsNavLink
     };
