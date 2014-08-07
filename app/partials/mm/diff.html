@@ -1,0 +1,11 @@
+<div fa-pane pane-anchor="west" pane-size="25%">
+	<mms-diff-tree></mms-diff-tree>
+
+  <div class="tree-view-btn-group btn-group">
+    <button ng-click="submitChanges()" type="button" class="btn btn-success">Submit</button>
+    <button ng-click="goBack()" type="button" class="btn btn-danger">Go Back</button>
+  </div>
+</div>
+<div fa-pane pane-anchor="east" pane-size="75%" class="main-view-container">
+	<mms-diff-table></mms-diff-table>
+</div>
