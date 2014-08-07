@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms')
-.factory('VizService', ['$q', '$http', 'URLService', VizService]);
+.factory('VizService', ['$q', '$http', 'URLService', 'CacheService', 'UtilsService', VizService]);
 
 /**
  * @ngdoc service
@@ -13,9 +13,7 @@ angular.module('mms')
  * @description
  * This service handles visualization needs and diagramming (TBD)
  */
-function VizService($q, $http, URLService) {
-
-    var urls = {}; //map of id to map of version to url
+function VizService($q, $http, URLService, CacheService, UtilsService) {
 
     /**
      * @ngdoc method
@@ -32,36 +30,25 @@ function VizService($q, $http, URLService) {
      * @returns {Promise} The promise will be resolved with the latest image url
      */
     var getImageURL = function(id, updateFromServer, workspace, version) {
-        var update = !updateFromServer ? false : updateFromServer;
-        var ws = !workspace ? 'master' : workspace;
-        var ver = !version ? 'latest' : version;
-
+        var n = normalize(id, updateFromServer, workspace, version);
         var deferred = $q.defer();
-        if (urls.hasOwnProperty(id)) {
-            if (urls[id].hasOwnProperty(ver)) {
-                if (version !== 'latest' || !update) {
-                    deferred.resolve(urls[id][ver]);
-                    return deferred.promise;
-                }
-            } 
-        } else {
-            urls[id] = {};
+        if (CacheService.exists(n.cacheKey) && !n.update) {
+            deferred.resolve(CacheService.get(n.cacheKey));
+            return deferred.promise;
         }
-        var options = {params:{}};
-        if (URLService.isTimestamp(version))
-            options.params.timestamp = version;
-        $http.get(URLService.getImageURL(id, ws, ver), options)
+        $http.get(URLService.getImageURL(id, n.ws, n.ver))
         .success(function(data, status, headers, config) {
-            if (data.artifacts.length > 0) {
-                urls[id][ver] = '/alfresco' + data.artifacts[0].url;
-                deferred.resolve(urls[id][ver]);
-            } else {
-                deferred.reject({status: 200, data: data, message: 'Not Found'});
-            }
+            deferred.resolve(CacheService.put(n.cacheKey, '/alfresco' + data.artifacts[0].url, false));
         }).error(function(data, status, headers, config) {
             URLService.handleHttpStatus(data, status, headers, config, deferred);
         });
         return deferred.promise;
+    };
+
+    var normalize = function(id, updateFromServer, workspace, version) {
+        var res = UtilsService.normalize({update: updateFromServer, workspace: workspace, version: version});
+        res.cacheKey = ['artifactUrl', id, res.ws, res.ver];
+        return res;
     };
 
     return {

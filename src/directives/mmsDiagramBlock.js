@@ -15,8 +15,8 @@ function mmsDiagramBlock(go, growl, ElementService) {
 
         var ownedElementsMap = {};
 
-        for (var i = 0; i < data.elements.length; i++) {
-          ownedElementsMap[data.elements[i].sysmlid] = data.elements[i];
+        for (var i = 0; i < data.length; i++) {
+          ownedElementsMap[data[i].sysmlid] = data[i];
         }
 
         // create a list of all the nodes
@@ -24,8 +24,8 @@ function mmsDiagramBlock(go, growl, ElementService) {
 
         var elem;
 
-        for (i = 0; i < data.elements.length; i++) {
-          elem = data.elements[i];
+        for (i = 0; i < data.length; i++) {
+          elem = data[i];
 
           if (elem.hasOwnProperty('specialization') && 
               elem.specialization.type === 'Element') {
@@ -56,8 +56,8 @@ function mmsDiagramBlock(go, growl, ElementService) {
         // create a list of all the edges / relationships
         var edges = [];
 
-        for (i = 0; i < data.elements.length; i++) {
-          elem = data.elements[i];
+        for (i = 0; i < data.length; i++) {
+          elem = data[i];
 
           if (elem.hasOwnProperty('specialization') && 
               elem.specialization.type === 'Dependency') {
