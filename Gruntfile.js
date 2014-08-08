@@ -431,7 +431,7 @@ module.exports = function(grunt) {
         grunt.task.run('stubby', 'configureProxies:' + arg1, 'connect:' + arg1);
       } else {
         grunt.log.writeln("Launching server with proxy API");
-        grunt.task.run('configureProxies:b', 'connect:b');
+        grunt.task.run('configureProxies:a', 'connect:a');
       }
       grunt.task.run('watch:' + build);
     }
