@@ -13,10 +13,6 @@ a.dropdown-toggle {
   padding-bottom: 10px;
 }
 
-a.dropdown-toggle:hover {
-  background-color: $dark_grey;
-}
-
 ul > li > a {
   padding-top: 20px;
   padding-bottom: 13px;
@@ -229,10 +225,6 @@ mms-nav {
     .active > a {
       background-color: $light_grey;
 
-      &:hover {
-        background-color: $light_grey;
-      }
-
       &:focus {
         background-color: $dark_grey;
       }
@@ -240,10 +232,6 @@ mms-nav {
 
     .open > a {
       background-color: $dark_grey;
-
-      &:hover {
-        background-color: $dark_grey;
-      }
 
       &:focus {
         background-color: $dark_grey;
@@ -326,7 +314,6 @@ accordion {
     & > a:hover {
       cursor: pointer;
       text-decoration: none;
-      background-color: $medium_grey;
     }
   }
 
@@ -339,7 +326,6 @@ accordion {
       & > a:hover {
         cursor: pointer;
         text-decoration: none; 
-        background-color: $light_grey;
       }
     }
   }

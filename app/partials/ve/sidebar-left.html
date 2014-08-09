@@ -1,19 +1,13 @@
-<div class="wrap">
-        <div class="btn-toolbar" role="toolbar">
-            <div class="wrap" id="inside-wrap">
-                <div class="col-xs-12 toolbar">
-                    <div class="btn-group" ng-repeat="button in buttons | filter: {permission: true}">
-                        <a type="button" class="view-tools" ng-click="button.action()" tooltip="{{button.tooltip}}" tooltip-append-to-body="true" tooltip-trigger="mouseenter" tooltip-popup-delay="100" tooltip-placement="{{button.placement}}">
-                            <span class="fa {{button.icon}}"></span>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div>
-            <input class="form-control" ng-show="filterOn" ng-model="search" type="text" placeholder="filter" ng-change="treeApi.expand_all()">
-        </div>
-        <mms-tree search="search" tree-data="my_data" section-numbering="true" tree-control="treeApi" 
-            on-select="my_tree_handler(branch)" initial-selection="{{veCurrentView}}" options="tree_options"> 
-        </mms-tree>
+<div class="sidebar-left">
+  <div class="sidebar-left-wrap">
+    <div class="col-xs-12 toolbar sidebar-left-btn-group">
+      <a ng-repeat="button in buttons | filter: {permission: true}" type="button" class="view-tools" ng-click="button.action()" tooltip="{{button.tooltip}}" tooltip-append-to-body="true" tooltip-trigger="mouseenter" tooltip-popup-delay="100" tooltip-placement="{{button.placement}}">
+        <span class="fa {{button.icon}}"></span>
+      </a>
+    </div>
+  </div>
+  <div>
+    <input class="form-control" ng-show="filterOn" ng-model="search" type="text" placeholder="filter" ng-change="treeApi.expand_all()">
+  </div>
+  <mms-tree search="search" tree-data="my_data" section-numbering="true" tree-control="treeApi" on-select="my_tree_handler(branch)" initial-selection="{{veCurrentView}}" options="tree_options"></mms-tree>
 </div>

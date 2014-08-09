@@ -1,16 +1,16 @@
-<div class="container-fluid">
-    <div class="col-xs-12 center-pane-btn-toolbar">
-        <a type="button" class="view-tools center" ng-click="nextSection()">
-            <span class="fa fa-chevron-right"></span>
+<div class="center-pane container-fluid">
+    <div class="center-pane-btn-group">
+        <a type="button" class="view-tools center" ng-click="toggleShowComments()">
+            <span class="fa fa-comment"></span>
+        </a>
+        <a type="button" class="view-tools center" ng-click="toggleShowElements()">
+            <span class="fa fa-lightbulb-o"></span>
         </a>
         <a type="button" class="view-tools center" ng-click="prevSection()">
             <span class="fa fa-chevron-left"></span>
         </a>
-        <a type="button" class="view-tools center" ng-click="toggleShowElements()">
-            <span class="fa fa-edit"></span>
-        </a>
-        <a type="button" class="view-tools center" ng-click="toggleShowComments()">
-            <span class="fa fa-comment"></span>
+        <a type="button" class="view-tools center" ng-click="nextSection()">
+            <span class="fa fa-chevron-right"></span>
         </a>
     </div>
     <mms-view mms-vid="{{vid}}" mms-cf-clicked="tscClicked(elementId)" mms-order="false" mms-version="{{version}}" mms-view-api="viewApi"></mms-view>

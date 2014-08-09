@@ -37,24 +37,28 @@ img {
   color: #fff;
 }
 
-.tab-pane .toolbar {
-  background-color:#FFF;
-  padding: 0px;
-}
-
 a.view-tools {
   color: #333;
   font-size: 16px;
   line-height: $toolHeight;
-  border-left: 2px solid #dedede;
-  border-right: 2px solid #dedede;
+  border-left: 1px solid #dedede;
+  border-right: 1px solid #dedede;
   margin-left: -2px;
   position: relative;
   float: left;
   width: $toolWidth;
 
   &:first-child {
-    margin-left: none; 
+    margin-left: none;
+    border-left: 1px solid #dedede !important;
+  }
+
+  &:last-child {
+    border-right: 1px solid #dedede !important;
+  }
+
+  &:nth-child(even) {
+    border: 0;
   }
 
   &:hover {
@@ -65,32 +69,38 @@ a.view-tools {
   }
 
   &.center {
-    float: right;
     text-align: center;
   }
 }
 
-.btn-group {
-  text-align: center;
+.center-pane {
+  .center-pane-btn-group {
+    float: right;
+    padding-top: 9px;
+    padding-right: 0;
+  }
 }
 
-.tab-pane .toolbar > .btn-group {
-  margin-left: 5px;
-}
-
-.tab-pane .toolbar > .btn-group > button {
-  height: 25px;
-  width: 25px;
-  padding: 0;
-  border-radius: 0;
-}
-
-.wrap {
+.sidebar-left {
   min-width: $tabWidth;
-}
 
-#inside-wrap {
-  padding: 9px 0px 30px 8px;
+  .sidebar-left-wrap {
+    padding: 9px 0px 30px 8px;
+  }
+
+  .sidebar-left-btn-group {
+    text-align: center;
+    margin-left: 11px;
+    background-color:#FFF;
+    padding: 0px;
+
+    button {
+      height: 25px;
+      width: 25px;
+      padding: 0;
+      border-radius: 0;
+    }
+  }
 }
 
 .tooltip.bottom-left {
