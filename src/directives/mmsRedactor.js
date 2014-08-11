@@ -140,7 +140,7 @@ function mmsRedactor(ElementService, ViewService, $modal, $templateCache, $windo
             changeCallback: read,
             maxHeight: $window.innerHeight*0.65,
             imageUploadURL: '', //prevent default upload to public url
-            placeholder: "Placeholder",
+            placeholder: "Start typing here",
             autoresize: true,
             wym: true
         });

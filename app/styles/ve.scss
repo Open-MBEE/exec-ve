@@ -18,12 +18,49 @@ $toolWidth: 32px;
   }
 }
 
-.west-tabs .table tbody tr:first-child td:first-child {
-  border-top: 0;
+a {
+  color: #4885BD;
 }
 
 img {
   max-width: 100%;
+}
+
+.btn {
+  border: 0;
+  border-radius: 3px;
+  padding: 11px 11px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.btn-primary {
+  background-color: #4885BD;
+}
+
+.btn:focus, .btn:active:focus, .btn.active:focus {
+  outline: none;
+}
+
+.snapshot-btn-group {
+  margin-bottom: 20px;
+
+  .create-new-snapshot-btn {
+    background-color: #9BBE81;
+
+    &:hover {
+      background-color: #738965;
+    }
+  }
+}
+
+.form-control:focus {
+  border-color: #4885BD;
+  box-shadow: none;
+}
+
+.west-tabs .table tbody tr:first-child td:first-child {
+  border-top: 0;
 }
 
 .nav-pills > li.active > a {
