@@ -5,7 +5,6 @@ module.exports = function(config){
         files : [
           'build/bower_components/lodash/dist/lodash.js',
           'build/bower_components/angular/angular.js',
-          'build/bower_components/angular-ui-sortable/sortable.js',
           'build/mms.js',
           'build/bower_components/angular-mocks/angular-mocks.js',
           'test/unit/**/*.js'
@@ -18,7 +17,7 @@ module.exports = function(config){
 
         singleRun: true,
 
-        reporters: ['dots'],
+        reporters: ['junit'],
 
         frameworks: ['jasmine'],
 
