@@ -272,14 +272,14 @@ function($scope, $rootScope) {
             onClick: function() {$rootScope.$broadcast('viewStructEditorSelected');}},
         {id: 'documentSnapshots', icon: 'fa fa-camera', selected: false, active: true, tooltip: 'Snapshots',
             onClick: function() {$rootScope.$broadcast('snapshotsSelected');}},
-        {id: 'elementSave', icon: 'fa fa-save', selected: false, active: false, tooltip: 'Save',
+        {id: 'elementSave', icon: 'fa fa-save', pullDown: true, dynamic: true, selected: false, active: false, tooltip: 'Save',
             onClick: function() {$rootScope.$broadcast('elementSave');}},
-        {id: 'elementCancel', icon: 'fa fa-times', selected: false, active: false, tooltip: 'Cancel',
+        {id: 'elementCancel', icon: 'fa fa-times', dynamic: true, selected: false, active: false, tooltip: 'Cancel',
             onClick: function() {$rootScope.$broadcast('elementCancel');}},
-        {id: 'viewSave', icon: 'fa fa-save', selected: false, active: false, tooltip: 'Save',
+        {id: 'viewSave', icon: 'fa fa-save', pullDown: true, dynamic: true, selected: false, active: false, tooltip: 'Save',
             onClick: function() {$rootScope.$broadcast('viewSave');}},
-        {id: 'viewCancel', icon: 'fa fa-times', selected: false, active: false, tooltip: 'Cancel',
-            onClick: function() {$rootScope.$broadcast('viewCancel');}},
+        {id: 'viewCancel', icon: 'fa fa-times', dynamic: true, selected: false, active: false, tooltip: 'Cancel',
+            onClick: function() {$rootScope.$broadcast('viewCancel');}}
     ];
 
     $scope.onClick = function(button) {

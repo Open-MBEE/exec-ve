@@ -45,6 +45,15 @@ a.tools:hover {
 	box-shadow: none;
 }
 
+.dynamic {
+	background-color: white;
+	box-shadow: none;
+}
+
+.pulldown {
+	margin-top: 75px;
+}
+
 @media screen and (max-width: 45em) {
 	@-moz-document url-prefix() {
 		.right-toolbar {
