@@ -1,11 +1,23 @@
 <div>
-    <h4><mms-transclude-name data-mms-eid="{{view.sysmlid}}"></mms-transclude-name></h4> 
-    <div ng-show="showElements">Last Modified: {{lastModified | date:'M/d/yy h:mm a'}} by {{author}}</div><br/>
+
+    <h1 class="view-title">
+      <mms-transclude-name data-mms-eid="{{view.sysmlid}}"></mms-transclude-name>
+    </h1>
+
+    <div ng-show="showElements">
+      Last Modified: {{lastModified | date:'M/d/yy h:mm a'}} by {{author}}
+    </div>
+
+    <br/>
+
     <div ng-repeat="contain in view.specialization.contains" ng-switch on="contain.type"> 
+
         <mms-view-para data-mms-para="contain" ng-switch-when="Paragraph"></mms-view-para>
         <mms-view-table data-mms-table="contain" ng-switch-when="Table"></mms-view-table>
         <mms-view-list data-mms-list="contain" ng-switch-when="List"></mms-view-list>
         <mms-view-img data-mms-image="contain" ng-switch-when="Image"></mms-view-img>
         <mms-view-section data-mms-section="contain" ng-switch-when="Section"></mms-view-section>
+
     </div>
+
 </div>

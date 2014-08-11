@@ -1,25 +1,27 @@
-.footer {
-  width: 100%;
-  height: 13px;
-  border-top: 1px solid #dedede;
-  font-size: 7px;
-  font-weight: 200;
-  color: rgba(64,64,64,.7);
-  position: absolute;
-  background-color: transparent;
-  text-align: center;
-  z-index: -1000;
-  cursor: default;
-  bottom: -12px;
-  padding-top: 1px;
-}
+mms-footer {
+  .footer {
+    width: 100%;
+    height: 13px;
+    border-top: 1px solid #dedede;
+    font-size: 7px;
+    font-weight: 200;
+    color: rgba(64,64,64,.7);
+    position: absolute;
+    background-color: transparent;
+    text-align: center;
+    z-index: -1000;
+    cursor: default;
+    bottom: -12px;
+    padding-top: 1px;
+  }
 
-.toolbar-extension {
-  width: 41px;
-  height: 20px;
-  background-color: #404040;
-  color: #404040;
-  position: relative;
-  top: -1px;
-  float: right;
+  .toolbar-extension {
+    width: 41px;
+    height: 20px;
+    background-color: #404040;
+    color: #404040;
+    position: relative;
+    top: -1px;
+    float: right;
+  }
 }
