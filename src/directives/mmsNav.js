@@ -42,18 +42,18 @@ function mmsNav(SiteService, $templateCache, $log, growl) {
             catOpen : false,
             bgColor : {'background-color': 'none'}
         };
+        var catNames = [];
+        var sites = {};
 
-        // Change dropdown color if active
-        scope.setBG = function(){
-            scope.obj.bgColor = {'background-color': '#404040'};
-        };
-        scope.clearBG = function(){
-            scope.obj.bgColor = {'background-color': 'none'};
-        };
-
-        //Resets catagory accordions
+        //Resets catagory and sites accordions
         scope.reset = function(){
-            scope.obj.catOpen = false;
+            for(var i = 0; i < catNames.length; i++){
+                var str = catNames[i];
+                scope.categories[str].open = false;
+                for(var k = 0; k < scope.categories[str].length; k++){
+                    scope.categories[str][k].isOpen = false;
+                }
+            }
         };
         // Define a few helper functions
         var Helper = {
@@ -179,15 +179,18 @@ function mmsNav(SiteService, $templateCache, $log, growl) {
 
         SiteService.getSites()
         .then(function(data) {
-            var sites = {};
+            // var sites = {};
+            //var catNames = [];
             for (var i = 0; i < data.length; i++) {
                 var site = data[i];
+                site.isOpen = true;
                 if (site.name === scope.site)
                     scope.siteTitle = site.title;
                 if (site.categories.length === 0)
                     site.categories.push("Uncategorized");
                 for (var j = 0; j < site.categories.length; j++) {
                     var cat = site.categories[j];
+                    catNames.push(cat);
                     if (sites.hasOwnProperty(cat)) {
                         sites[cat].push(site);
                     } else {
@@ -196,6 +199,10 @@ function mmsNav(SiteService, $templateCache, $log, growl) {
                 }
             }
             scope.categories = sites;
+            for(var k = 0; k < catNames.length; k++){
+                var str = catNames[k];
+                scope.categories[str].open = false;
+            }
         }, function(reason) {
             growl.error("Getting Sites Error: " + reason.message);
         });

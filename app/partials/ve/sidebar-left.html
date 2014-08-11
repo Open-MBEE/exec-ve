@@ -1,31 +1,11 @@
 <div class="wrap">
-<tabset>
-    <tab>
-        <tab-heading>Table of Contents</tab-heading>
         <div class="btn-toolbar" role="toolbar">
-            <div class="wrap">
+            <div class="wrap" id="inside-wrap">
                 <div class="col-xs-12 toolbar">
-                    <div class="btn-group">
-                        <button type="button" class="btn btn-default" ng-click="my_tree.expand_all()"
-                        tooltip="Expand All" tooltip-append-to-body="true" tooltip-trigger="mouseenter" tooltip-popup-delay="100" tooltip-placement="bottom">
-                            <span class="fa fa-caret-square-o-down"></span>
-                        </button>
-                        <button type="button" class="btn btn-default" ng-click="my_tree.collapse_all()"
-                        tooltip="Collapse All" tooltip-append-to-body="true" tooltip-trigger="mouseenter" tooltip-popup-delay="100" tooltip-placement="bottom">
-                            <span class="fa fa-caret-square-o-up"></span>
-                        </button>  
-                        <button type="button" class="btn btn-default" ng-click="toggleFilter()"
-                        tooltip="Filter" tooltip-append-to-body="true" tooltip-trigger="mouseenter" tooltip-popup-delay="100" tooltip-placement="bottom">
-                            <span class="fa fa-filter"></span>
-                        </button>
-                        <button type="button" class="btn btn-default" ng-click="try_adding_a_branch()"  ng-show="editable"
-                        tooltip="Add View" tooltip-append-to-body="true" tooltip-trigger="mouseenter" tooltip-popup-delay="100" tooltip-placement="bottom">
-                            <span class="fa fa-plus"></span>
-                        </button>
-                        <button type="button" class="btn btn-default" ng-click="reorder_tree_view()"  ng-show="editable"
-                        tooltip="Reorder" tooltip-append-to-body="true" tooltip-trigger="mouseenter" tooltip-popup-delay="100" tooltip-placement="bottom">
-                            <span class="fa fa-arrows-v"></span>
-                        </button>
+                    <div class="btn-group" ng-repeat="button in buttons | filter: {permission: true}">
+                        <a type="button" class="view-tools" ng-click="button.action(); selectTool($index)" tooltip="{{button.tooltip}}" tooltip-append-to-body="true" tooltip-trigger="mouseenter" tooltip-popup-delay="100" tooltip-placement="{{button.placement}}">
+                            <span class="fa {{button.icon}}"></span>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -34,31 +14,6 @@
             <input class="form-control" ng-show="filterOn" ng-model="search" type="text" placeholder="filter" ng-change="my_tree.expand_all()">
         </div>
         <mms-tree search="search" tree-data="my_data" section-numbering="true" tree-control="my_tree" 
-            on-select="my_tree_handler(branch)" expand-level="2" initial-selection="{{tree_initial_selection}}"> 
+            on-select="my_tree_handler(branch)" initial-selection="{{tree_initial_selection}}" options="tree_options"> 
         </mms-tree>
-    </tab>
-    <tab>
-        <tab-heading>Versions</tab-heading>
-        <div class="container-fluid">
-            <table class="table table-hover table-condensed">
-                <tr><td><a ui-sref="doc({site: site.name, docId: document.sysmlid, time: 'latest'})" 
-                    ui-sref-opts="{reload: true}">Latest</a></td></tr>
-                <tr ng-repeat="snapshot in snapshots | orderBy:'-created'">
-                    <td>
-                        <a ui-sref="doc({site: site.name, docId: document.sysmlid, time: snapshot.created})" 
-                            ui-sref-opts="{reload: true}">{{snapshot.created | date:'M/d/yy h:mm a'}}</a>
-                    </td>
-                    <td>
-                        <div ng-repeat="config in snapshot.configurations | orderBy:'name'">
-                            <a href="docweb.html#/sites/{{site.name}}/config/{{config.id}}">{{config.name}}</a>
-                        </div>
-                    </td>
-                </tr>
-            </table>
-
-        <button ng-show="editable" class="btn btn-sm btn-primary" ng-click="createNewSnapshot()">Create New</button>
-        <button class="btn btn-sm btn-primary" ng-click="refreshSnapshots()">Refresh</button>
-        </div>  
-    </tab>
-</tabset>
 </div>

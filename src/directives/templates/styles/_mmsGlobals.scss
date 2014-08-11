@@ -1,0 +1,54 @@
+/************************* Variables *************************/
+$white: #fff;
+$black: #000;
+$opaque_white: rgba(255, 255, 255, 0.1);
+$opaque_black: rgba(0, 0, 0, 0.25);
+$monolith: #404040;
+$cobalt: #44749d;
+$arrow_blue: #4885BD;
+$dark_grey: #505050;
+$medium_grey: #606060;
+$light_grey: #707070;
+$highlight_grey: #808080;
+$shadow_grey: #909090;
+$soft_grey: #dedede;
+
+/************************* Mixins *************************/
+@mixin border-radius($radius) {
+  -webkit-border-radius: $radius;
+  -moz-border-radius: $radius;
+  -ms-border-radius: $radius;
+  border-radius: $radius; 
+}
+
+@mixin transform($param) {
+  -webkit-transform: $param;
+  -moz-transform: $param;
+  -ms-transform: $param;
+  -o-transform: $param;
+  transform: $param; 
+}
+
+@mixin transition($transition-property, $transition-time, $method) {
+  -webkit-transition: $transition-property $transition-time $method;
+  -moz-transition: $transition-property $transition-time $method;
+  -ms-transition: $transition-property $transition-time $method;
+  -o-transition: $transition-property $transition-time $method;
+  transition: $transition-property $transition-time $method;
+}
+
+@mixin backface-visibility($param) {
+  -webkit-backface-visibility: $param;
+  -moz-backface-visibility: $param;
+  -ms-backface-visibility: $param;
+  -o-backface-visibility: $param;
+  backface-visibility: $param;
+}
+
+@mixin box-shadow($shadows...) {
+  -webkit-box-shadow: $shadows;
+  -moz-box-shadow: $shadows;
+  -ms-box-shadow: $shadows;
+  -o-box-shadow: $shadows;
+  box-shadow: $shadows;
+}

@@ -10,8 +10,34 @@ function($scope, $rootScope, $state, document, snapshots, site, time, ElementSer
     $scope.site = site;
     $scope.time = time;
     $scope.editable = $scope.document.editable && time === 'latest';
+    $rootScope.$broadcast('versionPermission', time === 'latest');
     $rootScope.tree_initial_selection = $scope.document.sysmlid;
-
+    $scope.buttons = [{
+        action: function(){ $scope.my_tree.expand_all(); },        
+        tooltip: "Expand All",
+        icon: "fa-caret-square-o-down",
+        permission: true
+    }, {
+        action: function(){ $scope.my_tree.collapse_all(); },
+        tooltip: "Collapse All",
+        icon: "fa-caret-square-o-up",
+        permission: true
+    }, {
+        action: function(){ $scope.toggleFilter(); },
+        tooltip: "Filter",
+        icon: "fa-filter",
+        permission: true
+    }, {
+        action: function(){ $scope.try_adding_a_branch(); },
+        tooltip: "Add View",
+        icon: "fa-plus",
+        permission: $scope.editable
+    }, {
+        action: function(){ $scope.reorder_tree_view(); },
+        tooltip: "Reorder",
+        icon: "fa-arrows-v",
+        permission: $scope.editable
+    }];
     $scope.createNewSnapshot = function() {
         ConfigService.createSnapshot($scope.document.sysmlid)
         .then(function(result) {
@@ -32,6 +58,15 @@ function($scope, $rootScope, $state, document, snapshots, site, time, ElementSer
         $scope.filterOn = !$scope.filterOn;
     };
     var tree = {};
+
+    $scope.tooltipPlacement = function(arr) {
+        arr[0].placement = "bottom-left";
+        for(var i=1; i<arr.length; i++){
+            arr[i].placement = "bottom";
+        }
+    };
+    $scope.tooltipPlacement($scope.buttons);
+    $rootScope.tree = tree;
 
       // 1. Iterate over view2view and create an array of all element ids
       // 2. Call get element ids and create a map of element id -> element name structure
@@ -113,6 +148,11 @@ function($scope, $rootScope, $state, document, snapshots, site, time, ElementSer
 
           $scope.my_data = [ viewElementIds2TreeNodeMap[rootElementId] ];
 
+        }, function(reason) {
+            if (reason.status === 404)
+                growl.error("Error: A view in this doc wasn't found");
+            else
+                growl.error(reason.data);
         });
 
     $scope.my_tree = tree;
@@ -154,6 +194,12 @@ function($scope, $rootScope, $state, document, snapshots, site, time, ElementSer
                 data: view
             });
         });
+    };
+    $scope.tree_options = {
+        types: {
+            "section": "fa fa-file-o fa-fw",
+            "view": "fa fa-file fa-fw"
+        }
     };
 }])
 .controller('ReorderCtrl', ['$scope', 'document', 'ElementService', 'ViewService', '$state', 'growl',

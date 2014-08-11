@@ -10,25 +10,26 @@ The mms module sources are in src/. app/ contains an application that uses mms m
 
 ## Building and Running
 
-* (install node.js and grunt)
+* (install node.js, ruby, grunt, bower, sass)
+* * _npm install -g grunt-cli_
+* * _npm install -g bower_
+* * _gem install sass_
+* install node.js
+* install grunt - sudo npm install -g grunt-cli
 * cd into angular-mms root dir
 * npm install - install all node modules needed to run tasks
+* ruby install - sudo gem install ruby
+* sass install - sudo gem install sass
 * grunt - default task - this will do jshint on all sources inside src/, concat them into dist/mms.js, run jshint on that, minify into dist/mms.min.js, and copy whats in app/ and dist/ into build/
-* grunt server - does the default, plus runs a webserver at localhost:9000 and a proxy server that proxies to sheldon for any path starting with /alfresco. This allows us to test with real service endpoint
-* grunt server:stub - does the same thing as grunt server except the proxy is to a local stub server, can mock alfresco service api with stubby configurations in mocks/
+* grunt server:a - does the default, plus runs a webserver at localhost:9000 and a proxy server that proxies to europaems-dev-staging-a for any path starting with /alfresco. This allows us to test with real service endpoint
 * grunt clean - deletes dist and build folders
-* The following steps will be automated soon
-  * cd into app
-   * run bower install
-  * cd into app/bower_components/angular-borderlayout/
-   * run npm install
 
 ## Testing
 TBD - the angular-seed project contains test scripts using karma, jasmine and protractor - need to figure out how to run tests on our src
 
 ## Generating Docs
 * grunt ngdocs - this would generate html docs based on code comments written in ngdocs style into docs/. The generated files need to be served through a webserver to work.
-* grunt docServer - this would generate the docs and run the server at localhost:10000
+* grunt docs - this would generate the docs and run the server at localhost:10000
 
 ## Clear bower cache
 If things aren't rendering properly, you may need to clear the bower cache.
@@ -37,6 +38,9 @@ If things aren't rendering properly, you may need to clear the bower cache.
 * In top level directory run _bower cache clean_
 
 ## Links
+* node.js - [http://nodejs.org/](http://nodejs.org/)
+* grunt - [http://gruntjs.com/](http://gruntjs.com/)
+* sass - [http://sass-lang.com/](http://sass-lang.com/)
 * grunt-stubby - [https://github.com/h2non/grunt-stubby](https://github.com/h2non/grunt-stubby)
 * ngdocs - [https://github.com/idanush/ngdocs/wiki/API-Docs-Syntax](https://github.com/idanush/ngdocs/wiki/API-Docs-Syntax)
 * grunt-ngdocs - [https://github.com/m7r/grunt-ngdocs](https://github.com/m7r/grunt-ngdocs)

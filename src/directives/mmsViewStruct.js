@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsViewStruct', ['ViewService', '$templateCache', 'growl', '_', mmsViewStruct]);
+.directive('mmsViewStruct', ['ViewService', '$templateCache', '$rootScope', 'growl', '_', mmsViewStruct]);
 
 /**
  * @ngdoc directive
@@ -19,7 +19,7 @@ angular.module('mms.directives')
  * @param {string=master} mmsWs Workspace to use, defaults to master
  * @param {string=latest} mmsVersion Version can be alfresco version number or timestamp, default is latest
  */
-function mmsViewStruct(ViewService, $templateCache, growl, _) {
+function mmsViewStruct(ViewService, $templateCache, $rootScope, growl, _) {
     var template = $templateCache.get('mms/templates/mmsViewStruct.html');
 
     var mmsViewStructCtrl = function($scope, ViewService) {
@@ -29,6 +29,9 @@ function mmsViewStruct(ViewService, $templateCache, growl, _) {
     };
 
     var mmsViewStructLink = function(scope, element, attrs) {
+        scope.editingPermission = false;
+        scope.reorderingPermission = false;
+
         scope.$watch('mmsVid', function(newVal, oldVal) {
             if (!newVal)
                 return;
@@ -38,16 +41,18 @@ function mmsViewStruct(ViewService, $templateCache, growl, _) {
                 scope.lastModified = data.lastModified;
                 scope.author = data.author;
                 scope.edit = _.cloneDeep(scope.view);
+                scope.editingPermission = scope.edit.editable;
+                scope.$emit('viewEditability', scope.edit.editable);
                 delete scope.edit.name;
                 delete scope.edit.documentation;
             }, function(reason) {
                 growl.error('Getting View Error: ' + reason.message);
             });
         });
+
         scope.structEditable = false;
         scope.structEdit = 'Edit Order';
         scope.sortableOptions = {
-            cancel: 'div',
             axis: 'y'
         };
         scope.toggleStructEdit = function() {
@@ -55,7 +60,7 @@ function mmsViewStruct(ViewService, $templateCache, growl, _) {
             scope.structEdit = scope.structEditable ? 'Cancel' : 'Edit Order';
             element.find('.ui-sortable').sortable('option', 'cancel', scope.structEditable ? '' : 'div');
         };
-
+        scope.toggleStructEdit();
         scope.save = function() {
             ViewService.updateView(scope.edit)
             .then(function(result) {

@@ -80,7 +80,6 @@ module.exports = function(grunt) {
       }
     },
 
-
     uglify: {
       options: {
         banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd HH:MM:ss") %> */\n',
@@ -101,17 +100,34 @@ module.exports = function(grunt) {
       }
     },
 
+    sass: {
+      dist : {
+        files: {
+          'dist/css/mms.css': 'src/directives/templates/styles/mmsMain.scss'
+        }
+      },
+      dist2 : {
+        files: [{
+          expand: true,
+          cwd: 'app/styles',
+          src: ['*.scss', '*.css'],
+          dest: 'dist/css/',
+          ext: '.css'
+        }]
+      }
+    },
+
     cssmin: {
       minify: {
         expand: true,
-        cwd: 'src/directives/templates/css/',
+        cwd: 'dist/css',
         src: ['*.css', '!*.min.css'],
         dest: 'dist/css/',
         ext: '.min.css'
       },
       combine: {
         files: {
-          'dist/mms.min.css': ['dist/css/*.css']
+          'dist/styles.min.css': ['dist/css/*.min.css']
         }
       }
     },
@@ -262,6 +278,34 @@ module.exports = function(grunt) {
             port: 9001
           }
         ]
+      }, 
+      ems: {
+        options: {
+          hostname: '*',
+          port: 9000,
+          middleware: function(connect) {
+            return [proxySnippet];
+          }
+        },
+        proxies: [
+          {
+            // /alfresco/service/javawebscripts
+            // https://sheldon.jpl.nasa.gov/alfresco/wcs/javawebscripts/element/_17_0_2_3_407019f_1386871336920_707205_26285
+            context: '/alfresco',  // '/api'
+            host: 'ems.jpl.nasa.gov',//128.149.16.152',
+            port: 443,
+            changeOrigin: true,
+            https: true,
+            //rewrite: {
+            //  '^/api': '/alfresco/service/javawebscripts'
+            //}
+          },
+          {
+            context: '/',
+            host: 'localhost',
+            port: 9001
+          }
+        ]
       }
     },
 
@@ -330,6 +374,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-cssmin');
+  grunt.loadNpmTasks('grunt-contrib-sass');
   grunt.loadNpmTasks('grunt-rsync-2');
   grunt.loadNpmTasks('grunt-connect-proxy');
   grunt.loadNpmTasks('grunt-stubby');
@@ -342,7 +387,7 @@ module.exports = function(grunt) {
 
   // grunt.registerTask('install', ['npm-install', 'bower']);
   grunt.registerTask('install', ['bower']);
-  grunt.registerTask('compile', ['html2js']);
+  grunt.registerTask('compile', ['html2js', 'sass']);
   grunt.registerTask('lint',    ['jshint:beforeconcat']);
   grunt.registerTask('minify',  ['cssmin', 'uglify']);
   grunt.registerTask('wire',    ['bowerInstall']);
@@ -392,7 +437,7 @@ module.exports = function(grunt) {
         grunt.task.run('stubby', 'configureProxies:' + arg1, 'connect:' + arg1);
       } else {
         grunt.log.writeln("Launching server with proxy API");
-        grunt.task.run('configureProxies:b', 'connect:b');
+        grunt.task.run('configureProxies:a', 'connect:a');
       }
       grunt.task.run('watch:' + build);
     }

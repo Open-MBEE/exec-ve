@@ -36,7 +36,10 @@ angular.module('mms.directives')
 function mmsView(ViewService, $templateCache, growl) {
     var template = $templateCache.get('mms/templates/mmsView.html');
 
-    var mmsViewCtrl = function($scope, ViewService) {
+    var mmsViewCtrl = function($rootScope, $scope, ViewService) {
+
+        $scope.my_tree = $rootScope.tree;
+
         this.getViewElements = function() {
             return ViewService.getViewElements($scope.mmsVid, false, $scope.mmsWs, $scope.mmsVersion);
         };
@@ -99,6 +102,12 @@ function mmsView(ViewService, $templateCache, growl) {
             scope.review = scope.reviewing ? 'Hide Comments' : 'Show Comments';
             element.toggleClass('reviewing');
         };
+        scope.nextSection = function() {
+            scope.my_tree.select_next_branch(scope.my_tree.get_selected_branch());
+        };
+        scope.prevSection = function() {
+            scope.my_tree.select_prev_branch(scope.my_tree.get_selected_branch());
+        };
     };
 
     return {
@@ -110,7 +119,7 @@ function mmsView(ViewService, $templateCache, growl) {
             mmsVersion: '@',
             mmsCfClicked: '&',
         },
-        controller: ['$scope', 'ViewService', mmsViewCtrl],
+        controller: ['$rootScope', '$scope', 'ViewService', mmsViewCtrl],
         link: mmsViewLink
     };
 }

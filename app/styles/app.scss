@@ -1,4 +1,6 @@
-/* app css stylesheet */
+$tabWidth: 200px;
+$toolHeight: 20px;
+$toolWidth: 32px;
 
 @media screen and (max-width: 45em) {
   #main-pane {
@@ -40,6 +42,38 @@ img {
   padding: 0px;
 }
 
+a.view-tools {
+  color: #333;
+  font-size: 16px;
+  line-height: $toolHeight;
+  border-left: 2px solid #dedede;
+  border-right: 2px solid #dedede;
+  margin-left: -2px;
+  position: relative;
+  float: left;
+  width: $toolWidth;
+
+  &:first-child {
+    margin-left: none; 
+  }
+
+  &:hover {
+    background-color: #dedede;
+    cursor: pointer;
+    color: #333;
+    z-index: 100;
+  }
+
+  &.center {
+    float: right;
+    text-align: center;
+  }
+}
+
+.btn-group {
+  text-align: center;
+}
+
 .tab-pane .toolbar > .btn-group {
   margin-left: 5px;
 }
@@ -51,34 +85,37 @@ img {
   border-radius: 0;
 }
 
-.footer {
-  font-size: 9px;
-  font-weight: 200;
-  color: #404040;
-  position: absolute;
-  background-color: transparent;
-  padding-left: 5px;
-  letter-spacing: 0.05em;
-  z-index: 1000;
-  cursor: default;
-  bottom: 2px;
-}
-
-.navTab {
-  width:175px;
-}
-
 .wrap {
-  min-width: 350px;
-  overflow: hidden;
+  min-width: $tabWidth;
+}
+
+#inside-wrap {
+  padding: 9px 0px 30px 8px;
+}
+
+.tooltip.bottom-left {
+  padding: 5px 0;
+  margin-top: 3px;
+}
+
+.tooltip.bottom-left .tooltip-arrow {
+  top: 0;
+  left: 13px;
+  border-width: 0 5px 5px;
+  border-bottom-color: #000;
+}
+
+#main-pane > .center-view {
+  right: 41px !important;
+}
+
+.center-view ul.nav-tabs {
+  min-width: $tabWidth;
+  background-color: #dedede;
 }
 
 ul.nav-tabs > li > a{
   height: 35px;
-}
-
-.center-view ul.nav-tabs {
-  min-width: 350px;
 }
 
 #outer-wrap {
@@ -86,6 +123,7 @@ ul.nav-tabs > li > a{
   overflow: hidden;
   width: 100%;
   height: 100vh;
+  padding-bottom:14px;
 }
 
 #inner-wrap {

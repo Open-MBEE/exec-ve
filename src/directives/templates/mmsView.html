@@ -1,14 +1,18 @@
 <div>
-    <div><div class="btn-toolbar" role="toolbar"> 
-        <div class="btn-group btn-group-sm"> 
-            <button type="button" class="btn btn-default" ng-click="toggleReview()">
-                <span class="fa fa-comment"></span> {{review}}
-            </button>
-            <button type="button" class="btn btn-default" ng-click="toggleTextEdit()"> 
-                <span class="fa fa-edit"></span> {{textEdit}}
-            </button>     
-        </div>
-    </div></div> 
+    <div class="col-xs-12 center-pane-btn-toolbar">
+        <a type="button" class="view-tools center" ng-click="nextSection()">
+            <span class="fa fa-chevron-right"></span>
+        </a>
+        <a type="button" class="view-tools center" ng-click="prevSection()">
+            <span class="fa fa-chevron-left"></span>
+        </a>
+        <a type="button" class="view-tools center" ng-click="toggleTextEdit()">
+            <span class="fa fa-edit"></span>
+        </a>
+        <a type="button" class="view-tools center" ng-click="toggleReview()">
+            <span class="fa fa-comment"></span>
+        </a>
+    </div>
     <h4><mms-transclude-name data-mms-eid="{{view.sysmlid}}"></mms-transclude-name></h4> 
     <div ng-show="textEditable">Last Modified: {{lastModified | date:'M/d/yy h:mm a'}} by {{author}}</div><br/>
     <div ng-repeat="contain in view.specialization.contains" ng-switch on="contain.type"> 
