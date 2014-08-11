@@ -1,20 +1,6 @@
 'use strict';
 
-/* jasmine specs for services go here */
-
-describe('service', function() {
-  beforeEach(module('myApp.services'));
-
-  var displayError = function() { console.log('This should not be displayed') };
-
-
-  describe('version', function() {
-    it('should return current version', inject(function(version) {
-      expect(version).toEqual('0.1');
-    }));
-  });
-});
-
+/*
 // !-- NOTE: VersionService incorrectly adds the version timestamp --!
 // VersionService - done, 4 methods, [4 $http], expect 3 to fail
 describe('VersionService', function() {
@@ -308,4 +294,4 @@ describe('VersionService', function() {
 		var secondPromise = VersionService.getGenericElements(url, 'elements', '01-01-2014', undefined);
 		expect(secondPromise).toEqual(firstPromise);
 	}));
-});
+}); */

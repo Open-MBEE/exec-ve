@@ -1,20 +1,5 @@
 'use strict';
 
-/* jasmine specs for services go here */
-
-describe('service', function() {
-  beforeEach(module('myApp.services'));
-
-  var displayError = function() { console.log('This should not be displayed') };
-
-
-  describe('version', function() {
-    it('should return current version', inject(function(version) {
-      expect(version).toEqual('0.1');
-    }));
-  });
-});
-
 // !-- NOTE: if more than one artifact is received then it will only accept 
 // the first one --!
 // !-- NOTE: timestamp-ing is done incorrectly --!

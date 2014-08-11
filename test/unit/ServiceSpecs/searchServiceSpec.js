@@ -1,20 +1,5 @@
 'use strict';
 
-/* jasmine specs for services go here */
-
-describe('service', function() {
-  beforeEach(module('myApp.services'));
-
-  var displayError = function() { console.log('This should not be displayed') };
-
-
-  describe('version', function() {
-    it('should return current version', inject(function(version) {
-      expect(version).toEqual('0.1');
-    }));
-  });
-});
-
 // !-- NOTE: this function calls on depricated function 'getRoot' from the URLService --!
 // !-- NOTE: this function calls on depricated function 'mergeElements' from the ElementService --!
 // SearchService - done, expect to fail [1 done], expect 1 to fail

@@ -1,20 +1,5 @@
 'use strict';
 
-/* jasmine specs for services go here */
-
-describe('service', function() {
-  beforeEach(module('myApp.services'));
-
-  var displayError = function() { console.log('This should not be displayed') };
-
-
-  describe('version', function() {
-    it('should return current version', inject(function(version) {
-      expect(version).toEqual('0.1');
-    }));
-  });
-});
-
 // ElementService - done, 12 methods, [10 done, 1 empty, 1 untested], expect 4 to fail
 describe('ElementService', function() {
 	beforeEach(module('mms'));

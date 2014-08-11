@@ -1,20 +1,5 @@
 'use strict';
 
-/* jasmine specs for services go here */
-
-describe('service', function() {
-  beforeEach(module('myApp.services'));
-
-  var displayError = function() { console.log('This should not be displayed') };
-
-
-  describe('version', function() {
-    it('should return current version', inject(function(version) {
-      expect(version).toEqual('0.1');
-    }));
-  });
-});
-
 // !-- NOTE: ask Doris how to test the hasCircularReference function --!
 // UtilsService - incomplete, 2 methods, [1 normal, 1 other]
 describe('UtilsService', function() {
