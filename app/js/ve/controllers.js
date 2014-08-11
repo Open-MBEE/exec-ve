@@ -342,6 +342,7 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
     $scope.$on('elementSelected', function(event, eid) {
         $scope.eid = eid;
         $rootScope.veTbApi.select('elementViewer');
+        $rootScope.editorIsOpen = false;
         showPane('element');
         ElementService.getElement(eid, false, 'master', time).
         then(function(element) {
@@ -428,11 +429,14 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
         $rootScope.veTbApi.select('viewStructEditor');
     });
     $scope.$on('viewCancel', function() {
+        $scope.specApi.setEditing(false);
+        $rootScope.editorIsOpen = false;
         $scope.viewOrderApi.revertEdits();
-        $rootScope.veTbApi.select('viewStructEditor');
+        $rootScope.veTbApi.select('elementViewer');
+        showPane('element');
         //$scope.viewOrderApi.setEditing(false);
         //$rootScope.veTbApi.select('viewStructViewer');
         setEditingButtonsActive('element', false);
-        setEditingButtonsActive('view', true);
+        setEditingButtonsActive('view', false);
     });
 }]);
