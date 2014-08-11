@@ -1,5 +1,5 @@
 <div class="sortable-container" ui-sortable="sortableOptions" ng-model="edit.specialization.contains">
-    <div ng-repeat="contain in edit.specialization.contains" ng-switch on="contain.type"> 
+    <div class="sortable-element" ng-repeat="contain in edit.specialization.contains" ng-switch on="contain.type"> 
         <div ng-class="editing ? 'panel panel-default' : ''">
             <div ng-class="editing ? 'panel-body' : ''">
                 <div ng-switch-when="Paragraph">Paragraph</div>

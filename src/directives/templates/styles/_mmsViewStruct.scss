@@ -12,4 +12,8 @@ mms-view-struct {
   .sortable-container {
     margin-top: 24px;
   }
+
+  .sortable-element {
+    cursor: pointer;
+  }
 }
