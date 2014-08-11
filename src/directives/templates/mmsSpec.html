@@ -1,10 +1,17 @@
 <div ng-show="editing">
-    <div><b>Last Modified:</b> {{element.lastModified | date:'M/d/yy h:mm a'}} by {{element.author}}</div>
-    <div><b>Name:</b> <input class="form-control" type="text" ng-model="edit.name"></input></div>
-    <div><b>Documentation:</b></div>
-    <textarea ng-model="edit.documentation" mms-redactor mms-cf-elements="mmsCfElements" mms-eid="{{element.sysmlid}}"></textarea>
-    <div ng-if="edit.specialization.type === 'Property'">
-        <div><b>Property Value:</b></div>
+    <h1><input class="form-control" type="text" ng-model="edit.name"></input></h1>
+
+    <h2>TYPE</h2>
+    <h3>{{element.specialization.type || 'Element'}}</h3>
+    <h2>QUALIFIED NAME</h2>
+    <h3>{{element.qualifiedName}}</h3>
+    <h2>ID</h2>
+    <h3>{{element.sysmlid}}</h3>
+    <h2>LAST MODIFICATION</h2>
+    <h3>{{element.lastModified | date:'M/d/yy h:mm a'}} by {{element.author}}</h3>
+
+    <div ng-if="edit.element.specialization.type === 'Property'">
+        <h2>PROPERTY VALUE</h2>
         <div ng-if="editValues.length == 0">
             <select ng-model="addValueType" ng-options="key for (key, value) in addValueTypes"></select>
             <button class="btn btn-sm" ng-click="addValue(addValueType)">Add</button>
@@ -20,9 +27,10 @@
             </div>
         </div>
     </div>
-    <div><b>Type:</b> {{element.specialization.type || 'Element'}}</div>
-    <div><b>Id:</b> {{element.sysmlid}}</div>
-    <div><b>Qualified Name:</b> {{element.qualifiedName}}</div>
+
+    <h2 class="spec-view-doc-heading">DOCUMENTATION</h2>
+    <textarea ng-model="edit.documentation" mms-redactor mms-cf-elements="mmsCfElements" mms-eid="{{element.sysmlid}}"></textarea>
+
 </div>
 
 <div ng-hide="$root.editorIsOpen">

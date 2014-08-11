@@ -353,12 +353,14 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
     });
     $scope.$on('elementViewerSelected', function() {
         $scope.specApi.setEditing(false);
+        $rootScope.editorIsOpen = false;
         setEditingButtonsActive('element', false);
         setEditingButtonsActive('view', false);
         showPane('element');
     });
     $scope.$on('elementEditorSelected', function() {
         $scope.specApi.setEditing(true);
+        $rootScope.editorIsOpen = true;
         setEditingButtonsActive('element', true);
         setEditingButtonsActive('view', false);
         showPane('element');
@@ -403,6 +405,7 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
     });
     $scope.$on('elementCancel', function() {
         $scope.specApi.setEditing(false);
+        $rootScope.editorIsOpen = false;
         $scope.specApi.revertEdits();
         $rootScope.veTbApi.select('elementViewer');
         setEditingButtonsActive('element', false);

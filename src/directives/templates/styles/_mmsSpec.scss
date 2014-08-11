@@ -1,9 +1,10 @@
 mms-spec {
-	h1 {
+	h1, h1 > .form-control {
 		font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, sans-serif; 
 		font-weight: 200;
 		font-size: 35px;
 		margin-bottom: 32px;
+		height: inherit;
 	}
 
 	h2 {
