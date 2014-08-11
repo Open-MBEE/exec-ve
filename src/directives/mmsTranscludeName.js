@@ -24,6 +24,7 @@ angular.module('mms.directives')
 function mmsTranscludeName(ElementService, $compile, growl) {
 
     var mmsTranscludeNameLink = function(scope, element, attrs, mmsViewCtrl) {
+
         element.click(function(e) {
             if (!mmsViewCtrl)
                 return false;
