@@ -30,7 +30,7 @@ function CacheService(_, $log) {
         var realkey = key;
         if (angular.isArray(key))
             realkey = makeKey(key);
-        $log.log(realkey);
+        //$log.log(realkey);
         if (cache.hasOwnProperty(realkey))
             return cache[realkey];
         return null;
@@ -88,8 +88,6 @@ function CacheService(_, $log) {
     var makeKey = function(keys) {
         return keys.join('|');
     };
-
-    
 
     return {
         get: get,
