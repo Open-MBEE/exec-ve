@@ -28,7 +28,7 @@ angular.module('mms.directives')
  *      elements to transclude from alfresco
  */
 function mmsRedactor(ElementService, ViewService, $modal, $templateCache, $window, growl) { //depends on angular bootstrap
-    
+
     var mmsRedactorLink = function(scope, element, attrs, ngModelCtrl) {
         var transcludeModalTemplate = $templateCache.get('mms/templates/mmsCfModal.html');
         var commentModalTemplate = $templateCache.get('mms/templates/mmsCommentModal.html');
@@ -72,7 +72,15 @@ function mmsRedactor(ElementService, ViewService, $modal, $templateCache, $windo
                 }
             };
             $scope.ok = function() {
-                $modalInstance.close($scope.comment);
+                if (ViewService.getCurrentViewId())
+                    $scope.comment.owner = ViewService.getCurrentViewId();
+                ElementService.createElement($scope.comment)
+                .then(function(data) {
+                    var tag = '<mms-transclude-com data-mms-eid="' + data.sysmlid + '">comment:' + data.author + '</mms-transclude-com> ';
+                    $modalInstance.close(tag);
+                }, function(reason) {
+                    growl.error("Comment Error: " + reason.message);
+                });
             };
             $scope.cancel = function() {
                 $modalInstance.dismiss();
@@ -91,7 +99,7 @@ function mmsRedactor(ElementService, ViewService, $modal, $templateCache, $windo
                 element.redactor('selectionRestore');
                 //element.redactor(saveUndoStep();
                 element.redactor('bufferSet');
-                element.redactor('insertHtml', tag);
+                element.redactor('insertHtmlAdvanced', tag);
                 //element.redactor(saveUndoStep();
                 //element.redactor(sync();
             });
@@ -104,29 +112,35 @@ function mmsRedactor(ElementService, ViewService, $modal, $templateCache, $windo
                 scope: scope,
                 controller: ['$scope', '$modalInstance', commentCtrl],
             });
-            instance.result.then(function(comment) {
-                if (ViewService.getCurrentViewId())
-                    comment.owner = ViewService.getCurrentViewId();
-                ElementService.createElement(comment)
-                .then(function(data) {
-                    var tag = '<mms-transclude-com data-mms-eid="' + data.sysmlid + '">comment:' + data.author + '</mms-transclude-com> ';
-                    element.redactor('selectionRestore');
-                    //element.redactor(saveUndoStep();
-                    element.redactor('bufferSet');
-                    element.redactor('insertHtml', tag);
-                    //element.redactor(saveUndoStep();
-                    //element.redactor(sync();
-                }, function(reason) {
-                    growl.error("Comment Error: " + reason.message);
-                });
+            instance.result.then(function(tag) {
+                element.redactor('selectionRestore');
+                //element.redactor(saveUndoStep();
+                element.redactor('bufferSet');
+                element.redactor('insertHtmlAdvanced', tag);
+                //element.redactor(saveUndoStep();
+                //element.redactor(sync();
             });
         };
 
         function read(html) {
-            //var html = element.editable("getHTML"); 
-            //if (angular.isArray(html))
-            //    html = html.join('');
-            ngModelCtrl.$setViewValue(html);
+            var cleanhtml = html.replace(new RegExp('<mms-transclude-[^>]+></mms-transclude-[^>]+>', 'g'), '');
+            cleanhtml = cleanhtml.replace('<br>', '');
+            //var cleanhtml = html.replace(/<mms-transclude[^>]+><\/mms-transclude[^>]+>/gi, '');
+            ngModelCtrl.$setViewValue(cleanhtml);
+
+            element.redactor('selectionSave');
+            var editor = element.redactor('getEditor');
+            var editorHtml = editor.html();
+            var cleanEditorHtml = editorHtml.replace(new RegExp('<mms-transclude-[^>]+></mms-transclude-[^>]+>', 'g'), '');
+            cleanEditorHtml = cleanEditorHtml.replace('<br>', '');
+            if (editorHtml !== cleanEditorHtml) {
+                editor.html(cleanEditorHtml);
+            }
+            //element.redactor('sync');
+            element.redactor('selectionRestore');
+            //element.redactor('set', cleanhtml);
+            //ngModelCtrl.$render();
+            //scope.$apply();
         }
 
         element.html(ngModelCtrl.$viewValue);
@@ -136,7 +150,7 @@ function mmsRedactor(ElementService, ViewService, $modal, $templateCache, $windo
                         'fontcolor', 'unorderedlist', 'orderedlist', 'outdent', 'indent', 
                         'image', 'video', 'file', 'table', 'link', 'alignment', 
                         'horizontalrule'],
-            plugins: ['fontcolor'],
+            plugins: ['fontcolor', 'fontsize'],
             changeCallback: read,
             maxHeight: $window.innerHeight*0.65,
             imageUploadURL: '', //prevent default upload to public url
@@ -149,6 +163,26 @@ function mmsRedactor(ElementService, ViewService, $modal, $templateCache, $windo
         element.redactor('buttonAwesome', 'transclude', 'fa-asterisk');
         element.redactor('buttonAdd', 'comment', 'Comment', commentCallback);
         element.redactor('buttonAwesome', 'comment', 'fa-comment');
+        element.redactor('buttonAdd', 'cfixr', 'Set Cursor Outside Right', function() {
+            var current = element.redactor('getCurrent');
+            var cfElem = current.parentElement;
+            if (!cfElem || cfElem.localName.substr(0, 3) !== 'mms')
+                return;
+            var space = angular.element('<span>&nbsp;</span>');
+            space.insertAfter(cfElem);
+            element.redactor('setCaretAfter', space);//current.parentElement);
+        });
+        element.redactor('buttonAwesome', 'cfixr', 'fa-external-link');
+        element.redactor('buttonAdd', 'cfixl', 'Set Cursor Outside Left', function() {
+            var current = element.redactor('getCurrent');
+            var cfElem = current.parentElement;
+            if (!cfElem || cfElem.localName.substr(0, 3) !== 'mms')
+                return;
+            var space = angular.element('<span>&nbsp;</span>');
+            space.insertBefore(cfElem);
+            element.redactor('setCaretBefore', space);//current.parentElement);
+        });
+        element.redactor('buttonAwesome', 'cfixl', 'fa-external-link fa-flip-horizontal');
         element.redactor('buttonAdd', 'undo', 'Undo', function() {
             //element.redactor('execCommand', 'undo');
             element.redactor('bufferUndo');
