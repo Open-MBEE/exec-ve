@@ -5663,6 +5663,33 @@
 			selection.addRange(cursorRange)
 			$(emptyElement).remove();
 		},
+		setCaretBefore: function(node)
+		{
+			this.$editor.focus();
+
+			node = node[0] || node;
+
+			var range = this.document.createRange()
+
+			var start = 1;
+			var end = -1;
+
+			range.setStart(node, start)
+			range.setEnd(node, end + 2)
+
+
+			var selection = this.window.getSelection()
+			var cursorRange = this.document.createRange()
+
+			var emptyElement = this.document.createTextNode('\u200B')
+			$(node).before(emptyElement)
+
+			cursorRange.setStartBefore(emptyElement)
+
+			selection.removeAllRanges()
+			selection.addRange(cursorRange)
+			$(emptyElement).remove();
+		},
 		getTextNodesIn: function (node)
 		{
 			var textNodes = [];

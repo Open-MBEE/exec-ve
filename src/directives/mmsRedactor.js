@@ -28,7 +28,7 @@ angular.module('mms.directives')
  *      elements to transclude from alfresco
  */
 function mmsRedactor(ElementService, ViewService, $modal, $templateCache, $window, growl) { //depends on angular bootstrap
-    
+
     var mmsRedactorLink = function(scope, element, attrs, ngModelCtrl) {
         var transcludeModalTemplate = $templateCache.get('mms/templates/mmsCfModal.html');
         var commentModalTemplate = $templateCache.get('mms/templates/mmsCommentModal.html');
@@ -163,11 +163,26 @@ function mmsRedactor(ElementService, ViewService, $modal, $templateCache, $windo
         element.redactor('buttonAwesome', 'transclude', 'fa-asterisk');
         element.redactor('buttonAdd', 'comment', 'Comment', commentCallback);
         element.redactor('buttonAwesome', 'comment', 'fa-comment');
-        element.redactor('buttonAdd', 'cfix', 'Set Cursor Outside', function() {
+        element.redactor('buttonAdd', 'cfixr', 'Set Cursor Outside Right', function() {
             var current = element.redactor('getCurrent');
-            element.redactor('setCaretAfter', current.parentElement);
+            var cfElem = current.parentElement;
+            if (!cfElem || cfElem.localName.substr(0, 3) !== 'mms')
+                return;
+            var space = angular.element('<span>&nbsp;</span>');
+            space.insertAfter(cfElem);
+            element.redactor('setCaretAfter', space);//current.parentElement);
         });
-        element.redactor('buttonAwesome', 'cfix', 'fa-external-link');
+        element.redactor('buttonAwesome', 'cfixr', 'fa-external-link');
+        element.redactor('buttonAdd', 'cfixl', 'Set Cursor Outside Left', function() {
+            var current = element.redactor('getCurrent');
+            var cfElem = current.parentElement;
+            if (!cfElem || cfElem.localName.substr(0, 3) !== 'mms')
+                return;
+            var space = angular.element('<span>&nbsp;</span>');
+            space.insertBefore(cfElem);
+            element.redactor('setCaretBefore', space);//current.parentElement);
+        });
+        element.redactor('buttonAwesome', 'cfixl', 'fa-external-link fa-flip-horizontal');
         element.redactor('buttonAdd', 'undo', 'Undo', function() {
             //element.redactor('execCommand', 'undo');
             element.redactor('bufferUndo');
