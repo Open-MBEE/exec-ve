@@ -72,7 +72,15 @@ function mmsRedactor(ElementService, ViewService, $modal, $templateCache, $windo
                 }
             };
             $scope.ok = function() {
-                $modalInstance.close($scope.comment);
+                if (ViewService.getCurrentViewId())
+                    $scope.comment.owner = ViewService.getCurrentViewId();
+                ElementService.createElement($scope.comment)
+                .then(function(data) {
+                    var tag = '<mms-transclude-com data-mms-eid="' + data.sysmlid + '">comment:' + data.author + '</mms-transclude-com> ';
+                    $modalInstance.close(tag);
+                }, function(reason) {
+                    growl.error("Comment Error: " + reason.message);
+                });
             };
             $scope.cancel = function() {
                 $modalInstance.dismiss();
@@ -91,7 +99,7 @@ function mmsRedactor(ElementService, ViewService, $modal, $templateCache, $windo
                 element.redactor('selectionRestore');
                 //element.redactor(saveUndoStep();
                 element.redactor('bufferSet');
-                element.redactor('insertHtml', tag);
+                element.redactor('insertHtmlAdvanced', tag);
                 //element.redactor(saveUndoStep();
                 //element.redactor(sync();
             });
@@ -104,21 +112,13 @@ function mmsRedactor(ElementService, ViewService, $modal, $templateCache, $windo
                 scope: scope,
                 controller: ['$scope', '$modalInstance', commentCtrl],
             });
-            instance.result.then(function(comment) {
-                if (ViewService.getCurrentViewId())
-                    comment.owner = ViewService.getCurrentViewId();
-                ElementService.createElement(comment)
-                .then(function(data) {
-                    var tag = '<mms-transclude-com data-mms-eid="' + data.sysmlid + '">comment:' + data.author + '</mms-transclude-com> ';
-                    element.redactor('selectionRestore');
-                    //element.redactor(saveUndoStep();
-                    element.redactor('bufferSet');
-                    element.redactor('insertHtml', tag);
-                    //element.redactor(saveUndoStep();
-                    //element.redactor(sync();
-                }, function(reason) {
-                    growl.error("Comment Error: " + reason.message);
-                });
+            instance.result.then(function(tag) {
+                element.redactor('selectionRestore');
+                //element.redactor(saveUndoStep();
+                element.redactor('bufferSet');
+                element.redactor('insertHtmlAdvanced', tag);
+                //element.redactor(saveUndoStep();
+                //element.redactor(sync();
             });
         };
 
