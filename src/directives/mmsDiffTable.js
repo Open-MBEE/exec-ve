@@ -1,9 +1,9 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsDiffTable', ['$templateCache', '$rootScope', 'DiffService', mmsDiffTable]);
+.directive('mmsDiffTable', ['$templateCache', '$rootScope', mmsDiffTable]);
 
-function mmsDiffTable($templateCache, $rootScope, DiffService) {
+function mmsDiffTable($templateCache, $rootScope) {
 
   var MMSDiffTableTemplate = $templateCache.get('mms/templates/mmsDiffTable.html');
   

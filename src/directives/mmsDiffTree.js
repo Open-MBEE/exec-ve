@@ -1,9 +1,10 @@
+
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsDiffTree', ['$templateCache', '$rootScope', 'DiffService', mmsDiffTree]);
+.directive('mmsDiffTree', ['$templateCache', '$rootScope', 'WorkspaceService', 'growl', mmsDiffTree]);
 
-function mmsDiffTree($templateCache, $rootScope, DiffService) {
+function mmsDiffTree($templateCache, $rootScope, WorkspaceService, growl) {
   var originalElements = [];
   var deltaElements = [];
   var deltaArrays = null;
@@ -13,91 +14,103 @@ function mmsDiffTree($templateCache, $rootScope, DiffService) {
   
   var MMSDiffTreeController = function($scope, $rootScope) {
     // Diff the two workspaces picked in the Workspace Picker
-    var response = DiffService.diff('ws1', 'ws2');
-    originalElements = response.workspace1.elements;
-    deltaArrays = response.workspace2;
     
-    $scope.epsilon = [];
-    setUpMMSTree($scope);
+    // var response = DiffService.diff('ws1', 'ws2');
+    $scope.treeData = [];
 
-    // Sets an element (tableElement) for the table to load
-    $scope.loadTableWithElement = function(sysmlid) {
-      if ($rootScope.workspaces !== null) {
-        $rootScope.tableElement = originalElements.filter(function(entry) {
-            return entry && entry.sysmlid.indexOf(sysmlid) !== -1;
-          })[0];
+    WorkspaceService.diff('ws1', 'ws2').then(
+     function(result) {
+        originalElements = result.workspace1.elements;
+        deltaArrays = result.workspace2;
+        
+        $scope.epsilon = [];
+        setUpMMSTree($scope);
 
-        if ($rootScope.tableElement === undefined) {
-          $rootScope.tableElement = deltaArrays.addedElements.filter(function(entry) {
-            return entry && entry.sysmlid.indexOf(sysmlid) !== -1;
-          })[0];
-        }
+        // Sets an element (tableElement) for the table to load
+        $scope.loadTableWithElement = function(sysmlid) {
+          if ($rootScope.workspaces !== null) {
+            $rootScope.tableElement = originalElements.filter(function(entry) {
+                return entry && entry.sysmlid.indexOf(sysmlid) !== -1;
+              })[0];
 
-        deltaArrays.conflicts.forEach(function(elem) {
-          if(elem.sysmlid === $rootScope.tableElement.sysmlid){
-             $rootScope.conflictElement = deltaArrays.conflicts;
-             $rootScope.conflict = true;
-          } else {
-            $rootScope.conflictElement = null;
-            $rootScope.conflict = false;
+            if ($rootScope.tableElement === undefined) {
+              $rootScope.tableElement = deltaArrays.addedElements.filter(function(entry) {
+                return entry && entry.sysmlid.indexOf(sysmlid) !== -1;
+              })[0];
+            }
+
+            deltaArrays.conflicts.forEach(function(elem) {
+              if(elem.sysmlid === $rootScope.tableElement.sysmlid){
+                 $rootScope.conflictElement = deltaArrays.conflicts;
+                 $rootScope.conflict = true;
+              } else {
+                $rootScope.conflictElement = null;
+                $rootScope.conflict = false;
+              }
+            });
+
+            deltaArrays.movedElements.forEach(function(elem) {
+              if(elem.sysmlid === $rootScope.tableElement.sysmlid) {
+                $rootScope.movedElement = elem;
+                $rootScope.elementMoved = true;
+              } else {
+                $rootScope.movedElement = null;
+                $rootScope.elementMoved = false;
+              }
+            });
+
+            deltaArrays.updatedElements.forEach(function(elem) {
+              if(elem.sysmlid === $rootScope.tableElement.sysmlid) {
+                $rootScope.updatedElement = elem;
+                $rootScope.elementUpdated = true;
+              } else {
+                $rootScope.updatedElement = null;
+                $rootScope.elementUpdated = false;
+              }
+            });
+
+            deltaArrays.addedElements.forEach(function(elem) {
+              if(elem.sysmlid === $rootScope.tableElement.sysmlid) {
+                $rootScope.addedElement = elem;
+                $rootScope.elementAdded = true;
+              } else {
+                $rootScope.addedElement = null;
+                $rootScope.elementAdded = false;
+              }
+            });
+
+            deltaArrays.deletedElements.forEach(function(elem) {
+              if(elem.sysmlid === $rootScope.tableElement.sysmlid) {
+                $rootScope.deletedElement = elem;
+                $rootScope.elementDeleted = true;
+              } else {
+                $rootScope.deletedElement = null;
+                $rootScope.elementDeleted = false;
+              }
+            });
           }
-        });
+        };
 
-        deltaArrays.movedElements.forEach(function(elem) {
-          if(elem.sysmlid === $rootScope.tableElement.sysmlid) {
-            $rootScope.movedElement = elem;
-            $rootScope.elementMoved = true;
-          } else {
-            $rootScope.movedElement = null;
-            $rootScope.elementMoved = false;
-          }
-        });
+        // Submits the user's changes to the server
+        $scope.submitChanges = function() {
+          console.log('Submitting epsilon to server...');
+          console.log('Epsilon:');
+          console.log($scope.epsilon);
+        };
 
-        deltaArrays.updatedElements.forEach(function(elem) {
-          if(elem.sysmlid === $rootScope.tableElement.sysmlid) {
-            $rootScope.updatedElement = elem;
-            $rootScope.elementUpdated = true;
-          } else {
-            $rootScope.updatedElement = null;
-            $rootScope.elementUpdated = false;
-          }
-        });
-
-        deltaArrays.addedElements.forEach(function(elem) {
-          if(elem.sysmlid === $rootScope.tableElement.sysmlid) {
-            $rootScope.addedElement = elem;
-            $rootScope.elementAdded = true;
-          } else {
-            $rootScope.addedElement = null;
-            $rootScope.elementAdded = false;
-          }
-        });
-
-        deltaArrays.deletedElements.forEach(function(elem) {
-          if(elem.sysmlid === $rootScope.tableElement.sysmlid) {
-            $rootScope.deletedElement = elem;
-            $rootScope.elementDeleted = true;
-          } else {
-            $rootScope.deletedElement = null;
-            $rootScope.elementDeleted = false;
-          }
-        });
+        // Returns the user to the workspace picker route
+        $scope.goBack = function() {
+          console.log('Cleaning up...');
+          $scope.epsilon = [];
+          console.log('Moving to previous route...');
+        };
+      },
+      function(reason) {
+        growl.error("Workspace diff failed: " + reason.message);
       }
-    };
+    );
 
-    // Submits the user's changes to the server
-    $scope.submitChanges = function() {
-      console.log('Submitting epsilon to server...');
-      console.log('Epsilon:');
-      console.log($scope.epsilon);
-    };
 
-    // Returns the user to the workspace picker route
-    $scope.goBack = function() {
-      console.log('Cleaning up...');
-      $scope.epsilon = [];
-      console.log('Moving to previous route...');
-    };
   };
   
   /*

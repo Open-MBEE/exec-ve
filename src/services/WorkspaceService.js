@@ -19,19 +19,19 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService) {
             id: 'master',
             name: 'base',
             parent: null,
-            "elements":[ 
+            elements:[ 
              { 
-                "documentation":"Lorem ipsum dolor set amit.",
-                "sysmlid":"_123_394241_12",
-                "name":"",
-                "owner":"Lunch",
-                "specialization":{ 
-                   "type":"Property",
-                   "isDerived":"false",
-                   "value":[ 
+                documentation:'Lorem ipsum dolor set amit.',
+                sysmlid:'_123_394241_12',
+                name:'',
+                owner:'Lunch',
+                specialization:{ 
+                   type:'Property',
+                   isDerived:'false',
+                   value:[ 
                       { 
-                         "type":"LiteralString",
-                         "string":"binada_string"
+                         type:'LiteralString',
+                         string:'binada_string'
                       }
                    ]
                 }
@@ -126,42 +126,42 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService) {
           id: 'test',
           name: 'test',
           parent: 'master',
-          "updatedElements":[ 
+          updatedElements:[ 
              { 
-                "sysmlid":"_123_394241_12",
-                "name":"Skewer"
+                sysmlid:'_123_394241_12',
+                name:'Skewer'
              }
           ],
-          "addedElements":[ 
+          addedElements:[ 
              { 
-                "documentation":"Salad ipsum dolor set amit.",
-                "sysmlid":"_192_19342_22",
-                "name":"Salad",
-                "owner":"Lunch",
-                "specialization":{ 
-                   "type":"Property",
-                   "isDerived":"false",
-                   "value":[ 
+                documentation:'Salad ipsum dolor set amit.',
+                sysmlid:'_192_19342_22',
+                name:'Salad',
+                owner:'Lunch',
+                specialization:{ 
+                   type:'Property',
+                   isDerived:'false',
+                   value:[ 
                       { 
-                         "type":"LiteralString",
-                         "string":"binada_string"
+                         type:'LiteralString',
+                         string:'binada_string'
                       }
                    ]
                 }
              }
           ],
-          "deletedElements":[ 
+          deletedElements:[ 
              { 
-                "sysmlid":"_456_93419_14"
+                sysmlid:'_456_93419_14'
              }
           ],
-          "movedElements":[ 
+          movedElements:[ 
              { 
-                "sysmlid":"_789_18919_19",
-                "owner":"Dinner"
+                sysmlid:'_789_18919_19',
+                owner:'Dinner'
              }
           ],
-          "conflicts":[ 
+          conflicts:[ 
 
           ]
        }
