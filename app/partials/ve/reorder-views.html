@@ -9,15 +9,11 @@
     </ol>
 </script>
 
-<tabset>
-    <tab heading="Reorder">
-        <div class="container-fluid">
-            <div ui-tree>
-                <ol ui-tree-nodes="" ng-model="tree">
-                    <li ng-repeat="node in tree" ui-tree-node ng-include="'nodes_renderer.html'"></li>
-                </ol>
-            </div>
-            <button class="btn btn-primary" ng-click="save()">Save</button>
-        </div>
-    </tab>
-</tabset>
+<div class="container-tree-reorder container-fluid">
+    <div class="tree-reorder" ui-tree>
+        <ol ui-tree-nodes="" ng-model="tree">
+            <li ng-repeat="node in tree" ui-tree-node ng-include="'nodes_renderer.html'"></li>
+        </ol>
+    </div>
+    <button class="btn-tree-reorder-save btn btn-primary" ng-click="save()">SAVE</button>
+</div>

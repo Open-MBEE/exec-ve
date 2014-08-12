@@ -26,7 +26,7 @@ img {
   max-width: 100%;
 }
 
-.sidebar-right, ul.nav-tabs {
+.sidebar-right, ul.nav-tabs, .center-view {
   .btn {
     border: 0;
     border-radius: 3px;
@@ -37,10 +37,35 @@ img {
 
   .btn-primary {
     background-color: #4885BD;
+
+    &:hover {
+      background-color: #28455D;
+    }
   }
 
   .btn:focus, .btn:active:focus, .btn.active:focus {
     outline: none;
+  }
+}
+
+.container-tree-reorder {
+  margin-bottom: 24px;
+
+  .tree-reorder {
+    width: 40%;
+    margin: 0 auto;
+    margin-top: 24px;
+
+    .angular-ui-tree-handle, .angular-ui-tree-placeholder {
+      font-weight: 400;
+    }
+  }
+
+  .btn-tree-reorder-save {
+    float: right;
+    margin-top: 24px;
+    padding-left: 24px;
+    padding-right: 24px;
   }
 }
 
