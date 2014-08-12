@@ -26,20 +26,22 @@ img {
   max-width: 100%;
 }
 
-.btn {
-  border: 0;
-  border-radius: 3px;
-  padding: 11px 11px;
-  font-size: 11px;
-  font-weight: 500;
-}
+.sidebar-right, ul.nav-tabs {
+  .btn {
+    border: 0;
+    border-radius: 3px;
+    padding: 11px 11px;
+    font-size: 11px;
+    font-weight: 500;
+  }
 
-.btn-primary {
-  background-color: #4885BD;
-}
+  .btn-primary {
+    background-color: #4885BD;
+  }
 
-.btn:focus, .btn:active:focus, .btn.active:focus {
-  outline: none;
+  .btn:focus, .btn:active:focus, .btn.active:focus {
+    outline: none;
+  }
 }
 
 .snapshot-btn-group {
@@ -56,7 +58,6 @@ img {
 
 .form-control:focus {
   border-color: #4885BD;
-  box-shadow: none;
 }
 
 .west-tabs .table tbody tr:first-child td:first-child {
