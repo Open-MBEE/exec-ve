@@ -36,3 +36,27 @@ $mainViewShadowColor: rgba(0,0,0,.26);
     bottom: 10px;
   }
 }
+
+.clean {
+  background-color: white !important;
+}
+
+.addition {
+  background-color: green;
+}
+
+.removal {
+  background-color: red;
+}
+
+.conflict {
+  background-color: yellow;
+}
+
+.update {
+  background-color: blue;
+}
+
+.undo {
+  background-color: white;
+}

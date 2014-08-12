@@ -13,11 +13,10 @@ function mmsDiffTree($templateCache, $rootScope, WorkspaceService, growl) {
   var MMSDiffTreeTemplate = $templateCache.get('mms/templates/mmsDiffTree.html');
   
   var MMSDiffTreeController = function($scope, $rootScope) {
-    // Diff the two workspaces picked in the Workspace Picker
-    
-    // var response = DiffService.diff('ws1', 'ws2');
+
     $scope.treeData = [];
 
+    // Diff the two workspaces picked in the Workspace Picker
     WorkspaceService.diff('ws1', 'ws2').then(
      function(result) {
         originalElements = result.workspace1.elements;

@@ -1,5 +1,5 @@
 <div fa-pane pane-anchor="west" pane-size="25%">
-	<mms-diff-tree></mms-diff-tree>
+	<mms-tree tree-data="treeData" tree-control="treeapi" section-numbering="false" options="options" on-select="loadTableWithElement(branch.data.sysmlid)"></mms-tree>
 
   <div class="tree-view-btn-group btn-group">
     <button ng-click="submitChanges()" type="button" class="btn btn-success">Submit</button>

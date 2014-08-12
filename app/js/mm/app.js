@@ -32,9 +32,7 @@ angular.module('mm', ['ui.router', 'mms', 'mms.directives', 'ui.bootstrap', 'ui.
         views: {
             'main@': {
                 templateUrl: 'partials/mm/diff.html',
-                controller: function ($scope, diff) {
-
-                }
+                controller: 'DiffTreeController'
             }
         }
     });
