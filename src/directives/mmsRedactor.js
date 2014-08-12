@@ -34,6 +34,7 @@ function mmsRedactor(ElementService, ViewService, $modal, $templateCache, $windo
         var commentModalTemplate = $templateCache.get('mms/templates/mmsCommentModal.html');
 
         var transcludeCtrl = function($scope, $modalInstance) {
+            var originalElements = $scope.mmsCfElements;
             $scope.filter = '';
             $scope.searchText = '';
             $scope.choose = function(elementId, property, name) {
@@ -60,6 +61,9 @@ function mmsRedactor(ElementService, ViewService, $modal, $templateCache, $windo
                 }, function(reason) {
                     growl.error("Propose Error: " + reason.message);
                 });
+            };
+            $scope.showOriginalElements = function() {
+                $scope.mmsCfElements = originalElements;
             };
         };
 
