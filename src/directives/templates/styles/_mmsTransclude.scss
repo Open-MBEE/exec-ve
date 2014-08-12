@@ -55,10 +55,12 @@ mms-spec mms-transclude-name,
 mms-spec mms-transclude-val,
 mms-spec mms-transclude-doc {
   background-color: lightblue;
+  cursor: not-allowed;
 }
 
 mms-spec mms-transclude-com {
   background-color: yellow;
+  cursor: not-allowed;
 }
 
 .transclude-table {
@@ -74,4 +76,15 @@ mms-spec mms-transclude-com {
 
 .error {
   color: red;
+}
+
+.redactor_editor.redactor_editor_wym mms-transclude-name,
+.redactor_editor.redactor_editor_wym mms-transclude-doc,
+.redactor_editor.redactor_editor_wym mms-transclude-val,
+.redactor_editor.redactor_editor_wym mms-transclude-com {
+  margin-top: 0;
+  margin-bottom: 3px !important;
+  padding: 3px !important;
+  border: 1px solid #000000 !important;
+  z-index: 0;
 }

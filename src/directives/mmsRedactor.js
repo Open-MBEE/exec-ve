@@ -123,10 +123,24 @@ function mmsRedactor(ElementService, ViewService, $modal, $templateCache, $windo
         };
 
         function read(html) {
-            //var html = element.editable("getHTML"); 
-            //if (angular.isArray(html))
-            //    html = html.join('');
-            ngModelCtrl.$setViewValue(html);
+            var cleanhtml = html.replace(new RegExp('<mms-transclude-[^>]+></mms-transclude-[^>]+>', 'g'), '');
+            cleanhtml = cleanhtml.replace('<br>', '');
+            //var cleanhtml = html.replace(/<mms-transclude[^>]+><\/mms-transclude[^>]+>/gi, '');
+            ngModelCtrl.$setViewValue(cleanhtml);
+
+            element.redactor('selectionSave');
+            var editor = element.redactor('getEditor');
+            var editorHtml = editor.html();
+            var cleanEditorHtml = editorHtml.replace(new RegExp('<mms-transclude-[^>]+></mms-transclude-[^>]+>', 'g'), '');
+            cleanEditorHtml = cleanEditorHtml.replace('<br>', '');
+            if (editorHtml !== cleanEditorHtml) {
+                editor.html(cleanEditorHtml);
+            }
+            //element.redactor('sync');
+            element.redactor('selectionRestore');
+            //element.redactor('set', cleanhtml);
+            //ngModelCtrl.$render();
+            //scope.$apply();
         }
 
         element.html(ngModelCtrl.$viewValue);
@@ -136,7 +150,7 @@ function mmsRedactor(ElementService, ViewService, $modal, $templateCache, $windo
                         'fontcolor', 'unorderedlist', 'orderedlist', 'outdent', 'indent', 
                         'image', 'video', 'file', 'table', 'link', 'alignment', 
                         'horizontalrule'],
-            plugins: ['fontcolor'],
+            plugins: ['fontcolor', 'fontsize'],
             changeCallback: read,
             maxHeight: $window.innerHeight*0.65,
             imageUploadURL: '', //prevent default upload to public url
