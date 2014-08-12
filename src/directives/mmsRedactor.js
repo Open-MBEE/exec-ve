@@ -163,6 +163,11 @@ function mmsRedactor(ElementService, ViewService, $modal, $templateCache, $windo
         element.redactor('buttonAwesome', 'transclude', 'fa-asterisk');
         element.redactor('buttonAdd', 'comment', 'Comment', commentCallback);
         element.redactor('buttonAwesome', 'comment', 'fa-comment');
+        element.redactor('buttonAdd', 'cfix', 'Set Cursor Outside', function() {
+            var current = element.redactor('getCurrent');
+            element.redactor('setCaretAfter', current.parentElement);
+        });
+        element.redactor('buttonAwesome', 'cfix', 'fa-external-link');
         element.redactor('buttonAdd', 'undo', 'Undo', function() {
             //element.redactor('execCommand', 'undo');
             element.redactor('bufferUndo');
