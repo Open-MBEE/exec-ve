@@ -9,7 +9,12 @@
 
     <div class="container-fluid" ng-show="show.snapshots">
 
-        <table class="snapshot-table table table-hover table-condensed">
+        <div class="snapshot-btn-group">
+            <button class="create-new-snapshot-btn btn btn-primary" ng-show="editable" ng-click="createNewSnapshot()">CREATE NEW SNAPSHOT</button>
+            <button class="btn btn-primary" ng-click="refreshSnapshots()">REFRESH LIST</button>
+        </div>
+
+        <table class="snapshot-table table table-condensed">
             <tr>
                 <td>
                     <a ui-sref="doc({site: site.name, docId: document.sysmlid, time: 'latest'})" ui-sref-opts="{reload: true}">Latest</a>
@@ -27,11 +32,6 @@
                 </td>
             </tr>
         </table>
-
-        <div class="snapshot-btn-group">
-            <button class="create-new-snapshot-btn btn btn-primary" ng-show="editable" ng-click="createNewSnapshot()">CREATE NEW SNAPSHOT</button>
-            <button class="btn btn-primary" ng-click="refreshSnapshots()">REFRESH LIST</button>
-        </div>
 
     </div>
 </div>

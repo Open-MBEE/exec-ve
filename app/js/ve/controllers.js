@@ -264,11 +264,11 @@ function($scope, $rootScope) {
     $rootScope.veTbApi = $scope.tbApi;
 
     $scope.buttons = [
-        {id: 'elementViewer', icon: 'fa fa-eye', selected: true, active: true, tooltip: 'Element', 
+        {id: 'elementViewer', icon: 'fa fa-eye', selected: true, active: true, tooltip: 'Preview Element', 
             onClick: function() {$rootScope.$broadcast('elementViewerSelected');}},
         {id: 'elementEditor', icon: 'fa fa-edit', selected: false, active: true, tooltip: 'Edit Element',
             onClick: function() {$rootScope.$broadcast('elementEditorSelected');}},
-        {id: 'viewStructEditor', icon: 'fa fa-arrows-v', selected: false, active: true, tooltip: 'Edit View',
+        {id: 'viewStructEditor', icon: 'fa fa-arrows-v', selected: false, active: true, tooltip: 'Reorder View',
             onClick: function() {$rootScope.$broadcast('viewStructEditorSelected');}},
         {id: 'documentSnapshots', icon: 'fa fa-camera', selected: false, active: true, tooltip: 'Snapshots',
             onClick: function() {$rootScope.$broadcast('snapshotsSelected');}},

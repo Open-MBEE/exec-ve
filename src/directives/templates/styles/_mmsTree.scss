@@ -82,6 +82,7 @@ ul.abn-tree {
 
 .shaft-hidden {
   background: transparent;
+  transition: background-color .2s linear;
 
   &:hover {
     background: $softer_grey;
