@@ -10,7 +10,7 @@
             <div class="form-search input-group">
                 <input class="form-control" type="text" ng-model="searchText" placeholder="Search for an element" />
                 <span class="input-group-btn">                
-                    <button class="btn btn-default" type="button" ng-click="search(searchText)">GO</button>
+                    <button class="btn btn-default" type="button" ng-click="search(searchText)">GO <i class="{{searchClass}}"></i></button>
                 </span>
             </div>
         </form>
@@ -19,7 +19,7 @@
             <div class="form-propose input-group">
                 <input class="form-control" type="text" ng-model="new" placeholder="Propose a new element" />
                 <span class="input-group-btn">
-                    <button class="btn btn-default" type="button" ng-click="makeNew(new)">SUBMIT</button>
+                    <button class="btn btn-default" type="button" ng-click="makeNew(new)">SUBMIT <i class="{{proposeClass}}"></i></button>
                 </span>
             </div>
         </form>
