@@ -10,7 +10,7 @@
     <h2>LAST MODIFICATION</h2>
     <h3>{{element.lastModified | date:'M/d/yy h:mm a'}} by {{element.author}}</h3>
 
-    <div ng-if="edit.element.specialization.type === 'Property'">
+    <div ng-if="edit.specialization.type === 'Property'">
         <h2>PROPERTY VALUE</h2>
         <div ng-if="editValues.length == 0">
             <select ng-model="addValueType" ng-options="key for (key, value) in addValueTypes"></select>
