@@ -122,7 +122,7 @@ function mmsTree($timeout, $log, $templateCache) {
                     else
                         expand_icon = attrs.iconExpand;
                 } else
-                    expand_icon = "fa fa-fw";
+                    expand_icon = "fa fa-lg fa-fw";
                 if (scope.options && scope.options.types && scope.options.types[branch.type])
                     type_icon = scope.options.types[branch.type];
                 else
