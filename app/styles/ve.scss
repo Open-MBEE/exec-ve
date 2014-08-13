@@ -98,11 +98,13 @@ a {
   .snapshot-table {
     margin-top: 24px;
 
-    tr {
-      &:hover {
-        transition: background-color .2s linear;
-        background-color: #f3f3f3;
-      }
+    tr:hover {
+      transition: background-color .2s linear;
+      background-color: #f3f3f3;
+    }
+
+    tbody:last-child {
+      border-bottom: 1px solid #dedede; 
     }
   }
 
