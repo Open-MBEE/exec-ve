@@ -167,14 +167,18 @@ function($scope, $rootScope, $state, document, time, ElementService, ViewService
             growl.error("Add View Error: Cannot add a child view to a section");
             return;
         }
-
+        $scope.buttons[3].icon = 'fa-spin fa-spinner';
         ViewService.createView(branch.data.sysmlid, 'Untitled View', $scope.document.sysmlid)
         .then(function(view) {
-            return treeApi.add_branch(branch, {
+            $scope.buttons[3].icon = 'fa-plus';
+            treeApi.add_branch(branch, {
                 label: view.name,
                 type: "view",
                 data: view
             });
+        }, function(reason) {
+            growl.error('Add View Error: ' + reason.message);
+            $scope.buttons[3].icon = 'fa-plus';
         });
     };
     $scope.tree_options = {
@@ -184,8 +188,8 @@ function($scope, $rootScope, $state, document, time, ElementService, ViewService
         }
     };
 }])
-.controller('ReorderCtrl', ['$scope', 'document', 'ElementService', 'ViewService', '$state', 'growl',
-function($scope, document, ElementService, ViewService, $state, growl) {
+.controller('ReorderCtrl', ['$scope', '$rootScope', 'document', 'ElementService', 'ViewService', '$state', 'growl',
+function($scope, $rootScope, document, ElementService, ViewService, $state, growl) {
     $scope.doc = document;
     var viewElementIds = [];
     var viewElementIds2TreeNodeMap = {};
@@ -214,9 +218,10 @@ function($scope, document, ElementService, ViewService, $state, growl) {
         }
         $scope.tree = [viewElementIds2TreeNodeMap[rootElementId]];
     });
-
+    $scope.saveClass = "";
     $scope.save = function() {
         var newView2View = [];
+        $scope.saveClass = "fa fa-spin fa-spinner";
         for (var i = 0; i < viewElementIds.length; i++) {
             var viewObject = {id: viewElementIds[i], childrenViews: []};
             for (var j = 0; j < viewElementIds2TreeNodeMap[viewElementIds[i]].children.length; j++) {
@@ -230,8 +235,16 @@ function($scope, document, ElementService, ViewService, $state, growl) {
             growl.success('Reorder Successful');
             $state.go('doc', {}, {reload:true});
         }, function(reason) {
+            $scope.saveClass = "";
             growl.error('Reorder Save Error: ' + reason.message);
         });
+    };
+    $scope.cancel = function() {
+        var curBranch = $rootScope.veTreeApi.get_selected_branch();
+        if (!curBranch)
+            $state.go('doc', {}, {reload:true});
+        else
+            $state.go('doc.view', {viewId: curBranch.data.sysmlid});
     };
 }])
 .controller('ViewCtrl', ['$scope', '$rootScope', '$stateParams', 'viewElements', 'ViewService', 'time', 'growl',
@@ -279,7 +292,11 @@ function($scope, $rootScope) {
         {id: 'viewSave', icon: 'fa fa-save', pullDown: true, dynamic: true, selected: false, active: false, tooltip: 'Save',
             onClick: function() {$rootScope.$broadcast('viewSave');}},
         {id: 'viewCancel', icon: 'fa fa-times', dynamic: true, selected: false, active: false, tooltip: 'Cancel',
-            onClick: function() {$rootScope.$broadcast('viewCancel');}}
+            onClick: function() {$rootScope.$broadcast('viewCancel');}},
+        {id: 'snapRefresh', icon: 'fa fa-refresh', pullDown: true, dynamic: true, selected: false, active: false, tooltip: 'Refresh',
+            onClick: function() {$rootScope.$broadcast('refreshSnapshots');}},
+        {id: 'snapNew', icon: 'fa fa-plus', dynamic: true, selected: false, active: false, tooltip: 'Create Snapshot',
+            onClick: function() {$rootScope.$broadcast('newSnapshot');}}
     ];
 
     $scope.onClick = function(button) {
@@ -309,6 +326,11 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
         $rootScope.veTbApi.setActive(type + 'Cancel', active);
     };
 
+    var setSnapshotButtonsActive = function(active) {
+        $rootScope.veTbApi.setActive('snapRefresh', active);
+        $rootScope.veTbApi.setActive('snapNew', $scope.editable && active);
+    };
+
     var showPane = function(pane) {
         angular.forEach($scope.show, function(value, key) {
             if (key === pane)
@@ -318,31 +340,40 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
         });
     };
 
-    $scope.createNewSnapshot = function() {
+    $scope.$on('newSnapshot', function() {
+        $rootScope.veTbApi.setButtonIcon('snapNew', 'fa fa-spinner fa-spin');
         ConfigService.createSnapshot($scope.document.sysmlid)
         .then(function(result) {
+            $rootScope.veTbApi.setButtonIcon('snapNew', 'fa fa-plus');
             growl.success("Create Successful: wait for email.");
         }, function(reason) {
             growl.error("Create Failed: " + reason.message);
+            $rootScope.veTbApi.setButtonIcon('snapNew', 'fa fa-plus');
         });
-    };
-    $scope.refreshSnapshots = function() {
+        $rootScope.veTbApi.select('documentSnapshots');
+    });
+    $scope.$on('refreshSnapshots', function() {
+        $rootScope.veTbApi.setButtonIcon('snapRefresh', 'fa fa-refresh fa-spin');
         ConfigService.getProductSnapshots($scope.document.sysmlid, $scope.site.name, 'master', true)
         .then(function(result) {
+            $scope.snapshots = result;
+            $rootScope.veTbApi.setButtonIcon('snapRefresh', 'fa fa-refresh');
         }, function(reason) {
             growl.error("Refresh Failed: " + reason.message);
+            $rootScope.veTbApi.setButtonIcon('snapRefresh', 'fa fa-refresh');
         });
-    };
+        $rootScope.veTbApi.select('documentSnapshots');
+    });
 
     $scope.$on('snapshotsSelected', function() {
         showPane('snapshots');
         setEditingButtonsActive('element', false);
         setEditingButtonsActive('view', false);
+        setSnapshotButtonsActive(true);
     });
     $scope.$on('elementSelected', function(event, eid) {
         $scope.eid = eid;
         $rootScope.veTbApi.select('elementViewer');
-        $rootScope.editorIsOpen = false;
         showPane('element');
         ElementService.getElement(eid, false, 'master', time).
         then(function(element) {
@@ -351,19 +382,20 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
         });
         setEditingButtonsActive('element', false);
         setEditingButtonsActive('view', false);
+        setSnapshotButtonsActive(false);
     });
     $scope.$on('elementViewerSelected', function() {
         $scope.specApi.setEditing(false);
-        $rootScope.editorIsOpen = false;
         setEditingButtonsActive('element', false);
         setEditingButtonsActive('view', false);
+        setSnapshotButtonsActive(false);
         showPane('element');
     });
     $scope.$on('elementEditorSelected', function() {
         $scope.specApi.setEditing(true);
-        $rootScope.editorIsOpen = true;
         setEditingButtonsActive('element', true);
         setEditingButtonsActive('view', false);
+        setSnapshotButtonsActive(false);
         showPane('element');
     });
     $scope.$on('viewSelected', function(event, vid, viewElements) {
@@ -380,12 +412,15 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
         });
         setEditingButtonsActive('element', false);
         setEditingButtonsActive('view', false);
+        setSnapshotButtonsActive(false);
+        $scope.specApi.setEditing(false);
     });
     $scope.$on('viewStructEditorSelected', function() {
         $scope.viewOrderApi.setEditing(true);
         showPane('reorder');
         setEditingButtonsActive('element', false);
         setEditingButtonsActive('view', true);
+        setSnapshotButtonsActive(false);
     });
     
     $scope.$on('elementSave', function() {
@@ -406,11 +441,11 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
     });
     $scope.$on('elementCancel', function() {
         $scope.specApi.setEditing(false);
-        $rootScope.editorIsOpen = false;
         $scope.specApi.revertEdits();
         $rootScope.veTbApi.select('elementViewer');
         setEditingButtonsActive('element', false);
         setEditingButtonsActive('view', false);
+        setSnapshotButtonsActive(false);
     });
     $scope.$on('viewSave', function() {
         $rootScope.veTbApi.setButtonIcon('viewSave', 'fa fa-spin fa-spinner');
@@ -430,7 +465,6 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
     });
     $scope.$on('viewCancel', function() {
         $scope.specApi.setEditing(false);
-        $rootScope.editorIsOpen = false;
         $scope.viewOrderApi.revertEdits();
         $rootScope.veTbApi.select('elementViewer');
         showPane('element');
@@ -438,5 +472,6 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
         //$rootScope.veTbApi.select('viewStructViewer');
         setEditingButtonsActive('element', false);
         setEditingButtonsActive('view', false);
+        setSnapshotButtonsActive(false);
     });
 }]);
