@@ -331,19 +331,27 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
         });
     };
 
+    $scope.snapshotClass = "";
+    $scope.refreshClass = "";
     $scope.createNewSnapshot = function() {
+        $scope.snapshotClass = "fa fa-spin fa-spinner";
         ConfigService.createSnapshot($scope.document.sysmlid)
         .then(function(result) {
+            $scope.snapshotClass = "";
             growl.success("Create Successful: wait for email.");
         }, function(reason) {
             growl.error("Create Failed: " + reason.message);
+            $scope.snapshotClass = "";
         });
     };
     $scope.refreshSnapshots = function() {
+        $scope.refreshClass = "fa fa-spin fa-refresh";
         ConfigService.getProductSnapshots($scope.document.sysmlid, $scope.site.name, 'master', true)
         .then(function(result) {
+            $scope.refreshClass = "";
         }, function(reason) {
             growl.error("Refresh Failed: " + reason.message);
+            $scope.refreshClass = "";
         });
     };
 
