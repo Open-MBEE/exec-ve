@@ -292,7 +292,11 @@ function($scope, $rootScope) {
         {id: 'viewSave', icon: 'fa fa-save', pullDown: true, dynamic: true, selected: false, active: false, tooltip: 'Save',
             onClick: function() {$rootScope.$broadcast('viewSave');}},
         {id: 'viewCancel', icon: 'fa fa-times', dynamic: true, selected: false, active: false, tooltip: 'Cancel',
-            onClick: function() {$rootScope.$broadcast('viewCancel');}}
+            onClick: function() {$rootScope.$broadcast('viewCancel');}},
+        {id: 'snapRefresh', icon: 'fa fa-refresh', pullDown: true, dynamic: true, selected: false, active: false, tooltip: 'Refresh',
+            onClick: function() {$rootScope.$broadcast('refreshSnapshots');}},
+        {id: 'snapNew', icon: 'fa fa-plus', dynamic: true, selected: false, active: false, tooltip: 'Create Snapshot',
+            onClick: function() {$rootScope.$broadcast('newSnapshot');}}
     ];
 
     $scope.onClick = function(button) {
@@ -322,6 +326,11 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
         $rootScope.veTbApi.setActive(type + 'Cancel', active);
     };
 
+    var setSnapshotButtonsActive = function(active) {
+        $rootScope.veTbApi.setActive('snapRefresh', active);
+        $rootScope.veTbApi.setActive('snapNew', $scope.editable && active);
+    };
+
     var showPane = function(pane) {
         angular.forEach($scope.show, function(value, key) {
             if (key === pane)
@@ -331,34 +340,36 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
         });
     };
 
-    $scope.snapshotClass = "";
-    $scope.refreshClass = "";
-    $scope.createNewSnapshot = function() {
-        $scope.snapshotClass = "fa fa-spin fa-spinner";
+    $scope.$on('newSnapshot', function() {
+        $rootScope.veTbApi.setButtonIcon('snapNew', 'fa fa-spinner fa-spin');
         ConfigService.createSnapshot($scope.document.sysmlid)
         .then(function(result) {
-            $scope.snapshotClass = "";
+            $rootScope.veTbApi.setButtonIcon('snapNew', 'fa fa-plus');
             growl.success("Create Successful: wait for email.");
         }, function(reason) {
             growl.error("Create Failed: " + reason.message);
-            $scope.snapshotClass = "";
+            $rootScope.veTbApi.setButtonIcon('snapNew', 'fa fa-plus');
         });
-    };
-    $scope.refreshSnapshots = function() {
-        $scope.refreshClass = "fa fa-spin fa-refresh";
+        $rootScope.veTbApi.select('documentSnapshots');
+    });
+    $scope.$on('refreshSnapshots', function() {
+        $rootScope.veTbApi.setButtonIcon('snapRefresh', 'fa fa-refresh fa-spin');
         ConfigService.getProductSnapshots($scope.document.sysmlid, $scope.site.name, 'master', true)
         .then(function(result) {
-            $scope.refreshClass = "";
+            $scope.snapshots = result;
+            $rootScope.veTbApi.setButtonIcon('snapRefresh', 'fa fa-refresh');
         }, function(reason) {
             growl.error("Refresh Failed: " + reason.message);
-            $scope.refreshClass = "";
+            $rootScope.veTbApi.setButtonIcon('snapRefresh', 'fa fa-refresh');
         });
-    };
+        $rootScope.veTbApi.select('documentSnapshots');
+    });
 
     $scope.$on('snapshotsSelected', function() {
         showPane('snapshots');
         setEditingButtonsActive('element', false);
         setEditingButtonsActive('view', false);
+        setSnapshotButtonsActive(true);
     });
     $scope.$on('elementSelected', function(event, eid) {
         $scope.eid = eid;
@@ -371,17 +382,20 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
         });
         setEditingButtonsActive('element', false);
         setEditingButtonsActive('view', false);
+        setSnapshotButtonsActive(false);
     });
     $scope.$on('elementViewerSelected', function() {
         $scope.specApi.setEditing(false);
         setEditingButtonsActive('element', false);
         setEditingButtonsActive('view', false);
+        setSnapshotButtonsActive(false);
         showPane('element');
     });
     $scope.$on('elementEditorSelected', function() {
         $scope.specApi.setEditing(true);
         setEditingButtonsActive('element', true);
         setEditingButtonsActive('view', false);
+        setSnapshotButtonsActive(false);
         showPane('element');
     });
     $scope.$on('viewSelected', function(event, vid, viewElements) {
@@ -398,6 +412,7 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
         });
         setEditingButtonsActive('element', false);
         setEditingButtonsActive('view', false);
+        setSnapshotButtonsActive(false);
         $scope.specApi.setEditing(false);
     });
     $scope.$on('viewStructEditorSelected', function() {
@@ -405,6 +420,7 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
         showPane('reorder');
         setEditingButtonsActive('element', false);
         setEditingButtonsActive('view', true);
+        setSnapshotButtonsActive(false);
     });
     
     $scope.$on('elementSave', function() {
@@ -429,6 +445,7 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
         $rootScope.veTbApi.select('elementViewer');
         setEditingButtonsActive('element', false);
         setEditingButtonsActive('view', false);
+        setSnapshotButtonsActive(false);
     });
     $scope.$on('viewSave', function() {
         $rootScope.veTbApi.setButtonIcon('viewSave', 'fa fa-spin fa-spinner');
@@ -455,5 +472,6 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
         //$rootScope.veTbApi.select('viewStructViewer');
         setEditingButtonsActive('element', false);
         setEditingButtonsActive('view', false);
+        setSnapshotButtonsActive(false);
     });
 }]);
