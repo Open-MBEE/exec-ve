@@ -28,6 +28,7 @@
 	&:active {
 		background-color: white;
 		box-shadow: none;
+		transition: all .2s linear;
 	}
 
 	&:hover {
