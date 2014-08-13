@@ -7,9 +7,9 @@ function mmsTree($timeout, $log, $templateCache) {
 
     var mmsTreeLink = function(scope, element, attrs) {
         if (!attrs.iconExpand)
-            attrs.iconExpand = 'fa fa-plus fa-fw';
+            attrs.iconExpand = 'fa fa-caret-right fa-lg fa-fw';
         if (!attrs.iconCollapse)
-            attrs.iconCollapse = 'fa fa-minus fa-fw';
+            attrs.iconCollapse = 'fa fa-caret-down fa-lg fa-fw';
         if (!attrs.iconDefault)
             attrs.iconDefault = 'fa fa-file fa-fw';
         if (!attrs.expandLevel)
