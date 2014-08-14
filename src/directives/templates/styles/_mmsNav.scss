@@ -1,3 +1,5 @@
+$max_accordion_panel_height: 300px;
+
 /************************* Utilities/buttons *************************/
 @viewport {
   width: device-width;
@@ -11,10 +13,6 @@
 a.dropdown-toggle {
   padding-top: 20px;
   padding-bottom: 10px;
-}
-
-a.dropdown-toggle:hover {
-  background-color: $dark_grey;
 }
 
 ul > li > a {
@@ -79,7 +77,6 @@ mms-nav {
   min-height: 40px;
   height: 40px;
   background-color: $monolith;
-  // @include box-shadow(0 1px 1px 0 $monolith);
   border: 0;
   margin-bottom: 0;
   color: $white;
@@ -200,7 +197,9 @@ mms-nav {
   }
 
   .panel-heading a {
-    padding: 12px;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    padding-right: 16px;
     display: block;
     line-height: 1.42857143;
     color: $white;
@@ -208,7 +207,9 @@ mms-nav {
   }
 
   .site-level > .panel-heading a {
-    padding: 12px;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    padding-right: 16px;
     display: block;
     line-height: 1.42857143;
     color: $white;
@@ -229,10 +230,6 @@ mms-nav {
     .active > a {
       background-color: $light_grey;
 
-      &:hover {
-        background-color: $light_grey;
-      }
-
       &:focus {
         background-color: $dark_grey;
       }
@@ -240,10 +237,6 @@ mms-nav {
 
     .open > a {
       background-color: $dark_grey;
-
-      &:hover {
-        background-color: $dark_grey;
-      }
 
       &:focus {
         background-color: $dark_grey;
@@ -308,6 +301,11 @@ accordion {
 
   > .panel-group {
     margin-bottom: 0;
+
+    accordion > .panel-group {
+      max-height: $max_accordion_panel_height;
+      overflow-y: auto;
+    }
   }
 
   .panel-group .panel + .panel {
@@ -326,7 +324,6 @@ accordion {
     & > a:hover {
       cursor: pointer;
       text-decoration: none;
-      background-color: $medium_grey;
     }
   }
 
@@ -339,7 +336,6 @@ accordion {
       & > a:hover {
         cursor: pointer;
         text-decoration: none; 
-        background-color: $light_grey;
       }
     }
   }
@@ -357,10 +353,11 @@ accordion {
     &:hover {
       cursor: pointer;
       background-color: $highlight_grey;
+      transition: background-color .2s linear;
     }
   }
 
-  div.accordion-links {
+  .accordion-links {
     text-align: center;
     height: 40px;
     background-color: $light_grey;
@@ -373,7 +370,7 @@ accordion {
 }
 
 .accordion-toggle {
-  width:270px;
+  width: 270px;
 }
 
 .accordion-toggle > .fa {
@@ -424,6 +421,7 @@ accordion {
     li.goto {
       .dropdown-menu a:hover {
         background: $medium_grey;
+        transition: background-color .2s linear;
       }
     }
 
@@ -477,8 +475,6 @@ accordion {
   }
 
   header {
-    // @include box-shadow(0 1px 1px 0 $monolith);
-
     .block {
       height: 46px;
       background-color: $monolith;
@@ -530,7 +526,6 @@ accordion {
         position: relative;
         top: 25%;
         font-weight: 200;
-        // padding: 0.85714em 2.14286em;
         padding: 0.4em 2.14286em;
       }
 
@@ -539,7 +534,6 @@ accordion {
       }
 
       &.nav-doc-li {
-        // padding: .85714em 2.14286em;
         padding: .4em 2.14286em;
         text-shadow: none;
         border-top: 0;

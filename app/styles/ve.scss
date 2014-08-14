@@ -1,0 +1,365 @@
+$tabWidth: 200px;
+$toolHeight: 20px;
+$toolWidth: 32px;
+
+@media screen and (max-width: 45em) {
+  #main-pane {
+    top: 46px;
+  }
+
+  #main-pane > div {
+    z-index: 1000;
+  }
+}
+
+@media screen and (min-width: 45.0625em) {
+  #main-pane {
+    top: 40px;
+  }
+}
+
+img {
+  max-width: 100%;
+}
+
+a {
+  color: #4885BD;
+
+  &.view-tools {
+    color: #333;
+    font-size: 16px;
+    line-height: $toolHeight;
+    border-left: 1px solid #dedede;
+    border-right: 1px solid #dedede;
+    margin-left: -2px;
+    position: relative;
+    float: left;
+    width: $toolWidth;
+    transition: background-color .2s linear;
+
+    &:first-child {
+      margin-left: none;
+      border-left: 1px solid #dedede !important;
+    }
+
+    &:last-child {
+      border-right: 1px solid #dedede !important;
+    }
+
+    &:nth-child(even) {
+      border: 0;
+    }
+
+    &:hover {
+      background-color: #dedede;
+      cursor: pointer;
+      color: #333;
+      z-index: 100;
+    }
+
+    &.center {
+      text-align: center;
+    }
+  }
+
+  &:hover, &:focus {
+    text-decoration: none;
+  }
+}
+
+
+.btn {
+  border: 0;
+  border-radius: 3px;
+  padding: 11px 11px;
+  font-size: 11px;
+  font-weight: 500;
+  box-shadow: 0px 1px 2px 0px rgba(50,50,50,.75);
+  transition: box-shadow .08s linear;
+
+  &:active {
+    box-shadow: 0px 2px 2px 1px rgba(50,50,50,.75);
+  }
+}
+
+.btn-primary {
+  background-color: #4885BD;
+
+  &:hover, &:active, &:focus {
+    background-color: #4885BD;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn.active:focus {
+  outline: none;
+}
+
+.sidebar-right {
+  .snapshot-table {
+    margin-top: 24px;
+
+    tr:hover {
+      transition: background-color .2s linear;
+      background-color: #f3f3f3;
+    }
+
+    tbody:last-child {
+      border-bottom: 1px solid #dedede; 
+    }
+  }
+
+  .snapshot-btn-group {
+    margin-top: 24px;
+    margin-bottom: 20px;
+
+    .create-new-snapshot-btn {
+      background-color: #9BBE81;
+      margin-right: 4px;
+    }
+  }
+}
+
+.sidebar-left {
+  min-width: $tabWidth;
+
+  .sidebar-left-wrap {
+    padding: 9px 0px 30px 8px;
+  }
+
+  .sidebar-left-btn-group {
+    text-align: center;
+    margin-left: 11px;
+    background-color:#FFF;
+    padding: 0px;
+  }
+}
+
+.center-pane {
+  .center-pane-btn-group {
+    float: right;
+    padding-top: 9px;
+    padding-right: 0;
+  }
+}
+
+.container-tree-reorder {
+  margin-bottom: 24px;
+
+  .tree-reorder {
+    width: 40%;
+    margin: 0 auto;
+    padding-top: 12px;
+    padding-bottom: 24px;
+    clear: both;
+  }
+
+  .btn-tree-reorder-save {
+    float: right;
+    margin-top: 24px;
+    margin-right: 8px;
+    padding-left: 27px;
+    padding-right: 27px;
+  }
+}
+
+.west-tabs .nav-tabs li {
+  text-align: center;
+}
+
+.west-tabs .table tbody tr:first-child td:first-child {
+  border-top: 0;
+}
+
+.west-tabs .nav-tabs li a,
+.center-view .nav-tabs li a {
+  cursor: pointer;
+  color: #333;
+  border-radius: 0;
+}
+
+.center-view .nav-tabs li.active a {
+  border-bottom-color: transparent;
+}
+
+.center-view ul.nav-tabs {
+  min-width: $tabWidth;
+  background-color: #dedede;
+}
+
+.form-control:focus {
+  border-color: #4885BD;
+}
+
+.nav-pills > li.active > a {
+  background-color: #505050;
+  color: #fff;
+}
+
+.nav-pills > li.active > a:hover,
+.nav-pills > li.active > a:focus {
+  background-color: #505050;
+  color: #fff;
+}
+
+.tooltip.bottom-left {
+  padding: 5px 0;
+  margin-top: 3px;
+}
+
+.tooltip.bottom-left .tooltip-arrow {
+  top: 0;
+  left: 13px;
+  border-width: 0 5px 5px;
+  border-bottom-color: #000;
+}
+
+#main-pane > .center-view {
+  right: 41px !important;
+}
+
+ul.nav-tabs > li > a{
+  height: 35px;
+}
+
+ul > span.divider {
+  height: 2px;
+  display: block;
+  font-size: 0;
+  line-height: 0;
+  background: #606060;
+  border-top: 1px solid #242424;
+}
+
+#outer-wrap {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  height: 100vh;
+  padding-bottom:14px;
+}
+
+#inner-wrap {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.inline {
+  display: inline;
+}
+
+.fa-pane-orientation-vertical > .fa-pane-handle {
+  cursor: row-resize;
+  background-color: #D3D3D3;
+}
+
+.fa-pane-orientation-horizontal > .fa-pane-handle {
+  cursor: col-resize;
+  background-color: #D3D3D3;
+}
+
+.fa-pane-orientation-horizontal > .fa-pane-handle > .fa-pane-toggle,
+.fa-pane-orientation-vertical > .fa-pane-handle > .fa-pane-toggle {
+  margin: auto;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 100px;
+  max-height: 20%;
+  cursor: pointer;
+  background-color: #808080;
+}
+
+.main {
+  overflow-x: auto;
+}
+
+.dropdown-submenu {
+  position: relative;
+}
+
+.dropdown-submenu > .dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  -webkit-border-radius: 0 6px 6px 6px;
+  -moz-border-radius: 0 6px 6px 6px;
+  border-radius:0 6px 6px 6px;
+}
+
+.dropdown-submenu:hover > .dropdown-menu {
+  display: block;
+}
+
+.dropdown-submenu > a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #CCC;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+
+.dropdown-submenu.pull-left {
+  float: none;
+}
+
+.dropdown-submenu.pull-left > .dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  -webkit-border-radius: 6px 0 6px 6px;
+  -moz-border-radius: 6px 0 6px 6px;
+  border-radius: 6px 0 6px 6px;
+}
+
+.pane-selector {
+  border-left: 1px solid #FFF;
+  background-color: #404040;
+}
+
+.pane-selector ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.pane-selector ul li {
+  text-align: center;
+  font-size: 16px;
+  position: relative;
+  margin: 0;
+  padding: 0;
+}
+
+.pane-selector ul li a {
+  display: table-cell;
+  vertical-align: middle;
+  width: 40px;
+  height: 45px;
+  line-height: 45px;
+  color: #999;
+  text-decoration: none;
+  font-size: 20px;
+  padding: 0;
+  cursor: pointer;
+}
+
+.pane-selector ul li.active a {
+  color: #FFF;
+}
+
+.pane-selector ul li a:hover {
+  color: #FFF;
+  -webkit-transition: color .15s ease-in;
+  -moz-transition: color .15s ease-in;
+  -o-transition: color .15s ease-in;
+  transition: color .15s ease-in;
+}

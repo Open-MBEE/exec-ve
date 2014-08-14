@@ -34,6 +34,8 @@ function mmsRedactor(ElementService, ViewService, $modal, $templateCache, $windo
         var commentModalTemplate = $templateCache.get('mms/templates/mmsCommentModal.html');
 
         var transcludeCtrl = function($scope, $modalInstance) {
+            $scope.searchClass = "";
+            $scope.proposeClass = "";
             var originalElements = $scope.mmsCfElements;
             $scope.filter = '';
             $scope.searchText = '';
@@ -46,20 +48,26 @@ function mmsRedactor(ElementService, ViewService, $modal, $templateCache, $windo
             };
             $scope.search = function(searchText) {
                 //var searchText = $scope.searchText; //TODO investigate why searchText isn't in $scope
-                growl.info("Searching...");
+                //growl.info("Searching...");
+                $scope.searchClass = "fa fa-spin fa-spinner";
                 ElementService.search(searchText)
                 .then(function(data) {
                     $scope.mmsCfElements = data;
+                    $scope.searchClass = "";
                 }, function(reason) {
                     growl.error("Search Error: " + reason.message);
+                    $scope.searchClass = "";
                 });
             };
             $scope.makeNew = function(newName) {
+                $scope.proposeClass = "fa fa-spin fa-spinner";
                 ElementService.createElement({name: newName, documentation: '', specialization: {type: 'Element'}})
                 .then(function(data) {
                     $scope.mmsCfElements = [data];
+                    $scope.proposeClass = "";
                 }, function(reason) {
                     growl.error("Propose Error: " + reason.message);
+                    $scope.proposeClass = "";
                 });
             };
             $scope.showOriginalElements = function() {
@@ -158,7 +166,7 @@ function mmsRedactor(ElementService, ViewService, $modal, $templateCache, $windo
             changeCallback: read,
             maxHeight: $window.innerHeight*0.65,
             imageUploadURL: '', //prevent default upload to public url
-            placeholder: "Placeholder",
+            placeholder: "Start typing here",
             autoresize: true,
             wym: true
         });

@@ -15,49 +15,97 @@
 
       <!-- Goto dropdown -->
       <li class="goto dropdown">
-        <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{siteTitle}}<i class="nav-dropdown-icon fa fa-caret-down"></i></a>
+
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+          {{siteTitle}}<i class="nav-dropdown-icon fa fa-caret-down"></i>
+        </a>
+
         <ul class="dropdown-menu" role="menu">
-          <li><a href="/share/page/site/{{site}}/dashboard">Dashboard</a></li>
-          <li ng-if="type != 'DocWeb'"><a href="docweb.html#/sites/{{site}}">DocWeb</a></li>
+
+          <li>
+            <a class="dash-link" href="/share/page/site/{{site}}/dashboard">Dashboard</a>
+          </li>
+
+          <li ng-if="type != 'DocWeb'">
+            <a class="docweb-link" href="docweb.html#/sites/{{site}}">DocWeb</a>
+          </li>
+
         </ul>
+
       </li>
 
       <!-- Other sites dropdown -->
       <li class="other-sites dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown" ng-click="reset()">Other Sites<i class="nav-dropdown-icon fa fa-caret-down"></i></a>
+
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" ng-click="reset()">
+            Other Sites<i class="nav-dropdown-icon fa fa-caret-down"></i>
+          </a>
+
           <ul class="accordion-dropdown dropdown-menu">
+
               <accordion>
+
                   <accordion-group ng-repeat="(cat,sites) in categories" is-open="sites.open">
+
                       <accordion-heading>
                           {{cat}}<i class="pull-right fa" ng-class="{'fa-caret-down': sites.open, 'fa-caret-right': !sites.open}"></i>
                       </accordion-heading>
+
                       <accordion>
+
                           <accordion-group ng-repeat="site in sites" class="site-level" is-open="site.isOpen">
+
                               <accordion-heading>
                                 {{site.title}}<i class="pull-right fa" ng-class="{'fa-caret-down': site.isOpen, 'fa-caret-right': !site.isOpen}"></i>
                               </accordion-heading>
+
                               <div class="accordion-links">
                                   <a class="dash-link" href="/share/page/site/{{site.name}}/dashboard">Dashboard</a><a class="docweb-link" href="docweb.html#/sites/{{site.name}}">Docweb</a>
                               </div>
+
                           </accordion-group>
+
                       </accordion>
+
                   </accordion-group>
+
               </accordion>
+
           </ul>
+
       </li>
 
-      <li class="docweb-flyover out-link" ng-if="type != 'docweb'"><a href="docweb.html#/sites/{{site}}">DocWeb</a></li>
-      <li class="dashboard-flyover out-link"><a href="/share/page/site/{{site}}/dashboard">Dashboard</a></li>
+      <li class="docweb-flyover out-link" ng-if="type != 'docweb'">
+        <a href="docweb.html#/sites/{{site}}">DocWeb</a>
+      </li>
+
+      <li class="dashboard-flyover out-link">
+        <a href="/share/page/site/{{site}}/dashboard">Dashboard</a>
+      </li>
 
       <!-- Support and logout buttons -->
       <ul class="nav-btns-main pull-right">
-        <li><a class="nav-btn support-btn" tooltip="Support" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" href="https://ems.jpl.nasa.gov/share/page/site/ems-support/dashboard"><i class="fa fa-question-circle"></i></a></li>
-        <li><a class="nav-btn logout-btn" tooltip="Logout" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" href="/alfresco/service/logout/info?next=/alfresco/mmsapp/docweb.html%23/sites/{{site}}"><i class="fa fa-sign-out"></i></a></li>
+
+        <li>
+          <a class="nav-btn support-btn" tooltip="Support" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" href="https://ems.jpl.nasa.gov/share/page/site/ems-support/dashboard"><i class="fa fa-question-circle"></i></a>
+        </li>
+
+        <li>
+          <a class="nav-btn logout-btn" tooltip="Logout" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" href="/alfresco/service/logout/info?next=/alfresco/mmsapp/docweb.html%23/sites/{{site}}"><i class="fa fa-sign-out"></i></a>
+        </li>
+
       </ul>
 
       <ul class="nav-btns-flyover pull-right">
-        <li class="out-link"><a href="/share/page/site/ems-training/dashboard">Support</a></li>
-        <li class="out-link"><a href="/alfresco/service/logout/info?next=/share/page">Logout</a></li>
+
+        <li class="out-link">
+          <a href="/share/page/site/ems-training/dashboard">Support</a>
+        </li>
+
+        <li class="out-link">
+          <a href="/alfresco/service/logout/info?next=/share/page">Logout</a>
+        </li>
+
       </ul>
 
     </ul>

@@ -1,79 +1,67 @@
-ul.abn-tree li.abn-tree-row {  
-  padding: 0px;
-  margin-right: -8px;
-}
-
-ul.abn-tree li.abn-tree-row a {
-  border-radius: 0;
-  padding: 3px 14px;
-}
-
-ul.abn-tree i.indented {
-  padding: 2px;
-}
-
 ul.abn-tree {
   overflow: hidden;
   cursor: pointer;
-}
 
-ul.nav.abn-tree .level-1 .indented {
-  position: relative;
-  left: 0px;
-}
+  li.abn-tree-row {  
+    padding: 0px;
+    margin-right: -8px;
 
-ul.nav.abn-tree .level-2 .indented {
-  position: relative;
-  left: 20px;
-}
+    a {
+      border-radius: 0;
+      padding: 3px 14px;  
+      color: #333;
+      text-decoration: none;
+    }
+  }
 
-ul.nav.abn-tree .level-3 .indented {
-  position: relative;
-  left: 40px;
-}
+  i.indented {
+    padding: 2px;
+  }
 
-ul.nav.abn-tree .level-4 .indented {
-  position: relative;
-  left: 60px;
-}
+  .level-1 .indented {
+    position: relative;
+    left: 0px;
+  }
 
-ul.nav.abn-tree .level-5 .indented {
-  position: relative;
-  left: 80px;
-}
+  .level-2 .indented {
+    position: relative;
+    left: 20px;
+  }
 
-ul.nav.abn-tree .level-6 .indented {
-  position: relative;
-  left: 100px;
-}
+  .level-3 .indented {
+    position: relative;
+    left: 40px;
+  }
 
-ul.nav.abn-tree a {
-  color: #333;
-  text-decoration: none;
-}
+  .level-4 .indented {
+    position: relative;
+    left: 60px;
+  }
 
-ul.nav.nav-list.abn-tree .level-7 .indented {
-  position: relative;
-  left: 120px;
-}
+  .level-5 .indented {
+    position: relative;
+    left: 80px;
+  }
 
-ul.nav.nav-list.abn-tree .level-8 .indented {
-  position: relative;
-  left: 140px;
-}
+  .level-6 .indented {
+    position: relative;
+    left: 100px;
+  }
 
-ul.nav.nav-list.abn-tree .level-9 .indented {
-  position: relative;
-  left: 160px;
-}
+  .level-7 .indented {
+    position: relative;
+    left: 120px;
+  }
 
-ul.nav-tabs {
-  background-color: $soft_grey;
-}
+  .level-8 .indented {
+    position: relative;
+    left: 140px;
+  }
 
-.active-text {
-  background: transparent !important;
-  color: #fff !important;
+  .level-9 .indented {
+    position: relative;
+    left: 160px;
+  }
 }
 
 .arrow {
@@ -83,48 +71,20 @@ ul.nav-tabs {
   overflow: hidden;
 }
 
-.arrow-active {
-  margin-left: -8px;
-}
-
 .shaft {
   display: block;
   float: left;
-  // width: 90%;
-  width: calc(100% - 20px);
+  width: calc(100%);
   height: 20px;
-  background: $arrow_blue;
+  background: $soft_grey;
   color: #fff;
-}
-.triangle-left {
-  display: block;
-  float: left;
-  position: relative;
-  left: 8px;
-  width: 0;
-  height: 0;
-  border-top: 10px solid transparent;
-  border-bottom: 10px solid transparent;
-  border-left: 8px solid #fff;
-}
-.triangle-right {
-  display: block;
-  float: left;
-  width: 0;
-  height: 0;
-  border-top: 10px solid transparent;
-  border-bottom: 10px solid transparent;
-  border-left: 12px solid $arrow_blue;
 }
 
 .shaft-hidden {
   background: transparent;
-}
+  transition: background-color .2s linear;
 
-.triangle-left-hidden {
-  border-left: none;
-}
-
-.triangle-right-hidden {
-  border-left: none;
+  &:hover {
+    background: $softer_grey;
+  }
 }
