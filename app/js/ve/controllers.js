@@ -249,6 +249,39 @@ function($scope, $rootScope, document, ElementService, ViewService, $state, grow
 }])
 .controller('ViewCtrl', ['$scope', '$rootScope', '$stateParams', 'viewElements', 'ViewService', 'time', 'growl',
 function($scope, $rootScope, $stateParams, viewElements, ViewService, time, growl) {
+    $scope.commentsOn = false;
+
+    $scope.buttons = [{
+        action: function() {
+            $scope.viewApi.toggleShowComments();
+
+            if (!$scope.commentsOn) 
+                $scope.buttons[0].icon = "fa-comment";
+            else
+                $scope.buttons[0].icon = "fa-comment-o";
+
+            $scope.commentsOn = !$scope.commentsOn;
+        },
+        tooltip: "Show Comments",
+        icon: "fa-comment-o",
+        permission: true
+    }, {
+        action: function(){ $scope.viewApi.toggleShowElements(); },
+        tooltip: "Show Elements",
+        icon: "fa-codepen",
+        permission: true
+    }, {
+        action: function(){ $rootScope.veTreeApi.select_next_branch($rootScope.veTreeApi.get_selected_branch()); },
+        tooltip: "Previous Section",
+        icon: "fa-chevron-left",
+        permission: true
+    }, {
+        action: function(){ $rootScope.veTreeApi.select_prev_branch($rootScope.veTreeApi.get_selected_branch()); },
+        tooltip: "Next Section",
+        icon: "fa-chevron-right",
+        permission: $scope.editable
+    }];
+
     ViewService.setCurrentViewId($stateParams.viewId);
     $rootScope.veCurrentView = $stateParams.viewId;
     $scope.vid = $stateParams.viewId;
@@ -257,18 +290,6 @@ function($scope, $rootScope, $stateParams, viewElements, ViewService, time, grow
     $scope.viewApi = {};
     $scope.tscClicked = function(elementId) {
         $rootScope.$broadcast('elementSelected', elementId);
-    };
-    $scope.toggleShowElements = function() {
-        $scope.viewApi.toggleShowElements();
-    };
-    $scope.toggleShowComments = function() {
-        $scope.viewApi.toggleShowComments();
-    };
-    $scope.nextSection = function() {
-        $rootScope.veTreeApi.select_next_branch($rootScope.veTreeApi.get_selected_branch());
-    };
-    $scope.prevSection = function() {
-        $rootScope.veTreeApi.select_prev_branch($rootScope.veTreeApi.get_selected_branch());
     };
 }])
 .controller('ToolbarCtrl', ['$scope', '$rootScope',
