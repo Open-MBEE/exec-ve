@@ -36,6 +36,7 @@ function mmsRedactor(ElementService, ViewService, $modal, $templateCache, $windo
         var transcludeCtrl = function($scope, $modalInstance) {
             $scope.searchClass = "";
             $scope.proposeClass = "";
+            var originalElements = $scope.mmsCfElements;
             $scope.filter = '';
             $scope.searchText = '';
             $scope.choose = function(elementId, property, name) {
@@ -68,6 +69,9 @@ function mmsRedactor(ElementService, ViewService, $modal, $templateCache, $windo
                     growl.error("Propose Error: " + reason.message);
                     $scope.proposeClass = "";
                 });
+            };
+            $scope.showOriginalElements = function() {
+                $scope.mmsCfElements = originalElements;
             };
         };
 
