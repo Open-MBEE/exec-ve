@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms')
-.factory('ViewService', ['$q', '$http', 'URLService', 'ElementService', 'UtilsService', 'CacheService', ViewService]);
+.factory('ViewService', ['$q', '$http', 'URLService', 'ElementService', 'UtilsService', 'CacheService', '_', ViewService]);
 
 /**
  * @ngdoc service
@@ -18,7 +18,7 @@ angular.module('mms')
  *
  * For View and Product json object schemas, see [here](https://ems.jpl.nasa.gov/alfresco/scripts/raml/index.html)
  */
-function ViewService($q, $http, URLService, ElementService, UtilsService, CacheService) {
+function ViewService($q, $http, URLService, ElementService, UtilsService, CacheService, _) {
     var currentViewId = '';
     var currentDocumentId = '';
     
@@ -219,19 +219,33 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
     var addViewToDocument = function(viewId, documentId, parentViewId, workspace) {
         var deferred = $q.defer();
         getDocument(documentId, workspace)
-        .then(function(data) {   
-            for (var i = 0; i < data.specialization.view2view.length; i++) {
-                if (data.specialization.view2view[i].id === parentViewId) {
-                    data.specialization.view2view[i].childrenViews.push(viewId);
+        .then(function(data) {  
+            var clone = {};
+            clone.sysmlid = data.sysmlid;
+            clone.read = data.read;
+            clone.specialization = _.cloneDeep(data.specialization);
+            delete clone.specialization.contains;
+            for (var i = 0; i < clone.specialization.view2view.length; i++) {
+                if (clone.specialization.view2view[i].id === parentViewId) {
+                    clone.specialization.view2view[i].childrenViews.push(viewId);
                     break;
                 }
             } 
-            data.specialization.view2view.push({id: viewId, childrenViews: []});
-            updateDocument(data, workspace)
+            clone.specialization.view2view.push({id: viewId, childrenViews: []});
+            updateDocument(clone, workspace)
             .then(function(data2) {
-                deferred.resolve(data);
+                deferred.resolve(data2);
             }, function(reason) {
-                deferred.reject(reason);
+                if (reason.status === 409) {
+                    clone.read = reason.data.elements[0].read;
+                    updateDocument(clone, workspace)
+                    .then(function(data3) {
+                        deferred.resolve(data3);
+                    }, function(reason2) {
+                        deferred.reject(reason2);
+                    });
+                } else
+                    deferred.reject(reason);
             });
         }, function(reason) {
             deferred.reject(reason);

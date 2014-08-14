@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsSpec', ['ElementService', '$compile', '$templateCache', '$modal', '$q', 'growl', mmsSpec]);
+.directive('mmsSpec', ['ElementService', '$compile', '$templateCache', '$modal', '$q', 'growl', '_', mmsSpec]);
 
 /**
  * @ngdoc directive
@@ -45,7 +45,7 @@ angular.module('mms.directives')
  * @param {Object=} mmsElement An element object, if this is provided, a read only 
  *      element spec for it would be shown, this will not use mms services to get the element
  */
-function mmsSpec(ElementService, $compile, $templateCache, $modal, $q, growl) {
+function mmsSpec(ElementService, $compile, $templateCache, $modal, $q, growl, _) {
     //var readTemplate = $templateCache.get('mms/templates/mmsSpec.html');
     //var editTemplate = $templateCache.get('mms/templates/mmsSpecEdit.html');
     var template = $templateCache.get('mms/templates/mmsSpec.html');
@@ -80,7 +80,7 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, $q, growl) {
                         !scope.element.editable || 
                         (scope.mmsVersion !== 'latest' && scope.mmsVersion)) {
                     scope.editable = false;
-                    scope.edit = {};
+                    scope.edit = null;
                     //scope.$emit('elementEditability', scope.editable);
                     //template = readTemplate;
                     
@@ -111,7 +111,7 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, $q, growl) {
             scope.edit.name = scope.element.name;
             scope.edit.documentation = scope.element.documentation;
             if (scope.edit.specialization.type === 'Property' && angular.isArray(scope.edit.specialization.value)) {
-                scope.edit.specialization.value = scope.element.specialization.value;
+                scope.edit.specialization.value = _.cloneDeep(scope.element.specialization.value);
                 scope.editValues = scope.edit.specialization.value;
             }
         };
@@ -199,6 +199,19 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, $q, growl) {
             return true;
         };
 
+        scope.hasEdits = function() {
+            if (scope.edit === null)
+                return false;
+            if (scope.edit.name !== scope.element.name)
+                return true;
+            if (scope.edit.documentation !== scope.element.documentation)
+                return true;
+            if (scope.edit.specialization.type === 'Property' && 
+                !_.isEqual(scope.edit.specialization.value, scope.element.specialization.value))
+                return true;
+            return false;
+        };
+
         scope.addValueTypes = {string: 'LiteralString', boolean: 'LiteralBoolean', integer: 'LiteralInteger', real: 'LiteralReal'};
         scope.addValue = function(type) {
             if (type === 'LiteralBoolean')
@@ -241,6 +254,7 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, $q, growl) {
             api.save = scope.save;
             api.revertEdits = scope.revert;
             api.changeElement = scope.changeElement;
+            api.hasEdits = scope.hasEdits;
         }
     };
 
