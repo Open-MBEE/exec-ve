@@ -188,8 +188,8 @@ function($scope, $rootScope, $state, document, time, ElementService, ViewService
         }
     };
 }])
-.controller('ReorderCtrl', ['$scope', '$rootScope', 'document', 'ElementService', 'ViewService', '$state', 'growl',
-function($scope, $rootScope, document, ElementService, ViewService, $state, growl) {
+.controller('ReorderCtrl', ['$scope', '$rootScope', 'document', 'ElementService', 'ViewService', '$state', 'growl', '_',
+function($scope, $rootScope, document, ElementService, ViewService, $state, growl, _) {
     $scope.doc = document;
     var viewElementIds = [];
     var viewElementIds2TreeNodeMap = {};
@@ -229,14 +229,30 @@ function($scope, $rootScope, document, ElementService, ViewService, $state, grow
             }
             newView2View.push(viewObject);
         }
-        document.specialization.view2view = newView2View;
-        ViewService.updateDocument(document)
+        var newdoc = {};
+        newdoc.sysmlid = document.sysmlid;
+        newdoc.read = document.read;
+        newdoc.specialization = {type: 'Product'};
+        newdoc.specialization.view2view = newView2View;
+        ViewService.updateDocument(newdoc)
         .then(function(data) {
             growl.success('Reorder Successful');
             $state.go('doc', {}, {reload:true});
         }, function(reason) {
-            $scope.saveClass = "";
-            growl.error('Reorder Save Error: ' + reason.message);
+            if (reason.status === 409) {
+                newdoc.read = reason.data.elements[0].read;
+                ViewService.updateDocument(newdoc)
+                .then(function(data2) {
+                    growl.success('Reorder Successful');
+                    $state.go('doc', {}, {reload:true});
+                }, function(reason2) {
+                    $scope.saveClass = "";
+                    growl.error('Reorder Save Error: ' + reason2.message);
+                });
+            } else {
+                $scope.saveClass = "";
+                growl.error('Reorder Save Error: ' + reason.message);
+            }
         });
     };
     $scope.cancel = function() {
