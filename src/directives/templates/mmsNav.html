@@ -53,7 +53,7 @@
 
                       <accordion>
 
-                          <accordion-group ng-repeat="site in sites" class="site-level" is-open="site.isOpen">
+                          <accordion-group ng-repeat="site in sites | orderBy:'name'" class="site-level" is-open="site.isOpen">
 
                               <accordion-heading>
                                 {{site.title}}<i class="pull-right fa" ng-class="{'fa-caret-down': site.isOpen, 'fa-caret-right': !site.isOpen}"></i>
