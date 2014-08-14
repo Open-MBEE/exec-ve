@@ -318,8 +318,8 @@ function($scope, $rootScope) {
     $scope.onClick = function(button) {
     };
 }])
-.controller('ToolCtrl', ['$scope', '$rootScope', 'document', 'snapshots', 'time', 'site', 'ConfigService', 'ElementService', 'growl',
-function($scope, $rootScope, document, snapshots, time, site, ConfigService, ElementService, growl) {
+.controller('ToolCtrl', ['$scope', '$rootScope', 'document', 'snapshots', 'time', 'site', 'ConfigService', 'ElementService', 'growl', '$modal',
+function($scope, $rootScope, document, snapshots, time, site, ConfigService, ElementService, growl, $modal) {
     $scope.document = document;
     $scope.editable = document.editable && time === 'latest';
     $scope.snapshots = snapshots;
@@ -457,12 +457,32 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
         $rootScope.veTbApi.select('elementEditor');
     });
     $scope.$on('elementCancel', function() {
-        $scope.specApi.setEditing(false);
-        $scope.specApi.revertEdits();
-        $rootScope.veTbApi.select('elementViewer');
-        setEditingButtonsActive('element', false);
-        setEditingButtonsActive('view', false);
-        setSnapshotButtonsActive(false);
+        var go = function() {
+            $scope.specApi.setEditing(false);
+            $scope.specApi.revertEdits();
+            $rootScope.veTbApi.select('elementViewer');
+            setEditingButtonsActive('element', false);
+            setEditingButtonsActive('view', false);
+            setSnapshotButtonsActive(false);
+        };
+        if ($scope.specApi.hasEdits()) {
+            var instance = $modal.open({
+                templateUrl: 'partials/ve/cancelConfirm.html',
+                scope: $scope,
+                controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
+                    $scope.ok = function() {
+                        $modalInstance.close('ok');
+                    };
+                    $scope.cancel = function() {
+                        $modalInstance.dismiss();
+                    };
+                }]
+            });
+            instance.result.then(function() {
+                go();
+            });
+        } else
+            go();
     });
     $scope.$on('viewSave', function() {
         $rootScope.veTbApi.setButtonIcon('viewSave', 'fa fa-spin fa-spinner');
@@ -485,8 +505,6 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
         $scope.viewOrderApi.revertEdits();
         $rootScope.veTbApi.select('elementViewer');
         showPane('element');
-        //$scope.viewOrderApi.setEditing(false);
-        //$rootScope.veTbApi.select('viewStructViewer');
         setEditingButtonsActive('element', false);
         setEditingButtonsActive('view', false);
         setSnapshotButtonsActive(false);
