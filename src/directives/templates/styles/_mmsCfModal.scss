@@ -1,5 +1,4 @@
 .transclude-modal {
-
   .modal-input {
     width: 60%;
     margin: 0 auto;
@@ -11,5 +10,32 @@
 
   .form-propose, .form-filter {
     margin-top: 7px;
+  }
+
+  .form-search, .form-propose {
+    & > .form-control {
+      border-right-width: 0;
+    }
+  }
+
+  span.input-group-btn {
+    .btn {
+      box-shadow: none;
+      transition: none;
+      border: 1px solid #ccc;
+      font-size: 14px;
+      font-weight: 400;
+      padding: 6px 12px;
+
+      &.btn-success {
+        border: 1px solid #4885bd;
+        background-color: #4885bd;
+        margin-left: 0;
+      }
+    }
+
+    .btn-text {
+      font-size: 11px;
+    }
   }
 }

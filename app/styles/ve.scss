@@ -83,14 +83,21 @@ a {
 }
 
 .btn-primary {
-  background-color: #4885BD;
+  background-color: #4885bd;
 
   &:hover, &:active, &:focus {
-    background-color: #4885BD;
+    background-color: #4885bd;
   }
 }
 
-.btn:focus, .btn:active:focus, .btn.active:focus {
+.btn-danger {
+  background-color: #d2322d;
+  &:hover, &:active, &:focus {
+    background-color: #d2322d;
+  }
+}
+
+.btn:focus, .btn:active:focus {
   outline: none;
 }
 
