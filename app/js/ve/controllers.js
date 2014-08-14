@@ -345,9 +345,9 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
         ConfigService.createSnapshot($scope.document.sysmlid)
         .then(function(result) {
             $rootScope.veTbApi.setButtonIcon('snapNew', 'fa fa-plus');
-            growl.success("Create Successful: wait for email.");
+            growl.success("Snapshot Created: You'll receive a confirmation email soon.");
         }, function(reason) {
-            growl.error("Create Failed: " + reason.message);
+            growl.error("Snapshot Creation failed: " + reason.message);
             $rootScope.veTbApi.setButtonIcon('snapNew', 'fa fa-plus');
         });
         $rootScope.veTbApi.select('documentSnapshots');

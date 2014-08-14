@@ -308,7 +308,7 @@ function mmsDiagramBlock(go, growl, ElementService) {
 
 
       }, function(reason) {
-          growl.error('Block Diagram - Error: ' + reason.message);
+          growl.error('Block Diagram Error: ' + reason.message);
       });
   };
 
