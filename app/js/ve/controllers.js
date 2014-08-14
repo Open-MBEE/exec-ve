@@ -375,6 +375,7 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
         $scope.eid = eid;
         $rootScope.veTbApi.select('elementViewer');
         showPane('element');
+        $scope.specApi.setEditing(false);
         ElementService.getElement(eid, false, 'master', time).
         then(function(element) {
             var editable = element.editable && time === 'latest';
