@@ -60,3 +60,25 @@ $mainViewShadowColor: rgba(0,0,0,.26);
 .undo {
   background-color: white;
 }
+
+tr {
+  &.clean {
+    background-color: white !important;
+  }
+
+  &.addition {
+    background-color: green;
+  }
+
+  &.removal {
+    background-color: red;
+  }
+
+  &.conflict {
+    background-color: yellow;
+  }
+
+  &.update {
+    background-color: blue;
+  }
+}
