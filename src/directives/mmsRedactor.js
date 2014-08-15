@@ -171,11 +171,20 @@ function mmsRedactor(ElementService, ViewService, $modal, $templateCache, $windo
             wym: true
         });
 
-        element.redactor('buttonAdd', 'transclude', 'Cross-Reference', transcludeCallback);
+        element.redactor('buttonAdd', 'transclude', 'Insert a Cross-Reference', transcludeCallback);
         element.redactor('buttonAwesome', 'transclude', 'fa-asterisk');
-        element.redactor('buttonAdd', 'comment', 'Comment', commentCallback);
+        element.redactor('buttonAdd', 'comment', 'Insert a Comment', commentCallback);
         element.redactor('buttonAwesome', 'comment', 'fa-comment');
-        element.redactor('buttonAdd', 'cfixr', 'Set Cursor Outside Right', function() {
+        element.redactor('buttonAdd', 'cfixl', 'Set Cursor Outside Left of CF/Comment', function() {
+            var current = element.redactor('getCurrent');
+            var cfElem = current.parentElement;
+            if (!cfElem || cfElem.localName.substr(0, 3) !== 'mms')
+                return;
+            var space = angular.element('<span>&nbsp;</span>');
+            space.insertBefore(cfElem);
+            element.redactor('setCaretBefore', space);//current.parentElement);
+        });
+        element.redactor('buttonAdd', 'cfixr', 'Set Cursor Outside Right of CF/Comment', function() {
             var current = element.redactor('getCurrent');
             var cfElem = current.parentElement;
             if (!cfElem || cfElem.localName.substr(0, 3) !== 'mms')
@@ -185,15 +194,6 @@ function mmsRedactor(ElementService, ViewService, $modal, $templateCache, $windo
             element.redactor('setCaretAfter', space);//current.parentElement);
         });
         element.redactor('buttonAwesome', 'cfixr', 'fa-external-link');
-        element.redactor('buttonAdd', 'cfixl', 'Set Cursor Outside Left', function() {
-            var current = element.redactor('getCurrent');
-            var cfElem = current.parentElement;
-            if (!cfElem || cfElem.localName.substr(0, 3) !== 'mms')
-                return;
-            var space = angular.element('<span>&nbsp;</span>');
-            space.insertBefore(cfElem);
-            element.redactor('setCaretBefore', space);//current.parentElement);
-        });
         element.redactor('buttonAwesome', 'cfixl', 'fa-external-link fa-flip-horizontal');
         element.redactor('buttonAdd', 'undo', 'Undo', function() {
             //element.redactor('execCommand', 'undo');

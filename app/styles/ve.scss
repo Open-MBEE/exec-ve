@@ -69,7 +69,6 @@ a {
   }
 }
 
-
 .btn {
   border: 0;
   border-radius: 3px;
@@ -130,6 +129,18 @@ a {
     .create-new-snapshot-btn {
       background-color: #9BBE81;
       margin-right: 4px;
+    }
+  }
+}
+
+.modal-dialog {
+  .modal-footer {
+    margin-top: 0px;
+  }
+
+  .modal-body {
+    p {
+      margin: 0;
     }
   }
 }

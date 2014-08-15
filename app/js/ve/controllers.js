@@ -21,7 +21,7 @@ function($scope, $rootScope, $state, document, time, ElementService, ViewService
         permission: true
     }, {
         action: function(){ $scope.toggleFilter(); },
-        tooltip: "Filter",
+        tooltip: "Filter Views",
         icon: "fa-filter",
         permission: true
     }, {
@@ -31,7 +31,7 @@ function($scope, $rootScope, $state, document, time, ElementService, ViewService
         permission: $scope.editable
     }, {
         action: function(){ $scope.reorder(); },
-        tooltip: "Reorder",
+        tooltip: "Reorder Views",
         icon: "fa-arrows-v",
         permission: $scope.editable
     }];
