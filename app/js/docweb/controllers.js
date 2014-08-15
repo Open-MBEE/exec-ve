@@ -166,7 +166,7 @@ angular.module('myApp')
                 ConfigService.updateConfigProducts(config.id, products, $scope.site, "master")
                 .then(
                     function(result) {
-                        growl.success("Create Successful: wait for email.");
+                        growl.success("Create Successful: You'll receive a confirmation email soon.");
                         $state.go('docweb');
                     },
                     function(reason) {

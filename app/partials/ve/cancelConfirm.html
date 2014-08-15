@@ -1,9 +1,15 @@
-<div class="modal-header"><h4>Discard Edits</h4></div>
-<div class="modal-body">
-    <div>You have unsaved edits, are you sure you want to discard?
-    </div>
+<div class="modal-header">
+  <h4>DISCARD MODIFICATIONS</h4>
 </div>
+
+<div class="modal-body">
+    <p>
+      You have unsaved modifications to this element.<br/>
+      Are you sure you want to discard them?
+    </p>
+</div>
+
 <div class="modal-footer">
-    <button class="btn btn-sm btn-danger" ng-click="ok()">Yes</button>
-    <button class="btn btn-sm btn-primary" ng-click="cancel()">No</button>
+    <button class="btn btn-sm btn-primary" ng-click="cancel()">CANCEL</button>
+    <button class="btn btn-sm btn-danger" ng-click="ok()">DISCARD MODIFICATIONS</button>
 </div>

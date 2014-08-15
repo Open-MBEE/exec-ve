@@ -1,15 +1,92 @@
 .transclude-modal {
+  .transclude-modal-instructions {
+    margin-top: -6px;
+  }
 
-  .modal-input {
+  .transclude-modal-input {
     width: 60%;
     margin: 0 auto;
   }
 
   .transclude-table {
     padding: 20px;
+    max-height: 400px;
+    max-width: 98%;
+    overflow: auto;
+  }
+
+  .misc-form-field {
+    top: -32px;
+    position: relative;
   }
 
   .form-propose, .form-filter {
     margin-top: 7px;
+  }
+
+  .form-search {
+    width: 70%;
+  }
+
+  .form-search, .form-propose {
+    & > .form-control {
+      border-right-width: 0;
+    }
+  }
+
+  span.input-group-btn {
+    .btn {
+      -webkit-box-shadow: none;
+      -moz-box-shadow: none;
+      box-shadow: none;
+      -webkit-transition: none;
+      -moz-transition: none;
+      -o-transition: none;
+      transition: none;
+      border: 1px solid #ccc;
+      font-size: 14px;
+      font-weight: 400;
+      padding: 6px 12px;
+
+      &.btn-default {
+        border: 1px solid #4885bd;
+        background-color: #4885bd;
+        margin-left: 0;
+        color: #fff;
+      }
+    }
+
+    .btn-text {
+      font-size: 11px;
+    }
+  }
+
+  .show-orig-table-btn {
+    font-weight: 400;
+    padding: 10px 12px 9px 12px;
+    background-color: #4B86BB;
+    color: #fff;
+    position: relative;
+    top: -34px;
+    left: 71.3%;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+
+    &:hover, &:active {
+      -webkit-box-shadow: none;
+      -moz-box-shadow: none;
+      box-shadow: none;
+    }
+  }
+
+  .clickable:hover {
+    cursor: pointer;
+    background-color: #ecf3f8;
+  }
+
+  .transclude-table {
+    position: relative;
+    top: -30px
   }
 }

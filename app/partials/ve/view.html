@@ -1,17 +1,13 @@
 <div class="center-pane container-fluid">
+
     <div class="center-pane-btn-group">
-        <a type="button" class="view-tools center" ng-click="toggleShowComments()" tooltip="Show Comments" tooltip-append-to-body="true" tooltip-trigger="mouseenter" tooltip-popup-delay="400" tooltip-placement="bottom">
-            <span class="fa fa-comment"></span>
+
+        <a type="button" ng-repeat="button in buttons" class="view-tools center" ng-click="button.action()" tooltip="{{button.tooltip}}" tooltip-append-to-body="true" tooltip-trigger="mouseenter" tooltip-popup-delay="400" tooltip-placement="bottom">
+            <span class="fa {{button.icon}}"></span>
         </a>
-        <a type="button" class="view-tools center" ng-click="toggleShowElements()" tooltip="Show Elements" tooltip-append-to-body="true" tooltip-trigger="mouseenter" tooltip-popup-delay="400" tooltip-placement="bottom">
-            <span class="fa fa-lightbulb-o"></span>
-        </a>
-        <a type="button" class="view-tools center" ng-click="prevSection()" tooltip="Previous" tooltip-append-to-body="true" tooltip-trigger="mouseenter" tooltip-popup-delay="400" tooltip-placement="bottom">
-            <span class="fa fa-chevron-left"></span>
-        </a>
-        <a type="button" class="view-tools center" ng-click="nextSection()" tooltip="Next" tooltip-append-to-body="true" tooltip-trigger="mouseenter" tooltip-popup-delay="400" tooltip-placement="bottom">
-            <span class="fa fa-chevron-right"></span>
-        </a>
+
     </div>
+
     <mms-view mms-vid="{{vid}}" mms-cf-clicked="tscClicked(elementId)" mms-order="false" mms-version="{{version}}" mms-view-api="viewApi"></mms-view>
+
 </div>

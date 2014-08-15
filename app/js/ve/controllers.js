@@ -21,7 +21,7 @@ function($scope, $rootScope, $state, document, time, ElementService, ViewService
         permission: true
     }, {
         action: function(){ $scope.toggleFilter(); },
-        tooltip: "Filter",
+        tooltip: "Filter Views",
         icon: "fa-filter",
         permission: true
     }, {
@@ -31,7 +31,7 @@ function($scope, $rootScope, $state, document, time, ElementService, ViewService
         permission: $scope.editable
     }, {
         action: function(){ $scope.reorder(); },
-        tooltip: "Reorder",
+        tooltip: "Reorder Views",
         icon: "fa-arrows-v",
         permission: $scope.editable
     }];
@@ -265,6 +265,64 @@ function($scope, $rootScope, document, ElementService, ViewService, $state, grow
 }])
 .controller('ViewCtrl', ['$scope', '$rootScope', '$stateParams', 'viewElements', 'ViewService', 'time', 'growl',
 function($scope, $rootScope, $stateParams, viewElements, ViewService, time, growl) {
+    $scope.commentsOn = false;
+    $scope.elementsOn = false;
+
+    $scope.buttons = [
+        {
+            action: function() {
+                $scope.viewApi.toggleShowComments();
+
+                if (!$scope.commentsOn) {
+                    $scope.buttons[0].icon = "fa-comment";
+                    $scope.buttons[0].tooltip = "Hide Comments";
+                }
+                else {
+                    $scope.buttons[0].icon = "fa-comment-o";
+                    $scope.buttons[0].tooltip = "Show Comments";
+                }
+
+                $scope.commentsOn = !$scope.commentsOn;
+            },
+            tooltip: "Show Comments",
+            icon: "fa-comment-o",
+            permission: true
+        },
+        {
+            action: function() {
+                $scope.viewApi.toggleShowElements();
+
+                if (!$scope.elementsOn) {
+                    $scope.buttons[1].tooltip = "Hide Elements";
+                }
+                else {
+                    $scope.buttons[1].tooltip = "Show Elements";
+                }
+
+                $scope.elementsOn = !$scope.elementsOn;
+            },
+            tooltip: "Show Elements",
+            icon: "fa-codepen",
+            permission: true
+        },
+        {
+            action: function() {
+                $rootScope.veTreeApi.select_prev_branch($rootScope.veTreeApi.get_selected_branch());
+            },
+            tooltip: "Previous",
+            icon: "fa-chevron-left",
+            permission: true
+        },
+        {
+            action: function() {
+                $rootScope.veTreeApi.select_next_branch($rootScope.veTreeApi.get_selected_branch());
+            },
+            tooltip: "Next",
+            icon: "fa-chevron-right",
+            permission: $scope.editable
+        }
+    ];
+
     ViewService.setCurrentViewId($stateParams.viewId);
     $rootScope.veCurrentView = $stateParams.viewId;
     $scope.vid = $stateParams.viewId;
@@ -273,18 +331,6 @@ function($scope, $rootScope, $stateParams, viewElements, ViewService, time, grow
     $scope.viewApi = {};
     $scope.tscClicked = function(elementId) {
         $rootScope.$broadcast('elementSelected', elementId);
-    };
-    $scope.toggleShowElements = function() {
-        $scope.viewApi.toggleShowElements();
-    };
-    $scope.toggleShowComments = function() {
-        $scope.viewApi.toggleShowComments();
-    };
-    $scope.nextSection = function() {
-        $rootScope.veTreeApi.select_next_branch($rootScope.veTreeApi.get_selected_branch());
-    };
-    $scope.prevSection = function() {
-        $rootScope.veTreeApi.select_prev_branch($rootScope.veTreeApi.get_selected_branch());
     };
 }])
 .controller('ToolbarCtrl', ['$scope', '$rootScope',
@@ -361,9 +407,9 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
         ConfigService.createSnapshot($scope.document.sysmlid)
         .then(function(result) {
             $rootScope.veTbApi.setButtonIcon('snapNew', 'fa fa-plus');
-            growl.success("Create Successful: wait for email.");
+            growl.success("Snapshot Created: You'll receive a confirmation email soon.");
         }, function(reason) {
-            growl.error("Create Failed: " + reason.message);
+            growl.error("Snapshot Creation failed: " + reason.message);
             $rootScope.veTbApi.setButtonIcon('snapNew', 'fa fa-plus');
         });
         $rootScope.veTbApi.select('documentSnapshots');

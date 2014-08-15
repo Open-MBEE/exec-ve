@@ -97,8 +97,8 @@ mms-nav {
       color: $white;
       font-weight: 200;
       font-size: 16px;
-      padding-left: 1em;
-      padding-right: 3em;
+      margin-left: 18px;
+      margin-right: 48px;
       cursor: default;
     }
 
@@ -353,6 +353,9 @@ accordion {
     &:hover {
       cursor: pointer;
       background-color: $highlight_grey;
+      -webkit-transition: background-color .2s linear;
+      -moz-transition: background-color .2s linear;
+      -o-transition: background-color .2s linear;
       transition: background-color .2s linear;
     }
   }
@@ -421,6 +424,9 @@ accordion {
     li.goto {
       .dropdown-menu a:hover {
         background: $medium_grey;
+        -webkit-transition: background-color .2s linear;
+        -moz-transition: background-color .2s linear;
+        -o-transition: background-color .2s linear;
         transition: background-color .2s linear;
       }
     }

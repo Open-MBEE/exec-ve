@@ -8,7 +8,7 @@ ul.abn-tree {
 
     a {
       border-radius: 0;
-      padding: 3px 14px;  
+      padding: 3px 10px;  
       color: #333;
       text-decoration: none;
     }
@@ -82,6 +82,9 @@ ul.abn-tree {
 
 .shaft-hidden {
   background: transparent;
+  -webkit-transition: background-color .2s linear;
+  -moz-transition: background-color .2s linear;
+  -o-transition: background-color .2s linear;
   transition: background-color .2s linear;
 
   &:hover {

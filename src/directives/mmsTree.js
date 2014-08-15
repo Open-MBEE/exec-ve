@@ -101,7 +101,6 @@ function mmsTree($timeout, $log, $templateCache) {
                 if (!b.uid)
                     b.uid = '' + Math.random();
             });
-            $log.log('UIDs are set');
             for_each_branch(function(b) {
                 if (angular.isArray(b.children)) {
                     for (var i = 0; i < b.children.length; i++) {
