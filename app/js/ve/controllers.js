@@ -306,13 +306,17 @@ function($scope, $rootScope, $stateParams, viewElements, ViewService, time, grow
             permission: true
         },
         {
-            action: function() { $rootScope.veTreeApi.select_next_branch($rootScope.veTreeApi.get_selected_branch()); },
+            action: function() {
+                $rootScope.veTreeApi.select_prev_branch($rootScope.veTreeApi.get_selected_branch());
+            },
             tooltip: "Previous",
             icon: "fa-chevron-left",
             permission: true
         },
         {
-            action: function() { $rootScope.veTreeApi.select_prev_branch($rootScope.veTreeApi.get_selected_branch()); },
+            action: function() {
+                $rootScope.veTreeApi.select_next_branch($rootScope.veTreeApi.get_selected_branch());
+            },
             tooltip: "Next",
             icon: "fa-chevron-right",
             permission: $scope.editable
