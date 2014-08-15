@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en" ng-app="myApp">
+<head>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge;chrome=1" />
+  <meta charset="utf-8">
+  <title>Portal</title>
+  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" type="text/css">
+  
+  <!-- bower:css -->
+  <!-- endbower -->
+
+  <link rel="stylesheet" href="ve.styles.min.css">
+  
+</head>
+
+<body>
+  <div id="outer-wrap">
+    <div id="inner-wrap">
+        <mms-nav mms-site="ems-support" mms-title="Portal" mms-type="Portal"></mms-nav>
+        <div ng-controller="PortalCtrl">
+          <div ng-repeat="site in sites | orderBy: 'title'">
+            <h4>{{site.title}}</h4>
+            <a class="dash-link" href="/share/page/site/{{site.name}}/dashboard">Dashboard</a><br/><a class="docweb-link" href="docweb.html#/sites/{{site.name}}">DocWeb</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+  <script src="lib/modernizr/modernizr.custom.61017.min.js"></script>
+
+<!-- bower:js -->
+<!-- endbower -->
+
+<!-- MMS -->
+<script src="mms.js"></script> 
+<script src="mms.directives.tpls.js"></script>
+<script src="mms.directives.js"></script>
+
+
+<!-- MMS Application-->
+<script src="js/portal/app.js"></script>
+
+</body>
+</html>

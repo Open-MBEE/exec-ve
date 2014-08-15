@@ -137,8 +137,8 @@ function mmsRedactor(ElementService, ViewService, $modal, $templateCache, $windo
         function read(html) {
             var cleanhtml = html.replace(new RegExp('<mms-transclude-[^>]+></mms-transclude-[^>]+>', 'g'), '');
             cleanhtml = cleanhtml.replace('<br>', '');
-            //var cleanhtml = html.replace(/<mms-transclude[^>]+><\/mms-transclude[^>]+>/gi, '');
-            ngModelCtrl.$setViewValue(cleanhtml);
+            if (ngModelCtrl.$viewValue !== cleanhtml)
+                ngModelCtrl.$setViewValue(cleanhtml);
 
             element.redactor('selectionSave');
             var editor = element.redactor('getEditor');
@@ -208,7 +208,9 @@ function mmsRedactor(ElementService, ViewService, $modal, $templateCache, $windo
         });
         //element.redactor('buttonAwesome', 'redo', 'fa-repeat');
         ngModelCtrl.$render = function() {
-            element.redactor("set", ngModelCtrl.$viewValue || '');
+            var current = element.redactor('get');
+            if (current !== ngModelCtrl.$viewValue)
+                element.redactor("set", ngModelCtrl.$viewValue || '');
         };
 
         scope.$on('$destroy', function() {
