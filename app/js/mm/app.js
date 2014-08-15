@@ -35,5 +35,16 @@ angular.module('mm', ['ui.router', 'mms', 'mms.directives', 'ui.bootstrap', 'ui.
                 controller: 'DiffTreeController'
             }
         }
+    })
+    .state('main.diff.view', {
+        url: '/element/:elementId',
+        resolve: {
+        },
+        views: {
+            'view@main.diff': {
+                templateUrl: 'partials/mm/diff-view.html',
+                controller: 'DiffViewController'
+            }
+        }
     });
 });

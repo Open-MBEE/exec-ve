@@ -1,5 +1,5 @@
 <div fa-pane pane-anchor="west" pane-size="25%">
-	<mms-tree tree-data="treeData" tree-control="treeapi" section-numbering="false" options="options" on-select="loadTableWithElement(branch.data.sysmlid)"></mms-tree>
+	<mms-tree tree-data="treeData" tree-control="treeapi" section-numbering="false" options="options" on-select="select_branch_id(branch.data.sysmlid)"></mms-tree>
 
   <div class="tree-view-btn-group btn-group">
     <button ng-click="submitChanges()" type="button" class="btn btn-success">Submit</button>
@@ -7,5 +7,5 @@
   </div>
 </div>
 <div fa-pane pane-anchor="east" pane-size="75%" class="main-view-container">
-	<mms-diff-table></mms-diff-table>
+	<div ui-view="view">Select an item from the Table of Contents.</div>
 </div>
