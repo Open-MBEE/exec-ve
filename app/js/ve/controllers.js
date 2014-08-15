@@ -266,37 +266,58 @@ function($scope, $rootScope, document, ElementService, ViewService, $state, grow
 .controller('ViewCtrl', ['$scope', '$rootScope', '$stateParams', 'viewElements', 'ViewService', 'time', 'growl',
 function($scope, $rootScope, $stateParams, viewElements, ViewService, time, growl) {
     $scope.commentsOn = false;
+    $scope.elementsOn = false;
 
-    $scope.buttons = [{
-        action: function() {
-            $scope.viewApi.toggleShowComments();
+    $scope.buttons = [
+        {
+            action: function() {
+                $scope.viewApi.toggleShowComments();
 
-            if (!$scope.commentsOn) 
-                $scope.buttons[0].icon = "fa-comment";
-            else
-                $scope.buttons[0].icon = "fa-comment-o";
+                if (!$scope.commentsOn) {
+                    $scope.buttons[0].icon = "fa-comment";
+                    $scope.buttons[0].tooltip = "Hide Comments";
+                }
+                else {
+                    $scope.buttons[0].icon = "fa-comment-o";
+                    $scope.buttons[0].tooltip = "Show Comments";
+                }
 
-            $scope.commentsOn = !$scope.commentsOn;
+                $scope.commentsOn = !$scope.commentsOn;
+            },
+            tooltip: "Show Comments",
+            icon: "fa-comment-o",
+            permission: true
         },
-        tooltip: "Show Comments",
-        icon: "fa-comment-o",
-        permission: true
-    }, {
-        action: function(){ $scope.viewApi.toggleShowElements(); },
-        tooltip: "Show Elements",
-        icon: "fa-codepen",
-        permission: true
-    }, {
-        action: function(){ $rootScope.veTreeApi.select_next_branch($rootScope.veTreeApi.get_selected_branch()); },
-        tooltip: "Previous",
-        icon: "fa-chevron-left",
-        permission: true
-    }, {
-        action: function(){ $rootScope.veTreeApi.select_prev_branch($rootScope.veTreeApi.get_selected_branch()); },
-        tooltip: "Next",
-        icon: "fa-chevron-right",
-        permission: $scope.editable
-    }];
+        {
+            action: function() {
+                $scope.viewApi.toggleShowElements();
+
+                if (!$scope.elementsOn) {
+                    $scope.buttons[1].tooltip = "Hide Elements";
+                }
+                else {
+                    $scope.buttons[1].tooltip = "Show Elements";
+                }
+
+                $scope.elementsOn = !$scope.elementsOn;
+            },
+            tooltip: "Show Elements",
+            icon: "fa-codepen",
+            permission: true
+        },
+        {
+            action: function() { $rootScope.veTreeApi.select_next_branch($rootScope.veTreeApi.get_selected_branch()); },
+            tooltip: "Previous",
+            icon: "fa-chevron-left",
+            permission: true
+        },
+        {
+            action: function() { $rootScope.veTreeApi.select_prev_branch($rootScope.veTreeApi.get_selected_branch()); },
+            tooltip: "Next",
+            icon: "fa-chevron-right",
+            permission: $scope.editable
+        }
+    ];
 
     ViewService.setCurrentViewId($stateParams.viewId);
     $rootScope.veCurrentView = $stateParams.viewId;
