@@ -1,58 +1,73 @@
-.right-toolbar {
-	width: 41px;
-	height: 100%;
-	float: right;
-	background-color: $monolith;
-	padding-top: 75px;
-	position: fixed;
-	left: calc(100% - 41px);
-}
+mms-toolbar {
+	.right-toolbar {
+		width: 41px;
+		height: 100%;
+		float: right;
+		background-color: $monolith;
+		padding-top: 75px;
+		position: fixed;
+		left: calc(100% - 41px);
+	}
 
-.toolbox {
-	width: 100%;
-	background-color: $monolith;
-}
+	.toolbox {
+		width: 100%;
+		background-color: $monolith;
+	}
 
-.tools {
-	display: block;
-	height: 45px;
-	margin-bottom: 3px;
-	color: black;
-	background-color: $soft_grey;
-	box-shadow: inset 7px 0 9px -7px rgba(0,0,0,0.7);
-	text-align: center;
-	vertical-align: bottom;
-	font-size: 20px;
-	line-height: 45px;
+	.tools {
+		display: block;
+		height: 45px;
+		margin-bottom: 3px;
+		color: black;
+		background-color: $soft_grey;
+		box-shadow: inset 7px 0 9px -7px rgba(0,0,0,0.7);
+		text-align: center;
+		vertical-align: bottom;
+		font-size: 20px;
+		line-height: 45px;
 
-	&:active {
+		&:active {
+			background-color: white;
+			box-shadow: none;
+			transition: all .2s linear;
+		}
+
+		&:hover {
+			text-decoration: none;
+			color: black !important;	
+			cursor: pointer;
+		}
+
+		.fa-save {
+			color: #366590;
+		}
+
+		.fa-times {
+			color: #d03433;
+		}
+
+		.fa-plus {
+			color: #597d6b;
+		}
+
+		.fa-refresh {
+			color: #366590;
+		}
+	}
+
+	.selected {
 		background-color: white;
 		box-shadow: none;
-		transition: all .2s linear;
 	}
 
-	&:hover {
-		cursor: pointer;
+	.dynamic {
+		background-color: white;
+		box-shadow: none;
 	}
-}
 
-a.tools:hover {
-	text-decoration: none;
-	color: black !important;	
-}
-
-.selected {
-	background-color: white;
-	box-shadow: none;
-}
-
-.dynamic {
-	background-color: white;
-	box-shadow: none;
-}
-
-.pulldown {
-	margin-top: 75px;
+	.pulldown {
+		margin-top: 75px;
+	}
 }
 
 @media screen and (max-width: 45em) {
