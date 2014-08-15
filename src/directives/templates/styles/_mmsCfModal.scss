@@ -36,7 +36,12 @@
 
   span.input-group-btn {
     .btn {
+      -webkit-box-shadow: none;
+      -moz-box-shadow: none;
       box-shadow: none;
+      -webkit-transition: none;
+      -moz-transition: none;
+      -o-transition: none;
       transition: none;
       border: 1px solid #ccc;
       font-size: 14px;
@@ -64,9 +69,13 @@
     position: relative;
     top: -34px;
     left: 71.3%;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
     box-shadow: none;
 
     &:hover, &:active {
+      -webkit-box-shadow: none;
+      -moz-box-shadow: none;
       box-shadow: none;
     }
   }

@@ -41,6 +41,9 @@ a {
     position: relative;
     float: left;
     width: $toolWidth;
+    -webkit-transition: background-color .2s linear;
+    -moz-transition: background-color .2s linear;
+    -o-transition: background-color .2s linear;
     transition: background-color .2s linear;
 
     &:first-child {
@@ -75,10 +78,17 @@ a {
   padding: 11px 11px;
   font-size: 11px;
   font-weight: 400;
+  -webkit-box-shadow: 0px 1px 2px 0px rgba(50,50,50,.75);
+  -moz-box-shadow: 0px 1px 2px 0px rgba(50,50,50,.75);
   box-shadow: 0px 1px 2px 0px rgba(50,50,50,.75);
+  -webkit-transition: box-shadow .08s linear;
+  -moz-transition: box-shadow .08s linear;
+  -o-transition: box-shadow .08s linear;
   transition: box-shadow .08s linear;
 
   &:active {
+    -webkit-box-shadow: 0px 1px 2px 0px rgba(50,50,50,.75);
+    -moz-box-shadow: 0px 1px 2px 0px rgba(50,50,50,.75);
     box-shadow: 0px 2px 2px 0px rgba(50,50,50,.75);
   }
 }
@@ -110,11 +120,17 @@ a {
 
 .table {
   tr {
+    -webkit-transition: background-color .2s linear;
+    -moz-transition: background-color .2s linear;
+    -o-transition: background-color .2s linear;
     transition: background-color .2s linear;
     background-color: #fff;
     cursor: pointer;
 
     &:hover {
+      -webkit-transition: background-color .2s linear;
+      -moz-transition: background-color .2s linear;
+      -o-transition: background-color .2s linear;
       transition: background-color .2s linear;
       background-color: #f3f3f3;
     }

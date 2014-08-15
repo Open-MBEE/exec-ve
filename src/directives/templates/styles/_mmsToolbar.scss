@@ -20,6 +20,8 @@ mms-toolbar {
 		margin-bottom: 3px;
 		color: black;
 		background-color: $soft_grey;
+		-webkit-box-shadow: inset 7px 0 9px -7px rgba(0,0,0,0.7);
+		-moz-box-shadow: inset 7px 0 9px -7px rgba(0,0,0,0.7);
 		box-shadow: inset 7px 0 9px -7px rgba(0,0,0,0.7);
 		text-align: center;
 		vertical-align: bottom;
@@ -28,7 +30,12 @@ mms-toolbar {
 
 		&:active {
 			background-color: white;
+			-webkit-box-shadow: none;
+			-moz-box-shadow: none;
 			box-shadow: none;
+			-webkit-transition: all .2s linear;
+			-moz-transition: all .2s linear;
+			-o-transition: all .2s linear;
 			transition: all .2s linear;
 		}
 
@@ -57,11 +64,15 @@ mms-toolbar {
 
 	.selected {
 		background-color: white;
+		-webkit-box-shadow: none;
+		-moz-box-shadow: none;
 		box-shadow: none;
 	}
 
 	.dynamic {
 		background-color: white;
+		-webkit-box-shadow: none;
+		-moz-box-shadow: none;
 		box-shadow: none;
 	}
 

@@ -30,6 +30,9 @@
   color: #333;
 
   li a:hover {
+    -webkit-transition: background-color .2s linear;
+    -moz-transition: background-color .2s linear;
+    -o-transition: background-color .2s linear;
     transition: background-color .2s linear;
     background-color: #dedede;
     color: #333;
