@@ -130,15 +130,33 @@ module.exports = function(grunt) {
     sass: {
       dist : {
         files: {
-          'dist/css/mms.css': 'src/directives/templates/styles/mmsMain.scss'
+          'dist/css/partials/mms.css': 'src/directives/templates/styles/mmsMain.scss'
         }
       },
-      dist2 : {
+      docweb : {
         files: [{
           expand: true,
-          cwd: 'app/styles',
+          cwd: 'app/styles/docweb',
           src: ['*.scss', '*.css'],
-          dest: 'dist/css/',
+          dest: 'dist/css/partials',
+          ext: '.css'
+        }]
+      },
+      mm : {
+        files: [{
+          expand: true,
+          cwd: 'app/styles/mm',
+          src: ['*.scss', '*.css'],
+          dest: 'dist/css/partials',
+          ext: '.css'
+        }]
+      },
+      ve : {
+        files: [{
+          expand: true,
+          cwd: 'app/styles/ve',
+          src: ['*.scss', '*.css'],
+          dest: 'dist/css/partials',
           ext: '.css'
         }]
       }
@@ -147,14 +165,19 @@ module.exports = function(grunt) {
     cssmin: {
       minify: {
         expand: true,
-        cwd: 'dist/css',
+        cwd: 'dist/css/partials',
         src: ['*.css', '!*.min.css'],
-        dest: 'dist/css/',
+        dest: 'dist/css/partials',
         ext: '.min.css'
       },
       combine: {
         files: {
-          'dist/ve.styles.min.css': ['dist/css/mms.min.css', 'dist/css/ve.min.css'],
+          'dist/css/docweb-mms.styles.min.css':
+            ['dist/css/partials/mms.min.css', 'dist/css/partials/docwebMain.min.css'],
+          'dist/css/mm-mms.styles.min.css':
+            ['dist/css/partials/mms.min.css', 'dist/css/partials/mmMain.min.css'],
+          'dist/css/ve-mms.styles.min.css':
+            ['dist/css/partials/mms.min.css', 'dist/css/partials/veMain.min.css']
         }
       }
     },

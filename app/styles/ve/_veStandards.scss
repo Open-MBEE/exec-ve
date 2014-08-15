@@ -1,0 +1,18 @@
+/*************************
+  Standard HTML element mods that
+  implement the MMS app design guide
+*************************/
+
+a {
+  color: #4885BD;
+  text-decoration: none;
+
+  &:hover {
+    color: #366590;
+    text-decoration: underline;
+  }
+}
+
+img {
+  max-width: 100%;
+}

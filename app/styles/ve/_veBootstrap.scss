@@ -1,0 +1,117 @@
+/*************************
+  Bootstrap mods that implement the
+  MMS app design guide
+*************************/
+
+.dropdown-submenu {
+  position: relative;
+
+  > .dropdown-menu {
+    top: 0;
+    left: 100%;
+    margin-top: -6px;
+    margin-left: -1px;
+    -webkit-border-radius: 0 6px 6px 6px;
+    -moz-border-radius: 0 6px 6px 6px;
+    border-radius:0 6px 6px 6px;
+
+    &:hover > .dropdown-menu {
+      display: block;
+    }
+  }
+
+  > a:after {
+    display: block;
+    content: " ";
+    float: right;
+    width: 0;
+    height: 0;
+    border-color: transparent;
+    border-style: solid;
+    border-width: 5px 0 5px 5px;
+    border-left-color: #CCC;
+    margin-top: 5px;
+    margin-right: -10px;
+  }
+
+  &.pull-left {
+    float: none;
+
+    > .dropdown-menu {
+      left: -100%;
+      margin-left: 10px;
+      -webkit-border-radius: 6px 0 6px 6px;
+      -moz-border-radius: 6px 0 6px 6px;
+      border-radius: 6px 0 6px 6px;
+    }
+  }
+}
+
+.form-control:focus {
+  border-color: #4885BD;
+}
+
+.modal-dialog {
+  .modal-footer {
+    margin-top: 0px;
+  }
+
+  .modal-body {
+    p {
+      margin: 0;
+    }
+  }
+}
+
+.nav-pills {
+  > li:active {
+    > a {
+      background-color: #505050;
+      color: #fff;
+    }
+
+    > a:hover,
+    > a:focus {
+      background-color: #505050;
+      color: #fff;
+    }
+  }
+}
+
+.table {
+  tr {
+    -webkit-transition: background-color .2s linear;
+    -moz-transition: background-color .2s linear;
+    -o-transition: background-color .2s linear;
+    transition: background-color .2s linear;
+    background-color: #fff;
+    cursor: pointer;
+
+    &:hover {
+      -webkit-transition: background-color .2s linear;
+      -moz-transition: background-color .2s linear;
+      -o-transition: background-color .2s linear;
+      transition: background-color .2s linear;
+      background-color: #f3f3f3;
+    }
+  }
+
+  td {
+    border-top: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+  }
+}
+
+.tooltip {
+  &.bottom-left {
+    padding: 5px 0;
+    margin-top: 3px;
+
+    .tooltip-arrow {
+      top: 0;
+      left: 13px;
+      border-width: 0 5px 5px;
+      border-bottom-color: #000;
+    }
+  }
+}
