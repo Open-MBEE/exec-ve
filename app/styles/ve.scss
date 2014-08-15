@@ -24,6 +24,12 @@ img {
 
 a {
   color: #4885BD;
+  text-decoration: none;
+
+  &:hover {
+    color: #366590;
+    text-decoration: underline;
+  }
 
   &.view-tools {
     color: #333;
@@ -60,10 +66,6 @@ a {
     &.center {
       text-align: center;
     }
-  }
-
-  &:hover, &:focus {
-    text-decoration: none;
   }
 }
 

@@ -15,8 +15,17 @@
     overflow: auto;
   }
 
+  .misc-form-field {
+    top: -32px;
+    position: relative;
+  }
+
   .form-propose, .form-filter {
     margin-top: 7px;
+  }
+
+  .form-search {
+    width: 70%;
   }
 
   .form-search, .form-propose {
@@ -34,10 +43,11 @@
       font-weight: 400;
       padding: 6px 12px;
 
-      &.btn-success {
+      &.btn-default {
         border: 1px solid #4885bd;
         background-color: #4885bd;
         margin-left: 0;
+        color: #fff;
       }
     }
 
@@ -46,8 +56,28 @@
     }
   }
 
+  .show-orig-table-btn {
+    font-weight: 400;
+    padding: 10px 12px 9px 12px;
+    background-color: #4B86BB;
+    color: #fff;
+    position: relative;
+    top: -34px;
+    left: 71.3%;
+    box-shadow: none;
+
+    &:hover, &:active {
+      box-shadow: none;
+    }
+  }
+
   .clickable:hover {
     cursor: pointer;
     background-color: #ecf3f8;
+  }
+
+  .transclude-table {
+    position: relative;
+    top: -30px
   }
 }
