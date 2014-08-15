@@ -1,52 +1,74 @@
-<div class="container-fluid">
+<div class="docweb-container-config-view container-fluid">
   <div class="col-xs-12">
-<div><h4>{{config.name}} - {{config.modified | date:'medium'}}</h4></div>
+<div><h1>{{config.name}} - {{config.modified | date:'medium'}}</h1></div>
 <div>{{config.description}}</div>
-<h5>Documents</h5>
+<h2>Documents</h2>
   <div ng-repeat="snapshot in configSnapshots | orderBy:'sysmlname'">
       <a href="ve.html#/sites/{{site}}/products/{{snapshot.sysmlid}}/{{snapshot.created}}">{{snapshot.sysmlname}} - {{snapshot.created | date:'medium'}}</a>
   </div>
   <br/>
-  <button ng-show="toggles.hideChangeForm" class="btn btn-primary btn-sm" ng-click="toggleChangeForm()">Change Name or Description</button>
-  <button ng-show="toggles.hideAddRemoveForm" class="btn btn-primary btn-sm" ng-click="toggleAddRemoveForm()">Add or Remove Snapshots</button>
+  <button ng-show="toggles.hideChangeForm" class="btn btn-primary" ng-click="toggleChangeForm()">TOGGLE NAME &amp; DESCRIPTION CHANGER</button>
+  <button ng-show="toggles.hideAddRemoveForm" class="btn btn-primary" ng-click="toggleAddRemoveForm()">TOGGLE SNAPSHOT ADDER &amp; REMOVER</button>
   <hr/>
   <div ng-hide="toggles.hideChangeForm">
-    <h4>Change Name or Description</h4>
+    <h2>NAME &amp; DESCRIPTION CHANGER</h2>
     <h5>Name:</h5> <input class="form-control" type="text" ng-model="configForEdit.name"/>
     <h5>Description:</h5> <textarea class="form-control" ng-model="configForEdit.description"></textarea>
     <br/>
-    <div><button class="btn btn-primary btn-sm" ng-click="change()">Change</button>
-      <button class="btn btn-primary btn-sm" ng-click="toggleChangeForm()">Cancel</button>
+    <div><button class="btn btn-primary" ng-click="change()">CHANGE</button>
+      <button class="btn btn-danger" ng-click="toggleChangeForm()">CANCEL</button>
     </div>
     <hr/>
   </div>
-  <div ng-hide="toggles.hideAddRemoveForm"><h4>Add or Remove Snapshots</h4>
+  <div ng-hide="toggles.hideAddRemoveForm"><h2>SNAPSHOT ADDER &amp; REMOVER</h2>
     <div ng-controller="TagAddRemoveCtrl">
       <div class="row">
-        <div class="col-xs-6">
+
+        <div class="col-xs-4">
           
+              <h3>Select Snapshots</h3>
+
               <div ng-repeat="doc in products | orderBy:'name'" ng-controller="TagAddRemoveDocCtrl">
-              <a href="" ng-click="toggleShowSnapshots()"><h6><span ng-hide="showSnapshots">></span><span ng-show="showSnapshots">v</span> {{doc.name}}</h6></a>
+
+                <a class="toggle-show-snapshots" ng-click="toggleShowSnapshots()">
+                  <span ng-hide="showSnapshots">
+                    <i class="fa fa-caret-right"></i>
+                  </span>
+                  <span ng-show="showSnapshots">
+                    <i class="fa fa-caret-down"></i>
+                  </span> {{doc.name}}
+                </a>
+
               <div ng-show="showSnapshots">
+
                 <div ng-repeat="snapshot in productSnapshots | orderBy:'-created'">
                   <input type="checkbox" ng-model="snapshot.selected" ng-change="toggleCheck(snapshot.id)"/> <a href="ve.html#/sites/{{site}}/products/{{doc.sysmlid}}/{{snapshot.created}}">{{snapshot.created | date:'medium'}}</a>
                 </div>
+
               </div>
+
             </div>
+
             <br/>
-            <div><button class="btn btn-primary btn-sm" ng-click="update()">Update</button>
-              <button class="btn btn-primary btn-sm" ng-click="toggleAddRemoveForm()">Cancel</button>
+
+            <div>
+              <button class="btn btn-primary" ng-click="update()">UPDATE CONFIGURATION</button>
+              <button class="btn btn-danger" ng-click="toggleAddRemoveForm()">CANCEL</button>
             </div>
-      
+
         </div>
-        <div class="col-xs-6">
-          <h6>Selected:</h6>
+
+        <div ng-show="selectedSnapshots.length" class="col-xs-8">
+          <h3>Snapshots Selected</h3>
           <div ng-repeat="id in selectedSnapshots">
             {{snapshotMap[id].sysmlname}} - {{snapshotMap[id].created | date:'medium'}}
           </div>
         </div>
+
       </div>
+
       <hr/>
+
     </div>
   </div>
 </div>

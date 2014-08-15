@@ -74,7 +74,7 @@ a {
   border-radius: 3px;
   padding: 11px 11px;
   font-size: 11px;
-  font-weight: 500;
+  font-weight: 400;
   box-shadow: 0px 1px 2px 0px rgba(50,50,50,.75);
   transition: box-shadow .08s linear;
 
@@ -91,9 +91,9 @@ a {
 }
 
 .btn-success {
-  background-color: #4885bd;
+  background-color: #9bbe81;
   &:hover, &:active, &:focus {
-    background-color: #4885bd;
+    background-color: #9bbe81;
   }
 }
 
@@ -108,27 +108,47 @@ a {
   outline: none;
 }
 
-.sidebar-right {
-  .snapshot-table {
-    margin-top: 24px;
+.table {
+  tr {
+    transition: background-color .2s linear;
+    background-color: #fff;
+    cursor: pointer;
 
-    tr:hover {
+    &:hover {
       transition: background-color .2s linear;
       background-color: #f3f3f3;
     }
-
-    tbody:last-child {
-      border-bottom: 1px solid #dedede; 
-    }
   }
 
-  .snapshot-btn-group {
-    margin-top: 24px;
-    margin-bottom: 20px;
+  td {
+    border-top: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+  }
+}
 
-    .create-new-snapshot-btn {
-      background-color: #9BBE81;
-      margin-right: 4px;
+.sidebar-right {
+  .container-snapshots { 
+    h1 {
+      font-family: HelveticaNeue-Light,"Helvetica Neue Light","Helvetica Neue",Helvetica,Arial,sans-serif;
+      font-weight: 200;
+      font-size: 35px;
+      margin-top: 24px;
+      margin-bottom: 32px;
+      height: inherit;
+    }
+
+    .snapshot-table {
+      margin-top: 24px;
+    }
+
+    .snapshot-btn-group {
+      margin-top: 24px;
+      margin-bottom: 20px;
+
+      .create-new-snapshot-btn {
+        background-color: #9BBE81;
+        margin-right: 4px;
+      }
     }
   }
 }
@@ -162,7 +182,7 @@ a {
   .input-filter-tree {
     width: 90%;
     margin-left: 14px;
-    height: 28px;
+    height: 33px;
     border-radius: 2px;
     margin-bottom: 6px;
   }
@@ -196,15 +216,69 @@ a {
   }
 }
 
-.west-tabs .nav-tabs li {
-  text-align: center;
+.docweb-sidebar-left {
+  .nav-tabs li {
+    text-align: center;
+
+    a {
+      cursor: pointer;
+      color: #333;
+      border-radius: 0;
+    }
+  }
+
+  .docweb-table-config {
+    tr {
+      &:first-child > td {
+        width: 100%;
+      }
+    }
+  }
+
+  .btn-create-config {
+    width: 100%;
+    padding: 16px;
+    margin-top: -8px;
+    margin-bottom: 33px;
+  }
 }
 
-.west-tabs .table tbody tr:first-child td:first-child {
-  border-top: 0;
+.docweb-container-latest,
+.docweb-container-config-view,
+.docweb-container-config,
+.docweb-dcontainer-new {
+  h1 {
+    font-family: HelveticaNeue-Light,"Helvetica Neue Light","Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-weight: 200;
+    font-size: 35px;
+    margin-top: 24px;
+    margin-bottom: 32px;
+    height: inherit;
+  }
+
+  h2 {
+    font-weight: 200;
+    font-size: 24px;
+  }
+
+  h3 {
+    font-weight: 200;
+    font-size: 18px;
+  }
 }
 
-.west-tabs .nav-tabs li a,
+.docweb-container-config-view {
+  .toggle-show-snapshots {
+    cursor: pointer;
+    color: #333;
+
+    &:hover {
+      text-decoration: none;
+      color: #333;
+    }
+  } 
+}
+
 .center-view .nav-tabs li a {
   cursor: pointer;
   color: #333;
