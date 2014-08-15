@@ -1,11 +1,18 @@
 .transclude-modal {
-  .modal-input {
+  .transclude-modal-instructions {
+    margin-top: -6px;
+  }
+
+  .transclude-modal-input {
     width: 60%;
     margin: 0 auto;
   }
 
   .transclude-table {
     padding: 20px;
+    max-height: 400px;
+    max-width: 98%;
+    overflow: auto;
   }
 
   .form-propose, .form-filter {
@@ -37,5 +44,10 @@
     .btn-text {
       font-size: 11px;
     }
+  }
+
+  .clickable:hover {
+    cursor: pointer;
+    background-color: #ecf3f8;
   }
 }

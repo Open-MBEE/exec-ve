@@ -1,11 +1,26 @@
-<div class="modal-header"><h4>Add Comment</h4></div>
-<div class="modal-body transclude-modal">
-    <div>Title: <input ng-model="comment.name" type="text"></input>
-    </div>
-    <div>Comment: <textarea ng-model="comment.documentation"></textarea>
-    </div>
+<div class="modal-header">
+  <h4>INSERT A COMMENT</h4>
 </div>
+
+<div class="modal-body comment-modal">
+  
+  <div class="comment-modal-input">
+
+    <div class="form-group">
+      <label>Title</label>
+      <input class="form-control" ng-model="comment.name" type="text" placeholder="Enter your comment's title here"></input>
+    </div>
+
+    <div class="form-group">
+      <label>Comment</label>
+      <textarea class="form-control" rows="3" ng-model="comment.documentation" placeholder="Enter your comment here"></textarea>
+    </div>
+
+  </div>
+
+</div>
+
 <div class="modal-footer">
-    <button class="btn btn-sm btn-primary" ng-click="ok(comment)">OK</button>
-    <button class="btn btn-sm btn-primary" ng-click="cancel()">Cancel</button>
+    <button class="btn btn-danger" ng-click="cancel()">CANCEL</button>
+    <button class="btn btn-success" ng-click="ok(comment)">SUBMIT</button>
 </div>

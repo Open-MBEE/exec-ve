@@ -78,13 +78,19 @@ a {
   transition: box-shadow .08s linear;
 
   &:active {
-    box-shadow: 0px 2px 2px 1px rgba(50,50,50,.75);
+    box-shadow: 0px 2px 2px 0px rgba(50,50,50,.75);
   }
 }
 
 .btn-primary {
   background-color: #4885bd;
+  &:hover, &:active, &:focus {
+    background-color: #4885bd;
+  }
+}
 
+.btn-success {
+  background-color: #4885bd;
   &:hover, &:active, &:focus {
     background-color: #4885bd;
   }

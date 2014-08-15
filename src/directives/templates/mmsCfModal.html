@@ -1,10 +1,16 @@
 <div class="modal-header">
+
     <h4>INSERT A CROSS REFERENCE</h4>
+
+    <div class="transclude-modal-instructions">
+        Search for an element and click on a cell in the table to insert a cross reference.
+    </div>
+
 </div>
 
 <div class="modal-body transclude-modal">
 
-    <div class="modal-input">
+    <div class="transclude-modal-input">
 
         <form ng-submit="search(searchText)">
             <div class="form-search input-group">
@@ -70,5 +76,5 @@
 <div class="modal-footer">
     <span class="input-group-btn">
         
-    </span><button class="btn btn-sm btn-danger" ng-click="cancel()">CANCEL</button>
+    </span><button class="btn btn-danger" ng-click="cancel()">CANCEL</button>
 </div>
