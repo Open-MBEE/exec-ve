@@ -36,16 +36,57 @@ function($scope, $rootScope, $http, $state, $stateParams, growl, WorkspaceServic
         var stageChange = function (branch) {
           branch.status = "undo";
           branch.merge_status = ! branch.merge_status;
+
+          branch.property_status.name = "undo";
+          branch.property_status.owner = "undo";
+          branch.property_status.documentation = "undo";
+
+          branch.property_merge_status.name = ! branch.property_merge_status.name;
+          branch.property_merge_status.owner = ! branch.property_merge_status.owner;
+          branch.property_merge_status.documentation = ! branch.property_merge_status.documentation;
+
         };
 
         var undoChange = function(branch) {
           branch.status = branch.change_type;
           branch.merge_status = ! branch.merge_status;
+
+          branch.property_status.name = branch.property_status_type.name;
+          branch.property_status.owner = branch.property_status_type.owner;
+          branch.property_status.documentation = branch.property_status_type.documentation;
+
+          branch.property_merge_status.name = ! branch.property_merge_status.name;
+          branch.property_merge_status.owner = ! branch.property_merge_status.owner;
+          branch.property_merge_status.documentation = ! branch.property_merge_status.documentation;
+
+        };
+
+        var registerPropertyChange = function (branch, property) {
+          if (branch.property_status[property] === branch.property_status_type[property])
+            branch.property_status[property] = "undo";
+          else
+            branch.property_status[property] = branch.property_status_type[property];
+
+          branch.property_merge_status[property] = ! branch.property_merge_status[property];
+        };
+
+        var stagePropertyChange = function (branch, property) {
+          branch.property_status[property] = "undo";
+
+          branch.property_merge_status[property] = ! branch.property_merge_status[property];
+        };
+
+        var undoPropertyChange = function (branch, property) {
+          branch.property_status[property] = branch.property_status_type[property];
+
+          branch.property_merge_status[property] = ! branch.property_merge_status[property];
         };
 
         var id2node = {};
 
         $scope.id2node = id2node;
+
+        $scope.registerPropertyChange = registerPropertyChange;
         
         $scope.treeData = [];
         
@@ -61,10 +102,10 @@ function($scope, $rootScope, $http, $state, $stateParams, growl, WorkspaceServic
             'Connector': 'fa fa-expand'
           },
           statuses: {
-            'moved': { style: "'update'", button: 'update' },
-            'added': { style: "'addition'", button: 'add' },
-            'removed': { style: "'removal'", button: 'remove' },
-            'updated': { style: "'update'", button: 'update' },
+            'moved': { style: "update", button: 'update' },
+            'added': { style: "addition", button: 'add' },
+            'removed': { style: "removal", button: 'remove' },
+            'updated': { style: "update", button: 'update' },
             'conflict': "",
             'resolve': "",
             'undo': { style: "'undo'", button: 'undo' }
@@ -98,11 +139,23 @@ function($scope, $rootScope, $http, $state, $stateParams, growl, WorkspaceServic
           node.children = [];
 
           node.status = "clean";
+          node.merge_status = false;
 
           node.property_status = {};
           node.property_status.name = "clean";
           node.property_status.owner = "clean";
           node.property_status.documentation = "clean";
+
+          node.property_status_type = {};
+          node.property_status_type.name = "clean";
+          node.property_status_type.owner = "clean";
+          node.property_status_type.documentation = "clean";
+
+          node.property_conflict_status = {};
+          node.property_conflict_status.name = false;
+          node.property_conflict_status.owner = false;
+          node.property_conflict_status.documentation = false;
+
           node.property_merge_status = {};
           node.property_merge_status.name = false;
           node.property_merge_status.owner = false;
@@ -135,11 +188,23 @@ function($scope, $rootScope, $http, $state, $stateParams, growl, WorkspaceServic
 
           node.change_type = "added";
           node.status = "added";
+          node.merge_status = false;
 
           node.property_status = {};
           node.property_status.name = "added";
           node.property_status.owner = "added";
           node.property_status.documentation = "added";
+
+          node.property_status_type = {};
+          node.property_status_type.name = "added";
+          node.property_status_type.owner = "added";
+          node.property_status_type.documentation = "added";
+
+          node.property_conflict_status = {};
+          node.property_conflict_status.name = true;
+          node.property_conflict_status.owner = true;
+          node.property_conflict_status.documentation = true;
+
           node.property_merge_status = {};
           node.property_merge_status.name = false;
           node.property_merge_status.owner = false;
@@ -154,18 +219,36 @@ function($scope, $rootScope, $http, $state, $stateParams, growl, WorkspaceServic
           id2node[e.sysmlid].property_status.owner = "removed";
           id2node[e.sysmlid].property_status.documentation = "removed";
 
+          id2node[e.sysmlid].property_status_type = {};
+          id2node[e.sysmlid].property_status_type.name = "removed";
+          id2node[e.sysmlid].property_status_type.owner = "removed";
+          id2node[e.sysmlid].property_status_type.documentation = "removed";
+
+          id2node[e.sysmlid].property_conflict_status.name = true;
+          id2node[e.sysmlid].property_conflict_status.owner = true;
+          id2node[e.sysmlid].property_conflict_status.documentation = true;
+
         });
 
         ws2.updatedElements.forEach(function(e) {
           id2node[e.sysmlid].change_type = "updated";
           id2node[e.sysmlid].status = "updated";
 
-          if (e.hasOwnProperty('name'))
+          if (e.hasOwnProperty('name')) {
             id2node[e.sysmlid].property_status.name = "updated";
-          if (e.hasOwnProperty('owner'))
+            id2node[e.sysmlid].property_status_type.name = "updated";
+            id2node[e.sysmlid].property_conflict_status.name = true;
+          }
+          if (e.hasOwnProperty('owner')) {
             id2node[e.sysmlid].property_status.owner = "updated";
-          if (e.hasOwnProperty('documentation'))
-            id2node[e.sysmlid].property_status.documentation = "updated";          
+            id2node[e.sysmlid].property_status_type.owner = "updated";
+            id2node[e.sysmlid].property_conflict_status.owner = true;
+          }
+          if (e.hasOwnProperty('documentation')) {
+            id2node[e.sysmlid].property_status.documentation = "updated";
+            id2node[e.sysmlid].property_status_type.documentation = "updated";
+            id2node[e.sysmlid].property_conflict_status.documentation = true;
+          }          
 
         });
 
@@ -173,12 +256,21 @@ function($scope, $rootScope, $http, $state, $stateParams, growl, WorkspaceServic
           id2node[e.sysmlid].change_type = "moved";
           id2node[e.sysmlid].status = "moved";
 
-          if (e.hasOwnProperty('name'))
+          if (e.hasOwnProperty('name')) {
             id2node[e.sysmlid].property_status.name = "moved";
-          if (e.hasOwnProperty('owner'))
-          id2node[e.sysmlid].property_status.owner = "moved";
-          if (e.hasOwnProperty('documentation'))
-          id2node[e.sysmlid].property_status.documentation = "moved";
+            id2node[e.sysmlid].property_status_type.name = "moved";
+            id2node[e.sysmlid].property_conflict_status.name = true;
+          }
+          if (e.hasOwnProperty('owner')) {
+            id2node[e.sysmlid].property_status.owner = "moved";
+            id2node[e.sysmlid].property_status_type.owner = "moved";
+            id2node[e.sysmlid].property_conflict_status.owner = true;
+          }
+          if (e.hasOwnProperty('documentation')) {
+            id2node[e.sysmlid].property_status.documentation = "moved";
+            id2node[e.sysmlid].property_status_type.documentation = "moved";
+            id2node[e.sysmlid].property_conflict_status.documentation = true;
+          }  
         });
       };
 }])

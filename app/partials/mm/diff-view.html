@@ -7,26 +7,45 @@
       <th></th>
       <th>Theirs</th>
       <th>Mine</th>
+      <th></th>
     </tr>
   </thead>
 
   <tbody>
-    <tr ng-class="{{options.statuses[originalNode.property_status.name].style}}">
+    <tr class="{{options.statuses[originalNode.property_status.name].style}}">
       <td>Name</td>
       <td>{{original.name}}</td>
       <td>{{delta.name}}</td>
+      <td>
+        <span ng-show="originalNode.property_conflict_status.name">
+            <button class="{{options.buttons[options.statuses[originalNode.property_status.name].button].style}}" 
+                    ng-click="registerPropertyChange(originalNode,'name');">{{options.statuses[originalNode.property_status.name].button}}</button>
+        </span>
+      </td>
     </tr>
 
-    <tr ng-class="{{options.statuses[originalNode.property_status.owner].style}}">
+    <tr class="{{options.statuses[originalNode.property_status.owner].style}}">
       <td>Owner</td>
       <td>{{original.owner}}</td>
       <td>{{delta.owner}}</td>
+      <td>
+        <span ng-show="originalNode.property_conflict_status.owner">
+            <button class="{{options.buttons[options.statuses[originalNode.property_status.owner].button].style}}" 
+                    ng-click="registerPropertyChange(originalNode,'owner');">{{options.statuses[originalNode.property_status.owner].button}}</button>
+        </span>
+      </td>
     </tr>
 
-    <tr ng-class="{{options.statuses[originalNode.property_status.documentation].style}}">
+    <tr class="{{options.statuses[originalNode.property_status.documentation].style}}">
       <td>Documentation</td>
       <td>{{original.documentation}}</td>
       <td>{{delta.documentation}}</td>
+      <td>
+        <span ng-show="originalNode.property_conflict_status.documentation">
+            <button class="{{options.buttons[options.statuses[originalNode.property_status.documentation].button].style}}" 
+                    ng-click="registerPropertyChange(originalNode,'documentation');">{{options.statuses[originalNode.property_status.documentation].button}}</button>
+        </span> 
+      </td>
     </tr>
   </tbody>
 
