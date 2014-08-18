@@ -1,0 +1,30 @@
+/*************************
+  Styles for the DocWeb left pane
+*************************/
+
+.docweb-sidebar-left {
+  .nav-tabs li {
+    text-align: center;
+
+    a {
+      cursor: pointer;
+      color: #333;
+      border-radius: 0;
+    }
+  }
+
+  .docweb-table-config {
+    tr {
+      &:first-child > td {
+        width: 100%;
+      }
+    }
+  }
+
+  .btn-create-config {
+    width: 100%;
+    padding: 16px;
+    margin-top: -8px;
+    margin-bottom: 33px;
+  }
+}

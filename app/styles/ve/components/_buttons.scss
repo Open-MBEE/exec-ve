@@ -51,3 +51,43 @@
     background-color: #d2322d;
   }
 }
+
+a.view-tools {
+  color: #333;
+  font-size: 16px;
+  line-height: $toolHeight;
+  border-left: 1px solid #dedede;
+  border-right: 1px solid #dedede;
+  margin-left: -2px;
+  position: relative;
+  float: left;
+  width: $toolWidth;
+  -webkit-transition: background-color .2s linear;
+  -moz-transition: background-color .2s linear;
+  -o-transition: background-color .2s linear;
+  transition: background-color .2s linear;
+
+  &:first-child {
+    margin-left: none;
+    border-left: 1px solid #dedede !important;
+  }
+
+  &:last-child {
+    border-right: 1px solid #dedede !important;
+  }
+
+  &:nth-child(even) {
+    border: 0;
+  }
+
+  &:hover {
+    background-color: #dedede;
+    cursor: pointer;
+    color: #333;
+    z-index: 100;
+  }
+
+  &.center {
+    text-align: center;
+  }
+}

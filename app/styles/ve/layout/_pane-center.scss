@@ -8,20 +8,25 @@
     padding-top: 9px;
     padding-right: 0;
   }
-  
-  .center-view .nav-tabs li a {
-    cursor: pointer;
-    color: #333;
-    border-radius: 0;
-  }
 
-  .center-view .nav-tabs li.active a {
-    border-bottom-color: transparent;
-  }
+  .center-view {
+    right: 41px !important;
 
-  .center-view ul.nav-tabs {
-    min-width: $tabWidth;
-    background-color: #dedede;
+    .nav-tabs {
+      min-width: $tabWidth;
+      background-color: #dedede;
+    }
+    
+    .nav-tabs li a {
+      cursor: pointer;
+      color: #333;
+      border-radius: 0;
+      height: 35px;
+    }
+
+    .nav-tabs li.active a {
+      border-bottom-color: transparent;
+    }
   }
 }
 
