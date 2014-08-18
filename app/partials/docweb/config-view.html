@@ -7,8 +7,8 @@
       <a href="ve.html#/sites/{{site}}/products/{{snapshot.sysmlid}}/{{snapshot.created}}">{{snapshot.sysmlname}} - {{snapshot.created | date:'medium'}}</a>
   </div>
   <br/>
-  <button ng-show="toggles.hideChangeForm" class="btn btn-primary" ng-click="toggleChangeForm()">TOGGLE NAME &amp; DESCRIPTION CHANGER</button>
-  <button ng-show="toggles.hideAddRemoveForm" class="btn btn-primary" ng-click="toggleAddRemoveForm()">TOGGLE SNAPSHOT ADDER &amp; REMOVER</button>
+  <button ng-show="toggles.hideChangeForm" class="btn btn-primary" ng-click="toggleChangeForm()">NAME &amp; DESCRIPTION CHANGER</button>
+  <button ng-show="toggles.hideAddRemoveForm" class="btn btn-primary" ng-click="toggleAddRemoveForm()">SNAPSHOT ADDER &amp; REMOVER</button>
   <hr/>
   <div ng-hide="toggles.hideChangeForm">
     <h2>NAME &amp; DESCRIPTION CHANGER</h2>
@@ -52,7 +52,7 @@
             <br/>
 
             <div>
-              <button class="btn btn-primary" ng-click="update()">UPDATE CONFIGURATION</button>
+              <button class="btn btn-primary" ng-click="update()">UPDATE TAG</button>
               <button class="btn btn-danger" ng-click="toggleAddRemoveForm()">CANCEL</button>
             </div>
 
