@@ -136,23 +136,19 @@ function mmsRedactor(ElementService, ViewService, $modal, $templateCache, $windo
 
         function read(html) {
             var cleanhtml = html.replace(new RegExp('<mms-transclude-[^>]+></mms-transclude-[^>]+>', 'g'), '');
-            cleanhtml = cleanhtml.replace('<br>', '');
+            cleanhtml = cleanhtml.replace(new RegExp('<br>', 'g'), '');
             if (ngModelCtrl.$viewValue !== cleanhtml)
                 ngModelCtrl.$setViewValue(cleanhtml);
 
-            element.redactor('selectionSave');
+            //element.redactor('selectionSave');
             var editor = element.redactor('getEditor');
             var editorHtml = editor.html();
             var cleanEditorHtml = editorHtml.replace(new RegExp('<mms-transclude-[^>]+></mms-transclude-[^>]+>', 'g'), '');
-            cleanEditorHtml = cleanEditorHtml.replace('<br>', '');
+            //cleanEditorHtml = cleanEditorHtml.replace('<br>', '');
             if (editorHtml !== cleanEditorHtml) {
                 editor.html(cleanEditorHtml);
             }
-            //element.redactor('sync');
-            element.redactor('selectionRestore');
-            //element.redactor('set', cleanhtml);
-            //ngModelCtrl.$render();
-            //scope.$apply();
+            //element.redactor('selectionRestore');
         }
 
         element.html(ngModelCtrl.$viewValue);

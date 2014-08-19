@@ -1,7 +1,7 @@
 <div ng-show="editing">
     <h1><input class="form-control" type="text" ng-model="edit.name"></input></h1>
 
-    <h2>TYPE</h2>
+    <h2>METATYPE</h2>
     <h3>{{element.specialization.type || 'Element'}}</h3>
     <h2>QUALIFIED NAME</h2>
     <h3>{{element.qualifiedName}}</h3>
@@ -36,7 +36,7 @@
 <div ng-hide="editing">
     <h1>{{element.name}}</h1>
 
-    <h2>TYPE</h2>
+    <h2>METATYPE</h2>
     <h3>{{element.specialization.type || 'Element'}}</h3>
     <h2>QUALIFIED NAME</h2>
     <h3>{{element.qualifiedName}}</h3>

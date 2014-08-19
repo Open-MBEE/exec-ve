@@ -307,7 +307,11 @@ function($scope, $rootScope, $stateParams, viewElements, ViewService, time, grow
         },
         {
             action: function() {
-                $rootScope.veTreeApi.select_prev_branch($rootScope.veTreeApi.get_selected_branch());
+                var prev = $rootScope.veTreeApi.get_prev_branch($rootScope.veTreeApi.get_selected_branch());
+                if (!prev)
+                    return;
+                $scope.buttons[2].icon = "fa-spinner fa-spin";
+                $rootScope.veTreeApi.select_branch(prev);
             },
             tooltip: "Previous",
             icon: "fa-chevron-left",
@@ -315,7 +319,11 @@ function($scope, $rootScope, $stateParams, viewElements, ViewService, time, grow
         },
         {
             action: function() {
-                $rootScope.veTreeApi.select_next_branch($rootScope.veTreeApi.get_selected_branch());
+                var next = $rootScope.veTreeApi.get_next_branch($rootScope.veTreeApi.get_selected_branch());
+                if (!next)
+                    return;
+                $scope.buttons[3].icon = "fa-spinner fa-spin";
+                $rootScope.veTreeApi.select_branch(next);
             },
             tooltip: "Next",
             icon: "fa-chevron-right",
