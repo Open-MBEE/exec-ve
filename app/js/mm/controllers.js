@@ -33,32 +33,18 @@ function($scope, $rootScope, $http, $state, $stateParams, growl, WorkspaceServic
        */
       var setupModelTree = function(ws1, ws2) {
 
-        var stageChange = function (branch) {
-          branch.status = "undo";
+        var registerChange = function(branch) {
+
+          if (branch.status === branch.change_type)
+            branch.status = "undo";
+          else
+            branch.status = branch.change_type;
+
           branch.merge_status = ! branch.merge_status;
 
-          branch.property_status.name = "undo";
-          branch.property_status.owner = "undo";
-          branch.property_status.documentation = "undo";
-
-          branch.property_merge_status.name = ! branch.property_merge_status.name;
-          branch.property_merge_status.owner = ! branch.property_merge_status.owner;
-          branch.property_merge_status.documentation = ! branch.property_merge_status.documentation;
-
-        };
-
-        var undoChange = function(branch) {
-          branch.status = branch.change_type;
-          branch.merge_status = ! branch.merge_status;
-
-          branch.property_status.name = branch.property_status_type.name;
-          branch.property_status.owner = branch.property_status_type.owner;
-          branch.property_status.documentation = branch.property_status_type.documentation;
-
-          branch.property_merge_status.name = ! branch.property_merge_status.name;
-          branch.property_merge_status.owner = ! branch.property_merge_status.owner;
-          branch.property_merge_status.documentation = ! branch.property_merge_status.documentation;
-
+          registerPropertyChange(branch, "name");
+          registerPropertyChange(branch, "owner");
+          registerPropertyChange(branch, "documentation");
         };
 
         var registerPropertyChange = function (branch, property) {
@@ -70,16 +56,33 @@ function($scope, $rootScope, $http, $state, $stateParams, growl, WorkspaceServic
           branch.property_merge_status[property] = ! branch.property_merge_status[property];
         };
 
-        var stagePropertyChange = function (branch, property) {
-          branch.property_status[property] = "undo";
+        var setBranchState = function (branch, state, status_type, conflict_status, merge_status) {
+          branch.status = state;
+          branch.change_type = status_type;
+          branch.merge_status = false;
 
-          branch.property_merge_status[property] = ! branch.property_merge_status[property];
+          if (! branch.property_status)
+            branch.property_status = {};
+
+          if (! branch.property_status_type)
+            branch.property_status_type = {};
+
+          if (! branch.property_conflict_status)
+            branch.property_conflict_status = {};
+
+          if (! branch.property_merge_status)
+            branch.property_merge_status = {};
+
+          setPropertyState(branch, "name", state, status_type, conflict_status, merge_status);
+          setPropertyState(branch, "owner", state, status_type, conflict_status, merge_status);
+          setPropertyState(branch, "documentation", state, status_type, conflict_status, merge_status);
         };
 
-        var undoPropertyChange = function (branch, property) {
-          branch.property_status[property] = branch.property_status_type[property];
-
-          branch.property_merge_status[property] = ! branch.property_merge_status[property];
+        var setPropertyState = function (branch, property, state, status_type, conflict_status, merge_status) {
+            branch.property_status[property] = state;
+            branch.property_status_type[property]  = status_type;
+            branch.property_conflict_status[property]  = conflict_status;
+            branch.property_merge_status[property]  = merge_status;
         };
 
         var id2node = {};
@@ -87,8 +90,6 @@ function($scope, $rootScope, $http, $state, $stateParams, growl, WorkspaceServic
         $scope.id2node = id2node;
 
         $scope.registerPropertyChange = registerPropertyChange;
-        
-        $scope.treeData = [];
         
         $scope.options = {
           types: {
@@ -108,24 +109,24 @@ function($scope, $rootScope, $http, $state, $stateParams, growl, WorkspaceServic
             'updated': { style: "update", button: 'update' },
             'conflict': "",
             'resolve': "",
-            'undo': { style: "'undo'", button: 'undo' }
+            'undo': { style: "undo", button: 'undo' }
           },
           buttons: {
             "update": {
               style: "btn btn-primary btn-xs",
-              action: function(branch) { stageChange(branch); } 
+              action: function(branch) { registerChange(branch); } 
             },
             "remove": {
               style: "btn btn-danger btn-xs",
-              action: function(branch) { stageChange(branch); } 
+              action: function(branch) { registerChange(branch); } 
             },
             "add": {
               style: "btn btn-success btn-xs",
-              action: function(branch) { stageChange(branch); } 
+              action: function(branch) { registerChange(branch); } 
             },
             "undo": {
               style: "btn btn-danger btn-xs",
-              action: function(branch) { undoChange(branch); } 
+              action: function(branch) { registerChange(branch); } 
             }
           }
         };
@@ -138,28 +139,7 @@ function($scope, $rootScope, $http, $state, $stateParams, growl, WorkspaceServic
           node.type = e.specialization.type;
           node.children = [];
 
-          node.status = "clean";
-          node.merge_status = false;
-
-          node.property_status = {};
-          node.property_status.name = "clean";
-          node.property_status.owner = "clean";
-          node.property_status.documentation = "clean";
-
-          node.property_status_type = {};
-          node.property_status_type.name = "clean";
-          node.property_status_type.owner = "clean";
-          node.property_status_type.documentation = "clean";
-
-          node.property_conflict_status = {};
-          node.property_conflict_status.name = false;
-          node.property_conflict_status.owner = false;
-          node.property_conflict_status.documentation = false;
-
-          node.property_merge_status = {};
-          node.property_merge_status.name = false;
-          node.property_merge_status.owner = false;
-          node.property_merge_status.documentation = false;
+          setBranchState(node, "clean", "clean", false, false);
 
           id2node[e.sysmlid] = node;
         });
@@ -185,92 +165,48 @@ function($scope, $rootScope, $http, $state, $stateParams, growl, WorkspaceServic
           } else {
               $scope.treeData.push(id2node[e.sysmlid]);
           }
+          
+          setBranchState(node, "added", "added", true, false);
 
-          node.change_type = "added";
-          node.status = "added";
-          node.merge_status = false;
-
-          node.property_status = {};
-          node.property_status.name = "added";
-          node.property_status.owner = "added";
-          node.property_status.documentation = "added";
-
-          node.property_status_type = {};
-          node.property_status_type.name = "added";
-          node.property_status_type.owner = "added";
-          node.property_status_type.documentation = "added";
-
-          node.property_conflict_status = {};
-          node.property_conflict_status.name = true;
-          node.property_conflict_status.owner = true;
-          node.property_conflict_status.documentation = true;
-
-          node.property_merge_status = {};
-          node.property_merge_status.name = false;
-          node.property_merge_status.owner = false;
-          node.property_merge_status.documentation = false;
         });
 
         ws2.deletedElements.forEach(function(e) {
+          
           id2node[e.sysmlid].change_type = "removed";
           id2node[e.sysmlid].status = "removed";
 
-          id2node[e.sysmlid].property_status.name = "removed";
-          id2node[e.sysmlid].property_status.owner = "removed";
-          id2node[e.sysmlid].property_status.documentation = "removed";
-
-          id2node[e.sysmlid].property_status_type = {};
-          id2node[e.sysmlid].property_status_type.name = "removed";
-          id2node[e.sysmlid].property_status_type.owner = "removed";
-          id2node[e.sysmlid].property_status_type.documentation = "removed";
-
-          id2node[e.sysmlid].property_conflict_status.name = true;
-          id2node[e.sysmlid].property_conflict_status.owner = true;
-          id2node[e.sysmlid].property_conflict_status.documentation = true;
+          setPropertyState(id2node[e.sysmlid], "name", "removed", "removed", true, false);
+          setPropertyState(id2node[e.sysmlid], "owner", "removed", "removed", true, false);
+          setPropertyState(id2node[e.sysmlid], "documentation", "removed", "removed", true, false);
 
         });
 
         ws2.updatedElements.forEach(function(e) {
+
           id2node[e.sysmlid].change_type = "updated";
           id2node[e.sysmlid].status = "updated";
 
-          if (e.hasOwnProperty('name')) {
-            id2node[e.sysmlid].property_status.name = "updated";
-            id2node[e.sysmlid].property_status_type.name = "updated";
-            id2node[e.sysmlid].property_conflict_status.name = true;
-          }
-          if (e.hasOwnProperty('owner')) {
-            id2node[e.sysmlid].property_status.owner = "updated";
-            id2node[e.sysmlid].property_status_type.owner = "updated";
-            id2node[e.sysmlid].property_conflict_status.owner = true;
-          }
-          if (e.hasOwnProperty('documentation')) {
-            id2node[e.sysmlid].property_status.documentation = "updated";
-            id2node[e.sysmlid].property_status_type.documentation = "updated";
-            id2node[e.sysmlid].property_conflict_status.documentation = true;
-          }          
+          if (e.hasOwnProperty('name'))
+            setPropertyState(id2node[e.sysmlid], "name", "updated", "updated", true, false);
+          if (e.hasOwnProperty('owner'))
+            setPropertyState(id2node[e.sysmlid], "owner", "updated", "updated", true, false);
+          if (e.hasOwnProperty('documentation'))
+            setPropertyState(id2node[e.sysmlid], "documentation", "updated", "updated", true, false);  
 
         });
 
         ws2.movedElements.forEach(function(e) {
+
           id2node[e.sysmlid].change_type = "moved";
           id2node[e.sysmlid].status = "moved";
 
-          if (e.hasOwnProperty('name')) {
-            id2node[e.sysmlid].property_status.name = "moved";
-            id2node[e.sysmlid].property_status_type.name = "moved";
-            id2node[e.sysmlid].property_conflict_status.name = true;
-          }
-          if (e.hasOwnProperty('owner')) {
-            id2node[e.sysmlid].property_status.owner = "moved";
-            id2node[e.sysmlid].property_status_type.owner = "moved";
-            id2node[e.sysmlid].property_conflict_status.owner = true;
-          }
-          if (e.hasOwnProperty('documentation')) {
-            id2node[e.sysmlid].property_status.documentation = "moved";
-            id2node[e.sysmlid].property_status_type.documentation = "moved";
-            id2node[e.sysmlid].property_conflict_status.documentation = true;
-          }  
+          if (e.hasOwnProperty('name'))
+            setPropertyState(id2node[e.sysmlid], "name", "moved", "moved", true, false);
+          if (e.hasOwnProperty('owner'))
+            setPropertyState(id2node[e.sysmlid], "owner", "moved", "moved", true, false);
+          if (e.hasOwnProperty('documentation'))
+            setPropertyState(id2node[e.sysmlid], "documentation", "moved", "moved", true, false);
+
         });
       };
 }])
