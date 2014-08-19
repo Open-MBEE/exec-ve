@@ -255,6 +255,9 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, $q, growl, _)
             api.revertEdits = scope.revert;
             api.changeElement = scope.changeElement;
             api.hasEdits = scope.hasEdits;
+            api.getEdits = function() {
+                return scope.edit;
+            };
         }
     };
 

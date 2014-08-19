@@ -5,7 +5,7 @@ angular.module('mms')
 
 /**
  * @ngdoc service
- * @name mms.CAcheService
+ * @name mms.CacheService
  * @requires _
  * 
  * @description

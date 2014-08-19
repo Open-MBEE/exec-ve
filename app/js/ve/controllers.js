@@ -391,6 +391,9 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
         snapshots: false
     };
 
+    if (!$rootScope.veEdits)
+        $rootScope.veEdits = {};
+
     var setEditingButtonsActive = function(type, active) {
         $rootScope.veTbApi.setActive(type + 'Save', active);
         $rootScope.veTbApi.setActive(type + 'Cancel', active);
@@ -468,6 +471,9 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
         setEditingButtonsActive('view', false);
         setSnapshotButtonsActive(false);
         showPane('element');
+        var edit = $scope.specApi.getEdits();
+        if (edit)
+            $rootScope.veEdits[edit.sysmlid] = edit;
     });
     $scope.$on('viewSelected', function(event, vid, viewElements) {
         $scope.eid = vid;
@@ -499,6 +505,7 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
         $scope.specApi.save().then(function(data) {
             growl.success('Save Successful');
             $rootScope.veTbApi.setButtonIcon('elementSave', 'fa fa-save');
+            delete $rootScope.veEdits[$scope.specApi.getEdits().sysmlid];
         }, function(reason) {
             if (reason.type === 'info')
                 growl.info(reason.message);
@@ -518,6 +525,7 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
             setEditingButtonsActive('element', false);
             setEditingButtonsActive('view', false);
             setSnapshotButtonsActive(false);
+            delete $rootScope.veEdits[$scope.specApi.getEdits().sysmlid];
         };
         if ($scope.specApi.hasEdits()) {
             var instance = $modal.open({
@@ -562,5 +570,16 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
         setEditingButtonsActive('element', false);
         setEditingButtonsActive('view', false);
         setSnapshotButtonsActive(false);
+    });
+}])
+.controller('VeCtrl', ['$scope', '$location', '$rootScope', '_', '$window',
+function($scope, $location, $rootScope, _, $window) {
+    $window.addEventListener('beforeunload', function(event) {
+        if ($rootScope.veEdits && !_.isEmpty($rootScope.veEdits)) {
+            var message = 'You may have unsaved changes, are you sure you want to leave?';
+            event.returnValue = message;
+            return message;
+            //event.preventDefault();
+        }
     });
 }]);
