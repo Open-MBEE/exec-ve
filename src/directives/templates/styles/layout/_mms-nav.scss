@@ -48,6 +48,10 @@ mms-nav {
       &:focus {
         text-decoration: none;
       }
+
+      &.dropdown-toggle {
+        cursor: pointer;
+      }
     }
 
     > a {
