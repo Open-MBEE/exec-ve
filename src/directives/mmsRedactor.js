@@ -191,6 +191,24 @@ function mmsRedactor(ElementService, ViewService, $modal, $templateCache, $windo
         });
         element.redactor('buttonAwesome', 'cfixr', 'fa-external-link');
         element.redactor('buttonAwesome', 'cfixl', 'fa-external-link fa-flip-horizontal');
+        element.redactor('buttonAdd', 'addptop', 'Add Paragraph to Top', function() {
+            var editor = element.redactor('getEditor');
+            var editorHtml = editor.html();
+            editorHtml = '<p><br></p>' + editorHtml;
+            //element.redactor('set', editorHtml);
+            editor.html(editorHtml);
+            //element.redactor('sync');
+        });
+        element.redactor('buttonAdd', 'addpbottom', 'Add Paragraph to Bottom', function() {
+            var editor = element.redactor('getEditor');
+            var editorHtml = editor.html();
+            editorHtml =  editorHtml + '<p><br></p>';
+            //element.redactor('set', editorHtml);
+            editor.html(editorHtml);
+            //element.redactor('sync');
+        });
+        element.redactor('buttonAwesome', 'addptop', 'fa-sign-in fa-rotate-270');
+        element.redactor('buttonAwesome', 'addpbottom', 'fa-sign-in fa-rotate-90');
         element.redactor('buttonAdd', 'undo', 'Undo', function() {
             //element.redactor('execCommand', 'undo');
             element.redactor('bufferUndo');
