@@ -1,7 +1,8 @@
 mms-spec {
-	h1, h1 > .form-control {
-		font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, sans-serif; 
-		font-weight: 200;
+	h1,
+	h1 > .form-control {
+		font-family: $light_font_family; 
+		font-weight: $light_font_weight;
 		font-size: 35px;
     	margin-top: 24px;
 		margin-bottom: 32px;
@@ -9,16 +10,16 @@ mms-spec {
 	}
 
 	h2 {
-		font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, sans-serif; 
-		font-weight: bold;
+		font-family: $light_font_family; 
+		font-weight: $bold_font_weight;
 		font-size: 12px;
 		margin-top: 10px;
 		margin-bottom: 5px;
 	}
 
 	h3 {
-		font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, sans-serif; 
-		font-weight: 300;
+		font-family: $light_font_family; 
+		font-weight: $light_font_weight;
 		font-size: 20px;
 		margin-top: 5px;
 		margin-bottom: 5px;
@@ -26,7 +27,7 @@ mms-spec {
 	}
 
 	p.doc-text {
-		font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; 
+		font-family: $default_font_family; 
 		font-weight: auto;
 		font-size: 14px;
 		margin-right: 30px;

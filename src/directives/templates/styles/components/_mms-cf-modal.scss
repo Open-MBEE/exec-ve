@@ -36,23 +36,18 @@
 
   span.input-group-btn {
     .btn {
-      -webkit-box-shadow: none;
-      -moz-box-shadow: none;
-      box-shadow: none;
-      -webkit-transition: none;
-      -moz-transition: none;
-      -o-transition: none;
-      transition: none;
-      border: 1px solid #ccc;
+      @include box-shadow(none);
+      @include transition(none);
+      border: 1px solid $tertiary_grey;
       font-size: 14px;
-      font-weight: 400;
+      font-weight: $default_font_weight;
       padding: 6px 12px;
 
       &.btn-default {
-        border: 1px solid #4885bd;
-        background-color: #4885bd;
+        border: 1px solid $base_blue;
+        background-color: $base_blue;
         margin-left: 0;
-        color: #fff;
+        color: $white;
       }
     }
 
@@ -62,27 +57,23 @@
   }
 
   .show-orig-table-btn {
-    font-weight: 400;
+    font-weight: $default_font_weight;
     padding: 10px 12px 9px 12px;
-    background-color: #4B86BB;
-    color: #fff;
+    background-color: $base_blue;
+    color: $white;
     position: relative;
     top: -34px;
     left: 71.3%;
-    -webkit-box-shadow: none;
-    -moz-box-shadow: none;
-    box-shadow: none;
+    @include box-shadow(none);
 
     &:hover, &:active {
-      -webkit-box-shadow: none;
-      -moz-box-shadow: none;
-      box-shadow: none;
+      @include box-shadow(none);
     }
   }
 
   .clickable:hover {
     cursor: pointer;
-    background-color: #ecf3f8;
+    background-color: $light_blue;
   }
 
   .transclude-table {

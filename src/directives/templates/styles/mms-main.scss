@@ -5,7 +5,10 @@
 *************************/
 
 /* Variables & mixins */
+@import "base/_mms-mixins.scss";
 @import "base/_mms-globals.scss";
+@import "base/_mms-typography.scss";
+@import "base/_mms-colors.scss";
 
 /* Layout directive customizations */
 @import "layout/_mms-nav.scss";

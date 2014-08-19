@@ -1,58 +1,9 @@
-$max_accordion_panel_height: 300px;
-
-/************************* Utilities/buttons *************************/
-@viewport {
-  width: device-width;
-}
-
-.block {
-  position: relative;
-  margin: 0 auto;
-}
-
-a.dropdown-toggle {
-  padding-top: 20px;
-  padding-bottom: 10px;
-}
-
-ul > li > a {
-  padding-top: 20px;
-  padding-bottom: 13px;
-}
-
-.closed {
-  background-color: transparent;
-}
-
-.btn-color {
-  background-color: $monolith;
-}
-
-.btn-clear {
-  background-color: transparent;
-}
-
-.logout-btn {
-  margin-left: 1em;
-  padding-left: 0 !important;
-}
-
-.support-btn {
-  padding-left: 0 !important;
-}
-
-.nav-btn:hover, .nav-btn:focus {
-  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=100);
-  opacity: 1;
-}
-
-/************************* Navigation *************************/
 mms-nav {
   header {
     z-index: 100;
     position: relative;
     color: $white;
-    background: #333;
+    background: $black;
 
     .nav-btn {
       position: absolute;
@@ -74,28 +25,44 @@ mms-nav {
   z-index: 200;
   position: relative;
   width: 100%;
-  min-height: 40px;
   height: 40px;
-  background-color: $monolith;
+  min-height: 40px;
   border: 0;
   margin-bottom: 0;
+  background-color: $base_grey;
   color: $white;
-}
-
-.navbar {
+  
   li {
     display: block;
 
     a {
       color: $white;
-      font-weight: 200;
+      font-weight: $light_font_weight;
       line-height: 1.28571em;
       outline: none;
+
+      &:hover {
+        text-decoration: none;
+      }
+
+      &:focus {
+        text-decoration: none;
+      }
+    }
+
+    > a {
+      padding-top: 20px;
+      padding-bottom: 13px;
+    }
+
+    > .dropdown-menu {
+      @include border-radius(0px);
+      padding: 0;
     }
 
     &.nav-title-li {
       color: $white;
-      font-weight: 200;
+      font-weight: $light_font_weight;
       font-size: 16px;
       margin-left: 18px;
       margin-right: 48px;
@@ -105,7 +72,7 @@ mms-nav {
     &.nav-doc-li {
       cursor: default;
       padding-right: 10px;
-      font-weight: 500;
+      font-weight: $bold_font_weight;
     }
 
     &.is-active a {
@@ -113,7 +80,7 @@ mms-nav {
     }
 
     &.dropdown.open > a { 
-      background-color: $dark_grey;
+      background-color: $secondary_grey;
     }
   }
 
@@ -137,38 +104,37 @@ mms-nav {
       margin-bottom: 0;
     }
   }
-}
 
-.navbar {
-  .goto.dropdown ul{ 
-    width:100%;
+  .logout-btn {
+    margin-left: 1em;
+    padding-left: 0 !important;
   }
+
+  .support-btn {
+    padding-left: 0 !important;
+  }
+
+  .nav-btn {
+    &:hover,
+    &:focus {
+      filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=100);
+      opacity: 1;
+    }
+
+    i {
+      color: $white
+    }
+  }
+
+  .goto.dropdown ul { 
+    width: 100%;
+  }
+
   .block {
     position: relative;
     margin: 0 auto;
     z-index: 2;
     top: 25%;
-  }
-
-  .block-title {
-    border: 0;
-    clip: rect(0 0 0 0);
-    height: 1px;
-    margin: -1px;
-    overflow: hidden;
-    padding: 0;
-    position: absolute;
-    width: 1px;
-  }
-
-  a {
-    &:hover {
-      text-decoration: none;
-    }
-
-    &:focus {
-      text-decoration: none;
-    }
   }
 
   .dropdown-menu {
@@ -179,73 +145,61 @@ mms-nav {
 
     > li > a {
       padding: 12px;
-      background-color: $dark_grey;
+      background-color: $secondary_grey;
       color: $white;
 
       &:hover {
         padding: 12px;
-        background-color: $dark_grey;
+        background-color: $secondary_grey;
         color: $white;
       }
     }
   }
-}
 
-.navbar {
-  .panel-heading {
-    @include border-radius(0);
-  }
-
-  .panel-heading a {
-    padding-top: 12px;
-    padding-bottom: 12px;
-    padding-right: 16px;
-    display: block;
-    line-height: 1.42857143;
-    color: $white;
-    background-color: $dark_grey;
-  }
-
-  .site-level > .panel-heading a {
-    padding-top: 12px;
-    padding-bottom: 12px;
-    padding-right: 16px;
-    display: block;
-    line-height: 1.42857143;
-    color: $white;
-    background-color: $medium_grey;
-  }
-
-  .panel-group .panel {
-    @include border-radius(0);
-  }
-
-  .panel-default > .panel-heading + .panel-collapse .panel-body {
-    border-top: 0;
-  }
-}
-
-.navbar {
-  .navbar-nav > {
-    .active > a {
-      background-color: $light_grey;
-
-      &:focus {
-        background-color: $dark_grey;
-      }
-    }
-
-    .open > a {
-      background-color: $dark_grey;
-
-      &:focus {
-        background-color: $dark_grey;
-      }
-    }
-
-    > li > .dropdown-menu {
+  .category-level {
+    .panel-heading {
       @include border-radius(0);
-      padding: 0;
+
+      a {
+        padding-top: 12px;
+        padding-bottom: 12px;
+        padding-right: 16px;
+        display: block;
+        line-height: 1.42857143;
+        color: $white;
+        background-color: $secondary_grey;
+      }
+    }
+  }
+
+  .site-level {
+    .panel-heading {
+      a {
+        background-color: $dark_grey;
+      }
+    }
+
+    .panel-title > a:hover {
+      cursor: pointer;
+      text-decoration: none; 
+    }
+
+    a.dash-link,
+    a.docweb-link {
+      display: inline-block;
+      text-align: center;
+      color: $white;
+      text-decoration: none;
+      height: 100%;
+      width: 50%;
+      line-height: 40px;
+      background-color: $medium_grey;
+
+      &:hover {
+        cursor: pointer;
+        background-color: $light_grey;
+        @include transition($background_hover_transition);
+      }
     }
   }
 
@@ -253,133 +207,70 @@ mms-nav {
     padding-left: 10px;
     padding-right: 10px;
   }
-}
 
-.nav-btn i {
-  color: $white;
-}
+  accordion {
+    .panel {
+      border: 0;
+      background-color: $secondary_grey;
+      @include border-radius(0);
 
-.menu {
-  list-style: none;
-  border-bottom: 0.1em solid black;
-  margin-bottom: 2em;
-  padding: 0 0 0.5em;
-
-  &:before {
-    content: "[";
-  }
-
-  &:after {
-    content: "]";
-  }
-
-  > li {
-    display: inline;
-
-    &:before {
-      content: "|";
-      padding-right: 0.3em;
+      & > .panel-heading + .panel-collapse .panel-body {
+        border-top: 0;
+      }
     }
 
-    &:nth-child(1):before {
-      content: "";
-      padding: 0;
+    > .panel-group {
+      margin-bottom: 0;
+
+      accordion > .panel-group {
+        max-height: $max_accordion_panel_height;
+        overflow-y: auto;
+      }
     }
-  }
-}
 
-/************************* Accordion *************************/
-accordion {
-  .panel {
-    border: 0;
-    @include border-radius(0);
-  }
+    .panel-group .panel {
+      @include border-radius(0);
 
-  .panel-default {
-    background-color: $dark_grey;
-  }
-
-  > .panel-group {
-    margin-bottom: 0;
-
-    accordion > .panel-group {
-      max-height: $max_accordion_panel_height;
-      overflow-y: auto;
+      & + .panel {
+        margin-top: 0;
+      }
     }
-  }
 
-  .panel-group .panel + .panel {
-    margin-top: 0;
-  }
-
-  .panel-body,
-  .panel-heading {
-    padding: 0;
-  }
-
-  .panel-title {
-    font-size: inherit;
-    font-weight: 400;
-
-    & > a:hover {
-      cursor: pointer;
-      text-decoration: none;
-    }
-  }
-
-  .site-level {
+    .panel-body,
     .panel-heading {
-      background-color: $dark_grey;
+      padding: 0;
     }
 
     .panel-title {
+      font-size: inherit;
+      font-weight: $default_font_weight;
+
       & > a:hover {
         cursor: pointer;
-        text-decoration: none; 
+        text-decoration: none;
       }
     }
-  }
 
-  a.dash-link,
-  a.docweb-link {
-    display: inline-block;
-    text-align: center;
-    color: $white;
-    text-decoration: none;
-    height: 100%;
-    width: 50%;
-    line-height: 40px;
-
-    &:hover {
-      cursor: pointer;
-      background-color: $highlight_grey;
-      -webkit-transition: background-color .2s linear;
-      -moz-transition: background-color .2s linear;
-      -o-transition: background-color .2s linear;
-      transition: background-color .2s linear;
+    .accordion-links {
+      text-align: center;
+      height: 40px;
+      background-color: $dark_grey;
     }
   }
 
-  .accordion-links {
-    text-align: center;
-    height: 40px;
-    background-color: $light_grey;
+  .accordion-dropdown {
+    border-left-width: 0;
+    min-width: 200px;
+  }
+
+  .accordion-toggle {
+    width: 270px;
+
+    > .fa {
+      line-height: inherit;
+    }
   }
 }
-
-.accordion-dropdown {
-  border-left-width: 0;
-  min-width: 200px;
-}
-
-.accordion-toggle {
-  width: 270px;
-}
-
-.accordion-toggle > .fa {
-  line-height: inherit;
-}
-
 
 /************************* Large displays *************************/
 @media screen and (min-width: 45.0625em) {
@@ -401,7 +292,7 @@ accordion {
   .navbar {
     li {
       display: none;
-      font-weight: 200;
+      font-weight: $light_font_weight;
       display: inline-block;
 
       a {
@@ -423,23 +314,9 @@ accordion {
 
     li.goto {
       .dropdown-menu a:hover {
-        background: $medium_grey;
-        -webkit-transition: background-color .2s linear;
-        -moz-transition: background-color .2s linear;
-        -o-transition: background-color .2s linear;
-        transition: background-color .2s linear;
+        background: $dark_grey;
+        @include transition($background_hover_transition);
       }
-    }
-
-    .block-title {
-      border: 0;
-      clip: rect(0 0 0 0);
-      height: 1px;
-      margin: -1px;
-      overflow: hidden;
-      padding: 0;
-      position: absolute;
-      width: 1px; 
     }
 
     .block {
@@ -469,7 +346,7 @@ accordion {
     margin-top: -20px;
   }
 
-  .out-link:hover{
+  .out-link:hover {
     background-color: rgba(255, 255, 255, 0.1);
     cursor:pointer;
     background-clip: padding-box;
@@ -483,7 +360,7 @@ accordion {
   header {
     .block {
       height: 46px;
-      background-color: $monolith;
+      background-color: $base_grey;
     }
 
     .banner-title {
@@ -531,7 +408,7 @@ accordion {
       a {
         position: relative;
         top: 25%;
-        font-weight: 200;
+        font-weight: $light_font_weight;
         padding: 0.4em 2.14286em;
       }
 
@@ -562,7 +439,7 @@ accordion {
         border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 
         &:hover {
-          border-bottom: 1px solid $monolith !important;
+          border-bottom: 1px solid $base_grey !important;
         }
       }
     }
@@ -570,7 +447,8 @@ accordion {
     .block {
       ul.nav-btns-main,
       li.goto,
-      li.other-sites {
+      li.other-sites,
+      li.nav-doc-li {
         display: none;
       }
 
@@ -589,7 +467,7 @@ accordion {
       left: -70%;
       height: 100%;
       width: 70%;
-      background: $monolith;
+      background: $base_grey;
       @include box-shadow(inset -1.5em 0 1.5em -0.75em rgba(0, 0, 0, 0.25));
 
       .block {
@@ -606,41 +484,46 @@ accordion {
     left: 20%;
   }
 
-  .csstransforms3d.csstransitions.js-ready .navbar {
-    @include transform(translate3d(-100%, 0, 0));
-    @include backface-visibility(hidden);
-    left: 0;
+  .csstransforms3d.csstransitions.js-ready {
+    .navbar {
+      @include transform(translate3d(-100%, 0, 0));
+      @include backface-visibility(hidden);
+      left: 0;
+    }
+
+    #inner-wrap {
+      @include transform(translate3d(0, 0, 0));
+      @include backface-visibility(hidden);
+      @include transition($background_hover_transition);
+      -webkit-transition: -webkit-transform 500ms ease;
+      -moz-transition: -moz-transform 500ms ease;
+      -o-transition: -o-transform 500ms ease;
+      transition: transform 500ms ease;
+      left: 0 !important;
+    }
+
+    .navbar .block {
+      @include transform(translate3d(70%, 0, 0) scale3d(0.9, 0.9, 0.9));
+      -webkit-transition: opacity 300ms 100ms, -webkit-transform 500ms ease;
+      -moz-transition: opacity 300ms 100ms ease, -moz-transform 500ms ease;
+      -o-transition: opacity 300ms 100ms ease, -o-transform 500ms ease;
+      transition: opacity 300ms 100ms ease, transform 500ms ease;
+      -webkit-transition-delay: ease, 0s;
+      transform-origin: 50% 0%;
+      filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=70);
+      opacity: 0.7;
+    }
   }
 
-  .csstransforms3d.csstransitions.js-ready #inner-wrap {
-    @include transform(translate3d(0, 0, 0));
-    @include backface-visibility(hidden);
-    -webkit-transition: -webkit-transform 500ms ease;
-    -moz-transition: -moz-transform 500ms ease;
-    -o-transition: -o-transform 500ms ease;
-    transition: transform 500ms ease;
-    left: 0 !important;
-  }
+  .csstransforms3d.csstransitions.js-nav {
+    #inner-wrap {
+      @include transform(translate3d(70%, 0, 0) scale3d(1, 1, 1));
+    }
 
-  .csstransforms3d.csstransitions.js-nav #inner-wrap {
-    @include transform(translate3d(70%, 0, 0) scale3d(1, 1, 1));
-  }
-
-  .csstransforms3d.csstransitions.js-ready .navbar .block {
-    @include transform(translate3d(70%, 0, 0) scale3d(0.9, 0.9, 0.9));
-    -webkit-transition: opacity 300ms 100ms, -webkit-transform 500ms ease;
-    -moz-transition: opacity 300ms 100ms ease, -moz-transform 500ms ease;
-    -o-transition: opacity 300ms 100ms ease, -o-transform 500ms ease;
-    transition: opacity 300ms 100ms ease, transform 500ms ease;
-    -webkit-transition-delay: ease, 0s;
-    transform-origin: 50% 0%;
-    filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=70);
-    opacity: 0.7;
-  }
-
-  .csstransforms3d.csstransitions.js-nav .navbar .block {
-    @include transform(translate3d(0, 0, 0));
-    filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=100);
-    opacity: 1;
+    .navbar .block {
+      @include transform(translate3d(0, 0, 0));
+      filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=100);
+      opacity: 1;
+    }
   }
 }

@@ -45,7 +45,7 @@
 
               <accordion>
 
-                  <accordion-group ng-repeat="(cat,sites) in categories" is-open="sites.open">
+                  <accordion-group ng-repeat="(cat,sites) in categories" class="category-level" is-open="sites.open">
 
                       <accordion-heading>
                           {{cat}}<i class="pull-right fa" ng-class="{'fa-caret-down': sites.open, 'fa-caret-right': !sites.open}"></i>

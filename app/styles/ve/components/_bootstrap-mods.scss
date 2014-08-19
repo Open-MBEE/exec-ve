@@ -4,11 +4,11 @@
 *************************/
 
 a {
-  color: #4885BD;
+  color: $base_blue;
   text-decoration: none;
 
   &:hover {
-    color: #366590;
+    color: $dark_blue;
     text-decoration: underline;
   }
 }
@@ -17,12 +17,12 @@ img {
   max-width: 100%;
 }
 .form-control:focus {
-  border-color: #4885BD;
+  border-color: $base_blue;
 }
 
 .modal-dialog {
   .modal-footer {
-    margin-top: 0px;
+    margin-top: 0;
   }
 
   .modal-body {
@@ -35,39 +35,33 @@ img {
 .nav-pills {
   > li:active {
     > a {
-      background-color: #505050;
-      color: #fff;
+      background-color: $secondary_grey;
+      color: $white;
     }
 
     > a:hover,
     > a:focus {
-      background-color: #505050;
-      color: #fff;
+      background-color: $secondary_grey;
+      color: $white;
     }
   }
 }
 
 .table {
   tr {
-    -webkit-transition: background-color .2s linear;
-    -moz-transition: background-color .2s linear;
-    -o-transition: background-color .2s linear;
-    transition: background-color .2s linear;
-    background-color: #fff;
+    @include transition($background_hover_transition);
+    background-color: $white;
     cursor: pointer;
 
     &:hover {
-      -webkit-transition: background-color .2s linear;
-      -moz-transition: background-color .2s linear;
-      -o-transition: background-color .2s linear;
-      transition: background-color .2s linear;
-      background-color: #f3f3f3;
+      @include transition($background_hover_transition);
+      background-color: $highlight_grey;
     }
   }
 
   td {
-    border-top: 1px solid #ddd;
-    border-bottom: 1px solid #ddd;
+    border-top: 1px solid $tertiary_grey;
+    border-bottom: 1px solid $tertiary_grey;
   }
 }
 

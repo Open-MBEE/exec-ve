@@ -13,14 +13,14 @@
     right: 41px !important;
 
     .nav-tabs {
-      min-width: $tabWidth;
-      background-color: #dedede;
+      min-width: $tab_width;
+      background-color: $tertiary_grey;
     }
     
     .nav-tabs li a {
       cursor: pointer;
-      color: #333;
-      border-radius: 0;
+      color: $black;
+      @include border-radius(0);
       height: 35px;
     }
 

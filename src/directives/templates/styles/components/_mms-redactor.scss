@@ -2,43 +2,44 @@
   display: none;
 }
 
+.redactor_box {
+  z-index: 0 !important;
+}
+
 .redactor_editor {
   &.redactor_editor_wym {
     mms-transclude-name,
     mms-transclude-doc,
     mms-transclude-val {
-      background-color: #bdd3e5;
+      background-color: $light_blue;
       margin-top: 0;
       margin-bottom: 0 !important;
       padding: 3px !important;
-      border: 1px solid #000000 !important;
+      border: 1px solid $black !important;
       z-index: 0;
     }
 
     mms-transclude-com {
-      background-color: #faf5ac;
+      background-color: $yellow;
       margin-top: 0;
       margin-bottom: 0 !important;
       padding: 3px !important;
-      border: 1px solid #000000 !important;
+      border: 1px solid $black !important;
       z-index: 0;
     }
   }
 }
 
 .redactor_toolbar {
-  color: #333;
+  color: $black;
 
   li a:hover {
-    -webkit-transition: background-color .2s linear;
-    -moz-transition: background-color .2s linear;
-    -o-transition: background-color .2s linear;
-    transition: background-color .2s linear;
-    background-color: #dedede;
-    color: #333;
+    @include transition($background_hover_transition);
+    background-color: $tertiary_grey;
+    color: $black;
 
     i::before {
-      color: #333
+      color: $black
     }
   }
 }

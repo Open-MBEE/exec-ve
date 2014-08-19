@@ -1,7 +1,7 @@
 mms-view {
   .view-title {
-    font-family: HelveticaNeue-Light, "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, sans-serif;
-    font-weight: 200;
+    font-family: $light_font_family;
+    font-weight: $light_font_weight;
     font-size: 35px;
     margin-top: 24px;
   }

@@ -29,11 +29,11 @@
 .docweb-container-config-view {
   .toggle-show-snapshots {
     cursor: pointer;
-    color: #333;
+    color: $black;
 
     &:hover {
       text-decoration: none;
-      color: #333;
+      color: $black;
     }
   } 
 }

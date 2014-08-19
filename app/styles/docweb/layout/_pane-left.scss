@@ -8,8 +8,9 @@
 
     a {
       cursor: pointer;
-      color: #333;
+      color: $black;
       border-radius: 0;
+      @include border-radius(0);
     }
   }
 

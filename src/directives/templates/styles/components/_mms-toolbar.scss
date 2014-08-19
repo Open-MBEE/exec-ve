@@ -3,77 +3,66 @@ mms-toolbar {
 		width: 41px;
 		height: 100%;
 		float: right;
-		background-color: $monolith;
+		background-color: $base_grey;
 		padding-top: 75px;
 		position: fixed;
-		left: calc(100% - 41px);
+		@include calc(left, "100% - 41px");
 	}
 
 	.toolbox {
 		width: 100%;
-		background-color: $monolith;
+		background-color: $base_grey;
 	}
 
 	.tools {
 		display: block;
 		height: 45px;
 		margin-bottom: 3px;
-		color: black;
-		background-color: $soft_grey;
-		-webkit-box-shadow: inset 7px 0 9px -7px rgba(0,0,0,0.7);
-		-moz-box-shadow: inset 7px 0 9px -7px rgba(0,0,0,0.7);
-		box-shadow: inset 7px 0 9px -7px rgba(0,0,0,0.7);
+		color: $black;
+		background-color: $tertiary_grey;
+		@include box-shadow(inset 7px 0 9px -7px $tool_inset);
 		text-align: center;
 		vertical-align: bottom;
 		font-size: 20px;
 		line-height: 45px;
 
 		&:active {
-			background-color: white;
-			-webkit-box-shadow: none;
-			-moz-box-shadow: none;
-			box-shadow: none;
-			-webkit-transition: all .2s linear;
-			-moz-transition: all .2s linear;
-			-o-transition: all .2s linear;
-			transition: all .2s linear;
+			background-color: $white;
+			@include box-shadow(none);
+			@include transition(all .2s linear);
 		}
 
 		&:hover {
 			text-decoration: none;
-			color: black !important;	
+			color: $black !important;	
 			cursor: pointer;
 		}
 
 		.fa-save {
-			color: #366590;
+			color: $dark_blue;
 		}
 
 		.fa-times {
-			color: #d03433;
+			color: $red;
 		}
 
 		.fa-plus {
-			color: #597d6b;
+			color: $green;
 		}
 
 		.fa-refresh {
-			color: #366590;
+			color: $dark_blue;
 		}
 	}
 
 	.selected {
-		background-color: white;
-		-webkit-box-shadow: none;
-		-moz-box-shadow: none;
-		box-shadow: none;
+		background-color: $white;
+		@include box-shadow(none);
 	}
 
 	.dynamic {
-		background-color: white;
-		-webkit-box-shadow: none;
-		-moz-box-shadow: none;
-		box-shadow: none;
+		@include box-shadow(none);
+		background-color: $white;
 	}
 
 	.pulldown {
