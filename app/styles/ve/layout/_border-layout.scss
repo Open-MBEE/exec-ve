@@ -7,7 +7,7 @@
   position: relative;
   overflow: hidden;
   width: 100%;
-  height: 100%;
+  height: 100vh;
   padding-bottom: 14px;
 }
 
@@ -53,6 +53,10 @@
 @media screen and (max-width: 45em) {
   #main-pane {
     top: 46px;
+  }
+
+  #main-pane > div {
+    z-index: 1000;
   }
 }
 
