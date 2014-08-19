@@ -11,6 +11,7 @@ $max_accordion_panel_height: 300px;
 }
 
 a.dropdown-toggle {
+  cursor: pointer;
   padding-top: 20px;
   padding-bottom: 10px;
 }
@@ -38,6 +39,7 @@ ul > li > a {
 }
 
 .support-btn {
+  margin-left: 1em;
   padding-left: 0 !important;
 }
 
