@@ -11,7 +11,7 @@ mms-transclude-img {
 mms-view.editing *,
 mms-view.editing button,
 mms-view.editing button * {
-  color: #333;
+  color: $black;
   cursor: default;
 }
 
@@ -21,7 +21,7 @@ mms-view.editing mms-transclude-doc *,
 mms-view.editing mms-transclude-val,
 mms-view.editing mms-transclude-val *,
 mms-view.editing mms-transclude-name {
-  color: #000;
+  color: $black;
   background-color: #EAEAEA;
   cursor: pointer;
 }
@@ -35,7 +35,7 @@ mms-view.editing mms-transclude-doc mms-transclude-doc *,
 mms-view.editing mms-transclude-val mms-transclude-val,
 mms-view.editing mms-transclude-val mms-transclude-val *,
 mms-view.editing mms-transclude-val mms-tranclude-name {
-  color: #000;
+  color: $black;
   background-color: #C6C6C6;
   cursor: pointer;
 }
@@ -45,7 +45,7 @@ mms-view mms-transclude-com,
 mms-view mms-transclude-com *,
 mms-view.editing mms-transclude-com,
 mms-view.editing mms-transclude-com * {
-  background-color: #faf5ac;
+  background-color: $yellow;
   cursor: pointer;
 }
 
@@ -62,15 +62,15 @@ mms-spec mms-transclude-img,
 mms-spec mms-transclude-name,
 mms-spec mms-transclude-val,
 mms-spec mms-transclude-doc {
-  background-color: #bdd3e5;
+  background-color: $light_blue;
   cursor: not-allowed;
 }
 
 mms-spec mms-transclude-com {
-  background-color: #faf5ac;
+  background-color: $yellow;
   cursor: not-allowed;
 }
 
 .error {
-  color: red;
+  color: $red;
 }

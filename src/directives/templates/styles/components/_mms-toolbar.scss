@@ -1,0 +1,79 @@
+mms-toolbar {
+	.right-toolbar {
+		width: 41px;
+		height: 100%;
+		float: right;
+		background-color: $base_grey;
+		padding-top: 75px;
+		position: fixed;
+		@include calc(left, "100% - 41px");
+	}
+
+	.toolbox {
+		width: 100%;
+		background-color: $base_grey;
+	}
+
+	.tools {
+		display: block;
+		height: 45px;
+		margin-bottom: 3px;
+		color: $black;
+		background-color: $tertiary_grey;
+		@include box-shadow(inset 7px 0 9px -7px $tool_inset);
+		text-align: center;
+		vertical-align: bottom;
+		font-size: 20px;
+		line-height: 45px;
+
+		&:active {
+			background-color: $white;
+			@include box-shadow(none);
+			@include transition(all .2s linear);
+		}
+
+		&:hover {
+			text-decoration: none;
+			color: $black !important;	
+			cursor: pointer;
+		}
+
+		.fa-save {
+			color: $dark_blue;
+		}
+
+		.fa-times {
+			color: $red;
+		}
+
+		.fa-plus {
+			color: $green;
+		}
+
+		.fa-refresh {
+			color: $dark_blue;
+		}
+	}
+
+	.selected {
+		background-color: $white;
+		@include box-shadow(none);
+	}
+
+	.dynamic {
+		@include box-shadow(none);
+		background-color: $white;
+	}
+
+	.pulldown {
+		margin-top: 75px;
+	}
+}
+
+@media screen and (max-width: 45em) {
+	@-moz-document url-prefix() {
+		.right-toolbar {
+			top: -56px;
+		}
+	}
+}

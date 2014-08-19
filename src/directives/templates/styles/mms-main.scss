@@ -1,0 +1,25 @@
+/*************************
+  Main combinator file for MMS
+  stylesheets. Comforms to the
+  MMS app design guide
+*************************/
+
+/* Variables & mixins */
+@import "base/_mms-mixins.scss";
+@import "base/_mms-globals.scss";
+@import "base/_mms-typography.scss";
+@import "base/_mms-colors.scss";
+
+/* Layout directive customizations */
+@import "layout/_mms-nav.scss";
+@import "layout/_mms-footer.scss";
+
+/* Other directive customizations */
+@import "components/_mms-tree.scss";
+@import "components/_mms-transclude.scss";
+@import "components/_mms-view-struct.scss";
+@import "components/_mms-toolbar.scss";
+@import "components/_mms-spec.scss";
+@import "components/_mms-view.scss";
+@import "components/_mms-cf-modal.scss";
+@import "components/_mms-redactor.scss";
