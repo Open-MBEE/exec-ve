@@ -223,6 +223,7 @@ function($scope, $rootScope, $http, $state, $stateParams, growl, WorkspaceServic
           var change = {};
           change.data = e;
           change.type = "added";
+          change.icon = "fa-plus-circle";
           change.staged = false;
           change.treeNode = node;
 
@@ -242,6 +243,7 @@ function($scope, $rootScope, $http, $state, $stateParams, growl, WorkspaceServic
           var change = {};
           change.data = e;
           change.type = "removed";
+          change.icon = "fa-times-circle";
           change.staged = false;
           change.treeNode = id2node[e.sysmlid];
 
@@ -264,6 +266,7 @@ function($scope, $rootScope, $http, $state, $stateParams, growl, WorkspaceServic
           var change = {};
           change.data = e;
           change.type = "updated";
+          change.icon = "fa-pencil";
           change.staged = false;
           change.treeNode = id2node[e.sysmlid];
 
@@ -286,6 +289,7 @@ function($scope, $rootScope, $http, $state, $stateParams, growl, WorkspaceServic
           var change = {};
           change.data = e;
           change.type = "moved";
+          change.icon = "fa-arrows";
           change.staged = false;
           change.treeNode = id2node[e.sysmlid];
 

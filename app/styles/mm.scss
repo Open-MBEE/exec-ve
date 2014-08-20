@@ -37,24 +37,44 @@ $mainViewShadowColor: rgba(0,0,0,.26);
   }
 }
 
+.icon-added {
+  color: green;
+}
+
+.icon-removed {
+  color: red;
+}
+
+.icon-updated {
+  color: blue;
+}
+
+.icon-moved {
+  color: orange;
+}
+
+.icon-conflict {
+  color: yellow;
+}
+
 .clean {
   background-color: white !important;
 }
 
 .addition {
-  background-color: green;
+  background-color: lightgreen;
 }
 
 .removal {
-  background-color: red;
+  background-color: lightpink;
 }
 
 .conflict {
-  background-color: yellow;
+  background-color: lightgoldenrodyellow;
 }
 
 .update {
-  background-color: blue;
+  background-color: lightblue;
 }
 
 .undo {
@@ -62,23 +82,27 @@ $mainViewShadowColor: rgba(0,0,0,.26);
 }
 
 tr {
-  &.clean {
+  .clean {
     background-color: white !important;
   }
 
-  &.addition {
-    background-color: green;
+  .addition {
+    background-color: lightgreen;
   }
 
-  &.removal {
-    background-color: red;
+  .removal {
+    background-color: lightpink;
   }
 
-  &.conflict {
-    background-color: yellow;
+  .conflict {
+    background-color: lightgoldenrodyellow;
   }
 
-  &.update {
-    background-color: blue;
+  .update {
+    background-color: lightblue;
+  }
+
+  .undo {
+    background-color: white;
   }
 }
