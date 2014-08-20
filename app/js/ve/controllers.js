@@ -394,6 +394,10 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
     if (!$rootScope.veEdits)
         $rootScope.veEdits = {};
 
+    $scope.snapshotClicked = function() {
+        $scope.snapshotLoading = 'fa fa-spinner fa-spin';
+    };
+
     var setEditingButtonsActive = function(type, active) {
         $rootScope.veTbApi.setActive(type + 'Save', active);
         $rootScope.veTbApi.setActive(type + 'Cancel', active);

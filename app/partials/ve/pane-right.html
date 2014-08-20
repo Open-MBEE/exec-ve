@@ -8,18 +8,18 @@
     </div>
 
     <div class="container-fluid container-snapshots" ng-show="show.snapshots">
-        <h1>Snapshots</h1>
+        <h1>Snapshots <i class="{{snapshotLoading}}"></i></h1>
 
         <table class="snapshot-table table table-condensed">
             <tr>
                 <td>
-                    <a ui-sref="doc({site: site.name, docId: document.sysmlid, time: 'latest'})" ui-sref-opts="{reload: true}">Latest</a>
+                    <a ui-sref="doc({site: site.name, docId: document.sysmlid, time: 'latest'})" ui-sref-opts="{reload: true}" ng-click="snapshotClicked()">Latest</a>
                 </td>
                 <td></td>
             </tr>
             <tr ng-repeat="snapshot in snapshots | orderBy:'-created'">
                 <td>
-                    <a ui-sref="doc({site: site.name, docId: document.sysmlid, time: snapshot.created})" ui-sref-opts="{reload: true}">{{snapshot.created | date:'M/d/yy h:mm a'}}</a>
+                    <a ui-sref="doc({site: site.name, docId: document.sysmlid, time: snapshot.created})" ui-sref-opts="{reload: true}" ng-click="snapshotClicked()">{{snapshot.created | date:'M/d/yy h:mm a'}}</a>
                 </td>
                 <td>
                     <div ng-repeat="config in snapshot.configurations | orderBy:'name'">
