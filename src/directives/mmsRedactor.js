@@ -154,11 +154,6 @@ function mmsRedactor(ElementService, ViewService, $modal, $templateCache, $windo
                 editor.html(cleanEditorHtml);
             }
             //element.redactor('selectionRestore');
-
-            cleanEditorHtml = cleanEditorHtml.replace('<table>', '<table class="table">');
-            if (editorHtml !== cleanEditorHtml) {
-                editor.html(cleanEditorHtml);
-            }
         }
 
         element.html(ngModelCtrl.$viewValue);
