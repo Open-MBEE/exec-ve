@@ -1,3 +1,9 @@
+@media screen and (max-width: 45em) {
+  #main-pane > div {
+    z-index: 1000;
+  }
+}
+
 mms-nav {
   header {
     z-index: 100;
@@ -47,6 +53,10 @@ mms-nav {
 
       &:focus {
         text-decoration: none;
+      }
+
+      &.dropdown-toggle {
+        cursor: pointer;
       }
     }
 
@@ -111,6 +121,7 @@ mms-nav {
   }
 
   .support-btn {
+    margin-left: 1em;
     padding-left: 0 !important;
   }
 

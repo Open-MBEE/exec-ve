@@ -7,14 +7,16 @@ mms-spec {
     	margin-top: 24px;
 		margin-bottom: 32px;
 		height: inherit;
+		width: 100%;
 	}
 
 	h2 {
-		font-family: $light_font_family; 
+		font-family: $default_font_family; 
 		font-weight: $bold_font_weight;
 		font-size: 12px;
 		margin-top: 10px;
 		margin-bottom: 5px;
+		white-space: nowrap;
 	}
 
 	h3 {
@@ -24,6 +26,13 @@ mms-spec {
 		margin-top: 5px;
 		margin-bottom: 5px;
 		margin-left: 15px;
+		white-space: nowrap;
+
+		&.sysmlid {
+			width: 250px;
+			word-wrap: break-word;
+			white-space: normal;
+		}
 	}
 
 	p.doc-text {
