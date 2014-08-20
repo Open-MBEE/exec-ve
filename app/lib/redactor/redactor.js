@@ -6070,7 +6070,7 @@
 				columns = $('#redactor_table_columns').val(),
 				$table_box = $('<div></div>'),
 				tableId = Math.floor(Math.random() * 99999),
-				$table = $('<table id="table' + tableId + '"><tbody></tbody></table>'),
+				$table = $('<table class="table table-bordered" id="table' + tableId + '"><tbody></tbody></table>'),
 				i, $row, z, $column;
 
 			for (i = 0; i < rows; i++)
