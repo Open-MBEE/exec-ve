@@ -28,6 +28,9 @@
             <div fa-pane pane-anchor="west" pane-size="20%" pane-handle="4" pane-min="20px" class="west-tabs">
                 <div ui-view="pane-left">loading...</div>
             </div>
+            <div fa-pane pane-anchor="east" pane-size="41px" pane-no-toggle="true">
+                <div ui-view="toolbar-right"></div>
+            </div>
             <div fa-pane pane-anchor="center" class="center-view">
                 <div fa-pane pane-anchor="east" pane-size="30%" pane-handle="4" pane-min="20px" class="pane-right">
                     <div ui-view="pane-right"></div>
@@ -36,7 +39,6 @@
                     <div ui-view="pane-center">Select an item from the Table of Contents.</div>
                 </div>
             </div> 
-            <div ui-view="toolbar-right"></div>
         </div>
         <mms-footer></mms-footer>
     </div>
