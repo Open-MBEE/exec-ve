@@ -139,7 +139,6 @@ function($scope, $rootScope, $state, document, time, ElementService, ViewService
 
 
     $scope.my_data = [];
-
     $scope.my_tree_handler = function(branch) {
         var viewId;
 
@@ -147,7 +146,8 @@ function($scope, $rootScope, $state, document, time, ElementService, ViewService
             viewId = branch.view;
         else
             viewId = branch.data.sysmlid;
-
+        if (viewId !== $rootScope.veCurrentView)
+            $rootScope.veViewLoading = true;
         $state.go('doc.view', {viewId: viewId});
 
     };
@@ -333,6 +333,7 @@ function($scope, $rootScope, $stateParams, viewElements, ViewService, time, grow
 
     ViewService.setCurrentViewId($stateParams.viewId);
     $rootScope.veCurrentView = $stateParams.viewId;
+    $rootScope.veViewLoading = false;
     $scope.vid = $stateParams.viewId;
     $scope.version = time;
     $rootScope.$broadcast('viewSelected', $scope.vid, viewElements);
@@ -417,19 +418,7 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
         });
     };
 
-    $scope.$on('newSnapshot', function() {
-        $rootScope.veTbApi.setButtonIcon('snapNew', 'fa fa-spinner fa-spin');
-        ConfigService.createSnapshot($scope.document.sysmlid)
-        .then(function(result) {
-            $rootScope.veTbApi.setButtonIcon('snapNew', 'fa fa-plus');
-            growl.success("Snapshot Created: You'll receive a confirmation email soon.");
-        }, function(reason) {
-            growl.error("Snapshot Creation failed: " + reason.message);
-            $rootScope.veTbApi.setButtonIcon('snapNew', 'fa fa-plus');
-        });
-        $rootScope.veTbApi.select('documentSnapshots');
-    });
-    $scope.$on('refreshSnapshots', function() {
+    var refreshSnapshots = function() {
         $rootScope.veTbApi.setButtonIcon('snapRefresh', 'fa fa-refresh fa-spin');
         ConfigService.getProductSnapshots($scope.document.sysmlid, $scope.site.name, 'master', true)
         .then(function(result) {
@@ -440,7 +429,23 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
             $rootScope.veTbApi.setButtonIcon('snapRefresh', 'fa fa-refresh');
         });
         $rootScope.veTbApi.select('documentSnapshots');
+    };
+
+    $scope.$on('newSnapshot', function() {
+        $rootScope.veTbApi.setButtonIcon('snapNew', 'fa fa-spinner fa-spin');
+        ConfigService.createSnapshot($scope.document.sysmlid)
+        .then(function(result) {
+            $rootScope.veTbApi.setButtonIcon('snapNew', 'fa fa-plus');
+            growl.success("Snapshot Created: Refreshing...");
+            refreshSnapshots();
+        }, function(reason) {
+            growl.error("Snapshot Creation failed: " + reason.message);
+            $rootScope.veTbApi.setButtonIcon('snapNew', 'fa fa-plus');
+        });
+        $rootScope.veTbApi.select('documentSnapshots');
     });
+
+    $scope.$on('refreshSnapshots', refreshSnapshots);
 
     $scope.$on('snapshotsSelected', function() {
         showPane('snapshots');
@@ -581,6 +586,7 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
 }])
 .controller('VeCtrl', ['$scope', '$location', '$rootScope', '_', '$window',
 function($scope, $location, $rootScope, _, $window) {
+    $rootScope.veViewLoading = false;
     $window.addEventListener('beforeunload', function(event) {
         if ($rootScope.veEdits && !_.isEmpty($rootScope.veEdits)) {
             var message = 'You may have unsaved changes, are you sure you want to leave?';
