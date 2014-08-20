@@ -140,11 +140,6 @@ function mmsRedactor(ElementService, ViewService, $modal, $templateCache, $windo
             if (ngModelCtrl.$viewValue !== cleanhtml)
                 ngModelCtrl.$setViewValue(cleanhtml);
 
-            cleanhtml = cleanhtml.replace('<table>', '<table class="table">');
-            if (ngModelCtrl.$viewValue !== cleanhtml) {
-                ngModelCtrl.$setViewValue(cleanhtml);
-            }
-
             //element.redactor('selectionSave');
             var editor = element.redactor('getEditor');
             var editorHtml = editor.html();
