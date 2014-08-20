@@ -4,6 +4,35 @@ angular.module('mm')
 .controller('DiffTreeController', ["$scope", "$rootScope", "$http", "$state", "$stateParams", "growl", "WorkspaceService",
 function($scope, $rootScope, $http, $state, $stateParams, growl, WorkspaceService) {
 
+    $scope.modelTree = {};
+
+    $scope.modelTree.toggle = {};
+    $scope.modelTree.toggle.mine = false;
+    $scope.modelTree.toggle.theirs = false;
+    $scope.modelTree.toggle.staged = true;
+    $scope.modelTree.toggle.deltas = false;
+
+    $scope.modelTree.data = {};
+
+    $scope.changes = [];
+
+    $scope.stageChange = function(change) {
+      change.staged = ! change.staged;
+    };
+
+    $scope.toggleTree = function(treeType) {
+      $scope.modelTree.toggle.mine = false;
+      $scope.modelTree.toggle.theirs = false;
+      $scope.modelTree.toggle.staged = false;
+      $scope.modelTree.toggle.deltas = false;
+
+      $scope.modelTree.toggle[treeType] = true;
+    };
+
+    $scope.selectChange = function (change) {
+      $state.go('main.diff.view', {elementId: change.data.sysmlid});
+    };
+
     $scope.treeData = [];
     $scope.id2node = {};
     $scope.ws1 = {};
@@ -91,6 +120,28 @@ function($scope, $rootScope, $http, $state, $stateParams, growl, WorkspaceServic
 
         $scope.registerPropertyChange = registerPropertyChange;
         
+        $scope.options_staged = {
+          types: {
+            'Element': 'fa fa-square',
+            'Property': 'fa fa-circle',
+            'View': 'fa fa-square',
+            'Dependency': 'fa fa-long-arrow-right',
+            'DirectedRelationship': 'fa fa-long-arrow-right',
+            'Generalization': 'fa fa-chevron-right',
+            'Package': 'fa fa-folder',
+            'Connector': 'fa fa-expand'
+          },
+          statuses: {
+            'moved': { style: "update"},
+            'added': { style: "addition"},
+            'removed': { style: "removal"},
+            'updated': { style: "update"},
+            'conflict': "",
+            'resolve': "",
+            'undo': { style: "undo"}
+          }
+        };
+
         $scope.options = {
           types: {
             'Element': 'fa fa-square',
@@ -146,7 +197,7 @@ function($scope, $rootScope, $http, $state, $stateParams, growl, WorkspaceServic
 
         ws1.elements.forEach(function(e) {
           if (!id2node.hasOwnProperty(e.owner))
-              $scope.treeData.push(id2node[e.sysmlid]);
+              $scope.treeData.push(id2node[e.sysmlid]);          
           else
               id2node[e.owner].children.push(id2node[e.sysmlid]);
        });
@@ -168,6 +219,15 @@ function($scope, $rootScope, $http, $state, $stateParams, growl, WorkspaceServic
           
           setBranchState(node, "added", "added", true, false);
 
+
+          var change = {};
+          change.data = e;
+          change.type = "added";
+          change.staged = false;
+          change.treeNode = node;
+
+          $scope.changes.push(change);
+
         });
 
         ws2.deletedElements.forEach(function(e) {
@@ -178,6 +238,14 @@ function($scope, $rootScope, $http, $state, $stateParams, growl, WorkspaceServic
           setPropertyState(id2node[e.sysmlid], "name", "removed", "removed", true, false);
           setPropertyState(id2node[e.sysmlid], "owner", "removed", "removed", true, false);
           setPropertyState(id2node[e.sysmlid], "documentation", "removed", "removed", true, false);
+
+          var change = {};
+          change.data = e;
+          change.type = "removed";
+          change.staged = false;
+          change.treeNode = id2node[e.sysmlid];
+
+          $scope.changes.push(change);
 
         });
 
@@ -193,6 +261,14 @@ function($scope, $rootScope, $http, $state, $stateParams, growl, WorkspaceServic
           if (e.hasOwnProperty('documentation'))
             setPropertyState(id2node[e.sysmlid], "documentation", "updated", "updated", true, false);  
 
+          var change = {};
+          change.data = e;
+          change.type = "updated";
+          change.staged = false;
+          change.treeNode = id2node[e.sysmlid];
+
+          $scope.changes.push(change);
+
         });
 
         ws2.movedElements.forEach(function(e) {
@@ -206,6 +282,14 @@ function($scope, $rootScope, $http, $state, $stateParams, growl, WorkspaceServic
             setPropertyState(id2node[e.sysmlid], "owner", "moved", "moved", true, false);
           if (e.hasOwnProperty('documentation'))
             setPropertyState(id2node[e.sysmlid], "documentation", "moved", "moved", true, false);
+
+          var change = {};
+          change.data = e;
+          change.type = "moved";
+          change.staged = false;
+          change.treeNode = id2node[e.sysmlid];
+
+          $scope.changes.push(change);
 
         });
       };
