@@ -4,6 +4,8 @@
   MMS app design guide
 *************************/
 
+/* Custom Bootstrap file */
+@import "base/_mms-bootstrap-variables.scss";
 @import "vendor/bootstrap-sass-official/assets/stylesheets/bootstrap-custom.scss";
 
 /* Variables & mixins */
