@@ -235,6 +235,7 @@ mms-nav {
 
       accordion > .panel-group {
         max-height: $max_accordion_panel_height;
+        overflow-x: hidden;
         overflow-y: auto;
       }
     }
