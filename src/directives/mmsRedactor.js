@@ -140,6 +140,11 @@ function mmsRedactor(ElementService, ViewService, $modal, $templateCache, $windo
             if (ngModelCtrl.$viewValue !== cleanhtml)
                 ngModelCtrl.$setViewValue(cleanhtml);
 
+            cleanhtml = cleanhtml.replace('<table>', '<table class="table">');
+            if (ngModelCtrl.$viewValue !== cleanhtml) {
+                ngModelCtrl.$setViewValue(cleanhtml);
+            }
+
             //element.redactor('selectionSave');
             var editor = element.redactor('getEditor');
             var editorHtml = editor.html();
@@ -149,6 +154,11 @@ function mmsRedactor(ElementService, ViewService, $modal, $templateCache, $windo
                 editor.html(cleanEditorHtml);
             }
             //element.redactor('selectionRestore');
+
+            cleanEditorHtml = cleanEditorHtml.replace('<table>', '<table class="table">');
+            if (editorHtml !== cleanEditorHtml) {
+                editor.html(cleanEditorHtml);
+            }
         }
 
         element.html(ngModelCtrl.$viewValue);
