@@ -506,6 +506,9 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
             growl.success('Save Successful');
             $rootScope.veTbApi.setButtonIcon('elementSave', 'fa fa-save');
             delete $rootScope.veEdits[$scope.specApi.getEdits().sysmlid];
+            $scope.specApi.setEditing(false);
+            $rootScope.veTbApi.select('elementViewer');
+            setEditingButtonsActive('element', false);
         }, function(reason) {
             if (reason.type === 'info')
                 growl.info(reason.message);
