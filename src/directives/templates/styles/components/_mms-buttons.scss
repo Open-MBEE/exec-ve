@@ -1,0 +1,39 @@
+/*************************
+  Button variables that make Bootstrap
+  conform to the MMS app design guide
+*************************/
+
+.btn {
+  border: 0;
+  @include border-radius(3px);
+  padding: 11px 11px;
+
+  font-size: 11px;
+  font-weight: 400;
+
+  @include box-shadow(0px 1px 2px 0px rgba(50,50,50,.75));
+  @include transition(box-shadow .08s linear);
+
+  &:active, &:focus {
+    @include box-shadow(0px 2px 2px 0px rgba(50,50,50,.75));
+    outline: none;
+  }
+}
+
+.btn-primary {
+  &:hover, &:active, &:focus {
+    background-color: $base_blue;
+  }
+}
+
+.btn-success {
+  &:hover, &:active, &:focus {
+    background-color: $green;
+  }
+}
+
+.btn-danger {
+  &:hover, &:active, &:focus {
+    background-color: $red;
+  }
+}

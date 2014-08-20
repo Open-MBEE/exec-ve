@@ -16,20 +16,20 @@
             <div class="form-search input-group">
                 <input class="form-control" type="text" ng-model="searchText" placeholder="Search for an element" />
                 <span class="input-group-btn">                
-                    <button class="btn btn-default" type="button" ng-click="search(searchText)">
+                    <button class="btn btn-primary" type="button" ng-click="search(searchText)">
                     <span class="btn-text">GO</span> <i class="{{searchClass}}"></i></button>
                 </span>
             </div>
         </form>
 
-        <button ng-click="showOriginalElements()" class="show-orig-table-btn btn btn-default">SHOW ORIGINAL TABLE</button>
+        <button ng-click="showOriginalElements()" class="show-orig-table-btn btn btn-primary">SHOW ORIGINAL TABLE</button>
 
         <div class="misc-form-field">
             <form ng-submit="makeNew(new)">
                 <div class="form-propose input-group">
                     <input class="form-control" type="text" ng-model="new" placeholder="Propose a new element" />
                     <span class="input-group-btn">
-                        <button class="btn btn-default" type="button" ng-click="makeNew(new)"><span class="btn-text">SUBMIT</span> <i class="{{proposeClass}}"></i></button>
+                        <button class="btn btn-primary" type="button" ng-click="makeNew(new)"><span class="btn-text">SUBMIT</span> <i class="{{proposeClass}}"></i></button>
                     </span>
                 </div>
             </form>
