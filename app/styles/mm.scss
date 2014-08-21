@@ -77,6 +77,10 @@ $mainViewShadowColor: rgba(0,0,0,.26);
   background-color: lightblue;
 }
 
+.moved {
+  background-color: lightsalmon;
+}
+
 .undo {
   background-color: white;
 }
@@ -100,6 +104,10 @@ tr {
 
   .update {
     background-color: lightblue;
+  }
+  
+  .moved {
+    background-color: lightsalmon;
   }
 
   .undo {

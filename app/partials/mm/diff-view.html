@@ -12,10 +12,10 @@
   </thead>
 
   <tbody>
-    <tr class="{{options.statuses[originalNode.property_status.name].style}}">
+    <tr class="{{options.statuses[change.properties.name.type].style}}">
       <td>Name</td>
-      <td>{{original.name}}</td>
-      <td>{{delta.name}}</td>
+      <td>{{change.original.name}}</td>
+      <td>{{change.delta.name}}</td>
       <td>
         <span ng-show="originalNode.property_conflict_status.name">
             <button class="{{options.buttons[options.statuses[originalNode.property_status.name].button].style}}" 
@@ -24,10 +24,10 @@
       </td>
     </tr>
 
-    <tr class="{{options.statuses[originalNode.property_status.owner].style}}">
+    <tr class="{{options.statuses[change.properties.owner.type].style}}">
       <td>Owner</td>
-      <td>{{original.owner}}</td>
-      <td>{{delta.owner}}</td>
+      <td>{{change.original.owner}}</td>
+      <td>{{change.delta.owner}}</td>
       <td>
         <span ng-show="originalNode.property_conflict_status.owner">
             <button class="{{options.buttons[options.statuses[originalNode.property_status.owner].button].style}}" 
@@ -36,12 +36,12 @@
       </td>
     </tr>
 
-    <tr class="{{options.statuses[originalNode.property_status.documentation].style}}">
+    <tr class="{{options.statuses[change.properties.documentation.type].style}}">
       <td>Documentation</td>
-      <td>{{original.documentation}}</td>
-      <td>{{delta.documentation}}</td>
+      <td>{{change.original.documentation}}</td>
+      <td>{{change.delta.documentation}}</td>
       <td>
-        <span ng-show="originalNode.property_conflict_status.documentation">
+        <span ng-show="change.properties.originalNode.property_conflict_status.documentation">
             <button class="{{options.buttons[options.statuses[originalNode.property_status.documentation].button].style}}" 
                     ng-click="registerPropertyChange(originalNode,'documentation');">{{options.statuses[originalNode.property_status.documentation].button}}</button>
         </span> 
