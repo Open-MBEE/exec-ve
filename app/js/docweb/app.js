@@ -18,7 +18,7 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
             },
             views: {
                 'menu': {
-                    template: '<mms-nav mms-site="{{site}}" mms-title="{{title}}" mms-type="DocWeb"></mms-nav>',
+                    template: '<mms-nav mms-responsive="true" mms-site="{{site}}" mms-title="{{title}}" mms-type="DocWeb" mms-goto="true" mms-other-sites="true"></mms-nav>',
                     controller: function($scope, $stateParams, site) {
                         $scope.site = site.name;
                         $scope.title = "Configurations";

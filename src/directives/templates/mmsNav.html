@@ -1,7 +1,7 @@
 <header role="banner">
   <div class="block">
     <div class="banner-title">{{type}}</div>
-    <a ng-click="nav.toggleNav()" class="nav-btn"><i class="fa fa-lg fa-bars"></i></a>
+    <a ng-if="responsive" ng-click="nav.toggleNav()" class="nav-btn"><i class="fa fa-lg fa-bars"></i></a>
   </div>
 </header>
 
@@ -36,7 +36,6 @@
 
       <!-- Other sites dropdown -->
       <li class="other-sites dropdown">
-
           <a class="dropdown-toggle" data-toggle="dropdown" ng-click="reset()">
             Other Sites<i class="nav-dropdown-icon fa fa-caret-down"></i>
           </a>
