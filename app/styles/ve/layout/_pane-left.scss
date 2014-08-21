@@ -2,6 +2,8 @@
   Styles for the View Editor left pane
 *************************/
 
+$pane_left_btn_group_width: 150px;
+
 .container-pane-left {
   height: 100%;
   width: 100%;
@@ -19,7 +21,7 @@
       margin-left: 11px;
       background-color: $white;
       padding: 0;
-      min-width: 300px;
+      min-width: $pane_left_btn_group_width;
     }
 
     .input-filter-tree {
