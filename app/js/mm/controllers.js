@@ -4,6 +4,9 @@ angular.module('mm')
 .controller('DiffTreeController', ["_", "$scope", "$rootScope", "$http", "$state", "$stateParams", "growl", "WorkspaceService",
 function(_, $scope, $rootScope, $http, $state, $stateParams, growl, WorkspaceService) {
 
+    var ws1 = $stateParams.source;
+    var ws2 = $stateParams.target;
+
     $scope.changes = [];
 
     $scope.options = {
@@ -63,7 +66,7 @@ function(_, $scope, $rootScope, $http, $state, $stateParams, growl, WorkspaceSer
     $scope.id2change = {};
 
     // Diff the two workspaces picked in the Workspace Picker
-    WorkspaceService.diff('ws1', 'ws2').then(
+    WorkspaceService.diff(ws1, ws2).then(
      function(result) {
         
         setupChangesList(result.workspace1, result.workspace2); 

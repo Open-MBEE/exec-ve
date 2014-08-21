@@ -182,7 +182,7 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService) {
             $http.get(URLService.getWorkspacesURL())
             .success(function(data, status, headers, config) {
                 CacheService.put(cacheKey, data.workspaces, true, function(workspace, i) {
-                    return {key: ['workspaces', workspace.parent, workspace.name], value: workspace, merge: true};
+                    return {key: ['workspaces', workspace.parent, workspace.name, workspace.creator], value: workspace, merge: true};
                 });
                 deferred.resolve(CacheService.get(cacheKey));
                 inProgress = null;
@@ -218,8 +218,25 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService) {
     };
 
     var diff = function(ws1, ws2, ws1time, ws2time) {
-        var deferred = $q.defer();
+        /* var deferred = $q.defer();
         deferred.resolve(dummy);
+        return deferred.promise; */
+
+        if (inProgress)
+          return inProgress;
+        
+        var deferred = $q.defer();
+        
+        inProgress = deferred.promise;
+        $http.get(URLService.getWsDiffURL(ws1, ws2, ws1time, ws2time))
+        .success(function(data, status, headers, config) {
+            deferred.resolve(data);
+            inProgress = null;
+        }).error(function(data, status, headers, config) {
+            URLService.handleHttpStatus(data, status, headers, config, deferred);
+            inProgress = null;
+        });
+
         return deferred.promise;
     };
 
