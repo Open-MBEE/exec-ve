@@ -207,7 +207,7 @@ function mmsNav(SiteService, $templateCache, $log, growl) {
                 scope.categories[str].open = false;
             }
         }, function(reason) {
-            growl.error("Getting Sites Error: " + reason.message);
+            growl.error("Sites Error: " + reason.message);
         });
     };
 

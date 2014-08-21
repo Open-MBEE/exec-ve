@@ -162,7 +162,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, _) {
         var n = normalize(id, updateFromServer, workspace, null, true);
 
         var deferred = $q.defer();
-        if (CacheService.exists(n.cacheKey))
+        if (CacheService.exists(n.cacheKey) && !n.update)
             deferred.resolve(CacheService.get(n.cacheKey));
         else {
             getElement(id, n.update, n.ws)
@@ -332,7 +332,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, _) {
                 var resp = CacheService.put(n.cacheKey, UtilsService.cleanElement(data.elements[0]), true);
                 deferred.resolve(resp);
                 /* TODO better way to sync edits on update, maybe app level*/
-                var edit = CacheService.remove(UtilsService.makeElementKey(elem.sysmlid, n.ws, null, true));
+                var edit = CacheService.get(UtilsService.makeElementKey(elem.sysmlid, n.ws, null, true));
                 if (edit) {
                     _.merge(edit, resp);
                     UtilsService.cleanElement(edit, true);

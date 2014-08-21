@@ -1,0 +1,31 @@
+/*************************
+  Styles for the View Editor right pane
+*************************/
+
+.pane-right {
+  .container-snapshots { 
+    h1 {
+      font-family: $light-font-family-sans-serif;
+      font-weight: 200;
+      font-size: 35px;
+      margin-top: 24px;
+      margin-bottom: 32px;
+      height: inherit;
+    }
+
+    .snapshot-table {
+      margin-top: 24px;
+    }
+
+    .snapshot-btn-group {
+      margin-top: 24px;
+      margin-bottom: 20px;
+
+      .create-new-snapshot-btn {
+        background-color: $green;
+        margin-right: 4px;
+      }
+    }
+  }
+}
+

@@ -1,0 +1,14 @@
+/*************************
+  Declarations
+*************************/
+
+@viewport {
+  width: device-width;
+}
+
+$max_accordion_panel_height: 300px;
+$background_hover_transition: background-color .2s linear;
+
+@include selection {
+  background-color: $light_blue !important;
+}

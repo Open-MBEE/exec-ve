@@ -1,11 +1,17 @@
-<div ng-show="$root.editorIsOpen">
-    <div><button class="btn btn-primary btn-sm" ng-click="save()">Save</button><button class="btn btn-sm" ng-click="editing=false">Cancel</button></div>
-    <div><b>Last Modified:</b> {{element.lastModified | date:'M/d/yy h:mm a'}} by {{element.author}}</div>
-    <div><b>Name:</b> <input class="form-control" type="text" ng-model="edit.name"></input></div>
-    <div><b>Documentation:</b></div>
-    <textarea ng-model="edit.documentation" mms-redactor mms-cf-elements="mmsCfElements" mms-eid="{{element.sysmlid}}"></textarea>
+<div ng-show="editing">
+    <h1 class="prop"><input class="form-control" type="text" ng-model="edit.name"></input></h1>
+
+    <h2 class="prop-title">METATYPE</h2>
+    <h3 class="prop">{{element.specialization.type || 'Element'}}</h3>
+    <h2 class="prop-title">QUALIFIED NAME</h2>
+    <h3 class="prop">{{element.qualifiedName}}</h3>
+    <h2 class="prop-title">ID</h2>
+    <h3 class="prop sysmlid">{{element.sysmlid}}</h3>
+    <h2 class="prop-title">LAST MODIFICATION</h2>
+    <h3 class="prop">{{element.lastModified | date:'M/d/yy h:mm a'}} by {{element.author}}</h3>
+
     <div ng-if="edit.specialization.type === 'Property'">
-        <div><b>Property Value:</b></div>
+        <h2 class="prop-title">PROPERTY VALUE</h2>
         <div ng-if="editValues.length == 0">
             <select ng-model="addValueType" ng-options="key for (key, value) in addValueTypes"></select>
             <button class="btn btn-sm" ng-click="addValue(addValueType)">Add</button>
@@ -21,26 +27,35 @@
             </div>
         </div>
     </div>
-    <div><b>Type:</b> {{element.specialization.type || 'Element'}}</div>
-    <div><b>Id:</b> {{element.sysmlid}}</div>
-    <div><b>Qualified Name:</b> {{element.qualifiedName}}</div>
+
+    <h2 class="prop-title spec-view-doc-heading">DOCUMENTATION</h2>
+    <textarea ng-model="edit.documentation" mms-redactor mms-cf-elements="mmsCfElements" mms-eid="{{element.sysmlid}}"></textarea>
+
 </div>
 
-<div ng-hide="$root.editorIsOpen">
-    <div><b>Last Modified:</b> {{element.lastModified | date:'M/d/yy h:mm a'}} by {{element.author}}</div>
-    <div><b>Name:</b> {{element.name}}</div>
-    <div><b>Documentation:</b></div><div ng-bind-html="element.documentation"></div>
+<div ng-hide="editing">
+    <h1 class="prop">{{element.name}}</h1>
+
+    <h2 class="prop-title">METATYPE</h2>
+    <h3 class="prop">{{element.specialization.type || 'Element'}}</h3>
+    <h2 class="prop-title">QUALIFIED NAME</h2>
+    <h3 class="prop">{{element.qualifiedName}}</h3>
+    <h2 class="prop-title">ID</h2>
+    <h3 class="prop sysmlid">{{element.sysmlid}}</h3>
+    <h2 class="prop-title">LAST MODIFICATION</h2>
+    <h3 class="prop">{{element.lastModified | date:'M/d/yy h:mm a'}} by {{element.author}}</h3>
+
     <div ng-if="element.specialization.type === 'Property'">
-        <div><b>Property Value:</b></div>
+        <h2 class="prop-title">PROPERTY VALUE</h2>
         <div ng-repeat="value in values" ng-switch on="value.type">
-            <div ng-switch-when="LiteralInteger">{{value.integer}}</div>
-            <div ng-switch-when="LiteralBoolean">{{value.boolean}}</div>
-            <div ng-switch-when="LiteralReal">{{value.double}}</div>
-            <div ng-switch-when="LiteralUnlimitedNatural">{{value.naturalValue}}</div>
-            <div ng-switch-when="LiteralString" ng-bind-html="value.string"></div>
+            <h3 class="prop" ng-switch-when="LiteralInteger">{{value.integer}}</h3>
+            <h3 class="prop" ng-switch-when="LiteralBoolean">{{value.boolean}}</h3>
+            <h3 class="prop" ng-switch-when="LiteralReal">{{value.double}}</h3>
+            <h3 class="prop" ng-switch-when="LiteralUnlimitedNatural">{{value.naturalValue}}</h3>
+            <h3 class="prop" ng-switch-when="LiteralString" ng-bind-html="value.string"></h3>
         </div>
     </div>
-    <div><b>Type:</b> {{element.specialization.type || 'Element'}}</div>
-    <div><b>Id:</b> {{element.sysmlid}}</div>
-    <div><b>Qualified Name:</b> {{element.qualifiedName}}</div>
+
+    <h2 class="prop-title spec-view-doc-heading">DOCUMENTATION</h2>
+    <p ng-bind-html="element.documentation" class="doc-text"></p>
 </div>

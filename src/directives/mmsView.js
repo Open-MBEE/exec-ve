@@ -36,10 +36,7 @@ angular.module('mms.directives')
 function mmsView(ViewService, $templateCache, growl) {
     var template = $templateCache.get('mms/templates/mmsView.html');
 
-    var mmsViewCtrl = function($rootScope, $scope, ViewService) {
-
-        $scope.my_tree = $rootScope.tree;
-
+    var mmsViewCtrl = function($scope) {
         this.getViewElements = function() {
             return ViewService.getViewElements($scope.mmsVid, false, $scope.mmsWs, $scope.mmsVersion);
         };
@@ -59,13 +56,10 @@ function mmsView(ViewService, $templateCache, growl) {
                 version: $scope.mmsVersion
             };
         };
-        this.getStructEditable = function() {
-            return $scope.structEditable;
-        };
     };
 
     var mmsViewLink = function(scope, element, attrs) {
-        scope.$watch('mmsVid', function(newVal, oldVal) {
+        var changeView = function(newVal, oldVal) {
             if (!newVal)
                 return;
             ViewService.getView(scope.mmsVid, false, scope.mmsWs, scope.mmsVersion)
@@ -76,38 +70,41 @@ function mmsView(ViewService, $templateCache, growl) {
             }, function(reason) {
                 growl.error('Getting View Error: ' + reason.message);
             });
-        });
-        scope.textEditable = false;
-        scope.structEditable = false;
-        scope.reviewing = false;
-        scope.textEdit = 'Show Elements';
-        scope.structEdit = 'Edit Order';
-        scope.review = 'Show Comments';
-        scope.sortableOptions = {
-            cancel: 'div',
-            axis: 'y'
         };
-        scope.toggleTextEdit = function() {
-            scope.textEditable = !scope.textEditable;
-            scope.textEdit = scope.textEditable ? 'Hide Elements' : 'Show Elements';
+        scope.$watch('mmsVid', changeView);
+        scope.showElements = false;
+        scope.showComments = false;
+        scope.toggleShowElements = function() {
+            scope.showElements = !scope.showElements;
             element.toggleClass('editing');
         };
-        scope.toggleStructEdit = function() {
-            scope.structEditable = !scope.structEditable;
-            scope.structEdit = scope.structEditable ? 'Stop Order Edit' : 'Edit Order';
-            element.find('.ui-sortable').sortable('option', 'cancel', scope.structEditable ? '' : 'div');
-        };
-        scope.toggleReview = function() {
-            scope.reviewing = !scope.reviewing;
-            scope.review = scope.reviewing ? 'Hide Comments' : 'Show Comments';
+        scope.toggleShowComments = function() {
+            scope.showComments = !scope.showComments;
             element.toggleClass('reviewing');
         };
-        scope.nextSection = function() {
-            scope.my_tree.select_next_branch(scope.my_tree.get_selected_branch());
-        };
-        scope.prevSection = function() {
-            scope.my_tree.select_prev_branch(scope.my_tree.get_selected_branch());
-        };
+
+        if (angular.isObject(scope.mmsViewApi)) {
+            var api = scope.mmsViewApi;
+            api.toggleShowElements = scope.toggleShowElements;
+            api.setShowElements = function(mode) {
+                scope.showElements = mode;
+                if (mode)
+                    element.addClass('editing');
+                else
+                    element.removeClass('editing');
+            };
+            api.toggleShowComments = scope.toggleShowComments;
+            api.setShowComments = function(mode) {
+                scope.showComments = mode; 
+                if (mode)
+                    element.addClass('reviewing');
+                else
+                    element.removeClass('reviewing');
+            };
+            api.changeView = function(vid) {
+                scope.changeView(vid);
+            };
+        }
     };
 
     return {
@@ -118,8 +115,9 @@ function mmsView(ViewService, $templateCache, growl) {
             mmsWs: '@',
             mmsVersion: '@',
             mmsCfClicked: '&',
+            mmsViewApi: '='
         },
-        controller: ['$rootScope', '$scope', 'ViewService', mmsViewCtrl],
+        controller: ['$scope', mmsViewCtrl],
         link: mmsViewLink
     };
 }

@@ -1,135 +1,67 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsToolbar', ['$templateCache', '$rootScope', 'toolService', '$stateParams', 'ConfigService', 'ElementService', mmsToolbar]);
+.directive('mmsToolbar', ['$templateCache', mmsToolbar]);
 
-function mmsToolbar($templateCache, $rootScope, toolService, $stateParams, ConfigService){
-	var template = $templateCache.get('mms/templates/mmsToolbar.html');
-	$rootScope.elementIsOpen = true;
-	$rootScope.editorIsOpen = false;
-	$rootScope.reorderIsOpen = false;
-	$rootScope.showVersionList = false;
+function mmsToolbar($templateCache) {
+    var template = $templateCache.get('mms/templates/mmsToolbar.html');
 
-	var mmsToolbarLink = function(scope, $rootScope, element, attrs, $stateParams, ConfigService, ElementService){
-		scope.tools = [
-			{tooltype: "viewer", icon: "fa-eye", selected: true, permission: true},
-			{tooltype: "editor", icon: "fa-edit", selected: false, permission: false},
-			{tooltype: "reorder", icon: "fa-arrows", selected: false, permission: false},
-			{tooltype: "versions", icon: "fa-camera", selected: false, permission: true}
-		];
+    var mmsToolbarLink = function(scope, element, attrs){
+        scope.clicked = function(button) {
+            if (!button.active)
+                return;
+            scope.buttons.forEach(function(b) {
+                if (b === button) {
+                    b.selected = true;
+                    if (b.onClick)
+                        b.onClick();
+                    else if (scope.onClick)
+                        scope.onClick({button: button});
+                } else
+                    b.selected = false;
+            });
+        };
 
-		scope.reorderPermission = false;
-		scope.$on('versionPermission', function(event, version){
-			scope.reorderPermission = version;
-		});
+        if (scope.mmsTbApi) {
+            var api = scope.mmsTbApi;
+            api.select = function(id) {
+                scope.buttons.forEach(function(button) {
+                if (button.id === id && button.active)
+                    button.selected = true;
+                else
+                    button.selected = false;
+                });
+            };
+            api.setActive = function(id, active) {
+                scope.buttons.forEach(function(button) {
+                    if (button.id === id)
+                        button.active = active;
+                });
+            };
+            api.addButton = function(button) {
+                scope.buttons.push(button);
+            };
+            api.removeButton = function(id) {
 
-		scope.$on('elementEditability', function(event, elementPermission){
-			scope.tools[1].permission = elementPermission;
-			if(!elementPermission && scope.tools[1].selected === true) {
-				scope.tools[0].selected = true;
-				toolService.selectTool("viewer");
-				scope.setVal("viewer");
-			}
-		});
+            };
+            api.setButtonIcon = function(id, icon) {
+                scope.buttons.forEach(function(button) {
+                    if (button.id === id)
+                        button.icon = icon;
+                });
+            };
+        }
+    };
 
-		scope.$on('viewEditability', function(event, viewPermission){
-			scope.tools[2].permission = viewPermission && scope.reorderPermission;
-			if(!viewPermission && scope.tools[2].selected === true) {
-				scope.tools[0].selected = true;
-				toolService.selectTool("viewer");
-				scope.setVal("viewer");
-			}
-		});
-
-		scope.setVal = function(str){
-			toolService.selectTool(str);
-			switch(str){
-				case "viewer":
-					scope.tools[0].selected = true;
-					scope.tools[1].selected = false;
-					scope.tools[2].selected = false;
-					scope.tools[3].selected = false;
-					break;
-
-				case "editor":
-					scope.tools[0].selected = false;
-					scope.tools[1].selected = true;
-					scope.tools[2].selected = false;
-					scope.tools[3].selected = false;
-					break;
-
-				case "reorder": 
-					scope.tools[0].selected = false;
-					scope.tools[1].selected = false;
-					scope.tools[2].selected = true;
-					scope.tools[3].selected = false;
-					break;
-
-				case "versions":
-					scope.tools[0].selected = false;
-					scope.tools[1].selected = false;
-					scope.tools[2].selected = false;
-					scope.tools[3].selected = true;
-					break;
-
-				default:
-					scope.tools[0].selected = true;
-					scope.tools[1].selected = false;
-					scope.tools[2].selected = false;
-					scope.tools[3].selected = false;
-					break;
-			}
-
-		};
-	};
-
-	return {
-		restrict: 'E', 
-		template: template,
-		link: mmsToolbarLink
-	};
+    return {
+        restrict: 'E', 
+        template: template,
+        link: mmsToolbarLink,
+        scope: {
+            buttons: '=',
+            mmsTbApi: '=',
+            onClick: '&',
+            direction: '@'
+        }
+    };
 }
-
-angular.module('mms.directives')
-.factory('toolService', function ($rootScope){
-	return {
-		selectTool: function(str){
-			switch(str){
-				case "viewer":
-					$rootScope.elementIsOpen = true;
-					$rootScope.editorIsOpen = false;
-					$rootScope.reorderIsOpen = false;
-					$rootScope.showVersionList = false;
-					break;
-
-				case "editor":
-					$rootScope.elementIsOpen = false;
-					$rootScope.editorIsOpen = true;
-					$rootScope.reorderIsOpen = false;
-					$rootScope.showVersionList = false;
-					break;
-
-				case "reorder":
-					$rootScope.elementIsOpen = false;
-					$rootScope.editorIsOpen = false;
-					$rootScope.reorderIsOpen = true;
-					$rootScope.showVersionList = false;
-					break;
-
-				case "versions":
-					$rootScope.elementIsOpen = false;
-					$rootScope.editorIsOpen = false;
-					$rootScope.reorderIsOpen = false;
-					$rootScope.showVersionList = true;
-					break;
-
-				default: 
-					$rootScope.elementIsOpen = true;
-					$rootScope.editorIsOpen = false;
-					$rootScope.reorderIsOpen = false;
-					$rootScope.showVersionList = false;
-					break;
-			}			
-		}
-	};
-});

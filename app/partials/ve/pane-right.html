@@ -1,0 +1,33 @@
+<div class="pane-right">
+    <div class="container-fluid" ng-show="show.element">
+        <mms-spec mms-eid="{{eid}}" mms-cf-elements="viewElements" mms-edit-field="all" mms-version="{{version}}" mms-spec-api="specApi"></mms-spec>
+    </div>
+
+    <div class="container-fluid" ng-show="show.reorder">
+        <mms-view-struct mms-vid="{{vid}}" mms-version="{{version}}" mms-order="true" mms-view-struct-api="viewOrderApi"></mms-view-struct>
+    </div>
+
+    <div class="container-fluid container-snapshots" ng-show="show.snapshots">
+        <h1>Snapshots <i class="{{snapshotLoading}}"></i></h1>
+
+        <table class="snapshot-table table table-condensed">
+            <tr>
+                <td>
+                    <a ui-sref="doc({site: site.name, docId: document.sysmlid, time: 'latest'})" ui-sref-opts="{reload: true}" ng-click="snapshotClicked()">Latest</a>
+                </td>
+                <td></td>
+            </tr>
+            <tr ng-repeat="snapshot in snapshots | orderBy:'-created'">
+                <td>
+                    <a ui-sref="doc({site: site.name, docId: document.sysmlid, time: snapshot.created})" ui-sref-opts="{reload: true}" ng-click="snapshotClicked()">{{snapshot.created | date:'M/d/yy h:mm a'}}</a>
+                </td>
+                <td>
+                    <div ng-repeat="config in snapshot.configurations | orderBy:'name'">
+                        <a href="docweb.html#/sites/{{site.name}}/config/{{config.id}}">{{config.name}}</a>
+                    </div>
+                </td>
+            </tr>
+        </table>
+
+    </div>
+</div>

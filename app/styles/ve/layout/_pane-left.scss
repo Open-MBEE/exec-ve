@@ -1,0 +1,26 @@
+/*************************
+  Styles for the View Editor left pane
+*************************/
+
+.pane-left {
+  min-width: $tab_width;
+
+  .pane-left-wrap {
+    padding: 9px 0px 30px 8px;
+  }
+
+  .pane-left-btn-group {
+    text-align: center;
+    margin-left: 11px;
+    background-color: $white;
+    padding: 0;
+  }
+
+  .input-filter-tree {
+    width: 90%;
+    margin-left: 14px;
+    height: 33px;
+    @include border-radius(2px);
+    margin-bottom: 6px;
+  }
+}

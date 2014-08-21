@@ -1,0 +1,76 @@
+/* Stylesheet for transclusion-related elements */
+
+mms-transclude-doc,
+mms-transclude-val,
+mms-transclude-name,
+mms-transclude-com,
+mms-transclude-img {
+  cursor: pointer;
+}
+
+mms-view.editing *,
+mms-view.editing button,
+mms-view.editing button * {
+  color: $black;
+  cursor: default;
+}
+
+/* first level transclusions */
+mms-view.editing mms-transclude-doc,
+mms-view.editing mms-transclude-doc *,
+mms-view.editing mms-transclude-val,
+mms-view.editing mms-transclude-val *,
+mms-view.editing mms-transclude-name {
+  color: $black;
+  background-color: #EAEAEA;
+  cursor: pointer;
+}
+
+/* second level transclusions */
+mms-view.editing mms-transclude-doc mms-transclude-name,
+mms-view.editing mms-transclude-doc mms-transclude-val,
+mms-view.editing mms-transclude-doc mms-transclude-val *,
+mms-view.editing mms-transclude-doc mms-transclude-doc,
+mms-view.editing mms-transclude-doc mms-transclude-doc *,
+mms-view.editing mms-transclude-val mms-transclude-val,
+mms-view.editing mms-transclude-val mms-transclude-val *,
+mms-view.editing mms-transclude-val mms-tranclude-name {
+  color: $black;
+  background-color: #C6C6C6;
+  cursor: pointer;
+}
+
+/* comments */
+mms-view mms-transclude-com, 
+mms-view mms-transclude-com *,
+mms-view.editing mms-transclude-com,
+mms-view.editing mms-transclude-com * {
+  background-color: $yellow;
+  cursor: pointer;
+}
+
+mms-view:not(.editing) .placeholder {
+  display: none;
+}
+
+mms-view:not(.reviewing) mms-transclude-com {
+  display: none;
+}
+
+
+mms-spec mms-transclude-img,
+mms-spec mms-transclude-name,
+mms-spec mms-transclude-val,
+mms-spec mms-transclude-doc {
+  background-color: $light_blue;
+  cursor: not-allowed;
+}
+
+mms-spec mms-transclude-com {
+  background-color: $yellow;
+  cursor: not-allowed;
+}
+
+.error {
+  color: $red;
+}

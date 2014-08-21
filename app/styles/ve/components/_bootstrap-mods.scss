@@ -1,0 +1,80 @@
+/*************************
+  Bootstrap mods that implement the
+  MMS app design guide
+*************************/
+
+a {
+  color: $base_blue;
+  text-decoration: none;
+
+  &:hover {
+    color: $dark_blue;
+    text-decoration: underline;
+  }
+}
+
+img {
+  max-width: 100%;
+}
+.form-control:focus {
+  border-color: $base_blue;
+}
+
+.modal-dialog {
+  .modal-footer {
+    margin-top: 0;
+  }
+
+  .modal-body {
+    p {
+      margin: 0;
+    }
+  }
+}
+
+.nav-pills {
+  > li:active {
+    > a {
+      background-color: $secondary_grey;
+      color: $white;
+    }
+
+    > a:hover,
+    > a:focus {
+      background-color: $secondary_grey;
+      color: $white;
+    }
+  }
+}
+
+.table {
+  tr {
+    @include transition($background_hover_transition);
+    background-color: $white;
+    cursor: pointer;
+
+    &:hover {
+      @include transition($background_hover_transition);
+      background-color: $highlight_grey;
+    }
+  }
+
+  td {
+    border-top: 1px solid $tertiary_grey;
+    border-bottom: 1px solid $tertiary_grey;
+  }
+}
+
+.tooltip {
+  &.bottom-left {
+    padding: 5px 0;
+    margin-top: 3px;
+
+    .tooltip-arrow {
+      top: 0;
+      left: 13px;
+      border-width: 0 5px 5px;
+      border-bottom-color: #000;
+    }
+  }
+}

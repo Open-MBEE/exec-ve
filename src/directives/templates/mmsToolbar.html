@@ -1,7 +1,7 @@
 <div class="right-toolbar">
 	<div class="toolbox">
-		<div ng-repeat="tool in tools | filter: {permission: true}">
-			<a class="tools" ng-class="{selected: tool.selected}" ng-click="setVal(tool.tooltype)"><i class="fa {{tool.icon}}"></i></a>
+		<div ng-repeat="button in buttons | filter: {active: true}">
+			<a class="tools" ng-class="{selected: button.selected, dynamic: button.dynamic, pulldown: button.pullDown}" ng-click="clicked(button)" tooltip="{{button.tooltip}}" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="left" tooltip-append-to-body="true"><i class="{{button.icon}}"></i></a>
 		</div>
 	</div>
 </div>

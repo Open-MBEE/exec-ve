@@ -26,7 +26,7 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
             'menu': {
                 template: '<mms-nav mms-responsive="true" mms-site="{{site}}" mms-title="{{title}}" mms-type="View Editor" mms-go-to="true" mms-other-sites="true"></mms-nav>',
                 //template: '<mms-nav site="{{site}}" type="document"></mms-nav>',
-                controller: function($scope, $stateParams, document, site, views) {
+                controller: function($scope, $stateParams, document, site) {
                     $scope.site = site.name;
                     if ($stateParams.time !== 'latest')
                         $scope.title = document.name + ' (' + $stateParams.time + ')';
@@ -35,51 +35,26 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
                     $scope.docweb = false;
                 }
             },
-            'sidebar-left': {
-                templateUrl: 'partials/ve/sidebar-left.html',
+            'pane-left': {
+                templateUrl: 'partials/ve/pane-left.html',
                 controller: 'NavTreeCtrl'
+            },
+            'pane-right': {
+                templateUrl: 'partials/ve/pane-right.html',
+                controller: 'ToolCtrl'
+            },
+            'toolbar-right': {
+                template: '<mms-toolbar buttons="buttons" on-click="onClick(button)" mms-tb-api="tbApi"></mms-toolbar>',
+                controller: 'ToolbarCtrl'
             }
         }
     })
     .state('doc.view', {
         url: '/view/:viewId',
         views: {
-            'view@': {
-                templateUrl: 'partials/ve/view.html',
-                controller: function($scope, $stateParams, $state, $rootScope, viewElements, ViewService, time, snapshots, site, document, growl, ConfigService) {
-                    ViewService.setCurrentViewId($stateParams.viewId);
-                    $rootScope.tree_initial_selection = $stateParams.viewId;
-                    $scope.vid = $stateParams.viewId;
-                    $scope.viewElements = viewElements;
-                    $scope.showSpec = true;
-                    $scope.version = time;
-                    $scope.eid = $scope.vid;
-                    $scope.document = document;
-                    $scope.snapshots = snapshots;
-                    $scope.editable = $scope.document.editable && time === 'latest';
-                    $scope.site = site;
-                    $scope.time = time;
-                    $scope.tscClicked = function(elementId) {
-                        $scope.eid = elementId;      //$state.go('view.element', {elementId: elementId});
-                        $scope.showSpec = true;
-                        $scope.$apply();
-                    };
-                    $scope.createNewSnapshot = function() {
-                        ConfigService.createSnapshot($scope.document.sysmlid)
-                        .then(function(result) {
-                            growl.success("Create Successful: wait for email.");
-                        }, function(reason) {
-                            growl.error("Create Failed: " + reason.message);
-                        });
-                    };
-                    $scope.refreshSnapshots = function() {
-                        ConfigService.getProductSnapshots($scope.document.sysmlid, $scope.site.name, 'master', true)
-                        .then(function(result) {
-                        }, function(reason) {
-                            growl.error("Refresh Failed: " + reason.message);
-                        });
-                    };
-                }
+            'pane-center@': {
+                templateUrl: 'partials/ve/pane-center.html',
+                controller: 'ViewCtrl'
             }
         },
         resolve: {
@@ -91,7 +66,7 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
     .state('doc.order', {
         url: '/order',
         views: {
-            'view@': {
+            'pane-center@': {
                 templateUrl: 'partials/ve/reorder-views.html',
                 controller: 'ReorderCtrl'
             }

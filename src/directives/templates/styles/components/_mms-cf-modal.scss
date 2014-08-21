@@ -1,0 +1,83 @@
+.transclude-modal {
+  .transclude-modal-instructions {
+    margin-top: -6px;
+  }
+
+  .transclude-modal-input {
+    width: 60%;
+    margin: 0 auto;
+  }
+
+  .transclude-table {
+    padding: 20px;
+    max-height: 400px;
+    max-width: 98%;
+    overflow: auto;
+  }
+
+  .misc-form-field {
+    top: -32px;
+    position: relative;
+  }
+
+  .form-propose, .form-filter {
+    margin-top: 7px;
+  }
+
+  .form-search {
+    width: 70%;
+  }
+
+  .form-search, .form-propose {
+    & > .form-control {
+      border-right-width: 0;
+    }
+  }
+
+  span.input-group-btn {
+    .btn {
+      @include box-shadow(none);
+      @include transition(none);
+      border: 1px solid $tertiary_grey;
+      font-size: 14px;
+      font-weight: $default_font_weight;
+      padding: 6px 12px;
+
+      &.btn-default {
+        border: 1px solid $base_blue;
+        background-color: $base_blue;
+        margin-left: 0;
+        color: $white;
+      }
+    }
+
+    .btn-text {
+      font-size: 11px;
+    }
+  }
+
+  .show-orig-table-btn {
+    font-weight: $default_font_weight;
+    padding: 10px 12px 9px 12px;
+    background-color: $base_blue;
+    color: $white;
+    position: relative;
+    top: -34px;
+    left: 71.3%;
+    @include box-shadow(none);
+
+    &:hover, &:active {
+      @include box-shadow(none);
+    }
+  }
+
+  .clickable:hover {
+    cursor: pointer;
+    background-color: $light_blue;
+  }
+
+  .transclude-table {
+    position: relative;
+    top: -30px
+  }
+}
