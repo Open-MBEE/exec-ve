@@ -113,6 +113,9 @@ function mmsTree($timeout, $log, $templateCache) {
             var add_branch_to_list = function(level, section, branch, visible) {
                 var expand_icon = "";
                 var type_icon = "";
+                var status_properties = { style: "" };
+                var button_properties = "";
+
                 if (!branch.expanded)
                     branch.expanded = false;
                 if (branch.children && branch.children.length > 0) {
@@ -126,6 +129,14 @@ function mmsTree($timeout, $log, $templateCache) {
                     type_icon = scope.options.types[branch.type];
                 else
                     type_icon = attrs.iconDefault;
+
+                if (scope.options && scope.options.statuses && scope.options.statuses[branch.status]) {
+                    status_properties = scope.options.statuses[branch.status];
+                    if (scope.options.buttons && scope.options.buttons[status_properties.button]) {
+                        button_properties = scope.options.buttons[status_properties.button];
+                    }
+                }
+
                 scope.tree_rows.push({
                     level: level,
                     section: section,
@@ -133,6 +144,9 @@ function mmsTree($timeout, $log, $templateCache) {
                     label: branch.label,
                     expand_icon: expand_icon,
                     visible: visible,
+                    status: branch.status,
+                    status_properties: status_properties,
+                    button_properties: button_properties,
                     type_icon: type_icon
                 });
                 if (branch.children) {
