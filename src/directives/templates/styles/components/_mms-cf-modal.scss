@@ -41,11 +41,13 @@
       border: 1px solid $tertiary_grey;
       font-size: 14px;
       font-weight: $default_font_weight;
-      padding: 6px 12px;
+      padding-top: 7px;
+      padding-bottom: 6px;
+      padding-left: 12px;
+      padding-right: 12px;
 
-      &.btn-default {
+      &.btn-primary {
         border: 1px solid $base_blue;
-        background-color: $base_blue;
         margin-left: 0;
         color: $white;
       }
@@ -59,7 +61,6 @@
   .show-orig-table-btn {
     font-weight: $default_font_weight;
     padding: 10px 12px 9px 12px;
-    background-color: $base_blue;
     color: $white;
     position: relative;
     top: -34px;

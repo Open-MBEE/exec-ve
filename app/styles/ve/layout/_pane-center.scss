@@ -2,18 +2,21 @@
   Styles for the View Editor center pane
 *************************/
 
+$pane_center_btn_group_width: 120px;
+
 .pane-center {
   .pane-center-btn-group {
     float: right;
     padding-top: 9px;
     padding-right: 0;
+    min-width: $pane_center_btn_group_width;
   }
 
   .center-view {
     right: 41px !important;
 
     .nav-tabs {
-      min-width: $tab_width;
+      min-width: 200px;
       background-color: $tertiary_grey;
     }
     
