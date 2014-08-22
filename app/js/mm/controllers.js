@@ -7,6 +7,10 @@ function(_, $scope, $rootScope, $http, $state, $stateParams, growl, WorkspaceSer
     var ws1 = $stateParams.source;
     var ws2 = $stateParams.target;
 
+    $scope.treeapi = {};
+
+    $scope.treeData = [];
+
     $scope.changes = [];
 
     $scope.options = {
@@ -30,28 +34,30 @@ function(_, $scope, $rootScope, $http, $state, $stateParams, growl, WorkspaceSer
         'undo': { style: "undo", button: 'undo' }
       },
       buttons: {
-        /*"update": {
+        "update": {
           style: "btn btn-primary btn-xs",
-          action: function(branch) { registerChange(branch); } 
+          action: function(branch) { stageChange(branch); } 
         },
         "remove": {
           style: "btn btn-danger btn-xs",
-          action: function(branch) { registerChange(branch); } 
+          action: function(branch) { stageChange(branch); } 
         },
         "add": {
           style: "btn btn-success btn-xs",
-          action: function(branch) { registerChange(branch); } 
+          action: function(branch) { stageChange(branch); } 
         },
         "undo": {
           style: "btn btn-danger btn-xs",
-          action: function(branch) { registerChange(branch); } 
-        }*/
+          action: function(branch) { stageChange(branch); } 
+        }
       } 
     };
 
-    $scope.stageChange = function(change) {
+    var stageChange = function(change) {
       change.staged = ! change.staged;
     };
+
+    $scope.stageChange = stageChange;
 
     $scope.selectChange = function (change) {
       var elementId;
@@ -112,11 +118,34 @@ function(_, $scope, $rootScope, $http, $state, $stateParams, growl, WorkspaceSer
         };
 
         var id2data = {};
+        var id2node = {};
 
         ws1.elements.forEach(function(e) {
           id2data[e.sysmlid] = e;
+
+          var node = {};
+          node.data = e;
+          node.label = e.name;
+          node.type = e.specialization.type;
+          node.children = [];
+
+          node.visible = true;
+          node.status = "clean";
+
+          // setBranchState(node, "clean", "clean", false, false);
+
+          id2node[e.sysmlid] = node;
+
         });
 
+        ws1.elements.forEach(function(e) {
+          if (!id2node.hasOwnProperty(e.owner)) 
+              $scope.treeData.push(id2node[e.sysmlid]);          
+          else
+              id2node[e.owner].children.push(id2node[e.sysmlid]);
+       });
+
+        $scope.treeapi.refresh();
 
         ws2.addedElements.forEach(function(e) {
           id2data[e.sysmlid] = e;

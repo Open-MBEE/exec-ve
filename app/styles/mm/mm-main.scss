@@ -1,3 +1,6 @@
+@import "../ve/base/_globals.scss";
+@import "../ve/layout/_border-layout.scss";
+
 $navHeight: 40px;
 $treeMarginTop: 15px;
 $mainViewShadowColor: rgba(0,0,0,.26);
@@ -12,7 +15,7 @@ $mainViewShadowColor: rgba(0,0,0,.26);
   box-shadow: 0 0 9px $mainViewShadowColor; 
 }
 
-.abn-tree {
+/*.abn-tree {
   position: relative;
   top: $treeMarginTop;
   height: 100%;
@@ -35,7 +38,7 @@ $mainViewShadowColor: rgba(0,0,0,.26);
     position: relative;
     bottom: 10px;
   }
-}
+}*/
 
 .icon-added {
   color: green;
