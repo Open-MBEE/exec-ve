@@ -47,7 +47,7 @@
             <div growl></div> <!-- for notifications -->
 
             <mms-spec mms-eid="_element_id"></mms-spec>
-            <!-- this will display a 'spec window' for the element with editing -->
+            <!-- this will display a 'spec window' for the element -->
         
         <!-- dependencies -->
         <script src="jquery.js"></script>

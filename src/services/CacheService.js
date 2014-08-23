@@ -9,7 +9,7 @@ angular.module('mms')
  * @requires _
  * 
  * @description
- * Generic Caching Service
+ * Provides cache of key value pairs. Key can be a string or an array of strings.
  */
 function CacheService(_) {
     
@@ -46,9 +46,10 @@ function CacheService(_) {
      * @param {Array.<string>|string} key String key or Array of hierarchical keys
      * @param {Object} value The value to save
      * @param {boolean} [merge=false] Whether to replace the value or do a merge if value already exists
-     * @param {function} [func] Optional function that take in value and key based on iteration of the original value
+     * @param {function} [func=null] Optional function that take in value and key based on iteration of the original value
      *      and returns an object with the same signature as arguments to the put function. For example, 
      *      {key: ['key'], value: 'value', merge: false, func: null}
+     * @returns {Object} the original value
      */
     var put = function(key, value, merge, func) {
         var m = !merge ? false : merge;
@@ -68,6 +69,17 @@ function CacheService(_) {
         return cache[realkey];
     };
 
+    /**
+     * @ngdoc method
+     * @name mms.CacheService#remove
+     * @methodOf mms.CacheService
+     * 
+     * @description
+     * Remove value from cache and return it
+     * 
+     * @param {Array.<string>|string} key String key or Array of hierarchical keys
+     * @returns {Object} value that was removed or undefined
+     */
     var remove = function(key) {
         var realkey = key;
         if (angular.isArray(key))
@@ -77,6 +89,17 @@ function CacheService(_) {
         return result;
     };
 
+    /**
+     * @ngdoc method
+     * @name mms.CacheService#exists
+     * @methodOf mms.CacheService
+     * 
+     * @description
+     * Check if value exists with a specific key
+     * 
+     * @param {Array.<string>|string} key String key or Array of hierarchical keys
+     * @returns {boolean} whether value exists for key
+     */
     var exists = function(key) {
         var realkey = key;
         if (angular.isArray(key))

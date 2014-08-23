@@ -14,7 +14,7 @@
  * 
  * ## Links
  * * [angular.js](http://angularjs.org)
- * * [mms rest api and json schema](https://ems.jpl.nasa.gov/alfresco/scripts/raml/index.html)
+ * * [mms rest api and json schema](https://ems.jpl.nasa.gov/alfresco/mms/raml/index.html)
  * * [lodash](http://lodash.com)
  *
  * ## Example app that uses this module
