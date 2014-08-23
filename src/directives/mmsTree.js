@@ -3,6 +3,103 @@
 angular.module('mms.directives')
 .directive('mmsTree', ["$timeout", "$log", '$templateCache', mmsTree]);
 
+/**
+ * @ngdoc directive
+ * @name mms.directives.directive:mmsTree
+ *
+ * @requires $timeout
+ * @requires $templateCache
+ *
+ * @restrict E
+ *
+ * @description
+ * Outputs a tree with customizable icons for different types of nodes and callback
+ * for node branch clicked. Includes api, see methods section. (the name display is
+ * angular data binded)
+ * Object for tree model require (can have multiple roots):
+ *  <pre>
+    [
+        {
+            label: 'root node name',
+            type: 'a type',
+            data: {name: 'name will be shown', ...},
+            children: [{...}]
+        },
+        {
+            label: 'another root node',
+            type: 'another type',
+            data: {name: 'another name', ...},
+            children: [{...}]
+        }
+    ]
+    </pre>
+ * Tree options:
+ *  <pre>
+    {
+        types: {
+            'a type': 'fa fa-file-o',
+            'another type': 'fa fa-file'
+        }
+    }
+    </pre>
+ *
+ * ## Example 
+ * ### controller (js)
+ *  <pre>
+    angular.module('app', ['mms.directives'])
+    .controller('TreeCtrl', ['$scope', function($scope) {
+        $scope.api = {}; //empty object to be populated by the spec api
+        $scope.handler = function(branch) {
+            //branch selected
+        };
+        $scope.treeData = [
+            {
+                label: 'Root',
+                type: 'Package',
+                data: {
+                    name: 'Root',
+                    sysmlid: 'id',
+                    //any other stuff
+                },
+                children: [
+                    {
+                        label: 'Child',
+                        type: 'Class',
+                        data: {
+                            name: 'Child',
+                            sysmlid: 'blah',
+                            //other stuff
+                        },
+                        children: []
+                    }
+                ]
+            }
+        ];
+        $scope.options = {
+            types: {
+                'Package': 'fa fa-folder',
+                'Class': 'fa fa-bomb'
+            }
+        };
+    }]);
+    </pre>
+ * ### template (html)
+ *  <pre>
+    <div ng-controller="TreeCtrl">
+        <mms-tree tree-data="treeData" on-select="handler(branch)" options="options" tree-control="api"></mms-tree>
+    </div>
+    </pre>
+ *
+ * @param {Array} treeData Array of root nodes
+ * @param {Object=} treeControl Empty object to populate with api
+ * @param {Object=} options Options object to customize icons for types and statuses
+ * @param {expression=} onSelect Handler for branch selected
+ * @param {string='fa fa-caret-right'} iconExpand icon to use when branch is collapsed
+ * @param {string='fa fa-caret-down'} iconCollapse icon to use when branch is expanded
+ * @param {string='fa fa-file'} iconDefault default icon to use for nodes
+ * @param {boolean=false} sectionNumbering Add section numbers
+ * @param {string} search filter on labels
+ */
 function mmsTree($timeout, $log, $templateCache) {
 
     var mmsTreeLink = function(scope, element, attrs) {
@@ -61,6 +158,16 @@ function mmsTree($timeout, $log, $templateCache) {
         };
 
         var selected_branch = null;
+        /**
+         * @ngdoc function
+         * @name mms.directives.directive:mmsTree#select_branch
+         * @methodOf mms.directives.directive:mmsTree
+         * 
+         * @description 
+         * self explanatory
+         *
+         * @param {Object} branch branch to select
+         */
         var select_branch = function(branch) {
             if (!branch) {
                 if (selected_branch)
@@ -203,12 +310,28 @@ function mmsTree($timeout, $log, $templateCache) {
 
         if (angular.isObject(scope.treeControl)) {
             var tree = scope.treeControl;
+            /**
+             * @ngdoc function
+             * @name mms.directives.directive:mmsTree#expand_all
+             * @methodOf mms.directives.directive:mmsTree
+             * 
+             * @description 
+             * self explanatory
+             */
             tree.expand_all = function() {
                 for_each_branch(function(b, level) {
                     b.expanded = true;
                 });
                 on_treeData_change();
             };
+            /**
+             * @ngdoc function
+             * @name mms.directives.directive:mmsTree#collapse_all
+             * @methodOf mms.directives.directive:mmsTree
+             * 
+             * @description 
+             * self explanatory
+             */
             tree.collapse_all = function() {
                 for_each_branch(function(b, level) {
                     b.expanded = false;
@@ -223,6 +346,16 @@ function mmsTree($timeout, $log, $templateCache) {
                 var b = tree.get_first_branch();
                 select_branch(b);
             };
+            /**
+             * @ngdoc function
+             * @name mms.directives.directive:mmsTree#get_selected_branch
+             * @methodOf mms.directives.directive:mmsTree
+             * 
+             * @description 
+             * self explanatory
+             *
+             * @return {Object} current selected branch
+             */
             tree.get_selected_branch = function() {
                 return selected_branch;
             };
@@ -236,6 +369,17 @@ function mmsTree($timeout, $log, $templateCache) {
                 if (p) 
                     tree.select_branch(p);
             };
+            /**
+             * @ngdoc function
+             * @name mms.directives.directive:mmsTree#add_branch
+             * @methodOf mms.directives.directive:mmsTree
+             * 
+             * @description 
+             * self explanatory
+             *
+             * @param {Object} parent parent branch or null 
+             * @param {Object} new_branch branch to add to parent or root
+             */
             tree.add_branch = function(parent, new_branch) {
                 if (parent) {
                     parent.children.push(new_branch);
@@ -248,6 +392,16 @@ function mmsTree($timeout, $log, $templateCache) {
             tree.add_root_branch = function(new_branch) {
                 tree.add_branch(null, new_branch);
             };
+            /**
+             * @ngdoc function
+             * @name mms.directives.directive:mmsTree#expand_branch
+             * @methodOf mms.directives.directive:mmsTree
+             * 
+             * @description 
+             * self explanatory
+             *
+             * @param {Object} branch branch to expand
+             */
             tree.expand_branch = function(b) {
                 if (!b)
                     b = tree.get_selected_branch();
@@ -255,6 +409,16 @@ function mmsTree($timeout, $log, $templateCache) {
                     b.expanded = true;
                 on_treeData_change();
             };
+            /**
+             * @ngdoc function
+             * @name mms.directives.directive:mmsTree#collapse_branch
+             * @methodOf mms.directives.directive:mmsTree
+             * 
+             * @description 
+             * self explanatory
+             *
+             * @param {Object} branch branch to collapse
+             */
             tree.collapse_branch = function(b) {
                 if (!b)
                     b = selected_branch;
@@ -312,6 +476,17 @@ function mmsTree($timeout, $log, $templateCache) {
                     return tree.get_closest_ancestor_next_sibling(next);
                 }
             };
+            /**
+             * @ngdoc function
+             * @name mms.directives.directive:mmsTree#get_next_branch
+             * @methodOf mms.directives.directive:mmsTree
+             * 
+             * @description 
+             * self explanatory
+             *
+             * @param {Object} branch current branch
+             * @return {Object} next branch
+             */
             tree.get_next_branch = function(b) {
                 if (!b)
                     b = selected_branch;
@@ -325,6 +500,16 @@ function mmsTree($timeout, $log, $templateCache) {
                     }
                 }
             };
+            /**
+             * @ngdoc function
+             * @name mms.directives.directive:mmsTree#select_next_branch
+             * @methodOf mms.directives.directive:mmsTree
+             * 
+             * @description 
+             * self explanatory
+             *
+             * @param {Object} branch current branch
+             */
             tree.select_next_branch = function(b) {
                 var next = tree.get_next_branch(b);
                 if (next)
@@ -338,17 +523,47 @@ function mmsTree($timeout, $log, $templateCache) {
                     return tree.last_descendant(last);
                 }
             };
+            /**
+             * @ngdoc function
+             * @name mms.directives.directive:mmsTree#get_prev_branch
+             * @methodOf mms.directives.directive:mmsTree
+             * 
+             * @description 
+             * self explanatory
+             *
+             * @param {Object} branch current branch
+             * @return {Object} previous branch
+             */
             tree.get_prev_branch = function(b) {
                 var prev_sibling = tree.get_prev_sibling(b);
                 if (prev_sibling)
                     return tree.last_descendant(prev_sibling);
                 return tree.get_parent_branch(b);
             };
+            /**
+             * @ngdoc function
+             * @name mms.directives.directive:mmsTree#select_prev_branch
+             * @methodOf mms.directives.directive:mmsTree
+             * 
+             * @description 
+             * self explanatory
+             *
+             * @param {Object} branch current branch
+             */
             tree.select_prev_branch = function(b) {
                 var prev = tree.get_prev_branch(b);
                 if (prev)
                     tree.select_branch(prev);
             };
+
+            /**
+             * @ngdoc function
+             * @name mms.directives.directive:mmsTree#refresh
+             * @methodOf mms.directives.directive:mmsTree
+             * 
+             * @description 
+             * rerender the tree when data or options change
+             */
             tree.refresh = function() {
                 on_treeData_change();
             };
