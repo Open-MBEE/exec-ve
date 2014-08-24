@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsNav', ['SiteService', '$templateCache', '$log', 'growl', mmsNav]);
+.directive('mmsNav', ['SiteService', '$templateCache', 'growl', mmsNav]);
 
 /**
  * @ngdoc directive
@@ -15,16 +15,16 @@ angular.module('mms.directives')
  * @description
  * A prebuilt nav bar that's customizable with current page title, current site,
  * and the "type" of page/app. Include navigation to other sites' dashboard
- * and docweb pages by setting mmsGoTo and mmsOtherSites.
+ * and docweb pages.
  * ## Example
  *  <pre>
-    <mms-nav mms-site="europa" mms-title="A Doc" mms-type="View Editor" mms-goto="true" mms-other-sites="true"></mms-nav>
+    <mms-nav mms-site="europa" mms-title="A Doc" mms-type="View Editor"></mms-nav>
     </pre>
  * ## Support for responsive sliding pane on small browser
  *  <pre>
     <div id="outer-wrap">
         <div id="inner-wrap">
-            <mms-nav mms-responsive="true" mms-site="europa" mms-title="Doc" mms-type="View Editor" mms-goto="true" mms-other-sites="true"></mms-nav>
+            <mms-nav mms-responsive="true" mms-site="europa" mms-title="Doc" mms-type="View Editor"></mms-nav>
             <!-- everything visible on the page should go in here -->
         </div>
     </div>
@@ -33,11 +33,9 @@ angular.module('mms.directives')
  * @param {string} mmsSite The current site name
  * @param {string} mmsTitle Title to display
  * @param {string} mmsType The type of current page (or app name like DocWeb)
- * @param {string} mmsGoTo True to display Go To dropdown, false otherwise
- * @param {string} mmsOtherSites True to display Other Sites dropdown, false otherwise
  * @param {string} mmsResponsive True to display a responsive sliding pane on small browser, false otherwise
  */
-function mmsNav(SiteService, $templateCache, $log, growl) {
+function mmsNav(SiteService, $templateCache, growl) {
     var template = $templateCache.get('mms/templates/mmsNav.html');
 
     var mmsNavLink = function(scope, element, attrs) {
@@ -218,8 +216,8 @@ function mmsNav(SiteService, $templateCache, $log, growl) {
             site: '@mmsSite', //current site name
             title: '@mmsTitle', //current page title
             type: '@mmsType', //current page type
-            goTo: '@mmsGoTo',
-            otherSites: '@mmsOtherSites',
+            //goTo: '@mmsGoTo',
+            //otherSites: '@mmsOtherSites',
             responsive: '@mmsResponsive'
         },
         link: mmsNavLink

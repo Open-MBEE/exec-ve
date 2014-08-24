@@ -12,6 +12,8 @@ angular.module('mms.directives')
  * @requires mms.ViewService
  * @requires $modal
  * @requires $templateCache
+ * @requires $window
+ * @requires growl
  *
  * @restrict A
  *
