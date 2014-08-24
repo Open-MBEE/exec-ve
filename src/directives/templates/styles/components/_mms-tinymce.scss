@@ -1,0 +1,21 @@
+.mce-content-body {
+  mms-transclude-name,
+  mms-transclude-doc,
+  mms-transclude-val {
+    background-color: $light_blue;
+    margin-top: 0;
+    margin-bottom: 0 !important;
+    padding: 3px !important;
+    border: 1px solid $black !important;
+    z-index: 0;
+  }
+
+  mms-transclude-com {
+    background-color: $yellow;
+    margin-top: 0;
+    margin-bottom: 0 !important;
+    padding: 3px !important;
+    border: 1px solid $black !important;
+    z-index: 0;
+  }
+}
