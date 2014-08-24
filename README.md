@@ -1,48 +1,50 @@
-# angular-mms : angular module that contains core services, directives, filters
+# angular-mms
+## File Structure
+* /package.json - node module dependencies for building
+* /Gruntfile.js - buildfile
+* /src/services - services for the mms module, these mostly wrap the rest services of the EMS
+* /src/directives - common components for mms.directives module, these provide common ui and behavior
+* /src/directives/templates - html templates for our directives plus common styling
+* /app - MDEV developed application, this will be separated out in the future
+* /app/bower.json - bower dependencies (js/css library dependencies)
 
-This is modified from the angular-seed project and added grunt tasks
 
+## Building and Running (also see links below)
 
-## Files
-
-The mms module sources are in src/. app/ contains an application that uses mms module just for testing out things and experimenting with how actual apps would use mms services and directives.
-
-
-## Building and Running
-
-* (install node.js, ruby, grunt, bower, sass)
-* * _npm install -g grunt-cli_
-* * _npm install -g bower_
-* * _gem install sass_
 * install node.js
-* install grunt - sudo npm install -g grunt-cli
+* install ruby
+* install grunt (_sudo npm install -g grunt-cli_)
+* install bower (_sudo npm install -g bower_)
+* install sass (_gem install sass_)
 * cd into angular-mms root dir
-* npm install - install all node modules needed to run tasks
-* ruby install - sudo gem install ruby
-* sass install - sudo gem install sass
-* grunt - default task - this will do jshint on all sources inside src/, concat them into dist/mms.js, run jshint on that, minify into dist/mms.min.js, and copy whats in app/ and dist/ into build/
-* grunt server:a - does the default, plus runs a webserver at localhost:9000 and a proxy server that proxies to europaems-dev-staging-a for any path starting with /alfresco. This allows us to test with real service endpoint
-* grunt clean - deletes dist and build folders
+* _npm install_ (install all node module dependencies specified in package.json - these will install into a local node_modules folder)
+* _grunt_ - default task - this will create a dist and build directory, the dist contains concatenated and minified versions of our module js code and css, build directory contains all necessary files to run the application from a server
+* _grunt server:ems_ - does the default, plus runs a webserver at localhost:9000 out of /build and a proxy server that proxies to ems for any path starting with /alfresco. This allows us to test with real service endpoint (there are other options like server:a, server:b that proxies to europaems-dev-staging-a and europaems-dev-staging-b)
+* _grunt clean_ - deletes dist and build folders
+
+## Problems?
+If you see some error after updating, try cleaning out the bower_components and bower_components_target folders under /app and do a _grunt clean_
+
+### Rendering problems - clear bower cache
+If you're sure everything is right, try running _bower cache clean_
 
 ## Testing
-TBD - the angular-seed project contains test scripts using karma, jasmine and protractor - need to figure out how to run tests on our src
+_grunt karma_ - Runs our current service unit tests under /test/unit/ServiceSpecs
 
 ## Generating Docs
-* grunt ngdocs - this would generate html docs based on code comments written in ngdocs style into docs/. The generated files need to be served through a webserver to work.
-* grunt docs - this would generate the docs and run the server at localhost:10000
+* _grunt ngdocs_ - this would generate html docs based on code comments written in ngdocs style into docs/. The generated files need to be served through a webserver to work.
+* _grunt docs_ - this would generate the docs and run the server at localhost:10000
 
-## Clear bower cache
-If things aren't rendering properly, you may need to clear the bower cache.
-* Remove the app/bower_component* directories
-* Remove the build directory
-* In top level directory run _bower cache clean_
+## Contributing and Experimenting
+* Fork this repo and use our existing build process and structure to add in directives/apps - in the future will have a better repo structure for pulling in dependencies
+
 
 ## Links
-* node.js - [http://nodejs.org/](http://nodejs.org/)
-* grunt - [http://gruntjs.com/](http://gruntjs.com/)
-* sass - [http://sass-lang.com/](http://sass-lang.com/)
-* grunt-stubby - [https://github.com/h2non/grunt-stubby](https://github.com/h2non/grunt-stubby)
-* ngdocs - [https://github.com/idanush/ngdocs/wiki/API-Docs-Syntax](https://github.com/idanush/ngdocs/wiki/API-Docs-Syntax)
-* grunt-ngdocs - [https://github.com/m7r/grunt-ngdocs](https://github.com/m7r/grunt-ngdocs)
-* jasmine - [http://jasmine.github.io/](http://jasmine.github.io/)
-* karma - [http://karma-runner.github.io/0.12/index.html](http://karma-runner.github.io/0.12/index.html)
+* [EMS Web Apps Alfresco Site](https://ems.jpl.nasa.gov/share/page/site/ems-web-apps/dashboard)
+* [node.js](http://nodejs.org/)
+* [grunt](http://gruntjs.com/)
+* [sass](http://sass-lang.com/)
+* [ngdocs](https://github.com/idanush/ngdocs/wiki/API-Docs-Syntax)
+* [grunt-ngdocs](https://github.com/m7r/grunt-ngdocs)
+* [jasmine](http://jasmine.github.io/)
+* [karma](http://karma-runner.github.io/0.12/index.html)
