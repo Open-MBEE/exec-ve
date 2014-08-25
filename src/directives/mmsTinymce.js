@@ -21,7 +21,7 @@ function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window
             $scope.filter = '';
             $scope.searchText = '';
             $scope.choose = function(elementId, property, name) {
-                var tag = '<mms-transclude-' + property + ' data-mms-eid="' + elementId + '">[cf:' + name + '.' + property + ']</mms-transclude-' + property + '>&nbsp;';
+                var tag = '<mms-transclude-' + property + ' data-mms-eid="' + elementId + '">[cf:' + name + '.' + property + ']</mms-transclude-' + property + '> ';
                 $modalInstance.close(tag);
             };
             $scope.cancel = function() {
@@ -69,7 +69,7 @@ function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window
                     $scope.comment.owner = ViewService.getCurrentViewId();
                 ElementService.createElement($scope.comment)
                 .then(function(data) {
-                    var tag = '<mms-transclude-com data-mms-eid="' + data.sysmlid + '">comment:' + data.author + '</mms-transclude-com>';
+                    var tag = '<mms-transclude-com data-mms-eid="' + data.sysmlid + '">comment:' + data.author + '</mms-transclude-com> ';
                     $modalInstance.close(tag);
                 }, function(reason) {
                     growl.error("Comment Error: " + reason.message);
@@ -109,7 +109,7 @@ function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window
 
         var options = {
             plugins: 'autoresize charmap code fullscreen image link media nonbreaking paste table textcolor',
-            toolbar: 'bold italic underline strikethrough | subscript superscript blockquote | formatselect | fontsizeselect | forecolor backcolor removeformat | bullist numlist outdent indent | table | link unlink | image charmap code | transclude comment | undo redo',
+            toolbar: 'bold italic underline strikethrough | subscript superscript blockquote | formatselect | fontsizeselect | forecolor backcolor removeformat | bullist numlist outdent indent | table | link unlink | image media | charmap code | transclude comment | mvleft mvright | undo redo',
             menubar: false,
             statusbar: true,
             resize: 'both',
@@ -136,6 +136,32 @@ function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window
                     text: 'Comment',
                     onclick: function() {
                         commentCallback(ed);
+                    }
+                });
+                ed.addButton('mvleft', {
+                    title: 'Move Left of Cf',
+                    text: '<-',
+                    onclick: function() {
+                        var node = ed.selection.getEnd();
+                        if (node.nodeName.substr(0,3) === 'MMS') {
+                            var space = ed.getDoc().createTextNode('#');
+                            var parent = node.parentNode;
+                            parent.insertBefore(space, node);
+                            ed.selection.select(space);
+                        }
+                    }
+                });
+                ed.addButton('mvright', {
+                    title: 'Move Right of Cf',
+                    text: '->',
+                    onclick: function() {
+                        var node = ed.selection.getEnd();
+                        if (node.nodeName.substr(0,3) === 'MMS') {
+                            var space = ed.getDoc().createTextNode('#');
+                            var parent = node.parentNode;
+                            parent.insertBefore(space, node.nextSibling);
+                            ed.selection.select(space);
+                        }
                     }
                 });
                 ed.on('init', function(args) {
