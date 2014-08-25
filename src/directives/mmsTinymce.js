@@ -112,7 +112,6 @@ function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window
             toolbar: 'bold italic underline strikethrough | subscript superscript blockquote | formatselect | fontsizeselect | forecolor backcolor removeformat | bullist numlist outdent indent | table | link unlink | image media | charmap code | transclude comment | mvleft mvright | undo redo',
             menubar: false,
             statusbar: true,
-            resize: 'both',
             nonbreaking_force_tab: true,
             selector: '#' + attrs.id,
             autoresize_max_height: $window.innerHeight*0.65,
@@ -186,8 +185,15 @@ function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window
         ngModelCtrl.$render = function() {
             if (!instance)
                 instance = tinymce.get(attrs.id);
-            if (instance)
+            if (instance) {
                 instance.setContent(ngModelCtrl.$viewValue || '');
+                var doc = instance.getDoc().documentElement;
+                if (instance.dom.getStyle(doc, 'overflow-y', true) !== 'auto')
+                    instance.dom.setStyle(doc, 'overflow-y', 'auto');
+                var iframe = instance.getContainer().getElementsByTagName('iframe')[0];
+                if (instance.dom.getStyle(iframe, 'height', true) === '0px')
+                    instance.dom.setStyle(iframe, 'height', $window.innerHeight*0.65);
+            }
         };
 
         scope.$on('$destroy', function() {
