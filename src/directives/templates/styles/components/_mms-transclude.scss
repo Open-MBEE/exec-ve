@@ -8,36 +8,23 @@ mms-transclude-img {
   cursor: pointer;
 }
 
-mms-view.editing *,
-mms-view.editing button,
-mms-view.editing button * {
+mms-view.editing {
   color: $black;
-  cursor: default;
-}
 
-/* first level transclusions */
-mms-view.editing mms-transclude-doc,
-mms-view.editing mms-transclude-doc *,
-mms-view.editing mms-transclude-val,
-mms-view.editing mms-transclude-val *,
-mms-view.editing mms-transclude-name {
-  color: $black;
-  background-color: #EAEAEA;
-  cursor: pointer;
-}
+  /* Level 1 transclusions */
+  mms-transclude-doc *,
+  mms-transclude-name *,
+  mms-transclude-val * {
+    background-color: #EAEAEA;
+    cursor: pointer;
 
-/* second level transclusions */
-mms-view.editing mms-transclude-doc mms-transclude-name,
-mms-view.editing mms-transclude-doc mms-transclude-val,
-mms-view.editing mms-transclude-doc mms-transclude-val *,
-mms-view.editing mms-transclude-doc mms-transclude-doc,
-mms-view.editing mms-transclude-doc mms-transclude-doc *,
-mms-view.editing mms-transclude-val mms-transclude-val,
-mms-view.editing mms-transclude-val mms-transclude-val *,
-mms-view.editing mms-transclude-val mms-tranclude-name {
-  color: $black;
-  background-color: #C6C6C6;
-  cursor: pointer;
+    /* Level 2 transclusion */
+    mms-transclude-doc *,
+    mms-transclude-name *,
+    mms-transclude-val * {
+      background-color: #C6C6C6;
+    }
+  }
 }
 
 /* comments */
@@ -56,7 +43,6 @@ mms-view:not(.editing) .placeholder {
 mms-view:not(.reviewing) mms-transclude-com {
   display: none;
 }
-
 
 mms-spec mms-transclude-img,
 mms-spec mms-transclude-name,
