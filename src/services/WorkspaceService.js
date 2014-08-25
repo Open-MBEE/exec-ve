@@ -218,11 +218,11 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService) {
     };
 
     var diff = function(ws1, ws2, ws1time, ws2time) {
-        /* var deferred = $q.defer();
+        var deferred = $q.defer();
         deferred.resolve(dummy);
-        return deferred.promise; */
+        return deferred.promise;
 
-        if (inProgress)
+      /*  if (inProgress)
           return inProgress;
         
         var deferred = $q.defer();
@@ -237,7 +237,7 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService) {
             inProgress = null;
         });
 
-        return deferred.promise;
+        return deferred.promise; */
     };
 
     var merge = function(changes, targetWs) {
