@@ -8,6 +8,7 @@
     padding: 3px !important;
     border: 1px solid $black !important;
     z-index: 0;
+    cursor: not-allowed;
   }
 
   mms-transclude-com {
@@ -17,5 +18,6 @@
     padding: 3px !important;
     border: 1px solid $black !important;
     z-index: 0;
+    cursor: not-allowed;
   }
 }

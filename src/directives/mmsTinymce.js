@@ -108,9 +108,8 @@ function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window
         };
 
         var options = {
-            plugins: 'autoresize charmap code contextmenu fullscreen image link media nonbreaking paste table textcolor',
+            plugins: 'autoresize charmap code fullscreen image link media nonbreaking paste table textcolor',
             toolbar: 'bold italic underline strikethrough | subscript superscript blockquote | formatselect | fontsizeselect | forecolor backcolor removeformat | bullist numlist outdent indent | table | link unlink | image charmap code | transclude comment | undo redo',
-            contextmenu: 'image inserttable | cell row column deletetable',
             menubar: false,
             statusbar: true,
             resize: 'both',
