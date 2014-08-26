@@ -109,13 +109,13 @@ function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window
 
         var options = {
             plugins: 'autoresize charmap code fullscreen image link media nonbreaking paste table textcolor',
-            toolbar: 'bold italic underline strikethrough | subscript superscript blockquote | formatselect | fontsizeselect | forecolor backcolor removeformat | bullist numlist outdent indent | table | link unlink | image media | charmap code | transclude comment | mvleft mvright | undo redo',
+            toolbar: 'bold italic underline strikethrough | subscript superscript blockquote | formatselect | fontsizeselect | forecolor backcolor removeformat | alignleft aligncenter alignright | bullist numlist outdent indent | table | link unlink | image media | charmap code | transclude comment | mvleft mvright | undo redo',
             menubar: false,
             statusbar: true,
             nonbreaking_force_tab: true,
             selector: '#' + attrs.id,
             autoresize_max_height: $window.innerHeight*0.65,
-            paste_retain_style_properties: 'color background-color font-size',
+            paste_retain_style_properties: 'color background-color font-size text-align',
             browser_spellcheck: true,
             invalid_elements: 'br',
             extended_valid_elements: '-mms-transclude-doc,-mms-transclude-name,-mms-transclude-com,-mms-transclude-val,-mms-transclude-img',
@@ -187,6 +187,7 @@ function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window
                 instance = tinymce.get(attrs.id);
             if (instance) {
                 instance.setContent(ngModelCtrl.$viewValue || '');
+                instance.undoManager.clear();
                 var doc = instance.getDoc().documentElement;
                 if (instance.dom.getStyle(doc, 'overflow-y', true) !== 'auto')
                     instance.dom.setStyle(doc, 'overflow-y', 'auto');
