@@ -123,6 +123,7 @@ function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window
             fix_list_elements: true,
             content_css: 'css/partials/mms.min.css',
             paste_data_images: true,
+            skin_url: 'lib/tinymce/skin/lightgray',
             setup: function(ed) {
                 ed.addButton('transclude', {
                     title: 'Cross Reference',
