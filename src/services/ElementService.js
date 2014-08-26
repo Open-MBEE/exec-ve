@@ -10,17 +10,13 @@ angular.module('mms')
  * @requires $http
  * @requires mms.URLService
  * @requires mms.UtilsService
- * @requires mms.VersionService
+ * @requires mms.CacheService
  * @requires _
  * 
  * @description
- * An element cache and CRUD service. Maintains a cache of element id to element objects.
- * This maintains a single source of truth for applications that use this service. Do not
- * directly modify the attributes of elements returned from this service but use the update
- * methods instead. Consider saving to html5 local storage for edited things incase of crashes.
- * The element objects will contain all its attributes including view and document keys.
+ * An element CRUD service with additional convenience methods for managing edits.
  *
- * For element json example, see [here](https://ems.jpl.nasa.gov/alfresco/scripts/raml/index.html)
+ * For element json example, see [here](https://ems.jpl.nasa.gov/alfresco/mms/raml/index.html)
  */
 function ElementService($q, $http, URLService, UtilsService, CacheService, _) {
     
@@ -32,10 +28,14 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, _) {
      * 
      * @description
      * Gets an element object by id. If the element object is already in the cache,
-     * resolve the existing reference, if not, request it from the repository, add 
-     * it to the cache, and resolve the new object.
+     * resolve the existing reference, if not or update is true, request it from server, 
+     * add/merge into the cache. 
+     * 
+     * Most of these methods return promises that will reject with a reason object
+     * when a server call fails, see
+     * {@link mms.URLService#methods_handleHttpStatus the return object}
      *
-     * ## Example
+     * ## Example Usage
      *  <pre>
         ElementService.getElement('element_id').then(
             function(element) { //element is an element object (see json schema)
@@ -61,17 +61,16 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, _) {
         </pre>
      * 
      * @param {string} id The id of the element to get.
-     * @param {boolean} [updateFromServer=false] (optional) whether to always get the latest 
-     *      from server, even if it's already in cache (this will update everywhere
-     *      it's displayed, except for the editables)
+     * @param {boolean} [update=false] (optional) whether to always get the latest 
+     *      from server, even if it's already in cache (this will update the cache if exists)
      * @param {string} [workspace=master] (optional) workspace to use
      * @param {string} [version=latest] (optional) alfresco version number or timestamp
      * @returns {Promise} The promise will be resolved with the element object, 
      *      multiple calls to this method with the same parameters would give the
      *      same object
      */
-    var getElement = function(id, updateFromServer, workspace, version) {
-        var n = normalize(id, updateFromServer, workspace, version);
+    var getElement = function(id, update, workspace, version) {
+        var n = normalize(id, update, workspace, version);
         var key = 'getElement(' + id + n.update + n.ws + n.ver + ')';
 
         if (inProgress.hasOwnProperty(key))
@@ -103,17 +102,17 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, _) {
      * Same as getElement, but for multiple ids.
      * 
      * @param {Array.<string>} ids The ids of the elements to get.
-     * @param {boolean} [updateFromServer=false] (optional) whether to always get latest from server.
+     * @param {boolean} [update=false] (optional) whether to always get latest from server.
      * @param {string} [workspace=master] (optional) workspace to use
      * @param {string} [version=latest] (optional) alfresco version number or timestamp
      * @returns {Promise} The promise will be resolved with an array of element objects, 
      *      multiple calls to this method with the same ids would result in an array of 
      *      references to the same objects.
      */
-    var getElements = function(ids, updateFromServer, workspace, version) {
+    var getElements = function(ids, update, workspace, version) {
         var promises = [];
         ids.forEach(function(id) {
-            promises.push(getElement(id, updateFromServer, workspace, version));
+            promises.push(getElement(id, update, workspace, version));
         });
         return $q.all(promises);
     };
@@ -133,7 +132,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, _) {
      *  <pre>
         ElementService.getElementForEdit('element_id').then(
             function(editableElement) {
-                editableElement.name = 'changed name'; //immediately change a name
+                editableElement.name = 'changed name'; //immediately change a name and save
                 ElementService.updateElement(editableElement).then(
                     function(updatedElement) { //at this point the regular getElement would show the update
                         alert('updated');
@@ -150,7 +149,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, _) {
         </pre>
      * 
      * @param {string} id The id of the element to get.
-     * @param {boolean} [updateFromServer=false] Get the latest from server first, e
+     * @param {boolean} [update=false] Get the latest from server first, 
      *      else just make a copy of what's in the element cache
      * @param {string} [workspace=master] (optional) workspace to use
      * @returns {Promise} The promise will be resolved with the element object, 
@@ -158,8 +157,8 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, _) {
      *      references to the same object. This object can be edited without
      *      affecting the same element object that's used for displays
      */
-    var getElementForEdit = function(id, updateFromServer, workspace) {
-        var n = normalize(id, updateFromServer, workspace, null, true);
+    var getElementForEdit = function(id, update, workspace) {
+        var n = normalize(id, update, workspace, null, true);
 
         var deferred = $q.defer();
         if (CacheService.exists(n.cacheKey) && !n.update)
@@ -185,14 +184,15 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, _) {
      * Gets element objects to edit by ids. 
      * 
      * @param {Array.<string>} ids The ids of the elements to get for edit.
+     * @param {boolean} [update=false] Get latest from server first
      * @param {string} [workspace=master] (optional) workspace to use
      * @returns {Promise} The promise will be resolved with an array of editable
      * element objects that won't affect the corresponding displays
      */
-    var getElementsForEdit = function(ids, updateFromServer, workspace) {
+    var getElementsForEdit = function(ids, update, workspace) {
         var promises = [];
         ids.forEach(function(id) {
-            promises.push(getElementForEdit(id, updateFromServer, workspace));
+            promises.push(getElementForEdit(id, update, workspace));
         });
         return $q.all(promises);
     };
@@ -206,13 +206,14 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, _) {
      * Gets element's owned element objects. TBD (stub)
      * 
      * @param {string} id The id of the elements to get owned elements for
+     * @param {boolean} [update=false] update elements from server
      * @param {string} [workspace=master] (optional) workspace to use
      * @param {string} [version=latest] (optional) alfresco version number or timestamp
      * @returns {Promise} The promise will be resolved with an array of 
      * element objects 
      */
-    var getOwnedElements = function(id, updateFromServer, workspace, version) {
-        var n = normalize(id, updateFromServer, workspace, version);
+    var getOwnedElements = function(id, update, workspace, version) {
+        var n = normalize(id, update, workspace, version);
         return getGenericElements(URLService.getOwnedElementURL(id, n.ws, n.ver), 'elements', n.update, n.ws, n.ver);
     };
 
@@ -222,11 +223,8 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, _) {
      * @methodOf mms.ElementService
      *
      * @description
-     * This is a method to call a predefined url that returns elements json, so 
-     * the ElementService can cache those results. A key provies the key of the json
-     * that has the elements array. Workspace and version tells which workspace and
-     * version these elements come from. These 2 arguments doesn't change the url 
-     * that actually gets called but only affects where the returned elements are cached.
+     * This is a method to call a predefined url that returns elements json.
+     * A key provides the key of the json that has the elements array. 
      *
      * ## Example (used by ViewService to get products in a site)
      *  <pre>
@@ -243,12 +241,12 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, _) {
      *
      * @param {string} url the url to get
      * @param {string} key json key that has the element array value
-     * @param {boolean} [updateFromServer=false] update cache
+     * @param {boolean} [update=false] update cache
      * @param {string} [workspace=master] workspace associated, this will not change the url
      * @param {string} [version=latest] timestamp associated, this will not change the url
      */
-    var getGenericElements = function(url, key, updateFromServer, workspace, version) {
-        var n = normalize(null, updateFromServer, workspace, version);
+    var getGenericElements = function(url, key, update, workspace, version) {
+        var n = normalize(null, update, workspace, version);
 
         var progress = 'getGenericElements(' + url + key + n.update + n.ws + n.ver + ')';
         if (inProgress.hasOwnProperty(progress))
@@ -270,8 +268,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, _) {
             URLService.handleHttpStatus(data, status, headers, config, deferred);
             delete inProgress[progress];
         });
-       
-        return deferred.promise;        
+        return deferred.promise;
     };
 
     /**
@@ -315,7 +312,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, _) {
      * @param {Object} elem An object that contains element id and any property changes to be saved.
      * @param {string} [workspace=master] (optional) workspace to use
      * @returns {Promise} The promise will be resolved with the updated cache element reference if 
-     *      update is successful.
+     *      update is successful. If a conflict occurs, the promise will be rejected with status of 409
      */
     var updateElement = function(elem, workspace) {
         var deferred = $q.defer();
@@ -371,7 +368,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, _) {
      * @methodOf mms.ElementService
      * 
      * @description
-     * Create element on alfresco and update the cache if successful.
+     * Create element on alfresco.
      *
      * ## Example
      *  <pre>
@@ -414,7 +411,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, _) {
             elem.owner = 'holding_bin_project'; //hardcode a holding bin for owner for propose element
         }
         if (elem.hasOwnProperty('sysmlid')) {
-            deferred.reject({status: 200, message: 'Element create cannot have id'});
+            deferred.reject({status: 400, message: 'Element create cannot have id'});
             return deferred.promise;
         }
         $http.post(URLService.getPostElementsURL(n.ws), {'elements': [elem]})
@@ -455,7 +452,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, _) {
      * @methodOf mms.ElementService
      * 
      * @description
-     * Check if element has been edited and not saved to server
+     * TBD, do not use. Check if element has been edited and not saved to server
      * 
      * @param {string} id Element id
      * @returns {boolean} Whether element is dirty
@@ -479,12 +476,12 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, _) {
      * Search for elements based on some query
      * 
      * @param {string} query A query string (TBD)
-     * @param {boolean} [updateFromServer=false] Whether to update cache of returned elements
+     * @param {boolean} [update=false] Whether to update from server
      * @param {string} [workspace=master] (optional) workspace to use
      * @returns {Promise} The promise will be resolved with an array of element objects
      */
-    var search = function(query, updateFromServer, workspace) {
-        var n = normalize(null, updateFromServer, workspace, null);
+    var search = function(query, update, workspace) {
+        var n = normalize(null, update, workspace, null);
         return getGenericElements(URLService.getElementSearchURL(query, n.ws), 'elements', n.update, n.ws, n.ver);
     };
 
@@ -497,12 +494,12 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, _) {
      * Queries for an element's entire version history
      *
      * @param {string} id The id of the element
-     * @param {boolean} [updateFromServer=false] update element version cache
+     * @param {boolean} [update=false] update element version cache
      * @param {string} [workspace=master] workspace
      * @returns {Promise} The promise will be resolved with an array of version objects.
      */
-    var getElementVersions = function(id, updateFromServer, workspace) {
-        var n = normalize(id, updateFromServer, workspace, 'versions');
+    var getElementVersions = function(id, update, workspace) {
+        var n = normalize(id, update, workspace, 'versions');
         var deferred = $q.defer();
         if (CacheService.exists(n.cacheKey) && !n.update) {
             deferred.resolve(CacheService.get(n.cacheKey));
@@ -517,8 +514,8 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, _) {
         return deferred.promise;
     };
 
-    var normalize = function(id, updateFromServer, workspace, version, edit) {
-        var res = UtilsService.normalize({update: updateFromServer, workspace: workspace, version: version});
+    var normalize = function(id, update, workspace, version, edit) {
+        var res = UtilsService.normalize({update: update, workspace: workspace, version: version});
         res.cacheKey = UtilsService.makeElementKey(id, res.ws, res.ver, edit);
         return res;
     };

@@ -16,7 +16,7 @@
 <body>
   <div id="outer-wrap" style="overflow:auto;">
     <div id="inner-wrap">
-        <mms-nav mms-site="ems-support" mms-title="Portal" mms-type="Portal"></mms-nav>
+        <mms-nav mms-responsive="true" mms-site="ems-support" mms-title="Portal" mms-type="Portal"></mms-nav>
         <div ng-controller="PortalCtrl" class="container-fluid">
           <input class="form-control" type="test" ng-model="filter" placeholder="Site filter"></input>
           <div ng-repeat="(cat,sites) in categories">
