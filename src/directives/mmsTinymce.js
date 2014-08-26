@@ -117,9 +117,9 @@ function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window
             autoresize_max_height: $window.innerHeight*0.65,
             paste_retain_style_properties: 'color background-color font-size text-align',
             browser_spellcheck: true,
-            invalid_elements: 'br',
-            extended_valid_elements: '-mms-transclude-doc,-mms-transclude-name,-mms-transclude-com,-mms-transclude-val,-mms-transclude-img',
-            custom_elements: '~mms-transclude-doc,~mms-transclude-name,~mms-transclude-com,~mms-transclude-val,~mms-transclude-img',
+            invalid_elements: 'br,div,font',
+            extended_valid_elements: 'mms-diagram-block,-mms-transclude-doc,-mms-transclude-name,-mms-transclude-com,-mms-transclude-val,-mms-transclude-img',
+            custom_elements: 'mms-diagram-block,~mms-transclude-doc,~mms-transclude-name,~mms-transclude-com,~mms-transclude-val,~mms-transclude-img',
             fix_list_elements: true,
             content_css: 'css/partials/mms.min.css',
             paste_data_images: true,
@@ -175,6 +175,16 @@ function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window
                 });
                 ed.on('blur', function(e) {
                     element.blur();
+                });
+                ed.on('keydown', function(e) {
+                    if (e.keyCode === 9) { 
+                        if (e.shiftKey) 
+                            ed.execCommand('Outdent');
+                        else 
+                            ed.execCommand('Indent');
+                        e.preventDefault();
+                        return false;
+                    }  
                 });
             }
         };
