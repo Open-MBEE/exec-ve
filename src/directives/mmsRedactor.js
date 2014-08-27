@@ -3,32 +3,6 @@
 angular.module('mms.directives')
 .directive('mmsRedactor', ['ElementService', 'ViewService', '$modal', '$templateCache', '$window', 'growl', mmsRedactor]);
 
-/**
- * @ngdoc directive
- * @name mms.directives.directive:mmsRedactor
- * @element textarea
- *
- * @requires mms.ElementService
- * @requires mms.ViewService
- * @requires $modal
- * @requires $templateCache
- * @requires $window
- * @requires growl
- *
- * @restrict A
- *
- * @description
- * Make any textarea with an ngModel attached to be a redactor wysiwyg editor. This
- * requires the Redactor library. Transclusion is supported. ngModel is required.
- * ### Example
- * <pre>
-   <textarea mms-redactor ng-model="element.documentation"></textarea>
-   </pre>
- *
- * @param {Array=} mmsCfElements Array of element objects as returned by ElementService
- *      that can be transcluded. Regardless, transclusion allows keyword searching 
- *      elements to transclude from alfresco
- */
 function mmsRedactor(ElementService, ViewService, $modal, $templateCache, $window, growl) { //depends on angular bootstrap
 
     var mmsRedactorLink = function(scope, element, attrs, ngModelCtrl) {

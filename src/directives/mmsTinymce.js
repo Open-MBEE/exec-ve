@@ -3,6 +3,33 @@
 angular.module('mms.directives')
 .directive('mmsTinymce', ['ElementService', 'ViewService', '$modal', '$templateCache', '$window', '$timeout', 'growl', 'tinymce', mmsTinymce]);
 
+/**
+ * @ngdoc directive
+ * @name mms.directives.directive:mmsTinymce
+ * @element textarea
+ *
+ * @requires mms.ElementService
+ * @requires mms.ViewService
+ * @requires $modal
+ * @requires $templateCache
+ * @requires $window
+ * @requires $timeout
+ * @requires growl
+ *
+ * @restrict A
+ *
+ * @description
+ * Make any textarea with an ngModel attached to be a tinymce wysiwyg editor. This
+ * requires the tinymce library. Transclusion is supported. ngModel is required.
+ * ### Example
+ * <pre>
+   <textarea mms-tinymce ng-model="element.documentation"></textarea>
+   </pre>
+ *
+ * @param {Array=} mmsCfElements Array of element objects as returned by ElementService
+ *      that can be transcluded. Regardless, transclusion allows keyword searching 
+ *      elements to transclude from alfresco
+ */
 function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window, $timeout, growl, tinymce) { //depends on angular bootstrap
     var generatedIds = 0;
 
@@ -117,12 +144,13 @@ function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window
             autoresize_max_height: $window.innerHeight*0.65,
             paste_retain_style_properties: 'color background-color font-size text-align',
             browser_spellcheck: true,
-            invalid_elements: 'br',
-            extended_valid_elements: '-mms-transclude-doc,-mms-transclude-name,-mms-transclude-com,-mms-transclude-val,-mms-transclude-img',
-            custom_elements: '~mms-transclude-doc,~mms-transclude-name,~mms-transclude-com,~mms-transclude-val,~mms-transclude-img',
+            invalid_elements: 'br,div,font',
+            extended_valid_elements: 'mms-diagram-block,-mms-transclude-doc,-mms-transclude-name,-mms-transclude-com,-mms-transclude-val,-mms-transclude-img',
+            custom_elements: 'mms-diagram-block,~mms-transclude-doc,~mms-transclude-name,~mms-transclude-com,~mms-transclude-val,~mms-transclude-img',
             fix_list_elements: true,
             content_css: 'css/partials/mms.min.css',
             paste_data_images: true,
+            skin_url: 'lib/tinymce/skin/lightgray',
             setup: function(ed) {
                 ed.addButton('transclude', {
                     title: 'Cross Reference',
@@ -174,6 +202,16 @@ function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window
                 });
                 ed.on('blur', function(e) {
                     element.blur();
+                });
+                ed.on('keydown', function(e) {
+                    if (e.keyCode === 9) { 
+                        if (e.shiftKey) 
+                            ed.execCommand('Outdent');
+                        else 
+                            ed.execCommand('Indent');
+                        e.preventDefault();
+                        return false;
+                    }  
                 });
             }
         };
