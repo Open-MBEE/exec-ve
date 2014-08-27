@@ -3,6 +3,33 @@
 angular.module('mms.directives')
 .directive('mmsTinymce', ['ElementService', 'ViewService', '$modal', '$templateCache', '$window', '$timeout', 'growl', 'tinymce', mmsTinymce]);
 
+/**
+ * @ngdoc directive
+ * @name mms.directives.directive:mmsTinymce
+ * @element textarea
+ *
+ * @requires mms.ElementService
+ * @requires mms.ViewService
+ * @requires $modal
+ * @requires $templateCache
+ * @requires $window
+ * @requires $timeout
+ * @requires growl
+ *
+ * @restrict A
+ *
+ * @description
+ * Make any textarea with an ngModel attached to be a tinymce wysiwyg editor. This
+ * requires the tinymce library. Transclusion is supported. ngModel is required.
+ * ### Example
+ * <pre>
+   <textarea mms-tinymce ng-model="element.documentation"></textarea>
+   </pre>
+ *
+ * @param {Array=} mmsCfElements Array of element objects as returned by ElementService
+ *      that can be transcluded. Regardless, transclusion allows keyword searching 
+ *      elements to transclude from alfresco
+ */
 function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window, $timeout, growl, tinymce) { //depends on angular bootstrap
     var generatedIds = 0;
 
