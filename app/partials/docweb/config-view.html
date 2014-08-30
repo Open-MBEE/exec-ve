@@ -3,8 +3,12 @@
 <div><h1>{{config.name}} - {{config.modified | date:'medium'}}</h1></div>
 <div>{{config.description}}</div>
 <h2>Documents</h2>
-  <div ng-repeat="snapshot in configSnapshots | orderBy:'sysmlname'">
-      <a href="ve.html#/sites/{{site}}/products/{{snapshot.sysmlid}}/{{snapshot.created}}">{{snapshot.sysmlname}} - {{snapshot.created | date:'medium'}}</a>
+  <div ng-repeat="snapshot in configSnapshots | orderBy:'sysmlname'" class="row">
+      <a href="ve.html#/sites/{{site}}/products/{{snapshot.sysmlid}}/{{snapshot.created}}" class="col-xs-4">{{snapshot.sysmlname}} - {{snapshot.created | date:'medium'}}</a>
+      <button ng-if="getPDFUrl(snapshot)==null" class="btn-link col-xs-2 text-left" ng-click="generatePdf(snapshot)">Generate PDF</button>
+      <a ng-if='getPDFUrl(snapshot)!=null' href="{{getPDFUrl(snapshot)}}" class="col-xs-2 text-left" target="_blank">Download PDF</a> 
+      <button ng-if="getHTMLUrl(snapshot)==null" class="btn-link col-xs-2 text-left" ng-click="generateHtml(snapshot)">Generate HTML</button>
+      <a ng-if="getHTMLUrl(snapshot)!=null" href="{{getHTMLUrl(snapshot)}}" class="col-xs-2 text-left" target="_blank">Download HTML</a>
   </div>
   <br/>
   <button ng-show="toggles.hideChangeForm" class="btn btn-primary" ng-click="toggleChangeForm()">NAME &amp; DESCRIPTION CHANGER</button>

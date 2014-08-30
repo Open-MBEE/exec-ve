@@ -347,6 +347,18 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, _) {
         return deferred.promise;
     };
 
+    var createSnapshotArtifact = function(snapshot, site, workspace){
+        var n = normalize(null, workspace);
+        var deferred = $q.defer();
+        $http.post(URLService.getProductSnapshotsURL(snapshot.sysmlid, site, n.ws), {'snapshots': [snapshot]})
+        .success(function(data, status, headers, config){
+            deferred.resolve('ok');
+        }).error(function(data, status, headers, config){
+            URLService.handleHttpStatus(data, status, headers, config, deferred);
+        });
+        return deferred.promise;
+    };
+
     var normalize = function(updateFromServer, workspace) {
         return UtilsService.normalize({update: updateFromServer, workspace: workspace, version: null});
     };
@@ -361,6 +373,7 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, _) {
         createConfig: createConfig,
         updateConfigSnapshots: updateConfigSnapshots,
         updateConfigProducts: updateConfigProducts,
-        createSnapshot: createSnapshot
+        createSnapshot: createSnapshot,
+        createSnapshotArtifact: createSnapshotArtifact 
     };
 }
