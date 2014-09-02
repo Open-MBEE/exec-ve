@@ -43,6 +43,49 @@ angular.module('myApp')
             }            
         );
     };
+
+    $scope.getPDFUrl = function(snapshot){
+        var formats = snapshot.formats;
+        if(!formats || formats.length===0) return null;
+        for(var i=0; i < formats.length; i++){
+            if(formats[i].type=='pdf') return formats[i].url;
+        }
+        return null;
+    };
+
+    $scope.getHTMLUrl = function(snapshot){if(angular.isUndefined(snapshot)) return null;if(snapshot===null) return null;
+        var formats = snapshot.formats;
+        if(formats===undefined || formats===null || formats.length===0) return null;
+        for(var i=0; i < formats.length; i++){
+            if(formats[i].type=='html') return formats[i].url;
+        }
+        return null;
+    };
+
+    $scope.generatePdf = function(snapshot){
+        snapshot.formats.push({"type":"pdf"});
+        ConfigService.createSnapshotArtifact(snapshot, site.name, 'master').then(
+            function(result){
+                growl.success('Generating PDF...');
+            },
+            function(reason){
+                growl.error('Failed to generate PDF: ' + reason.message);
+            }
+        );
+    };
+
+    $scope.generateHtml = function(snapshot){
+        snapshot.formats.push({"type":"html"});
+        ConfigService.createSnapshotArtifact(snapshot, site.name, 'master').then(
+            function(result){
+                growl.success('Generating HTML...');
+            },
+            function(reason){
+                growl.error('Failed to generate HTML: ' + reason.message);
+            }
+        );
+    };
+    
   }])
   .controller('TagAddRemoveCtrl', ["$scope", "$http", "_", "ConfigService", "growl", 
     function($scope, $http, _, ConfigService, growl) {
