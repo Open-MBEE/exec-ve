@@ -3,7 +3,22 @@
   the MMS app design guide
 *************************/
 
+@font-face {
+  font-family: "Droid Serif";
+  src: url(http://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic,700italic);
+}
+
+/* Sizings */
+$font-size-base: 16px;
+
+/* Families */
+$font-family-sans-serif:  "Helvetica Neue", Helvetica, Arial, sans-serif !default;
+$font-family-serif: "Droid Serif", Georgia, "Times New Roman", Times, serif;
 $light-font-family-sans-serif: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, sans-serif;
+$icon-font-name: "Font Awesome";
+
+/* Weights */
 $light_font_weight: 200;
 $default_font_weight: 400;
 $bold_font_weight: 700;
+$headings-font-weight: $light_font_weight;

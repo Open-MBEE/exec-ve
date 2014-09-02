@@ -67,6 +67,11 @@ img {
 }
 
 .tooltip {
+  .tooltip-inner {
+    font-size: 12px;
+    font-weight: $default_font_weight;
+  }
+
   &.bottom-left {
     padding: 5px 0;
     margin-top: 3px;
