@@ -6,7 +6,8 @@ $pane_center_btn_group_width: 120px;
 
 .pane-center {
   .pane-center-inner {
-    max-width: 33em;
+    max-width: $default-line-length;
+    min-width: 15em;
     margin: 0 auto;
   }
 

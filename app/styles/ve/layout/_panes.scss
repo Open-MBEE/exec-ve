@@ -11,12 +11,22 @@
   }
 
   blockquote {
-    font-weight: 200;
+    font-weight: $light_font_weight;
     font-style: italic;
   }
 
-  table {
+  table,
+  table * {
     font-family: $font-family-sans-serif;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: $light-font-family-sans-serif;
   }
 }
 

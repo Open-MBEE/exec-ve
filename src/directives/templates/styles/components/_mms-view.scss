@@ -1,9 +1,7 @@
 mms-view {
   .view-title {
-    font-family: $light-font-family-sans-serif;
-    font-weight: $light_font_weight;
-    font-size: 35px;
-    margin-top: 24px;
+    line-height: $headings-line-height;
+    margin-top: 32px;
     margin-bottom: 0px;
   }
 }
