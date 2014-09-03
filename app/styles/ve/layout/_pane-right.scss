@@ -14,7 +14,12 @@
     }
 
     .snapshot-table {
+      font-size: 14px;
       margin-top: 24px;
+
+      a:hover {
+        color: $base_blue;
+      }
     }
 
     .snapshot-btn-group {
@@ -27,4 +32,3 @@
     }
   }
 }
-
