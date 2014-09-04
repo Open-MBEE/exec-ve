@@ -27,7 +27,7 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
         },
         views: {
             'menu': {
-                template: '<mms-nav mms-site="{{site}}" mms-title="{{title}}" mms-type="View Editor" mms-ws="{{ws}}"></mms-nav>',
+                template: '<mms-nav mms-responsive="true" mms-site="{{site}}" mms-title="{{title}}" mms-type="View Editor" mms-go-to="true" mms-other-sites="true" mms-ws="{{ws}}"></mms-nav>',
                 //template: '<mms-nav site="{{site}}" type="document"></mms-nav>',
                 controller: function($scope, $stateParams, document, site, ws) {
                     $scope.site = site.name;
@@ -39,25 +39,25 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
                     $scope.docweb = false;
                 }
             },
-            'sidebar-left': {
-                templateUrl: 'partials/ve/sidebar-left.html',
+            'pane-left': {
+                templateUrl: 'partials/ve/pane-left.html',
                 controller: 'NavTreeCtrl'
             },
-            'toolbar': {
+            'pane-right': {
+                templateUrl: 'partials/ve/pane-right.html',
+                controller: 'ToolCtrl'
+            },
+            'toolbar-right': {
                 template: '<mms-toolbar buttons="buttons" on-click="onClick(button)" mms-tb-api="tbApi"></mms-toolbar>',
                 controller: 'ToolbarCtrl'
-            },
-            'sidebar-right': {
-                templateUrl: 'partials/ve/sidebar-right.html',
-                controller: 'ToolCtrl'
             }
         }
     })
     .state('doc.view', {
         url: '/view/:viewId',
         views: {
-            'view@': {
-                templateUrl: 'partials/ve/view.html',
+            'pane-center@': {
+                templateUrl: 'partials/ve/pane-center.html',
                 controller: 'ViewCtrl'
             }
         },
@@ -70,7 +70,7 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
     .state('doc.order', {
         url: '/order',
         views: {
-            'view@': {
+            'pane-center@': {
                 templateUrl: 'partials/ve/reorder-views.html',
                 controller: 'ReorderCtrl'
             }

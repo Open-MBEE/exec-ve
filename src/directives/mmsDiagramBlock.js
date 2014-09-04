@@ -227,7 +227,7 @@ function mmsDiagramBlock(go, growl, ElementService) {
           new go.Binding("figure", "figure"),
           new go.Binding("fill", "color")),
         $(go.TextBlock,
-          { stroke: "#333333",
+          { stroke: "$black",
             font: "bold 11px sans-serif" },
           new go.Binding("text", "", go.Binding.toString))
       ); 
@@ -308,7 +308,7 @@ function mmsDiagramBlock(go, growl, ElementService) {
 
 
       }, function(reason) {
-          growl.error('Block Diagram - Error: ' + reason.message);
+          growl.error('Block Diagram Error: ' + reason.message);
       });
   };
 

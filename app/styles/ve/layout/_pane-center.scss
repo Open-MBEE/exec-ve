@@ -1,0 +1,60 @@
+/*************************
+  Styles for the View Editor center pane
+*************************/
+
+$pane_center_btn_group_width: 120px;
+
+.pane-center {
+  .pane-center-spinner {
+    position: absolute;
+    top: 45%;
+    left: 50%;
+  }
+
+  .pane-center-btn-group {
+    float: right;
+    padding-top: 9px;
+    padding-right: 0;
+    min-width: $pane_center_btn_group_width;
+  }
+
+  .center-view {
+    right: 41px !important;
+
+    .nav-tabs {
+      min-width: 200px;
+      background-color: $tertiary_grey;
+    }
+    
+    .nav-tabs li a {
+      cursor: pointer;
+      color: $black;
+      @include border-radius(0);
+      height: 35px;
+    }
+
+    .nav-tabs li.active a {
+      border-bottom-color: transparent;
+    }
+  }
+}
+
+.container-tree-reorder {
+  margin-bottom: 24px;
+
+  .tree-reorder {
+    width: 40%;
+    margin: 0 auto;
+    padding-top: 12px;
+    padding-bottom: 24px;
+    clear: both;
+  }
+
+  .btn-tree-reorder-save {
+    float: right;
+    margin-top: 24px;
+    margin-right: 8px;
+    padding-left: 27px;
+    padding-right: 27px;
+  }
+}

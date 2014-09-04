@@ -24,6 +24,7 @@ angular.module('mms.directives')
 function mmsTranscludeName(ElementService, $compile, growl) {
 
     var mmsTranscludeNameLink = function(scope, element, attrs, mmsViewCtrl) {
+
         element.click(function(e) {
             if (!mmsViewCtrl)
                 return false;
@@ -63,7 +64,7 @@ function mmsTranscludeName(ElementService, $compile, growl) {
 
     return {
         restrict: 'E',
-        template: '{{element.name || "name"}}',
+        template: '<span ng-if="element.name">{{element.name}}</span><span ng-if="!element.name" class=\'placeholder\'>name placeholder</span>',
         scope: {
             mmsEid: '@',
             mmsWs: '@',

@@ -23,9 +23,9 @@ angular.module('mms')
  * not null or undefined. This service is usually called by higher level services and
  * should rarely be used directly by applications.
  *
- * To configure the base url of the mms server, you can use the URLServiceProvider
+ * To configure the base url of the ems server, you can use the URLServiceProvider
  * in your application module's config. By default, the baseUrl is '/alfresco/service' 
- * which assumes your application is hosted on the same machine as the mms. 
+ * which assumes your application is hosted on the same machine as the ems. 
  *  <pre>
         angular.module('myApp', ['mms'])
         .config(function(URLServiceProvider) {
@@ -176,7 +176,7 @@ function urlService(baseUrl) {
      * @methodOf mms.URLService
      * 
      * @description
-     * Gets the url for querying the latest image url 
+     * Gets the url for querying an image url 
      * (this is not the actual image path)
      * 
      * @param {string} id The id of the image
@@ -297,7 +297,6 @@ function urlService(baseUrl) {
      * @returns {string} The post elements url.
      */
     var getPostElementsURL = function(workspace) {
-        //return root + "/javawebscripts/sites/europa/projects/PROJECT-21bbdceb-a188-45d9-a585-b30bba346175/elements";
         return root + '/workspaces/' + workspace + '/elements';
     };
 
@@ -370,6 +369,22 @@ function urlService(baseUrl) {
         return root + "/javawebscripts/element/search?keyword=" + query;
     };
 
+    var getWorkspacesURL = function() {
+        return root + '/workspaces';
+    };
+
+    var getWorkspaceURL = function(ws) {
+        return root + '/workspaces/' + ws;
+    };
+
+    var getWsDiffURL = function(ws1, ws2, ws1time, ws2time) {
+        var r = root + '/diff?sourceWs=' + ws2 + '&targetWs=' + ws2;
+        if (ws1time && ws1time !== 'latest')
+            r += '&sourceTimestamp=' + ws1time;
+        if (ws2time && ws2time !== 'latest')
+            r += '&targetTimestamp=' + ws2time;
+    };
+
     var addVersion = function(url, version) {
         if (version === 'latest')
             return url;
@@ -380,8 +395,6 @@ function urlService(baseUrl) {
     };
 
     return {
-        //getRoot: getRoot,
-        //setRoot: setRoot,
         getSiteDashboardURL: getSiteDashboardURL,
         getElementURL: getElementURL,
         getOwnedElementURL: getOwnedElementURL,
@@ -399,6 +412,9 @@ function urlService(baseUrl) {
         getConfigProductsURL : getConfigProductsURL,
         getDocumentViewsURL: getDocumentViewsURL,
         getViewElementsURL: getViewElementsURL,
+        getWsDiffURL: getWsDiffURL,
+        getWorkspacesURL: getWorkspacesURL,
+        getWorkspaceURL: getWorkspaceURL,
         isTimestamp: isTimestamp
     };
 

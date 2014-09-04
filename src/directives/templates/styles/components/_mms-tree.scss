@@ -1,0 +1,89 @@
+ul.abn-tree {
+  cursor: pointer;
+
+  li.abn-tree-row {  
+    width: 100%;
+    padding: 0px;
+
+    a.tree-item {
+      @include border-radius(0);
+      margin-top: 3px;
+      margin-bottom: 3px;
+      margin-left: 10px;  
+      color: $black;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+  }
+
+  i.indented {
+    padding: 2px;
+  }
+
+  .level-1 .tree-item {
+    position: relative;
+    padding-left: 0px;
+  }
+
+  .level-2 .tree-item {
+    position: relative;
+    padding-left: 20px;
+  }
+
+  .level-3 .tree-item {
+    position: relative;
+    padding-left: 40px;
+  }
+
+  .level-4 .tree-item {
+    position: relative;
+    padding-left: 60px;
+  }
+
+  .level-5 .tree-item {
+    position: relative;
+    padding-left: 80px;
+  }
+
+  .level-6 .tree-item {
+    position: relative;
+    padding-left: 100px;
+  }
+
+  .level-7 .tree-item {
+    position: relative;
+    padding-left: 120px;
+  }
+
+  .level-8 .tree-item {
+    position: relative;
+    padding-left: 140px;
+  }
+
+  .level-9 .tree-item {
+    position: relative;
+    padding-left: 160px;
+  }
+}
+
+.arrow {
+  position: relative;
+  width: 100%;
+  clear: left;
+}
+
+.shaft {
+  width: 100%;
+  height: 20px;
+  background: $tertiary_grey;
+  color: $white;
+}
+
+.shaft-hidden {
+  background: transparent;
+  @include transition($background_hover_transition);
+
+  &:hover {
+    background: $highlight_grey;
+  }
+}

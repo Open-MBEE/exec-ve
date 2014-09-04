@@ -43,7 +43,7 @@ function mmsViewStruct(ViewService, $templateCache, growl, $q, _) {
                 delete scope.edit.name;
                 delete scope.edit.documentation;
             }, function(reason) {
-                growl.error('Getting View Error: ' + reason.message);
+                growl.error('View Error: ' + reason.message);
             });
         });
 
@@ -74,7 +74,7 @@ function mmsViewStruct(ViewService, $templateCache, growl, $q, _) {
                     scope.save().then(function(resolved) {
                         deferred.resolve(resolved);
                     }, function(rejected) {
-                        deferred.resolve(rejected);
+                        deferred.reject(rejected);
                     });
                 } else {
                     deferred.reject({type: 'error', message: reason.message});

@@ -77,6 +77,14 @@ module.exports = function(grunt) {
       mmsdirs: {
         src: ['src/mms.directives.js', 'src/directives/*.js'],
         dest: 'dist/mms.directives.js'
+      },
+      ve: {
+        src: ['app/js/ve/*.js'],
+        dest: 'dist/ve.js'
+      },
+      docweb: {
+        src: ['app/js/docweb/*.js'],
+        dest: 'dist/docweb.js'
       }
     },
 
@@ -96,38 +104,56 @@ module.exports = function(grunt) {
         options: {
           wrap: 'mmsdirs'
         },
-        files: {'dist/mms.directives.min.js': ['dist/mms.directives.js']}
+        files: {
+          'dist/mms.directives.min.js': ['dist/mms.directives.js'],
+          'dist/mms.directives.tpls.min.js': ['dist/mms.directives.tpls.js']
+        }
+      },
+      ve: {
+        options: {
+          mangle: false
+        },
+        files: {
+          'dist/ve.min.js': ['dist/ve.js']
+        }
+      },
+      docweb: {
+        options: {
+          mangle: false
+        },
+        files: {
+          'dist/docweb.min.js': ['dist/docweb.js']
+        }
       }
     },
 
     sass: {
       dist : {
         files: {
-          'dist/css/mms.css': 'src/directives/templates/styles/mmsMain.scss'
+          'dist/css/partials/mms.css': 'src/directives/templates/styles/mms-main.scss',
+          'dist/css/partials/docweb-main.css': 'app/styles/docweb/docweb-main.scss',
+          'dist/css/partials/mm-main.css': 'app/styles/mm/mm-main.scss',
+          'dist/css/partials/ve-main.css': 'app/styles/ve/ve-main.scss'
         }
-      },
-      dist2 : {
-        files: [{
-          expand: true,
-          cwd: 'app/styles',
-          src: ['*.scss', '*.css'],
-          dest: 'dist/css/',
-          ext: '.css'
-        }]
       }
     },
 
     cssmin: {
       minify: {
         expand: true,
-        cwd: 'dist/css',
+        cwd: 'dist/css/partials',
         src: ['*.css', '!*.min.css'],
-        dest: 'dist/css/',
+        dest: 'dist/css/partials',
         ext: '.min.css'
       },
       combine: {
         files: {
-          'dist/styles.min.css': ['dist/css/*.min.css']
+          'dist/css/docweb-mms.styles.min.css':
+            ['dist/css/partials/mms.min.css', 'dist/css/partials/docweb-main.min.css'],
+          'dist/css/mm-mms.styles.min.css':
+            ['dist/css/partials/mms.min.css', 'dist/css/partials/mm-main.min.css'],
+          'dist/css/ve-mms.styles.min.css':
+            ['dist/css/partials/mms.min.css', 'dist/css/partials/ve-main.min.css']
         }
       }
     },
@@ -355,6 +381,11 @@ module.exports = function(grunt) {
           remoteBase: "/opt/local/alfresco-4.2.c/tomcat/webapps/alfresco/scripts/vieweditor2" //"~/vieweditor2"
         }
       }
+    },
+    karma: {
+      unit: {
+        configFile: 'karma.conf.js'
+      }
     }
   });
 
@@ -378,6 +409,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-bower-install');
   grunt.loadNpmTasks('grunt-bower-installer');
   grunt.loadNpmTasks('grunt-npm-install');
+  grunt.loadNpmTasks('grunt-karma');
 
   // grunt.registerTask('install', ['npm-install', 'bower']);
   grunt.registerTask('install', ['bower']);
@@ -431,7 +463,7 @@ module.exports = function(grunt) {
         grunt.task.run('stubby', 'configureProxies:' + arg1, 'connect:' + arg1);
       } else {
         grunt.log.writeln("Launching server with proxy API");
-        grunt.task.run('configureProxies:b', 'connect:b');
+        grunt.task.run('configureProxies:a', 'connect:a');
       }
       grunt.task.run('watch:' + build);
     }
