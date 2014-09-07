@@ -81,9 +81,16 @@ function mmsView(ViewService, $templateCache, growl) {
                 return;
             ViewService.getView(scope.mmsVid, false, scope.mmsWs, scope.mmsVersion)
             .then(function(data) {
-                scope.view = data;
-                scope.lastModified = data.lastModified;
-                scope.author = data.author;
+                ViewService.getViewElements(scope.mmsVid, false, scope.mmsWs, scope.mmsVersion)
+                .then(function(data2) {
+                    scope.view = data;
+                    scope.lastModified = data.lastModified;
+                    scope.author = data.author;
+                }, function(reason) {
+                    scope.view = data;
+                    scope.lastModified = data.lastModified;
+                    scope.author = data.author;
+                });
             }, function(reason) {
                 growl.error('Getting View Error: ' + reason.message);
             });
@@ -167,6 +174,7 @@ function mmsView(ViewService, $templateCache, growl) {
             mmsVid: '@',
             mmsWs: '@',
             mmsVersion: '@',
+            mmsNumber: '@',
             mmsCfClicked: '&',
             mmsViewApi: '='
         },
