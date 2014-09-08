@@ -3,8 +3,8 @@
 /* Controllers */
 
 angular.module('myApp')
-.controller('NavTreeCtrl', ['$scope', '$rootScope', '$state', 'document', 'time', 'ElementService', 'ViewService', 'growl',
-function($scope, $rootScope, $state, document, time, ElementService, ViewService, growl) {
+.controller('NavTreeCtrl', ['$scope', '$rootScope', '$timeout', '$state', 'document', 'time', 'ElementService', 'ViewService', 'growl',
+function($scope, $rootScope, $timeout, $state, document, time, ElementService, ViewService, growl) {
     $scope.document = document;
     $scope.time = time;
     $scope.editable = $scope.document.editable && time === 'latest';
@@ -187,6 +187,10 @@ function($scope, $rootScope, $state, document, time, ElementService, ViewService
             "view": "fa fa-file fa-fw"
         }
     };
+    var delay = 300;
+    document.specialization.view2view.forEach(function(view, index) {
+        $timeout(function() {ViewService.getViewElements(view.id, false, 'master', time);}, delay*index);
+    });
 }])
 .controller('ReorderCtrl', ['$scope', '$rootScope', 'document', 'ElementService', 'ViewService', '$state', 'growl', '_',
 function($scope, $rootScope, document, ElementService, ViewService, $state, growl, _) {
