@@ -71,5 +71,14 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
                 controller: 'ReorderCtrl'
             }
         }
+    })
+    .state('doc.all', {
+        url: '/all',
+        views: {
+            'pane-center@': {
+                templateUrl: 'partials/ve/full-doc.html',
+                controller: 'FullDocCtrl'
+            }
+        }
     });
 });

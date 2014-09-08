@@ -595,4 +595,73 @@ function($scope, $location, $rootScope, _, $window) {
             //event.preventDefault();
         }
     });
+}])
+.controller('FullDocCtrl', ['$scope', '$rootScope', 'document', 'time',
+function($scope, $rootScope, document, time) {
+    var views = [];
+    views.push({id: document.sysmlid, api: {}});
+    var view2view = document.specialization.view2view;
+    var view2children = {};
+    view2view.forEach(function(view) {
+        view2children[view.id] = view.childrenViews;
+    });
+
+    var addToArray = function(viewId, curSection) {
+        views.push({id: viewId, api: {}, number: curSection});
+        if (view2children[viewId]) {
+            var num = 1;
+            view2children[viewId].forEach(function(cid) {
+                addToArray(cid, curSection + '.' + num);
+                num = num + 1;
+            });
+        }
+    };
+    var num = 1;
+    view2children[document.sysmlid].forEach(function(cid) {
+        addToArray(cid, num);
+        num = num + 1;
+    });
+    $scope.version = time;
+    $scope.views = views;
+    $scope.tscClicked = function(elementId) {
+        $rootScope.$broadcast('elementSelected', elementId);
+    };
+    $scope.commentsOn = false;
+    $scope.elementsOn = false;
+    $scope.buttons = [
+        {
+            action: function() {
+                $scope.views.forEach(function(view) {
+                    view.api.toggleShowComments();
+                });
+                if (!$scope.commentsOn) {
+                    $scope.buttons[0].icon = "fa-comment";
+                    $scope.buttons[0].tooltip = "Hide Comments";
+                }
+                else {
+                    $scope.buttons[0].icon = "fa-comment-o";
+                    $scope.buttons[0].tooltip = "Show Comments";
+                }
+                $scope.commentsOn = !$scope.commentsOn;
+            },
+            tooltip: "Show Comments",
+            icon: "fa-comment-o",
+        },
+        {
+            action: function() {
+                $scope.views.forEach(function(view) {
+                    view.api.toggleShowElements();
+                });
+                if (!$scope.elementsOn) {
+                    $scope.buttons[1].tooltip = "Hide Elements";
+                }
+                else {
+                    $scope.buttons[1].tooltip = "Show Elements";
+                }
+                $scope.elementsOn = !$scope.elementsOn;
+            },
+            tooltip: "Show Elements",
+            icon: "fa-codepen",
+        }
+    ];
 }]);
