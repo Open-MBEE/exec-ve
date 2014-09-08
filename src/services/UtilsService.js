@@ -41,6 +41,9 @@ function UtilsService(_) {
                 //delete elem.specialization.displayedElements;
                 //delete elem.specialization.allowedElements;
             }
+            if (elem.specialization.hasOwnProperty('specialization')) {
+                delete elem.specialization.specialization;
+            }
             if (forEdit) {
                 for (var i = 0; i < nonEditKeys.length; i++) {
                     if (elem.specialization.hasOwnProperty(nonEditKeys[i])) {
