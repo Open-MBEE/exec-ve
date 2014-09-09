@@ -8,7 +8,8 @@ function($scope, $rootScope, $timeout, $state, document, time, views, ElementSer
     $scope.document = document;
     $scope.time = time;
     $scope.editable = $scope.document.editable && time === 'latest';
-    $rootScope.veCurrentView = $scope.document.sysmlid;
+    if ($state.current.name === 'doc')
+        $rootScope.veCurrentView = $scope.document.sysmlid;
     $scope.buttons = [{
         action: function(){ $scope.treeApi.expand_all(); },        
         tooltip: "Expand All",
