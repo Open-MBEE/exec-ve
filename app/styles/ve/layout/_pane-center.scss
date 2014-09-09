@@ -5,6 +5,12 @@
 $pane_center_btn_group_width: 120px;
 
 .pane-center {
+  margin-right: -11px;
+
+  .pane-center {
+    margin-right: 0;
+  }
+
   .pane-center-spinner {
     position: absolute;
     top: 45%;
