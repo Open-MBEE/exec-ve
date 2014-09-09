@@ -13,7 +13,7 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
                 return SiteService.getSite($stateParams.site);
             },
             views: function($stateParams, ViewService) {
-                return ViewService.getDocumentViews($stateParams.docId, false, 'master', $stateParams.time);
+                return ViewService.getDocumentViews($stateParams.docId, false, 'master', $stateParams.time, true);
             },
             time: function($stateParams) {
                 return $stateParams.time;

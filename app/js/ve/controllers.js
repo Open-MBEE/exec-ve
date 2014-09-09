@@ -3,8 +3,8 @@
 /* Controllers */
 
 angular.module('myApp')
-.controller('NavTreeCtrl', ['$scope', '$rootScope', '$timeout', '$state', 'document', 'time', 'ElementService', 'ViewService', 'growl',
-function($scope, $rootScope, $timeout, $state, document, time, ElementService, ViewService, growl) {
+.controller('NavTreeCtrl', ['$scope', '$rootScope', '$timeout', '$state', 'document', 'time', 'views', 'ElementService', 'ViewService', 'growl',
+function($scope, $rootScope, $timeout, $state, document, time, views, ElementService, ViewService, growl) {
     $scope.document = document;
     $scope.time = time;
     $scope.editable = $scope.document.editable && time === 'latest';
@@ -39,106 +39,66 @@ function($scope, $rootScope, $timeout, $state, document, time, ElementService, V
     $scope.toggleFilter = function() {
         $scope.filterOn = !$scope.filterOn;
     };
-    var treeApi = {};
-
     $scope.tooltipPlacement = function(arr) {
         arr[0].placement = "bottom-left";
         for(var i=1; i<arr.length; i++){
             arr[i].placement = "bottom";
         }
     };
+    var treeApi = {};
     $scope.tooltipPlacement($scope.buttons);
     $rootScope.veTreeApi = treeApi;
     $scope.treeApi = treeApi;
-      // 1. Iterate over view2view and create an array of all element ids
-      // 2. Call get element ids and create a map of element id -> element name structure
-      // 3. Iterate over view2view and create a map of element id -> element tree node reference
-      
-    //ViewService.getDocument($scope.documentid, false, 'master', time)
-    //.then(function(data) {
 
-        // Array of all the view element ids
-        var viewElementIds = [];
-
-        // Map of view elements from view id -> tree node object
-        var viewElementIds2TreeNodeMap = {};
-        
-        // document id is the root the tree heirarchy
-        var rootElementId = document.sysmlid;
-
-        // Iterate through all the views in the view2view attribute
-        // view2view is a set of elements with related child views
-        // Note: The JSON format is NOT nested - it uses refrencing
-        for (var i = 0; i < document.specialization.view2view.length; i++) {
-
-          var viewId = document.specialization.view2view[i].id;
-          
-          viewElementIds.push(viewId);
-        }
-
-        function addSectionElements(element, viewNode, parentNode) {
-            var contains = null;
-            if (element.specialization)
-                contains = element.specialization.contains;
-            else
-                contains = element.contains;
-          for (var j = 0; j < contains.length; j++) {
+    function addSectionElements(element, viewNode, parentNode) {
+        var contains = null;
+        if (element.specialization)
+            contains = element.specialization.contains;
+        else
+            contains = element.contains;
+        var j = contains.length - 1;
+        for (; j >= 0; j--) {
             var containedElement = contains[j];
             if (containedElement.type === "Section") {
-              var sectionTreeNode = { label : containedElement.name, 
+                var sectionTreeNode = { 
+                    label : containedElement.name, 
                     type : "section",
                     view : viewNode.data.sysmlid,
                     data : containedElement, 
-                    children : [] };
-
-              parentNode.children.push(sectionTreeNode);
-
-              addSectionElements(containedElement, viewNode, sectionTreeNode);
-
+                    children : [] 
+                };
+                parentNode.children.unshift(sectionTreeNode);
+                addSectionElements(containedElement, viewNode, sectionTreeNode);
             }
-          }
         }
+    }
 
-        // Call the get element service and pass in all the elements
-        ElementService.getElements(viewElementIds, false, 'master', time)
-        .then(function(elements) {
+    var viewId2node = {};
+    viewId2node[document.sysmlid] = {
+        label: document.name,
+        type: 'view',
+        data: document,
+        children: []
+    };
+    views.forEach(function(view) {
+        var viewTreeNode = { 
+            label : view.name, 
+            type : "view",
+            data : view, 
+            children : [] 
+        };
+        viewId2node[view.sysmlid] = viewTreeNode;
+        //addSectionElements(elements[i], viewTreeNode, viewTreeNode);
+    });
 
-          // Fill out all the view names first
-          for (var i = 0; i < elements.length; i++) {
-            var viewTreeNode = { label : elements[i].name, 
-                                  type : "view",
-                                  data : elements[i], 
-                              children : [] };
-
-            viewElementIds2TreeNodeMap[elements[i].sysmlid] = viewTreeNode;
-
-            addSectionElements(elements[i], viewTreeNode, viewTreeNode);
-          }
-
-          for (i = 0; i < document.specialization.view2view.length; i++) {
-
-            var viewId = document.specialization.view2view[i].id;
-            
-            for (var j = 0; j < document.specialization.view2view[i].childrenViews.length; j++) {
-              
-              var childViewId = document.specialization.view2view[i].childrenViews[j];
-
-              viewElementIds2TreeNodeMap[viewId].children.push( viewElementIds2TreeNodeMap[childViewId] );
-
-            }
-          }
-
-          $scope.my_data = [ viewElementIds2TreeNodeMap[rootElementId] ];
-
-        }, function(reason) {
-            if (reason.status === 404)
-                growl.error("Error: A view in this doc wasn't found");
-            else
-                growl.error(reason.data);
+    document.specialization.view2view.forEach(function(view) {
+        var viewid = view.id;
+        view.childrenViews.forEach(function(childId) {
+            viewId2node[viewid].children.push(viewId2node[childId]);
         });
+    });
+    $scope.my_data = [viewId2node[document.sysmlid]];
 
-
-    $scope.my_data = [];
     $scope.my_tree_handler = function(branch) {
         var viewId;
 
@@ -187,9 +147,28 @@ function($scope, $rootScope, $timeout, $state, document, time, ElementService, V
             "view": "fa fa-file fa-fw"
         }
     };
+    /*ViewService.getDocumentViews(document.sysmlid, false, 'master', time)
+    .then(function(fullViews) {
+        fullViews.forEach(function(view) {
+            var node = viewId2node[view.sysmlid];
+            addSectionElements(view, node, node);
+        });
+        $scope.treeApi.refresh();
+    });*/
+    function addViewSections(view) {
+        var node = viewId2node[view.sysmlid];
+        addSectionElements(view, node, node);
+        $scope.treeApi.refresh();
+    }
     var delay = 300;
     document.specialization.view2view.forEach(function(view, index) {
-        $timeout(function() {ViewService.getViewElements(view.id, false, 'master', time);}, delay*index);
+        $timeout(function() {
+            ViewService.getViewElements(view.id, false, 'master', time)
+            .then(function() {
+                ViewService.getView(view.id, false, 'master', time)
+                .then(addViewSections);
+            });
+        }, delay*index);
     });
 }])
 .controller('ReorderCtrl', ['$scope', '$rootScope', 'document', 'ElementService', 'ViewService', '$state', 'growl', '_',
