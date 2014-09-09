@@ -20,20 +20,29 @@
 
 .fa-pane-orientation-vertical,
 .fa-pane-orientation-horizontal {
-  > .fa-pane-handle {
-    background-color: #d3d3d3;
+  .fa-pane-handle {
+    background-color: $white;
+    height: 100px;
+    top: -webkit-calc(50% - 50px) !important;
+    top: calc(50% - 50px) !important;
 
     > .fa-pane-toggle {
-      margin: auto;
-      position: absolute;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      left: 0;
-      height: 100px;
-      max-height: 20%;
+      height: 100%;
+      max-height: 100%;
       cursor: pointer;
-      background-color: $light_grey;
+      background-color: $white;
+      z-index: 1000;
+    
+      &::before {
+        font-family: "FontAwesome";
+        font-size: 8px;
+        content: "";
+        color: $tertiary_grey;
+        position: relative;
+        top: 39%;
+        display: inline-block;
+        @include transform(rotate(90deg));
+      }
     }
   }
 }
