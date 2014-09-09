@@ -35,6 +35,11 @@ function($scope, $rootScope, $timeout, $state, document, time, views, ElementSer
         tooltip: "Reorder Views",
         icon: "fa-arrows-v",
         permission: $scope.editable
+    }, {
+        action: function(){ $state.go('doc.all'); },
+        tooltip: "Full Document View",
+        icon: "fa-file-text",
+        permission: true
     }];
     $scope.filterOn = false;
     $scope.toggleFilter = function() {
