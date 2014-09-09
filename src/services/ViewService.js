@@ -178,10 +178,11 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
      * @param {string} [version=latest] (optional) alfresco version number or timestamp
      * @returns {Promise} The promise will be resolved with array of view objects. 
      */
-    var getDocumentViews = function(id, update, workspace, version) {
+    var getDocumentViews = function(id, update, workspace, version, simple) {
         var n = normalize(update, workspace, version);
+        var s = !simple ? false : simple; 
         var deferred = $q.defer();
-        var url = URLService.getDocumentViewsURL(id, n.ws, n.ver);
+        var url = URLService.getDocumentViewsURL(id, n.ws, n.ver, s);
         var cacheKey = ['products', n.ws, id, n.ver, 'views'];
         if (CacheService.exists(cacheKey) && !n.update) 
             deferred.resolve(CacheService.get(cacheKey));
