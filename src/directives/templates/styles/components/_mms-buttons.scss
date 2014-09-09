@@ -14,7 +14,7 @@
   @include box-shadow(0px 1px 2px 0px rgba(50,50,50,.75));
   @include transition(box-shadow .08s linear);
 
-  &:active, &:focus {
+  &:active {
     @include box-shadow(0px 2px 2px 0px rgba(50,50,50,.75));
     outline: none;
   }
