@@ -62,9 +62,9 @@ function mmsView(ViewService, $templateCache, growl) {
                 $scope.mmsCfClicked({elementId: elementId});
         };
         this.elementTranscluded = function(elem) {
-            if (elem.lastModified > $scope.lastModified) { 
-                $scope.lastModified = elem.lastModified;
-                $scope.author = elem.author;
+            if (elem.modified > $scope.modified) { 
+                $scope.modified = elem.modified;
+                $scope.creator = elem.creator;
             }
         };
         this.getWsAndVersion = function() {
@@ -84,12 +84,12 @@ function mmsView(ViewService, $templateCache, growl) {
                 ViewService.getViewElements(scope.mmsVid, false, scope.mmsWs, scope.mmsVersion)
                 .then(function(data2) {
                     scope.view = data;
-                    scope.lastModified = data.lastModified;
-                    scope.author = data.author;
+                    scope.modified = data.modified;
+                    scope.creator = data.creator;
                 }, function(reason) {
                     scope.view = data;
-                    scope.lastModified = data.lastModified;
-                    scope.author = data.author;
+                    scope.modified = data.modified;
+                    scope.creator = data.creator;
                 });
             }, function(reason) {
                 growl.error('Getting View Error: ' + reason.message);

@@ -8,7 +8,7 @@
     <h2 class="prop-title">ID</h2>
     <h3 class="prop sysmlid">{{element.sysmlid}}</h3>
     <h2 class="prop-title">LAST MODIFICATION</h2>
-    <h3 class="prop">{{element.lastModified | date:'M/d/yy h:mm a'}} by {{element.author}}</h3>
+    <h3 class="prop">{{element.modified | date:'M/d/yy h:mm a'}} by {{element.creator}}</h3>
 
     <div ng-if="edit.specialization.type === 'Property'">
         <h2 class="prop-title">PROPERTY VALUE</h2>
@@ -43,7 +43,7 @@
     <h2 class="prop-title">ID</h2>
     <h3 class="prop sysmlid">{{element.sysmlid}}</h3>
     <h2 class="prop-title">LAST MODIFICATION</h2>
-    <h3 class="prop">{{element.lastModified | date:'M/d/yy h:mm a'}} by {{element.author}}</h3>
+    <h3 class="prop">{{element.modified | date:'M/d/yy h:mm a'}} by {{element.creator}}</h3>
 
     <div ng-if="element.specialization.type === 'Property'">
         <h2 class="prop-title">PROPERTY VALUE</h2>
