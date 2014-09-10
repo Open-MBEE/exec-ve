@@ -26,6 +26,7 @@ angular.module('mms.directives')
 function mmsTranscludeCom(ElementService, UtilsService, $log, $compile, growl) {
 
     var mmsTranscludeComLink = function(scope, element, attrs, mmsViewCtrl) {
+        var processed = false;
         scope.cfType = 'doc';
         element.click(function(e) {
             if (mmsViewCtrl)
@@ -46,8 +47,9 @@ function mmsTranscludeCom(ElementService, UtilsService, $log, $compile, growl) {
         };
 
         scope.$watch('mmsEid', function(newVal, oldVal) {
-            if (!newVal)
+            if (!newVal || (newVal === oldVal && processed))
                 return;
+            processed = true;
             if (UtilsService.hasCircularReference(scope, scope.mmsEid, 'doc')) {
                 //$log.log("prevent circular dereference!");
                 element.html('<span class="error">Circular Reference!</span>');
@@ -68,7 +70,7 @@ function mmsTranscludeCom(ElementService, UtilsService, $log, $compile, growl) {
                 recompile();
                 scope.$watch('element.documentation', recompile);
             }, function(reason) {
-                growl.error('Cf Comment Error: ' + reason.message);
+                growl.error('Cf Comment Error: ' + reason.message + ': ' + scope.mmsEid);
             });
         });
     };

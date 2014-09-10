@@ -76,9 +76,11 @@ function mmsView(ViewService, $templateCache, growl) {
     };
 
     var mmsViewLink = function(scope, element, attrs) {
+        var processed = false;
         var changeView = function(newVal, oldVal) {
-            if (!newVal)
+            if (!newVal || (newVal === oldVal && processed))
                 return;
+            processed = true;
             ViewService.getView(scope.mmsVid, false, scope.mmsWs, scope.mmsVersion)
             .then(function(data) {
                 ViewService.getViewElements(scope.mmsVid, false, scope.mmsWs, scope.mmsVersion)
@@ -92,7 +94,7 @@ function mmsView(ViewService, $templateCache, growl) {
                     scope.creator = data.creator;
                 });
             }, function(reason) {
-                growl.error('Getting View Error: ' + reason.message);
+                growl.error('Getting View Error: ' + reason.message + ': ' + scope.mmsVid);
             });
         };
         scope.$watch('mmsVid', changeView);

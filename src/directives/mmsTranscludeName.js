@@ -24,7 +24,7 @@ angular.module('mms.directives')
 function mmsTranscludeName(ElementService, $compile, growl) {
 
     var mmsTranscludeNameLink = function(scope, element, attrs, mmsViewCtrl) {
-
+        var processed = false;
         element.click(function(e) {
             if (!mmsViewCtrl)
                 return false;
@@ -33,8 +33,9 @@ function mmsTranscludeName(ElementService, $compile, growl) {
         });
 
         scope.$watch('mmsEid', function(newVal, oldVal) {
-            if (!newVal)
+            if (!newVal || (newVal === oldVal && processed))
                 return;
+            processed = true;
             var ws = scope.mmsWs;
             var version = scope.mmsVersion;
             if (mmsViewCtrl) {
@@ -51,7 +52,7 @@ function mmsTranscludeName(ElementService, $compile, growl) {
                     mmsViewCtrl.elementTranscluded(scope.element);
                 }
             }, function(reason) {
-                growl.error('Cf Name Error: ' + reason.message);
+                growl.error('Cf Name Error: ' + reason.message + ': ' + scope.mmsEid);
             });
         });
 

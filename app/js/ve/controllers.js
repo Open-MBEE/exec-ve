@@ -3,13 +3,17 @@
 /* Controllers */
 
 angular.module('myApp')
-.controller('NavTreeCtrl', ['$scope', '$rootScope', '$timeout', '$state', 'document', 'time', 'views', 'ElementService', 'ViewService', 'growl',
-function($scope, $rootScope, $timeout, $state, document, time, views, ElementService, ViewService, growl) {
+.controller('NavTreeCtrl', ['$scope', '$rootScope', '$location', '$timeout', '$state', '$anchorScroll', 'document', 'time', 'views', 'ElementService', 'ViewService', 'growl',
+function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, document, time, views, ElementService, ViewService, growl) {
     $scope.document = document;
     $scope.time = time;
     $scope.editable = $scope.document.editable && time === 'latest';
     if ($state.current.name === 'doc')
         $rootScope.veCurrentView = $scope.document.sysmlid;
+    if ($state.current.name === 'doc.all')
+        $rootScope.veFullDocMode = true;
+    else
+        $rootScope.veFullDocMode = false;
     $scope.buttons = [{
         action: function(){ $scope.treeApi.expand_all(); },        
         tooltip: "Expand All",
@@ -36,9 +40,18 @@ function($scope, $rootScope, $timeout, $state, document, time, views, ElementSer
         icon: "fa-arrows-v",
         permission: $scope.editable
     }, {
-        action: function(){ $state.go('doc.all'); },
+        action: function(){ 
+            if ($rootScope.veFullDocMode) {
+                $rootScope.veFullDocMode = false;
+                $scope.buttons[5].icon = 'fa-file-text-o';
+            } else {
+                $rootScope.veFullDocMode = true;
+                $scope.buttons[5].icon = 'fa-file-text';
+                $state.go('doc.all'); 
+            }
+        },
         tooltip: "Full Document View",
-        icon: "fa-file-text",
+        icon: $rootScope.veFullDocMode ? "fa-file-text" : "fa-file-text-o",
         permission: true
     }];
     $scope.filterOn = false;
@@ -112,10 +125,14 @@ function($scope, $rootScope, $timeout, $state, document, time, views, ElementSer
             viewId = branch.view;
         else
             viewId = branch.data.sysmlid;
-        if (viewId !== $rootScope.veCurrentView)
-            $rootScope.veViewLoading = true;
-        $state.go('doc.view', {viewId: viewId});
-
+        if ($rootScope.veFullDocMode) {
+            $location.hash(viewId);
+            $anchorScroll();
+        } else {
+            if (viewId !== $rootScope.veCurrentView)
+                $rootScope.veViewLoading = true;
+            $state.go('doc.view', {viewId: viewId});
+        }
     };
 
     $scope.reorder = function() {
@@ -166,7 +183,7 @@ function($scope, $rootScope, $timeout, $state, document, time, views, ElementSer
         addSectionElements(view, node, node);
         $scope.treeApi.refresh();
     }
-    var delay = 300;
+    var delay = 500;
     document.specialization.view2view.forEach(function(view, index) {
         $timeout(function() {
             ViewService.getViewElements(view.id, false, 'master', time)
