@@ -213,8 +213,10 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
      * @param {string} [workspace=master] workspace to use
      * @returns {Promise} The promise would be resolved with updated document object
      */
-    var addViewToDocument = function(viewId, documentId, parentViewId, workspace) {
+    var addViewToDocument = function(viewId, documentId, parentViewId, workspace, viewOb) {
         var deferred = $q.defer();
+        var ws = !workspace ? 'master' : workspace;
+        var docViewsCacheKey = ['products', ws, documentId, 'latest', 'views'];
         getDocument(documentId, workspace)
         .then(function(data) {  
             var clone = {};
@@ -231,12 +233,16 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
             clone.specialization.view2view.push({id: viewId, childrenViews: []});
             updateDocument(clone, workspace)
             .then(function(data2) {
+                if (CacheService.exists(docViewsCacheKey) && viewOb)
+                    CacheService.get(docViewsCacheKey).push(viewOb);
                 deferred.resolve(data2);
             }, function(reason) {
                 if (reason.status === 409) {
                     clone.read = reason.data.elements[0].read;
                     updateDocument(clone, workspace)
                     .then(function(data3) {
+                        if (CacheService.exists(docViewsCacheKey) && viewOb)
+                            CacheService.get(docViewsCacheKey).push(viewOb);
                         deferred.resolve(data3);
                     }, function(reason2) {
                         deferred.reject(reason2);
@@ -293,7 +299,7 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
             ElementService.updateElement(data, workspace)
             .then(function(data2) {
                 if (documentId) {
-                    addViewToDocument(data.sysmlid, documentId, ownerId, workspace)
+                    addViewToDocument(data.sysmlid, documentId, ownerId, workspace, data2)
                     .then(function(data3) {
                         deferred.resolve(data2);
                     }, function(reason) {

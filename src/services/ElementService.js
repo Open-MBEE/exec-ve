@@ -333,6 +333,10 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, _) {
             $http.post(URLService.getPostElementsURL(n.ws), {'elements': [elem]})
             .success(function(data, status, headers, config) {
                 var resp = CacheService.put(n.cacheKey, UtilsService.cleanElement(data.elements[0]), true);
+                //special case for products view2view updates 
+                if (resp.specialization && resp.specialization.view2view &&
+                    elem.specialization && elem.specialization.view2view)
+                    resp.specialization.view2view = elem.specialization.view2view;
                 deferred.resolve(resp);
                 /* TODO better way to sync edits on update, maybe app level*/
                 var edit = CacheService.get(UtilsService.makeElementKey(elem.sysmlid, n.ws, null, true));

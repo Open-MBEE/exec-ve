@@ -35,7 +35,12 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, documen
         icon: "fa-plus",
         permission: $scope.editable
     }, {
-        action: function(){ $scope.reorder(); },
+        action: function(){ 
+            $rootScope.veFullDocMode = false;
+            $scope.buttons[5].tooltip = "Full Document";
+            $scope.buttons[5].icon = 'fa-file-text-o';
+            $scope.reorder(); 
+        },
         tooltip: "Reorder Views",
         icon: "fa-arrows-v",
         permission: $scope.editable
@@ -141,9 +146,13 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, documen
     $scope.reorder = function() {
         $state.go('doc.order');
     };
-
+    var adding = false;
     $scope.addView = function() {
-
+        if (adding) {
+            growl.info('Please wait...');
+            return;
+        }
+        adding = true;
         var branch = treeApi.get_selected_branch();
         if (!branch) {
             growl.error("Add View Error: Select parent view first");
@@ -162,9 +171,11 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, documen
                 type: "view",
                 data: view
             });
+            adding = false;
         }, function(reason) {
             growl.error('Add View Error: ' + reason.message);
             $scope.buttons[3].icon = 'fa-plus';
+            adding = false;
         });
     };
     $scope.tree_options = {
@@ -197,47 +208,47 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, documen
         }, delay*index);
     });
 }])
-.controller('ReorderCtrl', ['$scope', '$rootScope', 'document', 'ElementService', 'ViewService', '$state', 'growl', '_',
-function($scope, $rootScope, document, ElementService, ViewService, $state, growl, _) {
+.controller('ReorderCtrl', ['$scope', '$rootScope', 'document', 'time', 'ElementService', 'ViewService', '$state', 'growl', '_',
+function($scope, $rootScope, document, time, ElementService, ViewService, $state, growl, _) {
     $scope.doc = document;
-    var viewElementIds = [];
-    var viewElementIds2TreeNodeMap = {};
-    var rootElementId = $scope.doc.sysmlid;
+    var viewIds2node = {};
+    viewIds2node[document.sysmlid] = {
+        name: document.name,
+        id: document.sysmlid,
+        children: []
+    };
+    var up2dateViews = null;
 
-    for (var i = 0; i < document.specialization.view2view.length; i++) {
-        var viewId = document.specialization.view2view[i].id;
-        viewElementIds.push(viewId);
-    }
-    ElementService.getElements(viewElementIds)
-    .then(function(elements) {
-        for (var i = 0; i < elements.length; i++) {
+    ViewService.getDocumentViews(document.sysmlid, false, 'master', time, true)
+    .then(function(views) {
+        up2dateViews = views;
+        up2dateViews.forEach(function(view) {
             var viewTreeNode = { 
-                id: elements[i].sysmlid, 
-                name: elements[i].name, 
+                id: view.sysmlid, 
+                name: view.name, 
                 children : [] 
             };
-            viewElementIds2TreeNodeMap[elements[i].sysmlid] = viewTreeNode;    
-        }
-        for (i = 0; i < document.specialization.view2view.length; i++) {
-            var viewId = document.specialization.view2view[i].id;
-            for (var j = 0; j < document.specialization.view2view[i].childrenViews.length; j++) {
-                var childViewId = document.specialization.view2view[i].childrenViews[j];
-                viewElementIds2TreeNodeMap[viewId].children.push(viewElementIds2TreeNodeMap[childViewId]);
-            }
-        }
-        $scope.tree = [viewElementIds2TreeNodeMap[rootElementId]];
+            viewIds2node[view.sysmlid] = viewTreeNode;    
+        });
+        document.specialization.view2view.forEach(function(view) {
+            var viewId = view.id;
+            view.childrenViews.forEach(function(childId) {
+                viewIds2node[viewId].children.push(viewIds2node[childId]);
+            });
+        });
+        $scope.tree = [viewIds2node[document.sysmlid]];
     });
     $scope.saveClass = "";
     $scope.save = function() {
         var newView2View = [];
         $scope.saveClass = "fa fa-spin fa-spinner";
-        for (var i = 0; i < viewElementIds.length; i++) {
-            var viewObject = {id: viewElementIds[i], childrenViews: []};
-            for (var j = 0; j < viewElementIds2TreeNodeMap[viewElementIds[i]].children.length; j++) {
-                viewObject.childrenViews.push(viewElementIds2TreeNodeMap[viewElementIds[i]].children[j].id);
-            }
+        angular.forEach(viewIds2node, function(view) {
+            var viewObject = {id: view.id, childrenViews: []};
+            view.children.forEach(function(child) {
+                viewObject.childrenViews.push(child.id);
+            });
             newView2View.push(viewObject);
-        }
+        });
         var newdoc = {};
         newdoc.sysmlid = document.sysmlid;
         newdoc.read = document.read;
@@ -246,6 +257,7 @@ function($scope, $rootScope, document, ElementService, ViewService, $state, grow
         ViewService.updateDocument(newdoc)
         .then(function(data) {
             growl.success('Reorder Successful');
+            //document.specialization.view2view = newView2View;
             $state.go('doc', {}, {reload:true});
         }, function(reason) {
             if (reason.status === 409) {
@@ -253,6 +265,7 @@ function($scope, $rootScope, document, ElementService, ViewService, $state, grow
                 ViewService.updateDocument(newdoc)
                 .then(function(data2) {
                     growl.success('Reorder Successful');
+                    //document.specialization.view2view = newView2View;
                     $state.go('doc', {}, {reload:true});
                 }, function(reason2) {
                     $scope.saveClass = "";
@@ -654,7 +667,7 @@ function($scope, $rootScope, document, time) {
                 $scope.commentsOn = !$scope.commentsOn;
             },
             tooltip: "Show Comments",
-            icon: "fa-comment-o",
+            icon: "fa-comment-o"
         },
         {
             action: function() {
@@ -670,7 +683,7 @@ function($scope, $rootScope, document, time) {
                 $scope.elementsOn = !$scope.elementsOn;
             },
             tooltip: "Show Elements",
-            icon: "fa-codepen",
+            icon: "fa-codepen"
         }
     ];
 }]);
