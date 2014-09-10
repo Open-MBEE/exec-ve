@@ -43,14 +43,17 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, documen
         action: function(){ 
             if ($rootScope.veFullDocMode) {
                 $rootScope.veFullDocMode = false;
+                $scope.buttons[5].tooltip = "Full Document";
                 $scope.buttons[5].icon = 'fa-file-text-o';
             } else {
                 $rootScope.veFullDocMode = true;
+                $scope.buttons[5].tooltip = "View Mode";
                 $scope.buttons[5].icon = 'fa-file-text';
-                $state.go('doc.all'); 
+                if ($state.current.name !== 'doc.all')
+                    $state.go('doc.all'); 
             }
         },
-        tooltip: "Full Document View",
+        tooltip: $rootScope.veFullDocMode ? "View Mode" : "Full Document",
         icon: $rootScope.veFullDocMode ? "fa-file-text" : "fa-file-text-o",
         permission: true
     }];
