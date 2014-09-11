@@ -3,8 +3,8 @@
 /* Controllers */
 
 angular.module('myApp')
-.controller('NavTreeCtrl', ['$scope', '$rootScope', '$location', '$timeout', '$state', '$anchorScroll', 'document', 'time', 'views', 'ElementService', 'ViewService', 'growl',
-function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, document, time, views, ElementService, ViewService, growl) {
+.controller('NavTreeCtrl', ['$scope', '$rootScope', '$location', '$timeout', '$state', '$anchorScroll', 'document', 'time', 'views', 'ElementService', 'ViewService', 'growl', '$modal',
+function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, document, time, views, ElementService, ViewService, growl, $modal) {
     $scope.document = document;
     $scope.time = time;
     $scope.editable = $scope.document.editable && time === 'latest';
@@ -51,11 +51,35 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, documen
                 $scope.buttons[5].tooltip = "Full Document";
                 $scope.buttons[5].icon = 'fa-file-text-o';
             } else {
-                $rootScope.veFullDocMode = true;
-                $scope.buttons[5].tooltip = "View Mode";
-                $scope.buttons[5].icon = 'fa-file-text';
-                if ($state.current.name !== 'doc.all')
-                    $state.go('doc.all'); 
+                if ($state.current.name === 'doc.all') {
+                    $rootScope.veFullDocMode = true;
+                    $scope.buttons[5].tooltip = "View Mode";
+                    $scope.buttons[5].icon = 'fa-file-text';
+                } else {
+                    if (document.specialization.view2view.length > 30) {
+                        var instance = $modal.open({
+                            templateUrl: 'partials/ve/fullDocWarn.html',
+                            controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
+                                $scope.ok = function() {$modalInstance.close('ok');};
+                                $scope.cancel = function() {$modalInstance.close('cancel');};
+                            }],
+                            size: 'sm'
+                        });
+                        instance.result.then(function(choice) {
+                            if (choice === 'ok') {
+                                $rootScope.veFullDocMode = true;
+                                $scope.buttons[5].tooltip = "View Mode";
+                                $scope.buttons[5].icon = 'fa-file-text';
+                                $state.go('doc.all'); 
+                            }
+                        });
+                    } else {
+                        $rootScope.veFullDocMode = true;
+                        $scope.buttons[5].tooltip = "View Mode";
+                        $scope.buttons[5].icon = 'fa-file-text';
+                        $state.go('doc.all'); 
+                    }
+                }
             }
         },
         tooltip: $rootScope.veFullDocMode ? "View Mode" : "Full Document",
