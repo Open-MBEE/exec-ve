@@ -96,7 +96,7 @@ function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window
                     $scope.comment.owner = ViewService.getCurrentViewId();
                 ElementService.createElement($scope.comment)
                 .then(function(data) {
-                    var tag = '<mms-transclude-com data-mms-eid="' + data.sysmlid + '">comment:' + data.author + '</mms-transclude-com> ';
+                    var tag = '<mms-transclude-com data-mms-eid="' + data.sysmlid + '">comment:' + data.creator + '</mms-transclude-com> ';
                     $modalInstance.close(tag);
                 }, function(reason) {
                     growl.error("Comment Error: " + reason.message);
