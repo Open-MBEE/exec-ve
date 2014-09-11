@@ -9,10 +9,6 @@ $pane_left_btn_group_width: 150px;
     &.fa-pane-orientation-horizontal {
       .fa-pane-handle > .fa-pane-toggle {
         @include box-shadow(2px 0 2px 0px rgba(100,100,100,0.4));
-
-        &::before {
-          left: -10%;
-        }
       }
     }
 
