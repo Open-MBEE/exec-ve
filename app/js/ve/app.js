@@ -13,7 +13,7 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
                 return SiteService.getSite($stateParams.site);
             },
             views: function($stateParams, ViewService) {
-                return ViewService.getDocumentViews($stateParams.docId, false, $stateParams.ws, $stateParams.time);
+                return ViewService.getDocumentViews($stateParams.docId, false, $stateParams.ws, $stateParams.time, true);
             },
             time: function($stateParams) {
                 return $stateParams.time;
@@ -73,6 +73,15 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
             'pane-center@': {
                 templateUrl: 'partials/ve/reorder-views.html',
                 controller: 'ReorderCtrl'
+            }
+        }
+    })
+    .state('doc.all', {
+        url: '/all',
+        views: {
+            'pane-center@': {
+                templateUrl: 'partials/ve/full-doc.html',
+                controller: 'FullDocCtrl'
             }
         }
     });

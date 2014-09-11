@@ -21,20 +21,22 @@
 
 <div id="outer-wrap">
     <div id="inner-wrap">
-        <div ui-view="menu">loading...</div>
+        <div ui-view="menu"></div>
         <div fa-pane pane-anchor="center" id="main-pane">
-            <div fa-pane pane-anchor="west" pane-size="20%" pane-handle="4" pane-min="20px" class="west-tabs">
-                <div ui-view="pane-left" class="container-pane-left" style="display:table;">loading...</div>
+            <div fa-pane pane-anchor="west" pane-size="20%" pane-handle="13" pane-min="20px" class="west-tabs">
+                <div ui-view="pane-left" class="container-pane-left" style="display:table;"></div>
             </div>
             <div fa-pane pane-anchor="east" pane-size="41px" pane-no-toggle="true">
                 <div ui-view="toolbar-right"></div>
             </div>
             <div fa-pane pane-anchor="center" class="center-view">
-                <div fa-pane pane-anchor="east" pane-size="30%" pane-handle="4" pane-min="20px" class="pane-right">
+                <div fa-pane pane-anchor="east" pane-size="30%" pane-handle="14" pane-min="20px" class="pane-right">
                     <div ui-view="pane-right"></div>
                 </div>   
                 <div fa-pane pane-anchor="center" class="pane-center">
-                    <div ui-view="pane-center">Select an item from the Table of Contents.</div>
+                    <div ui-view="pane-center">
+                      <i class="pane-center-spinner fa fa-5x fa-spinner fa-spin"></i>
+                    </div>
                 </div>
             </div> 
         </div>

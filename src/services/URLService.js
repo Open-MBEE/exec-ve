@@ -243,10 +243,17 @@ function urlService(baseUrl) {
      * @param {string} version Timestamp or version number
      * @returns {string} The url.
      */
-    var getDocumentViewsURL = function(id, workspace, version) {
+    var getDocumentViewsURL = function(id, workspace, version, simple) {
         var r = root + "/javawebscripts/products/" + id + "/views";
         //var r = root + "/workspaces/" + workspace + "/products/" + id + "/views";
-        return addVersion(r, version);
+        r = addVersion(r, version);
+        if (simple) {
+            if (r.indexOf('?') > 0)
+                r += '&simple=true';
+            else
+                r += '?simple=true';
+        }
+        return r;
     };
 
     /**

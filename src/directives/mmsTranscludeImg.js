@@ -21,6 +21,7 @@ angular.module('mms.directives')
 function mmsTranscludeImg(VizService, growl) {
 
     var mmsTranscludeImgLink = function(scope, element, attrs, mmsViewCtrl) {
+        var processed = false;
         element.click(function(e) {
             if (!mmsViewCtrl)
                 return false;
@@ -29,8 +30,9 @@ function mmsTranscludeImg(VizService, growl) {
         });
 
         scope.$watch('mmsEid', function(newVal, oldVal) {
-            if (!newVal)
+            if (!newVal || (newVal === oldVal && processed))
                 return;
+            processed = true;
             var ws = scope.mmsWs;
             var version = scope.mmsVersion;
             if (mmsViewCtrl) {
@@ -44,7 +46,7 @@ function mmsTranscludeImg(VizService, growl) {
             .then(function(data) {
                 scope.imgUrl = data;
             }, function(reason) {
-                growl.error('Cf Image Error: ' + reason.message);
+                growl.error('Cf Image Error: ' + reason.message + ': ' + scope.mmsEid);
             });
         });
     };
