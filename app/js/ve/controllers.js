@@ -428,7 +428,6 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
     $scope.version = time;
     $scope.eid = $scope.document.sysmlid;
     $scope.vid = $scope.eid;
-
     $scope.specApi = {};
     $scope.viewOrderApi = {};
 
@@ -443,6 +442,18 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
 
     $scope.snapshotClicked = function() {
         $scope.snapshotLoading = 'fa fa-spinner fa-spin';
+    };
+
+    $scope.etrackerChange = function() {
+        $scope.specApi.keepMode();
+        $scope.eid = $scope.etrackerSelected;
+        //$scope.specApi.changeElement($scope.etrackerSelected, 'keep');
+    };
+
+    $scope.showTracker = function() {
+        if (Object.keys($rootScope.veEdits).length > 1 && $scope.specApi.getEditing())
+            return true;
+        return false;
     };
 
     var setEditingButtonsActive = function(type, active) {
@@ -535,8 +546,10 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
         setSnapshotButtonsActive(false);
         showPane('element');
         var edit = $scope.specApi.getEdits();
-        if (edit)
+        if (edit) {
+            $scope.etrackerSelected = edit.sysmlid;
             $rootScope.veEdits[edit.sysmlid] = edit;
+        }
     });
     $scope.$on('viewSelected', function(event, vid, viewElements) {
         $scope.eid = vid;
@@ -576,9 +589,16 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
             growl.success('Save Successful');
             $rootScope.veTbApi.setButtonIcon('elementSave', 'fa fa-save');
             delete $rootScope.veEdits[$scope.specApi.getEdits().sysmlid];
-            $scope.specApi.setEditing(false);
-            $rootScope.veTbApi.select('elementViewer');
-            setEditingButtonsActive('element', false);
+            if (Object.keys($rootScope.veEdits).length > 0) {
+                var next = Object.keys($rootScope.veEdits)[0];
+                $scope.etrackerSelected = next;
+                $scope.specApi.keepMode();
+                $scope.eid = next;
+            } else {
+                $scope.specApi.setEditing(false);
+                $rootScope.veTbApi.select('elementViewer');
+                setEditingButtonsActive('element', false);
+            }
         }, function(reason) {
             elementSaving = false;
             if (reason.type === 'info')
@@ -593,13 +613,20 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
     });
     $scope.$on('elementCancel', function() {
         var go = function() {
-            $scope.specApi.setEditing(false);
-            $scope.specApi.revertEdits();
-            $rootScope.veTbApi.select('elementViewer');
-            setEditingButtonsActive('element', false);
-            setEditingButtonsActive('view', false);
-            setSnapshotButtonsActive(false);
             delete $rootScope.veEdits[$scope.specApi.getEdits().sysmlid];
+            $scope.specApi.revertEdits();
+            if (Object.keys($rootScope.veEdits).length > 0) {
+                var next = Object.keys($rootScope.veEdits)[0];
+                $scope.etrackerSelected = next;
+                $scope.specApi.keepMode();
+                $scope.eid = next;
+            } else {
+                $scope.specApi.setEditing(false);
+                $rootScope.veTbApi.select('elementViewer');
+                setEditingButtonsActive('element', false);
+                setEditingButtonsActive('view', false);
+                setSnapshotButtonsActive(false);
+            }
         };
         if ($scope.specApi.hasEdits()) {
             var instance = $modal.open({
