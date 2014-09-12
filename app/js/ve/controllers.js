@@ -477,14 +477,22 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
         $rootScope.veTbApi.select('documentSnapshots');
     };
 
+    var creatingSnapshot = false;
     $scope.$on('newSnapshot', function() {
+        if (creatingSnapshot) {
+            growl.info('Please Wait...');
+            return;
+        }
+        creatingSnapshot = true;
         $rootScope.veTbApi.setButtonIcon('snapNew', 'fa fa-spinner fa-spin');
         ConfigService.createSnapshot($scope.document.sysmlid)
         .then(function(result) {
+            creatingSnapshot = false;
             $rootScope.veTbApi.setButtonIcon('snapNew', 'fa fa-plus');
             growl.success("Snapshot Created: Refreshing...");
             refreshSnapshots();
         }, function(reason) {
+            creatingSnapshot = false;
             growl.error("Snapshot Creation failed: " + reason.message);
             $rootScope.veTbApi.setButtonIcon('snapNew', 'fa fa-plus');
         });
@@ -555,9 +563,16 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
         setSnapshotButtonsActive(false);
     });
     
+    var elementSaving = false;
     $scope.$on('elementSave', function() {
+        if (elementSaving) {
+            growl.info('Please Wait...');
+            return;
+        }
+        elementSaving = true;
         $rootScope.veTbApi.setButtonIcon('elementSave', 'fa fa-spin fa-spinner');
         $scope.specApi.save().then(function(data) {
+            elementSaving = false;
             growl.success('Save Successful');
             $rootScope.veTbApi.setButtonIcon('elementSave', 'fa fa-save');
             delete $rootScope.veEdits[$scope.specApi.getEdits().sysmlid];
@@ -565,6 +580,7 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
             $rootScope.veTbApi.select('elementViewer');
             setEditingButtonsActive('element', false);
         }, function(reason) {
+            elementSaving = false;
             if (reason.type === 'info')
                 growl.info(reason.message);
             else if (reason.type === 'warning')
@@ -604,12 +620,20 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
         } else
             go();
     });
+    var viewSaving = false;
     $scope.$on('viewSave', function() {
+        if (viewSaving) {
+            growl.info('Please Wait...');
+            return;
+        }
+        viewSaving = true;
         $rootScope.veTbApi.setButtonIcon('viewSave', 'fa fa-spin fa-spinner');
         $scope.viewOrderApi.save().then(function(data) {
+            viewSaving = false;
             growl.success('Save Succesful');
             $rootScope.veTbApi.setButtonIcon('viewSave', 'fa fa-save');
         }, function(reason) {
+            viewSaving = false;
             if (reason.type === 'info')
                 growl.info(reason.message);
             else if (reason.type === 'warning')
