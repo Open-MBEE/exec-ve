@@ -62,9 +62,9 @@ function mmsView(ViewService, $templateCache, growl) {
                 $scope.mmsCfClicked({elementId: elementId});
         };
         this.elementTranscluded = function(elem) {
-            if (elem.lastModified > $scope.lastModified) { 
-                $scope.lastModified = elem.lastModified;
-                $scope.author = elem.author;
+            if (elem.modified > $scope.modified) { 
+                $scope.modified = elem.modified;
+                $scope.creator = elem.creator;
             }
         };
         this.getWsAndVersion = function() {
@@ -76,16 +76,25 @@ function mmsView(ViewService, $templateCache, growl) {
     };
 
     var mmsViewLink = function(scope, element, attrs) {
+        var processed = false;
         var changeView = function(newVal, oldVal) {
-            if (!newVal)
+            if (!newVal || (newVal === oldVal && processed))
                 return;
+            processed = true;
             ViewService.getView(scope.mmsVid, false, scope.mmsWs, scope.mmsVersion)
             .then(function(data) {
-                scope.view = data;
-                scope.lastModified = data.lastModified;
-                scope.author = data.author;
+                ViewService.getViewElements(scope.mmsVid, false, scope.mmsWs, scope.mmsVersion)
+                .then(function(data2) {
+                    scope.view = data;
+                    scope.modified = data.modified;
+                    scope.creator = data.creator;
+                }, function(reason) {
+                    scope.view = data;
+                    scope.modified = data.modified;
+                    scope.creator = data.creator;
+                });
             }, function(reason) {
-                growl.error('Getting View Error: ' + reason.message);
+                growl.error('Getting View Error: ' + reason.message + ': ' + scope.mmsVid);
             });
         };
         scope.$watch('mmsVid', changeView);
@@ -167,6 +176,7 @@ function mmsView(ViewService, $templateCache, growl) {
             mmsVid: '@',
             mmsWs: '@',
             mmsVersion: '@',
+            mmsNumber: '@',
             mmsCfClicked: '&',
             mmsViewApi: '='
         },

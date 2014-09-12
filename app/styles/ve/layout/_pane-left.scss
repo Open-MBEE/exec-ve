@@ -4,6 +4,20 @@
 
 $pane_left_btn_group_width: 150px;
 
+#main-pane {
+  > .west-tabs {
+    &.fa-pane-orientation-horizontal {
+      .fa-pane-handle > .fa-pane-toggle {
+        @include box-shadow(2px 0 2px 0px rgba(100,100,100,0.4));
+      }
+    }
+
+    .west-tabs {
+      @include box-shadow(1px 0px 5px 0px rgba(0, 0, 0, 0.4));
+    }
+  }
+}
+
 .container-pane-left {
   height: 100%;
   width: 100%;

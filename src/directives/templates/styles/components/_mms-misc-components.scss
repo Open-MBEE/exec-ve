@@ -48,16 +48,15 @@ img {
   }
 }
 
+table {
+  @extend .table;
+}
+
 .table {
   tr {
     @include transition($background_hover_transition);
     background-color: $white;
     cursor: pointer;
-
-    &:hover {
-      @include transition($background_hover_transition);
-      background-color: $highlight_grey;
-    }
   }
 
   td {
