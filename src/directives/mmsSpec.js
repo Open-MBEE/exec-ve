@@ -168,7 +168,7 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, $q, growl, _)
                 $modalInstance.close('ok');
             };
             $scope.cancel = function() {
-                $modalInstance.dismiss();
+                $modalInstance.close('cancel');
             };
             $scope.force = function() {
                 $modalInstance.close('force');
@@ -244,7 +244,8 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, $q, growl, _)
                             }, function(error) {
                                 deferred.reject(error);
                             });
-                        }
+                        } else
+                            deferred.reject({type: 'cancel'});
                     });
                 } else {
                     deferred.reject({type: 'error', message: reason.message});
