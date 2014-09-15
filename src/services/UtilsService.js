@@ -41,6 +41,9 @@ function UtilsService(_) {
                 //delete elem.specialization.displayedElements;
                 //delete elem.specialization.allowedElements;
             }
+            if (elem.specialization.hasOwnProperty('specialization')) {
+                delete elem.specialization.specialization;
+            }
             if (forEdit) {
                 for (var i = 0; i < nonEditKeys.length; i++) {
                     if (elem.specialization.hasOwnProperty(nonEditKeys[i])) {
@@ -52,6 +55,19 @@ function UtilsService(_) {
         return elem;
     };
 
+
+    /**
+     * @ngdoc method
+     * @name mms.UtilsService#normalize
+     * @methodOf mms.UtilsService
+     * 
+     * @description
+     * Normalize common arguments
+     *
+     * @param {Object} ob Object with update, workspace, version keys
+     * @returns {Object} object with update, ws, ver keys based on the input.
+     *      default values: {update: false, ws: 'master', ver: 'latest'}
+     */
     var normalize = function(ob) {
         var res = {};
         res.update = !ob.update? false : ob.update;
@@ -60,6 +76,20 @@ function UtilsService(_) {
         return res;
     };
 
+    /**
+     * @ngdoc method
+     * @name mms.UtilsService#makeElementKey
+     * @methodOf mms.UtilsService
+     * 
+     * @description
+     * Make key for element for use in CacheService
+     *
+     * @param {string} id id of element
+     * @param {string} [workspace=master] workspace
+     * @param {string} [version=latest] version or timestamp
+     * @param {boolean} [edited=false] element is to be edited
+     * @returns {Array} key to be used in CacheService
+     */
     var makeElementKey = function(id, workspace, version, edited) {
         var ws = !workspace ? 'master' : workspace;
         var ver = !version ? 'latest' : version;

@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms')
-.factory('SiteService', ['$q', '$http', 'URLService', 'ProjectService', 'CacheService', '_', SiteService]);
+.factory('SiteService', ['$q', '$http', 'URLService', 'CacheService', '_', SiteService]);
 
 /**
  * @ngdoc service
@@ -9,22 +9,13 @@ angular.module('mms')
  * @requires $q
  * @requires $http
  * @requires mms.URLService
- * @requires mms.ProjectService
+ * @requires mms.CacheService
  * 
  * @description
  * This is a utility service for getting alfresco site information, such as 
- * list of all sites, their categories, documents, projects, tags, etc.
- *
- * Current site object:
- * ```
- *      {
- *          "name": site name (like id),
- *          "title": user friendly name,
- *          "categories": [string]  
- *      }
- * ```
+ * list of all sites and their categories
  */
-function SiteService($q, $http, URLService, ProjectService, CacheService, _) {
+function SiteService($q, $http, URLService, CacheService, _) {
     var currentSite = 'europa';
     var inProgress = null;
 

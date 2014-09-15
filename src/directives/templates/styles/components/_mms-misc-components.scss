@@ -1,5 +1,5 @@
 /*************************
-  Bootstrap mods that implement the
+  Component mods that implement the
   MMS app design guide
 *************************/
 
@@ -16,6 +16,7 @@ a {
 img {
   max-width: 100%;
 }
+
 .form-control:focus {
   border-color: $base_blue;
 }
@@ -47,16 +48,15 @@ img {
   }
 }
 
+table {
+  @extend .table;
+}
+
 .table {
   tr {
     @include transition($background_hover_transition);
     background-color: $white;
     cursor: pointer;
-
-    &:hover {
-      @include transition($background_hover_transition);
-      background-color: $highlight_grey;
-    }
   }
 
   td {

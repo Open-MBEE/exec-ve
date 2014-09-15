@@ -9,12 +9,14 @@ angular.module('mms')
  * @requires $q
  * @requires $http
  * @requires mms.URLService
+ * @requires mms.CacheService
+ * @requires mms.UtilsService
  * @requires _
  * 
  * @description
- * This service manages configurations and snapshots of products. A product can 
+ * This service manages configurations (tags) and snapshots of products. A product can 
  * have snapshots that represent a point in time of the product (a version), and
- * configurations are a grouping of these snapshots from different prodcuts. A 
+ * configurations are a grouping of these snapshots from different products. A 
  * configuration can enforce a specific time for the snapshots of its products or 
  * it can be flexible to include snapshots of different times.
  */
@@ -36,6 +38,7 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, _) {
      *
      * @param {string} site Site name
      * @param {string} [workspace=master] Workspace name
+     * @param {boolean} [update=false] update from server
      * @returns {Promise} Promise would be resolved with array of configuration objects
      */
     var getSiteConfigs = function(site, workspace, update) {
@@ -69,6 +72,7 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, _) {
      * @param {string} id Config id
      * @param {string} site Site name
      * @param {string} [workspace=master] Workspace name
+     * @param {boolean} [update=false] update from server
      * @returns {Promise} Promise would be resolved with configuration object
      */
     var getConfig = function(id, site, workspace, update) {
@@ -99,6 +103,7 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, _) {
      * @param {string} id Config id
      * @param {string} site Site name
      * @param {string} [workspace=master] Workspace name
+     * @param {boolean} [update=false] update from server
      * @returns {Promise} Promise would be resolved with array of product objects
      */
     var getConfigProducts = function(id, site, workspace, update) {
@@ -132,6 +137,7 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, _) {
      * @param {string} id Config id
      * @param {string} site Site name
      * @param {string} [workspace=master] Workspace name
+     * @param {boolean} [update=false] update from server
      * @returns {Promise} Promise would be resolved with array of snapshot objects
      */
     var getConfigSnapshots = function(id, site, workspace, update) {
@@ -165,7 +171,7 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, _) {
      * @param {string} id Product id
      * @param {string} site Site name
      * @param {string} [workspace=master] Workspace name
-     * @param {boolean} [updateFromServer=false] get from server
+     * @param {boolean} [update=false] update from server
      * @returns {Promise} Promise would be resolved with array of snapshot objects
      */
     var getProductSnapshots = function(id, site, workspace, update) {
@@ -196,7 +202,7 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, _) {
      * @description
      * Update properties of a configuration
      *
-     * @param {Object} config The config object with updated properties
+     * @param {Object} config The config object with updated properties, must have id
      * @param {string} site Site name
      * @param {string} [workspace=master] Workspace name
      * @returns {Promise} Promise would be resolved with the updated config object
@@ -205,7 +211,7 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, _) {
         var n = normalize(null, workspace);
         var deferred = $q.defer();
         if (!config.hasOwnProperty('id'))
-            deferred.reject({status: 200, message: 'Config id not found, create configuration first!'});
+            deferred.reject({status: 400, message: 'Config id not found, create configuration first!'});
         else {
             $http.post(URLService.getSiteConfigsURL(site, n.ws), {'configurations': [config]})
             .success(function(data, status, headers, c) {
@@ -225,7 +231,7 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, _) {
      * @description
      * Create a new configuration 
      *
-     * @param {Object} config The new config object
+     * @param {Object} config The new config object, must not already have id
      * @param {string} site Site name
      * @param {string} [workspace=master] Workspace name
      * @returns {Promise} Promise would be resolved with the updated config object
@@ -234,7 +240,7 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, _) {
         var n = normalize(null, workspace);
         var deferred = $q.defer();
         if (config.hasOwnProperty('id')) {
-            deferred.reject({status: 200, message: 'Config create cannot already have id'});
+            deferred.reject({status: 400, message: 'Config create cannot already have id'});
             return deferred.promise;
         } 
         $http.post(URLService.getSiteConfigsURL(site, n.ws), {'configurations': [config]})
@@ -341,6 +347,18 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, _) {
         return deferred.promise;
     };
 
+    var createSnapshotArtifact = function(snapshot, site, workspace){
+        var n = normalize(null, workspace);
+        var deferred = $q.defer();
+        $http.post(URLService.getProductSnapshotsURL(snapshot.sysmlid, site, n.ws), {'snapshots': [snapshot]})
+        .success(function(data, status, headers, config){
+            deferred.resolve('ok');
+        }).error(function(data, status, headers, config){
+            URLService.handleHttpStatus(data, status, headers, config, deferred);
+        });
+        return deferred.promise;
+    };
+
     var normalize = function(updateFromServer, workspace) {
         return UtilsService.normalize({update: updateFromServer, workspace: workspace, version: null});
     };
@@ -355,6 +373,7 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, _) {
         createConfig: createConfig,
         updateConfigSnapshots: updateConfigSnapshots,
         updateConfigProducts: updateConfigProducts,
-        createSnapshot: createSnapshot
+        createSnapshot: createSnapshot,
+        createSnapshotArtifact: createSnapshotArtifact 
     };
 }

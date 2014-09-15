@@ -27,6 +27,7 @@ function mmsTranscludeVal(ElementService, UtilsService, $log, $compile, $templat
     var valTemplate = $templateCache.get('mms/templates/mmsTranscludeVal.html');
 
     var mmsTranscludeValLink = function(scope, element, attrs, mmsViewCtrl) {
+        var processed = false;
         scope.cfType = 'val';
         element.click(function(e) {
             if (mmsViewCtrl)
@@ -67,8 +68,9 @@ function mmsTranscludeVal(ElementService, UtilsService, $log, $compile, $templat
         };
 
         scope.$watch('mmsEid', function(newVal, oldVal) {
-            if (!newVal)
+            if (!newVal || (newVal === oldVal && processed))
                 return;
+            processed = true;
             if (UtilsService.hasCircularReference(scope, scope.mmsEid, 'val')) {
                 //$log.log("prevent circular dereference!");
                 element.html('<span class="error">Circular Reference!</span>');
@@ -90,7 +92,7 @@ function mmsTranscludeVal(ElementService, UtilsService, $log, $compile, $templat
                 recompile();
                 scope.$watch('values', recompile, true);
             }, function(reason) {
-                growl.error('Cf Val Error: ' + reason.message);
+                growl.error('Cf Val Error: ' + reason.message + ': ' + scope.mmsEid);
             });
         });
     };

@@ -2,22 +2,38 @@
   Styles for the DocWeb left pane
 *************************/
 
-.docweb-sidebar-left {
-  .nav-tabs li {
-    text-align: center;
+#main-pane {
+  > .docweb-sidebar-left {
+    &.fa-pane-orientation-horizontal {
+      .fa-pane-handle > .fa-pane-toggle {
+        @include box-shadow(2px 0 2px 0px rgba(100,100,100,0.4));
 
-    a {
-      cursor: pointer;
-      color: $black;
-      border-radius: 0;
-      @include border-radius(0);
+        &::before {
+          left: -10%;
+        }
+      }
     }
-  }
 
-  .btn-create-config {
-    width: 100%;
-    padding: 16px;
-    margin-top: -8px;
-    margin-bottom: 33px;
+    .docweb-sidebar-left {
+      @include box-shadow(1px 0px 5px 0px rgba(0, 0, 0, 0.4));
+    }
+
+    .nav-tabs li {
+      text-align: center;
+
+      a {
+        cursor: pointer;
+        color: $black;
+        border-radius: 0;
+        @include border-radius(0);
+      }
+    }
+
+    .btn-create-config {
+      width: 100%;
+      padding: 16px;
+      margin-top: -8px;
+      margin-bottom: 33px;
+    }
   }
 }

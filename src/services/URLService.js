@@ -23,9 +23,9 @@ angular.module('mms')
  * not null or undefined. This service is usually called by higher level services and
  * should rarely be used directly by applications.
  *
- * To configure the base url of the mms server, you can use the URLServiceProvider
+ * To configure the base url of the ems server, you can use the URLServiceProvider
  * in your application module's config. By default, the baseUrl is '/alfresco/service' 
- * which assumes your application is hosted on the same machine as the mms. 
+ * which assumes your application is hosted on the same machine as the ems. 
  *  <pre>
         angular.module('myApp', ['mms'])
         .config(function(URLServiceProvider) {
@@ -176,7 +176,7 @@ function urlService(baseUrl) {
      * @methodOf mms.URLService
      * 
      * @description
-     * Gets the url for querying the latest image url 
+     * Gets the url for querying an image url 
      * (this is not the actual image path)
      * 
      * @param {string} id The id of the image
@@ -243,10 +243,17 @@ function urlService(baseUrl) {
      * @param {string} version Timestamp or version number
      * @returns {string} The url.
      */
-    var getDocumentViewsURL = function(id, workspace, version) {
+    var getDocumentViewsURL = function(id, workspace, version, simple) {
         var r = root + "/javawebscripts/products/" + id + "/views";
         //var r = root + "/workspaces/" + workspace + "/products/" + id + "/views";
-        return addVersion(r, version);
+        r = addVersion(r, version);
+        if (simple) {
+            if (r.indexOf('?') > 0)
+                r += '&simple=true';
+            else
+                r += '?simple=true';
+        }
+        return r;
     };
 
     /**
@@ -297,7 +304,6 @@ function urlService(baseUrl) {
      * @returns {string} The post elements url.
      */
     var getPostElementsURL = function(workspace) {
-        //return root + "/javawebscripts/sites/europa/projects/PROJECT-21bbdceb-a188-45d9-a585-b30bba346175/elements";
         return root + '/workspaces/' + workspace + '/elements';
     };
 
@@ -397,8 +403,6 @@ function urlService(baseUrl) {
     };
 
     return {
-        //getRoot: getRoot,
-        //setRoot: setRoot,
         getSiteDashboardURL: getSiteDashboardURL,
         getElementURL: getElementURL,
         getOwnedElementURL: getOwnedElementURL,

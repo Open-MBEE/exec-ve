@@ -16,11 +16,28 @@ angular.module('mms.directives')
  * Given a view id, renders the view according to the json given by mms.ViewService
  * The view have a text edit mode, where transclusions can be clicked. The view's last 
  * modified time and author is the latest of any transcluded element modified time. 
+ * For available api methods, see methods section.
  *
  * ## Example
+ * ### controller (js)
  *  <pre>
-    <mms-view mms-vid="view_element_id" mms-cf-clicked="elementClickedHandler(elementId)"></mms-view>
-    <!-- the elementClickedHandler would be a function in your scope -->
+    angular.module('app', ['mms.directives'])
+    .controller('ViewCtrl', ['$scope', function($scope) {
+        $scope.api = {}; //empty object to be populated by the view directive
+        $scope.handler = function(elementId) {
+            //element with elementId clicked in view
+        };
+        $scope.showComments = function() {
+            $scope.api.setShowComments(true);
+        };
+    }]);
+    </pre>
+ * ### template (html)
+ *  <pre>
+    <div ng-controller="ViewCtrl">
+        <button ng-click="showComments()">Show Comments</button>
+        <mms-view mms-vid="view_element_id" mms-cf-clicked="handler(elementId)" mms-view-api="api"></mms-view>
+    </div>
     </pre>
  * ## Example view at a certain time
  *  <pre>
@@ -45,9 +62,9 @@ function mmsView(ViewService, $templateCache, growl) {
                 $scope.mmsCfClicked({elementId: elementId});
         };
         this.elementTranscluded = function(elem) {
-            if (elem.lastModified > $scope.lastModified) { 
-                $scope.lastModified = elem.lastModified;
-                $scope.author = elem.author;
+            if (elem.modified > $scope.modified) { 
+                $scope.modified = elem.modified;
+                $scope.creator = elem.creator;
             }
         };
         this.getWsAndVersion = function() {
@@ -59,25 +76,50 @@ function mmsView(ViewService, $templateCache, growl) {
     };
 
     var mmsViewLink = function(scope, element, attrs) {
+        var processed = false;
         var changeView = function(newVal, oldVal) {
-            if (!newVal)
+            if (!newVal || (newVal === oldVal && processed))
                 return;
+            processed = true;
             ViewService.getView(scope.mmsVid, false, scope.mmsWs, scope.mmsVersion)
             .then(function(data) {
-                scope.view = data;
-                scope.lastModified = data.lastModified;
-                scope.author = data.author;
+                ViewService.getViewElements(scope.mmsVid, false, scope.mmsWs, scope.mmsVersion)
+                .then(function(data2) {
+                    scope.view = data;
+                    scope.modified = data.modified;
+                    scope.creator = data.creator;
+                }, function(reason) {
+                    scope.view = data;
+                    scope.modified = data.modified;
+                    scope.creator = data.creator;
+                });
             }, function(reason) {
-                growl.error('Getting View Error: ' + reason.message);
+                growl.error('Getting View Error: ' + reason.message + ': ' + scope.mmsVid);
             });
         };
         scope.$watch('mmsVid', changeView);
         scope.showElements = false;
         scope.showComments = false;
+        /**
+         * @ngdoc function
+         * @name mms.directives.directive:mmsView#toggleShowElements
+         * @methodOf mms.directives.directive:mmsView
+         * 
+         * @description 
+         * toggle elements highlighting 
+         */
         scope.toggleShowElements = function() {
             scope.showElements = !scope.showElements;
             element.toggleClass('editing');
         };
+        /**
+         * @ngdoc function
+         * @name mms.directives.directive:mmsView#toggleShowComments
+         * @methodOf mms.directives.directive:mmsView
+         * 
+         * @description 
+         * toggle comments visibility
+         */
         scope.toggleShowComments = function() {
             scope.showComments = !scope.showComments;
             element.toggleClass('reviewing');
@@ -86,6 +128,16 @@ function mmsView(ViewService, $templateCache, growl) {
         if (angular.isObject(scope.mmsViewApi)) {
             var api = scope.mmsViewApi;
             api.toggleShowElements = scope.toggleShowElements;
+            /**
+             * @ngdoc function
+             * @name mms.directives.directive:mmsView#setShowElements
+             * @methodOf mms.directives.directive:mmsView
+             * 
+             * @description 
+             * self explanatory
+             *
+             * @param {boolean} mode arg
+             */
             api.setShowElements = function(mode) {
                 scope.showElements = mode;
                 if (mode)
@@ -94,6 +146,16 @@ function mmsView(ViewService, $templateCache, growl) {
                     element.removeClass('editing');
             };
             api.toggleShowComments = scope.toggleShowComments;
+            /**
+             * @ngdoc function
+             * @name mms.directives.directive:mmsView#setShowComments
+             * @methodOf mms.directives.directive:mmsView
+             * 
+             * @description 
+             * self explanatory
+             *
+             * @param {boolean} mode arg
+             */
             api.setShowComments = function(mode) {
                 scope.showComments = mode; 
                 if (mode)
@@ -114,6 +176,7 @@ function mmsView(ViewService, $templateCache, growl) {
             mmsVid: '@',
             mmsWs: '@',
             mmsVersion: '@',
+            mmsNumber: '@',
             mmsCfClicked: '&',
             mmsViewApi: '='
         },
