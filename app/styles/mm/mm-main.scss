@@ -1,5 +1,5 @@
 @import "../ve/base/_globals.scss";
-@import "../ve/layout/_border-layout.scss";
+@import "../ve/layout/_panes.scss";
 
 $navHeight: 40px;
 $treeMarginTop: 15px;
@@ -13,6 +13,19 @@ $mainViewShadowColor: rgba(0,0,0,.26);
   -webkit-box-shadow: 0 0 9px $mainViewShadowColor;
   -moz-box-shadow: 0 0 9px $mainViewShadowColor;
   box-shadow: 0 0 9px $mainViewShadowColor; 
+}
+
+.pane-right {
+  > .pane-right {
+    @include box-shadow(-1px 0px 5px 0px rgba(0, 0, 0, 0.4));
+  }
+
+  &.fa-pane-orientation-horizontal {
+    .fa-pane-handle > .fa-pane-toggle {
+      @include box-shadow(-2px 0 2px 0px rgba(100,100,100,0.4));
+      margin-left: 1px;
+    }
+  }
 }
 
 /*.abn-tree {
