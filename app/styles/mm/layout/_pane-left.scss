@@ -1,0 +1,49 @@
+.pane-left {
+  > .pane-left {
+    @include box-shadow(inset -1px 0px 3px 0px rgba(0,0,0,.24));
+
+    .container-fluid {
+      position: relative;
+      height: 100%;
+
+      .btn-merge {
+        position: absolute;
+        bottom: 60px;
+      }
+
+      .btn-go-back {
+        position: absolute;
+        bottom: 15px;
+      }
+    }
+  }
+
+  .fa-pane-handle {
+    display: none;
+  }
+}
+
+.icon-added {
+  color: green;
+}
+
+.icon-removed {
+  color: red;
+}
+
+.icon-updated {
+  color: blue;
+}
+
+.icon-moved {
+  color: orange;
+}
+
+.icon-conflict {
+  color: yellow;
+}
+
+.btn-merge,
+.btn-go-back {
+  display: block;
+}
