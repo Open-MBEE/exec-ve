@@ -91,7 +91,7 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, documen
         },
         tooltip: "Save All Open Edits",
         icon: "fa-save",
-        permission: true
+        permission: time === 'latest' ? true : false
     }];
     $scope.filterOn = false;
     $scope.toggleFilter = function() {
