@@ -224,7 +224,7 @@ function(_, $scope, $rootScope, $http, $state, $stateParams, growl, WorkspaceSer
 
           id2node[e.sysmlid] = node;
 
-          var change = createChange(e.name, emptyElement, e, "added", "fa-plus-circle", null);
+          var change = createChange(e.name, emptyElement, e, "added", "fa-plus", null);
 
           updateChangeProperty(change.properties.name, "added");
           updateChangeProperty(change.properties.owner, "added");
@@ -239,7 +239,7 @@ function(_, $scope, $rootScope, $http, $state, $stateParams, growl, WorkspaceSer
 
           var deletedElement = id2data[e.sysmlid];
 
-          var change = createChange(deletedElement.name, deletedElement, emptyElement, "removed", "fa-times-circle", null);
+          var change = createChange(deletedElement.name, deletedElement, emptyElement, "removed", "fa-times", null);
 
           updateChangeProperty(change.properties.name, "removed");
           updateChangeProperty(change.properties.owner, "removed");

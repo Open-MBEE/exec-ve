@@ -1,8 +1,8 @@
-<h1><i class="fa {{change.icon}} icon-{{change.type}}"></i> {{change.name}}</h1>
+<h1 class="pane-center-header"><i class="fa {{change.icon}} icon-{{change.type}}"></i> {{change.name}}</h1>
 
 <table class="table">
   
-  <h1>Element</h1>
+  <h1 class="pane-center-heading-element">Element</h1>
 
   <thead>
     <tr>
@@ -15,7 +15,7 @@
 
   <tbody>
     <tr class="{{options.statuses[change.properties.name.type].style}}">
-      <td>Name</td>
+      <td>NAME</td>
       <td>{{change.original.name}}</td>
       <td>{{change.delta.name}}</td>
       <td>
@@ -27,7 +27,7 @@
     </tr>
 
     <tr class="{{options.statuses[change.properties.owner.type].style}}">
-      <td>Owner</td>
+      <td>OWNER</td>
       <td>{{change.original.owner}}</td>
       <td>{{change.delta.owner}}</td>
       <td>
@@ -39,7 +39,7 @@
     </tr>
 
     <tr class="{{options.statuses[change.properties.documentation.type].style}}">
-      <td>Documentation</td>
+      <td>DOC</td>
       <td>{{change.original.documentation}}</td>
       <td>{{change.delta.documentation}}</td>
       <td>
@@ -55,37 +55,37 @@
 
 <table class="table">
 
-<div>
-  
-    <h1>Specializations</h1>
+  <div>
+    
+      <h1>Specializations</h1>
 
-    <thead>
-      <tr>
-        <th></th>
-        <th>A</th>
-        <th>B</th>
-      </tr>
-    </thead>
-  
-    <tbody>
-      <tr ng-class="{addition: specAddition, removal: specRemoval, update: specUpdate, clean: specClean}">
-        <td>Specialization Type</td>
-        <td>{{original.specialization.type}}</td>
-        <td>{{delta.specialization.type}}</td>
-      </tr>
-  
-      <tr ng-class="{addition: typeAddition, removal: typeRemoval, update: typeUpdate, clean: typeClean}">
-        <td>Value Type</td>
-        <td>{{original.specialization.valueArray[0]}}</td>
-        <td>{{delta.specialization.valueArray[0]}}</td>
-      </tr>
-  
-      <tr ng-class="{addition: valAddition, removal: valRemoval, update: valUpdate, clean: valClean}">
-        <td>Value</td>
-        <td>{{original.specialization.valueArray[1]}}</td>
-        <td>{{delta.specialization.valueArray[1]}}</td>
-      </tr>
-    </tbody>
-</div>
+      <thead>
+        <tr>
+          <th></th>
+          <th>A</th>
+          <th>B</th>
+        </tr>
+      </thead>
+    
+      <tbody>
+        <tr ng-class="{addition: specAddition, removal: specRemoval, update: specUpdate, clean: specClean}">
+          <td>TYPE</td>
+          <td>{{original.specialization.type}}</td>
+          <td>{{delta.specialization.type}}</td>
+        </tr>
+    
+        <tr ng-class="{addition: typeAddition, removal: typeRemoval, update: typeUpdate, clean: typeClean}">
+          <td>VALUE TYPE</td>
+          <td>{{original.specialization.valueArray[0]}}</td>
+          <td>{{delta.specialization.valueArray[0]}}</td>
+        </tr>
+    
+        <tr ng-class="{addition: valAddition, removal: valRemoval, update: valUpdate, clean: valClean}">
+          <td>VALUE</td>
+          <td>{{original.specialization.valueArray[1]}}</td>
+          <td>{{delta.specialization.valueArray[1]}}</td>
+        </tr>
+      </tbody>
+  </div>
 
 </table>
