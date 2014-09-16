@@ -71,7 +71,7 @@ angular.module('myApp')
     $scope.generatePdf = function(snapshot, elem){
         elem.pdfText = "Generating...";
         snapshot.formats.push({"type":"pdf"});
-        ConfigService.createSnapshotArtifact(snapshot, site.name, 'master').then(
+        ConfigService.createSnapshotArtifact(snapshot, site.name, ws).then(
             function(result){
                 growl.success('Generating PDF...');
             },
@@ -84,7 +84,7 @@ angular.module('myApp')
     $scope.generateHtml = function(snapshot, elem){
         elem.htmlText = "Generating...";
         snapshot.formats.push({"type":"html"});
-        ConfigService.createSnapshotArtifact(snapshot, site.name, 'master').then(
+        ConfigService.createSnapshotArtifact(snapshot, site.name, ws).then(
             function(result){
                 growl.success('Generating HTML...');
             },
