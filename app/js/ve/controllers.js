@@ -3,8 +3,8 @@
 /* Controllers */
 
 angular.module('myApp')
-.controller('NavTreeCtrl', ['$scope', '$rootScope', '$location', '$timeout', '$state', '$anchorScroll', 'document', 'time', 'views', 'ElementService', 'ViewService', 'growl', 'ws',
-function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, document, time, views, ElementService, ViewService, growl, ws) {
+.controller('NavTreeCtrl', ['$scope', '$rootScope', '$location', '$timeout', '$state', '$anchorScroll', 'document', 'time', 'views', 'ElementService', 'ViewService', 'growl', '$modal', '$q', 'ws',
+function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, document, time, views, ElementService, ViewService, growl, $modal, $q, ws) {
     $scope.document = document;
     $scope.time = time;
     $scope.ws = ws;
@@ -52,16 +52,47 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, documen
                 $scope.buttons[5].tooltip = "Full Document";
                 $scope.buttons[5].icon = 'fa-file-text-o';
             } else {
-                $rootScope.veFullDocMode = true;
-                $scope.buttons[5].tooltip = "View Mode";
-                $scope.buttons[5].icon = 'fa-file-text';
-                if ($state.current.name !== 'doc.all')
-                    $state.go('doc.all'); 
+                if ($state.current.name === 'doc.all') {
+                    $rootScope.veFullDocMode = true;
+                    $scope.buttons[5].tooltip = "View Mode";
+                    $scope.buttons[5].icon = 'fa-file-text';
+                } else {
+                    if (document.specialization.view2view.length > 30) {
+                        var instance = $modal.open({
+                            templateUrl: 'partials/ve/fullDocWarn.html',
+                            controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
+                                $scope.ok = function() {$modalInstance.close('ok');};
+                                $scope.cancel = function() {$modalInstance.close('cancel');};
+                            }],
+                            size: 'sm'
+                        });
+                        instance.result.then(function(choice) {
+                            if (choice === 'ok') {
+                                $rootScope.veFullDocMode = true;
+                                $scope.buttons[5].tooltip = "View Mode";
+                                $scope.buttons[5].icon = 'fa-file-text';
+                                $state.go('doc.all'); 
+                            }
+                        });
+                    } else {
+                        $rootScope.veFullDocMode = true;
+                        $scope.buttons[5].tooltip = "View Mode";
+                        $scope.buttons[5].icon = 'fa-file-text';
+                        $state.go('doc.all'); 
+                    }
+                }
             }
         },
         tooltip: $rootScope.veFullDocMode ? "View Mode" : "Full Document",
         icon: $rootScope.veFullDocMode ? "fa-file-text" : "fa-file-text-o",
         permission: true
+    }, {
+        action: function() {
+            $scope.saveAll();
+        },
+        tooltip: "Save All Open Edits",
+        icon: "fa-save",
+        permission: time === 'latest' ? true : false
     }];
     $scope.filterOn = false;
     $scope.toggleFilter = function() {
@@ -177,6 +208,56 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, documen
             growl.error('Add View Error: ' + reason.message);
             $scope.buttons[3].icon = 'fa-plus';
             adding = false;
+        });
+    };
+    var savingAll = false;
+    $scope.saveAll = function() {
+        if (savingAll) {
+            growl.info('Please wait...');
+            return;
+        }
+        if (Object.keys($rootScope.veEdits).length === 0) {
+            growl.info('Nothing to save');
+            return;
+        }
+        savingAll = true;
+        $scope.buttons[6].icon = 'fa-spin fa-spinner';
+        var promises = [];
+        angular.forEach($rootScope.veEdits, function(value, key) {
+            var defer = $q.defer();
+            promises.push(defer.promise);
+            ElementService.updateElement(value, ws)
+            .then(function(e) {
+                defer.resolve({status: 200, id: e.sysmlid});
+            }, function(reason) {
+                defer.resolve({status: reason.status, id: value.sysmlid});
+            });
+        });
+        $q.all(promises).then(function(results) {
+            var somefail = false;
+            var failed = null;
+            results.forEach(function(ob) {
+                if (ob.status === 200)
+                    delete $rootScope.veEdits[ob.id];
+                else {
+                    somefail = true;
+                    failed = ob.id;
+                }
+            });
+            if (!somefail) {
+                var branch = treeApi.get_selected_branch();
+                if (branch)
+                    branch = branch.data.sysmlid;
+                else
+                    branch = document.sysmlid;
+                growl.success("Save All Successful");
+                $rootScope.$broadcast('elementSelected', branch);
+            } else {
+                $rootScope.$broadcast('elementSelected', failed);
+                growl.error("Some elements failed to save, resolve individually in edit pane");
+            }
+            $scope.buttons[6].icon = 'fa-save';
+            savingAll = false;
         });
     };
     $scope.tree_options = {
@@ -407,7 +488,6 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
     $scope.version = time;
     $scope.eid = $scope.document.sysmlid;
     $scope.vid = $scope.eid;
-
     $scope.specApi = {};
     $scope.viewOrderApi = {};
 
@@ -422,6 +502,18 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
 
     $scope.snapshotClicked = function() {
         $scope.snapshotLoading = 'fa fa-spinner fa-spin';
+    };
+
+    $scope.etrackerChange = function() {
+        $scope.specApi.keepMode();
+        $scope.eid = $scope.etrackerSelected;
+        //$scope.specApi.changeElement($scope.etrackerSelected, 'keep');
+    };
+
+    $scope.showTracker = function() {
+        if (Object.keys($rootScope.veEdits).length > 1 && $scope.specApi.getEditing())
+            return true;
+        return false;
     };
 
     var setEditingButtonsActive = function(type, active) {
@@ -456,14 +548,22 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
         $rootScope.veTbApi.select('documentSnapshots');
     };
 
+    var creatingSnapshot = false;
     $scope.$on('newSnapshot', function() {
+        if (creatingSnapshot) {
+            growl.info('Please Wait...');
+            return;
+        }
+        creatingSnapshot = true;
         $rootScope.veTbApi.setButtonIcon('snapNew', 'fa fa-spinner fa-spin');
         ConfigService.createSnapshot($scope.document.sysmlid, site.name, ws)
         .then(function(result) {
+            creatingSnapshot = false;
             $rootScope.veTbApi.setButtonIcon('snapNew', 'fa fa-plus');
             growl.success("Snapshot Created: Refreshing...");
             refreshSnapshots();
         }, function(reason) {
+            creatingSnapshot = false;
             growl.error("Snapshot Creation failed: " + reason.message);
             $rootScope.veTbApi.setButtonIcon('snapNew', 'fa fa-plus');
         });
@@ -506,8 +606,10 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
         setSnapshotButtonsActive(false);
         showPane('element');
         var edit = $scope.specApi.getEdits();
-        if (edit)
+        if (edit) {
+            $scope.etrackerSelected = edit.sysmlid;
             $rootScope.veEdits[edit.sysmlid] = edit;
+        }
     });
     $scope.$on('viewSelected', function(event, vid, viewElements) {
         $scope.eid = vid;
@@ -534,16 +636,31 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
         setSnapshotButtonsActive(false);
     });
     
+    var elementSaving = false;
     $scope.$on('elementSave', function() {
+        if (elementSaving) {
+            growl.info('Please Wait...');
+            return;
+        }
+        elementSaving = true;
         $rootScope.veTbApi.setButtonIcon('elementSave', 'fa fa-spin fa-spinner');
         $scope.specApi.save().then(function(data) {
+            elementSaving = false;
             growl.success('Save Successful');
             $rootScope.veTbApi.setButtonIcon('elementSave', 'fa fa-save');
             delete $rootScope.veEdits[$scope.specApi.getEdits().sysmlid];
-            $scope.specApi.setEditing(false);
-            $rootScope.veTbApi.select('elementViewer');
-            setEditingButtonsActive('element', false);
+            if (Object.keys($rootScope.veEdits).length > 0) {
+                var next = Object.keys($rootScope.veEdits)[0];
+                $scope.etrackerSelected = next;
+                $scope.specApi.keepMode();
+                $scope.eid = next;
+            } else {
+                $scope.specApi.setEditing(false);
+                $rootScope.veTbApi.select('elementViewer');
+                setEditingButtonsActive('element', false);
+            }
         }, function(reason) {
+            elementSaving = false;
             if (reason.type === 'info')
                 growl.info(reason.message);
             else if (reason.type === 'warning')
@@ -556,13 +673,20 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
     });
     $scope.$on('elementCancel', function() {
         var go = function() {
-            $scope.specApi.setEditing(false);
-            $scope.specApi.revertEdits();
-            $rootScope.veTbApi.select('elementViewer');
-            setEditingButtonsActive('element', false);
-            setEditingButtonsActive('view', false);
-            setSnapshotButtonsActive(false);
             delete $rootScope.veEdits[$scope.specApi.getEdits().sysmlid];
+            $scope.specApi.revertEdits();
+            if (Object.keys($rootScope.veEdits).length > 0) {
+                var next = Object.keys($rootScope.veEdits)[0];
+                $scope.etrackerSelected = next;
+                $scope.specApi.keepMode();
+                $scope.eid = next;
+            } else {
+                $scope.specApi.setEditing(false);
+                $rootScope.veTbApi.select('elementViewer');
+                setEditingButtonsActive('element', false);
+                setEditingButtonsActive('view', false);
+                setSnapshotButtonsActive(false);
+            }
         };
         if ($scope.specApi.hasEdits()) {
             var instance = $modal.open({
@@ -583,12 +707,20 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
         } else
             go();
     });
+    var viewSaving = false;
     $scope.$on('viewSave', function() {
+        if (viewSaving) {
+            growl.info('Please Wait...');
+            return;
+        }
+        viewSaving = true;
         $rootScope.veTbApi.setButtonIcon('viewSave', 'fa fa-spin fa-spinner');
         $scope.viewOrderApi.save().then(function(data) {
+            viewSaving = false;
             growl.success('Save Succesful');
             $rootScope.veTbApi.setButtonIcon('viewSave', 'fa fa-save');
         }, function(reason) {
+            viewSaving = false;
             if (reason.type === 'info')
                 growl.info(reason.message);
             else if (reason.type === 'warning')

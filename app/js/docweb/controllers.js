@@ -47,6 +47,7 @@ angular.module('myApp')
     };
 
     $scope.getPDFUrl = function(snapshot){
+        $scope.pdfText = "Generate PDF";
         var formats = snapshot.formats;
         if(!formats || formats.length===0) return null;
         for(var i=0; i < formats.length; i++){
@@ -55,7 +56,10 @@ angular.module('myApp')
         return null;
     };
 
-    $scope.getHTMLUrl = function(snapshot){if(angular.isUndefined(snapshot)) return null;if(snapshot===null) return null;
+    $scope.getHTMLUrl = function(snapshot){
+        if(angular.isUndefined(snapshot)) return null;
+        if(snapshot===null) return null;
+        $scope.htmlText = "Generate HTML";
         var formats = snapshot.formats;
         if(formats===undefined || formats===null || formats.length===0) return null;
         for(var i=0; i < formats.length; i++){
@@ -64,7 +68,8 @@ angular.module('myApp')
         return null;
     };
 
-    $scope.generatePdf = function(snapshot){
+    $scope.generatePdf = function(snapshot, elem){
+        elem.pdfText = "Generating...";
         snapshot.formats.push({"type":"pdf"});
         ConfigService.createSnapshotArtifact(snapshot, site.name, 'master').then(
             function(result){
@@ -76,7 +81,8 @@ angular.module('myApp')
         );
     };
 
-    $scope.generateHtml = function(snapshot){
+    $scope.generateHtml = function(snapshot, elem){
+        elem.htmlText = "Generating...";
         snapshot.formats.push({"type":"html"});
         ConfigService.createSnapshotArtifact(snapshot, site.name, 'master').then(
             function(result){

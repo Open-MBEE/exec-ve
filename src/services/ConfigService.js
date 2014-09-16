@@ -306,9 +306,9 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, _) {
         var cacheKey = ['configs', n.ws, id, 'products'];
         $http.post(URLService.getConfigProductsURL(id, site, n.ws), {'products': products})
         .success(function(data, status, headers, config) {
-            CacheService.put(cacheKey, data.products, false, function(val, k) {
+            /*CacheService.put(cacheKey, data.products, false, function(val, k) {
                 return {key: UtilsService.makeElementKey(val.sysmlid, n.ws, 'latest'), value: val, merge: true};
-            });
+            });*/
             deferred.resolve(CacheService.get(cacheKey));
         }).error(function(data, status, headers, config) {
             URLService.handleHttpStatus(data, status, headers, config, deferred);

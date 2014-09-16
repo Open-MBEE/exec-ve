@@ -79,6 +79,7 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, $q, growl, _)
     var template = $templateCache.get('mms/templates/mmsSpec.html');
 
     var mmsSpecLink = function(scope, element, attrs) {
+        var keepMode = false;
         scope.editing = false;
         scope.editable = true;
         if (scope.mmsElement) {
@@ -111,7 +112,6 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, $q, growl, _)
                 //element.empty();
                 //var template = null;
                 scope.element = data;
-                scope.editing = false;
                 if (scope.element.specialization.type === 'Property')
                     scope.values = scope.element.specialization.value;
                 if (scope.mmsEditField === 'none' || 
@@ -119,6 +119,7 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, $q, growl, _)
                         (scope.mmsVersion !== 'latest' && scope.mmsVersion)) {
                     scope.editable = false;
                     scope.edit = null;
+                    scope.editing = false;
                     //scope.$emit('elementEditability', scope.editable);
                     //template = readTemplate;
                     
@@ -129,6 +130,9 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, $q, growl, _)
                     .then(function(data) {
                         scope.edit = data;
                         scope.editable = true;
+                        if (!keepMode)
+                            scope.editing = false;
+                        keepMode = false;
                         //template = editTemplate;
                         //scope.$emit('elementEditability', scope.editable);
                         if (scope.edit.specialization.type === 'Property' && angular.isArray(scope.edit.specialization.value)) {
@@ -142,7 +146,7 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, $q, growl, _)
                 //growl.error("Getting Element Error: " + reason.message);
             });
         };
-
+        scope.changeElement = changeElement;
         scope.$watch('mmsEid', changeElement);
 
         /**
@@ -168,7 +172,7 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, $q, growl, _)
                 $modalInstance.close('ok');
             };
             $scope.cancel = function() {
-                $modalInstance.dismiss();
+                $modalInstance.close('cancel');
             };
             $scope.force = function() {
                 $modalInstance.close('force');
@@ -244,7 +248,8 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, $q, growl, _)
                             }, function(error) {
                                 deferred.reject(error);
                             });
-                        }
+                        } else
+                            deferred.reject({type: 'cancel'});
                     });
                 } else {
                     deferred.reject({type: 'error', message: reason.message});
@@ -372,6 +377,10 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, $q, growl, _)
              */
             api.getEdits = function() {
                 return scope.edit;
+            };
+
+            api.keepMode = function() {
+                keepMode = true;
             };
         }
     };

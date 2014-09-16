@@ -345,7 +345,36 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, _) {
                     UtilsService.cleanElement(edit, true);
                 }
             }).error(function(data, status, headers, config) {
-                URLService.handleHttpStatus(data, status, headers, config, deferred);
+                if (status === 409) {
+                    var server = _.cloneDeep(data.elements[0]);
+                    var newread = server.read;
+                    delete server.modified;
+                    delete server.read;
+                    delete server.creator;
+                    UtilsService.cleanElement(server);
+                    var orig = CacheService.get(UtilsService.makeElementKey(elem.sysmlid, n.ws, null, false));
+                    if (!orig) {
+                        URLService.handleHttpStatus(data, status, headers, config, deferred);
+                    } else {
+                        var current = _.cloneDeep(orig);
+                        delete current.modified;
+                        delete current.read;
+                        delete current.creator;
+                        UtilsService.cleanElement(current);
+                        if (angular.equals(server, current)) {
+                            elem.read = newread;
+                            updateElement(elem, workspace)
+                            .then(function(good){
+                                deferred.resolve(good);
+                            }, function(reason) {
+                                deferred.reject(reason);
+                            });
+                        } else {
+                            URLService.handleHttpStatus(data, status, headers, config, deferred);
+                        }
+                    }
+                } else
+                    URLService.handleHttpStatus(data, status, headers, config, deferred);
             });
         } 
         return deferred.promise;
