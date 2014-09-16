@@ -23,7 +23,7 @@
             <h2>- {{cat}}</h2>
             <div ng-repeat="site in sites | filter:filter | orderBy: 'title'">
               <h4 style="display:inline;">{{site.title}}</h4>
-                <a class="dash-link" href="/share/page/site/{{site.name}}/dashboard">Dashboard</a> - <a class="docweb-link" href="docweb.html#/sites/{{site.name}}">DocWeb</a>
+                <a class="dash-link" href="/share/page/site/{{site.name}}/dashboard" target="_blank">Dashboard</a> - <a class="docweb-link" href="docweb.html#/sites/{{site.name}}" target="_blank">DocWeb</a>
             </div>
           </div>
         </div>
