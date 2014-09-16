@@ -753,8 +753,9 @@ function($scope, $location, $rootScope, _, $window) {
         }
     });
 }])
-.controller('FullDocCtrl', ['$scope', '$rootScope', 'document', 'time',
-function($scope, $rootScope, document, time) {
+.controller('FullDocCtrl', ['$scope', '$rootScope', 'document', 'time', 'ws',
+function($scope, $rootScope, document, time, ws) {
+    $scope.ws = ws;
     var views = [];
     views.push({id: document.sysmlid, api: {}});
     var view2view = document.specialization.view2view;

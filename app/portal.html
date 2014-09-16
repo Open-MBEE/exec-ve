@@ -14,20 +14,11 @@
 </head>
 
 <body>
-  <div id="outer-wrap" style="overflow:auto;">
-    <div id="inner-wrap">
-        <mms-nav mms-responsive="true" mms-site="ems-support" mms-title="Portal" mms-type="Portal"></mms-nav>
-        <div ng-controller="PortalCtrl" class="container-fluid">
-          <input class="form-control" type="test" ng-model="filter" placeholder="Site filter"></input>
-          <div ng-repeat="(cat,sites) in categories">
-            <h2>- {{cat}}</h2>
-            <div ng-repeat="site in sites | filter:filter | orderBy: 'title'">
-              <h4 style="display:inline;">{{site.title}}</h4>
-                <a class="dash-link" href="/share/page/site/{{site.name}}/dashboard">Dashboard</a> - <a class="docweb-link" href="docweb.html#/sites/{{site.name}}">DocWeb</a>
-            </div>
-          </div>
+    <div id="outer-wrap" style="overflow:auto;">
+        <div id="inner-wrap">
+            <mms-nav mms-responsive="true" mms-site="ems-support" mms-title="Portal" mms-type="Portal"></mms-nav>
+            <div ui-view="main"></div>
         </div>
-      </div>
     </div>
 
 
