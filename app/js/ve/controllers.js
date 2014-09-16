@@ -3,8 +3,8 @@
 /* Controllers */
 
 angular.module('myApp')
-.controller('NavTreeCtrl', ['$scope', '$rootScope', '$location', '$timeout', '$state', '$anchorScroll', 'document', 'time', 'views', 'ElementService', 'ViewService', 'growl', '$modal',
-function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, document, time, views, ElementService, ViewService, growl, $modal) {
+.controller('NavTreeCtrl', ['$scope', '$rootScope', '$location', '$timeout', '$state', '$anchorScroll', 'document', 'time', 'views', 'ElementService', 'ViewService', 'growl', '$modal', '$q',
+function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, document, time, views, ElementService, ViewService, growl, $modal, $q) {
     $scope.document = document;
     $scope.time = time;
     $scope.editable = $scope.document.editable && time === 'latest';
@@ -85,6 +85,13 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, documen
         tooltip: $rootScope.veFullDocMode ? "View Mode" : "Full Document",
         icon: $rootScope.veFullDocMode ? "fa-file-text" : "fa-file-text-o",
         permission: true
+    }, {
+        action: function() {
+            $scope.saveAll();
+        },
+        tooltip: "Save All Open Edits",
+        icon: "fa-save",
+        permission: time === 'latest' ? true : false
     }];
     $scope.filterOn = false;
     $scope.toggleFilter = function() {
@@ -200,6 +207,56 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, documen
             growl.error('Add View Error: ' + reason.message);
             $scope.buttons[3].icon = 'fa-plus';
             adding = false;
+        });
+    };
+    var savingAll = false;
+    $scope.saveAll = function() {
+        if (savingAll) {
+            growl.info('Please wait...');
+            return;
+        }
+        if (Object.keys($rootScope.veEdits).length === 0) {
+            growl.info('Nothing to save');
+            return;
+        }
+        savingAll = true;
+        $scope.buttons[6].icon = 'fa-spin fa-spinner';
+        var promises = [];
+        angular.forEach($rootScope.veEdits, function(value, key) {
+            var defer = $q.defer();
+            promises.push(defer.promise);
+            ElementService.updateElement(value)
+            .then(function(e) {
+                defer.resolve({status: 200, id: e.sysmlid});
+            }, function(reason) {
+                defer.resolve({status: reason.status, id: value.sysmlid});
+            });
+        });
+        $q.all(promises).then(function(results) {
+            var somefail = false;
+            var failed = null;
+            results.forEach(function(ob) {
+                if (ob.status === 200)
+                    delete $rootScope.veEdits[ob.id];
+                else {
+                    somefail = true;
+                    failed = ob.id;
+                }
+            });
+            if (!somefail) {
+                var branch = treeApi.get_selected_branch();
+                if (branch)
+                    branch = branch.data.sysmlid;
+                else
+                    branch = document.sysmlid;
+                growl.success("Save All Successful");
+                $rootScope.$broadcast('elementSelected', branch);
+            } else {
+                $rootScope.$broadcast('elementSelected', failed);
+                growl.error("Some elements failed to save, resolve individually in edit pane");
+            }
+            $scope.buttons[6].icon = 'fa-save';
+            savingAll = false;
         });
     };
     $scope.tree_options = {
