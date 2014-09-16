@@ -30,6 +30,7 @@ mms-nav {
 }
 
 .navbar {
+  font-size: 14px;
   z-index: 200;
   position: relative;
   width: 100%;
@@ -44,6 +45,7 @@ mms-nav {
     display: block;
 
     a {
+      font-size: 14px;
       color: $white;
       font-weight: $light_font_weight;
       line-height: 1.28571em;
@@ -76,6 +78,7 @@ mms-nav {
       color: $white;
       font-weight: $light_font_weight;
       font-size: 16px;
+      line-height: normal;
       margin-left: 18px;
       margin-right: 48px;
       cursor: default;

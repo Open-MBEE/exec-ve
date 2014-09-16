@@ -1,4 +1,21 @@
 .mce-content-body {
+  p {
+    font-family: $font-family-sans-serif;
+  }
+
+  blockquote {
+    font-weight: 200;
+    font-style: italic;
+  }
+
+  table {
+    font-family: $font-family-sans-serif;
+
+    td {
+      font-size: 14px;
+    }
+  }
+
   mms-transclude-name,
   mms-transclude-doc,
   mms-transclude-val {
