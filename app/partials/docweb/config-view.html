@@ -11,11 +11,11 @@
       <a ng-if="getHTMLUrl(snapshot)!=null" href="{{getHTMLUrl(snapshot)}}" class="col-xs-2 text-left" target="_blank">Download HTML</a>
   </div>
   <br/>
-  <button ng-show="toggles.hideChangeForm" class="btn btn-primary" ng-click="toggleChangeForm()">NAME &amp; DESCRIPTION CHANGER</button>
-  <button ng-show="toggles.hideAddRemoveForm" class="btn btn-primary" ng-click="toggleAddRemoveForm()">SNAPSHOT ADDER &amp; REMOVER</button>
+  <button ng-show="toggles.hideChangeForm" class="btn btn-primary" ng-click="toggleChangeForm()">EDIT TAG</button>
+  <button ng-show="toggles.hideAddRemoveForm" class="btn btn-primary" ng-click="toggleAddRemoveForm()">TAG SNAPSHOTS</button>
   <hr/>
   <div ng-hide="toggles.hideChangeForm">
-    <h2>NAME &amp; DESCRIPTION CHANGER</h2>
+    <h2>EDIT TAG</h2>
     <h5>Name:</h5> <input class="form-control" type="text" ng-model="configForEdit.name"/>
     <h5>Description:</h5> <textarea class="form-control" ng-model="configForEdit.description"></textarea>
     <br/>
@@ -24,7 +24,7 @@
     </div>
     <hr/>
   </div>
-  <div ng-hide="toggles.hideAddRemoveForm"><h2>SNAPSHOT ADDER &amp; REMOVER</h2>
+  <div ng-hide="toggles.hideAddRemoveForm"><h2>TAG SNAPSHOTS</h2>
     <div ng-controller="TagAddRemoveCtrl">
       <div class="row">
 
