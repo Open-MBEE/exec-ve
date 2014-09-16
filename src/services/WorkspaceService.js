@@ -170,30 +170,30 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService) {
     };
 
     var getAll = function() {
-        if (inProgress)
-            return inProgress;
+        // if (inProgress)
+        //     return inProgress;
         
-        var deferred = $q.defer();
-        var cacheKey = ['workspaces', 'master'];
-        if (CacheService.exists(cacheKey)) {
-            deferred.resolve(CacheService.get(cacheKey));
-        } else {
-            inProgress = deferred.promise;
-            $http.get(URLService.getWorkspacesURL())
-            .success(function(data, status, headers, config) {
-                CacheService.put(cacheKey, data.workspaces, true, function(workspace, i) {
-                    return {key: ['workspaces', workspace.parent, workspace.name, workspace.creator], value: workspace, merge: true};
-                });
-                deferred.resolve(CacheService.get(cacheKey));
-                inProgress = null;
-            }).error(function(data, status, headers, config) {
-                URLService.handleHttpStatus(data, status, headers, config, deferred);
-                inProgress = null;
-            });
-        }
-        return deferred.promise;
+        // var deferred = $q.defer();
+        // var cacheKey = ['workspaces', 'master'];
+        // if (CacheService.exists(cacheKey)) {
+        //     deferred.resolve(CacheService.get(cacheKey));
+        // } else {
+        //     inProgress = deferred.promise;
+        //     $http.get(URLService.getWorkspacesURL())
+        //     .success(function(data, status, headers, config) {
+        //         CacheService.put(cacheKey, data.workspaces, true, function(workspace, i) {
+        //             return {key: ['workspaces', workspace.parent, workspace.name, workspace.creator], value: workspace, merge: true};
+        //         });
+        //         deferred.resolve(CacheService.get(cacheKey));
+        //         inProgress = null;
+        //     }).error(function(data, status, headers, config) {
+        //         URLService.handleHttpStatus(data, status, headers, config, deferred);
+        //         inProgress = null;
+        //     });
+        // }
+        // return deferred.promise;
 
-        /*var deferred = $q.defer();
+        var deferred = $q.defer();
         deferred.resolve([
             {
                 creator: 'dlam',
@@ -210,7 +210,7 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService) {
                 parent: 'master'
             }
         ]);
-        return deferred.promise; */
+        return deferred.promise; 
     };
 
     var get = function(ws) {
