@@ -1,3 +1,12 @@
+.pane-left,
+.pane-center,
+.pane-right {
+  h3 {
+    font-size: 20px;
+    padding-left: 20px;
+  }
+}
+
 .content-container {
   top: $navHeight;
 }

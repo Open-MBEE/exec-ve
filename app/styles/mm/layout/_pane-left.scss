@@ -1,19 +1,62 @@
 .pane-left {
-  > .pane-left {
-    @include box-shadow(inset -1px 0px 3px 0px rgba(0,0,0,.24));
+  .container-fluid {
+    position: relative;
+    height: 100%;
+  }
 
-    .container-fluid {
+  .btn-stage,
+  .btn-unstage {
+    height: 17px;
+    width: 30px;
+    background-color: $highlight_grey;
+    @include box-shadow(none);
+
+    &:hover {
+      color: $black;      
+    }
+
+    i {
       position: relative;
-      height: 100%;
+      top: 50%;
+      @include transform(translateY(-50%));
+    }
+  }
 
-      .btn-merge {
-        position: absolute;
-        bottom: 60px;
+  .btn-merge,
+  .btn-go-back {
+    height: 45px;
+    width: 90%;
+    left: 5%;
+    font-weight: 700;
+    display: block;
+  }
+
+  .btn-merge {
+    position: absolute;
+    bottom: 75px;
+  }
+
+  .btn-go-back {
+    position: absolute;
+    bottom: 20px;
+  }
+
+  td:first-child {
+    padding-left: 20px;
+  }
+
+  table {
+    tr {
+      &:hover {
+        background-color: $tertiary_grey;
       }
 
-      .btn-go-back {
-        position: absolute;
-        bottom: 15px;
+      td {
+        font-size: 14px;
+        vertical-align: middle;
+        border: 0;
+        padding: 2px 0 2px 0;
+        background-color: inherit !important;
       }
     }
   }
@@ -21,9 +64,4 @@
   .fa-pane-handle {
     display: none;
   }
-}
-
-.btn-merge,
-.btn-go-back {
-  display: block;
 }
