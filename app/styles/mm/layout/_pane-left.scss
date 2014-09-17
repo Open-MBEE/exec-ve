@@ -4,8 +4,7 @@
     height: 100%;
   }
 
-  .btn-stage,
-  .btn-unstage {
+  .btn-staging {
     height: 17px;
     width: 30px;
     background-color: $highlight_grey;
@@ -20,6 +19,14 @@
       top: 50%;
       @include transform(translateY(-50%));
     }
+  }
+
+  .btn-stage-all {
+    margin-left: 64px;
+  }
+
+  .btn-unstage-all {
+    margin-left: 85px;
   }
 
   .btn-merge,

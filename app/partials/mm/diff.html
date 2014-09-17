@@ -1,29 +1,36 @@
 <div class="pane-left" fa-pane pane-anchor="west" pane-size="300px" pane-min="20px">
 
 	<table class="table">
-		<h3>Unstaged Changes<h3>
+
+		<h3>Unstaged Changes<button ng-show="unstagedCounter" ng-click="stageAllUnstaged(changes)" type="button" class="btn btn-staging btn-stage-all"><i class="fa fa-arrow-down"></i></button></h3>
+
+
 	    <tr ng-click="selectChange(change)" ng-repeat="change in changes | filter: {staged: false}">
 	        <td><i class="fa {{change.icon}} icon-{{change.type}}"><i></td>
 	        <td>{{change.name}}</td>
 	        <td>
-	        	<button ng-click="stageChange(change)" type="button" class="btn btn-stage"><i class="fa fa-arrow-down"></i></button>
+	        	<button ng-click="stageChange(change)" type="button" class="btn btn-staging"><i class="fa fa-arrow-down"></i></button>
 	        </td>
 	    </tr>
+
 	</table>
 
 	<table class="table">
-		<h3>Staged Changes<h3>
+
+		<h3>Staged Changes<button ng-show="stagedCounter" ng-click="unstageAllStaged(changes)" type="button" class="btn btn-staging btn-unstage-all"><i class="fa fa-arrow-up"></i></button></h3>
+
 	    <tr ng-click="selectChange(change)" ng-repeat="change in changes | filter: {staged: true}">
 	        <td><i class="fa {{change.icon}} icon-{{change.type}}"><i></td>
 	        <td>{{change.name}}</td>
 	        <td>
-	        	<button ng-click="stageChange(change)" type="button" class="btn btn-unstage"><i class="fa fa-arrow-up"></i></button>
+	        	<button ng-click="stageChange(change)" type="button" class="btn btn-staging"><i class="fa fa-arrow-up"></i></button>
 	        </td>
 	    </tr>
+
 	</table>
 
-	   <button type="button" class="btn btn-success btn-merge">MERGE STAGED CHANGES</button>
-	   <button type="button" class="btn btn-danger btn-go-back">GO BACK</button>
+   <button type="button" class="btn btn-success btn-merge">MERGE STAGED CHANGES</button>
+   <button type="button" class="btn btn-danger btn-go-back">GO BACK</button>
 
 </div>
 

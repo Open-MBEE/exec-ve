@@ -37,6 +37,9 @@ function(_, $scope, $rootScope, $http, $state, $stateParams, growl, WorkspaceSer
       }
     };
 
+    $scope.stagedCounter = 0;
+    $scope.unstagedCounter = 0;
+
     var stageChange = function(change) {
       change.staged = ! change.staged;
 
@@ -111,6 +114,36 @@ function(_, $scope, $rootScope, $http, $state, $stateParams, growl, WorkspaceSer
       $scope.treeapi.refresh();
       $scope.treeapi.expand_all();
 
+      refreshStageCounters();
+    };
+
+    $scope.stageAllUnstaged = function (changes) {
+      changes.forEach(function (change) {
+        if (!change.staged) {
+          stageChange(change);
+        }
+      });
+    };
+
+    $scope.unstageAllStaged = function (changes) {
+      changes.forEach(function (change) {
+        if (change.staged) {
+          stageChange(change);
+        }
+      });
+    };
+
+    var refreshStageCounters = function () {
+      $scope.stagedCounter = 0;
+      $scope.unstagedCounter = 0;
+
+      $scope.changes.forEach(function (change) {
+        if (change.staged) {
+          $scope.stagedCounter++;
+        } else {
+          $scope.unstagedCounter++;
+        }
+      });
     };
 
     var findIndexBySysMLID = function (array, sysmlid) {
@@ -297,6 +330,7 @@ function(_, $scope, $rootScope, $http, $state, $stateParams, growl, WorkspaceSer
 
         $scope.id2node = id2node;
 
+        refreshStageCounters();
       };
 
 }])
