@@ -10,4 +10,11 @@
       margin-left: 1px;
     }
   }
+
+  .abn-tree {
+    .shaft,
+    .shaft-hidden:hover {
+      background: inherit;
+    }
+  }
 }
