@@ -25,8 +25,8 @@
   .btn-merge,
   .btn-go-back {
     height: 45px;
-    width: 90%;
-    left: 5%;
+    width: 260px;
+    left: 20px;
     font-weight: 700;
     display: block;
   }
@@ -41,10 +41,6 @@
     bottom: 20px;
   }
 
-  td:first-child {
-    padding-left: 20px;
-  }
-
   table {
     tr {
       &:hover {
@@ -57,6 +53,15 @@
         border: 0;
         padding: 2px 0 2px 0;
         background-color: inherit !important;
+
+        &:first-child {
+          width: 50px;
+          padding-left: 20px;
+        }
+
+        &:nth-child(2) {
+          width: 200px;
+        }
       }
     }
   }
