@@ -11,10 +11,16 @@
     }
   }
 
-  .abn-tree {
+  ul.abn-tree {
+    cursor: default;
+
     .shaft,
     .shaft-hidden:hover {
       background: inherit;
+
+      i {
+        cursor: pointer;
+      }
     }
   }
 }
