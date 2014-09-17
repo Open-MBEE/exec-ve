@@ -1,3 +1,31 @@
 $navHeight: 40px;
 $treeMarginTop: 15px;
 $mainViewShadowColor: rgba(0,0,0,.26);
+
+.clean {
+  background-color: $white !important;
+}
+
+.addition {
+  background-color: lighten($green, 20%) !important;
+}
+
+.removal {
+  background-color: lighten($red, 33%) !important;
+}
+
+.conflict {
+  background-color: $yellow !important;
+}
+
+.update {
+  background-color: $light_blue !important;
+}
+
+.moved {
+  background-color: $light_purple !important;
+}
+
+.undo {
+  background-color: $white !important;
+}
