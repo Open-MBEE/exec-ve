@@ -67,6 +67,8 @@ angular.module('myApp')
     };
 
     $scope.generatePdf = function(snapshot, elem){
+        if (elem.pdfText === 'Generating...')
+            return;
         elem.pdfText = "Generating...";
         snapshot.formats.push({"type":"pdf"});
         ConfigService.createSnapshotArtifact(snapshot, site.name, 'master').then(
@@ -80,6 +82,8 @@ angular.module('myApp')
     };
 
     $scope.generateHtml = function(snapshot, elem){
+        if (elem.htmlText === 'Generating...')
+            return;
         elem.htmlText = "Generating...";
         snapshot.formats.push({"type":"html"});
         ConfigService.createSnapshotArtifact(snapshot, site.name, 'master').then(
