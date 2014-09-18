@@ -69,6 +69,8 @@ angular.module('myApp')
     };
 
     $scope.generatePdf = function(snapshot, elem){
+        if (elem.pdfText === 'Generating...')
+            return;
         elem.pdfText = "Generating...";
         snapshot.formats.push({"type":"pdf"});
         ConfigService.createSnapshotArtifact(snapshot, site.name, ws).then(
@@ -82,6 +84,8 @@ angular.module('myApp')
     };
 
     $scope.generateHtml = function(snapshot, elem){
+        if (elem.htmlText === 'Generating...')
+            return;
         elem.htmlText = "Generating...";
         snapshot.formats.push({"type":"html"});
         ConfigService.createSnapshotArtifact(snapshot, site.name, ws).then(
@@ -202,26 +206,31 @@ angular.module('myApp')
             $scope.selected.forEach(function(pid) {
                 products.push({"sysmlid" : pid});
             });
-        } else {
+        } /*else {
             growl.error("Create Failed: No Selected Products");
             return;
-        }
+        }*/
 
         var create = {"name": $scope.newConfigName, "description": $scope.newConfigDesc};
 
         ConfigService.createConfig(create, $scope.site, ws)
         .then(
             function(config) {
-                ConfigService.updateConfigProducts(config.id, products, $scope.site, ws)
-                .then(
-                    function(result) {
-                        growl.success("Create Successful: You'll receive a confirmation email soon.");
-                        $state.go('docweb');
-                    },
-                    function(reason) {
-                        growl.error("Update of Product Snapshots Failed: " + reason.message);
-                    }
-                );
+                if (products.length === 0) {
+                    growl.success("Create Successful.");
+                    $state.go('docweb');
+                } else {
+                    ConfigService.updateConfigProducts(config.id, products, $scope.site, ws)
+                    .then(
+                        function(result) {
+                            growl.success("Create Successful: You'll receive a confirmation email soon.");
+                            $state.go('docweb');
+                        },
+                        function(reason) {
+                            growl.error("Update of Product Snapshots Failed: " + reason.message);
+                        }
+                    );
+                }
             }, 
             function(reason) {
                 growl.error("Create of Config Failed: " + reason.message);
