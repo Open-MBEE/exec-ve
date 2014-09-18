@@ -132,6 +132,19 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService) {
              { 
                 sysmlid:'_123_394241_12',
                 name:'Fish Sauce ... yeah, just fish sauce'
+             },
+             {
+               sysmlid:"_123_394241_12",
+               specialization:{ 
+                   type:'Property',
+                   isDerived:'false',
+                   value:[ 
+                      { 
+                         type:'LiteralString',
+                         string:'some value'
+                      }
+                   ]
+                }
              }
           ],
           addedElements:[ 
