@@ -3,6 +3,33 @@
   follow the MMS app design guide
 *************************/
 
+.pane-center,
+.pane-right {
+  p {
+    font-family: $font-family-sans-serif;
+    font-size: $font-size-base;
+  }
+
+  blockquote {
+    font-weight: $light_font_weight;
+    font-style: italic;
+  }
+
+  table,
+  table * {
+    font-family: $font-family-sans-serif;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: $light-font-family-sans-serif;
+  }
+}
+
 #outer-wrap {
   position: relative;
   overflow: hidden;
