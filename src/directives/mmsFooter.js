@@ -8,6 +8,7 @@ function mmsFooter($templateCache) {
 	
 	return {
 		restrict: 'E', 
-		template: template
+		template: template,
+        transclude: true
 	};
 }
