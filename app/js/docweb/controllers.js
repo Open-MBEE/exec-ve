@@ -206,26 +206,31 @@ angular.module('myApp')
             $scope.selected.forEach(function(pid) {
                 products.push({"sysmlid" : pid});
             });
-        } else {
+        } /*else {
             growl.error("Create Failed: No Selected Products");
             return;
-        }
+        }*/
 
         var create = {"name": $scope.newConfigName, "description": $scope.newConfigDesc};
 
         ConfigService.createConfig(create, $scope.site, "master")
         .then(
             function(config) {
-                ConfigService.updateConfigProducts(config.id, products, $scope.site, "master")
-                .then(
-                    function(result) {
-                        growl.success("Create Successful: You'll receive a confirmation email soon.");
-                        $state.go('docweb');
-                    },
-                    function(reason) {
-                        growl.error("Update of Product Snapshots Failed: " + reason.message);
-                    }
-                );
+                if (products.length === 0) {
+                    growl.success("Create Successful.");
+                    $state.go('docweb');
+                } else {
+                    ConfigService.updateConfigProducts(config.id, products, $scope.site, "master")
+                    .then(
+                        function(result) {
+                            growl.success("Create Successful: You'll receive a confirmation email soon.");
+                            $state.go('docweb');
+                        },
+                        function(reason) {
+                            growl.error("Update of Product Snapshots Failed: " + reason.message);
+                        }
+                    );
+                }
             }, 
             function(reason) {
                 growl.error("Create of Config Failed: " + reason.message);
