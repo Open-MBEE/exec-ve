@@ -137,9 +137,11 @@ function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window
             $scope.fileChanged = function(input) {
                 var file = input.files[0];
                 var reader = new $window.FileReader();
+                reader.onload = function() {
+                    var data = reader.result;
+                    $scope.image.src = data;
+                };
                 reader.readAsDataURL(file);
-                var data = reader.result;
-                $scope.image.src = data;
             };
             $scope.image = {src: ''};
             $scope.ok = function() {
