@@ -115,6 +115,7 @@ function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window
                 size: 'lg'
             });
             instance.result.then(function(tag) {
+                ed.selection.collapse(false);
                 ed.insertContent(tag);
             });
         };
@@ -126,6 +127,7 @@ function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window
                 controller: ['$scope', '$modalInstance', commentCtrl],
             });
             instance.result.then(function(tag) {
+                ed.selection.collapse(false);
                 ed.insertContent(tag);
             });
         };
