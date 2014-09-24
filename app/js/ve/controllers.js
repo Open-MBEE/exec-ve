@@ -6,6 +6,7 @@ angular.module('myApp')
 .controller('NavTreeCtrl', ['$scope', '$rootScope', '$location', '$timeout', '$state', '$anchorScroll', 'document', 'time', 'views', 'ElementService', 'ViewService', 'growl', '$modal', '$q', 'ws',
 function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, document, time, views, ElementService, ViewService, growl, $modal, $q, ws) {
     $scope.document = document;
+    $rootScope.veTitle = document.name;
     $scope.time = time;
     $scope.ws = ws;
     $scope.editable = $scope.document.editable && time === 'latest';

@@ -40,7 +40,8 @@ function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window
 
         var transcludeModalTemplate = $templateCache.get('mms/templates/mmsCfModal.html');
         var commentModalTemplate = $templateCache.get('mms/templates/mmsCommentModal.html');
-        
+        var chooseImageModalTemplate = $templateCache.get('mms/templates/mmsChooseImageModal.html');
+
         var transcludeCtrl = function($scope, $modalInstance) {
             $scope.searchClass = "";
             $scope.proposeClass = "";
@@ -83,6 +84,19 @@ function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window
             };
         };
 
+        var transcludeCallback = function(ed) {
+            var instance = $modal.open({
+                template: transcludeModalTemplate,
+                scope: scope,
+                controller: ['$scope', '$modalInstance', transcludeCtrl],
+                size: 'lg'
+            });
+            instance.result.then(function(tag) {
+                ed.selection.collapse(false);
+                ed.insertContent(tag);
+            });
+        };
+
         var commentCtrl = function($scope, $modalInstance) {
             $scope.comment = {
                 name: '', 
@@ -107,26 +121,50 @@ function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window
             };
         };
 
-        var transcludeCallback = function(ed) {
-            var instance = $modal.open({
-                template: transcludeModalTemplate,
-                scope: scope,
-                controller: ['$scope', '$modalInstance', transcludeCtrl],
-                size: 'lg'
-            });
-            instance.result.then(function(tag) {
-                ed.insertContent(tag);
-            });
-        };
-
         var commentCallback = function(ed) {
             var instance = $modal.open({
                 template: commentModalTemplate,
                 scope: scope,
-                controller: ['$scope', '$modalInstance', commentCtrl],
+                controller: ['$scope', '$modalInstance', commentCtrl]
             });
             instance.result.then(function(tag) {
+                ed.selection.collapse(false);
                 ed.insertContent(tag);
+            });
+        };
+
+        var imageCtrl = function($scope, $modalInstance) {
+            $scope.fileChanged = function(input) {
+                var file = input.files[0];
+                var reader = new $window.FileReader();
+                reader.onload = function() {
+                    var data = reader.result;
+                    $scope.image.src = data;
+                };
+                reader.readAsDataURL(file);
+            };
+            $scope.image = {src: ''};
+            $scope.ok = function() {
+                $modalInstance.close($scope.image);
+            };
+            $scope.cancel = function() {
+                $modalInstance.dismiss();
+            };
+        };
+
+        var imageCallback = function(callback, value, meta) {
+            angular.element('#mce-modal-block').css('z-index', 98);
+            var tinymceModalId = $window.tinymce.activeEditor.windowManager.getWindows()[0]._id;
+            angular.element('#' + tinymceModalId).css('z-index', 99);
+            var instance = $modal.open({
+                template: chooseImageModalTemplate,
+                scope: scope,
+                controller: ['$scope', '$modalInstance', imageCtrl]
+            });
+            instance.result.then(function(image) {
+                callback(image.src);
+            }, function() {
+                callback('');
             });
         };
 
@@ -151,6 +189,8 @@ function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window
             content_css: 'css/partials/mms.min.css',
             paste_data_images: true,
             skin_url: 'lib/tinymce/skin/lightgray',
+            file_picker_callback: imageCallback,
+            file_picker_types: 'image',
             setup: function(ed) {
                 ed.addButton('transclude', {
                     title: 'Cross Reference',

@@ -184,23 +184,6 @@ module.exports = function(grunt) {
       }
     },
 
-    stubby: {
-      stubsServer: {
-        // note the array collection instead of an object
-        options: {
-          stubs: 9002,
-          //callback: function (server, options) {
-          //server.get(1, function (err, endpoint) {
-          //     console.log(endpoint);
-          //  });
-          //},
-        },
-        files: [{
-          src: [ 'mocks/*.{json,yaml,js}' ]
-        }]
-      }
-    },
-
     connect: {
       'static': {
         options: {
@@ -216,39 +199,6 @@ module.exports = function(grunt) {
           base: './docs',
         }
       },
-      //restServer: {
-      //  options: {
-      //      hostname: 'localhost',
-      //      port: 9002,
-      //      base: './rest',
-      //    },
-      //},
-      mockServer: {
-        options: {
-          hostname: 'localhost',
-          port: 9000,
-          middleware: function(connect) {
-            return [proxySnippet];
-          }
-        },
-        proxies: [
-          {
-            context: '/alfresco/service/javawebscripts',  // '/api'
-            host: 'localhost',
-            port: 9002,
-            changeOrigin: true,
-            //https: true,
-            rewrite: {
-              '^/alfresco/service/javawebscripts': ''
-            }
-          },
-          {
-            context: '/',
-            host: 'localhost',
-            port: 9001
-          }
-        ]
-      },
       a: {
         options: {
           hostname: '*',
@@ -259,16 +209,11 @@ module.exports = function(grunt) {
         },
         proxies: [
           {
-            // /alfresco/service/javawebscripts
-            // https://sheldon.jpl.nasa.gov/alfresco/wcs/javawebscripts/element/_17_0_2_3_407019f_1386871336920_707205_26285
             context: '/alfresco',  // '/api'
             host: 'europaems-dev-staging-a.jpl.nasa.gov',//128.149.16.155',
             port: 443,
             changeOrigin: true,
             https: true,
-            //rewrite: {
-            //  '^/api': '/alfresco/service/javawebscripts'
-            //}
           },
           {
             context: '/',
@@ -287,16 +232,11 @@ module.exports = function(grunt) {
         },
         proxies: [
           {
-            // /alfresco/service/javawebscripts
-            // https://sheldon.jpl.nasa.gov/alfresco/wcs/javawebscripts/element/_17_0_2_3_407019f_1386871336920_707205_26285
             context: '/alfresco',  // '/api'
             host: 'europaems-dev-staging-b.jpl.nasa.gov',//128.149.16.152',
             port: 443,
             changeOrigin: true,
             https: true,
-            //rewrite: {
-            //  '^/api': '/alfresco/service/javawebscripts'
-            //}
           },
           {
             context: '/',
@@ -315,16 +255,57 @@ module.exports = function(grunt) {
         },
         proxies: [
           {
-            // /alfresco/service/javawebscripts
-            // https://sheldon.jpl.nasa.gov/alfresco/wcs/javawebscripts/element/_17_0_2_3_407019f_1386871336920_707205_26285
             context: '/alfresco',  // '/api'
             host: 'ems.jpl.nasa.gov',//128.149.16.152',
             port: 443,
             changeOrigin: true,
             https: true,
-            //rewrite: {
-            //  '^/api': '/alfresco/service/javawebscripts'
-            //}
+          },
+          {
+            context: '/',
+            host: 'localhost',
+            port: 9001
+          }
+        ]
+      },
+      emstest: {
+        options: {
+          hostname: '*',
+          port: 9000,
+          middleware: function(connect) {
+            return [proxySnippet];
+          }
+        },
+        proxies: [
+          {
+            context: '/alfresco',  // '/api'
+            host: 'ems-test.jpl.nasa.gov',//128.149.16.152',
+            port: 443,
+            changeOrigin: true,
+            https: true,
+          },
+          {
+            context: '/',
+            host: 'localhost',
+            port: 9001
+          }
+        ]
+      },
+      emsstg: {
+        options: {
+          hostname: '*',
+          port: 9000,
+          middleware: function(connect) {
+            return [proxySnippet];
+          }
+        },
+        proxies: [
+          {
+            context: '/alfresco',  // '/api'
+            host: 'ems-stg.jpl.nasa.gov',//128.149.16.152',
+            port: 443,
+            changeOrigin: true,
+            https: true,
           },
           {
             context: '/',
@@ -367,21 +348,28 @@ module.exports = function(grunt) {
         ]
       }
     },
-    // Post to staging on sheldon
-    // https://sheldon/alfresco/scripts/vieweditor2/index.html
-    rsync: {
-      deploy: {
-        files: 'build/',
+
+    artifactory: {
+      options: {
+        url: 'http://europambee-build:8082',
+        repository: 'libs-snapshot-local',
+        username: 'admin',
+        password: 'password'
+      },
+      client: {
+        files: [{
+          src: ['build/**/*']
+        }],
         options: {
-          host      : "sheldon",
-          //port      : "1023",
-          //user      : "menzies",
-          //preservePermissions : false,
-          additionalOptions : "--chmod=a=rwx,g=rw,o=rx",
-          remoteBase: "/opt/local/alfresco-4.2.c/tomcat/webapps/alfresco/scripts/vieweditor2" //"~/vieweditor2"
+          publish: [{
+            id: 'gov.nasa.jpl:evm:zip',
+            version: '0.2.0.2-SNAPSHOT',
+            path: 'dist/'
+          }]
         }
       }
     },
+
     karma: {
       unit: {
         configFile: 'karma.conf.js'
@@ -410,6 +398,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-bower-installer');
   grunt.loadNpmTasks('grunt-npm-install');
   grunt.loadNpmTasks('grunt-karma');
+  grunt.loadNpmTasks('grunt-artifactory-artifact');
 
   // grunt.registerTask('install', ['npm-install', 'bower']);
   grunt.registerTask('install', ['bower']);
@@ -422,6 +411,7 @@ module.exports = function(grunt) {
   grunt.registerTask('release-build', ['install', 'compile', 'lint', 'concat', 'minify', 'copy', 'wire']);
   grunt.registerTask('docs-build',    ['ngdocs']);
   grunt.registerTask('default', ['dev-build']);
+  grunt.registerTask('deploy', ['dev-build', 'artifactory:client:publish']);
 
   grunt.registerTask('dev', function(arg1) {
       grunt.task.run('dev-build', 'connect:static');
@@ -458,9 +448,9 @@ module.exports = function(grunt) {
 
   grunt.registerTask('launch', function(build, arg1) {
       if (arg1) {
-        grunt.log.writeln("Launching server with mock REST API");
+        grunt.log.writeln("Launching server with proxy");
         //grunt.task.run('connect:restServer', 'configureProxies:mockServer', 'connect:mockServer');
-        grunt.task.run('stubby', 'configureProxies:' + arg1, 'connect:' + arg1);
+        grunt.task.run('configureProxies:' + arg1, 'connect:' + arg1);
       } else {
         grunt.log.writeln("Launching server with proxy API");
         grunt.task.run('configureProxies:a', 'connect:a');
