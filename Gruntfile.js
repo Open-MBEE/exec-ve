@@ -9,41 +9,35 @@ module.exports = function(grunt) {
     
     pkg: grunt.file.readJSON('package.json'),
 
-    bower: {
-      install: {
+    'bower-install-simple': {
+      options: {
+        color: true,
+        cwd: './app',
+        directory: 'bower_components'
+      },
+      prod: {
         options: {
-          targetDir: 'bower_components_target',
-          overrideBowerDirectory: false,
-          cwd: 'app',
-          layout: 'byComponent',
-          install: true,
-          verbose: false,
-          cleanTargetDir: false,
-          cleanBowerDir: false,
-          bowerOptions: {},
-          copy: true,
-          forcedCopyDir: 'app'
+          production: true
         }
       }
     },
     
-    bowerInstall: {
+    wiredep: {
 
       target: {
         src: [
           'build/*.html'
         ],
-
-        // Optional:
-        // ---------
-        cwd: 'build',
-        directory:'',
-        dependencies: true,
-        devDependencies: false,
-        exclude: [],
-        fileTypes: {},
-        ignorePath: '',
-        overrides: {}
+        options: {
+          cwd: 'build',
+          directory:'',
+          dependencies: true,
+          devDependencies: false,
+          exclude: [],
+          fileTypes: {},
+          ignorePath: '',
+          overrides: {}
+        }
       }
     },
 
@@ -199,52 +193,6 @@ module.exports = function(grunt) {
           base: './docs',
         }
       },
-      a: {
-        options: {
-          hostname: '*',
-          port: 9000,
-          middleware: function(connect) {
-            return [proxySnippet];
-          }
-        },
-        proxies: [
-          {
-            context: '/alfresco',  // '/api'
-            host: 'europaems-dev-staging-a.jpl.nasa.gov',//128.149.16.155',
-            port: 443,
-            changeOrigin: true,
-            https: true,
-          },
-          {
-            context: '/',
-            host: 'localhost',
-            port: 9001
-          }
-        ]
-      },
-      b: {
-        options: {
-          hostname: '*',
-          port: 9000,
-          middleware: function(connect) {
-            return [proxySnippet];
-          }
-        },
-        proxies: [
-          {
-            context: '/alfresco',  // '/api'
-            host: 'europaems-dev-staging-b.jpl.nasa.gov',//128.149.16.152',
-            port: 443,
-            changeOrigin: true,
-            https: true,
-          },
-          {
-            context: '/',
-            host: 'localhost',
-            port: 9001
-          }
-        ]
-      }, 
       ems: {
         options: {
           hostname: '*',
@@ -313,6 +261,29 @@ module.exports = function(grunt) {
             port: 9001
           }
         ]
+      },
+      europaemsstg: {
+        options: {
+          hostname: '*',
+          port: 9000,
+          middleware: function(connect) {
+            return [proxySnippet];
+          }
+        },
+        proxies: [
+          {
+            context: '/alfresco',  // '/api'
+            host: 'europaems-stg.jpl.nasa.gov',//128.149.16.152',
+            port: 443,
+            changeOrigin: true,
+            https: true,
+          },
+          {
+            context: '/',
+            host: 'localhost',
+            port: 9001
+          }
+        ]
       }
     },
 
@@ -329,10 +300,6 @@ module.exports = function(grunt) {
         files: ['app/**/*', '!app/bower_components/**', 'src/**/*'],
         tasks: ['docs-build']
       },
-    },
-
-    qunit: {
-      all: ['build/qtest/*.html']
     },
 
     clean: ["build", "dist", "docs"],
@@ -377,35 +344,29 @@ module.exports = function(grunt) {
     }
   });
 
-  // Load the plugin that provides the "uglify" task.
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-connect');
   grunt.loadNpmTasks('grunt-contrib-watch');
-  grunt.loadNpmTasks('grunt-contrib-nodeunit');
-  grunt.loadNpmTasks('grunt-contrib-qunit');
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-cssmin');
   grunt.loadNpmTasks('grunt-contrib-sass');
-  grunt.loadNpmTasks('grunt-rsync-2');
   grunt.loadNpmTasks('grunt-connect-proxy');
-  grunt.loadNpmTasks('grunt-stubby');
   grunt.loadNpmTasks('grunt-ngdocs');
   grunt.loadNpmTasks('grunt-html2js');
-  grunt.loadNpmTasks('grunt-bower-install');
-  grunt.loadNpmTasks('grunt-bower-installer');
-  grunt.loadNpmTasks('grunt-npm-install');
+  grunt.loadNpmTasks('grunt-bower-install-simple');
+  grunt.loadNpmTasks('grunt-wiredep');
   grunt.loadNpmTasks('grunt-karma');
   grunt.loadNpmTasks('grunt-artifactory-artifact');
 
   // grunt.registerTask('install', ['npm-install', 'bower']);
-  grunt.registerTask('install', ['bower']);
+  grunt.registerTask('install', ['bower-install-simple']);
   grunt.registerTask('compile', ['html2js', 'sass']);
   grunt.registerTask('lint',    ['jshint:beforeconcat']);
   grunt.registerTask('minify',  ['cssmin', 'uglify']);
-  grunt.registerTask('wire',    ['bowerInstall']);
+  grunt.registerTask('wire',    ['wiredep']);
 
   grunt.registerTask('dev-build',     ['install', 'compile', 'lint', 'concat', 'minify', 'copy', 'wire']);
   grunt.registerTask('release-build', ['install', 'compile', 'lint', 'concat', 'minify', 'copy', 'wire']);
@@ -453,7 +414,7 @@ module.exports = function(grunt) {
         grunt.task.run('configureProxies:' + arg1, 'connect:' + arg1);
       } else {
         grunt.log.writeln("Launching server with proxy API");
-        grunt.task.run('configureProxies:a', 'connect:a');
+        grunt.task.run('configureProxies:emsstg', 'connect:emsstg');
       }
       grunt.task.run('watch:' + build);
     }
