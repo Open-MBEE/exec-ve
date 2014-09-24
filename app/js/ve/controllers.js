@@ -34,7 +34,7 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, documen
         action: function(){ $scope.addView(); },
         tooltip: "Add View",
         icon: "fa-plus",
-        permission: false//$scope.editable
+        permission: $scope.editable
     }, {
         action: function(){ 
             $rootScope.veFullDocMode = false;
@@ -44,7 +44,7 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, documen
         },
         tooltip: "Reorder Views",
         icon: "fa-arrows-v",
-        permission: false//$scope.editable
+        permission: $scope.editable
     }, {
         action: function(){ 
             $scope.fullDocMode();
@@ -471,7 +471,7 @@ function($scope, $rootScope) {
             onClick: function() {$rootScope.$broadcast('elementViewerSelected');}},
         {id: 'elementEditor', icon: 'fa fa-edit', selected: false, active: true, tooltip: 'Edit Element',
             onClick: function() {$rootScope.$broadcast('elementEditorSelected');}},
-        {id: 'viewStructEditor', icon: 'fa fa-arrows-v', selected: false, active: false, tooltip: 'Reorder View',
+        {id: 'viewStructEditor', icon: 'fa fa-arrows-v', selected: false, active: true, tooltip: 'Reorder View',
             onClick: function() {$rootScope.$broadcast('viewStructEditorSelected');}},
         {id: 'documentSnapshots', icon: 'fa fa-camera', selected: false, active: true, tooltip: 'Snapshots',
             onClick: function() {$rootScope.$broadcast('snapshotsSelected');}},
@@ -634,7 +634,7 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
         then(function(element) {
             var editable = element.editable && time === 'latest';
             $rootScope.veTbApi.setActive('elementEditor', editable);
-            //$rootScope.veTbApi.setActive('viewStructEditor', editable);
+            $rootScope.veTbApi.setActive('viewStructEditor', editable);
         });
         setEditingButtonsActive('element', false);
         setEditingButtonsActive('view', false);
