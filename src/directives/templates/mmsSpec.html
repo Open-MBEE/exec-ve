@@ -1,0 +1,61 @@
+<div ng-show="editing">
+    <h1 class="prop"><input class="form-control" type="text" ng-model="edit.name"></input></h1>
+
+    <h2 class="prop-title">METATYPE</h2>
+    <h3 class="prop">{{element.specialization.type || 'Element'}}</h3>
+    <h2 class="prop-title">QUALIFIED NAME</h2>
+    <h3 class="prop">{{element.qualifiedName}}</h3>
+    <h2 class="prop-title">ID</h2>
+    <h3 class="prop sysmlid">{{element.sysmlid}}</h3>
+    <h2 class="prop-title">LAST MODIFICATION</h2>
+    <h3 class="prop">{{element.modified | date:'M/d/yy h:mm a'}} by {{element.creator}}</h3>
+
+    <div ng-if="edit.specialization.type === 'Property'">
+        <h2 class="prop-title">PROPERTY VALUE</h2>
+        <div ng-if="editValues.length == 0">
+            <select ng-model="addValueType" ng-options="key for (key, value) in addValueTypes"></select>
+            <button class="btn btn-sm" ng-click="addValue(addValueType)">Add</button>
+        </div>
+        <div ng-repeat="value in editValues" ng-switch on="value.type">
+            <div ng-switch-when="LiteralInteger"><input type="number" ng-model="value.integer"></input></div>
+            <div ng-switch-when="LiteralUnlimitedNatural"><input type="number" ng-model="value.naturalValue"></input></div>
+            <div ng-switch-when="LiteralBoolean"><input type="checkbox" ng-model="value.boolean"></input></div>
+            <div ng-switch-when="LiteralReal"><input type="number" ng-model="value.double" step="any"></input></div>
+            <div ng-switch-when="LiteralString">
+                <textarea ng-if="hasHtml(value.string)" mms-tinymce ng-model="value.string" mms-cf-elements="mmsCfElements" mms-eid="{{element.sysmlid}}"></textarea>
+                <textarea ng-if="!hasHtml(value.string)" ng-model="value.string"></textarea>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="prop-title spec-view-doc-heading">DOCUMENTATION</h2>
+    <textarea ng-model="edit.documentation" mms-tinymce mms-cf-elements="mmsCfElements" mms-eid="{{element.sysmlid}}"></textarea>
+
+</div>
+
+<div ng-hide="editing">
+    <h1 class="prop element-title">{{element.name}}</h1>
+
+    <h2 class="prop-title">METATYPE</h2>
+    <h3 class="prop">{{element.specialization.type || 'Element'}}</h3>
+    <h2 class="prop-title">QUALIFIED NAME</h2>
+    <h3 class="prop">{{element.qualifiedName}}</h3>
+    <h2 class="prop-title">ID</h2>
+    <h3 class="prop sysmlid">{{element.sysmlid}}</h3>
+    <h2 class="prop-title">LAST MODIFICATION</h2>
+    <h3 class="prop">{{element.modified | date:'M/d/yy h:mm a'}} by {{element.creator}}</h3>
+
+    <div ng-if="element.specialization.type === 'Property'">
+        <h2 class="prop-title">PROPERTY VALUE</h2>
+        <div ng-repeat="value in values" ng-switch on="value.type">
+            <h3 class="prop" ng-switch-when="LiteralInteger">{{value.integer}}</h3>
+            <h3 class="prop" ng-switch-when="LiteralBoolean">{{value.boolean}}</h3>
+            <h3 class="prop" ng-switch-when="LiteralReal">{{value.double}}</h3>
+            <h3 class="prop" ng-switch-when="LiteralUnlimitedNatural">{{value.naturalValue}}</h3>
+            <h3 class="prop" ng-switch-when="LiteralString" ng-bind-html="value.string"></h3>
+        </div>
+    </div>
+
+    <h2 class="prop-title spec-view-doc-heading">DOCUMENTATION</h2>
+    <p ng-bind-html="element.documentation" class="doc-text"></p>
+</div>

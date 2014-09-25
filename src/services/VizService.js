@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms')
-.factory('VizService', ['$q', '$http', 'URLService', VizService]);
+.factory('VizService', ['$q', '$http', 'URLService', 'CacheService', 'UtilsService', VizService]);
 
 /**
  * @ngdoc service
@@ -9,11 +9,13 @@ angular.module('mms')
  * @requires $q
  * @requires $http
  * @requires mms.URLService
+ * @requries mms.CacheService
+ * @requires mms.UtilsService
  * 
  * @description
  * This service handles visualization needs and diagramming (TBD)
  */
-function VizService($q, $http, URLService) {
+function VizService($q, $http, URLService, CacheService, UtilsService) {
 
     /**
      * @ngdoc method
@@ -24,10 +26,31 @@ function VizService($q, $http, URLService) {
      * Gets the url for an image link based on the Magicdraw diagram id 
      * 
      * @param {string} id The id of the Magicdraw diagram.
+     * @param {boolean} [update=false] update from server
+     * @param {string} [workspace=master] the workspace
+     * @param {string} [version=latest] timestamp or version
      * @returns {Promise} The promise will be resolved with the latest image url
      */
-    var getImageURL = function(id) {
-        
+    var getImageURL = function(id, update, workspace, version) {
+        var n = normalize(id, update, workspace, version);
+        var deferred = $q.defer();
+        if (CacheService.exists(n.cacheKey) && !n.update) {
+            deferred.resolve(CacheService.get(n.cacheKey));
+            return deferred.promise;
+        }
+        $http.get(URLService.getImageURL(id, n.ws, n.ver))
+        .success(function(data, status, headers, config) {
+            deferred.resolve(CacheService.put(n.cacheKey, '/alfresco' + data.artifacts[0].url, false));
+        }).error(function(data, status, headers, config) {
+            URLService.handleHttpStatus(data, status, headers, config, deferred);
+        });
+        return deferred.promise;
+    };
+
+    var normalize = function(id, update, workspace, version) {
+        var res = UtilsService.normalize({update: update, workspace: workspace, version: version});
+        res.cacheKey = ['artifactUrl', id, res.ws, res.ver];
+        return res;
     };
 
     return {

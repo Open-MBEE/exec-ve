@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms')
-.factory('SiteService', ['$q', '$http', 'URLService', 'ViewService', 'ProjectService', SiteService]);
+.factory('SiteService', ['$q', '$http', 'URLService', 'CacheService', '_', SiteService]);
 
 /**
  * @ngdoc service
@@ -9,53 +9,21 @@ angular.module('mms')
  * @requires $q
  * @requires $http
  * @requires mms.URLService
- * @requires mms.ViewService
- * @requires mms.ProjectService
+ * @requires mms.CacheService
  * 
  * @description
  * This is a utility service for getting alfresco site information, such as 
- * list of all sites, their categories, documents, projects, tags, etc.
- *
- * Current site object:
- * ```
- *      {
- *          "name": site name (like id),
- *          "title": user friendly name,
- *          "categories": [string]  
- *      }
- * ```
+ * list of all sites and their categories
  */
-function SiteService($q, $http, URLService, ViewService, ProjectService) {
+function SiteService($q, $http, URLService, CacheService, _) {
     var currentSite = 'europa';
-    var sites = {};
-    var siteDocuments = {};
+    var inProgress = null;
 
-    /**
-     * @ngdoc method
-     * @name mms.SiteService#setCurrentSite
-     * @methodOf mms.SiteService
-     * 
-     * @description
-     * Sets the current site
-     *
-     * @param {string} site The new site name.
-     *
-     * @returns {string} The new site name.
-     */
+    /* TODO remove */
     var setCurrentSite = function(site) {
         currentSite = site;
     };
 
-    /**
-     * @ngdoc method
-     * @name mms.SiteService#getCurrentSite
-     * @methodOf mms.SiteService
-     * 
-     * @description
-     * Gets the current site
-     *     
-     * @returns {string} The current site name.
-     */
     var getCurrentSite = function() {
         return currentSite;
     };
@@ -72,7 +40,15 @@ function SiteService($q, $http, URLService, ViewService, ProjectService) {
      * @returns {Promise} Resolves to the site info object.
      */
     var getSite = function(site) {
-
+        var deferred = $q.defer();
+        getSites().then(function(data) {
+            var result = CacheService.get(['sites', 'master', site]);
+            if (result)
+                deferred.resolve(result);
+            else
+                deferred.reject("Site not found");
+        });
+        return deferred.promise;
     };
 
     /**
@@ -85,33 +61,30 @@ function SiteService($q, $http, URLService, ViewService, ProjectService) {
      * @returns {Promise} Resolves into array of site info objects.
      */
     var getSites = function() {
-
+        if (inProgress)
+            return inProgress;
+        var deferred = $q.defer();
+        var cacheKey = ['sites', 'master'];
+        if (CacheService.exists(cacheKey)) {
+            deferred.resolve(CacheService.get(cacheKey));
+        } else {
+            inProgress = deferred.promise;
+            $http.get(URLService.getSitesURL())
+            .success(function(data, status, headers, config) {
+                CacheService.put(cacheKey, data, true, function(site, i) {
+                    return {key: ['sites', 'master', site.name], value: site, merge: true};
+                });
+                deferred.resolve(CacheService.get(cacheKey));
+                inProgress = null;
+            }).error(function(data, status, headers, config) {
+                URLService.handleHttpStatus(data, status, headers, config, deferred);
+                inProgress = null;
+            });
+        }
+        return deferred.promise;
     };
 
-    /**
-     * @ngdoc method
-     * @name mms.SiteService#getSiteDocuments
-     * @methodOf mms.SiteService
-     * 
-     * @description
-     * Gets all documents on a site
-     * @param {string} site The site name to get documents for.
-     * @returns {Promise} Resolves into array of document objects.
-     */
-    var getSiteDocuments = function(site) {
 
-    };
-
-    /**
-     * @ngdoc method
-     * @name mms.SiteService#getSiteProjects
-     * @methodOf mms.SiteService
-     * 
-     * @description
-     * Gets all projects on a site
-     * @param {string} site The site name to get projects for.
-     * @returns {Promise} Resolves into array of project objects.
-     */
     var getSiteProjects = function(site) {
 
     };
@@ -121,7 +94,6 @@ function SiteService($q, $http, URLService, ViewService, ProjectService) {
         setCurrentSite: setCurrentSite,
         getSites: getSites,
         getSite: getSite,
-        getSiteDocuments: getSiteDocuments,
         getSiteProjects: getSiteProjects
     };
 }

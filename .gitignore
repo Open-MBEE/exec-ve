@@ -5,4 +5,8 @@ tmp
 .DS_Store
 build
 dist
+deploy
 docs
+app/bower_components
+app/bower_components_target
+.sass-cache

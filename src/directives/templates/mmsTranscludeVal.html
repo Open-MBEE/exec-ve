@@ -1,0 +1,6 @@
+<span ng-repeat="value in values" ng-switch on="value.type">
+    <span ng-switch-when="LiteralInteger">{{value.integer}}</span>
+    <span ng-switch-when="LiteralBoolean">{{value.boolean}}</span>
+    <span ng-switch-when="LiteralReal">{{value.double}}</span>
+    <span ng-switch-when="LiteralUnlimitedNatural">{{value.naturalValue}}</span>
+</span>

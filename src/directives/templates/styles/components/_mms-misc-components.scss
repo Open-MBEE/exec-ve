@@ -1,0 +1,83 @@
+/*************************
+  Component mods that implement the
+  MMS app design guide
+*************************/
+
+a {
+  color: $base_blue;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+img {
+  max-width: 100%;
+}
+
+.form-control:focus {
+  border-color: $base_blue;
+}
+
+.modal-dialog {
+  .modal-footer {
+    margin-top: 0;
+  }
+
+  .modal-body {
+    p {
+      margin: 0;
+    }
+  }
+}
+
+.nav-pills {
+  > li:active {
+    > a {
+      background-color: $secondary_grey;
+      color: $white;
+    }
+
+    > a:hover,
+    > a:focus {
+      background-color: $secondary_grey;
+      color: $white;
+    }
+  }
+}
+
+table {
+  @extend .table;
+}
+
+.table {
+  tr {
+    @include transition($background_hover_transition);
+    background-color: $white;
+  }
+
+  td {
+    border-top: 1px solid $tertiary_grey;
+    border-bottom: 1px solid $tertiary_grey;
+  }
+}
+
+.tooltip {
+  .tooltip-inner {
+    font-size: 12px;
+    font-weight: $default_font_weight;
+  }
+
+  &.bottom-left {
+    padding: 5px 0;
+    margin-top: 3px;
+
+    .tooltip-arrow {
+      top: 0;
+      left: 13px;
+      border-width: 0 5px 5px;
+      border-bottom-color: #000;
+    }
+  }
+}

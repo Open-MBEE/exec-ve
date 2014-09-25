@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms')
-.factory('ElementService', ['$q', '$http', 'URLService', '_', ElementService]);
+.factory('ElementService', ['$q', '$http', 'URLService', 'UtilsService', 'CacheService', '_', ElementService]);
 
 /**
  * @ngdoc service
@@ -9,46 +9,18 @@ angular.module('mms')
  * @requires $q
  * @requires $http
  * @requires mms.URLService
+ * @requires mms.UtilsService
+ * @requires mms.CacheService
+ * @requires _
  * 
  * @description
- * An element cache and CRUD service. Maintains a cache of element id to element objects.
- * This maintains a single source of truth for applications that use this service. Do not
- * directly modify the attributes of elements returned from this service but use the update
- * methods instead. Consider forking and edited element cache support in future, and saving
- * to html5 local storage for edited things incase of crashes.
+ * An element CRUD service with additional convenience methods for managing edits.
  *
- * Current element object:
- * ```
- *      {
- *          "id": element id as string,
- *          "type": "Package" | "Property" | "Element" | "Dependency" | "Generalization" |
- *                  "DirectedRelationship" | "Conform" | "Expose" | "Viewpoint",
- *          "name": element name, empty string if no name,
- *          "documentation": element documentation as string, can contain html,
- *          "owner": owner element's id or null,
- *
- *          //if type is "Property"
- *          "propertyType": element id or null,
- *          "isDerived": true | false,
- *          "isSlot": true | false,
- *          "value": [string|boolean|number|elementIds], //based on valueType,
- *          "valueType": "LiteralBoolean" | "LiteralInteger" | "LiteralString" | 
- *                  "LiteralReal" | "ElementValue" | "Expression",
- *          
- *          //if type is DirectedRelationship or Generalization or Dependency
- *          "source": source element id,
- *          "target": target element id,
- *
- *          //if type is Comment
- *          "body": comment body, can contain html,
- *          "annotatedElements": [elementIds]
- *      }
- * ```
+ * For element json example, see [here](https://ems.jpl.nasa.gov/alfresco/mms/raml/index.html)
  */
-function ElementService($q, $http, URLService, _) {
-    var elements = {};
-    var edits = {};
-
+function ElementService($q, $http, URLService, UtilsService, CacheService, _) {
+    
+    var inProgress = {};
     /**
      * @ngdoc method
      * @name mms.ElementService#getElement
@@ -56,45 +28,74 @@ function ElementService($q, $http, URLService, _) {
      * 
      * @description
      * Gets an element object by id. If the element object is already in the cache,
-     * resolve the existing reference, if not, request it from the repository, add 
-     * it to the cache, and resolve the new object.
+     * resolve the existing reference, if not or update is true, request it from server, 
+     * add/merge into the cache. 
+     * 
+     * Most of these methods return promises that will reject with a reason object
+     * when a server call fails, see
+     * {@link mms.URLService#methods_handleHttpStatus the return object}
+     *
+     * ## Example Usage
+     *  <pre>
+        ElementService.getElement('element_id').then(
+            function(element) { //element is an element object (see json schema)
+                alert('got ' + element.name);
+            }, 
+            function(reason) {
+                alert('get element failed: ' + reason.message); 
+                //see mms.URLService#handleHttpStatus for the reason object
+            }
+        );
+        </pre>
+     * ## Example with timestamp
+     *  <pre>
+        ElementService.getElement('element_id', false, 'master', '2014-07-01T08:57:36.915-0700').then(
+            function(element) { //element is an element object (see json schema)
+                alert('got ' + element.name);
+            }, 
+            function(reason) {
+                alert('get element failed: ' + reason.message); 
+                //see mms.URLService#handleHttpStatus for the reason object
+            }
+        );
+        </pre>
      * 
      * @param {string} id The id of the element to get.
-     * @param {boolean} [updateFromServer=false] (optional) whether to always get the latest 
-     *      from server, even if it's already in cache (this will update everywhere
-     *      it's displayed, except for the editables)
+     * @param {boolean} [update=false] (optional) whether to always get the latest 
+     *      from server, even if it's already in cache (this will update the cache if exists)
+     * @param {string} [workspace=master] (optional) workspace to use
+     * @param {string} [version=latest] (optional) alfresco version number or timestamp
      * @returns {Promise} The promise will be resolved with the element object, 
-     *      multiple calls to this method with the same id would result in 
-     *      references to the same object.
+     *      multiple calls to this method with the same parameters would give the
+     *      same object
      */
-    var getElement = function(id, updateFromServer) {
+    var getElement = function(id, update, workspace, version) {
+        var n = normalize(id, update, workspace, version);
+        var key = 'getElement(' + id + n.update + n.ws + n.ver + ')';
+
+        if (inProgress.hasOwnProperty(key))
+            return inProgress[key];
+
         var deferred = $q.defer();
-        if (elements.hasOwnProperty(id))
-            deferred.resolve(elements[id]);
-        else {
-            $http.get(URLService.getElementURL(id))
-            .success(function(data, status, headers, config) {
-                if (data.elements.length > 0) {
-                    if (elements.hasOwnProperty(id))
-                        deferred.resolve(elements[id]);
-                    else {
-                        elements[id] = data.elements[0];
-                        deferred.resolve(elements[id]);
-                    }
-                } else {
-                    deferred.reject("Not Found");
-                }
-            }).error(function(data, status, headers, config) {
-                if (status === 404)
-                    deferred.reject("Not Found");
-                else if (status === 500)
-                    deferred.reject("Server Error");
-                else if (status === 401 || status === 403)
-                    deferred.reject("Unauthorized");
-                else
-                    deferred.reject("Failed");
-            });
+        if (CacheService.exists(n.cacheKey) && !n.update) {
+            var cached = CacheService.get(n.cacheKey);
+            if ((cached.specialization.type === 'View' ||
+                cached.specialization.type === 'Product') &&
+                !cached.specialization.hasOwnProperty('contains')) {
+            } else {
+                deferred.resolve(cached);
+                return deferred.promise;
+            }
         }
+        inProgress[key] = deferred.promise;
+        $http.get(URLService.getElementURL(id, n.ws, n.ver))
+        .success(function(data, status, headers, config) {
+            deferred.resolve(CacheService.put(n.cacheKey, UtilsService.cleanElement(data.elements[0]), true));
+            delete inProgress[key];
+        }).error(function(data, status, headers, config) {
+            URLService.handleHttpStatus(data, status, headers, config, deferred);
+            delete inProgress[key];
+        });
         return deferred.promise;
     };
 
@@ -107,15 +108,17 @@ function ElementService($q, $http, URLService, _) {
      * Same as getElement, but for multiple ids.
      * 
      * @param {Array.<string>} ids The ids of the elements to get.
-     * @param {boolean} [updateFromServer=false] (optional) whether to always get latest from server.
+     * @param {boolean} [update=false] (optional) whether to always get latest from server.
+     * @param {string} [workspace=master] (optional) workspace to use
+     * @param {string} [version=latest] (optional) alfresco version number or timestamp
      * @returns {Promise} The promise will be resolved with an array of element objects, 
      *      multiple calls to this method with the same ids would result in an array of 
      *      references to the same objects.
      */
-    var getElements = function(ids, updateFromServer) {
+    var getElements = function(ids, update, workspace, version) {
         var promises = [];
         ids.forEach(function(id) {
-            promises.push(getElement(id, updateFromServer));
+            promises.push(getElement(id, update, workspace, version));
         });
         return $q.all(promises);
     };
@@ -126,27 +129,53 @@ function ElementService($q, $http, URLService, _) {
      * @methodOf mms.ElementService
      * 
      * @description
-     * Gets an element object to edit by id. 
+     * Gets an element object to edit by id. (this is different from getElement in 
+     * that the element is a clone and not the same reference. The rationale is to
+     * consider angular data bindings so editing an element does not cause unintentional
+     * updates to other parts of the view, separating reads and edits)
+     * 
+     * ## Example
+     *  <pre>
+        ElementService.getElementForEdit('element_id').then(
+            function(editableElement) {
+                editableElement.name = 'changed name'; //immediately change a name and save
+                ElementService.updateElement(editableElement).then(
+                    function(updatedElement) { //at this point the regular getElement would show the update
+                        alert('updated');
+                    },
+                    function(reason) {
+                        alert('update failed');
+                    }
+                );
+            },
+            function(reason) {
+                alert('get element failed: ' + reason.message);
+            }
+        );
+        </pre>
      * 
      * @param {string} id The id of the element to get.
+     * @param {boolean} [update=false] Get the latest from server first, 
+     *      else just make a copy of what's in the element cache
+     * @param {string} [workspace=master] (optional) workspace to use
      * @returns {Promise} The promise will be resolved with the element object, 
      *      multiple calls to this method with the same id would result in 
      *      references to the same object. This object can be edited without
      *      affecting the same element object that's used for displays
      */
-    var getElementForEdit = function(id) {
+    var getElementForEdit = function(id, update, workspace) {
+        var n = normalize(id, update, workspace, null, true);
+
         var deferred = $q.defer();
-        if (edits.hasOwnProperty(id))
-            deferred.resolve(edits[id]);
+        if (CacheService.exists(n.cacheKey) && !n.update)
+            deferred.resolve(CacheService.get(n.cacheKey));
         else {
-            getElement(id).then(function(data){
-                if (edits.hasOwnProperty(id))
-                    deferred.resolve(edits[id]);
-                else {
-                    var edit = _.cloneDeep(data);
-                    edits[id] = edit;
-                    deferred.resolve(edit);
-                }
+            getElement(id, n.update, n.ws)
+            .then(function(data) {
+                var edit = _.cloneDeep(data);
+                deferred.resolve(CacheService.put(n.cacheKey, UtilsService.cleanElement(edit, true), true));
+            }, function(reason) {
+                deferred.reject(reason);
             });
         }
         return deferred.promise;
@@ -161,13 +190,15 @@ function ElementService($q, $http, URLService, _) {
      * Gets element objects to edit by ids. 
      * 
      * @param {Array.<string>} ids The ids of the elements to get for edit.
+     * @param {boolean} [update=false] Get latest from server first
+     * @param {string} [workspace=master] (optional) workspace to use
      * @returns {Promise} The promise will be resolved with an array of editable
      * element objects that won't affect the corresponding displays
      */
-    var getElementsForEdit = function(ids) {
+    var getElementsForEdit = function(ids, update, workspace) {
         var promises = [];
         ids.forEach(function(id) {
-            promises.push(getElementForEdit(id));
+            promises.push(getElementForEdit(id, update, workspace));
         });
         return $q.all(promises);
     };
@@ -178,56 +209,71 @@ function ElementService($q, $http, URLService, _) {
      * @methodOf mms.ElementService
      * 
      * @description
-     * Gets element's owned element objects. 
+     * Gets element's owned element objects. TBD (stub)
      * 
      * @param {string} id The id of the elements to get owned elements for
+     * @param {boolean} [update=false] update elements from server
+     * @param {string} [workspace=master] (optional) workspace to use
+     * @param {string} [version=latest] (optional) alfresco version number or timestamp
      * @returns {Promise} The promise will be resolved with an array of 
      * element objects 
      */
-    var getOwnedElements = function(id) {
-        
+    var getOwnedElements = function(id, update, workspace, version) {
+        var n = normalize(id, update, workspace, version);
+        return getGenericElements(URLService.getOwnedElementURL(id, n.ws, n.ver), 'elements', n.update, n.ws, n.ver);
     };
 
     /**
      * @ngdoc method
-     * @name mms.ElementService#getViewElements
+     * @name mms.ElementService#getGenericElements
      * @methodOf mms.ElementService
-     * 
+     *
      * @description
-     * Gets elements referenced in a view (this can be removed in preference of 
-     * getElements, since the view has the ids already).
-     * 
-     * @param {string} viewid The id of the view.
-     * @returns {Promise} The promise will be resolved with an array of element objects, 
-     *      multiple calls to this method may return with different elements depending
-     *      on if the view has changed on the server. (consider removing this and only
-     *      use the ones in ViewService instead)
+     * This is a method to call a predefined url that returns elements json.
+     * A key provides the key of the json that has the elements array. 
+     *
+     * ## Example (used by ViewService to get products in a site)
+     *  <pre>
+        ElementService.getGenericElements('/alfresco/service/sites/europa/products', 'products')
+        .then(
+            function(products) {
+                alert('got ' + products.length + ' products');
+            },
+            function(reason) {
+                alert('failed: ' + reason.message);
+            }
+        );
+        </pre>
+     *
+     * @param {string} url the url to get
+     * @param {string} key json key that has the element array value
+     * @param {boolean} [update=false] update cache
+     * @param {string} [workspace=master] workspace associated, this will not change the url
+     * @param {string} [version=latest] timestamp associated, this will not change the url
      */
-    var getViewElements = function(viewid) {
+    var getGenericElements = function(url, key, update, workspace, version) {
+        var n = normalize(null, update, workspace, version);
+
+        var progress = 'getGenericElements(' + url + key + n.update + n.ws + n.ver + ')';
+        if (inProgress.hasOwnProperty(progress))
+            return inProgress[progress];
+
         var deferred = $q.defer();
-        $http.get(URLService.getViewURL(viewid) + '/elements')
+       
+        inProgress[progress] = deferred.promise;
+        $http.get(url)
         .success(function(data, status, headers, config) {
             var result = [];
-            data.elements.forEach(function(element) {
-                if (elements.hasOwnProperty(element.id))
-                    result.push(elements[element.id]);
-                else {
-                    elements[element.id] = element;
-                    result.push(elements[element.id]);
-                }
-            });
+            data[key].forEach(function(element) {
+                var ekey = UtilsService.makeElementKey(element.sysmlid, n.ws, n.ver);
+                result.push(CacheService.put(ekey, UtilsService.cleanElement(element), true));
+            }); 
+            delete inProgress[progress];
             deferred.resolve(result); 
         }).error(function(data, status, headers, config) {
-            if (status === 404)
-                deferred.reject("Not Found");
-            else if (status === 500)
-                deferred.reject("Server Error");
-            else if (status === 401 || status === 403)
-                deferred.reject("Unauthorized");
-            else
-                deferred.reject("Failed");
+            URLService.handleHttpStatus(data, status, headers, config, deferred);
+            delete inProgress[progress];
         });
-        
         return deferred.promise;
     };
 
@@ -240,28 +286,97 @@ function ElementService($q, $http, URLService, _) {
      * Save element to alfresco and update the cache if successful, the element object
      * must have an id, and whatever property that needs to be updated.
      * 
+     * {@link mms.ElementService#methods_getElementForEdit see also getElementForEdit}
+     *
+     * ## Example
+     *  <pre>
+        var update = {
+            'sysmlid': 'element_id',
+            'read': '2014-07-01T08:57:36.915-0700', //time the element was last read from the server
+            'name': 'updated name',
+            'documentation': '<p>updated doc</p>',
+            'specialization': {
+                'type': 'Property',
+                'value': [
+                    {
+                        'type': 'LiteralString', 
+                        'string': 'updated string value'
+                    }
+                ]
+            }
+        };
+        ElementService.updateElement(update).then(
+            function(updatedElement) { //this element will have the latest info as well as read time
+                alert('update successful');
+            },
+            function(reason) {
+                alert('update failed: ' + reason.message);
+            }
+        );
+        </pre>
+     * 
      * @param {Object} elem An object that contains element id and any property changes to be saved.
+     * @param {string} [workspace=master] (optional) workspace to use
      * @returns {Promise} The promise will be resolved with the updated cache element reference if 
-     *      update is successful.
+     *      update is successful. If a conflict occurs, the promise will be rejected with status of 409
      */
-    var updateElement = function(elem) {
+    var updateElement = function(elem, workspace) {
         var deferred = $q.defer();
-        if (elements.hasOwnProperty(elem.id)) {
-            elements[elem.id].name = elem.name;
-            elements[elem.id].documentation = elem.documentation; //make a function to do deep copy
-            deferred.resolve(elements[elem.id]);
-            //alfresco service not implemented yet
-            /*$http.post(URLService.getPostElementsURL(), {'elements': [elem]})
+        if (!elem.hasOwnProperty('sysmlid'))
+            deferred.reject('Element id not found, create element first!');
+        else {
+            if (elem.hasOwnProperty('owner'))
+                delete elem.owner; //hack for getting around a 400 error when owner
+                                    //isn't found on server - ok for now since
+                                    //owner can't be changed from the web
+            var n = normalize(elem.sysmlid, null, workspace, null);
+            $http.post(URLService.getPostElementsURL(n.ws), {'elements': [elem]})
             .success(function(data, status, headers, config) {
-                //make some merging util function
-                var element = elements[elem.id];
-
-                deferred.resolve(elements[elem.id]);
+                var resp = CacheService.put(n.cacheKey, UtilsService.cleanElement(data.elements[0]), true);
+                //special case for products view2view updates 
+                if (resp.specialization && resp.specialization.view2view &&
+                    elem.specialization && elem.specialization.view2view)
+                    resp.specialization.view2view = elem.specialization.view2view;
+                deferred.resolve(resp);
+                /* TODO better way to sync edits on update, maybe app level*/
+                var edit = CacheService.get(UtilsService.makeElementKey(elem.sysmlid, n.ws, null, true));
+                if (edit) {
+                    _.merge(edit, resp);
+                    UtilsService.cleanElement(edit, true);
+                }
             }).error(function(data, status, headers, config) {
-                deferred.reject('Error');
-            });*/
-        } else
-            deferred.reject("Not in Cache");
+                if (status === 409) {
+                    var server = _.cloneDeep(data.elements[0]);
+                    var newread = server.read;
+                    delete server.modified;
+                    delete server.read;
+                    delete server.creator;
+                    UtilsService.cleanElement(server);
+                    var orig = CacheService.get(UtilsService.makeElementKey(elem.sysmlid, n.ws, null, false));
+                    if (!orig) {
+                        URLService.handleHttpStatus(data, status, headers, config, deferred);
+                    } else {
+                        var current = _.cloneDeep(orig);
+                        delete current.modified;
+                        delete current.read;
+                        delete current.creator;
+                        UtilsService.cleanElement(current);
+                        if (angular.equals(server, current)) {
+                            elem.read = newread;
+                            updateElement(elem, workspace)
+                            .then(function(good){
+                                deferred.resolve(good);
+                            }, function(reason) {
+                                deferred.reject(reason);
+                            });
+                        } else {
+                            URLService.handleHttpStatus(data, status, headers, config, deferred);
+                        }
+                    }
+                } else
+                    URLService.handleHttpStatus(data, status, headers, config, deferred);
+            });
+        } 
         return deferred.promise;
     };
 
@@ -274,13 +389,98 @@ function ElementService($q, $http, URLService, _) {
      * Save elements to alfresco and update the cache if successful.
      * 
      * @param {Array.<Object>} elems Array of element objects that contains element id and any property changes to be saved.
+     * @param {string} [workspace=master] (optional) workspace to use
      * @returns {Promise} The promise will be resolved with an array of updated element references if 
      *      update is successful.
      */
-    var updateElements = function(elems) {
+    var updateElements = function(elems, workspace) {
         var promises = [];
         elems.forEach(function(elem) {
-            promises.push(updateElement(elem));
+            promises.push(updateElement(elem, workspace));
+        });
+        return $q.all(promises);
+    };
+
+    /**
+     * @ngdoc method
+     * @name mms.ElementService#createElement
+     * @methodOf mms.ElementService
+     * 
+     * @description
+     * Create element on alfresco.
+     *
+     * ## Example
+     *  <pre>
+        var create = {
+            'name': 'new name',
+            'owner': 'owner_id',
+            'documentation': '<p>new doc</p>',
+            'specialization': {
+                'type': 'Property',
+                'value': [
+                    {
+                        'type': 'LiteralString', 
+                        'string': 'new value'
+                    }
+                ]
+            }
+        };
+        ElementService.createElement(create).then(
+            function(createdElement) { //this element will have a generated id
+                alert('create successful with id: ' + createdElement.sysmlid);
+            },
+            function(reason) {
+                alert('create failed: ' + reason.message);
+            }
+        );
+        </pre>
+     * 
+     * @param {Object} elem Element object that must have an owner id.
+     * @param {string} [workspace=master] (optional) workspace to use
+     * @returns {Promise} The promise will be resolved with the created element references if 
+     *      create is successful.
+     */
+    var createElement = function(elem, workspace) {
+        var n = normalize(null, null, workspace, null);
+
+        var deferred = $q.defer();
+        if (!elem.hasOwnProperty('owner')) {
+        //    deferred.reject('Element create needs an owner'); //relax this?
+        //    return deferred.promise;
+            elem.owner = 'holding_bin_project'; //hardcode a holding bin for owner for propose element
+        }
+        if (elem.hasOwnProperty('sysmlid')) {
+            deferred.reject({status: 400, message: 'Element create cannot have id'});
+            return deferred.promise;
+        }
+        $http.post(URLService.getPostElementsURL(n.ws), {'elements': [elem]})
+        .success(function(data, status, headers, config) {
+            var resp = data.elements[0];
+            var key = UtilsService.makeElementKey(resp.sysmlid, n.ws, 'latest');
+            deferred.resolve(CacheService.put(key, UtilsService.cleanElement(resp), true));
+        }).error(function(data, status, headers, config) {
+            URLService.handleHttpStatus(data, status, headers, config, deferred);
+        });
+        return deferred.promise;
+    };
+
+    /**
+     * @ngdoc method
+     * @name mms.ElementService#createElements
+     * @methodOf mms.ElementService
+     * 
+     * @description
+     * Create elements to alfresco and update the cache if successful.
+     * 
+     * @param {Array.<Object>} elems Array of element objects that must contain owner id.
+     * @param {string} [workspace=master] (optional) workspace to use
+     * @returns {Promise} The promise will be resolved with an array of created element references if 
+     *      create is successful.
+     */
+    var createElements = function(elems, workspace) {
+        var promises = [];
+        elems.forEach(function(elem) {
+            promises.push(createElement(elem, workspace));
         });
         return $q.all(promises);
     };
@@ -291,17 +491,19 @@ function ElementService($q, $http, URLService, _) {
      * @methodOf mms.ElementService
      * 
      * @description
-     * Check if element has been edited and not saved to server
+     * TBD, do not use. Check if element has been edited and not saved to server
      * 
      * @param {string} id Element id
      * @returns {boolean} Whether element is dirty
      */
-    var isDirty = function(id) {
-        if (!edits.hasOwnProperty(id))
-            return false;
-        if (_.isEqual(elements[id], edits[id]))
-            return false;
-        return true;
+    var isDirty = function(id, workspace) {
+        var editKey = UtilsService.makeElementKey(id, workspace, null, true);
+        var normalKey = UtilsService.makeElementKey(id, workspace);
+        var normal = CacheService.get(normalKey);
+        var edit = CacheService.get(editKey);
+        if (edit && !_.isEqual(normal, edit))
+            return true;
+        return false;
     };
 
     /**
@@ -313,10 +515,48 @@ function ElementService($q, $http, URLService, _) {
      * Search for elements based on some query
      * 
      * @param {string} query A query string (TBD)
+     * @param {boolean} [update=false] Whether to update from server
+     * @param {string} [workspace=master] (optional) workspace to use
      * @returns {Promise} The promise will be resolved with an array of element objects
      */
-    var search = function(query) {
+    var search = function(query, update, workspace) {
+        var n = normalize(null, update, workspace, null);
+        return getGenericElements(URLService.getElementSearchURL(query, n.ws), 'elements', n.update, n.ws, n.ver);
+    };
 
+    /**
+     * @ngdoc method
+     * @name mms.ElementService#getElementVersions
+     * @methodOf mms.ElementService
+     * 
+     * @description
+     * Queries for an element's entire version history
+     *
+     * @param {string} id The id of the element
+     * @param {boolean} [update=false] update element version cache
+     * @param {string} [workspace=master] workspace
+     * @returns {Promise} The promise will be resolved with an array of version objects.
+     */
+    var getElementVersions = function(id, update, workspace) {
+        var n = normalize(id, update, workspace, 'versions');
+        var deferred = $q.defer();
+        if (CacheService.exists(n.cacheKey) && !n.update) {
+            deferred.resolve(CacheService.get(n.cacheKey));
+            return deferred.promise;
+        }
+        $http.get(URLService.getElementVersionsURL(id, n.ws))
+        .success(function(data, statas, headers, config){
+            deferred.resolve(CacheService.put(n.cacheKey, data.versions, true));
+        }).error(function(data, status, headers, config){
+            URLService.handleHttpStatus(data, status, headers, config, deferred);
+        });
+        return deferred.promise;
+    };
+
+    var normalize = function(id, update, workspace, version, edit) {
+        var res = UtilsService.normalize({update: update, workspace: workspace, version: version});
+        res.cacheKey = UtilsService.makeElementKey(id, res.ws, res.ver, edit);
+        return res;
     };
 
     return {
@@ -324,10 +564,13 @@ function ElementService($q, $http, URLService, _) {
         getElements: getElements,
         getElementForEdit: getElementForEdit,
         getElementsForEdit: getElementsForEdit,
-        getViewElements: getViewElements,
         getOwnedElements: getOwnedElements,
         updateElement: updateElement,
         updateElements: updateElements,
+        createElement: createElement,
+        createElements: createElements,
+        getGenericElements: getGenericElements,
+        getElementVersions: getElementVersions,
         isDirty: isDirty,
         search: search
     };

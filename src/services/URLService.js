@@ -1,58 +1,173 @@
 'use strict';
 
 angular.module('mms')
-.factory('URLService', ['$q', '$http', '$location', URLService]);
+.provider('URLService', function URLServiceProvider() {
+    var baseUrl = '/alfresco/service';
+    
+    this.setBaseUrl = function(base) {
+        baseUrl = base;
+    };
+    
+    this.$get = [function URLServiceFactory() {
+        return urlService(baseUrl);
+    }];
+});
 
 /**
  * @ngdoc service
  * @name mms.URLService
- * @requires $q
- * @requires $http
- * @requires $location
  * 
  * @description
  * This utility service gives back url paths for use in other services in communicating
- * with the server
+ * with the server, arguments like workspace, version are expected to be strings and
+ * not null or undefined. This service is usually called by higher level services and
+ * should rarely be used directly by applications.
+ *
+ * To configure the base url of the ems server, you can use the URLServiceProvider
+ * in your application module's config. By default, the baseUrl is '/alfresco/service' 
+ * which assumes your application is hosted on the same machine as the ems. 
+ *  <pre>
+        angular.module('myApp', ['mms'])
+        .config(function(URLServiceProvider) {
+            URLServiceProvider.setBaseUrl('https://ems.jpl.nasa.gov/alfresco/service');
+        });
+    </pre>
+ * (You may run into problems like cross origin security policy that prevents it from
+ *  actually getting the resources from a different server, solution TBD)
  */
-function URLService($q, $http, $location) {
-    var root = "/alfresco/service";
+function urlService(baseUrl) {
+    var root = baseUrl;
 
     /**
      * @ngdoc method
-     * @name mms.URLService#getRoot
+     * @name mms.URLService#isTimestamp
      * @methodOf mms.URLService
      * 
      * @description
-     * Gives back the service root of the server, currently "/alfresco/service".
+     * self explanatory
      *
-     * @returns {string} The current service root.
+     * @param {string} version A version string or timestamp
+     * @returns {boolean} Returns true if the string has '-' in it
      */
-    var getRoot = function() {
-        return root;
+    var isTimestamp = function(version) {
+        if (String(version).indexOf('-') >= 0)
+            return true;
+        return false;
     };
 
     /**
      * @ngdoc method
-     * @name mms.URLService#setRoot
+     * @name mms.URLService#getConfigSnapshotsURL
      * @methodOf mms.URLService
-     * 
+     *
      * @description
-     * Sets the service root of the server.
-     * 
-     * @param {string} r The new service root.
-     * @returns {string} The new service root.
+     * Gets url that gets or posts snapshots for a configuration in a site
+     *
+     * @param {string} id Id of the configuration
+     * @param {string} site Site name
+     * @param {string} workspace Workspace name
+     * @returns {string} The url
      */
-    var setRoot = function(r) {
-        root = r;
-        return root;
+    var getConfigSnapshotsURL = function(id, site, workspace) {
+        return root + "/workspaces/" + workspace +
+                      "/sites/" + site +
+                      "/configurations/" + id +
+                      "/snapshots";                
     };
 
-    var getSnapshotURL = function(id) {
-        
+    /**
+     * @ngdoc method
+     * @name mms.URLService#getProductSnapshotsURL
+     * @methodOf mms.URLService
+     *
+     * @description
+     * Gets url that gets or creates snapshots for a product in a site
+     *
+     * @param {string} id Id of the product
+     * @param {string} site Site name
+     * @param {string} workspace Workspace name
+     * @returns {string} The url
+     */
+    var getProductSnapshotsURL = function(id, site, workspace) {
+        return root + "/workspaces/" + workspace +
+                      "/sites/" + site +
+                      "/products/" + id +
+                      "/snapshots";                
     };
 
-    var getTagURL = function(id) {
+    /**
+     * @ngdoc method
+     * @name mms.URLService#getSiteConfigsURL
+     * @methodOf mms.URLService
+     *
+     * @description
+     * Gets url that gets or creates configurations in a site
+     *
+     * @param {string} site Site name
+     * @param {string} workspace Workspace name
+     * @returns {string} The url
+     */
+    var getSiteConfigsURL = function(site, workspace) {
+        return root + "/workspaces/" + workspace +
+                      "/sites/" + site +
+                      "/configurations";
+    };
 
+    /**
+     * @ngdoc method
+     * @name mms.URLService#getConfigProductsURL
+     * @methodOf mms.URLService
+     *
+     * @description
+     * Gets url that gets or posts products in a configuration
+     *
+     * @param {string} id Id of the configuration
+     * @param {string} site Site name
+     * @param {string} workspace Workspace name
+     * @returns {string} The url
+     */
+    var getConfigProductsURL = function (id, site, workspace) {
+        return root + "/workspaces/" + workspace +
+                      "/sites/" + site +
+                      "/configurations/" + id +
+                      "/products";                        
+    };
+
+    /**
+     * @ngdoc method
+     * @name mms.URLService#getConfigURL
+     * @methodOf mms.URLService
+     *
+     * @description
+     * Gets url that gets a configuration
+     *
+     * @param {string} id Id of the configuration
+     * @param {string} site Site name
+     * @param {string} workspace Workspace name
+     * @returns {string} The url
+     */
+    var getConfigURL = function(id, site, workspace) {
+        return root + "/workspaces/" + workspace + 
+                      "/sites/" + site + 
+                      "/configurations/" + id;
+    };
+
+    /**
+     * @ngdoc method
+     * @name mms.URLService#getConfigProductsURL
+     * @methodOf mms.URLService
+     *
+     * @description
+     * Gets url that gets products in a site
+     *
+     * @param {string} site Site name
+     * @param {string} workspace Workspace name
+     * @returns {string} The url
+     */
+    var getSiteProductsURL = function(site, workspace) {
+        return root + "/workspaces/" + workspace + 
+                      "/sites/" + site + 
+                      "/products";
     };
 
     /**
@@ -61,13 +176,17 @@ function URLService($q, $http, $location) {
      * @methodOf mms.URLService
      * 
      * @description
-     * Gets the path for querying the latest image url
+     * Gets the url for querying an image url 
+     * (this is not the actual image path)
      * 
      * @param {string} id The id of the image
+     * @param {string} workspace Workspace name
+     * @param {string} version Timestamp or version number
      * @returns {string} The path for image url queries.
      */
-    var getImageURL = function(id) {
-
+    var getImageURL = function(id, workspace, version) {
+        var r = root + '/workspaces/' + workspace + '/artifacts/' + id;
+        return addVersion(r, version);
     };
 
     /**
@@ -78,7 +197,7 @@ function URLService($q, $http, $location) {
      * @description
      * Gets the path for a site dashboard.
      * 
-     * @param {string} site The site name (not title!).
+     * @param {string} site Site name (not title!).
      * @returns {string} The path for site dashboard.
      */
     var getSiteDashboardURL = function(site) {
@@ -91,13 +210,86 @@ function URLService($q, $http, $location) {
      * @methodOf mms.URLService
      * 
      * @description
-     * Gets the path for an element object json.
+     * Gets the path for an element
      * 
      * @param {string} id The element id.
-     * @returns {string} The element json path.
+     * @param {string} workspace Workspace name
+     * @param {string} version Timestamp or version number
+     * @returns {string} The url.
      */
-    var getElementURL = function(id) {
-        return root + "/javawebscripts/elements/" + id;
+    var getElementURL = function(id, workspace, version) {        
+        var r = root + '/workspaces/' + workspace + '/elements/' + id;
+        return addVersion(r, version);
+    };
+
+    var getOwnedElementURL = function(id, workspace, version) {
+        
+        var r = root + '/workspaces/' + workspace + '/elements/' + id + '?recurse=true';
+        // TODO return addVersion(r, version);
+        return r;
+        
+    };
+
+    /**
+     * @ngdoc method
+     * @name mms.URLService#getDocumentViewsURL
+     * @methodOf mms.URLService
+     * 
+     * @description
+     * Gets the url to get all views in a document
+     * 
+     * @param {string} id The document id.
+     * @param {string} workspace Workspace name
+     * @param {string} version Timestamp or version number
+     * @returns {string} The url.
+     */
+    var getDocumentViewsURL = function(id, workspace, version, simple) {
+        var r = root + "/javawebscripts/products/" + id + "/views";
+        //var r = root + "/workspaces/" + workspace + "/products/" + id + "/views";
+        r = addVersion(r, version);
+        if (simple) {
+            if (r.indexOf('?') > 0)
+                r += '&simple=true';
+            else
+                r += '?simple=true';
+        }
+        return r;
+    };
+
+    /**
+     * @ngdoc method
+     * @name mms.URLService#getViewElementsURL
+     * @methodOf mms.URLService
+     * 
+     * @description
+     * Gets the url to get all elements referenced in a view
+     * 
+     * @param {string} id The view id.
+     * @param {string} workspace Workspace name
+     * @param {string} version Timestamp or version number
+     * @returns {string} The url.
+     */
+    var getViewElementsURL = function(id, workspace, version) {
+        var r = root + "/javawebscripts/views/" + id + "/elements";
+        //var r = root + "/workspaces/" + workspace + "/views/" + id + "/elements";
+        return addVersion(r, version);
+    };
+
+    /**
+     * @ngdoc method
+     * @name mms.URLService#getElementVersionsURL
+     * @methodOf mms.URLService
+     * 
+     * @description
+     * Gets the url to query for element history
+     * 
+     * @param {string} id The element id.
+     * @param {string} workspace Workspace name
+     * @returns {string} The url.
+     */
+    var getElementVersionsURL = function(id, workspace) {
+        return root + "/javawebscripts/elements/" + id + "/versions";
+        //return root + '/workspaces/' + workspace + '/elements/' + id + '/versions';
     };
 
     /**
@@ -108,50 +300,129 @@ function URLService($q, $http, $location) {
      * @description
      * Gets the path for posting element changes.
      * 
-     * @returns {string} The post elements path.
+     * @param {string} workspace Workspace name
+     * @returns {string} The post elements url.
      */
-    var getPostElementsURL = function() {
-        return root + "/javawebscripts/elements";
+    var getPostElementsURL = function(workspace) {
+        return root + '/workspaces/' + workspace + '/elements';
     };
 
     /**
      * @ngdoc method
-     * @name mms.URLService#getViewURL
+     * @name mms.URLService#handleHttpStatus
      * @methodOf mms.URLService
      * 
      * @description
-     * Gets the path for a view object json
+     * Utility for setting the state of a deferred object based on the status
+     * of http error. The arguments are the same as angular's $http error 
+     * callback
      * 
-     * @param {string} id The view id.
-     * @returns {string} The view json path.
+     * @param {Object} data The http response
+     * @param {number} status Http return status
+     * @param {Object} header Http return header
+     * @param {Object} config Http config
+     * @param {Object} deferred A deferred object that would be rejected 
+     *      with this object based on the http status: 
+     *      ```
+     *          {
+     *              status: status,
+     *              message: http status message,
+     *              data: data
+     *          }
+     *      ```
      */
-    var getViewURL = function(id) {
-        return root + "/javawebscripts/views/" + id;
+    var handleHttpStatus = function(data, status, header, config, deferred) {
+        var result = {status: status, data: data};
+        if (status === 404)
+            result.message = "Not Found";
+        else if (status === 500)
+            result.message = "Server Error";
+        else if (status === 401 || status === 403)
+            result.message = "Permission Error";
+        else if (status === 409)
+            result.message = "Conflict";
+        else
+            result.message = "Failed";
+        deferred.reject(result);
     };
 
     /**
      * @ngdoc method
-     * @name mms.URLService#getDocumentURL
+     * @name mms.URLService#getSitesURL
      * @methodOf mms.URLService
      * 
      * @description
-     * Gets the path for a document object json
+     * Gets the url to query sites.
      * 
-     * @param {string} id The document id.
-     * @returns {string} The document json path.
+     * @returns {string} The url.
      */
-    var getDocumentURL = function(id) {
-        return root + "/javawebscripts/products/" + id;
+    var getSitesURL = function() {
+        return root + "/rest/sites";
+    };
+
+    /**
+     * @ngdoc method
+     * @name mms.URLService#getElementSearchURL
+     * @methodOf mms.URLService
+     * 
+     * @description
+     * Gets the url for element keyword search.
+     * 
+     * @param {string} query Keyword query
+     * @param {string} workspace Workspace name to search under
+     * @returns {string} The post elements url.
+     */
+    var getElementSearchURL = function(query, workspace) {
+        return root + "/javawebscripts/element/search?keyword=" + query;
+    };
+
+    var getWorkspacesURL = function() {
+        return root + '/workspaces';
+    };
+
+    var getWorkspaceURL = function(ws) {
+        return root + '/workspaces/' + ws;
+    };
+
+    var getWsDiffURL = function(ws1, ws2, ws1time, ws2time) {
+        var r = root + '/diff?sourceWs=' + ws2 + '&targetWs=' + ws2;
+        if (ws1time && ws1time !== 'latest')
+            r += '&sourceTimestamp=' + ws1time;
+        if (ws2time && ws2time !== 'latest')
+            r += '&targetTimestamp=' + ws2time;
+    };
+
+    var addVersion = function(url, version) {
+        if (version === 'latest')
+            return url;
+        if (isTimestamp(version))
+            return url + '?timestamp=' + version;
+        else
+            return url + '/versions/' + version;
     };
 
     return {
-        getRoot: getRoot,
-        setRoot: setRoot,
         getSiteDashboardURL: getSiteDashboardURL,
         getElementURL: getElementURL,
+        getOwnedElementURL: getOwnedElementURL,
+        getElementVersionsURL: getElementVersionsURL,
         getPostElementsURL: getPostElementsURL,
-        getViewURL: getViewURL,
-        getDocumentURL: getDocumentURL
+        handleHttpStatus: handleHttpStatus,
+        getSitesURL: getSitesURL,
+        getElementSearchURL: getElementSearchURL,
+        getImageURL: getImageURL,
+        getProductSnapshotsURL: getProductSnapshotsURL,
+        getConfigSnapshotsURL: getConfigSnapshotsURL,
+        getSiteProductsURL: getSiteProductsURL,
+        getConfigURL: getConfigURL,
+        getSiteConfigsURL: getSiteConfigsURL,
+        getConfigProductsURL : getConfigProductsURL,
+        getDocumentViewsURL: getDocumentViewsURL,
+        getViewElementsURL: getViewElementsURL,
+        getWsDiffURL: getWsDiffURL,
+        getWorkspacesURL: getWorkspacesURL,
+        getWorkspaceURL: getWorkspaceURL,
+        isTimestamp: isTimestamp
     };
 
 }
