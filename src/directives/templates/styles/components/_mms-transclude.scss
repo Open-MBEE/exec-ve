@@ -13,7 +13,6 @@ mms-view {
   mms-transclude-name *,
   mms-transclude-val * {
     @include transition(background-color, .2s, linear);
-    background-color: $white;  
   }
 }
 
