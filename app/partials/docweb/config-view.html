@@ -4,7 +4,7 @@
 <div>{{config.description}}</div>
 <h2>Documents</h2>
   <div ng-repeat="snapshot in configSnapshots | orderBy:'sysmlname'" class="row">
-      <a href="ve.html#/workspaces/{{ws}}/sites/{{site}}/products/{{snapshot.sysmlid}}/{{snapshot.created}}" class="col-xs-4">{{snapshot.sysmlname}} - {{snapshot.created | date:'medium'}}</a>
+      <a href="ve.html#/workspaces/{{ws}}/sites/{{site}}/products/{{snapshot.sysmlid}}/{{snapshot.created}}" class="col-xs-4">{{snapshot.sysmlname}} - {{snapshot.created | date:'medium'}} (created by {{snapshot.creator}})</a>
       <button ng-if="getPDFUrl(snapshot)==null" class="btn-link col-xs-2 text-left" ng-click="generatePdf(snapshot, this)">{{pdfText}}</button>
       <a ng-if='getPDFUrl(snapshot)!=null' href="{{getPDFUrl(snapshot)}}" class="col-xs-2 text-left" target="_blank">Download PDF</a> 
       <button ng-if="getHTMLUrl(snapshot)==null" class="btn-link col-xs-2 text-left" ng-click="generateHtml(snapshot, this)">{{htmlText}}</button>
@@ -46,7 +46,7 @@
               <div ng-show="showSnapshots">
 
                 <div ng-repeat="snapshot in productSnapshots | orderBy:'-created'">
-                  <input type="checkbox" ng-model="snapshot.selected" ng-change="toggleCheck(snapshot.id)"/> <a href="ve.html#/sites/{{site}}/products/{{doc.sysmlid}}/{{snapshot.created}}">{{snapshot.created | date:'medium'}}</a>
+                  <input type="checkbox" ng-model="snapshot.selected" ng-change="toggleCheck(snapshot.id)"/> <a href="ve.html#/sites/{{site}}/products/{{doc.sysmlid}}/{{snapshot.created}}">{{snapshot.created | date:'medium'}} by {{snapshot.creator}}</a>
                 </div>
 
               </div>
@@ -65,7 +65,7 @@
         <div ng-show="selectedSnapshots.length" class="col-xs-8">
           <h3>Snapshots Selected</h3>
           <div ng-repeat="id in selectedSnapshots">
-            {{snapshotMap[id].sysmlname}} - {{snapshotMap[id].created | date:'medium'}}
+            {{snapshotMap[id].sysmlname}} - {{snapshotMap[id].created | date:'medium'}} - {{snapshotMap[id].creator}}
           </div>
         </div>
 

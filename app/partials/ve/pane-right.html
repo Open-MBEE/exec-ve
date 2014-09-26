@@ -24,15 +24,19 @@
         <h1>Snapshots <i class="{{snapshotLoading}}"></i></h1>
 
         <table class="snapshot-table table table-condensed">
+            <tr><th>Time</th><th>Created By</th><th>Tag(s)</th></tr>
             <tr>
                 <td>
                     <a ui-sref="doc({site: site.name, docId: document.sysmlid, time: 'latest', ws: ws})" ui-sref-opts="{reload: true}" ng-click="snapshotClicked()">Latest</a>
                 </td>
                 <td></td>
+                <td></td>
             </tr>
             <tr ng-repeat="snapshot in snapshots | orderBy:'-created'">
                 <td>
                     <a ui-sref="doc({site: site.name, docId: document.sysmlid, time: snapshot.created, ws: ws})" ui-sref-opts="{reload: true}" ng-click="snapshotClicked()">{{snapshot.created | date:'M/d/yy h:mm a'}}</a>
+                </td>
+                <td>{{snapshot.creator}}
                 </td>
                 <td>
                     <div ng-repeat="config in snapshot.configurations | orderBy:'name'">

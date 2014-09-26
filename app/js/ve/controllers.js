@@ -12,9 +12,10 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, documen
     $scope.editable = $scope.document.editable && time === 'latest';
     if ($state.current.name === 'doc')
         $rootScope.veCurrentView = $scope.document.sysmlid;
-    if ($state.current.name === 'doc.all')
+    if ($state.current.name === 'doc.all') {
         $rootScope.veFullDocMode = true;
-    else
+        ViewService.setCurrentViewId(document.sysmlid);
+    } else
         $rootScope.veFullDocMode = false;
     $scope.buttons = [{
         action: function(){ $scope.treeApi.expand_all(); },        
