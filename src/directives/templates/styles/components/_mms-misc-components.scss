@@ -54,7 +54,6 @@ table {
 .table {
   tr {
     @include transition($background_hover_transition);
-    background-color: $white;
   }
 
   td {
