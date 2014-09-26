@@ -31,9 +31,11 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
                     if (time !== 'latest') {
                         snapshots.forEach(function(snapshot) {
                             if (time === snapshot.created && snapshot.configurations && snapshot.configurations.length > 0)
-                                tag = '(' + snapshot.configurations[0].name + ')';
+                                snapshot.configurations.forEach(function(config) {
+                                    tag += '(' + config.name + ') ';
+                                });
                         });
-                        tag += ' (' + $filter('date')(time, 'M/d/yy h:mm a') + ')';
+                        tag += '(' + $filter('date')(time, 'M/d/yy h:mm a') + ')';
                     }
                     $scope.site = site.name;
                     if ($stateParams.time !== 'latest')
