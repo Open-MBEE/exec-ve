@@ -1,26 +1,44 @@
 'use strict';
 
-angular.module('myApp', ['mms', 'mms.directives'])
-.controller('PortalCtrl', ['$scope', 'SiteService',
-    function($scope, SiteService) {
-        SiteService.getSites()
-        .then(function(sites) {
-            var categories = {};
-            for (var i = 0; i < sites.length; i++) {
-                var site = sites[i];
-                if (site.categories.length === 0)
-                    site.categories.push("Uncategorized");
-                for (var j = 0; j < site.categories.length; j++) {
-                    var cat = site.categories[j];
-                    if (categories.hasOwnProperty(cat)) {
-                        categories[cat].push(site);
-                    } else {
-                        categories[cat] = [site];
-                    }
+angular.module('myApp', ['ui.router', 'mms', 'mms.directives'])
+.config(function($stateProvider, $urlRouterProvider) {
+    $stateProvider
+    .state('portal', {
+        url: '/workspaces/:ws',
+        resolve: {
+            sites: function($stateParams, SiteService) {
+                return SiteService.getSites($stateParams.ws);
+            },
+            ws: function($stateParams) {
+                return $stateParams.ws;
+            }
+        },
+        views: {
+            'main': {
+                templateUrl: 'partials/portal/sites.html',
+                controller: 'PortalCtrl'
+            }
+        }
+    });
+})
+.controller('PortalCtrl', ['$scope', 'SiteService', 'sites', 'ws',
+    function($scope, SiteService, sites, ws) {
+        $scope.ws = ws;
+        var categories = {};
+        for (var i = 0; i < sites.length; i++) {
+            var site = sites[i];
+            if (site.categories.length === 0)
+                site.categories.push("Uncategorized");
+            for (var j = 0; j < site.categories.length; j++) {
+                var cat = site.categories[j];
+                if (categories.hasOwnProperty(cat)) {
+                    categories[cat].push(site);
+                } else {
+                    categories[cat] = [site];
                 }
             }
-            $scope.categories = categories;
-        });
+        }
+        $scope.categories = categories;
 }]);
 
 

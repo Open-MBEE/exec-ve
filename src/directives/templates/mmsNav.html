@@ -27,9 +27,8 @@
           </li>
 
           <li ng-if="type != 'DocWeb'">
-            <a class="docweb-link" href="docweb.html#/sites/{{site}}">DocWeb</a>
+            <a class="docweb-link" href="docweb.html#/workspaces/{{ws}}/sites/{{site}}">DocWeb</a>
           </li>
-
         </ul>
 
       </li>
@@ -59,7 +58,7 @@
                               </accordion-heading>
 
                               <div class="accordion-links">
-                                  <a class="dash-link" href="/share/page/site/{{site.name}}/dashboard">Dashboard</a><a class="docweb-link" href="docweb.html#/sites/{{site.name}}">Docweb</a>
+                                  <a class="dash-link" href="/share/page/site/{{site.name}}/dashboard">Dashboard</a><a class="docweb-link" href="docweb.html#/workspaces/{{ws}}/sites/{{site.name}}">Docweb</a>
                               </div>
 
                           </accordion-group>

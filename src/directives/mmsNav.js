@@ -216,9 +216,8 @@ function mmsNav(SiteService, $templateCache, growl) {
             site: '@mmsSite', //current site name
             title: '@mmsTitle', //current page title
             type: '@mmsType', //current page type
-            //goTo: '@mmsGoTo',
-            //otherSites: '@mmsOtherSites',
-            responsive: '@mmsResponsive'
+            ws: '@mmsWs',
+            responsive: '@mmsResponse'
         },
         link: mmsNavLink
     };

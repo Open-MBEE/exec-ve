@@ -3,11 +3,12 @@
 /* Controllers */
 
 angular.module('myApp')
-.controller('NavTreeCtrl', ['$scope', '$rootScope', '$location', '$timeout', '$state', '$anchorScroll', 'document', 'time', 'views', 'ElementService', 'ViewService', 'growl', '$modal', '$q',
-function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, document, time, views, ElementService, ViewService, growl, $modal, $q) {
+.controller('NavTreeCtrl', ['$scope', '$rootScope', '$location', '$timeout', '$state', '$anchorScroll', 'document', 'time', 'views', 'ElementService', 'ViewService', 'growl', '$modal', '$q', 'ws',
+function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, document, time, views, ElementService, ViewService, growl, $modal, $q, ws) {
     $scope.document = document;
     $rootScope.veTitle = document.name;
     $scope.time = time;
+    $scope.ws = ws;
     $scope.editable = $scope.document.editable && time === 'latest';
     if ($state.current.name === 'doc')
         $rootScope.veCurrentView = $scope.document.sysmlid;
@@ -211,7 +212,7 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, documen
             return;
         }
         $scope.buttons[3].icon = 'fa-spin fa-spinner';
-        ViewService.createView(branch.data.sysmlid, 'Untitled View', $scope.document.sysmlid)
+        ViewService.createView(branch.data.sysmlid, 'Untitled View', $scope.document.sysmlid, ws)
         .then(function(view) {
             $scope.buttons[3].icon = 'fa-plus';
             treeApi.add_branch(branch, {
@@ -242,7 +243,7 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, documen
         angular.forEach($rootScope.veEdits, function(value, key) {
             var defer = $q.defer();
             promises.push(defer.promise);
-            ElementService.updateElement(value)
+            ElementService.updateElement(value, ws)
             .then(function(e) {
                 defer.resolve({status: 200, id: e.sysmlid});
             }, function(reason) {
@@ -298,16 +299,16 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, documen
     var delay = 500;
     document.specialization.view2view.forEach(function(view, index) {
         $timeout(function() {
-            ViewService.getViewElements(view.id, false, 'master', time)
+            ViewService.getViewElements(view.id, false, ws, time)
             .then(function() {
-                ViewService.getView(view.id, false, 'master', time)
+                ViewService.getView(view.id, false, ws, time)
                 .then(addViewSections);
             });
         }, delay*index);
     });
 }])
-.controller('ReorderCtrl', ['$scope', '$rootScope', 'document', 'time', 'ElementService', 'ViewService', '$state', 'growl', '_',
-function($scope, $rootScope, document, time, ElementService, ViewService, $state, growl, _) {
+.controller('ReorderCtrl', ['$scope', '$rootScope', 'document', 'time', 'ElementService', 'ViewService', '$state', 'growl', '_', 'ws',
+function($scope, $rootScope, document, time, ElementService, ViewService, $state, growl, _, ws) {
     $scope.doc = document;
     var viewIds2node = {};
     viewIds2node[document.sysmlid] = {
@@ -317,7 +318,7 @@ function($scope, $rootScope, document, time, ElementService, ViewService, $state
     };
     var up2dateViews = null;
 
-    ViewService.getDocumentViews(document.sysmlid, false, 'master', time, true)
+    ViewService.getDocumentViews(document.sysmlid, false, ws, time, true)
     .then(function(views) {
         up2dateViews = views;
         up2dateViews.forEach(function(view) {
@@ -352,7 +353,7 @@ function($scope, $rootScope, document, time, ElementService, ViewService, $state
         newdoc.read = document.read;
         newdoc.specialization = {type: 'Product'};
         newdoc.specialization.view2view = newView2View;
-        ViewService.updateDocument(newdoc)
+        ViewService.updateDocument(newdoc, ws)
         .then(function(data) {
             growl.success('Reorder Successful');
             //document.specialization.view2view = newView2View;
@@ -383,8 +384,8 @@ function($scope, $rootScope, document, time, ElementService, ViewService, $state
             $state.go('doc.view', {viewId: curBranch.data.sysmlid});
     };
 }])
-.controller('ViewCtrl', ['$scope', '$rootScope', '$stateParams', 'viewElements', 'ViewService', 'time', 'growl',
-function($scope, $rootScope, $stateParams, viewElements, ViewService, time, growl) {
+.controller('ViewCtrl', ['$scope', '$rootScope', '$stateParams', 'viewElements', 'ViewService', 'time', 'growl', 'ws',
+function($scope, $rootScope, $stateParams, viewElements, ViewService, time, growl, ws) {
     $scope.commentsOn = false;
     $scope.elementsOn = false;
 
@@ -455,6 +456,7 @@ function($scope, $rootScope, $stateParams, viewElements, ViewService, time, grow
     $rootScope.veCurrentView = $stateParams.viewId;
     $rootScope.veViewLoading = false;
     $scope.vid = $stateParams.viewId;
+    $scope.ws = ws;
     $scope.version = time;
     $rootScope.$broadcast('viewSelected', $scope.vid, viewElements);
     $scope.viewApi = {};
@@ -493,9 +495,10 @@ function($scope, $rootScope) {
     $scope.onClick = function(button) {
     };
 }])
-.controller('ToolCtrl', ['$scope', '$rootScope', 'document', 'snapshots', 'time', 'site', 'ConfigService', 'ElementService', 'growl', '$modal',
-function($scope, $rootScope, document, snapshots, time, site, ConfigService, ElementService, growl, $modal) {
+.controller('ToolCtrl', ['$scope', '$rootScope', 'document', 'snapshots', 'time', 'site', 'ConfigService', 'ElementService', 'growl', '$modal', 'ws',
+function($scope, $rootScope, document, snapshots, time, site, ConfigService, ElementService, growl, $modal, ws) {
     $scope.document = document;
+    $scope.ws = ws;
     $scope.editable = document.editable && time === 'latest';
     $scope.snapshots = snapshots;
     $scope.site = site;
@@ -551,7 +554,7 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
 
     var refreshSnapshots = function() {
         $rootScope.veTbApi.setButtonIcon('snapRefresh', 'fa fa-refresh fa-spin');
-        ConfigService.getProductSnapshots($scope.document.sysmlid, $scope.site.name, 'master', true)
+        ConfigService.getProductSnapshots($scope.document.sysmlid, $scope.site.name, $scope.ws, true)
         .then(function(result) {
             $scope.snapshots = result;
             $rootScope.veTbApi.setButtonIcon('snapRefresh', 'fa fa-refresh');
@@ -570,7 +573,7 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
         }
         creatingSnapshot = true;
         $rootScope.veTbApi.setButtonIcon('snapNew', 'fa fa-spinner fa-spin');
-        ConfigService.createSnapshot($scope.document.sysmlid)
+        ConfigService.createSnapshot($scope.document.sysmlid, site.name, ws)
         .then(function(result) {
             creatingSnapshot = false;
             $rootScope.veTbApi.setButtonIcon('snapNew', 'fa fa-plus');
@@ -597,7 +600,7 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
         $rootScope.veTbApi.select('elementViewer');
         showPane('element');
         $scope.specApi.setEditing(false);
-        ElementService.getElement(eid, false, 'master', time).
+        ElementService.getElement(eid, false, ws, time).
         then(function(element) {
             var editable = element.editable && time === 'latest';
             $rootScope.veTbApi.setActive('elementEditor', editable);
@@ -631,7 +634,7 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
         $scope.viewElements = viewElements;
         $rootScope.veTbApi.select('elementViewer');
         showPane('element');
-        ElementService.getElement(vid, false, 'master', time).
+        ElementService.getElement(vid, false, ws, time).
         then(function(element) {
             var editable = element.editable && time === 'latest';
             $rootScope.veTbApi.setActive('elementEditor', editable);
@@ -767,8 +770,9 @@ function($scope, $location, $rootScope, _, $window) {
         }
     });
 }])
-.controller('FullDocCtrl', ['$scope', '$rootScope', 'document', 'time',
-function($scope, $rootScope, document, time) {
+.controller('FullDocCtrl', ['$scope', '$rootScope', 'document', 'time', 'ws',
+function($scope, $rootScope, document, time, ws) {
+    $scope.ws = ws;
     var views = [];
     views.push({id: document.sysmlid, api: {}});
     var view2view = document.specialization.view2view;
