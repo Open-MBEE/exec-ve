@@ -51,11 +51,13 @@ table {
   @extend .table;
 }
 
+thead td, table caption {
+  font-weight: bold;
+}
+
 .table {
   tr {
     @include transition($background_hover_transition);
-    background-color: $white;
-    cursor: pointer;
   }
 
   td {

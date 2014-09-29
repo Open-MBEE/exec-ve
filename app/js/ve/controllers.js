@@ -6,13 +6,15 @@ angular.module('myApp')
 .controller('NavTreeCtrl', ['$scope', '$rootScope', '$location', '$timeout', '$state', '$anchorScroll', 'document', 'time', 'views', 'ElementService', 'ViewService', 'growl', '$modal', '$q',
 function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, document, time, views, ElementService, ViewService, growl, $modal, $q) {
     $scope.document = document;
+    $rootScope.veTitle = document.name;
     $scope.time = time;
     $scope.editable = $scope.document.editable && time === 'latest';
     if ($state.current.name === 'doc')
         $rootScope.veCurrentView = $scope.document.sysmlid;
-    if ($state.current.name === 'doc.all')
+    if ($state.current.name === 'doc.all') {
         $rootScope.veFullDocMode = true;
-    else
+        ViewService.setCurrentViewId(document.sysmlid);
+    } else
         $rootScope.veFullDocMode = false;
     $scope.buttons = [{
         action: function(){ $scope.treeApi.expand_all(); },        
@@ -46,41 +48,7 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, documen
         permission: $scope.editable
     }, {
         action: function(){ 
-            if ($rootScope.veFullDocMode) {
-                $rootScope.veFullDocMode = false;
-                $scope.buttons[5].tooltip = "Full Document";
-                $scope.buttons[5].icon = 'fa-file-text-o';
-            } else {
-                if ($state.current.name === 'doc.all') {
-                    $rootScope.veFullDocMode = true;
-                    $scope.buttons[5].tooltip = "View Mode";
-                    $scope.buttons[5].icon = 'fa-file-text';
-                } else {
-                    if (document.specialization.view2view.length > 30) {
-                        var instance = $modal.open({
-                            templateUrl: 'partials/ve/fullDocWarn.html',
-                            controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
-                                $scope.ok = function() {$modalInstance.close('ok');};
-                                $scope.cancel = function() {$modalInstance.close('cancel');};
-                            }],
-                            size: 'sm'
-                        });
-                        instance.result.then(function(choice) {
-                            if (choice === 'ok') {
-                                $rootScope.veFullDocMode = true;
-                                $scope.buttons[5].tooltip = "View Mode";
-                                $scope.buttons[5].icon = 'fa-file-text';
-                                $state.go('doc.all'); 
-                            }
-                        });
-                    } else {
-                        $rootScope.veFullDocMode = true;
-                        $scope.buttons[5].tooltip = "View Mode";
-                        $scope.buttons[5].icon = 'fa-file-text';
-                        $state.go('doc.all'); 
-                    }
-                }
-            }
+            $scope.fullDocMode();
         },
         tooltip: $rootScope.veFullDocMode ? "View Mode" : "Full Document",
         icon: $rootScope.veFullDocMode ? "fa-file-text" : "fa-file-text-o",
@@ -166,11 +134,60 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, documen
             viewId = branch.data.sysmlid;
         if ($rootScope.veFullDocMode) {
             $location.hash(viewId);
+            $rootScope.veCurrentView = viewId;
+            ViewService.setCurrentViewId(viewId);
+            //$rootScope.$broadcast('viewSelected', viewId, viewElements);
             $anchorScroll();
         } else {
             if (viewId !== $rootScope.veCurrentView)
                 $rootScope.veViewLoading = true;
             $state.go('doc.view', {viewId: viewId});
+        }
+    };
+    $scope.fullDocMode = function() {
+        if ($rootScope.veFullDocMode) {
+            $rootScope.veFullDocMode = false;
+            $scope.buttons[5].tooltip = "Full Document";
+            $scope.buttons[5].icon = 'fa-file-text-o';
+            var curBranch = treeApi.get_selected_branch();
+            if (curBranch) {
+                var viewId;
+                if (curBranch.type == 'section')
+                    viewId = curBranch.view;
+                else
+                    viewId = curBranch.data.sysmlid;
+                $state.go('doc.view', {viewId: viewId});
+            }
+        } else {
+            if ($state.current.name === 'doc.all') {
+                $rootScope.veFullDocMode = true;
+                $scope.buttons[5].tooltip = "View Mode";
+                $scope.buttons[5].icon = 'fa-file-text';
+            } else {
+                if (document.specialization.view2view.length > 30) {
+                    var instance = $modal.open({
+                        templateUrl: 'partials/ve/fullDocWarn.html',
+                        controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
+                            $scope.ok = function() {$modalInstance.close('ok');};
+                            $scope.cancel = function() {$modalInstance.close('cancel');};
+                        }],
+                        size: 'sm'
+                    });
+                    instance.result.then(function(choice) {
+                        if (choice === 'ok') {
+                            $rootScope.veFullDocMode = true;
+                            $scope.buttons[5].tooltip = "View Mode";
+                            $scope.buttons[5].icon = 'fa-file-text';
+                            $state.go('doc.all'); 
+                        }
+                    });
+                } else {
+                    $rootScope.veFullDocMode = true;
+                    $scope.buttons[5].tooltip = "View Mode";
+                    $scope.buttons[5].icon = 'fa-file-text';
+                    $state.go('doc.all'); 
+                }
+            }
         }
     };
 
@@ -818,4 +835,5 @@ function($scope, $rootScope, document, time) {
             icon: "fa-codepen"
         }
     ];
+    $rootScope.veFullDocMode = true;
 }]);

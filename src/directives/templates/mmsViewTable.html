@@ -1,5 +1,5 @@
 <table class="table table-bordered">
-    <caption>{{table.title}}</caption>
+    <caption ng-bind-html="table.title"></caption>
     <tr ng-repeat="row in table.header">
         <th colspan="{{cell.colspan}}" rowspan="{{cell.rowspan}}" ng-repeat="cell in row">
             <div ng-repeat="content in cell.content" ng-switch on="content.type">

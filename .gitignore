@@ -5,30 +5,8 @@ tmp
 .DS_Store
 build
 dist
+deploy
 docs
 app/bower_components
 app/bower_components_target
-app/img/Test MMS Module App.html
-app/img/Test MMS Module App_files/angular-animate.js
-app/img/Test MMS Module App_files/angular-growl.js
-app/img/Test MMS Module App_files/angular-ui-router.js
-app/img/Test MMS Module App_files/angular-ui-tree.js
-app/img/Test MMS Module App_files/angular.js
-app/img/Test MMS Module App_files/app.js
-app/img/Test MMS Module App_files/bootstrap.min.css
-app/img/Test MMS Module App_files/borderLayout.js
-app/img/Test MMS Module App_files/controllers.js
-app/img/Test MMS Module App_files/es5-shim.js
-app/img/Test MMS Module App_files/fontcolor.js
-app/img/Test MMS Module App_files/fullscreen.js
-app/img/Test MMS Module App_files/jquery-ui.js
-app/img/Test MMS Module App_files/jquery.js
-app/img/Test MMS Module App_files/lodash.compat.js
-app/img/Test MMS Module App_files/mms.directives.js
-app/img/Test MMS Module App_files/mms.directives.tpls.js
-app/img/Test MMS Module App_files/mms.js
-app/img/Test MMS Module App_files/modernizr.custom.61017.min.js
-app/img/Test MMS Module App_files/redactor.js
-app/img/Test MMS Module App_files/sortable.js
-app/img/Test MMS Module App_files/ui-bootstrap-tpls.js
 .sass-cache
