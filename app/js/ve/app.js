@@ -26,10 +26,20 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
             'menu': {
                 template: '<mms-nav mms-responsive="true" mms-site="{{site}}" mms-title="{{title}}" mms-type="View Editor" mms-go-to="true" mms-other-sites="true"></mms-nav>',
                 //template: '<mms-nav site="{{site}}" type="document"></mms-nav>',
-                controller: function($scope, $stateParams, document, site) {
+                controller: function($scope, $stateParams, $filter, document, site, snapshots, time) {
+                    var tag = '';
+                    if (time !== 'latest') {
+                        snapshots.forEach(function(snapshot) {
+                            if (time === snapshot.created && snapshot.configurations && snapshot.configurations.length > 0)
+                                snapshot.configurations.forEach(function(config) {
+                                    tag += '(' + config.name + ') ';
+                                });
+                        });
+                        tag += '(' + $filter('date')(time, 'M/d/yy h:mm a') + ')';
+                    }
                     $scope.site = site.name;
                     if ($stateParams.time !== 'latest')
-                        $scope.title = document.name + ' (' + $stateParams.time + ')';
+                        $scope.title = document.name + ' ' + tag;
                     else
                         $scope.title = document.name;
                     $scope.docweb = false;
