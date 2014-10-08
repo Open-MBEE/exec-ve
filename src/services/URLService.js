@@ -244,8 +244,8 @@ function urlService(baseUrl) {
      * @returns {string} The url.
      */
     var getDocumentViewsURL = function(id, workspace, version, simple) {
-        var r = root + "/javawebscripts/products/" + id + "/views";
-        //var r = root + "/workspaces/" + workspace + "/products/" + id + "/views";
+        //var r = root + "/javawebscripts/products/" + id + "/views";
+        var r = root + "/workspaces/" + workspace + "/products/" + id + "/views";
         r = addVersion(r, version);
         if (simple) {
             if (r.indexOf('?') > 0)
@@ -270,8 +270,8 @@ function urlService(baseUrl) {
      * @returns {string} The url.
      */
     var getViewElementsURL = function(id, workspace, version) {
-        var r = root + "/javawebscripts/views/" + id + "/elements";
-        //var r = root + "/workspaces/" + workspace + "/views/" + id + "/elements";
+        //var r = root + "/javawebscripts/views/" + id + "/elements";
+        var r = root + "/workspaces/" + workspace + "/views/" + id + "/elements";
         return addVersion(r, version);
     };
 
