@@ -185,7 +185,7 @@ function(_, $scope, $rootScope, $http, $state, $stateParams, growl, WorkspaceSer
        */
       var setupChangesList = function(ws1, ws2) {
 
-        var emptyElement = { name: "", owner: "", documentation: ""};
+        var emptyElement = { name: "", owner: "", documentation: "", specialization : { type: "", value_type: "", values: ""} };
 
         var createChange = function (name, element, deltaElement, changeType, changeIcon) {
           var change = {};
@@ -202,9 +202,17 @@ function(_, $scope, $rootScope, $http, $state, $stateParams, growl, WorkspaceSer
           change.properties.owner = {};
           change.properties.documentation = {};
 
+          change.properties.specialization = {};
+          change.properties.specialization.type = {};
+          change.properties.specialization.value_type = {};
+          change.properties.specialization.values = {};
+
           updateChangeProperty(change.properties.name, "clean");
           updateChangeProperty(change.properties.owner, "clean");
           updateChangeProperty(change.properties.documentation, "clean");
+          updateChangeProperty(change.properties.specialization.type, "clean");
+          updateChangeProperty(change.properties.specialization.value_type, "clean");
+          updateChangeProperty(change.properties.specialization.values, "clean");
 
           return change;
         };
@@ -262,6 +270,10 @@ function(_, $scope, $rootScope, $http, $state, $stateParams, growl, WorkspaceSer
           updateChangeProperty(change.properties.name, "added");
           updateChangeProperty(change.properties.owner, "added");
           updateChangeProperty(change.properties.documentation, "added");
+          updateChangeProperty(change.properties.specialization.type, "added");
+          updateChangeProperty(change.properties.specialization.value_type, "added");
+          updateChangeProperty(change.properties.specialization.values, "added");
+
 
           $scope.changes.push(change);
           $scope.id2change[e.sysmlid] = change;
@@ -277,6 +289,9 @@ function(_, $scope, $rootScope, $http, $state, $stateParams, growl, WorkspaceSer
           updateChangeProperty(change.properties.name, "removed");
           updateChangeProperty(change.properties.owner, "removed");
           updateChangeProperty(change.properties.documentation, "removed");
+          updateChangeProperty(change.properties.specialization.type, "removed");
+          updateChangeProperty(change.properties.specialization.value_type, "removed");
+          updateChangeProperty(change.properties.specialization.values, "removed");
 
           $scope.changes.push(change);
           $scope.id2change[e.sysmlid] = change;
@@ -303,6 +318,15 @@ function(_, $scope, $rootScope, $http, $state, $stateParams, growl, WorkspaceSer
           if (e.hasOwnProperty('documentation')) {
             deltaElement.documentation = e.documentation;
             updateChangeProperty(change.properties.documentation, "updated");
+          }
+          if (e.hasOwnProperty('specialization.type')) {
+            deltaElement.specialization.type = e.specialization.type;
+            updateChangeProperty(change.properties.specialization.type, "updated");
+          }
+          if (e.hasOwnProperty('specialization.value')) {
+            deltaElement.specialization.value = e.specialization.value;
+            updateChangeProperty(change.properties.specialization.value_type, "updated");
+            updateChangeProperty(change.properties.specialization.values, "updated");
           }
 
           $scope.changes.push(change);

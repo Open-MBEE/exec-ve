@@ -160,6 +160,10 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService) {
                       { 
                          type:'LiteralString',
                          string:'binada_string'
+                      },
+                      { 
+                         type:'LiteralString',
+                         string:'raffi_string'
                       }
                    ]
                 }
