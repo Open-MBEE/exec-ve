@@ -70,7 +70,7 @@ function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window
             };
             $scope.makeNew = function(newName) {
                 $scope.proposeClass = "fa fa-spin fa-spinner";
-                ElementService.createElement({name: newName, documentation: '', specialization: {type: 'Element'}})
+                ElementService.createElement({name: newName, documentation: '', specialization: {type: 'Element'}}, scope.mmsWs)
                 .then(function(data) {
                     $scope.mmsCfElements = [data];
                     $scope.proposeClass = "";
@@ -108,7 +108,7 @@ function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window
             $scope.ok = function() {
                 if (ViewService.getCurrentViewId())
                     $scope.comment.owner = ViewService.getCurrentViewId();
-                ElementService.createElement($scope.comment)
+                ElementService.createElement($scope.comment, scope.mmsWs)
                 .then(function(data) {
                     var tag = '<mms-transclude-com data-mms-eid="' + data.sysmlid + '">comment:' + data.creator + '</mms-transclude-com> ';
                     $modalInstance.close(tag);
@@ -291,7 +291,8 @@ function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window
         require: 'ngModel',
         scope: {
             mmsCfElements: '=',
-            mmsEid: '@'
+            mmsEid: '@',
+            mmsWs: '@'
         },
         link: mmsTinymceLink
     };

@@ -361,7 +361,7 @@ function($scope, $rootScope, document, time, ElementService, ViewService, $state
         }, function(reason) {
             if (reason.status === 409) {
                 newdoc.read = reason.data.elements[0].read;
-                ViewService.updateDocument(newdoc)
+                ViewService.updateDocument(newdoc, ws)
                 .then(function(data2) {
                     growl.success('Reorder Successful');
                     //document.specialization.view2view = newView2View;
