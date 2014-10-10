@@ -74,7 +74,7 @@
       </li>
 
       <li class="docweb-flyover out-link" ng-if="type != 'docweb'">
-        <a href="docweb.html#/sites/{{site}}">DocWeb</a>
+        <a href="docweb.html#/workspaces/{{ws}}/sites/{{site}}">DocWeb</a>
       </li>
 
       <li class="dashboard-flyover out-link">
@@ -85,7 +85,7 @@
       <ul class="nav-btns-main pull-right">
         
         <li>
-          <a class="nav-btn portal-btn" tooltip="Site Portal" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" href="portal.html" target="_blank"><i class="fa fa-sitemap"></i></a>
+          <a class="nav-btn portal-btn" tooltip="Site Portal" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" href="portal.html#/workspaces/{{ws}}" target="_blank"><i class="fa fa-sitemap"></i></a>
         </li>
 
         <li>
@@ -97,7 +97,7 @@
         </li>
 
         <li>
-          <a class="nav-btn logout-btn" tooltip="Logout" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" href="/alfresco/service/logout/info?next=/alfresco/mmsapp/docweb.html%23/sites/{{site}}"><i class="fa fa-sign-out"></i></a>
+          <a class="nav-btn logout-btn" tooltip="Logout" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" href="/alfresco/service/logout/info?next=/alfresco/mmsapp/docweb.html%23/workspaces/{{ws}}/sites/{{site}}"><i class="fa fa-sign-out"></i></a>
         </li>
 
       </ul>
