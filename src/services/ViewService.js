@@ -217,7 +217,7 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
         var deferred = $q.defer();
         var ws = !workspace ? 'master' : workspace;
         var docViewsCacheKey = ['products', ws, documentId, 'latest', 'views'];
-        getDocument(documentId, workspace)
+        getDocument(documentId, false, ws)
         .then(function(data) {  
             var clone = {};
             clone.sysmlid = data.sysmlid;
@@ -231,7 +231,7 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
                 }
             } 
             clone.specialization.view2view.push({id: viewId, childrenViews: []});
-            updateDocument(clone, workspace)
+            updateDocument(clone, ws)
             .then(function(data2) {
                 if (CacheService.exists(docViewsCacheKey) && viewOb)
                     CacheService.get(docViewsCacheKey).push(viewOb);
@@ -239,7 +239,7 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
             }, function(reason) {
                 if (reason.status === 409) {
                     clone.read = reason.data.elements[0].read;
-                    updateDocument(clone, workspace)
+                    updateDocument(clone, ws)
                     .then(function(data3) {
                         if (CacheService.exists(docViewsCacheKey) && viewOb)
                             CacheService.get(docViewsCacheKey).push(viewOb);
