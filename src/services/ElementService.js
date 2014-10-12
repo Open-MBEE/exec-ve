@@ -553,6 +553,30 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, _) {
         return deferred.promise;
     };
 
+    /**
+     * @ngdoc method
+     * @name mms.ElementService#deleteElement
+     * @methodOf mms.ElementService
+     * 
+     * @description
+     * Delete an element 
+     *
+     * @param {string} id The id of the element
+     * @param {string} [workspace=master] workspace
+     * @returns {Promise} The promise will be resolved with server response if delete is successful.
+     */
+    var deleteElement = function(id, workspace) {
+        var ws = !workspace ? 'master' : workspace;
+        var deferred = $q.defer();
+        $http.delete(URLService.getElementURL(id, ws, 'latest'))
+        .success(function(data, status, headers, config) {
+            deferred.resolve(data);
+        }).error(function(data, status, headers, config) {
+            URLService.handleHttpStatus(data, status, headers, config, deferred);
+        });
+        return deferred.promise;
+    };
+
     var normalize = function(id, update, workspace, version, edit) {
         var res = UtilsService.normalize({update: update, workspace: workspace, version: version});
         res.cacheKey = UtilsService.makeElementKey(id, res.ws, res.ver, edit);
@@ -571,6 +595,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, _) {
         createElements: createElements,
         getGenericElements: getGenericElements,
         getElementVersions: getElementVersions,
+        deleteElement: deleteElement,
         isDirty: isDirty,
         search: search
     };

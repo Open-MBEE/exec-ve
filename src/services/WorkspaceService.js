@@ -12,8 +12,7 @@ angular.module('mms')
  * @description
  */
 function WorkspaceService($http, $q, URLService, ElementService, CacheService) {
-    var inProgress = null;
-
+    var inProgress = {};
     var dummy = { 
         "workspace1":{ 
             creator: 'dlam',
@@ -26,7 +25,7 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService) {
                 documentation: "Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec id elit non mi porta gravida at eget metus.",
                 sysmlid:'_123_394241_12',
                 name:'Garlic Rye with Fish Sauce',
-                owner:'A Horrid & Offensive Lunch',
+                owner:'A',
                 specialization:{ 
                    type:'Property',
                    isDerived:'false',
@@ -42,7 +41,7 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService) {
                 "documentation":"Curabitur blandit tempus porttitor. Maecenas sed diam eget risus varius blandit sit amet non magna. Cras mattis consectetur purus sit amet fermentum. Praesent commodo cursus magna, vel scelerisque nisl consectetur et.",
                 "sysmlid":"_456_93419_14",
                 "name":"Durian Burger",
-                "owner":"A Horrid & Offensive Lunch",
+                "owner":"A",
                 "specialization":{ 
                    "type":"Property",
                    "isDerived":"false",
@@ -58,7 +57,7 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService) {
                 "documentation":"Sed posuere consectetur est at lobortis. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit.",
                 "sysmlid":"_789_18919_19",
                 "name":"10 Year-old Pad Thai",
-                "owner":"A Horrid & Offensive Lunch",
+                "owner":"A",
                 "specialization":{ 
                    "type":"Property",
                    "isDerived":"false",
@@ -72,7 +71,7 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService) {
              },
              { 
                 "documentation":"Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Aenean lacinia bibendum nulla sed consectetur. Integer posuere erat a ante venenatis dapibus posuere velit aliquet. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor.",
-                "sysmlid":"A Horrid & Offensive Lunch",
+                "sysmlid":"A",
                 "name":"A Horrid & Offensive Lunch",
                 "owner":"Meal Plan of the Ages",
                 "specialization":{ 
@@ -131,10 +130,11 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService) {
           updatedElements:[ 
              { 
                 sysmlid:'_123_394241_12',
-                name:'Fish Sauce ... yeah, just fish sauce'
+                name:'Fish Sauce ... yeah, just fish sauce',
+                documentation: 'changed doc'
              },
              {
-               sysmlid:"_123_394241_12",
+               sysmlid:"_456_93419_14",
                specialization:{ 
                    type:'Property',
                    isDerived:'false',
@@ -152,7 +152,7 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService) {
                 documentation:'Salad ipsum dolor set amit.',
                 sysmlid:'_192_19342_22',
                 name:'Salad with Soil',
-                owner:'A Horrid & Offensive Lunch',
+                owner:'A',
                 specialization:{ 
                    type:'Property',
                    isDerived:'false',
@@ -171,13 +171,13 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService) {
           ],
           deletedElements:[ 
              { 
-                sysmlid:'_456_93419_14'
+                sysmlid:'_789_18919_19'
              }
           ],
           movedElements:[ 
              { 
-                sysmlid:'_789_18919_19',
-                owner:'Dinner'
+                sysmlid:'Dinner',
+                owner:'A'
              }
           ],
           conflicts:[ 
@@ -186,29 +186,30 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService) {
        }
     };
 
-    var getAll = function() {
-        // if (inProgress)
-        //     return inProgress;
+    var getWorkspaces = function(update) {
+        /*var u = !update ? false : update;
+        if (inProgress.hasOwnProperty('getWorkspaces'))
+            return inProgress.getWorkspaces;
         
-        // var deferred = $q.defer();
-        // var cacheKey = ['workspaces', 'master'];
-        // if (CacheService.exists(cacheKey)) {
-        //     deferred.resolve(CacheService.get(cacheKey));
-        // } else {
-        //     inProgress = deferred.promise;
-        //     $http.get(URLService.getWorkspacesURL())
-        //     .success(function(data, status, headers, config) {
-        //         CacheService.put(cacheKey, data.workspaces, true, function(workspace, i) {
-        //             return {key: ['workspaces', workspace.parent, workspace.name, workspace.creator], value: workspace, merge: true};
-        //         });
-        //         deferred.resolve(CacheService.get(cacheKey));
-        //         inProgress = null;
-        //     }).error(function(data, status, headers, config) {
-        //         URLService.handleHttpStatus(data, status, headers, config, deferred);
-        //         inProgress = null;
-        //     });
-        // }
-        // return deferred.promise;
+        var deferred = $q.defer();
+        var cacheKey = ['workspaces'];
+        if (CacheService.exists(cacheKey) && !u) {
+            deferred.resolve(CacheService.get(cacheKey));
+            return deferred.promise;
+        } 
+        inProgress['getWorkspaces'] = deferred.promise;
+        $http.get(URLService.getWorkspacesURL())
+        .success(function(data, status, headers, config) {
+            CacheService.put(cacheKey, data.workspaces, false, function(workspace, i) {
+                return {key: ['workspaces', workspace.id], value: workspace, merge: false};
+            });
+            deferred.resolve(CacheService.get(cacheKey));
+            delete inProgress['getWorkspaces'];
+        }).error(function(data, status, headers, config) {
+            URLService.handleHttpStatus(data, status, headers, config, deferred);
+            delete inProgress['getWorkspaces'];
+        });
+        return deferred.promise;*/
 
         var deferred = $q.defer();
         deferred.resolve([
@@ -230,8 +231,21 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService) {
         return deferred.promise; 
     };
 
-    var get = function(ws) {
-
+    var getWorkspace = function(wid) {
+        var deferred = $q.defer();
+        var cacheKey = ['workspaces', wid];
+        if (CacheService.exists(cacheKey) {
+            deferred.resolve(CacheService.get(cacheKey));
+            return deferred.promise;
+        } 
+        $http.get(URLService.getWorkspaceURL(wid))
+        .success(function(data, status, headers, config) {
+            CacheService.put(cacheKey, data.workspaces[0]);
+            deferred.resolve(CacheService.get(cacheKey));
+        }).error(function(data, status, headers, config) {
+            URLService.handleHttpStatus(data, status, headers, config, deferred);
+        });
+        return deferred.promise;
     };
 
     var diff = function(ws1, ws2, ws1time, ws2time) {
@@ -239,21 +253,21 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService) {
         deferred.resolve(dummy);
         return deferred.promise;
 
-      /*  if (inProgress)
-          return inProgress;
-        
+        /*var w1time = !ws1time ? 'latest' : ws1time;
+        var w2time = !ws2time ? 'latest' : ws2time;
+        var key = 'diff' + ws1 + ws2 + w1time + w2time;
+        if (inProgress.hasOwnProperty(key))
+            return inProgress[key];
         var deferred = $q.defer();
-        
-        inProgress = deferred.promise;
-        $http.get(URLService.getWsDiffURL(ws1, ws2, ws1time, ws2time))
+        inProgress[key] = deferred.promise;
+        $http.get(URLService.getWsDiffURL(ws1, ws2, w1time, w2time))
         .success(function(data, status, headers, config) {
             deferred.resolve(data);
-            inProgress = null;
+            delete inProgress[key];
         }).error(function(data, status, headers, config) {
             URLService.handleHttpStatus(data, status, headers, config, deferred);
-            inProgress = null;
+            delete inProgress[key];
         });
-
         return deferred.promise; */
     };
 
@@ -267,14 +281,27 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService) {
 
     };
 
-    var create = function(name, parentWs) {
-
+    var create = function(name, parentId) {
+        var deferred = $q.defer();
+        $http.post(URLService.getCreateWorkspaceURL(name, parentId))
+        .success(function(data, status, headers, config) {
+            var workspace = data.workspaces[0];
+            var cacheKey = ['workspaces', workspace.id];
+            CacheService.put(cacheKey, workspace, false);
+            var workspaces = CacheService.get(['workspaces']);
+            if (workspaces)
+                workspaces.push(workspace);
+            deferred.resolve(workspace);
+        }).error(function(data, status, headers, config) {
+            URLService.handleHttpStatus(data, status, headers, config, deferred);
+        });
+        return deferred.promise;
     };
     
 
     return {
-        getAll: getAll,
-        get: get,
+        getWorkspaces: getWorkspaces,
+        getWorkspace: getWorkspace,
         diff: diff,
         merge: merge,
         remove: remove,

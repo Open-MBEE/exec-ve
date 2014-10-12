@@ -7,7 +7,7 @@ angular.module('mm', ['ui.router', 'mms', 'mms.directives', 'ui.bootstrap', 'ui.
         url: '',
         resolve: {
             workspaces: function(WorkspaceService) {
-                return WorkspaceService.getAll();
+                return WorkspaceService.getWorkspaces();
             },
         },
         views: {

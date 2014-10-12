@@ -393,6 +393,11 @@ function urlService(baseUrl) {
         return r;
     };
 
+    var getCreateWorkspaceURL = function(name, parentId) {
+        var r = root + '/workspaces/' + name + '?sourceWorkspace=' + parentId;
+        return r;
+    };
+
     var addVersion = function(url, version) {
         if (version === 'latest')
             return url;
@@ -423,6 +428,7 @@ function urlService(baseUrl) {
         getWsDiffURL: getWsDiffURL,
         getWorkspacesURL: getWorkspacesURL,
         getWorkspaceURL: getWorkspaceURL,
+        getCreateWorkspaceURL : getCreateWorkspaceURL,
         isTimestamp: isTimestamp
     };
 
