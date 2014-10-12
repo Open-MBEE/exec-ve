@@ -234,7 +234,7 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService) {
     var getWorkspace = function(wid) {
         var deferred = $q.defer();
         var cacheKey = ['workspaces', wid];
-        if (CacheService.exists(cacheKey) {
+        if (CacheService.exists(cacheKey)) {
             deferred.resolve(CacheService.get(cacheKey));
             return deferred.promise;
         } 
