@@ -385,11 +385,12 @@ function urlService(baseUrl) {
     };
 
     var getWsDiffURL = function(ws1, ws2, ws1time, ws2time) {
-        var r = root + '/diff?sourceWs=' + ws2 + '&targetWs=' + ws2;
+        var r = root + '/diff?workspace1=' + ws1 + '&workspace2=' + ws2;
         if (ws1time && ws1time !== 'latest')
-            r += '&sourceTimestamp=' + ws1time;
+            r += '&workspace1Timepstamp=' + ws1time;
         if (ws2time && ws2time !== 'latest')
-            r += '&targetTimestamp=' + ws2time;
+            r += '&workspace2Timestamp=' + ws2time;
+        return r;
     };
 
     var addVersion = function(url, version) {

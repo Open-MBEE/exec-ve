@@ -25,9 +25,9 @@ angular.module('mm', ['ui.router', 'mms', 'mms.directives', 'ui.bootstrap', 'ui.
     .state('main.diff', {
         url: '/diff/:source/:target',
         resolve: {
-            diff: function($stateParams, WorkspaceService) {
+            /*diff: function($stateParams, WorkspaceService) {
                 return WorkspaceService.diff($stateParams.source, $stateParams.target);
-            }
+            }*/
         },
         views: {
             'main@': {

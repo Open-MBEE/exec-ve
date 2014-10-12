@@ -23,10 +23,10 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService) {
             parent: null,
             elements:[ 
              { 
-                documentation:'Lorem ipsum dolor set amit.',
+                documentation: "Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec id elit non mi porta gravida at eget metus.",
                 sysmlid:'_123_394241_12',
-                name:'',
-                owner:'Lunch',
+                name:'Garlic Rye with Fish Sauce',
+                owner:'A Horrid & Offensive Lunch',
                 specialization:{ 
                    type:'Property',
                    isDerived:'false',
@@ -39,10 +39,10 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService) {
                 }
              },
              { 
-                "documentation":"Bacon ipsum pork set amit.",
+                "documentation":"Curabitur blandit tempus porttitor. Maecenas sed diam eget risus varius blandit sit amet non magna. Cras mattis consectetur purus sit amet fermentum. Praesent commodo cursus magna, vel scelerisque nisl consectetur et.",
                 "sysmlid":"_456_93419_14",
-                "name":"Burger",
-                "owner":"Lunch",
+                "name":"Durian Burger",
+                "owner":"A Horrid & Offensive Lunch",
                 "specialization":{ 
                    "type":"Property",
                    "isDerived":"false",
@@ -55,10 +55,10 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService) {
                 }
              },
              { 
-                "documentation":"Foobar baz foo spam.",
+                "documentation":"Sed posuere consectetur est at lobortis. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit.",
                 "sysmlid":"_789_18919_19",
-                "name":"Pad Thai",
-                "owner":"Lunch",
+                "name":"10 Year-old Pad Thai",
+                "owner":"A Horrid & Offensive Lunch",
                 "specialization":{ 
                    "type":"Property",
                    "isDerived":"false",
@@ -71,27 +71,27 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService) {
                 }
              },
              { 
-                "documentation":"Foobar baz foo spam.",
-                "sysmlid":"Lunch",
-                "name":"Lunch",
-                "owner":"Meals",
+                "documentation":"Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Aenean lacinia bibendum nulla sed consectetur. Integer posuere erat a ante venenatis dapibus posuere velit aliquet. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor.",
+                "sysmlid":"A Horrid & Offensive Lunch",
+                "name":"A Horrid & Offensive Lunch",
+                "owner":"Meal Plan of the Ages",
                 "specialization":{ 
                    "type":"Element"
                 }
              },
              { 
-                "documentation":"Foobar baz foo spam.",
+                "documentation":"Nulla vitae elit libero, a pharetra augue. Sed posuere consectetur est at lobortis. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Maecenas sed diam eget risus varius blandit sit amet non magna. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Cras mattis consectetur purus sit amet fermentum. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Morbi leo risus, porta ac consectetur ac, vestibulum at eros.",
                 "sysmlid":"Dinner",
                 "name":"Dinner",
-                "owner":"Meals",
+                "owner":"Meal Plan of the Ages",
                 "specialization":{ 
                    "type":"Element"
                 }
              },
              { 
                 "documentation":"Foobar baz foo spam.",
-                "sysmlid":"Meals",
-                "name":"Meals",
+                "sysmlid":"Meal Plan of the Ages",
+                "name":"Meal Plan of the Ages",
                 "owner":"null",
                 "specialization":{ 
                    "type":"Package"
@@ -100,14 +100,14 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService) {
           ],
           "graph":[ 
              { 
-                "sysmlid":"Meals",
+                "sysmlid":"Meal Plan of the Ages",
                 "edges":[ 
-                   "Lunch",
+                   "A Horrid & Offensive Lunch",
                    "Dinner"
                 ]
              },
              { 
-                "sysmlid":"Lunch",
+                "sysmlid":"A Horrid & Offensive Lunch",
                 "edges":[ 
                    "_123_394241_12",
                    "_456_93419_14",
@@ -131,15 +131,28 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService) {
           updatedElements:[ 
              { 
                 sysmlid:'_123_394241_12',
-                name:'Skewer'
+                name:'Fish Sauce ... yeah, just fish sauce'
+             },
+             {
+               sysmlid:"_123_394241_12",
+               specialization:{ 
+                   type:'Property',
+                   isDerived:'false',
+                   value:[ 
+                      { 
+                         type:'LiteralString',
+                         string:'some value'
+                      }
+                   ]
+                }
              }
           ],
           addedElements:[ 
              { 
                 documentation:'Salad ipsum dolor set amit.',
                 sysmlid:'_192_19342_22',
-                name:'Salad',
-                owner:'Lunch',
+                name:'Salad with Soil',
+                owner:'A Horrid & Offensive Lunch',
                 specialization:{ 
                    type:'Property',
                    isDerived:'false',
@@ -147,6 +160,10 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService) {
                       { 
                          type:'LiteralString',
                          string:'binada_string'
+                      },
+                      { 
+                         type:'LiteralString',
+                         string:'raffi_string'
                       }
                    ]
                 }
@@ -170,30 +187,30 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService) {
     };
 
     var getAll = function() {
-        if (inProgress)
-            return inProgress;
+        // if (inProgress)
+        //     return inProgress;
         
-        var deferred = $q.defer();
-        var cacheKey = ['workspaces', 'master'];
-        if (CacheService.exists(cacheKey)) {
-            deferred.resolve(CacheService.get(cacheKey));
-        } else {
-            inProgress = deferred.promise;
-            $http.get(URLService.getWorkspacesURL())
-            .success(function(data, status, headers, config) {
-                CacheService.put(cacheKey, data.workspaces, true, function(workspace, i) {
-                    return {key: ['workspaces', workspace.parent, workspace.name], value: workspace, merge: true};
-                });
-                deferred.resolve(CacheService.get(cacheKey));
-                inProgress = null;
-            }).error(function(data, status, headers, config) {
-                URLService.handleHttpStatus(data, status, headers, config, deferred);
-                inProgress = null;
-            });
-        }
-        return deferred.promise;
+        // var deferred = $q.defer();
+        // var cacheKey = ['workspaces', 'master'];
+        // if (CacheService.exists(cacheKey)) {
+        //     deferred.resolve(CacheService.get(cacheKey));
+        // } else {
+        //     inProgress = deferred.promise;
+        //     $http.get(URLService.getWorkspacesURL())
+        //     .success(function(data, status, headers, config) {
+        //         CacheService.put(cacheKey, data.workspaces, true, function(workspace, i) {
+        //             return {key: ['workspaces', workspace.parent, workspace.name, workspace.creator], value: workspace, merge: true};
+        //         });
+        //         deferred.resolve(CacheService.get(cacheKey));
+        //         inProgress = null;
+        //     }).error(function(data, status, headers, config) {
+        //         URLService.handleHttpStatus(data, status, headers, config, deferred);
+        //         inProgress = null;
+        //     });
+        // }
+        // return deferred.promise;
 
-        /*var deferred = $q.defer();
+        var deferred = $q.defer();
         deferred.resolve([
             {
                 creator: 'dlam',
@@ -210,7 +227,7 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService) {
                 parent: 'master'
             }
         ]);
-        return deferred.promise; */
+        return deferred.promise; 
     };
 
     var get = function(ws) {
@@ -221,6 +238,23 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService) {
         var deferred = $q.defer();
         deferred.resolve(dummy);
         return deferred.promise;
+
+      /*  if (inProgress)
+          return inProgress;
+        
+        var deferred = $q.defer();
+        
+        inProgress = deferred.promise;
+        $http.get(URLService.getWsDiffURL(ws1, ws2, ws1time, ws2time))
+        .success(function(data, status, headers, config) {
+            deferred.resolve(data);
+            inProgress = null;
+        }).error(function(data, status, headers, config) {
+            URLService.handleHttpStatus(data, status, headers, config, deferred);
+            inProgress = null;
+        });
+
+        return deferred.promise; */
     };
 
     var merge = function(changes, targetWs) {

@@ -4,7 +4,18 @@ angular.module('mm')
 .controller('DiffTreeController', ["_", "$scope", "$rootScope", "$http", "$state", "$stateParams", "growl", "WorkspaceService",
 function(_, $scope, $rootScope, $http, $state, $stateParams, growl, WorkspaceService) {
 
+    var ws1 = $stateParams.source;
+    var ws2 = $stateParams.target;
+
+    $scope.treeapi = {};
+
+    $scope.treeData = [];
+
     $scope.changes = [];
+
+    $scope.id2change = {};
+
+    $scope.id2node = {};
 
     $scope.options = {
       types: {
@@ -18,37 +29,133 @@ function(_, $scope, $rootScope, $http, $state, $stateParams, growl, WorkspaceSer
         'Connector': 'fa fa-expand'
       },
       statuses: {
-        'moved': { style: "moved", button: 'update' },
-        'added': { style: "addition", button: 'add' },
-        'removed': { style: "removal", button: 'remove' },
-        'updated': { style: "update", button: 'update' },
-        'conflict': "",
-        'resolve': "",
-        'undo': { style: "undo", button: 'undo' }
-      },
-      buttons: {
-        /*"update": {
-          style: "btn btn-primary btn-xs",
-          action: function(branch) { registerChange(branch); } 
-        },
-        "remove": {
-          style: "btn btn-danger btn-xs",
-          action: function(branch) { registerChange(branch); } 
-        },
-        "add": {
-          style: "btn btn-success btn-xs",
-          action: function(branch) { registerChange(branch); } 
-        },
-        "undo": {
-          style: "btn btn-danger btn-xs",
-          action: function(branch) { registerChange(branch); } 
-        }*/
-      } 
+        'moved'   : { style: "moved" },
+        'added'   : { style: "addition" },
+        'removed' : { style: "removal" },
+        'updated' : { style: "update" },
+        'conflict': { style: "" }
+      }
     };
 
-    $scope.stageChange = function(change) {
+    $scope.stagedCounter = 0;
+    $scope.unstagedCounter = 0;
+
+    var stageChange = function(change) {
       change.staged = ! change.staged;
+
+      var treeNode = null;
+      var index;
+
+      if (change.type === "added") {
+        treeNode = $scope.id2node[change.delta.sysmlid];
+
+        var parentNode = $scope.id2node[change.delta.owner];
+        
+        if (change.staged) {
+          parentNode.children.push(treeNode);
+
+          treeNode.status = "added";
+        } else {
+          treeNode.status = "clean";
+
+          // remove node from tree
+          index = findIndexBySysMLID(parentNode.children, change.delta.sysmlid);
+          parentNode.children.splice(index,1);
+        }
+      } else if (change.type === "removed") {
+        treeNode = $scope.id2node[change.original.sysmlid];
+
+        if (change.staged) {
+          treeNode.status = "removed";
+        } else {
+          treeNode.status = "clean";
+        } 
+      } else if (change.type === "updated") {
+        treeNode = $scope.id2node[change.original.sysmlid];
+
+        // handle if the name of element has changed on update
+        if (change.staged) {
+          treeNode.status = "updated";
+          treeNode.data = change.delta;
+
+        } else {
+          treeNode.status = "clean";
+          treeNode.data = change.original;
+        }
+      } else if (change.type === "moved") {
+        treeNode = $scope.id2node[change.original.sysmlid];
+
+        var currentParentNode = $scope.id2node[change.original.owner];
+        var newParentNode = $scope.id2node[change.delta.owner];
+        
+        if (change.staged) {
+          treeNode.status = "moved";
+
+          // remove from current parent node
+          index = findIndexBySysMLID(currentParentNode.children, change.original.sysmlid);
+          currentParentNode.children.splice(index,1);
+
+          // add to new parent node
+          newParentNode.children.push(treeNode);
+
+        } else {
+          treeNode.status = "clean";
+
+          // remove from new parent node
+          currentParentNode.children.push(treeNode);
+
+          // add back to current parent node
+          index = findIndexBySysMLID(newParentNode.children, change.original.sysmlid);
+          newParentNode.children.splice(index,1);
+
+        }
+      }      
+
+      $scope.treeapi.refresh();
+      $scope.treeapi.expand_all();
+
+      refreshStageCounters();
     };
+
+    $scope.stageAllUnstaged = function (changes) {
+      changes.forEach(function (change) {
+        if (!change.staged) {
+          stageChange(change);
+        }
+      });
+    };
+
+    $scope.unstageAllStaged = function (changes) {
+      changes.forEach(function (change) {
+        if (change.staged) {
+          stageChange(change);
+        }
+      });
+    };
+
+    var refreshStageCounters = function () {
+      $scope.stagedCounter = 0;
+      $scope.unstagedCounter = 0;
+
+      $scope.changes.forEach(function (change) {
+        if (change.staged) {
+          $scope.stagedCounter++;
+        } else {
+          $scope.unstagedCounter++;
+        }
+      });
+    };
+
+    var findIndexBySysMLID = function (array, sysmlid) {
+     for (var i = 0; i < array.length; i++) {
+        if (array[i].data.sysmlid === sysmlid) {
+          return i;
+        }
+      }
+      return -1; 
+    };
+
+    $scope.stageChange = stageChange;
 
     $scope.selectChange = function (change) {
       var elementId;
@@ -60,10 +167,10 @@ function(_, $scope, $rootScope, $http, $state, $stateParams, growl, WorkspaceSer
       $state.go('main.diff.view', {elementId: elementId});
     };
 
-    $scope.id2change = {};
+
 
     // Diff the two workspaces picked in the Workspace Picker
-    WorkspaceService.diff('ws1', 'ws2').then(
+    WorkspaceService.diff(ws1, ws2).then(
      function(result) {
         
         setupChangesList(result.workspace1, result.workspace2); 
@@ -78,9 +185,9 @@ function(_, $scope, $rootScope, $http, $state, $stateParams, growl, WorkspaceSer
        */
       var setupChangesList = function(ws1, ws2) {
 
-        var emptyElement = { name: "", owner: "", documentation: ""};
+        var emptyElement = { name: "", owner: "", documentation: "", specialization : { type: "", value_type: "", values: ""} };
 
-        var createChange = function (name, element, deltaElement, changeType, changeIcon, treeNode) {
+        var createChange = function (name, element, deltaElement, changeType, changeIcon) {
           var change = {};
           
           change.name = name;
@@ -89,16 +196,23 @@ function(_, $scope, $rootScope, $http, $state, $stateParams, growl, WorkspaceSer
           change.type = changeType;
           change.icon = changeIcon;
           change.staged = false;
-          change.treeNode = treeNode;
 
           change.properties = {};
           change.properties.name = {};
           change.properties.owner = {};
           change.properties.documentation = {};
 
+          change.properties.specialization = {};
+          change.properties.specialization.type = {};
+          change.properties.specialization.value_type = {};
+          change.properties.specialization.values = {};
+
           updateChangeProperty(change.properties.name, "clean");
           updateChangeProperty(change.properties.owner, "clean");
           updateChangeProperty(change.properties.documentation, "clean");
+          updateChangeProperty(change.properties.specialization.type, "clean");
+          updateChangeProperty(change.properties.specialization.value_type, "clean");
+          updateChangeProperty(change.properties.specialization.values, "clean");
 
           return change;
         };
@@ -108,21 +222,58 @@ function(_, $scope, $rootScope, $http, $state, $stateParams, growl, WorkspaceSer
           property.staged = false;
         };
 
+        var createTreeNode = function (element, status) {
+          var node = {};
+          
+          node.data = element;
+          node.label = element.name;
+          node.type = element.specialization.type;
+          node.children = [];
+
+          // node.visible = true;
+          node.status = status;
+
+          return node;
+        };
+
         var id2data = {};
+        var id2node = {};
 
         ws1.elements.forEach(function(e) {
           id2data[e.sysmlid] = e;
+
+          var node = createTreeNode(e, "clean");
+
+          id2node[e.sysmlid] = node;
+
         });
 
+        ws1.elements.forEach(function(e) {
+          if (!id2node.hasOwnProperty(e.owner)) 
+              $scope.treeData.push(id2node[e.sysmlid]);          
+          else
+              id2node[e.owner].children.push(id2node[e.sysmlid]);
+        });
+
+        $scope.treeapi.refresh();
+        $scope.treeapi.expand_all();
 
         ws2.addedElements.forEach(function(e) {
           id2data[e.sysmlid] = e;
 
-          var change = createChange(e.name, emptyElement, e, "added", "fa-plus-circle", null);
+          var node = createTreeNode(e, "clean");
+
+          id2node[e.sysmlid] = node;
+
+          var change = createChange(e.name, emptyElement, e, "added", "fa-plus", null);
 
           updateChangeProperty(change.properties.name, "added");
           updateChangeProperty(change.properties.owner, "added");
           updateChangeProperty(change.properties.documentation, "added");
+          updateChangeProperty(change.properties.specialization.type, "added");
+          updateChangeProperty(change.properties.specialization.value_type, "added");
+          updateChangeProperty(change.properties.specialization.values, "added");
+
 
           $scope.changes.push(change);
           $scope.id2change[e.sysmlid] = change;
@@ -133,11 +284,14 @@ function(_, $scope, $rootScope, $http, $state, $stateParams, growl, WorkspaceSer
 
           var deletedElement = id2data[e.sysmlid];
 
-          var change = createChange(deletedElement.name, deletedElement, emptyElement, "removed", "fa-times-circle", null);
+          var change = createChange(deletedElement.name, deletedElement, emptyElement, "removed", "fa-times", null);
 
           updateChangeProperty(change.properties.name, "removed");
           updateChangeProperty(change.properties.owner, "removed");
           updateChangeProperty(change.properties.documentation, "removed");
+          updateChangeProperty(change.properties.specialization.type, "removed");
+          updateChangeProperty(change.properties.specialization.value_type, "removed");
+          updateChangeProperty(change.properties.specialization.values, "removed");
 
           $scope.changes.push(change);
           $scope.id2change[e.sysmlid] = change;
@@ -165,6 +319,15 @@ function(_, $scope, $rootScope, $http, $state, $stateParams, growl, WorkspaceSer
             deltaElement.documentation = e.documentation;
             updateChangeProperty(change.properties.documentation, "updated");
           }
+          if (e.hasOwnProperty('specialization.type')) {
+            deltaElement.specialization.type = e.specialization.type;
+            updateChangeProperty(change.properties.specialization.type, "updated");
+          }
+          if (e.hasOwnProperty('specialization.value')) {
+            deltaElement.specialization.value = e.specialization.value;
+            updateChangeProperty(change.properties.specialization.value_type, "updated");
+            updateChangeProperty(change.properties.specialization.values, "updated");
+          }
 
           $scope.changes.push(change);
           $scope.id2change[e.sysmlid] = change;
@@ -188,6 +351,10 @@ function(_, $scope, $rootScope, $http, $state, $stateParams, growl, WorkspaceSer
           $scope.id2change[e.sysmlid] = change;
 
         });
+
+        $scope.id2node = id2node;
+
+        refreshStageCounters();
       };
 
 }])

@@ -1,51 +1,62 @@
+<h1 class="pane-center-header"><i class="fa {{change.icon}} icon-{{change.type}}"></i> {{change.name}}</h1>
+
 <table class="table">
   
-  <caption>Element</caption>
+  <h1 class="pane-center-heading">Element</h1>
 
   <thead>
     <tr>
       <th></th>
-      <th>Theirs</th>
-      <th>Mine</th>
+      <th>A</th>
+      <th>B</th>
+      <!--
       <th></th>
+      -->
     </tr>
   </thead>
 
   <tbody>
     <tr class="{{options.statuses[change.properties.name.type].style}}">
-      <td>Name</td>
+      <td>NAME</td>
       <td>{{change.original.name}}</td>
       <td>{{change.delta.name}}</td>
+      <!-- 
       <td>
         <span ng-show="originalNode.property_conflict_status.name">
             <button class="{{options.buttons[options.statuses[originalNode.property_status.name].button].style}}" 
                     ng-click="registerPropertyChange(originalNode,'name');">{{options.statuses[originalNode.property_status.name].button}}</button>
         </span>
       </td>
+    -->
     </tr>
 
     <tr class="{{options.statuses[change.properties.owner.type].style}}">
-      <td>Owner</td>
+      <td>OWNER</td>
       <td>{{change.original.owner}}</td>
       <td>{{change.delta.owner}}</td>
+      <!-- 
       <td>
         <span ng-show="originalNode.property_conflict_status.owner">
             <button class="{{options.buttons[options.statuses[originalNode.property_status.owner].button].style}}" 
                     ng-click="registerPropertyChange(originalNode,'owner');">{{options.statuses[originalNode.property_status.owner].button}}</button>
         </span>
       </td>
+    -->
     </tr>
 
     <tr class="{{options.statuses[change.properties.documentation.type].style}}">
-      <td>Documentation</td>
+      <td>DOC</td>
       <td>{{change.original.documentation}}</td>
       <td>{{change.delta.documentation}}</td>
+      
+      <!--
       <td>
         <span ng-show="change.properties.originalNode.property_conflict_status.documentation">
             <button class="{{options.buttons[options.statuses[originalNode.property_status.documentation].button].style}}" 
                     ng-click="registerPropertyChange(originalNode,'documentation');">{{options.statuses[originalNode.property_status.documentation].button}}</button>
         </span> 
       </td>
+    -->
     </tr>
   </tbody>
 
@@ -53,36 +64,59 @@
 
 <table class="table">
 
-<div>
-  <caption>Specializations</caption>
-  
-    <thead>
-      <tr>
-        <th></th>
-        <th>Theirs</th>
-        <th>Mine</th>
-      </tr>
-    </thead>
-  
-    <tbody>
-      <tr ng-class="{addition: specAddition, removal: specRemoval, update: specUpdate, clean: specClean}">
-        <td>Specialization Type</td>
-        <td>{{original.specialization.type}}</td>
-        <td>{{delta.specialization.type}}</td>
-      </tr>
-  
-      <tr ng-class="{addition: typeAddition, removal: typeRemoval, update: typeUpdate, clean: typeClean}">
-        <td>Value Type</td>
-        <td>{{original.specialization.valueArray[0]}}</td>
-        <td>{{delta.specialization.valueArray[0]}}</td>
-      </tr>
-  
-      <tr ng-class="{addition: valAddition, removal: valRemoval, update: valUpdate, clean: valClean}">
-        <td>Value</td>
-        <td>{{original.specialization.valueArray[1]}}</td>
-        <td>{{delta.specialization.valueArray[1]}}</td>
-      </tr>
-    </tbody>
-</div>
+  <div>
+    
+      <h1 class="pane-center-heading">Specializations</h1>
+
+      <thead>
+        <tr>
+          <th></th>
+          <th>A</th>
+          <th>B</th>
+        </tr>
+      </thead>
+    
+      <tbody>
+        <tr class="{{options.statuses[change.properties.specialization.type.type].style}}">
+          <td>TYPE</td>
+          <td>{{change.original.specialization.type}}</td>
+          <td>{{change.delta.specialization.type}}</td>
+        </tr>
+    
+        <tr class="{{options.statuses[change.properties.specialization.value_type.type].style}}">
+          <td>VALUE TYPE</td>
+          <td>
+            <div ng-repeat="value in change.original.specialization.value">
+                {{value.type}}
+            </div>
+          <td>
+            <div ng-repeat="value in change.delta.specialization.value">
+                {{value.type}}
+            </div>
+          </td>
+        </tr>
+    
+        <tr class="{{options.statuses[change.properties.specialization.values.type].style}}">
+          <td>VALUE</td>
+          <td>
+            <div ng-repeat="value in change.original.specialization.value" ng-switch on="value.type">
+              <ng-switch-when="LiteralInteger">{{value.integer}}</h3>
+              <ng-switch-when="LiteralBoolean">{{value.boolean}}</h3>
+              <ng-switch-when="LiteralReal">{{value.double}}</h3>
+              <ng-switch-when="LiteralUnlimitedNatural">{{value.naturalValue}}</h3>
+              <ng-switch-when="LiteralString" ng-bind-html="value.string"></h3>
+            </div>
+          <td>
+            <div ng-repeat="value in change.delta.specialization.value" ng-switch on="value.type">
+              <ng-switch-when="LiteralInteger">{{value.integer}}</h3>
+              <ng-switch-when="LiteralBoolean">{{value.boolean}}</h3>
+              <ng-switch-when="LiteralReal">{{value.double}}</h3>
+              <ng-switch-when="LiteralUnlimitedNatural">{{value.naturalValue}}</h3>
+              <ng-switch-when="LiteralString" ng-bind-html="value.string"></h3>
+            </div>
+        </tr>
+      </tbody>
+      
+  </div>
 
 </table>
