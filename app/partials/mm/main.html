@@ -1,23 +1,72 @@
 <div class="container-fluid">
-	<table class="table table-hover table-condensed">
-		<caption><h1>Workspaces<h1></caption>
-		<tr>
-	        <th>Name</th>
-	        <th>Creator</th>
-	        <th>Date Created</th>
-	        <th>Date Last Updated</th>
-	        <th>Parent</th>
-	        <th></th>
-	    </tr>
-	    <tr ng-repeat="workspace in workspaces | orderBy: 'name'">
-	        <td>{{workspace.name}}</td>
-	        <td>{{workspace.creator}}</td>
-	        <td>{{workspace.created | date:'M/d/yy h:mm a' }}</td>
-	        <td>{{workspace.branched | date:'M/d/yy h:mm a'}}</td>
-	        <td>{{workspace.parent}}</td>
-	        <td>
-	        	<a class="btn btn-primary btn-sm" ui-sref="main.diff({source: workspace.parent, target: workspace.name})">Compare</button>
-	        </td>
-	    </tr>
-	</table>
+	<div class="row">
+		<br>
+        <div class="col-md-4">
+            <input class="form-control" type="text" ng-model="filter" placeholder="Search for a workspace" />
+        </div>
+        <div class="col-md-8">
+        	<div ng-show="merge_state.pickA">
+	    		<h3>Pick Workspace A to get started on a merge.</h3>
+	    	</div>
+	    	<div class="row" ng-hide="merge_state.pickA">
+		        <div class="col-md-4">
+		        	<h4>A</h4>
+		        	<br>
+		        	{{merge_state.A.name}}
+		        </div>
+		        <div class="col-md-2">
+		        	<-->
+		        </div>
+		        <div class="col-md-4">
+		        	<h4>B</h4>
+		        	<br>
+		        	{{merge_state.B.name}}
+		        </div>
+		        <div class="col-md-4">
+		        	<a class="btn btn-success btn-sm" ui-sref="main.diff({source: merge_state.A.id, target: merge_state.B.id})">COMPARE</button>
+		        	<a class="btn btn-danger btn-sm" ng-click="cancelPick()">CANCEL</a>
+		    	</div>
+		    </div>
+        </div>
+    </div>
+	<hr>
+	<div ng-repeat="key in workspaces_groupByParent_keys | filter:filter">
+		<h2>{{key}}
+			<a class="btn btn-success" ng-click="create()">CREATE WORKSPACE</a>
+		</h2>
+		<table class="table table-hover table-condensed">
+			<!-- <caption><h1>Workspaces<h1></caption> -->
+			<tr>
+		        <th>NAME</th>
+		        <th>AUTHOR</th>
+		        <th>LAST MODIFIED</th>
+		        <th>DATE CREATED</th>
+		        <th></th>
+		        <th></th>
+		    </tr>
+		    <tr ng-repeat="workspace in workspaces_groupByParent[key] | orderBy: 'name'">
+		        <td>{{workspace.name}}</td>
+		        <td>{{workspace.creator}}</td>
+		        <td>{{workspace.branched | date:'M/d/yy h:mm a'}}</td>
+		        <td>{{workspace.created | date:'M/d/yy h:mm a' }}</td>
+		        <td>
+		        	<a class="btn btn-primary btn-sm" href="portal.html#/workspaces/{{workspace.id}}" target="_blank">Portal</a>
+		        </td>
+		        <td>
+		            <span ng-show="merge_state.pickA">
+			        	<a class="btn btn-info btn-sm" ng-click="pickA(workspace)">Pick [A]</a>
+			        </span>
+		            <span ng-show="merge_state.pickB && merge_state.A.id !== workspace.id">
+			        	<a class="btn btn-info btn-sm" ng-click="pickB(workspace)">Pick [B]</a>
+			        </span>
+		            <span ng-show="merge_state.A.id === workspace.id">
+			        	<a class="btn btn-info btn-sm">A</a>
+			        </span>
+			        <span ng-show="merge_state.B.id === workspace.id">
+			        	<a class="btn btn-info btn-sm">B</a>
+			        </span>
+		        </td>
+		    </tr>
+		</table>
+	<div>
 </div>
