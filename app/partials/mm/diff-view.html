@@ -83,6 +83,7 @@
           <td>{{change.delta.specialization.type}}</td>
         </tr>
     
+        <!-- 
         <tr class="{{options.statuses[change.properties.specialization.value_type.type].style}}">
           <td>VALUE TYPE</td>
           <td>
@@ -95,24 +96,25 @@
             </div>
           </td>
         </tr>
+      -->
     
         <tr class="{{options.statuses[change.properties.specialization.values.type].style}}">
-          <td>VALUE</td>
+          <td>VALUE : VALUE TYPE</td>
           <td>
             <div ng-repeat="value in change.original.specialization.value" ng-switch on="value.type">
-              <ng-switch-when="LiteralInteger">{{value.integer}}</h3>
-              <ng-switch-when="LiteralBoolean">{{value.boolean}}</h3>
-              <ng-switch-when="LiteralReal">{{value.double}}</h3>
-              <ng-switch-when="LiteralUnlimitedNatural">{{value.naturalValue}}</h3>
-              <ng-switch-when="LiteralString" ng-bind-html="value.string"></h3>
+              <span ng-switch-when="LiteralInteger">{{value.integer}} : {{value.type}}</span>
+              <span ng-switch-when="LiteralBoolean">{{value.boolean}} : {{value.type}}</span>
+              <span ng-switch-when="LiteralReal">{{value.double}} : {{value.type}}</span>
+              <span ng-switch-when="LiteralUnlimitedNatural">{{value.naturalValue}} : {{value.type}}</span>
+              <span ng-switch-when="LiteralString" ng-bind-html="value.string"></span>
             </div>
           <td>
             <div ng-repeat="value in change.delta.specialization.value" ng-switch on="value.type">
-              <ng-switch-when="LiteralInteger">{{value.integer}}</h3>
-              <ng-switch-when="LiteralBoolean">{{value.boolean}}</h3>
-              <ng-switch-when="LiteralReal">{{value.double}}</h3>
-              <ng-switch-when="LiteralUnlimitedNatural">{{value.naturalValue}}</h3>
-              <ng-switch-when="LiteralString" ng-bind-html="value.string"></h3>
+              <span ng-switch-when="LiteralInteger">{{value.integer}} : {{value.type}}</span>
+              <span ng-switch-when="LiteralBoolean">{{value.boolean}} : {{value.type}}</span>
+              <span ng-switch-when="LiteralReal">{{value.double}} : {{value.type}}</span>
+              <span ng-switch-when="LiteralUnlimitedNatural">{{value.naturalValue}} : {{value.type}}</span>
+              <span ng-switch-when="LiteralString" ng-bind-html="value.string"></span>
             </div>
         </tr>
       </tbody>

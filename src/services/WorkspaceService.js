@@ -187,7 +187,7 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService) {
     };
 
     var getWorkspaces = function(update) {
-        /*var u = !update ? false : update;
+        var u = !update ? false : update;
         if (inProgress.hasOwnProperty('getWorkspaces'))
             return inProgress.getWorkspaces;
         
@@ -197,21 +197,21 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService) {
             deferred.resolve(CacheService.get(cacheKey));
             return deferred.promise;
         } 
-        inProgress['getWorkspaces'] = deferred.promise;
+        inProgress.getWorkspaces = deferred.promise;
         $http.get(URLService.getWorkspacesURL())
         .success(function(data, status, headers, config) {
             CacheService.put(cacheKey, data.workspaces, false, function(workspace, i) {
                 return {key: ['workspaces', workspace.id], value: workspace, merge: false};
             });
             deferred.resolve(CacheService.get(cacheKey));
-            delete inProgress['getWorkspaces'];
+            delete inProgress.getWorkspaces;
         }).error(function(data, status, headers, config) {
             URLService.handleHttpStatus(data, status, headers, config, deferred);
-            delete inProgress['getWorkspaces'];
+            delete inProgress.getWorkspaces;
         });
-        return deferred.promise;*/
+        return deferred.promise;
 
-        var deferred = $q.defer();
+        /* var deferred = $q.defer();
         deferred.resolve([
             {
                 creator: 'dlam',
@@ -227,8 +227,8 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService) {
                 name: 'test',
                 parent: 'master'
             }
-        ]);
-        return deferred.promise; 
+        ]); 
+        return deferred.promise; */
     };
 
     var getWorkspace = function(wid) {

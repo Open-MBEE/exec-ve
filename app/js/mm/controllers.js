@@ -1,8 +1,86 @@
 'use strict';
 
 angular.module('mm')
-.controller('DiffTreeController', ["_", "$scope", "$rootScope", "$http", "$state", "$stateParams", "growl", "WorkspaceService",
-function(_, $scope, $rootScope, $http, $state, $stateParams, growl, WorkspaceService) {
+.controller('DiffController', ["$scope", "$modal", "growl", "WorkspaceService", "workspaces",
+function($scope, $modal, growl, WorkspaceService, workspaces) {
+    $scope.workspaces = workspaces;
+
+    var workspaces_groupByParent = {};
+
+    workspaces.forEach(function (workspace) {
+        if (workspace.id === 'master') return;
+        
+        if (! workspaces_groupByParent.hasOwnProperty(workspace.parent)) {
+            workspaces_groupByParent[workspace.parent] = [];
+        }
+
+        workspaces_groupByParent[workspace.parent].push(workspace);
+    });
+
+    $scope.workspaces_groupByParent_keys = Object.keys(workspaces_groupByParent);
+    $scope.workspaces_groupByParent = workspaces_groupByParent;
+
+    $scope.merge_state = {};
+    $scope.merge_state.pickA = true;
+    $scope.merge_state.pickB = false;
+    $scope.merge_state.merge = false;
+
+    $scope.cancelPick = function () {
+        $scope.merge_state.pickA = true;
+        $scope.merge_state.pickB = false;
+        $scope.merge_state.merge = false;
+        $scope.merge_state.A = "";
+        $scope.merge_state.B = "";
+    };
+
+    $scope.pickA = function (workspace) {
+        $scope.merge_state.pickA = false;
+        $scope.merge_state.pickB = true;
+        $scope.merge_state.merge = false;
+        $scope.merge_state.A = workspace;
+    };
+
+    $scope.pickB = function (workspace) {
+        $scope.merge_state.pickA = false;
+        $scope.merge_state.pickB = false;
+        $scope.merge_state.merge = true;
+        $scope.merge_state.B = workspace;
+    };
+
+    $scope.createWorkspace = function (wsParentId) {
+      $scope.createWsParentId = wsParentId;
+
+      var instance = $modal.open({
+          templateUrl: 'partials/mm/new.html',
+          scope: $scope,
+          controller: ['$scope', '$modalInstance', workspaceCtrl]
+      });
+      instance.result.then(function(data) {
+          $scope.workspaces_groupByParent[data.parent].push(data);
+      });
+    };
+
+      var workspaceCtrl = function($scope, $modalInstance) {
+        $scope.workspace = {};
+        $scope.workspace.name = "";
+
+        $scope.ok = function() {
+            WorkspaceService.create($scope.workspace.name, $scope.createWsParentId)
+            .then(function(data) {
+                growl.success("Workspace Created");
+                $modalInstance.close(data);
+            }, function(reason) {
+                growl.error("Workspace Error: " + reason.message);
+            });
+        };
+        $scope.cancel = function() {
+            $modalInstance.dismiss();
+        };
+    };
+
+}])
+.controller('DiffTreeController', ["_", "$scope", "$rootScope", "$http", "$state", "$stateParams", "$modal", "growl", "WorkspaceService",
+function(_, $scope, $rootScope, $http, $state, $stateParams, $modal, growl, WorkspaceService) {
 
     var ws1 = $stateParams.source;
     var ws2 = $stateParams.target;
@@ -319,11 +397,11 @@ function(_, $scope, $rootScope, $http, $state, $stateParams, growl, WorkspaceSer
             deltaElement.documentation = e.documentation;
             updateChangeProperty(change.properties.documentation, "updated");
           }
-          if (e.hasOwnProperty('specialization.type')) {
+          if (e.hasOwnProperty('specialization') && e.specialization.hasOwnProperty('type')) {
             deltaElement.specialization.type = e.specialization.type;
             updateChangeProperty(change.properties.specialization.type, "updated");
           }
-          if (e.hasOwnProperty('specialization.value')) {
+          if (e.hasOwnProperty('specialization') && e.specialization.hasOwnProperty('value')) {
             deltaElement.specialization.value = e.specialization.value;
             updateChangeProperty(change.properties.specialization.value_type, "updated");
             updateChangeProperty(change.properties.specialization.values, "updated");
@@ -358,8 +436,8 @@ function(_, $scope, $rootScope, $http, $state, $stateParams, growl, WorkspaceSer
       };
 
 }])
-.controller('DiffViewController', ["$scope", "$rootScope", "$http", "$state", "$stateParams", "_", "growl", "WorkspaceService",
-function($scope, $rootScope, $http, $state, $stateParams, _, growl, WorkspaceService) {
+.controller('DiffViewController', ["$scope", "$rootScope", "$http", "$state", "$modal", "$stateParams", "_", "growl", "WorkspaceService",
+function($scope, $rootScope, $http, $state, $modal, $stateParams, _, growl, WorkspaceService) {
  
     var elementId = $stateParams.elementId;
 
