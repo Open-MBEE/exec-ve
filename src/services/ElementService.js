@@ -577,6 +577,27 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, _) {
         return deferred.promise;
     };
 
+    /**
+     * @ngdoc method
+     * @name mms.ElementService#deleteElements
+     * @methodOf mms.ElementService
+     * 
+     * @description
+     * Delete elements from alfresco and update the cache if successful.
+     * 
+     * @param {Array.<Object>} elems Array of element objects that contains element id and any property changes to be deleted.
+     * @param {string} [workspace=master] (optional) workspace to use
+     * @returns {Promise} The promise will be resolved with an array of updated element references if 
+     *      delete is successful.
+     */
+    var deleteElements = function(elems, workspace) {
+        var promises = [];
+        elems.forEach(function(elem) {
+            promises.push(deleteElement(elem, workspace));
+        });
+        return $q.all(promises);
+    };
+
     var normalize = function(id, update, workspace, version, edit) {
         var res = UtilsService.normalize({update: update, workspace: workspace, version: version});
         res.cacheKey = UtilsService.makeElementKey(id, res.ws, res.ver, edit);
@@ -596,6 +617,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, _) {
         getGenericElements: getGenericElements,
         getElementVersions: getElementVersions,
         deleteElement: deleteElement,
+        deleteElements: deleteElements,
         isDirty: isDirty,
         search: search
     };

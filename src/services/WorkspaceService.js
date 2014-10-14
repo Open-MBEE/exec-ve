@@ -249,11 +249,11 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService) {
     };
 
     var diff = function(ws1, ws2, ws1time, ws2time) {
-        var deferred = $q.defer();
+        /*var deferred = $q.defer();
         deferred.resolve(dummy);
-        return deferred.promise;
+        return deferred.promise;*/
 
-        /*var w1time = !ws1time ? 'latest' : ws1time;
+        var w1time = !ws1time ? 'latest' : ws1time;
         var w2time = !ws2time ? 'latest' : ws2time;
         var key = 'diff' + ws1 + ws2 + w1time + w2time;
         if (inProgress.hasOwnProperty(key))
@@ -268,7 +268,7 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService) {
             URLService.handleHttpStatus(data, status, headers, config, deferred);
             delete inProgress[key];
         });
-        return deferred.promise; */
+        return deferred.promise;
     };
 
     var merge = function(changes, targetWs) {

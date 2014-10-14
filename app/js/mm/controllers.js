@@ -7,6 +7,12 @@ function($scope, $modal, growl, WorkspaceService, workspaces) {
 
     var workspaces_groupByParent = {};
 
+    var workspacesIdtoWorkspace = {};
+
+    workspaces.forEach(function (workspace) {
+        workspacesIdtoWorkspace[workspace.id] = workspace;
+    });
+
     workspaces.forEach(function (workspace) {
         if (workspace.id === 'master') return;
         
@@ -17,6 +23,13 @@ function($scope, $modal, growl, WorkspaceService, workspaces) {
         workspaces_groupByParent[workspace.parent].push(workspace);
     });
 
+    workspaces.forEach(function (workspace) {
+        if (workspaces_groupByParent.hasOwnProperty(workspace.id)) return;
+
+        workspaces_groupByParent[workspace.id] = [];
+    });
+
+    $scope.workspacesIdtoWorkspace = workspacesIdtoWorkspace;
     $scope.workspaces_groupByParent_keys = Object.keys(workspaces_groupByParent);
     $scope.workspaces_groupByParent = workspaces_groupByParent;
 
@@ -57,6 +70,8 @@ function($scope, $modal, growl, WorkspaceService, workspaces) {
       });
       instance.result.then(function(data) {
           $scope.workspaces_groupByParent[data.parent].push(data);
+          $scope.workspaces_groupByParent_keys.push(data.id);
+          $scope.workspacesIdtoWorkspace[data.id] = data;
       });
     };
 
@@ -79,8 +94,8 @@ function($scope, $modal, growl, WorkspaceService, workspaces) {
     };
 
 }])
-.controller('DiffTreeController', ["_", "$scope", "$rootScope", "$http", "$state", "$stateParams", "$modal", "growl", "WorkspaceService",
-function(_, $scope, $rootScope, $http, $state, $stateParams, $modal, growl, WorkspaceService) {
+.controller('DiffTreeController', ["_", "$scope", "$rootScope", "$http", "$state", "$stateParams", "$modal", "growl", "WorkspaceService", "ElementService",
+function(_, $scope, $rootScope, $http, $state, $stateParams, $modal, growl, WorkspaceService, ElementService) {
 
     var ws1 = $stateParams.source;
     var ws2 = $stateParams.target;
@@ -193,6 +208,45 @@ function(_, $scope, $rootScope, $http, $state, $stateParams, $modal, growl, Work
       $scope.treeapi.expand_all();
 
       refreshStageCounters();
+    };
+
+    $scope.goBack = function () {
+      $state.go('main', {}, {reload:true});
+    };
+
+    $scope.mergeStagedChanges = function (workspaceId) {
+      var deletedElements = [];
+      var changedElements = [];
+
+      $scope.changes.forEach(function(change) {
+        if (change.staged) {
+          if (change.type === "deleted") {
+            deletedElements.push(change.original);
+          } else {
+            changedElements.push(change.delta);
+          }
+        }
+      });
+
+      ElementService.updateElements(changedElements, ws1)
+      .then(function(data) {
+
+          ElementService.deleteElements(deletedElements, ws1)
+          .then(function(data) {
+              growl.success("Workspace Elements Merged");
+              $state.go('main', {}, {reload:true});
+          }, function(reason) {
+          growl.error("Workspace Merge Error: " + reason.message);
+          });       
+
+      }, function(reason) {
+          growl.error("Workspace Merge Error: " + reason.message);
+      }); 
+
+
+
+
+
     };
 
     $scope.stageAllUnstaged = function (changes) {

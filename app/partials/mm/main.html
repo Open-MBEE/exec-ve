@@ -31,7 +31,7 @@
     </div>
 	<hr>
 	<div ng-repeat="key in workspaces_groupByParent_keys | filter:filter">
-		<h2>{{key}}
+		<h2>{{workspacesIdtoWorkspace[key].qualifiedName}}
 			<button ng-click="createWorkspace(key)" class="btn btn-success">CREATE WORKSPACE</button>
 		</h2>
 		<table class="table table-hover table-condensed">
