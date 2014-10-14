@@ -284,6 +284,29 @@ module.exports = function(grunt) {
             port: 9001
           }
         ]
+      },
+      localhost: {
+        options: {
+          hostname: '*',
+          port: 9000,
+          middleware: function(connect) {
+            return [proxySnippet];
+          }
+        },
+        proxies: [
+          {
+            context: '/alfresco',  // '/api'
+            host: 'localhost',//128.149.16.152',
+            port: 8080,
+            changeOrigin: false,
+            https: false,
+          },
+          {
+            context: '/',
+            host: 'localhost',
+            port: 9001
+          }
+        ]
       }
     },
 
