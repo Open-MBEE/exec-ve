@@ -69,9 +69,9 @@ function SiteService($q, $http, URLService, CacheService, _) {
             deferred.resolve(CacheService.get(cacheKey));
         } else {
             inProgress = deferred.promise;
-            $http.get(URLService.getSitesURL())
+            $http.get(URLService.getSitesURL('master'))
             .success(function(data, status, headers, config) {
-                CacheService.put(cacheKey, data, true, function(site, i) {
+                CacheService.put(cacheKey, data.sites, true, function(site, i) {
                     return {key: ['sites', 'master', site.name], value: site, merge: true};
                 });
                 deferred.resolve(CacheService.get(cacheKey));

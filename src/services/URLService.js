@@ -356,8 +356,9 @@ function urlService(baseUrl) {
      * 
      * @returns {string} The url.
      */
-    var getSitesURL = function() {
-        return root + "/rest/sites";
+    var getSitesURL = function(workspace) {
+        return root + '/workspaces/' + workspace + '/sites';
+        //return root + "/rest/sites";
     };
 
     /**
