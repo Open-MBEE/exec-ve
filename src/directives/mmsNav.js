@@ -45,7 +45,7 @@ function mmsNav(SiteService, $templateCache, growl) {
         };
         var catNames = [];
         var sites = {};
-
+        
         //Resets catagory and sites accordions
         scope.reset = function(){
             for(var i = 0; i < catNames.length; i++){
