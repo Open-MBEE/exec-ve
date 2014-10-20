@@ -1,6 +1,8 @@
 <div class="docweb-container-latest container-fluid">
-	<h1>Latest Editable Drafts</h1>
-	<div ng-repeat="doc in products | orderBy:'name'">
-	      <a href="ve.html#/workspaces/{{ws}}/sites/{{site}}/products/{{doc.sysmlid}}/latest">{{doc.name}}</a>   
-	</div>
+    <h1>Latest Editable Drafts</h1>
+    <div><input type="text" ng-model="newDocName" placeholder="Enter document name"></input><button class="btn" ng-click="create()">Create New</button></div>
+    <br>
+    <div ng-repeat="doc in products | orderBy:'name'">
+          <a href="ve.html#/workspaces/{{ws}}/sites/{{site}}/products/{{doc.sysmlid}}/latest">{{doc.name}}</a>   
+    </div>
 </div>

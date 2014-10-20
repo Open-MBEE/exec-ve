@@ -307,6 +307,10 @@ function urlService(baseUrl) {
         return root + '/workspaces/' + workspace + '/elements';
     };
 
+    var getPostElementsWithSiteURL = function(workspace, site) {
+        return root + '/workspaces/' + workspace + '/sites/' + site + '/elements';
+    };
+
     /**
      * @ngdoc method
      * @name mms.URLService#handleHttpStatus
@@ -374,7 +378,7 @@ function urlService(baseUrl) {
      * @returns {string} The post elements url.
      */
     var getElementSearchURL = function(query, workspace) {
-        return root + "/javawebscripts/element/search?keyword=" + query;
+        return root + '/workspaces/' + workspace + '/search?keyword=' + query;
     };
 
     var getWorkspacesURL = function() {
@@ -414,6 +418,7 @@ function urlService(baseUrl) {
         getOwnedElementURL: getOwnedElementURL,
         getElementVersionsURL: getElementVersionsURL,
         getPostElementsURL: getPostElementsURL,
+        getPostElementsWithSiteURL: getPostElementsWithSiteURL,
         handleHttpStatus: handleHttpStatus,
         getSitesURL: getSitesURL,
         getElementSearchURL: getElementSearchURL,

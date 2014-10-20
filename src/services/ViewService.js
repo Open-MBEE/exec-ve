@@ -316,6 +316,47 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
         return deferred.promise;
     };
 
+    var createDocument = function(name, site, workspace) {
+        var deferred = $q.defer();
+        var doc = {
+            specialization: {type: "Product"},
+            name: !name ? 'Untitled Document' : name,
+            documentation: ''
+        };
+        ElementService.createElement(doc, workspace, site)
+        .then(function(data) {
+            data.specialization.contains = [
+                {
+                    'type': 'Paragraph',
+                    'sourceType': 'reference',
+                    'source': data.sysmlid,
+                    'sourceProperty': 'documentation'
+                }
+            ];
+            data.specialization.allowedElements = [data.sysmlid];
+            data.specialization.displayedElements = [data.sysmlid];
+            data.specialization.view2view = [
+                {
+                    id: data.sysmlid,
+                    childrenViews: []
+                }
+            ];
+            ElementService.updateElement(data, workspace)
+            .then(function(data2) {
+                var ws = !workspace ? 'master' : workspace;
+                var cacheKey = ['sites', ws, site, 'products'];
+                if (CacheService.exists(cacheKey))
+                    CacheService.get(cacheKey).push(data2);
+                deferred.resolve(data2);
+            }, function(reason) {
+                deferred.reject(reason);
+            });
+        }, function(reason) {
+            deferred.reject(reason);
+        });
+        return deferred.promise;
+    };
+
     /**
      * @ngdoc method
      * @name mms.ViewService#getSiteDocuments
@@ -376,6 +417,7 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
         updateDocument: updateDocument,
         getViewElements: getViewElements,
         createView: createView,
+        createDocument: createDocument,
         addViewToDocument: addViewToDocument,
         getDocumentViews: getDocumentViews,
         getSiteDocuments: getSiteDocuments,

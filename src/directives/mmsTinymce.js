@@ -59,7 +59,7 @@ function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window
                 //var searchText = $scope.searchText; //TODO investigate why searchText isn't in $scope
                 //growl.info("Searching...");
                 $scope.searchClass = "fa fa-spin fa-spinner";
-                ElementService.search(searchText)
+                ElementService.search(searchText, false, scope.mmsWs)
                 .then(function(data) {
                     $scope.mmsCfElements = data;
                     $scope.searchClass = "";

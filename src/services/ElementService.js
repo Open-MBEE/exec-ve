@@ -325,10 +325,6 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, _) {
         if (!elem.hasOwnProperty('sysmlid'))
             deferred.reject('Element id not found, create element first!');
         else {
-            if (elem.hasOwnProperty('owner'))
-                delete elem.owner; //hack for getting around a 400 error when owner
-                                    //isn't found on server - ok for now since
-                                    //owner can't be changed from the web
             var n = normalize(elem.sysmlid, null, workspace, null);
             $http.post(URLService.getPostElementsURL(n.ws), {'elements': [elem]})
             .success(function(data, status, headers, config) {
@@ -394,11 +390,33 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, _) {
      *      update is successful.
      */
     var updateElements = function(elems, workspace) {
-        var promises = [];
+        /*var promises = [];
         elems.forEach(function(elem) {
             promises.push(updateElement(elem, workspace));
         });
-        return $q.all(promises);
+        return $q.all(promises);*/
+        var deferred = $q.defer();
+        var ws = !workspace ? 'master' : workspace;
+        $http.post(URLService.getPostElementsURL(ws), {'elements': elems})
+        .success(function(data, status, headers, config) {
+            data.elements.forEach(function(elem) {
+                var cacheKey = UtilsService.makeElementKey(elem.sysmlid, ws, null, false);
+                var resp = CacheService.put(cacheKey, UtilsService.cleanElement(elem), true);
+                //special case for products view2view updates 
+                if (resp.specialization && resp.specialization.view2view &&
+                    elem.specialization && elem.specialization.view2view)
+                    resp.specialization.view2view = elem.specialization.view2view;
+                var edit = CacheService.get(UtilsService.makeElementKey(elem.sysmlid, ws, null, true));
+                if (edit) {
+                    _.merge(edit, resp);
+                    UtilsService.cleanElement(edit, true);
+                }
+            });
+            deferred.resolve(data.elements);
+        }).error(function(data, status, headers, config) {
+            URLService.handleHttpStatus(data, status, headers, config, deferred);
+        });
+        return deferred.promise;
     };
 
     /**
@@ -437,23 +455,27 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, _) {
      * 
      * @param {Object} elem Element object that must have an owner id.
      * @param {string} [workspace=master] (optional) workspace to use
+     * @param {string} [site=null] (optional) site to post to
      * @returns {Promise} The promise will be resolved with the created element references if 
      *      create is successful.
      */
-    var createElement = function(elem, workspace) {
+    var createElement = function(elem, workspace, site) {
         var n = normalize(null, null, workspace, null);
 
         var deferred = $q.defer();
-        if (!elem.hasOwnProperty('owner')) {
+        //if (!elem.hasOwnProperty('owner')) {
         //    deferred.reject('Element create needs an owner'); //relax this?
         //    return deferred.promise;
-            elem.owner = 'holding_bin_project'; //hardcode a holding bin for owner for propose element
-        }
+        //    elem.owner = 'holding_bin_project'; //hardcode a holding bin for owner for propose element
+        //}
         if (elem.hasOwnProperty('sysmlid')) {
             deferred.reject({status: 400, message: 'Element create cannot have id'});
             return deferred.promise;
         }
-        $http.post(URLService.getPostElementsURL(n.ws), {'elements': [elem]})
+        var url = URLService.getPostElementsURL(n.ws);
+        if (site)
+            url = URLService.getPostElementsWithSiteURL(n.ws, site);
+        $http.post(url, {'elements': [elem]})
         .success(function(data, status, headers, config) {
             var resp = data.elements[0];
             var key = UtilsService.makeElementKey(resp.sysmlid, n.ws, 'latest');

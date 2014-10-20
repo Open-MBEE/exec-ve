@@ -34,10 +34,18 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
                 },
                 'view@': {
                     templateUrl: 'partials/docweb/latest.html',
-                    controller: function($scope, site, products, ws) {
+                    controller: function($scope, site, products, ws, ViewService, growl) {
                         $scope.products = products;
                         $scope.site = site.name;
                         $scope.ws = ws;
+                        $scope.create = function() {
+                            ViewService.createDocument($scope.newDocName, $scope.site, $scope.ws)
+                            .then(function(data) {
+                                growl.success("Create Document Successful");
+                            }, function(reason) {
+                                growl.error("Create Document Error: " + reason.message);
+                            });
+                        };
                     }
                 }
             }
