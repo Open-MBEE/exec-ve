@@ -94,12 +94,14 @@ function($scope, $modal, growl, WorkspaceService, workspaces) {
     };
 
 }])
-.controller('DiffTreeController', ["_", "$scope", "$rootScope", "$http", "$state", "$stateParams", "$modal", "growl", "WorkspaceService", "ElementService",
-function(_, $scope, $rootScope, $http, $state, $stateParams, $modal, growl, WorkspaceService, ElementService) {
+.controller('DiffTreeController', ["_", "$timeout", "$scope", "$rootScope", "$http", "$state", "$stateParams", "$modal", "growl", "WorkspaceService", "ElementService", "diff",
+function(_, $timeout, $scope, $rootScope, $http, $state, $stateParams, $modal, growl, WorkspaceService, ElementService, diff) {
 
     var ws1 = $stateParams.source;
     var ws2 = $stateParams.target;
 
+    $scope.diff = diff;
+    
     $scope.treeapi = {};
 
     $scope.treeData = [];
@@ -302,7 +304,7 @@ function(_, $scope, $rootScope, $http, $state, $stateParams, $modal, growl, Work
 
 
     // Diff the two workspaces picked in the Workspace Picker
-    WorkspaceService.diff(ws1, ws2).then(
+    /* WorkspaceService.diff(ws1, ws2).then(
      function(result) {
         
         setupChangesList(result.workspace1, result.workspace2); 
@@ -311,11 +313,12 @@ function(_, $scope, $rootScope, $http, $state, $stateParams, $modal, growl, Work
       function(reason) {
         growl.error("Workspace diff failed: " + reason.message);
       }
-    );   
+    );   */
+
       /*
        * Preps mms-tree with data and display options.
        */
-      var setupChangesList = function(ws1, ws2) {
+    var setupChangesList = function(ws1, ws2) {
 
         var emptyElement = { name: "", owner: "", documentation: "", specialization : { type: "", value_type: "", values: ""} };
 
@@ -487,14 +490,18 @@ function(_, $scope, $rootScope, $http, $state, $stateParams, $modal, growl, Work
         $scope.id2node = id2node;
 
         refreshStageCounters();
-      };
+    };
+
+    $timeout(function () { setupChangesList(diff.workspace1, diff.workspace2); } ); 
+
 
 }])
-.controller('DiffViewController', ["$scope", "$rootScope", "$http", "$state", "$modal", "$stateParams", "_", "growl", "WorkspaceService",
-function($scope, $rootScope, $http, $state, $modal, $stateParams, _, growl, WorkspaceService) {
+.controller('DiffViewController', ["$scope", "$rootScope", "$http", "$state", "$modal", "$stateParams", "_", "growl", "WorkspaceService", "diff",
+function($scope, $rootScope, $http, $state, $modal, $stateParams, _, growl, WorkspaceService, diff) {
  
     var elementId = $stateParams.elementId;
 
     $scope.change = $scope.id2change[elementId];
+    $scope.diff = diff;
     
 }]);
