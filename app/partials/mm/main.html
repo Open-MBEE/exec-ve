@@ -8,12 +8,12 @@
         	<table>
         		<caption>Change Comparison</caption>
         		<tr>
-        			<th>TO</th>
         			<th>FROM</th>
+        			<th>TO</th>
         		</tr>
         		<tr>
-        			<td>{{merge_state.A.name || 'Pick [To]'}}</td>
         			<td>{{merge_state.B.name || 'Pick [From]'}}</td>
+        			<td>{{merge_state.A.name || 'Pick [To]'}}</td>
         		</tr>
         	</table>
         	<a class="btn btn-success btn-sm" ui-sref="main.diff({source: merge_state.A.id, target: merge_state.B.id})">COMPARE</a>
@@ -38,13 +38,14 @@
 		        	<a href="portal.html#/workspaces/{{workspace.id}}" target="_blank">{{workspace.name}}</a>
 		        </td>
 		        <td>{{workspace.creator}}</td>
-		        <td>{{workspace.branched | date:'M/d/yy h:mm a'}}</td>
+		        <!-- NOTE: Created is really modified, revert back later.  Branched is created -->
 		        <td>{{workspace.created | date:'M/d/yy h:mm a' }}</td>
-		        <td>
-			        <a class="btn btn-primary btn-sm" ng-click="pickA(workspace)">Pick [To]</a>
-		        </td>
+		        <td>{{workspace.branched | date:'M/d/yy h:mm a'}}</td>
 		        <td>
 			        <a class="btn btn-primary btn-sm" ng-click="pickB(workspace)">Pick [From]</a>
+		        </td>
+		        <td>
+			        <a class="btn btn-primary btn-sm" ng-click="pickA(workspace)">Pick [To]</a>
 		        </td>
 		    </tr>
 		</table>
