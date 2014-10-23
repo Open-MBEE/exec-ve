@@ -16,14 +16,14 @@
             <div ng-switch-when="LiteralBoolean"><input type="checkbox" ng-model="value.boolean"></input></div>
             <div ng-switch-when="LiteralReal"><input type="number" ng-model="value.double" step="any"></input></div>
             <div ng-switch-when="LiteralString">
-                <textarea ng-if="hasHtml(value.string)" mms-tinymce mms-ws="{{mmsWs}}" ng-model="value.string" mms-cf-elements="mmsCfElements" mms-eid="{{element.sysmlid}}"></textarea>
+                <textarea ng-if="hasHtml(value.string)" mms-tinymce mms-ws="{{mmsWs}}" mms-site="{{mmsSite}}" ng-model="value.string" mms-cf-elements="mmsCfElements" mms-eid="{{element.sysmlid}}"></textarea>
                 <textarea ng-if="!hasHtml(value.string)" ng-model="value.string"></textarea>
             </div>
         </div>
     </div>
 
     <h2 class="prop-title spec-view-doc-heading">DOCUMENTATION</h2>
-    <textarea ng-model="edit.documentation" mms-tinymce mms-ws="{{mmsWs}}" mms-cf-elements="mmsCfElements" mms-eid="{{element.sysmlid}}"></textarea>
+    <textarea ng-model="edit.documentation" mms-tinymce mms-ws="{{mmsWs}}" mms-site="{{mmsSite}}" mms-cf-elements="mmsCfElements" mms-eid="{{element.sysmlid}}"></textarea>
 
     <h2 class="prop-title spec-view-type-heading">METATYPE</h2>
     <h3 class="prop">{{element.specialization.type || 'Element'}}</h3>
