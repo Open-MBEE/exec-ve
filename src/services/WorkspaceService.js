@@ -240,7 +240,7 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService) {
         } 
         $http.get(URLService.getWorkspaceURL(wid))
         .success(function(data, status, headers, config) {
-            CacheService.put(cacheKey, data.workspaces[0]);
+            CacheService.put(cacheKey, data.workspace[0]);
             deferred.resolve(CacheService.get(cacheKey));
         }).error(function(data, status, headers, config) {
             URLService.handleHttpStatus(data, status, headers, config, deferred);
