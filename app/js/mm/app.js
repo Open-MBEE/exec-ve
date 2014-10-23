@@ -33,7 +33,7 @@ angular.module('mm', ['ui.router', 'mms', 'mms.directives', 'ui.bootstrap', 'ui.
                 controller: 'DiffTreeController'
             },
             'menu@': {
-                template: '<mms-nav mms-title="{{title}}" mms-type="Model Manager" mms-go-to="false" mms-other-sites="false" mms-ws="master"></mms-nav>',
+                template: '<mms-nav mms-title="{{title}}" mms-type="Model Manager" mms-no-sites="true" mms-ws="master"></mms-nav>',
                 controller: function( $scope, diff) {
                     $scope.title = diff.workspace2.name + " -> " + diff.workspace1.name;
                 }
