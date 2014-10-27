@@ -228,6 +228,7 @@ function(_, $timeout, $scope, $rootScope, $http, $state, $stateParams, $modal, g
           if (change.type === "deleted") {
             deletedElements.push(change.original);
           } else {
+            delete change.delta.read;
             changedElements.push(change.delta);
           }
         }
