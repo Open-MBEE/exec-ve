@@ -342,6 +342,8 @@ function($scope, $rootScope, document, time, ElementService, ViewService, $state
         var newView2View = [];
         $scope.saveClass = "fa fa-spin fa-spinner";
         angular.forEach(viewIds2node, function(view) {
+            if ($scope.tree.indexOf(view) >= 0 && view.id !== document.sysmlid)
+                return; //allow removing views by moving them to be root
             var viewObject = {id: view.id, childrenViews: []};
             view.children.forEach(function(child) {
                 viewObject.childrenViews.push(child.id);
