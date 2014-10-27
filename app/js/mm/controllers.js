@@ -14,8 +14,10 @@ function($scope, $modal, growl, WorkspaceService, workspaces) {
     });
 
     workspaces.forEach(function (workspace) {
-        if (workspace.id === 'master') return;
-        
+        if (workspace.id === 'master') {
+          $scope.master = workspace;
+          return;
+        }
         if (! workspaces_groupByParent.hasOwnProperty(workspace.parent)) {
             workspaces_groupByParent[workspace.parent] = [];
         }
@@ -69,6 +71,7 @@ function($scope, $modal, growl, WorkspaceService, workspaces) {
           controller: ['$scope', '$modalInstance', workspaceCtrl]
       });
       instance.result.then(function(data) {
+          $scope.workspaces_groupByParent[data.id] = [];
           $scope.workspaces_groupByParent[data.parent].push(data);
           $scope.workspaces_groupByParent_keys.push(data.id);
           $scope.workspacesIdtoWorkspace[data.id] = data;
@@ -225,6 +228,7 @@ function(_, $timeout, $scope, $rootScope, $http, $state, $stateParams, $modal, g
           if (change.type === "deleted") {
             deletedElements.push(change.original);
           } else {
+            delete change.delta.read;
             changedElements.push(change.delta);
           }
         }

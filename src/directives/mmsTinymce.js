@@ -70,7 +70,7 @@ function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window
             };
             $scope.makeNew = function(newName) {
                 $scope.proposeClass = "fa fa-spin fa-spinner";
-                ElementService.createElement({name: newName, documentation: '', specialization: {type: 'Element'}}, scope.mmsWs)
+                ElementService.createElement({name: newName, documentation: '', specialization: {type: 'Element'}}, scope.mmsWs, scope.mmsSite)
                 .then(function(data) {
                     $scope.mmsCfElements = [data];
                     $scope.proposeClass = "";
@@ -292,7 +292,8 @@ function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window
         scope: {
             mmsCfElements: '=',
             mmsEid: '@',
-            mmsWs: '@'
+            mmsWs: '@',
+            mmsSite: '@'
         },
         link: mmsTinymceLink
     };

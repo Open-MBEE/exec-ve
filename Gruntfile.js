@@ -341,7 +341,7 @@ module.exports = function(grunt) {
 
     artifactory: {
       options: {
-        url: 'http://europambee-build:8082',
+        url: 'http://europambee-build.jpl.nasa.gov:8082',
         repository: 'libs-snapshot-local',
         username: 'admin',
         password: 'password'
@@ -353,7 +353,7 @@ module.exports = function(grunt) {
         options: {
           publish: [{
             id: 'gov.nasa.jpl:evm:zip',
-            version: '0.2.0-SNAPSHOT',
+            version: '0.2.1-SNAPSHOT',
             path: 'deploy/'
           }]
         }

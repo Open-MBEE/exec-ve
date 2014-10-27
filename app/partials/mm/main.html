@@ -15,14 +15,18 @@
         			<td>{{merge_state.B.name || 'Pick [From]'}}</td>
         			<td>{{merge_state.A.name || 'Pick [To]'}}</td>
         		</tr>
+                <tr>
+                    <td><button ng-click="pickB(master)">Set to master</button></td>
+                    <td><button ng-click="pickA(master)">Set to master</button></td>
+                </tr>
         	</table>
         	<a class="btn btn-success btn-sm" ui-sref="main.diff({source: merge_state.A.id, target: merge_state.B.id})">COMPARE</a>
         </div>
     </div>
 	<hr>
-	<div ng-repeat="key in workspaces_groupByParent_keys | filter:filter">
-		<h2>{{workspacesIdtoWorkspace[key].qualifiedName | masterToTask }}
-			<button ng-click="createWorkspace(key)" class="btn btn-success">CREATE TASK</button>
+	<div ng-repeat="ws in workspaces | filter:filter | orderBy:'qualifiedName'">
+		<h2>{{ws.qualifiedName | masterToTask }}
+			<button ng-click="createWorkspace(ws.id)" class="btn btn-success">CREATE TASK</button>
 		</h2>
 		<table class="table table-hover table-condensed">
 			<tr>
@@ -33,7 +37,7 @@
 		        <th></th>
 		        <th></th>
 		    </tr>
-		    <tr ng-repeat="workspace in workspaces_groupByParent[key] | orderBy: 'name'">
+		    <tr ng-repeat="workspace in workspaces_groupByParent[ws.id] | orderBy: 'name'">
 		        <td>
 		        	<a href="portal.html#/workspaces/{{workspace.id}}" target="_blank">{{workspace.name}}</a>
 		        </td>

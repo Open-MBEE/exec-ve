@@ -392,6 +392,7 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, $q, growl, _)
             mmsEid: '@',
             mmsEditField: '@', //all or none or individual field
             mmsWs: '@',
+            mmsSite: '@',
             mmsVersion: '@',
             mmsCfElements: '=', //array of element objects
             mmsElement: '=',
