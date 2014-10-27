@@ -218,7 +218,8 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, documen
             treeApi.add_branch(branch, {
                 label: view.name,
                 type: "view",
-                data: view
+                data: view,
+                children: []
             });
             adding = false;
         }, function(reason) {
