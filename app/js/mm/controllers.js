@@ -244,11 +244,6 @@ function(_, $timeout, $scope, $rootScope, $http, $state, $stateParams, $modal, g
       }, function(reason) {
           growl.error("Workspace Merge Error: " + reason.message);
       }); 
-
-
-
-
-
     };
 
     $scope.stageAllUnstaged = function (changes) {
@@ -320,7 +315,9 @@ function(_, $timeout, $scope, $rootScope, $http, $state, $stateParams, $modal, g
        */
     var setupChangesList = function(ws1, ws2) {
 
-        var emptyElement = { name: "", owner: "", documentation: "", specialization : { type: "", value_type: "", values: ""} };
+        // var emptyElement = { name: "", owner: "", documentation: "", specialization : { type: "", value_type: "", values: ""} };
+
+        var emptyElement = { name: "", owner: "", documentation: "", specialization : {} };
 
         var createChange = function (name, element, deltaElement, changeType, changeIcon) {
           var change = {};
@@ -337,17 +334,23 @@ function(_, $timeout, $scope, $rootScope, $http, $state, $stateParams, $modal, g
           change.properties.owner = {};
           change.properties.documentation = {};
 
-          change.properties.specialization = {};
-          change.properties.specialization.type = {};
-          change.properties.specialization.value_type = {};
-          change.properties.specialization.values = {};
-
           updateChangeProperty(change.properties.name, "clean");
           updateChangeProperty(change.properties.owner, "clean");
           updateChangeProperty(change.properties.documentation, "clean");
-          updateChangeProperty(change.properties.specialization.type, "clean");
-          updateChangeProperty(change.properties.specialization.value_type, "clean");
-          updateChangeProperty(change.properties.specialization.values, "clean");
+
+          change.properties.specialization = {};
+          if (element.hasOwnProperty('specialization')) {
+            Object.keys(element.specialization).forEach(function (property) {
+              change.properties.specialization[property] = {};
+              updateChangeProperty(change.properties.specialization[property], "clean");
+            });
+          }
+          if (deltaElement.hasOwnProperty('specialization')) {
+            Object.keys(deltaElement.specialization).forEach(function (property) {
+              change.properties.specialization[property] = {};
+              updateChangeProperty(change.properties.specialization[property], "clean");
+            });
+          }
 
           return change;
         };
@@ -356,6 +359,16 @@ function(_, $timeout, $scope, $rootScope, $http, $state, $stateParams, $modal, g
           property.type = changeType;
           property.staged = false;
         };
+
+        // dynamically create 1st order of depth of specialization properties
+        /*var updateChangePropertySpecializations = function(specialization, changeType) {
+
+          Object.keys(specialization).forEach(function (property) {
+            specialization[property].type = changeType;
+            specialization[property].staged = false;
+          });
+
+        }; */
 
         var createTreeNode = function (element, status) {
           var node = {};
@@ -405,10 +418,13 @@ function(_, $timeout, $scope, $rootScope, $http, $state, $stateParams, $modal, g
           updateChangeProperty(change.properties.name, "added");
           updateChangeProperty(change.properties.owner, "added");
           updateChangeProperty(change.properties.documentation, "added");
-          updateChangeProperty(change.properties.specialization.type, "added");
-          updateChangeProperty(change.properties.specialization.value_type, "added");
-          updateChangeProperty(change.properties.specialization.values, "added");
-
+          
+          if (e.hasOwnProperty('specialization')) {
+            Object.keys(e.specialization).forEach(function (property) {
+              change.properties.specialization[property] = {};
+              updateChangeProperty(change.properties.specialization[property], "added");
+            });            
+          }
 
           $scope.changes.push(change);
           $scope.id2change[e.sysmlid] = change;
@@ -424,9 +440,13 @@ function(_, $timeout, $scope, $rootScope, $http, $state, $stateParams, $modal, g
           updateChangeProperty(change.properties.name, "removed");
           updateChangeProperty(change.properties.owner, "removed");
           updateChangeProperty(change.properties.documentation, "removed");
-          updateChangeProperty(change.properties.specialization.type, "removed");
-          updateChangeProperty(change.properties.specialization.value_type, "removed");
-          updateChangeProperty(change.properties.specialization.values, "removed");
+          
+          if (deletedElement.hasOwnProperty('specialization')) {
+            Object.keys(deletedElement.specialization).forEach(function (property) {
+              change.properties.specialization[property] = {};
+              updateChangeProperty(change.properties.specialization[property], "removed");
+            });            
+          }
 
           $scope.changes.push(change);
           $scope.id2change[e.sysmlid] = change;
@@ -454,7 +474,15 @@ function(_, $timeout, $scope, $rootScope, $http, $state, $stateParams, $modal, g
             deltaElement.documentation = e.documentation;
             updateChangeProperty(change.properties.documentation, "updated");
           }
-          if (e.hasOwnProperty('specialization') && e.specialization.hasOwnProperty('type')) {
+          if (e.hasOwnProperty('specialization')) {
+            Object.keys(e.specialization).forEach(function (property) {
+              deltaElement.specialization[property] = e.specialization[property];
+              change.properties.specialization[property] = {};
+              updateChangeProperty(change.properties.specialization[property], "updated");
+            });            
+          }
+
+          /* if (e.hasOwnProperty('specialization') && e.specialization.hasOwnProperty('type')) {
             deltaElement.specialization.type = e.specialization.type;
             updateChangeProperty(change.properties.specialization.type, "updated");
           }
@@ -462,7 +490,7 @@ function(_, $timeout, $scope, $rootScope, $http, $state, $stateParams, $modal, g
             deltaElement.specialization.value = e.specialization.value;
             updateChangeProperty(change.properties.specialization.value_type, "updated");
             updateChangeProperty(change.properties.specialization.values, "updated");
-          }
+          } */
 
           $scope.changes.push(change);
           $scope.id2change[e.sysmlid] = change;

@@ -62,12 +62,11 @@
 
 </table>
 
-<table class="table">
+<div ng-switch on="change.original.specialization.type || change.delta.specialization.type">
+  <div ng-switch-when="Property">
 
-  <div>
-    
-      <h1 class="pane-center-heading">Specializations</h1>
-
+    <table class="table">
+      <h1 class="pane-center-heading">Properties</h1>
       <thead>
         <tr>
           <th></th>
@@ -75,30 +74,13 @@
           <th>{{diff.workspace2.name}}</th>
         </tr>
       </thead>
-    
       <tbody>
         <tr class="{{options.statuses[change.properties.specialization.type.type].style}}">
           <td>TYPE</td>
           <td>{{change.original.specialization.type}}</td>
           <td>{{change.delta.specialization.type}}</td>
         </tr>
-    
-        <!-- 
-        <tr class="{{options.statuses[change.properties.specialization.value_type.type].style}}">
-          <td>VALUE TYPE</td>
-          <td>
-            <div ng-repeat="value in change.original.specialization.value">
-                {{value.type}}
-            </div>
-          <td>
-            <div ng-repeat="value in change.delta.specialization.value">
-                {{value.type}}
-            </div>
-          </td>
-        </tr>
-      -->
-    
-        <tr class="{{options.statuses[change.properties.specialization.values.type].style}}">
+        <tr class="{{options.statuses[change.properties.specialization.value.type].style}}" ng-switch on="change.original.specialization.type">
           <td>VALUE : VALUE TYPE</td>
           <td>
             <div ng-repeat="value in change.original.specialization.value" ng-switch on="value.type">
@@ -116,9 +98,31 @@
               <span ng-switch-when="LiteralUnlimitedNatural">{{value.naturalValue}} : {{value.type}}</span>
               <span ng-switch-when="LiteralString" ng-bind-html="value.string"></span>
             </div>
+          </td>
         </tr>
       </tbody>
-      
+    </table>
+  
   </div>
+  <div ng-switch-default>
+  
+    <table class="table">
+      <h1 class="pane-center-heading">Properties</h1>
+      <thead>
+        <tr>
+          <th></th>
+          <th>{{diff.workspace1.name}}</th>
+          <th>{{diff.workspace2.name}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="(key, value) in change.properties.specialization" class="{{options.statuses[change.properties.specialization[key].type].style}}">
+          <td>{{key | uppercase }}</td>
+          <td>{{change.original.specialization[key]}}</td>
+          <td>{{change.delta.specialization[key]}}</td>
+        </tr>
+      </tbody>
+    </table>
 
-</table>
+  </div>
+</div> 
