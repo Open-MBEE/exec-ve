@@ -2,7 +2,7 @@
 	<div class="row">
 		<br>
         <div class="col-md-4">
-            <input class="form-control" type="text" ng-model="filter" placeholder="Search for a workspace" />
+            <input class="form-control" type="text" ng-model="filter" placeholder="Search for a task" />
         </div>
         <div class="col-md-8">
         	<table>
@@ -20,7 +20,7 @@
                     <td><button ng-click="pickA(master)">Set to master</button></td>
                 </tr>
         	</table>
-        	<a class="btn btn-success btn-sm" ui-sref="main.diff({source: merge_state.A.id, target: merge_state.B.id})">COMPARE</a>
+        	<a class="btn btn-success btn-sm" ui-sref="main.diff({source: merge_state.A.id, target: merge_state.B.id})">COMPARE <i ng-show="comparing" class="fa fa-spin fa-spinner"></i></a>
         </div>
     </div>
 	<hr>

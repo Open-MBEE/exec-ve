@@ -54,6 +54,6 @@ angular.module('mm', ['ui.router', 'mms', 'mms.directives', 'ui.bootstrap', 'ui.
 })
 .filter('masterToTask', function() {
     return function(input) {
-        return input.replace("master", "tasks");
+        return input.replace("master", "Tasks");
     };
   });

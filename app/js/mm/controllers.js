@@ -85,10 +85,10 @@ function($scope, $modal, growl, WorkspaceService, workspaces) {
         $scope.ok = function() {
             WorkspaceService.create($scope.workspace.name, $scope.createWsParentId)
             .then(function(data) {
-                growl.success("Workspace Created");
+                growl.success("Task Created");
                 $modalInstance.close(data);
             }, function(reason) {
-                growl.error("Workspace Error: " + reason.message);
+                growl.error("Task Error: " + reason.message);
             });
         };
         $scope.cancel = function() {
@@ -233,20 +233,23 @@ function(_, $timeout, $scope, $rootScope, $http, $state, $stateParams, $modal, g
           }
         }
       });
-
+      $scope.saving = true;
       ElementService.updateElements(changedElements, ws1)
       .then(function(data) {
 
           ElementService.deleteElements(deletedElements, ws1)
           .then(function(data) {
               growl.success("Workspace Elements Merged");
+              $scope.saving = false;
               $state.go('main', {}, {reload:true});
           }, function(reason) {
-          growl.error("Workspace Merge Error: " + reason.message);
+            growl.error("Workspace Merge Error: " + reason.message);
+            $scope.saving = false;
           });       
 
       }, function(reason) {
           growl.error("Workspace Merge Error: " + reason.message);
+          $scope.saving = false;
       }); 
     };
 
