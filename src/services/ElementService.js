@@ -455,7 +455,8 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, _) {
      * 
      * @param {Object} elem Element object that must have an owner id.
      * @param {string} [workspace=master] (optional) workspace to use
-     * @param {string} [site=null] (optional) site to post to
+     * @param {string} [site=null] (optional) site to post to (if the element has no predefined owner,
+     *      give the site argument so the server can put it in the site's holding bin)
      * @returns {Promise} The promise will be resolved with the created element references if 
      *      create is successful.
      */
