@@ -240,6 +240,14 @@ function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window
                     ed.save();
                     update();
                 });
+                ed.on('undo', function(e) {
+                    ed.save();
+                    update();
+                });
+                ed.on('redo', function(e) {
+                    ed.save();
+                    update();
+                });
                 ed.on('blur', function(e) {
                     element.blur();
                 });
