@@ -18,11 +18,16 @@
 
   <div growl></div>
   
-  <div ui-view="menu">loading...</div>
+    <div id="outer-wrap" style="overflow:auto;">
+        <div id="inner-wrap">
+          <div ui-view="menu">loading...</div>
 
-  <div fa-pane pane-anchor="center" class="content-container">
-    <div ui-view="main"></div>
-  </div>
+          <div fa-pane pane-anchor="center" class="content-container">
+            <div ui-view="main"></div>
+          </div>
+        </div>
+    </div>
+
 
   <script src="lib/modernizr/modernizr.custom.61017.min.js"></script>
   

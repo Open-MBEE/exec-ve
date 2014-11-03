@@ -217,12 +217,13 @@ function mmsNav(SiteService, WorkspaceService, $templateCache, growl) {
         restrict: 'E',
         template: template,
         scope: {
-            site: '@mmsSite', //current site name
-            title: '@mmsTitle', //current page title
-            type: '@mmsType', //current page type
+            title: '@mmsTitle', //page title - used in mobile view only
             ws: '@mmsWs',
-            noSites: '@mmsNoSites',
-            responsive: '@mmsResponsive'
+            site: '@mmsSite', //current site name
+            doc: '@mmsDoc' //current document
+            // type: '@mmsType', //current page type
+            // noSites: '@mmsNoSites',
+            // responsive: '@mmsResponsive'
         },
         link: mmsNavLink
     };

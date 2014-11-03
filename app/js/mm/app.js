@@ -12,7 +12,7 @@ angular.module('mm', ['ui.router', 'mms', 'mms.directives', 'ui.bootstrap', 'ui.
         },
         views: {
             'menu': {
-                template: '<mms-nav mms-type="Model Manager" mms-no-sites="true" mms-ws="master"></mms-nav>'
+                template: '<mms-nav mms-title="Model Manager" mms-ws="master"></mms-nav>'
             },
             'main': {
                 templateUrl: 'partials/mm/main.html',

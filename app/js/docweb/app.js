@@ -21,10 +21,10 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
             },
             views: {
                 'menu': {
-                    template: '<mms-nav mms-responsive="true" mms-site="{{site}}" mms-title="{{title}}" mms-type="DocWeb" mms-ws="{{ws}}"></mms-nav>',
+                    template: '<mms-nav mms-title="DocWeb" mms-ws="{{ws}}" mms-site="{{site}}"></mms-nav>',
                     controller: function($scope, $stateParams, site, ws) {
                         $scope.site = site.name;
-                        $scope.title = "Configurations";
+                        // $scope.title = "Configurations";
                         $scope.ws = ws;
                     }
                 },

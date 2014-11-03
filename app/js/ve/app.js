@@ -27,7 +27,7 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
         },
         views: {
             'menu': {
-                template: '<mms-nav mms-responsive="true" mms-site="{{site}}" mms-title="{{title}}" mms-type="View Editor" mms-ws="{{ws}}"></mms-nav>',
+                template: '<mms-nav mms-title="View Editor" mms-ws="{{ws}}" mms-site="{{site}}" mms-doc="{{title}}"></mms-nav>',
                 controller: function($scope, $stateParams, $filter, document, site, snapshots, time, ws) {
                     var tag = '';
                     if (time !== 'latest') {

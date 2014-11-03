@@ -120,7 +120,7 @@ mms-nav {
     }
   }
 
-  .logout-btn {
+  /*.logout-btn {
     margin-left: 1em;
     padding-left: 0 !important;
   }
@@ -128,7 +128,7 @@ mms-nav {
   .support-btn {
     margin-left: 1em;
     padding-left: 0 !important;
-  }
+  } */
 
   .nav-btn {
     &:hover,
@@ -140,6 +140,8 @@ mms-nav {
     i {
       color: $white
     }
+    margin-left: 1em;
+    padding-left: 0 !important;
   }
 
   .goto.dropdown ul { 
@@ -415,6 +417,12 @@ mms-nav {
       width: 100%;
     }
 
+    ul {
+      &.hide-small-display {
+          display: none; 
+        }
+    }  
+    
     li {
       position: relative;
       border-top: 1px solid rgba(255, 255, 255, 0.1);

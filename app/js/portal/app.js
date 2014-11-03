@@ -15,7 +15,7 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives'])
         },
         views: {
             'menu': {
-                template: '<mms-nav mms-responsive="true" mms-no-sites="true" mms-title="Portal" mms-type="Portal" mms-ws="{{ws}}"></mms-nav>',
+                template: '<mms-nav mms-title="Portal" mms-ws="{{ws}}"></mms-nav>',
                 controller: function($scope, $stateParams, ws) {
                     $scope.ws = ws;
                 }

@@ -1,7 +1,7 @@
 <header role="banner">
   <div class="block">
-    <div class="banner-title">{{type}}</div>
-    <a ng-if="responsive" ng-click="nav.toggleNav()" class="nav-btn"><i class="fa fa-lg fa-bars"></i></a>
+    <div class="banner-title">{{title}}</div>
+    <a ng-click="nav.toggleNav()" class="nav-btn"><i class="fa fa-lg fa-bars"></i></a>
   </div>
 </header>
 
@@ -10,10 +10,33 @@
 
     <ul>
       <!-- Brand name and document -->
-      <li class="nav-title-li">{{type}} ({{wsName}})</li>
-      <li class="nav-doc-li">{{title}}</li>
+      <!-- <li class="nav-title-li">{{type}}</li> -->
+      
+      <!-- <li class="nav-doc-li">{{title}}</li> -->
 
-      <!-- Goto dropdown -->
+      <ul class="nav-btns-main">
+        <li>
+          <a class="nav-btn" tooltip="Workspaces" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" href="mm.html"><i class="fa fa-code-fork"></i></a>
+        </li>
+
+        <span ng-show="ws">
+          <li> <i class="fa fa-ellipsis-v"></i> {{wsName}} <i class="fa fa-angle-double-right"></i><li>
+          <li>
+            <a class="nav-btn" tooltip="Site Portal" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" href="portal.html#/workspaces/{{ws}}"><i class="fa fa-sitemap"></i></a>
+          </li>
+          <span ng-show="site">
+            <li class=""> <i class="fa fa-ellipsis-v"></i> {{siteTitle}} <i class="fa fa-angle-double-right"></i></li>
+            <span ng-show="doc">
+              <li>
+                <a class="nav-btn" tooltip="DocWeb" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" href="docweb.html#/workspaces/{{ws}}/sites/{{site}}"><i class="fa fa-book"></i></a>
+              </li>
+              <li class=""> <i class="fa fa-ellipsis-v"></i> {{doc}}</li>
+            </span>
+          </span>
+        <span>
+      </ul>
+
+      <!-- Goto dropdown
       <li ng-if="!noSites" class="goto dropdown">
 
         <a class="dropdown-toggle" data-toggle="dropdown">
@@ -31,9 +54,9 @@
           </li>
         </ul>
 
-      </li>
+      </li> -->
 
-      <!-- Other sites dropdown -->
+      <!-- Other sites dropdown 
       <li ng-if="!noSites" class="other-sites dropdown">
           <a class="dropdown-toggle" data-toggle="dropdown" ng-click="reset()">
             Other Sites<i class="nav-dropdown-icon fa fa-caret-down"></i>
@@ -71,25 +94,12 @@
 
           </ul>
 
-      </li>
+      </li>  -->
 
-      <li class="docweb-flyover out-link" ng-if="type != 'docweb'">
-        <a href="docweb.html#/workspaces/{{ws}}/sites/{{site}}">DocWeb</a>
-      </li>
-
-      <li class="dashboard-flyover out-link">
-        <a href="/share/page/site/{{site}}/dashboard">Dashboard</a>
-      </li>
-
-      <!-- Support, Portal, and logout buttons -->
+      <!-- Dashboard, Support, Feedback, and Logout buttons -->
       <ul class="nav-btns-main pull-right">
-        
-        <li>
-          <a class="nav-btn portal-btn" tooltip="Workspaces" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" href="mm.html" target="_blank"><i class="fa fa-code-fork"></i></a>
-        </li>
-
-        <li>
-          <a class="nav-btn portal-btn" tooltip="Site Portal" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" href="portal.html#/workspaces/{{ws}}" target="_blank"><i class="fa fa-sitemap"></i></a>
+        <li ng-show="site">
+          <a class="nav-btn" tooltip="Dashboard" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" href="/share/page/site/{{site}}/dashboard" target="_blank"><i class="fa fa-dashboard"></i></a>
         </li>
 
         <li>
@@ -107,13 +117,20 @@
       </ul>
 
       <ul class="nav-btns-flyover pull-right">
-
+        <li ng-show="site && ws" class="out-link">
+          <a href="docweb.html#/workspaces/{{ws}}/sites/{{site}}">DocWeb</a>
+        </li>
+        
+        <li ng-show="ws" class="out-link">
+          <a href="portal.html#/workspaces/{{ws}}">Site Portal</a>
+        </li>
+        
         <li class="out-link">
-          <a href="mm.html" target="_blank">Workspaces</a>
+          <a href="mm.html">Model Manager</a>
         </li>
 
-        <li class="out-link">
-          <a href="portal.html#/workspaces/{{ws}}" target="_blank">Site Portal</a>
+        <li ng-show="site" class="out-link">
+          <a href="/share/page/site/{{site}}/dashboard">Dashboard</a>
         </li>
 
         <li class="out-link">
