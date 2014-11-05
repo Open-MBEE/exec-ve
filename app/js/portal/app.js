@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('myApp', ['ui.router', 'mms', 'mms.directives'])
+angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.borderLayout', 'ui.bootstrap', 'ui.tree', 'angular-growl'])
 .config(function($stateProvider, $urlRouterProvider) {
     $stateProvider
     .state('portal', {
@@ -20,32 +20,42 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives'])
                     $scope.ws = ws;
                 }
             },
-            'main': {
-                templateUrl: 'partials/portal/sites.html',
+            'pane-center': {
+                templateUrl: 'partials/portal/pane-center.html',
                 controller: 'PortalCtrl'
+            },
+            'pane-left': {
+                templateUrl: 'partials/portal/pane-left.html',
+                controller: 'NavTreeCtrl'
+            },
+            'pane-right': {
+                templateUrl: 'partials/portal/pane-right.html'
+            },
+            'toolbar-right': {
+                template: '<mms-toolbar buttons="buttons" on-click="onClick(button)" mms-tb-api="tbApi"></mms-toolbar>',
+                controller: 'ToolbarCtrl'
+            }            
+        }
+    })
+    .state('portal.site', {
+        url: '/site/:site',
+        resolve: {
+            documents: function($stateParams, ViewService) {
+                return ViewService.getSiteDocuments($stateParams.site, null, $stateParams.ws, null);
+            }
+        },
+        views: {
+            'pane-center@': {
+                templateUrl: 'partials/portal/pane-center.html',
+                controller: function ($scope, $stateParams, documents) {
+                    $scope.ws = $stateParams.ws;
+                    $scope.site = $stateParams.site;
+                    $scope.documents = documents;
+                    $scope.buttons = [];
+                 }
             }
         }
     });
-})
-.controller('PortalCtrl', ['$scope', 'SiteService', 'sites', 'ws',
-    function($scope, SiteService, sites, ws) {
-        $scope.ws = ws;
-        var categories = {};
-        for (var i = 0; i < sites.length; i++) {
-            var site = sites[i];
-            if (site.categories.length === 0)
-                site.categories.push("Uncategorized");
-            for (var j = 0; j < site.categories.length; j++) {
-                var cat = site.categories[j];
-                if (categories.hasOwnProperty(cat)) {
-                    categories[cat].push(site);
-                } else {
-                    categories[cat] = [site];
-                }
-            }
-        }
-        $scope.categories = categories;
-}]);
-
+});
 
 
