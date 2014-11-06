@@ -25,7 +25,7 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
                 controller: 'PortalCtrl'
             },
             'pane-left': {
-                templateUrl: 'partials/portal/pane-left.html',
+                templateUrl: 'partials/shared/pane-left.html',
                 controller: 'NavTreeCtrl'
             },
             'pane-right': {
