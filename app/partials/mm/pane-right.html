@@ -3,12 +3,14 @@
 	    <h1 class="prop element-title">{{element.name}}</h1>
 
 	    <h2 class="prop-title">TASK AUTHOR</h2>
-	    <h3 class="prop">{{element.modified | date:'M/d/yy h:mm a'}} by {{element.creator}}</h3>
+	    <h3 class="prop">{{element.creator}}</h3>
+
+		<!-- TODO: NOTE: Created is really modified, revert back when fixed.  Branched is created -->
 
 	    <h2 class="prop-title spec-view-type-heading">LAST MODIFIED</h2>
-	    <h3 class="prop">{{element.specialization.type || 'Element'}}</h3>
+	    <h3 class="prop">{{element.created | date:'M/d/yy h:mm a'}}</h3>
 
 	    <h2 class="prop-title">DATE CREATED</h2>
-	    <h3 class="prop">{{element.qualifiedName}}</h3>
+	    <h3 class="prop">{{element.branched | date:'M/d/yy h:mm a'}}</h3>
     </div>
 </div>

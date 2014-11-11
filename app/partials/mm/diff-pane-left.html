@@ -1,6 +1,6 @@
-<div class="pane-left" fa-pane pane-anchor="west" pane-size="300px" pane-min="20px">
+<div class="pane-left">
 
-	<table class="table">
+	<table>
 
 		<h3>Differences<button ng-show="unstagedCounter" ng-click="stageAllUnstaged(changes)" type="button" class="btn btn-staging btn-stage-all"><i class="fa fa-arrow-down"></i></button></h3>
 
@@ -31,18 +31,5 @@
 
    <button type="button" ng-click="mergeStagedChanges()" class="btn btn-success">SAVE CHANGES <i class="fa fa-spin fa-spinner" ng-show="saving"></i></button>
    <button type="button" ng-click="goBack()" class="btn btn-danger">CANCEL</button>
-
-</div>
-
-<div class="pane-right" fa-pane pane-anchor="east" pane-size="20%" pane-handle="14" pane-min="20px">
-
-   <h3>Model Context</h3>
-	<mms-tree tree-data="treeData" tree-control="treeapi" section-numbering="false" options="options"></mms-tree>
-
-</div>
-
-<div class="pane-center" fa-pane pane-anchor="center" pane-size="60%" pane-min="30px">
-
-	<div ui-view="view">Select a change to inspect from the left pane.</div>
 
 </div>

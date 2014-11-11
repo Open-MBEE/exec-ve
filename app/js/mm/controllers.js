@@ -1,68 +1,153 @@
 'use strict';
 
-angular.module('mm')
-.controller('DiffController', ["$scope", "$modal", "growl", "WorkspaceService", "workspaces",
-function($scope, $modal, growl, WorkspaceService, workspaces) {
-    $scope.workspaces = workspaces;
+/* Controllers */
 
-    var workspaces_groupByParent = {};
+angular.module('myApp')
+.controller('ToolbarCtrl', ['$scope', '$rootScope',
+function($scope, $rootScope) {   
+    $scope.tbApi = {};
+    $rootScope.veTbApi = $scope.tbApi;
 
-    var workspacesIdtoWorkspace = {};
+    $scope.buttons = [
+        {id: 'elementViewer', icon: 'fa fa-eye', selected: true, active: true, tooltip: 'Preview Element', 
+            onClick: function() {$rootScope.$broadcast('elementViewerSelected');}},
+        {id: 'elementEditor', icon: 'fa fa-edit', selected: false, active: true, tooltip: 'Edit Element',
+            onClick: function() {$rootScope.$broadcast('elementEditorSelected');}},
+        {id: 'viewStructEditor', icon: 'fa fa-arrows-v', selected: false, active: true, tooltip: 'Reorder View',
+            onClick: function() {$rootScope.$broadcast('viewStructEditorSelected');}},
+        {id: 'documentSnapshots', icon: 'fa fa-camera', selected: false, active: true, tooltip: 'Snapshots',
+            onClick: function() {$rootScope.$broadcast('snapshotsSelected');}},
+        {id: 'elementSave', icon: 'fa fa-save', pullDown: true, dynamic: true, selected: false, active: false, tooltip: 'Save',
+            onClick: function() {$rootScope.$broadcast('elementSave');}},
+        {id: 'elementCancel', icon: 'fa fa-times', dynamic: true, selected: false, active: false, tooltip: 'Cancel',
+            onClick: function() {$rootScope.$broadcast('elementCancel');}},
+        {id: 'viewSave', icon: 'fa fa-save', pullDown: true, dynamic: true, selected: false, active: false, tooltip: 'Save',
+            onClick: function() {$rootScope.$broadcast('viewSave');}},
+        {id: 'viewCancel', icon: 'fa fa-times', dynamic: true, selected: false, active: false, tooltip: 'Cancel',
+            onClick: function() {$rootScope.$broadcast('viewCancel');}},
+        {id: 'snapRefresh', icon: 'fa fa-refresh', pullDown: true, dynamic: true, selected: false, active: false, tooltip: 'Refresh',
+            onClick: function() {$rootScope.$broadcast('refreshSnapshots');}},
+        {id: 'snapNew', icon: 'fa fa-plus', dynamic: true, selected: false, active: false, tooltip: 'Create Snapshot',
+            onClick: function() {$rootScope.$broadcast('newSnapshot');}}
+    ];
 
-    workspaces.forEach(function (workspace) {
-        workspacesIdtoWorkspace[workspace.id] = workspace;
-    });
+    $scope.onClick = function(button) {
+    };
+}])
+.controller('WorkspaceTreeCtrl', ['$scope', '$rootScope', '$location', '$timeout', '$state', '$anchorScroll', 'WorkspaceService', 'ElementService', 'ViewService', 'growl', '$modal', '$q', '$filter', 'workspaces',
+function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, WorkspaceService, ElementService, ViewService, growl, $modal, $q, $filter, workspaces) {
 
-    workspaces.forEach(function (workspace) {
-        if (workspace.id === 'master') {
-          $scope.master = workspace;
-          return;
+    $scope.buttons = [
+    {
+        action: function(){ $scope.treeApi.expand_all(); },        
+        tooltip: "Expand All",
+        icon: "fa-caret-square-o-down",
+        permission: true
+    }, {
+        action: function(){ $scope.treeApi.collapse_all(); },
+        tooltip: "Collapse All",
+        icon: "fa-caret-square-o-up",
+        permission: true
+    }, {
+        action: function(){ $scope.toggleFilter(); },
+        tooltip: "Filter Sites",
+        icon: "fa-filter",
+        permission: true
+    },
+    {
+        action: function(){ $scope.addTask(); },
+        tooltip: "Add Task",
+        icon: "fa-plus",
+        permission: true
+        // TODO: permission: $scope.editable
+    },
+    {
+        action: function(){ $scope.toggleMerge(); },
+        tooltip: "Merge Task",
+        icon: "fa-share-alt fa-flip-horizontal",
+        permission: true
+        // TODO: permission: $scope.editable
+    }];
+
+    $scope.filterOn = false;
+    $scope.toggleFilter = function() {
+        $scope.filterOn = !$scope.filterOn;
+    };
+
+    $scope.mergeOn = false;
+    $scope.toggleMerge = function() {
+
+        var branch = treeApi.get_selected_branch();
+        if (!branch) {
+            growl.error("Merge Error: Select task to merge from");
+            return;
         }
-        if (! workspaces_groupByParent.hasOwnProperty(workspace.parent)) {
-            workspaces_groupByParent[workspace.parent] = [];
+
+        var parent_branch = treeApi.get_parent_branch(branch);
+
+        $scope.mergeOn = !$scope.mergeOn;
+        $scope.mergeFromWs = branch.data;
+        $scope.mergeToWs = parent_branch.data;
+    };
+
+    $scope.pickNewTarget = function(branch) {
+        $scope.mergeToWs = branch.data;
+    };
+
+    $scope.tooltipPlacement = function(arr) {
+        arr[0].placement = "bottom-left";
+        for(var i=1; i<arr.length; i++){
+            arr[i].placement = "bottom";
         }
+    };
+    var treeApi = {};
+    $scope.tooltipPlacement($scope.buttons);
+    $scope.treeApi = treeApi;
+    $rootScope.treeApi = treeApi;
+ 
+ 
+    var buildTreeHierarchy = function (array) {
+    	var rootNodes = [];
+    	var data2Node = {};
 
-        workspaces_groupByParent[workspace.parent].push(workspace);
-    });
+    	// make first pass to create all nodes
+    	array.forEach(function(data) {
+    		data2Node[data.id] = 
+   			{ 
+		        label : data.name, 
+		        type : 'view',
+		        data : data, 
+		        children : [] 
+        	};
+    	});
 
-    workspaces.forEach(function (workspace) {
-        if (workspaces_groupByParent.hasOwnProperty(workspace.id)) return;
+    	// make second pass to associate data to parent nodes
+    	array.forEach(function(data) {
+    		if (data.parent)	
+ 		   		data2Node[data.parent].children.push(data2Node[data.id]);
+ 		   	else
+ 		   		rootNodes.push(data2Node[data.id]);
+    	});
 
-        workspaces_groupByParent[workspace.id] = [];
-    });
-
-    $scope.workspacesIdtoWorkspace = workspacesIdtoWorkspace;
-    $scope.workspaces_groupByParent_keys = Object.keys(workspaces_groupByParent);
-    $scope.workspaces_groupByParent = workspaces_groupByParent;
-
-    $scope.merge_state = {};
-    $scope.merge_state.pickA = true;
-    $scope.merge_state.pickB = false;
-    $scope.merge_state.merge = false;
-
-    $scope.cancelPick = function () {
-        $scope.merge_state.pickA = true;
-        $scope.merge_state.pickB = false;
-        $scope.merge_state.merge = false;
-        $scope.merge_state.A = "";
-        $scope.merge_state.B = "";
+    	return rootNodes;
     };
 
-    $scope.pickA = function (workspace) {
-        $scope.merge_state.pickA = false;
-        $scope.merge_state.pickB = true;
-        $scope.merge_state.merge = false;
-        $scope.merge_state.A = workspace;
+    var dataTree = buildTreeHierarchy(workspaces);
+
+    $scope.my_data = dataTree;
+
+    $scope.my_tree_handler = function(branch) {
+        $state.go('mm.workspace', {ws: branch.data.id});
     };
 
-    $scope.pickB = function (workspace) {
-        $scope.merge_state.pickA = false;
-        $scope.merge_state.pickB = false;
-        $scope.merge_state.merge = true;
-        $scope.merge_state.B = workspace;
+    $scope.tree_options = {
+        types: {
+            "section": "fa fa-file-o fa-fw",
+            "view": "fa fa-file fa-fw"
+        }
     };
 
-    $scope.createWorkspace = function (wsParentId) {
+    $scope.createWorkspace = function (branch, wsParentId) {
       $scope.createWsParentId = wsParentId;
 
       var instance = $modal.open({
@@ -71,12 +156,54 @@ function($scope, $modal, growl, WorkspaceService, workspaces) {
           controller: ['$scope', '$modalInstance', workspaceCtrl]
       });
       instance.result.then(function(data) {
+        treeApi.add_branch(branch, {
+            label: data.name,
+            type: "view",
+            data: data,
+            children: []
+        });
+        /*
           $scope.workspaces_groupByParent[data.id] = [];
           $scope.workspaces_groupByParent[data.parent].push(data);
           $scope.workspaces_groupByParent_keys.push(data.id);
-          $scope.workspacesIdtoWorkspace[data.id] = data;
+          $scope.workspacesIdtoWorkspace[data.id] = data; */
       });
     };
+
+    // var adding = false;
+    $scope.addTask = function() {
+        /*if (adding) {
+            growl.info('Please wait...');
+            return;
+        }
+        adding = true; */
+        var branch = treeApi.get_selected_branch();
+        if (!branch) {
+            growl.error("Add Task Error: Select parent view first");
+            return;
+        }
+
+        $scope.createWorkspace(branch, branch.data.id);
+
+        /*$scope.buttons[3].icon = 'fa-spin fa-spinner';
+        ViewService.createView(branch.data.sysmlid, 'Untitled View', $scope.document.sysmlid, ws)
+        .then(function(view) {
+            $scope.buttons[3].icon = 'fa-plus';
+            treeApi.add_branch(branch, {
+                label: view.name,
+                type: "view",
+                data: view,
+                children: []
+            });
+            adding = false;
+        }, function(reason) {
+            growl.error('Add View Error: ' + reason.message);
+            $scope.buttons[3].icon = 'fa-plus';
+            adding = false;
+        });*/
+    };
+
+
 
       var workspaceCtrl = function($scope, $modalInstance) {
         $scope.workspace = {};
@@ -95,25 +222,31 @@ function($scope, $modal, growl, WorkspaceService, workspaces) {
             $modalInstance.dismiss();
         };
     };
-
 }])
-.controller('DiffTreeController', ["_", "$timeout", "$scope", "$rootScope", "$http", "$state", "$stateParams", "$modal", "growl", "WorkspaceService", "ElementService", "diff",
+.controller('WorkspaceDiffChangeController', ["_", "$timeout", "$scope", "$rootScope", "$http", "$state", "$stateParams", "$modal", "growl", "WorkspaceService", "ElementService", "diff",
 function(_, $timeout, $scope, $rootScope, $http, $state, $stateParams, $modal, growl, WorkspaceService, ElementService, diff) {
 
     var ws1 = $stateParams.source;
     var ws2 = $stateParams.target;
 
+    $scope.treeApi = {};
+
+    var treeApiLocal = $rootScope.treeApi;
+
+    $scope.treeApi = treeApiLocal;
+
+    $rootScope.treeData = [];
+
     $scope.diff = diff;
     
-    $scope.treeapi = {};
-
-    $scope.treeData = [];
-
     $scope.changes = [];
 
     $scope.id2change = {};
 
-    $scope.id2node = {};
+    $rootScope.id2node = {};
+
+    $scope.stagedCounter = 0;
+    $scope.unstagedCounter = 0;
 
     $scope.options = {
       types: {
@@ -134,9 +267,6 @@ function(_, $timeout, $scope, $rootScope, $http, $state, $stateParams, $modal, g
         'conflict': { style: "" }
       }
     };
-
-    $scope.stagedCounter = 0;
-    $scope.unstagedCounter = 0;
 
     var stageChange = function(change) {
       change.staged = ! change.staged;
@@ -209,14 +339,14 @@ function(_, $timeout, $scope, $rootScope, $http, $state, $stateParams, $modal, g
         }
       }      
 
-      $scope.treeapi.refresh();
-      $scope.treeapi.expand_all();
+      $rootScope.treeApi.refresh();
+      $rootScope.treeApi.expand_all();
 
       refreshStageCounters();
     };
 
     $scope.goBack = function () {
-      $state.go('main', {}, {reload:true});
+      $state.go('mm', {}, {reload:true});
     };
 
     $scope.mergeStagedChanges = function (workspaceId) {
@@ -241,7 +371,7 @@ function(_, $timeout, $scope, $rootScope, $http, $state, $stateParams, $modal, g
           .then(function(data) {
               growl.success("Workspace Elements Merged");
               $scope.saving = false;
-              $state.go('main', {}, {reload:true});
+              $state.go('mm', {}, {reload:true});
           }, function(reason) {
             growl.error("Workspace Merge Error: " + reason.message);
             $scope.saving = false;
@@ -300,7 +430,7 @@ function(_, $timeout, $scope, $rootScope, $http, $state, $stateParams, $modal, g
       else
         elementId = change.original.sysmlid;
 
-      $state.go('main.diff.view', {elementId: elementId});
+      $state.go('mm.diff.view', {elementId: elementId});
     };
 
 
@@ -405,13 +535,13 @@ function(_, $timeout, $scope, $rootScope, $http, $state, $stateParams, $modal, g
 
         ws1.elements.forEach(function(e) {
           if (!id2node.hasOwnProperty(e.owner)) 
-              $scope.treeData.push(id2node[e.sysmlid]);          
+              $rootScope.treeData.push(id2node[e.sysmlid]);          
           else
               id2node[e.owner].children.push(id2node[e.sysmlid]);
         });
 
-        $scope.treeapi.refresh();
-        $scope.treeapi.expand_all();
+        // $scope.treeApi.refresh();
+        // $scope.treeApi.expand_all();
 
         ws2.addedElements.forEach(function(e) {
           id2data[e.sysmlid] = e;
@@ -522,21 +652,62 @@ function(_, $timeout, $scope, $rootScope, $http, $state, $stateParams, $modal, g
 
         });
 
-        $scope.id2node = id2node;
+        $rootScope.id2node = id2node;
+
+        var id2change = $scope.id2change;
+
+        $rootScope.id2change = id2change;
 
         refreshStageCounters();
     };
 
     $timeout(function () { setupChangesList(diff.workspace1, diff.workspace2); } ); 
+}])
+.controller('WorkspaceDiffTreeController', ["_", "$timeout", "$scope", "$rootScope", "$http", "$state", "$stateParams", "$modal", "growl", "WorkspaceService", "ElementService", "diff",
+function(_, $timeout, $scope, $rootScope, $http, $state, $stateParams, $modal, growl, WorkspaceService, ElementService, diff) {
 
+    $scope.treeApi = {};
+
+    $scope.treeData = [];
+    
+    $scope.treeData = $rootScope.treeData;
+
+    $scope.options = {
+      types: {
+        'Element': 'fa fa-square',
+        'Property': 'fa fa-circle',
+        'View': 'fa fa-square',
+        'Dependency': 'fa fa-long-arrow-right',
+        'DirectedRelationship': 'fa fa-long-arrow-right',
+        'Generalization': 'fa fa-chevron-right',
+        'Package': 'fa fa-folder',
+        'Connector': 'fa fa-expand'
+      },
+      statuses: {
+        'moved'   : { style: "moved" },
+        'added'   : { style: "addition" },
+        'removed' : { style: "removal" },
+        'updated' : { style: "update" },
+        'conflict': { style: "" }
+      }
+    };
+
+    var options = $scope.options;
+
+    $rootScope.options = options;
+
+    $timeout(function () { $scope.treeApi.refresh(); $scope.treeApi.expand_all(); $rootScope.treeApi = $scope.treeApi; } ); 
+    
+    
 
 }])
-.controller('DiffViewController', ["$scope", "$rootScope", "$http", "$state", "$modal", "$stateParams", "_", "growl", "WorkspaceService", "diff",
-function($scope, $rootScope, $http, $state, $modal, $stateParams, _, growl, WorkspaceService, diff) {
- 
-    var elementId = $stateParams.elementId;
+.controller('WorkspaceDiffElementViewController', ["_", "$timeout", "$scope", "$rootScope", "$http", "$state", "$stateParams", "$modal", "growl", "WorkspaceService", "ElementService", "diff",
+function(_, $timeout, $scope, $rootScope, $http, $state, $stateParams, $modal, growl, WorkspaceService, ElementService, diff) {
 
-    $scope.change = $scope.id2change[elementId];
     $scope.diff = diff;
-    
+
+    $scope.options = $rootScope.options;
+
+    $scope.change = $rootScope.id2change[$stateParams.elementId];
+
 }]);

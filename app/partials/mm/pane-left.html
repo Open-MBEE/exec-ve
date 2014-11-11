@@ -1,0 +1,34 @@
+<div class="pane-left">
+
+  <div class="pane-left-toolbar-wrap">
+
+    <div class="toolbar pane-left-btn-group">
+
+      <a ng-repeat="button in buttons | filter: {permission: true}" type="button" class="view-tools" ng-click="button.action()" tooltip="{{button.tooltip}}" tooltip-append-to-body="true" tooltip-trigger="mouseenter" tooltip-popup-delay="400" tooltip-placement="{{button.placement}}">
+
+        <span class="fa {{button.icon}}"></span>
+
+      </a>
+      
+    </div>
+
+  </div>
+
+  <div>
+
+    <input class="input-filter-tree form-control" ng-show="filterOn" ng-model="search" type="text" placeholder="Type here to filter sites in the tree" ng-change="treeApi.expand_all()">
+
+  </div>
+
+  <div ng-show="mergeOn">
+    <span> Source (From): {{mergeFromWs.name}} </span>
+    <br>
+    <span> Target (To): {{mergeToWs.name}} </span>
+ 	<a class="btn btn-primary btn-xs" ng-click="pickNewTarget(treeApi.get_selected_branch())">Pick new Target</a>
+    <br>
+	<a class="btn btn-success btn-xs" ui-sref="mm.diff({source: mergeFromWs.id, target: mergeToWs.id})">MERGE <i ng-show="comparing" class="fa fa-spin fa-spinner"></i></a>
+  </div>
+
+  <mms-tree search="search" tree-data="my_data" section-numbering="false" tree-control="treeApi" on-select="my_tree_handler(branch)" initial-selection="" options="tree_options"></mms-tree>
+
+</div>
