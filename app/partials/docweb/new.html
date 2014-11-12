@@ -1,21 +1,21 @@
-<div class="docweb-container-new container-fluid">
+<div class="modal-header">
+  <h4>CREATE NEW DOCUMENT</h4>
+</div>
 
-  <form ng-submit="new()">
-    <h5>Name:</h5>
-    <input class="form-control" type="text" ng-model="newConfigName"/>
+<div class="modal-body comment-modal">
+  
+  <div class="comment-modal-input">
 
-    <h5>Description:</h5>
-    <textarea class="form-control" ng-model="newConfigDesc"></textarea>
-
-    <h5>Documents To Snapshot:</h5>
-    <div ng-repeat="doc in products | orderBy:'name'">
-        <input type="checkbox" ng-model="doc.add" ng-change="toggleCheck(doc.sysmlid)"/> {{doc.name}}
+    <div class="form-group">
+      <label>Name:</label>
+      <input class="form-control" ng-model="document.name" type="text" placeholder="Type a name for your document here"></input>
     </div>
 
-    <hr/>
+  </div>
 
-    <button class="btn btn-success" type="submit">CREATE</button>
+</div>
 
-  </form>
-
+<div class="modal-footer">
+    <button class="btn btn-success" ng-click="ok()">CREATE</button>
+    <button class="btn btn-danger" ng-click="cancel()">CANCEL</button>
 </div>

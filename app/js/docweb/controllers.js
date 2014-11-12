@@ -3,7 +3,165 @@
 /* Controllers */
 
 angular.module('myApp')
-  .controller('ConfigsCtrl', ["$scope", "$http", "$state", "$stateParams",  "configs", 'ws', 
+    .controller('ToolbarCtrl', ['$scope', '$rootScope',
+    function($scope, $rootScope) {   
+        $scope.tbApi = {};
+        $rootScope.veTbApi = $scope.tbApi;
+
+        $scope.buttons = [
+            {id: 'elementViewer', icon: 'fa fa-eye', selected: true, active: true, tooltip: 'Preview Element', 
+                onClick: function() {$rootScope.$broadcast('elementViewerSelected');}},
+            {id: 'elementEditor', icon: 'fa fa-edit', selected: false, active: true, tooltip: 'Edit Element',
+                onClick: function() {$rootScope.$broadcast('elementEditorSelected');}},
+            {id: 'viewStructEditor', icon: 'fa fa-arrows-v', selected: false, active: true, tooltip: 'Reorder View',
+                onClick: function() {$rootScope.$broadcast('viewStructEditorSelected');}},
+            {id: 'documentSnapshots', icon: 'fa fa-camera', selected: false, active: true, tooltip: 'Snapshots',
+                onClick: function() {$rootScope.$broadcast('snapshotsSelected');}},
+            {id: 'elementSave', icon: 'fa fa-save', pullDown: true, dynamic: true, selected: false, active: false, tooltip: 'Save',
+                onClick: function() {$rootScope.$broadcast('elementSave');}},
+            {id: 'elementCancel', icon: 'fa fa-times', dynamic: true, selected: false, active: false, tooltip: 'Cancel',
+                onClick: function() {$rootScope.$broadcast('elementCancel');}},
+            {id: 'viewSave', icon: 'fa fa-save', pullDown: true, dynamic: true, selected: false, active: false, tooltip: 'Save',
+                onClick: function() {$rootScope.$broadcast('viewSave');}},
+            {id: 'viewCancel', icon: 'fa fa-times', dynamic: true, selected: false, active: false, tooltip: 'Cancel',
+                onClick: function() {$rootScope.$broadcast('viewCancel');}},
+            {id: 'snapRefresh', icon: 'fa fa-refresh', pullDown: true, dynamic: true, selected: false, active: false, tooltip: 'Refresh',
+                onClick: function() {$rootScope.$broadcast('refreshSnapshots');}},
+            {id: 'snapNew', icon: 'fa fa-plus', dynamic: true, selected: false, active: false, tooltip: 'Create Snapshot',
+                onClick: function() {$rootScope.$broadcast('newSnapshot');}}
+        ];
+
+        $scope.onClick = function(button) {
+        };
+    }])
+    .controller('DocWebCtrl', ['$scope', 'ws', 'site', 'documents',
+        function($scope, ws, site, documents) {
+            $scope.ws = ws;
+            $scope.site = site.name;
+            $scope.documents = documents;
+    }])
+    .controller('DocWebTreeCtrl', ['$scope', '$rootScope', '$location', '$timeout', '$state', '$anchorScroll', 'ElementService', 'ViewService', 'growl', '$modal', '$q', '$filter', 'ws', 'site', 'documents',
+    function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, ElementService, ViewService, growl, $modal, $q, $filter, ws, site, documents) {
+        $scope.ws = ws;
+        $scope.site = site.name;
+
+        $scope.buttons = [{
+            action: function(){ $scope.treeApi.expand_all(); },        
+            tooltip: "Expand All",
+            icon: "fa-caret-square-o-down",
+            permission: true
+        }, {
+            action: function(){ $scope.treeApi.collapse_all(); },
+            tooltip: "Collapse All",
+            icon: "fa-caret-square-o-up",
+            permission: true
+        }, {
+            action: function(){ $scope.toggleFilter(); },
+            tooltip: "Filter Documents",
+            icon: "fa-filter",
+            permission: true
+        },
+        {
+            action: function(){ $scope.addDocument(); },
+            tooltip: "Add Document",
+            icon: "fa-plus",
+            permission: true
+            // TODO: permission: $scope.editable
+        }];
+
+        $scope.filterOn = false;
+        $scope.toggleFilter = function() {
+            $scope.filterOn = !$scope.filterOn;
+        };
+
+        $scope.tooltipPlacement = function(arr) {
+            arr[0].placement = "bottom-left";
+            for(var i=1; i<arr.length; i++){
+                arr[i].placement = "bottom";
+            }
+        };
+        var treeApi = {};
+        $scope.tooltipPlacement($scope.buttons);
+        $scope.treeApi = treeApi;
+
+
+        var buildTreeHierarchy = function (array) {
+            var rootNodes = [];
+            var data2Node = {};
+
+            // make first pass to create all nodes
+            array.forEach(function(data) {
+                data2Node[data.sysmlid] = 
+                { 
+                    label : data.name, 
+                    type : data.type,
+                    data : data, 
+                    children : [] 
+                };
+            });
+
+            // make second pass to associate data to parent nodes
+            array.forEach(function(data) {
+                if (data2Node.hasOwnProperty(data.owner))    
+                    data2Node[data.owner].chlidren.push(data2Node[data.sysmlid]);
+                else
+                    rootNodes.push(data2Node[data.sysmlid]);
+            });
+
+            return rootNodes;
+        };
+
+        var dataTree = buildTreeHierarchy(documents);
+
+        $scope.my_data = dataTree;
+
+        $scope.my_tree_handler = function(branch) {
+            $state.go('docweb.site', {site: branch.data.id});
+        };
+
+        $scope.tree_options = {
+            types: {
+                "section": "fa fa-file-o fa-fw",
+                "view": "fa fa-file fa-fw"
+            }
+        };
+
+        $scope.addDocument = function() {
+
+          var instance = $modal.open({
+              templateUrl: 'partials/docweb/new.html',
+              scope: $scope,
+              controller: ['$scope', '$modalInstance', documentCtrl]
+          });
+          instance.result.then(function(data) {
+            treeApi.add_root_branch({
+                label: data.name,
+                type: "view",
+                data: data,
+                children: []
+            });
+          });
+        };
+
+      var documentCtrl = function($scope, $modalInstance) {
+            $scope.document = {};
+            $scope.document.name = "";
+
+            $scope.ok = function() {
+                ViewService.createDocument($scope.document.name, $scope.site, $scope.ws)
+                .then(function(data) {
+                    growl.success("Create Document Successful");
+                }, function(reason) {
+                    growl.error("Create Document Error: " + reason.message);
+                });
+            };
+            $scope.cancel = function() {
+                $modalInstance.dismiss();
+            };
+        };
+
+    }])
+  /*.controller('ConfigsCtrl', ["$scope", "$http", "$state", "$stateParams",  "configs", 'ws', 
     function($scope, $http, $state, $stateParams, configs, ws) {
     $scope.configs = configs;
     $scope.site = $stateParams.site;
@@ -211,7 +369,7 @@ angular.module('myApp')
             return;
         }*/
 
-        var create = {"name": $scope.newConfigName, "description": $scope.newConfigDesc};
+        /*var create = {"name": $scope.newConfigName, "description": $scope.newConfigDesc};
 
         ConfigService.createConfig(create, $scope.site, ws)
         .then(
@@ -236,6 +394,6 @@ angular.module('myApp')
                 growl.error("Create of Config Failed: " + reason.message);
             }
         );
-    };
+    }; */
 
-  }]);
+  /*}])*/;

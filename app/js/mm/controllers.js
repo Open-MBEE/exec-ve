@@ -151,7 +151,7 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, Workspa
       $scope.createWsParentId = wsParentId;
 
       var instance = $modal.open({
-          templateUrl: 'partials/mm/new.html',
+          templateUrl: 'partials/docweb/new.html',
           scope: $scope,
           controller: ['$scope', '$modalInstance', workspaceCtrl]
       });
@@ -162,11 +162,6 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, Workspa
             data: data,
             children: []
         });
-        /*
-          $scope.workspaces_groupByParent[data.id] = [];
-          $scope.workspaces_groupByParent[data.parent].push(data);
-          $scope.workspaces_groupByParent_keys.push(data.id);
-          $scope.workspacesIdtoWorkspace[data.id] = data; */
       });
     };
 
