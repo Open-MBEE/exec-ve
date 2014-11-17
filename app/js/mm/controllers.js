@@ -34,8 +34,8 @@ function($scope, $rootScope) {
     $scope.onClick = function(button) {
     };
 }])
-.controller('WorkspaceTreeCtrl', ['$scope', '$rootScope', '$location', '$timeout', '$state', '$anchorScroll', 'WorkspaceService', 'ElementService', 'ViewService', 'growl', '$modal', '$q', '$filter', 'workspaces',
-function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, WorkspaceService, ElementService, ViewService, growl, $modal, $q, $filter, workspaces) {
+.controller('WorkspaceTreeCtrl', ['$scope', '$rootScope', '$location', '$timeout', '$state', '$stateParams','$anchorScroll', 'WorkspaceService', 'ElementService', 'ViewService', 'growl', '$modal', '$q', '$filter', 'workspaces',
+function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorScroll, WorkspaceService, ElementService, ViewService, growl, $modal, $q, $filter, workspaces) {
 
     $scope.buttons = [
     {
@@ -50,7 +50,7 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, Workspa
         permission: true
     }, {
         action: function(){ $scope.toggleFilter(); },
-        tooltip: "Filter Sites",
+        tooltip: "Filter Tasks",
         icon: "fa-filter",
         permission: true
     },
@@ -79,7 +79,7 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, Workspa
 
         var branch = treeApi.get_selected_branch();
         if (!branch) {
-            growl.error("Merge Error: Select task to merge from");
+            growl.warning("Merge Error: Select task to merge from");
             return;
         }
 
@@ -147,11 +147,13 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, Workspa
         }
     };
 
+    $rootScope.tree_initial = "";
+
     $scope.createWorkspace = function (branch, wsParentId) {
       $scope.createWsParentId = wsParentId;
 
       var instance = $modal.open({
-          templateUrl: 'partials/docweb/new.html',
+          templateUrl: 'partials/mm/new.html',
           scope: $scope,
           controller: ['$scope', '$modalInstance', workspaceCtrl]
       });
@@ -174,7 +176,7 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, Workspa
         adding = true; */
         var branch = treeApi.get_selected_branch();
         if (!branch) {
-            growl.error("Add Task Error: Select parent view first");
+            growl.warning("Add Task Error: Select parent view first");
             return;
         }
 

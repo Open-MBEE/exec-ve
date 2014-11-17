@@ -40,19 +40,22 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
         views: {
             'pane-center@': {
                 templateUrl: 'partials/mm/pane-center.html',
-                controller: function ($scope, $stateParams, sites) {
-                    $scope.ws = $stateParams.ws;
-                    $scope.sites = sites;
-                    $scope.buttons = [];
-                 }
-            },
-            'pane-right@': {
-                templateUrl: 'partials/mm/pane-right.html',
                 controller: function ($rootScope, $scope, $stateParams, sites) {
                     $scope.ws = $stateParams.ws;
                     $scope.sites = sites;
                     $scope.buttons = [];
-                    $scope.element = $rootScope.treeApi.get_selected_branch().data;
+                    $rootScope.tree_initial = $scope.ws;
+                 }
+            },
+            'pane-right@': {
+                templateUrl: 'partials/mm/pane-right.html',
+                controller: function ($rootScope, $scope, $stateParams, WorkspaceService, sites) {
+                    $scope.ws = $stateParams.ws;
+                    $scope.sites = sites;
+                    $scope.buttons = [];
+                    WorkspaceService.getWorkspace($scope.ws).then(function(data) {
+                        $scope.element = data;
+                    });
                  }
             }
         }

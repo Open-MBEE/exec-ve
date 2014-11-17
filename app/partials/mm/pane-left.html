@@ -16,7 +16,7 @@
 
   <div>
 
-    <input class="input-filter-tree form-control" ng-show="filterOn" ng-model="search" type="text" placeholder="Type here to filter sites in the tree" ng-change="treeApi.expand_all()">
+    <input class="input-filter-tree form-control" ng-show="filterOn" ng-model="search" type="text" placeholder="Type here to filter items in the tree" ng-change="treeApi.expand_all()">
 
   </div>
 
@@ -29,6 +29,6 @@
 	<a class="btn btn-success btn-xs" ui-sref="mm.diff({source: mergeFromWs.id, target: mergeToWs.id})">MERGE <i ng-show="comparing" class="fa fa-spin fa-spinner"></i></a>
   </div>
 
-  <mms-tree search="search" tree-data="my_data" section-numbering="false" tree-control="treeApi" on-select="my_tree_handler(branch)" initial-selection="" options="tree_options"></mms-tree>
+  <mms-tree search="search" tree-data="my_data" section-numbering="false" tree-control="treeApi" on-select="my_tree_handler(branch)" initial-selection="{{tree_initial}}" options="tree_options"></mms-tree>
 
 </div>

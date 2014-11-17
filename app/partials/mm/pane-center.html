@@ -13,7 +13,10 @@
 
   <div class="pane-center-inner">
     
-    <h4><a class="docweb-link" href="portal.html#/workspaces/{{ws}}">Site Portal</a></h4>
+
+    <span ng-if="ws.length > 0">
+      <h4><a class="docweb-link" href="portal.html#/workspaces/{{ws}}">Site Portal</a></h4>
+    </span>
     
     <div ng-repeat="site in sites | orderBy: 'name'">
         <!-- <h4 style="display:inline;">{{document.name}}</h4> -->
