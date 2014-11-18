@@ -115,7 +115,7 @@ function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorS
     		data2Node[data.id] = 
    			{ 
 		        label : data.name, 
-		        type : 'view',
+		        type : 'workspace',
 		        data : data, 
 		        children : [] 
         	};
@@ -143,7 +143,9 @@ function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorS
     $scope.tree_options = {
         types: {
             "section": "fa fa-file-o fa-fw",
-            "view": "fa fa-file fa-fw"
+            "view": "fa fa-file fa-fw",
+            "workspace": "fa fa-tasks fa-fw"
+
         }
     };
 
