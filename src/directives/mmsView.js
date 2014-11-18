@@ -61,11 +61,14 @@ function mmsView(ViewService, $templateCache, growl) {
             if ($scope.mmsCfClicked)
                 $scope.mmsCfClicked({elementId: elementId});
         };
-        this.elementTranscluded = function(elem) {
-            if (elem.modified > $scope.modified) { 
+        this.elementTranscluded = function(elem, type) {
+            if (elem.modified > $scope.modified && type !== 'Comment') { 
                 $scope.modified = elem.modified;
-                $scope.creator = elem.creator;
+                if (elem.creator)
+                    $scope.creator = elem.creator;
             }
+            if ($scope.mmsTranscluded)
+                $scope.mmsTranscluded({element: elem, type: type});
         };
         this.getWsAndVersion = function() {
             return {
@@ -178,7 +181,8 @@ function mmsView(ViewService, $templateCache, growl) {
             mmsVersion: '@',
             mmsNumber: '@',
             mmsCfClicked: '&',
-            mmsViewApi: '='
+            mmsViewApi: '=',
+            mmsTranscluded: '&'
         },
         controller: ['$scope', mmsViewCtrl],
         link: mmsViewLink

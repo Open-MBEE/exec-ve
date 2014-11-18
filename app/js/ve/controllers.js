@@ -463,8 +463,22 @@ function($scope, $rootScope, $stateParams, viewElements, ViewService, time, grow
     $scope.version = time;
     $rootScope.$broadcast('viewSelected', $scope.vid, viewElements);
     $scope.viewApi = {};
+    $scope.comments = {};
+    $scope.numComments = 0;
+    $scope.lastCommented = "";
+    $scope.lastCommentedBy = "";
     $scope.tscClicked = function(elementId) {
         $rootScope.$broadcast('elementSelected', elementId);
+    };
+    $scope.elementTranscluded = function(element, type) {
+        if (type === 'Comment' && !$scope.comments.hasOwnProperty(element.sysmlid)) {
+            $scope.comments[element.sysmlid] = element;
+            $scope.numComments++;
+            if (element.modified > $scope.lastCommented) {
+                $scope.lastCommented = element.modified;
+                $scope.lastCommentedBy = element.creator;
+            }
+        }
     };
 }])
 .controller('ToolbarCtrl', ['$scope', '$rootScope',
