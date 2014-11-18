@@ -191,6 +191,8 @@ function mmsNav(SiteService, WorkspaceService, $templateCache, growl) {
                 site.isOpen = true;
                 if (site.name === scope.site)
                     scope.siteTitle = site.title;
+                // TODO: Replace with .parent
+                site.categories = ["Uncategorized"];
                 if (site.categories.length === 0)
                     site.categories.push("Uncategorized");
                 for (var j = 0; j < site.categories.length; j++) {

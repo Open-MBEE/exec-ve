@@ -21,9 +21,9 @@
     <div ng-repeat="site in sites | orderBy: 'name'">
         <!-- <h4 style="display:inline;">{{document.name}}</h4> -->
 
-      <a class="dash-link" href="portal.html#/workspaces/{{ws}}/site/{{site.name}}">{{site.title}}</a>   
+      <a class="dash-link" href="portal.html#/workspaces/{{ws}}/site/{{site.sysmlid}}">{{site.name}}</a>   
 
-      <a class="dash-link" href="portal.html#/workspaces/{{ws}}/site/{{site.name}}" target="_blank"> <span class="fa fa-external-link"></span></a>   
+      <a class="dash-link" href="portal.html#/workspaces/{{ws}}/site/{{site.sysmlid}}" target="_blank"> <span class="fa fa-external-link"></span></a>   
 
     </div>
 

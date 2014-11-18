@@ -124,8 +124,10 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, Element
 
     	// make first pass to create all nodes
     	array.forEach(function(data) {
-    		data.id = data.name;
-    		data.name = data.title;
+    		data.id = data.sysmlid;
+    		data.name = data.name;
+            // TODO: fix changed to parent
+            data.categories = ["Uncategorized"];
 
     		data2Node[data.name] = 
    			{ 
