@@ -1,4 +1,4 @@
-<div ng-show="editing">
+<div ng-show="editing" class="editing">
     <h1 class="prop"><input class="form-control" type="text" ng-model="edit.name"></input></h1>
 
     <h2 class="prop-title">LAST MODIFICATION</h2>
@@ -34,7 +34,7 @@
 
 </div>
 
-<div ng-hide="editing">
+<div ng-hide="editing" class="reading">
     <h1 class="prop element-title">{{element.name}}</h1>
 
     <h2 class="prop-title">LAST MODIFICATION</h2>
@@ -48,7 +48,31 @@
             <h3 class="prop" ng-switch-when="LiteralReal">{{value.double}}</h3>
             <h3 class="prop" ng-switch-when="LiteralUnlimitedNatural">{{value.naturalValue}}</h3>
             <h3 class="prop" ng-switch-when="LiteralString" ng-bind-html="value.string"></h3>
+            <h3 class="prop" ng-switch-when="ElementValue"><mms-transclude-name mms-eid="{{value.element}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></h3>
         </div>
+        <h2 class="prop-title spec-view-value-heading">PROPERTY TYPE</h2>
+        <h3 class="prop"><mms-transclude-name mms-eid="{{element.specialization.propertyType}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></h3>
+    </div>
+
+    <div ng-if="element.specialization.type === 'Generalization' || element.specialization.type === 'Expose' || element.specialization.type === 'Dependency' || element.specialization.type === 'Conform'">
+        <h2 class="prop-title">SOURCE</h2>
+        <h3 class="prop"><mms-transclude-name mms-eid="{{element.specialization.source}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></h3>
+        <h2 class="prop-title">TARGET</h2>
+        <h3 class="prop"><mms-transclude-name mms-eid="{{element.specialization.target}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></h3>
+    </div>
+
+    <div ng-if="element.specialization.type === 'Connector'">
+        <h2 class="prop-title">PATH 1</h2>
+        <h3 class="prop" ng-repeat="path in element.specialization.sourcePath"><mms-transclude-name mms-eid="{{path}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></h3>
+        <h2 class="prop-title">PATH 2</h2>
+        <h3 class="prop" ng-repeat="path in element.specialization.targetPath"><mms-transclude-name mms-eid="{{path}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></h3>
+    </div>
+
+    <div ng-if="element.specialization.type === 'Association'">
+        <h2 class="prop-title">ROLE 1</h2>
+        <h3 class="prop"><mms-transclude-name mms-eid="{{element.specialization.source}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></h3>
+        <h2 class="prop-title">ROLE 2</h2>
+        <h3 class="prop"><mms-transclude-name mms-eid="{{element.specialization.target}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></h3>
     </div>
 
     <h2 class="prop-title spec-view-doc-heading">DOCUMENTATION</h2>

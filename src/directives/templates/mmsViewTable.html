@@ -1,5 +1,6 @@
-<table class="table table-bordered">
+<table class="table table-bordered table-condensed">
     <caption ng-bind-html="table.title"></caption>
+<thead>
     <tr ng-repeat="row in table.header">
         <th colspan="{{cell.colspan}}" rowspan="{{cell.rowspan}}" ng-repeat="cell in row">
             <div ng-repeat="content in cell.content" ng-switch on="content.type">
@@ -10,6 +11,8 @@
             </div>
         </th>
     </tr>
+</thead>
+<tbody>
     <tr ng-repeat="row in table.body | limitTo: tableLimit">
         <td colspan="{{cell.colspan}}" rowspan="{{cell.rowspan}}" ng-repeat="cell in row">
             <div ng-repeat="content in cell.content" ng-switch on="content.type">
@@ -20,4 +23,5 @@
             </div>
         </td>
     </tr>
+</tbody>
 </table>
