@@ -13,8 +13,10 @@
 
   <div class="pane-center-inner">
     
-    <h4><a class="docweb-link" href="docweb.html#/workspaces/{{ws}}/sites/{{site}}">DocWeb</a></h4>
-    
+    <span ng-if="ws.length > 0 && site.length > 0">
+      <h4><a class="docweb-link" href="docweb.html#/workspaces/{{ws}}/sites/{{site}}">DocWeb</a></h4>
+    </span>
+
     <div ng-repeat="document in documents | orderBy: 'name'">
         <!-- <h4 style="display:inline;">{{document.name}}</h4> -->
 

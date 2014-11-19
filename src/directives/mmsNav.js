@@ -189,8 +189,8 @@ function mmsNav(SiteService, WorkspaceService, $templateCache, growl) {
             for (var i = 0; i < data.length; i++) {
                 var site = data[i];
                 site.isOpen = true;
-                if (site.name === scope.site)
-                    scope.siteTitle = site.title;
+                if (site.sysmlid === scope.site)
+                    scope.siteTitle = site.name;
                 // TODO: Replace with .parent
                 site.categories = ["Uncategorized"];
                 if (site.categories.length === 0)

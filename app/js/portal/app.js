@@ -21,8 +21,7 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
                 }
             },
             'pane-center': {
-                templateUrl: 'partials/portal/pane-center.html',
-                controller: 'PortalCtrl'
+                templateUrl: 'partials/portal/pane-center.html'
             },
             'pane-left': {
                 templateUrl: 'partials/shared/pane-left.html',
@@ -47,11 +46,12 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
         views: {
             'pane-center@': {
                 templateUrl: 'partials/portal/pane-center.html',
-                controller: function ($scope, $stateParams, documents) {
+                controller: function ($rootScope, $scope, $stateParams, documents) {
                     $scope.ws = $stateParams.ws;
                     $scope.site = $stateParams.site;
                     $scope.documents = documents;
                     $scope.buttons = [];
+                    $rootScope.tree_initial = $scope.site;
                  }
             }
         }
