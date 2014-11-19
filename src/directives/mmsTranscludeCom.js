@@ -41,9 +41,9 @@ function mmsTranscludeCom(ElementService, UtilsService, $log, $compile, growl) {
             doc += ' - ' + scope.element.creator;
             element.append(doc);
             $compile(element.contents())(scope); 
-            //if (mmsViewCtrl) {
-            //    mmsViewCtrl.elementTranscluded(scope.element);
-            //}
+            if (mmsViewCtrl) {
+                mmsViewCtrl.elementTranscluded(scope.element, 'Comment');
+            }
         };
 
         scope.$watch('mmsEid', function(newVal, oldVal) {
