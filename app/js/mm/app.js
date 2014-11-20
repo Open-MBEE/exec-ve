@@ -64,7 +64,7 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
         url: '/diff/:source/:sourceTime/:target/:targetTime',
         resolve: {
             diff: function($stateParams, WorkspaceService) {
-                return WorkspaceService.diff($stateParams.source, $stateParams.target, $stateParams.sourceTime, $stateParams.targetTime);
+                return WorkspaceService.diff($stateParams.target, $stateParams.source, $stateParams.targetTime, $stateParams.sourceTime);
             }
         },
         views: {
