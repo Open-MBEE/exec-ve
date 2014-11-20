@@ -13,7 +13,8 @@ angular.module('mms')
  */
 function WorkspaceService($http, $q, URLService, ElementService, CacheService) {
     var inProgress = {};
-    var dummy = { 
+    
+    /*var dummy = { 
         "workspace1":{ 
             creator: 'dlam',
             created: '2014-07-30T09:21:29.032-0700',
@@ -184,7 +185,7 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService) {
 
           ]
        }
-    };
+    }; */
 
     var getWorkspaces = function(update) {
         var u = !update ? false : update;
@@ -277,8 +278,15 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService) {
         return deferred.promise;
     };
 
-    var remove = function(ws) {
-
+    var deleteWorkspace = function(ws) {
+        var deferred = $q.defer();
+        $http.delete(URLService.getWorkspaceURL(ws))
+        .success(function(data, status, headers, config) {
+            deferred.resolve(data);
+        }).error(function(data, status, headers, config) {
+            URLService.handleHttpStatus(data, status, headers, config, deferred);
+        });
+        return deferred.promise;
     };
 
     var create = function(name, parentId) {
@@ -304,7 +312,7 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService) {
         getWorkspace: getWorkspace,
         diff: diff,
         merge: merge,
-        remove: remove,
+        deleteWorkspace: deleteWorkspace,
         create: create
     };
 

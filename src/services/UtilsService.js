@@ -55,6 +55,42 @@ function UtilsService(_) {
         return elem;
     };
 
+    var buildTreeHierarchy = function (array, id, type, parent) {
+        var rootNodes = [];
+        var data2Node = {};
+
+        // make first pass to create all nodes
+        array.forEach(function(data) {
+            data2Node[data[id]] = 
+            { 
+                label : data.name, 
+                type : type,
+                data : data, 
+                children : [] 
+            };
+        });
+
+        // make second pass to associate data to parent nodes
+        array.forEach(function(data) {
+            if (data[parent])    
+                data2Node[data[parent]].children.push(data2Node[data[id]]);
+            else
+                rootNodes.push(data2Node[data[id]]);
+        });
+
+        var sortFunction = function(a, b) {
+            if (a.children.length > 1) a.children.sort(sortFunction);
+            if (b.children.length > 1) b.children.sort(sortFunction);
+            if(a.label.toLowerCase() < b.label.toLowerCase()) return -1;
+            if(a.label.toLowerCase() > b.label.toLowerCase()) return 1;
+            return 0;
+        };
+
+        // sort root notes
+        rootNodes.sort(sortFunction);
+
+        return rootNodes;
+    };
 
     /**
      * @ngdoc method
@@ -103,6 +139,7 @@ function UtilsService(_) {
         hasCircularReference: hasCircularReference,
         cleanElement: cleanElement,
         normalize: normalize,
-        makeElementKey: makeElementKey
+        makeElementKey: makeElementKey,
+        buildTreeHierarchy: buildTreeHierarchy
     };
 }
