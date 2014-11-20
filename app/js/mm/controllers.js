@@ -107,6 +107,16 @@ function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorS
             arr[i].placement = "bottom";
         }
     };
+    $scope.comparing = false;
+    $scope.compare = function() {
+      if ($scope.comparing) {
+        growl.info("Please wait...");
+        return;
+      }
+      $scope.comparing = true;
+      $state.go('mm.diff', {source: $scope.mergeFromWs.id, target: $scope.mergeToWs.id, sourceTime: 'latest', targetTime: 'latest'});
+    };
+
     var treeApi = {};
     $scope.tooltipPlacement($scope.buttons);
     $scope.treeApi = treeApi;
