@@ -34,8 +34,8 @@ function($scope, $rootScope) {
     $scope.onClick = function(button) {
     };
 }])
-.controller('WorkspaceTreeCtrl', ['$scope', '$rootScope', '$location', '$timeout', '$state', '$stateParams','$anchorScroll', 'WorkspaceService', 'ElementService', 'ViewService', 'growl', '$modal', '$q', '$filter', 'workspaces',
-function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorScroll, WorkspaceService, ElementService, ViewService, growl, $modal, $q, $filter, workspaces) {
+.controller('WorkspaceTreeCtrl', ['$scope', '$rootScope', '$location', '$timeout', '$state', '$stateParams','$anchorScroll', 'WorkspaceService', 'ElementService', 'ViewService', 'UtilsService', 'growl', '$modal', '$q', '$filter', 'workspaces',
+function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorScroll, WorkspaceService, ElementService, ViewService, UtilsService, growl, $modal, $q, $filter, workspaces) {
 
     $scope.buttons = [
     {
@@ -55,9 +55,16 @@ function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorS
         permission: true
     },
     {
-        action: function(){ $scope.addTask(); },
+        action: function(){ $scope.addWorkspace(); },
         tooltip: "Add Task",
         icon: "fa-plus",
+        permission: true
+        // TODO: permission: $scope.editable
+    },
+    {
+        action: function(){ $scope.deleteWorkspace(); },
+        tooltip: "Delete Task",
+        icon: "fa-times",
         permission: true
         // TODO: permission: $scope.editable
     },
@@ -105,34 +112,7 @@ function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorS
     $scope.treeApi = treeApi;
     $rootScope.treeApi = treeApi;
  
- 
-    var buildTreeHierarchy = function (array) {
-    	var rootNodes = [];
-    	var data2Node = {};
-
-    	// make first pass to create all nodes
-    	array.forEach(function(data) {
-    		data2Node[data.id] = 
-   			{ 
-		        label : data.name, 
-		        type : 'workspace',
-		        data : data, 
-		        children : [] 
-        	};
-    	});
-
-    	// make second pass to associate data to parent nodes
-    	array.forEach(function(data) {
-    		if (data.parent)	
- 		   		data2Node[data.parent].children.push(data2Node[data.id]);
- 		   	else
- 		   		rootNodes.push(data2Node[data.id]);
-    	});
-
-    	return rootNodes;
-    };
-
-    var dataTree = buildTreeHierarchy(workspaces);
+    var dataTree = UtilsService.buildTreeHierarchy(workspaces, "id", "Workspace", "parent");
 
     $scope.my_data = dataTree;
 
@@ -144,7 +124,7 @@ function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorS
         types: {
             "section": "fa fa-file-o fa-fw",
             "view": "fa fa-file fa-fw",
-            "workspace": "fa fa-tasks fa-fw"
+            "Workspace": "fa fa-tasks fa-fw"
 
         }
     };
@@ -162,20 +142,45 @@ function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorS
       instance.result.then(function(data) {
         treeApi.add_branch(branch, {
             label: data.name,
-            type: "view",
+            type: "Workspace",
             data: data,
             children: []
         });
       });
     };
 
-    // var adding = false;
-    $scope.addTask = function() {
-        /*if (adding) {
+    var deleteWorkspace = false;
+    $scope.deleteWorkspace = function() {
+
+        if (deleteWorkspace) {
             growl.info('Please wait...');
             return;
         }
-        adding = true; */
+
+        var branch = treeApi.get_selected_branch();
+        if (!branch) {
+            growl.warning("Delete Task Error: Select item to delete.");
+            return;
+        }
+
+        deleteWorkspace = true;
+        $scope.buttons[4].icon = 'fa-spin fa-spinner';
+
+        WorkspaceService.deleteWorkspace(branch.data.id)
+        .then(function(data) {
+            treeApi.remove_branch(branch);
+            growl.success("Task Deleted");
+            deleteWorkspace = false;
+            $scope.buttons[4].icon = 'fa-times';
+        }, function(reason) {
+            growl.error("Task Delete Error: " + reason.message);
+            deleteWorkspace = false;
+            $scope.buttons[4].icon = 'fa-times';
+        });
+    };
+
+    $scope.addWorkspace = function() {
+
         var branch = treeApi.get_selected_branch();
         if (!branch) {
             growl.warning("Add Task Error: Select parent view first");
@@ -183,25 +188,7 @@ function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorS
         }
 
         $scope.createWorkspace(branch, branch.data.id);
-
-        /*$scope.buttons[3].icon = 'fa-spin fa-spinner';
-        ViewService.createView(branch.data.sysmlid, 'Untitled View', $scope.document.sysmlid, ws)
-        .then(function(view) {
-            $scope.buttons[3].icon = 'fa-plus';
-            treeApi.add_branch(branch, {
-                label: view.name,
-                type: "view",
-                data: view,
-                children: []
-            });
-            adding = false;
-        }, function(reason) {
-            growl.error('Add View Error: ' + reason.message);
-            $scope.buttons[3].icon = 'fa-plus';
-            adding = false;
-        });*/
     };
-
 
 
       var workspaceCtrl = function($scope, $modalInstance) {

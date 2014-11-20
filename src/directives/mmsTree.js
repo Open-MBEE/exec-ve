@@ -131,6 +131,13 @@ function mmsTree($timeout, $log, $templateCache) {
             }
         };
 
+        var remove_branch = function (branch) {
+            var parent_branch = get_parent(branch);
+            for (var i = 0; i < parent_branch.children.length; i++)
+                if (parent_branch.children[i].uid === branch.uid)
+                    parent_branch.children.splice(i,1);
+        };
+
         var get_parent = function(child) {
             var parent = null;
             if (child.parent_uid) {
@@ -389,6 +396,12 @@ function mmsTree($timeout, $log, $templateCache) {
                 }
                 on_treeData_change();
             };
+
+            tree.remove_branch = function(branch) {
+                remove_branch(branch);
+                on_treeData_change();
+            };
+
             tree.add_root_branch = function(new_branch) {
                 tree.add_branch(null, new_branch);
             };
