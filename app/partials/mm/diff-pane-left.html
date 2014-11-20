@@ -7,7 +7,7 @@
 
 	    <tr ng-click="selectChange(change)" ng-repeat="change in changes | filter: {staged: false}">
 	        <td><i class="fa {{change.icon}} icon-{{change.type}}"><i></td>
-	        <td>{{change.name}}</td>
+	        <td>{{change.delta.specialization.type || change.original.specialization.type}}: {{change.name}}</td>
 	        <td>
 	        	<button ng-click="stageChange(change)" type="button" class="btn btn-staging"><i class="fa fa-arrow-down"></i></button>
 	        </td>
@@ -21,7 +21,7 @@
 
 	    <tr ng-click="selectChange(change)" ng-repeat="change in changes | filter: {staged: true}">
 	        <td><i class="fa {{change.icon}} icon-{{change.type}}"><i></td>
-	        <td>{{change.name}}</td>
+	        <td>{{change.delta.specialization.type || change.original.specialization.type}}: {{change.name}}</td>
 	        <td>
 	        	<button ng-click="stageChange(change)" type="button" class="btn btn-staging"><i class="fa fa-arrow-up"></i></button>
 	        </td>

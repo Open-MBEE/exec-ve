@@ -15,7 +15,7 @@
     <span> Target (To): {{mergeToWs.name}} </span>
  	<a class="btn btn-primary btn-xs" ng-click="pickNewTarget(treeApi.get_selected_branch())">Pick new Target</a>
     <br>
-	<a class="btn btn-success btn-xs" ui-sref="mm.diff({source: mergeFromWs.id, target: mergeToWs.id})">MERGE <i ng-show="comparing" class="fa fa-spin fa-spinner"></i></a>
+	<a class="btn btn-success btn-xs" ui-sref="mm.diff({source: mergeFromWs.id, target: mergeToWs.id, sourceTime: 'latest', targetTime: 'latest'})">MERGE <i ng-show="comparing" class="fa fa-spin fa-spinner"></i></a>
   </div>
 
   <mms-tree search="search" tree-data="my_data" section-numbering="false" tree-control="treeApi" on-select="my_tree_handler(branch)" initial-selection="{{tree_initial}}" options="tree_options"></mms-tree>
