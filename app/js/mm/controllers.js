@@ -222,8 +222,8 @@ function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorS
 .controller('WorkspaceDiffChangeController', ["_", "$timeout", "$scope", "$rootScope", "$http", "$state", "$stateParams", "$modal", "growl", "WorkspaceService", "ElementService", "diff",
 function(_, $timeout, $scope, $rootScope, $http, $state, $stateParams, $modal, growl, WorkspaceService, ElementService, diff) {
 
-    var ws1 = $stateParams.source;
-    var ws2 = $stateParams.target;
+    var ws1 = $stateParams.target;
+    var ws2 = $stateParams.source;
 
     $scope.treeApi = {};
 
