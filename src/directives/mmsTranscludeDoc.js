@@ -44,7 +44,7 @@ function mmsTranscludeDoc(ElementService, UtilsService, $compile, $log, growl) {
             element.empty();
             var doc = scope.element.documentation;
             if (!doc)
-                doc = '<p class="placeholder">documentation placeholder</p>';
+                doc = '<p class="placeholder">{{element.specialization.type}} (no name)</p>';
             element.append(doc);
             $compile(element.contents())(scope); 
             if (mmsViewCtrl) {
@@ -76,6 +76,7 @@ function mmsTranscludeDoc(ElementService, UtilsService, $compile, $log, growl) {
                 recompile();
                 scope.$watch('element.documentation', recompile);
             }, function(reason) {
+                element.html('<span class="error">element cf ' + newVal + ' not found</span>');
                 growl.error('Cf Doc Error: ' + reason.message + ': ' + scope.mmsEid);
             });
         });

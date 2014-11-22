@@ -52,6 +52,7 @@ function mmsTranscludeName(ElementService, $compile, growl) {
                     mmsViewCtrl.elementTranscluded(scope.element);
                 }
             }, function(reason) {
+                element.html('<span class="error">element cf ' + newVal + ' not found</span>');
                 growl.error('Cf Name Error: ' + reason.message + ': ' + scope.mmsEid);
             });
         });
@@ -65,7 +66,7 @@ function mmsTranscludeName(ElementService, $compile, growl) {
 
     return {
         restrict: 'E',
-        template: '<span ng-if="element.name">{{element.name}}</span><span ng-if="!element.name" class=\'placeholder\'>name placeholder</span>',
+        template: '<span ng-if="element.name">{{element.name}}</span><span ng-if="!element.name" class=\'placeholder\'>{{element.specialization.type}} (no name)</span>',
         scope: {
             mmsEid: '@',
             mmsWs: '@',

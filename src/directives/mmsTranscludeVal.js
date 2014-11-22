@@ -49,11 +49,11 @@ function mmsTranscludeVal(ElementService, UtilsService, $log, $compile, $templat
             } 
             element.empty();
             if (scope.values.length === 0)
-                element.html('<span class="placeholder">value placeholder</span>');
+                element.html('<span class="placeholder">Property (no val)</span>');
             else if (areStrings) {
                 var toCompile = toCompileList.join(' ');
                 if (toCompile === '') {
-                    element.html('<span class="placeholder">value placeholder</span>');
+                    element.html('<span class="placeholder">Property (no val)</span>');
                     return;
                 }
                 element.append(toCompile);
@@ -92,6 +92,7 @@ function mmsTranscludeVal(ElementService, UtilsService, $log, $compile, $templat
                 recompile();
                 scope.$watch('values', recompile, true);
             }, function(reason) {
+                element.html('<span class="error">value cf ' + newVal + ' not found</span>');
                 growl.error('Cf Val Error: ' + reason.message + ': ' + scope.mmsEid);
             });
         });
