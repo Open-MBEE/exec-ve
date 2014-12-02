@@ -52,7 +52,7 @@ function mmsTranscludeName(ElementService, $compile, growl) {
                     mmsViewCtrl.elementTranscluded(scope.element);
                 }
             }, function(reason) {
-                element.html('<span class="error">element cf ' + newVal + ' not found</span>');
+                element.html('<span class="error">name cf ' + newVal + ' not found</span>');
                 growl.error('Cf Name Error: ' + reason.message + ': ' + scope.mmsEid);
             });
         });

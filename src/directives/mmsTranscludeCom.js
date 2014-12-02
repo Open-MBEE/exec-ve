@@ -70,6 +70,7 @@ function mmsTranscludeCom(ElementService, UtilsService, $log, $compile, growl) {
                 recompile();
                 scope.$watch('element.documentation', recompile);
             }, function(reason) {
+                element.html('<span class="error">comment ' + newVal + ' not found</span>');
                 growl.error('Cf Comment Error: ' + reason.message + ': ' + scope.mmsEid);
             });
         });

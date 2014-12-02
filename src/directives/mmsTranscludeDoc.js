@@ -76,7 +76,7 @@ function mmsTranscludeDoc(ElementService, UtilsService, $compile, $log, growl) {
                 recompile();
                 scope.$watch('element.documentation', recompile);
             }, function(reason) {
-                element.html('<span class="error">element cf ' + newVal + ' not found</span>');
+                element.html('<span class="error">doc cf ' + newVal + ' not found</span>');
                 growl.error('Cf Doc Error: ' + reason.message + ': ' + scope.mmsEid);
             });
         });
