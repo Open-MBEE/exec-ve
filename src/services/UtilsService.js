@@ -55,7 +55,7 @@ function UtilsService(_) {
         return elem;
     };
 
-    var buildTreeHierarchy = function (array, id, type, parent) {
+    var buildTreeHierarchy = function (array, id, type, parent, level2_Func) {
         var rootNodes = [];
         var data2Node = {};
 
@@ -77,6 +77,14 @@ function UtilsService(_) {
             else
                 rootNodes.push(data2Node[data[id]]);
         });
+
+        // apply level 2 objects to tree
+        if (level2_Func) {
+            array.forEach(function(data) {
+                var level1_parentNode = data2Node[data[id]];
+                level2_Func(data[id], level1_parentNode);
+            });
+        }
 
         var sortFunction = function(a, b) {
             if (a.children.length > 1) a.children.sort(sortFunction);

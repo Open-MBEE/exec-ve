@@ -30,6 +30,38 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, _) {
 
     /**
      * @ngdoc method
+     * @name mms.ConfigService#getConfigurations
+     * @methodOf mms.ConfigService
+     *
+     * @description
+     * Get configurations in a worksace
+     *
+     * @param {string} [workspace=master] Workspace name
+     * @param {boolean} [update=false] update from server
+     * @returns {Promise} Promise would be resolved with array of configuration objects
+     */
+    var getConfigurations = function(workspace, update) {
+        var n = normalize(update, workspace);
+        var deferred = $q.defer();
+        var cacheKey = ['workspaces', n.ws, 'configs'];
+        if (CacheService.exists(cacheKey) && !n.update) {
+            deferred.resolve(CacheService.get(cacheKey));
+            return deferred.promise;
+        }
+        $http.get(URLService.getConfigsURL(n.ws))
+        .success(function(data, status, headers, config) {
+            CacheService.put(cacheKey, data.configurations, false, function(val, k) {
+                return {key: ['configs', n.ws, val.id], value: val, merge: true};
+            });
+            deferred.resolve(CacheService.get(cacheKey));
+        }).error(function(data, status, headers, config) {
+            URLService.handleHttpStatus(data, status, headers, config, deferred);
+        });
+        return deferred.promise;
+    };
+
+    /**
+     * @ngdoc method
      * @name mms.ConfigService#getSiteConfigs
      * @methodOf mms.ConfigService
      *
@@ -41,7 +73,7 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, _) {
      * @param {boolean} [update=false] update from server
      * @returns {Promise} Promise would be resolved with array of configuration objects
      */
-    var getSiteConfigs = function(site, workspace, update) {
+    var OldgetSiteConfigs = function(site, workspace, update) {
         var n = normalize(update, workspace);
         var deferred = $q.defer();
         var cacheKey = ['sites', n.ws, site, 'configs'];
@@ -75,7 +107,7 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, _) {
      * @param {boolean} [update=false] update from server
      * @returns {Promise} Promise would be resolved with configuration object
      */
-    var getConfig = function(id, site, workspace, update) {
+    var OldgetConfig = function(id, site, workspace, update) {
         var n = normalize(update, workspace);
         var deferred = $q.defer();
         var cacheKey = ['configs', n.ws, id];
@@ -106,7 +138,7 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, _) {
      * @param {boolean} [update=false] update from server
      * @returns {Promise} Promise would be resolved with array of product objects
      */
-    var getConfigProducts = function(id, site, workspace, update) {
+    var OldgetConfigProducts = function(id, site, workspace, update) {
         var n = normalize(update, workspace);
         var deferred = $q.defer();
         var cacheKey = ['configs', n.ws, id, 'products'];
@@ -140,7 +172,7 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, _) {
      * @param {boolean} [update=false] update from server
      * @returns {Promise} Promise would be resolved with array of snapshot objects
      */
-    var getConfigSnapshots = function(id, site, workspace, update) {
+    var OldgetConfigSnapshots = function(id, site, workspace, update) {
         var n = normalize(update, workspace);
         var deferred = $q.defer();
         var cacheKey = ['configs', n.ws, id, 'snapshots'];
@@ -174,7 +206,7 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, _) {
      * @param {boolean} [update=false] update from server
      * @returns {Promise} Promise would be resolved with array of snapshot objects
      */
-    var getProductSnapshots = function(id, site, workspace, update) {
+    var OldgetProductSnapshots = function(id, site, workspace, update) {
         var n = normalize(update, workspace);
         var deferred = $q.defer();
         var cacheKey = ['products', n.ws, id, 'snapshots'];
@@ -207,7 +239,7 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, _) {
      * @param {string} [workspace=master] Workspace name
      * @returns {Promise} Promise would be resolved with the updated config object
      */
-    var updateConfig = function(config, site, workspace) {
+    var OldupdateConfig = function(config, site, workspace) {
         var n = normalize(null, workspace);
         var deferred = $q.defer();
         if (!config.hasOwnProperty('id'))
@@ -236,7 +268,7 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, _) {
      * @param {string} [workspace=master] Workspace name
      * @returns {Promise} Promise would be resolved with the updated config object
      */
-    var createConfig = function(config, site, workspace) {
+    var OldcreateConfig = function(config, site, workspace) {
         var n = normalize(null, workspace);
         var deferred = $q.defer();
         if (config.hasOwnProperty('id')) {
@@ -269,7 +301,7 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, _) {
      * @param {string} [workspace=master] Workspace name
      * @returns {Promise} Promise would be resolved with array of snapshot objects
      */
-    var updateConfigSnapshots = function(id, snapshots, site, workspace) {
+    var OldupdateConfigSnapshots = function(id, snapshots, site, workspace) {
         var n = normalize(null, workspace);
         var deferred = $q.defer();
         var cacheKey = ['configs', n.ws, id, 'snapshots'];
@@ -300,7 +332,7 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, _) {
      * @returns {Promise} Promise would be resolved with 'ok', and the server 
      *      will email the user when completed
      */
-    var updateConfigProducts = function(id, products, site, workspace) {
+    var OldupdateConfigProducts = function(id, products, site, workspace) {
         var n = normalize(null, workspace);
         var deferred = $q.defer();
         var cacheKey = ['configs', n.ws, id, 'products'];
@@ -330,7 +362,7 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, _) {
      * @returns {Promise} Promise would be resolved with 'ok', and the server 
      *      will email the user when completed
      */
-    var createSnapshot = function(id, site, workspace) {
+    var OldcreateSnapshot = function(id, site, workspace) {
         var n = normalize(null, workspace);
         var deferred = $q.defer();
         $http.post(URLService.getProductSnapshotsURL(id, site, n.ws))
@@ -347,7 +379,7 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, _) {
         return deferred.promise;
     };
 
-    var createSnapshotArtifact = function(snapshot, site, workspace){
+    var OldcreateSnapshotArtifact = function(snapshot, site, workspace){
         var n = normalize(null, workspace);
         var deferred = $q.defer();
         $http.post(URLService.getProductSnapshotsURL(snapshot.sysmlid, site, n.ws), {'snapshots': [snapshot]})
@@ -364,16 +396,17 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, _) {
     };
 
     return {
-        getSiteConfigs : getSiteConfigs,
-        getConfig : getConfig,
-        getConfigProducts: getConfigProducts,
-        getConfigSnapshots: getConfigSnapshots,
-        getProductSnapshots: getProductSnapshots,
-        updateConfig: updateConfig,
-        createConfig: createConfig,
-        updateConfigSnapshots: updateConfigSnapshots,
-        updateConfigProducts: updateConfigProducts,
-        createSnapshot: createSnapshot,
-        createSnapshotArtifact: createSnapshotArtifact 
+        getConfigurations : getConfigurations,
+        getSiteConfigs : OldgetSiteConfigs,
+        getConfig : OldgetConfig,
+        getConfigProducts: OldgetConfigProducts,
+        getConfigSnapshots: OldgetConfigSnapshots,
+        getProductSnapshots: OldgetProductSnapshots,
+        updateConfig: OldupdateConfig,
+        createConfig: OldcreateConfig,
+        updateConfigSnapshots: OldupdateConfigSnapshots,
+        updateConfigProducts: OldupdateConfigProducts,
+        createSnapshot: OldcreateSnapshot,
+        createSnapshotArtifact: OldcreateSnapshotArtifact 
     };
 }

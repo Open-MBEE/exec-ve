@@ -34,12 +34,12 @@ function($scope, $rootScope) {
     $scope.onClick = function(button) {
     };
 }])
-.controller('WorkspaceTreeCtrl', ['$scope', '$rootScope', '$location', '$timeout', '$state', '$stateParams','$anchorScroll', 'WorkspaceService', 'ElementService', 'ViewService', 'UtilsService', 'growl', '$modal', '$q', '$filter', 'workspaces',
-function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorScroll, WorkspaceService, ElementService, ViewService, UtilsService, growl, $modal, $q, $filter, workspaces) {
+.controller('WorkspaceTreeCtrl', ['$scope', '$rootScope', '$location', '$timeout', '$state', '$stateParams','$anchorScroll', 'WorkspaceService', 'ElementService', 'ViewService', 'UtilsService', 'ConfigService', 'growl', '$modal', '$q', '$filter', 'workspaces',
+function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorScroll, WorkspaceService, ElementService, ViewService, UtilsService, ConfigService, growl, $modal, $q, $filter, workspaces) {
 
     $scope.buttons = [
     {
-        action: function(){ $scope.treeApi.expand_all(); },        
+        action: function(){ $scope.treeApi.refresh(); },        
         tooltip: "Expand All",
         icon: "fa-caret-square-o-down",
         permission: true
@@ -58,6 +58,13 @@ function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorS
         action: function(){ $scope.addWorkspace(); },
         tooltip: "Add Task",
         icon: "fa-plus",
+        permission: true
+        // TODO: permission: $scope.editable
+    },
+    {
+        action: function(){ $scope.addConfiguration(); },
+        tooltip: "Add Configuration",
+        icon: "fa-tag",
         permission: true
         // TODO: permission: $scope.editable
     },
@@ -122,7 +129,20 @@ function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorS
     $scope.treeApi = treeApi;
     $rootScope.treeApi = treeApi;
  
-    var dataTree = UtilsService.buildTreeHierarchy(workspaces, "id", "Workspace", "parent");
+    var level2Func = function(workspaceId, workspaceTreeNode) {
+      ConfigService.getConfigurations(workspaceId).then (function (data) {
+        data.forEach(function (config) {
+          workspaceTreeNode.children.push( { 
+                                              label : config.name, 
+                                              type : "Configuration",
+                                              data : config, 
+                                              children : [] }
+                                          ); 
+        });
+      });
+    };
+
+    var dataTree = UtilsService.buildTreeHierarchy(workspaces, "id", "Workspace", "parent", level2Func, "Configuraiton");
 
     $scope.my_data = dataTree;
 
@@ -134,8 +154,8 @@ function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorS
         types: {
             "section": "fa fa-file-o fa-fw",
             "view": "fa fa-file fa-fw",
-            "Workspace": "fa fa-tasks fa-fw"
-
+            "Workspace": "fa fa-tasks fa-fw",
+            "Configuration": "fa fa-tag fa-fw"
         }
     };
 
@@ -187,6 +207,52 @@ function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorS
             deleteWorkspace = false;
             $scope.buttons[4].icon = 'fa-times';
         });
+    };
+
+    $scope.addConfiguration = function() {
+
+        var branch = treeApi.get_selected_branch();
+        if (!branch) {
+            growl.warning("Add Configuration Error: Select parent view first");
+            return;
+        } else if (branch.type != "Workspace") {
+            growl.warning("Add Configuration Error: Selection must be a task");
+            return;
+        }
+
+        $scope.createConfigParentId = branch.data.id;
+
+        var instance = $modal.open({
+            templateUrl: 'partials/mm/new-configuration.html',
+            scope: $scope,
+            controller: ['$scope', '$modalInstance', configurationCtrl]
+        });
+        instance.result.then(function(data) {
+          treeApi.add_branch(branch, {
+              label: data.name,
+              type: "Configuration",
+              data: data,
+              children: []
+          });
+        });
+    };
+
+      var configurationCtrl = function($scope, $modalInstance) {
+        $scope.workspace = {};
+        $scope.workspace.name = "";
+
+        $scope.ok = function() {
+            WorkspaceService.create($scope.workspace.name, $scope.createWsParentId)
+            .then(function(data) {
+                growl.success("Configuration Created");
+                $modalInstance.close(data);
+            }, function(reason) {
+                growl.error("Configuration Error: " + reason.message);
+            });
+        };
+        $scope.cancel = function() {
+            $modalInstance.dismiss();
+        };
     };
 
     $scope.addWorkspace = function() {

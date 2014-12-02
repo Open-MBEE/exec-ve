@@ -103,13 +103,11 @@ function urlService(baseUrl) {
      * @description
      * Gets url that gets or creates configurations in a site
      *
-     * @param {string} site Site name
      * @param {string} workspace Workspace name
      * @returns {string} The url
      */
-    var getSiteConfigsURL = function(site, workspace) {
+    var getConfigsURL = function(workspace) {
         return root + "/workspaces/" + workspace +
-                      "/sites/" + site +
                       "/configurations";
     };
 
@@ -427,7 +425,7 @@ function urlService(baseUrl) {
         getConfigSnapshotsURL: getConfigSnapshotsURL,
         getSiteProductsURL: getSiteProductsURL,
         getConfigURL: getConfigURL,
-        getSiteConfigsURL: getSiteConfigsURL,
+        getConfigsURL: getConfigsURL,
         getConfigProductsURL : getConfigProductsURL,
         getDocumentViewsURL: getDocumentViewsURL,
         getViewElementsURL: getViewElementsURL,
