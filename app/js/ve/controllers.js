@@ -425,17 +425,19 @@ function($scope, $rootScope, document, time, ElementService, ViewService, $state
             $state.go('doc.view', {viewId: curBranch.data.sysmlid});
     };
 }])
-.controller('ViewCtrl', ['$scope', '$rootScope', '$stateParams', 'viewElements', 'ViewService', 'time', 'growl', 'ws',
-function($scope, $rootScope, $stateParams, viewElements, ViewService, time, growl, ws) {
-    $scope.commentsOn = false;
-    $scope.elementsOn = false;
+.controller('ViewCtrl', ['$scope', '$rootScope', '$stateParams', '$timeout', 'viewElements', 'ViewService', 'time', 'growl', 'ws',
+function($scope, $rootScope, $stateParams, $timeout, viewElements, ViewService, time, growl, ws) {
+    if (!$rootScope.veCommentsOn)
+        $rootScope.veCommentsOn = false;
+    if (!$rootScope.veElementsOn)
+        $rootScope.veElementsOn = false;
 
     $scope.buttons = [
         {
             action: function() {
                 $scope.viewApi.toggleShowComments();
 
-                if (!$scope.commentsOn) {
+                if (!$rootScope.veCommentsOn) {
                     $scope.buttons[0].icon = "fa-comment";
                     $scope.buttons[0].tooltip = "Hide Comments";
                 }
@@ -444,26 +446,26 @@ function($scope, $rootScope, $stateParams, viewElements, ViewService, time, grow
                     $scope.buttons[0].tooltip = "Show Comments";
                 }
 
-                $scope.commentsOn = !$scope.commentsOn;
+                $rootScope.veCommentsOn = !$rootScope.veCommentsOn;
             },
-            tooltip: "Show Comments",
-            icon: "fa-comment-o",
+            tooltip: !$rootScope.veCommentsOn ? "Show Comments" : "Hide Comments",
+            icon: !$rootScope.veCommentsOn ? "fa-comment-o" : "fa-comment",
             permission: true
         },
         {
             action: function() {
                 $scope.viewApi.toggleShowElements();
 
-                if (!$scope.elementsOn) {
+                if (!$rootScope.veElementsOn) {
                     $scope.buttons[1].tooltip = "Hide Elements";
                 }
                 else {
                     $scope.buttons[1].tooltip = "Show Elements";
                 }
 
-                $scope.elementsOn = !$scope.elementsOn;
+                $rootScope.veElementsOn = !$rootScope.veElementsOn;
             },
-            tooltip: "Show Elements",
+            tooltip: !$rootScope.veElementsOn ? "Show Elements": "Hide Elements",
             icon: "fa-codepen",
             permission: true
         },
@@ -518,6 +520,14 @@ function($scope, $rootScope, $stateParams, viewElements, ViewService, time, grow
             }
         }
     };
+    $timeout(function() {
+        if ($rootScope.veCommentsOn) {
+            $scope.viewApi.toggleShowComments();
+        }
+        if ($rootScope.veElementsOn) {
+            $scope.viewApi.toggleShowElements();
+        }
+    }, 500);
 }])
 .controller('ToolbarCtrl', ['$scope', '$rootScope',
 function($scope, $rootScope) {   
