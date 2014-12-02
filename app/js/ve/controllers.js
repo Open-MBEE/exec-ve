@@ -201,7 +201,6 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, documen
             growl.info('Please wait...');
             return;
         }
-        adding = true;
         var branch = treeApi.get_selected_branch();
         if (!branch) {
             growl.error("Add View Error: Select parent view first");
@@ -211,21 +210,37 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, documen
             growl.error("Add View Error: Cannot add a child view to a section");
             return;
         }
+        adding = true;
         $scope.buttons[3].icon = 'fa-spin fa-spinner';
-        ViewService.createView(branch.data.sysmlid, 'Untitled View', $scope.document.sysmlid, ws)
-        .then(function(view) {
-            $scope.buttons[3].icon = 'fa-plus';
-            treeApi.add_branch(branch, {
-                label: view.name,
-                type: "view",
-                data: view,
-                children: []
+        ElementService.isCacheOutdated(document.sysmlid, ws)
+        .then(function(status) {
+            if (status.status) {
+                if (!angular.equals(document.specialization.view2view, status.server.specialization.view2view)) {
+                    growl.error('The document hierarchy is outdated, refresh the page first!');
+                    adding = false;
+                    $scope.buttons[3].icon = 'fa-plus';
+                    return;
+                } 
+            } 
+            ViewService.createView(branch.data.sysmlid, 'Untitled View', $scope.document.sysmlid, ws)
+            .then(function(view) {
+                treeApi.add_branch(branch, {
+                    label: view.name,
+                    type: "view",
+                    data: view,
+                    children: []
+                });
+                adding = false;
+                $scope.buttons[3].icon = 'fa-plus';
+            }, function(reason) {
+                growl.error('Add View Error: ' + reason.message);
+                adding = false;
+                $scope.buttons[3].icon = 'fa-plus';
             });
-            adding = false;
         }, function(reason) {
-            growl.error('Add View Error: ' + reason.message);
-            $scope.buttons[3].icon = 'fa-plus';
+            growl.error('Checking if document hierarchy is up to date failed: ' + reason.message);
             adding = false;
+            $scope.buttons[3].icon = 'fa-plus';
         });
     };
     var savingAll = false;
@@ -311,6 +326,16 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, documen
 .controller('ReorderCtrl', ['$scope', '$rootScope', 'document', 'time', 'ElementService', 'ViewService', '$state', 'growl', '_', 'ws',
 function($scope, $rootScope, document, time, ElementService, ViewService, $state, growl, _, ws) {
     $scope.doc = document;
+    ElementService.isCacheOutdated(document.sysmlid, ws)
+    .then(function(status) {
+        if (status.status) {
+            if (!angular.equals(document.specialization.view2view, status.server.specialization.view2view)) {
+                growl.error('The document hierarchy is outdated, refresh the page first!');
+            } 
+        } 
+    }, function(reason) {
+        growl.error('Checking if document hierarchy is up to date failed: ' + reason.message);
+    });
     var viewIds2node = {};
     viewIds2node[document.sysmlid] = {
         name: document.name,
@@ -340,43 +365,56 @@ function($scope, $rootScope, document, time, ElementService, ViewService, $state
     });
     $scope.saveClass = "";
     $scope.save = function() {
-        var newView2View = [];
         $scope.saveClass = "fa fa-spin fa-spinner";
-        angular.forEach(viewIds2node, function(view) {
-            if ($scope.tree.indexOf(view) >= 0 && view.id !== document.sysmlid)
-                return; //allow removing views by moving them to be root
-            var viewObject = {id: view.id, childrenViews: []};
-            view.children.forEach(function(child) {
-                viewObject.childrenViews.push(child.id);
-            });
-            newView2View.push(viewObject);
-        });
-        var newdoc = {};
-        newdoc.sysmlid = document.sysmlid;
-        newdoc.read = document.read;
-        newdoc.specialization = {type: 'Product'};
-        newdoc.specialization.view2view = newView2View;
-        ViewService.updateDocument(newdoc, ws)
-        .then(function(data) {
-            growl.success('Reorder Successful');
-            //document.specialization.view2view = newView2View;
-            $state.go('doc', {}, {reload:true});
-        }, function(reason) {
-            if (reason.status === 409) {
-                newdoc.read = reason.data.elements[0].read;
-                ViewService.updateDocument(newdoc, ws)
-                .then(function(data2) {
-                    growl.success('Reorder Successful');
-                    //document.specialization.view2view = newView2View;
-                    $state.go('doc', {}, {reload:true});
-                }, function(reason2) {
+        ElementService.isCacheOutdated(document.sysmlid, ws)
+        .then(function(status) {
+            if (status.status) {
+                if (!angular.equals(document.specialization.view2view, status.server.specialization.view2view)) {
+                    growl.error('The document hierarchy is outdated, refresh the page first!');
                     $scope.saveClass = "";
-                    growl.error('Reorder Save Error: ' + reason2.message);
+                    return;
+                } 
+            } 
+            var newView2View = [];
+            angular.forEach(viewIds2node, function(view) {
+                if ($scope.tree.indexOf(view) >= 0 && view.id !== document.sysmlid)
+                    return; //allow removing views by moving them to be root
+                var viewObject = {id: view.id, childrenViews: []};
+                view.children.forEach(function(child) {
+                    viewObject.childrenViews.push(child.id);
                 });
-            } else {
-                $scope.saveClass = "";
-                growl.error('Reorder Save Error: ' + reason.message);
-            }
+                newView2View.push(viewObject);
+            });
+            var newdoc = {};
+            newdoc.sysmlid = document.sysmlid;
+            newdoc.read = document.read;
+            newdoc.specialization = {type: 'Product'};
+            newdoc.specialization.view2view = newView2View;
+            ViewService.updateDocument(newdoc, ws)
+            .then(function(data) {
+                growl.success('Reorder Successful');
+                //document.specialization.view2view = newView2View;
+                $state.go('doc', {}, {reload:true});
+            }, function(reason) {
+                if (reason.status === 409) {
+                    newdoc.read = reason.data.elements[0].read;
+                    ViewService.updateDocument(newdoc, ws)
+                    .then(function(data2) {
+                        growl.success('Reorder Successful');
+                        //document.specialization.view2view = newView2View;
+                        $state.go('doc', {}, {reload:true});
+                    }, function(reason2) {
+                        $scope.saveClass = "";
+                        growl.error('Reorder Save Error: ' + reason2.message);
+                    });
+                } else {
+                    $scope.saveClass = "";
+                    growl.error('Reorder Save Error: ' + reason.message);
+                }
+            });
+        }, function(reason) {
+            growl.error('Checking if document hierarchy is up to date failed: ' + reason.message);
+            $scope.saveClass = "";
         });
     };
     $scope.cancel = function() {

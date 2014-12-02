@@ -510,6 +510,51 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, _) {
 
     /**
      * @ngdoc method
+     * @name mms.ElementService#isCacheOutdated
+     * @methodOf mms.ElementService
+     *
+     * @description
+     * Checks if the current cached element has been updated on the server, does not update the cache. 
+     * If the element doesn't exist in the cache, it's considered not outdated
+     *
+     * @param {string} id Element id
+     * @param {string} [workspace=master] workspace
+     * @returns {Promise} Resolved with {status: false} if cache is up to date, 
+     *      Resolved with {status: true, server: server element, cache: cache element} if cache is outdated
+     */
+    var isCacheOutdated = function(id, workspace) {
+        var deferred = $q.defer();
+        var ws = !workspace ? 'master' : workspace;
+        var orig = CacheService.get(UtilsService.makeElementKey(id, ws, null, false));
+        if (!orig) {
+            deferred.resolve({status: false});
+            return deferred.promise;
+        }
+        $http.get(URLService.getElementURL(id, ws, 'latest'))
+        .success(function(data, status, headers, config) {
+            var server = _.cloneDeep(data.elements[0]);
+            delete server.modified;
+            delete server.read;
+            delete server.creator;
+            UtilsService.cleanElement(server);
+            var current = _.cloneDeep(orig);
+            delete current.modified;
+            delete current.read;
+            delete current.creator;
+            UtilsService.cleanElement(current);
+            if (angular.equals(server, current)) {
+                deferred.resolve({status: false});
+            } else {
+                deferred.resolve({status: true, server: data.elements[0], cache: orig});
+            }
+        }).error(function(data, status, headers, config) {
+            URLService.handleHttpStatus(data, status, headers, config, deferred);
+        });
+        return deferred.promise;
+    };
+
+    /**
+     * @ngdoc method
      * @name mms.ElementService#isDirty
      * @methodOf mms.ElementService
      * 
@@ -641,6 +686,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, _) {
         getElementVersions: getElementVersions,
         deleteElement: deleteElement,
         deleteElements: deleteElements,
+        isCacheOutdated: isCacheOutdated,
         isDirty: isDirty,
         search: search
     };
