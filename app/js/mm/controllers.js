@@ -40,6 +40,11 @@ function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorS
     $scope.buttons = [
     {
         action: function(){ $scope.treeApi.refresh(); },        
+        tooltip: "Refresh",
+        icon: "fa-refresh",
+        permission: true
+    }, {
+        action: function(){ $scope.treeApi.expand_all(); },        
         tooltip: "Expand All",
         icon: "fa-caret-square-o-down",
         permission: true
@@ -69,8 +74,8 @@ function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorS
         // TODO: permission: $scope.editable
     },
     {
-        action: function(){ $scope.deleteWorkspace(); },
-        tooltip: "Delete Task",
+        action: function(){ $scope.deleteWorkspaceOrConfig(); },
+        tooltip: "Delete",
         icon: "fa-times",
         permission: true
         // TODO: permission: $scope.editable
@@ -130,7 +135,7 @@ function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorS
     $rootScope.treeApi = treeApi;
  
     var level2Func = function(workspaceId, workspaceTreeNode) {
-      ConfigService.getConfigurations(workspaceId).then (function (data) {
+      ConfigService.getConfigs(workspaceId).then (function (data) {
         data.forEach(function (config) {
           workspaceTreeNode.children.push( { 
                                               label : config.name, 
@@ -179,34 +184,57 @@ function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorS
       });
     };
 
-    var deleteWorkspace = false;
-    $scope.deleteWorkspace = function() {
+    var deleteWorkspaceOrConfig = false;
+    $scope.deleteWorkspaceOrConfig = function() {
 
-        if (deleteWorkspace) {
+        if (deleteWorkspaceOrConfig) {
             growl.info('Please wait...');
             return;
         }
 
         var branch = treeApi.get_selected_branch();
         if (!branch) {
-            growl.warning("Delete Task Error: Select item to delete.");
+            growl.warning("Delete Error: Select item to delete.");
             return;
         }
 
-        deleteWorkspace = true;
-        $scope.buttons[4].icon = 'fa-spin fa-spinner';
+        deleteWorkspaceOrConfig = true;
 
-        WorkspaceService.deleteWorkspace(branch.data.id)
-        .then(function(data) {
-            treeApi.remove_branch(branch);
-            growl.success("Task Deleted");
-            deleteWorkspace = false;
-            $scope.buttons[4].icon = 'fa-times';
-        }, function(reason) {
-            growl.error("Task Delete Error: " + reason.message);
-            deleteWorkspace = false;
-            $scope.buttons[4].icon = 'fa-times';
-        });
+        $scope.buttons[6].icon = 'fa-spin fa-spinner';
+
+        if (branch.type === "Workspace") {
+
+          WorkspaceService.deleteWorkspace(branch.data.id)
+          .then(function(data) {
+              treeApi.remove_branch(branch);
+              growl.success("Task Deleted");
+              deleteWorkspaceOrConfig = false;
+              $scope.buttons[6].icon = 'fa-times';
+          }, function(reason) {
+              growl.error("Task Delete Error: " + reason.message);
+              deleteWorkspaceOrConfig = false;
+              $scope.buttons[6].icon = 'fa-times';
+          });
+
+        } else if (branch.type === "Configuration") {
+
+          ConfigService.deleteConfig(branch.data.id)
+          .then(function(data) {
+              treeApi.remove_branch(branch);
+              growl.success("Configuration Deleted");
+              deleteWorkspaceOrConfig = false;
+              $scope.buttons[6].icon = 'fa-times';
+          }, function(reason) {
+              growl.error("Configuration Delete Error: " + reason.message);
+              deleteWorkspaceOrConfig = false;
+              $scope.buttons[6].icon = 'fa-times';
+          });
+
+        } else {
+              $scope.buttons[6].icon = 'fa-times';          
+              deleteWorkspaceOrConfig = false;
+        }
+
     };
 
     $scope.addConfiguration = function() {
@@ -238,11 +266,13 @@ function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorS
     };
 
       var configurationCtrl = function($scope, $modalInstance) {
-        $scope.workspace = {};
-        $scope.workspace.name = "";
+        $scope.configuration = {};
+        $scope.configuration.name = "";
+        $scope.configuration.description = "";
 
         $scope.ok = function() {
-            WorkspaceService.create($scope.workspace.name, $scope.createWsParentId)
+            var config = {"name": $scope.configuration.name, "description": $scope.configuration.name};
+            ConfigService.createConfig(config, $scope.createWsParentId)
             .then(function(data) {
                 growl.success("Configuration Created");
                 $modalInstance.close(data);

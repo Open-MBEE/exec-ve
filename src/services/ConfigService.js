@@ -30,7 +30,7 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, _) {
 
     /**
      * @ngdoc method
-     * @name mms.ConfigService#getConfigurations
+     * @name mms.ConfigService#getConfigs
      * @methodOf mms.ConfigService
      *
      * @description
@@ -40,7 +40,7 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, _) {
      * @param {boolean} [update=false] update from server
      * @returns {Promise} Promise would be resolved with array of configuration objects
      */
-    var getConfigurations = function(workspace, update) {
+    var getConfigs = function(workspace, update) {
         var n = normalize(update, workspace);
         var deferred = $q.defer();
         var cacheKey = ['workspaces', n.ws, 'configs'];
@@ -54,6 +54,49 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, _) {
                 return {key: ['configs', n.ws, val.id], value: val, merge: true};
             });
             deferred.resolve(CacheService.get(cacheKey));
+        }).error(function(data, status, headers, config) {
+            URLService.handleHttpStatus(data, status, headers, config, deferred);
+        });
+        return deferred.promise;
+    };
+
+    /**
+     * @ngdoc method
+     * @name mms.ConfigService#createConfig
+     * @methodOf mms.ConfigService
+     *
+     * @description
+     * Create a new configuration 
+     *
+     * @param {Object} config The new config object, must not already have id
+     * @param {string} [workspace=master] Workspace name
+     * @returns {Promise} Promise would be resolved with the updated config object
+     */
+    var createConfig = function(config, workspace) {
+        var n = normalize(null, workspace);
+        var deferred = $q.defer();
+        if (config.hasOwnProperty('id')) {
+            deferred.reject({status: 400, message: 'Config create cannot already have id'});
+            return deferred.promise;
+        } 
+        $http.post(URLService.getConfigsURL(n.ws), {'configurations': [config]})
+        .success(function(data, status, headers, config) {
+            deferred.resolve(CacheService.put(['configs', n.ws, config.id], data, true));
+            if (CacheService.exists(['workspaces', n.ws, 'configs'])) {
+                CacheService.get(['workspaces', n.ws, 'configs']).push(data);
+            }
+        }).error(function(data, status, headers, config) {
+            URLService.handleHttpStatus(data, status, headers, config, deferred);
+        });
+        return deferred.promise;
+    };
+
+    var deleteConfig = function(configId, workspace) {
+        var n = normalize(null, workspace);
+        var deferred = $q.defer();
+        $http.delete(URLService.getConfigURL(configId, n.ws))
+        .success(function(data, status, headers, config) {
+            deferred.resolve(data);
         }).error(function(data, status, headers, config) {
             URLService.handleHttpStatus(data, status, headers, config, deferred);
         });
@@ -396,14 +439,16 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, _) {
     };
 
     return {
-        getConfigurations : getConfigurations,
+        getConfigs : getConfigs,
+        createConfig : createConfig,
+        deleteConfig : deleteConfig,
+
         getSiteConfigs : OldgetSiteConfigs,
         getConfig : OldgetConfig,
         getConfigProducts: OldgetConfigProducts,
         getConfigSnapshots: OldgetConfigSnapshots,
         getProductSnapshots: OldgetProductSnapshots,
         updateConfig: OldupdateConfig,
-        createConfig: OldcreateConfig,
         updateConfigSnapshots: OldupdateConfigSnapshots,
         updateConfigProducts: OldupdateConfigProducts,
         createSnapshot: OldcreateSnapshot,

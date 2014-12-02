@@ -140,13 +140,11 @@ function urlService(baseUrl) {
      * Gets url that gets a configuration
      *
      * @param {string} id Id of the configuration
-     * @param {string} site Site name
      * @param {string} workspace Workspace name
      * @returns {string} The url
      */
-    var getConfigURL = function(id, site, workspace) {
+    var getConfigURL = function(id, workspace) {
         return root + "/workspaces/" + workspace + 
-                      "/sites/" + site + 
                       "/configurations/" + id;
     };
 

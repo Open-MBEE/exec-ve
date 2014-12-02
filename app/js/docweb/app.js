@@ -9,9 +9,9 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
             site: function($stateParams, SiteService) {
                 return SiteService.getSite($stateParams.site);
             },
-            configs: function($stateParams, ConfigService) {
+            /*configs: function($stateParams, ConfigService) {
                 return ConfigService.getSiteConfigs($stateParams.site, $stateParams.ws);
-            },
+            },*/
             documents: function($stateParams, ViewService) {
                 return ViewService.getSiteDocuments($stateParams.site, null, $stateParams.ws, null);
             },
