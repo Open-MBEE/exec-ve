@@ -8,6 +8,8 @@ function($scope, $rootScope, $timeout, UxService) {
     $scope.tbApi = {};
     $rootScope.tbApi = $scope.tbApi;
 
+    $scope.buttons = [];
+
     $timeout(function() {
       $scope.tbApi.addButton(UxService.getToolbarButton("element.viewer"));
     }, 500);
