@@ -249,6 +249,8 @@ function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorS
         }
 
         $scope.createConfigParentId = branch.data.id;
+        $scope.configuration = {};
+        $scope.configuration.now = true;
 
         var instance = $modal.open({
             templateUrl: 'partials/mm/new-configuration.html',
@@ -269,9 +271,16 @@ function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorS
         $scope.configuration = {};
         $scope.configuration.name = "";
         $scope.configuration.description = "";
+        $scope.configuration.now = "true";
+        $scope.configuration.timestamp = "";
 
         $scope.ok = function() {
-            var config = {"name": $scope.configuration.name, "description": $scope.configuration.name};
+            var config = {"name": $scope.configuration.name, "description": $scope.configuration.description};
+
+            if ($scope.configuration.now === "false") {
+              config.timestamp = $scope.configuration.timestamp;
+            }
+
             ConfigService.createConfig(config, $scope.createWsParentId)
             .then(function(data) {
                 growl.success("Configuration Created");
