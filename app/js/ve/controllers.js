@@ -253,6 +253,8 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, documen
             growl.info('Nothing to save');
             return;
         }
+        if ($rootScope.veSpecApi && $rootScope.veSpecApi.tinymceSave)
+            $rootScope.veSpecApi.tinymceSave();
         savingAll = true;
         $scope.buttons[6].icon = 'fa-spin fa-spinner';
         var promises = [];
@@ -571,6 +573,7 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
     $scope.eid = $scope.document.sysmlid;
     $scope.vid = $scope.eid;
     $scope.specApi = {};
+    $rootScope.veSpecApi = $scope.specApi;
     $scope.viewOrderApi = {};
 
     $scope.show = {

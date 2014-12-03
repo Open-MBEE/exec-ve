@@ -23,7 +23,7 @@
     </div>
 
     <h2 class="prop-title spec-view-doc-heading">DOCUMENTATION</h2>
-    <textarea ng-model="edit.documentation" mms-tinymce mms-ws="{{mmsWs}}" mms-site="{{mmsSite}}" mms-cf-elements="mmsCfElements" mms-eid="{{element.sysmlid}}"></textarea>
+    <textarea ng-model="edit.documentation" mms-tinymce mms-tinymce-api="tinymceApi" mms-ws="{{mmsWs}}" mms-site="{{mmsSite}}" mms-cf-elements="mmsCfElements" mms-eid="{{element.sysmlid}}"></textarea>
 
     <h2 class="prop-title spec-view-type-heading">METATYPE</h2>
     <h3 class="prop">{{element.specialization.type || 'Element'}}</h3>

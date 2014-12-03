@@ -261,6 +261,12 @@ function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window
                         return false;
                     }  
                 });
+                if (scope.mmsTinymceApi) {
+                    scope.mmsTinymceApi.save = function() {
+                        ed.save();
+                        update();
+                    };
+                }
             }
         };
 
@@ -301,7 +307,8 @@ function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window
             mmsCfElements: '=',
             mmsEid: '@',
             mmsWs: '@',
-            mmsSite: '@'
+            mmsSite: '@',
+            mmsTinymceApi: '='
         },
         link: mmsTinymceLink
     };
