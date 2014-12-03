@@ -386,6 +386,11 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, $q, growl, _)
             api.keepMode = function() {
                 keepMode = true;
             };
+
+            api.tinymceSave = function() {
+                if (scope.edit && scope.tinymceApi.save)
+                    scope.tinymceApi.save();
+            };
         }
     };
 
