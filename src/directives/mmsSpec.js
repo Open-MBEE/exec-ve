@@ -92,6 +92,7 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, $q, growl, _)
             //$compile(element.contents())(scope);
             return;
         }
+        scope.tinymceApi = {};
         /**
          * @ngdoc function
          * @name mms.directives.directive:mmsSpec#changeElement
@@ -107,6 +108,8 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, $q, growl, _)
                 //element.empty();
                 return;
             }
+            if (scope.edit && scope.tinymceApi.save)
+                scope.tinymceApi.save();
             ElementService.getElement(scope.mmsEid, false, scope.mmsWs, scope.mmsVersion)
             .then(function(data) {
                 //element.empty();
@@ -202,6 +205,7 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, $q, growl, _)
                 deferred.reject({type: 'error', message: "Element isn't editable and can't be saved."});
                 return deferred.promise;
             }
+            scope.tinymceApi.save();
             ElementService.updateElement(scope.edit, scope.mmsWs)
             .then(function(data) {
                 deferred.resolve(data);
