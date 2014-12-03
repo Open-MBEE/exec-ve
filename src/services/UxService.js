@@ -1,0 +1,67 @@
+'use strict';
+
+angular.module('mms')
+.factory('UxService', ['$rootScope', UxService]);
+
+/**
+ * @ngdoc service
+ * @name mms.UxService
+ * 
+ * @description
+ * Ux Service
+ */
+function UxService($rootScope) {
+
+    /**
+     * @ngdoc method
+     * @name mms.UxService#getToolbarButton
+     * @methodOf mms.UxService
+     * 
+     * @description
+     * Get pre-defined toolbar buttons
+     * 
+     * @param {<string>} id of button
+     * @returns {Object} Button object
+     */
+    var getToolbarButton = function(button) {
+		switch (button) {
+		  case "element.viewer":
+		  	return {id: 'element.viewer', icon: 'fa fa-eye', selected: true, active: true, tooltip: 'Preview Element', 
+            		onClick: function() {$rootScope.$broadcast('element.viewer');}};
+		  case "element.editor":
+		    return {id: 'element.editor', icon: 'fa fa-edit', selected: false, active: true, tooltip: 'Edit Element',
+		            onClick: function() {$rootScope.$broadcast('element.editor');},
+		        	dynamic_buttons: [getToolbarButton("element.editor.save"), getToolbarButton("element.editor.cancel")]};
+		  case "view.reorder":
+	        return {id: 'view.reorder', icon: 'fa fa-arrows-v', selected: false, active: true, tooltip: 'Reorder View',
+	    	        onClick: function() {$rootScope.$broadcast('view.reorder');},
+		        	dynamic_buttons: [getToolbarButton("view.reorder.save"), getToolbarButton("view.reorder.cancel")]};
+		  case "document.snapshot":
+		  	return  {id: 'document.snapshot', icon: 'fa fa-camera', selected: false, active: true, tooltip: 'Snapshots',
+		            onClick: function() {$rootScope.$broadcast('document.snapshot');},
+		        	dynamic_buttons: [getToolbarButton("document.snapshot.refresh"), getToolbarButton("document.snapshot.create")]};
+		  case "element.editor.save":
+			return {id: 'element.editor.save', icon: 'fa fa-save', pullDown: true, dynamic: true, selected: false, active: false, tooltip: 'Save',
+				        onClick: function() {$rootScope.$broadcast('element.editor.save');}};
+		  case "element.editor.cancel":
+			return {id: 'element.editor.cancel', icon: 'fa fa-times', dynamic: true, selected: false, active: false, tooltip: 'Cancel',
+			            onClick: function() {$rootScope.$broadcast('element.editor.cancel');}};
+		  case "view.reorder.save":
+			return {id: 'view.reorder.save', icon: 'fa fa-save', pullDown: true, dynamic: true, selected: false, active: false, tooltip: 'Save',
+			            onClick: function() {$rootScope.$broadcast('view.reorder.save');}};
+		  case "view.reorder.cancel":
+		    return {id: 'view.reorder.cancel', icon: 'fa fa-times', dynamic: true, selected: false, active: false, tooltip: 'Cancel',
+		            onClick: function() {$rootScope.$broadcast('view.reorder.cancel');}};
+		  case "document.snapshot.refresh":
+		    return {id: 'document.snapshot.refresh', icon: 'fa fa-refresh', pullDown: true, dynamic: true, selected: false, active: false, tooltip: 'Refresh',
+		            onClick: function() {$rootScope.$broadcast('document.snapshot.refresh');}};
+		  case "document.snapshot.create":
+		    return {id: 'document.snapshot.create', icon: 'fa fa-plus', dynamic: true, selected: false, active: false, tooltip: 'Create Snapshot',
+		            onClick: function() {$rootScope.$broadcast('document.snapshot.create');}};
+		}    
+	};
+
+    return {
+        getToolbarButton: getToolbarButton
+    };
+}

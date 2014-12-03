@@ -3,15 +3,14 @@
 /* Controllers */
 
 angular.module('myApp')
-.controller('ToolbarCtrl', ['$scope', '$rootScope',
-function($scope, $rootScope) {   
+.controller('ToolbarCtrl', ['$scope', '$rootScope', '$timeout', 'UxService',
+function($scope, $rootScope, $timeout, UxService) {   
     $scope.tbApi = {};
-    $rootScope.veTbApi = $scope.tbApi;
+    $rootScope.tbApi = $scope.tbApi;
 
-    $scope.buttons = [
-        {id: 'elementViewer', icon: 'fa fa-eye', selected: true, active: true, tooltip: 'Preview Element', 
-            onClick: function() {$rootScope.$broadcast('elementViewerSelected');}},
-    ];
+    $timeout(function() {
+      $scope.tbApi.addButton(UxService.getToolbarButton("element.viewer"));
+    }, 500);
 
     $scope.onClick = function(button) {
     };

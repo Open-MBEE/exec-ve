@@ -7,9 +7,19 @@ function mmsToolbar($templateCache) {
     var template = $templateCache.get('mms/templates/mmsToolbar.html');
 
     var mmsToolbarLink = function(scope, element, attrs){
+
+        var sortFunction = function(a, b) {
+            if(b.dynamic) return -1;
+            if(a.dynamic) return 1;
+            return 0;
+        };
+
         scope.clicked = function(button) {
             if (!button.active)
                 return;
+            if (button.dynamic)
+                return;
+
             scope.buttons.forEach(function(b) {
                 if (b === button) {
                     b.selected = true;
@@ -20,10 +30,24 @@ function mmsToolbar($templateCache) {
                 } else
                     b.selected = false;
             });
+
+            // de-activate all dynamic buttons
+            scope.buttons.forEach(function(b) {
+                if (b.dynamic) {
+                    b.active = false;
+                }
+            });
+
+            if (button.dynamic_buttons) {
+                button.dynamic_buttons.forEach(function(b) {
+                    b.active = true;
+                });
+            }
         };
 
         if (scope.mmsTbApi) {
             var api = scope.mmsTbApi;
+
             api.select = function(id) {
                 scope.buttons.forEach(function(button) {
                 if (button.id === id && button.active)
@@ -40,6 +64,12 @@ function mmsToolbar($templateCache) {
             };
             api.addButton = function(button) {
                 scope.buttons.push(button);
+                if (button.dynamic_buttons) {
+                    button.dynamic_buttons.forEach(function(button) {
+                        scope.buttons.push(button);
+                    });
+                }
+                scope.buttons.sort(sortFunction);
             };
             api.removeButton = function(id) {
 

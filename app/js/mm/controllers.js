@@ -3,33 +3,19 @@
 /* Controllers */
 
 angular.module('myApp')
-.controller('ToolbarCtrl', ['$scope', '$rootScope',
-function($scope, $rootScope) {   
+.controller('ToolbarCtrl', ['$scope', '$rootScope', '$timeout', 'UxService',
+function($scope, $rootScope, $timeout, UxService) {   
     $scope.tbApi = {};
-    $rootScope.veTbApi = $scope.tbApi;
+    $rootScope.tbApi = $scope.tbApi;
 
-    $scope.buttons = [
-        {id: 'elementViewer', icon: 'fa fa-eye', selected: true, active: true, tooltip: 'Preview Element', 
-            onClick: function() {$rootScope.$broadcast('elementViewerSelected');}},
-        {id: 'elementEditor', icon: 'fa fa-edit', selected: false, active: true, tooltip: 'Edit Element',
-            onClick: function() {$rootScope.$broadcast('elementEditorSelected');}},
-        {id: 'viewStructEditor', icon: 'fa fa-arrows-v', selected: false, active: true, tooltip: 'Reorder View',
-            onClick: function() {$rootScope.$broadcast('viewStructEditorSelected');}},
-        {id: 'documentSnapshots', icon: 'fa fa-camera', selected: false, active: true, tooltip: 'Snapshots',
-            onClick: function() {$rootScope.$broadcast('snapshotsSelected');}},
-        {id: 'elementSave', icon: 'fa fa-save', pullDown: true, dynamic: true, selected: false, active: false, tooltip: 'Save',
-            onClick: function() {$rootScope.$broadcast('elementSave');}},
-        {id: 'elementCancel', icon: 'fa fa-times', dynamic: true, selected: false, active: false, tooltip: 'Cancel',
-            onClick: function() {$rootScope.$broadcast('elementCancel');}},
-        {id: 'viewSave', icon: 'fa fa-save', pullDown: true, dynamic: true, selected: false, active: false, tooltip: 'Save',
-            onClick: function() {$rootScope.$broadcast('viewSave');}},
-        {id: 'viewCancel', icon: 'fa fa-times', dynamic: true, selected: false, active: false, tooltip: 'Cancel',
-            onClick: function() {$rootScope.$broadcast('viewCancel');}},
-        {id: 'snapRefresh', icon: 'fa fa-refresh', pullDown: true, dynamic: true, selected: false, active: false, tooltip: 'Refresh',
-            onClick: function() {$rootScope.$broadcast('refreshSnapshots');}},
-        {id: 'snapNew', icon: 'fa fa-plus', dynamic: true, selected: false, active: false, tooltip: 'Create Snapshot',
-            onClick: function() {$rootScope.$broadcast('newSnapshot');}}
-    ];
+    $scope.buttons = [];
+
+    $timeout(function() {
+      $scope.tbApi.addButton(UxService.getToolbarButton("element.viewer"));
+      $scope.tbApi.addButton(UxService.getToolbarButton("element.editor"));
+      $scope.tbApi.addButton(UxService.getToolbarButton("view.reorder"));
+      $scope.tbApi.addButton(UxService.getToolbarButton("document.snapshot"));
+    }, 500);
 
     $scope.onClick = function(button) {
     };
