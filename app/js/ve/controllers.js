@@ -503,7 +503,11 @@ function($scope, $rootScope, $stateParams, $timeout, viewElements, ViewService, 
     $scope.vid = $stateParams.viewId;
     $scope.ws = ws;
     $scope.version = time;
-    $rootScope.$broadcast('viewSelected', $scope.vid, viewElements);
+
+    $timeout(function() {
+        $rootScope.$broadcast('viewSelected', $scope.vid, viewElements);
+    }, 225);
+
     $scope.viewApi = {};
     $scope.comments = {};
     $scope.numComments = 0;
@@ -531,33 +535,20 @@ function($scope, $rootScope, $stateParams, $timeout, viewElements, ViewService, 
         }
     }, 500);
 }])
-.controller('ToolbarCtrl', ['$scope', '$rootScope',
-function($scope, $rootScope) {   
+.controller('ToolbarCtrl', ['$scope', '$rootScope', '$timeout', 'UxService',
+function($scope, $rootScope, $timeout, UxService) {   
     $scope.tbApi = {};
-    $rootScope.veTbApi = $scope.tbApi;
 
-    $scope.buttons = [
-        {id: 'elementViewer', icon: 'fa fa-eye', selected: true, active: true, tooltip: 'Preview Element', 
-            onClick: function() {$rootScope.$broadcast('elementViewerSelected');}},
-        {id: 'elementEditor', icon: 'fa fa-edit', selected: false, active: true, tooltip: 'Edit Element',
-            onClick: function() {$rootScope.$broadcast('elementEditorSelected');}},
-        {id: 'viewStructEditor', icon: 'fa fa-arrows-v', selected: false, active: true, tooltip: 'Reorder View',
-            onClick: function() {$rootScope.$broadcast('viewStructEditorSelected');}},
-        {id: 'documentSnapshots', icon: 'fa fa-camera', selected: false, active: true, tooltip: 'Snapshots',
-            onClick: function() {$rootScope.$broadcast('snapshotsSelected');}},
-        {id: 'elementSave', icon: 'fa fa-save', pullDown: true, dynamic: true, selected: false, active: false, tooltip: 'Save',
-            onClick: function() {$rootScope.$broadcast('elementSave');}},
-        {id: 'elementCancel', icon: 'fa fa-times', dynamic: true, selected: false, active: false, tooltip: 'Cancel',
-            onClick: function() {$rootScope.$broadcast('elementCancel');}},
-        {id: 'viewSave', icon: 'fa fa-save', pullDown: true, dynamic: true, selected: false, active: false, tooltip: 'Save',
-            onClick: function() {$rootScope.$broadcast('viewSave');}},
-        {id: 'viewCancel', icon: 'fa fa-times', dynamic: true, selected: false, active: false, tooltip: 'Cancel',
-            onClick: function() {$rootScope.$broadcast('viewCancel');}},
-        {id: 'snapRefresh', icon: 'fa fa-refresh', pullDown: true, dynamic: true, selected: false, active: false, tooltip: 'Refresh',
-            onClick: function() {$rootScope.$broadcast('refreshSnapshots');}},
-        {id: 'snapNew', icon: 'fa fa-plus', dynamic: true, selected: false, active: false, tooltip: 'Create Snapshot',
-            onClick: function() {$rootScope.$broadcast('newSnapshot');}}
-    ];
+    $scope.buttons = [];
+
+    $timeout(function() {
+
+      $rootScope.tbApi = $scope.tbApi;
+      $scope.tbApi.addButton(UxService.getToolbarButton("element.viewer"));
+      $scope.tbApi.addButton(UxService.getToolbarButton("element.editor"));
+      $scope.tbApi.addButton(UxService.getToolbarButton("view.reorder"));
+      $scope.tbApi.addButton(UxService.getToolbarButton("document.snapshot"));
+    }, 200);
 
     $scope.onClick = function(button) {
     };
@@ -601,16 +592,6 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
         return false;
     };
 
-    var setEditingButtonsActive = function(type, active) {
-        $rootScope.veTbApi.setActive(type + 'Save', active);
-        $rootScope.veTbApi.setActive(type + 'Cancel', active);
-    };
-
-    var setSnapshotButtonsActive = function(active) {
-        $rootScope.veTbApi.setActive('snapRefresh', active);
-        $rootScope.veTbApi.setActive('snapNew', $scope.editable && active);
-    };
-
     var showPane = function(pane) {
         angular.forEach($scope.show, function(value, key) {
             if (key === pane)
@@ -621,74 +602,63 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
     };
 
     var refreshSnapshots = function() {
-        $rootScope.veTbApi.setButtonIcon('snapRefresh', 'fa fa-refresh fa-spin');
+        $rootScope.tbApi.setButtonIcon('document.snapshot.refresh', 'fa fa-refresh fa-spin');
         ConfigService.getProductSnapshots($scope.document.sysmlid, $scope.site.name, $scope.ws, true)
         .then(function(result) {
             $scope.snapshots = result;
-            $rootScope.veTbApi.setButtonIcon('snapRefresh', 'fa fa-refresh');
+            $rootScope.tbApi.setButtonIcon('document.snapshot.refresh', 'fa fa-refresh');
         }, function(reason) {
             growl.error("Refresh Failed: " + reason.message);
-            $rootScope.veTbApi.setButtonIcon('snapRefresh', 'fa fa-refresh');
+            $rootScope.tbApi.setButtonIcon('document.snapshot.refresh', 'fa fa-refresh');
         });
-        $rootScope.veTbApi.select('documentSnapshots');
+        $rootScope.tbApi.select('document.snapshot');
     };
 
     var creatingSnapshot = false;
-    $scope.$on('newSnapshot', function() {
+    $scope.$on('document.snapshot.create', function() {
         if (creatingSnapshot) {
             growl.info('Please Wait...');
             return;
         }
         creatingSnapshot = true;
-        $rootScope.veTbApi.setButtonIcon('snapNew', 'fa fa-spinner fa-spin');
+        $rootScope.tbApi.setButtonIcon('document.snapshot.create', 'fa fa-spinner fa-spin');
         ConfigService.createSnapshot($scope.document.sysmlid, site.name, ws)
         .then(function(result) {
             creatingSnapshot = false;
-            $rootScope.veTbApi.setButtonIcon('snapNew', 'fa fa-plus');
+            $rootScope.tbApi.setButtonIcon('document.snapshot.create', 'fa fa-plus');
             growl.success("Snapshot Created: Refreshing...");
             refreshSnapshots();
         }, function(reason) {
             creatingSnapshot = false;
             growl.error("Snapshot Creation failed: " + reason.message);
-            $rootScope.veTbApi.setButtonIcon('snapNew', 'fa fa-plus');
+            $rootScope.tbApi.setButtonIcon('document.snapshot.create', 'fa fa-plus');
         });
-        $rootScope.veTbApi.select('documentSnapshots');
+        $rootScope.tbApi.select('document.snapshot');
     });
 
-    $scope.$on('refreshSnapshots', refreshSnapshots);
+    $scope.$on('document.snapshot.refresh', refreshSnapshots);
 
-    $scope.$on('snapshotsSelected', function() {
+    $scope.$on('document.snapshot', function() {
         showPane('snapshots');
-        setEditingButtonsActive('element', false);
-        setEditingButtonsActive('view', false);
-        setSnapshotButtonsActive(true);
     });
     $scope.$on('elementSelected', function(event, eid) {
         $scope.eid = eid;
-        $rootScope.veTbApi.select('elementViewer');
+        $rootScope.tbApi.select('element.viewer');
         showPane('element');
         $scope.specApi.setEditing(false);
         ElementService.getElement(eid, false, ws, time).
         then(function(element) {
             var editable = element.editable && time === 'latest';
-            $rootScope.veTbApi.setActive('elementEditor', editable);
+            $rootScope.tbApi.setPermission('element.editor', editable);
+            $rootScope.tbApi.setPermission("document.snapshot.create", editable);
         });
-        setEditingButtonsActive('element', false);
-        setEditingButtonsActive('view', false);
-        setSnapshotButtonsActive(false);
     });
-    $scope.$on('elementViewerSelected', function() {
+    $scope.$on('element.viewer', function() {
         $scope.specApi.setEditing(false);
-        setEditingButtonsActive('element', false);
-        setEditingButtonsActive('view', false);
-        setSnapshotButtonsActive(false);
         showPane('element');
     });
-    $scope.$on('elementEditorSelected', function() {
+    $scope.$on('element.editor', function() {
         $scope.specApi.setEditing(true);
-        setEditingButtonsActive('element', true);
-        setEditingButtonsActive('view', false);
-        setSnapshotButtonsActive(false);
         showPane('element');
         var edit = $scope.specApi.getEdits();
         if (edit) {
@@ -700,39 +670,34 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
         $scope.eid = vid;
         $scope.vid = vid;
         $scope.viewElements = viewElements;
-        $rootScope.veTbApi.select('elementViewer');
+        $rootScope.tbApi.select('element.viewer');
         showPane('element');
         ElementService.getElement(vid, false, ws, time).
         then(function(element) {
             var editable = element.editable && time === 'latest';
-            $rootScope.veTbApi.setActive('elementEditor', editable);
-            $rootScope.veTbApi.setActive('viewStructEditor', editable);
+            $rootScope.tbApi.setPermission('element.editor', editable);
+            $rootScope.tbApi.setPermission('view.reorder', editable);
+            $rootScope.tbApi.setPermission("document.snapshot.create", editable);
         });
-        setEditingButtonsActive('element', false);
-        setEditingButtonsActive('view', false);
-        setSnapshotButtonsActive(false);
         $scope.specApi.setEditing(false);
     });
-    $scope.$on('viewStructEditorSelected', function() {
+    $scope.$on('view.reorder', function() {
         $scope.viewOrderApi.setEditing(true);
         showPane('reorder');
-        setEditingButtonsActive('element', false);
-        setEditingButtonsActive('view', true);
-        setSnapshotButtonsActive(false);
     });
     
     var elementSaving = false;
-    $scope.$on('elementSave', function() {
+    $scope.$on('element.editor.save', function() {
         if (elementSaving) {
             growl.info('Please Wait...');
             return;
         }
         elementSaving = true;
-        $rootScope.veTbApi.setButtonIcon('elementSave', 'fa fa-spin fa-spinner');
+        $rootScope.tbApi.setButtonIcon('element.editor.save', 'fa fa-spin fa-spinner');
         $scope.specApi.save().then(function(data) {
             elementSaving = false;
             growl.success('Save Successful');
-            $rootScope.veTbApi.setButtonIcon('elementSave', 'fa fa-save');
+            $rootScope.tbApi.setButtonIcon('element.editor.save', 'fa fa-save');
             delete $rootScope.veEdits[$scope.specApi.getEdits().sysmlid];
             if (Object.keys($rootScope.veEdits).length > 0) {
                 var next = Object.keys($rootScope.veEdits)[0];
@@ -741,8 +706,7 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
                 $scope.eid = next;
             } else {
                 $scope.specApi.setEditing(false);
-                $rootScope.veTbApi.select('elementViewer');
-                setEditingButtonsActive('element', false);
+                $rootScope.tbApi.select('element.viewer');
             }
         }, function(reason) {
             elementSaving = false;
@@ -752,11 +716,11 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
                 growl.warning(reason.message);
             else if (reason.type === 'error')
                 growl.error(reason.message);
-            $rootScope.veTbApi.setButtonIcon('elementSave', 'fa fa-save');
+            $rootScope.tbApi.setButtonIcon('element.editor.save', 'fa fa-save');
         });
-        $rootScope.veTbApi.select('elementEditor');
+        $rootScope.tbApi.select('element.editor');
     });
-    $scope.$on('elementCancel', function() {
+    $scope.$on('element.editor.cancel', function() {
         var go = function() {
             delete $rootScope.veEdits[$scope.specApi.getEdits().sysmlid];
             $scope.specApi.revertEdits();
@@ -767,10 +731,7 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
                 $scope.eid = next;
             } else {
                 $scope.specApi.setEditing(false);
-                $rootScope.veTbApi.select('elementViewer');
-                setEditingButtonsActive('element', false);
-                setEditingButtonsActive('view', false);
-                setSnapshotButtonsActive(false);
+                $rootScope.tbApi.select('element.viewer');
             }
         };
         if ($scope.specApi.hasEdits()) {
@@ -793,17 +754,17 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
             go();
     });
     var viewSaving = false;
-    $scope.$on('viewSave', function() {
+    $scope.$on('view.reorder.save', function() {
         if (viewSaving) {
             growl.info('Please Wait...');
             return;
         }
         viewSaving = true;
-        $rootScope.veTbApi.setButtonIcon('viewSave', 'fa fa-spin fa-spinner');
+        $rootScope.tbApi.setButtonIcon('view.reorder.save', 'fa fa-spin fa-spinner');
         $scope.viewOrderApi.save().then(function(data) {
             viewSaving = false;
             growl.success('Save Succesful');
-            $rootScope.veTbApi.setButtonIcon('viewSave', 'fa fa-save');
+            $rootScope.tbApi.setButtonIcon('view.reorder.save', 'fa fa-save');
         }, function(reason) {
             viewSaving = false;
             if (reason.type === 'info')
@@ -812,18 +773,15 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
                 growl.warning(reason.message);
             else if (reason.type === 'error')
                 growl.error(reason.message);
-            $rootScope.veTbApi.setButtonIcon('viewSave', 'fa fa-save');
+            $rootScope.tbApi.setButtonIcon('view.reorder.save', 'fa fa-save');
         });
-        $rootScope.veTbApi.select('viewStructEditor');
+        $rootScope.tbApi.select('view.reorder');
     });
-    $scope.$on('viewCancel', function() {
+    $scope.$on('view.reorder.cancel', function() {
         $scope.specApi.setEditing(false);
         $scope.viewOrderApi.revertEdits();
-        $rootScope.veTbApi.select('elementViewer');
+        $rootScope.tbApi.select('element.viewer');
         showPane('element');
-        setEditingButtonsActive('element', false);
-        setEditingButtonsActive('view', false);
-        setSnapshotButtonsActive(false);
     });
 }])
 .controller('VeCtrl', ['$scope', '$location', '$rootScope', '_', '$window',

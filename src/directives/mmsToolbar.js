@@ -6,76 +6,47 @@ angular.module('mms.directives')
 function mmsToolbar($templateCache) {
     var template = $templateCache.get('mms/templates/mmsToolbar.html');
 
-    var mmsToolbarLink = function(scope, element, attrs){
-
+    var mmsToolbarCtrl = function($scope) {
+        
         var sortFunction = function(a, b) {
             if(b.dynamic) return -1;
             if(a.dynamic) return 1;
             return 0;
         };
 
-        scope.clicked = function(button) {
-            if (!button.active)
-                return;
-            if (button.dynamic)
-                return;
-
-            scope.buttons.forEach(function(b) {
-                if (b === button) {
-                    b.selected = true;
-                    if (b.onClick)
-                        b.onClick();
-                    else if (scope.onClick)
-                        scope.onClick({button: button});
-                } else
-                    b.selected = false;
-            });
-
-            // de-activate all dynamic buttons
-            scope.buttons.forEach(function(b) {
-                if (b.dynamic) {
-                    b.active = false;
-                }
-            });
-
-            if (button.dynamic_buttons) {
-                button.dynamic_buttons.forEach(function(b) {
-                    b.active = true;
-                });
-            }
-        };
-
-        if (scope.mmsTbApi) {
-            var api = scope.mmsTbApi;
+        if ($scope.mmsTbApi) {
+            var api = $scope.mmsTbApi;
 
             api.select = function(id) {
-                scope.buttons.forEach(function(button) {
-                if (button.id === id && button.active)
-                    button.selected = true;
-                else
-                    button.selected = false;
+                $scope.buttons.forEach(function(button) {
+                    if (button.id === id && button.active) {
+                        button.selected = true;
+                        $scope.clicked(button);
+                    }
+                    else
+                        button.selected = false;
                 });
             };
-            api.setActive = function(id, active) {
-                scope.buttons.forEach(function(button) {
+
+            api.setPermission = function (id, permission) {
+                $scope.buttons.forEach(function(button) {
                     if (button.id === id)
-                        button.active = active;
+                        button.permission = permission;
                 });
             };
+
             api.addButton = function(button) {
-                scope.buttons.push(button);
+                $scope.buttons.push(button);
                 if (button.dynamic_buttons) {
                     button.dynamic_buttons.forEach(function(button) {
-                        scope.buttons.push(button);
+                        $scope.buttons.push(button);
                     });
                 }
-                scope.buttons.sort(sortFunction);
+                $scope.buttons.sort(sortFunction);
             };
-            api.removeButton = function(id) {
 
-            };
             api.setButtonIcon = function(id, icon) {
-                scope.buttons.forEach(function(button) {
+                $scope.buttons.forEach(function(button) {
                     if (button.id === id)
                         button.icon = icon;
                 });
@@ -83,9 +54,49 @@ function mmsToolbar($templateCache) {
         }
     };
 
+    var mmsToolbarLink = function(scope, element, attrs){
+
+        scope.clicked = function(button) {
+            if (! button.active)
+                return;
+
+            if (button.onClick)
+                button.onClick();
+            else if (scope.onClick)
+                scope.onClick({button: button});
+
+            if (! button.dynamic)
+            {
+                scope.buttons.forEach(function(b) {
+                    if (b === button) {
+                        b.selected = true;
+                    } else
+                        b.selected = false;
+                });
+
+                // de-activate all dynamic buttons
+                scope.buttons.forEach(function(b) {
+                    if (b.dynamic) {
+                        b.active = false;
+                    }
+                });
+
+                if (button.dynamic_buttons) {
+                    button.dynamic_buttons.forEach(function(b) {
+                        b.active = true;
+                    });
+                }
+            }
+
+        };
+    };  
+
+
+
     return {
         restrict: 'E', 
         template: template,
+        controller: ['$scope', mmsToolbarCtrl],
         link: mmsToolbarLink,
         scope: {
             buttons: '=',
