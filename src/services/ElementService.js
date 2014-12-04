@@ -344,6 +344,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, _) {
                 if (status === 409) {
                     var server = _.cloneDeep(data.elements[0]);
                     var newread = server.read;
+                    var newmodified = server.modified;
                     delete server.modified;
                     delete server.read;
                     delete server.creator;
@@ -359,6 +360,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, _) {
                         UtilsService.cleanElement(current);
                         if (angular.equals(server, current)) {
                             elem.read = newread;
+                            elem.modified = newmodified;
                             updateElement(elem, workspace)
                             .then(function(good){
                                 deferred.resolve(good);

@@ -63,6 +63,13 @@ thead td, table caption {
   td {
     border-top: 1px solid $tertiary_grey;
     border-bottom: 1px solid $tertiary_grey;
+    //border-left: 1px solid $tertiary_grey;
+    //border-right: 1px solid $tertiary_grey;
+  }
+}
+
+.table-bordered {
+  td {
     border-left: 1px solid $tertiary_grey;
     border-right: 1px solid $tertiary_grey;
   }

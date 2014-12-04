@@ -10,6 +10,7 @@
 
   table, .mce-item-table {
     @extend .table;
+    @extend .table-bordered;
     font-family: $font-family-sans-serif;
 
     td {
