@@ -18,8 +18,8 @@ function($scope, $rootScope, $timeout, UxService) {
     $scope.onClick = function(button) {
     };
 }])
-.controller('NavTreeCtrl', ['$scope', '$rootScope', '$location', '$timeout', '$state', '$anchorScroll', 'ElementService', 'ViewService', 'UtilsService', 'growl', '$modal', '$q', '$filter', 'ws', 'sites',
-function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, ElementService, ViewService, UtilsService, growl, $modal, $q, $filter, ws, sites) {
+.controller('NavTreeCtrl', ['$scope', '$rootScope', '$location', '$timeout', '$state', '$anchorScroll', 'ElementService', 'ViewService', 'UtilsService', 'growl', '$modal', '$q', '$filter', 'ws', 'sites', 'config', 'configSnapshots',
+function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, ElementService, ViewService, UtilsService, growl, $modal, $q, $filter, ws, sites, config, configSnapshots) {
     $scope.ws = ws;
     $scope.sites = sites;
 
@@ -55,21 +55,71 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, Element
     $scope.tooltipPlacement($scope.buttons);
     $scope.treeApi = treeApi;
 
-    var dataTree = UtilsService.buildTreeHierarchy(sites, "sysmlid", "Site", "parent" );
+
+    var addDocOrSnapshots = function(site, siteNode) {
+        ViewService.getSiteDocuments(site, false, ws)
+        .then(function(docs) {
+            if (config === 'latest') {
+                docs.forEach(function(doc) {
+                    var docNode = {
+                        label : doc.name,
+                        type : "view",
+                        data : doc,
+                        children : []
+                    };
+                    siteNode.children.unshift(docNode);
+                });
+            } else {
+                var docids = [];
+                docs.forEach(function(doc) {
+                    docids.push(doc.sysmlid);
+                });
+                configSnapshots.forEach(function(snapshot) {
+                    if (docids.indexOf(snapshot.sysmlid) > -1) {
+                        snapshot.name = snapshot.sysmlname;
+                        var snapshotNode = {
+                            label : snapshot.sysmlname,
+                            type : 'snapshot',
+                            data : snapshot,
+                            children : []
+                        };
+                        siteNode.children.unshift(snapshotNode);
+                    }
+                });
+            }
+        }, function(reason) {
+
+        });
+        
+    };
+
+    var dataTree = UtilsService.buildTreeHierarchy(sites, "sysmlid", "site", "parent", addDocOrSnapshots);
 
     $scope.my_data = dataTree;
 
     $scope.my_tree_handler = function(branch) {
-        $state.go('portal.site', {site: branch.data.sysmlid});
+        if (branch.type === 'site') {
+            $state.go('portal.site', {site: branch.data.sysmlid});
+        } else if (branch.type === 'view') {
+
+        } else if (branch.type === 'snapshot') {
+
+        }
+        
     };
 
     $scope.tree_options = {
         types: {
             "section": "fa fa-file-o fa-fw",
             "view": "fa fa-file fa-fw",
-            "Site": "fa fa-sitemap fa-fw"
+            "site": "fa fa-sitemap fa-fw",
+            "snapshot" : "fa fa-camera fa-fw"
         }
     };
+
+    $timeout(function() {
+        $scope.treeApi.refresh();
+    }, 5000);
 
 }])
 .controller('SiteCtrl', ['$rootScope', '$scope', '$stateParams', 'documents', 'config', 'configSnapshots',
