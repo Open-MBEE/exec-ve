@@ -655,15 +655,15 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, _) {
      * @description
      * Delete elements from alfresco and update the cache if successful.
      * 
-     * @param {Array.<Object>} elems Array of element objects that contains element id and any property changes to be deleted.
+     * @param {Array.<string>} ids Array of element ids to delete
      * @param {string} [workspace=master] (optional) workspace to use
      * @returns {Promise} The promise will be resolved with an array of updated element references if 
      *      delete is successful.
      */
-    var deleteElements = function(elems, workspace) {
+    var deleteElements = function(ids, workspace) {
         var promises = [];
-        elems.forEach(function(elem) {
-            promises.push(deleteElement(elem, workspace));
+        ids.forEach(function(id) {
+            promises.push(deleteElement(id, workspace));
         });
         return $q.all(promises);
     };

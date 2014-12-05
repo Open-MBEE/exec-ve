@@ -55,12 +55,32 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
         resolve: {
             documents: function($stateParams, ViewService) {
                 return ViewService.getSiteDocuments($stateParams.site, false, $stateParams.ws);
+            },
+            site : function($stateParams) {
+                return $stateParams.site;
             }
         },
         views: {
             'pane-center@': {
                 templateUrl: 'partials/portal/pane-center.html',
                 controller: 'SiteCtrl'
+            }
+        }
+    })
+    .state('portal.site.view', {
+        url: '/docs/:docid',
+        resolve: {
+            view: function($stateParams, ViewService, config) {
+                if (config === 'latest')
+                    return ViewService.getView($stateParams.docid, false, $stateParams.ws, 'latest');
+                else
+                    return ViewService.getView($stateParams.docid, false, $stateParams.ws, config.timestamp);
+            }
+        },
+        views: {
+            'pane-center@': {
+                templateUrl: 'partials/portal/pane-center-doc.html',
+                controller: 'DocCtrl'
             }
         }
     });

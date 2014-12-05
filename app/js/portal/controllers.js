@@ -65,6 +65,7 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, Element
                         label : doc.name,
                         type : "view",
                         data : doc,
+                        site : site,
                         children : []
                     };
                     siteNode.children.unshift(docNode);
@@ -81,6 +82,7 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, Element
                             label : snapshot.sysmlname,
                             type : 'snapshot',
                             data : snapshot,
+                            site : site,
                             children : []
                         };
                         siteNode.children.unshift(snapshotNode);
@@ -100,12 +102,9 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, Element
     $scope.my_tree_handler = function(branch) {
         if (branch.type === 'site') {
             $state.go('portal.site', {site: branch.data.sysmlid});
-        } else if (branch.type === 'view') {
-
-        } else if (branch.type === 'snapshot') {
-
-        }
-        
+        } else if (branch.type === 'view' || branch.type === 'snapshot') {
+            $state.go('portal.site.view', {site: branch.site, docid: branch.data.sysmlid});
+        } 
     };
 
     $scope.tree_options = {
@@ -148,4 +147,15 @@ function($scope, $rootScope, $timeout, configurations, ws) {
     $scope.ws = ws;
     $scope.show = {configs:true};
     $scope.configurations = configurations;
+}])
+.controller('DocCtrl', ['$scope', 'ws', 'config', 'view', 'site',
+function($scope, ws, config, view, site) {
+    $scope.ws = ws;
+    if (config === 'latest')
+        $scope.time = 'latest';
+    else
+        $scope.time = config.timestamp; //need to account for old snapshots times
+    $scope.view = view;
+    $scope.api = {};
+    $scope.site = site;
 }]);
