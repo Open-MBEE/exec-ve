@@ -12,67 +12,56 @@ function($scope, $rootScope, $timeout, UxService) {
 
     $timeout(function() {
       $scope.tbApi.addButton(UxService.getToolbarButton("element.viewer"));
-      $scope.tbApi.addButton(UxService.getToolbarButton("element.editor"));
-      $scope.tbApi.addButton(UxService.getToolbarButton("view.reorder"));
-      $scope.tbApi.addButton(UxService.getToolbarButton("document.snapshot"));
     }, 500);
 
     $scope.onClick = function(button) {
     };
 }])
-.controller('WorkspaceTreeCtrl', ['$scope', '$rootScope', '$location', '$timeout', '$state', '$stateParams','$anchorScroll', 'WorkspaceService', 'ElementService', 'ViewService', 'UtilsService', 'ConfigService', 'growl', '$modal', '$q', '$filter', 'workspaces',
-function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorScroll, WorkspaceService, ElementService, ViewService, UtilsService, ConfigService, growl, $modal, $q, $filter, workspaces) {
+.controller('WorkspaceTreeCtrl', ['$scope', '$rootScope', '$location', '$timeout', '$state', '$stateParams','$anchorScroll', 'WorkspaceService', 'ElementService', 'ViewService', 'UtilsService', 'ConfigService', 'growl', '$modal', '$q', '$filter', 'workspaces', 'UxService',
+function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorScroll, WorkspaceService, ElementService, ViewService, UtilsService, ConfigService, growl, $modal, $q, $filter, workspaces, UxService) {
 
-    $scope.buttons = [
-    {
-        action: function(){ $scope.treeApi.refresh(); },        
-        tooltip: "Refresh",
-        icon: "fa-refresh",
-        permission: true
-    }, {
-        action: function(){ $scope.treeApi.expand_all(); },        
-        tooltip: "Expand All",
-        icon: "fa-caret-square-o-down",
-        permission: true
-    }, {
-        action: function(){ $scope.treeApi.collapse_all(); },
-        tooltip: "Collapse All",
-        icon: "fa-caret-square-o-up",
-        permission: true
-    }, {
-        action: function(){ $scope.toggleFilter(); },
-        tooltip: "Filter Tasks",
-        icon: "fa-filter",
-        permission: true
-    },
-    {
-        action: function(){ $scope.addWorkspace(); },
-        tooltip: "Add Task",
-        icon: "fa-plus",
-        permission: true
-        // TODO: permission: $scope.editable
-    },
-    {
-        action: function(){ $scope.addConfiguration(); },
-        tooltip: "Add Configuration",
-        icon: "fa-tag",
-        permission: true
-        // TODO: permission: $scope.editable
-    },
-    {
-        action: function(){ $scope.deleteWorkspaceOrConfig(); },
-        tooltip: "Delete",
-        icon: "fa-times",
-        permission: true
-        // TODO: permission: $scope.editable
-    },
-    {
-        action: function(){ $scope.toggleMerge(); },
-        tooltip: "Merge Task",
-        icon: "fa-share-alt fa-flip-horizontal",
-        permission: true
-        // TODO: permission: $scope.editable
-    }];
+    $scope.bbApi = {};
+    $rootScope.bbApi = $scope.bbApi;
+
+    $scope.buttons = [];
+
+    $timeout(function() {
+      $scope.bbApi.addButton(UxService.getButtonBarButton("tree.expand"));
+      $scope.bbApi.addButton(UxService.getButtonBarButton("tree.collapse"));
+      $scope.bbApi.addButton(UxService.getButtonBarButton("tree.filter"));
+      $scope.bbApi.addButton(UxService.getButtonBarButton("tree.add.task"));
+      $scope.bbApi.addButton(UxService.getButtonBarButton("tree.add.configuration"));
+      $scope.bbApi.addButton(UxService.getButtonBarButton("tree.delete"));
+      $scope.bbApi.addButton(UxService.getButtonBarButton("tree.merge"));
+    }, 500);
+
+    $scope.$on('tree.expand', function() {
+        $scope.treeApi.expand_all();
+    });
+
+    $scope.$on('tree.collapse', function() {
+        $scope.treeApi.collapse_all();
+    });
+
+    $scope.$on('tree.filter', function() {
+        $scope.toggleFilter();
+    });
+
+    $scope.$on('tree.add.task', function() {
+        $scope.addWorkspace();
+    });
+
+    $scope.$on('tree.add.configuration', function() {
+        $scope.addConfiguration();
+    });
+
+    $scope.$on('tree.delete', function() {
+        $scope.deleteWorkspaceOrConfig();
+    });
+
+    $scope.$on('tree.merge', function() {
+        $scope.toggleMerge();
+    });
 
     $scope.filterOn = false;
     $scope.toggleFilter = function() {
@@ -99,12 +88,6 @@ function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorS
         $scope.mergeToWs = branch.data;
     };
 
-    $scope.tooltipPlacement = function(arr) {
-        arr[0].placement = "bottom-left";
-        for(var i=1; i<arr.length; i++){
-            arr[i].placement = "bottom";
-        }
-    };
     $scope.comparing = false;
     $scope.compare = function() {
       if ($scope.comparing) {
@@ -116,7 +99,6 @@ function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorS
     };
 
     var treeApi = {};
-    $scope.tooltipPlacement($scope.buttons);
     $scope.treeApi = treeApi;
     $rootScope.treeApi = treeApi;
  
@@ -186,7 +168,7 @@ function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorS
 
         deleteWorkspaceOrConfig = true;
 
-        $scope.buttons[6].icon = 'fa-spin fa-spinner';
+        $scope.bbApi.toggleButtonSpinner("tree.delete");
 
         if (branch.type === "Workspace") {
 
@@ -194,12 +176,11 @@ function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorS
           .then(function(data) {
               treeApi.remove_branch(branch);
               growl.success("Task Deleted");
-              deleteWorkspaceOrConfig = false;
-              $scope.buttons[6].icon = 'fa-times';
           }, function(reason) {
               growl.error("Task Delete Error: " + reason.message);
+          }).finally(function() {
               deleteWorkspaceOrConfig = false;
-              $scope.buttons[6].icon = 'fa-times';
+              $scope.bbApi.toggleButtonSpinner("tree.delete");
           });
 
         } else if (branch.type === "Configuration") {
@@ -208,19 +189,16 @@ function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorS
           .then(function(data) {
               treeApi.remove_branch(branch);
               growl.success("Configuration Deleted");
-              deleteWorkspaceOrConfig = false;
-              $scope.buttons[6].icon = 'fa-times';
           }, function(reason) {
               growl.error("Configuration Delete Error: " + reason.message);
+          }).finally(function() {
               deleteWorkspaceOrConfig = false;
-              $scope.buttons[6].icon = 'fa-times';
+              $scope.bbApi.toggleButtonSpinner("tree.delete");
           });
-
         } else {
-              $scope.buttons[6].icon = 'fa-times';          
-              deleteWorkspaceOrConfig = false;
+            deleteWorkspaceOrConfig = false;
+            $scope.bbApi.toggleButtonSpinner("tree.delete");
         }
-
     };
 
     $scope.addConfiguration = function() {
@@ -784,9 +762,6 @@ function(_, $timeout, $scope, $rootScope, $http, $state, $stateParams, $modal, g
     $rootScope.options = options;
 
     $timeout(function () { $scope.treeApi.refresh(); $scope.treeApi.expand_all(); $rootScope.treeApi = $scope.treeApi; } ); 
-    
-    
-
 }])
 .controller('WorkspaceDiffElementViewController', ["_", "$timeout", "$scope", "$rootScope", "$http", "$state", "$stateParams", "$modal", "growl", "WorkspaceService", "ElementService", "diff",
 function(_, $timeout, $scope, $rootScope, $http, $state, $stateParams, $modal, growl, WorkspaceService, ElementService, diff) {

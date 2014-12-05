@@ -602,16 +602,19 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
     };
 
     var refreshSnapshots = function() {
-        $rootScope.tbApi.setButtonIcon('document.snapshot.refresh', 'fa fa-refresh fa-spin');
+        // TODO: $rootScope.tbApi.toggleButtonSpinner('document.snapshot.refresh', 'fa fa-refresh fa-spin');
+        $rootScope.tbApi.toggleButtonSpinner('document.snapshot.refresh');
         ConfigService.getProductSnapshots($scope.document.sysmlid, $scope.site.name, $scope.ws, true)
         .then(function(result) {
             $scope.snapshots = result;
-            $rootScope.tbApi.setButtonIcon('document.snapshot.refresh', 'fa fa-refresh');
         }, function(reason) {
             growl.error("Refresh Failed: " + reason.message);
-            $rootScope.tbApi.setButtonIcon('document.snapshot.refresh', 'fa fa-refresh');
+        })
+        .finally(function() {
+            $rootScope.tbApi.toggleButtonSpinner('document.snapshot.refresh');
+            $rootScope.tbApi.select('document.snapshot');
+
         });
-        $rootScope.tbApi.select('document.snapshot');
     };
 
     var creatingSnapshot = false;
@@ -621,17 +624,17 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
             return;
         }
         creatingSnapshot = true;
-        $rootScope.tbApi.setButtonIcon('document.snapshot.create', 'fa fa-spinner fa-spin');
+        $rootScope.tbApi.toggleButtonSpinner('document.snapshot.create');
         ConfigService.createSnapshot($scope.document.sysmlid, site.name, ws)
         .then(function(result) {
             creatingSnapshot = false;
-            $rootScope.tbApi.setButtonIcon('document.snapshot.create', 'fa fa-plus');
+            $rootScope.tbApi.toggleButtonSpinner('document.snapshot.create');
             growl.success("Snapshot Created: Refreshing...");
             refreshSnapshots();
         }, function(reason) {
             creatingSnapshot = false;
             growl.error("Snapshot Creation failed: " + reason.message);
-            $rootScope.tbApi.setButtonIcon('document.snapshot.create', 'fa fa-plus');
+            $rootScope.tbApi.toggleButtonSpinner('document.snapshot.create');
         });
         $rootScope.tbApi.select('document.snapshot');
     });
@@ -693,11 +696,11 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
             return;
         }
         elementSaving = true;
-        $rootScope.tbApi.setButtonIcon('element.editor.save', 'fa fa-spin fa-spinner');
+        $rootScope.tbApi.toggleButtonSpinner('element.editor.save');
         $scope.specApi.save().then(function(data) {
             elementSaving = false;
             growl.success('Save Successful');
-            $rootScope.tbApi.setButtonIcon('element.editor.save', 'fa fa-save');
+            $rootScope.tbApi.toggleButtonSpinner('element.editor.save');
             delete $rootScope.veEdits[$scope.specApi.getEdits().sysmlid];
             if (Object.keys($rootScope.veEdits).length > 0) {
                 var next = Object.keys($rootScope.veEdits)[0];
@@ -716,7 +719,7 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
                 growl.warning(reason.message);
             else if (reason.type === 'error')
                 growl.error(reason.message);
-            $rootScope.tbApi.setButtonIcon('element.editor.save', 'fa fa-save');
+            $rootScope.tbApi.toggleButtonSpinner('element.editor.save');
         });
         $rootScope.tbApi.select('element.editor');
     });
@@ -760,11 +763,11 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
             return;
         }
         viewSaving = true;
-        $rootScope.tbApi.setButtonIcon('view.reorder.save', 'fa fa-spin fa-spinner');
+        $rootScope.tbApi.toggleButtonSpinner('view.reorder.save');
         $scope.viewOrderApi.save().then(function(data) {
             viewSaving = false;
             growl.success('Save Succesful');
-            $rootScope.tbApi.setButtonIcon('view.reorder.save', 'fa fa-save');
+            $rootScope.tbApi.toggleButtonSpinner('view.reorder.save');
         }, function(reason) {
             viewSaving = false;
             if (reason.type === 'info')
@@ -773,7 +776,7 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
                 growl.warning(reason.message);
             else if (reason.type === 'error')
                 growl.error(reason.message);
-            $rootScope.tbApi.setButtonIcon('view.reorder.save', 'fa fa-save');
+            $rootScope.tbApi.toggleButtonSpinner('view.reorder.save');
         });
         $rootScope.tbApi.select('view.reorder');
     });
