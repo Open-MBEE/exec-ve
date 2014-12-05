@@ -45,10 +45,18 @@ function mmsToolbar($templateCache) {
                 $scope.buttons.sort(sortFunction);
             };
 
-            api.setButtonIcon = function(id, icon) {
+            api.toggleButtonSpinner = function (id) {
                 $scope.buttons.forEach(function(button) {
-                    if (button.id === id)
-                        button.icon = icon;
+                    if (button.id === id) {
+                        if (button.spinner) {
+                            button.icon = button.icon_original;
+                        }
+                        else {
+                            button.icon_original = button.icon;
+                            button.icon = 'fa fa-spinner fa-spin';
+                        }
+                        button.spinner = ! button.spinner;
+                    }
                 });
             };
         }
