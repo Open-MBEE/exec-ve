@@ -109,18 +109,22 @@ function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorS
                                               label : config.name, 
                                               type : "Configuration",
                                               data : config, 
+                                              workspace: workspaceId,
                                               children : [] }
                                           ); 
         });
       });
     };
 
-    var dataTree = UtilsService.buildTreeHierarchy(workspaces, "id", "Workspace", "parent", level2Func, "Configuraiton");
+    var dataTree = UtilsService.buildTreeHierarchy(workspaces, "id", "Workspace", "parent", level2Func);
 
     $scope.my_data = dataTree;
 
     $scope.my_tree_handler = function(branch) {
+      if (branch.type === 'Workspace')
         $state.go('mm.workspace', {ws: branch.data.id});
+      else if (branch.type === 'Configuration')
+        $state.go('mm.workspace.config', {ws: branch.workspace, config: branch.data.id});
     };
 
     $scope.tree_options = {
@@ -133,7 +137,10 @@ function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorS
     };
 
     $rootScope.tree_initial = "";
-
+    $timeout(function() {
+      $scope.treeApi.refresh();
+    }, 5000);
+    
     $scope.createWorkspace = function (branch, wsParentId) {
       $scope.createWsParentId = wsParentId;
 
@@ -225,6 +232,7 @@ function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorS
           treeApi.add_branch(branch, {
               label: data.name,
               type: "Configuration",
+              workspace: branch.data.id,
               data: data,
               children: []
           });

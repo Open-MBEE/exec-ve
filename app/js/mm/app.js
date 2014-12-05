@@ -44,6 +44,7 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
                     $scope.ws = $stateParams.ws;
                     $scope.sites = sites;
                     $scope.buttons = [];
+                    $scope.config = 'latest';
                     $rootScope.tree_initial = $scope.ws;
                  }
             },
@@ -57,6 +58,19 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
                         $scope.element = data;
                     });
                  }
+            }
+        }
+    })
+    .state('mm.workspace.config', {
+        url: '/tags/:config',
+        views: {
+            'pane-center@': {
+                templateUrl: 'partials/mm/pane-center.html',
+                controller: function($scope, $stateParams, sites) {
+                    $scope.ws = $stateParams.ws;
+                    $scope.config = $stateParams.config;
+                    $scope.sites = sites;
+                }
             }
         }
     })
