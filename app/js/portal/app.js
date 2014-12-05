@@ -4,13 +4,26 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
 .config(function($stateProvider, $urlRouterProvider) {
     $stateProvider
     .state('portal', {
-        url: '/workspaces/:ws',
+        url: '/workspaces/:ws/tags/:config',
         resolve: {
             sites: function($stateParams, SiteService) {
                 return SiteService.getSites($stateParams.ws);
             },
             ws: function($stateParams) {
                 return $stateParams.ws;
+            },
+            config: function($stateParams, ConfigService) {
+                if ($stateParams.config === 'latest')
+                    return 'latest';
+                return ConfigService.getConfig($stateParams.config, $stateParams.ws, false);
+            },
+            configurations: function($stateParams, ConfigService) {
+                return ConfigService.getConfigs($stateParams.ws, false);
+            },
+            configSnapshots: function($stateParams, ConfigService) {
+                if ($stateParams.config === 'latest')
+                    return [];
+                return ConfigService.getConfigSnapshots($stateParams.config, $stateParams.ws, false);
             }
         },
         views: {
@@ -28,7 +41,8 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
                 controller: 'NavTreeCtrl'
             },
             'pane-right': {
-                templateUrl: 'partials/portal/pane-right.html'
+                templateUrl: 'partials/portal/pane-right.html',
+                controller: 'ToolCtrl'
             },
             'toolbar-right': {
                 template: '<mms-toolbar buttons="buttons" on-click="onClick(button)" mms-tb-api="tbApi"></mms-toolbar>',
@@ -37,22 +51,16 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
         }
     })
     .state('portal.site', {
-        url: '/site/:site',
+        url: '/sites/:site',
         resolve: {
             documents: function($stateParams, ViewService) {
-                return ViewService.getSiteDocuments($stateParams.site, null, $stateParams.ws, null);
+                return ViewService.getSiteDocuments($stateParams.site, false, $stateParams.ws);
             }
         },
         views: {
             'pane-center@': {
                 templateUrl: 'partials/portal/pane-center.html',
-                controller: function ($rootScope, $scope, $stateParams, documents) {
-                    $scope.ws = $stateParams.ws;
-                    $scope.site = $stateParams.site;
-                    $scope.documents = documents;
-                    $scope.buttons = [];
-                    $rootScope.tree_initial = $scope.site;
-                 }
+                controller: 'SiteCtrl'
             }
         }
     });

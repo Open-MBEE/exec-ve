@@ -68,9 +68,8 @@ function urlService(baseUrl) {
      * @param {string} workspace Workspace name
      * @returns {string} The url
      */
-    var getConfigSnapshotsURL = function(id, site, workspace) {
+    var getConfigSnapshotsURL = function(id, workspace) {
         return root + "/workspaces/" + workspace +
-                      "/sites/" + site +
                       "/configurations/" + id +
                       "/snapshots";                
     };

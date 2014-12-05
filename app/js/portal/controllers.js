@@ -12,6 +12,7 @@ function($scope, $rootScope, $timeout, UxService) {
 
     $timeout(function() {
       $scope.tbApi.addButton(UxService.getToolbarButton("element.viewer"));
+      $scope.tbApi.addButton(UxService.getToolbarButton("configurations"));
     }, 500);
 
     $scope.onClick = function(button) {
@@ -70,4 +71,31 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, Element
         }
     };
 
+}])
+.controller('SiteCtrl', ['$rootScope', '$scope', '$stateParams', 'documents', 'config', 'configSnapshots',
+function ($rootScope, $scope, $stateParams, documents, config, configSnapshots) {
+    $scope.ws = $stateParams.ws;
+    $scope.site = $stateParams.site;
+    $scope.documents = documents;
+    var docids = [];
+    documents.forEach(function(doc) {
+        docids.push(doc.sysmlid);
+    });
+    $scope.configSnapshots = configSnapshots;
+    $scope.buttons = [];
+    $scope.config = config;
+    $rootScope.tree_initial = $scope.site;
+    $scope.snapshots = [];
+    if (config !== 'latest') {
+        configSnapshots.forEach(function(snapshot) {
+            if (docids.indexOf(snapshot.sysmlid) > -1)
+                $scope.snapshots.push(snapshot);
+        });
+    }
+}])
+.controller('ToolCtrl', ['$scope', '$rootScope', '$timeout', 'configurations', 'ws',
+function($scope, $rootScope, $timeout, configurations, ws) {   
+    $scope.ws = ws;
+    $scope.show = {configs:true};
+    $scope.configurations = configurations;
 }]);

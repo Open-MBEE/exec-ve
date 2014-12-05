@@ -60,6 +60,42 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, _) {
         return deferred.promise;
     };
 
+    var getConfig = function(id, workspace, update) {
+        var n = normalize(update, workspace);
+        var deferred = $q.defer();
+        var cacheKey = ['configs', n.ws, id];
+        if (CacheService.exists(cacheKey) && !n.update) {
+            deferred.resolve(CacheService.get(cacheKey));
+            return deferred.promise;
+        }
+        $http.get(URLService.getConfigURL(id, n.ws))
+        .success(function(data, status, headers, config) {
+            deferred.resolve(CacheService.put(cacheKey, data.configurations[0], true));
+        }).error(function(data, status, headers, config) {
+            URLService.handleHttpStatus(data, status, headers, config, deferred);
+        });
+        return deferred.promise;
+    };
+
+    var getConfigSnapshots = function(id, workspace, update) {
+        var n = normalize(update, workspace);
+        var deferred = $q.defer();
+        var cacheKey = ['configs', n.ws, id, 'snapshots'];
+        if (CacheService.exists(cacheKey) && !n.update) {
+            deferred.resolve(CacheService.get(cacheKey));
+            return deferred.promise;
+        }
+        $http.get(URLService.getConfigSnapshotsURL(id, n.ws))
+        .success(function(data, status, headers, config) {
+            CacheService.put(cacheKey, data.snapshots, false, function(val, k) {
+                return {key: ['snapshots', n.ws, val.id], value: val, merge: true};
+            });
+            deferred.resolve(CacheService.get(cacheKey));
+        }).error(function(data, status, headers, config) {
+            URLService.handleHttpStatus(data, status, headers, config, deferred);
+        });
+        return deferred.promise;
+    };
     /**
      * @ngdoc method
      * @name mms.ConfigService#createConfig
@@ -442,11 +478,11 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, _) {
         getConfigs : getConfigs,
         createConfig : createConfig,
         deleteConfig : deleteConfig,
+        getConfig : getConfig,
+        getConfigSnapshots : getConfigSnapshots,
 
         getSiteConfigs : OldgetSiteConfigs,
-        getConfig : OldgetConfig,
         getConfigProducts: OldgetConfigProducts,
-        getConfigSnapshots: OldgetConfigSnapshots,
         getProductSnapshots: OldgetProductSnapshots,
         updateConfig: OldupdateConfig,
         updateConfigSnapshots: OldupdateConfigSnapshots,

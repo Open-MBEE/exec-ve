@@ -15,15 +15,15 @@
     
 
     <span ng-if="ws.length > 0">
-      <h4><a class="docweb-link" href="portal.html#/workspaces/{{ws}}">Site Portal</a></h4>
+      <h4><a class="docweb-link" href="portal.html#/workspaces/{{ws}}/tags/latest">Site Portal</a></h4>
     </span>
     
     <div ng-repeat="site in sites | orderBy: 'name'">
         <!-- <h4 style="display:inline;">{{document.name}}</h4> -->
 
-      <a class="dash-link" href="portal.html#/workspaces/{{ws}}/site/{{site.sysmlid}}">{{site.name}}</a>   
+      <a class="dash-link" href="portal.html#/workspaces/{{ws}}/tags/latest/sites/{{site.sysmlid}}">{{site.name}}</a>   
 
-      <a class="dash-link" href="portal.html#/workspaces/{{ws}}/site/{{site.sysmlid}}" target="_blank"> <span class="fa fa-external-link"></span></a>   
+      <a class="dash-link" href="portal.html#/workspaces/{{ws}}/tags/latest/sites/{{site.sysmlid}}" target="_blank"> <span class="fa fa-external-link"></span></a>   
 
     </div>
 

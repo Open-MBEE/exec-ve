@@ -58,7 +58,10 @@ function UxService($rootScope) {
 		  case "document.snapshot.create":
 		    return {id: 'document.snapshot.create', icon: 'fa fa-plus', dynamic: true, selected: false, active: false, permission:false, tooltip: 'Create Snapshot',
 		            onClick: function() {$rootScope.$broadcast('document.snapshot.create');}};
-		}    
+		  case "configurations":
+            return {id: 'configurations', icon: 'fa fa-tag', dynamic: false, selected: false, active: true, permission: true, tooltip: 'Tags',
+                    onClick: function() {$rootScope.$broadcast('configurations');}};
+        }    
 	};
 
     return {

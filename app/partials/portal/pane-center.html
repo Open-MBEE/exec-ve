@@ -17,15 +17,24 @@
       <h4><a class="docweb-link" href="docweb.html#/workspaces/{{ws}}/sites/{{site}}">DocWeb</a></h4>
     </span>
 
-    <div ng-repeat="document in documents | orderBy: 'name'">
-        <!-- <h4 style="display:inline;">{{document.name}}</h4> -->
+    <div ng-if="config === 'latest'">
+      <div ng-repeat="document in documents | orderBy: 'name'">
+          <!-- <h4 style="display:inline;">{{document.name}}</h4> -->
 
-      <a class="dash-link" href="ve.html#/workspaces/{{ws}}/sites/{{site}}/products/{{document.sysmlid}}/latest">{{document.name}}</a>   
+        <a class="dash-link" href="ve.html#/workspaces/{{ws}}/sites/{{site}}/products/{{document.sysmlid}}/latest">{{document.name}}</a>   
 
-      <a class="dash-link" href="ve.html#/workspaces/{{ws}}/sites/{{site}}/products/{{document.sysmlid}}/latest" target="_blank"> <span class="fa fa-external-link"></span></a>   
+        <a class="dash-link" href="ve.html#/workspaces/{{ws}}/sites/{{site}}/products/{{document.sysmlid}}/latest" target="_blank"> <span class="fa fa-external-link"></span></a>   
 
-        <!-- <a class="dash-link" href="/share/page/site/{{site.name}}/dashboard" target="_blank">Dashboard</a> - <a class="docweb-link" href="docweb.html#/workspaces/{{ws}}/sites/{{site.name}}" target="_blank">DocWeb</a> -->
+          <!-- <a class="dash-link" href="/share/page/site/{{site.name}}/dashboard" target="_blank">Dashboard</a> - <a class="docweb-link" href="docweb.html#/workspaces/{{ws}}/sites/{{site.name}}" target="_blank">DocWeb</a> -->
+      </div>
     </div>
+    <div ng-if="config !== 'latest'">
+      <div ng-repeat="snapshot in snapshots | orderBy: 'sysmlname'">
+        <a class="dash-link" href="ve.html#/workspaces/{{ws}}/sites/{{site}}/products/{{snapshot.sysmlid}}/{{snapshot.created}}">{{snapshot.sysmlname}} ({{snapshot.created | date:'M/d/yy h:mm a'}})</a>   
+
+        <a class="dash-link" href="ve.html#/workspaces/{{ws}}/sites/{{site}}/products/{{snapshot.sysmlid}}/{{snapshot.created}}" target="_blank"> <span class="fa fa-external-link"></span></a>   
+
+      </div>
 
   </div>
 
