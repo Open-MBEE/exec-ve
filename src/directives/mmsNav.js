@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsNav', ['SiteService', 'WorkspaceService', '$templateCache', 'growl', mmsNav]);
+.directive('mmsNav', ['SiteService', 'WorkspaceService', 'ConfigService', '$templateCache', 'growl', mmsNav]);
 
 /**
  * @ngdoc directive
@@ -35,7 +35,7 @@ angular.module('mms.directives')
  * @param {string} mmsType The type of current page (or app name like DocWeb)
  * @param {string} mmsResponsive True to display a responsive sliding pane on small browser, false otherwise
  */
-function mmsNav(SiteService, WorkspaceService, $templateCache, growl) {
+function mmsNav(SiteService, WorkspaceService, ConfigService, $templateCache, growl) {
     var template = $templateCache.get('mms/templates/mmsNav.html');
 
     var mmsNavLink = function(scope, element, attrs) {
@@ -182,6 +182,15 @@ function mmsNav(SiteService, WorkspaceService, $templateCache, growl) {
         .then(function(data) {
             scope.wsName = data.name;
         });
+        if (scope.config && scope.config !== '') {
+            ConfigService.getConfig(scope.config, scope.ws, false)
+            .then(function(data) {
+                scope.configName = data.name;
+            });
+        } else {
+            scope.config = 'latest';
+        }
+
         SiteService.getSites()
         .then(function(data) {
             // var sites = {};
@@ -222,7 +231,8 @@ function mmsNav(SiteService, WorkspaceService, $templateCache, growl) {
             title: '@mmsTitle', //page title - used in mobile view only
             ws: '@mmsWs',
             site: '@mmsSite', //current site name
-            doc: '@mmsDoc' //current document
+            doc: '@mmsDoc', //current document
+            config: '@mmsConfig', //config id
             // type: '@mmsType', //current page type
             // noSites: '@mmsNoSites',
             // responsive: '@mmsResponsive'

@@ -28,9 +28,11 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
         },
         views: {
             'menu': {
-                template: '<mms-nav mms-title="Portal" mms-ws="{{ws}}"></mms-nav>',
-                controller: function($scope, $stateParams, ws) {
+                template: '<mms-nav mms-title="Portal" mms-ws="{{ws}}" mms-config="{{config}}"></mms-nav>',
+                controller: function($scope, $stateParams, ws, config) {
                     $scope.ws = ws;
+                    if (config !== 'latest')
+                        $scope.config = config.id;
                 }
             },
             'pane-center': {
