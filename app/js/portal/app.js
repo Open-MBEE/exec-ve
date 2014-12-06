@@ -33,6 +33,8 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
                     $scope.ws = ws;
                     if (config !== 'latest')
                         $scope.config = config.id;
+                    else
+                        $scope.config = 'latest';
                 }
             },
             'pane-center': {

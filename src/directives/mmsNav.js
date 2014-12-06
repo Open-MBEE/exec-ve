@@ -182,7 +182,7 @@ function mmsNav(SiteService, WorkspaceService, ConfigService, $templateCache, gr
         .then(function(data) {
             scope.wsName = data.name;
         });
-        if (scope.config && scope.config !== '') {
+        if (scope.config && scope.config !== '' && scope.config !== 'latest') {
             ConfigService.getConfig(scope.config, scope.ws, false)
             .then(function(data) {
                 scope.configName = data.name;
