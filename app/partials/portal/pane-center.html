@@ -11,6 +11,11 @@
             <div ng-repeat="snapshot in snapshots | orderBy: 'sysmlname'">
                 <a class="dash-link" href="ve.html#/workspaces/{{ws}}/sites/{{site}}/products/{{snapshot.sysmlid}}/{{snapshot.created}}">{{snapshot.sysmlname}} ({{snapshot.created | date:'M/d/yy h:mm a'}})</a>   
                 <a class="dash-link" href="ve.html#/workspaces/{{ws}}/sites/{{site}}/products/{{snapshot.sysmlid}}/{{snapshot.created}}" target="_blank"> <span class="fa fa-external-link"></span></a>
+
+                <button ng-if="getPDFUrl(snapshot)==null" class="btn" ng-click="generatePdf(snapshot, this)">{{pdfText}}</button>
+                <a ng-if='getPDFUrl(snapshot)!=null' href="{{getPDFUrl(snapshot)}}" target="_blank">Download PDF</a> 
+                <button ng-if="getHTMLUrl(snapshot)==null" class="btn" ng-click="generateHtml(snapshot, this)">{{htmlText}}</button>
+                <a ng-if="getHTMLUrl(snapshot)!=null" href="{{getHTMLUrl(snapshot)}}" target="_blank">Download HTML</a>
             </div>
         </div>
     </div>

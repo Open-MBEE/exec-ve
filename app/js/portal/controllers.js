@@ -122,8 +122,8 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, Element
     }, 5000);
 
 }])
-.controller('SiteCtrl', ['$rootScope', '$scope', '$stateParams', 'documents', 'config', 'configSnapshots',
-function ($rootScope, $scope, $stateParams, documents, config, configSnapshots) {
+.controller('SiteCtrl', ['$rootScope', '$scope', '$stateParams', 'documents', 'config', 'configSnapshots', 'ConfigService', 'growl',
+function ($rootScope, $scope, $stateParams, documents, config, configSnapshots, ConfigService, growl) {
     $scope.ws = $stateParams.ws;
     $scope.site = $stateParams.site;
     $scope.documents = documents;
@@ -142,6 +142,58 @@ function ($rootScope, $scope, $stateParams, documents, config, configSnapshots) 
                 $scope.snapshots.push(snapshot);
         });
     }
+
+    $scope.getPDFUrl = function(snapshot){
+        $scope.pdfText = "Generate PDF";
+        var formats = snapshot.formats;
+        if(!formats || formats.length===0) return null;
+        for(var i=0; i < formats.length; i++){
+            if(formats[i].type=='pdf') return formats[i].url;
+        }
+        return null;
+    };
+
+    $scope.getHTMLUrl = function(snapshot){
+        if(angular.isUndefined(snapshot)) return null;
+        if(snapshot===null) return null;
+        $scope.htmlText = "Generate HTML";
+        var formats = snapshot.formats;
+        if(formats===undefined || formats===null || formats.length===0) return null;
+        for(var i=0; i < formats.length; i++){
+            if(formats[i].type=='html') return formats[i].url;
+        }
+        return null;
+    };
+
+    $scope.generatePdf = function(snapshot, elem){
+        if (elem.pdfText === 'Generating...')
+            return;
+        elem.pdfText = "Generating...";
+        snapshot.formats.push({"type":"pdf"});
+        ConfigService.createSnapshotArtifact(snapshot, $scope.site, $scope.ws).then(
+            function(result){
+                growl.success('Generating PDF...');
+            },
+            function(reason){
+                growl.error('Failed to generate PDF: ' + reason.message);
+            }
+        );
+    };
+
+    $scope.generateHtml = function(snapshot, elem){
+        if (elem.htmlText === 'Generating...')
+            return;
+        elem.htmlText = "Generating...";
+        snapshot.formats.push({"type":"html"});
+        ConfigService.createSnapshotArtifact(snapshot, $scope.site, $scope.ws).then(
+            function(result){
+                growl.success('Generating HTML...');
+            },
+            function(reason){
+                growl.error('Failed to generate HTML: ' + reason.message);
+            }
+        );
+    };
 }])
 .controller('ToolCtrl', ['$scope', '$rootScope', '$timeout', 'configurations', 'ws',
 function($scope, $rootScope, $timeout, configurations, ws) {   

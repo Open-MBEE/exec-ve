@@ -480,6 +480,7 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, _) {
         deleteConfig : deleteConfig,
         getConfig : getConfig,
         getConfigSnapshots : getConfigSnapshots,
+        createSnapshotArtifact: OldcreateSnapshotArtifact,
 
         getSiteConfigs : OldgetSiteConfigs,
         getConfigProducts: OldgetConfigProducts,
@@ -487,7 +488,7 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, _) {
         updateConfig: OldupdateConfig,
         updateConfigSnapshots: OldupdateConfigSnapshots,
         updateConfigProducts: OldupdateConfigProducts,
-        createSnapshot: OldcreateSnapshot,
-        createSnapshotArtifact: OldcreateSnapshotArtifact 
+        createSnapshot: OldcreateSnapshot
+        
     };
 }
