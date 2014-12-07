@@ -393,8 +393,10 @@ function urlService(baseUrl) {
         return r;
     };
 
-    var getCreateWorkspaceURL = function(name, parentId) {
+    var getCreateWorkspaceURL = function(name, parentId, time) {
         var r = root + '/workspaces/' + name + '?sourceWorkspace=' + parentId;
+        if (time)
+            r += '&sourceTimestamp=' + time;
         return r;
     };
 

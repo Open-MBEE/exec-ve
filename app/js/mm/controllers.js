@@ -70,32 +70,52 @@ function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorS
 
     $scope.mergeOn = false;
     $scope.toggleMerge = function() {
-
         var branch = treeApi.get_selected_branch();
         if (!branch) {
-            growl.warning("Merge Error: Select task to merge from");
+            growl.warning("Compare Error: Select task or tag to compare from");
             return;
         }
-
         var parent_branch = treeApi.get_parent_branch(branch);
-
         $scope.mergeOn = !$scope.mergeOn;
-        $scope.mergeFromWs = branch.data;
-        $scope.mergeToWs = parent_branch.data;
+        $scope.mergeFrom = branch;
+        $scope.mergeTo = parent_branch;
     };
 
-    $scope.pickNewTarget = function(branch) {
-        $scope.mergeToWs = branch.data;
+    $scope.pickNew = function(source, branch) {
+        if (!branch) {
+            growl.warning("Select new task or tag to compare");
+            return;
+        }
+        if (source == 'from')
+            $scope.mergeFrom = branch;
+        if (source == 'to')
+            $scope.mergeTo = branch;
     };
 
     $scope.comparing = false;
     $scope.compare = function() {
-      if ($scope.comparing) {
-        growl.info("Please wait...");
-        return;
-      }
-      $scope.comparing = true;
-      $state.go('mm.diff', {source: $scope.mergeFromWs.id, target: $scope.mergeToWs.id, sourceTime: 'latest', targetTime: 'latest'});
+        if ($scope.comparing) {
+            growl.info("Please wait...");
+            return;
+        }
+        if (!$scope.mergeFrom || !$scope.mergeTo) {
+            growl.warning("From and To fields must be filled in");
+            return;
+        }
+        var sourceWs = $scope.mergeFrom.data.id;
+        var sourceTime = 'latest';
+        if ($scope.mergeFrom.type === 'Configuration') {
+            sourceWs = $scope.mergeFrom.workspace;
+            sourceTime = $scope.mergeFrom.data.timestamp;
+        }
+        var targetWs = $scope.mergeTo.data.id;
+        var targetTime = 'latest';
+        if ($scope.mergeTo.type === 'Configuration') {
+            targetWs = $scope.mergeTo.workspace;
+            targetTime = $scope.mergeTo.data.timestamp;
+        }
+        $scope.comparing = true;
+        $state.go('mm.diff', {source: sourceWs, target: targetWs, sourceTime: sourceTime, targetTime: targetTime});
     };
 
     var treeApi = {};
@@ -103,17 +123,17 @@ function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorS
     $rootScope.treeApi = treeApi;
  
     var level2Func = function(workspaceId, workspaceTreeNode) {
-      ConfigService.getConfigs(workspaceId).then (function (data) {
-        data.forEach(function (config) {
-          workspaceTreeNode.children.push( { 
-                                              label : config.name, 
-                                              type : "Configuration",
-                                              data : config, 
-                                              workspace: workspaceId,
-                                              children : [] }
-                                          ); 
+        ConfigService.getConfigs(workspaceId).then (function (data) {
+            data.forEach(function (config) {
+                workspaceTreeNode.children.unshift( { 
+                    label : config.name, 
+                    type : "Configuration",
+                    data : config, 
+                    workspace: workspaceId,
+                    children : [] 
+                }); 
+            });
         });
-      });
     };
 
     var dataTree = UtilsService.buildTreeHierarchy(workspaces, "id", "Workspace", "parent", level2Func);
@@ -121,10 +141,10 @@ function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorS
     $scope.my_data = dataTree;
 
     $scope.my_tree_handler = function(branch) {
-      if (branch.type === 'Workspace')
-        $state.go('mm.workspace', {ws: branch.data.id});
-      else if (branch.type === 'Configuration')
-        $state.go('mm.workspace.config', {ws: branch.workspace, config: branch.data.id});
+        if (branch.type === 'Workspace')
+            $state.go('mm.workspace', {ws: branch.data.id});
+        else if (branch.type === 'Configuration')
+            $state.go('mm.workspace.config', {ws: branch.workspace, config: branch.data.id});
     };
 
     $scope.tree_options = {
@@ -138,25 +158,37 @@ function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorS
 
     $rootScope.tree_initial = "";
     $timeout(function() {
-      $scope.treeApi.refresh();
+        $scope.treeApi.refresh();
     }, 5000);
     
-    $scope.createWorkspace = function (branch, wsParentId) {
-      $scope.createWsParentId = wsParentId;
-
-      var instance = $modal.open({
-          templateUrl: 'partials/mm/new.html',
-          scope: $scope,
-          controller: ['$scope', '$modalInstance', workspaceCtrl]
-      });
-      instance.result.then(function(data) {
-        treeApi.add_branch(branch, {
-            label: data.name,
-            type: "Workspace",
-            data: data,
-            children: []
+    $scope.createWorkspace = function (branch) {
+        if (branch.type === 'Configuration') {
+            $scope.createWsParentId = branch.workspace;
+            $scope.createWsTime = branch.data.timestamp;
+            $scope.from = 'Tag ' + branch.data.name;
+        } else {
+            $scope.createWsParentId = branch.data.id;
+            $scope.createWsTime = $filter('date')(new Date(), 'yyyy-MM-ddTHH:mm:ss.sssZ');
+            $scope.from = 'Task ' + branch.data.name;
+        }
+        var instance = $modal.open({
+            templateUrl: 'partials/mm/new.html',
+            scope: $scope,
+            controller: ['$scope', '$modalInstance', workspaceCtrl]
         });
-      });
+        instance.result.then(function(data) {
+            var newbranch = {
+                label: data.name,
+                type: "Workspace",
+                data: data,
+                children: []
+            };
+            if (branch.type === 'Configuration') {
+                treeApi.add_branch(treeApi.get_parent_branch(branch), newbranch);
+            } else {
+                treeApi.add_branch(branch, newbranch);
+            }
+        });
     };
 
     var deleteWorkspaceOrConfig = false;
@@ -212,7 +244,7 @@ function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorS
 
         var branch = treeApi.get_selected_branch();
         if (!branch) {
-            growl.warning("Add Configuration Error: Select parent view first");
+            growl.warning("Add Configuration Error: Select parent task first");
             return;
         } else if (branch.type != "Workspace") {
             growl.warning("Add Configuration Error: Selection must be a task");
@@ -239,7 +271,7 @@ function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorS
         });
     };
 
-      var configurationCtrl = function($scope, $modalInstance) {
+    var configurationCtrl = function($scope, $modalInstance) {
         $scope.configuration = {};
         $scope.configuration.name = "";
         $scope.configuration.description = "";
@@ -250,7 +282,7 @@ function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorS
             var config = {"name": $scope.configuration.name, "description": $scope.configuration.description};
 
             if ($scope.configuration.now === "false") {
-              config.timestamp = $scope.configuration.timestamp;
+                config.timestamp = $scope.configuration.timestamp;
             }
 
             ConfigService.createConfig(config, $scope.createWsParentId)
@@ -267,23 +299,21 @@ function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorS
     };
 
     $scope.addWorkspace = function() {
-
         var branch = treeApi.get_selected_branch();
         if (!branch) {
-            growl.warning("Add Task Error: Select parent view first");
+            growl.warning("Add Task Error: Select a task or tag first");
             return;
         }
-
-        $scope.createWorkspace(branch, branch.data.id);
+        $scope.createWorkspace(branch);
     };
 
 
-      var workspaceCtrl = function($scope, $modalInstance) {
+    var workspaceCtrl = function($scope, $modalInstance) {
         $scope.workspace = {};
         $scope.workspace.name = "";
 
         $scope.ok = function() {
-            WorkspaceService.create($scope.workspace.name, $scope.createWsParentId)
+            WorkspaceService.create($scope.workspace.name, $scope.createWsParentId, $scope.createWsTime)
             .then(function(data) {
                 growl.success("Task Created");
                 $modalInstance.close(data);
