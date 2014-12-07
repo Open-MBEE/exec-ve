@@ -74,12 +74,6 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
     .state('portal.site.view', {
         url: '/docs/:docid',
         resolve: {
-            view: function($stateParams, ViewService, config) {
-                if (config === 'latest')
-                    return ViewService.getView($stateParams.docid, false, $stateParams.ws, 'latest');
-                else
-                    return ViewService.getView($stateParams.docid, false, $stateParams.ws, config.timestamp);
-            }
         },
         views: {
             'pane-center@': {

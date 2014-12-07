@@ -103,6 +103,7 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, Element
         if (branch.type === 'site') {
             $state.go('portal.site', {site: branch.data.sysmlid});
         } else if (branch.type === 'view' || branch.type === 'snapshot') {
+            $rootScope.portalDocBranch = branch;
             $state.go('portal.site.view', {site: branch.site, docid: branch.data.sysmlid});
         } 
     };
@@ -148,14 +149,14 @@ function($scope, $rootScope, $timeout, configurations, ws) {
     $scope.show = {configs:true};
     $scope.configurations = configurations;
 }])
-.controller('DocCtrl', ['$scope', 'ws', 'config', 'view', 'site',
-function($scope, ws, config, view, site) {
+.controller('DocCtrl', ['$scope', '$rootScope', 'ws', 'config', '$stateParams', 'site',
+function($scope, $rootScope, ws, config, $stateParams, site) {
     $scope.ws = ws;
     if (config === 'latest')
         $scope.time = 'latest';
     else
-        $scope.time = config.timestamp; //need to account for old snapshots times
-    $scope.view = view;
+        $scope.time = $rootScope.portalDocBranch.data.created; //this won't work if ppl go directy to url
+    $scope.docid = $stateParams.docid;
     $scope.api = {};
     $scope.site = site;
 }]);
