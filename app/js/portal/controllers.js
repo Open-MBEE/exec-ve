@@ -38,6 +38,11 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, Element
         tooltip: "Filter Sites",
         icon: "fa-filter",
         permission: true
+    }, {
+        action: function() {$scope.addDocument();},
+        tooltip: "Add Document",
+        icon: "fa-plus",
+        permission: config == 'latest' ? true : false
     }];
 
     $scope.filterOn = false;
@@ -115,6 +120,46 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, Element
             "site": "fa fa-sitemap fa-fw",
             "snapshot" : "fa fa-camera fa-fw"
         }
+    };
+
+    var addDocCtrl = function($scope, $modalInstance) {
+        $scope.doc = {name: ""};
+        $scope.ok = function() {
+            ViewService.createDocument($scope.doc.name, $scope.addDocSite, $scope.ws)
+            .then(function(data) {
+                growl.success("Document created");
+                $modalInstance.close(data);
+            }, function(reason) {
+                growl.error("Create Document Error: " + reason.message);
+            });
+        };
+        $scope.cancel = function() {
+            $modalInstance.dismiss();
+        };
+    };
+
+    $scope.addDocument = function() {
+        var branch = treeApi.get_selected_branch();
+        if (!branch || branch.type !== 'site') {
+            growl.error("Select a site to add document under");
+            return;
+        }
+        $scope.addDocSite = branch.data.sysmlid;
+        var instance = $modal.open({
+            templateUrl: 'partials/portal/newDoc.html',
+            scope: $scope,
+            controller: ['$scope', '$modalInstance', addDocCtrl]
+        });
+        instance.result.then(function(data) {
+            var newbranch = {
+                label: data.name,
+                type: 'view',
+                data: data,
+                children: [],
+                site: branch.data.sysmlid
+            };
+            treeApi.add_branch(branch, newbranch);
+        });
     };
 
     $timeout(function() {
