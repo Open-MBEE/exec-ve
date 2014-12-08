@@ -35,6 +35,13 @@ function mmsToolbar($templateCache) {
                 });
             };
 
+            api.setSelected = function (id, selected) {
+                $scope.buttons.forEach(function(button) {
+                    if (button.id === id)
+                        button.selected = selected;
+                });
+            };
+
             api.addButton = function(button) {
                 $scope.buttons.push(button);
                 if (button.dynamic_buttons) {

@@ -11,8 +11,8 @@ function($scope, $rootScope, $timeout, UxService) {
     $scope.buttons = [];
 
     $timeout(function() {
-      $scope.tbApi.addButton(UxService.getToolbarButton("element.viewer"));
       $scope.tbApi.addButton(UxService.getToolbarButton("configurations"));
+      $scope.tbApi.setSelected("configurations", true);
     }, 500);
 
     $scope.onClick = function(button) {
