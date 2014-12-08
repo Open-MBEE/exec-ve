@@ -54,13 +54,6 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, documen
         tooltip: $rootScope.veFullDocMode ? "View Mode" : "Full Document",
         icon: $rootScope.veFullDocMode ? "fa-file-text" : "fa-file-text-o",
         permission: true
-    }, {
-        action: function() {
-            $scope.saveAll();
-        },
-        tooltip: "Save All Open Edits",
-        icon: "fa-save",
-        permission: time === 'latest' ? true : false
     }];
     $scope.filterOn = false;
     $scope.toggleFilter = function() {
@@ -243,58 +236,7 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, documen
             $scope.buttons[3].icon = 'fa-plus';
         });
     };
-    var savingAll = false;
-    $scope.saveAll = function() {
-        if (savingAll) {
-            growl.info('Please wait...');
-            return;
-        }
-        if (Object.keys($rootScope.veEdits).length === 0) {
-            growl.info('Nothing to save');
-            return;
-        }
-        if ($rootScope.veSpecApi && $rootScope.veSpecApi.tinymceSave)
-            $rootScope.veSpecApi.tinymceSave();
-        savingAll = true;
-        $scope.buttons[6].icon = 'fa-spin fa-spinner';
-        var promises = [];
-        angular.forEach($rootScope.veEdits, function(value, key) {
-            var defer = $q.defer();
-            promises.push(defer.promise);
-            ElementService.updateElement(value, ws)
-            .then(function(e) {
-                defer.resolve({status: 200, id: e.sysmlid});
-            }, function(reason) {
-                defer.resolve({status: reason.status, id: value.sysmlid});
-            });
-        });
-        $q.all(promises).then(function(results) {
-            var somefail = false;
-            var failed = null;
-            results.forEach(function(ob) {
-                if (ob.status === 200)
-                    delete $rootScope.veEdits[ob.id];
-                else {
-                    somefail = true;
-                    failed = ob.id;
-                }
-            });
-            if (!somefail) {
-                var branch = treeApi.get_selected_branch();
-                if (branch)
-                    branch = branch.data.sysmlid;
-                else
-                    branch = document.sysmlid;
-                growl.success("Save All Successful");
-                $rootScope.$broadcast('elementSelected', branch);
-            } else {
-                $rootScope.$broadcast('elementSelected', failed);
-                growl.error("Some elements failed to save, resolve individually in edit pane");
-            }
-            $scope.buttons[6].icon = 'fa-save';
-            savingAll = false;
-        });
-    };
+
     $scope.tree_options = {
         types: {
             "section": "fa fa-file-o fa-fw",
@@ -553,8 +495,8 @@ function($scope, $rootScope, $timeout, UxService) {
     $scope.onClick = function(button) {
     };
 }])
-.controller('ToolCtrl', ['$scope', '$rootScope', 'document', 'snapshots', 'time', 'site', 'ConfigService', 'ElementService', 'growl', '$modal', 'ws',
-function($scope, $rootScope, document, snapshots, time, site, ConfigService, ElementService, growl, $modal, ws) {
+.controller('ToolCtrl', ['$scope', '$rootScope', 'document', 'snapshots', 'time', 'site', 'ConfigService', 'ElementService', 'growl', '$modal', '$q', 'ws',
+function($scope, $rootScope, document, snapshots, time, site, ConfigService, ElementService, growl, $modal, $q, ws) {
     $scope.document = document;
     $scope.ws = ws;
     $scope.editable = document.editable && time === 'latest';
@@ -667,6 +609,11 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
         if (edit) {
             $scope.etrackerSelected = edit.sysmlid;
             $rootScope.veEdits[edit.sysmlid] = edit;
+            if (Object.keys($rootScope.veEdits).length > 1) {
+                $rootScope.tbApi.setPermission('element.editor.saveall', true);
+            } else {
+                $rootScope.tbApi.setPermission('element.editor.saveall', false);
+            }
         }
     });
     $scope.$on('viewSelected', function(event, vid, viewElements) {
@@ -722,6 +669,53 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
             $rootScope.tbApi.toggleButtonSpinner('element.editor.save');
         });
         $rootScope.tbApi.select('element.editor');
+    });
+    var savingAll = false;
+    $scope.$on('element.editor.saveall', function() {
+        if (savingAll) {
+            growl.info('Please wait...');
+            return;
+        }
+        if (Object.keys($rootScope.veEdits).length === 0) {
+            growl.info('Nothing to save');
+            return;
+        }
+        if ($rootScope.veSpecApi && $rootScope.veSpecApi.tinymceSave)
+            $rootScope.veSpecApi.tinymceSave();
+        savingAll = true;
+        $rootScope.tbApi.toggleButtonSpinner('element.editor.saveall');
+        var promises = [];
+        angular.forEach($rootScope.veEdits, function(value, key) {
+            var defer = $q.defer();
+            promises.push(defer.promise);
+            ElementService.updateElement(value, ws)
+            .then(function(e) {
+                defer.resolve({status: 200, id: e.sysmlid});
+            }, function(reason) {
+                defer.resolve({status: reason.status, id: value.sysmlid});
+            });
+        });
+        $q.all(promises).then(function(results) {
+            var somefail = false;
+            var failed = null;
+            results.forEach(function(ob) {
+                if (ob.status === 200)
+                    delete $rootScope.veEdits[ob.id];
+                else {
+                    somefail = true;
+                    failed = ob.id;
+                }
+            });
+            if (!somefail) {
+                growl.success("Save All Successful");
+                $rootScope.tbApi.select('element.viewer');
+            } else {
+                $rootScope.$broadcast('elementSelected', failed);
+                growl.error("Some elements failed to save, resolve individually in edit pane");
+            }
+           $rootScope.tbApi.toggleButtonSpinner('element.editor.saveall');
+            savingAll = false;
+        });
     });
     $scope.$on('element.editor.cancel', function() {
         var go = function() {

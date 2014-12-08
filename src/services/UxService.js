@@ -31,7 +31,7 @@ function UxService($rootScope) {
 		  case "element.editor":
 		    return {id: button, icon: 'fa fa-edit', selected: false, active: true, permission:false, tooltip: 'Edit Element',
 		            spinner: false, onClick: function() {$rootScope.$broadcast(button);},
-		        	dynamic_buttons: [getToolbarButton("element.editor.save"), getToolbarButton("element.editor.cancel")]};
+		        	dynamic_buttons: [getToolbarButton("element.editor.save"), getToolbarButton("element.editor.saveall"), getToolbarButton("element.editor.cancel")]};
 		  case "view.reorder":
 	        return {id: button, icon: 'fa fa-arrows-v', selected: false, active: true, permission:false, tooltip: 'Reorder View',
 	    	        spinner: false, onClick: function() {$rootScope.$broadcast(button);},
@@ -42,6 +42,9 @@ function UxService($rootScope) {
 		        	dynamic_buttons: [getToolbarButton("document.snapshot.refresh"), getToolbarButton("document.snapshot.create")]};
 		  case "element.editor.save":
 			return {id: button, icon: 'fa fa-save', pullDown: true, dynamic: true, selected: false, active: false, permission:true, tooltip: 'Save',
+				        spinner: false, onClick: function() {$rootScope.$broadcast(button);}};
+		  case "element.editor.saveall":
+			return {id: button, icon: 'fa fa-save-all', dynamic: true, selected: false, active: false, permission:true, tooltip: 'Save All',
 				        spinner: false, onClick: function() {$rootScope.$broadcast(button);}};
 		  case "element.editor.cancel":
 			return {id: button, icon: 'fa fa-times', dynamic: true, selected: false, active: false, permission:true, tooltip: 'Cancel',

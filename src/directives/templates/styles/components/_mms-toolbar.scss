@@ -42,6 +42,31 @@ mms-toolbar {
 			color: $dark_blue;
 		}
 
+		.fa-save-all {
+			color: $dark_blue;
+		}
+
+		.fa-save-all:before{
+			content:"\f0c7";
+			position:relative;
+			display:inline-block;
+			width:2em;
+			height:2em;
+			line-height:2em;
+			vertical-align:middle;
+			left:-6px;
+			bottom:-5px;
+		}
+		.fa-save-all:after {
+			content:"\f0c7";
+			position:absolute;
+			left:0;
+			width:100%;
+			text-align:center;
+			float:right;
+			margin-left:.3em;
+			margin-top:.3em
+		}
 		.fa-times {
 			color: $red;
 		}
