@@ -396,7 +396,7 @@ function urlService(baseUrl) {
     var getCreateWorkspaceURL = function(name, parentId, time) {
         var r = root + '/workspaces/' + name + '?sourceWorkspace=' + parentId;
         if (time)
-            r += '&sourceTimestamp=' + time;
+            r += '&copyTime=' + time;
         return r;
     };
 
