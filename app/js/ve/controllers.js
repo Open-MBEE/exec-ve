@@ -188,53 +188,68 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, documen
     $scope.reorder = function() {
         $state.go('doc.order');
     };
-    var adding = false;
+
     $scope.addView = function() {
-        if (adding) {
-            growl.info('Please wait...');
-            return;
-        }
+
         var branch = treeApi.get_selected_branch();
         if (!branch) {
-            growl.error("Add View Error: Select parent view first");
+            growl.warning("Add View Error: Select parent view first");
+            return;
+        } else if (branch.type === "section") {
+            growl.warning("Add View Error: Cannot add a child view to a section");
             return;
         }
-        if (branch.type === "section") {
-            growl.error("Add View Error: Cannot add a child view to a section");
-            return;
-        }
-        adding = true;
-        $scope.buttons[3].icon = 'fa-spin fa-spinner';
+
         ElementService.isCacheOutdated(document.sysmlid, ws)
         .then(function(status) {
             if (status.status) {
                 if (!angular.equals(document.specialization.view2view, status.server.specialization.view2view)) {
                     growl.error('The document hierarchy is outdated, refresh the page first!');
-                    adding = false;
-                    $scope.buttons[3].icon = 'fa-plus';
                     return;
                 } 
             } 
-            ViewService.createView(branch.data.sysmlid, 'Untitled View', $scope.document.sysmlid, ws)
-            .then(function(view) {
-                treeApi.add_branch(branch, {
-                    label: view.name,
-                    type: "view",
-                    data: view,
-                    children: []
-                });
-                adding = false;
-                $scope.buttons[3].icon = 'fa-plus';
-            }, function(reason) {
-                growl.error('Add View Error: ' + reason.message);
-                adding = false;
-                $scope.buttons[3].icon = 'fa-plus';
+
+            $scope.createViewParentId = branch.data.sysmlid;
+            $scope.newView = {};
+            $scope.newView.name = "";
+
+            var instance = $modal.open({
+                templateUrl: 'partials/ve/new.html',
+                scope: $scope,
+                controller: ['$scope', '$modalInstance', viewCtrl]
             });
+            instance.result.then(function(data) {
+              treeApi.add_branch(branch, {
+                  label: data.name,
+                  type: "view",
+                  data: data,
+                  children: []
+              });
+            });
+
         }, function(reason) {
             growl.error('Checking if document hierarchy is up to date failed: ' + reason.message);
-            adding = false;
-            $scope.buttons[3].icon = 'fa-plus';
         });
+    };
+
+    var viewCtrl = function($scope, $modalInstance) {
+        $scope.newView = {};
+        $scope.newView.name = "";
+
+        $scope.ok2 = function() {
+
+            ViewService.createView($scope.createViewParentId, $scope.newView.name, 
+                                    $scope.document.sysmlid, ws)
+            .then(function(data) {
+                growl.success("View Created");
+                $modalInstance.close(data);
+            }, function(reason) {
+                growl.error("Add View Error: " + reason.message);
+            });
+        };
+        $scope.cancel = function() {
+            $modalInstance.dismiss();
+        };
     };
 
     $scope.tree_options = {
