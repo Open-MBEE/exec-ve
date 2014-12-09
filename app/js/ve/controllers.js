@@ -235,8 +235,13 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, documen
     var viewCtrl = function($scope, $modalInstance) {
         $scope.newView = {};
         $scope.newView.name = "";
-
-        $scope.ok2 = function() {
+        $scope.oking = false;
+        $scope.ok = function() {
+            if ($scope.oking) {
+                growl.info("Please wait...");
+                return;
+            }
+            $scope.oking = true;
 
             ViewService.createView($scope.createViewParentId, $scope.newView.name, 
                                     $scope.document.sysmlid, ws)
@@ -245,6 +250,8 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, documen
                 $modalInstance.close(data);
             }, function(reason) {
                 growl.error("Add View Error: " + reason.message);
+            }).finally(function() {
+                $scope.oking = false;
             });
         };
         $scope.cancel = function() {

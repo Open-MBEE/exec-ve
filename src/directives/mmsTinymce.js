@@ -105,7 +105,13 @@ function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window
                     type: 'Comment'
                 }
             };
+            $scope.oking = false;
             $scope.ok = function() {
+                if ($scope.oking) {
+                    growl.info("Please wait...");
+                    return;
+                }
+                $scope.oking = true;
                 if (ViewService.getCurrentViewId())
                     $scope.comment.owner = ViewService.getCurrentViewId();
                 ElementService.createElement($scope.comment, scope.mmsWs)
@@ -114,6 +120,8 @@ function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window
                     $modalInstance.close(tag);
                 }, function(reason) {
                     growl.error("Comment Error: " + reason.message);
+                }).finally(function() {
+                    $scope.oking = false;
                 });
             };
             $scope.cancel = function() {

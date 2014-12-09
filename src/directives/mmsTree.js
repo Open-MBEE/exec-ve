@@ -387,12 +387,18 @@ function mmsTree($timeout, $log, $templateCache) {
              * @param {Object} parent parent branch or null 
              * @param {Object} new_branch branch to add to parent or root
              */
-            tree.add_branch = function(parent, new_branch) {
+            tree.add_branch = function(parent, new_branch, top) {
                 if (parent) {
-                    parent.children.push(new_branch);
+                    if (top)
+                        parent.children.unshift(new_branch);
+                    else
+                        parent.children.push(new_branch);
                     parent.expanded = true;
                 } else {
-                    scope.treeData.push(new_branch);
+                    if (top)
+                        scope.treeData.unshift(new_branch);
+                    else
+                        scope.treeData.push(new_branch);
                 }
                 on_treeData_change();
             };

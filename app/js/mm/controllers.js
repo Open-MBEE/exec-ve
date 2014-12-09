@@ -269,7 +269,7 @@ function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorS
               workspace: branch.data.id,
               data: data,
               children: []
-          });
+          }, true);
         });
     };
 
@@ -279,8 +279,13 @@ function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorS
         $scope.configuration.description = "";
         $scope.configuration.now = "true";
         $scope.configuration.timestamp = "";
-
+        $scope.oking = false;
         $scope.ok = function() {
+            if ($scope.oking) {
+                growl.info("Please wait...");
+                return;
+            }
+            $scope.oking = true;
             var config = {"name": $scope.configuration.name, "description": $scope.configuration.description};
 
             if ($scope.configuration.now === "false") {
@@ -293,6 +298,8 @@ function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorS
                 $modalInstance.close(data);
             }, function(reason) {
                 growl.error("Configuration Error: " + reason.message);
+            }).finally(function(){
+                $scope.oking = false;
             });
         };
         $scope.cancel = function() {
@@ -313,14 +320,21 @@ function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorS
     var workspaceCtrl = function($scope, $modalInstance) {
         $scope.workspace = {};
         $scope.workspace.name = "";
-
+        $scope.oking = false;
         $scope.ok = function() {
+            if ($scope.oking) {
+                growl.info("Please wait...");
+                return;
+            }
+            $scope.oking = true;
             WorkspaceService.create($scope.workspace.name, $scope.createWsParentId, $scope.createWsTime)
             .then(function(data) {
                 growl.success("Task Created");
                 $modalInstance.close(data);
             }, function(reason) {
                 growl.error("Task Error: " + reason.message);
+            }).finally(function(){
+                $scope.oking = false;
             });
         };
         $scope.cancel = function() {

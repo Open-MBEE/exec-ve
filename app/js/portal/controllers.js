@@ -119,13 +119,21 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, Element
 
     var addDocCtrl = function($scope, $modalInstance) {
         $scope.doc = {name: ""};
+        $scope.oking = false;
         $scope.ok = function() {
+            if ($scope.oking) {
+                growl.info("Please wait...");
+                return;
+            }
+            $scope.oking = true;
             ViewService.createDocument($scope.doc.name, $scope.addDocSite, $scope.ws)
             .then(function(data) {
                 growl.success("Document created");
                 $modalInstance.close(data);
             }, function(reason) {
                 growl.error("Create Document Error: " + reason.message);
+            }).finally(function() {
+                $scope.oking = false;
             });
         };
         $scope.cancel = function() {
