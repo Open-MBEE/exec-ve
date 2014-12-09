@@ -239,6 +239,7 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, $q, growl, _)
                                 if (data.documentation !== currentEdit.documentation)
                                     currentEdit.documentation = data.documentation + '<p>MERGE</p>' + currentEdit.documentation;
                                 currentEdit.read = data.read;
+                                currentEdit.modified = data.modified;
                                 //growl.info("Element name and doc merged");
                                 deferred.reject({type: 'info', message: 'Element name and doc merged'});
                             }, function(reason2) {
@@ -247,6 +248,7 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, $q, growl, _)
                             });
                         } else if (choice === 'force') {
                             scope.edit.read = scope.latest.read;
+                            scope.edit.modified = scope.latest.modified;
                             scope.save().then(function(resolved) {
                                 deferred.resolve(resolved);
                             }, function(error) {
