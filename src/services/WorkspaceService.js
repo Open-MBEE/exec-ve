@@ -272,9 +272,14 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService) {
         return deferred.promise;
     };
 
-    var merge = function(changes, targetWs) {
+    var merge = function(changes) {
         var deferred = $q.defer();
-        deferred.resolve('ok');
+        $http.post(URLService.getPostWsDiffURL(), changes)
+        .success(function(data, status, headers, config) {
+            deferred.resolve(data);
+        }).error(function(data, status, headers, config) {
+            URLService.handleHttpStatus(data, status, headers, config, deferred);
+        });
         return deferred.promise;
     };
 

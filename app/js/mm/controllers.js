@@ -455,37 +455,45 @@ function(_, $timeout, $scope, $rootScope, $http, $state, $stateParams, $modal, g
     };
 
     $scope.mergeStagedChanges = function (workspaceId) {
-      var deletedElements = [];
-      var changedElements = [];
+        //var deletedElements = [];
+        //var changedElements = [];
 
-      $scope.changes.forEach(function(change) {
-        if (change.staged) {
-          if (change.type === "deleted") {
-            deletedElements.push(change.original);
-          } else {
-            delete change.delta.read;
-            changedElements.push(change.delta);
-          }
-        }
-      });
-      $scope.saving = true;
-      ElementService.updateElements(changedElements, ws1)
-      .then(function(data) {
+        var object = {
+            workspace1: {
+                id: ws1
+            },
+            workspace2: {
+                id: ws2,
+                addedElements: [],
+                deletedElements: [],
+                updatedElements: []
+            }
+        };
 
-          ElementService.deleteElements(deletedElements, ws1)
-          .then(function(data) {
+        $scope.changes.forEach(function(change) {
+            if (change.staged) {
+                if (change.type === "removed") {
+                    object.workspace2.deletedElements.push(change.ws2object);
+            //deletedElements.push(change.original);
+                } else if (change.type === 'updated') {
+                    object.workspace2.updatedElements.push(change.ws2object);
+            //delete change.delta.read;
+            //changedElements.push(change.delta);
+                } else if (change.type === 'added') {
+                    object.workspace2.addedElements.push(change.ws2object);
+                }
+            }
+        });
+        $scope.saving = true;
+        WorkspaceService.merge(object)
+        .then(function(data) {
               growl.success("Workspace Elements Merged");
               $scope.saving = false;
               $state.go('mm', {}, {reload:true});
-          }, function(reason) {
+        }, function(reason) {
             growl.error("Workspace Merge Error: " + reason.message);
             $scope.saving = false;
-          });       
-
-      }, function(reason) {
-          growl.error("Workspace Merge Error: " + reason.message);
-          $scope.saving = false;
-      }); 
+        });
     };
 
     $scope.stageAllUnstaged = function (changes) {
@@ -561,7 +569,7 @@ function(_, $timeout, $scope, $rootScope, $http, $state, $stateParams, $modal, g
 
         var emptyElement = { name: "", owner: "", documentation: "", specialization : {} };
 
-        var createChange = function (name, element, deltaElement, changeType, changeIcon) {
+        var createChange = function (name, element, deltaElement, changeType, changeIcon, ws2object) {
           var change = {};
           
           change.name = name;
@@ -570,6 +578,7 @@ function(_, $timeout, $scope, $rootScope, $http, $state, $stateParams, $modal, g
           change.type = changeType;
           change.icon = changeIcon;
           change.staged = false;
+          change.ws2object = ws2object;
 
           change.properties = {};
           change.properties.name = {};
@@ -655,7 +664,7 @@ function(_, $timeout, $scope, $rootScope, $http, $state, $stateParams, $modal, g
 
           id2node[e.sysmlid] = node;
 
-          var change = createChange(e.name, emptyElement, e, "added", "fa-plus", null);
+          var change = createChange(e.name, emptyElement, e, "added", "fa-plus", e);
 
           updateChangeProperty(change.properties.name, "added");
           updateChangeProperty(change.properties.owner, "added");
@@ -677,7 +686,7 @@ function(_, $timeout, $scope, $rootScope, $http, $state, $stateParams, $modal, g
 
           var deletedElement = id2data[e.sysmlid];
 
-          var change = createChange(deletedElement.name, deletedElement, emptyElement, "removed", "fa-times", null);
+          var change = createChange(deletedElement.name, deletedElement, emptyElement, "removed", "fa-times", e);
 
           updateChangeProperty(change.properties.name, "removed");
           updateChangeProperty(change.properties.owner, "removed");
@@ -701,7 +710,7 @@ function(_, $timeout, $scope, $rootScope, $http, $state, $stateParams, $modal, g
 
           var deltaElement = _.cloneDeep(updatedElement);
 
-          var change = createChange(updatedElement.name, updatedElement, deltaElement, "updated", "fa-pencil", null);
+          var change = createChange(updatedElement.name, updatedElement, deltaElement, "updated", "fa-pencil", e);
 
           if (e.hasOwnProperty('name')) {
             change.name = e.name;
@@ -745,7 +754,7 @@ function(_, $timeout, $scope, $rootScope, $http, $state, $stateParams, $modal, g
 
           var deltaElement = _.cloneDeep(movedElement);
 
-          var change = createChange(movedElement.name, movedElement, deltaElement, "moved", "fa-arrows", null);
+          var change = createChange(movedElement.name, movedElement, deltaElement, "moved", "fa-arrows", e);
 
           if (e.hasOwnProperty('owner')) {
             deltaElement.owner = e.owner;

@@ -159,10 +159,11 @@ function urlService(baseUrl) {
      * @param {string} workspace Workspace name
      * @returns {string} The url
      */
-    var getSiteProductsURL = function(site, workspace) {
-        return root + "/workspaces/" + workspace + 
+    var getSiteProductsURL = function(site, workspace, version) {
+        var r = root + "/workspaces/" + workspace + 
                       "/sites/" + site + 
                       "/products";
+        return addVersion(r, version);
     };
 
     /**
@@ -393,6 +394,11 @@ function urlService(baseUrl) {
         return r;
     };
 
+    var getPostWsDiffURL = function() {
+        var r = root + '/diff';
+        return r;
+    };
+
     var getCreateWorkspaceURL = function(name, parentId, time) {
         var r = root + '/workspaces/' + name + '?sourceWorkspace=' + parentId;
         if (time)
@@ -429,6 +435,7 @@ function urlService(baseUrl) {
         getDocumentViewsURL: getDocumentViewsURL,
         getViewElementsURL: getViewElementsURL,
         getWsDiffURL: getWsDiffURL,
+        getPostWsDiffURL: getPostWsDiffURL,
         getWorkspacesURL: getWorkspacesURL,
         getWorkspaceURL: getWorkspaceURL,
         getCreateWorkspaceURL : getCreateWorkspaceURL,
