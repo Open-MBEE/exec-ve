@@ -18,48 +18,47 @@ function($scope, $rootScope, $timeout, UxService) {
     $scope.onClick = function(button) {
     };
 }])
-.controller('NavTreeCtrl', ['$scope', '$rootScope', '$location', '$timeout', '$state', '$anchorScroll', 'ElementService', 'ViewService', 'UtilsService', 'growl', '$modal', '$q', '$filter', 'ws', 'sites', 'config', 'configSnapshots',
-function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, ElementService, ViewService, UtilsService, growl, $modal, $q, $filter, ws, sites, config, configSnapshots) {
+.controller('NavTreeCtrl', ['$scope', '$rootScope', '$location', '$timeout', '$state', '$anchorScroll', 'ElementService', 'ViewService', 'UtilsService', 'growl', '$modal', '$q', '$filter', 'ws', 'sites', 'config', 'configSnapshots', 'UxService',
+function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, ElementService, ViewService, UtilsService, growl, $modal, $q, $filter, ws, sites, config, configSnapshots, UxService) {
     $scope.ws = ws;
     $scope.sites = sites;
 
-    $scope.buttons = [{
-        action: function(){ $scope.treeApi.expand_all(); },        
-        tooltip: "Expand All",
-        icon: "fa-caret-square-o-down",
-        permission: true
-    }, {
-        action: function(){ $scope.treeApi.collapse_all(); },
-        tooltip: "Collapse All",
-        icon: "fa-caret-square-o-up",
-        permission: true
-    }, {
-        action: function(){ $scope.toggleFilter(); },
-        tooltip: "Filter Sites",
-        icon: "fa-filter",
-        permission: true
-    }, {
-        action: function() {$scope.addDocument();},
-        tooltip: "Add Document",
-        icon: "fa-plus",
-        permission: config == 'latest' ? true : false
-    }];
+    $scope.bbApi = {};
+    $rootScope.bbApi = $scope.bbApi;
+
+    $scope.buttons = [];
+
+    $timeout(function() {
+      $scope.bbApi.addButton(UxService.getButtonBarButton("tree.expand"));
+      $scope.bbApi.addButton(UxService.getButtonBarButton("tree.collapse"));
+      $scope.bbApi.addButton(UxService.getButtonBarButton("tree.filter"));
+      $scope.bbApi.addButton(UxService.getButtonBarButton("tree.add.document"));
+      $scope.bbApi.setPermission("tree.add.document", config == 'latest' ? true : false);
+    }, 500);
+
+    $scope.$on('tree.expand', function() {
+        $scope.treeApi.expand_all();
+    });
+
+    $scope.$on('tree.collapse', function() {
+        $scope.treeApi.collapse_all();
+    });
+
+    $scope.$on('tree.filter', function() {
+        $scope.toggleFilter();
+    });
+
+    $scope.$on('tree.add.document', function() {
+        $scope.addDocument();
+    });
 
     $scope.filterOn = false;
     $scope.toggleFilter = function() {
         $scope.filterOn = !$scope.filterOn;
     };
 
-    $scope.tooltipPlacement = function(arr) {
-        arr[0].placement = "bottom-left";
-        for(var i=1; i<arr.length; i++){
-            arr[i].placement = "bottom";
-        }
-    };
     var treeApi = {};
-    $scope.tooltipPlacement($scope.buttons);
     $scope.treeApi = treeApi;
-
 
     var addDocOrSnapshots = function(site, siteNode) {
         ViewService.getSiteDocuments(site, false, ws)
@@ -68,7 +67,7 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, Element
                 docs.forEach(function(doc) {
                     var docNode = {
                         label : doc.name,
-                        type : "view",
+                        type : 'view',
                         data : doc,
                         site : site,
                         children : []
@@ -116,12 +115,7 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, Element
     };
 
     $scope.tree_options = {
-        types: {
-            "section": "fa fa-file-o fa-fw",
-            "view": "fa fa-file fa-fw",
-            "site": "fa fa-sitemap fa-fw",
-            "snapshot" : "fa fa-camera fa-fw"
-        }
+        types: UxService.getTreeTypes()
     };
 
     var addDocCtrl = function($scope, $modalInstance) {
@@ -143,7 +137,7 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, Element
     $scope.addDocument = function() {
         var branch = treeApi.get_selected_branch();
         if (!branch || branch.type !== 'site') {
-            growl.error("Select a site to add document under");
+            growl.warning("Select a site to add document under");
             return;
         }
         $scope.addDocSite = branch.data.sysmlid;

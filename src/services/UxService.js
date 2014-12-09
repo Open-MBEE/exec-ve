@@ -78,11 +78,14 @@ function UxService($rootScope) {
 		  case "tree.filter":
 		  	return {id: button, icon: 'fa-filter', selected: true, active: true, permission: true, tooltip: 'Filter', 
             		spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
-		  case "tree.add.task":
-		  	return {id: button, icon: 'fa-plus', selected: true, active: true, permission: true, tooltip: 'Add Task', 
+		  case "tree.add.document":
+		  	return {id: button, icon: 'fa-plus', selected: true, active: true, permission: false, tooltip: 'Add Document', 
             		spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
 		  case "tree.add.configuration":
 		  	return {id: button, icon: 'fa-tag', selected: true, active: true, permission: true, tooltip: 'Add Configuration', 
+            		spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
+		  case "tree.add.task":
+		  	return {id: button, icon: 'fa-plus', selected: true, active: true, permission: true, tooltip: 'Add Task', 
             		spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
 		  case "tree.delete":
 		  	return {id: button, icon: 'fa-times', selected: true, active: true, permission: true, tooltip: 'Delete', 
@@ -93,8 +96,52 @@ function UxService($rootScope) {
         }
 	};
 
+	var MetaTypes = ['configuration', 'connector', 'dependency', 'directedrelationship', 'element', 'property', 'generalization', 'package', 'section', 'site', 'snapshot', 'view' ];
+
+	var getTreeTypes = function() {
+		var treeTypes = {};
+
+		MetaTypes.forEach(function (type) {
+			treeTypes[type] = "fa " + getTypeIcon(type) + " fa-fw";
+		});
+
+		return treeTypes;
+	};
+
+	var getTypeIcon = function(type) {
+		type = type.toLowerCase();
+		switch (type) {
+		  case "configuration":
+		  	return "fa-tag";
+		  case "connector":
+		  	return "fa-expand";
+		  case "dependency":
+		  	return "fa-long-arrow-right";
+		  case "directedrelationship":
+		  	return "fa-long-arrow-right";
+		  case "element":
+		  	return "fa-square";
+		  case "property":
+		  	return "fa-circle";
+		  case "generalization":
+		  	return "fa-chevron-right";
+		  case "package":
+		  	return "fa-folder";
+		  case "section":
+		  	return "fa-file-o";
+		  case "site":
+		  	return "fa-sitemap";
+		  case "snapshot":
+		  	return "fa-camera";
+		  case "view":
+		  	return "fa-file";
+        }
+	};
+
     return {
     	getButtonBarButton: getButtonBarButton,
-        getToolbarButton: getToolbarButton
+        getToolbarButton: getToolbarButton,
+        getTypeIcon: getTypeIcon,
+        getTreeTypes: getTreeTypes
     };
 }
