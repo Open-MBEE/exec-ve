@@ -63,13 +63,25 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
     })
     .state('mm.workspace.config', {
         url: '/tags/:config',
+        resolve: {
+            config: function($stateParams, ConfigService) {
+                if ($stateParams.config === 'latest')
+                    return 'latest';
+                return ConfigService.getConfig($stateParams.config, $stateParams.ws, false);
+            },
+            timedSites: function($stateParams, SiteService, config) {
+                if (config === 'latest')
+                    return SiteService.getSites();
+                return SiteService.getSites(config.timestamp);
+            }
+        },
         views: {
             'pane-center@': {
                 templateUrl: 'partials/mm/pane-center.html',
-                controller: function($scope, $stateParams, sites) {
+                controller: function($scope, $stateParams, timedSites) {
                     $scope.ws = $stateParams.ws;
                     $scope.config = $stateParams.config;
-                    $scope.sites = sites;
+                    $scope.sites = timedSites;
                 }
             }
         }
