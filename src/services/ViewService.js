@@ -345,7 +345,7 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
             ElementService.updateElement(data, workspace)
             .then(function(data2) {
                 var ws = !workspace ? 'master' : workspace;
-                var cacheKey = ['sites', ws, site, 'products'];
+                var cacheKey = ['sites', ws, 'latest', site, 'products'];
                 if (CacheService.exists(cacheKey))
                     CacheService.get(cacheKey).push(data2);
                 deferred.resolve(data2);
@@ -371,15 +371,15 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
      * @param {string} [workspace=master] workspace to use 
      * @returns {Promise} The promise will be resolved with array of document objects 
      */
-    var getSiteDocuments = function(site, update, workspace) {
-        var n = normalize(update, workspace, null);
+    var getSiteDocuments = function(site, update, workspace, version) {
+        var n = normalize(update, workspace, version);
         var deferred = $q.defer();
-        var url = URLService.getSiteProductsURL(site, n.ws);
-        var cacheKey = ['sites', n.ws, site, 'products'];
+        var url = URLService.getSiteProductsURL(site, n.ws, n.ver);
+        var cacheKey = ['sites', n.ws, n.ver, site, 'products'];
         if (CacheService.exists(cacheKey) && !n.update) 
             deferred.resolve(CacheService.get(cacheKey));
         else {
-            ElementService.getGenericElements(url, 'products', n.update, n.ws).
+            ElementService.getGenericElements(url, 'products', n.update, n.ws, n.ver).
             then(function(data) {              
                 deferred.resolve(CacheService.put(cacheKey, data, false));
             }, function(reason) {

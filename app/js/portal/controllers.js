@@ -61,7 +61,7 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, Element
     $scope.treeApi = treeApi;
 
     var addDocOrSnapshots = function(site, siteNode) {
-        ViewService.getSiteDocuments(site, false, ws)
+        ViewService.getSiteDocuments(site, false, ws, config === 'latest' ? 'latest' : config.timestamp)
         .then(function(docs) {
             if (config === 'latest') {
                 docs.forEach(function(doc) {
@@ -98,7 +98,6 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, Element
         }, function(reason) {
 
         });
-        
     };
 
     var dataTree = UtilsService.buildTreeHierarchy(sites, "sysmlid", "site", "parent", addDocOrSnapshots);
