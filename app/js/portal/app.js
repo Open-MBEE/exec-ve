@@ -6,9 +6,6 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
     .state('portal', {
         url: '/workspaces/:ws/tags/:config',
         resolve: {
-            sites: function($stateParams, SiteService) {
-                return SiteService.getSites($stateParams.ws);
-            },
             ws: function($stateParams) {
                 return $stateParams.ws;
             },
@@ -16,6 +13,11 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
                 if ($stateParams.config === 'latest')
                     return 'latest';
                 return ConfigService.getConfig($stateParams.config, $stateParams.ws, false);
+            },
+            sites: function($stateParams, SiteService, config) {
+                if (config === 'latest')
+                    return SiteService.getSites();
+                return SiteService.getSites(config.timestamp);
             },
             configurations: function($stateParams, ConfigService) {
                 return ConfigService.getConfigs($stateParams.ws, false);

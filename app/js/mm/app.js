@@ -34,7 +34,7 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
         url: '/workspace/:ws',
         resolve: {
             sites: function($stateParams, SiteService) {
-                return SiteService.getSites($stateParams.ws);
+                return SiteService.getSites();
             }
         },
         views: {
