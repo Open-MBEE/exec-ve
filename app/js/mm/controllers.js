@@ -133,6 +133,8 @@ function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorS
                     children : [] 
                 }); 
             });
+            if ($scope.treeApi.refresh)
+                $scope.treeApi.refresh();
         });
     };
 

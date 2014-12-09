@@ -94,6 +94,8 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, Element
                     }
                 });
             }
+            if ($scope.treeApi.refresh)
+                $scope.treeApi.refresh();
         }, function(reason) {
 
         });
