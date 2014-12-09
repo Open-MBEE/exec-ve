@@ -239,6 +239,7 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
             }, function(reason) {
                 if (reason.status === 409) {
                     clone.read = reason.data.elements[0].read;
+                    clone.modified = reason.data.elements[0].modified;
                     updateDocument(clone, ws)
                     .then(function(data3) {
                         if (CacheService.exists(docViewsCacheKey) && viewOb)
