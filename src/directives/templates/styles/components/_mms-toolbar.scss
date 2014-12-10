@@ -38,6 +38,28 @@ mms-toolbar {
 			cursor: pointer;
 		}
 
+		.fa-edit-asterisk:before {
+			content:"\f044";
+			position:relative;
+			display:inline-block;
+			width:2em;
+			height:2em;
+			line-height:2em;
+			vertical-align:middle;
+		}
+		.fa-edit-asterisk:after {
+			content:"\f069";
+			color: $red;
+			position:absolute;
+			left:0;
+			width:100%;
+			text-align:right;
+			float:right;
+			margin-right:.4em;
+			margin-top:.4em;
+			font-size: 12px;
+		}
+
 		.fa-save {
 			color: $dark_blue;
 		}

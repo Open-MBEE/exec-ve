@@ -26,43 +26,43 @@ function UxService($rootScope) {
     var getToolbarButton = function(button) {
 		switch (button) {
 		  case "element.viewer":
-		  	return {id: button, icon: 'fa fa-eye', selected: true, active: true, permission:true, tooltip: 'Preview Element', 
+		  	return {id: button, icon: 'fa-eye', selected: true, active: true, permission:true, tooltip: 'Preview Element', 
             		spinner: false, onClick: function() {$rootScope.$broadcast(button);}};
 		  case "element.editor":
-		    return {id: button, icon: 'fa fa-edit', selected: false, active: true, permission:false, tooltip: 'Edit Element',
+		    return {id: button, icon: 'fa-edit', selected: false, active: true, permission:false, tooltip: 'Edit Element',
 		            spinner: false, onClick: function() {$rootScope.$broadcast(button);},
 		        	dynamic_buttons: [getToolbarButton("element.editor.save"), getToolbarButton("element.editor.saveall"), getToolbarButton("element.editor.cancel")]};
 		  case "view.reorder":
-	        return {id: button, icon: 'fa fa-arrows-v', selected: false, active: true, permission:false, tooltip: 'Reorder View',
+	        return {id: button, icon: 'fa-arrows-v', selected: false, active: true, permission:false, tooltip: 'Reorder View',
 	    	        spinner: false, onClick: function() {$rootScope.$broadcast(button);},
 		        	dynamic_buttons: [getToolbarButton("view.reorder.save"), getToolbarButton("view.reorder.cancel")]};
 		  case "document.snapshot":
-		  	return  {id: button, icon: 'fa fa-camera', selected: false, active: true, permission:true, tooltip: 'Snapshots',
+		  	return  {id: button, icon: 'fa-camera', selected: false, active: true, permission:true, tooltip: 'Snapshots',
 		            spinner: false, onClick: function() {$rootScope.$broadcast(button);},
 		        	dynamic_buttons: [getToolbarButton("document.snapshot.refresh"), getToolbarButton("document.snapshot.create")]};
 		  case "element.editor.save":
-			return {id: button, icon: 'fa fa-save', pullDown: true, dynamic: true, selected: false, active: false, permission:true, tooltip: 'Save',
+			return {id: button, icon: 'fa-save', pullDown: true, dynamic: true, selected: false, active: false, permission:true, tooltip: 'Save',
 				        spinner: false, onClick: function() {$rootScope.$broadcast(button);}};
 		  case "element.editor.saveall":
-			return {id: button, icon: 'fa fa-save-all', dynamic: true, selected: false, active: false, permission:true, tooltip: 'Save All',
+			return {id: button, icon: 'fa-save-all', dynamic: true, selected: false, active: false, permission:true, tooltip: 'Save All',
 				        spinner: false, onClick: function() {$rootScope.$broadcast(button);}};
 		  case "element.editor.cancel":
-			return {id: button, icon: 'fa fa-times', dynamic: true, selected: false, active: false, permission:true, tooltip: 'Cancel',
+			return {id: button, icon: 'fa-times', dynamic: true, selected: false, active: false, permission:true, tooltip: 'Cancel',
 			            spinner: false, onClick: function() {$rootScope.$broadcast(button);}};
 		  case "view.reorder.save":
-			return {id: button, icon: 'fa fa-save', pullDown: true, dynamic: true, selected: false, active: false, permission:true, tooltip: 'Save',
+			return {id: button, icon: 'fa-save', pullDown: true, dynamic: true, selected: false, active: false, permission:true, tooltip: 'Save',
 			            spinner: false, onClick: function() {$rootScope.$broadcast(button);}};
 		  case "view.reorder.cancel":
-		    return {id: button, icon: 'fa fa-times', dynamic: true, selected: false, active: false, permission:true, tooltip: 'Cancel',
+		    return {id: button, icon: 'fa-times', dynamic: true, selected: false, active: false, permission:true, tooltip: 'Cancel',
 		            spinner: false, onClick: function() {$rootScope.$broadcast(button);}};
 		  case "document.snapshot.refresh":
-		    return {id: button, icon: 'fa fa-refresh', pullDown: true, dynamic: true, selected: false, active: false, permission:true, tooltip: 'Refresh',
+		    return {id: button, icon: 'fa-refresh', pullDown: true, dynamic: true, selected: false, active: false, permission:true, tooltip: 'Refresh',
 		            spinner: false, onClick: function() {$rootScope.$broadcast(button);}};
 		  case "document.snapshot.create":
-		    return {id: button, icon: 'fa fa-plus', dynamic: true, selected: false, active: false, permission:false, tooltip: 'Create Snapshot',
+		    return {id: button, icon: 'fa-plus', dynamic: true, selected: false, active: false, permission:false, tooltip: 'Create Snapshot',
 		            spinner: false, onClick: function() {$rootScope.$broadcast(button);}};
 		  case "configurations":
-            return {id: button, icon: 'fa fa-tag', dynamic: false, selected: false, active: true, permission: true, tooltip: 'Tags',
+            return {id: button, icon: 'fa-tag', dynamic: false, selected: false, active: true, permission: true, tooltip: 'Tags',
                     spinner: false, onClick: function() {$rootScope.$broadcast(button);}};
 		}    
 	};

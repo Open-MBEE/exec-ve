@@ -628,6 +628,7 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
         if (edit) {
             $scope.etrackerSelected = edit.sysmlid;
             $rootScope.veEdits[edit.sysmlid] = edit;
+            $rootScope.tbApi.setIcon('element.editor', 'fa-edit-asterisk');
             if (Object.keys($rootScope.veEdits).length > 1) {
                 $rootScope.tbApi.setPermission('element.editor.saveall', true);
             } else {
@@ -676,6 +677,9 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
             } else {
                 $scope.specApi.setEditing(false);
                 $rootScope.tbApi.select('element.viewer');
+                if (Object.keys($rootScope.veEdits).length === 0) {
+                    $rootScope.tbApi.setIcon('element.editor', 'fa-edit');
+                }
             }
         }, function(reason) {
             elementSaving = false;
@@ -687,8 +691,10 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
                 growl.error(reason.message);
             $rootScope.tbApi.toggleButtonSpinner('element.editor.save');
         });
+
         $rootScope.tbApi.select('element.editor');
     });
+
     var savingAll = false;
     $scope.$on('element.editor.saveall', function() {
         if (savingAll) {
@@ -734,6 +740,10 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
             }
            $rootScope.tbApi.toggleButtonSpinner('element.editor.saveall');
             savingAll = false;
+
+            if (Object.keys($rootScope.veEdits).length === 0) {
+                $rootScope.tbApi.setIcon('element.editor', 'fa-edit');
+        }
         });
     });
     $scope.$on('element.editor.cancel', function() {
@@ -748,6 +758,7 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
             } else {
                 $scope.specApi.setEditing(false);
                 $rootScope.tbApi.select('element.viewer');
+                $rootScope.tbApi.setIcon('element.editor', 'fa-edit');
             }
         };
         if ($scope.specApi.hasEdits()) {
