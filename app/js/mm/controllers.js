@@ -48,7 +48,7 @@ function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorS
     });
 
     $scope.$on('tree.add.task', function() {
-        $scope.addWorkspace();
+        $scope.createWorkspace();
     });
 
     $scope.$on('tree.add.configuration', function() {
@@ -163,7 +163,12 @@ function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorS
         $scope.treeApi.refresh();
     }, 5000);
     
-    $scope.createWorkspace = function (branch) {
+    $scope.createWorkspace = function() {
+        var branch = treeApi.get_selected_branch();
+        if (!branch) {
+            growl.warning("Add Task Error: Select a task or tag first");
+            return;
+        }
         if (branch.type === 'Configuration') {
             $scope.createWsParentId = branch.workspace;
             $scope.createWsTime = branch.data.timestamp;
@@ -193,53 +198,59 @@ function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorS
         });
     };
 
-    var deleteWorkspaceOrConfig = false;
     $scope.deleteWorkspaceOrConfig = function() {
-
-        if (deleteWorkspaceOrConfig) {
-            growl.info('Please wait...');
-            return;
-        }
-
         var branch = treeApi.get_selected_branch();
         if (!branch) {
             growl.warning("Delete Error: Select item to delete.");
             return;
         }
+        $scope.deleteBranch = branch;
+        var instance = $modal.open({
+            templateUrl: 'partials/mm/delete.html',
+            scope: $scope,
+            controller: ['$scope', '$modalInstance', deleteCtrl]
+        });
+        instance.result.then(function(data) {
+            treeApi.remove_branch(branch);
+        });
+    };
 
-        deleteWorkspaceOrConfig = true;
-
-        $scope.bbApi.toggleButtonSpinner("tree.delete");
-
-        if (branch.type === "Workspace") {
-
-          WorkspaceService.deleteWorkspace(branch.data.id)
-          .then(function(data) {
-              treeApi.remove_branch(branch);
-              growl.success("Task Deleted");
-          }, function(reason) {
-              growl.error("Task Delete Error: " + reason.message);
-          }).finally(function() {
-              deleteWorkspaceOrConfig = false;
-              $scope.bbApi.toggleButtonSpinner("tree.delete");
-          });
-
-        } else if (branch.type === "Configuration") {
-
-          ConfigService.deleteConfig(branch.data.id)
-          .then(function(data) {
-              treeApi.remove_branch(branch);
-              growl.success("Configuration Deleted");
-          }, function(reason) {
-              growl.error("Configuration Delete Error: " + reason.message);
-          }).finally(function() {
-              deleteWorkspaceOrConfig = false;
-              $scope.bbApi.toggleButtonSpinner("tree.delete");
-          });
-        } else {
-            deleteWorkspaceOrConfig = false;
-            $scope.bbApi.toggleButtonSpinner("tree.delete");
-        }
+    var deleteCtrl = function($scope, $modalInstance) {
+        $scope.oking = false;
+        var branch = $scope.deleteBranch;
+        $scope.type = branch.type === 'Workspace' ? 'Task' : 'Tag';
+        $scope.name = branch.data.name;
+        $scope.ok = function() {
+            if ($scope.oking) {
+                growl.info("Please wait...");
+                return;
+            }
+            $scope.oking = true;
+            if (branch.type === "Workspace") {
+                WorkspaceService.deleteWorkspace(branch.data.id)
+                .then(function(data) {
+                    growl.success("Task Deleted");
+                    $modalInstance.close('ok');
+                }, function(reason) {
+                    growl.error("Task Delete Error: " + reason.message);
+                }).finally(function() {
+                    $scope.oking = false;
+                });
+            } else if (branch.type === "Configuration") {
+                ConfigService.deleteConfig(branch.data.id)
+                .then(function(data) {
+                    growl.success("Configuration Deleted");
+                    $modalInstance.close('ok');
+                }, function(reason) {
+                    growl.error("Configuration Delete Error: " + reason.message);
+                }).finally(function() {
+                    $scope.oking = false;
+                });
+            } 
+        };
+        $scope.cancel = function() {
+            $modalInstance.dismiss();
+        };
     };
 
     $scope.addConfiguration = function() {
@@ -306,16 +317,6 @@ function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorS
             $modalInstance.dismiss();
         };
     };
-
-    $scope.addWorkspace = function() {
-        var branch = treeApi.get_selected_branch();
-        if (!branch) {
-            growl.warning("Add Task Error: Select a task or tag first");
-            return;
-        }
-        $scope.createWorkspace(branch);
-    };
-
 
     var workspaceCtrl = function($scope, $modalInstance) {
         $scope.workspace = {};
