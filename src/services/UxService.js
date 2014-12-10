@@ -77,9 +77,12 @@ function UxService($rootScope) {
             		spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
 		  case "tree.filter":
 		  	return {id: button, icon: 'fa-filter', selected: true, active: true, permission: true, tooltip: 'Filter', 
-            		spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
+            		spinner: false, togglable: true, action: function() {$rootScope.$broadcast(button);}};
 		  case "tree.add.document":
 		  	return {id: button, icon: 'fa-plus', selected: true, active: true, permission: false, tooltip: 'Add Document', 
+            		spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
+		  case "tree.add.view":
+		  	return {id: button, icon: 'fa-plus', selected: true, active: true, permission: false, tooltip: 'Add View', 
             		spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
 		  case "tree.add.configuration":
 		  	return {id: button, icon: 'fa-tag', selected: true, active: true, permission: true, tooltip: 'Add Configuration', 
@@ -93,6 +96,13 @@ function UxService($rootScope) {
 		  case "tree.merge":
 		  	return {id: button, icon: 'fa-share-alt fa-flip-horizontal', selected: true, active: true, permission: true, tooltip: 'Merge Task', 
             		spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
+		  case "tree.reorder.view":
+		  	return {id: button, icon: 'fa-arrows-v', selected: true, active: true, permission: false, tooltip: 'Reorder Views', 
+            		spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
+		  case "tree.full.document":
+		  	return {id: button, icon: 'fa-file-text-o', selected: true, active: true, permission: true, tooltip: 'Full Document', 
+            		spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
+
         }
 	};
 

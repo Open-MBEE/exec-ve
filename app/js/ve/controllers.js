@@ -3,8 +3,8 @@
 /* Controllers */
 
 angular.module('myApp')
-.controller('NavTreeCtrl', ['$scope', '$rootScope', '$location', '$timeout', '$state', '$anchorScroll', 'document', 'time', 'views', 'ElementService', 'ViewService', 'growl', '$modal', '$q', 'ws',
-function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, document, time, views, ElementService, ViewService, growl, $modal, $q, ws) {
+.controller('NavTreeCtrl', ['$scope', '$rootScope', '$location', '$timeout', '$state', '$anchorScroll', 'document', 'time', 'views', 'ElementService', 'ViewService', 'UxService', 'growl', '$modal', '$q', 'ws',
+function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, document, time, views, ElementService, ViewService, UxService, growl, $modal, $q, ws) {
     $scope.document = document;
     $rootScope.veTitle = document.name;
     $scope.time = time;
@@ -17,56 +17,57 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, documen
         ViewService.setCurrentViewId(document.sysmlid);
     } else
         $rootScope.veFullDocMode = false;
-    $scope.buttons = [{
-        action: function(){ $scope.treeApi.expand_all(); },        
-        tooltip: "Expand All",
-        icon: "fa-caret-square-o-down",
-        permission: true
-    }, {
-        action: function(){ $scope.treeApi.collapse_all(); },
-        tooltip: "Collapse All",
-        icon: "fa-caret-square-o-up",
-        permission: true
-    }, {
-        action: function(){ $scope.toggleFilter(); },
-        tooltip: "Filter Views",
-        icon: "fa-filter",
-        permission: true
-    }, {
-        action: function(){ $scope.addView(); },
-        tooltip: "Add View",
-        icon: "fa-plus",
-        permission: $scope.editable
-    }, {
-        action: function(){ 
-            $rootScope.veFullDocMode = false;
-            $scope.buttons[5].tooltip = "Full Document";
-            $scope.buttons[5].icon = 'fa-file-text-o';
-            $scope.reorder(); 
-        },
-        tooltip: "Reorder Views",
-        icon: "fa-arrows-v",
-        permission: $scope.editable
-    }, {
-        action: function(){ 
-            $scope.fullDocMode();
-        },
-        tooltip: $rootScope.veFullDocMode ? "View Mode" : "Full Document",
-        icon: $rootScope.veFullDocMode ? "fa-file-text" : "fa-file-text-o",
-        permission: true
-    }];
+
+    $scope.bbApi = {};
+    $rootScope.bbApi = $scope.bbApi;
+
+    $scope.buttons = [];
+
+    $timeout(function() {
+      $scope.bbApi.addButton(UxService.getButtonBarButton("tree.expand"));
+      $scope.bbApi.addButton(UxService.getButtonBarButton("tree.collapse"));
+      $scope.bbApi.addButton(UxService.getButtonBarButton("tree.filter"));
+      $scope.bbApi.addButton(UxService.getButtonBarButton("tree.add.view"));
+      $scope.bbApi.addButton(UxService.getButtonBarButton("tree.reorder.view"));
+      $scope.bbApi.addButton(UxService.getButtonBarButton("tree.full.document"));
+      $scope.bbApi.setPermission("tree.add.view", $scope.editable);
+      $scope.bbApi.setPermission("tree.reorder.view", $scope.editable);
+    }, 500);
+
+    $scope.$on('tree.expand', function() {
+        $scope.treeApi.expand_all();
+    });
+
+    $scope.$on('tree.collapse', function() {
+        $scope.treeApi.collapse_all();
+    });
+
     $scope.filterOn = false;
-    $scope.toggleFilter = function() {
-        $scope.filterOn = !$scope.filterOn;
-    };
-    $scope.tooltipPlacement = function(arr) {
-        arr[0].placement = "bottom-left";
-        for(var i=1; i<arr.length; i++){
-            arr[i].placement = "bottom";
-        }
-    };
+    $scope.$on('tree.filter', function() {
+        $scope.bbApi.select('tree.filter');
+        $scope.filterOn = $scope.bbApi.getToggleState('tree.filter');
+    });
+
+    $scope.$on('tree.add.view', function() {
+        $scope.addView();
+    });
+
+    $scope.$on('tree.reorder.view', function() {
+        $rootScope.veFullDocMode = false;
+        $scope.bbApi.setTooltip("tree.full.document", "Full Document");
+        $scope.bbApi.setIcon("tree.full.document", 'fa-file-text-o');
+
+        $scope.reorder(); 
+    });
+
+    $scope.$on('tree.full.document', function() {
+        $scope.fullDocMode();
+
+        $scope.bbApi.setTooltip("tree.full.document", $rootScope.veFullDocMode ? "View Mode" : "Full Document");
+        $scope.bbApi.setIcon("tree.full.document", $rootScope.veFullDocMode ? "fa-file-text" : "fa-file-text-o");
+    });
+
     var treeApi = {};
-    $scope.tooltipPlacement($scope.buttons);
     $rootScope.veTreeApi = treeApi;
     $scope.treeApi = treeApi;
 
@@ -141,8 +142,8 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, documen
     $scope.fullDocMode = function() {
         if ($rootScope.veFullDocMode) {
             $rootScope.veFullDocMode = false;
-            $scope.buttons[5].tooltip = "Full Document";
-            $scope.buttons[5].icon = 'fa-file-text-o';
+            $scope.bbApi.setTooltip("tree.full.document", "Full Document");
+            $scope.bbApi.setIcon("tree.full.document", 'fa-file-text-o');
             var curBranch = treeApi.get_selected_branch();
             if (curBranch) {
                 var viewId;
@@ -155,8 +156,8 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, documen
         } else {
             if ($state.current.name === 'doc.all') {
                 $rootScope.veFullDocMode = true;
-                $scope.buttons[5].tooltip = "View Mode";
-                $scope.buttons[5].icon = 'fa-file-text';
+                $scope.bbApi.setTooltip("tree.full.document", "View Mode");
+                $scope.bbApi.setIcon("tree.full.document", 'fa-file-text');
             } else {
                 if (document.specialization.view2view.length > 30) {
                     var instance = $modal.open({
@@ -170,15 +171,15 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, documen
                     instance.result.then(function(choice) {
                         if (choice === 'ok') {
                             $rootScope.veFullDocMode = true;
-                            $scope.buttons[5].tooltip = "View Mode";
-                            $scope.buttons[5].icon = 'fa-file-text';
+                            $scope.bbApi.setTooltip("tree.full.document", "View Mode");
+                            $scope.bbApi.setIcon("tree.full.document", 'fa-file-text');
                             $state.go('doc.all'); 
                         }
                     });
                 } else {
                     $rootScope.veFullDocMode = true;
-                    $scope.buttons[5].tooltip = "View Mode";
-                    $scope.buttons[5].icon = 'fa-file-text';
+                    $scope.bbApi.setTooltip("tree.full.document", "View Mode");
+                    $scope.bbApi.setIcon("tree.full.document", 'fa-file-text');
                     $state.go('doc.all'); 
                 }
             }
@@ -260,10 +261,7 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, documen
     };
 
     $scope.tree_options = {
-        types: {
-            "section": "fa fa-file-o fa-fw",
-            "view": "fa fa-file fa-fw"
-        }
+        types: UxService.getTreeTypes()
     };
     /*ViewService.getDocumentViews(document.sysmlid, false, 'master', time)
     .then(function(fullViews) {
@@ -566,7 +564,6 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
     };
 
     var refreshSnapshots = function() {
-        // TODO: $rootScope.tbApi.toggleButtonSpinner('document.snapshot.refresh', 'fa fa-refresh fa-spin');
         $rootScope.tbApi.toggleButtonSpinner('document.snapshot.refresh');
         ConfigService.getProductSnapshots($scope.document.sysmlid, $scope.site.name, $scope.ws, true)
         .then(function(result) {

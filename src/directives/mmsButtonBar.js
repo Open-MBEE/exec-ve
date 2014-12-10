@@ -19,6 +19,12 @@ function mmsButtonBar($templateCache) {
             scope.buttons.forEach(function(b) {
                 if (b === button) {
                     b.selected = true;
+                    if (b.togglable) {
+                        if (! b.toggle_state)
+                            b.toggle_state = true;
+                        else 
+                            b.toggle_state = ! b.toggle_state;
+                    }
                 } else
                     b.selected = false;
             });
@@ -45,6 +51,35 @@ function mmsButtonBar($templateCache) {
                     if (button.id === id)
                         button.permission = permission;
                 });
+            };
+            
+            api.setTooltip = function (id, tooltip) {
+                $scope.buttons.forEach(function(button) {
+                    if (button.id === id)
+                        button.tooltip = tooltip;
+                });
+            };
+
+            api.setIcon = function (id, icon) {
+                $scope.buttons.forEach(function(button) {
+                    if (button.id === id)
+                        button.icon = icon;
+                });
+            };
+
+            api.getToggleState = function (id) {
+                var buttonTemp = {};
+                buttonTemp.toggle_state = false;
+
+                $scope.buttons.forEach(function(button) {
+                    if (button.id === id) {
+                        buttonTemp = button;
+                        if (! button.togglable) button.toggle_state = false;
+                        if (! button.toggle_state) button.toggle_state = false;
+                    }
+                });
+
+                return buttonTemp.toggle_state;
             };
 
             api.addButton = function(button) {
