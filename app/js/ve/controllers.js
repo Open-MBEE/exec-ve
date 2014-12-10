@@ -32,6 +32,8 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, documen
       $scope.bbApi.addButton(UxService.getButtonBarButton("tree.full.document"));
       $scope.bbApi.setPermission("tree.add.view", $scope.editable);
       $scope.bbApi.setPermission("tree.reorder.view", $scope.editable);
+      $scope.bbApi.setTooltip("tree.full.document", $rootScope.veFullDocMode ? "View Mode" : "Full Document");
+      $scope.bbApi.setIcon("tree.full.document", $rootScope.veFullDocMode ? "fa-file-text" : "fa-file-text-o");
     }, 500);
 
     $scope.$on('tree.expand', function() {
