@@ -52,12 +52,11 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
                 templateUrl: 'partials/mm/pane-right.html',
                 controller: function ($rootScope, $scope, $stateParams, WorkspaceService, sites) {
                     $scope.ws = $stateParams.ws;
-                    $scope.sites = sites;
-                    $scope.buttons = [];
+                    $scope.type = "Workspace";
                     WorkspaceService.getWorkspace($scope.ws).then(function(data) {
                         $scope.element = data;
                     });
-                 }
+                }
             }
         }
     })
@@ -82,6 +81,14 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
                     $scope.ws = $stateParams.ws;
                     $scope.config = $stateParams.config;
                     $scope.sites = timedSites;
+                }
+            },
+            'pane-right@': {
+                templateUrl: 'partials/mm/pane-right.html',
+                controller: function ($rootScope, $scope, $stateParams, config) {
+                    $scope.ws = $stateParams.ws;
+                    $scope.element = config;
+                    $scope.type = "Configuration";
                 }
             }
         }
