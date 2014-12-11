@@ -8,12 +8,6 @@ function mmsToolbar($templateCache) {
 
     var mmsToolbarCtrl = function($scope) {
         
-        var sortFunction = function(a, b) {
-            if(b.dynamic) return -1;
-            if(a.dynamic) return 1;
-            return 0;
-        };
-
         if ($scope.mmsTbApi) {
             var api = $scope.mmsTbApi;
 
@@ -50,13 +44,14 @@ function mmsToolbar($templateCache) {
             };
 
             api.addButton = function(button) {
+                button.priority = $scope.buttons.length;
                 $scope.buttons.push(button);
                 if (button.dynamic_buttons) {
                     button.dynamic_buttons.forEach(function(button) {
+                        button.priority = $scope.buttons.length + 1000;
                         $scope.buttons.push(button);
                     });
                 }
-                $scope.buttons.sort(sortFunction);
             };
 
             api.toggleButtonSpinner = function (id) {
