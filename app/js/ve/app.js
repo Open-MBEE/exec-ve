@@ -75,6 +75,9 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
         resolve: {
             viewElements: function($stateParams, ViewService, time, ws) {
                 return ViewService.getViewElements($stateParams.viewId, false, ws, time);
+            },
+            view: function($stateParams, ViewService, time, ws, viewElements) {
+                return ViewService.getView($stateParams.viewId, false, ws, time);
             }
         }
     })

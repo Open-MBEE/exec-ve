@@ -391,25 +391,132 @@ function($scope, $rootScope, document, time, ElementService, ViewService, $state
             $state.go('doc.view', {viewId: curBranch.data.sysmlid});
     };
 }])
-.controller('ViewCtrl', ['$scope', '$rootScope', '$stateParams', '$timeout', 'viewElements', 'ViewService', 'time', 'growl', 'ws',
-function($scope, $rootScope, $stateParams, $timeout, viewElements, ViewService, time, growl, ws) {
+.controller('ViewCtrl', ['$scope', '$rootScope', '$stateParams', '$timeout', '$modal', 'viewElements', 'ViewService', 'time', 'growl', 'ws', 'site', 'view',
+function($scope, $rootScope, $stateParams, $timeout, $modal, viewElements, ViewService, time, growl, ws, site, view) {
     if (!$rootScope.veCommentsOn)
         $rootScope.veCommentsOn = false;
     if (!$rootScope.veElementsOn)
         $rootScope.veElementsOn = false;
 
+    $scope.viewElements = viewElements;
+    $scope.site = site;
+    var elementSaving = false;
     $scope.buttons = [
+        {
+            action: function() {
+                $scope.editing = !$scope.editing;
+                $scope.specApi.setEditing(true);
+                $scope.buttons[0].permission = false;
+                $scope.buttons[1].permission = true;
+                $scope.buttons[2].permission = true;
+                var edit = $scope.specApi.getEdits();
+                if (edit) {
+                    $rootScope.veEdits[edit.sysmlid] = edit;
+                    $rootScope.tbApi.setIcon('element.editor', 'fa-edit-asterisk');
+                    if (Object.keys($rootScope.veEdits).length > 1) {
+                        $rootScope.tbApi.setPermission('element.editor.saveall', true);
+                    } else {
+                        $rootScope.tbApi.setPermission('element.editor.saveall', false);
+                    }
+                }
+            },
+            tooltip: "Edit View Documentation",
+            icon: "fa-edit",
+            permission: view.editable && time === 'latest'
+        },
+        {
+            action: function() {
+                
+                    if (elementSaving) {
+                        growl.info('Please Wait...');
+                        return;
+                    }
+                    elementSaving = true;
+                    $scope.buttons[1].icon = "fa-spin fa-spinner";
+                    $scope.specApi.save().then(function(data) {
+                        elementSaving = false;
+                        growl.success('Save Successful');
+                        $scope.editing = false;
+                        delete $rootScope.veEdits[$scope.specApi.getEdits().sysmlid];
+                        if (Object.keys($rootScope.veEdits).length === 0) {
+                            $rootScope.tbApi.setIcon('element.editor', 'fa-edit');
+                        }
+                        if (Object.keys($rootScope.veEdits).length > 1) {
+                            $rootScope.tbApi.setPermission('element.editor.saveall', true);
+                        } else {
+                            $rootScope.tbApi.setPermission('element.editor.saveall', false);
+                        }
+                        $scope.buttons[0].permission = true;
+                        $scope.buttons[1].permission = false;
+                        $scope.buttons[2].permission = false;
+                    }, function(reason) {
+                        elementSaving = false;
+                        if (reason.type === 'info')
+                            growl.info(reason.message);
+                        else if (reason.type === 'warning')
+                            growl.warning(reason.message);
+                        else if (reason.type === 'error')
+                            growl.error(reason.message);
+                    }).finally(function() {
+                        $scope.buttons[1].icon = "fa-save";
+                    });
+            },
+            tooltip: "Save",
+            icon: "fa-save",
+            permission: false
+        },
+        {
+            action: function() {
+                var go = function() {
+                    delete $rootScope.veEdits[$scope.specApi.getEdits().sysmlid];
+                    $scope.specApi.revertEdits();
+                    $scope.editing = false;
+                    if (Object.keys($rootScope.veEdits).length === 0) {
+                        $rootScope.tbApi.setIcon('element.editor', 'fa-edit');
+                    }
+                    if (Object.keys($rootScope.veEdits).length > 1) {
+                        $rootScope.tbApi.setPermission('element.editor.saveall', true);
+                    } else {
+                        $rootScope.tbApi.setPermission('element.editor.saveall', false);
+                    }
+                    $scope.buttons[0].permission = true;
+                    $scope.buttons[1].permission = false;
+                    $scope.buttons[2].permission = false;
+                };
+                if ($scope.specApi.hasEdits()) {
+                    var instance = $modal.open({
+                        templateUrl: 'partials/ve/cancelConfirm.html',
+                        scope: $scope,
+                        controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
+                            $scope.ok = function() {
+                                $modalInstance.close('ok');
+                            };
+                            $scope.cancel = function() {
+                                $modalInstance.dismiss();
+                            };
+                        }]
+                    });
+                    instance.result.then(function() {
+                        go();
+                    });
+                } else
+                    go();
+            },
+            tooltip:"Cancel",
+            icon: "fa-times",
+            permission: false
+        },
         {
             action: function() {
                 $scope.viewApi.toggleShowComments();
 
                 if (!$rootScope.veCommentsOn) {
-                    $scope.buttons[0].icon = "fa-comment";
-                    $scope.buttons[0].tooltip = "Hide Comments";
+                    $scope.buttons[3].icon = "fa-comment";
+                    $scope.buttons[3].tooltip = "Hide Comments";
                 }
                 else {
-                    $scope.buttons[0].icon = "fa-comment-o";
-                    $scope.buttons[0].tooltip = "Show Comments";
+                    $scope.buttons[3].icon = "fa-comment-o";
+                    $scope.buttons[3].tooltip = "Show Comments";
                 }
 
                 $rootScope.veCommentsOn = !$rootScope.veCommentsOn;
@@ -423,10 +530,10 @@ function($scope, $rootScope, $stateParams, $timeout, viewElements, ViewService, 
                 $scope.viewApi.toggleShowElements();
 
                 if (!$rootScope.veElementsOn) {
-                    $scope.buttons[1].tooltip = "Hide Elements";
+                    $scope.buttons[4].tooltip = "Hide Elements";
                 }
                 else {
-                    $scope.buttons[1].tooltip = "Show Elements";
+                    $scope.buttons[4].tooltip = "Show Elements";
                 }
 
                 $rootScope.veElementsOn = !$rootScope.veElementsOn;
@@ -440,7 +547,7 @@ function($scope, $rootScope, $stateParams, $timeout, viewElements, ViewService, 
                 var prev = $rootScope.veTreeApi.get_prev_branch($rootScope.veTreeApi.get_selected_branch());
                 if (!prev)
                     return;
-                $scope.buttons[2].icon = "fa-spinner fa-spin";
+                $scope.buttons[5].icon = "fa-spinner fa-spin";
                 $rootScope.veTreeApi.select_branch(prev);
             },
             tooltip: "Previous",
@@ -452,27 +559,27 @@ function($scope, $rootScope, $stateParams, $timeout, viewElements, ViewService, 
                 var next = $rootScope.veTreeApi.get_next_branch($rootScope.veTreeApi.get_selected_branch());
                 if (!next)
                     return;
-                $scope.buttons[3].icon = "fa-spinner fa-spin";
+                $scope.buttons[6].icon = "fa-spinner fa-spin";
                 $rootScope.veTreeApi.select_branch(next);
             },
             tooltip: "Next",
             icon: "fa-chevron-right",
-            permission: $scope.editable
+            permission: true
         }
     ];
-
     ViewService.setCurrentViewId($stateParams.viewId);
     $rootScope.veCurrentView = $stateParams.viewId;
     $rootScope.veViewLoading = false;
     $scope.vid = $stateParams.viewId;
     $scope.ws = ws;
     $scope.version = time;
-
+    $scope.editing = false;
     $timeout(function() {
         $rootScope.$broadcast('viewSelected', $scope.vid, viewElements);
     }, 225);
 
     $scope.viewApi = {};
+    $scope.specApi = {};
     $scope.comments = {};
     $scope.numComments = 0;
     $scope.lastCommented = "";
@@ -745,7 +852,7 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
 
             if (Object.keys($rootScope.veEdits).length === 0) {
                 $rootScope.tbApi.setIcon('element.editor', 'fa-edit');
-        }
+            }
         });
     });
     $scope.$on('element.editor.cancel', function() {

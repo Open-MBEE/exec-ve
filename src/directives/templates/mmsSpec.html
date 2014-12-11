@@ -1,8 +1,8 @@
 <div ng-show="editing" class="editing">
     <h1 class="prop"><input class="form-control" type="text" ng-model="edit.name"></input></h1>
 
-    <h2 class="prop-title">LAST MODIFICATION</h2>
-    <h3 class="prop">{{element.modified | date:'M/d/yy h:mm a'}} by {{element.creator}}</h3>
+    <h2 ng-hide="mmsViewEdit" class="prop-title">LAST MODIFICATION</h2>
+    <h3 ng-hide="mmsViewEdit" class="prop">{{element.modified | date:'M/d/yy h:mm a'}} by {{element.creator}}</h3>
 
     <div ng-if="edit.specialization.type === 'Property'">
         <h2 class="prop-title spec-view-value-heading">PROPERTY VALUE</h2>
@@ -22,15 +22,17 @@
         </div>
     </div>
 
-    <h2 class="prop-title spec-view-doc-heading">DOCUMENTATION</h2>
+    <h2 ng-hide="mmsViewEdit" class="prop-title spec-view-doc-heading">DOCUMENTATION</h2>
     <textarea ng-model="edit.documentation" mms-tinymce mms-tinymce-api="tinymceApi" mms-ws="{{mmsWs}}" mms-site="{{mmsSite}}" mms-cf-elements="mmsCfElements" mms-eid="{{element.sysmlid}}"></textarea>
 
-    <h2 class="prop-title spec-view-type-heading">METATYPE</h2>
-    <h3 class="prop">{{element.specialization.type || 'Element'}}</h3>
-    <h2 class="prop-title">QUALIFIED NAME</h2>
-    <h3 class="prop">{{element.qualifiedName}}</h3>
-    <h2 class="prop-title">ID</h2>
-    <h3 class="prop sysmlid">{{element.sysmlid}}</h3>
+    <div ng-hide="mmsViewEdit">
+        <h2 class="prop-title spec-view-type-heading">METATYPE</h2>
+        <h3 class="prop">{{element.specialization.type || 'Element'}}</h3>
+        <h2 class="prop-title">QUALIFIED NAME</h2>
+        <h3 class="prop">{{element.qualifiedName}}</h3>
+        <h2 class="prop-title">ID</h2>
+        <h3 class="prop sysmlid">{{element.sysmlid}}</h3>
+    </div>
 
 </div>
 

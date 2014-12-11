@@ -407,7 +407,8 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, $q, growl, _)
             mmsVersion: '@',
             mmsCfElements: '=', //array of element objects
             mmsElement: '=',
-            mmsSpecApi: '='
+            mmsSpecApi: '=',
+            mmsViewEdit: '='
         },
         link: mmsSpecLink
     };
