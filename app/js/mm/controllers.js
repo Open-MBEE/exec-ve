@@ -400,15 +400,21 @@ function(_, $timeout, $scope, $rootScope, $http, $state, $stateParams, $modal, g
         var parentNode = $scope.id2node[change.delta.owner];
         
         if (change.staged) {
-          parentNode.children.push(treeNode);
-
-          treeNode.status = "added";
+            if (!parentNode) {
+                $rootScope.treeData.push(treeNode);
+            } else {
+                parentNode.children.push(treeNode);
+            }
+            treeNode.status = "added";
         } else {
-          treeNode.status = "clean";
-
-          // remove node from tree
-          index = findIndexBySysMLID(parentNode.children, change.delta.sysmlid);
-          parentNode.children.splice(index,1);
+            treeNode.status = "clean";
+            if (!parentNode) {
+                index = findIndexBySysMLID($rootScope.treeData, change.delta.sysmlid);
+                $rootScope.treeData.splice(index, 1);
+            } else {
+                index = findIndexBySysMLID(parentNode.children, change.delta.sysmlid);
+                parentNode.children.splice(index,1);
+            }
         }
       } else if (change.type === "removed") {
         treeNode = $scope.id2node[change.original.sysmlid];
