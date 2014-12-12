@@ -75,10 +75,6 @@ module.exports = function(grunt) {
       ve: {
         src: ['app/js/ve/*.js'],
         dest: 'dist/ve.js'
-      },
-      docweb: {
-        src: ['app/js/docweb/*.js'],
-        dest: 'dist/docweb.js'
       }
     },
 
@@ -110,14 +106,6 @@ module.exports = function(grunt) {
         files: {
           'dist/ve.min.js': ['dist/ve.js']
         }
-      },
-      docweb: {
-        options: {
-          mangle: false
-        },
-        files: {
-          'dist/docweb.min.js': ['dist/docweb.js']
-        }
       }
     },
 
@@ -125,7 +113,6 @@ module.exports = function(grunt) {
       dist : {
         files: {
           'dist/css/partials/mms.css': 'src/directives/templates/styles/mms-main.scss',
-          'dist/css/partials/docweb-main.css': 'app/styles/docweb/docweb-main.scss',
           'dist/css/partials/mm-main.css': 'app/styles/mm/mm-main.scss',
           'dist/css/partials/ve-main.css': 'app/styles/ve/ve-main.scss'
         }
@@ -142,8 +129,6 @@ module.exports = function(grunt) {
       },
       combine: {
         files: {
-          'dist/css/docweb-mms.styles.min.css':
-            ['dist/css/partials/mms.min.css', 'dist/css/partials/docweb-main.min.css'],
           'dist/css/mm-mms.styles.min.css':
             ['dist/css/partials/mms.min.css', 'dist/css/partials/mm-main.min.css'],
           'dist/css/ve-mms.styles.min.css':
