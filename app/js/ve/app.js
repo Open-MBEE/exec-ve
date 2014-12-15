@@ -41,7 +41,7 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
                         tag += '(' + $filter('date')(time, 'M/d/yy h:mm a') + ')';
                     } else
                         $scope.config = 'latest';
-                    $scope.site = site.name;
+                    $scope.site = site.sysmlid;
                     $scope.ws = ws;
                     if ($stateParams.time !== 'latest')
                         $scope.title = document.name + ' ' + tag;
