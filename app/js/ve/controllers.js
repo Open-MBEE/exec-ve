@@ -941,6 +941,9 @@ function($scope, $location, $rootScope, _, $window) {
             //event.preventDefault();
         }
     });
+    $scope.$on('$stateChangeError', function(event, toState, toParams, fromState, fromParams, error) {
+        var hmm;
+    });
 }])
 .controller('FullDocCtrl', ['$scope', '$rootScope', 'document', 'time', 'ws',
 function($scope, $rootScope, document, time, ws) {

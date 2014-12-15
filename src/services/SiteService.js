@@ -74,7 +74,7 @@ function SiteService($q, $http, URLService, CacheService, _) {
             $http.get(URLService.getSitesURL('master', ver))
             .success(function(data, status, headers, config) {
                 CacheService.put(cacheKey, data.sites, true, function(site, i) {
-                    return {key: ['sites', 'master', ver, site.name], value: site, merge: true};
+                    return {key: ['sites', 'master', ver, site.sysmlid], value: site, merge: true};
                 });
                 deferred.resolve(CacheService.get(cacheKey));
                 inProgress = null;
