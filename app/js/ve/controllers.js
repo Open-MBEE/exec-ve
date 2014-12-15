@@ -391,8 +391,8 @@ function($scope, $rootScope, document, time, ElementService, ViewService, $state
             $state.go('doc.view', {viewId: curBranch.data.sysmlid});
     };
 }])
-.controller('ViewCtrl', ['$scope', '$rootScope', '$stateParams', '$timeout', '$modal', 'viewElements', 'ViewService', 'time', 'growl', 'ws', 'site', 'view',
-function($scope, $rootScope, $stateParams, $timeout, $modal, viewElements, ViewService, time, growl, ws, site, view) {
+.controller('ViewCtrl', ['$scope', '$rootScope', '$stateParams', '$timeout', '$modal', 'viewElements', 'ElementService', 'ViewService', 'time', 'growl', 'ws', 'site', 'view',
+function($scope, $rootScope, $stateParams, $timeout, $modal, viewElements, ElementService, ViewService, time, growl, ws, site, view) {
     if (!$rootScope.veCommentsOn)
         $rootScope.veCommentsOn = false;
     if (!$rootScope.veElementsOn)
@@ -419,6 +419,11 @@ function($scope, $rootScope, $stateParams, $timeout, $modal, viewElements, ViewS
                         $rootScope.tbApi.setPermission('element.editor.saveall', false);
                     }
                 }
+                ElementService.isCacheOutdated(view.sysmlid, ws)
+                .then(function(data) {
+                    if (data.status && data.server.modified > data.cache.modified)
+                        growl.warning('This view has been updated on the server');
+                });
             },
             tooltip: "Edit View Documentation",
             icon: "fa-edit",
@@ -744,6 +749,11 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
                 $rootScope.tbApi.setPermission('element.editor.saveall', false);
             }
         }
+        ElementService.isCacheOutdated($scope.eid, ws)
+        .then(function(data) {
+            if (data.status && data.server.modified > data.cache.modified)
+                growl.warning('This element has been updated on the server');
+        });
     });
     $scope.$on('viewSelected', function(event, vid, viewElements) {
         $scope.eid = vid;
