@@ -66,7 +66,7 @@ function mmsTranscludeName(ElementService, $compile, growl) {
 
     return {
         restrict: 'E',
-        template: '<span ng-if="element.name">{{element.name}}</span><span ng-if="!element.name" class=\'placeholder\'>{{element.specialization.type}} (no name)</span>',
+        template: '<span ng-if="element.name">{{element.name}}</span><span ng-if="!element.name">(no name)</span>',
         scope: {
             mmsEid: '@',
             mmsWs: '@',

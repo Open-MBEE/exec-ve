@@ -49,11 +49,11 @@ function mmsTranscludeVal(ElementService, UtilsService, $log, $compile, $templat
             } 
             element.empty();
             if (scope.values.length === 0)
-                element.html('<span class="placeholder">Property (no val)</span>');
+                element.html('<span>(no value)</span>');
             else if (areStrings) {
                 var toCompile = toCompileList.join(' ');
                 if (toCompile === '') {
-                    element.html('<span class="placeholder">Property (no val)</span>');
+                    element.html('<span>(no value)</span>');
                     return;
                 }
                 element.append(toCompile);

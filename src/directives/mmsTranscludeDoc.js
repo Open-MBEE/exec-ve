@@ -44,7 +44,7 @@ function mmsTranscludeDoc(ElementService, UtilsService, $compile, $log, growl) {
             element.empty();
             var doc = scope.element.documentation;
             if (!doc)
-                doc = '<p class="placeholder">{{element.specialization.type}} (no doc)</p>';
+                doc = '<p>(no documentation)</p>';
             element.append(doc);
             $compile(element.contents())(scope); 
             if (mmsViewCtrl) {
