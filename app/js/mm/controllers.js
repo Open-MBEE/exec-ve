@@ -303,7 +303,7 @@ function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorS
                 config.timestamp = $scope.configuration.timestamp;
             }
 
-            ConfigService.createConfig(config, $scope.createWsParentId)
+            ConfigService.createConfig(config, $scope.createConfigParentId)
             .then(function(data) {
                 growl.success("Configuration Created");
                 $modalInstance.close(data);
