@@ -59,19 +59,14 @@ thead td, table caption {
   tr {
     @include transition($background_hover_transition);
   }
-
-  td {
-    border-top: 1px solid $tertiary_grey;
-    border-bottom: 1px solid $tertiary_grey;
-    //border-left: 1px solid $tertiary_grey;
-    //border-right: 1px solid $tertiary_grey;
-  }
 }
 
-.table-bordered {
-  td {
-    border-left: 1px solid $tertiary_grey;
-    border-right: 1px solid $tertiary_grey;
+.content-table {
+  @extend .table;
+  @extend .table-condensed;
+  @extend .table-bordered;
+  p {
+    margin: 0px 0px 5px;
   }
 }
 
