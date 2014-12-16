@@ -25,18 +25,21 @@
         <button ng-click="showOriginalElements()" class="show-orig-table-btn btn btn-primary">SHOW ORIGINAL TABLE</button>
 
         <div class="misc-form-field">
-            <form ng-submit="makeNew(new)">
-                <div class="form-propose input-group">
-                    <input class="form-control" type="text" ng-model="new" placeholder="Propose a new element" />
-                    <span class="input-group-btn">
-                        <button class="btn btn-primary" type="button" ng-click="makeNew(new)"><span class="btn-text">SUBMIT</span> <i class="{{proposeClass}}"></i></button>
-                    </span>
-                </div>
-            </form>
 
             <div class="form-filter" ng-show="mmsCfElements">
                 <input class="form-control" type="text" ng-model="filter" placeholder="Type here to filter elements in the table" />
             </div>
+
+            <form>
+                <div class="form-propose input-group">
+                    <input class="form-control" type="text" ng-model="newE.name" placeholder="Propose a new element" />
+                    <span class="input-group-btn">
+                        <button class="btn btn-primary" type="button" ng-click="makeNew()"><span class="btn-text">SUBMIT</span> <i class="{{proposeClass}}"></i></button>
+                    </span>
+                </div>
+                <textarea mms-tinymce ng-model="newE.documentation" mms-ws="{{mmsWs}}" mms-site="{{mmsSite}}"></textarea>
+            </form>
+
         </div>
 
     </div>

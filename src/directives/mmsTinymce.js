@@ -48,6 +48,7 @@ function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window
             var originalElements = $scope.mmsCfElements;
             $scope.filter = '';
             $scope.searchText = '';
+            $scope.newE = {name: '', documentation: ''};
             $scope.choose = function(elementId, property, name) {
                 var tag = '<mms-transclude-' + property + ' data-mms-eid="' + elementId + '">[cf:' + name + '.' + property + ']</mms-transclude-' + property + '> ';
                 $modalInstance.close(tag);
@@ -68,9 +69,9 @@ function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window
                     $scope.searchClass = "";
                 });
             };
-            $scope.makeNew = function(newName) {
+            $scope.makeNew = function() {
                 $scope.proposeClass = "fa fa-spin fa-spinner";
-                ElementService.createElement({name: newName, documentation: '', specialization: {type: 'Element'}}, scope.mmsWs, scope.mmsSite)
+                ElementService.createElement({name: $scope.newE.name, documentation: $scope.newE.documentation, specialization: {type: 'Element'}}, scope.mmsWs, scope.mmsSite)
                 .then(function(data) {
                     $scope.mmsCfElements = [data];
                     $scope.proposeClass = "";
