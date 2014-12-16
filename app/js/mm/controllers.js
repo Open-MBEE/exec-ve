@@ -48,7 +48,7 @@ function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorS
     });
 
     $scope.$on('tree.add.task', function() {
-        $scope.createWorkspace();
+        $scope.addWorkspace();
     });
 
     $scope.$on('tree.add.configuration', function() {
@@ -125,13 +125,29 @@ function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorS
     var level2Func = function(workspaceId, workspaceTreeNode) {
         ConfigService.getConfigs(workspaceId).then (function (data) {
             data.forEach(function (config) {
-                workspaceTreeNode.children.unshift( { 
+                var configTreeNode = { 
                     label : config.name, 
                     type : "Configuration",
                     data : config, 
                     workspace: workspaceId,
                     children : [] 
-                }); 
+                };
+
+                // check all the children of the workspace to see if any tasks match the timestamp of the config
+                // if so add the workspace as a child of the configiration it was tasked from
+                for (var i = 0; i < workspaceTreeNode.children.length; i++) {
+                    var childWorkspaceTreeNode = workspaceTreeNode.children[i];
+                    if (childWorkspaceTreeNode.type === 'Workspace') {
+                        if (childWorkspaceTreeNode.data.branched === config.timestamp) {
+                            configTreeNode.children.push(childWorkspaceTreeNode);
+                            
+                            workspaceTreeNode.children.splice(i, 1);
+                            i--;
+                        }
+                    }
+                }
+
+                workspaceTreeNode.children.unshift(configTreeNode); 
             });
             if ($scope.treeApi.refresh)
                 $scope.treeApi.refresh();
@@ -163,7 +179,7 @@ function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorS
         $scope.treeApi.refresh();
     }, 5000);
     
-    $scope.createWorkspace = function() {
+    $scope.addWorkspace = function() {
         var branch = treeApi.get_selected_branch();
         if (!branch) {
             growl.warning("Add Task Error: Select a task or tag first");
@@ -190,11 +206,14 @@ function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorS
                 data: data,
                 children: []
             };
-            if (branch.type === 'Configuration') {
+            
+            // Want to see branches under tags now, commenting this out
+            /*if (branch.type === 'Configuration') {
                 treeApi.add_branch(treeApi.get_parent_branch(branch), newbranch);
             } else {
                 treeApi.add_branch(branch, newbranch);
-            }
+            }*/
+            treeApi.add_branch(branch, newbranch);
         });
     };
 
@@ -211,7 +230,17 @@ function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorS
             controller: ['$scope', '$modalInstance', deleteCtrl]
         });
         instance.result.then(function(data) {
+            // If the deleted item is a configration, then all of its child workspaces
+            // are re-associated with the parent task of the configuration
+            if (branch.type === 'Configuration') {
+                var parentWsBranch = treeApi.get_parent_branch(branch);
+                branch.children.forEach(function(branchChild) {
+                     treeApi.add_branch(parentWsBranch, branchChild);       
+                });
+            }
+
             treeApi.remove_branch(branch);
+            treeApi.refresh();
         });
     };
 
