@@ -72,7 +72,7 @@ function UtilsService(_) {
 
         // make second pass to associate data to parent nodes
         array.forEach(function(data) {
-            if (data[parent])    
+            if (data[parent] && data2Node[data[parent]]) //bad data!
                 data2Node[data[parent]].children.push(data2Node[data[id]]);
             else
                 rootNodes.push(data2Node[data[id]]);

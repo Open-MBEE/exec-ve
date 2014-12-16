@@ -232,15 +232,22 @@ function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorS
         instance.result.then(function(data) {
             // If the deleted item is a configration, then all of its child workspaces
             // are re-associated with the parent task of the configuration
+            var parentWsBranch = treeApi.get_parent_branch(branch);
+            var expand = false;
             if (branch.type === 'Configuration') {
-                var parentWsBranch = treeApi.get_parent_branch(branch);
+                expand = true;
                 branch.children.forEach(function(branchChild) {
-                     treeApi.add_branch(parentWsBranch, branchChild);       
+                    parentWsBranch.children.push(branchChild);
+                     //treeApi.add_branch(parentWsBranch, branchChild);       
                 });
             }
 
             treeApi.remove_branch(branch);
-            treeApi.refresh();
+            if (expand) {
+                treeApi.collapse_branch(parentWsBranch);
+                treeApi.expand_branch(parentWsBranch);
+            }
+            //treeApi.refresh();
         });
     };
 
