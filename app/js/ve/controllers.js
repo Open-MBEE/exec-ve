@@ -114,10 +114,16 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, documen
         //addSectionElements(elements[i], viewTreeNode, viewTreeNode);
     });
 
+    var seenChild = {};
     document.specialization.view2view.forEach(function(view) {
         var viewid = view.id;
         view.childrenViews.forEach(function(childId) {
+            if (seenChild[childId]) {
+                growl.error("You have a view called " + seenChild[childId].label + " that's a child of multiple parents! Please fix in the model.");
+                return;
+            }
             viewId2node[viewid].children.push(viewId2node[childId]);
+            seenChild[childId] = viewId2node[childId];
         });
     });
     $scope.my_data = [viewId2node[document.sysmlid]];
