@@ -6,11 +6,14 @@ angular.module('myApp')
 .controller('ToolbarCtrl', ['$scope', '$rootScope', '$timeout', 'UxService',
 function($scope, $rootScope, $timeout, UxService) {   
     $scope.tbApi = {};
-    $rootScope.tbApi = $scope.tbApi;
 
     $scope.buttons = [];
 
+    $scope.togglePane = {};
+
     $timeout(function() {
+      $scope.togglePane = $rootScope.togglePane;
+      $rootScope.tbApi = $scope.tbApi;
       $scope.tbApi.addButton(UxService.getToolbarButton("element.viewer"));
     }, 500);
 

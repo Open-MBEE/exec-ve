@@ -617,8 +617,11 @@ function($scope, $rootScope, $timeout, UxService) {
 
     $scope.buttons = [];
 
+    $scope.togglePane = {};
+
     $timeout(function() {
 
+      $scope.togglePane = $rootScope.togglePane;
       $rootScope.tbApi = $scope.tbApi;
       $scope.tbApi.addButton(UxService.getToolbarButton("element.viewer"));
       $scope.tbApi.addButton(UxService.getToolbarButton("element.editor"));
@@ -642,6 +645,7 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
     $scope.specApi = {};
     $rootScope.veSpecApi = $scope.specApi;
     $scope.viewOrderApi = {};
+    $rootScope.togglePane = $scope.$pane;
 
     $scope.show = {
         element: true,
@@ -722,6 +726,10 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
     $scope.$on('elementSelected', function(event, eid) {
         $scope.eid = eid;
         $rootScope.tbApi.select('element.viewer');
+        
+        if ($rootScope.togglePane.closed)
+            $rootScope.togglePane.toggle();
+
         showPane('element');
         $scope.specApi.setEditing(false);
         ElementService.getElement(eid, false, ws, time).

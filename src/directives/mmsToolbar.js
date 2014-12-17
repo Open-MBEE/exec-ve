@@ -14,11 +14,48 @@ function mmsToolbar($templateCache) {
             api.select = function(id) {
                 $scope.buttons.forEach(function(button) {
                     if (button.id === id && button.active) {
-                        button.selected = true;
-                        $scope.clicked(button);
+                        // button.selected = true;
+                        // $scope.clicked(button);
+
+                        if (! button.dynamic)
+                        {
+                            $scope.buttons.forEach(function(b) {
+                                if (b === button) {
+                                    b.selected = true;
+                                } else
+                                    b.selected = false;
+                            });
+
+                            // de-activate all dynamic buttons
+                            $scope.buttons.forEach(function(b) {
+                                if (b.dynamic) {
+                                    b.active = false;
+                                }
+                            });
+
+                            if (button.dynamic_buttons) {
+                                button.dynamic_buttons.forEach(function(b) {
+                                    b.active = true;
+                                });
+                            }
+                        }
+
                     }
-                    else
-                        button.selected = false;
+                    //else
+                        // button.selected = false;
+                });
+            };
+
+            api.deactivate = function(id) {
+                $scope.buttons.forEach(function(button) {
+                    if (button.id === id) {
+                        if (button.dynamic_buttons) {
+                            // de-activate all dynamic buttons
+                            button.dynamic_buttons.forEach(function(b) {
+                                b.active = false;
+                            });
+                        }                        
+                    }
                 });
             };
 
@@ -74,15 +111,31 @@ function mmsToolbar($templateCache) {
     var mmsToolbarLink = function(scope, element, attrs){
 
         scope.clicked = function(button) {
+
             if (! button.active)
                 return;
+
+            var toggleDecativeFlag = false;
+            if (this.$root.togglePane) {
+                if (button.selected || this.$root.togglePane.closed) { 
+                    if (button.selected && ! this.$root.togglePane.closed)
+                        toggleDecativeFlag = true;
+                    this.$root.togglePane.toggle();
+                }
+            }
+
+            if (this.$root.tbApi)
+                this.$root.tbApi.select(button.id);
 
             if (button.onClick)
                 button.onClick();
             else if (scope.onClick)
                 scope.onClick({button: button});
 
-            if (! button.dynamic)
+            if (toggleDecativeFlag)
+                this.$root.tbApi.deactivate(button.id);
+
+            /*if (! button.dynamic)
             {
                 scope.buttons.forEach(function(b) {
                     if (b === button) {
@@ -103,7 +156,7 @@ function mmsToolbar($templateCache) {
                         b.active = true;
                     });
                 }
-            }
+            }*/
 
         };
     };  

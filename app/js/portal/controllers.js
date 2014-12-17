@@ -9,8 +9,12 @@ function($scope, $rootScope, $timeout, UxService) {
     $rootScope.tbApi = $scope.tbApi;
 
     $scope.buttons = [];
+    
+    $scope.togglePane = {};
 
     $timeout(function() {
+
+      $scope.togglePane = $rootScope.togglePane;
       $scope.tbApi.addButton(UxService.getToolbarButton("configurations"));
       $scope.tbApi.setSelected("configurations", true);
     }, 500);
@@ -248,6 +252,7 @@ function($scope, $rootScope, $timeout, configurations, ws) {
     $scope.ws = ws;
     $scope.show = {configs:true};
     $scope.configurations = configurations;
+    $rootScope.togglePane = $scope.$pane;    
 }])
 .controller('DocCtrl', ['$scope', '$rootScope', 'ws', 'config', '$stateParams', 'site',
 function($scope, $rootScope, ws, config, $stateParams, site) {

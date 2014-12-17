@@ -22,7 +22,10 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
                 controller: 'WorkspaceTreeCtrl'
             },
             'pane-right': {
-                templateUrl: 'partials/mm/pane-right.html'
+                templateUrl: 'partials/mm/pane-right.html',
+                controller: function ($state) {
+                    $state.go('mm.workspace', {ws: 'master'});
+                }
             },
             'toolbar-right': {
                 template: '<mms-toolbar buttons="buttons" on-click="onClick(button)" mms-tb-api="tbApi"></mms-toolbar>',
@@ -53,6 +56,8 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
                 controller: function ($rootScope, $scope, $stateParams, WorkspaceService, sites) {
                     $scope.ws = $stateParams.ws;
                     $scope.type = "Workspace";
+                    $rootScope.togglePane = $scope.$pane;
+
                     WorkspaceService.getWorkspace($scope.ws).then(function(data) {
                         $scope.element = data;
                     });

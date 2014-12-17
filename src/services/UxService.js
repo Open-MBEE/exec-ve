@@ -62,7 +62,7 @@ function UxService($rootScope) {
 		    return {id: button, icon: 'fa-plus', dynamic: true, selected: false, active: false, permission:false, tooltip: 'Create Snapshot',
 		            spinner: false, onClick: function() {$rootScope.$broadcast(button);}};
 		  case "configurations":
-            return {id: button, icon: 'fa-tag', dynamic: false, selected: false, active: true, permission: true, tooltip: 'Tags',
+            return {id: button, icon: 'fa-tag', dynamic: true, selected: false, active: true, permission: true, tooltip: 'Tags',
                     spinner: false, onClick: function() {$rootScope.$broadcast(button);}};
 		}    
 	};
