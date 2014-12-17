@@ -533,7 +533,7 @@ function(_, $timeout, $scope, $rootScope, $http, $state, $stateParams, $modal, g
             }
         });
         $scope.saving = true;
-        WorkspaceService.merge(object)
+        WorkspaceService.merge(object, $stateParams.sourceTime)
         .then(function(data) {
               growl.success("Workspace Elements Merged");
               $scope.saving = false;

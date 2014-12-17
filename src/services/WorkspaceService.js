@@ -80,9 +80,9 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService) {
         return deferred.promise;
     };
 
-    var merge = function(changes) {
+    var merge = function(changes, sourcetime) {
         var deferred = $q.defer();
-        $http.post(URLService.getPostWsDiffURL(), changes)
+        $http.post(URLService.getPostWsDiffURL(sourcetime), changes)
         .success(function(data, status, headers, config) {
             deferred.resolve(data);
         }).error(function(data, status, headers, config) {

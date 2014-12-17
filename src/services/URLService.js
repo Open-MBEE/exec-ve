@@ -388,14 +388,16 @@ function urlService(baseUrl) {
     var getWsDiffURL = function(ws1, ws2, ws1time, ws2time) {
         var r = root + '/diff?workspace1=' + ws1 + '&workspace2=' + ws2;
         if (ws1time && ws1time !== 'latest')
-            r += '&workspace1Timestamp=' + ws1time;
+            r += '&timestamp1=' + ws1time;
         if (ws2time && ws2time !== 'latest')
-            r += '&workspace2Timestamp=' + ws2time;
+            r += '&timestamp2=' + ws2time;
         return r;
     };
 
-    var getPostWsDiffURL = function() {
+    var getPostWsDiffURL = function(sourcetime) {
         var r = root + '/diff';
+        if (sourcetime && isTimestamp(sourcetime))
+            r += '?timestamp2=' + sourcetime;
         return r;
     };
 

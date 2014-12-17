@@ -14,7 +14,7 @@
   <div class="pane-center-inner">
     
 
-      <h4><a class="docweb-link" href="portal.html#/workspaces/{{ws}}/tags/{{config}}">Site Portal</a></h4>
+      <h4 ng-if="ws"><a class="docweb-link" href="portal.html#/workspaces/{{ws}}/tags/{{config}}">Site Portal</a></h4>
 
     
     <div ng-repeat="site in sites | orderBy: 'name'">
