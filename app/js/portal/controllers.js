@@ -64,6 +64,15 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, Element
     var treeApi = {};
     $scope.treeApi = treeApi;
 
+    /*var sortFunction = function(a, b) {
+        if (a.children.length > 1) a.children.sort(sortFunction);
+        if (b.children.length > 1) b.children.sort(sortFunction);
+        if(a.label.toLowerCase() < b.label.toLowerCase()) return -1;
+        if(a.label.toLowerCase() > b.label.toLowerCase()) return 1;
+        return 0;
+    };*/
+
+
     var addDocOrSnapshots = function(site, siteNode) {
         ViewService.getSiteDocuments(site, false, ws, config === 'latest' ? 'latest' : config.timestamp)
         .then(function(docs) {
@@ -117,8 +126,15 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, Element
         } 
     };
 
+    var sortFunction = function(a, b) {
+        if(a.label.toLowerCase() < b.label.toLowerCase()) return -1;
+        if(a.label.toLowerCase() > b.label.toLowerCase()) return 1;
+        return 0;
+    };
+
     $scope.tree_options = {
-        types: UxService.getTreeTypes()
+        types: UxService.getTreeTypes(),
+        sort: sortFunction
     };
 
     var addDocCtrl = function($scope, $modalInstance) {

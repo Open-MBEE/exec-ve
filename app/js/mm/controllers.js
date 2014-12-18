@@ -168,13 +168,22 @@ function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorS
             $state.go('mm.workspace.config', {ws: branch.workspace, config: branch.data.id});
     };
 
+    var sortFunction = function(a, b) {
+        if (a.type != b.type && a.type === 'Configuration') return -1;
+
+        if(a.label.toLowerCase() < b.label.toLowerCase()) return -1;
+        if(a.label.toLowerCase() > b.label.toLowerCase()) return 1;
+        return 0;
+    };
+
     $scope.tree_options = {
         types: {
             "section": "fa fa-file-o fa-fw",
             "view": "fa fa-file fa-fw",
             "Workspace": "fa fa-tasks fa-fw",
             "Configuration": "fa fa-tag fa-fw"
-        }
+        },
+        sort: sortFunction
     };
 
     $rootScope.tree_initial = "";

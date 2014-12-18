@@ -264,6 +264,9 @@ function mmsTree($timeout, $log, $templateCache) {
                     type_icon: type_icon
                 });
                 if (branch.children) {
+                    if (scope.options.sort) {
+                        branch.children.sort(scope.options.sort);
+                    }
                     for (var i = 0, j = 0; i < branch.children.length; i++) {
                         var child_visible = visible && branch.expanded;
                         var sectionChar = '.';
@@ -283,9 +286,15 @@ function mmsTree($timeout, $log, $templateCache) {
                     }
                 }
             };
+
+            if (scope.options.sort) {
+                scope.treeData.sort(scope.options.sort);
+            }
+
             for (var i = 0; i < scope.treeData.length; i++) {
                 add_branch_to_list(1, '', scope.treeData[i], true);
             }
+
         };
         scope.on_treeData_change = on_treeData_change;
         scope.$watch('treeData', on_treeData_change, false);
@@ -585,6 +594,10 @@ function mmsTree($timeout, $log, $templateCache) {
              */
             tree.refresh = function() {
                 on_treeData_change();
+            };
+
+            tree.sort_branch = function(b, sortFunction) {
+                b.children.sort(sortFunction);
             };
         }
     };
