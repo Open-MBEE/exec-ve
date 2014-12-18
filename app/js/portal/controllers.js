@@ -127,6 +127,7 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, Element
     };
 
     var sortFunction = function(a, b) {
+        if (a.type != b.type && a.type === 'view') return -1;
         if(a.label.toLowerCase() < b.label.toLowerCase()) return -1;
         if(a.label.toLowerCase() > b.label.toLowerCase()) return 1;
         return 0;
