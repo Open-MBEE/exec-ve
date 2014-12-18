@@ -84,8 +84,11 @@ function CacheService(_) {
         var realkey = key;
         if (angular.isArray(key))
             realkey = makeKey(key);
-        var result = cache[realkey];
-        delete cache[realkey];
+        var result = null;
+        if (cache.hasOwnProperty(realkey)) {
+            result = cache[realkey];
+            delete cache[realkey];
+        }
         return result;
     };
 

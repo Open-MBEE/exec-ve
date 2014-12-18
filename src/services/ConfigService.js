@@ -132,6 +132,14 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, _) {
         var deferred = $q.defer();
         $http.delete(URLService.getConfigURL(configId, n.ws))
         .success(function(data, status, headers, config) {
+            var wscache = CacheService.get(['workspaces', n.ws, 'configs']);
+            var cache = CacheService.get(['configs', n.ws, configId]);
+            CacheService.remove(['configs', n.ws, configId]);
+            if (wscache) {
+                var i = wscache.indexOf(cache);
+                if (i > -1)
+                    wscache.splice(i, 1);
+            }
             deferred.resolve(data);
         }).error(function(data, status, headers, config) {
             URLService.handleHttpStatus(data, status, headers, config, deferred);

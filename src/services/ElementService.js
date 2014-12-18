@@ -638,8 +638,10 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, _) {
     var deleteElement = function(id, workspace) {
         var ws = !workspace ? 'master' : workspace;
         var deferred = $q.defer();
+        var key = UtilsService.makeElementKey(id, ws, null, false);
         $http.delete(URLService.getElementURL(id, ws, 'latest'))
         .success(function(data, status, headers, config) {
+            CacheService.remove(key);
             deferred.resolve(data);
         }).error(function(data, status, headers, config) {
             URLService.handleHttpStatus(data, status, headers, config, deferred);

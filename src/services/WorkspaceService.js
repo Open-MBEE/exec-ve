@@ -95,6 +95,7 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService) {
         var deferred = $q.defer();
         $http.delete(URLService.getWorkspaceURL(ws))
         .success(function(data, status, headers, config) {
+            CacheService.remove(['workspaces', ws]);
             deferred.resolve(data);
         }).error(function(data, status, headers, config) {
             URLService.handleHttpStatus(data, status, headers, config, deferred);
