@@ -79,6 +79,10 @@ function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorS
             return;
         }
         var parent_branch = treeApi.get_parent_branch(branch);
+        while (parent_branch.type != 'Workspace') {
+            parent_branch = treeApi.get_parent_branch(parent_branch);
+        }
+
         $scope.mergeOn = !$scope.mergeOn;
         $scope.mergeFrom = branch;
         $scope.mergeTo = parent_branch;
