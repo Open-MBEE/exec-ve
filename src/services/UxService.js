@@ -38,8 +38,7 @@ function UxService($rootScope) {
 		        	dynamic_buttons: [getToolbarButton("view.reorder.save"), getToolbarButton("view.reorder.cancel")]};
 		  case "document.snapshot":
 		  	return  {id: button, icon: 'fa-camera', selected: false, active: true, permission:true, tooltip: 'Snapshots',
-		            spinner: false, onClick: function() {$rootScope.$broadcast(button);},
-		        	dynamic_buttons: [getToolbarButton("document.snapshot.refresh"), getToolbarButton("document.snapshot.create")]};
+		            spinner: false, onClick: function() {$rootScope.$broadcast(button);}};
 		  case "element.editor.save":
 			return {id: button, icon: 'fa-save', pullDown: true, dynamic: true, selected: false, active: false, permission:true, tooltip: 'Save',
 				        spinner: false, onClick: function() {$rootScope.$broadcast(button);}};
