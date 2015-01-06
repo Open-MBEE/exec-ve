@@ -673,9 +673,10 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
     };
 
     $scope.showTracker = function() {
-        if (Object.keys($rootScope.veEdits).length > 1 && $scope.specApi.getEditing())
+        return true;
+        /* if (Object.keys($rootScope.veEdits).length > 1 && $scope.specApi.getEditing())
             return true;
-        return false;
+        return false; */
     };
 
     var showPane = function(pane) {
