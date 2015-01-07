@@ -341,6 +341,8 @@ function urlService(baseUrl) {
             result.message = "Permission Error";
         else if (status === 409)
             result.message = "Conflict";
+        else if (status === 400)
+            result.message = "Bad Request";
         else
             result.message = "Failed";
         deferred.reject(result);

@@ -92,6 +92,9 @@ function UxService($rootScope) {
 		  case "tree.delete":
 		  	return {id: button, icon: 'fa-times', selected: true, active: true, permission: true, tooltip: 'Delete', 
             		spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
+		  case "tree.delete.view":
+		  	return {id: button, icon: 'fa-times', selected: true, active: true, permission: false, tooltip: 'Delete View', 
+            		spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
 		  case "tree.merge":
 		  	return {id: button, icon: 'fa-share-alt fa-flip-horizontal', selected: true, active: true, permission: true, tooltip: 'Merge Task', 
             		spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};

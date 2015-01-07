@@ -28,10 +28,12 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, documen
       $scope.bbApi.addButton(UxService.getButtonBarButton("tree.collapse"));
       $scope.bbApi.addButton(UxService.getButtonBarButton("tree.filter"));
       $scope.bbApi.addButton(UxService.getButtonBarButton("tree.add.view"));
+      $scope.bbApi.addButton(UxService.getButtonBarButton("tree.delete.view"));
       $scope.bbApi.addButton(UxService.getButtonBarButton("tree.reorder.view"));
       $scope.bbApi.addButton(UxService.getButtonBarButton("tree.full.document"));
       $scope.bbApi.setPermission("tree.add.view", $scope.editable);
       $scope.bbApi.setPermission("tree.reorder.view", $scope.editable);
+      $scope.bbApi.setPermission("tree.delete.view", $scope.editable);
       $scope.bbApi.setTooltip("tree.full.document", $rootScope.veFullDocMode ? "View Mode" : "Full Document");
       $scope.bbApi.setIcon("tree.full.document", $rootScope.veFullDocMode ? "fa-file-text" : "fa-file-text-o");
     }, 500);
@@ -52,6 +54,10 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, documen
 
     $scope.$on('tree.add.view', function() {
         $scope.addView();
+    });
+
+    $scope.$on('tree.delete.view', function() {
+        $scope.deleteView();
     });
 
     $scope.$on('tree.reorder.view', function() {
@@ -263,6 +269,82 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, documen
                 $scope.oking = false;
             });
         };
+        $scope.cancel = function() {
+            $modalInstance.dismiss();
+        };
+    };
+
+    $scope.deleteView = function() {
+        var branch = treeApi.get_selected_branch();
+        if (!branch) {
+            growl.warning("Delete Error: Select item to delete.");
+            return;
+        }
+
+        if (branch.type != 'view' || (branch.data.specialization && branch.data.specialization.type != 'View')) {
+            growl.warning("Delete Error: Selected item is not a view.");
+            return;
+        }
+
+        $scope.deleteBranch = branch;
+        var instance = $modal.open({
+            templateUrl: 'partials/ve/delete.html',
+            scope: $scope,
+            controller: ['$scope', '$modalInstance', deleteCtrl]
+        });
+        instance.result.then(function(data) {
+            treeApi.remove_branch(branch);
+        });
+    };
+
+    var deleteCtrl = function($scope, $modalInstance) {
+        $scope.oking = false;
+        var branch = $scope.deleteBranch;
+        $scope.type = 'View';
+        $scope.name = branch.data.name;
+        var product = $scope.document;
+        $scope.ok = function() {
+            if ($scope.oking) {
+                growl.info("Please wait...");
+                return;
+            }
+            $scope.oking = true;
+
+            for (var i = 0; i < product.specialization.view2view.length; i++) {
+                var view = product.specialization.view2view[i];
+                if (branch.data.sysmlid === view.id ) {
+                    // remove 
+                    product.specialization.view2view.splice(i,1);
+                    i--;
+                }
+                for (var j = 0; j < view.childrenViews.length; j++) {
+                    var childViewId = view.childrenViews[j];
+                    if (branch.data.sysmlid === childViewId) {
+                        // remove child view
+                        view.childrenViews.splice(j,1);
+                        j--;
+                    }
+                }
+            }
+
+            /*product.specialization.view2view.forEach(function(view) {
+                var viewId = view.id;
+                view.childrenViews.forEach(function(childId) {
+                    viewIds2node[viewId].children.push(viewIds2node[childId]);
+                });
+            }); */
+
+            ViewService.updateDocument(product, ws)
+            .then(function(data) {
+                growl.success("View Deleted");
+                $modalInstance.close('ok');
+            }, function(reason) {
+                growl.error("View Delete Error: " + reason.message);
+            }).finally(function() {
+                $scope.oking = false;
+            });
+
+        }; 
         $scope.cancel = function() {
             $modalInstance.dismiss();
         };
