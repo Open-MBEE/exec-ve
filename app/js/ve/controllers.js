@@ -251,6 +251,65 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, documen
         $scope.newView = {};
         $scope.newView.name = "";
         $scope.oking = false;
+            
+        $scope.search = function(searchText) {
+            //var searchText = $scope.searchText; //TODO investigate why searchText isn't in $scope
+            //growl.info("Searching...");
+            $scope.searchClass = "fa fa-spin fa-spinner";
+
+            ElementService.search(searchText, false, ws)
+            .then(function(data) {
+
+                for (var i = 0; i < data.length; i++) {
+                    if (data[i].specialization.type != 'View') {
+                        data.splice(i, 1);
+                        i--;
+                    }
+                }
+
+                $scope.mmsCfElements = data;
+                $scope.searchClass = "";
+            }, function(reason) {
+                growl.error("Search Error: " + reason.message);
+                $scope.searchClass = "";
+            });
+        };
+
+        $scope.addView = function(viewId) {
+            var documentId = $scope.document.sysmlid;
+            var workspace = ws;
+
+            var branch = treeApi.get_selected_branch();
+            var parentViewId = branch.data.sysmlid;
+
+            if ($scope.oking) {
+                growl.info("Please wait...");
+                return;
+            }
+            $scope.oking = true;  
+
+            ViewService.getView(viewId, false, workspace)
+            .then(function (data) {
+                
+                var viewOb = data;
+
+                ViewService.addViewToDocument(viewId, documentId, parentViewId, workspace, viewOb)
+                .then(function(data) {
+                    growl.success("View Added");
+                    $modalInstance.close(viewOb);
+                }, function(reason) {
+                    growl.error("View Add Error: " + reason.message);
+                }).finally(function() {
+                    $scope.oking = false;
+                }); 
+
+            }, function(reason) {
+                growl.error("View Add Error: " + reason.message);
+            }).finally(function() {
+                $scope.oking = false;
+            });             
+        };
+
         $scope.ok = function() {
             if ($scope.oking) {
                 growl.info("Please wait...");
