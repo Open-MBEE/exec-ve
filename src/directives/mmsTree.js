@@ -103,6 +103,8 @@ angular.module('mms.directives')
 function mmsTree($timeout, $log, $templateCache) {
 
     var mmsTreeLink = function(scope, element, attrs) {
+        scope.search = "";
+        
         if (!attrs.iconExpand)
             attrs.iconExpand = 'fa fa-caret-right fa-lg fa-fw';
         if (!attrs.iconCollapse)
@@ -605,7 +607,7 @@ function mmsTree($timeout, $log, $templateCache) {
     return {
         restrict: 'E',
         template: $templateCache.get('mms/templates/mmsTree.html'),
-        replace: true,
+        // replace: true,
         scope: {
             treeData: '=',
             sectionNumbering: '=',
