@@ -247,6 +247,29 @@ module.exports = function(grunt) {
           }
         ]
       },
+      emsint: {
+        options: {
+          hostname: '*',
+          port: 9000,
+          middleware: function(connect) {
+            return [proxySnippet];
+          }
+        },
+        proxies: [
+          {
+            context: '/alfresco',  // '/api'
+            host: 'ems-int.jpl.nasa.gov',//128.149.16.152',
+            port: 443,
+            changeOrigin: true,
+            https: true,
+          },
+          {
+            context: '/',
+            host: 'localhost',
+            port: 9001
+          }
+        ]
+      },      
       europaemsstg: {
         options: {
           hostname: '*',
@@ -259,6 +282,29 @@ module.exports = function(grunt) {
           {
             context: '/alfresco',  // '/api'
             host: 'europaems-stg.jpl.nasa.gov',//128.149.16.152',
+            port: 443,
+            changeOrigin: true,
+            https: true,
+          },
+          {
+            context: '/',
+            host: 'localhost',
+            port: 9001
+          }
+        ]
+      },
+      europaemsint: {
+        options: {
+          hostname: '*',
+          port: 9000,
+          middleware: function(connect) {
+            return [proxySnippet];
+          }
+        },
+        proxies: [
+          {
+            context: '/alfresco',  // '/api'
+            host: 'europaems-int.jpl.nasa.gov',//128.149.16.152',
             port: 443,
             changeOrigin: true,
             https: true,
