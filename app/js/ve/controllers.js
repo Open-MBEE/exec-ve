@@ -240,6 +240,9 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, documen
                   data: data,
                   children: []
               });
+              
+              $state.go('doc.view', {viewId: data.sysmlid});
+
             });
 
         }, function(reason) {
