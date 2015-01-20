@@ -212,8 +212,25 @@ function ($rootScope, $scope, $stateParams, documents, config, configSnapshots, 
         });
     }
 
-    $scope.getPDFUrl = function(snapshot){
+    $scope.getPDFStatus = function(snapshot){
         $scope.pdfText = "Generate PDF";
+        var formats = snapshot.formats;
+        if(!formats || formats.length===0) return null;
+        for(var i=0; i < formats.length; i++){
+            if(formats[i].type=='pdf') {
+                var status = formats[i].status;
+                if(status == 'Generating'){
+                    status = 'Generating...';
+                }
+                $scope.pdfText = status;
+                return status;
+            }
+        }
+        return null;
+    };
+
+    $scope.getPDFUrl = function(snapshot){
+        //$scope.pdfText = "Generate PDF";
         var formats = snapshot.formats;
         if(!formats || formats.length===0) return null;
         for(var i=0; i < formats.length; i++){
@@ -222,10 +239,25 @@ function ($rootScope, $scope, $stateParams, documents, config, configSnapshots, 
         return null;
     };
 
+    $scope.getHTMLStatus = function(snapshot){
+        $scope.htmlText = "Generate HTML";
+        var formats = snapshot.formats;
+        if(!formats || formats.length===0) return null;
+        for(var i=0; i < formats.length; i++){
+            if(formats[i].type=='html') {
+                var status = formats[i].status;
+                if(status == 'Generating') status = 'Generating...';
+                $scope.htmlText = status;
+                return status;
+            }
+        }
+        return null;
+    };
+
     $scope.getHTMLUrl = function(snapshot){
         if(angular.isUndefined(snapshot)) return null;
         if(snapshot===null) return null;
-        $scope.htmlText = "Generate HTML";
+        //$scope.htmlText = "Generate HTML";
         var formats = snapshot.formats;
         if(formats===undefined || formats===null || formats.length===0) return null;
         for(var i=0; i < formats.length; i++){
