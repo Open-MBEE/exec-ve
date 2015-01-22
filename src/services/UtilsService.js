@@ -27,6 +27,10 @@ function UtilsService(_) {
     };
 
     var cleanElement = function(elem, forEdit) {
+        // hack - should fix on MMS, if name is null should include name
+        if (! elem.name) {
+            elem.name = '';
+        }
         if (elem.hasOwnProperty('specialization')) {
             if (elem.specialization.type === 'Property') {
                 var spec = elem.specialization;
