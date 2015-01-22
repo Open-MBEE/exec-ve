@@ -173,10 +173,23 @@ function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorS
     };
 
     var sortFunction = function(a, b) {
-        if (a.type != b.type && a.type === 'Configuration') return -1;
+
+        a.priority = 100;
+        if (a.type === 'Configuration') {
+            a.priority = 0 ;
+        }
+
+        b.priority = 100;
+        if (b.type === 'Configuration') {
+            b.priority = 0 ;
+        }
+
+        if(a.priority < b.priority) return -1;
+        if(a.priority > b.priority) return 1;
 
         if(a.label.toLowerCase() < b.label.toLowerCase()) return -1;
         if(a.label.toLowerCase() > b.label.toLowerCase()) return 1;
+
         return 0;
     };
 
