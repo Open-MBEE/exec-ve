@@ -231,11 +231,10 @@ function mmsNav(SiteService, WorkspaceService, ConfigService, $templateCache, gr
             title: '@mmsTitle', //page title - used in mobile view only
             ws: '@mmsWs',
             site: '@mmsSite', //current site name
-            doc: '@mmsDoc', //current document
+            product: '=mmsDoc', //current document
             config: '@mmsConfig', //config id
-            // type: '@mmsType', //current page type
-            // noSites: '@mmsNoSites',
-            // responsive: '@mmsResponsive'
+            snapshot: '@mmsSnapshotTag' // snapshot titles (before tags - need to be backward compatible), if any
+
         },
         link: mmsNavLink
     };

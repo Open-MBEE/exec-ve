@@ -27,7 +27,7 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
         },
         views: {
             'menu': {
-                template: '<mms-nav mms-title="View Editor" mms-ws="{{ws}}" mms-site="{{site}}" mms-doc="{{title}}" mms-config="{{config}}"></mms-nav>',
+                template: '<mms-nav mms-title="View Editor" mms-ws="{{ws}}" mms-site="{{site}}" mms-doc="document" mms-config="{{config}}" mms-snapshot-tag="{{snapshotTag}}"></mms-nav>',
                 controller: function($scope, $stateParams, $filter, document, site, snapshots, time, ws) {
                     var tag = '';
                     if (time !== 'latest') {
@@ -39,15 +39,16 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
                                 });
                         });
                         tag += '(' + $filter('date')(time, 'M/d/yy h:mm a') + ')';
-                    } else
+                    } else {
                         $scope.config = 'latest';
-                    $scope.site = site.sysmlid;
+                    }
+                    
                     $scope.ws = ws;
+                    $scope.site = site.sysmlid;
+                    $scope.document = document;
                     if ($stateParams.time !== 'latest')
-                        $scope.title = document.name + ' ' + tag;
-                    else
-                        $scope.title = document.name;
-                    $scope.docweb = false;
+                        $scope.snapshotTag = ' ' + tag;
+
                 }
             },
             'pane-left': {
