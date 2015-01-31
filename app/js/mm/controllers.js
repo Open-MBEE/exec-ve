@@ -295,10 +295,10 @@ function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorS
             } else if (branch.type === "Configuration") {
                 ConfigService.deleteConfig(branch.data.id)
                 .then(function(data) {
-                    growl.success("Configuration Deleted");
+                    growl.success("Tag Deleted");
                     $modalInstance.close('ok');
                 }, function(reason) {
-                    growl.error("Configuration Delete Error: " + reason.message);
+                    growl.error("Tag Delete Error: " + reason.message);
                 }).finally(function() {
                     $scope.oking = false;
                 });
@@ -313,10 +313,10 @@ function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorS
 
         var branch = treeApi.get_selected_branch();
         if (!branch) {
-            growl.warning("Add Configuration Error: Select parent task first");
+            growl.warning("Add Tag Error: Select parent task first");
             return;
         } else if (branch.type != "Workspace") {
-            growl.warning("Add Configuration Error: Selection must be a task");
+            growl.warning("Add Tag Error: Selection must be a task");
             return;
         }
 
@@ -361,10 +361,10 @@ function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorS
 
             ConfigService.createConfig(config, $scope.createConfigParentId)
             .then(function(data) {
-                growl.success("Configuration Created");
+                growl.success("Tag Created");
                 $modalInstance.close(data);
             }, function(reason) {
-                growl.error("Configuration Error: " + reason.message);
+                growl.error("Tag Error: " + reason.message);
             }).finally(function(){
                 $scope.oking = false;
             });

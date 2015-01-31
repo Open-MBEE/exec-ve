@@ -84,7 +84,7 @@ function UxService($rootScope) {
 		  	return {id: button, icon: 'fa-plus', selected: true, active: true, permission: false, tooltip: 'Add View', 
             		spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
 		  case "tree.add.configuration":
-		  	return {id: button, icon: 'fa-tag', selected: true, active: true, permission: true, tooltip: 'Add Configuration', 
+		  	return {id: button, icon: 'fa-tag', selected: true, active: true, permission: true, tooltip: 'Add Tag', 
             		spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
 		  case "tree.add.task":
 		  	return {id: button, icon: 'fa-plus', selected: true, active: true, permission: true, tooltip: 'Add Task', 
