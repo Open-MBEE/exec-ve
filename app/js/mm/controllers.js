@@ -327,7 +327,7 @@ function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorS
         var instance = $modal.open({
             templateUrl: 'partials/mm/new-configuration.html',
             scope: $scope,
-            controller: ['$scope', '$modalInstance', configurationCtrl]
+            controller: ['$scope', '$modalInstance', '$filter', configurationCtrl]
         });
         instance.result.then(function(data) {
           treeApi.add_branch(branch, {
@@ -340,12 +340,12 @@ function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorS
         });
     };
 
-    var configurationCtrl = function($scope, $modalInstance) {
+    var configurationCtrl = function($scope, $modalInstance, $filter) {
         $scope.configuration = {};
         $scope.configuration.name = "";
         $scope.configuration.description = "";
         $scope.configuration.now = "true";
-        $scope.configuration.timestamp = "";
+        $scope.configuration.timestamp = new Date();
         $scope.oking = false;
         $scope.ok = function() {
             if ($scope.oking) {
@@ -356,7 +356,7 @@ function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorS
             var config = {"name": $scope.configuration.name, "description": $scope.configuration.description};
 
             if ($scope.configuration.now === "false") {
-                config.timestamp = $scope.configuration.timestamp;
+                config.timestamp = $filter('date')($scope.configuration.timestamp, 'yyyy-MM-ddTHH:mm:ss.sssZ');
             }
 
             ConfigService.createConfig(config, $scope.createConfigParentId)
@@ -543,7 +543,8 @@ function(_, $timeout, $scope, $rootScope, $http, $state, $stateParams, $modal, g
                 id: ws2,
                 addedElements: [],
                 deletedElements: [],
-                updatedElements: []
+                updatedElements: [],
+                movedElements: []
             }
         };
 
@@ -558,6 +559,8 @@ function(_, $timeout, $scope, $rootScope, $http, $state, $stateParams, $modal, g
             //changedElements.push(change.delta);
                 } else if (change.type === 'added') {
                     object.workspace2.addedElements.push(change.ws2object);
+                } else if (change.type === 'moved') {
+                    object.workspace2.movedElements.push(change.ws2object);
                 }
             }
         });
