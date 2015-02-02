@@ -103,9 +103,9 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService) {
         return deferred.promise;
     };
 
-    var create = function(name, parentId, time) {
+    var create = function(ws) {
         var deferred = $q.defer();
-        $http.post(URLService.getCreateWorkspaceURL(name, parentId, time))
+        $http.post(URLService.getWorkspacesURL(ws), {'workspaces': [ws]} )
         .success(function(data, status, headers, config) {
             var workspace = data.workspaces[0];
             var cacheKey = ['workspaces', workspace.id];

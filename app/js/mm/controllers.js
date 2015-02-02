@@ -377,6 +377,7 @@ function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorS
     var workspaceCtrl = function($scope, $modalInstance) {
         $scope.workspace = {};
         $scope.workspace.name = "";
+        $scope.workspace.description = "";
         $scope.oking = false;
         $scope.ok = function() {
             if ($scope.oking) {
@@ -384,7 +385,11 @@ function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorS
                 return;
             }
             $scope.oking = true;
-            WorkspaceService.create($scope.workspace.name, $scope.createWsParentId, $scope.createWsTime)
+            var workspaceObj = {"name": $scope.workspace.name, "description": $scope.workspace.description};
+            workspaceObj.parent = $scope.createWsParentId;
+            workspaceObj.copyTime = $scope.createWsTime;
+
+            WorkspaceService.create(workspaceObj)
             .then(function(data) {
                 growl.success("Task Created");
                 $modalInstance.close(data);

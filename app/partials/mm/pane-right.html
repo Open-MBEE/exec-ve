@@ -2,7 +2,8 @@
     <div class="container-fluid">
     	<div ng-if="type=='Workspace'">
 		    <h1 class="prop element-title">{{element.name}}</h1>
-
+			<h2 class="prop-title">DESCRIPTION</h2>
+			<div ng-bind-html="element.description"></div>
 		    <h2 class="prop-title">TASK AUTHOR</h2>
 		    <h3 class="prop">{{element.creator}}</h3>
 		   <!-- <h2 class="prop-title spec-view-type-heading">LAST MODIFIED</h2>
