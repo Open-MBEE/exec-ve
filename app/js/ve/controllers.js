@@ -911,7 +911,7 @@ function($scope, $rootScope, document, snapshots, time, site, ConfigService, Ele
         ElementService.isCacheOutdated($scope.eid, ws)
         .then(function(data) {
             if (data.status && data.server.modified > data.cache.modified)
-                growl.warning('This element has been updated on the server');
+                growl.error('This element has been updated on the server. Please refresh the page to get the latest version.');
         });
     });
     $scope.$on('viewSelected', function(event, vid, viewElements) {
