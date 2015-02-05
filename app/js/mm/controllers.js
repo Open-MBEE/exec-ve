@@ -15,10 +15,76 @@ function($scope, $rootScope, $timeout, UxService) {
       $scope.togglePane = $rootScope.togglePane;
       $rootScope.tbApi = $scope.tbApi;
       $scope.tbApi.addButton(UxService.getToolbarButton("element.viewer"));
+      $scope.tbApi.addButton(UxService.getToolbarButton("element.editor.mm"));
     }, 500);
 
     $scope.onClick = function(button) {
     };
+}])
+.controller('ToolCtrl', ['$scope', '$rootScope', '$stateParams', 'WorkspaceService', 'ConfigService', 'type', 'element', 'growl', '_',
+function ($scope, $rootScope, $stateParams, WorkspaceService, ConfigService, type, element, growl, _) {
+    $scope.ws = $stateParams.ws;
+    $scope.type = type;
+    $scope.element = _.cloneDeep(element);
+    $rootScope.togglePane = $scope.$pane;
+    $scope.editing = false;
+
+
+    $scope.$on('element.viewer', function() {
+        $scope.editing = false;
+    });
+
+    $scope.$on('element.editor.mm', function() {
+        $scope.editing = true;
+    });
+
+    $scope.$on('element.editor.cancel', function() {
+        $rootScope.tbApi.select('element.viewer');
+        $scope.editing = false;
+    });
+
+    var elementSaving = false;
+    $scope.$on('element.editor.save', function() {
+        if (elementSaving) {
+            growl.info('Please Wait...');
+            return;
+        }
+        elementSaving = true;
+
+        $rootScope.tbApi.toggleButtonSpinner('element.editor.save');
+
+        var service;
+        if ($scope.type == 'Configuration')
+            service = ConfigService;
+        else if ($scope.type == 'Workspace')
+            service = WorkspaceService;
+        else {
+            growl.error("type not defined");
+        }
+
+        service.update($scope.element, $scope.ws)
+        .then(function(data) {
+            growl.success('Save Successful');
+        }, function(reason) {
+            if (reason.type === 'info')
+                growl.info(reason.message);
+            else if (reason.type === 'warning')
+                growl.warning(reason.message);
+            else if (reason.type === 'error')
+                growl.error(reason.message);
+        }).finally(function(){
+            $rootScope.tbApi.toggleButtonSpinner('element.editor.save');
+            $rootScope.tbApi.select('element.viewer');
+            elementSaving = false;
+            $scope.editing = false;
+            // if name was updated, refresh the tree
+            if ($scope.element.name != element.name) {
+                //FIX-ME
+                element.name = $scope.element.name;
+                $rootScope.treeApi.refresh();
+            }
+        });
+    });
 }])
 .controller('WorkspaceTreeCtrl', ['$scope', '$rootScope', '$location', '$timeout', '$state', '$stateParams','$anchorScroll', 'WorkspaceService', 'ElementService', 'ViewService', 'UtilsService', 'ConfigService', 'growl', '$modal', '$q', '$filter', 'workspaces', 'UxService',
 function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorScroll, WorkspaceService, ElementService, ViewService, UtilsService, ConfigService, growl, $modal, $q, $filter, workspaces, UxService) {
@@ -170,6 +236,8 @@ function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorS
             $state.go('mm.workspace', {ws: branch.data.id});
         else if (branch.type === 'Configuration')
             $state.go('mm.workspace.config', {ws: branch.workspace, config: branch.data.id});
+
+        $rootScope.tbApi.select('element.viewer');
     };
 
     var sortFunction = function(a, b) {

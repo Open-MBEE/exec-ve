@@ -38,6 +38,12 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
         resolve: {
             sites: function($stateParams, SiteService) {
                 return SiteService.getSites();
+            },
+            type: function() {
+                return 'Workspace';
+            },
+            element: function($stateParams, WorkspaceService) {
+                return WorkspaceService.getWorkspace($stateParams.ws);
             }
         },
         views: {
@@ -53,15 +59,7 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
             },
             'pane-right@': {
                 templateUrl: 'partials/mm/pane-right.html',
-                controller: function ($rootScope, $scope, $stateParams, WorkspaceService, sites) {
-                    $scope.ws = $stateParams.ws;
-                    $scope.type = "Workspace";
-                    $rootScope.togglePane = $scope.$pane;
-
-                    WorkspaceService.getWorkspace($scope.ws).then(function(data) {
-                        $scope.element = data;
-                    });
-                }
+                controller: 'ToolCtrl'
             }
         }
     })
@@ -77,7 +75,13 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
                 if (config === 'latest')
                     return SiteService.getSites();
                 return SiteService.getSites(config.timestamp);
-            }
+            },
+            type: function() {
+                return 'Configuration';
+            },
+            element: function($stateParams, ConfigService) {
+                return ConfigService.getConfig($stateParams.config, $stateParams.ws, false);
+            }        
         },
         views: {
             'pane-center@': {
@@ -90,11 +94,8 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
             },
             'pane-right@': {
                 templateUrl: 'partials/mm/pane-right.html',
-                controller: function ($rootScope, $scope, $stateParams, config) {
-                    $scope.ws = $stateParams.ws;
-                    $scope.element = config;
-                    $scope.type = "Configuration";
-                }
+                controller: 'ToolCtrl'
+
             }
         }
     })

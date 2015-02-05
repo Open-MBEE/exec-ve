@@ -111,10 +111,10 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, _) {
     var createConfig = function(config, workspace) {
         var n = normalize(null, workspace);
         var deferred = $q.defer();
-        if (config.hasOwnProperty('id')) {
+        /* if (config.hasOwnProperty('id')) {
             deferred.reject({status: 400, message: 'Config create cannot already have id'});
             return deferred.promise;
-        } 
+        } */
         $http.post(URLService.getConfigsURL(n.ws), {'configurations': [config]})
         .success(function(data, status, headers, config) {
             deferred.resolve(CacheService.put(['configs', n.ws, config.id], data, true));
@@ -482,6 +482,10 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, _) {
         return UtilsService.normalize({update: updateFromServer, workspace: workspace, version: null});
     };
 
+    var update = function(config, workspace) {
+        return createConfig(config, workspace);
+    };
+
     return {
         getConfigs : getConfigs,
         createConfig : createConfig,
@@ -489,6 +493,7 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, _) {
         getConfig : getConfig,
         getConfigSnapshots : getConfigSnapshots,
         createSnapshotArtifact: OldcreateSnapshotArtifact,
+        update : update,
 
         getSiteConfigs : OldgetSiteConfigs,
         getConfigProducts: OldgetConfigProducts,

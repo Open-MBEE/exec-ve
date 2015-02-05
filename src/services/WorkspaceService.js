@@ -120,6 +120,11 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService) {
         return deferred.promise;
     };
     
+    var update = function(ws) {
+        // there is no distinction between update and create,
+        // creating this just for semantic purposes
+        return create(ws);
+    };
 
     return {
         getWorkspaces: getWorkspaces,
@@ -127,7 +132,8 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService) {
         diff: diff,
         merge: merge,
         deleteWorkspace: deleteWorkspace,
-        create: create
+        create: create,
+        update: update
     };
 
 }
