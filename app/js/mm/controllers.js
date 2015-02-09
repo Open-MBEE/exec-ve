@@ -455,7 +455,7 @@ function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorS
             $scope.oking = true;
             var workspaceObj = {"name": $scope.workspace.name, "description": $scope.workspace.description};
             workspaceObj.parent = $scope.createWsParentId;
-            workspaceObj.copyTime = $scope.createWsTime;
+            workspaceObj.branched = $scope.createWsTime;
 
             WorkspaceService.create(workspaceObj)
             .then(function(data) {
