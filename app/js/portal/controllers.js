@@ -221,7 +221,7 @@ function ($rootScope, $scope, $stateParams, documents, config, configSnapshots, 
     };
 
     $scope.getPDFUrl = function(snapshot){
-        //$scope.pdfText = "Generate PDF";
+        $scope.pdfText = "Regenerate PDF";
         var formats = snapshot.formats;
         if(!formats || formats.length===0) return null;
         for(var i=0; i < formats.length; i++){
