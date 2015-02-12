@@ -45,6 +45,7 @@ function mmsTranscludeName(ElementService, $compile, growl) {
                 if (!version)
                     version = viewVersion.version;
             }
+            scope.version = version ? version : 'latest';
             ElementService.getElement(scope.mmsEid, false, ws, version)
             .then(function(data) {
                 scope.element = data;
@@ -66,7 +67,7 @@ function mmsTranscludeName(ElementService, $compile, growl) {
 
     return {
         restrict: 'E',
-        template: '<span ng-if="element.name">{{element.name}}</span><span ng-if="!element.name">(no name)</span>',
+        template: '<span ng-if="element.name">{{element.name}}</span><span ng-if="!element.name" ng-class="{placeholder: version!=\'latest\'}">(no name)</span>',
         scope: {
             mmsEid: '@',
             mmsWs: '@',

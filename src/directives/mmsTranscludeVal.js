@@ -49,11 +49,11 @@ function mmsTranscludeVal(ElementService, UtilsService, $log, $compile, $templat
             } 
             element.empty();
             if (scope.values.length === 0)
-                element.html('<span>(no value)</span>');
+                element.html('<span' + ((scope.version === 'latest') ? '' : ' class="placeholder"') + '>(no value)</span>');
             else if (areStrings) {
                 var toCompile = toCompileList.join(' ');
                 if (toCompile === '') {
-                    element.html('<span>(no value)</span>');
+                    element.html('<span' + ((scope.version === 'latest') ? '' : ' class="placeholder"') + '>(no value)</span>');
                     return;
                 }
                 element.append(toCompile);
@@ -85,6 +85,7 @@ function mmsTranscludeVal(ElementService, UtilsService, $log, $compile, $templat
                 if (!version)
                     version = viewVersion.version;
             }
+            scope.version = version ? version : 'latest';
             ElementService.getElement(scope.mmsEid, false, ws, version)
             .then(function(data) {
                 scope.element = data;

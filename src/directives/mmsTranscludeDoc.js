@@ -44,7 +44,7 @@ function mmsTranscludeDoc(ElementService, UtilsService, $compile, $log, growl) {
             element.empty();
             var doc = scope.element.documentation;
             if (!doc)
-                doc = '<p>(no documentation)</p>';
+                doc = '<p ng-class="{placeholder: version!=\'latest\'}">(no documentation)</p>';
             element.append(doc);
             $compile(element.contents())(scope); 
             if (mmsViewCtrl) {
@@ -70,6 +70,7 @@ function mmsTranscludeDoc(ElementService, UtilsService, $compile, $log, growl) {
                 if (!version)
                     version = viewVersion.version;
             }
+            scope.version = version ? version : 'latest';
             ElementService.getElement(scope.mmsEid, false, ws, version)
             .then(function(data) {
                 scope.element = data;
