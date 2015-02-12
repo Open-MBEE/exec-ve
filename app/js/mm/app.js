@@ -44,17 +44,64 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
             },
             element: function($stateParams, WorkspaceService) {
                 return WorkspaceService.getWorkspace($stateParams.ws);
-            }
+            },
+            wsCoverDoc : function($stateParams, ElementService, growl) {
+            
+                // This is a short-term work-around -- all this should be done the back-end MMS in the future
+                var wsCoverDocId = 'master_cover';
+
+                return ElementService.getElement(wsCoverDocId, false, $stateParams.ws, 'latest')
+                .then(function(data) {
+                    return data;
+                }, function(reason) {
+
+                    // if it is an error, other than a 404 (element not found) then stop and return
+                    if (reason.status !== 404) return null;
+
+                    var doc = {
+                        specialization: {type: "View"},
+                        name: 'Workspace Cover Page',
+                        documentation: ''
+                    };
+                    doc.sysmlid = wsCoverDocId;
+                    doc.specialization.contains = [
+                        {
+                            'type': 'Paragraph',
+                            'sourceType': 'reference',
+                            'source': wsCoverDocId,
+                            'sourceProperty': 'documentation'
+                        }
+                    ];
+                    doc.specialization.allowedElements = [wsCoverDocId];
+                    doc.specialization.displayedElements = [wsCoverDocId];
+                    doc.specialization.childrenViews = [];
+
+                    return ElementService.createElement(doc, $stateParams.ws, null)
+                    .then(function(data) {
+                        // growl.success('Created Document Successful');
+                        return data;
+                    }, function(reason) {
+                        return null;
+
+                    });
+
+                }).finally(function(){
+                    return null;
+                });
+
+            }            
         },
         views: {
             'pane-center@': {
                 templateUrl: 'partials/mm/pane-center.html',
-                controller: function ($rootScope, $scope, $stateParams, sites) {
+                controller: function ($rootScope, $scope, $stateParams, sites, wsCoverDoc) {
                     $scope.ws = $stateParams.ws;
                     $scope.sites = sites;
                     $scope.buttons = [];
                     $scope.config = 'latest';
                     $rootScope.tree_initial = $scope.ws;
+                    $scope.wsCoverDoc = wsCoverDoc;
+                    $scope.time = 'latest';
                  }
             },
             'pane-right@': {
@@ -81,16 +128,32 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
             },
             element: function($stateParams, ConfigService) {
                 return ConfigService.getConfig($stateParams.config, $stateParams.ws, false);
-            }        
+            }, 
+            wsCoverDoc : function($stateParams, ElementService, config, growl) {
+            
+                // This is a short-term work-around -- all this should be done the back-end MMS in the future
+                var wsCoverDocId = 'master_cover';
+
+                return ElementService.getElement(wsCoverDocId, false, $stateParams.ws, config.timestamp)
+                .then(function(data) {
+                    return data;
+                }, function(reason) {
+                    return null;
+                }).finally(function(){
+                    return null;
+                });
+            } 
         },
         views: {
             'pane-center@': {
                 templateUrl: 'partials/mm/pane-center.html',
-                controller: function($scope, $stateParams, timedSites) {
+                controller: function($scope, $stateParams, timedSites, wsCoverDoc, config) {
                     $scope.ws = $stateParams.ws;
                     $scope.config = $stateParams.config;
                     $scope.sites = timedSites;
-                }
+                    $scope.wsCoverDoc = wsCoverDoc;
+                    $scope.time = config.timestamp;  
+                }              
             },
             'pane-right@': {
                 templateUrl: 'partials/mm/pane-right.html',

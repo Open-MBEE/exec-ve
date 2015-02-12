@@ -46,6 +46,8 @@ function SiteService($q, $http, URLService, CacheService, _) {
             var result = CacheService.get(['sites', 'master', ver, site]);
             if (result)
                 deferred.resolve(result);
+            else if (site === 'no_site')
+                deferred.resolve({name:'No Site', sysmlid:'no-site'});
             else
                 deferred.reject("Site not found");
         });

@@ -75,7 +75,7 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
                 }, function(reason) {
 
                     // if it is an error, other than a 404 (element not found) then stop and return
-                    // TODO if (reason.status === 404) return null;
+                    if (reason.status !== 404) return null;
                     
                     // if it is a tag look-up, then don't create element
                     if ($stateParams.config !== 'latest') 
