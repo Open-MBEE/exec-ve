@@ -2,6 +2,16 @@
 
 angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.borderLayout', 'ui.bootstrap', 'ui.tree', 'angular-growl'])
 .config(function($stateProvider, $urlRouterProvider) {
+
+    $urlRouterProvider.rule(function ($injector, $location) {
+        // default to workspace - master if url is old format
+        if (! $location.path().startsWith('/workspaces'))
+        {
+            var workspacePath = 'workspaces/master' + $location.path();
+            $location.path(workspacePath);
+        }
+    });
+
     $stateProvider
     .state('doc', {
         url: '/workspaces/:ws/sites/:site/products/:docId/:time',

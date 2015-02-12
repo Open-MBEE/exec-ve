@@ -471,10 +471,12 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, _) {
         //    return deferred.promise;
         //    elem.owner = 'holding_bin_project'; //hardcode a holding bin for owner for propose element
         //}
-        if (elem.hasOwnProperty('sysmlid')) {
+        
+        /*if (elem.hasOwnProperty('sysmlid')) {
             deferred.reject({status: 400, message: 'Element create cannot have id'});
             return deferred.promise;
-        }
+        }*/
+
         var url = URLService.getPostElementsURL(n.ws);
         if (site)
             url = URLService.getPostElementsWithSiteURL(n.ws, site);

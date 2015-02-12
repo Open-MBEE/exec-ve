@@ -1,6 +1,14 @@
 <div class="pane-center container-fluid">
     <div class="pane-center-btn-group"></div>
     <div class="pane-center-inner">
+
+        <div ng-if="siteCoverDoc !== null">
+            <div ng-if="config === 'latest'">
+                <a href="ve.html#/workspaces/{{ws}}/sites/{{site}}/products/{{siteCoverDoc.sysmlid}}/latest/view/{{siteCoverDoc.sysmlid}}">Edit Cover Page Document</a> 
+            </div>  
+            <mms-view mms-vid="{{siteCoverDoc.sysmlid}}" mms-version="{{time}}" mms-ws="{{ws}}"></mms-view>
+        </div>
+
         <div ng-if="config === 'latest'">
             <div ng-repeat="document in documents | orderBy: 'name'">
                 <a class="dash-link" href="ve.html#/workspaces/{{ws}}/sites/{{site}}/products/{{document.sysmlid}}/latest/view/{{document.sysmlid}}">{{document.name}}</a>   

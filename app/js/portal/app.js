@@ -64,6 +64,54 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
             },
             site : function($stateParams) {
                 return $stateParams.site;
+            },
+            siteCoverDoc : function($stateParams, ElementService, config, growl) {
+            
+                var siteCoverDocId = $stateParams.site + '_cover';
+
+                return ElementService.getElement(siteCoverDocId, false, $stateParams.ws, config.timestamp)
+                .then(function(data) {
+                    return data;
+                }, function(reason) {
+
+                    // if it is an error, other than a 404 (element not found) then stop and return
+                    // TODO if (reason.status === 404) return null;
+                    
+                    // if it is a tag look-up, then don't create element
+                    if ($stateParams.config !== 'latest') 
+                        return null;
+
+                    var doc = {
+                        specialization: {type: "View"},
+                        name: $stateParams.site + ' Cover Page',
+                        documentation: ''
+                    };
+                    doc.sysmlid = siteCoverDocId;
+                    doc.specialization.contains = [
+                        {
+                            'type': 'Paragraph',
+                            'sourceType': 'reference',
+                            'source': siteCoverDocId,
+                            'sourceProperty': 'documentation'
+                        }
+                    ];
+                    doc.specialization.allowedElements = [siteCoverDocId];
+                    doc.specialization.displayedElements = [siteCoverDocId];
+                    doc.specialization.childrenViews = [];
+
+                    return ElementService.createElement(doc, $stateParams.ws, $stateParams.site)
+                    .then(function(data) {
+                        growl.success('Created Document Successful');
+                        return data;
+                    }, function(reason) {
+                        return null;
+
+                    });
+
+                }).finally(function(){
+                    return null;
+                });
+
             }
         },
         views: {

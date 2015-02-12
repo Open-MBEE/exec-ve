@@ -182,10 +182,16 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, Element
     }, 5000);
 
 }])
-.controller('SiteCtrl', ['$rootScope', '$scope', '$stateParams', 'documents', 'config', 'configSnapshots', 'ConfigService', 'growl',
-function ($rootScope, $scope, $stateParams, documents, config, configSnapshots, ConfigService, growl) {
+.controller('SiteCtrl', ['$rootScope', '$scope', '$stateParams', 'documents', 'config', 'configSnapshots', 'siteCoverDoc', 'ConfigService', 'ElementService', 'growl',
+function ($rootScope, $scope, $stateParams, documents, config, configSnapshots, siteCoverDoc, ConfigService, ElementService, growl) {
     $scope.ws = $stateParams.ws;
     $scope.site = $stateParams.site;
+    $scope.time = 'latest';
+    if (config !== 'latest')
+        $scope.time = config.timestamp;
+
+    $scope.siteCoverDoc = siteCoverDoc;
+
     $scope.documents = documents;
     var docids = [];
     documents.forEach(function(doc) {
