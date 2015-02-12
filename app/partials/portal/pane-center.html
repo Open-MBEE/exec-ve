@@ -12,10 +12,10 @@
                 <a class="dash-link" href="ve.html#/workspaces/{{ws}}/sites/{{site}}/products/{{snapshot.sysmlid}}/{{snapshot.created}}/view/{{snapshot.sysmlid}}">{{snapshot.sysmlname}} ({{snapshot.created | date:'M/d/yy h:mm a'}})</a>   
                 <a class="dash-link" href="ve.html#/workspaces/{{ws}}/sites/{{site}}/products/{{snapshot.sysmlid}}/{{snapshot.created}}/view/{{snapshot.sysmlid}}" target="_blank"> <span class="fa fa-external-link"></span></a>
                 
-                <button ng-if="getPDFStatus(snapshot)==null || (getPDFStatus(snapshot)!=null && getPDFUrl(snapshot)==null )" class="btn" ng-click="generatePdf(snapshot, this)">{{pdfText}}</button>
+                <button ng-if="getPDFStatus(snapshot)==null || getPDFUrl(snapshot)==null" class="btn" ng-click="generatePdf(snapshot, this)">{{pdfText}}</button>
                 <a ng-if='getPDFUrl(snapshot)!=null' href="{{getPDFUrl(snapshot)}}" target="_blank">Download PDF</a> 
                 
-                <button ng-if="getHTMLStatus(snapshot)==null || (getHTMLStatus(snapshot)!=null && getHTMLUrl(snapshot)==null)" class="btn" ng-click="generateHtml(snapshot, this)">{{htmlText}}</button>
+                <button ng-if="getHTMLStatus(snapshot)==null || getHTMLUrl(snapshot)==null" class="btn" ng-click="generateHtml(snapshot, this)">{{htmlText}}</button>
                 <a ng-if="getHTMLUrl(snapshot)!=null" href="{{getHTMLUrl(snapshot)}}" target="_blank">Download HTML</a>
             </div>
         </div>
