@@ -628,6 +628,8 @@ function(_, $timeout, $scope, $rootScope, $http, $state, $stateParams, $modal, g
             //deletedElements.push(change.original);
                 } else if (change.type === 'updated') {
                     object.workspace2.updatedElements.push(change.ws2object);
+                    delete change.ws2object.read;
+                    delete change.ws2object.modified;
             //delete change.delta.read;
             //changedElements.push(change.delta);
                 } else if (change.type === 'added') {
