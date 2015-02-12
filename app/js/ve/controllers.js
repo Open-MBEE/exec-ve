@@ -9,7 +9,7 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, documen
     $rootScope.veTitle = document.name;
     $scope.time = time;
     $scope.ws = ws;
-    $scope.editable = $scope.document.editable && time === 'latest';
+    $scope.editable = $scope.document.editable && time === 'latest' && $scope.document.specialization === 'Product';
     if ($state.current.name === 'doc')
         $rootScope.veCurrentView = $scope.document.sysmlid;
     if ($state.current.name === 'doc.all') {
@@ -121,6 +121,9 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, documen
     });
 
     var seenChild = {};
+    if (!document.specialization.view2view) {
+        document.specialization.view2view = [{id: document.sysmlid, childrenViews: []}];
+    }
     document.specialization.view2view.forEach(function(view) {
         var viewid = view.id;
         view.childrenViews.forEach(function(childId) {

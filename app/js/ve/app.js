@@ -22,13 +22,17 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
             site: function($stateParams, SiteService) {
                 return SiteService.getSite($stateParams.site);
             },
-            views: function($stateParams, ViewService) {
+            views: function($stateParams, ViewService, document) {
+                if (document.specialization.type !== 'Product')
+                    return [];
                 return ViewService.getDocumentViews($stateParams.docId, false, $stateParams.ws, $stateParams.time, true);
             },
             time: function($stateParams) {
                 return $stateParams.time;
             },
-            snapshots: function($stateParams, ConfigService) {
+            snapshots: function($stateParams, ConfigService, document) {
+                if (document.specialization.type !== 'Product')
+                    return [];
                 return ConfigService.getProductSnapshots($stateParams.docId, $stateParams.site, $stateParams.ws);
             },
             ws: function($stateParams) {
