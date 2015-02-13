@@ -48,7 +48,7 @@ function mmsTranscludeVal(ElementService, UtilsService, $log, $compile, $templat
                 }
             } 
             element.empty();
-            if (scope.values.length === 0)
+            if (scope.values.length === 0 || Object.keys(scope.values[0]).length < 2)
                 element.html('<span' + ((scope.version === 'latest') ? '' : ' class="placeholder"') + '>(no value)</span>');
             else if (areStrings) {
                 var toCompile = toCompileList.join(' ');
@@ -90,6 +90,8 @@ function mmsTranscludeVal(ElementService, UtilsService, $log, $compile, $templat
             .then(function(data) {
                 scope.element = data;
                 scope.values = scope.element.specialization.value;
+                if (scope.element.specialization.type === 'Constraint' && scope.element.specialization.specification)
+                    scope.values = [scope.element.specialization.specification];
                 recompile();
                 scope.$watch('values', recompile, true);
             }, function(reason) {

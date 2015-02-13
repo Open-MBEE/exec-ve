@@ -19,6 +19,27 @@
                 <textarea ng-if="hasHtml(value.string)" mms-tinymce mms-ws="{{mmsWs}}" mms-site="{{mmsSite}}" ng-model="value.string" mms-cf-elements="mmsCfElements" mms-eid="{{element.sysmlid}}"></textarea>
                 <textarea ng-if="!hasHtml(value.string)" ng-model="value.string"></textarea>
             </div>
+            <div ng-switch-when="OpaqueExpression">
+                <textarea ng-model="value.expressionBody[0]"></textarea>
+            </div>
+            <div ng-switch-default>Editing not supported for now</div>
+        </div>
+    </div>
+
+    <div ng-if="edit.specialization.type === 'Constraint'">
+        <h2 class="prop-title spec-view-value-heading">CONSTRAINT SPECIFICATION</h2>
+        <div ng-switch on="editValue.type">
+            <div ng-switch-when="LiteralInteger"><input type="number" ng-model="editValue.integer"></input></div>
+            <div ng-switch-when="LiteralUnlimitedNatural"><input type="number" ng-model="editValue.naturalValue"></input></div>
+            <div ng-switch-when="LiteralBoolean"><input type="checkbox" ng-model="editValue.boolean"></input></div>
+            <div ng-switch-when="LiteralReal"><input type="number" ng-model="editValue.double" step="any"></input></div>
+            <div ng-switch-when="LiteralString">
+                <textarea ng-model="editValue.string"></textarea>
+            </div>
+            <div ng-switch-when="OpaqueExpression">
+                <textarea ng-model="editValue.expressionBody[0]"></textarea>
+            </div>
+            <div ng-switch-default>Editing not supported for now</div>
         </div>
     </div>
 
@@ -51,6 +72,8 @@
             <h3 class="prop" ng-switch-when="LiteralUnlimitedNatural">{{value.naturalValue}}</h3>
             <h3 class="prop" ng-switch-when="LiteralString" ng-bind-html="value.string"></h3>
             <h3 class="prop" ng-switch-when="ElementValue"><mms-transclude-name mms-eid="{{value.element}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></h3>
+            <h3 class="prop" ng-switch-when="OpaqueExpression">{{value.expressionBody[0]}}</h3>
+            <h3 class="prop" ng-switch-default>{{value}}</h3>
         </div>
         <h2 class="prop-title spec-view-value-heading">PROPERTY TYPE</h2>
         <h3 class="prop"><mms-transclude-name mms-eid="{{element.specialization.propertyType}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></h3>
@@ -75,6 +98,20 @@
         <h3 class="prop"><mms-transclude-name mms-eid="{{element.specialization.source}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></h3>
         <h2 class="prop-title">ROLE 2</h2>
         <h3 class="prop"><mms-transclude-name mms-eid="{{element.specialization.target}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></h3>
+    </div>
+
+    <div ng-if="element.specialization.type === 'Constraint'">
+        <h2 class="prop-title">CONSTRAINT SPECIFICATION</h2>
+        <div ng-switch on="value.type">
+            <h3 class="prop" ng-switch-when="LiteralInteger">{{value.integer}}</h3>
+            <h3 class="prop" ng-switch-when="LiteralBoolean">{{value.boolean}}</h3>
+            <h3 class="prop" ng-switch-when="LiteralReal">{{value.double}}</h3>
+            <h3 class="prop" ng-switch-when="LiteralUnlimitedNatural">{{value.naturalValue}}</h3>
+            <h3 class="prop" ng-switch-when="LiteralString" ng-bind-html="value.string"></h3>
+            <h3 class="prop" ng-switch-when="ElementValue"><mms-transclude-name mms-eid="{{value.element}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></h3>
+            <h3 class="prop" ng-switch-when="OpaqueExpression">{{value.expressionBody[0]}}</h3>
+            <h3 class="prop" ng-switch-default>{{value}}</h3>
+        </div>
     </div>
 
     <h2 class="prop-title spec-view-doc-heading">DOCUMENTATION</h2>

@@ -86,6 +86,8 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, $q, growl, _)
             scope.element = scope.mmsElement;
             if (scope.element.specialization.type === 'Property')
                 scope.values = scope.element.specialization.value;
+            if (scope.element.specialization.type === 'Constraint')
+                scope.value = scope.element.specialization.specification;
             scope.editable = false;
             //element.empty();
             //element.append(readTemplate);
@@ -117,6 +119,8 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, $q, growl, _)
                 scope.element = data;
                 if (scope.element.specialization.type === 'Property')
                     scope.values = scope.element.specialization.value;
+                if (scope.element.specialization.type === 'Constraint')
+                    scope.value = scope.element.specialization.specification;
                 if (scope.mmsEditField === 'none' || 
                         !scope.element.editable || 
                         (scope.mmsVersion !== 'latest' && scope.mmsVersion)) {
@@ -140,6 +144,9 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, $q, growl, _)
                         //scope.$emit('elementEditability', scope.editable);
                         if (scope.edit.specialization.type === 'Property' && angular.isArray(scope.edit.specialization.value)) {
                             scope.editValues = scope.edit.specialization.value;
+                        }
+                        if (scope.edit.specialization.type === 'Constraint' && scope.edit.specialization.specification) {
+                            scope.editValue = scope.edit.specialization.specification;
                         }
                         //element.append(template);
                         //$compile(element.contents())(scope); 
@@ -167,6 +174,10 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, $q, growl, _)
             if (scope.edit.specialization.type === 'Property' && angular.isArray(scope.edit.specialization.value)) {
                 scope.edit.specialization.value = _.cloneDeep(scope.element.specialization.value);
                 scope.editValues = scope.edit.specialization.value;
+            }
+            if (scope.edit.specialization.type === 'Constraint' && scope.edit.specialization.specification) {
+                scope.edit.specialization.specification = _.cloneDeep(scope.element.specialization.specification);
+                scope.editValue = scope.edit.specialization.specification;
             }
         };
         
