@@ -305,8 +305,8 @@ function($scope, $rootScope, $timeout, configurations, ws) {
     $scope.configurations = configurations;
     $rootScope.togglePane = $scope.$pane;    
 }])
-.controller('DocCtrl', ['$scope', '$rootScope', 'ws', 'config', '$stateParams', 'site',
-function($scope, $rootScope, ws, config, $stateParams, site) {
+.controller('DocCtrl', ['$scope', '$rootScope', 'ws', 'config', '$stateParams', 'site', 'snapshot', 'ConfigService', 'growl',
+function($scope, $rootScope, ws, config, $stateParams, site, snapshot, ConfigService, growl) {
     $scope.ws = ws;
     if (config === 'latest')
         $scope.time = 'latest';
@@ -315,4 +315,95 @@ function($scope, $rootScope, ws, config, $stateParams, site) {
     $scope.docid = $stateParams.docid;
     $scope.api = {};
     $scope.site = site;
+    $scope.snapshot = snapshot;
+    $scope.pdfText = "Generate PDF";
+    $scope.getPDFStatus = function(){
+        
+        var formats = snapshot.formats;
+        if(!formats || formats.length===0) return null;
+        for(var i=0; i < formats.length; i++){
+            if(formats[i].type=='pdf') {
+                var status = formats[i].status;
+                if(status == 'Generating'){
+                    status = 'Generating...';
+                }
+                else if(status == 'Error') status = 'Regenerate PDF';
+                $scope.pdfText = status;
+                return status;
+            }
+        }
+        return null;
+    };
+
+    $scope.getPDFUrl = function(){
+        var formats = snapshot.formats;
+        if(!formats || formats.length===0) return null;
+        for(var i=0; i < formats.length; i++){
+            if(formats[i].type=='pdf'){
+                return formats[i].url;
+            }
+        }
+        return null;
+    };
+
+    $scope.htmlText = "Generate HTML";
+    $scope.getHTMLStatus = function(){
+        
+        var formats = snapshot.formats;
+        if(!formats || formats.length===0) return null;
+        for(var i=0; i < formats.length; i++){
+            if(formats[i].type=='html') {
+                var status = formats[i].status;
+                if(status == 'Generating') status = 'Generating...';
+                else if(status == 'Error') status = 'Regenerate HTML';
+                $scope.htmlText = status;
+                return status;
+            }
+        }
+        return null;
+    };
+
+    $scope.getHTMLUrl = function(){
+        if(angular.isUndefined(snapshot)) return null;
+        if(snapshot===null) return null;
+        
+        var formats = snapshot.formats;
+        if(formats===undefined || formats===null || formats.length===0) return null;
+        for(var i=0; i < formats.length; i++){
+            if(formats[i].type=='html'){
+                return formats[i].url;  
+            } 
+        }
+        return null;
+    };
+
+    $scope.generatePdf = function(){
+        if ($scope.pdfText === 'Generating...')
+            return;
+        $scope.pdfText = "Generating...";
+        snapshot.formats.push({"type":"pdf"});
+        ConfigService.createSnapshotArtifact(snapshot, $scope.site, $scope.ws).then(
+            function(result){
+                growl.success('Generating PDF...');
+            },
+            function(reason){
+                growl.error('Failed to generate PDF: ' + reason.message);
+            }
+        );
+    };
+
+    $scope.generateHtml = function(){
+        if ($scope.htmlText === 'Generating...')
+            return;
+        $scope.htmlText = "Generating...";
+        snapshot.formats.push({"type":"html"});
+        ConfigService.createSnapshotArtifact(snapshot, $scope.site, $scope.ws).then(
+            function(result){
+                growl.success('Generating HTML...');
+            },
+            function(reason){
+                growl.error('Failed to generate HTML: ' + reason.message);
+            }
+        );
+    };
 }]);

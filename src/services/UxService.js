@@ -146,7 +146,7 @@ function UxService($rootScope) {
 		  case "section":
 		  	return "fa-file-o";
 		  case "site":
-		  	return "fa-sitemap";
+		  	return "fa-folder";
 		  case "snapshot":
 		  	return "fa-camera";
 		  case "view":
