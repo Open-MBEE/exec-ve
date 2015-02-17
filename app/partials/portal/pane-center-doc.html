@@ -7,8 +7,8 @@
                 <button ng-if="getPDFStatus()==null || getPDFUrl()==null" class="btn" ng-click="generatePdf()">{{pdfText}}</button>
                 <a ng-if='getPDFUrl()!=null' href="{{getPDFUrl()}}" target="_blank">Download PDF</a> 
                 
-                <button ng-if="getHTMLStatus()==null || getHTMLUrl()==null" class="btn" ng-click="generateHtml()">{{htmlText}}</button>
-                <a ng-if="getHTMLUrl()!=null" href="{{getHTMLUrl()}}" target="_blank">Download HTML</a>
+                <button ng-if="getZipStatus()==null || getZipUrl()==null" class="btn" ng-click="generateZip()">{{zipText}}</button>
+                <a ng-if="getZipUrl()!=null" href="{{getZipUrl()}}" target="_blank">Download Zip</a>
             </div>
         <mms-view mms-vid="{{docid}}" mms-version="{{time}}" mms-ws="{{ws}}" mms-view-api="api"></mms-view>
     </div>

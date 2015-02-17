@@ -238,23 +238,23 @@ function ($rootScope, $scope, $stateParams, documents, config, configSnapshots, 
         return null;
     };
 
-    $scope.getHTMLStatus = function(snapshot){
-        $scope.htmlText = "Generate HTML";
+    $scope.getZipStatus = function(snapshot){
+        $scope.zipText = "Generate Zip";
         var formats = snapshot.formats;
         if(!formats || formats.length===0) return null;
         for(var i=0; i < formats.length; i++){
             if(formats[i].type=='html') {
                 var status = formats[i].status;
                 if(status == 'Generating') status = 'Generating...';
-                else if(status == 'Error') status = 'Regenerate HTML';
-                $scope.htmlText = status;
+                else if(status == 'Error') status = 'Regenerate Zip';
+                $scope.zipText = status;
                 return status;
             }
         }
         return null;
     };
 
-    $scope.getHTMLUrl = function(snapshot){
+    $scope.getZipUrl = function(snapshot){
         if(angular.isUndefined(snapshot)) return null;
         if(snapshot===null) return null;
         
@@ -268,34 +268,29 @@ function ($rootScope, $scope, $stateParams, documents, config, configSnapshots, 
         return null;
     };
 
-    $scope.generatePdf = function(snapshot, elem){
-        if (elem.pdfText === 'Generating...')
-            return;
-        elem.pdfText = "Generating...";
-        snapshot.formats.push({"type":"pdf"});
+    $scope.generateArtifacts = function(snapshot, elem){
+        snapshot.formats.push({"type":"pdf", "status":"Generating"});
+        snapshot.formats.push({"type":"html", "status":"Generating"});
         ConfigService.createSnapshotArtifact(snapshot, $scope.site, $scope.ws).then(
             function(result){
-                growl.success('Generating PDF...');
+                growl.success('Generating artifacts...');
             },
             function(reason){
-                growl.error('Failed to generate PDF: ' + reason.message);
+                growl.error('Failed to generate artifacts: ' + reason.message);
             }
         );
     };
 
-    $scope.generateHtml = function(snapshot, elem){
-        if (elem.htmlText === 'Generating...')
+    $scope.generatePdf = function(snapshot, elem){
+        if (elem.pdfText === 'Generating...')
             return;
-        elem.htmlText = "Generating...";
-        snapshot.formats.push({"type":"html"});
-        ConfigService.createSnapshotArtifact(snapshot, $scope.site, $scope.ws).then(
-            function(result){
-                growl.success('Generating HTML...');
-            },
-            function(reason){
-                growl.error('Failed to generate HTML: ' + reason.message);
-            }
-        );
+        $scope.generateArtifacts(snapshot, elem);
+    };
+
+    $scope.generateZip = function(snapshot, elem){
+        if (elem.zipText === 'Generating...')
+            return;
+        $scope.generateArtifacts(snapshot, elem);
     };
 }])
 .controller('ToolCtrl', ['$scope', '$rootScope', '$timeout', 'configurations', 'ws',
@@ -346,24 +341,23 @@ function($scope, $rootScope, ws, config, $stateParams, site, snapshot, ConfigSer
         return null;
     };
 
-    $scope.htmlText = "Generate HTML";
-    $scope.getHTMLStatus = function(){
-        
+    $scope.zipText = "Generate Zip";
+    $scope.getZipStatus = function(){
         var formats = snapshot.formats;
         if(!formats || formats.length===0) return null;
         for(var i=0; i < formats.length; i++){
             if(formats[i].type=='html') {
                 var status = formats[i].status;
                 if(status == 'Generating') status = 'Generating...';
-                else if(status == 'Error') status = 'Regenerate HTML';
-                $scope.htmlText = status;
+                else if(status == 'Error') status = 'Regenerate Zip';
+                $scope.zipText = status;
                 return status;
             }
         }
         return null;
     };
 
-    $scope.getHTMLUrl = function(){
+    $scope.getZipUrl = function(){
         if(angular.isUndefined(snapshot)) return null;
         if(snapshot===null) return null;
         
@@ -377,33 +371,28 @@ function($scope, $rootScope, ws, config, $stateParams, site, snapshot, ConfigSer
         return null;
     };
 
-    $scope.generatePdf = function(){
-        if ($scope.pdfText === 'Generating...')
-            return;
-        $scope.pdfText = "Generating...";
-        snapshot.formats.push({"type":"pdf"});
-        ConfigService.createSnapshotArtifact(snapshot, $scope.site, $scope.ws).then(
+    $scope.generateArtifacts = function(){
+        $scope.snapshot.formats.push({"type":"pdf", "status":"Generating"});
+        $scope.snapshot.formats.push({"type":"html", "status":"Generating"});
+        ConfigService.createSnapshotArtifact($scope.snapshot, $scope.site, $scope.ws).then(
             function(result){
-                growl.success('Generating PDF...');
+                growl.success('Generating artifacts...');
             },
             function(reason){
-                growl.error('Failed to generate PDF: ' + reason.message);
+                growl.error('Failed to generate artifacts: ' + reason.message);
             }
         );
     };
 
-    $scope.generateHtml = function(){
-        if ($scope.htmlText === 'Generating...')
+    $scope.generatePdf = function(){
+        if ($scope.pdfText === 'Generating...')
             return;
-        $scope.htmlText = "Generating...";
-        snapshot.formats.push({"type":"html"});
-        ConfigService.createSnapshotArtifact(snapshot, $scope.site, $scope.ws).then(
-            function(result){
-                growl.success('Generating HTML...');
-            },
-            function(reason){
-                growl.error('Failed to generate HTML: ' + reason.message);
-            }
-        );
+        $scope.generateArtifacts();
+    };
+
+    $scope.generateZip = function(){
+        if ($scope.zipText === 'Generating...')
+            return;
+        $scope.generateArtifacts();
     };
 }]);

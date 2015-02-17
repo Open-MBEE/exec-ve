@@ -23,8 +23,8 @@
                 <button ng-if="getPDFStatus(snapshot)==null || getPDFUrl(snapshot)==null" class="btn" ng-click="generatePdf(snapshot, this)">{{pdfText}}</button>
                 <a ng-if='getPDFUrl(snapshot)!=null' href="{{getPDFUrl(snapshot)}}" target="_blank">Download PDF</a> 
                 
-                <button ng-if="getHTMLStatus(snapshot)==null || getHTMLUrl(snapshot)==null" class="btn" ng-click="generateHtml(snapshot, this)">{{htmlText}}</button>
-                <a ng-if="getHTMLUrl(snapshot)!=null" href="{{getHTMLUrl(snapshot)}}" target="_blank">Download HTML</a>
+                <button ng-if="getZipStatus(snapshot)==null || getZipUrl(snapshot)==null" class="btn" ng-click="generateZip(snapshot, this)">{{zipText}}</button>
+                <a ng-if="getZipUrl(snapshot)!=null" href="{{getZipUrl(snapshot)}}" target="_blank">Download Zip</a>
             </div>
         </div>
     </div>
