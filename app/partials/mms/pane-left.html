@@ -1,0 +1,15 @@
+  <div class="pane-left">
+
+  <mms-button-bar buttons="buttons" on-click="onClick(button)" mms-bb-api="bbApi"></mms-button-bar>
+
+  </div>
+
+  <div>
+
+    <input class="input-filter-tree form-control" ng-show="filterOn" ng-model="search" type="text" placeholder="Type here to filter items in the tree" ng-change="treeApi.expand_all()">
+
+  </div>
+
+ <mms-tree search="search" tree-data="my_data" section-numbering="false" tree-control="treeApi" on-select="my_tree_handler(branch)" initial-selection="{{tree_initial}}" options="tree_options"></mms-tree>
+
+</div>
