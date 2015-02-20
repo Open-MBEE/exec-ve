@@ -38,6 +38,548 @@ function($scope, $rootScope, $timeout, UxService) {
     $scope.onClick = function(button) {
     };
 }])
+.controller('ViewCtrl', ['$scope', '$rootScope', '$stateParams', '$timeout', '$modal', 'viewElements', 'ElementService', 'ViewService', 'time', 'growl', 'site', 'view',
+function($scope, $rootScope, $stateParams, $timeout, $modal, viewElements, ElementService, ViewService, time, growl, site, view) {
+    if (!$rootScope.veCommentsOn)
+        $rootScope.veCommentsOn = false;
+    if (!$rootScope.veElementsOn)
+        $rootScope.veElementsOn = false;
+
+    // TODO: WS = master
+    var ws = $stateParams.workspace;
+
+    $scope.viewElements = viewElements;
+    $scope.site = site;
+    var elementSaving = false;
+    $scope.buttons = [
+        {
+            action: function() {
+                $scope.editing = !$scope.editing;
+                $scope.specApi.setEditing(true);
+                $scope.buttons[0].permission = false;
+                $scope.buttons[1].permission = true;
+                $scope.buttons[2].permission = true;
+                var edit = $scope.specApi.getEdits();
+                if (edit) {
+                    $rootScope.veEdits[edit.sysmlid] = edit;
+                    $rootScope.mms_tbApi.setIcon('element.editor', 'fa-edit-asterisk');
+                    if (Object.keys($rootScope.veEdits).length > 1) {
+                        $rootScope.mms_tbApi.setPermission('element.editor.saveall', true);
+                    } else {
+                        $rootScope.mms_tbApi.setPermission('element.editor.saveall', false);
+                    }
+                }
+                ElementService.isCacheOutdated(view.sysmlid, ws)
+                .then(function(data) {
+                    if (data.status && data.server.modified > data.cache.modified)
+                        growl.warning('This view has been updated on the server');
+                });
+            },
+            tooltip: "Edit View Documentation",
+            icon: "fa-edit",
+            permission: view.editable && time === 'latest'
+        },
+        {
+            action: function() {
+                
+                    if (elementSaving) {
+                        growl.info('Please Wait...');
+                        return;
+                    }
+                    elementSaving = true;
+                    $scope.buttons[1].icon = "fa-spin fa-spinner";
+                    $scope.specApi.save().then(function(data) {
+                        elementSaving = false;
+                        growl.success('Save Successful');
+                        $scope.editing = false;
+                        delete $rootScope.veEdits[$scope.specApi.getEdits().sysmlid];
+                        if (Object.keys($rootScope.veEdits).length === 0) {
+                            $rootScope.mms_tbApi.setIcon('element.editor', 'fa-edit');
+                        }
+                        if (Object.keys($rootScope.veEdits).length > 1) {
+                            $rootScope.mms_tbApi.setPermission('element.editor.saveall', true);
+                        } else {
+                            $rootScope.mms_tbApi.setPermission('element.editor.saveall', false);
+                        }
+                        $scope.buttons[0].permission = true;
+                        $scope.buttons[1].permission = false;
+                        $scope.buttons[2].permission = false;
+                    }, function(reason) {
+                        elementSaving = false;
+                        if (reason.type === 'info')
+                            growl.info(reason.message);
+                        else if (reason.type === 'warning')
+                            growl.warning(reason.message);
+                        else if (reason.type === 'error')
+                            growl.error(reason.message);
+                    }).finally(function() {
+                        $scope.buttons[1].icon = "fa-save";
+                    });
+            },
+            tooltip: "Save",
+            icon: "fa-save",
+            permission: false
+        },
+        {
+            action: function() {
+                var go = function() {
+                    delete $rootScope.veEdits[$scope.specApi.getEdits().sysmlid];
+                    $scope.specApi.revertEdits();
+                    $scope.editing = false;
+                    if (Object.keys($rootScope.veEdits).length === 0) {
+                        $rootScope.mms_tbApi.setIcon('element.editor', 'fa-edit');
+                    }
+                    if (Object.keys($rootScope.veEdits).length > 1) {
+                        $rootScope.mms_tbApi.setPermission('element.editor.saveall', true);
+                    } else {
+                        $rootScope.mms_tbApi.setPermission('element.editor.saveall', false);
+                    }
+                    $scope.buttons[0].permission = true;
+                    $scope.buttons[1].permission = false;
+                    $scope.buttons[2].permission = false;
+                };
+                if ($scope.specApi.hasEdits()) {
+                    var instance = $modal.open({
+                        templateUrl: 'partials/ve/cancelConfirm.html',
+                        scope: $scope,
+                        controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
+                            $scope.ok = function() {
+                                $modalInstance.close('ok');
+                            };
+                            $scope.cancel = function() {
+                                $modalInstance.dismiss();
+                            };
+                        }]
+                    });
+                    instance.result.then(function() {
+                        go();
+                    });
+                } else
+                    go();
+            },
+            tooltip:"Cancel",
+            icon: "fa-times",
+            permission: false
+        },
+        {
+            action: function() {
+                $scope.viewApi.toggleShowComments();
+
+                if (!$rootScope.veCommentsOn) {
+                    $scope.buttons[3].icon = "fa-comment";
+                    $scope.buttons[3].tooltip = "Hide Comments";
+                }
+                else {
+                    $scope.buttons[3].icon = "fa-comment-o";
+                    $scope.buttons[3].tooltip = "Show Comments";
+                }
+
+                $rootScope.veCommentsOn = !$rootScope.veCommentsOn;
+            },
+            tooltip: !$rootScope.veCommentsOn ? "Show Comments" : "Hide Comments",
+            icon: !$rootScope.veCommentsOn ? "fa-comment-o" : "fa-comment",
+            permission: true
+        },
+        {
+            action: function() {
+                $scope.viewApi.toggleShowElements();
+
+                if (!$rootScope.veElementsOn) {
+                    $scope.buttons[4].tooltip = "Hide Elements";
+                }
+                else {
+                    $scope.buttons[4].tooltip = "Show Elements";
+                }
+
+                $rootScope.veElementsOn = !$rootScope.veElementsOn;
+            },
+            tooltip: !$rootScope.veElementsOn ? "Show Elements": "Hide Elements",
+            icon: "fa-codepen",
+            permission: true
+        },
+        {
+            action: function() {
+                var prev = $rootScope.mms_treeApi.get_prev_branch($rootScope.mms_treeApi.get_selected_branch());
+                if (!prev)
+                    return;
+                $scope.buttons[5].icon = "fa-spinner fa-spin";
+                $rootScope.mms_treeApi.select_branch(prev);
+            },
+            tooltip: "Previous",
+            icon: "fa-chevron-left",
+            permission: true
+        },
+        {
+            action: function() {
+                var next = $rootScope.mms_treeApi.get_next_branch($rootScope.mms_treeApi.get_selected_branch());
+                if (!next)
+                    return;
+                $scope.buttons[6].icon = "fa-spinner fa-spin";
+                $rootScope.mms_treeApi.select_branch(next);
+            },
+            tooltip: "Next",
+            icon: "fa-chevron-right",
+            permission: true
+        }
+    ];
+    
+    ViewService.setCurrentViewId(view.sysmlid);
+    $rootScope.veCurrentView = view.sysmlid;
+    $rootScope.veViewLoading = false;
+    $scope.vid = view.sysmlid;
+    $scope.ws = ws;
+    $scope.version = time;
+    $scope.editing = false;
+    $timeout(function() {
+        $rootScope.$broadcast('viewSelected', $scope.vid, viewElements);
+    }, 225);
+
+    $scope.viewApi = {};
+    $scope.specApi = {};
+    $scope.comments = {};
+    $scope.numComments = 0;
+    $scope.lastCommented = "";
+    $scope.lastCommentedBy = "";
+    $scope.tscClicked = function(elementId) {
+        $rootScope.$broadcast('elementSelected', elementId);
+    };
+    $scope.elementTranscluded = function(element, type) {
+        if (type === 'Comment' && !$scope.comments.hasOwnProperty(element.sysmlid)) {
+            $scope.comments[element.sysmlid] = element;
+            $scope.numComments++;
+            if (element.modified > $scope.lastCommented) {
+                $scope.lastCommented = element.modified;
+                $scope.lastCommentedBy = element.creator;
+            }
+        }
+    };
+    $timeout(function() {
+        if ($rootScope.veCommentsOn) {
+            $scope.viewApi.toggleShowComments();
+        }
+        if ($rootScope.veElementsOn) {
+            $scope.viewApi.toggleShowElements();
+        }
+    }, 500);
+}])
+.controller('ToolCtrl', ['$scope', '$rootScope', '$modal', '$q', '$stateParams',
+            'ConfigService', 'ElementService', 'growl', 
+            'site', 'document', 'time',
+function($scope, $rootScope, $modal, $q, $stateParams,
+         ConfigService, ElementService, growl,
+         site, document, time) {
+
+    // TODO configs
+    var snapshots = null;
+
+    // TODO rename variable ws
+    var ws = $stateParams.workspace;
+
+    $scope.document = document;
+    $scope.ws = ws;
+    $scope.editable = document.editable && time === 'latest';
+    $scope.snapshots = snapshots;
+    $scope.site = site;
+    $scope.version = time;
+    $scope.eid = $scope.document.sysmlid;
+    $scope.vid = $scope.eid;
+    $scope.specApi = {};
+    $rootScope.veSpecApi = $scope.specApi;
+    $scope.viewOrderApi = {};
+    $rootScope.togglePane = $scope.$pane;
+
+    $scope.show = {
+        element: true,
+        reorder: false,
+        snapshots: false
+    };
+
+    if (!$rootScope.veEdits)
+        $rootScope.veEdits = {};
+
+    $scope.snapshotClicked = function() {
+        $scope.snapshotLoading = 'fa fa-spinner fa-spin';
+    };
+
+    $scope.etrackerChange = function() {
+        $scope.specApi.keepMode();
+        $scope.eid = $scope.etrackerSelected;
+        //$scope.specApi.changeElement($scope.etrackerSelected, 'keep');
+    };
+
+    $scope.showTracker = function() {
+        return true;
+        /* if (Object.keys($rootScope.veEdits).length > 1 && $scope.specApi.getEditing())
+            return true;
+        return false; */
+    };
+
+    var showPane = function(pane) {
+        angular.forEach($scope.show, function(value, key) {
+            if (key === pane)
+                $scope.show[key] = true;
+            else
+                $scope.show[key] = false;
+        });
+    };
+
+    var refreshSnapshots = function() {
+        $rootScope.mms_tbApi.toggleButtonSpinner('document.snapshot.refresh');
+        ConfigService.getProductSnapshots($scope.document.sysmlid, $scope.site.name, $scope.ws, true)
+        .then(function(result) {
+            $scope.snapshots = result;
+        }, function(reason) {
+            growl.error("Refresh Failed: " + reason.message);
+        })
+        .finally(function() {
+            $rootScope.mms_tbApi.toggleButtonSpinner('document.snapshot.refresh');
+            $rootScope.mms_tbApi.select('document.snapshot');
+
+        });
+    };
+
+    var creatingSnapshot = false;
+    $scope.$on('document.snapshot.create', function() {
+        if (creatingSnapshot) {
+            growl.info('Please Wait...');
+            return;
+        }
+        creatingSnapshot = true;
+        $rootScope.mms_tbApi.toggleButtonSpinner('document.snapshot.create');
+        ConfigService.createSnapshot($scope.document.sysmlid, site.name, ws)
+        .then(function(result) {
+            creatingSnapshot = false;
+            $rootScope.mms_tbApi.toggleButtonSpinner('document.snapshot.create');
+            growl.success("Snapshot Created: Refreshing...");
+            refreshSnapshots();
+        }, function(reason) {
+            creatingSnapshot = false;
+            growl.error("Snapshot Creation failed: " + reason.message);
+            $rootScope.mms_tbApi.toggleButtonSpinner('document.snapshot.create');
+        });
+        $rootScope.mms_tbApi.select('document.snapshot');
+    });
+
+    $scope.$on('document.snapshot.refresh', refreshSnapshots);
+
+    $scope.$on('document.snapshot', function() {
+        showPane('snapshots');
+    });
+    $scope.$on('elementSelected', function(event, eid) {
+        $scope.eid = eid;
+        $rootScope.mms_tbApi.select('element.viewer');
+        
+        if ($rootScope.togglePane.closed)
+            $rootScope.togglePane.toggle();
+
+        showPane('element');
+        $scope.specApi.setEditing(false);
+        ElementService.getElement(eid, false, ws, time).
+        then(function(element) {
+            var editable = element.editable && time === 'latest';
+            $rootScope.mms_tbApi.setPermission('element.editor', editable);
+            $rootScope.mms_tbApi.setPermission("document.snapshot.create", editable);
+        });
+    });
+    $scope.$on('element.viewer', function() {
+        $scope.specApi.setEditing(false);
+        showPane('element');
+    });
+    $scope.$on('element.editor', function() {
+        $scope.specApi.setEditing(true);
+        showPane('element');
+        var edit = $scope.specApi.getEdits();
+        if (edit) {
+            $scope.etrackerSelected = edit.sysmlid;
+            $rootScope.veEdits[edit.sysmlid] = edit;
+            $rootScope.mms_tbApi.setIcon('element.editor', 'fa-edit-asterisk');
+            if (Object.keys($rootScope.veEdits).length > 1) {
+                $rootScope.mms_tbApi.setPermission('element.editor.saveall', true);
+            } else {
+                $rootScope.mms_tbApi.setPermission('element.editor.saveall', false);
+            }
+        }
+        ElementService.isCacheOutdated($scope.eid, ws)
+        .then(function(data) {
+            if (data.status && data.server.modified > data.cache.modified)
+                growl.error('This element has been updated on the server. Please refresh the page to get the latest version.');
+        });
+    });
+    $scope.$on('viewSelected', function(event, vid, viewElements) {
+        $scope.eid = vid;
+        $scope.vid = vid;
+        $scope.viewElements = viewElements;
+        $rootScope.mms_tbApi.select('element.viewer');
+        showPane('element');
+        ElementService.getElement(vid, false, ws, time).
+        then(function(element) {
+            var editable = element.editable && time === 'latest';
+            $rootScope.mms_tbApi.setPermission('element.editor', editable);
+            $rootScope.mms_tbApi.setPermission('view.reorder', editable);
+            $rootScope.mms_tbApi.setPermission("document.snapshot.create", editable);
+        });
+        $scope.specApi.setEditing(false);
+    });
+    $scope.$on('view.reorder', function() {
+        $scope.viewOrderApi.setEditing(true);
+        showPane('reorder');
+    });
+    
+    var elementSaving = false;
+    $scope.$on('element.editor.save', function() {
+        if (elementSaving) {
+            growl.info('Please Wait...');
+            return;
+        }
+        elementSaving = true;
+        $rootScope.mms_tbApi.toggleButtonSpinner('element.editor.save');
+        $scope.specApi.save().then(function(data) {
+            elementSaving = false;
+            growl.success('Save Successful');
+            $rootScope.mms_tbApi.toggleButtonSpinner('element.editor.save');
+            delete $rootScope.veEdits[$scope.specApi.getEdits().sysmlid];
+            if (Object.keys($rootScope.veEdits).length > 0) {
+                var next = Object.keys($rootScope.veEdits)[0];
+                $scope.etrackerSelected = next;
+                $scope.specApi.keepMode();
+                $scope.eid = next;
+            } else {
+                $scope.specApi.setEditing(false);
+                $rootScope.mms_tbApi.select('element.viewer');
+                if (Object.keys($rootScope.veEdits).length === 0) {
+                    $rootScope.mms_tbApi.setIcon('element.editor', 'fa-edit');
+                }
+            }
+        }, function(reason) {
+            elementSaving = false;
+            if (reason.type === 'info')
+                growl.info(reason.message);
+            else if (reason.type === 'warning')
+                growl.warning(reason.message);
+            else if (reason.type === 'error')
+                growl.error(reason.message);
+            $rootScope.mms_tbApi.toggleButtonSpinner('element.editor.save');
+        });
+
+        $rootScope.mms_tbApi.select('element.editor');
+    });
+
+    var savingAll = false;
+    $scope.$on('element.editor.saveall', function() {
+        if (savingAll) {
+            growl.info('Please wait...');
+            return;
+        }
+        if (Object.keys($rootScope.veEdits).length === 0) {
+            growl.info('Nothing to save');
+            return;
+        }
+        if ($rootScope.veSpecApi && $rootScope.veSpecApi.tinymceSave)
+            $rootScope.veSpecApi.tinymceSave();
+        savingAll = true;
+        $rootScope.mms_tbApi.toggleButtonSpinner('element.editor.saveall');
+        var promises = [];
+        angular.forEach($rootScope.veEdits, function(value, key) {
+            var defer = $q.defer();
+            promises.push(defer.promise);
+            ElementService.updateElement(value, ws)
+            .then(function(e) {
+                defer.resolve({status: 200, id: e.sysmlid});
+            }, function(reason) {
+                defer.resolve({status: reason.status, id: value.sysmlid});
+            });
+        });
+        $q.all(promises).then(function(results) {
+            var somefail = false;
+            var failed = null;
+            results.forEach(function(ob) {
+                if (ob.status === 200)
+                    delete $rootScope.veEdits[ob.id];
+                else {
+                    somefail = true;
+                    failed = ob.id;
+                }
+            });
+            if (!somefail) {
+                growl.success("Save All Successful");
+                $rootScope.mms_tbApi.select('element.viewer');
+            } else {
+                $rootScope.$broadcast('elementSelected', failed);
+                growl.error("Some elements failed to save, resolve individually in edit pane");
+            }
+           $rootScope.mms_tbApi.toggleButtonSpinner('element.editor.saveall');
+            savingAll = false;
+
+            if (Object.keys($rootScope.veEdits).length === 0) {
+                $rootScope.mms_tbApi.setIcon('element.editor', 'fa-edit');
+            }
+        });
+    });
+    $scope.$on('element.editor.cancel', function() {
+        var go = function() {
+            delete $rootScope.veEdits[$scope.specApi.getEdits().sysmlid];
+            $scope.specApi.revertEdits();
+            if (Object.keys($rootScope.veEdits).length > 0) {
+                var next = Object.keys($rootScope.veEdits)[0];
+                $scope.etrackerSelected = next;
+                $scope.specApi.keepMode();
+                $scope.eid = next;
+            } else {
+                $scope.specApi.setEditing(false);
+                $rootScope.mms_tbApi.select('element.viewer');
+                $rootScope.mms_tbApi.setIcon('element.editor', 'fa-edit');
+            }
+        };
+        if ($scope.specApi.hasEdits()) {
+            var instance = $modal.open({
+                templateUrl: 'partials/ve/cancelConfirm.html',
+                scope: $scope,
+                controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
+                    $scope.ok = function() {
+                        $modalInstance.close('ok');
+                    };
+                    $scope.cancel = function() {
+                        $modalInstance.dismiss();
+                    };
+                }]
+            });
+            instance.result.then(function() {
+                go();
+            });
+        } else
+            go();
+    });
+    var viewSaving = false;
+    $scope.$on('view.reorder.save', function() {
+        if (viewSaving) {
+            growl.info('Please Wait...');
+            return;
+        }
+        viewSaving = true;
+        $rootScope.mms_tbApi.toggleButtonSpinner('view.reorder.save');
+        $scope.viewOrderApi.save().then(function(data) {
+            viewSaving = false;
+            growl.success('Save Succesful');
+            $rootScope.mms_tbApi.toggleButtonSpinner('view.reorder.save');
+        }, function(reason) {
+            viewSaving = false;
+            if (reason.type === 'info')
+                growl.info(reason.message);
+            else if (reason.type === 'warning')
+                growl.warning(reason.message);
+            else if (reason.type === 'error')
+                growl.error(reason.message);
+            $rootScope.mms_tbApi.toggleButtonSpinner('view.reorder.save');
+        });
+        $rootScope.mms_tbApi.select('view.reorder');
+    });
+    $scope.$on('view.reorder.cancel', function() {
+        $scope.specApi.setEditing(false);
+        $scope.viewOrderApi.revertEdits();
+        $rootScope.mms_tbApi.select('element.viewer');
+        showPane('element');
+    });
+}])
 .controller('TreeCtrl', ['$anchorScroll' , '$filter', '$location', '$modal', '$scope', '$rootScope', '$state', '$stateParams', '$timeout', 'growl', 
                           'UxService', 'ConfigService', 'ElementService', 'UtilsService', 'WorkspaceService', 'ViewService',
                           'workspaces', 'sites', 'document', 'views',
@@ -357,6 +899,22 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
     }
     // TODO: Update behavior to handle new state descriptions
     $scope.my_tree_handler = function(branch) {
+      if ($state.current.name === 'workspace') {
+        if (branch.type === 'Workspace')
+            $state.go('workspace', {workspace: branch.data.id});
+      } else if ($state.current.name === 'workspace.site') {
+        if (branch.type === 'site') {
+            $state.go('workspace.site', {site: branch.data.sysmlid});
+        }
+      } else if ($state.current.name === 'workspace.site.document' || 
+                 $state.current.name === 'workspace.site.document.view') {
+        if (branch.type === 'view') {
+            $state.go('workspace.site.document.view', {view: branch.data.sysmlid});
+        }
+      }
+      else {
+        // TODO: re-route old stuff
+
         if (branch.type === 'Workspace')
             $state.go('mm.workspace', {ws: branch.data.id});
         else if (branch.type === 'Configuration')
@@ -385,8 +943,9 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
                 $state.go('doc.view', {viewId: viewId});
             }
         }
+    }
 
-        $rootScope.tbApi.select('element.viewer');
+        // $rootScope.mms_tbApi.select('element.viewer');
 
     };
 
