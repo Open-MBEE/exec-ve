@@ -13,23 +13,23 @@
 
   <div class="pane-center-inner">
   
-    <div ng-if="wsCoverDoc !== null">
+    <div ng-if="wsCoverDoc">
         <div ng-if="config === 'latest'">
             <a href="ve.html#/workspaces/{{ws}}/sites/no_site/products/{{wsCoverDoc.sysmlid}}/latest/view/{{wsCoverDoc.sysmlid}}">Edit Cover Page View</a> 
         </div>  
         <mms-view mms-vid="{{wsCoverDoc.sysmlid}}" mms-version="{{time}}" mms-ws="{{ws}}"></mms-view>
     </div>
     
-    <h4 ng-if="ws"><a class="docweb-link" href="portal.html#/workspaces/{{ws}}/tags/{{config}}">Sites</a></h4>
-
+    <h4 ng-if="ws"><a class="docweb-link" href="portal.html#/workspaces/{{ws}}/tags/{{config}}">Sites and Documents</a></h4>
+<!--
     <div ng-repeat="site in sites | orderBy: 'name'">
-        <!-- <h4 style="display:inline;">{{document.name}}</h4> -->
 
       <i class="fa fa-sitemap"></i> <a class="dash-link" href="portal.html#/workspaces/{{ws}}/tags/{{config}}/sites/{{site.sysmlid}}">{{site.name}}</a>   
 
       <a class="dash-link" href="portal.html#/workspaces/{{ws}}/tags/{{config}}/sites/{{site.sysmlid}}" target="_blank"> <span class="fa fa-external-link"></span></a>   
 
     </div>
+  -->
 
   </div>
 

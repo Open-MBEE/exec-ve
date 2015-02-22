@@ -16,24 +16,19 @@
 
       <ul class="nav-btns-main">
         <li>
-          <a class="nav-btn" tooltip="Workspaces" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom-left" href="mm.html"><i class="fa fa-code-fork"></i></a>
+          <a class="nav-btn" tooltip="Tasks and Tags" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom-left" href="mm.html"><i class="fa fa-tasks"></i></a>
         </li>
 
-        <span ng-show="ws">
-          <li> <i class="fa fa-ellipsis-v"></i> {{wsName}} <span ng-if="config !== 'latest'">({{configName}})</span> <i class="fa fa-angle-double-right"></i><li>
-          <li>
-            <a class="nav-btn" tooltip="Portal" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" href="portal.html#/workspaces/{{ws}}/tags/{{config}}"><i class="fa fa-sitemap"></i></a>
-          </li>
-          <span ng-show="site">
-            <li class=""> <i class="fa fa-ellipsis-v"></i> {{siteTitle}} <i class="fa fa-angle-double-right"></i></li>
-            <span ng-show="product">
-              <li>
-                <i class="fa fa-book"></i>
-              </li>
-              <li class=""> {{product.name}} {{snapshot}}</li>
-            </span>
-          </span>
-        <span>
+        <li ng-show="ws"> <i class="fa fa-ellipsis-v"></i> {{wsName}} <span ng-if="config !== 'latest'">({{configName}})</span> <i class="fa fa-angle-double-right"></i><li>
+        <li ng-show="ws">
+          <a class="nav-btn" tooltip="Sites and Documents" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" href="portal.html#/workspaces/{{ws}}/tags/{{config}}"><i class="fa fa-folder"></i></a>
+        </li>
+        <li ng-show="site"> <i class="fa fa-ellipsis-v"></i> {{siteTitle}} <i class="fa fa-angle-double-right"></i></li>
+        <li ng-show="product">
+          <a class="nav-btn"><i class="fa fa-file"></i></a>
+        </li>
+        <li ng-show="product"> {{product.name}} {{snapshot}}</li>
+ 
       </ul>
 
       <!-- Goto dropdown
@@ -111,7 +106,7 @@
         </li>
 
         <li>
-          <a class="nav-btn logout-btn" tooltip="Logout" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" href="/alfresco/service/logout/info?next=/alfresco/mmsapp/docweb.html%23/workspaces/{{ws}}/sites/{{site}}"><i class="fa fa-sign-out"></i></a>
+          <a class="nav-btn logout-btn" tooltip="Logout" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" href="/alfresco/service/logout/info?next=/alfresco/mmsapp/mm.html"><i class="fa fa-sign-out"></i></a>
         </li>
 
       </ul>

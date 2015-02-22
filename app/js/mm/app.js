@@ -12,7 +12,7 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
         },
         views: {
             'menu': {
-                template: '<mms-nav mms-title="Model Manager" mms-ws="master" mms-config="latest"></mms-nav>'
+                template: '<mms-nav mms-title="Model Manager"></mms-nav>'
             },
             'pane-center': {
                 templateUrl: 'partials/mm/pane-center.html'

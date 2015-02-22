@@ -124,6 +124,15 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
     .state('portal.site.view', {
         url: '/docs/:docid',
         resolve: {
+            snapshot: function(configSnapshots, $stateParams) {
+                var docid = $stateParams.docid;
+                var found = null;
+                configSnapshots.forEach(function(snapshot) {
+                    if (docid === snapshot.sysmlid)
+                        found = snapshot;
+                });
+                return found; 
+            }
         },
         views: {
             'pane-center@': {

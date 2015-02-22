@@ -219,6 +219,7 @@ function ($rootScope, $scope, $stateParams, documents, config, configSnapshots, 
                 if(status == 'Generating'){
                     status = 'Generating...';
                 }
+                else if(status == 'Error') status = 'Regenerate PDF';
                 $scope.pdfText = status;
                 return status;
             }
@@ -227,70 +228,69 @@ function ($rootScope, $scope, $stateParams, documents, config, configSnapshots, 
     };
 
     $scope.getPDFUrl = function(snapshot){
-        $scope.pdfText = "Regenerate PDF";
         var formats = snapshot.formats;
         if(!formats || formats.length===0) return null;
         for(var i=0; i < formats.length; i++){
-            if(formats[i].type=='pdf') return formats[i].url;
+            if(formats[i].type=='pdf'){
+                return formats[i].url;
+            }
         }
         return null;
     };
 
-    $scope.getHTMLStatus = function(snapshot){
-        $scope.htmlText = "Generate HTML";
+    $scope.getZipStatus = function(snapshot){
+        $scope.zipText = "Generate Zip";
         var formats = snapshot.formats;
         if(!formats || formats.length===0) return null;
         for(var i=0; i < formats.length; i++){
             if(formats[i].type=='html') {
                 var status = formats[i].status;
                 if(status == 'Generating') status = 'Generating...';
-                $scope.htmlText = status;
+                else if(status == 'Error') status = 'Regenerate Zip';
+                $scope.zipText = status;
                 return status;
             }
         }
         return null;
     };
 
-    $scope.getHTMLUrl = function(snapshot){
+    $scope.getZipUrl = function(snapshot){
         if(angular.isUndefined(snapshot)) return null;
         if(snapshot===null) return null;
-        //$scope.htmlText = "Generate HTML";
+        
         var formats = snapshot.formats;
         if(formats===undefined || formats===null || formats.length===0) return null;
         for(var i=0; i < formats.length; i++){
-            if(formats[i].type=='html') return formats[i].url;
+            if(formats[i].type=='html'){
+                return formats[i].url;  
+            } 
         }
         return null;
+    };
+
+    $scope.generateArtifacts = function(snapshot, elem){
+        snapshot.formats.push({"type":"pdf", "status":"Generating"});
+        snapshot.formats.push({"type":"html", "status":"Generating"});
+        ConfigService.createSnapshotArtifact(snapshot, $scope.site, $scope.ws).then(
+            function(result){
+                growl.success('Generating artifacts...');
+            },
+            function(reason){
+                growl.error('Failed to generate artifacts: ' + reason.message);
+            }
+        );
     };
 
     $scope.generatePdf = function(snapshot, elem){
         if (elem.pdfText === 'Generating...')
             return;
-        elem.pdfText = "Generating...";
-        snapshot.formats.push({"type":"pdf"});
-        ConfigService.createSnapshotArtifact(snapshot, $scope.site, $scope.ws).then(
-            function(result){
-                growl.success('Generating PDF...');
-            },
-            function(reason){
-                growl.error('Failed to generate PDF: ' + reason.message);
-            }
-        );
+        $scope.generateArtifacts(snapshot, elem);
     };
 
-    $scope.generateHtml = function(snapshot, elem){
-        if (elem.htmlText === 'Generating...')
+    $scope.generateZip = function(snapshot, elem){
+        if (elem.zipText === 'Generating...')
             return;
-        elem.htmlText = "Generating...";
-        snapshot.formats.push({"type":"html"});
-        ConfigService.createSnapshotArtifact(snapshot, $scope.site, $scope.ws).then(
-            function(result){
-                growl.success('Generating HTML...');
-            },
-            function(reason){
-                growl.error('Failed to generate HTML: ' + reason.message);
-            }
-        );
+        $scope.generateArtifacts(snapshot, elem);
     };
 }])
 .controller('ToolCtrl', ['$scope', '$rootScope', '$timeout', 'configurations', 'ws',
@@ -300,8 +300,8 @@ function($scope, $rootScope, $timeout, configurations, ws) {
     $scope.configurations = configurations;
     $rootScope.togglePane = $scope.$pane;    
 }])
-.controller('DocCtrl', ['$scope', '$rootScope', 'ws', 'config', '$stateParams', 'site',
-function($scope, $rootScope, ws, config, $stateParams, site) {
+.controller('DocCtrl', ['$scope', '$rootScope', 'ws', 'config', '$stateParams', 'site', 'snapshot', 'ConfigService', 'growl',
+function($scope, $rootScope, ws, config, $stateParams, site, snapshot, ConfigService, growl) {
     $scope.ws = ws;
     if (config === 'latest')
         $scope.time = 'latest';
@@ -310,4 +310,89 @@ function($scope, $rootScope, ws, config, $stateParams, site) {
     $scope.docid = $stateParams.docid;
     $scope.api = {};
     $scope.site = site;
+    $scope.snapshot = snapshot;
+    $scope.pdfText = "Generate PDF";
+    $scope.getPDFStatus = function(){
+        
+        var formats = snapshot.formats;
+        if(!formats || formats.length===0) return null;
+        for(var i=0; i < formats.length; i++){
+            if(formats[i].type=='pdf') {
+                var status = formats[i].status;
+                if(status == 'Generating'){
+                    status = 'Generating...';
+                }
+                else if(status == 'Error') status = 'Regenerate PDF';
+                $scope.pdfText = status;
+                return status;
+            }
+        }
+        return null;
+    };
+
+    $scope.getPDFUrl = function(){
+        var formats = snapshot.formats;
+        if(!formats || formats.length===0) return null;
+        for(var i=0; i < formats.length; i++){
+            if(formats[i].type=='pdf'){
+                return formats[i].url;
+            }
+        }
+        return null;
+    };
+
+    $scope.zipText = "Generate Zip";
+    $scope.getZipStatus = function(){
+        var formats = snapshot.formats;
+        if(!formats || formats.length===0) return null;
+        for(var i=0; i < formats.length; i++){
+            if(formats[i].type=='html') {
+                var status = formats[i].status;
+                if(status == 'Generating') status = 'Generating...';
+                else if(status == 'Error') status = 'Regenerate Zip';
+                $scope.zipText = status;
+                return status;
+            }
+        }
+        return null;
+    };
+
+    $scope.getZipUrl = function(){
+        if(angular.isUndefined(snapshot)) return null;
+        if(snapshot===null) return null;
+        
+        var formats = snapshot.formats;
+        if(formats===undefined || formats===null || formats.length===0) return null;
+        for(var i=0; i < formats.length; i++){
+            if(formats[i].type=='html'){
+                return formats[i].url;  
+            } 
+        }
+        return null;
+    };
+
+    $scope.generateArtifacts = function(){
+        $scope.snapshot.formats.push({"type":"pdf", "status":"Generating"});
+        $scope.snapshot.formats.push({"type":"html", "status":"Generating"});
+        ConfigService.createSnapshotArtifact($scope.snapshot, $scope.site, $scope.ws).then(
+            function(result){
+                growl.success('Generating artifacts...');
+            },
+            function(reason){
+                growl.error('Failed to generate artifacts: ' + reason.message);
+            }
+        );
+    };
+
+    $scope.generatePdf = function(){
+        if ($scope.pdfText === 'Generating...')
+            return;
+        $scope.generateArtifacts();
+    };
+
+    $scope.generateZip = function(){
+        if ($scope.zipText === 'Generating...')
+            return;
+        $scope.generateArtifacts();
+    };
 }]);
