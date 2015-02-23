@@ -116,16 +116,16 @@ function mmsToolbar($templateCache) {
                 return;
 
             var toggleDecativeFlag = false;
-            if (this.$root.togglePane) {
-                if (button.selected || this.$root.togglePane.closed) { 
-                    if (button.selected && ! this.$root.togglePane.closed)
+            if (this.$root.mms_togglePane) {
+                if (button.selected || this.$root.mms_togglePane.closed) { 
+                    if (button.selected && ! this.$root.mms_togglePane.closed)
                         toggleDecativeFlag = true;
-                    this.$root.togglePane.toggle();
+                    this.$root.mms_togglePane.toggle();
                 }
             }
 
-            if (this.$root.tbApi)
-                this.$root.tbApi.select(button.id);
+            if (this.$root.mms_tbApi)
+                this.$root.mms_tbApi.select(button.id);
 
             if (button.onClick)
                 button.onClick();
@@ -133,7 +133,7 @@ function mmsToolbar($templateCache) {
                 scope.onClick({button: button});
 
             if (toggleDecativeFlag)
-                this.$root.tbApi.deactivate(button.id);
+                this.$root.mms_tbApi.deactivate(button.id);
 
             /*if (! button.dynamic)
             {

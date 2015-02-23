@@ -3,8 +3,8 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('ToolbarCtrl', ['$scope', '$rootScope', '$timeout', 'UxService',
-function($scope, $rootScope, $timeout, UxService) {   
+.controller('ToolbarCtrl', ['$scope', '$rootScope', '$state', '$timeout', 'UxService',
+function($scope, $rootScope, $state, $timeout, UxService) {   
 
     $scope.tbApi = {};
     $scope.buttons = [];
@@ -24,14 +24,14 @@ function($scope, $rootScope, $timeout, UxService) {
       $scope.tbApi.addButton(UxService.getToolbarButton("element.viewer"));
       $scope.tbApi.addButton(UxService.getToolbarButton("element.editor"));
 
-      // TODO: if state is View Editor only
-      $scope.tbApi.addButton(UxService.getToolbarButton("view.reorder"));
-      $scope.tbApi.addButton(UxService.getToolbarButton("document.snapshot"));
-
-      // TODO: remove this button from UxService not needed anymore
-      // $scope.tbApi.addButton(UxService.getToolbarButton("element.editor.mm"));
-
-      $scope.tbApi.addButton(UxService.getToolbarButton("configurations"));
+      if ($state.current.name === 'workspace') {
+          $scope.tbApi.setPermission('element.editor', true);
+      } else if ($state.current.name === 'workspace.site') {
+          $scope.tbApi.addButton(UxService.getToolbarButton("configurations"));
+      } else if ($state.current.name === 'workspace.site.document') {
+          $scope.tbApi.addButton(UxService.getToolbarButton("view.reorder"));
+          $scope.tbApi.addButton(UxService.getToolbarButton("document.snapshot"));
+      }
 
     }, 500);
 
@@ -286,7 +286,7 @@ function($scope, $rootScope, $modal, $q, $stateParams,
     $scope.specApi = {};
     $rootScope.veSpecApi = $scope.specApi;
     $scope.viewOrderApi = {};
-    $rootScope.togglePane = $scope.$pane;
+    $rootScope.mms_togglePane = $scope.$pane;
 
     $scope.show = {
         element: true,
@@ -762,7 +762,7 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
             data.forEach(function (config) {
                 var configTreeNode = { 
                     label : config.name, 
-                    type : "Configuration",
+                    type : "configuration",
                     data : config, 
                     workspace: workspaceId,
                     children : [] 
@@ -772,7 +772,7 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
                 // if so add the workspace as a child of the configiration it was tasked from
                 for (var i = 0; i < workspaceTreeNode.children.length; i++) {
                     var childWorkspaceTreeNode = workspaceTreeNode.children[i];
-                    if (childWorkspaceTreeNode.type === 'Workspace') {
+                    if (childWorkspaceTreeNode.type === 'workspace') {
                         if (childWorkspaceTreeNode.data.branched === config.timestamp) {
                             configTreeNode.children.push(childWorkspaceTreeNode);
                             
@@ -831,7 +831,7 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
 
     var dataTree;
     if ($state.current.name === 'workspace') {
-        dataTree = UtilsService.buildTreeHierarchy(workspaces, "id", "Workspace", "parent", workspaceLevel2Func);
+        dataTree = UtilsService.buildTreeHierarchy(workspaces, "id", "workspace", "parent", workspaceLevel2Func);
         $scope.my_data = dataTree;
     } else if ($state.current.name === 'workspace.site') {
         dataTree = UtilsService.buildTreeHierarchy(sites, "sysmlid", "site", "parent", siteLevel2Func);
@@ -900,7 +900,7 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
     // TODO: Update behavior to handle new state descriptions
     $scope.my_tree_handler = function(branch) {
       if ($state.current.name === 'workspace') {
-        if (branch.type === 'Workspace')
+        if (branch.type === 'workspace')
             $state.go('workspace', {workspace: branch.data.id});
       } else if ($state.current.name === 'workspace.site') {
         if (branch.type === 'site') {
@@ -915,7 +915,7 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
       else {
         // TODO: re-route old stuff
 
-        if (branch.type === 'Workspace')
+        /* if (branch.type === 'Workspace')
             $state.go('mm.workspace', {ws: branch.data.id});
         else if (branch.type === 'Configuration')
             $state.go('mm.workspace.config', {ws: branch.workspace, config: branch.data.id});
@@ -942,7 +942,7 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
                     $rootScope.veViewLoading = true;
                 $state.go('doc.view', {viewId: viewId});
             }
-        }
+        } */
     }
 
         // $rootScope.mms_tbApi.select('element.viewer');
@@ -953,14 +953,14 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
     var sortFunction = function(a, b) {
 
         a.priority = 100;
-        if (a.type === 'Configuration') {
+        if (a.type === 'configuration') {
             a.priority = 0 ;
-        } else if (a.type === 'View') {
+        } else if (a.type === 'view') {
             a.priority = 1;
         }
 
         b.priority = 100;
-        if (b.type === 'Configuration') {
+        if (b.type === 'configuration') {
             b.priority = 0 ;
         } else if (a.type === 'view') {
             a.priority = 1;
@@ -1102,7 +1102,7 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
             growl.warning("Add Task Error: Select a task or tag first");
             return;
         }
-        if (branch.type === 'Configuration') {
+        if (branch.type === 'configuration') {
             $scope.createWsParentId = branch.workspace;
             $scope.createWsTime = branch.data.timestamp;
             $scope.from = 'Tag ' + branch.data.name;
@@ -1119,7 +1119,7 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
         instance.result.then(function(data) {
             var newbranch = {
                 label: data.name,
-                type: "Workspace",
+                type: "workspace",
                 data: data,
                 children: []
             };
@@ -1141,7 +1141,7 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
         if (!branch) {
             growl.warning("Add Tag Error: Select parent task first");
             return;
-        } else if (branch.type != "Workspace") {
+        } else if (branch.type != "workspace") {
             growl.warning("Add Tag Error: Selection must be a task");
             return;
         }
@@ -1158,7 +1158,7 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
         instance.result.then(function(data) {
           $scope.treeApi.add_branch(branch, {
               label: data.name,
-              type: "Configuration",
+              type: "configuration",
               workspace: branch.data.id,
               data: data,
               children: []
@@ -1184,7 +1184,7 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
         instance.result.then(function(data) {
             // If the deleted item is a configration, then all of its child workspaces
             // are re-associated with the parent task of the configuration
-            if (branch.type === 'Configuration') {
+            if (branch.type === 'configuration') {
                 var parentWsBranch = $scope.treeApi.get_parent_branch(branch);
                 branch.children.forEach(function(branchChild) {
                     parentWsBranch.children.push(branchChild);
@@ -1221,7 +1221,7 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
     var deleteCtrl = function($scope, $modalInstance) {
         $scope.oking = false;
         var branch = $scope.deleteBranch;
-        $scope.type = branch.type === 'Workspace' ? 'Task' : 'Tag';
+        $scope.type = branch.type === 'workspace' ? 'task' : 'tag';
         $scope.name = branch.data.name;
         $scope.ok = function() {
             if ($scope.oking) {
@@ -1229,7 +1229,7 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
                 return;
             }
             $scope.oking = true;
-            if (branch.type === "Workspace") {
+            if (branch.type === "workspace") {
                 WorkspaceService.deleteWorkspace(branch.data.id)
                 .then(function(data) {
                     growl.success("Task Deleted");
@@ -1239,7 +1239,7 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
                 }).finally(function() {
                     $scope.oking = false;
                 });
-            } else if (branch.type === "Configuration") {
+            } else if (branch.type === "configuration") {
                 ConfigService.deleteConfig(branch.data.id)
                 .then(function(data) {
                     growl.success("Tag Deleted");
