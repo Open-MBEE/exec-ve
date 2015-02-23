@@ -182,14 +182,15 @@ function mmsNav(SiteService, WorkspaceService, ConfigService, $templateCache, gr
         .then(function(data) {
             scope.wsName = data.name;
         });
-        if (scope.config && scope.config !== '' && scope.config !== 'latest') {
+        
+        /*if (scope.config && scope.config !== '' && scope.config !== 'latest') {
             ConfigService.getConfig(scope.config, scope.ws, false)
             .then(function(data) {
                 scope.configName = data.name;
             });
         } else {
             scope.config = 'latest';
-        }
+        } */
 
         SiteService.getSites()
         .then(function(data) {
@@ -230,9 +231,9 @@ function mmsNav(SiteService, WorkspaceService, ConfigService, $templateCache, gr
         scope: {
             title: '@mmsTitle', //page title - used in mobile view only
             ws: '@mmsWs',
-            site: '@mmsSite', //current site name
+            site: '=mmsSite', //current site name
             product: '=mmsDoc', //current document
-            config: '@mmsConfig', //config id
+            config: '=mmsConfig', //config id
             snapshot: '@mmsSnapshotTag' // snapshot titles (before tags - need to be backward compatible), if any
 
         },

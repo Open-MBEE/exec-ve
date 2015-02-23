@@ -27,8 +27,9 @@ function($scope, $rootScope, $state, $timeout, UxService) {
       if ($state.current.name === 'workspace') {
           $scope.tbApi.setPermission('element.editor', true);
       } else if ($state.current.name === 'workspace.site') {
-          $scope.tbApi.addButton(UxService.getToolbarButton("configurations"));
-      } else if ($state.current.name === 'workspace.site.document') {
+          $scope.tbApi.setPermission('element.editor', true);
+          $scope.tbApi.addButton(UxService.getToolbarButton("tags"));
+      } else if ($state.includes('workspace.site.document')) {
           $scope.tbApi.addButton(UxService.getToolbarButton("view.reorder"));
           $scope.tbApi.addButton(UxService.getToolbarButton("document.snapshot"));
       }
@@ -38,8 +39,8 @@ function($scope, $rootScope, $state, $timeout, UxService) {
     $scope.onClick = function(button) {
     };
 }])
-.controller('ViewCtrl', ['$scope', '$rootScope', '$stateParams', '$timeout', '$modal', 'viewElements', 'ElementService', 'ViewService', 'time', 'growl', 'site', 'view',
-function($scope, $rootScope, $stateParams, $timeout, $modal, viewElements, ElementService, ViewService, time, growl, site, view) {
+.controller('ViewCtrl', ['$scope', '$rootScope', '$state', '$stateParams', '$timeout', '$modal', 'viewElements', 'ElementService', 'ViewService', 'time', 'growl', 'site', 'view',
+function($scope, $rootScope, $state, $stateParams, $timeout, $modal, viewElements, ElementService, ViewService, time, growl, site, view) {
     if (!$rootScope.veCommentsOn)
         $rootScope.veCommentsOn = false;
     if (!$rootScope.veElementsOn)
@@ -51,6 +52,7 @@ function($scope, $rootScope, $stateParams, $timeout, $modal, viewElements, Eleme
     $scope.viewElements = viewElements;
     $scope.site = site;
     var elementSaving = false;
+
     $scope.buttons = [
         {
             action: function() {
@@ -207,7 +209,7 @@ function($scope, $rootScope, $stateParams, $timeout, $modal, viewElements, Eleme
             },
             tooltip: "Previous",
             icon: "fa-chevron-left",
-            permission: true
+            permission: $state.includes('workspace.site.document')
         },
         {
             action: function() {
@@ -219,7 +221,7 @@ function($scope, $rootScope, $stateParams, $timeout, $modal, viewElements, Eleme
             },
             tooltip: "Next",
             icon: "fa-chevron-right",
-            permission: true
+            permission: $state.includes('workspace.site.document')
         }
     ];
     
@@ -582,10 +584,10 @@ function($scope, $rootScope, $modal, $q, $stateParams,
 }])
 .controller('TreeCtrl', ['$anchorScroll' , '$filter', '$location', '$modal', '$scope', '$rootScope', '$state', '$stateParams', '$timeout', 'growl', 
                           'UxService', 'ConfigService', 'ElementService', 'UtilsService', 'WorkspaceService', 'ViewService',
-                          'workspaces', 'sites', 'document', 'views',
+                          'workspaces', 'sites', 'document', 'views', 'time', 'configSnapshots',
 function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, $stateParams, $timeout, growl, 
           UxService, ConfigService, ElementService, UtilsService, WorkspaceService, ViewService,
-          workspaces, sites, document, views) {
+          workspaces, sites, document, views, time, configSnapshots) {
 
     $rootScope.mms_bbApi = $scope.bbApi = {};
 
@@ -597,11 +599,13 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
 
     $scope.buttons = [];
 
+    $scope.treeSectionNumbering = false;
+    if ($state.includes('workspace.site.document')) {
+        $scope.treeSectionNumbering = true;
+    }
 
     // TODO: pull in config/tags
-    var time = 'latest';
     var config = time;
-    var configSnapshots = null;
     var ws = $stateParams.workspace;
 
     if (document !== null) {
@@ -623,7 +627,7 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
       } else if ($state.current.name === 'workspace.site') {
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree.add.document"));
         $scope.bbApi.setPermission("tree.add.document", config == 'latest' ? true : false);
-      } else if ($state.current.name === 'workspace.site.document') {
+      } else if ($state.includes('workspace.site.document')) {
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree.add.view"));
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree.delete.view"));
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree.reorder.view"));
@@ -902,10 +906,14 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
       if ($state.current.name === 'workspace') {
         if (branch.type === 'workspace')
             $state.go('workspace', {workspace: branch.data.id});
+        else if (branch.type === 'configuration')
+            $state.go('workspace', {workspace: branch.workspace, tag: branch.data.id});
       } else if ($state.current.name === 'workspace.site') {
-        if (branch.type === 'site') {
+        if (branch.type === 'site')
             $state.go('workspace.site', {site: branch.data.sysmlid});
-        }
+        else if (branch.type === 'view' || branch.type === 'snapshot')
+            $state.go('workspace.site.document', {document: branch.data.sysmlid});
+            // $rootScope.portalDocBranch = branch;
       } else if ($state.current.name === 'workspace.site.document' || 
                  $state.current.name === 'workspace.site.document.view') {
         if (branch.type === 'view') {
@@ -945,7 +953,7 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
         } */
     }
 
-        // $rootScope.mms_tbApi.select('element.viewer');
+    $rootScope.mms_tbApi.select('element.viewer');
 
     };
 
@@ -994,6 +1002,12 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
         $scope.addWorkspace();        
       } else if (itemType === 'Tag') {
         $scope.addConfiguration();
+      } else if (itemType === 'Document') {
+        $scope.addDocument();
+      } else if (itemType === 'View') {
+        $scope.addView();
+      } else {
+        growl.error("Add Item of Type " + itemType + " is not supported");
       }
 
     };
@@ -1086,7 +1100,7 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
                   children: []
               });
               
-              $state.go('doc.view', {viewId: data.sysmlid});
+              $state.go('workspace.site.document.view', {view: data.sysmlid});
 
             });
 
@@ -1166,6 +1180,31 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
         });
     };
 
+    // TODO: merge with addItem and remove
+    $scope.addDocument = function() {
+        var branch = $scope.treeApi.get_selected_branch();
+        if (!branch || branch.type !== 'site') {
+            growl.warning("Select a site to add document under");
+            return;
+        }
+        $scope.addDocSite = branch.data.sysmlid;
+        var instance = $modal.open({
+            templateUrl: 'partials/portal/newDoc.html',
+            scope: $scope,
+            controller: ['$scope', '$modalInstance', addDocCtrl]
+        });
+        instance.result.then(function(data) {
+            var newbranch = {
+                label: data.name,
+                type: 'view',
+                data: data,
+                children: [],
+                site: branch.data.sysmlid
+            };
+            $scope.treeApi.add_branch(branch, newbranch);
+        });
+    };
+
 
     $scope.deleteItem = function() {
         var branch = $scope.treeApi.get_selected_branch();
@@ -1210,7 +1249,7 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
         var instance = $modal.open({
             templateUrl: 'partials/ve/delete.html',
             scope: $scope,
-            controller: ['$scope', '$modalInstance', deleteCtrl]
+            controller: ['$scope', '$modalInstance', deleteViewCtrl]
         });
         instance.result.then(function(data) {
             $scope.treeApi.remove_branch(branch);

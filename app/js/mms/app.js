@@ -5,28 +5,29 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
     // TODO: Add default state to resolve to workspace : master
     $stateProvider
     .state('workspace', {
-        url: '/workspaces/:workspace',
+        url: '/workspaces/:workspace?tag',
         resolve: {
             workspaces: function(WorkspaceService) {
                 return WorkspaceService.getWorkspaces();
             },
-            sites: function(SiteService) { 
-                
-                // TODO: Sites based on config
-                /* if (config === 'latest')
-                    return SiteService.getSites();
-                return SiteService.getSites(config.timestamp); */
-                return SiteService.getSites(); 
+            workspace: function ($stateParams) {
+                return $stateParams.workspace;
             },
-            site: function($stateParams, SiteService) {
+            sites: function(SiteService, time) { 
+                
+                if (time === 'latest')
+                    return SiteService.getSites();
+                return SiteService.getSites(time);
+            },
+            site: function(SiteService) {
                 return SiteService.getSite('no_site');
             },
-            document : function($stateParams, ElementService, growl) {
+            document : function(ElementService, workspace, time, growl) {
             
                 // This is a short-term work-around -- all this should be done the back-end MMS in the future
                 var wsCoverDocId = 'master_cover';
 
-                return ElementService.getElement(wsCoverDocId, false, $stateParams.workspace, 'latest')
+                return ElementService.getElement(wsCoverDocId, false, workspace, time)
                 .then(function(data) {
                     return data;
                 }, function(reason) {
@@ -52,7 +53,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
                     doc.specialization.displayedElements = [wsCoverDocId];
                     doc.specialization.childrenViews = [];
 
-                    return ElementService.createElement(doc, $stateParams.workspace, null)
+                    return ElementService.createElement(doc, workspace, null)
                     .then(function(data) {
                         // growl.success('Created Document Successful');
                         return data;
@@ -65,31 +66,36 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
                     return null;
                 });
             },
-            views: function($stateParams, ViewService, document, time) {
-                return ViewService.getDocumentViews(document.sysmlid, false, $stateParams.workspace, time, true);
+            views: function(ViewService, workspace, document, time) {
+                return ViewService.getDocumentViews(document.sysmlid, false, workspace, time, true);
             },
-            viewElements: function($stateParams, ViewService, document, time) {
-                return ViewService.getViewElements(document.sysmlid, false, $stateParams.workspace, time);
+            viewElements: function(ViewService, workspace, document, time) {
+                return ViewService.getViewElements(document.sysmlid, false, workspace, time);
             },    
-            view: function($stateParams, ViewService, document, viewElements, time) {
-                return ViewService.getView(document.sysmlid, false, $stateParams.workspace, time);
+            view: function(ViewService, workspace, document, viewElements, time) {
+                return ViewService.getView(document.sysmlid, false, workspace, time);
+            },
+            tag: function ($stateParams, ConfigService, workspace) {
+                if ($stateParams.tag === undefined)
+                    return { name: 'latest', timestamp: 'latest' };
+                return ConfigService.getConfig($stateParams.tag, workspace, false);
             },        
-            time: function($stateParams) {
-                // TODO: grab from stateParams if exists
-                return 'latest';
+            configSnapshots: function(ConfigService, workspace, tag) {
+                if (tag.timestamp === 'latest')
+                    return [];
+                return ConfigService.getConfigSnapshots(tag.id, workspace, false);
+            },
+            time: function(tag) {
+                return tag.timestamp;
             }
         },
         views: {
             'menu': {
-                // TODO: mms-title generic
-                // TODO: mms-config generic 
-                // TODO: mms-nav links need to redirect to point to states instead of html url pages
-                template: '<mms-nav mms-title="Model Manager" mms-ws="{{workspace}}" mms-config="latest"></mms-nav>',
-                controller: function ($scope, $stateParams) {
-                    $scope.workspace = $stateParams.workspace;
+                template: '<mms-nav mms-title="Model Manager" mms-ws="{{workspace}}" mms-config="tag"></mms-nav>',
+                controller: function ($scope, workspace, tag) {
+                    $scope.workspace = workspace;
+                    $scope.tag = tag;
                 }
-                // TODO: mms-nav for portal
-                // TODO: mms-nav for view editor
             },
             'pane-left': {
                 templateUrl: 'partials/mms/pane-left.html',
@@ -115,11 +121,14 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
             site: function($stateParams, SiteService) {
                 return SiteService.getSite($stateParams.site);
             },
-            document : function($stateParams, ElementService, time, growl) {
-            
-                var siteCoverDocId = $stateParams.site + '_cover';
+            document : function($stateParams, ElementService, workspace, site, time, growl) {
+                var siteCoverDocId;
+                if ($stateParams.site === 'no_site')
+                    siteCoverDocId = 'master_cover';
+                else
+                    siteCoverDocId = site.sysmlid + '_cover';
 
-                return ElementService.getElement(siteCoverDocId, false, $stateParams.workspace, time)
+                return ElementService.getElement(siteCoverDocId, false, workspace, time)
                 .then(function(data) {
                     return data;
                 }, function(reason) {
@@ -133,7 +142,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
 
                     var doc = {
                         specialization: {type: "View"},
-                        name: $stateParams.site + ' Cover Page',
+                        name: site.sysmlid + ' Cover Page',
                         documentation: ''
                     };
                     doc.sysmlid = siteCoverDocId;
@@ -149,7 +158,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
                     doc.specialization.displayedElements = [siteCoverDocId];
                     doc.specialization.childrenViews = [];
 
-                    return ElementService.createElement(doc, $stateParams.workspace, $stateParams.site)
+                    return ElementService.createElement(doc, workspace, site.sysmlid)
                     .then(function(data) {
                         growl.success('Created Document Successful');
                         return data;
@@ -162,17 +171,25 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
                     return null;
                 });
             },
-            views: function($stateParams, ViewService, document, time) {
-                return ViewService.getDocumentViews(document.sysmlid, false, $stateParams.workspace, time, true);
+            views: function(ViewService, workspace, document, time) {
+                return ViewService.getDocumentViews(document.sysmlid, false, workspace, time, true);
             },
-            viewElements: function($stateParams, ViewService, document, time) {
-                return ViewService.getViewElements(document.sysmlid, false, $stateParams.workspace, time);
+            viewElements: function(ViewService, workspace, document, time) {
+                return ViewService.getViewElements(document.sysmlid, false, workspace, time);
             },    
-            view: function($stateParams, ViewService, document, viewElements, time) {
-                return ViewService.getView(document.sysmlid, false, $stateParams.workspace, time);
-            }            
+            view: function(ViewService, workspace, document, viewElements, time) {
+                return ViewService.getView(document.sysmlid, false, workspace, time);
+            }
         },
         views: {
+            'menu@': {
+                template: '<mms-nav mms-title="Portal" mms-ws="{{workspace}}" mms-site="site" mms-config="tag"></mms-nav>',
+                controller: function ($scope, workspace, site, tag) {
+                    $scope.workspace = workspace;
+                    $scope.tag = tag;
+                    $scope.site = site;
+                }
+            },
             'pane-left@': {
                 templateUrl: 'partials/mms/pane-left.html',
                 controller: 'TreeCtrl'
@@ -193,17 +210,67 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
                 if (document.specialization.type !== 'Product')
                     return [];
                 return ViewService.getDocumentViews($stateParams.document, false, $stateParams.workspace, time, true);
+            },
+            viewElements: function($stateParams, ViewService, time) {
+                return ViewService.getViewElements($stateParams.document, false, $stateParams.workspace, time);
+            },
+            view: function($stateParams, ViewService, viewElements, time) {
+                return ViewService.getView($stateParams.document, false, $stateParams.workspace, time);
             }
         },
         views: {
+            'menu@': {
+                template: '<mms-nav mms-title="View Editor" mms-ws="{{workspace}}" mms-site="site" mms-doc="document" mms-config="tag"></mms-nav>',
+                controller: function ($scope, workspace, site, document, tag) {
+                    $scope.workspace = workspace;
+                    $scope.tag = tag;
+                    $scope.site = site;
+                    $scope.document = document;
+
+                    /* 
+                    TODO: snapshot tag
+                    controller: function($scope, $stateParams, $filter, document, site, snapshots, time, ws) {
+                    var tag = '';
+                    if (time !== 'latest') {
+                        snapshots.forEach(function(snapshot) {
+                            if (time === snapshot.created && snapshot.configurations && snapshot.configurations.length > 0)
+                                snapshot.configurations.forEach(function(config) {
+                                    tag += '(' + config.name + ') ';
+                                    $scope.config = config.id;
+                                });
+                        });
+                        tag += '(' + $filter('date')(time, 'M/d/yy h:mm a') + ')';
+                    } else {
+                        $scope.config = 'latest';
+                    } 
+                    
+                    $scope.ws = ws;
+                    $scope.site = site.sysmlid;
+                    $scope.document = document;
+                    if ($stateParams.time !== 'latest')
+                        $scope.snapshotTag = ' ' + tag;
+                    
+
+                } */
+
+                }
+            },
             'pane-left@': {
                 templateUrl: 'partials/mms/pane-left.html',
                 controller: 'TreeCtrl'
+            },          
+            'pane-center@': {
+                templateUrl: 'partials/mms/pane-center.html',
+                controller: 'ViewCtrl'
+            },
+            'pane-right@': {
+                templateUrl: 'partials/mms/pane-right.html',
+                controller: 'ToolCtrl'
             }
         }
     })
     .state('workspace.site.document.view', {
-        url: '/view/:view',
+        url: '/views/:view',
         views: {
             'pane-center@': {
                 templateUrl: 'partials/mms/pane-center.html',

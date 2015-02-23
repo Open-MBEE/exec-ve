@@ -39,6 +39,9 @@ function UxService($rootScope) {
 		  case "document.snapshot":
 		  	return  {id: button, icon: 'fa-camera', selected: false, active: true, permission:true, tooltip: 'Snapshots',
 		            spinner: false, onClick: function() {$rootScope.$broadcast(button);}};
+		  case "tags":
+            return {id: button, icon: 'fa-tag', selected: false, active: true, permission: true, tooltip: 'Tags',
+                    spinner: false, onClick: function() {$rootScope.$broadcast(button);}};
 		  case "element.editor.save":
 			return {id: button, icon: 'fa-save', pullDown: true, dynamic: true, selected: false, active: false, permission:true, tooltip: 'Save',
 				        spinner: false, onClick: function() {$rootScope.$broadcast(button);}};
@@ -60,9 +63,6 @@ function UxService($rootScope) {
 		  case "document.snapshot.create":
 		    return {id: button, icon: 'fa-plus', dynamic: true, selected: false, active: false, permission:false, tooltip: 'Create Snapshot',
 		            spinner: false, onClick: function() {$rootScope.$broadcast(button);}};
-		  case "configurations":
-            return {id: button, icon: 'fa-tag', dynamic: true, selected: false, active: true, permission: true, tooltip: 'Tags',
-                    spinner: false, onClick: function() {$rootScope.$broadcast(button);}};
 		}    
 	};
 

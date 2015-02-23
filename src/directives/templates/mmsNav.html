@@ -19,11 +19,11 @@
           <a class="nav-btn" tooltip="Tasks and Tags" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom-left" ui-sref="workspace"><i class="fa fa-tasks"></i></a>
         </li>
 
-        <li ng-show="ws"> <i class="fa fa-ellipsis-v"></i> {{wsName}} <span ng-if="config !== 'latest'">({{configName}})</span> <i class="fa fa-angle-double-right"></i><li>
+        <li ng-show="ws"> <i class="fa fa-ellipsis-v"></i> {{wsName}} <span ng-if="config.timestamp != 'latest'">({{config.name}})</span> <i class="fa fa-angle-double-right"></i><li>
         <li ng-show="ws">
-          <a class="nav-btn" tooltip="Sites and Documents" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" ui-sref="workspace.site({site:'ems-web-apps'})"><i class="fa fa-folder"></i></a>
+          <a class="nav-btn" tooltip="Sites and Documents" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" ui-sref="workspace.site({site:'no_site'})"><i class="fa fa-folder"></i></a>
         </li>
-        <li ng-show="site"> <i class="fa fa-ellipsis-v"></i> {{siteTitle}} <i class="fa fa-angle-double-right"></i></li>
+        <li ng-show="site"> <i class="fa fa-ellipsis-v"></i> {{site.name}} <i class="fa fa-angle-double-right"></i></li>
         <li ng-show="product">
           <a class="nav-btn"><i class="fa fa-file"></i></a>
         </li>
