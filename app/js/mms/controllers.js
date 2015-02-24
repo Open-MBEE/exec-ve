@@ -33,8 +33,9 @@ function($scope, $rootScope, $state, $timeout, UxService) {
       } else if ($state.includes('workspace.site.document')) {
           $scope.tbApi.addButton(UxService.getToolbarButton("view.reorder"));
           $scope.tbApi.addButton(UxService.getToolbarButton("document.snapshot"));
+      } else if ($state.includes('workspace.diff')) {
+          $scope.tbApi.setPermission('element.editor', false);
       }
-
     }, 500);
 
     $scope.onClick = function(button) {
@@ -47,7 +48,6 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, viewElement
     if (!$rootScope.veElementsOn)
         $rootScope.veElementsOn = false;
 
-    // TODO: WS = master
     var ws = $stateParams.workspace;
 
     $scope.viewElements = viewElements;
@@ -265,10 +265,10 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, viewElement
         }
     }, 500);
 }])
-.controller('ToolCtrl', ['$scope', '$rootScope', '$modal', '$q', '$stateParams',
+.controller('ToolCtrl', ['$scope', '$rootScope', '$state', '$modal', '$q', '$stateParams',
             'ConfigService', 'ElementService', 'growl', 
-            'tags', 'snapshots', 'site', 'document', 'time',
-function($scope, $rootScope, $modal, $q, $stateParams, ConfigService, ElementService, growl, tags, snapshots, site, document, time) {
+            'workspaceObj', 'tags', 'tag', 'snapshots', 'site', 'document', 'time',
+function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, ElementService, growl, workspaceObj, tags, tag, snapshots, site, document, time) {
 
     // TODO rename variable ws
     var ws = $stateParams.workspace;
@@ -296,6 +296,17 @@ function($scope, $rootScope, $modal, $q, $stateParams, ConfigService, ElementSer
 
     if (!$rootScope.veEdits)
         $rootScope.veEdits = {};
+
+    if ($state.current.name === 'workspace') {
+        if (tag.name !== 'latest') {
+            $scope.document = tag;
+            $scope.eid = tag.id;
+        }
+        else {
+            $scope.document = workspaceObj;
+            $scope.eid = workspaceObj.id;            
+        }
+    }
 
     $scope.snapshotClicked = function() {
         $scope.snapshotLoading = 'fa fa-spinner fa-spin';
@@ -587,14 +598,25 @@ function($scope, $rootScope, $modal, $q, $stateParams, ConfigService, ElementSer
 }])
 .controller('TreeCtrl', ['$anchorScroll' , '$filter', '$location', '$modal', '$scope', '$rootScope', '$state', '$stateParams', '$timeout', 'growl', 
                           'UxService', 'ConfigService', 'ElementService', 'UtilsService', 'WorkspaceService', 'ViewService',
-                          'workspaces', 'sites', 'document', 'views', 'time', 'configSnapshots',
-function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, $stateParams, $timeout, growl, UxService, ConfigService, ElementService, UtilsService, WorkspaceService, ViewService, workspaces, sites, document, views, time, configSnapshots) {
+                          'workspaces', 'workspaceObj', 'tag', 'sites', 'site', 'document', 'views', 'view', 'time', 'configSnapshots',
+function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, $stateParams, $timeout, growl, UxService, ConfigService, ElementService, UtilsService, WorkspaceService, ViewService, workspaces, workspaceObj, tag, sites, site, document, views, view, time, configSnapshots) {
 
     $rootScope.mms_bbApi = $scope.bbApi = {};
 
     $rootScope.mms_treeApi = $scope.treeApi = {};
 
     $rootScope.mms_treeInitial = '';
+    if ($state.current.name === 'workspace') {
+        if (tag.name !== 'latest')
+            $rootScope.mms_treeInitial = tag.id;
+        else
+            $rootScope.mms_treeInitial = workspaceObj.id;            
+    } else if ($state.current.name === 'workspace.site') {
+        $rootScope.mms_treeInitial = site.sysmlid;            
+    } else if ($state.includes('workspace.site.document')) {
+        $rootScope.mms_treeInitial = view.sysmlid;                    
+    }
+
 
     $rootScope.mms_fullDocMode = false;
 
@@ -912,8 +934,10 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
         } else if ($state.current.name === 'workspace.site') {
             if (branch.type === 'site')
                 $state.go('workspace.site', {site: branch.data.sysmlid});
-            else if (branch.type === 'view' || branch.type === 'snapshot')
-                $state.go('workspace.site.document', {document: branch.data.sysmlid});
+            else if (branch.type === 'view' || branch.type === 'snapshot') {
+                var documentSiteBranch = $rootScope.mms_treeApi.get_parent_branch(branch);
+                $state.go('workspace.site.document', {site: documentSiteBranch.data.sysmlid, document: branch.data.sysmlid});
+            }
         } else if ($state.includes('workspace.site.document')) {
 
             var view = branch.type === 'section' ? branch.view : branch.data.sysmlid;
@@ -1819,7 +1843,7 @@ function(_, $timeout, $scope, $rootScope, $http, $state, $stateParams, $modal, g
     };
 
     $scope.goBack = function () {
-      $state.go('mm', {}, {reload:true});
+      $state.go('workspace', {}, {reload:true});
     };
 
     $scope.mergeStagedChanges = function (workspaceId) {
@@ -1862,7 +1886,7 @@ function(_, $timeout, $scope, $rootScope, $http, $state, $stateParams, $modal, g
         .then(function(data) {
               growl.success("Workspace Elements Merged");
               $scope.saving = false;
-              $state.go('mm', {}, {reload:true});
+              $state.go('workspace', {}, {reload:true});
         }, function(reason) {
             growl.error("Workspace Merge Error: " + reason.message);
             $scope.saving = false;
@@ -1916,7 +1940,7 @@ function(_, $timeout, $scope, $rootScope, $http, $state, $stateParams, $modal, g
       else
         elementId = change.original.sysmlid;
 
-      $state.go('mm.diff.view', {elementId: elementId});
+      $state.go('workspace.diff.view', {elementId: elementId});
     };
 
 

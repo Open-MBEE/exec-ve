@@ -23,7 +23,7 @@
         <li ng-show="ws">
           <a class="nav-btn" tooltip="Sites and Documents" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" ui-sref="workspace.site({site:'no_site'})"><i class="fa fa-folder"></i></a>
         </li>
-        <li ng-show="site"> <i class="fa fa-ellipsis-v"></i> {{site.name}} <i class="fa fa-angle-double-right"></i></li>
+        <li ng-show="site.sysmlid !== 'no-site'"> <i class="fa fa-ellipsis-v"></i> {{site.name}} <i class="fa fa-angle-double-right"></i></li>
         <li ng-show="product">
           <a class="nav-btn"><i class="fa fa-file"></i></a>
         </li>
@@ -93,8 +93,8 @@
 
       <!-- Dashboard, Support, Feedback, and Logout buttons -->
       <ul class="nav-btns-main pull-right">
-        <li ng-show="site">
-          <a class="nav-btn" tooltip="Dashboard" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" href="/share/page/site/{{site}}/dashboard" target="_blank"><i class="fa fa-dashboard"></i></a>
+        <li ng-show="site.sysmlid !== 'no-site'">
+          <a class="nav-btn" tooltip="Dashboard" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" href="/share/page/site/{{site.sysmlid}}/dashboard" target="_blank"><i class="fa fa-dashboard"></i></a>
         </li>
 
         <li>
@@ -113,19 +113,19 @@
 
       <ul class="nav-btns-flyover pull-right">
         <li ng-show="site && ws" class="out-link">
-          <a href="docweb.html#/workspaces/{{ws}}/sites/{{site}}">DocWeb</a>
+          <a ui-sref="workspace.site({site: site.sysmlid})">DocWeb</a>
         </li>
         
         <li ng-show="ws" class="out-link">
-          <a href="portal.html#/workspaces/{{ws}}">Site Portal</a>
+          <a ui-sref="workspace.site({site:'no_site'})">Site Portal</a>
         </li>
         
         <li class="out-link">
-          <a href="mm.html">Model Manager</a>
+          <a ui-sref="workspace({workspace:'master'})"href="mm.html">Model Manager</a>
         </li>
 
         <li ng-show="site" class="out-link">
-          <a href="/share/page/site/{{site}}/dashboard">Dashboard</a>
+          <a href="/share/page/site/{{site.sysmlid}}/dashboard">Dashboard</a>
         </li>
 
         <li class="out-link">

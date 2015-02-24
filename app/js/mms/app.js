@@ -2,7 +2,15 @@
 
 angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 'ui.bootstrap', 'ui.router', 'ui.tree', 'angular-growl'])
 .config(function($stateProvider, $urlRouterProvider) {
-    // TODO: Add default state to resolve to workspace : master
+    $urlRouterProvider.rule(function ($injector, $location) {
+        // default to workspace - master if url is old format
+        if ($location.path().indexOf('/workspaces') === -1)
+        {
+            var workspacePath = 'workspaces/master' + $location.path();
+            $location.path(workspacePath);
+        }
+    });
+
     $stateProvider
     .state('workspace', {
         url: '/workspaces/:workspace?tag',
@@ -12,6 +20,9 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
             },
             workspace: function ($stateParams) {
                 return $stateParams.workspace;
+            },
+            workspaceObj: function (WorkspaceService, workspace) {
+                return WorkspaceService.getWorkspace(workspace);
             },
             sites: function(SiteService, time) { 
                 
@@ -288,7 +299,6 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
                 controller: 'ReorderCtrl'
             }
         }
-
     })
     .state('workspace.site.document.full', {
         url: '/full',
@@ -298,7 +308,6 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
                 controller: 'FullDocCtrl'
             }
         }
-
     })
     .state('workspace.site.document.view', {
         url: '/views/:view',
@@ -351,6 +360,4 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
             }
         }
     });
-
-
 });
