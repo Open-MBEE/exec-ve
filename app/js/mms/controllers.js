@@ -267,9 +267,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, viewElement
 .controller('ToolCtrl', ['$scope', '$rootScope', '$modal', '$q', '$stateParams',
             'ConfigService', 'ElementService', 'growl', 
             'site', 'document', 'time',
-function($scope, $rootScope, $modal, $q, $stateParams,
-         ConfigService, ElementService, growl,
-         site, document, time) {
+function($scope, $rootScope, $modal, $q, $stateParams, ConfigService, ElementService, growl, site, document, time) {
 
     // TODO configs
     var snapshots = null;
@@ -585,9 +583,7 @@ function($scope, $rootScope, $modal, $q, $stateParams,
 .controller('TreeCtrl', ['$anchorScroll' , '$filter', '$location', '$modal', '$scope', '$rootScope', '$state', '$stateParams', '$timeout', 'growl', 
                           'UxService', 'ConfigService', 'ElementService', 'UtilsService', 'WorkspaceService', 'ViewService',
                           'workspaces', 'sites', 'document', 'views', 'time', 'configSnapshots',
-function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, $stateParams, $timeout, growl, 
-          UxService, ConfigService, ElementService, UtilsService, WorkspaceService, ViewService,
-          workspaces, sites, document, views, time, configSnapshots) {
+function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, $stateParams, $timeout, growl, UxService, ConfigService, ElementService, UtilsService, WorkspaceService, ViewService, workspaces, sites, document, views, time, configSnapshots) {
 
     $rootScope.mms_bbApi = $scope.bbApi = {};
 
@@ -687,7 +683,7 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
         $scope.bbApi.setTooltip("tree.full.document", "Full Document");
         $scope.bbApi.setIcon("tree.full.document", 'fa-file-text-o');
 
-        $scope.reorder(); 
+        $state.go('workspace.site.document.order');
     });
 
     $scope.$on('tree.full.document', function() {
@@ -1013,8 +1009,8 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
     };
 
     $scope.fullDocMode = function() {
-        if ($rootScope.veFullDocMode) {
-            $rootScope.veFullDocMode = false;
+        if ($rootScope.mms_fullDocMode) {
+            $rootScope.mms_fullDocMode = false;
             $scope.bbApi.setTooltip("tree.full.document", "Full Document");
             $scope.bbApi.setIcon("tree.full.document", 'fa-file-text-o');
             var curBranch = $scope.treeApi.get_selected_branch();
@@ -1024,11 +1020,11 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
                     viewId = curBranch.view;
                 else
                     viewId = curBranch.data.sysmlid;
-                $state.go('doc.view', {viewId: viewId});
+                $state.go('workspace.site.document.view', {view: viewId});
             }
         } else {
             if ($state.current.name === 'doc.all') {
-                $rootScope.veFullDocMode = true;
+                $rootScope.mms_fullDocMode = true;
                 $scope.bbApi.setTooltip("tree.full.document", "View Mode");
                 $scope.bbApi.setIcon("tree.full.document", 'fa-file-text');
             } else {
@@ -1043,24 +1039,20 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
                     });
                     instance.result.then(function(choice) {
                         if (choice === 'ok') {
-                            $rootScope.veFullDocMode = true;
+                            $rootScope.mms_fullDocMode = true;
                             $scope.bbApi.setTooltip("tree.full.document", "View Mode");
                             $scope.bbApi.setIcon("tree.full.document", 'fa-file-text');
-                            $state.go('doc.all'); 
+                            $state.go('workspace.site.document.full'); 
                         }
                     });
                 } else {
-                    $rootScope.veFullDocMode = true;
+                    $rootScope.mms_fullDocMode = true;
                     $scope.bbApi.setTooltip("tree.full.document", "View Mode");
                     $scope.bbApi.setIcon("tree.full.document", 'fa-file-text');
-                    $state.go('doc.all'); 
+                    $state.go('workspace.site.document.full'); 
                 }
             }
         }
-    };
-
-    $scope.reorder = function() {
-        $state.go('doc.order');
     };
 
     $scope.addView = function() {
@@ -1545,5 +1537,179 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
             }, delay*index);
         });
     }
+}])
+.controller('ReorderCtrl', ['$scope', '$rootScope', '$stateParams', 'document', 'time', 'ElementService', 'ViewService', '$state', 'growl', '_',
+function($scope, $rootScope, $stateParams, document, time, ElementService, ViewService, $state, growl, _) {
+    $scope.doc = document;
+    var ws = $stateParams.workspace;
+    ElementService.isCacheOutdated(document.sysmlid, ws)
+    .then(function(status) {
+        if (status.status) {
+            if (!angular.equals(document.specialization.view2view, status.server.specialization.view2view)) {
+                growl.error('The document hierarchy is outdated, refresh the page first!');
+            } 
+        } 
+    }, function(reason) {
+        growl.error('Checking if document hierarchy is up to date failed: ' + reason.message);
+    });
+    var viewIds2node = {};
+    viewIds2node[document.sysmlid] = {
+        name: document.name,
+        id: document.sysmlid,
+        children: []
+    };
+    var up2dateViews = null;
 
-}]);
+    ViewService.getDocumentViews(document.sysmlid, false, ws, time, true)
+    .then(function(views) {
+        up2dateViews = views;
+        up2dateViews.forEach(function(view) {
+            var viewTreeNode = { 
+                id: view.sysmlid, 
+                name: view.name, 
+                children : [] 
+            };
+            viewIds2node[view.sysmlid] = viewTreeNode;    
+        });
+        document.specialization.view2view.forEach(function(view) {
+            var viewId = view.id;
+            view.childrenViews.forEach(function(childId) {
+                viewIds2node[viewId].children.push(viewIds2node[childId]);
+            });
+        });
+        $scope.tree = [viewIds2node[document.sysmlid]];
+    });
+    $scope.saveClass = "";
+    $scope.save = function() {
+        $scope.saveClass = "fa fa-spin fa-spinner";
+        ElementService.isCacheOutdated(document.sysmlid, ws)
+        .then(function(status) {
+            if (status.status) {
+                if (!angular.equals(document.specialization.view2view, status.server.specialization.view2view)) {
+                    growl.error('The document hierarchy is outdated, refresh the page first!');
+                    $scope.saveClass = "";
+                    return;
+                } 
+            } 
+            var newView2View = [];
+            angular.forEach(viewIds2node, function(view) {
+                if ($scope.tree.indexOf(view) >= 0 && view.id !== document.sysmlid)
+                    return; //allow removing views by moving them to be root
+                var viewObject = {id: view.id, childrenViews: []};
+                view.children.forEach(function(child) {
+                    viewObject.childrenViews.push(child.id);
+                });
+                newView2View.push(viewObject);
+            });
+            var newdoc = {};
+            newdoc.sysmlid = document.sysmlid;
+            newdoc.read = document.read;
+            newdoc.specialization = {type: 'Product'};
+            newdoc.specialization.view2view = newView2View;
+            ViewService.updateDocument(newdoc, ws)
+            .then(function(data) {
+                growl.success('Reorder Successful');
+                //document.specialization.view2view = newView2View;
+                $state.go('workspace.site.document', {}, {reload:true});
+            }, function(reason) {
+                if (reason.status === 409) {
+                    newdoc.read = reason.data.elements[0].read;
+                    ViewService.updateDocument(newdoc, ws)
+                    .then(function(data2) {
+                        growl.success('Reorder Successful');
+                        //document.specialization.view2view = newView2View;
+                        $state.go('workspace.site.document', {}, {reload:true});
+                    }, function(reason2) {
+                        $scope.saveClass = "";
+                        growl.error('Reorder Save Error: ' + reason2.message);
+                    });
+                } else {
+                    $scope.saveClass = "";
+                    growl.error('Reorder Save Error: ' + reason.message);
+                }
+            });
+        }, function(reason) {
+            growl.error('Checking if document hierarchy is up to date failed: ' + reason.message);
+            $scope.saveClass = "";
+        });
+    };
+    $scope.cancel = function() {
+        var curBranch = $rootScope.mms_treeApi.get_selected_branch();
+        if (!curBranch)
+            $state.go('workspace.site.document', {}, {reload:true});
+        else
+            $state.go('workspace.site.document.view', {view: curBranch.data.sysmlid});
+    };
+}])
+.controller('FullDocCtrl', ['$scope', '$rootScope', '$stateParams', 'document', 'time',
+function($scope, $rootScope, $stateParams, document, time) {
+    $scope.ws = $stateParams.workspace;
+    var views = [];
+    views.push({id: document.sysmlid, api: {}});
+    var view2view = document.specialization.view2view;
+    var view2children = {};
+    view2view.forEach(function(view) {
+        view2children[view.id] = view.childrenViews;
+    });
+
+    var addToArray = function(viewId, curSection) {
+        views.push({id: viewId, api: {}, number: curSection});
+        if (view2children[viewId]) {
+            var num = 1;
+            view2children[viewId].forEach(function(cid) {
+                addToArray(cid, curSection + '.' + num);
+                num = num + 1;
+            });
+        }
+    };
+    var num = 1;
+    view2children[document.sysmlid].forEach(function(cid) {
+        addToArray(cid, num);
+        num = num + 1;
+    });
+    $scope.version = time;
+    $scope.views = views;
+    $scope.tscClicked = function(elementId) {
+        $rootScope.$broadcast('elementSelected', elementId);
+    };
+    $scope.commentsOn = false;
+    $scope.elementsOn = false;
+    $scope.buttons = [
+        {
+            action: function() {
+                $scope.views.forEach(function(view) {
+                    view.api.toggleShowComments();
+                });
+                if (!$scope.commentsOn) {
+                    $scope.buttons[0].icon = "fa-comment";
+                    $scope.buttons[0].tooltip = "Hide Comments";
+                }
+                else {
+                    $scope.buttons[0].icon = "fa-comment-o";
+                    $scope.buttons[0].tooltip = "Show Comments";
+                }
+                $scope.commentsOn = !$scope.commentsOn;
+            },
+            tooltip: "Show Comments",
+            icon: "fa-comment-o"
+        },
+        {
+            action: function() {
+                $scope.views.forEach(function(view) {
+                    view.api.toggleShowElements();
+                });
+                if (!$scope.elementsOn) {
+                    $scope.buttons[1].tooltip = "Hide Elements";
+                }
+                else {
+                    $scope.buttons[1].tooltip = "Show Elements";
+                }
+                $scope.elementsOn = !$scope.elementsOn;
+            },
+            tooltip: "Show Elements",
+            icon: "fa-codepen"
+        }
+    ];
+    $rootScope.mms_fullDocMode = true;
+}])
+;

@@ -269,8 +269,36 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
             }
         }
     })
+    .state('workspace.site.document.order', {
+        url: '/order',
+        views: {      
+            'pane-center@': {
+                templateUrl: 'partials/ve/reorder-views.html',
+                controller: 'ReorderCtrl'
+            }
+        }
+
+    })
+    .state('workspace.site.document.full', {
+        url: '/full',
+        views: {      
+            'pane-center@': {
+                templateUrl: 'partials/ve/full-doc.html',
+                controller: 'FullDocCtrl'
+            }
+        }
+
+    })
     .state('workspace.site.document.view', {
         url: '/views/:view',
+        resolve: {
+            viewElements: function($stateParams, ViewService, time) {
+                return ViewService.getViewElements($stateParams.view, false, $stateParams.workspace, time);
+            },
+            view: function($stateParams, ViewService, viewElements, time) {
+                return ViewService.getView($stateParams.view, false, $stateParams.workspace, time);
+            }
+        },
         views: {
             'pane-center@': {
                 templateUrl: 'partials/mms/pane-center.html',
@@ -279,14 +307,6 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
             'pane-right@': {
                 templateUrl: 'partials/mms/pane-right.html',
                 controller: 'ToolCtrl'
-            }
-        },
-        resolve: {
-            viewElements: function($stateParams, ViewService, time) {
-                return ViewService.getViewElements($stateParams.view, false, $stateParams.workspace, time);
-            },
-            view: function($stateParams, ViewService, viewElements, time) {
-                return ViewService.getView($stateParams.view, false, $stateParams.workspace, time);
             }
         }
     });
