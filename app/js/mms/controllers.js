@@ -267,11 +267,8 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, viewElement
 }])
 .controller('ToolCtrl', ['$scope', '$rootScope', '$modal', '$q', '$stateParams',
             'ConfigService', 'ElementService', 'growl', 
-            'tags', 'site', 'document', 'time',
-function($scope, $rootScope, $modal, $q, $stateParams, ConfigService, ElementService, growl, tags, site, document, time) {
-
-    // TODO configs
-    var snapshots = null;
+            'tags', 'snapshots', 'site', 'document', 'time',
+function($scope, $rootScope, $modal, $q, $stateParams, ConfigService, ElementService, growl, tags, snapshots, site, document, time) {
 
     // TODO rename variable ws
     var ws = $stateParams.workspace;

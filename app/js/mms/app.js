@@ -79,7 +79,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
                 return ConfigService.getConfigs(workspace, false);
             },
             tag: function ($stateParams, ConfigService, workspace) {
-                if ($stateParams.tag === undefined)
+                if ($stateParams.tag === undefined || $stateParams.tag === 'latest')
                     return { name: 'latest', timestamp: 'latest' };
                 return ConfigService.getConfig($stateParams.tag, workspace, false);
             },        
@@ -87,6 +87,9 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
                 if (tag.timestamp === 'latest')
                     return [];
                 return ConfigService.getConfigSnapshots(tag.id, workspace, false);
+            },
+            snapshots: function() {
+                return [];
             },
             time: function(tag) {
                 return tag.timestamp;
@@ -219,6 +222,11 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
             },
             view: function($stateParams, ViewService, viewElements, time) {
                 return ViewService.getView($stateParams.document, false, $stateParams.workspace, time);
+            },
+            snapshots: function(ConfigService, workspace, site, document) {
+                if (document.specialization.type !== 'Product')
+                    return [];
+                return ConfigService.getProductSnapshots(document.sysmlid, site.sysmlid, workspace);
             }
         },
         views: {
