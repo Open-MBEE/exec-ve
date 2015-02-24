@@ -29,6 +29,7 @@ function($scope, $rootScope, $state, $timeout, UxService) {
       } else if ($state.current.name === 'workspace.site') {
           $scope.tbApi.setPermission('element.editor', true);
           $scope.tbApi.addButton(UxService.getToolbarButton("tags"));
+          $scope.tbApi.setPermission('tags', true);
       } else if ($state.includes('workspace.site.document')) {
           $scope.tbApi.addButton(UxService.getToolbarButton("view.reorder"));
           $scope.tbApi.addButton(UxService.getToolbarButton("document.snapshot"));
@@ -266,8 +267,8 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, viewElement
 }])
 .controller('ToolCtrl', ['$scope', '$rootScope', '$modal', '$q', '$stateParams',
             'ConfigService', 'ElementService', 'growl', 
-            'site', 'document', 'time',
-function($scope, $rootScope, $modal, $q, $stateParams, ConfigService, ElementService, growl, site, document, time) {
+            'tags', 'site', 'document', 'time',
+function($scope, $rootScope, $modal, $q, $stateParams, ConfigService, ElementService, growl, tags, site, document, time) {
 
     // TODO configs
     var snapshots = null;
@@ -279,6 +280,7 @@ function($scope, $rootScope, $modal, $q, $stateParams, ConfigService, ElementSer
     $scope.ws = ws;
     $scope.editable = document.editable && time === 'latest';
     $scope.snapshots = snapshots;
+    $scope.tags = tags;
     $scope.site = site;
     $scope.version = time;
     $scope.eid = $scope.document.sysmlid;
@@ -291,7 +293,8 @@ function($scope, $rootScope, $modal, $q, $stateParams, ConfigService, ElementSer
     $scope.show = {
         element: true,
         reorder: false,
-        snapshots: false
+        snapshots: false,
+        tags: false
     };
 
     if (!$rootScope.veEdits)
@@ -365,6 +368,11 @@ function($scope, $rootScope, $modal, $q, $stateParams, ConfigService, ElementSer
     $scope.$on('document.snapshot', function() {
         showPane('snapshots');
     });
+
+    $scope.$on('tags', function() {
+        showPane('tags');
+    });
+
     $scope.$on('elementSelected', function(event, eid) {
         $scope.eid = eid;
         $rootScope.mms_tbApi.select('element.viewer');
@@ -703,14 +711,14 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
     // TODO: Move toggle to button bar api
     $scope.mergeOn = false;
     $scope.toggleMerge = function() {
-        var branch = $scope.treeApi.get_selected_branch();
+        var branch = $scope.mms_treeApi.get_selected_branch();
         if (!branch) {
             growl.warning("Compare Error: Select task or tag to compare from");
             return;
         }
-        var parent_branch = $scope.treeApi.get_parent_branch(branch);
-        while (parent_branch.type != 'Workspace') {
-            parent_branch = $scope.treeApi.get_parent_branch(parent_branch);
+        var parent_branch = $scope.mms_treeApi.get_parent_branch(branch);
+        while (parent_branch.type != 'workspace') {
+            parent_branch = $scope.mms_treeApi.get_parent_branch(parent_branch);
         }
 
         $scope.mergeOn = !$scope.mergeOn;
@@ -742,18 +750,18 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
         }
         var sourceWs = $scope.mergeFrom.data.id;
         var sourceTime = 'latest';
-        if ($scope.mergeFrom.type === 'Configuration') {
+        if ($scope.mergeFrom.type === 'configuration') {
             sourceWs = $scope.mergeFrom.workspace;
             sourceTime = $scope.mergeFrom.data.timestamp;
         }
         var targetWs = $scope.mergeTo.data.id;
         var targetTime = 'latest';
-        if ($scope.mergeTo.type === 'Configuration') {
+        if ($scope.mergeTo.type === 'configuration') {
             targetWs = $scope.mergeTo.workspace;
             targetTime = $scope.mergeTo.data.timestamp;
         }
         $scope.comparing = true;
-        $state.go('mm.diff', {source: sourceWs, target: targetWs, sourceTime: sourceTime, targetTime: targetTime});
+        $state.go('workspace.diff', {source: sourceWs, target: targetWs, sourceTime: sourceTime, targetTime: targetTime});
     };
  
     // TODO: Make this section generic
@@ -899,57 +907,30 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
     }
     // TODO: Update behavior to handle new state descriptions
     $scope.my_tree_handler = function(branch) {
-      if ($state.current.name === 'workspace') {
-        if (branch.type === 'workspace')
-            $state.go('workspace', {workspace: branch.data.id});
-        else if (branch.type === 'configuration')
-            $state.go('workspace', {workspace: branch.workspace, tag: branch.data.id});
-      } else if ($state.current.name === 'workspace.site') {
-        if (branch.type === 'site')
-            $state.go('workspace.site', {site: branch.data.sysmlid});
-        else if (branch.type === 'view' || branch.type === 'snapshot')
-            $state.go('workspace.site.document', {document: branch.data.sysmlid});
-            // $rootScope.portalDocBranch = branch;
-      } else if ($state.current.name === 'workspace.site.document' || 
-                 $state.current.name === 'workspace.site.document.view') {
-        if (branch.type === 'view') {
-            $state.go('workspace.site.document.view', {view: branch.data.sysmlid});
-        }
-      }
-      else {
-        // TODO: re-route old stuff
+        if ($state.current.name === 'workspace') {
+            if (branch.type === 'workspace')
+                $state.go('workspace', {workspace: branch.data.id});
+            else if (branch.type === 'configuration')
+                $state.go('workspace', {workspace: branch.workspace, tag: branch.data.id});
+        } else if ($state.current.name === 'workspace.site') {
+            if (branch.type === 'site')
+                $state.go('workspace.site', {site: branch.data.sysmlid});
+            else if (branch.type === 'view' || branch.type === 'snapshot')
+                $state.go('workspace.site.document', {document: branch.data.sysmlid});
+        } else if ($state.includes('workspace.site.document')) {
 
-        /* if (branch.type === 'Workspace')
-            $state.go('mm.workspace', {ws: branch.data.id});
-        else if (branch.type === 'Configuration')
-            $state.go('mm.workspace.config', {ws: branch.workspace, config: branch.data.id});
-        else if (branch.type === 'site') {
-            $state.go('portal.site', {site: branch.data.sysmlid});
-        } else if (branch.type === 'view' || branch.type === 'snapshot') {
-            // TODO: remove this   ---   is it really needed? $rootScope.portalDocBranch = branch;
-            $state.go('portal.site.view', {site: branch.site, docid: branch.data.sysmlid});
-        } else {
-            // this is from the view editor 
-            var viewId;
-            if (branch.type == "section")
-                viewId = branch.view;
-            else
-                viewId = branch.data.sysmlid;
-            if ($rootScope.veFullDocMode) {
-                $location.hash(viewId);
-                $rootScope.veCurrentView = viewId;
-                ViewService.setCurrentViewId(viewId);
-                //$rootScope.$broadcast('viewSelected', viewId, viewElements);
+            var view = branch.type === 'section' ? branch.view : branch.data.sysmlid;
+            if ($rootScope.mms_fullDocMode) {
+                $location.hash(view);
+                $rootScope.veCurrentView = view;
+                ViewService.setCurrentViewId(view);
                 $anchorScroll();
-            } else {
-                if (viewId !== $rootScope.veCurrentView)
-                    $rootScope.veViewLoading = true;
-                $state.go('doc.view', {viewId: viewId});
-            }
-        } */
-    }
-
-    $rootScope.mms_tbApi.select('element.viewer');
+            } else if (branch.type === 'view') {
+                $state.go('workspace.site.document.view', {view: branch.data.sysmlid});
+            } 
+        }
+    
+        $rootScope.mms_tbApi.select('element.viewer');
 
     };
 
@@ -1712,4 +1693,511 @@ function($scope, $rootScope, $stateParams, document, time) {
     ];
     $rootScope.mms_fullDocMode = true;
 }])
-;
+.controller('WorkspaceDiffChangeController', ["_", "$timeout", "$scope", "$rootScope", "$http", "$state", "$stateParams", "$modal", "growl", "WorkspaceService", "ElementService", "diff",
+function(_, $timeout, $scope, $rootScope, $http, $state, $stateParams, $modal, growl, WorkspaceService, ElementService, diff) {
+
+    var ws1 = $stateParams.target;
+    var ws2 = $stateParams.source;
+
+    $scope.treeApi = {};
+
+    var treeApiLocal = $rootScope.treeApi;
+
+    $scope.treeApi = treeApiLocal;
+
+    $rootScope.treeData = [];
+
+    $scope.diff = diff;
+    
+    $scope.changes = [];
+
+    $scope.id2change = {};
+
+    $rootScope.id2node = {};
+
+    $scope.stagedCounter = 0;
+    $scope.unstagedCounter = 0;
+
+    $scope.options = {
+      types: {
+        'Element': 'fa fa-square',
+        'Property': 'fa fa-circle',
+        'View': 'fa fa-square',
+        'Dependency': 'fa fa-long-arrow-right',
+        'DirectedRelationship': 'fa fa-long-arrow-right',
+        'Generalization': 'fa fa-chevron-right',
+        'Package': 'fa fa-folder',
+        'Connector': 'fa fa-expand'
+      },
+      statuses: {
+        'moved'   : { style: "moved" },
+        'added'   : { style: "addition" },
+        'removed' : { style: "removal" },
+        'updated' : { style: "update" },
+        'conflict': { style: "" }
+      }
+    };
+
+    var stageChange = function(change) {
+      change.staged = ! change.staged;
+
+      var treeNode = null;
+      var index;
+
+      if (change.type === "added") {
+        treeNode = $scope.id2node[change.delta.sysmlid];
+
+        var parentNode = $scope.id2node[change.delta.owner];
+        
+        if (change.staged) {
+            if (!parentNode) {
+                $rootScope.treeData.push(treeNode);
+            } else {
+                parentNode.children.push(treeNode);
+            }
+            treeNode.status = "added";
+        } else {
+            treeNode.status = "clean";
+            if (!parentNode) {
+                index = findIndexBySysMLID($rootScope.treeData, change.delta.sysmlid);
+                $rootScope.treeData.splice(index, 1);
+            } else {
+                index = findIndexBySysMLID(parentNode.children, change.delta.sysmlid);
+                parentNode.children.splice(index,1);
+            }
+        }
+      } else if (change.type === "removed") {
+        treeNode = $scope.id2node[change.original.sysmlid];
+
+        if (change.staged) {
+          treeNode.status = "removed";
+        } else {
+          treeNode.status = "clean";
+        } 
+      } else if (change.type === "updated") {
+        treeNode = $scope.id2node[change.original.sysmlid];
+
+        // handle if the name of element has changed on update
+        if (change.staged) {
+          treeNode.status = "updated";
+          treeNode.data = change.delta;
+
+        } else {
+          treeNode.status = "clean";
+          treeNode.data = change.original;
+        }
+      } else if (change.type === "moved") {
+        treeNode = $scope.id2node[change.original.sysmlid];
+
+        var currentParentNode = $scope.id2node[change.original.owner];
+        var newParentNode = $scope.id2node[change.delta.owner];
+        
+        if (change.staged) {
+          treeNode.status = "moved";
+
+          // remove from current parent node
+          index = findIndexBySysMLID(currentParentNode.children, change.original.sysmlid);
+          currentParentNode.children.splice(index,1);
+
+          // add to new parent node
+          newParentNode.children.push(treeNode);
+
+        } else {
+          treeNode.status = "clean";
+
+          // remove from new parent node
+          currentParentNode.children.push(treeNode);
+
+          // add back to current parent node
+          index = findIndexBySysMLID(newParentNode.children, change.original.sysmlid);
+          newParentNode.children.splice(index,1);
+
+        }
+      }      
+
+      $rootScope.treeApi.refresh();
+      $rootScope.treeApi.expand_all();
+
+      refreshStageCounters();
+    };
+
+    $scope.goBack = function () {
+      $state.go('mm', {}, {reload:true});
+    };
+
+    $scope.mergeStagedChanges = function (workspaceId) {
+        //var deletedElements = [];
+        //var changedElements = [];
+
+        var object = {
+            workspace1: {
+                id: ws1
+            },
+            workspace2: {
+                id: ws2,
+                addedElements: [],
+                deletedElements: [],
+                updatedElements: [],
+                movedElements: []
+            }
+        };
+
+        $scope.changes.forEach(function(change) {
+            if (change.staged) {
+                if (change.type === "removed") {
+                    object.workspace2.deletedElements.push(change.ws2object);
+            //deletedElements.push(change.original);
+                } else if (change.type === 'updated') {
+                    object.workspace2.updatedElements.push(change.ws2object);
+                    delete change.ws2object.read;
+                    delete change.ws2object.modified;
+            //delete change.delta.read;
+            //changedElements.push(change.delta);
+                } else if (change.type === 'added') {
+                    object.workspace2.addedElements.push(change.ws2object);
+                } else if (change.type === 'moved') {
+                    object.workspace2.movedElements.push(change.ws2object);
+                }
+            }
+        });
+        $scope.saving = true;
+        WorkspaceService.merge(object, $stateParams.sourceTime)
+        .then(function(data) {
+              growl.success("Workspace Elements Merged");
+              $scope.saving = false;
+              $state.go('mm', {}, {reload:true});
+        }, function(reason) {
+            growl.error("Workspace Merge Error: " + reason.message);
+            $scope.saving = false;
+        });
+    };
+
+    $scope.stageAllUnstaged = function (changes) {
+      changes.forEach(function (change) {
+        if (!change.staged) {
+          stageChange(change);
+        }
+      });
+    };
+
+    $scope.unstageAllStaged = function (changes) {
+      changes.forEach(function (change) {
+        if (change.staged) {
+          stageChange(change);
+        }
+      });
+    };
+
+    var refreshStageCounters = function () {
+      $scope.stagedCounter = 0;
+      $scope.unstagedCounter = 0;
+
+      $scope.changes.forEach(function (change) {
+        if (change.staged) {
+          $scope.stagedCounter++;
+        } else {
+          $scope.unstagedCounter++;
+        }
+      });
+    };
+
+    var findIndexBySysMLID = function (array, sysmlid) {
+     for (var i = 0; i < array.length; i++) {
+        if (array[i].data.sysmlid === sysmlid) {
+          return i;
+        }
+      }
+      return -1; 
+    };
+
+    $scope.stageChange = stageChange;
+
+    $scope.selectChange = function (change) {
+      var elementId;
+      if (change.type === "added")
+        elementId = change.delta.sysmlid;
+      else
+        elementId = change.original.sysmlid;
+
+      $state.go('mm.diff.view', {elementId: elementId});
+    };
+
+
+
+    // Diff the two workspaces picked in the Workspace Picker
+    /* WorkspaceService.diff(ws1, ws2).then(
+     function(result) {
+        
+        setupChangesList(result.workspace1, result.workspace2); 
+
+      },
+      function(reason) {
+        growl.error("Workspace diff failed: " + reason.message);
+      }
+    );   */
+
+      /*
+       * Preps mms-tree with data and display options.
+       */
+    var setupChangesList = function(ws1, ws2) {
+
+        // var emptyElement = { name: "", owner: "", documentation: "", specialization : { type: "", value_type: "", values: ""} };
+
+        var emptyElement = { name: "", owner: "", documentation: "", specialization : {} };
+
+        var createChange = function (name, element, deltaElement, changeType, changeIcon, ws2object) {
+          var change = {};
+          
+          change.name = name;
+          change.original = element;
+          change.delta = deltaElement;
+          change.type = changeType;
+          change.icon = changeIcon;
+          change.staged = false;
+          change.ws2object = ws2object;
+
+          change.properties = {};
+          change.properties.name = {};
+          change.properties.owner = {};
+          change.properties.documentation = {};
+
+          updateChangeProperty(change.properties.name, "clean");
+          updateChangeProperty(change.properties.owner, "clean");
+          updateChangeProperty(change.properties.documentation, "clean");
+
+          change.properties.specialization = {};
+          if (element.hasOwnProperty('specialization')) {
+            Object.keys(element.specialization).forEach(function (property) {
+              change.properties.specialization[property] = {};
+              updateChangeProperty(change.properties.specialization[property], "clean");
+            });
+          }
+          if (deltaElement.hasOwnProperty('specialization')) {
+            Object.keys(deltaElement.specialization).forEach(function (property) {
+              change.properties.specialization[property] = {};
+              updateChangeProperty(change.properties.specialization[property], "clean");
+            });
+          }
+
+          return change;
+        };
+
+        var updateChangeProperty = function(property, changeType) {
+          property.type = changeType;
+          property.staged = false;
+        };
+
+        // dynamically create 1st order of depth of specialization properties
+        /*var updateChangePropertySpecializations = function(specialization, changeType) {
+
+          Object.keys(specialization).forEach(function (property) {
+            specialization[property].type = changeType;
+            specialization[property].staged = false;
+          });
+
+        }; */
+
+        var createTreeNode = function (element, status) {
+          var node = {};
+          
+          node.data = element;
+          node.label = element.name;
+          node.type = element.specialization.type;
+          node.children = [];
+
+          // node.visible = true;
+          node.status = status;
+
+          return node;
+        };
+
+        var id2data = {};
+        var id2node = {};
+
+        ws1.elements.forEach(function(e) {
+          id2data[e.sysmlid] = e;
+
+          var node = createTreeNode(e, "clean");
+
+          id2node[e.sysmlid] = node;
+
+        });
+
+        ws1.elements.forEach(function(e) {
+          if (!id2node.hasOwnProperty(e.owner)) 
+              $rootScope.treeData.push(id2node[e.sysmlid]);          
+          else
+              id2node[e.owner].children.push(id2node[e.sysmlid]);
+        });
+
+        // $scope.treeApi.refresh();
+        // $scope.treeApi.expand_all();
+
+        ws2.addedElements.forEach(function(e) {
+          id2data[e.sysmlid] = e;
+
+          var node = createTreeNode(e, "clean");
+
+          id2node[e.sysmlid] = node;
+
+          var change = createChange(e.name, emptyElement, e, "added", "fa-plus", e);
+
+          updateChangeProperty(change.properties.name, "added");
+          updateChangeProperty(change.properties.owner, "added");
+          updateChangeProperty(change.properties.documentation, "added");
+          
+          if (e.hasOwnProperty('specialization')) {
+            Object.keys(e.specialization).forEach(function (property) {
+              change.properties.specialization[property] = {};
+              updateChangeProperty(change.properties.specialization[property], "added");
+            });            
+          }
+
+          $scope.changes.push(change);
+          $scope.id2change[e.sysmlid] = change;
+
+        });
+
+        ws2.deletedElements.forEach(function(e) {
+
+          var deletedElement = id2data[e.sysmlid];
+
+          var change = createChange(deletedElement.name, deletedElement, emptyElement, "removed", "fa-times", e);
+
+          updateChangeProperty(change.properties.name, "removed");
+          updateChangeProperty(change.properties.owner, "removed");
+          updateChangeProperty(change.properties.documentation, "removed");
+          
+          if (deletedElement.hasOwnProperty('specialization')) {
+            Object.keys(deletedElement.specialization).forEach(function (property) {
+              change.properties.specialization[property] = {};
+              updateChangeProperty(change.properties.specialization[property], "removed");
+            });            
+          }
+
+          $scope.changes.push(change);
+          $scope.id2change[e.sysmlid] = change;
+
+        });
+
+        ws2.updatedElements.forEach(function(e) {
+
+          var updatedElement = id2data[e.sysmlid];
+
+          var deltaElement = _.cloneDeep(updatedElement);
+
+          var change = createChange(updatedElement.name, updatedElement, deltaElement, "updated", "fa-pencil", e);
+
+          if (e.hasOwnProperty('name')) {
+            change.name = e.name;
+            deltaElement.name = e.name;
+            updateChangeProperty(change.properties.name, "updated");
+          }
+          if (e.hasOwnProperty('owner')) {
+            deltaElement.owner = e.owner;
+            updateChangeProperty(change.properties.owner, "updated");
+          }
+          if (e.hasOwnProperty('documentation')) {
+            deltaElement.documentation = e.documentation;
+            updateChangeProperty(change.properties.documentation, "updated");
+          }
+          if (e.hasOwnProperty('specialization')) {
+            Object.keys(e.specialization).forEach(function (property) {
+              deltaElement.specialization[property] = e.specialization[property];
+              change.properties.specialization[property] = {};
+              updateChangeProperty(change.properties.specialization[property], "updated");
+            });            
+          }
+
+          /* if (e.hasOwnProperty('specialization') && e.specialization.hasOwnProperty('type')) {
+            deltaElement.specialization.type = e.specialization.type;
+            updateChangeProperty(change.properties.specialization.type, "updated");
+          }
+          if (e.hasOwnProperty('specialization') && e.specialization.hasOwnProperty('value')) {
+            deltaElement.specialization.value = e.specialization.value;
+            updateChangeProperty(change.properties.specialization.value_type, "updated");
+            updateChangeProperty(change.properties.specialization.values, "updated");
+          } */
+
+          $scope.changes.push(change);
+          $scope.id2change[e.sysmlid] = change;
+
+        });
+
+        ws2.movedElements.forEach(function(e) {
+
+          var movedElement = id2data[e.sysmlid];
+
+          var deltaElement = _.cloneDeep(movedElement);
+
+          var change = createChange(movedElement.name, movedElement, deltaElement, "moved", "fa-arrows", e);
+
+          if (e.hasOwnProperty('owner')) {
+            deltaElement.owner = e.owner;
+            updateChangeProperty(change.properties.owner, "moved");
+          }
+
+          $scope.changes.push(change);
+          $scope.id2change[e.sysmlid] = change;
+
+        });
+
+        $rootScope.id2node = id2node;
+
+        var id2change = $scope.id2change;
+
+        $rootScope.id2change = id2change;
+
+        refreshStageCounters();
+    };
+
+    $timeout(function () { setupChangesList(diff.workspace1, diff.workspace2); } ); 
+}])
+.controller('WorkspaceDiffTreeController', ["_", "$timeout", "$scope", "$rootScope", "$http", "$state", "$stateParams", "$modal", "growl", "WorkspaceService", "ElementService", "diff",
+function(_, $timeout, $scope, $rootScope, $http, $state, $stateParams, $modal, growl, WorkspaceService, ElementService, diff) {
+
+    $scope.treeApi = {};
+
+    $scope.treeData = [];
+    
+    $scope.treeData = $rootScope.treeData;
+
+    $scope.options = {
+      types: {
+        'Element': 'fa fa-square',
+        'Property': 'fa fa-circle',
+        'View': 'fa fa-square',
+        'Dependency': 'fa fa-long-arrow-right',
+        'DirectedRelationship': 'fa fa-long-arrow-right',
+        'Generalization': 'fa fa-chevron-right',
+        'Package': 'fa fa-folder',
+        'Connector': 'fa fa-expand'
+      },
+      statuses: {
+        'moved'   : { style: "moved" },
+        'added'   : { style: "addition" },
+        'removed' : { style: "removal" },
+        'updated' : { style: "update" },
+        'conflict': { style: "" }
+      }
+    };
+
+    var options = $scope.options;
+
+    $rootScope.options = options;
+
+    $timeout(function () { $scope.treeApi.refresh(); $scope.treeApi.expand_all(); $rootScope.treeApi = $scope.treeApi; } ); 
+}])
+.controller('WorkspaceDiffElementViewController', ["_", "$timeout", "$scope", "$rootScope", "$http", "$state", "$stateParams", "$modal", "growl", "WorkspaceService", "ElementService", "diff",
+function(_, $timeout, $scope, $rootScope, $http, $state, $stateParams, $modal, growl, WorkspaceService, ElementService, diff) {
+    $scope.source = $stateParams.source;
+    $scope.target = $stateParams.target;
+    $scope.sourceTime = $stateParams.sourceTime;
+    $scope.targetTime = $stateParams.targetTime;
+    $scope.diff = diff;
+
+    $scope.options = $rootScope.options;
+
+    $scope.change = $rootScope.id2change[$stateParams.elementId];
+
+}]);

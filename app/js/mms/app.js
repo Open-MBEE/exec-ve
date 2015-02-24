@@ -75,6 +75,9 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
             view: function(ViewService, workspace, document, viewElements, time) {
                 return ViewService.getView(document.sysmlid, false, workspace, time);
             },
+            tags: function(ConfigService, workspace) {
+                return ConfigService.getConfigs(workspace, false);
+            },
             tag: function ($stateParams, ConfigService, workspace) {
                 if ($stateParams.tag === undefined)
                     return { name: 'latest', timestamp: 'latest' };
@@ -309,5 +312,37 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
                 controller: 'ToolCtrl'
             }
         }
+    })
+    .state('workspace.diff', {
+        url: '/diff/:source/:sourceTime/:target/:targetTime',
+        resolve: {
+            diff: function($stateParams, WorkspaceService) {
+                return WorkspaceService.diff($stateParams.target, $stateParams.source, $stateParams.targetTime, $stateParams.sourceTime);
+            }
+        },
+        views: {
+            'pane-center@': {
+                templateUrl: 'partials/mm/diff-pane-center.html'
+            },
+            'pane-left@': {
+                templateUrl: 'partials/mm/diff-pane-left.html',
+                controller: 'WorkspaceDiffChangeController'
+            },
+            'pane-right@': {
+                templateUrl: 'partials/mm/diff-pane-right.html',
+                controller: 'WorkspaceDiffTreeController'
+            }
+        }
+    })
+    .state('workspace.diff.view', {
+        url: '/element/:elementId',
+        views: {
+            'pane-center@': {
+                templateUrl: 'partials/mm/diff-view-pane-center.html',
+                controller: 'WorkspaceDiffElementViewController'
+            }
+        }
     });
+
+
 });

@@ -47,4 +47,26 @@
         </table>
 
     </div>
+
+    <div class="container-fluid container-snapshots" ng-show="show.tags">
+        <h1>Tags <i class="{{snapshotLoading}}"></i></h1>
+
+        <table class="snapshot-table table table-condensed">
+            <tr><th>Name</th><th>Time</th></tr>
+            <tr>
+                <td>
+                    <a ui-sref="workspace.site()" ui-sref-opts="{reload: true}">Latest</a>
+                </td>
+                <td></td>
+            </tr>
+            <tr ng-repeat="tag in tags | orderBy:'-timestamp'">
+                <td>
+                    <a ui-sref="workspace.site({tag: tag.id})" ui-sref-opts="{reload: true}">{{tag.name}}</a>
+                </td>
+                <td>{{tag.timestamp | date:'M/d/yy h:mm a'}}
+                </td>
+            </tr>
+        </table>
+
+    </div>
 </div>
