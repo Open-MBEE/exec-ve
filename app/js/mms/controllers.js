@@ -26,7 +26,7 @@ function($scope, $rootScope, $state, $timeout, UxService, document, time) {
 
       if ($state.current.name === 'workspace') {
           $scope.tbApi.setPermission('element.editor', true);
-      } else if ($state.current.name === 'workspace.site') {
+      } else if ($state.current.name === 'workspace.site' || $state.current.name === 'workspace.site.documentpreview') {
           $scope.tbApi.setPermission('element.editor', true);
           $scope.tbApi.addButton(UxService.getToolbarButton("tags"));
           $scope.tbApi.setPermission('tags', true);
@@ -616,7 +616,9 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
             $rootScope.mms_treeInitial = workspaceObj.id;            
     } else if ($state.current.name === 'workspace.site') {
         $rootScope.mms_treeInitial = site.sysmlid;            
-    } else if ($state.includes('workspace.site.document')) {
+    } else if ($state.current.name === 'workspace.site.documentpreview') {
+        $rootScope.mms_treeInitial = document.sysmlid;            
+    }else if ($state.includes('workspace.site.document')) {
         $rootScope.mms_treeInitial = view.sysmlid;                    
     }
 
@@ -650,7 +652,7 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree.add.configuration"));
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree.delete"));
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree.merge"));
-      } else if ($state.current.name === 'workspace.site') {
+      } else if ($state.current.name === 'workspace.site' || $state.current.name === 'workspace.site.documentpreview') {
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree.add.document"));
         $scope.bbApi.setPermission("tree.add.document", config == 'latest' ? true : false);
       } else if ($state.includes('workspace.site.document')) {
@@ -863,7 +865,7 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
     if ($state.current.name === 'workspace') {
         dataTree = UtilsService.buildTreeHierarchy(workspaces, "id", "workspace", "parent", workspaceLevel2Func);
         $scope.my_data = dataTree;
-    } else if ($state.current.name === 'workspace.site') {
+    } else if ($state.current.name === 'workspace.site' || $state.current.name === 'workspace.site.documentpreview') {
         dataTree = UtilsService.buildTreeHierarchy(sites, "sysmlid", "site", "parent", siteLevel2Func);
         $scope.my_data = dataTree;
     } else
@@ -934,12 +936,12 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
                 $state.go('workspace', {workspace: branch.data.id, tag: undefined});
             else if (branch.type === 'configuration')
                 $state.go('workspace', {workspace: branch.workspace, tag: branch.data.id});
-        } else if ($state.current.name === 'workspace.site') {
+        } else if ($state.current.name === 'workspace.site' || $state.current.name === 'workspace.site.documentpreview') {
             if (branch.type === 'site')
                 $state.go('workspace.site', {site: branch.data.sysmlid});
             else if (branch.type === 'view' || branch.type === 'snapshot') {
                 var documentSiteBranch = $rootScope.mms_treeApi.get_parent_branch(branch);
-                $state.go('workspace.site.document', {site: documentSiteBranch.data.sysmlid, document: branch.data.sysmlid});
+                $state.go('workspace.site.documentpreview', {site: documentSiteBranch.data.sysmlid, previewDocument: branch.data.sysmlid});
             }
         } else if ($state.includes('workspace.site.document')) {
 
@@ -1716,6 +1718,101 @@ function($scope, $rootScope, $stateParams, document, time) {
         }
     ];
     $rootScope.mms_fullDocMode = true;
+}])
+.controller('DocPreviewCtrl', ['$scope', '$rootScope', 'workspace', 'tag', 'time', 'site', 'documentPreview', 'snapshot', 'ConfigService', 'growl',
+function($scope, $rootScope, workspace, tag, time, site, documentPreview, snapshot, ConfigService, growl) {
+    $scope.ws = workspace;
+    if (time !== 'latest')
+        $scope.time = documentPreview.created;
+
+    $scope.docid = documentPreview.sysmlid;
+    $scope.api = {};
+    $scope.site = site.sysmlid;
+    $scope.snapshot = snapshot;
+    $scope.pdfText = "Generate PDF";
+    $scope.getPDFStatus = function(){
+        
+        var formats = snapshot.formats;
+        if(!formats || formats.length===0) return null;
+        for(var i=0; i < formats.length; i++){
+            if(formats[i].type=='pdf') {
+                var status = formats[i].status;
+                if(status == 'Generating'){
+                    status = 'Generating...';
+                }
+                else if(status == 'Error') status = 'Regenerate PDF';
+                $scope.pdfText = status;
+                return status;
+            }
+        }
+        return null;
+    };
+
+    $scope.getPDFUrl = function(){
+        var formats = snapshot.formats;
+        if(!formats || formats.length===0) return null;
+        for(var i=0; i < formats.length; i++){
+            if(formats[i].type=='pdf'){
+                return formats[i].url;
+            }
+        }
+        return null;
+    };
+
+    $scope.zipText = "Generate Zip";
+    $scope.getZipStatus = function(){
+        var formats = snapshot.formats;
+        if(!formats || formats.length===0) return null;
+        for(var i=0; i < formats.length; i++){
+            if(formats[i].type=='html') {
+                var status = formats[i].status;
+                if(status == 'Generating') status = 'Generating...';
+                else if(status == 'Error') status = 'Regenerate Zip';
+                $scope.zipText = status;
+                return status;
+            }
+        }
+        return null;
+    };
+
+    $scope.getZipUrl = function(){
+        if(angular.isUndefined(snapshot)) return null;
+        if(snapshot===null) return null;
+        
+        var formats = snapshot.formats;
+        if(formats===undefined || formats===null || formats.length===0) return null;
+        for(var i=0; i < formats.length; i++){
+            if(formats[i].type=='html'){
+                return formats[i].url;  
+            } 
+        }
+        return null;
+    };
+
+    $scope.generateArtifacts = function(){
+        $scope.snapshot.formats.push({"type":"pdf", "status":"Generating"});
+        $scope.snapshot.formats.push({"type":"html", "status":"Generating"});
+        ConfigService.createSnapshotArtifact($scope.snapshot, $scope.site, $scope.ws).then(
+            function(result){
+                growl.success('Generating artifacts...');
+            },
+            function(reason){
+                growl.error('Failed to generate artifacts: ' + reason.message);
+            }
+        );
+    };
+
+    $scope.generatePdf = function(){
+        if ($scope.pdfText === 'Generating...')
+            return;
+        $scope.generateArtifacts();
+    };
+
+    $scope.generateZip = function(){
+        if ($scope.zipText === 'Generating...')
+            return;
+        $scope.generateArtifacts();
+    };
 }])
 .controller('WorkspaceDiffChangeController', ["_", "$timeout", "$scope", "$rootScope", "$http", "$state", "$stateParams", "$modal", "growl", "WorkspaceService", "ElementService", "diff",
 function(_, $timeout, $scope, $rootScope, $http, $state, $stateParams, $modal, growl, WorkspaceService, ElementService, diff) {

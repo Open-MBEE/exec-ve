@@ -1,0 +1,14 @@
+<div class="pane-center container-fluid">
+    <div class="pane-center-btn-group"></div>
+    <div class="pane-center-inner">
+        <a ui-sref="workspace.site.document({document: docid})">Go to document</a>   
+        <div ng-if="time !== 'latest'">
+            <button ng-if="getPDFStatus()==null || getPDFUrl()==null" class="btn" ng-click="generatePdf()">{{pdfText}}</button>
+            <a ng-if='getPDFUrl()!=null' href="{{getPDFUrl()}}" target="_blank">Download PDF</a> 
+            
+            <button ng-if="getZipStatus()==null || getZipUrl()==null" class="btn" ng-click="generateZip()">{{zipText}}</button>
+            <a ng-if="getZipUrl()!=null" href="{{getZipUrl()}}" target="_blank">Download Zip</a>
+        </div>
+        <mms-view mms-vid="{{docid}}" mms-version="{{time}}" mms-ws="{{ws}}" mms-view-api="api"></mms-view>
+    </div>
+</div>

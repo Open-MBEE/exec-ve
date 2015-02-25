@@ -221,6 +221,29 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
             }                    
         }
     })
+    .state('workspace.site.documentpreview', {
+        url: '/document/:previewDocument',
+        resolve: {
+            documentPreview: function($stateParams, ElementService, workspace, time) {
+                return ElementService.getElement($stateParams.previewDocument, false, workspace, time);
+            },
+            snapshot: function(configSnapshots, documentPreview) {
+                var docid = documentPreview.sysmlid;
+                var found = null;
+                configSnapshots.forEach(function(snapshot) {
+                    if (docid === snapshot.sysmlid)
+                        found = snapshot;
+                });
+                return found; 
+            }
+        },
+        views: {
+            'pane-center@': {
+                templateUrl: 'partials/mms/pane-center-doc.html',
+                controller: 'DocPreviewCtrl'
+            }
+        }
+    })
     .state('workspace.site.document', {
         url: '/documents/:document',
         resolve: {
