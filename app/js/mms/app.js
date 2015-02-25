@@ -295,7 +295,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
         url: '/order',
         views: {      
             'pane-center@': {
-                templateUrl: 'partials/ve/reorder-views.html',
+                templateUrl: 'partials/mms/reorder-views.html',
                 controller: 'ReorderCtrl'
             }
         }
@@ -304,7 +304,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
         url: '/full',
         views: {      
             'pane-center@': {
-                templateUrl: 'partials/ve/full-doc.html',
+                templateUrl: 'partials/mms/full-doc.html',
                 controller: 'FullDocCtrl'
             }
         }
@@ -339,14 +339,14 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
         },
         views: {
             'pane-center@': {
-                templateUrl: 'partials/mm/diff-pane-center.html'
+                templateUrl: 'partials/mms/diff-pane-center.html'
             },
             'pane-left@': {
-                templateUrl: 'partials/mm/diff-pane-left.html',
+                templateUrl: 'partials/mms/diff-pane-left.html',
                 controller: 'WorkspaceDiffChangeController'
             },
             'pane-right@': {
-                templateUrl: 'partials/mm/diff-pane-right.html',
+                templateUrl: 'partials/mms/diff-pane-right.html',
                 controller: 'WorkspaceDiffTreeController'
             }
         }
@@ -355,7 +355,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
         url: '/element/:elementId',
         views: {
             'pane-center@': {
-                templateUrl: 'partials/mm/diff-view-pane-center.html',
+                templateUrl: 'partials/mms/diff-view-pane-center.html',
                 controller: 'WorkspaceDiffElementViewController'
             }
         }

@@ -143,7 +143,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, viewElement
                 };
                 if ($scope.specApi.hasEdits()) {
                     var instance = $modal.open({
-                        templateUrl: 'partials/ve/cancelConfirm.html',
+                        templateUrl: 'partials/mms/cancelConfirm.html',
                         scope: $scope,
                         controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
                             $scope.ok = function() {
@@ -548,7 +548,7 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
         };
         if ($scope.specApi.hasEdits()) {
             var instance = $modal.open({
-                templateUrl: 'partials/ve/cancelConfirm.html',
+                templateUrl: 'partials/mms/cancelConfirm.html',
                 scope: $scope,
                 controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
                     $scope.ok = function() {
@@ -928,7 +928,7 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
     $scope.my_tree_handler = function(branch) {
         if ($state.current.name === 'workspace') {
             if (branch.type === 'workspace')
-                $state.go('workspace', {workspace: branch.data.id});
+                $state.go('workspace', {workspace: branch.data.id, tag: undefined});
             else if (branch.type === 'configuration')
                 $state.go('workspace', {workspace: branch.workspace, tag: branch.data.id});
         } else if ($state.current.name === 'workspace.site') {
@@ -1032,7 +1032,7 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
             } else {
                 if (document.specialization.view2view.length > 30) {
                     var instance = $modal.open({
-                        templateUrl: 'partials/ve/fullDocWarn.html',
+                        templateUrl: 'partials/mms/fullDocWarn.html',
                         controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
                             $scope.ok = function() {$modalInstance.close('ok');};
                             $scope.cancel = function() {$modalInstance.close('cancel');};
@@ -1082,7 +1082,7 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
             $scope.newView.name = "";
 
             var instance = $modal.open({
-                templateUrl: 'partials/ve/new.html',
+                templateUrl: 'partials/mms/new-view.html',
                 scope: $scope,
                 controller: ['$scope', '$modalInstance', viewCtrl]
             });
@@ -1120,7 +1120,7 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
             $scope.from = 'Task ' + branch.data.name;
         }
         var instance = $modal.open({
-            templateUrl: 'partials/mm/new.html',
+            templateUrl: 'partials/mms/new-task.html',
             scope: $scope,
             controller: ['$scope', '$modalInstance', workspaceCtrl]
         });
@@ -1159,7 +1159,7 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
         $scope.configuration.now = true;
 
         var instance = $modal.open({
-            templateUrl: 'partials/mm/new-configuration.html',
+            templateUrl: 'partials/mms/new-tag.html',
             scope: $scope,
             controller: ['$scope', '$modalInstance', '$filter', configurationCtrl]
         });
@@ -1183,7 +1183,7 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
         }
         $scope.addDocSite = branch.data.sysmlid;
         var instance = $modal.open({
-            templateUrl: 'partials/portal/newDoc.html',
+            templateUrl: 'partials/mms/new-doc.html',
             scope: $scope,
             controller: ['$scope', '$modalInstance', addDocCtrl]
         });
@@ -1210,7 +1210,7 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
         // TODO: do not pass selected branch in scope, move page to generic location
         $scope.deleteBranch = branch;
         var instance = $modal.open({
-            templateUrl: 'partials/mm/delete.html',
+            templateUrl: 'partials/mms/delete.html',
             scope: $scope,
             controller: ['$scope', '$modalInstance', deleteCtrl]
         });
@@ -1241,7 +1241,7 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
 
         $scope.deleteBranch = branch;
         var instance = $modal.open({
-            templateUrl: 'partials/ve/delete.html',
+            templateUrl: 'partials/mms/delete.html',
             scope: $scope,
             controller: ['$scope', '$modalInstance', deleteViewCtrl]
         });
@@ -2220,5 +2220,4 @@ function(_, $timeout, $scope, $rootScope, $http, $state, $stateParams, $modal, g
     $scope.options = $rootScope.options;
 
     $scope.change = $rootScope.id2change[$stateParams.elementId];
-
 }]);
