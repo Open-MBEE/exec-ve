@@ -3,8 +3,8 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('ToolbarCtrl', ['$scope', '$rootScope', '$state', '$timeout', 'UxService',
-function($scope, $rootScope, $state, $timeout, UxService) {   
+.controller('ToolbarCtrl', ['$scope', '$rootScope', '$state', '$timeout', 'UxService', 'document', 'time',
+function($scope, $rootScope, $state, $timeout, UxService, document, time) {   
 
     $scope.tbApi = {};
     $scope.buttons = [];
@@ -31,8 +31,11 @@ function($scope, $rootScope, $state, $timeout, UxService) {
           $scope.tbApi.addButton(UxService.getToolbarButton("tags"));
           $scope.tbApi.setPermission('tags', true);
       } else if ($state.includes('workspace.site.document')) {
+          var editable = document.editable && time === 'latest';
           $scope.tbApi.addButton(UxService.getToolbarButton("view.reorder"));
           $scope.tbApi.addButton(UxService.getToolbarButton("document.snapshot"));
+          $scope.tbApi.setPermission('element.editor',editable);
+          $scope.tbApi.setPermission("view.reorder", editable); 
       } else if ($state.includes('workspace.diff')) {
           $scope.tbApi.setPermission('element.editor', false);
       }

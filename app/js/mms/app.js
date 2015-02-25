@@ -126,7 +126,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
                 templateUrl: 'partials/mms/pane-right.html',
                 controller: 'ToolCtrl'
             },
-           'toolbar-right': {
+            'toolbar-right': {
                 template: '<mms-toolbar buttons="buttons" on-click="onClick(button)" mms-tb-api="tbApi"></mms-toolbar>',
                 controller: 'ToolbarCtrl'
             }            
@@ -214,7 +214,11 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
             'pane-center@': {
                 templateUrl: 'partials/mms/pane-center.html',
                 controller: 'ViewCtrl'
-            }        
+            }, 
+            'toolbar-right@': {
+                template: '<mms-toolbar buttons="buttons" on-click="onClick(button)" mms-tb-api="tbApi"></mms-toolbar>',
+                controller: 'ToolbarCtrl'
+            }                    
         }
     })
     .state('workspace.site.document', {
@@ -288,8 +292,12 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
             'pane-right@': {
                 templateUrl: 'partials/mms/pane-right.html',
                 controller: 'ToolCtrl'
+            },
+            'toolbar-right@': {
+                template: '<mms-toolbar buttons="buttons" on-click="onClick(button)" mms-tb-api="tbApi"></mms-toolbar>',
+                controller: 'ToolbarCtrl'
             }
-        }
+         }
     })
     .state('workspace.site.document.order', {
         url: '/order',
@@ -327,6 +335,10 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
             'pane-right@': {
                 templateUrl: 'partials/mms/pane-right.html',
                 controller: 'ToolCtrl'
+            },
+            'toolbar-right@': {
+                template: '<mms-toolbar buttons="buttons" on-click="onClick(button)" mms-tb-api="tbApi"></mms-toolbar>',
+                controller: 'ToolbarCtrl'
             }
         }
     })
@@ -348,6 +360,10 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
             'pane-right@': {
                 templateUrl: 'partials/mms/diff-pane-right.html',
                 controller: 'WorkspaceDiffTreeController'
+            },
+            'toolbar-right@': {
+                template: '<mms-toolbar buttons="buttons" on-click="onClick(button)" mms-tb-api="tbApi"></mms-toolbar>',
+                controller: 'ToolbarCtrl'
             }
         }
     })
