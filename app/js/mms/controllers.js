@@ -23,15 +23,17 @@ function($scope, $rootScope, $state, $timeout, UxService, document, time) {
 
       $scope.tbApi.addButton(UxService.getToolbarButton("element.viewer"));
       $scope.tbApi.addButton(UxService.getToolbarButton("element.editor"));
-
+      
+      var editable = false;
       if ($state.current.name === 'workspace') {
           $scope.tbApi.setPermission('element.editor', true);
       } else if ($state.current.name === 'workspace.site' || $state.current.name === 'workspace.site.documentpreview') {
-          $scope.tbApi.setPermission('element.editor', true);
+          editable = time === 'latest';
+          $scope.tbApi.setPermission('element.editor', editable);
           $scope.tbApi.addButton(UxService.getToolbarButton("tags"));
           $scope.tbApi.setPermission('tags', true);
       } else if ($state.includes('workspace.site.document')) {
-          var editable = document.editable && time === 'latest';
+          editable = document.editable && time === 'latest';
           $scope.tbApi.addButton(UxService.getToolbarButton("view.reorder"));
           $scope.tbApi.addButton(UxService.getToolbarButton("document.snapshot"));
           $scope.tbApi.setPermission('element.editor',editable);
@@ -322,6 +324,8 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
     };
 
     $scope.showTracker = function() {
+        if (time !== 'latest')
+            return false;
         return true;
         /* if (Object.keys($rootScope.veEdits).length > 1 && $scope.specApi.getEditing())
             return true;
