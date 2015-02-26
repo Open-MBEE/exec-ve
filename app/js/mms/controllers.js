@@ -26,9 +26,10 @@ function($scope, $rootScope, $state, $timeout, UxService, document, time) {
       
       var editable = false;
       if ($state.current.name === 'workspace') {
-          $scope.tbApi.setPermission('element.editor', true);
+          editable = document && document.editable && time === 'latest';
+          $scope.tbApi.setPermission('element.editor', editable);
       } else if ($state.current.name === 'workspace.site' || $state.current.name === 'workspace.site.documentpreview') {
-          editable = time === 'latest';
+          editable = document && time === 'latest';
           $scope.tbApi.setPermission('element.editor', editable);
           $scope.tbApi.addButton(UxService.getToolbarButton("tags"));
           $scope.tbApi.setPermission('tags', true);
@@ -48,6 +49,13 @@ function($scope, $rootScope, $state, $timeout, UxService, document, time) {
 }])
 .controller('ViewCtrl', ['$scope', '$rootScope', '$state', '$stateParams', '$timeout', '$modal', 'viewElements', 'ElementService', 'ViewService', 'time', 'growl', 'site', 'view',
 function($scope, $rootScope, $state, $stateParams, $timeout, $modal, viewElements, ElementService, ViewService, time, growl, site, view) {
+    
+    if ($state.current.name === 'workspace') {
+        $rootScope.mms_showSiteDocLink = true;
+    } else {
+        $rootScope.mms_showSiteDocLink = false;
+    }
+
     if (!$rootScope.veCommentsOn)
         $rootScope.veCommentsOn = false;
     if (!$rootScope.veElementsOn)
@@ -55,6 +63,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, viewElement
 
     var ws = $stateParams.workspace;
 
+    $scope.view = view;
     $scope.viewElements = viewElements;
     $scope.site = site;
     var elementSaving = false;
@@ -85,7 +94,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, viewElement
             },
             tooltip: "Edit View Documentation",
             icon: "fa-edit",
-            permission: view.editable && time === 'latest'
+            permission: view && view.editable && time === 'latest'
         },
         {
             action: function() {
@@ -231,16 +240,24 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, viewElement
         }
     ];
     
-    ViewService.setCurrentViewId(view.sysmlid);
-    $rootScope.veCurrentView = view.sysmlid;
+    if (view) {
+        ViewService.setCurrentViewId(view.sysmlid);
+        $rootScope.veCurrentView = view.sysmlid;
+        $scope.vid = view.sysmlid;
+    } else {
+        $rootScope.veCurrentView = '';
+        $scope.vid = '';        
+    }
     $rootScope.veViewLoading = false;
-    $scope.vid = view.sysmlid;
     $scope.ws = ws;
     $scope.version = time;
     $scope.editing = false;
-    $timeout(function() {
-        $rootScope.$broadcast('viewSelected', $scope.vid, viewElements);
-    }, 225);
+
+    if (view) {
+        $timeout(function() {
+            $rootScope.$broadcast('viewSelected', $scope.vid, viewElements);
+        }, 225);
+    }
 
     $scope.viewApi = {};
     $scope.specApi = {};
@@ -280,12 +297,17 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
 
     $scope.document = document;
     $scope.ws = ws;
-    $scope.editable = document.editable && time === 'latest';
+    $scope.editable = document && document.editable && time === 'latest';
     $scope.snapshots = snapshots;
     $scope.tags = tags;
     $scope.site = site;
     $scope.version = time;
-    $scope.eid = $scope.document.sysmlid;
+
+    if (document)
+        $scope.eid = $scope.document.sysmlid;
+    else
+        $scope.eid = null;
+
     $scope.vid = $scope.eid;
     $scope.specApi = {};
     $rootScope.veSpecApi = $scope.specApi;
@@ -302,6 +324,7 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
     if (!$rootScope.veEdits)
         $rootScope.veEdits = {};
 
+    /* TODO: for editing of workspace/tag elements
     if ($state.current.name === 'workspace') {
         if (tag.name !== 'latest') {
             $scope.document = tag;
@@ -311,7 +334,10 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
             $scope.document = workspaceObj;
             $scope.eid = workspaceObj.id;            
         }
-    }
+    } */
+
+    $scope.document = workspaceObj;
+    $scope.eid = workspaceObj.id;            
 
     $scope.snapshotClicked = function() {
         $scope.snapshotLoading = 'fa fa-spinner fa-spin';

@@ -1,21 +1,23 @@
 <div class="pane-right">
-    <div class="container-fluid" ng-show="show.element">
-        <div ng-show="showTracker()">
-            <br>
-            <form class="form-horizontal">
-                <div class="form-group">
-                    <label class="col-sm-3 control-label">Open&nbsp;Edits:</label>
-                    <div class="col-sm-9">
-                        <select class="form-control" ng-options="eid as edit.specialization.type + ': ' + edit.name for (eid, edit) in veEdits" ng-model="etrackerSelected" ng-change="etrackerChange()">
-                        <!-- <option value="">--- Choose Open Edits ---</option> -->
-                        </select>
+    <div ng-if="document !== null">
+        <div class="container-fluid" ng-show="show.element">
+            <div ng-show="showTracker()">
+                <br>
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Open&nbsp;Edits:</label>
+                        <div class="col-sm-9">
+                            <select class="form-control" ng-options="eid as edit.specialization.type + ': ' + edit.name for (eid, edit) in veEdits" ng-model="etrackerSelected" ng-change="etrackerChange()">
+                            <!-- <option value="">--- Choose Open Edits ---</option> -->
+                            </select>
+                        </div>
                     </div>
-                </div>
-            </form>
+                </form>
+            </div>
+            <mms-spec mms-eid="{{eid}}" mms-cf-elements="viewElements" mms-edit-field="all" mms-version="{{version}}" mms-ws="{{ws}}" mms-site="{{site.sysmlid}}" mms-spec-api="specApi"></mms-spec>
         </div>
-        <mms-spec mms-eid="{{eid}}" mms-cf-elements="viewElements" mms-edit-field="all" mms-version="{{version}}" mms-ws="{{ws}}" mms-site="{{site.sysmlid}}" mms-spec-api="specApi"></mms-spec>
     </div>
-
+    
     <div class="container-fluid" ng-show="show.reorder">
         <mms-view-struct mms-vid="{{vid}}" mms-version="{{version}}" mms-order="true" mms-ws="{{ws}}" mms-view-struct-api="viewOrderApi"></mms-view-struct>
     </div>

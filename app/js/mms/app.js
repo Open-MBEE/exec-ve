@@ -44,7 +44,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
                 }, function(reason) {
 
                     // if it is an error, other than a 404 (element not found) then stop and return
-                    if (reason.status !== 404) return null;
+                    if (reason.status === 404 || time !== 'latest') return null;
 
                     var doc = {
                         specialization: {type: "View"},
@@ -73,17 +73,21 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
 
                     });
 
-                }).finally(function(){
-                    return null;
                 });
             },
             views: function(ViewService, workspace, document, time) {
+                if (document === null) 
+                    return null;
                 return ViewService.getDocumentViews(document.sysmlid, false, workspace, time, true);
             },
             viewElements: function(ViewService, workspace, document, time) {
+                if (document === null) 
+                    return null;
                 return ViewService.getViewElements(document.sysmlid, false, workspace, time);
             },    
-            view: function(ViewService, workspace, document, viewElements, time) {
+            view: function(ViewService, workspace, document, time) {
+                if (document === null) 
+                    return null;
                 return ViewService.getView(document.sysmlid, false, workspace, time);
             },
             tags: function(ConfigService, workspace) {
@@ -151,7 +155,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
                 }, function(reason) {
 
                     // if it is an error, other than a 404 (element not found) then stop and return
-                    if (reason.status !== 404) return null;
+                    if (reason.status === 404 || time !== 'latest') return null;
                     
                     // if it is a tag look-up, then don't create element
                     if (time !== 'latest') 
@@ -184,17 +188,21 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
 
                     });
 
-                }).finally(function(){
-                    return null;
                 });
             },
             views: function(ViewService, workspace, document, time) {
+                if (document === null) 
+                    return null;
                 return ViewService.getDocumentViews(document.sysmlid, false, workspace, time, true);
             },
             viewElements: function(ViewService, workspace, document, time) {
+                if (document === null) 
+                    return null;
                 return ViewService.getViewElements(document.sysmlid, false, workspace, time);
             },    
-            view: function(ViewService, workspace, document, viewElements, time) {
+            view: function(ViewService, workspace, document, time) {
+                if (document === null) 
+                    return null;
                 return ViewService.getView(document.sysmlid, false, workspace, time);
             }
         },

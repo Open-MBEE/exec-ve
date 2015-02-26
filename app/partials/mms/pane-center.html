@@ -1,27 +1,32 @@
-<i class="pane-center-spinner fa fa-5x fa-spinner fa-spin" ng-show="veViewLoading"></i>
 
-<div ng-hide="veViewLoading" class="pane-center container-fluid">
+<div ng-show="mms_showSiteDocLink">
+  <h4><a class="docweb-link" ui-sref="workspace.site({site:'no_site'})">Sites and Documents</a></h4>
+</div>
 
-  <div class="pane-center-btn-group">
+<div ng-if="view !== null" >
+  <i class="pane-center-spinner fa fa-5x fa-spinner fa-spin" ng-show="veViewLoading"></i>
 
-      <a ng-show="button.permission" type="button" ng-repeat="button in buttons" class="view-tools center" ng-click="button.action()" tooltip="{{button.tooltip}}" tooltip-append-to-body="true" tooltip-trigger="mouseenter" tooltip-popup-delay="400" tooltip-placement="bottom">
-          <span class="fa {{button.icon}}"></span>
-      </a>
+  <div ng-hide="veViewLoading" class="pane-center container-fluid">
+
+    <div class="pane-center-btn-group">
+        <a ng-show="button.permission" type="button" ng-repeat="button in buttons" class="view-tools center" ng-click="button.action()" tooltip="{{button.tooltip}}" tooltip-append-to-body="true" tooltip-trigger="mouseenter" tooltip-popup-delay="400" tooltip-placement="bottom">
+            <span class="fa {{button.icon}}"></span>
+        </a>        
+
+    </div>
       
+    <div class="pane-center-inner">
 
-  </div>
-    
-  <div class="pane-center-inner">
+      <div>{{numComments}} Comment<span ng-if="numComments > 0">, Last Commented {{lastCommented | date:'M/d/yy h:mm a'}} by {{lastCommentedBy}}</span></div>
 
-    <div>{{numComments}} Comment<span ng-if="numComments > 0">, Last Commented {{lastCommented | date:'M/d/yy h:mm a'}} by {{lastCommentedBy}}</span></div>
+      <div ng-show="editing">
+          <mms-spec mms-eid="{{vid}}" mms-cf-elements="viewElements" mms-edit-field="all" mms-version="{{version}}" mms-ws="{{ws}}" mms-site="{{site.sysmlid}}" mms-view-edit="true" mms-spec-api="specApi"></mms-spec>
+      </div>
 
-    <div ng-show="editing">
-        <mms-spec mms-eid="{{vid}}" mms-cf-elements="viewElements" mms-edit-field="all" mms-version="{{version}}" mms-ws="{{ws}}" mms-site="{{site.sysmlid}}" mms-view-edit="true" mms-spec-api="specApi"></mms-spec>
+      <div ng-hide="editing">
+          <mms-view mms-vid="{{vid}}" mms-cf-clicked="tscClicked(elementId)" mms-version="{{version}}" mms-ws="{{ws}}" mms-view-api="viewApi" mms-transcluded="elementTranscluded(element, type)"></mms-view>
+      </div>
     </div>
 
-    <div ng-hide="editing">
-        <mms-view mms-vid="{{vid}}" mms-cf-clicked="tscClicked(elementId)" mms-version="{{version}}" mms-ws="{{ws}}" mms-view-api="viewApi" mms-transcluded="elementTranscluded(element, type)"></mms-view>
-    </div>
   </div>
-
 </div>
