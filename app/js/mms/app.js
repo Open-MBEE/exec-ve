@@ -253,7 +253,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
         }
     })
     .state('workspace.site.document', {
-        url: '/documents/:document',
+        url: '/documents/:document?time',
         resolve: {
             document: function($stateParams, ElementService, time) {
                 return ElementService.getElement($stateParams.document, false, $stateParams.workspace, time);
@@ -273,43 +273,35 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
                 if (document.specialization.type !== 'Product')
                     return [];
                 return ConfigService.getProductSnapshots(document.sysmlid, site.sysmlid, workspace);
-            }
+            },
+            time: function($stateParams, tag) {
+                if ($stateParams.time === undefined)
+                    return tag.timestamp;
+                return $stateParams.time;
+            }        
         },
         views: {
             'menu@': {
-                template: '<mms-nav mms-title="View Editor" mms-ws="{{workspace}}" mms-site="site" mms-doc="document" mms-config="tag"></mms-nav>',
-                controller: function ($scope, workspace, site, document, tag) {
+                template: '<mms-nav mms-title="View Editor" mms-ws="{{workspace}}" mms-site="site" mms-doc="document" mms-config="tag" mms-snapshot-tag="{{snapshotTag}}""></mms-nav>',
+                controller: function ($scope, $filter, workspace, site, document, tag, snapshots, time) {
                     $scope.workspace = workspace;
                     $scope.tag = tag;
                     $scope.site = site;
                     $scope.document = document;
 
-                    /* 
-                    TODO: snapshot tag
-                    controller: function($scope, $stateParams, $filter, document, site, snapshots, time, ws) {
-                    var tag = '';
+                    var tagStr = '';
                     if (time !== 'latest') {
                         snapshots.forEach(function(snapshot) {
                             if (time === snapshot.created && snapshot.configurations && snapshot.configurations.length > 0)
                                 snapshot.configurations.forEach(function(config) {
-                                    tag += '(' + config.name + ') ';
-                                    $scope.config = config.id;
+                                    tagStr += '(' + config.name + ') ';
+                                    $scope.tag = config;
                                 });
                         });
-                        tag += '(' + $filter('date')(time, 'M/d/yy h:mm a') + ')';
-                    } else {
-                        $scope.config = 'latest';
-                    } 
-                    
-                    $scope.ws = ws;
-                    $scope.site = site.sysmlid;
-                    $scope.document = document;
-                    if ($stateParams.time !== 'latest')
-                        $scope.snapshotTag = ' ' + tag;
-                    
+                        tagStr += '(' + $filter('date')(time, 'M/d/yy h:mm a') + ')';
 
-                } */
-
+                        $scope.snapshotTag = ' ' + tagStr;
+                    }                                        
                 }
             },
             'pane-left@': {
