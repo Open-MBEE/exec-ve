@@ -77,6 +77,24 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, _) {
         return deferred.promise;
     };
 
+    var getConfigForEdit = function(id, workspace) {
+        var n = normalize(false, workspace);
+        var deferred = $q.defer();
+        var cacheKey = ['configs', n.ws, id, 'edit'];
+        if (CacheService.exists(cacheKey)) {
+            deferred.resolve(CacheService.get(cacheKey));
+        } else {
+            getConfig(id, workspace, false)
+            .then(function(data) {
+                var edit = _.cloneDeep(data);
+                deferred.resolve(CacheService.put(cacheKey, edit, true));
+            }, function(reason) {
+                deferred.reject(reason);
+            });
+        }
+        return deferred.promise;
+    };
+
     var getConfigSnapshots = function(id, workspace, update) {
         var n = normalize(update, workspace);
         var deferred = $q.defer();
@@ -108,7 +126,7 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, _) {
      * @param {string} [workspace=master] Workspace name
      * @returns {Promise} Promise would be resolved with the updated config object
      */
-    var createConfig = function(config, workspace) {
+    var createConfig = function(config, workspace, update) {
         var n = normalize(null, workspace);
         var deferred = $q.defer();
         /* if (config.hasOwnProperty('id')) {
@@ -118,8 +136,10 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, _) {
         $http.post(URLService.getConfigsURL(n.ws), {'configurations': [config]})
         .success(function(data, status, headers, config) {
             deferred.resolve(CacheService.put(['configs', n.ws, config.id], data, true));
-            if (CacheService.exists(['workspaces', n.ws, 'configs'])) {
-                CacheService.get(['workspaces', n.ws, 'configs']).push(data);
+            if (!update) {
+                if (CacheService.exists(['workspaces', n.ws, 'configs'])) {
+                    CacheService.get(['workspaces', n.ws, 'configs']).push(data);
+                }
             }
         }).error(function(data, status, headers, config) {
             URLService.handleHttpStatus(data, status, headers, config, deferred);
@@ -483,7 +503,7 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, _) {
     };
 
     var update = function(config, workspace) {
-        return createConfig(config, workspace);
+        return createConfig(config, workspace, true);
     };
 
     return {
@@ -491,6 +511,7 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, _) {
         createConfig : createConfig,
         deleteConfig : deleteConfig,
         getConfig : getConfig,
+        getConfigForEdit : getConfigForEdit,
         getConfigSnapshots : getConfigSnapshots,
         createSnapshotArtifact: OldcreateSnapshotArtifact,
         update : update,

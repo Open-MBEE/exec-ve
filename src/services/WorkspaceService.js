@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms')
-.factory('WorkspaceService', ['$http', '$q', 'URLService', 'ElementService', 'CacheService', WorkspaceService]);
+.factory('WorkspaceService', ['$http', '$q', 'URLService', 'ElementService', 'CacheService', '_', WorkspaceService]);
 
 /**
  * @ngdoc service
@@ -11,7 +11,7 @@ angular.module('mms')
  * 
  * @description
  */
-function WorkspaceService($http, $q, URLService, ElementService, CacheService) {
+function WorkspaceService($http, $q, URLService, ElementService, CacheService, _) {
     var inProgress = {};
 
     var getWorkspaces = function(update) {
@@ -54,6 +54,23 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService) {
         }).error(function(data, status, headers, config) {
             URLService.handleHttpStatus(data, status, headers, config, deferred);
         });
+        return deferred.promise;
+    };
+
+    var getWorkspaceForEdit = function(wid) {
+        var deferred = $q.defer();
+        var cacheKey = ['workspaces', wid, 'edit'];
+        if (CacheService.exists(cacheKey)) {
+            deferred.resolve(CacheService.get(cacheKey));
+        } else {
+            getWorkspace(wid)
+            .then(function(data) {
+                var edit = _.cloneDeep(data);
+                deferred.resolve(CacheService.put(cacheKey, edit, true));
+            }, function(reason) {
+                deferred.reject(reason);
+            });
+        }
         return deferred.promise;
     };
 
@@ -103,16 +120,18 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService) {
         return deferred.promise;
     };
 
-    var create = function(ws) {
+    var create = function(ws, update) {
         var deferred = $q.defer();
         $http.post(URLService.getWorkspacesURL(ws), {'workspaces': [ws]} )
         .success(function(data, status, headers, config) {
             var workspace = data.workspaces[0];
             var cacheKey = ['workspaces', workspace.id];
-            CacheService.put(cacheKey, workspace, false);
-            var workspaces = CacheService.get(['workspaces']);
-            if (workspaces)
-                workspaces.push(workspace);
+            CacheService.put(cacheKey, workspace, true);
+            if (update) {
+                var workspaces = CacheService.get(['workspaces']);
+                if (workspaces)
+                    workspaces.push(workspace);
+            }
             deferred.resolve(workspace);
         }).error(function(data, status, headers, config) {
             URLService.handleHttpStatus(data, status, headers, config, deferred);
@@ -123,12 +142,13 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService) {
     var update = function(ws) {
         // there is no distinction between update and create,
         // creating this just for semantic purposes
-        return create(ws);
+        return create(ws, true);
     };
 
     return {
         getWorkspaces: getWorkspaces,
         getWorkspace: getWorkspace,
+        getWorkspaceForEdit: getWorkspaceForEdit,
         diff: diff,
         merge: merge,
         deleteWorkspace: deleteWorkspace,

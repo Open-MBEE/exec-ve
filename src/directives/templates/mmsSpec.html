@@ -1,4 +1,4 @@
-<div ng-show="editing" class="editing">
+<div ng-if="mmsType=='element'" ng-show="editing" class="editing">
     <h1 class="prop"><input class="form-control" type="text" ng-model="edit.name"></input></h1>
 
     <h2 ng-hide="mmsViewEdit" class="prop-title">LAST MODIFICATION</h2>
@@ -57,7 +57,7 @@
 
 </div>
 
-<div ng-hide="editing" class="reading">
+<div ng-if="mmsType=='element'" ng-hide="editing" class="reading">
     <h1 class="prop element-title">{{element.name}}</h1>
 
     <h2 class="prop-title">LAST MODIFICATION</h2>
@@ -123,4 +123,36 @@
     <h3 class="prop">{{element.qualifiedName}}</h3>
     <h2 class="prop-title">ID</h2>
     <h3 class="prop sysmlid">{{element.sysmlid}}</h3>
+</div>
+
+<div ng-if="mmsType=='workspace'" ng-show="editing" class="editing">
+    <h1 class="prop"><input class="form-control" type="text" ng-model="edit.name"></input></h1>
+    <h2 class="prop-title">TASK AUTHOR</h2>
+    <h3 class="prop">{{element.creator}}</h3>
+    <h2 class="prop-title">DATE CREATED</h2>
+    <h3 class="prop">{{element.created | date:'M/d/yy h:mm a'}}</h3>
+</div>
+
+<div ng-if="mmsType=='workspace'" ng-hide="editing" class="reading">
+    <h1 class="prop element-title">{{element.name}}</h1>
+    <h2 class="prop-title">TASK AUTHOR</h2>
+    <h3 class="prop">{{element.creator}}</h3>
+    <h2 class="prop-title">DATE CREATED</h2>
+    <h3 class="prop">{{element.created | date:'M/d/yy h:mm a'}}</h3>
+</div>
+
+<div ng-if="mmsType=='tag'" ng-show="editing" class="editing">
+    <h1 class="prop"><input class="form-control" type="text" ng-model="edit.name"></input></h1>
+    <h2 class="prop-title">DESCRIPTION</h2>
+    <textarea ng-model="edit.description"></textarea>
+    <h2 class="prop-title">TIMESTAMP</h2>
+    <h3 class="prop">{{element.timestamp | date:'M/d/yy h:mm a'}}</h3>
+</div>
+
+<div ng-if="mmsType=='tag'" ng-hide="editing" class="reading">
+    <h1 class="prop element-title">{{element.name}}</h1>
+    <h2 class="prop-title">DESCRIPTION</h2>
+    <p class="doc-text" ng-bind-html="element.description"></p>
+    <h2 class="prop-title">TIMESTAMP</h2>
+    <h3 class="prop">{{element.timestamp | date:'M/d/yy h:mm a'}}</h3>
 </div>
