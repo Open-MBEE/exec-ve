@@ -127,7 +127,7 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService, _
             var workspace = data.workspaces[0];
             var cacheKey = ['workspaces', workspace.id];
             CacheService.put(cacheKey, workspace, true);
-            if (update) {
+            if (!update) {
                 var workspaces = CacheService.get(['workspaces']);
                 if (workspaces)
                     workspaces.push(workspace);

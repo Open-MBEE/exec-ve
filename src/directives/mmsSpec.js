@@ -188,6 +188,8 @@ function mmsSpec(ElementService, WorkspaceService, ConfigService, $compile, $tem
         };
         scope.changeElement = changeElement;
         scope.$watch('mmsEid', changeElement);
+        //scope.$watch('mmsType', changeElement);
+        //scope.$watch('mmsWs', changeElement);
 
         /**
          * @ngdoc function

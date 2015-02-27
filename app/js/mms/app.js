@@ -33,7 +33,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
             site: function(SiteService) {
                 return SiteService.getSite('no_site');
             },
-            document : function(ElementService, workspace, time, growl) {
+            document : function(ElementService, workspace, time, growl, workspaceObj) {
             
                 // This is a short-term work-around -- all this should be done the back-end MMS in the future
                 var wsCoverDocId = 'master_cover';
@@ -44,11 +44,11 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
                 }, function(reason) {
 
                     // if it is an error, other than a 404 (element not found) then stop and return
-                    if (reason.status === 404 || time !== 'latest') return null;
+                    if (reason.status !== 404 || time !== 'latest') return null;
 
                     var doc = {
                         specialization: {type: "View"},
-                        name: 'Workspace Cover Page',
+                        name: 'Workspace ' + workspaceObj.name + ' Cover Page',
                         documentation: ''
                     };
                     doc.sysmlid = wsCoverDocId;
@@ -76,13 +76,14 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
                 });
             },
             views: function(ViewService, workspace, document, time) {
-                if (document === null) 
-                    return null;
-                return ViewService.getDocumentViews(document.sysmlid, false, workspace, time, true);
+                return [];
+                /*if (document === null) 
+                    return [];
+                return ViewService.getDocumentViews(document.sysmlid, false, workspace, time, true);*/
             },
             viewElements: function(ViewService, workspace, document, time) {
                 if (document === null) 
-                    return null;
+                    return [];
                 return ViewService.getViewElements(document.sysmlid, false, workspace, time);
             },    
             view: function(ViewService, workspace, document, time) {
@@ -155,7 +156,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
                 }, function(reason) {
 
                     // if it is an error, other than a 404 (element not found) then stop and return
-                    if (reason.status === 404 || time !== 'latest') return null;
+                    if (reason.status !== 404 || time !== 'latest') return null;
                     
                     // if it is a tag look-up, then don't create element
                     if (time !== 'latest') 
@@ -191,9 +192,10 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
                 });
             },
             views: function(ViewService, workspace, document, time) {
-                if (document === null) 
+                return [];
+                /*if (document === null) 
                     return null;
-                return ViewService.getDocumentViews(document.sysmlid, false, workspace, time, true);
+                return ViewService.getDocumentViews(document.sysmlid, false, workspace, time, true);*/
             },
             viewElements: function(ViewService, workspace, document, time) {
                 if (document === null) 

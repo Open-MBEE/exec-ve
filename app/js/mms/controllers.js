@@ -26,8 +26,8 @@ function($scope, $rootScope, $state, $timeout, UxService, document, time) {
       
       var editable = false;
       if ($state.current.name === 'workspace') {
-          editable = document && document.editable && time === 'latest';
-          $scope.tbApi.setPermission('element.editor', editable);
+          //editable = document && document.editable && time === 'latest';
+          $scope.tbApi.setPermission('element.editor', true);
       } else if ($state.current.name === 'workspace.site' || $state.current.name === 'workspace.site.documentpreview') {
           editable = document && time === 'latest';
           $scope.tbApi.setPermission('element.editor', editable);
@@ -369,8 +369,8 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
     };
 
     $scope.showTracker = function() {
-        if (time !== 'latest')
-            return false;
+        /*if (time !== 'latest')
+            return false;*/
         return true;
         /* if (Object.keys($rootScope.veEdits).length > 1 && $scope.specApi.getEditing())
             return true;
@@ -472,6 +472,8 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
                 $rootScope.mms_tbApi.setPermission('element.editor.saveall', false);
             }
         }
+        if ($scope.elementType !== 'element')
+            return;
         ElementService.isCacheOutdated($scope.eid, $scope.specWs)
         .then(function(data) {
             if (data.status && data.server.modified > data.cache.modified)
@@ -997,10 +999,10 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
     $scope.my_tree_handler = function(branch) {
         if ($state.current.name === 'workspace') {
             if (branch.type === 'workspace') {
-                $rootScope.$broadcast('elementSelected', branch.data.id, 'workspace');
+                //$rootScope.$broadcast('elementSelected', branch.data.id, 'workspace');
                 $state.go('workspace', {workspace: branch.data.id, tag: undefined});
             } else if (branch.type === 'configuration') {
-                $rootScope.$broadcast('elementSelected', branch.data.id, 'tag');
+                //$rootScope.$broadcast('elementSelected', branch.data.id, 'tag');
                 $state.go('workspace', {workspace: branch.workspace, tag: branch.data.id});
             }
         } else if ($state.current.name === 'workspace.site' || $state.current.name === 'workspace.site.documentpreview') {
