@@ -5,7 +5,7 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
 
     $urlRouterProvider.rule(function ($injector, $location) {
         // default to workspace - master if url is old format
-        if (! $location.path().startsWith('/workspaces'))
+        if ($location.path().indexOf('/workspaces') === -1)
         {
             var workspacePath = 'workspaces/master' + $location.path();
             $location.path(workspacePath);
