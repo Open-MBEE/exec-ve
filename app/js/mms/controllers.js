@@ -329,7 +329,7 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
     if (!$rootScope.veEdits)
         $rootScope.veEdits = {};
 
-    /* TODO: for editing of workspace/tag elements
+    // TODO: for editing of workspace/tag elements
     if ($state.current.name === 'workspace') {
         if (tag.name !== 'latest') {
             $scope.document = tag;
@@ -339,10 +339,10 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
             $scope.document = workspaceObj;
             $scope.eid = workspaceObj.id;            
         }
-    } */
+    } 
 
-    $scope.document = workspaceObj;
-    $scope.eid = workspaceObj.id;            
+    //$scope.document = workspaceObj;
+    //$scope.eid = workspaceObj.id;            
 
     $scope.snapshotClicked = function() {
         $scope.snapshotLoading = 'fa fa-spinner fa-spin';
