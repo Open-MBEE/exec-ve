@@ -1030,19 +1030,123 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
 
     $scope.addItem = function(itemType) {
 
-      // TODO: Merge functions for adding, make generic, hack for now
-      if (itemType === 'Workspace') {
-        $scope.addWorkspace();        
-      } else if (itemType === 'Tag') {
-        $scope.addConfiguration();
-      } else if (itemType === 'Document') {
-        $scope.addDocument();
-      } else if (itemType === 'View') {
-        $scope.addView();
-      } else {
-        growl.error("Add Item of Type " + itemType + " is not supported");
-      }
+        // TODO: combine templateUrlStr into one .html
 
+        $scope.itemType = itemType;
+        var branch = $scope.treeApi.get_selected_branch();
+        var templateUrlStr = "";
+        var branchType = "";
+
+        // Adds the branch:
+        var myAddBranch = function() {
+            var instance = $modal.open({
+                templateUrl: templateUrlStr,
+                scope: $scope,
+                controller: ['$scope', '$modalInstance', '$filter', addItemCtrl]
+            });
+            instance.result.then(function(data) {
+                var newbranch = {
+                    label: data.name,
+                    type: branchType,
+                    data: data,
+                    children: [],
+                };
+                
+                var top = false;
+                if (itemType === 'Tag') {
+                    newbranch.workspace = branch.data.id;
+                    top = true;
+                }
+                else if (itemType === 'Document') {
+                    newbranch.site = branch.data.sysmlid;
+                }
+
+                $scope.treeApi.add_branch(branch, newbranch, top);
+
+                if (itemType === 'View') {
+                    $state.go('workspace.site.document.view', {view: data.sysmlid});
+                }
+
+            });
+        };
+
+        // Item specific setup:
+        if (itemType === 'Workspace') {
+            if (!branch) {
+                growl.warning("Add Task Error: Select a task or tag first");
+                return;
+            }
+            if (branch.type === 'configuration') {
+                $scope.createWsParentId = branch.workspace;
+                $scope.createWsTime = branch.data.timestamp;
+                $scope.from = 'Tag ' + branch.data.name;
+            } else {
+                $scope.createWsParentId = branch.data.id;
+                $scope.createWsTime = $filter('date')(new Date(), 'yyyy-MM-ddTHH:mm:ss.sssZ');
+                $scope.from = 'Task ' + branch.data.name;
+            }
+            templateUrlStr = 'partials/mms/new-task.html';
+            branchType = 'workspace';
+        }
+        else if (itemType === 'Tag') {
+            if (!branch) {
+                growl.warning("Add Tag Error: Select parent task first");
+                return;
+            } else if (branch.type != "workspace") {
+                growl.warning("Add Tag Error: Selection must be a task");
+                return;
+            }
+            $scope.createConfigParentId = branch.data.id;
+            $scope.configuration = {};
+            $scope.configuration.now = true;
+            templateUrlStr = 'partials/mms/new-tag.html';
+            branchType = 'configuration';
+        } 
+        else if (itemType === 'Document') {
+            if (!branch || branch.type !== 'site') {
+                growl.warning("Select a site to add document under");
+                return;
+            }
+            $scope.addDocSite = branch.data.sysmlid;
+            templateUrlStr = 'partials/mms/new-doc.html';
+            branchType = 'view';
+        } 
+        else if (itemType === 'View') {
+            if (!branch) {
+                growl.warning("Add View Error: Select parent view first");
+                return;
+            } else if (branch.type === "section") {
+                growl.warning("Add View Error: Cannot add a child view to a section");
+                return;
+            }
+            templateUrlStr = 'partials/mms/new-view.html';
+            branchType = 'view';
+
+            ElementService.isCacheOutdated(document.sysmlid, ws)
+            .then(function(status) {
+                if (status.status) {
+                    if (!angular.equals(document.specialization.view2view, status.server.specialization.view2view)) {
+                        growl.error('The document hierarchy is outdated, refresh the page first!');
+                        return;
+                    } 
+                } 
+                $scope.createViewParentId = branch.data.sysmlid;
+                $scope.newView = {};
+                $scope.newView.name = "";
+
+                myAddBranch();
+
+            }, function(reason) {
+                growl.error('Checking if document hierarchy is up to date failed: ' + reason.message);
+            });
+        } 
+        else {
+            growl.error("Add Item of Type " + itemType + " is not supported");
+        }
+
+        if (itemType !== 'View') {
+            myAddBranch();
+        }
     };
 
     $scope.fullDocMode = function() {
@@ -1092,6 +1196,7 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
         }
     };
 
+    // TODO: remove
     $scope.addView = function() {
 
         var branch = $scope.treeApi.get_selected_branch();
@@ -1119,7 +1224,8 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
             var instance = $modal.open({
                 templateUrl: 'partials/mms/new-view.html',
                 scope: $scope,
-                controller: ['$scope', '$modalInstance', viewCtrl]
+                //controller: ['$scope', '$modalInstance', viewCtrl]
+                controller: ['$scope', '$modalInstance', '$filter', addItemCtrl]
             });
             instance.result.then(function(data) {
               $scope.treeApi.add_branch(branch, {
@@ -1138,7 +1244,7 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
         });
     };
 
-    // TODO: merge with addItem and remove
+    // TODO: remove
     $scope.addWorkspace = function() {
         var branch = $scope.treeApi.get_selected_branch();
         if (!branch) {
@@ -1158,6 +1264,7 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
             templateUrl: 'partials/mms/new-task.html',
             scope: $scope,
             controller: ['$scope', '$modalInstance', workspaceCtrl]
+            //controller: ['$scope', '$modalInstance', '$filter', addItemCtrl]
         });
         instance.result.then(function(data) {
             var newbranch = {
@@ -1177,7 +1284,7 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
         });
     };
 
-    // TODO: merge with addItem and remove
+    // TODO: remove
     $scope.addConfiguration = function() {
 
         var branch = $scope.treeApi.get_selected_branch();
@@ -1196,7 +1303,8 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
         var instance = $modal.open({
             templateUrl: 'partials/mms/new-tag.html',
             scope: $scope,
-            controller: ['$scope', '$modalInstance', '$filter', configurationCtrl]
+            //controller: ['$scope', '$modalInstance', '$filter', configurationCtrl]
+            controller: ['$scope', '$modalInstance', '$filter', addItemCtrl]
         });
         instance.result.then(function(data) {
           $scope.treeApi.add_branch(branch, {
@@ -1209,7 +1317,7 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
         });
     };
 
-    // TODO: merge with addItem and remove
+    // TODO: remove
     $scope.addDocument = function() {
         var branch = $scope.treeApi.get_selected_branch();
         if (!branch || branch.type !== 'site') {
@@ -1220,7 +1328,8 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
         var instance = $modal.open({
             templateUrl: 'partials/mms/new-doc.html',
             scope: $scope,
-            controller: ['$scope', '$modalInstance', addDocCtrl]
+            //controller: ['$scope', '$modalInstance', addDocCtrl]
+            controller: ['$scope', '$modalInstance', '$filter', addItemCtrl]
         });
         instance.result.then(function(data) {
             var newbranch = {
@@ -1377,6 +1486,154 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
         $scope.cancel = function() {
             $modalInstance.dismiss();
         };
+    };
+
+    // Generic add controller    
+    var addItemCtrl = function($scope, $modalInstance, $filter) {
+
+        $scope.oking = false;
+        var displayName = "";
+
+        // Item specific setup:
+        if ($scope.itemType === 'Workspace') {
+            $scope.workspace = {};
+            $scope.workspace.name = "";
+            $scope.workspace.description = "";
+            $scope.workspace.permission = "read";
+            displayName = "Task";
+        }
+        else if ($scope.itemType === 'Tag') {
+            $scope.configuration = {};
+            $scope.configuration.name = "";
+            $scope.configuration.description = "";
+            $scope.configuration.now = "true";
+            $scope.configuration.timestamp = new Date();
+            displayName = "Tag";
+        }
+        else if ($scope.itemType === 'Document') {
+            $scope.doc = {name: ""};
+            displayName = "Document";
+        }
+        else if ($scope.itemType === 'View') {
+            $scope.newView = {};
+            $scope.newView.name = "";
+            displayName = "View";
+        }
+        else {
+            growl.error("Add Item of Type " + $scope.itemType + " is not supported");
+            return;
+        }
+
+        $scope.search = function(searchText) {
+            //var searchText = $scope.searchText; //TODO investigate why searchText isn't in $scope
+            //growl.info("Searching...");
+            $scope.searchClass = "fa fa-spin fa-spinner";
+
+            ElementService.search(searchText, false, ws)
+            .then(function(data) {
+
+                for (var i = 0; i < data.length; i++) {
+                    if (data[i].specialization.type != 'View') {
+                        data.splice(i, 1);
+                        i--;
+                    }
+                }
+
+                $scope.mmsCfElements = data;
+                $scope.searchClass = "";
+            }, function(reason) {
+                growl.error("Search Error: " + reason.message);
+                $scope.searchClass = "";
+            });
+        };
+
+        $scope.addView = function(viewId) {
+            var documentId = $scope.document.sysmlid;
+            var workspace = ws;
+
+            var branch = $scope.treeApi.get_selected_branch();
+            var parentViewId = branch.data.sysmlid;
+
+            if ($scope.oking) {
+                growl.info("Please wait...");
+                return;
+            }
+            $scope.oking = true;  
+
+            ViewService.getView(viewId, false, workspace)
+            .then(function (data) {
+                
+                var viewOb = data;
+
+                ViewService.addViewToDocument(viewId, documentId, parentViewId, workspace, viewOb)
+                .then(function(data) {
+                    growl.success("View Added");
+                    $modalInstance.close(viewOb);
+                }, function(reason) {
+                    growl.error("View Add Error: " + reason.message);
+                }).finally(function() {
+                    $scope.oking = false;
+                }); 
+
+            }, function(reason) {
+                growl.error("View Add Error: " + reason.message);
+            }).finally(function() {
+                $scope.oking = false;
+            });             
+        };
+
+        $scope.ok = function() {
+            if ($scope.oking) {
+                growl.info("Please wait...");
+                return;
+            }
+            $scope.oking = true;
+            var promise;
+
+            // Item specific promise:
+            if ($scope.itemType === 'Workspace') {
+                var workspaceObj = {"name": $scope.workspace.name, "description": $scope.workspace.description,
+                                    "permission": $scope.workspace.permission};
+                workspaceObj.parent = $scope.createWsParentId;
+                workspaceObj.branched = $scope.createWsTime;
+                promise = WorkspaceService.create(workspaceObj);
+            }
+            else if ($scope.itemType === 'Tag') {
+                var config = {"name": $scope.configuration.name, "description": $scope.configuration.description};
+                if ($scope.configuration.now === "false") {
+                    config.timestamp = $filter('date')($scope.configuration.timestamp, 'yyyy-MM-ddTHH:mm:ss.sssZ');
+                }
+                promise = ConfigService.createConfig(config, $scope.createConfigParentId);
+            }
+            else if ($scope.itemType === 'Document') {
+                promise = ViewService.createDocument($scope.doc.name, $scope.addDocSite, $scope.ws);
+            }
+            else if ($scope.itemType === 'View') {
+                promise = ViewService.createView($scope.createViewParentId, $scope.newView.name, 
+                                                 $scope.document.sysmlid, ws);
+            }
+            else {
+                growl.error("Add Item of Type " + $scope.itemType + " is not supported");
+                $scope.oking = false;
+                return;
+            }
+
+            // Handle the promise:
+            promise
+            .then(function(data) {
+                growl.success(displayName+" Created");
+                $modalInstance.close(data);
+            }, function(reason) {
+                growl.error("Create "+displayName+" Error: " + reason.message);
+            }).finally(function() {
+                $scope.oking = false;
+            });
+        };
+
+        $scope.cancel = function() {
+            $modalInstance.dismiss();
+        };
+
     };
 
     // TODO: Make this a generic add controller

@@ -14,6 +14,11 @@
       <label>Description:</label>
       <textarea mms-tinymce class="form-control" ng-model="workspace.description"></textarea>
     </div>
+    <div class="form-group">
+      <label>Permission:</label>
+      <input ng-model="workspace.permission" value="read" type="radio"> Read</input>
+      <input ng-model="workspace.permission" value="write" type="radio"> Write</input>    
+    </div>
   </div>
 
 </div>
