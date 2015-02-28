@@ -334,10 +334,7 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
             $scope.document = workspaceObj;
             $scope.eid = workspaceObj.id;            
         }
-    } */
-
-    $scope.document = workspaceObj;
-    $scope.eid = workspaceObj.id;            
+    } */           
 
     $scope.snapshotClicked = function() {
         $scope.snapshotLoading = 'fa fa-spinner fa-spin';
@@ -1004,7 +1001,7 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
         if (b.type === 'configuration') {
             b.priority = 0 ;
         } else if (a.type === 'view') {
-            a.priority = 1;
+            b.priority = 1;
         }
 
         if(a.priority < b.priority) return -1;
