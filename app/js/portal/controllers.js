@@ -182,8 +182,8 @@ function($scope, $rootScope, $location, $timeout, $state, $anchorScroll, Element
     }, 5000);
 
 }])
-.controller('SiteCtrl', ['$rootScope', '$scope', '$stateParams', 'documents', 'config', 'configSnapshots', 'siteCoverDoc', 'ConfigService', 'ElementService', 'growl',
-function ($rootScope, $scope, $stateParams, documents, config, configSnapshots, siteCoverDoc, ConfigService, ElementService, growl) {
+.controller('SiteCtrl', ['$rootScope', '$scope', '$stateParams', 'documents', 'config', 'configSnapshots', 'siteCoverDoc', 'ConfigService', 'ElementService', 'growl', '$modal',
+function ($rootScope, $scope, $stateParams, documents, config, configSnapshots, siteCoverDoc, ConfigService, ElementService, growl, $modal) {
     $scope.ws = $stateParams.ws;
     $scope.site = $stateParams.site;
     $scope.time = 'latest';
@@ -198,7 +198,6 @@ function ($rootScope, $scope, $stateParams, documents, config, configSnapshots, 
         docids.push(doc.sysmlid);
     });
     $scope.configSnapshots = configSnapshots;
-    $scope.buttons = [];
     $scope.config = config;
     $rootScope.tree_initial = $scope.site;
     $scope.snapshots = [];
@@ -292,6 +291,94 @@ function ($rootScope, $scope, $stateParams, documents, config, configSnapshots, 
             return;
         $scope.generateArtifacts(snapshot, elem);
     };
+
+
+    $scope.specApi = {};
+    $scope.editing = false;
+    var elementSaving = false;
+    $scope.buttons = [
+        {
+            action: function() {
+                $scope.editing = !$scope.editing;
+                $scope.specApi.setEditing(true);
+                $scope.buttons[0].permission = false;
+                $scope.buttons[1].permission = true;
+                $scope.buttons[2].permission = true;
+                ElementService.isCacheOutdated(siteCoverDoc.sysmlid, $scope.ws)
+                .then(function(data) {
+                    if (data.status && data.server.modified > data.cache.modified)
+                        growl.warning('This view has been updated on the server');
+                });
+            },
+            tooltip: "Edit Site View",
+            icon: "fa-edit",
+            permission: siteCoverDoc && siteCoverDoc.editable && config === 'latest'
+        },
+        {
+            action: function() {
+                
+                    if (elementSaving) {
+                        growl.info('Please Wait...');
+                        return;
+                    }
+                    elementSaving = true;
+                    $scope.buttons[1].icon = "fa-spin fa-spinner";
+                    $scope.specApi.save().then(function(data) {
+                        elementSaving = false;
+                        growl.success('Save Successful');
+                        $scope.editing = false;
+                        $scope.buttons[0].permission = true;
+                        $scope.buttons[1].permission = false;
+                        $scope.buttons[2].permission = false;
+                    }, function(reason) {
+                        elementSaving = false;
+                        if (reason.type === 'info')
+                            growl.info(reason.message);
+                        else if (reason.type === 'warning')
+                            growl.warning(reason.message);
+                        else if (reason.type === 'error')
+                            growl.error(reason.message);
+                    }).finally(function() {
+                        $scope.buttons[1].icon = "fa-save";
+                    });
+            },
+            tooltip: "Save",
+            icon: "fa-save",
+            permission: false
+        },
+        {
+            action: function() {
+                var go = function() {
+                    $scope.specApi.revertEdits();
+                    $scope.editing = false;
+                    $scope.buttons[0].permission = true;
+                    $scope.buttons[1].permission = false;
+                    $scope.buttons[2].permission = false;
+                };
+                if ($scope.specApi.hasEdits()) {
+                    var instance = $modal.open({
+                        templateUrl: 'partials/ve/cancelConfirm.html',
+                        scope: $scope,
+                        controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
+                            $scope.ok = function() {
+                                $modalInstance.close('ok');
+                            };
+                            $scope.cancel = function() {
+                                $modalInstance.dismiss();
+                            };
+                        }]
+                    });
+                    instance.result.then(function() {
+                        go();
+                    });
+                } else
+                    go();
+            },
+            tooltip:"Cancel",
+            icon: "fa-times",
+            permission: false
+        }
+    ];
 }])
 .controller('ToolCtrl', ['$scope', '$rootScope', '$timeout', 'configurations', 'ws',
 function($scope, $rootScope, $timeout, configurations, ws) {   

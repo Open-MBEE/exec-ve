@@ -1,13 +1,22 @@
 <div class="pane-center container-fluid">
-    <div class="pane-center-btn-group"></div>
+    <div class="pane-center-btn-group">
+        <a ng-show="button.permission" type="button" ng-repeat="button in buttons" class="view-tools center" ng-click="button.action()" tooltip="{{button.tooltip}}" tooltip-append-to-body="true" tooltip-trigger="mouseenter" tooltip-popup-delay="400" tooltip-placement="bottom">
+          <span class="fa {{button.icon}}"></span>
+      </a>
+    </div>
     <div class="pane-center-inner">
 
         <div ng-if="siteCoverDoc">
-            <div ng-if="config === 'latest'">
-                <a href="ve.html#/workspaces/{{ws}}/sites/{{site}}/products/{{siteCoverDoc.sysmlid}}/latest/view/{{siteCoverDoc.sysmlid}}">Edit Cover Page View</a> 
+            <div ng-if="config === 'latest'" ng-show="editing">
+                <mms-spec mms-eid="{{siteCoverDoc.sysmlid}}" mms-cf-elements="viewElements" mms-edit-field="all" mms-version="latest" mms-ws="{{ws}}" mms-site="{{site}}" mms-view-edit="true" mms-spec-api="specApi"></mms-spec>
             </div>  
-            <mms-view mms-vid="{{siteCoverDoc.sysmlid}}" mms-version="{{time}}" mms-ws="{{ws}}"></mms-view>
+
+            <div ng-hide="editing">
+                <mms-view mms-vid="{{siteCoverDoc.sysmlid}}" mms-version="{{time}}" mms-ws="{{ws}}"></mms-view>
+            </div>
         </div>
+
+
 
         <div ng-if="config === 'latest'">
             <div ng-repeat="document in documents | orderBy: 'name'">
