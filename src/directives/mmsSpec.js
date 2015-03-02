@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsSpec', ['ElementService', '$compile', '$templateCache', '$modal', '$q', 'growl', '_', mmsSpec]);
+.directive('mmsSpec', ['ElementService', 'WorkspaceService', 'ConfigService', '$compile', '$templateCache', '$modal', '$q', 'growl', '_', mmsSpec]);
 
 /**
  * @ngdoc directive
@@ -73,7 +73,7 @@ angular.module('mms.directives')
  * @param {Object=} mmsElement An element object, if this is provided, a read only 
  *      element spec for it would be shown, this will not use mms services to get the element
  */
-function mmsSpec(ElementService, $compile, $templateCache, $modal, $q, growl, _) {
+function mmsSpec(ElementService, WorkspaceService, ConfigService, $compile, $templateCache, $modal, $q, growl, _) {
     //var readTemplate = $templateCache.get('mms/templates/mmsSpec.html');
     //var editTemplate = $templateCache.get('mms/templates/mmsSpecEdit.html');
     var template = $templateCache.get('mms/templates/mmsSpec.html');
@@ -112,6 +112,35 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, $q, growl, _)
             }
             if (scope.edit && scope.tinymceApi.save)
                 scope.tinymceApi.save();
+            if (scope.mmsType === 'workspace') {
+                WorkspaceService.getWorkspace(scope.mmsEid)
+                .then(function(data) {
+                    scope.element = data;
+                    scope.editable = true;
+                    WorkspaceService.getWorkspaceForEdit(scope.mmsEid)
+                    .then(function(data) {
+                        scope.edit = data;
+                        scope.editable = true;
+                        if (!keepMode)
+                            scope.editing = false;
+                        keepMode = false;
+                    });
+                });
+            } else if (scope.mmsType === 'tag') {
+                ConfigService.getConfig(scope.mmsEid, scope.mmsWs, false)
+                .then(function(data) {
+                    scope.element = data;
+                    scope.editable = true;
+                    ConfigService.getConfigForEdit(scope.mmsEid, scope.mmsWs)
+                    .then(function(data) {
+                        scope.edit = data;
+                        scope.editable = true;
+                        if (!keepMode)
+                            scope.editing = false;
+                        keepMode = false;
+                    });
+                });
+            } else {
             ElementService.getElement(scope.mmsEid, false, scope.mmsWs, scope.mmsVersion)
             .then(function(data) {
                 //element.empty();
@@ -155,9 +184,12 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, $q, growl, _)
             }, function(reason) {
                 //growl.error("Getting Element Error: " + reason.message);
             });
+            }
         };
         scope.changeElement = changeElement;
         scope.$watch('mmsEid', changeElement);
+        //scope.$watch('mmsType', changeElement);
+        //scope.$watch('mmsWs', changeElement);
 
         /**
          * @ngdoc function
@@ -169,6 +201,12 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, $q, growl, _)
          * 
          */
         scope.revertEdits = function() {
+            if (scope.mmsType === 'workspace') {
+                scope.edit.name = scope.element.name;
+            } else if (scope.mmsType === 'tag') {
+                scope.edit.name = scope.element.name;
+                scope.edit.description = scope.element.description;
+            } else {
             scope.edit.name = scope.element.name;
             scope.edit.documentation = scope.element.documentation;
             if (scope.edit.specialization.type === 'Property' && angular.isArray(scope.edit.specialization.value)) {
@@ -178,6 +216,7 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, $q, growl, _)
             if (scope.edit.specialization.type === 'Constraint' && scope.edit.specialization.specification) {
                 scope.edit.specialization.specification = _.cloneDeep(scope.element.specialization.specification);
                 scope.editValue = scope.edit.specialization.specification;
+            }
             }
         };
         
@@ -216,7 +255,23 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, $q, growl, _)
                 deferred.reject({type: 'error', message: "Element isn't editable and can't be saved."});
                 return deferred.promise;
             }
-            scope.tinymceApi.save();
+            if (scope.tinymceApi.save)
+                scope.tinymceApi.save();
+            if (scope.mmsType === 'workspace') {
+                WorkspaceService.update(scope.edit)
+                .then(function(data) {
+                    deferred.resolve(data);
+                }, function(reason) {
+                    deferred.reject({type: 'error', message: reason.message});
+                });
+            } else if (scope.mmsType === 'tag') {
+                ConfigService.update(scope.edit, scope.mmsWs)
+                .then(function(data) {
+                    deferred.resolve(data);
+                }, function(reason) {
+                    deferred.reject({type: 'error', message: reason.message});
+                });
+            } else {
             ElementService.updateElement(scope.edit, scope.mmsWs)
             .then(function(data) {
                 deferred.resolve(data);
@@ -273,6 +328,7 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, $q, growl, _)
                     //growl.error("Save Error: Status " + reason.status);
                 }
             });
+            }
             return deferred.promise;
         };
 
@@ -301,8 +357,10 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, $q, growl, _)
                 return true;
             if (scope.edit.documentation !== scope.element.documentation)
                 return true;
-            if (scope.edit.specialization.type === 'Property' && 
+            if (scope.edit.specialization && scope.edit.specialization.type === 'Property' && 
                 !_.isEqual(scope.edit.specialization.value, scope.element.specialization.value))
+                return true;
+            if (scope.edit.description !== scope.element.description)
                 return true;
             return false;
         };
@@ -419,7 +477,8 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, $q, growl, _)
             mmsCfElements: '=', //array of element objects
             mmsElement: '=',
             mmsSpecApi: '=',
-            mmsViewEdit: '='
+            mmsViewEdit: '=',
+            mmsType: '@'
         },
         link: mmsSpecLink
     };
