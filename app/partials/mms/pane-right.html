@@ -57,13 +57,13 @@
             <tr><th>Name</th><th>Time</th></tr>
             <tr>
                 <td>
-                    <a ui-sref="workspace.site({site: 'no_site', tag: undefined})" ui-sref-opts="{reload: true}">Latest</a>
+                    <a ui-sref="workspace.sites({tag: undefined})" ui-sref-opts="{reload: true}">Latest</a>
                 </td>
                 <td></td>
             </tr>
             <tr ng-repeat="tag in tags | orderBy:'-timestamp'">
                 <td>
-                    <a ui-sref="workspace.site({tag: tag.id})" ui-sref-opts="{reload: true}">{{tag.name}}</a>
+                    <a ui-sref="workspace.sites({tag: tag.id})" ui-sref-opts="{reload: true}">{{tag.name}}</a>
                 </td>
                 <td>{{tag.timestamp | date:'M/d/yy h:mm a'}}
                 </td>

@@ -144,7 +144,7 @@
 <div ng-if="mmsType=='tag'" ng-show="editing" class="editing">
     <h1 class="prop"><input class="form-control" type="text" ng-model="edit.name"></input></h1>
     <h2 class="prop-title">DESCRIPTION</h2>
-    <textarea ng-model="edit.description"></textarea>
+    <textarea mms-tinymce mms-ws="{{mmsWs}}" ng-model="edit.description"></textarea>
     <h2 class="prop-title">TIMESTAMP</h2>
     <h3 class="prop">{{element.timestamp | date:'M/d/yy h:mm a'}}</h3>
 </div>

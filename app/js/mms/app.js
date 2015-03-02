@@ -12,8 +12,8 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
     });
 
     $stateProvider
-    .state('root', {
-        url: '',
+    .state('workspaces', {
+        url: '/workspaces',
         resolve: {
             workspaces: function(WorkspaceService) {
                 return WorkspaceService.getWorkspaces();
@@ -128,8 +128,8 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
         }        
     })
     .state('workspace', {
-        parent: 'root',
-        url: '/workspaces/:workspace?tag',
+        parent: 'workspaces',
+        url: '/:workspace?tag',
         resolve: {
             workspace: function ($stateParams) {
                 return $stateParams.workspace;

@@ -25,10 +25,10 @@ function($scope, $rootScope, $state, $timeout, UxService, document, time) {
       $scope.tbApi.addButton(UxService.getToolbarButton("element.editor"));
       
       var editable = false;
-      if ($state.current.name === 'workspace' || $state.current.name === 'root') {
-          editable = document && document.editable && time === 'latest';
+      if ($state.includes('workspaces') && !$state.includes('workspace.sites')) {
+          editable = true;          
           $scope.tbApi.setPermission('element.editor', editable);
-      } else if ($state.current.name === 'workspace.site' || $state.current.name === 'workspace.site.documentpreview') {
+      } else if ($state.includes('workspace.sites') && !$state.includes('workspace.site.document')) {
           editable = document && time === 'latest';
           $scope.tbApi.setPermission('element.editor', editable);
           $scope.tbApi.addButton(UxService.getToolbarButton("tags"));
@@ -50,7 +50,7 @@ function($scope, $rootScope, $state, $timeout, UxService, document, time) {
 .controller('ViewCtrl', ['$scope', '$rootScope', '$state', '$stateParams', '$timeout', '$modal', 'viewElements', 'ElementService', 'ViewService', 'time', 'growl', 'site', 'view', 'tag',
 function($scope, $rootScope, $state, $stateParams, $timeout, $modal, viewElements, ElementService, ViewService, time, growl, site, view, tag) {
     
-    if ($state.current.name === 'workspace' || $state.current.name === 'root') {
+    if ($state.includes('workspaces') && !$state.includes('workspace.sites')) {
         $rootScope.mms_showSiteDocLink = true;
     } else {
         $rootScope.mms_showSiteDocLink = false;
@@ -671,7 +671,7 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
     $rootScope.mms_treeApi = $scope.treeApi = {};
 
     $rootScope.mms_treeInitial = '';
-    if ($state.current.name === 'workspace' || $state.current.name === 'root') {
+    if ($state.includes('workspaces') && !$state.includes('workspace.sites')) {
         if (tag.name !== 'latest')
             $rootScope.mms_treeInitial = tag.id;
         else
@@ -709,12 +709,12 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
       $scope.bbApi.addButton(UxService.getButtonBarButton("tree.collapse"));
       $scope.bbApi.addButton(UxService.getButtonBarButton("tree.filter"));
 
-      if ($state.current.name === 'workspace' || $state.current.name === 'root') {
+      if ($state.includes('workspaces') && !$state.includes('workspace.sites')) {
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree.add.task"));
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree.add.configuration"));
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree.delete"));
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree.merge"));
-      } else if ($state.current.name === 'workspace.site' || $state.current.name === 'workspace.site.documentpreview') {
+      } else if ($state.includes('workspace.sites') && !$state.includes('workspace.site.document')) {
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree.add.document"));
         $scope.bbApi.setPermission("tree.add.document", config == 'latest' ? true : false);
       } else if ($state.includes('workspace.site.document')) {
@@ -924,10 +924,10 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
     };
 
     var dataTree;
-    if ($state.current.name === 'workspace' || $state.current.name === 'root') {
+    if ($state.includes('workspaces') && !$state.includes('workspace.sites')) {
         dataTree = UtilsService.buildTreeHierarchy(workspaces, "id", "workspace", "parent", workspaceLevel2Func);
         $scope.my_data = dataTree;
-    } else if ($state.current.name === 'workspace.site' || $state.current.name === 'workspace.site.documentpreview') {
+    } else if ($state.includes('workspace.sites') && !$state.includes('workspace.site.document')) {
         dataTree = UtilsService.buildTreeHierarchy(sites, "sysmlid", "site", "parent", siteLevel2Func);
         $scope.my_data = dataTree;
     } else
@@ -993,14 +993,14 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
     }
     // TODO: Update behavior to handle new state descriptions
     $scope.my_tree_handler = function(branch) {
-        if ($state.current.name === 'workspace' || $state.current.name === 'root') {
+        if ($state.includes('workspaces') && !$state.includes('workspace.sites')) {
             if (branch.type === 'workspace') {
                 $state.go('workspace', {workspace: branch.data.id, tag: undefined});
             } else if (branch.type === 'configuration') {
                 //$rootScope.$broadcast('elementSelected', branch.data.id, 'tag');
                 $state.go('workspace', {workspace: branch.workspace, tag: branch.data.id});
             }
-        } else if ($state.current.name === 'workspace.site' || $state.current.name === 'workspace.site.documentpreview') {
+        } else if ($state.includes('workspace.sites') && !$state.includes('workspace.site.document')) {
             if (branch.type === 'site')
                 $state.go('workspace.site', {site: branch.data.sysmlid});
             else if (branch.type === 'view' || branch.type === 'snapshot') {
@@ -2052,7 +2052,7 @@ function($scope, $rootScope, workspace, tag, time, site, documentPreview, snapsh
     $scope.snapshot = snapshot;
     $scope.pdfText = "Generate PDF";
     $scope.getPDFStatus = function(){
-        
+        if(!snapshot) return null;
         var formats = snapshot.formats;
         if(!formats || formats.length===0) return null;
         for(var i=0; i < formats.length; i++){
@@ -2070,6 +2070,7 @@ function($scope, $rootScope, workspace, tag, time, site, documentPreview, snapsh
     };
 
     $scope.getPDFUrl = function(){
+        if(!snapshot) return null;
         var formats = snapshot.formats;
         if(!formats || formats.length===0) return null;
         for(var i=0; i < formats.length; i++){
@@ -2082,6 +2083,7 @@ function($scope, $rootScope, workspace, tag, time, site, documentPreview, snapsh
 
     $scope.zipText = "Generate Zip";
     $scope.getZipStatus = function(){
+        if(!snapshot) return null;
         var formats = snapshot.formats;
         if(!formats || formats.length===0) return null;
         for(var i=0; i < formats.length; i++){
