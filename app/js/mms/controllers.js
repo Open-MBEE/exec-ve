@@ -2568,7 +2568,11 @@ function(_, $timeout, $scope, $rootScope, $http, $state, $stateParams, $modal, g
 
         });
 
-        ws2.movedElements.forEach(function(e) {
+        /*
+          TODO: removing this was a hack, we removed it because the moved elements
+          also show up in the updated list and creates duplicates 
+           
+          ws2.movedElements.forEach(function(e) {
 
           var movedElement = id2data[e.sysmlid];
 
@@ -2584,7 +2588,7 @@ function(_, $timeout, $scope, $rootScope, $http, $state, $stateParams, $modal, g
           $scope.changes.push(change);
           $scope.id2change[e.sysmlid] = change;
 
-        });
+        }); */
 
         $rootScope.id2node = id2node;
 
