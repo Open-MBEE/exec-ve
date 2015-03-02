@@ -86,6 +86,21 @@ function mmsView(ViewService, $templateCache, growl) {
             processed = true;
             ViewService.getView(scope.mmsVid, false, scope.mmsWs, scope.mmsVersion)
             .then(function(data) {
+                if (scope.mmsVersion && scope.mmsVersion !== 'latest') {
+                    if (data.specialization.contains) {
+                        var hasDiagram = false;
+                        data.specialization.contains.forEach(function(contain) {
+                            if (contain.type === 'Image')
+                                hasDiagram = true;
+                        });
+                        if (hasDiagram) {
+                            scope.view = data;
+                            scope.modified = data.modified;
+                            scope.creator = data.creator;
+                            return;
+                        }
+                    }
+                }
                 ViewService.getViewElements(scope.mmsVid, false, scope.mmsWs, scope.mmsVersion)
                 .then(function(data2) {
                     scope.view = data;

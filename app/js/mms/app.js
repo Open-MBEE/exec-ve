@@ -49,7 +49,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
                 }, function(reason) {
 
                     // if it is an error, other than a 404 (element not found) then stop and return
-                    if (reason.status === 404 || time !== 'latest') return null;
+                    if (reason.status !== 404 || time !== 'latest') return null;
 
                     var doc = {
                         specialization: {type: "View"},
@@ -354,7 +354,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
                 }, function(reason) {
 
                     // if it is an error, other than a 404 (element not found) then stop and return
-                    if (reason.status === 404 || time !== 'latest') return null;
+                    if (reason.status !== 404 || time !== 'latest') return null;
                     
                     // if it is a tag look-up, then don't create element
                     if (time !== 'latest') 
@@ -539,7 +539,9 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
         url: '/views/:view',
         resolve: {
             viewElements: function($stateParams, ViewService, time) {
-                return ViewService.getViewElements($stateParams.view, false, $stateParams.workspace, time);
+                if (time === 'latest')
+                    return ViewService.getViewElements($stateParams.view, false, $stateParams.workspace, time);
+                return [];
             },
             view: function($stateParams, ViewService, viewElements, time) {
                 return ViewService.getView($stateParams.view, false, $stateParams.workspace, time);
