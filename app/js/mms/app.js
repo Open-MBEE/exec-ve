@@ -12,20 +12,132 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
     });
 
     $stateProvider
-    .state('workspace', {
-        url: '/workspaces/:workspace?tag',
+    .state('root', {
+        url: '',
         resolve: {
             workspaces: function(WorkspaceService) {
                 return WorkspaceService.getWorkspaces();
             },
+            workspace: function () {
+                return 'master';
+            },
+            workspaceObj: function (WorkspaceService, workspace) {
+                // TODO; replace workspace with workspaceObj, but first all controllers
+                // need to be adapted to handle workspace as an object and not a string
+                return WorkspaceService.getWorkspace(workspace);
+            },  
+            tags: function(ConfigService, workspace) {
+                return ConfigService.getConfigs(workspace, false);
+            },
+            tag: function ($stateParams, ConfigService, workspace) {
+                return { name: 'latest', timestamp: 'latest' };
+            },  
+            sites: function(SiteService) {                 
+               return SiteService.getSites();
+            },
+            site: function(SiteService) {
+                return SiteService.getSite('no_site');
+            },
+            document : function(ElementService, workspace, time, growl) {
+            
+                // This is a short-term work-around -- all this should be done the back-end MMS in the future
+                var wsCoverDocId = 'master_cover';
+
+                return ElementService.getElement(wsCoverDocId, false, workspace, time)
+                .then(function(data) {
+                    return data;
+                }, function(reason) {
+
+                    // if it is an error, other than a 404 (element not found) then stop and return
+                    if (reason.status === 404 || time !== 'latest') return null;
+
+                    var doc = {
+                        specialization: {type: "View"},
+                        name: 'Workspace Cover Page',
+                        documentation: ''
+                    };
+                    doc.sysmlid = wsCoverDocId;
+                    doc.specialization.contains = [
+                        {
+                            'type': 'Paragraph',
+                            'sourceType': 'reference',
+                            'source': wsCoverDocId,
+                            'sourceProperty': 'documentation'
+                        }
+                    ];
+                    doc.specialization.allowedElements = [wsCoverDocId];
+                    doc.specialization.displayedElements = [wsCoverDocId];
+                    doc.specialization.childrenViews = [];
+
+                    return ElementService.createElement(doc, workspace, null)
+                    .then(function(data) {
+                        // growl.success('Created Document Successful');
+                        return data;
+                    }, function(reason) {
+                        return null;
+
+                    });
+
+                });
+            },
+            views: function() {
+                return null;
+            },
+            view: function() {
+                return null;
+            },
+            viewElements: function(ViewService, workspace, document, time) {
+                if (document === null) 
+                    return null;
+                return ViewService.getViewElements(document.sysmlid, false, workspace, time);
+            },   
+            time: function(tag) {
+                return tag.timestamp;
+            },
+            configSnapshots: function(ConfigService, workspace, tag) {
+                return [];
+            },
+            snapshots: function() {
+                return [];        
+            }
+        },
+        views: {
+            'menu': {
+                template: '<mms-nav mms-title="Model Manager" mms-ws="{{workspace}}" mms-config="tag"></mms-nav>',
+                controller: function ($scope, workspace, tag) {
+                    $scope.workspace = workspace;
+                    $scope.tag = tag;
+                }
+            },
+            'pane-left': {
+                templateUrl: 'partials/mms/pane-left.html',
+                controller: 'TreeCtrl'
+            },
+            'pane-center': {
+                templateUrl: 'partials/mms/pane-center.html',
+                controller: 'ViewCtrl'
+            },
+            'pane-right': {
+                templateUrl: 'partials/mms/pane-right.html',
+                controller: 'ToolCtrl'
+            },
+            'toolbar-right': {
+                template: '<mms-toolbar buttons="buttons" on-click="onClick(button)" mms-tb-api="tbApi"></mms-toolbar>',
+                controller: 'ToolbarCtrl'
+            } 
+        }        
+    })
+    .state('workspace', {
+        parent: 'root',
+        url: '/workspaces/:workspace?tag',
+        resolve: {
             workspace: function ($stateParams) {
                 return $stateParams.workspace;
             },
             workspaceObj: function (WorkspaceService, workspace) {
                 return WorkspaceService.getWorkspace(workspace);
             },
-            sites: function(SiteService, time) { 
-                
+            sites: function(SiteService, time) {                 
                 if (time === 'latest')
                     return SiteService.getSites();
                 return SiteService.getSites(time);
@@ -104,45 +216,35 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
                     return [];
                 return ConfigService.getConfigSnapshots(tag.id, workspace, false);
             },
-            snapshots: function() {
-                return [];
-            },
             time: function(tag) {
                 return tag.timestamp;
             }
         },
         views: {
-            'menu': {
+            'menu@': {
                 template: '<mms-nav mms-title="Model Manager" mms-ws="{{workspace}}" mms-config="tag"></mms-nav>',
                 controller: function ($scope, workspace, tag) {
                     $scope.workspace = workspace;
                     $scope.tag = tag;
                 }
             },
-            'pane-left': {
-                templateUrl: 'partials/mms/pane-left.html',
-                controller: 'TreeCtrl'
-            },
-            'pane-center': {
+            'pane-center@': {
                 templateUrl: 'partials/mms/pane-center.html',
                 controller: 'ViewCtrl'
             },
-            'pane-right': {
+            'pane-right@': {
                 templateUrl: 'partials/mms/pane-right.html',
                 controller: 'ToolCtrl'
             },
-            'toolbar-right': {
+            'toolbar-right@': {
                 template: '<mms-toolbar buttons="buttons" on-click="onClick(button)" mms-tb-api="tbApi"></mms-toolbar>',
                 controller: 'ToolbarCtrl'
-            }            
+            }    
         }
     })
-    .state('workspace.site', {
-        url: '/sites/:site',
+    .state('workspace.sites', {
+        url: '/sites',
         resolve: {
-            site: function($stateParams, SiteService) {
-                return SiteService.getSite($stateParams.site);
-            },
             document : function($stateParams, ElementService, workspace, site, time, growl) {
                 var siteCoverDocId;
                 if ($stateParams.site === 'no_site')
@@ -208,6 +310,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
                 return ViewService.getView(document.sysmlid, false, workspace, time);
             }
         },
+        parent: 'workspace',
         views: {
             'menu@': {
                 template: '<mms-nav mms-title="Portal" mms-ws="{{workspace}}" mms-site="site" mms-config="tag"></mms-nav>',
@@ -220,6 +323,96 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
             'pane-left@': {
                 templateUrl: 'partials/mms/pane-left.html',
                 controller: 'TreeCtrl'
+            },
+            'pane-center@': {
+                templateUrl: 'partials/mms/pane-center.html',
+                controller: 'ViewCtrl'
+            }, 
+            'toolbar-right@': {
+                template: '<mms-toolbar buttons="buttons" on-click="onClick(button)" mms-tb-api="tbApi"></mms-toolbar>',
+                controller: 'ToolbarCtrl'
+            }
+        }  
+    })
+    .state('workspace.site', {
+        url: '/:site',
+        parent: 'workspace.sites',
+        resolve: {
+            site: function($stateParams, SiteService) {
+                return SiteService.getSite($stateParams.site);
+            },
+            document : function($stateParams, ElementService, workspace, site, time, growl) {
+                var siteCoverDocId;
+                if ($stateParams.site === 'no_site')
+                    siteCoverDocId = 'master_cover';
+                else
+                    siteCoverDocId = site.sysmlid + '_cover';
+
+                return ElementService.getElement(siteCoverDocId, false, workspace, time)
+                .then(function(data) {
+                    return data;
+                }, function(reason) {
+
+                    // if it is an error, other than a 404 (element not found) then stop and return
+                    if (reason.status === 404 || time !== 'latest') return null;
+                    
+                    // if it is a tag look-up, then don't create element
+                    if (time !== 'latest') 
+                        return null;
+
+                    var doc = {
+                        specialization: {type: "View"},
+                        name: site.sysmlid + ' Cover Page',
+                        documentation: ''
+                    };
+                    doc.sysmlid = siteCoverDocId;
+                    doc.specialization.contains = [
+                        {
+                            'type': 'Paragraph',
+                            'sourceType': 'reference',
+                            'source': siteCoverDocId,
+                            'sourceProperty': 'documentation'
+                        }
+                    ];
+                    doc.specialization.allowedElements = [siteCoverDocId];
+                    doc.specialization.displayedElements = [siteCoverDocId];
+                    doc.specialization.childrenViews = [];
+
+                    return ElementService.createElement(doc, workspace, site.sysmlid)
+                    .then(function(data) {
+                        growl.success('Created Document Successful');
+                        return data;
+                    }, function(reason) {
+                        return null;
+
+                    });
+
+                });
+            },
+            views: function(ViewService, workspace, document, time) {
+                if (document === null) 
+                    return null;
+                return ViewService.getDocumentViews(document.sysmlid, false, workspace, time, true);
+            },
+            viewElements: function(ViewService, workspace, document, time) {
+                if (document === null) 
+                    return null;
+                return ViewService.getViewElements(document.sysmlid, false, workspace, time);
+            },    
+            view: function(ViewService, workspace, document, time) {
+                if (document === null) 
+                    return null;
+                return ViewService.getView(document.sysmlid, false, workspace, time);
+            }
+        },
+        views: {
+            'menu@': {
+                template: '<mms-nav mms-title="Portal" mms-ws="{{workspace}}" mms-site="site" mms-config="tag"></mms-nav>',
+                controller: function ($scope, workspace, site, tag) {
+                    $scope.workspace = workspace;
+                    $scope.tag = tag;
+                    $scope.site = site;
+                }
             },
             'pane-center@': {
                 templateUrl: 'partials/mms/pane-center.html',

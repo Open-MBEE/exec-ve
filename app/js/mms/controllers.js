@@ -25,9 +25,9 @@ function($scope, $rootScope, $state, $timeout, UxService, document, time) {
       $scope.tbApi.addButton(UxService.getToolbarButton("element.editor"));
       
       var editable = false;
-      if ($state.current.name === 'workspace') {
-          //editable = document && document.editable && time === 'latest';
-          $scope.tbApi.setPermission('element.editor', true);
+      if ($state.current.name === 'workspace' || $state.current.name === 'root') {
+          editable = document && document.editable && time === 'latest';
+          $scope.tbApi.setPermission('element.editor', editable);
       } else if ($state.current.name === 'workspace.site' || $state.current.name === 'workspace.site.documentpreview') {
           editable = document && time === 'latest';
           $scope.tbApi.setPermission('element.editor', editable);
@@ -50,7 +50,7 @@ function($scope, $rootScope, $state, $timeout, UxService, document, time) {
 .controller('ViewCtrl', ['$scope', '$rootScope', '$state', '$stateParams', '$timeout', '$modal', 'viewElements', 'ElementService', 'ViewService', 'time', 'growl', 'site', 'view', 'tag',
 function($scope, $rootScope, $state, $stateParams, $timeout, $modal, viewElements, ElementService, ViewService, time, growl, site, view, tag) {
     
-    if ($state.current.name === 'workspace') {
+    if ($state.current.name === 'workspace' || $state.current.name === 'root') {
         $rootScope.mms_showSiteDocLink = true;
     } else {
         $rootScope.mms_showSiteDocLink = false;
@@ -362,7 +362,6 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
             $scope.elementType = 'tag';
             $scope.specWs = info[2];
         }
-        //$scope.specApi.changeElement($scope.etrackerSelected, 'keep');
     };
 
     $scope.showTracker = function() {
@@ -672,7 +671,7 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
     $rootScope.mms_treeApi = $scope.treeApi = {};
 
     $rootScope.mms_treeInitial = '';
-    if ($state.current.name === 'workspace') {
+    if ($state.current.name === 'workspace' || $state.current.name === 'root') {
         if (tag.name !== 'latest')
             $rootScope.mms_treeInitial = tag.id;
         else
@@ -710,7 +709,7 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
       $scope.bbApi.addButton(UxService.getButtonBarButton("tree.collapse"));
       $scope.bbApi.addButton(UxService.getButtonBarButton("tree.filter"));
 
-      if ($state.current.name === 'workspace') {
+      if ($state.current.name === 'workspace' || $state.current.name === 'root') {
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree.add.task"));
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree.add.configuration"));
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree.delete"));
@@ -925,7 +924,7 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
     };
 
     var dataTree;
-    if ($state.current.name === 'workspace') {
+    if ($state.current.name === 'workspace' || $state.current.name === 'root') {
         dataTree = UtilsService.buildTreeHierarchy(workspaces, "id", "workspace", "parent", workspaceLevel2Func);
         $scope.my_data = dataTree;
     } else if ($state.current.name === 'workspace.site' || $state.current.name === 'workspace.site.documentpreview') {
@@ -994,9 +993,8 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
     }
     // TODO: Update behavior to handle new state descriptions
     $scope.my_tree_handler = function(branch) {
-        if ($state.current.name === 'workspace') {
+        if ($state.current.name === 'workspace' || $state.current.name === 'root') {
             if (branch.type === 'workspace') {
-                //$rootScope.$broadcast('elementSelected', branch.data.id, 'workspace');
                 $state.go('workspace', {workspace: branch.data.id, tag: undefined});
             } else if (branch.type === 'configuration') {
                 //$rootScope.$broadcast('elementSelected', branch.data.id, 'tag');
