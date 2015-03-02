@@ -127,18 +127,27 @@
 
 <div ng-if="mmsType=='workspace'" ng-show="editing" class="editing">
     <h1 class="prop"><input class="form-control" type="text" ng-model="edit.name"></input></h1>
+    <h2 class="prop-title">DESCRIPTION</h2>
+    <textarea mms-tinymce mms-ws="{{mmsWs}}" ng-model="edit.description"></textarea>
     <h2 class="prop-title">TASK AUTHOR</h2>
     <h3 class="prop">{{element.creator}}</h3>
     <h2 class="prop-title">DATE CREATED</h2>
     <h3 class="prop">{{element.created | date:'M/d/yy h:mm a'}}</h3>
+    <h2 class="prop-title">PERMISSION</h2>
+    <h3 class="prop"><input ng-model="edit.permission" value="read" type="radio"> Read</input>
+                     <input ng-model="edit.permission" value="write" type="radio"> Write</input></h3>
 </div>
 
 <div ng-if="mmsType=='workspace'" ng-hide="editing" class="reading">
     <h1 class="prop element-title">{{element.name}}</h1>
+    <h2 class="prop-title">DESCRIPTION</h2>
+    <p class="doc-text" ng-bind-html="element.description"></p>
     <h2 class="prop-title">TASK AUTHOR</h2>
     <h3 class="prop">{{element.creator}}</h3>
     <h2 class="prop-title">DATE CREATED</h2>
     <h3 class="prop">{{element.created | date:'M/d/yy h:mm a'}}</h3>
+    <h2 class="prop-title">PERMISSION</h2>
+    <h3 class="prop">{{element.permission}}</h3>
 </div>
 
 <div ng-if="mmsType=='tag'" ng-show="editing" class="editing">
