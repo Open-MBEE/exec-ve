@@ -103,7 +103,8 @@ mms-spec div.editing {
   mms-transclude-img,
   mms-transclude-name,
   mms-transclude-val,
-  mms-transclude-doc {
+  mms-transclude-doc,
+  mms-view-link {
     background-color: $light_blue;
     cursor: not-allowed;
   }

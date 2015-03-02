@@ -472,6 +472,102 @@ function($scope, $rootScope, $location, $timeout, $state, $stateParams, $anchorS
         };
     };
 }])
+.controller('WorkspaceViewController', ['$rootScope', '$scope', '$stateParams', 'sites', 'wsCoverDoc', 'ElementService', 'growl', '$modal',
+function($rootScope, $scope, $stateParams, sites, wsCoverDoc, ElementService, growl, $modal) {
+    $scope.ws = $stateParams.ws;
+    $scope.sites = sites;
+    $scope.config = 'latest';
+    $rootScope.tree_initial = $scope.ws;
+    $scope.wsCoverDoc = wsCoverDoc;
+    $scope.time = 'latest';
+
+    $scope.specApi = {};
+    $scope.editing = false;
+    var elementSaving = false;
+    $scope.buttons = [
+        {
+            action: function() {
+                $scope.editing = !$scope.editing;
+                $scope.specApi.setEditing(true);
+                $scope.buttons[0].permission = false;
+                $scope.buttons[1].permission = true;
+                $scope.buttons[2].permission = true;
+                ElementService.isCacheOutdated(wsCoverDoc.sysmlid, $scope.ws)
+                .then(function(data) {
+                    if (data.status && data.server.modified > data.cache.modified)
+                        growl.warning('This view has been updated on the server');
+                });
+            },
+            tooltip: "Edit Workspace View",
+            icon: "fa-edit",
+            permission: wsCoverDoc && wsCoverDoc.editable
+        },
+        {
+            action: function() {
+                
+                    if (elementSaving) {
+                        growl.info('Please Wait...');
+                        return;
+                    }
+                    elementSaving = true;
+                    $scope.buttons[1].icon = "fa-spin fa-spinner";
+                    $scope.specApi.save().then(function(data) {
+                        elementSaving = false;
+                        growl.success('Save Successful');
+                        $scope.editing = false;
+                        $scope.buttons[0].permission = true;
+                        $scope.buttons[1].permission = false;
+                        $scope.buttons[2].permission = false;
+                    }, function(reason) {
+                        elementSaving = false;
+                        if (reason.type === 'info')
+                            growl.info(reason.message);
+                        else if (reason.type === 'warning')
+                            growl.warning(reason.message);
+                        else if (reason.type === 'error')
+                            growl.error(reason.message);
+                    }).finally(function() {
+                        $scope.buttons[1].icon = "fa-save";
+                    });
+            },
+            tooltip: "Save",
+            icon: "fa-save",
+            permission: false
+        },
+        {
+            action: function() {
+                var go = function() {
+                    $scope.specApi.revertEdits();
+                    $scope.editing = false;
+                    $scope.buttons[0].permission = true;
+                    $scope.buttons[1].permission = false;
+                    $scope.buttons[2].permission = false;
+                };
+                if ($scope.specApi.hasEdits()) {
+                    var instance = $modal.open({
+                        templateUrl: 'partials/ve/cancelConfirm.html',
+                        scope: $scope,
+                        controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
+                            $scope.ok = function() {
+                                $modalInstance.close('ok');
+                            };
+                            $scope.cancel = function() {
+                                $modalInstance.dismiss();
+                            };
+                        }]
+                    });
+                    instance.result.then(function() {
+                        go();
+                    });
+                } else
+                    go();
+            },
+            tooltip:"Cancel",
+            icon: "fa-times",
+            permission: false
+        }
+    ];
+}])
 .controller('WorkspaceDiffChangeController', ["_", "$timeout", "$scope", "$rootScope", "$http", "$state", "$stateParams", "$modal", "growl", "WorkspaceService", "ElementService", "diff",
 function(_, $timeout, $scope, $rootScope, $http, $state, $stateParams, $modal, growl, WorkspaceService, ElementService, diff) {
 

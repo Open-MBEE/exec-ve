@@ -42,7 +42,11 @@ function mmsTranscludeVal(ElementService, UtilsService, $log, $compile, $templat
             for (var i = 0; i < scope.values.length; i++) {
                 if (scope.values[i].type === 'LiteralString') {
                     areStrings = true;
-                    toCompileList.push(scope.values[i].string);
+                    var s = scope.values[i].string;
+                    if (s.indexOf('<p>') === -1) {
+                        s = s.replace('<', '&lt;');
+                    }
+                    toCompileList.push(s);
                 } else {
                     break;
                 }

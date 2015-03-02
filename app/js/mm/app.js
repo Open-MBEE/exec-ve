@@ -94,15 +94,7 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
         views: {
             'pane-center@': {
                 templateUrl: 'partials/mm/pane-center.html',
-                controller: function ($rootScope, $scope, $stateParams, sites, wsCoverDoc) {
-                    $scope.ws = $stateParams.ws;
-                    $scope.sites = sites;
-                    $scope.buttons = [];
-                    $scope.config = 'latest';
-                    $rootScope.tree_initial = $scope.ws;
-                    $scope.wsCoverDoc = wsCoverDoc;
-                    $scope.time = 'latest';
-                 }
+                controller: 'WorkspaceViewController'
             },
             'pane-right@': {
                 templateUrl: 'partials/mm/pane-right.html',
@@ -153,6 +145,7 @@ angular.module('myApp', ['ui.router', 'mms', 'mms.directives', 'fa.directive.bor
                     $scope.sites = timedSites;
                     $scope.wsCoverDoc = wsCoverDoc;
                     $scope.time = config.timestamp;  
+                    $scope.editng = false;
                 }              
             },
             'pane-right@': {
