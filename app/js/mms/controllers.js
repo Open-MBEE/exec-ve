@@ -3,6 +3,20 @@
 /* Controllers */
 
 angular.module('mmsApp')
+.controller('MainCtrl', ['$scope', '$location', '$rootScope', '_', '$window',
+function($scope, $location, $rootScope, _, $window) {
+    $rootScope.veViewLoading = false;
+    $window.addEventListener('beforeunload', function(event) {
+        if ($rootScope.veEdits && !_.isEmpty($rootScope.veEdits)) {
+            var message = 'You may have unsaved changes, are you sure you want to leave?';
+            event.returnValue = message;
+            return message;
+        }
+    });
+    $scope.$on('$stateChangeError', function(event, toState, toParams, fromState, fromParams, error) {
+
+    });
+}])
 .controller('ToolbarCtrl', ['$scope', '$rootScope', '$state', '$timeout', 'UxService', 'document', 'time',
 function($scope, $rootScope, $state, $timeout, UxService, document, time) {   
 
