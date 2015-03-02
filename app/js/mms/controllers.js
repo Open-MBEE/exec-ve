@@ -1669,10 +1669,16 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
                 return;
             }
 
+            
             // Handle the promise:
             promise
             .then(function(data) {
                 growl.success(displayName+" Created");
+
+                if ($scope.itemType === 'Tag') {
+                    growl.info('Please wait for a completion email prior to viewing of the tag.');
+                }
+
                 $modalInstance.close(data);
             }, function(reason) {
                 growl.error("Create "+displayName+" Error: " + reason.message);
