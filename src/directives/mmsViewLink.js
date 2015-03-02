@@ -48,14 +48,14 @@ function mmsViewLink(ElementService, $compile, growl) {
             var site = findSite(data);
             if (data.specialization.type === 'Product') {
                 docid = data.sysmlid;
-                element.html('<a href="ve.html#/workspaces/' + ws + '/sites/' + site + '/products/' + 
-                    docid + '/' + version + '/view/' + scope.mmsVid + '">' + data.name + '</a>');
+                element.html('<a href="mms.html#/workspaces/' + ws + '/sites/' + site + '/documents/' + 
+                    docid + '/views/' + scope.mmsVid + '?time=' + version  + '">' + data.name + '</a>');
             } else if (data.specialization.type === "View") {
                 if (!docid || docid === '') {
                     docid = data.sysmlid;
                 } 
-                element.html('<a href="ve.html#/workspaces/' + ws + '/sites/' + site + '/products/' + 
-                    docid + '/' + version + '/view/' + scope.mmsVid + '">' + data.name + '</a>');
+                element.html('<a href="mms.html#/workspaces/' + ws + '/sites/' + site + '/documents/' + 
+                    docid + '/views/' + scope.mmsVid + '?time=' + version + '">' + data.name + '</a>');
             } else {
                 element.html('<span class="error">view link is not a view</span>');
                 growl.error('View Link Error: not a view: ' + scope.mmsVid);
