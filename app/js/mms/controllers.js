@@ -17,8 +17,8 @@ function($scope, $location, $rootScope, _, $window) {
 
     });
 }])
-.controller('ToolbarCtrl', ['$scope', '$rootScope', '$state', '$timeout', 'UxService', 'document', 'time',
-function($scope, $rootScope, $state, $timeout, UxService, document, time) {   
+.controller('ToolbarCtrl', ['$scope', '$rootScope', '$state', '$timeout', 'UxService', 'workspace', 'tag', 'document', 'time',
+function($scope, $rootScope, $state, $timeout, UxService, workspace, tag, document, time) {   
 
     $scope.tbApi = {};
     $scope.buttons = [];
@@ -40,7 +40,10 @@ function($scope, $rootScope, $state, $timeout, UxService, document, time) {
       
       var editable = false;
       if ($state.includes('workspaces') && !$state.includes('workspace.sites')) {
-          editable = true;          
+          if (workspace === 'master' && tag.timestamp === 'latest')  // do not allow edit of master workspace
+            editable = false;
+          else
+            editable = true;          
           $scope.tbApi.setPermission('element.editor', editable);
       } else if ($state.includes('workspace.sites') && !$state.includes('workspace.site.document')) {
           editable = document && time === 'latest';
