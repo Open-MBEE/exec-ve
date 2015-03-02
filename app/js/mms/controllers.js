@@ -347,7 +347,7 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
 
     $scope.etrackerChange = function() {
         $scope.specApi.keepMode();
-        var id = $scope.etrackerSelected;
+        var id = this.etrackerSelected;
         var info = id.split('|');
         if (info[0] === 'element') {
             $scope.eid = info[1];
@@ -460,8 +460,8 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
         showPane('element');
         var edit = $scope.specApi.getEdits();
         if (edit) {
-            $rootScope.veEdits[$scope.elementType + '|' + (edit.sysmlid || edit.id) + '|' + $scope.specWs] = edit;
             $scope.etrackerSelected = $scope.elementType + '|' + (edit.sysmlid || edit.id) + '|' + $scope.specWs;
+            $rootScope.veEdits[$scope.elementType + '|' + (edit.sysmlid || edit.id) + '|' + $scope.specWs] = edit;
             $rootScope.mms_tbApi.setIcon('element.editor', 'fa-edit-asterisk');
             if (Object.keys($rootScope.veEdits).length > 1) {
                 $rootScope.mms_tbApi.setPermission('element.editor.saveall', true);
