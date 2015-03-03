@@ -342,7 +342,7 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
         snapshots: false,
         tags: false
     };
-
+    $scope.tracker = {};
     if (!$rootScope.veEdits)
         $rootScope.veEdits = {};
 
@@ -364,7 +364,7 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
 
     $scope.etrackerChange = function() {
         $scope.specApi.keepMode();
-        var id = this.etrackerSelected;
+        var id = $scope.tracker.etrackerSelected;
         var info = id.split('|');
         if (info[0] === 'element') {
             $scope.eid = info[1];
@@ -476,7 +476,7 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
         showPane('element');
         var edit = $scope.specApi.getEdits();
         if (edit) {
-            $scope.etrackerSelected = $scope.elementType + '|' + (edit.sysmlid || edit.id) + '|' + $scope.specWs;
+            $scope.tracker.etrackerSelected = $scope.elementType + '|' + (edit.sysmlid || edit.id) + '|' + $scope.specWs;
             $rootScope.veEdits[$scope.elementType + '|' + (edit.sysmlid || edit.id) + '|' + $scope.specWs] = edit;
             $rootScope.mms_tbApi.setIcon('element.editor', 'fa-edit-asterisk');
             if (Object.keys($rootScope.veEdits).length > 1) {
@@ -532,7 +532,7 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
             if (Object.keys($rootScope.veEdits).length > 0) {
                 var next = Object.keys($rootScope.veEdits)[0];
                 var id = next.split('|');
-                $scope.etrackerSelected = next;
+                $scope.tracker.etrackerSelected = next;
                 $scope.specApi.keepMode();
                 $scope.eid = id[1];
                 $scope.specWs = id[2];
@@ -636,7 +636,7 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
             if (Object.keys($rootScope.veEdits).length > 0) {
                 var next = Object.keys($rootScope.veEdits)[0];
                 var id = next.split('|');
-                $scope.etrackerSelected = next;
+                $scope.tracker.etrackerSelected = next;
                 $scope.specApi.keepMode();
                 $scope.eid = id[1];
                 $scope.specWs = id[2];
