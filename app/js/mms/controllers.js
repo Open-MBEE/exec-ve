@@ -2066,8 +2066,7 @@ function($scope, $rootScope, $stateParams, document, time) {
 .controller('DocPreviewCtrl', ['$scope', '$rootScope', 'workspace', 'tag', 'time', 'site', 'documentPreview', 'snapshot', 'ConfigService', 'growl',
 function($scope, $rootScope, workspace, tag, time, site, documentPreview, snapshot, ConfigService, growl) {
     $scope.ws = workspace;
-    if (time !== 'latest')
-        $scope.time = documentPreview.created;
+    $scope.time = time;
 
     $scope.docid = documentPreview.sysmlid;
     $scope.api = {};
