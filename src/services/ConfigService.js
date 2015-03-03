@@ -27,7 +27,7 @@ angular.module('mms')
  //['configs', ws, id]
  //['sites', ws, sitename, 'configs']
 function ConfigService($q, $http, URLService, CacheService, UtilsService, _) {
-
+    var inProgress = {};
     /**
      * @ngdoc method
      * @name mms.ConfigService#getConfigs
@@ -42,20 +42,26 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, _) {
      */
     var getConfigs = function(workspace, update) {
         var n = normalize(update, workspace);
+        var inProgressKey = 'getConfigs.' + n.ws;
+        if (inProgress.hasOwnProperty(inProgressKey))
+            return inProgress[inProgressKey];
         var deferred = $q.defer();
         var cacheKey = ['workspaces', n.ws, 'configs'];
         if (CacheService.exists(cacheKey) && !n.update) {
             deferred.resolve(CacheService.get(cacheKey));
             return deferred.promise;
         }
+        inProgress[inProgressKey] = deferred.promise;
         $http.get(URLService.getConfigsURL(n.ws))
         .success(function(data, status, headers, config) {
             CacheService.put(cacheKey, data.configurations, false, function(val, k) {
                 return {key: ['configs', n.ws, val.id], value: val, merge: true};
             });
             deferred.resolve(CacheService.get(cacheKey));
+            delete inProgress[inProgressKey];
         }).error(function(data, status, headers, config) {
             URLService.handleHttpStatus(data, status, headers, config, deferred);
+            delete inProgress[inProgressKey];
         });
         return deferred.promise;
     };
@@ -68,12 +74,21 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, _) {
             deferred.resolve(CacheService.get(cacheKey));
             return deferred.promise;
         }
-        $http.get(URLService.getConfigURL(id, n.ws))
+        getConfigs(workspace, update).then(function(data) {
+            var result = CacheService.get(cacheKey);
+            if (result)
+                deferred.resolve(result);
+            else
+                deferred.reject("Tag not found");
+        }, function(reason) {
+            deferred.reject(reason);
+        });
+        /*$http.get(URLService.getConfigURL(id, n.ws))
         .success(function(data, status, headers, config) {
             deferred.resolve(CacheService.put(cacheKey, data.configurations[0], true));
         }).error(function(data, status, headers, config) {
             URLService.handleHttpStatus(data, status, headers, config, deferred);
-        });
+        });*/
         return deferred.promise;
     };
 
@@ -135,7 +150,7 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, _) {
         } */
         $http.post(URLService.getConfigsURL(n.ws), {'configurations': [config]})
         .success(function(data, status, headers, config) {
-            deferred.resolve(CacheService.put(['configs', n.ws, config.id], data, true));
+            deferred.resolve(CacheService.put(['configs', n.ws, data.id], data, true));
             if (!update) {
                 if (CacheService.exists(['workspaces', n.ws, 'configs'])) {
                     CacheService.get(['workspaces', n.ws, 'configs']).push(data);
