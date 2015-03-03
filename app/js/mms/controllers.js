@@ -1438,6 +1438,7 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
                 });
             }
             $scope.treeApi.remove_branch(branch);
+            $state.go('^');
         });
     };
 
@@ -1461,6 +1462,7 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
         });
         instance.result.then(function(data) {
             $scope.treeApi.remove_branch(branch);
+            $state.go('^');
         });
     };
 
