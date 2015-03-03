@@ -52,10 +52,10 @@ function($scope, $rootScope, $state, $timeout, UxService, workspace, tag, docume
           $scope.tbApi.setPermission('tags', true);
       } else if ($state.includes('workspace.site.document')) {
           editable = document.editable && time === 'latest';
-          $scope.tbApi.addButton(UxService.getToolbarButton("view.reorder"));
+          //$scope.tbApi.addButton(UxService.getToolbarButton("view.reorder"));
           $scope.tbApi.addButton(UxService.getToolbarButton("document.snapshot"));
           $scope.tbApi.setPermission('element.editor',editable);
-          $scope.tbApi.setPermission("view.reorder", editable); 
+          //$scope.tbApi.setPermission("view.reorder", editable); 
       } else if ($state.includes('workspace.diff')) {
           $scope.tbApi.setPermission('element.editor', false);
       }
