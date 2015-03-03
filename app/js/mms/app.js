@@ -551,14 +551,6 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
             'pane-center@': {
                 templateUrl: 'partials/mms/pane-center.html',
                 controller: 'ViewCtrl'
-            },
-            'pane-right@': {
-                templateUrl: 'partials/mms/pane-right.html',
-                controller: 'ToolCtrl'
-            },
-            'toolbar-right@': {
-                template: '<mms-toolbar buttons="buttons" on-click="onClick(button)" mms-tb-api="tbApi"></mms-toolbar>',
-                controller: 'ToolbarCtrl'
             }
         }
     })
