@@ -310,9 +310,9 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, viewElement
     }, 500);
 }])
 .controller('ToolCtrl', ['$scope', '$rootScope', '$state', '$modal', '$q', '$stateParams',
-            'ConfigService', 'ElementService', 'growl', 
+            'ConfigService', 'ElementService', 'WorkspaceService', 'growl', 
             'workspaceObj', 'tags', 'tag', 'snapshots', 'site', 'document', 'time',
-function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, ElementService, growl, workspaceObj, tags, tag, snapshots, site, document, time) {
+function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, ElementService, WorkspaceService, growl, workspaceObj, tags, tag, snapshots, site, document, time) {
 
     // TODO rename variable ws
     var ws = $stateParams.workspace;
@@ -576,19 +576,38 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
         angular.forEach($rootScope.veEdits, function(value, key) {
             var defer = $q.defer();
             promises.push(defer.promise);
-            ElementService.updateElement(value, ws)
-            .then(function(e) {
-                defer.resolve({status: 200, id: e.sysmlid});
-            }, function(reason) {
-                defer.resolve({status: reason.status, id: value.sysmlid});
-            });
+            var keys = key.split('|');
+            var elementWs = keys[2];
+            var elementType = keys[0];
+            if (elementType === 'element') {
+                ElementService.updateElement(value, elementWs)
+                .then(function(e) {
+                    defer.resolve({status: 200, id: e.sysmlid, type: elementType, ws: elementWs});
+                }, function(reason) {
+                    defer.resolve({status: reason.status, id: value.sysmlid});
+                });
+            } else if (elementType === 'tag') {
+                ConfigService.update(value, elementWs)
+                .then(function(e) {
+                    defer.resolve({status: 200, id: e.id, type: elementType, ws: elementWs});
+                }, function(reason) {
+                    defer.resolve({status: reason.status, id: value.id});
+                });
+            } else if (elementType === 'workspace') {
+                WorkspaceService.update(value)
+                .then(function(e) {
+                    defer.resolve({status: 200, id: e.id, type: elementType, ws: elementWs});
+                }, function(reason) {
+                    defer.resolve({status: reason.status, id: value.id});
+                });
+            }
         });
         $q.all(promises).then(function(results) {
             var somefail = false;
             var failed = null;
             results.forEach(function(ob) {
                 if (ob.status === 200)
-                    delete $rootScope.veEdits[ob.id];
+                    delete $rootScope.veEdits[ob.type + '|' + ob.id + '|' + ob.ws];
                 else {
                     somefail = true;
                     failed = ob.id;
