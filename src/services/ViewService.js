@@ -221,7 +221,7 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
         .then(function(data) {  
             var clone = {};
             clone.sysmlid = data.sysmlid;
-            clone.read = data.read;
+            //clone.read = data.read;
             clone.specialization = _.cloneDeep(data.specialization);
             delete clone.specialization.contains;
             for (var i = 0; i < clone.specialization.view2view.length; i++) {
