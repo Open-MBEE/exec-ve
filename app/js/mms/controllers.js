@@ -5,7 +5,7 @@
 angular.module('mmsApp')
 .controller('MainCtrl', ['$scope', '$location', '$rootScope', '$state', '_', '$window',
 function($scope, $location, $rootScope, $state, _, $window) {
-    $rootScope.veViewLoading = false;
+    $rootScope.mms_viewContentLoading = false;
     $rootScope.mms_treeInitial = '';
 
     $window.addEventListener('beforeunload', function(event) {
@@ -17,6 +17,12 @@ function($scope, $location, $rootScope, $state, _, $window) {
     });
     $scope.$on('$stateChangeError', function(event, toState, toParams, fromState, fromParams, error) {
 
+    });
+
+    $rootScope.$on('$viewContentLoading', 
+    function(event, viewConfig){ 
+        if (viewConfig.view.controller === 'ViewCtrl')
+            $rootScope.mms_viewContentLoading = true;
     });
 
     $rootScope.$on('$stateChangeSuccess', 
@@ -92,6 +98,12 @@ function($scope, $rootScope, $state, $timeout, UxService, workspace, tag, docume
 .controller('ViewCtrl', ['$scope', '$rootScope', '$state', '$stateParams', '$timeout', '$modal', 'viewElements', 'ElementService', 'ViewService', 'time', 'growl', 'site', 'view', 'tag',
 function($scope, $rootScope, $state, $stateParams, $timeout, $modal, viewElements, ElementService, ViewService, time, growl, site, view, tag) {
     
+    $scope.$on('$viewContentLoaded', 
+        function(event) {
+            $rootScope.mms_viewContentLoading = false; 
+        }
+    );
+
     if ($state.includes('workspaces') && !$state.includes('workspace.sites')) {
         $rootScope.mms_showSiteDocLink = true;
     } else {
@@ -290,7 +302,6 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, viewElement
         $rootScope.veCurrentView = '';
         $scope.vid = '';        
     }
-    $rootScope.veViewLoading = false;
     $scope.ws = ws;
     $scope.version = time;
     $scope.editing = false;
