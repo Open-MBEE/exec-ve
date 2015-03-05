@@ -3,9 +3,11 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('MainCtrl', ['$scope', '$location', '$rootScope', '_', '$window',
-function($scope, $location, $rootScope, _, $window) {
+.controller('MainCtrl', ['$scope', '$location', '$rootScope', '$state', '_', '$window',
+function($scope, $location, $rootScope, $state, _, $window) {
     $rootScope.veViewLoading = false;
+    $rootScope.mms_treeInitial = '';
+
     $window.addEventListener('beforeunload', function(event) {
         if ($rootScope.veEdits && !_.isEmpty($rootScope.veEdits)) {
             var message = 'You may have unsaved changes, are you sure you want to leave?';
@@ -16,6 +18,29 @@ function($scope, $location, $rootScope, _, $window) {
     $scope.$on('$stateChangeError', function(event, toState, toParams, fromState, fromParams, error) {
 
     });
+
+    $rootScope.$on('$stateChangeSuccess', 
+        function(event, toState, toParams, fromState, fromParams) {
+        
+            // set the initial tree selection
+            if ($state.includes('workspaces') && !$state.includes('workspace.sites')) {
+                if (toParams.tag !== undefined && toParams.tag !== 'latest')
+                    $rootScope.mms_treeInitial = toParams.tag;
+                else
+                    $rootScope.mms_treeInitial = toParams.workspace;            
+            } else if ($state.current.name === 'workspace.site') {
+                $rootScope.mms_treeInitial = toParams.site;            
+            } else if ($state.current.name === 'workspace.site.documentpreview') {
+                $rootScope.mms_treeInitial = toParams.previewDocument;            
+            }else if ($state.includes('workspace.site.document')) {
+                if (toParams.view !== undefined)
+                    $rootScope.mms_treeInitial = toParams.view;
+                else
+                    $rootScope.mms_treeInitial = toParams.document;                    
+            }
+        }
+    );
+
 }])
 .controller('ToolbarCtrl', ['$scope', '$rootScope', '$state', '$timeout', 'UxService', 'workspace', 'tag', 'document', 'time',
 function($scope, $rootScope, $state, $timeout, UxService, workspace, tag, document, time) {   
@@ -256,7 +281,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, viewElement
             permission: $state.includes('workspace.site.document')
         }
     ];
-    
+
     if (view) {
         ViewService.setCurrentViewId(view.sysmlid);
         $rootScope.veCurrentView = view.sysmlid;
@@ -705,21 +730,6 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
     $rootScope.mms_bbApi = $scope.bbApi = {};
 
     $rootScope.mms_treeApi = $scope.treeApi = {};
-
-    $rootScope.mms_treeInitial = '';
-    if ($state.includes('workspaces') && !$state.includes('workspace.sites')) {
-        if (tag.name !== 'latest')
-            $rootScope.mms_treeInitial = tag.id;
-        else
-            $rootScope.mms_treeInitial = workspaceObj.id;            
-    } else if ($state.current.name === 'workspace.site') {
-        $rootScope.mms_treeInitial = site.sysmlid;            
-    } else if ($state.current.name === 'workspace.site.documentpreview') {
-        $rootScope.mms_treeInitial = document.sysmlid;            
-    }else if ($state.includes('workspace.site.document')) {
-        $rootScope.mms_treeInitial = view.sysmlid;                    
-    }
-
 
     $rootScope.mms_fullDocMode = false;
 
