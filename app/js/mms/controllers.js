@@ -3,9 +3,11 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('MainCtrl', ['$scope', '$location', '$rootScope', '_', '$window',
-function($scope, $location, $rootScope, _, $window) {
-    $rootScope.veViewLoading = false;
+.controller('MainCtrl', ['$scope', '$location', '$rootScope', '$state', '_', '$window', 'growl',
+function($scope, $location, $rootScope, $state, _, $window, growl) {
+    $rootScope.mms_viewContentLoading = false;
+    $rootScope.mms_treeInitial = '';
+
     $window.addEventListener('beforeunload', function(event) {
         if ($rootScope.veEdits && !_.isEmpty($rootScope.veEdits)) {
             var message = 'You may have unsaved changes, are you sure you want to leave?';
@@ -14,8 +16,37 @@ function($scope, $location, $rootScope, _, $window) {
         }
     });
     $scope.$on('$stateChangeError', function(event, toState, toParams, fromState, fromParams, error) {
-
+        growl.error('Error: ' + error.message);
     });
+
+    $rootScope.$on('$viewContentLoading', 
+    function(event, viewConfig){ 
+        if (viewConfig.view.controller === 'ViewCtrl')
+            $rootScope.mms_viewContentLoading = true;
+    });
+
+    $rootScope.$on('$stateChangeSuccess', 
+        function(event, toState, toParams, fromState, fromParams) {
+        
+            // set the initial tree selection
+            if ($state.includes('workspaces') && !$state.includes('workspace.sites')) {
+                if (toParams.tag !== undefined && toParams.tag !== 'latest')
+                    $rootScope.mms_treeInitial = toParams.tag;
+                else
+                    $rootScope.mms_treeInitial = toParams.workspace;            
+            } else if ($state.current.name === 'workspace.site') {
+                $rootScope.mms_treeInitial = toParams.site;            
+            } else if ($state.current.name === 'workspace.site.documentpreview') {
+                $rootScope.mms_treeInitial = toParams.previewDocument;            
+            }else if ($state.includes('workspace.site.document')) {
+                if (toParams.view !== undefined)
+                    $rootScope.mms_treeInitial = toParams.view;
+                else
+                    $rootScope.mms_treeInitial = toParams.document;                    
+            }
+        }
+    );
+
 }])
 .controller('ToolbarCtrl', ['$scope', '$rootScope', '$state', '$timeout', 'UxService', 'workspace', 'tag', 'document', 'time',
 function($scope, $rootScope, $state, $timeout, UxService, workspace, tag, document, time) {   
@@ -67,6 +98,12 @@ function($scope, $rootScope, $state, $timeout, UxService, workspace, tag, docume
 .controller('ViewCtrl', ['$scope', '$rootScope', '$state', '$stateParams', '$timeout', '$modal', 'viewElements', 'ElementService', 'ViewService', 'time', 'growl', 'site', 'view', 'tag',
 function($scope, $rootScope, $state, $stateParams, $timeout, $modal, viewElements, ElementService, ViewService, time, growl, site, view, tag) {
     
+    $scope.$on('$viewContentLoaded', 
+        function(event) {
+            $rootScope.mms_viewContentLoading = false; 
+        }
+    );
+
     if ($state.includes('workspaces') && !$state.includes('workspace.sites')) {
         $rootScope.mms_showSiteDocLink = true;
     } else {
@@ -256,7 +293,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, viewElement
             permission: $state.includes('workspace.site.document')
         }
     ];
-    
+
     if (view) {
         ViewService.setCurrentViewId(view.sysmlid);
         $rootScope.veCurrentView = view.sysmlid;
@@ -265,7 +302,6 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, viewElement
         $rootScope.veCurrentView = '';
         $scope.vid = '';        
     }
-    $rootScope.veViewLoading = false;
     $scope.ws = ws;
     $scope.version = time;
     $scope.editing = false;
@@ -706,21 +742,6 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
 
     $rootScope.mms_treeApi = $scope.treeApi = {};
 
-    $rootScope.mms_treeInitial = '';
-    if ($state.includes('workspaces') && !$state.includes('workspace.sites')) {
-        if (tag.name !== 'latest')
-            $rootScope.mms_treeInitial = tag.id;
-        else
-            $rootScope.mms_treeInitial = workspaceObj.id;            
-    } else if ($state.current.name === 'workspace.site') {
-        $rootScope.mms_treeInitial = site.sysmlid;            
-    } else if ($state.current.name === 'workspace.site.documentpreview') {
-        $rootScope.mms_treeInitial = document.sysmlid;            
-    }else if ($state.includes('workspace.site.document')) {
-        $rootScope.mms_treeInitial = view.sysmlid;                    
-    }
-
-
     $rootScope.mms_fullDocMode = false;
 
     $scope.buttons = [];
@@ -732,11 +753,21 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
 
     // TODO: pull in config/tags
     var config = time;
-    var ws = $stateParams.workspace;
+    var ws = $stateParams.workspace; // TODO this is undefined, but is being used below
 
     if (document !== null) {
         $scope.document = document;
         $scope.editable = $scope.document.editable && time === 'latest' && $scope.document.specialization.type === 'Product';
+    }
+
+    // If it is not the master workspace, then retrieve it:
+    if (workspaceObj.id !== 'master') {
+        WorkspaceService.getWorkspace('master').then(function (data) {
+            $scope.isManager = data.siteManagerPermission;
+        });
+    }
+    else {
+        $scope.isManager = workspaceObj.siteManagerPermission;
     }
 
     // TODO: convert to callback rather than timeout
@@ -750,6 +781,8 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree.add.configuration"));
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree.delete"));
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree.merge"));
+        $scope.bbApi.setPermission("tree.add.task", $scope.isManager);
+        $scope.bbApi.setPermission("tree.delete", $scope.isManager);
       } else if ($state.includes('workspace.sites') && !$state.includes('workspace.site.document')) {
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree.add.document"));
         $scope.bbApi.setPermission("tree.add.document", config == 'latest' ? true : false);
@@ -1088,9 +1121,10 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
 
     // TODO: update tree options to call from UxService
     $scope.tree_options = {
-        types: UxService.getTreeTypes(),
-        sort: sortFunction
+        types: UxService.getTreeTypes()
     };
+    if (!$state.includes('workspace.site.document'))
+        $scope.tree_options.sort = sortFunction;
     
     // TODO: this is a hack, need to resolve in alternate way    
     $timeout(function() {
