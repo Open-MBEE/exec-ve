@@ -108,6 +108,21 @@ function mmsButtonBar($templateCache) {
                     }
                 });
             };
+
+            api.toggleButtonSlash = function (id) {
+                $scope.buttons.forEach(function(button) {
+                    if (button.id === id) {
+                        if (button.slash) {
+                            button.icon = button.icon_original;
+                        }
+                        else {
+                            button.icon_original = button.icon;
+                            button.icon = button.icon + '-slash';
+                        }
+                        button.slash = ! button.slash;
+                    }
+                });
+            };
         }
     };
 

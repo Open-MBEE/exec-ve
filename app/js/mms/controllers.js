@@ -785,6 +785,7 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
         $scope.bbApi.setPermission("tree.delete", $scope.isManager);
       } else if ($state.includes('workspace.sites') && !$state.includes('workspace.site.document')) {
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree.add.document"));
+        $scope.bbApi.addButton(UxService.getButtonBarButton("tree.showall.sites"));
         $scope.bbApi.setPermission("tree.add.document", config == 'latest' ? true : false);
       } else if ($state.includes('workspace.site.document')) {
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree.add.view"));
@@ -810,6 +811,10 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
 
     $scope.$on('tree.filter', function() {
         $scope.toggleFilter();
+    });
+
+    $scope.$on('tree.showall.sites', function() {
+        $scope.toggleShowAllSites();
     });
 
     $scope.$on('tree.add.task', function() {
@@ -856,11 +861,17 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
         $scope.bbApi.setIcon("tree.full.document", $rootScope.mms_fullDocMode ? "fa-file-text" : "fa-file-text-o");
     });
 
-
     // TODO: Move toggle to button bar api
     $scope.filterOn = false;
     $scope.toggleFilter = function() {
         $scope.filterOn = !$scope.filterOn;
+    };
+
+    $scope.showAllSites = false;
+    $scope.toggleShowAllSites = function() {
+        $scope.showAllSites = !$scope.showAllSites;
+        $scope.bbApi.toggleButtonSlash('tree.showall.sites');
+        $scope.my_data = $scope.filter_sites($scope.dataTree);
     };
 
     // TODO: Move toggle to button bar api
@@ -917,6 +928,35 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
         }
         $scope.comparing = true;
         $state.go('workspace.diff', {source: sourceWs, target: targetWs, sourceTime: sourceTime, targetTime: targetTime});
+    };
+
+    // Filters sites based on whether they are site characterizations
+    $scope.filter_sites = function(site_array) {
+        var ret_array = [];
+
+        if ($scope.showAllSites) {
+            ret_array = site_array;
+        }
+        else {
+            for (var i=0; i < site_array.length; i++) {
+                var obj = site_array[i];
+                // If it is a site characterization or any of 
+                // the children are a site characterization:
+                if (obj.type === 'site') {
+                    if (obj.data.isCharacterization) {
+                        ret_array.push(obj);
+                    }
+                    else {
+                        var child_array = $scope.filter_sites(obj.children);
+                        if (child_array.length > 0) {
+                            ret_array.push(obj);
+                            ret_array.concat(child_array);
+                        }
+                    }
+                }
+            }
+        }
+        return ret_array;
     };
  
     // TODO: Make this section generic
@@ -992,13 +1032,12 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
         });
     };
 
-    var dataTree;
     if ($state.includes('workspaces') && !$state.includes('workspace.sites')) {
-        dataTree = UtilsService.buildTreeHierarchy(workspaces, "id", "workspace", "parent", workspaceLevel2Func);
-        $scope.my_data = dataTree;
+        $scope.my_data = UtilsService.buildTreeHierarchy(workspaces, "id", 
+                                                         "workspace", "parent", workspaceLevel2Func);
     } else if ($state.includes('workspace.sites') && !$state.includes('workspace.site.document')) {
-        dataTree = UtilsService.buildTreeHierarchy(sites, "sysmlid", "site", "parent", siteLevel2Func);
-        $scope.my_data = dataTree;
+        $scope.dataTree = UtilsService.buildTreeHierarchy(sites, "sysmlid", "site", "parent", siteLevel2Func);
+        $scope.my_data = $scope.filter_sites($scope.dataTree);
     } else
     {
         // this is from view editor
