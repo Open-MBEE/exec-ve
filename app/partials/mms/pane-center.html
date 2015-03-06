@@ -3,8 +3,9 @@
   <h4><a class="docweb-link" ui-sref="workspace.sites()">Sites and Documents</a></h4>
 </div>
 
+<i class="pane-center-spinner fa fa-5x fa-spinner fa-spin" ng-show="mms_viewContentLoading"></i>
+
 <div ng-if="view !== null" >
-  <i class="pane-center-spinner fa fa-5x fa-spinner fa-spin" ng-show="mms_viewContentLoading"></i>
 
   <div ng-hide="mms_viewContentLoading" class="pane-center container-fluid">
 

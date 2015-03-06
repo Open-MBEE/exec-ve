@@ -3,8 +3,8 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('MainCtrl', ['$scope', '$location', '$rootScope', '$state', '_', '$window',
-function($scope, $location, $rootScope, $state, _, $window) {
+.controller('MainCtrl', ['$scope', '$location', '$rootScope', '$state', '_', '$window', 'growl',
+function($scope, $location, $rootScope, $state, _, $window, growl) {
     $rootScope.mms_viewContentLoading = false;
     $rootScope.mms_treeInitial = '';
 
@@ -16,7 +16,7 @@ function($scope, $location, $rootScope, $state, _, $window) {
         }
     });
     $scope.$on('$stateChangeError', function(event, toState, toParams, fromState, fromParams, error) {
-
+        growl.error('Error: ' + error.message);
     });
 
     $rootScope.$on('$viewContentLoading', 

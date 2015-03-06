@@ -298,7 +298,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
 
                     var doc = {
                         specialization: {type: "View"},
-                        name: site.sysmlid + ' Cover Page',
+                        name: site.name + ' Cover Page',
                         documentation: ''
                     };
                     doc.sysmlid = siteCoverDocId;
