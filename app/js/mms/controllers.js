@@ -1121,9 +1121,10 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
 
     // TODO: update tree options to call from UxService
     $scope.tree_options = {
-        types: UxService.getTreeTypes(),
-        sort: sortFunction
+        types: UxService.getTreeTypes()
     };
+    if (!$state.includes('workspace.site.document'))
+        $scope.tree_options.sort = sortFunction;
     
     // TODO: this is a hack, need to resolve in alternate way    
     $timeout(function() {
