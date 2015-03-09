@@ -6,7 +6,7 @@
 
   <div>
 
-    <input class="input-filter-tree form-control" ng-show="filterOn" ng-model="search" type="text" placeholder="Type here to filter items in the tree" ng-change="treeApi.expand_all()">
+    <input class="input-filter-tree form-control" ng-show="bbApi.getToggleState('tree.filter')" ng-model="search" type="text" placeholder="Type here to filter items in the tree" ng-change="treeApi.expand_all()">
 
   </div>
 

@@ -861,10 +861,8 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
         $scope.bbApi.setIcon("tree.full.document", $rootScope.mms_fullDocMode ? "fa-file-text" : "fa-file-text-o");
     });
 
-    // TODO: Move toggle to button bar api
-    $scope.filterOn = false;
     $scope.toggleFilter = function() {
-        $scope.filterOn = !$scope.filterOn;
+        $scope.bbApi.toggleButtonState('tree.filter');
     };
 
     $scope.toggleShowAllSites = function() {
