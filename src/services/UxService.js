@@ -70,43 +70,44 @@ function UxService($rootScope) {
 		switch (button) {
 		  case "tree.expand":
 		  	return {id: button, icon: 'fa-caret-square-o-down', selected: true, active: true, permission: true, tooltip: 'Expand All', 
-            		spinner: false, togglable: false, slash: false, action: function() {$rootScope.$broadcast(button);}};
+            		spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
 		  case "tree.collapse":
 		  	return {id: button, icon: 'fa-caret-square-o-up', selected: true, active: true, permission: true, tooltip: 'Collapse All', 
-            		spinner: false, togglable: false, slash: false, action: function() {$rootScope.$broadcast(button);}};
+            		spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
 		  case "tree.filter":
 		  	return {id: button, icon: 'fa-filter', selected: true, active: true, permission: true, tooltip: 'Filter', 
-            		spinner: false, togglable: true, slash: false, action: function() {$rootScope.$broadcast(button);}};
+            		spinner: false, togglable: true, action: function() {$rootScope.$broadcast(button);}};
 		  case "tree.add.document":
 		  	return {id: button, icon: 'fa-plus', selected: true, active: true, permission: false, tooltip: 'Add Document', 
-            		spinner: false, togglable: false, slash: false, action: function() {$rootScope.$broadcast(button);}};
+            		spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
 		  case "tree.add.view":
 		  	return {id: button, icon: 'fa-plus', selected: true, active: true, permission: false, tooltip: 'Add View', 
-            		spinner: false, togglable: false, slash: false, action: function() {$rootScope.$broadcast(button);}};
+            		spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
 		  case "tree.add.configuration":
 		  	return {id: button, icon: 'fa-tag', selected: true, active: true, permission: true, tooltip: 'Add Tag', 
-            		spinner: false, togglable: false, slash: false, action: function() {$rootScope.$broadcast(button);}};
+            		spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
 		  case "tree.add.task":
 		  	return {id: button, icon: 'fa-plus', selected: true, active: true, permission: true, tooltip: 'Add Task', 
-            		spinner: false, togglable: false, slash: false, action: function() {$rootScope.$broadcast(button);}};
+            		spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
 		  case "tree.delete":
 		  	return {id: button, icon: 'fa-times', selected: true, active: true, permission: true, tooltip: 'Delete', 
-            		spinner: false, togglable: false, slash: false, action: function() {$rootScope.$broadcast(button);}};
+            		spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
 		  case "tree.delete.view":
 		  	return {id: button, icon: 'fa-times', selected: true, active: true, permission: false, tooltip: 'Delete View', 
-            		spinner: false, togglable: false, slash: false, action: function() {$rootScope.$broadcast(button);}};
+            		spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
 		  case "tree.merge":
 		  	return {id: button, icon: 'fa-share-alt fa-flip-horizontal', selected: true, active: true, permission: true, tooltip: 'Merge Task', 
-            		spinner: false, togglable: false, slash: false, action: function() {$rootScope.$broadcast(button);}};
+            		spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
 		  case "tree.reorder.view":
 		  	return {id: button, icon: 'fa-arrows-v', selected: true, active: true, permission: false, tooltip: 'Reorder Views', 
-            		spinner: false, togglable: false, slash: false, action: function() {$rootScope.$broadcast(button);}};
+            		spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
 		  case "tree.full.document":
 		  	return {id: button, icon: 'fa-file-text-o', selected: true, active: true, permission: true, tooltip: 'Full Document', 
-            		spinner: false, togglable: false, slash: false, action: function() {$rootScope.$broadcast(button);}};
+            		spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
           case "tree.showall.sites":
-            return {id: button, icon: 'fa-eye', selected: true, active: true, permission: true, tooltip: 'Show/Hide Alfresco Sites', 
-                    spinner: false, togglable: false, slash: false, action: function() {$rootScope.$broadcast(button);}};
+            return {id: button, icon: 'fa-eye', selected: true, active: true, permission: true, tooltip: 'Show Alfresco Sites', 
+                    spinner: false, togglable: true, toggle_icon: 'fa-eye-slash', toggle_tooltip: 'Hide Alfresco Sites',
+                    action: function() {$rootScope.$broadcast(button);}};
 
         }
 	};

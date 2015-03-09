@@ -6,6 +6,7 @@ angular.module('mms.directives')
 function mmsButtonBar($templateCache) {
     var template = $templateCache.get('mms/templates/mmsButtonBar.html');
 
+    // TODO: this link is currently not used
     var mmsButtonBarLink = function(scope, element, attrs){
         scope.clicked = function(button) {
             if (! button.active)
@@ -35,6 +36,7 @@ function mmsButtonBar($templateCache) {
         if ($scope.mmsBbApi) {
             var api = $scope.mmsBbApi;
 
+            // TODO: select is currently not being used, so clicked is not being used
             api.select = function(id) {
                 $scope.buttons.forEach(function(button) {
                     if (button.id === id && button.active) {
@@ -91,6 +93,11 @@ function mmsButtonBar($templateCache) {
                     button.placement = "bottom";
                 }
 
+                if (button.togglable) {
+                    button.toggle_state = false;
+                    button.icon_original = button.icon;
+                    button.tooltip_orginal = button.tooltip;
+                }
                 $scope.buttons.push(button);
             };
 
@@ -109,17 +116,20 @@ function mmsButtonBar($templateCache) {
                 });
             };
 
-            api.toggleButtonSlash = function (id) {
+            api.toggleButtonState = function (id) {
                 $scope.buttons.forEach(function(button) {
                     if (button.id === id) {
-                        if (button.slash) {
-                            button.icon = button.icon_original;
+                        if (button.togglable) {
+                            button.toggle_state = !button.toggle_state;
+                            if (button.toggle_state && button.toggle_icon && button.toggle_tooltip) {
+                                button.icon = button.toggle_icon;
+                                button.tooltip = button.toggle_tooltip;
+                            }
+                            else {
+                                button.icon = button.icon_original;
+                                button.tooltip = button.tooltip_orginal;
+                            }
                         }
-                        else {
-                            button.icon_original = button.icon;
-                            button.icon = button.icon + '-slash';
-                        }
-                        button.slash = ! button.slash;
                     }
                 });
             };

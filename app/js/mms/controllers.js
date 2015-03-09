@@ -867,11 +867,9 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
         $scope.filterOn = !$scope.filterOn;
     };
 
-    $scope.showAllSites = false;
     $scope.toggleShowAllSites = function() {
-        $scope.showAllSites = !$scope.showAllSites;
-        $scope.bbApi.toggleButtonSlash('tree.showall.sites');
-        $scope.my_data = $scope.filter_sites($scope.dataTree);
+        $scope.bbApi.toggleButtonState('tree.showall.sites');
+        $scope.my_data = filter_sites($scope.dataTree);
     };
 
     // TODO: Move toggle to button bar api
@@ -931,10 +929,10 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
     };
 
     // Filters sites based on whether they are site characterizations
-    $scope.filter_sites = function(site_array) {
+    var filter_sites = function(site_array) {
         var ret_array = [];
 
-        if ($scope.showAllSites) {
+        if ($scope.bbApi.getToggleState && $scope.bbApi.getToggleState('tree.showall.sites')) {
             ret_array = site_array;
         }
         else {
@@ -947,7 +945,7 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
                         ret_array.push(obj);
                     }
                     else {
-                        var child_array = $scope.filter_sites(obj.children);
+                        var child_array = filter_sites(obj.children);
                         if (child_array.length > 0) {
                             ret_array.push(obj);
                             ret_array.concat(child_array);
@@ -1037,7 +1035,7 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
                                                          "workspace", "parent", workspaceLevel2Func);
     } else if ($state.includes('workspace.sites') && !$state.includes('workspace.site.document')) {
         $scope.dataTree = UtilsService.buildTreeHierarchy(sites, "sysmlid", "site", "parent", siteLevel2Func);
-        $scope.my_data = $scope.filter_sites($scope.dataTree);
+        $scope.my_data = filter_sites($scope.dataTree);
     } else
     {
         // this is from view editor
