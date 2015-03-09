@@ -430,11 +430,11 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
                         snapshots.forEach(function(snapshot) {
                             if (time === snapshot.created && snapshot.configurations && snapshot.configurations.length > 0)
                                 snapshot.configurations.forEach(function(config) {
-                                    tagStr += '(' + config.name + ') ';
+                                    tagStr += '( <i class="fa fa-tag"></i> ' + config.name + ' ) ';
                                     $scope.tag = config;
                                 });
                         });
-                        tagStr += '(' + $filter('date')(time, 'M/d/yy h:mm a') + ')';
+                        tagStr += '( <i class="fa fa-camera"></i> ' + $filter('date')(time, 'M/d/yy h:mm a') + ' )';
 
                         $scope.snapshotTag = ' ' + tagStr;
                     }                                        
