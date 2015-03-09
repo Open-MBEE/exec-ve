@@ -867,7 +867,7 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
 
     $scope.toggleShowAllSites = function() {
         $scope.bbApi.toggleButtonState('tree.showall.sites');
-        $scope.my_data = filter_sites($scope.dataTree);
+        $scope.my_data = UtilsService.buildTreeHierarchy(filter_sites(sites), "sysmlid", "site", "parent", siteLevel2Func);
     };
 
     // TODO: Move toggle to button bar api
@@ -926,7 +926,7 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
         $state.go('workspace.diff', {source: sourceWs, target: targetWs, sourceTime: sourceTime, targetTime: targetTime});
     };
 
-    // Filters sites based on whether they are site characterizations
+    // Filter out alfresco sites
     var filter_sites = function(site_array) {
         var ret_array = [];
 
@@ -936,19 +936,9 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
         else {
             for (var i=0; i < site_array.length; i++) {
                 var obj = site_array[i];
-                // If it is a site characterization or any of 
-                // the children are a site characterization:
-                if (obj.type === 'site') {
-                    if (obj.data.isCharacterization) {
-                        ret_array.push(obj);
-                    }
-                    else {
-                        var child_array = filter_sites(obj.children);
-                        if (child_array.length > 0) {
-                            ret_array.push(obj);
-                            ret_array.concat(child_array);
-                        }
-                    }
+                // If it is a site characterization:
+                if (obj.isCharacterization) {
+                    ret_array.push(obj);
                 }
             }
         }
@@ -1032,8 +1022,7 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
         $scope.my_data = UtilsService.buildTreeHierarchy(workspaces, "id", 
                                                          "workspace", "parent", workspaceLevel2Func);
     } else if ($state.includes('workspace.sites') && !$state.includes('workspace.site.document')) {
-        $scope.dataTree = UtilsService.buildTreeHierarchy(sites, "sysmlid", "site", "parent", siteLevel2Func);
-        $scope.my_data = filter_sites($scope.dataTree);
+        $scope.my_data = UtilsService.buildTreeHierarchy(filter_sites(sites), "sysmlid", "site", "parent", siteLevel2Func);
     } else
     {
         // this is from view editor
