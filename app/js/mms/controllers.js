@@ -33,16 +33,16 @@ function($scope, $location, $rootScope, $state, _, $window, growl) {
                 if (toParams.tag !== undefined && toParams.tag !== 'latest')
                     $rootScope.mms_treeInitial = toParams.tag;
                 else
-                    $rootScope.mms_treeInitial = toParams.workspace;            
+                    $rootScope.mms_treeInitial = toParams.workspace;
             } else if ($state.current.name === 'workspace.site') {
-                $rootScope.mms_treeInitial = toParams.site;            
+                $rootScope.mms_treeInitial = toParams.site;
             } else if ($state.current.name === 'workspace.site.documentpreview') {
-                $rootScope.mms_treeInitial = toParams.previewDocument;            
+                $rootScope.mms_treeInitial = toParams.previewDocument;
             }else if ($state.includes('workspace.site.document')) {
                 if (toParams.view !== undefined)
                     $rootScope.mms_treeInitial = toParams.view;
                 else
-                    $rootScope.mms_treeInitial = toParams.document;                    
+                    $rootScope.mms_treeInitial = toParams.document;
             }
         }
     );
