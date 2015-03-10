@@ -95,8 +95,8 @@ function($scope, $rootScope, $state, $timeout, UxService, workspace, tag, docume
     $scope.onClick = function(button) {
     };
 }])
-.controller('ViewCtrl', ['$scope', '$rootScope', '$state', '$stateParams', '$timeout', '$modal', 'viewElements', 'ElementService', 'ViewService', 'time', 'growl', 'site', 'view', 'tag',
-function($scope, $rootScope, $state, $stateParams, $timeout, $modal, viewElements, ElementService, ViewService, time, growl, site, view, tag) {
+.controller('ViewCtrl', ['$scope', '$rootScope', '$state', '$stateParams', '$timeout', '$modal', 'viewElements', 'ElementService', 'ViewService', 'time', 'growl', 'site', 'view', 'tag', 'UxService',
+function($scope, $rootScope, $state, $stateParams, $timeout, $modal, viewElements, ElementService, ViewService, time, growl, site, view, tag, UxService) {
     
     $scope.$on('$viewContentLoaded', 
         function(event) {
@@ -121,178 +121,152 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, viewElement
     $scope.viewElements = viewElements;
     $scope.site = site;
     var elementSaving = false;
+    $scope.bbApi = {};
+    $scope.buttons = [];
 
-    $scope.buttons = [
-        {
-            action: function() {
-                $scope.editing = !$scope.editing;
-                $scope.specApi.setEditing(true);
-                $scope.buttons[0].permission = false;
-                $scope.buttons[1].permission = true;
-                $scope.buttons[2].permission = true;
-                var edit = $scope.specApi.getEdits();
-                if (edit) {
-                    $rootScope.veEdits['element|' + edit.sysmlid + '|' + ws] = edit;
-                    $rootScope.mms_tbApi.setIcon('element.editor', 'fa-edit-asterisk');
-                    if (Object.keys($rootScope.veEdits).length > 1) {
-                        $rootScope.mms_tbApi.setPermission('element.editor.saveall', true);
-                    } else {
-                        $rootScope.mms_tbApi.setPermission('element.editor.saveall', false);
-                    }
-                }
-                ElementService.isCacheOutdated(view.sysmlid, ws)
-                .then(function(data) {
-                    if (data.status && data.server.modified > data.cache.modified)
-                        growl.warning('This view has been updated on the server');
-                });
-            },
-            tooltip: "Edit View Documentation",
-            icon: "fa-edit",
-            permission: view && view.editable && time === 'latest'
-        },
-        {
-            action: function() {
-                
-                    if (elementSaving) {
-                        growl.info('Please Wait...');
-                        return;
-                    }
-                    elementSaving = true;
-                    $scope.buttons[1].icon = "fa-spin fa-spinner";
-                    $scope.specApi.save().then(function(data) {
-                        elementSaving = false;
-                        growl.success('Save Successful');
-                        $scope.editing = false;
-                        delete $rootScope.veEdits['element|' + $scope.specApi.getEdits().sysmlid + '|' + ws];
-                        if (Object.keys($rootScope.veEdits).length === 0) {
-                            $rootScope.mms_tbApi.setIcon('element.editor', 'fa-edit');
-                        }
-                        if (Object.keys($rootScope.veEdits).length > 1) {
-                            $rootScope.mms_tbApi.setPermission('element.editor.saveall', true);
-                        } else {
-                            $rootScope.mms_tbApi.setPermission('element.editor.saveall', false);
-                        }
-                        $scope.buttons[0].permission = true;
-                        $scope.buttons[1].permission = false;
-                        $scope.buttons[2].permission = false;
-                    }, function(reason) {
-                        elementSaving = false;
-                        if (reason.type === 'info')
-                            growl.info(reason.message);
-                        else if (reason.type === 'warning')
-                            growl.warning(reason.message);
-                        else if (reason.type === 'error')
-                            growl.error(reason.message);
-                    }).finally(function() {
-                        $scope.buttons[1].icon = "fa-save";
-                    });
-            },
-            tooltip: "Save",
-            icon: "fa-save",
-            permission: false
-        },
-        {
-            action: function() {
-                var go = function() {
-                    delete $rootScope.veEdits['element|' + $scope.specApi.getEdits().sysmlid + '|' + ws];
-                    $scope.specApi.revertEdits();
-                    $scope.editing = false;
-                    if (Object.keys($rootScope.veEdits).length === 0) {
-                        $rootScope.mms_tbApi.setIcon('element.editor', 'fa-edit');
-                    }
-                    if (Object.keys($rootScope.veEdits).length > 1) {
-                        $rootScope.mms_tbApi.setPermission('element.editor.saveall', true);
-                    } else {
-                        $rootScope.mms_tbApi.setPermission('element.editor.saveall', false);
-                    }
-                    $scope.buttons[0].permission = true;
-                    $scope.buttons[1].permission = false;
-                    $scope.buttons[2].permission = false;
-                };
-                if ($scope.specApi.hasEdits()) {
-                    var instance = $modal.open({
-                        templateUrl: 'partials/mms/cancelConfirm.html',
-                        scope: $scope,
-                        controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
-                            $scope.ok = function() {
-                                $modalInstance.close('ok');
-                            };
-                            $scope.cancel = function() {
-                                $modalInstance.dismiss();
-                            };
-                        }]
-                    });
-                    instance.result.then(function() {
-                        go();
-                    });
-                } else
-                    go();
-            },
-            tooltip:"Cancel",
-            icon: "fa-times",
-            permission: false
-        },
-        {
-            action: function() {
-                $scope.viewApi.toggleShowComments();
+    // TODO: convert to callback rather than timeout
+    $timeout(function() {
 
-                if (!$rootScope.veCommentsOn) {
-                    $scope.buttons[3].icon = "fa-comment";
-                    $scope.buttons[3].tooltip = "Hide Comments";
-                }
-                else {
-                    $scope.buttons[3].icon = "fa-comment-o";
-                    $scope.buttons[3].tooltip = "Show Comments";
-                }
-
-                $rootScope.veCommentsOn = !$rootScope.veCommentsOn;
-            },
-            tooltip: !$rootScope.veCommentsOn ? "Show Comments" : "Hide Comments",
-            icon: !$rootScope.veCommentsOn ? "fa-comment-o" : "fa-comment",
-            permission: true
-        },
-        {
-            action: function() {
-                $scope.viewApi.toggleShowElements();
-
-                if (!$rootScope.veElementsOn) {
-                    $scope.buttons[4].tooltip = "Hide Elements";
-                }
-                else {
-                    $scope.buttons[4].tooltip = "Show Elements";
-                }
-
-                $rootScope.veElementsOn = !$rootScope.veElementsOn;
-            },
-            tooltip: !$rootScope.veElementsOn ? "Show Elements": "Hide Elements",
-            icon: "fa-codepen",
-            permission: true
-        },
-        {
-            action: function() {
-                var prev = $rootScope.mms_treeApi.get_prev_branch($rootScope.mms_treeApi.get_selected_branch());
-                if (!prev)
-                    return;
-                $scope.buttons[5].icon = "fa-spinner fa-spin";
-                $rootScope.mms_treeApi.select_branch(prev);
-            },
-            tooltip: "Previous",
-            icon: "fa-chevron-left",
-            permission: $state.includes('workspace.site.document')
-        },
-        {
-            action: function() {
-                var next = $rootScope.mms_treeApi.get_next_branch($rootScope.mms_treeApi.get_selected_branch());
-                if (!next)
-                    return;
-                $scope.buttons[6].icon = "fa-spinner fa-spin";
-                $rootScope.mms_treeApi.select_branch(next);
-            },
-            tooltip: "Next",
-            icon: "fa-chevron-right",
-            permission: $state.includes('workspace.site.document')
+        if (view && view.editable && time === 'latest') {
+            $scope.bbApi.addButton(UxService.getButtonBarButton('edit.view.documentation'));
         }
-    ];
+        $scope.bbApi.addButton(UxService.getButtonBarButton('edit.view.documentation.save'));
+        $scope.bbApi.addButton(UxService.getButtonBarButton('edit.view.documentation.cancel'));
+        $scope.bbApi.addButton(UxService.getButtonBarButton('show.comments'));
+        $scope.bbApi.setToggleState('show.comments', $rootScope.veCommentsOn);
+        $scope.bbApi.addButton(UxService.getButtonBarButton('show.elements'));
+        $scope.bbApi.setToggleState('show.elements', $rootScope.veElementsOn);
+
+        if ($state.includes('workspace.site.document')) {
+            $scope.bbApi.addButton(UxService.getButtonBarButton('center.previous'));
+            $scope.bbApi.addButton(UxService.getButtonBarButton('center.next'));
+        }
+
+    }, 500);
+
+    $scope.$on('edit.view.documentation', function() {
+        $scope.editing = !$scope.editing;
+        $scope.specApi.setEditing(true);
+        $scope.bbApi.setPermission('edit.view.documentation',false);
+        $scope.bbApi.setPermission('edit.view.documentation.save',true);
+        $scope.bbApi.setPermission('edit.view.documentation.cancel',true);
+        var edit = $scope.specApi.getEdits();
+        if (edit) {
+            $rootScope.veEdits['element|' + edit.sysmlid + '|' + ws] = edit;
+            $rootScope.mms_tbApi.setIcon('element.editor', 'fa-edit-asterisk');
+            if (Object.keys($rootScope.veEdits).length > 1) {
+                $rootScope.mms_tbApi.setPermission('element.editor.saveall', true);
+            } else {
+                $rootScope.mms_tbApi.setPermission('element.editor.saveall', false);
+            }
+        }
+        ElementService.isCacheOutdated(view.sysmlid, ws)
+        .then(function(data) {
+            if (data.status && data.server.modified > data.cache.modified)
+                growl.warning('This view has been updated on the server');
+        });
+    });
+
+    $scope.$on('edit.view.documentation.save', function() {
+        if (elementSaving) {
+            growl.info('Please Wait...');
+            return;
+        }
+        elementSaving = true;
+        $scope.bbApi.toggleButtonSpinner('edit.view.documentation.save');
+        $scope.specApi.save().then(function(data) {
+            elementSaving = false;
+            growl.success('Save Successful');
+            $scope.editing = false;
+            delete $rootScope.veEdits['element|' + $scope.specApi.getEdits().sysmlid + '|' + ws];
+            if (Object.keys($rootScope.veEdits).length === 0) {
+                $rootScope.mms_tbApi.setIcon('element.editor', 'fa-edit');
+            }
+            if (Object.keys($rootScope.veEdits).length > 1) {
+                $rootScope.mms_tbApi.setPermission('element.editor.saveall', true); 
+            } else {
+                $rootScope.mms_tbApi.setPermission('element.editor.saveall', false);
+            }
+            $scope.bbApi.setPermission('edit.view.documentation',true);
+            $scope.bbApi.setPermission('edit.view.documentation.save',false);
+            $scope.bbApi.setPermission('edit.view.documentation.cancel',false);
+        }, function(reason) {
+            elementSaving = false;
+            if (reason.type === 'info')
+                growl.info(reason.message);
+            else if (reason.type === 'warning')
+                growl.warning(reason.message);
+            else if (reason.type === 'error')
+                growl.error(reason.message);
+        }).finally(function() {
+            $scope.bbApi.toggleButtonSpinner('edit.view.documentation.save');
+        });
+    });
+
+    $scope.$on('edit.view.documentation.cancel', function() {
+        var go = function() {
+            delete $rootScope.veEdits['element|' + $scope.specApi.getEdits().sysmlid + '|' + ws];
+            $scope.specApi.revertEdits();
+            $scope.editing = false;
+            if (Object.keys($rootScope.veEdits).length === 0) {
+                $rootScope.mms_tbApi.setIcon('element.editor', 'fa-edit');
+            }
+            if (Object.keys($rootScope.veEdits).length > 1) {
+                $rootScope.mms_tbApi.setPermission('element.editor.saveall', true);
+            } else {
+                $rootScope.mms_tbApi.setPermission('element.editor.saveall', false);
+            }
+            $scope.bbApi.setPermission('edit.view.documentation',true);
+            $scope.bbApi.setPermission('edit.view.documentation.save',false);
+            $scope.bbApi.setPermission('edit.view.documentation.cancel',false);
+        };
+        if ($scope.specApi.hasEdits()) {
+            var instance = $modal.open({
+                templateUrl: 'partials/mms/cancelConfirm.html',
+                scope: $scope,
+                controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
+                    $scope.ok = function() {
+                        $modalInstance.close('ok');
+                    };
+                    $scope.cancel = function() {
+                        $modalInstance.dismiss();
+                    };
+                }]
+            });
+            instance.result.then(function() {
+                go();
+            });
+        } else
+            go();
+    });
+
+    $scope.$on('show.comments', function() {
+        $scope.viewApi.toggleShowComments();
+        $scope.bbApi.toggleButtonState('show.comments');
+        $rootScope.veCommentsOn = !$rootScope.veCommentsOn;
+    });
+
+    $scope.$on('show.elements', function() {
+        $scope.viewApi.toggleShowElements();
+        $scope.bbApi.toggleButtonState('show.elements');
+        $rootScope.veElementsOn = !$rootScope.veElementsOn;
+    });
+
+    $scope.$on('center.previous', function() {
+        var prev = $rootScope.mms_treeApi.get_prev_branch($rootScope.mms_treeApi.get_selected_branch());
+        if (!prev)
+            return;
+        $scope.bbApi.toggleButtonSpinner('center.previous');
+        $rootScope.mms_treeApi.select_branch(prev);
+    });
+
+    $scope.$on('center.next', function() {
+        var next = $rootScope.mms_treeApi.get_next_branch($rootScope.mms_treeApi.get_selected_branch());
+        if (!next)
+            return;
+        $scope.bbApi.toggleButtonSpinner('center.next');
+        $rootScope.mms_treeApi.select_branch(next);
+    });
 
     if (view) {
         ViewService.setCurrentViewId(view.sysmlid);
