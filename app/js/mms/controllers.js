@@ -1995,6 +1995,13 @@ function($scope, $rootScope, $stateParams, document, time, ElementService, ViewS
                     return;
                 } 
             } 
+
+            if ($scope.tree.length > 1 || $scope.tree[0].id !== document.sysmlid) {
+                growl.error('Views cannot be re-ordered outside the context of the current document.');
+                $scope.saveClass = "";
+                return;
+            }
+
             var newView2View = [];
             angular.forEach(viewIds2node, function(view) {
                 if ($scope.tree.indexOf(view) >= 0 && view.id !== document.sysmlid)
