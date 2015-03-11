@@ -3,12 +3,35 @@
 angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 'ui.bootstrap', 'ui.router', 'ui.tree', 'angular-growl'])
 .config(function($stateProvider, $urlRouterProvider) {
     $urlRouterProvider.rule(function ($injector, $location) {
-        // default to workspace - master if url is old format
-        if ($location.path().indexOf('/workspaces') === -1)
+        // determine if the url is older 2.0 format (will not have a workspace)
+        if ($location.url().indexOf('/workspaces') === -1)
         {
-            var workspacePath = 'workspaces/master' + $location.path();
-            $location.path(workspacePath);
+            var locationPath = 'workspaces/master' + $location.url();
+
+            // determine if this came from docweb.html or ve.html, is there a product?
+            if (locationPath.indexOf('/products/') !== -1) {
+
+                // replace products with documents
+                locationPath = locationPath.replace('/products/', '/documents/');
+                locationPath = locationPath.replace('/view/', '/views/');
+
+                // if there is a view, there should be a time in the url prior
+                var pathArr = locationPath.split('/');
+
+                // get the time param and remove it from the array
+                var time = pathArr[6]; 
+                pathArr.splice(6,1);
+
+                locationPath = pathArr.join('/');
+
+                // add time as query param if it is not latest
+                if (time && time !== 'latest') {
+                    locationPath = locationPath + "?time=" + time;
+                }
+            }
+            $location.url(locationPath);
         }
+
     });
 
     $stateProvider
