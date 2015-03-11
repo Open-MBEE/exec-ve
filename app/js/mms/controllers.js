@@ -7,6 +7,14 @@ angular.module('mmsApp')
 function($scope, $location, $rootScope, $state, _, $window, growl) {
     $rootScope.mms_viewContentLoading = false;
     $rootScope.mms_treeInitial = '';
+    $rootScope.mms_title = '';
+    $rootScope.mms_footer = 'The technical data in this document is controlled under the U.S. Export Regulations, release to foreign persons may require an export authorization.';
+
+    var host = $location.host();
+    if ($location.host().indexOf('rn-ems') !== -1) {
+        // special footer for rn-ems
+        $rootScope.mms_footer = 'JPL/Caltech PROPRIETARY — Not for Public Release or Redistribution. No export controlled documents allowed on this server.';
+    }
 
     $window.addEventListener('beforeunload', function(event) {
         if ($rootScope.veEdits && !_.isEmpty($rootScope.veEdits)) {
