@@ -745,11 +745,11 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
     // If it is not the master workspace, then retrieve it:
     if (workspaceObj.id !== 'master') {
         WorkspaceService.getWorkspace('master').then(function (data) {
-            $scope.isManager = data.siteManagerPermission;
+            $scope.wsPerms = data.workspaceOperationsPermission;
         });
     }
     else {
-        $scope.isManager = workspaceObj.siteManagerPermission;
+        $scope.wsPerms = workspaceObj.workspaceOperationsPermission;
     }
 
     // TODO: convert to callback rather than timeout
@@ -763,9 +763,9 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree.add.configuration"));
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree.delete"));
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree.merge"));
-        $scope.bbApi.setPermission("tree.add.task", $scope.isManager);
-        $scope.bbApi.setPermission("tree.delete", $scope.isManager);
-        $scope.bbApi.setPermission("tree.merge", $scope.isManager);
+        $scope.bbApi.setPermission("tree.add.task", $scope.wsPerms);
+        $scope.bbApi.setPermission("tree.delete", $scope.wsPerms);
+        $scope.bbApi.setPermission("tree.merge", $scope.wsPerms);
       } else if ($state.includes('workspace.sites') && !$state.includes('workspace.site.document')) {
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree.add.document"));
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree.showall.sites"));
