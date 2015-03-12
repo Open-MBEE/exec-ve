@@ -851,6 +851,7 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
     $scope.toggleShowAllSites = function() {
         $scope.bbApi.toggleButtonState('tree.showall.sites');
         $scope.my_data = UtilsService.buildTreeHierarchy(filter_sites(sites), "sysmlid", "site", "parent", siteLevel2Func);
+        $scope.mms_treeApi.clear_selected_branch();
     };
 
     // TODO: Move toggle to button bar api

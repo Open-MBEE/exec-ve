@@ -377,6 +377,11 @@ function mmsTree($timeout, $log, $templateCache) {
             tree.get_selected_branch = function() {
                 return selected_branch;
             };
+
+            tree.clear_selected_branch = function() {
+                selected_branch = null;
+            };
+
             tree.get_parent_branch = get_parent;
             tree.select_branch = select_branch;
             tree.get_children = function(b) {
