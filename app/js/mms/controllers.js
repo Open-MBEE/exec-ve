@@ -765,6 +765,7 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree.merge"));
         $scope.bbApi.setPermission("tree.add.task", $scope.isManager);
         $scope.bbApi.setPermission("tree.delete", $scope.isManager);
+        $scope.bbApi.setPermission("tree.merge", $scope.isManager);
       } else if ($state.includes('workspace.sites') && !$state.includes('workspace.site.document')) {
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree.add.document"));
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree.showall.sites"));
