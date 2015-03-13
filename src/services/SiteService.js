@@ -17,7 +17,7 @@ angular.module('mms')
  */
 function SiteService($q, $http, URLService, CacheService, _) {
     var currentSite = 'europa';
-    var inProgress = null;
+    var inProgress = {};
 
     /* TODO remove */
     var setCurrentSite = function(site) {
@@ -49,7 +49,9 @@ function SiteService($q, $http, URLService, CacheService, _) {
             else if (site === 'no_site')
                 deferred.resolve({name:'No Site', sysmlid:'no-site'});
             else
-                deferred.reject("Site not found");
+                deferred.reject({status: 404, data: '', message: "Site not found"});
+        }, function(reason) {
+            deferred.reject(reason);
         });
         return deferred.promise;
     };
@@ -64,25 +66,25 @@ function SiteService($q, $http, URLService, CacheService, _) {
      * @returns {Promise} Resolves into array of site info objects.
      */
     var getSites = function(version) {
-        if (inProgress)
-            return inProgress;
         var ver = !version ? 'latest' : version;
+        if (inProgress.hasOwnProperty(ver))
+            return inProgress[ver];
         var deferred = $q.defer();
         var cacheKey = ['sites', 'master', ver];
         if (CacheService.exists(cacheKey)) {
             deferred.resolve(CacheService.get(cacheKey));
         } else {
-            inProgress = deferred.promise;
+            inProgress[ver] = deferred.promise;
             $http.get(URLService.getSitesURL('master', ver))
             .success(function(data, status, headers, config) {
-                CacheService.put(cacheKey, data.sites, true, function(site, i) {
+                CacheService.put(cacheKey, data.sites, false, function(site, i) {
                     return {key: ['sites', 'master', ver, site.sysmlid], value: site, merge: true};
                 });
                 deferred.resolve(CacheService.get(cacheKey));
-                inProgress = null;
+                delete inProgress[ver];
             }).error(function(data, status, headers, config) {
                 URLService.handleHttpStatus(data, status, headers, config, deferred);
-                inProgress = null;
+                delete inProgress[ver];
             });
         }
         return deferred.promise;
