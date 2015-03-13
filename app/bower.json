@@ -31,8 +31,8 @@
     "angular-ui-bootstrap-bower": "~0.11.0",
     "angular-ui-tree": "~2.1.2",
     "angular-growl-v2": "~0.6.1",
-    "font-awesome-bower": "~4.1.0",
-    "lodash": "~2.4.1",
+    "font-awesome-bower": "~4.3.0",
+    "lodash": "~3.2.0",
     "timely-angular": "https://github.jpl.nasa.gov/SEQR/timely-angular.git#master"
   },
   "devDependencies": {
