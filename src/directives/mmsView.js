@@ -184,6 +184,9 @@ function mmsView(ViewService, $templateCache, growl) {
             api.changeView = function(vid) {
                 scope.changeView(vid);
             };
+            if (api.init) {
+                api.init(api);
+            }
         }
     };
 

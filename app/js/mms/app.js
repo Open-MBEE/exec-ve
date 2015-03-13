@@ -3,12 +3,35 @@
 angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 'ui.bootstrap', 'ui.router', 'ui.tree', 'angular-growl', 'timelyModule'])
 .config(function($stateProvider, $urlRouterProvider) {
     $urlRouterProvider.rule(function ($injector, $location) {
-        // default to workspace - master if url is old format
-        if ($location.path().indexOf('/workspaces') === -1)
+        // determine if the url is older 2.0 format (will not have a workspace)
+        if ($location.url().indexOf('/workspaces') === -1)
         {
-            var workspacePath = 'workspaces/master' + $location.path();
-            $location.path(workspacePath);
+            var locationPath = 'workspaces/master' + $location.url();
+
+            // determine if this came from docweb.html or ve.html, is there a product?
+            if (locationPath.indexOf('/products/') !== -1) {
+
+                // replace products with documents
+                locationPath = locationPath.replace('/products/', '/documents/');
+                locationPath = locationPath.replace('/view/', '/views/');
+
+                // if there is a view, there should be a time in the url prior
+                var pathArr = locationPath.split('/');
+
+                // get the time param and remove it from the array
+                var time = pathArr[6]; 
+                pathArr.splice(6,1);
+
+                locationPath = pathArr.join('/');
+
+                // add time as query param if it is not latest
+                if (time && time !== 'latest') {
+                    locationPath = locationPath + "?time=" + time;
+                }
+            }
+            $location.url(locationPath);
         }
+
     });
 
     $stateProvider
@@ -104,9 +127,10 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
         views: {
             'menu': {
                 template: '<mms-nav mms-title="Model Manager" mms-ws="{{workspace}}" mms-config="tag"></mms-nav>',
-                controller: function ($scope, workspace, tag) {
+                controller: function ($scope, $rootScope, workspace, tag) {
                     $scope.workspace = workspace;
                     $scope.tag = tag;
+                    $rootScope.mms_title = 'Model Manager';
                 }
             },
             'pane-left': {
@@ -223,9 +247,10 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
         views: {
             'menu@': {
                 template: '<mms-nav mms-title="Model Manager" mms-ws="{{workspace}}" mms-config="tag"></mms-nav>',
-                controller: function ($scope, workspace, tag) {
+                controller: function ($scope, $rootScope, workspace, tag) {
                     $scope.workspace = workspace;
                     $scope.tag = tag;
+                    $rootScope.mms_title = 'Model Manager';
                 }
             },
             'pane-center@': {
@@ -250,10 +275,11 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
         views: {
             'menu@': {
                 template: '<mms-nav mms-title="Portal" mms-ws="{{workspace}}" mms-site="site" mms-config="tag"></mms-nav>',
-                controller: function ($scope, workspace, site, tag) {
+                controller: function ($scope, $rootScope, workspace, site, tag, workspaceObj) {
                     $scope.workspace = workspace;
                     $scope.tag = tag;
                     $scope.site = site;
+                    $rootScope.mms_title = 'Portal: '+workspaceObj.name;
                 }
             },
             'pane-left@': {
@@ -344,10 +370,11 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
         views: {
             'menu@': {
                 template: '<mms-nav mms-title="Portal" mms-ws="{{workspace}}" mms-site="site" mms-config="tag"></mms-nav>',
-                controller: function ($scope, workspace, site, tag) {
+                controller: function ($scope, $rootScope, workspace, site, tag, workspaceObj) {
                     $scope.workspace = workspace;
                     $scope.tag = tag;
                     $scope.site = site;
+                    $rootScope.mms_title = 'Portal: '+workspaceObj.name;
                 }
             },
             'pane-center@': {
@@ -414,22 +441,23 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
         views: {
             'menu@': {
                 template: '<mms-nav mms-title="View Editor" mms-ws="{{workspace}}" mms-site="site" mms-doc="document" mms-config="tag" mms-snapshot-tag="{{snapshotTag}}""></mms-nav>',
-                controller: function ($scope, $filter, workspace, site, document, tag, snapshots, time) {
+                controller: function ($scope, $filter, $rootScope, workspace, site, document, tag, snapshots, time) {
                     $scope.workspace = workspace;
                     $scope.tag = tag;
                     $scope.site = site;
                     $scope.document = document;
+                    $rootScope.mms_title = 'View Editor: '+document.name;
 
                     var tagStr = '';
                     if (time !== 'latest') {
                         snapshots.forEach(function(snapshot) {
                             if (time === snapshot.created && snapshot.configurations && snapshot.configurations.length > 0)
                                 snapshot.configurations.forEach(function(config) {
-                                    tagStr += '(' + config.name + ') ';
+                                    tagStr += '( <i class="fa fa-tag"></i> ' + config.name + ' ) ';
                                     $scope.tag = config;
                                 });
                         });
-                        tagStr += '(' + $filter('date')(time, 'M/d/yy h:mm a') + ')';
+                        tagStr += '( <i class="fa fa-camera"></i> ' + $filter('date')(time, 'M/d/yy h:mm a') + ' )';
 
                         $scope.snapshotTag = ' ' + tagStr;
                     }                                        
@@ -510,7 +538,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
                 controller: 'WorkspaceDiffTreeController'
             },
             'toolbar-right@': {
-                template: '<mms-toolbar buttons="buttons" on-click="onClick(button)" mms-tb-api="tbApi"></mms-toolbar>',
+                template: '<mms-toolbar buttons="buttons" mms-tb-api="tbApi"></mms-toolbar>',
                 controller: 'ToolbarCtrl'
             }
         }

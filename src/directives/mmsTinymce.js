@@ -264,7 +264,7 @@ function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window
                 });
                 ed.addButton('vlink', {
                     title: 'Insert View Link',
-                    text: 'V-Link',
+                    text: 'Cf View',
                     onclick: function() {
                         viewLinkCallback(ed);
                     }
@@ -296,8 +296,8 @@ function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window
                     }
                 });
                 ed.addButton('normalize', {
-                    title: 'Normalize Cross References',
-                    text: 'Norm',
+                    title: 'Reset Cross References',
+                    text: 'Reset Cf',
                     onclick: function() {
                         var body = ed.getBody();
                         body = angular.element(body);
@@ -305,6 +305,8 @@ function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window
                         body.find('mms-transclude-doc').html('[cf:doc]');
                         body.find('mms-transclude-val').html('[cf:val]');
                         body.find('mms-view-link').html('[cf:vlink]');
+                        ed.save();
+                        update();
                     }
                 });
                 ed.on('init', function(args) {

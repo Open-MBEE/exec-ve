@@ -29,7 +29,7 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService, _
         $http.get(URLService.getWorkspacesURL())
         .success(function(data, status, headers, config) {
             CacheService.put(cacheKey, data.workspaces, false, function(workspace, i) {
-                return {key: ['workspaces', workspace.id], value: workspace, merge: false};
+                return {key: ['workspaces', workspace.id], value: workspace, merge: true};
             });
             deferred.resolve(CacheService.get(cacheKey));
             delete inProgress.getWorkspaces;
@@ -43,17 +43,26 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService, _
     var getWorkspace = function(wid) {
         var deferred = $q.defer();
         var cacheKey = ['workspaces', wid];
-        if (CacheService.exists(cacheKey)) {
+        /*if (CacheService.exists(cacheKey)) {
             deferred.resolve(CacheService.get(cacheKey));
             return deferred.promise;
-        } 
-        $http.get(URLService.getWorkspaceURL(wid))
+        } */
+        getWorkspaces(false).then(function(data) {
+            var result = CacheService.get(cacheKey);
+            if (result)
+                deferred.resolve(result);
+            else
+                deferred.reject({status: 404, data:'', message: 'Workspace not Found'});
+        }, function(reason) {
+            deferred.reject(reason);
+        });
+        /*$http.get(URLService.getWorkspaceURL(wid))
         .success(function(data, status, headers, config) {
             CacheService.put(cacheKey, data.workspace[0]);
             deferred.resolve(CacheService.get(cacheKey));
         }).error(function(data, status, headers, config) {
             URLService.handleHttpStatus(data, status, headers, config, deferred);
-        });
+        });*/
         return deferred.promise;
     };
 
@@ -97,6 +106,7 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService, _
         return deferred.promise;
     };
 
+    //TODO need to update cache for target ws
     var merge = function(changes, sourcetime) {
         var deferred = $q.defer();
         $http.post(URLService.getPostWsDiffURL(sourcetime), changes)
@@ -112,6 +122,17 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService, _
         var deferred = $q.defer();
         $http.delete(URLService.getWorkspaceURL(ws))
         .success(function(data, status, headers, config) {
+            var wss = CacheService.get(['workspaces']);
+            if (wss) {
+                var index = -1;
+                for (var i = 0; i < wss.length; i++) {
+                    if (wss[i].id === ws) {
+                        index = i;
+                    }
+                }
+                if (index !== -1)
+                    wss.splice(index, 1);
+            }
             CacheService.remove(['workspaces', ws]);
             deferred.resolve(data);
         }).error(function(data, status, headers, config) {

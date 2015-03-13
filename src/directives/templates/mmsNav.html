@@ -19,7 +19,7 @@
           <a class="nav-btn" tooltip="Tasks and Tags" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom-left" ui-sref="workspace"><i class="fa fa-tasks"></i></a>
         </li>
 
-        <li ng-show="ws"> <i class="fa fa-ellipsis-v"></i> {{wsName}} <span ng-if="config.timestamp != 'latest'">({{config.name}})</span> <i class="fa fa-angle-double-right"></i><li>
+        <li ng-show="ws"> <i class="fa fa-ellipsis-v"></i> {{wsName}} <span ng-if="config.timestamp != 'latest'">( <i class="fa fa-tag"></i> {{config.name}} )</span> <i class="fa fa-angle-double-right"></i><li>
         <li ng-show="ws">
           <a class="nav-btn" tooltip="Sites and Documents" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" ui-sref="workspace.sites()"><i class="fa fa-folder"></i></a>
         </li>
@@ -27,7 +27,8 @@
         <li ng-show="product">
           <a class="nav-btn"><i class="fa fa-file"></i></a>
         </li>
-        <li ng-show="product"> {{product.name}} {{snapshot}}</li>
+        <li ng-show="product">{{product.name}} <span ng-bind-html="snapshot"></span></li>
+        <li ng-show="snapshot"><span class="label label-danger">READ ONLY</span></li>
  
       </ul>
 
@@ -98,7 +99,7 @@
         </li>
 
         <li>
-          <a class="nav-btn support-btn" tooltip="Support" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" href="https://ems.jpl.nasa.gov/share/page/site/ems-support/dashboard" target="_blank"><i class="fa fa-question-circle"></i></a>
+          <a class="nav-btn support-btn" tooltip="Support" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" href="https://ems.jpl.nasa.gov/alfresco/mmsapp/mms.html#/workspaces/master/sites/ems-support" target="_blank"><i class="fa fa-question-circle"></i></a>
         </li>
 
         <li>
@@ -106,7 +107,7 @@
         </li>
 
         <li>
-          <a class="nav-btn logout-btn" tooltip="Logout" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" href="/alfresco/service/logout/info?next=/alfresco/mmsapp/mm.html"><i class="fa fa-sign-out"></i></a>
+          <a class="nav-btn logout-btn" tooltip="Logout" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" href="/alfresco/service/logout/info?next=/alfresco/mmsapp/mms.html"><i class="fa fa-sign-out"></i></a>
         </li>
 
       </ul>
