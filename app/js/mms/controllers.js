@@ -743,11 +743,11 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
     // If it is not the master workspace, then retrieve it:
     if (workspaceObj.id !== 'master') {
         WorkspaceService.getWorkspace('master').then(function (data) {
-            $scope.wsPerms = data.siteManagerPermission;
+            $scope.wsPerms = data.workspaceOperationsPermission;
         });
     }
     else {
-        $scope.wsPerms = workspaceObj.siteManagerPermission;
+        $scope.wsPerms = workspaceObj.workspaceOperationsPermission;
     }
 
     // TODO: convert to callback rather than timeout

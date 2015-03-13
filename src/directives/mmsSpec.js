@@ -358,7 +358,7 @@ function mmsSpec(ElementService, WorkspaceService, ConfigService, $compile, $tem
             if (scope.edit.documentation !== scope.element.documentation)
                 return true;
             if (scope.edit.specialization && scope.edit.specialization.type === 'Property' && 
-                !_.isEqual(scope.edit.specialization.value, scope.element.specialization.value))
+                !angular.equals(scope.edit.specialization.value, scope.element.specialization.value))
                 return true;
             if (scope.edit.description !== scope.element.description)
                 return true;
