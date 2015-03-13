@@ -325,10 +325,6 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, _) {
         if (!elem.hasOwnProperty('sysmlid'))
             deferred.reject('Element id not found, create element first!');
         else {
-            if (elem.hasOwnProperty('owner'))
-                delete elem.owner; //hack for getting around a 400 error when owner
-                                    //isn't found on server - ok for now since
-                                    //owner can't be changed from the web
             var n = normalize(elem.sysmlid, null, workspace, null);
             $http.post(URLService.getPostElementsURL(n.ws), {'elements': [elem]})
             .success(function(data, status, headers, config) {
@@ -348,6 +344,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, _) {
                 if (status === 409) {
                     var server = _.cloneDeep(data.elements[0]);
                     var newread = server.read;
+                    var newmodified = server.modified;
                     delete server.modified;
                     delete server.read;
                     delete server.creator;
@@ -363,6 +360,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, _) {
                         UtilsService.cleanElement(current);
                         if (angular.equals(server, current)) {
                             elem.read = newread;
+                            elem.modified = newmodified;
                             updateElement(elem, workspace)
                             .then(function(good){
                                 deferred.resolve(good);
@@ -394,11 +392,33 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, _) {
      *      update is successful.
      */
     var updateElements = function(elems, workspace) {
-        var promises = [];
+        /*var promises = [];
         elems.forEach(function(elem) {
             promises.push(updateElement(elem, workspace));
         });
-        return $q.all(promises);
+        return $q.all(promises);*/
+        var deferred = $q.defer();
+        var ws = !workspace ? 'master' : workspace;
+        $http.post(URLService.getPostElementsURL(ws), {'elements': elems})
+        .success(function(data, status, headers, config) {
+            data.elements.forEach(function(elem) {
+                var cacheKey = UtilsService.makeElementKey(elem.sysmlid, ws, null, false);
+                var resp = CacheService.put(cacheKey, UtilsService.cleanElement(elem), true);
+                //special case for products view2view updates 
+                if (resp.specialization && resp.specialization.view2view &&
+                    elem.specialization && elem.specialization.view2view)
+                    resp.specialization.view2view = elem.specialization.view2view;
+                var edit = CacheService.get(UtilsService.makeElementKey(elem.sysmlid, ws, null, true));
+                if (edit) {
+                    _.merge(edit, resp);
+                    UtilsService.cleanElement(edit, true);
+                }
+            });
+            deferred.resolve(data.elements);
+        }).error(function(data, status, headers, config) {
+            URLService.handleHttpStatus(data, status, headers, config, deferred);
+        });
+        return deferred.promise;
     };
 
     /**
@@ -437,23 +457,30 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, _) {
      * 
      * @param {Object} elem Element object that must have an owner id.
      * @param {string} [workspace=master] (optional) workspace to use
+     * @param {string} [site=null] (optional) site to post to (if the element has no predefined owner,
+     *      give the site argument so the server can put it in the site's holding bin)
      * @returns {Promise} The promise will be resolved with the created element references if 
      *      create is successful.
      */
-    var createElement = function(elem, workspace) {
+    var createElement = function(elem, workspace, site) {
         var n = normalize(null, null, workspace, null);
 
         var deferred = $q.defer();
-        if (!elem.hasOwnProperty('owner')) {
+        //if (!elem.hasOwnProperty('owner')) {
         //    deferred.reject('Element create needs an owner'); //relax this?
         //    return deferred.promise;
-            elem.owner = 'holding_bin_project'; //hardcode a holding bin for owner for propose element
-        }
-        if (elem.hasOwnProperty('sysmlid')) {
+        //    elem.owner = 'holding_bin_project'; //hardcode a holding bin for owner for propose element
+        //}
+        
+        /*if (elem.hasOwnProperty('sysmlid')) {
             deferred.reject({status: 400, message: 'Element create cannot have id'});
             return deferred.promise;
-        }
-        $http.post(URLService.getPostElementsURL(n.ws), {'elements': [elem]})
+        }*/
+
+        var url = URLService.getPostElementsURL(n.ws);
+        if (site)
+            url = URLService.getPostElementsWithSiteURL(n.ws, site);
+        $http.post(url, {'elements': [elem]})
         .success(function(data, status, headers, config) {
             var resp = data.elements[0];
             var key = UtilsService.makeElementKey(resp.sysmlid, n.ws, 'latest');
@@ -483,6 +510,51 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, _) {
             promises.push(createElement(elem, workspace));
         });
         return $q.all(promises);
+    };
+
+    /**
+     * @ngdoc method
+     * @name mms.ElementService#isCacheOutdated
+     * @methodOf mms.ElementService
+     *
+     * @description
+     * Checks if the current cached element has been updated on the server, does not update the cache. 
+     * If the element doesn't exist in the cache, it's considered not outdated
+     *
+     * @param {string} id Element id
+     * @param {string} [workspace=master] workspace
+     * @returns {Promise} Resolved with {status: false} if cache is up to date, 
+     *      Resolved with {status: true, server: server element, cache: cache element} if cache is outdated
+     */
+    var isCacheOutdated = function(id, workspace) {
+        var deferred = $q.defer();
+        var ws = !workspace ? 'master' : workspace;
+        var orig = CacheService.get(UtilsService.makeElementKey(id, ws, null, false));
+        if (!orig) {
+            deferred.resolve({status: false});
+            return deferred.promise;
+        }
+        $http.get(URLService.getElementURL(id, ws, 'latest'))
+        .success(function(data, status, headers, config) {
+            var server = _.cloneDeep(data.elements[0]);
+            delete server.modified;
+            delete server.read;
+            delete server.creator;
+            UtilsService.cleanElement(server);
+            var current = _.cloneDeep(orig);
+            delete current.modified;
+            delete current.read;
+            delete current.creator;
+            UtilsService.cleanElement(current);
+            if (angular.equals(server, current)) {
+                deferred.resolve({status: false});
+            } else {
+                deferred.resolve({status: true, server: data.elements[0], cache: orig});
+            }
+        }).error(function(data, status, headers, config) {
+            URLService.handleHttpStatus(data, status, headers, config, deferred);
+        });
+        return deferred.promise;
     };
 
     /**
@@ -553,6 +625,53 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, _) {
         return deferred.promise;
     };
 
+    /**
+     * @ngdoc method
+     * @name mms.ElementService#deleteElement
+     * @methodOf mms.ElementService
+     * 
+     * @description
+     * Delete an element 
+     *
+     * @param {string} id The id of the element
+     * @param {string} [workspace=master] workspace
+     * @returns {Promise} The promise will be resolved with server response if delete is successful.
+     */
+    var deleteElement = function(id, workspace) {
+        var ws = !workspace ? 'master' : workspace;
+        var deferred = $q.defer();
+        var key = UtilsService.makeElementKey(id, ws, null, false);
+        $http.delete(URLService.getElementURL(id, ws, 'latest'))
+        .success(function(data, status, headers, config) {
+            CacheService.remove(key);
+            deferred.resolve(data);
+        }).error(function(data, status, headers, config) {
+            URLService.handleHttpStatus(data, status, headers, config, deferred);
+        });
+        return deferred.promise;
+    };
+
+    /**
+     * @ngdoc method
+     * @name mms.ElementService#deleteElements
+     * @methodOf mms.ElementService
+     * 
+     * @description
+     * Delete elements from alfresco and update the cache if successful.
+     * 
+     * @param {Array.<string>} ids Array of element ids to delete
+     * @param {string} [workspace=master] (optional) workspace to use
+     * @returns {Promise} The promise will be resolved with an array of updated element references if 
+     *      delete is successful.
+     */
+    var deleteElements = function(ids, workspace) {
+        var promises = [];
+        ids.forEach(function(id) {
+            promises.push(deleteElement(id, workspace));
+        });
+        return $q.all(promises);
+    };
+
     var normalize = function(id, update, workspace, version, edit) {
         var res = UtilsService.normalize({update: update, workspace: workspace, version: version});
         res.cacheKey = UtilsService.makeElementKey(id, res.ws, res.ver, edit);
@@ -571,6 +690,9 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, _) {
         createElements: createElements,
         getGenericElements: getGenericElements,
         getElementVersions: getElementVersions,
+        deleteElement: deleteElement,
+        deleteElements: deleteElements,
+        isCacheOutdated: isCacheOutdated,
         isDirty: isDirty,
         search: search
     };

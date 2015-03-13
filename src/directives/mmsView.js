@@ -61,11 +61,14 @@ function mmsView(ViewService, $templateCache, growl) {
             if ($scope.mmsCfClicked)
                 $scope.mmsCfClicked({elementId: elementId});
         };
-        this.elementTranscluded = function(elem) {
-            if (elem.modified > $scope.modified) { 
+        this.elementTranscluded = function(elem, type) {
+            if (elem.modified > $scope.modified && type !== 'Comment') { 
                 $scope.modified = elem.modified;
-                $scope.creator = elem.creator;
+                if (elem.creator)
+                    $scope.creator = elem.creator;
             }
+            if ($scope.mmsTranscluded)
+                $scope.mmsTranscluded({element: elem, type: type});
         };
         this.getWsAndVersion = function() {
             return {
@@ -83,6 +86,21 @@ function mmsView(ViewService, $templateCache, growl) {
             processed = true;
             ViewService.getView(scope.mmsVid, false, scope.mmsWs, scope.mmsVersion)
             .then(function(data) {
+                if (scope.mmsVersion && scope.mmsVersion !== 'latest') {
+                    if (data.specialization.contains) {
+                        var hasDiagram = false;
+                        data.specialization.contains.forEach(function(contain) {
+                            if (contain.type === 'Image')
+                                hasDiagram = true;
+                        });
+                        if (hasDiagram) {
+                            scope.view = data;
+                            scope.modified = data.modified;
+                            scope.creator = data.creator;
+                            return;
+                        }
+                    }
+                }
                 ViewService.getViewElements(scope.mmsVid, false, scope.mmsWs, scope.mmsVersion)
                 .then(function(data2) {
                     scope.view = data;
@@ -166,6 +184,9 @@ function mmsView(ViewService, $templateCache, growl) {
             api.changeView = function(vid) {
                 scope.changeView(vid);
             };
+            if (api.init) {
+                api.init(api);
+            }
         }
     };
 
@@ -178,7 +199,8 @@ function mmsView(ViewService, $templateCache, growl) {
             mmsVersion: '@',
             mmsNumber: '@',
             mmsCfClicked: '&',
-            mmsViewApi: '='
+            mmsViewApi: '=',
+            mmsTranscluded: '&'
         },
         controller: ['$scope', mmsViewCtrl],
         link: mmsViewLink

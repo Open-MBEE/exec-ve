@@ -68,9 +68,8 @@ function urlService(baseUrl) {
      * @param {string} workspace Workspace name
      * @returns {string} The url
      */
-    var getConfigSnapshotsURL = function(id, site, workspace) {
+    var getConfigSnapshotsURL = function(id, workspace) {
         return root + "/workspaces/" + workspace +
-                      "/sites/" + site +
                       "/configurations/" + id +
                       "/snapshots";                
     };
@@ -103,13 +102,11 @@ function urlService(baseUrl) {
      * @description
      * Gets url that gets or creates configurations in a site
      *
-     * @param {string} site Site name
      * @param {string} workspace Workspace name
      * @returns {string} The url
      */
-    var getSiteConfigsURL = function(site, workspace) {
+    var getConfigsURL = function(workspace) {
         return root + "/workspaces/" + workspace +
-                      "/sites/" + site +
                       "/configurations";
     };
 
@@ -142,13 +139,11 @@ function urlService(baseUrl) {
      * Gets url that gets a configuration
      *
      * @param {string} id Id of the configuration
-     * @param {string} site Site name
      * @param {string} workspace Workspace name
      * @returns {string} The url
      */
-    var getConfigURL = function(id, site, workspace) {
+    var getConfigURL = function(id, workspace) {
         return root + "/workspaces/" + workspace + 
-                      "/sites/" + site + 
                       "/configurations/" + id;
     };
 
@@ -164,10 +159,11 @@ function urlService(baseUrl) {
      * @param {string} workspace Workspace name
      * @returns {string} The url
      */
-    var getSiteProductsURL = function(site, workspace) {
-        return root + "/workspaces/" + workspace + 
+    var getSiteProductsURL = function(site, workspace, version) {
+        var r = root + "/workspaces/" + workspace + 
                       "/sites/" + site + 
                       "/products";
+        return addVersion(r, version);
     };
 
     /**
@@ -244,8 +240,8 @@ function urlService(baseUrl) {
      * @returns {string} The url.
      */
     var getDocumentViewsURL = function(id, workspace, version, simple) {
-        var r = root + "/javawebscripts/products/" + id + "/views";
-        //var r = root + "/workspaces/" + workspace + "/products/" + id + "/views";
+        //var r = root + "/javawebscripts/products/" + id + "/views";
+        var r = root + "/workspaces/" + workspace + "/products/" + id + "/views";
         r = addVersion(r, version);
         if (simple) {
             if (r.indexOf('?') > 0)
@@ -270,8 +266,8 @@ function urlService(baseUrl) {
      * @returns {string} The url.
      */
     var getViewElementsURL = function(id, workspace, version) {
-        var r = root + "/javawebscripts/views/" + id + "/elements";
-        //var r = root + "/workspaces/" + workspace + "/views/" + id + "/elements";
+        //var r = root + "/javawebscripts/views/" + id + "/elements";
+        var r = root + "/workspaces/" + workspace + "/views/" + id + "/elements";
         return addVersion(r, version);
     };
 
@@ -305,6 +301,10 @@ function urlService(baseUrl) {
      */
     var getPostElementsURL = function(workspace) {
         return root + '/workspaces/' + workspace + '/elements';
+    };
+
+    var getPostElementsWithSiteURL = function(workspace, site) {
+        return root + '/workspaces/' + workspace + '/sites/' + site + '/elements';
     };
 
     /**
@@ -341,6 +341,8 @@ function urlService(baseUrl) {
             result.message = "Permission Error";
         else if (status === 409)
             result.message = "Conflict";
+        else if (status === 400)
+            result.message = "Bad Request";
         else
             result.message = "Failed";
         deferred.reject(result);
@@ -356,8 +358,9 @@ function urlService(baseUrl) {
      * 
      * @returns {string} The url.
      */
-    var getSitesURL = function() {
-        return root + "/rest/sites";
+    var getSitesURL = function(workspace, version) {
+        var r = root + '/workspaces/' + workspace + '/sites';
+        return addVersion(r, version);
     };
 
     /**
@@ -373,7 +376,7 @@ function urlService(baseUrl) {
      * @returns {string} The post elements url.
      */
     var getElementSearchURL = function(query, workspace) {
-        return root + "/javawebscripts/element/search?keyword=" + query;
+        return root + '/workspaces/' + workspace + '/search?keyword=' + query;
     };
 
     var getWorkspacesURL = function() {
@@ -385,12 +388,21 @@ function urlService(baseUrl) {
     };
 
     var getWsDiffURL = function(ws1, ws2, ws1time, ws2time) {
-        var r = root + '/diff?sourceWs=' + ws2 + '&targetWs=' + ws2;
+        var r = root + '/diff?workspace1=' + ws1 + '&workspace2=' + ws2;
         if (ws1time && ws1time !== 'latest')
-            r += '&sourceTimestamp=' + ws1time;
+            r += '&timestamp1=' + ws1time;
         if (ws2time && ws2time !== 'latest')
-            r += '&targetTimestamp=' + ws2time;
+            r += '&timestamp2=' + ws2time;
+        return r;
     };
+
+    var getPostWsDiffURL = function(sourcetime) {
+        var r = root + '/diff';
+        if (sourcetime && isTimestamp(sourcetime))
+            r += '?timestamp2=' + sourcetime;
+        return r;
+    };
+
 
     var addVersion = function(url, version) {
         if (version === 'latest')
@@ -407,6 +419,7 @@ function urlService(baseUrl) {
         getOwnedElementURL: getOwnedElementURL,
         getElementVersionsURL: getElementVersionsURL,
         getPostElementsURL: getPostElementsURL,
+        getPostElementsWithSiteURL: getPostElementsWithSiteURL,
         handleHttpStatus: handleHttpStatus,
         getSitesURL: getSitesURL,
         getElementSearchURL: getElementSearchURL,
@@ -415,11 +428,12 @@ function urlService(baseUrl) {
         getConfigSnapshotsURL: getConfigSnapshotsURL,
         getSiteProductsURL: getSiteProductsURL,
         getConfigURL: getConfigURL,
-        getSiteConfigsURL: getSiteConfigsURL,
+        getConfigsURL: getConfigsURL,
         getConfigProductsURL : getConfigProductsURL,
         getDocumentViewsURL: getDocumentViewsURL,
         getViewElementsURL: getViewElementsURL,
         getWsDiffURL: getWsDiffURL,
+        getPostWsDiffURL: getPostWsDiffURL,
         getWorkspacesURL: getWorkspacesURL,
         getWorkspaceURL: getWorkspaceURL,
         isTimestamp: isTimestamp

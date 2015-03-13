@@ -27,6 +27,10 @@ function UtilsService(_) {
     };
 
     var cleanElement = function(elem, forEdit) {
+        // hack - should fix on MMS, if name is null should include name
+        if (! elem.name) {
+            elem.name = '';
+        }
         if (elem.hasOwnProperty('specialization')) {
             if (elem.specialization.type === 'Property') {
                 var spec = elem.specialization;
@@ -55,6 +59,50 @@ function UtilsService(_) {
         return elem;
     };
 
+    var buildTreeHierarchy = function (array, id, type, parent, level2_Func) {
+        var rootNodes = [];
+        var data2Node = {};
+
+        // make first pass to create all nodes
+        array.forEach(function(data) {
+            data2Node[data[id]] = 
+            { 
+                label : data.name, 
+                type : type,
+                data : data, 
+                children : [] 
+            };
+        });
+
+        // make second pass to associate data to parent nodes
+        array.forEach(function(data) {
+            if (data[parent] && data2Node[data[parent]]) //bad data!
+                data2Node[data[parent]].children.push(data2Node[data[id]]);
+            else
+                rootNodes.push(data2Node[data[id]]);
+        });
+
+        // apply level 2 objects to tree
+        if (level2_Func) {
+            array.forEach(function(data) {
+                var level1_parentNode = data2Node[data[id]];
+                level2_Func(data[id], level1_parentNode);
+            });
+        }
+
+        var sortFunction = function(a, b) {
+            if (a.children.length > 1) a.children.sort(sortFunction);
+            if (b.children.length > 1) b.children.sort(sortFunction);
+            if(a.label.toLowerCase() < b.label.toLowerCase()) return -1;
+            if(a.label.toLowerCase() > b.label.toLowerCase()) return 1;
+            return 0;
+        };
+
+        // sort root notes
+        rootNodes.sort(sortFunction);
+
+        return rootNodes;
+    };
 
     /**
      * @ngdoc method
@@ -103,6 +151,7 @@ function UtilsService(_) {
         hasCircularReference: hasCircularReference,
         cleanElement: cleanElement,
         normalize: normalize,
-        makeElementKey: makeElementKey
+        makeElementKey: makeElementKey,
+        buildTreeHierarchy: buildTreeHierarchy
     };
 }

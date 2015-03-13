@@ -217,11 +217,11 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
         var deferred = $q.defer();
         var ws = !workspace ? 'master' : workspace;
         var docViewsCacheKey = ['products', ws, documentId, 'latest', 'views'];
-        getDocument(documentId, workspace)
+        getDocument(documentId, false, ws)
         .then(function(data) {  
             var clone = {};
             clone.sysmlid = data.sysmlid;
-            clone.read = data.read;
+            //clone.read = data.read;
             clone.specialization = _.cloneDeep(data.specialization);
             delete clone.specialization.contains;
             for (var i = 0; i < clone.specialization.view2view.length; i++) {
@@ -231,7 +231,7 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
                 }
             } 
             clone.specialization.view2view.push({id: viewId, childrenViews: []});
-            updateDocument(clone, workspace)
+            updateDocument(clone, ws)
             .then(function(data2) {
                 if (CacheService.exists(docViewsCacheKey) && viewOb)
                     CacheService.get(docViewsCacheKey).push(viewOb);
@@ -239,7 +239,8 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
             }, function(reason) {
                 if (reason.status === 409) {
                     clone.read = reason.data.elements[0].read;
-                    updateDocument(clone, workspace)
+                    clone.modified = reason.data.elements[0].modified;
+                    updateDocument(clone, ws)
                     .then(function(data3) {
                         if (CacheService.exists(docViewsCacheKey) && viewOb)
                             CacheService.get(docViewsCacheKey).push(viewOb);
@@ -316,6 +317,47 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
         return deferred.promise;
     };
 
+    var createDocument = function(name, site, workspace) {
+        var deferred = $q.defer();
+        var doc = {
+            specialization: {type: "Product"},
+            name: !name ? 'Untitled Document' : name,
+            documentation: ''
+        };
+        ElementService.createElement(doc, workspace, site)
+        .then(function(data) {
+            data.specialization.contains = [
+                {
+                    'type': 'Paragraph',
+                    'sourceType': 'reference',
+                    'source': data.sysmlid,
+                    'sourceProperty': 'documentation'
+                }
+            ];
+            data.specialization.allowedElements = [data.sysmlid];
+            data.specialization.displayedElements = [data.sysmlid];
+            data.specialization.view2view = [
+                {
+                    id: data.sysmlid,
+                    childrenViews: []
+                }
+            ];
+            ElementService.updateElement(data, workspace)
+            .then(function(data2) {
+                var ws = !workspace ? 'master' : workspace;
+                var cacheKey = ['sites', ws, 'latest', site, 'products'];
+                if (CacheService.exists(cacheKey))
+                    CacheService.get(cacheKey).push(data2);
+                deferred.resolve(data2);
+            }, function(reason) {
+                deferred.reject(reason);
+            });
+        }, function(reason) {
+            deferred.reject(reason);
+        });
+        return deferred.promise;
+    };
+
     /**
      * @ngdoc method
      * @name mms.ViewService#getSiteDocuments
@@ -329,15 +371,15 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
      * @param {string} [workspace=master] workspace to use 
      * @returns {Promise} The promise will be resolved with array of document objects 
      */
-    var getSiteDocuments = function(site, update, workspace) {
-        var n = normalize(update, workspace, null);
+    var getSiteDocuments = function(site, update, workspace, version) {
+        var n = normalize(update, workspace, version);
         var deferred = $q.defer();
-        var url = URLService.getSiteProductsURL(site, n.ws);
-        var cacheKey = ['sites', n.ws, site, 'products'];
+        var url = URLService.getSiteProductsURL(site, n.ws, n.ver);
+        var cacheKey = ['sites', n.ws, n.ver, site, 'products'];
         if (CacheService.exists(cacheKey) && !n.update) 
             deferred.resolve(CacheService.get(cacheKey));
         else {
-            ElementService.getGenericElements(url, 'products', n.update, n.ws).
+            ElementService.getGenericElements(url, 'products', n.update, n.ws, n.ver).
             then(function(data) {              
                 deferred.resolve(CacheService.put(cacheKey, data, false));
             }, function(reason) {
@@ -376,6 +418,7 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
         updateDocument: updateDocument,
         getViewElements: getViewElements,
         createView: createView,
+        createDocument: createDocument,
         addViewToDocument: addViewToDocument,
         getDocumentViews: getDocumentViews,
         getSiteDocuments: getSiteDocuments,

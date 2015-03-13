@@ -17,7 +17,7 @@ angular.module('mms')
  */
 function SiteService($q, $http, URLService, CacheService, _) {
     var currentSite = 'europa';
-    var inProgress = null;
+    var inProgress = {};
 
     /* TODO remove */
     var setCurrentSite = function(site) {
@@ -39,14 +39,19 @@ function SiteService($q, $http, URLService, CacheService, _) {
      * @param {string} site The name of site to get.
      * @returns {Promise} Resolves to the site info object.
      */
-    var getSite = function(site) {
+    var getSite = function(site, version) {
         var deferred = $q.defer();
-        getSites().then(function(data) {
-            var result = CacheService.get(['sites', 'master', site]);
+        var ver = !version ? 'latest' : version;
+        getSites(version).then(function(data) {
+            var result = CacheService.get(['sites', 'master', ver, site]);
             if (result)
                 deferred.resolve(result);
+            else if (site === 'no_site')
+                deferred.resolve({name:'No Site', sysmlid:'no-site'});
             else
-                deferred.reject("Site not found");
+                deferred.reject({status: 404, data: '', message: "Site not found"});
+        }, function(reason) {
+            deferred.reject(reason);
         });
         return deferred.promise;
     };
@@ -60,25 +65,26 @@ function SiteService($q, $http, URLService, CacheService, _) {
      * Gets sites information - name, title, categories for all sites on the server
      * @returns {Promise} Resolves into array of site info objects.
      */
-    var getSites = function() {
-        if (inProgress)
-            return inProgress;
+    var getSites = function(version) {
+        var ver = !version ? 'latest' : version;
+        if (inProgress.hasOwnProperty(ver))
+            return inProgress[ver];
         var deferred = $q.defer();
-        var cacheKey = ['sites', 'master'];
+        var cacheKey = ['sites', 'master', ver];
         if (CacheService.exists(cacheKey)) {
             deferred.resolve(CacheService.get(cacheKey));
         } else {
-            inProgress = deferred.promise;
-            $http.get(URLService.getSitesURL())
+            inProgress[ver] = deferred.promise;
+            $http.get(URLService.getSitesURL('master', ver))
             .success(function(data, status, headers, config) {
-                CacheService.put(cacheKey, data, true, function(site, i) {
-                    return {key: ['sites', 'master', site.name], value: site, merge: true};
+                CacheService.put(cacheKey, data.sites, false, function(site, i) {
+                    return {key: ['sites', 'master', ver, site.sysmlid], value: site, merge: true};
                 });
                 deferred.resolve(CacheService.get(cacheKey));
-                inProgress = null;
+                delete inProgress[ver];
             }).error(function(data, status, headers, config) {
                 URLService.handleHttpStatus(data, status, headers, config, deferred);
-                inProgress = null;
+                delete inProgress[ver];
             });
         }
         return deferred.promise;

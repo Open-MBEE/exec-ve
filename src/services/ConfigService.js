@@ -27,6 +27,160 @@ angular.module('mms')
  //['configs', ws, id]
  //['sites', ws, sitename, 'configs']
 function ConfigService($q, $http, URLService, CacheService, UtilsService, _) {
+    var inProgress = {};
+    /**
+     * @ngdoc method
+     * @name mms.ConfigService#getConfigs
+     * @methodOf mms.ConfigService
+     *
+     * @description
+     * Get configurations in a worksace
+     *
+     * @param {string} [workspace=master] Workspace name
+     * @param {boolean} [update=false] update from server
+     * @returns {Promise} Promise would be resolved with array of configuration objects
+     */
+    var getConfigs = function(workspace, update) {
+        var n = normalize(update, workspace);
+        var inProgressKey = 'getConfigs.' + n.ws;
+        if (inProgress.hasOwnProperty(inProgressKey))
+            return inProgress[inProgressKey];
+        var deferred = $q.defer();
+        var cacheKey = ['workspaces', n.ws, 'configs'];
+        if (CacheService.exists(cacheKey) && !n.update) {
+            deferred.resolve(CacheService.get(cacheKey));
+            return deferred.promise;
+        }
+        inProgress[inProgressKey] = deferred.promise;
+        $http.get(URLService.getConfigsURL(n.ws))
+        .success(function(data, status, headers, config) {
+            CacheService.put(cacheKey, data.configurations, false, function(val, k) {
+                return {key: ['configs', n.ws, val.id], value: val, merge: true};
+            });
+            deferred.resolve(CacheService.get(cacheKey));
+            delete inProgress[inProgressKey];
+        }).error(function(data, status, headers, config) {
+            URLService.handleHttpStatus(data, status, headers, config, deferred);
+            delete inProgress[inProgressKey];
+        });
+        return deferred.promise;
+    };
+
+    var getConfig = function(id, workspace, update) {
+        var n = normalize(update, workspace);
+        var deferred = $q.defer();
+        var cacheKey = ['configs', n.ws, id];
+        if (CacheService.exists(cacheKey) && !n.update) {
+            deferred.resolve(CacheService.get(cacheKey));
+            return deferred.promise;
+        }
+        getConfigs(workspace, update).then(function(data) {
+            var result = CacheService.get(cacheKey);
+            if (result)
+                deferred.resolve(result);
+            else
+                deferred.reject({status: 404, message: "Tag not found", data: ""});
+        }, function(reason) {
+            deferred.reject(reason);
+        });
+        /*$http.get(URLService.getConfigURL(id, n.ws))
+        .success(function(data, status, headers, config) {
+            deferred.resolve(CacheService.put(cacheKey, data.configurations[0], true));
+        }).error(function(data, status, headers, config) {
+            URLService.handleHttpStatus(data, status, headers, config, deferred);
+        });*/
+        return deferred.promise;
+    };
+
+    var getConfigForEdit = function(id, workspace) {
+        var n = normalize(false, workspace);
+        var deferred = $q.defer();
+        var cacheKey = ['configs', n.ws, id, 'edit'];
+        if (CacheService.exists(cacheKey)) {
+            deferred.resolve(CacheService.get(cacheKey));
+        } else {
+            getConfig(id, workspace, false)
+            .then(function(data) {
+                var edit = _.cloneDeep(data);
+                deferred.resolve(CacheService.put(cacheKey, edit, true));
+            }, function(reason) {
+                deferred.reject(reason);
+            });
+        }
+        return deferred.promise;
+    };
+
+    var getConfigSnapshots = function(id, workspace, update) {
+        var n = normalize(update, workspace);
+        var deferred = $q.defer();
+        var cacheKey = ['configs', n.ws, id, 'snapshots'];
+        if (CacheService.exists(cacheKey) && !n.update) {
+            deferred.resolve(CacheService.get(cacheKey));
+            return deferred.promise;
+        }
+        $http.get(URLService.getConfigSnapshotsURL(id, n.ws))
+        .success(function(data, status, headers, config) {
+            CacheService.put(cacheKey, data.snapshots, false, function(val, k) {
+                return {key: ['snapshots', n.ws, val.id], value: val, merge: true};
+            });
+            deferred.resolve(CacheService.get(cacheKey));
+        }).error(function(data, status, headers, config) {
+            URLService.handleHttpStatus(data, status, headers, config, deferred);
+        });
+        return deferred.promise;
+    };
+    /**
+     * @ngdoc method
+     * @name mms.ConfigService#createConfig
+     * @methodOf mms.ConfigService
+     *
+     * @description
+     * Create a new configuration 
+     *
+     * @param {Object} config The new config object, must not already have id
+     * @param {string} [workspace=master] Workspace name
+     * @returns {Promise} Promise would be resolved with the updated config object
+     */
+    var createConfig = function(config, workspace, update) {
+        var n = normalize(null, workspace);
+        var deferred = $q.defer();
+        /* if (config.hasOwnProperty('id')) {
+            deferred.reject({status: 400, message: 'Config create cannot already have id'});
+            return deferred.promise;
+        } */
+        $http.post(URLService.getConfigsURL(n.ws), {'configurations': [config]})
+        .success(function(data, status, headers, config) {
+            deferred.resolve(CacheService.put(['configs', n.ws, data.id], data, true));
+            if (!update) {
+                if (CacheService.exists(['workspaces', n.ws, 'configs'])) {
+                    CacheService.get(['workspaces', n.ws, 'configs']).push(data);
+                }
+            }
+        }).error(function(data, status, headers, config) {
+            URLService.handleHttpStatus(data, status, headers, config, deferred);
+        });
+        return deferred.promise;
+    };
+
+    var deleteConfig = function(configId, workspace) {
+        var n = normalize(null, workspace);
+        var deferred = $q.defer();
+        $http.delete(URLService.getConfigURL(configId, n.ws))
+        .success(function(data, status, headers, config) {
+            var wscache = CacheService.get(['workspaces', n.ws, 'configs']);
+            var cache = CacheService.get(['configs', n.ws, configId]);
+            CacheService.remove(['configs', n.ws, configId]);
+            if (wscache) {
+                var i = wscache.indexOf(cache);
+                if (i > -1)
+                    wscache.splice(i, 1);
+            }
+            deferred.resolve(data);
+        }).error(function(data, status, headers, config) {
+            URLService.handleHttpStatus(data, status, headers, config, deferred);
+        });
+        return deferred.promise;
+    };
 
     /**
      * @ngdoc method
@@ -41,7 +195,7 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, _) {
      * @param {boolean} [update=false] update from server
      * @returns {Promise} Promise would be resolved with array of configuration objects
      */
-    var getSiteConfigs = function(site, workspace, update) {
+    var OldgetSiteConfigs = function(site, workspace, update) {
         var n = normalize(update, workspace);
         var deferred = $q.defer();
         var cacheKey = ['sites', n.ws, site, 'configs'];
@@ -75,7 +229,7 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, _) {
      * @param {boolean} [update=false] update from server
      * @returns {Promise} Promise would be resolved with configuration object
      */
-    var getConfig = function(id, site, workspace, update) {
+    var OldgetConfig = function(id, site, workspace, update) {
         var n = normalize(update, workspace);
         var deferred = $q.defer();
         var cacheKey = ['configs', n.ws, id];
@@ -106,7 +260,7 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, _) {
      * @param {boolean} [update=false] update from server
      * @returns {Promise} Promise would be resolved with array of product objects
      */
-    var getConfigProducts = function(id, site, workspace, update) {
+    var OldgetConfigProducts = function(id, site, workspace, update) {
         var n = normalize(update, workspace);
         var deferred = $q.defer();
         var cacheKey = ['configs', n.ws, id, 'products'];
@@ -140,7 +294,7 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, _) {
      * @param {boolean} [update=false] update from server
      * @returns {Promise} Promise would be resolved with array of snapshot objects
      */
-    var getConfigSnapshots = function(id, site, workspace, update) {
+    var OldgetConfigSnapshots = function(id, site, workspace, update) {
         var n = normalize(update, workspace);
         var deferred = $q.defer();
         var cacheKey = ['configs', n.ws, id, 'snapshots'];
@@ -174,7 +328,7 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, _) {
      * @param {boolean} [update=false] update from server
      * @returns {Promise} Promise would be resolved with array of snapshot objects
      */
-    var getProductSnapshots = function(id, site, workspace, update) {
+    var OldgetProductSnapshots = function(id, site, workspace, update) {
         var n = normalize(update, workspace);
         var deferred = $q.defer();
         var cacheKey = ['products', n.ws, id, 'snapshots'];
@@ -207,7 +361,7 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, _) {
      * @param {string} [workspace=master] Workspace name
      * @returns {Promise} Promise would be resolved with the updated config object
      */
-    var updateConfig = function(config, site, workspace) {
+    var OldupdateConfig = function(config, site, workspace) {
         var n = normalize(null, workspace);
         var deferred = $q.defer();
         if (!config.hasOwnProperty('id'))
@@ -236,7 +390,7 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, _) {
      * @param {string} [workspace=master] Workspace name
      * @returns {Promise} Promise would be resolved with the updated config object
      */
-    var createConfig = function(config, site, workspace) {
+    var OldcreateConfig = function(config, site, workspace) {
         var n = normalize(null, workspace);
         var deferred = $q.defer();
         if (config.hasOwnProperty('id')) {
@@ -269,7 +423,7 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, _) {
      * @param {string} [workspace=master] Workspace name
      * @returns {Promise} Promise would be resolved with array of snapshot objects
      */
-    var updateConfigSnapshots = function(id, snapshots, site, workspace) {
+    var OldupdateConfigSnapshots = function(id, snapshots, site, workspace) {
         var n = normalize(null, workspace);
         var deferred = $q.defer();
         var cacheKey = ['configs', n.ws, id, 'snapshots'];
@@ -300,7 +454,7 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, _) {
      * @returns {Promise} Promise would be resolved with 'ok', and the server 
      *      will email the user when completed
      */
-    var updateConfigProducts = function(id, products, site, workspace) {
+    var OldupdateConfigProducts = function(id, products, site, workspace) {
         var n = normalize(null, workspace);
         var deferred = $q.defer();
         var cacheKey = ['configs', n.ws, id, 'products'];
@@ -330,7 +484,7 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, _) {
      * @returns {Promise} Promise would be resolved with 'ok', and the server 
      *      will email the user when completed
      */
-    var createSnapshot = function(id, site, workspace) {
+    var OldcreateSnapshot = function(id, site, workspace) {
         var n = normalize(null, workspace);
         var deferred = $q.defer();
         $http.post(URLService.getProductSnapshotsURL(id, site, n.ws))
@@ -347,7 +501,7 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, _) {
         return deferred.promise;
     };
 
-    var createSnapshotArtifact = function(snapshot, site, workspace){
+    var OldcreateSnapshotArtifact = function(snapshot, site, workspace){
         var n = normalize(null, workspace);
         var deferred = $q.defer();
         $http.post(URLService.getProductSnapshotsURL(snapshot.sysmlid, site, n.ws), {'snapshots': [snapshot]})
@@ -363,17 +517,27 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, _) {
         return UtilsService.normalize({update: updateFromServer, workspace: workspace, version: null});
     };
 
+    var update = function(config, workspace) {
+        return createConfig(config, workspace, true);
+    };
+
     return {
-        getSiteConfigs : getSiteConfigs,
+        getConfigs : getConfigs,
+        createConfig : createConfig,
+        deleteConfig : deleteConfig,
         getConfig : getConfig,
-        getConfigProducts: getConfigProducts,
-        getConfigSnapshots: getConfigSnapshots,
-        getProductSnapshots: getProductSnapshots,
-        updateConfig: updateConfig,
-        createConfig: createConfig,
-        updateConfigSnapshots: updateConfigSnapshots,
-        updateConfigProducts: updateConfigProducts,
-        createSnapshot: createSnapshot,
-        createSnapshotArtifact: createSnapshotArtifact 
+        getConfigForEdit : getConfigForEdit,
+        getConfigSnapshots : getConfigSnapshots,
+        createSnapshotArtifact: OldcreateSnapshotArtifact,
+        update : update,
+
+        getSiteConfigs : OldgetSiteConfigs,
+        getConfigProducts: OldgetConfigProducts,
+        getProductSnapshots: OldgetProductSnapshots,
+        updateConfig: OldupdateConfig,
+        updateConfigSnapshots: OldupdateConfigSnapshots,
+        updateConfigProducts: OldupdateConfigProducts,
+        createSnapshot: OldcreateSnapshot
+        
     };
 }

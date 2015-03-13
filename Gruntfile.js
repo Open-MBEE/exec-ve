@@ -75,10 +75,6 @@ module.exports = function(grunt) {
       ve: {
         src: ['app/js/ve/*.js'],
         dest: 'dist/ve.js'
-      },
-      docweb: {
-        src: ['app/js/docweb/*.js'],
-        dest: 'dist/docweb.js'
       }
     },
 
@@ -110,14 +106,6 @@ module.exports = function(grunt) {
         files: {
           'dist/ve.min.js': ['dist/ve.js']
         }
-      },
-      docweb: {
-        options: {
-          mangle: false
-        },
-        files: {
-          'dist/docweb.min.js': ['dist/docweb.js']
-        }
       }
     },
 
@@ -125,7 +113,6 @@ module.exports = function(grunt) {
       dist : {
         files: {
           'dist/css/partials/mms.css': 'src/directives/templates/styles/mms-main.scss',
-          'dist/css/partials/docweb-main.css': 'app/styles/docweb/docweb-main.scss',
           'dist/css/partials/mm-main.css': 'app/styles/mm/mm-main.scss',
           'dist/css/partials/ve-main.css': 'app/styles/ve/ve-main.scss'
         }
@@ -142,8 +129,6 @@ module.exports = function(grunt) {
       },
       combine: {
         files: {
-          'dist/css/docweb-mms.styles.min.css':
-            ['dist/css/partials/mms.min.css', 'dist/css/partials/docweb-main.min.css'],
           'dist/css/mm-mms.styles.min.css':
             ['dist/css/partials/mms.min.css', 'dist/css/partials/mm-main.min.css'],
           'dist/css/ve-mms.styles.min.css':
@@ -262,6 +247,29 @@ module.exports = function(grunt) {
           }
         ]
       },
+      emsint: {
+        options: {
+          hostname: '*',
+          port: 9000,
+          middleware: function(connect) {
+            return [proxySnippet];
+          }
+        },
+        proxies: [
+          {
+            context: '/alfresco',  // '/api'
+            host: 'ems-int.jpl.nasa.gov',//128.149.16.152',
+            port: 443,
+            changeOrigin: true,
+            https: true,
+          },
+          {
+            context: '/',
+            host: 'localhost',
+            port: 9001
+          }
+        ]
+      },      
       europaemsstg: {
         options: {
           hostname: '*',
@@ -277,6 +285,52 @@ module.exports = function(grunt) {
             port: 443,
             changeOrigin: true,
             https: true,
+          },
+          {
+            context: '/',
+            host: 'localhost',
+            port: 9001
+          }
+        ]
+      },
+      europaemsint: {
+        options: {
+          hostname: '*',
+          port: 9000,
+          middleware: function(connect) {
+            return [proxySnippet];
+          }
+        },
+        proxies: [
+          {
+            context: '/alfresco',  // '/api'
+            host: 'europaems-int.jpl.nasa.gov',//128.149.16.152',
+            port: 443,
+            changeOrigin: true,
+            https: true,
+          },
+          {
+            context: '/',
+            host: 'localhost',
+            port: 9001
+          }
+        ]
+      },
+      localhost: {
+        options: {
+          hostname: '*',
+          port: 9000,
+          middleware: function(connect) {
+            return [proxySnippet];
+          }
+        },
+        proxies: [
+          {
+            context: '/alfresco',  // '/api'
+            host: 'localhost',//128.149.16.152',
+            port: 8080,
+            changeOrigin: false,
+            https: false,
           },
           {
             context: '/',
@@ -318,7 +372,7 @@ module.exports = function(grunt) {
 
     artifactory: {
       options: {
-        url: 'http://europambee-build:8082',
+        url: 'http://europambee-build.jpl.nasa.gov:8082',
         repository: 'libs-snapshot-local',
         username: 'admin',
         password: 'password'
@@ -330,7 +384,7 @@ module.exports = function(grunt) {
         options: {
           publish: [{
             id: 'gov.nasa.jpl:evm:zip',
-            version: '0.2.0-SNAPSHOT',
+            version: '0.2.1-SNAPSHOT',
             path: 'deploy/'
           }]
         }

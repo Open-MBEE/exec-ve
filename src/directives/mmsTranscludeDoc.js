@@ -35,7 +35,7 @@ function mmsTranscludeDoc(ElementService, UtilsService, $compile, $log, growl) {
         element.click(function(e) {
             if (mmsViewCtrl)
                 mmsViewCtrl.transcludeClicked(scope.mmsEid);
-            if (e.target.tagName !== 'A')
+            if (e.target.tagName !== 'A' && e.target.tagName !== 'INPUT')
                 return false;
             //e.stopPropagation();
         });
@@ -44,7 +44,7 @@ function mmsTranscludeDoc(ElementService, UtilsService, $compile, $log, growl) {
             element.empty();
             var doc = scope.element.documentation;
             if (!doc)
-                doc = '<p class="placeholder">documentation placeholder</p>';
+                doc = '<p ng-class="{placeholder: version!=\'latest\'}">(no documentation)</p>';
             element.append(doc);
             $compile(element.contents())(scope); 
             if (mmsViewCtrl) {
@@ -70,12 +70,14 @@ function mmsTranscludeDoc(ElementService, UtilsService, $compile, $log, growl) {
                 if (!version)
                     version = viewVersion.version;
             }
+            scope.version = version ? version : 'latest';
             ElementService.getElement(scope.mmsEid, false, ws, version)
             .then(function(data) {
                 scope.element = data;
                 recompile();
                 scope.$watch('element.documentation', recompile);
             }, function(reason) {
+                element.html('<span class="error">doc cf ' + newVal + ' not found</span>');
                 growl.error('Cf Doc Error: ' + reason.message + ': ' + scope.mmsEid);
             });
         });
