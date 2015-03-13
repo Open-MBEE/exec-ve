@@ -79,7 +79,7 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, _) {
             if (result)
                 deferred.resolve(result);
             else
-                deferred.reject("Tag not found");
+                deferred.reject({status: 404, message: "Tag not found", data: ""});
         }, function(reason) {
             deferred.reject(reason);
         });

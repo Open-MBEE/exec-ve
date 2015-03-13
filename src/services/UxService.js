@@ -103,7 +103,7 @@ function UxService($rootScope) {
             		spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
 		  case "tree.full.document":
 		  	return {id: button, icon: 'fa-file-text-o', selected: true, active: true, permission: true, tooltip: 'Full Document', 
-            		spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
+            		spinner: false, togglable: true, toggle_icon: 'fa-file-text', toggle_tooltip: 'View Mode', action: function() {$rootScope.$broadcast(button);}};
           case "tree.showall.sites":
             return {id: button, icon: 'fa-eye', selected: true, active: true, permission: true, tooltip: 'Show Alfresco Sites', 
                     spinner: false, togglable: true, toggle_icon: 'fa-eye-slash', toggle_tooltip: 'Hide Alfresco Sites',
@@ -123,7 +123,7 @@ function UxService($rootScope) {
                     action: function() {$rootScope.$broadcast(button);}};
           case "show.elements":
             return {id: button, icon: 'fa-codepen', selected: true, active: true, permission: true, tooltip: 'Show Elements', 
-                    spinner: false, togglable: true, toggle_icon: 'fa-codepen', toggle_tooltip: 'Hide Elements',
+                    spinner: false, togglable: true, toggle_icon: 'fa-cube', toggle_tooltip: 'Hide Elements',
                     action: function() {$rootScope.$broadcast(button);}};
           case "center.previous":
             return {id: button, icon: 'fa-chevron-left', selected: true, active: true, permission: true, tooltip: 'Previous', 

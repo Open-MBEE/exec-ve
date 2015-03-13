@@ -73,7 +73,9 @@ function mmsButtonBar($templateCache) {
                 $scope.buttons.forEach(function(button) {
                     if (button.id === id) {
                         if (button.togglable) {
-                            button.toggle_state = state;
+                            var original = button.toggle_state;
+                            if ((!original && state) || (original && !state))
+                                api.toggleButtonState(id);
                         }
                     }
                 });
@@ -144,6 +146,10 @@ function mmsButtonBar($templateCache) {
                     }
                 });
             };
+
+            if (api.init) {
+                api.init();
+            }
         }
     };
 

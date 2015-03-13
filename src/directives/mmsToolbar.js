@@ -105,6 +105,10 @@ function mmsToolbar($templateCache) {
                     }
                 });
             };
+
+            if (api.init) {
+                api.init();
+            }
         }
     };
 

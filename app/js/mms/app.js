@@ -538,7 +538,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
                 controller: 'WorkspaceDiffTreeController'
             },
             'toolbar-right@': {
-                template: '<mms-toolbar buttons="buttons" on-click="onClick(button)" mms-tb-api="tbApi"></mms-toolbar>',
+                template: '<mms-toolbar buttons="buttons" mms-tb-api="tbApi"></mms-toolbar>',
                 controller: 'ToolbarCtrl'
             }
         }
