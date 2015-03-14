@@ -1422,11 +1422,11 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
             growl.error("Add Item of Type " + $scope.itemType + " is not supported");
             return;
         }
-
+        $scope.searching = false;
         $scope.search = function(searchText) {
             //var searchText = $scope.searchText; //TODO investigate why searchText isn't in $scope
             //growl.info("Searching...");
-            $scope.searchClass = "fa fa-spin fa-spinner";
+            $scope.searching = true;
 
             ElementService.search(searchText, false, ws)
             .then(function(data) {
@@ -1439,10 +1439,10 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
                 }
 
                 $scope.mmsCfElements = data;
-                $scope.searchClass = "";
+                $scope.searching = false;
             }, function(reason) {
                 growl.error("Search Error: " + reason.message);
-                $scope.searchClass = "";
+                $scope.searching = false;
             });
         };
 
