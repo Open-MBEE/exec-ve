@@ -464,8 +464,12 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
         showPane('element');
         if ($scope.specApi.setEditing)
             $scope.specApi.setEditing(false);
-        if (type !== 'element')
-            $rootScope.mms_tbApi.setPermission('element.editor', true);
+        if (type !== 'element') {
+            if (type === 'workspace' && eid === 'master')
+                $rootScope.mms_tbApi.setPermission('element.editor', false);
+            else
+                $rootScope.mms_tbApi.setPermission('element.editor', true);
+        }
         if (type === 'element') {
             ElementService.getElement(eid, false, ws, time).
             then(function(element) {
