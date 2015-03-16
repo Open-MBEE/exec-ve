@@ -73,7 +73,10 @@ function($scope, $rootScope, $state, $timeout, UxService, workspace, tag, docume
 
       $scope.tbApi.addButton(UxService.getToolbarButton("element.viewer"));
       $scope.tbApi.addButton(UxService.getToolbarButton("element.editor"));
-      
+      if ($rootScope.veEdits && Object.keys($rootScope.veEdits).length > 0) {
+          $scope.tbApi.setIcon('element.editor', 'fa-edit-asterisk');
+      } 
+
       var editable = false;
       if ($state.includes('workspaces') && !$state.includes('workspace.sites')) {
           if (workspace === 'master' && tag.timestamp === 'latest')  // do not allow edit of master workspace
