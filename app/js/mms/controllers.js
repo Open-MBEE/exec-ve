@@ -754,7 +754,6 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
         $scope.wsPerms = workspaceObj.workspaceOperationsPermission;
     }
 
-    // TODO: convert to callback rather than timeout
     $scope.bbApi.init = function() {
       $scope.bbApi.addButton(UxService.getButtonBarButton("tree.expand"));
       $scope.bbApi.addButton(UxService.getButtonBarButton("tree.collapse"));

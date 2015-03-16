@@ -94,11 +94,9 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
 
                     return ElementService.createElement(doc, workspace, null)
                     .then(function(data) {
-                        // growl.success('Created Document Successful');
                         return data;
                     }, function(reason) {
                         return null;
-
                     });
 
                 });
@@ -202,20 +200,15 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
 
                     return ElementService.createElement(doc, workspace, null)
                     .then(function(data) {
-                        // growl.success('Created Document Successful');
                         return data;
                     }, function(reason) {
                         return null;
-
                     });
 
                 });
             },
             views: function(ViewService, workspace, document, time) {
                 return [];
-                /*if (document === null) 
-                    return [];
-                return ViewService.getDocumentViews(document.sysmlid, false, workspace, time, true);*/
             },
             viewElements: function(ViewService, workspace, document, time) {
                 if (document === null) 
@@ -342,11 +335,9 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
 
                     return ElementService.createElement(doc, workspace, site.sysmlid)
                     .then(function(data) {
-                        growl.success('Created Document Successful');
                         return data;
                     }, function(reason) {
                         return null;
-
                     });
 
                 });
