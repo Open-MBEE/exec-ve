@@ -1101,15 +1101,21 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
         a.priority = 100;
         if (a.type === 'configuration') {
             a.priority = 0 ;
-        } else if (a.type === 'view') {
+        } else if (a.type === 'site') {
             a.priority = 1;
+        }
+         else if (a.type === 'view') {
+            a.priority = 2;
         }
 
         b.priority = 100;
         if (b.type === 'configuration') {
             b.priority = 0 ;
-        } else if (a.type === 'view') {
+        } else if (b.type === 'site') {
             b.priority = 1;
+        }
+         else if (b.type === 'view') {
+            b.priority = 2;
         }
 
         if(a.priority < b.priority) return -1;
