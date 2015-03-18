@@ -1557,18 +1557,26 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
         var node = viewId2node[view.sysmlid];
         addSectionElements(view, node, node);
         $scope.treeApi.refresh();
+        if (view.specialization.displayedElements && view.specialization.displayedElements.length < 20) {
+            ViewService.getViewElements(view.sysmlid, false, ws, time);
+        }
     }
-    if ($state.current.name === 'workspace.site.document') {
-        var delay = 500;
-        document.specialization.view2view.forEach(function(view, index) {
-            $timeout(function() {
-                ViewService.getViewElements(view.id, false, ws, time)
-                .then(function() {
+
+    if ($state.includes('workspace.site.document')) {
+        var delay = 300;
+        if (document.specialization.view2view) {
+            document.specialization.view2view.forEach(function(view, index) {
+                $timeout(function() {
                     ViewService.getView(view.id, false, ws, time)
                     .then(addViewSections);
-                });
-            }, delay*index);
-        });
+                    /*ViewService.getViewElements(view.id, false, ws, time)
+                    .then(function() {
+                        ViewService.getView(view.id, false, ws, time)
+                        .then(addViewSections);
+                    });*/
+                }, delay*index);
+            });
+        }
     }
 }])
 .controller('ReorderCtrl', ['$scope', '$rootScope', '$stateParams', 'document', 'time', 'ElementService', 'ViewService', '$state', 'growl', '_',
