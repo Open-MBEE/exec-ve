@@ -1,6 +1,10 @@
 <div id="{{mmsVid}}">
 
-    <h1 class="view-title">
+    <h1 ng-if="mmsLink" class="view-title">
+      {{mmsNumber}} <mms-view-link data-mms-did="{{view.sysmlid}}" data-mms-vid="{{view.sysmlid}}"><mms-transclude-name data-mms-eid="{{view.sysmlid}}"></mms-transclude-name></mms-view-link> 
+    </h1>
+
+    <h1 ng-if="!mmsLink" class="view-title">
       {{mmsNumber}} <mms-transclude-name data-mms-eid="{{view.sysmlid}}"></mms-transclude-name>
     </h1>
 

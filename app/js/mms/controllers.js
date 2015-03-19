@@ -45,7 +45,7 @@ function($scope, $location, $rootScope, $state, _, $window, growl) {
             } else if ($state.current.name === 'workspace.site') {
                 $rootScope.mms_treeInitial = toParams.site;
             } else if ($state.current.name === 'workspace.site.documentpreview') {
-                $rootScope.mms_treeInitial = toParams.previewDocument;
+                $rootScope.mms_treeInitial = toParams.document;
             }else if ($state.includes('workspace.site.document')) {
                 if (toParams.view !== undefined)
                     $rootScope.mms_treeInitial = toParams.view;
@@ -100,8 +100,8 @@ function($scope, $rootScope, $state, $timeout, UxService, workspace, tag, docume
       }
     };
 }])
-.controller('ViewCtrl', ['$scope', '$rootScope', '$state', '$stateParams', '$timeout', '$modal', 'viewElements', 'ElementService', 'ViewService', 'time', 'growl', 'site', 'view', 'tag', 'UxService',
-function($scope, $rootScope, $state, $stateParams, $timeout, $modal, viewElements, ElementService, ViewService, time, growl, site, view, tag, UxService) {
+.controller('ViewCtrl', ['$scope', '$rootScope', '$state', '$stateParams', '$timeout', '$modal', '$window', 'viewElements', 'ElementService', 'ViewService', 'ConfigService', 'time', 'growl', 'workspace', 'site', 'view', 'tag', 'snapshot', 'UxService',
+function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, viewElements, ElementService, ViewService, ConfigService, time, growl, workspace, site, view, tag, snapshot, UxService) {
     
     $scope.$on('$viewContentLoaded', 
         function(event) {
@@ -114,6 +114,15 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, viewElement
     } else {
         $rootScope.mms_showSiteDocLink = false;
     }
+    
+    $scope.vidLink = false;
+    if ($state.includes('workspace.site.documentpreview')) {
+        $scope.vidLink = true;
+    }
+
+    $scope.tagId = undefined;
+    if (tag !== 'latest')
+        $scope.tagId = tag.id;
 
     if (!$rootScope.veCommentsOn)
         $rootScope.veCommentsOn = false;
@@ -133,6 +142,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, viewElement
         if (view && view.editable && time === 'latest') {
             $scope.bbApi.addButton(UxService.getButtonBarButton('edit.view.documentation'));
         }
+
         $scope.bbApi.addButton(UxService.getButtonBarButton('edit.view.documentation.save'));
         $scope.bbApi.addButton(UxService.getButtonBarButton('edit.view.documentation.cancel'));
         $scope.bbApi.addButton(UxService.getButtonBarButton('show.comments'));
@@ -140,11 +150,125 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, viewElement
         $scope.bbApi.addButton(UxService.getButtonBarButton('show.elements'));
         $scope.bbApi.setToggleState('show.elements', $rootScope.veElementsOn);
 
-        if ($state.includes('workspace.site.document')) {
+        if ($state.includes('workspace.site.document') || $state.includes('workspace.site.documentpreview')) {
+            if (snapshot !== null) {
+                var pdfUrl = getPDFUrl();
+                if (pdfUrl !== null && pdfUrl !== undefined) {
+                    $scope.bbApi.addButton(UxService.getButtonBarButton('download.pdf'));                
+                } else {
+                    $scope.bbApi.addButton(UxService.getButtonBarButton('generate.pdf'));
+
+                    var pdfStatus = getPDFStatus();
+                    if (pdfStatus === 'Generating...')
+                        $scope.bbApi.toggleButtonSpinner('generate.pdf');
+                    else if (pdfStatus !== null)
+                        $scope.bbApi.setTooltip('generate.pdf', pdfStatus);
+                }
+
+                var zipUrl = getZipUrl();
+                if (zipUrl !== null && zipUrl !== undefined) {
+                    $scope.bbApi.addButton(UxService.getButtonBarButton('download.zip'));                
+                } else {
+                    $scope.bbApi.addButton(UxService.getButtonBarButton('generate.zip'));
+
+                    var zipStatus = getZipStatus();
+                    if (zipStatus === 'Generating...')
+                        $scope.bbApi.toggleButtonSpinner('generate.zip');
+                    else if (zipStatus !== null)
+                        $scope.bbApi.setTooltip('generate.zip', zipStatus);
+                }
+            }
+
             $scope.bbApi.addButton(UxService.getButtonBarButton('center.previous'));
             $scope.bbApi.addButton(UxService.getButtonBarButton('center.next'));
         }
     };
+
+    var getPDFStatus = function(){
+        if(!snapshot) return null;
+        var formats = snapshot.formats;
+        if(!formats || formats.length===0) return null;
+        for(var i=0; i < formats.length; i++){
+            if(formats[i].type=='pdf') {
+                var status = formats[i].status;
+                if(status == 'Generating') status = 'Generating...';
+                else if(status == 'Error') status = 'Regenerate PDF';
+                return status;
+            }
+        }
+        return null;
+    };
+
+    var getPDFUrl = function(){
+        if(!snapshot) return null;
+        var formats = snapshot.formats;
+        if(!formats || formats.length===0) return null;
+        for(var i=0; i < formats.length; i++){
+            if(formats[i].type=='pdf'){
+                return formats[i].url;
+            }
+        }
+        return null;
+    };
+
+    var getZipStatus = function(){
+        if(!snapshot) return null;
+        var formats = snapshot.formats;
+        if(!formats || formats.length===0) return null;
+        for(var i=0; i < formats.length; i++){
+            if(formats[i].type=='html') {
+                var status = formats[i].status;
+                if(status == 'Generating') status = 'Generating...';
+                else if(status == 'Error') status = 'Regenerate Zip';
+                return status;
+            }
+        }
+        return null;
+    };
+
+    var getZipUrl = function(){
+        if(angular.isUndefined(snapshot)) return null;
+        if(snapshot===null) return null;
+        
+        var formats = snapshot.formats;
+        if(formats===undefined || formats===null || formats.length===0) return null;
+        for(var i=0; i < formats.length; i++){
+            if(formats[i].type=='html'){
+                return formats[i].url;  
+            } 
+        }
+        return null;
+    };
+
+    $scope.$on('generate.pdf', function() {
+
+        $scope.bbApi.toggleButtonSpinner('generate.pdf');
+        $scope.bbApi.toggleButtonSpinner('generate.zip');
+
+        snapshot.formats.push({"type":"pdf",  "status":"Generating"});
+        snapshot.formats.push({"type":"html", "status":"Generating"});
+        ConfigService.createSnapshotArtifact(snapshot, site.sysmlid, workspace).then(
+            function(result){
+                growl.info('Generating artifacts...Please wait for a completion email and reload the page.');
+            },
+            function(reason){
+                growl.error('Failed to generate artifacts: ' + reason.message);
+            }
+        );
+    });
+
+    $scope.$on('generate.zip', function() {
+        $rootScope.$broadcast('generate.pdf');        
+    });
+
+    $scope.$on('download.pdf', function() {
+        $window.open(getPDFUrl());
+
+    });
+
+    $scope.$on('download.zip', function() {
+        $window.open(getZipUrl());
+    });
 
     $scope.$on('edit.view.documentation', function() {
         $scope.editing = !$scope.editing;
@@ -1081,7 +1205,7 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
                 $state.go('workspace.site', {site: branch.data.sysmlid});
             else if (branch.type === 'view' || branch.type === 'snapshot') {
                 var documentSiteBranch = $rootScope.mms_treeApi.get_parent_branch(branch);
-                $state.go('workspace.site.documentpreview', {site: documentSiteBranch.data.sysmlid, previewDocument: branch.data.sysmlid});
+                $state.go('workspace.site.documentpreview', {site: documentSiteBranch.data.sysmlid, document: branch.data.sysmlid});
             }
         } else if ($state.includes('workspace.site.document')) {
 
@@ -1767,102 +1891,6 @@ function($scope, $rootScope, $stateParams, document, time, UxService) {
         $rootScope.veElementsOn = !$rootScope.veElementsOn;
     });
     $rootScope.mms_fullDocMode = true;
-}])
-.controller('DocPreviewCtrl', ['$scope', '$rootScope', 'workspace', 'tag', 'time', 'site', 'documentPreview', 'snapshot', 'ConfigService', 'growl',
-function($scope, $rootScope, workspace, tag, time, site, documentPreview, snapshot, ConfigService, growl) {
-    $scope.ws = workspace;
-    $scope.time = time;
-
-    $scope.docid = documentPreview.sysmlid;
-    $scope.api = {};
-    $scope.site = site.sysmlid;
-    $scope.snapshot = snapshot;
-    $scope.pdfText = "Generate PDF";
-    $scope.getPDFStatus = function(){
-        if(!snapshot) return null;
-        var formats = snapshot.formats;
-        if(!formats || formats.length===0) return null;
-        for(var i=0; i < formats.length; i++){
-            if(formats[i].type=='pdf') {
-                var status = formats[i].status;
-                if(status == 'Generating'){
-                    status = 'Generating...';
-                }
-                else if(status == 'Error') status = 'Regenerate PDF';
-                $scope.pdfText = status;
-                return status;
-            }
-        }
-        return null;
-    };
-
-    $scope.getPDFUrl = function(){
-        if(!snapshot) return null;
-        var formats = snapshot.formats;
-        if(!formats || formats.length===0) return null;
-        for(var i=0; i < formats.length; i++){
-            if(formats[i].type=='pdf'){
-                return formats[i].url;
-            }
-        }
-        return null;
-    };
-
-    $scope.zipText = "Generate Zip";
-    $scope.getZipStatus = function(){
-        if(!snapshot) return null;
-        var formats = snapshot.formats;
-        if(!formats || formats.length===0) return null;
-        for(var i=0; i < formats.length; i++){
-            if(formats[i].type=='html') {
-                var status = formats[i].status;
-                if(status == 'Generating') status = 'Generating...';
-                else if(status == 'Error') status = 'Regenerate Zip';
-                $scope.zipText = status;
-                return status;
-            }
-        }
-        return null;
-    };
-
-    $scope.getZipUrl = function(){
-        if(angular.isUndefined(snapshot)) return null;
-        if(snapshot===null) return null;
-        
-        var formats = snapshot.formats;
-        if(formats===undefined || formats===null || formats.length===0) return null;
-        for(var i=0; i < formats.length; i++){
-            if(formats[i].type=='html'){
-                return formats[i].url;  
-            } 
-        }
-        return null;
-    };
-
-    $scope.generateArtifacts = function(){
-        $scope.snapshot.formats.push({"type":"pdf", "status":"Generating"});
-        $scope.snapshot.formats.push({"type":"html", "status":"Generating"});
-        ConfigService.createSnapshotArtifact($scope.snapshot, $scope.site, $scope.ws).then(
-            function(result){
-                growl.success('Generating artifacts...');
-            },
-            function(reason){
-                growl.error('Failed to generate artifacts: ' + reason.message);
-            }
-        );
-    };
-
-    $scope.generatePdf = function(){
-        if ($scope.pdfText === 'Generating...')
-            return;
-        $scope.generateArtifacts();
-    };
-
-    $scope.generateZip = function(){
-        if ($scope.zipText === 'Generating...')
-            return;
-        $scope.generateArtifacts();
-    };
 }])
 .controller('WorkspaceDiffChangeController', ["_", "$timeout", "$scope", "$rootScope", "$http", "$state", "$stateParams", "$modal", "growl", "WorkspaceService", "ElementService", "diff",
 function(_, $timeout, $scope, $rootScope, $http, $state, $stateParams, $modal, growl, WorkspaceService, ElementService, diff) {

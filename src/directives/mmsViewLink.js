@@ -29,67 +29,60 @@ function mmsViewLink(ElementService, $compile, growl) {
 
     var mmsViewLinkLink = function(scope, element, attrs, mmsViewCtrl) {
         var processed = false;
-        var ws = scope.mmsWs;
-        var version = scope.mmsVersion;
-        var docid = scope.mmsDid;
-        if (mmsViewCtrl) {
-            var viewVersion = mmsViewCtrl.getWsAndVersion();
-            if (!ws)
-                ws = viewVersion.workspace;
-            if (!version)
-                version = viewVersion.version;
-        }
-        if (!ws)
-            ws = 'master';
-        if (!version)
-            version = 'latest';
-        ElementService.getElement(scope.mmsVid, false, ws, version)
-        .then(function(data) {
-            var site = findSite(data);
-            if (data.specialization.type === 'Product') {
-                docid = data.sysmlid;
-                element.html('<a href="mms.html#/workspaces/' + ws + '/sites/' + site + '/documents/' + 
-                    docid + '/views/' + scope.mmsVid + '?time=' + version  + '">' + data.name + '</a>');
-            } else if (data.specialization.type === "View") {
-                if (!docid || docid === '') {
-                    docid = data.sysmlid;
-                } 
-                element.html('<a href="mms.html#/workspaces/' + ws + '/sites/' + site + '/documents/' + 
-                    docid + '/views/' + scope.mmsVid + '?time=' + version + '">' + data.name + '</a>');
-            } else {
-                element.html('<span class="error">view link is not a view</span>');
-                growl.error('View Link Error: not a view: ' + scope.mmsVid);
-            }
-        }, function(reason) {
-            element.html('<span class="error">view link not found</span>');
-            growl.error('View Link Error: ' + reason.message + ': ' + scope.mmsVid);
-        });
-/*
-        scope.$watch('mmsEid', function(newVal, oldVal) {
+        scope.$watch('mmsVid', function(newVal, oldVal) {
             if (!newVal || (newVal === oldVal && processed))
                 return;
             processed = true;
+
             var ws = scope.mmsWs;
             var version = scope.mmsVersion;
+            var docid = scope.mmsDid;
+            var tag = scope.mmsTag;
             if (mmsViewCtrl) {
                 var viewVersion = mmsViewCtrl.getWsAndVersion();
                 if (!ws)
                     ws = viewVersion.workspace;
                 if (!version)
                     version = viewVersion.version;
+                if (!tag)
+                    tag = viewVersion.tag;
             }
-            ElementService.getElement(scope.mmsEid, false, ws, version)
+            if (!ws)
+                ws = 'master';
+            if (!version)
+                version = 'latest';
+
+
+            ElementService.getElement(scope.mmsVid, false, ws, version)
             .then(function(data) {
-                scope.element = data;
-                if (mmsViewCtrl) {
-                    mmsViewCtrl.elementTranscluded(scope.element);
+                var site = findSite(data);
+                var queryParam = '';
+                if (tag !== undefined) {
+                    queryParam = '?tag=' + tag;
+                }
+                else if (version !== 'latest') {
+                    queryParam = '?time=' + version;
+                }
+
+                if (data.specialization.type === 'Product') {
+                    docid = data.sysmlid;
+                    element.html('<a href="mms.html#/workspaces/' + ws + '/sites/' + site + '/documents/' + 
+                        docid + '/views/' + scope.mmsVid + queryParam + '">' + data.name + '</a>');
+                } else if (data.specialization.type === "View") {
+                    if (!docid || docid === '') {
+                        docid = data.sysmlid;
+                    } 
+                    element.html('<a href="mms.html#/workspaces/' + ws + '/sites/' + site + '/documents/' + 
+                        docid + '/views/' + scope.mmsVid + queryParam + '">' + data.name + '</a>');
+                } else {
+                    element.html('<span class="error">view link is not a view</span>');
+                    growl.error('View Link Error: not a view: ' + scope.mmsVid);
                 }
             }, function(reason) {
-                element.html('<span class="error">name cf ' + newVal + ' not found</span>');
-                growl.error('Cf Name Error: ' + reason.message + ': ' + scope.mmsEid);
+                element.html('<span class="error">view link not found</span>');
+                growl.error('View Link Error: ' + reason.message + ': ' + scope.mmsVid);
             });
         });
-*/
     };
 
     return {
@@ -98,7 +91,8 @@ function mmsViewLink(ElementService, $compile, growl) {
             mmsVid: '@',
             mmsDid: '@',
             mmsWs: '@',
-            mmsVersion: '@'
+            mmsVersion: '@',
+            mmsTag: '@'
         },
         require: '?^mmsView',
         //controller: ['$scope', controller]

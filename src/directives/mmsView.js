@@ -73,7 +73,8 @@ function mmsView(ViewService, $templateCache, growl) {
         this.getWsAndVersion = function() {
             return {
                 workspace: $scope.mmsWs, 
-                version: $scope.mmsVersion
+                version: $scope.mmsVersion,
+                tag: $scope.mmsTag
             };
         };
     };
@@ -197,7 +198,9 @@ function mmsView(ViewService, $templateCache, growl) {
             mmsVid: '@',
             mmsWs: '@',
             mmsVersion: '@',
+            mmsTag: '@',
             mmsNumber: '@',
+            mmsLink: '=',
             mmsCfClicked: '&',
             mmsViewApi: '=',
             mmsTranscluded: '&'

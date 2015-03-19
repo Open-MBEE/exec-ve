@@ -120,6 +120,9 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
             },
             snapshots: function() {
                 return [];        
+            },
+            snapshot: function() {
+                return null;
             }
         },
         views: {
@@ -379,13 +382,28 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
         }
     })
     .state('workspace.site.documentpreview', {
-        url: '/document/:previewDocument',
+        url: '/document/:document',
         resolve: {
-            documentPreview: function($stateParams, ElementService, workspace, time) {
-                return ElementService.getElement($stateParams.previewDocument, false, workspace, time);
+            document: function($stateParams, ElementService, workspace, time) {
+                return ElementService.getElement($stateParams.document, false, workspace, time);
             },
-            snapshot: function(configSnapshots, documentPreview) {
-                var docid = documentPreview.sysmlid;
+            views: function(ViewService, workspace, document, time) {
+                if (document === null) 
+                    return null;
+                return ViewService.getDocumentViews(document.sysmlid, false, workspace, time, true);
+            },
+            viewElements: function(ViewService, workspace, document, time) {
+                if (document === null) 
+                    return null;
+                return ViewService.getViewElements(document.sysmlid, false, workspace, time);
+            },    
+            view: function(ViewService, workspace, document, time) {
+                if (document === null) 
+                    return null;
+                return ViewService.getView(document.sysmlid, false, workspace, time);
+            },
+            snapshot: function(configSnapshots, document) {
+                var docid = document.sysmlid;
                 var found = null;
                 configSnapshots.forEach(function(snapshot) {
                     if (docid === snapshot.sysmlid)
@@ -396,8 +414,8 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
         },
         views: {
             'pane-center@': {
-                templateUrl: 'partials/mms/pane-center-doc.html',
-                controller: 'DocPreviewCtrl'
+                templateUrl: 'partials/mms/pane-center.html',
+                controller: 'ViewCtrl'
             }
         }
     })
@@ -422,6 +440,15 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
                 if (document.specialization.type !== 'Product')
                     return [];
                 return ConfigService.getProductSnapshots(document.sysmlid, site.sysmlid, workspace);
+            },
+            snapshot: function(configSnapshots, document) {
+                var docid = document.sysmlid;
+                var found = null;
+                configSnapshots.forEach(function(snapshot) {
+                    if (docid === snapshot.sysmlid)
+                        found = snapshot;
+                });
+                return found; 
             },
             time: function($stateParams, tag) {
                 if ($stateParams.time === undefined)
