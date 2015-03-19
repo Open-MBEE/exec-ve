@@ -1,0 +1,9 @@
+<div ng-switch on="presentationElem.type"> 
+
+    <mms-view-para data-mms-para="presentationElem" ng-switch-when="Paragraph"></mms-view-para>
+    <mms-view-table data-mms-table="presentationElem" ng-switch-when="Table"></mms-view-table>
+    <mms-view-list data-mms-list="presentationElem" ng-switch-when="List"></mms-view-list>
+    <mms-view-img data-mms-image="presentationElem" ng-switch-when="Image"></mms-view-img>
+    <mms-view-section data-mms-section="presentationElem" ng-switch-when="Section"></mms-view-section>
+
+</div>

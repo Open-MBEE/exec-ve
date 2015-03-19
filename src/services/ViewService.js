@@ -389,6 +389,85 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
         return deferred.promise;
     };
 
+    /**
+     * @ngdoc method
+     * @name mms.ViewService#parseExprRefTree
+     * @methodOf mms.ViewService
+     * 
+     * @description
+     * Parses a InstanceValue node of the expression reference tree in the contents
+     * of a View, and returns a presentation element json object.
+     * 
+     * @param {string} instanceVal
+     * @returns {Promise} The promise will be resolved with a json object for the 
+     *                    corresponding presentation element
+     */
+    var parseExprRefTree = function(instanceVal, workspace) {
+
+        var instanceSpecId = instanceVal.instance;
+        var deferred = $q.defer();
+
+        // TODO do we need version?
+        ElementService.getElement(instanceSpecId, false, workspace)
+        .then(function(instanceSpec) {
+
+            // InstanceSpecifcations can have instanceSpecificationSpecification 
+            // for opaque presentation elements, or slots:
+
+            // TODO eventually instanceSpecificationSpecification will most likely be 
+            //      a embedded json object, but for now look it up:
+            var instanceSpecSpecId = instanceSpec.specialization.instanceSpecificationSpecification;
+            //var instanceSpecSpec = instanceSpec.specialization.instanceSpecificationSpecification;
+
+            // TODO do we need version?
+            ElementService.getElement(instanceSpecSpecId, false, workspace)
+            .then(function(instanceSpecSpec) {
+
+                // TODO will become instanceSpecSpec.type when its a embedded object
+                var type = instanceSpecSpec.specialization.type;
+                // If it is a Opaque List, Paragraph, Table, Image, List:
+                if (type === 'LiteralString') {
+                    var jsonString = instanceSpecSpec.specialization.string;  // TODO take out specialization
+                    deferred.resolve(JSON.parse(jsonString)); 
+                }
+                // If it is a Opaque Section, or a Expression:
+                else if (type === 'Expression') {
+                    // If it is a Opaque Section then we want the instanceSpec:
+                    if (isSection(instanceSpec)) {
+                        deferred.resolve(instanceSpec);
+                    }
+                    // Will we ever have an Expression otherwise?
+                    else {
+                        deferred.resolve(instanceSpecSpec);
+                    }
+                }
+            });
+
+            // If it is a non-Opaque presentation element:
+            if (instanceSpec.slots) {
+                // TODO
+            }        
+        });
+
+        return deferred.promise;
+    };
+
+    /**
+     * @ngdoc method
+     * @name mms.ViewService#isSection
+     * @methodOf mms.ViewService
+     * 
+     * @description
+     * Returns true if the passed InstanceSpecification is a Section
+     * 
+     * @param {Object} instanceSpec A InstanceSpecification json object
+     * @returns {boolean} 
+     */
+    var isSection = function(instanceSpec) {
+        return instanceSpec.classifier && instanceSpec.classifier.length > 0 &&
+               instanceSpec.classifier[0].indexOf('Section') > -1;
+    };
+
     //TODO remove
     var setCurrentViewId = function(id) {
         currentViewId = id;
@@ -425,7 +504,8 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
         setCurrentViewId: setCurrentViewId,
         setCurrentDocumentId: setCurrentDocumentId,
         getCurrentViewId: getCurrentViewId,
-        getCurrentDocumentId: getCurrentDocumentId
+        getCurrentDocumentId: getCurrentDocumentId,
+        parseExprRefTree: parseExprRefTree,
     };
 
 }

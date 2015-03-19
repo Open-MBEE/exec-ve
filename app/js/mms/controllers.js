@@ -1171,14 +1171,10 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
 
     function addSectionElements(element, viewNode, parentNode) {
         var contains = null;
-        if (element.specialization)
-            contains = element.specialization.contains;
-        else
-            contains = element.contains;
-        var j = contains.length - 1;
-        for (; j >= 0; j--) {
-            var containedElement = contains[j];
-            if (containedElement.type === "Section") {
+        var contents = null;
+
+        var addContainsSectionTreeNode = function(containedElement) {
+           if (containedElement.type === "Section") {
                 var sectionTreeNode = { 
                     label : containedElement.name, 
                     type : "section",
@@ -1188,6 +1184,62 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
                 };
                 parentNode.children.unshift(sectionTreeNode);
                 addSectionElements(containedElement, viewNode, sectionTreeNode);
+            }
+        };
+
+        var addContentsSectionTreeNode = function(instanceVal) {
+
+           ViewService.parseExprRefTree(instanceVal, $scope.workspace)
+           .then(function(containedElement) {
+               if (ViewService.isSection(containedElement)) {
+                    var sectionTreeNode = { 
+                        label : containedElement.name, 
+                        type : "section",
+                        view : viewNode.data.sysmlid,
+                        data : containedElement, 
+                        children : [] 
+                    };
+                    parentNode.children.unshift(sectionTreeNode);
+                    addSectionElements(containedElement, viewNode, sectionTreeNode);
+                }
+            });
+        };
+
+        if (element.specialization) {
+            if (element.specialization.contains) {
+                contains = element.specialization.contains;
+            }
+
+            if (element.specialization.contents) {
+                contents = element.specialization.contents;
+            }
+            // For Sections, the contents expression is the instanceSpecificationSpecification:
+            else if (ViewService.isSection(element) &&
+                     element.specialization.instanceSpecificationSpecification) {
+                // TODO: this is assuming a embedded json object, server doesnt do that yet
+                contents = element.specialization.instanceSpecificationSpecification;
+            }
+        }
+        else {
+            if (element.contains) {
+                contains = element.contains;
+            }
+            if (element.contents) {
+                contents = element.contents;
+            }
+        }
+
+        var j;
+        if (contains) {
+            j = contains.length - 1;
+            for (; j >= 0; j--) {
+                addContainsSectionTreeNode(contains[j]);
+            }
+        }
+        if (contents && contents.operand) {
+            j = contents.operand.length - 1;
+            for (; j >= 0; j--) {
+                addContentsSectionTreeNode(contents.operand[j]);
             }
         }
     }
