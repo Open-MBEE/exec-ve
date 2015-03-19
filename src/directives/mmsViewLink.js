@@ -57,7 +57,7 @@ function mmsViewLink(ElementService, $compile, growl) {
             .then(function(data) {
                 var site = findSite(data);
                 var queryParam = '';
-                if (tag !== undefined) {
+                if (tag !== undefined && tag !== null && tag !== '') {
                     queryParam = '?tag=' + tag;
                 }
                 else if (version !== 'latest') {
