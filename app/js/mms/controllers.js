@@ -1217,7 +1217,17 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
             else if (ViewService.isSection(element) &&
                      element.specialization.instanceSpecificationSpecification) {
                 // TODO: this is assuming a embedded json object, server doesnt do that yet
-                contents = element.specialization.instanceSpecificationSpecification;
+                //contents = element.specialization.instanceSpecificationSpecification;
+                var sectionId = element.specialization.instanceSpecificationSpecification;
+                ElementService.getElement(sectionId, false, $scope.workspace).
+                then(function(element) {
+                    if (element && element.specialization.operand) {
+                        j = element.specialization.operand.length - 1;
+                        for (; j >= 0; j--) {
+                            addContentsSectionTreeNode(element.specialization.operand[j]);
+                        }
+                    }
+                });
             }
         }
         else {

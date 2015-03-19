@@ -464,8 +464,9 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
      * @returns {boolean} 
      */
     var isSection = function(instanceSpec) {
-        return instanceSpec.classifier && instanceSpec.classifier.length > 0 &&
-               instanceSpec.classifier[0].indexOf('Section') > -1;
+        return instanceSpec.specialization && instanceSpec.specialization.classifier && 
+               instanceSpec.specialization.classifier.length > 0 &&
+               instanceSpec.specialization.classifier[0].indexOf('Section') > -1;
     };
 
     //TODO remove
@@ -506,6 +507,7 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
         getCurrentViewId: getCurrentViewId,
         getCurrentDocumentId: getCurrentDocumentId,
         parseExprRefTree: parseExprRefTree,
+        isSection: isSection,
     };
 
 }
