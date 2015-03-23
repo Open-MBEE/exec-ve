@@ -131,6 +131,18 @@ function UxService($rootScope) {
           case "center.next":
             return {id: button, icon: 'fa-chevron-right', selected: true, active: true, permission: true, tooltip: 'Next', 
                     spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
+          case "download.pdf":
+            return {id: button, icon: 'fa-file-pdf-o', selected: true, active: true, permission: true, tooltip: 'Download PDF', 
+                    spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
+          case "download.zip":
+            return {id: button, icon: 'fa-file-zip-o', selected: true, active: true, permission: true, tooltip: 'Download ZIP', 
+                    spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
+          case "generate.pdf":
+            return {id: button, icon: 'fa-file-pdf-o', selected: true, active: true, permission: true, tooltip: 'Generate PDF', 
+                    spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
+          case "generate.zip":
+            return {id: button, icon: 'fa-file-zip-o', selected: true, active: true, permission: true, tooltip: 'Generate ZIP', 
+                    spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
         }
 	};
 
