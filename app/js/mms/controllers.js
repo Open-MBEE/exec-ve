@@ -141,6 +141,11 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     $scope.bbApi.init = function() {
         if (view && view.editable && time === 'latest') {
             $scope.bbApi.addButton(UxService.getButtonBarButton('edit.view.documentation'));
+            $scope.bbApi.addButton(UxService.getButtonBarButton('view.add.table'));
+            $scope.bbApi.addButton(UxService.getButtonBarButton('view.add.list'));
+            $scope.bbApi.addButton(UxService.getButtonBarButton('view.add.paragraph'));
+            $scope.bbApi.addButton(UxService.getButtonBarButton('view.add.image'));
+            $scope.bbApi.addButton(UxService.getButtonBarButton('view.add.section'));
         }
 
         $scope.bbApi.addButton(UxService.getButtonBarButton('edit.view.documentation.save'));

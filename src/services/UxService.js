@@ -143,6 +143,22 @@ function UxService($rootScope) {
           case "generate.zip":
             return {id: button, icon: 'fa-file-zip-o', selected: true, active: true, permission: true, tooltip: 'Generate ZIP', 
                     spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
+          case "view.add.table":
+            return {id: button, icon: 'fa-table', selected: true, active: true, permission: true, tooltip: 'Add Table', 
+                    spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
+          case "view.add.list":
+            return {id: button, icon: 'fa-list', selected: true, active: true, permission: true, tooltip: 'Add List', 
+                    spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
+          case "view.add.paragraph":
+            return {id: button, icon: 'fa-paragraph', selected: true, active: true, permission: true, tooltip: 'Add Paragraph', 
+                    spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
+          case "view.add.image":
+            return {id: button, icon: 'fa-image', selected: true, active: true, permission: true, tooltip: 'Add Image', 
+                    spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
+          case "view.add.section":
+            return {id: button, icon: 'fa-list-alt', selected: true, active: true, permission: true, tooltip: 'Add Section', 
+                    spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
+
         }
 	};
 
