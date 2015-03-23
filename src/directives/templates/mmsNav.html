@@ -15,6 +15,7 @@
       <!-- <li class="nav-doc-li">{{title}}</li> -->
 
       <ul class="nav-btns-main">
+        <li ng-show="snapshot">&nbsp;&nbsp;<span class="label label-danger">SNAPSHOT</span></li>
         <li>
           <a class="nav-btn" tooltip="Tasks and Tags" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom-left" ui-sref="workspace"><i class="fa fa-tasks"></i></a>
         </li>
@@ -28,7 +29,6 @@
           <a class="nav-btn"><i class="fa fa-file"></i></a>
         </li>
         <li ng-show="product">{{product.name}} <span ng-bind-html="snapshot"></span></li>
-        <li ng-show="snapshot"><span class="label label-danger">READ ONLY</span></li>
  
       </ul>
 
