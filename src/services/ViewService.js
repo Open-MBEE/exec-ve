@@ -259,6 +259,125 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
 
     /**
      * @ngdoc method
+     * @name mms.ViewService#addElementToView
+     * @methodOf mms.ViewService
+     *
+     * @description
+     * This updates a view to include a new element, the new element must be a child
+     * of an existing element in the view
+     * 
+     * @param {string} documentId Id of the document to add the element to
+     * @param {string} parentElementId Id of the parent element, this element should 
+     *      already be in the document
+     * @param {string} [workspace=master] workspace to use
+     * @returns {Promise} The promise would be resolved with updated document object
+     */
+    var addElementToView = function(viewId, parentElementId, workspace, viewOb, elementOb) {
+
+        var deferred = $q.defer();
+        var ws = !workspace ? 'master' : workspace;
+        var docViewsCacheKey = ['products', ws, viewId, 'latest', 'views'];
+        getDocument(viewId, false, ws)
+        .then(function(data) {  
+            var clone = {};
+            clone.sysmlid = data.sysmlid;
+            //clone.read = data.read;
+            clone.specialization = _.cloneDeep(data.specialization);
+            delete clone.specialization.contains;
+            if (clone.specialization.contents) {
+                clone.specialization.contents.operand.push(elementOb);
+            }
+            // TODO add to parentElement also if needed 
+            updateDocument(clone, ws)
+            .then(function(data2) {
+                if (CacheService.exists(docViewsCacheKey) && viewOb)
+                    CacheService.get(docViewsCacheKey).push(viewOb);
+                deferred.resolve(data2);
+            }, function(reason) {
+                if (reason.status === 409) {
+                    clone.read = reason.data.elements[0].read;
+                    clone.modified = reason.data.elements[0].modified;
+                    updateDocument(clone, ws)
+                    .then(function(data3) {
+                        if (CacheService.exists(docViewsCacheKey) && viewOb)
+                            CacheService.get(docViewsCacheKey).push(viewOb);
+                        deferred.resolve(data3);
+                    }, function(reason2) {
+                        deferred.reject(reason2);
+                    });
+                } else
+                    deferred.reject(reason);
+            });
+        }, function(reason) {
+            deferred.reject(reason);
+        });
+        return deferred.promise;
+    };
+
+    var addParagraph = function(view, workspace, addToView) {
+
+        var deferred = $q.defer();
+
+        // Create a Untitled Opaque Paragraph:
+        var parElement = {
+             "owner": view.sysmlid,
+             "name": "Untitled Paragraph",
+             "specialization": {
+                  "type":"Element"
+              }
+        };
+
+        ElementService.createElement(parElement, workspace).then(function(createdParElement) {
+
+            var paragraph = {
+                "sourceType": "reference",
+                "source": createdParElement.sysmlid,
+                "sourceProperty": "name",
+                "type": "Paragraph"
+            };
+
+            var paragraphWrapper = {
+                "owner": view.sysmlid,
+                "specialization": {
+                    "string":JSON.stringify(paragraph),
+                    "type":"LiteralString"
+                }
+            };
+
+            ElementService.createElement(paragraphWrapper, workspace).then(function(createdParagraphWrapper) {
+
+                var instanceSpec = {
+                    "owner": view.sysmlid,
+                    "specialization": {
+                      "type":"InstanceSpecification",
+                      "classifier":["PE_Opaque_Paragraph"],
+                      "instanceSpecificationSpecification":createdParagraphWrapper.sysmlid
+                   }
+                };
+
+                ElementService.createElement(instanceSpec, workspace).then(function(createdInstanceSpec) {
+
+                    deferred.resolve(createdInstanceSpec);
+
+                    var instanceVal = {
+                        "instance":createdInstanceSpec.sysmlid,
+                        "type":"InstanceValue"
+                    };
+
+                    if (addToView) {
+                        addElementToView(view.sysmlid, view.sysmlid, workspace, view, instanceVal);
+                    }
+                });
+
+            });
+
+        });
+
+        return deferred.promise;
+    };
+
+    /**
+     * @ngdoc method
      * @name mms.ViewService#createView
      * @methodOf mms.ViewService
      * 
@@ -396,7 +515,7 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
      * 
      * @description
      * Parses a InstanceValue node of the expression reference tree in the contents
-     * of a View, and returns a presentation element json object.
+     * of a View, and returns the corresponding presentation element json object.
      * 
      * @param {string} instanceVal
      * @returns {Promise} The promise will be resolved with a json object for the 
@@ -508,6 +627,8 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
         getCurrentDocumentId: getCurrentDocumentId,
         parseExprRefTree: parseExprRefTree,
         isSection: isSection,
+        addElementToView: addElementToView,
+        addParagraph: addParagraph,
     };
 
 }

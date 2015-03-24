@@ -370,6 +370,203 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         } else
             go();
     });
+ 
+    $scope.$on('view.add.paragraph', function() {
+
+        ViewService.addParagraph(view, workspace, true);
+    });
+
+    $scope.$on('view.add.list', function() {
+
+        // Create a Opaque List:
+        var parElement = {
+             "owner": view.sysmlid,
+             "name": "Untitled Paragraph",
+             "specialization": {
+                  "type":"Element"
+              }
+        };
+
+        ElementService.createElement(parElement, workspace).then(function(createdParElement) {
+
+            var paragraph = {
+                "sourceType": "reference",
+                "source": createdParElement.sysmlid,
+                "sourceProperty": "name",
+                "type": "Paragraph"
+            };
+
+            var list = {
+                "ordered": true,
+                "bulleted": true,
+                "list":[[paragraph]],
+                "type": "List"
+            };
+
+            var listWrapper = {
+                "owner": view.sysmlid,
+                "specialization": {
+                    "string":JSON.stringify(list),
+                    "type":"LiteralString"
+                }
+            };
+
+            ElementService.createElement(listWrapper, workspace).then(function(createdListWrapper) {
+
+                var instanceSpec = {
+                    "owner": view.sysmlid,
+                    "specialization": {
+                      "type":"InstanceSpecification",
+                      "classifier":["PE_Opaque_List"],
+                      "instanceSpecificationSpecification":createdListWrapper.sysmlid
+                   }
+                };
+
+                ElementService.createElement(instanceSpec, workspace).then(function(createdInstanceSpec) {
+
+                    var instanceVal = {
+                        "instance":createdInstanceSpec.sysmlid,
+                        "type":"InstanceValue"
+                    };
+
+                    ViewService.addElementToView(view.sysmlid, view.sysmlid, workspace, view, instanceVal);
+                });
+
+            });
+
+        });
+
+    });
+
+    $scope.$on('view.add.table', function() {
+
+        // Create a Opaque Table:
+        var parElement = {
+             "owner": view.sysmlid,
+             "name": "Untitled Paragraph",
+             "specialization": {
+                  "type":"Element"
+              }
+        };
+
+        ElementService.createElement(parElement, workspace).then(function(createdParElement) {
+
+            var paragraph = {
+                "sourceType": "reference",
+                "source": createdParElement.sysmlid,
+                "sourceProperty": "name",
+                "type": "Paragraph"
+            };
+
+            var table = {
+                "body":[
+                    [{"content":[paragraph],
+                      "rowspan":1,
+                      "colspan":1}]
+                ],
+                "type": "Table",
+                "style": "normal",
+                "title": "Untitled",
+                "header": [[
+                    {
+                        "content": [{
+                            "sourceType": "text",
+                            "text": "Untitled Header",
+                            "type": "Paragraph"
+                        }]
+                    }
+                ]]
+            };
+
+            var tableWrapper = {
+                "owner": view.sysmlid,
+                "specialization": {
+                    "string":JSON.stringify(table),
+                    "type":"LiteralString"
+                }
+            };
+
+            ElementService.createElement(tableWrapper, workspace).then(function(createdTableWrapper) {
+
+                var instanceSpec = {
+                    "owner": view.sysmlid,
+                    "specialization": {
+                      "type":"InstanceSpecification",
+                      "classifier":["PE_Opaque_Table"],
+                      "instanceSpecificationSpecification":createdTableWrapper.sysmlid
+                   }
+                };
+
+                ElementService.createElement(instanceSpec, workspace).then(function(createdInstanceSpec) {
+
+                    var instanceVal = {
+                        "instance":createdInstanceSpec.sysmlid,
+                        "type":"InstanceValue"
+                    };
+
+                    ViewService.addElementToView(view.sysmlid, view.sysmlid, workspace, view, instanceVal);
+                });
+
+            });
+
+        });
+
+    });
+
+
+    $scope.$on('view.add.section', function() {
+
+        // Create a Opaque Section:
+        ViewService.addParagraph(view, workspace, false).then(function(createdInstanceVal) {
+
+            var sectionWrapper = {
+                "owner": view.sysmlid,
+                "specialization": {
+                    "operand":[{
+                                    "instance": createdInstanceVal.sysmlid,
+                                    "type":"InstanceValue"   
+                    }],
+                    "type":"Expression"
+                }
+            };
+
+            ElementService.createElement(sectionWrapper, workspace).then(function(createdSectionWrapper) {
+
+                var instanceSpec = {
+                    "owner": view.sysmlid,
+                    "name": "Untitled Section",
+                    "specialization": {
+                      "type":"InstanceSpecification",
+                      "classifier":["PE_Opaque_Section"],
+                      "instanceSpecificationSpecification":createdSectionWrapper.sysmlid
+                   }
+                };
+
+                ElementService.createElement(instanceSpec, workspace).then(function(createdInstanceSpec) {
+
+                    var instanceVal = {
+                        "instance":createdInstanceSpec.sysmlid,
+                        "type":"InstanceValue"
+                    };
+
+                    ViewService.addElementToView(view.sysmlid, view.sysmlid, workspace, view, instanceVal).
+                    then (function (data) {
+                        // Broadcast message to TreeCtrl:
+                        $rootScope.$broadcast('viewctrl.add.section', instanceSpec);
+                    });
+                });
+
+            });
+
+        });
+
+    });
+
+    $scope.$on('view.add.image', function() {
+
+        // TODO
+
+    });
 
     $scope.$on('show.comments', function() {
         $scope.viewApi.toggleShowComments();
@@ -1753,8 +1950,27 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
         }
     }
 
+    // ViewCtrl creates this event when adding sections to the view
+    $scope.$on('viewctrl.add.section', function(event, instanceSpec) {
+
+        // TODO it may not be the selected branch, may just want to move add sections
+        //      to left pane/tree controller
+        var branch = $scope.treeApi.get_selected_branch();
+
+        var newbranch = {
+            label: instanceSpec.name,
+            type: "section",
+            view: view.sysmlid,
+            data: instanceSpec,
+            children: [],
+        };
+
+        $scope.treeApi.add_branch(branch, newbranch, false);
+    });
+
     if ($state.includes('workspace.site.document')) {
         var delay = 300;
+        // TODO cant we have sections on the parent view w/o a view2view?
         if (document.specialization.view2view) {
             document.specialization.view2view.forEach(function(view, index) {
                 $timeout(function() {
