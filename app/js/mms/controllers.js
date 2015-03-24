@@ -564,8 +564,54 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
 
     $scope.$on('view.add.image', function() {
 
-        // TODO
+        // Create a Opaque Image:
+        var imageElement = {
+             "owner": view.sysmlid,
+             "name": "Untitled Image",
+             "specialization": {
+                  "type":"Element"
+              }
+        };
 
+        ElementService.createElement(imageElement, workspace).then(function(createdImageElement) {
+
+            var image = {
+                "sysmlid": createdImageElement.sysmlid,
+                "type": "Image"
+            };
+
+            var imageWrapper = {
+                "owner": view.sysmlid,
+                "specialization": {
+                    "string":JSON.stringify(image),
+                    "type":"LiteralString"
+                }
+            };
+
+            ElementService.createElement(imageWrapper, workspace).then(function(createdImageWrapper) {
+
+                var instanceSpec = {
+                    "owner": view.sysmlid,
+                    "specialization": {
+                      "type":"InstanceSpecification",
+                      "classifier":["PE_Opaque_Image"],
+                      "instanceSpecificationSpecification":createdImageWrapper.sysmlid
+                   }
+                };
+
+                ElementService.createElement(instanceSpec, workspace).then(function(createdInstanceSpec) {
+
+                    var instanceVal = {
+                        "instance":createdInstanceSpec.sysmlid,
+                        "type":"InstanceValue"
+                    };
+
+                    ViewService.addElementToView(view.sysmlid, view.sysmlid, workspace, view, instanceVal);
+                });
+
+            });
+
+        });
     });
 
     $scope.$on('show.comments', function() {
