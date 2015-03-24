@@ -123,6 +123,9 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
             },
             snapshot: function() {
                 return null;
+            },
+            siteDocsFilter: function() {
+                return null;
             }
         },
         views: {
@@ -342,7 +345,33 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
                     }, function(reason) {
                         return null;
                     });
+                });
+            },
+            siteDocsFilter: function($stateParams, ElementService, workspace, site, time, growl) {
+                //create dummy element that contains document ids that should be filtered out (not shown for site)
+                var siteDocsViewId;
+                if ($stateParams.site === 'no_site')
+                    return null;
+                else
+                    siteDocsViewId = site.sysmlid + '_filtered_docs';
 
+                return ElementService.getElement(siteDocsViewId, false, workspace, time)
+                .then(function(data) {
+                    return data;
+                }, function(reason) {
+                    if (reason.status !== 404 || time !== 'latest') return null;
+                    var siteDocs = {
+                        specialization: {type: "Element"},
+                        name: site.name + ' Filtered Docs',
+                        documentation: '[]'
+                    };
+                    siteDocs.sysmlid = siteDocsViewId;
+                    return ElementService.createElement(siteDocs, workspace, site.sysmlid)
+                    .then(function(data) {
+                        return data;
+                    }, function(reason) {
+                        return null;
+                    });
                 });
             },
             views: function(ViewService, workspace, document, time) {

@@ -1,0 +1,25 @@
+
+<div ng-hide="editing">
+<table>
+    <tr><th>Document</th><th>Last Modified</th><th>Last Modified By</th><th>Created</th></tr>
+    <tr ng-repeat="doc in siteDocsFiltered">
+        <td>{{doc.name}}</td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+</table>
+</div>
+
+<div ng-show="editing">
+<table>
+    <tr><th>Document</th><th>Last Modified</th><th>Last Modified By</th><th>Created</th><th>Show</th></tr>
+    <tr ng-repeat="docOb in siteDocs">
+        <td>{{docOb.doc.name}}</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td><input type="checkbox" ng-change="toggleCheck(docOb.doc.sysmlid)" ng-model="docOb.show"></input></td>
+    </tr>
+</table>
+</div>
