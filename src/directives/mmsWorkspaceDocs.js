@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsWorkspaceDocs', ['ElementService', 'SiteService', 'ViewService', 'growl', '$q', '$templateCache', mmsWorkspaceDocs]);
+.directive('mmsWorkspaceDocs', ['ElementService', 'SiteService', 'ViewService', 'growl', '$q', '$templateCache', '_', mmsWorkspaceDocs]);
 
 /**
  * @ngdoc directive
@@ -20,11 +20,12 @@ angular.module('mms.directives')
  * @param {string=master} mmsWs Workspace to use, defaults to master
  * @param {string=latest} mmsVersion Version can be alfresco version number or timestamp, default is latest
  */
-function mmsWorkspaceDocs(ElementService, SiteService, ViewService, growl, $q, $templateCache) {
+function mmsWorkspaceDocs(ElementService, SiteService, ViewService, growl, $q, $templateCache, _) {
 
     var mmsWorkspaceDocsLink = function(scope, element, attrs, mmsViewCtrl) {
 
-        var docs = {};
+        var docs = [];
+        var docsKey = {};
         scope.docs = docs;
         var filtered = {};
         var ws = scope.mmsWs;
@@ -39,7 +40,6 @@ function mmsWorkspaceDocs(ElementService, SiteService, ViewService, growl, $q, $
         scope.version = version ? version : 'latest';
         scope.ws = ws ? ws : 'master';
 
-        var docsPromises = [];
         var filterPromises = [];
 
         SiteService.getSites(version)
@@ -50,14 +50,15 @@ function mmsWorkspaceDocs(ElementService, SiteService, ViewService, growl, $q, $
                     ElementService.getElement(site.sysmlid + '_filtered_docs', false, ws, version)
                     .then(function(filter) {
                         var sitefilter = JSON.parse(filter.documentation);
-                        sitefilter.forEach(function(f) {
-                            filtered[f] = true;
-                        });
+                        _.merge(filtered, sitefilter);
                     }, function(reason) {
                     }).finally(function() {
                         sitedocs.forEach(function(doc) {
                             if (!filtered[doc.sysmlid]) {
-                                docs[doc.sysmlid] = doc;
+                                if (!docsKey[doc.sysmlid]) {
+                                    docsKey[doc.sysmlid] = doc;
+                                    docs.append(doc);
+                                }
                             }
                         });
                     });

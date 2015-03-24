@@ -1,8 +1,8 @@
 
 <div ng-hide="editing">
-<table>
+<table class="table table-condensed">
     <tr><th>Document</th><th>Last Modified</th><th>Last Modified By</th><th>Created</th></tr>
-    <tr ng-repeat="doc in siteDocsFiltered">
+    <tr ng-repeat="doc in siteDocsFiltered | orderBy: name">
         <td>{{doc.name}}</td>
         <td></td>
         <td></td>
@@ -12,9 +12,9 @@
 </div>
 
 <div ng-show="editing">
-<table>
+<table class="table table-condensed">
     <tr><th>Document</th><th>Last Modified</th><th>Last Modified By</th><th>Created</th><th>Show</th></tr>
-    <tr ng-repeat="docOb in siteDocs">
+    <tr ng-repeat="docOb in siteDocs | orderBy: doc.name">
         <td>{{docOb.doc.name}}</td>
         <td></td>
         <td></td>

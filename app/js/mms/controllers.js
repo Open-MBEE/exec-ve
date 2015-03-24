@@ -345,8 +345,10 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
 
     $scope.$on('edit.view.documentation.cancel', function() {
         var go = function() {
-            if ($scope.filterApi.cancel)
+            if ($scope.filterApi.cancel) {
                 $scope.filterApi.cancel();
+                $scope.filterApi.setEditing(false);
+            }
             delete $rootScope.veEdits['element|' + $scope.specApi.getEdits().sysmlid + '|' + ws];
             $scope.specApi.revertEdits();
             $scope.editing = false;
@@ -1105,7 +1107,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
     var siteLevel2Func = function(site, siteNode) {
         ViewService.getSiteDocuments(site, false, ws, config === 'latest' ? 'latest' : tag.timestamp)
         .then(function(docs) {
-            var filteredDocs = [];
+            var filteredDocs = {};
             var siteDocsViewId = site + '_filtered_docs';
             var deferred = $q.defer();
 
@@ -1119,7 +1121,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
             deferred.promise.then(function() {
                 if (config === 'latest') {
                     docs.forEach(function(doc) {
-                        if (filteredDocs.indexOf(doc.sysmlid) > -1)
+                        if (filteredDocs[doc.sysmlid])
                             return;
                         var docNode = {
                             label : doc.name,
@@ -1133,7 +1135,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
                 } else {
                     var docids = [];
                     docs.forEach(function(doc) {
-                        if (filteredDocs.indexOf(doc.sysmlid) > -1)
+                        if (filteredDocs[doc.sysmlid])
                             return;
                         docids.push(doc.sysmlid);
                     });

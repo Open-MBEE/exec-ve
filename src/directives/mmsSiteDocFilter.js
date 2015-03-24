@@ -41,7 +41,7 @@ function mmsSiteDocFilter(ElementService, ViewService, growl, $templateCache, $q
             ViewService.getSiteDocuments(scope.mmsSite, false, scope.mmsWs, scope.mmsVersion)
             .then(function(docs) {
                 docs.forEach(function(doc) {
-                    scope.siteDocs.push({show: scope.filtered.indexOf(doc.sysmlid) < 0, doc: doc});
+                    scope.siteDocs.push({show: !scope.filtered[doc.sysmlid], doc: doc});
                 });
                 updateSiteDocsFiltered();
             }, function(reason) {
@@ -66,10 +66,10 @@ function mmsSiteDocFilter(ElementService, ViewService, growl, $templateCache, $q
             if (orig) {
                 scope.filtered = JSON.parse(orig.documentation);
                 scope.siteDocs.forEach(function(doc) {
-                    if (scope.filtered.indexOf(doc.doc.sysmlid) < 0)
-                        doc.show = true;
-                    else
+                    if (scope.filtered[doc.doc.sysmlid])
                         doc.show = false;
+                    else
+                        doc.show = true;
                 });
                 updateSiteDocsFiltered();
             }
@@ -95,12 +95,12 @@ function mmsSiteDocFilter(ElementService, ViewService, growl, $templateCache, $q
         };
 
         var toggleCheck = function(id) {
-            var index = scope.filtered.indexOf(id);
+            scope.filtered[id] = !scope.filtered[id];
+            /*var index = scope.filtered.indexOf(id);
             if (index < 0)
                 scope.filtered.push(id);
             else
-                scope.filtered.splice(index, 1);
-            updateSiteDocsFiltered(); //shoudl only on save
+                scope.filtered.splice(index, 1);*/
         };
 
         scope.toggleCheck = toggleCheck;

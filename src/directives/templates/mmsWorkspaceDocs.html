@@ -1,6 +1,6 @@
-<table>
+<table class="table table-condensed">
     <tr><th>Document</th><th>Last Modified</th><th>Last Modified By</th><th>Created</th></tr>
-    <tr ng-repeat="(sysmlid, doc) in docs">
+    <tr ng-repeat="doc in docs | orderBy: name">
         <td>{{doc.name}}</td>
         <td></td>
         <td></td>
