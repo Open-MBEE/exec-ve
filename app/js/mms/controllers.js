@@ -182,9 +182,10 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
                         $scope.bbApi.setTooltip('generate.zip', zipStatus);
                 }
             }
-
-            $scope.bbApi.addButton(UxService.getButtonBarButton('center.previous'));
-            $scope.bbApi.addButton(UxService.getButtonBarButton('center.next'));
+            if ($state.includes('workspace.site.document')) {
+                $scope.bbApi.addButton(UxService.getButtonBarButton('center.previous'));
+                $scope.bbApi.addButton(UxService.getButtonBarButton('center.next'));
+            }
         }
     };
 
@@ -245,7 +246,8 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     };
 
     $scope.$on('generate.pdf', function() {
-
+        if (getPDFStatus() === 'Generating...')
+            return;
         $scope.bbApi.toggleButtonSpinner('generate.pdf');
         $scope.bbApi.toggleButtonSpinner('generate.zip');
 

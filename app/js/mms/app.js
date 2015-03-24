@@ -487,25 +487,31 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
         },
         views: {
             'menu@': {
-                template: '<mms-nav mms-title="View Editor" mms-ws="{{workspace}}" mms-site="site" mms-doc="document" mms-config="tag" mms-snapshot-tag="{{snapshotTag}}""></mms-nav>',
-                controller: function ($scope, $filter, $rootScope, workspace, site, document, tag, snapshots, time) {
+                template: '<mms-nav mms-title="View Editor" mms-ws="{{workspace}}" mms-site="site" mms-doc="document" mms-config="tag" mms-snapshot-tag="{{snapshotTag}}" mms-show-tag="{{showTag}}"></mms-nav>',
+                controller: function ($scope, $filter, $rootScope, workspace, site, document, tag, snapshots, time, siteDocsFilter) {
                     $scope.workspace = workspace;
                     $scope.tag = tag;
                     $scope.site = site;
                     $scope.document = document;
+                    $scope.showTag = true;
                     $rootScope.mms_title = 'View Editor: '+document.name;
-
+                    var filtered = [];
+                    if (siteDocsFilter)
+                        filtered = JSON.parse(siteDocsFilter.documentation);
                     var tagStr = '';
                     if (time !== 'latest') {
                         snapshots.forEach(function(snapshot) {
                             if (time === snapshot.created && snapshot.configurations && snapshot.configurations.length > 0)
                                 snapshot.configurations.forEach(function(config) {
+                                    if (filtered.indexOf(document.sysmlid) > -1)
+                                        return;
                                     tagStr += '( <i class="fa fa-tag"></i> ' + config.name + ' ) ';
                                     $scope.tag = config;
                                 });
                         });
                         tagStr += '( <i class="fa fa-camera"></i> ' + $filter('date')(time, 'M/d/yy h:mm a') + ' )';
-
+                        if (filtered.indexOf(document.sysmlid) > -1)
+                            $scope.showTag = false;
                         $scope.snapshotTag = ' ' + tagStr;
                     }                                        
                 }
