@@ -266,13 +266,13 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
      * This updates a view to include a new element, the new element must be a child
      * of an existing element in the view
      * 
-     * @param {string} documentId Id of the document to add the element to
+     * @param {string} viewId Id of the View to add the element to
      * @param {string} parentElementId Id of the parent element, this element should 
      *      already be in the document
      * @param {string} [workspace=master] workspace to use
      * @returns {Promise} The promise would be resolved with updated document object
      */
-    var addElementToView = function(viewId, parentElementId, workspace, viewOb, elementOb) {
+    var addElementToView = function(viewId, parentElementId, workspace, elementOb) {
 
         var deferred = $q.defer();
         var ws = !workspace ? 'master' : workspace;
@@ -290,8 +290,6 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
             // TODO add to parentElement also if needed 
             updateDocument(clone, ws)
             .then(function(data2) {
-                if (CacheService.exists(docViewsCacheKey) && viewOb)
-                    CacheService.get(docViewsCacheKey).push(viewOb);
                 deferred.resolve(data2);
             }, function(reason) {
                 if (reason.status === 409) {
@@ -299,8 +297,6 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
                     clone.modified = reason.data.elements[0].modified;
                     updateDocument(clone, ws)
                     .then(function(data3) {
-                        if (CacheService.exists(docViewsCacheKey) && viewOb)
-                            CacheService.get(docViewsCacheKey).push(viewOb);
                         deferred.resolve(data3);
                     }, function(reason2) {
                         deferred.reject(reason2);
@@ -314,6 +310,70 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
         return deferred.promise;
     };
 
+    /**
+     * @ngdoc method
+     * @name mms.ViewService#deleteElementFromView
+     * @methodOf mms.ViewService
+     *
+     * @description
+     * This deletes the specified instanceVal from the contents of the View
+     * 
+     * @param {string} viewId Id of the View to delete the element from
+     * @param {string} [workspace=master] workspace to use
+     * @param {string} instanceVal to remove from the View
+     * @returns {Promise} The promise would be resolved with updated View object
+     */
+    var deleteElementFromView = function(viewId, workspace, instanceVal) {
+
+        var deferred = $q.defer();
+        var ws = !workspace ? 'master' : workspace;
+        var docViewsCacheKey = ['products', ws, viewId, 'latest', 'views'];
+        getDocument(viewId, false, ws)
+        .then(function(data) {  
+            var clone = {};
+            clone.sysmlid = data.sysmlid;
+            //clone.read = data.read;
+            clone.specialization = _.cloneDeep(data.specialization);
+            delete clone.specialization.contains;
+            // Remove from contents and delete all other associated nodes:
+            if (clone.specialization.contents) {
+                for (var i = 0; i < data.specialization.contents.length; i++) {
+                    if (instanceVal.instance === data.specialization.contents[i].instance) {
+                        clone.specialization.contents.splice(i,1);
+                    }
+                }
+            }
+            // Delete the instance spec pointed to be the instanceVal and all its children:
+            // TODO verify that parent/child relationships are such that this will delete 
+            //      everything needed:
+            // TODO error message on failure to delete?
+            ElementService.deleteElement(instanceVal.instance, workspace);
+
+            updateDocument(clone, ws)
+            .then(function(data2) {
+                deferred.resolve(data2);
+            }, function(reason) {
+                if (reason.status === 409) {
+                    clone.read = reason.data.elements[0].read;
+                    clone.modified = reason.data.elements[0].modified;
+                    updateDocument(clone, ws)
+                    .then(function(data3) {
+                        deferred.resolve(data3);
+                    }, function(reason2) {
+                        deferred.reject(reason2);
+                    });
+                } else
+                    deferred.reject(reason);
+            });
+        }, function(reason) {
+            deferred.reject(reason);
+        });
+        return deferred.promise;
+    };
+
+    /**
+    * TODO add comments
+    */
     var addParagraph = function(view, workspace, addToView) {
 
         var deferred = $q.defer();
@@ -629,6 +689,7 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
         isSection: isSection,
         addElementToView: addElementToView,
         addParagraph: addParagraph,
+        deleteElementFromView: deleteElementFromView,
     };
 
 }
