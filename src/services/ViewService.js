@@ -425,7 +425,7 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
                     };
 
                     if (addToView) {
-                        addElementToView(view.sysmlid, view.sysmlid, workspace, view, instanceVal);
+                        addElementToView(view.sysmlid, view.sysmlid, workspace, instanceVal);
                     }
                 });
 

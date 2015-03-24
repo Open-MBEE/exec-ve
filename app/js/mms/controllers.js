@@ -429,7 +429,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
                         "type":"InstanceValue"
                     };
 
-                    ViewService.addElementToView(view.sysmlid, view.sysmlid, workspace, view, instanceVal);
+                    ViewService.addElementToView(view.sysmlid, view.sysmlid, workspace, instanceVal);
                 });
 
             });
@@ -504,7 +504,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
                         "type":"InstanceValue"
                     };
 
-                    ViewService.addElementToView(view.sysmlid, view.sysmlid, workspace, view, instanceVal);
+                    ViewService.addElementToView(view.sysmlid, view.sysmlid, workspace, instanceVal);
                 });
 
             });
@@ -549,7 +549,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
                         "type":"InstanceValue"
                     };
 
-                    ViewService.addElementToView(view.sysmlid, view.sysmlid, workspace, view, instanceVal).
+                    ViewService.addElementToView(view.sysmlid, view.sysmlid, workspace, instanceVal).
                     then (function (data) {
                         // Broadcast message to TreeCtrl:
                         $rootScope.$broadcast('viewctrl.add.section', instanceSpec);
@@ -606,7 +606,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
                         "type":"InstanceValue"
                     };
 
-                    ViewService.addElementToView(view.sysmlid, view.sysmlid, workspace, view, instanceVal);
+                    ViewService.addElementToView(view.sysmlid, view.sysmlid, workspace, instanceVal);
                 });
 
             });
