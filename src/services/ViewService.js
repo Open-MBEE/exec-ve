@@ -284,9 +284,13 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
             //clone.read = data.read;
             clone.specialization = _.cloneDeep(data.specialization);
             delete clone.specialization.contains;
-            if (clone.specialization.contents) {
-                clone.specialization.contents.operand.push(elementOb);
+            if (!clone.specialization.contents) {
+                clone.specialization.contents = {
+                    operand: [],
+                    type: "Expression"
+                };
             }
+            clone.specialization.contents.operand.push(elementOb);
             // TODO add to parentElement also if needed 
             updateDocument(clone, ws)
             .then(function(data2) {
