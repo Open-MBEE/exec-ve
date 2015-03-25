@@ -1,11 +1,17 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsViewPara', ['$templateCache', '$compile', mmsViewPara]);
+.directive('mmsViewPara', ['$templateCache', '$compile', '$rootScope', mmsViewPara]);
 
-function mmsViewPara($templateCache, $compile) {
+function mmsViewPara($templateCache, $compile, $rootScope) {
     var template = $templateCache.get('mms/templates/mmsViewPara.html');
     
+    var mmsViewParamCtrl = function ($scope, $rootScope) {
+        $scope.deleteParagraph = function(instanceVal) {
+            $rootScope.$broadcast('element.paragraph.delete', instanceVal);
+        };
+    };
+
     var mmsViewParaLink = function(scope, element, attrs) {
         if (scope.para.sourceType === 'text') {
             element.append(scope.para.text);
@@ -21,8 +27,9 @@ function mmsViewPara($templateCache, $compile) {
         //template: template,
         scope: {
             para: '=mmsPara',
+            instanceVal: '=mmsInstanceVal'
         },
-        //controller: ['$scope', controller]
+        controller: ['$scope', '$rootScope', mmsViewParamCtrl],
         link: mmsViewParaLink
     };
 }

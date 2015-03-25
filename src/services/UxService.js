@@ -125,6 +125,10 @@ function UxService($rootScope) {
             return {id: button, icon: 'fa-codepen', selected: true, active: true, permission: true, tooltip: 'Show Elements', 
                     spinner: false, togglable: true, toggle_icon: 'fa-cube', toggle_tooltip: 'Hide Elements',
                     action: function() {$rootScope.$broadcast(button);}};
+          case "show.edits":
+            return {id: button, icon: 'fa-pencil-square-o', selected: true, active: true, permission: true, tooltip: 'Enable Edits', 
+                    spinner: false, togglable: true, toggle_icon: 'fa-pencil-square', toggle_tooltip: 'Disable Edits',
+                    action: function() {$rootScope.$broadcast(button);}};
           case "center.previous":
             return {id: button, icon: 'fa-chevron-left', selected: true, active: true, permission: true, tooltip: 'Previous', 
                     spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};

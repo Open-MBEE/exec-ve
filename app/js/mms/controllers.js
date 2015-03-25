@@ -128,6 +128,8 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         $rootScope.veCommentsOn = false;
     if (!$rootScope.veElementsOn)
         $rootScope.veElementsOn = false;
+    if (!$rootScope.veEditsOn)
+        $rootScope.veEditsOn = false;
 
     var ws = $stateParams.workspace;
 
@@ -154,6 +156,8 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         $scope.bbApi.setToggleState('show.comments', $rootScope.veCommentsOn);
         $scope.bbApi.addButton(UxService.getButtonBarButton('show.elements'));
         $scope.bbApi.setToggleState('show.elements', $rootScope.veElementsOn);
+        $scope.bbApi.addButton(UxService.getButtonBarButton('show.edits'));
+        $scope.bbApi.setToggleState('show.edits', $rootScope.veEditsOn);
 
         if ($state.includes('workspace.site.document') || $state.includes('workspace.site.documentpreview')) {
             if (snapshot !== null) {
@@ -614,6 +618,22 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         });
     });
 
+    $scope.$on('element.paragraph.delete', function(event, instanceVal) {
+        ViewService.deleteElementFromView(view.sysmlid, workspace, instanceVal).then(function(data) {
+            growl.success('Delete Successful');
+        }, function(reason) {
+            if (reason.type === 'info')
+                growl.info(reason.message);
+            else if (reason.type === 'warning')
+                growl.warning(reason.message);
+            else if (reason.type === 'error')
+                growl.error(reason.message);
+        }).finally(function() {
+            // $scope.bbApi.toggleButtonSpinner('edit.view.documentation.save');
+        });
+
+    });
+
     $scope.$on('show.comments', function() {
         $scope.viewApi.toggleShowComments();
         $scope.bbApi.toggleButtonState('show.comments');
@@ -624,6 +644,13 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         $scope.viewApi.toggleShowElements();
         $scope.bbApi.toggleButtonState('show.elements');
         $rootScope.veElementsOn = !$rootScope.veElementsOn;
+    });
+
+    $scope.$on('show.elements', function() {
+        // TODO: manage this in the view like the comments/elements
+        // $scope.viewApi.toggleShowElements();
+        $scope.bbApi.toggleButtonState('show.elements');
+        $rootScope.veEditsOn = !$rootScope.veEditsOn;
     });
 
     $scope.$on('center.previous', function() {

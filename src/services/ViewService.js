@@ -693,7 +693,7 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
         isSection: isSection,
         addElementToView: addElementToView,
         addParagraph: addParagraph,
-        deleteElementFromView: deleteElementFromView,
+        deleteElementFromView: deleteElementFromView
     };
 
 }
