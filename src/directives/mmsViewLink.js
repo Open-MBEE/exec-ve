@@ -23,6 +23,8 @@ angular.module('mms.directives')
 function mmsViewLink(ElementService, $compile, growl) {
 
     function findSite(element) {
+        if (element.siteCharacterizationId)
+            return element.siteCharacterizationId;
         var path = element.qualifiedId.split('/');
         return path[1];
     }
@@ -42,10 +44,10 @@ function mmsViewLink(ElementService, $compile, growl) {
                 var viewVersion = mmsViewCtrl.getWsAndVersion();
                 if (!ws)
                     ws = viewVersion.workspace;
+                if (!version && !tag) //if a time is passed in manually, ignore the tag on the surrounding view
+                    tag = viewVersion.tag;
                 if (!version)
                     version = viewVersion.version;
-                if (!tag)
-                    tag = viewVersion.tag;
             }
             if (!ws)
                 ws = 'master';
