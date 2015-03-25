@@ -32,6 +32,9 @@ function mmsSiteDocFilter(ElementService, ViewService, growl, $templateCache, $q
         var siteDocsViewId = scope.mmsSite + '_filtered_docs';
         scope.editing = false;
         
+        scope.ws = scope.mmsWs;
+        scope.version = scope.mmsVersion;
+        
         ElementService.getElement(siteDocsViewId, false, scope.mmsWs, scope.mmsVersion)
         .then(function(data) {
             orig = data;

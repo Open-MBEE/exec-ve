@@ -311,6 +311,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         $scope.specApi.save().then(function(data) {
             if ($scope.filterApi.getEditing && $scope.filterApi.getEditing()) {
                 $scope.filterApi.save().then(function(filter) {
+                    //do a reload of the tree
                 }, function(reason) {
                     growl.error("Filter save error: " + reason.message);
                 });

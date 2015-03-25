@@ -25,8 +25,8 @@ function mmsWorkspaceDocs(ElementService, SiteService, ViewService, growl, $q, $
     var mmsWorkspaceDocsLink = function(scope, element, attrs, mmsViewCtrl) {
 
         var docs = [];
+        //scope.docs = docs;
         var docsKey = {};
-        scope.docs = docs;
         var filtered = {};
         var ws = scope.mmsWs;
         var version = scope.mmsVersion;
@@ -40,11 +40,14 @@ function mmsWorkspaceDocs(ElementService, SiteService, ViewService, growl, $q, $
         scope.version = version ? version : 'latest';
         scope.ws = ws ? ws : 'master';
 
-        var filterPromises = [];
+        var deferred = $q.defer();
+        var filterPromises = [deferred.promise];
 
         SiteService.getSites(version)
         .then(function(sites) {
             sites.forEach(function(site) {
+                var siteDeferred = $q.defer();
+                filterPromises.push(siteDeferred.promise);
                 ViewService.getSiteDocuments(site.sysmlid, false, ws, version)
                 .then(function(sitedocs) {
                     ElementService.getElement(site.sysmlid + '_filtered_docs', false, ws, version)
@@ -57,19 +60,27 @@ function mmsWorkspaceDocs(ElementService, SiteService, ViewService, growl, $q, $
                             if (!filtered[doc.sysmlid]) {
                                 if (!docsKey[doc.sysmlid]) {
                                     docsKey[doc.sysmlid] = doc;
-                                    docs.append(doc);
+                                    docs.push(doc);
                                 }
                             }
                         });
+                        siteDeferred.resolve('ok');
                     });
                 }, function(reason) {
-
+                    siteDeferred.resolve('ok');
                 });
             });
+            
         }, function(reason) {
 
+        }).finally(function() {
+            deferred.resolve('ok');
+            $q.all(filterPromises).then(function(data) {
+                scope.docs = docs;
+            }, function(bad) {
+                scope.docs = docs;
+            });
         });
-
     };
 
     return {
