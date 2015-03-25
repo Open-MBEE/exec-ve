@@ -23,6 +23,8 @@ angular.module('mms.directives')
 function mmsViewLink(ElementService, $compile, growl) {
 
     function findSite(element) {
+        if (element.siteCharacterizationId)
+            return element.siteCharacterizationId;
         var path = element.qualifiedId.split('/');
         return path[1];
     }
@@ -42,20 +44,22 @@ function mmsViewLink(ElementService, $compile, growl) {
                 var viewVersion = mmsViewCtrl.getWsAndVersion();
                 if (!ws)
                     ws = viewVersion.workspace;
+                if (!version && !tag) //if a time is passed in manually, ignore the tag on the surrounding view
+                    tag = viewVersion.tag;
                 if (!version)
                     version = viewVersion.version;
-                if (!tag)
-                    tag = viewVersion.tag;
             }
             if (!ws)
                 ws = 'master';
             if (!version)
                 version = 'latest';
-
+            scope.ws = ws;
 
             ElementService.getElement(scope.mmsVid, false, ws, version)
             .then(function(data) {
+                scope.element = data;
                 var site = findSite(data);
+                scope.site = site;
                 var queryParam = '';
                 if (tag !== undefined && tag !== null && tag !== '') {
                     queryParam = '?tag=' + tag;
@@ -63,17 +67,21 @@ function mmsViewLink(ElementService, $compile, growl) {
                 else if (version !== 'latest') {
                     queryParam = '?time=' + version;
                 }
-
+                scope.query = queryParam;
                 if (data.specialization.type === 'Product') {
                     docid = data.sysmlid;
-                    element.html('<a href="mms.html#/workspaces/' + ws + '/sites/' + site + '/documents/' + 
-                        docid + '/views/' + scope.mmsVid + queryParam + '">' + data.name + '</a>');
+                    scope.docid = docid;
+                    scope.vid = data.sysmlid;
+                    //element.html('<a href="mms.html#/workspaces/' + ws + '/sites/' + site + '/documents/' + 
+                        //docid + '/views/' + scope.mmsVid + queryParam + '">' + data.name + '</a>');
                 } else if (data.specialization.type === "View") {
                     if (!docid || docid === '') {
                         docid = data.sysmlid;
                     } 
-                    element.html('<a href="mms.html#/workspaces/' + ws + '/sites/' + site + '/documents/' + 
-                        docid + '/views/' + scope.mmsVid + queryParam + '">' + data.name + '</a>');
+                    scope.docid = docid;
+                    scope.vid = data.sysmlid;
+                    //element.html('<a href="mms.html#/workspaces/' + ws + '/sites/' + site + '/documents/' + 
+                    //    docid + '/views/' + scope.mmsVid + queryParam + '">' + data.name + '</a>');
                 } else {
                     element.html('<span class="error">view link is not a view</span>');
                     growl.error('View Link Error: not a view: ' + scope.mmsVid);
@@ -95,6 +103,7 @@ function mmsViewLink(ElementService, $compile, growl) {
             mmsTag: '@'
         },
         require: '?^mmsView',
+        template: '<a href="mms.html#/workspaces/{{ws}}/sites/{{site}}/documents/{{docid}}/views/{{vid}}{{query}}">{{element.name}}</a>',
         //controller: ['$scope', controller]
         link: mmsViewLinkLink
     };

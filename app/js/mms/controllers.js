@@ -114,6 +114,10 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     } else {
         $rootScope.mms_showSiteDocLink = false;
     }
+
+    $scope.showFilter = false;
+    if ($state.current.name === 'workspace.site')
+        $scope.showFilter = true;
     
     $scope.vidLink = false;
     if ($state.includes('workspace.site.documentpreview')) {
@@ -121,7 +125,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     }
 
     $scope.tagId = undefined;
-    if (tag !== 'latest')
+    if (tag.timestamp !== 'latest')
         $scope.tagId = tag.id;
 
     if (!$rootScope.veCommentsOn)
@@ -178,9 +182,10 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
                         $scope.bbApi.setTooltip('generate.zip', zipStatus);
                 }
             }
-
-            $scope.bbApi.addButton(UxService.getButtonBarButton('center.previous'));
-            $scope.bbApi.addButton(UxService.getButtonBarButton('center.next'));
+            if ($state.includes('workspace.site.document')) {
+                $scope.bbApi.addButton(UxService.getButtonBarButton('center.previous'));
+                $scope.bbApi.addButton(UxService.getButtonBarButton('center.next'));
+            }
         }
     };
 
@@ -241,7 +246,8 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     };
 
     $scope.$on('generate.pdf', function() {
-
+        if (getPDFStatus() === 'Generating...')
+            return;
         $scope.bbApi.toggleButtonSpinner('generate.pdf');
         $scope.bbApi.toggleButtonSpinner('generate.zip');
 
@@ -273,6 +279,8 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     $scope.$on('edit.view.documentation', function() {
         $scope.editing = !$scope.editing;
         $scope.specApi.setEditing(true);
+        if ($scope.filterApi.setEditing)
+            $scope.filterApi.setEditing(true);
         $scope.bbApi.setPermission('edit.view.documentation',false);
         $scope.bbApi.setPermission('edit.view.documentation.save',true);
         $scope.bbApi.setPermission('edit.view.documentation.cancel',true);
@@ -301,6 +309,13 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         elementSaving = true;
         $scope.bbApi.toggleButtonSpinner('edit.view.documentation.save');
         $scope.specApi.save().then(function(data) {
+            if ($scope.filterApi.getEditing && $scope.filterApi.getEditing()) {
+                $scope.filterApi.save().then(function(filter) {
+                    $state.reload();
+                }, function(reason) {
+                    growl.error("Filter save error: " + reason.message);
+                });
+            }
             elementSaving = false;
             growl.success('Save Successful');
             $scope.editing = false;
@@ -331,6 +346,10 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
 
     $scope.$on('edit.view.documentation.cancel', function() {
         var go = function() {
+            if ($scope.filterApi.cancel) {
+                $scope.filterApi.cancel();
+                $scope.filterApi.setEditing(false);
+            }
             delete $rootScope.veEdits['element|' + $scope.specApi.getEdits().sysmlid + '|' + ws];
             $scope.specApi.revertEdits();
             $scope.editing = false;
@@ -417,6 +436,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         }, 225);
     }
 
+    $scope.filterApi = {}; //for site doc filter
     $scope.viewApi = {};
     $scope.specApi = {};
     $scope.comments = {};
@@ -845,10 +865,10 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
         showPane('element');
     });
 }])
-.controller('TreeCtrl', ['$anchorScroll' , '$filter', '$location', '$modal', '$scope', '$rootScope', '$state', '$stateParams', '$timeout', 'growl', 
+.controller('TreeCtrl', ['$anchorScroll' , '$q', '$filter', '$location', '$modal', '$scope', '$rootScope', '$state', '$stateParams', '$timeout', 'growl', 
                           'UxService', 'ConfigService', 'ElementService', 'UtilsService', 'WorkspaceService', 'ViewService',
                           'workspaces', 'workspaceObj', 'tag', 'sites', 'site', 'document', 'views', 'view', 'time', 'configSnapshots',
-function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, $stateParams, $timeout, growl, UxService, ConfigService, ElementService, UtilsService, WorkspaceService, ViewService, workspaces, workspaceObj, tag, sites, site, document, views, view, time, configSnapshots) {
+function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $state, $stateParams, $timeout, growl, UxService, ConfigService, ElementService, UtilsService, WorkspaceService, ViewService, workspaces, workspaceObj, tag, sites, site, document, views, view, time, configSnapshots) {
 
     $rootScope.mms_bbApi = $scope.bbApi = {};
     $rootScope.mms_treeApi = $scope.treeApi = {};
@@ -1086,40 +1106,57 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
     };
 
     var siteLevel2Func = function(site, siteNode) {
-        ViewService.getSiteDocuments(site, false, ws, config === 'latest' ? 'latest' : config.timestamp)
+        ViewService.getSiteDocuments(site, false, ws, config === 'latest' ? 'latest' : tag.timestamp)
         .then(function(docs) {
-            if (config === 'latest') {
-                docs.forEach(function(doc) {
-                    var docNode = {
-                        label : doc.name,
-                        type : 'view',
-                        data : doc,
-                        site : site,
-                        children : []
-                    };
-                    siteNode.children.unshift(docNode);
-                });
-            } else {
-                var docids = [];
-                docs.forEach(function(doc) {
-                    docids.push(doc.sysmlid);
-                });
-                configSnapshots.forEach(function(snapshot) {
-                    if (docids.indexOf(snapshot.sysmlid) > -1) {
-                        snapshot.name = snapshot.sysmlname;
-                        var snapshotNode = {
-                            label : snapshot.sysmlname,
-                            type : 'snapshot',
-                            data : snapshot,
+            var filteredDocs = {};
+            var siteDocsViewId = site + '_filtered_docs';
+            var deferred = $q.defer();
+
+            ElementService.getElement(siteDocsViewId, false, ws, config === 'latest' ? 'latest' : tag.timestamp)
+            .then(function(filter) {
+                filteredDocs = JSON.parse(filter.documentation);
+                deferred.resolve('ok');
+            }, function(reason) {
+                deferred.resolve('ok');
+            });
+            deferred.promise.then(function() {
+                if (config === 'latest') {
+                    docs.forEach(function(doc) {
+                        if (filteredDocs[doc.sysmlid])
+                            return;
+                        var docNode = {
+                            label : doc.name,
+                            type : 'view',
+                            data : doc,
                             site : site,
                             children : []
                         };
-                        siteNode.children.unshift(snapshotNode);
-                    }
-                });
-            }
-            if ($scope.treeApi.refresh)
-                $scope.treeApi.refresh();
+                        siteNode.children.unshift(docNode);
+                    });
+                } else {
+                    var docids = [];
+                    docs.forEach(function(doc) {
+                        if (filteredDocs[doc.sysmlid])
+                            return;
+                        docids.push(doc.sysmlid);
+                    });
+                    configSnapshots.forEach(function(snapshot) {
+                        if (docids.indexOf(snapshot.sysmlid) > -1) {
+                            snapshot.name = snapshot.sysmlname;
+                            var snapshotNode = {
+                                label : snapshot.sysmlname,
+                                type : 'snapshot',
+                                data : snapshot,
+                                site : site,
+                                children : []
+                            };
+                            siteNode.children.unshift(snapshotNode);
+                        }
+                    });
+                }
+                if ($scope.treeApi.refresh)
+                    $scope.treeApi.refresh();
+            });
         }, function(reason) {
             growl.error(reason.message);
         });

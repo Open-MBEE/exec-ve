@@ -234,8 +234,8 @@ function mmsNav(SiteService, WorkspaceService, ConfigService, $templateCache, gr
             site: '=mmsSite', //current site name
             product: '=mmsDoc', //current document
             config: '=mmsConfig', //config id
-            snapshot: '@mmsSnapshotTag' // snapshot titles (before tags - need to be backward compatible), if any
-
+            snapshot: '@mmsSnapshotTag', // snapshot titles (before tags - need to be backward compatible), if any
+            showTag: '@mmsShowTag'
         },
         link: mmsNavLink
     };

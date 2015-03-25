@@ -123,6 +123,9 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
             },
             snapshot: function() {
                 return null;
+            },
+            siteDocsFilter: function() {
+                return null;
             }
         },
         views: {
@@ -342,7 +345,33 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
                     }, function(reason) {
                         return null;
                     });
+                });
+            },
+            siteDocsFilter: function($stateParams, ElementService, workspace, site, time, growl) {
+                //create dummy element that contains document ids that should be filtered out (not shown for site)
+                var siteDocsViewId;
+                if ($stateParams.site === 'no_site')
+                    return null;
+                else
+                    siteDocsViewId = site.sysmlid + '_filtered_docs';
 
+                return ElementService.getElement(siteDocsViewId, false, workspace, time)
+                .then(function(data) {
+                    return data;
+                }, function(reason) {
+                    if (reason.status !== 404 || time !== 'latest') return null;
+                    var siteDocs = {
+                        specialization: {type: "Element"},
+                        name: site.name + ' Filtered Docs',
+                        documentation: '{}'
+                    };
+                    siteDocs.sysmlid = siteDocsViewId;
+                    return ElementService.createElement(siteDocs, workspace, site.sysmlid)
+                    .then(function(data) {
+                        return data;
+                    }, function(reason) {
+                        return null;
+                    });
                 });
             },
             views: function(ViewService, workspace, document, time) {
@@ -450,25 +479,78 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
                 });
                 return found; 
             },
-            time: function($stateParams, tag) {
-                if ($stateParams.time === undefined)
-                    return tag.timestamp;
-                return $stateParams.time;
+            tag: function ($stateParams, ConfigService, workspace, snapshots) {
+                if ($stateParams.tag === undefined)
+                {
+                    if ($stateParams.time !== undefined && $stateParams.time !== 'latest') {
+                        
+                        var snapshotFound = false;
+                        var snapshotPromise;
+                        // if time is defined, then do a reverse look-up from the
+                        // product snapshots to determine if there is a match tag
+                        snapshots.forEach(function(snapshot) {
+                            if (snapshot.created === $stateParams.time) {
+                                // product snapshot found based on time, 
+                                // next see if there is a configuration for the snapshot
+                                if (snapshot.configurations && snapshot.configurations.length > 0) {
+                                    // there may be 0 or more, if there is more than 1, 
+                                    // base the configuration tag on the first one
+                                    snapshotFound = true;
+
+                                    snapshotPromise = ConfigService.getConfig(snapshot.configurations[0].id, workspace, false);
+                                }
+                            }
+                        });
+                        if (snapshotFound)
+                            return snapshotPromise;
+                        else 
+                            return { name: 'latest', timestamp: 'latest' };
+                    } else {
+                        return { name: 'latest', timestamp: 'latest' };
+                    }
+                } else if ($stateParams.tag === 'latest') {
+                    return { name: 'latest', timestamp: 'latest' };
+                } else {
+                    return ConfigService.getConfig($stateParams.tag, workspace, false);
+                }
+            },        
+            configSnapshots: function(ConfigService, workspace, tag) {
+                if (tag.timestamp === 'latest')
+                    return [];
+                return ConfigService.getConfigSnapshots(tag.id, workspace, false);
+            },
+            time: function($stateParams, ConfigService, workspace) {
+                if ($stateParams.tag !== undefined) {
+                    return ConfigService.getConfig($stateParams.tag, workspace, false).then(function(tag) {
+                        return tag.timestamp;
+                    }); 
+                }
+                else if ($stateParams.time !== undefined)
+                    return $stateParams.time;
+                else
+                    return "latest";
             }        
         },
         views: {
             'menu@': {
-                template: '<mms-nav mms-title="View Editor" mms-ws="{{workspace}}" mms-site="site" mms-doc="document" mms-config="tag" mms-snapshot-tag="{{snapshotTag}}""></mms-nav>',
-                controller: function ($scope, $filter, $rootScope, workspace, site, document, tag, snapshots, time) {
+                template: '<mms-nav mms-title="View Editor" mms-ws="{{workspace}}" mms-site="site" mms-doc="document" mms-config="tag" mms-snapshot-tag="{{snapshotTag}}" mms-show-tag="{{showTag}}"></mms-nav>',
+                controller: function ($scope, $filter, $rootScope, workspace, site, document, tag, snapshots, time, siteDocsFilter) {
                     $scope.workspace = workspace;
                     $scope.tag = tag;
                     $scope.site = site;
                     $scope.document = document;
+
+                    $scope.showTag = true;
                     $rootScope.mms_title = 'View Editor: '+document.name;
+                    var filtered = {};
+                    if (siteDocsFilter)
+                        filtered = JSON.parse(siteDocsFilter.documentation);
 
                     var tagStr = '';
                     if (time !== 'latest') {
                         snapshots.forEach(function(snapshot) {
+                            if (filtered[document.sysmlid])
+                                return;
                             if (time === snapshot.created && snapshot.configurations && snapshot.configurations.length > 0)
                                 snapshot.configurations.forEach(function(config) {
                                     tagStr += '( <i class="fa fa-tag"></i> ' + config.name + ' ) ';
@@ -476,7 +558,8 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
                                 });
                         });
                         tagStr += '( <i class="fa fa-camera"></i> ' + $filter('date')(time, 'M/d/yy h:mm a') + ' )';
-
+                        if (filtered[document.sysmlid])
+                            $scope.showTag = false;
                         $scope.snapshotTag = ' ' + tagStr;
                     }                                        
                 }
