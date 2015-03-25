@@ -65,7 +65,7 @@ function mmsViewLink(ElementService, $compile, growl) {
                 else if (version !== 'latest') {
                     queryParam = '?time=' + version;
                 }
-                scope.queryParam = queryParam;
+                scope.query = queryParam;
                 if (data.specialization.type === 'Product') {
                     docid = data.sysmlid;
                     scope.docid = docid;
