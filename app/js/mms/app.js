@@ -479,10 +479,56 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
                 });
                 return found; 
             },
-            time: function($stateParams, tag) {
-                if ($stateParams.time === undefined)
-                    return tag.timestamp;
-                return $stateParams.time;
+            tag: function ($stateParams, ConfigService, workspace, snapshots) {
+                if ($stateParams.tag === undefined)
+                {
+                    if ($stateParams.time !== undefined && $stateParams.time !== 'latest') {
+                        
+                        var snapshotFound = false;
+                        var snapshotPromise;
+                        // if time is defined, then do a reverse look-up from the
+                        // product snapshots to determine if there is a match tag
+                        snapshots.forEach(function(snapshot) {
+                            if (snapshot.created === $stateParams.time) {
+                                // product snapshot found based on time, 
+                                // next see if there is a configuration for the snapshot
+                                if (snapshot.configurations && snapshot.configurations.length > 0) {
+                                    // there may be 0 or more, if there is more than 1, 
+                                    // base the configuration tag on the first one
+                                    snapshotFound = true;
+
+                                    snapshotPromise = ConfigService.getConfig(snapshot.configurations[0].id, workspace, false);
+                                }
+                            }
+                        });
+                        if (snapshotFound)
+                            return snapshotPromise;
+                        else 
+                            return { name: 'latest', timestamp: 'latest' };
+                    } else {
+                        return { name: 'latest', timestamp: 'latest' };
+                    }
+                } else if ($stateParams.tag === 'latest') {
+                    return { name: 'latest', timestamp: 'latest' };
+                } else {
+                    return ConfigService.getConfig($stateParams.tag, workspace, false);
+                }
+            },        
+            configSnapshots: function(ConfigService, workspace, tag) {
+                if (tag.timestamp === 'latest')
+                    return [];
+                return ConfigService.getConfigSnapshots(tag.id, workspace, false);
+            },
+            time: function($stateParams, ConfigService, workspace) {
+                if ($stateParams.tag !== undefined) {
+                    return ConfigService.getConfig($stateParams.tag, workspace, false).then(function(tag) {
+                        return tag.timestamp;
+                    }); 
+                }
+                else if ($stateParams.time !== undefined)
+                    return $stateParams.time;
+                else
+                    return "latest";
             }        
         },
         views: {
@@ -493,11 +539,13 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
                     $scope.tag = tag;
                     $scope.site = site;
                     $scope.document = document;
+
                     $scope.showTag = true;
                     $rootScope.mms_title = 'View Editor: '+document.name;
                     var filtered = {};
                     if (siteDocsFilter)
                         filtered = JSON.parse(siteDocsFilter.documentation);
+
                     var tagStr = '';
                     if (time !== 'latest') {
                         snapshots.forEach(function(snapshot) {

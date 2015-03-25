@@ -125,7 +125,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     }
 
     $scope.tagId = undefined;
-    if (tag !== 'latest')
+    if (tag.timestamp !== 'latest')
         $scope.tagId = tag.id;
 
     if (!$rootScope.veCommentsOn)
