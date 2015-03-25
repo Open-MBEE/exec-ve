@@ -529,7 +529,22 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
                     return $stateParams.time;
                 else
                     return "latest";
-            }        
+            },
+            siteDocsFilter: function($stateParams, ElementService, workspace, site, time, growl) {
+                //need to redefine here since time is redefined
+                var siteDocsViewId;
+                if ($stateParams.site === 'no_site')
+                    return null;
+                else
+                    siteDocsViewId = site.sysmlid + '_filtered_docs';
+
+                return ElementService.getElement(siteDocsViewId, false, workspace, time)
+                .then(function(data) {
+                    return data;
+                }, function(reason) {
+                    return null;
+                });
+            },
         },
         views: {
             'menu@': {
