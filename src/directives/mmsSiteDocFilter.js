@@ -24,18 +24,17 @@ angular.module('mms.directives')
 function mmsSiteDocFilter(ElementService, ViewService, growl, $templateCache, $q) {
 
     var mmsSiteDocFilterLink = function(scope, element, attrs) {
-        scope.filtered = [];
+        scope.filtered = {};
         var editable = true;
         var orig = null;
         scope.siteDocs = [];
         scope.siteDocsFiltered = [];
-        var siteDocsViewId = scope.mmsSite + '_filtered_docs';
         scope.editing = false;
         
         scope.ws = scope.mmsWs;
         scope.version = scope.mmsVersion;
         
-        ElementService.getElement(siteDocsViewId, false, scope.mmsWs, scope.mmsVersion)
+        ElementService.getElement("master_filter", false, scope.mmsWs, scope.mmsVersion)
         .then(function(data) {
             orig = data;
             scope.filtered = JSON.parse(data.documentation);
@@ -85,7 +84,7 @@ function mmsSiteDocFilter(ElementService, ViewService, growl, $templateCache, $q
                 return deferred.promise;
             }
             ElementService.updateElement({
-                sysmlid: siteDocsViewId, 
+                sysmlid: "master_filter", 
                 documentation: JSON.stringify(scope.filtered)
             }, scope.mmsWs).then(function(data) {
                 updateSiteDocsFiltered();

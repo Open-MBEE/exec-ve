@@ -124,7 +124,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
             snapshot: function() {
                 return null;
             },
-            siteDocsFilter: function() {
+            docFilter: function() {
                 return null;
             }
         },
@@ -211,6 +211,26 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
                         return null;
                     });
 
+                });
+            },
+            docFilter: function(ElementService, workspace, time) {
+                return ElementService.getElement("master_filter", false, workspace, time)
+                .then(function(data) {
+                    return data;
+                }, function(reason) {
+                    if (reason.status !== 404 || time !== 'latest') return null;
+                    var siteDocs = {
+                        specialization: {type: "Element"},
+                        name: 'Filtered Docs',
+                        documentation: '{}'
+                    };
+                    siteDocs.sysmlid = "master_filter";
+                    return ElementService.createElement(siteDocs, workspace, null)
+                    .then(function(data) {
+                        return data;
+                    }, function(reason) {
+                        return null;
+                    });
                 });
             },
             views: function(ViewService, workspace, document, time) {
@@ -340,33 +360,6 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
                     doc.specialization.childrenViews = [];
 
                     return ElementService.createElement(doc, workspace, site.sysmlid)
-                    .then(function(data) {
-                        return data;
-                    }, function(reason) {
-                        return null;
-                    });
-                });
-            },
-            siteDocsFilter: function($stateParams, ElementService, workspace, site, time, growl) {
-                //create dummy element that contains document ids that should be filtered out (not shown for site)
-                var siteDocsViewId;
-                if ($stateParams.site === 'no_site')
-                    return null;
-                else
-                    siteDocsViewId = site.sysmlid + '_filtered_docs';
-
-                return ElementService.getElement(siteDocsViewId, false, workspace, time)
-                .then(function(data) {
-                    return data;
-                }, function(reason) {
-                    if (reason.status !== 404 || time !== 'latest') return null;
-                    var siteDocs = {
-                        specialization: {type: "Element"},
-                        name: site.name + ' Filtered Docs',
-                        documentation: '{}'
-                    };
-                    siteDocs.sysmlid = siteDocsViewId;
-                    return ElementService.createElement(siteDocs, workspace, site.sysmlid)
                     .then(function(data) {
                         return data;
                     }, function(reason) {
@@ -530,15 +523,9 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
                 else
                     return "latest";
             },
-            siteDocsFilter: function($stateParams, ElementService, workspace, site, time, growl) {
+            docFilter: function($stateParams, ElementService, workspace, site, time, growl) {
                 //need to redefine here since time is redefined
-                var siteDocsViewId;
-                if ($stateParams.site === 'no_site')
-                    return null;
-                else
-                    siteDocsViewId = site.sysmlid + '_filtered_docs';
-
-                return ElementService.getElement(siteDocsViewId, false, workspace, time)
+                return ElementService.getElement("master_filter", false, workspace, time)
                 .then(function(data) {
                     return data;
                 }, function(reason) {
@@ -549,7 +536,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
         views: {
             'menu@': {
                 template: '<mms-nav mms-title="View Editor" mms-ws="{{workspace}}" mms-site="site" mms-doc="document" mms-config="tag" mms-snapshot-tag="{{snapshotTag}}" mms-show-tag="{{showTag}}"></mms-nav>',
-                controller: function ($scope, $filter, $rootScope, workspace, site, document, tag, snapshots, time, siteDocsFilter) {
+                controller: function ($scope, $filter, $rootScope, workspace, site, document, tag, snapshots, time, docFilter) {
                     $scope.workspace = workspace;
                     $scope.tag = tag;
                     $scope.site = site;
@@ -558,8 +545,8 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
                     $scope.showTag = true;
                     $rootScope.mms_title = 'View Editor: '+document.name;
                     var filtered = {};
-                    if (siteDocsFilter)
-                        filtered = JSON.parse(siteDocsFilter.documentation);
+                    if (docFilter)
+                        filtered = JSON.parse(docFilter.documentation);
 
                     var tagStr = '';
                     if (time !== 'latest') {
