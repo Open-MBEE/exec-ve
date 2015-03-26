@@ -33,7 +33,7 @@
     "angular-growl-v2": "~0.6.1",
     "font-awesome-bower": "~4.3.0",
     "lodash": "~3.2.0",
-    "timely-angular": "https://github.jpl.nasa.gov/SEQR/timely-angular.git#master"
+    "timely-angular": "git@github.jpl.nasa.gov:SEQR/timely-angular.git#master"
   },
   "devDependencies": {
     "angular-mocks": "~1.2.21"
