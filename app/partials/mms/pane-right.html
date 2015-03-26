@@ -41,8 +41,10 @@
                 <td>{{snapshot.creator}}
                 </td>
                 <td>
-                    <div ng-repeat="config in snapshot.configurations | orderBy:'name'">
-                        <a ui-sref="workspace.site({tag: config.id})" ui-sref-opts="{reload: true}">{{config.name}}</a>
+                    <div ng-hide="snapshot.hideTag">
+                        <div ng-repeat="config in snapshot.configurations | orderBy:'name'">
+                            <a ui-sref="workspace.site({tag: config.id})" ui-sref-opts="{reload: true}">{{config.name}}</a>
+                        </div>
                     </div>
                 </td>
             </tr>
