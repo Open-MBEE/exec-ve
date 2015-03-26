@@ -428,7 +428,20 @@ module.exports = function(grunt) {
           'src/services': [ '**']
         },
       },
+    },
+
+   plato: {
+      options: {
+        // Task-specific options go here. 
+      },
+      your_target: {
+        // Target-specific file lists and/or options go here. 
+        files: {
+          'reports/plato': [ 'app/js/**/*.js', 'src/directives/**/*.js', 'src/directives/**/*.js','src/services/**/*.js' ],
+        }
+      }
     }
+
   });
 
   grunt.loadNpmTasks('grunt-contrib-uglify');
@@ -448,6 +461,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-karma');
   grunt.loadNpmTasks('grunt-artifactory-artifact');
   grunt.loadNpmTasks('grunt-sloc');
+  grunt.loadNpmTasks('grunt-plato');  
   
   // grunt.registerTask('install', ['npm-install', 'bower']);
   grunt.registerTask('install', ['bower-install-simple']);
