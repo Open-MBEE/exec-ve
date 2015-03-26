@@ -513,6 +513,22 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
         }
     }
 
+    if (snapshots) {
+        snapshots.forEach(function(snapshot) {
+            ElementService.getElement(document.sysmlid, ws, false, snapshot.created)
+            .then(function(pastElement) {
+                var siteId = pastElement.siteCharacterizationId;
+                ElementService.getElement(siteId + '_filtered_docs', ws, false, snapshot.created)
+                .then(function(filter) {
+                    var json = JSON.parse(filter.documentation);
+                    if (json[document.sysmlid]) {
+                        snapshot.hideTag = true;
+                    }
+                });
+            });
+        });
+    }
+
     $scope.snapshotClicked = function() {
         $scope.snapshotLoading = 'fa fa-spinner fa-spin';
     };
