@@ -72,9 +72,9 @@ module.exports = function(grunt) {
         src: ['src/mms.directives.js', 'src/directives/*.js'],
         dest: 'dist/mms.directives.js'
       },
-      ve: {
-        src: ['app/js/ve/*.js'],
-        dest: 'dist/ve.js'
+      mmsapp: {
+        src: ['app/js/mms/controllers/*.js'],
+        dest: 'build/js/mms/controllers.js'
       }
     },
 
@@ -97,14 +97,6 @@ module.exports = function(grunt) {
         files: {
           'dist/mms.directives.min.js': ['dist/mms.directives.js'],
           'dist/mms.directives.tpls.min.js': ['dist/mms.directives.tpls.js']
-        }
-      },
-      ve: {
-        options: {
-          mangle: false
-        },
-        files: {
-          'dist/ve.min.js': ['dist/ve.js']
         }
       }
     },
