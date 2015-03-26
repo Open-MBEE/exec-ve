@@ -42,7 +42,7 @@ function mmsWorkspaceDocs(ElementService, SiteService, ViewService, growl, $q, $
 
         var deferred = $q.defer();
         var filterPromises = [deferred.promise];
-
+        var gotfilter = false;
         SiteService.getSites(version)
         .then(function(sites) {
             sites.forEach(function(site) {
@@ -50,10 +50,12 @@ function mmsWorkspaceDocs(ElementService, SiteService, ViewService, growl, $q, $
                 filterPromises.push(siteDeferred.promise);
                 ViewService.getSiteDocuments(site.sysmlid, false, ws, version)
                 .then(function(sitedocs) {
-                    ElementService.getElement(site.sysmlid + '_filtered_docs', false, ws, version)
+                    ElementService.getElement("master_filter", false, ws, version)
                     .then(function(filter) {
-                        var sitefilter = JSON.parse(filter.documentation);
-                        _.merge(filtered, sitefilter);
+                        if (gotfilter)
+                            return;
+                        filtered = JSON.parse(filter.documentation);
+                        gotfilter = true;
                     }, function(reason) {
                     }).finally(function() {
                         sitedocs.forEach(function(doc) {
