@@ -395,7 +395,53 @@ module.exports = function(grunt) {
       unit: {
         configFile: 'karma.conf.js'
       }
+    },
+
+    sloc: {
+      options: {
+        // Task-specific options go here. 
+      },
+      'all-files': {
+        files: {
+          // Target-specific file lists and/or options go here. 
+          'app/js': [ '**.js'],
+          'app': [ '*.html', 'partials/**', 'styles/**'],
+          'src/directives': [ '**.js', '**.html'],
+          'src/directives/templates/styles': [ 'base/**', 'components/**', 'layout/**'],
+          'src/services': [ '**']
+        },
+      },
+      'mms-app': {
+        files: {
+          'app/js': [ '**.js'],
+          'app': [ '*.html', 'partials/**', 'styles/**'],
+        },
+      },
+      'mms-directives': {
+        files: {
+          'src/directives': [ '**.js', '**.html'],
+          'src/directives/templates/styles': [ 'base/**', 'components/**', 'layout/**']
+        },
+      },
+      'mms-services': {
+        files: {
+          'src/services': [ '**']
+        },
+      },
+    },
+
+   plato: {
+      options: {
+        // Task-specific options go here. 
+      },
+      your_target: {
+        // Target-specific file lists and/or options go here. 
+        files: {
+          'reports/plato': [ 'app/js/**/*.js', 'src/directives/**/*.js', 'src/directives/**/*.js','src/services/**/*.js' ],
+        }
+      }
     }
+
   });
 
   grunt.loadNpmTasks('grunt-contrib-uglify');
@@ -414,7 +460,9 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-wiredep');
   grunt.loadNpmTasks('grunt-karma');
   grunt.loadNpmTasks('grunt-artifactory-artifact');
-
+  grunt.loadNpmTasks('grunt-sloc');
+  grunt.loadNpmTasks('grunt-plato');  
+  
   // grunt.registerTask('install', ['npm-install', 'bower']);
   grunt.registerTask('install', ['bower-install-simple']);
   grunt.registerTask('compile', ['html2js', 'sass']);

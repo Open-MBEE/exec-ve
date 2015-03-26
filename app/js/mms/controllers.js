@@ -94,6 +94,8 @@ function($scope, $rootScope, $state, $timeout, UxService, workspace, tag, docume
           //$scope.tbApi.addButton(UxService.getToolbarButton("view.reorder"));
           $scope.tbApi.addButton(UxService.getToolbarButton("document.snapshot"));
           $scope.tbApi.setPermission('element.editor',editable);
+          // $scope.tbApi.setPermission('document.snapshot.refresh',editable);
+          $scope.tbApi.setPermission('document.snapshot.create',editable);
           //$scope.tbApi.setPermission("view.reorder", editable); 
       } else if ($state.includes('workspace.diff')) {
           $scope.tbApi.setPermission('element.editor', false);
@@ -114,6 +116,10 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     } else {
         $rootScope.mms_showSiteDocLink = false;
     }
+
+    $scope.showFilter = false;
+    if ($state.current.name === 'workspace.site')
+        $scope.showFilter = true;
     
     $scope.vidLink = false;
     if ($state.includes('workspace.site.documentpreview')) {
@@ -121,7 +127,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     }
 
     $scope.tagId = undefined;
-    if (tag !== 'latest')
+    if (tag.timestamp !== 'latest')
         $scope.tagId = tag.id;
 
     if (!$rootScope.veCommentsOn)
@@ -159,6 +165,9 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         $scope.bbApi.addButton(UxService.getButtonBarButton('show.edits'));
         $scope.bbApi.setToggleState('show.edits', $rootScope.veEditsOn);
 
+        // TODO: This code is duplicated in the FullDocCtrl
+        // **WARNING** IF YOU CHANGE THIS CODE, NEED TO UPDATE IN FULL DOC CTRL TOO
+
         if ($state.includes('workspace.site.document') || $state.includes('workspace.site.documentpreview')) {
             if (snapshot !== null) {
                 var pdfUrl = getPDFUrl();
@@ -187,12 +196,15 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
                         $scope.bbApi.setTooltip('generate.zip', zipStatus);
                 }
             }
-
-            $scope.bbApi.addButton(UxService.getButtonBarButton('center.previous'));
-            $scope.bbApi.addButton(UxService.getButtonBarButton('center.next'));
+            if ($state.includes('workspace.site.document')) {
+                $scope.bbApi.addButton(UxService.getButtonBarButton('center.previous'));
+                $scope.bbApi.addButton(UxService.getButtonBarButton('center.next'));
+            }
         }
     };
 
+    // TODO: This code is duplicated in the FullDocCtrl
+    // **WARNING** IF YOU CHANGE THIS CODE, NEED TO UPDATE IN FULL DOC CTRL TOO
     var getPDFStatus = function(){
         if(!snapshot) return null;
         var formats = snapshot.formats;
@@ -250,7 +262,8 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     };
 
     $scope.$on('generate.pdf', function() {
-
+        if (getPDFStatus() === 'Generating...')
+            return;
         $scope.bbApi.toggleButtonSpinner('generate.pdf');
         $scope.bbApi.toggleButtonSpinner('generate.zip');
 
@@ -282,6 +295,8 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     $scope.$on('edit.view.documentation', function() {
         $scope.editing = !$scope.editing;
         $scope.specApi.setEditing(true);
+        if ($scope.filterApi.setEditing)
+            $scope.filterApi.setEditing(true);
         $scope.bbApi.setPermission('edit.view.documentation',false);
         $scope.bbApi.setPermission('edit.view.documentation.save',true);
         $scope.bbApi.setPermission('edit.view.documentation.cancel',true);
@@ -310,6 +325,13 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         elementSaving = true;
         $scope.bbApi.toggleButtonSpinner('edit.view.documentation.save');
         $scope.specApi.save().then(function(data) {
+            if ($scope.filterApi.getEditing && $scope.filterApi.getEditing()) {
+                $scope.filterApi.save().then(function(filter) {
+                    $state.reload();
+                }, function(reason) {
+                    growl.error("Filter save error: " + reason.message);
+                });
+            }
             elementSaving = false;
             growl.success('Save Successful');
             $scope.editing = false;
@@ -340,6 +362,10 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
 
     $scope.$on('edit.view.documentation.cancel', function() {
         var go = function() {
+            if ($scope.filterApi.cancel) {
+                $scope.filterApi.cancel();
+                $scope.filterApi.setEditing(false);
+            }
             delete $rootScope.veEdits['element|' + $scope.specApi.getEdits().sysmlid + '|' + ws];
             $scope.specApi.revertEdits();
             $scope.editing = false;
@@ -692,6 +718,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         }, 225);
     }
 
+    $scope.filterApi = {}; //for site doc filter
     $scope.viewApi = {};
     $scope.specApi = {};
     $scope.comments = {};
@@ -768,6 +795,18 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
         }
     }
 
+    if (snapshots) {
+        snapshots.forEach(function(snapshot) {
+            ElementService.getElement("master_filter", ws, false, snapshot.created)
+            .then(function(filter) {
+                    var json = JSON.parse(filter.documentation);
+                    if (json[document.sysmlid]) {
+                        snapshot.hideTag = true;
+                    }
+            });
+        });
+    }
+
     $scope.snapshotClicked = function() {
         $scope.snapshotLoading = 'fa fa-spinner fa-spin';
     };
@@ -808,45 +847,6 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
                 $scope.show[key] = false;
         });
     };
-
-    var refreshSnapshots = function() {
-        $rootScope.mms_tbApi.toggleButtonSpinner('document.snapshot.refresh');
-        ConfigService.getProductSnapshots($scope.document.sysmlid, $scope.site.name, $scope.ws, true)
-        .then(function(result) {
-            $scope.snapshots = result;
-        }, function(reason) {
-            growl.error("Refresh Failed: " + reason.message);
-        })
-        .finally(function() {
-            $rootScope.mms_tbApi.toggleButtonSpinner('document.snapshot.refresh');
-            $rootScope.mms_tbApi.select('document.snapshot');
-
-        });
-    };
-
-    var creatingSnapshot = false;
-    $scope.$on('document.snapshot.create', function() {
-        if (creatingSnapshot) {
-            growl.info('Please Wait...');
-            return;
-        }
-        creatingSnapshot = true;
-        $rootScope.mms_tbApi.toggleButtonSpinner('document.snapshot.create');
-        ConfigService.createSnapshot($scope.document.sysmlid, site.name, ws)
-        .then(function(result) {
-            creatingSnapshot = false;
-            $rootScope.mms_tbApi.toggleButtonSpinner('document.snapshot.create');
-            growl.success("Snapshot Created: Refreshing...");
-            refreshSnapshots();
-        }, function(reason) {
-            creatingSnapshot = false;
-            growl.error("Snapshot Creation failed: " + reason.message);
-            $rootScope.mms_tbApi.toggleButtonSpinner('document.snapshot.create');
-        });
-        $rootScope.mms_tbApi.select('document.snapshot');
-    });
-
-    $scope.$on('document.snapshot.refresh', refreshSnapshots);
 
     $scope.$on('document.snapshot', function() {
         showPane('snapshots');
@@ -1120,10 +1120,10 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
         showPane('element');
     });
 }])
-.controller('TreeCtrl', ['$anchorScroll' , '$filter', '$location', '$modal', '$scope', '$rootScope', '$state', '$stateParams', '$timeout', 'growl', 
+.controller('TreeCtrl', ['$anchorScroll' , '$q', '$filter', '$location', '$modal', '$scope', '$rootScope', '$state', '$stateParams', '$timeout', 'growl', 
                           'UxService', 'ConfigService', 'ElementService', 'UtilsService', 'WorkspaceService', 'ViewService',
-                          'workspaces', 'workspaceObj', 'tag', 'sites', 'site', 'document', 'views', 'view', 'time', 'configSnapshots',
-function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, $stateParams, $timeout, growl, UxService, ConfigService, ElementService, UtilsService, WorkspaceService, ViewService, workspaces, workspaceObj, tag, sites, site, document, views, view, time, configSnapshots) {
+                          'workspaces', 'workspaceObj', 'tag', 'sites', 'site', 'document', 'views', 'view', 'time', 'configSnapshots', 'docFilter',
+function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $state, $stateParams, $timeout, growl, UxService, ConfigService, ElementService, UtilsService, WorkspaceService, ViewService, workspaces, workspaceObj, tag, sites, site, document, views, view, time, configSnapshots, docFilter) {
 
     $rootScope.mms_bbApi = $scope.bbApi = {};
     $rootScope.mms_treeApi = $scope.treeApi = {};
@@ -1235,6 +1235,57 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
         $scope.bbApi.setToggleState("tree.full.document", false);
         $state.go('workspace.site.document.order');
     });
+
+    var creatingSnapshot = false;
+    $scope.$on('document.snapshot.create', function() {
+        if (creatingSnapshot) {
+            growl.info('Please Wait...');
+            return;
+        }
+        creatingSnapshot = true;
+        $rootScope.mms_tbApi.toggleButtonSpinner('document.snapshot.create');
+
+        $scope.itemType = 'Tag';
+        $scope.createConfigParentId = workspaceObj.id;
+        $scope.configuration = {};
+        $scope.configuration.now = true;
+        var templateUrlStr = 'partials/mms/new-tag.html';
+        var branchType = 'configuration';
+
+        var instance = $modal.open({
+            templateUrl: templateUrlStr,
+            scope: $scope,
+            controller: ['$scope', '$modalInstance', '$filter', addItemCtrl]
+        });
+        instance.result.then(function(data) {
+
+        }, function(reason) {
+            growl.error("Snapshot Creation failed: " + reason.message);
+        }).finally(function() {
+            creatingSnapshot = false;
+            $rootScope.mms_tbApi.toggleButtonSpinner('document.snapshot.create');
+        });
+
+        $rootScope.mms_tbApi.select('document.snapshot');
+
+    });
+
+    /* var refreshSnapshots = function() {
+        $rootScope.mms_tbApi.toggleButtonSpinner('document.snapshot.refresh');
+        ConfigService.getProductSnapshots(document.sysmlid, site.sysmlid, workspaceObj.id, true)
+        .then(function(result) {
+            $scope.snapshots = result;
+        }, function(reason) {
+            growl.error("Refresh Failed: " + reason.message);
+        })
+        .finally(function() {
+            $rootScope.mms_tbApi.toggleButtonSpinner('document.snapshot.refresh');
+            $rootScope.mms_tbApi.select('document.snapshot');
+
+        });
+    };
+
+    $scope.$on('document.snapshot.refresh', refreshSnapshots); */
 
     $scope.$on('tree.full.document', function() {
         $scope.fullDocMode();
@@ -1361,40 +1412,48 @@ function($anchorScroll, $filter, $location, $modal, $scope, $rootScope, $state, 
     };
 
     var siteLevel2Func = function(site, siteNode) {
-        ViewService.getSiteDocuments(site, false, ws, config === 'latest' ? 'latest' : config.timestamp)
+        ViewService.getSiteDocuments(site, false, ws, config === 'latest' ? 'latest' : tag.timestamp)
         .then(function(docs) {
-            if (config === 'latest') {
-                docs.forEach(function(doc) {
-                    var docNode = {
-                        label : doc.name,
-                        type : 'view',
-                        data : doc,
-                        site : site,
-                        children : []
-                    };
-                    siteNode.children.unshift(docNode);
-                });
-            } else {
-                var docids = [];
-                docs.forEach(function(doc) {
-                    docids.push(doc.sysmlid);
-                });
-                configSnapshots.forEach(function(snapshot) {
-                    if (docids.indexOf(snapshot.sysmlid) > -1) {
-                        snapshot.name = snapshot.sysmlname;
-                        var snapshotNode = {
-                            label : snapshot.sysmlname,
-                            type : 'snapshot',
-                            data : snapshot,
+            var filteredDocs = {};
+            if (docFilter)
+                filteredDocs = JSON.parse(docFilter.documentation);
+            
+                if (config === 'latest') {
+                    docs.forEach(function(doc) {
+                        if (filteredDocs[doc.sysmlid])
+                            return;
+                        var docNode = {
+                            label : doc.name,
+                            type : 'view',
+                            data : doc,
                             site : site,
                             children : []
                         };
-                        siteNode.children.unshift(snapshotNode);
-                    }
-                });
-            }
-            if ($scope.treeApi.refresh)
-                $scope.treeApi.refresh();
+                        siteNode.children.unshift(docNode);
+                    });
+                } else {
+                    var docids = [];
+                    docs.forEach(function(doc) {
+                        if (filteredDocs[doc.sysmlid])
+                            return;
+                        docids.push(doc.sysmlid);
+                    });
+                    configSnapshots.forEach(function(snapshot) {
+                        if (docids.indexOf(snapshot.sysmlid) > -1) {
+                            snapshot.name = snapshot.sysmlname;
+                            var snapshotNode = {
+                                label : snapshot.sysmlname,
+                                type : 'snapshot',
+                                data : snapshot,
+                                site : site,
+                                children : []
+                            };
+                            siteNode.children.unshift(snapshotNode);
+                        }
+                    });
+                }
+                if ($scope.treeApi.refresh)
+                    $scope.treeApi.refresh();
         }, function(reason) {
             growl.error(reason.message);
         });
@@ -2169,8 +2228,8 @@ function($scope, $rootScope, $stateParams, document, time, ElementService, ViewS
             $state.go('workspace.site.document.view', {view: curBranch.data.sysmlid});
     };
 }])
-.controller('FullDocCtrl', ['$scope', '$rootScope', '$stateParams', 'document', 'time', 'UxService',
-function($scope, $rootScope, $stateParams, document, time, UxService) {
+.controller('FullDocCtrl', ['$scope', '$rootScope', '$state', '$stateParams', '$window', 'document', 'workspace', 'site', 'snapshot', 'time', 'ConfigService', 'UxService', 'growl',
+function($scope, $rootScope, $state, $stateParams, $window, document, workspace, site, snapshot, time, ConfigService, UxService, growl) {
     $scope.ws = $stateParams.workspace;
     var views = [];
     if (!$rootScope.veCommentsOn)
@@ -2230,7 +2289,131 @@ function($scope, $rootScope, $stateParams, document, time, UxService) {
         $scope.bbApi.setToggleState('show.comments', $rootScope.veCommentsOn);
         $scope.bbApi.addButton(UxService.getButtonBarButton('show.elements'));
         $scope.bbApi.setToggleState('show.elements', $rootScope.veElementsOn);
+
+        // TODO: This code is duplicated in the ViewCtrl
+        // **WARNING** IF YOU CHANGE THIS CODE, NEED TO UPDATE IN VIEW CTRL TOO
+
+        if ($state.includes('workspace.site.document') || $state.includes('workspace.site.documentpreview')) {
+            if (snapshot !== null) {
+                var pdfUrl = getPDFUrl();
+                if (pdfUrl !== null && pdfUrl !== undefined) {
+                    $scope.bbApi.addButton(UxService.getButtonBarButton('download.pdf'));                
+                } else {
+                    $scope.bbApi.addButton(UxService.getButtonBarButton('generate.pdf'));
+
+                    var pdfStatus = getPDFStatus();
+                    if (pdfStatus === 'Generating...')
+                        $scope.bbApi.toggleButtonSpinner('generate.pdf');
+                    else if (pdfStatus !== null)
+                        $scope.bbApi.setTooltip('generate.pdf', pdfStatus);
+                }
+
+                var zipUrl = getZipUrl();
+                if (zipUrl !== null && zipUrl !== undefined) {
+                    $scope.bbApi.addButton(UxService.getButtonBarButton('download.zip'));                
+                } else {
+                    $scope.bbApi.addButton(UxService.getButtonBarButton('generate.zip'));
+
+                    var zipStatus = getZipStatus();
+                    if (zipStatus === 'Generating...')
+                        $scope.bbApi.toggleButtonSpinner('generate.zip');
+                    else if (zipStatus !== null)
+                        $scope.bbApi.setTooltip('generate.zip', zipStatus);
+                }
+            }
+        }
     };
+
+    // TODO: This code is duplicated in the ViewCtrl
+    // **WARNING** IF YOU CHANGE THIS CODE, NEED TO UPDATE IN VIEW CTRL TOO
+
+    var getPDFStatus = function(){
+        if(!snapshot) return null;
+        var formats = snapshot.formats;
+        if(!formats || formats.length===0) return null;
+        for(var i=0; i < formats.length; i++){
+            if(formats[i].type=='pdf') {
+                var status = formats[i].status;
+                if(status == 'Generating') status = 'Generating...';
+                else if(status == 'Error') status = 'Regenerate PDF';
+                return status;
+            }
+        }
+        return null;
+    };
+
+    var getPDFUrl = function(){
+        if(!snapshot) return null;
+        var formats = snapshot.formats;
+        if(!formats || formats.length===0) return null;
+        for(var i=0; i < formats.length; i++){
+            if(formats[i].type=='pdf'){
+                return formats[i].url;
+            }
+        }
+        return null;
+    };
+
+    var getZipStatus = function(){
+        if(!snapshot) return null;
+        var formats = snapshot.formats;
+        if(!formats || formats.length===0) return null;
+        for(var i=0; i < formats.length; i++){
+            if(formats[i].type=='html') {
+                var status = formats[i].status;
+                if(status == 'Generating') status = 'Generating...';
+                else if(status == 'Error') status = 'Regenerate Zip';
+                return status;
+            }
+        }
+        return null;
+    };
+
+    var getZipUrl = function(){
+        if(angular.isUndefined(snapshot)) return null;
+        if(snapshot===null) return null;
+        
+        var formats = snapshot.formats;
+        if(formats===undefined || formats===null || formats.length===0) return null;
+        for(var i=0; i < formats.length; i++){
+            if(formats[i].type=='html'){
+                return formats[i].url;  
+            } 
+        }
+        return null;
+    };
+
+    $scope.$on('generate.pdf', function() {
+        if (getPDFStatus() === 'Generating...')
+            return;
+        $scope.bbApi.toggleButtonSpinner('generate.pdf');
+        $scope.bbApi.toggleButtonSpinner('generate.zip');
+
+        snapshot.formats.push({"type":"pdf",  "status":"Generating"});
+        snapshot.formats.push({"type":"html", "status":"Generating"});
+        ConfigService.createSnapshotArtifact(snapshot, site.sysmlid, workspace).then(
+            function(result){
+                growl.info('Generating artifacts...Please wait for a completion email and reload the page.');
+            },
+            function(reason){
+                growl.error('Failed to generate artifacts: ' + reason.message);
+            }
+        );
+    });
+
+    $scope.$on('generate.zip', function() {
+        $rootScope.$broadcast('generate.pdf');        
+    });
+
+    $scope.$on('download.pdf', function() {
+        $window.open(getPDFUrl());
+
+    });
+
+    $scope.$on('download.zip', function() {
+        $window.open(getZipUrl());
+    });
+
     $scope.$on('show.comments', function() {
         $scope.views.forEach(function(view) {
             view.api.toggleShowComments();

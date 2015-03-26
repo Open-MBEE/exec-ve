@@ -38,7 +38,8 @@ function UxService($rootScope) {
 		        	dynamic_buttons: [getToolbarButton("view.reorder.save"), getToolbarButton("view.reorder.cancel")]};
 		  case "document.snapshot":
 		  	return  {id: button, icon: 'fa-camera', selected: false, active: true, permission:true, tooltip: 'Snapshots',
-		            spinner: false, onClick: function() {$rootScope.$broadcast(button);}};
+		            spinner: false, onClick: function() {$rootScope.$broadcast(button);},
+		            dynamic_buttons: [getToolbarButton("document.snapshot.create")]};
 		  case "tags":
             return {id: button, icon: 'fa-tag', selected: false, active: true, permission: true, tooltip: 'Tags',
                     spinner: false, onClick: function() {$rootScope.$broadcast(button);}};
@@ -61,7 +62,7 @@ function UxService($rootScope) {
 		    return {id: button, icon: 'fa-refresh', pullDown: true, dynamic: true, selected: false, active: false, permission:true, tooltip: 'Refresh',
 		            spinner: false, onClick: function() {$rootScope.$broadcast(button);}};
 		  case "document.snapshot.create":
-		    return {id: button, icon: 'fa-plus', dynamic: true, selected: false, active: false, permission:false, tooltip: 'Create Snapshot',
+		    return {id: button, icon: 'fa-plus', pullDown: true, dynamic: true, selected: false, active: false, permission:false, tooltip: 'Create Tag',
 		            spinner: false, onClick: function() {$rootScope.$broadcast(button);}};
 		}    
 	};
