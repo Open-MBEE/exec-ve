@@ -105,6 +105,16 @@ function mmsSiteDocFilter(ElementService, ViewService, growl, $templateCache, $q
                 scope.filtered.splice(index, 1);*/
         };
 
+        scope.checkall = false;
+        scope.toggleAll = function() {
+            //scope.checkall = !scope.checkall;
+            scope.siteDocs.forEach(function(sitedoc) {
+                sitedoc.show = scope.checkall;
+                scope.filtered[sitedoc.doc.sysmlid] = !scope.checkall;
+            });
+            updateSiteDocsFiltered();
+        };
+
         scope.toggleCheck = toggleCheck;
         scope.save = save;
         scope.cancel = cancel;
