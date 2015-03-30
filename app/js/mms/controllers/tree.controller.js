@@ -858,7 +858,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
                 promise = ConfigService.createConfig(config, $scope.createConfigParentId);
             }
             else if ($scope.itemType === 'Document') {
-                promise = ViewService.createDocument($scope.doc.name, $scope.addDocSite, $scope.ws);
+                promise = ViewService.createDocument($scope.doc.name, $scope.addDocSite, ws);
             }
             else if ($scope.itemType === 'View') {
                 promise = ViewService.createView($scope.createViewParentId, $scope.newView.name, 
