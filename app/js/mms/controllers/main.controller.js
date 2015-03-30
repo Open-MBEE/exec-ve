@@ -46,7 +46,7 @@ function($scope, $location, $rootScope, $state, _, $window, growl) {
                 $rootScope.mms_treeInitial = toParams.site;
             } else if ($state.current.name === 'workspace.site.documentpreview') {
                 $rootScope.mms_treeInitial = toParams.document;
-            }else if ($state.includes('workspace.site.document')) {
+            }else if ($state.includes('workspace.site.document') && ($state.current.name !== 'workspace.site.document.order')) {
                 if (toParams.view !== undefined)
                     $rootScope.mms_treeInitial = toParams.view;
                 else

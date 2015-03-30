@@ -42,10 +42,15 @@ function mmsSiteDocFilter(ElementService, ViewService, growl, $templateCache, $q
                 editable = false;
             ViewService.getSiteDocuments(scope.mmsSite, false, scope.mmsWs, scope.mmsVersion)
             .then(function(docs) {
-                docs.forEach(function(doc) {
-                    scope.siteDocs.push({show: !scope.filtered[doc.sysmlid], doc: doc});
+                updateSiteDocs(docs);
+                scope.cachedSiteDocs = docs;
+                scope.$watchCollection("cachedSiteDocs", function(newVal, oldVal) {
+                    if (newVal) {
+                        updateSiteDocs(newVal);
+                        //updateSiteDocsFiltered();
+                    }
                 });
-                updateSiteDocsFiltered();
+                //updateSiteDocsFiltered();
             }, function(reason) {
                 editable = false;
             });
@@ -55,6 +60,13 @@ function mmsSiteDocFilter(ElementService, ViewService, growl, $templateCache, $q
         
         if (scope.mmsVersion && scope.mmsVersion !== 'latest')
             editable = false;
+
+        var updateSiteDocs = function(cacheSiteDocs) {
+            scope.siteDocs = [];
+            cacheSiteDocs.forEach(function(doc) {
+                scope.siteDocs.push({show: !scope.filtered[doc.sysmlid], doc: doc});
+            });
+        };
 
         var updateSiteDocsFiltered = function() {
             scope.siteDocsFiltered = [];
@@ -73,7 +85,7 @@ function mmsSiteDocFilter(ElementService, ViewService, growl, $templateCache, $q
                     else
                         doc.show = true;
                 });
-                updateSiteDocsFiltered();
+                //updateSiteDocsFiltered();
             }
         };
 
@@ -87,7 +99,7 @@ function mmsSiteDocFilter(ElementService, ViewService, growl, $templateCache, $q
                 sysmlid: "master_filter", 
                 documentation: JSON.stringify(scope.filtered)
             }, scope.mmsWs).then(function(data) {
-                updateSiteDocsFiltered();
+                //updateSiteDocsFiltered();
                 deferred.resolve(data);
                 scope.editing = false;
             }, function(reason) {
@@ -98,11 +110,6 @@ function mmsSiteDocFilter(ElementService, ViewService, growl, $templateCache, $q
 
         var toggleCheck = function(id) {
             scope.filtered[id] = !scope.filtered[id];
-            /*var index = scope.filtered.indexOf(id);
-            if (index < 0)
-                scope.filtered.push(id);
-            else
-                scope.filtered.splice(index, 1);*/
         };
 
         scope.checkall = false;
@@ -112,7 +119,7 @@ function mmsSiteDocFilter(ElementService, ViewService, growl, $templateCache, $q
                 sitedoc.show = scope.checkall;
                 scope.filtered[sitedoc.doc.sysmlid] = !scope.checkall;
             });
-            updateSiteDocsFiltered();
+            //updateSiteDocsFiltered();
         };
 
         scope.toggleCheck = toggleCheck;

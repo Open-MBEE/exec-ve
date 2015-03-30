@@ -5,7 +5,7 @@
                 <br>
                 <form class="form-horizontal">
                     <div class="form-group">
-                        <label class="col-sm-3 control-label">Open&nbsp;Edits:</label>
+                        <label class="col-sm-3 control-label">Edits ({{veEditsLength()}}):</label>
                         <div class="col-sm-9">
                             <select class="form-control" ng-options="eid as edit.specialization.type + ': ' + edit.name for (eid, edit) in veEdits" ng-model="tracker.etrackerSelected" ng-change="etrackerChange()">
                             <!-- <option value="">--- Choose Open Edits ---</option> -->

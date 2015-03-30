@@ -62,9 +62,9 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
                 return SiteService.getSite('no_site');
             },
             document : function(ElementService, workspace, time, growl) {
-            
+                return null;
                 // This is a short-term work-around -- all this should be done the back-end MMS in the future
-                var wsCoverDocId = 'master_cover';
+                /*var wsCoverDocId = 'master_cover';
 
                 return ElementService.getElement(wsCoverDocId, false, workspace, time)
                 .then(function(data) {
@@ -99,7 +99,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
                         return null;
                     });
 
-                });
+                });*/
             },
             views: function() {
                 return null;
@@ -213,7 +213,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
 
                 });
             },
-            docFilter: function(ElementService, workspace, time) {
+            docFilter: function(ElementService, workspace, time, document) {
                 return ElementService.getElement("master_filter", false, workspace, time)
                 .then(function(data) {
                     return data;
@@ -325,7 +325,8 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
             document : function($stateParams, ElementService, workspace, site, time, growl) {
                 var siteCoverDocId;
                 if ($stateParams.site === 'no_site')
-                    siteCoverDocId = 'master_cover';
+                    return null;
+                    //siteCoverDocId = 'master_cover';
                 else
                     siteCoverDocId = site.sysmlid + '_cover';
 
@@ -344,7 +345,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
                     var doc = {
                         specialization: {type: "View"},
                         name: site.name + ' Cover Page',
-                        documentation: ''
+                        documentation: '<mms-site-docs data-mms-site="' + site.sysmlid + '">[cf:site docs]</mms-site-docs>'
                     };
                     doc.sysmlid = siteCoverDocId;
                     doc.specialization.contains = [

@@ -12,7 +12,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         }
     );
 
-    if ($state.includes('workspaces') && !$state.includes('workspace.sites')) {
+    if ($state.includes('workspace') && !$state.includes('workspace.sites')) {
         $rootScope.mms_showSiteDocLink = true;
     } else {
         $rootScope.mms_showSiteDocLink = false;

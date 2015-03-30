@@ -1,5 +1,5 @@
 <table class="table table-condensed">
-    <tr><th>Document</th><!--<th>Last Modified</th><th>Last Modified By</th><th>Created</th>--></tr>
+    <tr><th>Document(s)</th><!--<th>Last Modified</th><th>Last Modified By</th><th>Created</th>--></tr>
     <tr ng-repeat="doc in docs | orderBy: 'name'">
         <td><mms-view-link mms-did="{{doc.sysmlid}}" mms-vid="{{doc.sysmlid}}" mms-ws="{{ws}}" mms-version="{{version}}"></mms-view-link></td>
     </tr>
