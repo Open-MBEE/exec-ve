@@ -12,11 +12,7 @@ angular.module('mms.directives')
  * @restrict E
  *
  * @description
- * Given an element id, puts in the element's name binding, if there's a parent 
- * mmsView directive, will notify parent view of transclusion on init and name change,
- * and on click
  *
- * @param {string} mmsEid The id of the element whose name to transclude
  * @param {string=master} mmsWs Workspace to use, defaults to master
  * @param {string=latest} mmsVersion Version can be alfresco version number or timestamp, default is latest
  */
