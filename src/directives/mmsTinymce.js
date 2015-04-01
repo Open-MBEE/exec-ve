@@ -229,8 +229,8 @@ function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window
         };
 
         var options = {
-            plugins: 'autoresize charmap code fullscreen image link media nonbreaking paste table textcolor',
-            toolbar: 'bold italic underline strikethrough | subscript superscript blockquote | formatselect | fontsizeselect | forecolor backcolor removeformat | alignleft aligncenter alignright | bullist numlist outdent indent | table | link unlink | image media | charmap code | transclude comment vlink normalize | mvleft mvright | undo redo',
+            plugins: 'autoresize charmap code fullscreen image link media nonbreaking paste table textcolor searchreplace',
+            toolbar: 'bold italic underline strikethrough | subscript superscript blockquote | formatselect | fontsizeselect | forecolor backcolor removeformat | alignleft aligncenter alignright | bullist numlist outdent indent | table | link unlink | image media | charmap searchreplace code | transclude comment vlink normalize | mvleft mvright | undo redo',
             menubar: false,
             statusbar: true,
             nonbreaking_force_tab: true,

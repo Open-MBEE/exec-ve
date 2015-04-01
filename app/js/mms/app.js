@@ -8,6 +8,9 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
         {
             var locationPath = 'workspaces/master' + $location.url();
 
+            var queryParams = '';
+            var pathArr = locationPath.split('/');
+
             // determine if this came from docweb.html or ve.html, is there a product?
             if (locationPath.indexOf('/products/') !== -1) {
 
@@ -16,19 +19,34 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
                 locationPath = locationPath.replace('/view/', '/views/');
 
                 // if there is a view, there should be a time in the url prior
-                var pathArr = locationPath.split('/');
+                pathArr = locationPath.split('/');
 
                 // get the time param and remove it from the array
                 var time = pathArr[6]; 
                 pathArr.splice(6,1);
 
-                locationPath = pathArr.join('/');
-
                 // add time as query param if it is not latest
                 if (time && time !== 'latest') {
-                    locationPath = locationPath + "?time=" + time;
+                    queryParams += 'time=' + time;
                 }
+
             }
+
+            // if there is a config, remove it and add it as a tag query param
+            var idxOfTag = pathArr.indexOf('config');    
+            if (idxOfTag !== -1) {
+                var tag = pathArr[idxOfTag+1];
+                queryParams += 'tag=' + tag;
+                pathArr.splice(idxOfTag, 2);
+            }
+
+            locationPath = pathArr.join('/');
+
+
+            if (queryParams !== '') {
+                locationPath += '?' + queryParams;
+            }
+
             $location.url(locationPath);
         }
 
@@ -63,43 +81,6 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
             },
             document : function(ElementService, workspace, time, growl) {
                 return null;
-                // This is a short-term work-around -- all this should be done the back-end MMS in the future
-                /*var wsCoverDocId = 'master_cover';
-
-                return ElementService.getElement(wsCoverDocId, false, workspace, time)
-                .then(function(data) {
-                    return data;
-                }, function(reason) {
-
-                    // if it is an error, other than a 404 (element not found) then stop and return
-                    if (reason.status !== 404 || time !== 'latest') return null;
-
-                    var doc = {
-                        specialization: {type: "View"},
-                        name: 'Workspace Cover Page',
-                        documentation: ''
-                    };
-                    doc.sysmlid = wsCoverDocId;
-                    doc.specialization.contains = [
-                        {
-                            'type': 'Paragraph',
-                            'sourceType': 'reference',
-                            'source': wsCoverDocId,
-                            'sourceProperty': 'documentation'
-                        }
-                    ];
-                    doc.specialization.allowedElements = [wsCoverDocId];
-                    doc.specialization.displayedElements = [wsCoverDocId];
-                    doc.specialization.childrenViews = [];
-
-                    return ElementService.createElement(doc, workspace, null)
-                    .then(function(data) {
-                        return data;
-                    }, function(reason) {
-                        return null;
-                    });
-
-                });*/
             },
             views: function() {
                 return null;
