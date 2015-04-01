@@ -34,5 +34,5 @@
 </div>
 <div ng-if="mms_showTagDescriptionFix">
   <h1 class="view-title">{{tag.name}}</h1>
-  {{tag.description}}
+  <div ng-bind-html="tag.description"></div>
 </div>
