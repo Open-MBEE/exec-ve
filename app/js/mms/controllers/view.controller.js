@@ -3,8 +3,8 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('ViewCtrl', ['$scope', '$rootScope', '$state', '$stateParams', '$timeout', '$modal', '$window', 'viewElements', 'ElementService', 'ViewService', 'ConfigService', 'time', 'growl', 'workspace', 'site', 'view', 'tag', 'snapshot', 'UxService',
-function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, viewElements, ElementService, ViewService, ConfigService, time, growl, workspace, site, view, tag, snapshot, UxService) {
+.controller('ViewCtrl', ['$scope', '$rootScope', '$state', '$stateParams', '$timeout', '$modal', '$window', 'viewElements', 'ElementService', 'ViewService', 'ConfigService', 'time', 'growl', 'workspace', 'site', 'document', 'view', 'tag', 'snapshot', 'UxService',
+function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, viewElements, ElementService, ViewService, ConfigService, time, growl, workspace, site, document, view, tag, snapshot, UxService) {
     
     $scope.$on('$viewContentLoaded', 
         function(event) {
@@ -16,6 +16,17 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         $rootScope.mms_showSiteDocLink = true;
     } else {
         $rootScope.mms_showSiteDocLink = false;
+    }
+
+    // show the tag descriptions if document is null 
+    $rootScope.mms_showTagDescriptionFix = false;
+    if ($state.includes('workspace') && !$state.includes('workspace.sites')) {
+        // if document is null, and there is a tag, then save the tag to be used for
+        // the tag cover page
+        if (document === null && time !== 'latest' && tag !== null) {
+            $rootScope.mms_showTagDescriptionFix = true;
+            $scope.tag = tag;
+        }
     }
 
     $scope.showFilter = false;

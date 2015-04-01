@@ -81,43 +81,6 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
             },
             document : function(ElementService, workspace, time, growl) {
                 return null;
-                // This is a short-term work-around -- all this should be done the back-end MMS in the future
-                /*var wsCoverDocId = 'master_cover';
-
-                return ElementService.getElement(wsCoverDocId, false, workspace, time)
-                .then(function(data) {
-                    return data;
-                }, function(reason) {
-
-                    // if it is an error, other than a 404 (element not found) then stop and return
-                    if (reason.status !== 404 || time !== 'latest') return null;
-
-                    var doc = {
-                        specialization: {type: "View"},
-                        name: 'Workspace Cover Page',
-                        documentation: ''
-                    };
-                    doc.sysmlid = wsCoverDocId;
-                    doc.specialization.contains = [
-                        {
-                            'type': 'Paragraph',
-                            'sourceType': 'reference',
-                            'source': wsCoverDocId,
-                            'sourceProperty': 'documentation'
-                        }
-                    ];
-                    doc.specialization.allowedElements = [wsCoverDocId];
-                    doc.specialization.displayedElements = [wsCoverDocId];
-                    doc.specialization.childrenViews = [];
-
-                    return ElementService.createElement(doc, workspace, null)
-                    .then(function(data) {
-                        return data;
-                    }, function(reason) {
-                        return null;
-                    });
-
-                });*/
             },
             views: function() {
                 return null;
