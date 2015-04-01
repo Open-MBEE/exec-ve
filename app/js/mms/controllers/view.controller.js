@@ -226,13 +226,20 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
             return;
         }
         elementSaving = true;
+        var waitForFilter = false;
         $scope.bbApi.toggleButtonSpinner('edit.view.documentation.save');
         $scope.specApi.save().then(function(data) {
             if ($scope.filterApi.getEditing && $scope.filterApi.getEditing()) {
+                waitForFilter = true;
                 $scope.filterApi.save().then(function(filter) {
                     $state.reload();
                 }, function(reason) {
                     growl.error("Filter save error: " + reason.message);
+                }).finally(function() {
+                    $scope.bbApi.setPermission('edit.view.documentation',true);
+                    $scope.bbApi.setPermission('edit.view.documentation.save',false);
+                    $scope.bbApi.setPermission('edit.view.documentation.cancel',false);
+                    $scope.bbApi.toggleButtonSpinner('edit.view.documentation.save');
                 });
             }
             elementSaving = false;
@@ -247,9 +254,11 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
             } else {
                 $rootScope.mms_tbApi.setPermission('element.editor.saveall', false);
             }
-            $scope.bbApi.setPermission('edit.view.documentation',true);
-            $scope.bbApi.setPermission('edit.view.documentation.save',false);
-            $scope.bbApi.setPermission('edit.view.documentation.cancel',false);
+            if (!waitForFilter) {
+                $scope.bbApi.setPermission('edit.view.documentation',true);
+                $scope.bbApi.setPermission('edit.view.documentation.save',false);
+                $scope.bbApi.setPermission('edit.view.documentation.cancel',false);
+            }
         }, function(reason) {
             elementSaving = false;
             if (reason.type === 'info')
@@ -259,7 +268,8 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
             else if (reason.type === 'error')
                 growl.error(reason.message);
         }).finally(function() {
-            $scope.bbApi.toggleButtonSpinner('edit.view.documentation.save');
+            if (!waitForFilter)
+                $scope.bbApi.toggleButtonSpinner('edit.view.documentation.save');
         });
     });
 
