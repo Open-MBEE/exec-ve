@@ -8,6 +8,9 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
         {
             var locationPath = 'workspaces/master' + $location.url();
 
+            var queryParams = '';
+            var pathArr = locationPath.split('/');
+
             // determine if this came from docweb.html or ve.html, is there a product?
             if (locationPath.indexOf('/products/') !== -1) {
 
@@ -16,19 +19,34 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
                 locationPath = locationPath.replace('/view/', '/views/');
 
                 // if there is a view, there should be a time in the url prior
-                var pathArr = locationPath.split('/');
+                pathArr = locationPath.split('/');
 
                 // get the time param and remove it from the array
                 var time = pathArr[6]; 
                 pathArr.splice(6,1);
 
-                locationPath = pathArr.join('/');
-
                 // add time as query param if it is not latest
                 if (time && time !== 'latest') {
-                    locationPath = locationPath + "?time=" + time;
+                    queryParams += 'time=' + time;
                 }
+
             }
+
+            // if there is a config, remove it and add it as a tag query param
+            var idxOfTag = pathArr.indexOf('config');    
+            if (idxOfTag !== -1) {
+                var tag = pathArr[idxOfTag+1];
+                queryParams += 'tag=' + tag;
+                pathArr.splice(idxOfTag, 2);
+            }
+
+            locationPath = pathArr.join('/');
+
+
+            if (queryParams !== '') {
+                locationPath += '?' + queryParams;
+            }
+
             $location.url(locationPath);
         }
 
