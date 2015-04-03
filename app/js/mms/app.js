@@ -38,6 +38,9 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
                 var tag = pathArr[idxOfTag+1];
                 queryParams += 'tag=' + tag;
                 pathArr.splice(idxOfTag, 2);
+                var idxOfSite = pathArr.indexOf('sites'); //redirect old config page to tag landing page
+                if (idxOfSite !== -1)
+                    pathArr.splice(idxOfSite, 2);
             }
 
             locationPath = pathArr.join('/');
