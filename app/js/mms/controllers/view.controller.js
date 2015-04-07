@@ -25,6 +25,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         // the tag cover page
         if (document === null && time !== 'latest' && tag !== null) {
             $rootScope.mms_showTagDescriptionFix = true;
+            $rootScope.mms_showSiteDocLink = false;
             $scope.tag = tag;
         }
     }
