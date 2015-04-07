@@ -904,7 +904,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
     }
 
     if ($state.includes('workspace.site.document')) {
-        var delay = 300;
+        var delay = 0;
         if (document.specialization.view2view) {
             document.specialization.view2view.forEach(function(view, index) {
                 $timeout(function() {
