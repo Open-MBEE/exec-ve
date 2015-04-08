@@ -63,6 +63,10 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
         });
     }
 
+    $scope.veEditsLength = function() {
+        return Object.keys($rootScope.veEdits).length;
+    };
+
     $scope.snapshotClicked = function() {
         $scope.snapshotLoading = 'fa fa-spinner fa-spin';
     };

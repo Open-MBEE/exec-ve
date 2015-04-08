@@ -110,6 +110,10 @@ function mmsSpec(ElementService, WorkspaceService, ConfigService, $compile, $tem
                 //element.empty();
                 return;
             }
+            WorkspaceService.getWorkspace(scope.mmsWs)
+            .then(function(data) {
+                scope.workspace = data;
+            }, function(reason) {scope.workspace = null;});
             if (scope.edit && scope.tinymceApi.save)
                 scope.tinymceApi.save();
             if (scope.mmsType === 'workspace') {

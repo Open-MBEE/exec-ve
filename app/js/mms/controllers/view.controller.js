@@ -3,8 +3,8 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('ViewCtrl', ['$scope', '$rootScope', '$state', '$stateParams', '$timeout', '$modal', '$window', 'viewElements', 'ElementService', 'ViewService', 'ConfigService', 'time', 'growl', 'workspace', 'site', 'view', 'tag', 'snapshot', 'UxService',
-function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, viewElements, ElementService, ViewService, ConfigService, time, growl, workspace, site, view, tag, snapshot, UxService) {
+.controller('ViewCtrl', ['$scope', '$rootScope', '$state', '$stateParams', '$timeout', '$modal', '$window', 'viewElements', 'ElementService', 'ViewService', 'ConfigService', 'time', 'growl', 'workspace', 'site', 'document', 'view', 'tag', 'snapshot', 'UxService',
+function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, viewElements, ElementService, ViewService, ConfigService, time, growl, workspace, site, document, view, tag, snapshot, UxService) {
     
     $scope.$on('$viewContentLoaded', 
         function(event) {
@@ -12,10 +12,22 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         }
     );
 
-    if ($state.includes('workspaces') && !$state.includes('workspace.sites')) {
+    if ($state.includes('workspace') && !$state.includes('workspace.sites')) {
         $rootScope.mms_showSiteDocLink = true;
     } else {
         $rootScope.mms_showSiteDocLink = false;
+    }
+
+    // show the tag descriptions if document is null 
+    $rootScope.mms_showTagDescriptionFix = false;
+    if ($state.includes('workspace') && !$state.includes('workspace.sites')) {
+        // if document is null, and there is a tag, then save the tag to be used for
+        // the tag cover page
+        if (document === null && time !== 'latest' && tag !== null) {
+            $rootScope.mms_showTagDescriptionFix = true;
+            $rootScope.mms_showSiteDocLink = false;
+            $scope.tag = tag;
+        }
     }
 
     $scope.showFilter = false;
@@ -215,13 +227,20 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
             return;
         }
         elementSaving = true;
+        var waitForFilter = false;
         $scope.bbApi.toggleButtonSpinner('edit.view.documentation.save');
         $scope.specApi.save().then(function(data) {
             if ($scope.filterApi.getEditing && $scope.filterApi.getEditing()) {
+                waitForFilter = true;
                 $scope.filterApi.save().then(function(filter) {
                     $state.reload();
                 }, function(reason) {
                     growl.error("Filter save error: " + reason.message);
+                }).finally(function() {
+                    $scope.bbApi.setPermission('edit.view.documentation',true);
+                    $scope.bbApi.setPermission('edit.view.documentation.save',false);
+                    $scope.bbApi.setPermission('edit.view.documentation.cancel',false);
+                    $scope.bbApi.toggleButtonSpinner('edit.view.documentation.save');
                 });
             }
             elementSaving = false;
@@ -236,9 +255,11 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
             } else {
                 $rootScope.mms_tbApi.setPermission('element.editor.saveall', false);
             }
-            $scope.bbApi.setPermission('edit.view.documentation',true);
-            $scope.bbApi.setPermission('edit.view.documentation.save',false);
-            $scope.bbApi.setPermission('edit.view.documentation.cancel',false);
+            if (!waitForFilter) {
+                $scope.bbApi.setPermission('edit.view.documentation',true);
+                $scope.bbApi.setPermission('edit.view.documentation.save',false);
+                $scope.bbApi.setPermission('edit.view.documentation.cancel',false);
+            }
         }, function(reason) {
             elementSaving = false;
             if (reason.type === 'info')
@@ -248,7 +269,8 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
             else if (reason.type === 'error')
                 growl.error(reason.message);
         }).finally(function() {
-            $scope.bbApi.toggleButtonSpinner('edit.view.documentation.save');
+            if (!waitForFilter)
+                $scope.bbApi.toggleButtonSpinner('edit.view.documentation.save');
         });
     });
 

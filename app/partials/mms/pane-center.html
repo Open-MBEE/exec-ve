@@ -32,3 +32,10 @@
 
   </div>
 </div>
+<div ng-if="mms_showTagDescriptionFix">
+  <h1 class="view-title">{{tag.name}}</h1>
+  <h5>TAG DESCRIPTION</h5>
+  <div ng-bind-html="tag.description"></div>
+  <br/>
+  <mms-tag-docs mms-ws="{{ws}}" mms-tag="{{tag.id}}"></mms-tag-docs>
+</div>
