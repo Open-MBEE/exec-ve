@@ -261,6 +261,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
  
     // TODO: Make this section generic
     var workspaceLevel2Func = function(workspaceId, workspaceTreeNode) {
+        workspaceTreeNode.loading = true;
         ConfigService.getConfigs(workspaceId).then (function (data) {
             data.forEach(function (config) {
                 var configTreeNode = { 
@@ -287,6 +288,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
 
                 workspaceTreeNode.children.unshift(configTreeNode); 
             });
+            workspaceTreeNode.loading = false;
             if ($scope.treeApi.refresh)
                 $scope.treeApi.refresh();
         }, function(reason) {
@@ -295,6 +297,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
     };
 
     var siteLevel2Func = function(site, siteNode) {
+        siteNode.loading = true;
         ViewService.getSiteDocuments(site, false, ws, config === 'latest' ? 'latest' : tag.timestamp)
         .then(function(docs) {
             var filteredDocs = {};
@@ -335,6 +338,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
                         }
                     });
                 }
+                siteNode.loading = false;
                 if ($scope.treeApi.refresh)
                     $scope.treeApi.refresh();
         }, function(reason) {
@@ -355,14 +359,16 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
             label: document.name,
             type: 'view',
             data: document,
-            children: []
+            children: [],
+            loading: true
         };
         views.forEach(function(view) {
             var viewTreeNode = { 
                 label : view.name, 
                 type : "view",
                 data : view, 
-                children : [] 
+                children : [], 
+                loading: true
             };
             viewId2node[view.sysmlid] = viewTreeNode;
             //addSectionElements(elements[i], viewTreeNode, viewTreeNode);
@@ -897,6 +903,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
     function addViewSections(view) {
         var node = viewId2node[view.sysmlid];
         addSectionElements(view, node, node);
+        node.loading = false;
         $scope.treeApi.refresh();
         if (view.specialization.displayedElements && view.specialization.displayedElements.length < 20) {
             ViewService.getViewElements(view.sysmlid, false, ws, time);

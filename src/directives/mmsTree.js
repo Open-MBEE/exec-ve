@@ -241,7 +241,10 @@ function mmsTree($timeout, $log, $templateCache) {
                         expand_icon = attrs.iconExpand;
                 } else
                     expand_icon = "fa fa-lg fa-fw";
-                if (scope.options && scope.options.types && scope.options.types[branch.type])
+
+                if (branch.loading)
+                    type_icon = "fa fa-spinner fa-spin";
+                else if (scope.options && scope.options.types && scope.options.types[branch.type])
                     type_icon = scope.options.types[branch.type.toLowerCase()];
                 else
                     type_icon = attrs.iconDefault;
