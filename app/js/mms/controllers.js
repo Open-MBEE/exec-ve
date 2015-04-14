@@ -149,11 +149,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     $scope.bbApi.init = function() {
         if (view && view.editable && time === 'latest') {
             $scope.bbApi.addButton(UxService.getButtonBarButton('edit.view.documentation'));
-            $scope.bbApi.addButton(UxService.getButtonBarButton('view.add.table'));
-            $scope.bbApi.addButton(UxService.getButtonBarButton('view.add.list'));
-            $scope.bbApi.addButton(UxService.getButtonBarButton('view.add.paragraph'));
-            $scope.bbApi.addButton(UxService.getButtonBarButton('view.add.image'));
-            $scope.bbApi.addButton(UxService.getButtonBarButton('view.add.section'));
+            $scope.bbApi.addButton(UxService.getButtonBarButton('view.add.dropdown'));
         }
 
         $scope.bbApi.addButton(UxService.getButtonBarButton('edit.view.documentation.save'));
@@ -162,8 +158,8 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         $scope.bbApi.setToggleState('show.comments', $rootScope.veCommentsOn);
         $scope.bbApi.addButton(UxService.getButtonBarButton('show.elements'));
         $scope.bbApi.setToggleState('show.elements', $rootScope.veElementsOn);
-        $scope.bbApi.addButton(UxService.getButtonBarButton('show.edits'));
-        $scope.bbApi.setToggleState('show.edits', $rootScope.veEditsOn);
+        // $scope.bbApi.addButton(UxService.getButtonBarButton('show.edits'));
+        // $scope.bbApi.setToggleState('show.edits', $rootScope.veEditsOn);
 
         // TODO: This code is duplicated in the FullDocCtrl
         // **WARNING** IF YOU CHANGE THIS CODE, NEED TO UPDATE IN FULL DOC CTRL TOO

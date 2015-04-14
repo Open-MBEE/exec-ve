@@ -148,6 +148,12 @@ function UxService($rootScope) {
           case "generate.zip":
             return {id: button, icon: 'fa-file-zip-o', selected: true, active: true, permission: true, tooltip: 'Generate ZIP', 
                     spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
+          case "view.add.dropdown":
+            return {id: button, icon: 'fa-plus', selected: true, active: true, permission: true, tooltip: 'Add Item', 
+                    spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);},
+                	dropdown_buttons: [getButtonBarButton("view.add.paragraph"), getButtonBarButton("view.add.table"),
+                						getButtonBarButton("view.add.list"), getButtonBarButton("view.add.image"),
+                						getButtonBarButton("view.add.section")]};
           case "view.add.table":
             return {id: button, icon: 'fa-table', selected: true, active: true, permission: true, tooltip: 'Add Table', 
                     spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
