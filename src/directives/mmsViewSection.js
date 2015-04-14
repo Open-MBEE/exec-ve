@@ -6,7 +6,7 @@ angular.module('mms.directives')
 function mmsViewSection($compile, $templateCache, ElementService) {
     var template = $templateCache.get('mms/templates/mmsViewSection.html');
 
-    var mmsViewSectionCtrl = function($scope) {
+    var mmsViewSectionCtrl = function($scope, $rootScope) {
 
         $scope.sectionInstanceVals = [];
 
@@ -16,6 +16,10 @@ function mmsViewSection($compile, $templateCache, ElementService) {
 
             $scope.sectionInstanceVals = $scope.section.specialization.instanceSpecificationSpecification.operand;
         }
+
+         $scope.deleteSection = function(instanceVal) {
+            $rootScope.$broadcast('element.delete', instanceVal);
+        };
     };
 
     var mmsViewSectionLink = function(scope, element, attrs, mmsViewCtrl) {
@@ -33,9 +37,10 @@ function mmsViewSection($compile, $templateCache, ElementService) {
         restrict: 'E',
         scope: {
             section: '=mmsSection',
+            instanceVal: '=mmsInstanceVal'
         },
         require: '?^mmsView',
-        controller: ['$scope', mmsViewSectionCtrl],
+        controller: ['$scope', '$rootScope', mmsViewSectionCtrl],
         link: mmsViewSectionLink
     };
 }

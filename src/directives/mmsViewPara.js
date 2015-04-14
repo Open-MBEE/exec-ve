@@ -8,7 +8,7 @@ function mmsViewPara($templateCache, $compile, $rootScope) {
     
     var mmsViewParamCtrl = function ($scope, $rootScope) {
         $scope.deleteParagraph = function(instanceVal) {
-            $rootScope.$broadcast('element.paragraph.delete', instanceVal);
+            $rootScope.$broadcast('element.delete', instanceVal);
         };
     };
 

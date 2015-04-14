@@ -609,7 +609,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         });
     });
 
-    $scope.$on('element.paragraph.delete', function(event, instanceVal) {
+    var deleteInstanceValFromView = function(instanceVal) {
         ViewService.deleteElementFromView(view.sysmlid, workspace, instanceVal).then(function(data) {
             growl.success('Delete Successful');
         }, function(reason) {
@@ -622,7 +622,10 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         }).finally(function() {
             // $scope.bbApi.toggleButtonSpinner('edit.view.documentation.save');
         });
+    };
 
+    $scope.$on('element.delete', function(event, instanceVal) {
+        deleteInstanceValFromView(instanceVal);
     });
 
     $scope.$on('show.comments', function() {

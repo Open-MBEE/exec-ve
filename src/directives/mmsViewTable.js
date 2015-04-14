@@ -6,6 +6,12 @@ angular.module('mms.directives')
 function mmsViewTable($compile, $timeout, $templateCache) {
     var template = $templateCache.get('mms/templates/mmsViewTable.html');
     
+    var mmsViewTableCtrl = function ($scope, $rootScope) {
+        $scope.deleteTable = function(instanceVal) {
+            $rootScope.$broadcast('element.delete', instanceVal);
+        };
+    };
+
     var mmsViewTableLink = function(scope, element, attrs) {
         scope.tableLimit = 20;
 
@@ -28,7 +34,9 @@ function mmsViewTable($compile, $timeout, $templateCache) {
         //template: template,
         scope: {
             table: '=mmsTable',
+            instanceVal: '=mmsInstanceVal'
         },
+        controller: ['$scope', '$rootScope', mmsViewTableCtrl],
         link: mmsViewTableLink
     };
 }
