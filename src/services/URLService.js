@@ -304,7 +304,13 @@ function urlService(baseUrl) {
     };
 
     var getPostElementsWithSiteURL = function(workspace, site) {
-        return root + '/workspaces/' + workspace + '/sites/' + site + '/elements';
+        if (root && workspace && site) {
+            // TODO maybe move this check elsewhere to keep this method simple
+            if (site === 'no-site') {
+                site = 'no_site';
+            }
+            return root + '/workspaces/' + workspace + '/sites/' + site + '/elements';
+        }
     };
 
     /**
