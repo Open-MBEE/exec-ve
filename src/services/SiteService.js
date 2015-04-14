@@ -47,6 +47,7 @@ function SiteService($q, $http, URLService, CacheService, _) {
             if (result)
                 deferred.resolve(result);
             else if (site === 'no_site')
+                // TODO GG thinks this is wrong.  'no_site' for both symlid/name would be better
                 deferred.resolve({name:'No Site', sysmlid:'no-site'});
             else
                 deferred.reject({status: 404, data: '', message: "Site not found"});

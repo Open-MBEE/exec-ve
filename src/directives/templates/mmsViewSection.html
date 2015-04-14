@@ -8,11 +8,6 @@
         <mms-view-section data-mms-section="contain" ng-switch-when="Section"></mms-view-section>
     </div>
 
-    <!-- TODO: This assumes that instanceSpecificationSpecification is a embedded json object -->
-<!--     <div ng-repeat="instanceVal in section.specialization.instanceSpecificationSpecification.operand"> 
-        <mms-view-elem-ref-tree data-mms-instance-val="instanceVal"></mms-view-elem-ref-tree>
-    </div> -->
-
     <div ng-repeat="instanceVal in sectionInstanceVals"> 
         <mms-view-elem-ref-tree data-mms-instance-val="instanceVal"></mms-view-elem-ref-tree>
     </div>

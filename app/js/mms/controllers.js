@@ -403,21 +403,20 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
  
     $scope.$on('view.add.paragraph', function() {
 
-        ViewService.addParagraph(view, workspace, true);
+        ViewService.addParagraph(view, workspace, true, site.sysmlid);
     });
 
     $scope.$on('view.add.list', function() {
 
         // Create a Opaque List:
         var parElement = {
-             "owner": view.sysmlid,
              "name": "Untitled Paragraph",
              "specialization": {
                   "type":"Element"
               }
         };
 
-        ElementService.createElement(parElement, workspace).then(function(createdParElement) {
+        ElementService.createElement(parElement, workspace, site.sysmlid).then(function(createdParElement) {
 
             var paragraph = {
                 "sourceType": "reference",
@@ -434,17 +433,15 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
             };
 
             var listWrapper = {
-                "owner": view.sysmlid,
                 "specialization": {
                     "string":JSON.stringify(list),
                     "type":"LiteralString"
                 }
             };
 
-            ElementService.createElement(listWrapper, workspace).then(function(createdListWrapper) {
+            ElementService.createElement(listWrapper, workspace, site.sysmlid).then(function(createdListWrapper) {
 
                 var instanceSpec = {
-                    "owner": view.sysmlid,
                     "specialization": {
                       "type":"InstanceSpecification",
                       "classifier":["PE_Opaque_List"],
@@ -452,7 +449,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
                    }
                 };
 
-                ElementService.createElement(instanceSpec, workspace).then(function(createdInstanceSpec) {
+                ElementService.createElement(instanceSpec, workspace, site.sysmlid).then(function(createdInstanceSpec) {
 
                     var instanceVal = {
                         "instance":createdInstanceSpec.sysmlid,
@@ -472,14 +469,13 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
 
         // Create a Opaque Table:
         var parElement = {
-             "owner": view.sysmlid,
              "name": "Untitled Paragraph",
              "specialization": {
                   "type":"Element"
               }
         };
 
-        ElementService.createElement(parElement, workspace).then(function(createdParElement) {
+        ElementService.createElement(parElement, workspace, site.sysmlid).then(function(createdParElement) {
 
             var paragraph = {
                 "sourceType": "reference",
@@ -509,17 +505,15 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
             };
 
             var tableWrapper = {
-                "owner": view.sysmlid,
                 "specialization": {
                     "string":JSON.stringify(table),
                     "type":"LiteralString"
                 }
             };
 
-            ElementService.createElement(tableWrapper, workspace).then(function(createdTableWrapper) {
+            ElementService.createElement(tableWrapper, workspace, site.sysmlid).then(function(createdTableWrapper) {
 
                 var instanceSpec = {
-                    "owner": view.sysmlid,
                     "specialization": {
                       "type":"InstanceSpecification",
                       "classifier":["PE_Opaque_Table"],
@@ -527,7 +521,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
                    }
                 };
 
-                ElementService.createElement(instanceSpec, workspace).then(function(createdInstanceSpec) {
+                ElementService.createElement(instanceSpec, workspace, site.sysmlid).then(function(createdInstanceSpec) {
 
                     var instanceVal = {
                         "instance":createdInstanceSpec.sysmlid,
@@ -547,10 +541,9 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     $scope.$on('view.add.section', function() {
 
         // Create a Opaque Section:
-        ViewService.addParagraph(view, workspace, false).then(function(createdInstanceVal) {
+        ViewService.addParagraph(view, workspace, false, site.sysmlid).then(function(createdInstanceVal) {
 
             var sectionWrapper = {
-                "owner": view.sysmlid,
                 "specialization": {
                     "operand":[{
                                     "instance": createdInstanceVal.sysmlid,
@@ -560,10 +553,9 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
                 }
             };
 
-            ElementService.createElement(sectionWrapper, workspace).then(function(createdSectionWrapper) {
+            ElementService.createElement(sectionWrapper, workspace, site.sysmlid).then(function(createdSectionWrapper) {
 
                 var instanceSpec = {
-                    "owner": view.sysmlid,
                     "name": "Untitled Section",
                     "specialization": {
                       "type":"InstanceSpecification",
@@ -572,7 +564,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
                    }
                 };
 
-                ElementService.createElement(instanceSpec, workspace).then(function(createdInstanceSpec) {
+                ElementService.createElement(instanceSpec, workspace, site.sysmlid).then(function(createdInstanceSpec) {
 
                     var instanceVal = {
                         "instance":createdInstanceSpec.sysmlid,
@@ -596,14 +588,13 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
 
         // Create a Opaque Image:
         var imageElement = {
-             "owner": view.sysmlid,
              "name": "Untitled Image",
              "specialization": {
                   "type":"Element"
               }
         };
 
-        ElementService.createElement(imageElement, workspace).then(function(createdImageElement) {
+        ElementService.createElement(imageElement, workspace, site.sysmlid).then(function(createdImageElement) {
 
             var image = {
                 "sysmlid": createdImageElement.sysmlid,
@@ -611,17 +602,15 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
             };
 
             var imageWrapper = {
-                "owner": view.sysmlid,
                 "specialization": {
                     "string":JSON.stringify(image),
                     "type":"LiteralString"
                 }
             };
 
-            ElementService.createElement(imageWrapper, workspace).then(function(createdImageWrapper) {
+            ElementService.createElement(imageWrapper, workspace, site.sysmlid).then(function(createdImageWrapper) {
 
                 var instanceSpec = {
-                    "owner": view.sysmlid,
                     "specialization": {
                       "type":"InstanceSpecification",
                       "classifier":["PE_Opaque_Image"],
@@ -629,7 +618,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
                    }
                 };
 
-                ElementService.createElement(instanceSpec, workspace).then(function(createdInstanceSpec) {
+                ElementService.createElement(instanceSpec, workspace, site.sysmlid).then(function(createdInstanceSpec) {
 
                     var instanceVal = {
                         "instance":createdInstanceSpec.sysmlid,
@@ -1550,18 +1539,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
             // For Sections, the contents expression is the instanceSpecificationSpecification:
             else if (ViewService.isSection(element) &&
                      element.specialization.instanceSpecificationSpecification) {
-                // TODO: this is assuming a embedded json object, server doesnt do that yet
-                //contents = element.specialization.instanceSpecificationSpecification;
-                var sectionId = element.specialization.instanceSpecificationSpecification;
-                ElementService.getElement(sectionId, false, $scope.workspace).
-                then(function(element) {
-                    if (element && element.specialization.operand) {
-                        j = element.specialization.operand.length - 1;
-                        for (; j >= 0; j--) {
-                            addContentsSectionTreeNode(element.specialization.operand[j]);
-                        }
-                    }
-                });
+                contents = element.specialization.instanceSpecificationSpecification;
             }
         }
         else {

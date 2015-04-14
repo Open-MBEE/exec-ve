@@ -10,13 +10,11 @@ function mmsViewSection($compile, $templateCache, ElementService) {
 
         $scope.sectionInstanceVals = [];
 
-        // TODO this will not be needed once server side has embedded objects
-        if ($scope.section && $scope.section.specialization.instanceSpecificationSpecification) {
-            var instanceSpecSpecId = $scope.section.specialization.instanceSpecificationSpecification;
-            ElementService.getElement(instanceSpecSpecId, false, $scope.workspace).
-            then(function(element) {
-                $scope.sectionInstanceVals = element.specialization.operand;
-            });
+        if ($scope.section && $scope.section.specialization && 
+            $scope.section.specialization.instanceSpecificationSpecification && 
+            $scope.section.specialization.instanceSpecificationSpecification.operand) {
+
+            $scope.sectionInstanceVals = $scope.section.specialization.instanceSpecificationSpecification.operand;
         }
     };
 

@@ -330,68 +330,78 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
     var deleteElementFromView = function(viewId, workspace, instanceVal) {
 
         var deferred = $q.defer();
-        var ws = !workspace ? 'master' : workspace;
-        var docViewsCacheKey = ['products', ws, viewId, 'latest', 'views'];
-        getDocument(viewId, false, ws)
-        .then(function(data) {  
-            var clone = {};
-            clone.sysmlid = data.sysmlid;
-            //clone.read = data.read;
-            clone.specialization = _.cloneDeep(data.specialization);
-            delete clone.specialization.contains;
-            // Remove from contents and delete all other associated nodes:
-            if (clone.specialization.contents) {
-                for (var i = 0; i < data.specialization.contents.length; i++) {
-                    if (instanceVal.instance === data.specialization.contents[i].instance) {
-                        clone.specialization.contents.splice(i,1);
+
+        if (instanceVal) {
+            var ws = !workspace ? 'master' : workspace;
+            var docViewsCacheKey = ['products', ws, viewId, 'latest', 'views'];
+            getDocument(viewId, false, ws)
+            .then(function(data) {  
+                var clone = {};
+                clone.sysmlid = data.sysmlid;
+                //clone.read = data.read;
+                clone.specialization = _.cloneDeep(data.specialization);
+                delete clone.specialization.contains;
+                // Remove from contents and delete all other associated nodes:
+                if (clone.specialization.contents) {
+                    for (var i = 0; i < data.specialization.contents.length; i++) {
+                        if (instanceVal.instance === data.specialization.contents[i].instance) {
+                            clone.specialization.contents.splice(i,1);
+                        }
                     }
                 }
-            }
-            // Delete the instance spec pointed to be the instanceVal and all its children:
-            // TODO verify that parent/child relationships are such that this will delete 
-            //      everything needed:
-            // TODO error message on failure to delete?
-            ElementService.deleteElement(instanceVal.instance, workspace);
+                // Delete the instance spec pointed to be the instanceVal and all its children:
+                // TODO verify that parent/child relationships are such that this will delete 
+                //      everything needed
+                // TODO error message on failure to delete?
+                ElementService.deleteElement(instanceVal.instance, workspace);
 
-            updateDocument(clone, ws)
-            .then(function(data2) {
-                deferred.resolve(data2);
+                updateDocument(clone, ws)
+                .then(function(data2) {
+                    deferred.resolve(data2);
+                }, function(reason) {
+                    if (reason.status === 409) {
+                        clone.read = reason.data.elements[0].read;
+                        clone.modified = reason.data.elements[0].modified;
+                        updateDocument(clone, ws)
+                        .then(function(data3) {
+                            deferred.resolve(data3);
+                        }, function(reason2) {
+                            deferred.reject(reason2);
+                        });
+                    } else
+                        deferred.reject(reason);
+                });
             }, function(reason) {
-                if (reason.status === 409) {
-                    clone.read = reason.data.elements[0].read;
-                    clone.modified = reason.data.elements[0].modified;
-                    updateDocument(clone, ws)
-                    .then(function(data3) {
-                        deferred.resolve(data3);
-                    }, function(reason2) {
-                        deferred.reject(reason2);
-                    });
-                } else
-                    deferred.reject(reason);
+                deferred.reject(reason);
             });
-        }, function(reason) {
-            deferred.reject(reason);
-        });
+        }
         return deferred.promise;
     };
 
     /**
-    * TODO add comments
+     * Adds a opaque paragraph to the passed view if addToView is true,
+     * otherwise, just creates the opaque paragraph but doesnt add it the
+     * view.
+     *
+     * @param {string} view Id of the View to add to
+     * @param {string} [workspace=master] workspace to use
+     * @param {string} addToView true if wanting to add the paragraph to the view
+     * @param {string} [site=null] (optional) site to post to 
+     * @returns {Promise} The promise would be resolved with updated View object
     */
-    var addParagraph = function(view, workspace, addToView) {
+    var addParagraph = function(view, workspace, addToView, site) {
 
         var deferred = $q.defer();
 
         // Create a Untitled Opaque Paragraph:
         var parElement = {
-             "owner": view.sysmlid,
              "name": "Untitled Paragraph",
              "specialization": {
                   "type":"Element"
               }
         };
 
-        ElementService.createElement(parElement, workspace).then(function(createdParElement) {
+        ElementService.createElement(parElement, workspace, site).then(function(createdParElement) {
 
             var paragraph = {
                 "sourceType": "reference",
@@ -401,14 +411,13 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
             };
 
             var paragraphWrapper = {
-                "owner": view.sysmlid,
                 "specialization": {
                     "string":JSON.stringify(paragraph),
                     "type":"LiteralString"
                 }
             };
 
-            ElementService.createElement(paragraphWrapper, workspace).then(function(createdParagraphWrapper) {
+            ElementService.createElement(paragraphWrapper, workspace, site).then(function(createdParagraphWrapper) {
 
                 var instanceSpec = {
                     "owner": view.sysmlid,
@@ -419,7 +428,7 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
                    }
                 };
 
-                ElementService.createElement(instanceSpec, workspace).then(function(createdInstanceSpec) {
+                ElementService.createElement(instanceSpec, workspace, site).then(function(createdInstanceSpec) {
 
                     deferred.resolve(createdInstanceSpec);
 
@@ -597,34 +606,25 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
             // InstanceSpecifcations can have instanceSpecificationSpecification 
             // for opaque presentation elements, or slots:
 
-            // TODO eventually instanceSpecificationSpecification will most likely be 
-            //      a embedded json object, but for now look it up:
-            var instanceSpecSpecId = instanceSpec.specialization.instanceSpecificationSpecification;
-            //var instanceSpecSpec = instanceSpec.specialization.instanceSpecificationSpecification;
+            var instanceSpecSpec = instanceSpec.specialization.instanceSpecificationSpecification;
+            var type = instanceSpecSpec.type;
 
-            // TODO do we need version?
-            ElementService.getElement(instanceSpecSpecId, false, workspace)
-            .then(function(instanceSpecSpec) {
-
-                // TODO will become instanceSpecSpec.type when its a embedded object
-                var type = instanceSpecSpec.specialization.type;
-                // If it is a Opaque List, Paragraph, Table, Image, List:
-                if (type === 'LiteralString') {
-                    var jsonString = instanceSpecSpec.specialization.string;  // TODO take out specialization
-                    deferred.resolve(JSON.parse(jsonString)); 
+            // If it is a Opaque List, Paragraph, Table, Image, List:
+            if (type === 'LiteralString') {
+                var jsonString = instanceSpecSpec.string;
+                deferred.resolve(JSON.parse(jsonString)); 
+            }
+            // If it is a Opaque Section, or a Expression:
+            else if (type === 'Expression') {
+                // If it is a Opaque Section then we want the instanceSpec:
+                if (isSection(instanceSpec)) {
+                    deferred.resolve(instanceSpec);
                 }
-                // If it is a Opaque Section, or a Expression:
-                else if (type === 'Expression') {
-                    // If it is a Opaque Section then we want the instanceSpec:
-                    if (isSection(instanceSpec)) {
-                        deferred.resolve(instanceSpec);
-                    }
-                    // Will we ever have an Expression otherwise?
-                    else {
-                        deferred.resolve(instanceSpecSpec);
-                    }
+                // Will we ever have an Expression otherwise?
+                else {
+                    deferred.resolve(instanceSpecSpec);
                 }
-            });
+            }
 
             // If it is a non-Opaque presentation element:
             if (instanceSpec.slots) {
