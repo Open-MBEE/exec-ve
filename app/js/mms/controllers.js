@@ -433,32 +433,26 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
             };
 
             var listWrapper = {
-                "specialization": {
-                    "string":JSON.stringify(list),
-                    "type":"LiteralString"
-                }
+                "string":JSON.stringify(list),
+                "type":"LiteralString"
             };
 
-            ElementService.createElement(listWrapper, workspace, site.sysmlid).then(function(createdListWrapper) {
+            var instanceSpec = {
+                "specialization": {
+                  "type":"InstanceSpecification",
+                  "classifier":["PE_Opaque_List"],
+                  "instanceSpecificationSpecification":listWrapper
+               }
+            };
 
-                var instanceSpec = {
-                    "specialization": {
-                      "type":"InstanceSpecification",
-                      "classifier":["PE_Opaque_List"],
-                      "instanceSpecificationSpecification":createdListWrapper.sysmlid
-                   }
+            ElementService.createElement(instanceSpec, workspace, site.sysmlid).then(function(createdInstanceSpec) {
+
+                var instanceVal = {
+                    "instance":createdInstanceSpec.sysmlid,
+                    "type":"InstanceValue"
                 };
 
-                ElementService.createElement(instanceSpec, workspace, site.sysmlid).then(function(createdInstanceSpec) {
-
-                    var instanceVal = {
-                        "instance":createdInstanceSpec.sysmlid,
-                        "type":"InstanceValue"
-                    };
-
-                    ViewService.addElementToView(view.sysmlid, view.sysmlid, workspace, instanceVal);
-                });
-
+                ViewService.addElementToView(view.sysmlid, view.sysmlid, workspace, instanceVal);
             });
 
         });
@@ -505,32 +499,26 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
             };
 
             var tableWrapper = {
-                "specialization": {
-                    "string":JSON.stringify(table),
-                    "type":"LiteralString"
-                }
+                "string":JSON.stringify(table),
+                "type":"LiteralString"
             };
 
-            ElementService.createElement(tableWrapper, workspace, site.sysmlid).then(function(createdTableWrapper) {
+            var instanceSpec = {
+                "specialization": {
+                  "type":"InstanceSpecification",
+                  "classifier":["PE_Opaque_Table"],
+                  "instanceSpecificationSpecification":tableWrapper
+               }
+            };
 
-                var instanceSpec = {
-                    "specialization": {
-                      "type":"InstanceSpecification",
-                      "classifier":["PE_Opaque_Table"],
-                      "instanceSpecificationSpecification":createdTableWrapper.sysmlid
-                   }
+            ElementService.createElement(instanceSpec, workspace, site.sysmlid).then(function(createdInstanceSpec) {
+
+                var instanceVal = {
+                    "instance":createdInstanceSpec.sysmlid,
+                    "type":"InstanceValue"
                 };
 
-                ElementService.createElement(instanceSpec, workspace, site.sysmlid).then(function(createdInstanceSpec) {
-
-                    var instanceVal = {
-                        "instance":createdInstanceSpec.sysmlid,
-                        "type":"InstanceValue"
-                    };
-
-                    ViewService.addElementToView(view.sysmlid, view.sysmlid, workspace, instanceVal);
-                });
-
+                ViewService.addElementToView(view.sysmlid, view.sysmlid, workspace, instanceVal);
             });
 
         });
@@ -544,40 +532,34 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         ViewService.addParagraph(view, workspace, false, site.sysmlid).then(function(createdInstanceVal) {
 
             var sectionWrapper = {
-                "specialization": {
-                    "operand":[{
-                                    "instance": createdInstanceVal.sysmlid,
-                                    "type":"InstanceValue"   
-                    }],
-                    "type":"Expression"
-                }
+                "operand":[{
+                                "instance": createdInstanceVal.sysmlid,
+                                "type":"InstanceValue"   
+                }],
+                "type":"Expression"
             };
 
-            ElementService.createElement(sectionWrapper, workspace, site.sysmlid).then(function(createdSectionWrapper) {
+            var instanceSpec = {
+                "name": "Untitled Section",
+                "specialization": {
+                  "type":"InstanceSpecification",
+                  "classifier":["PE_Opaque_Section"],
+                  "instanceSpecificationSpecification":sectionWrapper
+               }
+            };
 
-                var instanceSpec = {
-                    "name": "Untitled Section",
-                    "specialization": {
-                      "type":"InstanceSpecification",
-                      "classifier":["PE_Opaque_Section"],
-                      "instanceSpecificationSpecification":createdSectionWrapper.sysmlid
-                   }
+            ElementService.createElement(instanceSpec, workspace, site.sysmlid).then(function(createdInstanceSpec) {
+
+                var instanceVal = {
+                    "instance":createdInstanceSpec.sysmlid,
+                    "type":"InstanceValue"
                 };
 
-                ElementService.createElement(instanceSpec, workspace, site.sysmlid).then(function(createdInstanceSpec) {
-
-                    var instanceVal = {
-                        "instance":createdInstanceSpec.sysmlid,
-                        "type":"InstanceValue"
-                    };
-
-                    ViewService.addElementToView(view.sysmlid, view.sysmlid, workspace, instanceVal).
-                    then (function (data) {
-                        // Broadcast message to TreeCtrl:
-                        $rootScope.$broadcast('viewctrl.add.section', instanceSpec);
-                    });
+                ViewService.addElementToView(view.sysmlid, view.sysmlid, workspace, instanceVal).
+                then (function (data) {
+                    // Broadcast message to TreeCtrl:
+                    $rootScope.$broadcast('viewctrl.add.section', instanceSpec);
                 });
-
             });
 
         });
@@ -602,32 +584,26 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
             };
 
             var imageWrapper = {
-                "specialization": {
-                    "string":JSON.stringify(image),
-                    "type":"LiteralString"
-                }
+                "string":JSON.stringify(image),
+                "type":"LiteralString"
             };
 
-            ElementService.createElement(imageWrapper, workspace, site.sysmlid).then(function(createdImageWrapper) {
+            var instanceSpec = {
+                "specialization": {
+                  "type":"InstanceSpecification",
+                  "classifier":["PE_Opaque_Image"],
+                  "instanceSpecificationSpecification":imageWrapper
+               }
+            };
 
-                var instanceSpec = {
-                    "specialization": {
-                      "type":"InstanceSpecification",
-                      "classifier":["PE_Opaque_Image"],
-                      "instanceSpecificationSpecification":createdImageWrapper.sysmlid
-                   }
+            ElementService.createElement(instanceSpec, workspace, site.sysmlid).then(function(createdInstanceSpec) {
+
+                var instanceVal = {
+                    "instance":createdInstanceSpec.sysmlid,
+                    "type":"InstanceValue"
                 };
 
-                ElementService.createElement(instanceSpec, workspace, site.sysmlid).then(function(createdInstanceSpec) {
-
-                    var instanceVal = {
-                        "instance":createdInstanceSpec.sysmlid,
-                        "type":"InstanceValue"
-                    };
-
-                    ViewService.addElementToView(view.sysmlid, view.sysmlid, workspace, instanceVal);
-                });
-
+                ViewService.addElementToView(view.sysmlid, view.sysmlid, workspace, instanceVal);
             });
 
         });

@@ -411,37 +411,31 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
             };
 
             var paragraphWrapper = {
-                "specialization": {
-                    "string":JSON.stringify(paragraph),
-                    "type":"LiteralString"
-                }
+                "string":JSON.stringify(paragraph),
+                "type":"LiteralString"
             };
 
-            ElementService.createElement(paragraphWrapper, workspace, site).then(function(createdParagraphWrapper) {
+            var instanceSpec = {
+                "owner": view.sysmlid,
+                "specialization": {
+                  "type":"InstanceSpecification",
+                  "classifier":["PE_Opaque_Paragraph"],
+                  "instanceSpecificationSpecification":paragraphWrapper
+               }
+            };
 
-                var instanceSpec = {
-                    "owner": view.sysmlid,
-                    "specialization": {
-                      "type":"InstanceSpecification",
-                      "classifier":["PE_Opaque_Paragraph"],
-                      "instanceSpecificationSpecification":createdParagraphWrapper.sysmlid
-                   }
+            ElementService.createElement(instanceSpec, workspace, site).then(function(createdInstanceSpec) {
+
+                deferred.resolve(createdInstanceSpec);
+
+                var instanceVal = {
+                    "instance":createdInstanceSpec.sysmlid,
+                    "type":"InstanceValue"
                 };
 
-                ElementService.createElement(instanceSpec, workspace, site).then(function(createdInstanceSpec) {
-
-                    deferred.resolve(createdInstanceSpec);
-
-                    var instanceVal = {
-                        "instance":createdInstanceSpec.sysmlid,
-                        "type":"InstanceValue"
-                    };
-
-                    if (addToView) {
-                        addElementToView(view.sysmlid, view.sysmlid, workspace, instanceVal);
-                    }
-                });
-
+                if (addToView) {
+                    addElementToView(view.sysmlid, view.sysmlid, workspace, instanceVal);
+                }
             });
 
         });
