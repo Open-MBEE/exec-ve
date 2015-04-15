@@ -21,8 +21,8 @@
         </li>
 
         <li ng-show="ws"> <i class="fa fa-ellipsis-v"></i> {{wsName}} <span ng-if="config.timestamp != 'latest' && showTag != 'false'">( <i class="fa fa-tag"></i> {{config.name}} )</span> <i class="fa fa-angle-double-right"></i><li>
-        <li ng-show="ws">
-          <a class="nav-btn" tooltip="Sites and Documents" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" ui-sref="workspace.sites()"><i class="fa fa-folder"></i></a>
+        <li ng-show="site && site.sysmlid !== 'no-site'">
+          <a class="nav-btn" tooltip="Sites and Documents" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" ui-sref="workspace.site(site.sysmlid)"><i class="fa fa-folder"></i></a>
         </li>
         <li ng-show="site && site.sysmlid !== 'no-site'"> <i class="fa fa-ellipsis-v"></i> {{site.name}} <i class="fa fa-angle-double-right"></i></li>
         <li ng-show="product">
