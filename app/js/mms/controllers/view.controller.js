@@ -47,6 +47,8 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         $rootScope.veCommentsOn = false;
     if (!$rootScope.veElementsOn)
         $rootScope.veElementsOn = false;
+    if (!$rootScope.veEditsOn)
+        $rootScope.veEditsOn = false;
 
     var ws = $stateParams.workspace;
 
@@ -60,6 +62,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     $scope.bbApi.init = function() {
         if (view && view.editable && time === 'latest') {
             $scope.bbApi.addButton(UxService.getButtonBarButton('edit.view.documentation'));
+            $scope.bbApi.addButton(UxService.getButtonBarButton('view.add.dropdown'));
         }
 
         $scope.bbApi.addButton(UxService.getButtonBarButton('edit.view.documentation.save'));
@@ -68,6 +71,8 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         $scope.bbApi.setToggleState('show.comments', $rootScope.veCommentsOn);
         $scope.bbApi.addButton(UxService.getButtonBarButton('show.elements'));
         $scope.bbApi.setToggleState('show.elements', $rootScope.veElementsOn);
+        $scope.bbApi.addButton(UxService.getButtonBarButton('show.edits'));
+        $scope.bbApi.setToggleState('show.edits', $rootScope.veEditsOn);
 
         // TODO: This code is duplicated in the FullDocCtrl
         // **WARNING** IF YOU CHANGE THIS CODE, NEED TO UPDATE IN FULL DOC CTRL TOO
@@ -314,6 +319,233 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         } else
             go();
     });
+ 
+    $scope.$on('view.add.paragraph', function() {
+
+        ViewService.addParagraph(view, workspace, true, site.sysmlid);
+    });
+
+    $scope.$on('view.add.list', function() {
+
+        // Create a Opaque List:
+        var parElement = {
+             "name": "Untitled Paragraph",
+             "specialization": {
+                  "type":"Element"
+              }
+        };
+
+        ElementService.createElement(parElement, workspace, site.sysmlid).then(function(createdParElement) {
+
+            var paragraph = {
+                "sourceType": "reference",
+                "source": createdParElement.sysmlid,
+                "sourceProperty": "name",
+                "type": "Paragraph"
+            };
+
+            var list = {
+                "ordered": true,
+                "bulleted": true,
+                "list":[[paragraph]],
+                "type": "List"
+            };
+
+            var listWrapper = {
+                "string":JSON.stringify(list),
+                "type":"LiteralString"
+            };
+
+            var instanceSpec = {
+                "specialization": {
+                  "type":"InstanceSpecification",
+                  "classifier":["PE_Opaque_List"],
+                  "instanceSpecificationSpecification":listWrapper
+               }
+            };
+
+            ElementService.createElement(instanceSpec, workspace, site.sysmlid).then(function(createdInstanceSpec) {
+
+                var instanceVal = {
+                    "instance":createdInstanceSpec.sysmlid,
+                    "type":"InstanceValue"
+                };
+
+                ViewService.addElementToView(view.sysmlid, view.sysmlid, workspace, instanceVal);
+            });
+
+        });
+
+    });
+
+    $scope.$on('view.add.table', function() {
+
+        // Create a Opaque Table:
+        var parElement = {
+             "name": "Untitled Paragraph",
+             "specialization": {
+                  "type":"Element"
+              }
+        };
+
+        ElementService.createElement(parElement, workspace, site.sysmlid).then(function(createdParElement) {
+
+            var paragraph = {
+                "sourceType": "reference",
+                "source": createdParElement.sysmlid,
+                "sourceProperty": "name",
+                "type": "Paragraph"
+            };
+
+            var table = {
+                "body":[
+                    [{"content":[paragraph],
+                      "rowspan":1,
+                      "colspan":1}]
+                ],
+                "type": "Table",
+                "style": "normal",
+                "title": "Untitled",
+                "header": [[
+                    {
+                        "content": [{
+                            "sourceType": "text",
+                            "text": "Untitled Header",
+                            "type": "Paragraph"
+                        }]
+                    }
+                ]]
+            };
+
+            var tableWrapper = {
+                "string":JSON.stringify(table),
+                "type":"LiteralString"
+            };
+
+            var instanceSpec = {
+                "specialization": {
+                  "type":"InstanceSpecification",
+                  "classifier":["PE_Opaque_Table"],
+                  "instanceSpecificationSpecification":tableWrapper
+               }
+            };
+
+            ElementService.createElement(instanceSpec, workspace, site.sysmlid).then(function(createdInstanceSpec) {
+
+                var instanceVal = {
+                    "instance":createdInstanceSpec.sysmlid,
+                    "type":"InstanceValue"
+                };
+
+                ViewService.addElementToView(view.sysmlid, view.sysmlid, workspace, instanceVal);
+            });
+
+        });
+
+    });
+
+
+    $scope.$on('view.add.section', function() {
+
+        // Create a Opaque Section:
+        ViewService.addParagraph(view, workspace, false, site.sysmlid).then(function(createdInstanceVal) {
+
+            var sectionWrapper = {
+                "operand":[{
+                                "instance": createdInstanceVal.sysmlid,
+                                "type":"InstanceValue"   
+                }],
+                "type":"Expression"
+            };
+
+            var instanceSpec = {
+                "name": "Untitled Section",
+                "specialization": {
+                  "type":"InstanceSpecification",
+                  "classifier":["PE_Opaque_Section"],
+                  "instanceSpecificationSpecification":sectionWrapper
+               }
+            };
+
+            ElementService.createElement(instanceSpec, workspace, site.sysmlid).then(function(createdInstanceSpec) {
+
+                var instanceVal = {
+                    "instance":createdInstanceSpec.sysmlid,
+                    "type":"InstanceValue"
+                };
+
+                ViewService.addElementToView(view.sysmlid, view.sysmlid, workspace, instanceVal).
+                then (function (data) {
+                    // Broadcast message to TreeCtrl:
+                    $rootScope.$broadcast('viewctrl.add.section', instanceSpec);
+                });
+            });
+
+        });
+
+    });
+
+    $scope.$on('view.add.image', function() {
+
+        // Create a Opaque Image:
+        var imageElement = {
+             "name": "Untitled Image",
+             "specialization": {
+                  "type":"Element"
+              }
+        };
+
+        ElementService.createElement(imageElement, workspace, site.sysmlid).then(function(createdImageElement) {
+
+            var image = {
+                "sysmlid": createdImageElement.sysmlid,
+                "type": "Image"
+            };
+
+            var imageWrapper = {
+                "string":JSON.stringify(image),
+                "type":"LiteralString"
+            };
+
+            var instanceSpec = {
+                "specialization": {
+                  "type":"InstanceSpecification",
+                  "classifier":["PE_Opaque_Image"],
+                  "instanceSpecificationSpecification":imageWrapper
+               }
+            };
+
+            ElementService.createElement(instanceSpec, workspace, site.sysmlid).then(function(createdInstanceSpec) {
+
+                var instanceVal = {
+                    "instance":createdInstanceSpec.sysmlid,
+                    "type":"InstanceValue"
+                };
+
+                ViewService.addElementToView(view.sysmlid, view.sysmlid, workspace, instanceVal);
+            });
+
+        });
+    });
+
+    var deleteInstanceValFromView = function(instanceVal) {
+        ViewService.deleteElementFromView(view.sysmlid, workspace, instanceVal).then(function(data) {
+            growl.success('Delete Successful');
+        }, function(reason) {
+            if (reason.type === 'info')
+                growl.info(reason.message);
+            else if (reason.type === 'warning')
+                growl.warning(reason.message);
+            else if (reason.type === 'error')
+                growl.error(reason.message);
+        }).finally(function() {
+            // $scope.bbApi.toggleButtonSpinner('edit.view.documentation.save');
+        });
+    };
+
+    $scope.$on('element.delete', function(event, instanceVal) {
+        deleteInstanceValFromView(instanceVal);
+    });
 
     $scope.$on('show.comments', function() {
         $scope.viewApi.toggleShowComments();
@@ -325,6 +557,13 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         $scope.viewApi.toggleShowElements();
         $scope.bbApi.toggleButtonState('show.elements');
         $rootScope.veElementsOn = !$rootScope.veElementsOn;
+    });
+
+    $scope.$on('show.elements', function() {
+        // TODO: manage this in the view like the comments/elements
+        // $scope.viewApi.toggleShowElements();
+        $scope.bbApi.toggleButtonState('show.elements');
+        $rootScope.veEditsOn = !$rootScope.veEditsOn;
     });
 
     $scope.$on('center.previous', function() {

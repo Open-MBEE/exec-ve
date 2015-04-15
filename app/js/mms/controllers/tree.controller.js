@@ -394,14 +394,10 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
 
     function addSectionElements(element, viewNode, parentNode) {
         var contains = null;
-        if (element.specialization)
-            contains = element.specialization.contains;
-        else
-            contains = element.contains;
-        var j = contains.length - 1;
-        for (; j >= 0; j--) {
-            var containedElement = contains[j];
-            if (containedElement.type === "Section") {
+        var contents = null;
+
+        var addContainsSectionTreeNode = function(containedElement) {
+           if (containedElement.type === "Section") {
                 var sectionTreeNode = { 
                     label : containedElement.name, 
                     type : "section",
@@ -411,6 +407,61 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
                 };
                 parentNode.children.unshift(sectionTreeNode);
                 addSectionElements(containedElement, viewNode, sectionTreeNode);
+            }
+        };
+
+        var addContentsSectionTreeNode = function(instanceVal) {
+
+           ViewService.parseExprRefTree(instanceVal, $scope.workspace)
+           .then(function(containedElement) {
+               if (ViewService.isSection(containedElement)) {
+                    var sectionTreeNode = { 
+                        label : containedElement.name, 
+                        type : "section",
+                        view : viewNode.data.sysmlid,
+                        data : containedElement, 
+                        children : [] 
+                    };
+                    parentNode.children.unshift(sectionTreeNode);
+                    addSectionElements(containedElement, viewNode, sectionTreeNode);
+                }
+            });
+        };
+
+        if (element.specialization) {
+            if (element.specialization.contains) {
+                contains = element.specialization.contains;
+            }
+
+            if (element.specialization.contents) {
+                contents = element.specialization.contents;
+            }
+            // For Sections, the contents expression is the instanceSpecificationSpecification:
+            else if (ViewService.isSection(element) &&
+                     element.specialization.instanceSpecificationSpecification) {
+                contents = element.specialization.instanceSpecificationSpecification;
+            }
+        }
+        else {
+            if (element.contains) {
+                contains = element.contains;
+            }
+            if (element.contents) {
+                contents = element.contents;
+            }
+        }
+
+        var j;
+        if (contains) {
+            j = contains.length - 1;
+            for (; j >= 0; j--) {
+                addContainsSectionTreeNode(contains[j]);
+            }
+        }
+        if (contents && contents.operand) {
+            j = contents.operand.length - 1;
+            for (; j >= 0; j--) {
+                addContentsSectionTreeNode(contents.operand[j]);
             }
         }
     }
@@ -910,8 +961,27 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
         }
     }
 
+    // ViewCtrl creates this event when adding sections to the view
+    $scope.$on('viewctrl.add.section', function(event, instanceSpec) {
+
+        // TODO it may not be the selected branch, may just want to move add sections
+        //      to left pane/tree controller
+        var branch = $scope.treeApi.get_selected_branch();
+
+        var newbranch = {
+            label: instanceSpec.name,
+            type: "section",
+            view: view.sysmlid,
+            data: instanceSpec,
+            children: [],
+        };
+
+        $scope.treeApi.add_branch(branch, newbranch, false);
+    });
+
     if ($state.includes('workspace.site.document')) {
         var delay = 300;
+        // TODO cant we have sections on the parent view w/o a view2view?
         if (document.specialization.view2view) {
             document.specialization.view2view.forEach(function(view, index) {
                 $timeout(function() {
