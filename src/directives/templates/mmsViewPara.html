@@ -1,15 +1,5 @@
-<div class="panel panel-default" ng-switch on="para.sourceProperty"> 
-  <div class="panel-heading clearfix">
-    <h3 class="panel-title pull-left">Paragraph</h3>
-    <div class="btn-group pull-right">      
-		<a class="view-tools center" ng-click="" tooltip="Add" tooltip-append-to-body="true" tooltip-trigger="mouseenter" tooltip-popup-delay="400" tooltip-placement="Bottom"><i class="fa fa-plus" style="color:green"></i></a>
-		<a class="view-tools center" ng-click="" tooltip="Edit" tooltip-append-to-body="true" tooltip-trigger="mouseenter" tooltip-popup-delay="400" tooltip-placement="Bottom"><i class="fa fa-edit"></i></a>
-		<a class="view-tools center" ng-click="deleteParagraph(instanceVal)" tooltip="Delete" tooltip-append-to-body="true" tooltip-trigger="mouseenter" tooltip-popup-delay="400" tooltip-placement="Bottom"><i class="fa fa-times" style="color:red"></i></a>
-    </div>
-  </div>
-  <div class="panel-body">
+<div ng-switch on="para.sourceProperty"> 
     <mms-transclude-doc data-mms-eid="{{para.source}}" ng-switch-when="documentation"></mms-transclude-doc> 
     <mms-transclude-name data-mms-eid="{{para.source}}" ng-switch-when="name"></mms-transclude-name> 
     <mms-transclude-val data-mms-eid="{{para.source}}" ng-switch-when="value"></mms-transclude-val>
-  </div>
 </div> 

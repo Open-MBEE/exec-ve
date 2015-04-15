@@ -7,9 +7,6 @@ function mmsViewPara($templateCache, $compile, $rootScope) {
     var template = $templateCache.get('mms/templates/mmsViewPara.html');
     
     var mmsViewParamCtrl = function ($scope, $rootScope) {
-        $scope.deleteParagraph = function(instanceVal) {
-            $rootScope.$broadcast('element.delete', instanceVal);
-        };
     };
 
     var mmsViewParaLink = function(scope, element, attrs) {

@@ -7,9 +7,6 @@ function mmsViewList($compile, $templateCache) {
     var template = $templateCache.get('mms/templates/mmsViewList.html');
     
     var mmsViewListCtrl = function ($scope, $rootScope) {
-        $scope.deleteList = function(instanceVal) {
-            $rootScope.$broadcast('element.delete', instanceVal);
-        };
     };
 
     return {

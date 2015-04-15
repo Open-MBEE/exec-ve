@@ -7,9 +7,6 @@ function mmsViewTable($compile, $timeout, $templateCache) {
     var template = $templateCache.get('mms/templates/mmsViewTable.html');
     
     var mmsViewTableCtrl = function ($scope, $rootScope) {
-        $scope.deleteTable = function(instanceVal) {
-            $rootScope.$broadcast('element.delete', instanceVal);
-        };
     };
 
     var mmsViewTableLink = function(scope, element, attrs) {

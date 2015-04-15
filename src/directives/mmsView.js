@@ -54,6 +54,10 @@ function mmsView(ViewService, $templateCache, growl) {
     var template = $templateCache.get('mms/templates/mmsView.html');
 
     var mmsViewCtrl = function($scope) {
+
+        this.getShowEdits = function () {
+            return $scope.showEdits;
+        };
         this.getViewElements = function() {
             return ViewService.getViewElements($scope.mmsVid, false, $scope.mmsWs, $scope.mmsVersion);
         };
@@ -119,6 +123,8 @@ function mmsView(ViewService, $templateCache, growl) {
         scope.$watch('mmsVid', changeView);
         scope.showElements = false;
         scope.showComments = false;
+        scope.showEdits = false;
+
         /**
          * @ngdoc function
          * @name mms.directives.directive:mmsView#toggleShowElements
@@ -142,6 +148,18 @@ function mmsView(ViewService, $templateCache, growl) {
         scope.toggleShowComments = function() {
             scope.showComments = !scope.showComments;
             element.toggleClass('reviewing');
+        };
+
+        /**
+         * @ngdoc function
+         * @name mms.directives.directive:mmsView#toggleShowEdits
+         * @methodOf mms.directives.directive:mmsView
+         * 
+         * @description 
+         * toggle elements editing panel 
+         */
+        scope.toggleShowEdits = function() {
+            scope.showEdits = !scope.showEdits;
         };
 
         if (angular.isObject(scope.mmsViewApi)) {
@@ -182,6 +200,7 @@ function mmsView(ViewService, $templateCache, growl) {
                 else
                     element.removeClass('reviewing');
             };
+            api.toggleShowEdits = scope.toggleShowEdits;
             api.changeView = function(vid) {
                 scope.changeView(vid);
             };

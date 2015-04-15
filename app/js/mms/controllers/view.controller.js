@@ -559,10 +559,9 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         $rootScope.veElementsOn = !$rootScope.veElementsOn;
     });
 
-    $scope.$on('show.elements', function() {
-        // TODO: manage this in the view like the comments/elements
-        // $scope.viewApi.toggleShowElements();
-        $scope.bbApi.toggleButtonState('show.elements');
+    $scope.$on('show.edits', function() {
+        $scope.viewApi.toggleShowEdits();
+        $scope.bbApi.toggleButtonState('show.edits');
         $rootScope.veEditsOn = !$rootScope.veEditsOn;
     });
 
