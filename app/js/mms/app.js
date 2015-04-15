@@ -17,6 +17,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
                 // replace products with documents
                 locationPath = locationPath.replace('/products/', '/documents/');
                 locationPath = locationPath.replace('/view/', '/views/');
+                locationPath = locationPath.replace('/all', '/full');
 
                 // if there is a view, there should be a time in the url prior
                 pathArr = locationPath.split('/');
