@@ -342,10 +342,11 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
                 clone.specialization = _.cloneDeep(data.specialization);
                 delete clone.specialization.contains;
                 // Remove from contents and delete all other associated nodes:
-                if (clone.specialization.contents) {
-                    for (var i = 0; i < data.specialization.contents.length; i++) {
-                        if (instanceVal.instance === data.specialization.contents[i].instance) {
-                            clone.specialization.contents.splice(i,1);
+                if (clone.specialization.contents && clone.specialization.contents.operand) {
+                    var operands = data.specialization.contents.operand;
+                    for (var i = 0; i < operands.length; i++) {
+                        if (instanceVal.instance === operands[i].instance) {
+                            clone.specialization.contents.operand.splice(i,1);
                         }
                     }
                 }
