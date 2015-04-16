@@ -1,4 +1,4 @@
-<div ng-switch on="para.sourceProperty"> 
+<div ng-switch on="para.sourceProperty" ng-dblclick="callDoubleClick(para)"> 
     <mms-transclude-doc data-mms-eid="{{para.source}}" ng-switch-when="documentation"></mms-transclude-doc> 
     <mms-transclude-name data-mms-eid="{{para.source}}" ng-switch-when="name"></mms-transclude-name> 
     <mms-transclude-val data-mms-eid="{{para.source}}" ng-switch-when="value"></mms-transclude-val>

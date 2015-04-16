@@ -7,6 +7,9 @@ function mmsViewPara($templateCache, $compile, $rootScope) {
     var template = $templateCache.get('mms/templates/mmsViewPara.html');
     
     var mmsViewParamCtrl = function ($scope, $rootScope) {
+        $scope.callDoubleClick = function(value) {
+            growl.info(value.type);
+        };
     };
 
     var mmsViewParaLink = function(scope, element, attrs) {

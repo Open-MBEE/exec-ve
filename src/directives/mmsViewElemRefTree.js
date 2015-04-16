@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsViewElemRefTree', ['ViewService', 'ElementService', '$templateCache', mmsViewElemRefTree]);
+.directive('mmsViewElemRefTree', ['ViewService', 'ElementService', '$templateCache', '$rootScope', mmsViewElemRefTree]);
 
 /**
  * @ngdoc directive
@@ -17,10 +17,10 @@ angular.module('mms.directives')
  * 
  * @param mmsInstanceVal A InstanceValue json object 
  */
-function mmsViewElemRefTree(ViewService, ElementService, $templateCache) {
+function mmsViewElemRefTree(ViewService, ElementService, $templateCache, $rootScope) {
     var template = $templateCache.get('mms/templates/mmsViewElemRefTree.html');
 
-    var mmsViewElemRefTreeCtrl = function($scope) {
+    var mmsViewElemRefTreeCtrl = function($scope, $rootScope) {
         
         $scope.presentationElem = {};
 
@@ -37,16 +37,28 @@ function mmsViewElemRefTree(ViewService, ElementService, $templateCache) {
                     $scope.presentationElem.type = 'Section';
                 }
             });           
-        }
+        }      
+
+        $scope.delete = function(instanceVal) {
+            $rootScope.$broadcast('element.delete', instanceVal);
+        };
     };
+
+    var mmsViewElemRefTreeLink = function(scope, element, attrs, mmsViewCtrl) {
+        scope.showEdits = function () {
+            return mmsViewCtrl.getShowEdits();
+        };  
+    };
+
 
     return {
         restrict: 'E',
         template: template,
+        require: '?^mmsView',
         scope: {
             mmsInstanceVal: '=',
         },
-        controller: ['$scope', mmsViewElemRefTreeCtrl],
-        //link: mmsViewElemRefTreeLink
+        controller: ['$scope', '$rootScope', mmsViewElemRefTreeCtrl],
+        link: mmsViewElemRefTreeLink
     };
 }
