@@ -1,13 +1,5 @@
-<div class="panel panel-default"> 
-    <div class="panel-heading clearfix">
-        <h4 class="panel-title pull-left">{{section.name}}</h4>
-        <div class="btn-group pull-right">      
-            <a class="view-tools center" ng-click="" tooltip="Add" tooltip-append-to-body="true" tooltip-trigger="mouseenter" tooltip-popup-delay="400" tooltip-placement="Bottom"><i class="fa fa-plus" style="color:green"></i></a>
-            <a class="view-tools center" ng-click="" tooltip="Edit" tooltip-append-to-body="true" tooltip-trigger="mouseenter" tooltip-popup-delay="400" tooltip-placement="Bottom"><i class="fa fa-edit"></i></a>
-            <a class="view-tools center" ng-click="deleteSection(instanceVal)" tooltip="Delete" tooltip-append-to-body="true" tooltip-trigger="mouseenter" tooltip-popup-delay="400" tooltip-placement="Bottom"><i class="fa fa-times" style="color:red"></i></a>
-        </div>
-    </div>
-  <!--   <h4>{{section.name}}</h4>  -->
+<div>
+    <h4>{{section.name}}</h4> 
     <div ng-repeat="contain in ::section.contains" ng-switch on="contain.type"> 
         <mms-view-para data-mms-para="contain" ng-switch-when="Paragraph"></mms-view-para>
         <mms-view-table data-mms-table="contain" ng-switch-when="Table"></mms-view-table>
@@ -15,9 +7,4 @@
         <mms-view-img data-mms-image="contain" ng-switch-when="Image"></mms-view-img>
         <mms-view-section data-mms-section="contain" ng-switch-when="Section"></mms-view-section>
     </div>
-
-    <div ng-repeat="instanceVal in sectionInstanceVals"> 
-        <mms-view-elem-ref-tree data-mms-instance-val="instanceVal"></mms-view-elem-ref-tree>
-    </div>
-
 </div>
