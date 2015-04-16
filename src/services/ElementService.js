@@ -321,7 +321,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, _) {
      * @returns {Promise} The promise will be resolved with the updated cache element reference if 
      *      update is successful. If a conflict occurs, the promise will be rejected with status of 409
      */
-    var updateElement = function(elem, workspace) {
+    var updateElement = function(elem, workspace, dont_merge) {
         var deferred = $q.defer();
         if (!elem.hasOwnProperty('sysmlid'))
             deferred.reject('Element id not found, create element first!');
@@ -329,7 +329,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, _) {
             var n = normalize(elem.sysmlid, null, workspace, null);
             $http.post(URLService.getPostElementsURL(n.ws), {'elements': [elem]})
             .success(function(data, status, headers, config) {
-                var resp = CacheService.put(n.cacheKey, UtilsService.cleanElement(data.elements[0]), true);
+                var resp = CacheService.put(n.cacheKey, UtilsService.cleanElement(data.elements[0]), !dont_merge);
                 //special case for products view2view updates 
                 if (resp.specialization && resp.specialization.view2view &&
                     elem.specialization && elem.specialization.view2view)
