@@ -29,6 +29,12 @@ angular.module('mms.directives')
  */
 function mmsTranscludeDoc(ElementService, UtilsService, $compile, $log, growl) {
 
+    var mmsTranscludeDocCtrl = function ($scope) {
+        $scope.callDoubleClick = function(value) {
+            growl.info(value.type);
+        };
+    };
+
     var mmsTranscludeDocLink = function(scope, element, attrs, mmsViewCtrl) {
         var processed = false;
         scope.cfType = 'doc';
@@ -91,7 +97,7 @@ function mmsTranscludeDoc(ElementService, UtilsService, $compile, $log, growl) {
             mmsVersion: '@'
         },
         require: '?^mmsView',
-        //controller: ['$scope', mmsTranscludeDocCtrl],
+        controller: ['$scope', mmsTranscludeDocCtrl],
         link: mmsTranscludeDocLink
     };
 }

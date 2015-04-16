@@ -7,8 +7,8 @@ function mmsViewPara($templateCache, $compile, $rootScope) {
     var template = $templateCache.get('mms/templates/mmsViewPara.html');
     
     var mmsViewParamCtrl = function ($scope, $rootScope) {
-        $scope.deleteParagraph = function(instanceVal) {
-            $rootScope.$broadcast('element.delete', instanceVal);
+        $scope.callDoubleClick = function(value) {
+            // growl.info(value.type);
         };
     };
 

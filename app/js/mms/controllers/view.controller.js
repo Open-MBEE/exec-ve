@@ -47,8 +47,6 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         $rootScope.veCommentsOn = false;
     if (!$rootScope.veElementsOn)
         $rootScope.veElementsOn = false;
-    if (!$rootScope.veEditsOn)
-        $rootScope.veEditsOn = false;
 
     var ws = $stateParams.workspace;
 
@@ -72,7 +70,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         $scope.bbApi.addButton(UxService.getButtonBarButton('show.elements'));
         $scope.bbApi.setToggleState('show.elements', $rootScope.veElementsOn);
         $scope.bbApi.addButton(UxService.getButtonBarButton('show.edits'));
-        $scope.bbApi.setToggleState('show.edits', $rootScope.veEditsOn);
+        $scope.bbApi.setToggleState('show.edits', false);
 
         // TODO: This code is duplicated in the FullDocCtrl
         // **WARNING** IF YOU CHANGE THIS CODE, NEED TO UPDATE IN FULL DOC CTRL TOO
@@ -559,11 +557,9 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         $rootScope.veElementsOn = !$rootScope.veElementsOn;
     });
 
-    $scope.$on('show.elements', function() {
-        // TODO: manage this in the view like the comments/elements
-        // $scope.viewApi.toggleShowElements();
-        $scope.bbApi.toggleButtonState('show.elements');
-        $rootScope.veEditsOn = !$rootScope.veEditsOn;
+    $scope.$on('show.edits', function() {
+        $scope.viewApi.toggleShowEdits();
+        $scope.bbApi.toggleButtonState('show.edits');
     });
 
     $scope.$on('center.previous', function() {
