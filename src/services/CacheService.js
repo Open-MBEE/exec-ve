@@ -56,8 +56,13 @@ function CacheService(_) {
         var realkey = key;
         if (angular.isArray(key))
             realkey = makeKey(key);
-        if (cache.hasOwnProperty(realkey) && m)
-            _.merge(cache[realkey], value);
+        if (cache.hasOwnProperty(realkey) && m) {
+            _.merge(cache[realkey], value, function(a,b,id) {
+                if (id == 'contents') {
+                    return b;
+                }
+            });
+        }
         else
             cache[realkey] = value;
         if (func) {

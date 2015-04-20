@@ -356,7 +356,7 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
                 // TODO error message on failure to delete?
                 ElementService.deleteElement(instanceVal.instance, workspace);
 
-                ElementService.updateElement(clone, ws, true)
+                updateDocument(clone, ws)
                 .then(function(data2) {
                     deferred.resolve(data2);
                 }, function(reason) {
