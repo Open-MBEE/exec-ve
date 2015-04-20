@@ -407,7 +407,7 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
             var paragraph = {
                 "sourceType": "reference",
                 "source": createdParElement.sysmlid,
-                "sourceProperty": "name",
+                "sourceProperty": "documentation",
                 "type": "Paragraph"
             };
 
