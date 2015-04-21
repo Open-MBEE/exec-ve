@@ -318,9 +318,20 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
             go();
     });
  
+    var handleError = function(reason) {
+        if (reason.type === 'info')
+            growl.info(reason.message);
+        else if (reason.type === 'warning')
+            growl.warning(reason.message);
+        else if (reason.type === 'error')
+            growl.error(reason.message);
+    };
+
     $scope.$on('view.add.paragraph', function() {
 
-        ViewService.addParagraph(view, workspace, true, site.sysmlid);
+        ViewService.addParagraph(view, workspace, true, site.sysmlid).then(function(data) {
+            growl.success('Adding Paragraph Successful');
+        }, handleError);
     });
 
     $scope.$on('view.add.list', function() {
@@ -369,7 +380,9 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
                     "type":"InstanceValue"
                 };
 
-                ViewService.addElementToView(view.sysmlid, view.sysmlid, workspace, instanceVal);
+                ViewService.addElementToView(view.sysmlid, view.sysmlid, workspace, instanceVal).then(function(data) {
+                    growl.success('Adding List Successful');
+                }, handleError);
             });
 
         });
@@ -435,7 +448,9 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
                     "type":"InstanceValue"
                 };
 
-                ViewService.addElementToView(view.sysmlid, view.sysmlid, workspace, instanceVal);
+                ViewService.addElementToView(view.sysmlid, view.sysmlid, workspace, instanceVal).then(function(data) {
+                    growl.success('Adding Table Successful');
+                }, handleError);
             });
 
         });
@@ -474,9 +489,11 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
 
                 ViewService.addElementToView(view.sysmlid, view.sysmlid, workspace, instanceVal).
                 then (function (data) {
+                    growl.success('Adding Section Successful');
+
                     // Broadcast message to TreeCtrl:
                     $rootScope.$broadcast('viewctrl.add.section', instanceSpec);
-                });
+                }, handleError);
             });
 
         });
@@ -520,7 +537,10 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
                     "type":"InstanceValue"
                 };
 
-                ViewService.addElementToView(view.sysmlid, view.sysmlid, workspace, instanceVal);
+                ViewService.addElementToView(view.sysmlid, view.sysmlid, workspace, instanceVal).then(function(data) {
+                    growl.success('Adding Image Successful');
+                }, handleError);
+
             });
 
         });
@@ -529,14 +549,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     var deleteInstanceValFromView = function(instanceVal) {
         ViewService.deleteElementFromView(view.sysmlid, workspace, instanceVal).then(function(data) {
             growl.success('Delete Successful');
-        }, function(reason) {
-            if (reason.type === 'info')
-                growl.info(reason.message);
-            else if (reason.type === 'warning')
-                growl.warning(reason.message);
-            else if (reason.type === 'error')
-                growl.error(reason.message);
-        }).finally(function() {
+        }, handleError).finally(function() {
             // $scope.bbApi.toggleButtonSpinner('edit.view.documentation.save');
         });
     };
