@@ -350,11 +350,9 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
                         }
                     }
                 }
-                // Delete the instance spec pointed to be the instanceVal and all its children:
-                // TODO verify that parent/child relationships are such that this will delete 
-                //      everything needed
-                // TODO error message on failure to delete?
-                ElementService.deleteElement(instanceVal.instance, workspace);
+                
+                // Note:  We decided we do not need to delete the instanceVal, just remove from
+                //         contents.
 
                 updateDocument(clone, ws)
                 .then(function(data2) {
