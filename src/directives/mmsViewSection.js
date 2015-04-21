@@ -17,8 +17,9 @@ function mmsViewSection($compile, $templateCache, ElementService) {
             $scope.sectionInstanceVals = $scope.section.specialization.instanceSpecificationSpecification.operand;
         }
 
-         $scope.deleteSection = function(instanceVal) {
-            $rootScope.$broadcast('element.delete', instanceVal);
+        // TODO: this method can prob be removed
+        $scope.deleteSection = function(instanceVal) {
+            $rootScope.$broadcast('element.section.delete', instanceVal, $scope.section.name);
         };
     };
 

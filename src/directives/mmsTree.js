@@ -609,6 +609,24 @@ function mmsTree($timeout, $log, $templateCache) {
             tree.sort_branch = function(b, sortFunction) {
                 b.children.sort(sortFunction);
             };
+
+            /**
+             * @ngdoc function
+             * @name mms.directives.directive:mmsTree#get_branch
+             * @methodOf mms.directives.directive:mmsTree
+             * 
+             * @description 
+             * Returns the branch with the specified label
+             */
+            tree.get_branch = function(label) {
+                var branch = null;
+                for_each_branch(function(b) {
+                    if (b.label === label) {
+                        branch = b;
+                    }
+                });
+                return branch;
+            };
         }
     };
 

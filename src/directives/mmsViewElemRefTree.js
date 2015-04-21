@@ -39,8 +39,8 @@ function mmsViewElemRefTree(ViewService, ElementService, $templateCache, $rootSc
             });           
         }      
 
-        $scope.delete = function(instanceVal) {
-            $rootScope.$broadcast('element.delete', instanceVal);
+        $scope.delete = function() {
+            $rootScope.$broadcast('element.delete', $scope.mmsInstanceVal, $scope.presentationElem);
         };
     };
 

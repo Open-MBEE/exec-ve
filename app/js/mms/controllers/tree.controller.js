@@ -979,6 +979,14 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
         $scope.treeApi.add_branch(branch, newbranch, false);
     });
 
+    // ViewCtrl creates this event when deleting sections from the view
+    $scope.$on('viewctrl.delete.section', function(event, sectionName) {
+
+        var branch = $scope.treeApi.get_branch(sectionName);
+
+        $scope.treeApi.remove_branch(branch);
+    });
+
     if ($state.includes('workspace.site.document')) {
         var delay = 300;
         // TODO cant we have sections on the parent view w/o a view2view?

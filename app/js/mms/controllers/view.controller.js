@@ -541,8 +541,13 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         });
     };
 
-    $scope.$on('element.delete', function(event, instanceVal) {
+    $scope.$on('element.delete', function(event, instanceVal, presentationElem) {
         deleteInstanceValFromView(instanceVal);
+
+        if (ViewService.isSection(presentationElem)) {
+            // Broadcast message to TreeCtrl:
+            $rootScope.$broadcast('viewctrl.delete.section', presentationElem.name);
+        }
     });
 
     $scope.$on('show.comments', function() {
