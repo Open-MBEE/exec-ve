@@ -42,12 +42,21 @@ function mmsViewElemRefTree(ViewService, ElementService, $templateCache, $rootSc
         $scope.delete = function() {
             $rootScope.$broadcast('element.delete', $scope.mmsInstanceVal, $scope.presentationElem);
         };
+
+        $scope.edit = function(instanceVal) {
+            $rootScope.$broadcast('element.edit', instanceVal);            
+        };
+
+        this.getInstanceId = function() {
+            return $scope.mmsInstanceVal.instance;
+        };
+
     };
 
     var mmsViewElemRefTreeLink = function(scope, element, attrs, mmsViewCtrl) {
         scope.showEdits = function () {
             return mmsViewCtrl.getShowEdits();
-        };  
+        };
     };
 
 

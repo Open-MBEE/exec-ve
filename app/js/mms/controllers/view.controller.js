@@ -349,7 +349,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
             var paragraph = {
                 "sourceType": "reference",
                 "source": createdParElement.sysmlid,
-                "sourceProperty": "name",
+                "sourceProperty": "documentation",
                 "type": "Paragraph"
             };
 
@@ -404,7 +404,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
             var paragraph = {
                 "sourceType": "reference",
                 "source": createdParElement.sysmlid,
-                "sourceProperty": "name",
+                "sourceProperty": "documentation",
                 "type": "Paragraph"
             };
 
@@ -546,16 +546,49 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         });
     });
 
-    var deleteInstanceValFromView = function(instanceVal) {
+    $scope.$on('element.edit', function(event, instanceVal) {
+
+        // $scope.editing = !$scope.editing;
+        $scope.viewApi.setEditingInstance(instanceVal.instance);
+        $scope.editingInstance = !$scope.editingInstance;
+
+        $scope.specApi.setEditing(true);
+        if ($scope.filterApi.setEditing)
+            $scope.filterApi.setEditing(true);
+        
+        // TODO: refactor as directive 
+        // $scope.bbApi.setPermission('edit.view.documentation',false);
+        // $scope.bbApi.setPermission('edit.view.documentation.save',true);
+        // $scope.bbApi.setPermission('edit.view.documentation.cancel',true);
+        
+        var edit = $scope.specApi.getEdits();
+        if (edit) {
+            // TODO: this code may be better if automatically handled as part of the specApi
+            $rootScope.veEdits['element|' + edit.sysmlid + '|' + ws] = edit;
+            $rootScope.mms_tbApi.setIcon('element.editor', 'fa-edit-asterisk');
+            if (Object.keys($rootScope.veEdits).length > 1) {
+                $rootScope.mms_tbApi.setPermission('element.editor.saveall', true);
+            } else {
+                $rootScope.mms_tbApi.setPermission('element.editor.saveall', false);
+            }
+        }
+
+        // TODO: Should this check the entire or just the instance specification
+        // TODO: How smart does it need to be, since the instance specification is just a reference.
+        // Will need to unravel until the end to check all references
+        ElementService.isCacheOutdated(view.sysmlid, ws)
+        .then(function(data) {
+            if (data.status && data.server.modified > data.cache.modified)
+                growl.warning('This view has been updated on the server');
+        });
+    });
+
+    $scope.$on('element.delete', function(event, instanceVal, presentationElem) {
         ViewService.deleteElementFromView(view.sysmlid, workspace, instanceVal).then(function(data) {
             growl.success('Delete Successful');
         }, handleError).finally(function() {
             // $scope.bbApi.toggleButtonSpinner('edit.view.documentation.save');
         });
-    };
-
-    $scope.$on('element.delete', function(event, instanceVal, presentationElem) {
-        deleteInstanceValFromView(instanceVal);
 
         if (ViewService.isSection(presentationElem)) {
             // Broadcast message to TreeCtrl:

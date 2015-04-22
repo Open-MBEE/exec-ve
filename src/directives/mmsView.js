@@ -55,6 +55,12 @@ function mmsView(ViewService, $templateCache, growl) {
 
     var mmsViewCtrl = function($scope) {
 
+        this.isEditingInstance = function(instance) {
+            if (! $scope.editing) return false;
+            if ($scope.editingInstance !== instance) return false;
+            return true;
+        };
+
         this.getShowEdits = function () {
             return $scope.showEdits;
         };
@@ -124,6 +130,12 @@ function mmsView(ViewService, $templateCache, growl) {
         scope.showElements = false;
         scope.showComments = false;
         scope.showEdits = false;
+        scope.editing = false;
+        
+        scope.setEditingInstance = function(instance) {
+            scope.editing = true;
+            scope.editingInstance = instance;
+        };
 
         /**
          * @ngdoc function
@@ -201,6 +213,8 @@ function mmsView(ViewService, $templateCache, growl) {
                     element.removeClass('reviewing');
             };
             api.toggleShowEdits = scope.toggleShowEdits;
+            api.setEditingInstance = scope.setEditingInstance;
+
             api.changeView = function(vid) {
                 scope.changeView(vid);
             };

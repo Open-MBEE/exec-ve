@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsTranscludeDoc', ['ElementService', 'UtilsService', '$compile', '$log', 'growl', mmsTranscludeDoc]);
+.directive('mmsTranscludeDoc', ['ElementService', 'UtilsService', '$compile', '$log', '$templateCache', 'growl', mmsTranscludeDoc]);
 
 /**
  * @ngdoc directive
@@ -27,7 +27,9 @@ angular.module('mms.directives')
  * @param {string=master} mmsWs Workspace to use, defaults to master
  * @param {string=latest} mmsVersion Version can be alfresco version number or timestamp, default is latest
  */
-function mmsTranscludeDoc(ElementService, UtilsService, $compile, $log, growl) {
+function mmsTranscludeDoc(ElementService, UtilsService, $compile, $log, $templateCache, growl) {
+
+    var template = $templateCache.get('mms/templates/mmsTranscludeDoc.html');
 
     var mmsTranscludeDocCtrl = function ($scope) {
         $scope.callDoubleClick = function(value) {
@@ -35,9 +37,14 @@ function mmsTranscludeDoc(ElementService, UtilsService, $compile, $log, growl) {
         };
     };
 
-    var mmsTranscludeDocLink = function(scope, element, attrs, mmsViewCtrl) {
+    var mmsTranscludeDocLink = function(scope, element, attrs, controllers) {
+
+        var mmsViewCtrl = controllers[0];
+        var mmsViewElemRefTreeCtrl = controllers[1];
+
         var processed = false;
         scope.cfType = 'doc';
+
         element.click(function(e) {
             if (mmsViewCtrl)
                 mmsViewCtrl.transcludeClicked(scope.mmsEid);
@@ -48,10 +55,10 @@ function mmsTranscludeDoc(ElementService, UtilsService, $compile, $log, growl) {
 
         var recompile = function() {
             element.empty();
-            var doc = scope.element.documentation;
-            if (!doc)
-                doc = '<p ng-class="{placeholder: version!=\'latest\'}">(no documentation)</p>';
-            element.append(doc);
+            scope.value = scope.element.documentation;
+            if (!scope.value)
+                scope.value = '<p ng-class="{placeholder: version!=\'latest\'}">(no documentation)</p>';
+            element.append(template);
             $compile(element.contents())(scope); 
             if (mmsViewCtrl) {
                 mmsViewCtrl.elementTranscluded(scope.element);
@@ -87,6 +94,20 @@ function mmsTranscludeDoc(ElementService, UtilsService, $compile, $log, growl) {
                 growl.error('Cf Doc Error: ' + reason.message + ': ' + scope.mmsEid);
             });
         });
+
+        if (mmsViewCtrl && mmsViewElemRefTreeCtrl) {
+            scope.isEditing = function(instance) {
+                console.log('isEditing = ' + mmsViewCtrl.isEditingInstance(instance));
+                return mmsViewCtrl.isEditingInstance(instance);
+            };
+
+            scope.getInstance = function() {
+                console.log('getInstance = ' + mmsViewElemRefTreeCtrl.getInstanceId());
+                return mmsViewElemRefTreeCtrl.getInstanceId();
+            };
+            scope.raffi = 'haha';
+        }
+
     };
 
     return {
@@ -96,7 +117,7 @@ function mmsTranscludeDoc(ElementService, UtilsService, $compile, $log, growl) {
             mmsWs: '@',
             mmsVersion: '@'
         },
-        require: '?^mmsView',
+        require: ['?^mmsView','?^mmsViewElemRefTree'],
         controller: ['$scope', mmsTranscludeDocCtrl],
         link: mmsTranscludeDocLink
     };
