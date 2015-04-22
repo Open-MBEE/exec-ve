@@ -97,12 +97,10 @@ function mmsTranscludeDoc(ElementService, UtilsService, $compile, $log, $templat
 
         if (mmsViewCtrl && mmsViewElemRefTreeCtrl) {
             scope.isEditing = function(instance) {
-                console.log('isEditing = ' + mmsViewCtrl.isEditingInstance(instance));
                 return mmsViewCtrl.isEditingInstance(instance);
             };
 
             scope.getInstance = function() {
-                console.log('getInstance = ' + mmsViewElemRefTreeCtrl.getInstanceId());
                 return mmsViewElemRefTreeCtrl.getInstanceId();
             };
             scope.raffi = 'haha';
