@@ -103,7 +103,6 @@ function mmsTranscludeDoc(ElementService, UtilsService, $compile, $log, $templat
             scope.getInstance = function() {
                 return mmsViewElemRefTreeCtrl.getInstanceId();
             };
-            scope.raffi = 'haha';
         }
 
     };

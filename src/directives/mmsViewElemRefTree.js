@@ -39,6 +39,14 @@ function mmsViewElemRefTree(ViewService, ElementService, $templateCache, $rootSc
             });           
         }      
 
+        $scope.cancel = function(instanceVal) {
+            $rootScope.$broadcast('element.edit.cancel', $scope.mmsInstanceVal);
+        };
+
+        $scope.save = function(instanceVal) {
+            $rootScope.$broadcast('element.edit.save', $scope.mmsInstanceVal);
+        };
+
         $scope.delete = function() {
             $rootScope.$broadcast('element.delete', $scope.mmsInstanceVal, $scope.presentationElem);
         };
@@ -56,6 +64,10 @@ function mmsViewElemRefTree(ViewService, ElementService, $templateCache, $rootSc
     var mmsViewElemRefTreeLink = function(scope, element, attrs, mmsViewCtrl) {
         scope.showEdits = function () {
             return mmsViewCtrl.getShowEdits();
+        };
+
+        scope.isEditing = function(instance) {
+            return mmsViewCtrl.isEditingInstance(instance.instance);
         };
     };
 

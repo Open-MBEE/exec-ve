@@ -583,6 +583,53 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         });
     });
 
+    $scope.$on('element.edit.cancel', function(event, instanceVal) {
+        $scope.viewApi.clearEditingInstance();
+
+        // TODO: simplify all this into the edit api
+
+        /* var go = function() {
+            if ($scope.filterApi.cancel) {
+                $scope.filterApi.cancel();
+                $scope.filterApi.setEditing(false);
+            }
+            delete $rootScope.veEdits['element|' + $scope.specApi.getEdits().sysmlid + '|' + ws];
+            $scope.specApi.revertEdits();
+            $scope.editing = false;
+            if (Object.keys($rootScope.veEdits).length === 0) {
+                $rootScope.mms_tbApi.setIcon('element.editor', 'fa-edit');
+            }
+            if (Object.keys($rootScope.veEdits).length > 1) {
+                $rootScope.mms_tbApi.setPermission('element.editor.saveall', true);
+            } else {
+                $rootScope.mms_tbApi.setPermission('element.editor.saveall', false);
+            }
+            $scope.bbApi.setPermission('edit.view.documentation',true);
+            $scope.bbApi.setPermission('edit.view.documentation.save',false);
+            $scope.bbApi.setPermission('edit.view.documentation.cancel',false);
+        };
+        if ($scope.specApi.hasEdits()) {
+            var instance = $modal.open({
+                templateUrl: 'partials/mms/cancelConfirm.html',
+                scope: $scope,
+                controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
+                    $scope.ok = function() {
+                        $modalInstance.close('ok');
+                    };
+                    $scope.cancel = function() {
+                        $modalInstance.dismiss();
+                    };
+                }]
+            });
+            instance.result.then(function() {
+                go();
+            });
+        } else
+            go();
+
+        */
+    });
+
     $scope.$on('element.delete', function(event, instanceVal, presentationElem) {
         ViewService.deleteElementFromView(view.sysmlid, workspace, instanceVal).then(function(data) {
             growl.success('Delete Successful');

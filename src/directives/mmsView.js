@@ -131,10 +131,16 @@ function mmsView(ViewService, $templateCache, growl) {
         scope.showComments = false;
         scope.showEdits = false;
         scope.editing = false;
+        scope.editingInstane = undefined;
         
         scope.setEditingInstance = function(instance) {
             scope.editing = true;
             scope.editingInstance = instance;
+        };
+
+        scope.clearEditingInstance = function() {
+            scope.editing = false;
+            scope.editingInstance = undefined;
         };
 
         /**
@@ -214,6 +220,7 @@ function mmsView(ViewService, $templateCache, growl) {
             };
             api.toggleShowEdits = scope.toggleShowEdits;
             api.setEditingInstance = scope.setEditingInstance;
+            api.clearEditingInstance = scope.clearEditingInstance;
 
             api.changeView = function(vid) {
                 scope.changeView(vid);
