@@ -23,6 +23,7 @@ function mmsViewElemRefTree(ViewService, ElementService, $templateCache, $rootSc
     var mmsViewElemRefTreeCtrl = function($scope, $rootScope) {
         
         $scope.presentationElem = {};
+        $scope.instanceSpecName = "";
 
         if ($scope.mmsInstanceVal) {
 
@@ -36,6 +37,11 @@ function mmsViewElemRefTree(ViewService, ElementService, $templateCache, $rootSc
                 if (ViewService.isSection(element)) {
                     $scope.presentationElem.type = 'Section';
                 }
+
+                ElementService.getElement($scope.mmsInstanceVal.instance, false, $scope.workspace).
+                then(function(instanceSpec) {
+                    $scope.instanceSpecName = instanceSpec.name;
+                });
             });           
         }      
 

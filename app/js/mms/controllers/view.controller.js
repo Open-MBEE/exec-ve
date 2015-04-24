@@ -327,223 +327,123 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
             growl.error(reason.message);
     };
 
-    $scope.$on('view.add.paragraph', function() {
+    var addElementCtrl = function($scope, $modalInstance, $filter) {
 
-        ViewService.addParagraph(view, workspace, true, site.sysmlid).then(function(data) {
-            growl.success('Adding Paragraph Successful');
-        }, handleError);
+        $scope.oking = false;
+        $scope.newItem = {};
+        $scope.newItem.name = "";
+
+        $scope.searching = false;
+
+        // Search for InstanceSpecs.  We are searching for InstanceSpecs b/c we only want to
+        // create a InstanceValue to point to that InstanceSpec when cross-referencing.
+        $scope.search = function(searchText) {
+            //var searchText = $scope.searchText; //TODO investigate why searchText isn't in $scope
+            //growl.info("Searching...");
+            $scope.searching = true;
+
+            ElementService.search(searchText, false, ws)
+            .then(function(data) {
+
+                // Filter out anything that is not a InstanceSpecification or not of the correct type:
+                for (var i = 0; i < data.length; i++) {
+                    if (data[i].specialization.type != 'InstanceSpecification') {
+                        data.splice(i, 1);
+                        i--;
+                    }
+                    else if (data[i].specialization.classifier[0].indexOf($scope.presentationElemType) == -1) {
+                        data.splice(i, 1);
+                        i--;
+                    }
+                }
+
+                $scope.mmsCfElements = data;
+                $scope.searching = false;
+            }, function(reason) {
+                growl.error("Search Error: " + reason.message);
+                $scope.searching = false;
+            });
+        };
+
+        // Adds a InstanceValue to the view given the sysmlid of the InstanceSpecification
+        $scope.addElement = function(elementId) {
+
+            if ($scope.oking) {
+                growl.info("Please wait...");
+                return;
+            }
+            $scope.oking = true;  
+
+            ViewService.addInstanceVal(view, workspace, elementId).
+            then(function(data) {
+                growl.success("Adding "+$scope.presentationElemType+"  Successful");
+                $modalInstance.close(data);
+            }, function(reason) {
+                growl.error($scope.presentationElemType+" Add Error: " + reason.message);
+            }).finally(function() {
+                $scope.oking = false;
+            });            
+        };
+
+        $scope.ok = function() {
+            if ($scope.oking) {
+                growl.info("Please wait...");
+                return;
+            }
+            $scope.oking = true;
+
+            ViewService.createAndAddElement(view, workspace, true, $scope.presentationElemType, site.sysmlid, $scope.newItem.name).
+            then(function(data) {
+                growl.success("Adding "+$scope.presentationElemType+"  Successful");
+                $modalInstance.close(data);
+            }, function(reason) {
+                growl.error($scope.presentationElemType+" Add Error: " + reason.message);
+            }).finally(function() {
+                $scope.oking = false;
+            }); 
+        };
+
+        $scope.cancel = function() {
+            $modalInstance.dismiss();
+        };
+
+    };
+
+    var addElement = function(type) {
+
+        $scope.presentationElemType = type;
+        $scope.newItem = {};
+        $scope.newItem.name = "";
+        var templateUrlStr = 'partials/mms/add-item.html';
+
+        var instance = $modal.open({
+            templateUrl: templateUrlStr,
+            scope: $scope,
+            controller: ['$scope', '$modalInstance', '$filter', addElementCtrl]
+        });
+        instance.result.then(function(data) {
+            // TODO: do anything here?
+        });
+    };
+
+    $scope.$on('view.add.paragraph', function() {
+        addElement('Paragraph');
     });
 
     $scope.$on('view.add.list', function() {
-
-        // Create a Opaque List:
-        var parElement = {
-             "name": "Untitled Paragraph",
-             "specialization": {
-                  "type":"Element"
-              }
-        };
-
-        ElementService.createElement(parElement, workspace, site.sysmlid).then(function(createdParElement) {
-
-            var paragraph = {
-                "sourceType": "reference",
-                "source": createdParElement.sysmlid,
-                "sourceProperty": "documentation",
-                "type": "Paragraph"
-            };
-
-            var list = {
-                "ordered": true,
-                "bulleted": true,
-                "list":[[paragraph]],
-                "type": "List"
-            };
-
-            var listWrapper = {
-                "string":JSON.stringify(list),
-                "type":"LiteralString"
-            };
-
-            var instanceSpec = {
-                "specialization": {
-                  "type":"InstanceSpecification",
-                  "classifier":["PE_Opaque_List"],
-                  "instanceSpecificationSpecification":listWrapper
-               }
-            };
-
-            ElementService.createElement(instanceSpec, workspace, site.sysmlid).then(function(createdInstanceSpec) {
-
-                var instanceVal = {
-                    "instance":createdInstanceSpec.sysmlid,
-                    "type":"InstanceValue"
-                };
-
-                ViewService.addElementToView(view.sysmlid, view.sysmlid, workspace, instanceVal).then(function(data) {
-                    growl.success('Adding List Successful');
-                }, handleError);
-            });
-
-        });
-
+        addElement('List');
     });
 
     $scope.$on('view.add.table', function() {
-
-        // Create a Opaque Table:
-        var parElement = {
-             "name": "Untitled Paragraph",
-             "specialization": {
-                  "type":"Element"
-              }
-        };
-
-        ElementService.createElement(parElement, workspace, site.sysmlid).then(function(createdParElement) {
-
-            var paragraph = {
-                "sourceType": "reference",
-                "source": createdParElement.sysmlid,
-                "sourceProperty": "documentation",
-                "type": "Paragraph"
-            };
-
-            var table = {
-                "body":[
-                    [{"content":[paragraph],
-                      "rowspan":1,
-                      "colspan":1}]
-                ],
-                "type": "Table",
-                "style": "normal",
-                "title": "Untitled",
-                "header": [[
-                    {
-                        "content": [{
-                            "sourceType": "text",
-                            "text": "Untitled Header",
-                            "type": "Paragraph"
-                        }]
-                    }
-                ]]
-            };
-
-            var tableWrapper = {
-                "string":JSON.stringify(table),
-                "type":"LiteralString"
-            };
-
-            var instanceSpec = {
-                "specialization": {
-                  "type":"InstanceSpecification",
-                  "classifier":["PE_Opaque_Table"],
-                  "instanceSpecificationSpecification":tableWrapper
-               }
-            };
-
-            ElementService.createElement(instanceSpec, workspace, site.sysmlid).then(function(createdInstanceSpec) {
-
-                var instanceVal = {
-                    "instance":createdInstanceSpec.sysmlid,
-                    "type":"InstanceValue"
-                };
-
-                ViewService.addElementToView(view.sysmlid, view.sysmlid, workspace, instanceVal).then(function(data) {
-                    growl.success('Adding Table Successful');
-                }, handleError);
-            });
-
-        });
-
+        addElement('Table');
     });
 
-
     $scope.$on('view.add.section', function() {
-
-        // Create a Opaque Section:
-        ViewService.addParagraph(view, workspace, false, site.sysmlid).then(function(createdInstanceVal) {
-
-            var sectionWrapper = {
-                "operand":[{
-                                "instance": createdInstanceVal.sysmlid,
-                                "type":"InstanceValue"   
-                }],
-                "type":"Expression"
-            };
-
-            var instanceSpec = {
-                "name": "Untitled Section",
-                "specialization": {
-                  "type":"InstanceSpecification",
-                  "classifier":["PE_Opaque_Section"],
-                  "instanceSpecificationSpecification":sectionWrapper
-               }
-            };
-
-            ElementService.createElement(instanceSpec, workspace, site.sysmlid).then(function(createdInstanceSpec) {
-
-                var instanceVal = {
-                    "instance":createdInstanceSpec.sysmlid,
-                    "type":"InstanceValue"
-                };
-
-                ViewService.addElementToView(view.sysmlid, view.sysmlid, workspace, instanceVal).
-                then (function (data) {
-                    growl.success('Adding Section Successful');
-
-                    // Broadcast message to TreeCtrl:
-                    $rootScope.$broadcast('viewctrl.add.section', instanceSpec);
-                }, handleError);
-            });
-
-        });
-
+        addElement('Section');
     });
 
     $scope.$on('view.add.image', function() {
-
-        // Create a Opaque Image:
-        var imageElement = {
-             "name": "Untitled Image",
-             "specialization": {
-                  "type":"Element"
-              }
-        };
-
-        ElementService.createElement(imageElement, workspace, site.sysmlid).then(function(createdImageElement) {
-
-            var image = {
-                "sysmlid": createdImageElement.sysmlid,
-                "type": "Image"
-            };
-
-            var imageWrapper = {
-                "string":JSON.stringify(image),
-                "type":"LiteralString"
-            };
-
-            var instanceSpec = {
-                "specialization": {
-                  "type":"InstanceSpecification",
-                  "classifier":["PE_Opaque_Image"],
-                  "instanceSpecificationSpecification":imageWrapper
-               }
-            };
-
-            ElementService.createElement(instanceSpec, workspace, site.sysmlid).then(function(createdInstanceSpec) {
-
-                var instanceVal = {
-                    "instance":createdInstanceSpec.sysmlid,
-                    "type":"InstanceValue"
-                };
-
-                ViewService.addElementToView(view.sysmlid, view.sysmlid, workspace, instanceVal).then(function(data) {
-                    growl.success('Adding Image Successful');
-                }, handleError);
-
-            });
-
-        });
+        addElement('Image');
     });
 
     $scope.$on('element.edit', function(event, instanceVal) {

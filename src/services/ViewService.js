@@ -378,68 +378,167 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
     };
 
     /**
-     * Adds a opaque paragraph to the passed view if addToView is true,
-     * otherwise, just creates the opaque paragraph but doesnt add it the
+     * Creates and adds a opaque presentation element to the passed view if addToView is true,
+     * otherwise, just creates the opaque element but doesnt add it the
      * view.
      *
      * @param {string} view Id of the View to add to
      * @param {string} [workspace=master] workspace to use
-     * @param {string} addToView true if wanting to add the paragraph to the view
-     * @param {string} [site=null] (optional) site to post to 
+     * @param {string} addToView true if wanting to add the element to the view
+     * @param {string} elementType The type of element that is to be created, ie 'Paragraph'
+     * @param {string} [site=null] (optional) site to post to
+     * @param {string} [name=Untitled <elementType>] (optional) InstanceSpecification name to use
      * @returns {Promise} The promise would be resolved with updated View object
     */
-    var addParagraph = function(view, workspace, addToView, site) {
+    var createAndAddElement = function(view, workspace, addToView, elementType, site, name) {
 
         var deferred = $q.defer();
+        var defaultName = "Untitled "+elementType;
+        var instanceSpecName = name ? name : defaultName;
 
-        // Create a Untitled Opaque Paragraph:
-        var parElement = {
-             "name": "Untitled Paragraph",
-             "specialization": {
-                  "type":"Element"
+        var element = {
+             name: "paragraph",     // TODO: should we make this name unique or not have one?
+             specialization: {
+                  type:"Element"
               }
         };
 
-        ElementService.createElement(parElement, workspace, site).then(function(createdParElement) {
+        ElementService.createElement(element, workspace, site).then(function(createdElement) {
 
             var paragraph = {
-                "sourceType": "reference",
-                "source": createdParElement.sysmlid,
-                "sourceProperty": "documentation",
-                "type": "Paragraph"
+                sourceType: "reference",
+                source: createdElement.sysmlid,
+                sourceProperty: "documentation",
+                type: "Paragraph"
             };
 
-            var paragraphWrapper = {
-                "string":JSON.stringify(paragraph),
-                "type":"LiteralString"
-            };
-
-            var instanceSpec = {
-                "owner": view.sysmlid,
-                "specialization": {
-                  "type":"InstanceSpecification",
-                  "classifier":["PE_Opaque_Paragraph"],
-                  "instanceSpecificationSpecification":paragraphWrapper
-               }
-            };
-
-            ElementService.createElement(instanceSpec, workspace, site).then(function(createdInstanceSpec) {
-
-                deferred.resolve(createdInstanceSpec);
-
-                var instanceVal = {
-                    "instance":createdInstanceSpec.sysmlid,
-                    "type":"InstanceValue"
+            var jsonBlob = {};
+            if (elementType === "Paragraph") {
+                jsonBlob = paragraph;
+            }
+            else if (elementType === "List") {
+                jsonBlob = {
+                    ordered: true,
+                    bulleted: true,
+                    list:[[paragraph]],
+                    type: elementType
                 };
+            }
+            else if (elementType === "Table") {
+                jsonBlob = {
+                    body:[
+                        [{content:[paragraph],
+                          rowspan:1,
+                          colspan:1}]
+                    ],
+                    style: "normal",
+                    title: "Untitled",
+                    header: [[
+                        {
+                            content: [{
+                                sourceType: "text",
+                                text: "Untitled Header",
+                                type: "Paragraph"
+                            }]
+                        }
+                    ]],
+                    type: elementType
+                };
+            }
+            else if (elementType === "Image") {
+                jsonBlob = {
+                    sysmlid: createdElement.sysmlid,
+                    type: elementType
+                };
+            }
+            else if (elementType === "Section") {
+                // Section's do not use json blobs, and cannot use the paragraph created
+                // above.  Would need to create a paragraph using this method and then 
+                // add it to operand below.
+                jsonBlob = {
+                    operand:[],  
+                    type:"Expression"
+                };
+            }
 
-                if (addToView) {
-                    addElementToView(view.sysmlid, view.sysmlid, workspace, instanceVal);
-                }
+            addInstanceSpecification(view, workspace, elementType, jsonBlob, addToView, site, instanceSpecName).
+            then(function(data) {
+                deferred.resolve(data);
             });
 
         });
 
         return deferred.promise;
+
+    };
+
+    /**
+     * Adds a InstanceVal/InstanceSpecification to the contents of the View
+     *
+     * @param {string} view Id of the View to add to
+     * @param {string} [workspace=master] workspace to use
+     * @param {string} type The type of element that is to be created, ie 'Paragraph'
+     * @param {object} jsonBlob The JSON blob for the presentation element being added
+     * @param {string} addToView true if wanting to add the element to the view
+     * @param {string} [site=null] (optional) site to post to
+     * @param {string} [name=Untitled <elementType>] (optional) InstanceSpecification name to use
+     * @returns {Promise} The promise would be resolved with updated View object
+    */
+    var addInstanceSpecification = function(view, workspace, type, jsonBlob, addToView, site, name) {
+
+        var deferred = $q.defer();
+        var instanceSpecName = name ? name : "Untitled InstanceSpec";
+        var presentationElem = {};
+
+        // Special case for Section.  Doesnt use json blobs.
+        if (type === "Section") {
+            presentationElem = jsonBlob;  
+        }
+        else {
+            presentationElem = {
+                string:JSON.stringify(jsonBlob),
+                type:"LiteralString"
+            };
+        }
+
+        var instanceSpec = {
+            specialization: {
+              name:instanceSpecName,
+              type:"InstanceSpecification",
+              classifier:["PE_Opaque_"+type],
+              instanceSpecificationSpecification:presentationElem
+           }
+        };
+
+        ElementService.createElement(instanceSpec, workspace, site).then(function(createdInstanceSpec) {
+
+            deferred.resolve(createdInstanceSpec);
+
+            if (addToView) {
+                addInstanceVal(view, workspace, createdInstanceSpec.sysmlid);
+            }
+        });
+
+        return deferred.promise;
+    };
+
+    /**
+     * Adds a InstanceValue to the contents of the View
+     *
+     * @param {string} view Id of the View to add to
+     * @param {string} [workspace=master] workspace to use
+     * @param {string} instanceSpecId InstanceSpecification sysmlid.  This is the instance
+     #                 for the InstanceValue.
+     * @returns {Promise} The promise would be resolved with updated View object
+    */
+    var addInstanceVal = function(view, workspace, instanceSpecId) {
+
+        var instanceVal = {
+            instance:instanceSpecId,
+            type:"InstanceValue"
+        };
+
+        return addElementToView(view.sysmlid, view.sysmlid, workspace, instanceVal);
     };
 
     /**
@@ -685,8 +784,10 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
         parseExprRefTree: parseExprRefTree,
         isSection: isSection,
         addElementToView: addElementToView,
-        addParagraph: addParagraph,
-        deleteElementFromView: deleteElementFromView
+        createAndAddElement: createAndAddElement,
+        addInstanceVal: addInstanceVal,
+        deleteElementFromView: deleteElementFromView,
+        addInstanceSpecification: addInstanceSpecification,
     };
 
 }
