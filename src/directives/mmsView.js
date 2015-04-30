@@ -183,6 +183,7 @@ function mmsView(ViewService, $templateCache, growl) {
          */
         scope.toggleShowEdits = function() {
             scope.showEdits = !scope.showEdits;
+            scope.showEditsInstance = undefined;
         };
 
         scope.toggleShowEditsWireFrame = function(instanceVal) {
