@@ -24,6 +24,7 @@ function mmsViewElemRefTree(ViewService, ElementService, $templateCache, $rootSc
         
         $scope.presentationElem = {};
         $scope.instanceSpecName = "";
+        $scope.presentationElemLoading = true;
 
         if ($scope.mmsInstanceVal) {
 
@@ -42,6 +43,8 @@ function mmsViewElemRefTree(ViewService, ElementService, $templateCache, $rootSc
                 then(function(instanceSpec) {
                     $scope.instanceSpecName = instanceSpec.name;
                 });
+
+                $scope.presentationElemLoading = false;
             });           
         }      
 
@@ -61,6 +64,14 @@ function mmsViewElemRefTree(ViewService, ElementService, $templateCache, $rootSc
             $rootScope.$broadcast('element.edit', instanceVal);            
         };
 
+        $scope.toggleFrame = function() {
+            $rootScope.$broadcast("show.edits.wireframe", $scope.mmsInstanceVal);
+        };
+
+        this.toggleWireFrame = function() {
+            $rootScope.$broadcast("show.edits.wireframe", $scope.mmsInstanceVal);
+        };
+
         this.getInstanceId = function() {
             return $scope.mmsInstanceVal.instance;
         };
@@ -68,13 +79,19 @@ function mmsViewElemRefTree(ViewService, ElementService, $templateCache, $rootSc
     };
 
     var mmsViewElemRefTreeLink = function(scope, element, attrs, mmsViewCtrl) {
+
         scope.showEdits = function () {
             return mmsViewCtrl.getShowEdits();
+        };
+
+        scope.showEditsWireFrame = function (instanceVal) {
+            return mmsViewCtrl.getShowEditsWireFrame(instanceVal) && mmsViewCtrl.getShowEdits();
         };
 
         scope.isEditing = function(instance) {
             return mmsViewCtrl.isEditingInstance(instance.instance);
         };
+       
     };
 
 

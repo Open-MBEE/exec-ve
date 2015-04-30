@@ -1,6 +1,7 @@
-<div ng-switch on="presentationElem.type"> 
+<div ng-show="presentationElemLoading" class="fa fa-spinner fa-spin"></div>
+<div ng-hide="presentationElemLoading" ng-switch on="presentationElem.type"> 
 
-        <div ng-show="showEdits()" class="panel panel-danger"> 
+        <div ng-show="showEditsWireFrame(mmsInstanceVal)" class="panel panel-danger"> 
           <div class="panel-heading clearfix">
             <h3 class="panel-title pull-left">{{presentationElem.type}}: {{instanceSpecName}}</h3>
             <div ng-hide="isEditing(mmsInstanceVal)" class="btn-group pull-right">      
@@ -22,7 +23,7 @@
           </div>
         </div> 
 
-        <div ng-hide="showEdits()"> 
+        <div ng-hide="showEditsWireFrame(mmsInstanceVal)" ng-click="toggleFrame()"> 
   		    <mms-view-para data-mms-instance-val="mmsInstanceVal" data-mms-para="presentationElem" ng-switch-when="Paragraph"></mms-view-para>
   		    <mms-view-table data-mms-instance-val="mmsInstanceVal" data-mms-table="presentationElem" ng-switch-when="Table"></mms-view-table>
   		    <mms-view-list data-mms-instance-val="mmsInstanceVal" data-mms-list="presentationElem" ng-switch-when="List"></mms-view-list>

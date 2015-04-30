@@ -64,6 +64,10 @@ function mmsView(ViewService, $templateCache, growl) {
         this.getShowEdits = function () {
             return $scope.showEdits;
         };
+        this.getShowEditsWireFrame = function (instanceVal) {
+            return $scope.showEditsInstance === instanceVal;
+        };
+
         this.getViewElements = function() {
             return ViewService.getViewElements($scope.mmsVid, false, $scope.mmsWs, $scope.mmsVersion);
         };
@@ -131,6 +135,7 @@ function mmsView(ViewService, $templateCache, growl) {
         scope.showComments = false;
         scope.showEdits = false;
         scope.editing = false;
+        scope.showEditsInstance = undefined;
         scope.editingInstane = undefined;
         
         scope.setEditingInstance = function(instance) {
@@ -180,6 +185,10 @@ function mmsView(ViewService, $templateCache, growl) {
             scope.showEdits = !scope.showEdits;
         };
 
+        scope.toggleShowEditsWireFrame = function(instanceVal) {
+            scope.showEditsInstance = instanceVal;
+        };
+
         if (angular.isObject(scope.mmsViewApi)) {
             var api = scope.mmsViewApi;
             api.toggleShowElements = scope.toggleShowElements;
@@ -221,6 +230,7 @@ function mmsView(ViewService, $templateCache, growl) {
             api.toggleShowEdits = scope.toggleShowEdits;
             api.setEditingInstance = scope.setEditingInstance;
             api.clearEditingInstance = scope.clearEditingInstance;
+            api.toggleShowEditsWireFrame = scope.toggleShowEditsWireFrame;
 
             api.changeView = function(vid) {
                 scope.changeView(vid);

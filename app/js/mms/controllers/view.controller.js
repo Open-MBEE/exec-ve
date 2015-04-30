@@ -560,6 +560,10 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         $scope.bbApi.toggleButtonState('show.edits');
     });
 
+    $scope.$on('show.edits.wireframe', function(event, instanceVal) {
+        $scope.viewApi.toggleShowEditsWireFrame(instanceVal);
+    });
+
     $scope.$on('center.previous', function() {
         var prev = $rootScope.mms_treeApi.get_prev_branch($rootScope.mms_treeApi.get_selected_branch());
         if (!prev)

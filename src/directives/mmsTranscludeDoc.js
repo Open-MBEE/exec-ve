@@ -48,6 +48,8 @@ function mmsTranscludeDoc(ElementService, UtilsService, $compile, $log, $templat
         element.click(function(e) {
             if (mmsViewCtrl)
                 mmsViewCtrl.transcludeClicked(scope.mmsEid);
+            if (mmsViewElemRefTreeCtrl)
+                mmsViewElemRefTreeCtrl.toggleWireFrame();
             if (e.target.tagName !== 'A' && e.target.tagName !== 'INPUT')
                 return false;
             //e.stopPropagation();
