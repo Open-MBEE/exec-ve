@@ -388,7 +388,8 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
      * @param {string} elementType The type of element that is to be created, ie 'Paragraph'
      * @param {string} [site=null] (optional) site to post to
      * @param {string} [name=Untitled <elementType>] (optional) InstanceSpecification name to use
-     * @returns {Promise} The promise would be resolved with updated View object
+     * @returns {Promise} The promise would be resolved with updated View object if addToView is true
+     *                    otherwise the created InstanceSpecification
     */
     var createAndAddElement = function(view, workspace, addToView, elementType, site, name) {
 
@@ -482,7 +483,8 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
      * @param {string} addToView true if wanting to add the element to the view
      * @param {string} [site=null] (optional) site to post to
      * @param {string} [name=Untitled <elementType>] (optional) InstanceSpecification name to use
-     * @returns {Promise} The promise would be resolved with updated View object
+     * @returns {Promise} The promise would be resolved with updated View object if addToView is true
+     *                    otherwise the created InstanceSpecification
     */
     var addInstanceSpecification = function(view, workspace, type, jsonBlob, addToView, site, name) {
 
@@ -512,10 +514,13 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
 
         ElementService.createElement(instanceSpec, workspace, site).then(function(createdInstanceSpec) {
 
-            deferred.resolve(createdInstanceSpec);
-
             if (addToView) {
-                addInstanceVal(view, workspace, createdInstanceSpec.sysmlid);
+                addInstanceVal(view, workspace, createdInstanceSpec.sysmlid).then(function(updatedView) {
+                    deferred.resolve(updatedView);
+                });
+            }
+            else {
+                deferred.resolve(createdInstanceSpec);
             }
         });
 
@@ -548,7 +553,7 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
      * 
      * @description
      * Create a new view, owner must be specified (parent view), id cannot be specified,
-     * if name isn't specified, "Untitled" will be used, a default contains with 
+     * if name isn't specified, "Untitled" will be used, a default contents with 
      * paragraph of the view documentation will be used. If a document is specified, 
      * will also add the view to the document, in this case the parent view should 
      * already be in the document. The new view will be added as the last child of the 
@@ -563,25 +568,24 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
     var createView = function(ownerId, name, documentId, workspace) {
         var deferred = $q.defer();
         var view = {
-            specialization: {type: 'View', contains: []},
+            specialization: {type: 'View'},
             owner: ownerId,
             name: !name ? 'Untitled View' : name,
             documentation: '',
         };
         ElementService.createElement(view, workspace)
         .then(function(data) {
-            data.specialization.contains = [
-                {
-                    'type': 'Paragraph', 
-                    'sourceType': 'reference', 
-                    'source': data.sysmlid, 
-                    'sourceProperty': 'documentation'
-                }
-            ];
             data.specialization.allowedElements = [data.sysmlid];
             data.specialization.displayedElements = [data.sysmlid];
             data.specialization.childrenViews = [];
-            ElementService.updateElement(data, workspace)
+
+            var jsonBlob = {
+                'type': 'Paragraph', 
+                'sourceType': 'reference', 
+                'source': data.sysmlid, 
+                'sourceProperty': 'documentation'
+            };
+            addInstanceSpecification(data, workspace, "Paragraph", jsonBlob, true, null, data.name+" Documentation")
             .then(function(data2) {
                 if (documentId) {
                     addViewToDocument(data.sysmlid, documentId, ownerId, workspace, data2)
@@ -610,14 +614,6 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
         };
         ElementService.createElement(doc, workspace, site)
         .then(function(data) {
-            data.specialization.contains = [
-                {
-                    'type': 'Paragraph',
-                    'sourceType': 'reference',
-                    'source': data.sysmlid,
-                    'sourceProperty': 'documentation'
-                }
-            ];
             data.specialization.allowedElements = [data.sysmlid];
             data.specialization.displayedElements = [data.sysmlid];
             data.specialization.view2view = [
@@ -626,7 +622,14 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
                     childrenViews: []
                 }
             ];
-            ElementService.updateElement(data, workspace)
+
+            var jsonBlob = {
+                'type': 'Paragraph', 
+                'sourceType': 'reference', 
+                'source': data.sysmlid, 
+                'sourceProperty': 'documentation'
+            };
+            addInstanceSpecification(data, workspace, "Paragraph", jsonBlob, true, site, data.name+" Documentation")
             .then(function(data2) {
                 var ws = !workspace ? 'master' : workspace;
                 var cacheKey = ['sites', ws, 'latest', site, 'products'];

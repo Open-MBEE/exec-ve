@@ -186,6 +186,14 @@ function mmsView(ViewService, $templateCache, growl) {
             scope.showEditsInstance = undefined;
         };
 
+        /**
+         * @ngdoc function
+         * @name mms.directives.directive:mmsView#toggleShowEditsWireFrame
+         * @methodOf mms.directives.directive:mmsView
+         * 
+         * @description 
+         * toggle elements editing panel for a specific instanceVal
+         */
         scope.toggleShowEditsWireFrame = function(instanceVal) {
             scope.showEditsInstance = instanceVal;
         };
