@@ -327,7 +327,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
             growl.error(reason.message);
     };
 
-    var addElementCtrl = function($scope, $modalInstance, $filter) {
+    var addElementCtrl = function($scope, $modalInstance, $filter, ViewService) {
 
         $scope.oking = false;
         $scope.newItem = {};
@@ -351,7 +351,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
                         data.splice(i, 1);
                         i--;
                     }
-                    else if (data[i].specialization.classifier[0].indexOf($scope.presentationElemType) == -1) {
+                    else if (data[i].specialization.classifier[0] !== ViewService.typeToClassifierId[$scope.presentationElemType]) {
                         data.splice(i, 1);
                         i--;
                     }
@@ -366,7 +366,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         };
 
         // Adds a InstanceValue to the view given the sysmlid of the InstanceSpecification
-        $scope.addElement = function(elementId) {
+        $scope.addElement = function(element) {
 
             if ($scope.oking) {
                 growl.info("Please wait...");
@@ -374,8 +374,12 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
             }
             $scope.oking = true;  
 
-            ViewService.addInstanceVal(view, workspace, elementId).
+            ViewService.addInstanceVal(view, workspace, element.sysmlid).
             then(function(data) {
+                if ($scope.presentationElemType === "Section") {
+                    // Broadcast message to TreeCtrl:
+                    $rootScope.$broadcast('viewctrl.add.section', element);
+                }
                 growl.success("Adding "+$scope.presentationElemType+"  Successful");
                 $modalInstance.close(data);
             }, function(reason) {
@@ -419,7 +423,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         var instance = $modal.open({
             templateUrl: templateUrlStr,
             scope: $scope,
-            controller: ['$scope', '$modalInstance', '$filter', addElementCtrl]
+            controller: ['$scope', '$modalInstance', '$filter', 'ViewService', addElementCtrl]
         });
         instance.result.then(function(data) {
             // TODO: do anything here?

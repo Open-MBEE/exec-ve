@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms')
-.factory('ViewService', ['$q', '$http', 'URLService', 'ElementService', 'UtilsService', 'CacheService', '_', ViewService]);
+.factory('ViewService', ['$q', '$http', '$rootScope','URLService', 'ElementService', 'UtilsService', 'CacheService', '_', ViewService]);
 
 /**
  * @ngdoc service
@@ -20,9 +20,18 @@ angular.module('mms')
  *
  * For View and Product json object schemas, see [here](https://ems.jpl.nasa.gov/alfresco/mms/raml/index.html)
  */
-function ViewService($q, $http, URLService, ElementService, UtilsService, CacheService, _) {
+function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsService, CacheService, _) {
     var currentViewId = '';
     var currentDocumentId = '';
+
+    // The type of opaque element to the sysmlid of the classifier:
+    var typeToClassifierId = {
+        Image: "_17_0_5_1_407019f_1430628206190_469511_11978",
+        List: "_17_0_5_1_407019f_1430628190151_363897_11927",
+        Paragraph: "_17_0_5_1_407019f_1430628197332_560980_11953",
+        Table: "_17_0_5_1_407019f_1430628178633_708586_11903",
+        Section: "_17_0_5_1_407019f_1430628211976_255218_12002"
+    };
     
     /**
      * @ngdoc method
@@ -465,8 +474,12 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
             addInstanceSpecification(view, workspace, elementType, jsonBlob, addToView, site, instanceSpecName).
             then(function(data) {
                 deferred.resolve(data);
+            }, function(reason) {
+                deferred.reject(reason);
             });
 
+        }, function(reason) {
+            deferred.reject(reason);
         });
 
         return deferred.promise;
@@ -492,6 +505,7 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
         var instanceSpecName = name ? name : "Untitled InstanceSpec";
         var presentationElem = {};
 
+
         // Special case for Section.  Doesnt use json blobs.
         if (type === "Section") {
             presentationElem = jsonBlob;  
@@ -507,7 +521,7 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
             specialization: {
               name:instanceSpecName,
               type:"InstanceSpecification",
-              classifier:["PE_Opaque_"+type],
+              classifier:[typeToClassifierId[type]],
               instanceSpecificationSpecification:presentationElem
            }
         };
@@ -516,12 +530,20 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
 
             if (addToView) {
                 addInstanceVal(view, workspace, createdInstanceSpec.sysmlid).then(function(updatedView) {
+                    if (type === "Section") {
+                        // Broadcast message to TreeCtrl:
+                        $rootScope.$broadcast('viewctrl.add.section', createdInstanceSpec);
+                    }
                     deferred.resolve(updatedView);
+                }, function(reason) {
+                    deferred.reject(reason);
                 });
             }
             else {
                 deferred.resolve(createdInstanceSpec);
             }
+        }, function(reason) {
+            deferred.reject(reason);
         });
 
         return deferred.promise;
@@ -725,6 +747,8 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
             if (instanceSpec.slots) {
                 // TODO
             }        
+        }, function(reason) {
+            deferred.reject(reason);
         });
 
         return deferred.promise;
@@ -744,7 +768,7 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
     var isSection = function(instanceSpec) {
         return instanceSpec.specialization && instanceSpec.specialization.classifier && 
                instanceSpec.specialization.classifier.length > 0 &&
-               instanceSpec.specialization.classifier[0].indexOf('Section') > -1;
+               instanceSpec.specialization.classifier[0] === typeToClassifierId.Section;
     };
 
     //TODO remove
@@ -791,6 +815,7 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
         addInstanceVal: addInstanceVal,
         deleteElementFromView: deleteElementFromView,
         addInstanceSpecification: addInstanceSpecification,
+        typeToClassifierId: typeToClassifierId
     };
 
 }
