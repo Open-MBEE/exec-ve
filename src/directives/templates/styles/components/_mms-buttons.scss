@@ -21,20 +21,26 @@
 }
 
 .btn-primary {
+  background-color: $base_blue;
+
   &:hover, &:active, &:focus {
     background-color: $base_blue;
   }
 }
 
 .btn-success {
+  background-color: $green;
+
   &:hover, &:active, &:focus {
     background-color: $green;
   }
 }
 
 .btn-danger {
+  background-color: $secondary_red;
+  
   &:hover, &:active, &:focus {
-    background-color: $red;
+    background-color: $secondary_red;
   }
 }
 

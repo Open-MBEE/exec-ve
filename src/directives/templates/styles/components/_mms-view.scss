@@ -6,4 +6,8 @@ mms-view {
     margin-top: 24px;
     margin-bottom: 0px;
   }
+
+  table {
+    @extend .content-table;
+  }
 }

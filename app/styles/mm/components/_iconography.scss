@@ -1,0 +1,19 @@
+.icon-added {
+  color: $green;
+}
+
+.icon-removed {
+  color: $red;
+}
+
+.icon-updated {
+  color: $base_blue;
+}
+
+.icon-moved {
+  color: $purple;
+}
+
+.icon-conflict {
+  color: darken($yellow, 33%);
+}

@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsNav', ['SiteService', '$templateCache', 'growl', mmsNav]);
+.directive('mmsNav', ['SiteService', 'WorkspaceService', 'ConfigService', '$templateCache', 'growl', mmsNav]);
 
 /**
  * @ngdoc directive
@@ -35,7 +35,7 @@ angular.module('mms.directives')
  * @param {string} mmsType The type of current page (or app name like DocWeb)
  * @param {string} mmsResponsive True to display a responsive sliding pane on small browser, false otherwise
  */
-function mmsNav(SiteService, $templateCache, growl) {
+function mmsNav(SiteService, WorkspaceService, ConfigService, $templateCache, growl) {
     var template = $templateCache.get('mms/templates/mmsNav.html');
 
     var mmsNavLink = function(scope, element, attrs) {
@@ -45,7 +45,7 @@ function mmsNav(SiteService, $templateCache, growl) {
         };
         var catNames = [];
         var sites = {};
-
+        
         //Resets catagory and sites accordions
         scope.reset = function(){
             for(var i = 0; i < catNames.length; i++){
@@ -178,6 +178,20 @@ function mmsNav(SiteService, $templateCache, growl) {
         scope.nav = new Nav();
         scope.nav.init();
 
+        WorkspaceService.getWorkspace(scope.ws)
+        .then(function(data) {
+            scope.wsName = data.name;
+        });
+        
+        /*if (scope.config && scope.config !== '' && scope.config !== 'latest') {
+            ConfigService.getConfig(scope.config, scope.ws, false)
+            .then(function(data) {
+                scope.configName = data.name;
+            });
+        } else {
+            scope.config = 'latest';
+        } */
+
         SiteService.getSites()
         .then(function(data) {
             // var sites = {};
@@ -185,8 +199,10 @@ function mmsNav(SiteService, $templateCache, growl) {
             for (var i = 0; i < data.length; i++) {
                 var site = data[i];
                 site.isOpen = true;
-                if (site.name === scope.site)
-                    scope.siteTitle = site.title;
+                if (site.sysmlid === scope.site)
+                    scope.siteTitle = site.name;
+                // TODO: Replace with .parent
+                site.categories = ["Uncategorized"];
                 if (site.categories.length === 0)
                     site.categories.push("Uncategorized");
                 for (var j = 0; j < site.categories.length; j++) {
@@ -213,12 +229,13 @@ function mmsNav(SiteService, $templateCache, growl) {
         restrict: 'E',
         template: template,
         scope: {
-            site: '@mmsSite', //current site name
-            title: '@mmsTitle', //current page title
-            type: '@mmsType', //current page type
-            //goTo: '@mmsGoTo',
-            //otherSites: '@mmsOtherSites',
-            responsive: '@mmsResponsive'
+            title: '@mmsTitle', //page title - used in mobile view only
+            ws: '@mmsWs',
+            site: '=mmsSite', //current site name
+            product: '=mmsDoc', //current document
+            config: '=mmsConfig', //config id
+            snapshot: '@mmsSnapshotTag', // snapshot titles (before tags - need to be backward compatible), if any
+            showTag: '@mmsShowTag'
         },
         link: mmsNavLink
     };

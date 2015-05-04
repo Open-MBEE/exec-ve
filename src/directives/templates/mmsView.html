@@ -1,6 +1,10 @@
 <div id="{{mmsVid}}">
 
-    <h1 class="view-title">
+    <h1 ng-if="mmsLink" class="view-title">
+      {{mmsNumber}} <mms-view-link data-mms-did="{{view.sysmlid}}" data-mms-vid="{{view.sysmlid}}"></mms-view-link> 
+    </h1>
+
+    <h1 ng-if="!mmsLink" class="view-title">
       {{mmsNumber}} <mms-transclude-name data-mms-eid="{{view.sysmlid}}"></mms-transclude-name>
     </h1>
 
@@ -11,7 +15,7 @@
     <br/>
     <i ng-hide="view" class="fa fa-2x fa-spinner fa-spin"></i>
 
-    <div ng-repeat="contain in view.specialization.contains" ng-switch on="contain.type"> 
+    <div ng-repeat="contain in ::view.specialization.contains" ng-switch on="contain.type"> 
 
         <mms-view-para data-mms-para="contain" ng-switch-when="Paragraph"></mms-view-para>
         <mms-view-table data-mms-table="contain" ng-switch-when="Table"></mms-view-table>

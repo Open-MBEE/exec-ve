@@ -1,0 +1,76 @@
+<div class="pane-right">
+    <div ng-if="document !== null">
+        <div class="container-fluid" ng-show="show.element">
+            <div ng-show="showTracker()">
+                <br>
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Edits ({{veEditsLength()}}):</label>
+                        <div class="col-sm-9">
+                            <select class="form-control" ng-options="eid as edit.specialization.type + ': ' + edit.name for (eid, edit) in veEdits" ng-model="tracker.etrackerSelected" ng-change="etrackerChange()">
+                            <!-- <option value="">--- Choose Open Edits ---</option> -->
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <mms-spec mms-eid="{{eid}}" mms-cf-elements="viewElements" mms-edit-field="all" mms-version="{{version}}" mms-ws="{{specWs}}" mms-site="{{site.sysmlid}}" mms-spec-api="specApi" mms-type="{{elementType}}"></mms-spec>
+        </div>
+    </div>
+    
+    <div class="container-fluid" ng-show="show.reorder">
+        <mms-view-struct mms-vid="{{vid}}" mms-version="{{version}}" mms-order="true" mms-ws="{{ws}}" mms-view-struct-api="viewOrderApi"></mms-view-struct>
+    </div>
+
+    <div class="container-fluid container-snapshots" ng-show="show.snapshots">
+        <h1>Snapshots <i class="{{snapshotLoading}}"></i></h1>
+
+        <table class="snapshot-table table table-condensed">
+            <tr><th>Time</th><th>Created By</th><th>Tag(s)</th></tr>
+            <tr>
+                <td>
+                    <a ui-sref="workspace.site.document({time: undefined, tag: undefined})" ui-sref-opts="{reload: true}" ng-click="snapshotClicked()">Latest</a>
+                </td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr ng-repeat="snapshot in snapshots | orderBy:'-created'">
+                <td>
+                    <a ui-sref="workspace.site.document({time: snapshot.created, tag: undefined})" ui-sref-opts="{reload: true}" ng-click="snapshotClicked()">{{snapshot.created | date:'M/d/yy h:mm a'}}</a>
+                </td>
+                <td>{{snapshot.creator}}
+                </td>
+                <td>
+                    <div ng-hide="snapshot.hideTag">
+                        <div ng-repeat="config in snapshot.configurations | orderBy:'name'">
+                            <a ui-sref="workspace.site({tag: config.id})" ui-sref-opts="{reload: true}">{{config.name}}</a>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+
+    </div>
+
+    <div class="container-fluid container-snapshots" ng-show="show.tags">
+        <h1>Tags <i class="{{snapshotLoading}}"></i></h1>
+
+        <table class="snapshot-table table table-condensed">
+            <tr><th>Name</th><th>Time</th></tr>
+            <tr>
+                <td>
+                    <a ui-sref="workspace.sites({tag: undefined})" ui-sref-opts="{reload: true}">Latest</a>
+                </td>
+                <td></td>
+            </tr>
+            <tr ng-repeat="tag in tags | orderBy:'-timestamp'">
+                <td>
+                    <a ui-sref="workspace.sites({tag: tag.id})" ui-sref-opts="{reload: true}">{{tag.name}}</a>
+                </td>
+                <td>{{tag.timestamp | date:'M/d/yy h:mm a'}}
+                </td>
+            </tr>
+        </table>
+
+    </div>
+</div>

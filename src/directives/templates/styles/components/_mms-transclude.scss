@@ -99,17 +99,20 @@ mms-view:not(.reviewing) mms-transclude-com {
   display: none;
 }
 
-mms-spec mms-transclude-img,
-mms-spec mms-transclude-name,
-mms-spec mms-transclude-val,
-mms-spec mms-transclude-doc {
-  background-color: $light_blue;
-  cursor: not-allowed;
-}
+mms-spec div {
+  mms-transclude-img,
+  mms-transclude-name,
+  mms-transclude-val,
+  mms-transclude-doc,
+  mms-view-link {
+    background-color: $light_blue;
+    cursor: not-allowed;
+  }
 
-mms-spec mms-transclude-com {
-  background-color: $yellow;
-  cursor: not-allowed;
+  mms-transclude-com {
+    background-color: $yellow;
+    cursor: not-allowed;
+  }
 }
 
 .error {

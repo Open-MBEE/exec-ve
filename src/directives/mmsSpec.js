@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsSpec', ['ElementService', '$compile', '$templateCache', '$modal', '$q', 'growl', '_', mmsSpec]);
+.directive('mmsSpec', ['ElementService', 'WorkspaceService', 'ConfigService', '$compile', '$templateCache', '$modal', '$q', 'growl', '_', mmsSpec]);
 
 /**
  * @ngdoc directive
@@ -73,7 +73,7 @@ angular.module('mms.directives')
  * @param {Object=} mmsElement An element object, if this is provided, a read only 
  *      element spec for it would be shown, this will not use mms services to get the element
  */
-function mmsSpec(ElementService, $compile, $templateCache, $modal, $q, growl, _) {
+function mmsSpec(ElementService, WorkspaceService, ConfigService, $compile, $templateCache, $modal, $q, growl, _) {
     //var readTemplate = $templateCache.get('mms/templates/mmsSpec.html');
     //var editTemplate = $templateCache.get('mms/templates/mmsSpecEdit.html');
     var template = $templateCache.get('mms/templates/mmsSpec.html');
@@ -86,12 +86,15 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, $q, growl, _)
             scope.element = scope.mmsElement;
             if (scope.element.specialization.type === 'Property')
                 scope.values = scope.element.specialization.value;
+            if (scope.element.specialization.type === 'Constraint')
+                scope.value = scope.element.specialization.specification;
             scope.editable = false;
             //element.empty();
             //element.append(readTemplate);
             //$compile(element.contents())(scope);
             return;
         }
+        scope.tinymceApi = {};
         /**
          * @ngdoc function
          * @name mms.directives.directive:mmsSpec#changeElement
@@ -107,6 +110,41 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, $q, growl, _)
                 //element.empty();
                 return;
             }
+            WorkspaceService.getWorkspace(scope.mmsWs)
+            .then(function(data) {
+                scope.workspace = data;
+            }, function(reason) {scope.workspace = null;});
+            if (scope.edit && scope.tinymceApi.save)
+                scope.tinymceApi.save();
+            if (scope.mmsType === 'workspace') {
+                WorkspaceService.getWorkspace(scope.mmsEid)
+                .then(function(data) {
+                    scope.element = data;
+                    scope.editable = true;
+                    WorkspaceService.getWorkspaceForEdit(scope.mmsEid)
+                    .then(function(data) {
+                        scope.edit = data;
+                        scope.editable = true;
+                        if (!keepMode)
+                            scope.editing = false;
+                        keepMode = false;
+                    });
+                });
+            } else if (scope.mmsType === 'tag') {
+                ConfigService.getConfig(scope.mmsEid, scope.mmsWs, false)
+                .then(function(data) {
+                    scope.element = data;
+                    scope.editable = true;
+                    ConfigService.getConfigForEdit(scope.mmsEid, scope.mmsWs)
+                    .then(function(data) {
+                        scope.edit = data;
+                        scope.editable = true;
+                        if (!keepMode)
+                            scope.editing = false;
+                        keepMode = false;
+                    });
+                });
+            } else {
             ElementService.getElement(scope.mmsEid, false, scope.mmsWs, scope.mmsVersion)
             .then(function(data) {
                 //element.empty();
@@ -114,6 +152,8 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, $q, growl, _)
                 scope.element = data;
                 if (scope.element.specialization.type === 'Property')
                     scope.values = scope.element.specialization.value;
+                if (scope.element.specialization.type === 'Constraint')
+                    scope.value = scope.element.specialization.specification;
                 if (scope.mmsEditField === 'none' || 
                         !scope.element.editable || 
                         (scope.mmsVersion !== 'latest' && scope.mmsVersion)) {
@@ -138,6 +178,9 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, $q, growl, _)
                         if (scope.edit.specialization.type === 'Property' && angular.isArray(scope.edit.specialization.value)) {
                             scope.editValues = scope.edit.specialization.value;
                         }
+                        if (scope.edit.specialization.type === 'Constraint' && scope.edit.specialization.specification) {
+                            scope.editValue = scope.edit.specialization.specification;
+                        }
                         //element.append(template);
                         //$compile(element.contents())(scope); 
                     });
@@ -145,9 +188,12 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, $q, growl, _)
             }, function(reason) {
                 //growl.error("Getting Element Error: " + reason.message);
             });
+            }
         };
         scope.changeElement = changeElement;
         scope.$watch('mmsEid', changeElement);
+        //scope.$watch('mmsType', changeElement);
+        scope.$watch('mmsWs', changeElement);
 
         /**
          * @ngdoc function
@@ -159,11 +205,22 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, $q, growl, _)
          * 
          */
         scope.revertEdits = function() {
+            if (scope.mmsType === 'workspace') {
+                scope.edit.name = scope.element.name;
+            } else if (scope.mmsType === 'tag') {
+                scope.edit.name = scope.element.name;
+                scope.edit.description = scope.element.description;
+            } else {
             scope.edit.name = scope.element.name;
             scope.edit.documentation = scope.element.documentation;
             if (scope.edit.specialization.type === 'Property' && angular.isArray(scope.edit.specialization.value)) {
                 scope.edit.specialization.value = _.cloneDeep(scope.element.specialization.value);
                 scope.editValues = scope.edit.specialization.value;
+            }
+            if (scope.edit.specialization.type === 'Constraint' && scope.edit.specialization.specification) {
+                scope.edit.specialization.specification = _.cloneDeep(scope.element.specialization.specification);
+                scope.editValue = scope.edit.specialization.specification;
+            }
             }
         };
         
@@ -202,6 +259,23 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, $q, growl, _)
                 deferred.reject({type: 'error', message: "Element isn't editable and can't be saved."});
                 return deferred.promise;
             }
+            if (scope.tinymceApi.save)
+                scope.tinymceApi.save();
+            if (scope.mmsType === 'workspace') {
+                WorkspaceService.update(scope.edit)
+                .then(function(data) {
+                    deferred.resolve(data);
+                }, function(reason) {
+                    deferred.reject({type: 'error', message: reason.message});
+                });
+            } else if (scope.mmsType === 'tag') {
+                ConfigService.update(scope.edit, scope.mmsWs)
+                .then(function(data) {
+                    deferred.resolve(data);
+                }, function(reason) {
+                    deferred.reject({type: 'error', message: reason.message});
+                });
+            } else {
             ElementService.updateElement(scope.edit, scope.mmsWs)
             .then(function(data) {
                 deferred.resolve(data);
@@ -235,6 +309,7 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, $q, growl, _)
                                 if (data.documentation !== currentEdit.documentation)
                                     currentEdit.documentation = data.documentation + '<p>MERGE</p>' + currentEdit.documentation;
                                 currentEdit.read = data.read;
+                                currentEdit.modified = data.modified;
                                 //growl.info("Element name and doc merged");
                                 deferred.reject({type: 'info', message: 'Element name and doc merged'});
                             }, function(reason2) {
@@ -243,6 +318,7 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, $q, growl, _)
                             });
                         } else if (choice === 'force') {
                             scope.edit.read = scope.latest.read;
+                            scope.edit.modified = scope.latest.modified;
                             scope.save().then(function(resolved) {
                                 deferred.resolve(resolved);
                             }, function(error) {
@@ -256,6 +332,7 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, $q, growl, _)
                     //growl.error("Save Error: Status " + reason.status);
                 }
             });
+            }
             return deferred.promise;
         };
 
@@ -284,8 +361,10 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, $q, growl, _)
                 return true;
             if (scope.edit.documentation !== scope.element.documentation)
                 return true;
-            if (scope.edit.specialization.type === 'Property' && 
-                !_.isEqual(scope.edit.specialization.value, scope.element.specialization.value))
+            if (scope.edit.specialization && scope.edit.specialization.type === 'Property' && 
+                !angular.equals(scope.edit.specialization.value, scope.element.specialization.value))
+                return true;
+            if (scope.edit.description !== scope.element.description)
                 return true;
             return false;
         };
@@ -382,6 +461,11 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, $q, growl, _)
             api.keepMode = function() {
                 keepMode = true;
             };
+
+            api.tinymceSave = function() {
+                if (scope.edit && scope.tinymceApi.save)
+                    scope.tinymceApi.save();
+            };
         }
     };
 
@@ -392,10 +476,13 @@ function mmsSpec(ElementService, $compile, $templateCache, $modal, $q, growl, _)
             mmsEid: '@',
             mmsEditField: '@', //all or none or individual field
             mmsWs: '@',
+            mmsSite: '@',
             mmsVersion: '@',
             mmsCfElements: '=', //array of element objects
             mmsElement: '=',
-            mmsSpecApi: '='
+            mmsSpecApi: '=',
+            mmsViewEdit: '=',
+            mmsType: '@'
         },
         link: mmsSpecLink
     };

@@ -42,18 +42,22 @@ function mmsTranscludeVal(ElementService, UtilsService, $log, $compile, $templat
             for (var i = 0; i < scope.values.length; i++) {
                 if (scope.values[i].type === 'LiteralString') {
                     areStrings = true;
-                    toCompileList.push(scope.values[i].string);
+                    var s = scope.values[i].string;
+                    if (s.indexOf('<p>') === -1) {
+                        s = s.replace('<', '&lt;');
+                    }
+                    toCompileList.push(s);
                 } else {
                     break;
                 }
             } 
             element.empty();
-            if (scope.values.length === 0)
-                element.html('<span class="placeholder">value placeholder</span>');
+            if (scope.values.length === 0 || Object.keys(scope.values[0]).length < 2)
+                element.html('<span' + ((scope.version === 'latest') ? '' : ' class="placeholder"') + '>(no value)</span>');
             else if (areStrings) {
                 var toCompile = toCompileList.join(' ');
                 if (toCompile === '') {
-                    element.html('<span class="placeholder">value placeholder</span>');
+                    element.html('<span' + ((scope.version === 'latest') ? '' : ' class="placeholder"') + '>(no value)</span>');
                     return;
                 }
                 element.append(toCompile);
@@ -85,13 +89,17 @@ function mmsTranscludeVal(ElementService, UtilsService, $log, $compile, $templat
                 if (!version)
                     version = viewVersion.version;
             }
+            scope.version = version ? version : 'latest';
             ElementService.getElement(scope.mmsEid, false, ws, version)
             .then(function(data) {
                 scope.element = data;
                 scope.values = scope.element.specialization.value;
+                if (scope.element.specialization.type === 'Constraint' && scope.element.specialization.specification)
+                    scope.values = [scope.element.specialization.specification];
                 recompile();
                 scope.$watch('values', recompile, true);
             }, function(reason) {
+                element.html('<span class="error">value cf ' + newVal + ' not found</span>');
                 growl.error('Cf Val Error: ' + reason.message + ': ' + scope.mmsEid);
             });
         });

@@ -1,8 +1,9 @@
-<table class="table table-bordered">
+<table class="table table-bordered table-condensed">
     <caption ng-bind-html="table.title"></caption>
-    <tr ng-repeat="row in table.header">
-        <th colspan="{{cell.colspan}}" rowspan="{{cell.rowspan}}" ng-repeat="cell in row">
-            <div ng-repeat="content in cell.content" ng-switch on="content.type">
+<thead>
+    <tr ng-repeat="row in ::table.header">
+        <th colspan="{{::cell.colspan}}" rowspan="{{::cell.rowspan}}" ng-repeat="cell in ::row">
+            <div ng-repeat="content in ::cell.content" ng-switch on="content.type">
                 <mms-view-para data-mms-para="content" ng-switch-when="Paragraph"></mms-view-para>
                 <mms-view-table data-mms-table="content" ng-switch-when="Table"></mms-view-table>
                 <mms-view-list data-mms-list="content" ng-switch-when="List"></mms-view-list>
@@ -10,9 +11,11 @@
             </div>
         </th>
     </tr>
+</thead>
+<tbody>
     <tr ng-repeat="row in table.body | limitTo: tableLimit">
-        <td colspan="{{cell.colspan}}" rowspan="{{cell.rowspan}}" ng-repeat="cell in row">
-            <div ng-repeat="content in cell.content" ng-switch on="content.type">
+        <td colspan="{{::cell.colspan}}" rowspan="{{::cell.rowspan}}" ng-repeat="cell in ::row">
+            <div ng-repeat="content in ::cell.content" ng-switch on="content.type">
                 <mms-view-para data-mms-para="content" ng-switch-when="Paragraph"></mms-view-para>
                 <mms-view-table data-mms-table="content" ng-switch-when="Table"></mms-view-table>
                 <mms-view-list data-mms-list="content" ng-switch-when="List"></mms-view-list>
@@ -20,4 +23,5 @@
             </div>
         </td>
     </tr>
+</tbody>
 </table>

@@ -4,6 +4,11 @@
 
 $pane_center_btn_group_width: 120px;
 
+.clickable:hover {
+  cursor: pointer;
+  background-color: $light_blue;
+}
+  
 .pane-center {
   margin-right: -11px;
 
@@ -42,6 +47,10 @@ $pane_center_btn_group_width: 120px;
     .nav-tabs li.active a {
       border-bottom-color: transparent;
     }
+  }
+
+  .pane-center-inner {
+    padding-top: 9px;
   }
 }
 

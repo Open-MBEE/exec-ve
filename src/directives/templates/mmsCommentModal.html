@@ -13,7 +13,7 @@
 
     <div class="form-group">
       <label>Comment</label>
-      <textarea class="form-control" rows="3" ng-model="comment.documentation" placeholder="Type your comment here"></textarea>
+      <textarea mms-tinymce class="form-control" rows="3" ng-model="comment.documentation" mms-ws="{{mmsWs}}" mms-site="{{mmsSite}}" placeholder="Type your comment here"></textarea>
     </div>
 
   </div>
@@ -22,5 +22,5 @@
 
 <div class="modal-footer">
     <button class="btn btn-danger" ng-click="cancel()">CANCEL</button>
-    <button class="btn btn-primary" ng-click="ok(comment)">SUBMIT</button>
+    <button class="btn btn-primary" ng-click="ok(comment)">SUBMIT <i ng-show="oking" class="fa fa-spin fa-spinner"></i></button>
 </div>

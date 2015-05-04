@@ -1,0 +1,276 @@
+<script type="text/ng-template" id="relationshipsDiff.html">
+    <table class="table">
+      <h1 class="pane-center-heading">Properties</h1>
+      <thead>
+        <tr>
+          <th></th>
+          <th>{{diff.workspace1.name}}</th>
+          <th>{{diff.workspace2.name}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="{{options.statuses[change.properties.specialization.type.type].style}}">
+          <td>TYPE</td>
+          <td>{{change.original.specialization.type}}</td>
+          <td>{{change.delta.specialization.type}}</td>
+        </tr>
+        <tr class="{{options.statuses[change.properties.specialization.source.type].style}}">
+          <td>SOURCE</td>
+          <td><mms-transclude-name mms-eid="{{change.original.specialization.source}}" mms-version="{{targetTime}}" mms-ws="{{target}}"></mms-transclude-name></td>
+          <td><mms-transclude-name mms-eid="{{change.delta.specialization.source}}" mms-version="{{sourceTime}}" mms-ws="{{source}}"></mms-transclude-name></td>
+        </tr>
+        <tr class="{{options.statuses[change.properties.specialization.target.type].style}}">
+          <td>TARGET</td>
+          <td><mms-transclude-name mms-eid="{{change.original.specialization.target}}" mms-version="{{targetTime}}" mms-ws="{{target}}"></mms-transclude-name></td>
+          <td><mms-transclude-name mms-eid="{{change.delta.specialization.target}}" mms-version="{{sourceTime}}" mms-ws="{{source}}"></mms-transclude-name></td>
+        </tr>
+      </tbody>
+    </table>
+</script>
+
+<h1 class="pane-center-header"><i class="fa {{change.icon}} icon-{{change.type}}"></i> {{change.delta.specialization.type || change.original.specialization.type}}: {{change.name}}</h1>
+
+<table class="table">
+  
+  <h1 class="pane-center-heading">Element</h1>
+
+  <thead>
+    <tr>
+      <th></th>
+      <th>{{diff.workspace1.name}}</th>
+      <th>{{diff.workspace2.name}}</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr class="{{options.statuses[change.properties.name.type].style}}">
+      <td>NAME</td>
+      <td>{{change.original.name}}</td>
+      <td>{{change.delta.name}}</td>
+      <!-- 
+      <td>
+        <span ng-show="originalNode.property_conflict_status.name">
+            <button class="{{options.buttons[options.statuses[originalNode.property_status.name].button].style}}" 
+                    ng-click="registerPropertyChange(originalNode,'name');">{{options.statuses[originalNode.property_status.name].button}}</button>
+        </span>
+      </td>
+    -->
+    </tr>
+
+    <tr class="{{options.statuses[change.properties.owner.type].style}}">
+      <td>OWNER</td>
+      <td><mms-transclude-name mms-eid="{{change.original.owner}}" mms-version="{{targetTime}}" mms-ws="{{target}}"></mms-transclude-name></td>
+      <td><mms-transclude-name mms-eid="{{change.delta.owner}}" mms-version="{{sourceTime}}" mms-ws="{{source}}"></mms-transclude-name></td>
+      <!-- 
+      <td>
+        <span ng-show="originalNode.property_conflict_status.owner">
+            <button class="{{options.buttons[options.statuses[originalNode.property_status.owner].button].style}}" 
+                    ng-click="registerPropertyChange(originalNode,'owner');">{{options.statuses[originalNode.property_status.owner].button}}</button>
+        </span>
+      </td>
+    -->
+    </tr>
+
+    <tr class="{{options.statuses[change.properties.documentation.type].style}}">
+      <td>DOC</td>
+      <td><div ng-bind-html="change.original.documentation"></div></td>
+      <td><div ng-bind-html="change.delta.documentation"></div></td>
+      
+      <!--
+      <td>
+        <span ng-show="change.properties.originalNode.property_conflict_status.documentation">
+            <button class="{{options.buttons[options.statuses[originalNode.property_status.documentation].button].style}}" 
+                    ng-click="registerPropertyChange(originalNode,'documentation');">{{options.statuses[originalNode.property_status.documentation].button}}</button>
+        </span> 
+      </td>
+    -->
+    </tr>
+  </tbody>
+
+</table>
+
+<div ng-switch on="change.original.specialization.type || change.delta.specialization.type">
+  <div ng-switch-when="Property">
+    <table class="table">
+      <h1 class="pane-center-heading">Properties</h1>
+      <thead>
+        <tr>
+          <th></th>
+          <th>{{diff.workspace1.name}}</th>
+          <th>{{diff.workspace2.name}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="{{options.statuses[change.properties.specialization.type.type].style}}">
+          <td>TYPE</td>
+          <td>{{change.original.specialization.type}}</td>
+          <td>{{change.delta.specialization.type}}</td>
+        </tr>
+        <tr class="{{options.statuses[change.properties.specialization.value.type].style}}" ng-switch on="change.original.specialization.type">
+          <td>VALUE : VALUE TYPE</td>
+          <td>
+            <div ng-repeat="value in change.original.specialization.value" ng-switch on="value.type">
+              <span ng-switch-when="LiteralInteger">{{value.integer}} : {{value.type}}</span>
+              <span ng-switch-when="LiteralBoolean">{{value.boolean}} : {{value.type}}</span>
+              <span ng-switch-when="LiteralReal">{{value.double}} : {{value.type}}</span>
+              <span ng-switch-when="LiteralUnlimitedNatural">{{value.naturalValue}} : {{value.type}}</span>
+              <span ng-switch-when="LiteralString" ng-bind-html="value.string"></span>
+              <span ng-switch-when="Expression">{{value.operand}}</span>
+              <span ng-switch-when="ElementValue">
+                <mms-transclude-name mms-version="{{sourceTime}}" mms-ws="{{source}}" mms-eid="{{value.element}}"></mms-transclude-name>
+              </span>
+            </div>
+          <td>
+            <div ng-repeat="value in change.delta.specialization.value" ng-switch on="value.type">
+              <span ng-switch-when="LiteralInteger">{{value.integer}} : {{value.type}}</span>
+              <span ng-switch-when="LiteralBoolean">{{value.boolean}} : {{value.type}}</span>
+              <span ng-switch-when="LiteralReal">{{value.double}} : {{value.type}}</span>
+              <span ng-switch-when="LiteralUnlimitedNatural">{{value.naturalValue}} : {{value.type}}</span>
+              <span ng-switch-when="LiteralString" ng-bind-html="value.string"></span>
+              <span ng-switch-when="Expression">{{value.operand}}</span>
+              <span ng-switch-when="ElementValue">
+                <mms-transclude-name mms-version="{{targetTime}}" mms-ws="{{target}}" mms-eid="{{value.element}}"></mms-transclude-name>
+              </span>
+            </div>
+          </td>
+        </tr>
+        <tr class="{{options.statuses[change.properties.specialization.propertyType.type].style}}">
+          <td>PROPERTY TYPE</td>
+          <td><mms-transclude-name mms-eid="{{change.original.specialization.propertyType}}" mms-version="{{targetTime}}" mms-ws="{{target}}"></mms-transclude-name></td>
+          <td><mms-transclude-name mms-eid="{{change.delta.specialization.propertyType}}" mms-version="{{sourceTime}}" mms-ws="{{source}}"></mms-transclude-name></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div ng-switch-when="Expose">
+    <div ng-include="'relationshipsDiff.html'"></div>
+  </div>
+  <div ng-switch-when="Dependency">
+    <div ng-include="'relationshipsDiff.html'"></div>
+  </div>
+   <div ng-switch-when="Generalization">
+    <div ng-include="'relationshipsDiff.html'"></div>
+  </div>
+   <div ng-switch-when="Characterizes">
+    <div ng-include="'relationshipsDiff.html'"></div>
+  </div>
+   <div ng-switch-when="DirectedRelationship">
+    <div ng-include="'relationshipsDiff.html'"></div>
+  </div>
+   <div ng-switch-when="Conform">
+    <div ng-include="'relationshipsDiff.html'"></div>
+  </div>
+ <div ng-switch-when="Connector">
+  <table class="table">
+      <h1 class="pane-center-heading">Properties</h1>
+      <thead>
+        <tr>
+          <th></th>
+          <th>{{diff.workspace1.name}}</th>
+          <th>{{diff.workspace2.name}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="{{options.statuses[change.properties.specialization.type.type].style}}">
+          <td>TYPE</td>
+          <td>{{change.original.specialization.type}}</td>
+          <td>{{change.delta.specialization.type}}</td>
+        </tr>
+        <tr class="{{options.statuses[change.properties.specialization.sourcePath.type].style}}">
+          <td>PATH 1</td>
+          <td><div ng-repeat="path in change.original.specialization.sourcePath"><mms-transclude-name mms-eid="{{path}}" mms-version="{{targetTime}}" mms-ws="{{target}}"></mms-transclude-name>
+          </div></td>
+          <td><div ng-repeat="path in change.delta.specialization.sourcePath"><mms-transclude-name mms-eid="{{path}}" mms-version="{{sourceTime}}" mms-ws="{{source}}"></mms-transclude-name>
+          </div></td>
+        </tr>
+        <tr class="{{options.statuses[change.properties.specialization.targetPath.type].style}}">
+          <td>PATH 2</td>
+          <td><div ng-repeat="path in change.original.specialization.targetPath"><mms-transclude-name mms-eid="{{path}}" mms-version="{{targetTime}}" mms-ws="{{target}}"></mms-transclude-name>
+          </div></td>
+          <td><div ng-repeat="path in change.delta.specialization.targetPath"><mms-transclude-name mms-eid="{{path}}" mms-version="{{sourceTime}}" mms-ws="{{source}}"></mms-transclude-name>
+          </div></td>
+        </tr>
+        <tr class="{{options.statuses[change.properties.specialization.connectorType.type].style}}">
+          <td>CONNECTOR TYPE</td>
+          <td>{{change.original.specialization.connectorType}}</td>
+          <td>{{change.delta.specialization.connectorType}}</td>
+        </tr>
+        <tr class="{{options.statuses[change.properties.specialization.connectorKind.type].style}}">
+          <td>CONNECTOR KIND</td>
+          <td>{{change.original.specialization.connectorKind}}</td>
+          <td>{{change.delta.specialization.connectorKind}}</td>
+        </tr>
+      </tbody>
+    </table>
+ </div>
+ <div ng-switch-when="Association">
+  <table class="table">
+      <h1 class="pane-center-heading">Properties</h1>
+      <thead>
+        <tr>
+          <th></th>
+          <th>{{diff.workspace1.name}}</th>
+          <th>{{diff.workspace2.name}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="{{options.statuses[change.properties.specialization.type.type].style}}">
+          <td>TYPE</td>
+          <td>{{change.original.specialization.type}}</td>
+          <td>{{change.delta.specialization.type}}</td>
+        </tr>
+        <tr class="{{options.statuses[change.properties.specialization.source.type].style}}">
+          <td>ROLE 1</td>
+          <td><mms-transclude-name mms-eid="{{change.original.specialization.source}}" mms-version="{{targetTime}}" mms-ws="{{target}}"></mms-transclude-name>
+          </td>
+          <td><mms-transclude-name mms-eid="{{change.delta.specialization.source}}" mms-version="{{sourceTime}}" mms-ws="{{source}}"></mms-transclude-name>
+          </td>
+        </tr>
+        <tr class="{{options.statuses[change.properties.specialization.target.type].style}}">
+          <td>ROLE 2</td>
+          <td><mms-transclude-name mms-eid="{{change.original.specialization.target}}" mms-version="{{targetTime}}" mms-ws="{{target}}"></mms-transclude-name>
+          </td>
+          <td><mms-transclude-name mms-eid="{{change.delta.specialization.target}}" mms-version="{{sourceTime}}" mms-ws="{{source}}"></mms-transclude-name>
+          </td>
+        </tr>
+        <tr class="{{options.statuses[change.properties.specialization.sourceAggregation.type].style}}">
+          <td>ROLE 1 AGGREGATION</td>
+          <td>{{change.original.specialization.sourceAggregation}}</td>
+          <td>{{change.delta.specialization.sourceAggregation}}</td>
+        </tr>
+        <tr class="{{options.statuses[change.properties.specialization.targetAggregation.type].style}}">
+          <td>ROLE 2 AGGREGATION</td>
+          <td>{{change.original.specialization.targetAggregation}}</td>
+          <td>{{change.delta.specialization.targetAggregation}}</td>
+        </tr>
+        <tr class="{{options.statuses[change.properties.specialization.ownedEnd.type].style}}">
+          <td>OWNED END</td>
+          <td><div ng-repeat="end in change.original.specialization.ownedEnd"><mms-transclude-name mms-eid="{{end}}" mms-version="{{targetTime}}" mms-ws="{{target}}"></mms-transclude-name>
+          </div></td>
+          <td><div ng-repeat="end in change.delta.specialization.ownedEnd"><mms-transclude-name mms-eid="{{end}}" mms-version="{{sourceTime}}" mms-ws="{{source}}"></mms-transclude-name>
+          </div></td>
+        </tr>
+      </tbody>
+    </table>
+ </div>
+  <div ng-switch-default>
+    <table class="table">
+      <h1 class="pane-center-heading">Properties</h1>
+      <thead>
+        <tr>
+          <th></th>
+          <th>{{diff.workspace1.name}}</th>
+          <th>{{diff.workspace2.name}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="(key, value) in change.properties.specialization" class="{{options.statuses[change.properties.specialization[key].type].style}}">
+          <td>{{key | uppercase }}</td>
+          <td>{{change.original.specialization[key]}}</td>
+          <td>{{change.delta.specialization[key]}}</td>
+        </tr>
+      </tbody>
+    </table>
+
+  </div>
+</div> 

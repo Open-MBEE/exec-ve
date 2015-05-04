@@ -99,6 +99,8 @@ Put core directives under /src/directives. These should all be prefixed with mms
 To use this on an html page, use
         
         <mms-element-name data-mms-id="someid"></mms-element-name>
+
+For a more complex template, put your template html in /src/directives/templates and they will be picked up in the compile process, and put into the $templateCache as 'mms/templates/template.html' (see other mms directives for examples or consult the angular docs)
         
 There are many more directive options to make complex directives, consult the Angular docs or other mms directives for examples.
 
