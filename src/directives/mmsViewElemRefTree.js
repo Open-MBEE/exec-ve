@@ -85,7 +85,7 @@ function mmsViewElemRefTree(ViewService, ElementService, $templateCache, $rootSc
         };
 
         scope.showEditsWireFrame = function (instanceVal) {
-            return mmsViewCtrl.getShowEditsWireFrame(instanceVal) && mmsViewCtrl.getShowEdits();
+            return mmsViewCtrl.getShowEditsWireFrame(instanceVal);
         };
 
         scope.isEditing = function(instance) {

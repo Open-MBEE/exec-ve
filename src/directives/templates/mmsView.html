@@ -4,8 +4,18 @@
       {{mmsNumber}} <mms-view-link data-mms-did="{{view.sysmlid}}" data-mms-vid="{{view.sysmlid}}"></mms-view-link> 
     </h1>
 
-    <h1 ng-if="!mmsLink" class="view-title">
-      {{mmsNumber}} <mms-transclude-name data-mms-eid="{{view.sysmlid}}"></mms-transclude-name>
+    <h1 ng-if="!mmsLink" class="view-title" ng-click="toggleShowEditsWireFrame(view)">
+        <div ng-show="showEditsViewWireFrame(view)" class="panel panel-danger"> 
+          <div class="panel-heading clearfix">
+            <h3 class="panel-title pull-left">View Name</h3>
+          </div>
+          <div class="panel-body">
+            {{mmsNumber}} <mms-transclude-name data-mms-eid="{{view.sysmlid}}"></mms-transclude-name>
+          </div>
+        </div> 
+        <div ng-hide="showEditsViewWireFrame(view)"> 
+            {{mmsNumber}} <mms-transclude-name data-mms-eid="{{view.sysmlid}}" ng-click="toggleShowEditsWireFrame(view)"></mms-transclude-name>
+        </div>
     </h1>
 
     <div ng-show="showElements">

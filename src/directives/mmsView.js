@@ -91,6 +91,12 @@ function mmsView(ViewService, $templateCache, growl) {
                 tag: $scope.mmsTag
             };
         };
+        this.getShowEditsWireFrame = function(instanceVal) {
+            return $scope.showEditsViewWireFrame(instanceVal);
+        };
+        $scope.showEditsViewWireFrame = function(instanceVal) {
+            return $scope.showEditsInstance === instanceVal && $scope.showEdits;
+        };
     };
 
     var mmsViewLink = function(scope, element, attrs) {
