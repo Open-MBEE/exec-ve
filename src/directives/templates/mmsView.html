@@ -25,34 +25,36 @@
     <br/>
     <i ng-hide="view" class="fa fa-2x fa-spinner fa-spin"></i>
 
-    <div ng-repeat="contain in ::view.specialization.contains" ng-switch on="contain.type"> 
+    <div ng-if="view.specialization.contents == null">
+        <div ng-repeat="contain in ::view.specialization.contains" ng-switch on="contain.type"> 
 
-        <div ng-show="showEdits" class="panel panel-default"> 
-          <div class="panel-heading clearfix">
-            <h3 class="panel-title pull-left">{{contain.type}}</h3>
-            <div class="btn-group pull-right">      
-                <a class="view-tools center" ng-click="" tooltip="Add" tooltip-append-to-body="true" tooltip-trigger="mouseenter" tooltip-popup-delay="400" tooltip-placement="Bottom"><i class="fa fa-plus"></i></a>
-                <a class="view-tools center" ng-click="" tooltip="Edit" tooltip-append-to-body="true" tooltip-trigger="mouseenter" tooltip-popup-delay="400" tooltip-placement="Bottom"><i class="fa fa-edit"></i></a>
-                <a class="view-tools center" ng-click="delete(instanceVal)" tooltip="Delete" tooltip-append-to-body="true" tooltip-trigger="mouseenter" tooltip-popup-delay="400" tooltip-placement="Bottom"><i class="fa fa-trash"></i></a>
-            </div>
-          </div>
-          <div class="panel-body">
-            <mms-view-para data-mms-para="contain" ng-switch-when="Paragraph"></mms-view-para>
-            <mms-view-table data-mms-table="contain" ng-switch-when="Table"></mms-view-table>
-            <mms-view-list data-mms-list="contain" ng-switch-when="List"></mms-view-list>
-            <mms-view-img data-mms-image="contain" ng-switch-when="Image"></mms-view-img>
-            <mms-view-section data-mms-section="contain" ng-switch-when="Section"></mms-view-section>
-          </div>
-        </div> 
+            <div ng-show="showEdits" class="panel panel-default"> 
+              <div class="panel-heading clearfix">
+                <h3 class="panel-title pull-left">{{contain.type}}</h3>
+                <div class="btn-group pull-right">      
+                    <a class="view-tools center" ng-click="" tooltip="Add" tooltip-append-to-body="true" tooltip-trigger="mouseenter" tooltip-popup-delay="400" tooltip-placement="Bottom"><i class="fa fa-plus"></i></a>
+                    <a class="view-tools center" ng-click="" tooltip="Edit" tooltip-append-to-body="true" tooltip-trigger="mouseenter" tooltip-popup-delay="400" tooltip-placement="Bottom"><i class="fa fa-edit"></i></a>
+                    <a class="view-tools center" ng-click="delete(instanceVal)" tooltip="Delete" tooltip-append-to-body="true" tooltip-trigger="mouseenter" tooltip-popup-delay="400" tooltip-placement="Bottom"><i class="fa fa-trash"></i></a>
+                </div>
+              </div>
+              <div class="panel-body">
+                <mms-view-para data-mms-para="contain" ng-switch-when="Paragraph"></mms-view-para>
+                <mms-view-table data-mms-table="contain" ng-switch-when="Table"></mms-view-table>
+                <mms-view-list data-mms-list="contain" ng-switch-when="List"></mms-view-list>
+                <mms-view-img data-mms-image="contain" ng-switch-when="Image"></mms-view-img>
+                <mms-view-section data-mms-section="contain" ng-switch-when="Section"></mms-view-section>
+              </div>
+            </div> 
 
-        <div ng-hide="showEdits"> 
-            <mms-view-para data-mms-para="contain" ng-switch-when="Paragraph"></mms-view-para>
-            <mms-view-table data-mms-table="contain" ng-switch-when="Table"></mms-view-table>
-            <mms-view-list data-mms-list="contain" ng-switch-when="List"></mms-view-list>
-            <mms-view-img data-mms-image="contain" ng-switch-when="Image"></mms-view-img>
-            <mms-view-section data-mms-section="contain" ng-switch-when="Section"></mms-view-section>
-        </div> 
+            <div ng-hide="showEdits"> 
+                <mms-view-para data-mms-para="contain" ng-switch-when="Paragraph"></mms-view-para>
+                <mms-view-table data-mms-table="contain" ng-switch-when="Table"></mms-view-table>
+                <mms-view-list data-mms-list="contain" ng-switch-when="List"></mms-view-list>
+                <mms-view-img data-mms-image="contain" ng-switch-when="Image"></mms-view-img>
+                <mms-view-section data-mms-section="contain" ng-switch-when="Section"></mms-view-section>
+            </div> 
 
+        </div>
     </div>
 
     <div ng-repeat="instanceVal in view.specialization.contents.operand"> 
