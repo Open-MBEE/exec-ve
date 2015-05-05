@@ -450,11 +450,14 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         addElement('Image');
     });
 
-    $scope.$on('element.edit', function(event, instanceVal) {
+    $scope.$on('element.edit', function(event, instanceVal, presentationElem) {
 
         // $scope.editing = !$scope.editing;
         $scope.viewApi.setEditingInstance(instanceVal.instance);
         $scope.editingInstance = !$scope.editingInstance;
+
+        $scope.elementType = 'element';
+        $scope.specApi.setEdit(presentationElem.source);
 
         $scope.specApi.setEditing(true);
         if ($scope.filterApi.setEditing)
@@ -484,6 +487,63 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         .then(function(data) {
             if (data.status && data.server.modified > data.cache.modified)
                 growl.warning('This view has been updated on the server');
+        });
+    });
+
+    $scope.$on('element.edit.save', function(event, instanceVal) {
+        if (elementSaving) {
+            growl.info('Please Wait...');
+            return;
+        }
+        elementSaving = true;
+        var waitForFilter = false;
+
+        // TODO: $scope.bbApi.toggleButtonSpinner('edit.view.documentation.save');
+        $scope.specApi.save().then(function(data) {
+            if ($scope.filterApi.getEditing && $scope.filterApi.getEditing()) {
+                waitForFilter = true;
+                $scope.filterApi.save().then(function(filter) {
+                    $state.reload();
+                }, function(reason) {
+                    growl.error("Filter save error: " + reason.message);
+                }).finally(function() {
+                    // TODO
+                    /* $scope.bbApi.setPermission('edit.view.documentation',true);
+                    $scope.bbApi.setPermission('edit.view.documentation.save',false);
+                    $scope.bbApi.setPermission('edit.view.documentation.cancel',false);
+                    $scope.bbApi.toggleButtonSpinner('edit.view.documentation.save'); */
+                });
+            }
+            elementSaving = false;
+            growl.success('Save Successful');
+            $scope.editing = false;
+            delete $rootScope.veEdits['element|' + $scope.specApi.getEdits().sysmlid + '|' + ws];
+            if (Object.keys($rootScope.veEdits).length === 0) {
+                $rootScope.mms_tbApi.setIcon('element.editor', 'fa-edit');
+            }
+            if (Object.keys($rootScope.veEdits).length > 1) {
+                $rootScope.mms_tbApi.setPermission('element.editor.saveall', true); 
+            } else {
+                $rootScope.mms_tbApi.setPermission('element.editor.saveall', false);
+            }
+            if (!waitForFilter) {
+                // TODO
+                /* $scope.bbApi.setPermission('edit.view.documentation',true);
+                $scope.bbApi.setPermission('edit.view.documentation.save',false);
+                $scope.bbApi.setPermission('edit.view.documentation.cancel',false); */
+            }
+        }, function(reason) {
+            elementSaving = false;
+            if (reason.type === 'info')
+                growl.info(reason.message);
+            else if (reason.type === 'warning')
+                growl.warning(reason.message);
+            else if (reason.type === 'error')
+                growl.error(reason.message);
+        }).finally(function() {
+            if (!waitForFilter) {
+                // TODO: $scope.bbApi.toggleButtonSpinner('edit.view.documentation.save');
+            }
         });
     });
 

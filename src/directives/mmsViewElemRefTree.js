@@ -60,8 +60,8 @@ function mmsViewElemRefTree(ViewService, ElementService, $templateCache, $rootSc
             $rootScope.$broadcast('element.delete', $scope.mmsInstanceVal, $scope.presentationElem);
         };
 
-        $scope.edit = function(instanceVal) {
-            $rootScope.$broadcast('element.edit', instanceVal);            
+        $scope.edit = function(instanceVal, presentationElem) {
+            $rootScope.$broadcast('element.edit', instanceVal, presentationElem);            
         };
 
         $scope.toggleFrame = function() {

@@ -5,8 +5,8 @@
           <div class="panel-heading clearfix">
             <h3 class="panel-title pull-left">{{presentationElem.type}}: {{instanceSpecName}}</h3>
             <div ng-hide="isEditing(mmsInstanceVal)" class="btn-group pull-right">      
-                <a class="view-tools center" ng-click="" tooltip="Add" tooltip-append-to-body="true" tooltip-trigger="mouseenter" tooltip-popup-delay="400" tooltip-placement="Bottom"><i class="fa fa-plus"></i></a>
-                <a class="view-tools center" ng-click="edit(mmsInstanceVal)" tooltip="Edit" tooltip-append-to-body="true" tooltip-trigger="mouseenter" tooltip-popup-delay="400" tooltip-placement="Bottom"><i class="fa fa-edit"></i></a>
+                <!-- <a class="view-tools center" ng-click="" tooltip="Add" tooltip-append-to-body="true" tooltip-trigger="mouseenter" tooltip-popup-delay="400" tooltip-placement="Bottom"><i class="fa fa-plus"></i></a> -->
+                <a class="view-tools center" ng-click="edit(mmsInstanceVal, presentationElem)" tooltip="Edit" tooltip-append-to-body="true" tooltip-trigger="mouseenter" tooltip-popup-delay="400" tooltip-placement="Bottom"><i class="fa fa-edit"></i></a>
                 <a class="view-tools center" ng-click="delete(mmsInstanceVal)" tooltip="Delete" tooltip-append-to-body="true" tooltip-trigger="mouseenter" tooltip-popup-delay="400" tooltip-placement="Bottom"><i class="fa fa-trash"></i></a>
             </div>
             <div ng-show="isEditing(mmsInstanceVal)" class="btn-group pull-right">      

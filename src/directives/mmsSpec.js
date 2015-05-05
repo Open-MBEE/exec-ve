@@ -255,10 +255,11 @@ function mmsSpec(ElementService, WorkspaceService, ConfigService, $compile, $tem
          */
         scope.save = function() {
             var deferred = $q.defer();
-            if (!scope.editable || !scope.editing) {
+            // TODO: put this back when removed scope.editing from view documentation edit
+            /* if (!scope.editable || !scope.editing) {
                 deferred.reject({type: 'error', message: "Element isn't editable and can't be saved."});
                 return deferred.promise;
-            }
+            } */
             if (scope.tinymceApi.save)
                 scope.tinymceApi.save();
             if (scope.mmsType === 'workspace') {
@@ -456,6 +457,10 @@ function mmsSpec(ElementService, WorkspaceService, ConfigService, $compile, $tem
              */
             api.getEdits = function() {
                 return scope.edit;
+            };
+
+            api.setEdit = function(id) {
+                scope.mmsEid = id;
             };
 
             api.keepMode = function() {
