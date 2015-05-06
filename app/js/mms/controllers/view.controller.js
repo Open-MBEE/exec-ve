@@ -59,12 +59,9 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
 
     $scope.bbApi.init = function() {
         if (view && view.editable && time === 'latest') {
-            $scope.bbApi.addButton(UxService.getButtonBarButton('edit.view.documentation'));
             $scope.bbApi.addButton(UxService.getButtonBarButton('view.add.dropdown'));
         }
 
-        $scope.bbApi.addButton(UxService.getButtonBarButton('edit.view.documentation.save'));
-        $scope.bbApi.addButton(UxService.getButtonBarButton('edit.view.documentation.cancel'));
         $scope.bbApi.addButton(UxService.getButtonBarButton('show.comments'));
         $scope.bbApi.setToggleState('show.comments', $rootScope.veCommentsOn);
         $scope.bbApi.addButton(UxService.getButtonBarButton('show.elements'));
@@ -197,125 +194,6 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
 
     $scope.$on('download.zip', function() {
         $window.open(getZipUrl());
-    });
-
-    $scope.$on('edit.view.documentation', function() {
-        $scope.editing = !$scope.editing;
-        $scope.specApi.setEditing(true);
-        if ($scope.filterApi.setEditing)
-            $scope.filterApi.setEditing(true);
-        $scope.bbApi.setPermission('edit.view.documentation',false);
-        $scope.bbApi.setPermission('edit.view.documentation.save',true);
-        $scope.bbApi.setPermission('edit.view.documentation.cancel',true);
-        var edit = $scope.specApi.getEdits();
-        if (edit) {
-            $rootScope.veEdits['element|' + edit.sysmlid + '|' + ws] = edit;
-            $rootScope.mms_tbApi.setIcon('element.editor', 'fa-edit-asterisk');
-            if (Object.keys($rootScope.veEdits).length > 1) {
-                $rootScope.mms_tbApi.setPermission('element.editor.saveall', true);
-            } else {
-                $rootScope.mms_tbApi.setPermission('element.editor.saveall', false);
-            }
-        }
-        ElementService.isCacheOutdated(view.sysmlid, ws)
-        .then(function(data) {
-            if (data.status && data.server.modified > data.cache.modified)
-                growl.warning('This view has been updated on the server');
-        });
-    });
-
-    $scope.$on('edit.view.documentation.save', function() {
-        if (elementSaving) {
-            growl.info('Please Wait...');
-            return;
-        }
-        elementSaving = true;
-        var waitForFilter = false;
-        $scope.bbApi.toggleButtonSpinner('edit.view.documentation.save');
-        $scope.specApi.save().then(function(data) {
-            if ($scope.filterApi.getEditing && $scope.filterApi.getEditing()) {
-                waitForFilter = true;
-                $scope.filterApi.save().then(function(filter) {
-                    $state.reload();
-                }, function(reason) {
-                    growl.error("Filter save error: " + reason.message);
-                }).finally(function() {
-                    $scope.bbApi.setPermission('edit.view.documentation',true);
-                    $scope.bbApi.setPermission('edit.view.documentation.save',false);
-                    $scope.bbApi.setPermission('edit.view.documentation.cancel',false);
-                    $scope.bbApi.toggleButtonSpinner('edit.view.documentation.save');
-                });
-            }
-            elementSaving = false;
-            growl.success('Save Successful');
-            $scope.editing = false;
-            delete $rootScope.veEdits['element|' + $scope.specApi.getEdits().sysmlid + '|' + ws];
-            if (Object.keys($rootScope.veEdits).length === 0) {
-                $rootScope.mms_tbApi.setIcon('element.editor', 'fa-edit');
-            }
-            if (Object.keys($rootScope.veEdits).length > 1) {
-                $rootScope.mms_tbApi.setPermission('element.editor.saveall', true); 
-            } else {
-                $rootScope.mms_tbApi.setPermission('element.editor.saveall', false);
-            }
-            if (!waitForFilter) {
-                $scope.bbApi.setPermission('edit.view.documentation',true);
-                $scope.bbApi.setPermission('edit.view.documentation.save',false);
-                $scope.bbApi.setPermission('edit.view.documentation.cancel',false);
-            }
-        }, function(reason) {
-            elementSaving = false;
-            if (reason.type === 'info')
-                growl.info(reason.message);
-            else if (reason.type === 'warning')
-                growl.warning(reason.message);
-            else if (reason.type === 'error')
-                growl.error(reason.message);
-        }).finally(function() {
-            if (!waitForFilter)
-                $scope.bbApi.toggleButtonSpinner('edit.view.documentation.save');
-        });
-    });
-
-    $scope.$on('edit.view.documentation.cancel', function() {
-        var go = function() {
-            if ($scope.filterApi.cancel) {
-                $scope.filterApi.cancel();
-                $scope.filterApi.setEditing(false);
-            }
-            delete $rootScope.veEdits['element|' + $scope.specApi.getEdits().sysmlid + '|' + ws];
-            $scope.specApi.revertEdits();
-            $scope.editing = false;
-            if (Object.keys($rootScope.veEdits).length === 0) {
-                $rootScope.mms_tbApi.setIcon('element.editor', 'fa-edit');
-            }
-            if (Object.keys($rootScope.veEdits).length > 1) {
-                $rootScope.mms_tbApi.setPermission('element.editor.saveall', true);
-            } else {
-                $rootScope.mms_tbApi.setPermission('element.editor.saveall', false);
-            }
-            $scope.bbApi.setPermission('edit.view.documentation',true);
-            $scope.bbApi.setPermission('edit.view.documentation.save',false);
-            $scope.bbApi.setPermission('edit.view.documentation.cancel',false);
-        };
-        if ($scope.specApi.hasEdits()) {
-            var instance = $modal.open({
-                templateUrl: 'partials/mms/cancelConfirm.html',
-                scope: $scope,
-                controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
-                    $scope.ok = function() {
-                        $modalInstance.close('ok');
-                    };
-                    $scope.cancel = function() {
-                        $modalInstance.dismiss();
-                    };
-                }]
-            });
-            instance.result.then(function() {
-                go();
-            });
-        } else
-            go();
     });
  
     var handleError = function(reason) {

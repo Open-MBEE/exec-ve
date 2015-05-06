@@ -109,16 +109,7 @@ function UxService($rootScope) {
             return {id: button, icon: 'fa-eye', selected: true, active: true, permission: true, tooltip: 'Show Alfresco Sites', 
                     spinner: false, togglable: true, toggle_icon: 'fa-eye-slash', toggle_tooltip: 'Hide Alfresco Sites',
                     action: function() {$rootScope.$broadcast(button);}};
-          case "edit.view.documentation":
-            return {id: button, icon: 'fa-edit', selected: true, active: true, permission: true, tooltip: 'Edit View Documenation', 
-                    spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
-          case "edit.view.documentation.save":
-            return {id: button, icon: 'fa-save', selected: true, active: true, permission: false, tooltip: 'Save', 
-                    spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
-          case "edit.view.documentation.cancel":
-            return {id: button, icon: 'fa-times', selected: true, active: true, permission: false, tooltip: 'Cancel', 
-                    spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
-          case "show.comments":
+           case "show.comments":
             return {id: button, icon: 'fa-comment-o', selected: true, active: true, permission: true, tooltip: 'Show Comments', 
                     spinner: false, togglable: true, toggle_icon: 'fa-comment', toggle_tooltip: 'Hide Comments',
                     action: function() {$rootScope.$broadcast(button);}};

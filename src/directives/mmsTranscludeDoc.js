@@ -99,6 +99,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, $compile, $log, $
 
         if (mmsViewCtrl && mmsViewElemRefTreeCtrl) {
 
+            // TODO: Fix, may be global scope
             var elementSaving = false;
 
             scope.isEditing = function(instance) {

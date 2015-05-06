@@ -19,10 +19,11 @@ angular.module('mms.directives')
  */
 function mmsViewElemRefTree(ViewService, ElementService, $templateCache, $rootScope) {
     var template = $templateCache.get('mms/templates/mmsViewElemRefTree.html');
-    var callBackFncs = {};
+    // var callBackFncs = {};
 
     var mmsViewElemRefTreeCtrl = function($scope, $rootScope) {
         
+        $scope.callBackFncs = {};
         $scope.presentationElem = {};
         $scope.instanceSpecName = "";
         $scope.presentationElemLoading = true;
@@ -55,7 +56,7 @@ function mmsViewElemRefTree(ViewService, ElementService, $templateCache, $rootSc
 
         $scope.save = function(instanceVal, presentationElem) {
             //$rootScope.$broadcast('element.edit.save', $scope.mmsInstanceVal);
-            callBackFncs.save(presentationElem);  // Calls the save callback in mmsTranscludeDoc
+            $scope.callBackFncs.save(presentationElem);  // Calls the save callback in mmsTranscludeDoc
         };
 
         $scope.delete = function() {
@@ -64,7 +65,7 @@ function mmsViewElemRefTree(ViewService, ElementService, $templateCache, $rootSc
 
         $scope.edit = function(instanceVal, presentationElem) {
             //$rootScope.$broadcast('element.edit', instanceVal, presentationElem);
-            callBackFncs.edit(instanceVal, presentationElem);  // Calls the edit callback in mmsTranscludeDoc            
+            $scope.callBackFncs.edit(instanceVal, presentationElem);  // Calls the edit callback in mmsTranscludeDoc            
         };
 
         $scope.toggleFrame = function() {
@@ -80,7 +81,7 @@ function mmsViewElemRefTree(ViewService, ElementService, $templateCache, $rootSc
         };
 
         this.registerCallBackFnc = function(callbackFnc, type) {
-            callBackFncs[type] = callbackFnc;
+            $scope.callBackFncs[type] = callbackFnc;
         };
 
     };
