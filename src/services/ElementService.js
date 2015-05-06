@@ -166,17 +166,23 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, _) {
      */
     var getElementForEdit = function(id, update, workspace) {
         var n = normalize(id, update, workspace, null, true);
-
+        var key = 'getElementForEdit(' + id + n.update + n.ws + ')';
+        if (inProgress.hasOwnProperty(key))
+            return inProgress[key];
         var deferred = $q.defer();
+        
         if (CacheService.exists(n.cacheKey) && !n.update)
             deferred.resolve(CacheService.get(n.cacheKey));
         else {
+            inProgress[key] = deferred.promise;
             getElement(id, n.update, n.ws)
             .then(function(data) {
                 var edit = _.cloneDeep(data);
                 deferred.resolve(CacheService.put(n.cacheKey, UtilsService.cleanElement(edit, true), true));
+                delete inProgress[key];
             }, function(reason) {
                 deferred.reject(reason);
+                delete inProgress[key];
             });
         }
         return deferred.promise;
