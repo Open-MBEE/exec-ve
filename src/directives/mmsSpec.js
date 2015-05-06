@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsSpec', ['ElementService', 'WorkspaceService', 'ConfigService', '$compile', '$templateCache', '$modal', '$q', 'growl', '_', mmsSpec]);
+.directive('mmsSpec', ['Utils','ElementService', 'WorkspaceService', 'ConfigService', '$compile', '$templateCache', '$modal', '$q', 'growl', '_', mmsSpec]);
 
 /**
  * @ngdoc directive
@@ -73,7 +73,7 @@ angular.module('mms.directives')
  * @param {Object=} mmsElement An element object, if this is provided, a read only 
  *      element spec for it would be shown, this will not use mms services to get the element
  */
-function mmsSpec(ElementService, WorkspaceService, ConfigService, $compile, $templateCache, $modal, $q, growl, _) {
+function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, $compile, $templateCache, $modal, $q, growl, _) {
     //var readTemplate = $templateCache.get('mms/templates/mmsSpec.html');
     //var editTemplate = $templateCache.get('mms/templates/mmsSpecEdit.html');
     var template = $templateCache.get('mms/templates/mmsSpec.html');
@@ -254,87 +254,7 @@ function mmsSpec(ElementService, WorkspaceService, ConfigService, $compile, $tem
          *      the original save failed. Error means an actual error occured. 
          */
         scope.save = function() {
-            var deferred = $q.defer();
-            // TODO: put this back when removed scope.editing from view documentation edit
-            /* if (!scope.editable || !scope.editing) {
-                deferred.reject({type: 'error', message: "Element isn't editable and can't be saved."});
-                return deferred.promise;
-            } */
-            if (scope.tinymceApi.save)
-                scope.tinymceApi.save();
-            if (scope.mmsType === 'workspace') {
-                WorkspaceService.update(scope.edit)
-                .then(function(data) {
-                    deferred.resolve(data);
-                }, function(reason) {
-                    deferred.reject({type: 'error', message: reason.message});
-                });
-            } else if (scope.mmsType === 'tag') {
-                ConfigService.update(scope.edit, scope.mmsWs)
-                .then(function(data) {
-                    deferred.resolve(data);
-                }, function(reason) {
-                    deferred.reject({type: 'error', message: reason.message});
-                });
-            } else {
-            ElementService.updateElement(scope.edit, scope.mmsWs)
-            .then(function(data) {
-                deferred.resolve(data);
-                //growl.success("Save successful");
-                //scope.editing = false;
-            }, function(reason) {
-                if (reason.status === 409) {
-                    scope.latest = reason.data.elements[0];
-                    var instance = $modal.open({
-                        template: $templateCache.get('mms/templates/saveConflict.html'),
-                        controller: ['$scope', '$modalInstance', conflictCtrl],
-                        scope: scope,
-                        size: 'lg'
-                    });
-                    instance.result.then(function(choice) {
-                        if (choice === 'ok') {
-                            ElementService.getElementForEdit(scope.mmsEid, true, scope.mmsWs)
-                            .then(function(data) {
-                                //growl.info("Element Updated to Latest");
-                                deferred.reject({type: 'info', message: 'Element Updated to Latest'});
-                            }, function(reason) {
-                                //growl.error("Element Update Error: " + reason.message);
-                                deferred.reject({type: 'error', message: 'Element Update Error: ' + reason.message});
-                            }); 
-                        } else if (choice === 'merge') { 
-                            ElementService.getElement(scope.mmsEid, true, scope.mmsWs)
-                            .then(function(data) {
-                                var currentEdit = scope.edit;
-                                if (data.name !== currentEdit.name)
-                                    currentEdit.name = data.name + ' MERGE ' + currentEdit.name;
-                                if (data.documentation !== currentEdit.documentation)
-                                    currentEdit.documentation = data.documentation + '<p>MERGE</p>' + currentEdit.documentation;
-                                currentEdit.read = data.read;
-                                currentEdit.modified = data.modified;
-                                //growl.info("Element name and doc merged");
-                                deferred.reject({type: 'info', message: 'Element name and doc merged'});
-                            }, function(reason2) {
-                                //growl.error("Merge error: " + reason2.message);
-                                deferred.reject({type: 'error', message: 'Merge error: ' + reason2.message});
-                            });
-                        } else if (choice === 'force') {
-                            scope.edit.read = scope.latest.read;
-                            scope.edit.modified = scope.latest.modified;
-                            scope.save().then(function(resolved) {
-                                deferred.resolve(resolved);
-                            }, function(error) {
-                                deferred.reject(error);
-                            });
-                        } else
-                            deferred.reject({type: 'cancel'});
-                    });
-                } else {
-                    deferred.reject({type: 'error', message: reason.message});
-                    //growl.error("Save Error: Status " + reason.status);
-                }
-            });
-            }
-            return deferred.promise;
+            return Utils.save(scope.edit, scope.mmsWs, scope.mmsType, scope.mmsEid, scope.tinymceApi, scope);
         };
 
         scope.hasHtml = function(s) {

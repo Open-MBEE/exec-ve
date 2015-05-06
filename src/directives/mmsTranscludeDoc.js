@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsTranscludeDoc', ['ElementService', 'UtilsService', '$compile', '$log', '$templateCache', 'growl', mmsTranscludeDoc]);
+.directive('mmsTranscludeDoc', ['Utils','ElementService', 'UtilsService', '$compile', '$log', '$templateCache', 'growl', mmsTranscludeDoc]);
 
 /**
  * @ngdoc directive
@@ -27,9 +27,9 @@ angular.module('mms.directives')
  * @param {string=master} mmsWs Workspace to use, defaults to master
  * @param {string=latest} mmsVersion Version can be alfresco version number or timestamp, default is latest
  */
-function mmsTranscludeDoc(ElementService, UtilsService, $compile, $log, $templateCache, growl) {
+function mmsTranscludeDoc(Utils, ElementService, UtilsService, $compile, $log, $templateCache, growl) {
 
-    var template = $templateCache.get('mms/templates/mmsTranscludeDoc.html');
+    //var template = $templateCache.get('mms/templates/mmsTranscludeDoc.html');
 
     var mmsTranscludeDocCtrl = function ($scope) {
         $scope.callDoubleClick = function(value) {
@@ -57,10 +57,10 @@ function mmsTranscludeDoc(ElementService, UtilsService, $compile, $log, $templat
 
         var recompile = function() {
             element.empty();
-            scope.value = scope.element.documentation;
-            if (!scope.value)
-                scope.value = '<p ng-class="{placeholder: version!=\'latest\'}">(no documentation)</p>';
-            element.append(template);
+            var doc = scope.element.documentation;
+            if (!doc)
+                doc = '<p ng-class="{placeholder: version!=\'latest\'}">(no documentation)</p>';
+            element.append(doc);
             $compile(element.contents())(scope); 
             if (mmsViewCtrl) {
                 mmsViewCtrl.elementTranscluded(scope.element);
@@ -81,7 +81,7 @@ function mmsTranscludeDoc(ElementService, UtilsService, $compile, $log, $templat
             if (mmsViewCtrl) {
                 var viewVersion = mmsViewCtrl.getWsAndVersion();
                 if (!ws)
-                    ws = viewVersion.workspace;
+                    scope.ws = viewVersion.workspace;
                 if (!version)
                     version = viewVersion.version;
             }
@@ -98,6 +98,9 @@ function mmsTranscludeDoc(ElementService, UtilsService, $compile, $log, $templat
         });
 
         if (mmsViewCtrl && mmsViewElemRefTreeCtrl) {
+
+            var elementSaving = false;
+
             scope.isEditing = function(instance) {
                 return mmsViewCtrl.isEditingInstance(instance);
             };
@@ -106,11 +109,114 @@ function mmsTranscludeDoc(ElementService, UtilsService, $compile, $log, $templat
                 return mmsViewElemRefTreeCtrl.getInstanceId();
             };
 
-            var saveCallBack = function() {
-                // TODO do save stuffs here
+            var editCallBack = function(instanceVal, presentationElem) {
+
+                // TODO tell view controller that this is being edited for tracker 
+                //scope.mmsEid = presentationElem.source;
+
+                ElementService.getElementForEdit(scope.mmsEid, false, scope.ws)
+                .then(function(data) {
+                    scope.edit = data;
+                    element.empty();
+                    element.append('<textarea ng-model="edit.documentation" mms-tinymce mms-tinymce-api="tinymceApi" mms-ws="{{ws}}" mms-site="{{mmsSite}}" mms-cf-elements="mmsCfElements" mms-eid="{{element.sysmlid}}"></textarea>');
+                    $compile(element.contents())(scope); 
+
+                }, function(reason) {
+                    // Not TODOz
+                    growl.error("poo");
+                });
+
+                // $scope.editing = !$scope.editing;
+                //mmsViewCtrl.setEditingInstance(instanceVal.instance);
+                //$scope.editingInstance = !$scope.editingInstance;
+
+                //$scope.elementType = 'element';
+                //$scope.specApi.setEdit(presentationElem.source);
+
+                //$scope.specApi.setEditing(true);
+                // if ($scope.filterApi.setEditing)
+                //     $scope.filterApi.setEditing(true);
+                
+                // TODO: refactor as directive 
+                // $scope.bbApi.setPermission('edit.view.documentation',false);
+                // $scope.bbApi.setPermission('edit.view.documentation.save',true);
+                // $scope.bbApi.setPermission('edit.view.documentation.cancel',true);
+                
+                // var edit = $scope.specApi.getEdits();
+                // if (edit) {
+                //     // TODO: this code may be better if automatically handled as part of the specApi
+                //     $rootScope.veEdits['element|' + edit.sysmlid + '|' + ws] = edit;
+                //     $rootScope.mms_tbApi.setIcon('element.editor', 'fa-edit-asterisk');
+                //     if (Object.keys($rootScope.veEdits).length > 1) {
+                //         $rootScope.mms_tbApi.setPermission('element.editor.saveall', true);
+                //     } else {
+                //         $rootScope.mms_tbApi.setPermission('element.editor.saveall', false);
+                //     }
+                // }
+
+                // TODO: Should this check the entire or just the instance specification
+                // TODO: How smart does it need to be, since the instance specification is just a reference.
+                // Will need to unravel until the end to check all references
+                ElementService.isCacheOutdated(scope.mmsEid, scope.ws)
+                .then(function(data) {
+                    if (data.status && data.server.modified > data.cache.modified)
+                        growl.warning('This element has been updated on the server');
+                });
+
             };
 
+            var saveCallBack = function(presentationElem) {
+
+                if (elementSaving) {
+                    growl.info('Please Wait...');
+                    return;
+                }
+                elementSaving = true;
+                var waitForFilter = false;
+
+                // TODO: $scope.bbApi.toggleButtonSpinner('edit.view.documentation.save');
+                Utils.save(scope.edit, scope.ws, "element", presentationElem.source, null, scope).then(function(data) {
+                    elementSaving = false;
+                    growl.success('Save Successful');
+
+                    // TODO tell view controller that this is being saved for tracker 
+
+                    // $scope.editing = false;
+                    // delete $rootScope.veEdits['element|' + $scope.specApi.getEdits().sysmlid + '|' + ws];
+                    // if (Object.keys($rootScope.veEdits).length === 0) {
+                    //     $rootScope.mms_tbApi.setIcon('element.editor', 'fa-edit');
+                    // }
+                    // if (Object.keys($rootScope.veEdits).length > 1) {
+                    //     $rootScope.mms_tbApi.setPermission('element.editor.saveall', true); 
+                    // } else {
+                    //     $rootScope.mms_tbApi.setPermission('element.editor.saveall', false);
+                    // }
+                    // if (!waitForFilter) {
+                    //     // TODO
+                    //     /* $scope.bbApi.setPermission('edit.view.documentation',true);
+                    //     $scope.bbApi.setPermission('edit.view.documentation.save',false);
+                    //     $scope.bbApi.setPermission('edit.view.documentation.cancel',false); */
+                    // }
+                }, function(reason) {
+                    elementSaving = false;
+                    if (reason.type === 'info')
+                        growl.info(reason.message);
+                    else if (reason.type === 'warning')
+                        growl.warning(reason.message);
+                    else if (reason.type === 'error')
+                        growl.error(reason.message);
+                }).finally(function() {
+                    // if (!waitForFilter) {
+                    //     // TODO: $scope.bbApi.toggleButtonSpinner('edit.view.documentation.save');
+                    // }
+                });
+
+            };
+
+            // Register callbacks:
             mmsViewElemRefTreeCtrl.registerCallBackFnc(saveCallBack, "save");
+            mmsViewElemRefTreeCtrl.registerCallBackFnc(editCallBack, "edit");
+
         }
 
     };

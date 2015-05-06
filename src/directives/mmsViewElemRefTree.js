@@ -53,9 +53,9 @@ function mmsViewElemRefTree(ViewService, ElementService, $templateCache, $rootSc
             $rootScope.$broadcast('element.edit.cancel', $scope.mmsInstanceVal);
         };
 
-        $scope.save = function(instanceVal) {
+        $scope.save = function(instanceVal, presentationElem) {
             //$rootScope.$broadcast('element.edit.save', $scope.mmsInstanceVal);
-            callBackFncs.save();  // Calls the save callback in mmsTranscludeDoc
+            callBackFncs.save(presentationElem);  // Calls the save callback in mmsTranscludeDoc
         };
 
         $scope.delete = function() {
@@ -63,7 +63,8 @@ function mmsViewElemRefTree(ViewService, ElementService, $templateCache, $rootSc
         };
 
         $scope.edit = function(instanceVal, presentationElem) {
-            $rootScope.$broadcast('element.edit', instanceVal, presentationElem);            
+            //$rootScope.$broadcast('element.edit', instanceVal, presentationElem);
+            callBackFncs.edit(instanceVal, presentationElem);  // Calls the edit callback in mmsTranscludeDoc            
         };
 
         $scope.toggleFrame = function() {
