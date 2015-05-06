@@ -64,9 +64,6 @@ function mmsView(ViewService, $templateCache, growl) {
         this.getShowEdits = function () {
             return $scope.showEdits;
         };
-        this.getShowEditsWireFrame = function (instanceVal) {
-            return $scope.showEditsInstance === instanceVal;
-        };
 
         this.getViewElements = function() {
             return ViewService.getViewElements($scope.mmsVid, false, $scope.mmsWs, $scope.mmsVersion);
@@ -95,7 +92,7 @@ function mmsView(ViewService, $templateCache, growl) {
             return $scope.showEditsViewWireFrame(instanceVal);
         };
         $scope.showEditsViewWireFrame = function(instanceVal) {
-            return $scope.showEditsInstance === instanceVal && $scope.showEdits;
+            return ($scope.openEdits.indexOf(instanceVal) !== -1) && $scope.showEdits;
         };
     };
 
@@ -141,18 +138,7 @@ function mmsView(ViewService, $templateCache, growl) {
         scope.showComments = false;
         scope.showEdits = false;
         scope.editing = false;
-        scope.showEditsInstance = undefined;
-        scope.editingInstane = undefined;
-        
-        scope.setEditingInstance = function(instance) {
-            scope.editing = true;
-            scope.editingInstance = instance;
-        };
-
-        scope.clearEditingInstance = function() {
-            scope.editing = false;
-            scope.editingInstance = undefined;
-        };
+        scope.openEdits = [];
 
         /**
          * @ngdoc function
@@ -189,7 +175,6 @@ function mmsView(ViewService, $templateCache, growl) {
          */
         scope.toggleShowEdits = function() {
             scope.showEdits = !scope.showEdits;
-            scope.showEditsInstance = undefined;
         };
 
         /**
@@ -201,7 +186,7 @@ function mmsView(ViewService, $templateCache, growl) {
          * toggle elements editing panel for a specific instanceVal
          */
         scope.toggleShowEditsWireFrame = function(instanceVal) {
-            scope.showEditsInstance = instanceVal;
+            scope.openEdits.push(instanceVal);
         };
 
         if (angular.isObject(scope.mmsViewApi)) {
