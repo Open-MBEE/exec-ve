@@ -105,6 +105,12 @@ function mmsTranscludeDoc(ElementService, UtilsService, $compile, $log, $templat
             scope.getInstance = function() {
                 return mmsViewElemRefTreeCtrl.getInstanceId();
             };
+
+            var saveCallBack = function() {
+                // TODO do save stuffs here
+            };
+
+            mmsViewElemRefTreeCtrl.registerCallBackFnc(saveCallBack, "save");
         }
 
     };

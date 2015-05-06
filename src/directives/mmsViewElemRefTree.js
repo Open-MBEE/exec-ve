@@ -19,6 +19,7 @@ angular.module('mms.directives')
  */
 function mmsViewElemRefTree(ViewService, ElementService, $templateCache, $rootScope) {
     var template = $templateCache.get('mms/templates/mmsViewElemRefTree.html');
+    var callBackFncs = {};
 
     var mmsViewElemRefTreeCtrl = function($scope, $rootScope) {
         
@@ -53,7 +54,8 @@ function mmsViewElemRefTree(ViewService, ElementService, $templateCache, $rootSc
         };
 
         $scope.save = function(instanceVal) {
-            $rootScope.$broadcast('element.edit.save', $scope.mmsInstanceVal);
+            //$rootScope.$broadcast('element.edit.save', $scope.mmsInstanceVal);
+            callBackFncs.save();  // Calls the save callback in mmsTranscludeDoc
         };
 
         $scope.delete = function() {
@@ -74,6 +76,10 @@ function mmsViewElemRefTree(ViewService, ElementService, $templateCache, $rootSc
 
         this.getInstanceId = function() {
             return $scope.mmsInstanceVal.instance;
+        };
+
+        this.registerCallBackFnc = function(callbackFnc, type) {
+            callBackFncs[type] = callbackFnc;
         };
 
     };
