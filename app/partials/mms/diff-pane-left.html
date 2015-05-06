@@ -1,0 +1,35 @@
+<div class="diff-pane-left">
+
+	<table>
+
+		<h3>Differences<button ng-show="unstagedCounter" ng-click="stageAllUnstaged(changes)" type="button" class="btn btn-staging btn-stage-all"><i class="fa fa-arrow-down"></i></button></h3>
+
+
+	    <tr ng-click="selectChange(change)" ng-repeat="change in changes | filter: {staged: false}">
+	        <td><i class="fa {{change.icon}} icon-{{change.type}}"><i></td>
+	        <td>{{change.delta.specialization.type || change.original.specialization.type}}: {{change.name}}</td>
+	        <td>
+	        	<button ng-click="stageChange(change)" type="button" class="btn btn-staging"><i class="fa fa-arrow-down"></i></button>
+	        </td>
+	    </tr>
+
+	</table>
+
+	<table>
+
+		<h3>Staged Changes<button ng-show="stagedCounter" ng-click="unstageAllStaged(changes)" type="button" class="btn btn-staging btn-unstage-all"><i class="fa fa-arrow-up"></i></button></h3>
+
+	    <tr ng-click="selectChange(change)" ng-repeat="change in changes | filter: {staged: true}">
+	        <td><i class="fa {{change.icon}} icon-{{change.type}}"><i></td>
+	        <td>{{change.delta.specialization.type || change.original.specialization.type}}: {{change.name}}</td>
+	        <td>
+	        	<button ng-click="stageChange(change)" type="button" class="btn btn-staging"><i class="fa fa-arrow-up"></i></button>
+	        </td>
+	    </tr>
+
+	</table>
+
+   <button type="button" ng-click="mergeStagedChanges()" class="btn btn-success">SAVE CHANGES <i class="fa fa-spin fa-spinner" ng-show="saving"></i></button>
+   <button type="button" ng-click="goBack()" class="btn btn-danger">CANCEL</button>
+
+</div>

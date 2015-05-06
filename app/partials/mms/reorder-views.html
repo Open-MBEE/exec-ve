@@ -1,0 +1,22 @@
+<!-- Nested node template -->
+<script type="text/ng-template" id="nodes_renderer.html">
+    <div ui-tree-handle>
+        {{node.name}}
+    </div>
+    <ol ui-tree-nodes="" ng-model="node.children">
+        <li ng-repeat="node in node.children" ui-tree-node ng-include="'nodes_renderer.html'">
+        </li>
+    </ol>
+</script>
+
+<div class="container-tree-reorder container-fluid">
+
+    <button class="btn-tree-reorder-save btn btn-primary" ng-click="save()">SAVE <i class="{{saveClass}}"></i></button>
+    <button class="btn-tree-reorder-save btn btn-danger" ng-click="cancel()">CANCEL</button>
+
+    <div class="tree-reorder" ui-tree>
+        <ol ui-tree-nodes="" ng-model="tree">
+            <li ng-repeat="node in tree" ui-tree-node ng-include="'nodes_renderer.html'"></li>
+        </ol>
+    </div>
+</div>

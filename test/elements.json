@@ -1,0 +1,59 @@
+{"elements": [
+    {
+        "documentation": "<p>\nA spacecraft doesn't need wheels, but what the heck.\n\n    <\/p>",
+        "sysmlid": "_17_0_2_3_407019f_1390507392384_798171_29256",
+        "name": "Wheel",
+        "owner": "_17_0_2_3_407019f_1390507581047_689015_29384",
+        "type": "Element"
+    },
+    {
+        "documentation": "<p>\nThis is a thing that flies in space.\n\n    <\/p>",
+        "sysmlid": "_17_0_2_3_407019f_1386871355202_825879_26310",
+        "name": "Spacecraft",
+        "owner": "_17_0_2_3_407019f_1390507581047_689015_29384",
+        "type": "Element"
+    },
+    {
+        "documentation": "",
+        "sysmlid": "_17_0_2_3_407019f_1390507415007_980263_29329",
+        "name": "mass",
+        "owner": "_17_0_2_3_407019f_1390507581047_689015_29384",
+        "specialization": {
+            "type": "Property",
+            "value": [{"type": "LiteralReal", "double": 33.2}],
+            "isDerived": false,
+        }
+    },
+    {
+        "documentation": "",
+        "sysmlid": "_17_0_2_3_407019f_1387309243448_48276_29113",
+        "name": "mass",
+        "owner": "_17_0_2_3_407019f_1390507581047_689015_29384",
+        "specialization": {
+            "type": "Property",
+            "value": [{"type": "LiteralReal", "double": 34.5}],
+            "isDerived": false,
+        }
+    },
+    {
+        "documentation": "<p>this is showing components of the spacecraft which include the&nbsp;<span class=\"transclusion\" data-mdid=\"_17_0_2_3_407019f_1386871384972_702931_26371\" data-type=\"name\" data-name=\"RTGa\" title=\"/test/Test334/components/RTG [name]\">[\"RTGa\":name:_17_0_2_3_407019f_1386871384972_702931_26371]<\/span> the&nbsp;<span class=\"transclusion\" data-mdid=\"_17_0_2_3_407019f_1386871384972_702931_26371\" data-type=\"documentation\" data-name=\"RTGa\" title=\"/test/Test334/components/RTG [documentation]\">[\"RTGa\":documentation:_17_0_2_3_407019f_1386871384972_702931_26371]<\/span><\/p>",
+        "sysmlid": "_17_0_2_3_407019f_1390507595220_102072_29439",
+        "name": "Components",
+        "owner": "_17_0_2_3_407019f_1390507581047_689015_29384",
+        "type": "Element"
+    },
+    {
+        "documentation": "",
+        "sysmlid": "_17_0_2_3_407019f_1390507581047_689015_29384",
+        "name": "Spacecraft Doc",
+        "owner": "123456",
+        "type": "Element"
+    },
+    {
+        "sysmlid": "_17_0_2_3_407019f_1386871350559_140692_26286",
+        "name": "space",
+        "owner": "_17_0_2_3_407019f_1390507581047_689015_29384",
+        "documentation": "blah",
+        "type": "Element"
+    }
+]}

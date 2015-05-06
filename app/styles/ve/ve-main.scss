@@ -1,0 +1,13 @@
+/*************************
+  Main combinator file for
+  View Editor stylesheets
+*************************/
+
+/* Variables & mixins */
+@import "base/_globals.scss";
+
+/* Overall page design */
+@import "layout/_pane-left.scss";
+@import "layout/_pane-center.scss";
+@import "layout/_pane-right.scss";
+@import "layout/_panes.scss";

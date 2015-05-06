@@ -1,0 +1,88 @@
+<div class="modal-header">
+
+    <h4>INSERT A CROSS REFERENCE</h4>
+
+    <div class="transclude-modal-instructions">
+        Search for an element and click on a cell in the table to insert a cross reference.
+    </div>
+
+</div>
+
+<div class="modal-body transclude-modal">
+
+    <div class="transclude-modal-input">
+
+        <form ng-submit="search(searchText)">
+            <div class="form-search input-group">
+                <input class="form-control" type="text" ng-model="searchText" placeholder="Search for an element" />
+                <span class="input-group-btn">                
+                    <button class="btn btn-primary" type="button" ng-click="search(searchText)">
+                    <span class="btn-text">GO</span> <i class="{{searchClass}}"></i></button>
+                </span>
+            </div>
+        </form>
+
+        <button ng-click="showOriginalElements()" class="show-orig-table-btn btn btn-primary">SHOW ORIGINAL TABLE</button>
+
+        <div class="misc-form-field">
+
+            <div class="form-filter" ng-show="mmsCfElements">
+                <input class="form-control" type="text" ng-model="filter" placeholder="Type here to filter elements in the table" />
+            </div>
+
+            <form>
+                <div class="form-propose input-group">
+                    <input class="form-control" type="text" ng-model="newE.name" placeholder="Propose a new element" />
+                    <span class="input-group-btn">
+                        <button class="btn btn-primary" type="button" ng-click="makeNew()"><span class="btn-text">SUBMIT</span> <i class="{{proposeClass}}"></i></button>
+                    </span>
+                </div>
+                <textarea mms-tinymce ng-model="newE.documentation" mms-ws="{{mmsWs}}" mms-site="{{mmsSite}}"></textarea>
+            </form>
+
+        </div>
+
+    </div>
+
+    <div class="container-fluid transclude-table">
+        <table class="table table-bordered">
+
+            <tr>
+                <th>NAME</th>
+                <th>QUALIFIED NAME</th>
+                <th>METATYPE</th>
+                <th>DOC</th>
+                <th>VALUE (if applicable)</th>
+            </tr>
+
+            <tr ng-repeat="elem in mmsCfElements | filter:filter">
+                <td ng-click="choose(elem.sysmlid, 'name', elem.name)" class="clickable">
+                    {{elem.name}}
+                </td>
+                <td>
+                    {{elem.qualifiedName}}
+                </td>
+                <td>
+                    {{elem.specialization.type || 'Element'}}
+                </td>
+                <td ng-click="choose(elem.sysmlid, 'doc', elem.name)" class="clickable">
+                    {{elem.documentation | limitTo:20}}
+                </td>
+                <td ng-click="choose(elem.sysmlid, 'val', elem.name)" class="clickable">
+                    <span ng-repeat="val in elem.specialization.value">
+                        {{val.integer || val.double || val.boolean + '' || val.string}}
+                    </span>
+                    <span>{{elem.specialization.specification}}</span>
+                </td>
+            </tr>
+
+        </table>
+    </div>
+
+</div>
+
+<div class="modal-footer">
+    <span class="input-group-btn">
+        
+    </span><button class="btn btn-danger" ng-click="cancel()">CANCEL</button>
+</div>

@@ -1,0 +1,1 @@
+<a ng-repeat="button in buttons | filter: {permission: true}" type="button" class="view-tools center" ng-click="button.action()" tooltip="{{button.tooltip}}" tooltip-append-to-body="true" tooltip-trigger="mouseenter" tooltip-popup-delay="400" tooltip-placement="{{button.placement}}"><i class="fa {{button.icon}}"></i></a>
