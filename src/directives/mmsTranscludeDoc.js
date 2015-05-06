@@ -173,6 +173,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, $compile, $log, $
                     growl.success('Save Successful');
 
                     mmsViewCtrl.removeOpenEdit(instanceVal);
+                    mmsViewCtrl.toggleEditing();
 
                     // TODO tell view controller that this is being saved for tracker 
 
@@ -210,7 +211,8 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, $compile, $log, $
 
             var cancelCallBack = function(instanceVal) {
                 mmsViewCtrl.removeOpenEdit(instanceVal);
-
+                mmsViewCtrl.toggleEditing();
+                recompile();
 
                 // $scope.viewApi.clearEditingInstance();
 
@@ -261,6 +263,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, $compile, $log, $
             // Register callbacks:
             mmsViewElemRefTreeCtrl.registerCallBackFnc(saveCallBack, "save");
             mmsViewElemRefTreeCtrl.registerCallBackFnc(editCallBack, "edit");
+            mmsViewElemRefTreeCtrl.registerCallBackFnc(cancelCallBack, "cancel");
 
         }
 

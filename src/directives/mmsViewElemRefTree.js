@@ -50,11 +50,10 @@ function mmsViewElemRefTree(ViewService, ElementService, $templateCache, $rootSc
         }      
 
         $scope.cancel = function(instanceVal) {
-            $rootScope.$broadcast('element.edit.cancel', $scope.mmsInstanceVal);
+            $scope.callBackFncs.cancel(instanceVal);  // Calls the cancel callback in mmsTranscludeDoc            
         };
 
         $scope.save = function(instanceVal, presentationElem) {
-            //$rootScope.$broadcast('element.edit.save', $scope.mmsInstanceVal);
             $scope.callBackFncs.save(instanceVal, presentationElem);  // Calls the save callback in mmsTranscludeDoc
         };
 
@@ -63,7 +62,6 @@ function mmsViewElemRefTree(ViewService, ElementService, $templateCache, $rootSc
         };
 
         $scope.edit = function(instanceVal, presentationElem) {
-            //$rootScope.$broadcast('element.edit', instanceVal, presentationElem);
             $scope.callBackFncs.edit(instanceVal, presentationElem);  // Calls the edit callback in mmsTranscludeDoc            
         };
 
