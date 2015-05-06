@@ -55,14 +55,16 @@ function mmsView(ViewService, $templateCache, growl) {
 
     var mmsViewCtrl = function($scope) {
 
-        this.isEditingInstance = function(instance) {
-            if (! $scope.editing) return false;
-            if ($scope.editingInstance !== instance) return false;
-            return true;
+        this.isEditing = function() {
+            return $scope.editing;
         };
 
         this.getShowEdits = function () {
             return $scope.showEdits;
+        };
+
+        this.toggleEditing = function() {
+            $scope.editing = ! $scope.editing;
         };
 
         this.getViewElements = function() {
@@ -93,6 +95,13 @@ function mmsView(ViewService, $templateCache, growl) {
         };
         $scope.showEditsViewWireFrame = function(instanceVal) {
             return ($scope.openEdits.indexOf(instanceVal) !== -1) && $scope.showEdits;
+        };
+
+        this.removeOpenEdit = function(instanceVal) {
+            var idx = $scope.openEdits.indexOf(instanceVal);
+            if (idx > -1) {
+                $scope.openEdits.splice(idx,1);
+            }
         };
     };
 
@@ -175,6 +184,9 @@ function mmsView(ViewService, $templateCache, growl) {
          */
         scope.toggleShowEdits = function() {
             scope.showEdits = !scope.showEdits;
+            // Reset the editing flag if toggle edits is turned off
+            if (! scope.showEdits)
+                scope.editing = false;
         };
 
         /**

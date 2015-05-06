@@ -29,8 +29,6 @@ angular.module('mms.directives')
  */
 function mmsTranscludeDoc(Utils, ElementService, UtilsService, $compile, $log, $templateCache, growl) {
 
-    //var template = $templateCache.get('mms/templates/mmsTranscludeDoc.html');
-
     var mmsTranscludeDocCtrl = function ($scope) {
         $scope.callDoubleClick = function(value) {
             growl.info(value.type);
@@ -102,10 +100,6 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, $compile, $log, $
             // TODO: Fix, may be global scope
             var elementSaving = false;
 
-            scope.isEditing = function(instance) {
-                return mmsViewCtrl.isEditingInstance(instance);
-            };
-
             scope.getInstance = function() {
                 return mmsViewElemRefTreeCtrl.getInstanceId();
             };
@@ -127,9 +121,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, $compile, $log, $
                     growl.error("poo");
                 });
 
-                // $scope.editing = !$scope.editing;
-                //mmsViewCtrl.setEditingInstance(instanceVal.instance);
-                //$scope.editingInstance = !$scope.editingInstance;
+                mmsViewCtrl.toggleEditing();
 
                 //$scope.elementType = 'element';
                 //$scope.specApi.setEdit(presentationElem.source);
@@ -166,7 +158,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, $compile, $log, $
 
             };
 
-            var saveCallBack = function(presentationElem) {
+            var saveCallBack = function(instanceVal, presentationElem) {
 
                 if (elementSaving) {
                     growl.info('Please Wait...');
@@ -179,6 +171,8 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, $compile, $log, $
                 Utils.save(scope.edit, scope.ws, "element", presentationElem.source, null, scope).then(function(data) {
                     elementSaving = false;
                     growl.success('Save Successful');
+
+                    mmsViewCtrl.removeOpenEdit(instanceVal);
 
                     // TODO tell view controller that this is being saved for tracker 
 
@@ -212,6 +206,56 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, $compile, $log, $
                     // }
                 });
 
+            };
+
+            var cancelCallBack = function(instanceVal) {
+                mmsViewCtrl.removeOpenEdit(instanceVal);
+
+
+                // $scope.viewApi.clearEditingInstance();
+
+                // TODO: simplify all this into the edit api
+
+                /* var go = function() {
+                    if ($scope.filterApi.cancel) {
+                        $scope.filterApi.cancel();
+                        $scope.filterApi.setEditing(false);
+                    }
+                    delete $rootScope.veEdits['element|' + $scope.specApi.getEdits().sysmlid + '|' + ws];
+                    $scope.specApi.revertEdits();
+                    $scope.editing = false;
+                    if (Object.keys($rootScope.veEdits).length === 0) {
+                        $rootScope.mms_tbApi.setIcon('element.editor', 'fa-edit');
+                    }
+                    if (Object.keys($rootScope.veEdits).length > 1) {
+                        $rootScope.mms_tbApi.setPermission('element.editor.saveall', true);
+                    } else {
+                        $rootScope.mms_tbApi.setPermission('element.editor.saveall', false);
+                    }
+                    $scope.bbApi.setPermission('edit.view.documentation',true);
+                    $scope.bbApi.setPermission('edit.view.documentation.save',false);
+                    $scope.bbApi.setPermission('edit.view.documentation.cancel',false);
+                };
+                if ($scope.specApi.hasEdits()) {
+                    var instance = $modal.open({
+                        templateUrl: 'partials/mms/cancelConfirm.html',
+                        scope: $scope,
+                        controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
+                            $scope.ok = function() {
+                                $modalInstance.close('ok');
+                            };
+                            $scope.cancel = function() {
+                                $modalInstance.dismiss();
+                            };
+                        }]
+                    });
+                    instance.result.then(function() {
+                        go();
+                    });
+                } else
+                    go();
+
+                */
             };
 
             // Register callbacks:

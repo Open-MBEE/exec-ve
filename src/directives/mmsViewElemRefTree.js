@@ -19,7 +19,6 @@ angular.module('mms.directives')
  */
 function mmsViewElemRefTree(ViewService, ElementService, $templateCache, $rootScope) {
     var template = $templateCache.get('mms/templates/mmsViewElemRefTree.html');
-    // var callBackFncs = {};
 
     var mmsViewElemRefTreeCtrl = function($scope, $rootScope) {
         
@@ -56,7 +55,7 @@ function mmsViewElemRefTree(ViewService, ElementService, $templateCache, $rootSc
 
         $scope.save = function(instanceVal, presentationElem) {
             //$rootScope.$broadcast('element.edit.save', $scope.mmsInstanceVal);
-            $scope.callBackFncs.save(presentationElem);  // Calls the save callback in mmsTranscludeDoc
+            $scope.callBackFncs.save(instanceVal, presentationElem);  // Calls the save callback in mmsTranscludeDoc
         };
 
         $scope.delete = function() {
@@ -96,8 +95,8 @@ function mmsViewElemRefTree(ViewService, ElementService, $templateCache, $rootSc
             return mmsViewCtrl.getShowEditsWireFrame(instanceVal);
         };
 
-        scope.isEditing = function(instance) {
-            return mmsViewCtrl.isEditingInstance(instance.instance);
+        scope.isEditing = function() {
+            return mmsViewCtrl.isEditing();
         };
        
     };
