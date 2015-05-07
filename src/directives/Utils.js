@@ -6,10 +6,16 @@ angular.module('mms.directives')
 /**
  * @ngdoc service
  * @name mms.directives.Utils
- * @requires 
+ * @requires $q
+ * @requires $modal
+ * @requires $templateCache
+ * @requires mms.WorkspaceService
+ * @requires mms.ConfigService
+ * @requires mms.ElementService
  * 
  * @description
- * 
+ * Utility methods for saving edits to a element
+ *
  */
 function Utils($q, $modal, $templateCache, WorkspaceService, ConfigService, ElementService) {
     
@@ -30,8 +36,8 @@ function Utils($q, $modal, $templateCache, WorkspaceService, ConfigService, Elem
 
     /**
      * @ngdoc function
-     * @name mms.directives.directive:mmsSpec#save
-     * @methodOf mms.directives.directive:mmsSpec
+     * @name mms.directives.Utils#save
+     * @methodOf mms.directives.Utils
      * 
      * @description 
      * save edited element

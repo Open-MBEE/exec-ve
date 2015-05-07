@@ -26,6 +26,7 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
 
     $scope.vid = $scope.eid;
     $scope.specApi = {};
+    $scope.viewApi = {};
     $scope.viewOrderApi = {};
     $rootScope.mms_togglePane = $scope.$pane;
 
@@ -114,6 +115,36 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
 
     $scope.$on('tags', function() {
         showPane('tags');
+    });
+
+    var cleanUpEdit = function(edit, ws) {
+        delete $rootScope.veEdits['element|' + edit.sysmlid + '|' + ws];
+        if (Object.keys($rootScope.veEdits).length === 0) {
+            $rootScope.mms_tbApi.setIcon('element.editor', 'fa-edit');
+        }
+        if (Object.keys($rootScope.veEdits).length > 1) {
+            $rootScope.mms_tbApi.setPermission('element.editor.saveall', true); 
+        } else {
+            $rootScope.mms_tbApi.setPermission('element.editor.saveall', false);
+        }
+    };
+
+    $scope.$on('presentationElem.edit', function(event, edit, ws) {
+        $rootScope.veEdits['element|' + edit.sysmlid + '|' + ws] = edit;
+        $rootScope.mms_tbApi.setIcon('element.editor', 'fa-edit-asterisk');
+        if (Object.keys($rootScope.veEdits).length > 1) {
+            $rootScope.mms_tbApi.setPermission('element.editor.saveall', true);
+        } else {
+            $rootScope.mms_tbApi.setPermission('element.editor.saveall', false);
+        }
+    });
+
+    $scope.$on('presentationElem.save', function(event, edit, ws) {
+        cleanUpEdit(edit, ws);
+    });
+
+    $scope.$on('presentationElem.cancel', function(event, edit, ws) {
+        cleanUpEdit(edit, ws);           
     });
 
     $scope.$on('elementSelected', function(event, eid, type) {

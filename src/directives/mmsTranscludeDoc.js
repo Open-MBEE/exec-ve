@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsTranscludeDoc', ['Utils','ElementService', 'UtilsService', '$compile', '$log', '$templateCache', 'growl', mmsTranscludeDoc]);
+.directive('mmsTranscludeDoc', ['Utils','ElementService', 'UtilsService', '$compile', '$log', '$templateCache', '$rootScope', '$modal', 'growl', mmsTranscludeDoc]);
 
 /**
  * @ngdoc directive
@@ -27,9 +27,12 @@ angular.module('mms.directives')
  * @param {string=master} mmsWs Workspace to use, defaults to master
  * @param {string=latest} mmsVersion Version can be alfresco version number or timestamp, default is latest
  */
-function mmsTranscludeDoc(Utils, ElementService, UtilsService, $compile, $log, $templateCache, growl) {
+function mmsTranscludeDoc(Utils, ElementService, UtilsService, $compile, $log, $templateCache, $rootScope, $modal, growl) {
 
     var mmsTranscludeDocCtrl = function ($scope) {
+
+        $scope.elementSaving = false;
+
         $scope.callDoubleClick = function(value) {
             growl.info(value.type);
         };
@@ -97,17 +100,11 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, $compile, $log, $
 
         if (mmsViewCtrl && mmsViewElemRefTreeCtrl) {
 
-            // TODO: Fix, may be global scope
-            var elementSaving = false;
-
             scope.getInstance = function() {
                 return mmsViewElemRefTreeCtrl.getInstanceId();
             };
 
             var editCallBack = function(instanceVal, presentationElem) {
-
-                // TODO tell view controller that this is being edited for tracker 
-                //scope.mmsEid = presentationElem.source;
 
                 ElementService.getElementForEdit(scope.mmsEid, false, scope.ws)
                 .then(function(data) {
@@ -116,36 +113,18 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, $compile, $log, $
                     element.append('<textarea ng-model="edit.documentation" mms-tinymce mms-tinymce-api="tinymceApi" mms-ws="{{ws}}" mms-site="{{mmsSite}}" mms-cf-elements="mmsCfElements" mms-eid="{{element.sysmlid}}"></textarea>');
                     $compile(element.contents())(scope); 
 
+                    // Broadcast message for the toolCtrl:
+                    $rootScope.$broadcast('presentationElem.edit',scope.edit, scope.ws);
+
+                    mmsViewCtrl.toggleEditing(instanceVal);
                 }, function(reason) {
-                    // Not TODOz
-                    growl.error("poo");
+                    if (reason.type === 'info')
+                        growl.info(reason.message);
+                    else if (reason.type === 'warning')
+                        growl.warning(reason.message);
+                    else if (reason.type === 'error')
+                        growl.error(reason.message);
                 });
-
-                mmsViewCtrl.toggleEditing();
-
-                //$scope.elementType = 'element';
-                //$scope.specApi.setEdit(presentationElem.source);
-
-                //$scope.specApi.setEditing(true);
-                // if ($scope.filterApi.setEditing)
-                //     $scope.filterApi.setEditing(true);
-                
-                // TODO: refactor as directive 
-                // $scope.bbApi.setPermission('edit.view.documentation',false);
-                // $scope.bbApi.setPermission('edit.view.documentation.save',true);
-                // $scope.bbApi.setPermission('edit.view.documentation.cancel',true);
-                
-                // var edit = $scope.specApi.getEdits();
-                // if (edit) {
-                //     // TODO: this code may be better if automatically handled as part of the specApi
-                //     $rootScope.veEdits['element|' + edit.sysmlid + '|' + ws] = edit;
-                //     $rootScope.mms_tbApi.setIcon('element.editor', 'fa-edit-asterisk');
-                //     if (Object.keys($rootScope.veEdits).length > 1) {
-                //         $rootScope.mms_tbApi.setPermission('element.editor.saveall', true);
-                //     } else {
-                //         $rootScope.mms_tbApi.setPermission('element.editor.saveall', false);
-                //     }
-                // }
 
                 // TODO: Should this check the entire or just the instance specification
                 // TODO: How smart does it need to be, since the instance specification is just a reference.
@@ -160,41 +139,22 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, $compile, $log, $
 
             var saveCallBack = function(instanceVal, presentationElem) {
 
-                if (elementSaving) {
+                if (scope.elementSaving) {
                     growl.info('Please Wait...');
                     return;
                 }
-                elementSaving = true;
-                var waitForFilter = false;
+                scope.elementSaving = true;
 
-                // TODO: $scope.bbApi.toggleButtonSpinner('edit.view.documentation.save');
-                Utils.save(scope.edit, scope.ws, "element", presentationElem.source, null, scope).then(function(data) {
-                    elementSaving = false;
+                Utils.save(scope.edit, scope.ws, "element", scope.mmsEid, null, scope).then(function(data) {
+                    scope.elementSaving = false;
                     growl.success('Save Successful');
 
+                    // Broadcast message for the toolCtrl:
+                    $rootScope.$broadcast('presentationElem.save',scope.edit, scope.ws);
                     mmsViewCtrl.removeOpenEdit(instanceVal);
-                    mmsViewCtrl.toggleEditing();
-
-                    // TODO tell view controller that this is being saved for tracker 
-
-                    // $scope.editing = false;
-                    // delete $rootScope.veEdits['element|' + $scope.specApi.getEdits().sysmlid + '|' + ws];
-                    // if (Object.keys($rootScope.veEdits).length === 0) {
-                    //     $rootScope.mms_tbApi.setIcon('element.editor', 'fa-edit');
-                    // }
-                    // if (Object.keys($rootScope.veEdits).length > 1) {
-                    //     $rootScope.mms_tbApi.setPermission('element.editor.saveall', true); 
-                    // } else {
-                    //     $rootScope.mms_tbApi.setPermission('element.editor.saveall', false);
-                    // }
-                    // if (!waitForFilter) {
-                    //     // TODO
-                    //     /* $scope.bbApi.setPermission('edit.view.documentation',true);
-                    //     $scope.bbApi.setPermission('edit.view.documentation.save',false);
-                    //     $scope.bbApi.setPermission('edit.view.documentation.cancel',false); */
-                    // }
+                    mmsViewCtrl.toggleEditing(instanceVal);
                 }, function(reason) {
-                    elementSaving = false;
+                    scope.elementSaving = false;
                     if (reason.type === 'info')
                         growl.info(reason.message);
                     else if (reason.type === 'warning')
@@ -202,62 +162,31 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, $compile, $log, $
                     else if (reason.type === 'error')
                         growl.error(reason.message);
                 }).finally(function() {
-                    // if (!waitForFilter) {
-                    //     // TODO: $scope.bbApi.toggleButtonSpinner('edit.view.documentation.save');
-                    // }
                 });
 
             };
 
             var cancelCallBack = function(instanceVal) {
-                mmsViewCtrl.removeOpenEdit(instanceVal);
-                mmsViewCtrl.toggleEditing();
-                recompile();
 
-                // $scope.viewApi.clearEditingInstance();
-
-                // TODO: simplify all this into the edit api
-
-                /* var go = function() {
-                    if ($scope.filterApi.cancel) {
-                        $scope.filterApi.cancel();
-                        $scope.filterApi.setEditing(false);
-                    }
-                    delete $rootScope.veEdits['element|' + $scope.specApi.getEdits().sysmlid + '|' + ws];
-                    $scope.specApi.revertEdits();
-                    $scope.editing = false;
-                    if (Object.keys($rootScope.veEdits).length === 0) {
-                        $rootScope.mms_tbApi.setIcon('element.editor', 'fa-edit');
-                    }
-                    if (Object.keys($rootScope.veEdits).length > 1) {
-                        $rootScope.mms_tbApi.setPermission('element.editor.saveall', true);
-                    } else {
-                        $rootScope.mms_tbApi.setPermission('element.editor.saveall', false);
-                    }
-                    $scope.bbApi.setPermission('edit.view.documentation',true);
-                    $scope.bbApi.setPermission('edit.view.documentation.save',false);
-                    $scope.bbApi.setPermission('edit.view.documentation.cancel',false);
-                };
-                if ($scope.specApi.hasEdits()) {
-                    var instance = $modal.open({
-                        templateUrl: 'partials/mms/cancelConfirm.html',
-                        scope: $scope,
-                        controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
-                            $scope.ok = function() {
-                                $modalInstance.close('ok');
-                            };
-                            $scope.cancel = function() {
-                                $modalInstance.dismiss();
-                            };
-                        }]
-                    });
-                    instance.result.then(function() {
-                        go();
-                    });
-                } else
-                    go();
-
-                */
+                var instance = $modal.open({
+                    templateUrl: 'partials/mms/cancelConfirm.html',
+                    scope: scope,
+                    controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
+                        $scope.ok = function() {
+                            $modalInstance.close('ok');
+                        };
+                        $scope.cancel = function() {
+                            $modalInstance.dismiss();
+                        };
+                    }]
+                });
+                instance.result.then(function() {
+                     // Broadcast message for the toolCtrl:
+                    $rootScope.$broadcast('presentationElem.cancel',scope.edit, scope.ws);
+                    mmsViewCtrl.removeOpenEdit(instanceVal);
+                    mmsViewCtrl.toggleEditing(instanceVal);
+                    recompile();
+                });
             };
 
             // Register callbacks:

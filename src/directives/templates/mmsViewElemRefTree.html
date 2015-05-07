@@ -4,12 +4,12 @@
   <div ng-class="{'panel panel-danger' : showEditsWireFrame(mmsInstanceVal)}">
     <div ng-class="{'no-display' : ! showEditsWireFrame(mmsInstanceVal)}" class="panel-heading clearfix">
       <h3 class="panel-title pull-left">{{presentationElem.type}}: {{instanceSpecName}}</h3>
-      <div ng-hide="isEditing()" class="btn-group pull-right">      
+      <div ng-hide="isEditing(mmsInstanceVal)" class="btn-group pull-right">      
           <!-- <a class="view-tools center" ng-click="" tooltip="Add" tooltip-append-to-body="true" tooltip-trigger="mouseenter" tooltip-popup-delay="400" tooltip-placement="Bottom"><i class="fa fa-plus"></i></a> -->
           <a class="view-tools center" ng-click="edit(mmsInstanceVal, presentationElem)" tooltip="Edit" tooltip-append-to-body="true" tooltip-trigger="mouseenter" tooltip-popup-delay="400" tooltip-placement="Bottom"><i class="fa fa-edit"></i></a>
           <a class="view-tools center" ng-click="delete(mmsInstanceVal)" tooltip="Delete" tooltip-append-to-body="true" tooltip-trigger="mouseenter" tooltip-popup-delay="400" tooltip-placement="Bottom"><i class="fa fa-trash"></i></a>
       </div>
-      <div ng-show="isEditing()" class="btn-group pull-right">      
+      <div ng-show="isEditing(mmsInstanceVal)" class="btn-group pull-right">      
           <a class="view-tools center" ng-click="save(mmsInstanceVal, presentationElem)" tooltip="Save" tooltip-append-to-body="true" tooltip-trigger="mouseenter" tooltip-popup-delay="400" tooltip-placement="Bottom"><i class="fa fa-save"></i></a>
           <a class="view-tools center" ng-click="cancel(mmsInstanceVal)" tooltip="Cancel" tooltip-append-to-body="true" tooltip-trigger="mouseenter" tooltip-popup-delay="400" tooltip-placement="Bottom"><i class="fa fa-times"></i></a>
       </div>

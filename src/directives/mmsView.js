@@ -55,16 +55,23 @@ function mmsView(ViewService, $templateCache, growl) {
 
     var mmsViewCtrl = function($scope) {
 
-        this.isEditing = function() {
-            return $scope.editing;
+        this.isEditing = function(instanceVal) {
+            return $scope.inprogressEdits.indexOf(instanceVal) !== -1;
         };
 
         this.getShowEdits = function () {
             return $scope.showEdits;
         };
 
-        this.toggleEditing = function() {
-            $scope.editing = ! $scope.editing;
+        this.toggleEditing = function(instanceVal) {
+
+            var idx = $scope.inprogressEdits.indexOf(instanceVal);
+            if (idx > -1) {
+                $scope.inprogressEdits.splice(idx,1);
+            }
+            else {
+                $scope.inprogressEdits.push(instanceVal);
+            }
         };
 
         this.getViewElements = function() {
@@ -146,7 +153,7 @@ function mmsView(ViewService, $templateCache, growl) {
         scope.showElements = false;
         scope.showComments = false;
         scope.showEdits = false;
-        scope.editing = false;
+        scope.inprogressEdits = [];
         scope.openEdits = [];
 
         /**
