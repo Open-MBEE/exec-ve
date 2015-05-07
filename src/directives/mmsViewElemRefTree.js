@@ -22,9 +22,7 @@ function mmsViewElemRefTree(ViewService, ElementService, $templateCache, $rootSc
 
     var mmsViewElemRefTreeCtrl = function($scope, $rootScope) {
         
-        $scope.callBackFncs = {};
         $scope.presentationElem = {};
-        $scope.instanceSpecName = "";
         $scope.presentationElemLoading = true;
 
         if ($scope.mmsInstanceVal) {
@@ -42,60 +40,20 @@ function mmsViewElemRefTree(ViewService, ElementService, $templateCache, $rootSc
 
                 ElementService.getElement($scope.mmsInstanceVal.instance, false, $scope.workspace).
                 then(function(instanceSpec) {
+                    $scope.instanceSpec = instanceSpec;
                     $scope.instanceSpecName = instanceSpec.name;
                 });
 
                 $scope.presentationElemLoading = false;
             });           
-        }      
+        } 
 
-        $scope.cancel = function(instanceVal) {
-            $scope.callBackFncs.cancel(instanceVal);  // Calls the cancel callback in mmsTranscludeDoc            
-        };
-
-        $scope.save = function(instanceVal, presentationElem) {
-            $scope.callBackFncs.save(instanceVal, presentationElem);  // Calls the save callback in mmsTranscludeDoc
-        };
-
-        $scope.delete = function() {
-            $rootScope.$broadcast('element.delete', $scope.mmsInstanceVal, $scope.presentationElem);
-        };
-
-        $scope.edit = function(instanceVal, presentationElem) {
-            $scope.callBackFncs.edit(instanceVal, presentationElem);  // Calls the edit callback in mmsTranscludeDoc            
-        };
-
-        $scope.toggleFrame = function() {
-            $rootScope.$broadcast("show.edits.wireframe", $scope.mmsInstanceVal);
-        };
-
-        this.toggleWireFrame = function() {
-            $rootScope.$broadcast("show.edits.wireframe", $scope.mmsInstanceVal);
-        };
-
-        this.getInstanceId = function() {
-            return $scope.mmsInstanceVal.instance;
-        };
-
-        this.registerCallBackFnc = function(callbackFnc, type) {
-            $scope.callBackFncs[type] = callbackFnc;
-        };
-
+        this.getInstanceSpec = function() {
+            return $scope.instanceSpec;
+        };     
     };
 
     var mmsViewElemRefTreeLink = function(scope, element, attrs, mmsViewCtrl) {
-
-        scope.showEdits = function () {
-            return mmsViewCtrl.getShowEdits();
-        };
-
-        scope.showEditsWireFrame = function (instanceVal) {
-            return mmsViewCtrl.getShowEditsWireFrame(instanceVal);
-        };
-
-        scope.isEditing = function(instanceVal) {
-            return mmsViewCtrl.isEditing(instanceVal);
-        };
        
     };
 

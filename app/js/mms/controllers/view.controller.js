@@ -328,6 +328,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         addElement('Image');
     });
 
+    // TODO: Move this to the trasnclude doc
     $scope.$on('element.delete', function(event, instanceVal, presentationElem) {
         ViewService.deleteElementFromView(view.sysmlid, workspace, instanceVal).then(function(data) {
             growl.success('Delete Successful');
@@ -356,10 +357,6 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     $scope.$on('show.edits', function() {
         $scope.viewApi.toggleShowEdits();
         $scope.bbApi.toggleButtonState('show.edits');
-    });
-
-    $scope.$on('show.edits.wireframe', function(event, instanceVal) {
-        $scope.viewApi.toggleShowEditsWireFrame(instanceVal);
     });
 
     $scope.$on('center.previous', function() {

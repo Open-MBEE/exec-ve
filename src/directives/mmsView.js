@@ -55,32 +55,19 @@ function mmsView(ViewService, $templateCache, growl) {
 
     var mmsViewCtrl = function($scope) {
 
-        this.isEditing = function(instanceVal) {
-            return $scope.inprogressEdits.indexOf(instanceVal) !== -1;
-        };
-
-        this.getShowEdits = function () {
+        this.isEditable = function() {
             return $scope.showEdits;
-        };
-
-        this.toggleEditing = function(instanceVal) {
-
-            var idx = $scope.inprogressEdits.indexOf(instanceVal);
-            if (idx > -1) {
-                $scope.inprogressEdits.splice(idx,1);
-            }
-            else {
-                $scope.inprogressEdits.push(instanceVal);
-            }
         };
 
         this.getViewElements = function() {
             return ViewService.getViewElements($scope.mmsVid, false, $scope.mmsWs, $scope.mmsVersion);
         };
+
         this.transcludeClicked = function(elementId) {
             if ($scope.mmsCfClicked)
                 $scope.mmsCfClicked({elementId: elementId});
         };
+
         this.elementTranscluded = function(elem, type) {
             if (elem.modified > $scope.modified && type !== 'Comment') { 
                 $scope.modified = elem.modified;
@@ -90,25 +77,13 @@ function mmsView(ViewService, $templateCache, growl) {
             if ($scope.mmsTranscluded)
                 $scope.mmsTranscluded({element: elem, type: type});
         };
+
         this.getWsAndVersion = function() {
             return {
                 workspace: $scope.mmsWs, 
                 version: $scope.mmsVersion,
                 tag: $scope.mmsTag
             };
-        };
-        this.getShowEditsWireFrame = function(instanceVal) {
-            return $scope.showEditsViewWireFrame(instanceVal);
-        };
-        $scope.showEditsViewWireFrame = function(instanceVal) {
-            return ($scope.openEdits.indexOf(instanceVal) !== -1) && $scope.showEdits;
-        };
-
-        this.removeOpenEdit = function(instanceVal) {
-            var idx = $scope.openEdits.indexOf(instanceVal);
-            if (idx > -1) {
-                $scope.openEdits.splice(idx,1);
-            }
         };
     };
 
@@ -153,8 +128,6 @@ function mmsView(ViewService, $templateCache, growl) {
         scope.showElements = false;
         scope.showComments = false;
         scope.showEdits = false;
-        scope.inprogressEdits = [];
-        scope.openEdits = [];
 
         /**
          * @ngdoc function
@@ -191,22 +164,8 @@ function mmsView(ViewService, $templateCache, growl) {
          */
         scope.toggleShowEdits = function() {
             scope.showEdits = !scope.showEdits;
-            // Reset the editing flag if toggle edits is turned off
-            if (! scope.showEdits)
-                scope.editing = false;
         };
 
-        /**
-         * @ngdoc function
-         * @name mms.directives.directive:mmsView#toggleShowEditsWireFrame
-         * @methodOf mms.directives.directive:mmsView
-         * 
-         * @description 
-         * toggle elements editing panel for a specific instanceVal
-         */
-        scope.toggleShowEditsWireFrame = function(instanceVal) {
-            scope.openEdits.push(instanceVal);
-        };
 
         if (angular.isObject(scope.mmsViewApi)) {
             var api = scope.mmsViewApi;
@@ -247,9 +206,6 @@ function mmsView(ViewService, $templateCache, growl) {
                     element.removeClass('reviewing');
             };
             api.toggleShowEdits = scope.toggleShowEdits;
-            api.setEditingInstance = scope.setEditingInstance;
-            api.clearEditingInstance = scope.clearEditingInstance;
-            api.toggleShowEditsWireFrame = scope.toggleShowEditsWireFrame;
 
             api.changeView = function(vid) {
                 scope.changeView(vid);
