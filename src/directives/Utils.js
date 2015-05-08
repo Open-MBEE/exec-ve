@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.factory('Utils', ['$q','$modal','$templateCache','WorkspaceService','ConfigService','ElementService', Utils]);
+.factory('Utils', ['$q','$modal','$templateCache','$rootScope','$compile','WorkspaceService','ConfigService','ElementService','ViewService', 'growl','_', Utils]);
 
 /**
  * @ngdoc service
@@ -12,12 +12,13 @@ angular.module('mms.directives')
  * @requires mms.WorkspaceService
  * @requires mms.ConfigService
  * @requires mms.ElementService
- * 
+ * @requires _
+ *
  * @description
- * Utility methods for saving edits to a element
+ * Utility methods for performing edit like behavior to a element
  *
  */
-function Utils($q, $modal, $templateCache, WorkspaceService, ConfigService, ElementService) {
+function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceService, ConfigService, ElementService, ViewService, growl, _) {
     
      var conflictCtrl = function($scope, $modalInstance) {
         $scope.ok = function() {
@@ -134,8 +135,185 @@ function Utils($q, $modal, $templateCache, WorkspaceService, ConfigService, Elem
         return deferred.promise;
     };
 
+    /**
+     * @ngdoc function
+     * @name mms.directives.Utils#hasEdits
+     * @methodOf  mms.directives.Utils
+     * 
+     * @description 
+     * whether editing object has changes compared to base element,
+     * currently compares name, doc, property values, if element is not 
+     * editable, returns false
+     * 
+     * @return {boolean} has changes or not
+     */
+     var hasEdits = function($scope) {
+        if ($scope.edit === null)
+            return false;
+        if ($scope.edit.name !== $scope.element.name)
+            return true;
+        if ($scope.edit.documentation !== $scope.element.documentation)
+            return true;
+        if ($scope.edit.specialization && $scope.edit.specialization.type === 'Property' && 
+            !angular.equals($scope.edit.specialization.value, $scope.element.specialization.value))
+            return true;
+        if ($scope.edit.description !== $scope.element.description)
+            return true;
+        return false;
+    };
+
+    /**
+     * @ngdoc function
+     * @name mms.directives.Utils#revertEdits
+     * @methodOf mms.directives.Utils
+     * 
+     * @description 
+     * reset editing object back to base element values for name, doc, values
+     * 
+     */
+    var revertEdits = function($scope) {
+        if ($scope.mmsType === 'workspace') {
+            $scope.edit.name = $scope.element.name;
+        } else if ($scope.mmsType === 'tag') {
+            $scope.edit.name = $scope.element.name;
+            $scope.edit.description = $scope.element.description;
+        } else {
+        $scope.edit.name = $scope.element.name;
+        $scope.edit.documentation = $scope.element.documentation;
+        if ($scope.edit.specialization.type === 'Property' && angular.isArray($scope.edit.specialization.value)) {
+            $scope.edit.specialization.value = _.cloneDeep($scope.element.specialization.value);
+            $scope.editValues = $scope.edit.specialization.value;
+        }
+        if ($scope.edit.specialization.type === 'Constraint' && $scope.edit.specialization.specification) {
+            $scope.edit.specialization.specification = _.cloneDeep($scope.element.specialization.specification);
+            $scope.editValue = $scope.edit.specialization.specification;
+        }
+        }
+    };
+
+    var handleError = function(reason) {
+        if (reason.type === 'info')
+            growl.info(reason.message);
+        else if (reason.type === 'warning')
+            growl.warning(reason.message);
+        else if (reason.type === 'error')
+            growl.error(reason.message);
+    };
+
+    var addFrame = function($scope, mmsViewCtrl, element,template) {
+
+        if (mmsViewCtrl.isEditable() && !$scope.isEditing && !$scope.cleanUp) {
+
+            ElementService.getElementForEdit($scope.mmsEid, false, $scope.ws)
+            .then(function(data) {
+                $scope.isEditing = true;
+                $scope.edit = data;
+                element.empty();
+                element.append(template);
+                $compile(element.contents())($scope); 
+
+                // Broadcast message for the toolCtrl:
+                $rootScope.$broadcast('presentationElem.edit',$scope.edit, $scope.ws);
+                mmsViewCtrl.incrementNumOpenEdits();
+            }, handleError);
+
+            // TODO: Should this check the entire or just the instance specification
+            // TODO: How smart does it need to be, since the instance specification is just a reference.
+            // Will need to unravel until the end to check all references
+            ElementService.isCacheOutdated($scope.mmsEid, $scope.ws)
+            .then(function(data) {
+                if (data.status && data.server.modified > data.cache.modified)
+                    growl.warning('This element has been updated on the server');
+            });
+        }
+
+        // This logic prevents a cancel/save from also triggering a open edit
+        if ($scope.cleanUp) {
+            $scope.cleanUp = false;
+        }
+    };
+
+    var saveAction = function($scope, recompile, mmsViewCtrl) {
+
+        if ($scope.elementSaving) {
+            growl.info('Please Wait...');
+            return;
+        }
+        $scope.elementSaving = true;
+
+        save($scope.edit, $scope.ws, "element", $scope.mmsEid, null, $scope).then(function(data) {
+            $scope.elementSaving = false;
+            $scope.isEditing = false;
+            $scope.cleanUp = true;
+            // Broadcast message for the toolCtrl:
+            $rootScope.$broadcast('presentationElem.save',$scope.edit, $scope.ws);
+            recompile();
+            mmsViewCtrl.decrementNumOpenEdits();
+            growl.success('Save Successful');
+        }, function(reason) {
+            $scope.elementSaving = false;
+            handleError(reason);
+        }).finally(function() {
+        });
+
+    };
+
+    var cancelAction = function($scope, mmsViewCtrl, recompile) {
+
+        var cancelCleanUp = function() {
+            $scope.isEditing = false;
+            $scope.cleanUp = true;
+            revertEdits($scope);
+             // Broadcast message for the ToolCtrl:
+            $rootScope.$broadcast('presentationElem.cancel',$scope.edit, $scope.ws);
+            recompile();
+            mmsViewCtrl.decrementNumOpenEdits();
+        };
+
+        // Only need to confirm the cancellation if edits have been made:
+        if (hasEdits($scope)) {
+            var instance = $modal.open({
+                templateUrl: 'partials/mms/cancelConfirm.html',
+                scope: $scope,
+                controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
+                    $scope.ok = function() {
+                        $modalInstance.close('ok');
+                    };
+                    $scope.cancel = function() {
+                        $modalInstance.dismiss();
+                    };
+                }]
+            });
+            instance.result.then(function() {
+                cancelCleanUp();
+            });
+        }
+        else {
+                cancelCleanUp();
+        }
+    };
+
+    var deleteAction = function($scope) {
+        ViewService.deleteElementFromView($scope.view.sysmlid, $scope.ws, $scope.instanceVal).then(function(data) {
+            growl.success('Delete Successful');
+        }, handleError).finally(function() {
+        });
+
+        if (ViewService.isSection($scope.presentationElem)) {
+            // Broadcast message to TreeCtrl:
+            $rootScope.$broadcast('viewctrl.delete.section', $scope.presentationElem.name);
+        }
+
+    };
+
     return {
         save: save,
+        hasEdits: hasEdits,
+        revertEdits: revertEdits,
+        addFrame: addFrame,
+        saveAction: saveAction,
+        cancelAction: cancelAction,
+        deleteAction: deleteAction
     };
 
 }

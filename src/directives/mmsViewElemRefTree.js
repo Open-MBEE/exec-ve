@@ -3,6 +3,8 @@
 angular.module('mms.directives')
 .directive('mmsViewElemRefTree', ['ViewService', 'ElementService', '$templateCache', '$rootScope', mmsViewElemRefTree]);
 
+// TODO CHANGE THE NAME OF THIS DIRECTIVE TO PRESENATION ELEMENT!!!!
+
 /**
  * @ngdoc directive
  * @name mms.directives.directive:mmsViewElemRefTree
@@ -50,7 +52,15 @@ function mmsViewElemRefTree(ViewService, ElementService, $templateCache, $rootSc
 
         this.getInstanceSpec = function() {
             return $scope.instanceSpec;
-        };     
+        };
+
+        this.getInstanceVal = function() {
+            return $scope.mmsInstanceVal;
+        };
+
+        this.getPresentationElement = function() {
+            return $scope.presentationElem;
+        };      
     };
 
     var mmsViewElemRefTreeLink = function(scope, element, attrs, mmsViewCtrl) {

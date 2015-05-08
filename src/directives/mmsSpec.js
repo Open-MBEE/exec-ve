@@ -205,23 +205,7 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, $compil
          * 
          */
         scope.revertEdits = function() {
-            if (scope.mmsType === 'workspace') {
-                scope.edit.name = scope.element.name;
-            } else if (scope.mmsType === 'tag') {
-                scope.edit.name = scope.element.name;
-                scope.edit.description = scope.element.description;
-            } else {
-            scope.edit.name = scope.element.name;
-            scope.edit.documentation = scope.element.documentation;
-            if (scope.edit.specialization.type === 'Property' && angular.isArray(scope.edit.specialization.value)) {
-                scope.edit.specialization.value = _.cloneDeep(scope.element.specialization.value);
-                scope.editValues = scope.edit.specialization.value;
-            }
-            if (scope.edit.specialization.type === 'Constraint' && scope.edit.specialization.specification) {
-                scope.edit.specialization.specification = _.cloneDeep(scope.element.specialization.specification);
-                scope.editValue = scope.edit.specialization.specification;
-            }
-            }
+            Utils.revertEdits(scope);
         };
         
         var conflictCtrl = function($scope, $modalInstance) {
@@ -276,18 +260,7 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, $compil
          * @return {boolean} has changes or not
          */
         scope.hasEdits = function() {
-            if (scope.edit === null)
-                return false;
-            if (scope.edit.name !== scope.element.name)
-                return true;
-            if (scope.edit.documentation !== scope.element.documentation)
-                return true;
-            if (scope.edit.specialization && scope.edit.specialization.type === 'Property' && 
-                !angular.equals(scope.edit.specialization.value, scope.element.specialization.value))
-                return true;
-            if (scope.edit.description !== scope.element.description)
-                return true;
-            return false;
+            return Utils.hasEdits(scope);
         };
 
         scope.addValueTypes = {string: 'LiteralString', boolean: 'LiteralBoolean', integer: 'LiteralInteger', real: 'LiteralReal'};

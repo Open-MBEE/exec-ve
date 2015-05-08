@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsTranscludeName', ['ElementService', '$compile', 'growl', mmsTranscludeName]);
+.directive('mmsTranscludeName', ['ElementService', '$compile', 'growl', '$templateCache', '$rootScope', '$modal', 'Utils', mmsTranscludeName]);
 
 /**
  * @ngdoc directive
@@ -21,16 +21,33 @@ angular.module('mms.directives')
  * @param {string=master} mmsWs Workspace to use, defaults to master
  * @param {string=latest} mmsVersion Version can be alfresco version number or timestamp, default is latest
  */
-function mmsTranscludeName(ElementService, $compile, growl) {
+function mmsTranscludeName(ElementService, $compile, growl, $templateCache, $rootScope, $modal, Utils) {
+
+    var template = $templateCache.get('mms/templates/mmsTranscludeName.html');
+    var defaultTemplate = '<span ng-if="element.name">{{element.name}}</span><span ng-if="!element.name" ng-class="{placeholder: version!=\'latest\'}">(no name)</span>';
 
     var mmsTranscludeNameLink = function(scope, element, attrs, mmsViewCtrl) {
+
         var processed = false;
         element.click(function(e) {
+            if (scope.addFrame)
+                scope.addFrame();
+
             if (!mmsViewCtrl)
                 return false;
             mmsViewCtrl.transcludeClicked(scope.mmsEid);
             return false;
         });
+
+        var recompile = function() {
+            element.empty();
+            element.append(defaultTemplate);
+            $compile(element.contents())(scope); 
+            if (mmsViewCtrl) {
+                mmsViewCtrl.elementTranscluded(scope.element);
+            }
+        };
+
 
         scope.$watch('mmsEid', function(newVal, oldVal) {
             if (!newVal || (newVal === oldVal && processed))
@@ -41,7 +58,7 @@ function mmsTranscludeName(ElementService, $compile, growl) {
             if (mmsViewCtrl) {
                 var viewVersion = mmsViewCtrl.getWsAndVersion();
                 if (!ws)
-                    ws = viewVersion.workspace;
+                    scope.ws = viewVersion.workspace;
                 if (!version)
                     version = viewVersion.version;
             }
@@ -49,6 +66,7 @@ function mmsTranscludeName(ElementService, $compile, growl) {
             ElementService.getElement(scope.mmsEid, false, ws, version)
             .then(function(data) {
                 scope.element = data;
+                recompile();
                 if (mmsViewCtrl) {
                     mmsViewCtrl.elementTranscluded(scope.element);
                 }
@@ -63,11 +81,34 @@ function mmsTranscludeName(ElementService, $compile, growl) {
                 mmsViewCtrl.elementTranscluded(scope.element);
             }
         });
+
+        if (mmsViewCtrl) {
+
+            scope.isEditing = false;
+            scope.elementSaving = false;
+            scope.cleanUp = false;
+            scope.view = mmsViewCtrl.getView();
+
+            scope.save = function() {
+                Utils.saveAction(scope,recompile,mmsViewCtrl);
+            };
+
+            scope.cancel = function() {
+                Utils.cancelAction(scope,mmsViewCtrl,recompile);
+            };
+
+            scope.addFrame = function() {
+                Utils.addFrame(scope,mmsViewCtrl,element,template);
+            };
+
+            // TODO: will we ever want a delete? 
+        }
+        
     };
 
     return {
         restrict: 'E',
-        template: '<span ng-if="element.name">{{element.name}}</span><span ng-if="!element.name" ng-class="{placeholder: version!=\'latest\'}">(no name)</span>',
+        //template: '<span ng-if="element.name">{{element.name}}</span><span ng-if="!element.name" ng-class="{placeholder: version!=\'latest\'}">(no name)</span>',
         scope: {
             mmsEid: '@',
             mmsWs: '@',

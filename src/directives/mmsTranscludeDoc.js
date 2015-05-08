@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsTranscludeDoc', ['Utils','ElementService', 'UtilsService', '$compile', '$log', '$templateCache', '$rootScope', '$modal', 'growl', mmsTranscludeDoc]);
+.directive('mmsTranscludeDoc', ['Utils','ElementService', 'UtilsService', 'ViewService', '$compile', '$log', '$templateCache', '$rootScope', '$modal', 'growl', mmsTranscludeDoc]);
 
 /**
  * @ngdoc directive
@@ -27,7 +27,7 @@ angular.module('mms.directives')
  * @param {string=master} mmsWs Workspace to use, defaults to master
  * @param {string=latest} mmsVersion Version can be alfresco version number or timestamp, default is latest
  */
-function mmsTranscludeDoc(Utils, ElementService, UtilsService, $compile, $log, $templateCache, $rootScope, $modal, growl) {
+function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, $compile, $log, $templateCache, $rootScope, $modal, growl) {
 
     var template = $templateCache.get('mms/templates/mmsTranscludeDoc.html');
 
@@ -44,7 +44,8 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, $compile, $log, $
         scope.cfType = 'doc';
 
         element.click(function(e) {
-            scope.toggleFrame();
+            if (scope.addFrame)
+                scope.addFrame();
 
             if (mmsViewCtrl)
                 mmsViewCtrl.transcludeClicked(scope.mmsEid);
@@ -59,8 +60,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, $compile, $log, $
             var doc = scope.element.documentation;
             if (!doc)
                 doc = '<p ng-class="{placeholder: version!=\'latest\'}">(no documentation)</p>';
-            element.append(template);
-            element.find('.inner').after(doc);
+            element.append(doc);
             $compile(element.contents())(scope); 
             if (mmsViewCtrl) {
                 mmsViewCtrl.elementTranscluded(scope.element);
@@ -99,99 +99,28 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, $compile, $log, $
 
         if (mmsViewCtrl && mmsViewElemRefTreeCtrl) {
 
-            scope.showFrame = false;
             scope.isEditing = false;
             scope.elementSaving = false;
+            scope.cleanUp = false;
             scope.instanceSpec = mmsViewElemRefTreeCtrl.getInstanceSpec();
-
-            scope.toggleFrame = function() {
-                if (mmsViewCtrl.isEditable() && ! scope.isEditing)
-                    scope.showFrame = ! scope.showFrame;
-            };
-
-            scope.edit = function() {
-
-                ElementService.getElementForEdit(scope.mmsEid, false, scope.ws)
-                .then(function(data) {
-                    scope.isEditing = true;
-
-                    scope.edit = data;
-                    element.empty();
-                    var doc  = '<textarea ng-model="edit.documentation" mms-tinymce mms-tinymce-api="tinymceApi" mms-ws="{{ws}}" mms-site="{{mmsSite}}" mms-cf-elements="mmsCfElements" mms-eid="{{element.sysmlid}}"></textarea>';
-                    element.append(template);
-                    element.find('.inner').after(doc);
-                    $compile(element.contents())(scope); 
-
-                    // Broadcast message for the toolCtrl:
-                    $rootScope.$broadcast('presentationElem.edit',scope.edit, scope.ws);
-                }, function(reason) {
-                    if (reason.type === 'info')
-                        growl.info(reason.message);
-                    else if (reason.type === 'warning')
-                        growl.warning(reason.message);
-                    else if (reason.type === 'error')
-                        growl.error(reason.message);
-                });
-
-                // TODO: Should this check the entire or just the instance specification
-                // TODO: How smart does it need to be, since the instance specification is just a reference.
-                // Will need to unravel until the end to check all references
-                ElementService.isCacheOutdated(scope.mmsEid, scope.ws)
-                .then(function(data) {
-                    if (data.status && data.server.modified > data.cache.modified)
-                        growl.warning('This element has been updated on the server');
-                });
-
-            };
+            scope.instanceVal = mmsViewElemRefTreeCtrl.getInstanceVal();
+            scope.presentationElem = mmsViewElemRefTreeCtrl.getPresentationElement();
+            scope.view = mmsViewCtrl.getView();
 
             scope.save = function() {
-
-                if (scope.elementSaving) {
-                    growl.info('Please Wait...');
-                    return;
-                }
-                scope.elementSaving = true;
-
-                Utils.save(scope.edit, scope.ws, "element", scope.mmsEid, null, scope).then(function(data) {
-                    scope.elementSaving = false;
-                    growl.success('Save Successful');
-
-                    scope.isEditing = false;
-                    // Broadcast message for the toolCtrl:
-                    $rootScope.$broadcast('presentationElem.save',scope.edit, scope.ws);
-                }, function(reason) {
-                    scope.elementSaving = false;
-                    if (reason.type === 'info')
-                        growl.info(reason.message);
-                    else if (reason.type === 'warning')
-                        growl.warning(reason.message);
-                    else if (reason.type === 'error')
-                        growl.error(reason.message);
-                }).finally(function() {
-                });
-
+                Utils.saveAction(scope,recompile,mmsViewCtrl);
             };
 
             scope.cancel = function() {
+                Utils.cancelAction(scope,mmsViewCtrl,recompile);
+            };
 
-                var instance = $modal.open({
-                    templateUrl: 'partials/mms/cancelConfirm.html',
-                    scope: scope,
-                    controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
-                        $scope.ok = function() {
-                            $modalInstance.close('ok');
-                        };
-                        $scope.cancel = function() {
-                            $modalInstance.dismiss();
-                        };
-                    }]
-                });
-                instance.result.then(function() {
-                    scope.isEditing = false;
-                     // Broadcast message for the toolCtrl:
-                    $rootScope.$broadcast('presentationElem.cancel',scope.edit, scope.ws);
-                    recompile();
-                });
+            scope.delete = function() {
+                Utils.deleteAction(scope);
+            };
+
+            scope.addFrame = function() {
+                Utils.addFrame(scope,mmsViewCtrl,element,template);
             };
         }
 

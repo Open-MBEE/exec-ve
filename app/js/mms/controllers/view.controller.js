@@ -328,20 +328,6 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         addElement('Image');
     });
 
-    // TODO: Move this to the trasnclude doc
-    $scope.$on('element.delete', function(event, instanceVal, presentationElem) {
-        ViewService.deleteElementFromView(view.sysmlid, workspace, instanceVal).then(function(data) {
-            growl.success('Delete Successful');
-        }, handleError).finally(function() {
-            // $scope.bbApi.toggleButtonSpinner('edit.view.documentation.save');
-        });
-
-        if (ViewService.isSection(presentationElem)) {
-            // Broadcast message to TreeCtrl:
-            $rootScope.$broadcast('viewctrl.delete.section', presentationElem.name);
-        }
-    });
-
     $scope.$on('show.comments', function() {
         $scope.viewApi.toggleShowComments();
         $scope.bbApi.toggleButtonState('show.comments');
@@ -355,8 +341,14 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     });
 
     $scope.$on('show.edits', function() {
-        $scope.viewApi.toggleShowEdits();
-        $scope.bbApi.toggleButtonState('show.edits');
+        var numOpenEdits =  $scope.viewApi.getNumOpenEdits();
+        if (numOpenEdits === 0) {
+            $scope.viewApi.toggleShowEdits();
+            $scope.bbApi.toggleButtonState('show.edits');
+        }
+        else {
+            growl.warning("Must close all editor windows before toggling the Edit state. There are "+numOpenEdits+" open edits");
+        }
     });
 
     $scope.$on('center.previous', function() {

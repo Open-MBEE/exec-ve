@@ -54,9 +54,20 @@ function mmsView(ViewService, $templateCache, growl) {
     var template = $templateCache.get('mms/templates/mmsView.html');
 
     var mmsViewCtrl = function($scope) {
+        $scope.numOpenEdits = 0;
 
         this.isEditable = function() {
             return $scope.showEdits;
+        };
+
+        this.incrementNumOpenEdits = function() {
+            $scope.numOpenEdits = $scope.numOpenEdits + 1;
+        };
+
+        this.decrementNumOpenEdits = function() {
+            if ($scope.numOpenEdits > 0) {
+                $scope.numOpenEdits = $scope.numOpenEdits - 1;
+            }
         };
 
         this.getViewElements = function() {
@@ -85,6 +96,11 @@ function mmsView(ViewService, $templateCache, growl) {
                 tag: $scope.mmsTag
             };
         };
+
+        this.getView = function() {
+            return $scope.view;
+        };
+
     };
 
     var mmsViewLink = function(scope, element, attrs) {
@@ -166,10 +182,15 @@ function mmsView(ViewService, $templateCache, growl) {
             scope.showEdits = !scope.showEdits;
         };
 
+        scope.getNumOpenEdits = function() {
+            return scope.numOpenEdits;
+        };
 
         if (angular.isObject(scope.mmsViewApi)) {
             var api = scope.mmsViewApi;
             api.toggleShowElements = scope.toggleShowElements;
+            api.getNumOpenEdits = scope.getNumOpenEdits;
+
             /**
              * @ngdoc function
              * @name mms.directives.directive:mmsView#setShowElements
