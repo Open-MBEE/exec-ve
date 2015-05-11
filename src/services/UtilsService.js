@@ -237,6 +237,8 @@ function UtilsService(_) {
         normalize: normalize,
         makeElementKey: makeElementKey,
         buildTreeHierarchy: buildTreeHierarchy,
-        makeHtmlTable : makeHtmlTable
+        makeHtmlTable : makeHtmlTable,
+        makeHtmlPara: makeHtmlPara,
+        makeHtmlList: makeHtmlList
     };
 }
