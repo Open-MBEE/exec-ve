@@ -607,7 +607,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 'source': data.sysmlid, 
                 'sourceProperty': 'documentation'
             };
-            addInstanceSpecification(data, workspace, "Paragraph", jsonBlob, true, null, data.name+" Documentation")
+            addInstanceSpecification(data, workspace, "Paragraph", jsonBlob, true, null, "View Documentation")
             .then(function(data2) {
                 if (documentId) {
                     addViewToDocument(data.sysmlid, documentId, ownerId, workspace, data2)
@@ -651,7 +651,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 'source': data.sysmlid, 
                 'sourceProperty': 'documentation'
             };
-            addInstanceSpecification(data, workspace, "Paragraph", jsonBlob, true, site, data.name+" Documentation")
+            addInstanceSpecification(data, workspace, "Paragraph", jsonBlob, true, site, "View Documentation")
             .then(function(data2) {
                 var ws = !workspace ? 'master' : workspace;
                 var cacheKey = ['sites', ws, 'latest', site, 'products'];
