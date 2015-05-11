@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsTranscludeDoc', ['Utils','ElementService', 'UtilsService', 'ViewService', '$compile', '$log', '$templateCache', '$rootScope', '$modal', 'growl', mmsTranscludeDoc]);
+.directive('mmsTranscludeDoc', ['Utils','ElementService', 'UtilsService', 'ViewService', 'UxService', '$compile', '$log', '$templateCache', '$rootScope', '$modal', 'growl', mmsTranscludeDoc]);
 
 /**
  * @ngdoc directive
@@ -27,11 +27,24 @@ angular.module('mms.directives')
  * @param {string=master} mmsWs Workspace to use, defaults to master
  * @param {string=latest} mmsVersion Version can be alfresco version number or timestamp, default is latest
  */
-function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, $compile, $log, $templateCache, $rootScope, $modal, growl) {
+function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxService, $compile, $log, $templateCache, $rootScope, $modal, growl) {
 
     var template = $templateCache.get('mms/templates/mmsTranscludeDoc.html');
 
     var mmsTranscludeDocCtrl = function ($scope) {
+
+        $scope.bbApi = {};
+        $scope.buttons = [];
+        $scope.buttonsInit = false;
+
+        $scope.bbApi.init = function() {
+            if (!$scope.buttonsInit) {
+                $scope.buttonsInit = true;
+                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.save", $scope));
+                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.cancel", $scope));
+                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.delete", $scope));
+            }     
+        };
 
     };
 
@@ -108,15 +121,15 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, $com
             scope.view = mmsViewCtrl.getView();
 
             scope.save = function() {
-                Utils.saveAction(scope,recompile,mmsViewCtrl);
+                Utils.saveAction(scope,recompile,mmsViewCtrl,scope.bbApi);
             };
 
             scope.cancel = function() {
-                Utils.cancelAction(scope,mmsViewCtrl,recompile);
+                Utils.cancelAction(scope,mmsViewCtrl,recompile,scope.bbApi);
             };
 
             scope.delete = function() {
-                Utils.deleteAction(scope);
+                Utils.deleteAction(scope,scope.bbApi);
             };
 
             scope.addFrame = function() {

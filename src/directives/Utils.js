@@ -233,12 +233,13 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
         }
     };
 
-    var saveAction = function($scope, recompile, mmsViewCtrl) {
+    var saveAction = function($scope, recompile, mmsViewCtrl, bbApi) {
 
         if ($scope.elementSaving) {
             growl.info('Please Wait...');
             return;
         }
+        bbApi.toggleButtonSpinner('presentation.element.save');
         $scope.elementSaving = true;
 
         save($scope.edit, $scope.ws, "element", $scope.mmsEid, null, $scope).then(function(data) {
@@ -254,11 +255,12 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
             $scope.elementSaving = false;
             handleError(reason);
         }).finally(function() {
+            bbApi.toggleButtonSpinner('presentation.element.save');
         });
 
     };
 
-    var cancelAction = function($scope, mmsViewCtrl, recompile) {
+    var cancelAction = function($scope, mmsViewCtrl, recompile, bbApi) {
 
         var cancelCleanUp = function() {
             $scope.isEditing = false;
@@ -269,6 +271,8 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
             recompile();
             mmsViewCtrl.decrementNumOpenEdits();
         };
+
+        bbApi.toggleButtonSpinner('presentation.element.cancel');
 
         // Only need to confirm the cancellation if edits have been made:
         if (hasEdits($scope)) {
@@ -286,17 +290,22 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
             });
             instance.result.then(function() {
                 cancelCleanUp();
+            }).finally(function() {
+                bbApi.toggleButtonSpinner('presentation.element.cancel');
             });
         }
         else {
-                cancelCleanUp();
+            cancelCleanUp();
+            bbApi.toggleButtonSpinner('presentation.element.cancel');
         }
     };
 
-    var deleteAction = function($scope) {
+    var deleteAction = function($scope, bbApi) {
+        bbApi.toggleButtonSpinner('presentation.element.delete');
         ViewService.deleteElementFromView($scope.view.sysmlid, $scope.ws, $scope.instanceVal).then(function(data) {
             growl.success('Delete Successful');
         }, handleError).finally(function() {
+            bbApi.toggleButtonSpinner('presentation.element.delete');
         });
 
         if (ViewService.isSection($scope.presentationElem)) {

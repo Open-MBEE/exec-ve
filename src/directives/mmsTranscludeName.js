@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsTranscludeName', ['ElementService', '$compile', 'growl', '$templateCache', '$rootScope', '$modal', 'Utils', mmsTranscludeName]);
+.directive('mmsTranscludeName', ['ElementService', 'UxService', '$compile', 'growl', '$templateCache', '$rootScope', '$modal', 'Utils', mmsTranscludeName]);
 
 /**
  * @ngdoc directive
@@ -21,10 +21,26 @@ angular.module('mms.directives')
  * @param {string=master} mmsWs Workspace to use, defaults to master
  * @param {string=latest} mmsVersion Version can be alfresco version number or timestamp, default is latest
  */
-function mmsTranscludeName(ElementService, $compile, growl, $templateCache, $rootScope, $modal, Utils) {
+function mmsTranscludeName(ElementService, UxService, $compile, growl, $templateCache, $rootScope, $modal, Utils) {
 
     var template = $templateCache.get('mms/templates/mmsTranscludeName.html');
     var defaultTemplate = '<span ng-if="element.name">{{element.name}}</span><span ng-if="!element.name" ng-class="{placeholder: version!=\'latest\'}">(no name)</span>';
+
+    var mmsTranscludeNameCtrl = function ($scope) {
+
+        $scope.bbApi = {};
+        $scope.buttons = [];
+        $scope.buttonsInit = false;
+
+        $scope.bbApi.init = function() {
+            if (!$scope.buttonsInit) {
+                $scope.buttonsInit = true;
+                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.save", $scope));
+                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.cancel", $scope));
+            }     
+        };
+
+    };
 
     var mmsTranscludeNameLink = function(scope, element, attrs, mmsViewCtrl) {
 
@@ -90,11 +106,11 @@ function mmsTranscludeName(ElementService, $compile, growl, $templateCache, $roo
             scope.view = mmsViewCtrl.getView();
 
             scope.save = function() {
-                Utils.saveAction(scope,recompile,mmsViewCtrl);
+                Utils.saveAction(scope,recompile,mmsViewCtrl,scope.bbApi);
             };
 
             scope.cancel = function() {
-                Utils.cancelAction(scope,mmsViewCtrl,recompile);
+                Utils.cancelAction(scope,mmsViewCtrl,recompile,scope.bbApi);
             };
 
             scope.addFrame = function() {
@@ -103,7 +119,7 @@ function mmsTranscludeName(ElementService, $compile, growl, $templateCache, $roo
 
             // TODO: will we ever want a delete? 
         }
-        
+
     };
 
     return {
@@ -115,7 +131,7 @@ function mmsTranscludeName(ElementService, $compile, growl, $templateCache, $roo
             mmsVersion: '@'
         },
         require: '?^mmsView',
-        //controller: ['$scope', controller]
+        controller: ['$scope', mmsTranscludeNameCtrl],
         link: mmsTranscludeNameLink
     };
 }

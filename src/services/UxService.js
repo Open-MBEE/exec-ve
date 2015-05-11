@@ -67,7 +67,7 @@ function UxService($rootScope) {
 		}    
 	};
 
-	var getButtonBarButton = function(button) {
+	var getButtonBarButton = function(button, $scope) {
 		switch (button) {
 		  case "tree.expand":
 		  	return {id: button, icon: 'fa-caret-square-o-down', selected: true, active: true, permission: true, tooltip: 'Expand All', 
@@ -160,7 +160,15 @@ function UxService($rootScope) {
           case "view.add.section":
             return {id: button, icon: 'fa-list-alt', selected: true, active: true, permission: true, tooltip: 'Add Section', 
                     spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
-
+          case "presentation.element.delete":
+            return {id: button, icon: 'fa-trash', selected: true, active: true, permission: true, tooltip: 'Delete', 
+                    spinner: false, togglable: false, action: function() {$scope.delete();}};
+          case "presentation.element.save":
+            return {id: button, icon: 'fa-save', selected: true, active: true, permission: true, tooltip: 'Save', 
+                    spinner: false, togglable: false, action: function() {$scope.save();}};
+          case "presentation.element.cancel":
+            return {id: button, icon: 'fa-times', selected: true, active: true, permission: true, tooltip: 'Cancel', 
+                    spinner: false, togglable: false, action: function() {$scope.cancel();}};
         }
 	};
 
