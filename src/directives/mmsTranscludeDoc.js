@@ -54,7 +54,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
         scope.domElement = element;
 
         var mmsViewCtrl = controllers[0];
-        var mmsViewElemRefTreeCtrl = controllers[1];
+        var mmsViewPresentationElemCtrl = controllers[1];
 
         var processed = false;
         scope.cfType = 'doc';
@@ -125,7 +125,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             });
         });
 
-        if (mmsViewCtrl && mmsViewElemRefTreeCtrl) {
+        if (mmsViewCtrl && mmsViewPresentationElemCtrl) {
             
             var isDirectChildOfPresentationElementFunc = function() {
 
@@ -146,9 +146,9 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             scope.isEditing = false;
             scope.elementSaving = false;
             scope.cleanUp = false;
-            scope.instanceSpec = mmsViewElemRefTreeCtrl.getInstanceSpec();
-            scope.instanceVal = mmsViewElemRefTreeCtrl.getInstanceVal();
-            scope.presentationElem = mmsViewElemRefTreeCtrl.getPresentationElement();
+            scope.instanceSpec = mmsViewPresentationElemCtrl.getInstanceSpec();
+            scope.instanceVal = mmsViewPresentationElemCtrl.getInstanceVal();
+            scope.presentationElem = mmsViewPresentationElemCtrl.getPresentationElement();
             scope.view = mmsViewCtrl.getView();
             scope.isDirectChildOfPresentationElement = isDirectChildOfPresentationElementFunc();
 
@@ -186,7 +186,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             mmsWs: '@',
             mmsVersion: '@'
         },
-        require: ['?^mmsView','?^mmsViewElemRefTree'],
+        require: ['?^mmsView','?^mmsViewPresentationElem'],
         controller: ['$scope', mmsTranscludeDocCtrl],
         link: mmsTranscludeDocLink
     };

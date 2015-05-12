@@ -1,13 +1,11 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsViewElemRefTree', ['ViewService', 'ElementService', '$templateCache', '$rootScope', mmsViewElemRefTree]);
-
-// TODO CHANGE THE NAME OF THIS DIRECTIVE TO PRESENATION ELEMENT!!!!
+.directive('mmsViewPresentationElem', ['ViewService', 'ElementService', '$templateCache', '$rootScope', mmsViewPresentationElem]);
 
 /**
  * @ngdoc directive
- * @name mms.directives.directive:mmsViewElemRefTree
+ * @name mms.directives.directive:mmsViewPresentationElem
  *
  * @requires mms.ViewService
  * @requires $templateCache
@@ -19,10 +17,10 @@ angular.module('mms.directives')
  * 
  * @param mmsInstanceVal A InstanceValue json object 
  */
-function mmsViewElemRefTree(ViewService, ElementService, $templateCache, $rootScope) {
-    var template = $templateCache.get('mms/templates/mmsViewElemRefTree.html');
+function mmsViewPresentationElem(ViewService, ElementService, $templateCache, $rootScope) {
+    var template = $templateCache.get('mms/templates/mmsViewPresentationElem.html');
 
-    var mmsViewElemRefTreeCtrl = function($scope, $rootScope) {
+    var mmsViewPresentationElemCtrl = function($scope, $rootScope) {
         
         $scope.presentationElem = {};
         $scope.presentationElemLoading = true;
@@ -64,7 +62,7 @@ function mmsViewElemRefTree(ViewService, ElementService, $templateCache, $rootSc
 
     };
 
-    var mmsViewElemRefTreeLink = function(scope, element, attrs, mmsViewCtrl) {
+    var mmsViewPresentationElemLink = function(scope, element, attrs, mmsViewCtrl) {
         scope.domElement = element;
     };
 
@@ -76,7 +74,7 @@ function mmsViewElemRefTree(ViewService, ElementService, $templateCache, $rootSc
         scope: {
             mmsInstanceVal: '=',
         },
-        controller: ['$scope', '$rootScope', mmsViewElemRefTreeCtrl],
-        link: mmsViewElemRefTreeLink
+        controller: ['$scope', '$rootScope', mmsViewPresentationElemCtrl],
+        link: mmsViewPresentationElemLink
     };
 }
