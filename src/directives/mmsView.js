@@ -56,6 +56,24 @@ function mmsView(ViewService, $templateCache, $rootScope, growl) {
     var mmsViewCtrl = function($scope) {
         $scope.presentationElemCleanUpFncs = [];
 
+        this.isTranscludedElement = function(elementName) {
+            if (elementName === 'MMS-TRANSCLUDE-COM' ||
+                elementName === 'MMS-TRANSCLUDE-DOC' ||
+                elementName === 'MMS-TRANSCLUDE-IMG' ||
+                elementName === 'MMS-TRANSCLUDE-NAME' ||
+                elementName === 'MMS-TRANSCLUDE-VAL') {
+                return true;
+            }
+            return false;
+        };
+
+        this.isPresentationElement = function(elementName) {
+            if (elementName === 'MMS-VIEW-ELEM-REF-TREE') {
+                return true;
+            }
+            return false;
+        };
+
         this.isEditable = function() {
             return $scope.showEdits;
         };

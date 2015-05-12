@@ -43,12 +43,15 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                 $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.save", $scope));
                 $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.cancel", $scope));
                 $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.delete", $scope));
+                $scope.bbApi.setPermission("presentation.element.delete", $scope.isDirectChildOfPresentationElement);
             }     
         };
 
     };
 
     var mmsTranscludeDocLink = function(scope, element, attrs, controllers) {
+
+        scope.domElement = element;
 
         var mmsViewCtrl = controllers[0];
         var mmsViewElemRefTreeCtrl = controllers[1];
@@ -123,6 +126,22 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
         });
 
         if (mmsViewCtrl && mmsViewElemRefTreeCtrl) {
+            
+            var isDirectChildOfPresentationElementFunc = function() {
+
+                var curscope = scope;
+                while (curscope.$parent) {
+                    var parent = curscope.$parent;
+                    if (parent.domElement && parent.domElement[0]) {
+                        if (mmsViewCtrl.isTranscludedElement(parent.domElement[0].nodeName))
+                            return false;
+                        if (mmsViewCtrl.isPresentationElement(parent.domElement[0].nodeName))
+                            return true;
+                    }
+                    curscope = parent;
+                }
+                return false;
+            };
 
             scope.isEditing = false;
             scope.elementSaving = false;
@@ -131,6 +150,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             scope.instanceVal = mmsViewElemRefTreeCtrl.getInstanceVal();
             scope.presentationElem = mmsViewElemRefTreeCtrl.getPresentationElement();
             scope.view = mmsViewCtrl.getView();
+            scope.isDirectChildOfPresentationElement = isDirectChildOfPresentationElementFunc();
 
             mmsViewCtrl.registerPresenElemCallBack(function() {
                 Utils.showEditCallBack(scope,mmsViewCtrl,element,template,recompile,recompileEdit,"documentation");

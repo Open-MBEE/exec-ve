@@ -60,11 +60,12 @@ function mmsViewElemRefTree(ViewService, ElementService, $templateCache, $rootSc
 
         this.getPresentationElement = function() {
             return $scope.presentationElem;
-        };      
+        };
+
     };
 
     var mmsViewElemRefTreeLink = function(scope, element, attrs, mmsViewCtrl) {
-       
+        scope.domElement = element;
     };
 
 
