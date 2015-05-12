@@ -68,7 +68,7 @@ function mmsView(ViewService, $templateCache, $rootScope, growl) {
         };
 
         this.isPresentationElement = function(elementName) {
-            if (elementName === 'MMS-VIEW-ELEM-REF-TREE') {
+            if (elementName === 'MMS-VIEW-PRESENTATION-ELEM') {
                 return true;
             }
             return false;
