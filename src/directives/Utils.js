@@ -147,17 +147,10 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
      * 
      * @return {boolean} has changes or not
      */
-     var hasEdits = function($scope) {
+     var hasEdits = function($scope, type) {
         if ($scope.edit === null)
             return false;
-        if ($scope.edit.name !== $scope.element.name)
-            return true;
-        if ($scope.edit.documentation !== $scope.element.documentation)
-            return true;
-        if ($scope.edit.specialization && $scope.edit.specialization.type === 'Property' && 
-            !angular.equals($scope.edit.specialization.value, $scope.element.specialization.value))
-            return true;
-        if ($scope.edit.description !== $scope.element.description)
+        if ($scope.edit[type] !== $scope.element[type])
             return true;
         return false;
     };
@@ -214,7 +207,6 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
 
                 // Broadcast message for the toolCtrl:
                 $rootScope.$broadcast('presentationElem.edit',$scope.edit, $scope.ws);
-                mmsViewCtrl.incrementNumOpenEdits();
             }, handleError);
 
             // TODO: Should this check the entire or just the instance specification
@@ -249,7 +241,6 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
             // Broadcast message for the toolCtrl:
             $rootScope.$broadcast('presentationElem.save',$scope.edit, $scope.ws);
             recompile();
-            mmsViewCtrl.decrementNumOpenEdits();
             growl.success('Save Successful');
         }, function(reason) {
             $scope.elementSaving = false;
@@ -260,7 +251,7 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
 
     };
 
-    var cancelAction = function($scope, mmsViewCtrl, recompile, bbApi) {
+    var cancelAction = function($scope, mmsViewCtrl, recompile, bbApi, type) {
 
         var cancelCleanUp = function() {
             $scope.isEditing = false;
@@ -269,13 +260,12 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
              // Broadcast message for the ToolCtrl:
             $rootScope.$broadcast('presentationElem.cancel',$scope.edit, $scope.ws);
             recompile();
-            mmsViewCtrl.decrementNumOpenEdits();
         };
 
         bbApi.toggleButtonSpinner('presentation.element.cancel');
 
         // Only need to confirm the cancellation if edits have been made:
-        if (hasEdits($scope)) {
+        if (hasEdits($scope, type)) {
             var instance = $modal.open({
                 templateUrl: 'partials/mms/cancelConfirm.html',
                 scope: $scope,
@@ -315,6 +305,28 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
 
     };
 
+    var showEditCallBack = function($scope, mmsViewCtrl, element, template, recompile, recompileEdit, type) {
+
+        // Going into edit mode, so add a frame if had a previous edit in progress:
+        if (mmsViewCtrl.isEditable()) {
+            if ($scope.edit && hasEdits($scope, type)) {
+                addFrame($scope,mmsViewCtrl,element,template);
+            }
+        }
+        // Leaving edit mode, so highlight the unsaved edit if needed:
+        else {
+            $scope.isEditing = false;
+            $scope.cleanUp = false;
+            $scope.elementSaving = false;
+            if ($scope.edit && hasEdits($scope, type)) {
+                recompileEdit();
+            }
+            else {
+                recompile();
+            }
+        }
+    };
+
     return {
         save: save,
         hasEdits: hasEdits,
@@ -322,7 +334,8 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
         addFrame: addFrame,
         saveAction: saveAction,
         cancelAction: cancelAction,
-        deleteAction: deleteAction
+        deleteAction: deleteAction,
+        showEditCallBack: showEditCallBack
     };
 
 }

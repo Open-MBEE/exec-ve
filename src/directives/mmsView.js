@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsView', ['ViewService', '$templateCache', 'growl', mmsView]);
+.directive('mmsView', ['ViewService', '$templateCache', '$rootScope', 'growl', mmsView]);
 
 /**
  * @ngdoc directive
@@ -50,24 +50,14 @@ angular.module('mms.directives')
  * @param {expression=} mmsCfClicked The expression to handle transcluded elements 
  *     in the view being clicked, this should be a function whose argument is 'elementId'
  */
-function mmsView(ViewService, $templateCache, growl) {
+function mmsView(ViewService, $templateCache, $rootScope, growl) {
     var template = $templateCache.get('mms/templates/mmsView.html');
 
     var mmsViewCtrl = function($scope) {
-        $scope.numOpenEdits = 0;
+        $scope.presentationElemCleanUpFncs = [];
 
         this.isEditable = function() {
             return $scope.showEdits;
-        };
-
-        this.incrementNumOpenEdits = function() {
-            $scope.numOpenEdits = $scope.numOpenEdits + 1;
-        };
-
-        this.decrementNumOpenEdits = function() {
-            if ($scope.numOpenEdits > 0) {
-                $scope.numOpenEdits = $scope.numOpenEdits - 1;
-            }
         };
 
         this.getViewElements = function() {
@@ -99,6 +89,10 @@ function mmsView(ViewService, $templateCache, growl) {
 
         this.getView = function() {
             return $scope.view;
+        };
+
+        this.registerPresenElemCallBack = function(callback) {
+            $scope.presentationElemCleanUpFncs.push(callback);
         };
 
     };
@@ -180,16 +174,17 @@ function mmsView(ViewService, $templateCache, growl) {
          */
         scope.toggleShowEdits = function() {
             scope.showEdits = !scope.showEdits;
-        };
 
-        scope.getNumOpenEdits = function() {
-            return scope.numOpenEdits;
+            // Call the callback functions to clean up frames, show edits, and
+            // re-open frames when needed:
+            for (var i = 0; i < scope.presentationElemCleanUpFncs.length; i++) {
+                scope.presentationElemCleanUpFncs[i]();
+            }
         };
 
         if (angular.isObject(scope.mmsViewApi)) {
             var api = scope.mmsViewApi;
             api.toggleShowElements = scope.toggleShowElements;
-            api.getNumOpenEdits = scope.getNumOpenEdits;
 
             /**
              * @ngdoc function

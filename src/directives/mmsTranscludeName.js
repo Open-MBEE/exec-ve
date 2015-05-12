@@ -25,6 +25,7 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
 
     var template = $templateCache.get('mms/templates/mmsTranscludeName.html');
     var defaultTemplate = '<span ng-if="element.name">{{element.name}}</span><span ng-if="!element.name" ng-class="{placeholder: version!=\'latest\'}">(no name)</span>';
+    var editTemplate = '<span ng-if="edit.name">{{edit.name}}</span><span ng-if="!edit.name" ng-class="{placeholder: version!=\'latest\'}">(no name)</span>';
 
     var mmsTranscludeNameCtrl = function ($scope) {
 
@@ -61,6 +62,15 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
             $compile(element.contents())(scope); 
             if (mmsViewCtrl) {
                 mmsViewCtrl.elementTranscluded(scope.element);
+            }
+        };
+
+        var recompileEdit = function() {
+            element.empty();
+            element.append('<div class="panel panel-info">'+editTemplate+'</div>');
+            $compile(element.contents())(scope); 
+            if (mmsViewCtrl) {
+                mmsViewCtrl.elementTranscluded(scope.edit);
             }
         };
 
@@ -105,12 +115,16 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
             scope.cleanUp = false;
             scope.view = mmsViewCtrl.getView();
 
+            mmsViewCtrl.registerPresenElemCallBack(function() {
+                Utils.showEditCallBack(scope,mmsViewCtrl,element,template,recompile,recompileEdit,"name");
+            });
+
             scope.save = function() {
                 Utils.saveAction(scope,recompile,mmsViewCtrl,scope.bbApi);
             };
 
             scope.cancel = function() {
-                Utils.cancelAction(scope,mmsViewCtrl,recompile,scope.bbApi);
+                Utils.cancelAction(scope,mmsViewCtrl,recompile,scope.bbApi,"name");
             };
 
             scope.addFrame = function() {

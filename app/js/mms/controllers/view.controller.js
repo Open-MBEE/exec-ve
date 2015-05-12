@@ -341,14 +341,8 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     });
 
     $scope.$on('show.edits', function() {
-        var numOpenEdits =  $scope.viewApi.getNumOpenEdits();
-        if (numOpenEdits === 0) {
-            $scope.viewApi.toggleShowEdits();
-            $scope.bbApi.toggleButtonState('show.edits');
-        }
-        else {
-            growl.warning("Must close all editor windows before toggling the Edit state. There are "+numOpenEdits+" open edits");
-        }
+        $scope.viewApi.toggleShowEdits();
+        $scope.bbApi.toggleButtonState('show.edits');
     });
 
     $scope.$on('center.previous', function() {

@@ -80,6 +80,18 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             }
         };
 
+        var recompileEdit = function() {
+            element.empty();
+            var doc = scope.edit.documentation;
+            if (!doc)
+                doc = '<p ng-class="{placeholder: version!=\'latest\'}">(no documentation)</p>';
+            element.append('<div class="panel panel-info">'+doc+'</div>');
+            $compile(element.contents())(scope); 
+            if (mmsViewCtrl) {
+                mmsViewCtrl.elementTranscluded(scope.edit);
+            }
+        };
+
         scope.$watch('mmsEid', function(newVal, oldVal) {
             if (!newVal || (newVal === oldVal && processed))
                 return;
@@ -120,12 +132,16 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             scope.presentationElem = mmsViewElemRefTreeCtrl.getPresentationElement();
             scope.view = mmsViewCtrl.getView();
 
+            mmsViewCtrl.registerPresenElemCallBack(function() {
+                Utils.showEditCallBack(scope,mmsViewCtrl,element,template,recompile,recompileEdit,"documentation");
+            });
+
             scope.save = function() {
                 Utils.saveAction(scope,recompile,mmsViewCtrl,scope.bbApi);
             };
 
             scope.cancel = function() {
-                Utils.cancelAction(scope,mmsViewCtrl,recompile,scope.bbApi);
+                Utils.cancelAction(scope,mmsViewCtrl,recompile,scope.bbApi,"documentation");
             };
 
             scope.delete = function() {
@@ -135,7 +151,11 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             scope.addFrame = function() {
                 Utils.addFrame(scope,mmsViewCtrl,element,template);
             };
-        }
+
+            scope.showEdits = function() {
+                return mmsViewCtrl.isEditable();
+            };
+        } 
 
     };
 
