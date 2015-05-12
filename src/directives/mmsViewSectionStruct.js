@@ -7,6 +7,7 @@ function mmsViewSectionStruct($compile, $templateCache) {
     var template = $templateCache.get('mms/templates/mmsViewSectionStruct.html');
 
     var mmsViewSectionStructLink = function(scope, element, attrs, mmsViewStructCtrl) {
+        element.append(template);
         $compile(element.contents())(scope); 
         scope.editing = function() {
             if (mmsViewStructCtrl) {
