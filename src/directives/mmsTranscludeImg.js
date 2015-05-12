@@ -21,8 +21,6 @@ angular.module('mms.directives')
 function mmsTranscludeImg(VizService, growl) {
 
     var mmsTranscludeImgLink = function(scope, element, attrs, mmsViewCtrl) {
-        scope.domElement = element;
-
         var processed = false;
         element.click(function(e) {
             if (!mmsViewCtrl)

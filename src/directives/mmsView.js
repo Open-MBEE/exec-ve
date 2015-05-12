@@ -67,6 +67,16 @@ function mmsView(ViewService, $templateCache, $rootScope, growl) {
             return false;
         };
 
+        this.isViewElement = function(elementName) {
+            if (elementName === 'MMS-VIEW-IMG' ||
+                elementName === 'MMS-VIEW-LIST' ||
+                elementName === 'MMS-VIEW-PARA' ||
+                elementName === 'MMS-VIEW-TABLE') {
+                return true;
+            }
+            return false;
+        };
+
         this.isPresentationElement = function(elementName) {
             if (elementName === 'MMS-VIEW-PRESENTATION-ELEM') {
                 return true;

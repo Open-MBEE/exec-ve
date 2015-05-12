@@ -26,7 +26,6 @@ angular.module('mms.directives')
 function mmsTranscludeCom(ElementService, UtilsService, $log, $compile, growl) {
 
     var mmsTranscludeComLink = function(scope, element, attrs, mmsViewCtrl) {
-        scope.domElement = element;
         var processed = false;
         scope.cfType = 'doc';
         element.click(function(e) {

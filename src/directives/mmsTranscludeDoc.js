@@ -50,9 +50,6 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
     };
 
     var mmsTranscludeDocLink = function(scope, element, attrs, controllers) {
-
-        scope.domElement = element;
-
         var mmsViewCtrl = controllers[0];
         var mmsViewPresentationElemCtrl = controllers[1];
 
@@ -128,17 +125,20 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
         if (mmsViewCtrl && mmsViewPresentationElemCtrl) {
             
             var isDirectChildOfPresentationElementFunc = function() {
-
-                var curscope = scope;
-                while (curscope.$parent) {
-                    var parent = curscope.$parent;
-                    if (parent.domElement && parent.domElement[0]) {
-                        if (mmsViewCtrl.isTranscludedElement(parent.domElement[0].nodeName))
+                var currentElement = (element[0]) ? element[0] : element;
+                var viewElementCount = 0;
+                while (currentElement.parentElement) {
+                    var parent = (currentElement.parentElement[0]) ? currentElement.parentElement[0] : currentElement.parentElement;
+                    if (mmsViewCtrl.isTranscludedElement(parent.nodeName))
+                        return false;
+                    if (mmsViewCtrl.isViewElement(parent.nodeName)) {
+                        viewElementCount++;
+                        if (viewElementCount > 1)
                             return false;
-                        if (mmsViewCtrl.isPresentationElement(parent.domElement[0].nodeName))
-                            return true;
                     }
-                    curscope = parent;
+                    if (mmsViewCtrl.isPresentationElement(parent.nodeName))
+                        return true;
+                    currentElement = parent;
                 }
                 return false;
             };

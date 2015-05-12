@@ -33,8 +33,6 @@ function mmsTranscludeVal(ElementService, UtilsService, $log, $compile, $templat
     };
 
     var mmsTranscludeValLink = function(scope, element, attrs, mmsViewCtrl) {
-        scope.domElement = element;
-
         var processed = false;
         scope.cfType = 'val';
         element.click(function(e) {

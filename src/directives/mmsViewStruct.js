@@ -29,7 +29,6 @@ function mmsViewStruct(ViewService, $templateCache, growl, $q, _) {
     };
 
     var mmsViewStructLink = function(scope, element, attrs) {
-        scope.editable = false;
         scope.$watch('mmsVid', function(newVal, oldVal) {
             if (!newVal)
                 return;
