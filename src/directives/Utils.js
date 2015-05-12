@@ -322,6 +322,10 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
                 recompileEdit();
             }
             else {
+                if ($scope.edit && $scope.ws) {
+                    // Broadcast message for the ToolCtrl to clear out the tracker window:
+                    $rootScope.$broadcast('presentationElem.cancel',$scope.edit, $scope.ws);
+                }
                 recompile();
             }
         }
