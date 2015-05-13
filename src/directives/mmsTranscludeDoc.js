@@ -131,9 +131,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             scope.instanceVal = mmsViewPresentationElemCtrl.getInstanceVal();
             scope.presentationElem = mmsViewPresentationElemCtrl.getPresentationElement();
             scope.view = mmsViewCtrl.getView();
-            scope.isDirectChildOfPresentationElement = function() {
-                return Utils.isDirectChildOfPresentationElementFunc(element, mmsViewCtrl);
-            };
+            scope.isDirectChildOfPresentationElement = Utils.isDirectChildOfPresentationElementFunc(element, mmsViewCtrl);
 
             mmsViewCtrl.registerPresenElemCallBack(function() {
                 Utils.showEditCallBack(scope,mmsViewCtrl,element,template,recompile,recompileEdit,"documentation");

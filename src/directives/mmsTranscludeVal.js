@@ -61,8 +61,12 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, $log, 
 
             if (mmsViewCtrl)
                 mmsViewCtrl.transcludeClicked(scope.mmsEid);
-            if (e.target.tagName !== 'A')
-                return false;
+
+            if (!scope.isEditing) {
+
+                if (e.target.tagName !== 'A')
+                    return false;
+            }
         });
 
         var recompile = function() {
@@ -168,6 +172,23 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, $log, 
             });
         });
 
+        scope.hasHtml = function(s) {
+            return Utils.hasHtml(s);
+        };
+
+        scope.addValueTypes = {string: 'LiteralString', boolean: 'LiteralBoolean', integer: 'LiteralInteger', real: 'LiteralReal'};
+        scope.addValue = function(type) {
+            if (type === 'LiteralBoolean')
+                scope.editValues.push({type: type, boolean: false});
+            else if (type === 'LiteralInteger')
+                scope.editValues.push({type: type, integer: 0});
+            else if (type === 'LiteralString')
+                scope.editValues.push({type: type, string: ''});
+            else if (type === 'LiteralReal')
+                scope.editValues.push({type: type, double: 0.0});
+        };
+        scope.addValueType = 'LiteralString';
+
         if (mmsViewCtrl && mmsViewPresentationElemCtrl) {
             
             scope.isEditing = false;
@@ -177,9 +198,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, $log, 
             scope.instanceVal = mmsViewPresentationElemCtrl.getInstanceVal();
             scope.presentationElem = mmsViewPresentationElemCtrl.getPresentationElement();
             scope.view = mmsViewCtrl.getView();
-            scope.isDirectChildOfPresentationElement = function() {
-                return Utils.isDirectChildOfPresentationElementFunc(element, mmsViewCtrl);
-            };
+            scope.isDirectChildOfPresentationElement = Utils.isDirectChildOfPresentationElementFunc(element, mmsViewCtrl);
 
             mmsViewCtrl.registerPresenElemCallBack(function() {
                 Utils.showEditCallBack(scope,mmsViewCtrl,element,frameTemplate,recompile,recompileEdit);

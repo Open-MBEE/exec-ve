@@ -242,9 +242,7 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, $compil
         };
 
         scope.hasHtml = function(s) {
-            if (s.indexOf('<p>') === -1)
-                return false;
-            return true;
+            return Utils.hasHtml(s);
         };
 
         /**

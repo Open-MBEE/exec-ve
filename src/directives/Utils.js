@@ -363,6 +363,12 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
             return false;
         };
 
+        var hasHtml = function(s) {
+            if (s.indexOf('<p>') === -1)
+                return false;
+            return true;
+        };
+
     return {
         save: save,
         hasEdits: hasEdits,
@@ -373,6 +379,7 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
         deleteAction: deleteAction,
         showEditCallBack: showEditCallBack,
         isDirectChildOfPresentationElementFunc: isDirectChildOfPresentationElementFunc,
+        hasHtml: hasHtml,
     };
 
 }
