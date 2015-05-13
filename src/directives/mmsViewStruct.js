@@ -41,6 +41,20 @@ function mmsViewStruct(ViewService, $templateCache, growl, $q, _) {
                 scope.editable = scope.edit.editable && scope.mmsVersion === 'latest';
                 delete scope.edit.name;
                 delete scope.edit.documentation;
+
+                if (data.specialization.contents) {
+                    scope.instance2presentation = {};
+                    
+                    angular.forEach(data.specialization.contents.operand, function(content) {
+
+                        ViewService.parseExprRefTree(content, scope.mmsWs).then(function(presentationElement) {
+
+                            scope.instance2presentation[content.instance] = presentationElement;
+
+                        });
+                    });
+                }
+
             }, function(reason) {
                 growl.error('View Error: ' + reason.message);
             });
