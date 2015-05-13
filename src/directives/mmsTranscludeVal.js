@@ -26,6 +26,7 @@ angular.module('mms.directives')
 function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, $log, $compile, $templateCache, growl) {
     var valTemplate = $templateCache.get('mms/templates/mmsTranscludeVal.html');
     var frameTemplate = $templateCache.get('mms/templates/mmsTranscludeValFrame.html');
+    var editTemplate = $templateCache.get('mms/templates/mmsTranscludeValEdit.html');
 
     var mmsTranscludeCtrl = function ($scope, $rootScope) {
 
@@ -123,10 +124,10 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, $log, 
                     element.html('<span' + ((scope.version === 'latest') ? '' : ' class="placeholder"') + '>(no value)</span>');
                     return;
                 }
-                element.append(toCompile);
+                element.append('<div class="panel panel-info">'+toCompile+'</div>');
                 $compile(element.contents())(scope); 
             } else {
-                element.append(valTemplate);
+                element.append(editTemplate);
                 $compile(element.contents())(scope);
             }
             if (mmsViewCtrl) {
