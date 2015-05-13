@@ -44,12 +44,19 @@ function mmsViewStruct(ViewService, $templateCache, growl, $q, _) {
 
                 if (data.specialization.contents) {
                     scope.instance2presentation = {};
+                    scope.instance2specification = {};
                     
                     angular.forEach(data.specialization.contents.operand, function(content) {
 
                         ViewService.parseExprRefTree(content, scope.mmsWs).then(function(presentationElement) {
 
                             scope.instance2presentation[content.instance] = presentationElement;
+
+                        });
+
+                        ViewService.getInstanceSpecification(content, scope.mmsWs).then(function(instanceSpecification) {
+
+                            scope.instance2specification[content.instance] = instanceSpecification;
 
                         });
                     });

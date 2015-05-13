@@ -2,7 +2,7 @@
     <div class="sortable-element" ng-repeat="content in edit.specialization.contents.operand" ng-switch on="instance2presentation[content.instance].type"> 
         <div ng-class="editing ? 'panel panel-default' : ''">
             <div ng-class="editing ? 'panel-body' : ''">
-                <div ng-switch-when="Paragraph">Paragraph : {{instance2presentation[content.instance].title}}</div>
+                <div ng-switch-when="Paragraph">Paragraph : {{instance2specification[content.instance].name}}</div>
                 <div ng-switch-when="Table">Table</div>
                 <div ng-switch-when="List">List</div>
                 <div ng-switch-when="Image">Image</div>

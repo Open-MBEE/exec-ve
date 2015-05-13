@@ -756,6 +756,34 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
 
     /**
      * @ngdoc method
+     * @name mms.ViewService#getInstanceSpecification
+     * @methodOf mms.ViewService
+     * 
+     * @description
+     * Parses a InstanceValue node of the expression reference tree in the contents
+     * of a View, and returns the corresponding presentation element json object.
+     * 
+     * @param {string} instanceVal
+     * @returns {Promise} The promise will be resolved with a json object for the 
+     *                    corresponding presentation element
+     */
+    var getInstanceSpecification = function(instanceVal, workspace) {
+
+        var instanceSpecId = instanceVal.instance;
+        var deferred = $q.defer();
+
+        ElementService.getElement(instanceSpecId, false, workspace)
+        .then(function(instanceSpec) {
+            deferred.resolve(instanceSpec);
+        }, function(reason) {
+            deferred.reject(reason);
+        });
+
+        return deferred.promise;
+    };
+
+    /**
+     * @ngdoc method
      * @name mms.ViewService#isSection
      * @methodOf mms.ViewService
      * 
@@ -815,7 +843,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         addInstanceVal: addInstanceVal,
         deleteElementFromView: deleteElementFromView,
         addInstanceSpecification: addInstanceSpecification,
-        typeToClassifierId: typeToClassifierId
+        typeToClassifierId: typeToClassifierId,
+        getInstanceSpecification : getInstanceSpecification
     };
 
 }
