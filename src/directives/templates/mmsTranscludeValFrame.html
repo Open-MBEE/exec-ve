@@ -1,0 +1,27 @@
+<!-- Separate panel for each value or one for all of them? -->
+<!-- Most of this code is borrowed from mmsSepc.html -->
+<span ng-repeat="value in editValues" ng-switch on="value.type" ng-dblclick="callDoubleClick(value)">
+    <div class="panel panel-danger">
+      <div class="panel-heading clearfix">
+        <h3 class="panel-title pull-left">Value : {{instanceSpec.name}}</h3>
+        <div class="btn-group pull-right">      
+            <mms-button-bar buttons="buttons" mms-bb-api="bbApi"></mms-button-bar>
+        </div>
+      </div>
+      <div class="inner panel-body">
+        <div ng-switch-when="LiteralInteger"><input type="number" ng-model="value.integer"></input></div>
+        <div ng-switch-when="LiteralUnlimitedNatural"><input type="number" ng-model="value.naturalValue"></input></div>
+        <div ng-switch-when="LiteralBoolean"><input type="checkbox" ng-model="value.boolean"></input></div>
+        <div ng-switch-when="LiteralReal"><input type="number" ng-model="value.double" step="any"></input></div>
+        <div ng-switch-when="LiteralString">
+            <textarea ng-if="hasHtml(value.string)" mms-tinymce mms-ws="{{mmsWs}}" mms-site="{{mmsSite}}" ng-model="value.string" mms-cf-elements="mmsCfElements" mms-eid="{{element.sysmlid}}"></textarea>
+            <textarea ng-if="!hasHtml(value.string)" ng-model="value.string"></textarea>
+        </div>
+        <div ng-switch-when="OpaqueExpression">
+            <textarea ng-model="value.expressionBody[0]"></textarea>
+        </div>
+        <div ng-switch-default>Editing not supported for now</div>
+      </div>
+    </div>
+</span>
+

@@ -123,25 +123,6 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
         });
 
         if (mmsViewCtrl && mmsViewPresentationElemCtrl) {
-            
-            var isDirectChildOfPresentationElementFunc = function() {
-                var currentElement = (element[0]) ? element[0] : element;
-                var viewElementCount = 0;
-                while (currentElement.parentElement) {
-                    var parent = (currentElement.parentElement[0]) ? currentElement.parentElement[0] : currentElement.parentElement;
-                    if (mmsViewCtrl.isTranscludedElement(parent.nodeName))
-                        return false;
-                    if (mmsViewCtrl.isViewElement(parent.nodeName)) {
-                        viewElementCount++;
-                        if (viewElementCount > 1)
-                            return false;
-                    }
-                    if (mmsViewCtrl.isPresentationElement(parent.nodeName))
-                        return true;
-                    currentElement = parent;
-                }
-                return false;
-            };
 
             scope.isEditing = false;
             scope.elementSaving = false;
@@ -150,7 +131,9 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             scope.instanceVal = mmsViewPresentationElemCtrl.getInstanceVal();
             scope.presentationElem = mmsViewPresentationElemCtrl.getPresentationElement();
             scope.view = mmsViewCtrl.getView();
-            scope.isDirectChildOfPresentationElement = isDirectChildOfPresentationElementFunc();
+            scope.isDirectChildOfPresentationElement = function() {
+                return Utils.isDirectChildOfPresentationElementFunc(element, mmsViewCtrl);
+            };
 
             mmsViewCtrl.registerPresenElemCallBack(function() {
                 Utils.showEditCallBack(scope,mmsViewCtrl,element,template,recompile,recompileEdit,"documentation");
@@ -170,10 +153,6 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
 
             scope.addFrame = function() {
                 Utils.addFrame(scope,mmsViewCtrl,element,template);
-            };
-
-            scope.showEdits = function() {
-                return mmsViewCtrl.isEditable();
             };
         } 
 

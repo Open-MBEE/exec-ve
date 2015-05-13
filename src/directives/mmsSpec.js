@@ -260,7 +260,19 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, $compil
          * @return {boolean} has changes or not
          */
         scope.hasEdits = function() {
-            return Utils.hasEdits(scope);
+            // TODO: this doesnt handle constraints and other cases
+            if (scope.edit === null)
+                return false;
+            if (scope.edit.name !== scope.element.name)
+                return true;
+            if (scope.edit.documentation !== scope.element.documentation)
+                return true;
+            if (scope.edit.specialization && scope.edit.specialization.type === 'Property' && 
+                !angular.equals(scope.edit.specialization.value, scope.element.specialization.value))
+                return true;
+            if (scope.edit.description !== scope.element.description)
+                return true;
+            return false;
         };
 
         scope.addValueTypes = {string: 'LiteralString', boolean: 'LiteralBoolean', integer: 'LiteralInteger', real: 'LiteralReal'};

@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsTranscludeVal', ['ElementService', 'UtilsService', '$log', '$compile', '$templateCache', 'growl', mmsTranscludeVal]);
+.directive('mmsTranscludeVal', ['ElementService', 'UtilsService', 'UxService', 'Utils', '$log', '$compile', '$templateCache', 'growl', mmsTranscludeVal]);
 
 /**
  * @ngdoc directive
@@ -23,19 +23,41 @@ angular.module('mms.directives')
  * @param {string=master} mmsWs Workspace to use, defaults to master
  * @param {string=latest} mmsVersion Version can be alfresco version number or timestamp, default is latest
  */
-function mmsTranscludeVal(ElementService, UtilsService, $log, $compile, $templateCache, growl) {
+function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, $log, $compile, $templateCache, growl) {
     var valTemplate = $templateCache.get('mms/templates/mmsTranscludeVal.html');
+    var frameTemplate = $templateCache.get('mms/templates/mmsTranscludeValFrame.html');
 
     var mmsTranscludeCtrl = function ($scope, $rootScope) {
+
+        $scope.bbApi = {};
+        $scope.buttons = [];
+        $scope.buttonsInit = false;
+
         $scope.callDoubleClick = function(value) {
             growl.info(value.type);
         };
+
+        $scope.bbApi.init = function() {
+            if (!$scope.buttonsInit) {
+                $scope.buttonsInit = true;
+                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.save", $scope));
+                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.cancel", $scope));
+                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.delete", $scope));
+                $scope.bbApi.setPermission("presentation.element.delete", $scope.isDirectChildOfPresentationElement);
+            }     
+        };
     };
 
-    var mmsTranscludeValLink = function(scope, element, attrs, mmsViewCtrl) {
+    var mmsTranscludeValLink = function(scope, element, attrs, controllers) {
+        var mmsViewCtrl = controllers[0];
+        var mmsViewPresentationElemCtrl = controllers[1];
+
         var processed = false;
         scope.cfType = 'val';
         element.click(function(e) {
+            if (scope.addFrame)
+                scope.addFrame();
+
             if (mmsViewCtrl)
                 mmsViewCtrl.transcludeClicked(scope.mmsEid);
             if (e.target.tagName !== 'A')
@@ -77,6 +99,41 @@ function mmsTranscludeVal(ElementService, UtilsService, $log, $compile, $templat
             }
         };
 
+        var recompileEdit = function() {
+            var toCompileList = [];
+            var areStrings = false;
+            for (var i = 0; i < scope.editValues.length; i++) {
+                if (scope.editValues[i].type === 'LiteralString') {
+                    areStrings = true;
+                    var s = scope.editValues[i].string;
+                    if (s.indexOf('<p>') === -1) {
+                        s = s.replace('<', '&lt;');
+                    }
+                    toCompileList.push(s);
+                } else {
+                    break;
+                }
+            } 
+            element.empty();
+            if (scope.editValues.length === 0 || Object.keys(scope.editValues[0]).length < 2)
+                element.html('<span' + ((scope.version === 'latest') ? '' : ' class="placeholder"') + '>(no value)</span>');
+            else if (areStrings) {
+                var toCompile = toCompileList.join(' ');
+                if (toCompile === '') {
+                    element.html('<span' + ((scope.version === 'latest') ? '' : ' class="placeholder"') + '>(no value)</span>');
+                    return;
+                }
+                element.append(toCompile);
+                $compile(element.contents())(scope); 
+            } else {
+                element.append(valTemplate);
+                $compile(element.contents())(scope);
+            }
+            if (mmsViewCtrl) {
+                mmsViewCtrl.elementTranscluded(scope.edit);
+            }
+        };
+
         scope.$watch('mmsEid', function(newVal, oldVal) {
             if (!newVal || (newVal === oldVal && processed))
                 return;
@@ -109,6 +166,40 @@ function mmsTranscludeVal(ElementService, UtilsService, $log, $compile, $templat
                 growl.error('Cf Val Error: ' + reason.message + ': ' + scope.mmsEid);
             });
         });
+
+        if (mmsViewCtrl && mmsViewPresentationElemCtrl) {
+            
+            scope.isEditing = false;
+            scope.elementSaving = false;
+            scope.cleanUp = false;
+            scope.instanceSpec = mmsViewPresentationElemCtrl.getInstanceSpec();
+            scope.instanceVal = mmsViewPresentationElemCtrl.getInstanceVal();
+            scope.presentationElem = mmsViewPresentationElemCtrl.getPresentationElement();
+            scope.view = mmsViewCtrl.getView();
+            scope.isDirectChildOfPresentationElement = function() {
+                return Utils.isDirectChildOfPresentationElementFunc(element, mmsViewCtrl);
+            };
+
+            mmsViewCtrl.registerPresenElemCallBack(function() {
+                Utils.showEditCallBack(scope,mmsViewCtrl,element,frameTemplate,recompile,recompileEdit);
+            });
+
+            scope.save = function() {
+                Utils.saveAction(scope,recompile,mmsViewCtrl,scope.bbApi);
+            };
+
+            scope.cancel = function() {
+                Utils.cancelAction(scope,mmsViewCtrl,recompile,scope.bbApi);
+            };
+
+            scope.delete = function() {
+                Utils.deleteAction(scope,scope.bbApi);
+            };
+
+            scope.addFrame = function() {
+                Utils.addFrame(scope,mmsViewCtrl,element,frameTemplate);
+            };
+        } 
     };
 
     return {
@@ -119,7 +210,7 @@ function mmsTranscludeVal(ElementService, UtilsService, $log, $compile, $templat
             mmsWs: '@',
             mmsVersion: '@'
         },
-        require: '?^mmsView',
+        require: ['?^mmsView','?^mmsViewPresentationElem'],
         controller: ['$scope', mmsTranscludeCtrl],
         link: mmsTranscludeValLink
     };
