@@ -73,8 +73,10 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         var n = normalize(id, update, workspace, version);
         var key = 'getElement(' + id + n.update + n.ws + n.ver + ')';
 
-        if (inProgress.hasOwnProperty(key))
+        if (inProgress.hasOwnProperty(key)) {
+            HttpService.ping(URLService.getElementURL(id, n.ws, n.ver));
             return inProgress[key];
+        }
 
         var deferred = $q.defer();
         if (CacheService.exists(n.cacheKey) && !n.update) {
@@ -257,8 +259,10 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         var n = normalize(null, update, workspace, version);
 
         var progress = 'getGenericElements(' + url + key + n.update + n.ws + n.ver + ')';
-        if (inProgress.hasOwnProperty(progress))
+        if (inProgress.hasOwnProperty(progress)) {
+            HttpService.ping(url);
             return inProgress[progress];
+        }
 
         var deferred = $q.defer();
        
