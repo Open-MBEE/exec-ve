@@ -50,9 +50,6 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
     };
 
     var mmsTranscludeDocLink = function(scope, element, attrs, controllers) {
-
-        scope.domElement = element;
-
         var mmsViewCtrl = controllers[0];
         var mmsViewPresentationElemCtrl = controllers[1];
 
@@ -117,6 +114,8 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             ElementService.getElement(scope.mmsEid, false, ws, version)
             .then(function(data) {
                 scope.element = data;
+                if (!scope.panelTitle)
+                    scope.panelTitle = scope.element.name;
                 recompile();
                 scope.$watch('element.documentation', recompile);
             }, function(reason) {
@@ -125,32 +124,13 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             });
         });
 
-        if (mmsViewCtrl && mmsViewPresentationElemCtrl) {
-            
-            var isDirectChildOfPresentationElementFunc = function() {
-
-                var curscope = scope;
-                while (curscope.$parent) {
-                    var parent = curscope.$parent;
-                    if (parent.domElement && parent.domElement[0]) {
-                        if (mmsViewCtrl.isTranscludedElement(parent.domElement[0].nodeName))
-                            return false;
-                        if (mmsViewCtrl.isPresentationElement(parent.domElement[0].nodeName))
-                            return true;
-                    }
-                    curscope = parent;
-                }
-                return false;
-            };
+        if (mmsViewCtrl) {
 
             scope.isEditing = false;
             scope.elementSaving = false;
             scope.cleanUp = false;
-            scope.instanceSpec = mmsViewPresentationElemCtrl.getInstanceSpec();
-            scope.instanceVal = mmsViewPresentationElemCtrl.getInstanceVal();
-            scope.presentationElem = mmsViewPresentationElemCtrl.getPresentationElement();
             scope.view = mmsViewCtrl.getView();
-            scope.isDirectChildOfPresentationElement = isDirectChildOfPresentationElementFunc();
+            scope.isDirectChildOfPresentationElement = Utils.isDirectChildOfPresentationElementFunc(element, mmsViewCtrl);
 
             mmsViewCtrl.registerPresenElemCallBack(function() {
                 Utils.showEditCallBack(scope,mmsViewCtrl,element,template,recompile,recompileEdit,"documentation");
@@ -171,11 +151,16 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             scope.addFrame = function() {
                 Utils.addFrame(scope,mmsViewCtrl,element,template);
             };
-
-            scope.showEdits = function() {
-                return mmsViewCtrl.isEditable();
-            };
         } 
+
+        if (mmsViewPresentationElemCtrl) {
+
+            scope.instanceSpec = mmsViewPresentationElemCtrl.getInstanceSpec();
+            scope.instanceVal = mmsViewPresentationElemCtrl.getInstanceVal();
+            scope.presentationElem = mmsViewPresentationElemCtrl.getPresentationElement();
+            if (scope.isDirectChildOfPresentationElement)
+                scope.panelTitle = scope.instanceSpec.name;
+        }
 
     };
 

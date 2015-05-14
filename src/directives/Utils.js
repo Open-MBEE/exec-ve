@@ -148,9 +148,13 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
      * @return {boolean} has changes or not
      */
      var hasEdits = function($scope, type) {
+        // TODO: this doesnt handle constraints and other cases
         if ($scope.edit === null)
             return false;
-        if ($scope.edit[type] !== $scope.element[type])
+        if (type && $scope.edit[type] !== $scope.element[type])
+            return true;
+        if ($scope.edit.specialization && $scope.edit.specialization.type === 'Property' && 
+            !angular.equals($scope.edit.specialization.value, $scope.element.specialization.value))
             return true;
         return false;
     };
@@ -193,7 +197,7 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
             growl.error(reason.message);
     };
 
-    var addFrame = function($scope, mmsViewCtrl, element,template) {
+    var addFrame = function($scope, mmsViewCtrl, element, template) {
 
         if (mmsViewCtrl.isEditable() && !$scope.isEditing && !$scope.cleanUp) {
 
@@ -201,6 +205,14 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
             .then(function(data) {
                 $scope.isEditing = true;
                 $scope.edit = data;
+
+                if ($scope.edit.specialization.type === 'Property' && angular.isArray($scope.edit.specialization.value)) {
+                    $scope.editValues = $scope.edit.specialization.value;
+                }
+                if ($scope.edit.specialization.type === 'Constraint' && $scope.edit.specialization.specification) {
+                    $scope.editValues = [$scope.edit.specialization.specification];
+                }
+
                 element.empty();
                 element.append(template);
                 $compile(element.contents())($scope); 
@@ -326,10 +338,36 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
                     // Broadcast message for the ToolCtrl to clear out the tracker window:
                     $rootScope.$broadcast('presentationElem.cancel',$scope.edit, $scope.ws);
                 }
-                recompile();
+                if ($scope.element)
+                    recompile();
             }
         }
     };
+
+      var isDirectChildOfPresentationElementFunc = function(element, mmsViewCtrl) {
+            var currentElement = (element[0]) ? element[0] : element;
+            var viewElementCount = 0;
+            while (currentElement.parentElement) {
+                var parent = (currentElement.parentElement[0]) ? currentElement.parentElement[0] : currentElement.parentElement;
+                if (mmsViewCtrl.isTranscludedElement(parent.nodeName))
+                    return false;
+                if (mmsViewCtrl.isViewElement(parent.nodeName)) {
+                    viewElementCount++;
+                    if (viewElementCount > 1)
+                        return false;
+                }
+                if (mmsViewCtrl.isPresentationElement(parent.nodeName))
+                    return true;
+                currentElement = parent;
+            }
+            return false;
+        };
+
+        var hasHtml = function(s) {
+            if (s.indexOf('<p>') === -1)
+                return false;
+            return true;
+        };
 
     return {
         save: save,
@@ -339,7 +377,9 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
         saveAction: saveAction,
         cancelAction: cancelAction,
         deleteAction: deleteAction,
-        showEditCallBack: showEditCallBack
+        showEditCallBack: showEditCallBack,
+        isDirectChildOfPresentationElementFunc: isDirectChildOfPresentationElementFunc,
+        hasHtml: hasHtml,
     };
 
 }

@@ -63,7 +63,6 @@ function mmsViewPresentationElem(ViewService, ElementService, $templateCache, $r
     };
 
     var mmsViewPresentationElemLink = function(scope, element, attrs, mmsViewCtrl) {
-        scope.domElement = element;
     };
 
 

@@ -58,16 +58,16 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     $scope.buttons = [];
 
     $scope.bbApi.init = function() {
+
+        $scope.bbApi.addButton(UxService.getButtonBarButton('show.edits'));
+        $scope.bbApi.setToggleState('show.edits', false);
         if (view && view.editable && time === 'latest') {
             $scope.bbApi.addButton(UxService.getButtonBarButton('view.add.dropdown'));
         }
-
         $scope.bbApi.addButton(UxService.getButtonBarButton('show.comments'));
         $scope.bbApi.setToggleState('show.comments', $rootScope.veCommentsOn);
         $scope.bbApi.addButton(UxService.getButtonBarButton('show.elements'));
         $scope.bbApi.setToggleState('show.elements', $rootScope.veElementsOn);
-        $scope.bbApi.addButton(UxService.getButtonBarButton('show.edits'));
-        $scope.bbApi.setToggleState('show.edits', false);
 
         // TODO: This code is duplicated in the FullDocCtrl
         // **WARNING** IF YOU CHANGE THIS CODE, NEED TO UPDATE IN FULL DOC CTRL TOO
@@ -313,11 +313,11 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     });
 
     $scope.$on('view.add.list', function() {
-        addElement('List');
+        //addElement('List');
     });
 
     $scope.$on('view.add.table', function() {
-        addElement('Table');
+        //addElement('Table');
     });
 
     $scope.$on('view.add.section', function() {
@@ -325,7 +325,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     });
 
     $scope.$on('view.add.image', function() {
-        addElement('Image');
+        //addElement('Image');
     });
 
     $scope.$on('show.comments', function() {
