@@ -47,6 +47,8 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         $rootScope.veCommentsOn = false;
     if (!$rootScope.veElementsOn)
         $rootScope.veElementsOn = false;
+    if (!$rootScope.mms_ShowEdits)
+        $rootScope.mms_ShowEdits = false;
 
     var ws = $stateParams.workspace;
 
@@ -60,7 +62,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     $scope.bbApi.init = function() {
 
         $scope.bbApi.addButton(UxService.getButtonBarButton('show.edits'));
-        $scope.bbApi.setToggleState('show.edits', false);
+        $scope.bbApi.setToggleState('show.edits', $rootScope.mms_ShowEdits);
         if (view && view.editable && time === 'latest') {
             $scope.bbApi.addButton(UxService.getButtonBarButton('view.add.dropdown'));
         }
@@ -343,6 +345,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     $scope.$on('show.edits', function() {
         $scope.viewApi.toggleShowEdits();
         $scope.bbApi.toggleButtonState('show.edits');
+        $rootScope.mms_ShowEdits = !$rootScope.mms_ShowEdits;
     });
 
     $scope.$on('center.previous', function() {
@@ -410,6 +413,9 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         }
         if ($rootScope.veElementsOn) {
             $scope.viewApi.toggleShowElements();
+        }
+        if ($rootScope.mms_ShowEdits) {
+            $scope.viewApi.toggleShowEdits();
         }
     };
 }]);
