@@ -37,6 +37,33 @@ function CacheService(_) {
 
     /**
      * @ngdoc method
+     * @name mms.CacheService#getElements
+     * @methodOf mms.CacheService
+     * 
+     * @description
+     * Get the latest elements in the cache with the parameter workspace ID
+     * 
+     * @param {string} mmsWs The workspace id
+     * @returns {Object} Value if found, null if not found
+     */
+    var getLatestElements = function(mmsWs) {
+        var latestElements = [];
+
+        for (var item in cache) {
+            if (!cache.hasOwnProperty(item)) {
+                continue;
+            }
+
+            if (item.indexOf('|latest') >= 0 && item.indexOf('elements|') >= 0 && item.indexOf(mmsWs) >= 0) {
+                latestElements.push(cache[item]);
+            }
+        }
+
+        return latestElements;
+    };
+
+    /**
+     * @ngdoc method
      * @name mms.CacheService#put
      * @methodOf mms.CacheService
      * 
@@ -121,6 +148,7 @@ function CacheService(_) {
 
     return {
         get: get,
+        getLatestElements: getLatestElements,
         put: put,
         exists: exists,
         remove: remove,
