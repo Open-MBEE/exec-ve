@@ -1,0 +1,3 @@
+<div class="modal-body">
+  <input typeahead="autocompleteItem.name for autocompleteItem in autocompleteItems | filter:$viewValue | limitTo:10" typeahead-on-select='autocompleteOnSelect($item, $model, $label)' ng-model="selected" ng-keyup="$event.keyCode === 13 && submitAutocomplete()" class="form-control" />
+</div>
