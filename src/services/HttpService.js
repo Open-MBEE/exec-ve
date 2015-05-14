@@ -34,15 +34,15 @@ function HttpService($http, $q, _) {
         }
         else {
             inProgress++;
-
+            if (cache.hasOwnProperty(url)) {
+                delete cache[url];
+            }
             $http.get(url)
                 .success(success)
                 .error(error)
                 .finally( function() {
                     inProgress--;
-                    if (cache.hasOwnProperty(url)) {
-                        delete cache[url];
-                    }
+                    
                     if (queue.length > 0) {
                         var next = queue.shift();
                         get(next.url, next.success, next.error);
