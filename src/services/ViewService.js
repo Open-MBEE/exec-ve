@@ -268,47 +268,58 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
 
     /**
      * @ngdoc method
-     * @name mms.ViewService#addElementToView
+     * @name mms.ViewService#addElementToViewOrSection
      * @methodOf mms.ViewService
      *
      * @description
-     * This updates a view to include a new element, the new element must be a child
+     * This updates a view or section to include a new element, the new element must be a child
      * of an existing element in the view
      * 
-     * @param {string} viewId Id of the View to add the element to
+     * @param {string} viewOrSectionId Id of the View or Section to add the element to
      * @param {string} parentElementId Id of the parent element, this element should 
      *      already be in the document
      * @param {string} [workspace=master] workspace to use
      * @returns {Promise} The promise would be resolved with updated document object
      */
-    var addElementToView = function(viewId, parentElementId, workspace, elementOb) {
+    var addElementToViewOrSection = function(viewOrSectionId, parentElementId, workspace, elementOb) {
 
         var deferred = $q.defer();
         var ws = !workspace ? 'master' : workspace;
-        var docViewsCacheKey = ['products', ws, viewId, 'latest', 'views'];
-        getDocument(viewId, false, ws)
+        ElementService.getElement(viewOrSectionId, false, ws)
         .then(function(data) {  
             var clone = {};
             clone.sysmlid = data.sysmlid;
             //clone.read = data.read;
             clone.specialization = _.cloneDeep(data.specialization);
-            delete clone.specialization.contains;
-            if (!clone.specialization.contents) {
-                clone.specialization.contents = {
-                    operand: [],
-                    type: "Expression"
-                };
+
+            if (isSection(data)) {
+                if (!clone.specialization.instanceSpecificationSpecification) {
+                    clone.specialization.instanceSpecificationSpecification = {
+                        operand: [],
+                        type: "Expression"
+                    };
+                }
+                clone.specialization.instanceSpecificationSpecification.operand.push(elementOb);
             }
-            clone.specialization.contents.operand.push(elementOb);
+            else {
+                delete clone.specialization.contains;
+                if (!clone.specialization.contents) {
+                    clone.specialization.contents = {
+                        operand: [],
+                        type: "Expression"
+                    };
+                }
+                clone.specialization.contents.operand.push(elementOb);
+            }
             // TODO add to parentElement also if needed 
-            updateDocument(clone, ws)
+            ElementService.updateElement(clone, ws)
             .then(function(data2) {
                 deferred.resolve(data2);
             }, function(reason) {
                 if (reason.status === 409) {
                     clone.read = reason.data.elements[0].read;
                     clone.modified = reason.data.elements[0].modified;
-                    updateDocument(clone, ws)
+                    ElementService.updateElement(clone, ws)
                     .then(function(data3) {
                         deferred.resolve(data3);
                     }, function(reason2) {
@@ -387,11 +398,11 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
     };
 
     /**
-     * Creates and adds a opaque presentation element to the passed view if addToView is true,
+     * Creates and adds a opaque presentation element to the passed view or section if addToView is true,
      * otherwise, just creates the opaque element but doesnt add it the
-     * view.
+     * view or section
      *
-     * @param {string} view Id of the View to add to
+     * @param {object} viewOrSection The View or Section to add to
      * @param {string} [workspace=master] workspace to use
      * @param {string} addToView true if wanting to add the element to the view
      * @param {string} elementType The type of element that is to be created, ie 'Paragraph'
@@ -400,13 +411,13 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @returns {Promise} The promise would be resolved with updated View object if addToView is true
      *                    otherwise the created InstanceSpecification
     */
-    var createAndAddElement = function(view, workspace, addToView, elementType, site, name) {
+    var createAndAddElement = function(viewOrSection, workspace, addToView, elementType, site, name) {
 
         var deferred = $q.defer();
         var defaultName = "Untitled "+elementType;
         var instanceSpecName = name ? name : defaultName;
 
-        addInstanceSpecification(view, workspace, elementType, addToView, site, instanceSpecName).
+        addInstanceSpecification(viewOrSection, workspace, elementType, addToView, site, instanceSpecName).
         then(function(data) {
             deferred.resolve(data);
         }, function(reason) {
@@ -419,7 +430,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
     /**
      * Adds a InstanceVal/InstanceSpecification to the contents of the View
      *
-     * @param {string} view Id of the View to add to
+     * @param {object} viewOrSection The View or Section to add to
      * @param {string} [workspace=master] workspace to use
      * @param {string} type The type of element that is to be created, ie 'Paragraph'
      * @param {string} addToView true if wanting to add the element to the view
@@ -429,7 +440,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @returns {Promise} The promise would be resolved with updated View object if addToView is true
      *                    otherwise the created InstanceSpecification
     */
-    var addInstanceSpecification = function(view, workspace, type, addToView, site, name, json) {
+    var addInstanceSpecification = function(viewOrSection, workspace, type, addToView, site, name, json) {
 
         var deferred = $q.defer();
         var instanceSpecName = name ? name : "Untitled InstanceSpec";
@@ -438,7 +449,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         var processInstanceSpec = function(createdInstanceSpecUpdate) {
 
             if (addToView) {
-                addInstanceVal(view, workspace, createdInstanceSpecUpdate.sysmlid).then(function(updatedView) {
+                addInstanceVal(viewOrSection, workspace, createdInstanceSpecUpdate.sysmlid).then(function(updatedView) {
                     if (type === "Section") {
                         // Broadcast message to TreeCtrl:
                         $rootScope.$broadcast('viewctrl.add.section', createdInstanceSpecUpdate);
@@ -563,20 +574,20 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
     /**
      * Adds a InstanceValue to the contents of the View
      *
-     * @param {string} view Id of the View to add to
+     * @param {object} viewOrSection The View or Section to add to
      * @param {string} [workspace=master] workspace to use
      * @param {string} instanceSpecId InstanceSpecification sysmlid.  This is the instance
      #                 for the InstanceValue.
      * @returns {Promise} The promise would be resolved with updated View object
     */
-    var addInstanceVal = function(view, workspace, instanceSpecId) {
+    var addInstanceVal = function(viewOrSection, workspace, instanceSpecId) {
 
         var instanceVal = {
             instance:instanceSpecId,
             type:"InstanceValue"
         };
 
-        return addElementToView(view.sysmlid, view.sysmlid, workspace, instanceVal);
+        return addElementToViewOrSection(viewOrSection.sysmlid, viewOrSection.sysmlid, workspace, instanceVal);
     };
 
     /**
@@ -849,7 +860,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         getCurrentDocumentId: getCurrentDocumentId,
         parseExprRefTree: parseExprRefTree,
         isSection: isSection,
-        addElementToView: addElementToView,
+        addElementToViewOrSection: addElementToViewOrSection,
         createAndAddElement: createAndAddElement,
         addInstanceVal: addInstanceVal,
         deleteElementFromView: deleteElementFromView,
