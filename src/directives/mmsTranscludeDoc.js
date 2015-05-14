@@ -114,6 +114,8 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             ElementService.getElement(scope.mmsEid, false, ws, version)
             .then(function(data) {
                 scope.element = data;
+                if (!scope.panelTitle)
+                    scope.panelTitle = scope.element.name;
                 recompile();
                 scope.$watch('element.documentation', recompile);
             }, function(reason) {
@@ -122,14 +124,11 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             });
         });
 
-        if (mmsViewCtrl && mmsViewPresentationElemCtrl) {
+        if (mmsViewCtrl) {
 
             scope.isEditing = false;
             scope.elementSaving = false;
             scope.cleanUp = false;
-            scope.instanceSpec = mmsViewPresentationElemCtrl.getInstanceSpec();
-            scope.instanceVal = mmsViewPresentationElemCtrl.getInstanceVal();
-            scope.presentationElem = mmsViewPresentationElemCtrl.getPresentationElement();
             scope.view = mmsViewCtrl.getView();
             scope.isDirectChildOfPresentationElement = Utils.isDirectChildOfPresentationElementFunc(element, mmsViewCtrl);
 
@@ -153,6 +152,15 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                 Utils.addFrame(scope,mmsViewCtrl,element,template);
             };
         } 
+
+        if (mmsViewPresentationElemCtrl) {
+
+            scope.instanceSpec = mmsViewPresentationElemCtrl.getInstanceSpec();
+            scope.instanceVal = mmsViewPresentationElemCtrl.getInstanceVal();
+            scope.presentationElem = mmsViewPresentationElemCtrl.getPresentationElement();
+            if (scope.isDirectChildOfPresentationElement)
+                scope.panelTitle = scope.instanceSpec.name;
+        }
 
     };
 
