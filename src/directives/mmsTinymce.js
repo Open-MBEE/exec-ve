@@ -118,9 +118,13 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                     autocompleteProperty = 'value';
                 }
             };
-            $scope.submitAutocomplete = function() {
-                var tag = '<mms-transclude-' + autocompleteProperty + ' data-mms-eid="' + autocompleteElementId + '">[cf:' + autocompleteName + '.' + autocompleteProperty + ']</mms-transclude-' + autocompleteProperty + '> ';
-                $modalInstance.close(tag);
+            $scope.autocomplete = function(success) {
+                if (success) {
+                    var tag = '<mms-transclude-' + autocompleteProperty + ' data-mms-eid="' + autocompleteElementId + '">[cf:' + autocompleteName + '.' + autocompleteProperty + ']</mms-transclude-' + autocompleteProperty + '> ';
+                    $modalInstance.close(tag);
+                } else {
+                    $modalInstance.close(false);
+                }
             };
         };
 
@@ -132,8 +136,12 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                 size: 'sm'
             });
             instance.result.then(function(tag) {
-                ed.selection.collapse(false);
-                ed.insertContent(tag);
+                if (!tag) {
+                    transcludeCallback(ed);
+                } else {
+                    ed.selection.collapse(false);
+                    ed.insertContent(tag);
+                }
             });
         };
 
