@@ -197,11 +197,12 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
             growl.error(reason.message);
     };
 
-    var addFrame = function($scope, mmsViewCtrl, element, template) {
+    var addFrame = function($scope, mmsViewCtrl, element, template, editObj) {
 
         if (mmsViewCtrl.isEditable() && !$scope.isEditing && !$scope.cleanUp) {
 
-            ElementService.getElementForEdit($scope.mmsEid, false, $scope.ws)
+            var id = editObj ? editObj.sysmlid : $scope.mmsEid;
+            ElementService.getElementForEdit(id, false, $scope.ws)
             .then(function(data) {
                 $scope.isEditing = true;
                 $scope.edit = data;
@@ -224,7 +225,7 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
             // TODO: Should this check the entire or just the instance specification
             // TODO: How smart does it need to be, since the instance specification is just a reference.
             // Will need to unravel until the end to check all references
-            ElementService.isCacheOutdated($scope.mmsEid, $scope.ws)
+            ElementService.isCacheOutdated(id, $scope.ws)
             .then(function(data) {
                 if (data.status && data.server.modified > data.cache.modified)
                     growl.warning('This element has been updated on the server');
@@ -237,7 +238,7 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
         }
     };
 
-    var saveAction = function($scope, recompile, mmsViewCtrl, bbApi) {
+    var saveAction = function($scope, recompile, mmsViewCtrl, bbApi, editObj) {
 
         if ($scope.elementSaving) {
             growl.info('Please Wait...');
@@ -245,8 +246,8 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
         }
         bbApi.toggleButtonSpinner('presentation.element.save');
         $scope.elementSaving = true;
-
-        save($scope.edit, $scope.ws, "element", $scope.mmsEid, null, $scope).then(function(data) {
+        var id = editObj ? editObj.sysmlid : $scope.mmsEid;
+        save($scope.edit, $scope.ws, "element", id, null, $scope).then(function(data) {
             $scope.elementSaving = false;
             $scope.isEditing = false;
             $scope.cleanUp = true;
@@ -317,12 +318,12 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
 
     };
 
-    var showEditCallBack = function($scope, mmsViewCtrl, element, template, recompile, recompileEdit, type) {
+    var showEditCallBack = function($scope, mmsViewCtrl, element, template, recompile, recompileEdit, type, editObj) {
 
         // Going into edit mode, so add a frame if had a previous edit in progress:
         if (mmsViewCtrl.isEditable()) {
             if ($scope.edit && hasEdits($scope, type)) {
-                addFrame($scope,mmsViewCtrl,element,template);
+                addFrame($scope,mmsViewCtrl,element,template,editObj);
             }
         }
         // Leaving edit mode, so highlight the unsaved edit if needed:

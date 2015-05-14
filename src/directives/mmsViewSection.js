@@ -1,14 +1,26 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsViewSection', ['$compile', '$templateCache', 'ElementService', mmsViewSection]);
+.directive('mmsViewSection', ['$compile', '$templateCache', '$rootScope', 'ElementService', 'UxService', 'Utils', mmsViewSection]);
 
-function mmsViewSection($compile, $templateCache, ElementService) {
-    var template = $templateCache.get('mms/templates/mmsViewSection.html');
+function mmsViewSection($compile, $templateCache, $rootScope, ElementService, UxService, Utils) {
+
+    // TODO: 
+    //       drop down add button
+    //          - will need to update hasEdits()
+
+
+    var defaultTemplate = $templateCache.get('mms/templates/mmsViewSection.html');
+    var frameTemplate = $templateCache.get('mms/templates/mmsViewSectionFrame.html');
+    var editTemplate = $templateCache.get('mms/templates/mmsViewSectionEdit.html');
 
     var mmsViewSectionCtrl = function($scope, $rootScope) {
 
         $scope.sectionInstanceVals = [];
+        $scope.bbApi = {};
+        $scope.buttons = [];
+        $scope.buttonsInit = false;
+        $scope.element = $scope.section;  // This is for methods in Utils 
 
         if ($scope.section && $scope.section.specialization && 
             $scope.section.specialization.instanceSpecificationSpecification && 
@@ -17,14 +29,41 @@ function mmsViewSection($compile, $templateCache, ElementService) {
             $scope.sectionInstanceVals = $scope.section.specialization.instanceSpecificationSpecification.operand;
         }
 
-        // TODO: this method can prob be removed
-        $scope.deleteSection = function(instanceVal) {
-            $rootScope.$broadcast('element.section.delete', instanceVal, $scope.section.name);
+        $scope.bbApi.init = function() {
+            if (!$scope.buttonsInit) {
+                $scope.buttonsInit = true;
+                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.save", $scope));
+                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.cancel", $scope));
+                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.delete", $scope));
+                $scope.bbApi.setPermission("presentation.element.delete", $scope.isDirectChildOfPresentationElement);
+            }     
         };
+
     };
 
-    var mmsViewSectionLink = function(scope, element, attrs, mmsViewCtrl) {
-        element.append(template);
+    var mmsViewSectionLink = function(scope, element, attrs, controllers) {
+
+        var mmsViewCtrl = controllers[0];
+        var mmsViewPresentationElemCtrl = controllers[1];
+
+        element.click(function(e) {
+            if (scope.addFrame)
+                scope.addFrame();
+        });
+
+        var recompile = function() {
+            element.empty();
+            element.append(defaultTemplate);
+            $compile(element.contents())(scope); 
+        };
+
+        var recompileEdit = function() {
+            element.empty();
+            element.append(editTemplate);
+            $compile(element.contents())(scope); 
+        };
+
+        element.append(defaultTemplate);
         $compile(element.contents())(scope); 
         scope.structEditable = function() {
             if (mmsViewCtrl) {
@@ -32,6 +71,44 @@ function mmsViewSection($compile, $templateCache, ElementService) {
             } else
                 return false;
         };
+
+        if (mmsViewCtrl) {
+            var viewVersion = mmsViewCtrl.getWsAndVersion();
+            if (viewVersion)
+                scope.ws = viewVersion.workspace;
+        }
+
+        if (mmsViewCtrl && mmsViewPresentationElemCtrl) {
+            
+            scope.isEditing = false;
+            scope.elementSaving = false;
+            scope.cleanUp = false;
+            scope.instanceSpec = mmsViewPresentationElemCtrl.getInstanceSpec();
+            scope.instanceVal = mmsViewPresentationElemCtrl.getInstanceVal();
+            scope.presentationElem = mmsViewPresentationElemCtrl.getPresentationElement();
+            scope.view = mmsViewCtrl.getView();
+            scope.isDirectChildOfPresentationElement = Utils.isDirectChildOfPresentationElementFunc(element, mmsViewCtrl);
+
+            mmsViewCtrl.registerPresenElemCallBack(function() {
+                Utils.showEditCallBack(scope,mmsViewCtrl,element,frameTemplate,recompile,recompileEdit,"name",scope.section);
+            });
+
+            scope.save = function() {
+                Utils.saveAction(scope,recompile,mmsViewCtrl,scope.bbApi,scope.section);
+            };
+
+            scope.cancel = function() {
+                Utils.cancelAction(scope,mmsViewCtrl,recompile,scope.bbApi,"name");
+            };
+
+            scope.delete = function() {
+                Utils.deleteAction(scope,scope.bbApi);
+            };
+
+            scope.addFrame = function() {
+                Utils.addFrame(scope,mmsViewCtrl,element,frameTemplate,scope.section);
+            };
+        } 
     };
 
     return {
@@ -40,7 +117,7 @@ function mmsViewSection($compile, $templateCache, ElementService) {
             section: '=mmsSection',
             instanceVal: '=mmsInstanceVal'
         },
-        require: '?^mmsView',
+        require: ['?^mmsView','?^mmsViewPresentationElem'],
         controller: ['$scope', '$rootScope', mmsViewSectionCtrl],
         link: mmsViewSectionLink
     };

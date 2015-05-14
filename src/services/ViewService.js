@@ -453,6 +453,74 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             }
         };
 
+        var createPresentationElem = function(createdInstanceSpec) {
+
+            // Have it reference the InstanceSpec so we dont need to create extra elements:
+            var paragraph = {
+                sourceType: "reference",
+                source: createdInstanceSpec.sysmlid,
+                sourceProperty: "documentation",
+                type: "Paragraph"
+            };
+
+            var jsonBlob = {};
+            if (type === "Paragraph") {
+                jsonBlob = paragraph;
+            }
+            else if (type === "List") {
+                jsonBlob = {
+                    ordered: true,
+                    bulleted: true,
+                    list:[[paragraph]],
+                    type: type
+                };
+            }
+            else if (type === "Table") {
+                jsonBlob = {
+                    body:[
+                        [{content:[paragraph],
+                          rowspan:1,
+                          colspan:1}]
+                    ],
+                    style: "normal",
+                    title: "Untitled",
+                    header: [[
+                        {
+                            content: [{
+                                sourceType: "text",
+                                text: "Untitled Header",
+                                type: "Paragraph"
+                            }]
+                        }
+                    ]],
+                    type: type
+                };
+            }
+            else if (type === "Image") {
+                // TODO this doesnt really work
+                jsonBlob = {
+                    type: type
+                };
+            }
+            else if (type === "Section") {
+                jsonBlob = {
+                    operand:[],  
+                    type:"Expression"
+                };
+            }
+
+            // Special case for Section.  Doesnt use json blobs.
+            if (type === "Section") {
+                presentationElem = jsonBlob;  
+            }
+            else {
+                presentationElem = {
+                    string:JSON.stringify(jsonBlob),
+                    type:"LiteralString"
+                };
+            }
+        };
+
         if (json) {
             presentationElem.string = JSON.stringify(json);
             presentationElem.type = "LiteralString";
@@ -474,74 +542,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 processInstanceSpec(createdInstanceSpec);
             }
             else {
-                // Have it reference the InstanceSpec so we dont need to create extra elements:
-                var paragraph = {
-                    sourceType: "reference",
-                    source: createdInstanceSpec.sysmlid,
-                    sourceProperty: "documentation",
-                    type: "Paragraph"
-                };
-
-                var jsonBlob = {};
-                if (type === "Paragraph") {
-                    jsonBlob = paragraph;
-                }
-                else if (type === "List") {
-                    jsonBlob = {
-                        ordered: true,
-                        bulleted: true,
-                        list:[[paragraph]],
-                        type: type
-                    };
-                }
-                else if (type === "Table") {
-                    jsonBlob = {
-                        body:[
-                            [{content:[paragraph],
-                              rowspan:1,
-                              colspan:1}]
-                        ],
-                        style: "normal",
-                        title: "Untitled",
-                        header: [[
-                            {
-                                content: [{
-                                    sourceType: "text",
-                                    text: "Untitled Header",
-                                    type: "Paragraph"
-                                }]
-                            }
-                        ]],
-                        type: type
-                    };
-                }
-                else if (type === "Image") {
-                    // TODO this doesnt really work
-                    jsonBlob = {
-                        type: type
-                    };
-                }
-                else if (type === "Section") {
-                    // Section's do not use json blobs, and cannot use the paragraph created
-                    // above.  Would need to create a paragraph using this method and then 
-                    // add it to operand below.
-                    jsonBlob = {
-                        operand:[],  
-                        type:"Expression"
-                    };
-                }
-
-                // Special case for Section.  Doesnt use json blobs.
-                if (type === "Section") {
-                    presentationElem = jsonBlob;  
-                }
-                else {
-                    presentationElem = {
-                        string:JSON.stringify(jsonBlob),
-                        type:"LiteralString"
-                    };
-                }
-
+                createPresentationElem(createdInstanceSpec);
                 createdInstanceSpec.specialization.instanceSpecificationSpecification = presentationElem;
 
                 ElementService.updateElement(createdInstanceSpec, workspace).then(function(createdInstanceSpecUpdate) {
@@ -550,7 +551,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                     deferred.reject(reason);
                 });
 
-            } // ends else
+            }
 
         }, function(reason) {
             deferred.reject(reason);
