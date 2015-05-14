@@ -406,84 +406,14 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         var defaultName = "Untitled "+elementType;
         var instanceSpecName = name ? name : defaultName;
 
-        var element = {
-             name: "paragraph",     // TODO: should we make this name unique or not have one?
-             specialization: {
-                  type:"Element"
-              }
-        };
-
-        ElementService.createElement(element, workspace, site).then(function(createdElement) {
-
-            var paragraph = {
-                sourceType: "reference",
-                source: createdElement.sysmlid,
-                sourceProperty: "documentation",
-                type: "Paragraph"
-            };
-
-            var jsonBlob = {};
-            if (elementType === "Paragraph") {
-                jsonBlob = paragraph;
-            }
-            else if (elementType === "List") {
-                jsonBlob = {
-                    ordered: true,
-                    bulleted: true,
-                    list:[[paragraph]],
-                    type: elementType
-                };
-            }
-            else if (elementType === "Table") {
-                jsonBlob = {
-                    body:[
-                        [{content:[paragraph],
-                          rowspan:1,
-                          colspan:1}]
-                    ],
-                    style: "normal",
-                    title: "Untitled",
-                    header: [[
-                        {
-                            content: [{
-                                sourceType: "text",
-                                text: "Untitled Header",
-                                type: "Paragraph"
-                            }]
-                        }
-                    ]],
-                    type: elementType
-                };
-            }
-            else if (elementType === "Image") {
-                jsonBlob = {
-                    sysmlid: createdElement.sysmlid,
-                    type: elementType
-                };
-            }
-            else if (elementType === "Section") {
-                // Section's do not use json blobs, and cannot use the paragraph created
-                // above.  Would need to create a paragraph using this method and then 
-                // add it to operand below.
-                jsonBlob = {
-                    operand:[],  
-                    type:"Expression"
-                };
-            }
-
-            addInstanceSpecification(view, workspace, elementType, jsonBlob, addToView, site, instanceSpecName).
-            then(function(data) {
-                deferred.resolve(data);
-            }, function(reason) {
-                deferred.reject(reason);
-            });
-
+        addInstanceSpecification(view, workspace, elementType, addToView, site, instanceSpecName).
+        then(function(data) {
+            deferred.resolve(data);
         }, function(reason) {
             deferred.reject(reason);
         });
 
         return deferred.promise;
-
     };
 
     /**
@@ -492,47 +422,26 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @param {string} view Id of the View to add to
      * @param {string} [workspace=master] workspace to use
      * @param {string} type The type of element that is to be created, ie 'Paragraph'
-     * @param {object} jsonBlob The JSON blob for the presentation element being added
      * @param {string} addToView true if wanting to add the element to the view
      * @param {string} [site=null] (optional) site to post to
      * @param {string} [name=Untitled <elementType>] (optional) InstanceSpecification name to use
+     * @param {string} [json=null] (optional) Json blob for the presentation element
      * @returns {Promise} The promise would be resolved with updated View object if addToView is true
      *                    otherwise the created InstanceSpecification
     */
-    var addInstanceSpecification = function(view, workspace, type, jsonBlob, addToView, site, name) {
+    var addInstanceSpecification = function(view, workspace, type, addToView, site, name, json) {
 
         var deferred = $q.defer();
         var instanceSpecName = name ? name : "Untitled InstanceSpec";
         var presentationElem = {};
 
-
-        // Special case for Section.  Doesnt use json blobs.
-        if (type === "Section") {
-            presentationElem = jsonBlob;  
-        }
-        else {
-            presentationElem = {
-                string:JSON.stringify(jsonBlob),
-                type:"LiteralString"
-            };
-        }
-
-        var instanceSpec = {
-            specialization: {
-              name:instanceSpecName,
-              type:"InstanceSpecification",
-              classifier:[typeToClassifierId[type]],
-              instanceSpecificationSpecification:presentationElem
-           }
-        };
-
-        ElementService.createElement(instanceSpec, workspace, site).then(function(createdInstanceSpec) {
+        var processInstanceSpec = function(createdInstanceSpecUpdate) {
 
             if (addToView) {
-                addInstanceVal(view, workspace, createdInstanceSpec.sysmlid).then(function(updatedView) {
+                addInstanceVal(view, workspace, createdInstanceSpecUpdate.sysmlid).then(function(updatedView) {
                     if (type === "Section") {
                         // Broadcast message to TreeCtrl:
-                        $rootScope.$broadcast('viewctrl.add.section', createdInstanceSpec);
+                        $rootScope.$broadcast('viewctrl.add.section', createdInstanceSpecUpdate);
                     }
                     deferred.resolve(updatedView);
                 }, function(reason) {
@@ -540,8 +449,109 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 });
             }
             else {
-                deferred.resolve(createdInstanceSpec);
+                deferred.resolve(createdInstanceSpecUpdate);
             }
+        };
+
+        if (json) {
+            presentationElem.string = JSON.stringify(json);
+            presentationElem.type = "LiteralString";
+        }
+
+        var instanceSpec = {
+            specialization: {
+              name:instanceSpecName,
+              type:"InstanceSpecification",
+              classifier:[typeToClassifierId[type]],
+              instanceSpecificationSpecification: presentationElem
+           }
+        };
+
+        ElementService.createElement(instanceSpec, workspace, site).then(function(createdInstanceSpec) {
+
+            // Add in the presentation element:
+            if (json) {
+                processInstanceSpec(createdInstanceSpec);
+            }
+            else {
+                // Have it reference the InstanceSpec so we dont need to create extra elements:
+                var paragraph = {
+                    sourceType: "reference",
+                    source: createdInstanceSpec.sysmlid,
+                    sourceProperty: "documentation",
+                    type: "Paragraph"
+                };
+
+                var jsonBlob = {};
+                if (type === "Paragraph") {
+                    jsonBlob = paragraph;
+                }
+                else if (type === "List") {
+                    jsonBlob = {
+                        ordered: true,
+                        bulleted: true,
+                        list:[[paragraph]],
+                        type: type
+                    };
+                }
+                else if (type === "Table") {
+                    jsonBlob = {
+                        body:[
+                            [{content:[paragraph],
+                              rowspan:1,
+                              colspan:1}]
+                        ],
+                        style: "normal",
+                        title: "Untitled",
+                        header: [[
+                            {
+                                content: [{
+                                    sourceType: "text",
+                                    text: "Untitled Header",
+                                    type: "Paragraph"
+                                }]
+                            }
+                        ]],
+                        type: type
+                    };
+                }
+                else if (type === "Image") {
+                    // TODO this doesnt really work
+                    jsonBlob = {
+                        type: type
+                    };
+                }
+                else if (type === "Section") {
+                    // Section's do not use json blobs, and cannot use the paragraph created
+                    // above.  Would need to create a paragraph using this method and then 
+                    // add it to operand below.
+                    jsonBlob = {
+                        operand:[],  
+                        type:"Expression"
+                    };
+                }
+
+                // Special case for Section.  Doesnt use json blobs.
+                if (type === "Section") {
+                    presentationElem = jsonBlob;  
+                }
+                else {
+                    presentationElem = {
+                        string:JSON.stringify(jsonBlob),
+                        type:"LiteralString"
+                    };
+                }
+
+                createdInstanceSpec.specialization.instanceSpecificationSpecification = presentationElem;
+
+                ElementService.updateElement(createdInstanceSpec, workspace).then(function(createdInstanceSpecUpdate) {
+                    processInstanceSpec(createdInstanceSpecUpdate);
+                }, function(reason) {
+                    deferred.reject(reason);
+                });
+
+            } // ends else
+
         }, function(reason) {
             deferred.reject(reason);
         });
@@ -607,7 +617,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 'source': data.sysmlid, 
                 'sourceProperty': 'documentation'
             };
-            addInstanceSpecification(data, workspace, "Paragraph", jsonBlob, true, null, "View Documentation")
+            addInstanceSpecification(data, workspace, "Paragraph", true, null, "View Documentation", jsonBlob)
             .then(function(data2) {
                 if (documentId) {
                     addViewToDocument(data.sysmlid, documentId, ownerId, workspace, data2)
@@ -651,7 +661,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 'source': data.sysmlid, 
                 'sourceProperty': 'documentation'
             };
-            addInstanceSpecification(data, workspace, "Paragraph", jsonBlob, true, site, "View Documentation")
+            addInstanceSpecification(data, workspace, "Paragraph", true, site, "View Documentation", jsonBlob)
             .then(function(data2) {
                 var ws = !workspace ? 'master' : workspace;
                 var cacheKey = ['sites', ws, 'latest', site, 'products'];

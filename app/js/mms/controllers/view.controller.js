@@ -313,11 +313,11 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     });
 
     $scope.$on('view.add.list', function() {
-        addElement('List');
+        //addElement('List');
     });
 
     $scope.$on('view.add.table', function() {
-        addElement('Table');
+        //addElement('Table');
     });
 
     $scope.$on('view.add.section', function() {
@@ -325,7 +325,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     });
 
     $scope.$on('view.add.image', function() {
-        addElement('Image');
+        //addElement('Image');
     });
 
     $scope.$on('show.comments', function() {
