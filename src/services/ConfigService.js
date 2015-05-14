@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms')
-.factory('ConfigService', ['$q', '$http', 'URLService', 'CacheService', 'UtilsService', '_', ConfigService]);
+.factory('ConfigService', ['$q', '$http', 'URLService', 'CacheService', 'UtilsService', 'HttpService', '_', ConfigService]);
 
 /**
  * @ngdoc service
@@ -25,7 +25,7 @@ angular.module('mms')
  //['configs', ws, id, 'snapshots']
  //['configs', ws, id]
  //['sites', ws, sitename, 'configs']
-function ConfigService($q, $http, URLService, CacheService, UtilsService, _) {
+function ConfigService($q, $http, URLService, CacheService, UtilsService, HttpService, _) {
     var inProgress = {};
     /**
      * @ngdoc method
@@ -42,8 +42,10 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, _) {
     var getConfigs = function(workspace, update) {
         var n = normalize(update, workspace);
         var inProgressKey = 'getConfigs.' + n.ws;
-        if (inProgress.hasOwnProperty(inProgressKey))
+        if (inProgress.hasOwnProperty(inProgressKey)) {
+            HttpService.ping(URLService.getConfigsURL(n.ws));
             return inProgress[inProgressKey];
+        }
         var deferred = $q.defer();
         var cacheKey = ['workspaces', n.ws, 'configs'];
         if (CacheService.exists(cacheKey) && !n.update) {
@@ -51,14 +53,14 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, _) {
             return deferred.promise;
         }
         inProgress[inProgressKey] = deferred.promise;
-        $http.get(URLService.getConfigsURL(n.ws))
-        .success(function(data, status, headers, config) {
+        HttpService.get(URLService.getConfigsURL(n.ws),
+        function(data, status, headers, config) {
             CacheService.put(cacheKey, data.configurations, false, function(val, k) {
                 return {key: ['configs', n.ws, val.id], value: val, merge: true};
             });
             deferred.resolve(CacheService.get(cacheKey));
             delete inProgress[inProgressKey];
-        }).error(function(data, status, headers, config) {
+        }, function(data, status, headers, config) {
             URLService.handleHttpStatus(data, status, headers, config, deferred);
             delete inProgress[inProgressKey];
         });

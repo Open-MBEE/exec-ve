@@ -988,8 +988,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
     });
 
     if ($state.includes('workspace.site.document')) {
-        var delay = 300;
-        // TODO cant we have sections on the parent view w/o a view2view?
+        var delay = 0;
         if (document.specialization.view2view) {
             document.specialization.view2view.forEach(function(view, index) {
                 $timeout(function() {
