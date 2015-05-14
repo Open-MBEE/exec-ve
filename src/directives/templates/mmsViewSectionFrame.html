@@ -8,4 +8,8 @@
   <div class="inner panel-body">
     <h1 class="prop"><input class="form-control" type="text" ng-model="edit.name"></input></h1>
   </div>
+
+  <div ng-repeat="instanceVal in sectionInstanceVals"> 
+    <mms-view-presentation-elem data-mms-instance-val="instanceVal"></mms-view-presentation-elem>
+  </div>
 </div>

@@ -8,6 +8,7 @@ function mmsViewSection($compile, $templateCache, $rootScope, ElementService, Ux
     // TODO: 
     //       drop down add button
     //          - will need to update hasEdits()
+    //          - will need to update delete for preseElems to remove from section instead of view
 
 
     var defaultTemplate = $templateCache.get('mms/templates/mmsViewSection.html');
@@ -32,6 +33,7 @@ function mmsViewSection($compile, $templateCache, $rootScope, ElementService, Ux
         $scope.bbApi.init = function() {
             if (!$scope.buttonsInit) {
                 $scope.buttonsInit = true;
+                $scope.bbApi.addButton(UxService.getButtonBarButton("section.add.dropdown", $scope));
                 $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.save", $scope));
                 $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.cancel", $scope));
                 $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.delete", $scope));

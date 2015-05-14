@@ -67,7 +67,7 @@ function UxService($rootScope) {
 		}    
 	};
 
-	var getButtonBarButton = function(button, $scope) {
+	var getButtonBarButton = function(button, scope) {
 		switch (button) {
 		  case "tree.expand":
 		  	return {id: button, icon: 'fa-caret-square-o-down', selected: true, active: true, permission: true, tooltip: 'Expand All', 
@@ -162,13 +162,34 @@ function UxService($rootScope) {
                     spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
           case "presentation.element.delete":
             return {id: button, icon: 'fa-trash', selected: true, active: true, permission: true, tooltip: 'Delete', 
-                    spinner: false, togglable: false, action: function() {$scope.delete();}};
+                    spinner: false, togglable: false, action: function() {scope.delete();}};
           case "presentation.element.save":
             return {id: button, icon: 'fa-save', selected: true, active: true, permission: true, tooltip: 'Save', 
-                    spinner: false, togglable: false, action: function() {$scope.save();}};
+                    spinner: false, togglable: false, action: function() {scope.save();}};
           case "presentation.element.cancel":
             return {id: button, icon: 'fa-times', selected: true, active: true, permission: true, tooltip: 'Cancel', 
-                    spinner: false, togglable: false, action: function() {$scope.cancel();}};
+                    spinner: false, togglable: false, action: function() {scope.cancel();}};
+          case "section.add.dropdown":
+            return {id: button, icon: 'fa-plus', selected: true, active: true, permission: true, tooltip: 'Add Item', 
+                    spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);},
+                    dropdown_buttons: [getButtonBarButton("section.add.paragraph",scope), getButtonBarButton("section.add.table",scope),
+                                        getButtonBarButton("section.add.list",scope), getButtonBarButton("section.add.image",scope),
+                                        getButtonBarButton("section.add.section",scope)]};
+          case "section.add.table":
+            return {id: button, icon: 'fa-table', selected: true, active: true, permission: true, tooltip: 'Add Table', 
+                    spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button, scope.section);}};
+          case "section.add.list":
+            return {id: button, icon: 'fa-list', selected: true, active: true, permission: true, tooltip: 'Add List', 
+                    spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button, scope.section);}};
+          case "section.add.paragraph":
+            return {id: button, icon: 'fa-paragraph', selected: true, active: true, permission: true, tooltip: 'Add Paragraph', 
+                    spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button, scope.section);}};
+          case "section.add.image":
+            return {id: button, icon: 'fa-image', selected: true, active: true, permission: true, tooltip: 'Add Image', 
+                    spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button, scope.section);}};
+          case "section.add.section":
+            return {id: button, icon: 'fa-list-alt', selected: true, active: true, permission: true, tooltip: 'Add Section', 
+                    spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button, scope.section);}};
         }
 	};
 
