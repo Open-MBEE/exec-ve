@@ -292,25 +292,23 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             //clone.read = data.read;
             clone.specialization = _.cloneDeep(data.specialization);
 
+           var key;
             if (isSection(data)) {
-                if (!clone.specialization.instanceSpecificationSpecification) {
-                    clone.specialization.instanceSpecificationSpecification = {
-                        operand: [],
-                        type: "Expression"
-                    };
-                }
-                clone.specialization.instanceSpecificationSpecification.operand.push(elementOb);
+                key = "instanceSpecificationSpecification";
             }
             else {
                 delete clone.specialization.contains;
-                if (!clone.specialization.contents) {
-                    clone.specialization.contents = {
-                        operand: [],
-                        type: "Expression"
-                    };
-                }
-                clone.specialization.contents.operand.push(elementOb);
+                key = "contents";
             }
+
+           if (!clone.specialization[key]) {
+                clone.specialization[key] = {
+                    operand: [],
+                    type: "Expression"
+                };
+            }
+            clone.specialization[key].operand.push(elementOb);
+
             // TODO add to parentElement also if needed 
             ElementService.updateElement(clone, ws)
             .then(function(data2) {
@@ -336,37 +334,44 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
 
     /**
      * @ngdoc method
-     * @name mms.ViewService#deleteElementFromView
+     * @name mms.ViewService#deleteElementFromViewOrSection
      * @methodOf mms.ViewService
      *
      * @description
-     * This deletes the specified instanceVal from the contents of the View
+     * This deletes the specified instanceVal from the contents of the View or Section
      * 
-     * @param {string} viewId Id of the View to delete the element from
+     * @param {string} viewOrSecId Id of the View or Section to delete the element from
      * @param {string} [workspace=master] workspace to use
-     * @param {string} instanceVal to remove from the View
-     * @returns {Promise} The promise would be resolved with updated View object
+     * @param {string} instanceVal to remove from the View or Section
+     * @returns {Promise} The promise would be resolved with updated View or Section object
      */
-    var deleteElementFromView = function(viewId, workspace, instanceVal) {
+    var deleteElementFromViewOrSection = function(viewOrSecId, workspace, instanceVal) {
 
         var deferred = $q.defer();
 
         if (instanceVal) {
             var ws = !workspace ? 'master' : workspace;
-            var docViewsCacheKey = ['products', ws, viewId, 'latest', 'views'];
-            getDocument(viewId, false, ws)
+            ElementService.getElement(viewOrSecId, false, ws)
             .then(function(data) {  
                 var clone = {};
                 clone.sysmlid = data.sysmlid;
                 //clone.read = data.read;
                 clone.specialization = _.cloneDeep(data.specialization);
-                delete clone.specialization.contains;
-                // Remove from contents and delete all other associated nodes:
-                if (clone.specialization.contents && clone.specialization.contents.operand) {
-                    var operands = data.specialization.contents.operand;
+
+                var key;
+                if (isSection(data)) {
+                    key = "instanceSpecificationSpecification";
+                }
+                else {
+                    delete clone.specialization.contains;
+                    key = "contents";
+                }
+
+                if (clone.specialization[key] && clone.specialization[key].operand) {
+                    var operands = data.specialization[key].operand;
                     for (var i = 0; i < operands.length; i++) {
                         if (instanceVal.instance === operands[i].instance) {
-                            clone.specialization.contents.operand.splice(i,1);
+                            clone.specialization[key].operand.splice(i,1);
                         }
                     }
                 }
@@ -374,7 +379,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 // Note:  We decided we do not need to delete the instanceVal, just remove from
                 //         contents.
 
-                updateDocument(clone, ws)
+                ElementService.updateElement(clone, ws)
                 .then(function(data2) {
                     deferred.resolve(data2);
                 }, function(reason) {
@@ -863,7 +868,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         addElementToViewOrSection: addElementToViewOrSection,
         createAndAddElement: createAndAddElement,
         addInstanceVal: addInstanceVal,
-        deleteElementFromView: deleteElementFromView,
+        deleteElementFromViewOrSection: deleteElementFromViewOrSection,
         addInstanceSpecification: addInstanceSpecification,
         typeToClassifierId: typeToClassifierId,
         getInstanceSpecification : getInstanceSpecification

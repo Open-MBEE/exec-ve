@@ -60,6 +60,9 @@ function mmsViewPresentationElem(ViewService, ElementService, $templateCache, $r
             return $scope.presentationElem;
         };
 
+        this.getParentSection = function() {
+            return $scope.mmsParentSection;
+        };
     };
 
     var mmsViewPresentationElemLink = function(scope, element, attrs, mmsViewCtrl) {
@@ -72,6 +75,7 @@ function mmsViewPresentationElem(ViewService, ElementService, $templateCache, $r
         require: '?^mmsView',
         scope: {
             mmsInstanceVal: '=',
+            mmsParentSection: '=',
         },
         controller: ['$scope', '$rootScope', mmsViewPresentationElemCtrl],
         link: mmsViewPresentationElemLink

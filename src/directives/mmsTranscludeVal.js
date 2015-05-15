@@ -213,7 +213,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, $log, 
             };
 
             scope.delete = function() {
-                Utils.deleteAction(scope,scope.bbApi);
+                Utils.deleteAction(scope,scope.bbApi,mmsViewPresentationElemCtrl.getParentSection());
             };
 
             scope.addFrame = function() {

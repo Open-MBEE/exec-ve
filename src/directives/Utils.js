@@ -303,9 +303,10 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
         }
     };
 
-    var deleteAction = function($scope, bbApi) {
+    var deleteAction = function($scope, bbApi, section) {
         bbApi.toggleButtonSpinner('presentation.element.delete');
-        ViewService.deleteElementFromView($scope.view.sysmlid, $scope.ws, $scope.instanceVal).then(function(data) {
+        var viewOrSecId = section ? section.sysmlid : $scope.view.sysmlid;
+        ViewService.deleteElementFromViewOrSection(viewOrSecId, $scope.ws, $scope.instanceVal).then(function(data) {
             growl.success('Delete Successful');
         }, handleError).finally(function() {
             bbApi.toggleButtonSpinner('presentation.element.delete');
@@ -345,30 +346,30 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
         }
     };
 
-      var isDirectChildOfPresentationElementFunc = function(element, mmsViewCtrl) {
-            var currentElement = (element[0]) ? element[0] : element;
-            var viewElementCount = 0;
-            while (currentElement.parentElement) {
-                var parent = (currentElement.parentElement[0]) ? currentElement.parentElement[0] : currentElement.parentElement;
-                if (mmsViewCtrl.isTranscludedElement(parent.nodeName))
-                    return false;
-                if (mmsViewCtrl.isViewElement(parent.nodeName)) {
-                    viewElementCount++;
-                    if (viewElementCount > 1)
-                        return false;
-                }
-                if (mmsViewCtrl.isPresentationElement(parent.nodeName))
-                    return true;
-                currentElement = parent;
-            }
-            return false;
-        };
-
-        var hasHtml = function(s) {
-            if (s.indexOf('<p>') === -1)
+    var isDirectChildOfPresentationElementFunc = function(element, mmsViewCtrl) {
+        var currentElement = (element[0]) ? element[0] : element;
+        var viewElementCount = 0;
+        while (currentElement.parentElement) {
+            var parent = (currentElement.parentElement[0]) ? currentElement.parentElement[0] : currentElement.parentElement;
+            if (mmsViewCtrl.isTranscludedElement(parent.nodeName))
                 return false;
-            return true;
-        };
+            if (mmsViewCtrl.isViewElement(parent.nodeName)) {
+                viewElementCount++;
+                if (viewElementCount > 1)
+                    return false;
+            }
+            if (mmsViewCtrl.isPresentationElement(parent.nodeName))
+                return true;
+            currentElement = parent;
+        }
+        return false;
+    };
+
+    var hasHtml = function(s) {
+        if (s.indexOf('<p>') === -1)
+            return false;
+        return true;
+    };
 
     return {
         save: save,

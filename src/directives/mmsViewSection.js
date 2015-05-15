@@ -6,9 +6,11 @@ angular.module('mms.directives')
 function mmsViewSection($compile, $templateCache, $rootScope, ElementService, UxService, Utils) {
 
     // TODO: 
-    //       drop down add button
-    //          - will need to update hasEdits()
-    //          - will need to update delete for preseElems to remove from section instead of view
+    //      Deleting sections with in sections gives a console error, prob b/c the section is not
+    //      added to the tree correctly which needs to fixed
+    //
+    //      Tracker is not cleared for children of the section that are opened when the section
+    //      is opened also.
 
 
     var defaultTemplate = $templateCache.get('mms/templates/mmsViewSection.html');
@@ -23,12 +25,12 @@ function mmsViewSection($compile, $templateCache, $rootScope, ElementService, Ux
         $scope.buttonsInit = false;
         $scope.element = $scope.section;  // This is for methods in Utils 
 
-        if ($scope.section && $scope.section.specialization && 
-            $scope.section.specialization.instanceSpecificationSpecification && 
-            $scope.section.specialization.instanceSpecificationSpecification.operand) {
+        // if ($scope.section && $scope.section.specialization && 
+        //     $scope.section.specialization.instanceSpecificationSpecification && 
+        //     $scope.section.specialization.instanceSpecificationSpecification.operand) {
 
-            $scope.sectionInstanceVals = $scope.section.specialization.instanceSpecificationSpecification.operand;
-        }
+        //     $scope.sectionInstanceVals = $scope.section.specialization.instanceSpecificationSpecification.operand;
+        // }
 
         $scope.bbApi.init = function() {
             if (!$scope.buttonsInit) {
@@ -65,8 +67,10 @@ function mmsViewSection($compile, $templateCache, $rootScope, ElementService, Ux
             $compile(element.contents())(scope); 
         };
 
-        element.append(defaultTemplate);
-        $compile(element.contents())(scope); 
+        // element.append(defaultTemplate);
+        // $compile(element.contents())(scope); 
+        recompile();
+
         scope.structEditable = function() {
             if (mmsViewCtrl) {
                 return mmsViewCtrl.getStructEditable();
@@ -104,7 +108,7 @@ function mmsViewSection($compile, $templateCache, $rootScope, ElementService, Ux
             };
 
             scope.delete = function() {
-                Utils.deleteAction(scope,scope.bbApi);
+                Utils.deleteAction(scope,scope.bbApi,mmsViewPresentationElemCtrl.getParentSection());
             };
 
             scope.addFrame = function() {
