@@ -160,6 +160,9 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             scope.presentationElem = mmsViewPresentationElemCtrl.getPresentationElement();
             if (scope.isDirectChildOfPresentationElement)
                 scope.panelTitle = scope.instanceSpec.name;
+            if (scope.presentationElem) {
+                scope.tinymceType = scope.presentationElem.type;
+            }
         }
 
     };

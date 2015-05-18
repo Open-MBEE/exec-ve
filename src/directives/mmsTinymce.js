@@ -385,6 +385,7 @@ function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window
             mmsEid: '@',
             mmsWs: '@',
             mmsSite: '@',
+            mmsTinymceType: '@',
             mmsTinymceApi: '='
         },
         link: mmsTinymceLink

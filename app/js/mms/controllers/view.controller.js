@@ -225,14 +225,23 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
 
             ElementService.search(searchText, false, ws)
             .then(function(data) {
-
+                var validClassifierIds = [];
+                if ($scope.presentationElemType === 'Table') {
+                    validClassifierIds.push(ViewService.typeToClassifierId.Table);
+                    validClassifierIds.push(ViewService.typeToClassifierId.TableT);
+                } else if ($scope.presentationElemType === 'List') {
+                    validClassifierIds.push(ViewService.typeToClassifierId.List);
+                    validClassifierIds.push(ViewService.typeToClassifierId.ListT);
+                } else {
+                    validClassifierIds.push(ViewService.typeToClassifierId[$scope.presentationElemType]);
+                }
                 // Filter out anything that is not a InstanceSpecification or not of the correct type:
                 for (var i = 0; i < data.length; i++) {
                     if (data[i].specialization.type != 'InstanceSpecification') {
                         data.splice(i, 1);
                         i--;
                     }
-                    else if (data[i].specialization.classifier[0] !== ViewService.typeToClassifierId[$scope.presentationElemType]) {
+                    else if (validClassifierIds.indexOf(data[i].specialization.classifier[0]) < 0) {
                         data.splice(i, 1);
                         i--;
                     }
@@ -317,11 +326,11 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     });
 
     $scope.$on('view.add.list', function() {
-        //addElement('List');
+        addElement('List');
     });
 
     $scope.$on('view.add.table', function() {
-        //addElement('Table');
+        addElement('Table');
     });
 
     $scope.$on('view.add.section', function() {
@@ -337,11 +346,11 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     });
 
     $scope.$on('section.add.list', function(event, section) {
-        //addElement('List', section);
+        addElement('List', section);
     });
 
     $scope.$on('section.add.table', function(event, section) {
-        //addElement('Table', section);
+        addElement('Table', section);
     });
 
     $scope.$on('section.add.section', function(event, section) {
