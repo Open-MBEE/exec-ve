@@ -962,11 +962,9 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
     }
 
     // ViewCtrl creates this event when adding sections to the view
-    $scope.$on('viewctrl.add.section', function(event, instanceSpec) {
+    $scope.$on('viewctrl.add.section', function(event, instanceSpec, parentBranchName) {
 
-        // TODO it may not be the selected branch, may just want to move add sections
-        //      to left pane/tree controller
-        var branch = $scope.treeApi.get_selected_branch();
+        var branch = $scope.treeApi.get_branch(parentBranchName);
 
         var newbranch = {
             label: instanceSpec.name,

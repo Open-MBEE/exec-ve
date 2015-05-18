@@ -6,11 +6,13 @@ angular.module('mms.directives')
 function mmsViewSection($compile, $templateCache, $rootScope, ElementService, UxService, Utils) {
 
     // TODO: 
-    //      Deleting sections with in sections gives a console error, prob b/c the section is not
-    //      added to the tree correctly which needs to fixed
+    //      Sections and nested sections not being added to the tree correctly
     //
     //      Tracker is not cleared for children of the section that are opened when the section
     //      is opened also.
+    //
+    //      Save overrides add/deleting things to sections b/c it uses the edit
+    //      object.
 
 
     var defaultTemplate = $templateCache.get('mms/templates/mmsViewSection.html');
