@@ -247,6 +247,21 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
         bbApi.toggleButtonSpinner('presentation.element.save');
         $scope.elementSaving = true;
         var id = editObj ? editObj.sysmlid : $scope.mmsEid;
+
+        // If it is a Section, then merge the changes b/c deletions to the Section's contents
+        // are not done on the scope.edit.
+        if (ViewService.isSection(editObj)) {
+            _.merge($scope.edit, editObj, function(a,b,id) {
+                if (angular.isArray(a) && angular.isArray(b) && b.length < a.length) {
+                    return b;
+                }
+
+                if (id === 'name') {
+                    return a;
+                }
+            });
+        }
+
         save($scope.edit, $scope.ws, "element", id, null, $scope).then(function(data) {
             $scope.elementSaving = false;
             $scope.isEditing = false;
