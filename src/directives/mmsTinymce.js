@@ -135,13 +135,21 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                 controller: ['$scope', '$modalInstance', transcludeCtrl],
                 size: 'sm'
             });
+
+            $timeout(function() {
+                angular.element('.autocomplete-modal-typeahead').focus();
+            });
+
             instance.result.then(function(tag) {
                 if (!tag) {
                     transcludeCallback(ed);
                 } else {
+                    ed.execCommand('delete');
                     ed.selection.collapse(false);
                     ed.insertContent(tag);
                 }
+            }, function() {
+                ed.focus();
             });
         };
 
