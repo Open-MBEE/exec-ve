@@ -324,15 +324,18 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
         bbApi.toggleButtonSpinner('presentation.element.delete');
         var viewOrSecId = section ? section.sysmlid : $scope.view.sysmlid;
         ViewService.deleteElementFromViewOrSection(viewOrSecId, $scope.ws, $scope.instanceVal).then(function(data) {
+            if (ViewService.isSection($scope.presentationElem)) {
+                // Broadcast message to TreeCtrl:
+                $rootScope.$broadcast('viewctrl.delete.section', $scope.presentationElem.name);
+            }
+             // Broadcast message for the ToolCtrl:
+            $rootScope.$broadcast('presentationElem.cancel',$scope.edit, $scope.ws);
+
             growl.success('Delete Successful');
         }, handleError).finally(function() {
             bbApi.toggleButtonSpinner('presentation.element.delete');
         });
 
-        if (ViewService.isSection($scope.presentationElem)) {
-            // Broadcast message to TreeCtrl:
-            $rootScope.$broadcast('viewctrl.delete.section', $scope.presentationElem.name);
-        }
 
     };
 

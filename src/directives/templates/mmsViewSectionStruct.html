@@ -1,5 +1,5 @@
 <div>
-    <div ng-if="section.instance" ui-sortable="sortableOptions" ng-model="instanceSpecificationSpecification.operand">
+    <div ng-if="section.instance" class="sortable-container" ui-sortable="sortableOptions" ng-model="instanceSpecificationSpecification.operand">
         <p>Section {{presentationElement.name}}</p> 
         <div ng-repeat="content in instanceSpecificationSpecification.operand" ng-switch on="instance2presentation[content.instance].type"> 
             <div ng-class="editing() ? 'panel panel-default' : ''">
@@ -13,7 +13,7 @@
             </div>
         </div>
     </div>
-    <div ng-if="!section.instance" ui-sortable="sortableOptions" ng-model="section.contains">
+    <div ng-if="!section.instance" class="sortable-container" ui-sortable="sortableOptions" ng-model="section.contains">
         <p>Section {{section.name}}</p> 
         <div ng-repeat="contain in section.contains" ng-switch on="contain.type"> 
             <div ng-class="editing() ? 'panel panel-default' : ''">
