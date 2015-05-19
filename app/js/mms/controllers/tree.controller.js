@@ -429,10 +429,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
         };
 
         if (element.specialization) {
-            if (element.specialization.contains) {
-                contains = element.specialization.contains;
-            }
-
+          
             if (element.specialization.contents) {
                 contents = element.specialization.contents;
             }
@@ -441,13 +438,17 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
                      element.specialization.instanceSpecificationSpecification) {
                 contents = element.specialization.instanceSpecificationSpecification;
             }
+            else if (element.specialization.contains) {
+                contains = element.specialization.contains;
+            }
         }
         else {
-            if (element.contains) {
-                contains = element.contains;
-            }
+
             if (element.contents) {
                 contents = element.contents;
+            }
+            else if (element.contains) {
+                contains = element.contains;
             }
         }
 

@@ -200,8 +200,14 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, $log, 
             scope.view = mmsViewCtrl.getView();
             scope.isDirectChildOfPresentationElement = Utils.isDirectChildOfPresentationElementFunc(element, mmsViewCtrl);
 
-            mmsViewCtrl.registerPresenElemCallBack(function() {
+            var callback = function() {
                 Utils.showEditCallBack(scope,mmsViewCtrl,element,frameTemplate,recompile,recompileEdit);
+            };
+            
+            mmsViewCtrl.registerPresenElemCallBack(callback);
+
+            scope.$on('$destroy', function() {
+                mmsViewCtrl.unRegisterPresenElemCallBack(callback);
             });
 
             scope.save = function() {

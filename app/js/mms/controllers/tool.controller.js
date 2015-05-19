@@ -147,6 +147,8 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
         cleanUpEdit(edit, ws);           
     });
 
+    // TODO need to clean up the edit if the element was deleted!
+
     $scope.$on('elementSelected', function(event, eid, type) {
         $scope.elementType = type;
         $scope.eid = eid;

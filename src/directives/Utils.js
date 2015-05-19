@@ -214,9 +214,11 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
                     $scope.editValues = [$scope.edit.specialization.specification];
                 }
 
-                element.empty();
-                element.append(template);
-                $compile(element.contents())($scope); 
+                if (template) {
+                    element.empty();
+                    element.append(template);
+                    $compile(element.contents())($scope);
+                }
 
                 // Broadcast message for the toolCtrl:
                 $rootScope.$broadcast('presentationElem.edit',$scope.edit, $scope.ws);
@@ -250,7 +252,7 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
 
         // If it is a Section, then merge the changes b/c deletions to the Section's contents
         // are not done on the scope.edit.
-        if (ViewService.isSection(editObj)) {
+        if (editObj && ViewService.isSection(editObj)) {
             _.merge($scope.edit, editObj, function(a,b,id) {
                 if (angular.isArray(a) && angular.isArray(b) && b.length < a.length) {
                     return b;
@@ -264,8 +266,8 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
 
         save($scope.edit, $scope.ws, "element", id, null, $scope).then(function(data) {
             $scope.elementSaving = false;
-            $scope.isEditing = false;
             $scope.cleanUp = true;
+            $scope.isEditing = false;
             // Broadcast message for the toolCtrl:
             $rootScope.$broadcast('presentationElem.save',$scope.edit, $scope.ws);
             recompile();
@@ -282,8 +284,8 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
     var cancelAction = function($scope, mmsViewCtrl, recompile, bbApi, type) {
 
         var cancelCleanUp = function() {
-            $scope.isEditing = false;
             $scope.cleanUp = true;
+            $scope.isEditing = false;
             revertEdits($scope);
              // Broadcast message for the ToolCtrl:
             $rootScope.$broadcast('presentationElem.cancel',$scope.edit, $scope.ws);
@@ -339,6 +341,7 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
         // Going into edit mode, so add a frame if had a previous edit in progress:
         if (mmsViewCtrl.isEditable()) {
             if ($scope.edit && hasEdits($scope, type)) {
+                $scope.recompileEdit = false;
                 addFrame($scope,mmsViewCtrl,element,template,editObj);
             }
         }
@@ -348,6 +351,7 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
             $scope.cleanUp = false;
             $scope.elementSaving = false;
             if ($scope.edit && hasEdits($scope, type)) {
+                $scope.recompileEdit = true;
                 recompileEdit();
             }
             else {
