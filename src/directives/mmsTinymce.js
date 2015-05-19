@@ -142,7 +142,7 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
 
             instance.result.then(function(tag) {
                 if (!tag) {
-                    transcludeCallback(ed);
+                    transcludeCallback(ed, true);
                 } else {
                     ed.execCommand('delete');
                     ed.selection.collapse(false);
@@ -153,7 +153,7 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
             });
         };
 
-        var transcludeCallback = function(ed) {
+        var transcludeCallback = function(ed, fromAutocomplete) {
             var instance = $modal.open({
                 template: transcludeModalTemplate,
                 scope: scope,
@@ -161,8 +161,14 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                 size: 'lg'
             });
             instance.result.then(function(tag) {
+                if (fromAutocomplete) {
+                    ed.execCommand('delete');
+                }
+
                 ed.selection.collapse(false);
                 ed.insertContent(tag);
+            }, function() {
+                ed.focus();
             });
         };
 
@@ -319,7 +325,7 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                     title: 'Cross Reference',
                     text: 'Cf',
                     onclick: function() {
-                        transcludeCallback(ed);
+                        transcludeCallback(ed, false);
                     }
                 });
                 ed.addButton('comment', {
