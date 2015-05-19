@@ -157,6 +157,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, $log, 
                 if (!version)
                     version = viewVersion.version;
             }
+            scope.ws = ws;
             scope.version = version ? version : 'latest';
             ElementService.getElement(scope.mmsEid, false, ws, version)
             .then(function(data) {
