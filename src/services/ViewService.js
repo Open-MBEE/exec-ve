@@ -268,47 +268,56 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
 
     /**
      * @ngdoc method
-     * @name mms.ViewService#addElementToView
+     * @name mms.ViewService#addElementToViewOrSection
      * @methodOf mms.ViewService
      *
      * @description
-     * This updates a view to include a new element, the new element must be a child
+     * This updates a view or section to include a new element, the new element must be a child
      * of an existing element in the view
      * 
-     * @param {string} viewId Id of the View to add the element to
+     * @param {string} viewOrSectionId Id of the View or Section to add the element to
      * @param {string} parentElementId Id of the parent element, this element should 
      *      already be in the document
      * @param {string} [workspace=master] workspace to use
      * @returns {Promise} The promise would be resolved with updated document object
      */
-    var addElementToView = function(viewId, parentElementId, workspace, elementOb) {
+    var addElementToViewOrSection = function(viewOrSectionId, parentElementId, workspace, elementOb) {
 
         var deferred = $q.defer();
         var ws = !workspace ? 'master' : workspace;
-        var docViewsCacheKey = ['products', ws, viewId, 'latest', 'views'];
-        getDocument(viewId, false, ws)
+        ElementService.getElement(viewOrSectionId, false, ws)
         .then(function(data) {  
             var clone = {};
             clone.sysmlid = data.sysmlid;
             //clone.read = data.read;
             clone.specialization = _.cloneDeep(data.specialization);
-            delete clone.specialization.contains;
-            if (!clone.specialization.contents) {
-                clone.specialization.contents = {
+
+           var key;
+            if (isSection(data)) {
+                key = "instanceSpecificationSpecification";
+            }
+            else {
+                delete clone.specialization.contains;
+                key = "contents";
+            }
+
+           if (!clone.specialization[key]) {
+                clone.specialization[key] = {
                     operand: [],
                     type: "Expression"
                 };
             }
-            clone.specialization.contents.operand.push(elementOb);
+            clone.specialization[key].operand.push(elementOb);
+
             // TODO add to parentElement also if needed 
-            updateDocument(clone, ws)
+            ElementService.updateElement(clone, ws)
             .then(function(data2) {
                 deferred.resolve(data2);
             }, function(reason) {
                 if (reason.status === 409) {
                     clone.read = reason.data.elements[0].read;
                     clone.modified = reason.data.elements[0].modified;
-                    updateDocument(clone, ws)
+                    ElementService.updateElement(clone, ws)
                     .then(function(data3) {
                         deferred.resolve(data3);
                     }, function(reason2) {
@@ -325,37 +334,44 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
 
     /**
      * @ngdoc method
-     * @name mms.ViewService#deleteElementFromView
+     * @name mms.ViewService#deleteElementFromViewOrSection
      * @methodOf mms.ViewService
      *
      * @description
-     * This deletes the specified instanceVal from the contents of the View
+     * This deletes the specified instanceVal from the contents of the View or Section
      * 
-     * @param {string} viewId Id of the View to delete the element from
+     * @param {string} viewOrSecId Id of the View or Section to delete the element from
      * @param {string} [workspace=master] workspace to use
-     * @param {string} instanceVal to remove from the View
-     * @returns {Promise} The promise would be resolved with updated View object
+     * @param {string} instanceVal to remove from the View or Section
+     * @returns {Promise} The promise would be resolved with updated View or Section object
      */
-    var deleteElementFromView = function(viewId, workspace, instanceVal) {
+    var deleteElementFromViewOrSection = function(viewOrSecId, workspace, instanceVal) {
 
         var deferred = $q.defer();
 
         if (instanceVal) {
             var ws = !workspace ? 'master' : workspace;
-            var docViewsCacheKey = ['products', ws, viewId, 'latest', 'views'];
-            getDocument(viewId, false, ws)
+            ElementService.getElement(viewOrSecId, false, ws)
             .then(function(data) {  
                 var clone = {};
                 clone.sysmlid = data.sysmlid;
                 //clone.read = data.read;
                 clone.specialization = _.cloneDeep(data.specialization);
-                delete clone.specialization.contains;
-                // Remove from contents and delete all other associated nodes:
-                if (clone.specialization.contents && clone.specialization.contents.operand) {
-                    var operands = data.specialization.contents.operand;
+
+                var key;
+                if (isSection(data)) {
+                    key = "instanceSpecificationSpecification";
+                }
+                else {
+                    delete clone.specialization.contains;
+                    key = "contents";
+                }
+
+                if (clone.specialization[key] && clone.specialization[key].operand) {
+                    var operands = data.specialization[key].operand;
                     for (var i = 0; i < operands.length; i++) {
                         if (instanceVal.instance === operands[i].instance) {
-                            clone.specialization.contents.operand.splice(i,1);
+                            clone.specialization[key].operand.splice(i,1);
                         }
                     }
                 }
@@ -363,7 +379,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 // Note:  We decided we do not need to delete the instanceVal, just remove from
                 //         contents.
 
-                updateDocument(clone, ws)
+                ElementService.updateElement(clone, ws)
                 .then(function(data2) {
                     deferred.resolve(data2);
                 }, function(reason) {
@@ -387,11 +403,11 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
     };
 
     /**
-     * Creates and adds a opaque presentation element to the passed view if addToView is true,
+     * Creates and adds a opaque presentation element to the passed view or section if addToView is true,
      * otherwise, just creates the opaque element but doesnt add it the
-     * view.
+     * view or section
      *
-     * @param {string} view Id of the View to add to
+     * @param {object} viewOrSection The View or Section to add to
      * @param {string} [workspace=master] workspace to use
      * @param {string} addToView true if wanting to add the element to the view
      * @param {string} elementType The type of element that is to be created, ie 'Paragraph'
@@ -400,13 +416,13 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @returns {Promise} The promise would be resolved with updated View object if addToView is true
      *                    otherwise the created InstanceSpecification
     */
-    var createAndAddElement = function(view, workspace, addToView, elementType, site, name) {
+    var createAndAddElement = function(viewOrSection, workspace, addToView, elementType, site, name) {
 
         var deferred = $q.defer();
         var defaultName = "Untitled "+elementType;
         var instanceSpecName = name ? name : defaultName;
 
-        addInstanceSpecification(view, workspace, elementType, addToView, site, instanceSpecName).
+        addInstanceSpecification(viewOrSection, workspace, elementType, addToView, site, instanceSpecName).
         then(function(data) {
             deferred.resolve(data);
         }, function(reason) {
@@ -419,7 +435,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
     /**
      * Adds a InstanceVal/InstanceSpecification to the contents of the View
      *
-     * @param {string} view Id of the View to add to
+     * @param {object} viewOrSection The View or Section to add to
      * @param {string} [workspace=master] workspace to use
      * @param {string} type The type of element that is to be created, ie 'Paragraph'
      * @param {string} addToView true if wanting to add the element to the view
@@ -429,7 +445,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @returns {Promise} The promise would be resolved with updated View object if addToView is true
      *                    otherwise the created InstanceSpecification
     */
-    var addInstanceSpecification = function(view, workspace, type, addToView, site, name, json) {
+    var addInstanceSpecification = function(viewOrSection, workspace, type, addToView, site, name, json) {
 
         var deferred = $q.defer();
         var instanceSpecName = name ? name : "Untitled InstanceSpec";
@@ -438,10 +454,10 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         var processInstanceSpec = function(createdInstanceSpecUpdate) {
 
             if (addToView) {
-                addInstanceVal(view, workspace, createdInstanceSpecUpdate.sysmlid).then(function(updatedView) {
+                addInstanceVal(viewOrSection, workspace, createdInstanceSpecUpdate.sysmlid).then(function(updatedView) {
                     if (type === "Section") {
                         // Broadcast message to TreeCtrl:
-                        $rootScope.$broadcast('viewctrl.add.section', createdInstanceSpecUpdate);
+                        $rootScope.$broadcast('viewctrl.add.section', createdInstanceSpecUpdate, viewOrSection.name);
                     }
                     deferred.resolve(updatedView);
                 }, function(reason) {
@@ -450,6 +466,74 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             }
             else {
                 deferred.resolve(createdInstanceSpecUpdate);
+            }
+        };
+
+        var createPresentationElem = function(createdInstanceSpec) {
+
+            // Have it reference the InstanceSpec so we dont need to create extra elements:
+            var paragraph = {
+                sourceType: "reference",
+                source: createdInstanceSpec.sysmlid,
+                sourceProperty: "documentation",
+                type: "Paragraph"
+            };
+
+            var jsonBlob = {};
+            if (type === "Paragraph") {
+                jsonBlob = paragraph;
+            }
+            else if (type === "List") {
+                jsonBlob = {
+                    ordered: true,
+                    bulleted: true,
+                    list:[[paragraph]],
+                    type: type
+                };
+            }
+            else if (type === "Table") {
+                jsonBlob = {
+                    body:[
+                        [{content:[paragraph],
+                          rowspan:1,
+                          colspan:1}]
+                    ],
+                    style: "normal",
+                    title: "Untitled",
+                    header: [[
+                        {
+                            content: [{
+                                sourceType: "text",
+                                text: "Untitled Header",
+                                type: "Paragraph"
+                            }]
+                        }
+                    ]],
+                    type: type
+                };
+            }
+            else if (type === "Image") {
+                // TODO this doesnt really work
+                jsonBlob = {
+                    type: type
+                };
+            }
+            else if (type === "Section") {
+                jsonBlob = {
+                    operand:[],  
+                    type:"Expression"
+                };
+            }
+
+            // Special case for Section.  Doesnt use json blobs.
+            if (type === "Section") {
+                presentationElem = jsonBlob;  
+            }
+            else {
+                presentationElem = {
+                    string:JSON.stringify(jsonBlob),
+                    type:"LiteralString"
+                };
             }
         };
 
@@ -474,74 +558,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 processInstanceSpec(createdInstanceSpec);
             }
             else {
-                // Have it reference the InstanceSpec so we dont need to create extra elements:
-                var paragraph = {
-                    sourceType: "reference",
-                    source: createdInstanceSpec.sysmlid,
-                    sourceProperty: "documentation",
-                    type: "Paragraph"
-                };
-
-                var jsonBlob = {};
-                if (type === "Paragraph") {
-                    jsonBlob = paragraph;
-                }
-                else if (type === "List") {
-                    jsonBlob = {
-                        ordered: true,
-                        bulleted: true,
-                        list:[[paragraph]],
-                        type: type
-                    };
-                }
-                else if (type === "Table") {
-                    jsonBlob = {
-                        body:[
-                            [{content:[paragraph],
-                              rowspan:1,
-                              colspan:1}]
-                        ],
-                        style: "normal",
-                        title: "Untitled",
-                        header: [[
-                            {
-                                content: [{
-                                    sourceType: "text",
-                                    text: "Untitled Header",
-                                    type: "Paragraph"
-                                }]
-                            }
-                        ]],
-                        type: type
-                    };
-                }
-                else if (type === "Image") {
-                    // TODO this doesnt really work
-                    jsonBlob = {
-                        type: type
-                    };
-                }
-                else if (type === "Section") {
-                    // Section's do not use json blobs, and cannot use the paragraph created
-                    // above.  Would need to create a paragraph using this method and then 
-                    // add it to operand below.
-                    jsonBlob = {
-                        operand:[],  
-                        type:"Expression"
-                    };
-                }
-
-                // Special case for Section.  Doesnt use json blobs.
-                if (type === "Section") {
-                    presentationElem = jsonBlob;  
-                }
-                else {
-                    presentationElem = {
-                        string:JSON.stringify(jsonBlob),
-                        type:"LiteralString"
-                    };
-                }
-
+                createPresentationElem(createdInstanceSpec);
                 createdInstanceSpec.specialization.instanceSpecificationSpecification = presentationElem;
 
                 ElementService.updateElement(createdInstanceSpec, workspace).then(function(createdInstanceSpecUpdate) {
@@ -550,7 +567,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                     deferred.reject(reason);
                 });
 
-            } // ends else
+            }
 
         }, function(reason) {
             deferred.reject(reason);
@@ -562,20 +579,20 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
     /**
      * Adds a InstanceValue to the contents of the View
      *
-     * @param {string} view Id of the View to add to
+     * @param {object} viewOrSection The View or Section to add to
      * @param {string} [workspace=master] workspace to use
      * @param {string} instanceSpecId InstanceSpecification sysmlid.  This is the instance
      #                 for the InstanceValue.
      * @returns {Promise} The promise would be resolved with updated View object
     */
-    var addInstanceVal = function(view, workspace, instanceSpecId) {
+    var addInstanceVal = function(viewOrSection, workspace, instanceSpecId) {
 
         var instanceVal = {
             instance:instanceSpecId,
             type:"InstanceValue"
         };
 
-        return addElementToView(view.sysmlid, view.sysmlid, workspace, instanceVal);
+        return addElementToViewOrSection(viewOrSection.sysmlid, viewOrSection.sysmlid, workspace, instanceVal);
     };
 
     /**
@@ -848,10 +865,10 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         getCurrentDocumentId: getCurrentDocumentId,
         parseExprRefTree: parseExprRefTree,
         isSection: isSection,
-        addElementToView: addElementToView,
+        addElementToViewOrSection: addElementToViewOrSection,
         createAndAddElement: createAndAddElement,
         addInstanceVal: addInstanceVal,
-        deleteElementFromView: deleteElementFromView,
+        deleteElementFromViewOrSection: deleteElementFromViewOrSection,
         addInstanceSpecification: addInstanceSpecification,
         typeToClassifierId: typeToClassifierId,
         getInstanceSpecification : getInstanceSpecification

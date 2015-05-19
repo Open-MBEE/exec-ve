@@ -26,7 +26,7 @@ function($scope, $location, $rootScope, $state, _, $window, growl, $http, URLSer
 
     // Per CMED-737, always check the login first, so we can authenticate into the server 
     // before making any more calls.
-    $http.get(URLService.getCheckLoginURL())
+    /*$http.get(URLService.getCheckLoginURL())
     .success(function(data, status, headers, config) {
         // Do nothing
     }).error(function(data, status, headers, config) {
@@ -34,7 +34,8 @@ function($scope, $location, $rootScope, $state, _, $window, growl, $http, URLSer
         // Note: this may not be needed b/c the browser will keep prompting for credentials till
         //       they are correct
         $state.reload();
-    });
+    });*/
+
 
     $scope.$on('$stateChangeError', function(event, toState, toParams, fromState, fromParams, error) {
         growl.error('Error: ' + error.message);

@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms')
-.factory('ElementService', ['$q', '$http', 'URLService', 'UtilsService', 'CacheService', '_', ElementService]);
+.factory('ElementService', ['$q', '$http', 'URLService', 'UtilsService', 'CacheService', 'HttpService', '_', ElementService]);
 
 /**
  * @ngdoc service
@@ -18,7 +18,7 @@ angular.module('mms')
  *
  * For element json example, see [here](https://ems.jpl.nasa.gov/alfresco/mms/raml/index.html)
  */
-function ElementService($q, $http, URLService, UtilsService, CacheService, _) {
+function ElementService($q, $http, URLService, UtilsService, CacheService, HttpService,  _) {
     
     var inProgress = {};
     /**
@@ -73,8 +73,10 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, _) {
         var n = normalize(id, update, workspace, version);
         var key = 'getElement(' + id + n.update + n.ws + n.ver + ')';
 
-        if (inProgress.hasOwnProperty(key))
+        if (inProgress.hasOwnProperty(key)) {
+            HttpService.ping(URLService.getElementURL(id, n.ws, n.ver));
             return inProgress[key];
+        }
 
         var deferred = $q.defer();
         if (CacheService.exists(n.cacheKey) && !n.update) {
@@ -89,14 +91,16 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, _) {
             }
         }
         inProgress[key] = deferred.promise;
-        $http.get(URLService.getElementURL(id, n.ws, n.ver))
-        .success(function(data, status, headers, config) {
-            deferred.resolve(CacheService.put(n.cacheKey, UtilsService.cleanElement(data.elements[0]), true));
-            delete inProgress[key];
-        }).error(function(data, status, headers, config) {
-            URLService.handleHttpStatus(data, status, headers, config, deferred);
-            delete inProgress[key];
-        });
+        HttpService.get(URLService.getElementURL(id, n.ws, n.ver),
+            function(data, status, headers, config) {
+                deferred.resolve(CacheService.put(n.cacheKey, UtilsService.cleanElement(data.elements[0]), true));
+                delete inProgress[key];
+            },
+            function(data, status, headers, config) {
+                URLService.handleHttpStatus(data, status, headers, config, deferred);
+                delete inProgress[key];
+            }
+        );
         return deferred.promise;
     };
 
@@ -262,25 +266,31 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, _) {
         var n = normalize(null, update, workspace, version);
 
         var progress = 'getGenericElements(' + url + key + n.update + n.ws + n.ver + ')';
-        if (inProgress.hasOwnProperty(progress))
+        if (inProgress.hasOwnProperty(progress)) {
+            HttpService.ping(url);
             return inProgress[progress];
+        }
 
         var deferred = $q.defer();
        
         inProgress[progress] = deferred.promise;
-        $http.get(url)
-        .success(function(data, status, headers, config) {
-            var result = [];
-            data[key].forEach(function(element) {
-                var ekey = UtilsService.makeElementKey(element.sysmlid, n.ws, n.ver);
-                result.push(CacheService.put(ekey, UtilsService.cleanElement(element), true));
-            }); 
-            delete inProgress[progress];
-            deferred.resolve(result); 
-        }).error(function(data, status, headers, config) {
-            URLService.handleHttpStatus(data, status, headers, config, deferred);
-            delete inProgress[progress];
-        });
+        
+        HttpService.get(url, 
+            function(data, status, headers, config) {
+                var result = [];
+                data[key].forEach(function(element) {
+                    var ekey = UtilsService.makeElementKey(element.sysmlid, n.ws, n.ver);
+                    result.push(CacheService.put(ekey, UtilsService.cleanElement(element), true));
+                }); 
+                delete inProgress[progress];
+                deferred.resolve(result); 
+            },
+            function(data, status, headers, config) {
+                URLService.handleHttpStatus(data, status, headers, config, deferred);
+                delete inProgress[progress];
+            }
+        );
+
         return deferred.promise;
     };
 

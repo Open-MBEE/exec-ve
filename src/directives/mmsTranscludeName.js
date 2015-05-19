@@ -114,8 +114,14 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
             scope.cleanUp = false;
             scope.view = mmsViewCtrl.getView();
 
-            mmsViewCtrl.registerPresenElemCallBack(function() {
+            var callback = function() {
                 Utils.showEditCallBack(scope,mmsViewCtrl,element,template,recompile,recompileEdit,"name");
+            };
+            
+            mmsViewCtrl.registerPresenElemCallBack(callback);
+
+            scope.$on('$destroy', function() {
+                mmsViewCtrl.unRegisterPresenElemCallBack(callback);
             });
 
             scope.save = function() {

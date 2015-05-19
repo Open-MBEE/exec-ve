@@ -197,11 +197,12 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
             growl.error(reason.message);
     };
 
-    var addFrame = function($scope, mmsViewCtrl, element, template) {
+    var addFrame = function($scope, mmsViewCtrl, element, template, editObj) {
 
         if (mmsViewCtrl.isEditable() && !$scope.isEditing && !$scope.cleanUp) {
 
-            ElementService.getElementForEdit($scope.mmsEid, false, $scope.ws)
+            var id = editObj ? editObj.sysmlid : $scope.mmsEid;
+            ElementService.getElementForEdit(id, false, $scope.ws)
             .then(function(data) {
                 $scope.isEditing = true;
                 $scope.edit = data;
@@ -213,9 +214,11 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
                     $scope.editValues = [$scope.edit.specialization.specification];
                 }
 
-                element.empty();
-                element.append(template);
-                $compile(element.contents())($scope); 
+                if (template) {
+                    element.empty();
+                    element.append(template);
+                    $compile(element.contents())($scope);
+                }
 
                 // Broadcast message for the toolCtrl:
                 $rootScope.$broadcast('presentationElem.edit',$scope.edit, $scope.ws);
@@ -224,7 +227,7 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
             // TODO: Should this check the entire or just the instance specification
             // TODO: How smart does it need to be, since the instance specification is just a reference.
             // Will need to unravel until the end to check all references
-            ElementService.isCacheOutdated($scope.mmsEid, $scope.ws)
+            ElementService.isCacheOutdated(id, $scope.ws)
             .then(function(data) {
                 if (data.status && data.server.modified > data.cache.modified)
                     growl.warning('This element has been updated on the server');
@@ -237,7 +240,7 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
         }
     };
 
-    var saveAction = function($scope, recompile, mmsViewCtrl, bbApi) {
+    var saveAction = function($scope, recompile, mmsViewCtrl, bbApi, editObj) {
 
         if ($scope.elementSaving) {
             growl.info('Please Wait...');
@@ -245,11 +248,26 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
         }
         bbApi.toggleButtonSpinner('presentation.element.save');
         $scope.elementSaving = true;
+        var id = editObj ? editObj.sysmlid : $scope.mmsEid;
 
-        save($scope.edit, $scope.ws, "element", $scope.mmsEid, null, $scope).then(function(data) {
+        // If it is a Section, then merge the changes b/c deletions to the Section's contents
+        // are not done on the scope.edit.
+        if (editObj && ViewService.isSection(editObj)) {
+            _.merge($scope.edit, editObj, function(a,b,id) {
+                if (angular.isArray(a) && angular.isArray(b) && b.length < a.length) {
+                    return b;
+                }
+
+                if (id === 'name') {
+                    return a;
+                }
+            });
+        }
+
+        save($scope.edit, $scope.ws, "element", id, null, $scope).then(function(data) {
             $scope.elementSaving = false;
-            $scope.isEditing = false;
             $scope.cleanUp = true;
+            $scope.isEditing = false;
             // Broadcast message for the toolCtrl:
             $rootScope.$broadcast('presentationElem.save',$scope.edit, $scope.ws);
             recompile();
@@ -266,8 +284,8 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
     var cancelAction = function($scope, mmsViewCtrl, recompile, bbApi, type) {
 
         var cancelCleanUp = function() {
-            $scope.isEditing = false;
             $scope.cleanUp = true;
+            $scope.isEditing = false;
             revertEdits($scope);
              // Broadcast message for the ToolCtrl:
             $rootScope.$broadcast('presentationElem.cancel',$scope.edit, $scope.ws);
@@ -302,27 +320,32 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
         }
     };
 
-    var deleteAction = function($scope, bbApi) {
+    var deleteAction = function($scope, bbApi, section) {
         bbApi.toggleButtonSpinner('presentation.element.delete');
-        ViewService.deleteElementFromView($scope.view.sysmlid, $scope.ws, $scope.instanceVal).then(function(data) {
+        var viewOrSecId = section ? section.sysmlid : $scope.view.sysmlid;
+        ViewService.deleteElementFromViewOrSection(viewOrSecId, $scope.ws, $scope.instanceVal).then(function(data) {
+            if (ViewService.isSection($scope.presentationElem)) {
+                // Broadcast message to TreeCtrl:
+                $rootScope.$broadcast('viewctrl.delete.section', $scope.presentationElem.name);
+            }
+             // Broadcast message for the ToolCtrl:
+            $rootScope.$broadcast('presentationElem.cancel',$scope.edit, $scope.ws);
+
             growl.success('Delete Successful');
         }, handleError).finally(function() {
             bbApi.toggleButtonSpinner('presentation.element.delete');
         });
 
-        if (ViewService.isSection($scope.presentationElem)) {
-            // Broadcast message to TreeCtrl:
-            $rootScope.$broadcast('viewctrl.delete.section', $scope.presentationElem.name);
-        }
 
     };
 
-    var showEditCallBack = function($scope, mmsViewCtrl, element, template, recompile, recompileEdit, type) {
+    var showEditCallBack = function($scope, mmsViewCtrl, element, template, recompile, recompileEdit, type, editObj) {
 
         // Going into edit mode, so add a frame if had a previous edit in progress:
         if (mmsViewCtrl.isEditable()) {
             if ($scope.edit && hasEdits($scope, type)) {
-                addFrame($scope,mmsViewCtrl,element,template);
+                $scope.recompileEdit = false;
+                addFrame($scope,mmsViewCtrl,element,template,editObj);
             }
         }
         // Leaving edit mode, so highlight the unsaved edit if needed:
@@ -331,6 +354,7 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
             $scope.cleanUp = false;
             $scope.elementSaving = false;
             if ($scope.edit && hasEdits($scope, type)) {
+                $scope.recompileEdit = true;
                 recompileEdit();
             }
             else {
@@ -344,30 +368,30 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
         }
     };
 
-      var isDirectChildOfPresentationElementFunc = function(element, mmsViewCtrl) {
-            var currentElement = (element[0]) ? element[0] : element;
-            var viewElementCount = 0;
-            while (currentElement.parentElement) {
-                var parent = (currentElement.parentElement[0]) ? currentElement.parentElement[0] : currentElement.parentElement;
-                if (mmsViewCtrl.isTranscludedElement(parent.nodeName))
-                    return false;
-                if (mmsViewCtrl.isViewElement(parent.nodeName)) {
-                    viewElementCount++;
-                    if (viewElementCount > 1)
-                        return false;
-                }
-                if (mmsViewCtrl.isPresentationElement(parent.nodeName))
-                    return true;
-                currentElement = parent;
-            }
-            return false;
-        };
-
-        var hasHtml = function(s) {
-            if (s.indexOf('<p>') === -1)
+    var isDirectChildOfPresentationElementFunc = function(element, mmsViewCtrl) {
+        var currentElement = (element[0]) ? element[0] : element;
+        var viewElementCount = 0;
+        while (currentElement.parentElement) {
+            var parent = (currentElement.parentElement[0]) ? currentElement.parentElement[0] : currentElement.parentElement;
+            if (mmsViewCtrl.isTranscludedElement(parent.nodeName))
                 return false;
-            return true;
-        };
+            if (mmsViewCtrl.isViewElement(parent.nodeName)) {
+                viewElementCount++;
+                if (viewElementCount > 1)
+                    return false;
+            }
+            if (mmsViewCtrl.isPresentationElement(parent.nodeName))
+                return true;
+            currentElement = parent;
+        }
+        return false;
+    };
+
+    var hasHtml = function(s) {
+        if (s.indexOf('<p>') === -1)
+            return false;
+        return true;
+    };
 
     return {
         save: save,

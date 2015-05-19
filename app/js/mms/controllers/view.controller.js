@@ -47,6 +47,8 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         $rootScope.veCommentsOn = false;
     if (!$rootScope.veElementsOn)
         $rootScope.veElementsOn = false;
+    if (!$rootScope.mms_ShowEdits)
+        $rootScope.mms_ShowEdits = false;
 
     var ws = $stateParams.workspace;
 
@@ -60,7 +62,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     $scope.bbApi.init = function() {
 
         $scope.bbApi.addButton(UxService.getButtonBarButton('show.edits'));
-        $scope.bbApi.setToggleState('show.edits', false);
+        $scope.bbApi.setToggleState('show.edits', $rootScope.mms_ShowEdits);
         if (view && view.editable && time === 'latest') {
             $scope.bbApi.addButton(UxService.getButtonBarButton('view.add.dropdown'));
         }
@@ -212,6 +214,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         $scope.newItem.name = "";
 
         $scope.searching = false;
+        $scope.viewOrSection = $scope.section ? $scope.section : view;
 
         // Search for InstanceSpecs.  We are searching for InstanceSpecs b/c we only want to
         // create a InstanceValue to point to that InstanceSpec when cross-referencing.
@@ -252,11 +255,11 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
             }
             $scope.oking = true;  
 
-            ViewService.addInstanceVal(view, workspace, element.sysmlid).
+            ViewService.addInstanceVal($scope.viewOrSection, workspace, element.sysmlid).
             then(function(data) {
                 if ($scope.presentationElemType === "Section") {
                     // Broadcast message to TreeCtrl:
-                    $rootScope.$broadcast('viewctrl.add.section', element);
+                    $rootScope.$broadcast('viewctrl.add.section', element, $scope.viewOrSection.name);
                 }
                 growl.success("Adding "+$scope.presentationElemType+"  Successful");
                 $modalInstance.close(data);
@@ -274,7 +277,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
             }
             $scope.oking = true;
 
-            ViewService.createAndAddElement(view, workspace, true, $scope.presentationElemType, site.sysmlid, $scope.newItem.name).
+            ViewService.createAndAddElement($scope.viewOrSection, workspace, true, $scope.presentationElemType, site.sysmlid, $scope.newItem.name).
             then(function(data) {
                 growl.success("Adding "+$scope.presentationElemType+"  Successful");
                 $modalInstance.close(data);
@@ -291,8 +294,9 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
 
     };
 
-    var addElement = function(type) {
+    var addElement = function(type, section) {
 
+        $scope.section = section;
         $scope.presentationElemType = type;
         $scope.newItem = {};
         $scope.newItem.name = "";
@@ -328,6 +332,26 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         //addElement('Image');
     });
 
+    $scope.$on('section.add.paragraph', function(event, section) {
+        addElement('Paragraph', section);
+    });
+
+    $scope.$on('section.add.list', function(event, section) {
+        //addElement('List', section);
+    });
+
+    $scope.$on('section.add.table', function(event, section) {
+        //addElement('Table', section);
+    });
+
+    $scope.$on('section.add.section', function(event, section) {
+        addElement('Section', section);
+    });
+
+    $scope.$on('section.add.image', function(event, section) {
+        //addElement('Image', section);
+    });
+
     $scope.$on('show.comments', function() {
         $scope.viewApi.toggleShowComments();
         $scope.bbApi.toggleButtonState('show.comments');
@@ -343,6 +367,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     $scope.$on('show.edits', function() {
         $scope.viewApi.toggleShowEdits();
         $scope.bbApi.toggleButtonState('show.edits');
+        $rootScope.mms_ShowEdits = !$rootScope.mms_ShowEdits;
     });
 
     $scope.$on('center.previous', function() {
@@ -410,6 +435,9 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         }
         if ($rootScope.veElementsOn) {
             $scope.viewApi.toggleShowElements();
+        }
+        if ($rootScope.mms_ShowEdits) {
+            $scope.viewApi.toggleShowEdits();
         }
     };
 }]);

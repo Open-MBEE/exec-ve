@@ -132,8 +132,14 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             scope.view = mmsViewCtrl.getView();
             scope.isDirectChildOfPresentationElement = Utils.isDirectChildOfPresentationElementFunc(element, mmsViewCtrl);
 
-            mmsViewCtrl.registerPresenElemCallBack(function() {
+            var callback = function() {
                 Utils.showEditCallBack(scope,mmsViewCtrl,element,template,recompile,recompileEdit,"documentation");
+            };
+
+            mmsViewCtrl.registerPresenElemCallBack(callback);
+
+            scope.$on('$destroy', function() {
+                mmsViewCtrl.unRegisterPresenElemCallBack(callback);
             });
 
             scope.save = function() {
@@ -144,16 +150,16 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                 Utils.cancelAction(scope,mmsViewCtrl,recompile,scope.bbApi,"documentation");
             };
 
-            scope.delete = function() {
-                Utils.deleteAction(scope,scope.bbApi);
-            };
-
             scope.addFrame = function() {
                 Utils.addFrame(scope,mmsViewCtrl,element,template);
             };
         } 
 
         if (mmsViewPresentationElemCtrl) {
+
+            scope.delete = function() {
+                Utils.deleteAction(scope,scope.bbApi,mmsViewPresentationElemCtrl.getParentSection());
+            };
 
             scope.instanceSpec = mmsViewPresentationElemCtrl.getInstanceSpec();
             scope.instanceVal = mmsViewPresentationElemCtrl.getInstanceVal();
