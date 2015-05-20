@@ -15,17 +15,8 @@
     overflow: auto;
   }
 
-  .misc-form-field {
-    top: -32px;
-    position: relative;
-  }
-
   .form-propose, .form-filter {
     margin-top: 7px;
-  }
-
-  .form-search {
-    width: 70%;
   }
 
   .form-search, .form-propose {
@@ -77,8 +68,9 @@
     background-color: $light_blue;
   }
 
-  .transclude-table {
-    position: relative;
-    top: -30px
+  .cant-find-element {
+    font-size: 12px;
+    margin-top: 5px;
+    margin-left: 3px;
   }
 }

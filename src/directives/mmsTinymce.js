@@ -42,6 +42,7 @@ function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window
         var commentModalTemplate = $templateCache.get('mms/templates/mmsCommentModal.html');
         var chooseImageModalTemplate = $templateCache.get('mms/templates/mmsChooseImageModal.html');
         var viewLinkModalTemplate = $templateCache.get('mms/templates/mmsViewLinkModal.html');
+        var proposeModalTemplate = $templateCache.get('mms/templates/mmsProposeModal.html');
 
         var transcludeCtrl = function($scope, $modalInstance) {
             $scope.searchClass = "";
@@ -50,6 +51,10 @@ function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window
             $scope.filter = '';
             $scope.searchText = '';
             $scope.newE = {name: '', documentation: ''};
+            $scope.searchSuccess = false;
+            $scope.requestName = false;
+            $scope.requestDocumentation = false;
+            $scope.requestValue = false;
             $scope.choose = function(elementId, property, name) {
                 var tag = '<mms-transclude-' + property + ' data-mms-eid="' + elementId + '">[cf:' + name + '.' + property + ']</mms-transclude-' + property + '> ';
                 $modalInstance.close(tag);
@@ -63,12 +68,16 @@ function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window
                 $scope.searchClass = "fa fa-spin fa-spinner";
                 ElementService.search(searchText, false, scope.mmsWs)
                 .then(function(data) {
+                    $scope.searchSuccess = true;
                     $scope.mmsCfElements = data;
                     $scope.searchClass = "";
                 }, function(reason) {
                     growl.error("Search Error: " + reason.message);
                     $scope.searchClass = "";
                 });
+            };
+            $scope.openProposeModal = function() {
+                $modalInstance.close(false);
             };
             $scope.makeNew = function() {
                 $scope.proposeClass = "fa fa-spin fa-spinner";
@@ -81,9 +90,48 @@ function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window
                     $scope.proposeClass = "";
                 });
             };
+            $scope.makeNewAndChoose = function() {
+                $scope.makeNew();
+
+                if ($scope.requestName) {
+                    $scope.choose($scope.newE.sysmlid, 'name', $scope.newE.name);
+                } else if ($scope.requestDocumentation) {
+                    $scope.choose($scope.newE.sysmlid, 'doc', $scope.newE.name);
+                } else if ($scope.requestValue) {
+                    $scope.choose($scope.newE.sysmlid, 'val', $scope.newE.name);
+                }
+            };
             $scope.showOriginalElements = function() {
                 $scope.mmsCfElements = originalElements;
             };
+            $scope.toggleRadio = function(field) {
+                if (field === "name") {
+                    $scope.requestName = true;
+                    $scope.requestDocumentation = false;
+                    $scope.requestValue = false;
+                } else if (field === "documentation") {
+                    $scope.requestName = false;
+                    $scope.requestDocumentation = true;
+                    $scope.requestValue = false;
+                } else if (field === "value") {
+                    $scope.requestName = false;
+                    $scope.requestDocumentation = false;
+                    $scope.requestValue = true;
+                }
+            };
+        };
+
+        var proposeCallback = function(ed) {
+            var instance = $modal.open({
+                template: proposeModalTemplate,
+                scope: scope,
+                controller: ['$scope', '$modalInstance', transcludeCtrl],
+                size: 'lg'
+            });
+            instance.result.then(function(tag) {
+                ed.selection.collapse(false);
+                ed.insertContent(tag);
+            });
         };
 
         var transcludeCallback = function(ed) {
@@ -94,8 +142,12 @@ function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window
                 size: 'lg'
             });
             instance.result.then(function(tag) {
-                ed.selection.collapse(false);
-                ed.insertContent(tag);
+                if (!tag) {
+                    proposeCallback(ed);
+                } else {
+                    ed.selection.collapse(false);
+                    ed.insertContent(tag);
+                }
             });
         };
 

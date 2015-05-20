@@ -1,0 +1,32 @@
+<div class="modal-header">
+
+    <h4>CREATE A NEW ELEMENT</h4>
+
+    <div class="transclude-modal-instructions">
+        Add a name and optional documentation to create a new element.
+    </div>
+
+</div>
+
+<div class="modal-body transclude-modal">
+    <form>
+        <div class="form-propose input-group">
+            <div>Name <span class="star-mandatory">*</span></div>
+            <input class="form-control" type="text" ng-model="newE.name" placeholder="Element name" />
+        </div>
+        <div>Documentation</div>
+        <textarea mms-tinymce ng-model="newE.documentation" mms-ws="{{mmsWs}}" mms-site="{{mmsSite}}"></textarea>
+    </form>
+
+    <div class="radio">
+        <div>Property to cross-reference <span class="star-mandatory">*</span></div>
+        <label class="radio-inline"><input type="radio" name="optradio" value="true" ng-click="toggleRadio('name')">Name</label>
+        <label class="radio-inline"><input type="radio" name="optradio" value="true" ng-click="toggleRadio('documentation')">Documentation</label>
+        <label class="radio-inline"><input type="radio" name="optradio" value="true" ng-click="toggleRadio('value')">Value</label>
+    </div>
+
+    <span class="input-group-btn">
+        <button class="btn btn-danger" ng-click="cancel()">CANCEL</button>
+        <button class="btn btn-primary" type="button" ng-click="makeNewAndChoose()"><span class="btn-text">INSERT CROSS-REFERENCE</span> <i class="{{proposeClass}}"></i></button>
+    </span>
+</div>
