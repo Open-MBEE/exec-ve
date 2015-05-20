@@ -115,7 +115,7 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                 } else if (property === 'documentation') {
                     autocompleteProperty = 'doc';
                 } else if (property === 'value') {
-                    autocompleteProperty = 'value';
+                    autocompleteProperty = 'val';
                 }
             };
             $scope.autocomplete = function(success) {
