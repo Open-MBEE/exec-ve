@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsTinymce', ['ElementService', 'ViewService', '$modal', '$templateCache', '$window', '$timeout', 'growl', 'tinymce', mmsTinymce]);
+.directive('mmsTinymce', ['ElementService', 'ViewService', 'CacheService', '$modal', '$templateCache', '$window', '$timeout', 'growl', 'tinymce', mmsTinymce]);
 
 /**
  * @ngdoc directive
@@ -30,7 +30,7 @@ angular.module('mms.directives')
  *      that can be transcluded. Regardless, transclusion allows keyword searching 
  *      elements to transclude from alfresco
  */
-function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window, $timeout, growl, tinymce) { //depends on angular bootstrap
+function mmsTinymce(ElementService, ViewService, CacheService, $modal, $templateCache, $window, $timeout, growl, tinymce) { //depends on angular bootstrap
     var generatedIds = 0;
 
     var mmsTinymceLink = function(scope, element, attrs, ngModelCtrl) {
@@ -38,12 +38,29 @@ function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window
             attrs.$set('id', 'mmsTinymce' + generatedIds++);
         var instance = null;
 
+        var autocompleteModalTemplate = $templateCache.get('mms/templates/mmsAutocompleteModal.html');
         var transcludeModalTemplate = $templateCache.get('mms/templates/mmsCfModal.html');
         var commentModalTemplate = $templateCache.get('mms/templates/mmsCommentModal.html');
         var chooseImageModalTemplate = $templateCache.get('mms/templates/mmsChooseImageModal.html');
         var viewLinkModalTemplate = $templateCache.get('mms/templates/mmsViewLinkModal.html');
 
         var transcludeCtrl = function($scope, $modalInstance) {
+            var autocompleteName;
+            var autocompleteProperty;
+            var autocompleteElementId;
+
+            $scope.cacheElements = CacheService.getLatestElements(scope.mmsWs);
+            $scope.autocompleteItems = [];
+
+            $scope.cacheElements.forEach(function(cacheElement) {
+                $scope.autocompleteItems.push({ 'sysmlid' : cacheElement.sysmlid, 'name' : cacheElement.name + ' name' });
+                $scope.autocompleteItems.push({ 'sysmlid' : cacheElement.sysmlid, 'name' : cacheElement.name + ' documentation' });
+
+                if (cacheElement.specialization.type === 'Property') {
+                    $scope.autocompleteItems.push({ 'sysmlid' : cacheElement.sysmlid, 'name' : cacheElement.name + ' value' });
+                }
+            });
+
             $scope.searchClass = "";
             $scope.proposeClass = "";
             var originalElements = $scope.mmsCfElements;
@@ -84,9 +101,59 @@ function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window
             $scope.showOriginalElements = function() {
                 $scope.mmsCfElements = originalElements;
             };
+            $scope.autocompleteOnSelect = function($item, $model, $label) {
+                autocompleteElementId = $item.sysmlid;
+
+                var lastIndexOfName = $item.name.lastIndexOf(" ");
+                autocompleteName = $item.name.substring(0, lastIndexOfName);
+
+                var property = $label.split(' ');
+                property = property[property.length - 1];
+
+                if (property === 'name') {
+                    autocompleteProperty = 'name';
+                } else if (property === 'documentation') {
+                    autocompleteProperty = 'doc';
+                } else if (property === 'value') {
+                    autocompleteProperty = 'value';
+                }
+            };
+            $scope.autocomplete = function(success) {
+                if (success) {
+                    var tag = '<mms-transclude-' + autocompleteProperty + ' data-mms-eid="' + autocompleteElementId + '">[cf:' + autocompleteName + '.' + autocompleteProperty + ']</mms-transclude-' + autocompleteProperty + '> ';
+                    $modalInstance.close(tag);
+                } else {
+                    $modalInstance.close(false);
+                }
+            };
         };
 
-        var transcludeCallback = function(ed) {
+        var autocompleteCallback = function(ed) {
+            var instance = $modal.open({
+                template: autocompleteModalTemplate,
+                scope: scope,
+                controller: ['$scope', '$modalInstance', transcludeCtrl],
+                size: 'sm'
+            });
+
+            $timeout(function() {
+                angular.element('.autocomplete-modal-typeahead').focus();
+            });
+
+            instance.result.then(function(tag) {
+                if (!tag) {
+                    transcludeCallback(ed, true);
+                } else {
+                    ed.execCommand('delete');
+                    ed.selection.collapse(false);
+                    ed.insertContent(tag);
+                }
+            }, function() {
+                ed.focus();
+            });
+        };
+
+        var transcludeCallback = function(ed, fromAutocomplete) {
             var instance = $modal.open({
                 template: transcludeModalTemplate,
                 scope: scope,
@@ -94,8 +161,14 @@ function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window
                 size: 'lg'
             });
             instance.result.then(function(tag) {
+                if (fromAutocomplete) {
+                    ed.execCommand('delete');
+                }
+
                 ed.selection.collapse(false);
                 ed.insertContent(tag);
+            }, function() {
+                ed.focus();
             });
         };
 
@@ -252,7 +325,7 @@ function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window
                     title: 'Cross Reference',
                     text: 'Cf',
                     onclick: function() {
-                        transcludeCallback(ed);
+                        transcludeCallback(ed, false);
                     }
                 });
                 ed.addButton('comment', {
@@ -337,6 +410,11 @@ function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window
                         e.preventDefault();
                         return false;
                     }  
+                });
+                ed.on('keypress', function(e) {
+                    if (e.keyCode === 64) {
+                        autocompleteCallback(ed);
+                    }
                 });
                 if (scope.mmsTinymceApi) {
                     scope.mmsTinymceApi.save = function() {
