@@ -116,15 +116,21 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                     return;
                 }
 
-                $scope.makeNew();
-
-                if ($scope.requestName) {
-                    $scope.choose($scope.newE.sysmlid, 'name', $scope.newE.name);
-                } else if ($scope.requestDocumentation) {
-                    $scope.choose($scope.newE.sysmlid, 'doc', $scope.newE.name);
-                } else if ($scope.requestValue) {
-                    $scope.choose($scope.newE.sysmlid, 'val', $scope.newE.name);
-                }
+                $scope.proposeClass = "fa fa-spin fa-spinner";
+                ElementService.createElement({name: $scope.newE.name, documentation: $scope.newE.documentation, specialization: {type: 'Element'}}, scope.mmsWs, scope.mmsSite)
+                .then(function(data) {
+                    if ($scope.requestName) {
+                        $scope.choose(data.sysmlid, 'name', $scope.newE.name);
+                    } else if ($scope.requestDocumentation) {
+                        $scope.choose(data.sysmlid, 'doc', $scope.newE.name);
+                    } else if ($scope.requestValue) {
+                        $scope.choose(data.sysmlid, 'val', $scope.newE.name);
+                    }
+                    $scope.proposeClass = "";
+                }, function(reason) {
+                    growl.error("Propose Error: " + reason.message);
+                    $scope.proposeClass = "";
+                });
             };
             $scope.showOriginalElements = function() {
                 $scope.mmsCfElements = originalElements;
