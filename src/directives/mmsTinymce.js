@@ -91,6 +91,14 @@ function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window
                 });
             };
             $scope.makeNewAndChoose = function() {
+                if (!$scope.newE.name) {
+                    growl.error('Error: A name for your new element is required.');
+                    return;
+                } else if (!$scope.requestName && !$scope.requestDocumentation && !$scope.requestValue) {
+                    growl.error('Error: Selection of a property to cross-reference is required.');
+                    return;
+                }
+
                 $scope.makeNew();
 
                 if ($scope.requestName) {

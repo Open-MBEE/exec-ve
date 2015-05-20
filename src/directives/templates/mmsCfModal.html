@@ -1,9 +1,9 @@
 <div class="modal-header">
 
-    <h4>INSERT A CROSS REFERENCE</h4>
+    <h4>INSERT A CROSS-REFERENCE</h4>
 
     <div class="transclude-modal-instructions">
-        Search for an element and click on a cell in the table to insert a cross reference.
+        Begin by searching for an element, then click a cell in the results to insert a cross-reference.
     </div>
 
 </div>
@@ -11,34 +11,27 @@
 <div class="modal-body transclude-modal">
 
     <div class="transclude-modal-input">
-
         <form ng-submit="search(searchText)">
             <div class="form-search input-group">
-                <input class="form-control" type="text" ng-model="searchText" placeholder="Search for an element" />
+                <input class="form-control" type="text" ng-model="searchText" placeholder="Search for an element by keyword" />
                 <span class="input-group-btn">                
                     <button class="btn btn-primary" type="button" ng-click="search(searchText)">
                     <span class="btn-text">SEARCH</span> <i class="{{searchClass}}"></i></button>
                 </span>
             </div>
         </form>
-
         <div class="misc-form-field" ng-show="mmsCfElements && searchSuccess">
-
             <div class="form-filter">
-                <input class="form-control" type="text" ng-model="filter" placeholder="Filter elements in the table" />
+                <input class="form-control" type="text" ng-model="filter" placeholder="Filter elements in the results" />
             </div>
-
             <div class="cant-find-element">
-                Can't find your element? <a ng-click="openProposeModal()" class="create-element-link">Create it</a>
+                Can't find your element? <a ng-click="openProposeModal()" class="create-element-link">Create a new element</a>
             </div>
-
         </div>
-
     </div>
 
     <div class="container-fluid transclude-table" ng-show="mmsCfElements && searchSuccess">
         <table class="table table-bordered">
-
             <tr>
                 <th>NAME</th>
                 <th>QUALIFIED NAME</th>
@@ -46,7 +39,6 @@
                 <th>DOC</th>
                 <th>VALUE (if applicable)</th>
             </tr>
-
             <tr ng-repeat="elem in mmsCfElements | filter:filter">
                 <td ng-click="choose(elem.sysmlid, 'name', elem.name)" class="clickable">
                     {{elem.name}}
@@ -67,14 +59,11 @@
                     <span>{{elem.specialization.specification}}</span>
                 </td>
             </tr>
-
         </table>
     </div>
 
 </div>
 
 <div class="modal-footer">
-    <span class="input-group-btn">
-        
     </span><button class="btn btn-danger" ng-click="cancel()">CANCEL</button>
 </div>

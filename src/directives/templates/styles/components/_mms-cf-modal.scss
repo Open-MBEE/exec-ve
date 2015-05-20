@@ -19,10 +19,30 @@
     margin-top: 7px;
   }
 
-  .form-search, .form-propose {
-    & > .form-control {
-      border-right-width: 0;
-    }
+  .form-propose {
+    margin-bottom: 10px;
+  }
+
+  .form-search {
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
+
+  .misc-form-field {
+    margin-top: -10px;
+  }
+
+  .textarea-transclude-modal {
+    margin-bottom: 10px;
+  }
+
+  .radio {
+    margin-bottom: 30px;
+  }
+
+  .expl-mandatory {
+    font-size: 12px;
+    margin-top: 15px;
   }
 
   span.input-group-btn {
