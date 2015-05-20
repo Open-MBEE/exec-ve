@@ -5,7 +5,7 @@
 <div ng-class="{'panel panel-danger' : isEditing}">
   <div ng-class="{'no-display' : ! isEditing}" class="panel-heading clearfix">
     <h3 class="panel-title pull-left">
-        <div ng-class="{prop: isEditing}"><input ng-class="{form-control : isEditing}" type="text" ng-model="edit.name"></input></div>
+        <div ng-class="{prop: isEditing}"><input class="form-control" type="text" ng-model="edit.name"></input></div>
     </h3>
     <div class="btn-group pull-right">      
         <mms-button-bar buttons="buttons" mms-bb-api="bbApi"></mms-button-bar>
