@@ -13,18 +13,18 @@ function mmsViewPara($templateCache, $compile, UtilsService) {
     };
 
     var mmsViewParaLink = function(scope, element, attrs) {
-        var html = UtilsService.makeHtmlPara(scope.para);
+        /*var html = UtilsService.makeHtmlPara(scope.para);
         element.append(html);
         $compile(element.contents())(scope);
-        return;
-        /*
+        return;*/
+        
         if (scope.para.sourceType === 'text') {
             element.append(scope.para.text);
             $compile(element.contents())(scope); 
         } else {
             element.append(template);
             $compile(element.contents())(scope); 
-        }*/
+        }
     };
 
     return {
