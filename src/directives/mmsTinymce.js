@@ -71,7 +71,6 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
             $scope.searchSuccess = false;
             $scope.requestName = false;
             $scope.requestDocumentation = false;
-            $scope.requestValue = false;
             $scope.choose = function(elementId, property, name) {
                 var tag = '<mms-transclude-' + property + ' data-mms-eid="' + elementId + '">[cf:' + name + '.' + property + ']</mms-transclude-' + property + '> ';
                 $modalInstance.close(tag);
@@ -111,7 +110,7 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                 if (!$scope.newE.name) {
                     growl.error('Error: A name for your new element is required.');
                     return;
-                } else if (!$scope.requestName && !$scope.requestDocumentation && !$scope.requestValue) {
+                } else if (!$scope.requestName && !$scope.requestDocumentation) {
                     growl.error('Error: Selection of a property to cross-reference is required.');
                     return;
                 }
@@ -123,8 +122,6 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                         $scope.choose(data.sysmlid, 'name', $scope.newE.name);
                     } else if ($scope.requestDocumentation) {
                         $scope.choose(data.sysmlid, 'doc', $scope.newE.name);
-                    } else if ($scope.requestValue) {
-                        $scope.choose(data.sysmlid, 'val', $scope.newE.name);
                     }
                     $scope.proposeClass = "";
                 }, function(reason) {
@@ -139,15 +136,9 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                 if (field === "name") {
                     $scope.requestName = true;
                     $scope.requestDocumentation = false;
-                    $scope.requestValue = false;
                 } else if (field === "documentation") {
                     $scope.requestName = false;
                     $scope.requestDocumentation = true;
-                    $scope.requestValue = false;
-                } else if (field === "value") {
-                    $scope.requestName = false;
-                    $scope.requestDocumentation = false;
-                    $scope.requestValue = true;
                 }
             };
             $scope.autocompleteOnSelect = function($item, $model, $label) {
