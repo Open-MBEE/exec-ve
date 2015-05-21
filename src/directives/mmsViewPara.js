@@ -1,19 +1,24 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsViewPara', ['$templateCache', '$compile', mmsViewPara]);
+.directive('mmsViewPara', ['$templateCache', '$compile', 'UtilsService', mmsViewPara]);
 
-function mmsViewPara($templateCache, $compile) {
+function mmsViewPara($templateCache, $compile, UtilsService) {
     var template = $templateCache.get('mms/templates/mmsViewPara.html');
     
     var mmsViewParaLink = function(scope, element, attrs) {
+        var html = UtilsService.makeHtmlPara(scope.para);
+        element.append(html);
+        $compile(element.contents())(scope);
+        return;
+        /*
         if (scope.para.sourceType === 'text') {
             element.append(scope.para.text);
             $compile(element.contents())(scope); 
         } else {
             element.append(template);
             $compile(element.contents())(scope); 
-        }
+        }*/
     };
 
     return {
