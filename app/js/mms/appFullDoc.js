@@ -70,7 +70,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'ui.router'])
     $scope.ws = params['ws'];
     $scope.site=params['site'];
     $scope.docId=params['docId'];
-    $scope.version=params['time'];
+    // $scope.version=params['time'];
 
     var views= [];
     views.push({id: $scope.docId, api: {
