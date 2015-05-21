@@ -1,3 +1,15 @@
+<div ng-if="section.contains">
+    <h4>{{section.name}}</h4> 
+    <div ng-repeat="contain in ::section.contains" ng-switch on="contain.type"> 
+        <mms-view-para data-mms-para="::contain" ng-switch-when="Paragraph"></mms-view-para>
+        <mms-view-table data-mms-table="::contain" ng-switch-when="Table"></mms-view-table>
+        <mms-view-list data-mms-list="::contain" ng-switch-when="List"></mms-view-list>
+        <mms-view-img data-mms-image="::contain" ng-switch-when="Image"></mms-view-img>
+        <mms-view-section data-mms-section="::contain" ng-switch-when="Section"></mms-view-section>
+    </div>
+</div>
+
+<div ng-if="!section.contains">
 <div ng-show="! isEditing">
     <h4 ng-hide="recompileEdit">{{section.name}}</h4>
     <div ng-show="recompileEdit" class="panel panel-info"><h4>{{edit.name}}</h4></div>
@@ -16,4 +28,5 @@
         <mms-view-presentation-elem data-mms-instance-val="instanceVal" data-mms-parent-section="section"></mms-view-presentation-elem>
       </div>
   </div>
+</div>
 </div>
