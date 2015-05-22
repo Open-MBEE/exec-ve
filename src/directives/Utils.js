@@ -20,17 +20,17 @@ angular.module('mms.directives')
  */
 function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceService, ConfigService, ElementService, ViewService, growl, _) {
     
-     var conflictCtrl = function(scope, $modalInstance) {
-        scope.ok = function() {
+     var conflictCtrl = function($scope, $modalInstance) {
+        $scope.ok = function() {
             $modalInstance.close('ok');
         };
-        scope.cancel = function() {
+        $scope.cancel = function() {
             $modalInstance.close('cancel');
         };
-        scope.force = function() {
+        $scope.force = function() {
             $modalInstance.close('force');
         };
-        scope.merge = function() {
+        $scope.merge = function() {
             $modalInstance.close('merge');
         };
     };
@@ -84,7 +84,7 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
                     scope.latest = reason.data.elements[0];
                     var instance = $modal.open({
                         template: $templateCache.get('mms/templates/saveConflict.html'),
-                        controller: ['scope', '$modalInstance', conflictCtrl],
+                        controller: ['$scope', '$modalInstance', conflictCtrl],
                         scope: scope,
                         size: 'lg'
                     });
