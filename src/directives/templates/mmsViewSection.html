@@ -1,4 +1,4 @@
-<div ng-if="section.contains">
+<div ng-if="!section.specialization">
     <h4>{{section.name}}</h4> 
     <div ng-repeat="contain in ::section.contains" ng-switch on="contain.type"> 
         <mms-view-para data-mms-para="::contain" ng-switch-when="Paragraph"></mms-view-para>
@@ -9,7 +9,7 @@
     </div>
 </div>
 
-<div ng-if="!section.contains">
+<div ng-if="section.specialization.instanceSpecificationSpecification">
 <div ng-show="! isEditing">
     <h4 ng-hide="recompileEdit">{{section.name}}</h4>
     <div ng-show="recompileEdit" class="panel panel-info"><h4>{{edit.name}}</h4></div>

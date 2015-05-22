@@ -299,11 +299,11 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
             var instance = $modal.open({
                 templateUrl: 'partials/mms/cancelConfirm.html',
                 scope: scope,
-                controller: ['scope', '$modalInstance', function(scope, $modalInstance) {
-                    scope.ok = function() {
+                controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
+                    $scope.ok = function() {
                         $modalInstance.close('ok');
                     };
-                    scope.cancel = function() {
+                    $scope.cancel = function() {
                         $modalInstance.dismiss();
                     };
                 }]
