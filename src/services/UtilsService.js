@@ -147,11 +147,98 @@ function UtilsService(_) {
             return ['elements', ws, id, ver];
     };
 
+    var makeHtmlTable = function(table) {
+        var result = '<table class="table table-bordered table-condensed">';
+        if (table.title)
+            result += '<caption>' + table.title + '</caption>';
+        if (table.header) {
+            result += '<thead>';
+            result += makeTableBody(table.header);
+            result += '</thead>';
+        }
+        result += '<tbody>';
+        result += makeTableBody(table.body);
+        result += '</tbody>';
+        result += '</table>';
+        return result;
+
+    };
+
+    var makeTableBody = function(body) {
+        var result = '';
+        body.forEach(function(row) {
+            result += '<tr>';
+            row.forEach(function(cell) {
+                result += '<td colspan="' + cell.colspan + '" rowspan="' + cell.rowspan + '">';
+                cell.content.forEach(function(thing) {
+                    result += '<div>';
+                    if (thing.type === 'Paragraph') {
+                        result += makeHtmlPara(thing);
+                    } else if (thing.type === 'Table') {
+                        result += makeHtmlTable(thing);
+                    } else if (thing.type === 'List') {
+                        result += makeHtmlList(thing);
+                    } else if (thing.type === 'Image') {
+                        result += '<mms-transclude-img mms-eid="' + thing.sysmlid + '"></mms-transclude-img>';
+                    }
+                    result += '</div>';
+                });
+                result += '</td>';
+            });
+            result += '</tr>';
+        });
+        return result;
+    };
+
+    var makeHtmlList = function(list) {
+        var result = '';
+        if (list.ordered)
+            result += '<ol>';
+        else
+            result += '<ul>';
+        list.list.forEach(function(item) {
+            result += '<li>';
+            item.forEach(function(thing) {
+                result += '<div>';
+                if (thing.type === 'Paragraph') {
+                    result += makeHtmlPara(thing);
+                } else if (thing.type === 'Table') {
+                    result += makeHtmlTable(thing);
+                } else if (thing.type === 'List') {
+                    result += makeHtmlList(thing);
+                } else if (thing.type === 'Image') {
+                    result += '<mms-transclude-img mms-eid="' + thing.sysmlid + '"></mms-transclude-img>';
+                }
+                result += '</div>';
+            });
+            result += '</li>';
+        });
+        if (list.ordered)
+            result += '</ol>';
+        else
+            result += '</ul>';
+        return result;
+    };
+
+    var makeHtmlPara = function(para) {
+        if (para.sourceType === 'text')
+            return para.text;
+        var t = 'doc';
+        if (para.sourceProperty === 'name')
+            t = 'name';
+        if (para.sourceProperty === 'value')
+            t = 'val';
+        return '<mms-transclude-' + t + ' data-mms-eid="' + para.source + '"></mms-transclude-' + t + '>';
+    };
+
     return {
         hasCircularReference: hasCircularReference,
         cleanElement: cleanElement,
         normalize: normalize,
         makeElementKey: makeElementKey,
-        buildTreeHierarchy: buildTreeHierarchy
+        buildTreeHierarchy: buildTreeHierarchy,
+        makeHtmlTable : makeHtmlTable,
+        makeHtmlPara: makeHtmlPara,
+        makeHtmlList: makeHtmlList
     };
 }
