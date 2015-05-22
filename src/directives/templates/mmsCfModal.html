@@ -3,7 +3,7 @@
     <h4>INSERT A CROSS-REFERENCE</h4>
 
     <div class="transclude-modal-instructions">
-        Begin by searching for an element, then click a cell in the results to insert a cross-reference.
+        Begin by searching for an element, then click a link to cross-reference.
     </div>
 
 </div>
@@ -22,15 +22,53 @@
         </form>
         <div class="misc-form-field" ng-show="mmsCfElements && searchSuccess">
             <div class="form-filter">
-                <input class="form-control" type="text" ng-model="filter" placeholder="Filter elements in the results" />
+                <input class="form-control" type="text" ng-model="filter" placeholder="Filter results" />
             </div>
             <div class="cant-find-element">
-                Can't find your element? <a ng-click="openProposeModal()" class="create-element-link">Create a new element</a>
+                Can't find your element? <a ng-click="openProposeModal()" class="create-element-link">Create a new one</a>
             </div>
         </div>
     </div>
 
-    <div class="container-fluid transclude-table" ng-show="mmsCfElements && searchSuccess">
+    <div class="container-fluid" ng-show="mmsCfElements && searchSuccess">
+        <div class="elem-wrapper" ng-repeat="elem in mmsCfElements | filter:filter">
+            <hr>
+            <div class="elem-name-wrapper">
+                <a class="elem-name" ng-click="choose(elem.sysmlid, 'name', elem.name)">{{elem.name}}</a>
+            </div>
+            <div class="elem-qualified-name-wrapper">
+                <div class="elem-qualified-name">
+                        {{elem.qualifiedName}}
+                </div>
+            </div>
+            <div class="elem-documentation-wrapper">
+                <label>DOCUMENTATION</label>
+                <div class="elem-documentation">
+                    <a ng-show="elem.documentation" ng-bind-html="elem.documentation | limitTo:300" ng-click="choose(elem.sysmlid, 'doc', elem.name)"></a>
+                    <a ng-show="!elem.documentation" ng-click="choose(elem.sysmlid, 'doc', elem.name)">This field is empty, but you can still click here to cross-reference a placeholder.</a>
+                </div>
+            </div>
+            <div class="elem-type-wrapper">
+                <label>TYPE</label>
+                <div class="elem-type">
+                    {{elem.specialization.type || 'Element'}}
+                </div>
+            </div>
+            <div ng-show="elem.specialization.value && elem.specialization.value[0]" class="elem-properties-wrapper">
+                <label>PROPERTIES</label>
+                <div class="elem-properties">
+                    <a ng-click="choose(elem.sysmlid, 'val', elem.name)">
+                        <span ng-repeat="val in elem.specialization.value">
+                            {{val.integer || val.double || val.boolean + '' || val.string}}
+                        </span>
+                        <span>{{elem.specialization.specification}}</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!--     <div class="container-fluid transclude-table" ng-show="mmsCfElements && searchSuccess">
         <table class="table table-bordered">
             <tr>
                 <th>NAME</th>
@@ -61,7 +99,7 @@
             </tr>
         </table>
     </div>
-
+ -->
 </div>
 
 <div class="modal-footer">
