@@ -469,8 +469,8 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                         return false;
                     }  
                 });
-                ed.on('keypress', function(e) {
-                    if (e.keyCode === 64) {
+                ed.on('keydown', function(e) {
+                    if (e.shiftKey && e.keyCode === 50) {
                         autocompleteCallback(ed);
                     }
                 });
