@@ -168,23 +168,31 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
      * reset editing object back to base element values for name, doc, values
      * 
      */
-    var revertEdits = function(scope) {
+    var revertEdits = function(scope, type, revertAll) {
         if (scope.mmsType === 'workspace') {
             scope.edit.name = scope.element.name;
-        } else if (scope.mmsType === 'tag') {
+        } 
+        else if (scope.mmsType === 'tag') {
             scope.edit.name = scope.element.name;
             scope.edit.description = scope.element.description;
-        } else {
-        scope.edit.name = scope.element.name;
-        scope.edit.documentation = scope.element.documentation;
-        if (scope.edit.specialization.type === 'Property' && angular.isArray(scope.edit.specialization.value)) {
-            scope.edit.specialization.value = _.cloneDeep(scope.element.specialization.value);
-            scope.editValues = scope.edit.specialization.value;
-        }
-        if (scope.edit.specialization.type === 'Constraint' && scope.edit.specialization.specification) {
-            scope.edit.specialization.specification = _.cloneDeep(scope.element.specialization.specification);
-            scope.editValue = scope.edit.specialization.specification;
-        }
+        } 
+        else {
+            if (type) {
+                scope.edit[type] = scope.element[type];
+            }
+            else if (revertAll) {
+                scope.edit.name = scope.element.name;
+                scope.edit.documentation = scope.element.documentation;
+            }
+
+            if (scope.edit.specialization && scope.edit.specialization.type === 'Property' && angular.isArray(scope.edit.specialization.value)) {
+                scope.edit.specialization.value = _.cloneDeep(scope.element.specialization.value);
+                scope.editValues = scope.edit.specialization.value;
+            }
+            else if (scope.edit.specialization && scope.edit.specialization.type === 'Constraint' && scope.edit.specialization.specification) {
+                scope.edit.specialization.specification = _.cloneDeep(scope.element.specialization.specification);
+                scope.editValue = scope.edit.specialization.specification;
+            }
         }
     };
 
@@ -207,11 +215,11 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
                 scope.isEditing = true;
                 scope.edit = data;
 
-                if (scope.edit.specialization.type === 'Property' && angular.isArray(scope.edit.specialization.value)) {
-                    scope.editValues = scope.edit.specialization.value;
+                if (data.specialization.type === 'Property' && angular.isArray(data.specialization.value)) {
+                    scope.editValues = data.specialization.value;
                 }
-                if (scope.edit.specialization.type === 'Constraint' && scope.edit.specialization.specification) {
-                    scope.editValues = [scope.edit.specialization.specification];
+                if (data.specialization.type === 'Constraint' && data.specialization.specification) {
+                    scope.editValues = [data.specialization.specification];
                 }
 
                 if (template) {
@@ -240,7 +248,7 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
         }
     };
 
-    var saveAction = function(scope, recompile, mmsViewCtrl, bbApi, editObj) {
+    var saveAction = function(scope, recompile, mmsViewCtrl, bbApi, editObj, type) {
 
         if (scope.elementSaving) {
             growl.info('Please Wait...');
@@ -264,7 +272,28 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
             });
         }
 
-        save(scope.edit, scope.ws, "element", id, null, scope).then(function(data) {
+        // Want the save object to contain only what properties were edited:
+        var myEdit = {sysmlid: scope.edit.sysmlid};
+        if (type) {
+            myEdit[type] = scope.edit[type];
+        }
+        else if (scope.edit.specialization.type === 'Property' && angular.isArray(scope.edit.specialization.value)) {
+            myEdit.specialization = {
+                                        value: scope.edit.specialization.value,
+                                        type: 'Property'
+                                    };
+        }
+        else if (scope.edit.specialization.type === 'Constraint' && scope.edit.specialization.specification) {
+            myEdit.specialization = {
+                                        specification: scope.edit.specialization.specification,
+                                        type: 'Constraint'
+                                    };
+        }
+        else {
+            myEdit = scope.edit;
+        }
+
+        save(myEdit, scope.ws, "element", id, null, scope).then(function(data) {
             scope.elementSaving = false;
             scope.cleanUp = true;
             scope.isEditing = false;
@@ -286,7 +315,7 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
         var cancelCleanUp = function() {
             scope.cleanUp = true;
             scope.isEditing = false;
-            revertEdits(scope);
+            revertEdits(scope, type);
              // Broadcast message for the ToolCtrl:
             $rootScope.$broadcast('presentationElem.cancel',scope.edit, scope.ws);
             recompile();

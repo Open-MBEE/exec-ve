@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsTranscludeDoc', ['Utils','ElementService', 'UtilsService', 'ViewService', 'UxService', '$compile', '$log', '$templateCache', '$rootScope', '$modal', 'growl', mmsTranscludeDoc]);
+.directive('mmsTranscludeDoc', ['Utils','ElementService', 'UtilsService', 'ViewService', 'UxService', '$compile', '$log', '$templateCache', '$rootScope', '$modal', 'growl', '_', mmsTranscludeDoc]);
 
 /**
  * @ngdoc directive
@@ -27,7 +27,7 @@ angular.module('mms.directives')
  * @param {string=master} mmsWs Workspace to use, defaults to master
  * @param {string=latest} mmsVersion Version can be alfresco version number or timestamp, default is latest
  */
-function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxService, $compile, $log, $templateCache, $rootScope, $modal, growl) {
+function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxService, $compile, $log, $templateCache, $rootScope, $modal, growl, _) {
 
     var template = $templateCache.get('mms/templates/mmsTranscludeDoc.html');
 
@@ -117,8 +117,42 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                 scope.element = data;
                 if (!scope.panelTitle)
                     scope.panelTitle = scope.element.name;
+
                 recompile();
                 scope.$watch('element.documentation', recompile);
+
+                // TODO: below has issues when having edits.  For some reason this is
+                //       entered twice, once and the frame is added, and then again
+                //       and recompileEdit is ran! 
+                
+                // // We cant count on scope.edit or scope.isEditing in the case that the
+                // // view name is saved while the view documenation is being edited, so
+                // // no way to know if there should be a frame or not based on that, so
+                // // get the edit object from the cache and check the editable state
+                // // and if we have any edits: 
+                // ElementService.getElementForEdit(scope.mmsEid, false, ws)
+                // .then(function(edit) {
+
+                //     // TODO: replace with Utils.hasEdits() after refactoring to not pass in scope
+                //     //if (_.isEqual(edit, data)) {
+                //     if (edit.documentation === data.documentation) {
+                //         recompile();
+                //     }
+                //     else {
+                //         if (mmsViewCtrl && mmsViewCtrl.isEditable()) {
+                //             Utils.addFrame(scope,mmsViewCtrl,element,template);
+                //         }
+                //         else {
+                //             scope.recompileEdit = true;
+                //             recompileEdit();
+                //         }
+                //     }
+
+                // }, function(reason) {
+                //     element.html('<span class="error">doc cf ' + newVal + ' not found</span>');
+                //     growl.error('Cf Doc Error: ' + reason.message + ': ' + scope.mmsEid);
+                // });
+
             }, function(reason) {
                 element.html('<span class="error">doc cf ' + newVal + ' not found</span>');
                 growl.error('Cf Doc Error: ' + reason.message + ': ' + scope.mmsEid);
@@ -144,7 +178,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             });
 
             scope.save = function() {
-                Utils.saveAction(scope,recompile,mmsViewCtrl,scope.bbApi);
+                Utils.saveAction(scope,recompile,mmsViewCtrl,scope.bbApi,null,"documentation");
             };
 
             scope.cancel = function() {
