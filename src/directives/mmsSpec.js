@@ -205,7 +205,7 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, $compil
          * 
          */
         scope.revertEdits = function() {
-            Utils.revertEdits(scope);
+            Utils.revertEdits(scope, null, true);
         };
         
         var conflictCtrl = function($scope, $modalInstance) {

@@ -49,7 +49,7 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
      *      or force save. If the user decides to discord or merge, type will be info even though 
      *      the original save failed. Error means an actual error occured. 
      */
-    var save = function(edit, mmsWs, mmsType, mmsEid, tinymceApi, $scope) {
+    var save = function(edit, mmsWs, mmsType, mmsEid, tinymceApi, scope) {
         var deferred = $q.defer();
         // TODO: put this back when removed scope.editing from view documentation edit
         /* if (!scope.editable || !scope.editing) {
@@ -81,11 +81,11 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
                 //scope.editing = false;
             }, function(reason) {
                 if (reason.status === 409) {
-                    $scope.latest = reason.data.elements[0];
+                    scope.latest = reason.data.elements[0];
                     var instance = $modal.open({
                         template: $templateCache.get('mms/templates/saveConflict.html'),
                         controller: ['$scope', '$modalInstance', conflictCtrl],
-                        scope: $scope,
+                        scope: scope,
                         size: 'lg'
                     });
                     instance.result.then(function(choice) {
@@ -115,8 +115,8 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
                                 deferred.reject({type: 'error', message: 'Merge error: ' + reason2.message});
                             });
                         } else if (choice === 'force') {
-                            edit.read = $scope.latest.read;
-                            edit.modified = $scope.latest.modified;
+                            edit.read = scope.latest.read;
+                            edit.modified = scope.latest.modified;
                             save().then(function(resolved) {
                                 deferred.resolve(resolved);
                             }, function(error) {
@@ -147,14 +147,14 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
      * 
      * @return {boolean} has changes or not
      */
-     var hasEdits = function($scope, type) {
+     var hasEdits = function(scope, type) {
         // TODO: this doesnt handle constraints and other cases
-        if ($scope.edit === null)
+        if (scope.edit === null)
             return false;
-        if (type && $scope.edit[type] !== $scope.element[type])
+        if (type && scope.edit[type] !== scope.element[type])
             return true;
-        if ($scope.edit.specialization && $scope.edit.specialization.type === 'Property' && 
-            !angular.equals($scope.edit.specialization.value, $scope.element.specialization.value))
+        if (scope.edit.specialization && scope.edit.specialization.type === 'Property' && 
+            !angular.equals(scope.edit.specialization.value, scope.element.specialization.value))
             return true;
         return false;
     };
@@ -168,23 +168,31 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
      * reset editing object back to base element values for name, doc, values
      * 
      */
-    var revertEdits = function($scope) {
-        if ($scope.mmsType === 'workspace') {
-            $scope.edit.name = $scope.element.name;
-        } else if ($scope.mmsType === 'tag') {
-            $scope.edit.name = $scope.element.name;
-            $scope.edit.description = $scope.element.description;
-        } else {
-        $scope.edit.name = $scope.element.name;
-        $scope.edit.documentation = $scope.element.documentation;
-        if ($scope.edit.specialization.type === 'Property' && angular.isArray($scope.edit.specialization.value)) {
-            $scope.edit.specialization.value = _.cloneDeep($scope.element.specialization.value);
-            $scope.editValues = $scope.edit.specialization.value;
-        }
-        if ($scope.edit.specialization.type === 'Constraint' && $scope.edit.specialization.specification) {
-            $scope.edit.specialization.specification = _.cloneDeep($scope.element.specialization.specification);
-            $scope.editValue = $scope.edit.specialization.specification;
-        }
+    var revertEdits = function(scope, type, revertAll) {
+        if (scope.mmsType === 'workspace') {
+            scope.edit.name = scope.element.name;
+        } 
+        else if (scope.mmsType === 'tag') {
+            scope.edit.name = scope.element.name;
+            scope.edit.description = scope.element.description;
+        } 
+        else {
+            if (type) {
+                scope.edit[type] = scope.element[type];
+            }
+            else if (revertAll) {
+                scope.edit.name = scope.element.name;
+                scope.edit.documentation = scope.element.documentation;
+            }
+
+            if (scope.edit.specialization && scope.edit.specialization.type === 'Property' && angular.isArray(scope.edit.specialization.value)) {
+                scope.edit.specialization.value = _.cloneDeep(scope.element.specialization.value);
+                scope.editValues = scope.edit.specialization.value;
+            }
+            else if (scope.edit.specialization && scope.edit.specialization.type === 'Constraint' && scope.edit.specialization.specification) {
+                scope.edit.specialization.specification = _.cloneDeep(scope.element.specialization.specification);
+                scope.editValue = scope.edit.specialization.specification;
+            }
         }
     };
 
@@ -197,35 +205,37 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
             growl.error(reason.message);
     };
 
-    var addFrame = function($scope, mmsViewCtrl, element, template, editObj) {
+    var addFrame = function(scope, mmsViewCtrl, element, template, editObj) {
 
-        if (mmsViewCtrl.isEditable() && !$scope.isEditing && !$scope.cleanUp) {
+        if (mmsViewCtrl.isEditable() && !scope.isEditing && !scope.cleanUp) {
 
-            var id = editObj ? editObj.sysmlid : $scope.mmsEid;
-            ElementService.getElementForEdit(id, false, $scope.ws)
+            var id = editObj ? editObj.sysmlid : scope.mmsEid;
+            ElementService.getElementForEdit(id, false, scope.ws)
             .then(function(data) {
-                $scope.isEditing = true;
-                $scope.edit = data;
+                scope.isEditing = true;
+                scope.edit = data;
 
-                if ($scope.edit.specialization.type === 'Property' && angular.isArray($scope.edit.specialization.value)) {
-                    $scope.editValues = $scope.edit.specialization.value;
+                if (data.specialization.type === 'Property' && angular.isArray(data.specialization.value)) {
+                    scope.editValues = data.specialization.value;
                 }
-                if ($scope.edit.specialization.type === 'Constraint' && $scope.edit.specialization.specification) {
-                    $scope.editValues = [$scope.edit.specialization.specification];
+                if (data.specialization.type === 'Constraint' && data.specialization.specification) {
+                    scope.editValues = [data.specialization.specification];
                 }
 
-                element.empty();
-                element.append(template);
-                $compile(element.contents())($scope); 
+                if (template) {
+                    element.empty();
+                    element.append(template);
+                    $compile(element.contents())(scope);
+                }
 
                 // Broadcast message for the toolCtrl:
-                $rootScope.$broadcast('presentationElem.edit',$scope.edit, $scope.ws);
+                $rootScope.$broadcast('presentationElem.edit',scope.edit, scope.ws);
             }, handleError);
 
             // TODO: Should this check the entire or just the instance specification
             // TODO: How smart does it need to be, since the instance specification is just a reference.
             // Will need to unravel until the end to check all references
-            ElementService.isCacheOutdated(id, $scope.ws)
+            ElementService.isCacheOutdated(id, scope.ws)
             .then(function(data) {
                 if (data.status && data.server.modified > data.cache.modified)
                     growl.warning('This element has been updated on the server');
@@ -233,30 +243,66 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
         }
 
         // This logic prevents a cancel/save from also triggering a open edit
-        if ($scope.cleanUp) {
-            $scope.cleanUp = false;
+        if (scope.cleanUp) {
+            scope.cleanUp = false;
         }
     };
 
-    var saveAction = function($scope, recompile, mmsViewCtrl, bbApi, editObj) {
+    var saveAction = function(scope, recompile, mmsViewCtrl, bbApi, editObj, type) {
 
-        if ($scope.elementSaving) {
+        if (scope.elementSaving) {
             growl.info('Please Wait...');
             return;
         }
         bbApi.toggleButtonSpinner('presentation.element.save');
-        $scope.elementSaving = true;
-        var id = editObj ? editObj.sysmlid : $scope.mmsEid;
-        save($scope.edit, $scope.ws, "element", id, null, $scope).then(function(data) {
-            $scope.elementSaving = false;
-            $scope.isEditing = false;
-            $scope.cleanUp = true;
+        scope.elementSaving = true;
+        var id = editObj ? editObj.sysmlid : scope.mmsEid;
+
+        // If it is a Section, then merge the changes b/c deletions to the Section's contents
+        // are not done on the scope.edit.
+        if (editObj && ViewService.isSection(editObj)) {
+            _.merge(scope.edit, editObj, function(a,b,id) {
+                if (angular.isArray(a) && angular.isArray(b) && b.length < a.length) {
+                    return b;
+                }
+
+                if (id === 'name') {
+                    return a;
+                }
+            });
+        }
+
+        // Want the save object to contain only what properties were edited:
+        var myEdit = {sysmlid: scope.edit.sysmlid};
+        if (type) {
+            myEdit[type] = scope.edit[type];
+        }
+        else if (scope.edit.specialization.type === 'Property' && angular.isArray(scope.edit.specialization.value)) {
+            myEdit.specialization = {
+                                        value: scope.edit.specialization.value,
+                                        type: 'Property'
+                                    };
+        }
+        else if (scope.edit.specialization.type === 'Constraint' && scope.edit.specialization.specification) {
+            myEdit.specialization = {
+                                        specification: scope.edit.specialization.specification,
+                                        type: 'Constraint'
+                                    };
+        }
+        else {
+            myEdit = scope.edit;
+        }
+
+        save(myEdit, scope.ws, "element", id, null, scope).then(function(data) {
+            scope.elementSaving = false;
+            scope.cleanUp = true;
+            scope.isEditing = false;
             // Broadcast message for the toolCtrl:
-            $rootScope.$broadcast('presentationElem.save',$scope.edit, $scope.ws);
+            $rootScope.$broadcast('presentationElem.save',scope.edit, scope.ws);
             recompile();
             growl.success('Save Successful');
         }, function(reason) {
-            $scope.elementSaving = false;
+            scope.elementSaving = false;
             handleError(reason);
         }).finally(function() {
             bbApi.toggleButtonSpinner('presentation.element.save');
@@ -264,24 +310,24 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
 
     };
 
-    var cancelAction = function($scope, mmsViewCtrl, recompile, bbApi, type) {
+    var cancelAction = function(scope, mmsViewCtrl, recompile, bbApi, type) {
 
         var cancelCleanUp = function() {
-            $scope.isEditing = false;
-            $scope.cleanUp = true;
-            revertEdits($scope);
+            scope.cleanUp = true;
+            scope.isEditing = false;
+            revertEdits(scope, type);
              // Broadcast message for the ToolCtrl:
-            $rootScope.$broadcast('presentationElem.cancel',$scope.edit, $scope.ws);
+            $rootScope.$broadcast('presentationElem.cancel',scope.edit, scope.ws);
             recompile();
         };
 
         bbApi.toggleButtonSpinner('presentation.element.cancel');
 
         // Only need to confirm the cancellation if edits have been made:
-        if (hasEdits($scope, type)) {
+        if (hasEdits(scope, type)) {
             var instance = $modal.open({
                 templateUrl: 'partials/mms/cancelConfirm.html',
-                scope: $scope,
+                scope: scope,
                 controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
                     $scope.ok = function() {
                         $modalInstance.close('ok');
@@ -303,44 +349,49 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
         }
     };
 
-    var deleteAction = function($scope, bbApi, section) {
+    var deleteAction = function(scope, bbApi, section) {
         bbApi.toggleButtonSpinner('presentation.element.delete');
-        var viewOrSecId = section ? section.sysmlid : $scope.view.sysmlid;
-        ViewService.deleteElementFromViewOrSection(viewOrSecId, $scope.ws, $scope.instanceVal).then(function(data) {
+        var viewOrSecId = section ? section.sysmlid : scope.view.sysmlid;
+        ViewService.deleteElementFromViewOrSection(viewOrSecId, scope.ws, scope.instanceVal).then(function(data) {
+            if (ViewService.isSection(scope.presentationElem)) {
+                // Broadcast message to TreeCtrl:
+                $rootScope.$broadcast('viewctrl.delete.section', scope.presentationElem.name);
+            }
+             // Broadcast message for the ToolCtrl:
+            $rootScope.$broadcast('presentationElem.cancel',scope.edit, scope.ws);
+
             growl.success('Delete Successful');
         }, handleError).finally(function() {
             bbApi.toggleButtonSpinner('presentation.element.delete');
         });
 
-        if (ViewService.isSection($scope.presentationElem)) {
-            // Broadcast message to TreeCtrl:
-            $rootScope.$broadcast('viewctrl.delete.section', $scope.presentationElem.name);
-        }
 
     };
 
-    var showEditCallBack = function($scope, mmsViewCtrl, element, template, recompile, recompileEdit, type, editObj) {
+    var showEditCallBack = function(scope, mmsViewCtrl, element, template, recompile, recompileEdit, type, editObj) {
 
         // Going into edit mode, so add a frame if had a previous edit in progress:
         if (mmsViewCtrl.isEditable()) {
-            if ($scope.edit && hasEdits($scope, type)) {
-                addFrame($scope,mmsViewCtrl,element,template,editObj);
+            if (scope.edit && hasEdits(scope, type)) {
+                scope.recompileEdit = false;
+                addFrame(scope,mmsViewCtrl,element,template,editObj);
             }
         }
         // Leaving edit mode, so highlight the unsaved edit if needed:
         else {
-            $scope.isEditing = false;
-            $scope.cleanUp = false;
-            $scope.elementSaving = false;
-            if ($scope.edit && hasEdits($scope, type)) {
+            scope.isEditing = false;
+            scope.cleanUp = false;
+            scope.elementSaving = false;
+            if (scope.edit && hasEdits(scope, type)) {
+                scope.recompileEdit = true;
                 recompileEdit();
             }
             else {
-                if ($scope.edit && $scope.ws) {
+                if (scope.edit && scope.ws) {
                     // Broadcast message for the ToolCtrl to clear out the tracker window:
-                    $rootScope.$broadcast('presentationElem.cancel',$scope.edit, $scope.ws);
+                    $rootScope.$broadcast('presentationElem.cancel',scope.edit, scope.ws);
                 }
-                if ($scope.element)
+                if (scope.element)
                     recompile();
             }
         }

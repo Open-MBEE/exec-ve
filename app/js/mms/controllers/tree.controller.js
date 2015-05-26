@@ -429,10 +429,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
         };
 
         if (element.specialization) {
-            if (element.specialization.contains) {
-                contains = element.specialization.contains;
-            }
-
+          
             if (element.specialization.contents) {
                 contents = element.specialization.contents;
             }
@@ -441,13 +438,17 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
                      element.specialization.instanceSpecificationSpecification) {
                 contents = element.specialization.instanceSpecificationSpecification;
             }
+            else if (element.specialization.contains) {
+                contains = element.specialization.contains;
+            }
         }
         else {
-            if (element.contains) {
-                contains = element.contains;
-            }
+
             if (element.contents) {
                 contents = element.contents;
+            }
+            else if (element.contains) {
+                contains = element.contains;
             }
         }
 
@@ -962,11 +963,9 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
     }
 
     // ViewCtrl creates this event when adding sections to the view
-    $scope.$on('viewctrl.add.section', function(event, instanceSpec) {
+    $scope.$on('viewctrl.add.section', function(event, instanceSpec, parentBranchName) {
 
-        // TODO it may not be the selected branch, may just want to move add sections
-        //      to left pane/tree controller
-        var branch = $scope.treeApi.get_selected_branch();
+        var branch = $scope.treeApi.get_branch(parentBranchName);
 
         var newbranch = {
             label: instanceSpec.name,

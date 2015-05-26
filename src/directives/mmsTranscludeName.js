@@ -83,10 +83,11 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
             if (mmsViewCtrl) {
                 var viewVersion = mmsViewCtrl.getWsAndVersion();
                 if (!ws)
-                    scope.ws = viewVersion.workspace;
+                    ws = viewVersion.workspace;
                 if (!version)
                     version = viewVersion.version;
             }
+            scope.ws = ws;
             scope.version = version ? version : 'latest';
             ElementService.getElement(scope.mmsEid, false, ws, version)
             .then(function(data) {
@@ -114,12 +115,18 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
             scope.cleanUp = false;
             scope.view = mmsViewCtrl.getView();
 
-            mmsViewCtrl.registerPresenElemCallBack(function() {
+            var callback = function() {
                 Utils.showEditCallBack(scope,mmsViewCtrl,element,template,recompile,recompileEdit,"name");
+            };
+            
+            mmsViewCtrl.registerPresenElemCallBack(callback);
+
+            scope.$on('$destroy', function() {
+                mmsViewCtrl.unRegisterPresenElemCallBack(callback);
             });
 
             scope.save = function() {
-                Utils.saveAction(scope,recompile,mmsViewCtrl,scope.bbApi);
+                Utils.saveAction(scope,recompile,mmsViewCtrl,scope.bbApi,null,"name");
             };
 
             scope.cancel = function() {

@@ -5,17 +5,7 @@ angular.module('mms.directives')
 
 function mmsViewSection($compile, $templateCache, $rootScope, ElementService, UxService, Utils) {
 
-    // TODO: 
-    //      Deleting sections with in sections gives a console error, prob b/c the section is not
-    //      added to the tree correctly which needs to fixed
-    //
-    //      Tracker is not cleared for children of the section that are opened when the section
-    //      is opened also.
-
-
     var defaultTemplate = $templateCache.get('mms/templates/mmsViewSection.html');
-    var frameTemplate = $templateCache.get('mms/templates/mmsViewSectionFrame.html');
-    var editTemplate = $templateCache.get('mms/templates/mmsViewSectionEdit.html');
 
     var mmsViewSectionCtrl = function($scope, $rootScope) {
 
@@ -24,13 +14,6 @@ function mmsViewSection($compile, $templateCache, $rootScope, ElementService, Ux
         $scope.buttons = [];
         $scope.buttonsInit = false;
         $scope.element = $scope.section;  // This is for methods in Utils 
-
-        // if ($scope.section && $scope.section.specialization && 
-        //     $scope.section.specialization.instanceSpecificationSpecification && 
-        //     $scope.section.specialization.instanceSpecificationSpecification.operand) {
-
-        //     $scope.sectionInstanceVals = $scope.section.specialization.instanceSpecificationSpecification.operand;
-        // }
 
         $scope.bbApi.init = function() {
             if (!$scope.buttonsInit) {
@@ -56,20 +39,15 @@ function mmsViewSection($compile, $templateCache, $rootScope, ElementService, Ux
         });
 
         var recompile = function() {
-            element.empty();
-            element.append(defaultTemplate);
-            $compile(element.contents())(scope); 
+            // do nothing
         };
 
         var recompileEdit = function() {
-            element.empty();
-            element.append(editTemplate);
-            $compile(element.contents())(scope); 
+            // do nothing
         };
 
-        // element.append(defaultTemplate);
-        // $compile(element.contents())(scope); 
-        recompile();
+        element.append(defaultTemplate);
+        $compile(element.contents())(scope); 
 
         scope.structEditable = function() {
             if (mmsViewCtrl) {
@@ -87,6 +65,7 @@ function mmsViewSection($compile, $templateCache, $rootScope, ElementService, Ux
         if (mmsViewCtrl && mmsViewPresentationElemCtrl) {
             
             scope.isEditing = false;
+            scope.recompileEdit = false;
             scope.elementSaving = false;
             scope.cleanUp = false;
             scope.instanceSpec = mmsViewPresentationElemCtrl.getInstanceSpec();
@@ -94,13 +73,19 @@ function mmsViewSection($compile, $templateCache, $rootScope, ElementService, Ux
             scope.presentationElem = mmsViewPresentationElemCtrl.getPresentationElement();
             scope.view = mmsViewCtrl.getView();
             scope.isDirectChildOfPresentationElement = Utils.isDirectChildOfPresentationElementFunc(element, mmsViewCtrl);
+            
+            var callback = function() {
+                Utils.showEditCallBack(scope,mmsViewCtrl,element,null,recompile,recompileEdit,"name",scope.section);
+            };
 
-            mmsViewCtrl.registerPresenElemCallBack(function() {
-                Utils.showEditCallBack(scope,mmsViewCtrl,element,frameTemplate,recompile,recompileEdit,"name",scope.section);
+            mmsViewCtrl.registerPresenElemCallBack(callback);
+
+            scope.$on('$destroy', function() {
+                mmsViewCtrl.unRegisterPresenElemCallBack(callback);
             });
 
             scope.save = function() {
-                Utils.saveAction(scope,recompile,mmsViewCtrl,scope.bbApi,scope.section);
+                Utils.saveAction(scope,recompile,mmsViewCtrl,scope.bbApi,scope.section,"name");
             };
 
             scope.cancel = function() {
@@ -112,7 +97,7 @@ function mmsViewSection($compile, $templateCache, $rootScope, ElementService, Ux
             };
 
             scope.addFrame = function() {
-                Utils.addFrame(scope,mmsViewCtrl,element,frameTemplate,scope.section);
+                Utils.addFrame(scope,mmsViewCtrl,element,null,scope.section);
             };
         } 
     };

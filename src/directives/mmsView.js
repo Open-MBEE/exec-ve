@@ -127,6 +127,13 @@ function mmsView(ViewService, $templateCache, $rootScope, growl) {
             $scope.presentationElemCleanUpFncs.push(callback);
         };
 
+        this.unRegisterPresenElemCallBack = function(callback) {
+            var idx = $scope.presentationElemCleanUpFncs.indexOf(callback);
+
+            if (idx >= 0)
+                $scope.presentationElemCleanUpFncs.splice(idx, 1);
+        };
+
     };
 
     var mmsViewLink = function(scope, element, attrs) {

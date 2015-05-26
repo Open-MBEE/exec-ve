@@ -60,56 +60,59 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
     .state('workspaces', {
         url: '/workspaces',
         resolve: {
-            workspaces: function(WorkspaceService) {
+            dummyLogin: function($http, URLService) {
+                return $http.get(URLService.getCheckLoginURL());
+            },
+            workspaces: function(WorkspaceService, dummyLogin) {
                 return WorkspaceService.getWorkspaces();
             },
-            workspace: function () {
+            workspace: function (dummyLogin) {
                 return 'master';
             },
-            workspaceObj: function (WorkspaceService, workspace) {
+            workspaceObj: function (WorkspaceService, workspace, dummyLogin) {
                 // TODO; replace workspace with workspaceObj, but first all controllers
                 // need to be adapted to handle workspace as an object and not a string
                 return WorkspaceService.getWorkspace(workspace);
             },  
-            tags: function(ConfigService, workspace) {
+            tags: function(ConfigService, workspace, dummyLogin) {
                 return ConfigService.getConfigs(workspace, false);
             },
-            tag: function ($stateParams, ConfigService, workspace) {
+            tag: function ($stateParams, ConfigService, workspace, dummyLogin) {
                 return { name: 'latest', timestamp: 'latest' };
             },  
-            sites: function(SiteService) {                 
+            sites: function(SiteService, dummyLogin) {                 
                return SiteService.getSites();
             },
-            site: function(SiteService) {
+            site: function(SiteService, dummyLogin) {
                 return SiteService.getSite('no_site');
             },
-            document : function(ElementService, workspace, time, growl) {
+            document : function(ElementService, workspace, time, growl, dummyLogin) {
                 return null;
             },
-            views: function() {
+            views: function(dummyLogin) {
                 return null;
             },
-            view: function() {
+            view: function(dummyLogin) {
                 return null;
             },
-            viewElements: function(ViewService, workspace, document, time) {
+            viewElements: function(ViewService, workspace, document, time, dummyLogin) {
                 if (document === null) 
                     return null;
                 return ViewService.getViewElements(document.sysmlid, false, workspace, time);
             },   
-            time: function(tag) {
+            time: function(tag, dummyLogin) {
                 return tag.timestamp;
             },
-            configSnapshots: function(ConfigService, workspace, tag) {
+            configSnapshots: function(ConfigService, workspace, tag, dummyLogin) {
                 return [];
             },
-            snapshots: function() {
+            snapshots: function(dummyLogin) {
                 return [];        
             },
-            snapshot: function() {
+            snapshot: function(dummyLogin) {
                 return null;
             },
-            docFilter: function() {
+            docFilter: function(dummyLogin) {
                 return null;
             }
         },
@@ -147,18 +150,18 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
             workspace: function ($stateParams) {
                 return $stateParams.workspace;
             },
-            workspaceObj: function (WorkspaceService, workspace) {
+            workspaceObj: function (WorkspaceService, workspace, dummyLogin) {
                 return WorkspaceService.getWorkspace(workspace);
             },
-            sites: function(SiteService, time) {                 
+            sites: function(SiteService, time, dummyLogin) {                 
                 if (time === 'latest')
                     return SiteService.getSites();
                 return SiteService.getSites(time);
             },
-            site: function(SiteService) {
+            site: function(SiteService, dummyLogin) {
                 return SiteService.getSite('no_site');
             },
-            document : function(ElementService, workspace, time, growl, workspaceObj) {
+            document : function(ElementService, workspace, time, growl, workspaceObj, dummyLogin) {
             
                 // This is a short-term work-around -- all this should be done the back-end MMS in the future
                 var wsCoverDocId = 'master_cover';
@@ -198,7 +201,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
 
                 });
             },
-            docFilter: function(ElementService, workspace, time, document) {
+            docFilter: function(ElementService, workspace, time, document, dummyLogin) {
                 return ElementService.getElement("master_filter", false, workspace, time)
                 .then(function(data) {
                     return data;
@@ -218,33 +221,33 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
                     });
                 });
             },
-            views: function(ViewService, workspace, document, time) {
+            views: function(ViewService, workspace, document, time, dummyLogin) {
                 return [];
             },
-            viewElements: function(ViewService, workspace, document, time) {
+            viewElements: function(ViewService, workspace, document, time, dummyLogin) {
                 if (document === null) 
                     return [];
                 return ViewService.getViewElements(document.sysmlid, false, workspace, time);
             },    
-            view: function(ViewService, workspace, document, time) {
+            view: function(ViewService, workspace, document, time, dummyLogin) {
                 if (document === null) 
                     return null;
                 return ViewService.getView(document.sysmlid, false, workspace, time);
             },
-            tags: function(ConfigService, workspace) {
+            tags: function(ConfigService, workspace, dummyLogin) {
                 return ConfigService.getConfigs(workspace, false);
             },
-            tag: function ($stateParams, ConfigService, workspace) {
+            tag: function ($stateParams, ConfigService, workspace, dummyLogin) {
                 if ($stateParams.tag === undefined || $stateParams.tag === 'latest')
                     return { name: 'latest', timestamp: 'latest' };
                 return ConfigService.getConfig($stateParams.tag, workspace, false);
             },        
-            configSnapshots: function(ConfigService, workspace, tag) {
+            configSnapshots: function(ConfigService, workspace, tag, dummyLogin) {
                 if (tag.timestamp === 'latest')
                     return [];
                 return ConfigService.getConfigSnapshots(tag.id, workspace, false);
             },
-            time: function(tag) {
+            time: function(tag, dummyLogin) {
                 return tag.timestamp;
             }
         },
@@ -304,10 +307,10 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
         url: '/:site',
         parent: 'workspace.sites',
         resolve: {
-            site: function($stateParams, SiteService) {
+            site: function($stateParams, SiteService, dummyLogin) {
                 return SiteService.getSite($stateParams.site);
             },
-            document : function($stateParams, ElementService, workspace, site, time, growl) {
+            document : function($stateParams, ElementService, workspace, site, time, growl, dummyLogin) {
                 var siteCoverDocId;
                 if ($stateParams.site === 'no_site')
                     return null;
@@ -353,17 +356,17 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
                     });
                 });
             },
-            views: function(ViewService, workspace, document, time) {
+            views: function(ViewService, workspace, document, time, dummyLogin) {
                 if (document === null) 
                     return null;
                 return ViewService.getDocumentViews(document.sysmlid, false, workspace, time, true);
             },
-            viewElements: function(ViewService, workspace, document, time) {
+            viewElements: function(ViewService, workspace, document, time, dummyLogin) {
                 if (document === null) 
                     return null;
                 return ViewService.getViewElements(document.sysmlid, false, workspace, time);
             },    
-            view: function(ViewService, workspace, document, time) {
+            view: function(ViewService, workspace, document, time, dummyLogin) {
                 if (document === null) 
                     return null;
                 return ViewService.getView(document.sysmlid, false, workspace, time);
@@ -392,25 +395,25 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
     .state('workspace.site.documentpreview', {
         url: '/document/:document',
         resolve: {
-            document: function($stateParams, ElementService, workspace, time) {
+            document: function($stateParams, ElementService, workspace, time, dummyLogin) {
                 return ElementService.getElement($stateParams.document, false, workspace, time);
             },
-            views: function(ViewService, workspace, document, time) {
+            views: function(ViewService, workspace, document, time, dummyLogin) {
                 if (document === null) 
                     return null;
                 return ViewService.getDocumentViews(document.sysmlid, false, workspace, time, true);
             },
-            viewElements: function(ViewService, workspace, document, time) {
+            viewElements: function(ViewService, workspace, document, time, dummyLogin) {
                 if (document === null) 
                     return null;
                 return ViewService.getViewElements(document.sysmlid, false, workspace, time);
             },    
-            view: function(ViewService, workspace, document, time) {
+            view: function(ViewService, workspace, document, time, dummyLogin) {
                 if (document === null) 
                     return null;
                 return ViewService.getView(document.sysmlid, false, workspace, time);
             },
-            snapshot: function(configSnapshots, document) {
+            snapshot: function(configSnapshots, document, dummyLogin) {
                 var docid = document.sysmlid;
                 var found = null;
                 configSnapshots.forEach(function(snapshot) {
@@ -430,26 +433,26 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
     .state('workspace.site.document', {
         url: '/documents/:document?time',
         resolve: {
-            document: function($stateParams, ElementService, time) {
+            document: function($stateParams, ElementService, time, dummyLogin) {
                 return ElementService.getElement($stateParams.document, false, $stateParams.workspace, time);
             },
-            views: function($stateParams, ViewService, document, time) {
+            views: function($stateParams, ViewService, document, time, dummyLogin) {
                 if (document.specialization.type !== 'Product')
                     return [];
                 return ViewService.getDocumentViews($stateParams.document, false, $stateParams.workspace, time, true);
             },
-            viewElements: function($stateParams, ViewService, time) {
+            viewElements: function($stateParams, ViewService, time, dummyLogin) {
                 return ViewService.getViewElements($stateParams.document, false, $stateParams.workspace, time);
             },
-            view: function($stateParams, ViewService, viewElements, time) {
+            view: function($stateParams, ViewService, viewElements, time, dummyLogin) {
                 return ViewService.getView($stateParams.document, false, $stateParams.workspace, time);
             },
-            snapshots: function(ConfigService, workspace, site, document) {
+            snapshots: function(ConfigService, workspace, site, document, dummyLogin) {
                 if (document.specialization.type !== 'Product')
                     return [];
                 return ConfigService.getProductSnapshots(document.sysmlid, site.sysmlid, workspace);
             },
-            snapshot: function(configSnapshots, document) {
+            snapshot: function(configSnapshots, document, dummyLogin) {
                 var docid = document.sysmlid;
                 var found = null;
                 configSnapshots.forEach(function(snapshot) {
@@ -458,7 +461,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
                 });
                 return found; 
             },
-            tag: function ($stateParams, ConfigService, workspace, snapshots) {
+            tag: function ($stateParams, ConfigService, workspace, snapshots, dummyLogin) {
                 if ($stateParams.tag === undefined)
                 {
                     if ($stateParams.time !== undefined && $stateParams.time !== 'latest') {
@@ -493,12 +496,12 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
                     return ConfigService.getConfig($stateParams.tag, workspace, false);
                 }
             },        
-            configSnapshots: function(ConfigService, workspace, tag) {
+            configSnapshots: function(ConfigService, workspace, tag, dummyLogin) {
                 if (tag.timestamp === 'latest')
                     return [];
                 return ConfigService.getConfigSnapshots(tag.id, workspace, false);
             },
-            time: function($stateParams, ConfigService, workspace) {
+            time: function($stateParams, ConfigService, workspace, dummyLogin) {
                 if ($stateParams.tag !== undefined) {
                     return ConfigService.getConfig($stateParams.tag, workspace, false).then(function(tag) {
                         return tag.timestamp;
@@ -509,7 +512,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
                 else
                     return "latest";
             },
-            docFilter: function($stateParams, ElementService, workspace, site, time, growl) {
+            docFilter: function($stateParams, ElementService, workspace, site, time, growl, dummyLogin) {
                 //need to redefine here since time is redefined
                 return ElementService.getElement("master_filter", false, workspace, time)
                 .then(function(data) {
@@ -591,12 +594,12 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
     .state('workspace.site.document.view', {
         url: '/views/:view',
         resolve: {
-            viewElements: function($stateParams, ViewService, time) {
+            viewElements: function($stateParams, ViewService, time, dummyLogin) {
                 if (time === 'latest')
                     return ViewService.getViewElements($stateParams.view, false, $stateParams.workspace, time);
                 return [];
             },
-            view: function($stateParams, ViewService, viewElements, time) {
+            view: function($stateParams, ViewService, viewElements, time, dummyLogin) {
                 return ViewService.getView($stateParams.view, false, $stateParams.workspace, time);
             }
         },
@@ -610,7 +613,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
     .state('workspace.diff', {
         url: '/diff/:source/:sourceTime/:target/:targetTime',
         resolve: {
-            diff: function($stateParams, WorkspaceService) {
+            diff: function($stateParams, WorkspaceService, dummyLogin) {
                 return WorkspaceService.diff($stateParams.target, $stateParams.source, $stateParams.targetTime, $stateParams.sourceTime);
             }
         },

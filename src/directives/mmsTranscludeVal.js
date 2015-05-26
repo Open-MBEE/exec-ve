@@ -157,6 +157,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, $log, 
                 if (!version)
                     version = viewVersion.version;
             }
+            scope.ws = ws;
             scope.version = version ? version : 'latest';
             ElementService.getElement(scope.mmsEid, false, ws, version)
             .then(function(data) {
@@ -200,8 +201,14 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, $log, 
             scope.view = mmsViewCtrl.getView();
             scope.isDirectChildOfPresentationElement = Utils.isDirectChildOfPresentationElementFunc(element, mmsViewCtrl);
 
-            mmsViewCtrl.registerPresenElemCallBack(function() {
+            var callback = function() {
                 Utils.showEditCallBack(scope,mmsViewCtrl,element,frameTemplate,recompile,recompileEdit);
+            };
+            
+            mmsViewCtrl.registerPresenElemCallBack(callback);
+
+            scope.$on('$destroy', function() {
+                mmsViewCtrl.unRegisterPresenElemCallBack(callback);
             });
 
             scope.save = function() {

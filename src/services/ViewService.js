@@ -460,7 +460,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 addInstanceVal(viewOrSection, workspace, createdInstanceSpecUpdate.sysmlid).then(function(updatedView) {
                     if (type === "Section") {
                         // Broadcast message to TreeCtrl:
-                        $rootScope.$broadcast('viewctrl.add.section', createdInstanceSpecUpdate);
+                        $rootScope.$broadcast('viewctrl.add.section', createdInstanceSpecUpdate, viewOrSection.name);
                     }
                     deferred.resolve(updatedView);
                 }, function(reason) {
