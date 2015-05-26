@@ -62,11 +62,9 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, $log, 
             if (mmsViewCtrl)
                 mmsViewCtrl.transcludeClicked(scope.mmsEid);
 
-            if (!scope.isEditing) {
-
-                if (e.target.tagName !== 'A')
-                    return false;
-            }
+            if (e.target.tagName !== 'A')
+                return false;
+            
         });
 
         var recompile = function() {
