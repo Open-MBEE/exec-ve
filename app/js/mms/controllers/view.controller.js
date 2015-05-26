@@ -341,6 +341,10 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         //addElement('Image');
     });
 
+    $scope.$on('view.add.equation', function() {
+        addElement('Equation');
+    });
+
     $scope.$on('section.add.paragraph', function(event, section) {
         addElement('Paragraph', section);
     });
@@ -351,6 +355,10 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
 
     $scope.$on('section.add.table', function(event, section) {
         addElement('Table', section);
+    });
+
+    $scope.$on('section.add.equation', function(event, section) {
+        addElement('Equation', section);
     });
 
     $scope.$on('section.add.section', function(event, section) {

@@ -531,6 +531,10 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                     type:"Expression"
                 };
             }
+            else if (type === "Equation") {
+                jsonBlob = paragraph;
+                jsonBlob.type = 'Equation';
+            }
 
             // Special case for Section.  Doesnt use json blobs.
             if (type === "Section") {

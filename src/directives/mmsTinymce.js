@@ -359,9 +359,23 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
             ngModelCtrl.$setViewValue(element.val());
         };
 
+        var defaultToolbar = 'bold italic underline strikethrough | subscript superscript blockquote | formatselect | fontsizeselect | forecolor backcolor removeformat | alignleft aligncenter alignright | link unlink | image media | charmap searchreplace | undo redo';
+        var tableToolbar = ' table ';
+        var listToolbar = ' bullist numlist outdent indent ';
+        var codeToolbar = ' code ';
+        var customToolbar = ' transclude comment vlink normalize | mvleft mvright ';
+        var allToolbar = defaultToolbar + ' | ' + listToolbar + ' | ' + tableToolbar + ' | ' + codeToolbar + ' | ' + customToolbar;
+        var thisToolbar = allToolbar;
+        if (scope.mmsTinymceType === 'Equation')
+            thisToolbar = codeToolbar;
+        if (scope.mmsTinymceType === 'TableT')
+            thisToolbar = defaultToolbar + ' | ' + tableToolbar + ' | ' + codeToolbar + ' | ' + customToolbar;
+        if (scope.mmsTinymceType === 'ListT')
+            thisToolbar = defaultToolbar + ' | ' + listToolbar + ' | ' + codeToolbar + ' | ' + customToolbar;
         var options = {
             plugins: 'autoresize charmap code fullscreen image link media nonbreaking paste table textcolor searchreplace',
-            toolbar: 'bold italic underline strikethrough | subscript superscript blockquote | formatselect | fontsizeselect | forecolor backcolor removeformat | alignleft aligncenter alignright | bullist numlist outdent indent | table | link unlink | image media | charmap searchreplace code | transclude comment vlink normalize | mvleft mvright | undo redo',
+            //toolbar: 'bold italic underline strikethrough | subscript superscript blockquote | formatselect | fontsizeselect | forecolor backcolor removeformat | alignleft aligncenter alignright | bullist numlist outdent indent | table | link unlink | image media | charmap searchreplace code | transclude comment vlink normalize | mvleft mvright | undo redo',
+            toolbar: thisToolbar,
             menubar: false,
             statusbar: true,
             nonbreaking_force_tab: true,
