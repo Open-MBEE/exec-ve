@@ -352,13 +352,19 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                     resp.specialization.view2view = elem.specialization.view2view;
                 deferred.resolve(resp);
 
-                // TODO: update merge to have a custom function to just merge the properties in elem, so
-                //       we dont override another edit modifying a different property:
                 var edit = CacheService.get(UtilsService.makeElementKey(elem.sysmlid, n.ws, null, true));
-                // if (edit) {
-                //     _.merge(edit, resp);
-                //     UtilsService.cleanElement(edit, true);
-                // }
+                if (edit) {
+                    // Only want to merge the properties that were updated:
+                    _.merge(edit, resp, function(a,b,id) {
+                        if (elem.hasOwnProperty(id)) {
+                            return b;
+                        }
+                        else {
+                            return a;
+                        }
+                    });
+                    UtilsService.cleanElement(edit, true);
+                }
             }).error(function(data, status, headers, config) {
                 if (status === 409) {
                     var server = _.cloneDeep(data.elements[0]);
