@@ -62,9 +62,10 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, $log, 
             if (mmsViewCtrl)
                 mmsViewCtrl.transcludeClicked(scope.mmsEid);
 
-            if (e.target.tagName !== 'A')
+            /*if (e.target.tagName !== 'A' && e.target.tagName !== 'INPUT' && !scope.isEditing) //need review for inline editing (boolean and nested)
                 return false;
-            
+            if (scope.isEditing)*/
+                e.stopPropagation();
         });
 
         var recompile = function() {
