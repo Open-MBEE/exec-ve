@@ -35,6 +35,7 @@
             <hr>
             <div class="elem-name-wrapper">
                 <a class="elem-name" ng-click="choose(elem.sysmlid, 'name', elem.name)">{{elem.name}}</a>
+                <a class="elem-name" ng-show="elem.specialization.isSlot" ng-click="choose(elem.sysmlid, 'name', elem.name)"><mms-transclude-name mms-eid="{{elem.specialization.propertyType}}"></mms-transclude-name></a>
             </div>
             <div class="elem-qualified-name-wrapper">
                 <div class="elem-qualified-name">
@@ -44,7 +45,7 @@
             <div class="elem-documentation-wrapper">
                 <label>DOCUMENTATION</label>
                 <div class="elem-documentation">
-                    <a ng-show="elem.documentation" ng-bind-html="elem.documentation | limitTo:300" ng-click="choose(elem.sysmlid, 'doc', elem.name)"></a>
+                    <a ng-show="elem.documentation" ng-bind-html="elem.documentation | limitTo:300" ng-click="choose(elem.sysmlid, 'doc', elem.name)"></a><span class="ellipses">{{elem.documentation.length > 300 ? ' ...' : ''}}</span>
                     <a ng-show="!elem.documentation" ng-click="choose(elem.sysmlid, 'doc', elem.name)">This field is empty, but you can still click here to cross-reference a placeholder.</a>
                 </div>
             </div>
@@ -54,52 +55,48 @@
                     {{elem.specialization.type || 'Element'}}
                 </div>
             </div>
-            <div ng-show="elem.specialization.value && elem.specialization.value[0]" class="elem-properties-wrapper">
-                <label>PROPERTIES</label>
+            <div ng-if="elem.specialization.type === 'Property' && elem.specialization.value[0]">
+                <label>VALUE</label>
                 <div class="elem-properties">
                     <a ng-click="choose(elem.sysmlid, 'val', elem.name)">
                         <span ng-repeat="val in elem.specialization.value">
-                            {{val.integer || val.double || val.boolean + '' || val.string}}
+                            {{val.string || val.boolean + '' || val.naturalValue || val.integer || val.double || val.element || val.instance || val.expressionBody[0]}}<span class="ellipses">{{(val.expressionBody[0] && val.expressionBody.length > 1) ? ' ...' : '' }}</span>{{$last ? '' : ', '}}
                         </span>
-                        <span>{{elem.specialization.specification}}</span>
                     </a>
                 </div>
+            </div>
+            <div ng-if="elem.specialization.type === 'Constraint'">
+                <label>SPECIFICATION</label>
+                <div class="elem-specification">
+                    <a ng-click="choose(elem.sysmlid, 'val', elem.name)">
+                        {{elem.specialization.specification.string || elem.specialization.specification.boolean ||
+                          elem.specialization.specification.naturalValue || elem.specialization.specification.integer ||
+                          elem.specialization.specification.double || elem.specialization.specification.element ||
+                          elem.specialization.specification.instance}}
+                    </a>
+                </div>
+                <a ng-click="choose(elem.sysmlid, 'val', elem.name)">
+                    <div ng-repeat="str in elem.specialization.specification.expressionBody">
+                        <div class="elem-specification">{{str}}</div>
+                    </div>
+                </a>
+            </div>
+            <div ng-if="elem.properties[0]" class="elem-properties-wrapper">
+                <label>PROPERTIES</label>
+                <table>
+                    <tbody>
+                        <tr ng-repeat="row in elem.properties">
+                            <td ng-repeat="property in row">
+                                {{property.name}}<span ng-show="property.specialization.isSlot"><mms-transclude-name mms-eid="{{property.specialization.propertyType}}"></mms-transclude-name></span>: 
+                                <a ng-click="choose(property.sysmlid, 'val', property.name)"><span ng-repeat="val in property.specialization.value">{{val.string || val.boolean + '' || val.naturalValue || val.integer || val.double || val.element || val.instance || val.expressionBody[0]}}<span class="ellipses">{{(val.expressionBody[0] && val.expressionBody.length > 1) ? ' ...' : '' }}</span>{{$last ? '' : ', '}}</span></a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
 
-<!--     <div class="container-fluid transclude-table" ng-show="mmsCfElements && searchSuccess">
-        <table class="table table-bordered">
-            <tr>
-                <th>NAME</th>
-                <th>QUALIFIED NAME</th>
-                <th>METATYPE</th>
-                <th>DOC</th>
-                <th>VALUE (if applicable)</th>
-            </tr>
-            <tr ng-repeat="elem in mmsCfElements | filter:filter">
-                <td ng-click="choose(elem.sysmlid, 'name', elem.name)" class="clickable">
-                    {{elem.name}}
-                </td>
-                <td>
-                    {{elem.qualifiedName}}
-                </td>
-                <td>
-                    {{elem.specialization.type || 'Element'}}
-                </td>
-                <td ng-click="choose(elem.sysmlid, 'doc', elem.name)" class="clickable">
-                    {{elem.documentation | limitTo:20}}
-                </td>
-                <td ng-click="choose(elem.sysmlid, 'val', elem.name)" class="clickable">
-                    <span ng-repeat="val in elem.specialization.value">
-                        {{val.integer || val.double || val.boolean + '' || val.string}}
-                    </span>
-                    <span>{{elem.specialization.specification}}</span>
-                </td>
-            </tr>
-        </table>
-    </div>
- -->
 </div>
 
 <div class="modal-footer">

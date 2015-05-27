@@ -82,15 +82,248 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                 //var searchText = $scope.searchText; //TODO investigate why searchText isn't in $scope
                 //growl.info("Searching...");
                 $scope.searchClass = "fa fa-spin fa-spinner";
-                ElementService.search(searchText, false, scope.mmsWs)
-                .then(function(data) {
+                // ElementService.search(searchText, false, scope.mmsWs)
+                // .then(function(data) {
                     $scope.searchSuccess = true;
-                    $scope.mmsCfElements = data;
-                    $scope.searchClass = "";
-                }, function(reason) {
-                    growl.error("Search Error: " + reason.message);
-                    $scope.searchClass = "";
+                    // $scope.mmsCfElements = data;
+
+                    // MOCK DATA - DELETE THIS DECL
+                    $scope.mmsCfElements =
+[
+    {
+        "sysmlid": "2345",
+        "name": "Flight System (ELEMENT)",
+        "documentation": "blah",
+        "qualifiedName": "/q/Flight System",
+        "properties":[
+            {
+                "sysmlid": "3434243",
+                "name": "mix",
+                "qualifiedName": "/q/Flight System/mass",
+                "documentation": "mass of flight system",
+                "specialization": {
+                    "type": "Property",
+                    "isSlot": false,
+                    "value": [{"type": "LiteralReal", "double": 45.2}, {"type": "LiteralString", "string": "bam"}, {"type": "LiteralInteger", "integer": 12}]
+                }
+             },
+             {
+                "sysmlid": "34342422",
+                "name": "afid",
+                "qualifiedName": "/q/Flight System//",
+                "documentation": "",
+                "specialization": {
+                    "type": "Property",
+                    "isSlot": false,
+                    "value": [{"type": "LiteralString", "string": "123"}]
+                }
+             }
+         ],
+         "specialization": {
+             "type": "Element"
+         }
+    },
+    {
+        "sysmlid": "1421421",
+        "name": "Rocket (ELEMENT)",
+        "documentation": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed posuere consectetur est at lobortis. Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Cras mattis consectetur purus sit amet fermentum. Aenean lacinia bibendum nulla sed consectetur. Etiam porta sem malesuada magna mollis euismod. Integer posuere erat a ante venenatis dapibus posuere velit aliquet.",
+        "qualifiedName": "/q/Rocket",
+        "properties":[
+            {
+                "sysmlid": "3434243",
+                "name": "mass",
+                "qualifiedName": "/q/Flight System/mass",
+                "documentation": "mass of flight system",
+                "specialization": {
+                    "type": "Property",
+                    "isSlot": false,
+                    "value": [{"type": "LiteralReal", "double": 45.2}]
+                }
+             },
+             {
+                "sysmlid": "34342422",
+                "name": "afid",
+                "qualifiedName": "/q/Flight System//",
+                "documentation": "",
+                "specialization": {
+                    "type": "Property",
+                    "isSlot": false,
+                    "value": [{"type": "LiteralString", "string": "123"}]
+                }
+             },
+             {
+                "sysmlid": "12421421",
+                "qualifiedName": "/q/Flight System//",
+                "documentation": "",
+                "specialization": {
+                    "type": "Property",
+                    "isSlot": true,
+                    "propertyType": "MMS_1408982971725_a9873a09-adad-4fd1-935c-9fe1eab8ed4c",
+                    "value": [{"type": "LiteralUnlimitedNatural", "naturalValue": 45}]
+                }
+             },
+             {
+                "sysmlid": "34342422",
+                "name": "width",
+                "qualifiedName": "/q/Flight System//",
+                "documentation": "",
+                "specialization": {
+                    "type": "Property",
+                    "isSlot": false,
+                    "value": [{"type": "LiteralInteger", "integer": 3490}]
+                }
+             },
+             {
+                "sysmlid": "135513513",
+                "qualifiedName": "/q/Flight System//",
+                "documentation": "",
+                "specialization": {
+                    "type": "Property",
+                    "isSlot": true,
+                    "propertyType": "MMS_1408982971725_a9873a09-adad-4fd1-935c-9fe1eab8ed4c",
+                    "value": [{"type": "LiteralReal", "double": 150.2}]
+                }
+             },
+             {
+                "sysmlid": "34342422",
+                "name": "acceleration",
+                "qualifiedName": "/q/Flight System//",
+                "documentation": "",
+                "specialization": {
+                    "type": "Property",
+                    "isSlot": false,
+                    "value": [{"type": "OpaqueExpression", "expressionBody": ["expr1", "expr2", "des1", "des2"] }]
+                }
+             },
+             {
+                "sysmlid": "34342422",
+                "name": "angle",
+                "qualifiedName": "/q/Flight System//",
+                "documentation": "",
+                "specialization": {
+                    "type": "Property",
+                    "isSlot": false,
+                    "value": [{"type": "LiteralInteger", "integer": 149}]
+                }
+             },
+             {
+                "sysmlid": "34342422",
+                "name": "diameter",
+                "qualifiedName": "/q/Flight System//",
+                "documentation": "",
+                "specialization": {
+                    "type": "Property",
+                    "isSlot": false,
+                    "value": [{"type": "ElementValue", "element": "MMS_1408982971725_a9873a09-adad-4fd1-935c-9fe1eab8ed4c"}]
+                }
+             },
+             {
+                "sysmlid": "34342422",
+                "name": "rotation",
+                "qualifiedName": "/q/Flight System//",
+                "documentation": "",
+                "specialization": {
+                    "type": "Property",
+                    "isSlot": false,
+                    "value": [{"type": "LiteralString", "string": "123"}]
+                }
+             },
+             {
+                "sysmlid": "34342422",
+                "name": "momentum",
+                "qualifiedName": "/q/Flight System//",
+                "documentation": "",
+                "specialization": {
+                    "type": "Property",
+                    "isSlot": false,
+                    "value": [{"type": "LiteralString", "string": "123"}]
+                }
+             }
+         ],
+         "specialization": {
+             "type": "Element"
+         }
+    },
+    {
+        "sysmlid": "2345",
+        "name": "Flight System (CONSTRAINT)",
+        "documentation": "blah",
+        "qualifiedName": "/q/Flight System",
+        "specialization": {
+            "type": "Constraint",
+            "specification": {
+                "type": "OpaqueExpression",
+                "expressionBody": [ "bam", "bammmm", "bammm", "bam!!", "huzzaahh"]
+            }
+        }
+    },
+    {
+        "sysmlid": "2345",
+        "name": "Wiring (CONSTRAINT)",
+        "documentation": "blah",
+        "qualifiedName": "/q/Flight System",
+        "specialization": {
+            "type": "Constraint",
+            "specification": {
+                "type": "OpaqueExpression",
+                "string": "hello world"
+            }
+        }
+    },
+    {
+        "sysmlid": "34342422",
+        "qualifiedName": "/q/Flight System//",
+        "documentation": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed posuere consectetur est at lobortis.",
+        "specialization": {
+            "type": "Property",
+            "isSlot": true,
+            "propertyType": "MMS_1408982971725_a9873a09-adad-4fd1-935c-9fe1eab8ed4c",
+            "value": [{"type": "LiteralString", "string": "123"}]
+        }
+    },
+    {
+        "sysmlid": "34342422",
+        "name": "afid (PROPERTY W/ NAME)",
+        "qualifiedName": "/q/Flight System//",
+        "documentation": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed posuere consectetur est at lobortis. Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Cras mattis consectetur purus sit amet fermentum. Aenean lacinia bibendum nulla sed consectetur. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed posuere consectetur est at lobortis. Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Cras mattis consectetur purus sit amet fermentum. Aenean lacinia bibendum nulla sed consectetur. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed posuere consectetur est at lobortis. Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Cras mattis consectetur purus sit amet fermentum. Aenean lacinia bibendum nulla sed consectetur. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed posuere consectetur est at lobortis. Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Cras mattis consectetur purus sit amet fermentum. Aenean lacinia bibendum nulla sed consectetur. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed posuere consectetur est at lobortis. Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Cras mattis consectetur purus sit amet fermentum. Aenean lacinia bibendum nulla sed consectetur. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed posuere consectetur est at lobortis. Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Cras mattis consectetur purus sit amet fermentum. Aenean lacinia bibendum nulla sed consectetur. ",
+        "specialization": {
+            "type": "Property",
+            "isSlot": false,
+            "value": [{"type": "LiteralString", "string": "123"}]
+        }
+    },
+    {
+        "sysmlid": "34342422",
+        "name": "bam (PROPERTY W/ NAME)",
+        "qualifiedName": "/q/Flight System//",
+        "documentation": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed posuere consectetur est at lobortis. Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Cras mattis consectetur purus sit amet fermentum. Aenean lacinia bibendum nulla sed consectetur. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed posuere consectetur est at lobortis. Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Cras mattis consectetur purus sit amet fermentum. Aenean lacinia bibendum nulla sed consectetur. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed posuere consectetur est at lobortis. Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Cras mattis consectetur purus sit amet fermentum. Aenean lacinia bibendum nulla sed consectetur. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed posuere consectetur est at lobortis. Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Cras mattis consectetur purus sit amet fermentum. Aenean lacinia bibendum nulla sed consectetur. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed posuere consectetur est at lobortis. Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Cras mattis consectetur purus sit amet fermentum. Aenean lacinia bibendum nulla sed consectetur. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed posuere consectetur est at lobortis. Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Cras mattis consectetur purus sit amet fermentum. Aenean lacinia bibendum nulla sed consectetur. ",
+        "specialization": {
+            "type": "Property",
+            "isSlot": false,
+            "value": [{"type": "LiteralString", "string": "123"}, {"type": "LiteralString", "string": "123"}, {"type": "LiteralString", "string": "123"}, {"type": "LiteralString", "string": "123"}, {"type": "LiteralString", "string": "123"}, {"type": "LiteralString", "string": "123"}]
+        }
+    }
+];
+
+                // change properties arr to 2-dim to display table
+                $scope.mmsCfElements.forEach(function(elem) {
+                    if (elem.specialization.type === 'Element' && elem.properties[0]) {
+                        var properties = [];
+                        for (var i = 0; i < elem.properties.length; i++) {
+                            if (i % 3 === 0) {
+                                properties.push([]);
+                            }
+                            properties[properties.length-1].push(elem.properties[i]);
+                        }
+                        elem.properties = properties;
+                    }
                 });
+
+                //     $scope.searchClass = "";
+                // }, function(reason) {
+                //     growl.error("Search Error: " + reason.message);
+                //     $scope.searchClass = "";
+                // });
             };
             $scope.openProposeModal = function() {
                 $modalInstance.close(false);

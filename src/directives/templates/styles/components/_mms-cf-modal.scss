@@ -5,8 +5,11 @@
 
     .elem-documentation,
     .elem-type,
-    .elem-properties {
+    .elem-properties,
+    .elem-specification,
+    table {
       margin-left: 20px;
+      padding-right: 20px;
     }
 
     .elem-name {
@@ -26,6 +29,16 @@
     label {
       font-size: 12px;
       margin-bottom: 0;
+    }
+
+    table > tbody > tr > td {
+      padding: 0;
+      border: 0;
+      max-width: 190px
+    }
+
+    .ellipses {
+      color: $base_blue;
     }
   }
 
