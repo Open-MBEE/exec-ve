@@ -223,7 +223,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
             //growl.info("Searching...");
             $scope.searching = true;
 
-            ElementService.search(searchText, false, ws)
+            ElementService.search(searchText, ['name'], null, false, ws)
             .then(function(data) {
                 var validClassifierIds = [];
                 if ($scope.presentationElemType === 'Table') {

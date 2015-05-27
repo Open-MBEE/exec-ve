@@ -395,8 +395,16 @@ function urlService(baseUrl) {
      * @param {string} workspace Workspace name to search under
      * @returns {string} The post elements url.
      */
-    var getElementSearchURL = function(query, workspace) {
-        return root + '/workspaces/' + workspace + '/search?keyword=' + query;
+    var getElementSearchURL = function(query, filters, propertyName, workspace) {
+        var r = root + '/workspaces/' + workspace + '/search?keyword=' + query;
+        if (filters) {
+            var l = filters.join();
+            r += '&filters=' + l;
+        }
+        if (propertyName) {
+            r += '&propertyName=' + propertyName;
+        }
+        return r;
     };
 
     var getWorkspacesURL = function() {

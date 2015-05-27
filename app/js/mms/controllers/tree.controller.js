@@ -839,7 +839,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
             //growl.info("Searching...");
             $scope.searching = true;
 
-            ElementService.search(searchText, false, ws)
+            ElementService.search(searchText, ['name'], null, false, ws)
             .then(function(data) {
 
                 for (var i = 0; i < data.length; i++) {

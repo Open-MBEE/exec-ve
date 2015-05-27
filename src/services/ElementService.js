@@ -616,9 +616,47 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
      * @param {string} [workspace=master] (optional) workspace to use
      * @returns {Promise} The promise will be resolved with an array of element objects
      */
-    var search = function(query, update, workspace) {
+    var search = function(query, filters, propertyName, update, workspace) {
+        //var n = normalize(null, update, workspace, null);
+        //return getGenericElements(URLService.getElementSearchURL(query, n.ws), 'elements', n.update, n.ws, n.ver);
         var n = normalize(null, update, workspace, null);
-        return getGenericElements(URLService.getElementSearchURL(query, n.ws), 'elements', n.update, n.ws, n.ver);
+        var url = URLService.getElementSearchURL(query, filters, propertyName, n.ws);
+        var progress = 'search(' + url + n.update + n.ws + ')';
+        if (inProgress.hasOwnProperty(progress)) {
+            HttpService.ping(url);
+            return inProgress[progress];
+        }
+
+        var deferred = $q.defer();
+        inProgress[progress] = deferred.promise;
+        HttpService.get(url, 
+            function(data, status, headers, config) {
+                var result = [];
+                data.elements.forEach(function(element) {
+                    var properties = element.properties;
+                    if (properties)
+                        delete element.properties;
+                    var ekey = UtilsService.makeElementKey(element.sysmlid, n.ws, n.ver);
+                    CacheService.put(ekey, UtilsService.cleanElement(element), true);
+                    if (properties) {
+                        properties.forEach(function(property) {
+                            var pkey = UtilsService.makeElementKey(property.sysmlid, n.ws, n.ver);
+                            CacheService.put(pkey, UtilsService.cleanElement(property), true);
+                        });
+                    }
+                    var toAdd = JSON.parse(JSON.stringify(element));
+                    toAdd.properties = properties;
+                    result.push(toAdd);
+                }); 
+                delete inProgress[progress];
+                deferred.resolve(result); 
+            },
+            function(data, status, headers, config) {
+                URLService.handleHttpStatus(data, status, headers, config, deferred);
+                delete inProgress[progress];
+            }
+        );
+        return deferred.promise;
     };
 
     /**
