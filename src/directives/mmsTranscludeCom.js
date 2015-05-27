@@ -31,8 +31,9 @@ function mmsTranscludeCom(ElementService, UtilsService, $log, $compile, growl) {
         element.click(function(e) {
             if (mmsViewCtrl)
                 mmsViewCtrl.transcludeClicked(scope.mmsEid);
-            if (e.target.tagName !== 'A')
-                return false;
+            //if (e.target.tagName !== 'A')
+              //  return false;
+              e.stopPropagation();
         });
 
         var recompile = function() {

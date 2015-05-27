@@ -52,7 +52,8 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
             if (!mmsViewCtrl)
                 return false;
             mmsViewCtrl.transcludeClicked(scope.mmsEid);
-            return false;
+            //return false;
+            e.stopPropagation();
         });
 
         var recompile = function() {
