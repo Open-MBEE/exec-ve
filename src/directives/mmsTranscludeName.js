@@ -126,7 +126,7 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
             });
 
             scope.save = function() {
-                Utils.saveAction(scope,recompile,mmsViewCtrl,scope.bbApi);
+                Utils.saveAction(scope,recompile,mmsViewCtrl,scope.bbApi,null,"name");
             };
 
             scope.cancel = function() {

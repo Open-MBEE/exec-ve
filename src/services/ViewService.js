@@ -30,7 +30,10 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         List: "_17_0_5_1_407019f_1430628190151_363897_11927",
         Paragraph: "_17_0_5_1_407019f_1430628197332_560980_11953",
         Table: "_17_0_5_1_407019f_1430628178633_708586_11903",
-        Section: "_17_0_5_1_407019f_1430628211976_255218_12002"
+        Section: "_17_0_5_1_407019f_1430628211976_255218_12002",
+        ListT: "_17_0_5_1_407019f_1431903739087_549326_12013",
+        TableT: "_17_0_5_1_407019f_1431903724067_825986_11992",
+        Equation: "_17_0_5_1_407019f_1431905053808_352752_11992"
     };
     
     /**
@@ -484,15 +487,17 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 jsonBlob = paragraph;
             }
             else if (type === "List") {
-                jsonBlob = {
+                /*jsonBlob = {
                     ordered: true,
                     bulleted: true,
                     list:[[paragraph]],
                     type: type
-                };
+                };*/
+                jsonBlob = paragraph;
+                jsonBlob.type = 'ListT';
             }
             else if (type === "Table") {
-                jsonBlob = {
+                /*jsonBlob = {
                     body:[
                         [{content:[paragraph],
                           rowspan:1,
@@ -510,7 +515,9 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                         }
                     ]],
                     type: type
-                };
+                };*/
+                jsonBlob = paragraph;
+                jsonBlob.type = 'TableT';
             }
             else if (type === "Image") {
                 // TODO this doesnt really work
@@ -523,6 +530,10 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                     operand:[],  
                     type:"Expression"
                 };
+            }
+            else if (type === "Equation") {
+                jsonBlob = paragraph;
+                jsonBlob.type = 'Equation';
             }
 
             // Special case for Section.  Doesnt use json blobs.
@@ -541,12 +552,16 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             presentationElem.string = JSON.stringify(json);
             presentationElem.type = "LiteralString";
         }
-
+        var realType = type;
+        if (type === 'Table')
+            realType = 'TableT';
+        if (type === 'List')
+            realType = 'ListT';
         var instanceSpec = {
             specialization: {
               name:instanceSpecName,
               type:"InstanceSpecification",
-              classifier:[typeToClassifierId[type]],
+              classifier:[typeToClassifierId[realType]],
               instanceSpecificationSpecification: presentationElem
            }
         };

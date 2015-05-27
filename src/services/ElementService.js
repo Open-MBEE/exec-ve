@@ -351,10 +351,18 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                     elem.specialization && elem.specialization.view2view)
                     resp.specialization.view2view = elem.specialization.view2view;
                 deferred.resolve(resp);
-                /* TODO better way to sync edits on update, maybe app level*/
+
                 var edit = CacheService.get(UtilsService.makeElementKey(elem.sysmlid, n.ws, null, true));
                 if (edit) {
-                    _.merge(edit, resp);
+                    // Only want to merge the properties that were updated:
+                    _.merge(edit, resp, function(a,b,id) {
+                        if (elem.hasOwnProperty(id)) {
+                            return b;
+                        }
+                        else {
+                            return a;
+                        }
+                    });
                     UtilsService.cleanElement(edit, true);
                 }
             }).error(function(data, status, headers, config) {

@@ -85,7 +85,7 @@ function mmsViewSection($compile, $templateCache, $rootScope, ElementService, Ux
             });
 
             scope.save = function() {
-                Utils.saveAction(scope,recompile,mmsViewCtrl,scope.bbApi,scope.section);
+                Utils.saveAction(scope,recompile,mmsViewCtrl,scope.bbApi,scope.section,"name");
             };
 
             scope.cancel = function() {
