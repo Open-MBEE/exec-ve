@@ -317,17 +317,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             .then(function(data2) {
                 deferred.resolve(data2);
             }, function(reason) {
-                if (reason.status === 409) {
-                    clone.read = reason.data.elements[0].read;
-                    clone.modified = reason.data.elements[0].modified;
-                    ElementService.updateElement(clone, ws)
-                    .then(function(data3) {
-                        deferred.resolve(data3);
-                    }, function(reason2) {
-                        deferred.reject(reason2);
-                    });
-                } else
-                    deferred.reject(reason);
+                deferred.reject(reason);
             });
         }, function(reason) {
             deferred.reject(reason);
@@ -386,17 +376,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 .then(function(data2) {
                     deferred.resolve(data2);
                 }, function(reason) {
-                    if (reason.status === 409) {
-                        clone.read = reason.data.elements[0].read;
-                        clone.modified = reason.data.elements[0].modified;
-                        updateDocument(clone, ws)
-                        .then(function(data3) {
-                            deferred.resolve(data3);
-                        }, function(reason2) {
-                            deferred.reject(reason2);
-                        });
-                    } else
-                        deferred.reject(reason);
+                    deferred.reject(reason);
                 });
             }, function(reason) {
                 deferred.reject(reason);
