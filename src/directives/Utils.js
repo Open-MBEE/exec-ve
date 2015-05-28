@@ -205,7 +205,7 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
             growl.error(reason.message);
     };
 
-    var addFrame = function(scope, mmsViewCtrl, element, template, editObj) {
+    var addFrame = function(scope, mmsViewCtrl, element, template, editObj, skipBroadcast) {
 
         if (mmsViewCtrl.isEditable() && !scope.isEditing && !scope.cleanUp) {
 
@@ -228,8 +228,10 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
                     $compile(element.contents())(scope);
                 }
 
-                // Broadcast message for the toolCtrl:
-                $rootScope.$broadcast('presentationElem.edit',scope.edit, scope.ws);
+                if (!skipBroadcast) {
+                    // Broadcast message for the toolCtrl:
+                    $rootScope.$broadcast('presentationElem.edit',scope.edit, scope.ws);
+                }
             }, handleError);
 
             // TODO: Should this check the entire or just the instance specification
@@ -374,7 +376,7 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
         if (mmsViewCtrl.isEditable()) {
             if (scope.edit && hasEdits(scope, type)) {
                 scope.recompileEdit = false;
-                addFrame(scope,mmsViewCtrl,element,template,editObj);
+                addFrame(scope,mmsViewCtrl,element,template,editObj,true);
             }
         }
         // Leaving edit mode, so highlight the unsaved edit if needed:
