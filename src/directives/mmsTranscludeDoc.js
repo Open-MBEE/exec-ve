@@ -63,9 +63,11 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             if (mmsViewCtrl)
                 mmsViewCtrl.transcludeClicked(scope.mmsEid);
 
-            if (e.target.tagName !== 'A' && e.target.tagName !== 'INPUT')
+            /*if (e.target.tagName !== 'A' && e.target.tagName !== 'INPUT' && !scope.isEditing)
                 return false;
-            //e.stopPropagation();
+            if (scope.isEditing)
+                e.stopPropagation();*/
+            e.stopPropagation();
         });
 
         var recompile = function() {

@@ -39,6 +39,7 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
     $scope.tracker = {};
     if (!$rootScope.veEdits)
         $rootScope.veEdits = {};
+    $scope.presentElemEditCnts = {};
 
     // TODO: for editing of workspace/tag elements
     if ($state.current.name === 'workspace') {
@@ -118,19 +119,39 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
     });
 
     var cleanUpEdit = function(edit, ws) {
-        delete $rootScope.veEdits['element|' + edit.sysmlid + '|' + ws];
-        if (Object.keys($rootScope.veEdits).length === 0) {
-            $rootScope.mms_tbApi.setIcon('element.editor', 'fa-edit');
+
+        var key = 'element|' + edit.sysmlid + '|' + ws;
+        var currentCnt = 0;
+
+        if ($scope.presentElemEditCnts.hasOwnProperty(key)) {
+            currentCnt = $scope.presentElemEditCnts[key];
         }
-        if (Object.keys($rootScope.veEdits).length > 1) {
-            $rootScope.mms_tbApi.setPermission('element.editor.saveall', true); 
-        } else {
-            $rootScope.mms_tbApi.setPermission('element.editor.saveall', false);
+        if (currentCnt <= 1) {
+            delete $rootScope.veEdits[key];
+            delete $scope.presentElemEditCnts[key];
+            if (Object.keys($rootScope.veEdits).length === 0) {
+                $rootScope.mms_tbApi.setIcon('element.editor', 'fa-edit');
+            }
+            if (Object.keys($rootScope.veEdits).length > 1) {
+                $rootScope.mms_tbApi.setPermission('element.editor.saveall', true); 
+            } else {
+                $rootScope.mms_tbApi.setPermission('element.editor.saveall', false);
+            }
+        }
+        else {
+            $scope.presentElemEditCnts[key] = currentCnt - 1;
         }
     };
 
     $scope.$on('presentationElem.edit', function(event, edit, ws) {
-        $rootScope.veEdits['element|' + edit.sysmlid + '|' + ws] = edit;
+        var key = 'element|' + edit.sysmlid + '|' + ws;
+        var currentCnt = 1;
+        $rootScope.veEdits[key] = edit;
+        if ($scope.presentElemEditCnts.hasOwnProperty(key)) {
+            currentCnt = $scope.presentElemEditCnts[key] + 1;
+        }
+        $scope.presentElemEditCnts[key] = currentCnt;
+
         $rootScope.mms_tbApi.setIcon('element.editor', 'fa-edit-asterisk');
         if (Object.keys($rootScope.veEdits).length > 1) {
             $rootScope.mms_tbApi.setPermission('element.editor.saveall', true);
@@ -146,8 +167,6 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
     $scope.$on('presentationElem.cancel', function(event, edit, ws) {
         cleanUpEdit(edit, ws);           
     });
-
-    // TODO need to clean up the edit if the element was deleted!
 
     $scope.$on('elementSelected', function(event, eid, type) {
         $scope.elementType = type;

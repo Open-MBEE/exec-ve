@@ -338,33 +338,39 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
      *      update is successful. If a conflict occurs, the promise will be rejected with status of 409
      */
     var updateElement = function(elem, workspace) {
+
         var deferred = $q.defer();
+
+        var handleSuccess = function(n, data) {
+            var resp = CacheService.put(n.cacheKey, UtilsService.cleanElement(data.elements[0]), true);
+            //special case for products view2view updates 
+            if (resp.specialization && resp.specialization.view2view &&
+                elem.specialization && elem.specialization.view2view)
+                resp.specialization.view2view = elem.specialization.view2view;
+            deferred.resolve(resp);
+
+            var edit = CacheService.get(UtilsService.makeElementKey(elem.sysmlid, n.ws, null, true));
+            if (edit) {
+                // Only want to merge the properties that were updated:
+                _.merge(edit, resp, function(a,b,id) {
+                    if (elem.hasOwnProperty(id)) {
+                        return b;
+                    }
+                    else {
+                        return a;
+                    }
+                });
+                UtilsService.cleanElement(edit, true);
+            }
+        };
+
         if (!elem.hasOwnProperty('sysmlid'))
             deferred.reject('Element id not found, create element first!');
         else {
             var n = normalize(elem.sysmlid, null, workspace, null);
             $http.post(URLService.getPostElementsURL(n.ws), {'elements': [elem]})
             .success(function(data, status, headers, config) {
-                var resp = CacheService.put(n.cacheKey, UtilsService.cleanElement(data.elements[0]), true);
-                //special case for products view2view updates 
-                if (resp.specialization && resp.specialization.view2view &&
-                    elem.specialization && elem.specialization.view2view)
-                    resp.specialization.view2view = elem.specialization.view2view;
-                deferred.resolve(resp);
-
-                var edit = CacheService.get(UtilsService.makeElementKey(elem.sysmlid, n.ws, null, true));
-                if (edit) {
-                    // Only want to merge the properties that were updated:
-                    _.merge(edit, resp, function(a,b,id) {
-                        if (elem.hasOwnProperty(id)) {
-                            return b;
-                        }
-                        else {
-                            return a;
-                        }
-                    });
-                    UtilsService.cleanElement(edit, true);
-                }
+                handleSuccess(n, data);
             }).error(function(data, status, headers, config) {
                 if (status === 409) {
                     var server = _.cloneDeep(data.elements[0]);
@@ -374,27 +380,44 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                     delete server.read;
                     delete server.creator;
                     UtilsService.cleanElement(server);
-                    var orig = CacheService.get(UtilsService.makeElementKey(elem.sysmlid, n.ws, null, false));
-                    if (!orig) {
-                        URLService.handleHttpStatus(data, status, headers, config, deferred);
-                    } else {
-                        var current = _.cloneDeep(orig);
-                        delete current.modified;
-                        delete current.read;
-                        delete current.creator;
-                        UtilsService.cleanElement(current);
-                        if (angular.equals(server, current)) {
-                            elem.read = newread;
-                            elem.modified = newmodified;
-                            updateElement(elem, workspace)
-                            .then(function(good){
-                                deferred.resolve(good);
-                            }, function(reason) {
-                                deferred.reject(reason);
-                            });
-                        } else {
-                            URLService.handleHttpStatus(data, status, headers, config, deferred);
+                    var hasRealConflicts = false;
+
+                    // Check if there was a conflict with the properties updated:
+                    for (var prop in elem) {
+                        if ( elem.hasOwnProperty(prop) && server.hasOwnProperty(prop) &&
+                             !angular.equals(elem[prop], server[prop]) ) {
+
+                            hasRealConflicts = true;
+                            break;
                         }
+                    }
+
+                    if (hasRealConflicts) {
+                        var orig = CacheService.get(UtilsService.makeElementKey(elem.sysmlid, n.ws, null, false));
+                        if (!orig) {
+                            URLService.handleHttpStatus(data, status, headers, config, deferred);
+                        } else {
+                            var current = _.cloneDeep(orig);
+                            delete current.modified;
+                            delete current.read;
+                            delete current.creator;
+                            UtilsService.cleanElement(current);
+                            if (angular.equals(server, current)) {
+                                elem.read = newread;
+                                elem.modified = newmodified;
+                                updateElement(elem, workspace)
+                                .then(function(good){
+                                    deferred.resolve(good);
+                                }, function(reason) {
+                                    deferred.reject(reason);
+                                });
+                            } else {
+                                URLService.handleHttpStatus(data, status, headers, config, deferred);
+                            }
+                        }
+                    }
+                    else {
+                        handleSuccess(n, data);
                     }
                 } else
                     URLService.handleHttpStatus(data, status, headers, config, deferred);
@@ -616,9 +639,47 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
      * @param {string} [workspace=master] (optional) workspace to use
      * @returns {Promise} The promise will be resolved with an array of element objects
      */
-    var search = function(query, update, workspace) {
+    var search = function(query, filters, propertyName, update, workspace) {
+        //var n = normalize(null, update, workspace, null);
+        //return getGenericElements(URLService.getElementSearchURL(query, n.ws), 'elements', n.update, n.ws, n.ver);
         var n = normalize(null, update, workspace, null);
-        return getGenericElements(URLService.getElementSearchURL(query, n.ws), 'elements', n.update, n.ws, n.ver);
+        var url = URLService.getElementSearchURL(query, filters, propertyName, n.ws);
+        var progress = 'search(' + url + n.update + n.ws + ')';
+        if (inProgress.hasOwnProperty(progress)) {
+            HttpService.ping(url);
+            return inProgress[progress];
+        }
+
+        var deferred = $q.defer();
+        inProgress[progress] = deferred.promise;
+        HttpService.get(url, 
+            function(data, status, headers, config) {
+                var result = [];
+                data.elements.forEach(function(element) {
+                    var properties = element.properties;
+                    if (properties)
+                        delete element.properties;
+                    var ekey = UtilsService.makeElementKey(element.sysmlid, n.ws, n.ver);
+                    CacheService.put(ekey, UtilsService.cleanElement(element), true);
+                    if (properties) {
+                        properties.forEach(function(property) {
+                            var pkey = UtilsService.makeElementKey(property.sysmlid, n.ws, n.ver);
+                            CacheService.put(pkey, UtilsService.cleanElement(property), true);
+                        });
+                    }
+                    var toAdd = JSON.parse(JSON.stringify(element));
+                    toAdd.properties = properties;
+                    result.push(toAdd);
+                }); 
+                delete inProgress[progress];
+                deferred.resolve(result); 
+            },
+            function(data, status, headers, config) {
+                URLService.handleHttpStatus(data, status, headers, config, deferred);
+                delete inProgress[progress];
+            }
+        );
+        return deferred.promise;
     };
 
     /**
