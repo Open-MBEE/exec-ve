@@ -3,7 +3,7 @@
     <h4>INSERT A CROSS-REFERENCE</h4>
 
     <div class="transclude-modal-instructions">
-        Begin by searching for an element, then click a link to cross-reference.
+        Begin by searching for an element, then click a field to cross-reference.
     </div>
 
 </div>
@@ -13,11 +13,19 @@
     <div class="transclude-modal-input">
         <form ng-submit="search(searchText)">
             <div class="form-search input-group">
-                <input class="form-control" type="text" ng-model="searchText" placeholder="Search for an element by keyword" />
+                <input class="form-control" type="text" ng-model="searchText" placeholder="Search for an element" />
                 <span class="input-group-btn">                
                     <button class="btn btn-primary" type="button" ng-click="search(searchText)">
                     <span class="btn-text">SEARCH</span> <i class="{{searchClass}}"></i></button>
                 </span>
+            </div>
+            <div class="container-search-type">
+                <div class="btn-group btn-group-xs">
+                    <button ng-click="setSearchType('name')" type="button" class="btn-search-name btn-search-type btn btn-default active">NAME</button>
+                    <button ng-click="setSearchType('doc')" type="button" class="btn-search-doc btn btn-search-type btn-default">DOCUMENTATION</button>
+                    <button ng-click="setSearchType('value')" type="button" class="btn-search-value btn-search-type btn btn-default">VALUE</button>
+                    <button ng-click="setSearchType('id')" type="button" class="btn-search-id btn-search-type btn btn-default">MDID</button>
+                </div>
             </div>
         </form>
         <div class="misc-form-field" ng-show="mmsCfElements && searchSuccess">
@@ -95,6 +103,10 @@
                 </table>
             </div>
         </div>
+    </div>
+
+    <div class="container-no-results container-fluid" ng-show="mmsCfElements.length === 0 && searchSuccess">
+        <h3>NO RESULTS FOUND.</h3>
     </div>
 
 </div>
