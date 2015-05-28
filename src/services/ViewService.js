@@ -785,6 +785,47 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         return deferred.promise;
     };
 
+
+    var getElementReferenceTree = function (contents, workspace) {
+
+        var promises = [];
+        angular.forEach(contents.operand, function(content) {
+            promises.push( getElementReference(content, workspace) );
+        });
+        return $q.all(promises);
+    };
+
+    var getElementReference = function (content, workspace) {
+        var deferred = $q.defer();
+
+        var elementObject = {};
+
+        elementObject.instance = content.instance;
+        elementObject.operand = content;
+        elementObject.sectionElements = [];
+
+        getInstanceSpecification(content, workspace).then(function(instanceSpecification) {
+
+            elementObject.instanceSpecification = instanceSpecification;
+
+        });
+
+        parseExprRefTree(content, workspace).then(function(presentationElement) {
+
+            elementObject.presentationElement = presentationElement;
+
+            if (presentationElement.type === 'Section') {
+                getElementReferenceTree(presentationElement.specialization.instanceSpecificationSpecification, workspace).then(function(sectionElementReferenceTree) {
+                    elementObject.sectionElements = sectionElementReferenceTree;
+                });
+            }
+        });
+
+        deferred.resolve(elementObject);
+        
+        return deferred.promise;
+    };
+
     /**
      * @ngdoc method
      * @name mms.ViewService#getInstanceSpecification
@@ -875,7 +916,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         deleteElementFromViewOrSection: deleteElementFromViewOrSection,
         addInstanceSpecification: addInstanceSpecification,
         typeToClassifierId: typeToClassifierId,
-        getInstanceSpecification : getInstanceSpecification
+        getInstanceSpecification : getInstanceSpecification,
+        getElementReferenceTree : getElementReferenceTree
     };
 
 }
