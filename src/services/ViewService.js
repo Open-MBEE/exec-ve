@@ -433,6 +433,11 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         var deferred = $q.defer();
         var instanceSpecName = name ? name : "Untitled InstanceSpec";
         var presentationElem = {};
+        var splitArray = viewOrSection.qualifiedId.split('/');
+        var projectId = null;
+
+        if (splitArray && splitArray.length > 2)
+            projectId = splitArray[2];
 
         var processInstanceSpec = function(createdInstanceSpecUpdate) {
 
@@ -545,6 +550,10 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
               instanceSpecificationSpecification: presentationElem
            }
         };
+
+        if (projectId) {
+            instanceSpec.owner = projectId;
+        }
 
         ElementService.createElement(instanceSpec, workspace, site).then(function(createdInstanceSpec) {
 
