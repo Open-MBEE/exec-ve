@@ -410,9 +410,31 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
             }
         };
 
-        var addContentsSectionTreeNode = function(instanceVal) {
-
-           ViewService.parseExprRefTree(instanceVal, $scope.workspace)
+        var addContentsSectionTreeNode = function(operand) {
+            var instances = [];
+            operand.forEach(function(instanceVal) {
+                instances.push(ViewService.parseExprRefTree(instanceVal, $scope.workspace));
+            });
+            $q.all(instances).then(function(results) {
+                var k = results.length - 1;
+                for (; k >= 0; k--) {
+                    var instance = results[k];
+                    if (ViewService.isSection(instance)) {
+                        var sectionTreeNode = {
+                            label : instance.name,
+                            type : "section",
+                            view : viewNode.data.sysmlid,
+                            data : instance,
+                            children: []
+                        };
+                        parentNode.children.unshift(sectionTreeNode);
+                        addSectionElements(instance, viewNode, sectionTreeNode);
+                    }
+                }
+            }, function(reason) {
+                //view is bad
+            });
+           /*ViewService.parseExprRefTree(instanceVal, $scope.workspace)
            .then(function(containedElement) {
                if (ViewService.isSection(containedElement)) {
                     var sectionTreeNode = { 
@@ -425,7 +447,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
                     parentNode.children.unshift(sectionTreeNode);
                     addSectionElements(containedElement, viewNode, sectionTreeNode);
                 }
-            });
+            });*/
         };
 
         if (element.specialization) {
@@ -442,7 +464,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
                 contains = element.specialization.contains;
             }
         }
-        else {
+        /*else {
 
             if (element.contents) {
                 contents = element.contents;
@@ -450,7 +472,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
             else if (element.contains) {
                 contains = element.contains;
             }
-        }
+        }*/
 
         var j;
         if (contains) {
@@ -460,10 +482,11 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
             }
         }
         if (contents && contents.operand) {
-            j = contents.operand.length - 1;
+            addContentsSectionTreeNode(contents.operand);
+            /*j = contents.operand.length - 1;
             for (; j >= 0; j--) {
                 addContentsSectionTreeNode(contents.operand[j]);
-            }
+            }*/
         }
     }
     // TODO: Update behavior to handle new state descriptions
