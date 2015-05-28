@@ -431,6 +431,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
                         addSectionElements(instance, viewNode, sectionTreeNode);
                     }
                 }
+                $scope.treeApi.refresh();
             }, function(reason) {
                 //view is bad
             });
@@ -508,14 +509,22 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
         } else if ($state.includes('workspace.site.document')) {
 
             var view = branch.type === 'section' ? branch.view : branch.data.sysmlid;
+            var sectionId = branch.type === 'section' ? branch.data.sysmlid : null;
+            var hash = sectionId ? sectionId : view;
             if ($rootScope.mms_fullDocMode) {
-                $location.hash(view);
+                $location.hash(hash);
                 $rootScope.veCurrentView = view;
                 ViewService.setCurrentViewId(view);
                 $anchorScroll();
             } else if (branch.type === 'view') {
                 $state.go('workspace.site.document.view', {view: branch.data.sysmlid});
-            } 
+            } else if (branch.type === 'section') {
+                $state.go('workspace.site.document.view', {view: view});
+                $timeout(function() {
+                    $location.hash(hash);
+                    $anchorScroll();
+                }, 1000);
+            }
         }
         $rootScope.mms_tbApi.select('element.viewer');
     };

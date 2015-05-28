@@ -1,5 +1,5 @@
 <div ng-show="presentationElemLoading" class="fa fa-spinner fa-spin"></div>
-<div ng-hide="presentationElemLoading" ng-switch on="presentationElem.type"> 
+<div id="{{instanceSpec.sysmlid}}" ng-hide="presentationElemLoading" ng-switch on="presentationElem.type"> 
     <mms-view-para data-mms-instance-val="mmsInstanceVal" data-mms-para="presentationElem" ng-switch-when="Paragraph"></mms-view-para>
     <mms-view-table data-mms-instance-val="mmsInstanceVal" data-mms-table="presentationElem" ng-switch-when="Table"></mms-view-table>
     <mms-view-table-t data-mms-instance-val="mmsInstanceVal" data-mms-para="presentationElem" ng-switch-when="TableT"></mms-view-table-t>
