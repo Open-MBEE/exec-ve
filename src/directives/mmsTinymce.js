@@ -76,7 +76,7 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
             $scope.setSearchType = function(searchType) {
                 $scope.searchType = searchType;
                 angular.element('.btn-search-name').removeClass('active');
-                angular.element('.btn-search-doc').removeClass('active');
+                angular.element('.btn-search-documentation').removeClass('active');
                 angular.element('.btn-search-value').removeClass('active');
                 angular.element('.btn-search-id').removeClass('active');
                 angular.element('.btn-search-' + searchType).addClass('active');
