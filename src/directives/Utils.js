@@ -275,7 +275,11 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
         }
 
         // Want the save object to contain only what properties were edited:
-        var myEdit = {sysmlid: scope.edit.sysmlid};
+        var myEdit = {
+                        sysmlid: scope.edit.sysmlid,
+                        modified: scope.edit.modified,
+                        read: scope.edit.read
+                     };
         if (type) {
             myEdit[type] = scope.edit[type];
         }
