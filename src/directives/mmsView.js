@@ -73,7 +73,8 @@ function mmsView(ViewService, $templateCache, $rootScope, growl) {
                 elementName === 'MMS-VIEW-PARA' ||
                 elementName === 'MMS-VIEW-TABLE' ||
                 elementName === 'MMS-VIEW-TABLE-T' ||
-                elementName === 'MMS-VIEW-LIST-T') {
+                elementName === 'MMS-VIEW-LIST-T' ||
+                elementName === 'MMS-VIEW-EQUATION') {
                 return true;
             }
             return false;

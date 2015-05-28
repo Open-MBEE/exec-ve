@@ -275,7 +275,11 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
         }
 
         // Want the save object to contain only what properties were edited:
-        var myEdit = {sysmlid: scope.edit.sysmlid};
+        var myEdit = {
+                        sysmlid: scope.edit.sysmlid,
+                        modified: scope.edit.modified,
+                        read: scope.edit.read
+                     };
         if (type) {
             myEdit[type] = scope.edit[type];
         }
@@ -357,7 +361,7 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
         ViewService.deleteElementFromViewOrSection(viewOrSecId, scope.ws, scope.instanceVal).then(function(data) {
             if (ViewService.isSection(scope.presentationElem)) {
                 // Broadcast message to TreeCtrl:
-                $rootScope.$broadcast('viewctrl.delete.section', scope.presentationElem.name);
+                $rootScope.$broadcast('viewctrl.delete.section', scope.presentationElem);
             }
              // Broadcast message for the ToolCtrl:
             $rootScope.$broadcast('presentationElem.cancel',scope.edit, scope.ws);

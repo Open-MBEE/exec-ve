@@ -380,45 +380,42 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                     delete server.read;
                     delete server.creator;
                     UtilsService.cleanElement(server);
-                    var hasRealConflicts = false;
 
-                    // Check if there was a conflict with the properties updated:
-                    for (var prop in elem) {
-                        if ( elem.hasOwnProperty(prop) && server.hasOwnProperty(prop) &&
-                             !angular.equals(elem[prop], server[prop]) ) {
+                    var orig = CacheService.get(UtilsService.makeElementKey(elem.sysmlid, n.ws, null, false));
+                    if (!orig) {
+                        URLService.handleHttpStatus(data, status, headers, config, deferred);
+                    } else {
+                        var hasRealConflicts = false;
+                        var current = _.cloneDeep(orig);
+                        delete current.modified;
+                        delete current.read;
+                        delete current.creator;
+                        UtilsService.cleanElement(current);
 
-                            hasRealConflicts = true;
-                            break;
-                        }
-                    }
+                        // Check if there was a conflict with the properties updated:
+                        for (var prop in elem) {
+                            if ( current.hasOwnProperty(prop) && server.hasOwnProperty(prop) &&
+                                 !angular.equals(current[prop], server[prop]) ) {
 
-                    if (hasRealConflicts) {
-                        var orig = CacheService.get(UtilsService.makeElementKey(elem.sysmlid, n.ws, null, false));
-                        if (!orig) {
-                            URLService.handleHttpStatus(data, status, headers, config, deferred);
-                        } else {
-                            var current = _.cloneDeep(orig);
-                            delete current.modified;
-                            delete current.read;
-                            delete current.creator;
-                            UtilsService.cleanElement(current);
-                            if (angular.equals(server, current)) {
-                                elem.read = newread;
-                                elem.modified = newmodified;
-                                updateElement(elem, workspace)
-                                .then(function(good){
-                                    deferred.resolve(good);
-                                }, function(reason) {
-                                    deferred.reject(reason);
-                                });
-                            } else {
-                                URLService.handleHttpStatus(data, status, headers, config, deferred);
+                                hasRealConflicts = true;
+                                break;
                             }
                         }
+
+                        if (!hasRealConflicts) {
+                            elem.read = newread;
+                            elem.modified = newmodified;
+                            updateElement(elem, workspace)
+                            .then(function(good){
+                                deferred.resolve(good);
+                            }, function(reason) {
+                                deferred.reject(reason);
+                            });
+                        } else {
+                            URLService.handleHttpStatus(data, status, headers, config, deferred);
+                        }
                     }
-                    else {
-                        handleSuccess(n, data);
-                    }
+                    
                 } else
                     URLService.handleHttpStatus(data, status, headers, config, deferred);
             });

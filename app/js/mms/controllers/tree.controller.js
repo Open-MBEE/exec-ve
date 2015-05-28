@@ -410,9 +410,32 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
             }
         };
 
-        var addContentsSectionTreeNode = function(instanceVal) {
-
-           ViewService.parseExprRefTree(instanceVal, $scope.workspace)
+        var addContentsSectionTreeNode = function(operand) {
+            var instances = [];
+            operand.forEach(function(instanceVal) {
+                instances.push(ViewService.parseExprRefTree(instanceVal, $scope.workspace));
+            });
+            $q.all(instances).then(function(results) {
+                var k = results.length - 1;
+                for (; k >= 0; k--) {
+                    var instance = results[k];
+                    if (ViewService.isSection(instance)) {
+                        var sectionTreeNode = {
+                            label : instance.name,
+                            type : "section",
+                            view : viewNode.data.sysmlid,
+                            data : instance,
+                            children: []
+                        };
+                        parentNode.children.unshift(sectionTreeNode);
+                        addSectionElements(instance, viewNode, sectionTreeNode);
+                    }
+                }
+                $scope.treeApi.refresh();
+            }, function(reason) {
+                //view is bad
+            });
+           /*ViewService.parseExprRefTree(instanceVal, $scope.workspace)
            .then(function(containedElement) {
                if (ViewService.isSection(containedElement)) {
                     var sectionTreeNode = { 
@@ -425,7 +448,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
                     parentNode.children.unshift(sectionTreeNode);
                     addSectionElements(containedElement, viewNode, sectionTreeNode);
                 }
-            });
+            });*/
         };
 
         if (element.specialization) {
@@ -442,7 +465,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
                 contains = element.specialization.contains;
             }
         }
-        else {
+        /*else {
 
             if (element.contents) {
                 contents = element.contents;
@@ -450,7 +473,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
             else if (element.contains) {
                 contains = element.contains;
             }
-        }
+        }*/
 
         var j;
         if (contains) {
@@ -460,10 +483,11 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
             }
         }
         if (contents && contents.operand) {
-            j = contents.operand.length - 1;
+            addContentsSectionTreeNode(contents.operand);
+            /*j = contents.operand.length - 1;
             for (; j >= 0; j--) {
                 addContentsSectionTreeNode(contents.operand[j]);
-            }
+            }*/
         }
     }
     // TODO: Update behavior to handle new state descriptions
@@ -485,14 +509,22 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
         } else if ($state.includes('workspace.site.document')) {
 
             var view = branch.type === 'section' ? branch.view : branch.data.sysmlid;
+            var sectionId = branch.type === 'section' ? branch.data.sysmlid : null;
+            var hash = sectionId ? sectionId : view;
             if ($rootScope.mms_fullDocMode) {
-                $location.hash(view);
+                $location.hash(hash);
                 $rootScope.veCurrentView = view;
                 ViewService.setCurrentViewId(view);
                 $anchorScroll();
             } else if (branch.type === 'view') {
                 $state.go('workspace.site.document.view', {view: branch.data.sysmlid});
-            } 
+            } else if (branch.type === 'section') {
+                $state.go('workspace.site.document.view', {view: view});
+                $timeout(function() {
+                    $location.hash(hash);
+                    $anchorScroll();
+                }, 1000);
+            }
         }
         $rootScope.mms_tbApi.select('element.viewer');
     };
@@ -963,9 +995,9 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
     }
 
     // ViewCtrl creates this event when adding sections to the view
-    $scope.$on('viewctrl.add.section', function(event, instanceSpec, parentBranchName) {
+    $scope.$on('viewctrl.add.section', function(event, instanceSpec, parentBranchData) {
 
-        var branch = $scope.treeApi.get_branch(parentBranchName);
+        var branch = $scope.treeApi.get_branch(parentBranchData);
 
         var newbranch = {
             label: instanceSpec.name,
@@ -979,9 +1011,9 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
     });
 
     // ViewCtrl creates this event when deleting sections from the view
-    $scope.$on('viewctrl.delete.section', function(event, sectionName) {
+    $scope.$on('viewctrl.delete.section', function(event, sectionData) {
 
-        var branch = $scope.treeApi.get_branch(sectionName);
+        var branch = $scope.treeApi.get_branch(sectionData);
 
         $scope.treeApi.remove_branch(branch);
     });

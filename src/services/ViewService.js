@@ -317,17 +317,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             .then(function(data2) {
                 deferred.resolve(data2);
             }, function(reason) {
-                if (reason.status === 409) {
-                    clone.read = reason.data.elements[0].read;
-                    clone.modified = reason.data.elements[0].modified;
-                    ElementService.updateElement(clone, ws)
-                    .then(function(data3) {
-                        deferred.resolve(data3);
-                    }, function(reason2) {
-                        deferred.reject(reason2);
-                    });
-                } else
-                    deferred.reject(reason);
+                deferred.reject(reason);
             });
         }, function(reason) {
             deferred.reject(reason);
@@ -386,17 +376,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 .then(function(data2) {
                     deferred.resolve(data2);
                 }, function(reason) {
-                    if (reason.status === 409) {
-                        clone.read = reason.data.elements[0].read;
-                        clone.modified = reason.data.elements[0].modified;
-                        updateDocument(clone, ws)
-                        .then(function(data3) {
-                            deferred.resolve(data3);
-                        }, function(reason2) {
-                            deferred.reject(reason2);
-                        });
-                    } else
-                        deferred.reject(reason);
+                    deferred.reject(reason);
                 });
             }, function(reason) {
                 deferred.reject(reason);
@@ -453,6 +433,11 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         var deferred = $q.defer();
         var instanceSpecName = name ? name : "Untitled InstanceSpec";
         var presentationElem = {};
+        var splitArray = viewOrSection.qualifiedId.split('/');
+        var projectId = null;
+
+        if (splitArray && splitArray.length > 2)
+            projectId = splitArray[2];
 
         var processInstanceSpec = function(createdInstanceSpecUpdate) {
 
@@ -460,7 +445,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 addInstanceVal(viewOrSection, workspace, createdInstanceSpecUpdate.sysmlid).then(function(updatedView) {
                     if (type === "Section") {
                         // Broadcast message to TreeCtrl:
-                        $rootScope.$broadcast('viewctrl.add.section', createdInstanceSpecUpdate, viewOrSection.name);
+                        $rootScope.$broadcast('viewctrl.add.section', createdInstanceSpecUpdate, viewOrSection);
                     }
                     deferred.resolve(updatedView);
                 }, function(reason) {
@@ -565,6 +550,10 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
               instanceSpecificationSpecification: presentationElem
            }
         };
+
+        if (projectId) {
+            instanceSpec.owner = projectId;
+        }
 
         ElementService.createElement(instanceSpec, workspace, site).then(function(createdInstanceSpec) {
 
@@ -796,6 +785,47 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         return deferred.promise;
     };
 
+
+    var getElementReferenceTree = function (contents, workspace) {
+
+        var promises = [];
+        angular.forEach(contents.operand, function(content) {
+            promises.push( getElementReference(content, workspace) );
+        });
+        return $q.all(promises);
+    };
+
+    var getElementReference = function (content, workspace) {
+        var deferred = $q.defer();
+
+        var elementObject = {};
+
+        elementObject.instance = content.instance;
+        elementObject.operand = content;
+        elementObject.sectionElements = [];
+
+        getInstanceSpecification(content, workspace).then(function(instanceSpecification) {
+
+            elementObject.instanceSpecification = instanceSpecification;
+
+        });
+
+        parseExprRefTree(content, workspace).then(function(presentationElement) {
+
+            elementObject.presentationElement = presentationElement;
+
+            if (presentationElement.type === 'Section') {
+                getElementReferenceTree(presentationElement.specialization.instanceSpecificationSpecification, workspace).then(function(sectionElementReferenceTree) {
+                    elementObject.sectionElements = sectionElementReferenceTree;
+                });
+            }
+        });
+
+        deferred.resolve(elementObject);
+        
+        return deferred.promise;
+    };
+
     /**
      * @ngdoc method
      * @name mms.ViewService#getInstanceSpecification
@@ -886,7 +916,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         deleteElementFromViewOrSection: deleteElementFromViewOrSection,
         addInstanceSpecification: addInstanceSpecification,
         typeToClassifierId: typeToClassifierId,
-        getInstanceSpecification : getInstanceSpecification
+        getInstanceSpecification : getInstanceSpecification,
+        getElementReferenceTree : getElementReferenceTree
     };
 
 }
