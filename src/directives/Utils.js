@@ -361,7 +361,7 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
         ViewService.deleteElementFromViewOrSection(viewOrSecId, scope.ws, scope.instanceVal).then(function(data) {
             if (ViewService.isSection(scope.presentationElem)) {
                 // Broadcast message to TreeCtrl:
-                $rootScope.$broadcast('viewctrl.delete.section', scope.presentationElem.name);
+                $rootScope.$broadcast('viewctrl.delete.section', scope.presentationElem);
             }
              // Broadcast message for the ToolCtrl:
             $rootScope.$broadcast('presentationElem.cancel',scope.edit, scope.ws);

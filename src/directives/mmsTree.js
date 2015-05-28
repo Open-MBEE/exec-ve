@@ -616,12 +616,12 @@ function mmsTree($timeout, $log, $templateCache) {
              * @methodOf mms.directives.directive:mmsTree
              * 
              * @description 
-             * Returns the branch with the specified label
+             * Returns the branch with the specified data
              */
-            tree.get_branch = function(label) {
+            tree.get_branch = function(data) {
                 var branch = null;
                 for_each_branch(function(b) {
-                    if (b.label === label) {
+                    if (angular.equals(b.data,data)) {
                         branch = b;
                     }
                 });

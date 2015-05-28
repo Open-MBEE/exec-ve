@@ -986,9 +986,9 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
     }
 
     // ViewCtrl creates this event when adding sections to the view
-    $scope.$on('viewctrl.add.section', function(event, instanceSpec, parentBranchName) {
+    $scope.$on('viewctrl.add.section', function(event, instanceSpec, parentBranchData) {
 
-        var branch = $scope.treeApi.get_branch(parentBranchName);
+        var branch = $scope.treeApi.get_branch(parentBranchData);
 
         var newbranch = {
             label: instanceSpec.name,
@@ -1002,9 +1002,9 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
     });
 
     // ViewCtrl creates this event when deleting sections from the view
-    $scope.$on('viewctrl.delete.section', function(event, sectionName) {
+    $scope.$on('viewctrl.delete.section', function(event, sectionData) {
 
-        var branch = $scope.treeApi.get_branch(sectionName);
+        var branch = $scope.treeApi.get_branch(sectionData);
 
         $scope.treeApi.remove_branch(branch);
     });

@@ -268,7 +268,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
             then(function(data) {
                 if ($scope.presentationElemType === "Section") {
                     // Broadcast message to TreeCtrl:
-                    $rootScope.$broadcast('viewctrl.add.section', element, $scope.viewOrSection.name);
+                    $rootScope.$broadcast('viewctrl.add.section', element, $scope.viewOrSection);
                 }
                 growl.success("Adding "+$scope.presentationElemType+"  Successful");
                 $modalInstance.close(data);
