@@ -71,6 +71,16 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
             $scope.searchSuccess = false;
             $scope.requestName = false;
             $scope.requestDocumentation = false;
+            $scope.searchType = 'name';
+
+            $scope.setSearchType = function(searchType) {
+                $scope.searchType = searchType;
+                angular.element('.btn-search-name').removeClass('active');
+                angular.element('.btn-search-doc').removeClass('active');
+                angular.element('.btn-search-value').removeClass('active');
+                angular.element('.btn-search-id').removeClass('active');
+                angular.element('.btn-search-' + searchType).addClass('active');
+            };
             $scope.choose = function(elementId, property, name) {
                 var tag = '<mms-transclude-' + property + ' data-mms-eid="' + elementId + '">[cf:' + name + '.' + property + ']</mms-transclude-' + property + '> ';
                 $modalInstance.close(tag);
@@ -79,14 +89,28 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                 $modalInstance.dismiss();
             };
             $scope.search = function(searchText) {
-                //var searchText = $scope.searchText; //TODO investigate why searchText isn't in $scope
-                //growl.info("Searching...");
+                // var searchText = $scope.searchText; //TODO investigate why searchText isn't in $scope
                 $scope.searchClass = "fa fa-spin fa-spinner";
-                ElementService.search(searchText, null, null, false, scope.mmsWs)
+                ElementService.search(searchText, [$scope.searchType], null, false, scope.mmsWs)
                 .then(function(data) {
                     $scope.searchSuccess = true;
-                    $scope.mmsCfElements = data;
                     $scope.searchClass = "";
+
+                    // change properties arr to 2-dim to display table
+                    data.forEach(function(elem) {
+                        if (elem.properties && elem.properties[0]) {
+                            var properties = [];
+                            for (var i = 0; i < elem.properties.length; i++) {
+                                if (i % 3 === 0) {
+                                    properties.push([]);
+                                }
+                                properties[properties.length-1].push(elem.properties[i]);
+                            }
+                            elem.properties = properties;
+                        }
+                    });
+
+                    $scope.mmsCfElements = data;
                 }, function(reason) {
                     growl.error("Search Error: " + reason.message);
                     $scope.searchClass = "";
