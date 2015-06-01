@@ -47,17 +47,15 @@ function mmsViewReorder(ViewService, $templateCache, growl, $q, _) {
                 scope.view = data;
                 scope.lastModified = data.lastModified;
                 scope.author = data.author;
-                // TODO remove scope.edit = _.cloneDeep(scope.view);
                 scope.edit = { sysmlid: data.sysmlid };
                 scope.edit.specialization = _.cloneDeep(scope.view.specialization);
 
                 scope.editable = scope.view.editable && scope.mmsVersion === 'latest';
-                // delete scope.edit.name;
-                // delete scope.edit.documentation;
 
                 if (data.specialization.contents) {
                     ViewService.getElementReferenceTree(data.specialization.contents, scope.mmsWs, scope.mmsVersion).then(function(elementReferenceTree) {
                         scope.elementReferenceTree = elementReferenceTree;
+                        scope.originalElementReferenceTree = _.clone(elementReferenceTree);
                     });
                 }
 
@@ -73,7 +71,6 @@ function mmsViewReorder(ViewService, $templateCache, growl, $q, _) {
             if (!scope.editable) 
                 return false;
             scope.editing = !scope.editing;
-            // TODO: element.find('.ui-sortable').sortable('option', 'cancel', scope.editing ? '' : 'div');
             return true;
         };
 
@@ -102,8 +99,7 @@ function mmsViewReorder(ViewService, $templateCache, growl, $q, _) {
         };
 
         scope.revert = function() {
-            // TODO: 
-            // scope.edit = _.cloneDeep(scope.elementReferenceTree);
+            scope.elementReferenceTree = _.clone(scope.originalElementReferenceTree);
         };
 
         if (angular.isObject(scope.mmsViewReorderApi)) {
@@ -114,7 +110,6 @@ function mmsViewReorder(ViewService, $templateCache, growl, $q, _) {
                 if (!scope.editable && mode)
                     return false;
                 scope.editing = mode;
-                // TODO: element.find('.ui-sortable').sortable('option', 'cancel', scope.editing ? '' : 'div');
             };
             api.revertEdits = scope.revert;
         }
