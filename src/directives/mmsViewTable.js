@@ -35,8 +35,7 @@ function mmsViewTable($compile, $timeout, $templateCache, UtilsService) {
         restrict: 'E',
         //template: template,
         scope: {
-            table: '=mmsTable',
-            instanceVal: '=mmsInstanceVal'
+            table: '=mmsTable'
         },
         controller: ['$scope', '$rootScope', mmsViewTableCtrl],
         link: mmsViewTableLink

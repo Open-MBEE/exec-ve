@@ -2,7 +2,7 @@
     <h1 class="prop"><input class="form-control" type="text" ng-model="edit.name"></input></h1>
 
     <h2 ng-hide="mmsViewEdit" class="prop-title">LAST MODIFICATION</h2>
-    <h3 ng-hide="mmsViewEdit" class="prop">{{element.modified | date:'M/d/yy h:mm a'}} by {{element.creator}}</h3>
+    <h3 ng-hide="mmsViewEdit" class="prop">{{element.modified | date:'M/d/yy h:mm a'}} by {{element.modifier}}</h3>
 
     <div ng-if="edit.specialization.type === 'Property'">
         <h2 class="prop-title spec-view-value-heading">PROPERTY VALUE</h2>
@@ -63,7 +63,7 @@
     <h1 class="prop element-title">{{element.name}}</h1>
 
     <h2 class="prop-title">LAST MODIFICATION</h2>
-    <h3 class="prop">{{element.modified | date:'M/d/yy h:mm a'}} by {{element.creator}}</h3>
+    <h3 class="prop">{{element.modified | date:'M/d/yy h:mm a'}} by {{element.modifier}}</h3>
 
     <div ng-if="element.specialization.type === 'Property'">
         <h2 class="prop-title spec-view-value-heading">PROPERTY VALUE</h2>

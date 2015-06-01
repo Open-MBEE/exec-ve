@@ -9,7 +9,7 @@
     </h1>
 
     <div ng-show="showElements">
-      Last Modified: {{modified | date:'M/d/yy h:mm a'}} by {{creator}}
+      Last Modified: {{modified | date:'M/d/yy h:mm a'}} by {{modifier}}
     </div>
 
     <br/>
@@ -24,9 +24,10 @@
             <mms-view-section data-mms-section="::contain" ng-switch-when="Section"></mms-view-section>
         </div>
     </div>
-
-    <div ng-repeat="instanceVal in view.specialization.contents.operand"> 
-        <mms-view-presentation-elem data-mms-instance-val="instanceVal"></mms-view-presentation-elem>
+    <div ng-if="view.specialization.contents">
+        <div ng-repeat="instanceVal in view.specialization.contents.operand track by instanceVal.instance"> 
+            <mms-view-presentation-elem data-mms-instance-val="::instanceVal"></mms-view-presentation-elem>
+        </div>
     </div>
 
 </div>

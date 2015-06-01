@@ -26,6 +26,15 @@ function mmsViewReorder(ViewService, $templateCache, growl, $q, _) {
         this.getEditing = function() {
             return $scope.editing;
         };
+        $scope.treeOptions = {
+            accept: function(sourceNodeScope, destNodeScope, destIndex) {
+                if (destNodeScope.$element.hasClass('root'))
+                    return true;
+                if (destNodeScope.element.presentationElement.type === 'Section')
+                    return true;
+                return false;
+            }
+        };
     };
 
     var mmsViewReorderLink = function(scope, element, attrs) {
@@ -79,7 +88,7 @@ function mmsViewReorder(ViewService, $templateCache, growl, $q, _) {
             if (scope.edit.specialization.contents) {
                 scope.edit.specialization.contents.operand = [];
                 for (var i = 0; i < scope.elementReferenceTree.length; i++) {
-                    scope.edit.specialization.contents.operand.push(scope.elementReferenceTree[i].operand);
+                    scope.edit.specialization.contents.operand.push(scope.elementReferenceTree[i].instanceVal);
                 }
             }
 
@@ -87,18 +96,7 @@ function mmsViewReorder(ViewService, $templateCache, growl, $q, _) {
             .then(function(data) {
                 deferred.resolve(data);
             }, function(reason) {
-                if (reason.status === 409) {
-                    scope.latest = reason.data.elements[0];
-                    scope.edit.read = scope.latest.read;
-                    scope.save().then(function(resolved) {
-                        deferred.resolve(resolved);
-                    }, function(rejected) {
-                        deferred.reject(rejected);
-                    });
-                } else {
-                    deferred.reject({type: 'error', message: reason.message});
-                    //growl.error("Save Error: Status " + reason.status);
-                }
+                deferred.reject(reason);
             });
             return deferred.promise;
         };

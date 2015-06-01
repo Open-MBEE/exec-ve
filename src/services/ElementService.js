@@ -343,25 +343,19 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
 
         var handleSuccess = function(n, data) {
             var resp = CacheService.put(n.cacheKey, UtilsService.cleanElement(data.elements[0]), true);
-            //special case for products view2view updates 
-            if (resp.specialization && resp.specialization.view2view &&
-                elem.specialization && elem.specialization.view2view)
-                resp.specialization.view2view = elem.specialization.view2view;
-            deferred.resolve(resp);
-
             var edit = CacheService.get(UtilsService.makeElementKey(elem.sysmlid, n.ws, null, true));
             if (edit) {
                 // Only want to merge the properties that were updated:
-                _.merge(edit, resp, function(a,b,id) {
-                    if (elem.hasOwnProperty(id)) {
-                        return b;
-                    }
-                    else {
-                        return a;
-                    }
-                });
+                var updated = UtilsService.filterProperties(elem, resp);
+                _.merge(edit, updated);
                 UtilsService.cleanElement(edit, true);
             }
+            //special case for products view2view updates and view contents
+            if (elem.specialization && elem.specialization.view2view)
+                resp.specialization.view2view = elem.specialization.view2view;
+            if (elem.specialization && elem.specialization.contents)
+                resp.specialization.contents = elem.specialization.contents;
+            deferred.resolve(resp);
         };
 
         if (!elem.hasOwnProperty('sysmlid'))
@@ -373,38 +367,16 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                 handleSuccess(n, data);
             }).error(function(data, status, headers, config) {
                 if (status === 409) {
-                    var server = _.cloneDeep(data.elements[0]);
-                    var newread = server.read;
-                    var newmodified = server.modified;
-                    delete server.modified;
-                    delete server.read;
-                    delete server.creator;
+                    var server = data.elements[0];
                     UtilsService.cleanElement(server);
-
                     var orig = CacheService.get(UtilsService.makeElementKey(elem.sysmlid, n.ws, null, false));
                     if (!orig) {
                         URLService.handleHttpStatus(data, status, headers, config, deferred);
                     } else {
-                        var hasRealConflicts = false;
-                        var current = _.cloneDeep(orig);
-                        delete current.modified;
-                        delete current.read;
-                        delete current.creator;
-                        UtilsService.cleanElement(current);
-
-                        // Check if there was a conflict with the properties updated:
-                        for (var prop in elem) {
-                            if ( current.hasOwnProperty(prop) && server.hasOwnProperty(prop) &&
-                                 !angular.equals(current[prop], server[prop]) ) {
-
-                                hasRealConflicts = true;
-                                break;
-                            }
-                        }
-
-                        if (!hasRealConflicts) {
-                            elem.read = newread;
-                            elem.modified = newmodified;
+                        UtilsService.cleanElement(orig);
+                        if (!UtilsService.hasConflict(elem, orig, server)) {
+                            elem.read = server.read;
+                            elem.modified = server.modified;
                             updateElement(elem, workspace)
                             .then(function(good){
                                 deferred.resolve(good);
@@ -415,7 +387,6 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                             URLService.handleHttpStatus(data, status, headers, config, deferred);
                         }
                     }
-                    
                 } else
                     URLService.handleHttpStatus(data, status, headers, config, deferred);
             });

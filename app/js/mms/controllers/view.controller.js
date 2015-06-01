@@ -442,7 +442,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
             $scope.numComments++;
             if (element.modified > $scope.lastCommented) {
                 $scope.lastCommented = element.modified;
-                $scope.lastCommentedBy = element.creator;
+                $scope.lastCommentedBy = element.modifier;
             }
         }
     };

@@ -22,32 +22,7 @@ function mmsViewPresentationElem(ViewService, ElementService, $templateCache, $r
 
     var mmsViewPresentationElemCtrl = function($scope, $rootScope) {
         
-        $scope.presentationElem = {};
         $scope.presentationElemLoading = true;
-
-        if ($scope.mmsInstanceVal) {
-
-            // Parse the element reference tree for the presentation element:
-            ViewService.parseExprRefTree($scope.mmsInstanceVal, $scope.workspace)
-            .then(function(element) {
-                $scope.presentationElem = element;
-
-                // This is a kludge to get the template switch statement to work
-                // for Sections:
-                if (ViewService.isSection(element)) {
-                    $scope.presentationElem.type = 'Section';
-                }
-
-                ElementService.getElement($scope.mmsInstanceVal.instance, false, $scope.workspace).
-                then(function(instanceSpec) {
-                    $scope.instanceSpec = instanceSpec;
-                    $scope.instanceSpecName = instanceSpec.name;
-                });
-
-                $scope.presentationElemLoading = false;
-            });           
-        } 
-
         this.getInstanceSpec = function() {
             return $scope.instanceSpec;
         };
@@ -66,8 +41,32 @@ function mmsViewPresentationElem(ViewService, ElementService, $templateCache, $r
     };
 
     var mmsViewPresentationElemLink = function(scope, element, attrs, mmsViewCtrl) {
-    };
+        if (scope.mmsInstanceVal) {
+            var ws = null;
+            var version = null;
+            if (mmsViewCtrl) {
+                var viewVersion = mmsViewCtrl.getWsAndVersion();
+                ws = viewVersion.workspace;
+                version = viewVersion.version;
+            }
+            // Parse the element reference tree for the presentation element:
+            ViewService.parseExprRefTree(scope.mmsInstanceVal, ws, version)
+            .then(function(element) {
+                scope.presentationElem = element;
+                // This is a kludge to get the template switch statement to work
+                // for Sections:
+                if (ViewService.isSection(element)) {
+                    scope.presentationElem.type = 'Section';
+                }
 
+                ElementService.getElement(scope.mmsInstanceVal.instance, false, ws, version).
+                then(function(instanceSpec) {
+                    scope.instanceSpec = instanceSpec;
+                    scope.presentationElemLoading = false;
+                });
+            });
+        } 
+    };
 
     return {
         restrict: 'E',

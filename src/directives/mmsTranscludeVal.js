@@ -34,10 +34,6 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, $log, 
         $scope.buttons = [];
         $scope.buttonsInit = false;
 
-        $scope.callDoubleClick = function(value) {
-            growl.info(value.type);
-        };
-
         $scope.bbApi.init = function() {
             if (!$scope.buttonsInit) {
                 $scope.buttonsInit = true;
@@ -138,10 +134,10 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, $log, 
             }
         };
 
-        scope.$watch('mmsEid', function(newVal, oldVal) {
-            if (!newVal || (newVal === oldVal && processed))
+        var idwatch = scope.$watch('mmsEid', function(newVal, oldVal) {
+            if (!newVal)
                 return;
-            processed = true;
+            idwatch();
             if (UtilsService.hasCircularReference(scope, scope.mmsEid, 'val')) {
                 //$log.log("prevent circular dereference!");
                 element.html('<span class="error">Circular Reference!</span>');
@@ -201,7 +197,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, $log, 
             scope.isDirectChildOfPresentationElement = Utils.isDirectChildOfPresentationElementFunc(element, mmsViewCtrl);
 
             var callback = function() {
-                Utils.showEditCallBack(scope,mmsViewCtrl,element,frameTemplate,recompile,recompileEdit);
+                Utils.showEditCallBack(scope, mmsViewCtrl, element, frameTemplate, recompile, recompileEdit, 'value');
             };
             
             mmsViewCtrl.registerPresenElemCallBack(callback);
@@ -211,11 +207,11 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, $log, 
             });
 
             scope.save = function() {
-                Utils.saveAction(scope,recompile,mmsViewCtrl,scope.bbApi);
+                Utils.saveAction(scope, recompile, scope.bbApi, null, 'value');
             };
 
             scope.cancel = function() {
-                Utils.cancelAction(scope,mmsViewCtrl,recompile,scope.bbApi);
+                Utils.cancelAction(scope, recompile, scope.bbApi, 'value');
             };
 
             scope.delete = function() {

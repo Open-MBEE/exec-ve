@@ -31,8 +31,7 @@ function mmsViewPara($templateCache, $compile, UtilsService) {
         restrict: 'E',
         //template: template,
         scope: {
-            para: '=mmsPara',
-            instanceVal: '=mmsInstanceVal'
+            para: '=mmsPara'
         },
         controller: ['$scope', '$rootScope', mmsViewParamCtrl],
         link: mmsViewParaLink

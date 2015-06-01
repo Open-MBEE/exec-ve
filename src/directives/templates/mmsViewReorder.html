@@ -3,7 +3,7 @@
     <div ui-tree-handle>
         {{element.presentationElement.type}} : {{element.instanceSpecification.name}}
     </div>
-    <ol ui-tree-nodes="" ng-model="element.sectionElements">
+    <ol ui-tree-nodes ng-model="element.sectionElements">
         <li ng-repeat="element in element.sectionElements" ui-tree-node ng-include="'nodes_renderer.html'">
         </li>
     </ol>
@@ -11,8 +11,8 @@
 
 <div class="container-tree-reorder container-fluid">
 
-    <div class="tree-reorder" ui-tree>
-        <ol ui-tree-nodes="" ng-model="elementReferenceTree">
+    <div class="tree-reorder" ui-tree="treeOptions">
+        <ol ui-tree-nodes class="root" ng-model="elementReferenceTree">
             <li ng-repeat="element in elementReferenceTree" ui-tree-node ng-include="'nodes_renderer.html'"></li>
         </ol>
     </div>

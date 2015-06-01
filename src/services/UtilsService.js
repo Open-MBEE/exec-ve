@@ -13,7 +13,7 @@ angular.module('mms')
  */
 function UtilsService(_) {
     var nonEditKeys = ['contains', 'view2view', 'childrenViews', 'displayedElements',
-        'allowedElements'];
+        'allowedElements', 'contents'];
 
     var hasCircularReference = function(scope, curId, curType) {
         var curscope = scope;
@@ -147,6 +147,37 @@ function UtilsService(_) {
             return ['elements', ws, id, ver];
     };
 
+    var filterProperties = function(a, b) {
+        var res = {};
+        for (var key in a) {
+            if (a.hasOwnProperty(key) && b.hasOwnProperty(key)) {
+                if (key === 'specialization')
+                    res.specialization = filterProperties(a.specialization, b.specialization);
+                else
+                    res[key] = b[key];
+            }
+        }
+        return res;
+    };
+
+    var hasConflict = function(edit, orig, server) {
+        for (var i in edit) {
+            if (i === 'read' || i === 'modified' || i === 'modifier' || 
+                    i === 'creator' || i === 'created')
+                continue;
+            if (edit.hasOwnProperty(i) && orig.hasOwnProperty(i) && server.hasOwnProperty(i)) {
+                if (i === 'specialization') {
+                    if (hasConflict(edit[i], orig[i], server[i]))
+                        return true;
+                } else {
+                    if (!angular.equals(orig[i], server[i]))
+                        return true;
+                }
+            }
+        }
+        return false;
+    };
+
     var makeHtmlTable = function(table) {
         var result = '<table class="table table-bordered table-condensed">';
         if (table.title)
@@ -237,6 +268,8 @@ function UtilsService(_) {
         normalize: normalize,
         makeElementKey: makeElementKey,
         buildTreeHierarchy: buildTreeHierarchy,
+        filterProperties: filterProperties,
+        hasConflict: hasConflict,
         makeHtmlTable : makeHtmlTable,
         makeHtmlPara: makeHtmlPara,
         makeHtmlList: makeHtmlList

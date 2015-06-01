@@ -147,15 +147,25 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
      * 
      * @return {boolean} has changes or not
      */
-     var hasEdits = function(scope, type) {
-        // TODO: this doesnt handle constraints and other cases
-        if (scope.edit === null)
+     var hasEdits = function(scope, type, checkAll) {
+        if (!scope.edit)
             return false;
-        if (type && scope.edit[type] !== scope.element[type])
-            return true;
-        if (scope.edit.specialization && scope.edit.specialization.type === 'Property' && 
-            !angular.equals(scope.edit.specialization.value, scope.element.specialization.value))
-            return true;
+        if (type === 'name' || checkAll) {
+            if (scope.edit.name !== scope.element.name)
+                return true;
+        }
+        if (type === 'documentation' || checkAll) {
+            if (scope.edit.documentation !== scope.element.documentation)
+                return true;
+        }
+        if (type === 'value' || checkAll) {
+            if (scope.edit.specialization && scope.edit.specialization.type === 'Property' && 
+                    !angular.equals(scope.edit.specialization.value, scope.element.specialization.value))
+                return true;
+            if (scope.edit.specialization.type === 'Constraint' && 
+                    !angular.equals(scope.edit.specialization.specification, scope.element.specialization.specification))
+                return true;
+        }
         return false;
     };
 
@@ -177,21 +187,22 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
             scope.edit.description = scope.element.description;
         } 
         else {
-            if (type) {
-                scope.edit[type] = scope.element[type];
-            }
-            else if (revertAll) {
+            if (type === 'name' || revertAll) {
                 scope.edit.name = scope.element.name;
+            }
+            if (type === 'documentation' || revertAll) {
                 scope.edit.documentation = scope.element.documentation;
             }
-
-            if (scope.edit.specialization && scope.edit.specialization.type === 'Property' && angular.isArray(scope.edit.specialization.value)) {
-                scope.edit.specialization.value = _.cloneDeep(scope.element.specialization.value);
-                scope.editValues = scope.edit.specialization.value;
-            }
-            else if (scope.edit.specialization && scope.edit.specialization.type === 'Constraint' && scope.edit.specialization.specification) {
-                scope.edit.specialization.specification = _.cloneDeep(scope.element.specialization.specification);
-                scope.editValue = scope.edit.specialization.specification;
+            if (type === 'value' || revertAll) {
+                if (scope.edit.specialization && scope.edit.specialization.type === 'Property' && angular.isArray(scope.edit.specialization.value)) {
+                    scope.edit.specialization.value = _.cloneDeep(scope.element.specialization.value);
+                    scope.editValues = scope.edit.specialization.value;
+                }
+                if (scope.edit.specialization && scope.edit.specialization.type === 'Constraint' && scope.edit.specialization.specification) {
+                    scope.edit.specialization.specification = _.cloneDeep(scope.element.specialization.specification);
+                    scope.editValues = [scope.edit.specialization.specification];
+                    scope.editValue = scope.edit.specialization.specification;
+                }
             }
         }
     };
@@ -250,7 +261,8 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
         }
     };
 
-    var saveAction = function(scope, recompile, mmsViewCtrl, bbApi, editObj, type) {
+    //called by transcludes
+    var saveAction = function(scope, recompile, bbApi, editObj, type) {
 
         if (scope.elementSaving) {
             growl.info('Please Wait...');
@@ -280,31 +292,30 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
                         modified: scope.edit.modified,
                         read: scope.edit.read
                      };
-        if (type) {
+        if (type === 'name' || type === 'documentation') {
             myEdit[type] = scope.edit[type];
-        }
-        else if (scope.edit.specialization.type === 'Property' && angular.isArray(scope.edit.specialization.value)) {
-            myEdit.specialization = {
-                                        value: scope.edit.specialization.value,
-                                        type: 'Property'
-                                    };
-        }
-        else if (scope.edit.specialization.type === 'Constraint' && scope.edit.specialization.specification) {
-            myEdit.specialization = {
-                                        specification: scope.edit.specialization.specification,
-                                        type: 'Constraint'
-                                    };
-        }
-        else {
+        } else if (type === 'value') {
+            if (scope.edit.specialization.type === 'Property' && angular.isArray(scope.edit.specialization.value)) {
+                myEdit.specialization = {
+                                            value: scope.edit.specialization.value,
+                                            type: 'Property'
+                                        };
+            }
+            if (scope.edit.specialization.type === 'Constraint' && scope.edit.specialization.specification) {
+                myEdit.specialization = {
+                                            specification: scope.edit.specialization.specification,
+                                            type: 'Constraint'
+                                        };
+            }
+        } else {
             myEdit = scope.edit;
         }
-
         save(myEdit, scope.ws, "element", id, null, scope).then(function(data) {
             scope.elementSaving = false;
             scope.cleanUp = true;
             scope.isEditing = false;
             // Broadcast message for the toolCtrl:
-            $rootScope.$broadcast('presentationElem.save',scope.edit, scope.ws);
+            $rootScope.$broadcast('presentationElem.save', scope.edit, scope.ws, type);
             recompile();
             growl.success('Save Successful');
         }, function(reason) {
@@ -313,17 +324,17 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
         }).finally(function() {
             bbApi.toggleButtonSpinner('presentation.element.save');
         });
-
     };
 
-    var cancelAction = function(scope, mmsViewCtrl, recompile, bbApi, type) {
+    //called by transcludes
+    var cancelAction = function(scope, recompile, bbApi, type) {
 
         var cancelCleanUp = function() {
             scope.cleanUp = true;
             scope.isEditing = false;
             revertEdits(scope, type);
              // Broadcast message for the ToolCtrl:
-            $rootScope.$broadcast('presentationElem.cancel',scope.edit, scope.ws);
+            $rootScope.$broadcast('presentationElem.cancel', scope.edit, scope.ws, type);
             recompile();
         };
 
@@ -378,28 +389,28 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
 
         // Going into edit mode, so add a frame if had a previous edit in progress:
         if (mmsViewCtrl.isEditable()) {
-            if (scope.edit && hasEdits(scope, type)) {
+            if (scope.edit && hasEdits(scope, type) && !scope.isEditing) {
                 scope.recompileEdit = false;
                 addFrame(scope,mmsViewCtrl,element,template,editObj,true);
             }
         }
         // Leaving edit mode, so highlight the unsaved edit if needed:
         else {
-            scope.isEditing = false;
-            scope.cleanUp = false;
-            scope.elementSaving = false;
-            if (scope.edit && hasEdits(scope, type)) {
+            if (scope.edit && hasEdits(scope, type) && !scope.recompileEdit) {
                 scope.recompileEdit = true;
                 recompileEdit();
             }
             else {
-                if (scope.edit && scope.ws) {
+                if (scope.edit && scope.ws && scope.isEditing) {
                     // Broadcast message for the ToolCtrl to clear out the tracker window:
                     $rootScope.$broadcast('presentationElem.cancel',scope.edit, scope.ws);
+                    if (scope.element)
+                        recompile();
                 }
-                if (scope.element)
-                    recompile();
             }
+            scope.isEditing = false;
+            scope.cleanUp = false;
+            scope.elementSaving = false;
         }
     };
 

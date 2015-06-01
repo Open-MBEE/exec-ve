@@ -94,10 +94,10 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             }
         };
 
-        scope.$watch('mmsEid', function(newVal, oldVal) {
-            if (!newVal || (newVal === oldVal && processed))
+        var idwatch = scope.$watch('mmsEid', function(newVal, oldVal) {
+            if (!newVal)
                 return;
-            processed = true;
+            idwatch();
             if (UtilsService.hasCircularReference(scope, scope.mmsEid, 'doc')) {
                 element.html('<span class="error">Circular Reference!</span>');
                 //$log.log("prevent circular dereference!");
@@ -123,6 +123,10 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                 }
 
                 recompile();
+                /*scope.$on('presentationElem.save', function(event, edit, ws, type) {
+                    if (edit.sysmlid === scope.element.sysmlid && ws === scope.ws && type === 'documentation')
+                        recompile();
+                });*/
                 scope.$watch('element.documentation', recompile);
 
                 // TODO: below has issues when having edits.  For some reason this is
@@ -182,11 +186,11 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             });
 
             scope.save = function() {
-                Utils.saveAction(scope,recompile,mmsViewCtrl,scope.bbApi,null,"documentation");
+                Utils.saveAction(scope,recompile,scope.bbApi,null,"documentation");
             };
 
             scope.cancel = function() {
-                Utils.cancelAction(scope,mmsViewCtrl,recompile,scope.bbApi,"documentation");
+                Utils.cancelAction(scope,recompile,scope.bbApi,"documentation");
             };
 
             scope.addFrame = function() {

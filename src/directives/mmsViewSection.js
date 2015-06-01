@@ -105,8 +105,7 @@ function mmsViewSection($compile, $templateCache, $rootScope, ElementService, Ux
     return {
         restrict: 'E',
         scope: {
-            section: '=mmsSection',
-            instanceVal: '=mmsInstanceVal'
+            section: '=mmsSection'
         },
         require: ['?^mmsView','?^mmsViewPresentationElem'],
         controller: ['$scope', '$rootScope', mmsViewSectionCtrl],

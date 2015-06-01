@@ -75,10 +75,10 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
         };
 
 
-        scope.$watch('mmsEid', function(newVal, oldVal) {
-            if (!newVal || (newVal === oldVal && processed))
+        var idwatch = scope.$watch('mmsEid', function(newVal, oldVal) {
+            if (!newVal)
                 return;
-            processed = true;
+            idwatch();
             var ws = scope.mmsWs;
             var version = scope.mmsVersion;
             if (mmsViewCtrl) {
@@ -127,11 +127,11 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
             });
 
             scope.save = function() {
-                Utils.saveAction(scope,recompile,mmsViewCtrl,scope.bbApi,null,"name");
+                Utils.saveAction(scope,recompile,scope.bbApi,null,"name");
             };
 
             scope.cancel = function() {
-                Utils.cancelAction(scope,mmsViewCtrl,recompile,scope.bbApi,"name");
+                Utils.cancelAction(scope,recompile,scope.bbApi,"name");
             };
 
             scope.addFrame = function() {
