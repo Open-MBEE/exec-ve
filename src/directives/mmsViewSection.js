@@ -34,6 +34,7 @@ function mmsViewSection($compile, $templateCache, $rootScope, ElementService, Ux
         var mmsViewPresentationElemCtrl = controllers[1];
 
         element.click(function(e) {
+            //should not do anything if section is not an instancespec
             if (scope.addFrame)
                 scope.addFrame();
         });
@@ -85,11 +86,11 @@ function mmsViewSection($compile, $templateCache, $rootScope, ElementService, Ux
             });
 
             scope.save = function() {
-                Utils.saveAction(scope,recompile,mmsViewCtrl,scope.bbApi,scope.section,"name");
+                Utils.saveAction(scope,recompile,scope.bbApi,scope.section,"name");
             };
 
             scope.cancel = function() {
-                Utils.cancelAction(scope,mmsViewCtrl,recompile,scope.bbApi,"name");
+                Utils.cancelAction(scope,recompile,scope.bbApi,"name");
             };
 
             scope.delete = function() {
