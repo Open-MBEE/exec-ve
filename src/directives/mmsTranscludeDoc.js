@@ -119,7 +119,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                 scope.element = data;
                 if (!scope.panelTitle) {
                     scope.panelTitle = scope.element.name + " Documentation";
-                    scope.panelType = "Paragraph";
+                    scope.panelType = "Text";
                 }
 
                 recompile();
@@ -212,6 +212,8 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                 scope.panelType = scope.presentationElem.type; //this is hack for fake table/list/equation until we get actual editors
                 if (scope.panelType.charAt(scope.panelType.length-1) === 'T')
                     scope.panelType = scope.panelType.substring(0, scope.panelType.length-1);
+                if (scope.panelType === 'Paragraph')
+                    scope.panelType = 'Text';
             }
             if (scope.presentationElem) {
                 scope.tinymceType = scope.presentationElem.type;

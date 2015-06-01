@@ -33,6 +33,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         Section: "_17_0_5_1_407019f_1430628211976_255218_12002",
         ListT: "_17_0_5_1_407019f_1431903739087_549326_12013",
         TableT: "_17_0_5_1_407019f_1431903724067_825986_11992",
+        Figure: "_17_0_5_1_407019f_1431903748021_2367_12034",  //manual images + timely, etc
         Equation: "_17_0_5_1_407019f_1431905053808_352752_11992"
     };
     
@@ -489,11 +490,9 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 jsonBlob = paragraph;
                 jsonBlob.type = 'TableT';
             }
-            else if (type === "Image") {
-                // TODO this doesnt really work
-                jsonBlob = {
-                    type: type
-                };
+            else if (type === "Figure") {
+                jsonBlob = paragraph;
+                jsonBlob.type = 'Figure';
             }
             else if (type === "Section") {
                 jsonBlob = {
