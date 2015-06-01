@@ -37,6 +37,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, $log, 
         $scope.bbApi.init = function() {
             if (!$scope.buttonsInit) {
                 $scope.buttonsInit = true;
+                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.preview", $scope));
                 $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.save", $scope));
                 $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.cancel", $scope));
                 $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.delete", $scope));
@@ -220,6 +221,10 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, $log, 
 
             scope.addFrame = function() {
                 Utils.addFrame(scope,mmsViewCtrl,element,frameTemplate);
+            };
+
+            scope.preview = function() {
+                Utils.previewAction(scope, recompileEdit);
             };
         } 
     };

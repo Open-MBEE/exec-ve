@@ -18,6 +18,7 @@ function mmsViewSection($compile, $templateCache, $rootScope, ElementService, Ux
         $scope.bbApi.init = function() {
             if (!$scope.buttonsInit) {
                 $scope.buttonsInit = true;
+                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.preview", $scope));
                 $scope.bbApi.addButton(UxService.getButtonBarButton("section.add.dropdown", $scope));
                 $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.save", $scope));
                 $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.cancel", $scope));
@@ -99,6 +100,10 @@ function mmsViewSection($compile, $templateCache, $rootScope, ElementService, Ux
 
             scope.addFrame = function() {
                 Utils.addFrame(scope,mmsViewCtrl,element,null,scope.section);
+            };
+
+            scope.preview = function() {
+                Utils.previewAction(scope, recompileEdit);
             };
         } 
     };

@@ -36,6 +36,7 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
         $scope.bbApi.init = function() {
             if (!$scope.buttonsInit) {
                 $scope.buttonsInit = true;
+                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.preview", $scope));
                 $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.save", $scope));
                 $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.cancel", $scope));
             }     
@@ -138,7 +139,11 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
                 Utils.addFrame(scope,mmsViewCtrl,element,template);
             };
 
-            // TODO: will we ever want a delete? 
+            // TODO: will we ever want a delete?
+
+            scope.preview = function() {
+                Utils.previewAction(scope, recompileEdit);
+            };
         }
 
     };

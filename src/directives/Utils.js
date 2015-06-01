@@ -224,6 +224,7 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
             ElementService.getElementForEdit(id, false, scope.ws)
             .then(function(data) {
                 scope.isEditing = true;
+                scope.recompileEdit = false;
                 scope.edit = data;
 
                 if (data.specialization.type === 'Property' && angular.isArray(data.specialization.value)) {
@@ -381,8 +382,13 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
         }, handleError).finally(function() {
             bbApi.toggleButtonSpinner('presentation.element.delete');
         });
+    };
 
-
+    var previewAction = function(scope, recompileEdit) {
+        scope.recompileEdit = true;
+        scope.isEditing = false;
+        scope.cleanUp = true;
+        recompileEdit();
     };
 
     var showEditCallBack = function(scope, mmsViewCtrl, element, template, recompile, recompileEdit, type, editObj) {
@@ -390,7 +396,6 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
         // Going into edit mode, so add a frame if had a previous edit in progress:
         if (mmsViewCtrl.isEditable()) {
             if (scope.edit && hasEdits(scope, type) && !scope.isEditing) {
-                scope.recompileEdit = false;
                 addFrame(scope,mmsViewCtrl,element,template,editObj,true);
             }
         }
@@ -447,6 +452,7 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
         saveAction: saveAction,
         cancelAction: cancelAction,
         deleteAction: deleteAction,
+        previewAction: previewAction,
         showEditCallBack: showEditCallBack,
         isDirectChildOfPresentationElementFunc: isDirectChildOfPresentationElementFunc,
         hasHtml: hasHtml,
