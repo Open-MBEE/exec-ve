@@ -369,17 +369,38 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
 
     var deleteAction = function(scope, bbApi, section) {
         bbApi.toggleButtonSpinner('presentation.element.delete');
-        var viewOrSecId = section ? section.sysmlid : scope.view.sysmlid;
-        ViewService.deleteElementFromViewOrSection(viewOrSecId, scope.ws, scope.instanceVal).then(function(data) {
-            if (ViewService.isSection(scope.presentationElem)) {
-                // Broadcast message to TreeCtrl:
-                $rootScope.$broadcast('viewctrl.delete.section', scope.presentationElem);
-            }
-             // Broadcast message for the ToolCtrl:
-            $rootScope.$broadcast('presentationElem.cancel',scope.edit, scope.ws);
 
-            growl.success('Delete Successful');
-        }, handleError).finally(function() {
+        scope.name = scope.edit.name;
+
+        var instance = $modal.open({
+            templateUrl: 'partials/mms/delete.html',
+            scope: scope,
+            controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
+                $scope.ok = function() {
+                    $modalInstance.close('ok');
+                };
+                $scope.cancel = function() {
+                    $modalInstance.dismiss();
+                };
+            }]
+        });
+        instance.result.then(function() {
+
+            var viewOrSecId = section ? section.sysmlid : scope.view.sysmlid;
+            ViewService.deleteElementFromViewOrSection(viewOrSecId, scope.ws, scope.instanceVal).then(function(data) {
+                if (ViewService.isSection(scope.presentationElem)) {
+                    // Broadcast message to TreeCtrl:
+                    $rootScope.$broadcast('viewctrl.delete.section', scope.presentationElem);
+                }
+                 // Broadcast message for the ToolCtrl:
+                $rootScope.$broadcast('presentationElem.cancel',scope.edit, scope.ws);
+
+                growl.success('Delete Successful');
+            }, handleError).finally(function() {
+                bbApi.toggleButtonSpinner('presentation.element.delete');
+            });
+
+        }).finally(function() {
             bbApi.toggleButtonSpinner('presentation.element.delete');
         });
     };
