@@ -56,7 +56,7 @@ function mmsViewReorder(ViewService, $templateCache, growl, $q, _) {
                 // delete scope.edit.documentation;
 
                 if (data.specialization.contents) {
-                    ViewService.getElementReferenceTree(data.specialization.contents, scope.mmsWs).then(function(elementReferenceTree) {
+                    ViewService.getElementReferenceTree(data.specialization.contents, scope.mmsWs, scope.mmsVersion).then(function(elementReferenceTree) {
                         scope.elementReferenceTree = elementReferenceTree;
                     });
                 }

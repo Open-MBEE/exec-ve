@@ -413,7 +413,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
         var addContentsSectionTreeNode = function(operand) {
             var instances = [];
             operand.forEach(function(instanceVal) {
-                instances.push(ViewService.parseExprRefTree(instanceVal, $scope.workspace));
+                instances.push(ViewService.parseExprRefTree(instanceVal, $scope.workspace, time));
             });
             $q.all(instances).then(function(results) {
                 var k = results.length - 1;
