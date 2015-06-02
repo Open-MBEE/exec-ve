@@ -218,7 +218,7 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
 
     var addFrame = function(scope, mmsViewCtrl, element, template, editObj, skipBroadcast) {
 
-        if (mmsViewCtrl.isEditable() && !scope.isEditing && !scope.cleanUp) {
+        if (mmsViewCtrl.isEditable() && !scope.isEditing) { // && !scope.cleanUp) {
 
             var id = editObj ? editObj.sysmlid : scope.mmsEid;
             ElementService.getElementForEdit(id, false, scope.ws)
@@ -254,11 +254,6 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
                 if (data.status && data.server.modified > data.cache.modified)
                     growl.warning('This element has been updated on the server');
             });
-        }
-
-        // This logic prevents a cancel/save from also triggering a open edit
-        if (scope.cleanUp) {
-            scope.cleanUp = false;
         }
     };
 
@@ -313,7 +308,6 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
         }
         save(myEdit, scope.ws, "element", id, null, scope).then(function(data) {
             scope.elementSaving = false;
-            scope.cleanUp = true;
             scope.isEditing = false;
             // Broadcast message for the toolCtrl:
             $rootScope.$broadcast('presentationElem.save', scope.edit, scope.ws, type);
@@ -332,7 +326,6 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
     var cancelAction = function(scope, recompile, bbApi, type) {
 
         var cancelCleanUp = function() {
-            scope.cleanUp = true;
             scope.isEditing = false;
             revertEdits(scope, type);
              // Broadcast message for the ToolCtrl:
@@ -412,7 +405,6 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
     var previewAction = function(scope, recompileEdit) {
         scope.recompileEdit = true;
         scope.isEditing = false;
-        scope.cleanUp = true;
         recompileEdit();
     };
 
@@ -439,7 +431,6 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
                 }
             }
             scope.isEditing = false;
-            scope.cleanUp = false;
             scope.elementSaving = false;
         }
     };

@@ -198,7 +198,6 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, $log, 
             
             scope.isEditing = false;
             scope.elementSaving = false;
-            scope.cleanUp = false;
             scope.instanceSpec = mmsViewPresentationElemCtrl.getInstanceSpec();
             scope.instanceVal = mmsViewPresentationElemCtrl.getInstanceVal();
             scope.presentationElem = mmsViewPresentationElemCtrl.getPresentationElement();

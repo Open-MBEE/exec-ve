@@ -114,7 +114,6 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
 
             scope.isEditing = false;
             scope.elementSaving = false;
-            scope.cleanUp = false;
             scope.view = mmsViewCtrl.getView();
 
             var callback = function() {
