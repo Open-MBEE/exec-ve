@@ -9,8 +9,7 @@ function mmsViewTableT($templateCache, $compile, $rootScope) {
         restrict: 'E',
         template: '<mms-transclude-doc data-mms-eid="{{para.source}}"></mms-transclude-doc>',
         scope: {
-            para: '=mmsPara',
-            instanceVal: '=mmsInstanceVal'
+            para: '=mmsPara'
         }
     };
 }

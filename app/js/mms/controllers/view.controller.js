@@ -232,6 +232,9 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
                 } else if ($scope.presentationElemType === 'List') {
                     validClassifierIds.push(ViewService.typeToClassifierId.List);
                     validClassifierIds.push(ViewService.typeToClassifierId.ListT);
+                } else if ($scope.presentationElemType === 'Figure') {
+                    validClassifierIds.push(ViewService.typeToClassifierId.Image);
+                    validClassifierIds.push(ViewService.typeToClassifierId.Figure);
                 } else {
                     validClassifierIds.push(ViewService.typeToClassifierId[$scope.presentationElemType]);
                 }
@@ -288,6 +291,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
 
             ViewService.createAndAddElement($scope.viewOrSection, workspace, true, $scope.presentationElemType, site.sysmlid, $scope.newItem.name).
             then(function(data) {
+                $rootScope.$broadcast('view.reorder.refresh');
                 growl.success("Adding "+$scope.presentationElemType+"  Successful");
                 $modalInstance.close(data);
             }, function(reason) {
@@ -338,7 +342,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     });
 
     $scope.$on('view.add.image', function() {
-        //addElement('Image');
+        addElement('Figure');
     });
 
     $scope.$on('view.add.equation', function() {
@@ -366,7 +370,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     });
 
     $scope.$on('section.add.image', function(event, section) {
-        //addElement('Image', section);
+        addElement('Figure', section);
     });
 
     $scope.$on('show.comments', function() {
@@ -442,7 +446,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
             $scope.numComments++;
             if (element.modified > $scope.lastCommented) {
                 $scope.lastCommented = element.modified;
-                $scope.lastCommentedBy = element.creator;
+                $scope.lastCommentedBy = element.modifier;
             }
         }
     };

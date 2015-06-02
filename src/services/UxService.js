@@ -155,10 +155,10 @@ function UxService($rootScope) {
             return {id: button, icon: 'fa-superscript', selected: true, active: true, permission: true, tooltip: 'Add Equation', 
                     spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
           case "view.add.paragraph":
-            return {id: button, icon: 'fa-paragraph', selected: true, active: true, permission: true, tooltip: 'Add Paragraph', 
+            return {id: button, icon: 'fa-paragraph', selected: true, active: true, permission: true, tooltip: 'Add Text', 
                     spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
           case "view.add.image":
-            return {id: button, icon: 'fa-image', selected: true, active: true, permission: true, tooltip: 'Add Image', 
+            return {id: button, icon: 'fa-image', selected: true, active: true, permission: true, tooltip: 'Add Figure', 
                     spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
           case "view.add.section":
             return {id: button, icon: 'fa-list-alt', selected: true, active: true, permission: true, tooltip: 'Add Section', 
@@ -172,6 +172,9 @@ function UxService($rootScope) {
           case "presentation.element.cancel":
             return {id: button, icon: 'fa-times', selected: true, active: true, permission: true, tooltip: 'Cancel', 
                     spinner: false, togglable: false, action: function() {scope.cancel();}};
+          case "presentation.element.preview":
+            return {id: button, icon: 'fa-file-powerpoint-o', selected: true, active: true, permission: true, tooltip: 'Preview Changes', 
+                    spinner: false, togglable: false, action: function() {scope.preview();}};
           case "section.add.dropdown":
             return {id: button, icon: 'fa-plus', selected: true, active: true, permission: true, tooltip: 'Add Item', 
                     spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);},
@@ -188,10 +191,10 @@ function UxService($rootScope) {
             return {id: button, icon: 'fa-superscript', selected: true, active: true, permission: true, tooltip: 'Add Equation', 
                     spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button, scope.section);}};
           case "section.add.paragraph":
-            return {id: button, icon: 'fa-paragraph', selected: true, active: true, permission: true, tooltip: 'Add Paragraph', 
+            return {id: button, icon: 'fa-paragraph', selected: true, active: true, permission: true, tooltip: 'Add Text', 
                     spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button, scope.section);}};
           case "section.add.image":
-            return {id: button, icon: 'fa-image', selected: true, active: true, permission: true, tooltip: 'Add Image', 
+            return {id: button, icon: 'fa-image', selected: true, active: true, permission: true, tooltip: 'Add Figure', 
                     spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button, scope.section);}};
           case "section.add.section":
             return {id: button, icon: 'fa-list-alt', selected: true, active: true, permission: true, tooltip: 'Add Section', 

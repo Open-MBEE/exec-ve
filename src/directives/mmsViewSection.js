@@ -18,6 +18,7 @@ function mmsViewSection($compile, $templateCache, $rootScope, ElementService, Ux
         $scope.bbApi.init = function() {
             if (!$scope.buttonsInit) {
                 $scope.buttonsInit = true;
+                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.preview", $scope));
                 $scope.bbApi.addButton(UxService.getButtonBarButton("section.add.dropdown", $scope));
                 $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.save", $scope));
                 $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.cancel", $scope));
@@ -34,6 +35,7 @@ function mmsViewSection($compile, $templateCache, $rootScope, ElementService, Ux
         var mmsViewPresentationElemCtrl = controllers[1];
 
         element.click(function(e) {
+            //should not do anything if section is not an instancespec
             if (scope.addFrame)
                 scope.addFrame();
         });
@@ -85,11 +87,11 @@ function mmsViewSection($compile, $templateCache, $rootScope, ElementService, Ux
             });
 
             scope.save = function() {
-                Utils.saveAction(scope,recompile,mmsViewCtrl,scope.bbApi,scope.section,"name");
+                Utils.saveAction(scope,recompile,scope.bbApi,scope.section,"name");
             };
 
             scope.cancel = function() {
-                Utils.cancelAction(scope,mmsViewCtrl,recompile,scope.bbApi,"name");
+                Utils.cancelAction(scope,recompile,scope.bbApi,"name");
             };
 
             scope.delete = function() {
@@ -99,14 +101,17 @@ function mmsViewSection($compile, $templateCache, $rootScope, ElementService, Ux
             scope.addFrame = function() {
                 Utils.addFrame(scope,mmsViewCtrl,element,null,scope.section);
             };
+
+            scope.preview = function() {
+                Utils.previewAction(scope, recompileEdit);
+            };
         } 
     };
 
     return {
         restrict: 'E',
         scope: {
-            section: '=mmsSection',
-            instanceVal: '=mmsInstanceVal'
+            section: '=mmsSection'
         },
         require: ['?^mmsView','?^mmsViewPresentationElem'],
         controller: ['$scope', '$rootScope', mmsViewSectionCtrl],

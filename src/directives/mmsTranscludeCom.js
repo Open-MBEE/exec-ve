@@ -47,10 +47,10 @@ function mmsTranscludeCom(ElementService, UtilsService, $log, $compile, growl) {
             }
         };
 
-        scope.$watch('mmsEid', function(newVal, oldVal) {
-            if (!newVal || (newVal === oldVal && processed))
+        var idwatch = scope.$watch('mmsEid', function(newVal, oldVal) {
+            if (!newVal)
                 return;
-            processed = true;
+            idwatch();
             if (UtilsService.hasCircularReference(scope, scope.mmsEid, 'doc')) {
                 //$log.log("prevent circular dereference!");
                 element.html('<span class="error">Circular Reference!</span>');

@@ -104,8 +104,8 @@ function mmsView(ViewService, $templateCache, $rootScope, growl) {
             if (elem) {
                 if (elem.modified > $scope.modified && type !== 'Comment') { 
                     $scope.modified = elem.modified;
-                    if (elem.creator)
-                        $scope.creator = elem.creator;
+                    if (elem.modifier)
+                        $scope.modifier = elem.modifier;
                 }
                 if ($scope.mmsTranscluded)
                     $scope.mmsTranscluded({element: elem, type: type});
@@ -155,7 +155,7 @@ function mmsView(ViewService, $templateCache, $rootScope, growl) {
                         if (hasDiagram) {
                             scope.view = data;
                             scope.modified = data.modified;
-                            scope.creator = data.creator;
+                            scope.modifier = data.modifier;
                             return;
                         }
                     }
@@ -164,11 +164,11 @@ function mmsView(ViewService, $templateCache, $rootScope, growl) {
                 .then(function(data2) {
                     scope.view = data;
                     scope.modified = data.modified;
-                    scope.creator = data.creator;
+                    scope.modifier = data.modifier;
                 }, function(reason) {
                     scope.view = data;
                     scope.modified = data.modified;
-                    scope.creator = data.creator;
+                    scope.modifier = data.modifier;
                 });
             }, function(reason) {
                 growl.error('Getting View Error: ' + reason.message + ': ' + scope.mmsVid);

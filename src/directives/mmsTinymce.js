@@ -396,6 +396,8 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
             thisToolbar = defaultToolbar + ' | ' + tableToolbar + ' | ' + codeToolbar + ' | ' + customToolbar;
         if (scope.mmsTinymceType === 'ListT')
             thisToolbar = defaultToolbar + ' | ' + listToolbar + ' | ' + codeToolbar + ' | ' + customToolbar;
+        if (scope.mmsTinymceType === 'Figure')
+            thisToolbar = 'image | code ';
         var options = {
             plugins: 'autoresize charmap code fullscreen image link media nonbreaking paste table textcolor searchreplace',
             //toolbar: 'bold italic underline strikethrough | subscript superscript blockquote | formatselect | fontsizeselect | forecolor backcolor removeformat | alignleft aligncenter alignright | bullist numlist outdent indent | table | link unlink | image media | charmap searchreplace code | transclude comment vlink normalize | mvleft mvright | undo redo',

@@ -40,6 +40,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
         $scope.bbApi.init = function() {
             if (!$scope.buttonsInit) {
                 $scope.buttonsInit = true;
+                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.preview", $scope));
                 $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.save", $scope));
                 $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.cancel", $scope));
                 $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.delete", $scope));
@@ -94,10 +95,10 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             }
         };
 
-        scope.$watch('mmsEid', function(newVal, oldVal) {
-            if (!newVal || (newVal === oldVal && processed))
+        var idwatch = scope.$watch('mmsEid', function(newVal, oldVal) {
+            if (!newVal)
                 return;
-            processed = true;
+            idwatch();
             if (UtilsService.hasCircularReference(scope, scope.mmsEid, 'doc')) {
                 element.html('<span class="error">Circular Reference!</span>');
                 //$log.log("prevent circular dereference!");
@@ -119,10 +120,14 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                 scope.element = data;
                 if (!scope.panelTitle) {
                     scope.panelTitle = scope.element.name + " Documentation";
-                    scope.panelType = "Paragraph";
+                    scope.panelType = "Text";
                 }
 
                 recompile();
+                /*scope.$on('presentationElem.save', function(event, edit, ws, type) {
+                    if (edit.sysmlid === scope.element.sysmlid && ws === scope.ws && type === 'documentation')
+                        recompile();
+                });*/
                 scope.$watch('element.documentation', recompile);
 
                 // TODO: below has issues when having edits.  For some reason this is
@@ -182,15 +187,19 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             });
 
             scope.save = function() {
-                Utils.saveAction(scope,recompile,mmsViewCtrl,scope.bbApi,null,"documentation");
+                Utils.saveAction(scope,recompile,scope.bbApi,null,"documentation");
             };
 
             scope.cancel = function() {
-                Utils.cancelAction(scope,mmsViewCtrl,recompile,scope.bbApi,"documentation");
+                Utils.cancelAction(scope,recompile,scope.bbApi,"documentation");
             };
 
             scope.addFrame = function() {
                 Utils.addFrame(scope,mmsViewCtrl,element,template);
+            };
+
+            scope.preview = function() {
+                Utils.previewAction(scope, recompileEdit);
             };
         } 
 
@@ -208,6 +217,8 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                 scope.panelType = scope.presentationElem.type; //this is hack for fake table/list/equation until we get actual editors
                 if (scope.panelType.charAt(scope.panelType.length-1) === 'T')
                     scope.panelType = scope.panelType.substring(0, scope.panelType.length-1);
+                if (scope.panelType === 'Paragraph')
+                    scope.panelType = 'Text';
             }
             if (scope.presentationElem) {
                 scope.tinymceType = scope.presentationElem.type;

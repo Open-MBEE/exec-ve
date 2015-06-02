@@ -236,6 +236,11 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
         });
         $scope.specApi.setEditing(false);
     });
+
+    $scope.$on('view.reorder.refresh', function() {
+        $scope.viewOrderApi.refresh();
+    });
+
     $scope.$on('view.reorder', function() {
         $scope.viewOrderApi.setEditing(true);
         showPane('reorder');

@@ -24,8 +24,8 @@
     </div>
   </div>
   <div ng-class="{'panel-body' :  isEditing}" class="inner">
-       <div ng-repeat="instanceVal in section.specialization.instanceSpecificationSpecification.operand"> 
-        <mms-view-presentation-elem data-mms-instance-val="instanceVal" data-mms-parent-section="section"></mms-view-presentation-elem>
+       <div ng-repeat="instanceVal in section.specialization.instanceSpecificationSpecification.operand track by instanceVal.instance"> 
+        <mms-view-presentation-elem data-mms-instance-val="::instanceVal" data-mms-parent-section="::section"></mms-view-presentation-elem>
       </div>
   </div>
 </div>
