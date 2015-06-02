@@ -38,6 +38,7 @@ function mmsViewSection($compile, $templateCache, $rootScope, ElementService, Ux
             //should not do anything if section is not an instancespec
             if (scope.addFrame)
                 scope.addFrame();
+            e.stopPropagation();
         });
 
         var recompile = function() {
