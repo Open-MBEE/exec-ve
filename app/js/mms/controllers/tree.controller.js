@@ -613,6 +613,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
                 $scope.treeApi.add_branch(branch, newbranch, top);
 
                 if (itemType === 'View') {
+                    viewId2node[data.sysmlid] = newbranch;
                     $state.go('workspace.site.document.view', {view: data.sysmlid});
                 }
 
@@ -998,16 +999,21 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
     $scope.$on('viewctrl.add.section', function(event, instanceSpec, parentBranchData) {
 
         var branch = $scope.treeApi.get_branch(parentBranchData);
+        var viewid = null;
+        if (branch.type === 'section')
+            viewid = branch.view;
+        else
+            viewid = branch.data.sysmlid;
         var newbranch = {
             label: instanceSpec.name,
             type: "section",
-            view: view.sysmlid,
+            view: viewid,
             data: instanceSpec,
             children: [],
         };
         $scope.treeApi.add_branch(branch, newbranch, false);
 
-        addSectionElements(instanceSpec, viewId2node[view.sysmlid], newbranch);
+        addSectionElements(instanceSpec, viewId2node[viewid], newbranch);
         $scope.treeApi.refresh();
 
     });
