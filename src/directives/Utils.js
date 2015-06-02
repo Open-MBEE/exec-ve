@@ -317,6 +317,7 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
             scope.isEditing = false;
             // Broadcast message for the toolCtrl:
             $rootScope.$broadcast('presentationElem.save', scope.edit, scope.ws, type);
+            $rootScope.$broadcast('view.reorder.refresh');
             recompile();
             growl.success('Save Successful');
         }, function(reason) {

@@ -55,7 +55,7 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
                 if (data.specialization.contents) {
                     ViewService.getElementReferenceTree(data.specialization.contents, scope.mmsWs, scope.mmsVersion).then(function(elementReferenceTree) {
                         scope.elementReferenceTree = elementReferenceTree;
-                        scope.originalElementReferenceTree = _.clone(elementReferenceTree);
+                        scope.originalElementReferenceTree = _.cloneDeep(elementReferenceTree);
                     });
                 }
 
@@ -134,7 +134,7 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
             if (scope.view.specialization.contents) {
                 ViewService.getElementReferenceTree(scope.view.specialization.contents, scope.mmsWs, scope.mmsVersion).then(function(elementReferenceTree) {
                     scope.elementReferenceTree = elementReferenceTree;
-                    scope.originalElementReferenceTree = _.clone(elementReferenceTree);
+                    scope.originalElementReferenceTree = _.cloneDeep(elementReferenceTree);
                 });
             }            
         };
