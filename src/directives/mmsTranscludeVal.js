@@ -91,6 +91,12 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, $log, 
                 }
                 element.append(toCompile);
                 $compile(element.contents())(scope); 
+            } else if (UtilsService.isRestrictedValue(scope.values)) {
+                ElementService.getElement(scope.values[0].operand[1].element, false, scope.ws, scope.version)
+                .then(function(e) {
+                    scope.isRestrictedVal = true;
+                    element.html(e.name);
+                });
             } else {
                 element.append(valTemplate);
                 $compile(element.contents())(scope);
@@ -126,12 +132,14 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, $log, 
                 }
                 element.append('<div class="panel panel-info">'+toCompile+'</div>');
                 $compile(element.contents())(scope); 
+            } else if (UtilsService.isRestrictedValue(scope.editValues)) {
+                ElementService.getElement(scope.editValues[0].operand[1].element, false, scope.ws, scope.version)
+                .then(function(e) {
+                    element.html(e.name);
+                });
             } else {
                 element.append(editTemplate);
                 $compile(element.contents())(scope);
-            }
-            if (mmsViewCtrl) {
-                mmsViewCtrl.elementTranscluded(scope.edit);
             }
         };
 
@@ -190,7 +198,6 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, $log, 
             
             scope.isEditing = false;
             scope.elementSaving = false;
-            scope.cleanUp = false;
             scope.instanceSpec = mmsViewPresentationElemCtrl.getInstanceSpec();
             scope.instanceVal = mmsViewPresentationElemCtrl.getInstanceVal();
             scope.presentationElem = mmsViewPresentationElemCtrl.getPresentationElement();
@@ -220,7 +227,19 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, $log, 
             };
 
             scope.addFrame = function() {
-                Utils.addFrame(scope,mmsViewCtrl,element,frameTemplate);
+                if (scope.isRestrictedVal) {
+                    var options = [];
+                    scope.values[0].operand[2].operand.forEach(function(o) {
+                        options.push(o.element);
+                    });
+                    ElementService.getElements(options, false, scope.ws, scope.version)
+                    .then(function(elements) {
+                        scope.options = elements;
+                        Utils.addFrame(scope, mmsViewCtrl, element, frameTemplate);
+                    });
+                } else {
+                    Utils.addFrame(scope,mmsViewCtrl,element,frameTemplate);
+                }
             };
 
             scope.preview = function() {

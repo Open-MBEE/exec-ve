@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsSpec', ['Utils','ElementService', 'WorkspaceService', 'ConfigService', '$compile', '$templateCache', '$modal', '$q', 'growl', '_', mmsSpec]);
+.directive('mmsSpec', ['Utils','ElementService', 'WorkspaceService', 'ConfigService', 'UtilsService', '$compile', '$templateCache', '$modal', '$q', 'growl', '_', mmsSpec]);
 
 /**
  * @ngdoc directive
@@ -73,7 +73,7 @@ angular.module('mms.directives')
  * @param {Object=} mmsElement An element object, if this is provided, a read only 
  *      element spec for it would be shown, this will not use mms services to get the element
  */
-function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, $compile, $templateCache, $modal, $q, growl, _) {
+function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsService, $compile, $templateCache, $modal, $q, growl, _) {
     //var readTemplate = $templateCache.get('mms/templates/mmsSpec.html');
     //var editTemplate = $templateCache.get('mms/templates/mmsSpecEdit.html');
     var template = $templateCache.get('mms/templates/mmsSpec.html');
@@ -82,6 +82,7 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, $compil
         var keepMode = false;
         scope.editing = false;
         scope.editable = true;
+        scope.isRestrictedVal = false;
         if (scope.mmsElement) {
             scope.element = scope.mmsElement;
             if (scope.element.specialization.type === 'Property')
@@ -150,8 +151,13 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, $compil
                 //element.empty();
                 //var template = null;
                 scope.element = data;
-                if (scope.element.specialization.type === 'Property')
+                if (scope.element.specialization.type === 'Property') {
                     scope.values = scope.element.specialization.value;
+                    if (UtilsService.isRestrictedValue(scope.values))
+                        scope.isRestrictedVal = true;
+                    else
+                        scope.isRestrictedVal = false;
+                }
                 if (scope.element.specialization.type === 'Constraint')
                     scope.value = scope.element.specialization.specification;
                 if (scope.mmsEditField === 'none' || 
@@ -177,6 +183,16 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, $compil
                         //scope.$emit('elementEditability', scope.editable);
                         if (scope.edit.specialization.type === 'Property' && angular.isArray(scope.edit.specialization.value)) {
                             scope.editValues = scope.edit.specialization.value;
+                            if (scope.isRestrictedVal) {
+                                var options = [];
+                                scope.values[0].operand[2].operand.forEach(function(o) {
+                                    options.push(o.element);
+                                });
+                                ElementService.getElements(options, false, scope.ws, scope.version)
+                                .then(function(elements) {
+                                    scope.options = elements;
+                                });
+                            }
                         }
                         if (scope.edit.specialization.type === 'Constraint' && scope.edit.specialization.specification) {
                             scope.editValue = scope.edit.specialization.specification;

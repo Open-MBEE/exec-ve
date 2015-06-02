@@ -165,16 +165,16 @@ function UxService($rootScope) {
                     spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
           case "presentation.element.delete":
             return {id: button, icon: 'fa-trash', selected: true, active: true, permission: true, tooltip: 'Delete', 
-                    spinner: false, togglable: false, action: function() {scope.delete();}};
+                    spinner: false, togglable: false, action: function(e) {e.stopPropagation(); scope.delete();}};
           case "presentation.element.save":
             return {id: button, icon: 'fa-save', selected: true, active: true, permission: true, tooltip: 'Save', 
-                    spinner: false, togglable: false, action: function() {scope.save();}};
+                    spinner: false, togglable: false, action: function(e) {e.stopPropagation(); scope.save();}};
           case "presentation.element.cancel":
             return {id: button, icon: 'fa-times', selected: true, active: true, permission: true, tooltip: 'Cancel', 
-                    spinner: false, togglable: false, action: function() {scope.cancel();}};
+                    spinner: false, togglable: false, action: function(e) {e.stopPropagation(); scope.cancel();}};
           case "presentation.element.preview":
             return {id: button, icon: 'fa-file-powerpoint-o', selected: true, active: true, permission: true, tooltip: 'Preview Changes', 
-                    spinner: false, togglable: false, action: function() {scope.preview();}};
+                    spinner: false, togglable: false, action: function(e) {e.stopPropagation(); scope.preview();}};
           case "section.add.dropdown":
             return {id: button, icon: 'fa-plus', selected: true, active: true, permission: true, tooltip: 'Add Item', 
                     spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);},

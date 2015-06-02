@@ -172,7 +172,6 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
 
             scope.isEditing = false;
             scope.elementSaving = false;
-            scope.cleanUp = false;
             scope.view = mmsViewCtrl.getView();
             scope.isDirectChildOfPresentationElement = Utils.isDirectChildOfPresentationElementFunc(element, mmsViewCtrl);
 
