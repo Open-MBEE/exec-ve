@@ -75,7 +75,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             element.empty();
             var doc = scope.element.documentation;
             if (!doc)
-                doc = '<p ng-class="{placeholder: version!=\'latest\'}">(no documentation)</p>';
+                doc = '<p ng-class="{placeholder: version!=\'latest\'}">(No ' + scope.panelType + ')</p>';
             element.append(doc);
             $compile(element.contents())(scope); 
             if (mmsViewCtrl) {
@@ -87,7 +87,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             element.empty();
             var doc = scope.edit.documentation;
             if (!doc)
-                doc = '<p ng-class="{placeholder: version!=\'latest\'}">(no documentation)</p>';
+                doc = '<p ng-class="{placeholder: version!=\'latest\'}">(No ' + scope.panelType + ')</p>';
             element.append('<div class="panel panel-info">'+doc+'</div>');
             $compile(element.contents())(scope); 
             if (mmsViewCtrl) {
