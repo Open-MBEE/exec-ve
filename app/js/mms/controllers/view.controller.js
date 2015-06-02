@@ -291,6 +291,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
 
             ViewService.createAndAddElement($scope.viewOrSection, workspace, true, $scope.presentationElemType, site.sysmlid, $scope.newItem.name).
             then(function(data) {
+                $rootScope.$broadcast('view.reorder.refresh');
                 growl.success("Adding "+$scope.presentationElemType+"  Successful");
                 $modalInstance.close(data);
             }, function(reason) {

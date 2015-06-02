@@ -392,6 +392,9 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
                     // Broadcast message to TreeCtrl:
                     $rootScope.$broadcast('viewctrl.delete.section', scope.presentationElem);
                 }
+
+                $rootScope.$broadcast('view.reorder.refresh');
+
                  // Broadcast message for the ToolCtrl:
                 $rootScope.$broadcast('presentationElem.cancel',scope.edit, scope.ws);
 

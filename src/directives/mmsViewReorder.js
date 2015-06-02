@@ -130,10 +130,20 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
             scope.elementReferenceTree = _.clone(scope.originalElementReferenceTree);
         };
 
+        scope.refresh = function() {
+            if (scope.view.specialization.contents) {
+                ViewService.getElementReferenceTree(scope.view.specialization.contents, scope.mmsWs, scope.mmsVersion).then(function(elementReferenceTree) {
+                    scope.elementReferenceTree = elementReferenceTree;
+                    scope.originalElementReferenceTree = _.clone(elementReferenceTree);
+                });
+            }            
+        };
+
         if (angular.isObject(scope.mmsViewReorderApi)) {
             var api = scope.mmsViewReorderApi;
             api.toggleEditing = scope.toggleEditing;
             api.save = scope.save;
+            api.refresh = scope.refresh;
             api.setEditing = function(mode) {
                 if (!scope.editable && mode)
                     return false;
