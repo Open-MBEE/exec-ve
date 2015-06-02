@@ -173,9 +173,10 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
 
         snapshot.formats.push({"type":"pdf",  "status":"Generating"});
         snapshot.formats.push({"type":"html", "status":"Generating"});
-        snapshot.ws = 'master';
+        snapshot.ws = ws;
         snapshot.site = site.sysmlid;
         snapshot.time = time;
+        
         ConfigService.createSnapshotArtifact(snapshot, site.sysmlid, workspace).then(
             function(result){
                 growl.info('Generating artifacts...Please wait for a completion email and reload the page.');
@@ -185,24 +186,6 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
             }
         );
     });
-
-    // $scope.$on('generate.pdf', function() {
-    //     if (getPDFStatus() === 'Generating...')
-    //         return;
-    //     $scope.bbApi.toggleButtonSpinner('generate.pdf');
-    //     $scope.bbApi.toggleButtonSpinner('generate.zip');
-
-    //     snapshot.formats.push({"type":"pdf",  "status":"Generating"});
-    //     snapshot.formats.push({"type":"html", "status":"Generating"});
-    //     ConfigService.createSnapshotArtifact(snapshot, site.sysmlid, workspace).then(
-    //         function(result){
-    //             growl.info('Generating artifacts...Please wait for a completion email and reload the page.');
-    //         },
-    //         function(reason){
-    //             growl.error('Failed to generate artifacts: ' + reason.message);
-    //         }
-    //     );
-    // });
 
     $scope.$on('generate.zip', function() {
         $rootScope.$broadcast('generate.pdf');        

@@ -166,6 +166,10 @@ function($scope, $rootScope, $state, $stateParams, $window, document, workspace,
 
         snapshot.formats.push({"type":"pdf",  "status":"Generating"});
         snapshot.formats.push({"type":"html", "status":"Generating"});
+        snapshot.ws = $scope.ws;
+        snapshot.site = site.sysmlid;
+        snapshot.time = time;
+        
         ConfigService.createSnapshotArtifact(snapshot, site.sysmlid, workspace).then(
             function(result){
                 growl.info('Generating artifacts...Please wait for a completion email and reload the page.');
