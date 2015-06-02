@@ -998,7 +998,6 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
     $scope.$on('viewctrl.add.section', function(event, instanceSpec, parentBranchData) {
 
         var branch = $scope.treeApi.get_branch(parentBranchData);
-
         var newbranch = {
             label: instanceSpec.name,
             type: "section",
@@ -1006,8 +1005,11 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
             data: instanceSpec,
             children: [],
         };
-
         $scope.treeApi.add_branch(branch, newbranch, false);
+
+        addSectionElements(instanceSpec, viewId2node[view.sysmlid], newbranch);
+        $scope.treeApi.refresh();
+
     });
 
     // ViewCtrl creates this event when deleting sections from the view

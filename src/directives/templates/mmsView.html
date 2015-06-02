@@ -25,7 +25,8 @@
         </div>
     </div>
     <div ng-if="view.specialization.contents">
-        <div ng-repeat="instanceVal in view.specialization.contents.operand track by instanceVal.instance"> 
+        <!-- Cant use track by instanceVal.instance b/c of possible duplicate entries -->
+        <div ng-repeat="instanceVal in view.specialization.contents.operand"> 
             <mms-view-presentation-elem data-mms-instance-val="::instanceVal"></mms-view-presentation-elem>
         </div>
     </div>
