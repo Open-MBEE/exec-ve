@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsViewReorder', ['ViewService', '$templateCache', 'growl', '$q', '_', mmsViewReorder]);
+.directive('mmsViewReorder', ['ElementService', 'ViewService', '$templateCache', 'growl', '$q', '_', mmsViewReorder]);
 
 /**
  * @ngdoc directive
@@ -19,7 +19,7 @@ angular.module('mms.directives')
  * @param {string=master} mmsWs Workspace to use, defaults to master
  * @param {string=latest} mmsVersion Version can be alfresco version number or timestamp, default is latest
  */
-function mmsViewReorder(ViewService, $templateCache, growl, $q, _) {
+function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, _) {
     var template = $templateCache.get('mms/templates/mmsViewReorder.html');
 
     var mmsViewReorderCtrl = function($scope, ViewService) {
@@ -91,10 +91,38 @@ function mmsViewReorder(ViewService, $templateCache, growl, $q, _) {
 
             ViewService.updateView(scope.edit, scope.mmsWs)
             .then(function(data) {
+                angular.forEach(scope.elementReferenceTree, function(elementReference) {
+                    function1(elementReference);
+                });
+
                 deferred.resolve(data);
+
             }, function(reason) {
                 deferred.reject(reason);
             });
+
+            var function1 = function(elementReference) {
+                var sectionEdit = { sysmlid: elementReference.instance };
+                sectionEdit.specialization = _.cloneDeep(elementReference.instanceSpecification.specialization);
+                sectionEdit.specialization.instanceSpecificationSpecification.operand = [];
+                
+                var sectionElements = elementReference.sectionElements;
+                angular.forEach(sectionElements, function(sectionElement) {
+                    sectionEdit.specialization.instanceSpecificationSpecification.operand.push(sectionElement.instanceVal);
+    
+                    if (sectionElement.sectionElements.length > 0)
+                         function1(sectionElement);
+                });
+
+                ElementService.updateElement(sectionEdit, scope.mssWs)
+                .then(function(data) {
+                }, function(reason) {
+                });
+
+            };
+
+
+
             return deferred.promise;
         };
 
