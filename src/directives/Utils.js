@@ -393,9 +393,7 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
                 $rootScope.$broadcast('presentationElem.cancel',scope.edit, scope.ws);
 
                 growl.success('Delete Successful');
-            }, handleError).finally(function() {
-                bbApi.toggleButtonSpinner('presentation.element.delete');
-            });
+            }, handleError);
 
         }).finally(function() {
             bbApi.toggleButtonSpinner('presentation.element.delete');

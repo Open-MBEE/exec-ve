@@ -1023,7 +1023,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
 
         var branch = $scope.treeApi.get_branch(sectionData);
 
-        $scope.treeApi.remove_branch(branch);
+        $scope.treeApi.remove_single_branch(branch);
     });
 
     if ($state.includes('workspace.site.document')) {
