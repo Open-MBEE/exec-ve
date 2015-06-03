@@ -203,9 +203,10 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, $log, 
             scope.presentationElem = mmsViewPresentationElemCtrl.getPresentationElement();
             scope.view = mmsViewCtrl.getView();
             scope.isDirectChildOfPresentationElement = Utils.isDirectChildOfPresentationElementFunc(element, mmsViewCtrl);
+            var type = "value";
 
             var callback = function() {
-                Utils.showEditCallBack(scope, mmsViewCtrl, element, frameTemplate, recompile, recompileEdit, 'value');
+                Utils.showEditCallBack(scope, mmsViewCtrl, element, frameTemplate, recompile, recompileEdit, type);
             };
             
             mmsViewCtrl.registerPresenElemCallBack(callback);
@@ -215,11 +216,11 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, $log, 
             });
 
             scope.save = function() {
-                Utils.saveAction(scope, recompile, scope.bbApi, null, 'value');
+                Utils.saveAction(scope, recompile, scope.bbApi, null, type);
             };
 
             scope.cancel = function() {
-                Utils.cancelAction(scope, recompile, scope.bbApi, 'value');
+                Utils.cancelAction(scope, recompile, scope.bbApi, type);
             };
 
             scope.delete = function() {
@@ -243,7 +244,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, $log, 
             };
 
             scope.preview = function() {
-                Utils.previewAction(scope, recompileEdit);
+                Utils.previewAction(scope, recompileEdit, recompile, type);
             };
         } 
     };

@@ -76,9 +76,10 @@ function mmsViewSection($compile, $templateCache, $rootScope, ElementService, Ux
             scope.presentationElem = mmsViewPresentationElemCtrl.getPresentationElement();
             scope.view = mmsViewCtrl.getView();
             scope.isDirectChildOfPresentationElement = Utils.isDirectChildOfPresentationElementFunc(element, mmsViewCtrl);
-            
+            var type = "name";
+
             var callback = function() {
-                Utils.showEditCallBack(scope,mmsViewCtrl,element,null,recompile,recompileEdit,"name",scope.section);
+                Utils.showEditCallBack(scope,mmsViewCtrl,element,null,recompile,recompileEdit,type,scope.section);
             };
 
             mmsViewCtrl.registerPresenElemCallBack(callback);
@@ -88,11 +89,11 @@ function mmsViewSection($compile, $templateCache, $rootScope, ElementService, Ux
             });
 
             scope.save = function() {
-                Utils.saveAction(scope,recompile,scope.bbApi,scope.section,"name");
+                Utils.saveAction(scope,recompile,scope.bbApi,scope.section,type);
             };
 
             scope.cancel = function() {
-                Utils.cancelAction(scope,recompile,scope.bbApi,"name");
+                Utils.cancelAction(scope,recompile,scope.bbApi,type);
             };
 
             scope.delete = function() {
@@ -104,7 +105,7 @@ function mmsViewSection($compile, $templateCache, $rootScope, ElementService, Ux
             };
 
             scope.preview = function() {
-                Utils.previewAction(scope, recompileEdit);
+                Utils.previewAction(scope, recompileEdit, recompile, type);
             };
         } 
     };

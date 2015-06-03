@@ -115,9 +115,10 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
             scope.isEditing = false;
             scope.elementSaving = false;
             scope.view = mmsViewCtrl.getView();
+            var type = "name";
 
             var callback = function() {
-                Utils.showEditCallBack(scope,mmsViewCtrl,element,template,recompile,recompileEdit,"name");
+                Utils.showEditCallBack(scope,mmsViewCtrl,element,template,recompile,recompileEdit,type);
             };
             
             mmsViewCtrl.registerPresenElemCallBack(callback);
@@ -127,11 +128,11 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
             });
 
             scope.save = function() {
-                Utils.saveAction(scope,recompile,scope.bbApi,null,"name");
+                Utils.saveAction(scope,recompile,scope.bbApi,null,type);
             };
 
             scope.cancel = function() {
-                Utils.cancelAction(scope,recompile,scope.bbApi,"name");
+                Utils.cancelAction(scope,recompile,scope.bbApi,type);
             };
 
             scope.addFrame = function() {
@@ -141,7 +142,7 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
             // TODO: will we ever want a delete?
 
             scope.preview = function() {
-                Utils.previewAction(scope, recompileEdit);
+                Utils.previewAction(scope, recompileEdit, recompile, type);
             };
         }
 

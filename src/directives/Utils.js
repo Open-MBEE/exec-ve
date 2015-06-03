@@ -400,10 +400,15 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
         });
     };
 
-    var previewAction = function(scope, recompileEdit) {
-        scope.recompileEdit = true;
+    var previewAction = function(scope, recompileEdit, recompile, type) {
         scope.isEditing = false;
-        recompileEdit();
+        if (scope.edit && hasEdits(scope, type) && !scope.recompileEdit) {
+            scope.recompileEdit = true;
+            recompileEdit();
+        }
+        else if (scope.element) {
+            recompile();
+        }
     };
 
     var showEditCallBack = function(scope, mmsViewCtrl, element, template, recompile, recompileEdit, type, editObj) {
