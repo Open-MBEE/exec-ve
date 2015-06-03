@@ -61,15 +61,15 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'ui.router'])
         url: '/',
         templateUrl: 'partials/mms/full-doc2.html',
         controller: 'FullDocCtrl2'
-    })
+    });
 })
 .controller('FullDocCtrl2', ['$scope', '$window', 'ElementService', 'ViewService', 'ConfigService', 
     function($scope, $window, ElementService, ViewService, ConfigService){
     var url = $window.location.href;
     var params = parseQueryString(url.substring(url.indexOf('?') + 1));
-    $scope.ws = params['ws'];
-    $scope.site=params['site'];
-    $scope.docId=params['docId'];
+    $scope.ws = params.ws;
+    $scope.site=params.site;
+    $scope.docId=params.docId;
     // $scope.version=params['time'];
 
     var views= [];
