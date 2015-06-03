@@ -65,11 +65,19 @@ function mmsTranscludeCom(ElementService, UtilsService, $log, $compile, growl) {
                 if (!version)
                     version = viewVersion.version;
             }
+            scope.ws = ws;
+            scope.version = version;
             ElementService.getElement(scope.mmsEid, false, ws, version)
             .then(function(data) {
                 scope.element = data;
                 recompile();
-                scope.$watch('element.documentation', recompile);
+                if (scope.version === 'latest') {
+                    scope.$on('element.updated', function(event, eid, ws, type) {
+                        if (eid === scope.mmsEid && ws === scope.ws && type === 'all' || type === 'documentation')
+                            recompile();
+                    });
+                }
+                //scope.$watch('element.documentation', recompile);
             }, function(reason) {
                 element.html('<span class="error">comment ' + newVal + ' not found</span>');
                 growl.error('Cf Comment Error: ' + reason.message + ': ' + scope.mmsEid);

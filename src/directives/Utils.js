@@ -77,6 +77,7 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
             ElementService.updateElement(edit, mmsWs)
             .then(function(data) {
                 deferred.resolve(data);
+                $rootScope.$broadcast('element.updated', edit.sysmlid, (mmsWs ? mmsWs : 'master'), type);
                 //growl.success("Save successful");
                 //scope.editing = false;
             }, function(reason) {
@@ -304,7 +305,7 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
             // Broadcast message for the toolCtrl:
             $rootScope.$broadcast('presentationElem.save', scope);
             $rootScope.$broadcast('view.reorder.refresh');
-            recompile();
+            //recompile();
             growl.success('Save Successful');
         }, function(reason) {
             scope.elementSaving = false;

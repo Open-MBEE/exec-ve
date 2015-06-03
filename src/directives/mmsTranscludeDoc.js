@@ -129,8 +129,13 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                     if (edit.sysmlid === scope.element.sysmlid && ws === scope.ws && type === 'documentation')
                         recompile();
                 });*/
-                scope.$watch('element.documentation', recompile);
-
+                //scope.$watch('element.documentation', recompile);
+                if (scope.version === 'latest') {
+                    scope.$on('element.updated', function(event, eid, ws, type) {
+                        if (eid === scope.mmsEid && ws === scope.ws && type === 'all' || type === 'documentation')
+                            recompile();
+                    });
+                }
                 // TODO: below has issues when having edits.  For some reason this is
                 //       entered twice, once and the frame is added, and then again
                 //       and recompileEdit is ran! 

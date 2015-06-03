@@ -171,7 +171,13 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, $log, 
                 if (scope.element.specialization.type === 'Constraint' && scope.element.specialization.specification)
                     scope.values = [scope.element.specialization.specification];
                 recompile();
-                scope.$watch('values', recompile, true);
+                //scope.$watch('values', recompile, true);
+                if (scope.version === 'latest') {
+                    scope.$on('element.updated', function(event, eid, ws, type) {
+                        if (eid === scope.mmsEid && ws === scope.ws && type === 'all' || type === 'value')
+                            recompile();
+                    });
+                }
             }, function(reason) {
                 element.html('<span class="error">value cf ' + newVal + ' not found</span>');
                 growl.error('Cf Val Error: ' + reason.message + ': ' + scope.mmsEid);

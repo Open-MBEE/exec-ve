@@ -99,17 +99,24 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
                 if (mmsViewCtrl) {
                     mmsViewCtrl.elementTranscluded(scope.element);
                 }
+                if (scope.version === 'latest') {
+                    scope.$on('element.updated', function(event, eid, ws, type) {
+                        if (eid === scope.mmsEid && ws === scope.ws && type === 'all' || type === 'name')
+                            recompile();
+                    });
+                }
             }, function(reason) {
                 element.html('<span class="error">name cf ' + newVal + ' not found</span>');
                 growl.error('Cf Name Error: ' + reason.message + ': ' + scope.mmsEid);
             });
         });
 
-        scope.$watch('element.name', function(newVal) {
+        /*scope.$watch('element.name', function(newVal) {
             if (mmsViewCtrl && newVal) {
                 mmsViewCtrl.elementTranscluded(scope.element);
             }
-        });
+        });*/
+
 
         if (mmsViewCtrl) {
 

@@ -349,9 +349,11 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
             var failedType = 'element';
             var failedWs = 'master';
             results.forEach(function(ob) {
-                if (ob.status === 200)
+                if (ob.status === 200) {
                     delete $rootScope.veEdits[ob.type + '|' + ob.id + '|' + ob.ws];
-                else {
+                    if (ob.type === 'element')
+                        $rootScope.$broadcast('element.updated', ob.id, ob.ws, 'all');
+                } else {
                     somefail = true;
                     failedId = ob.id;
                     failedType = ob.type;
