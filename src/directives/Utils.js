@@ -205,7 +205,7 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
             growl.error(reason.message);
     };
 
-    var addFrame = function(scope, mmsViewCtrl, element, template, editObj, skipBroadcast) {
+    var addFrame = function(scope, mmsViewCtrl, element, template, editObj) {
 
         if (mmsViewCtrl.isEditable() && !scope.isEditing) { // && !scope.cleanUp) {
 
@@ -229,9 +229,12 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
                     $compile(element.contents())(scope);
                 }
 
-                if (!skipBroadcast) {
+                if (!scope.skipBroadcast) {
                     // Broadcast message for the toolCtrl:
-                    $rootScope.$broadcast('presentationElem.edit',scope.edit, scope.ws);
+                    $rootScope.$broadcast('presentationElem.edit',scope);
+                }
+                else {
+                    scope.skipBroadcast = false;
                 }
             }, handleError);
 
@@ -299,7 +302,7 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
             scope.elementSaving = false;
             scope.isEditing = false;
             // Broadcast message for the toolCtrl:
-            $rootScope.$broadcast('presentationElem.save', scope.edit, scope.ws, type);
+            $rootScope.$broadcast('presentationElem.save', scope);
             $rootScope.$broadcast('view.reorder.refresh');
             recompile();
             growl.success('Save Successful');
@@ -318,7 +321,7 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
             scope.isEditing = false;
             revertEdits(scope, type);
              // Broadcast message for the ToolCtrl:
-            $rootScope.$broadcast('presentationElem.cancel', scope.edit, scope.ws, type);
+            $rootScope.$broadcast('presentationElem.cancel', scope);
             recompile();
         };
 
@@ -379,7 +382,7 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
                 $rootScope.$broadcast('view.reorder.refresh');
 
                  // Broadcast message for the ToolCtrl:
-                $rootScope.$broadcast('presentationElem.cancel',scope.edit, scope.ws);
+                $rootScope.$broadcast('presentationElem.cancel',scope);
 
                 growl.success('Delete Successful');
             }, handleError);
@@ -389,15 +392,27 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
         });
     };
 
-    var previewAction = function(scope, recompileEdit, recompile, type) {
-        scope.isEditing = false;
+    var leaveEditModeOrFrame = function(scope, recompile, recompileEdit, type) {
+
         if (scope.edit && hasEdits(scope, type) && !scope.recompileEdit) {
+            scope.skipBroadcast = true;
             scope.recompileEdit = true;
             recompileEdit();
         }
-        else if (scope.element) {
-            recompile();
+        else {
+            if (scope.edit && scope.ws && scope.isEditing) {
+                // Broadcast message for the ToolCtrl to clear out the tracker window:
+                $rootScope.$broadcast('presentationElem.cancel',scope);
+                if (scope.element)
+                    recompile();
+            }
         }
+        scope.isEditing = false;
+        scope.elementSaving = false;
+    };
+
+    var previewAction = function(scope, recompileEdit, recompile, type) {
+        leaveEditModeOrFrame(scope, recompile, recompileEdit, type);
     };
 
     var showEditCallBack = function(scope, mmsViewCtrl, element, template, recompile, recompileEdit, type, editObj) {
@@ -405,25 +420,12 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
         // Going into edit mode, so add a frame if had a previous edit in progress:
         if (mmsViewCtrl.isEditable()) {
             if (scope.edit && hasEdits(scope, type) && !scope.isEditing) {
-                addFrame(scope,mmsViewCtrl,element,template,editObj,true);
+                addFrame(scope,mmsViewCtrl,element,template,editObj);
             }
         }
         // Leaving edit mode, so highlight the unsaved edit if needed:
         else {
-            if (scope.edit && hasEdits(scope, type) && !scope.recompileEdit) {
-                scope.recompileEdit = true;
-                recompileEdit();
-            }
-            else {
-                if (scope.edit && scope.ws && scope.isEditing) {
-                    // Broadcast message for the ToolCtrl to clear out the tracker window:
-                    $rootScope.$broadcast('presentationElem.cancel',scope.edit, scope.ws);
-                    if (scope.element)
-                        recompile();
-                }
-            }
-            scope.isEditing = false;
-            scope.elementSaving = false;
+            leaveEditModeOrFrame(scope, recompile, recompileEdit, type);
         }
     };
 

@@ -5,8 +5,8 @@
 angular.module('mmsApp')
 .controller('ToolCtrl', ['$scope', '$rootScope', '$state', '$modal', '$q', '$stateParams',
             'ConfigService', 'ElementService', 'WorkspaceService', 'growl', 
-            'workspaceObj', 'tags', 'tag', 'snapshots', 'site', 'document', 'time',
-function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, ElementService, WorkspaceService, growl, workspaceObj, tags, tag, snapshots, site, document, time) {
+            'workspaceObj', 'tags', 'tag', 'snapshots', 'site', 'document', 'time', 'Utils',
+function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, ElementService, WorkspaceService, growl, workspaceObj, tags, tag, snapshots, site, document, time, Utils) {
 
     // TODO rename variable ws
     var ws = $stateParams.workspace;
@@ -118,15 +118,17 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
         showPane('tags');
     });
 
-    var cleanUpEdit = function(edit, ws) {
+    var cleanUpEdit = function(scope) {
 
+        var ws = scope.ws;
+        var edit = scope.edit;
         var key = 'element|' + edit.sysmlid + '|' + ws;
         var currentCnt = 0;
 
         if ($scope.presentElemEditCnts.hasOwnProperty(key)) {
             currentCnt = $scope.presentElemEditCnts[key];
         }
-        if (currentCnt <= 1) {
+        if (currentCnt <= 1 && !Utils.hasEdits(scope,null,true)) {
             delete $rootScope.veEdits[key];
             delete $scope.presentElemEditCnts[key];
             if (Object.keys($rootScope.veEdits).length === 0) {
@@ -143,7 +145,10 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
         }
     };
 
-    $scope.$on('presentationElem.edit', function(event, edit, ws) {
+    $scope.$on('presentationElem.edit', function(event, scope) {
+        
+        var ws = scope.ws;
+        var edit = scope.edit;
         var key = 'element|' + edit.sysmlid + '|' + ws;
         var currentCnt = 1;
         $rootScope.veEdits[key] = edit;
@@ -160,12 +165,12 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
         }
     });
 
-    $scope.$on('presentationElem.save', function(event, edit, ws) {
-        cleanUpEdit(edit, ws);
+    $scope.$on('presentationElem.save', function(event, scope) {
+        cleanUpEdit(scope);
     });
 
-    $scope.$on('presentationElem.cancel', function(event, edit, ws) {
-        cleanUpEdit(edit, ws);           
+    $scope.$on('presentationElem.cancel', function(event, scope) {
+        cleanUpEdit(scope);           
     });
 
     $scope.$on('elementSelected', function(event, eid, type) {
