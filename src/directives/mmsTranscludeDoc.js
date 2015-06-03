@@ -132,7 +132,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                 //scope.$watch('element.documentation', recompile);
                 if (scope.version === 'latest') {
                     scope.$on('element.updated', function(event, eid, ws, type) {
-                        if (eid === scope.mmsEid && ws === scope.ws && type === 'all' || type === 'documentation')
+                        if (eid === scope.mmsEid && ws === scope.ws && (type === 'all' || type === 'documentation'))
                             recompile();
                     });
                 }

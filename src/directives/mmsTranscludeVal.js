@@ -174,7 +174,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, $log, 
                 //scope.$watch('values', recompile, true);
                 if (scope.version === 'latest') {
                     scope.$on('element.updated', function(event, eid, ws, type) {
-                        if (eid === scope.mmsEid && ws === scope.ws && type === 'all' || type === 'value')
+                        if (eid === scope.mmsEid && ws === scope.ws && (type === 'all' || type === 'value'))
                             recompile();
                     });
                 }

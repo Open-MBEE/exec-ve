@@ -101,7 +101,7 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
                 }
                 if (scope.version === 'latest') {
                     scope.$on('element.updated', function(event, eid, ws, type) {
-                        if (eid === scope.mmsEid && ws === scope.ws && type === 'all' || type === 'name')
+                        if (eid === scope.mmsEid && ws === scope.ws && (type === 'all' || type === 'name'))
                             recompile();
                     });
                 }
