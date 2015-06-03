@@ -72,6 +72,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
         });
 
         var recompile = function() {
+            scope.isEditing = false;
             element.empty();
             var doc = scope.element.documentation;
             if (!doc)

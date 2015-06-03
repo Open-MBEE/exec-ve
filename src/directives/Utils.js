@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.factory('Utils', ['$q','$modal','$templateCache','$rootScope','$compile','WorkspaceService','ConfigService','ElementService','ViewService', 'growl','_', Utils]);
+.factory('Utils', ['$q','$modal','$templateCache','$rootScope','$compile','WorkspaceService','ConfigService','ElementService','ViewService', 'UtilsService', 'growl','_', Utils]);
 
 /**
  * @ngdoc service
@@ -18,7 +18,7 @@ angular.module('mms.directives')
  * Utility methods for performing edit like behavior to a element
  *
  */
-function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceService, ConfigService, ElementService, ViewService, growl, _) {
+function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceService, ConfigService, ElementService, ViewService, UtilsService, growl, _) {
     
      var conflictCtrl = function($scope, $modalInstance) {
         $scope.ok = function() {
@@ -49,7 +49,7 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
      *      or force save. If the user decides to discord or merge, type will be info even though 
      *      the original save failed. Error means an actual error occured. 
      */
-    var save = function(edit, mmsWs, mmsType, mmsEid, tinymceApi, scope) {
+    var save = function(edit, mmsWs, mmsType, mmsEid, tinymceApi, scope, type) {
         var deferred = $q.defer();
         // TODO: put this back when removed scope.editing from view documentation edit
         /* if (!scope.editable || !scope.editing) {
@@ -90,34 +90,23 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
                     });
                     instance.result.then(function(choice) {
                         if (choice === 'ok') {
-                            ElementService.getElementForEdit(mmsEid, true, mmsWs)
-                            .then(function(data) {
-                                //growl.info("Element Updated to Latest");
-                                deferred.reject({type: 'info', message: 'Element Updated to Latest'});
-                            }, function(reason) {
-                                //growl.error("Element Update Error: " + reason.message);
-                                deferred.reject({type: 'error', message: 'Element Update Error: ' + reason.message});
-                            }); 
+                            UtilsService.mergeElement(scope.latest, mmsEid, mmsWs, true, type);
+                            deferred.reject({type: 'info', message: 'Element Updated to Latest'});
                         } else if (choice === 'merge') { 
-                            ElementService.getElement(mmsEid, true, mmsWs)
-                            .then(function(data) {
-                                var currentEdit = edit;
-                                if (data.name !== currentEdit.name)
-                                    currentEdit.name = data.name + ' MERGE ' + currentEdit.name;
-                                if (data.documentation !== currentEdit.documentation)
-                                    currentEdit.documentation = data.documentation + '<p>MERGE</p>' + currentEdit.documentation;
-                                currentEdit.read = data.read;
-                                currentEdit.modified = data.modified;
+                            UtilsService.mergeElement(scope.latest, mmsEid, mmsWs, false, type);
+                            var currentEdit = scope.edit;
+                            if (scope.latest.name !== currentEdit.name && (type === 'name' || type === 'all'))
+                                currentEdit.name = scope.latest.name + ' MERGE ' + currentEdit.name;
+                            if (scope.latest.documentation !== currentEdit.documentation && (type === 'documentation' || type === 'all'))
+                                currentEdit.documentation = scope.latest.documentation + '<p>MERGE</p>' + currentEdit.documentation;
+                            currentEdit.read = scope.latest.read;
+                            currentEdit.modified = scope.latest.modified;
                                 //growl.info("Element name and doc merged");
-                                deferred.reject({type: 'info', message: 'Element name and doc merged'});
-                            }, function(reason2) {
-                                //growl.error("Merge error: " + reason2.message);
-                                deferred.reject({type: 'error', message: 'Merge error: ' + reason2.message});
-                            });
+                            deferred.reject({type: 'info', message: 'Element name and doc merged'});
                         } else if (choice === 'force') {
                             edit.read = scope.latest.read;
                             edit.modified = scope.latest.modified;
-                            save().then(function(resolved) {
+                            save(edit, mmsWs, mmsType, mmsEid, tinymceApi, scope, type).then(function(resolved) {
                                 deferred.resolve(resolved);
                             }, function(error) {
                                 deferred.reject(error);
@@ -306,7 +295,7 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
         } else {
             myEdit = scope.edit;
         }
-        save(myEdit, scope.ws, "element", id, null, scope).then(function(data) {
+        save(myEdit, scope.ws, "element", id, null, scope, type).then(function(data) {
             scope.elementSaving = false;
             scope.isEditing = false;
             // Broadcast message for the toolCtrl:

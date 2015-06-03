@@ -254,7 +254,7 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
          *      the original save failed. Error means an actual error occured. 
          */
         scope.save = function() {
-            return Utils.save(scope.edit, scope.mmsWs, scope.mmsType, scope.mmsEid, scope.tinymceApi, scope);
+            return Utils.save(scope.edit, scope.mmsWs, scope.mmsType, scope.mmsEid, scope.tinymceApi, scope, 'all');
         };
 
         scope.hasHtml = function(s) {

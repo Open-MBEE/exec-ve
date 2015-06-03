@@ -58,6 +58,7 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
         });
 
         var recompile = function() {
+            scope.isEditing = false;
             element.empty();
             element.append(defaultTemplate);
             $compile(element.contents())(scope); 

@@ -66,6 +66,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, $log, 
         });
 
         var recompile = function() {
+            scope.isEditing = false;
             var toCompileList = [];
             var areStrings = false;
             for (var i = 0; i < scope.values.length; i++) {
@@ -194,15 +195,12 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, $log, 
         };
         scope.addValueType = 'LiteralString';
 
-        if (mmsViewCtrl && mmsViewPresentationElemCtrl) {
+        if (mmsViewCtrl) { 
             
             scope.isEditing = false;
             scope.elementSaving = false;
-            scope.instanceSpec = mmsViewPresentationElemCtrl.getInstanceSpec();
-            scope.instanceVal = mmsViewPresentationElemCtrl.getInstanceVal();
-            scope.presentationElem = mmsViewPresentationElemCtrl.getPresentationElement();
-            scope.view = mmsViewCtrl.getView();
             scope.isDirectChildOfPresentationElement = Utils.isDirectChildOfPresentationElementFunc(element, mmsViewCtrl);
+            scope.view = mmsViewCtrl.getView();
             var type = "value";
 
             var callback = function() {
@@ -221,10 +219,6 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, $log, 
 
             scope.cancel = function() {
                 Utils.cancelAction(scope, recompile, scope.bbApi, type);
-            };
-
-            scope.delete = function() {
-                Utils.deleteAction(scope,scope.bbApi,mmsViewPresentationElemCtrl.getParentSection());
             };
 
             scope.addFrame = function() {
@@ -247,6 +241,15 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, $log, 
                 Utils.previewAction(scope, recompileEdit, recompile, type);
             };
         } 
+
+        if (mmsViewPresentationElemCtrl) {
+            scope.delete = function() {
+                Utils.deleteAction(scope,scope.bbApi,mmsViewPresentationElemCtrl.getParentSection());
+            };
+            scope.instanceSpec = mmsViewPresentationElemCtrl.getInstanceSpec();
+            scope.instanceVal = mmsViewPresentationElemCtrl.getInstanceVal();
+            scope.presentationElem = mmsViewPresentationElemCtrl.getPresentationElement();
+        }
     };
 
     return {

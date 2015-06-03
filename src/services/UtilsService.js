@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms')
-.factory('UtilsService', ['_', UtilsService]);
+.factory('UtilsService', ['CacheService', '_', UtilsService]);
 
 /**
  * @ngdoc service
@@ -11,7 +11,7 @@ angular.module('mms')
  * @description
  * Utilities
  */
-function UtilsService(_) {
+function UtilsService(CacheService, _) {
     var nonEditKeys = ['contains', 'view2view', 'childrenViews', 'displayedElements',
         'allowedElements', 'contents'];
 
@@ -147,6 +147,36 @@ function UtilsService(_) {
             return ['elements', ws, id, ver];
     };
 
+    var mergeElement = function(source, eid, workspace, updateEdit, property) {
+        var ws = workspace ? workspace : 'master';
+        var key = makeElementKey(eid, ws, 'latest', false);
+        var keyEdit = makeElementKey(eid, ws, 'latest', true);
+        var clean = cleanElement(source);
+        CacheService.put(key, clean, true);
+        var edit = CacheService.get(keyEdit);
+        if (updateEdit && edit) {
+            edit.read = clean.read;
+            edit.modified = clean.modified;
+            if (property === 'all')
+                CacheService.put(keyEdit, clean, true);
+            else if (property === 'name')
+                edit.name = clean.name;
+            else if (property === 'documentation')
+                edit.documentation = clean.documentation;
+            else if (property === 'value') {
+                _.merge(edit.specialization, clean.specialization, function(a,b,id) {
+                    if ((id === 'contents' || id === 'contains') && a)
+                        return a; //handle contains and contents updates manually at higher level
+                    if (angular.isArray(a) && angular.isArray(b) && b.length < a.length) {
+                        return b; 
+                    }
+                    return undefined;
+                });
+            }
+            cleanElement(edit, true);
+        }
+    };
+
     var filterProperties = function(a, b) {
         var res = {};
         for (var key in a) {
@@ -179,7 +209,7 @@ function UtilsService(_) {
     };
 
     function isRestrictedValue(values) {
-        if (values[0].type === 'Expression' &&
+        if (values.length > 0 && values[0].type === 'Expression' &&
             values[0].operand.length === 3 && values[0].operand[0].string === 'RestrictedValue' &&
             values[0].operand[2].type === 'Expression' && values[0].operand[2].operand.length > 0 &&
             values[0].operand[1].type === 'ElementValue')
@@ -278,6 +308,7 @@ function UtilsService(_) {
         makeElementKey: makeElementKey,
         buildTreeHierarchy: buildTreeHierarchy,
         filterProperties: filterProperties,
+        mergeElement: mergeElement,
         hasConflict: hasConflict,
         isRestrictedValue: isRestrictedValue,
         makeHtmlTable : makeHtmlTable,
