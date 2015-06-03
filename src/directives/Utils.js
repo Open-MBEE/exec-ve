@@ -103,7 +103,12 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
                             currentEdit.read = scope.latest.read;
                             currentEdit.modified = scope.latest.modified;
                                 //growl.info("Element name and doc merged");
-                            deferred.reject({type: 'info', message: 'Element name and doc merged'});
+                            var message = 'Element name and doc merged';
+                            if (type === 'name')
+                                message = 'Element name merged';
+                            else if (type === 'documentation')
+                                message = 'Element documentation merged';
+                            deferred.reject({type: 'info', message: message});
                         } else if (choice === 'force') {
                             edit.read = scope.latest.read;
                             edit.modified = scope.latest.modified;
