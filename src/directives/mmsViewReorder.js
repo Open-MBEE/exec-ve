@@ -92,7 +92,7 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
             ViewService.updateView(scope.edit, scope.mmsWs)
             .then(function(data) {
                 angular.forEach(scope.elementReferenceTree, function(elementReference) {
-                    function1(elementReference);
+                    updateSectionElementOrder(elementReference);
                 });
 
                 deferred.resolve(data);
@@ -101,7 +101,7 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
                 deferred.reject(reason);
             });
 
-            var function1 = function(elementReference) {
+            var updateSectionElementOrder = function(elementReference) {
                 var sectionEdit = { sysmlid: elementReference.instance };
                 sectionEdit.specialization = _.cloneDeep(elementReference.instanceSpecification.specialization);
                 sectionEdit.specialization.instanceSpecificationSpecification.operand = [];
@@ -111,7 +111,7 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
                     sectionEdit.specialization.instanceSpecificationSpecification.operand.push(sectionElement.instanceVal);
     
                     if (sectionElement.sectionElements.length > 0)
-                         function1(sectionElement);
+                         updateSectionElementOrder(sectionElement);
                 });
 
                 ElementService.updateElement(sectionEdit, scope.mssWs)
