@@ -4,6 +4,11 @@
 
 $pane_center_btn_group_width: 120px;
 
+body.fullDoc{
+  text-rendering: optimizeLegibility;
+  overflow:scroll;
+}
+
 .clickable:hover {
   cursor: pointer;
   background-color: $light_blue;
