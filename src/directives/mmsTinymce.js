@@ -54,11 +54,11 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
             $scope.autocompleteItems = [];
 
             $scope.cacheElements.forEach(function(cacheElement) {
-                $scope.autocompleteItems.push({ 'sysmlid' : cacheElement.sysmlid, 'name' : cacheElement.name + ' name' });
-                $scope.autocompleteItems.push({ 'sysmlid' : cacheElement.sysmlid, 'name' : cacheElement.name + ' documentation' });
+                $scope.autocompleteItems.push({ 'sysmlid' : cacheElement.sysmlid, 'name' : cacheElement.name + ' - name' });
+                $scope.autocompleteItems.push({ 'sysmlid' : cacheElement.sysmlid, 'name' : cacheElement.name + ' - documentation' });
 
                 if (cacheElement.specialization.type === 'Property') {
-                    $scope.autocompleteItems.push({ 'sysmlid' : cacheElement.sysmlid, 'name' : cacheElement.name + ' value' });
+                    $scope.autocompleteItems.push({ 'sysmlid' : cacheElement.sysmlid, 'name' : cacheElement.name + ' - value' });
                 }
             });
 
