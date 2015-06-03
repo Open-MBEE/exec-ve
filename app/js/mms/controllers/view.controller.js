@@ -63,6 +63,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
 
         if (view && view.editable && time === 'latest') {
             $scope.bbApi.addButton(UxService.getButtonBarButton('show.edits'));
+            $scope.bbApi.setToggleState('show.edits', $rootScope.mms_ShowEdits);
             $scope.bbApi.addButton(UxService.getButtonBarButton('view.add.dropdown'));
         }
         $scope.bbApi.addButton(UxService.getButtonBarButton('show.comments'));
