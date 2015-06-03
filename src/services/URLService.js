@@ -96,6 +96,20 @@ function urlService(baseUrl) {
 
     /**
      * @ngdoc method
+     * @name mms.URLService#getCheckLoginURL
+     * @methodOf mms.URLService
+     *
+     * @description
+     * Gets url that checks the login
+     *
+     * @returns {string} The url
+     */
+    var getCheckLoginURL = function() {
+        return root + "/checklogin";
+    };
+
+    /**
+     * @ngdoc method
      * @name mms.URLService#getSiteConfigsURL
      * @methodOf mms.URLService
      *
@@ -436,6 +450,7 @@ function urlService(baseUrl) {
         getPostWsDiffURL: getPostWsDiffURL,
         getWorkspacesURL: getWorkspacesURL,
         getWorkspaceURL: getWorkspaceURL,
+        getCheckLoginURL: getCheckLoginURL,
         isTimestamp: isTimestamp
     };
 
