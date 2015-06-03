@@ -23,6 +23,7 @@ function($scope, $rootScope, $state, $timeout, UxService, workspace, tag, docume
       $scope.tbApi.addButton(UxService.getToolbarButton("element.editor"));
       if ($rootScope.veEdits && Object.keys($rootScope.veEdits).length > 0) {
           $scope.tbApi.setIcon('element.editor', 'fa-edit-asterisk');
+          $scope.tbApi.setPermission('element.editor.saveall', true);
       } 
 
       var editable = false;

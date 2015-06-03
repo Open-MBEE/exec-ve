@@ -132,7 +132,7 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
             if (Object.keys($rootScope.veEdits).length === 0) {
                 $rootScope.mms_tbApi.setIcon('element.editor', 'fa-edit');
             }
-            if (Object.keys($rootScope.veEdits).length > 1) {
+            if (Object.keys($rootScope.veEdits).length > 0) {
                 $rootScope.mms_tbApi.setPermission('element.editor.saveall', true); 
             } else {
                 $rootScope.mms_tbApi.setPermission('element.editor.saveall', false);
@@ -153,7 +153,7 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
         $scope.presentElemEditCnts[key] = currentCnt;
 
         $rootScope.mms_tbApi.setIcon('element.editor', 'fa-edit-asterisk');
-        if (Object.keys($rootScope.veEdits).length > 1) {
+        if (Object.keys($rootScope.veEdits).length > 0) {
             $rootScope.mms_tbApi.setPermission('element.editor.saveall', true);
         } else {
             $rootScope.mms_tbApi.setPermission('element.editor.saveall', false);
@@ -195,6 +195,11 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
     });
     $scope.$on('element.viewer', function() {
         $scope.specApi.setEditing(false);
+        if (Object.keys($rootScope.veEdits).length > 0) {
+            $rootScope.mms_tbApi.setPermission('element.editor.saveall', true);
+        } else {
+            $rootScope.mms_tbApi.setPermission('element.editor.saveall', false);
+        }
         showPane('element');
     });
     $scope.$on('element.editor', function() {
@@ -205,7 +210,7 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
             $scope.tracker.etrackerSelected = $scope.elementType + '|' + (edit.sysmlid || edit.id) + '|' + $scope.specWs;
             $rootScope.veEdits[$scope.elementType + '|' + (edit.sysmlid || edit.id) + '|' + $scope.specWs] = edit;
             $rootScope.mms_tbApi.setIcon('element.editor', 'fa-edit-asterisk');
-            if (Object.keys($rootScope.veEdits).length > 1) {
+            if (Object.keys($rootScope.veEdits).length > 0) {
                 $rootScope.mms_tbApi.setPermission('element.editor.saveall', true);
             } else {
                 $rootScope.mms_tbApi.setPermission('element.editor.saveall', false);
