@@ -21,49 +21,11 @@ ul.abn-tree {
     padding: 2px;
   }
 
-  .level-1 .tree-item {
-    position: relative;
-    padding-left: 0px;
-  }
-
-  .level-2 .tree-item {
-    position: relative;
-    padding-left: 20px;
-  }
-
-  .level-3 .tree-item {
-    position: relative;
-    padding-left: 40px;
-  }
-
-  .level-4 .tree-item {
-    position: relative;
-    padding-left: 60px;
-  }
-
-  .level-5 .tree-item {
-    position: relative;
-    padding-left: 80px;
-  }
-
-  .level-6 .tree-item {
-    position: relative;
-    padding-left: 100px;
-  }
-
-  .level-7 .tree-item {
-    position: relative;
-    padding-left: 120px;
-  }
-
-  .level-8 .tree-item {
-    position: relative;
-    padding-left: 140px;
-  }
-
-  .level-9 .tree-item {
-    position: relative;
-    padding-left: 160px;
+  @for $i from 1 through 25 { 
+    .level-#{$i} .tree-item {
+      position: relative;
+      padding-left: 20px * ($i - 1);
+    }
   }
 }
 

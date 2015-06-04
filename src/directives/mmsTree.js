@@ -133,11 +133,24 @@ function mmsTree($timeout, $log, $templateCache) {
             }
         };
 
-        var remove_branch = function (branch) {
+        var remove_branch_impl = function (branch, singleBranch) {
             var parent_branch = get_parent(branch);
-            for (var i = 0; i < parent_branch.children.length; i++)
-                if (parent_branch.children[i].uid === branch.uid)
+            for (var i = 0; i < parent_branch.children.length; i++) {
+                if (parent_branch.children[i].uid === branch.uid) {
                     parent_branch.children.splice(i,1);
+                    if (singleBranch) {
+                        break;
+                    }
+                }
+            }
+        };
+
+        var remove_branch = function (branch) {
+            remove_branch_impl(branch, false);
+        };
+
+        var remove_single_branch = function (branch) {
+            remove_branch_impl(branch, true);
         };
 
         var get_parent = function(child) {
@@ -427,6 +440,11 @@ function mmsTree($timeout, $log, $templateCache) {
                 on_treeData_change();
             };
 
+            tree.remove_single_branch = function(branch) {
+                remove_single_branch(branch);
+                on_treeData_change();
+            };
+
             tree.add_root_branch = function(new_branch) {
                 tree.add_branch(null, new_branch);
             };
@@ -608,6 +626,27 @@ function mmsTree($timeout, $log, $templateCache) {
 
             tree.sort_branch = function(b, sortFunction) {
                 b.children.sort(sortFunction);
+            };
+
+            /**
+             * @ngdoc function
+             * @name mms.directives.directive:mmsTree#get_branch
+             * @methodOf mms.directives.directive:mmsTree
+             * 
+             * @description 
+             * Returns the branch with the specified data
+             */
+            tree.get_branch = function(data) {
+                var branch = null;
+                for_each_branch(function(b) {
+                    // if (angular.equals(b.data,data)) {
+                    //     branch = b;
+                    // }
+                    if (b.data.sysmlid === data.sysmlid) {
+                        branch = b;
+                    }
+                });
+                return branch;
             };
         }
     };

@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsView', ['ViewService', '$templateCache', 'growl', mmsView]);
+.directive('mmsView', ['ViewService', '$templateCache', '$rootScope', 'growl', mmsView]);
 
 /**
  * @ngdoc directive
@@ -50,26 +50,68 @@ angular.module('mms.directives')
  * @param {expression=} mmsCfClicked The expression to handle transcluded elements 
  *     in the view being clicked, this should be a function whose argument is 'elementId'
  */
-function mmsView(ViewService, $templateCache, growl) {
+function mmsView(ViewService, $templateCache, $rootScope, growl) {
     var template = $templateCache.get('mms/templates/mmsView.html');
 
     var mmsViewCtrl = function($scope) {
+        $scope.presentationElemCleanUpFncs = [];
+
+        this.isTranscludedElement = function(elementName) {
+            if (elementName === 'MMS-TRANSCLUDE-COM' ||
+                elementName === 'MMS-TRANSCLUDE-DOC' ||
+                elementName === 'MMS-TRANSCLUDE-IMG' ||
+                elementName === 'MMS-TRANSCLUDE-NAME' ||
+                elementName === 'MMS-TRANSCLUDE-VAL') {
+                return true;
+            }
+            return false;
+        };
+
+        this.isViewElement = function(elementName) {
+            if (elementName === 'MMS-VIEW-IMG' ||
+                elementName === 'MMS-VIEW-LIST' ||
+                elementName === 'MMS-VIEW-PARA' ||
+                elementName === 'MMS-VIEW-TABLE' ||
+                elementName === 'MMS-VIEW-TABLE-T' ||
+                elementName === 'MMS-VIEW-LIST-T' ||
+                elementName === 'MMS-VIEW-EQUATION') {
+                return true;
+            }
+            return false;
+        };
+
+        this.isPresentationElement = function(elementName) {
+            if (elementName === 'MMS-VIEW-PRESENTATION-ELEM') {
+                return true;
+            }
+            return false;
+        };
+
+        this.isEditable = function() {
+            return $scope.showEdits;
+        };
+
         this.getViewElements = function() {
             return ViewService.getViewElements($scope.mmsVid, false, $scope.mmsWs, $scope.mmsVersion);
         };
+
         this.transcludeClicked = function(elementId) {
             if ($scope.mmsCfClicked)
                 $scope.mmsCfClicked({elementId: elementId});
         };
+
         this.elementTranscluded = function(elem, type) {
-            if (elem.modified > $scope.modified && type !== 'Comment') { 
-                $scope.modified = elem.modified;
-                if (elem.creator)
-                    $scope.creator = elem.creator;
+            if (elem) {
+                if (elem.modified > $scope.modified && type !== 'Comment') { 
+                    $scope.modified = elem.modified;
+                    if (elem.modifier)
+                        $scope.modifier = elem.modifier;
+                }
+                if ($scope.mmsTranscluded)
+                    $scope.mmsTranscluded({element: elem, type: type});
             }
-            if ($scope.mmsTranscluded)
-                $scope.mmsTranscluded({element: elem, type: type});
         };
+
         this.getWsAndVersion = function() {
             return {
                 workspace: $scope.mmsWs, 
@@ -77,6 +119,22 @@ function mmsView(ViewService, $templateCache, growl) {
                 tag: $scope.mmsTag
             };
         };
+
+        this.getView = function() {
+            return $scope.view;
+        };
+
+        this.registerPresenElemCallBack = function(callback) {
+            $scope.presentationElemCleanUpFncs.push(callback);
+        };
+
+        this.unRegisterPresenElemCallBack = function(callback) {
+            var idx = $scope.presentationElemCleanUpFncs.indexOf(callback);
+
+            if (idx >= 0)
+                $scope.presentationElemCleanUpFncs.splice(idx, 1);
+        };
+
     };
 
     var mmsViewLink = function(scope, element, attrs) {
@@ -97,7 +155,7 @@ function mmsView(ViewService, $templateCache, growl) {
                         if (hasDiagram) {
                             scope.view = data;
                             scope.modified = data.modified;
-                            scope.creator = data.creator;
+                            scope.modifier = data.modifier;
                             return;
                         }
                     }
@@ -106,11 +164,11 @@ function mmsView(ViewService, $templateCache, growl) {
                 .then(function(data2) {
                     scope.view = data;
                     scope.modified = data.modified;
-                    scope.creator = data.creator;
+                    scope.modifier = data.modifier;
                 }, function(reason) {
                     scope.view = data;
                     scope.modified = data.modified;
-                    scope.creator = data.creator;
+                    scope.modifier = data.modifier;
                 });
             }, function(reason) {
                 growl.error('Getting View Error: ' + reason.message + ': ' + scope.mmsVid);
@@ -119,6 +177,8 @@ function mmsView(ViewService, $templateCache, growl) {
         scope.$watch('mmsVid', changeView);
         scope.showElements = false;
         scope.showComments = false;
+        scope.showEdits = false;
+
         /**
          * @ngdoc function
          * @name mms.directives.directive:mmsView#toggleShowElements
@@ -144,9 +204,28 @@ function mmsView(ViewService, $templateCache, growl) {
             element.toggleClass('reviewing');
         };
 
+        /**
+         * @ngdoc function
+         * @name mms.directives.directive:mmsView#toggleShowEdits
+         * @methodOf mms.directives.directive:mmsView
+         * 
+         * @description 
+         * toggle elements editing panel 
+         */
+        scope.toggleShowEdits = function() {
+            scope.showEdits = !scope.showEdits;
+
+            // Call the callback functions to clean up frames, show edits, and
+            // re-open frames when needed:
+            for (var i = 0; i < scope.presentationElemCleanUpFncs.length; i++) {
+                scope.presentationElemCleanUpFncs[i]();
+            }
+        };
+
         if (angular.isObject(scope.mmsViewApi)) {
             var api = scope.mmsViewApi;
             api.toggleShowElements = scope.toggleShowElements;
+
             /**
              * @ngdoc function
              * @name mms.directives.directive:mmsView#setShowElements
@@ -182,6 +261,8 @@ function mmsView(ViewService, $templateCache, growl) {
                 else
                     element.removeClass('reviewing');
             };
+            api.toggleShowEdits = scope.toggleShowEdits;
+
             api.changeView = function(vid) {
                 scope.changeView(vid);
             };

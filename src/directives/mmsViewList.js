@@ -6,24 +6,27 @@ angular.module('mms.directives')
 function mmsViewList($compile, $templateCache, UtilsService) {
     var template = $templateCache.get('mms/templates/mmsViewList.html');
     
+    var mmsViewListCtrl = function ($scope, $rootScope) {
+    };
+
     return {
         restrict: 'E',
         //template: template,
         scope: {
-            list: '=mmsList',
+            list: '=mmsList'
         },
-        //controller: ['$scope', controller]
+        controller: ['$scope', '$rootScope', mmsViewListCtrl],
         link: function(scope, element, attrs) {
-            var html = UtilsService.makeHtmlList(scope.list);
+            /*var html = UtilsService.makeHtmlList(scope.list);
             element.append(html);
             $compile(element.contents())(scope);
-            return;
-            /*
+            return;*/
+            
             element.append(template);
             $compile(element.contents())(scope); 
             //var el = $compile(template)(scope);
             //element.append(el);
-            */
+            
         }
     };
 }

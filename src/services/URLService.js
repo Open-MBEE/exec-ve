@@ -318,7 +318,13 @@ function urlService(baseUrl) {
     };
 
     var getPostElementsWithSiteURL = function(workspace, site) {
-        return root + '/workspaces/' + workspace + '/sites/' + site + '/elements';
+        if (root && workspace && site) {
+            // TODO maybe move this check elsewhere to keep this method simple
+            if (site === 'no-site') {
+                site = 'no_site';
+            }
+            return root + '/workspaces/' + workspace + '/sites/' + site + '/elements';
+        }
     };
 
     /**
@@ -389,8 +395,16 @@ function urlService(baseUrl) {
      * @param {string} workspace Workspace name to search under
      * @returns {string} The post elements url.
      */
-    var getElementSearchURL = function(query, workspace) {
-        return root + '/workspaces/' + workspace + '/search?keyword=' + query;
+    var getElementSearchURL = function(query, filters, propertyName, workspace) {
+        var r = root + '/workspaces/' + workspace + '/search?keyword=' + query;
+        if (filters) {
+            var l = filters.join();
+            r += '&filters=' + l;
+        }
+        if (propertyName) {
+            r += '&propertyName=' + propertyName;
+        }
+        return r;
     };
 
     var getWorkspacesURL = function() {

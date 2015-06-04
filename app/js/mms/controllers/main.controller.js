@@ -36,6 +36,7 @@ function($scope, $location, $rootScope, $state, _, $window, growl, $http, URLSer
         $state.reload();
     });*/
 
+
     $scope.$on('$stateChangeError', function(event, toState, toParams, fromState, fromParams, error) {
         growl.error('Error: ' + error.message);
     });

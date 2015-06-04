@@ -47,6 +47,8 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         $rootScope.veCommentsOn = false;
     if (!$rootScope.veElementsOn)
         $rootScope.veElementsOn = false;
+    if (!$rootScope.mms_ShowEdits)
+        $rootScope.mms_ShowEdits = false;
 
     var ws = $stateParams.workspace;
 
@@ -58,12 +60,15 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     $scope.buttons = [];
 
     $scope.bbApi.init = function() {
-        if (view && view.editable && time === 'latest') {
-            $scope.bbApi.addButton(UxService.getButtonBarButton('edit.view.documentation'));
-        }
 
-        $scope.bbApi.addButton(UxService.getButtonBarButton('edit.view.documentation.save'));
-        $scope.bbApi.addButton(UxService.getButtonBarButton('edit.view.documentation.cancel'));
+        if (view && view.editable && time === 'latest') {
+            $scope.bbApi.addButton(UxService.getButtonBarButton('show.edits'));
+            $scope.bbApi.setToggleState('show.edits', $rootScope.mms_ShowEdits);
+
+            if ($scope.view.specialization.contents) {
+                $scope.bbApi.addButton(UxService.getButtonBarButton('view.add.dropdown'));
+            }
+        }
         $scope.bbApi.addButton(UxService.getButtonBarButton('show.comments'));
         $scope.bbApi.setToggleState('show.comments', $rootScope.veCommentsOn);
         $scope.bbApi.addButton(UxService.getButtonBarButton('show.elements'));
@@ -173,6 +178,10 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
 
         snapshot.formats.push({"type":"pdf",  "status":"Generating"});
         snapshot.formats.push({"type":"html", "status":"Generating"});
+        snapshot.ws = ws;
+        snapshot.site = site.sysmlid;
+        snapshot.time = time;
+        
         ConfigService.createSnapshotArtifact(snapshot, site.sysmlid, workspace).then(
             function(result){
                 growl.info('Generating artifacts...Please wait for a completion email and reload the page.');
@@ -195,124 +204,183 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     $scope.$on('download.zip', function() {
         $window.open(getZipUrl());
     });
+ 
+    var handleError = function(reason) {
+        if (reason.type === 'info')
+            growl.info(reason.message);
+        else if (reason.type === 'warning')
+            growl.warning(reason.message);
+        else if (reason.type === 'error')
+            growl.error(reason.message);
+    };
 
-    $scope.$on('edit.view.documentation', function() {
-        $scope.editing = !$scope.editing;
-        $scope.specApi.setEditing(true);
-        if ($scope.filterApi.setEditing)
-            $scope.filterApi.setEditing(true);
-        $scope.bbApi.setPermission('edit.view.documentation',false);
-        $scope.bbApi.setPermission('edit.view.documentation.save',true);
-        $scope.bbApi.setPermission('edit.view.documentation.cancel',true);
-        var edit = $scope.specApi.getEdits();
-        if (edit) {
-            $rootScope.veEdits['element|' + edit.sysmlid + '|' + ws] = edit;
-            $rootScope.mms_tbApi.setIcon('element.editor', 'fa-edit-asterisk');
-            if (Object.keys($rootScope.veEdits).length > 1) {
-                $rootScope.mms_tbApi.setPermission('element.editor.saveall', true);
-            } else {
-                $rootScope.mms_tbApi.setPermission('element.editor.saveall', false);
-            }
-        }
-        ElementService.isCacheOutdated(view.sysmlid, ws)
-        .then(function(data) {
-            if (data.status && data.server.modified > data.cache.modified)
-                growl.warning('This view has been updated on the server');
-        });
-    });
+    var addElementCtrl = function($scope, $modalInstance, $filter, ViewService) {
 
-    $scope.$on('edit.view.documentation.save', function() {
-        if (elementSaving) {
-            growl.info('Please Wait...');
-            return;
-        }
-        elementSaving = true;
-        var waitForFilter = false;
-        $scope.bbApi.toggleButtonSpinner('edit.view.documentation.save');
-        $scope.specApi.save().then(function(data) {
-            if ($scope.filterApi.getEditing && $scope.filterApi.getEditing()) {
-                waitForFilter = true;
-                $scope.filterApi.save().then(function(filter) {
-                    $state.reload();
-                }, function(reason) {
-                    growl.error("Filter save error: " + reason.message);
-                }).finally(function() {
-                    $scope.bbApi.setPermission('edit.view.documentation',true);
-                    $scope.bbApi.setPermission('edit.view.documentation.save',false);
-                    $scope.bbApi.setPermission('edit.view.documentation.cancel',false);
-                    $scope.bbApi.toggleButtonSpinner('edit.view.documentation.save');
-                });
-            }
-            elementSaving = false;
-            growl.success('Save Successful');
-            $scope.editing = false;
-            delete $rootScope.veEdits['element|' + $scope.specApi.getEdits().sysmlid + '|' + ws];
-            if (Object.keys($rootScope.veEdits).length === 0) {
-                $rootScope.mms_tbApi.setIcon('element.editor', 'fa-edit');
-            }
-            if (Object.keys($rootScope.veEdits).length > 1) {
-                $rootScope.mms_tbApi.setPermission('element.editor.saveall', true); 
-            } else {
-                $rootScope.mms_tbApi.setPermission('element.editor.saveall', false);
-            }
-            if (!waitForFilter) {
-                $scope.bbApi.setPermission('edit.view.documentation',true);
-                $scope.bbApi.setPermission('edit.view.documentation.save',false);
-                $scope.bbApi.setPermission('edit.view.documentation.cancel',false);
-            }
-        }, function(reason) {
-            elementSaving = false;
-            if (reason.type === 'info')
-                growl.info(reason.message);
-            else if (reason.type === 'warning')
-                growl.warning(reason.message);
-            else if (reason.type === 'error')
-                growl.error(reason.message);
-        }).finally(function() {
-            if (!waitForFilter)
-                $scope.bbApi.toggleButtonSpinner('edit.view.documentation.save');
-        });
-    });
+        $scope.oking = false;
+        $scope.newItem = {};
+        $scope.newItem.name = "";
 
-    $scope.$on('edit.view.documentation.cancel', function() {
-        var go = function() {
-            if ($scope.filterApi.cancel) {
-                $scope.filterApi.cancel();
-                $scope.filterApi.setEditing(false);
-            }
-            delete $rootScope.veEdits['element|' + $scope.specApi.getEdits().sysmlid + '|' + ws];
-            $scope.specApi.revertEdits();
-            $scope.editing = false;
-            if (Object.keys($rootScope.veEdits).length === 0) {
-                $rootScope.mms_tbApi.setIcon('element.editor', 'fa-edit');
-            }
-            if (Object.keys($rootScope.veEdits).length > 1) {
-                $rootScope.mms_tbApi.setPermission('element.editor.saveall', true);
-            } else {
-                $rootScope.mms_tbApi.setPermission('element.editor.saveall', false);
-            }
-            $scope.bbApi.setPermission('edit.view.documentation',true);
-            $scope.bbApi.setPermission('edit.view.documentation.save',false);
-            $scope.bbApi.setPermission('edit.view.documentation.cancel',false);
+        $scope.searching = false;
+        $scope.viewOrSection = $scope.section ? $scope.section : view;
+
+        // Search for InstanceSpecs.  We are searching for InstanceSpecs b/c we only want to
+        // create a InstanceValue to point to that InstanceSpec when cross-referencing.
+        $scope.search = function(searchText) {
+            //var searchText = $scope.searchText; //TODO investigate why searchText isn't in $scope
+            //growl.info("Searching...");
+            $scope.searching = true;
+
+            ElementService.search(searchText, ['name'], null, false, ws)
+            .then(function(data) {
+                var validClassifierIds = [];
+                if ($scope.presentationElemType === 'Table') {
+                    validClassifierIds.push(ViewService.typeToClassifierId.Table);
+                    validClassifierIds.push(ViewService.typeToClassifierId.TableT);
+                } else if ($scope.presentationElemType === 'List') {
+                    validClassifierIds.push(ViewService.typeToClassifierId.List);
+                    validClassifierIds.push(ViewService.typeToClassifierId.ListT);
+                } else if ($scope.presentationElemType === 'Figure') {
+                    validClassifierIds.push(ViewService.typeToClassifierId.Image);
+                    validClassifierIds.push(ViewService.typeToClassifierId.Figure);
+                } else if ($scope.presentationElemType === 'Paragraph') {
+                    validClassifierIds.push(ViewService.typeToClassifierId.Paragraph);
+                    validClassifierIds.push(ViewService.typeToClassifierId.ParagraphT);
+                } else {
+                    validClassifierIds.push(ViewService.typeToClassifierId[$scope.presentationElemType]);
+                }
+                // Filter out anything that is not a InstanceSpecification or not of the correct type:
+                for (var i = 0; i < data.length; i++) {
+                    if (data[i].specialization.type != 'InstanceSpecification') {
+                        data.splice(i, 1);
+                        i--;
+                    }
+                    else if (validClassifierIds.indexOf(data[i].specialization.classifier[0]) < 0) {
+                        data.splice(i, 1);
+                        i--;
+                    }
+                }
+
+                $scope.mmsCfElements = data;
+                $scope.searching = false;
+            }, function(reason) {
+                growl.error("Search Error: " + reason.message);
+                $scope.searching = false;
+            });
         };
-        if ($scope.specApi.hasEdits()) {
-            var instance = $modal.open({
-                templateUrl: 'partials/mms/cancelConfirm.html',
-                scope: $scope,
-                controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
-                    $scope.ok = function() {
-                        $modalInstance.close('ok');
-                    };
-                    $scope.cancel = function() {
-                        $modalInstance.dismiss();
-                    };
-                }]
-            });
-            instance.result.then(function() {
-                go();
-            });
-        } else
-            go();
+
+        // Adds a InstanceValue to the view given the sysmlid of the InstanceSpecification
+        $scope.addElement = function(element) {
+
+            if ($scope.oking) {
+                growl.info("Please wait...");
+                return;
+            }
+            $scope.oking = true;  
+
+            ViewService.addInstanceVal($scope.viewOrSection, workspace, element.sysmlid).
+            then(function(data) {
+                if ($scope.presentationElemType === "Section") {
+                    // Broadcast message to TreeCtrl:
+                    $rootScope.$broadcast('viewctrl.add.section', element, $scope.viewOrSection);
+                }
+                growl.success("Adding "+$scope.presentationElemType+"  Successful");
+                $modalInstance.close(data);
+            }, function(reason) {
+                growl.error($scope.presentationElemType+" Add Error: " + reason.message);
+            }).finally(function() {
+                $scope.oking = false;
+            });            
+        };
+
+        $scope.ok = function() {
+            if ($scope.oking) {
+                growl.info("Please wait...");
+                return;
+            }
+            $scope.oking = true;
+
+            ViewService.createAndAddElement($scope.viewOrSection, workspace, true, $scope.presentationElemType, site.sysmlid, $scope.newItem.name).
+            then(function(data) {
+                $rootScope.$broadcast('view.reorder.refresh');
+                growl.success("Adding "+$scope.presentationElemType+"  Successful");
+                $modalInstance.close(data);
+            }, function(reason) {
+                growl.error($scope.presentationElemType+" Add Error: " + reason.message);
+            }).finally(function() {
+                $scope.oking = false;
+            }); 
+        };
+
+        $scope.cancel = function() {
+            $modalInstance.dismiss();
+        };
+
+    };
+
+    var addElement = function(type, section) {
+
+        $scope.section = section;
+        $scope.presentationElemType = type;
+        $scope.newItem = {};
+        $scope.newItem.name = "";
+        var templateUrlStr = 'partials/mms/add-item.html';
+
+        var instance = $modal.open({
+            templateUrl: templateUrlStr,
+            scope: $scope,
+            controller: ['$scope', '$modalInstance', '$filter', 'ViewService', addElementCtrl]
+        });
+        instance.result.then(function(data) {
+            // TODO: do anything here?
+        });
+    };
+
+    $scope.$on('view.add.paragraph', function() {
+        addElement('Paragraph');
+    });
+
+    $scope.$on('view.add.list', function() {
+        addElement('List');
+    });
+
+    $scope.$on('view.add.table', function() {
+        addElement('Table');
+    });
+
+    $scope.$on('view.add.section', function() {
+        addElement('Section');
+    });
+
+    $scope.$on('view.add.image', function() {
+        addElement('Figure');
+    });
+
+    $scope.$on('view.add.equation', function() {
+        addElement('Equation');
+    });
+
+    $scope.$on('section.add.paragraph', function(event, section) {
+        addElement('Paragraph', section);
+    });
+
+    $scope.$on('section.add.list', function(event, section) {
+        addElement('List', section);
+    });
+
+    $scope.$on('section.add.table', function(event, section) {
+        addElement('Table', section);
+    });
+
+    $scope.$on('section.add.equation', function(event, section) {
+        addElement('Equation', section);
+    });
+
+    $scope.$on('section.add.section', function(event, section) {
+        addElement('Section', section);
+    });
+
+    $scope.$on('section.add.image', function(event, section) {
+        addElement('Figure', section);
     });
 
     $scope.$on('show.comments', function() {
@@ -325,6 +393,14 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         $scope.viewApi.toggleShowElements();
         $scope.bbApi.toggleButtonState('show.elements');
         $rootScope.veElementsOn = !$rootScope.veElementsOn;
+    });
+
+    $scope.$on('show.edits', function() {
+        $scope.viewApi.toggleShowEdits();
+        $scope.bbApi.toggleButtonState('show.edits');
+        $rootScope.mms_ShowEdits = !$rootScope.mms_ShowEdits;
+        if ($scope.filterApi.setEditing)
+            $scope.filterApi.setEditing($rootScope.mms_ShowEdits);
     });
 
     $scope.$on('center.previous', function() {
@@ -382,7 +458,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
             $scope.numComments++;
             if (element.modified > $scope.lastCommented) {
                 $scope.lastCommented = element.modified;
-                $scope.lastCommentedBy = element.creator;
+                $scope.lastCommentedBy = element.modifier;
             }
         }
     };
@@ -392,6 +468,9 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         }
         if ($rootScope.veElementsOn) {
             $scope.viewApi.toggleShowElements();
+        }
+        if ($rootScope.mms_ShowEdits) {
+            $scope.viewApi.toggleShowEdits();
         }
     };
 }]);

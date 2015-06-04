@@ -2,10 +2,11 @@
     <h1 class="prop"><input class="form-control" type="text" ng-model="edit.name"></input></h1>
 
     <h2 ng-hide="mmsViewEdit" class="prop-title">LAST MODIFICATION</h2>
-    <h3 ng-hide="mmsViewEdit" class="prop">{{element.modified | date:'M/d/yy h:mm a'}} by {{element.creator}}</h3>
+    <h3 ng-hide="mmsViewEdit" class="prop">{{element.modified | date:'M/d/yy h:mm a'}} by {{element.modifier}}</h3>
 
     <div ng-if="edit.specialization.type === 'Property'">
         <h2 class="prop-title spec-view-value-heading">PROPERTY VALUE</h2>
+        <div ng-if="!isRestrictedVal">
         <div ng-if="editValues.length == 0">
             <select ng-model="addValueType" ng-options="key for (key, value) in addValueTypes"></select>
             <button class="btn btn-sm" ng-click="addValue(addValueType)">Add</button>
@@ -24,6 +25,11 @@
             </div>
             <div ng-switch-default>Editing not supported for now</div>
         </div>
+        </div>
+        <div ng-if="isRestrictedVal">
+            <select ng-model="editValues[0].operand[1].element" ng-options="el.sysmlid as el.name for el in options">
+        </select>
+    </div>
     </div>
 
     <div ng-if="edit.specialization.type === 'Constraint'">
@@ -63,10 +69,11 @@
     <h1 class="prop element-title">{{element.name}}</h1>
 
     <h2 class="prop-title">LAST MODIFICATION</h2>
-    <h3 class="prop">{{element.modified | date:'M/d/yy h:mm a'}} by {{element.creator}}</h3>
+    <h3 class="prop">{{element.modified | date:'M/d/yy h:mm a'}} by {{element.modifier}}</h3>
 
     <div ng-if="element.specialization.type === 'Property'">
         <h2 class="prop-title spec-view-value-heading">PROPERTY VALUE</h2>
+        <div ng-if="!isRestrictedVal">
         <div ng-repeat="value in values" ng-switch on="value.type">
             <h3 class="prop" ng-switch-when="LiteralInteger">{{value.integer}}</h3>
             <h3 class="prop" ng-switch-when="LiteralBoolean">{{value.boolean}}</h3>
@@ -77,6 +84,11 @@
             <h3 class="prop" ng-switch-when="OpaqueExpression">{{value.expressionBody[0]}}</h3>
             <h3 class="prop" ng-switch-default>{{value}}</h3>
         </div>
+        </div>
+        <div ng-if="isRestrictedVal">
+            <h3 class="prop"><mms-transclude-name mms-eid="{{values[0].operand[1].element}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></h3>
+        </select>
+    </div>
         <h2 class="prop-title spec-view-value-heading">PROPERTY TYPE</h2>
         <h3 class="prop"><mms-transclude-name mms-eid="{{element.specialization.propertyType}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></h3>
     </div>

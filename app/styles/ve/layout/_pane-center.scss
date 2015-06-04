@@ -4,6 +4,11 @@
 
 $pane_center_btn_group_width: 120px;
 
+body.fullDoc{
+  text-rendering: optimizeLegibility;
+  overflow:scroll;
+}
+
 .clickable:hover {
   cursor: pointer;
   background-color: $light_blue;
@@ -58,7 +63,6 @@ $pane_center_btn_group_width: 120px;
   margin-bottom: 24px;
 
   .tree-reorder {
-    width: 40%;
     margin: 0 auto;
     padding-top: 12px;
     padding-bottom: 24px;
