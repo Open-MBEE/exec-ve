@@ -242,6 +242,9 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
                 } else if ($scope.presentationElemType === 'Figure') {
                     validClassifierIds.push(ViewService.typeToClassifierId.Image);
                     validClassifierIds.push(ViewService.typeToClassifierId.Figure);
+                } else if ($scope.presentationElemType === 'Paragraph') {
+                    validClassifierIds.push(ViewService.typeToClassifierId.Paragraph);
+                    validClassifierIds.push(ViewService.typeToClassifierId.ParagraphT);
                 } else {
                     validClassifierIds.push(ViewService.typeToClassifierId[$scope.presentationElemType]);
                 }
