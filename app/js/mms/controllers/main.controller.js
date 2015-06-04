@@ -8,14 +8,12 @@ function($scope, $location, $rootScope, $state, _, $window, growl, $http, URLSer
     $rootScope.mms_viewContentLoading = false;
     $rootScope.mms_treeInitial = '';
     $rootScope.mms_title = '';
-    $rootScope.mms_footer = 'The technical data in this document is controlled under the U.S. Export Regulations, release to foreign persons may require an export authorization.';
+    $rootScope.mms_footer = 'JPL/Caltech PROPRIETARY — Not for Public Release or Redistribution. No export controlled documents allowed on this server.';
 
     var host = $location.host();
-    if ($location.host().indexOf('rn-ems') !== -1) {
-        // special footer for rn-ems
-        $rootScope.mms_footer = 'JPL/Caltech PROPRIETARY — Not for Public Release or Redistribution. No export controlled documents allowed on this server.';
+    if ($location.host().indexOf('europaems') !== -1) {
+        $rootScope.mms_footer = 'The technical data in this document is controlled under the U.S. Export Regulations, release to foreign persons may require an export authorization.';
     }
-
     $window.addEventListener('beforeunload', function(event) {
         if ($rootScope.veEdits && !_.isEmpty($rootScope.veEdits)) {
             var message = 'You may have unsaved changes, are you sure you want to leave?';
