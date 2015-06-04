@@ -385,6 +385,14 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
                     growl.error("You have a view called " + seenChild[childId].label + " that's a child of multiple parents! Please fix in the model.");
                     return;
                 }
+                if (!viewId2node[childId]) {
+                    growl.error("View " + childId + " not found.");
+                    return;
+                }
+                if (!viewId2node[viewid]) {
+                    growl.error("View " + viewid + " not found.");
+                    return;
+                }
                 viewId2node[viewid].children.push(viewId2node[childId]);
                 seenChild[childId] = viewId2node[childId];
             });
