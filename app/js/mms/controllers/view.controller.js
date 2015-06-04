@@ -399,6 +399,8 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         $scope.viewApi.toggleShowEdits();
         $scope.bbApi.toggleButtonState('show.edits');
         $rootScope.mms_ShowEdits = !$rootScope.mms_ShowEdits;
+        if ($scope.filterApi.setEditing)
+            $scope.filterApi.setEditing($rootScope.mms_ShowEdits);
     });
 
     $scope.$on('center.previous', function() {
