@@ -316,7 +316,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
                     var viewName = site.name + ' Cover Page';
                     var viewDoc = '<mms-site-docs data-mms-site="' + site.sysmlid + '">[cf:site docs]</mms-site-docs>';
 
-                    return ViewService.createView(undefined, viewName, undefined, workspace, siteCoverDocId, viewDoc)
+                    return ViewService.createView(undefined, viewName, undefined, workspace, siteCoverDocId, viewDoc, site.sysmlid)
                     .then(function(data) {
                         return data;
                     }, function(reason) {

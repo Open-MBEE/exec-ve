@@ -363,6 +363,8 @@ function urlService(baseUrl) {
             result.message = "Conflict";
         else if (status === 400)
             result.message = "Bad Request";
+        else if (status === 410)
+            result.message = "Deleted";
         else
             result.message = "Failed";
         deferred.reject(result);

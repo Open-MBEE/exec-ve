@@ -607,7 +607,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @param {string} [viewDoc] optional documentation to be used for the view
      * @returns {Promise} The promise will be resolved with the new view. 
      */
-    var createView = function(ownerId, name, documentId, workspace, viewId, viewDoc) {
+    var createView = function(ownerId, name, documentId, workspace, viewId, viewDoc, site) {
         var deferred = $q.defer();
         var view = {
             specialization: {type: 'View'},
@@ -618,7 +618,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         if (viewId) view.sysmlid = viewId;
         if (viewDoc) view.documentation = viewDoc;
 
-        ElementService.createElement(view, workspace)
+        ElementService.createElement(view, workspace, site)
         .then(function(data) {
             data.specialization.allowedElements = [data.sysmlid];
             data.specialization.displayedElements = [data.sysmlid];
