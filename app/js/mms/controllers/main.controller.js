@@ -39,10 +39,15 @@ function($scope, $location, $rootScope, $state, _, $window, growl, $http, URLSer
         growl.error('Error: ' + error.message);
     });
 
-    $rootScope.$on('$viewContentLoading', 
+    /*$rootScope.$on('$viewContentLoading', 
     function(event, viewConfig){ 
         if (viewConfig.view.controller === 'ViewCtrl')
             $rootScope.mms_viewContentLoading = true;
+    });*/
+
+    $rootScope.$on('$stateChangeStart', 
+    function(event, viewConfig){ 
+        $rootScope.mms_viewContentLoading = true;
     });
 
     $rootScope.$on('$stateChangeSuccess', 
@@ -64,6 +69,7 @@ function($scope, $location, $rootScope, $state, _, $window, growl, $http, URLSer
                 else
                     $rootScope.mms_treeInitial = toParams.document;
             }
+            $rootScope.mms_viewContentLoading = false;
         }
     );
 }]);

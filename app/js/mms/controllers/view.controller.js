@@ -6,11 +6,11 @@ angular.module('mmsApp')
 .controller('ViewCtrl', ['$scope', '$rootScope', '$state', '$stateParams', '$timeout', '$modal', '$window', 'viewElements', 'ElementService', 'ViewService', 'ConfigService', 'time', 'growl', 'workspace', 'site', 'document', 'view', 'tag', 'snapshot', 'UxService',
 function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, viewElements, ElementService, ViewService, ConfigService, time, growl, workspace, site, document, view, tag, snapshot, UxService) {
     
-    $scope.$on('$viewContentLoaded', 
+    /*$scope.$on('$viewContentLoaded', 
         function(event) {
             $rootScope.mms_viewContentLoading = false; 
         }
-    );
+    );*/
 
     if ($state.includes('workspace') && !$state.includes('workspace.sites')) {
         $rootScope.mms_showSiteDocLink = true;
