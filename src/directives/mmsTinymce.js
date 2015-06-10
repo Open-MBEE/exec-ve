@@ -271,7 +271,7 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                 //var searchText = $scope.searchText; //TODO investigate why searchText isn't in $scope
                 //growl.info("Searching...");
                 $scope.searchClass = "fa fa-spin fa-spinner";
-                ElementService.search(searchText, false, scope.mmsWs)
+                ElementService.search(searchText, ['name'], null, false, scope.mmsWs)
                 .then(function(data) {
                     var views = [];
                     data.forEach(function(v) {
@@ -525,6 +525,7 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
 
         $timeout(function() {
             tinymce.init(options);
+            //tinymce.get(attrs.id).focus();
         });
 
         ngModelCtrl.$render = function() {
