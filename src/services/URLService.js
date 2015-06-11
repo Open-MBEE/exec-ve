@@ -64,7 +64,6 @@ function urlService(baseUrl) {
      * Gets url that gets or posts snapshots for a configuration in a site
      *
      * @param {string} id Id of the configuration
-     * @param {string} site Site name
      * @param {string} workspace Workspace name
      * @returns {string} The url
      */
@@ -171,6 +170,7 @@ function urlService(baseUrl) {
      *
      * @param {string} site Site name
      * @param {string} workspace Workspace name
+     * @param {string} version timestamp
      * @returns {string} The url
      */
     var getSiteProductsURL = function(site, workspace, version) {
@@ -251,6 +251,7 @@ function urlService(baseUrl) {
      * @param {string} id The document id.
      * @param {string} workspace Workspace name
      * @param {string} version Timestamp or version number
+     * @param {boolean} simple Whether to get simple views (without specialization, for performance reasons)
      * @returns {string} The url.
      */
     var getDocumentViewsURL = function(id, workspace, version, simple) {
@@ -378,6 +379,8 @@ function urlService(baseUrl) {
      * @description
      * Gets the url to query sites.
      * 
+     * @param {string} workspace the workspace
+     * @param {string} version timestamp
      * @returns {string} The url.
      */
     var getSitesURL = function(workspace, version) {
@@ -394,6 +397,8 @@ function urlService(baseUrl) {
      * Gets the url for element keyword search.
      * 
      * @param {string} query Keyword query
+     * @param {Array.<string>} filters if not null, put in filters
+     * @param {string} propertyName if not null put in propertyName
      * @param {string} workspace Workspace name to search under
      * @returns {string} The post elements url.
      */

@@ -190,6 +190,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      *      it's displayed, except for the editables)
      * @param {string} [workspace=master] (optional) workspace to use
      * @param {string} [version=latest] (optional) alfresco version number or timestamp
+     * @param {boolean} [simple=false] (optional) whether to get simple views
      * @returns {Promise} The promise will be resolved with array of view objects. 
      */
     var getDocumentViews = function(id, update, workspace, version, simple) {
@@ -225,6 +226,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @param {string} parentViewId Id of the parent view, this view should 
      *      already be in the document
      * @param {string} [workspace=master] workspace to use
+     * @param {Object} [viewOb=null] if present, adds to document views cache array
      * @returns {Promise} The promise would be resolved with updated document object
      */
     var addViewToDocument = function(viewId, documentId, parentViewId, workspace, viewOb) {
@@ -288,6 +290,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @param {string} parentElementId Id of the parent element, this element should 
      *      already be in the document
      * @param {string} [workspace=master] workspace to use
+     * @param {Object} elementOb the element object to add (for element ref tree this should be an instanceValue)
      * @returns {Promise} The promise would be resolved with updated document object
      */
     var addElementToViewOrSection = function(viewOrSectionId, parentElementId, workspace, elementOb) {
@@ -605,6 +608,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @param {string} [workspace=master] workspace to use 
      * @param {string} [viewId] optional sysmlid to be used for the view
      * @param {string} [viewDoc] optional documentation to be used for the view
+     * @param {string} [site] site to create under
      * @returns {Promise} The promise will be resolved with the new view. 
      */
     var createView = function(ownerId, name, documentId, workspace, viewId, viewDoc, site) {
@@ -650,6 +654,21 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         return deferred.promise;
     };
 
+    /**
+     * @ngdoc method
+     * @name mms.ViewService#createDocument
+     * @methodOf mms.ViewService
+     * 
+     * @description
+     * Create a new document,
+     * if name isn't specified, "Untitled" will be used, a default contents with 
+     * paragraph of the view documentation will be used. 
+     * 
+     * @param {string} [name=Untitled] name for the Document
+     * @param {string} [site] site name
+     * @param {string} [workspace=master] workspace to use 
+     * @returns {Promise} The promise will be resolved with the new view. 
+     */
     var createDocument = function(name, site, workspace) {
         var deferred = $q.defer();
         var doc = {
@@ -701,6 +720,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @param {string} site Site name
      * @param {boolean} [update=false] Update latest
      * @param {string} [workspace=master] workspace to use 
+     * @param {string} [version=latest] timestamp
      * @returns {Promise} The promise will be resolved with array of document objects 
      */
     var getSiteDocuments = function(site, update, workspace, version) {
@@ -730,7 +750,9 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * Parses a InstanceValue node of the expression reference tree in the contents
      * of a View, and returns the corresponding presentation element json object.
      * 
-     * @param {string} instanceVal
+     * @param {object} instanceVal instance value object
+     * @param {string} [workspace=master] workspace
+     * @param {string} [version=latest] timestamp
      * @returns {Promise} The promise will be resolved with a json object for the 
      *                    corresponding presentation element
      */
@@ -825,9 +847,11 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * 
      * @description
      * Parses a InstanceValue node of the expression reference tree in the contents
-     * of a View, and returns the corresponding presentation element json object.
+     * of a View, and returns the corresponding instance specification
      * 
-     * @param {string} instanceVal
+     * @param {object} instanceVal instance value object
+     * @param {string} [workspace=master] workspace
+     * @param {string} [version=latest] timestamp
      * @returns {Promise} The promise will be resolved with a json object for the 
      *                    corresponding presentation element
      */
@@ -855,7 +879,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * Returns true if the passed InstanceSpecification is a Section
      * 
      * @param {Object} instanceSpec A InstanceSpecification json object
-     * @returns {boolean} 
+     * @returns {boolean} whether it's a section
      */
     var isSection = function(instanceSpec) {
         return instanceSpec.specialization && instanceSpec.specialization.classifier && 

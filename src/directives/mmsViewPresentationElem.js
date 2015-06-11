@@ -15,7 +15,8 @@ angular.module('mms.directives')
  * Given a InstanceVal, parses the element reference tree to get the corresponding
  * presentation element, and renders it in the view
  * 
- * @param mmsInstanceVal A InstanceValue json object 
+ * @param {Object} mmsInstanceVal A InstanceValue json object 
+ * @param {Object} mmsParentSection the parent section if available
  */
 function mmsViewPresentationElem(ViewService, ElementService, $templateCache, $rootScope) {
     var template = $templateCache.get('mms/templates/mmsViewPresentationElem.html');

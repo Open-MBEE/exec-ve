@@ -23,8 +23,12 @@ function HttpService($http, $q, _) {
      * @methodOf mms.HttpService
      * 
      * @description
+     * Put a new get request in the queue, the queue is LIFO
+     *
+     * @param {string} url url to get
+     * @param {function} success success function
+     * @param {function} error function
      */
-
     var get = function(url, success, error) {
         if (inProgress >= GET_OUTBOUND_LIMIT) {
             // push to top of list
@@ -51,6 +55,16 @@ function HttpService($http, $q, _) {
         }
     };
 
+    /**
+     * @ngdoc method
+     * @name mms.HttpService#ping
+     * @methodOf mms.HttpService
+     * 
+     * @description
+     * If the current queue has an ongoing request, put it in front
+     *
+     * @param {string} url url to get
+     */
     var ping = function(url) {
         if (cache.hasOwnProperty(url)) {
             var request = cache[url];

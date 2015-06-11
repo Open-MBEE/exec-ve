@@ -67,6 +67,19 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, HttpSe
         return deferred.promise;
     };
 
+    /**
+     * @ngdoc method
+     * @name mms.ConfigService#getConfig
+     * @methodOf mms.ConfigService
+     *
+     * @description
+     * Get configurations in a worksace
+     *
+     * @param {string} id id of config to get
+     * @param {string} [workspace=master] Workspace name
+     * @param {boolean} [update=false] update from server
+     * @returns {Promise} Promise would be resolved with config object
+     */
     var getConfig = function(id, workspace, update) {
         var n = normalize(update, workspace);
         var deferred = $q.defer();
@@ -111,6 +124,19 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, HttpSe
         return deferred.promise;
     };
 
+    /**
+     * @ngdoc method
+     * @name mms.ConfigService#getConfigSnapshots
+     * @methodOf mms.ConfigService
+     *
+     * @description
+     * Get snapshots of a config
+     *
+     * @param {string} id Config id
+     * @param {string} [workspace=master] Workspace name
+     * @param {boolean} [update=false] update from server
+     * @returns {Promise} Promise would be resolved with array of snapshot objects
+     */
     var getConfigSnapshots = function(id, workspace, update) {
         var n = normalize(update, workspace);
         var deferred = $q.defer();
@@ -136,10 +162,11 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, HttpSe
      * @methodOf mms.ConfigService
      *
      * @description
-     * Create a new configuration 
+     * Create a new configuration or update existing one
      *
      * @param {Object} config The new config object, must not already have id
      * @param {string} [workspace=master] Workspace name
+     * @param {boolean} [update=false] whether this is an update
      * @returns {Promise} Promise would be resolved with the updated config object
      */
     var createConfig = function(config, workspace, update) {
@@ -163,6 +190,18 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, HttpSe
         return deferred.promise;
     };
 
+    /**
+     * @ngdoc method
+     * @name mms.ConfigService#deleteConfig
+     * @methodOf mms.ConfigService
+     *
+     * @description
+     * Delete a config
+     *
+     * @param {string} configId Id of config to delete
+     * @param {string} [workspace=master] Workspace name
+     * @returns {Promise} Promise would be resolved with server reply
+     */
     var deleteConfig = function(configId, workspace) {
         var n = normalize(null, workspace);
         var deferred = $q.defer();
@@ -217,6 +256,19 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, HttpSe
         return deferred.promise;
     };
 
+    /**
+     * @ngdoc method
+     * @name mms.ConfigService#createSnapshotArtifact
+     * @methodOf mms.ConfigService
+     *
+     * @description
+     * Create artifacts for a snapshot
+     *
+     * @param {Object} snapshot The snapshot object with artifact types to create
+     * @param {string} site The site name
+     * @param {string} [workspace=master] Workspace name
+     * @returns {Promise} Promise would be resolved with 'ok', the server will send an email to user when done
+     */
     var createSnapshotArtifact = function(snapshot, site, workspace){
         var n = normalize(null, workspace);
         var deferred = $q.defer();
@@ -233,6 +285,18 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, HttpSe
         return UtilsService.normalize({update: updateFromServer, workspace: workspace, version: null});
     };
 
+    /**
+     * @ngdoc method
+     * @name mms.ConfigService#update
+     * @methodOf mms.ConfigService
+     *
+     * @description
+     * Update existing config
+     *
+     * @param {Object} config The config object with updates
+     * @param {string} [workspace=master] Workspace name
+     * @returns {Promise} Promise would be resolved with the updated config object
+     */
     var update = function(config, workspace) {
         return createConfig(config, workspace, true);
     };
