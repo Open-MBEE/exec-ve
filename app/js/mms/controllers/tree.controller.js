@@ -301,14 +301,16 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
         // Whether to load only top-level documents
         onlyTopLevel = typeof onlyTopLevel !== 'undefined' ? onlyTopLevel : true;
         
-        /*
-if(siteNode.children.length === 0)
+        if(siteNode.children.length === 0)
         {
 	        // notAChild is just an empty object. It tells the tree to place a disclosure arrow next to all sites
-	        var notAChild = {};
+	        var notAChild = {
+		        data: {
+			        sysmlid: null
+		        }
+	        };
 	        siteNode.children.push(notAChild);
         }
-*/
         
         // Skip if not a top-level ndoe
         if(onlyTopLevel && siteNode.level !== 1)
