@@ -70,12 +70,11 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'ui.router'])
     $scope.ws = params['ws'];
     $scope.site=params['site'];
     $scope.docId=params['docId'];
-    // $scope.version=params['time'];
+    $scope.viewId=params['viewId'];
+    $scope.section=params['section'];
+    $scope.version=params['time'];
 
     var views= [];
-    views.push({id: $scope.docId, api: {
-        
-    }});
     var view2children = {};
     var addToArray = function(viewId, curSection) {
         views.push({id: viewId, api: {
@@ -91,21 +90,31 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'ui.router'])
         }
     };
 
-    ElementService.getElement($scope.docId, false, $scope.ws, $scope.version)
-    .then(function(document) {
-        $scope.document = document;
-        var view2view = document.specialization.view2view;
-        view2view.forEach(function(view) {
-            view2children[view.id] = view.childrenViews;
-         });
-        var num = 1;
-        view2children[document.sysmlid].forEach(function(cid) {
-            addToArray(cid, num);
-            num = num + 1;
-        });
-        $scope.views = views;
+    if($scope.viewId && $scope.viewId.length>0){
+        // views.push({id:$scope.viewId, api:{}});
+        addToArray($scope.viewId, $scope.section);
+    }
+    else{
+        views.push({id: $scope.docId, api: {}});
+       
 
-    });
+        ElementService.getElement($scope.docId, false, $scope.ws, $scope.version)
+        .then(function(document) {
+            $scope.document = document;
+            var view2view = document.specialization.view2view;
+            view2view.forEach(function(view) {
+                view2children[view.id] = view.childrenViews;
+             });
+            var num = 1;
+            view2children[document.sysmlid].forEach(function(cid) {
+                addToArray(cid, num);
+                num = num + 1;
+            });
+            //$scope.views = views;
+
+        });
+    }
+    $scope.views = views;
 }]);
 
 var parseQueryString = function(queryString){
