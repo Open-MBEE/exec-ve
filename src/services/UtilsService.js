@@ -81,9 +81,23 @@ function UtilsService(_) {
             else
                 rootNodes.push(data2Node[data[id]]);
         });
+        
+        // make a third pass to indicate if a node is a top-level node
+        array.forEach(function(data)
+        {
+	        if (data[parent] && data2Node[data[parent]]) //bad data!
+	        {
+		        // Deeper level
+	        }
+	        else
+	        {
+		        data2Node[data[id]].level = 1;
+	        }
+        });
 
         // apply level 2 objects to tree
         if (level2_Func) {
+            
             array.forEach(function(data) {
                 var level1_parentNode = data2Node[data[id]];
                 level2_Func(data[id], level1_parentNode);
