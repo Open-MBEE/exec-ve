@@ -64,7 +64,6 @@ function urlService(baseUrl) {
      * Gets url that gets or posts snapshots for a configuration in a site
      *
      * @param {string} id Id of the configuration
-     * @param {string} site Site name
      * @param {string} workspace Workspace name
      * @returns {string} The url
      */
@@ -171,6 +170,7 @@ function urlService(baseUrl) {
      *
      * @param {string} site Site name
      * @param {string} workspace Workspace name
+     * @param {string} version timestamp
      * @returns {string} The url
      */
     var getSiteProductsURL = function(site, workspace, version) {
@@ -251,6 +251,7 @@ function urlService(baseUrl) {
      * @param {string} id The document id.
      * @param {string} workspace Workspace name
      * @param {string} version Timestamp or version number
+     * @param {boolean} simple Whether to get simple views (without specialization, for performance reasons)
      * @returns {string} The url.
      */
     var getDocumentViewsURL = function(id, workspace, version, simple) {
@@ -318,7 +319,13 @@ function urlService(baseUrl) {
     };
 
     var getPostElementsWithSiteURL = function(workspace, site) {
-        return root + '/workspaces/' + workspace + '/sites/' + site + '/elements';
+        if (root && workspace && site) {
+            // TODO maybe move this check elsewhere to keep this method simple
+            if (site === 'no-site') {
+                site = 'no_site';
+            }
+            return root + '/workspaces/' + workspace + '/sites/' + site + '/elements';
+        }
     };
 
     /**
@@ -357,6 +364,8 @@ function urlService(baseUrl) {
             result.message = "Conflict";
         else if (status === 400)
             result.message = "Bad Request";
+        else if (status === 410)
+            result.message = "Deleted";
         else
             result.message = "Failed";
         deferred.reject(result);
@@ -370,6 +379,8 @@ function urlService(baseUrl) {
      * @description
      * Gets the url to query sites.
      * 
+     * @param {string} workspace the workspace
+     * @param {string} version timestamp
      * @returns {string} The url.
      */
     var getSitesURL = function(workspace, version) {
@@ -386,11 +397,21 @@ function urlService(baseUrl) {
      * Gets the url for element keyword search.
      * 
      * @param {string} query Keyword query
+     * @param {Array.<string>} filters if not null, put in filters
+     * @param {string} propertyName if not null put in propertyName
      * @param {string} workspace Workspace name to search under
      * @returns {string} The post elements url.
      */
-    var getElementSearchURL = function(query, workspace) {
-        return root + '/workspaces/' + workspace + '/search?keyword=' + query;
+    var getElementSearchURL = function(query, filters, propertyName, workspace) {
+        var r = root + '/workspaces/' + workspace + '/search?keyword=' + query;
+        if (filters) {
+            var l = filters.join();
+            r += '&filters=' + l;
+        }
+        if (propertyName) {
+            r += '&propertyName=' + propertyName;
+        }
+        return r;
     };
 
     var getWorkspacesURL = function() {

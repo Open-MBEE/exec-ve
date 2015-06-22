@@ -161,7 +161,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
             site: function(SiteService, dummyLogin) {
                 return SiteService.getSite('no_site');
             },
-            document : function(ElementService, workspace, time, growl, workspaceObj, dummyLogin) {
+            document : function(ViewService, ElementService, workspace, time, growl, workspaceObj, dummyLogin) {
             
                 // This is a short-term work-around -- all this should be done the back-end MMS in the future
                 var wsCoverDocId = 'master_cover';
@@ -172,33 +172,16 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
                 }, function(reason) {
 
                     // if it is an error, other than a 404 (element not found) then stop and return
-                    if (reason.status !== 404 || time !== 'latest') return null;
+                    if ((reason.status !== 404 && reason.status !== 410) || time !== 'latest') return null;
 
-                    var doc = {
-                        specialization: {type: "View"},
-                        name: 'Workspace ' + workspaceObj.name + ' Cover Page',
-                        documentation: ''
-                    };
-                    doc.sysmlid = wsCoverDocId;
-                    doc.specialization.contains = [
-                        {
-                            'type': 'Paragraph',
-                            'sourceType': 'reference',
-                            'source': wsCoverDocId,
-                            'sourceProperty': 'documentation'
-                        }
-                    ];
-                    doc.specialization.allowedElements = [wsCoverDocId];
-                    doc.specialization.displayedElements = [wsCoverDocId];
-                    doc.specialization.childrenViews = [];
+                    var viewName = 'Workspace ' + workspaceObj.name + ' Cover Page';
 
-                    return ElementService.createElement(doc, workspace, null)
+                    return ViewService.createView(undefined, viewName, undefined, workspace, wsCoverDocId)
                     .then(function(data) {
                         return data;
                     }, function(reason) {
                         return null;
                     });
-
                 });
             },
             docFilter: function(ElementService, workspace, time, document, dummyLogin) {
@@ -310,7 +293,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
             site: function($stateParams, SiteService, dummyLogin) {
                 return SiteService.getSite($stateParams.site);
             },
-            document : function($stateParams, ElementService, workspace, site, time, growl, dummyLogin) {
+            document : function($stateParams, ViewService, ElementService, workspace, site, time, growl, dummyLogin) {
                 var siteCoverDocId;
                 if ($stateParams.site === 'no_site')
                     return null;
@@ -324,31 +307,16 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
                 }, function(reason) {
 
                     // if it is an error, other than a 404 (element not found) then stop and return
-                    if (reason.status !== 404 || time !== 'latest') return null;
+                    if ((reason.status !== 404 && reason.status !== 410) || time !== 'latest') return null;
                     
                     // if it is a tag look-up, then don't create element
                     if (time !== 'latest') 
                         return null;
 
-                    var doc = {
-                        specialization: {type: "View"},
-                        name: site.name + ' Cover Page',
-                        documentation: '<mms-site-docs data-mms-site="' + site.sysmlid + '">[cf:site docs]</mms-site-docs>'
-                    };
-                    doc.sysmlid = siteCoverDocId;
-                    doc.specialization.contains = [
-                        {
-                            'type': 'Paragraph',
-                            'sourceType': 'reference',
-                            'source': siteCoverDocId,
-                            'sourceProperty': 'documentation'
-                        }
-                    ];
-                    doc.specialization.allowedElements = [siteCoverDocId];
-                    doc.specialization.displayedElements = [siteCoverDocId];
-                    doc.specialization.childrenViews = [];
+                    var viewName = site.name + ' Cover Page';
+                    var viewDoc = '<mms-site-docs data-mms-site="' + site.sysmlid + '">[cf:site docs]</mms-site-docs>';
 
-                    return ElementService.createElement(doc, workspace, site.sysmlid)
+                    return ViewService.createView(undefined, viewName, undefined, workspace, siteCoverDocId, viewDoc, site.sysmlid)
                     .then(function(data) {
                         return data;
                     }, function(reason) {

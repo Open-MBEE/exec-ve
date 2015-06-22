@@ -61,7 +61,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'ui.router'])
         url: '/',
         templateUrl: 'partials/mms/full-doc2.html',
         controller: 'FullDocCtrl2'
-    })
+    });
 })
 .controller('FullDocCtrl2', ['$scope', '$window', 'ElementService', 'ViewService', 'ConfigService', 
     function($scope, $window, ElementService, ViewService, ConfigService){

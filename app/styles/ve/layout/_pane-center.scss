@@ -38,7 +38,7 @@ tr {
   .pane-center-btn-group {
     float: right;
     padding-top: 9px;
-    padding-right: 0;
+    padding-right: 75px;
     min-width: $pane_center_btn_group_width;
   }
 
@@ -71,7 +71,6 @@ tr {
   margin-bottom: 24px;
 
   .tree-reorder {
-    width: 40%;
     margin: 0 auto;
     padding-top: 12px;
     padding-bottom: 24px;
