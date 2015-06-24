@@ -234,16 +234,16 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
             .then(function(data) {
                 var validClassifierIds = [];
                 if ($scope.presentationElemType === 'Table') {
-                    validClassifierIds.push(ViewService.typeToClassifierId.Table);
+                    //validClassifierIds.push(ViewService.typeToClassifierId.Table);
                     validClassifierIds.push(ViewService.typeToClassifierId.TableT);
                 } else if ($scope.presentationElemType === 'List') {
-                    validClassifierIds.push(ViewService.typeToClassifierId.List);
+                    //validClassifierIds.push(ViewService.typeToClassifierId.List);
                     validClassifierIds.push(ViewService.typeToClassifierId.ListT);
                 } else if ($scope.presentationElemType === 'Figure') {
-                    validClassifierIds.push(ViewService.typeToClassifierId.Image);
+                    //validClassifierIds.push(ViewService.typeToClassifierId.Image);
                     validClassifierIds.push(ViewService.typeToClassifierId.Figure);
                 } else if ($scope.presentationElemType === 'Paragraph') {
-                    validClassifierIds.push(ViewService.typeToClassifierId.Paragraph);
+                    //validClassifierIds.push(ViewService.typeToClassifierId.Paragraph);
                     validClassifierIds.push(ViewService.typeToClassifierId.ParagraphT);
                 } else {
                     validClassifierIds.push(ViewService.typeToClassifierId[$scope.presentationElemType]);

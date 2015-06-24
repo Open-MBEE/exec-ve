@@ -218,6 +218,12 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             scope.instanceSpec = mmsViewPresentationElemCtrl.getInstanceSpec();
             scope.instanceVal = mmsViewPresentationElemCtrl.getInstanceVal();
             scope.presentationElem = mmsViewPresentationElemCtrl.getPresentationElement();
+            var auto = [ViewService.typeToClassifierId.Image, ViewService.typeToClassifierId.Paragraph,
+                ViewService.typeToClassifierId.List, ViewService.typeToClassifierId.Table];
+
+            if (auto.indexOf(scope.instanceSpec.specialization.classifier[0]) >= 0)
+            //do not allow model generated to be deleted
+                scope.isDirectChildOfPresentationElement = false;
             if (scope.isDirectChildOfPresentationElement) {
                 scope.panelTitle = scope.instanceSpec.name;
                 scope.panelType = scope.presentationElem.type; //this is hack for fake table/list/equation until we get actual editors
