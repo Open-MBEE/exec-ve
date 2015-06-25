@@ -301,6 +301,17 @@ function mmsTree($timeout, $log, $templateCache) {
             }
 
         };
+        scope.expandCallback = function(obj){
+	        console.info('Row toggled');
+	        console.log(obj);
+	        
+	        if(obj.branch.level !== 1 && obj.ranOnce !== true)
+	        {
+		        scope.options.siteLevel2Func(obj.branch.data.sysmlid, obj.branch, false);
+	        }
+	        
+	        obj.ranOnce = true;
+        };
         scope.on_treeData_change = on_treeData_change;
         scope.$watch('treeData', on_treeData_change, false);
         scope.$watch('initialSelection', on_initialSelection_change);

@@ -313,10 +313,10 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
         }
         
         // Skip if not a top-level ndoe
-        if(onlyTopLevel && siteNode.level !== 1)
-        {
-	        return;
-        }
+        if(onlyTopLevel && siteNode.level !== 1) return;
+        
+        // Don't reload data if already populated
+        if(siteNode.level !==1 && siteNode.children.length > 1 && siteNode.children[0].data.sysmlid !== null) return;
         
         siteNode.loading = true;
         ViewService.getSiteDocuments(site, false, ws, config === 'latest' ? 'latest' : tag.timestamp)
@@ -366,6 +366,8 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
             growl.error(reason.message);
         });
     };
+    
+    $scope.siteLevel2Func = siteLevel2Func;
 
     if ($state.includes('workspaces') && !$state.includes('workspace.sites')) {
         $scope.my_data = UtilsService.buildTreeHierarchy(workspaces, "id", 
@@ -503,7 +505,8 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
 
     // TODO: update tree options to call from UxService
     $scope.tree_options = {
-        types: UxService.getTreeTypes()
+        types: UxService.getTreeTypes(),
+        siteLevel2Func: siteLevel2Func
     };
     if (!$state.includes('workspace.site.document'))
         $scope.tree_options.sort = sortFunction;
