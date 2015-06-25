@@ -602,10 +602,17 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
      * @description
      * Search for elements based on some query
      * 
-     * @param {string} query A query string (TBD)
+     * @param {string} query A keyword
+     * @param {Array.<string>} [filters=null] An array of string of what to search in,
+     *                                        can be name, documentation, id, value
+     * @param {string} [propertyName=null] if filter is value, propertyName is used to further filter
      * @param {boolean} [update=false] Whether to update from server
      * @param {string} [workspace=master] (optional) workspace to use
-     * @returns {Promise} The promise will be resolved with an array of element objects
+     * @returns {Promise} The promise will be resolved with an array of element objects.
+     *                  the server will return each element's properties as another array of element objects
+     *                  in each object's 'properties' key, the array isn't stored in the cache with the element
+     *                  but elements in the properties array will be stored in the cache
+     *                  The element results returned will be a clone of the original server response and not cache references
      */
     var search = function(query, filters, propertyName, update, workspace) {
         //var n = normalize(null, update, workspace, null);

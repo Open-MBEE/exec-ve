@@ -296,7 +296,25 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
         });
     };
 
-    var siteLevel2Func = function(site, siteNode) {
+    var siteLevel2Func = function(site, siteNode, onlyTopLevel) {
+        
+        // Setting all sites to be expandable
+        siteNode.expandable = true;
+        
+        // String relating to the proper callback as defined in the directive
+        siteNode.expandCallback = 'siteLevel2Func';
+        
+        // Whether to load only top-level documents
+        onlyTopLevel = typeof onlyTopLevel !== 'undefined' ? onlyTopLevel : true;
+        
+        // Skip if not a top-level node
+        if(onlyTopLevel && (siteNode.level !== 1 || siteNode.data.isCharacterization !== true)) return;
+        
+        // Make sure we haven't already loaded the docs for this site
+        if(siteNode.docsLoaded) return;
+        // Set docs loaded attribute
+        siteNode.docsLoaded = true;
+        
         siteNode.loading = true;
         ViewService.getSiteDocuments(site, false, ws, config === 'latest' ? 'latest' : tag.timestamp)
         .then(function(docs) {
@@ -345,6 +363,8 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
             growl.error(reason.message);
         });
     };
+    
+    $scope.siteLevel2Func = siteLevel2Func;
 
     if ($state.includes('workspaces') && !$state.includes('workspace.sites')) {
         $scope.my_data = UtilsService.buildTreeHierarchy(workspaces, "id", 
@@ -574,7 +594,8 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
 
     // TODO: update tree options to call from UxService
     $scope.tree_options = {
-        types: UxService.getTreeTypes()
+        types: UxService.getTreeTypes(),
+        siteLevel2Func: siteLevel2Func
     };
     if (!$state.includes('workspace.site.document'))
         $scope.tree_options.sort = sortFunction;

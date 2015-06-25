@@ -34,9 +34,10 @@ function SiteService($q, $http, URLService, CacheService, _) {
      * @methodOf mms.SiteService
      * 
      * @description
-     * Gets site information - name, title, categories
+     * Gets site information - name, title, categories, site info is always from master workspace
      *
      * @param {string} site The name of site to get.
+     * @param {string} [version=latest] timestamp
      * @returns {Promise} Resolves to the site info object.
      */
     var getSite = function(site, version) {
@@ -63,6 +64,8 @@ function SiteService($q, $http, URLService, CacheService, _) {
      * 
      * @description
      * Gets sites information - name, title, categories for all sites on the server
+     *
+     * @param {string} [version=latest] timestamp
      * @returns {Promise} Resolves into array of site info objects.
      */
     var getSites = function(version) {

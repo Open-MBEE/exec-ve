@@ -15,7 +15,7 @@ angular.module('mms.directives')
  * @requires _
  *
  * @description
- * Utility methods for performing edit like behavior to a element
+ * Utility methods for performing edit like behavior to a transclude element
  *
  */
 function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceService, ConfigService, ElementService, ViewService, UtilsService, growl, _) {
@@ -43,6 +43,13 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
      * @description 
      * save edited element
      * 
+     * @param {object} edit the edit object to save
+     * @param {string} mmsWs workspace
+     * @param {string} mmsType workspace/tag/element
+     * @param {string} mmsEid id of element
+     * @param {object} [tinymceApi=null] optional tinymce api
+     * @param {object} scope angular scope that has common functions
+     * @param {string} type name/documentation/value/all
      * @return {Promise} promise would be resolved with updated element if save is successful.
      *      For unsuccessful saves, it will be rejected with an object with type and message.
      *      Type can be error or info. In case of conflict, there is an option to discard, merge,
@@ -140,6 +147,9 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
      * currently compares name, doc, property values, if element is not 
      * editable, returns false
      * 
+     * @param {object} scope scope with common properties
+     * @param {string} type name/documentation/value
+     * @param {boolena} checkAll check everything
      * @return {boolean} has changes or not
      */
      var hasEdits = function(scope, type, checkAll) {
@@ -172,6 +182,9 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
      * @description 
      * reset editing object back to base element values for name, doc, values
      * 
+     * @param {object} scope scope with common properties
+     * @param {string} type name/documentation/value
+     * @param {boolean} revertAll revert all properties
      */
     var revertEdits = function(scope, type, revertAll) {
         if (scope.mmsType === 'workspace') {
