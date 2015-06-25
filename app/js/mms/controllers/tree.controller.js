@@ -298,25 +298,22 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
 
     var siteLevel2Func = function(site, siteNode, onlyTopLevel) {
         
+        // Setting all sites to be expandable
+        siteNode.expandable = true;
+        
+        // String relating to the proper callback as defined in the directive
+        siteNode.expandCallback = 'siteLevel2Func';
+        
         // Whether to load only top-level documents
         onlyTopLevel = typeof onlyTopLevel !== 'undefined' ? onlyTopLevel : true;
         
-        if(siteNode.children.length === 0)
-        {
-	        // notAChild is just an empty object. It tells the tree to place a disclosure arrow next to all sites
-	        var notAChild = {
-		        data: {
-			        sysmlid: null
-		        }
-	        };
-	        siteNode.children.push(notAChild);
-        }
+        // Skip if not a top-level node
+        if(onlyTopLevel && (siteNode.level !== 1 || siteNode.data.isCharacterization !== true)) return;
         
-        // Skip if not a top-level ndoe
-        if(onlyTopLevel && siteNode.level !== 1) return;
-        
-        // Don't reload data if already populated
-        if(siteNode.level !==1 && siteNode.children.length > 1 && siteNode.children[0].data.sysmlid !== null) return;
+        // Make sure we haven't already loaded the docs for this site
+        if(siteNode.docsLoaded) return;
+        // Set docs loaded attribute
+        siteNode.docsLoaded = true;
         
         siteNode.loading = true;
         ViewService.getSiteDocuments(site, false, ws, config === 'latest' ? 'latest' : tag.timestamp)

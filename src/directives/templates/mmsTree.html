@@ -4,7 +4,7 @@
         <div class="arrow" ng-click="user_clicks_branch(row.branch)" ng-class="{'active-text': row.branch.selected}">
         	<div class="shaft" ng-class="{'shaft-selected': row.branch.selected, 'shaft-hidden': !row.branch.selected}">
   	        <a class="tree-item">
-              <i ng-class="{'active-text': row.branch.selected}" ng-click="expandCallback(row); siteLevel2Func(row.branch.data.sysmlid, row.branch.data, false); row.branch.expanded = !row.branch.expanded; $event.stopPropagation(); on_treeData_change();" class="indented tree-icon {{row.expand_icon}}" ></i>
+              <i ng-class="{'active-text': row.branch.selected}" ng-click="expandCallback(row); row.branch.expanded = !row.branch.expanded; $event.stopPropagation(); on_treeData_change();" class="indented tree-icon {{row.expand_icon}}" ></i>
               <i ng-class="{'active-text': row.branch.selected}" class="indented tree-icon {{row.type_icon}}" ></i>
               <span class="indented tree-label" ng-class="{'active-text': row.branch.selected}">{{row.section}} {{row.branch.data.name}}</span>
               <span ng-show="{{row.status_properties && row.status_properties.button && row.button_properties}}" class="pull-right">
