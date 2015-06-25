@@ -91,6 +91,7 @@ angular.module('mms.directives')
     </pre>
  *
  * @param {Array} treeData Array of root nodes
+ * @param {Array} treeData Array of root nodes
  * @param {Object=} treeControl Empty object to populate with api
  * @param {Object=} options Options object to customize icons for types and statuses
  * @param {expression=} onSelect Handler for branch selected
@@ -162,6 +163,10 @@ function mmsTree($timeout, $log, $templateCache) {
 
         var expand_all_parents = function(child) {
             for_all_ancestors(child, function(b) {
+	            if(b.expandable === true)
+                {
+                    scope.expandCallback({ branch: b });
+                }
                 b.expanded = true;
             });
         };
@@ -189,6 +194,10 @@ function mmsTree($timeout, $log, $templateCache) {
                     selected_branch.selected = false;
                 branch.selected = true;
                 selected_branch = branch;
+	            if(branch.expandable === true)
+                {
+                    scope.expandCallback({ branch: branch });
+                }
                 expand_all_parents(branch);
                 if (branch.onSelect) {
                     $timeout(function() {
@@ -234,11 +243,12 @@ function mmsTree($timeout, $log, $templateCache) {
 
                 if (!branch.expanded)
                     branch.expanded = false;
-                if (branch.children && branch.children.length > 0) {
-                    if (branch.expanded) 
+                if ((branch.children && branch.children.length > 0) || (branch.expandable === true)) {
+                    if (branch.expanded) {
                         expand_icon = attrs.iconCollapse;
-                    else
+                    } else {
                         expand_icon = attrs.iconExpand;
+                    }
                 } else
                     expand_icon = "fa fa-lg fa-fw";
 
@@ -301,6 +311,25 @@ function mmsTree($timeout, $log, $templateCache) {
             }
 
         };
+        
+        scope.expandCallback = function(obj){
+	        // Callback function upon node expansion
+	        // Any functions here must be in the local scope of this directive
+	        // Placing in $scope.options (scope.options here) appears to be the best way
+	        
+	        if(obj.branch.expanded === false)
+	        {
+		        if(obj.branch.expandCallback === 'siteLevel2Func')
+		        {
+			        scope.options.siteLevel2Func(obj.branch.data.sysmlid, obj.branch, false);
+		        }
+	        }
+	        // Callback function upon node collapse
+	        else
+	        {
+		        
+	        }
+        };
         scope.on_treeData_change = on_treeData_change;
         scope.$watch('treeData', on_treeData_change, false);
         scope.$watch('initialSelection', on_initialSelection_change);
@@ -341,6 +370,10 @@ function mmsTree($timeout, $log, $templateCache) {
              */
             tree.expand_all = function() {
                 for_each_branch(function(b, level) {
+                    if(b.expandable === true)
+                    {
+	                    scope.expandCallback({ branch: b });
+                    }
                     b.expanded = true;
                 });
                 on_treeData_change();
