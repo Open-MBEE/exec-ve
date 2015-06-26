@@ -318,6 +318,10 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
         siteNode.loading = true;
         ViewService.getSiteDocuments(site, false, ws, config === 'latest' ? 'latest' : tag.timestamp)
         .then(function(docs) {
+	        
+	        // If no documents are found on a site, stop forcing expansion
+	        if(docs.length === 0) siteNode.expandable = false;
+	        
             var filteredDocs = {};
             if (docFilter)
                 filteredDocs = JSON.parse(docFilter.documentation);
