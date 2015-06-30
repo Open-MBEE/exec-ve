@@ -3,8 +3,8 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('ViewCtrl', ['$scope', '$rootScope', '$state', '$stateParams', '$timeout', '$modal', '$window', 'viewElements', 'ElementService', 'ViewService', 'ConfigService', 'time', 'growl', 'workspace', 'site', 'document', 'view', 'tag', 'snapshot', 'UxService',
-function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, viewElements, ElementService, ViewService, ConfigService, time, growl, workspace, site, document, view, tag, snapshot, UxService) {
+.controller('ViewCtrl', ['$scope', '$rootScope', '$state', '$stateParams', '$timeout', '$modal', '$window', 'viewElements', 'ElementService', 'ViewService', 'ConfigService', 'time', 'growl', 'workspace', 'site', 'document', 'view', 'tag', 'snapshot', 'UxService', 'hotkeys',
+function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, viewElements, ElementService, ViewService, ConfigService, time, growl, workspace, site, document, view, tag, snapshot, UxService, hotkeys) {
     
     /*$scope.$on('$viewContentLoaded', 
         function(event) {
@@ -73,7 +73,16 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         $scope.bbApi.setToggleState('show.comments', $rootScope.veCommentsOn);
         $scope.bbApi.addButton(UxService.getButtonBarButton('show.elements'));
         $scope.bbApi.setToggleState('show.elements', $rootScope.veElementsOn);
-
+        hotkeys.bindTo($scope)
+        .add({
+            combo: 'alt+c',
+            description: 'toggle show comments',
+            callback: function() {$scope.$broadcast('show.comments');}
+        }).add({
+            combo: 'alt+e',
+            description: 'toggle show elements',
+            callback: function() {$scope.$broadcast('show.elements');}
+        });
         // TODO: This code is duplicated in the FullDocCtrl
         // **WARNING** IF YOU CHANGE THIS CODE, NEED TO UPDATE IN FULL DOC CTRL TOO
 
@@ -108,6 +117,16 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
             if ($state.includes('workspace.site.document')) {
                 $scope.bbApi.addButton(UxService.getButtonBarButton('center.previous'));
                 $scope.bbApi.addButton(UxService.getButtonBarButton('center.next'));
+                hotkeys.bindTo($scope)
+                .add({
+                    combo: 'alt+.',
+                    description: 'next',
+                    callback: function() {$scope.$broadcast('center.next');}
+                }).add({
+                    combo: 'alt+,',
+                    description: 'previous',
+                    callback: function() {$scope.$broadcast('center.previous');}
+                });
             }
         }
     };
@@ -411,6 +430,8 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
             return;
         $scope.bbApi.toggleButtonSpinner('center.previous');
         $rootScope.mms_treeApi.select_branch(prev);
+        if (prev.type === 'section')
+            $scope.bbApi.toggleButtonSpinner('center.previous');
     });
 
     $scope.$on('center.next', function() {
@@ -419,6 +440,8 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
             return;
         $scope.bbApi.toggleButtonSpinner('center.next');
         $rootScope.mms_treeApi.select_branch(next);
+        if (next.type === 'section')
+            $scope.bbApi.toggleButtonSpinner('center.next');
     });
 
     if (view) {
