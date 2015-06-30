@@ -106,7 +106,10 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
                     });
                 }
             }, function(reason) {
-                element.html('<span class="error">name cf ' + newVal + ' not found</span>');
+                var status = ' not found';
+                if (reason.status === 410)
+                    status = ' deleted';
+                element.html('<span class="error">name cf ' + newVal + status + '</span>');
                 growl.error('Cf Name Error: ' + reason.message + ': ' + scope.mmsEid);
             });
         });

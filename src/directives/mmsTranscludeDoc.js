@@ -169,7 +169,10 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                 // });
 
             }, function(reason) {
-                element.html('<span class="error">doc cf ' + newVal + ' not found</span>');
+                var status = ' not found';
+                if (reason.status === 410)
+                    status = ' deleted';
+                element.html('<span class="error">doc cf ' + newVal + status + '</span>');
                 growl.error('Cf Doc Error: ' + reason.message + ': ' + scope.mmsEid);
             });
         });

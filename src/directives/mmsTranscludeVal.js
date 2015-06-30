@@ -179,7 +179,10 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, $log, 
                     });
                 }
             }, function(reason) {
-                element.html('<span class="error">value cf ' + newVal + ' not found</span>');
+                var status = ' not found';
+                if (reason.status === 410)
+                    status = ' deleted';
+                element.html('<span class="error">value cf ' + newVal + status + '</span>');
                 growl.error('Cf Val Error: ' + reason.message + ': ' + scope.mmsEid);
             });
         });

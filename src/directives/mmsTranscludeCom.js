@@ -79,7 +79,10 @@ function mmsTranscludeCom(ElementService, UtilsService, $log, $compile, growl) {
                 }
                 //scope.$watch('element.documentation', recompile);
             }, function(reason) {
-                element.html('<span class="error">comment ' + newVal + ' not found</span>');
+                var status = ' not found';
+                if (reason.status === 410)
+                    status = ' deleted';
+                element.html('<span class="error">comment ' + newVal + status + '</span>');
                 growl.error('Cf Comment Error: ' + reason.message + ': ' + scope.mmsEid);
             });
         });
