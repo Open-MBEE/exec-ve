@@ -53,7 +53,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
     var mmsTranscludeDocLink = function(scope, element, attrs, controllers) {
         var mmsViewCtrl = controllers[0];
         var mmsViewPresentationElemCtrl = controllers[1];
-
+        scope.recompileScope = null;
         var processed = false;
         scope.cfType = 'doc';
 
@@ -72,25 +72,31 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
         });
 
         var recompile = function() {
+            if (scope.recompileScope)
+                scope.recompileScope.$destroy();
             scope.isEditing = false;
             element.empty();
             var doc = scope.element.documentation;
             if (!doc)
                 doc = '<p ng-class="{placeholder: version!=\'latest\'}">(No ' + scope.panelType + ')</p>';
             element.append(doc);
-            $compile(element.contents())(scope); 
+            scope.recompileScope = scope.$new();
+            $compile(element.contents())(scope.recompileScope); 
             if (mmsViewCtrl) {
                 mmsViewCtrl.elementTranscluded(scope.element);
             }
         };
 
         var recompileEdit = function() {
+            if (scope.recompileScope)
+                scope.recompileScope.$destroy();
             element.empty();
             var doc = scope.edit.documentation;
             if (!doc)
                 doc = '<p ng-class="{placeholder: version!=\'latest\'}">(No ' + scope.panelType + ')</p>';
             element.append('<div class="panel panel-info">'+doc+'</div>');
-            $compile(element.contents())(scope); 
+            scope.recompileScope = scope.$new();
+            $compile(element.contents())(scope.recompileScope); 
             if (mmsViewCtrl) {
                 mmsViewCtrl.elementTranscluded(scope.edit);
             }
@@ -196,11 +202,11 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             });
 
             scope.save = function() {
-                Utils.saveAction(scope,recompile,scope.bbApi,null,type);
+                Utils.saveAction(scope,recompile,scope.bbApi,null,type,element);
             };
 
             scope.cancel = function() {
-                Utils.cancelAction(scope,recompile,scope.bbApi,type);
+                Utils.cancelAction(scope,recompile,scope.bbApi,type,element);
             };
 
             scope.addFrame = function() {
@@ -208,7 +214,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             };
 
             scope.preview = function() {
-                Utils.previewAction(scope, recompileEdit, recompile, type);
+                Utils.previewAction(scope, recompileEdit, recompile, type,element);
             };
         } 
 
