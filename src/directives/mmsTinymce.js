@@ -383,6 +383,17 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
             ngModelCtrl.$setViewValue(element.val());
         };
 
+        //fix <br> in pre blocks
+        var fixNewLines = function(content) {
+            var codeBlocks = content.match(/<pre.*?>[^]*?<\/pre>/mg);
+            console.log('codeBlocks', codeBlocks);
+            if(!codeBlocks) return content;
+            for(var index=0; index < codeBlocks.length; index++) {
+                content = content.replace(codeBlocks[index], codeBlocks[index].replace(/<br\s*\/?>/mgi, "\n"));
+            }
+            return content;
+        };
+
         var defaultToolbar = 'bold italic underline strikethrough | subscript superscript blockquote | formatselect | fontsizeselect | forecolor backcolor removeformat | alignleft aligncenter alignright | link unlink | image media | charmap searchreplace | undo redo';
         var tableToolbar = ' table ';
         var listToolbar = ' bullist numlist outdent indent ';
@@ -409,7 +420,7 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
             autoresize_max_height: $window.innerHeight*0.65,
             paste_retain_style_properties: 'color background-color font-size text-align',
             browser_spellcheck: true,
-            invalid_elements: 'br,div,font',
+            invalid_elements: 'div,font',
             extended_valid_elements: 'seqr-timely,mms-d3-observation-profile-chart-io,mms-d3-parallel-axis-chart-io,mms-d3-radar-chart-io,mms-d3-horizontal-bar-chart-io,mms-site-docs,mms-workspace-docs,mms-diagram-block,mms-view-link,-mms-transclude-doc,-mms-transclude-name,-mms-transclude-com,-mms-transclude-val,-mms-transclude-img,math,maction,maligngroup,malignmark,menclose,merror,mfenced,mfrac,mglyph,mi,mlabeledtr,mlongdiv,mmultiscripts,mn,mo,mover,mpadded,mphantom,mroot,mrow,ms,mscarries,mscarry,msgroup,mstack,msline,mspace,msqrt,msrow,mstyle,msub,msup,msubsup,mtable,mtd,mtext,mtr,munder,munderover',
             custom_elements: 'seqr-timely,mms-d3-observation-profile-chart-io,mms-d3-parallel-axis-chart-io,mms-d3-radar-chart-io,mms-d3-horizontal-bar-chart-io,mms-site-docs,mms-workspace-docs,mms-diagram-block,~mms-view-link,~mms-transclude-doc,~mms-transclude-name,~mms-transclude-com,~mms-transclude-val,~mms-transclude-img,math,maction,maligngroup,malignmark,menclose,merror,mfenced,mfrac,mglyph,mi,mlabeledtr,mlongdiv,mmultiscripts,mn,mo,mover,mpadded,mphantom,mroot,mrow,ms,mscarries,mscarry,msgroup,mstack,msline,mspace,msqrt,msrow,mstyle,msub,msup,msubsup,mtable,mtd,mtext,mtr,munder,munderover',
             fix_list_elements: true,
@@ -479,6 +490,9 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                         ed.save();
                         update();
                     }
+                });
+                ed.on('GetContent', function(e) {
+                    e.content = fixNewLines(e.content);
                 });
                 ed.on('init', function(args) {
                     ngModelCtrl.$render();
