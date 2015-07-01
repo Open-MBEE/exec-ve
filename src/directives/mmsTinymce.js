@@ -526,7 +526,7 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
         $timeout(function() {
             tinymce.init(options);
             //tinymce.get(attrs.id).focus();
-        });
+        }, 0, false);
 
         ngModelCtrl.$render = function() {
             if (!instance)

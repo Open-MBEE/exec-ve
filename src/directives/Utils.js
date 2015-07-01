@@ -485,10 +485,9 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
         $timeout(function() {
             var el = element.get(0);
             if (element.isOnScreen())
-                console.log("good");
-            else
-                el.scrollIntoView();
-        }, 500);
+                return;
+            el.scrollIntoView();
+        }, 500, false);
     };
 
     return {
