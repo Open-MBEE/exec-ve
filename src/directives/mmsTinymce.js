@@ -398,7 +398,7 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
         var tableToolbar = ' table ';
         var listToolbar = ' bullist numlist outdent indent ';
         var codeToolbar = ' code ';
-        var customToolbar = ' transclude comment vlink normalize | mvleft mvright ';
+        var customToolbar = ' transclude comment vlink normalize';
         var allToolbar = defaultToolbar + ' | ' + listToolbar + ' | ' + tableToolbar + ' | ' + codeToolbar + ' | ' + customToolbar;
         var thisToolbar = allToolbar;
         if (scope.mmsTinymceType === 'Equation')
@@ -410,7 +410,7 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
         if (scope.mmsTinymceType === 'Figure')
             thisToolbar = 'image | code ';
         var options = {
-            plugins: 'autoresize charmap code fullscreen image link media nonbreaking paste table textcolor searchreplace',
+            plugins: 'autoresize charmap code fullscreen image link media nonbreaking paste table textcolor searchreplace noneditable',
             //toolbar: 'bold italic underline strikethrough | subscript superscript blockquote | formatselect | fontsizeselect | forecolor backcolor removeformat | alignleft aligncenter alignright | bullist numlist outdent indent | table | link unlink | image media | charmap searchreplace code | transclude comment vlink normalize | mvleft mvright | undo redo',
             toolbar: thisToolbar,
             menubar: false,
@@ -421,7 +421,7 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
             paste_retain_style_properties: 'color background-color font-size text-align',
             browser_spellcheck: true,
             invalid_elements: 'div,font',
-            extended_valid_elements: 'seqr-timely,mms-d3-observation-profile-chart-io,mms-d3-parallel-axis-chart-io,mms-d3-radar-chart-io,mms-d3-horizontal-bar-chart-io,mms-site-docs,mms-workspace-docs,mms-diagram-block,mms-view-link,-mms-transclude-doc,-mms-transclude-name,-mms-transclude-com,-mms-transclude-val,-mms-transclude-img,math,maction,maligngroup,malignmark,menclose,merror,mfenced,mfrac,mglyph,mi,mlabeledtr,mlongdiv,mmultiscripts,mn,mo,mover,mpadded,mphantom,mroot,mrow,ms,mscarries,mscarry,msgroup,mstack,msline,mspace,msqrt,msrow,mstyle,msub,msup,msubsup,mtable,mtd,mtext,mtr,munder,munderover',
+            extended_valid_elements: 'seqr-timely,mms-d3-observation-profile-chart-io,mms-d3-parallel-axis-chart-io,mms-d3-radar-chart-io,mms-d3-horizontal-bar-chart-io,mms-site-docs,mms-workspace-docs,mms-diagram-block,mms-view-link[class:mceNonEditable],-mms-transclude-doc[class:mceNonEditable],-mms-transclude-name[class:mceNonEditable],-mms-transclude-com[class:mceNonEditable],-mms-transclude-val[class:mceNonEditable],-mms-transclude-img[class:mceNonEditable],math,maction,maligngroup,malignmark,menclose,merror,mfenced,mfrac,mglyph,mi,mlabeledtr,mlongdiv,mmultiscripts,mn,mo,mover,mpadded,mphantom,mroot,mrow,ms,mscarries,mscarry,msgroup,mstack,msline,mspace,msqrt,msrow,mstyle,msub,msup,msubsup,mtable,mtd,mtext,mtr,munder,munderover',
             custom_elements: 'seqr-timely,mms-d3-observation-profile-chart-io,mms-d3-parallel-axis-chart-io,mms-d3-radar-chart-io,mms-d3-horizontal-bar-chart-io,mms-site-docs,mms-workspace-docs,mms-diagram-block,~mms-view-link,~mms-transclude-doc,~mms-transclude-name,~mms-transclude-com,~mms-transclude-val,~mms-transclude-img,math,maction,maligngroup,malignmark,menclose,merror,mfenced,mfrac,mglyph,mi,mlabeledtr,mlongdiv,mmultiscripts,mn,mo,mover,mpadded,mphantom,mroot,mrow,ms,mscarries,mscarry,msgroup,mstack,msline,mspace,msqrt,msrow,mstyle,msub,msup,msubsup,mtable,mtd,mtext,mtr,munder,munderover',
             fix_list_elements: true,
             content_css: 'css/partials/mms.min.css',
@@ -450,7 +450,8 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                     onclick: function() {
                         viewLinkCallback(ed);
                     }
-                });
+                });/* Likely not necessary any more due to non-editable elements
+
                 ed.addButton('mvleft', {
                     title: 'Move Left of Cf',
                     text: '<-',
@@ -477,6 +478,7 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                         }
                     }
                 });
+*/
                 ed.addButton('normalize', {
                     title: 'Reset Cross References',
                     text: 'Reset Cf',

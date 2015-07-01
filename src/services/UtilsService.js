@@ -76,26 +76,32 @@ function UtilsService(CacheService, _) {
 
         // make second pass to associate data to parent nodes
         array.forEach(function(data) {
+            // If theres an element in data2Node whose key matches the 'parent' value in the array element
+            // add the array element to the children array of the matched data2Node element
             if (data[parent] && data2Node[data[parent]]) //bad data!
                 data2Node[data[parent]].children.push(data2Node[data[id]]);
+            // If theres not an element in data2Node whose key matches the 'parent' value in the array element
+            // it's a "root node" and so it should be pushed to the root nodes array along with its children
             else
                 rootNodes.push(data2Node[data[id]]);
         });
         
-        // make a third pass to indicate if a node is a top-level node
-        array.forEach(function(data)
+        // Recursive function which sets the level of all nodes passed
+        var determineLevelOfNodes = function(nodes, initialLevel)
         {
-	        if (data[parent] && data2Node[data[parent]]) //bad data!
+	        nodes.forEach(function(node)
 	        {
-		        // Deeper level
-	        }
-	        else
-	        {
-		        data2Node[data[id]].level = 1;
-	        }
-        });
+		        node.level = initialLevel;
+		        if(node.children && node.children.length > 0)
+		        {
+			        determineLevelOfNodes(node.children, initialLevel + 1);
+		        }
+	        });
+        };
+        
+        determineLevelOfNodes(rootNodes, 1);
 
-        // apply level 2 objects to tree
+        // Get documents and apply them to the tree structure
         if (level2_Func) {
             
             array.forEach(function(data) {
