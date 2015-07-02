@@ -221,6 +221,14 @@ function mmsTree($timeout, $log, $templateCache) {
                         scope.onSelect({branch: branch});
                     });
                 }
+                if (branch.data.sysmlid) {
+                    $timeout(function() {
+                        var el = angular.element('#tree-branch-' + branch.data.sysmlid);
+                        if (!el.isOnScreen()) {
+                            el.get(0).scrollIntoView();
+                        }
+                    }, 500, false);
+                }
             }
         };
 
