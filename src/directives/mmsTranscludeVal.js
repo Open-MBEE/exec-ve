@@ -86,11 +86,11 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, $log, 
             element.empty();
             scope.recompileScope = scope.$new();
             if (scope.values.length === 0 || Object.keys(scope.values[0]).length < 2)
-                element.html('<span' + ((scope.version === 'latest') ? '' : ' class="placeholder"') + '>(no value)</span>');
+                element.html('<span>' + ((scope.version === 'latest') ? '(no value)' : '') + '</span>');
             else if (areStrings) {
                 var toCompile = toCompileList.join(' ');
                 if (toCompile === '') {
-                    element.html('<span' + ((scope.version === 'latest') ? '' : ' class="placeholder"') + '>(no value)</span>');
+                    element.html('<span>' + ((scope.version === 'latest') ? '(no value)' : '') + '</span>');
                     return;
                 }
                 element.append(toCompile);
