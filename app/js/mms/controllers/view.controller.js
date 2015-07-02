@@ -108,6 +108,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
             if ($state.includes('workspace.site.document')) {
                 $scope.bbApi.addButton(UxService.getButtonBarButton('center.previous'));
                 $scope.bbApi.addButton(UxService.getButtonBarButton('center.next'));
+                $scope.sectionNumber = $rootScope.mms_treeApi.get_selected_branch().section;
             }
         }
     };
