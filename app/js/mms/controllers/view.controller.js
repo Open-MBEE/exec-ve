@@ -127,6 +127,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
                     description: 'previous',
                     callback: function() {$scope.$broadcast('center.previous');}
                 });
+                $scope.sectionNumber = $rootScope.mms_treeApi.get_selected_branch().section;
             }
         }
     };

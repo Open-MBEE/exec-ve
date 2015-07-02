@@ -278,6 +278,8 @@ function mmsTree($timeout, $log, $templateCache) {
                         button_properties = scope.options.buttons[status_properties.button];
                     }
                 }
+                
+                branch.section = section;
 
                 scope.tree_rows.push({
                     level: level,
