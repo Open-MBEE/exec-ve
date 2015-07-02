@@ -25,6 +25,33 @@ function($scope, $rootScope, $stateParams, document, time, ElementService, ViewS
     };
     var up2dateViews = null;
 
+    var updateNumber = function(node, curSection, key) {
+        node[key] = curSection;
+        var num = 1;
+        node.children.forEach(function(cnode) {
+            updateNumber(cnode, curSection + '.' + num, key);
+            num++;
+        });
+    };
+
+    $scope.treeOptions = {
+        dropped : function() {
+            $scope.tree.forEach(function(root) {
+                root.new = '';
+                var num = 1;
+                root.children.forEach(function(node) {
+                    updateNumber(node, num + '', 'new');
+                    num++;
+                });
+            });
+        },
+        accept: function(sourceNodeScope, destNodeScope, destIndex) {
+            if (destNodeScope.$element.hasClass('root'))
+                return false; //don't allow moving to outside doc
+            return true;
+        }
+    };
+
     ViewService.getDocumentViews(document.sysmlid, false, ws, time, true)
     .then(function(views) {
         up2dateViews = views;
@@ -39,8 +66,15 @@ function($scope, $rootScope, $stateParams, document, time, ElementService, ViewS
         document.specialization.view2view.forEach(function(view) {
             var viewId = view.id;
             view.childrenViews.forEach(function(childId) {
-                viewIds2node[viewId].children.push(viewIds2node[childId]);
+                if (viewIds2node[childId] && viewIds2node[viewId])
+                    viewIds2node[viewId].children.push(viewIds2node[childId]);
             });
+        });
+        var num = 1;
+        viewIds2node[document.sysmlid].children.forEach(function(node) {
+            updateNumber(node, num + '', 'old');
+            updateNumber(node, num + '', 'new');
+            num++;
         });
         $scope.tree = [viewIds2node[document.sysmlid]];
     });

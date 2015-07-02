@@ -19,10 +19,10 @@
 
 <body ng-controller="FullDocCtrl2" class="fullDoc">
 
-  <div growl></div>
+  <!-- <div growl></div> -->
 
   <div class="pane-center container-fluid">
-    <div ng-repeat="view in views track by view.id">
+    <div ng-repeat="view in views track by view.id" style="page-break-after: always;">
       <mms-view mms-vid="{{view.id}}" mms-version="{{version}}" mms-ws="{{ws}}" mms-number="{{view.number}}"></mms-view>
     </div>
   </div>

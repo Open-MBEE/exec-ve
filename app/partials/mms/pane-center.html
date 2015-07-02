@@ -16,7 +16,7 @@
 
       <div>{{numComments}} Comment<span ng-if="numComments !== 1">s</span><span ng-if="numComments > 0">, Last Commented {{lastCommented | date:'M/d/yy h:mm a'}} by {{lastCommentedBy}}</span></div>
 
-        <mms-view mms-vid="{{vid}}" mms-cf-clicked="tscClicked(elementId)" mms-version="{{version}}" mms-tag="{{tagId}}" mms-ws="{{ws}}" mms-view-api="viewApi" mms-link="vidLink" mms-transcluded="elementTranscluded(element, type)"></mms-view>
+        <mms-view mms-vid="{{vid}}" mms-number="{{sectionNumber}}" mms-cf-clicked="tscClicked(elementId)" mms-version="{{version}}" mms-tag="{{tagId}}" mms-ws="{{ws}}" mms-view-api="viewApi" mms-link="vidLink" mms-transcluded="elementTranscluded(element, type)"></mms-view>
 
       <div ng-if="showFilter">
           <mms-site-doc-filter mms-site="{{site.sysmlid}}" mms-ws="{{ws}}" mms-version="{{version}}" mms-api="filterApi"></mms-site-doc-filter>

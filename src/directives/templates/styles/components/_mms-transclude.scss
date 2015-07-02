@@ -20,9 +20,9 @@ mms-view.editing {
   color: #000;
 
   /* Level 1 transclusions */
-  mms-transclude-doc *,
-  mms-transclude-name *,
-  mms-transclude-val * {
+  mms-transclude-doc>*,
+  mms-transclude-name>*,
+  mms-transclude-val>* {
     @include transition(background-color, .2s, linear);
     background-color: $tertiary_grey;
     cursor: pointer;
@@ -33,9 +33,9 @@ mms-view.editing {
   mms-transclude-name,
   mms-transclude-val {
 
-    mms-transclude-doc *,
-    mms-transclude-name *,
-    mms-transclude-val * {
+    mms-transclude-doc>*,
+    mms-transclude-name>*,
+    mms-transclude-val>* {
       background-color: darken($tertiary_grey, 25%);
     }
   }
@@ -49,9 +49,9 @@ mms-view.editing {
     mms-transclude-name,
     mms-transclude-val {
 
-      mms-transclude-doc *,
-      mms-transclude-name *,
-      mms-transclude-val * {
+      mms-transclude-doc>*,
+      mms-transclude-name>*,
+      mms-transclude-val>* {
         color: darken($white, 10%);
         background-color: darken($tertiary_grey, 50%);
       }
@@ -71,9 +71,9 @@ mms-view.editing {
       mms-transclude-name,
       mms-transclude-val {
         
-        mms-transclude-doc *,
-        mms-transclude-name *,
-        mms-transclude-val * {
+        mms-transclude-doc>*,
+        mms-transclude-name>*,
+        mms-transclude-val>* {
           color: darken($white, 20%);
           background-color: darken($tertiary_grey, 65%);
         }

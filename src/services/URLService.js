@@ -356,9 +356,12 @@ function urlService(baseUrl) {
         var result = {status: status, data: data};
         if (status === 404)
             result.message = "Not Found";
-        else if (status === 500)
-            result.message = "Server Error";
-        else if (status === 401 || status === 403)
+        else if (status === 500) {
+            if (angular.isString(data) && data.indexOf("ENOTFOUND") >= 0)
+                result.message = "Network Error (Please check network)";
+            else
+                result.message = "Server Error";
+        } else if (status === 401 || status === 403)
             result.message = "Permission Error";
         else if (status === 409)
             result.message = "Conflict";
@@ -366,8 +369,10 @@ function urlService(baseUrl) {
             result.message = "Bad Request";
         else if (status === 410)
             result.message = "Deleted";
+        else if (status === 408)
+            result.message = "Timed Out (Please check network)";
         else
-            result.message = "Failed";
+            result.message = "Failed (Please check network)";
         deferred.reject(result);
     };
 

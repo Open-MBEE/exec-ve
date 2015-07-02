@@ -35,7 +35,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         TableT: "_17_0_5_1_407019f_1431903724067_825986_11992",
         Figure: "_17_0_5_1_407019f_1431903748021_2367_12034",  //manual images + timely, etc
         Equation: "_17_0_5_1_407019f_1431905053808_352752_11992",
-        ParagraphT: "_17_0_5_1_407019f_1431903758416_800749_12055"
+        ParagraphT: "_17_0_5_1_407019f_1431903758416_800749_12055",
+        SectionT: "_18_0_2_407019f_1435683487667_494971_14412"
     };
     
     /**
@@ -532,6 +533,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             realType = 'ListT';
         if (type === 'Paragraph')
             realType = 'ParagraphT';
+        if (type === 'Section')
+            realType = 'SectionT';
         var instanceSpec = {
             name:instanceSpecName,
             specialization: {
@@ -884,7 +887,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
     var isSection = function(instanceSpec) {
         return instanceSpec.specialization && instanceSpec.specialization.classifier && 
                instanceSpec.specialization.classifier.length > 0 &&
-               instanceSpec.specialization.classifier[0] === typeToClassifierId.Section;
+               (instanceSpec.specialization.classifier[0] === typeToClassifierId.Section ||
+                instanceSpec.specialization.classifier[0] === typeToClassifierId.SectionT);
     };
 
     //TODO remove

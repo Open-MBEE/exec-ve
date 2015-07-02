@@ -4,10 +4,18 @@
 
 $pane_center_btn_group_width: 120px;
 
+/* start of fullDoc page styles */
 body.fullDoc{
   text-rendering: optimizeLegibility;
   overflow:scroll;
+  font-family: "Times New Roman", Serif;
 }
+
+tr {
+  page-break-inside: avoid !important;
+}
+/* end of fullDoc page styles */
+
 
 .clickable:hover {
   cursor: pointer;
@@ -16,6 +24,7 @@ body.fullDoc{
   
 .pane-center {
   margin-right: -11px;
+  font-size: 16px;
 
   .pane-center {
     margin-right: 0;

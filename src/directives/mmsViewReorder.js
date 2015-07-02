@@ -28,6 +28,11 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
         };
         $scope.treeOptions = {
             accept: function(sourceNodeScope, destNodeScope, destIndex) {
+                var auto = [ViewService.typeToClassifierId.Image, ViewService.typeToClassifierId.Paragraph,
+                ViewService.typeToClassifierId.List, ViewService.typeToClassifierId.Table, ViewService.typeToClassifierId.Section];
+
+                if (auto.indexOf(sourceNodeScope.element.instanceSpecification.specialization.classifier[0]) >= 0)
+                    return false;
                 if (destNodeScope.$element.hasClass('root'))
                     return true;
                 if (destNodeScope.element.presentationElement.type === 'Section')

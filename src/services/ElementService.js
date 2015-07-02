@@ -362,7 +362,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
             deferred.reject('Element id not found, create element first!');
         else {
             var n = normalize(elem.sysmlid, null, workspace, null);
-            $http.post(URLService.getPostElementsURL(n.ws), {'elements': [elem]})
+            $http.post(URLService.getPostElementsURL(n.ws), {'elements': [elem]}, {timeout: 10000})
             .success(function(data, status, headers, config) {
                 handleSuccess(n, data);
             }).error(function(data, status, headers, config) {
