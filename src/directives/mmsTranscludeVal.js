@@ -14,9 +14,9 @@ angular.module('mms.directives')
  * @restrict E
  *
  * @description
- * Given an element id, puts in the element's value binding, if there's a parent 
+ * Given an element id, puts in the element's value binding, if there's a parent
  * mmsView directive, will notify parent view of transclusion on init and val change,
- * and on click. The element should be a Property. Nested transclusions within 
+ * and on click. The element should be a Property. Nested transclusions within
  * string values will also be registered.
  *
  * @param {string} mmsEid The id of the element whose value to transclude
@@ -42,7 +42,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, $log, 
                 $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.cancel", $scope));
                 $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.delete", $scope));
                 $scope.bbApi.setPermission("presentation.element.delete", $scope.isDirectChildOfPresentationElement);
-            }     
+            }
         };
     };
 
@@ -65,51 +65,74 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, $log, 
                 e.stopPropagation();
         });
 
-        var recompile = function() {
+
+        //******************************************************************************************
+        var recompile = function ()
+        {
             if (scope.recompileScope)
+            {
                 scope.recompileScope.$destroy();
+            }
             scope.isEditing = false;
             var toCompileList = [];
             var areStrings = false;
-            for (var i = 0; i < scope.values.length; i++) {
-                if (scope.values[i].type === 'LiteralString') {
+            var foundExpression = false;
+
+
+            for (var i = 0; i < scope.values.length; i++)
+            {
+                if (scope.values[i].type === 'LiteralString')
+                {
                     areStrings = true;
                     var s = scope.values[i].string;
-                    if (s.indexOf('<p>') === -1) {
+                    if (s.indexOf('<p>') === -1)
+                    {
                         s = s.replace('<', '&lt;');
                     }
                     toCompileList.push(s);
-                } else {
+                }
+                else if (scope.values[i].type === "Expression")
+                {
+                    foundExpression = true;
                     break;
                 }
-            } 
-            element.empty();
-            scope.recompileScope = scope.$new();
-            if (scope.values.length === 0 || Object.keys(scope.values[0]).length < 2)
-                element.html('<span' + ((scope.version === 'latest') ? '' : ' class="placeholder"') + '>(no value)</span>');
-            else if (areStrings) {
-                var toCompile = toCompileList.join(' ');
-                if (toCompile === '') {
-                    element.html('<span' + ((scope.version === 'latest') ? '' : ' class="placeholder"') + '>(no value)</span>');
-                    return;
+                else
+                {
+                    break;
                 }
-                element.append(toCompile);
-                $compile(element.contents())(scope.recompileScope); 
-            } else if (UtilsService.isRestrictedValue(scope.values)) {
-                ElementService.getElement(scope.values[0].operand[1].element, false, scope.ws, scope.version)
-                .then(function(e) {
-                    scope.isRestrictedVal = true;
-                    element.html(e.name);
-                });
-            } else {
-                element.append(valTemplate);
-                $compile(element.contents())(scope.recompileScope);
             }
-            if (mmsViewCtrl) {
-                mmsViewCtrl.elementTranscluded(scope.element);
+
+            if (foundExpression)
+            {
+                $http.get(URLService.getElementURL(scope.mmsEid, scope.ws, scope.version) + '?evaulate')
+                    .success(function (data, status, headers, config)
+                    {
+                        var server = _.cloneDeep(data.elements[0]);
+                        delete server.modified;
+                        delete server.read;
+                        delete server.creator;
+                        UtilsService.cleanElement(server);
+                        var current = _.cloneDeep(orig);
+                        delete current.modified;
+                        delete current.read;
+                        delete current.creator;
+                        UtilsService.cleanElement(current);
+                        if (angular.equals(server, current))
+                        {
+                            deferred.resolve({status: false});
+                        } else
+                        {
+                            deferred.resolve({status: true, server: data.elements[0], cache: orig});
+                        }
+                    }).error(function (data, status, headers, config)
+                    {
+                        URLService.handleHttpStatus(data, status, headers, config, deferred);
+                    });
+
+
             }
         };
-
+//******************************************************************************************
         var recompileEdit = function() {
             if (scope.recompileScope)
                 scope.recompileScope.$destroy();
@@ -126,7 +149,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, $log, 
                 } else {
                     break;
                 }
-            } 
+            }
             element.empty();
             scope.recompileScope = scope.$new();
             if (scope.editValues.length === 0 || Object.keys(scope.editValues[0]).length < 2)
@@ -138,7 +161,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, $log, 
                     return;
                 }
                 element.append('<div class="panel panel-info">'+toCompile+'</div>');
-                $compile(element.contents())(scope.recompileScope); 
+                $compile(element.contents())(scope.recompileScope);
             } else if (UtilsService.isRestrictedValue(scope.editValues)) {
                 ElementService.getElement(scope.editValues[0].operand[1].element, false, scope.ws, scope.version)
                 .then(function(e) {
@@ -210,8 +233,8 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, $log, 
         };
         scope.addValueType = 'LiteralString';
 
-        if (mmsViewCtrl) { 
-            
+        if (mmsViewCtrl) {
+
             scope.isEditing = false;
             scope.elementSaving = false;
             scope.isDirectChildOfPresentationElement = Utils.isDirectChildOfPresentationElementFunc(element, mmsViewCtrl);
@@ -221,7 +244,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, $log, 
             var callback = function() {
                 Utils.showEditCallBack(scope, mmsViewCtrl, element, frameTemplate, recompile, recompileEdit, type);
             };
-            
+
             mmsViewCtrl.registerPresenElemCallBack(callback);
 
             scope.$on('$destroy', function() {
@@ -255,7 +278,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, $log, 
             scope.preview = function() {
                 Utils.previewAction(scope, recompileEdit, recompile, type, element);
             };
-        } 
+        }
 
         if (mmsViewPresentationElemCtrl) {
             scope.delete = function() {
