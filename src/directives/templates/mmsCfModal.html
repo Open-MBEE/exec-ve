@@ -44,11 +44,12 @@
             <div class="cant-find-element">
                 Can't find your element? <a ng-click="openProposeModal()" class="create-element-link">Create a new one</a>
             </div>
+			<div>Showing {{filteredElms.length}} of {{mmsCfElements.length}} search results.</div>
         </div>
     </div>
 
     <div class="container-fluid" ng-show="mmsCfElements && searchSuccess">
-        <div class="elem-wrapper" ng-repeat="elem in mmsCfElements | filter:searchFilter">
+        <div class="elem-wrapper" ng-repeat="elem in filteredElms = (mmsCfElements | filter: searchFilter)">
             <hr>
             <div class="elem-name-wrapper">
                 <a class="elem-name" ng-click="choose(elem.sysmlid, 'name', elem.name)">{{elem.name}}</a>
@@ -113,7 +114,7 @@
             </div>
         </div>
     </div>
-
+    
     <div class="container-no-results container-fluid" ng-show="mmsCfElements.length === 0 && searchSuccess">
         <h3>NO RESULTS FOUND.</h3>
     </div>
