@@ -31,8 +31,9 @@ function mmsTranscludeCom(ElementService, UtilsService, $log, $compile, growl) {
         element.click(function(e) {
             if (mmsViewCtrl)
                 mmsViewCtrl.transcludeClicked(scope.mmsEid);
-            if (e.target.tagName !== 'A')
-                return false;
+            //if (e.target.tagName !== 'A')
+              //  return false;
+              e.stopPropagation();
         });
 
         var recompile = function() {
@@ -46,10 +47,10 @@ function mmsTranscludeCom(ElementService, UtilsService, $log, $compile, growl) {
             }
         };
 
-        scope.$watch('mmsEid', function(newVal, oldVal) {
-            if (!newVal || (newVal === oldVal && processed))
+        var idwatch = scope.$watch('mmsEid', function(newVal, oldVal) {
+            if (!newVal)
                 return;
-            processed = true;
+            idwatch();
             if (UtilsService.hasCircularReference(scope, scope.mmsEid, 'doc')) {
                 //$log.log("prevent circular dereference!");
                 element.html('<span class="error">Circular Reference!</span>');
@@ -64,13 +65,24 @@ function mmsTranscludeCom(ElementService, UtilsService, $log, $compile, growl) {
                 if (!version)
                     version = viewVersion.version;
             }
+            scope.ws = ws;
+            scope.version = version;
             ElementService.getElement(scope.mmsEid, false, ws, version)
             .then(function(data) {
                 scope.element = data;
                 recompile();
-                scope.$watch('element.documentation', recompile);
+                if (scope.version === 'latest') {
+                    scope.$on('element.updated', function(event, eid, ws, type) {
+                        if (eid === scope.mmsEid && ws === scope.ws && (type === 'all' || type === 'documentation'))
+                            recompile();
+                    });
+                }
+                //scope.$watch('element.documentation', recompile);
             }, function(reason) {
-                element.html('<span class="error">comment ' + newVal + ' not found</span>');
+                var status = ' not found';
+                if (reason.status === 410)
+                    status = ' deleted';
+                element.html('<span class="error">comment ' + newVal + status + '</span>');
                 growl.error('Cf Comment Error: ' + reason.message + ': ' + scope.mmsEid);
             });
         });

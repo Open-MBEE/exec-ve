@@ -1,0 +1,63 @@
+<!-- TODO: This is almost the same as new-view.html.  Should be combined if possible -->
+
+<div class="modal-header">
+  <h4>ADD NEW ITEM</h4>
+</div>
+
+<div class="modal-body comment-modal">
+  
+  <div class="comment-modal-input">
+
+    <div class="form-group">
+      <label>Name:</label>
+      <input class="form-control" ng-model="newItem.name" type="text" placeholder="Type a name for your item here"></input>
+    </div>
+
+    <form ng-submit="search(searchText)">
+        <div class="form-search input-group">
+            <input class="form-control" type="text" ng-model="searchText" placeholder="Search for the item" />
+            <span class="input-group-btn">                
+                <button class="btn btn-primary" type="button" ng-click="search(searchText)">
+                <span class="btn-text">GO</span> <i ng-show="searching" class="fa fa-spin fa-spinner"></i></button>
+            </span>
+        </div>
+    </form>
+
+    <div class="misc-form-field">
+        <div class="form-filter" ng-show="mmsCfElements">
+            <input class="form-control" type="text" ng-model="filter" placeholder="Type here to filter elements in the table" />
+        </div>
+    </div>
+    <br>
+    <div class="container-fluid transclude-table">
+        <table class="table table-bordered">
+
+            <tr>
+                <th>NAME</th>
+                <th>QUALIFIED NAME</th>
+                <th>DOC</th>
+            </tr>
+
+            <tr ng-repeat="elem in mmsCfElements | filter:filter">
+                <td ng-click="addElement(elem)" class="clickable">
+                    {{elem.name}}
+                </td>
+                <td>
+                    {{elem.qualifiedName}}
+                </td>
+                <td>
+                    {{elem.documentation | limitTo:20}}
+                </td>
+            </tr>
+
+        </table>
+    </div>
+
+  </div>
+
+</div>
+
+<div class="modal-footer">
+    <button class="btn btn-success" ng-click="ok()">CREATE <i ng-show="oking" class="fa fa-spin fa-spinner"></i></button>
+    <button class="btn btn-danger" ng-click="cancel()">CANCEL</button>
+</div>

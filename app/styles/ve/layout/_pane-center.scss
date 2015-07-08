@@ -4,6 +4,19 @@
 
 $pane_center_btn_group_width: 120px;
 
+/* start of fullDoc page styles */
+body.fullDoc{
+  text-rendering: optimizeLegibility;
+  overflow:scroll;
+  font-family: "Times New Roman", Serif;
+}
+
+tr {
+  page-break-inside: avoid !important;
+}
+/* end of fullDoc page styles */
+
+
 .clickable:hover {
   cursor: pointer;
   background-color: $light_blue;
@@ -11,6 +24,7 @@ $pane_center_btn_group_width: 120px;
   
 .pane-center {
   margin-right: -11px;
+  font-size: 16px;
 
   .pane-center {
     margin-right: 0;
@@ -25,7 +39,7 @@ $pane_center_btn_group_width: 120px;
   .pane-center-btn-group {
     float: right;
     padding-top: 9px;
-    padding-right: 0;
+    padding-right: 75px;
     min-width: $pane_center_btn_group_width;
   }
 
@@ -58,7 +72,6 @@ $pane_center_btn_group_width: 120px;
   margin-bottom: 24px;
 
   .tree-reorder {
-    width: 40%;
     margin: 0 auto;
     padding-top: 12px;
     padding-bottom: 24px;

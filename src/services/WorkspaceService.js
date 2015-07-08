@@ -10,10 +10,22 @@ angular.module('mms')
  * @requires $q
  * 
  * @description
+ * Service to get and set workspace info, create/delete workspaces
  */
 function WorkspaceService($http, $q, URLService, ElementService, CacheService, _) {
     var inProgress = {};
 
+    /**
+     * @ngdoc method
+     * @name mms.WorkspaceService#getWorkspaces
+     * @methodOf mms.WorkspaceService
+     *
+     * @description
+     * Get workspaces
+     *
+     * @param {boolean} [update=false] update from server
+     * @returns {Promise} Promise would be resolved with array workspace objects
+     */
     var getWorkspaces = function(update) {
         var u = !update ? false : update;
         if (inProgress.hasOwnProperty('getWorkspaces'))
@@ -40,6 +52,17 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService, _
         return deferred.promise;
     };
 
+    /**
+     * @ngdoc method
+     * @name mms.WorkspaceService#getWorkspace
+     * @methodOf mms.WorkspaceService
+     *
+     * @description
+     * Get workspace
+     *
+     * @param {string} wid workspace id to get
+     * @returns {Promise} Promise would be resolved with workspace object
+     */
     var getWorkspace = function(wid) {
         var deferred = $q.defer();
         var cacheKey = ['workspaces', wid];
@@ -83,6 +106,20 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService, _
         return deferred.promise;
     };
 
+    /**
+     * @ngdoc method
+     * @name mms.WorkspaceService#diff
+     * @methodOf mms.WorkspaceService
+     *
+     * @description
+     * Get workspace diff
+     *
+     * @param {string} ws1 target workspace
+     * @param {string} ws2 source workspace
+     * @param {string} ws1time timestamp of ws1
+     * @param {string} ws2time timestamp of ws2
+     * @returns {Promise} Promise would be resolved with diff object
+     */
     var diff = function(ws1, ws2, ws1time, ws2time) {
         /*var deferred = $q.defer();
         deferred.resolve(dummy);
@@ -118,6 +155,17 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService, _
         return deferred.promise;
     };
 
+    /**
+     * @ngdoc method
+     * @name mms.WorkspaceService#deleteWorkspace
+     * @methodOf mms.WorkspaceService
+     *
+     * @description
+     * delete workspace
+     *
+     * @param {string} ws workspace id to delete
+     * @returns {Promise} Promise would be resolved with server response
+     */
     var deleteWorkspace = function(ws) {
         var deferred = $q.defer();
         $http.delete(URLService.getWorkspaceURL(ws))
@@ -141,6 +189,18 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService, _
         return deferred.promise;
     };
 
+    /**
+     * @ngdoc method
+     * @name mms.WorkspaceService#create
+     * @methodOf mms.WorkspaceService
+     *
+     * @description
+     * Create new workspace or update
+     *
+     * @param {object} ws workspace object to create
+     * @param {boolean} udpate whether to update existing workspace
+     * @returns {Promise} Promise would be resolved with new workspace object
+     */
     var create = function(ws, update) {
         var deferred = $q.defer();
         $http.post(URLService.getWorkspacesURL(ws), {'workspaces': [ws]} )
@@ -160,6 +220,17 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService, _
         return deferred.promise;
     };
     
+    /**
+     * @ngdoc method
+     * @name mms.WorkspaceService#update
+     * @methodOf mms.WorkspaceService
+     *
+     * @description
+     * update workspace
+     *
+     * @param {object} ws workspace object to update
+     * @returns {Promise} Promise would be resolved with updated object
+     */
     var update = function(ws) {
         // there is no distinction between update and create,
         // creating this just for semantic purposes

@@ -2,14 +2,14 @@
 
 	<table>
 
-		<h3>Differences<button ng-show="unstagedCounter" ng-click="stageAllUnstaged(changes)" type="button" class="btn btn-staging btn-stage-all"><i class="fa fa-arrow-down"></i></button></h3>
+		<h3>Differences<button ng-show="unstagedCounter" ng-click="stageAllUnstaged(changes)" type="button" class="btn btn-staging btn-stage-all"  tooltip="Stage All Changes" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="right" tooltip-append-to-body="true"><i class="fa fa-2x fa-arrow-circle-o-down"></i></button></h3>
 
 
 	    <tr ng-click="selectChange(change)" ng-repeat="change in changes | filter: {staged: false}">
 	        <td><i class="fa {{change.icon}} icon-{{change.type}}"><i></td>
 	        <td>{{change.delta.specialization.type || change.original.specialization.type}}: {{change.name}}</td>
 	        <td>
-	        	<button ng-click="stageChange(change)" type="button" class="btn btn-staging"><i class="fa fa-arrow-down"></i></button>
+	        	<button ng-click="stageChange(change)" type="button" class="btn btn-staging" tooltip="Stage Change" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="right" tooltip-append-to-body="true"><i class="fa fa-arrow-down"></i></button>
 	        </td>
 	    </tr>
 
@@ -17,13 +17,13 @@
 
 	<table>
 
-		<h3>Staged Changes<button ng-show="stagedCounter" ng-click="unstageAllStaged(changes)" type="button" class="btn btn-staging btn-unstage-all"><i class="fa fa-arrow-up"></i></button></h3>
+		<h3>Staged Changes<button ng-show="stagedCounter" ng-click="unstageAllStaged(changes)" type="button" class="btn btn-staging btn-unstage-all"  tooltip="Unstage All Changes" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="right" tooltip-append-to-body="true"><i class="fa fa-2x fa-arrow-circle-o-up"></i></button></h3>
 
 	    <tr ng-click="selectChange(change)" ng-repeat="change in changes | filter: {staged: true}">
 	        <td><i class="fa {{change.icon}} icon-{{change.type}}"><i></td>
 	        <td>{{change.delta.specialization.type || change.original.specialization.type}}: {{change.name}}</td>
 	        <td>
-	        	<button ng-click="stageChange(change)" type="button" class="btn btn-staging"><i class="fa fa-arrow-up"></i></button>
+	        	<button ng-click="stageChange(change)" type="button" class="btn btn-staging" tooltip="Unstage Change" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="right" tooltip-append-to-body="true"><i class="fa fa-arrow-up"></i></button>
 	        </td>
 	    </tr>
 

@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms')
-.factory('UtilsService', ['_', UtilsService]);
+.factory('UtilsService', ['CacheService', '_', UtilsService]);
 
 /**
  * @ngdoc service
@@ -11,9 +11,9 @@ angular.module('mms')
  * @description
  * Utilities
  */
-function UtilsService(_) {
+function UtilsService(CacheService, _) {
     var nonEditKeys = ['contains', 'view2view', 'childrenViews', 'displayedElements',
-        'allowedElements'];
+        'allowedElements', 'contents'];
 
     var hasCircularReference = function(scope, curId, curType) {
         var curscope = scope;
@@ -76,26 +76,32 @@ function UtilsService(_) {
 
         // make second pass to associate data to parent nodes
         array.forEach(function(data) {
+            // If theres an element in data2Node whose key matches the 'parent' value in the array element
+            // add the array element to the children array of the matched data2Node element
             if (data[parent] && data2Node[data[parent]]) //bad data!
                 data2Node[data[parent]].children.push(data2Node[data[id]]);
+            // If theres not an element in data2Node whose key matches the 'parent' value in the array element
+            // it's a "root node" and so it should be pushed to the root nodes array along with its children
             else
                 rootNodes.push(data2Node[data[id]]);
         });
         
-        // make a third pass to indicate if a node is a top-level node
-        array.forEach(function(data)
+        // Recursive function which sets the level of all nodes passed
+        var determineLevelOfNodes = function(nodes, initialLevel)
         {
-	        if (data[parent] && data2Node[data[parent]]) //bad data!
+	        nodes.forEach(function(node)
 	        {
-		        // Deeper level
-	        }
-	        else
-	        {
-		        data2Node[data[id]].level = 1;
-	        }
-        });
+		        node.level = initialLevel;
+		        if(node.children && node.children.length > 0)
+		        {
+			        determineLevelOfNodes(node.children, initialLevel + 1);
+		        }
+	        });
+        };
+        
+        determineLevelOfNodes(rootNodes, 1);
 
-        // apply level 2 objects to tree
+        // Get documents and apply them to the tree structure
         if (level2_Func) {
             
             array.forEach(function(data) {
@@ -160,6 +166,76 @@ function UtilsService(_) {
         else
             return ['elements', ws, id, ver];
     };
+
+    var mergeElement = function(source, eid, workspace, updateEdit, property) {
+        var ws = workspace ? workspace : 'master';
+        var key = makeElementKey(eid, ws, 'latest', false);
+        var keyEdit = makeElementKey(eid, ws, 'latest', true);
+        var clean = cleanElement(source);
+        CacheService.put(key, clean, true);
+        var edit = CacheService.get(keyEdit);
+        if (updateEdit && edit) {
+            edit.read = clean.read;
+            edit.modified = clean.modified;
+            if (property === 'all')
+                CacheService.put(keyEdit, clean, true);
+            else if (property === 'name')
+                edit.name = clean.name;
+            else if (property === 'documentation')
+                edit.documentation = clean.documentation;
+            else if (property === 'value') {
+                _.merge(edit.specialization, clean.specialization, function(a,b,id) {
+                    if ((id === 'contents' || id === 'contains') && a)
+                        return a; //handle contains and contents updates manually at higher level
+                    if (angular.isArray(a) && angular.isArray(b) && b.length < a.length) {
+                        return b; 
+                    }
+                    return undefined;
+                });
+            }
+            cleanElement(edit, true);
+        }
+    };
+
+    var filterProperties = function(a, b) {
+        var res = {};
+        for (var key in a) {
+            if (a.hasOwnProperty(key) && b.hasOwnProperty(key)) {
+                if (key === 'specialization')
+                    res.specialization = filterProperties(a.specialization, b.specialization);
+                else
+                    res[key] = b[key];
+            }
+        }
+        return res;
+    };
+
+    var hasConflict = function(edit, orig, server) {
+        for (var i in edit) {
+            if (i === 'read' || i === 'modified' || i === 'modifier' || 
+                    i === 'creator' || i === 'created')
+                continue;
+            if (edit.hasOwnProperty(i) && orig.hasOwnProperty(i) && server.hasOwnProperty(i)) {
+                if (i === 'specialization') {
+                    if (hasConflict(edit[i], orig[i], server[i]))
+                        return true;
+                } else {
+                    if (!angular.equals(orig[i], server[i]))
+                        return true;
+                }
+            }
+        }
+        return false;
+    };
+
+    function isRestrictedValue(values) {
+        if (values.length > 0 && values[0].type === 'Expression' &&
+            values[0].operand.length === 3 && values[0].operand[0].string === 'RestrictedValue' &&
+            values[0].operand[2].type === 'Expression' && values[0].operand[2].operand.length > 0 &&
+            values[0].operand[1].type === 'ElementValue')
+                    return true;
+        return false;
+    }
 
     var makeHtmlTable = function(table) {
         var result = '<table class="table table-bordered table-condensed">';
@@ -251,6 +327,10 @@ function UtilsService(_) {
         normalize: normalize,
         makeElementKey: makeElementKey,
         buildTreeHierarchy: buildTreeHierarchy,
+        filterProperties: filterProperties,
+        mergeElement: mergeElement,
+        hasConflict: hasConflict,
+        isRestrictedValue: isRestrictedValue,
         makeHtmlTable : makeHtmlTable,
         makeHtmlPara: makeHtmlPara,
         makeHtmlList: makeHtmlList

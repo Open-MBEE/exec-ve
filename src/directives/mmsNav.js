@@ -18,22 +18,22 @@ angular.module('mms.directives')
  * and docweb pages.
  * ## Example
  *  <pre>
-    <mms-nav mms-site="europa" mms-title="A Doc" mms-type="View Editor"></mms-nav>
+    <mms-nav mms-title="Model Manager" mms-ws="master" mms-config="tag" mms-site="europa"></mms-nav>
     </pre>
  * ## Support for responsive sliding pane on small browser
  *  <pre>
     <div id="outer-wrap">
         <div id="inner-wrap">
-            <mms-nav mms-responsive="true" mms-site="europa" mms-title="Doc" mms-type="View Editor"></mms-nav>
+            <mms-nav mms-title="Model Manager" mms-ws="master" mms-config="tag" mms-site="europa"></mms-nav>
             <!-- everything visible on the page should go in here -->
         </div>
     </div>
     </pre>
- *
- * @param {string} mmsSite The current site name
+ * @param {string} mmsWs workspace name
+ * @param {object} mmsSite site object
+ * @param {object} mmsDoc document object
+ * @param {object} mmsConfig tag/config object
  * @param {string} mmsTitle Title to display
- * @param {string} mmsType The type of current page (or app name like DocWeb)
- * @param {string} mmsResponsive True to display a responsive sliding pane on small browser, false otherwise
  */
 function mmsNav(SiteService, WorkspaceService, ConfigService, $templateCache, growl) {
     var template = $templateCache.get('mms/templates/mmsNav.html');
@@ -231,9 +231,9 @@ function mmsNav(SiteService, WorkspaceService, ConfigService, $templateCache, gr
         scope: {
             title: '@mmsTitle', //page title - used in mobile view only
             ws: '@mmsWs',
-            site: '=mmsSite', //current site name
-            product: '=mmsDoc', //current document
-            config: '=mmsConfig', //config id
+            site: '=mmsSite', //site object
+            product: '=mmsDoc', //document object
+            config: '=mmsConfig', //config object
             snapshot: '@mmsSnapshotTag', // snapshot titles (before tags - need to be backward compatible), if any
             showTag: '@mmsShowTag'
         },

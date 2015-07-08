@@ -5,8 +5,8 @@
 angular.module('mmsApp')
 .controller('ToolCtrl', ['$scope', '$rootScope', '$state', '$modal', '$q', '$stateParams',
             'ConfigService', 'ElementService', 'WorkspaceService', 'growl', 
-            'workspaceObj', 'tags', 'tag', 'snapshots', 'site', 'document', 'time',
-function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, ElementService, WorkspaceService, growl, workspaceObj, tags, tag, snapshots, site, document, time) {
+            'workspaceObj', 'tags', 'tag', 'snapshots', 'site', 'document', 'time', 'Utils',
+function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, ElementService, WorkspaceService, growl, workspaceObj, tags, tag, snapshots, site, document, time, Utils) {
 
     // TODO rename variable ws
     var ws = $stateParams.workspace;
@@ -26,6 +26,7 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
 
     $scope.vid = $scope.eid;
     $scope.specApi = {};
+    $scope.viewApi = {};
     $scope.viewOrderApi = {};
     $rootScope.mms_togglePane = $scope.$pane;
 
@@ -38,6 +39,7 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
     $scope.tracker = {};
     if (!$rootScope.veEdits)
         $rootScope.veEdits = {};
+    $scope.presentElemEditCnts = {};
 
     // TODO: for editing of workspace/tag elements
     if ($state.current.name === 'workspace') {
@@ -116,6 +118,61 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
         showPane('tags');
     });
 
+    var cleanUpEdit = function(scope) {
+
+        var ws = scope.ws;
+        var edit = scope.edit;
+        var key = 'element|' + edit.sysmlid + '|' + ws;
+        var currentCnt = 0;
+
+        if ($scope.presentElemEditCnts.hasOwnProperty(key)) {
+            currentCnt = $scope.presentElemEditCnts[key];
+        }
+        if (currentCnt <= 1 && !Utils.hasEdits(scope,null,true)) {
+            delete $rootScope.veEdits[key];
+            delete $scope.presentElemEditCnts[key];
+            if (Object.keys($rootScope.veEdits).length === 0) {
+                $rootScope.mms_tbApi.setIcon('element.editor', 'fa-edit');
+            }
+            if (Object.keys($rootScope.veEdits).length > 0) {
+                $rootScope.mms_tbApi.setPermission('element.editor.saveall', true); 
+            } else {
+                $rootScope.mms_tbApi.setPermission('element.editor.saveall', false);
+            }
+        }
+        else {
+            $scope.presentElemEditCnts[key] = currentCnt - 1;
+        }
+    };
+
+    $scope.$on('presentationElem.edit', function(event, scope) {
+        
+        var ws = scope.ws;
+        var edit = scope.edit;
+        var key = 'element|' + edit.sysmlid + '|' + ws;
+        var currentCnt = 1;
+        $rootScope.veEdits[key] = edit;
+        if ($scope.presentElemEditCnts.hasOwnProperty(key)) {
+            currentCnt = $scope.presentElemEditCnts[key] + 1;
+        }
+        $scope.presentElemEditCnts[key] = currentCnt;
+
+        $rootScope.mms_tbApi.setIcon('element.editor', 'fa-edit-asterisk');
+        if (Object.keys($rootScope.veEdits).length > 0) {
+            $rootScope.mms_tbApi.setPermission('element.editor.saveall', true);
+        } else {
+            $rootScope.mms_tbApi.setPermission('element.editor.saveall', false);
+        }
+    });
+
+    $scope.$on('presentationElem.save', function(event, scope) {
+        cleanUpEdit(scope);
+    });
+
+    $scope.$on('presentationElem.cancel', function(event, scope) {
+        cleanUpEdit(scope);           
+    });
+
     $scope.$on('elementSelected', function(event, eid, type) {
         $scope.elementType = type;
         $scope.eid = eid;
@@ -143,6 +200,11 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
     });
     $scope.$on('element.viewer', function() {
         $scope.specApi.setEditing(false);
+        if (Object.keys($rootScope.veEdits).length > 0) {
+            $rootScope.mms_tbApi.setPermission('element.editor.saveall', true);
+        } else {
+            $rootScope.mms_tbApi.setPermission('element.editor.saveall', false);
+        }
         showPane('element');
     });
     $scope.$on('element.editor', function() {
@@ -153,7 +215,7 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
             $scope.tracker.etrackerSelected = $scope.elementType + '|' + (edit.sysmlid || edit.id) + '|' + $scope.specWs;
             $rootScope.veEdits[$scope.elementType + '|' + (edit.sysmlid || edit.id) + '|' + $scope.specWs] = edit;
             $rootScope.mms_tbApi.setIcon('element.editor', 'fa-edit-asterisk');
-            if (Object.keys($rootScope.veEdits).length > 1) {
+            if (Object.keys($rootScope.veEdits).length > 0) {
                 $rootScope.mms_tbApi.setPermission('element.editor.saveall', true);
             } else {
                 $rootScope.mms_tbApi.setPermission('element.editor.saveall', false);
@@ -184,6 +246,11 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
         });
         $scope.specApi.setEditing(false);
     });
+
+    $scope.$on('view.reorder.refresh', function() {
+        $scope.viewOrderApi.refresh();
+    });
+
     $scope.$on('view.reorder', function() {
         $scope.viewOrderApi.setEditing(true);
         showPane('reorder');
@@ -282,9 +349,11 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
             var failedType = 'element';
             var failedWs = 'master';
             results.forEach(function(ob) {
-                if (ob.status === 200)
+                if (ob.status === 200) {
                     delete $rootScope.veEdits[ob.type + '|' + ob.id + '|' + ob.ws];
-                else {
+                    if (ob.type === 'element')
+                        $rootScope.$broadcast('element.updated', ob.id, ob.ws, 'all');
+                } else {
                     somefail = true;
                     failedId = ob.id;
                     failedType = ob.type;

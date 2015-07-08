@@ -19,12 +19,12 @@
     </div>
     
     <div class="container-fluid" ng-show="show.reorder">
-        <mms-view-struct mms-vid="{{vid}}" mms-version="{{version}}" mms-order="true" mms-ws="{{ws}}" mms-view-struct-api="viewOrderApi"></mms-view-struct>
+        <mms-view-reorder mms-vid="{{vid}}" mms-version="{{version}}" mms-order="true" mms-ws="{{ws}}" mms-view-reorder-api="viewOrderApi"></mms-view-reorder>
     </div>
 
     <div class="container-fluid container-snapshots" ng-show="show.snapshots">
         <h1>Snapshots <i class="{{snapshotLoading}}"></i></h1>
-
+        <input class="form-control" ng-model="snapshotsFilter" type="text" placeholder="Type here to filter snapshots">
         <table class="snapshot-table table table-condensed">
             <tr><th>Time</th><th>Created By</th><th>Tag(s)</th></tr>
             <tr>
@@ -34,7 +34,7 @@
                 <td></td>
                 <td></td>
             </tr>
-            <tr ng-repeat="snapshot in snapshots | orderBy:'-created'">
+            <tr ng-repeat="snapshot in snapshots | filter:snapshotsFilter | orderBy:'-created'">
                 <td>
                     <a ui-sref="workspace.site.document({time: snapshot.created, tag: undefined})" ui-sref-opts="{reload: true}" ng-click="snapshotClicked()">{{snapshot.created | date:'M/d/yy h:mm a'}}</a>
                 </td>
