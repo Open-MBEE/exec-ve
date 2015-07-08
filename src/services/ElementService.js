@@ -279,6 +279,8 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
             function(data, status, headers, config) {
                 var result = [];
                 data[key].forEach(function(element) {
+                    if (!element) //check for null, seen before
+                        return;
                     var ekey = UtilsService.makeElementKey(element.sysmlid, n.ws, n.ver);
                     result.push(CacheService.put(ekey, UtilsService.cleanElement(element), true));
                 }); 
