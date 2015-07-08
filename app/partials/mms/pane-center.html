@@ -1,29 +1,22 @@
 
-<div ng-show="mms_showSiteDocLink">
-  <h4><a class="docweb-link" ui-sref="workspace.sites()">Sites and Documents</a></h4>
-</div>
-
-<i class="pane-center-spinner fa fa-5x fa-spinner fa-spin" ng-show="mms_viewContentLoading"></i>
-
 <div ng-if="view !== null" >
-
-  <div ng-hide="mms_viewContentLoading" class="pane-center container-fluid">
-
+ <div fa-pane pane-anchor="north" pane-size="41px" pane-no-toggle="true" pane-no-scroll="true">
     <div class="pane-center-btn-group">      
         <mms-button-bar buttons="buttons" mms-bb-api="bbApi"></mms-button-bar>
     </div>
-      
+  </div>
+  <div fa-pane pane-anchor="center">
+    <i class="pane-center-spinner fa fa-5x fa-spinner fa-spin" ng-show="mms_viewContentLoading"></i>
+    <div ng-if="mms_showSiteDocLink">
+    <h4><a class="docweb-link" ui-sref="workspace.sites()">Sites and Documents</a></h4>
+    </div>
+  <div ng-hide="mms_viewContentLoading" class="pane-center container-fluid">
+
     <div class="pane-center-inner">
 
       <div>{{numComments}} Comment<span ng-if="numComments !== 1">s</span><span ng-if="numComments > 0">, Last Commented {{lastCommented | date:'M/d/yy h:mm a'}} by {{lastCommentedBy}}</span></div>
 
-      <div ng-show="editing">
-          <mms-spec mms-eid="{{vid}}" mms-cf-elements="viewElements" mms-edit-field="all" mms-version="{{version}}" mms-ws="{{ws}}" mms-site="{{site.sysmlid}}" mms-view-edit="true" mms-spec-api="specApi" mms-type="element"></mms-spec>
-      </div>
-
-      <div ng-hide="editing">
-          <mms-view mms-vid="{{vid}}" mms-cf-clicked="tscClicked(elementId)" mms-version="{{version}}" mms-tag="{{tagId}}" mms-ws="{{ws}}" mms-view-api="viewApi" mms-link="vidLink" mms-transcluded="elementTranscluded(element, type)"></mms-view>
-      </div>
+        <mms-view mms-vid="{{vid}}" mms-number="{{sectionNumber}}" mms-cf-clicked="tscClicked(elementId)" mms-version="{{version}}" mms-tag="{{tagId}}" mms-ws="{{ws}}" mms-view-api="viewApi" mms-link="vidLink" mms-transcluded="elementTranscluded(element, type)"></mms-view>
 
       <div ng-if="showFilter">
           <mms-site-doc-filter mms-site="{{site.sysmlid}}" mms-ws="{{ws}}" mms-version="{{version}}" mms-api="filterApi"></mms-site-doc-filter>
@@ -32,7 +25,10 @@
 
   </div>
 </div>
+</div>
 <div ng-if="mms_showTagDescriptionFix">
+  <i class="pane-center-spinner fa fa-5x fa-spinner fa-spin" ng-show="mms_viewContentLoading"></i>
+
   <h1 class="view-title">{{tag.name}}</h1>
   <h5>TAG DESCRIPTION</h5>
   <div ng-bind-html="tag.description"></div>

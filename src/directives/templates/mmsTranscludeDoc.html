@@ -1,0 +1,11 @@
+<div class="panel panel-danger">
+  <div class="panel-heading clearfix">
+    <h3 class="panel-title pull-left">{{panelType}} : {{panelTitle}}</h3>
+    <div class="btn-group pull-right">      
+        <mms-button-bar buttons="buttons" mms-bb-api="bbApi"></mms-button-bar>
+    </div>
+  </div>
+  <div class="inner panel-body">
+    <textarea ng-model="edit.documentation" mms-tinymce mms-tinymce-type="{{tinymceType}}" mms-tinymce-api="tinymceApi" mms-ws="{{ws}}" mms-site="{{mmsSite}}" mms-cf-elements="mmsCfElements" mms-eid="{{element.sysmlid}}"></textarea>
+  </div>
+</div>

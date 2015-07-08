@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsSpec', ['ElementService', 'WorkspaceService', 'ConfigService', '$compile', '$templateCache', '$modal', '$q', 'growl', '_', mmsSpec]);
+.directive('mmsSpec', ['Utils','ElementService', 'WorkspaceService', 'ConfigService', 'UtilsService', '$compile', '$templateCache', '$modal', '$q', 'growl', '_', mmsSpec]);
 
 /**
  * @ngdoc directive
@@ -73,7 +73,7 @@ angular.module('mms.directives')
  * @param {Object=} mmsElement An element object, if this is provided, a read only 
  *      element spec for it would be shown, this will not use mms services to get the element
  */
-function mmsSpec(ElementService, WorkspaceService, ConfigService, $compile, $templateCache, $modal, $q, growl, _) {
+function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsService, $compile, $templateCache, $modal, $q, growl, _) {
     //var readTemplate = $templateCache.get('mms/templates/mmsSpec.html');
     //var editTemplate = $templateCache.get('mms/templates/mmsSpecEdit.html');
     var template = $templateCache.get('mms/templates/mmsSpec.html');
@@ -82,6 +82,7 @@ function mmsSpec(ElementService, WorkspaceService, ConfigService, $compile, $tem
         var keepMode = false;
         scope.editing = false;
         scope.editable = true;
+        scope.isRestrictedVal = false;
         if (scope.mmsElement) {
             scope.element = scope.mmsElement;
             if (scope.element.specialization.type === 'Property')
@@ -150,8 +151,13 @@ function mmsSpec(ElementService, WorkspaceService, ConfigService, $compile, $tem
                 //element.empty();
                 //var template = null;
                 scope.element = data;
-                if (scope.element.specialization.type === 'Property')
+                if (scope.element.specialization.type === 'Property') {
                     scope.values = scope.element.specialization.value;
+                    if (UtilsService.isRestrictedValue(scope.values))
+                        scope.isRestrictedVal = true;
+                    else
+                        scope.isRestrictedVal = false;
+                }
                 if (scope.element.specialization.type === 'Constraint')
                     scope.value = scope.element.specialization.specification;
                 if (scope.mmsEditField === 'none' || 
@@ -177,6 +183,16 @@ function mmsSpec(ElementService, WorkspaceService, ConfigService, $compile, $tem
                         //scope.$emit('elementEditability', scope.editable);
                         if (scope.edit.specialization.type === 'Property' && angular.isArray(scope.edit.specialization.value)) {
                             scope.editValues = scope.edit.specialization.value;
+                            if (scope.isRestrictedVal) {
+                                var options = [];
+                                scope.values[0].operand[2].operand.forEach(function(o) {
+                                    options.push(o.element);
+                                });
+                                ElementService.getElements(options, false, scope.ws, scope.version)
+                                .then(function(elements) {
+                                    scope.options = elements;
+                                });
+                            }
                         }
                         if (scope.edit.specialization.type === 'Constraint' && scope.edit.specialization.specification) {
                             scope.editValue = scope.edit.specialization.specification;
@@ -205,23 +221,7 @@ function mmsSpec(ElementService, WorkspaceService, ConfigService, $compile, $tem
          * 
          */
         scope.revertEdits = function() {
-            if (scope.mmsType === 'workspace') {
-                scope.edit.name = scope.element.name;
-            } else if (scope.mmsType === 'tag') {
-                scope.edit.name = scope.element.name;
-                scope.edit.description = scope.element.description;
-            } else {
-            scope.edit.name = scope.element.name;
-            scope.edit.documentation = scope.element.documentation;
-            if (scope.edit.specialization.type === 'Property' && angular.isArray(scope.edit.specialization.value)) {
-                scope.edit.specialization.value = _.cloneDeep(scope.element.specialization.value);
-                scope.editValues = scope.edit.specialization.value;
-            }
-            if (scope.edit.specialization.type === 'Constraint' && scope.edit.specialization.specification) {
-                scope.edit.specialization.specification = _.cloneDeep(scope.element.specialization.specification);
-                scope.editValue = scope.edit.specialization.specification;
-            }
-            }
+            Utils.revertEdits(scope, null, true);
         };
         
         var conflictCtrl = function($scope, $modalInstance) {
@@ -254,92 +254,11 @@ function mmsSpec(ElementService, WorkspaceService, ConfigService, $compile, $tem
          *      the original save failed. Error means an actual error occured. 
          */
         scope.save = function() {
-            var deferred = $q.defer();
-            if (!scope.editable || !scope.editing) {
-                deferred.reject({type: 'error', message: "Element isn't editable and can't be saved."});
-                return deferred.promise;
-            }
-            if (scope.tinymceApi.save)
-                scope.tinymceApi.save();
-            if (scope.mmsType === 'workspace') {
-                WorkspaceService.update(scope.edit)
-                .then(function(data) {
-                    deferred.resolve(data);
-                }, function(reason) {
-                    deferred.reject({type: 'error', message: reason.message});
-                });
-            } else if (scope.mmsType === 'tag') {
-                ConfigService.update(scope.edit, scope.mmsWs)
-                .then(function(data) {
-                    deferred.resolve(data);
-                }, function(reason) {
-                    deferred.reject({type: 'error', message: reason.message});
-                });
-            } else {
-            ElementService.updateElement(scope.edit, scope.mmsWs)
-            .then(function(data) {
-                deferred.resolve(data);
-                //growl.success("Save successful");
-                //scope.editing = false;
-            }, function(reason) {
-                if (reason.status === 409) {
-                    scope.latest = reason.data.elements[0];
-                    var instance = $modal.open({
-                        template: $templateCache.get('mms/templates/saveConflict.html'),
-                        controller: ['$scope', '$modalInstance', conflictCtrl],
-                        scope: scope,
-                        size: 'lg'
-                    });
-                    instance.result.then(function(choice) {
-                        if (choice === 'ok') {
-                            ElementService.getElementForEdit(scope.mmsEid, true, scope.mmsWs)
-                            .then(function(data) {
-                                //growl.info("Element Updated to Latest");
-                                deferred.reject({type: 'info', message: 'Element Updated to Latest'});
-                            }, function(reason) {
-                                //growl.error("Element Update Error: " + reason.message);
-                                deferred.reject({type: 'error', message: 'Element Update Error: ' + reason.message});
-                            }); 
-                        } else if (choice === 'merge') { 
-                            ElementService.getElement(scope.mmsEid, true, scope.mmsWs)
-                            .then(function(data) {
-                                var currentEdit = scope.edit;
-                                if (data.name !== currentEdit.name)
-                                    currentEdit.name = data.name + ' MERGE ' + currentEdit.name;
-                                if (data.documentation !== currentEdit.documentation)
-                                    currentEdit.documentation = data.documentation + '<p>MERGE</p>' + currentEdit.documentation;
-                                currentEdit.read = data.read;
-                                currentEdit.modified = data.modified;
-                                //growl.info("Element name and doc merged");
-                                deferred.reject({type: 'info', message: 'Element name and doc merged'});
-                            }, function(reason2) {
-                                //growl.error("Merge error: " + reason2.message);
-                                deferred.reject({type: 'error', message: 'Merge error: ' + reason2.message});
-                            });
-                        } else if (choice === 'force') {
-                            scope.edit.read = scope.latest.read;
-                            scope.edit.modified = scope.latest.modified;
-                            scope.save().then(function(resolved) {
-                                deferred.resolve(resolved);
-                            }, function(error) {
-                                deferred.reject(error);
-                            });
-                        } else
-                            deferred.reject({type: 'cancel'});
-                    });
-                } else {
-                    deferred.reject({type: 'error', message: reason.message});
-                    //growl.error("Save Error: Status " + reason.status);
-                }
-            });
-            }
-            return deferred.promise;
+            return Utils.save(scope.edit, scope.mmsWs, scope.mmsType, scope.mmsEid, scope.tinymceApi, scope, 'all');
         };
 
         scope.hasHtml = function(s) {
-            if (s.indexOf('<p>') === -1)
-                return false;
-            return true;
+            return Utils.hasHtml(s);
         };
 
         /**
@@ -355,18 +274,7 @@ function mmsSpec(ElementService, WorkspaceService, ConfigService, $compile, $tem
          * @return {boolean} has changes or not
          */
         scope.hasEdits = function() {
-            if (scope.edit === null)
-                return false;
-            if (scope.edit.name !== scope.element.name)
-                return true;
-            if (scope.edit.documentation !== scope.element.documentation)
-                return true;
-            if (scope.edit.specialization && scope.edit.specialization.type === 'Property' && 
-                !angular.equals(scope.edit.specialization.value, scope.element.specialization.value))
-                return true;
-            if (scope.edit.description !== scope.element.description)
-                return true;
-            return false;
+            return Utils.hasEdits(scope, null, true);
         };
 
         scope.addValueTypes = {string: 'LiteralString', boolean: 'LiteralBoolean', integer: 'LiteralInteger', real: 'LiteralReal'};
@@ -456,6 +364,10 @@ function mmsSpec(ElementService, WorkspaceService, ConfigService, $compile, $tem
              */
             api.getEdits = function() {
                 return scope.edit;
+            };
+
+            api.setEdit = function(id) {
+                scope.mmsEid = id;
             };
 
             api.keepMode = function() {

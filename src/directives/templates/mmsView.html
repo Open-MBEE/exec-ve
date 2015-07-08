@@ -9,20 +9,26 @@
     </h1>
 
     <div ng-show="showElements">
-      Last Modified: {{modified | date:'M/d/yy h:mm a'}} by {{creator}}
+      Last Modified: {{modified | date:'M/d/yy h:mm a'}} by {{modifier}}
     </div>
 
     <br/>
     <i ng-hide="view" class="fa fa-2x fa-spinner fa-spin"></i>
 
-    <div ng-repeat="contain in ::view.specialization.contains" ng-switch on="contain.type"> 
-
-        <mms-view-para data-mms-para="contain" ng-switch-when="Paragraph"></mms-view-para>
-        <mms-view-table data-mms-table="contain" ng-switch-when="Table"></mms-view-table>
-        <mms-view-list data-mms-list="contain" ng-switch-when="List"></mms-view-list>
-        <mms-view-img data-mms-image="contain" ng-switch-when="Image"></mms-view-img>
-        <mms-view-section data-mms-section="contain" ng-switch-when="Section"></mms-view-section>
-
+    <div ng-if="view.specialization.contents == null">
+        <div ng-repeat="contain in ::view.specialization.contains" ng-switch on="contain.type">  
+            <mms-view-para data-mms-para="::contain" ng-switch-when="Paragraph"></mms-view-para>
+            <mms-view-table data-mms-table="::contain" ng-switch-when="Table"></mms-view-table>
+            <mms-view-list data-mms-list="::contain" ng-switch-when="List"></mms-view-list>
+            <mms-view-img data-mms-image="::contain" ng-switch-when="Image"></mms-view-img>
+            <mms-view-section data-mms-section="::contain" ng-switch-when="Section"></mms-view-section>
+        </div>
+    </div>
+    <div ng-if="view.specialization.contents">
+        <!-- Cant use track by instanceVal.instance b/c of possible duplicate entries -->
+        <div ng-repeat="instanceVal in view.specialization.contents.operand"> 
+            <mms-view-presentation-elem data-mms-instance-val="::instanceVal"></mms-view-presentation-elem>
+        </div>
     </div>
 
 </div>

@@ -4,10 +4,10 @@
     <tr ng-repeat="row in ::table.header">
         <th colspan="{{::cell.colspan}}" rowspan="{{::cell.rowspan}}" ng-repeat="cell in ::row">
             <div ng-repeat="content in ::cell.content" ng-switch on="content.type">
-                <mms-view-para data-mms-para="content" ng-switch-when="Paragraph"></mms-view-para>
-                <mms-view-table data-mms-table="content" ng-switch-when="Table"></mms-view-table>
-                <mms-view-list data-mms-list="content" ng-switch-when="List"></mms-view-list>
-                <mms-view-img data-mms-image="content" ng-switch-when="Image"></mms-view-img>
+                <mms-view-para data-mms-para="::content" ng-switch-when="Paragraph"></mms-view-para>
+                <mms-view-table data-mms-table="::content" ng-switch-when="Table"></mms-view-table>
+                <mms-view-list data-mms-list="::content" ng-switch-when="List"></mms-view-list>
+                <mms-view-img data-mms-image="::content" ng-switch-when="Image"></mms-view-img>
             </div>
         </th>
     </tr>
@@ -16,10 +16,10 @@
     <tr ng-repeat="row in table.body | limitTo: tableLimit">
         <td colspan="{{::cell.colspan}}" rowspan="{{::cell.rowspan}}" ng-repeat="cell in ::row">
             <div ng-repeat="content in ::cell.content" ng-switch on="content.type">
-                <mms-view-para data-mms-para="content" ng-switch-when="Paragraph"></mms-view-para>
-                <mms-view-table data-mms-table="content" ng-switch-when="Table"></mms-view-table>
-                <mms-view-list data-mms-list="content" ng-switch-when="List"></mms-view-list>
-                <mms-view-img data-mms-image="content" ng-switch-when="Image"></mms-view-img>
+                <mms-view-para data-mms-para="::content" ng-switch-when="Paragraph"></mms-view-para>
+                <mms-view-table data-mms-table="::content" ng-switch-when="Table"></mms-view-table>
+                <mms-view-list data-mms-list="::content" ng-switch-when="List"></mms-view-list>
+                <mms-view-img data-mms-image="::content" ng-switch-when="Image"></mms-view-img>
             </div>
         </td>
     </tr>
