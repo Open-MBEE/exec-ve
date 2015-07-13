@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 'ui.bootstrap', 'ui.router', 'ui.tree', 'angular-growl', 'cfp.hotkeys', 'timelyModule'])
+angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 'ui.bootstrap', 'ui.router', 'ui.tree', 'angular-growl', 'timelyModule'])
 .config(function($stateProvider, $urlRouterProvider) {
     $urlRouterProvider.rule(function ($injector, $location) {
         // determine if the url is older 2.0 format (will not have a workspace)
@@ -594,8 +594,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
                 controller: 'WorkspaceDiffChangeController'
             },
             'pane-right@': {
-                templateUrl: 'partials/mms/diff-pane-right.html',
-                controller: 'WorkspaceDiffTreeController'
+                template: ''
             },
             'toolbar-right@': {
                 template: '<mms-toolbar buttons="buttons" mms-tb-api="tbApi"></mms-toolbar>',
@@ -609,6 +608,15 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
             'pane-center@': {
                 templateUrl: 'partials/mms/diff-view-pane-center.html',
                 controller: 'WorkspaceDiffElementViewController'
+            }
+        }
+    })
+    .state('workspace.diff.tree', {
+        url: '/tree',
+        views: {
+            'pane-center@': {
+                templateUrl: 'partials/mms/diff-pane-right.html',
+                controller: 'WorkspaceDiffTreeController'
             }
         }
     });

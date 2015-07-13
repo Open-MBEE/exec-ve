@@ -3,26 +3,19 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('WorkspaceDiffTreeController', ["_", "$timeout", "$scope", "$rootScope", "$state", "$stateParams", "$modal", "growl", "WorkspaceService", "ElementService", "diff",
-function(_, $timeout, $scope, $rootScope, $state, $stateParams, $modal, growl, WorkspaceService, ElementService, diff) {
+.controller('WorkspaceDiffTreeController', ["_", "$timeout", "$scope", "$rootScope", "$state", "$stateParams", "$modal", "growl", "WorkspaceService", "ElementService", "diff", "UxService",
+function(_, $timeout, $scope, $rootScope, $state, $stateParams, $modal, growl, WorkspaceService, ElementService, diff, UxService) {
 
     $scope.treeApi = {};
+    
+    $rootScope.hideRightPane = true;
 
     $scope.treeData = [];
     
     $scope.treeData = $rootScope.treeData;
 
     $scope.options = {
-      types: {
-        'Element': 'fa fa-square',
-        'Property': 'fa fa-circle',
-        'View': 'fa fa-square',
-        'Dependency': 'fa fa-long-arrow-right',
-        'DirectedRelationship': 'fa fa-long-arrow-right',
-        'Generalization': 'fa fa-chevron-right',
-        'Package': 'fa fa-folder',
-        'Connector': 'fa fa-expand'
-      },
+      types: UxService.getTreeTypes(),
       statuses: {
         'moved'   : { style: "moved" },
         'added'   : { style: "addition" },
