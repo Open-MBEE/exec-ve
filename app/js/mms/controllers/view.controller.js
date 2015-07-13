@@ -169,7 +169,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         if (getPDFStatus() === 'Generating...')
             return;
         if (time < '2015-04-11')
-            $window.alert('There is a known issue with artifacts generated from tags prior to April 11, 2015 where the content may not be accurate. The fix is schedule for the next 2.2 release.');
+            $window.alert('WARNING: There is a known issue with artifacts (including PDFs) generated from tags prior to April 11, 2015 where the content may not be accurate. In the event of a conflict between the generated artifacts and the associated View Editor web content, the information in View Editor shall take precedence. The fix is scheduled for the next 2.2 release.');
         $scope.bbApi.toggleButtonSpinner('generate.pdf');
         $scope.bbApi.toggleButtonSpinner('generate.zip');
 
@@ -191,14 +191,14 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
 
     $scope.$on('download.pdf', function() {
         if (time < '2015-04-11')
-            $window.alert('There is a known issue with artifacts generated from tags prior to April 11, 2015 where the content may not be accurate. The fix is schedule for the next 2.2 release.');
+            $window.alert('WARNING: There is a known issue with artifacts (including PDFs) generated from tags prior to April 11, 2015 where the content may not be accurate. In the event of a conflict between the generated artifacts and the associated View Editor web content, the information in View Editor shall take precedence. The fix is scheduled for the next 2.2 release.');
         $window.open(getPDFUrl());
 
     });
 
     $scope.$on('download.zip', function() {
         if (time < '2015-04-11')
-            $window.alert('There is a known issue with artifacts generated from tags prior to April 11, 2015 where the content may not be accurate. The fix is schedule for the next 2.2 release.');
+            $window.alert('WARNING: There is a known issue with artifacts (including PDFs) generated from tags prior to April 11, 2015 where the content may not be accurate. In the event of a conflict between the generated artifacts and the associated View Editor web content, the information in View Editor shall take precedence. The fix is scheduled for the next 2.2 release.');
         $window.open(getZipUrl());
     });
 
