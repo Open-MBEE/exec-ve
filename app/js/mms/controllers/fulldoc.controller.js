@@ -3,8 +3,8 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('FullDocCtrl', ['$scope', '$rootScope', '$state', '$stateParams', '$window', 'document', 'workspace', 'site', 'snapshot', 'time', 'ConfigService', 'UxService', 'growl',
-function($scope, $rootScope, $state, $stateParams, $window, document, workspace, site, snapshot, time, ConfigService, UxService, growl) {
+.controller('FullDocCtrl', ['$scope', '$rootScope', '$state', '$stateParams', '$window', 'document', 'workspace', 'site', 'snapshot', 'time', 'ConfigService', 'UxService', 'growl', 'hotkeys',
+function($scope, $rootScope, $state, $stateParams, $window, document, workspace, site, snapshot, time, ConfigService, UxService, growl, hotkeys) {
     $scope.ws = $stateParams.workspace;
     var views = [];
     if (!$rootScope.veCommentsOn)
@@ -64,7 +64,16 @@ function($scope, $rootScope, $state, $stateParams, $window, document, workspace,
         $scope.bbApi.setToggleState('show.comments', $rootScope.veCommentsOn);
         $scope.bbApi.addButton(UxService.getButtonBarButton('show.elements'));
         $scope.bbApi.setToggleState('show.elements', $rootScope.veElementsOn);
-
+        hotkeys.bindTo($scope)
+        .add({
+            combo: 'alt+c',
+            description: 'toggle show comments',
+            callback: function() {$scope.$broadcast('show.comments');}
+        }).add({
+            combo: 'alt+e',
+            description: 'toggle show elements',
+            callback: function() {$scope.$broadcast('show.elements');}
+        });
         // TODO: This code is duplicated in the ViewCtrl
         // **WARNING** IF YOU CHANGE THIS CODE, NEED TO UPDATE IN VIEW CTRL TOO
 

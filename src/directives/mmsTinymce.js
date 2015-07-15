@@ -81,6 +81,12 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                 angular.element('.btn-search-id').removeClass('active');
                 angular.element('.btn-search-' + searchType).addClass('active');
             };
+            $scope.setFilterFacet = function(filterFacet) {
+                if(filterFacet === 'all') $scope.facet = '$';
+                else  $scope.facet = filterFacet;
+                angular.element('.search-filter-type button').removeClass('active');
+                angular.element('.btn-filter-facet-' + filterFacet).addClass('active');
+            };
             $scope.choose = function(elementId, property, name) {
                 var tag = '<mms-transclude-' + property + ' data-mms-eid="' + elementId + '">[cf:' + name + '.' + property + ']</mms-transclude-' + property + '> ';
                 $modalInstance.close(tag);
@@ -190,6 +196,12 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                     $modalInstance.close(false);
                 }
             };
+            
+            $scope.facet = '$';
+            $scope.$watchGroup(['filterQuery', 'facet'], function(newVal, oldVal){
+	            $scope.searchFilter = {};
+	            $scope.searchFilter[$scope.facet] = $scope.filterQuery;
+            });
         };
 
         var autocompleteCallback = function(ed) {
@@ -383,11 +395,22 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
             ngModelCtrl.$setViewValue(element.val());
         };
 
+        //fix <br> in pre blocks
+        var fixNewLines = function(content) {
+            var codeBlocks = content.match(/<pre.*?>[^]*?<\/pre>/mg);
+            console.log('codeBlocks', codeBlocks);
+            if(!codeBlocks) return content;
+            for(var index=0; index < codeBlocks.length; index++) {
+                content = content.replace(codeBlocks[index], codeBlocks[index].replace(/<br\s*\/?>/mgi, "\n"));
+            }
+            return content;
+        };
+
         var defaultToolbar = 'bold italic underline strikethrough | subscript superscript blockquote | formatselect | fontsizeselect | forecolor backcolor removeformat | alignleft aligncenter alignright | link unlink | image media | charmap searchreplace | undo redo';
         var tableToolbar = ' table ';
         var listToolbar = ' bullist numlist outdent indent ';
         var codeToolbar = ' code ';
-        var customToolbar = ' transclude comment vlink normalize | mvleft mvright ';
+        var customToolbar = ' transclude comment vlink normalize';
         var allToolbar = defaultToolbar + ' | ' + listToolbar + ' | ' + tableToolbar + ' | ' + codeToolbar + ' | ' + customToolbar;
         var thisToolbar = allToolbar;
         if (scope.mmsTinymceType === 'Equation')
@@ -399,7 +422,7 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
         if (scope.mmsTinymceType === 'Figure')
             thisToolbar = 'image | code ';
         var options = {
-            plugins: 'autoresize charmap code fullscreen image link media nonbreaking paste table textcolor searchreplace',
+            plugins: 'autoresize charmap code fullscreen image link media nonbreaking paste table textcolor searchreplace noneditable',
             //toolbar: 'bold italic underline strikethrough | subscript superscript blockquote | formatselect | fontsizeselect | forecolor backcolor removeformat | alignleft aligncenter alignright | bullist numlist outdent indent | table | link unlink | image media | charmap searchreplace code | transclude comment vlink normalize | mvleft mvright | undo redo',
             toolbar: thisToolbar,
             menubar: false,
@@ -409,8 +432,8 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
             autoresize_max_height: $window.innerHeight*0.65,
             paste_retain_style_properties: 'color background-color font-size text-align',
             browser_spellcheck: true,
-            invalid_elements: 'br,div,font',
-            extended_valid_elements: 'seqr-timely,mms-d3-observation-profile-chart-io,mms-d3-parallel-axis-chart-io,mms-d3-radar-chart-io,mms-d3-horizontal-bar-chart-io,mms-site-docs,mms-workspace-docs,mms-diagram-block,mms-view-link,-mms-transclude-doc,-mms-transclude-name,-mms-transclude-com,-mms-transclude-val,-mms-transclude-img,math,maction,maligngroup,malignmark,menclose,merror,mfenced,mfrac,mglyph,mi,mlabeledtr,mlongdiv,mmultiscripts,mn,mo,mover,mpadded,mphantom,mroot,mrow,ms,mscarries,mscarry,msgroup,mstack,msline,mspace,msqrt,msrow,mstyle,msub,msup,msubsup,mtable,mtd,mtext,mtr,munder,munderover',
+            invalid_elements: 'div,font',
+            extended_valid_elements: 'seqr-timely,mms-d3-observation-profile-chart-io,mms-d3-parallel-axis-chart-io,mms-d3-radar-chart-io,mms-d3-horizontal-bar-chart-io,mms-site-docs,mms-workspace-docs,mms-diagram-block,mms-view-link[class:mceNonEditable],-mms-transclude-doc[class:mceNonEditable],-mms-transclude-name[class:mceNonEditable],-mms-transclude-com[class:mceNonEditable],-mms-transclude-val[class:mceNonEditable],-mms-transclude-img[class:mceNonEditable],math,maction,maligngroup,malignmark,menclose,merror,mfenced,mfrac,mglyph,mi,mlabeledtr,mlongdiv,mmultiscripts,mn,mo,mover,mpadded,mphantom,mroot,mrow,ms,mscarries,mscarry,msgroup,mstack,msline,mspace,msqrt,msrow,mstyle,msub,msup,msubsup,mtable,mtd,mtext,mtr,munder,munderover',
             custom_elements: 'seqr-timely,mms-d3-observation-profile-chart-io,mms-d3-parallel-axis-chart-io,mms-d3-radar-chart-io,mms-d3-horizontal-bar-chart-io,mms-site-docs,mms-workspace-docs,mms-diagram-block,~mms-view-link,~mms-transclude-doc,~mms-transclude-name,~mms-transclude-com,~mms-transclude-val,~mms-transclude-img,math,maction,maligngroup,malignmark,menclose,merror,mfenced,mfrac,mglyph,mi,mlabeledtr,mlongdiv,mmultiscripts,mn,mo,mover,mpadded,mphantom,mroot,mrow,ms,mscarries,mscarry,msgroup,mstack,msline,mspace,msqrt,msrow,mstyle,msub,msup,msubsup,mtable,mtd,mtext,mtr,munder,munderover',
             fix_list_elements: true,
             content_css: 'css/partials/mms.min.css',
@@ -439,7 +462,8 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                     onclick: function() {
                         viewLinkCallback(ed);
                     }
-                });
+                });/* Likely not necessary any more due to non-editable elements
+
                 ed.addButton('mvleft', {
                     title: 'Move Left of Cf',
                     text: '<-',
@@ -466,6 +490,7 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                         }
                     }
                 });
+*/
                 ed.addButton('normalize', {
                     title: 'Reset Cross References',
                     text: 'Reset Cf',
@@ -479,6 +504,9 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                         ed.save();
                         update();
                     }
+                });
+                ed.on('GetContent', function(e) {
+                    e.content = fixNewLines(e.content);
                 });
                 ed.on('init', function(args) {
                     ngModelCtrl.$render();
@@ -526,7 +554,7 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
         $timeout(function() {
             tinymce.init(options);
             //tinymce.get(attrs.id).focus();
-        });
+        }, 0, false);
 
         ngModelCtrl.$render = function() {
             if (!instance)

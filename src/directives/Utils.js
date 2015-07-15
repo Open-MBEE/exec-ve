@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.factory('Utils', ['$q','$modal','$templateCache','$rootScope','$compile','WorkspaceService','ConfigService','ElementService','ViewService', 'UtilsService', 'growl','_', Utils]);
+.factory('Utils', ['$q','$modal','$timeout', '$templateCache','$rootScope','$compile','WorkspaceService','ConfigService','ElementService','ViewService', 'UtilsService', 'growl','_', Utils]);
 
 /**
  * @ngdoc service
@@ -18,7 +18,7 @@ angular.module('mms.directives')
  * Utility methods for performing edit like behavior to a transclude element
  *
  */
-function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceService, ConfigService, ElementService, ViewService, UtilsService, growl, _) {
+function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, WorkspaceService, ConfigService, ElementService, ViewService, UtilsService, growl, _) {
     
      var conflictCtrl = function($scope, $modalInstance) {
         $scope.ok = function() {
@@ -224,7 +224,7 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
             growl.error(reason.message);
     };
 
-    var addFrame = function(scope, mmsViewCtrl, element, template, editObj) {
+    var addFrame = function(scope, mmsViewCtrl, element, template, editObj, doNotScroll) {
 
         if (mmsViewCtrl.isEditable() && !scope.isEditing) { // && !scope.cleanUp) {
 
@@ -243,9 +243,12 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
                 }
 
                 if (template) {
+                    if (scope.recompileScope)
+                        scope.recompileScope.$destroy();
+                    scope.recompileScope = scope.$new();
                     element.empty();
                     element.append(template);
-                    $compile(element.contents())(scope);
+                    $compile(element.contents())(scope.recompileScope);
                 }
 
                 if (!scope.skipBroadcast) {
@@ -255,6 +258,8 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
                 else {
                     scope.skipBroadcast = false;
                 }
+                if (!doNotScroll)
+                    scrollToElement(element);
             }, handleError);
 
             // TODO: Should this check the entire or just the instance specification
@@ -269,7 +274,7 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
     };
 
     //called by transcludes
-    var saveAction = function(scope, recompile, bbApi, editObj, type) {
+    var saveAction = function(scope, recompile, bbApi, editObj, type, element) {
 
         if (scope.elementSaving) {
             growl.info('Please Wait...');
@@ -325,6 +330,7 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
             $rootScope.$broadcast('view.reorder.refresh');
             //recompile();
             growl.success('Save Successful');
+            scrollToElement(element);
         }, function(reason) {
             scope.elementSaving = false;
             handleError(reason);
@@ -334,7 +340,7 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
     };
 
     //called by transcludes
-    var cancelAction = function(scope, recompile, bbApi, type) {
+    var cancelAction = function(scope, recompile, bbApi, type, element) {
 
         var cancelCleanUp = function() {
             scope.isEditing = false;
@@ -342,6 +348,7 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
              // Broadcast message for the ToolCtrl:
             $rootScope.$broadcast('presentationElem.cancel', scope);
             recompile();
+            scrollToElement(element);
         };
 
         bbApi.toggleButtonSpinner('presentation.element.cancel');
@@ -430,8 +437,9 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
         scope.elementSaving = false;
     };
 
-    var previewAction = function(scope, recompileEdit, recompile, type) {
+    var previewAction = function(scope, recompileEdit, recompile, type, element) {
         leaveEditModeOrFrame(scope, recompile, recompileEdit, type);
+        scrollToElement(element);
     };
 
     var showEditCallBack = function(scope, mmsViewCtrl, element, template, recompile, recompileEdit, type, editObj) {
@@ -439,7 +447,7 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
         // Going into edit mode, so add a frame if had a previous edit in progress:
         if (mmsViewCtrl.isEditable()) {
             if (scope.edit && hasEdits(scope, type) && !scope.isEditing) {
-                addFrame(scope,mmsViewCtrl,element,template,editObj);
+                addFrame(scope,mmsViewCtrl,element,template,editObj,true);
             }
         }
         // Leaving edit mode, so highlight the unsaved edit if needed:
@@ -471,6 +479,15 @@ function Utils($q, $modal, $templateCache, $rootScope, $compile, WorkspaceServic
         if (s.indexOf('<p>') === -1)
             return false;
         return true;
+    };
+
+    var scrollToElement = function(element) {
+        $timeout(function() {
+            var el = element.get(0);
+            if (element.isOnScreen())
+                return;
+            el.scrollIntoView();
+        }, 500, false);
     };
 
     return {

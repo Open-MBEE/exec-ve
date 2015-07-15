@@ -279,6 +279,8 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
             function(data, status, headers, config) {
                 var result = [];
                 data[key].forEach(function(element) {
+                    if (!element) //check for null, seen before
+                        return;
                     var ekey = UtilsService.makeElementKey(element.sysmlid, n.ws, n.ver);
                     result.push(CacheService.put(ekey, UtilsService.cleanElement(element), true));
                 }); 
@@ -362,7 +364,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
             deferred.reject('Element id not found, create element first!');
         else {
             var n = normalize(elem.sysmlid, null, workspace, null);
-            $http.post(URLService.getPostElementsURL(n.ws), {'elements': [elem]})
+            $http.post(URLService.getPostElementsURL(n.ws), {'elements': [elem]}, {timeout: 10000})
             .success(function(data, status, headers, config) {
                 handleSuccess(n, data);
             }).error(function(data, status, headers, config) {

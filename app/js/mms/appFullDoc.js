@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('mmsApp', ['mms', 'mms.directives', 'ui.router'])
+angular.module('mmsApp', ['mms', 'mms.directives'])
 .config(function($httpProvider) {
     $httpProvider.defaults.headers.get = {'Authorization':'Basic bGhvOkNoQG5nMy5uMFcyMDM0'};
 })
@@ -8,12 +8,12 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'ui.router'])
     function($scope, $window, ElementService, ViewService, ConfigService){
     var url = $window.location.href;
     var params = parseQueryString(url.substring(url.indexOf('?') + 1));
-    $scope.ws = params['ws'];
-    $scope.site=params['site'];
-    $scope.docId=params['docId'];
-    $scope.viewId=params['viewId'];
-    $scope.section=params['section'];
-    $scope.version=params['time'];
+    $scope.ws = params.ws;
+    $scope.site=params.site;
+    $scope.docId=params.docId;
+    $scope.viewId=params.viewId;
+    $scope.section=params.section;
+    $scope.version=params.time;
 
     var views= [];
     var view2children = {};
@@ -56,7 +56,6 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'ui.router'])
         });
     }
     $scope.views = views;
-    $window.prerenderReady = true;
 }]);
 
 var parseQueryString = function(queryString){

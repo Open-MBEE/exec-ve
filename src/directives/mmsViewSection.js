@@ -1,9 +1,9 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsViewSection', ['$compile', '$templateCache', '$rootScope', 'ElementService', 'UxService', 'Utils', mmsViewSection]);
+.directive('mmsViewSection', ['$compile', '$templateCache', '$rootScope', 'ElementService', 'ViewService', 'UxService', 'Utils', mmsViewSection]);
 
-function mmsViewSection($compile, $templateCache, $rootScope, ElementService, UxService, Utils) {
+function mmsViewSection($compile, $templateCache, $rootScope, ElementService, ViewService, UxService, Utils) {
 
     var defaultTemplate = $templateCache.get('mms/templates/mmsViewSection.html');
 
@@ -76,6 +76,8 @@ function mmsViewSection($compile, $templateCache, $rootScope, ElementService, Ux
             scope.presentationElem = mmsViewPresentationElemCtrl.getPresentationElement();
             scope.view = mmsViewCtrl.getView();
             scope.isDirectChildOfPresentationElement = Utils.isDirectChildOfPresentationElementFunc(element, mmsViewCtrl);
+            if (scope.instanceSpec.specialization.classifier[0] === ViewService.typeToClassifierId.Section)
+                scope.isDirectChildOfPresentationElement = false;
             var type = "name";
 
             var callback = function() {

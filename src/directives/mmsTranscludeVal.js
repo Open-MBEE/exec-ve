@@ -49,7 +49,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, $log, 
     var mmsTranscludeValLink = function(scope, element, attrs, controllers) {
         var mmsViewCtrl = controllers[0];
         var mmsViewPresentationElemCtrl = controllers[1];
-
+        scope.recompileScope = null;
         var processed = false;
         scope.cfType = 'val';
         element.click(function(e) {
@@ -66,6 +66,8 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, $log, 
         });
 
         var recompile = function() {
+            if (scope.recompileScope)
+                scope.recompileScope.$destroy();
             scope.isEditing = false;
             var toCompileList = [];
             var areStrings = false;
@@ -82,16 +84,17 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, $log, 
                 }
             } 
             element.empty();
+            scope.recompileScope = scope.$new();
             if (scope.values.length === 0 || Object.keys(scope.values[0]).length < 2)
-                element.html('<span' + ((scope.version === 'latest') ? '' : ' class="placeholder"') + '>(no value)</span>');
+                element.html('<span>' + ((scope.version === 'latest') ? '(no value)' : '') + '</span>');
             else if (areStrings) {
                 var toCompile = toCompileList.join(' ');
                 if (toCompile === '') {
-                    element.html('<span' + ((scope.version === 'latest') ? '' : ' class="placeholder"') + '>(no value)</span>');
+                    element.html('<span>' + ((scope.version === 'latest') ? '(no value)' : '') + '</span>');
                     return;
                 }
                 element.append(toCompile);
-                $compile(element.contents())(scope); 
+                $compile(element.contents())(scope.recompileScope); 
             } else if (UtilsService.isRestrictedValue(scope.values)) {
                 ElementService.getElement(scope.values[0].operand[1].element, false, scope.ws, scope.version)
                 .then(function(e) {
@@ -100,7 +103,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, $log, 
                 });
             } else {
                 element.append(valTemplate);
-                $compile(element.contents())(scope);
+                $compile(element.contents())(scope.recompileScope);
             }
             if (mmsViewCtrl) {
                 mmsViewCtrl.elementTranscluded(scope.element);
@@ -108,6 +111,8 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, $log, 
         };
 
         var recompileEdit = function() {
+            if (scope.recompileScope)
+                scope.recompileScope.$destroy();
             var toCompileList = [];
             var areStrings = false;
             for (var i = 0; i < scope.editValues.length; i++) {
@@ -123,6 +128,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, $log, 
                 }
             } 
             element.empty();
+            scope.recompileScope = scope.$new();
             if (scope.editValues.length === 0 || Object.keys(scope.editValues[0]).length < 2)
                 element.html('<span' + ((scope.version === 'latest') ? '' : ' class="placeholder"') + '>(no value)</span>');
             else if (areStrings) {
@@ -132,7 +138,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, $log, 
                     return;
                 }
                 element.append('<div class="panel panel-info">'+toCompile+'</div>');
-                $compile(element.contents())(scope); 
+                $compile(element.contents())(scope.recompileScope); 
             } else if (UtilsService.isRestrictedValue(scope.editValues)) {
                 ElementService.getElement(scope.editValues[0].operand[1].element, false, scope.ws, scope.version)
                 .then(function(e) {
@@ -140,7 +146,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, $log, 
                 });
             } else {
                 element.append(editTemplate);
-                $compile(element.contents())(scope);
+                $compile(element.contents())(scope.recompileScope);
             }
         };
 
@@ -179,7 +185,10 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, $log, 
                     });
                 }
             }, function(reason) {
-                element.html('<span class="error">value cf ' + newVal + ' not found</span>');
+                var status = ' not found';
+                if (reason.status === 410)
+                    status = ' deleted';
+                element.html('<span class="error">value cf ' + newVal + status + '</span>');
                 growl.error('Cf Val Error: ' + reason.message + ': ' + scope.mmsEid);
             });
         });
@@ -220,11 +229,11 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, $log, 
             });
 
             scope.save = function() {
-                Utils.saveAction(scope, recompile, scope.bbApi, null, type);
+                Utils.saveAction(scope, recompile, scope.bbApi, null, type, element);
             };
 
             scope.cancel = function() {
-                Utils.cancelAction(scope, recompile, scope.bbApi, type);
+                Utils.cancelAction(scope, recompile, scope.bbApi, type, element);
             };
 
             scope.addFrame = function() {
@@ -244,7 +253,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, $log, 
             };
 
             scope.preview = function() {
-                Utils.previewAction(scope, recompileEdit, recompile, type);
+                Utils.previewAction(scope, recompileEdit, recompile, type, element);
             };
         } 
 

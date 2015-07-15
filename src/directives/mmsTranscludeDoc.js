@@ -53,7 +53,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
     var mmsTranscludeDocLink = function(scope, element, attrs, controllers) {
         var mmsViewCtrl = controllers[0];
         var mmsViewPresentationElemCtrl = controllers[1];
-
+        scope.recompileScope = null;
         var processed = false;
         scope.cfType = 'doc';
 
@@ -72,25 +72,35 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
         });
 
         var recompile = function() {
+            if (scope.recompileScope)
+                scope.recompileScope.$destroy();
             scope.isEditing = false;
             element.empty();
             var doc = scope.element.documentation;
-            if (!doc)
-                doc = '<p ng-class="{placeholder: version!=\'latest\'}">(No ' + scope.panelType + ')</p>';
+            if (!doc) {
+                var p = '(No ' + scope.panelType + ')';
+                if (scope.version !== 'latest')
+                    p = '';
+                doc = '<p>' + p + '</p>';
+            }
             element.append(doc);
-            $compile(element.contents())(scope); 
+            scope.recompileScope = scope.$new();
+            $compile(element.contents())(scope.recompileScope); 
             if (mmsViewCtrl) {
                 mmsViewCtrl.elementTranscluded(scope.element);
             }
         };
 
         var recompileEdit = function() {
+            if (scope.recompileScope)
+                scope.recompileScope.$destroy();
             element.empty();
             var doc = scope.edit.documentation;
             if (!doc)
                 doc = '<p ng-class="{placeholder: version!=\'latest\'}">(No ' + scope.panelType + ')</p>';
             element.append('<div class="panel panel-info">'+doc+'</div>');
-            $compile(element.contents())(scope); 
+            scope.recompileScope = scope.$new();
+            $compile(element.contents())(scope.recompileScope); 
             if (mmsViewCtrl) {
                 mmsViewCtrl.elementTranscluded(scope.edit);
             }
@@ -169,7 +179,10 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                 // });
 
             }, function(reason) {
-                element.html('<span class="error">doc cf ' + newVal + ' not found</span>');
+                var status = ' not found';
+                if (reason.status === 410)
+                    status = ' deleted';
+                element.html('<span class="error">doc cf ' + newVal + status + '</span>');
                 growl.error('Cf Doc Error: ' + reason.message + ': ' + scope.mmsEid);
             });
         });
@@ -193,11 +206,11 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             });
 
             scope.save = function() {
-                Utils.saveAction(scope,recompile,scope.bbApi,null,type);
+                Utils.saveAction(scope,recompile,scope.bbApi,null,type,element);
             };
 
             scope.cancel = function() {
-                Utils.cancelAction(scope,recompile,scope.bbApi,type);
+                Utils.cancelAction(scope,recompile,scope.bbApi,type,element);
             };
 
             scope.addFrame = function() {
@@ -205,7 +218,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             };
 
             scope.preview = function() {
-                Utils.previewAction(scope, recompileEdit, recompile, type);
+                Utils.previewAction(scope, recompileEdit, recompile, type,element);
             };
         } 
 
@@ -218,6 +231,12 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             scope.instanceSpec = mmsViewPresentationElemCtrl.getInstanceSpec();
             scope.instanceVal = mmsViewPresentationElemCtrl.getInstanceVal();
             scope.presentationElem = mmsViewPresentationElemCtrl.getPresentationElement();
+            var auto = [ViewService.typeToClassifierId.Image, ViewService.typeToClassifierId.Paragraph,
+                ViewService.typeToClassifierId.List, ViewService.typeToClassifierId.Table];
+
+            if (auto.indexOf(scope.instanceSpec.specialization.classifier[0]) >= 0)
+            //do not allow model generated to be deleted
+                scope.isDirectChildOfPresentationElement = false;
             if (scope.isDirectChildOfPresentationElement) {
                 scope.panelTitle = scope.instanceSpec.name;
                 scope.panelType = scope.presentationElem.type; //this is hack for fake table/list/equation until we get actual editors

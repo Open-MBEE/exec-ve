@@ -46,6 +46,7 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
 
     var mmsTranscludeNameLink = function(scope, element, attrs, mmsViewCtrl) {
         var processed = false;
+        scope.recompileScope = null;
         element.click(function(e) {
             if (scope.addFrame)
                 scope.addFrame();
@@ -58,19 +59,25 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
         });
 
         var recompile = function() {
+            if (scope.recompileScope)
+                scope.recompileScope.$destroy();
             scope.isEditing = false;
             element.empty();
             element.append(defaultTemplate);
-            $compile(element.contents())(scope); 
+            scope.recompileScope = scope.$new();
+            $compile(element.contents())(scope.recompileScope); 
             if (mmsViewCtrl) {
                 mmsViewCtrl.elementTranscluded(scope.element);
             }
         };
 
         var recompileEdit = function() {
+            if (scope.recompileScope)
+                scope.recompileScope.$destroy();
             element.empty();
             element.append('<div class="panel panel-info">'+editTemplate+'</div>');
-            $compile(element.contents())(scope); 
+            scope.recompileScope = scope.$new();
+            $compile(element.contents())(scope.recompileScope); 
             if (mmsViewCtrl) {
                 mmsViewCtrl.elementTranscluded(scope.edit);
             }
@@ -106,7 +113,10 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
                     });
                 }
             }, function(reason) {
-                element.html('<span class="error">name cf ' + newVal + ' not found</span>');
+                var status = ' not found';
+                if (reason.status === 410)
+                    status = ' deleted';
+                element.html('<span class="error">name cf ' + newVal + status + '</span>');
                 growl.error('Cf Name Error: ' + reason.message + ': ' + scope.mmsEid);
             });
         });
@@ -136,11 +146,11 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
             });
 
             scope.save = function() {
-                Utils.saveAction(scope,recompile,scope.bbApi,null,type);
+                Utils.saveAction(scope,recompile,scope.bbApi,null,type,element);
             };
 
             scope.cancel = function() {
-                Utils.cancelAction(scope,recompile,scope.bbApi,type);
+                Utils.cancelAction(scope,recompile,scope.bbApi,type,element);
             };
 
             scope.addFrame = function() {
@@ -150,7 +160,7 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
             // TODO: will we ever want a delete?
 
             scope.preview = function() {
-                Utils.previewAction(scope, recompileEdit, recompile, type);
+                Utils.previewAction(scope, recompileEdit, recompile, type, element);
             };
         }
 
