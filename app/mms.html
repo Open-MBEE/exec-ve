@@ -31,7 +31,8 @@
                 <div ui-view="toolbar-right"></div>
             </div>
             <div fa-pane pane-anchor="center" class="center-view">
-                <div fa-pane pane-anchor="east" pane-size="30%" pane-handle="14" pane-min="20px" pane-closed="true" class="pane-right" ng-class="{hidden: hideRightPane}">
+                <div fa-pane pane-anchor="east" pane-size="30%" pane-handle="14" pane-min="20px" pane-closed="true" class="pane-right" ng-class="{ng-hide: hideRightPane}">
+                    HIDE RIGHT PANE {{hideRightPane}}
                     <div ui-view="pane-right"></div>
                 </div>   
                 <div fa-pane pane-anchor="center" class="pane-center">

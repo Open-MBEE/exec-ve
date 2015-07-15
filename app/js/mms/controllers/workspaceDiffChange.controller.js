@@ -40,6 +40,8 @@ function(_, $timeout, $scope, $rootScope, $state, $stateParams, $modal, growl, W
     };
 
     var stageChange = function(change) {
+      
+      // @TODO: Compare original and new owner to determine if a move has occurred
       change.staged = ! change.staged;
 
       var treeNode = null;
@@ -48,26 +50,14 @@ function(_, $timeout, $scope, $rootScope, $state, $stateParams, $modal, growl, W
       if (change.type === "added") {
         treeNode = $scope.id2node[change.delta.sysmlid];
 
-        var parentNode = $scope.id2node[change.delta.owner];
-        
         if (change.staged) {
-            if (!parentNode) {
-                $rootScope.treeData.push(treeNode);
-            } else {
-                parentNode.children.push(treeNode);
-            }
             treeNode.status = "added";
-        } else {
-            treeNode.status = "clean";
-            if (!parentNode) {
-                index = findIndexBySysMLID($rootScope.treeData, change.delta.sysmlid);
-                $rootScope.treeData.splice(index, 1);
-            } else {
-                index = findIndexBySysMLID(parentNode.children, change.delta.sysmlid);
-                parentNode.children.splice(index,1);
-            }
         }
-      } else if (change.type === "removed") {
+        else {
+            treeNode.status = "clean";
+        }
+      }
+      else if (change.type === "removed") {
         treeNode = $scope.id2node[change.original.sysmlid];
 
         if (change.staged) {
@@ -75,7 +65,8 @@ function(_, $timeout, $scope, $rootScope, $state, $stateParams, $modal, growl, W
         } else {
           treeNode.status = "clean";
         } 
-      } else if (change.type === "updated") {
+      }
+      else if (change.type === "updated") {
         treeNode = $scope.id2node[change.original.sysmlid];
 
         // handle if the name of element has changed on update
@@ -87,7 +78,8 @@ function(_, $timeout, $scope, $rootScope, $state, $stateParams, $modal, growl, W
           treeNode.status = "clean";
           treeNode.data = change.original;
         }
-      } else if (change.type === "moved") {
+      }
+      else if (change.type === "moved") {
         treeNode = $scope.id2node[change.original.sysmlid];
 
         var currentParentNode = $scope.id2node[change.original.owner];
@@ -114,7 +106,16 @@ function(_, $timeout, $scope, $rootScope, $state, $stateParams, $modal, growl, W
           newParentNode.children.splice(index,1);
 
         }
-      }      
+      }
+      
+      if(treeNode.status === "clean")
+      {
+	      treeNode.detail.stageStatus = "ignore";
+      }
+      else
+      {
+	      treeNode.detail.stageStatus = "apply";
+      }
 
       $rootScope.treeApi.refresh();
       $rootScope.treeApi.expand_all();
@@ -298,7 +299,7 @@ function(_, $timeout, $scope, $rootScope, $state, $stateParams, $modal, growl, W
 
         }; */
 
-        var createTreeNode = function (element, status) {
+        var createTreeNode = function (element, status, detailType) {
           var node = {};
           
           node.data = element;
@@ -318,7 +319,7 @@ function(_, $timeout, $scope, $rootScope, $state, $stateParams, $modal, growl, W
         ws1.elements.forEach(function(e) {
           id2data[e.sysmlid] = e;
 
-          var node = createTreeNode(e, "clean");
+          var node = createTreeNode(e, "clean", 'something');
 
           id2node[e.sysmlid] = node;
 
@@ -336,11 +337,17 @@ function(_, $timeout, $scope, $rootScope, $state, $stateParams, $modal, growl, W
 
         ws2.addedElements.forEach(function(e) {
           id2data[e.sysmlid] = e;
-          e.rowDetail = 'newElm';
-
-          var node = createTreeNode(e, "clean");
+          
+          var node = createTreeNode(e, "clean", "addition");
 
           id2node[e.sysmlid] = node;
+          
+          id2node[e.sysmlid].detail = {
+	          type: 'addition',
+	          stageStatus: 'ignore',
+	          icon: 'plus',
+	          iconType: 'added'
+          };
 
           var change = createChange(e.name, emptyElement, e, "added", "fa-plus", e);
 
@@ -361,10 +368,17 @@ function(_, $timeout, $scope, $rootScope, $state, $stateParams, $modal, growl, W
         });
 
         ws2.deletedElements.forEach(function(e) {
-
-          var deletedElement = id2data[e.sysmlid];
+	      
+	      var deletedElement = id2data[e.sysmlid];
 
           var change = createChange(deletedElement.name, deletedElement, emptyElement, "removed", "fa-times", e);
+          
+          id2node[e.sysmlid].detail = {
+	          type: 'deletion',
+	          stageStatus: 'ignore',
+	          icon: 'times',
+	          iconType: 'removed'
+          };
 
           updateChangeProperty(change.properties.name, "removed");
           updateChangeProperty(change.properties.owner, "removed");
@@ -383,12 +397,19 @@ function(_, $timeout, $scope, $rootScope, $state, $stateParams, $modal, growl, W
         });
 
         ws2.updatedElements.forEach(function(e) {
-
-          var updatedElement = id2data[e.sysmlid];
+	      
+	      var updatedElement = id2data[e.sysmlid];
 
           var deltaElement = _.cloneDeep(updatedElement);
 
           var change = createChange(updatedElement.name, updatedElement, deltaElement, "updated", "fa-pencil", e);
+          
+          id2node[e.sysmlid].detail = {
+	          type: 'modification',
+	          stageStatus: 'ignore',
+	          icon: 'pencil',
+	          iconType: 'updated'
+          };
 
           if (e.hasOwnProperty('name')) {
             change.name = e.name;
@@ -424,6 +445,20 @@ function(_, $timeout, $scope, $rootScope, $state, $stateParams, $modal, growl, W
           $scope.changes.push(change);
           $scope.id2change[e.sysmlid] = change;
 
+        });
+        
+        // Added second pass to populate additions
+        ws2.addedElements.forEach(function(e){
+            
+            var treeNode = id2node[e.sysmlid];
+            var parentNode = id2node[e.owner];
+            
+            if (!parentNode) {
+                $rootScope.treeData.push(treeNode);
+            }
+            else {
+                parentNode.children.push(treeNode);
+            }
         });
 
         /*
