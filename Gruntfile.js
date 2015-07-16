@@ -394,7 +394,7 @@ module.exports = function(grunt) {
       },
     },
 
-    clean: ["build", "dist", "docs"],
+    clean: ["app/bower_components", "build", "dist", "docs"],
 
     copy: {
       main: {
