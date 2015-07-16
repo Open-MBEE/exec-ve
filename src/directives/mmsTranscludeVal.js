@@ -52,19 +52,19 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
         var processed = false;
         scope.cfType = 'val';
         element.click(function (e) {
-                if (scope.addFrame) {
-                    scope.addFrame();
-                }
+            if (scope.addFrame) {
+                scope.addFrame();
+            }
 
-                if (mmsViewCtrl) {
-                    mmsViewCtrl.transcludeClicked(scope.mmsEid);
-                }
+            if (mmsViewCtrl) {
+                mmsViewCtrl.transcludeClicked(scope.mmsEid);
+            }
 
-                /*if (e.target.tagName !== 'A' && e.target.tagName !== 'INPUT' && !scope.isEditing) //need review for inline editing (boolean and nested)
-                 return false;
-                 if (scope.isEditing)*/
-                e.stopPropagation();
-            });
+            /*if (e.target.tagName !== 'A' && e.target.tagName !== 'INPUT' && !scope.isEditing) //need review for inline editing (boolean and nested)
+             return false;
+             if (scope.isEditing)*/
+            e.stopPropagation();
+        });
 
         var recompile = function () {
             if (scope.recompileScope) {
@@ -78,23 +78,18 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
             var isConstraint = false;
 
             for (var i = 0; i <
-            scope.values.length; i++)
-            {
+            scope.values.length; i++) {
                 if (scope.values[i].type ===
-                    'LiteralString')
-                {
+                    'LiteralString') {
                     areStrings = true;
                     var s = scope.values[i].string;
-                    if (s.indexOf('<p>') ===
-                        -1)
-                    {
+                    if (s.indexOf('<p>') === -1) {
                         s = s.replace('<', '&lt;');
                     }
                     toCompileList.push(s);
                     console.log("Lit string");
                 } else if (scope.values[i].type ===
-                    "Expression")
-                {
+                    "Expression") {
                     isExpression = true;
                     console.log("Tis an expressions");
                     break;
@@ -109,13 +104,13 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                 // Expression
                 $http.get(URLService.getElementURL(scope.mmsEid, scope.ws, scope.version) +
                     '?evaluate').success(function (data, status, headers, config) {
-                        if (isExpression) {
-                            element.html(data.elements[0].evaluationResult);
-                        }
-                    }).error(function (data, status, headers, config) {
-                        //URLService.handleHttpStatus(data, status, headers, config, deferred);
-                        //TODO: Needs case statement when .error is thrown
-                    });
+                    if (isExpression) {
+                        element.html(data.elements[0].evaluationResult);
+                    }
+                }).error(function (data, status, headers, config) {
+                    //URLService.handleHttpStatus(data, status, headers, config, deferred);
+                    //TODO: Needs case statement when .error is thrown
+                });
                 return;
             } else {
                 element.empty();
@@ -123,16 +118,14 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                 if (scope.values.length ===
                     0 ||
                     Object.keys(scope.values[0]).length <
-                    2)
-                {
+                    2) {
                     element.html('<span>' +
                         ((scope.version ===
                         'latest') ? '(no value)' : '') +
                         '</span>');
                 } else if (areStrings) {
                     var toCompile = toCompileList.join(' ');
-                    if (toCompile === '')
-                    {
+                    if (toCompile === '') {
                         element.html('<span>' +
                             ((scope.version ===
                             'latest') ? '(no value)' : '') +
@@ -143,9 +136,9 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                     $compile(element.contents())(scope.recompileScope);
                 } else if (UtilsService.isRestrictedValue(scope.values)) {
                     ElementService.getElement(scope.values[0].operand[1].element, false, scope.ws, scope.version).then(function (e) {
-                            scope.isRestrictedVal = true;
-                            element.html(e.name);
-                        });
+                        scope.isRestrictedVal = true;
+                        element.html(e.name);
+                    });
                 } else {
                     element.append(valTemplate);
                     $compile(element.contents())(scope.recompileScope);
@@ -163,16 +156,12 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
             var toCompileList = [];
             var areStrings = false;
             for (var i = 0; i <
-            scope.editValues.length; i++)
-            {
+            scope.editValues.length; i++) {
                 if (scope.editValues[i].type ===
-                    'LiteralString')
-                {
+                    'LiteralString') {
                     areStrings = true;
                     var s = scope.editValues[i].string;
-                    if (s.indexOf('<p>') ===
-                        -1)
-                    {
+                    if (s.indexOf('<p>') === -1) {
                         s = s.replace('<', '&lt;');
                     }
                     toCompileList.push(s);
@@ -185,8 +174,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
             if (scope.editValues.length ===
                 0 ||
                 Object.keys(scope.editValues[0]).length <
-                2)
-            {
+                2) {
                 element.html('<span' +
                     ((scope.version ===
                     'latest') ? '' : ' class="placeholder"') +
@@ -194,8 +182,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
             } else if (areStrings) {
                 var toCompile = toCompileList.join(' ');
                 if (toCompile ===
-                    '')
-                {
+                    '') {
                     element.html('<span' +
                         ((scope.version ===
                         'latest') ? '' : ' class="placeholder"') +
@@ -208,8 +195,8 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                 $compile(element.contents())(scope.recompileScope);
             } else if (UtilsService.isRestrictedValue(scope.editValues)) {
                 ElementService.getElement(scope.editValues[0].operand[1].element, false, scope.ws, scope.version).then(function (e) {
-                        element.html(e.name);
-                    });
+                    element.html(e.name);
+                });
             } else {
                 element.append(editTemplate);
                 $compile(element.contents())(scope.recompileScope);
@@ -217,80 +204,75 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
         };
 
         var idwatch = scope.$watch('mmsEid', function (newVal, oldVal) {
-                if (!newVal) {
-                    return;
+            if (!newVal) {
+                return;
+            }
+            idwatch();
+            if (UtilsService.hasCircularReference(scope, scope.mmsEid, 'val')) {
+                //$log.log("prevent circular dereference!");
+                element.html('<span class="error">Circular Reference!</span>');
+                return;
+            }
+            var ws = scope.mmsWs;
+            var version = scope.mmsVersion;
+            if (mmsViewCtrl) {
+                var viewVersion = mmsViewCtrl.getWsAndVersion();
+                if (!ws) {
+                    ws = viewVersion.workspace;
                 }
-                idwatch();
-                if (UtilsService.hasCircularReference(scope, scope.mmsEid, 'val')) {
-                    //$log.log("prevent circular dereference!");
-                    element.html('<span class="error">Circular Reference!</span>');
-                    return;
+                if (!version) {
+                    version = viewVersion.version;
                 }
-                var ws = scope.mmsWs;
-                var version = scope.mmsVersion;
-                if (mmsViewCtrl) {
-                    var viewVersion = mmsViewCtrl.getWsAndVersion();
-                    if (!ws) {
-                        ws = viewVersion.workspace;
-                    }
-                    if (!version) {
-                        version = viewVersion.version;
-                    }
+            }
+            scope.ws = ws;
+            scope.version = version ? version : 'latest';
+            ElementService.getElement(scope.mmsEid, false, ws, version).then(function (data) {
+                scope.element = data;
+                scope.values = scope.element.specialization.value;
+                if (scope.element.specialization.type ===
+                    'Constraint' &&
+                    scope.element.specialization.specification) {
+                    scope.values = [scope.element.specialization.specification];
                 }
-                scope.ws = ws;
-                scope.version = version ? version : 'latest';
-                ElementService.getElement(scope.mmsEid, false, ws, version).then(function (data) {
-                        scope.element = data;
-                        scope.values = scope.element.specialization.value;
-                        if (scope.element.specialization.type ===
-                            'Constraint' &&
-                            scope.element.specialization.specification)
-                        {
-                            scope.values = [scope.element.specialization.specification];
+                if (scope.element.specialization.type ===
+                    'Expression') {
+                    scope.values = [scope.element.specialization];//TODO : Assigned spec type :
+                    // expression
+                    // into it's own value
+                }
+                recompile();
+                //scope.$watch('values', recompile, true);
+                if (scope.version ===
+                    'latest') {
+                    scope.$on('element.updated', function (event, eid, ws, type) {
+                        if (eid ===
+                            scope.mmsEid &&
+                            ws ===
+                            scope.ws &&
+                            (type ===
+                            'all' ||
+                            type ===
+                            'value')) {
+                            recompile();
                         }
-                        if (scope.element.specialization.type ===
-                            'Expression')
-                        {
-                            scope.values = [scope.element.specialization];//TODO : Assigned spec type :
-                            // expression
-                            // into it's own value
-                        }
-                        recompile();
-                        //scope.$watch('values', recompile, true);
-                        if (scope.version ===
-                            'latest')
-                        {
-                            scope.$on('element.updated', function (event, eid, ws, type) {
-                                    if (eid ===
-                                        scope.mmsEid &&
-                                        ws ===
-                                        scope.ws &&
-                                        (type ===
-                                        'all' ||
-                                        type ===
-                                        'value'))
-                                    {
-                                        recompile();
-                                    }
-                                });
-                        }
-                    }, function (reason) {
-                        var status = ' not found';
-                        if (reason.status ===
-                            410)
-                        {
-                            status = ' deleted';
-                        }
-                        element.html('<span class="error">value cf ' +
-                            newVal +
-                            status +
-                            '</span>');
-                        growl.error('Cf Val Error: ' +
-                            reason.message +
-                            ': ' +
-                            scope.mmsEid);
                     });
+                }
+            }, function (reason) {
+                var status = ' not found';
+                if (reason.status ===
+                    410) {
+                    status = ' deleted';
+                }
+                element.html('<span class="error">value cf ' +
+                    newVal +
+                    status +
+                    '</span>');
+                growl.error('Cf Val Error: ' +
+                    reason.message +
+                    ': ' +
+                    scope.mmsEid);
             });
+        });
 
         scope.hasHtml = function (s) {
             return Utils.hasHtml(s);
@@ -301,20 +283,16 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
         };
         scope.addValue = function (type) {
             if (type ===
-                'LiteralBoolean')
-            {
+                'LiteralBoolean') {
                 scope.editValues.push({type: type, boolean: false});
             } else if (type ===
-                'LiteralInteger')
-            {
+                'LiteralInteger') {
                 scope.editValues.push({type: type, integer: 0});
             } else if (type ===
-                'LiteralString')
-            {
+                'LiteralString') {
                 scope.editValues.push({type: type, string: ''});
             } else if (type ===
-                'LiteralReal')
-            {
+                'LiteralReal') {
                 scope.editValues.push({type: type, double: 0.0});
             }
         };
@@ -335,8 +313,8 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
             mmsViewCtrl.registerPresenElemCallBack(callback);
 
             scope.$on('$destroy', function () {
-                    mmsViewCtrl.unRegisterPresenElemCallBack(callback);
-                });
+                mmsViewCtrl.unRegisterPresenElemCallBack(callback);
+            });
 
             scope.save = function () {
                 Utils.saveAction(scope, recompile, scope.bbApi, null, type, element);
@@ -350,12 +328,12 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                 if (scope.isRestrictedVal) {
                     var options = [];
                     scope.values[0].operand[2].operand.forEach(function (o) {
-                            options.push(o.element);
-                        });
+                        options.push(o.element);
+                    });
                     ElementService.getElements(options, false, scope.ws, scope.version).then(function (elements) {
-                            scope.options = elements;
-                            Utils.addFrame(scope, mmsViewCtrl, element, frameTemplate);
-                        });
+                        scope.options = elements;
+                        Utils.addFrame(scope, mmsViewCtrl, element, frameTemplate);
+                    });
                 } else {
                     Utils.addFrame(scope, mmsViewCtrl, element, frameTemplate);
                 }
