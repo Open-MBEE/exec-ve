@@ -81,6 +81,12 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                 angular.element('.btn-search-id').removeClass('active');
                 angular.element('.btn-search-' + searchType).addClass('active');
             };
+            $scope.setFilterFacet = function(filterFacet) {
+                if(filterFacet === 'all') $scope.facet = '$';
+                else  $scope.facet = filterFacet;
+                angular.element('.search-filter-type button').removeClass('active');
+                angular.element('.btn-filter-facet-' + filterFacet).addClass('active');
+            };
             $scope.choose = function(elementId, property, name) {
                 var tag = '<mms-transclude-' + property + ' data-mms-eid="' + elementId + '">[cf:' + name + '.' + property + ']</mms-transclude-' + property + '> ';
                 $modalInstance.close(tag);
@@ -190,6 +196,12 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                     $modalInstance.close(false);
                 }
             };
+            
+            $scope.facet = '$';
+            $scope.$watchGroup(['filterQuery', 'facet'], function(newVal, oldVal){
+	            $scope.searchFilter = {};
+	            $scope.searchFilter[$scope.facet] = $scope.filterQuery;
+            });
         };
 
         var autocompleteCallback = function(ed) {

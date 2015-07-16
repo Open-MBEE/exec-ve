@@ -77,8 +77,12 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             scope.isEditing = false;
             element.empty();
             var doc = scope.element.documentation;
-            if (!doc)
-                doc = '<p ng-class="{placeholder: version!=\'latest\'}">(No ' + scope.panelType + ')</p>';
+            if (!doc) {
+                var p = '(No ' + scope.panelType + ')';
+                if (scope.version !== 'latest')
+                    p = '';
+                doc = '<p>' + p + '</p>';
+            }
             element.append(doc);
             scope.recompileScope = scope.$new();
             $compile(element.contents())(scope.recompileScope); 
