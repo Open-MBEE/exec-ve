@@ -1,6 +1,9 @@
 'use strict';
 
 angular.module('mmsApp', ['mms', 'mms.directives'])
+.config(function($httpProvider) {
+    $httpProvider.defaults.headers.get = {'Authorization':'Basic bGhvOkNoQG5nMy5uMFcyMDM0'};
+})
 .controller('FullDocCtrl2', ['$scope', '$window', 'ElementService', 'ViewService', 'ConfigService', 
     function($scope, $window, ElementService, ViewService, ConfigService){
     var url = $window.location.href;

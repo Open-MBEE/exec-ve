@@ -27,6 +27,6 @@
 	 <a class="btn btn-success btn-xs" ng-click="compare()">COMPARE <i ng-show="comparing" class="fa fa-spin fa-spinner"></i></a>
   </div>
 
- <mms-tree search="search" tree-data="my_data" section-numbering="treeSectionNumbering" tree-control="treeApi" on-select="my_tree_handler(branch)" initial-selection="{{mms_treeInitial}}" options="tree_options"></mms-tree>
+ <mms-tree search="search" tree-data="my_data" section-numbering="treeSectionNumbering" tree-control="treeApi" on-select="my_tree_handler(branch)" expand-level="{{treeExpandLevel}}" initial-selection="{{mms_treeInitial}}" options="tree_options"></mms-tree>
 
 </div>
