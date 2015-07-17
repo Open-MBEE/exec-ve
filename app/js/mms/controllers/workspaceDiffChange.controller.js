@@ -3,13 +3,15 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('WorkspaceDiffChangeController', ["_", "$timeout", "$scope", "$rootScope", "$state", "$stateParams", "$modal", "growl", "WorkspaceService", "ElementService", "diff",
-function(_, $timeout, $scope, $rootScope, $state, $stateParams, $modal, growl, WorkspaceService, ElementService, diff) {
 .controller('WorkspaceDiffChangeController', ["_", "$timeout", "$scope", "$rootScope", "$state", "$stateParams", "$modal", "growl", "WorkspaceService", "ElementService", "UxService", "diff",
 function(_, $timeout, $scope, $rootScope, $state, $stateParams, $modal, growl, WorkspaceService, ElementService, UxService, diff) {
 
     var ws1 = $stateParams.target;
     var ws2 = $stateParams.source;
+    console.info("Workspace 1");
+    console.log(ws1);
+    console.info("Workspace 2");
+    console.log(ws2);
 
     $scope.treeApi = {};
 
@@ -267,8 +269,12 @@ function(_, $timeout, $scope, $rootScope, $state, $stateParams, $modal, growl, W
           change.delta = deltaElement;
           change.type = changeType;
           change.icon = changeIcon;
+          // @test var
           change.changeTypeName = UxService.getChangeTypeName(change.type);
           change.typeIcon = UxService.getTypeIcon(change.delta.specialization.type);
+          console.info("change.typeIcon");
+          console.log(change.typeIcon);
+
           change.staged = false;
           change.ws2object = ws2object;
 
@@ -294,6 +300,10 @@ function(_, $timeout, $scope, $rootScope, $state, $stateParams, $modal, growl, W
               updateChangeProperty(change.properties.specialization[property], "clean");
             });
           }
+
+          // @remove
+          console.info("change.delta");
+          console.log(change.delta);
 
           return change;
         };
@@ -435,8 +445,17 @@ function(_, $timeout, $scope, $rootScope, $state, $stateParams, $modal, growl, W
             updateChangeProperty(change.properties.specialization.values, "updated");
           } */
 
+          console.info("ws2.updatedElements.forEach()");
+          console.log(change);
+
           $scope.changes.push(change);
           $scope.id2change[e.sysmlid] = change;
+          console.info("$scope.changes");
+          console.log($scope.changes);
+          console.info("$scope.changes modifiers");
+          $scope.changes.forEach(function(change){
+            console.log(change.delta.modifier);
+          });
 
         });
 
@@ -469,6 +488,12 @@ function(_, $timeout, $scope, $rootScope, $state, $stateParams, $modal, growl, W
         $rootScope.id2change = id2change;
 
         refreshStageCounters();
+
+        /* console.info("setupChangesList");
+        console.info("ws1.elements");
+        console.log(ws1.elements); */
+        console.info("ws2 name");
+        console.log(ws2.name);
         $scope.workspace1Name = ws1.name;
     };
 

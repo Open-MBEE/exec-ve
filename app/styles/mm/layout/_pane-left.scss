@@ -5,8 +5,6 @@
   }
 
   .btn-staging {
-    height: 17px;
-    width: 30px;
     padding: 8px 12px;
     margin: 0px 5px;
     background-color: $highlight_grey;
@@ -78,9 +76,16 @@
         font-size: 14px;
         vertical-align: middle;
         border: 0;
-        padding: 2px 0 2px 0;
         padding: 2px 4px 2px 4px;
         background-color: inherit !important;
+
+        /* Remove */
+        /*width: 150px;*/
+        width: 20%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        /**********/
 
         &:first-child {
           width: 25%;
