@@ -238,7 +238,17 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
             targetTime = $scope.mergeTo.data.timestamp;
         }
         $scope.comparing = true;
-        $state.go('workspace.diff', {source: sourceWs, target: targetWs, sourceTime: sourceTime, targetTime: targetTime});
+        //try background diff
+        WorkspaceService.diff(targetWs, sourceWs, targetTime, sourceTime)
+        .then(function(data) {
+            if (data.status === 'GENERATING') {
+                growl.info("tell user to wait for email");
+                $scope.comparing = false;
+                return;
+            }
+            $state.go('workspace.diff', {source: sourceWs, target: targetWs, sourceTime: sourceTime, targetTime: targetTime});
+        });
+        //$state.go('workspace.diff', {source: sourceWs, target: targetWs, sourceTime: sourceTime, targetTime: targetTime});
     };
 
     // Filter out alfresco sites
