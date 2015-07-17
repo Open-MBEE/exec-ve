@@ -7,6 +7,8 @@
   .btn-staging {
     height: 17px;
     width: 30px;
+    padding: 8px 12px;
+    margin: 0px 5px;
     background-color: $highlight_grey;
     @include box-shadow(none);
 
@@ -17,8 +19,22 @@
     i {
       position: relative;
       top: 50%;
-      @include transform(translateY(-50%));
+      /*@include transform(translateY(-50%));*/
     }
+  }
+
+  #merge-btn {
+    width: 100%;
+    font-size: 12pt;
+  }
+
+  #merge-btn-container {
+    width: 100%;
+    padding-left: 20px;
+    padding-right: 10px;
+    text-align: center;
+    position: absolute;
+    bottom: 20px;
   }
 
   .btn-stage-all {
@@ -49,6 +65,10 @@
   }
 
   table {
+
+    table-layout: fixed;
+    min-width: 555px;
+
     tr {
       &:hover {
         background-color: $tertiary_grey;
@@ -59,15 +79,32 @@
         vertical-align: middle;
         border: 0;
         padding: 2px 0 2px 0;
+        padding: 2px 4px 2px 4px;
         background-color: inherit !important;
 
         &:first-child {
+          width: 25%;
+          padding-left: 20px;
+        };
+
+        &:last-child {
+          text-align: right;
+          width: 15%;
+          padding-right: 5px;
+        };
+
+        /*&:first-child {
           width: 50px;
           padding-left: 20px;
         }
 
         &:nth-child(2) {
           width: 200px;
+        }*/
+
+        & i {
+          width: 20px;
+          text-align: center;
         }
       }
     }

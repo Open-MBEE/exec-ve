@@ -2,8 +2,7 @@
 
 /* Controllers */
 
-angular.module('mmsApp')
-.controller('WorkspaceDiffChangeController', ["_", "$timeout", "$scope", "$rootScope", "$state", "$stateParams", "$modal", "growl", "WorkspaceService", "ElementService", "diff", "UxService", "paneManager",
+angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$timeout", "$scope", "$rootScope", "$state", "$stateParams", "$modal", "growl", "WorkspaceService", "ElementService", "diff", "UxService", "paneManager",
 function(_, $timeout, $scope, $rootScope, $state, $stateParams, $modal, growl, WorkspaceService, ElementService, diff, UxService, paneManager) {
 
     var ws1 = $stateParams.target;
@@ -27,6 +26,8 @@ function(_, $timeout, $scope, $rootScope, $state, $stateParams, $modal, growl, W
 
     $scope.stagedCounter = 0;
     $scope.unstagedCounter = 0;
+
+    $scope.workspace1Name = ""; 
 
     $scope.options = {
       types: UxService.getTreeTypes(),
@@ -253,6 +254,8 @@ function(_, $timeout, $scope, $rootScope, $state, $stateParams, $modal, growl, W
           change.delta = deltaElement;
           change.type = changeType;
           change.icon = changeIcon;
+          change.changeTypeName = UxService.getChangeTypeName(change.type);
+          change.typeIcon = UxService.getTypeIcon(change.delta.specialization.type);
           change.staged = false;
           change.ws2object = ws2object;
 
@@ -488,6 +491,7 @@ function(_, $timeout, $scope, $rootScope, $state, $stateParams, $modal, growl, W
         $rootScope.id2change = id2change;
 
         refreshStageCounters();
+        $scope.workspace1Name = ws1.name;
     };
     
     // Hiding the right-hand pane
