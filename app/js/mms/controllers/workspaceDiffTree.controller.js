@@ -7,8 +7,6 @@ angular.module('mmsApp')
 function(_, $timeout, $scope, $rootScope, $state, $stateParams, $modal, growl, WorkspaceService, ElementService, diff, UxService) {
 
     $scope.treeApi = {};
-    
-    $rootScope.hideRightPane = true;
 
     $scope.treeData = [];
     
@@ -29,5 +27,6 @@ function(_, $timeout, $scope, $rootScope, $state, $stateParams, $modal, growl, W
 
     $rootScope.options = options;
 
-    $timeout(function () { $scope.treeApi.refresh(); $scope.treeApi.expand_all(); $rootScope.treeApi = $scope.treeApi; } ); 
+    $timeout(function () { $scope.treeApi.refresh(); $scope.treeApi.expand_all(); $rootScope.treeApi = $scope.treeApi; } );
+    
 }]);

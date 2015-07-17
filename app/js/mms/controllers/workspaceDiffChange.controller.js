@@ -3,8 +3,8 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('WorkspaceDiffChangeController', ["_", "$timeout", "$scope", "$rootScope", "$state", "$stateParams", "$modal", "growl", "WorkspaceService", "ElementService", "diff", "UxService",
-function(_, $timeout, $scope, $rootScope, $state, $stateParams, $modal, growl, WorkspaceService, ElementService, diff, UxService) {
+.controller('WorkspaceDiffChangeController', ["_", "$timeout", "$scope", "$rootScope", "$state", "$stateParams", "$modal", "growl", "WorkspaceService", "ElementService", "diff", "UxService", "paneManager",
+function(_, $timeout, $scope, $rootScope, $state, $stateParams, $modal, growl, WorkspaceService, ElementService, diff, UxService, paneManager) {
 
     var ws1 = $stateParams.target;
     var ws2 = $stateParams.source;
@@ -223,8 +223,6 @@ function(_, $timeout, $scope, $rootScope, $state, $stateParams, $modal, growl, W
 
       $state.go('workspace.diff.view', {elementId: elementId});
     };
-
-
 
     // Diff the two workspaces picked in the Workspace Picker
     /* WorkspaceService.diff(ws1, ws2).then(
@@ -491,6 +489,21 @@ function(_, $timeout, $scope, $rootScope, $state, $stateParams, $modal, growl, W
 
         refreshStageCounters();
     };
+    
+    // Hiding the right-hand pane
+    paneManager.get("right-pane").setOptions({
+        closed: true,
+        noToggle: true,
+        handle: 0
+    });
+    
+    // Showing the right-hand pane once we leave the diff view
+    $scope.$on('$destroy', function() {
+        paneManager.get("right-pane").setOptions({
+            noToggle: false,
+            handle: 14
+        });
+    });
 
     $timeout(function () { setupChangesList(diff.workspace1, diff.workspace2); } ); 
 }]);

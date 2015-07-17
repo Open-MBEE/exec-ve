@@ -55,6 +55,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
         }
 
     });
+    
 
     $stateProvider
     .state('workspaces', {

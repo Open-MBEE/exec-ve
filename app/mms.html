@@ -27,12 +27,11 @@
             <div fa-pane pane-anchor="west" pane-size="20%" pane-handle="13" pane-min="20px" class="west-tabs">
                 <div ui-view="pane-left" class="container-pane-left" style="display:table;"></div>
             </div>
-            <div fa-pane pane-anchor="east" pane-size="41px" pane-no-toggle="true">
+            <div fa-pane="toolbar" pane-anchor="east" pane-size="41px" pane-no-toggle="true">
                 <div ui-view="toolbar-right"></div>
             </div>
             <div fa-pane pane-anchor="center" class="center-view">
-                <div fa-pane pane-anchor="east" pane-size="30%" pane-handle="14" pane-min="20px" pane-closed="true" class="pane-right" ng-class="{ng-hide: hideRightPane}">
-                    HIDE RIGHT PANE {{hideRightPane}}
+                <div fa-pane="right-pane" pane-anchor="east" pane-size="30%" pane-handle="14" pane-closed="true" class="pane-right">
                     <div ui-view="pane-right"></div>
                 </div>   
                 <div fa-pane pane-anchor="center" class="pane-center">
