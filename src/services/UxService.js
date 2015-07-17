@@ -246,13 +246,28 @@ function UxService($rootScope) {
 		  	return "fa-file";
 		  case "workspace":
 		  	return "fa-tasks";
+      default:
+        return "fa-square";
         }
 	};
+
+  var getChangeTypeName = function(type) {
+    type = type.toLowerCase();
+    switch (type) {
+      case "added":
+        return "Addition";
+      case "updated":
+        return "Modification";
+      case "removed":
+        return "Removal";
+    }
+  };
 
     return {
     	getButtonBarButton: getButtonBarButton,
         getToolbarButton: getToolbarButton,
         getTypeIcon: getTypeIcon,
+        getChangeTypeName: getChangeTypeName,
         getTreeTypes: getTreeTypes
     };
 }

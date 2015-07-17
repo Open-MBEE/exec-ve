@@ -5,6 +5,8 @@
 angular.module('mmsApp')
 .controller('WorkspaceDiffChangeController', ["_", "$timeout", "$scope", "$rootScope", "$state", "$stateParams", "$modal", "growl", "WorkspaceService", "ElementService", "diff",
 function(_, $timeout, $scope, $rootScope, $state, $stateParams, $modal, growl, WorkspaceService, ElementService, diff) {
+.controller('WorkspaceDiffChangeController', ["_", "$timeout", "$scope", "$rootScope", "$state", "$stateParams", "$modal", "growl", "WorkspaceService", "ElementService", "UxService", "diff",
+function(_, $timeout, $scope, $rootScope, $state, $stateParams, $modal, growl, WorkspaceService, ElementService, UxService, diff) {
 
     var ws1 = $stateParams.target;
     var ws2 = $stateParams.source;
@@ -27,6 +29,8 @@ function(_, $timeout, $scope, $rootScope, $state, $stateParams, $modal, growl, W
 
     $scope.stagedCounter = 0;
     $scope.unstagedCounter = 0;
+
+    $scope.workspace1Name = ""; 
 
     $scope.options = {
       types: {
@@ -263,6 +267,8 @@ function(_, $timeout, $scope, $rootScope, $state, $stateParams, $modal, growl, W
           change.delta = deltaElement;
           change.type = changeType;
           change.icon = changeIcon;
+          change.changeTypeName = UxService.getChangeTypeName(change.type);
+          change.typeIcon = UxService.getTypeIcon(change.delta.specialization.type);
           change.staged = false;
           change.ws2object = ws2object;
 
@@ -463,6 +469,7 @@ function(_, $timeout, $scope, $rootScope, $state, $stateParams, $modal, growl, W
         $rootScope.id2change = id2change;
 
         refreshStageCounters();
+        $scope.workspace1Name = ws1.name;
     };
 
     $timeout(function () { setupChangesList(diff.workspace1, diff.workspace2); } ); 

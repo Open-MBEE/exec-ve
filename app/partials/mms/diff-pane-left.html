@@ -3,6 +3,7 @@
 	<table>
 
 		<h3>Differences<button ng-show="unstagedCounter" ng-click="stageAllUnstaged(changes)" type="button" class="btn btn-staging btn-stage-all"  tooltip="Stage All Changes" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="right" tooltip-append-to-body="true"><i class="fa fa-2x fa-arrow-circle-o-down"></i></button></h3>
+		<h3>Changes to Ignore<button ng-show="unstagedCounter" ng-click="stageAllUnstaged(changes)" type="button" class="btn btn-staging btn-stage-all"  tooltip="Stage All Changes" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="right" tooltip-append-to-body="true"><i class="fa fa-2x fa-arrow-circle-o-down"></i>Apply All</button></h3>
 
 
 	    <tr ng-click="selectChange(change)" ng-repeat="change in changes | filter: {staged: false}">
@@ -11,6 +12,14 @@
 	        <td>
 	        	<button ng-click="stageChange(change)" type="button" class="btn btn-staging" tooltip="Stage Change" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="right" tooltip-append-to-body="true"><i class="fa fa-arrow-down"></i></button>
 	        </td>
+	    <tr ng-click="selectChange(change)" ng-repeat="change in changes | filter: {staged: false}">
+	        <td tooltip="{{change.name}}" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" tooltip-append-to-body="true" tooltip-class="tooltip-test">{{change.name}}</td>
+	        <td><i class="fa {{change.icon}} icon-{{change.type}}"></i>   {{change.changeTypeName}}</td>
+	        <td><i class="fa {{change.typeIcon}}"></i>{{change.delta.specialization.type || change.original.specialization.type}}</td>
+	        <td>{{change.delta.modifier}}</td>
+	        <td>
+	        	<button ng-click="stageChange(change)" type="button" class="btn btn-staging"><i class="fa fa-arrow-down"></i>Apply</button>
+	        </td>
 	    </tr>
 
 	</table>
@@ -18,12 +27,21 @@
 	<table>
 
 		<h3>Staged Changes<button ng-show="stagedCounter" ng-click="unstageAllStaged(changes)" type="button" class="btn btn-staging btn-unstage-all"  tooltip="Unstage All Changes" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="right" tooltip-append-to-body="true"><i class="fa fa-2x fa-arrow-circle-o-up"></i></button></h3>
+		<h3>Changes to Apply to {{workspace1Name}}<button ng-show="stagedCounter" ng-click="unstageAllStaged(changes)" type="button" class="btn btn-staging btn-unstage-all"  tooltip="Unstage All Changes" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="right" tooltip-append-to-body="true"><i class="fa fa-2x fa-arrow-circle-o-up"></i>Ignore All</button></h3>
 
 	    <tr ng-click="selectChange(change)" ng-repeat="change in changes | filter: {staged: true}">
 	        <td><i class="fa {{change.icon}} icon-{{change.type}}"><i></td>
+	        <td><i class="fa {{change.icon}} icon-{{change.type}}"></i></td>
 	        <td>{{change.delta.specialization.type || change.original.specialization.type}}: {{change.name}}</td>
 	        <td>
 	        	<button ng-click="stageChange(change)" type="button" class="btn btn-staging" tooltip="Unstage Change" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="right" tooltip-append-to-body="true"><i class="fa fa-arrow-up"></i></button>
+	    <tr ng-click="selectChange(change)" ng-repeat="change in changes | filter: {staged: true}">
+	        <td>{{change.name}}</td>
+	        <td><i class="fa {{change.icon}} icon-{{change.type}}"></i>   {{change.changeTypeName}}</td>
+	        <td><i class="fa {{change.typeIcon}}"></i>{{change.delta.specialization.type || change.original.specialization.type}}</td>
+	        <td>{{change.delta.modifier}}</td>
+	        <td>
+	        	<button ng-click="stageChange(change)" type="button" class="btn btn-staging"><i class="fa fa-arrow-up"></i>Ignore</button>
 	        </td>
 	    </tr>
 
@@ -31,5 +49,8 @@
 
    <button type="button" ng-click="mergeStagedChanges()" class="btn btn-success">SAVE CHANGES <i class="fa fa-spin fa-spinner" ng-show="saving"></i></button>
    <button type="button" ng-click="goBack()" class="btn btn-danger">CANCEL</button>
+   <div id="merge-btn-container">
+		<button type="button" ng-click="mergeStagedChanges()" class="btn btn-success" id="merge-btn">Apply Changes to {{workspace1Name}}<i class="fa fa-spin fa-spinner" ng-show="saving"></i></button>
+   </div>
 
 </div>
