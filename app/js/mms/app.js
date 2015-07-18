@@ -10,6 +10,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
 
             var queryParams = '';
             var pathArr = locationPath.split('/');
+            // var diff = '';
 
             // determine if this came from docweb.html or ve.html, is there a product?
             if (locationPath.indexOf('/products/') !== -1) {
@@ -586,6 +587,63 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
             }
         },
         views: {
+            // 'menu@':{
+            //     template: '<mms-nav mms-title="View Editor" mms-ws="{{workspace}}" mms-site="site" mms-config="tag" mms-show-tag="{{showTag}}"></mms-nav>',
+            //     controller: function ($scope, $filter, $rootScope, workspace, site, document, tag, snapshots, time, docFilter) {
+            //         $scope.workspace = workspace;
+            //         $scope.tag = tag;
+            //         $scope.site = site;
+
+            //         $scope.showTag = true;
+            //         $rootScope.mms_title = 'View SOmeee: ';
+
+            //         var tagStr = 'helllooooo';
+            //         // if (time !== 'latest') {
+            //         //     snapshots.forEach(function(snapshot) {
+            //         //         if (filtered[document.sysmlid])
+            //         //             return;
+            //         //         if (time === snapshot.created && snapshot.configurations && snapshot.configurations.length > 0)
+            //         //             snapshot.configurations.forEach(function(config) {
+            //         //                 tagStr += '( <i class="fa fa-tag"></i> ' + config.name + ' ) ';
+            //         //                 $scope.tag = config;
+            //         //             });
+            //         //     });
+            //         //     tagStr += '( <i class="fa fa-camera"></i> ' + $filter('date')(time, 'M/d/yy h:mm a') + ' )';
+            //         //     if (filtered[document.sysmlid])
+            //         //         $scope.showTag = false;
+            //         //     $scope.snapshotTag = ' ' + tagStr;
+            //         // }                                        
+            //     }
+            // },
+            // 'menu@': {
+            //     template: '<mms-nav mms-title="Portal" mms-ws="{{workspace}}" mms-site="site" mms-config="tag"></mms-nav>',
+            //     controller: function ($scope, $rootScope, workspace, site, tag, workspaceObj) {
+            //         $scope.workspace = workspace;
+            //         $scope.tag = tag;
+            //         $scope.site = site;
+            //         $rootScope.mms_title = 'Diff: '+workspaceObj.name;
+            //     }
+            // },
+
+
+            'menu@':{
+                template: '<mms-nav mms-title="Portal" mms-ws="{{workspace}}" mms-site="site" mms-config="tag"></mms-nav>',
+                controller: function ($scope, $rootScope, workspace, site, tag, workspaceObj) {
+                // $scope.workspace = workspace;
+                // $scope.tag = tag;
+                // $scope.laura = 'hiiii laura';
+                // $scope.site = 'DiffMerge';
+                // $rootScope.mms_title = 'Diff: ';//+workspaceObj.name;
+                $scope.diff = 'yes';
+                $rootScope.mms_title = 'Diff';
+
+
+
+
+
+                }
+            },
+
             'pane-center@': {
                 templateUrl: 'partials/mms/diff-pane-center.html'
             },
