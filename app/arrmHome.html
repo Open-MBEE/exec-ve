@@ -45,10 +45,10 @@
 	  border: 2px solid black;
 	}*/
 	div.transbox {
-	    margin: 20px;
+	    margin: 20px 60px;
 	    background-color: #000000;
 	    border: 1px solid black;
-	    opacity: 0.7;
+	    opacity: 0.8;
 	    filter: alpha(opacity=30); /* For IE8 and earlier */
 	}
 
@@ -72,9 +72,9 @@
 
 	div.transbox h3 {
 	    /*margin: 30% 5%;*/
-	    /*font-weight: 100%;*/
+	    /*font-weight: 130%;*/
 	    font-size:130%;
-	    /*font-weight: bold;*/
+	    font-weight: 600;
 	    color: #ff0000;
 	   	width: auto;
 	    overflow-x: auto;
@@ -96,21 +96,44 @@
 	  margin-right: auto;
 	} 
 
-	ul {
+
+
+	div.transboxRed {
+	    margin: 20px;
+	    background-color: #B20000;
+	    border: 1px solid white;
+	    opacity: 0.6;
+	    filter: alpha(opacity=30); /* For IE8 and earlier */
+	}
+
+
+	div.transboxRed ul {
 	    list-style-type: none;
 /*	    margin: 0;
 	    padding: 0;*/
 	    text-align:center;
 	}
 
-	li {
+	div.transboxRed li {
 	    display: inline;
 	    color:white;
 	}
 
 	a{
 		color:white;
+		font-size:130%;
 	}
+
+
+	.arrow-left {
+		width: 0; 
+		height: 0; 
+		border-top: 5px solid transparent;
+		border-bottom: 5px solid transparent; 
+		
+		border-right:10px solid blue; 
+	}
+
 
 
 	</style>
@@ -137,9 +160,17 @@
 	// slideimages[6].src = "arrmimages/announcement.jpg"//http://vignette3.wikia.nocookie.net/psi/images/8/8c/Empty_board_promotion_announcement.jpg/revision/latest?cb=20130707174434"
 
 
-var slideimages = new Array("arrmimages/orbitor.jpg","arrmimages/orion.jpg", "arrmimages/budget.jpg","arrmimages/asteroid.jpg", "arrmimages/commTerminal.jpg","arrmimages/eva.jpg","arrmimages/announcement.jpg")
+// var slideimages = new Array("arrmimages/orbitor.jpg","arrmimages/orion.jpg", "arrmimages/budget.jpg","arrmimages/asteroid.jpg", "arrmimages/commTerminal.jpg","arrmimages/eva.jpg","arrmimages/announcement.jpg")
 
-var titleArray = new Array('18 May 2015 story: NASA Seeks Additional Information for Asteroid Redirect Mission Spacecraft','Notional ARV Modules and Launch Adapter Design','NASA FY\u0026#39;16 Budget Summary Briefing Calls Our ARRM work','Boulder Capture Simulations Test-bed','Ground-based Optical Comm Terminal could support a secondary optical telecom system for high data rate downlink in lunar orbit and potentially, at the asteroid.','Astronaut EVA with tools at boulder','Announcement:  ARRM MCR rescheduled for March 24, 2015.')
+// var slideimages = new Array("http://www.nasa.gov/sites/default/files/thumbnails/image/15-094.jpg","https://upload.wikimedia.org/wikipedia/commons/8/80/Orion_with_ATV_SM.jpg","http://images.spaceref.com/news/2004/02.01.04.chart.2.lrg.jpg","http://o.aolcdn.com/dims-shared/dims3/GLOB/crop/4000x2445+0+327/resize/630x385!/format/jpg/quality/85/http://hss-prod.hss.aol.com/hss/storage/midas/9d45beddc69216d5863a060ff0c2d8d9/200723983/469055831.jpg",)
+
+// var slideimages = ("https://gateway-uat.jpl.nasa.gov/sites/ARRM/Site%20Images/_w/15-094_jpg.jpg","https://gateway-uat.jpl.nasa.gov/sites/ARRM/Site%20Images/_w/Screen%20Shot%202015-02-03%20at%209.20.45%20AM_png.jpg","https://gateway-uat.jpl.nasa.gov/sites/ARRM/Site%20Images/_w/Screen%20Shot%202015-02-04%20at%208.52.58%20AM_png.jpg","https://gateway-uat.jpl.nasa.gov/sites/ARRM/Site%20Images/_w/Boulder_capture_testbed_png.jpg","https://gateway-uat.jpl.nasa.gov/sites/ARRM/Site%20Images/_w/ground_terminal_png.jpg","https://gateway-uat.jpl.nasa.gov/sites/ARRM/Site%20Images/_w/eva_png.jpg","https://gateway-uat.jpl.nasa.gov/sites/ARRM/Site%20Images/_w/boulder_capture_png.jpg")
+
+var slideimages = new Array("arrmimages/orbitor.jpg","arrmimages/eva.jpg","arrmimages/commTerminal.jpg","arrmimages/arv_models.jpg","arrmimages/budget.jpg","arrmimages/boulder_capture.jpg","arrmimages/testbed.jpg")
+
+// var titleArray = new Array('18 May 2015 story: NASA Seeks Additional Information for Asteroid Redirect Mission Spacecraft','Notional ARV Modules and Launch Adapter Design','NASA FY\u0026#39;16 Budget Summary Briefing Calls Our ARRM work','Boulder Capture Simulations Test-bed','Ground-based Optical Comm Terminal could support a secondary optical telecom system for high data rate downlink in lunar orbit and potentially, at the asteroid.','Astronaut EVA with tools at boulder','Announcement:  ARRM MCR rescheduled for March 24, 2015.')
+
+var titleArray = new Array("18 May 2015 story: NASA Seeks Additional Information for Asteroid Redirect Mission Spacecraft","Astronaut EVA with tools at boulder","Ground-based Optical Comm Terminal could support a secondary optical telecom system for high data rate downlink in lunar orbit and potentially, at the asteroid.","Notional ARV Modules and Launch Adapter Design","NASA FY\u0026#39;16 Budget Summary Briefing Calls Our ARRM work","Announcement:  ARRM MCR rescheduled for March 24, 2015.","Boulder Capture Simulations Test-bed")
 
 
 	</script>
@@ -151,13 +182,14 @@ var titleArray = new Array('18 May 2015 story: NASA Seeks Additional Information
 	<!-- <link href="css/arrmHome.css" rel="stylesheet" type="text/css"> -->
 <body class="backgrounddd">
 
-
-<ul>
-  <li><a href="https://js.jpl.nasa.gov" style="font-size:130%;">JPL Space | </a></li>
-  <li><a href="http://www.jpl.nasa.gov/" style="font-size:130%;">JPL | </a></li>
-  <li><a href="http://www.caltech.edu/" style="font-size:130%;">Caltech | </a></li>
-  <li><a href="http://www.nasa.gov" style="font-size:130%;">NASA</a></li>
-</ul>
+<div class="transboxRed">
+	<ul>
+	  <li><a href="https://js.jpl.nasa.gov">JPL Space | </a></li>
+	  <li><a href="http://www.jpl.nasa.gov/">JPL | </a></li>
+	  <li><a href="http://www.caltech.edu/" >Caltech | </a></li>
+	  <li><a href="http://www.nasa.gov" >NASA</a></li>
+	</ul>
+</div>
 
 
 
@@ -192,19 +224,20 @@ var titleArray = new Array('18 May 2015 story: NASA Seeks Additional Information
 	    background-color: #000000;
 	    border: 1px solid black;
 	    opacity: 0.7;"> -->
-			<h1><a href="arrmHome.html"><u> Home </u></a></h1>
+			<h1><a href="arrmHome.html" style="font-size:100%"> Home </a></h1>
 			<h2> Administrative Resources <span style="float:right; color:white;">Technical Design Concept Info</span> </p> 
 			<h3 style="text-align:left"> ARRM Resources:<span> Mission Objectives & Requirements </span></h3>
 				<p> Library </p>
-				<p><a href=" https://arrm.jpl.nasa.gov/jira/secure/BrowseProjects.jspa?selectedCategory=all"> Jira Site <span style="font-size:130%; font-weight:200">Mission Design</span></p>
-				<p><a href="mms.html"> View Editor </a></p>
+				<p><a href=" https://arrm.jpl.nasa.gov/jira/secure/BrowseProjects.jspa?selectedCategory=all" style="font-size:100%;"> Jira Site <span style="font-size:120%; ">Mission Design</span></p> 
+				<!-- font-weight:200; -->
+				<p><a href="mms.html" style="font-size:100%;"> View Editor </a></p>
 			<h3 style="text-align:left"> Administrative: <span> Block Diagrams</h3>
-				<p> Team Org Tree <span style="font-size:120%; font-weight:200"> (composition & interfaces)</span></p>
+				<p> Team Org Tree <span style="font-size:120%;"> (composition & interfaces)</span></p>
 				<p> Project Schedule </p>
 				<p> New Member Form </p>
 			<h3 style="text-align:left"> ARRM Library:<span> Mechanical Drawings </span></h3>	
 				<p> Work Area </p>
-				<p><a href="calendar.html"> Reviews and Meetings </a><span style="font-size:130%; font-weight:200">Functional OpsCon</span></p>
+				<p><a href="calendar.html" style="font-size:100%;"> Reviews and Meetings </a><span style="font-size:120%;">Functional OpsCon</span></p>
 				<p> MMRs </p>
 			<h3 style="text-align:left"> Public Sites:<span> Mass: </span></h3>	
 				<p> Asteroid Redirect Mission <span style="color:white;"> MEL & Margins</p>
@@ -263,13 +296,14 @@ var titleArray = new Array('18 May 2015 story: NASA Seeks Additional Information
 
 
 
-	<img src="arrmimages/orbitor.jpg" class="center" name="slidewhow" width="400" height="200" style="border-style:solid; border-color:white;"/>
+	<img src="https://gateway-uat.jpl.nasa.gov/sites/ARRM/Site%20Images/_w/15-094_jpg.jpg" class="center" name="slidewhow" width="313" height="200" style="border-style:solid; border-color:white;"/>
 	<!-- center image in block link o jsfiddle.net/csbp2 -->
 	<p id="description" style="margin-left: auto; margin-right: auto; color:white; width:300px; height: 90px; word-wrap:break-word;">
 		18 May 2015 story: NASA Seeks Additional Information for Asteroid Redirect Mission Spacecraft
 	</p>
 	<table align="center" style="width:100px;">
 		<tr>
+			<!-- <td align="left"><a href="" onclick="return change_image(-1)" class="arrow-left"></a></td>  -->
 			<td align="left"><a href="" onclick="return change_image(-1)">PREV</a></td> 
 			<!-- <td align="center"><a href="" onclick="auto()">AUTO</a></td> -->
 			<!-- <td align="center"><a href="" onclick="return pause()" >PAUSE</a></td> -->
