@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- <html lang="en" ng-app="mmsApp">
+<html lang="en" ng-app="mmsApp">
 <head>
 
   <meta http-equiv="X-UA-Compatible" content="IE=edge;chrome=1" />
@@ -10,1141 +10,248 @@
   <!-- bower:css -->
   <!-- endbower -->
 
-  <!-- <link href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic,700italic" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic,700italic" rel="stylesheet" type="text/css">
   <link href="css/mm-mms.styles.min.css" rel="stylesheet" type="text/css">
   <link href="css/ve-mms.styles.min.css" rel="stylesheet" type="text/css">
- -->
-<!-- </head>
-<body background= >
+  <style>
+	body.backgrounddd { 
+	    background-image: url("0917da1b-bfc1-42d8-839b-44a73a779638bkimage-480DF201.themedjpg.jpeg");
+	    /*url('https://gateway-uat.jpl.nasa.gov/sites/ARRM/_catalogs/theme/Themed/1554F203/0917da1b-bfc1-42d8-839b-44a73a779638bkimage-480DF201.themedjpg?ctag');*/
+	    /*margin: 50%;*/
+	    background-size: 100% 100%;
+
+	    /*background-size: 1450px 1000px;*/
+	    background-repeat: no-repeat;
+	    background-attachment: fixed;
+	    background-position: center; 
+	    /*width: auto;*/
+	    overflow-x: auto;
+	    overflow-y: auto;
+
+	}
+
+	h1 a{
+		font-size:80%;
+		color:white;
+		font-weight:140%;
+		text-decoration: none;
+	}
+.alignleft {float:left;}
+.alignright {float:right;}
+
+/*	div.background
+	{
+	  background: url(klematis.jpg) repeat;
+	  border: 2px solid black;
+	}*/
+	div.transbox {
+	    margin: 20px;
+	    background-color: #000000;
+	    border: 1px solid black;
+	    opacity: 0.7;
+	    filter: alpha(opacity=30); /* For IE8 and earlier */
+	}
+
+	div.transbox p {
+	    margin: 0;
+	    /*font-weight: bold;*/
+	    color: #ffffff;
+	   	width: auto;
+	    /*overflow-x: auto;*/
+	    text-indent:30px;
+	}
+
+	div.transbox h2 {
+		font-size:130%;
+		font-weight: bold;
+	    color: #ffffff;
+	   	width: auto;
+	    overflow-x: auto;
+	    text-indent:5px;
+	}
+
+	div.transbox h3 {
+	    /*margin: 30% 5%;*/
+	    /*font-weight: 100%;*/
+	    font-size:130%;
+	    /*font-weight: bold;*/
+	    color: #ff0000;
+	   	width: auto;
+	    overflow-x: auto;
+	    text-indent:5px;
+	}
+
+	div.transbox span{
+		float:right;
+		text-indent: -400px;
+		/*font-size:130%; */
+		/*font-weight: bold; */
+		color: #ff0000; 
+		/*text-indent:-10px;*/
+	}
 
 
-</body> -->
+
+	</style>
 
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html dir="ltr" lang="en-US">
-<head><meta name="GENERATOR" content="Microsoft SharePoint" /><meta http-equiv="Content-type" content="text/html; charset=utf-8" /><meta http-equiv="X-UA-Compatible" content="IE=10" /><meta http-equiv="Expires" content="0" /><meta name="msapplication-TileImage" content="/_layouts/15/images/SharePointMetroAppTile.png" /><meta name="msapplication-TileColor" content="#0072C6" /><title>
-	
-	Asteroid Robotic Redirect Mission - Home
-
-</title><link rel="shortcut icon" href="/_layouts/15/images/favicon.ico?rev=23" type="image/vnd.microsoft.icon" id="favicon" /><link rel="stylesheet" type="text/css" href="/sites/ARRM/_catalogs/theme/Themed/1554F203/oslo-236A6B32.themedcss?ctag=2"/>
-<link id="CustomCSS" rel="stylesheet" type="text/css" href="/sites/ARRM/_layouts/15/Gateway.Branding/gateway.css?v1"/>
-<script type="text/javascript" src="/_layouts/15/init.js?rev=0%2BjgcYFw8Xoj0N42kzP%2BcQ%3D%3D"></script>
-<script src="/sites/arrm/_layouts/15/gateway.branding/jquery-1.11.0.min.js"></script>
-<script src="/sites/arrm/_layouts/15/gateway.branding/jquery-migrate-1.2.1.min.js"></script>
-<script src="/sites/arrm/_layouts/15/gateway.branding/gateway.js"></script>
-<script src="/sites/arrm/_layouts/15/gateway.branding/jplspace/jpl.jplspace.quickfind.displayfunctions.js"></script>
-<script src="/sites/arrm/_layouts/15/gateway.branding/jplspace/jpl.jplspace.quickfind.js"></script>
-<script type="text/javascript" src="/ScriptResource.axd?d=02gkOhlh4oVzaOJ5zNr_aRMiIsrThcgSmFI9J9aP8qEzZu3z6f3PWfTZ0zu1Y-Ww4pE4GnMmEHhpzE4MUo2lfGUrDO6dDJgxrivSSc7AjIMOcLSzPB-piX2mXlduVSN17VBz32GEcMnQ3iUCluxcPVegXiZmf_UKYYYMsCkXJAhpQfnOgrHB-YaYnnjJ_fKd0&amp;t=ffffffff805766b3"></script>
-<script type="text/javascript" src="/_layouts/15/blank.js?rev=ZaOXZEobVwykPO9g8hq%2F8A%3D%3D"></script>
-<script type="text/javascript" src="/ScriptResource.axd?d=a_7iqSdoP--1RPsiwntWa-x6QC9puTIawOX8A9Q2X1ffmt9FH5qvXZkqoceUmumvxVDrBJq3iQfRB9ycKwTBwvG_VUWLcG8QvcqLCipDnPQ6z-Of03tXs8zyTz01b5Mcv3TINOuArcEeaa1hjqQTTv-psFYdctAAYEd8HCpiD2zzj0jrcp3X_veqd923q6ha0&amp;t=ffffffff805766b3"></script>
-<script type="text/javascript">RegisterSod("initstrings.js", "\u002f_layouts\u002f15\u002f1033\u002finitstrings.js?rev=4Yrxyggg5knao3D48Ii\u00252FWA\u00253D\u00253D");</script>
-<script type="text/javascript">RegisterSod("strings.js", "\u002f_layouts\u002f15\u002f1033\u002fstrings.js?rev=u\u00252B0KcZWR52dtr8LTlqcZcw\u00253D\u00253D");RegisterSodDep("strings.js", "initstrings.js");</script>
-<script type="text/javascript">RegisterSod("sp.init.js", "\u002f_layouts\u002f15\u002fsp.init.js?rev=jvJC3Kl5gbORaLtf7kxULQ\u00253D\u00253D");</script>
-<script type="text/javascript">RegisterSod("sp.res.resx", "\u002f_layouts\u002f15\u002fScriptResx.ashx?culture=en\u00252Dus\u0026name=SP\u00252ERes\u0026rev=yNk\u00252FhRzgBn40LJVP\u00252BqfgdQ\u00253D\u00253D");</script>
-<script type="text/javascript">RegisterSod("sp.ui.dialog.js", "\u002f_layouts\u002f15\u002fsp.ui.dialog.js?rev=0xf6wCIW4E1pN83I9nSIJQ\u00253D\u00253D");RegisterSodDep("sp.ui.dialog.js", "sp.init.js");RegisterSodDep("sp.ui.dialog.js", "sp.res.resx");</script>
-<script type="text/javascript">RegisterSod("core.js", "\u002f_layouts\u002f15\u002fcore.js?rev=drep\u00252FVpUvfktWJG\u00252Fl4UQ\u00252Bg\u00253D\u00253D");RegisterSodDep("core.js", "strings.js");</script>
-<script type="text/javascript">RegisterSod("menu.js", "\u002f_layouts\u002f15\u002fmenu.js?rev=q3IuDaBADYgaV\u00252BNJoTKbmA\u00253D\u00253D");</script>
-<script type="text/javascript">RegisterSod("mQuery.js", "\u002f_layouts\u002f15\u002fmquery.js?rev=VYAJYBo5H8I3gVSL3MzD6A\u00253D\u00253D");</script>
-<script type="text/javascript">RegisterSod("callout.js", "\u002f_layouts\u002f15\u002fcallout.js?rev=ryx2n4ePkYj1\u00252FALmcsXZfA\u00253D\u00253D");RegisterSodDep("callout.js", "strings.js");RegisterSodDep("callout.js", "mQuery.js");RegisterSodDep("callout.js", "core.js");</script>
-<script type="text/javascript">RegisterSod("clienttemplates.js", "\u002f_layouts\u002f15\u002fclienttemplates.js?rev=y3xh0qyJB62CM2ZD4nL8tw\u00253D\u00253D");RegisterSodDep("clienttemplates.js", "initstrings.js");</script>
-<script type="text/javascript">RegisterSod("sharing.js", "\u002f_layouts\u002f15\u002fsharing.js?rev=kuxIlOxkkypT9A17r72Ljw\u00253D\u00253D");RegisterSodDep("sharing.js", "strings.js");RegisterSodDep("sharing.js", "mQuery.js");RegisterSodDep("sharing.js", "clienttemplates.js");RegisterSodDep("sharing.js", "core.js");</script>
-<script type="text/javascript">RegisterSod("suitelinks.js", "\u002f_layouts\u002f15\u002fsuitelinks.js?rev=REwVU5jSsadDdOZlCx4wpA\u00253D\u00253D");RegisterSodDep("suitelinks.js", "strings.js");RegisterSodDep("suitelinks.js", "core.js");</script>
-<script type="text/javascript">RegisterSod("clientrenderer.js", "\u002f_layouts\u002f15\u002fclientrenderer.js?rev=PWwV4FATEiOxN90BeB5Hzw\u00253D\u00253D");</script>
-<script type="text/javascript">RegisterSod("srch.resources.resx", "\u002f_layouts\u002f15\u002fScriptResx.ashx?culture=en\u00252Dus\u0026name=Srch\u00252EResources\u0026rev=T\u00252BEc8BFdsTQbQuVAobKatQ\u00253D\u00253D");</script>
-<script type="text/javascript">RegisterSod("search.clientcontrols.js", "\u002f_layouts\u002f15\u002fsearch.clientcontrols.js?rev=VfCemuOggDNNFsFIKGy\u00252FOw\u00253D\u00253D");RegisterSodDep("search.clientcontrols.js", "sp.init.js");RegisterSodDep("search.clientcontrols.js", "clientrenderer.js");RegisterSodDep("search.clientcontrols.js", "srch.resources.resx");</script>
-<script type="text/javascript">RegisterSod("sp.runtime.js", "\u002f_layouts\u002f15\u002fsp.runtime.js?rev=5f2WkYJoaxlIRdwUeg4WEg\u00253D\u00253D");RegisterSodDep("sp.runtime.js", "sp.res.resx");</script>
-<script type="text/javascript">RegisterSod("sp.search.js", "\u002f_layouts\u002f15\u002fsp.search.js?rev=uZlrSmuyYGO8yQWFVg\u00252BIdw\u00253D\u00253D");RegisterSodDep("sp.search.js", "sp.init.js");RegisterSodDep("sp.search.js", "sp.runtime.js");</script>
-<script type="text/javascript">RegisterSod("ajaxtoolkit.js", "\u002f_layouts\u002f15\u002fajaxtoolkit.js?rev=4rOiCbaFgJMmqw9Ojtpa6g\u00253D\u00253D");RegisterSodDep("ajaxtoolkit.js", "search.clientcontrols.js");</script>
-<script type="text/javascript">RegisterSod("sp.core.js", "\u002f_layouts\u002f15\u002fsp.core.js?rev=tZDGLPOvY1bRw\u00252BsgzXpxTg\u00253D\u00253D");RegisterSodDep("sp.core.js", "strings.js");RegisterSodDep("sp.core.js", "sp.init.js");RegisterSodDep("sp.core.js", "core.js");</script>
-<script type="text/javascript">RegisterSod("sp.js", "\u002f_layouts\u002f15\u002fsp.js?rev=38t1tBEEonTR8ozTCV4YrA\u00253D\u00253D");RegisterSodDep("sp.js", "sp.runtime.js");RegisterSodDep("sp.js", "sp.ui.dialog.js");RegisterSodDep("sp.js", "sp.res.resx");</script>
-<script type="text/javascript">RegisterSod("cui.js", "\u002f_layouts\u002f15\u002fcui.js?rev=xnkvKcaTLxRah8B2ooWw4Q\u00253D\u00253D");</script>
-<script type="text/javascript">RegisterSod("inplview", "\u002f_layouts\u002f15\u002finplview.js?rev=FJslh\u00252FITKI8BRLkElp\u00252FWdA\u00253D\u00253D");RegisterSodDep("inplview", "strings.js");RegisterSodDep("inplview", "core.js");RegisterSodDep("inplview", "sp.js");</script>
-<script type="text/javascript">RegisterSod("ribbon", "\u002f_layouts\u002f15\u002fsp.ribbon.js?rev=HuKvLijAVokRXAsG0Ib\u00252FKQ\u00253D\u00253D");RegisterSodDep("ribbon", "strings.js");RegisterSodDep("ribbon", "core.js");RegisterSodDep("ribbon", "sp.core.js");RegisterSodDep("ribbon", "sp.js");RegisterSodDep("ribbon", "cui.js");RegisterSodDep("ribbon", "sp.res.resx");RegisterSodDep("ribbon", "sp.runtime.js");RegisterSodDep("ribbon", "inplview");</script>
-<script type="text/javascript">RegisterSod("socialdata.js", "\u002f_layouts\u002f15\u002fsocialdata.js?rev=U1\u00252BtYxvHIRcUOpNdD5kLbA\u00253D\u00253D");</script>
-<script type="text/javascript">RegisterSod("sp.ui.socialribbon.js", "\u002f_layouts\u002f15\u002fsp.ui.socialribbon.js?rev=7xw5QRBKJJRwkla0Eywr\u00252FA\u00253D\u00253D");RegisterSodDep("sp.ui.socialribbon.js", "ribbon");RegisterSodDep("sp.ui.socialribbon.js", "socialdata.js");</script>
-<script type="text/javascript">RegisterSod("userprofile", "\u002f_layouts\u002f15\u002fsp.userprofiles.js?rev=Pbfi3FBmvy2ewPqDZp16\u00252BQ\u00253D\u00253D");RegisterSodDep("userprofile", "sp.runtime.js");</script>
-<script type="text/javascript">RegisterSod("followingcommon.js", "\u002f_layouts\u002f15\u002ffollowingcommon.js?rev=sObFmln\u00252BGVrczIpXNeFRrg\u00253D\u00253D");RegisterSodDep("followingcommon.js", "strings.js");RegisterSodDep("followingcommon.js", "sp.js");RegisterSodDep("followingcommon.js", "userprofile");RegisterSodDep("followingcommon.js", "core.js");RegisterSodDep("followingcommon.js", "mQuery.js");</script>
-<script type="text/javascript">RegisterSod("profilebrowserscriptres.resx", "\u002f_layouts\u002f15\u002fScriptResx.ashx?culture=en\u00252Dus\u0026name=ProfileBrowserScriptRes\u0026rev=J5HzNnB\u00252FO1Id\u00252FGI18rpRcw\u00253D\u00253D");</script>
-<script type="text/javascript">RegisterSod("sp.ui.mysitecommon.js", "\u002f_layouts\u002f15\u002fsp.ui.mysitecommon.js?rev=Ua8qmZSU9nyf53S7PEyJwQ\u00253D\u00253D");RegisterSodDep("sp.ui.mysitecommon.js", "sp.init.js");RegisterSodDep("sp.ui.mysitecommon.js", "sp.runtime.js");RegisterSodDep("sp.ui.mysitecommon.js", "userprofile");RegisterSodDep("sp.ui.mysitecommon.js", "profilebrowserscriptres.resx");</script>
-<script type="text/javascript">RegisterSod("browserScript", "\u002f_layouts\u002f15\u002fie55up.js?rev=0R4dbpInVlmjoVSw2Gglmw\u00253D\u00253D");RegisterSodDep("browserScript", "strings.js");</script>
-<script type="text/javascript">RegisterSod("imglib.js", "\u002f_layouts\u002f15\u002fimglib.js?rev=pJT\u00252B05bFsTB1okMm4c0ojA\u00253D\u00253D");RegisterSodDep("imglib.js", "strings.js");</script>
-<script type="text/javascript">RegisterSod("offline.js", "\u002f_layouts\u002f15\u002foffline.js?rev=5NCDZdcT1qj5k8yEP01AKA\u00253D\u00253D");</script>
-<script type="text/javascript">RegisterSod("WPAdderClass", "\u002f_layouts\u002f15\u002fwpadder.js?rev=ApLnd\u00252BqIPjLXRfr1t\u00252BCxyQ\u00253D\u00253D");</script>
-<script type="text/javascript">RegisterSod("dragdrop.js", "\u002f_layouts\u002f15\u002fdragdrop.js?rev=\u00252FlbcPNAdxvx6ol\u00252BJ5Sir4g\u00253D\u00253D");RegisterSodDep("dragdrop.js", "strings.js");</script>
-<script type="text/javascript">RegisterSod("quicklaunch.js", "\u002f_layouts\u002f15\u002fquicklaunch.js?rev=\u00252BHeX6ARcp\u00252F9LpMq6FqQYyA\u00253D\u00253D");RegisterSodDep("quicklaunch.js", "strings.js");RegisterSodDep("quicklaunch.js", "dragdrop.js");</script>
-<link type="text/xml" rel="alternate" href="/sites/ARRM/_vti_bin/spsdisco.aspx" />
-		
-	<meta name="CollaborationServer" content="SharePoint Team Web Site" />
-	<script type="text/javascript">// <![CDATA[ 
 
 
-	var navBarHelpOverrideKey = "WSSEndUser";
-	// ]]>
-</script>
-	<link rel="alternate" type="application/rss+xml" title="Site Pages" href="/sites/ARRM/_layouts/15/listfeed.aspx?List=4e2ad1b1%2D67f2%2D4f5a%2Dbaf2%2Dfb3868aa7e43" />
-
-	
-		
-
-		
-	</head>
-<body>
-  <div id="imgPrefetch" style="display:none">
-<img src="/_layouts/15/images/favicon.ico?rev=23" />
-<img src="/_layouts/15/images/spcommon.png" />
-<img src="/sites/ARRM/_catalogs/theme/Themed/1554F203/spcommon-B35BB0A9.themedpng?ctag=2" />
-<img src="/sites/ARRM/_catalogs/theme/Themed/1554F203/siteIcon-2129F729.themedpng?ctag=2" />
-</div>
-
-  <noscript><div class='noindex'>You may be trying to access this site from a secured browser on the server. Please enable scripts and reload this page.</div></noscript>
-  
-  <form method="post" action="Home.aspx" onsubmit="javascript:return WebForm_OnSubmit();" id="aspnetForm">
-<div class="aspNetHidden">
-<input type="hidden" name="_wpcmWpid" id="_wpcmWpid" value="" />
-<input type="hidden" name="wpcmVal" id="wpcmVal" value="" />
-<input type="hidden" name="MSOWebPartPage_PostbackSource" id="MSOWebPartPage_PostbackSource" value="" />
-<input type="hidden" name="MSOTlPn_SelectedWpId" id="MSOTlPn_SelectedWpId" value="" />
-<input type="hidden" name="MSOTlPn_View" id="MSOTlPn_View" value="0" />
-<input type="hidden" name="MSOTlPn_ShowSettings" id="MSOTlPn_ShowSettings" value="False" />
-<input type="hidden" name="MSOGallery_SelectedLibrary" id="MSOGallery_SelectedLibrary" value="" />
-<input type="hidden" name="MSOGallery_FilterString" id="MSOGallery_FilterString" value="" />
-<input type="hidden" name="MSOTlPn_Button" id="MSOTlPn_Button" value="none" />
-<input type="hidden" name="_wikiPageMode" id="_wikiPageMode" value="" />
-<input type="hidden" name="__EVENTTARGET" id="__EVENTTARGET" value="" />
-<input type="hidden" name="__EVENTARGUMENT" id="__EVENTARGUMENT" value="" />
-<input type="hidden" name="__REQUESTDIGEST" id="__REQUESTDIGEST" value="0x447178DB0663AB24480E047C8B27C990987CA19A5B46F5AFA92DE3B71CCD5B6CB1A62E3ADE62D36AA639CE7D83152340FC31958245064F4F0BD2269CDBB436E3,16 Jul 2015 23:34:01 -0000" />
-<input type="hidden" name="MSOAuthoringConsole_FormContext" id="MSOAuthoringConsole_FormContext" value="" />
-<input type="hidden" name="MSOAC_EditDuringWorkflow" id="MSOAC_EditDuringWorkflow" value="" />
-<input type="hidden" name="InputComments" id="InputComments" value="" />
-<input type="hidden" name="_wikiPageCommand" id="_wikiPageCommand" value="" />
-<input type="hidden" name="SPPageStateContext_PreviousAuthoringVersion" id="SPPageStateContext_PreviousAuthoringVersion" value="22" />
-<input type="hidden" name="MSOSPWebPartManager_DisplayModeName" id="MSOSPWebPartManager_DisplayModeName" value="Browse" />
-<input type="hidden" name="MSOSPWebPartManager_ExitingDesignMode" id="MSOSPWebPartManager_ExitingDesignMode" value="false" />
-<input type="hidden" name="MSOWebPartPage_Shared" id="MSOWebPartPage_Shared" value="" />
-<input type="hidden" name="MSOLayout_LayoutChanges" id="MSOLayout_LayoutChanges" value="" />
-<input type="hidden" name="MSOLayout_InDesignMode" id="MSOLayout_InDesignMode" value="" />
-<input type="hidden" name="_wpSelected" id="_wpSelected" value="" />
-<input type="hidden" name="_wzSelected" id="_wzSelected" value="" />
-<input type="hidden" name="MSOSPWebPartManager_OldDisplayModeName" id="MSOSPWebPartManager_OldDisplayModeName" value="Browse" />
-<input type="hidden" name="MSOSPWebPartManager_StartWebPartEditingName" id="MSOSPWebPartManager_StartWebPartEditingName" value="false" />
-<input type="hidden" name="MSOSPWebPartManager_EndWebPartEditing" id="MSOSPWebPartManager_EndWebPartEditing" value="false" />
-<input type="hidden" name="_maintainWorkspaceScrollPosition" id="_maintainWorkspaceScrollPosition" value="0" />
-<input type="hidden" name="SPPageStateContext_PreviousAuthoringItemUser" id="SPPageStateContext_PreviousAuthoringItemUser" value="1" />
-<input type="hidden" name="__VIEWSTATE" id="__VIEWSTATE" value="/wEPDwULLTEwMTY0Mjg0NTIPZBYCZg9kFgICAQ9kFgQCAQ9kFgICEg9kFgICAw9kFgJmD2QWAmYPFCsABmQFMGh0dHBzOi8vZ2F0ZXdheS11YXQuanBsLm5hc2EuZ292OjQ0My9QZXJzb24uYXNweAUlaHR0cHM6Ly9nYXRld2F5LXVhdC5qcGwubmFzYS5nb3Y6NDQzLwUjL3NpdGVzL0FSUk0vX2xheW91dHMvMTUvbXlzdWJzLmFzcHgFkwEvc2l0ZXMvQVJSTS9fbGF5b3V0cy8xNS9yZWdpb25hbHNldG5nLmFzcHg/dHlwZT11c2VyJnNvdXJjZT1odHRwcyUzQSUyRiUyRmdhdGV3YXklMkR1YXQlMkVqcGwlMkVuYXNhJTJFZ292JTJGc2l0ZXMlMkZBUlJNJTJGU2l0ZVBhZ2VzJTJGSG9tZSUyRWFzcHgF5QFodHRwczovL2dhdGV3YXktdWF0LmpwbC5uYXNhLmdvdjo0NDMvX2xheW91dHMvMTUvRWRpdFByb2ZpbGUuYXNweD9Vc2VyU2V0dGluZ3NQcm92aWRlcj0yMzRiZjBlZCUyRDcwZGIlMkQ0MTU4JTJEYTMzMiUyRDRkZmQ2ODNiNDE0OCZSZXR1cm5Vcmw9aHR0cHMlM0ElMkYlMkZnYXRld2F5JTJEdWF0JTJFanBsJTJFbmFzYSUyRWdvdiUyRnNpdGVzJTJGQVJSTSUyRlNpdGVQYWdlcyUyRkhvbWUlMkVhc3B4ZAIJD2QWBAIBD2QWAgIBD2QWCAUmZ185YWFkZGI1Nl83YzE5XzRiZTFfYTVkY18wMjM5MTA4NjMzNjUPZBYEZg8WAh4HVmlzaWJsZWhkAgEPFgIfAGhkBSZnXzA3MzA0NjEwXzcyZWNfNGIzNF9iMWY5XzZkZTYxYTBhNzQzMA9kFgRmDxYCHwBoZAIBDxYCHwBoZAUmZ18xMWIxNmQ0N19hNzc3XzQwZTFfOTllM183M2U4YzFlNzMwNTIPZBYEZg8WAh8AaGQCAQ8WAh8AaGQFJmdfMjAxNTRjMGRfNzZmM180Yzc3Xzg2ZjhfZjNkYWEzMWM1YmRkD2QWBGYPFgIfAGhkAgEPFgIfAGhkAgkPZBYOAgUPZBYCAgEPZBYCAgMPZBYCZg9kFgQCAg9kFgYCAQ8WBh4TQ2xpZW50T25DbGlja1NjcmlwdAWCAUVuc3VyZVNjcmlwdEZ1bmMoJ3NoYXJpbmcuanMnLCAnRGlzcGxheVNoYXJlZFdpdGhEaWFsb2cnLCBmdW5jdGlvbiAoKSB7IERpc3BsYXlTaGFyZWRXaXRoRGlhbG9nKCdcdTAwMmZzaXRlc1x1MDAyZkFSUk1cdTAwMmYnKTsgfSkeKENsaWVudE9uQ2xpY2tTY3JpcHRDb250YWluaW5nUHJlZml4ZWRVcmwFggFFbnN1cmVTY3JpcHRGdW5jKCdzaGFyaW5nLmpzJywgJ0Rpc3BsYXlTaGFyZWRXaXRoRGlhbG9nJywgZnVuY3Rpb24gKCkgeyBEaXNwbGF5U2hhcmVkV2l0aERpYWxvZygnXHUwMDJmc2l0ZXNcdTAwMmZBUlJNXHUwMDJmJyk7IH0pHhhDbGllbnRPbkNsaWNrTmF2aWdhdGVVcmxkZAIDDxYKHgtEZXNjcmlwdGlvbgUfRWRpdCB0aGUgY29udGVudHMgb2YgdGhpcyBwYWdlLh8BBV93aW5kb3cubG9jYXRpb24gPSAnamF2YXNjcmlwdDp7RW5zdXJlU2NyaXB0UGFyYW1zKFwncmliYm9uXCcsIFwnQ2hhbmdlV2lraVBhZ2VNb2RlXCcsIHRydWUpO30nOx8CZB4EVGV4dAUJRWRpdCBwYWdlHwMFSmphdmFzY3JpcHQ6e0Vuc3VyZVNjcmlwdFBhcmFtcyhcJ3JpYmJvblwnLCBcJ0NoYW5nZVdpa2lQYWdlTW9kZVwnLCB0cnVlKTt9ZAILDxYCHwBoZAIDDw8WAh4JQWNjZXNzS2V5BQEvZGQCBw9kFgICAw9kFgICAQ9kFggCAQ8PFgQeBF8hU0ICAh4IQ3NzQ2xhc3MFF21zLXByb21vdGVkQWN0aW9uQnV0dG9uZGQCAw9kFgJmDw8WBB8HAgIfCAUXbXMtcHJvbW90ZWRBY3Rpb25CdXR0b25kZAIFDw8WBh8AaB8HAgIfCAUXbXMtcHJvbW90ZWRBY3Rpb25CdXR0b25kZAIHDxYEHgZBY3Rpb24LKYoBTWljcm9zb2Z0LlNoYXJlUG9pbnQuV2ViQ29udHJvbHMuUGFnZVN0YXRlQWN0aW9uLCBNaWNyb3NvZnQuU2hhcmVQb2ludCwgVmVyc2lvbj0xNS4wLjAuMCwgQ3VsdHVyZT1uZXV0cmFsLCBQdWJsaWNLZXlUb2tlbj03MWU5YmNlMTExZTk0MjljAB8AZ2QCDQ9kFgICAQ8PFgQeC05hdmlnYXRlVXJsBQsvc2l0ZXMvQVJSTR4HVG9vbFRpcAUhQXN0ZXJvaWQgUm9ib3RpYyBSZWRpcmVjdCBNaXNzaW9uZGQCGQ9kFgICAQ9kFgQCCQ9kFgICAQ9kFgJmD2QWBAIBDw8WAh8KBVgvc2l0ZXMvQVJSTS9fbGF5b3V0cy8xNS9SZWNlbnRXaWtpUGFnZXMuYXNweD9MaXN0PXs0RTJBRDFCMS02N0YyLTRGNUEtQkFGMi1GQjM4NjhBQTdFNDN9ZGQCAw8WAh8AaGQCDQ8PFgIfAGhkFgICAw9kFgICAw9kFgICAQ88KwAJAQAPFgIeDU5ldmVyRXhwYW5kZWRnZGQCGw9kFgICAQ9kFgICAQ88KwAFAQAPFgIeFVBhcmVudExldmVsc0Rpc3BsYXllZGZkZAIdD2QWAgICD2QWBAIDD2QWAgIBDw8WAh4JTWF4TGVuZ3RoAntkZAIHDxYCHhNQcmV2aW91c0NvbnRyb2xNb2RlCymIAU1pY3Jvc29mdC5TaGFyZVBvaW50LldlYkNvbnRyb2xzLlNQQ29udHJvbE1vZGUsIE1pY3Jvc29mdC5TaGFyZVBvaW50LCBWZXJzaW9uPTE1LjAuMC4wLCBDdWx0dXJlPW5ldXRyYWwsIFB1YmxpY0tleVRva2VuPTcxZTliY2UxMTFlOTQyOWMBFgJmDxYCHw8LKwUBZAInD2QWAgIBDxYCHwBoFgJmD2QWAgIBD2QWAmYPZBYCAgEPDxYOHghJbWFnZVVybAUgL19sYXlvdXRzLzE1L2ltYWdlcy9lZGl0aXRlbS5naWYfBgUBSR4RUGVybWlzc2lvbkNvbnRleHQLKYoBTWljcm9zb2Z0LlNoYXJlUG9pbnQuVXRpbGl0aWVzLlBlcm1pc3Npb25Db250ZXh0LCBNaWNyb3NvZnQuU2hhcmVQb2ludCwgVmVyc2lvbj0xNS4wLjAuMCwgQ3VsdHVyZT1uZXV0cmFsLCBQdWJsaWNLZXlUb2tlbj03MWU5YmNlMTExZTk0MjljAh4LUGVybWlzc2lvbnMoKYABTWljcm9zb2Z0LlNoYXJlUG9pbnQuU1BCYXNlUGVybWlzc2lvbnMsIE1pY3Jvc29mdC5TaGFyZVBvaW50LCBWZXJzaW9uPTE1LjAuMC4wLCBDdWx0dXJlPW5ldXRyYWwsIFB1YmxpY0tleVRva2VuPTcxZTliY2UxMTFlOTQyOWMNRWRpdExpc3RJdGVtcx4NT25DbGllbnRDbGljawXAAmphdmFzY3JpcHQ6U1RTTmF2aWdhdGVXaXRoQ2hlY2tvdXRBbGVydCgnXHUwMDJmc2l0ZXNcdTAwMmZBUlJNXHUwMDJmX2xheW91dHNcdTAwMmYxNVx1MDAyZmxpc3Rmb3JtLmFzcHg/TGlzdElkPXs0RTJBRDFCMS02N0YyLTRGNUEtQkFGMi1GQjM4NjhBQTdFNDN9XHUwMDI2UGFnZVR5cGU9Nlx1MDAyNklEPTEnLCcwJywnMCcsJ1x1MDAyZnNpdGVzXHUwMDJmQVJSTVx1MDAyZlNpdGVQYWdlc1x1MDAyZkhvbWUuYXNweCcsJ2h0dHBzOlx1MDAyZlx1MDAyZmdhdGV3YXktdWF0LmpwbC5uYXNhLmdvdlx1MDAyZnNpdGVzXHUwMDJmQVJSTScpOyByZXR1cm4gZmFsc2U7HwJkHwoFsgJqYXZhc2NyaXB0OlNUU05hdmlnYXRlV2l0aENoZWNrb3V0QWxlcnQoJ1x1MDAyZnNpdGVzXHUwMDJmQVJSTVx1MDAyZl9sYXlvdXRzXHUwMDJmMTVcdTAwMmZsaXN0Zm9ybS5hc3B4P0xpc3RJZD17NEUyQUQxQjEtNjdGMi00RjVBLUJBRjItRkIzODY4QUE3RTQzfVx1MDAyNlBhZ2VUeXBlPTZcdTAwMjZJRD0xJywnMCcsJzAnLCdcdTAwMmZzaXRlc1x1MDAyZkFSUk1cdTAwMmZTaXRlUGFnZXNcdTAwMmZIb21lLmFzcHgnLCdodHRwczpcdTAwMmZcdTAwMmZnYXRld2F5LXVhdC5qcGwubmFzYS5nb3ZcdTAwMmZzaXRlc1x1MDAyZkFSUk0nKTtkZBgBBRdjdGwwMCRWNFF1aWNrTGF1bmNoTWVudQ8PZAUESG9tZWQ/wqj1qZIDek71ICK1+6JfgZ6WJuwgOi7KI9ezUZOYBQ==" />
-</div>
-
-<script type="text/javascript">
-//<![CDATA[
-var theForm = document.forms['aspnetForm'];
-if (!theForm) {
-    theForm = document.aspnetForm;
-}
-function __doPostBack(eventTarget, eventArgument) {
-    if (!theForm.onsubmit || (theForm.onsubmit() != false)) {
-        theForm.__EVENTTARGET.value = eventTarget;
-        theForm.__EVENTARGUMENT.value = eventArgument;
-        theForm.submit();
-    }
-}
-//]]>
-</script>
-
-
-<script src="/WebResource.axd?d=-Np7TzPJtMuxklPojiQmwosSYwpgGAvgWwAMfRGSW8feDdYsOLs_WqjIa-9A3hZm05ykXVRayCngRneyTuUZ4raI4b-xJQnBOy3vWgxmveQ1&amp;t=635588330815688065" type="text/javascript"></script>
-
-
-<script type="text/javascript">
-//<![CDATA[
-var MSOWebPartPageFormName = 'aspnetForm';
-var g_presenceEnabled = true;
-var g_wsaEnabled = false;
-var g_wsaQoSEnabled = false;
-var g_wsaQoSDataPoints = [];
-var g_wsaLCID = 1033;
-var g_wsaListTemplateId = 119;
-var g_wsaSiteTemplateId = 'STS#0';
-var _fV4UI=true;var _spPageContextInfo = {webServerRelativeUrl: "\u002fsites\u002fARRM", webAbsoluteUrl: "https:\u002f\u002fgateway-uat.jpl.nasa.gov\u002fsites\u002fARRM", siteAbsoluteUrl: "https:\u002f\u002fgateway-uat.jpl.nasa.gov\u002fsites\u002fARRM", serverRequestPath: "\u002fsites\u002fARRM\u002fSitePages\u002fHome.aspx", layoutsUrl: "_layouts\u002f15", webTitle: "Asteroid Robotic Redirect Mission", webTemplate: "1", tenantAppVersion: "0", isAppWeb: false, webLogoUrl: "_layouts\u002f15\u002fimages\u002fsiteicon.png", webLanguage: 1033, currentLanguage: 1033, currentUICultureName: "en-US", currentCultureName: "en-US", clientServerTimeDelta: new Date("2015-07-16T23:34:01.6774777Z") - new Date(), siteClientTag: "0$$15.0.4701.1000", crossDomainPhotosEnabled:false, webUIVersion:15, webPermMasks:{High:432,Low:1011030767},pageListId:"{4e2ad1b1-67f2-4f5a-baf2-fb3868aa7e43}",pageItemId:1, pagePersonalizationScope:1,userId:19, systemUserKey:"i:0\u0029.w|s-1-5-21-1608413684-1126320247-1535859923-116050", alertsEnabled:true, siteServerRelativeUrl: "\u002fsites\u002fARRM", allowSilverlightPrompt:'True',"themedCssFolderUrl" : "/sites/ARRM/_catalogs/theme/Themed/1554F203","themedImageFileNames" : {"spcommon.png" : "spcommon-B35BB0A9.themedpng?ctag=2","ellipsis.11x11x32.png" : "ellipsis.11x11x32-2F01F47D.themedpng?ctag=2","O365BrandSuite.95x30x32.png" : "O365BrandSuite.95x30x32-C212E2FD.themedpng?ctag=2","socialcommon.png" : "socialcommon-6F3394A9.themedpng?ctag=2","spnav.png" : "spnav-230C537D.themedpng?ctag=2"}};function CallServer_54619628(arg, context) {WebForm_DoCallback('ctl00$ctl21',arg,SP.UI.MyLinksRibbon.MyLinksRibbonPageComponent.ribbonActionCallback,context,null,false); }function _myLinksRibbonLoad2()
-{
-    var fnd = function () {
-        try {
-            mylinks_init.MyLinksInit('CallServer_54619628'); 
-        } 
-        catch (Ex)
-        { }
-    };
-    RegisterSod('mylinks_init', '/_layouts/15/SP.UI.MyLinksRibbon.js');
-    LoadSodByKey('mylinks_init', fnd);
-}
-
-function _myLinksRibbonLoad1()
-{
-    ExecuteOrDelayUntilScriptLoaded(_myLinksRibbonLoad2, 'SP.Ribbon.js');
-}
-
-_spBodyOnLoadFunctionNames.push('_myLinksRibbonLoad1');
-var L_Menu_BaseUrl="/sites/ARRM";
-var L_Menu_LCID="1033";
-var L_Menu_SiteTheme="null";
-
-function _spNavigateHierarchy(nodeDiv, dataSourceId, dataPath, url, listInContext, type) {
-
-    CoreInvoke('ProcessDefaultNavigateHierarchy', nodeDiv, dataSourceId, dataPath, url, listInContext, type, document.forms.aspnetForm, "", "\u002fsites\u002fARRM\u002fSitePages\u002fHome.aspx");
-
-}
-
-function _markElemForSaving(elemId)
-{
-    if (typeof(_spWikiRteElemIds) == 'undefined' || _spWikiRteElemIds == null)
-    {
-        _spWikiRteElemIds = new Object();
-    }
-    _spWikiRteElemIds[elemId] = true;
-}
-
-function _saveMarkedElems()
-{
-    if (typeof(_spWikiRteElemIds) != 'undefined' && _spWikiRteElemIds != null)
-    {
-        for (elemId in _spWikiRteElemIds)
-        {
-            RTE.RichTextEditor.transferContentsToInputField(elemId, true);
-        }
-    }
-}
-var __SafeRunFunctionLoadedScripts = new Array();function SafeRunFunction(fnc, script, type){    if (!_spBodyOnLoadCalled)    {        __QueueFunctionForSafeRunFunction(fnc, script, type);        return;    }    var executed = ExecuteOrDelayUntilScriptLoaded(fnc, script);    if (executed)    {        return;    }    var loaded = false;    for (var i = 0; i < __SafeRunFunctionLoadedScripts.length; i++)    {        if (__SafeRunFunctionLoadedScripts[i].toLowerCase() != script.toLowerCase())        {            continue;        }        loaded = true;        break;    }    if (loaded)    {        return;    }    __SafeRunFunctionLoadedScripts.push(script);    SP.SOD.executeFunc(script, type, function(){});}var __SafeRunFunctionQueue = null;function __QueueFunctionForSafeRunFunction(fnc, script, type){    if (!__SafeRunFunctionQueue)    {        __SafeRunFunctionQueue = new Array();    }    var container = new Object();    container['Function'] = fnc;    container['Script']   = script;    container['Type']     = type;    __SafeRunFunctionQueue.push(container);}function __ProcessQueuedFunctions(){    if (!__SafeRunFunctionQueue ||          __SafeRunFunctionQueue.length <= 0)    {        return;    }    for (var i = 0; i < __SafeRunFunctionQueue.length; i++)    {        var container = __SafeRunFunctionQueue[i];        var fnc    = container['Function'];        var script = container['Script'];        var type   = container['Type'];        SafeRunFunction(fnc, script, type);    }    __SafeRunFunctionQueue = null;}_spBodyOnLoadFunctionNames.push('__ProcessQueuedFunctions');var _spWebPartComponents = new Object();//]]>
-</script>
-
-<script src="/_layouts/15/blank.js?rev=ZaOXZEobVwykPO9g8hq%2F8A%3D%3D" type="text/javascript"></script>
-<script type="text/javascript">
-//<![CDATA[
-(function(){
-
-        if (typeof(_spBodyOnLoadFunctions) === 'undefined' || _spBodyOnLoadFunctions === null) {
-            return;
-        }
-        _spBodyOnLoadFunctions.push(function() 
-        {
-          ExecuteOrDelayUntilScriptLoaded(
-            function()
-            {
-              var pairs = SP.ScriptHelpers.getDocumentQueryPairs();
-              var followDoc, itemId, listId, docName;
-              for (var key in pairs)
-              {
-                if(key.toLowerCase() == 'followdocument') 
-                  followDoc = pairs[key];
-                else if(key.toLowerCase() == 'itemid') 
-                  itemId = pairs[key];
-                else if(key.toLowerCase() == 'listid') 
-                  listId = pairs[key];
-                else if(key.toLowerCase() == 'docname') 
-                  docName = decodeURI(pairs[key]);
-              } 
-
-              if(followDoc != null && followDoc == '1' && listId!=null && itemId != null && docName != null)
-              {
-                SP.SOD.executeFunc('followingcommon.js', 'FollowDocumentFromEmail', function() 
-                { 
-                  FollowDocumentFromEmail(itemId, listId, docName);
-                });
-              }
-
-            }, 'SP.init.js');
-
-        });
-    })();(function(){
-
-        if (typeof(_spBodyOnLoadFunctions) === 'undefined' || _spBodyOnLoadFunctions === null) {
-            return;
-        }
-        _spBodyOnLoadFunctions.push(function() {
-
-            if (typeof(SPClientTemplates) === 'undefined' || SPClientTemplates === null || (typeof(APD_InAssetPicker) === 'function' && APD_InAssetPicker())) {
-                return;
-            }
-
-            var renderFollowFooter = function(renderCtx,  calloutActionMenu)
-            {
-                if (renderCtx.ListTemplateType == 700) 
-                    myDocsActionsMenuPopulator(renderCtx, calloutActionMenu);
-                else
-                    CalloutOnPostRenderTemplate(renderCtx, calloutActionMenu);
-
-                var listItem = renderCtx.CurrentItem;
-                if (typeof(listItem) === 'undefined' || listItem === null) {
-                    return;
-                }
-                if (listItem.FSObjType == 0) {
-                    calloutActionMenu.addAction(new CalloutAction({
-                        text: Strings.STS.L_CalloutFollowAction,
-                        tooltip: Strings.STS.L_CalloutFollowAction_Tooltip,
-                        onClickCallback: function (calloutActionClickEvent, calloutAction) {
-                            var callout = GetCalloutFromRenderCtx(renderCtx);
-                            if (!(typeof(callout) === 'undefined' || callout === null))
-                                callout.close();
-                            SP.SOD.executeFunc('followingcommon.js', 'FollowSelectedDocument', function() { FollowSelectedDocument(renderCtx); });
-                        }
-                    }));
-                }
-            };
-
-            var registerOverride = function(id) {
-                var followingOverridePostRenderCtx = {};
-                followingOverridePostRenderCtx.BaseViewID = 'Callout';
-                followingOverridePostRenderCtx.ListTemplateType = id;
-                followingOverridePostRenderCtx.Templates = {};
-                followingOverridePostRenderCtx.Templates.Footer = function(renderCtx) {
-                    var  renderECB;
-                    if (typeof(isSharedWithMeView) === 'undefined' || isSharedWithMeView === null) {
-                        renderECB = true;
-                    } else {
-                        var viewCtx = getViewCtxFromCalloutCtx(renderCtx);
-                        renderECB = !isSharedWithMeView(viewCtx);
-                    }
-                    return CalloutRenderFooterTemplate(renderCtx, renderFollowFooter, renderECB);
-                };
-                SPClientTemplates.TemplateManager.RegisterTemplateOverrides(followingOverridePostRenderCtx);
-            }
-            registerOverride(101);
-            registerOverride(700);
-        });
-    })();if (typeof(DeferWebFormInitCallback) == 'function') DeferWebFormInitCallback();function WebForm_OnSubmit() {
-_saveMarkedElems();UpdateFormDigest('\u002fsites\u002fARRM', 1440000);
-                    var workspaceElem = GetCachedElement("s4-workspace");
-                    if (workspaceElem != null)
-                    {
-                        var scrollElem = GetCachedElement("_maintainWorkspaceScrollPosition");
-                        if (scrollElem != null)
-                        {
-                            scrollElem.value = workspaceElem.scrollTop;
-                        }
-                    };
-                if (typeof(SP) != 'undefined' && SP.Ribbon && SP.Ribbon.PageState && SP.Ribbon.PageState.PageStateHandler && SP.Ribbon.PageState.PageStateHandler.pageStateOnSubmit) SP.Ribbon.PageState.PageStateHandler.pageStateOnSubmit();if (typeof(_spFormOnSubmitWrapper) != 'undefined') {return _spFormOnSubmitWrapper();} else {return true;};
-return true;
-}
-//]]>
-</script>
-
-<div class="aspNetHidden">
-
-	<input type="hidden" name="__VIEWSTATEGENERATOR" id="__VIEWSTATEGENERATOR" value="F94CABF6" />
-	<input type="hidden" name="__SCROLLPOSITIONX" id="__SCROLLPOSITIONX" value="0" />
-	<input type="hidden" name="__SCROLLPOSITIONY" id="__SCROLLPOSITIONY" value="0" />
-	<input type="hidden" name="__EVENTVALIDATION" id="__EVENTVALIDATION" value="/wEdAAdPSYCDJ+yVsPdTb9aYJ0Oj0mdSE9/ejYYPXEQDvuz8jTE2ZPaixp3A4yJqsaaZ9TPrrN5FvkZkW5vb4NPvkQr2IQ5QKMsxgDRRtKyNeQNRvng7JHlkfZLTAARmSBM9y2krrdvjNgLBtpjrqtTpA1/bdBW89Wf3ZnomSy8oPUedOlL4XM57o/gJJWx2jhIcFB0=" />
-</div>
-	<script type="text/javascript"> var submitHook = function () { return false; }; theForm._spOldSubmit = theForm.submit; theForm.submit = function () { if (!submitHook()) { this._spOldSubmit(); } }; </script>
-	<span id="DeltaSPWebPartManager">
-		
-	</span>
 	<script type="text/javascript">
-//<![CDATA[
-Sys.WebForms.PageRequestManager._initialize('ctl00$ScriptManager', 'aspnetForm', ['fctl00$WebPartAdderUpdatePanel',''], [], ['ctl00$WebPartAdder',''], 90, 'ctl00');
-//]]>
-</script>
 
-	<span id="DeltaDelegateControls">
-		
-		
-	</span>
-	<div>
-	
-<div id="TurnOnAccessibility" style="display:none" class="s4-notdlg noindex">
-	<a id="linkTurnOnAcc" href="#" class="ms-accessible ms-acc-button" onclick="SetIsAccessibilityFeatureEnabled(true);UpdateAccessibilityUI();document.getElementById('linkTurnOffAcc').focus();return false;">Turn on more accessible mode</a>
-</div>
-<div id="TurnOffAccessibility" style="display:none" class="s4-notdlg noindex">
-	<a id="linkTurnOffAcc" href="#" class="ms-accessible ms-acc-button" onclick="SetIsAccessibilityFeatureEnabled(false);UpdateAccessibilityUI();document.getElementById('linkTurnOnAcc').focus();return false;">Turn off more accessible mode</a>
-</div>
-<div class="s4-notdlg s4-skipribbonshortcut noindex">
-	<a href="javascript:;" onclick="document.getElementById(&#39;startNavigation&#39;).focus();" class="ms-accessible ms-acc-button" accesskey="Y">Skip Ribbon Commands</a>
-</div>
-<div class="s4-notdlg noindex">
-	<a href="javascript:;" onclick="document.getElementById(&#39;mainContent&#39;).focus();" class="ms-accessible ms-acc-button">Skip to main content</a>
-</div>
-<div id="TurnOffAnimation" style="display:none;" class="s4-notdlg noindex">
-	<a id="linkTurnOffAnimation" href="#" class="ms-accessible ms-acc-button" onclick="ToggleAnimationStatus();return false;">Turn off Animations</a>
-</div>
-<div id="TurnOnAnimation" style="display:none;" class="s4-notdlg noindex">
-	<a id="linkTurnOnAnimation" href="#" class="ms-accessible ms-acc-button" onclick="ToggleAnimationStatus();return false;">Turn on Animations</a>
-</div>
-<a id="HiddenAnchor" href="javascript:;" style="display:none;"></a>
-	
-</div>
-	<div id="authWrapper" class="ms-belltown-authenticated">
-<div id="suiteBar" class="ms-dialogHidden noindex">
-	<div id="suiteBarLeft">
-		<div class="ms-table ms-fullWidth">
-			<div class="ms-tableRow">
-				<div class="ms-tableCell ms-verticalAlignMiddle">
-					
+	var slideimages = new Array() // create new array to preload images
+	slideimages[0] = new Image() // create new instance of image object
+	slideimages[0].src = "/arrmimages/orbitor.jpg"//http://www.nasa.gov/sites/default/files/thumbnails/image/15-094.jpg" // set image src property to image path, preloading image in the process
+	slideimages[1] = new Image()
+	slideimages[1].src = "/arrmimages/orion.jpg"//https://upload.wikimedia.org/wikipedia/commons/8/80/Orion_with_ATV_SM.jpg"
+	slideimages[2] = new Image()
+	slideimages[2].src = "/arrmimages/budget.jpg"//http://images.spaceref.com/news/2004/02.01.04.chart.2.lrg.jpg"
+	slideimages[3] = new Image()
+	slideimages[3].src = "/arrmimages/asteroid.jpg"//http://o.aolcdn.com/dims-shared/dims3/GLOB/crop/4000x2445+0+327/resize/630x385!/format/jpg/quality/85/http://hss-prod.hss.aol.com/hss/storage/midas/9d45beddc69216d5863a060ff0c2d8d9/200723983/469055831.jpg"
+	slideimages[4] = new Image()
+	slideimages[4].src = "/arrmimages/commTerminal.jpg"
+	slideimages[5] = new Image()
+	slideimages[5].src = "/arrmimages/eva.jpg"//https://upload.wikimedia.org/wikipedia/en/7/78/Nasa_astronaut_training_at_NBL.jpg"
+	slideimages[6] = new Image()
+	slideimages[6].src = "/arrmimages/announcement.jpg"//http://vignette3.wikia.nocookie.net/psi/images/8/8c/Empty_board_promotion_announcement.jpg/revision/latest?cb=20130707174434"
 
-<!-- Gateway includes -->
+
+var titleArray = [
+'18 May 2015 story: NASA Seeks Additional Information for Asteroid Redirect Mission Spacecraft',
+'Notional ARV Modules and Launch Adapter Design',
+'NASA FY\u0026#39;16 Budget Summary Briefing Calls Our ARRM work',
+'Boulder Capture Simulations Test-bed',
+'Ground-based Optical Comm Terminal could support a secondary optical telecom system for high data rate downlink in lunar orbit and potentially, at the asteroid.',
+'Astronaut EVA with tools at boulder',
+'Announcement:  ARRM MCR rescheduled for March 24, 2015.'];
+
+
+	</script>
+
+
+</head>
+<!-- <body background= "https://gateway-uat.jpl.nasa.gov/sites/ARRM/_catalogs/theme/Themed/1554F203/0917da1b-bfc1-42d8-839b-44a73a779638bkimage-480DF201.themedjpg?ctag"> -->
+<!-- <body background="background-image: url(https://gateway-uat.jpl.nasa.gov/sites/ARRM/_catalogs/theme/Themed/1554F203/0917da1b-bfc1-42d8-839b-44a73a779638bkimage-480DF201.themedjpg?ctag);background-repeat: no-repeat; background-attachment: fixed; background-position: center; "> -->
+	<!-- <link href="css/arrmHome.css" rel="stylesheet" type="text/css"> -->
+<body class="backgrounddd">
 
 
 
 
-
-
-
-
-
-<div id="jplbar">
-    <div id="jpllogo" class="ms-core-brandingText">
-        <a href="https://gateway-uat.jpl.nasa.gov/sites/ARRM">
-            <img alt="JPL" src="/_layouts/15/Gateway.Branding/logo.png">
-        </a>
+<!-- <nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="#">
+        <img alt="Brand" src="...">
+      </a>
     </div>
-    <div id="jplNavButtons">
-        <ul id="navButtons">
-            <li><a href="http://js.jpl.nasa.gov/">JPL Space</a></li>
-
-            <li>
-                <div class="divider"></div>
-                <a href="http://www.jpl.nasa.gov/" target="_blank">JPL</a></li>
-
-            <li>
-                <div class="divider"></div>
-                <a href="http://www.caltech.edu/" target="_blank">CALTECH</a></li>
-
-            <li>
-                <div class="divider"></div>
-                <a href="http://www.nasa.gov/" target="_blank">NASA</a></li>
-        </ul>
-    </div>
-    <div class="" style="display: inline-block" id="search_padding">
-
-        <div class="input-group">
-            <!-- Search Div -->
-            <div class="JPLSpaceQuickFindWebpart" id="jplSpaceQuickFind">
-                <div id="topMenuContainer">
-                </div>
-                <div id="rtSearchResults"></div>
-                <div id="ijplTicker"></div>
-                
-            </div>
-
-        </div>
-
-    </div>
-</div>
-
-				</div>
-				<div id="DeltaSuiteLinks" class="ms-core-deltaSuiteLinks">
-	
-					<div>
-		
-						<div id="suiteLinksBox">
-							
-
-
-<div id="suiteLinksBox">
-    <ul class="ms-core-suiteLinkList">
-        <li class="ms-core-suiteLink"><a id="ctl00_ctl46_ShellNewsfeed" class="ms-core-suiteLink-a" href="/"><span>Gateway</span></a></li>
-        <li class="ms-core-suiteLink"><a id="ctl00_ctl46_ShellDocuments" class="ms-core-suiteLink-a" href="/_layouts/15/MySite.aspx?MySiteRedirect=AllDocuments"><span>Workspace</span></a></li>
-        <li class="ms-core-suiteLink"><a id="ctl00_ctl46_ShellSites" class="ms-core-suiteLink-a" href="/_layouts/15/MySite.aspx?MySiteRedirect=AllSites"><span>Sites</span></a></li>
-    </ul>
-</div>
-
-						</div>
-					
-	</div>
-				
-</div>
-			</div>
-		</div>
-	</div>
-	<div id="suiteBarRight">
-		<div id="DeltaSuiteBarRight" class="ms-core-deltaSuiteBarRight">
-	
-			<div>
-		
-				<div id="welcomeMenuBox">
-  
-	 
-	<span style="display:none"><menu type='ServerMenu' id="zz1_ID_PersonalActionMenu" hideicons="true"><ie:menuitem id="zz2_ID_PersonalInformation" type="option" iconSrc="/_layouts/15/images/menuprofile.gif?rev=23" onMenuClick="javascript:GoToPage(&#39;\u002fsites\u002fARRM\u002f_layouts\u002f15\u002fuserdisp.aspx?Force=True&#39;);return false;" text="My Settings" description="Update your user information, language and regional settings, and alerts." menuGroupId="100"></ie:menuitem>
-		<ie:menuitem id="zz3_ID_Logout" type="option" onMenuClick="STSNavigate2(event,&#39;/sites/ARRM/_layouts/15/SignOut.aspx&#39;);" text="Sign Out" description="Logout of this site." menuGroupId="100"></ie:menuitem>
-		</menu></span><span  id="zz4_Menu_t" class="ms-menu-althov ms-welcome-root" title="Open Menu" onmouseover="MMU_PopMenuIfShowing(this);MMU_EcbTableMouseOverOut(this, true)" hoveractive="ms-menu-althov-active ms-welcome-root ms-welcome-hover" hoverinactive="ms-menu-althov ms-welcome-root" onclick=" CoreInvoke('MMU_Open',byid('zz1_ID_PersonalActionMenu'), MMU_GetMenuFromClientId('zz4_Menu'),event,true, null, 0); return false;" foa="MMU_GetMenuFromClientId('zz4_Menu')" oncontextmenu="ClkElmt(this); return false;" style="white-space:nowrap"><a class="ms-core-menu-root" id="zz4_Menu" accesskey="/" href="javascript:;" title="Open Menu" onfocus="MMU_EcbLinkOnFocusBlur(byid('zz1_ID_PersonalActionMenu'), this, true);" onkeydown="MMU_EcbLinkOnKeyDown(byid('zz1_ID_PersonalActionMenu'), MMU_GetMenuFromClientId('zz4_Menu'), event);" onclick=" CoreInvoke('MMU_Open',byid('zz1_ID_PersonalActionMenu'), MMU_GetMenuFromClientId('zz4_Menu'),event,true, null, 0); return false;" oncontextmenu="ClkElmt(this); return false;" menutokenvalues="MENUCLIENTID=zz4_Menu,TEMPLATECLIENTID=zz1_ID_PersonalActionMenu" serverclientid="zz4_Menu">Derewa, Chrishma (313B)<span class='ms-accessible'>Use SHIFT+ENTER to open the menu (new window).</span></a><span style="height:4px;width:7px;position:relative;display:inline-block;overflow:hidden;" class="s4-clust ms-viewselector-arrow ms-menu-stdarw ms-core-menu-arrow"><img src="/sites/ARRM/_catalogs/theme/Themed/1554F203/spcommon-B35BB0A9.themedpng?ctag=2" alt="Open Menu" style="position:absolute;left:-95px !important;top:-259px !important;" /></span><span style="height:4px;width:7px;position:relative;display:inline-block;overflow:hidden;" class="s4-clust ms-core-menu-arrow ms-viewselector-arrow ms-menu-hovarw"><img src="/sites/ARRM/_catalogs/theme/Themed/1554F203/spcommon-B35BB0A9.themedpng?ctag=2" alt="Open Menu" style="position:absolute;left:-86px !important;top:-259px !important;" /></span></span>
-
-
-				</div>
-				<div id="suiteBarButtons">
-					   <span class="ms-siteactions-root" id="siteactiontd">
-					   
-						
-						<span style="display:none"><menu type='ServerMenu' id="zz5_SiteActionsMenuMain" hideicons="true"><ie:menuitem id="zz6_MenuItem_ShareThisSite" type="option" onMenuClick="EnsureScriptFunc(&#39;sharing.js&#39;, &#39;DisplaySharedWithDialog&#39;, function () { DisplaySharedWithDialog(&#39;\u002fsites\u002fARRM\u002f&#39;); })" text="Shared with..." description="See who&#39;s here and invite new people." menuGroupId="100"></ie:menuitem>
-		<ie:menuitem id="ctl00_SiteActionsMenuMain_ctl00_MenuItem_EditPage" type="option" iconSrc="/_layouts/15/images/ActionsEditPage.png?rev=23" onMenuClick="window.location = &#39;javascript:{EnsureScriptParams(\&#39;ribbon\&#39;, \&#39;ChangeWikiPageMode\&#39;, true);}&#39;;" text="Edit page" description="Edit the contents of this page." menuGroupId="200"></ie:menuitem>
-		<ie:menuitem id="zz7_MenuItem_CreatePage" type="option" iconSrc="/_layouts/15/images/NewContentPageHH.png?rev=23" onMenuClick="OpenCreateWebPageDialog(&#39;\u002fsites\u002fARRM\u002f_layouts\u002f15\u002fcreatewebpage.aspx&#39;)" text="Add a page" description="Create a page you can customize." menuGroupId="200"></ie:menuitem>
-		<ie:menuitem id="zz8_MenuItem_Create" type="option" onMenuClick="GoToPage(&#39;\u002fsites\u002fARRM\u002f_layouts\u002f15\u002faddanapp.aspx&#39;)" text="Add an app" description="Create other types of pages, lists, libraries, and sites." menuGroupId="200"></ie:menuitem>
-		<ie:menuitem id="zz9_MenuItem_ViewAllSiteContents" type="option" iconSrc="/_layouts/15/images/allcontent32.png?rev=23" onMenuClick="STSNavigate2(event,&#39;/sites/ARRM/_layouts/15/viewlsts.aspx&#39;);" text="Site contents" description="View all libraries and lists in this site." menuGroupId="200"></ie:menuitem>
-		<ie:menuitem id="zz10_MenuItem_Settings" type="option" iconSrc="/_layouts/15/images/settingsIcon.png?rev=23" onMenuClick="GoToPage(&#39;\u002fsites\u002fARRM\u002f_layouts\u002f15\u002fsettings.aspx&#39;)" text="Site settings" description="Access all settings for this site." menuGroupId="300"></ie:menuitem>
-		<ie:menuitem id="ctl00_SiteActionsMenuMain_ctl00_ctl02" type="option" onMenuClick="STSNavigate2(event,&#39;/sites/ARRM/GettingStarted.aspx&#39;);" text="Getting started" description="Get started with your site." menuGroupId="2147483647"></ie:menuitem>
-		</menu></span><span id="zz11_SiteActionsMenu_t" class="ms-siteactions-normal" title="Settings" onmouseover="MMU_PopMenuIfShowing(this);MMU_EcbTableMouseOverOut(this, true)" hoveractive="ms-siteactions-normal ms-siteactions-hover" hoverinactive="ms-siteactions-normal" onclick=" CoreInvoke('MMU_Open',byid('zz5_SiteActionsMenuMain'), MMU_GetMenuFromClientId('zz11_SiteActionsMenu'),event,true, null, 0); return false;" foa="MMU_GetMenuFromClientId('zz11_SiteActionsMenu')" oncontextmenu="ClkElmt(this); return false;"><a class="ms-core-menu-root" id="zz11_SiteActionsMenu" accesskey="/" href="javascript:;" title="Settings" onkeydown="MMU_EcbLinkOnKeyDown(byid('zz5_SiteActionsMenuMain'), MMU_GetMenuFromClientId('zz11_SiteActionsMenu'));" menutokenvalues="MENUCLIENTID=zz11_SiteActionsMenu,TEMPLATECLIENTID=zz5_SiteActionsMenuMain" serverclientid="zz11_SiteActionsMenu"><span class="ms-siteactions-imgspan"><img class="ms-core-menu-buttonIcon" src="/sites/ARRM/_catalogs/theme/Themed/1554F203/spcommon-B35BB0A9.themedpng?ctag=2" alt="Settings" title="Settings" /></span><span class='ms-accessible'>Use SHIFT+ENTER to open the menu (new window).</span></a></span></span>
-<span id="ms-help">
-	<a onmouseover="this.firstChild.firstChild.firstChild.style.left=&#39;-1px&#39;; this.firstChild.firstChild.firstChild.style.top=&#39;-1px&#39;;" onmouseout="this.firstChild.firstChild.firstChild.style.left=&#39;-19px&#39;; this.firstChild.firstChild.firstChild.style.top=&#39;-1px&#39;;" id="ctl00_TopHelpLink" accesskey="6" title="Help" onclick="TopHelpButtonClick(&#39;HelpHome&#39;,event);return false" href="../_catalogs/masterpage/#" style="display:inline-block;height:30px;width:30px;"><span style="display:inline-block;overflow:hidden;height:16px;width:16px;padding-left:7px;padding-top:7px;padding-right:7px;padding-bottom:7px;"><span style="height:16px;width:16px;position:relative;display:inline-block;overflow:hidden;" class="s4-clust"><img src="/sites/ARRM/_catalogs/theme/Themed/1554F203/spintl-C9940797.themedpng?ctag=2" alt="Help" style="border:0;position:absolute;left:-19px;top:-1px;" /></span></span></a>
-</span>
-				</div>
-			
-	</div>
-		
-</div>
-	</div>
-</div>
-		<div class="ms-belltown-anonShow">
-			<div id="s4-ribbonrow">
-				<div id="globalNavBox">
-<div id="ribbonBox">
-	<div id="s4-ribboncont">
-		<div id="DeltaSPRibbon">
-	
-			
-			<input id="RibbonContainer_activeTabId" name="ctl00$ctl50" type="hidden" value=""/><div id='RibbonContainer'><div class="ms-cui-ribbon ms-cui-needIEFilter" id="Ribbon" unselectable="on" aria-describedby="ribboninstructions" oncontextmenu="return false" role="toolbar"><span class="ms-cui-hidden" id="ribboninstructions" unselectable="on">To navigate through the Ribbon, use standard browser navigation keys. To skip between groups, use Ctrl+LEFT or Ctrl+RIGHT. To jump to the first Ribbon tab use Ctrl+[. To jump to the last selected command use Ctrl+]. To activate a command, use Enter.</span><div class="ms-cui-ribbonTopBars" unselectable="on"><div class="ms-cui-topBar1" unselectable="on" style="display:none"><div class="ms-cui-qat-container" unselectable="on"></div></div><div class="ms-cui-topBar2" unselectable="on"><div class="ms-cui-jewel-container" id="jewelcontainer" unselectable="on" style="display:none"></div><div class="ms-cui-TabRowLeft ms-core-defaultFont ms-dialogHidden" id="RibbonContainer-TabRowLeft" unselectable="on">
-				</div><ul class="ms-cui-tts" unselectable="on" role="tablist"><li class="ms-cui-tt ms-browseTab ms-cui-tt-s" id="Ribbon.Read-title" unselectable="on" role="tab"><a class="ms-cui-tt-a" unselectable="on" href="javascript:;" onclick="_ribbonStartInit('Ribbon.Read',false, event);" title="Browse" onkeydown="if(event != null && event.keyCode == 13){ if(typeof(_ribbon) != 'undefined') _ribbon.launchedByKeyboard = true; _ribbonStartInit('Ribbon.Read',false, event);  }"><span class="ms-cui-tt-span" unselectable="on">Browse</span><span class="ms-cui-hidden" unselectable="on">Tab 1 of 2.</span></a></li><li class="ms-cui-tt" id="Ribbon.WikiPageTab-title" unselectable="on" role="tab"><a class="ms-cui-tt-a" unselectable="on" href="javascript:;" onclick="_ribbonStartInit('Ribbon.WikiPageTab',false, event);" title="Page" onkeydown="if(event != null && event.keyCode == 13){ if(typeof(_ribbon) != 'undefined') _ribbon.launchedByKeyboard = true; _ribbonStartInit('Ribbon.WikiPageTab',false, event);  }"><span class="ms-cui-tt-span" unselectable="on">Page</span><span class="ms-cui-hidden" unselectable="on">Tab 2 of 2.</span></a></li></ul><div class="ms-cui-TabRowRight s4-trc-container s4-notdlg ms-core-defaultFont" id="RibbonContainer-TabRowRight" unselectable="on">
-					<a onmouseover="this.firstChild.firstChild.style.left=&#39;-91px&#39;; this.firstChild.firstChild.style.top=&#39;-232px&#39;;" onmouseout="this.firstChild.firstChild.style.left=&#39;-200px&#39;; this.firstChild.firstChild.style.top=&#39;-48px&#39;;" onclick="EnsureScriptFunc(&#39;sharing.js&#39;, &#39;DisplaySharingDialog&#39;, function(){DisplaySharingDialog(&#39;\u002fsites\u002fARRM&#39;)}); return false;" id="ctl00_site_share_button" title="Give people access to this site." class="ms-promotedActionButton" href="javascript:WebForm_DoPostBackWithOptions(new WebForm_PostBackOptions(&quot;ctl00$site_share_button&quot;, &quot;&quot;, true, &quot;&quot;, &quot;&quot;, false, true))" style="display:inline-block;"><span style="height:16px;width:16px;position:relative;display:inline-block;overflow:hidden;" class="s4-clust ms-promotedActionButton-icon"><img src="/sites/ARRM/_catalogs/theme/Themed/1554F203/spcommon-B35BB0A9.themedpng?ctag=2" alt="Share" style="position:absolute;left:-200px;top:-48px;" /></span><span class="ms-promotedActionButton-text">Share</span></a>
-					<a onmouseover="this.firstChild.firstChild.style.left=&#39;-217px&#39;; this.firstChild.firstChild.style.top=&#39;-192px&#39;;" onmouseout="this.firstChild.firstChild.style.left=&#39;-218px&#39;; this.firstChild.firstChild.style.top=&#39;-48px&#39;;" onclick="SP.SOD.executeFunc(&#39;followingcommon.js&#39;, &#39;FollowSite&#39;, function() { FollowSite(); }); return false;" id="site_follow_button" title="Follow this site and get back to it easily from your sites page." class="ms-promotedActionButton" href="javascript:WebForm_DoPostBackWithOptions(new WebForm_PostBackOptions(&quot;ctl00$site_follow_button&quot;, &quot;&quot;, true, &quot;&quot;, &quot;&quot;, false, true))" style="display:inline-block;"><span style="height:16px;width:16px;position:relative;display:inline-block;overflow:hidden;" class="s4-clust ms-promotedActionButton-icon"><img src="/sites/ARRM/_catalogs/theme/Themed/1554F203/spcommon-B35BB0A9.themedpng?ctag=2" alt="Follow" style="position:absolute;left:-218px;top:-48px;" /></span><span class="ms-promotedActionButton-text">Follow</span></a>
-					
-					<a class="ms-rtefocus-invalid ms-promotedActionButton" id="ctl00_PageStateActionButton" href="javascript:" onclick="CoreInvoke('PageActionClick', this);return false;" _action="edit" _editoffsetx="236" _editoffsety="84" _edithoveroffsetx="181" _edithoveroffsety="192" _saveoffsetx="0" _saveoffsety="433" _savehoveroffsetx="0" _savehoveroffsety="449" _edittooltip="Edit" _savetooltip="Save" title="Edit" onmouseover="this.firstChild.firstChild.style.left=&#39;-&#39; + (this.getAttribute(&#39;_action&#39;) === &#39;edit&#39; ? this.getAttribute(&#39;_edithoveroffsetx&#39;) : this.getAttribute(&#39;_savehoveroffsetx&#39;)) + &#39;px&#39;; this.firstChild.firstChild.style.top=&#39;-&#39; + (this.getAttribute(&#39;_action&#39;) === &#39;edit&#39; ? this.getAttribute(&#39;_edithoveroffsety&#39;) : this.getAttribute(&#39;_savehoveroffsety&#39;)) + &#39;px&#39;;" onmouseout="this.firstChild.firstChild.style.left=&#39;-&#39; + (this.getAttribute(&#39;_action&#39;) === &#39;edit&#39; ? this.getAttribute(&#39;_editoffsetx&#39;) : this.getAttribute(&#39;_saveoffsetx&#39;)) + &#39;px&#39;; this.firstChild.firstChild.style.top=&#39;-&#39; + (this.getAttribute(&#39;_action&#39;) === &#39;edit&#39; ? this.getAttribute(&#39;_editoffsety&#39;) : this.getAttribute(&#39;_saveoffsety&#39;)) + &#39;px&#39;;"><span style="height:16px;width:16px;position:relative;display:inline-block;overflow:hidden;" class="s4-clust ms-promotedActionButton-icon"><img src="/sites/ARRM/_catalogs/theme/Themed/1554F203/spcommon-B35BB0A9.themedpng?ctag=2" style="position:absolute;left:-236px;top:-84px;" /></span><span class="ms-promotedActionButton-text">Edit</span></a>
-<span id="fullscreenmodebox" class="ms-qatbutton">
-	<span id="fullscreenmode">
-		<a onmouseover="this.firstChild.firstChild.firstChild.style.left=&#39;-125px&#39;; this.firstChild.firstChild.firstChild.style.top=&#39;-178px&#39;;" onmouseout="this.firstChild.firstChild.firstChild.style.left=&#39;-143px&#39;; this.firstChild.firstChild.firstChild.style.top=&#39;-178px&#39;;" id="ctl00_fullscreenmodeBtn" title="Focus on Content" onclick="SetFullScreenMode(true);PreventDefaultNavigation();return false;" href="../_catalogs/masterpage/#" style="display:inline-block;height:30px;width:30px;"><span style="display:inline-block;overflow:hidden;height:16px;width:16px;padding-left:7px;padding-top:7px;padding-right:7px;padding-bottom:7px;"><span style="height:16px;width:16px;position:relative;display:inline-block;overflow:hidden;" class="s4-clust"><img src="/sites/ARRM/_catalogs/theme/Themed/1554F203/spcommon-B35BB0A9.themedpng?ctag=2" alt="Focus on Content" style="border:0;position:absolute;left:-143px;top:-178px;" /></span></span></a>
-	</span>
-	<span id="exitfullscreenmode" style="display: none;">
-		<a onmouseover="this.firstChild.firstChild.firstChild.style.left=&#39;-179px&#39;; this.firstChild.firstChild.firstChild.style.top=&#39;-96px&#39;;" onmouseout="this.firstChild.firstChild.firstChild.style.left=&#39;-107px&#39;; this.firstChild.firstChild.firstChild.style.top=&#39;-178px&#39;;" id="ctl00_exitfullscreenmodeBtn" title="Focus on Content" onclick="SetFullScreenMode(false);PreventDefaultNavigation();return false;" href="../_catalogs/masterpage/#" style="display:inline-block;height:30px;width:30px;"><span style="display:inline-block;overflow:hidden;height:16px;width:16px;padding-left:7px;padding-top:7px;padding-right:7px;padding-bottom:7px;"><span style="height:16px;width:16px;position:relative;display:inline-block;overflow:hidden;" class="s4-clust"><img src="/sites/ARRM/_catalogs/theme/Themed/1554F203/spcommon-B35BB0A9.themedpng?ctag=2" alt="Focus on Content" style="border:0;position:absolute;left:-107px;top:-178px;" /></span></span></a>
-	</span>
-</span>
-
-
-				</div></div></div></div></div>
-		
-</div>
-	</div>
-	<span id="DeltaSPNavigation">
-		
-			
-		
-	</span>
-</div>
-<div id="DeltaWebPartAdderUpdatePanelContainer" class="ms-core-webpartadder">
-	
-  <div id="WebPartAdderUpdatePanelContainer">
-	<div id="ctl00_WebPartAdderUpdatePanel">
-		
-		<span id="ctl00_WebPartAdder"></span>
-	  
-	</div>
   </div>
+</nav> -->
 
-</div>
-				</div>
+
+
+
+
+	<!-- <h1 style="font-size:150%; color:white; font-weight:100;text-decoration: none;"><a href="arrmHome.html" style="color:white"> HOMEEEEE </a></h1> -->
+	
+	<!-- <div id="textbox" style="opacity:0.4; fukter:alpha(opacity=40);"> -->
+<!-- 	<div clas="background">
+	  	<div class="transbox">	
+	  		<p class="alignleft" style="color:white; font-size:120%">Text on the left.</p>
+	  		<p class="alignright" style="color:white; font-size:120%">Text on the right.</p>
+		</div>
+	</div> -->
+	<!-- </div style="clear:both;"></div> -->
+
+	<!-- <div clas="background"> -->
+		<div class="transbox">
+<!-- 		<div id="textbox" style="	    margin: 20px;
+	    background-color: #000000;
+	    border: 1px solid black;
+	    opacity: 0.7;"> -->
+			<h1><a href="arrmHome.html" style="color:white"> Home </a></h1>
+			<h2> Administrative Resources <span style="float:right; color:white;">Technical Design Concept Info</span> </p> 
+			<h3 style="text-align:left"> ARRM Resources:<span> Mission Objectives & Requirements </span></h3>
+				<p> Library </p>
+				<p> Jira Site <span style="font-size:130%; font-weight:200">Mission Design</span></p>
+				<p> ViewEditor </p>
+			<h3 style="text-align:left"> Administrative: <span> Block Diagrams</h3>
+				<p> Team Org Tree <span style="font-size:120%; font-weight:200"> (composition & interfaces)</span></p>
+				<p> Project Schedule </p>
+				<p> New Member Form </p>
+			<h3 style="text-align:left"> ARRM Library:<span> Mechanical Drawings </span></h3>	
+				<p> Work Area </p>
+				<p> Reviews and Meetings <span style="font-size:130%; font-weight:200">Functional OpsCon</span></p>
+				<p> MMRs </p>
+			<h3 style="text-align:left"> Public Sites:<span> Mass: </span></h3>	
+				<p> Asteroid Redirect Mission <span style="color:white;"> MEL & Margins</p>
+				<p> Asteroid Initiative </p>
+				 <!-- <span style="font-size:130%; font-weight:200">Power</span></p> -->
+			<h3 style="text-align:left"> Released Documents and Presentation<span> Power: </span></h3>	
+				<p> 2014 ARRM Mission Concept Options Overview <span style="color:white;"> PEL & Margins </span></p>
+				<p> 2013 ARRM Feasibility Study <span style="color:white"> Power Modes </span> </p>
+			<h3 style="color:black"> place holder text <span> Data: </span></h3>	
+				<p style="color:black"> place holder text <span style="color:white;"> Characterisitcs</span></p>
+				<p style="color:black"> place holder text <span style="color:white"> Data Analyses </span> </p>
+
+
+		<img src="commTerminal.jpg" name="slide" width="100" height="56"/>
+		<script type="text/javascript">
+			var step=0
+			function slideit(){
+				// if(!document.images) return document.getElementById('slide').src=slideimages[step].src
+			document.images.slide.src=eval("image"+step+".src")
+			if(step<7)
+				step++
+			else
+				step=0
+			setTimeout("slideit()",2500)
+		}
+		slideit()
+		</script>
+
+
+
+
+<!-- bottom authoring box -->
+			<div class="transbox" style="border: 1px solid white;">
+<!-- 				<p style="margin: 5px;color:white;"> Project Manager: <span style="text-align: left; color:white;"> Project Technologist:
+				 <span style="float:center; text-align:right; color:white;"> Content Manager: </span>
+				</span> <p> -->
+			<h4 style="text-align:center; font-size:100%; font-weight:200; color:white;"> Project Manager: &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp Project Technologist: &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp Content Manager:</h4> 
+
+
 			</div>
-		</div>
-		<div id="s4-workspace">
-			<div id="s4-bodyContainer">
-				<div class="ms-belltown-anonspacer"></div>
-				<div id="ms-belltown-table" class="ms-table">
-					<div id="titlerow" class="ms-dialogHidden ms-core-header ms-tableRow">
-						<div id="titleAreaBox" class="ms-noList ms-table">
-							<div id="titleAreaRow" class="ms-tableRow">
-<div id="siteIcon" class="ms-tableCell ms-verticalAlignTop">
-	<div id="DeltaSiteLogo">
-	
-		<a id="ctl00_onetidProjectPropertyTitleGraphic" title="Asteroid Robotic Redirect Mission" class="ms-siteicon-a" href="/sites/ARRM"><img id="ctl00_onetidHeadbnnr2" class="ms-siteicon-img" name="onetidHeadbnnr0" src="/sites/ARRM/_catalogs/theme/Themed/1554F203/siteIcon-2129F729.themedpng?ctag=2" alt="Asteroid Robotic Redirect Mission" /></a>
-	
-</div>
-</div>
-								<div class="ms-breadcrumb-box ms-tableCell ms-verticalAlignTop">
-									<h1 id="pageTitle" class="ms-core-pageTitle">
-										<span id="DeltaPlaceHolderPageSiteName" class="ms-core-navigation">
-											
-												<a id="ctl00_PlaceHolderSiteName_onetidProjectPropertyTitle1" onclick="return STSNavigate(this.href);" href="/sites/ARRM/">
-													Asteroid Robotic Redirect Mission
-												</a>
-											
-										</span>
-									</h1>
-									<div id="DeltaHorizontalQuickLaunch" class="ms-core-navigation ms-belltown-quicklaunch" role="navigation">
-	
-				<div class="ms-quicklaunchouter">
-				<div class="ms-quickLaunch">
-				<div id="ctl00_QuickLaunchNavigationManager">
-		
-					
-							
-						
-					<div id="zz12_V4QuickLaunchMenu" class=" noindex ms-core-listMenu-horizontalBox" onclick="return AjaxNavigate$OnClickHook(event, this);">
-			<ul id="zz13_RootAspMenu" class="root ms-core-listMenu-root static">
-				<li class="static selected"><a class="static selected menu-item ms-core-listMenu-item ms-displayInline ms-core-listMenu-selected ms-navedit-linkNode" tabindex="0" href="/sites/ARRM"><span class="additional-background ms-navedit-flyoutArrow"><span class="menu-item-text">Home</span><span class="ms-hidden">Currently selected</span></span></a></li><li class="static"><a class="static menu-item ms-core-listMenu-item ms-displayInline ms-navedit-linkNode" tabindex="0" href="/sites/ARRM/Lists/Calendar/calendar.aspx"><span class="additional-background ms-navedit-flyoutArrow"><span class="menu-item-text">
-Calendar
-							</span></span></a></li><li class="static"><a class="static ms-quicklaunch-dropNode menu-item ms-core-listMenu-item ms-displayInline ms-navedit-linkNode" tabindex="0" href="/sites/ARRM/Shared Documents/Forms/AllItems.aspx"><span class="additional-background ms-navedit-flyoutArrow"><span class="menu-item-text">Documents</span></span></a></li><li class="static dynamic-children"><span class="static dynamic-children menu-item ms-core-listMenu-item ms-displayInline ms-navedit-linkNode" tabindex="0"><span aria-haspopup="true" class="additional-background ms-navedit-flyoutArrow dynamic-children"><span class="menu-item-text">Recent</span></span></span><ul class="dynamic">
-					<li class="dynamic"><a class="dynamic menu-item ms-core-listMenu-item ms-displayInline ms-navedit-linkNode" tabindex="0" href="/sites/ARRM/Lists/Calendar/calendar.aspx"><span class="additional-background ms-navedit-flyoutArrow"><span class="menu-item-text">Calendar</span></span></a></li><li class="dynamic"><a class="dynamic ms-quicklaunch-dropNode menu-item ms-core-listMenu-item ms-displayInline ms-navedit-linkNode" tabindex="0" href="/sites/ARRM/Site Images/Forms/Thumbnails.aspx"><span class="additional-background ms-navedit-flyoutArrow"><span class="menu-item-text">Site Images</span></span></a></li>
-				</ul></li><li class="static"><a class="static menu-item ms-core-listMenu-item ms-displayInline ms-navedit-linkNode" tabindex="0" href="/sites/ARRM/_layouts/15/viewlsts.aspx"><span class="additional-background ms-navedit-flyoutArrow"><span class="menu-item-text">Site Contents</span></span></a></li><li class="static ms-verticalAlignTop ms-listMenu-editLink ms-navedit-editArea"><span class="ms-navedit-editSpan" id="zz12_V4QuickLaunchMenu_NavMenu_Edit"><a id="zz12_V4QuickLaunchMenu_NavMenu_EditLinks" class="ms-navedit-editLinksText" href="#" onclick="g_QuickLaunchMenu = null; EnsureScriptParams(&#39;quicklaunch.js&#39;, &#39;QuickLaunchInitEditMode&#39;, &#39;zz12_V4QuickLaunchMenu&#39;, 1, 2, 0, &#39;sid:1025&#39;); cancelDefault(event); return false;"><span class="ms-displayInlineBlock"><span class="ms-navedit-editLinksIconWrapper ms-verticalAlignMiddle"><img class="ms-navedit-editLinksIcon" src="/sites/ARRM/_catalogs/theme/Themed/1554F203/spcommon-B35BB0A9.themedpng?ctag=2" /></span><span class="ms-metadata ms-verticalAlignMiddle">Edit Links</span></span></a><span id="zz12_V4QuickLaunchMenu_NavMenu_Loading" class="ms-navedit-menuLoading ms-hide"><a id="zz12_V4QuickLaunchMenu_NavMenu_GearsLink" href="#" onclick="HideGears(); return false;" title="This animation indicates the operation is in progress. Click to remove this animated image."><img id="zz12_V4QuickLaunchMenu_NavMenu_GearsImage" src="/_layouts/15/images/loadingcirclests16.gif?rev=23" /></a></span><div id="zz12_V4QuickLaunchMenu_NavMenu_ErrorMsg" class="ms-navedit-errorMsg">
-
-				</div></span></li>
-			</ul>
-		</div>
-				
-	</div>
-				</div>
-				</div>
-									
-</div>
-								</div>
-								<div class="ms-tableCell ms-verticalAlignTop">
-									<span id="DeltaPlaceHolderPageHeader" class="ms-belltown-pageheader">
-										
-									</span>
-									<div id="DeltaPlaceHolderSearchArea" class="ms-belltown-searcharea">
-	
-										<div class="ms-pub-logon">
-											
-	 
-	<span style="display:none"><menu type='ServerMenu' id="zz14_ID_PersonalActionMenu" hideicons="true"><ie:menuitem id="zz15_ID_PersonalInformation" type="option" iconSrc="/_layouts/15/images/menuprofile.gif?rev=23" onMenuClick="javascript:GoToPage(&#39;\u002fsites\u002fARRM\u002f_layouts\u002f15\u002fuserdisp.aspx?Force=True&#39;);return false;" text="My Settings" description="Update your user information, language and regional settings, and alerts." menuGroupId="100"></ie:menuitem>
-	<ie:menuitem id="zz16_ID_Logout" type="option" onMenuClick="STSNavigate2(event,&#39;/sites/ARRM/_layouts/15/SignOut.aspx&#39;);" text="Sign Out" description="Logout of this site." menuGroupId="100"></ie:menuitem>
-	</menu></span><span  id="zz17_Menu_t" class="ms-menu-althov ms-welcome-root" title="Open Menu" onmouseover="MMU_PopMenuIfShowing(this);MMU_EcbTableMouseOverOut(this, true)" hoveractive="ms-menu-althov-active ms-welcome-root ms-welcome-hover" hoverinactive="ms-menu-althov ms-welcome-root" onclick=" CoreInvoke('MMU_Open',byid('zz14_ID_PersonalActionMenu'), MMU_GetMenuFromClientId('zz17_Menu'),event,true, null, 0); return false;" foa="MMU_GetMenuFromClientId('zz17_Menu')" oncontextmenu="ClkElmt(this); return false;" style="white-space:nowrap"><a class="ms-core-menu-root" id="zz17_Menu" accesskey="/" href="javascript:;" title="Open Menu" onfocus="MMU_EcbLinkOnFocusBlur(byid('zz14_ID_PersonalActionMenu'), this, true);" onkeydown="MMU_EcbLinkOnKeyDown(byid('zz14_ID_PersonalActionMenu'), MMU_GetMenuFromClientId('zz17_Menu'), event);" onclick=" CoreInvoke('MMU_Open',byid('zz14_ID_PersonalActionMenu'), MMU_GetMenuFromClientId('zz17_Menu'),event,true, null, 0); return false;" oncontextmenu="ClkElmt(this); return false;" menutokenvalues="MENUCLIENTID=zz17_Menu,TEMPLATECLIENTID=zz14_ID_PersonalActionMenu" serverclientid="zz17_Menu">Derewa, Chrishma (313B)<span class='ms-accessible'>Use SHIFT+ENTER to open the menu (new window).</span></a><span style="height:4px;width:7px;position:relative;display:inline-block;overflow:hidden;" class="s4-clust ms-viewselector-arrow ms-menu-stdarw ms-core-menu-arrow"><img src="/sites/ARRM/_catalogs/theme/Themed/1554F203/spcommon-B35BB0A9.themedpng?ctag=2" alt="Open Menu" style="position:absolute;left:-95px !important;top:-259px !important;" /></span><span style="height:4px;width:7px;position:relative;display:inline-block;overflow:hidden;" class="s4-clust ms-core-menu-arrow ms-viewselector-arrow ms-menu-hovarw"><img src="/sites/ARRM/_catalogs/theme/Themed/1554F203/spcommon-B35BB0A9.themedpng?ctag=2" alt="Open Menu" style="position:absolute;left:-86px !important;top:-259px !important;" /></span></span>
-
-
-										</div>
-										
-											<div id="searchInputBox">
-												<div class="ms-webpart-chrome ms-webpart-chrome-fullWidth ">
-		<div WebPartID="00000000-0000-0000-0000-000000000000" HasPers="true" id="WebPartWPQ1" width="100%" class="ms-WPBody noindex " OnlyForMePart="true" allowDelete="false" style="" ><div componentid="ctl00_PlaceHolderSearchArea_SmallSearchInputBox1_csr" id="ctl00_PlaceHolderSearchArea_SmallSearchInputBox1_csr"><div id="SearchBox" name="Control"><div class="ms-srch-sb ms-srch-sb-border" id="ctl00_PlaceHolderSearchArea_SmallSearchInputBox1_csr_sboxdiv"><input type="text" value="Search this site" maxlength="2048" accessKey="S" title="Search this site" id="ctl00_PlaceHolderSearchArea_SmallSearchInputBox1_csr_sbox" autocomplete="off" autocorrect="off" onkeypress="EnsureScriptFunc('Search.ClientControls.js', 'Srch.U', function() {if (Srch.U.isEnterKey(String.fromCharCode(event.keyCode))) {$find('ctl00_PlaceHolderSearchArea_SmallSearchInputBox1_csr').search($get('ctl00_PlaceHolderSearchArea_SmallSearchInputBox1_csr_sbox').value);return Srch.U.cancelEvent(event);}})" onkeydown="EnsureScriptFunc('Search.ClientControls.js', 'Srch.U', function() {var ctl = $find('ctl00_PlaceHolderSearchArea_SmallSearchInputBox1_csr');ctl.activateDefaultQuerySuggestionBehavior();})" onfocus="EnsureScriptFunc('Search.ClientControls.js', 'Srch.U', function() {var ctl = $find('ctl00_PlaceHolderSearchArea_SmallSearchInputBox1_csr');ctl.hidePrompt();ctl.setBorder(true);})" onblur="EnsureScriptFunc('Search.ClientControls.js', 'Srch.U', function() {var ctl = $find('ctl00_PlaceHolderSearchArea_SmallSearchInputBox1_csr'); if (ctl){ ctl.showPrompt(); ctl.setBorder(false);}})" class="ms-textSmall ms-srch-sb-prompt ms-helperText"/><a title="Navigation" id="ctl00_PlaceHolderSearchArea_SmallSearchInputBox1_csr_NavButton" onclick="EnsureScriptFunc('Search.ClientControls.js', 'Srch.U', function() {$find('ctl00_PlaceHolderSearchArea_SmallSearchInputBox1_csr').activateDefaultNavigationBehavior();return Srch.U.cancelEvent(event);})" href="javascript: {}" class="ms-srch-sb-navLink" ><img src="/sites/ARRM/_catalogs/theme/Themed/1554F203/searchresultui-61174269.themedpng?ctag=2" class="ms-srch-sb-navImg" id="navImg" alt="Navigation" /></a><a title="Search" class="ms-srch-sb-searchLink" id="ctl00_PlaceHolderSearchArea_SmallSearchInputBox1_csr_SearchLink" onclick="EnsureScriptFunc('Search.ClientControls.js', 'Srch.U', function() {$find('ctl00_PlaceHolderSearchArea_SmallSearchInputBox1_csr').search($get('ctl00_PlaceHolderSearchArea_SmallSearchInputBox1_csr_sbox').value);})" href="javascript: {}" ><img src="/sites/ARRM/_catalogs/theme/Themed/1554F203/searchresultui-61174269.themedpng?ctag=2" class="ms-srch-sb-searchImg" id="searchImg" alt="Search" /></a><div class="ms-qSuggest-container ms-shadow" id="AutoCompContainer"><div id="ctl00_PlaceHolderSearchArea_SmallSearchInputBox1_csr_AutoCompList"></div></div><div class="ms-qSuggest-container ms-shadow" id="NavDropdownListContainer"><div id="ctl00_PlaceHolderSearchArea_SmallSearchInputBox1_csr_NavDropdownList"></div></div></div></div></div><noscript><div id="ctl00_PlaceHolderSearchArea_SmallSearchInputBox1_noscript">It looks like your browser does not have JavaScript enabled. Please turn on JavaScript and try again.</div></noscript><div id="ctl00_PlaceHolderSearchArea_SmallSearchInputBox1">
-
-		</div><div class="ms-clear"></div></div>
-	</div>
-											</div>
-										
-									
-</div>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div class="ms-tableRow">
-						<div class="ms-tableCell ms-verticalAlignTop">
-							<div id="notificationArea" class="ms-notif-box"></div>
-							<div id="DeltaPageStatusBar">
-	
-								<div id="pageStatusBar"></div>
-							
-</div>
-						</div>
-					</div>
-					<div class="ms-tableRow">
-						<div class="ms-tableCell">
-							<div class="contentwrapper">
-								<div class="ms-table ms-fullWidth">
-									<div class="ms-tableRow">
-										<div class="ms-tableCell ms-verticalAlignTop">
-											<div id="sideNavBox" class="ms-dialogHidden ms-forceWrap ms-noList">
-												<a id="startNavigation" name="startNavigation" tabIndex="-1"></a>
-												<div id="DeltaPlaceHolderLeftNavBar" class="ms-core-navigation ms-belltown-sideNavDelta">
-	
-													
 
 
 
 
 
-	
+<!-- 
+				<h3 style= "text-align:right">Power</h3>
+				<p> <span style="color:white;"> PEL & Margins </span></p>
+				<p> <span style="color:white;"> Power Modes </span></p>
+				<p> PEL & Margins </p>
+				<p> Power Modes </p> -->
 
 
-					
-													
-												
-</div>
-											</div>
-										</div>
-<div id="contentBox" class="ms-pub-contentLayout ms-verticalAlignTop" aria-live="polite" aria-relevant="all">
-	<a id="mainContent" name="mainContent" tabindex="-1"></a>
-	<h1 id="pageContentTitle" class="ms-belltown-pageName ms-noWrap ms-dialogHidden">
-		<span id="DeltaPlaceHolderPageTitleInTitleArea">
+
+
+<!-- 			<h3 style="text-align:left"> Released Documents and Presentation:<span style="color:white; font-size=10%;"> Power Analyses </spam> </p>
+				<p> 2014 ARRM Mission Concept Options Overview <span style="font-size:130%; font-weight:200">Data:</span></p>
+				<p> 2013 ARRM Feasibility Study <span style="color:white;"> Characterisitics</span></p>
+				<p> <span style="color:white"> Data Anaylses </span></p> -->
+
+
+
+				<!-- This is some text that is placed in the transparent box.what if i threw this over here?? other things that h -->
+			<!-- <p style="text-align:center; width:33.3333%;">sssss</p> -->
+			<!-- <p style="text-align:right;">This is some right?? text that is placed in the transparent box. -->
 			
-			  <span><a href="#ctl00_PlaceHolderPageTitleInTitleArea_ctl00_SkipLink"><img alt="Skip Navigation Links" src="/WebResource.axd?d=XUs-3lJ0my3MEUli7CczkbWfEUKB45tdapuzBumpcvgYNLiMNomokYoctHr9P5zotqCr9Of3N8zq9hZH3Iwxnb7oSAXK9HeQPgpzTRHwkmA1&amp;t=635588330815688065" width="0" height="0" style="border-width:0px;" /></a><span><a href="/sites/ARRM/SitePages/Home.aspx">Home</a></span><a id="ctl00_PlaceHolderPageTitleInTitleArea_ctl00_SkipLink"></a></span>
-			
-		</span>
-	</h1>
-	<div id="DeltaPlaceHolderMain">
-	
-		
-	<span id="ctl00_PlaceHolderMain_wikiPageNameDisplay" style="display: none;">
-		Home
-	</span>
-	<span id="ctl00_PlaceHolderMain_wikiPageNameEdit" style="display:none;">
-		<input name="ctl00$PlaceHolderMain$wikiPageNameEditTextBox" type="text" value="Home" maxlength="123" id="ctl00_PlaceHolderMain_wikiPageNameEditTextBox" />
-	</span>
-	<div style='display:none'><input type="submit" name="ctl00$PlaceHolderMain$btnWikiEdit" value="edit" onclick="javascript:WebForm_DoPostBackWithOptions(new WebForm_PostBackOptions(&quot;ctl00$PlaceHolderMain$btnWikiEdit&quot;, &quot;&quot;, true, &quot;&quot;, &quot;&quot;, false, false))" id="ctl00_PlaceHolderMain_btnWikiEdit" /></div><div style='display:none'><input type="submit" name="ctl00$PlaceHolderMain$btnWikiSave" value="edit" onclick="javascript:WebForm_DoPostBackWithOptions(new WebForm_PostBackOptions(&quot;ctl00$PlaceHolderMain$btnWikiSave&quot;, &quot;&quot;, true, &quot;&quot;, &quot;&quot;, false, false))" id="ctl00_PlaceHolderMain_btnWikiSave" /></div><div style='display:none'><input type="submit" name="ctl00$PlaceHolderMain$btnWikiRevert" value="Revert" onclick="javascript:WebForm_DoPostBackWithOptions(new WebForm_PostBackOptions(&quot;ctl00$PlaceHolderMain$btnWikiRevert&quot;, &quot;&quot;, true, &quot;&quot;, &quot;&quot;, false, false))" id="ctl00_PlaceHolderMain_btnWikiRevert" /></div>
-	<div id="ctl00_PlaceHolderMain_WikiField">
-		<div class="ms-wikicontent ms-rtestate-field" style="padding-right: 10px"><div class="ExternalClassB2951DD610594F9EB41ECF5A34603CDE">
-            <table id="layoutsTable" style="width&#58;100%;"><tbody><tr style="vertical-align&#58;top;"><td colspan="3"><div class="ms-rte-layoutszone-outer" style="width&#58;100%;"><div class="ms-rte-layoutszone-inner" role="textbox" aria-autocomplete="both" aria-haspopup="true" aria-multiline="true">​​​
-</div></div></td></tr><tr style="vertical-align&#58;top;"><td style="width&#58;33.3%;"><div class="ms-rte-layoutszone-outer" style="width&#58;100%;"><div class="ms-rte-layoutszone-inner" role="textbox" aria-autocomplete="both" aria-haspopup="true" aria-multiline="true">
-<div class="ms-rtestate-read ms-rte-wpbox"><div class="ms-rtestate-notify  ms-rtestate-read 9aaddb56-7c19-4be1-a5dc-023910863365" id="div_9aaddb56-7c19-4be1-a5dc-023910863365" unselectable="on"><div id="MSOZoneCell_WebPartWPQ2" class="s4-wpcell-plain ms-webpartzone-cell ms-webpart-cell-vertical ms-fullWidth ">
-			<div class="ms-webpart-chrome ms-webpart-chrome-vertical ms-webpart-chrome-fullWidth ">
-	<div class="ms-webpart-chrome-title" id="WebPartWPQ2_ChromeTitle">
-		<span title="Adminstrative Resources - Allows authors to enter rich text content." id="WebPartTitleWPQ2" class="js-webpart-titleCell"><h2 style="text-align:justify;" class="ms-webpart-titleText"><nobr><span>Adminstrative Resources</span><span id="WebPartCaptionWPQ2"></span></nobr></h2></span>
-	</div><div WebPartID="268ff58f-392b-4fd5-80b4-3904648ae511" WebPartID2="9aaddb56-7c19-4be1-a5dc-023910863365" HasPers="false" id="WebPartWPQ2" width="100%" class="ms-WPBody noindex ms-wpContentDivSpace " allowRemove="false" allowDelete="false" style="" ><div class="ms-rtestate-field"><h2>ARRM Resources:</h2><blockquote><p> Library<br/><span class="ms-rteThemeForeColor-2-0">JIRA Site</span><br/><span class="ms-rteThemeForeColor-9-2"></span>View Editor<br/> <span class="ms-rteThemeForeColor-9-2"></span></p></blockquote><span><h2>Administrative:</h2><blockquote><p>Team Org Tee<br/> Project Schedule<span class="ms-rteThemeForeColor-9-2"></span><span class="ms-rteThemeForeColor-9-2"></span><br/><span>New Member Form<span class="ms-rteThemeForeColor-9-2"></span><span class="ms-rteThemeForeColor-9-2"></span></span><br/> </p></blockquote><span><span><h2>ARRM Library:</h2><blockquote><p>Work Area<br/> Reviews and Meetings<br/>MMRs<br/> </p></blockquote></span></span></span><blockquote><p><span class="ms-rteThemeForeColor-9-2"></span></p></blockquote></div><div class="ms-clear"></div></div>
-</div>
-		</div></div><div id="vid_9aaddb56-7c19-4be1-a5dc-023910863365" unselectable="on" style="display&#58;none;"></div></div><div class="ms-rtestate-read ms-rte-wpbox"><div class="ms-rtestate-notify  ms-rtestate-read 07304610-72ec-4b34-b1f9-6de61a0a7430" id="div_07304610-72ec-4b34-b1f9-6de61a0a7430" unselectable="on"><div id="MSOZoneCell_WebPartWPQ3" class="s4-wpcell-plain ms-webpartzone-cell ms-webpart-cell-vertical ms-fullWidth ">
-			<div class="ms-webpart-chrome ms-webpart-chrome-vertical ms-webpart-chrome-fullWidth ">
-	<div WebPartID="a307a17e-8c0f-474e-bc90-2a85d65bc15e" WebPartID2="07304610-72ec-4b34-b1f9-6de61a0a7430" HasPers="false" id="WebPartWPQ3" width="100%" class="ms-WPBody noindex " allowRemove="false" allowDelete="false" style="" ><div class="ms-rtestate-field"><h2>Public Sites:</h2><blockquote><p><a href="http://www.nasa.gov/content/what-is-nasa-s-asteroid-redirect-mission/">Asteroid Redirect Mission</a><br/> <a href="http://www.nasa.gov/mission_pages/asteroids/initiative/">Asteroid Initiative</a></p></blockquote><h2>Released Documents and Presentation:</h2><blockquote><p><a href="http://www.google.com/url?sa=t&amp;rct=j&amp;q=&amp;esrc=s&amp;source=web&amp;cd=3&amp;cad=rja&amp;uact=8&amp;ved=0CDAQFjAC&amp;url=http://www.lpi.usra.edu/sbag/meetings/jul2014/presentations/1030_Wed_Muirhead_ARM_OptionA.pdf&amp;ei=yMHLVOCPApO1oQSvt4LIAQ&amp;usg=AFQjCNEm7FG1XmXYX0nkYqSxGxHtgpfw1Q&amp;bvm=bv.85076809,d.cGU">2014 ARRM Mission Concept Options Overview</a><br/> <a href="http://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=6836358">2013 ARRM Feasibility Study</a><br/></p></blockquote></div><div class="ms-clear"></div></div>
-</div>
-		</div></div><div id="vid_07304610-72ec-4b34-b1f9-6de61a0a7430" unselectable="on" style="display&#58;none;"></div></div><p><br></p></div></div></td><td class="ms-wiki-columnSpacing" style="width&#58;33.3%;"><div class="ms-rte-layoutszone-outer" style="width&#58;100%;"><div class="ms-rte-layoutszone-inner" role="textbox" aria-autocomplete="both" aria-haspopup="true" aria-multiline="true"><div class="ms-rtestate-read ms-rte-wpbox"><div id="div_d994e962-ee03-4135-84fe-8bb06c5215e6" class="ms-rtestate-notify  ms-rtestate-read d994e962-ee03-4135-84fe-8bb06c5215e6" unselectable="on"><div id="MSOZoneCell_WebPartctl00_ctl33_g_d994e962_ee03_4135_84fe_8bb06c5215e6" class="s4-wpcell-plain ms-webpartzone-cell ms-webpart-cell-vertical ms-fullWidth ">
-			<div class="ms-webpart-chrome ms-webpart-chrome-vertical " style="width:400px">
-	<div WebPartID="fc46c473-4e65-45ab-9c76-2f5824188671" WebPartID2="d994e962-ee03-4135-84fe-8bb06c5215e6" HasPers="false" id="WebPartctl00_ctl33_g_d994e962_ee03_4135_84fe_8bb06c5215e6" class="ms-WPBody noindex " allowRemove="false" allowDelete="false" allowExport="false" style="width:400px;overflow:auto;" ><table border="0" style="table-layout:fixed">
-		<tr>
-		<td style='width:331px;height:431px'>
-		<div id='MSOPictureLibrarySlideshowWebPart_ctl00_ctl33_g_d994e962_ee03_4135_84fe_8bb06c5215e6_cell' style='display:table-cell;vertical-align:middle;text-align:center;width:331px;height:431px'>
-		<span style='vertical-align:middle;height:100%;display:inline-block'></span>
-		<a id='MSOPictureLibrarySlideshowWebPart_ctl00_ctl33_g_d994e962_ee03_4135_84fe_8bb06c5215e6_link' href='' target='_blank'>
-		<img id='MSOPictureLibrarySlideshowWebPart_ctl00_ctl33_g_d994e962_ee03_4135_84fe_8bb06c5215e6_curr' style='filter:alpha(opacity=0);opacity:0;border:0px;vertical-align:middle'/>
-		</a></div>
-		</td>
-		</tr>
-<tr>
-<td style='height:75px'>
-		<div style='height:75px' id='MSOPictureLibrarySlideshowWebPart_ctl00_ctl33_g_d994e962_ee03_4135_84fe_8bb06c5215e6_text'>
-		<span id='MSOPictureLibrarySlideshowWebPart_ctl00_ctl33_g_d994e962_ee03_4135_84fe_8bb06c5215e6_title' class='ms-slideshow-title'></span><br/>
 		</div>
-		</td></tr>
-		<tr>
-		<td style='text-align:center'>
-		<a onclick='NextPrevious(MSOPictureLibrarySlideshowWebPart_ctl00_ctl33_g_d994e962_ee03_4135_84fe_8bb06c5215e6_slideshowObject, false);'><img border='0' style='position:relative;cursor:hand' onmouseover='HiliteButton()' onmouseout='DemoteButton()' src='/_layouts/15/images/plprev1.gif' alt='Previous Image' /></a> <a onclick='PlayPause(MSOPictureLibrarySlideshowWebPart_ctl00_ctl33_g_d994e962_ee03_4135_84fe_8bb06c5215e6_slideshowObject);'><img border='0' style='position:relative;cursor:hand' onmouseover='HiliteButton()' onmouseout='DemoteButton()' src='/_layouts/15/images/plpause1.gif' id='MSOPictureLibrarySlideshowWebPart_ctl00_ctl33_g_d994e962_ee03_4135_84fe_8bb06c5215e6_playpause' alt='Pause' /></a> <a onclick='NextPrevious(MSOPictureLibrarySlideshowWebPart_ctl00_ctl33_g_d994e962_ee03_4135_84fe_8bb06c5215e6_slideshowObject, true);'><img border='0' style='position:relative;cursor:hand' onmouseover='HiliteButton()' onmouseout='DemoteButton()' src='/_layouts/15/images/plnext1.gif' alt='Next Image' /></a>
-		</td>
-		</tr>
-
-	</table><img id='MSOPictureLibrarySlideshowWebPart_ctl00_ctl33_g_d994e962_ee03_4135_84fe_8bb06c5215e6_next' width='0' height='0' style='visibility:hidden' />
-	<img id='MSOPictureLibrarySlideshowWebPart_ctl00_ctl33_g_d994e962_ee03_4135_84fe_8bb06c5215e6_prev' width='0' height='0' style='visibility:hidden' />
-	<img id='MSOPictureLibrarySlideshowWebPart_ctl00_ctl33_g_d994e962_ee03_4135_84fe_8bb06c5215e6_pp'   width='0' height='0' style='visibility:hidden' />
-	<div class="ms-clear"></div></div>
-</div>
-		</div></div><div id="vid_d994e962-ee03-4135-84fe-8bb06c5215e6" unselectable="on" style="display&#58;none;"></div></div>
-</div></div></td><td class="ms-wiki-columnSpacing" style="width&#58;33.3%;"><div class="ms-rte-layoutszone-outer" style="width&#58;100%;"><div class="ms-rte-layoutszone-inner" role="textbox" aria-autocomplete="both" aria-haspopup="true" aria-multiline="true"><div class="ms-rtestate-read ms-rte-wpbox"><div class="ms-rtestate-notify  ms-rtestate-read 11b16d47-a777-40e1-99e3-73e8c1e73052" id="div_11b16d47-a777-40e1-99e3-73e8c1e73052" unselectable="on"><div id="MSOZoneCell_WebPartWPQ4" class="s4-wpcell-plain ms-webpartzone-cell ms-webpart-cell-vertical ms-fullWidth ">
-			<div class="ms-webpart-chrome ms-webpart-chrome-vertical ms-webpart-chrome-fullWidth ">
-	<div class="ms-webpart-chrome-title" id="WebPartWPQ4_ChromeTitle">
-		<span title="Technical Design Concept Info - Allows authors to enter rich text content." id="WebPartTitleWPQ4" class="js-webpart-titleCell"><h2 style="text-align:justify;" class="ms-webpart-titleText"><nobr><span>Technical Design Concept Info</span><span id="WebPartCaptionWPQ4"></span></nobr></h2></span>
-	</div><div WebPartID="ea9e7a53-90d6-4048-a170-ec6280aa0f33" WebPartID2="11b16d47-a777-40e1-99e3-73e8c1e73052" HasPers="false" id="WebPartWPQ4" width="100%" class="ms-WPBody noindex ms-wpContentDivSpace " allowRemove="false" allowDelete="false" style="" ><div class="ms-rtestate-field"><h2>Mission Objectives &amp; <br/>Requirements</h2><p>​<br/></p><h2>Mission Design</h2><p><br/> </p><h2>Block Diagrams <br/><span class="ms-rteFontSize-2">(composition &amp; interfaces)</span></h2><p><br/> </p><h2>Mechanical Drawings </h2><p><br/></p><h2>Functional OpsCon<br/></h2><p><br/> </p><h2>Mass:</h2><p>&#160;&#160;&#160;&#160;&#160; MEL &amp; Margins<br/> </p><h2>Power:</h2><p> &#160;&#160; &#160;&#160; PEL&#160; &amp; Margins<br/> &#160; &#160;&#160;&#160; Power Modes<br/> &#160;&#160; &#160;&#160; Power Analyses<br/> </p><h2>Data:</h2><p> &#160;&#160; &#160;  Characteristics<br/> &#160; &#160;&#160; Data Analyses<br/></p></div><div class="ms-clear"></div></div>
-</div>
-		</div></div><div id="vid_11b16d47-a777-40e1-99e3-73e8c1e73052" unselectable="on" style="display&#58;none;"></div></div></div></div></td></tr><tr style="vertical-align&#58;top;"><td colspan="3"><div class="ms-rte-layoutszone-outer" style="width&#58;100%;"><div class="ms-rte-layoutszone-inner" role="textbox" aria-autocomplete="both" aria-haspopup="true" aria-multiline="true"><div class="ms-rtestate-read ms-rte-wpbox"><div class="ms-rtestate-notify  ms-rtestate-read 20154c0d-76f3-4c77-86f8-f3daa31c5bdd" id="div_20154c0d-76f3-4c77-86f8-f3daa31c5bdd" unselectable="on"><div id="MSOZoneCell_WebPartWPQ5" class="s4-wpcell-plain ms-webpartzone-cell ms-webpart-cell-vertical ms-fullWidth ">
-			<div class="ms-webpart-chrome ms-webpart-chrome-vertical ms-webpart-chrome-fullWidth ">
-	<div WebPartID="3c08e6c4-5a11-4d24-b5a2-afcd09ea3886" WebPartID2="20154c0d-76f3-4c77-86f8-f3daa31c5bdd" HasPers="false" id="WebPartWPQ5" width="100%" class="ms-WPBody ms-WPBorderBorderOnly noindex " allowRemove="false" allowDelete="false" style="" ><div class="ms-rtestate-field"><table width="100%" cellspacing="0" class="ms-rteTable-0" style="height: 33px;"><tbody><tr class="ms-rteTableEvenRow-0"><td class="ms-rteTableEvenCol-0" style="width: 33.3333%;"><h4>​Project Manager: <br/></h4></td><td class="ms-rteTableOddCol-0" style="width: 33.3333%;"><h4>​Project Technologist: <br/></h4></td><td class="ms-rteTableEvenCol-0" style="width: 33.3333%;"><h4>​Content Manager: <br/></h4></td></tr></tbody></table><p></p></div><div class="ms-clear"></div></div>
-</div>
-		</div></div><div id="vid_20154c0d-76f3-4c77-86f8-f3daa31c5bdd" unselectable="on" style="display&#58;none;"></div></div></div></div></td></tr></tbody></table>
-            <span id="layoutsData" style="display&#58;none;">true,true,3</span></div></div>
-	</div>
-	<menu id="MSOMenu_WebPartMenu" class="ms-hide">
-		<ie:menuitem title="Collapse this web part." id="MSOMenu_Minimize" onmenuclick="javascript:MSOLayout_MinimizeRestore(MenuWebPart)" text="Minimize" type="option">
-
-		</ie:menuitem><ie:menuitem title="Expand this web part." id="MSOMenu_Restore" onmenuclick="javascript:MSOLayout_MinimizeRestore(MenuWebPart)" text="Restore" type="option">
-
-		</ie:menuitem><ie:menuitem title="Close this Web Part. You can still find it under closed Web Parts section in the insert ribbon. These changes will apply to all users." id="MSOMenu_Close" onmenuclick="javascript:MSOLayout_RemoveWebPart(MenuWebPart)" text="Close" type="option">
-
-		</ie:menuitem><ie:menuitem title="Delete this Web Part from the page. These changes will apply to all users." id="MSOMenu_Delete" iconsrc="/_layouts/15/images/DelItem.gif" onmenuclick="if(confirm('You are about to permanently delete this Web Part. Are you sure you want to do this?')) {MSOWebPartPage_partDeleted = MenuWebPartID;MSOWebPartPage_MenuDoPostBack('ctl00$ctl33', MenuWebPartID + ';MSOMenu_Delete');}" text="Delete" type="option">
-
-		</ie:menuitem><ie:menuitem type="separator"></ie:menuitem><ie:menuitem title="Change properties of this shared Web Part. These changes will apply to all users." id="MSOMenu_Edit" iconsrc="/_layouts/15/images/EditItem.gif" onmenuclick="javascript:MSOTlPn_ShowToolPane2Wrapper('Edit', 16, MenuWebPartID)" text="Edit Web Part" type="option">
-
-		</ie:menuitem><ie:menuitem title="Show connections options for this Web Part. These changes will apply to all users." id="MSOMenu_Connections" onmenuclick="" text="Connections" type="option">
-
-		</ie:menuitem><ie:menuitem type="separator"></ie:menuitem><ie:menuitem title="Export this Web Part. These changes will apply to all users." id="MSOMenu_Export" onmenuclick="javascript:MSOWebPartPage_ExportCheckWarning(&#39;\u002fsites\u002fARRM\u002f_vti_bin\u002fexportwp.aspx?pageurl=https\u00253A\u00252F\u00252Fgateway\u00252Duat\u00252Ejpl\u00252Enasa\u00252Egov\u00253A443\u00252Fsites\u00252FARRM\u00252FSitePages\u00252FHome\u00252Easpx\u0026guidstring=&#39;+ escape(MenuWebPartID), MenuWebPart.getAttribute(&#39;HasPers&#39;) == &#39;true&#39;)" text="Export..." type="option">
-
-		</ie:menuitem><ie:menuitem id="MSOMenu_Help" iconsrc="/_layouts/15/images/HelpIcon.gif" onmenuclick="MSOWebPartPage_SetNewWindowLocation(MenuWebPart.getAttribute('helpLink'), MenuWebPart.getAttribute('helpMode'))" text="Help" type="option" style="display:none">
-
-		</ie:menuitem>
-	</menu>
-<div style='display:none' id='hidZone'><div class="ms-webpart-zone ms-fullWidth">
-		<div id="MSOZoneCell_WebPartWPQ5" class="s4-wpcell-plain ms-webpartzone-cell ms-webpart-cell-vertical ms-fullWidth ">
-			<div class="ms-PartSpacingVertical"></div>
-		</div><div id="MSOZoneCell_WebPartWPQ4" class="s4-wpcell-plain ms-webpartzone-cell ms-webpart-cell-vertical ms-fullWidth ">
-			<div class="ms-PartSpacingVertical"></div>
-		</div><div id="MSOZoneCell_WebPartWPQ3" class="s4-wpcell-plain ms-webpartzone-cell ms-webpart-cell-vertical ms-fullWidth ">
-			<div class="ms-PartSpacingVertical"></div>
-		</div><div id="MSOZoneCell_WebPartWPQ2" class="s4-wpcell-plain ms-webpartzone-cell ms-webpart-cell-vertical ms-fullWidth ">
-			<div class="ms-PartSpacingVertical"></div>
-		</div><div id="MSOZoneCell_WebPartctl00_ctl33_g_d994e962_ee03_4135_84fe_8bb06c5215e6" class="s4-wpcell-plain ms-webpartzone-cell ms-webpart-cell-vertical ms-fullWidth ">
-
-		</div>
-	</div></div>
-	
-</div>
-</div>
-										<div class="ms-tableCell ms-verticalAlignTop">
-<div id="DeltaFormDigest">
-	
-	
-		
-	
-
-</div>
-<div class="ms-hide">
+	<!-- </div> -->
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-</div>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div id="DeltaPlaceHolderFooter">
-	
-							
-					
-</div>
-				</div>
-			</div>
-		</div>
-	</div>
-
-
-<script type="text/javascript">
-//<![CDATA[
-ExecuteOrDelayUntilScriptLoaded(
-    function()
-    {
-        SP.Ribbon.PageState.PageStateHandler.EnableSaveBeforeNavigate(false);
-    },
-"sp.ribbon.js");
-var callBackFrameUrl='/WebResource.axd?d=L8BNnkSFNfOENLN7oMhfyfhH0_trTC2ff9Tm2WYdM9tKP4HIhTolV407c30qOl2nrWJFYdmI0KQ2B5oTUcwvDYmkleOqCm6OFpQwmSmQkDc1&t=635588330815688065';
-WebForm_InitCallback();var _spFormDigestRefreshInterval = 1440000;
-ExecuteOrDelayUntilScriptLoaded(
-function()
-{
-var initInfo = 
-{
-itemPermMasks: {High: 432, Low: 1011030767 },
-listPermMasks: {High: 432, Low: 1011030767 },
-listId: "4e2ad1b1-67f2-4f5a-baf2-fb3868aa7e43",
-itemId: 1,
-editable: true,
-editMode: false,
-postbackScript: "__doPostBack\u0028\u0027__Page\u0027,\u0027PageCommand\u0027\u0029",
-missingRequiredFields: false,
-conflictMergeTargetStatusHtml: null
-};
-SP.Ribbon.WikiPageComponent.registerWithPageManager(initInfo);
-},
-"sp.ribbon.js");
-function _wikiCallback(arg, successCallback, context, errorCallback)
-{
-    __theFormPostData = "";__theFormPostCollection=new Array(); WebForm_OnSubmit();WebForm_InitCallback();_spResetFormOnSubmitCalledFlag();
-    WebForm_DoCallback('__Page',arg,successCallback,context,errorCallback,true);
-}
-
-if(typeof(Sys) != 'undefined' && Sys.Browser.agent == Sys.Browser.Safari && navigator.userAgent.indexOf('AppleWebKit/') > -1)
-{
-  Sys.Browser.AppleWebKit = {};
-  Sys.Browser.version = parseFloat(navigator.userAgent.match(/ AppleWebKit\/(\d+(\.\d+)?)/)[1]);
-  Sys.Browser.agent = Sys.Browser.AppleWebKit;
-}
-function GetPageNormalizedUrl(){    alert('This SharePoint Tags And Notes Tool link is out of date. To get the latest Tags And Notes Tool, click OK. In the Tags and Note Board dialog, click the My Tags link. From here you can access the new SharePoint Tags And Notes tool.');    return document.location.href;}var _openTagDialog_DialogUrl = '';function OpenTagDialog(dialogUrl){    _openTagDialog_DialogUrl = dialogUrl;    SafeRunFunction(_OpenTagDialogInternal, 'SocialData.js', 'TagDialogOpener');}function _OpenTagDialogInternal(){    var normalizer = PageUrlNormalizer.GetInstance();    normalizer.GetUrl('https:\u002f\u002fgateway-uat.jpl.nasa.gov\u002fsites\u002fARRM\u002fSitePages\u002fHome.aspx', function(normalizedUrl) {        var url = _openTagDialog_DialogUrl                + '?Title='      + encodeURIComponent(document.title)                + '&Src='        + 'bm'                + '&DisplayUrl=' + encodeURIComponent(document.location.href)                + '&Url='        + encodeURIComponent(normalizedUrl);        var options = 'toolbar=0,status=0,resizable=0,scrollbars=1,width=650,height=400';        if (!window.open(url, null, options))        {            document.location.href = url;        }    });}function InitializeSocialRibbonComponentWrapper_ctl00_ctl20(){    SafeRunFunction(InitializeSocialRibbonComponent_ctl00_ctl20, 'sp.ui.socialribbon.js', 'SP.UI.SocialData.TRCRibbonComponent');}function InitializeSocialRibbonComponent_ctl00_ctl20(){    SP.UI.SocialData.TRCRibbonComponent.RegisterWithPageManager();    var ribbonComponent = SP.UI.SocialData.TRCRibbonComponent.get_Instance();    ribbonComponent['EnableSocialComment'] = true;    ribbonComponent['EnableSocialTag']     = true;    ribbonComponent['ListID']               = '{4e2ad1b1-67f2-4f5a-baf2-fb3868aa7e43}';    ribbonComponent['ResAddMessage']        ='Add Tag...';    ribbonComponent['ResVerifyTypeMessage'] ='Verifying ...';    ribbonComponent.AddQuickTag = function(quickTagId)    {        SafeRunFunction(function ()        {            var adder = new SocialQuickTag('ctl00_ctl20');            adder.title        = document.title;            adder.url          = 'https:\u002f\u002fgateway-uat.jpl.nasa.gov\u002fsites\u002fARRM\u002fSitePages\u002fHome.aspx';            adder.tagged_text  = 'Tagged this page with \u0027I Like It.\u0027';            adder.failure_text = 'Failed tagging this page.';            adder.AddQuickTag(quickTagId);        }, 'SocialData.js', 'SocialQuickTag');    };    ribbonComponent.AddQuickTagToListItem = function(quickTagId)    {        var notificationId = addNotification("Add Tag...", true);        var listAndItemIds = this.SelectedListAndItemIds().split('|');        var request = new Object();        request.listid = listAndItemIds[0];        request.itemids = listAndItemIds[1];        request.id     = quickTagId;        WebForm_DoCallback('ctl00$ctl20',Sys.Serialization.JavaScriptSerializer.serialize(request),Function.createDelegate(ribbonComponent, ribbonComponent._OnSucceededCallback),notificationId,Function.createDelegate(ribbonComponent, ribbonComponent._OnFailedCallback),true);    };    return ribbonComponent;}ExecuteOrDelayUntilScriptLoaded(InitializeSocialRibbonComponentWrapper_ctl00_ctl20, 'sp.ribbon.js');function ctl00_ctl20_SocialNavControl_insertMyProfileMenu() {    var menus = document.getElementsByTagName('menu');    if (menus == null)  return;    var menu = null;    for (var i=0, len=menus.length; i<len; i++) {        if (menus[i].id.lastIndexOf('PersonalActionMenu') != -1) {            menu = menus[i]; break;        }    }    if (menu == null)   return;    var sep = null;    for (var i=0, len=menu.childNodes.length; i<len; i++) {        if (menu.childNodes[i].id == undefined || menu.childNodes[i].id == '') {            sep = menu.childNodes[i]; break;        }    }    var menuItems = menu.getElementsByTagName('ie:menuitem');    if (menuItems.length == 0)        menuItems = menu.getElementsByTagName('menuitem');    var mySettingsMenuItem = null;    for (var i=0, len=menuItems.length; i<len; i++) {        if (menuItems[i] != null && menuItems[i].id != null && menuItems[i].id.lastIndexOf('PersonalInformation') != -1) {            mySettingsMenuItem = menuItems[i];            break;        }    }    var anchorElement = mySettingsMenuItem;if (anchorElement != null) {    var elm = mySettingsMenuItem.cloneNode(true);    elm.setAttribute('menugroupid', '100');    elm.setAttribute('description', 'View and manage your profile.');    elm.setAttribute('text', 'About Me');    elm.setAttribute('onmenuclick', 'STSNavigate2(event,\'https:\u002f\u002fgateway-uat.jpl.nasa.gov:443\u002fPerson.aspx\')');    elm.setAttribute('id', 'ID_AboutMe');    elm.removeAttribute('iconSrc');    menu.replaceChild(elm, mySettingsMenuItem);    anchorElement = elm;}};if (typeof(_spBodyOnLoadFunctionNames) != 'undefined' && _spBodyOnLoadFunctionNames != null) { _spBodyOnLoadFunctionNames.push('ctl00_ctl20_SocialNavControl_insertMyProfileMenu'); }var _fV4UI = true;
-function _RegisterWebPartPageCUI()
-{
-    var initInfo = {editable: true,isEditMode: false,allowWebPartAdder: false,listId: "{4e2ad1b1-67f2-4f5a-baf2-fb3868aa7e43}",itemId: 1,recycleBinEnabled: true,enableMinorVersioning: false,enableModeration: false,forceCheckout: false,rootFolderUrl: "\u002fsites\u002fARRM\u002fSitePages",itemPermissions:{High:432,Low:1011030767}};
-    SP.Ribbon.WebPartComponent.registerWithPageManager(initInfo);
-    var wpcomp = SP.Ribbon.WebPartComponent.get_instance();
-    var hid;
-    hid = document.getElementById("_wpSelected");
-    if (hid != null)
-    {
-        var wpid = hid.value;
-        if (wpid.length > 0)
-        {
-            var zc = document.getElementById(wpid);
-            if (zc != null)
-                wpcomp.selectWebPart(zc, false);
-        }
-    }
-    hid = document.getElementById("_wzSelected");
-    if (hid != null)
-    {
-        var wzid = hid.value;
-        if (wzid.length > 0)
-        {
-            wpcomp.selectWebPartZone(null, wzid);
-        }
-    }
-};
-function __RegisterWebPartPageCUI() {
-ExecuteOrDelayUntilScriptLoaded(_RegisterWebPartPageCUI, "sp.ribbon.js");}
-_spBodyOnLoadFunctionNames.push("__RegisterWebPartPageCUI");var __wpmExportWarning='This Web Part Page has been personalized. As a result, one or more Web Part properties may contain confidential information. Make sure the properties contain information that is safe for others to read. After exporting this Web Part, view properties in the Web Part description file (.WebPart) by using a text editor such as Microsoft Notepad.';var __wpmCloseProviderWarning='You are about to close this Web Part.  It is currently providing data to other Web Parts, and these connections will be deleted if this Web Part is closed.  To close this Web Part, click OK.  To keep this Web Part, click Cancel.';var __wpmDeleteWarning='You are about to permanently delete this Web Part.  Are you sure you want to do this?  To delete this Web Part, click OK.  To keep this Web Part, click Cancel.';
-ExecuteOrDelayUntilScriptLoaded(
-function()
-{
-var initInfo = 
-{
-itemPermMasks: {High:432,Low:1011030767},
-listPermMasks: {High:432,Low:1011030767},
-listId: "4e2ad1b1-67f2-4f5a-baf2-fb3868aa7e43",
-itemId: 1,
-workflowsAssociated: false,
-editable: true,
-doNotShowProperties: false,
-enableVersioning: true
-};
-SP.Ribbon.DocLibAspxPageComponent.registerWithPageManager(initInfo);
-},
-"sp.ribbon.js");
-var g_disableCheckoutInEditMode = false;
-var _spWebPermMasks = {High:432,Low:1011030767};var _spPageStateActionControlId='ctl00_PageStateActionButton';var slNavUrl = '\u002fsites\u002fARRM';_spBodyOnLoadFunctionNames.push('_cUpdonetidProjectPropertyTitleGraphic');function _cUpdonetidProjectPropertyTitleGraphic(){var myd = null; if (typeof(dataonetidProjectPropertyTitleGraphic) != 'undefined') {myd = dataonetidProjectPropertyTitleGraphic;} var myc = document.getElementById('ctl00_onetidProjectPropertyTitleGraphic');_cUpdconetidProjectPropertyTitleGraphic(myd, myc);}function _cUpdconetidProjectPropertyTitleGraphic(data, ctrl){ctrl.href = slNavUrl;}function _cUpdonetidHeadbnnr2(){var myd = null; if (typeof(dataonetidHeadbnnr2) != 'undefined') {myd = dataonetidHeadbnnr2;} var myc = document.getElementById('ctl00_onetidHeadbnnr2');_cUpdconetidHeadbnnr2(myd, myc);}function _cUpdconetidHeadbnnr2(data, ctrl){SiteLogoImagePageUpdate(ctrl, data);}if (typeof(_v_rg_spbutton) == 'undefined')
-var _v_rg_spbutton = new Array(); 
-_v_rg_spbutton['Ribbon.WikiPageTab.EditAndCheckout.SaveEdit.Menu.SaveEdit.Edit'] = 'ctl00_PlaceHolderMain_btnWikiEdit';if (typeof(_v_rg_spbutton) == 'undefined')
-var _v_rg_spbutton = new Array(); 
-_v_rg_spbutton['Ribbon.WikiPageTab.EditAndCheckout.SaveEdit.Menu.SaveEdit.SaveAndStop'] = 'ctl00_PlaceHolderMain_btnWikiSave';if (typeof(_v_rg_spbutton) == 'undefined')
-var _v_rg_spbutton = new Array(); 
-_v_rg_spbutton['Ribbon.WikiPageTab.EditAndCheckout.SaveEdit.Menu.SaveEdit.Revert'] = 'ctl00_PlaceHolderMain_btnWikiRevert';var PageState = {};var PageStateEnabledHandler = {};var PageStateCommandHandler = {};PageState ={'ItemHasCheckedInVersion':'1','UserHasDeleteRights':'1','ItemIsInSharedView':'1','ItemIsMajorVersion':'1','ItemHasFieldControls':'1','ItemIsDefaultPage':'1','ItemHasCustomizableZones':'1','UserHasContributorRights':'1','ItemIsWikiPage':'1','ItemIsInLibrary':'1','ItemHasPersonalizableZones':'1'};PageStateEnabledHandler = {'PageStateGroupSave':'SP.Ribbon.PageState.Handlers.isSaveEnabled\u0028\u0029;','PageStateSaveBeforeNavigate':'','PageStateGroupSaveAndStop':'SP.Ribbon.PageState.Handlers.isSaveAndStopEditEnabled\u0028\u0029;','PageStateGroupEdit':'SP.Ribbon.PageState.Handlers.isEditEnabled\u0028\u0029;','PageStateGroupDontSaveAndStop':'SP.Ribbon.PageState.Handlers.isDontSaveAndStopEnabled\u0028\u0029;','PageStateGroupCheckin':'SP.Ribbon.PageState.Handlers.isCheckinEnabled\u0028\u0029;','PageStateGroupCheckout':'SP.Ribbon.PageState.Handlers.isCheckoutEnabled\u0028\u0029;','PageStateGroupOverrideCheckout':'SP.Ribbon.PageState.Handlers.isOverrideCheckoutEnabled\u0028\u0029;','PageStateGroupDiscardCheckout':'SP.Ribbon.PageState.Handlers.isDiscardCheckoutEnabled\u0028\u0029;','PageStateGroupSubmitForApproval':'SP.Ribbon.PageState.Handlers.isSubmitForApprovalEnabled\u0028\u0029;','PageStateGroupCancelApproval':'SP.Ribbon.PageState.Handlers.isCancelApprovalEnabled\u0028\u0029;','PageStateGroupPublish':'SP.Ribbon.PageState.Handlers.isPublishEnabled\u0028\u0029;','PageStateGroupUnpublish':'SP.Ribbon.PageState.Handlers.isUnpublishEnabled\u0028\u0029;','PageStateGroupApprove':'SP.Ribbon.PageState.Handlers.isApproveEnabled\u0028\u0029;','PageStateGroupReject':'SP.Ribbon.PageState.Handlers.isRejectEnabled\u0028\u0029;','DeletePage':'SP.Ribbon.PageState.Handlers.isDeleteEnabled\u0028\u0029;','PageStateUpdatePageState':'true;','PageStateGroupSaveAndPublish':'SP.Ribbon.PageState.Handlers.isSaveAndPublishEnabled\u0028\u0029;'};PageStateCommandHandler = {'PageStateGroupSave':'__doPostBack\u0028\u0027ctl02\u0027,\u0027PageStateGroupSave\u0027\u0029','PageStateSaveBeforeNavigate':'__theFormPostData = \u0022\u0022;__theFormPostCollection=new Array\u0028\u0029; WebForm_OnSubmit\u0028\u0029;WebForm_InitCallback\u0028\u0029;_spResetFormOnSubmitCalledFlag\u0028\u0029;WebForm_DoCallback\u0028\u0027ctl03\u0027,\u0027PageStateSaveBeforeNavigate\u0027,SP.Ribbon.PageState.PageStateHandler.SaveBeforeNavigateCallback,SP.Ribbon.PageState.SaveBeforeNavigateCallback,null,true\u0029','PageStateGroupSaveAndStop':'SP.Ribbon.PageState.PageStateHandler.ignoreNextUnload = true;__doPostBack\u0028\u0027ctl04\u0027,\u0027PageStateGroupSaveAndStop\u0027\u0029','PageStateGroupEdit':'if \u0028document.forms[\u0027aspnetForm\u0027][\u0027MSOLayout_InDesignMode\u0027] != null\u0029 document.forms[\u0027aspnetForm\u0027][\u0027MSOLayout_InDesignMode\u0027].value = 1;if \u0028document.forms[\u0027aspnetForm\u0027][\u0027MSOAuthoringConsole_FormContext\u0027] != null\u0029 document.forms[\u0027aspnetForm\u0027][\u0027MSOAuthoringConsole_FormContext\u0027].value = 1;if \u0028document.forms[\u0027aspnetForm\u0027][\u0027MSOSPWebPartManager_DisplayModeName\u0027] != null\u0029 document.forms[\u0027aspnetForm\u0027][\u0027MSOSPWebPartManager_DisplayModeName\u0027].value = \u0027Design\u0027;__doPostBack\u0028\u0027ctl05\u0027,\u0027edit\u0027\u0029','PageStateGroupDontSaveAndStop':'if \u0028confirm\u0028\u0027Are you sure you want to exit without saving? Any unsaved data will be lost.\u0027\u0029\u0029 {__doPostBack\u0028\u0027ctl06\u0027,\u0027PageStateGroupDontSaveAndStop\u0027\u0029}','PageStateGroupCheckin':'__doPostBack\u0028\u0027ctl07\u0027,\u0027PageStateGroupCheckin\u0027\u0029','PageStateGroupCheckout':'SP.Ribbon.PageState.PageStateHandler.popupWaitScreen\u0028\u0027Page State\u0027,\u0027Checking out page\u0027\u0029;__theFormPostData = \u0022\u0022;__theFormPostCollection=new Array\u0028\u0029; WebForm_OnSubmit\u0028\u0029;WebForm_InitCallback\u0028\u0029;_spResetFormOnSubmitCalledFlag\u0028\u0029;WebForm_DoCallback\u0028\u0027ctl08\u0027,\u0027PageStateGroupCheckout\u0027,SP.Ribbon.PageState.Handlers.GenericCompleteHandler,SP.Ribbon.PageState.Handlers.GenericError,null,true\u0029','PageStateGroupOverrideCheckout':'SP.Ribbon.PageState.PageStateHandler.popupWaitScreen\u0028\u0027Page State\u0027,\u0027Operation in progress\u0027\u0029;__theFormPostData = \u0022\u0022;__theFormPostCollection=new Array\u0028\u0029; WebForm_OnSubmit\u0028\u0029;WebForm_InitCallback\u0028\u0029;_spResetFormOnSubmitCalledFlag\u0028\u0029;WebForm_DoCallback\u0028\u0027ctl09\u0027,\u0027PageStateGroupOverrideCheckout\u0027,SP.Ribbon.PageState.Handlers.GenericCompleteHandler,SP.Ribbon.PageState.Handlers.GenericError,null,true\u0029','PageStateGroupDiscardCheckout':'if \u0028confirm\u0028\u0027Are you sure you want to exit without saving? Any unsaved data will be lost.\u0027\u0029\u0029 {__doPostBack\u0028\u0027ctl10\u0027,\u0027PageStateGroupDiscardCheckout\u0027\u0029}','PageStateGroupSubmitForApproval':'if \u0028PageState[\u0027ViewModeIsEdit\u0027] != null\u0029 {SP.Ribbon.PageState.PageStateHandler.ignoreNextUnload = true;__doPostBack\u0028\u0027ctl11\u0027,\u0027PageStateGroupSubmitForApproval\u0027\u0029}else{SP.Ribbon.PageState.PageStateHandler.popupWaitScreen\u0028\u0027Page State\u0027,\u0027Submitting page for approval\u0027\u0029;__theFormPostData = \u0022\u0022;__theFormPostCollection=new Array\u0028\u0029; WebForm_OnSubmit\u0028\u0029;WebForm_InitCallback\u0028\u0029;_spResetFormOnSubmitCalledFlag\u0028\u0029;WebForm_DoCallback\u0028\u0027ctl11\u0027,\u0027PageStateGroupSubmitForApproval\u0027,SP.Ribbon.PageState.Handlers.GenericCompleteHandler,SP.Ribbon.PageState.Handlers.GenericErrorHandler,null,true\u0029}','PageStateGroupCancelApproval':'WebForm_DoCallback\u0028\u0027ctl12\u0027,\u0027PageStateGroupCancelApproval\u0027,SP.Ribbon.PageState.Handlers.GenericCompleteHandler,SP.Ribbon.PageState.Handlers.GenericError,null,true\u0029','PageStateGroupPublish':'if \u0028PageState[\u0027ViewModeIsEdit\u0027] != null\u0029 {SP.Ribbon.PageState.PageStateHandler.ignoreNextUnload = true;__doPostBack\u0028\u0027ctl13\u0027,\u0027PageStateGroupPublish\u0027\u0029}else{SP.Ribbon.PageState.PageStateHandler.popupWaitScreen\u0028\u0027Page State\u0027,\u0027Publishing page\u0027\u0029;__theFormPostData = \u0022\u0022;__theFormPostCollection=new Array\u0028\u0029; WebForm_OnSubmit\u0028\u0029;WebForm_InitCallback\u0028\u0029;_spResetFormOnSubmitCalledFlag\u0028\u0029;WebForm_DoCallback\u0028\u0027ctl13\u0027,\u0027PageStateGroupPublish\u0027,SP.Ribbon.PageState.Handlers.GenericCompleteHandler,SP.Ribbon.PageState.Handlers.GenericErrorHandler,null,true\u0029}','PageStateGroupUnpublish':'SP.Ribbon.PageState.PageStateHandler.popupWaitScreen\u0028\u0027Page State\u0027,\u0027Unpublishing page\u0027\u0029;__theFormPostData = \u0022\u0022;__theFormPostCollection=new Array\u0028\u0029; WebForm_OnSubmit\u0028\u0029;WebForm_InitCallback\u0028\u0029;_spResetFormOnSubmitCalledFlag\u0028\u0029;WebForm_DoCallback\u0028\u0027ctl14\u0027,\u0027PageStateGroupUnpublish\u0027,SP.Ribbon.PageState.Handlers.GenericCompleteHandler,SP.Ribbon.PageState.Handlers.GenericError,null,true\u0029','PageStateGroupApprove':'SP.Ribbon.PageState.PageStateHandler.popupWaitScreen\u0028\u0027Page State\u0027,\u0027Approving page\u0027\u0029;__theFormPostData = \u0022\u0022;__theFormPostCollection=new Array\u0028\u0029; WebForm_OnSubmit\u0028\u0029;WebForm_InitCallback\u0028\u0029;_spResetFormOnSubmitCalledFlag\u0028\u0029;WebForm_DoCallback\u0028\u0027ctl15\u0027,\u0027PageStateGroupApprove\u0027,SP.Ribbon.PageState.Handlers.GenericCompleteHandler,SP.Ribbon.PageState.Handlers.GenericError,null,true\u0029','PageStateGroupReject':'SP.Ribbon.PageState.PageStateHandler.popupWaitScreen\u0028\u0027Page State\u0027,\u0027Rejecting page\u0027\u0029;__theFormPostData = \u0022\u0022;__theFormPostCollection=new Array\u0028\u0029; WebForm_OnSubmit\u0028\u0029;WebForm_InitCallback\u0028\u0029;_spResetFormOnSubmitCalledFlag\u0028\u0029;WebForm_DoCallback\u0028\u0027ctl16\u0027,\u0027PageStateGroupReject\u0027,SP.Ribbon.PageState.Handlers.GenericCompleteHandler,SP.Ribbon.PageState.Handlers.GenericError,null,true\u0029','DeletePage':'if \u0028confirm\u0028\u0027Are you sure you want to send this page to the site Recycle Bin?\u0027\u0029\u0029 {__doPostBack\u0028\u0027ctl17\u0027,\u0027DeletePage\u0027\u0029}','PageStateUpdatePageState':'SP.Ribbon.PageState.PageStateHandler.popupWaitScreen\u0028\u0027Page State\u0027,\u0027Operation in progress\u0027\u0029;__theFormPostData = \u0022\u0022;__theFormPostCollection=new Array\u0028\u0029; WebForm_OnSubmit\u0028\u0029;WebForm_InitCallback\u0028\u0029;_spResetFormOnSubmitCalledFlag\u0028\u0029;WebForm_DoCallback\u0028\u0027ctl18\u0027,\u0027PageStateUpdatePageState\u0027,SP.Ribbon.PageState.Handlers.GenericCompleteHandler,SP.Ribbon.PageState.Handlers.GenericError,null,true\u0029','PageStateGroupSaveAndPublish':'if \u0028PageState[\u0027ViewModeIsEdit\u0027] != null\u0029 {SP.Ribbon.PageState.PageStateHandler.ignoreNextUnload = true;__doPostBack\u0028\u0027ctl19\u0027,\u0027PageStateGroupSaveAndPublish\u0027\u0029}else{SP.Ribbon.PageState.PageStateHandler.popupWaitScreen\u0028\u0027Page State\u0027,\u0027Publishing page\u0027\u0029;__theFormPostData = \u0022\u0022;__theFormPostCollection=new Array\u0028\u0029; WebForm_OnSubmit\u0028\u0029;WebForm_InitCallback\u0028\u0029;_spResetFormOnSubmitCalledFlag\u0028\u0029;WebForm_DoCallback\u0028\u0027ctl19\u0027,\u0027PageStateGroupSaveAndPublish\u0027,SP.Ribbon.PageState.Handlers.GenericCompleteHandler,SP.Ribbon.PageState.Handlers.GenericErrorHandler,null,true\u0029}'};var Notification = {};var PageErrorState = {};PageErrorState = { 'Message': '', 'Title' : '', 'ButtonCount' :0};
-function InitPageStateHandler()
-{
-    SP.Ribbon.PageState.ImportedNativeData = function SP_Ribbon_PageStateHandler_ImportedNativeData()
-    {
-    }
-    SP.Ribbon.PageState.NativeErrorState = function SP_Ribbon_PageStateHandler_NativeErrorState()
-    {
-    }
-    SP.Ribbon.PageState.ImportedNativeData.PageState = PageState;
-    SP.Ribbon.PageState.ImportedNativeData.CommandHandlers = PageStateCommandHandler;
-    SP.Ribbon.PageState.ImportedNativeData.EnabledHandlers = PageStateEnabledHandler;
-    SP.Ribbon.PageState.NativeErrorState = PageErrorState;SP.Ribbon.PageState.ImportedNativeData.StatusTitle = ['Status:'];SP.Ribbon.PageState.ImportedNativeData.StatusBody = ['Published and visible to all readers'];SP.Ribbon.PageState.ImportedNativeData.StatusPriority = 'blue';
-    SP.Ribbon.PageState.CallNativeFunction = function SP_Ribbon_PageState_PageStateHandler_CallNativeFunction(fnName)
-    {
-        return eval(fnName);
-    }
-    pm = SP.Ribbon.PageManager.get_instance();
-    var psh = new SP.Ribbon.PageState.PageStateHandler();
-    pm.addPageComponent(psh);
-    SP.Ribbon.PageState.Handlers.registerCommentsHandler();
-    pm.get_commandDispatcher().executeCommand(Commands.CommandIds.ApplicationStateChanged, null)
-}
-function DelayUntilRibbonLoaded()
-{
-    ExecuteOrDelayUntilScriptLoaded(InitPageStateHandler, "sp.ribbon.js");
-}
-_spBodyOnLoadFunctionNames.push("DelayUntilRibbonLoaded")
-
-            ExecuteOrDelayUntilScriptLoaded(
-                function() 
-                {                    
-                    Srch.ScriptApplicationManager.get_current().states = {"webUILanguageName":"en-US","webDefaultLanguageName":"en-US","contextUrl":"https://gateway-uat.jpl.nasa.gov/sites/ARRM","contextTitle":"Asteroid Robotic Redirect Mission","supportedLanguages":[{"id":1025,"label":"Arabic"},{"id":1093,"label":"Bengali"},{"id":1026,"label":"Bulgarian"},{"id":1027,"label":"Catalan"},{"id":2052,"label":"Chinese (Simplified)"},{"id":1028,"label":"Chinese (Traditional)"},{"id":1050,"label":"Croatian"},{"id":1029,"label":"Czech"},{"id":1030,"label":"Danish"},{"id":1043,"label":"Dutch"},{"id":1033,"label":"English"},{"id":1035,"label":"Finnish"},{"id":1036,"label":"French"},{"id":1031,"label":"German"},{"id":1032,"label":"Greek"},{"id":1095,"label":"Gujarati"},{"id":1037,"label":"Hebrew"},{"id":1081,"label":"Hindi"},{"id":1038,"label":"Hungarian"},{"id":1039,"label":"Icelandic"},{"id":1057,"label":"Indonesian"},{"id":1040,"label":"Italian"},{"id":1041,"label":"Japanese"},{"id":1099,"label":"Kannada"},{"id":1042,"label":"Korean"},{"id":1062,"label":"Latvian"},{"id":1063,"label":"Lithuanian"},{"id":1086,"label":"Malay"},{"id":1100,"label":"Malayalam"},{"id":1102,"label":"Marathi"},{"id":1044,"label":"Norwegian"},{"id":1045,"label":"Polish"},{"id":1046,"label":"Portuguese (Brazil)"},{"id":2070,"label":"Portuguese (Portugal)"},{"id":1094,"label":"Punjabi"},{"id":1048,"label":"Romanian"},{"id":1049,"label":"Russian"},{"id":3098,"label":"Serbian (Cyrillic)"},{"id":2074,"label":"Serbian (Latin)"},{"id":1051,"label":"Slovak"},{"id":1060,"label":"Slovenian"},{"id":3082,"label":"Spanish (Spain)"},{"id":2058,"label":"Spanish (Mexico)"},{"id":1053,"label":"Swedish"},{"id":1097,"label":"Tamil"},{"id":1098,"label":"Telugu"},{"id":1054,"label":"Thai"},{"id":1055,"label":"Turkish"},{"id":1058,"label":"Ukrainian"},{"id":1056,"label":"Urdu"},{"id":1066,"label":"Vietnamese"}],"navigationNodes":[{"id":1001,"name":"Everything","url":"{searchcenterurl}/results.aspx","promptString":"Search everything"},{"id":1002,"name":"People","url":"{searchcenterurl}/peopleresults.aspx","promptString":"Search people"},{"id":1003,"name":"Conversations","url":"{searchcenterurl}/conversationresults.aspx","promptString":"Search conversations"},{"id":0,"name":"This Site","url":"~site/_layouts/15/osssearchresults.aspx?u={contexturl}","promptString":"Search this site"}],"searchCenterUrl":"https://gateway-uat.jpl.nasa.gov/sites/search/Pages","showAdminDetails":true,"defaultPagesListName":"Pages","isSPFSKU":false,"userAdvancedLanguageSettingsUrl":"https://gateway-uat.jpl.nasa.gov:443/_layouts/15/EditProfile.aspx?Section=LanguageAndRegion\u0026UserSettingsProvider=234bf0ed%2D70db%2D4158%2Da332%2D4dfd683b4148\u0026ReturnUrl=https%3A%2F%2Fgateway%2Duat%2Ejpl%2Enasa%2Egov%2Fsites%2FARRM%2FSitePages%2FHome%2Easpx\u0026ShowAdvLang=1","defaultQueryProperties":{"culture":1033,"uiLanguage":1033,"summaryLength":180,"desiredSnippetLength":90,"enableStemming":true,"enablePhonetic":false,"enableNicknames":false,"trimDuplicates":true,"bypassResultTypes":false,"enableInterleaving":true,"enableQueryRules":true,"processBestBets":true,"enableOrderingHitHighlightedProperty":false,"hitHighlightedMultivaluePropertyLimit":-1,"processPersonalFavorites":true}};
-                    Srch.U.trace(null, 'SerializeToClient', 'ScriptApplicationManager state initialized.');
-                }, 'Search.ClientControls.js');
-function EnsureScripts(scriptInfoList, finalFunction)
-{
-if (scriptInfoList.length == 0)
-{
-finalFunction();
-}
-else
-{
-var scriptInfo = scriptInfoList.shift();
-var rest = function () { EnsureScripts(scriptInfoList, finalFunction); };
-var defd;
-try
-{
-eval('defd = typeof(' + scriptInfo[1] + ');');
-}
-catch (e)
-{
-defd = 'undefined';
-}
-var ensureKey = scriptInfo[0];
-if (ensureKey == 'SP.Ribbon.js')
-{
-ensureKey = 'ribbon';
-}
-if (scriptInfo[2])
-{
-EnsureScript(ensureKey, defd, null);
-ExecuteOrDelayUntilScriptLoaded(rest, scriptInfo[0]);
-}
-else
-{
-EnsureScript(ensureKey, defd, rest);
-}
-}
-}
-function PublishingRibbonUpdateRibbon()
-{
-var pageManager = SP.Ribbon.PageManager.get_instance();
-if (pageManager)
-{
-pageManager.get_commandDispatcher().executeCommand('appstatechanged', null);
-}
-}RegisterSod("ribbon", "\u002f_layouts\u002f15\u002fsp.ribbon.js?rev=HuKvLijAVokRXAsG0Ib\u00252FKQ\u00253D\u00253D");RegisterSodDep("ribbon", "strings.js");RegisterSodDep("ribbon", "core.js");RegisterSodDep("ribbon", "sp.core.js");RegisterSodDep("ribbon", "sp.js");RegisterSodDep("ribbon", "cui.js");RegisterSodDep("ribbon", "sp.res.resx");RegisterSodDep("ribbon", "sp.runtime.js");RegisterSodDep("ribbon", "inplview");RegisterSod("sp.ui.pub.ribbon.js", "\u002f_layouts\u002f15\u002fsp.ui.pub.ribbon.js?rev=75kKdJAREet7iiUJWDStBg\u00253D\u00253D");RegisterSod("sp.publishing.resources.resx", "\u002f_layouts\u002f15\u002fScriptResx.ashx?culture=en\u00252Dus\u0026name=SP\u00252EPublishing\u00252EResources\u0026rev=GGzheobKQRsxiF6yBwAfZA\u00253D\u00253D");RegisterSod("sp.documentmanagement.js", "\u002f_layouts\u002f15\u002fsp.documentmanagement.js?rev=8n\u00252FARlQYGJ7s3D5W6G06XQ\u00253D\u00253D");RegisterSod("assetpickers.js", "\u002f_layouts\u002f15\u002fassetpickers.js?rev=E1rGNtOdYy\u00252FmUMeiFXX3Bg\u00253D\u00253D");RegisterSodDep("assetpickers.js", "strings.js");
-function EnsureMediaPlayerEditModeScripts()
-{
-EnsureScripts(
-[['SP.Ribbon.js', 'SP.Ribbon', true],
- ['SP.Publishing.Resources.resx', 'SP.Publishing.Resources', false],
- ['SP.UI.Pub.Ribbon.js', 'Pub.Ribbon', true]], PublishingRibbonUpdateRibbon);
-}
-if (_spBodyOnLoadFunctionNames != null && !_spBodyOnLoadCalled)
-{
-_spBodyOnLoadFunctionNames.push('EnsureMediaPlayerEditModeScripts');
-}
-else
-{
-EnsureMediaPlayerEditModeScripts();
-}if (!window.mediaPlayer) window.mediaPlayer = {}; mediaPlayer.mediaWebPartInsertId = '73674860-604d-4eca-8538-e3c2986072a9=c1e82faa-465a-424f-9398-de90057ceaeb';if (!window.mediaPlayer) window.mediaPlayer = {};
-                        mediaPlayer.mediaExtensions = 'wmv,wma,avi,mpg,mp3,mp4,asf,ogg,ogv,oga,webm,';var g_MinimalDownload = true;var g_WebServerRelativeUrl = "/sites/ARRM";var _spFullDownloadList = ['closeconnection', 'download', 'signout', 'xlviewer', 'wordviewer', 'wordeditor', 'powerpoint', 'powerpointframe', 'onenote', 'visiowebaccess', 'storefront', 'wopiframe', 'appredirect', 'wfstart'];
-var g_clientIdDeltaPlaceHolderMain = "DeltaPlaceHolderMain";
-var g_clientIdDeltaPlaceHolderPageTitleInTitleArea = "DeltaPlaceHolderPageTitleInTitleArea";
-var g_clientIdDeltaPlaceHolderUtilityContent = "DeltaPlaceHolderUtilityContent";
-
-theForm.oldSubmit = theForm.submit;
-theForm.submit = WebForm_SaveScrollPositionSubmit;
-
-theForm.oldOnSubmit = theForm.onsubmit;
-theForm.onsubmit = WebForm_SaveScrollPositionOnSubmit;
-
-                function _ribbonInitFunc1()
-
-                {
-                    EnsureScriptParams('core.js', '_ribbonInitFunc1Wrapped', '', '', '\u002fsites\u002fARRM\u002f_layouts\u002f15\u002fcommandui.ashx', '-1839628427', '1033', 'RibbonContainer', {'Ribbon.EditingTools.CPEditTab':true,'Ribbon.Table.Design':true,'Ribbon.EditingTools.CPInsert':true,'Ribbon.Link.Link':true,'Ribbon.WikiPageTab':true,'Ribbon.WebPartOption':true,'Ribbon.Image.Image':true,'Ribbon.Table.Layout':true,'Ribbon.Read':true}, null, {'Ribbon.WikiPageTab.PageActions.SetHomePage':true,'Ribbon.WebPartPage':true,'Ribbon.PublishTab.Publishing.Reject':true,'Ribbon.WebPartInsert.InsertRelatedDataToListForm':true,'Ribbon.WikiPageTab.LibrarySettings.LibraryPermissions':true,'Ribbon.PublishTab.Publishing.Approve':true,'Ribbon.PublishTab':true,'Ribbon.WikiPageTab.EditAndCheckout.SaveAndPublish':true,'Ribbon.EditingTools.CPEditTab.EditAndCheckout.SaveAndPublish':true},
-                                            {'PublishTabTrimmingVisibilityContext':true,'WSSWikiPage':true}, false, 0, false, 'SP.Ribbon.PageManager.get_instance()', false, null, null, null, '1619541884', 0, '.');
-                }
-                function _ribbonStartInit(initialTabId, buildMinimized, e)
-                {
-                    EnsureScriptParams('core.js', '_ribbonStartInitWrapped', initialTabId, buildMinimized, e, true, 'EnsureScriptParams("core.js", "RibbonControlInitWrapped");EnsureScriptFunc("ribbon", "SP.Ribbon.PageManager", function () { _registerCUIEComponentWrapped( "\u002fsites\u002fARRM\u002f_layouts\u002f15\u002fcommandui.ashx", "1033", "-1839628427");});EnsureScriptFunc("ribbon", "SP.Ribbon.PageManager", _ribbonInitFunc1);');
-                }
-                function _ribbonKeyboardTitleShortcut(e)
-                {
-                    EnsureScriptParams('core.js', '_ribbonKeyboardTitleShortcutWrapped', e, 'tff[', 'Ribbon.Read-title');
-                }
-                function _ribbonDataInit(p6, p7)
-                {
-                    _ribbon = new Object();
-                    _ribbon.initialTabId = p6;
-                    _ribbon.buildMinimized = p7;
-                    _ribbon.initStarted = false;
-                    _ribbon.initialTabSelectedByUser = false;
-                    _ribbon.launchedByKeyboard = false;
-                }
-                function _ribbonWaitForBodyEvent()
-                {
-                    if (false)
-                        _ribbonStartInit();
-                    
-                function _ribbonOnWindowResizeForHeaderScaling(evt)
-                {
-                    _ribbonOnWindowResizeForHeaderScalingWrapped(evt, 'RibbonContainer', false);
-                }
-                EnsureScriptParams('core.js', '_ribbonInitResizeHandlers', _ribbonOnWindowResizeForHeaderScaling, 'RibbonContainer', true, false);
-                
-                    EnsureScriptParams('core.js', '_ribbonAddEventListener', _ribbonKeyboardTitleShortcut);
-                }
-                _ribbonDataInit('Ribbon.Read', true);
-                if (SP.SOD.get_prefetch() == 0)
-                {
-                    ExecuteOrDelayUntilScriptLoaded(_ribbonWaitForBodyEvent, 'sp.ribbon.js');
-                }
-                else
-                {
-                    EnsureScriptFunc('ribbon', 'SP.Ribbon.PageStateActionButton', _ribbonWaitForBodyEvent);
-                }
-                
-var g_commandUIHandlers = {"name":"CommandHandlers","attrs":{},"children":[]};
-g_QuickLaunchControlIds.push("zz12_V4QuickLaunchMenu");_spBodyOnLoadFunctionNames.push('QuickLaunchInitDroppable'); _spBodyOnLoadFunctionNames.push('QuickLaunchInitDroppable');  function zz12_V4QuickLaunchMenu_Callback(data, errorHandlerName) { WebForm_DoCallback('ctl00$V4QuickLaunchMenu',data,AspMenuHandleDataRefresh,g_QuickLaunchMenu.Id,errorHandlerName,true); }var g_zz12_V4QuickLaunchMenu = null; function init_zz12_V4QuickLaunchMenu() { if (g_zz12_V4QuickLaunchMenu == null) g_zz12_V4QuickLaunchMenu = $create(SP.UI.AspMenu, null, null, null, $get('zz12_V4QuickLaunchMenu')); } if(g_spPreFetchKeys) {{ g_spPreFetchKeys.push('SP.Core.js');}}EnsureScriptFunc('SP.Core.js', 'SP.UI.AspMenu', init_zz12_V4QuickLaunchMenu);
-
-                    ExecuteOrDelayUntilScriptLoaded(
-                        function() 
-                        {
-                            if ($isNull($find('ctl00_PlaceHolderSearchArea_SmallSearchInputBox1_csr')))
-                            {
-                                var sb = $create(Srch.SearchBox, {"delayLoadTemplateScripts":true,"initialPrompt":"Search this site","messages":[],"navigationNodes":[{"id":1001,"name":"Everything","url":"{searchcenterurl}/results.aspx","promptString":"Search everything"},{"id":1002,"name":"People","url":"{searchcenterurl}/peopleresults.aspx","promptString":"Search people"},{"id":1003,"name":"Conversations","url":"{searchcenterurl}/conversationresults.aspx","promptString":"Search conversations"},{"id":0,"name":"This Site","url":"~site/_layouts/15/osssearchresults.aspx?u={contexturl}","promptString":"Search this site"}],"queryGroupNames":["MasterPage"],"renderTemplateId":"~sitecollection/_catalogs/masterpage/Display Templates/Search/Control_SearchBox_Compact.js","resultsPageAddress":"~site/_layouts/15/osssearchresults.aspx?u={contexturl}","serverInitialRender":true,"showDataErrors":true,"showNavigation":true,"states":{},"tryInplaceQuery":false}, null, null, $get("ctl00_PlaceHolderSearchArea_SmallSearchInputBox1_csr"));
-                                sb.activate('Search this site', 'ctl00_PlaceHolderSearchArea_SmallSearchInputBox1_csr_sbox', 'ctl00_PlaceHolderSearchArea_SmallSearchInputBox1_csr_sboxdiv', 'ctl00_PlaceHolderSearchArea_SmallSearchInputBox1_csr_NavButton', 'ctl00_PlaceHolderSearchArea_SmallSearchInputBox1_csr_AutoCompList', 'ctl00_PlaceHolderSearchArea_SmallSearchInputBox1_csr_NavDropdownList', 'ctl00_PlaceHolderSearchArea_SmallSearchInputBox1_csr_SearchLink', 'ms-srch-sbprogress', 'ms-srch-sb-prompt ms-helperText');
-                            }
-                        }, 'Search.ClientControls.js');var MSOPictureLibrarySlideshowWebPart_ctl00_ctl33_g_d994e962_ee03_4135_84fe_8bb06c5215e6_slideshowObject = null;
-(function(){
-var pictureArray = ['https://gateway-uat.jpl.nasa.gov/sites/ARRM/Site%20Images/_w/15-094_jpg.jpg','https://gateway-uat.jpl.nasa.gov/sites/ARRM/Site%20Images/_w/Screen%20Shot%202015-02-03%20at%209.20.45%20AM_png.jpg','https://gateway-uat.jpl.nasa.gov/sites/ARRM/Site%20Images/_w/Screen%20Shot%202015-02-04%20at%208.52.58%20AM_png.jpg','https://gateway-uat.jpl.nasa.gov/sites/ARRM/Site%20Images/_w/Boulder_capture_testbed_png.jpg','https://gateway-uat.jpl.nasa.gov/sites/ARRM/Site%20Images/_w/ground_terminal_png.jpg','https://gateway-uat.jpl.nasa.gov/sites/ARRM/Site%20Images/_w/eva_png.jpg','https://gateway-uat.jpl.nasa.gov/sites/ARRM/Site%20Images/_w/boulder_capture_png.jpg'];
-var linkArray = ['https://gateway-uat.jpl.nasa.gov/sites/ARRM/Site%20Images/15-094.jpg','https://gateway-uat.jpl.nasa.gov/sites/ARRM/Site%20Images/Screen%20Shot%202015-02-03%20at%209.20.45%20AM.png','https://gateway-uat.jpl.nasa.gov/sites/ARRM/Site%20Images/Screen%20Shot%202015-02-04%20at%208.52.58%20AM.png','https://gateway-uat.jpl.nasa.gov/sites/ARRM/Site%20Images/Boulder_capture_testbed.png','https://gateway-uat.jpl.nasa.gov/sites/ARRM/Site%20Images/ground_terminal.png','https://gateway-uat.jpl.nasa.gov/sites/ARRM/Site%20Images/eva.png','https://gateway-uat.jpl.nasa.gov/sites/ARRM/Site%20Images/boulder_capture.png'];
-var titleArray = ['18 May 2015 story: NASA Seeks Additional Information for Asteroid Redirect Mission Spacecraft http:\u002f\u002fwww.nasa.gov\u002fpress-release\u002fnasa-seeks-additional-information-for-asteroid-redirect-mission-spacecraft','Notional ARV Modules and Launch Adapter Design','NASA FY\u0026#39;16 Budget Summary Briefing Calls Our ARRM work','Boulder Capture Simulations Test-bed','Ground-based Optical Comm Terminal could support a secondary optical telecom system for high data rate downlink in lunar orbit and potentially, at the asteroid.','Astronaut EVA with tools at boulder','Announcement:  ARRM MCR rescheduled for March 24, 2015.'];
-var descriptionArray = ['NASA Seeks Additional Information for Asteroid Redirect Mission Spacecraft','','http:\u002f\u002fwww.nasa.gov\u002fnews\u002fbudget\u002f#.VNJOPkjOXQ4','','','','Boulder Capture for ARRM Option B ConOps.'];
-var heightArray = [96,338,241,176,278,273,273];
-var widthArray = [313,313,313,313,313,313,313];
-EnsureScriptFunc("imglib.js", "SlideshowObject", function() {MSOPictureLibrarySlideshowWebPart_ctl00_ctl33_g_d994e962_ee03_4135_84fe_8bb06c5215e6_slideshowObject = new SlideshowObject('MSOPictureLibrarySlideshowWebPart_ctl00_ctl33_g_d994e962_ee03_4135_84fe_8bb06c5215e6_', pictureArray, linkArray, titleArray, descriptionArray, heightArray, widthArray, 15, 1.0);
-ChangePic(MSOPictureLibrarySlideshowWebPart_ctl00_ctl33_g_d994e962_ee03_4135_84fe_8bb06c5215e6_slideshowObject);
-});
-})();
-
-function RelatedAdder_addWebPartToRTECore(adder, relatedWeb, relatedList, relatedField, sourceWebPart)
-{
-    var range = RTE.Cursor.get_range();
-    range.collapse(false);
-    var targetWebPartId = adder._createWebpartPlaceholderInRte(range);
-    if (targetWebPartId == null)
-        return false;
-    if (IsFullNameDefined('SP.UI.ModalDialog.showWaitScreenWithNoClose'))
-    {
-        SP.UI.ModalDialog.showWaitScreenWithNoClose(SP.Res.genericLoading, SP.Res.genericLoading, 76, 290);
-    }
-    __doPostBack('ctl00$ctl62', 'addItemAndConnect&wpz&' + relatedWeb + '&' + relatedList + '&' + relatedField + '&' + sourceWebPart + '&' + targetWebPartId);
-}
-function RelatedAdder_addWebPartToRTE(relatedWeb, relatedList, relatedField, sourceWebPart)
-{
-    var editableRegion = RTE.Canvas.currentEditableRegion();
-    if (!RTE.Canvas.getRestriction(editableRegion, RTE.Canvas.allowWebParts, false)) {
-        return false;
-    }
-
-    var adder = window.WPAdder;
-    if (!adder) {
-        LoadWPAdderOnDemand();
-        ExecuteOrDelayUntilEventNotified(
-            function()
-            {
-                var adder = window.WPAdder;
-                if (!adder)
-                {
-                    return false;
-                }
-                RelatedAdder_addWebPartToRTECore(adder, relatedWeb, relatedList, relatedField, sourceWebPart);
-            },
-            "_spEventWebPartAdderReady");
-    }
-    else
-    {
-        RelatedAdder_addWebPartToRTECore(adder, relatedWeb, relatedList, relatedField, sourceWebPart);
-    }
-}
-function RelatedAdder_addItemAndConnect(zone, relatedWeb, relatedList, relatedField, sourceWebPart, bAddToWikiZone)
-{
-    if (bAddToWikiZone)
-    {
-        ExecuteOrDelayUntilScriptLoaded( 
-            function()
-            {
-                RelatedAdder_addWebPartToRTE(relatedWeb, relatedList, relatedField, sourceWebPart);
-            },
-            "sp.ui.rte.js");
-    }
-    else
-    {
-        __doPostBack('ctl00$ctl62', 'addItemAndConnect&' + zone + '&' + relatedWeb + '&' + relatedList + '&' + relatedField + '&' + sourceWebPart + '&');
-    }
-}
-            //]]>
-</script>
-</form>
-	<span id="DeltaPlaceHolderUtilityContent">
-		
-	</span>
-	<script type="text/javascript">// <![CDATA[ 
-
-
-		var g_Workspace = "s4-workspace";
-	// ]]>
-</script>
 </body>
-</html>
+
+
