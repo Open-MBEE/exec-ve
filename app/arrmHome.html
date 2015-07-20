@@ -83,13 +83,34 @@
 
 	div.transbox span{
 		float:right;
-		text-indent: -400px;
+		text-indent: -300px;
 		/*font-size:130%; */
 		/*font-weight: bold; */
 		color: #ff0000; 
 		/*text-indent:-10px;*/
 	}
 
+	img.center {
+	  display: block;
+	  margin-left: auto;
+	  margin-right: auto;
+	} 
+
+	ul {
+	    list-style-type: none;
+/*	    margin: 0;
+	    padding: 0;*/
+	    text-align:center;
+	}
+
+	li {
+	    display: inline;
+	    color:white;
+	}
+
+	a{
+		color:white;
+	}
 
 
 	</style>
@@ -99,31 +120,26 @@
 
 	<script type="text/javascript">
 
-	var slideimages = new Array() // create new array to preload images
-	slideimages[0] = new Image() // create new instance of image object
-	slideimages[0].src = "/arrmimages/orbitor.jpg"//http://www.nasa.gov/sites/default/files/thumbnails/image/15-094.jpg" // set image src property to image path, preloading image in the process
-	slideimages[1] = new Image()
-	slideimages[1].src = "/arrmimages/orion.jpg"//https://upload.wikimedia.org/wikipedia/commons/8/80/Orion_with_ATV_SM.jpg"
-	slideimages[2] = new Image()
-	slideimages[2].src = "/arrmimages/budget.jpg"//http://images.spaceref.com/news/2004/02.01.04.chart.2.lrg.jpg"
-	slideimages[3] = new Image()
-	slideimages[3].src = "/arrmimages/asteroid.jpg"//http://o.aolcdn.com/dims-shared/dims3/GLOB/crop/4000x2445+0+327/resize/630x385!/format/jpg/quality/85/http://hss-prod.hss.aol.com/hss/storage/midas/9d45beddc69216d5863a060ff0c2d8d9/200723983/469055831.jpg"
-	slideimages[4] = new Image()
-	slideimages[4].src = "/arrmimages/commTerminal.jpg"
-	slideimages[5] = new Image()
-	slideimages[5].src = "/arrmimages/eva.jpg"//https://upload.wikimedia.org/wikipedia/en/7/78/Nasa_astronaut_training_at_NBL.jpg"
-	slideimages[6] = new Image()
-	slideimages[6].src = "/arrmimages/announcement.jpg"//http://vignette3.wikia.nocookie.net/psi/images/8/8c/Empty_board_promotion_announcement.jpg/revision/latest?cb=20130707174434"
+	// var slideimages = new Array() // create new array to preload images
+	// slideimages[0] = new Image() // create new instance of image object
+	// slideimages[0].src = "arrmimages/orbitor.jpg"//http://www.nasa.gov/sites/default/files/thumbnails/image/15-094.jpg" // set image src property to image path, preloading image in the process
+	// slideimages[1] = new Image()
+	// slideimages[1].src = "arrmimages/orion.jpg"//https://upload.wikimedia.org/wikipedia/commons/8/80/Orion_with_ATV_SM.jpg"
+	// slideimages[2] = new Image()
+	// slideimages[2].src = "arrmimages/budget.jpg"//http://images.spaceref.com/news/2004/02.01.04.chart.2.lrg.jpg"
+	// slideimages[3] = new Image()
+	// slideimages[3].src = "arrmimages/asteroid.jpg"//http://o.aolcdn.com/dims-shared/dims3/GLOB/crop/4000x2445+0+327/resize/630x385!/format/jpg/quality/85/http://hss-prod.hss.aol.com/hss/storage/midas/9d45beddc69216d5863a060ff0c2d8d9/200723983/469055831.jpg"
+	// slideimages[4] = new Image()
+	// slideimages[4].src = "arrmimages/commTerminal.jpg"
+	// slideimages[5] = new Image()
+	// slideimages[5].src = "arrmimages/eva.jpg"//https://upload.wikimedia.org/wikipedia/en/7/78/Nasa_astronaut_training_at_NBL.jpg"
+	// slideimages[6] = new Image()
+	// slideimages[6].src = "arrmimages/announcement.jpg"//http://vignette3.wikia.nocookie.net/psi/images/8/8c/Empty_board_promotion_announcement.jpg/revision/latest?cb=20130707174434"
 
 
-var titleArray = [
-'18 May 2015 story: NASA Seeks Additional Information for Asteroid Redirect Mission Spacecraft',
-'Notional ARV Modules and Launch Adapter Design',
-'NASA FY\u0026#39;16 Budget Summary Briefing Calls Our ARRM work',
-'Boulder Capture Simulations Test-bed',
-'Ground-based Optical Comm Terminal could support a secondary optical telecom system for high data rate downlink in lunar orbit and potentially, at the asteroid.',
-'Astronaut EVA with tools at boulder',
-'Announcement:  ARRM MCR rescheduled for March 24, 2015.'];
+var slideimages = new Array("arrmimages/orbitor.jpg","arrmimages/orion.jpg", "arrmimages/budget.jpg","arrmimages/asteroid.jpg", "arrmimages/commTerminal.jpg","arrmimages/eva.jpg","arrmimages/announcement.jpg")
+
+var titleArray = new Array('18 May 2015 story: NASA Seeks Additional Information for Asteroid Redirect Mission Spacecraft','Notional ARV Modules and Launch Adapter Design','NASA FY\u0026#39;16 Budget Summary Briefing Calls Our ARRM work','Boulder Capture Simulations Test-bed','Ground-based Optical Comm Terminal could support a secondary optical telecom system for high data rate downlink in lunar orbit and potentially, at the asteroid.','Astronaut EVA with tools at boulder','Announcement:  ARRM MCR rescheduled for March 24, 2015.')
 
 
 	</script>
@@ -135,6 +151,13 @@ var titleArray = [
 	<!-- <link href="css/arrmHome.css" rel="stylesheet" type="text/css"> -->
 <body class="backgrounddd">
 
+
+<ul>
+  <li><a href="https://js.jpl.nasa.gov" style="font-size:130%;">JPL Space | </a></li>
+  <li><a href="http://www.jpl.nasa.gov/" style="font-size:130%;">JPL | </a></li>
+  <li><a href="http://www.caltech.edu/" style="font-size:130%;">Caltech | </a></li>
+  <li><a href="http://www.nasa.gov" style="font-size:130%;">NASA</a></li>
+</ul>
 
 
 
@@ -169,23 +192,102 @@ var titleArray = [
 	    background-color: #000000;
 	    border: 1px solid black;
 	    opacity: 0.7;"> -->
-			<h1><a href="arrmHome.html" style="color:white"> Home </a></h1>
+			<h1><a href="arrmHome.html"><u> Home </u></a></h1>
 			<h2> Administrative Resources <span style="float:right; color:white;">Technical Design Concept Info</span> </p> 
 			<h3 style="text-align:left"> ARRM Resources:<span> Mission Objectives & Requirements </span></h3>
 				<p> Library </p>
-				<p> Jira Site <span style="font-size:130%; font-weight:200">Mission Design</span></p>
-				<p> ViewEditor </p>
+				<p><a href=" https://arrm.jpl.nasa.gov/jira/secure/BrowseProjects.jspa?selectedCategory=all"> Jira Site <span style="font-size:130%; font-weight:200">Mission Design</span></p>
+				<p><a href="mms.html"> View Editor </a></p>
 			<h3 style="text-align:left"> Administrative: <span> Block Diagrams</h3>
 				<p> Team Org Tree <span style="font-size:120%; font-weight:200"> (composition & interfaces)</span></p>
 				<p> Project Schedule </p>
 				<p> New Member Form </p>
 			<h3 style="text-align:left"> ARRM Library:<span> Mechanical Drawings </span></h3>	
 				<p> Work Area </p>
-				<p> Reviews and Meetings <span style="font-size:130%; font-weight:200">Functional OpsCon</span></p>
+				<p><a href="calendar.html"> Reviews and Meetings </a><span style="font-size:130%; font-weight:200">Functional OpsCon</span></p>
 				<p> MMRs </p>
 			<h3 style="text-align:left"> Public Sites:<span> Mass: </span></h3>	
 				<p> Asteroid Redirect Mission <span style="color:white;"> MEL & Margins</p>
 				<p> Asteroid Initiative </p>
+
+<script type="text/javascript">		
+	// var slideimages = new Array("orion.jpg","budget.jpg","orbitor.jpg")
+	// var slidedesc = new Array("orion pic duh", "hey there's a budge", "and an orbiotor")
+
+	var image_number = 0
+	var image_length = slideimages.length -1
+
+	function change_image(num){
+
+		// if(num = 0){
+		// 	document.slidewhow.src= slideimages[image_number]
+		// 	document.getElementById("description").innerHTML = titleArray[image_number];
+		// 	setInterval(100000)
+		// }
+
+		image_number = image_number + num
+
+		if(image_number > image_length){
+			image_number = 0
+		}
+
+		if(image_number <0){
+			image_number = image_length
+		}
+
+
+
+
+		// document.write(image_number)
+		document.slidewhow.src= slideimages[image_number]
+		document.getElementById("description").innerHTML = titleArray[image_number];
+		return false;
+	}
+
+	function auto(){
+		setInterval("change_image(1)", 2500)
+	}
+
+	// function getImageNum(){
+	// 	return image_number
+	// }
+
+	function pause(){
+		// setInterval(5000)
+		setInterval("change_image(0)", 5000)
+	}
+	window.onload = auto()
+	</script>
+
+
+
+
+
+	<img src="arrmimages/orbitor.jpg" class="center" name="slidewhow" width="400" height="200" style="border-style:solid; border-color:white;"/>
+	<!-- center image in block link o jsfiddle.net/csbp2 -->
+	<p id="description" style="margin-left: auto; margin-right: auto; color:white; width:300px; height: 90px; word-wrap:break-word;">
+		18 May 2015 story: NASA Seeks Additional Information for Asteroid Redirect Mission Spacecraft
+	</p>
+	<table align="center" style="width:100px;">
+		<tr>
+			<td align="left"><a href="" onclick="return change_image(-1)">PREV</a></td> 
+			<!-- <td align="center"><a href="" onclick="auto()">AUTO</a></td> -->
+			<!-- <td align="center"><a href="" onclick="return pause()" >PAUSE</a></td> -->
+			<td align="right"><a href="" onclick="return change_image(1)">NEXT</a></td>
+			
+		</tr>
+	</table>
+
+
+
+
+
+
+
+
+
+
+
 				 <!-- <span style="font-size:130%; font-weight:200">Power</span></p> -->
 			<h3 style="text-align:left"> Released Documents and Presentation<span> Power: </span></h3>	
 				<p> 2014 ARRM Mission Concept Options Overview <span style="color:white;"> PEL & Margins </span></p>
@@ -195,20 +297,9 @@ var titleArray = [
 				<p style="color:black"> place holder text <span style="color:white"> Data Analyses </span> </p>
 
 
-		<img src="commTerminal.jpg" name="slide" width="100" height="56"/>
-		<script type="text/javascript">
-			var step=0
-			function slideit(){
-				// if(!document.images) return document.getElementById('slide').src=slideimages[step].src
-			document.images.slide.src=eval("image"+step+".src")
-			if(step<7)
-				step++
-			else
-				step=0
-			setTimeout("slideit()",2500)
-		}
-		slideit()
-		</script>
+		<!-- <img src="commTerminal.jpg" name="slide" width="100" height="56"/> -->
+
+
 
 
 

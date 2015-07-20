@@ -1,55 +1,72 @@
 <!-- slideshowtesting -->
 <!doctype html>
-<html>
+<!-- <html>
 <head>
 <script type="text/javascript">
 
-var slideimages = new Array() // create new array to preload images
-slideimages[0] = new Image() // create new instance of image object
-slideimages[0].src = "orion.jpg" // set image src property to image path, preloading image in the process
-slideimages[1] = new Image()
-slideimages[1].src = "orbitor.jpg"
-slideimages[2] = new Image()
-slideimages[2].src = "budget.jpg"
+// var slideimages = new Array() // create new array to preload images
+// slideimages[0] = new Image() // create new instance of image object
+// slideimages[0].src = "orion.jpg" // set image src property to image path, preloading image in the process
+// slideimages[1] = new Image()
+// slideimages[1].src = "orbitor.jpg"
+// slideimages[2] = new Image()
+// slideimages[2].src = "budget.jpg"
 
 </script>
-</head>
+ --><!-- </head>
 <body>
 <a href="javascript:slidelink()">
 	<img src="orion.jpg" id="slide" width="200" height="86" />
 </a>
-<script type="text/javascript">
+// <script type="text/javascript">
 
-//variable that will increment through the images
-var step=0
-var whichiimage=0
+// //variable that will increment through the images
+// var step=0
+// var whichiimage=0
 
-function slideit(){
- //if browser does not support the image object, exit.
- if (!document.images)
-  return
- document.getElementById('slide').src = slideimages[step].src
- whichimage=step
- if (step<2)
-  step++
- else
-  step=0
- //call function "slideit()" every 2.5 seconds
- setTimeout("slideit()",2500)
-}
+// function slideit(){
+//  //if browser does not support the image object, exit.
+//  if (!document.images)
+//   return
+//  document.getElementById('slide').src = slideimages[step].src
+//  whichimage=step
+//  if (step<2)
+//   step++
+//  else
+//   step=0
+//  //call function "slideit()" every 2.5 seconds
+//  setTimeout("slideit()",2500)
+// }
 
-function slidelink(){
- if (whichimage == 0)
-  window.location = "link1.htm"
- else if (whichimage == 1)
-  window.location = "link2.htm"
- else if (whichimage == 2)
-  window.location = "link3.htm"
-}
+// function slidelink(){
+//  if (whichimage == 0)
+//   window.location = "link1.htm"
+//  else if (whichimage == 1)
+//   window.location = "link2.htm"
+//  else if (whichimage == 2)
+//   window.location = "link3.htm"
+// }
 
 
-slideit()
+// slideit()
 
-</script>
+// </script>
 </body>
-</html>
+</html> -->
+
+
+
+		//<script type="text/javascript">
+
+		// 	var step=0
+		// 	function slideit(){
+		// 		// if(!document.images) return document.getElementById('slide').src=slideimages[step].src
+		// 	document.images.slide.src=eval("image"+step+".src")
+		// 	if(step<7)
+		// 		step++
+		// 	else
+		// 		step=0
+		// 	setTimeout("slideit()",2500)
+		// }
+		// slideit()
+<!--		// </script> -->

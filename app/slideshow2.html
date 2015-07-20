@@ -1,6 +1,4 @@
 <!DOCTYPE HTML>
-
-<!doctype html>
 <html>
 <head>
 <script type="text/javascript">
@@ -42,7 +40,7 @@
 	}
 
 	function auto(){
-		setInterval("change_image(1)", 1500)
+		setInterval("change_image(1)", 2500)
 	}
 
 	// function getImageNum(){
@@ -53,19 +51,19 @@
 		// setInterval(5000)
 		document.slidewhow.src= slideimages[image_number]
 	}
-	window.onload = auto()
+	// window.onload = auto()
 	</script>
 
 
 
 
 
-	<img src="orion.jpg" name="slidewhow" width="800" height="500" />
+	<img src="orion.jpg" name="slidewhow" width="400" height="200" />
 	<table>
 		<tr>
 			<td align="left"><a href="" onclick="return change_image(-1)">PREV</a></td> 
 			<td align="right"><a href="" onclick="return change_image(1)">NEXT</a></td>
-			<td align="right"><a href="" onclick="return pause()" >  Pause</a></td>
+			<td align="right"><a href="" onclick="return auto()" >Auto</a></td>
 		</tr>
 	</table>
 	<div id="description">
