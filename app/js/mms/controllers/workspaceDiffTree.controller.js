@@ -5,7 +5,8 @@
 angular.module('mmsApp')
 .controller('WorkspaceDiffTreeController', ["_", "$timeout", "$scope", "$rootScope", "$state", "$stateParams", "$modal", "growl", "WorkspaceService", "ElementService", "diff", "UxService",
 function(_, $timeout, $scope, $rootScope, $state, $stateParams, $modal, growl, WorkspaceService, ElementService, diff, UxService) {
-
+	$rootScope.tbApi.select('diff.perspective.tree');
+	
     $scope.treeApi = {};
 
     $scope.treeData = [];
@@ -28,5 +29,4 @@ function(_, $timeout, $scope, $rootScope, $state, $stateParams, $modal, growl, W
     $rootScope.options = options;
 
     $timeout(function () { $scope.treeApi.refresh(); $scope.treeApi.expand_all(); $rootScope.treeApi = $scope.treeApi; } );
-    
 }]);

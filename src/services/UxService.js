@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms')
-.factory('UxService', ['$rootScope', UxService]);
+.factory('UxService', ['$rootScope', '$state', UxService]);
 
 /**
  * @ngdoc service
@@ -10,7 +10,7 @@ angular.module('mms')
  * @description
  * Ux Service
  */
-function UxService($rootScope) {
+function UxService($rootScope, $state) {
 
     /**
      * @ngdoc method
@@ -65,6 +65,12 @@ function UxService($rootScope) {
 		  case "document.snapshot.create":
 		    return {id: button, icon: 'fa-plus', dynamic: true, selected: false, active: false, permission:false, tooltip: 'Create Tag',
 		            spinner: false, onClick: function() {$rootScope.$broadcast(button);}};
+		  case "diff.perspective.detail":
+            return {id: button, icon: 'fa-ship', selected: true, active: true, permission: true, tooltip: 'Detail',
+                    spinner: false, onClick: function() {$state.go('workspace.diff.view');}};
+		  case "diff.perspective.tree":
+            return {id: button, icon: 'fa-space-shuttle', selected: false, active: true, permission: true, tooltip: 'Context',
+                    spinner: false, onClick: function() {$state.go('workspace.diff.tree');}};
 		}    
 	};
 
@@ -246,13 +252,28 @@ function UxService($rootScope) {
 		  	return "fa-file";
 		  case "workspace":
 		  	return "fa-tasks";
+      default:
+        return "fa-square";
         }
 	};
+
+  var getChangeTypeName = function(type) {
+    type = type.toLowerCase();
+    switch (type) {
+      case "added":
+        return "Addition";
+      case "updated":
+        return "Modification";
+      case "removed":
+        return "Removal";
+    }
+  };
 
     return {
     	getButtonBarButton: getButtonBarButton,
         getToolbarButton: getToolbarButton,
         getTypeIcon: getTypeIcon,
+        getChangeTypeName: getChangeTypeName,
         getTreeTypes: getTreeTypes
     };
 }

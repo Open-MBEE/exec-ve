@@ -28,6 +28,8 @@ function(_, $timeout, $scope, $rootScope, $state, $stateParams, $modal, growl, W
     $scope.stagedCounter = 0;
     $scope.unstagedCounter = 0;
 
+    $scope.workspace1Name = ""; 
+
     $scope.options = {
       types: UxService.getTreeTypes(),
       statuses: {
@@ -253,6 +255,10 @@ function(_, $timeout, $scope, $rootScope, $state, $stateParams, $modal, growl, W
           change.delta = deltaElement;
           change.type = changeType;
           change.icon = changeIcon;
+          // @test var
+          change.changeTypeName = UxService.getChangeTypeName(change.type);
+          change.typeIcon = UxService.getTypeIcon(change.delta.specialization.type);
+
           change.staged = false;
           change.ws2object = ws2object;
 
@@ -442,7 +448,6 @@ function(_, $timeout, $scope, $rootScope, $state, $stateParams, $modal, growl, W
 
           $scope.changes.push(change);
           $scope.id2change[e.sysmlid] = change;
-
         });
         
         // Added second pass to populate additions
@@ -488,6 +493,8 @@ function(_, $timeout, $scope, $rootScope, $state, $stateParams, $modal, growl, W
         $rootScope.id2change = id2change;
 
         refreshStageCounters();
+
+        $scope.workspace1Name = ws1.name;
     };
     
     // Hiding the right-hand pane
@@ -496,12 +503,22 @@ function(_, $timeout, $scope, $rootScope, $state, $stateParams, $modal, growl, W
         noToggle: true,
         handle: 0
     });
+    paneManager.get("left-pane").setOptions({
+	    noToggle: true,
+	    handle: 0,
+	    size: "33%"
+    });
     
     // Showing the right-hand pane once we leave the diff view
     $scope.$on('$destroy', function() {
         paneManager.get("right-pane").setOptions({
             noToggle: false,
             handle: 14
+        });
+        paneManager.get("left-pane").setOptions({
+            noToggle: false,
+            handle: 14,
+            size: "20%"
         });
     });
 
