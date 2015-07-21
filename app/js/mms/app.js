@@ -584,9 +584,41 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
         resolve: {
             diff: function($stateParams, WorkspaceService, dummyLogin) {
                 return WorkspaceService.diff($stateParams.target, $stateParams.source, $stateParams.targetTime, $stateParams.sourceTime);
+            },
+
+            workspace1: function( $stateParams, WorkspaceService, dummyLogin){
+                return WorkspaceService.getWorkspace($stateParams.target);
+            },
+
+            workspace2: function( $stateParams, WorkspaceService, dummyLogin){
+                return WorkspaceService.getWorkspace($stateParams.source);
             }
+            // maybe don't need workspace1?? can just use getConfig??
+            //ConfigService.getConfig($stateParams.target, workspace1, $stateParams.targetTime);
+
         },
         views: {
+
+            'menu@': {
+                templateUrl: '/partials/mms/diff-nav.html',
+                //reference DiffChangeController and add a function to get config name since already have workspaces in there??
+                controller: function ($scope, $rootScope, workspace1, workspace2, $state){
+                    $scope.workspace1 = workspace1;
+                    $scope.workspace2 = workspace2;
+                    $rootScope.mms_title = 'DiffMerge';    
+
+                    // $scope.goBack = function () {
+                    //   $state.go('workspace', {}, {reload:true});
+                    // };
+                }
+
+
+            },
+
+
+
+
+
             // 'menu@':{
             //     template: '<mms-nav mms-title="View Editor" mms-ws="{{workspace}}" mms-site="site" mms-config="tag" mms-show-tag="{{showTag}}"></mms-nav>',
             //     controller: function ($scope, $filter, $rootScope, workspace, site, document, tag, snapshots, time, docFilter) {
@@ -626,23 +658,19 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
             // },
 
 
-            'menu@':{
-                template: '<mms-nav mms-title="Portal" mms-ws="{{workspace}}" mms-site="site" mms-config="tag"></mms-nav>',
-                controller: function ($scope, $rootScope, workspace, site, tag, workspaceObj) {
-                // $scope.workspace = workspace;
-                // $scope.tag = tag;
-                // $scope.laura = 'hiiii laura';
-                // $scope.site = 'DiffMerge';
-                // $rootScope.mms_title = 'Diff: ';//+workspaceObj.name;
-                $scope.diff = 'yes';
-                $rootScope.mms_title = 'Diff';
-
-
-
-
-
-                }
-            },
+            // 'menu@':{
+            //     template: '<mms-nav mms-title="Portal" mms-ws="{{workspace}}" mms-site="site" mms-config="tag"></mms-nav>',
+            //     controller: function ($scope, $rootScope, workspace, site, tag, workspaceObj, diff) {
+            //     // $scope.workspace = workspace;
+            //     // $scope.tag = tag;
+            //     // $scope.laura = 'hiiii laura';
+            //     // $scope.site = 'DiffMerge';
+            //     // $rootScope.mms_title = 'Diff: ';//+workspaceObj.name;
+            //     // $scope.diff = 'yes';
+            //     $scope.diff = 'yes';
+            //     $rootScope.mms_title = 'Diff';
+            //     }
+            // },
 
             'pane-center@': {
                 templateUrl: 'partials/mms/diff-pane-center.html'
