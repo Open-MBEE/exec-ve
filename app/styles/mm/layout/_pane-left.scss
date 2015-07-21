@@ -1,16 +1,23 @@
 .diff-pane-left {
+
+  height: 100%; 
+
   .container-fluid {
     position: relative;
   }
 
   .btn-staging {
     padding: 8px 12px;
-    margin: 0px 5px;
+    margin: 0px;
     background-color: $highlight_grey;
     @include box-shadow(none);
 
     &:hover {
       color: $black;      
+    }
+
+    h3 {
+      padding-left: 0px !important;
     }
 
     i {
@@ -20,6 +27,34 @@
     }
   }
 
+  .unstaged-table {
+    height: 40vh;
+    width: 100%;
+    overflow-y: auto;
+  }
+
+  .staged-table {
+    // height: 30vh;
+    top: 10px;
+    bottom: 60px;
+    width: 100%;
+    overflow-y: auto;
+  }
+
+  // .header-row {
+  //   width: 100%;
+
+  //   & > td {
+  //     &:first-child {
+  //       padding-left: 0px;
+  //       width: 50%;
+  //     }
+  //     &:last-child {
+  //       width: 50%;
+  //     }
+  //   }
+  // }
+
   #merge-btn {
     width: 100%;
     font-size: 12pt;
@@ -27,20 +62,20 @@
 
   #merge-btn-container {
     width: 100%;
-    min-width: 555px;
+    min-width: 600px;
     padding-left: 20px;
-    padding-right: 10px;
+    padding-right: 15px;
     text-align: center;
     position: absolute;
-    bottom: 20px;
+    bottom: 10px;
   }
 
   .btn-stage-all {
-    margin-left: 64px;
+    margin-left: 33px;
   }
 
   .btn-unstage-all {
-    margin-left: 85px;
+    margin-left: 30px;
   }
 
   .btn-merge,
@@ -65,11 +100,42 @@
   table {
 
     table-layout: fixed;
-    min-width: 555px;
+    min-width: 600px;
+    margin-bottom: 7px;
+
+    &.header-table {
+      margin-bottom: 10px;
+    }
 
     tr {
       &:hover {
         background-color: $tertiary_grey;
+      }
+
+      &.header-row {
+        margin-bottom: 10px;
+        width: 100%;
+
+        & > td {
+
+          &:first-child {
+            padding-left: 20px;
+            width: 50%;
+
+            & h3 {
+              white-space: nowrap;     
+              overflow: hidden;
+              text-overflow: ellipsis;
+            }
+          }
+          &:last-child {
+            width: 50%;
+          }
+        }
+
+        &:hover {
+          background-color: transparent;
+        }
       }
 
       td {
@@ -95,7 +161,7 @@
         &:last-child {
           text-align: right;
           width: 15%;
-          padding-right: 5px;
+          padding-right: 15px;
         };
 
         /*&:first-child {
@@ -112,7 +178,25 @@
           text-align: center;
         }
       }
+
+      // .header-row {
+      //   width: 100%;
+
+      //   & > td {
+      //     &:first-child {
+      //       padding-left: 0px;
+      //       width: 25%;
+      //     }
+      //     &:last-child {
+      //       width: 75%;
+      //     }
+      //   }
+      // }
     }
+  }
+
+  .sorting-options {
+    background: transparent;
   }
 
   .fa-pane-handle {
