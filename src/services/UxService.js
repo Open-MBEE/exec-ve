@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms')
-.factory('UxService', ['$rootScope', UxService]);
+.factory('UxService', ['$rootScope', '$state', UxService]);
 
 /**
  * @ngdoc service
@@ -10,7 +10,7 @@ angular.module('mms')
  * @description
  * Ux Service
  */
-function UxService($rootScope) {
+function UxService($rootScope, $state) {
 
     /**
      * @ngdoc method
@@ -65,6 +65,12 @@ function UxService($rootScope) {
 		  case "document.snapshot.create":
 		    return {id: button, icon: 'fa-plus', dynamic: true, selected: false, active: false, permission:false, tooltip: 'Create Tag',
 		            spinner: false, onClick: function() {$rootScope.$broadcast(button);}};
+		  case "diff.perspective.detail":
+            return {id: button, icon: 'fa-info-circle', selected: true, active: true, permission: true, tooltip: 'Detail',
+                    spinner: false, onClick: function() {$rootScope.diffPerspective = 'detail'; }};
+		  case "diff.perspective.tree":
+            return {id: button, icon: 'fa-sitemap', selected: false, active: true, permission: true, tooltip: 'Context',
+                    spinner: false, onClick: function() {$rootScope.diffPerspective = 'tree'; }};
 		}    
 	};
 

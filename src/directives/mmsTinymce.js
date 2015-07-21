@@ -398,7 +398,6 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
         //fix <br> in pre blocks
         var fixNewLines = function(content) {
             var codeBlocks = content.match(/<pre.*?>[^]*?<\/pre>/mg);
-            console.log('codeBlocks', codeBlocks);
             if(!codeBlocks) return content;
             for(var index=0; index < codeBlocks.length; index++) {
                 content = content.replace(codeBlocks[index], codeBlocks[index].replace(/<br\s*\/?>/mgi, "\n"));

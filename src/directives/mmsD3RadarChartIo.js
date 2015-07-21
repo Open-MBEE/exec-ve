@@ -4,7 +4,6 @@
     function mmsD3RadarChartIo(ElementService, UtilsService, $compile, growl, $window, mmsViewCtrl) {
       
       var mmsRadarChartLink = function(scope, element, attrs) {
-          //console.log(scope.xx);
           var d3 = $window.d3;  
           var colorscale = d3.scale.category10();
           var w = 500, h = 500;

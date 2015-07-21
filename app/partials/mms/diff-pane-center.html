@@ -1,5 +1,12 @@
 <div class="diff-pane-center">
 
-	<div ui-view="view">Select a change to inspect from the left pane.</div>
+	<div ng-show="!diffPerspective">Select a change to inspect from the left pane.</div>
+	
+	<div ng-show="diffPerspective == 'detail'" ng-include="'/partials/mms/diff-view-pane-center.html'"></div>
+	
+	<div class="container-fluid" ng-show="diffPerspective == 'tree'">
+	   <h3>Model Context</h3>
+		<mms-tree search="''" tree-data="treeData" tree-control="treeApi" section-numbering="false" options="options"></mms-tree>
+    </div>
 
 </div>
