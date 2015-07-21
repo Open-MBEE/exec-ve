@@ -587,12 +587,13 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
             }
         },
         views: {
-            'pane-center@': {
-                templateUrl: 'partials/mms/diff-pane-center.html'
-            },
             'pane-left@': {
                 templateUrl: 'partials/mms/diff-pane-left.html',
                 controller: 'WorkspaceDiffChangeController'
+            },
+            'pane-center@': {
+                templateUrl: 'partials/mms/diff-pane-center.html',
+                controller: 'WorkspaceDiffElementViewController'
             },
             'pane-right@': {
                 template: ''
@@ -600,24 +601,6 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
             'toolbar-right@': {
                 template: '<mms-toolbar buttons="buttons" mms-tb-api="tbApi"></mms-toolbar>',
                 controller: 'ToolbarCtrl'
-            }
-        }
-    })
-    .state('workspace.diff.view', {
-        url: '/element/:elementId',
-        views: {
-            'pane-center@': {
-                templateUrl: 'partials/mms/diff-view-pane-center.html',
-                controller: 'WorkspaceDiffElementViewController'
-            }
-        }
-    })
-    .state('workspace.diff.tree', {
-        url: '/tree',
-        views: {
-            'pane-center@': {
-                templateUrl: 'partials/mms/diff-pane-right.html',
-                controller: 'WorkspaceDiffTreeController'
             }
         }
     });

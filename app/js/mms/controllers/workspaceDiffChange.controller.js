@@ -2,232 +2,313 @@
 
 /* Controllers */
 
-angular.module('mmsApp')
-.controller('WorkspaceDiffChangeController', ["_", "$timeout", "$scope", "$rootScope", "$state", "$stateParams", "$modal", "growl", "WorkspaceService", "ElementService", "diff", "UxService", "paneManager",
-function(_, $timeout, $scope, $rootScope, $state, $stateParams, $modal, growl, WorkspaceService, ElementService, diff, UxService, paneManager) {
+angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$timeout", "$scope", "$rootScope", "$state", "$stateParams", "$modal", "growl", "WorkspaceService", "ElementService", "diff", "UxService", "paneManager", function(_, $timeout, $scope, $rootScope, $state, $stateParams, $modal, growl, WorkspaceService, ElementService, diff, UxService, paneManager)
+{
 
-    var ws1 = $stateParams.target;
-    var ws2 = $stateParams.source;
+	var ws1 = $stateParams.target;
+	var ws2 = $stateParams.source;
 
-    $scope.treeApi = {};
+	$scope.treeApi = {};
 
-    var treeApiLocal = $rootScope.treeApi;
+	var treeApiLocal = $rootScope.treeApi;
 
-    $scope.treeApi = treeApiLocal;
+	$scope.treeApi = treeApiLocal;
 
-    $rootScope.treeData = [];
+	$rootScope.treeData = [];
 
-    $scope.diff = diff;
-    
-    $scope.changes = [];
+	$scope.diff = diff;
 
-    $scope.id2change = {};
+	$scope.changes = [];
 
-    $rootScope.id2node = {};
+	$scope.id2change = {};
 
-    $scope.stagedCounter = 0;
-    $scope.unstagedCounter = 0;
+	$rootScope.id2node = {};
 
-    $scope.workspace1Name = ""; 
+	$scope.stagedCounter = 0;
+	$scope.unstagedCounter = 0;
 
-    $scope.options = {
-      types: UxService.getTreeTypes(),
-      statuses: {
-        'moved'   : { style: "moved" },
-        'added'   : { style: "addition" },
-        'removed' : { style: "removal" },
-        'updated' : { style: "update" },
-        'conflict': { style: "" }
-      }
-    };
+	$scope.workspace1Name = "";
 
-    var stageChange = function(change) {
-      
-      // @TODO: Compare original and new owner to determine if a move has occurred
-      change.staged = ! change.staged;
+	$scope.options = {
+		types: UxService.getTreeTypes(),
+		statuses: {
+			'moved': {
+				style: "moved"
+			},
+			'added': {
+				style: "addition"
+			},
+			'removed': {
+				style: "removal"
+			},
+			'updated': {
+				style: "update"
+			},
+			'conflict': {
+				style: ""
+			}
+		}
+	};
 
-      var treeNode = null;
-      var index;
+	var stageChange = function(change)
+	{
 
-      if (change.type === "added") {
-        treeNode = $scope.id2node[change.delta.sysmlid];
+			// @TODO: Compare original and new owner to determine if a move has occurred
+			change.staged = !change.staged;
 
-        if (change.staged) {
-            treeNode.status = "added";
-        }
-        else {
-            treeNode.status = "clean";
-        }
-      }
-      else if (change.type === "removed") {
-        treeNode = $scope.id2node[change.original.sysmlid];
+			var treeNode = null;
+			var index;
 
-        if (change.staged) {
-          treeNode.status = "removed";
-        } else {
-          treeNode.status = "clean";
-        } 
-      }
-      else if (change.type === "updated") {
-        treeNode = $scope.id2node[change.original.sysmlid];
+			if (change.type === "added")
+			{
+				treeNode = $scope.id2node[change.delta.sysmlid];
 
-        // handle if the name of element has changed on update
-        if (change.staged) {
-          treeNode.status = "updated";
-          treeNode.data = change.delta;
+				if (change.staged)
+				{
+// 					treeNode.status = "added";
+				}
+				else
+				{
+// 					treeNode.status = "clean";
+				}
+			}
+			else if (change.type === "removed")
+			{
+				treeNode = $scope.id2node[change.original.sysmlid];
 
-        } else {
-          treeNode.status = "clean";
-          treeNode.data = change.original;
-        }
-      }
-      else if (change.type === "moved") {
-        treeNode = $scope.id2node[change.original.sysmlid];
+				if (change.staged)
+				{
+// 					treeNode.status = "removed";
+				}
+				else
+				{
+// 					treeNode.status = "clean";
+				}
+			}
+			else if (change.type === "updated")
+			{
+				treeNode = $scope.id2node[change.original.sysmlid];
 
-        var currentParentNode = $scope.id2node[change.original.owner];
-        var newParentNode = $scope.id2node[change.delta.owner];
-        
-        if (change.staged) {
-          treeNode.status = "moved";
+				// handle if the name of element has changed on update
+				if (change.staged)
+				{
+// 					treeNode.status = "updated";
+					treeNode.data = change.delta;
 
-          // remove from current parent node
-          index = findIndexBySysMLID(currentParentNode.children, change.original.sysmlid);
-          currentParentNode.children.splice(index,1);
+				}
+				else
+				{
+// 					treeNode.status = "clean";
+					treeNode.data = change.original;
+				}
+			}
+			else if (change.type === "moved")
+			{
+				treeNode = $scope.id2node[change.original.sysmlid];
 
-          // add to new parent node
-          newParentNode.children.push(treeNode);
+				var currentParentNode = $scope.id2node[change.original.owner];
+				var newParentNode = $scope.id2node[change.delta.owner];
 
-        } else {
-          treeNode.status = "clean";
+				if (change.staged)
+				{
+// 					treeNode.status = "moved";
 
-          // remove from new parent node
-          currentParentNode.children.push(treeNode);
+					// remove from current parent node
+					index = findIndexBySysMLID(currentParentNode.children, change.original.sysmlid);
+					currentParentNode.children.splice(index, 1);
 
-          // add back to current parent node
-          index = findIndexBySysMLID(newParentNode.children, change.original.sysmlid);
-          newParentNode.children.splice(index,1);
+					// add to new parent node
+					newParentNode.children.push(treeNode);
 
-        }
-      }
-      
-      if(treeNode.status === "clean")
-      {
-	      treeNode.detail.stageStatus = "ignore";
-      }
-      else
-      {
-	      treeNode.detail.stageStatus = "apply";
-      }
+				}
+				else
+				{
+// 					treeNode.status = "clean";
 
-      $rootScope.treeApi.refresh();
-      $rootScope.treeApi.expand_all();
+					// remove from new parent node
+					currentParentNode.children.push(treeNode);
 
-      refreshStageCounters();
-    };
+					// add back to current parent node
+					index = findIndexBySysMLID(newParentNode.children, change.original.sysmlid);
+					newParentNode.children.splice(index, 1);
 
-    $scope.goBack = function () {
-      $state.go('workspace', {}, {reload:true});
-    };
+				}
+			}
 
-    $scope.mergeStagedChanges = function (workspaceId) {
-        //var deletedElements = [];
-        //var changedElements = [];
+			if (change.staged)
+			{
+				treeNode.detail.stageStatus = "apply";
+			}
+			else
+			{
+				treeNode.detail.stageStatus = "ignore";
+			}
 
-        var object = {
-            workspace1: {
-                id: ws1
-            },
-            workspace2: {
-                id: ws2,
-                addedElements: [],
-                deletedElements: [],
-                updatedElements: [],
-                movedElements: []
-            }
-        };
+			$rootScope.treeApi.refresh();
+			$rootScope.treeApi.expand_all();
 
-        $scope.changes.forEach(function(change) {
-            if (change.staged) {
-                if (change.type === "removed") {
-                    object.workspace2.deletedElements.push(change.ws2object);
-            //deletedElements.push(change.original);
-                } else if (change.type === 'updated') {
-                    object.workspace2.updatedElements.push(change.ws2object);
-                    delete change.ws2object.read;
-                    delete change.ws2object.modified;
-            //delete change.delta.read;
-            //changedElements.push(change.delta);
-                } else if (change.type === 'added') {
-                    object.workspace2.addedElements.push(change.ws2object);
-                } else if (change.type === 'moved') {
-                    object.workspace2.movedElements.push(change.ws2object);
-                }
-            }
-        });
-        $scope.saving = true;
-        WorkspaceService.merge(object, $stateParams.sourceTime)
-        .then(function(data) {
-              growl.success("Workspace Elements Merged");
-              $scope.saving = false;
-              $state.go('workspace', {}, {reload:true});
-        }, function(reason) {
-            growl.error("Workspace Merge Error: " + reason.message);
-            $scope.saving = false;
-        });
-    };
+			refreshStageCounters();
+		};
 
-    $scope.stageAllUnstaged = function (changes) {
-      changes.forEach(function (change) {
-        if (!change.staged) {
-          stageChange(change);
-        }
-      });
-    };
+	var highlightTreeRow = function(change)
+	{
+		var treeNode = null;
+		var index;
+		
+		if (change.type === "added")
+			treeNode = $scope.id2node[change.delta.sysmlid];
+		else
+			treeNode = $scope.id2node[change.original.sysmlid];
+		
+		angular.forEach($scope.id2node, function(node)
+		{
+			node.selected = null;
+		});
+		
+		change.selected = true;
+		treeNode.selected = true;
+	
+		$rootScope.treeApi.refresh();
+		$rootScope.treeApi.expand_all();
+	};
 
-    $scope.unstageAllStaged = function (changes) {
-      changes.forEach(function (change) {
-        if (change.staged) {
-          stageChange(change);
-        }
-      });
-    };
+	$scope.goBack = function()
+	{
+		$state.go('workspace', {}, {
+			reload: true
+		});
+	};
 
-    var refreshStageCounters = function () {
-      $scope.stagedCounter = 0;
-      $scope.unstagedCounter = 0;
+	$scope.mergeStagedChanges = function(workspaceId)
+	{
+		//var deletedElements = [];
+		//var changedElements = [];
+		var object = {
+			workspace1: {
+				id: ws1
+			},
+			workspace2: {
+				id: ws2,
+				addedElements: [],
+				deletedElements: [],
+				updatedElements: [],
+				movedElements: []
+			}
+		};
 
-      $scope.changes.forEach(function (change) {
-        if (change.staged) {
-          $scope.stagedCounter++;
-        } else {
-          $scope.unstagedCounter++;
-        }
-      });
-    };
+		$scope.changes.forEach(function(change)
+		{
+			if (change.staged)
+			{
+				if (change.type === "removed")
+				{
+					object.workspace2.deletedElements.push(change.ws2object);
+					//deletedElements.push(change.original);
+				}
+				else if (change.type === 'updated')
+				{
+					object.workspace2.updatedElements.push(change.ws2object);
+					delete change.ws2object.read;
+					delete change.ws2object.modified;
+					//delete change.delta.read;
+					//changedElements.push(change.delta);
+				}
+				else if (change.type === 'added')
+				{
+					object.workspace2.addedElements.push(change.ws2object);
+				}
+				else if (change.type === 'moved')
+				{
+					object.workspace2.movedElements.push(change.ws2object);
+				}
+			}
+		});
+		$scope.saving = true;
+		WorkspaceService.merge(object, $stateParams.sourceTime).then(function(data)
+		{
+			growl.success("Workspace Elements Merged");
+			$scope.saving = false;
+			$state.go('workspace', {}, {
+				reload: true
+			});
+		}, function(reason)
+		{
+			growl.error("Workspace Merge Error: " + reason.message);
+			$scope.saving = false;
+		});
+	};
 
-    var findIndexBySysMLID = function (array, sysmlid) {
-     for (var i = 0; i < array.length; i++) {
-        if (array[i].data.sysmlid === sysmlid) {
-          return i;
-        }
-      }
-      return -1; 
-    };
+	$scope.stageAllUnstaged = function(changes)
+	{
+		changes.forEach(function(change)
+		{
+			if (!change.staged)
+			{
+				stageChange(change);
+			}
+		});
+	};
 
-    $scope.stageChange = stageChange;
+	$scope.unstageAllStaged = function(changes)
+	{
+		changes.forEach(function(change)
+		{
+			if (change.staged)
+			{
+				stageChange(change);
+			}
+		});
+	};
 
-    $scope.selectChange = function (change) {
-      var elementId;
-      if (change.type === "added")
-        elementId = change.delta.sysmlid;
-      else
-        elementId = change.original.sysmlid;
+	var refreshStageCounters = function()
+	{
+			$scope.stagedCounter = 0;
+			$scope.unstagedCounter = 0;
 
-      $state.go('workspace.diff.view', {elementId: elementId});
-    };
+			$scope.changes.forEach(function(change)
+			{
+				if (change.staged)
+				{
+					$scope.stagedCounter++;
+				}
+				else
+				{
+					$scope.unstagedCounter++;
+				}
+			});
+		};
 
-    // Diff the two workspaces picked in the Workspace Picker
-    /* WorkspaceService.diff(ws1, ws2).then(
+	var findIndexBySysMLID = function(array, sysmlid)
+	{
+			for (var i = 0; i < array.length; i++)
+			{
+				if (array[i].data.sysmlid === sysmlid)
+				{
+					return i;
+				}
+			}
+			return -1;
+		};
+
+	$scope.stageChange = stageChange;
+
+	$scope.selectChange = function(change)
+	{
+		var elementId;
+		if (change.type === "added") elementId = change.delta.sysmlid;
+		else elementId = change.original.sysmlid;
+		
+		if( ! $rootScope.diffPerspective)
+			$rootScope.diffPerspective = 'detail';
+		
+		$rootScope.$broadcast('elementId', elementId);
+		highlightTreeRow(change);
+		
+// 		$state.go('workspace.diff.view', {elementId: elementId});
+	};
+
+	// Diff the two workspaces picked in the Workspace Picker
+/* WorkspaceService.diff(ws1, ws2).then(
      function(result) {
         
         setupChangesList(result.workspace1, result.workspace2); 
@@ -238,63 +319,74 @@ function(_, $timeout, $scope, $rootScope, $state, $stateParams, $modal, growl, W
       }
     );   */
 
-      /*
-       * Preps mms-tree with data and display options.
-       */
-    var setupChangesList = function(ws1, ws2) {
+	/*
+	 * Preps mms-tree with data and display options.
+	 */
+	var setupChangesList = function(ws1, ws2)
+	{
 
-        // var emptyElement = { name: "", owner: "", documentation: "", specialization : { type: "", value_type: "", values: ""} };
+			// var emptyElement = { name: "", owner: "", documentation: "", specialization : { type: "", value_type: "", values: ""} };
+			var emptyElement = {
+				name: "",
+				owner: "",
+				documentation: "",
+				specialization: {}
+			};
 
-        var emptyElement = { name: "", owner: "", documentation: "", specialization : {} };
+			var createChange = function(name, element, deltaElement, changeType, changeIcon, ws2object)
+				{
+					var change = {};
 
-        var createChange = function (name, element, deltaElement, changeType, changeIcon, ws2object) {
-          var change = {};
-          
-          change.name = name;
-          change.original = element;
-          change.delta = deltaElement;
-          change.type = changeType;
-          change.icon = changeIcon;
-          // @test var
-          change.changeTypeName = UxService.getChangeTypeName(change.type);
-          change.typeIcon = UxService.getTypeIcon(change.delta.specialization.type);
+					change.name = name;
+					change.original = element;
+					change.delta = deltaElement;
+					change.type = changeType;
+					change.icon = changeIcon;
+					// @test var
+					change.changeTypeName = UxService.getChangeTypeName(change.type);
+					change.typeIcon = UxService.getTypeIcon(change.delta.specialization.type);
 
-          change.staged = false;
-          change.ws2object = ws2object;
+					change.staged = false;
+					change.ws2object = ws2object;
 
-          change.properties = {};
-          change.properties.name = {};
-          change.properties.owner = {};
-          change.properties.documentation = {};
+					change.properties = {};
+					change.properties.name = {};
+					change.properties.owner = {};
+					change.properties.documentation = {};
 
-          updateChangeProperty(change.properties.name, "clean");
-          updateChangeProperty(change.properties.owner, "clean");
-          updateChangeProperty(change.properties.documentation, "clean");
+					updateChangeProperty(change.properties.name, "clean");
+					updateChangeProperty(change.properties.owner, "clean");
+					updateChangeProperty(change.properties.documentation, "clean");
 
-          change.properties.specialization = {};
-          if (element.hasOwnProperty('specialization')) {
-            Object.keys(element.specialization).forEach(function (property) {
-              change.properties.specialization[property] = {};
-              updateChangeProperty(change.properties.specialization[property], "clean");
-            });
-          }
-          if (deltaElement.hasOwnProperty('specialization')) {
-            Object.keys(deltaElement.specialization).forEach(function (property) {
-              change.properties.specialization[property] = {};
-              updateChangeProperty(change.properties.specialization[property], "clean");
-            });
-          }
+					change.properties.specialization = {};
+					if (element.hasOwnProperty('specialization'))
+					{
+						Object.keys(element.specialization).forEach(function(property)
+						{
+							change.properties.specialization[property] = {};
+							updateChangeProperty(change.properties.specialization[property], "clean");
+						});
+					}
+					if (deltaElement.hasOwnProperty('specialization'))
+					{
+						Object.keys(deltaElement.specialization).forEach(function(property)
+						{
+							change.properties.specialization[property] = {};
+							updateChangeProperty(change.properties.specialization[property], "clean");
+						});
+					}
 
-          return change;
-        };
+					return change;
+				};
 
-        var updateChangeProperty = function(property, changeType) {
-          property.type = changeType;
-          property.staged = false;
-        };
+			var updateChangeProperty = function(property, changeType)
+				{
+					property.type = changeType;
+					property.staged = false;
+				};
 
-        // dynamically create 1st order of depth of specialization properties
-        /*var updateChangePropertySpecializations = function(specialization, changeType) {
+			// dynamically create 1st order of depth of specialization properties
+/*var updateChangePropertySpecializations = function(specialization, changeType) {
 
           Object.keys(specialization).forEach(function (property) {
             specialization[property].type = changeType;
@@ -303,140 +395,152 @@ function(_, $timeout, $scope, $rootScope, $state, $stateParams, $modal, growl, W
 
         }; */
 
-        var createTreeNode = function (element, status, detailType) {
-          var node = {};
-          
-          node.data = element;
-          node.label = element.name;
-          node.type = element.specialization.type;
-          node.children = [];
+			var createTreeNode = function(element, status, detailType)
+				{
+					var node = {};
 
-          // node.visible = true;
-          node.status = status;
+					node.data = element;
+					node.label = element.name;
+					node.type = element.specialization.type;
+					node.children = [];
 
-          return node;
-        };
+					// node.visible = true;
+					node.status = status;
 
-        var id2data = {};
-        var id2node = {};
+					return node;
+				};
 
-        ws1.elements.forEach(function(e) {
-          id2data[e.sysmlid] = e;
+			var id2data = {};
+			var id2node = {};
 
-          var node = createTreeNode(e, "clean", 'something');
+			ws1.elements.forEach(function(e)
+			{
+				id2data[e.sysmlid] = e;
 
-          id2node[e.sysmlid] = node;
+				var node = createTreeNode(e, "clean", 'something');
 
-        });
+				id2node[e.sysmlid] = node;
 
-        ws1.elements.forEach(function(e) {
-          if (!id2node.hasOwnProperty(e.owner)) 
-              $rootScope.treeData.push(id2node[e.sysmlid]);          
-          else
-              id2node[e.owner].children.push(id2node[e.sysmlid]);
-        });
+			});
 
-        // $scope.treeApi.refresh();
-        // $scope.treeApi.expand_all();
+			ws1.elements.forEach(function(e)
+			{
+				if (!id2node.hasOwnProperty(e.owner)) $rootScope.treeData.push(id2node[e.sysmlid]);
+				else id2node[e.owner].children.push(id2node[e.sysmlid]);
+			});
 
-        ws2.addedElements.forEach(function(e) {
-          id2data[e.sysmlid] = e;
-          
-          var node = createTreeNode(e, "clean", "addition");
+			// $scope.treeApi.refresh();
+			// $scope.treeApi.expand_all();
+			ws2.addedElements.forEach(function(e)
+			{
+				id2data[e.sysmlid] = e;
 
-          id2node[e.sysmlid] = node;
-          
-          id2node[e.sysmlid].detail = {
-	          type: 'addition',
-	          stageStatus: 'ignore',
-	          icon: 'plus',
-	          iconType: 'added'
-          };
+				var node = createTreeNode(e, "clean", "addition");
 
-          var change = createChange(e.name, emptyElement, e, "added", "fa-plus", e);
+				id2node[e.sysmlid] = node;
 
-          updateChangeProperty(change.properties.name, "added");
-          updateChangeProperty(change.properties.owner, "added");
-          updateChangeProperty(change.properties.documentation, "added");
-          
-          if (e.hasOwnProperty('specialization')) {
-            Object.keys(e.specialization).forEach(function (property) {
-              change.properties.specialization[property] = {};
-              updateChangeProperty(change.properties.specialization[property], "added");
-            });            
-          }
+				id2node[e.sysmlid].detail = {
+					type: 'addition',
+					stageStatus: 'ignore',
+					icon: 'plus',
+					iconType: 'added'
+				};
 
-          $scope.changes.push(change);
-          $scope.id2change[e.sysmlid] = change;
+				var change = createChange(e.name, emptyElement, e, "added", "fa-plus", e);
 
-        });
+				updateChangeProperty(change.properties.name, "added");
+				updateChangeProperty(change.properties.owner, "added");
+				updateChangeProperty(change.properties.documentation, "added");
 
-        ws2.deletedElements.forEach(function(e) {
-	      
-	      var deletedElement = id2data[e.sysmlid];
+				if (e.hasOwnProperty('specialization'))
+				{
+					Object.keys(e.specialization).forEach(function(property)
+					{
+						change.properties.specialization[property] = {};
+						updateChangeProperty(change.properties.specialization[property], "added");
+					});
+				}
 
-          var change = createChange(deletedElement.name, deletedElement, emptyElement, "removed", "fa-times", e);
-          
-          id2node[e.sysmlid].detail = {
-	          type: 'deletion',
-	          stageStatus: 'ignore',
-	          icon: 'times',
-	          iconType: 'removed'
-          };
+				$scope.changes.push(change);
+				$scope.id2change[e.sysmlid] = change;
 
-          updateChangeProperty(change.properties.name, "removed");
-          updateChangeProperty(change.properties.owner, "removed");
-          updateChangeProperty(change.properties.documentation, "removed");
-          
-          if (deletedElement.hasOwnProperty('specialization')) {
-            Object.keys(deletedElement.specialization).forEach(function (property) {
-              change.properties.specialization[property] = {};
-              updateChangeProperty(change.properties.specialization[property], "removed");
-            });            
-          }
+			});
 
-          $scope.changes.push(change);
-          $scope.id2change[e.sysmlid] = change;
+			ws2.deletedElements.forEach(function(e)
+			{
 
-        });
+				var deletedElement = id2data[e.sysmlid];
 
-        ws2.updatedElements.forEach(function(e) {
-	      
-	      var updatedElement = id2data[e.sysmlid];
+				var change = createChange(deletedElement.name, deletedElement, emptyElement, "removed", "fa-times", e);
 
-          var deltaElement = _.cloneDeep(updatedElement);
+				id2node[e.sysmlid].detail = {
+					type: 'deletion',
+					stageStatus: 'ignore',
+					icon: 'times',
+					iconType: 'removed'
+				};
 
-          var change = createChange(updatedElement.name, updatedElement, deltaElement, "updated", "fa-pencil", e);
-          
-          id2node[e.sysmlid].detail = {
-	          type: 'modification',
-	          stageStatus: 'ignore',
-	          icon: 'pencil',
-	          iconType: 'updated'
-          };
+				updateChangeProperty(change.properties.name, "removed");
+				updateChangeProperty(change.properties.owner, "removed");
+				updateChangeProperty(change.properties.documentation, "removed");
 
-          if (e.hasOwnProperty('name')) {
-            change.name = e.name;
-            deltaElement.name = e.name;
-            updateChangeProperty(change.properties.name, "updated");
-          }
-          if (e.hasOwnProperty('owner')) {
-            deltaElement.owner = e.owner;
-            updateChangeProperty(change.properties.owner, "updated");
-          }
-          if (e.hasOwnProperty('documentation')) {
-            deltaElement.documentation = e.documentation;
-            updateChangeProperty(change.properties.documentation, "updated");
-          }
-          if (e.hasOwnProperty('specialization')) {
-            Object.keys(e.specialization).forEach(function (property) {
-              deltaElement.specialization[property] = e.specialization[property];
-              change.properties.specialization[property] = {};
-              updateChangeProperty(change.properties.specialization[property], "updated");
-            });            
-          }
+				if (deletedElement.hasOwnProperty('specialization'))
+				{
+					Object.keys(deletedElement.specialization).forEach(function(property)
+					{
+						change.properties.specialization[property] = {};
+						updateChangeProperty(change.properties.specialization[property], "removed");
+					});
+				}
 
-          /* if (e.hasOwnProperty('specialization') && e.specialization.hasOwnProperty('type')) {
+				$scope.changes.push(change);
+				$scope.id2change[e.sysmlid] = change;
+
+			});
+
+			ws2.updatedElements.forEach(function(e)
+			{
+
+				var updatedElement = id2data[e.sysmlid];
+
+				var deltaElement = _.cloneDeep(updatedElement);
+
+				var change = createChange(updatedElement.name, updatedElement, deltaElement, "updated", "fa-pencil", e);
+
+				id2node[e.sysmlid].detail = {
+					type: 'modification',
+					stageStatus: 'ignore',
+					icon: 'pencil',
+					iconType: 'updated'
+				};
+
+				if (e.hasOwnProperty('name'))
+				{
+					change.name = e.name;
+					deltaElement.name = e.name;
+					updateChangeProperty(change.properties.name, "updated");
+				}
+				if (e.hasOwnProperty('owner'))
+				{
+					deltaElement.owner = e.owner;
+					updateChangeProperty(change.properties.owner, "updated");
+				}
+				if (e.hasOwnProperty('documentation'))
+				{
+					deltaElement.documentation = e.documentation;
+					updateChangeProperty(change.properties.documentation, "updated");
+				}
+				if (e.hasOwnProperty('specialization'))
+				{
+					Object.keys(e.specialization).forEach(function(property)
+					{
+						deltaElement.specialization[property] = e.specialization[property];
+						change.properties.specialization[property] = {};
+						updateChangeProperty(change.properties.specialization[property], "updated");
+					});
+				}
+
+/* if (e.hasOwnProperty('specialization') && e.specialization.hasOwnProperty('type')) {
             deltaElement.specialization.type = e.specialization.type;
             updateChangeProperty(change.properties.specialization.type, "updated");
           }
@@ -446,25 +550,28 @@ function(_, $timeout, $scope, $rootScope, $state, $stateParams, $modal, growl, W
             updateChangeProperty(change.properties.specialization.values, "updated");
           } */
 
-          $scope.changes.push(change);
-          $scope.id2change[e.sysmlid] = change;
-        });
-        
-        // Added second pass to populate additions
-        ws2.addedElements.forEach(function(e){
-            
-            var treeNode = id2node[e.sysmlid];
-            var parentNode = id2node[e.owner];
-            
-            if (!parentNode) {
-                $rootScope.treeData.push(treeNode);
-            }
-            else {
-                parentNode.children.push(treeNode);
-            }
-        });
+				$scope.changes.push(change);
+				$scope.id2change[e.sysmlid] = change;
+			});
 
-        /*
+			// Added second pass to populate additions
+			ws2.addedElements.forEach(function(e)
+			{
+
+				var treeNode = id2node[e.sysmlid];
+				var parentNode = id2node[e.owner];
+
+				if (!parentNode)
+				{
+					$rootScope.treeData.push(treeNode);
+				}
+				else
+				{
+					parentNode.children.push(treeNode);
+				}
+			});
+
+/*
           TODO: removing this was a hack, we removed it because the moved elements
           also show up in the updated list and creates duplicates 
            
@@ -486,41 +593,52 @@ function(_, $timeout, $scope, $rootScope, $state, $stateParams, $modal, growl, W
 
         }); */
 
-        $rootScope.id2node = id2node;
+			$rootScope.id2node = id2node;
 
-        var id2change = $scope.id2change;
+			var id2change = $scope.id2change;
 
-        $rootScope.id2change = id2change;
+			$rootScope.id2change = id2change;
 
-        refreshStageCounters();
+			refreshStageCounters();
 
-        $scope.workspace1Name = ws1.name;
-    };
-    
-    // Hiding the right-hand pane
-    paneManager.get("right-pane").setOptions({
-        closed: true,
-        noToggle: true,
-        handle: 0
-    });
-    paneManager.get("left-pane").setOptions({
-	    noToggle: true,
-	    handle: 0,
-	    size: "33%"
-    });
-    
-    // Showing the right-hand pane once we leave the diff view
-    $scope.$on('$destroy', function() {
-        paneManager.get("right-pane").setOptions({
-            noToggle: false,
-            handle: 14
-        });
-        paneManager.get("left-pane").setOptions({
-            noToggle: false,
-            handle: 14,
-            size: "20%"
-        });
-    });
+			$scope.workspace1Name = ws1.name;
+		};
 
-    $timeout(function () { setupChangesList(diff.workspace1, diff.workspace2); } ); 
+	// Hiding the right-hand pane
+	paneManager.get("right-pane").setOptions(
+	{
+		closed: true,
+		noToggle: true,
+		handle: 0
+	});
+	paneManager.get("left-pane").setOptions(
+	{
+		noToggle: true,
+		handle: 0,
+		size: "40%"
+	});
+
+	// Showing the right-hand pane once we leave the diff view
+	$scope.$on('$destroy', function()
+	{
+		paneManager.get("right-pane").setOptions(
+		{
+			noToggle: false,
+			handle: 14
+		});
+		paneManager.get("left-pane").setOptions(
+		{
+			noToggle: false,
+			handle: 14,
+			size: "20%"
+		});
+		
+		$rootScope.selectedElementId = null;
+		$rootScope.diffPerspective = null;
+	});
+
+	$timeout(function()
+	{
+		setupChangesList(diff.workspace1, diff.workspace2);
+	});
 }]);

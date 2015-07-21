@@ -66,11 +66,11 @@ function UxService($rootScope, $state) {
 		    return {id: button, icon: 'fa-plus', dynamic: true, selected: false, active: false, permission:false, tooltip: 'Create Tag',
 		            spinner: false, onClick: function() {$rootScope.$broadcast(button);}};
 		  case "diff.perspective.detail":
-            return {id: button, icon: 'fa-ship', selected: true, active: true, permission: true, tooltip: 'Detail',
-                    spinner: false, onClick: function() {$state.go('workspace.diff.view');}};
+            return {id: button, icon: 'fa-info-circle', selected: true, active: true, permission: true, tooltip: 'Detail',
+                    spinner: false, onClick: function() {$rootScope.diffPerspective = 'detail'; }};
 		  case "diff.perspective.tree":
-            return {id: button, icon: 'fa-space-shuttle', selected: false, active: true, permission: true, tooltip: 'Context',
-                    spinner: false, onClick: function() {$state.go('workspace.diff.tree');}};
+            return {id: button, icon: 'fa-sitemap', selected: false, active: true, permission: true, tooltip: 'Context',
+                    spinner: false, onClick: function() {$rootScope.diffPerspective = 'tree'; }};
 		}    
 	};
 
