@@ -13,6 +13,8 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 	var treeApiLocal = $rootScope.treeApi;
 
 	$scope.treeApi = treeApiLocal;
+	
+	$rootScope.mms_pane_toggleable = false;
 
 	$rootScope.treeData = [];
 
@@ -645,6 +647,7 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 		
 		$rootScope.selectedElementId = null;
 		$rootScope.diffPerspective = null;
+		$rootScope.mms_pane_toggleable = null;
 	});
 
 	$timeout(function()

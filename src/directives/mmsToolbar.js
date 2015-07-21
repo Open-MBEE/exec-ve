@@ -1,8 +1,8 @@
 'use strict';
 
-angular.module('mms.directives').directive('mmsToolbar', ['$templateCache', mmsToolbar]);
+angular.module('mms.directives').directive('mmsToolbar', ['$templateCache', '$rootScope', mmsToolbar]);
 
-function mmsToolbar($templateCache)
+function mmsToolbar($templateCache, $rootScope)
 {
 	var template = $templateCache.get('mms/templates/mmsToolbar.html');
 
@@ -172,7 +172,7 @@ function mmsToolbar($templateCache)
 				if (!button.active) return;
 
 				var toggleDecativeFlag = false;
-				if (this.$root.mms_togglePane)
+				if (this.$root.mms_togglePane && $rootScope.mms_pane_toggleable !== false)
 				{
 					if (button.selected || this.$root.mms_togglePane.closed)
 					{

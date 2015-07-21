@@ -15,8 +15,6 @@ function(_, $timeout, $scope, $rootScope, $state, $stateParams, $modal, growl, W
 
     $scope.options = $rootScope.options;
     
-    $scope.selectedElementId = $rootScope.selectedElementId;
-    
     // BEGIN TREE STUFF
     $scope.treeApi = {};
 
