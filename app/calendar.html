@@ -15,7 +15,7 @@
   <link href="css/ve-mms.styles.min.css" rel="stylesheet" type="text/css">
   <style>
 	body.backgrounddd { 
-	    background-image: url("0917da1b-bfc1-42d8-839b-44a73a779638bkimage-480DF201.themedjpg.jpeg");
+	    background-image: url("arrmimages/backgroundImage.jpeg");
 	    /*url('https://gateway-uat.jpl.nasa.gov/sites/ARRM/_catalogs/theme/Themed/1554F203/0917da1b-bfc1-42d8-839b-44a73a779638bkimage-480DF201.themedjpg?ctag');*/
 	    /*margin: 50%;*/
 	    background-size: 100% 100%;
@@ -47,12 +47,38 @@
 	}
 
 	div.transbox h2 {
-		font-size:130%;
+		font-size:110%;
 		font-weight: bold;
 	    color: #ffffff;
 	   	width: auto;
 	    overflow-x: auto;
 	    text-indent:5px;
+	}
+
+	div.transboxRed {
+	    margin: 20px;
+	    background-color: #B20000;
+	    border: 1px solid white;
+	    opacity: 0.6;
+	    filter: alpha(opacity=30); /* For IE8 and earlier */
+	}
+
+
+	div.transboxRed ul {
+	    list-style-type: none;
+/*	    margin: 0;
+	    padding: 0;*/
+	    text-align:center;
+	}
+
+	div.transboxRed li {
+	    display: inline;
+	    color:white;
+	}
+
+	div.transboxRed a {
+	    display: inline;
+	    color:white;
 	}
 
 	ul {
@@ -69,6 +95,7 @@
 
 	a{
 		color:white;
+		font-size:130%;
 	}
 
 	</style>
@@ -76,16 +103,18 @@
 <body class="backgrounddd">
 
 
-<ul>
-  <li><a href="https://js.jpl.nasa.gov" style="font-size:130%;">JPL Space | </a></li>
-  <li><a href="http://www.jpl.nasa.gov/" style="font-size:130%;">JPL | </a></li>
-  <li><a href="http://www.caltech.edu/" style="font-size:130%;">Caltech | </a></li>
-  <li><a href="http://www.nasa.gov" style="font-size:130%;">NASA</a></li>
-</ul>
+<div class="transboxRed">
+	<ul>
+	  <li><a href="https://js.jpl.nasa.gov">JPL Space | </a></li>
+	  <li><a href="http://www.jpl.nasa.gov/">JPL | </a></li>
+	  <li><a href="http://www.caltech.edu/" >Caltech | </a></li>
+	  <li><a href="http://www.nasa.gov" >NASA</a></li>
+	</ul>
+</div>
 
 
 <div class="transbox">
-	<h1><a href="arrmHome.html" style="font-size: 80%;"><u> Home </u></a></h1>
+	<h1><a href="arrmHomePresentation.html" style="font-size: 80%;"><u> Home </u></a></h1>
 	<h2> The link below is to a Google Calendar that will give you read-only access to a project calendar, controlled (at the moment) by Liz Feria.
 	<br>
 	<br>
@@ -93,7 +122,8 @@
 	If you are on a Mac, you need to use the Outlook Web App to be able to add an internet calendar.
 	You can also add this calendar to your iPhone or Android devices.
 	<br>
-			<a href="https://www.google.com/calendar/ical/hmjr192i2pkrbathi6cao67o6o%40group.calendar.google.com/private-fbf7472e490b410d13830055fdba61b2/basic.ics" style="display:block; text-align:center; color:blue;"> Calendar</a>
+	<br>
+			<a href="https://www.google.com/calendar/ical/hmjr192i2pkrbathi6cao67o6o%40group.calendar.google.com/private-fbf7472e490b410d13830055fdba61b2/basic.ics" style="display:block; text-align:center; color:#00B8E6;"> Calendar</a>
 	<br>
 	<br>
 	Note, the data in the calendar today may not be all correct. It comes from Reuter’s calendar and we haven’t checked it all.
