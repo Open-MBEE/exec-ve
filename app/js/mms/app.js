@@ -605,7 +605,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
             },
 
             ws1TagName: function($stateParams, ws1Configs,dummyLogin){
-                var result = null;
+                var result = 'latest';
 
                 ws1Configs.forEach(function(config){
                     if(config.timestamp === $stateParams.targetTime)
@@ -615,16 +615,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
             },
 
             ws2TagName: function($stateParams, ws2Configs,dummyLogin){
-                var result = null;
-
-                //IF LATEST
-                // if ($stateParams.time !== undefined)
-                //     return $stateParams.time;
-                // else
-                //     return "latest";
-
-
-
+                var result = 'latest';
                 ws2Configs.forEach(function(config){
                     if(config.timestamp === $stateParams.sourceTime)
                         result = config.name;
@@ -638,21 +629,8 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
 
             'menu@': {
                 templateUrl: '/partials/mms/diff-nav.html',
-                //reference DiffChangeController and add a function to get config name since already have workspaces in there??
-                // controller: 'WorkspaceDiffChangeController'
 
-            //     controller: function($scope, $stateParams, $rootScope, tag, time){
-            //         $scope.workspace = $stateParams.source;
-            //         $scope.tag = tag;
-            //         $rootScope.mms_title = "hi??";
-            // //         $scope.tag = tag;
-
-            //     }
-            // },
-
-                controller: function ($scope, $rootScope, ws1, ws2, ws1TagName, ws2TagName, $stateParams, $state){
-                    // $scope.ws1 = ws1;
-                    // $scope.ws2 = ws2;
+                controller: function ($scope, $rootScope,ws1TagName, ws2TagName, $stateParams, $state){
                     $scope.ws1TagName = ws1TagName;
                     $scope.ws2TagName = ws2TagName;
                     console.log(ws1TagName);
@@ -665,78 +643,6 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
 
                 }
             },
-
-
-
-
-
-
-
-
-                    // $scope.goBack = function () {
-                    //   $state.go('workspace', {}, {reload:true});
-                    // };
-                // }
-
-
-            // },
-
-
-
-
-
-            // 'menu@':{
-            //     template: '<mms-nav mms-title="View Editor" mms-ws="{{workspace}}" mms-site="site" mms-config="tag" mms-show-tag="{{showTag}}"></mms-nav>',
-            //     controller: function ($scope, $filter, $rootScope, workspace, site, document, tag, snapshots, time, docFilter) {
-            //         $scope.workspace = workspace;
-            //         $scope.tag = tag;
-            //         $scope.site = site;
-
-            //         $scope.showTag = true;
-            //         $rootScope.mms_title = 'View SOmeee: ';
-
-            //         var tagStr = 'helllooooo';
-            //         // if (time !== 'latest') {
-            //         //     snapshots.forEach(function(snapshot) {
-            //         //         if (filtered[document.sysmlid])
-            //         //             return;
-            //         //         if (time === snapshot.created && snapshot.configurations && snapshot.configurations.length > 0)
-            //         //             snapshot.configurations.forEach(function(config) {
-            //         //                 tagStr += '( <i class="fa fa-tag"></i> ' + config.name + ' ) ';
-            //         //                 $scope.tag = config;
-            //         //             });
-            //         //     });
-            //         //     tagStr += '( <i class="fa fa-camera"></i> ' + $filter('date')(time, 'M/d/yy h:mm a') + ' )';
-            //         //     if (filtered[document.sysmlid])
-            //         //         $scope.showTag = false;
-            //         //     $scope.snapshotTag = ' ' + tagStr;
-            //         // }                                        
-            //     }
-            // },
-            // 'menu@': {
-            //     template: '<mms-nav mms-title="Portal" mms-ws="{{workspace}}" mms-site="site" mms-config="tag"></mms-nav>',
-            //     controller: function ($scope, $rootScope, workspace, site, tag, workspaceObj) {
-            //         $scope.workspace = workspace;
-            //         $scope.tag = tag;
-            //         $scope.site = site;
-            //         $rootScope.mms_title = 'Diff: '+workspaceObj.name;
-            //     }
-            // },
-
-
-            // 'menu@':{
-            //     template: '<mms-nav mms-title="Portal" mms-ws="{{workspace}}" mms-site="site" mms-config="tag"></mms-nav>',
-            //     controller: function ($scope, $rootScope, workspace, site, tag, workspaceObj, diff) {
-            //     // $scope.workspace = workspace;
-            //     // $scope.tag = tag;
-            //     // $scope.laura = 'hiiii laura';
-            //     // $scope.site = 'DiffMerge';
-            //     // $rootScope.mms_title = 'Diff: ';//+workspaceObj.name;
-            //     // $scope.diff = 'yes';
-            //     $scope.diff = 'yes';
-            //     $rootScope.mms_title = 'Diff';
-            //     }
-            // },
 
             'pane-center@': {
                 templateUrl: 'partials/mms/diff-pane-center.html'
