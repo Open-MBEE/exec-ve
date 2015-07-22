@@ -11,12 +11,13 @@
     <ul>
       <ul class="nav-btns-main">
         <!-- <li ng-show="snapshot">&nbsp;&nbsp;<span class="label label-danger">SNAPSHOT</span></li> -->
-        <li>
+<!--         <li>
           <a class="nav-btn" tooltip="Tasks and Tags" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom-left" ui-sref="workspace"><i class="fa fa-tasks"></i></a>
-        </li>
-          <button type="button" ng-click="goBack()" class="btn btn-danger">CANCEL</button></li>
+        </li> -->
+          <button type="button" ng-click="goBack()" class="btn btn-sm btn-danger" style="height:25px; line-height: 0px; text-align:left; margin-left:5px; font-size:25px; weight:900;">&#8701; <span style="font-size:12px;font-weight:500;">CANCEL</span></button></li>
         <!-- <li> Comparing ws: {{ws1.name}} | {{ws2.name}} </li> -->
-        <li>Comparing {{ws1TagName}} to {{ws2TagName}} </li> 
+        <li>Comparing from {{ws2TagName}} to {{ws1TagName}} </li> 
+        <!-- from to -->
 
 
       </ul>
