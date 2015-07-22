@@ -586,16 +586,14 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
                 return WorkspaceService.diff($stateParams.target, $stateParams.source, $stateParams.targetTime, $stateParams.sourceTime);
             },
 
-            ws1: function( $stateParams, WorkspaceService, dummyLogin){
-                return WorkspaceService.getWorkspace($stateParams.target);
+            ws1: function( $stateParams, WorkspaceService, dummyLogin){ //ws1:target because that's what DiffElementChangeController has
+                return WorkspaceService.getWorkspace($stateParams.target); 
             },
 
-            ws2: function( $stateParams, WorkspaceService, dummyLogin){
+            ws2: function( $stateParams, WorkspaceService, dummyLogin){ //ws2:source because that's what DiffElementChangeController has
                 return WorkspaceService.getWorkspace($stateParams.source);
             },
 
-
-            //config here too
             ws1Configs: function($stateParams, ConfigService, ws1, dummyLogin){
                 return ConfigService.getConfigs(ws1, false);
             },
@@ -604,21 +602,32 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
                 return ConfigService.getConfigs(ws2, false);
             },
 
-            ws1TagName: function($stateParams, ws1Configs,dummyLogin){
-                var result = 'latest';
-
-                ws1Configs.forEach(function(config){
+            targetName: function($stateParams, ws1, ws1Configs,dummyLogin){
+                var result = null;
+                if(ws1.id === 'master'){
+                    result = 'master';
+                }
+                else{
+                    result= ws1.name; //for comparing tasks
+                }
+                ws1Configs.forEach(function(config){ //for comparing tags - won't go in if comparing on task level
                     if(config.timestamp === $stateParams.targetTime)
                         result = config.name;
                 });
                 return result;
             },
 
-            ws2TagName: function($stateParams, ws2Configs,dummyLogin){
-                var result = 'latest';
-                ws2Configs.forEach(function(config){
+            sourceName: function($stateParams, ws2, ws2Configs,dummyLogin){
+                var result = null ;
+                if(ws2.id === 'master'){
+                    result = 'master';
+                }
+                else{
+                    result= ws2.name; //for comparing tasks
+                }
+                ws2Configs.forEach(function(config){ //for comparing tags - won't go in if comparing on task level
                     if(config.timestamp === $stateParams.sourceTime)
-                        result = config.name;
+                        result = config.name; 
                 });
                 return result;
             }
@@ -628,20 +637,17 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
         views: {
 
             'menu@': {
-                templateUrl: '/partials/mms/diff-nav.html',
-
-                controller: function ($scope, $rootScope,ws1TagName, ws2TagName, $stateParams, $state){
-                    $scope.ws1TagName = ws1TagName;
-                    $scope.ws2TagName = ws2TagName;
-                    console.log(ws1TagName);
-                    console.log(ws2TagName);
-                    $rootScope.mms_title = 'DiffMerge';
+                templateUrl: '/partials/mms/diff-nav.html',               
+                controller: function ($scope, $rootScope,targetName, sourceName, $stateParams, $state){
+                    $scope.targetName = targetName;
+                    $scope.sourceName = sourceName;
+                    $rootScope.mms_title = 'Merge Differences';
 
                     $scope.goBack = function () {
                         $state.go('workspace', {}, {reload:true});
                     }; 
 
-                }
+                }                
             },
 
             'pane-center@': {
