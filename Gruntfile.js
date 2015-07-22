@@ -365,8 +365,8 @@ module.exports = function(grunt) {
         proxies: [
           {
             context: '/alfresco',  // '/api'
-            host: 'mbee-bclement.jpl.nasa.gov',//128.149.16.152',
-            port: 9093,
+            host: 'localhost',//128.149.16.152',
+            port: 8080,
             changeOrigin: false,
             https: false,
           },
