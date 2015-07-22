@@ -85,9 +85,10 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
         scope.isRestrictedVal = false;
         if (scope.mmsElement) {
             scope.element = scope.mmsElement;
-            if(scope.element.specialization.type === 'Expression')
+            if(scope.element.specialization.type === 'Expression'){
                 scope.values = null;
                 scope.value = null;
+            }
             if (scope.element.specialization.type === 'Property')
                 scope.values = scope.element.specialization.value;
             if (scope.element.specialization.type === 'Constraint')
@@ -163,9 +164,6 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
                 }
                 if (scope.element.specialization.type === 'Constraint')
                     scope.value = scope.element.specialization.specification;
-
-
-
                 if (scope.mmsEditField === 'none' ||
                         !scope.element.editable ||
                         (scope.mmsVersion !== 'latest' && scope.mmsVersion)) {
@@ -174,7 +172,6 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
                     scope.editing = false;
                     //scope.$emit('elementEditability', scope.editable);
                     //template = readTemplate;
-
                     //element.append(template);
                     //$compile(element.contents())(scope);
                 } else {
