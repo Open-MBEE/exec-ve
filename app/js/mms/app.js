@@ -586,15 +586,52 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
                 return WorkspaceService.diff($stateParams.target, $stateParams.source, $stateParams.targetTime, $stateParams.sourceTime);
             },
 
-            workspace1: function( $stateParams, WorkspaceService, dummyLogin){
+            ws1: function( $stateParams, WorkspaceService, dummyLogin){
                 return WorkspaceService.getWorkspace($stateParams.target);
             },
 
-            workspace2: function( $stateParams, WorkspaceService, dummyLogin){
+            ws2: function( $stateParams, WorkspaceService, dummyLogin){
                 return WorkspaceService.getWorkspace($stateParams.source);
+            },
+
+
+            //config here too
+            ws1Configs: function($stateParams, ConfigService, ws1, dummyLogin){
+                return ConfigService.getConfigs(ws1, false);
+            },
+
+            ws2Configs: function($stateParams, ConfigService, ws2, dummyLogin){
+                return ConfigService.getConfigs(ws2, false);
+            },
+
+            ws1TagName: function($stateParams, ws1Configs,dummyLogin){
+                var result = null;
+
+                ws1Configs.forEach(function(config){
+                    if(config.timestamp === $stateParams.targetTime)
+                        result = config.name;
+                });
+                return result;
+            },
+
+            ws2TagName: function($stateParams, ws2Configs,dummyLogin){
+                var result = null;
+
+                //IF LATEST
+                // if ($stateParams.time !== undefined)
+                //     return $stateParams.time;
+                // else
+                //     return "latest";
+
+
+
+                ws2Configs.forEach(function(config){
+                    if(config.timestamp === $stateParams.sourceTime)
+                        result = config.name;
+                });
+                return result;
             }
-            // maybe don't need workspace1?? can just use getConfig??
-            //ConfigService.getConfig($stateParams.target, workspace1, $stateParams.targetTime);
+
 
         },
         views: {
@@ -602,18 +639,47 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
             'menu@': {
                 templateUrl: '/partials/mms/diff-nav.html',
                 //reference DiffChangeController and add a function to get config name since already have workspaces in there??
-                controller: function ($scope, $rootScope, workspace1, workspace2, $state){
-                    $scope.workspace1 = workspace1;
-                    $scope.workspace2 = workspace2;
-                    $rootScope.mms_title = 'DiffMerge';    
+                // controller: 'WorkspaceDiffChangeController'
+
+            //     controller: function($scope, $stateParams, $rootScope, tag, time){
+            //         $scope.workspace = $stateParams.source;
+            //         $scope.tag = tag;
+            //         $rootScope.mms_title = "hi??";
+            // //         $scope.tag = tag;
+
+            //     }
+            // },
+
+                controller: function ($scope, $rootScope, ws1, ws2, ws1TagName, ws2TagName, $stateParams, $state){
+                    // $scope.ws1 = ws1;
+                    // $scope.ws2 = ws2;
+                    $scope.ws1TagName = ws1TagName;
+                    $scope.ws2TagName = ws2TagName;
+                    console.log(ws1TagName);
+                    console.log(ws2TagName);
+                    $rootScope.mms_title = 'DiffMerge';
+
+                    $scope.goBack = function () {
+                        $state.go('workspace', {}, {reload:true});
+                    }; 
+
+                }
+            },
+
+
+
+
+
+
+
 
                     // $scope.goBack = function () {
                     //   $state.go('workspace', {}, {reload:true});
                     // };
-                }
+                // }
 
 
-            },
+            // },
 
 
 
