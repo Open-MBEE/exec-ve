@@ -110,7 +110,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
     });
 
     $scope.$on('tree.merge', function() {
-        $scope.toggleMerge();
+        $scope.mergeAssist();
     });
 
     $scope.$on('tree.reorder.view', function() {
@@ -184,7 +184,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
         $scope.mms_treeApi.clear_selected_branch();
     };
 
-    // TODO: Move toggle to button bar api
+    // BEGIN @DEPRECATED
     $scope.mergeOn = false;
     $scope.toggleMerge = function() {
         var branch = $scope.mms_treeApi.get_selected_branch();
@@ -200,6 +200,31 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
         $scope.mergeOn = !$scope.mergeOn;
         $scope.mergeFrom = branch;
         $scope.mergeTo = parent_branch;
+    };
+    
+    // END @DEPRECATED
+    
+    $scope.mergeAssist = function() {
+	    var branch = $scope.mms_treeApi.get_selected_branch();
+        if (!branch) {
+            growl.warning("Compare Error: Select task or tag to compare from");
+            return;
+        }
+        var parent_branch = $scope.mms_treeApi.get_parent_branch(branch);
+        while (parent_branch.type != 'workspace') {
+            parent_branch = $scope.mms_treeApi.get_parent_branch(parent_branch);
+        }
+        
+        $rootScope.mergeInfo = {
+	      branch: branch,
+	      parentBranch: parent_branch  
+        };
+        
+        var modalInstance = $modal.open({
+	        templateUrl: 'partials/mms/merge_assistant-type_chooser.html',
+	        controller: 'WorkspaceMergeAssistant',
+	        size: 'sm'
+        });
     };
 
     $scope.pickNew = function(source, branch) {

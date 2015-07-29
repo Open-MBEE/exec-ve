@@ -1,0 +1,9 @@
+<div id="confirm" class="assistModal">
+    <div class="modal-body text-center">
+        <h2>From-to chooser</h2>
+        <div>This is a <b>{{mergeInfo.type}}</b> merge.</div>
+        <div>Suggested source: {{mergeInfo.branch.label}}</div>
+	    <div>Suggested destination: {{mergeInfo.parentBranch.label}}</div>
+	    <button class="btn" ng-disabled="!mergeInfo.source || !mergeInfo.dest" ng-click="mergeAssistConfirmation(mergeInfo.source, mergeInfo.dest)">Next</button>
+    </div>
+</div>
