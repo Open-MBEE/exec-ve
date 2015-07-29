@@ -11,10 +11,11 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
     $rootScope.mms_bbApi = $scope.bbApi = {};
     $rootScope.mms_treeApi = $scope.treeApi = {};
     $scope.buttons = [];
-
+    $scope.treeExpandLevel = 1;
     $scope.treeSectionNumbering = false;
     if ($state.includes('workspace.site.document')) {
         $scope.treeSectionNumbering = true;
+        $scope.treeExpandLevel = 3;
     }
     $rootScope.mms_fullDocMode = false;
     if ($state.includes('workspace.site.document.full'))
@@ -262,7 +263,17 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
             targetTime = $scope.mergeTo.data.timestamp;
         }
         $scope.comparing = true;
-        $state.go('workspace.diff', {source: sourceWs, target: targetWs, sourceTime: sourceTime, targetTime: targetTime});
+        //try background diff
+        WorkspaceService.diff(targetWs, sourceWs, targetTime, sourceTime)
+        .then(function(data) {
+            if (data.status === 'GENERATING') {
+                growl.info("tell user to wait for email");
+                $scope.comparing = false;
+                return;
+            }
+            $state.go('workspace.diff', {source: sourceWs, target: targetWs, sourceTime: sourceTime, targetTime: targetTime});
+        });
+        //$state.go('workspace.diff', {source: sourceWs, target: targetWs, sourceTime: sourceTime, targetTime: targetTime});
     };
 
     // Filter out alfresco sites
