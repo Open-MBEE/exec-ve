@@ -21,6 +21,7 @@
 	var image_length = slideimages.length -1
 
 	function change_image(num){
+		console.log("num" + num)
 		image_number = image_number + num
 
 		if(image_number > image_length){
@@ -31,39 +32,58 @@
 			image_number = image_length
 		}
 
-		// document.write(image_number)
+
 		document.slidewhow.src= slideimages[image_number]
+		console.log("image_nmber" + image_number)
 		document.getElementById("description").innerHTML = slidedesc[image_number];
 		return false;
 
-		return image_number
+		// return image_number
 	}
 
-	function auto(){
-		setInterval("change_image(1)", 2500)
+	// function auto(){
+	// 	setInterval("change_image(1)", 2500)
+	// }
+	function pause(){
+		// var s = auto()
+		clearInterval(myVar)
+		setTimeout("myVar",5000)
+		// setTimeout("change_image(0)",5000)
+		// setInterval("change_image(0)",5000)
 	}
+
 
 	// function getImageNum(){
 	// 	return image_number
 	// }
 
-	function pause(){
-		// setInterval(5000)
-		document.slidewhow.src= slideimages[image_number]
-	}
+	// function pause(){
+	// 	// setInterval(5000)
+	// 	document.slidewhow.src= slideimages[image_number]
+	// }
 	// window.onload = auto()
+
+	// function pause(){
+	// 	setInterval("change_image(0)", 2500)
+	// }
+	var myVar = setInterval("change_image(1)",2500)
+
+
 	</script>
 
 
 
-
+	<p> something else</p>
 
 	<img src="orion.jpg" name="slidewhow" width="400" height="200" />
 	<table>
 		<tr>
 			<td align="left"><a href="" onclick="return change_image(-1)">PREV</a></td> 
+			<!-- <td align="left"><a href="" onclick="return change_image(0) clearInterval(myVar)">Pause</a></td>  -->
+			<td align="left"><a href="javascript:pause()">Pause</a></p>
 			<td align="right"><a href="" onclick="return change_image(1)">NEXT</a></td>
-			<td align="right"><a href="" onclick="return auto()" >Auto</a></td>
+			<td align="right"><a href="" onclick="myVar">Auto</a></td>
+			<!-- <td align="right"><a href="javascript:auto()">Auto</a></td> -->
 		</tr>
 	</table>
 	<div id="description">

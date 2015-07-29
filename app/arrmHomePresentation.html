@@ -1,375 +1,236 @@
 <!doctype html>
 <html lang="en" ng-app="mmsApp">
 <head>
-
   <meta http-equiv="X-UA-Compatible" content="IE=edge;chrome=1" />
   <meta charset="utf-8">
 
   <title>ARRM Home</title>
 
-  <!-- bower:css -->
-  <!-- endbower -->
 
   <link href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic,700italic" rel="stylesheet" type="text/css">
-  <link href="css/mm-mms.styles.min.css" rel="stylesheet" type="text/css">
-  <link href="css/ve-mms.styles.min.css" rel="stylesheet" type="text/css">
-  <style>
-	body.backgrounddd { 
-	    background-image: url("arrmimages/backgroundImage.jpeg");
-	    /*url('https://gateway-uat.jpl.nasa.gov/sites/ARRM/_catalogs/theme/Themed/1554F203/0917da1b-bfc1-42d8-839b-44a73a779638bkimage-480DF201.themedjpg?ctag');*/
-	    /*margin: 50%;*/
-	    background-size: 100% 100%;
-
-	    /*background-size: 1450px 1000px;*/
-	    background-repeat: no-repeat;
-	    background-attachment: fixed;
-	    background-position: center; 
-	    /*width: auto;*/
-	    overflow-x: auto;
-	    overflow-y: auto;
-
-	}
-
-	h1 a{
-		font-size:80%;
-		color:white;
-		font-weight:140%;
-		text-decoration: none;
-	}
-.alignleft {float:left;}
-.alignright {float:right;}
-
-/*	div.background
-	{
-	  background: url(klematis.jpg) repeat;
-	  border: 2px solid black;
-	}*/
-	div.transbox {
-	    margin: 20px 60px;
-	    background-color: #000000;
-	    border: 1px solid black;
-	    opacity: 0.8;
-	    filter: alpha(opacity=30); /* For IE8 and earlier */
-	}
-
-	div.transbox p {
-	    margin: 0;
-	    /*font-weight: bold;*/
-	    color: #ffffff;
-	   	width: auto;
-	    /*overflow-x: auto;*/
-	    text-indent:30px;
-	}
-
-	div.transbox h2 {
-		font-size:130%;
-		font-weight: bold;
-	    color: #ffffff;
-	   	width: auto;
-	    overflow-x: auto;
-	    text-indent:5px;
-	}
-
-	div.transbox h3 {
-	    /*margin: 30% 5%;*/
-	    /*font-weight: 130%;*/
-	    font-size:130%;
-	    font-weight: 600;
-	    color: #ff0000;
-	   	width: auto;
-	    overflow-x: auto;
-	    text-indent:5px;
-	}
-
-	div.transbox span{
-		float:right;
-		text-indent: -300px;
-		/*font-size:130%; */
-		/*font-weight: bold; */
-		color: #ff0000; 
-		/*text-indent:-10px;*/
-	}
-
-	img.center {
-	  display: block;
-	  margin-left: auto;
-	  margin-right: auto;
-	} 
+  <link href="css/arrmHome.css" rel="stylesheet" type="text/css">
 
 
+  <script type="text/javascript">
+  	var slideimages = new Array("arrmimages/orbitor.jpg","arrmimages/eva.jpg","arrmimages/commTerminal.jpg","arrmimages/arv_models.jpg",
+  		// "arrmimages/budget.jpg",
+  		"arrmimages/boulder_capture.jpg","arrmimages/testbed.jpg")
 
-	div.transboxRed {
-	    margin: 20px;
-	    background-color: #B20000;
-	    border: 1px solid white;
-	    opacity: 0.6;
-	    filter: alpha(opacity=30); /* For IE8 and earlier */
-	}
-
-
-	div.transboxRed ul {
-	    list-style-type: none;
-/*	    margin: 0;
-	    padding: 0;*/
-	    text-align:center;
-	}
-
-	div.transboxRed li {
-	    display: inline;
-	    color:white;
-	}
-
-	a{
-		color:white;
-		font-size:130%;
-	}
-
-
-	.arrow-left {
-		width: 0; 
-		height: 0; 
-		border-top: 5px solid transparent;
-		border-bottom: 5px solid transparent; 
-		
-		border-right:10px solid blue; 
-	}
-
-
-
-	</style>
-
-
-
-
-	<script type="text/javascript">
-
-	// var slideimages = new Array() // create new array to preload images
-	// slideimages[0] = new Image() // create new instance of image object
-	// slideimages[0].src = "arrmimages/orbitor.jpg"//http://www.nasa.gov/sites/default/files/thumbnails/image/15-094.jpg" // set image src property to image path, preloading image in the process
-	// slideimages[1] = new Image()
-	// slideimages[1].src = "arrmimages/orion.jpg"//https://upload.wikimedia.org/wikipedia/commons/8/80/Orion_with_ATV_SM.jpg"
-	// slideimages[2] = new Image()
-	// slideimages[2].src = "arrmimages/budget.jpg"//http://images.spaceref.com/news/2004/02.01.04.chart.2.lrg.jpg"
-	// slideimages[3] = new Image()
-	// slideimages[3].src = "arrmimages/asteroid.jpg"//http://o.aolcdn.com/dims-shared/dims3/GLOB/crop/4000x2445+0+327/resize/630x385!/format/jpg/quality/85/http://hss-prod.hss.aol.com/hss/storage/midas/9d45beddc69216d5863a060ff0c2d8d9/200723983/469055831.jpg"
-	// slideimages[4] = new Image()
-	// slideimages[4].src = "arrmimages/commTerminal.jpg"
-	// slideimages[5] = new Image()
-	// slideimages[5].src = "arrmimages/eva.jpg"//https://upload.wikimedia.org/wikipedia/en/7/78/Nasa_astronaut_training_at_NBL.jpg"
-	// slideimages[6] = new Image()
-	// slideimages[6].src = "arrmimages/announcement.jpg"//http://vignette3.wikia.nocookie.net/psi/images/8/8c/Empty_board_promotion_announcement.jpg/revision/latest?cb=20130707174434"
-
-
-// var slideimages = new Array("arrmimages/orbitor.jpg","arrmimages/orion.jpg", "arrmimages/budget.jpg","arrmimages/asteroid.jpg", "arrmimages/commTerminal.jpg","arrmimages/eva.jpg","arrmimages/announcement.jpg")
-
-// var slideimages = new Array("http://www.nasa.gov/sites/default/files/thumbnails/image/15-094.jpg","https://upload.wikimedia.org/wikipedia/commons/8/80/Orion_with_ATV_SM.jpg","http://images.spaceref.com/news/2004/02.01.04.chart.2.lrg.jpg","http://o.aolcdn.com/dims-shared/dims3/GLOB/crop/4000x2445+0+327/resize/630x385!/format/jpg/quality/85/http://hss-prod.hss.aol.com/hss/storage/midas/9d45beddc69216d5863a060ff0c2d8d9/200723983/469055831.jpg",)
-
-// var slideimages = ("https://gateway-uat.jpl.nasa.gov/sites/ARRM/Site%20Images/_w/15-094_jpg.jpg","https://gateway-uat.jpl.nasa.gov/sites/ARRM/Site%20Images/_w/Screen%20Shot%202015-02-03%20at%209.20.45%20AM_png.jpg","https://gateway-uat.jpl.nasa.gov/sites/ARRM/Site%20Images/_w/Screen%20Shot%202015-02-04%20at%208.52.58%20AM_png.jpg","https://gateway-uat.jpl.nasa.gov/sites/ARRM/Site%20Images/_w/Boulder_capture_testbed_png.jpg","https://gateway-uat.jpl.nasa.gov/sites/ARRM/Site%20Images/_w/ground_terminal_png.jpg","https://gateway-uat.jpl.nasa.gov/sites/ARRM/Site%20Images/_w/eva_png.jpg","https://gateway-uat.jpl.nasa.gov/sites/ARRM/Site%20Images/_w/boulder_capture_png.jpg")
-
-var slideimages = new Array("arrmimages/orbitor.jpg","arrmimages/eva.jpg","arrmimages/commTerminal.jpg","arrmimages/arv_models.jpg","arrmimages/budget.jpg","arrmimages/boulder_capture.jpg","arrmimages/testbed.jpg")
-
-// var titleArray = new Array('18 May 2015 story: NASA Seeks Additional Information for Asteroid Redirect Mission Spacecraft','Notional ARV Modules and Launch Adapter Design','NASA FY\u0026#39;16 Budget Summary Briefing Calls Our ARRM work','Boulder Capture Simulations Test-bed','Ground-based Optical Comm Terminal could support a secondary optical telecom system for high data rate downlink in lunar orbit and potentially, at the asteroid.','Astronaut EVA with tools at boulder','Announcement:  ARRM MCR rescheduled for March 24, 2015.')
-
-var titleArray = new Array("18 May 2015 story: NASA Seeks Additional Information for Asteroid Redirect Mission Spacecraft","Astronaut EVA with tools at boulder","Ground-based Optical Comm Terminal could support a secondary optical telecom system for high data rate downlink in lunar orbit and potentially, at the asteroid.","Notional ARV Modules and Launch Adapter Design","NASA FY\u0026#39;16 Budget Summary Briefing Calls Our ARRM work","Announcement:  ARRM MCR rescheduled for March 24, 2015.","Boulder Capture Simulations Test-bed")
-
-
+	var titleArray = new Array("NASA Seeks Additional Information for Asteroid Redirect Mission Spacecraft","Astronaut EVA with tools at boulder","Ground-based Optical Comm Terminal could support a secondary optical telecom system for high data rate downlink in lunar orbit and potentially, at the asteroid.","Notional ARV Modules and Launch Adapter Design",
+		// "NASA FY\u0026#39;16 Budget Summary Briefing Calls Our ARRM work",
+		"ARRM MCR - December 2015.","Boulder Capture Simulations Test-bed")
 	</script>
+
 
 
 </head>
-<!-- <body background= "https://gateway-uat.jpl.nasa.gov/sites/ARRM/_catalogs/theme/Themed/1554F203/0917da1b-bfc1-42d8-839b-44a73a779638bkimage-480DF201.themedjpg?ctag"> -->
-<!-- <body background="background-image: url(https://gateway-uat.jpl.nasa.gov/sites/ARRM/_catalogs/theme/Themed/1554F203/0917da1b-bfc1-42d8-839b-44a73a779638bkimage-480DF201.themedjpg?ctag);background-repeat: no-repeat; background-attachment: fixed; background-position: center; "> -->
-	<!-- <link href="css/arrmHome.css" rel="stylesheet" type="text/css"> -->
-<body class="backgrounddd">
 
-<div class="transboxRed">
-	<ul>
-	  <li><a href="https://js.jpl.nasa.gov">JPL Space | </a></li>
-	  <li><a href="http://www.jpl.nasa.gov/">JPL | </a></li>
-	  <li><a href="http://www.caltech.edu/" >Caltech | </a></li>
-	  <li><a href="http://www.nasa.gov" >NASA</a></li>
-	</ul>
-</div>
+<!-- <body class="backgrounddd"> -->
+<body style="	    background-image: url('arrmimages/backgroundImage.jpg');
+	    background-size: 100% 100%;
+	    background-repeat: no-repeat;
+	    background-attachment: fixed;
+	    background-position: center; 
+	    overflow-x: auto;
+	    overflow-y: auto;">
 
-
-
-<!-- <nav class="navbar navbar-default">
-  <div class="container-fluid">
-    <div class="navbar-header">
-      <a class="navbar-brand" href="#">
-        <img alt="Brand" src="...">
-      </a>
-    </div>
-  </div>
-</nav> -->
+	<div class="transboxRed">
+		<ul>
+		  <!-- <img src="http://div27.jpl.nasa.gov/2740/files/logos/jpl_logo%2880x24%29.jpg" style="vertical-align:top;"/> -->
+		  <!-- <li style="margin-left:10px;"><a href="https://js.jpl.nasa.gov">JPL Space | </a></li> -->
+		  <li><a href="https://js.jpl.nasa.gov">JPL Space | </a></li>
+		  <li><a href="http://www.jpl.nasa.gov/">JPL | </a></li>
+		  <li><a href="http://www.caltech.edu/" >Caltech | </a></li>
+		  <li><a href="http://www.nasa.gov" >NASA</a></li>
+		</ul>
+	</div>
 
 
 
+	<!-- <nav class="navbar navbar-default">
+	  <div class="container-fluid">
+	    <div class="navbar-header">
+	      <a class="navbar-brand" href="#">
+	        <img alt="Brand" src="...">
+	      </a>
+	    </div>
+	  </div>
+	</nav> -->
+	<script type="text/javascript">		
 
+		var image_number = 0
+		var image_length = slideimages.length -1
 
-	<!-- <h1 style="font-size:150%; color:white; font-weight:100;text-decoration: none;"><a href="arrmHome.html" style="color:white"> HOMEEEEE </a></h1> -->
-	
-	<!-- <div id="textbox" style="opacity:0.4; fukter:alpha(opacity=40);"> -->
-<!-- 	<div clas="background">
-	  	<div class="transbox">	
-	  		<p class="alignleft" style="color:white; font-size:120%">Text on the left.</p>
-	  		<p class="alignright" style="color:white; font-size:120%">Text on the right.</p>
-		</div>
-	</div> -->
-	<!-- </div style="clear:both;"></div> -->
+		function change_image(num){
 
-	<!-- <div clas="background"> -->
-		<div class="transbox">
-<!-- 		<div id="textbox" style="	    margin: 20px;
-	    background-color: #000000;
-	    border: 1px solid black;
-	    opacity: 0.7;"> -->
-	    	<h1><a href="arrmHome.html" style="margin-left:auto; margin-right:auto; font-weight:600; font-size:110%;" > Asteroid Robotic Redirect Mission </a></h1>
-			<h1><a href="arrmHome.html" style="font-size:100%"> Home </a></h1>
-			<h2> <a href="https://arrm.jpl.nasa.gov/confluence" style="font-size:100%;"> Administrative Resources </a>
-				<span style="float:right; color:white;">Technical Design Concept Info</span> </h2> 
-			<h3 style="text-align:left"> ARRM Resources:<span> Mission Objectives & Requirements </span></h3>
-				<p><a href="https://arrmems.jpl.nasa.gov/share" style="font-size=100%;"> Library </a></p>
-				<!-- alfresco -->
-				<p><a href=" https://arrm.jpl.nasa.gov/jira/secure/BrowseProjects.jspa?selectedCategory=all" style="font-size:100%;"> Jira Site </a><span style="font-size:120%; ">Mission Design</span></p> 
-				<!-- font-weight:200; -->
-				<p><a href="mms.html" style="font-size:100%;"> View Editor </a></p>
-				<!-- <p><a href="https://arrmems.jpl.nasa.gov/" style="font-size:100%;"> View Editor </a></p> -->
-			<h3 style="text-align:left"> Administrative: <span> Block Diagrams</h3>
-				<p> Team Org Tree <span style="font-size:120%;"> (composition & interfaces)</span></p>
-				<p> Project Schedule </p>
-				<p> <a href="arrmimages/newMemberForm.doc" download>  New Member Form </a></p>
-<script type="text/javascript">		
-	// var slideimages = new Array("orion.jpg","budget.jpg","orbitor.jpg")
-	// var slidedesc = new Array("orion pic duh", "hey there's a budge", "and an orbiotor")
+			// if(num = 0){
+			// 	document.slidewhow.src= slideimages[image_number]
+			// 	document.getElementById("description").innerHTML = titleArray[image_number];
+			// 	setInterval(100000)
+			// }
 
-	var image_number = 0
-	var image_length = slideimages.length -1
+			image_number = image_number + num
 
-	function change_image(num){
+			if(image_number > image_length){
+				image_number = 0
+			}
 
-		// if(num = 0){
-		// 	document.slidewhow.src= slideimages[image_number]
-		// 	document.getElementById("description").innerHTML = titleArray[image_number];
-		// 	setInterval(100000)
+			if(image_number <0){
+				image_number = image_length
+			}
+
+			// document.write(image_number)
+			document.slidewhow.src= slideimages[image_number]
+			document.getElementById("description").innerHTML = titleArray[image_number];
+			return false;
+		}
+
+		// function auto(){
+		// 	setInterval("change_image(1)", 5000)
 		// }
+		
+		var myVar = setInterval("change_image(1)",2500)
 
-		image_number = image_number + num
-
-		if(image_number > image_length){
-			image_number = 0
+		function pause(){
+			clearInterval(myVar)
 		}
 
-		if(image_number <0){
-			image_number = image_length
-		}
+	
+	// window.onload = auto()
 
-
-
-
-		// document.write(image_number)
-		document.slidewhow.src= slideimages[image_number]
-		document.getElementById("description").innerHTML = titleArray[image_number];
-		return false;
-	}
-
-	function auto(){
-		setInterval("change_image(1)", 2500)
-	}
-
-	// function getImageNum(){
-	// 	return image_number
-	// }
-
-	function pause(){
-		// setInterval(5000)
-		setInterval("change_image(0)", 5000)
-	}
-	window.onload = auto()
 	</script>
 
+	<div class="transbox">
+
+		<h1 style="font-size:140%; text-align:center;"><a href="#" style="margin-left:auto; margin-right:auto; font-weight:600; font-size:140%;" > Asteroid Robotic Redirect Mission </a></h1>
+		<h1 style="text-indent:20px; font-size:120%;"><a href="#" style="font-size:120%;"> <u>Home</u> |</a> <a href="calendar.html" style="font-size:120%;"> <u>Calendar</u> </a></h1>
+
+		<table align="center" style="border: 1px solid black; border-collapse:collapse;">
+			<tr> <!-- one big row -->
+				<td>
+					<h2> Administrative Resources </a></h2>
+				</td>
+				<td style="border: 1px solid black;">
+				</td>
+				<td style="border: 1px solid black;">
+					<h2> Technical Design Concept Info </h2>
+				</td>
+			</tr>
+			<tr>
+				<td style="border: 1px solid black;">
+						<h3> ARRM Resources: </h3>
+						<p><a href=" https://arrm.jpl.nasa.gov/jira/secure/BrowseProjects.jspa?selectedCategory=all" style="font-size:100%;"> Jira Site </a></p>
+						<p style="text-indent:40px; font-size:85%;">(Action items/risk management)</p>
+						<p><a href="https://arrmems.jpl.nasa.gov/" style="font-size:100%;"> View Editor </a></p>
+						<p style="text-indent:40px; font-size:85%;">(Model interaction within web based environment)</p>
+						<p><a href="https://arrm.jpl.nasa.gov/confluence" style="font-size:100%;">Confluence</a></p>
+						<p style="text-indent:40px; font-size:85%;">(ARRRM wiki page)</p>
+						<p><a href="https://arrmems.jpl.nasa.gov/alfresco/mmsapp/mms.html#/workspaces/master/sites/site__17_0_2_1_8f40291_1359399709274_551619_13496/document/MMS_1438038559899_0748d7d7-64bd-4866-89ac-7b62de661267" style="font-size:100%">AARM Project Tools, How-to, and Help </a></p>
+				</td>
 
 
+				<td rowspan="4" style="border: 1px solid black; width:500px;"> <!--image here -->
+					<!-- <div style:"padding:20px;"> -->
+						<img src="arrmimages/orbitor.jpg" class="center" name="slidewhow" width="325" height="340" style="border-style:solid; border-color:black;"/>
+			<!-- center image in block link o jsfiddle.net/csbp2 -->
+							<p id="description" style="margin-left: auto; margin-right: auto; text-align: center; color:white;  word-wrap:break-word; text-indent:0px; width:400px; height: 50px; "> NASA Seeks Additional Information for Asteroid Redirect Mission Spacecraft </p>
+						<table align="center" style="width:100px; border-color:black;">
+							<tr>
+								<!-- <td align="left"><a href="" onclick="return change_image(-1)" class="arrow-left"></a></td>  -->
+								<td align="left"><a href="" onclick=" return change_image(-1)" style="font-size:80%; border-color:black;"> PREV </a></td> 
+								<td align="left"><a href="javascript:pause()" style="font-size:80%; border-color:black;"> PAUSE </a></td>
+								<!-- <td align="center"><a href="" onclick="auto()">AUTO</a></td> -->
+								<!-- <td align="center"><a href="" onclick="return pause()" >PAUSE</a></td> -->
+								<td align="right"><a href="" onclick="return change_image(1)" style="font-size:80%; border-color:black;"> NEXT </a></td>
+								<td align="right"><a href="" onclick="myVar" style="font-size:80%; border-color:black;"> AUTO </a></td>
+
+							</tr>
+						</table>
+					<!-- </div> -->
+				</td>
+
+				<td style="border: 1px solid black;">
+					<h3><a href="https://arrmems.jpl.nasa.gov/alfresco/mmsapp/mms.html#/workspaces/master/sites/site__17_0_2_1_8f40291_1359399709274_551619_13496/documents/_18_0_2_f280366_1436915473015_20271_97252/views/_18_0_2_f280366_1436915473015_20271_97252" style="font-size:100%; color:#ff0000;"> Mission Objectives <br> & Requirements</a></h3>
+					<h3> Mission Design <p style="font-size:70%; font-weight:300;" >(coming soon)</p></h3>
+				</td>
+			</tr>
+			<tr>
+				<td style="border: 1px solid black;"> 
+					<h3><a href="https://arrmems.jpl.nasa.gov/share" style="color:#ff0000; font-size:100%;">ARRM Library</a> </h3>
+					<p> Work Area </p>
+					<p> Reviews and Meetings </a></p>
+					<p> MMRs </p>
+				</td>
+				<td style="border: 1px solid black;">
+					<h3> Block Diagrams <p style="color:#ff0000; text-indent:5px; font-size:80%;">(composition & interfaces)</p><p style="font-size:70%; font-weight:300;" >(coming soon)</p></h3>
+				</td>
+			</tr>
+			<tr>
+				<<td style="border: 1px solid black;">
+					<h3> Administrative:</h3>
+					<p> Team Org Tree </p>
+					<p> Project Schedule </p>
+					<p><a href="arrmimages/newMemberForm.doc" download style="font-size:100%"> New Member Form </a></p>
+				</td>
+				<td style="border: 1px solid black;">
+					<h3> Mechanical Drawings <p style="font-size:70%; font-weight:300;" >(coming soon)</p></h3>
+					<h3> Functional OpsCon <p style="font-size:70%; font-weight:300;" >(coming soon)</p></h3>
+				</td>
+
+			</tr>
+			<tr>
+				<td style="border: 1px solid black;">
+					<h3> Public Sites: </h3>
+					<p><a href="http://www.nasa.gov/content/what-is-nasa-s-asteroid-redirect-mission" style="font-size:100%;"> Asteroid Redirect Mission </a></p>
+					<p><a href="http://www.nasa.gov/mission_pages/asteroids/initiative/index.html" style="font-size:100%;"> Asteroid Initiative </a></p>
+				</td>
+				<td style="border: 1px solid black;">
+					<h3> Mass: </h3>
+					<p><a href="https://arrmems.jpl.nasa.gov/alfresco/mmsapp/mms.html#/workspaces/master/sites/site__17_0_2_1_8f40291_1359399709274_551619_13496/documents/_18_0_2_f280366_1436920355631_713404_72338/views/_18_0_2_f280366_1436920355631_713404_72338" style="font-size:100%;"> MEL & Margins </a></p>
+					<h3> Power: <p style="font-size:70%; font-weight:300;"> (coming soon) </p></h3>
+					<p> PEL & Margins </p>
+					<p> Power Modes </p>
+					
+				</td>
+			</tr>
+
+			<tr>
+				<td colspan="2" style="border: 1px solid black;">
+					<h3> Released Documents and Presentation </h3>
+					<p><a href="https://arrmems.jpl.nasa.gov/share/proxy/alfresco/api/node/content/workspace/SpacesStore/98de5c84-bf9e-423e-9656-b1ae7350f226/1030_Wed_Muirhead_ARM_OptionA.pdf" style="font-size:100%;"> 2014 ARRM Mission Concept Options Overview </a></p>
+					<p><a href="http://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=6836358&tag=1" style="font-size:100%;"> 2013 ARRM Feasibility Study </a></p>
+				</td>
+				<td style="border: 1px solid black;">
+		<!-- 			<p> PEL & Margins </p>
+					<p> Power Modes </p> -->
+					<h3> Data: <p style="font-size:70%; font-weight:300;" >(coming soon)</p></h3>
+					<p> Characteristics </p>
+					<p> Analyses </p>
+				<td>
+			</tr>
+			<tr style="border-bottom:1px solid white;">
+				<td><h3></h3></td>
+			</tr>
+			<tr style="margin:100px; outline: 1px solid white;">	
+				<td style="color:#ffffff;"> <p style="text-indent:5px;"> Project Manager: Brian Muirhead </p></td>
+				<td style="color:#ffffff;" align="center" > <p style="text-indent:0px"> Project Technologist: John Brophy</p></td>
+				<td style="color:#ffffff;"> <p style="text-indent:0px;"> Portal Admin: Tanaz Mozafari </p></td>
+			</tr>
+
+		</table>
+		<h2></h2>
+		
+		<!-- <div class="transbox" style="border: 1px solid white;"> -->
+<!-- 			<table align="center" style="border:1px solid white; border-collapse:collapse;">
+				<tr style="margin:100px;">	
+					<td style="color:#ffffff;"> <p style="margin-left:10%"> Project Manager: Brian Muirhead </p></td>
+					<td style="color:#ffffff;" align="center" > <p style="margin-left:auto; margin-right:auto;"> Project Technologist: So and So</p></td>
+					<td style="color:#ffffff;"> <p style="margin-right:10%"> Portal Admin: Tanaz Mozafari </p></td>
+				</tr>
+			</table> -->
+		<!-- </div> -->
 
 
-	<img src="arrmimages/orbitor.jpg" class="center" name="slidewhow" width="313" height="200" style="border-style:solid; border-color:black;"/>
-	<!-- center image in block link o jsfiddle.net/csbp2 -->
-	<p id="description" style="margin-left: auto; margin-right: auto; text-align: center; color:white; width:400px; height: 50px; word-wrap:break-word;">
-		18 May 2015 story: NASA Seeks Additional Information for Asteroid Redirect Mission Spacecraft
-	</p>
-	<table align="center" style="width:100px; border-color:black;">
-		<tr>
-			<!-- <td align="left"><a href="" onclick="return change_image(-1)" class="arrow-left"></a></td>  -->
-			<td align="left"><a href="" onclick="return change_image(-1)" style="font-size:80%; border-color:black">PREV</a></td> 
-			<!-- <td align="center"><a href="" onclick="auto()">AUTO</a></td> -->
-			<!-- <td align="center"><a href="" onclick="return pause()" >PAUSE</a></td> -->
-			<td align="right"><a href="" onclick="return change_image(1)" style="font-size:80%; border-color:black">NEXT</a></td>
-			
-		</tr>
-	</table>
-
-
-			<h3 style="text-align:left"> ARRM Library:<span> Mechanical Drawings </span></h3>	
-				<p> Work Area </p>
-				<p><a href="calendar.html" style="font-size:100%;"> Reviews and Meetings </a><span style="font-size:120%;">Functional OpsCon</span></p>
-				<p> MMRs </p>
-			<h3 style="text-align:left"> Public Sites:<span> Mass: </span></h3>	
-				<p> Asteroid Redirect Mission <span style="color:white;"> MEL & Margins</p>
-				<p> Asteroid Initiative </p>
-
-				 <!-- <span style="font-size:130%; font-weight:200">Power</span></p> -->
-			<h3 style="text-align:left"> Released Documents and Presentation<span> Power: </span></h3>	
-				<p> 2014 ARRM Mission Concept Options Overview <span style="color:white;"> PEL & Margins </span></p>
-				<p> 2013 ARRM Feasibility Study <span style="color:white"> Power Modes </span> </p>
-			<h3 style="color:black"> place holder text <span> Data: </span></h3>	
-				<p style="color:black"> place holder text <span style="color:white;"> Characterisitcs</span></p>
-				<p style="color:black"> place holder text <span style="color:white"> Data Analyses </span> </p>
-
-
-		<!-- <img src="commTerminal.jpg" name="slide" width="100" height="56"/> -->
-
-
-
-
-
-
-<!-- bottom authoring box -->
-			<div class="transbox" style="border: 1px solid white;">
-<!-- 				<p style="margin: 5px;color:white;"> Project Manager: <span style="text-align: left; color:white;"> Project Technologist:
-				 <span style="float:center; text-align:right; color:white;"> Content Manager: </span>
-				</span> <p> -->
-	<!-- 		<h4 style="text-align:center; font-size:100%; font-weight:200; color:white;"> Project Manager: &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp Project Technologist: &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp Content Manager:</h4> --> 
-
-<h4 style="text-align:center; font-size:100%; font-weight:400; color:white;">Point of Contanct for any ARRMEms Portal issues:  Tanaz Mozafari (312E) Tanaz.Mozafari@jpl.nasa.gov ex:3-8635</h4>
-			</div>
-
-
-
-<!-- MAKE SURE LOGIN WORKS -->
-
-<!-- 
-				<h3 style= "text-align:right">Power</h3>
-				<p> <span style="color:white;"> PEL & Margins </span></p>
-				<p> <span style="color:white;"> Power Modes </span></p>
-				<p> PEL & Margins </p>
-				<p> Power Modes </p> -->
-
-
-
-
-<!-- 			<h3 style="text-align:left"> Released Documents and Presentation:<span style="color:white; font-size=10%;"> Power Analyses </spam> </p>
-				<p> 2014 ARRM Mission Concept Options Overview <span style="font-size:130%; font-weight:200">Data:</span></p>
-				<p> 2013 ARRM Feasibility Study <span style="color:white;"> Characterisitics</span></p>
-				<p> <span style="color:white"> Data Anaylses </span></p> -->
-
-
-
-				<!-- This is some text that is placed in the transparent box.what if i threw this over here?? other things that h -->
-			<!-- <p style="text-align:center; width:33.3333%;">sssss</p> -->
-			<!-- <p style="text-align:right;">This is some right?? text that is placed in the transparent box. -->
-			
-		</div>
-	<!-- </div> -->
 
 
 </body>
