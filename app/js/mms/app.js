@@ -154,18 +154,18 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
             } 
         }        
     })
-    .state('workspace.arrmportal', {
-        url: '/arrmportal',
-        resolve: {
-        },
-        parent: 'workspace',
-        views: {
-            'pane-center@': {
-                templateUrl: 'partials/testerrr/partialsArrmHomePresent.html',
-                controller: 'slideShowCtrl'
-            }
-        }
-    })
+    // .state('workspace.arrmportal', {
+    //     url: '/arrmportal',
+    //     resolve: {
+    //     },
+    //     parent: 'workspace',
+    //     views: {
+    //         'pane-center@': {
+    //             templateUrl: 'partials/testerrr/partialsArrmHomePresent.html',
+    //             controller: 'slideShowCtrl'
+    //         }
+    //     }
+    // })
 
     .state('workspace', {
         parent: 'workspaces',
