@@ -686,6 +686,11 @@ function mmsTree($timeout, $log, $templateCache) {
                 });
                 return branch;
             };
+            
+            tree.get_rows = function()
+            {
+	            return scope.tree_rows;
+            };
         }
     };
 

@@ -427,8 +427,11 @@ function urlService(baseUrl) {
         return root + '/workspaces/' + ws;
     };
 
-    var getWsDiffURL = function(ws1, ws2, ws1time, ws2time) {
-        return root + '/diff/' + ws1 + '/' + ws2 + '/' + ws1time + '/' + ws2time  + '?background=true';
+    var getWsDiffURL = function(ws1, ws2, ws1time, ws2time, recalc) {
+        var diffUrl =  root + '/diff/' + ws1 + '/' + ws2 + '/' + ws1time + '/' + ws2time  + '?background=true';
+        if(recalc === true) diffUrl += '&recalculate=true';
+        
+        return diffUrl;
         /*if (ws1time && ws1time !== 'latest')
             r += '&timestamp1=' + ws1time;
         if (ws2time && ws2time !== 'latest')

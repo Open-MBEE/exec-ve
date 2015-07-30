@@ -218,13 +218,16 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
         
         $rootScope.mergeInfo = {
 	      branch: branch,
-	      parentBranch: parent_branch  
+	      parentBranch: parent_branch,
+	      pane: 'fromToChooser',
+	      tree_rows: $rootScope.mms_treeApi.get_rows()
         };
         
+        console.log($rootScope.mms_treeApi.get_rows());
+                
         var modalInstance = $modal.open({
-	        templateUrl: 'partials/mms/merge_assistant-type_chooser.html',
-	        controller: 'WorkspaceMergeAssistant',
-	        size: 'sm'
+	        templateUrl: 'partials/mms/merge_assistant.html',
+	        controller: 'WorkspaceMergeAssistant'
         });
     };
 

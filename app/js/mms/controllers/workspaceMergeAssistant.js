@@ -3,77 +3,81 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('WorkspaceMergeAssistant', ["_", "$timeout", "$scope", "$rootScope", "$modal", "growl", "ElementService", "UxService", "$modalInstance", "$state",
-function(_, $timeout, $scope, $rootScope, $modal, growl, ElementService, UxService, $modalInstance, $state) {
+.controller('WorkspaceMergeAssistant', ["_", "$timeout", "$scope", "$rootScope", "$modal", "growl", "ElementService", "UxService", "$modalInstance", "$state", "WorkspaceService",
+function(_, $timeout, $scope, $rootScope, $modal, growl, ElementService, UxService, $modalInstance, $state, WorkspaceService) {
     
-    var sourceId = $scope.mergeInfo.branch.data.id;
-    var targetId = $scope.mergeInfo.parentBranch.data.id;
+    var sourceWsId = $scope.mergeInfo.branch.data.id;
+    var targetWsId = $scope.mergeInfo.parentBranch.data.id;
+    
+    $scope.pane = $rootScope.mergeInfo.pane;
+    
+    // Setting default to custom merge. Will be set by user once "quick" merge is available
+    $scope.mergeInfo.type = 'custom';
     
     $scope.mergeAssistFromTo = function(type)
     {
 	    $scope.mergeInfo.type = type;
 	    
+	    // @TODO @REMOVE This are just test variables
 	    $scope.mergeInfo.source = 'foo';
 	    $scope.mergeInfo.dest = 'bar';
 	    
 	    // @TODO Verify that both source and destination are selected
 	    
 	    // Call up "from/to" modal
-	    $modalInstance.close();
-	    $modal.open({
-		    templateUrl: 'partials/mms/merge_assistant-from_to_chooser.html',
-		    size: 'sm',
-		    controller: 'WorkspaceMergeAssistant'
-	    });
+	    $scope.pane = 'fromToChooser';
     };
     
     $scope.mergeAssistConfirmation = function(source, dest)
     {
-	    // @TODO Show cancel confirmation if user clicks outside of modal
+	    $scope.pane = 'beginMerge';
+    };
+    
+    // @TODO Show cancel confirmation if user clicks outside of modal
+    
+    $scope.startDiff = function()
+    {
+	    var targetTime = 'latest';
+	    var sourceTime = 'latest';
 	    
-	    var diffCompleted = false;
-	    var diffInProgress = false;
-	    
-	    // Check to see if the diff has already completed
-	    if(diffCompleted === true)
-	    {
-		    // @TODO If the diff has already completed, send user to diff
-		    var sourceId = $scope.mergeFrom.data.id;
-	        var sourceTime = 'latest';
-	        
-	        if ($scope.mergeFrom.type === 'configuration') {
-	            sourceId = $scope.mergeFrom.workspace;
-	            sourceTime = $scope.mergeFrom.data.timestamp;
-	        }
-	        var targetId = $scope.mergeTo.data.id;
-	        var targetTime = 'latest';
-	        
-	        if ($scope.mergeTo.type === 'configuration') {
-	            targetId = $scope.mergeTo.workspace;
-	            targetTime = $scope.mergeTo.data.timestamp;
-	        }
-	        
-		    $state.go('workspace.diff', {source: sourceId, target: targetId, sourceTime: sourceTime, targetTime: targetTime});
-	    }
-	    
-	    // @TODO Check to see if the diff is currently in progress
-	    if(diffInProgress === true)
-	    {
-		    // If in progress, tell the view to show the "in progress" text
-		    $scope.mergeInfo.inProgress = true;
-		    // @TODO find user who started this dynamically
-		    $scope.mergeInfo.startedBy = "Brad";
-	    }
-	    
-	    
-	    // If no diff exists, show confirmation dialogue
-	    $modalInstance.close();
-	    
-	    $modal.open({
-		    templateUrl: 'partials/mms/merge_assistant-confirmation.html',
-		    size: 'sm',
-		    controller: 'WorkspaceMergeAssistant'
-	    });
+	    WorkspaceService.diff(targetWsId, sourceWsId, targetTime, sourceTime)
+        .then(function(data)
+        {   
+            // @TODO @REMOVE
+            console.log(data);
+            
+            if(data.status === 'COMPLETED')
+            {
+	            console.info('Status supposedly completed. Status:');
+	            console.log(data.status);
+	            
+	            // Close modal
+	            $modalInstance.close();
+	            
+	            // Redirect to diffs page
+	            $state.go('workspace.diff', {
+		            source: sourceWsId,
+		            target: targetWsId,
+		            sourceTime: sourceTime,
+		            targetTime: targetTime
+	            });
+            }
+            
+            if(data.status === 'GENERATING' || data.status === "OUTDATED")
+            {
+	            if(data.status === 'GENERATING')
+	            {
+		            $scope.pane = 'generating';
+	            }
+	            else if(data.status === "OUTDATED")
+	            {
+		            WorkspaceService.diff(targetWsId, sourceWsId, targetTime, sourceTime, true).then(function(data)
+		            {
+			            $scope.pane = 'generating';
+		            });
+	            }
+            }
+        });
     };
     
     // @TODO
@@ -85,6 +89,11 @@ function(_, $timeout, $scope, $rootScope, $modal, growl, ElementService, UxServi
 		    size: 'sm',
 		    templateUrl: 'partials/mms/merge_assistant-cancel.html'
 	    });
+    };
+    
+    $scope.finished = function()
+    {
+	    $modalInstance.close();
     };
     
 }]);
