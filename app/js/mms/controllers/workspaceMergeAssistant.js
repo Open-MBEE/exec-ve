@@ -22,10 +22,6 @@ function(_, $timeout, $scope, $rootScope, $modal, growl, ElementService, UxServi
     $scope.mergeAssistConfirmation = function(source, dest)
     {
 	    $scope.pane = 'beginMerge';
-	    // @REMOVE
-	    console.log($scope.mergeInfo);
-	    
-	    console.log($rootScope.mms_treeApi.get_parent_branch($scope.mergeInfo.source.branch));
     };
     
     // @TODO Show cancel confirmation if user clicks outside of modal
@@ -55,8 +51,6 @@ function(_, $timeout, $scope, $rootScope, $modal, growl, ElementService, UxServi
 	    WorkspaceService.diff(targetWsId, sourceWsId, targetTime, sourceTime)
         .then(function(data)
         {   
-            console.log(data);
-            
             if(data.status === 'COMPLETED')
             {
 	            // Close modal

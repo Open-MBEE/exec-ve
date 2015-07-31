@@ -431,8 +431,6 @@ function urlService(baseUrl) {
         var diffUrl =  root + '/diff/' + ws1 + '/' + ws2 + '/' + ws1time + '/' + ws2time  + '?background=true';
         if(recalc === true) diffUrl += '&recalculate=true';
         
-        console.log(diffUrl);
-        
         return diffUrl;
         /*if (ws1time && ws1time !== 'latest')
             r += '&timestamp1=' + ws1time;
