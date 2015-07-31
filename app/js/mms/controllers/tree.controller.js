@@ -11,10 +11,11 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
     $rootScope.mms_bbApi = $scope.bbApi = {};
     $rootScope.mms_treeApi = $scope.treeApi = {};
     $scope.buttons = [];
-
+    $scope.treeExpandLevel = 1;
     $scope.treeSectionNumbering = false;
     if ($state.includes('workspace.site.document')) {
         $scope.treeSectionNumbering = true;
+        $scope.treeExpandLevel = 3;
     }
     $rootScope.mms_fullDocMode = false;
     if ($state.includes('workspace.site.document.full'))
@@ -296,10 +297,32 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
         });
     };
 
-    var siteLevel2Func = function(site, siteNode) {
+    var siteLevel2Func = function(site, siteNode, onlyTopLevel) {
+        
+        // Setting all sites to be expandable
+        siteNode.expandable = true;
+        
+        // String relating to the proper callback as defined in the directive
+        siteNode.expandCallback = 'siteLevel2Func';
+        
+        // Whether to load only top-level documents
+        onlyTopLevel = typeof onlyTopLevel !== 'undefined' ? onlyTopLevel : true;
+        
+        // Skip if not a top-level node
+        if(onlyTopLevel && (siteNode.level !== 1 || siteNode.data.isCharacterization !== true)) return;
+        
+        // Make sure we haven't already loaded the docs for this site
+        if(siteNode.docsLoaded) return;
+        // Set docs loaded attribute
+        siteNode.docsLoaded = true;
+        
         siteNode.loading = true;
         ViewService.getSiteDocuments(site, false, ws, config === 'latest' ? 'latest' : tag.timestamp)
         .then(function(docs) {
+	        
+	        // If no documents are found on a site, stop forcing expansion
+	        if(docs.length === 0) siteNode.expandable = false;
+	        
             var filteredDocs = {};
             if (docFilter)
                 filteredDocs = JSON.parse(docFilter.documentation);
@@ -345,6 +368,8 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
             growl.error(reason.message);
         });
     };
+    
+    $scope.siteLevel2Func = siteLevel2Func;
 
     if ($state.includes('workspaces') && !$state.includes('workspace.sites')) {
         $scope.my_data = UtilsService.buildTreeHierarchy(workspaces, "id", 
@@ -385,6 +410,14 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
                     growl.error("You have a view called " + seenChild[childId].label + " that's a child of multiple parents! Please fix in the model.");
                     return;
                 }
+                if (!viewId2node[childId]) {
+                    growl.error("View " + childId + " not found.");
+                    return;
+                }
+                if (!viewId2node[viewid]) {
+                    growl.error("View " + viewid + " not found.");
+                    return;
+                }
                 viewId2node[viewid].children.push(viewId2node[childId]);
                 seenChild[childId] = viewId2node[childId];
             });
@@ -394,14 +427,10 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
 
     function addSectionElements(element, viewNode, parentNode) {
         var contains = null;
-        if (element.specialization)
-            contains = element.specialization.contains;
-        else
-            contains = element.contains;
-        var j = contains.length - 1;
-        for (; j >= 0; j--) {
-            var containedElement = contains[j];
-            if (containedElement.type === "Section") {
+        var contents = null;
+
+        var addContainsSectionTreeNode = function(containedElement) {
+           if (containedElement.type === "Section") {
                 var sectionTreeNode = { 
                     label : containedElement.name, 
                     type : "section",
@@ -412,6 +441,86 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
                 parentNode.children.unshift(sectionTreeNode);
                 addSectionElements(containedElement, viewNode, sectionTreeNode);
             }
+        };
+
+        var addContentsSectionTreeNode = function(operand) {
+            var instances = [];
+            operand.forEach(function(instanceVal) {
+                instances.push(ViewService.parseExprRefTree(instanceVal, $scope.workspace, time));
+            });
+            $q.all(instances).then(function(results) {
+                var k = results.length - 1;
+                for (; k >= 0; k--) {
+                    var instance = results[k];
+                    if (ViewService.isSection(instance)) {
+                        var sectionTreeNode = {
+                            label : instance.name,
+                            type : "section",
+                            view : viewNode.data.sysmlid,
+                            data : instance,
+                            children: []
+                        };
+                        parentNode.children.unshift(sectionTreeNode);
+                        addSectionElements(instance, viewNode, sectionTreeNode);
+                    }
+                }
+                $scope.treeApi.refresh();
+            }, function(reason) {
+                //view is bad
+            });
+           /*ViewService.parseExprRefTree(instanceVal, $scope.workspace)
+           .then(function(containedElement) {
+               if (ViewService.isSection(containedElement)) {
+                    var sectionTreeNode = { 
+                        label : containedElement.name, 
+                        type : "section",
+                        view : viewNode.data.sysmlid,
+                        data : containedElement, 
+                        children : [] 
+                    };
+                    parentNode.children.unshift(sectionTreeNode);
+                    addSectionElements(containedElement, viewNode, sectionTreeNode);
+                }
+            });*/
+        };
+
+        if (element.specialization) {
+          
+            if (element.specialization.contents) {
+                contents = element.specialization.contents;
+            }
+            // For Sections, the contents expression is the instanceSpecificationSpecification:
+            else if (ViewService.isSection(element) &&
+                     element.specialization.instanceSpecificationSpecification) {
+                contents = element.specialization.instanceSpecificationSpecification;
+            }
+            else if (element.specialization.contains) {
+                contains = element.specialization.contains;
+            }
+        }
+        /*else {
+
+            if (element.contents) {
+                contents = element.contents;
+            }
+            else if (element.contains) {
+                contains = element.contains;
+            }
+        }*/
+
+        var j;
+        if (contains) {
+            j = contains.length - 1;
+            for (; j >= 0; j--) {
+                addContainsSectionTreeNode(contains[j]);
+            }
+        }
+        if (contents && contents.operand) {
+            addContentsSectionTreeNode(contents.operand);
+            /*j = contents.operand.length - 1;
+            for (; j >= 0; j--) {
+                addContentsSectionTreeNode(contents.operand[j]);
+            }*/
         }
     }
     // TODO: Update behavior to handle new state descriptions
@@ -433,14 +542,22 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
         } else if ($state.includes('workspace.site.document')) {
 
             var view = branch.type === 'section' ? branch.view : branch.data.sysmlid;
+            var sectionId = branch.type === 'section' ? branch.data.sysmlid : null;
+            var hash = sectionId ? sectionId : view;
             if ($rootScope.mms_fullDocMode) {
-                $location.hash(view);
+                $location.hash(hash);
                 $rootScope.veCurrentView = view;
                 ViewService.setCurrentViewId(view);
                 $anchorScroll();
             } else if (branch.type === 'view') {
                 $state.go('workspace.site.document.view', {view: branch.data.sysmlid});
-            } 
+            } else if (branch.type === 'section') {
+                $state.go('workspace.site.document.view', {view: view});
+                $timeout(function() {
+                    $location.hash(hash);
+                    $anchorScroll();
+                }, 1000);
+            }
         }
         $rootScope.mms_tbApi.select('element.viewer');
     };
@@ -482,7 +599,8 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
 
     // TODO: update tree options to call from UxService
     $scope.tree_options = {
-        types: UxService.getTreeTypes()
+        types: UxService.getTreeTypes(),
+        siteLevel2Func: siteLevel2Func
     };
     if (!$state.includes('workspace.site.document'))
         $scope.tree_options.sort = sortFunction;
@@ -529,6 +647,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
                 $scope.treeApi.add_branch(branch, newbranch, top);
 
                 if (itemType === 'View') {
+                    viewId2node[data.sysmlid] = newbranch;
                     $state.go('workspace.site.document.view', {view: data.sysmlid});
                 }
 
@@ -787,7 +906,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
             //growl.info("Searching...");
             $scope.searching = true;
 
-            ElementService.search(searchText, false, ws)
+            ElementService.search(searchText, ['name'], null, false, ws)
             .then(function(data) {
 
                 for (var i = 0; i < data.length; i++) {
@@ -910,8 +1029,39 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
         }
     }
 
+    // ViewCtrl creates this event when adding sections to the view
+    $scope.$on('viewctrl.add.section', function(event, instanceSpec, parentBranchData) {
+
+        var branch = $scope.treeApi.get_branch(parentBranchData);
+        var viewid = null;
+        if (branch.type === 'section')
+            viewid = branch.view;
+        else
+            viewid = branch.data.sysmlid;
+        var newbranch = {
+            label: instanceSpec.name,
+            type: "section",
+            view: viewid,
+            data: instanceSpec,
+            children: [],
+        };
+        $scope.treeApi.add_branch(branch, newbranch, false);
+
+        addSectionElements(instanceSpec, viewId2node[viewid], newbranch);
+        $scope.treeApi.refresh();
+
+    });
+
+    // ViewCtrl creates this event when deleting sections from the view
+    $scope.$on('viewctrl.delete.section', function(event, sectionData) {
+
+        var branch = $scope.treeApi.get_branch(sectionData);
+
+        $scope.treeApi.remove_single_branch(branch);
+    });
+
     if ($state.includes('workspace.site.document')) {
-        var delay = 300;
+        var delay = 0;
         if (document.specialization.view2view) {
             document.specialization.view2view.forEach(function(view, index) {
                 $timeout(function() {

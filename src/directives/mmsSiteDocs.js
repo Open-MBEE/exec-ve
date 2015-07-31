@@ -23,9 +23,14 @@ function mmsSiteDocs(ElementService, SiteService, ViewService, growl, $q, $templ
 
         var update = function() {
             var filteredDocs = [];
+            var seen = {};
             scope.siteDocs.forEach(function(doc) {
-                if (!scope.filtered[doc.sysmlid])
+                if (!scope.filtered[doc.sysmlid]) {
+                    if (seen[doc.sysmlid])
+                        return;
                     filteredDocs.push(doc);
+                    seen[doc.sysmlid] = 'seen';
+                }
             });
             scope.docs = filteredDocs;
         };

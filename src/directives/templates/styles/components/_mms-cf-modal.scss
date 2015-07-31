@@ -1,4 +1,94 @@
 .transclude-modal {
+  padding: 25px;
+  
+  .elem-wrapper {
+    margin-top: 20px;
+    margin-bottom: 20px;
+
+    .elem-documentation,
+    .elem-type,
+    .elem-properties,
+    .elem-specification,
+    table {
+      margin-left: 20px;
+      padding-right: 20px;
+    }
+
+    .elem-name {
+      font-size: 20px;
+      font-weight: 400;
+    }
+
+    .elem-qualified-name {
+      font-size: 14px;
+      font-style: italic;
+    }
+
+    .elem-documentation-wrapper {
+      margin-top: 8px;
+    }
+
+    .elem-documentation {
+      font-color: $base_blue !important;
+    }
+
+    label {
+      font-size: 12px;
+      margin-bottom: 0;
+    }
+
+    table > tbody > tr > td {
+      padding: 0;
+      border: 0;
+      max-width: 190px;
+      overflow: hidden;
+      border-right: 25px solid white;
+      text-overflow: ellipsis;
+    }
+
+    .ellipses {
+      color: $base_blue;
+    }
+  }
+
+  .container-search-type {
+    font-size: 12px;
+  }
+
+  .btn-search-type {
+    font-size: 12px;
+    color: $medium_grey;
+    border-radius: 3px;
+    @include box-shadow(none);
+  }
+
+  .label-search-type {
+    margin-right: 5px;
+  }
+
+  .btn-group>.btn:not(:first-child):not(:last-child):not(.dropdown-toggle) {
+    border-radius: 3px;
+  }
+
+  .btn-group .btn+.btn {
+    margin-left: inherit;
+  }
+
+  .btn-group>.btn {
+    position: inherit;
+    float: inherit;
+  }
+
+  .btn-group>.btn:first-child:not(:last-child):not(.dropdown-toggle) {
+    border-bottom-right-radius: 3px;
+    border-top-right-radius: 3px;
+  }
+
+  .btn-group>.btn:last-child:not(:first-child) {
+    border-bottom-left-radius: 3px;
+    border-top-left-radius: 3px;
+  }
+
   .transclude-modal-instructions {
     margin-top: -6px;
   }
@@ -8,35 +98,38 @@
     margin: 0 auto;
   }
 
-  .transclude-table {
-    padding: 20px;
-    max-height: 400px;
-    max-width: 98%;
-    overflow: auto;
+  .form-propose,
+  .form-filter {
+    margin-top: 12px;
   }
 
-  .misc-form-field {
-    top: -32px;
-    position: relative;
+  .form-propose {
+    margin-bottom: 10px;
   }
 
-  .form-propose, .form-filter {
-    margin-top: 7px;
-  }
+  .form-search, .form-filter {
+    margin-bottom: 5px;
 
-  .form-search {
-    width: 70%;
-  }
-
-  .form-search, .form-propose {
-    & > .form-control {
-      border-right-width: 0;
+    input {
+      border-radius: 4px !important;
     }
+  }
+
+  .textarea-transclude-modal {
+    margin-bottom: 10px;
+  }
+
+  .radio {
+    margin-bottom: 30px;
+  }
+
+  .expl-mandatory {
+    font-size: 12px;
+    margin-top: 15px;
   }
 
   span.input-group-btn {
     .btn {
-      @include box-shadow(none);
       @include transition(none);
       border: 1px solid $tertiary_grey;
       font-size: 14px;
@@ -47,8 +140,9 @@
       padding-right: 12px;
 
       &.btn-primary {
-        border: 1px solid $base_blue;
-        margin-left: 0;
+        border: 2px solid $base_blue;
+        margin-left: 6px;
+        border-radius: 3px !important;
         color: $white;
       }
     }
@@ -58,27 +152,20 @@
     }
   }
 
-  .show-orig-table-btn {
-    font-weight: $default_font_weight;
-    padding: 10px 12px 9px 12px;
-    color: $white;
-    position: relative;
-    top: -34px;
-    left: 71.3%;
-    @include box-shadow(none);
+  .cant-find-element {
+    font-size: 12px;
+    color: $medium_grey;
+    margin-top: 12px;
+    margin-left: 3px;
+  }
 
-    &:hover, &:active {
-      @include box-shadow(none);
+  .container-no-results {
+    color: $medium_grey;
+
+    h3 {
+      font-weight: 500;
+      margin: 40px auto;
+      width: 290px;
     }
-  }
-
-  .clickable:hover {
-    cursor: pointer;
-    background-color: $light_blue;
-  }
-
-  .transclude-table {
-    position: relative;
-    top: -30px
   }
 }

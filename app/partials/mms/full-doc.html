@@ -1,9 +1,13 @@
-<div class="pane-center container-fluid">
+<div fa-pane pane-anchor="north" pane-size="41px" pane-no-toggle="true" pane-no-scroll="true">
     <div class="pane-center-btn-group">      
         <mms-button-bar buttons="buttons" mms-bb-api="bbApi"></mms-button-bar>
     </div>
-    <div ng-repeat="view in views track by view.id">
+</div>
+<div fa-pane pane-anchor="center">
+    <div class="pane-center container-fluid">
+    <div ng-repeat="view in views">
         <mms-view mms-vid="{{view.id}}" mms-version="{{version}}" mms-ws="{{ws}}" mms-number="{{view.number}}" mms-view-api="view.api" mms-cf-clicked="tscClicked(elementId)"></mms-view>
+    </div>
     </div>
 </div>
 

@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms')
-.factory('UtilsService', ['_', UtilsService]);
+.factory('UtilsService', ['CacheService', '_', UtilsService]);
 
 /**
  * @ngdoc service
@@ -11,9 +11,9 @@ angular.module('mms')
  * @description
  * Utilities
  */
-function UtilsService(_) {
+function UtilsService(CacheService, _) {
     var nonEditKeys = ['contains', 'view2view', 'childrenViews', 'displayedElements',
-        'allowedElements'];
+        'allowedElements', 'contents'];
 
     var hasCircularReference = function(scope, curId, curType) {
         var curscope = scope;
@@ -76,14 +76,34 @@ function UtilsService(_) {
 
         // make second pass to associate data to parent nodes
         array.forEach(function(data) {
+            // If theres an element in data2Node whose key matches the 'parent' value in the array element
+            // add the array element to the children array of the matched data2Node element
             if (data[parent] && data2Node[data[parent]]) //bad data!
                 data2Node[data[parent]].children.push(data2Node[data[id]]);
+            // If theres not an element in data2Node whose key matches the 'parent' value in the array element
+            // it's a "root node" and so it should be pushed to the root nodes array along with its children
             else
                 rootNodes.push(data2Node[data[id]]);
         });
+        
+        // Recursive function which sets the level of all nodes passed
+        var determineLevelOfNodes = function(nodes, initialLevel)
+        {
+	        nodes.forEach(function(node)
+	        {
+		        node.level = initialLevel;
+		        if(node.children && node.children.length > 0)
+		        {
+			        determineLevelOfNodes(node.children, initialLevel + 1);
+		        }
+	        });
+        };
+        
+        determineLevelOfNodes(rootNodes, 1);
 
-        // apply level 2 objects to tree
+        // Get documents and apply them to the tree structure
         if (level2_Func) {
+            
             array.forEach(function(data) {
                 var level1_parentNode = data2Node[data[id]];
                 level2_Func(data[id], level1_parentNode);
@@ -147,11 +167,172 @@ function UtilsService(_) {
             return ['elements', ws, id, ver];
     };
 
+    var mergeElement = function(source, eid, workspace, updateEdit, property) {
+        var ws = workspace ? workspace : 'master';
+        var key = makeElementKey(eid, ws, 'latest', false);
+        var keyEdit = makeElementKey(eid, ws, 'latest', true);
+        var clean = cleanElement(source);
+        CacheService.put(key, clean, true);
+        var edit = CacheService.get(keyEdit);
+        if (updateEdit && edit) {
+            edit.read = clean.read;
+            edit.modified = clean.modified;
+            if (property === 'all')
+                CacheService.put(keyEdit, clean, true);
+            else if (property === 'name')
+                edit.name = clean.name;
+            else if (property === 'documentation')
+                edit.documentation = clean.documentation;
+            else if (property === 'value') {
+                _.merge(edit.specialization, clean.specialization, function(a,b,id) {
+                    if ((id === 'contents' || id === 'contains') && a)
+                        return a; //handle contains and contents updates manually at higher level
+                    if (angular.isArray(a) && angular.isArray(b) && b.length < a.length) {
+                        return b; 
+                    }
+                    return undefined;
+                });
+            }
+            cleanElement(edit, true);
+        }
+    };
+
+    var filterProperties = function(a, b) {
+        var res = {};
+        for (var key in a) {
+            if (a.hasOwnProperty(key) && b.hasOwnProperty(key)) {
+                if (key === 'specialization')
+                    res.specialization = filterProperties(a.specialization, b.specialization);
+                else
+                    res[key] = b[key];
+            }
+        }
+        return res;
+    };
+
+    var hasConflict = function(edit, orig, server) {
+        for (var i in edit) {
+            if (i === 'read' || i === 'modified' || i === 'modifier' || 
+                    i === 'creator' || i === 'created')
+                continue;
+            if (edit.hasOwnProperty(i) && orig.hasOwnProperty(i) && server.hasOwnProperty(i)) {
+                if (i === 'specialization') {
+                    if (hasConflict(edit[i], orig[i], server[i]))
+                        return true;
+                } else {
+                    if (!angular.equals(orig[i], server[i]))
+                        return true;
+                }
+            }
+        }
+        return false;
+    };
+
+    function isRestrictedValue(values) {
+        if (values.length > 0 && values[0].type === 'Expression' &&
+            values[0].operand.length === 3 && values[0].operand[0].string === 'RestrictedValue' &&
+            values[0].operand[2].type === 'Expression' && values[0].operand[2].operand.length > 0 &&
+            values[0].operand[1].type === 'ElementValue')
+                    return true;
+        return false;
+    }
+
+    var makeHtmlTable = function(table) {
+        var result = '<table class="table table-bordered table-condensed">';
+        if (table.title)
+            result += '<caption>' + table.title + '</caption>';
+        if (table.header) {
+            result += '<thead>';
+            result += makeTableBody(table.header);
+            result += '</thead>';
+        }
+        result += '<tbody>';
+        result += makeTableBody(table.body);
+        result += '</tbody>';
+        result += '</table>';
+        return result;
+
+    };
+
+    var makeTableBody = function(body) {
+        var result = '';
+        body.forEach(function(row) {
+            result += '<tr>';
+            row.forEach(function(cell) {
+                result += '<td colspan="' + cell.colspan + '" rowspan="' + cell.rowspan + '">';
+                cell.content.forEach(function(thing) {
+                    result += '<div>';
+                    if (thing.type === 'Paragraph') {
+                        result += makeHtmlPara(thing);
+                    } else if (thing.type === 'Table') {
+                        result += makeHtmlTable(thing);
+                    } else if (thing.type === 'List') {
+                        result += makeHtmlList(thing);
+                    } else if (thing.type === 'Image') {
+                        result += '<mms-transclude-img mms-eid="' + thing.sysmlid + '"></mms-transclude-img>';
+                    }
+                    result += '</div>';
+                });
+                result += '</td>';
+            });
+            result += '</tr>';
+        });
+        return result;
+    };
+
+    var makeHtmlList = function(list) {
+        var result = '';
+        if (list.ordered)
+            result += '<ol>';
+        else
+            result += '<ul>';
+        list.list.forEach(function(item) {
+            result += '<li>';
+            item.forEach(function(thing) {
+                result += '<div>';
+                if (thing.type === 'Paragraph') {
+                    result += makeHtmlPara(thing);
+                } else if (thing.type === 'Table') {
+                    result += makeHtmlTable(thing);
+                } else if (thing.type === 'List') {
+                    result += makeHtmlList(thing);
+                } else if (thing.type === 'Image') {
+                    result += '<mms-transclude-img mms-eid="' + thing.sysmlid + '"></mms-transclude-img>';
+                }
+                result += '</div>';
+            });
+            result += '</li>';
+        });
+        if (list.ordered)
+            result += '</ol>';
+        else
+            result += '</ul>';
+        return result;
+    };
+
+    var makeHtmlPara = function(para) {
+        if (para.sourceType === 'text')
+            return para.text;
+        var t = 'doc';
+        if (para.sourceProperty === 'name')
+            t = 'name';
+        if (para.sourceProperty === 'value')
+            t = 'val';
+        return '<mms-transclude-' + t + ' data-mms-eid="' + para.source + '"></mms-transclude-' + t + '>';
+    };
+
     return {
         hasCircularReference: hasCircularReference,
         cleanElement: cleanElement,
         normalize: normalize,
         makeElementKey: makeElementKey,
-        buildTreeHierarchy: buildTreeHierarchy
+        buildTreeHierarchy: buildTreeHierarchy,
+        filterProperties: filterProperties,
+        mergeElement: mergeElement,
+        hasConflict: hasConflict,
+        isRestrictedValue: isRestrictedValue,
+        makeHtmlTable : makeHtmlTable,
+        makeHtmlPara: makeHtmlPara,
+        makeHtmlList: makeHtmlList
     };
 }

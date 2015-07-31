@@ -84,7 +84,12 @@ function mmsToolbar($templateCache) {
                 button.priority = $scope.buttons.length;
                 $scope.buttons.push(button);
                 if (button.dynamic_buttons) {
+                    var firstButton = true;
                     button.dynamic_buttons.forEach(function(button) {
+                        if (firstButton) {
+                            button.pullDown = true;
+                            firstButton = false;
+                        }
                         button.priority = $scope.buttons.length + 1000;
                         $scope.buttons.push(button);
                     });

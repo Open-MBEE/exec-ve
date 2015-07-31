@@ -1,0 +1,12 @@
+<div ng-if="presentationElemLoading" class="fa fa-spinner fa-spin"></div>
+<div id="{{instanceSpec.sysmlid}}" ng-if="!presentationElemLoading" ng-switch on="presentationElem.type"> 
+    <mms-view-para data-mms-para="presentationElem" ng-switch-when="Paragraph"></mms-view-para>
+    <mms-view-table data-mms-table="presentationElem" ng-switch-when="Table"></mms-view-table>
+    <mms-view-table-t data-mms-para="presentationElem" ng-switch-when="TableT"></mms-view-table-t>
+    <mms-view-list data-mms-list="presentationElem" ng-switch-when="List"></mms-view-list>
+    <mms-view-list-t data-mms-para="presentationElem" ng-switch-when="ListT"></mms-view-list-t>
+    <mms-view-img data-mms-image="presentationElem" ng-switch-when="Image"></mms-view-img>
+    <mms-view-section data-mms-section="presentationElem" ng-switch-when="Section"></mms-view-section>
+    <mms-view-equation data-mms-para="presentationElem" ng-switch-when="Equation"></mms-view-equation>
+    <mms-view-figure data-mms-para="presentationElem" ng-switch-when="Figure"></mms-view-figure>
+</div>

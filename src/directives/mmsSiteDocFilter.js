@@ -30,7 +30,7 @@ function mmsSiteDocFilter(ElementService, ViewService, growl, $templateCache, $q
         scope.siteDocs = [];
         scope.siteDocsFiltered = [];
         scope.editing = false;
-        
+        scope.saving = false;
         scope.ws = scope.mmsWs;
         scope.version = scope.mmsVersion;
         
@@ -90,6 +90,11 @@ function mmsSiteDocFilter(ElementService, ViewService, growl, $templateCache, $q
         };
 
         var save = function() {
+            if (scope.saving) {
+                growl.info("Saving, please wait");
+                return;
+            }
+            scope.saving = true;
             var deferred = $q.defer();
             if (!editable || !scope.editing) {
                 deferred.resolve("ok");
@@ -100,10 +105,13 @@ function mmsSiteDocFilter(ElementService, ViewService, growl, $templateCache, $q
                 documentation: JSON.stringify(scope.filtered)
             }, scope.mmsWs).then(function(data) {
                 //updateSiteDocsFiltered();
+                growl.success("Filter Saved");
+                scope.saving = false;
                 deferred.resolve(data);
-                scope.editing = false;
+                //scope.editing = false;
             }, function(reason) {
                 deferred.reject({type: 'error', message: reason.message});
+                scope.saving = false;
             });
             return deferred.promise;
         };

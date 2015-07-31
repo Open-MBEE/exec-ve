@@ -285,6 +285,29 @@ module.exports = function(grunt) {
           }
         ]
       },
+      europaems: {
+        options: {
+          hostname: '*',
+          port: 9000,
+          middleware: function(connect) {
+            return [proxySnippet];
+          }
+        },
+        proxies: [
+          {
+            context: '/alfresco',  // '/api'
+            host: 'europaems.jpl.nasa.gov',//128.149.16.152',
+            port: 443,
+            changeOrigin: true,
+            https: true,
+          },
+          {
+            context: '/',
+            host: 'localhost',
+            port: 9001
+          }
+        ]
+      },
       europaemsint: {
         options: {
           hostname: '*',
@@ -297,6 +320,29 @@ module.exports = function(grunt) {
           {
             context: '/alfresco',  // '/api'
             host: 'europaems-int.jpl.nasa.gov',//128.149.16.152',
+            port: 443,
+            changeOrigin: true,
+            https: true,
+          },
+          {
+            context: '/',
+            host: 'localhost',
+            port: 9001
+          }
+        ]
+      },
+      rnems: {
+        options: {
+          hostname: '*',
+          port: 9000,
+          middleware: function(connect) {
+            return [proxySnippet];
+          }
+        },
+        proxies: [
+          {
+            context: '/alfresco',  // '/api'
+            host: 'rn-ems.jpl.nasa.gov',//128.149.16.152',
             port: 443,
             changeOrigin: true,
             https: true,
@@ -348,7 +394,7 @@ module.exports = function(grunt) {
       },
     },
 
-    clean: ["build", "dist", "docs"],
+    clean: ["app/bower_components", "build", "dist", "docs"],
 
     copy: {
       main: {
@@ -376,7 +422,7 @@ module.exports = function(grunt) {
         options: {
           publish: [{
             id: 'gov.nasa.jpl:evm:zip',
-            version: '0.2.1-SNAPSHOT',
+            version: '0.2.2-SNAPSHOT',
             path: 'deploy/'
           }]
         }

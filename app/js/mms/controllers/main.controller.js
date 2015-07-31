@@ -3,19 +3,17 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('MainCtrl', ['$scope', '$location', '$rootScope', '$state', '_', '$window', 'growl',
-function($scope, $location, $rootScope, $state, _, $window, growl) {
+.controller('MainCtrl', ['$scope', '$location', '$rootScope', '$state', '_', '$window', 'growl', '$http', 'URLService', 'hotkeys', 'growlMessages',
+function($scope, $location, $rootScope, $state, _, $window, growl, $http, URLService, hotkeys, growlMessages) {
     $rootScope.mms_viewContentLoading = false;
     $rootScope.mms_treeInitial = '';
     $rootScope.mms_title = '';
-    $rootScope.mms_footer = 'The technical data in this document is controlled under the U.S. Export Regulations, release to foreign persons may require an export authorization.';
+    $rootScope.mms_footer = 'JPL/Caltech PROPRIETARY — Not for Public Release or Redistribution. No export controlled documents allowed on this server.';
 
     var host = $location.host();
-    if ($location.host().indexOf('rn-ems') !== -1) {
-        // special footer for rn-ems
-        $rootScope.mms_footer = 'JPL/Caltech PROPRIETARY — Not for Public Release or Redistribution. No export controlled documents allowed on this server.';
+    if ($location.host().indexOf('europaems') !== -1) {
+        $rootScope.mms_footer = 'The technical data in this document is controlled under the U.S. Export Regulations, release to foreign persons may require an export authorization.';
     }
-
     $window.addEventListener('beforeunload', function(event) {
         if ($rootScope.veEdits && !_.isEmpty($rootScope.veEdits)) {
             var message = 'You may have unsaved changes, are you sure you want to leave?';
@@ -23,14 +21,27 @@ function($scope, $location, $rootScope, $state, _, $window, growl) {
             return message;
         }
     });
+
+    hotkeys.bindTo($scope)
+        .add({
+            combo: 'alt+m',
+            description: 'close all messages',
+            callback: function() {growlMessages.destroyAllMessages();}
+        });
+
     $scope.$on('$stateChangeError', function(event, toState, toParams, fromState, fromParams, error) {
         growl.error('Error: ' + error.message);
     });
 
-    $rootScope.$on('$viewContentLoading', 
+    /*$rootScope.$on('$viewContentLoading', 
     function(event, viewConfig){ 
         if (viewConfig.view.controller === 'ViewCtrl')
             $rootScope.mms_viewContentLoading = true;
+    });*/
+
+    $rootScope.$on('$stateChangeStart', 
+    function(event, viewConfig){ 
+        $rootScope.mms_viewContentLoading = true;
     });
 
     $rootScope.$on('$stateChangeSuccess', 
@@ -52,6 +63,7 @@ function($scope, $location, $rootScope, $state, _, $window, growl) {
                 else
                     $rootScope.mms_treeInitial = toParams.document;
             }
+            $rootScope.mms_viewContentLoading = false;
         }
     );
 }]);
