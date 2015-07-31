@@ -11,10 +11,11 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
     $rootScope.mms_bbApi = $scope.bbApi = {};
     $rootScope.mms_treeApi = $scope.treeApi = {};
     $scope.buttons = [];
-
+    $scope.treeExpandLevel = 1;
     $scope.treeSectionNumbering = false;
     if ($state.includes('workspace.site.document')) {
         $scope.treeSectionNumbering = true;
+        $scope.treeExpandLevel = 3;
     }
     $rootScope.mms_fullDocMode = false;
     if ($state.includes('workspace.site.document.full'))

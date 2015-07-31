@@ -44,11 +44,12 @@
             <div class="cant-find-element">
                 Can't find your element? <a ng-click="openProposeModal()" class="create-element-link">Create a new one</a>
             </div>
+			<div>Showing {{filteredElms.length}} of {{mmsCfElements.length}} search results.</div>
         </div>
     </div>
 
     <div class="container-fluid" ng-show="mmsCfElements && searchSuccess">
-        <div class="elem-wrapper" ng-repeat="elem in mmsCfElements | filter:searchFilter">
+        <div class="elem-wrapper" ng-repeat="elem in filteredElms = (mmsCfElements | filter: searchFilter)">
             <hr>
             <div class="elem-name-wrapper">
                 <a class="elem-name" ng-click="choose(elem.sysmlid, 'name', elem.name)">{{elem.name}}</a>
@@ -77,7 +78,7 @@
                 <div class="elem-properties">
                     <a ng-click="choose(elem.sysmlid, 'val', elem.name)">
                         <span ng-repeat="val in elem.specialization.value">
-                            {{val.string || val.boolean + '' || val.naturalValue || val.integer || val.double || val.element || val.instance || val.expressionBody[0]}}<span class="ellipses">{{(val.expressionBody[0] && val.expressionBody.length > 1) ? ' ...' : '' }}</span>{{$last ? '' : ', '}}
+                            {{val.string || val.boolean + '' || val.naturalValue || val.integer || val.double || val.expressionBody[0] || 'Default Value'}}<span class="ellipses">{{(val.expressionBody[0] && val.expressionBody.length > 1) ? ' ...' : '' }}</span>{{$last ? '' : ', '}}
                         </span>
                     </a>
                 </div>
@@ -88,8 +89,7 @@
                     <a ng-click="choose(elem.sysmlid, 'val', elem.name)">
                         {{elem.specialization.specification.string || elem.specialization.specification.boolean ||
                           elem.specialization.specification.naturalValue || elem.specialization.specification.integer ||
-                          elem.specialization.specification.double || elem.specialization.specification.element ||
-                          elem.specialization.specification.instance}}
+                          elem.specialization.specification.double || 'Constraint Specification'}}
                     </a>
                 </div>
                 <a ng-click="choose(elem.sysmlid, 'val', elem.name)">
@@ -105,7 +105,7 @@
                         <tr ng-repeat="row in elem.properties">
                             <td ng-repeat="property in row">
                                 {{property.name}}<span ng-show="property.specialization.isSlot"><mms-transclude-name mms-eid="{{property.specialization.propertyType}}"></mms-transclude-name></span>: 
-                                <a ng-click="choose(property.sysmlid, 'val', property.name)"><span ng-repeat="val in property.specialization.value">{{val.string || val.boolean + '' || val.naturalValue || val.integer || val.double || val.element || val.instance || val.expressionBody[0]}}<span class="ellipses">{{(val.expressionBody[0] && val.expressionBody.length > 1) ? ' ...' : '' }}</span>{{$last ? '' : ', '}}</span></a>
+                                <a ng-click="choose(property.sysmlid, 'val', property.name)"><span ng-repeat="val in property.specialization.value">{{val.string || val.boolean + '' || val.naturalValue || val.integer || val.double || val.expressionBody[0] || 'Default Value'}}<span class="ellipses">{{(val.expressionBody[0] && val.expressionBody.length > 1) ? ' ...' : '' }}</span>{{$last ? '' : ', '}}</span></a>
                             </td>
                         </tr>
                     </tbody>
@@ -113,7 +113,7 @@
             </div>
         </div>
     </div>
-
+    
     <div class="container-no-results container-fluid" ng-show="mmsCfElements.length === 0 && searchSuccess">
         <h3>NO RESULTS FOUND.</h3>
     </div>

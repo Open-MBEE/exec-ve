@@ -57,7 +57,7 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                 $scope.autocompleteItems.push({ 'sysmlid' : cacheElement.sysmlid, 'name' : cacheElement.name + ' - name' });
                 $scope.autocompleteItems.push({ 'sysmlid' : cacheElement.sysmlid, 'name' : cacheElement.name + ' - documentation' });
 
-                if (cacheElement.specialization.type === 'Property') {
+                if (cacheElement.specialization && cacheElement.specialization.type === 'Property') {
                     $scope.autocompleteItems.push({ 'sysmlid' : cacheElement.sysmlid, 'name' : cacheElement.name + ' - value' });
                 }
             });
@@ -214,7 +214,7 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
 
             $timeout(function() {
                 angular.element('.autocomplete-modal-typeahead').focus();
-            });
+            }, 0, false);
 
             instance.result.then(function(tag) {
                 if (!tag) {

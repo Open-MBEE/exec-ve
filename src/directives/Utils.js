@@ -226,7 +226,7 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
 
     var addFrame = function(scope, mmsViewCtrl, element, template, editObj, doNotScroll) {
 
-        if (mmsViewCtrl.isEditable() && !scope.isEditing) { // && !scope.cleanUp) {
+        if (mmsViewCtrl.isEditable() && !scope.isEditing && scope.element.editable && scope.version === 'latest') { // && !scope.cleanUp) {
 
             var id = editObj ? editObj.sysmlid : scope.mmsEid;
             ElementService.getElementForEdit(id, false, scope.ws)
