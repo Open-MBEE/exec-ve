@@ -13,8 +13,11 @@
     <!-- From and to chooser -->
     <div ng-if="pane == 'fromToChooser'" class="modal-body text-center">
         <h3 class="text-capitalize">Compare Items</h3>
-        <div>Suggested source: <a href="" ng-click="mergeInfo.source = mergeInfo.branch.data.id">{{mergeInfo.branch.label}}</a></div>
-	    <div>Suggested destination: <a href="" ng-click="mergeInfo.dest = mergeInfo.parentBranch.data.id">{{mergeInfo.parentBranch.label}}</a></div>
+        <h2>Compare From</h2>
+        <input typeahead="rowItem.label for rowItem in mergeInfo.tree_rows | filter:{label:$viewValue} | limitTo:10" typeahead-on-select='mergeInfo.source = $item.branch.data.id' ng-model="origin" class="form-control" placeholder="Type a workspace name"/>
+        <br>
+        <h2>Compare To</h2>
+        <input typeahead="rowItem.label for rowItem in mergeInfo.tree_rows | filter:{label:$viewValue} | limitTo:10" typeahead-on-select='mergeInfo.dest = $item.branch.data.id' ng-model="destination" class="form-control" placeholder="Type a workspace name"/>
     </div>
     <div ng-if="pane == 'fromToChooser'" class="modal-footer">
         <button class="btn" ng-disabled="!mergeInfo.source || !mergeInfo.dest" ng-click="mergeAssistConfirmation(mergeInfo.source, mergeInfo.dest)">Next</button>

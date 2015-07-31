@@ -27,7 +27,7 @@ function(_, $timeout, $scope, $rootScope, $modal, growl, ElementService, UxServi
 	    // Call up "from/to" modal
 	    $scope.pane = 'fromToChooser';
     };
-    
+
     $scope.mergeAssistConfirmation = function(source, dest)
     {
 	    $scope.pane = 'beginMerge';
