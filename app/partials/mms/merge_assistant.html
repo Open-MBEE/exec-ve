@@ -13,14 +13,12 @@
     <!-- From and to chooser -->
     <div ng-if="pane == 'fromToChooser'" class="modal-body text-center">
         <h3 class="text-capitalize">Compare Items</h3>
-        <h2>Compare From</h2>
-        <input typeahead="rowItem.label for rowItem in mergeInfo.tree_rows | filter:{label:$viewValue} | limitTo:10" typeahead-on-select='mergeInfo.source = $item.branch.data.id' ng-model="origin" class="form-control" placeholder="Type a workspace name"/>
+        <input typeahead="rowItem.label for rowItem in mergeInfo.tree_rows | filter:{label:$viewValue} | limitTo:10" typeahead-on-select='mergeInfo.source = $item' ng-model="origin" class="form-control" placeholder="From" f />
         <br>
-        <h2>Compare To</h2>
-        <input typeahead="rowItem.label for rowItem in mergeInfo.tree_rows | filter:{label:$viewValue} | limitTo:10" typeahead-on-select='mergeInfo.dest = $item.branch.data.id' ng-model="destination" class="form-control" placeholder="Type a workspace name"/>
+        <input typeahead="rowItem.label for rowItem in mergeInfo.tree_rows | filter:{label:$viewValue} | limitTo:10" typeahead-on-select='mergeInfo.dest = $item' ng-model="destination" class="form-control" placeholder="To"/>
     </div>
     <div ng-if="pane == 'fromToChooser'" class="modal-footer">
-        <button class="btn" ng-disabled="!mergeInfo.source || !mergeInfo.dest" ng-click="mergeAssistConfirmation(mergeInfo.source, mergeInfo.dest)">Next</button>
+        <button class="btn btn-primary" ng-disabled="!mergeInfo.source || !mergeInfo.dest" ng-click="mergeAssistConfirmation(mergeInfo.source, mergeInfo.dest)">Next</button>
     </div>
     
     <!-- New merge request -->
@@ -34,8 +32,8 @@
         </div>
     </div>
     <div ng-if="pane == 'beginMerge'" class="modal-footer">
-	    <button class="btn" ng-click="startDiff()">Sounds Good, Start!</button>
-        <button class="btn" ng-click="">Cancel</button>
+	    <button class="btn btn-primary" ng-click="startDiff()">Sounds Good, Start!</button>
+        <button class="btn btn-danger" ng-click="finished()">Cancel</button>
     </div>
     
     <!-- Merge in progress -->
@@ -57,7 +55,7 @@
         </div>
     </div>
     <div ng-if="pane == 'generating'" class="modal-footer">
-        <button class="btn" ng-click="finished()">Done</button>
+        <button class="btn btn-primary" ng-click="finished()">Done</button>
     </div>
     
 </div>

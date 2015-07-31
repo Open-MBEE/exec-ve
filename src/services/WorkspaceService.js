@@ -134,6 +134,7 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService, _
             return inProgress[key];
         var deferred = $q.defer();
         inProgress[key] = deferred.promise;
+        
         $http.get(URLService.getWsDiffURL(ws1, ws2, w1time, w2time, recalc))
         .success(function(data, status, headers, config) {
             deferred.resolve(data);
@@ -142,6 +143,7 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService, _
             URLService.handleHttpStatus(data, status, headers, config, deferred);
             delete inProgress[key];
         });
+        
         return deferred.promise;
     };
 

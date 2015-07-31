@@ -206,24 +206,10 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
     // END @DEPRECATED
     
     $scope.mergeAssist = function() {
-	    var branch = $scope.mms_treeApi.get_selected_branch();
-        if (!branch) {
-            growl.warning("Compare Error: Select task or tag to compare from");
-            return;
-        }
-        var parent_branch = $scope.mms_treeApi.get_parent_branch(branch);
-        while (parent_branch.type != 'workspace') {
-            parent_branch = $scope.mms_treeApi.get_parent_branch(parent_branch);
-        }
-        
-        $rootScope.mergeInfo = {
-	      branch: branch,
-	      parentBranch: parent_branch,
+	    $rootScope.mergeInfo = {
 	      pane: 'fromToChooser',
 	      tree_rows: $rootScope.mms_treeApi.get_rows()
         };
-        
-        console.log($rootScope.mms_treeApi.get_rows());
                 
         var modalInstance = $modal.open({
 	        templateUrl: 'partials/mms/merge_assistant.html',
