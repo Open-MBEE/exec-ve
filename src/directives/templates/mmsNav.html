@@ -21,6 +21,10 @@
         </li>
 
         <li ng-show="ws"> <i class="fa fa-ellipsis-v"></i> {{wsName}} <span ng-if="config.timestamp != 'latest' && showTag != 'false'">( <i class="fa fa-tag"></i> {{config.name}} )</span> <i class="fa fa-angle-double-right"></i><li>
+
+        <!-- <li ng-if="$scope.diff=='yes'">  -->
+          <!-- <button type="button" ng-click="goBack()" class="btn btn-danger">CANCEL</button>Comparing {{config.name}} with  {{wsName}}</li> -->
+
         <li ng-show="site && site.sysmlid !== 'no-site'">
           <a class="nav-btn" tooltip="Sites and Documents" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" ui-sref="workspace.site(site.sysmlid)"><i class="fa fa-folder"></i></a>
         </li>
@@ -30,6 +34,11 @@
         </li>
         <li ng-show="product">{{product.name}} <span ng-bind-html="snapshot"></span></li>
  
+
+
+        <!-- <li ng-show="diff == 'yes'">hola youuuus</li> -->
+
+
       </ul>
 
       <!-- Goto dropdown
