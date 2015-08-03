@@ -111,7 +111,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
     });
 
     $scope.$on('tree.merge', function() {
-        $scope.toggleMerge();
+        $scope.mergeAssist();
     });
 
     $scope.$on('tree.reorder.view', function() {
@@ -185,7 +185,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
         $scope.mms_treeApi.clear_selected_branch();
     };
 
-    // TODO: Move toggle to button bar api
+    // BEGIN @DEPRECATED
     $scope.mergeOn = false;
     $scope.toggleMerge = function() {
         var branch = $scope.mms_treeApi.get_selected_branch();
@@ -201,6 +201,20 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
         $scope.mergeOn = !$scope.mergeOn;
         $scope.mergeFrom = branch;
         $scope.mergeTo = parent_branch;
+    };
+    
+    // END @DEPRECATED
+    
+    $scope.mergeAssist = function() {
+	    $rootScope.mergeInfo = {
+	      pane: 'fromToChooser',
+	      tree_rows: $rootScope.mms_treeApi.get_rows()
+        };
+                
+        var modalInstance = $modal.open({
+	        templateUrl: 'partials/mms/merge_assistant.html',
+	        controller: 'WorkspaceMergeAssistant'
+        });
     };
 
     $scope.pickNew = function(source, branch) {
