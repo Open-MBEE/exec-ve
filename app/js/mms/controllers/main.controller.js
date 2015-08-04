@@ -3,8 +3,8 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('MainCtrl', ['$scope', '$location', '$rootScope', '$state', '_', '$window', 'growl', '$http', 'URLService',
-function($scope, $location, $rootScope, $state, _, $window, growl, $http, URLService) {
+.controller('MainCtrl', ['$scope', '$location', '$rootScope', '$state', '_', '$window', 'growl', '$http', 'URLService', 'hotkeys', 'growlMessages',
+function($scope, $location, $rootScope, $state, _, $window, growl, $http, URLService, hotkeys, growlMessages) {
     $rootScope.mms_viewContentLoading = false;
     $rootScope.mms_treeInitial = '';
     $rootScope.mms_title = '';
@@ -22,18 +22,12 @@ function($scope, $location, $rootScope, $state, _, $window, growl, $http, URLSer
         }
     });
 
-    // Per CMED-737, always check the login first, so we can authenticate into the server 
-    // before making any more calls.
-    /*$http.get(URLService.getCheckLoginURL())
-    .success(function(data, status, headers, config) {
-        // Do nothing
-    }).error(function(data, status, headers, config) {
-        // On error, re-load the page:
-        // Note: this may not be needed b/c the browser will keep prompting for credentials till
-        //       they are correct
-        $state.reload();
-    });*/
-
+    hotkeys.bindTo($scope)
+        .add({
+            combo: 'alt+m',
+            description: 'close all messages',
+            callback: function() {growlMessages.destroyAllMessages();}
+        });
 
     $scope.$on('$stateChangeError', function(event, toState, toParams, fromState, fromParams, error) {
         growl.error('Error: ' + error.message);

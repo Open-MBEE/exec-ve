@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsTranscludeVal', ['ElementService', 'UtilsService', 'UxService', 'Utils', '$log', '$compile', '$templateCache', 'growl', mmsTranscludeVal]);
+.directive('mmsTranscludeVal', ['ElementService', 'UtilsService', 'UxService', 'Utils', 'URLService', '$http', '_', '$log', '$compile', '$templateCache', 'growl', mmsTranscludeVal]);
 
 /**
  * @ngdoc directive
@@ -23,7 +23,7 @@ angular.module('mms.directives')
  * @param {string=master} mmsWs Workspace to use, defaults to master
  * @param {string=latest} mmsVersion Version can be alfresco version number or timestamp, default is latest
  */
-function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, $log, $compile, $templateCache, growl) {
+function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLService, $http, _, $log, $compile, $templateCache, growl) {
     var valTemplate = $templateCache.get('mms/templates/mmsTranscludeVal.html');
     var frameTemplate = $templateCache.get('mms/templates/mmsTranscludeValFrame.html');
     var editTemplate = $templateCache.get('mms/templates/mmsTranscludeValEdit.html');
@@ -71,6 +71,8 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, $log, 
             scope.isEditing = false;
             var toCompileList = [];
             var areStrings = false;
+            var isExpression = false;
+
             for (var i = 0; i < scope.values.length; i++) {
                 if (scope.values[i].type === 'LiteralString') {
                     areStrings = true;
@@ -79,6 +81,9 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, $log, 
                         s = s.replace('<', '&lt;');
                     }
                     toCompileList.push(s);
+                } else if (scope.values[i].type === 'Expression') {
+                    isExpression = true;
+                    break;
                 } else {
                     break;
                 }
@@ -100,6 +105,14 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, $log, 
                 .then(function(e) {
                     scope.isRestrictedVal = true;
                     element.html(e.name);
+                });
+            } else if (isExpression) {
+                $http.get(URLService.getElementURL(scope.mmsEid, scope.ws, scope.version) + '?evaluate')
+                .success(function(data,status,headers,config) {
+                    element.html(data.elements[0].evaluationResult);
+                }).error(function(data,status,headers,config){
+                    //URLService.handleHttpStatus(data, status, headers, config, deferred);
+                    //TODO: Needs case statement when .error is thrown
                 });
             } else {
                 element.append(valTemplate);
@@ -176,6 +189,9 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, $log, 
                 scope.values = scope.element.specialization.value;
                 if (scope.element.specialization.type === 'Constraint' && scope.element.specialization.specification)
                     scope.values = [scope.element.specialization.specification];
+                if (scope.element.specialization.type==='Expression') {
+                    scope.values = [scope.element.specialization];
+                }
                 recompile();
                 //scope.$watch('values', recompile, true);
                 if (scope.version === 'latest') {
