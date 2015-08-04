@@ -210,6 +210,14 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
 	      pane: 'fromToChooser',
 	      tree_rows: $rootScope.mms_treeApi.get_rows()
         };
+
+        for (var rowItem in $rootScope.mergeInfo.tree_rows){
+            if($rootScope.mms_treeApi.get_parent_branch($rootScope.mergeInfo.tree_rows[rowItem].branch) !== null){
+                $rootScope.mergeInfo.tree_rows[rowItem].parentInfo = $rootScope.mms_treeApi.get_parent_branch($rootScope.mergeInfo.tree_rows[rowItem].branch);
+            } else {
+                $rootScope.mergeInfo.tree_rows[rowItem].parentInfo = null;
+            }
+        }
                 
         var modalInstance = $modal.open({
 	        templateUrl: 'partials/mms/merge_assistant.html',

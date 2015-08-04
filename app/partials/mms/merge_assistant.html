@@ -1,7 +1,7 @@
 <script type="text/ng-template" id="autocompleteResultsTemplate.html">
     <a>
         <i class="{{match.model.type_icon}}"></i>
-        <span ng-bind-html-unsafe="match | typeaheadHighlight:query">{{match.label}}</span>
+        <span ng-bind-html-unsafe="match | typeaheadHighlight:query">{{match.label}} <span ng-if="match.model.parentInfo != null"> > </span> {{match.model.parentInfo.label}}</span>
     </a>
 </script>
 
