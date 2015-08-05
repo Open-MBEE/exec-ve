@@ -222,8 +222,11 @@ function UxService($rootScope, $state) {
 	};
 
 	var getTypeIcon = function(type) {
-		type = type.toLowerCase();
-		switch (type) {
+    var t = type;
+    if (!t)
+      t = "unknown";
+		t = t.toLowerCase();
+		switch (t) {
 		  case "configuration":
 		  	return "fa-tag";
 		  case "connector":
