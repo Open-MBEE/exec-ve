@@ -621,12 +621,12 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 	{
 		closed: true,
 		noToggle: true,
-		handle: 0
+		//handle: 0
 	});
 	paneManager.get("left-pane").setOptions(
 	{
 		noToggle: true,
-		handle: 0,
+		//handle: 0,
 		size: "40%"
 	});
 
