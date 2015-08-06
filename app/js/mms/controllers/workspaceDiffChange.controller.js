@@ -174,8 +174,8 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 			nodeId = change.original.sysmlid;
 		
 		treeNode = $scope.id2node[nodeId];
-		
-		angular.forEach($scope.id2node, function(node)
+		$rootScope.treeApi.select_branch(treeNode);
+		/*angular.forEach($scope.id2node, function(node)
 		{
 			node.selected = null;
 		});
@@ -185,9 +185,9 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 		
 		var branch = window.document.getElementById("tree-branch-" + nodeId);
 		branch.scrollIntoView();
-	
+		
 		$rootScope.treeApi.refresh();
-		$rootScope.treeApi.expand_all();
+		$rootScope.treeApi.expand_all();*/
 	};
 
 	$scope.goBack = function()
