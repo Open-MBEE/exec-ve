@@ -164,13 +164,16 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 
 	var highlightTreeRow = function(change)
 	{
-		var treeNode = null;
+		var treeNode;
+		var nodeId;
 		var index;
 		
 		if (change.type === "added")
-			treeNode = $scope.id2node[change.delta.sysmlid];
+			nodeId = change.delta.sysmlid;
 		else
-			treeNode = $scope.id2node[change.original.sysmlid];
+			nodeId = change.original.sysmlid;
+		
+		treeNode = $scope.id2node[nodeId];
 		
 		angular.forEach($scope.id2node, function(node)
 		{
@@ -179,6 +182,9 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 		
 		change.selected = true;
 		treeNode.selected = true;
+		
+		var branch = window.document.getElementById("tree-branch-" + nodeId);
+		branch.scrollIntoView();
 	
 		$rootScope.treeApi.refresh();
 		$rootScope.treeApi.expand_all();
@@ -307,6 +313,7 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 	$scope.selectChange = function(change)
 	{
 		var elementId;
+		
 		if (change.type === "added") elementId = change.delta.sysmlid;
 		else elementId = change.original.sysmlid;
 		

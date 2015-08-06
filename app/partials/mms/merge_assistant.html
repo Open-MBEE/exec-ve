@@ -1,7 +1,6 @@
 <script type="text/ng-template" id="autocompleteResultsTemplate.html">
     <a>
-        <i class="{{match.model.type_icon}}"></i>
-        <span ng-bind-html-unsafe="match | typeaheadHighlight:query">{{match.label}}</span>
+        <span ng-bind-html-unsafe="match | typeaheadHighlight:query"> {{match.model.parentInfo.label}}<span ng-if="match.model.parentInfo != null"> > </span><strong>{{match.label}}</strong></span>
     </a>
 </script>
 
@@ -18,19 +17,21 @@
     </div>
     
     <!-- From and to chooser -->
-    <div ng-if="pane == 'fromToChooser'" class="modal-body text-center">
-        <h3 class="text-capitalize">Compare Items</h3>
-        <input typeahead="rowItem.label for rowItem in mergeInfo.tree_rows | filter:{label:$viewValue} | limitTo:10" typeahead-on-select='mergeInfo.source = $item' ng-model="origin" typeahead-template-url="autocompleteResultsTemplate.html" class="form-control" placeholder="From"/>
+    <div ng-if="pane == 'fromToChooser'" class="modal-body">
+        <h4>COMPARE TASKS</h4>
+        <label>From</label>
+        <input typeahead="rowItem.label for rowItem in mergeInfo.tree_rows | filter:{label:$viewValue} | limitTo:10" typeahead-on-select='mergeInfo.source = $item' ng-model="origin" typeahead-template-url="autocompleteResultsTemplate.html" class="form-control" placeholder="Type a task name"/>
         <br>
-        <input typeahead="rowItem.label for rowItem in mergeInfo.tree_rows | filter:{label:$viewValue} | limitTo:10" typeahead-on-select='mergeInfo.dest = $item' ng-model="destination" typeahead-template-url="autocompleteResultsTemplate.html" class="form-control" placeholder="To"/>
+        <Label>To</Label>
+        <input typeahead="rowItem.label for rowItem in mergeInfo.tree_rows | filter:{label:$viewValue} | limitTo:10" typeahead-on-select='mergeInfo.dest = $item' ng-model="destination" typeahead-template-url="autocompleteResultsTemplate.html" class="form-control" placeholder="Type a task name"/>
     </div>
     <div ng-if="pane == 'fromToChooser'" class="modal-footer">
         <button class="btn btn-primary" ng-disabled="!mergeInfo.source || !mergeInfo.dest" ng-click="mergeAssistConfirmation(mergeInfo.source, mergeInfo.dest)">Next</button>
     </div>
     
     <!-- New merge request -->
-    <div ng-if="pane == 'beginMerge'" class="modal-body text-center">
-        <h3>Begin Merge</h3>
+    <div ng-if="pane == 'beginMerge'" class="modal-body">
+        <h4>BEGIN MERGE</h4>
         <div ng-if="mergeInfo.type == 'quick'">
 	        Big model you've got there! Because this may take a while, we'll email you a direct link to the differences to resolve as soon as we've prepared them for you.
         </div>

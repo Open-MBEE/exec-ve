@@ -7,6 +7,7 @@ angular.module('mmsApp')
 function(_, $timeout, $scope, $rootScope, $modal, growl, ElementService, UxService, $modalInstance, $state, WorkspaceService) {
     
     $scope.pane = $rootScope.mergeInfo.pane;
+    $scope.treeApi = $rootScope.mms_treeApi;
     
     // Setting default to custom merge. Will be set by user once "quick" merge is available
     $scope.mergeInfo.type = 'custom';
