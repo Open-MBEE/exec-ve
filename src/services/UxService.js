@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms')
-.factory('UxService', ['$rootScope', '$state', UxService]);
+.factory('UxService', ['$rootScope', UxService]);
 
 /**
  * @ngdoc service
@@ -10,7 +10,7 @@ angular.module('mms')
  * @description
  * Ux Service
  */
-function UxService($rootScope, $state) {
+function UxService($rootScope) {
 
     /**
      * @ngdoc method
