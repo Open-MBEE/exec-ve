@@ -3,8 +3,8 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('WorkspaceDiffElementViewController', ["_", "$timeout", "$scope", "$rootScope", "$state", "$stateParams", "$modal", "growl", "WorkspaceService", "ElementService", "diff", "UxService",
-function(_, $timeout, $scope, $rootScope, $state, $stateParams, $modal, growl, WorkspaceService, ElementService, diff, UxService) {
+.controller('WorkspaceDiffElementViewController', ["_", "$timeout", "$scope", "$rootScope", "$state", "$stateParams", "$modal", "growl", "WorkspaceService", "ElementService", "diff", "UxService", 'sourceName', 'targetName',
+function(_, $timeout, $scope, $rootScope, $state, $stateParams, $modal, growl, WorkspaceService, ElementService, diff, UxService, sourceName, targetName) {
     $rootScope.tbApi.select('diff.perspective.detail');
     
     $scope.source = $stateParams.source;
@@ -12,6 +12,9 @@ function(_, $timeout, $scope, $rootScope, $state, $stateParams, $modal, growl, W
     $scope.sourceTime = $stateParams.sourceTime;
     $scope.targetTime = $stateParams.targetTime;
     $scope.diff = diff;
+
+    $scope.sourceName = sourceName;
+    $scope.targetName = targetName;
 
     $scope.options = $rootScope.options;
     
