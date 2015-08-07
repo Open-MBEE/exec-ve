@@ -7,11 +7,11 @@
               <i ng-class="{'active-text': row.branch.selected}" ng-click="expandCallback(row); row.branch.expanded = !row.branch.expanded; $event.stopPropagation(); on_treeData_change();" class="indented tree-icon {{row.expand_icon}}" ></i>
               <i ng-class="{'active-text': row.branch.selected}" class="indented tree-icon {{row.type_icon}}" ></i>
               <span class="indented tree-label" ng-class="{'active-text': row.branch.selected}">{{row.section}} {{row.branch.data.name}}</span>
-              <div class="pull-right {{row.branch.detail.style}}" ng-if="row.branch.detail">
-	              <i class="fa fa-{{row.branch.detail.icon}} icon-{{row.branch.detail.iconType}} indented"></i>
-	              <span class="indented">{{row.branch.detail.type | uppercase}} TO {{row.branch.detail.stageStatus | uppercase}}</span>
-              </div>
   	        </a>
+            <span class="pull-right {{row.branch.detail.style}}" ng-if="row.branch.detail">
+                <i class="fa fa-{{row.branch.detail.icon}} icon-{{row.branch.detail.iconType}} indented"></i>
+                {{row.branch.detail.type | uppercase}} TO {{row.branch.detail.stageStatus | uppercase}}
+            </span>
   		    </div>
 		</div>
   </li>
