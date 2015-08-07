@@ -89,7 +89,7 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
             };
             $scope.choose = function(elementId, property, name) {
                 var tag = '<mms-transclude-' + property + ' data-mms-eid="' + elementId + '">[cf:' + name + '.' + property + ']</mms-transclude-' + property + '> ';
-�� �� �� �� �� �� �� �� $modalInstance.close(tag);
+                $modalInstance.close(tag);
             };
             $scope.cancel = function() {
                 $modalInstance.dismiss();
@@ -191,9 +191,9 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
             $scope.autocomplete = function(success) {
                 if (success) {
                     var tag = '<mms-transclude-' + autocompleteProperty + ' data-mms-eid="' + autocompleteElementId + '">[cf:' + autocompleteName + '.' + autocompleteProperty + ']</mms-transclude-' + autocompleteProperty + '> ';
-    �� �� �� �� �� �� �� �� $modalInstance.close(tag);
+                    $modalInstance.close(tag);
                 } else {
-    �� �� �� �� �� �� �� �� $modalInstance.close(false);
+                    $modalInstance.close(false);
                 }
             };
             
@@ -274,7 +274,7 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
             $scope.mmsCfViewElements = [];
             $scope.choose = function(elementId, name) {
                 var tag = '<mms-view-link data-mms-vid="' + elementId + '">[cf:' + name + '.vlink]</mms-view-link> ';
-�� �� �� �� �� �� �� �� $modalInstance.close(tag);
+                $modalInstance.close(tag);
             };
             $scope.cancel = function() {
                 $modalInstance.dismiss();
