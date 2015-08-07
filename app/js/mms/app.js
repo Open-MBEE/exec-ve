@@ -596,11 +596,11 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
             },
 
             ws1Configs: function($stateParams, ConfigService, ws1, dummyLogin){
-                return ConfigService.getConfigs(ws1, false);
+                return ConfigService.getConfigs(ws1.id, false);
             },
 
             ws2Configs: function($stateParams, ConfigService, ws2, dummyLogin){
-                return ConfigService.getConfigs(ws2, false);
+                return ConfigService.getConfigs(ws2.id, false);
             },
 
             targetName: function($stateParams, ws1, ws1Configs,dummyLogin){
