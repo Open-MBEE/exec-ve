@@ -635,7 +635,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
         },
         views: {
             'menu@': {
-                templateUrl: '/partials/mms/diff-nav.html',               
+                templateUrl: 'partials/mms/diff-nav.html',               
                 controller: function ($scope, $rootScope,targetName, sourceName, $stateParams, $state){
                     $scope.targetName = targetName;
                     $scope.sourceName = sourceName;
