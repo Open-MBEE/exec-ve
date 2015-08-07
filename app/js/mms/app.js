@@ -10,6 +10,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
 
             var queryParams = '';
             var pathArr = locationPath.split('/');
+            // var diff = '';
 
             // determine if this came from docweb.html or ve.html, is there a product?
             if (locationPath.indexOf('/products/') !== -1) {
@@ -55,6 +56,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
         }
 
     });
+    
 
     $stateProvider
     .state('workspaces', {
@@ -583,32 +585,82 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
         resolve: {
             diff: function($stateParams, WorkspaceService, dummyLogin) {
                 return WorkspaceService.diff($stateParams.target, $stateParams.source, $stateParams.targetTime, $stateParams.sourceTime);
+            },
+
+            ws1: function( $stateParams, WorkspaceService, dummyLogin){ //ws1:target because that's what DiffElementChangeController has
+                return WorkspaceService.getWorkspace($stateParams.target); 
+            },
+
+            ws2: function( $stateParams, WorkspaceService, dummyLogin){ //ws2:source because that's what DiffElementChangeController has
+                return WorkspaceService.getWorkspace($stateParams.source);
+            },
+
+            ws1Configs: function($stateParams, ConfigService, ws1, dummyLogin){
+                return ConfigService.getConfigs(ws1.id, false);
+            },
+
+            ws2Configs: function($stateParams, ConfigService, ws2, dummyLogin){
+                return ConfigService.getConfigs(ws2.id, false);
+            },
+
+            targetName: function($stateParams, ws1, ws1Configs,dummyLogin){
+                var result = null;
+                if(ws1.id === 'master'){
+                    result = 'master';
+                }
+                else{
+                    result= ws1.name; //for comparing tasks
+                }
+                ws1Configs.forEach(function(config){ //for comparing tags - won't go in if comparing on task level
+                    if(config.timestamp === $stateParams.targetTime)
+                        result = config.name;
+                });
+                return result;
+            },
+
+            sourceName: function($stateParams, ws2, ws2Configs,dummyLogin){
+                var result = null ;
+                if(ws2.id === 'master'){
+                    result = 'master';
+                }
+                else{
+                    result= ws2.name; //for comparing tasks
+                }
+                ws2Configs.forEach(function(config){ //for comparing tags - won't go in if comparing on task level
+                    if(config.timestamp === $stateParams.sourceTime)
+                        result = config.name; 
+                });
+                return result;
             }
         },
         views: {
-            'pane-center@': {
-                templateUrl: 'partials/mms/diff-pane-center.html'
+            'menu@': {
+                templateUrl: '/partials/mms/diff-nav.html',               
+                controller: function ($scope, $rootScope,targetName, sourceName, $stateParams, $state){
+                    $scope.targetName = targetName;
+                    $scope.sourceName = sourceName;
+                    $rootScope.mms_title = 'Merge Differences';
+
+                    $scope.goBack = function () {
+                        $state.go('workspace', {}, {reload:true});
+                    }; 
+
+                }                
             },
             'pane-left@': {
                 templateUrl: 'partials/mms/diff-pane-left.html',
                 controller: 'WorkspaceDiffChangeController'
             },
+            'pane-center@': {
+                templateUrl: 'partials/mms/diff-pane-center.html',
+                controller: 'WorkspaceDiffElementViewController'
+            },
             'pane-right@': {
-                templateUrl: 'partials/mms/diff-pane-right.html',
-                controller: 'WorkspaceDiffTreeController'
+                template: ''
             },
             'toolbar-right@': {
                 template: '<mms-toolbar buttons="buttons" mms-tb-api="tbApi"></mms-toolbar>',
                 controller: 'ToolbarCtrl'
-            }
-        }
-    })
-    .state('workspace.diff.view', {
-        url: '/element/:elementId',
-        views: {
-            'pane-center@': {
-                templateUrl: 'partials/mms/diff-view-pane-center.html',
-                controller: 'WorkspaceDiffElementViewController'
             }
         }
     });
