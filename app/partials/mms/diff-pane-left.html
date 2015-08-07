@@ -1,85 +1,71 @@
 <div class="diff-pane-left">
 
-	<table class="fluid-height-container">
-		
-		<tr>
-			<td class="fixed-height-container">
-				<table class="header-table">
-					<tr class="header-row">
-						<td class="header-row-cell"><h3>Changes to Ignore</h3></td>
-						<td class="header-row-cell">
-							<span ng-show="unstagedCounter">Sort By </span>
-							<select class="sorting-options" ng-model="stagingOrder" ng-show="unstagedCounter" ng-init="stagingOrder = 'name'">
-								<option value="{{orderValue.value}}" ng-repeat="orderValue in orderValues">{{orderValue.name}}</option>
-							</select>
-							<button ng-show="unstagedCounter" ng-click="stageAllUnstaged(changes)" type="button" class="btn btn-staging btn-stage-all"  tooltip="Stage All Changes" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="right" tooltip-append-to-body="true"><i class="fa fa-2x fa-arrow-circle-o-down"></i>Apply All</button>
-						</td>
-					</tr>
-				</table>
-			</td>
-		</tr>
+	<div class="flex-container">
 
-		<tr>
-			<td class="table-container">
-				<div class="unstaged-table">
-					<table>
-					    <tr class="diff-item-row" ng-click="selectChange(change)" ng-repeat="change in changes | orderBy:stagingOrder | filter: {staged: false}">
-					        <td tooltip="{{change.name}}" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" tooltip-append-to-body="true">{{change.name}}</td>
-					        <td><i class="fa {{change.icon}} icon-{{change.type}}"></i>   {{change.changeTypeName}}</td>
-					        <td><i class="fa {{change.typeIcon}}"></i>{{change.delta.specialization.type || change.original.specialization.type}}</td>
-					        <td>{{change.delta.modifier}}</td>
-					        <td>
-					        	<button ng-click="stageChange(change)" type="button" class="btn btn-staging"><i class="fa fa-arrow-down"></i>Apply</button>
-					        </td>
-					    </tr>
-					</table>
-				</div>
-			</td>
-		</tr>
+		<div class="flex-header">
+			<table class="header-table">
+				<tr class="header-row">
+					<td class="header-row-cell"><h3>Changes to Ignore</h3></td>
+					<td class="header-row-cell">
+						<span ng-show="unstagedCounter">Sort By </span>
+						<select class="sorting-options" ng-model="stagingOrder" ng-show="unstagedCounter" ng-init="stagingOrder = 'name'">
+							<option value="{{orderValue.value}}" ng-repeat="orderValue in orderValues">{{orderValue.name}}</option>
+						</select>
+						<button ng-show="unstagedCounter" ng-click="stageAllUnstaged(changes)" type="button" class="btn btn-staging btn-stage-all"  tooltip="Stage All Changes" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="right" tooltip-append-to-body="true"><i class="fa fa-2x fa-arrow-circle-o-down"></i>Apply All</button>
+					</td>
+				</tr>
+			</table>
+		</div>
 
-		<tr>
-			<td class="fixed-height-container">
-				<table class="header-table">
-					<tr class="header-row">
-						<td class="header-row-cell" tooltip="Changes to Apply to {{workspace1Name}}" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" tooltip-append-to-body="true"><h3>Changes to Apply to {{workspace1Name}}</h3></td>
-						<td class="header-row-cell">
-							<span ng-show="stagedCounter">Sort By </span>
-							<select class="sorting-options" ng-model="unstagingOrder" ng-show="stagedCounter" ng-init="unstagingOrder = 'name'">
-								<option value="{{orderValue.value}}" ng-repeat="orderValue in orderValues">{{orderValue.name}}</option>
-							</select>
-							<button ng-show="stagedCounter" ng-click="unstageAllStaged(changes)" type="button" class="btn btn-staging btn-unstage-all"  tooltip="Unstage All Changes" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="right" tooltip-append-to-body="true"><i class="fa fa-2x fa-arrow-circle-o-up"></i>Ignore All</button>
-						</td>
-					</tr>
-				</table>
-			</td>
-		</tr>
+		<div class="flex-changes">
+			<table>
+			    <tr class="diff-item-row" ng-click="selectChange(change)" ng-repeat="change in changes | orderBy:stagingOrder | filter: {staged: false}">
+			        <td tooltip="{{change.name}}" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" tooltip-append-to-body="true">{{change.name}}</td>
+			        <td><i class="fa {{change.icon}} icon-{{change.type}}"></i>   {{change.changeTypeName}}</td>
+			        <td><i class="fa {{change.typeIcon}}"></i>{{change.delta.specialization.type || change.original.specialization.type}}</td>
+			        <td>{{change.delta.modifier}}</td>
+			        <td>
+			        	<button ng-click="stageChange(change)" type="button" class="btn btn-staging"><i class="fa fa-arrow-down"></i>Apply</button>
+			        </td>
+			    </tr>
+			</table>
+		</div>
 
-		<tr>
-			<td class="table-container">
-				<div class="staged-table">
-					<table>
-					    <tr class="diff-item-row" ng-click="selectChange(change)" ng-repeat="change in changes | orderBy:unstagingOrder | filter: {staged: true}">
-					        <td>{{change.name}}</td>
-					        <td><i class="fa {{change.icon}} icon-{{change.type}}"></i>   {{change.changeTypeName}}</td>
-					        <td><i class="fa {{change.typeIcon}}"></i>{{change.delta.specialization.type || change.original.specialization.type}}</td>
-					        <td>{{change.delta.modifier}}</td>
-					        <td>
-					        	<button ng-click="stageChange(change)" type="button" class="btn btn-staging"><i class="fa fa-arrow-up"></i>Ignore</button>
-					        </td>
-					    </tr>
-					</table>
-				</div>
-			</td>
-		</tr>
+		<div class="flex-header">
+			<table class="header-table">
+				<tr class="header-row">
+					<td class="header-row-cell" tooltip="Changes to Apply to {{workspace1Name}}" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" tooltip-append-to-body="true"><h3>Changes to Apply to {{workspace1Name}}</h3></td>
+					<td class="header-row-cell">
+						<span ng-show="stagedCounter">Sort By </span>
+						<select class="sorting-options" ng-model="unstagingOrder" ng-show="stagedCounter" ng-init="unstagingOrder = 'name'">
+							<option value="{{orderValue.value}}" ng-repeat="orderValue in orderValues">{{orderValue.name}}</option>
+						</select>
+						<button ng-show="stagedCounter" ng-click="unstageAllStaged(changes)" type="button" class="btn btn-staging btn-unstage-all"  tooltip="Unstage All Changes" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="right" tooltip-append-to-body="true"><i class="fa fa-2x fa-arrow-circle-o-up"></i>Ignore All</button>
+					</td>
+				</tr>
+			</table>
+		</div>
 
-		<tr>
-			<td class="fixed-height-container">
-				<div id="merge-btn-container">
-					<button type="button" ng-click="mergeStagedChanges()" class="btn btn-success" id="merge-btn">Apply Changes to {{workspace1Name}}<i class="fa fa-spin fa-spinner" ng-show="saving"></i></button>
-			   </div>
-			</td>
-		</tr>
+		<div class="flex-changes">
+			<table>
+			    <tr class="diff-item-row" ng-click="selectChange(change)" ng-repeat="change in changes | orderBy:unstagingOrder | filter: {staged: true}">
+			        <td>{{change.name}}</td>
+			        <td><i class="fa {{change.icon}} icon-{{change.type}}"></i>   {{change.changeTypeName}}</td>
+			        <td><i class="fa {{change.typeIcon}}"></i>{{change.delta.specialization.type || change.original.specialization.type}}</td>
+			        <td>{{change.delta.modifier}}</td>
+			        <td>
+			        	<button ng-click="stageChange(change)" type="button" class="btn btn-staging"><i class="fa fa-arrow-up"></i>Ignore</button>
+			        </td>
+			    </tr>
+			</table>
+		</div>
 
-	</table>
+		<div class="flex-header">
+			<div id="merge-btn-container">
+				<button type="button" ng-click="mergeStagedChanges()" class="btn btn-success" id="merge-btn">Apply Changes to {{workspace1Name}}<i class="fa fa-spin fa-spinner" ng-show="saving"></i></button>
+		   </div>
+		</div>
+
+	</div>
 
 </div>

@@ -6,6 +6,22 @@
     position: relative;
   }
 
+  .flex-container {
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+
+    & > .flex-header {
+      height: 60px;
+      flex: 0 0 60px;
+    }
+
+    & > .flex-changes {
+      flex: 1 1 50%;
+      overflow-y: auto;
+    }
+  }
+
   .btn-staging {
     padding: 8px 12px;
     margin: 0px;
@@ -54,6 +70,7 @@
     padding-left: 20px;
     padding-right: 15px;
     text-align: center;
+    padding-top: 8px;
     // position: absolute;
     // bottom: 10px;
   }
