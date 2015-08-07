@@ -427,13 +427,16 @@ function urlService(baseUrl) {
         return root + '/workspaces/' + ws;
     };
 
-    var getWsDiffURL = function(ws1, ws2, ws1time, ws2time) {
-        var r = root + '/diff?workspace1=' + ws1 + '&workspace2=' + ws2;
-        if (ws1time && ws1time !== 'latest')
+    var getWsDiffURL = function(ws1, ws2, ws1time, ws2time, recalc) {
+        var diffUrl =  root + '/diff/' + ws1 + '/' + ws2 + '/' + ws1time + '/' + ws2time  + '?background=true';
+        if(recalc === true) diffUrl += '&recalculate=true';
+        
+        return diffUrl;
+        /*if (ws1time && ws1time !== 'latest')
             r += '&timestamp1=' + ws1time;
         if (ws2time && ws2time !== 'latest')
             r += '&timestamp2=' + ws2time;
-        return r;
+        return r;*/
     };
 
     var getPostWsDiffURL = function(sourcetime) {
