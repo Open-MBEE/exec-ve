@@ -20,10 +20,10 @@
     <div ng-if="pane == 'fromToChooser'" class="modal-body">
         <h4>COMPARE TASKS</h4>
         <label>From</label>
-        <input typeahead="rowItem.label for rowItem in mergeInfo.tree_rows | filter:{label:$viewValue} | limitTo:10" typeahead-on-select='mergeInfo.source = $item' ng-model="origin" typeahead-template-url="autocompleteResultsTemplate.html" class="form-control" placeholder="Type a task name"/>
+        <input typeahead="rowItem.label for rowItem in mergeInfo.tree_rows | filter:{label:$viewValue} | limitTo:10" typeahead-on-select="mergeInfo.source = $item" typeahead-select-on-blur="true" ng-model="origin" typeahead-template-url="autocompleteResultsTemplate.html" class="form-control" placeholder="Type a task name"/>
         <br>
         <Label>To</Label>
-        <input typeahead="rowItem.label for rowItem in mergeInfo.tree_rows | filter:{label:$viewValue} | limitTo:10" typeahead-on-select='mergeInfo.dest = $item' ng-model="destination" typeahead-template-url="autocompleteResultsTemplate.html" class="form-control" placeholder="Type a task name"/>
+        <input typeahead="rowItem.label for rowItem in mergeInfo.tree_rows | filter:{label:$viewValue} | limitTo:10" typeahead-on-select='mergeInfo.dest = $item' typeahead-select-on-blur="true" ng-model="destination" typeahead-template-url="autocompleteResultsTemplate.html" class="form-control" placeholder="Type a task name"/>
     </div>
     <div ng-if="pane == 'fromToChooser'" class="modal-footer">
         <button class="btn btn-primary" ng-disabled="!mergeInfo.source || !mergeInfo.dest" ng-click="mergeAssistConfirmation(mergeInfo.source, mergeInfo.dest)">Next</button>
