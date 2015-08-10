@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsNav', ['SiteService', 'WorkspaceService', 'ConfigService', '$templateCache', 'growl', mmsNav]);
+.directive('mmsNav', ['SiteService', 'WorkspaceService', 'ConfigService', '$templateCache', 'growl', 'hotkeys', mmsNav]);
 
 /**
  * @ngdoc directive
@@ -35,7 +35,7 @@ angular.module('mms.directives')
  * @param {object} mmsConfig tag/config object
  * @param {string} mmsTitle Title to display
  */
-function mmsNav(SiteService, WorkspaceService, ConfigService, $templateCache, growl) {
+function mmsNav(SiteService, WorkspaceService, ConfigService, $templateCache, growl, hotkeys) {
     var template = $templateCache.get('mms/templates/mmsNav.html');
 
     var mmsNavLink = function(scope, element, attrs) {
@@ -45,7 +45,9 @@ function mmsNav(SiteService, WorkspaceService, ConfigService, $templateCache, gr
         };
         var catNames = [];
         var sites = {};
-        
+        scope.toggleHelp = function() {
+            hotkeys.toggleCheatSheet();
+        };
         //Resets catagory and sites accordions
         scope.reset = function(){
             for(var i = 0; i < catNames.length; i++){
