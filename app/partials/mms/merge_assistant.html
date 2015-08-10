@@ -27,6 +27,7 @@
     </div>
     <div ng-if="pane == 'fromToChooser'" class="modal-footer">
         <button class="btn btn-primary" ng-disabled="!mergeInfo.source || !mergeInfo.dest" ng-click="mergeAssistConfirmation(mergeInfo.source, mergeInfo.dest)">Next</button>
+        <button class="btn btn-danger" ng-click="finished()">Cancel</button>
     </div>
     
     <!-- New merge request -->
