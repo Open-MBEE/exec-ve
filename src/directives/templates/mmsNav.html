@@ -24,6 +24,10 @@
         </li>
 
         <li ng-show="ws"> <i class="fa fa-ellipsis-v"></i> {{wsName}} <span ng-if="config.timestamp != 'latest' && showTag != 'false'">( <i class="fa fa-tag"></i> {{config.name}} )</span> <i class="fa fa-angle-double-right"></i><li>
+
+        <!-- <li ng-if="$scope.diff=='yes'">  -->
+          <!-- <button type="button" ng-click="goBack()" class="btn btn-danger">CANCEL</button>Comparing {{config.name}} with  {{wsName}}</li> -->
+
         <li ng-show="site && site.sysmlid !== 'no-site'">
           <a class="nav-btn" tooltip="Sites and Documents" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" ui-sref="workspace.site(site.sysmlid)"><i class="fa fa-folder"></i></a>
         </li>
@@ -32,7 +36,7 @@
           <a class="nav-btn"><i class="fa fa-file"></i></a>
         </li>
         <li ng-show="product">{{product.name}} <span ng-bind-html="snapshot"></span></li>
- 
+
       </ul>
 
       <!-- Goto dropdown
@@ -97,6 +101,11 @@
 
       <!-- Dashboard, Support, Feedback, and Logout buttons -->
       <ul class="nav-btns-main pull-right">
+
+        <li>
+          <a class="nav-btn support-btn" tooltip="Keyboard Shortcuts" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" ng-click="toggleHelp()"><i class="fa fa-keyboard-o"></i></a>
+        </li>
+        
         <li ng-show="site && site.sysmlid !== 'no-site'">
           <a class="nav-btn" tooltip="Dashboard" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" href="/share/page/site/{{site.sysmlid}}/dashboard" target="_blank"><i class="fa fa-dashboard"></i></a>
         </li>

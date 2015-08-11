@@ -65,6 +65,12 @@ function UxService($rootScope) {
 		  case "document.snapshot.create":
 		    return {id: button, icon: 'fa-plus', dynamic: true, selected: false, active: false, permission:false, tooltip: 'Create Tag',
 		            spinner: false, onClick: function() {$rootScope.$broadcast(button);}};
+		  case "diff.perspective.detail":
+            return {id: button, icon: 'fa-info-circle', selected: true, active: true, permission: true, tooltip: 'Detail',
+                    spinner: false, onClick: function() {$rootScope.diffPerspective = 'detail'; }};
+		  case "diff.perspective.tree":
+            return {id: button, icon: 'fa-sitemap', selected: false, active: true, permission: true, tooltip: 'Context',
+                    spinner: false, onClick: function() {$rootScope.diffPerspective = 'tree'; }};
 		}    
 	};
 
@@ -216,8 +222,11 @@ function UxService($rootScope) {
 	};
 
 	var getTypeIcon = function(type) {
-		type = type.toLowerCase();
-		switch (type) {
+    var t = type;
+    if (!t)
+      t = "unknown";
+		t = t.toLowerCase();
+		switch (t) {
 		  case "configuration":
 		  	return "fa-tag";
 		  case "connector":
@@ -246,13 +255,28 @@ function UxService($rootScope) {
 		  	return "fa-file";
 		  case "workspace":
 		  	return "fa-tasks";
+      default:
+        return "fa-square";
         }
 	};
+
+  var getChangeTypeName = function(type) {
+    type = type.toLowerCase();
+    switch (type) {
+      case "added":
+        return "Addition";
+      case "updated":
+        return "Modification";
+      case "removed":
+        return "Removal";
+    }
+  };
 
     return {
     	getButtonBarButton: getButtonBarButton,
         getToolbarButton: getToolbarButton,
         getTypeIcon: getTypeIcon,
+        getChangeTypeName: getChangeTypeName,
         getTreeTypes: getTreeTypes
     };
 }

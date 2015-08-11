@@ -1,0 +1,70 @@
+<script type="text/ng-template" id="autocompleteResultsTemplate.html">
+    <a>
+        <span ng-bind-html-unsafe="match | typeaheadHighlight:query"> {{match.model.parentInfo.label}}<span ng-if="match.model.parentInfo != null"> > </span><strong>{{match.label}}</strong></span>
+    </a>
+</script>
+
+<div class="assistModal">
+    
+    <!-- Type Chooser -->
+    <div ng-if="!pane || pane == 'typeChooser'" class="modal-body text-center">
+        <div>
+	        <button type="button" class="btn btn-big" ng-click="mergeAssistFromTo('quick')">Quick Merge</button>
+        </div>
+        <div>
+	        <button type="button" class="btn btn-big" ng-click="mergeAssistFromTo('custom')">Custom Merge</button>
+        </div>
+    </div>
+    
+    <!-- From and to chooser -->
+    <div ng-if="pane == 'fromToChooser'" class="modal-body">
+        <h4>COMPARE TASKS OR TAGS</h4>
+        <label>From</label>
+        <input typeahead="rowItem.label for rowItem in mergeInfo.tree_rows | filter:{label:$viewValue} | limitTo:10" typeahead-on-select="mergeInfo.source = $item" typeahead-select-on-blur="true" ng-model="origin" typeahead-template-url="autocompleteResultsTemplate.html" class="form-control" placeholder="Type a task or tag name"/>
+        <br>
+        <Label>To</Label>
+        <input typeahead="rowItem.label for rowItem in mergeInfo.tree_rows | filter:{label:$viewValue} | limitTo:10" typeahead-on-select='mergeInfo.dest = $item' typeahead-select-on-blur="true" ng-model="destination" typeahead-template-url="autocompleteResultsTemplate.html" class="form-control" placeholder="Type a task or tag name"/>
+    </div>
+    <div ng-if="pane == 'fromToChooser'" class="modal-footer">
+        <button class="btn btn-primary" ng-disabled="!mergeInfo.source || !mergeInfo.dest" ng-click="mergeAssistConfirmation(mergeInfo.source, mergeInfo.dest)">Next</button>
+        <button class="btn btn-danger" ng-click="finished()">Cancel</button>
+    </div>
+    
+    <!-- New merge request -->
+    <div ng-if="pane == 'beginMerge'" class="modal-body">
+        <h4>BEGIN MERGE</h4>
+        <div ng-if="mergeInfo.type == 'quick'">
+	        Big model you've got there! Because this may take a while, we'll email you a direct link to the differences to resolve as soon as we've prepared them for you.
+        </div>
+        <div ng-if="mergeInfo.type == 'custom'">
+	        Big model you've got there! Because this may take a while, we'll send you an email once the differences have been calculated.
+        </div>
+    </div>
+    <div ng-if="pane == 'beginMerge'" class="modal-footer">
+	    <button class="btn btn-primary" ng-click="startDiff()">Sounds Good, Start!</button>
+        <button class="btn btn-danger" ng-click="finished()">Cancel</button>
+    </div>
+    
+    <!-- Merge in progress -->
+    <div ng-if="pane == 'diffInProgress'" class="modal-body text-center">
+        <h3>Already Calculating Differences</h3>
+        <div>
+	        The differences between these two items are already being calculated.
+        </div>
+        <div>
+	        {{originator}} started this operation on {{diffStartTime}}. Contact {{originator}} at {{originatorEmail}} for more information.
+        </div>
+    </div>
+    
+    <!-- Generating differences -->
+    <div ng-if="pane == 'generating'" class="modal-body text-center">
+        <h3>Calculating Differences</h3>
+        <div>
+	        The differences between these two items are now being calculated. You will receive an email once the job has completed.
+        </div>
+    </div>
+    <div ng-if="pane == 'generating'" class="modal-footer">
+        <button class="btn btn-primary" ng-click="finished()">Done</button>
+    </div>
+    
+</div>
