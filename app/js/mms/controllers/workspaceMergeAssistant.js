@@ -45,8 +45,8 @@ function(_, $timeout, $scope, $rootScope, $modal, growl, ElementService, UxServi
 	    }
 	    if(dest.type === "configuration")
 	    {
-		    sourceWsId = dest.workspace;
-		    sourceTime = dest.data.timestamp;
+		    targetWsId = dest.workspace;
+		    targetTime = dest.data.timestamp;
 	    }
 	    
 	    WorkspaceService.diff(targetWsId, sourceWsId, targetTime, sourceTime)
