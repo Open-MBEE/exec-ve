@@ -634,7 +634,7 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 	{
 		noToggle: true,
 		//handle: 0,
-		size: "40%"
+		size: "50%"
 	});
 
 	// Showing the right-hand pane once we leave the diff view

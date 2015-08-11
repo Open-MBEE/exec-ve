@@ -1,6 +1,7 @@
 .diff-pane-left {
 
   height: 100%; 
+  min-width: 600px;
 
   .container-fluid {
     position: relative;
@@ -66,7 +67,7 @@
 
   #merge-btn-container {
     width: 100%;
-    min-width: 600px;
+    // min-width: 600px;
     padding-left: 20px;
     padding-right: 15px;
     text-align: center;
@@ -105,7 +106,7 @@
   table {
 
     table-layout: fixed;
-    min-width: 600px;
+    // min-width: 600px;
     margin-bottom: 7px;
 
     &.header-table {

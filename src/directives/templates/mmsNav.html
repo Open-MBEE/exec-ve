@@ -98,6 +98,11 @@
 
       <!-- Dashboard, Support, Feedback, and Logout buttons -->
       <ul class="nav-btns-main pull-right">
+
+        <li>
+          <a class="nav-btn support-btn" tooltip="Keyboard Shortcuts" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" ng-click="toggleHelp()"><i class="fa fa-keyboard-o"></i></a>
+        </li>
+        
         <li ng-show="site && site.sysmlid !== 'no-site'">
           <a class="nav-btn" tooltip="Dashboard" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" href="/share/page/site/{{site.sysmlid}}/dashboard" target="_blank"><i class="fa fa-dashboard"></i></a>
         </li>
