@@ -64,22 +64,18 @@ function(_, $timeout, $scope, $rootScope, $modal, growl, ElementService, UxServi
 		            sourceTime: sourceTime,
 		            targetTime: targetTime
 	            });
-            }
-            
-            if(data.status === 'GENERATING' || data.status === "OUTDATED")
-            {
-	            if(data.status === 'GENERATING')
-	            {
-		            $scope.pane = 'generating';
-	            }
-	            else if(data.status === "OUTDATED")
-	            {
-		            WorkspaceService.diff(targetWsId, sourceWsId, targetTime, sourceTime, true).then(function(data)
-		            {
-			            $scope.pane = 'generating';
-		            });
-	            }
-            }
+            } else if(data.status === 'GENERATING') {
+		        $scope.pane = 'diffInProgress';
+                $scope.originator = data.user;
+                $scope.originatorEmail = data.email;
+                $scope.diffStartTime = data.diffTime;
+	        } else if(data.status === "OUTDATED") {
+		        WorkspaceService.diff(targetWsId, sourceWsId, targetTime, sourceTime, true)
+                .then(function(data) {
+			         $scope.pane = 'generating';
+		        });
+	        } else if (data.status === 'STARTED')
+                $scope.pane = 'generating';
         },
         function(data)
         {
