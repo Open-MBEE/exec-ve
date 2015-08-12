@@ -1,0 +1,22 @@
+<div class="assistModal">
+	<div ng-if="pane == 'diffInProgress'" class="modal-body">
+        <h3>Already Calculating Differences</h3>
+        <div>
+	        The differences between these two items are already being calculated.
+        </div>
+        <br>
+        <div>
+	        User "{{originator}}" started this operation on {{diffStartTime}}. Contact {{originator}} at {{originatorEmail}} for more information.
+        </div>
+    </div>
+
+    <div ng-if="pane == 'outdatedDiff'" class="modal-body">
+        <h3>Differences are outdated!</h3>
+        <div>
+	        One or both of these items have had changes since the diff was started. 
+        </div>
+    </div>
+    <div ng-if="pane == 'outdatedDiff'" class="modal-footer">
+        <button class="btn btn-primary" ng-click="startDiff()">Regenerate Differences</button>
+    </div>
+</div>

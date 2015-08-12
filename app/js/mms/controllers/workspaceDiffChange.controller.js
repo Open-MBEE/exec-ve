@@ -31,6 +31,8 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 
 	$scope.workspace1Name = "";
 
+	$scope.mergeInfo = $rootScope.mergeInfo;
+
   $scope.stagingOrder = '';
   $scope.unstagingOrder = '';
   $scope.orderValues = [
@@ -351,6 +353,16 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 				documentation: "",
 				specialization: {}
 			};
+			
+			if($scope.diff.status === "GENERATING" || $scope.diff.status === "OUTDATED"){
+				var modalInstance = $modal.open({
+					templateUrl: 'partials/mms/diffPageModal.html',
+					controller: 'diffPageModalCtrl',
+					resolve: {
+						diff: function(){return $scope.diff;}
+					}
+				});
+			}
 
 			var createChange = function(name, element, deltaElement, changeType, changeIcon, ws2object)
 				{

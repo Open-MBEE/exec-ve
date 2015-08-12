@@ -46,18 +46,19 @@
     </div>
     
     <!-- Merge in progress -->
-    <div ng-if="pane == 'diffInProgress'" class="modal-body text-center">
+    <div ng-if="pane == 'diffInProgress'" class="modal-body">
         <h3>Already Calculating Differences</h3>
         <div>
 	        The differences between these two items are already being calculated.
         </div>
+        <br>
         <div>
-	        {{originator}} started this operation on {{diffStartTime}}. Contact {{originator}} at {{originatorEmail}} for more information.
+	        User "{{originator}}" started this operation on {{diffStartTime}}. Contact {{originator}} at {{originatorEmail}} for more information.
         </div>
     </div>
     
     <!-- Generating differences -->
-    <div ng-if="pane == 'generating'" class="modal-body text-center">
+    <div ng-if="pane == 'generating'" class="modal-body">
         <h3>Calculating Differences</h3>
         <div>
 	        The differences between these two items are now being calculated. You will receive an email once the job has completed.
