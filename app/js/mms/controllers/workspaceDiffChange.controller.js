@@ -66,6 +66,18 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 		}
 	};
 
+	if($scope.diff.status === "GENERATING" || $scope.diff.status === "OUTDATED"){
+		var modalInstance = $modal.open({
+			templateUrl: 'partials/mms/diffPageModal.html',
+			controller: 'diffPageModalCtrl',
+			resolve: {
+				diff: function(){return $scope.diff;}
+			},
+			backdrop: 'static',
+			keyboard: false
+		});
+	}
+
 	var stageChange = function(change)
 	{
 
@@ -355,18 +367,6 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 				documentation: "",
 				specialization: {}
 			};
-
-			if($scope.diff.status === "GENERATING" || $scope.diff.status === "OUTDATED"){
-				var modalInstance = $modal.open({
-					templateUrl: 'partials/mms/diffPageModal.html',
-					controller: 'diffPageModalCtrl',
-					resolve: {
-						diff: function(){return $scope.diff;}
-					},
-					backdrop: 'static',
-					keyboard: false
-				});
-			}
 
 			var createChange = function(name, element, deltaElement, changeType, changeIcon, ws2object)
 				{

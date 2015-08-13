@@ -7,25 +7,7 @@ angular.module('mmsApp')
 function(_, $timeout, $scope, $rootScope, $modal, growl, ElementService, UxService, $modalInstance, $state, WorkspaceService, diff) {
 
 	$scope.diff = diff;
-	$rootScope.mergeInfo = {
-		tree_rows: $rootScope.treeApi.get_rows()
-	};
-
-	$scope.source = $scope.diff.workspace2;
-	$scope.dest = $scope.diff.workspace1;
-
-	$scope.targetTime = 'latest';
-	$scope.sourceTime = 'latest';
-	$scope.sourceWsId = $scope.source.id;
-	$scope.targetWsId = $scope.dest.id;
-
-	if($scope.source.timestamp){
-		$scope.sourceTime = $scope.source.timestamp;
-	}
-	if($scope.dest.timestamp){
-		$scope.targetTime = $scope.dest.timestamp;
-	}
-
+	
 	if($scope.diff.status === 'GENERATING'){
 		$scope.pane = 'diffInProgress';
 		$scope.originator = $scope.diff.user;
@@ -36,7 +18,22 @@ function(_, $timeout, $scope, $rootScope, $modal, growl, ElementService, UxServi
 	}
 
 	$scope.startDiff = function(){
-		WorkspaceService.diff($scope.targetWsId, $scope.sourceWsId, $scope.targetTime, $scope.sourceTime)
+		$scope.source = $scope.diff.workspace2;
+		$scope.dest = $scope.diff.workspace1;
+
+		$scope.targetTime = 'latest';
+		$scope.sourceTime = 'latest';
+		$scope.sourceWsId = $scope.source.id;
+		$scope.targetWsId = $scope.dest.id;
+
+		if($scope.source.timestamp){
+			$scope.sourceTime = $scope.source.timestamp;
+		}
+		if($scope.dest.timestamp){
+			$scope.targetTime = $scope.dest.timestamp;
+		}
+
+		WorkspaceService.diff($scope.targetWsId, $scope.sourceWsId, $scope.targetTime, $scope.sourceTime, true)
 		.then(function(data){
 			if(data.status === 'COMPLETED'){
 				$modalInstance.close();
@@ -47,8 +44,14 @@ function(_, $timeout, $scope, $rootScope, $modal, growl, ElementService, UxServi
 					sourceTime: $scope.sourceTime,
 					targetTime: $scope.targetTime
 				});
+			} else {
+				$scope.pane = 'generating';
 			}
 		});
+	};
+
+	$scope.finished = function() {
+		$modalInstance.close();
 	};
 
 }]);
