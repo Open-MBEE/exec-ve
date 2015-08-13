@@ -2,7 +2,7 @@
 
 /* Controllers */
 
-angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$timeout", "$scope", "$rootScope", "$state", "$stateParams", "$modal", "growl", "WorkspaceService", "ElementService", "diff", "UxService", "paneManager", function(_, $timeout, $scope, $rootScope, $state, $stateParams, $modal, growl, WorkspaceService, ElementService, diff, UxService, paneManager)
+angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$timeout", "$scope", "$rootScope", "$state", "$stateParams", "$modal", "growl", "WorkspaceService", "ElementService", "diff", "UxService", "paneManager", "targetName", function(_, $timeout, $scope, $rootScope, $state, $stateParams, $modal, growl, WorkspaceService, ElementService, diff, UxService, paneManager, targetName)
 {
 
 	var ws1 = $stateParams.target;
@@ -29,7 +29,11 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 	$scope.stagedCounter = 0;
 	$scope.unstagedCounter = 0;
 
-	$scope.workspace1Name = "";
+	$scope.workspace1Name = targetName;
+
+	$scope.mergeInfo = $rootScope.mergeInfo;
+
+	$scope.targetTime = $stateParams.targetTime;
 
   $scope.stagingOrder = '';
   $scope.unstagingOrder = '';
@@ -61,6 +65,18 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 			}
 		}
 	};
+
+	if($scope.diff.status === "GENERATING" || $scope.diff.status === "OUTDATED"){
+		var modalInstance = $modal.open({
+			templateUrl: 'partials/mms/diffPageModal.html',
+			controller: 'diffPageModalCtrl',
+			resolve: {
+				diff: function(){return $scope.diff;}
+			},
+			backdrop: 'static',
+			keyboard: false
+		});
+	}
 
 	var stageChange = function(change)
 	{
@@ -619,8 +635,6 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 			$rootScope.id2change = id2change;
 
 			refreshStageCounters();
-
-			$scope.workspace1Name = ws1.name;
 		};
 
 	// Hiding the right-hand pane

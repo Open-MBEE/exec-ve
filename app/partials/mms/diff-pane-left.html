@@ -60,7 +60,7 @@
 			</table>
 		</div>
 
-		<div class="flex-header">
+		<div class="flex-header" ng-if="(diff.status !== 'GENERATING' && diff.status !== 'OUTDATED') && targetTime === 'latest'">
 			<div id="merge-btn-container">
 				<button type="button" ng-click="mergeStagedChanges()" class="btn btn-success" id="merge-btn">Apply Changes to {{workspace1Name}}<i class="fa fa-spin fa-spinner" ng-show="saving"></i></button>
 		   </div>
