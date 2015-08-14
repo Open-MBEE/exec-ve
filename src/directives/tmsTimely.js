@@ -1,20 +1,47 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('tmsTimely', ['$http', '$q', tmsTimely]);
+.directive('tmsTimely', ['$http', '$q', '$window', tmsTimely]);
 
-function tmsTimely($http, $q) {
+function tmsTimely($http, $q, $window) {
     
-    var buildChart = function(scope, element, spec) {
+    var buildChart = function(scope, element, spec, attrs) {
         spec.element = element[0];
         scope.spec = spec;
         scope.chart = new Timely.Chart(spec);
         if (scope.tmsApi) {
             scope.tmsApi.api = scope.chart;
         }
-        scope.chart.setHeight(600);
-        scope.chart.setWidth(600);
+        if (attrs.height) {
+            scope.height = attrs.height;
+            scope.chart.setHeight(attrs.height);
+        }
+        if (attrs.width) {
+            scope.width = attrs.width;
+            scope.chart.setWidth(attrs.width);
+        }
+        scope.$on('$destroy', function() {
+
+        });
         scope.chart.draw();
+        setResize(scope, element, attrs);
+    };
+
+    var setResize = function(scope, element, attrs) {
+        if (attrs.fitToWindow === 'true' || attrs.fitToWindowWidth === 'true' || attrs.fitToWindowHeight === 'true') {
+            angular.element($window).on('resize', function(e) {
+                if (attrs.fitToWindow === 'true') {
+                    scope.height = $window.innerHeight;
+                    scope.width = $window.innerWidth;
+                } else if (attrs.fitToWindowWidth === 'true')
+                    scope.width = $window.innerWidth;
+                else if (attrs.fitToWindowHeight === 'true')
+                    scope.height = $window.innerHeight;
+                scope.chart.setHeight(scope.height);
+                scope.chart.setWidth(scope.width);
+                scope.chart.draw();
+            });
+        }
     };
 
     var tmsTimelyLink = function(scope, element, attrs) {
@@ -37,22 +64,25 @@ function tmsTimely($http, $q) {
                     var defer = $q.defer();
                     promises.push(defer.promise);
                     $http.get(value).then(function(data) {
-                        defer.resolve({'key': key, 'data': data});
+                        defer.resolve({'key': key, 'data': data, 'success': true});
+                    }, function(data) {
+                        //getting timeline data failed
+                        defer.resolve({'key': key, 'data': data, 'success': false});
+                        console.log('getting timeline data failed for ' + key);
                     });
                 });
                 $q.all(promises).then(function(datas) {
-                    var count = 1;
                     datas.forEach(function(data) {
-                        spec.data[data.key] = data.data.data['Timeline Data'];
-                        count++;
+                        if (data.success)
+                            spec.data[data.key] = data.data.data['Timeline Data'];
                     });
-                    buildChart(scope, element, spec);
+                    buildChart(scope, element, spec, attrs);
                 });
             }
             return;
         }
         if (spec) {
-            buildChart(scope, element, spec);
+            buildChart(scope, element, spec, attrs);
         }
     };
 

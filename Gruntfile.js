@@ -138,7 +138,8 @@ module.exports = function(grunt) {
           angular: true,
           window: true,
           console: true,
-          Timely: true
+          Timely: true,
+          __timely: true
         }
       }
     },
