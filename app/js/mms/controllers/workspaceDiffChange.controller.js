@@ -647,7 +647,9 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 	paneManager.get("left-pane").setOptions(
 	{
 		noToggle: true,
-		//handle: 0,
+		min: "50%",
+		max: "50%",
+		handle: 0,
 		size: "50%"
 	});
 
