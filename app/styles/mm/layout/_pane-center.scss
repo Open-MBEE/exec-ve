@@ -19,12 +19,14 @@
       border-bottom: 0 !important;
       padding: 0;
       vertical-align: middle !important;
+      /*font-size: 16px;*/
     }
 
     tbody {
       td {
         border-bottom: 1px solid #f3f3f3;
         padding: 0;
+        /*font-size: 14px;*/
       }
 
       tr {
@@ -81,7 +83,7 @@
 
 @media screen and (min-width: 1500px) {
   .diff-pane-center {
-    .pane-center-header {
+    /*.pane-center-header {
       font-size: 56px;
     }
 
@@ -116,6 +118,6 @@
           }
         }
       }
-    } 
+    } */
   }
 }

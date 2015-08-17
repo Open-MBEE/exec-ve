@@ -41,7 +41,7 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
     { name: 'Name', value: 'name' },
     { name: 'Type of Change', value: 'type' },
     { name: 'Type of Element', value: 'delta.specialization.type' },
-    { name: 'Modifier', value: 'delta.modifier' }
+    { name: 'Username', value: 'delta.modifier' }
   ];
 
 
