@@ -19,11 +19,11 @@
 
 		<div class="flex-changes">
 			<table>
-			    <tr class="diff-item-row" ng-click="selectChange(change)" ng-repeat="change in changes | orderBy:stagingOrder | filter: {staged: false}">
-			        <td tooltip="{{change.name}}" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" tooltip-append-to-body="true">{{change.name}}</td>
-			        <td><i class="fa {{change.icon}} icon-{{change.type}}"></i>   {{change.changeTypeName}}</td>
-			        <td><i class="fa {{change.typeIcon}}"></i>{{change.delta.specialization.type || change.original.specialization.type}}</td>
-			        <td>{{change.delta.modifier}}</td>
+			    <tr class="diff-item-row" ng-click="selectChange(change)" ng-repeat="change in changes | orderBy:stagingOrder | filter: {staged: false} track by change.delta.sysmlid">
+			        <td tooltip="{{::change.name}}" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" tooltip-append-to-body="true">{{change.name}}</td>
+			        <td><i class="fa {{::change.icon}} icon-{{::change.type}}"></i>   {{::change.changeTypeName}}</td>
+			        <td><i class="fa {{::change.typeIcon}}"></i>{{::change.delta.specialization.type || change.original.specialization.type}}</td>
+			        <td>{{::change.delta.modifier}}</td>
 			        <td>
 			        	<button ng-click="stageChange(change)" type="button" class="btn btn-staging"><i class="fa fa-arrow-down"></i>Apply</button>
 			        </td>
@@ -48,11 +48,11 @@
 
 		<div class="flex-changes">
 			<table>
-			    <tr class="diff-item-row" ng-click="selectChange(change)" ng-repeat="change in changes | orderBy:unstagingOrder | filter: {staged: true}">
-			        <td>{{change.name}}</td>
-			        <td><i class="fa {{change.icon}} icon-{{change.type}}"></i>   {{change.changeTypeName}}</td>
-			        <td><i class="fa {{change.typeIcon}}"></i>{{change.delta.specialization.type || change.original.specialization.type}}</td>
-			        <td>{{change.delta.modifier}}</td>
+			    <tr class="diff-item-row" ng-click="selectChange(change)" ng-repeat="change in changes | orderBy:unstagingOrder | filter: {staged: true} track by change.delta.sysmlid">
+			        <td>{{::change.name}}</td>
+			        <td><i class="fa {{::change.icon}} icon-{{::change.type}}"></i>   {{::change.changeTypeName}}</td>
+			        <td><i class="fa {{::change.typeIcon}}"></i>{{::change.delta.specialization.type || change.original.specialization.type}}</td>
+			        <td>{{::change.delta.modifier}}</td>
 			        <td>
 			        	<button ng-click="stageChange(change)" type="button" class="btn btn-staging"><i class="fa fa-arrow-up"></i>Ignore</button>
 			        </td>
