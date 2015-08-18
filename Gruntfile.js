@@ -137,7 +137,9 @@ module.exports = function(grunt) {
         globals: {
           angular: true,
           window: true,
-          console: true
+          console: true,
+          Timely: true,
+          __timely: true
         }
       }
     },

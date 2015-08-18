@@ -139,6 +139,16 @@
           <td><mms-transclude-name mms-eid="{{change.original.specialization.propertyType}}" mms-version="{{targetTime}}" mms-ws="{{target}}"></mms-transclude-name></td>
           <td><mms-transclude-name mms-eid="{{change.delta.specialization.propertyType}}" mms-version="{{sourceTime}}" mms-ws="{{source}}"></mms-transclude-name></td>
         </tr>
+        <tr class="{{options.statuses[change.properties.specialization.aggregation.type].style}}">
+          <td>AGGREGATION</td>
+          <td>{{change.original.specialization.aggregation}}</td>
+          <td>{{change.delta.specialization.aggregation}}</td>
+        </tr>
+        <tr class="{{options.statuses[change.properties.specialization.isSlot.type].style}}">
+          <td>SLOT</td>
+          <td>{{change.original.specialization.isSlot}}</td>
+          <td>{{change.delta.specialization.isSlot}}</td>
+        </tr>
       </tbody>
     </table>
   </div>
@@ -233,6 +243,7 @@
           <td><mms-transclude-name mms-eid="{{change.delta.specialization.target}}" mms-version="{{sourceTime}}" mms-ws="{{source}}"></mms-transclude-name>
           </td>
         </tr>
+        <!--
         <tr class="{{options.statuses[change.properties.specialization.sourceAggregation.type].style}}">
           <td>ROLE 1 AGGREGATION</td>
           <td>{{change.original.specialization.sourceAggregation}}</td>
@@ -242,7 +253,8 @@
           <td>ROLE 2 AGGREGATION</td>
           <td>{{change.original.specialization.targetAggregation}}</td>
           <td>{{change.delta.specialization.targetAggregation}}</td>
-        </tr>
+        </tr> 
+      -->
         <tr class="{{options.statuses[change.properties.specialization.ownedEnd.type].style}}">
           <td>OWNED END</td>
           <td><div ng-repeat="end in change.original.specialization.ownedEnd"><mms-transclude-name mms-eid="{{end}}" mms-version="{{targetTime}}" mms-ws="{{target}}"></mms-transclude-name>

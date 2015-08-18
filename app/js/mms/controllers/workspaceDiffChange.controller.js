@@ -361,13 +361,7 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 	{
 
 			// var emptyElement = { name: "", owner: "", documentation: "", specialization : { type: "", value_type: "", values: ""} };
-			var emptyElement = {
-				name: "",
-				owner: "",
-				documentation: "",
-				specialization: {}
-			};
-
+			
 			var createChange = function(name, element, deltaElement, changeType, changeIcon, ws2object)
 				{
 					var change = {};
@@ -468,6 +462,14 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 			// $scope.treeApi.expand_all();
 			ws2.addedElements.forEach(function(e)
 			{
+				var emptyElement = {
+					sysmlid: e.sysmlid,
+					name: "",
+					owner: "",
+					documentation: "",
+					specialization: {}
+				};
+
 				id2data[e.sysmlid] = e;
 
 				var node = createTreeNode(e, "clean", "addition");
@@ -503,6 +505,13 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 
 			ws2.deletedElements.forEach(function(e)
 			{
+				var emptyElement = {
+					sysmlid: e.sysmlid,
+					name: "",
+					owner: "",
+					documentation: "",
+					specialization: {}
+				};
 
 				var deletedElement = id2data[e.sysmlid];
 
