@@ -646,11 +646,11 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 	});
 	paneManager.get("left-pane").setOptions(
 	{
-		noToggle: true,
-		min: "50%",
-		max: "50%",
-		handle: 0,
-		size: "50%"
+		// noToggle: true,
+		min: "20%",
+		// max: "50%",
+		// handle: 50,
+		size: "45%"
 	});
 
 	// Showing the right-hand pane once we leave the diff view
@@ -664,7 +664,7 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 		paneManager.get("left-pane").setOptions(
 		{
 			noToggle: false,
-			handle: 14,
+			handle: 13,
 			size: "20%"
 		});
 		
