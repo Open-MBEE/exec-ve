@@ -636,15 +636,17 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
         views: {
             'menu@': {
                 templateUrl: 'partials/mms/diff-nav.html',               
-                controller: function ($scope, $rootScope,targetName, sourceName, $stateParams, $state){
+                controller: function ($scope, $rootScope,targetName, sourceName, $stateParams, $state, $modal){
                     $scope.targetName = targetName;
                     $scope.sourceName = sourceName;
                     $rootScope.mms_title = 'Merge Differences';
 
                     $scope.goBack = function () {
-                        $state.go('workspace', {}, {reload:true}); 
-                    }; 
-
+                        $modal.open({
+                            templateUrl: 'partials/mms/cancelModal.html',
+                            controller: 'cancelModalCtrl'
+                        });
+                    };
                 }                
             },
             'pane-left@': {
