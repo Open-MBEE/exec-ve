@@ -674,7 +674,8 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 		{
 			noToggle: false,
 			handle: 13,
-			size: "20%"
+			size: "20%",
+			min: '20px'
 		});
 		
 		$rootScope.selectedElementId = null;
