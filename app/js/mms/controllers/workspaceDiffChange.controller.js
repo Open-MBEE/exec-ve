@@ -35,6 +35,12 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 
 	$scope.targetTime = $stateParams.targetTime;
 
+	if($scope.diff.workspace1.timestamp){
+		$scope.targetIsTag = true;
+	} else {
+		$scope.targetIsTag = false;
+	}
+
   $scope.stagingOrder = '';
   $scope.unstagingOrder = '';
   $scope.orderValues = [
