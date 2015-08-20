@@ -34,14 +34,14 @@
     <div ng-if="pane == 'beginMerge'" class="modal-body">
         <h4>BEGIN MERGE</h4>
         <div ng-if="mergeInfo.type == 'quick'">
-	        Big model you've got there! Because this may take a while, we'll email you a direct link to the differences to resolve as soon as we've prepared them for you.
+	       Because this comparison may take a while, we'll email you a direct link to the differences to resolve as soon as we've prepared them for you.
         </div>
         <div ng-if="mergeInfo.type == 'custom'">
-	        Big model you've got there! Because this may take a while, we'll send you an email once the differences have been calculated.
+	        Because this comparison may take a while, we'll email you a direct link to the differences once it's finished.
         </div>
     </div>
     <div ng-if="pane == 'beginMerge'" class="modal-footer">
-	    <button class="btn btn-primary" ng-click="startDiff()">Sounds Good, Start!</button>
+	    <button class="btn btn-primary" ng-click="startDiff()">Sounds good, start!</button>
         <button class="btn btn-danger" ng-click="finished()">Cancel</button>
     </div>
     
@@ -61,7 +61,7 @@
     <div ng-if="pane == 'generating'" class="modal-body">
         <h3>Calculating Differences</h3>
         <div>
-	        The differences between these two items are now being calculated. You will receive an email once the job has completed.
+	        The differences between these two items are now being calculated. You will receive an email with a direct link to the differences once the job has completed.
         </div>
     </div>
     <div ng-if="pane == 'generating'" class="modal-footer">
