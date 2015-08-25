@@ -666,7 +666,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
                     $rootScope.mms_title = 'Merge Differences';
 
                     $scope.goBack = function () {
-                        $state.go('workspace', {}, {reload:true});
+                        $state.go('workspace', {}, {reload:true}); 
                     }; 
 
                 }                
