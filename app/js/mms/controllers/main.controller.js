@@ -10,6 +10,7 @@ function($scope, $location, $rootScope, $state, _, $window, growl, $http, URLSer
     $rootScope.mms_title = '';
     // Per SMOD-14, they want this removed
     //$rootScope.mms_footer = 'JPL/Caltech PROPRIETARY — Not for Public Release or Redistribution. No export controlled documents allowed on this server.';
+    $rootScope.mms_footer = '';
 
     var host = $location.host();
     if ($location.host().indexOf('europaems') !== -1) {
