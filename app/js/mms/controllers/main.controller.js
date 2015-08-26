@@ -8,7 +8,8 @@ function($scope, $location, $rootScope, $state, _, $window, growl, $http, URLSer
     $rootScope.mms_viewContentLoading = false;
     $rootScope.mms_treeInitial = '';
     $rootScope.mms_title = '';
-    $rootScope.mms_footer = 'JPL/Caltech PROPRIETARY — Not for Public Release or Redistribution. No export controlled documents allowed on this server.';
+    // Per SMOD-14, they want this removed
+    //$rootScope.mms_footer = 'JPL/Caltech PROPRIETARY — Not for Public Release or Redistribution. No export controlled documents allowed on this server.';
 
     var host = $location.host();
     if ($location.host().indexOf('europaems') !== -1) {
