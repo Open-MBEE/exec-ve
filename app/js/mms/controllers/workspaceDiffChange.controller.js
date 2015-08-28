@@ -41,6 +41,21 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 		$scope.targetIsTag = false;
 	}
 
+	$rootScope.$on('tree-pane-item-clicked', function(event, data){
+
+		var previousActiveElement = angular.element('.row-selected');
+		previousActiveElement.removeClass("row-selected");
+
+		var activeElement = angular.element('#'+data.data.sysmlid);
+		if(activeElement){
+			if(!activeElement.isOnScreen()){
+				activeElement.get(0).scrollIntoView();
+			}
+			activeElement.addClass("row-selected");
+		}
+
+	});
+
   $scope.stagingOrder = '';
   $scope.unstagingOrder = '';
   $scope.orderValues = [
@@ -343,6 +358,7 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 			$rootScope.diffPerspective = 'detail';
 		
 		$rootScope.$broadcast('elementId', elementId);
+
 		highlightTreeRow(change);
 		
 // 		$state.go('workspace.diff.view', {elementId: elementId});

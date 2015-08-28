@@ -116,6 +116,10 @@
     tr {
       height: 35px;
 
+      &.row-selected {
+        background-color: $tertiary_grey; 
+      }
+
       &.diff-item-row {
         &:hover {
           background-color: $tertiary_grey;

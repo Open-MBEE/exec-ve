@@ -196,6 +196,9 @@ function mmsTree($timeout, $log, $templateCache) {
          * @param {Object} branch branch to select
          */
         var select_branch = function(branch) {
+
+            scope.$emit('tree-pane-item-clicked', branch);
+
             if (!branch) {
                 if (selected_branch)
                     selected_branch.selected = false;
