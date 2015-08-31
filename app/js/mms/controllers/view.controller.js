@@ -66,7 +66,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
             $scope.bbApi.setToggleState('show.edits', $rootScope.mms_ShowEdits);
 
             if ($scope.view.specialization.contents) {
-                $scope.bbApi.addButton(UxService.getButtonBarButton('view.add.dropdown'));
+                //$scope.bbApi.addButton(UxService.getButtonBarButton('view.add.dropdown'));
             }
         }
         $scope.bbApi.addButton(UxService.getButtonBarButton('show.comments'));
