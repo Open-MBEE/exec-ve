@@ -33,8 +33,7 @@
     "angular-growl-v2": "~0.7.4",
     "angular-hotkeys": "https://github.com/chieffancypants/angular-hotkeys.git#1.5.0",
     "font-awesome-bower": "~4.3.0",
-    "lodash": "~3.9.3",
-    "timely-angular": "git@github.jpl.nasa.gov:SEQR/timely-angular.git#master"
+    "lodash": "~3.9.3"
   },
   "devDependencies": {
     "angular-mocks": "~1.4.0"
