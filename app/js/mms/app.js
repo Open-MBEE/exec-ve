@@ -422,11 +422,11 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
                     return [];
                 return ConfigService.getProductSnapshots(document.sysmlid, site.sysmlid, workspace);
             },
-            snapshot: function(configSnapshots, document, dummyLogin) {
+            snapshot: function(snapshots, document, time, dummyLogin) {
                 var docid = document.sysmlid;
                 var found = null;
-                configSnapshots.forEach(function(snapshot) {
-                    if (docid === snapshot.sysmlid)
+                snapshots.forEach(function(snapshot) {
+                    if (snapshot.created === time)
                         found = snapshot;
                 });
                 return found; 
@@ -467,9 +467,9 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
                 }
             },        
             configSnapshots: function(ConfigService, workspace, tag, dummyLogin) {
-                if (tag.timestamp === 'latest')
+                //if (tag.timestamp === 'latest')
                     return [];
-                return ConfigService.getConfigSnapshots(tag.id, workspace, false);
+                //return ConfigService.getConfigSnapshots(tag.id, workspace, false);
             },
             time: function($stateParams, ConfigService, workspace, dummyLogin) {
                 if ($stateParams.tag !== undefined) {
