@@ -77,7 +77,7 @@
     angular.module('exampleApp', ['mms', 'mms.directives']);
     </pre>
  */
-angular.module('mms.directives', ['mms', 'mms.directives.tpls', 'ui.bootstrap', 'ui.sortable', 'angular-growl', 'cfp.hotkeys'])
+angular.module('mms.directives', ['mms', 'mms.directives.tpls', 'ui.bootstrap', 'ui.sortable', 'angular-growl'])
 .config(['$sceProvider', 'growlProvider', function($sceProvider, growlProvider) {
     $sceProvider.enabled(false);
     growlProvider.onlyUniqueMessages(false);
