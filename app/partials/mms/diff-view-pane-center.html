@@ -43,18 +43,23 @@
   </thead>
 
   <tbody>
+
     <tr class="{{options.statuses[change.properties.name.type].style}}">
       <td>NAME</td>
       <td>{{change.original.name}}</td>
       <td>{{change.delta.name}}</td>
-      <!-- 
-      <td>
-        <span ng-show="originalNode.property_conflict_status.name">
-            <button class="{{options.buttons[options.statuses[originalNode.property_status.name].button].style}}" 
-                    ng-click="registerPropertyChange(originalNode,'name');">{{options.statuses[originalNode.property_status.name].button}}</button>
-        </span>
-      </td>
-    -->
+    </tr>
+
+    <tr class="{{options.statuses[change.properties.qualifiedName.type].style}}">
+      <td>QUALIFIED NAME</td>
+      <td><div ng-bind-html="change.original.qualifiedName"></div></td>
+      <td><div ng-bind-html="change.delta.qualifiedName"></div></td>
+    </tr>
+
+    <tr class="{{options.statuses[change.properties.sysmlid.type].style}}">
+      <td>ID</td>
+      <td><div ng-bind-html="change.original.sysmlid"></div></td>
+      <td><div ng-bind-html="change.delta.sysmlid"></div></td>
     </tr>
 
     <tr class="{{options.statuses[change.properties.owner.type].style}}">
@@ -72,19 +77,11 @@
     </tr>
 
     <tr class="{{options.statuses[change.properties.documentation.type].style}}">
-      <td>DOC</td>
+      <td>DOCUMENTATION</td>
       <td><div ng-bind-html="change.original.documentation"></div></td>
       <td><div ng-bind-html="change.delta.documentation"></div></td>
-      
-      <!--
-      <td>
-        <span ng-show="change.properties.originalNode.property_conflict_status.documentation">
-            <button class="{{options.buttons[options.statuses[originalNode.property_status.documentation].button].style}}" 
-                    ng-click="registerPropertyChange(originalNode,'documentation');">{{options.statuses[originalNode.property_status.documentation].button}}</button>
-        </span> 
-      </td>
-    -->
     </tr>
+
   </tbody>
 
 </table>
