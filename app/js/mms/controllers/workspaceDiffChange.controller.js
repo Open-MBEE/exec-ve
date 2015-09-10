@@ -35,6 +35,12 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 
 	$scope.targetTime = $stateParams.targetTime;
 
+	if($scope.targetTime !== 'latest'){
+		$scope.targetIsTag = true;
+	} else {
+		$scope.targetIsTag = false;
+	}
+
   $scope.stagingOrder = '';
   $scope.unstagingOrder = '';
   $scope.orderValues = [
@@ -337,6 +343,7 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 			$rootScope.diffPerspective = 'detail';
 		
 		$rootScope.$broadcast('elementId', elementId);
+
 		highlightTreeRow(change);
 		
 // 		$state.go('workspace.diff.view', {elementId: elementId});
