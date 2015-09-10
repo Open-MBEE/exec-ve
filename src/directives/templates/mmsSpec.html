@@ -80,38 +80,38 @@
             <h3 class="prop" ng-switch-when="LiteralReal">{{value.double}}</h3>
             <h3 class="prop" ng-switch-when="LiteralUnlimitedNatural">{{value.naturalValue}}</h3>
             <h3 class="prop" ng-switch-when="LiteralString" ng-bind-html="value.string"></h3>
-            <h3 class="prop" ng-switch-when="ElementValue"><mms-transclude-name mms-eid="{{value.element}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></h3>
+            <h3 class="prop" ng-switch-when="ElementValue"><mms-transclude-name mms-watch-id="true" mms-eid="{{value.element}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></h3>
             <h3 class="prop" ng-switch-when="OpaqueExpression">{{value.expressionBody[0]}}</h3>
             <h3 class="prop" ng-switch-default>{{value}}</h3>
         </div>
         </div>
         <div ng-if="isRestrictedVal">
-            <h3 class="prop"><mms-transclude-name mms-eid="{{values[0].operand[1].element}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></h3>
+            <h3 class="prop"><mms-transclude-name mms-watch-id="true" mms-eid="{{values[0].operand[1].element}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></h3>
         </select>
     </div>
         <h2 class="prop-title spec-view-value-heading">PROPERTY TYPE</h2>
-        <h3 class="prop"><mms-transclude-name mms-eid="{{element.specialization.propertyType}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></h3>
+        <h3 class="prop"><mms-transclude-name mms-watch-id="true" mms-eid="{{element.specialization.propertyType}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></h3>
     </div>
 
     <div ng-if="element.specialization.type === 'Generalization' || element.specialization.type === 'Expose' || element.specialization.type === 'Dependency' || element.specialization.type === 'Conform'">
         <h2 class="prop-title">SOURCE</h2>
-        <h3 class="prop"><mms-transclude-name mms-eid="{{element.specialization.source}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></h3>
+        <h3 class="prop"><mms-transclude-name mms-watch-id="true" mms-eid="{{element.specialization.source}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></h3>
         <h2 class="prop-title">TARGET</h2>
-        <h3 class="prop"><mms-transclude-name mms-eid="{{element.specialization.target}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></h3>
+        <h3 class="prop"><mms-transclude-name mms-watch-id="true" mms-eid="{{element.specialization.target}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></h3>
     </div>
 
     <div ng-if="element.specialization.type === 'Connector'">
         <h2 class="prop-title">PATH 1</h2>
-        <h3 class="prop" ng-repeat="path in element.specialization.sourcePath"><mms-transclude-name mms-eid="{{path}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></h3>
+        <h3 class="prop" ng-repeat="path in element.specialization.sourcePath"><mms-transclude-name mms-watch-id="true" mms-eid="{{path}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></h3>
         <h2 class="prop-title">PATH 2</h2>
-        <h3 class="prop" ng-repeat="path in element.specialization.targetPath"><mms-transclude-name mms-eid="{{path}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></h3>
+        <h3 class="prop" ng-repeat="path in element.specialization.targetPath"><mms-transclude-name mms-watch-id="true" mms-eid="{{path}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></h3>
     </div>
 
     <div ng-if="element.specialization.type === 'Association'">
         <h2 class="prop-title">ROLE 1</h2>
-        <h3 class="prop"><mms-transclude-name mms-eid="{{element.specialization.source}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></h3>
+        <h3 class="prop"><mms-transclude-name mms-watch-id="true" mms-eid="{{element.specialization.source}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></h3>
         <h2 class="prop-title">ROLE 2</h2>
-        <h3 class="prop"><mms-transclude-name mms-eid="{{element.specialization.target}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></h3>
+        <h3 class="prop"><mms-transclude-name mms-watch-id="true" mms-eid="{{element.specialization.target}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></h3>
     </div>
 
     <div ng-if="element.specialization.type === 'Constraint'">
@@ -122,7 +122,7 @@
             <h3 class="prop" ng-switch-when="LiteralReal">{{value.double}}</h3>
             <h3 class="prop" ng-switch-when="LiteralUnlimitedNatural">{{value.naturalValue}}</h3>
             <h3 class="prop" ng-switch-when="LiteralString" ng-bind-html="value.string"></h3>
-            <h3 class="prop" ng-switch-when="ElementValue"><mms-transclude-name mms-eid="{{value.element}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></h3>
+            <h3 class="prop" ng-switch-when="ElementValue"><mms-transclude-name mms-watch-id="true" mms-eid="{{value.element}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></h3>
             <h3 class="prop" ng-switch-when="OpaqueExpression">{{value.expressionBody[0]}}</h3>
             <h3 class="prop" ng-switch-default>{{value}}</h3>
         </div>

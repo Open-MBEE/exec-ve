@@ -16,13 +16,13 @@
         </tr>
         <tr class="{{options.statuses[change.properties.specialization.source.type].style}}">
           <td>SOURCE</td>
-          <td><mms-transclude-name mms-eid="{{change.original.specialization.source}}" mms-version="{{targetTime}}" mms-ws="{{target}}"></mms-transclude-name></td>
-          <td><mms-transclude-name mms-eid="{{change.delta.specialization.source}}" mms-version="{{sourceTime}}" mms-ws="{{source}}"></mms-transclude-name></td>
+          <td><mms-transclude-name mms-watch-id="true" mms-eid="{{change.original.specialization.source}}" mms-version="{{targetTime}}" mms-ws="{{target}}"></mms-transclude-name></td>
+          <td><mms-transclude-name mms-watch-id="true" mms-eid="{{change.delta.specialization.source}}" mms-version="{{sourceTime}}" mms-ws="{{source}}"></mms-transclude-name></td>
         </tr>
         <tr class="{{options.statuses[change.properties.specialization.target.type].style}}">
           <td>TARGET</td>
-          <td><mms-transclude-name mms-eid="{{change.original.specialization.target}}" mms-version="{{targetTime}}" mms-ws="{{target}}"></mms-transclude-name></td>
-          <td><mms-transclude-name mms-eid="{{change.delta.specialization.target}}" mms-version="{{sourceTime}}" mms-ws="{{source}}"></mms-transclude-name></td>
+          <td><mms-transclude-name mms-watch-id="true" mms-eid="{{change.original.specialization.target}}" mms-version="{{targetTime}}" mms-ws="{{target}}"></mms-transclude-name></td>
+          <td><mms-transclude-name mms-watch-id="true" mms-eid="{{change.delta.specialization.target}}" mms-version="{{sourceTime}}" mms-ws="{{source}}"></mms-transclude-name></td>
         </tr>
       </tbody>
     </table>
@@ -59,8 +59,8 @@
 
     <tr class="{{options.statuses[change.properties.owner.type].style}}">
       <td>OWNER</td>
-      <td><mms-transclude-name mms-eid="{{change.original.owner}}" mms-version="{{targetTime}}" mms-ws="{{target}}"></mms-transclude-name></td>
-      <td><mms-transclude-name mms-eid="{{change.delta.owner}}" mms-version="{{sourceTime}}" mms-ws="{{source}}"></mms-transclude-name></td>
+      <td><mms-transclude-name mms-watch-id="true" mms-eid="{{change.original.owner}}" mms-version="{{targetTime}}" mms-ws="{{target}}"></mms-transclude-name></td>
+      <td><mms-transclude-name mms-watch-id="true" mms-eid="{{change.delta.owner}}" mms-version="{{sourceTime}}" mms-ws="{{source}}"></mms-transclude-name></td>
       <!-- 
       <td>
         <span ng-show="originalNode.property_conflict_status.owner">
@@ -117,7 +117,7 @@
               <span ng-switch-when="LiteralString" ng-bind-html="value.string"></span>
               <span ng-switch-when="Expression">{{value.operand}}</span>
               <span ng-switch-when="ElementValue">
-                <mms-transclude-name mms-version="{{sourceTime}}" mms-ws="{{source}}" mms-eid="{{value.element}}"></mms-transclude-name>
+                <mms-transclude-name mms-watch-id="true" mms-version="{{sourceTime}}" mms-ws="{{source}}" mms-eid="{{value.element}}"></mms-transclude-name>
               </span>
             </div>
           <td>
@@ -129,15 +129,15 @@
               <span ng-switch-when="LiteralString" ng-bind-html="value.string"></span>
               <span ng-switch-when="Expression">{{value.operand}}</span>
               <span ng-switch-when="ElementValue">
-                <mms-transclude-name mms-version="{{targetTime}}" mms-ws="{{target}}" mms-eid="{{value.element}}"></mms-transclude-name>
+                <mms-transclude-name mms-watch-id="true" mms-version="{{targetTime}}" mms-ws="{{target}}" mms-eid="{{value.element}}"></mms-transclude-name>
               </span>
             </div>
           </td>
         </tr>
         <tr class="{{options.statuses[change.properties.specialization.propertyType.type].style}}">
           <td>PROPERTY TYPE</td>
-          <td><mms-transclude-name mms-eid="{{change.original.specialization.propertyType}}" mms-version="{{targetTime}}" mms-ws="{{target}}"></mms-transclude-name></td>
-          <td><mms-transclude-name mms-eid="{{change.delta.specialization.propertyType}}" mms-version="{{sourceTime}}" mms-ws="{{source}}"></mms-transclude-name></td>
+          <td><mms-transclude-name mms-watch-id="true" mms-eid="{{change.original.specialization.propertyType}}" mms-version="{{targetTime}}" mms-ws="{{target}}"></mms-transclude-name></td>
+          <td><mms-transclude-name mms-watch-id="true" mms-eid="{{change.delta.specialization.propertyType}}" mms-version="{{sourceTime}}" mms-ws="{{source}}"></mms-transclude-name></td>
         </tr>
         <tr class="{{options.statuses[change.properties.specialization.aggregation.type].style}}">
           <td>AGGREGATION</td>
@@ -188,16 +188,16 @@
         </tr>
         <tr class="{{options.statuses[change.properties.specialization.sourcePath.type].style}}">
           <td>PATH 1</td>
-          <td><div ng-repeat="path in change.original.specialization.sourcePath"><mms-transclude-name mms-eid="{{path}}" mms-version="{{targetTime}}" mms-ws="{{target}}"></mms-transclude-name>
+          <td><div ng-repeat="path in change.original.specialization.sourcePath"><mms-transclude-name mms-watch-id="true" mms-eid="{{path}}" mms-version="{{targetTime}}" mms-ws="{{target}}"></mms-transclude-name>
           </div></td>
-          <td><div ng-repeat="path in change.delta.specialization.sourcePath"><mms-transclude-name mms-eid="{{path}}" mms-version="{{sourceTime}}" mms-ws="{{source}}"></mms-transclude-name>
+          <td><div ng-repeat="path in change.delta.specialization.sourcePath"><mms-transclude-name mms-watch-id="true" mms-eid="{{path}}" mms-version="{{sourceTime}}" mms-ws="{{source}}"></mms-transclude-name>
           </div></td>
         </tr>
         <tr class="{{options.statuses[change.properties.specialization.targetPath.type].style}}">
           <td>PATH 2</td>
-          <td><div ng-repeat="path in change.original.specialization.targetPath"><mms-transclude-name mms-eid="{{path}}" mms-version="{{targetTime}}" mms-ws="{{target}}"></mms-transclude-name>
+          <td><div ng-repeat="path in change.original.specialization.targetPath"><mms-transclude-name mms-watch-id="true" mms-eid="{{path}}" mms-version="{{targetTime}}" mms-ws="{{target}}"></mms-transclude-name>
           </div></td>
-          <td><div ng-repeat="path in change.delta.specialization.targetPath"><mms-transclude-name mms-eid="{{path}}" mms-version="{{sourceTime}}" mms-ws="{{source}}"></mms-transclude-name>
+          <td><div ng-repeat="path in change.delta.specialization.targetPath"><mms-transclude-name mms-watch-id="true" mms-eid="{{path}}" mms-version="{{sourceTime}}" mms-ws="{{source}}"></mms-transclude-name>
           </div></td>
         </tr>
         <tr class="{{options.statuses[change.properties.specialization.connectorType.type].style}}">
@@ -231,16 +231,16 @@
         </tr>
         <tr class="{{options.statuses[change.properties.specialization.source.type].style}}">
           <td>ROLE 1</td>
-          <td><mms-transclude-name mms-eid="{{change.original.specialization.source}}" mms-version="{{targetTime}}" mms-ws="{{target}}"></mms-transclude-name>
+          <td><mms-transclude-name mms-watch-id="true" mms-eid="{{change.original.specialization.source}}" mms-version="{{targetTime}}" mms-ws="{{target}}"></mms-transclude-name>
           </td>
-          <td><mms-transclude-name mms-eid="{{change.delta.specialization.source}}" mms-version="{{sourceTime}}" mms-ws="{{source}}"></mms-transclude-name>
+          <td><mms-transclude-name mms-watch-id="true" mms-eid="{{change.delta.specialization.source}}" mms-version="{{sourceTime}}" mms-ws="{{source}}"></mms-transclude-name>
           </td>
         </tr>
         <tr class="{{options.statuses[change.properties.specialization.target.type].style}}">
           <td>ROLE 2</td>
-          <td><mms-transclude-name mms-eid="{{change.original.specialization.target}}" mms-version="{{targetTime}}" mms-ws="{{target}}"></mms-transclude-name>
+          <td><mms-transclude-name mms-watch-id="true" mms-eid="{{change.original.specialization.target}}" mms-version="{{targetTime}}" mms-ws="{{target}}"></mms-transclude-name>
           </td>
-          <td><mms-transclude-name mms-eid="{{change.delta.specialization.target}}" mms-version="{{sourceTime}}" mms-ws="{{source}}"></mms-transclude-name>
+          <td><mms-transclude-name mms-watch-id="true" mms-eid="{{change.delta.specialization.target}}" mms-version="{{sourceTime}}" mms-ws="{{source}}"></mms-transclude-name>
           </td>
         </tr>
         <!--
@@ -257,9 +257,9 @@
       -->
         <tr class="{{options.statuses[change.properties.specialization.ownedEnd.type].style}}">
           <td>OWNED END</td>
-          <td><div ng-repeat="end in change.original.specialization.ownedEnd"><mms-transclude-name mms-eid="{{end}}" mms-version="{{targetTime}}" mms-ws="{{target}}"></mms-transclude-name>
+          <td><div ng-repeat="end in change.original.specialization.ownedEnd"><mms-transclude-name mms-watch-id="true" mms-eid="{{end}}" mms-version="{{targetTime}}" mms-ws="{{target}}"></mms-transclude-name>
           </div></td>
-          <td><div ng-repeat="end in change.delta.specialization.ownedEnd"><mms-transclude-name mms-eid="{{end}}" mms-version="{{sourceTime}}" mms-ws="{{source}}"></mms-transclude-name>
+          <td><div ng-repeat="end in change.delta.specialization.ownedEnd"><mms-transclude-name mms-watch-id="true" mms-eid="{{end}}" mms-version="{{sourceTime}}" mms-ws="{{source}}"></mms-transclude-name>
           </div></td>
         </tr>
       </tbody>
