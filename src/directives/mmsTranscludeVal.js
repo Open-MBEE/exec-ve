@@ -104,7 +104,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                 ElementService.getElement(scope.values[0].operand[1].element, false, scope.ws, scope.version)
                 .then(function(e) {
                     scope.isRestrictedVal = true;
-                    element.html(e.name);
+                    element.html("<span>" + e.name + "</span>");
                 });
             } else if (isExpression) {
                 $http.get(URLService.getElementURL(scope.mmsEid, scope.ws, scope.version) + '?evaluate')

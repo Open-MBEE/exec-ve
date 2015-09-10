@@ -42,6 +42,17 @@ function(_, $timeout, $scope, $rootScope, $state, $stateParams, $modal, growl, W
 
     $timeout(function () { $scope.treeApi.refresh(); $scope.treeApi.expand_all(); $rootScope.treeApi = $scope.treeApi; } );
     
+    $scope.treeHandler = function(branch) {
+        var previousActiveElement = angular.element('.diff-row-selected');
+        previousActiveElement.removeClass("diff-row-selected");
+        var activeElement = angular.element('#'+branch.data.sysmlid);
+        if(activeElement){
+            if(!activeElement.isOnScreen()){
+                activeElement.get(0).scrollIntoView();
+            }
+            activeElement.addClass("diff-row-selected");
+        }
+    };
     // END TREE STUFF
     
     $rootScope.$on('elementId', function(event, arg)
