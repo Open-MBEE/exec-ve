@@ -173,7 +173,7 @@ function mmsD3GroupedHorizontalBarChartIo(ElementService, UtilsService, TableSer
   
       function createGroupedHorizontalBarChart(data, dataIdDiv){
               if ( data.id !== "default" && dataIdDiv !== null)
-                dataIdDiv.append("h3").text(data.titles);
+                dataIdDiv.append("h3").text(data.title);
 
               d3.select(".ghbchart." + data.id).selectAll('*').remove();
               var svg = d3.select(".ghbchart." + data.id);
@@ -379,7 +379,7 @@ function mmsD3GroupedHorizontalBarChartIo(ElementService, UtilsService, TableSer
                 //dataseries[i] = tvalues;
              }
             var achartdata = {
-              titles: scopeTableTitles[k],
+              title: scopeTableTitles[k],
               id: scopeTableIds[k],//(scopeTableIds[k] !== undefined ? TableService.toValidId(scopeTableIds[k]) : "default"),
               labels: scopetableColumnHeadersLabel[k],
               legends: legends,
