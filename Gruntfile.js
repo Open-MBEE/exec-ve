@@ -137,7 +137,8 @@ module.exports = function(grunt) {
         globals: {
           angular: true,
           window: true,
-          console: true
+          console: true,
+          Stomp:true
         }
       }
     },
@@ -208,6 +209,13 @@ module.exports = function(grunt) {
             port: 443,
             changeOrigin: true,
             https: true,
+          },
+          {
+            context: '/stomp+ssl',
+            host: 'ems-test-origin.jpl.nasa.gov',
+            port: 61614,
+            https: true,
+            changeOrigin: true
           },
           {
             context: '/',

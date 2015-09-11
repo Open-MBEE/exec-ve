@@ -63,6 +63,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                 return false;
             if (scope.isEditing)*/
                 e.stopPropagation();
+        
         });
 
         var recompile = function() {
@@ -272,7 +273,22 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                 Utils.previewAction(scope, recompileEdit, recompile, type, element);
             };
         } 
-
+        //actions for stomp 
+        scope.$on("stomp.element", function(event, deltaWorkspaceId, deltaElementID){
+            // have to check i
+            if(deltaWorkspaceId === scope.ws && deltaElementID === scope.mmsEid){
+                //recompile();
+                recompileEdit();
+                console.log("=============true===========");
+            }
+            else {
+                console.log("=======this is being not being edited==============");
+            }
+            console.log(scope.ws + " WorkspaceID " + deltaWorkspaceId);
+            console.log(scope.mmsEid + " ElementID " + deltaElementID);
+            // check mmsEid === elementIDStomp and mmsWs === workspaceIdStomp => edit mode
+            // else update by calling recompile
+        });
         if (mmsViewPresentationElemCtrl) {
             scope.delete = function() {
                 Utils.deleteAction(scope,scope.bbApi,mmsViewPresentationElemCtrl.getParentSection());

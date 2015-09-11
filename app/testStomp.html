@@ -40,14 +40,25 @@
   <!-- MMS Services and Directives-->
   <script src="//cdn.jsdelivr.net/sockjs/1.0.0/sockjs.min.js"></script>
   <script src="/angular-stomp.js"></script>
+  <!-- MMS Services and Directives-->
+  <script src="mms.js"></script>
+  <script src="mms.directives.tpls.js"></script>
+  <script src="mms.directives.js"></script>
+
   <!-- MMS Application-->
+  <script src="js/mms/app.js"></script>
+  <script src="js/mms/controllers.js"></script>
   <script>
   angular.module('stompApp', ['AngularStomp'])
-  .controller('StompController', ['$scope','ngstomp',function($scope, ngstomp) {
+  .controller('StompController', ['$scope','ngstomp','$rootScope',function($scope, ngstomp, $rootScope) {
     $scope.master = {'documentation':'Hello World'};
     $scope.messages = [];
-    $scope.client = ngstomp('ws://localhost/stomp');
-
+    $scope.client = ngstomp('wss://ems-test-origin:61614/stomp+ssl');
+    $scope.client.connect("guest", "guest", function(){
+      $scope.client.subscribe("/topic/master", function(message) {
+        $scope.messages.push(message.body);
+      });
+    } ,function(){}, '/');
   }]);
 
 
