@@ -1,0 +1,13 @@
+mms-view {
+  .view-title {
+    font-family: $light-font-family-sans-serif;
+    font-weight: $light_font_weight;
+    font-size: 35px;
+    margin-top: 24px;
+    margin-bottom: 0px;
+  }
+
+  table {
+    @extend .content-table;
+  }
+}

@@ -1,0 +1,46 @@
+.redactor-selection-marker {
+  display: none;
+}
+
+.redactor_box {
+  z-index: 0 !important;
+}
+
+.redactor_editor {
+
+  &.redactor_editor_wym {
+    mms-transclude-name,
+    mms-transclude-doc,
+    mms-transclude-val {
+      background-color: $light_blue;
+      margin-top: 0;
+      margin-bottom: 0 !important;
+      padding: 3px !important;
+      border: 1px solid $black !important;
+      z-index: 0;
+    }
+
+    mms-transclude-com {
+      background-color: $yellow;
+      margin-top: 0;
+      margin-bottom: 0 !important;
+      padding: 3px !important;
+      border: 1px solid $black !important;
+      z-index: 0;
+    }
+  }
+}
+
+.redactor_toolbar {
+  color: $black;
+
+  li a:hover {
+    @include transition($background_hover_transition);
+    background-color: $tertiary_grey;
+    color: $black;
+
+    i::before {
+      color: $black
+    }
+  }
+}

@@ -1,0 +1,82 @@
+/*************************
+  Button variables that make Bootstrap
+  conform to the MMS app design guide
+*************************/
+
+.btn {
+  border: 0;
+  @include border-radius(3px);
+  padding: 11px 11px;
+
+  font-size: 11px;
+  font-weight: 400;
+
+  @include box-shadow(0px 1px 2px 0px rgba(50,50,50,.75));
+  @include transition(box-shadow .08s linear);
+
+  &:active {
+    @include box-shadow(0px 2px 2px 0px rgba(50,50,50,.75));
+    outline: none;
+  }
+}
+
+.btn-primary {
+  background-color: $base_blue;
+
+  &:hover, &:active, &:focus {
+    background-color: $base_blue;
+  }
+}
+
+.btn-success {
+  background-color: $green;
+
+  &:hover, &:active, &:focus {
+    background-color: $green;
+  }
+}
+
+.btn-danger {
+  background-color: $secondary_red;
+  
+  &:hover, &:active, &:focus {
+    background-color: $secondary_red;
+  }
+}
+
+.view-tools {
+  color: $black;
+  font-size: 16px;
+  line-height: 20px;
+  border-left: 1px solid $tertiary_grey;
+  border-right: 1px solid $tertiary_grey;
+  margin-left: -2px;
+  position: relative;
+  float: left;
+  width: 32px;
+  @include transition($background_hover_transition);
+
+  &:first-child {
+    margin-left: none;
+    border-left: 1px solid $tertiary_grey !important;
+  }
+
+  &:last-child {
+    border-right: 1px solid $tertiary_grey !important;
+  }
+
+  &:nth-child(even) {
+    border: 0;
+  }
+
+  &:hover {
+    background-color: $tertiary_grey;
+    cursor: pointer;
+    color: $black;
+    z-index: 100;
+  }
+
+  &.center {
+    text-align: center;
+  }
+}
