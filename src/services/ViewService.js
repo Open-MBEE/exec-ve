@@ -544,11 +544,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
            }
         };
 
-        if (projectId) {
-            projectId = projectId.replace('PROJECT', 'View_Instances');
-            instanceSpec.owner = projectId;
-        }
-
+        var createInstanceSpecElement = function() {
         ElementService.createElement(instanceSpec, workspace, site).then(function(createdInstanceSpec) {
 
             // Add in the presentation element:
@@ -564,13 +560,36 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 }, function(reason) {
                     deferred.reject(reason);
                 });
-
             }
-
         }, function(reason) {
             deferred.reject(reason);
         });
+        };
 
+        if (projectId) {
+            if (projectId.indexOf('PROJECT') >= 0) {
+                var viewInstancePackage = {
+                    sysmlid: projectId.replace('PROJECT', 'View_Instances'), 
+                    name: 'View Instances', 
+                    owner: projectId,
+                    specialization: {type: 'Package'}
+                };
+                ElementService.updateElement(viewInstancePackage, workspace)
+                .then(function() {
+                    projectId = projectId.replace('PROJECT', 'View_Instances');
+                    instanceSpec.owner = projectId;
+                    createInstanceSpecElement();
+                }, function(reason) {
+                    instanceSpec.owner = projectId;
+                    createInstanceSpecElement();
+                });
+            } else {
+                instanceSpec.owner = projectId;
+                createInstanceSpecElement();
+            }
+        } else {
+            createInstanceSpecElement();
+        }
         return deferred.promise;
     };
 
