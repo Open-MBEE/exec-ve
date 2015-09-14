@@ -45,7 +45,7 @@
                     version = viewVersion.version;
             }
             scope.render = function() {
-            if (scopetableColumnHeadersLabel.length === 0) return;
+              if (scopetableColumnHeadersLabel.length === 0) return;
               var i, j, k;
               var datatable = [];
               var dataValuesPerTable;
@@ -93,7 +93,6 @@
 
              TableService.readTables (scope.mmsEid,ws, version)
                .then(function(value) {
-                  console.log(value);
                   scopeTableTitles = value.tableTitles;
                   scopeTableIds = value.tableIds;
                   scopetableColumnHeadersLabel= value.tableColumnHeadersLabels;
