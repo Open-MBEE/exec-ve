@@ -1,5 +1,5 @@
 .diff-pane-center {
-  margin-right: -14px;
+  /*margin-right: -14px;*/
 
   > .pane-center {
     @include box-shadow(-4px 0px 2px -2px rgba(0, 0, 0, .24));
@@ -19,12 +19,14 @@
       border-bottom: 0 !important;
       padding: 0;
       vertical-align: middle !important;
+      /*font-size: 16px;*/
     }
 
     tbody {
       td {
         border-bottom: 1px solid #f3f3f3;
         padding: 0;
+        /*font-size: 14px;*/
       }
 
       tr {
@@ -66,12 +68,12 @@
 
         tr {
           td:nth-child(1) {
-            padding: 15px 0 15px 50px;
+            padding: 10px;
           }
 
           td:nth-child(2),
           td:nth-child(3) {
-            padding: 15px 15px 15px 0;
+            padding: 10px;
           }
         }
       }
@@ -81,7 +83,7 @@
 
 @media screen and (min-width: 1500px) {
   .diff-pane-center {
-    .pane-center-header {
+    /*.pane-center-header {
       font-size: 56px;
     }
 
@@ -116,6 +118,6 @@
           }
         }
       }
-    } 
+    } */
   }
 }

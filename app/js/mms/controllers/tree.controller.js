@@ -111,7 +111,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
     });
 
     $scope.$on('tree.merge', function() {
-        $scope.toggleMerge();
+        $scope.mergeAssist();
     });
 
     $scope.$on('tree.reorder.view', function() {
@@ -185,7 +185,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
         $scope.mms_treeApi.clear_selected_branch();
     };
 
-    // TODO: Move toggle to button bar api
+    // BEGIN @DEPRECATED
     $scope.mergeOn = false;
     $scope.toggleMerge = function() {
         var branch = $scope.mms_treeApi.get_selected_branch();
@@ -201,6 +201,28 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
         $scope.mergeOn = !$scope.mergeOn;
         $scope.mergeFrom = branch;
         $scope.mergeTo = parent_branch;
+    };
+    
+    // END @DEPRECATED
+    
+    $scope.mergeAssist = function() {
+	    $rootScope.mergeInfo = {
+	      pane: 'fromToChooser',
+	      tree_rows: $rootScope.mms_treeApi.get_rows()
+        };
+
+        for (var rowItem in $rootScope.mergeInfo.tree_rows){
+            if($rootScope.mms_treeApi.get_parent_branch($rootScope.mergeInfo.tree_rows[rowItem].branch) !== null){
+                $rootScope.mergeInfo.tree_rows[rowItem].parentInfo = $rootScope.mms_treeApi.get_parent_branch($rootScope.mergeInfo.tree_rows[rowItem].branch);
+            } else {
+                $rootScope.mergeInfo.tree_rows[rowItem].parentInfo = null;
+            }
+        }
+                
+        var modalInstance = $modal.open({
+	        templateUrl: 'partials/mms/merge_assistant.html',
+	        controller: 'WorkspaceMergeAssistant'
+        });
     };
 
     $scope.pickNew = function(source, branch) {
@@ -238,7 +260,17 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
             targetTime = $scope.mergeTo.data.timestamp;
         }
         $scope.comparing = true;
-        $state.go('workspace.diff', {source: sourceWs, target: targetWs, sourceTime: sourceTime, targetTime: targetTime});
+        //try background diff
+        WorkspaceService.diff(targetWs, sourceWs, targetTime, sourceTime)
+        .then(function(data) {
+            if (data.status === 'GENERATING') {
+                growl.info("tell user to wait for email");
+                $scope.comparing = false;
+                return;
+            }
+            $state.go('workspace.diff', {source: sourceWs, target: targetWs, sourceTime: sourceTime, targetTime: targetTime});
+        });
+        //$state.go('workspace.diff', {source: sourceWs, target: targetWs, sourceTime: sourceTime, targetTime: targetTime});
     };
 
     // Filter out alfresco sites
@@ -446,7 +478,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
         var addContentsSectionTreeNode = function(operand) {
             var instances = [];
             operand.forEach(function(instanceVal) {
-                instances.push(ViewService.parseExprRefTree(instanceVal, $scope.workspace, time));
+                instances.push(ViewService.parseExprRefTree(instanceVal, ws, time));
             });
             $q.all(instances).then(function(results) {
                 var k = results.length - 1;

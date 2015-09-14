@@ -120,10 +120,12 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService, _
      * @param {string} ws2time timestamp of ws2
      * @returns {Promise} Promise would be resolved with diff object
      */
-    var diff = function(ws1, ws2, ws1time, ws2time) {
+    var diff = function(ws1, ws2, ws1time, ws2time, recalc) {
         /*var deferred = $q.defer();
         deferred.resolve(dummy);
         return deferred.promise;*/
+        
+        if(recalc !== true) recalc = false;
 
         var w1time = !ws1time ? 'latest' : ws1time;
         var w2time = !ws2time ? 'latest' : ws2time;
@@ -132,7 +134,8 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService, _
             return inProgress[key];
         var deferred = $q.defer();
         inProgress[key] = deferred.promise;
-        $http.get(URLService.getWsDiffURL(ws1, ws2, w1time, w2time))
+        
+        $http.get(URLService.getWsDiffURL(ws1, ws2, w1time, w2time, recalc))
         .success(function(data, status, headers, config) {
             deferred.resolve(data);
             delete inProgress[key];
@@ -140,6 +143,7 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService, _
             URLService.handleHttpStatus(data, status, headers, config, deferred);
             delete inProgress[key];
         });
+        
         return deferred.promise;
     };
 

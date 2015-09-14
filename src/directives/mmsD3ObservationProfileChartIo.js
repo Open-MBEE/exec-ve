@@ -5,11 +5,6 @@ function mmsD3ObservationProfileChartIo(ElementService, UtilsService, $compile, 
       
   var mmsChartLink = function(scope, element, attrs) {
       
-      /*console.log("mmsChartLink=============");
-      console.log(scope);
-      console.log(element);
-      console.log(attrs);
-      */
     var reversed = false;
     if (scope.reversed !== undefined)
       reversed = Boolean(scope.reversed);

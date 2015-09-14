@@ -224,9 +224,6 @@ function mmsD3GroupedHorizontalBarChartIo(ElementService, UtilsService, $compile
                   colors: udcolors[k],
                   series: dataseries
                  };
-               // console.log("=====render data ============");
-               // console.log(data);
-                //console.log(scope.tableRowHeadersLabel);
               /* original datavar data = {
                   id: "id123",
                   labels: [

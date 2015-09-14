@@ -103,7 +103,7 @@ function mmsViewLink(ElementService, $compile, growl) {
             mmsTag: '@'
         },
         require: '?^mmsView',
-        template: '<a href="mms.html#/workspaces/{{ws}}/sites/{{site}}/documents/{{docid}}/views/{{vid}}{{query}}">{{element.name}}</a>',
+        template: '<a href="mms.html#/workspaces/{{ws}}/sites/{{site}}/documents/{{docid}}/views/{{vid}}{{query}}">{{element.name || "Unnamed View"}}</a>',
         //controller: ['$scope', controller]
         link: mmsViewLinkLink
     };
