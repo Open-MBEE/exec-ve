@@ -226,12 +226,13 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
      * @param {boolean} [update=false] update elements from server
      * @param {string} [workspace=master] (optional) workspace to use
      * @param {string} [version=latest] (optional) alfresco version number or timestamp
+     * @param {integer} [depth=0] depth, 0 is infinite, will include this element
      * @returns {Promise} The promise will be resolved with an array of 
      * element objects 
      */
-    var getOwnedElements = function(id, update, workspace, version) {
+    var getOwnedElements = function(id, update, workspace, version, depth) {
         var n = normalize(id, update, workspace, version);
-        return getGenericElements(URLService.getOwnedElementURL(id, n.ws, n.ver), 'elements', n.update, n.ws, n.ver);
+        return getGenericElements(URLService.getOwnedElementURL(id, n.ws, n.ver, depth), 'elements', n.update, n.ws, n.ver);
     };
 
     /**

@@ -21,7 +21,15 @@ module.exports = function(grunt) {
         }
       }
     },
-    
+
+    cacheBust: {
+      assets: {
+        files: {
+          src: ['build/mms.html', 'build/mmsFullDoc.html']
+        }
+      }
+    },
+
     wiredep: {
 
       target: {
@@ -43,15 +51,27 @@ module.exports = function(grunt) {
 
     html2js: {
       options: {
-        module: 'mms.directives.tpls',
+        module: function(modulePath, taskName) {
+          if (taskName === 'directives')
+            return 'mms.directives.tpls';
+          return 'app.tpls';
+        },
+        //module: 'mms.directives.tpls',
         rename: function(modulePath) {
-          var moduleName = modulePath.replace('directives/templates/', '');
-          return 'mms/templates/' + moduleName;
+          if (modulePath.indexOf('directives/templates') > -1) {
+            var moduleName = modulePath.replace('directives/templates/', '');
+            return 'mms/templates/' + moduleName;
+          }
+          return modulePath.replace('app/', '').replace('../', '');
         }
       },
-      main: {
+      directives: {
         src: ['src/directives/templates/*.html'],
         dest: 'dist/mms.directives.tpls.js'
+      },
+      main: {
+        src: ['app/partials/mms/*.html'],
+        dest: 'build/js/mms/app.tpls.js'
       }
     },
 
@@ -137,7 +157,9 @@ module.exports = function(grunt) {
         globals: {
           angular: true,
           window: true,
-          console: true
+          console: true,
+          Timely: true,
+          __timely: true
         }
       }
     },
@@ -500,6 +522,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-artifactory-artifact');
   grunt.loadNpmTasks('grunt-sloc');
   grunt.loadNpmTasks('grunt-plato');  
+  grunt.loadNpmTasks('grunt-cache-bust');
   
   // grunt.registerTask('install', ['npm-install', 'bower']);
   grunt.registerTask('install', ['bower-install-simple']);
@@ -508,8 +531,8 @@ module.exports = function(grunt) {
   grunt.registerTask('minify',  ['cssmin', 'uglify']);
   grunt.registerTask('wire',    ['wiredep']);
 
-  grunt.registerTask('dev-build',     ['install', 'compile', 'lint', 'concat', 'minify', 'copy', 'wire']);
-  grunt.registerTask('release-build', ['install', 'compile', 'lint', 'concat', 'minify', 'copy', 'wire']);
+  grunt.registerTask('dev-build',     ['install', 'compile', 'lint', 'concat', 'minify', 'copy', 'wire', 'cacheBust']);
+  grunt.registerTask('release-build', ['install', 'compile', 'lint', 'concat', 'minify', 'copy', 'wire', 'cacheBust']);
   grunt.registerTask('docs-build',    ['ngdocs']);
   grunt.registerTask('default', ['dev-build']);
   grunt.registerTask('deploy', ['dev-build', 'artifactory:client:publish']);
