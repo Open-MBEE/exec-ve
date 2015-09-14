@@ -65,6 +65,12 @@ function UxService($rootScope) {
 		  case "document.snapshot.create":
 		    return {id: button, icon: 'fa-plus', dynamic: true, selected: false, active: false, permission:false, tooltip: 'Create Tag',
 		            spinner: false, onClick: function() {$rootScope.$broadcast(button);}};
+		  case "diff.perspective.detail":
+            return {id: button, icon: 'fa-info-circle', selected: true, active: true, permission: true, tooltip: 'Detail',
+                    spinner: false, onClick: function() {$rootScope.diffPerspective = 'detail'; }};
+		  case "diff.perspective.tree":
+            return {id: button, icon: 'fa-sitemap', selected: false, active: true, permission: true, tooltip: 'Context',
+                    spinner: false, onClick: function() {$rootScope.diffPerspective = 'tree'; }};
 		}    
 	};
 
@@ -98,7 +104,7 @@ function UxService($rootScope) {
 		  	return {id: button, icon: 'fa-trash', selected: true, active: true, permission: false, tooltip: 'Delete View', 
             		spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
 		  case "tree.merge":
-		  	return {id: button, icon: 'fa-share-alt fa-flip-horizontal', selected: true, active: true, permission: true, tooltip: 'Merge Task', 
+		  	return {id: button, icon: 'fa-share-alt fa-flip-horizontal', selected: true, active: true, permission: true, tooltip: 'Compare', 
             		spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
 		  case "tree.reorder.view":
 		  	return {id: button, icon: 'fa-arrows-v', selected: true, active: true, permission: false, tooltip: 'Reorder Views', 
@@ -143,9 +149,11 @@ function UxService($rootScope) {
           case "view.add.dropdown":
             return {id: button, icon: 'fa-plus', selected: true, active: true, permission: true, tooltip: 'Add Item', 
                     spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);},
-                	dropdown_buttons: [getButtonBarButton("view.add.paragraph"), getButtonBarButton("view.add.table"),
-                						getButtonBarButton("view.add.list"), getButtonBarButton("view.add.equation"), getButtonBarButton("view.add.image"),
-                						getButtonBarButton("view.add.section")]};
+                	dropdown_buttons: [getButtonBarButton("view.add.paragraph"), getButtonBarButton("view.add.section")]
+                  //, getButtonBarButton("view.add.table"),
+                		//				getButtonBarButton("view.add.list"), getButtonBarButton("view.add.equation"), getButtonBarButton("view.add.image"),
+                			//			getButtonBarButton("view.add.section")]
+                    };
           case "view.add.table":
             return {id: button, icon: 'fa-table', selected: true, active: true, permission: true, tooltip: 'Add Table', 
                     spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
@@ -179,9 +187,11 @@ function UxService($rootScope) {
           case "section.add.dropdown":
             return {id: button, icon: 'fa-plus', selected: true, active: true, permission: true, tooltip: 'Add Item', 
                     spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);},
-                    dropdown_buttons: [getButtonBarButton("section.add.paragraph",scope), getButtonBarButton("section.add.table",scope),
-                                        getButtonBarButton("section.add.list",scope), getButtonBarButton("section.add.equation", scope), getButtonBarButton("section.add.image",scope),
-                                        getButtonBarButton("section.add.section",scope)]};
+                    dropdown_buttons: [getButtonBarButton("section.add.paragraph",scope), getButtonBarButton("section.add.section", scope)]
+                    //, getButtonBarButton("section.add.table",scope),
+                      //                  getButtonBarButton("section.add.list",scope), getButtonBarButton("section.add.equation", scope), getButtonBarButton("section.add.image",scope),
+                        //                getButtonBarButton("section.add.section",scope)]
+                      };
           case "section.add.table":
             return {id: button, icon: 'fa-table', selected: true, active: true, permission: true, tooltip: 'Add Table', 
                     spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button, scope.section);}};
@@ -216,8 +226,11 @@ function UxService($rootScope) {
 	};
 
 	var getTypeIcon = function(type) {
-		type = type.toLowerCase();
-		switch (type) {
+    var t = type;
+    if (!t)
+      t = "unknown";
+		t = t.toLowerCase();
+		switch (t) {
 		  case "configuration":
 		  	return "fa-tag";
 		  case "connector":
@@ -246,13 +259,28 @@ function UxService($rootScope) {
 		  	return "fa-file";
 		  case "workspace":
 		  	return "fa-tasks";
+      default:
+        return "fa-square";
         }
 	};
+
+  var getChangeTypeName = function(type) {
+    type = type.toLowerCase();
+    switch (type) {
+      case "added":
+        return "Addition";
+      case "updated":
+        return "Modification";
+      case "removed":
+        return "Removal";
+    }
+  };
 
     return {
     	getButtonBarButton: getButtonBarButton,
         getToolbarButton: getToolbarButton,
         getTypeIcon: getTypeIcon,
+        getChangeTypeName: getChangeTypeName,
         getTreeTypes: getTreeTypes
     };
 }

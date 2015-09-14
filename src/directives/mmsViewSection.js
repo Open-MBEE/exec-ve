@@ -61,8 +61,12 @@ function mmsViewSection($compile, $templateCache, $rootScope, ElementService, Vi
 
         if (mmsViewCtrl) {
             var viewVersion = mmsViewCtrl.getWsAndVersion();
-            if (viewVersion)
+            if (viewVersion) {
                 scope.ws = viewVersion.workspace;
+                scope.version = viewVersion.version;
+            }
+            if (!scope.version)
+                scope.version = 'latest';
         }
 
         if (mmsViewCtrl && mmsViewPresentationElemCtrl) {
@@ -115,7 +119,7 @@ function mmsViewSection($compile, $templateCache, $rootScope, ElementService, Vi
     return {
         restrict: 'E',
         scope: {
-            section: '=mmsSection'
+            section: '=mmsSection' //this is json if contains, the instancespec if contents
         },
         require: ['?^mmsView','?^mmsViewPresentationElem'],
         controller: ['$scope', '$rootScope', mmsViewSectionCtrl],

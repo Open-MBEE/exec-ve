@@ -545,6 +545,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         };
 
         if (projectId) {
+            projectId = projectId.replace('PROJECT', 'View_Instances');
             instanceSpec.owner = projectId;
         }
 

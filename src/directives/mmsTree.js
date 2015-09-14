@@ -260,7 +260,6 @@ function mmsTree($timeout, $log, $templateCache) {
                 var expand_icon = "";
                 var type_icon = "";
                 var status_properties = { style: "" };
-                var button_properties = "";
 
                 if (!branch.expanded)
                     branch.expanded = false;
@@ -275,16 +274,13 @@ function mmsTree($timeout, $log, $templateCache) {
 
                 if (branch.loading)
                     type_icon = "fa fa-spinner fa-spin";
-                else if (scope.options && scope.options.types && scope.options.types[branch.type])
+                else if (scope.options && scope.options.types && scope.options.types[branch.type.toLowerCase()])
                     type_icon = scope.options.types[branch.type.toLowerCase()];
                 else
                     type_icon = attrs.iconDefault;
 
                 if (scope.options && scope.options.statuses && scope.options.statuses[branch.status]) {
                     status_properties = scope.options.statuses[branch.status];
-                    if (scope.options.buttons && scope.options.buttons[status_properties.button]) {
-                        button_properties = scope.options.buttons[status_properties.button];
-                    }
                 }
                 
                 branch.section = section;
@@ -298,7 +294,6 @@ function mmsTree($timeout, $log, $templateCache) {
                     visible: visible,
                     status: branch.status,
                     status_properties: status_properties,
-                    button_properties: button_properties,
                     type_icon: type_icon
                 });
                 if (branch.children) {
@@ -690,6 +685,11 @@ function mmsTree($timeout, $log, $templateCache) {
                     }
                 });
                 return branch;
+            };
+            
+            tree.get_rows = function()
+            {
+	            return scope.tree_rows;
             };
         }
     };

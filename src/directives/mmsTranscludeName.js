@@ -87,7 +87,8 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
         var idwatch = scope.$watch('mmsEid', function(newVal, oldVal) {
             if (!newVal)
                 return;
-            idwatch();
+            if (!scope.mmsWatchId)
+                idwatch();
             var ws = scope.mmsWs;
             var version = scope.mmsVersion;
             if (mmsViewCtrl) {
@@ -172,7 +173,8 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
         scope: {
             mmsEid: '@',
             mmsWs: '@',
-            mmsVersion: '@'
+            mmsVersion: '@',
+            mmsWatchId: '@'
         },
         require: '?^mmsView',
         controller: ['$scope', mmsTranscludeNameCtrl],

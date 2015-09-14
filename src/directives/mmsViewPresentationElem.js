@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsViewPresentationElem', ['ViewService', 'ElementService', '$templateCache', '$rootScope', mmsViewPresentationElem]);
+.directive('mmsViewPresentationElem', ['ViewService', 'ElementService', '$templateCache', '$rootScope', 'growl', mmsViewPresentationElem]);
 
 /**
  * @ngdoc directive
@@ -18,7 +18,7 @@ angular.module('mms.directives')
  * @param {Object} mmsInstanceVal A InstanceValue json object 
  * @param {Object} mmsParentSection the parent section if available
  */
-function mmsViewPresentationElem(ViewService, ElementService, $templateCache, $rootScope) {
+function mmsViewPresentationElem(ViewService, ElementService, $templateCache, $rootScope, growl) {
     var template = $templateCache.get('mms/templates/mmsViewPresentationElem.html');
 
     var mmsViewPresentationElemCtrl = function($scope, $rootScope) {
@@ -43,6 +43,11 @@ function mmsViewPresentationElem(ViewService, ElementService, $templateCache, $r
 
     var mmsViewPresentationElemLink = function(scope, element, attrs, mmsViewCtrl) {
         if (scope.mmsInstanceVal) {
+            if (!scope.mmsInstanceVal.instance) {
+                element.html('<span class="error">Reference is null</span>');
+                growl.error("A presentation element reference is null.");
+                return;
+            }
             var ws = null;
             var version = null;
             if (mmsViewCtrl) {
@@ -65,6 +70,12 @@ function mmsViewPresentationElem(ViewService, ElementService, $templateCache, $r
                     scope.instanceSpec = instanceSpec;
                     scope.presentationElemLoading = false;
                 });
+            }, function(reason) {
+                var status = ' not found';
+                if (reason.status === 410)
+                    status = ' deleted';
+                element.html('<span class="error">View element reference error: ' + scope.mmsInstanceVal.instance + ' ' + status + '</span>');
+                growl.error('View Element Ref Error: ' + scope.mmsInstanceVal.instance + ' ' + reason.message);
             });
         } 
     };
