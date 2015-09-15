@@ -346,7 +346,7 @@ function mmsD3ObservationProfileChartIo(ElementService, UtilsService, TableServi
             }
             states.push(eachStates);
         }//end of for loop i
-        console.log(states);
+        
         dataseries= [];
         if ( reversed){     
           states = transpose(states);
@@ -502,8 +502,6 @@ function mmsD3ObservationProfileChartIo(ElementService, UtilsService, TableServi
 
     TableService.readTables (scope.mmsEid,ws, version)
       .then(function(value) {
-        console.log("TableService");
-        console.log(value);
         scopeTableTitles = value.tableTitles;
         scopeTableIds = value.tableIds;
         scopetableColumnHeadersLabel= value.tableColumnHeadersLabels;

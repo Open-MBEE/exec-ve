@@ -172,7 +172,7 @@ function mmsD3GroupedHorizontalBarChartIo(ElementService, UtilsService, TableSer
       }
   
       function createGroupedHorizontalBarChart(data, dataIdDiv){
-              if ( data.id !== "default" && dataIdDiv !== null)
+              if ( dataIdDiv !== null)
                 dataIdDiv.append("h3").text(data.title);
 
               d3.select(".ghbchart." + data.id).selectAll('*').remove();
@@ -447,8 +447,6 @@ function mmsD3GroupedHorizontalBarChartIo(ElementService, UtilsService, TableSer
       
       TableService.readTables (scope.mmsEid,ws, version)
          .then(function(value) {
-            console.log("TableService.readTables");
-            console.log(value);
             scopeTableTitles = value.tableTitles;
             scopeTableIds = value.tableIds;
             scopetableColumnHeadersLabel= value.tableColumnHeadersLabels;
