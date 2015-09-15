@@ -72,6 +72,21 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
             });
             if ($scope.view.specialization.contents) {
                 $scope.bbApi.addButton(UxService.getButtonBarButton('view.add.dropdown'));
+            } else {
+                var fakeDropdown = {
+                    id: 'view.add.dropdown.fake', 
+                    icon: 'fa-plus', 
+                    selected: true, 
+                    active: true, 
+                    permission: true, 
+                    tooltip: 'Add New Element Disabled', 
+                    spinner: false, 
+                    togglable: false, 
+                    action: function() {
+                        growl.warning("This view hasn't been converted to support adding new elements.");
+                    }
+                };
+                $scope.bbApi.addButton(fakeDropdown);
             }
         }
         $scope.bbApi.addButton(UxService.getButtonBarButton('show.comments'));
@@ -132,7 +147,11 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
                     description: 'previous',
                     callback: function() {$scope.$broadcast('center.previous');}
                 });
-                $scope.sectionNumber = $rootScope.mms_treeApi.get_selected_branch().section;
+                if ($rootScope.mms_treeApi && $rootScope.mms_treeApi.get_selected_branch) {
+                    var selected_branch = $rootScope.mms_treeApi.get_selected_branch();
+                    if (selected_branch)
+                        $scope.sectionNumber = selected_branch.section;
+                }
             }
         }
     };
