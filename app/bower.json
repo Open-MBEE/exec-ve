@@ -34,13 +34,15 @@
     "angular-hotkeys": "https://github.com/chieffancypants/angular-hotkeys.git#1.5.0",
     "font-awesome-bower": "~4.3.0",
     "lodash": "~3.9.3",
-    "timely-angular": "git@github.jpl.nasa.gov:SEQR/timely-angular.git#master"
+    "d3": "~3.5.6",
+    "c3": "~0.4.10",
+    "timely": "git@github.jpl.nasa.gov:SEQR/timely.git#master"
   },
   "devDependencies": {
     "angular-mocks": "~1.4.0"
   },
   "resolutions": {
-    "angular": "1.4.0",
-    "lodash": "3.9.3"
+    "lodash": "3.9.3",
+    "d3": "3.5.6"
   }
 }

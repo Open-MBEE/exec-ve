@@ -1,33 +1,39 @@
 'use strict';
  angular.module('mms.directives')
-    .directive('mmsD3RadarChartIo', ['ElementService', 'UtilsService','$compile', 'growl','$window', mmsD3RadarChartIo]);
-    function mmsD3RadarChartIo(ElementService, UtilsService, $compile, growl, $window, mmsViewCtrl) {
+    .directive('mmsD3RadarChartIo', ['ElementService', 'UtilsService', 'TableService', '$compile', 'growl','$window', mmsD3RadarChartIo]);
+    function mmsD3RadarChartIo(ElementService, UtilsService, TableService, $compile, growl, $window) {
       
-      var mmsRadarChartLink = function(scope, element, attrs) {
-          var d3 = $window.d3;  
-          var colorscale = d3.scale.category10();
-          var w = 500, h = 500;
+      var mmsRadarChartLink = function(scope, element, attrs, mmsViewCtrl) {
+        var d3 = $window.d3;  
+        var colorscale = d3.scale.category10();
+        var w = 500, h = 500;
 
-          //if no below div, the table will be on top of Radar chart.
-          var xx = d3.select(element[0])
+       var dataIdFilters = [];
+       var scopeTableIds = [];
+       var scopeTableTitles=[];
+       var scopetableColumnHeadersLabel= [];
+
+
+        //if no below div, the table will be on top of Radar chart.
+        /*  var xx = d3.select(element[0])
           .append('div')
           .append("svg")
           .attr("height", h+200)
           .attr("width", w + 200);
+        */
+ 
+          var divchart = d3.select(element[0]).append('div');
 
-           var divchart = d3.select(element[0]) 
+           /*var divchart = d3.select(element[0]) 
           .append("div")
           .attr("id", "chart");
-          //.attr("height", h+200)
-          //.attr("width", w + 200);
-          //.classed("svg-container", true); //container class to make it responsive
-
+ 
            var svg = divchart 
             .append('svg')
             .attr("height", h+200)
             .attr("width", w + 200);
+          */
          
-          var columns = [];
            var processed = false;
             var ws = scope.mmsWs;
             var version = scope.mmsVersion;
@@ -39,28 +45,42 @@
                     version = viewVersion.version;
             }
             scope.render = function() {
-                if (columns.length === 0) return;
-                //if (changelegends){
-                  var datatable = [];
-                  for (i = 0; i < scope.datavalues.length; i++){
-                    var row = scope.datavalues[i];
-                    var datarow = [];
-                    for ( var j = 0; j < row.length; j++){
-                      if (row[j].specialization.value[0].type === "LiteralString")
-                        datarow[j] = {axis: columns[j], value:row[j].specialization.value[0].string };
-                      else if (row[j].specialization.value[0].type === "LiteralReal")
-                        datarow[j] = {axis: columns[j], value:row[j].specialization.value[0].double };
-                      else if (row[j].specialization.value[0].type === "LiteralInteger")
-                        datarow[j] = {axis: columns[j], value:row[j].specialization.value[0].integer };
+              if (scopetableColumnHeadersLabel.length === 0) return;
+              var i, j, k;
+              var datatable = [];
+              var dataValuesPerTable;
+              for ( k = 0; k < scope.datavalues.length; k++){
+                dataValuesPerTable = scope.datavalues[k];
+                var rowvalues=[];
+                var rowsysmlids=[];
+                for ( i = 0; i < dataValuesPerTable.length; i++){
+                    var tvalues = [];
+                    //var sysmlids = []; //not used but possible to use for filter
+                    for ( j = 0; j < dataValuesPerTable[i].length; j++){
+                      //sysmlids[j] =  dataValuesPerTable[i][j].sysmlid;
+                      if (dataValuesPerTable[i][j].specialization.value[0].type === "LiteralString")
+                        tvalues[j] = {axis: scopetableColumnHeadersLabel[k][j],  value:dataValuesPerTable[i][j].specialization.value[0].string};
+                      else if (dataValuesPerTable[i][j].specialization.value[0].type === "LiteralReal")
+                        tvalues[j] = {axis: scopetableColumnHeadersLabel[k][j],  value:dataValuesPerTable[i][j].specialization.value[0].double};
+                      else if (dataValuesPerTable[i][j].specialization.value[0].type === "LiteralInteger")
+                        tvalues[j] = {axis: scopetableColumnHeadersLabel[k][j],  value:dataValuesPerTable[i][j].specialization.value[0].integer};
                     }
-                    datatable[i] = datarow;
-                  }
-                  RadarChart.draw("#chart", datatable);
-                  var LegendOptions= [];
-                  for ( var i = 0; i < scope.legends.length; i++){
-                    LegendOptions[i] = scope.legends[i].name;
-                  }
-                  initiateLegend(LegendOptions);
+                    rowvalues[i] = tvalues;
+                    //rowsysmlids[i] =sysmlids;
+                }
+                d3.select("."+ scopeTableIds[k]).remove();
+                var dataIdDiv = divchart.append('div').attr("class", scopeTableIds[k])
+                                                      .attr("style", 'border:1px solid #ddd');
+
+
+                RadarChart.draw(scopeTableIds[k], rowvalues, dataIdDiv, scopeTableTitles[k]);
+                //add legends
+                var legends = [];
+                for ( i = 0; i < scope.tableRowHeaders[k].length; i++){
+                  legends.push(scope.tableRowHeaders[k][i].name);
+                }
+                initiateLegend(legends, scopeTableIds[k]);
+              } //end of loop k (per table)
             }; //end of scope.render
  
             scope.$watch('datavalues', function(newVals, oldVals) {
@@ -70,47 +90,20 @@
                   return scope.render();
                   }, true);
             
-            ElementService.getElement(scope.mmsEid, false, ws, version)
-            .then(function(data) {
-                  var LegendOptionsMmsEid = [];
-                  var header = data.specialization.contains[1].header[0];//array[4]
-                  columns = [];
-                  for ( i = 1; i < header.length; i++){
-                      columns[i-1] = header[i].content[0].text.replace("<p>","").replace("</p>","");
-                  }
 
-                  var body = data.specialization.contains[1].body;//array[3] each of them contain array[4]
-                  var dataValuesMmmEid = [];
-                  var counter = 0;
-                  for (var i = 0; i < body.length; i++ ){
-                      LegendOptionsMmsEid[i] = body[i][0].content[0].source;
-                      for ( var j = 1; j < body[i].length; j++){
-                        dataValuesMmmEid[counter++] = body[i][j].content[0].source;
-                      }
-                  }
-                  ElementService.getElements(LegendOptionsMmsEid, false, ws, version)
-                    .then(function(legends) {
-                            ElementService.getElements(dataValuesMmmEid, false, ws, version)
-                              .then(function(values) {
-                              var datavalues = [];
-                              var counter = 0;
-                              for ( var i = 0; i < values.length; i= i + columns.length){
-                                  var datarow = new Array(columns.length);
-                                  for ( var j = 0; j < columns.length; j++){
-                                     datarow[j] = values[i+j]; 
-                                  }
-                                  datavalues[counter++]=datarow;
-                              }
-                              scope.datavalues = datavalues;
-                              scope.legends = legends;
-                              scope.render();
-                        });
-                  }); //end of ElementService
-                  
-            });//end of ElementService
-          var cfg;
+             TableService.readTables (scope.mmsEid,ws, version)
+               .then(function(value) {
+                  scopeTableTitles = value.tableTitles;
+                  scopeTableIds = value.tableIds;
+                  scopetableColumnHeadersLabel= value.tableColumnHeadersLabels;
+                  scope.tableRowHeaders = value.tableRowHeaders;
+                  scope.datavalues = value.datavalues; //[][] - array
+                  dataIdFilters = value.dataIdFilters;
+            });
+
+        var cfg;
         var RadarChart = {
-        draw: function(id, d){
+        draw: function(id, d, dataIdDiv, title){
           cfg = {
            radius: 5,
            w: 500,
@@ -141,7 +134,17 @@
         var total = allAxis.length;
         var radius = cfg.factor*Math.min(cfg.w/2, cfg.h/2);
         
-        d3.select('#chart').select("svg").selectAll('*').remove();
+        if ( dataIdDiv !== null)
+          dataIdDiv.append("h3").text(title);
+        d3.select(".rdchart." + id).selectAll('*').remove();
+              var svg = d3.select(".rdchart." + id);
+        if ( svg[0][0] === null) //first time
+            svg = dataIdDiv.append("svg").attr("class", "rdchart " + id)
+                                         .attr("height", h+200)
+                                         .attr("width", w + 200);
+              
+
+        //d3.select('#chart').select("svg").selectAll('*').remove();
      
         var g = svg
           .append("g")
@@ -252,7 +255,7 @@
                  .data([dataValues])
                  .enter()
                  .append("polygon")
-                 .attr("class", "radar-chart-serie"+series)
+                 .attr("class", "radar-chart-serie"+series + " " + id)
                  .style("stroke-width", "2px")
                  .style("stroke", cfg.color(series))
                  .attr("points",function(d) {
@@ -285,7 +288,7 @@
           g.selectAll(".nodes")
           .data(y).enter()
           .append("svg:circle")
-          .attr("class", "radar-chart-serie"+series)
+          .attr("class", "radar-chart-serie"+series + " " + id)
           .attr('r', cfg.radius)
           .attr("alt", function(j){return Math.max(j.value, 0);})
           .attr("cx", function(j, i){
@@ -342,8 +345,9 @@
     ////////////////////////////////////////////
     /////////// Initiate legend ////////////////
     ////////////////////////////////////////////
-    function initiateLegend (LegendOptions){
-      var svg = d3.select('#chart')
+    function initiateLegend (LegendOptions, id){
+
+      var svg = d3.select("." + id) //div
         .selectAll('svg')
         .append('svg')
         .attr("width", w+300)
@@ -368,15 +372,15 @@
             .style("fill", function(d, i){ return colorscale(i);})
             .attr("rid", function(d){return d;})
             .on('mouseover', function (d, i){
-                    d3.select('#chart').selectAll("svg").selectAll("polygon")
+                    d3.select("." + id).selectAll("svg").selectAll("polygon")
                      .transition(200)
                      .style("fill-opacity", 0.1); 
-                    d3.select(".radar-chart-serie"+i)
+                    d3.select(".radar-chart-serie"+i + "." + id)
                      .transition(200)
                      .style("fill-opacity", 0.7);
              })
             .on('mouseout', function (d, i){
-                  d3.select('#chart').selectAll("svg").selectAll("polygon")
+                  d3.select("." + id).selectAll("svg").selectAll("polygon")
                          .transition(200)
                          .style("fill-opacity", cfg.opacityArea);
              });
@@ -392,15 +396,15 @@
             .attr("fill", "#737373")
             .text(function(d) { return d; })
             .on('mouseover', function (d, i){
-                    d3.select('#chart').selectAll("svg").selectAll("polygon")
+                    d3.select("." + id).selectAll("svg").selectAll("polygon")
                      .transition(200)
                      .style("fill-opacity", 0.1); 
-                    d3.select(".radar-chart-serie"+i)
+                    d3.select(".radar-chart-serie"+i + "." + id)
                      .transition(200)
                      .style("fill-opacity", 0.7);
              })
             .on('mouseout', function (d, i){
-                  d3.select('#chart').selectAll("svg").selectAll("polygon")
+                  d3.select("." + id).selectAll("svg").selectAll("polygon")
                          .transition(200)
                          .style("fill-opacity", cfg.opacityArea);
              });
