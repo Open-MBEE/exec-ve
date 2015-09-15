@@ -444,7 +444,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @returns {Promise} The promise would be resolved with updated View object if addToView is true
      *                    otherwise the created InstanceSpecification
     */
-    var addInstanceSpecification = function(viewOrSection, workspace, type, addToView, site, name, json) {
+    var addInstanceSpecification = function(viewOrSection, workspace, type, addToView, site, name, json, viewDoc) {
 
         var deferred = $q.defer();
         var instanceSpecName = name ? name : "Untitled InstanceSpec";
@@ -531,17 +531,19 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             realType = 'TableT';
         if (type === 'List')
             realType = 'ListT';
-        if (type === 'Paragraph')
+        if (type === 'Paragraph' && !viewDoc)
             realType = 'ParagraphT';
         if (type === 'Section')
             realType = 'SectionT';
         var instanceSpec = {
             name:instanceSpecName,
             specialization: {
-              type:"InstanceSpecification",
-              classifier:[typeToClassifierId[realType]],
-              instanceSpecificationSpecification: presentationElem
-           }
+                type:"InstanceSpecification",
+                classifier:[typeToClassifierId[realType]],
+                instanceSpecificationSpecification: presentationElem
+            },
+            appliedMetatypes: ["_9_0_62a020a_1105704885251_933969_7897"],
+            isMetatype: false
         };
 
         var createInstanceSpecElement = function() {
@@ -641,6 +643,11 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             owner: ownerId,
             name: !name ? 'Untitled View' : name,
             documentation: '',
+            appliedMetatypes: [
+                "_17_0_1_232f03dc_1325612611695_581988_21583",
+                "_9_0_62a020a_1105704885343_144138_7929"
+            ],
+            isMetatype: false
         };
         if (viewId) view.sysmlid = viewId;
         if (viewDoc) view.documentation = viewDoc;
@@ -657,7 +664,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 'source': data.sysmlid, 
                 'sourceProperty': 'documentation'
             };
-            addInstanceSpecification(data, workspace, "Paragraph", true, null, "View Documentation", jsonBlob)
+            addInstanceSpecification(data, workspace, "Paragraph", true, null, "View Documentation", jsonBlob, true)
             .then(function(data2) {
                 if (documentId) {
                     addViewToDocument(data.sysmlid, documentId, ownerId, workspace, data2)
@@ -697,7 +704,12 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         var doc = {
             specialization: {type: "Product"},
             name: !name ? 'Untitled Document' : name,
-            documentation: ''
+            documentation: '',
+            appliedMetatypes: [
+                "_17_0_2_3_87b0275_1371477871400_792964_43374",
+                "_9_0_62a020a_1105704885343_144138_7929"
+            ],
+            isMetatype: false
         };
         ElementService.createElement(doc, workspace, site)
         .then(function(data) {
