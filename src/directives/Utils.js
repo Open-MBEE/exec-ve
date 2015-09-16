@@ -16,6 +16,7 @@ angular.module('mms.directives')
  *
  * @description
  * Utility methods for performing edit like behavior to a transclude element
+ * WARNING These are intended to be internal utility functions and not designed to be used as api
  *
  */
 function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, WorkspaceService, ConfigService, ElementService, ViewService, UtilsService, growl, _) {
