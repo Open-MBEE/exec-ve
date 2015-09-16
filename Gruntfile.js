@@ -159,7 +159,9 @@ module.exports = function(grunt) {
           window: true,
           console: true,
           Timely: true,
-          __timely: true
+          __timely: true,
+          jQuery: true,
+          $:true
         }
       }
     },
