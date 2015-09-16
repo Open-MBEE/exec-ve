@@ -417,7 +417,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
             type: 'view',
             data: document,
             children: [],
-            loading: true
+            loading: false
         };
         views.forEach(function(view) {
             var viewTreeNode = { 
@@ -425,7 +425,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
                 type : "view",
                 data : view, 
                 children : [], 
-                loading: true
+                loading: false
             };
             viewId2node[view.sysmlid] = viewTreeNode;
             //addSectionElements(elements[i], viewTreeNode, viewTreeNode);
@@ -473,6 +473,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
                 parentNode.children.unshift(sectionTreeNode);
                 addSectionElements(containedElement, viewNode, sectionTreeNode);
             }
+            $scope.treeApi.refresh();
         };
 
         var addContentsSectionTreeNode = function(operand) {
@@ -1053,12 +1054,13 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
 
     function addViewSections(view) {
         var node = viewId2node[view.sysmlid];
-        addSectionElements(view, node, node);
+        //stop spinny so perception is it loads faster, took out loading view elements for all views for performance
         node.loading = false;
-        $scope.treeApi.refresh();
-        if (view.specialization.displayedElements && view.specialization.displayedElements.length < 20) {
-            ViewService.getViewElements(view.sysmlid, false, ws, time);
-        }
+        //$scope.treeApi.refresh();
+        addSectionElements(view, node, node);
+        //if (view.specialization.displayedElements && view.specialization.displayedElements.length < 20) {
+        //    ViewService.getViewElements(view.sysmlid, false, ws, time);
+        //}
     }
 
     // ViewCtrl creates this event when adding sections to the view
@@ -1096,15 +1098,10 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
         var delay = 0;
         if (document.specialization.view2view) {
             document.specialization.view2view.forEach(function(view, index) {
-                $timeout(function() {
+                //$timeout(function() {
                     ViewService.getView(view.id, false, ws, time)
                     .then(addViewSections);
-                    /*ViewService.getViewElements(view.id, false, ws, time)
-                    .then(function() {
-                        ViewService.getView(view.id, false, ws, time)
-                        .then(addViewSections);
-                    });*/
-                }, delay*index);
+                //}, delay*index);
             });
         }
     }
