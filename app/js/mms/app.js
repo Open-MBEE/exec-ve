@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 'ui.bootstrap', 'ui.router', 'ui.tree', 'angular-growl', 'cfp.hotkeys', 'timelyModule'])
+angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.borderLayout', 'ui.bootstrap', 'ui.router', 'ui.tree', 'angular-growl', 'cfp.hotkeys'])
 .config(function($stateProvider, $urlRouterProvider) {
     $urlRouterProvider.rule(function ($injector, $location) {
         // determine if the url is older 2.0 format (will not have a workspace)
@@ -636,16 +636,26 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
         views: {
             'menu@': {
                 templateUrl: 'partials/mms/diff-nav.html',               
-                controller: function ($scope, $rootScope,targetName, sourceName, $stateParams, $state){
+                controller: function ($scope, $rootScope,targetName, sourceName, $stateParams, $state, $modal){
                     $scope.targetName = targetName;
                     $scope.sourceName = sourceName;
                     $rootScope.mms_title = 'Merge Differences';
 
                     $scope.goBack = function () {
-                        $state.go('workspace', {}, {reload:true}); 
-                    }; 
-
-                }                
+                        $modal.open({
+                            templateUrl: 'partials/mms/cancelModal.html',
+                            controller: function($scope, $modalInstance, $state) {      
+                                $scope.close = function() {
+                                    $modalInstance.close();
+                                };
+                                $scope.exit = function() {
+                                    $state.go('workspace', {}, {reload:true});
+                                    $modalInstance.close(); 
+                                };
+                            }
+                        });
+                    };
+                }
             },
             'pane-left@': {
                 templateUrl: 'partials/mms/diff-pane-left.html',
