@@ -5,8 +5,8 @@
 angular.module('mmsApp')
 .controller('ToolCtrl', ['$scope', '$rootScope', '$state', '$modal', '$q', '$stateParams',
             'ConfigService', 'ElementService', 'WorkspaceService', 'growl', 
-            'workspaceObj', 'tags', 'tag', 'snapshots', 'site', 'document', 'time', 'Utils',
-function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, ElementService, WorkspaceService, growl, workspaceObj, tags, tag, snapshots, site, document, time, Utils) {
+            'workspaceObj', 'tags', 'tag', 'snapshots', 'site', 'document', 'time', 'Utils', 'hotkeys',
+function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, ElementService, WorkspaceService, growl, workspaceObj, tags, tag, snapshots, site, document, time, Utils, hotkeys) {
 
     // TODO rename variable ws
     var ws = $stateParams.workspace;
@@ -299,6 +299,12 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
         $rootScope.mms_tbApi.select('element.editor');
     });
 
+    hotkeys.bindTo($scope)
+    .add({
+        combo: 'alt+a',
+        description: 'save all',
+        callback: function() {$scope.$broadcast('element.editor.saveall');}
+    });
     var savingAll = false;
     $scope.$on('element.editor.saveall', function() {
         if (savingAll) {
