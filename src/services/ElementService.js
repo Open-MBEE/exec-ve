@@ -226,12 +226,13 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
      * @param {boolean} [update=false] update elements from server
      * @param {string} [workspace=master] (optional) workspace to use
      * @param {string} [version=latest] (optional) alfresco version number or timestamp
+     * @param {integer} [depth=0] depth, 0 is infinite, will include this element
      * @returns {Promise} The promise will be resolved with an array of 
      * element objects 
      */
-    var getOwnedElements = function(id, update, workspace, version) {
+    var getOwnedElements = function(id, update, workspace, version, depth) {
         var n = normalize(id, update, workspace, version);
-        return getGenericElements(URLService.getOwnedElementURL(id, n.ws, n.ver), 'elements', n.update, n.ws, n.ver);
+        return getGenericElements(URLService.getOwnedElementURL(id, n.ws, n.ver, depth), 'elements', n.update, n.ws, n.ver);
     };
 
     /**
@@ -364,7 +365,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
             deferred.reject('Element id not found, create element first!');
         else {
             var n = normalize(elem.sysmlid, null, workspace, null);
-            $http.post(URLService.getPostElementsURL(n.ws), {'elements': [elem]}, {timeout: 10000})
+            $http.post(URLService.getPostElementsURL(n.ws), {'elements': [elem]}, {timeout: 30000})
             .success(function(data, status, headers, config) {
                 handleSuccess(n, data);
             }).error(function(data, status, headers, config) {

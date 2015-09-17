@@ -232,12 +232,17 @@ function urlService(baseUrl) {
         return addVersion(r, version);
     };
 
-    var getOwnedElementURL = function(id, workspace, version) {
-        
-        var r = root + '/workspaces/' + workspace + '/elements/' + id + '?recurse=true';
-        // TODO return addVersion(r, version);
-        return r;
-        
+    var getOwnedElementURL = function(id, workspace, version, depth) {
+        var recurseString = 'recurse=true';
+        if (depth && depth > 0)
+            recurseString = 'depth=' + depth;
+        var r = root + '/workspaces/' + workspace + '/elements/' + id;
+        r = addVersion(r, version);
+        if (r.indexOf('?') > 0)
+            r += '&' + recurseString;
+        else
+            r += '?' + recurseString;
+        return r;        
     };
 
     /**
@@ -370,9 +375,9 @@ function urlService(baseUrl) {
         else if (status === 410)
             result.message = "Deleted";
         else if (status === 408)
-            result.message = "Timed Out (Please check network)";
+            result.message = "Timed Out";
         else
-            result.message = "Failed (Please check network)";
+            result.message = "Timed Out (Please check network)";
         deferred.reject(result);
     };
 
