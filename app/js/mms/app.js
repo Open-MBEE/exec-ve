@@ -4,6 +4,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
 .config(function($stateProvider, $urlRouterProvider) {
     $urlRouterProvider.rule(function ($injector, $location) {
         // determine if the url is older 2.0 format (will not have a workspace)
+        // generate some random client id
         if ($location.url().indexOf('/workspaces') === -1)
         {
             var locationPath = 'workspaces/master' + $location.url();

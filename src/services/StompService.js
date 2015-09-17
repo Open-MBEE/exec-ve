@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms')
-.factory('StompService', ['$rootScope', 'UtilsService', '$window', StompService]);
+.factory('StompService', ['$rootScope', 'UtilsService', '$window', '$location','ApplicationService', StompService]);
 
 /**
  * @ngdoc service
@@ -11,15 +11,22 @@ angular.module('mms')
  * @description
  * Provides messages from the activemq JMS bus
  */
-function StompService($rootScope, UtilsService, $window) {
+function StompService($rootScope, UtilsService, $window, $location, ApplicationService) {
      var stompClient = {};
-     stompClient = Stomp.client('wss://ems-test-origin:61614/stomp+ssl');
+     var timeStamp = Date.now().toString();//alternate for uniqueID this line is just for testing 
+     console.log("Stomp: " + ApplicationService.getSource());
+     var hostName = ($location.host() === 'localhost') ? 
+                    'wss://ems-test-origin.jpl.nasa.gov:61614' : 
+                    'wss://' + $location.host() + '-origin.jpl.nasa.gov:61614';
+     // elementService.update -- when it constructs a json to the source get added 
+     //in there root json oject add another key called src with the client id and 
+     //filter them out in angular in the messages becase they have the source information
+     stompClient = Stomp.client('wss://ems-test-origin.jpl.nasa.gov:61614');
      stompClient.connect("guest", "guest", function(){
            stompClient.subscribe("/topic/master", function(message) {
-               //var crazyData = JSON.parse(JSON.stringify(message.body));
                var updateWebpage = angular.fromJson(message.body);
                var workspaceId = updateWebpage.workspace2.id;
-               console.log("length of empty array" + updateWebpage.workspace2.updatedElements.length);
+               console.log("=========length of empty array========" + updateWebpage.workspace2.updatedElements.length);
                $rootScope.$apply( function(){
                if(updateWebpage.workspace2.addedElements.length !== 0){
                       angular.forEach( updateWebpage.workspace2.addedElements, function(value, key) {
@@ -27,12 +34,12 @@ function StompService($rootScope, UtilsService, $window) {
                                $rootScope.$broadcast("stomp.element", workspaceId, value.sysmlid);
                            });
                }
-               //if(updateWebpage.workspace2.updatedElements.length !== 0){
+               if(updateWebpage.workspace2.updatedElements.length !== 0){
                       angular.forEach( updateWebpage.workspace2.updatedElements, function(value, key) {
                                UtilsService.mergeElement(value, value.sysmlid, workspaceId, false, "all" );
                                $rootScope.$broadcast("stomp.element", workspaceId, value.sysmlid);
                            });               
-               //}
+               }
             });
             //    if(updateWebpage.wor)
             //    var loop = function(updateWebpage, whichElement){

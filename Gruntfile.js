@@ -211,13 +211,6 @@ module.exports = function(grunt) {
             https: true,
           },
           {
-            context: '/stomp+ssl',
-            host: 'ems-test-origin.jpl.nasa.gov',
-            port: 61614,
-            https: true,
-            changeOrigin: true
-          },
-          {
             context: '/',
             host: 'localhost',
             port: 9001

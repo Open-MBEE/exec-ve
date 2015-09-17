@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms')
-.factory('ElementService', ['$q', '$http', 'URLService', 'UtilsService', 'CacheService', 'HttpService', '_', ElementService]);
+.factory('ElementService', ['$q', '$http', 'URLService', 'UtilsService', 'CacheService', 'HttpService', 'ApplicationService','_', ElementService]);
 
 /**
  * @ngdoc service
@@ -18,8 +18,8 @@ angular.module('mms')
  *
  * For element json example, see [here](https://ems.jpl.nasa.gov/alfresco/mms/raml/index.html)
  */
-function ElementService($q, $http, URLService, UtilsService, CacheService, HttpService,  _) {
-    
+function ElementService($q, $http, URLService, UtilsService, CacheService, HttpService, ApplicationService, _) {
+
     var inProgress = {};
     /**
      * @ngdoc method
@@ -364,7 +364,8 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
             deferred.reject('Element id not found, create element first!');
         else {
             var n = normalize(elem.sysmlid, null, workspace, null);
-            $http.post(URLService.getPostElementsURL(n.ws), {'elements': [elem]}, {timeout: 10000})
+            $http.post(URLService.getPostElementsURL(n.ws), {'elements': [elem], //'source': cleint id (string)  general id in the intialization of the app and pass it into the services
+        },{timeout: 10000})// need another key called source
             .success(function(data, status, headers, config) {
                 handleSuccess(n, data);
             }).error(function(data, status, headers, config) {
@@ -740,7 +741,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         res.cacheKey = UtilsService.makeElementKey(id, res.ws, res.ver, edit);
         return res;
     };
-
+    console.log("Element: " + ApplicationService.getSource());
     return {
         getElement: getElement,
         getElements: getElements,
