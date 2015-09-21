@@ -302,7 +302,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         .then(function(data) {  
             var clone = {};
             clone.sysmlid = data.sysmlid;
-            //clone.read = data.read;
+            clone.read = data.read;
+            clone.modified = data.modified;
             clone.specialization = _.cloneDeep(data.specialization);
 
             var key;
@@ -359,7 +360,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             .then(function(data) {  
                 var clone = {};
                 clone.sysmlid = data.sysmlid;
-                //clone.read = data.read;
+                clone.read = data.read;
+                clone.modified = data.modified;
                 clone.specialization = _.cloneDeep(data.specialization);
 
                 var key;
