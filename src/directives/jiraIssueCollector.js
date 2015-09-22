@@ -46,8 +46,7 @@ function jiraIssueCollector($templateCache, $compile) {
         restrict: 'E',
         transclude: true,
         scope: {
-            collectorId: '@',
-            text: '@'
+            collectorId: '@'
         },
         template: '<div style="display:inline" class="{{collectorId}}"><ng-transclude></ng-transclude></div>',
         link: jiraIssueCollectorLink
