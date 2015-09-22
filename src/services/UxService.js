@@ -178,6 +178,9 @@ function UxService($rootScope) {
           case "presentation.element.save":
             return {id: button, icon: 'fa-save', selected: true, active: true, permission: true, tooltip: 'Save', 
                     spinner: false, togglable: false, action: function(e) {e.stopPropagation(); scope.save();}};
+          case "presentation.element.saveC":
+            return {id: button, icon: 'fa-life-saver', selected: true, active: true, permission: true, tooltip: 'Save and Continue', 
+                    spinner: false, togglable: false, action: function(e) {e.stopPropagation(); scope.saveC();}};
           case "presentation.element.cancel":
             return {id: button, icon: 'fa-times', selected: true, active: true, permission: true, tooltip: 'Cancel', 
                     spinner: false, togglable: false, action: function(e) {e.stopPropagation(); scope.cancel();}};
