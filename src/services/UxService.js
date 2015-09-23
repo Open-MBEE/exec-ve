@@ -91,6 +91,9 @@ function UxService($rootScope) {
 		  case "tree.add.document":
 		  	return {id: button, icon: 'fa-plus', selected: true, active: true, permission: false, tooltip: 'Add Document', 
             		spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
+      case "tree.delete.document":
+        return {id: button, icon: 'fa-trash', selected: true, active: true, permission: false, tooltip: 'Delete Document', 
+                spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
 		  case "tree.add.view":
 		  	return {id: button, icon: 'fa-plus', selected: true, active: true, permission: false, tooltip: 'Add View', 
             		spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
