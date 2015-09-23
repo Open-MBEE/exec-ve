@@ -125,7 +125,7 @@ module.exports = function(grunt) {
       dist : {
         files: {
           'dist/css/partials/mms.css': 'src/directives/templates/styles/mms-main.scss',
-          'dist/css/partials/mm-main.css': 'app/styles/mm/mm-main.scss',
+          //'dist/css/partials/mm-main.css': 'app/styles/mm/mm-main.scss',
           'dist/css/partials/ve-main.css': 'app/styles/ve/ve-main.scss'
         }
       }
@@ -141,8 +141,8 @@ module.exports = function(grunt) {
       },
       combine: {
         files: {
-          'dist/css/mm-mms.styles.min.css':
-            ['dist/css/partials/mms.min.css', 'dist/css/partials/mm-main.min.css'],
+          //'dist/css/mm-mms.styles.min.css':
+            //['dist/css/partials/mms.min.css', 'dist/css/partials/mm-main.min.css'],
           'dist/css/ve-mms.styles.min.css':
             ['dist/css/partials/mms.min.css', 'dist/css/partials/ve-main.min.css']
         }
