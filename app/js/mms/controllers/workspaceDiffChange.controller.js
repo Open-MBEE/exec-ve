@@ -380,7 +380,10 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 					change.icon = changeIcon;
 					// @test var
 					change.changeTypeName = UxService.getChangeTypeName(change.type);
-					change.typeIcon = UxService.getTypeIcon(change.delta.specialization.type);
+					if (change.delta.specialization)
+						change.typeIcon = UxService.getTypeIcon(change.delta.specialization.type);
+					else
+						change.typeIcon = UxService.getTypeIcon('Element');
 
 					change.staged = false;
 					change.ws2object = ws2object;
@@ -441,7 +444,10 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 
 					node.data = element;
 					node.label = element.name;
-					node.type = element.specialization.type;
+					if (element.specialization)
+						node.type = element.specialization.type;
+					else
+						node.type = 'Element';
 					node.children = [];
 
 					// node.visible = true;
