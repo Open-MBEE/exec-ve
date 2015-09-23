@@ -12,6 +12,8 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
     $rootScope.mms_treeApi = $scope.treeApi = {};
     $scope.buttons = [];
     $scope.treeExpandLevel = 1;
+    if ($state.includes('workspace.sites') && !$state.includes('workspace.site.document')) 
+        $scope.treeExpandLevel = 0;
     $scope.treeSectionNumbering = false;
     if ($state.includes('workspace.site.document')) {
         $scope.treeSectionNumbering = true;
@@ -181,7 +183,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
 
     $scope.toggleShowAllSites = function() {
         $scope.bbApi.toggleButtonState('tree.showall.sites');
-        $scope.my_data = UtilsService.buildTreeHierarchy(filter_sites(sites), "sysmlid", "site", "parent", siteLevel2Func);
+        $scope.my_data = UtilsService.buildTreeHierarchy(filter_sites(sites), "sysmlid", "site", "parent", siteInitFunc);
         $scope.mms_treeApi.clear_selected_branch();
     };
 
@@ -329,20 +331,11 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
         });
     };
 
-    var siteLevel2Func = function(site, siteNode, onlyTopLevel) {
-        
-        // Setting all sites to be expandable
+    var siteInitFunc = function(site, siteNode) {
         siteNode.expandable = true;
-        
-        // String relating to the proper callback as defined in the directive
-        siteNode.expandCallback = 'siteLevel2Func';
-        
-        // Whether to load only top-level documents
-        onlyTopLevel = typeof onlyTopLevel !== 'undefined' ? onlyTopLevel : true;
-        
-        // Skip if not a top-level node
-        if(onlyTopLevel && (siteNode.level !== 1 || siteNode.data.isCharacterization !== true)) return;
-        
+    };
+
+    var siteLevel2Func = function(site, siteNode) {
         // Make sure we haven't already loaded the docs for this site
         if(siteNode.docsLoaded) return;
         // Set docs loaded attribute
@@ -401,13 +394,11 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
         });
     };
     
-    $scope.siteLevel2Func = siteLevel2Func;
-
     if ($state.includes('workspaces') && !$state.includes('workspace.sites')) {
         $scope.my_data = UtilsService.buildTreeHierarchy(workspaces, "id", 
                                                          "workspace", "parent", workspaceLevel2Func);
     } else if ($state.includes('workspace.sites') && !$state.includes('workspace.site.document')) {
-        $scope.my_data = UtilsService.buildTreeHierarchy(filter_sites(sites), "sysmlid", "site", "parent", siteLevel2Func);
+        $scope.my_data = UtilsService.buildTreeHierarchy(filter_sites(sites), "sysmlid", "site", "parent", siteInitFunc);
     } else
     {
         // this is from view editor
@@ -632,12 +623,12 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
 
     // TODO: update tree options to call from UxService
     $scope.tree_options = {
-        types: UxService.getTreeTypes(),
-        siteLevel2Func: siteLevel2Func
+        types: UxService.getTreeTypes()
     };
     if (!$state.includes('workspace.site.document'))
         $scope.tree_options.sort = sortFunction;
-    
+    if ($state.includes('workspace.sites') && !$state.includes('workspace.site.document'))
+        $scope.tree_options.expandCallback = siteLevel2Func;
     // TODO: this is a hack, need to resolve in alternate way    
     $timeout(function() {
         $scope.treeApi.refresh();
