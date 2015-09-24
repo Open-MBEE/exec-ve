@@ -57,8 +57,10 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
         $scope.bbApi.setPermission("tree.merge", $scope.wsPerms);
       } else if ($state.includes('workspace.sites') && !$state.includes('workspace.site.document')) {
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree.add.document"));
+        $scope.bbApi.addButton(UxService.getButtonBarButton("tree.delete.document"));
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree.showall.sites"));
         $scope.bbApi.setPermission("tree.add.document", config == 'latest' ? true : false);
+        $scope.bbApi.setPermission("tree.delete.document", config == 'latest' ? true : false);
       } else if ($state.includes('workspace.site.document')) {
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree.add.view"));
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree.delete.view"));
@@ -98,6 +100,10 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
 
     $scope.$on('tree.add.document', function() {
         $scope.addItem('Document');
+    });
+
+    $scope.$on('tree.delete.document', function() {
+        $scope.deleteItem();
     });
 
     $scope.$on('tree.add.view', function() {
@@ -811,6 +817,12 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
             growl.warning("Delete Error: Selected item is not a view.");
             return;
         }
+        if ($state.includes('workspace.sites') && !$state.includes('workspace.site.document')) {
+            if (branch.type !== 'view' || (branch.data.specialization && branch.data.specialization.type !== 'Product')) {
+                growl.warning("Delete Error: Selected item is not a document.");
+                return;
+            }
+        }
         // TODO: do not pass selected branch in scope, move page to generic location
         $scope.deleteBranch = branch;
         var instance = $modal.open({
@@ -828,6 +840,8 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
                 });
             }
             $scope.treeApi.remove_branch(branch);
+            if ($state.includes('workspace.sites') && !$state.includes('workspace.site.document'))
+                return;
             $state.go('^');
         });
     };
@@ -840,8 +854,11 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
             $scope.type = 'Task';
         if (branch.type === 'configuration')
             $scope.type = 'Tag';
-        if (branch.type === 'view')
+        if (branch.type === 'view') {
             $scope.type = 'View';
+            if (branch.data.specialization.type === 'Product')
+                $scope.type = 'Document';
+        }
         //$scope.type = branch.type === 'workspace' ? 'task' : 'tag';
         $scope.name = branch.data.name;
         $scope.ok = function() {
@@ -856,6 +873,13 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
             } else if (branch.type === "configuration") {
                 promise = ConfigService.deleteConfig(branch.data.id);
             } else if (branch.type === 'view') {
+                if (!$state.includes('workspace.site.document')) {
+                    var parentSiteBranch = $scope.treeApi.get_parent_branch(branch);
+                    if (parentSiteBranch && parentSiteBranch.type === 'site')
+                        promise = ViewService.downgradeDocument(branch.data, ws, parentSiteBranch.data.sysmlid);
+                    else
+                        promise = ViewService.downgradeDocument(branch.data, ws);
+                } else {
                 var product = $scope.document;
                 for (var i = 0; i < product.specialization.view2view.length; i++) {
                     var view = product.specialization.view2view[i];
@@ -874,6 +898,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
                     }
                 }
                 promise = ViewService.updateDocument(product, ws);
+                }
             }
             promise.then(function(data) {
                 growl.success($scope.type + " Deleted");
@@ -1070,8 +1095,16 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
             data: instanceSpec,
             children: [],
         };
-        $scope.treeApi.add_branch(branch, newbranch, false);
-
+        //$scope.treeApi.add_branch(branch, newbranch, false);
+        var i = 0;
+        var lastSection = -1;
+        for (i = 0; i < branch.children.length; i++) {
+            if (branch.children[i].type === 'view') {
+                lastSection = i-1;
+                break;
+            }
+        }
+        branch.children.splice(lastSection+1, 0, newbranch);
         addSectionElements(instanceSpec, viewId2node[viewid], newbranch);
         $scope.treeApi.refresh();
 
