@@ -1095,8 +1095,16 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
             data: instanceSpec,
             children: [],
         };
-        $scope.treeApi.add_branch(branch, newbranch, false);
-
+        //$scope.treeApi.add_branch(branch, newbranch, false);
+        var i = 0;
+        var lastSection = -1;
+        for (i = 0; i < branch.children.length; i++) {
+            if (branch.children[i].type === 'view') {
+                lastSection = i-1;
+                break;
+            }
+        }
+        branch.children.splice(lastSection+1, 0, newbranch);
         addSectionElements(instanceSpec, viewId2node[viewid], newbranch);
         $scope.treeApi.refresh();
 
