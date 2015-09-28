@@ -166,12 +166,13 @@ function($scope, $rootScope, $state, $stateParams, $window, document, workspace,
         }
         return null;
     };
+    var artifactWarning = 'WARNING: There is a known issue with artifacts (including PDFs) generated from tags prior to April 11, 2015 where the content may not be accurate. In the event of a conflict between the generated artifacts and the associated View Editor web content, the information in View Editor shall take precedence.';
 
     $scope.$on('generate.pdf', function() {
         if (getPDFStatus() === 'Generating...')
             return;
         if (time < '2015-04-11')
-            $window.alert('WARNING: There is a known issue with artifacts (including PDFs) generated from tags prior to April 11, 2015 where the content may not be accurate. In the event of a conflict between the generated artifacts and the associated View Editor web content, the information in View Editor shall take precedence. The fix is scheduled for the next 2.2 release.');
+            $window.alert(artifactWarning);
         $scope.bbApi.toggleButtonSpinner('generate.pdf');
         $scope.bbApi.toggleButtonSpinner('generate.zip');
 
@@ -197,14 +198,14 @@ function($scope, $rootScope, $state, $stateParams, $window, document, workspace,
 
     $scope.$on('download.pdf', function() {
         if (time < '2015-04-11')
-            $window.alert('WARNING: There is a known issue with artifacts (including PDFs) generated from tags prior to April 11, 2015 where the content may not be accurate. In the event of a conflict between the generated artifacts and the associated View Editor web content, the information in View Editor shall take precedence. The fix is scheduled for the next 2.2 release.');
+            $window.alert(artifactWarning);
         $window.open(getPDFUrl());
 
     });
 
     $scope.$on('download.zip', function() {
         if (time < '2015-04-11')
-            $window.alert('WARNING: There is a known issue with artifacts (including PDFs) generated from tags prior to April 11, 2015 where the content may not be accurate. In the event of a conflict between the generated artifacts and the associated View Editor web content, the information in View Editor shall take precedence. The fix is scheduled for the next 2.2 release.');
+            $window.alert(artifactWarning);
         $window.open(getZipUrl());
     });
 
