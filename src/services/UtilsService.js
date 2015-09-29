@@ -44,6 +44,8 @@ function UtilsService(CacheService, _) {
             if (elem.specialization.type === 'View') {
                 //delete elem.specialization.displayedElements;
                 //delete elem.specialization.allowedElements;
+                if (elem.specialization.contents && elem.specialization.contains)
+                    delete elem.specialization.contains;
             }
             if (elem.specialization.hasOwnProperty('specialization')) {
                 delete elem.specialization.specialization;
@@ -238,76 +240,81 @@ function UtilsService(CacheService, _) {
     }
 
     var makeHtmlTable = function(table) {
-        var result = '<table class="table table-bordered table-condensed">';
+        var result = ['<table class="table table-bordered table-condensed">'];
         if (table.title)
-            result += '<caption>' + table.title + '</caption>';
+            result.push('<caption>' + table.title + '</caption>');
         if (table.header) {
-            result += '<thead>';
-            result += makeTableBody(table.header);
-            result += '</thead>';
+            result.push('<thead>');
+            result.push(makeTableBody(table.header));
+            result.push('</thead>');
         }
-        result += '<tbody>';
-        result += makeTableBody(table.body);
-        result += '</tbody>';
-        result += '</table>';
-        return result;
+        result.push('<tbody>');
+        result.push(makeTableBody(table.body));
+        result.push('</tbody>');
+        result.push('</table>');
+        return result.join('');
 
     };
 
     var makeTableBody = function(body) {
-        var result = '';
-        body.forEach(function(row) {
-            result += '<tr>';
-            row.forEach(function(cell) {
-                result += '<td colspan="' + cell.colspan + '" rowspan="' + cell.rowspan + '">';
-                cell.content.forEach(function(thing) {
-                    result += '<div>';
+        var result = [], i, j, k, row, cell, thing;
+        for (i = 0; i < body.length; i++) {
+            result.push('<tr>');
+            row = body[i];
+            for (j = 0; j < row.length; j++) {
+                cell = row[j];
+                result.push('<td colspan="' + cell.colspan + '" rowspan="' + cell.rowspan + '">');
+                for (k = 0; k < cell.content.length; k++) {
+                    thing = cell.content[k];
+                    result.push('<div>');
                     if (thing.type === 'Paragraph') {
-                        result += makeHtmlPara(thing);
+                        result.push(makeHtmlPara(thing));
                     } else if (thing.type === 'Table') {
-                        result += makeHtmlTable(thing);
+                        result.push(makeHtmlTable(thing));
                     } else if (thing.type === 'List') {
-                        result += makeHtmlList(thing);
+                        result.push(makeHtmlList(thing));
                     } else if (thing.type === 'Image') {
-                        result += '<mms-transclude-img mms-eid="' + thing.sysmlid + '"></mms-transclude-img>';
+                        result.push('<mms-transclude-img mms-eid="' + thing.sysmlid + '"></mms-transclude-img>');
                     }
-                    result += '</div>';
-                });
-                result += '</td>';
-            });
-            result += '</tr>';
-        });
-        return result;
+                    result.push('</div>');
+                }
+                result.push('</td>');
+            }
+            result.push('</tr>');
+        }
+        return result.join('');
     };
 
     var makeHtmlList = function(list) {
-        var result = '';
+        var result = [], i, j, item, thing;
         if (list.ordered)
-            result += '<ol>';
+            result.push('<ol>');
         else
-            result += '<ul>';
-        list.list.forEach(function(item) {
-            result += '<li>';
-            item.forEach(function(thing) {
-                result += '<div>';
+            result.push('<ul>');
+        for (i = 0; i < list.list.length; i++) {
+            item = list.list[i];
+            result.push('<li>');
+            for (j = 0; j < item.length; j++) {
+                thing = item[j];
+                result.push('<div>');
                 if (thing.type === 'Paragraph') {
-                    result += makeHtmlPara(thing);
+                    result.push(makeHtmlPara(thing));
                 } else if (thing.type === 'Table') {
-                    result += makeHtmlTable(thing);
+                    result.push(makeHtmlTable(thing));
                 } else if (thing.type === 'List') {
-                    result += makeHtmlList(thing);
+                    result.push(makeHtmlList(thing));
                 } else if (thing.type === 'Image') {
-                    result += '<mms-transclude-img mms-eid="' + thing.sysmlid + '"></mms-transclude-img>';
+                    result.push('<mms-transclude-img mms-eid="' + thing.sysmlid + '"></mms-transclude-img>');
                 }
-                result += '</div>';
-            });
-            result += '</li>';
-        });
+                result.push('</div>');
+            }
+            result.push('</li>');
+        }
         if (list.ordered)
-            result += '</ol>';
+            result.push('</ol>');
         else
-            result += '</ul>';
-        return result;
+            result.push('</ul>');
+        return result.join('');
     };
 
     var makeHtmlPara = function(para) {

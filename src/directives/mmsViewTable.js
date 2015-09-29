@@ -10,12 +10,14 @@ function mmsViewTable($compile, $timeout, $templateCache, UtilsService) {
     };
 
     var mmsViewTableLink = function(scope, element, attrs) {
-        /*var html = UtilsService.makeHtmlTable(scope.table);
-        element.append(html);
-        $compile(element.contents())(scope);
-        return;*/
+        var html = UtilsService.makeHtmlTable(scope.table);
+        element[0].innerHTML = html;
+        $timeout(function(){
+            $compile(element.contents())(scope);
+        }, 5000, false);
+        return;
 
-        scope.tableLimit = 20;
+        /*scope.tableLimit = 20;
 
         var addLimit = function() {
             if (scope.tableLimit < scope.table.body.length) {
@@ -29,6 +31,7 @@ function mmsViewTable($compile, $timeout, $templateCache, UtilsService) {
             $compile(element.contents())(scope);
             addLimit();
             }, 100);
+*/
     };
 
     return {
