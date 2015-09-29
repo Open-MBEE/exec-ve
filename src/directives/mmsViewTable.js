@@ -12,9 +12,24 @@ function mmsViewTable($compile, $timeout, $templateCache, UtilsService) {
     var mmsViewTableLink = function(scope, element, attrs) {
         var html = UtilsService.makeHtmlTable(scope.table);
         element[0].innerHTML = html;
-        $timeout(function(){
-            $compile(element.contents())(scope);
-        }, 0, false);
+        var nextIndex = 0;
+        var thead = element.find('thead');
+        $compile(thead)(scope);
+        var trs = element.children('table').children('tbody').children('tr');
+        var lastIndex = trs.length;
+        function compile() {
+            $timeout(function() {
+                var first = lastIndex - 100;
+                if (first < 0)
+                    first = 0;
+                var now = trs.slice(first, lastIndex);
+                $compile(now)(scope);
+                lastIndex = lastIndex - 100;
+                if (lastIndex > 0)
+                    compile();
+            }, 200, false);
+        }
+        compile();
         return;
 
         /*scope.tableLimit = 20;
