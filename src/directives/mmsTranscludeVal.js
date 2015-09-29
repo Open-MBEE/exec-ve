@@ -116,7 +116,8 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                     //TODO: Needs case statement when .error is thrown
                 });
             } else {
-                element.append(valTemplate);
+                element[0].innerHTML = valTemplate;
+                //element.append(valTemplate);
                 $compile(element.contents())(scope.recompileScope);
             }
             if (mmsViewCtrl) {
@@ -159,7 +160,8 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                     element.html(e.name);
                 });
             } else {
-                element.append(editTemplate);
+                element[0].innerHTML = editTemplate;
+                //element.append(editTemplate);
                 $compile(element.contents())(scope.recompileScope);
             }
         };
@@ -173,6 +175,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                 element.html('<span class="error">Circular Reference!</span>');
                 return;
             }
+            element.html('(loading...)');
             var ws = scope.mmsWs;
             var version = scope.mmsVersion;
             if (mmsViewCtrl) {

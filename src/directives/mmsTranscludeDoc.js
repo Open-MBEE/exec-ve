@@ -84,7 +84,8 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                     p = '';
                 doc = '<p>' + p + '</p>';
             }
-            element.append(doc);
+            element[0].innerHTML = doc;
+            //element.append(doc);
             scope.recompileScope = scope.$new();
             $compile(element.contents())(scope.recompileScope); 
             if (mmsViewCtrl) {
@@ -99,7 +100,8 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             var doc = scope.edit.documentation;
             if (!doc)
                 doc = '<p ng-class="{placeholder: version!=\'latest\'}">(No ' + scope.panelType + ')</p>';
-            element.append('<div class="panel panel-info">'+doc+'</div>');
+            element[0].innerHTML = '<div class="panel panel-info">'+doc+'</div>';
+            //element.append('<div class="panel panel-info">'+doc+'</div>');
             scope.recompileScope = scope.$new();
             $compile(element.contents())(scope.recompileScope); 
             if (mmsViewCtrl) {
@@ -125,6 +127,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                 if (!version)
                     version = viewVersion.version;
             }
+            element.html('(loading...)');
             scope.ws = ws;
             scope.version = version ? version : 'latest';
             ElementService.getElement(scope.mmsEid, false, ws, version)

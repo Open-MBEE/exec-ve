@@ -64,7 +64,8 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
                 scope.recompileScope.$destroy();
             scope.isEditing = false;
             element.empty();
-            element.append(defaultTemplate);
+            element[0].innerHTML = defaultTemplate;
+            //element.append(defaultTemplate);
             scope.recompileScope = scope.$new();
             $compile(element.contents())(scope.recompileScope); 
             if (mmsViewCtrl) {
@@ -76,7 +77,8 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
             if (scope.recompileScope)
                 scope.recompileScope.$destroy();
             element.empty();
-            element.append('<div class="panel panel-info">'+editTemplate+'</div>');
+            element[0].innerHTML = '<div class="panel panel-info">'+editTemplate+'</div>';
+            //element.append('<div class="panel panel-info">'+editTemplate+'</div>');
             scope.recompileScope = scope.$new();
             $compile(element.contents())(scope.recompileScope); 
             if (mmsViewCtrl) {
@@ -99,6 +101,7 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
                 if (!version)
                     version = viewVersion.version;
             }
+            element.html('(loading...)');
             scope.ws = ws;
             scope.version = version ? version : 'latest';
             ElementService.getElement(scope.mmsEid, false, ws, version)

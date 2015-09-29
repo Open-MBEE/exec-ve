@@ -14,7 +14,7 @@ function mmsViewTable($compile, $timeout, $templateCache, UtilsService) {
         element[0].innerHTML = html;
         $timeout(function(){
             $compile(element.contents())(scope);
-        }, 5000, false);
+        }, 0, false);
         return;
 
         /*scope.tableLimit = 20;

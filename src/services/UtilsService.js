@@ -46,6 +46,10 @@ function UtilsService(CacheService, _) {
                 //delete elem.specialization.allowedElements;
                 if (elem.specialization.contents && elem.specialization.contains)
                     delete elem.specialization.contains;
+                if (elem.specialization.displayedElements)
+                    delete elem.specialization.displayedElements;
+                if (elem.specialization.allowedElements)
+                    delete elem.specialization.allowedElements;
             }
             if (elem.specialization.hasOwnProperty('specialization')) {
                 delete elem.specialization.specialization;
