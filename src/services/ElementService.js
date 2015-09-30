@@ -19,7 +19,7 @@ angular.module('mms')
  * For element json example, see [here](https://ems.jpl.nasa.gov/alfresco/mms/raml/index.html)
  */
 function ElementService($q, $http, URLService, UtilsService, CacheService, HttpService, ApplicationService, _) {
-
+    
     var inProgress = {};
     /**
      * @ngdoc method
@@ -364,8 +364,8 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
             deferred.reject('Element id not found, create element first!');
         else {
             var n = normalize(elem.sysmlid, null, workspace, null);
-            $http.post(URLService.getPostElementsURL(n.ws), {'elements': [elem], //'source': cleint id (string)  general id in the intialization of the app and pass it into the services
-        },{timeout: 10000})// need another key called source
+            $http.post(URLService.getPostElementsURL(n.ws), {'elements': [elem],'source': ApplicationService.getSource()
+        },{timeout: 10000})
             .success(function(data, status, headers, config) {
                 handleSuccess(n, data);
             }).error(function(data, status, headers, config) {
