@@ -274,20 +274,16 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
             };
         } 
         //actions for stomp 
-        scope.$on("stomp.element", function(event, deltaWorkspaceId, deltaElementID){
-            // have to check i
-            if(deltaWorkspaceId === scope.ws && deltaElementID === scope.mmsEid){
-                //recompile();
-                recompileEdit();
-                console.log("=============true===========");
+        scope.$on("stomp.element", function(event, deltaWorkspaceId, deltaElementId, deltaModifier, elemName){
+            if(deltaWorkspaceId === scope.ws && deltaElementId === scope.mmsEid){
+                if(scope.isEditing === false){
+                    recompile();
+                }
+                if(scope.isEditing === true){
+                    growl.warning("This value has been changed: " + elemName +
+                                " modified by: " + deltaModifier, {ttl: 10000});
+                }
             }
-            else {
-                console.log("=======this is being not being edited==============");
-            }
-            console.log(scope.ws + " WorkspaceID " + deltaWorkspaceId);
-            console.log(scope.mmsEid + " ElementID " + deltaElementID);
-            // check mmsEid === elementIDStomp and mmsWs === workspaceIdStomp => edit mode
-            // else update by calling recompile
         });
         if (mmsViewPresentationElemCtrl) {
             scope.delete = function() {
