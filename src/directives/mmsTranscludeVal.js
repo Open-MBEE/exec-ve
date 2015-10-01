@@ -92,25 +92,25 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
             element.empty();
             scope.recompileScope = scope.$new();
             if (scope.values.length === 0 || Object.keys(scope.values[0]).length < 2)
-                element.html('<span>' + ((scope.version === 'latest') ? '(no value)' : '') + '</span>');
+                element[0].innerHTML = '<span>' + ((scope.version === 'latest') ? '(no value)' : '') + '</span>';
             else if (areStrings) {
                 var toCompile = toCompileList.join(' ');
                 if (toCompile === '') {
-                    element.html('<span>' + ((scope.version === 'latest') ? '(no value)' : '') + '</span>');
+                    element[0].innerHTML = '<span>' + ((scope.version === 'latest') ? '(no value)' : '') + '</span>';
                     return;
                 }
-                element.append(toCompile);
+                element[0].innerHTML = toCompile;
                 $compile(element.contents())(scope.recompileScope); 
             } else if (UtilsService.isRestrictedValue(scope.values)) {
                 ElementService.getElement(scope.values[0].operand[1].element, false, scope.ws, scope.version)
                 .then(function(e) {
                     scope.isRestrictedVal = true;
-                    element.html("<span>" + e.name + "</span>");
+                    element[0].innerHTML = "<span>" + e.name + "</span>";
                 });
             } else if (isExpression) {
                 $http.get(URLService.getElementURL(scope.mmsEid, scope.ws, scope.version) + '?evaluate')
                 .success(function(data,status,headers,config) {
-                    element.html(data.elements[0].evaluationResult);
+                    element[0].innerHTML = data.elements[0].evaluationResult;
                 }).error(function(data,status,headers,config){
                     //URLService.handleHttpStatus(data, status, headers, config, deferred);
                     //TODO: Needs case statement when .error is thrown
@@ -145,19 +145,19 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
             element.empty();
             scope.recompileScope = scope.$new();
             if (scope.editValues.length === 0 || Object.keys(scope.editValues[0]).length < 2)
-                element.html('<span' + ((scope.version === 'latest') ? '' : ' class="placeholder"') + '>(no value)</span>');
+                element[0].innerHTML = '<span' + ((scope.version === 'latest') ? '' : ' class="placeholder"') + '>(no value)</span>';
             else if (areStrings) {
                 var toCompile = toCompileList.join(' ');
                 if (toCompile === '') {
-                    element.html('<span' + ((scope.version === 'latest') ? '' : ' class="placeholder"') + '>(no value)</span>');
+                    element[0].innerHTML = '<span' + ((scope.version === 'latest') ? '' : ' class="placeholder"') + '>(no value)</span>';
                     return;
                 }
-                element.append('<div class="panel panel-info">'+toCompile+'</div>');
+                element[0].innerHTML = '<div class="panel panel-info">'+toCompile+'</div>';
                 $compile(element.contents())(scope.recompileScope); 
             } else if (UtilsService.isRestrictedValue(scope.editValues)) {
                 ElementService.getElement(scope.editValues[0].operand[1].element, false, scope.ws, scope.version)
                 .then(function(e) {
-                    element.html(e.name);
+                    element[0].innerHTML = e.name;
                 });
             } else {
                 element[0].innerHTML = editTemplate;

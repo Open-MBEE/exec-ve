@@ -40,7 +40,7 @@ function mmsTranscludeCom(ElementService, UtilsService, $log, $compile, growl) {
             element.empty();
             var doc = scope.element.documentation;
             doc += ' - ' + scope.element.creator;
-            element.append(doc);
+            element[0].innerHTML = doc;
             $compile(element.contents())(scope); 
             if (mmsViewCtrl) {
                 mmsViewCtrl.elementTranscluded(scope.element, 'Comment');
