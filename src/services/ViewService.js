@@ -143,6 +143,52 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
 
     /**
      * @ngdoc method
+     * @name mms.ViewService#downgradeDocument
+     * @methodOf mms.ViewService
+     * 
+     * @description
+     * Demote document to a view
+     * 
+     * @param {Object} document A document object
+     * @param {string} [workspace=master] (optional) workspace to use
+     * @param {string} [site] (optional) site id if present will remove doc from site docs list
+     * @returns {Promise} The promise will be resolved with the downgraded view
+     */
+    var downgradeDocument = function(document, workspace, site) {
+        var clone = {};
+        clone.sysmlid = document.sysmlid;
+        clone.specialization = {
+            type: 'View', 
+            contents: document.specialization.contents,
+            contains: document.specialization.contains
+        };
+        return ElementService.updateElement(clone, workspace).then(
+            function(data) {
+                if (site) {
+                    var ws = workspace;
+                    if (!workspace)
+                        ws = 'master';
+                    var cacheKey = ['sites', ws, 'latest', site, 'products'];
+                    var index = -1;
+                    var found = false;
+                    var sitedocs = CacheService.get(cacheKey);
+                    if (sitedocs) {
+                        for (index = 0; index < sitedocs.length; index++) {
+                            if (sitedocs[index].sysmlid === document.sysmlid)
+                                break;
+                        }
+                        if (index >= 0)
+                            sitedocs.splice(index, 1);
+                    }
+                }
+                return data;
+            }, function(reason) {
+                return reason;
+            });
+    };
+
+    /**
+     * @ngdoc method
      * @name mms.ViewService#getViewElements
      * @methodOf mms.ViewService
      * 
@@ -302,7 +348,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         .then(function(data) {  
             var clone = {};
             clone.sysmlid = data.sysmlid;
-            //clone.read = data.read;
+            clone.read = data.read;
+            clone.modified = data.modified;
             clone.specialization = _.cloneDeep(data.specialization);
 
             var key;
@@ -359,7 +406,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             .then(function(data) {  
                 var clone = {};
                 clone.sysmlid = data.sysmlid;
-                //clone.read = data.read;
+                clone.read = data.read;
+                clone.modified = data.modified;
                 clone.specialization = _.cloneDeep(data.specialization);
 
                 var key;
@@ -953,6 +1001,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         getViewElements: getViewElements,
         createView: createView,
         createDocument: createDocument,
+        downgradeDocument: downgradeDocument,
         addViewToDocument: addViewToDocument,
         getDocumentViews: getDocumentViews,
         getSiteDocuments: getSiteDocuments,

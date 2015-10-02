@@ -330,24 +330,17 @@ function mmsTree($timeout, $log, $templateCache) {
 
         };
         
-        scope.expandCallback = function(obj){
-	        // Callback function upon node expansion
-	        // Any functions here must be in the local scope of this directive
-	        // Placing in $scope.options (scope.options here) appears to be the best way
-	        
-	        if(obj.branch.expanded === false)
-	        {
-		        if(obj.branch.expandCallback === 'siteLevel2Func')
-		        {
-			        scope.options.siteLevel2Func(obj.branch.data.sysmlid, obj.branch, false);
-		        }
-	        }
-	        // Callback function upon node collapse
-	        else
-	        {
-		        
-	        }
+        scope.expandCallback = function(obj, e){
+            if(!obj.branch.expanded && scope.options.expandCallback) {
+               scope.options.expandCallback(obj.branch.data.sysmlid, obj.branch, false);
+            }
+            obj.branch.expanded = !obj.branch.expanded;
+            if (e) {
+                e.stopPropagation();
+                on_treeData_change();
+            }
         };
+
         scope.on_treeData_change = on_treeData_change;
         scope.$watch('treeData', on_treeData_change, false);
         scope.$watch('initialSelection', on_initialSelection_change);
@@ -388,10 +381,7 @@ function mmsTree($timeout, $log, $templateCache) {
              */
             tree.expand_all = function() {
                 for_each_branch(function(b, level) {
-                    if(b.expandable === true)
-                    {
-	                    scope.expandCallback({ branch: b });
-                    }
+                    scope.expandCallback({ branch: b });
                     b.expanded = true;
                 });
                 on_treeData_change();
