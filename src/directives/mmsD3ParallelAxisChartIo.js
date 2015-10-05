@@ -1,9 +1,9 @@
 'use strict';
  angular.module('mms.directives')
-    .directive('mmsD3ParallelAxisChartIo', ['ElementService', 'UtilsService','$compile', 'growl','$window', mmsD3ParallelAxisChartIo]);
-function mmsD3ParallelAxisChartIo(ElementService, UtilsService, $compile, growl, $window, mmsViewCtrl) {
+    .directive('mmsD3ParallelAxisChartIo', ['ElementService', 'UtilsService', 'TableService', '$compile', 'growl','$window', mmsD3ParallelAxisChartIo]);
+function mmsD3ParallelAxisChartIo(ElementService, UtilsService, TableService, $compile, growl, $window) {
       
-  var mmsChartLink = function(scope, element, attrs) {
+  var mmsChartLink = function(scope, element, attrs, mmsViewCtrl) {
    
     scope.rowHeaders=[]; //not null when render is called 1st time.      
     var d3 = $window.d3;  
@@ -290,39 +290,40 @@ function mmsD3ParallelAxisChartIo(ElementService, UtilsService, $compile, growl,
     }//end of vf_pplot()
 
     scope.render = function() {
-      if (scope.rowHeaders.length === 0) return;
+      if (scopetableColumnHeadersLabel.length === 0) return;
       svg.selectAll('*').remove();
-      var  dataseries= [];
-      var tickColor;
-      for ( var i = 0; i < scope.datavalues.length; i++){
-          tickColor = undefined; //reset
-          var tvalues = [];
-          for ( var j = 0; j < scope.datavalues[i].length; j++){
-            if (scope.datavalues[i][j].specialization.value[0].type === "LiteralString")
-              tvalues[scope.rowHeaders[j]] = Number(scope.datavalues[i][j].specialization.value[0].string);
-            else if (scope.datavalues[i][j].specialization.value[0].type === "LiteralReal")
-              tvalues[scope.rowHeaders[j]] = scope.datavalues[i][j].specialization.value[0].double;
-            else if (scope.datavalues[i][j].specialization.value[0].type === "LiteralInteger")
-              tvalues[scope.rowHeaders[j]] = scope.datavalues[i][j].specialization.value[0].integer;
-          }
-          if ( scope.columnHeaders[i].name === scope.tick1){
-             tickColor = scope.tick1color;
-          }
-          else if ( scope.columnHeaders[i].name === scope.tick2){
-             tickColor = scope.tick2color;
-          }
-          else if ( scope.columnHeaders[i].name === scope.tick3){
-             tickColor = scope.tick3color;
-          }
-
-          dataseries[i] = { row: scope.columnHeaders[i].name, 
-                            tickColor: tickColor,
-                            values:tvalues};
-      }
-      var modelData = {
-           variables: scope.rowHeaders,
-           table: dataseries //columnHeader and values
-      };
+      
+      for ( var k = 0; k < scopeTableIds.length; k++){
+        var  dataseries= [];
+        var tickColor;
+        for ( var i = 0; i < scope.datavalues[k].length; i++){
+            tickColor = undefined; //reset
+            var tvalues = [];
+            for ( var j = 0; j < scope.datavalues[k][i].length; j++){
+              if (scope.datavalues[k][i][j].specialization.value[0].type === "LiteralString")
+                tvalues[scopetableColumnHeadersLabel[k][j]] = Number(scope.datavalues[k][i][j].specialization.value[0].string);
+              else if (scope.datavalues[k][i][j].specialization.value[0].type === "LiteralReal")
+                tvalues[scopetableColumnHeadersLabel[k][j]]  = scope.datavalues[k][i][j].specialization.value[0].double;
+              else if (scope.datavalues[k][i][j].specialization.value[0].type === "LiteralInteger")
+                tvalues[scopetableColumnHeadersLabel[k][j]]  = scope.datavalues[k][i][j].specialization.value[0].integer;
+            }
+            if (scope.tableRowHeaders[k][i].name === scope.tick1){
+               tickColor = scope.tick1color;
+            }
+            else if ( scope.tableRowHeaders[k][i].name === scope.tick2){
+               tickColor = scope.tick2color;
+            }
+            else if ( scope.tableRowHeaders[k][i].name === scope.tick3){
+               tickColor = scope.tick3color;
+            }
+            dataseries[i] = { row: scope.tableRowHeaders[k][i].name, 
+                              tickColor: tickColor,
+                              values:tvalues};
+        }
+        var modelData = {
+             variables: scopetableColumnHeadersLabel[k],
+             table: dataseries //columnHeader and values
+        };
       
       /*var dummyData = {
             "variables": [
@@ -369,51 +370,28 @@ function mmsD3ParallelAxisChartIo(ElementService, UtilsService, $compile, growl,
               }
             ]
           };*/
-      vf_pplot(modelData);
-      //console.log(dummyData);
+        vf_pplot(modelData);
+      }
     };//end of render
  
     scope.$watch('datavalues', function(newVals, oldVals) {
         return scope.render();
     }, true);
-    
-    ElementService.getElement(scope.mmsEid, false, ws, version)
-      .then(function(data) {
-          var rowHeaders = data.specialization.contains[1].header[0];
-            scope.rowHeaders = [];
-            //assume first column is empty
-            for ( var i = 1; i < rowHeaders.length; i++){
-                scope.rowHeaders[i-1] = rowHeaders[i].content[0].text.replace("<p>","").replace("</p>","");
-            }
-            var columnHeadersMmsEid = [];
-            var body = data.specialization.contains[1].body;//array[3] each of them contain array[4]
-            var dataValuesMmmEid = [];
-            var counter = 0;
-            for (i = 0; i < body.length; i++ ){
-                columnHeadersMmsEid[i] = body[i][0].content[0].source;
-                for ( var j = 1; j < body[i].length; j++){
-                  dataValuesMmmEid[counter++] = body[i][j].content[0].source;
-                }
-            }
-            ElementService.getElements(columnHeadersMmsEid, false, ws, version)
-              .then(function(columnHeaders) {
-                      ElementService.getElements(dataValuesMmmEid, false, ws, version)
-                        .then(function(values) {
-                        var datavalues = [];
-                        var counter = 0;
-                        for (i = 0; i < values.length; i= i + scope.rowHeaders.length){
-                            var datarow = new Array(scope.rowHeaders.length);
-                            for ( var j = 0; j < scope.rowHeaders.length; j++){
-                               datarow[j] = values[i+j]; 
-                            }
-                            datavalues[counter++]=datarow;
-                        }
-                        scope.datavalues = datavalues; //2D - array
-                        scope.columnHeaders = columnHeaders;
-                        scope.render();
-                  });
-            });
-      }); //end of ElementService
+      
+    var scopeTableTitles=[];
+    var scopeTableIds = [];
+    var scopetableColumnHeadersLabel= [];
+    var dataIdFilters = [];
+
+    TableService.readTables (scope.mmsEid,ws, version)
+      .then(function(value) {
+        scopeTableTitles = value.tableTitles;
+        scopeTableIds = value.tableIds;
+        scopetableColumnHeadersLabel= value.tableColumnHeadersLabels;
+        scope.tableRowHeaders = value.tableRowHeaders;
+        scope.datavalues = value.datavalues; //[][] - array
+        dataIdFilters = value.dataIdFilters;
+      });
     }; //end of link
 
     return {

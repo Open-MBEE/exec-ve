@@ -125,7 +125,7 @@ module.exports = function(grunt) {
       dist : {
         files: {
           'dist/css/partials/mms.css': 'src/directives/templates/styles/mms-main.scss',
-          'dist/css/partials/mm-main.css': 'app/styles/mm/mm-main.scss',
+          //'dist/css/partials/mm-main.css': 'app/styles/mm/mm-main.scss',
           'dist/css/partials/ve-main.css': 'app/styles/ve/ve-main.scss'
         }
       }
@@ -141,8 +141,8 @@ module.exports = function(grunt) {
       },
       combine: {
         files: {
-          'dist/css/mm-mms.styles.min.css':
-            ['dist/css/partials/mms.min.css', 'dist/css/partials/mm-main.min.css'],
+          //'dist/css/mm-mms.styles.min.css':
+            //['dist/css/partials/mms.min.css', 'dist/css/partials/mm-main.min.css'],
           'dist/css/ve-mms.styles.min.css':
             ['dist/css/partials/mms.min.css', 'dist/css/partials/ve-main.min.css']
         }
@@ -166,7 +166,7 @@ module.exports = function(grunt) {
 
     ngdocs: {
       options: {
-        dest: 'docs',
+        dest: 'build/docs',
         html5Mode: false,
         title: 'MMS',
         startPage: '/api'
@@ -189,7 +189,7 @@ module.exports = function(grunt) {
         options: {
           hostname: 'localhost',
           port: 10000,
-          base: './docs',
+          base: './build/docs',
         }
       },
       ems: {
@@ -535,7 +535,7 @@ module.exports = function(grunt) {
   grunt.registerTask('release-build', ['install', 'compile', 'lint', 'concat', 'minify', 'copy', 'wire', 'cacheBust']);
   grunt.registerTask('docs-build',    ['ngdocs']);
   grunt.registerTask('default', ['dev-build']);
-  grunt.registerTask('deploy', ['dev-build', 'artifactory:client:publish']);
+  grunt.registerTask('deploy', ['dev-build', 'ngdocs', 'artifactory:client:publish']);
 
   grunt.registerTask('dev', function(arg1) {
       grunt.task.run('dev-build', 'connect:static');

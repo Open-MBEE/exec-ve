@@ -364,7 +364,28 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     };
 
     var addElement = function(type, section) {
+        var id = view.sysmlid;
+        if (section)
+            id = section.sysmlid;
+        ElementService.isCacheOutdated(id, ws)
+        .then(function(status) {
+            if (status.status) {
+                if (section && section.specialization.instanceSpecificationSpecification && !angular.equals(section.specialization.instanceSpecificationSpecification, status.server.specialization.instanceSpecificationSpecification)) {
+                    growl.error('The view section contents is outdated, refresh the page first!');
+                    return;
+                } else if (!section && view.specialization.contents && !angular.equals(view.specialization.contents, status.server.specialization.contents)) {
+                    growl.error('The view contents is outdated, refresh the page first!');
+                    return;
+                }
+            } 
+            realAddElement();
 
+        }, function(reason) {
+            growl.error('Checking if view contents is up to date failed: ' + reason.message);
+            realAddElement();
+        });
+
+        function realAddElement() {
         $scope.section = section;
         $scope.presentationElemType = type;
         $scope.newItem = {};
@@ -379,6 +400,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         instance.result.then(function(data) {
             // TODO: do anything here?
         });
+        }
     };
 
     $scope.$on('view.add.paragraph', function() {

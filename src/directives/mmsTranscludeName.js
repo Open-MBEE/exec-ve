@@ -38,6 +38,7 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
                 $scope.buttonsInit = true;
                 $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.preview", $scope));
                 $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.save", $scope));
+                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.saveC", $scope));
                 $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.cancel", $scope));
             }     
         };
@@ -108,8 +109,8 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
                     mmsViewCtrl.elementTranscluded(scope.element);
                 }
                 if (scope.version === 'latest') {
-                    scope.$on('element.updated', function(event, eid, ws, type) {
-                        if (eid === scope.mmsEid && ws === scope.ws && (type === 'all' || type === 'name'))
+                    scope.$on('element.updated', function(event, eid, ws, type, continueEdit) {
+                        if (eid === scope.mmsEid && ws === scope.ws && (type === 'all' || type === 'name') && !continueEdit)
                             recompile();
                     });
                 }
@@ -148,6 +149,10 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
 
             scope.save = function() {
                 Utils.saveAction(scope,recompile,scope.bbApi,null,type,element);
+            };
+
+            scope.saveC = function() {
+                Utils.saveAction(scope,recompile,scope.bbApi,null,type,element,true);
             };
 
             scope.cancel = function() {
