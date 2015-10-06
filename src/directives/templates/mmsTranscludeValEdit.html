@@ -4,8 +4,8 @@
         <span ng-switch-when="LiteralBoolean">{{value.boolean}}</span>
         <span ng-switch-when="LiteralReal">{{value.double}}</span>
         <span ng-switch-when="LiteralUnlimitedNatural">{{value.naturalValue}}</span>
-        <span ng-switch-when="ElementValue"><mms-transclude-name mms-eid="{{value.element}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></span>
-        <span ng-switch-when="InstanceValue"><mms-transclude-name mms-eid="{{::value.instance}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></span>
+        <span ng-switch-when="ElementValue"><mms-transclude-name no-click="true" mms-eid="{{value.element}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></span>
+        <span ng-switch-when="InstanceValue"><mms-transclude-name no-click="true" mms-eid="{{::value.instance}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></span>
         <span ng-switch-when="OpaqueExpression">{{value.expressionBody[0]}}</span>
         <span ng-switch-default>{{value}}</span>
     </span>
