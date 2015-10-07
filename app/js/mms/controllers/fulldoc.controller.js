@@ -60,6 +60,23 @@ function($scope, $rootScope, $state, $stateParams, $window, document, workspace,
 
     $scope.bbApi = {};
     $scope.bbApi.init = function() {
+        $scope.bbApi.addButton({
+            id: 'print', 
+            icon: 'fa-print', 
+            selected: true, 
+            active: true, 
+            permission: true, 
+            tooltip: 'Print', 
+            spinner: false, 
+            togglable: false, 
+            action: function() {
+                var printContents = $window.document.getElementById('full-doc').innerHTML;
+                var popupWin = $window.open('', '_blank', 'width=300,height=300,scrollbars=1');
+                popupWin.document.open();
+                popupWin.document.write('<html><head><link href="css/ve-mms.styles.min.css" rel="stylesheet" type="text/css"></head><body style="overflow: auto">' + printContents + '</html>');
+                popupWin.document.close();
+            }
+        });
         $scope.bbApi.addButton(UxService.getButtonBarButton('show.comments'));
         $scope.bbApi.setToggleState('show.comments', $rootScope.veCommentsOn);
         $scope.bbApi.addButton(UxService.getButtonBarButton('show.elements'));
