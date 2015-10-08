@@ -11,6 +11,8 @@ function($scope, $rootScope, $state, $stateParams, $window, document, workspace,
         $rootScope.veCommentsOn = false;
     if (!$rootScope.veElementsOn)
         $rootScope.veElementsOn = false;
+    if (!$rootScope.mms_ShowEdits)
+        $rootScope.mms_ShowEdits = false;
     $scope.buttons = [];
     views.push({id: document.sysmlid, api: {
         init: function(dis) {
@@ -19,6 +21,9 @@ function($scope, $rootScope, $state, $stateParams, $window, document, workspace,
             }
             if ($rootScope.veElementsOn) {
                 dis.toggleShowElements();
+            }
+            if ($rootScope.mms_ShowEdits) {
+                dis.toggleShowEdits();
             }
         }
     }});
@@ -36,6 +41,9 @@ function($scope, $rootScope, $state, $stateParams, $window, document, workspace,
                 }
                 if ($rootScope.veElementsOn) {
                     dis.toggleShowElements();
+                }
+                if ($rootScope.mms_ShowEdits) {
+                    dis.toggleShowEdits();
                 }
             }
         }, number: curSection});
@@ -60,6 +68,16 @@ function($scope, $rootScope, $state, $stateParams, $window, document, workspace,
 
     $scope.bbApi = {};
     $scope.bbApi.init = function() {
+        if (document && document.editable && time === 'latest') {
+            $scope.bbApi.addButton(UxService.getButtonBarButton('show.edits'));
+            $scope.bbApi.setToggleState('show.edits', $rootScope.mms_ShowEdits);
+            hotkeys.bindTo($scope)
+            .add({
+                combo: 'alt+d',
+                description: 'toggle edit mode',
+                callback: function() {$scope.$broadcast('show.edits');}
+            });
+        }
         $scope.bbApi.addButton(UxService.getButtonBarButton('show.comments'));
         $scope.bbApi.setToggleState('show.comments', $rootScope.veCommentsOn);
         $scope.bbApi.addButton(UxService.getButtonBarButton('show.elements'));
@@ -216,6 +234,16 @@ function($scope, $rootScope, $state, $stateParams, $window, document, workspace,
         });
         $scope.bbApi.toggleButtonState('show.elements');
         $rootScope.veElementsOn = !$rootScope.veElementsOn;
+    });
+
+    $scope.$on('show.edits', function() {
+        $scope.views.forEach(function(view) {
+            view.api.toggleShowEdits();
+        });
+        $scope.bbApi.toggleButtonState('show.edits');
+        $rootScope.mms_ShowEdits = !$rootScope.mms_ShowEdits;
+        if ($scope.filterApi.setEditing)
+            $scope.filterApi.setEditing($rootScope.mms_ShowEdits);
     });
     $rootScope.mms_fullDocMode = true;
 }]);
