@@ -273,7 +273,20 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
 
                     //Get the ID, do backend call for Element data
                     var id = scope.mmsEid;
+
                     var temp = ElementService.getOwnedElements(id, false, scope.ws, scope.version, 1);
+
+                    temp.then(
+                        function(val) {
+                            console.log(val.owner);
+                            console.log(val[0].owner);
+                        }
+                    ).catch(
+                        function(reason) {
+                            console.log(reason);
+                        }
+                    );
+
                     Utils.addFrame(scope,mmsViewCtrl,element,frameTemplate);
                 }
             };
