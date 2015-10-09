@@ -263,7 +263,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                     scope.values[0].operand[2].operand.forEach(function(o) {
                         options.push(o.element);
                     });
-                    ElementService.getElements(options, false, scope.ws, scope.version) //Rest call done here <-
+                    ElementService.getElements(options, false, scope.ws, scope.version)
                     .then(function(elements) {
                         scope.options = elements;
                         Utils.addFrame(scope, mmsViewCtrl, element, frameTemplate);
@@ -278,14 +278,10 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
 
                     elementData.then(
                         function(val) {
-                            //console.log(val[0]);
-                            //console.log(val[0].specialization.propertyType);
-
                             var dataID = val[0].specialization.propertyType;
                             var fillData = ElementService.getOwnedElements(dataID, false, scope.ws, scope.version, 1);
 
                             fillDropDown(fillData);
-                            //console.log(fillData);
                         }
                     ).catch(
                         function(reason) {
