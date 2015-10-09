@@ -269,6 +269,11 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                         Utils.addFrame(scope, mmsViewCtrl, element, frameTemplate);
                     });
                 } else {
+                    //The editor check occurs here; should get "not supported for now" from here
+
+                    //Get the ID, do backend call for Element data
+                    var id = scope.mmsEid;
+                    var temp = ElementService.getOwnedElements(id, false, scope.ws, scope.version, 1);
                     Utils.addFrame(scope,mmsViewCtrl,element,frameTemplate);
                 }
             };
