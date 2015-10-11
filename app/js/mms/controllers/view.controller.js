@@ -149,6 +149,9 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
                 });
                 if ($rootScope.mms_treeApi && $rootScope.mms_treeApi.get_selected_branch) {
                     var selected_branch = $rootScope.mms_treeApi.get_selected_branch();
+                    while (selected_branch && selected_branch.type !== 'view') {
+                        selected_branch = $rootScope.mms_treeApi.get_parent_branch(selected_branch);
+                    }
                     if (selected_branch)
                         $scope.sectionNumber = selected_branch.section;
                 }
