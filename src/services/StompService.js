@@ -49,7 +49,10 @@ function StompService($rootScope, UtilsService, $window, $location, ApplicationS
                  .unsubscribe('/topic/master'/*, whatToDoWhenUnsubscribe*/);
              });
          });
-     }, function(){/*on failure*/}, '/');
+     }, function(error){/*on failure*/
+         console.log("========== the callback for the failure is here ============");
+         console.log(error.headers.message);
+     }, '/');
      // TODO: server disconnects in sufficiently long enough periods of inactivity
      //"Whoops! Lost connection to " and then reconnect
      //http://stackoverflow.com/questions/22361917/automatic-reconnect-with-stomp-js-in-node-js-application/22403521#22403521
