@@ -143,6 +143,52 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
 
     /**
      * @ngdoc method
+     * @name mms.ViewService#downgradeDocument
+     * @methodOf mms.ViewService
+     * 
+     * @description
+     * Demote document to a view
+     * 
+     * @param {Object} document A document object
+     * @param {string} [workspace=master] (optional) workspace to use
+     * @param {string} [site] (optional) site id if present will remove doc from site docs list
+     * @returns {Promise} The promise will be resolved with the downgraded view
+     */
+    var downgradeDocument = function(document, workspace, site) {
+        var clone = {};
+        clone.sysmlid = document.sysmlid;
+        clone.specialization = {
+            type: 'View', 
+            contents: document.specialization.contents,
+            contains: document.specialization.contains
+        };
+        return ElementService.updateElement(clone, workspace).then(
+            function(data) {
+                if (site) {
+                    var ws = workspace;
+                    if (!workspace)
+                        ws = 'master';
+                    var cacheKey = ['sites', ws, 'latest', site, 'products'];
+                    var index = -1;
+                    var found = false;
+                    var sitedocs = CacheService.get(cacheKey);
+                    if (sitedocs) {
+                        for (index = 0; index < sitedocs.length; index++) {
+                            if (sitedocs[index].sysmlid === document.sysmlid)
+                                break;
+                        }
+                        if (index >= 0)
+                            sitedocs.splice(index, 1);
+                    }
+                }
+                return data;
+            }, function(reason) {
+                return reason;
+            });
+    };
+
+    /**
+     * @ngdoc method
      * @name mms.ViewService#getViewElements
      * @methodOf mms.ViewService
      * 
@@ -302,7 +348,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         .then(function(data) {  
             var clone = {};
             clone.sysmlid = data.sysmlid;
-            //clone.read = data.read;
+            clone.read = data.read;
+            clone.modified = data.modified;
             clone.specialization = _.cloneDeep(data.specialization);
 
             var key;
@@ -318,7 +365,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
            if (!clone.specialization[key]) {
                 clone.specialization[key] = {
                     operand: [],
-                    type: "Expression"
+                    type: "Expression",
+                    valueExpression: null
                 };
             }
             clone.specialization[key].operand.push(elementOb);
@@ -359,7 +407,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             .then(function(data) {  
                 var clone = {};
                 clone.sysmlid = data.sysmlid;
-                //clone.read = data.read;
+                clone.read = data.read;
+                clone.modified = data.modified;
                 clone.specialization = _.cloneDeep(data.specialization);
 
                 var key;
@@ -444,7 +493,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @returns {Promise} The promise would be resolved with updated View object if addToView is true
      *                    otherwise the created InstanceSpecification
     */
-    var addInstanceSpecification = function(viewOrSection, workspace, type, addToView, site, name, json) {
+    var addInstanceSpecification = function(viewOrSection, workspace, type, addToView, site, name, json, viewDoc) {
 
         var deferred = $q.defer();
         var instanceSpecName = name ? name : "Untitled InstanceSpec";
@@ -531,23 +580,22 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             realType = 'TableT';
         if (type === 'List')
             realType = 'ListT';
-        if (type === 'Paragraph')
+        if (type === 'Paragraph' && !viewDoc)
             realType = 'ParagraphT';
         if (type === 'Section')
             realType = 'SectionT';
         var instanceSpec = {
             name:instanceSpecName,
             specialization: {
-              type:"InstanceSpecification",
-              classifier:[typeToClassifierId[realType]],
-              instanceSpecificationSpecification: presentationElem
-           }
+                type:"InstanceSpecification",
+                classifier:[typeToClassifierId[realType]],
+                instanceSpecificationSpecification: presentationElem
+            },
+            appliedMetatypes: ["_9_0_62a020a_1105704885251_933969_7897"],
+            isMetatype: false
         };
 
-        if (projectId) {
-            instanceSpec.owner = projectId;
-        }
-
+        var createInstanceSpecElement = function() {
         ElementService.createElement(instanceSpec, workspace, site).then(function(createdInstanceSpec) {
 
             // Add in the presentation element:
@@ -563,13 +611,36 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 }, function(reason) {
                     deferred.reject(reason);
                 });
-
             }
-
         }, function(reason) {
             deferred.reject(reason);
         });
+        };
 
+        if (projectId) {
+            if (projectId.indexOf('PROJECT') >= 0) {
+                var viewInstancePackage = {
+                    sysmlid: projectId.replace('PROJECT', 'View_Instances'), 
+                    name: 'View Instances', 
+                    owner: projectId,
+                    specialization: {type: 'Package'}
+                };
+                ElementService.updateElement(viewInstancePackage, workspace)
+                .then(function() {
+                    projectId = projectId.replace('PROJECT', 'View_Instances');
+                    instanceSpec.owner = projectId;
+                    createInstanceSpecElement();
+                }, function(reason) {
+                    instanceSpec.owner = projectId;
+                    createInstanceSpecElement();
+                });
+            } else {
+                instanceSpec.owner = projectId;
+                createInstanceSpecElement();
+            }
+        } else {
+            createInstanceSpecElement();
+        }
         return deferred.promise;
     };
 
@@ -586,7 +657,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
 
         var instanceVal = {
             instance:instanceSpecId,
-            type:"InstanceValue"
+            type:"InstanceValue",
+            valueExpression: null
         };
 
         return addElementToViewOrSection(viewOrSection.sysmlid, viewOrSection.sysmlid, workspace, instanceVal);
@@ -621,6 +693,11 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             owner: ownerId,
             name: !name ? 'Untitled View' : name,
             documentation: '',
+            appliedMetatypes: [
+                "_17_0_1_232f03dc_1325612611695_581988_21583",
+                "_9_0_62a020a_1105704885343_144138_7929"
+            ],
+            isMetatype: false
         };
         if (viewId) view.sysmlid = viewId;
         if (viewDoc) view.documentation = viewDoc;
@@ -637,7 +714,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 'source': data.sysmlid, 
                 'sourceProperty': 'documentation'
             };
-            addInstanceSpecification(data, workspace, "Paragraph", true, null, "View Documentation", jsonBlob)
+            addInstanceSpecification(data, workspace, "Paragraph", true, null, "View Documentation", jsonBlob, true)
             .then(function(data2) {
                 if (documentId) {
                     addViewToDocument(data.sysmlid, documentId, ownerId, workspace, data2)
@@ -677,7 +754,12 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         var doc = {
             specialization: {type: "Product"},
             name: !name ? 'Untitled Document' : name,
-            documentation: ''
+            documentation: '',
+            appliedMetatypes: [
+                "_17_0_2_3_87b0275_1371477871400_792964_43374",
+                "_9_0_62a020a_1105704885343_144138_7929"
+            ],
+            isMetatype: false
         };
         ElementService.createElement(doc, workspace, site)
         .then(function(data) {
@@ -921,6 +1003,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         getViewElements: getViewElements,
         createView: createView,
         createDocument: createDocument,
+        downgradeDocument: downgradeDocument,
         addViewToDocument: addViewToDocument,
         getDocumentViews: getDocumentViews,
         getSiteDocuments: getSiteDocuments,

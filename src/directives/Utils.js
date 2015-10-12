@@ -16,6 +16,7 @@ angular.module('mms.directives')
  *
  * @description
  * Utility methods for performing edit like behavior to a transclude element
+ * WARNING These are intended to be internal utility functions and not designed to be used as api
  *
  */
 function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, WorkspaceService, ConfigService, ElementService, ViewService, UtilsService, growl, _) {
@@ -56,7 +57,7 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
      *      or force save. If the user decides to discord or merge, type will be info even though 
      *      the original save failed. Error means an actual error occured. 
      */
-    var save = function(edit, mmsWs, mmsType, mmsEid, tinymceApi, scope, type) {
+    var save = function(edit, mmsWs, mmsType, mmsEid, tinymceApi, scope, type, continueEdit) {
         var deferred = $q.defer();
         // TODO: put this back when removed scope.editing from view documentation edit
         /* if (!scope.editable || !scope.editing) {
@@ -84,7 +85,7 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
             ElementService.updateElement(edit, mmsWs)
             .then(function(data) {
                 deferred.resolve(data);
-                $rootScope.$broadcast('element.updated', edit.sysmlid, (mmsWs ? mmsWs : 'master'), type);
+                $rootScope.$broadcast('element.updated', edit.sysmlid, (mmsWs ? mmsWs : 'master'), type, continueEdit);
                 //growl.success("Save successful");
                 //scope.editing = false;
             }, function(reason) {
@@ -274,13 +275,16 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
     };
 
     //called by transcludes
-    var saveAction = function(scope, recompile, bbApi, editObj, type, element) {
+    var saveAction = function(scope, recompile, bbApi, editObj, type, element, continueEdit) {
 
         if (scope.elementSaving) {
             growl.info('Please Wait...');
             return;
         }
-        bbApi.toggleButtonSpinner('presentation.element.save');
+        if (!continueEdit)
+            bbApi.toggleButtonSpinner('presentation.element.save');
+        else
+            bbApi.toggleButtonSpinner('presentation.element.saveC');
         scope.elementSaving = true;
         var id = editObj ? editObj.sysmlid : scope.mmsEid;
 
@@ -322,11 +326,13 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
         } else {
             myEdit = scope.edit;
         }
-        save(myEdit, scope.ws, "element", id, null, scope, type).then(function(data) {
+        save(myEdit, scope.ws, "element", id, null, scope, type, continueEdit).then(function(data) {
             scope.elementSaving = false;
-            scope.isEditing = false;
+            if (!continueEdit) {
+                scope.isEditing = false;
             // Broadcast message for the toolCtrl:
-            $rootScope.$broadcast('presentationElem.save', scope);
+                $rootScope.$broadcast('presentationElem.save', scope);
+            }
             $rootScope.$broadcast('view.reorder.refresh');
             //recompile();
             growl.success('Save Successful');
@@ -335,7 +341,10 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
             scope.elementSaving = false;
             handleError(reason);
         }).finally(function() {
-            bbApi.toggleButtonSpinner('presentation.element.save');
+            if (!continueEdit)
+                bbApi.toggleButtonSpinner('presentation.element.save');
+            else
+                bbApi.toggleButtonSpinner('presentation.element.saveC');
         });
     };
 

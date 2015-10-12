@@ -256,6 +256,24 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, HttpSe
         return deferred.promise;
     };
 
+    var getSnapshot = function(id, workspace, update) {
+        var n = normalize(update, workspace);
+        var deferred = $q.defer();
+        var cacheKey = ['snapshots', n.ws, id];
+        if (CacheService.exists(cacheKey) && !n.update) {
+            deferred.resolve(CacheService.get(cacheKey));
+            return deferred.promise;
+        }
+        $http.get(URLService.getSnapshotURL(id, n.ws))
+        .success(function(data, status, headers, config) {
+            CacheService.put(cacheKey, data.snapshots, true);
+            deferred.resolve(CacheService.get(cacheKey));
+        }).error(function(data, status, headers, config) {
+            URLService.handleHttpStatus(data, status, headers, config, deferred);
+        });
+        return deferred.promise;
+    };
+
     /**
      * @ngdoc method
      * @name mms.ConfigService#createSnapshotArtifact
@@ -306,6 +324,7 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, HttpSe
         createConfig : createConfig,
         deleteConfig : deleteConfig,
         getConfig : getConfig,
+        getSnapshot: getSnapshot,
         getConfigForEdit : getConfigForEdit,
         getConfigSnapshots : getConfigSnapshots,
         createSnapshotArtifact: createSnapshotArtifact,

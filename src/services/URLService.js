@@ -162,6 +162,23 @@ function urlService(baseUrl) {
 
     /**
      * @ngdoc method
+     * @name mms.URLService#getSnapshotURL
+     * @methodOf mms.URLService
+     *
+     * @description
+     * Gets url that gets a snapshot
+     *
+     * @param {string} id Id of the snapshot
+     * @param {string} workspace Workspace name
+     * @returns {string} The url
+     */
+    var getSnapshotURL = function(id, workspace) {
+        return root + "/workspaces/" + workspace + 
+                      "/snapshots/" + id;
+    };
+
+    /**
+     * @ngdoc method
      * @name mms.URLService#getConfigProductsURL
      * @methodOf mms.URLService
      *
@@ -232,12 +249,17 @@ function urlService(baseUrl) {
         return addVersion(r, version);
     };
 
-    var getOwnedElementURL = function(id, workspace, version) {
-        
-        var r = root + '/workspaces/' + workspace + '/elements/' + id + '?recurse=true';
-        // TODO return addVersion(r, version);
-        return r;
-        
+    var getOwnedElementURL = function(id, workspace, version, depth) {
+        var recurseString = 'recurse=true';
+        if (depth && depth > 0)
+            recurseString = 'depth=' + depth;
+        var r = root + '/workspaces/' + workspace + '/elements/' + id;
+        r = addVersion(r, version);
+        if (r.indexOf('?') > 0)
+            r += '&' + recurseString;
+        else
+            r += '?' + recurseString;
+        return r;        
     };
 
     /**
@@ -370,9 +392,9 @@ function urlService(baseUrl) {
         else if (status === 410)
             result.message = "Deleted";
         else if (status === 408)
-            result.message = "Timed Out (Please check network)";
+            result.message = "Timed Out";
         else
-            result.message = "Failed (Please check network)";
+            result.message = "Timed Out (Please check network)";
         deferred.reject(result);
     };
 
@@ -427,13 +449,16 @@ function urlService(baseUrl) {
         return root + '/workspaces/' + ws;
     };
 
-    var getWsDiffURL = function(ws1, ws2, ws1time, ws2time) {
-        var r = root + '/diff?workspace1=' + ws1 + '&workspace2=' + ws2;
-        if (ws1time && ws1time !== 'latest')
+    var getWsDiffURL = function(ws1, ws2, ws1time, ws2time, recalc) {
+        var diffUrl =  root + '/diff/' + ws1 + '/' + ws2 + '/' + ws1time + '/' + ws2time  + '?background=true';
+        if(recalc === true) diffUrl += '&recalculate=true';
+        
+        return diffUrl;
+        /*if (ws1time && ws1time !== 'latest')
             r += '&timestamp1=' + ws1time;
         if (ws2time && ws2time !== 'latest')
             r += '&timestamp2=' + ws2time;
-        return r;
+        return r;*/
     };
 
     var getPostWsDiffURL = function(sourcetime) {
@@ -468,6 +493,7 @@ function urlService(baseUrl) {
         getConfigSnapshotsURL: getConfigSnapshotsURL,
         getSiteProductsURL: getSiteProductsURL,
         getConfigURL: getConfigURL,
+        getSnapshotURL: getSnapshotURL,
         getConfigsURL: getConfigsURL,
         getConfigProductsURL : getConfigProductsURL,
         getDocumentViewsURL: getDocumentViewsURL,

@@ -5,8 +5,8 @@
 angular.module('mmsApp')
 .controller('ToolCtrl', ['$scope', '$rootScope', '$state', '$modal', '$q', '$stateParams',
             'ConfigService', 'ElementService', 'WorkspaceService', 'growl', 
-            'workspaceObj', 'tags', 'tag', 'snapshots', 'site', 'document', 'time', 'Utils',
-function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, ElementService, WorkspaceService, growl, workspaceObj, tags, tag, snapshots, site, document, time, Utils) {
+            'workspaceObj', 'tags', 'tag', 'snapshots', 'site', 'document', 'time', 'Utils', 'hotkeys',
+function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, ElementService, WorkspaceService, growl, workspaceObj, tags, tag, snapshots, site, document, time, Utils, hotkeys) {
 
     // TODO rename variable ws
     var ws = $stateParams.workspace;
@@ -258,16 +258,26 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
     
     var elementSaving = false;
     $scope.$on('element.editor.save', function() {
+        save(false);
+    });
+    $scope.$on('element.editor.saveC', function() {
+        save(true);
+    });
+    var save = function(continueEdit) {
         if (elementSaving) {
             growl.info('Please Wait...');
             return;
         }
         elementSaving = true;
-        $rootScope.mms_tbApi.toggleButtonSpinner('element.editor.save');
+        if (!continueEdit)
+            $rootScope.mms_tbApi.toggleButtonSpinner('element.editor.save');
+        else
+            $rootScope.mms_tbApi.toggleButtonSpinner('element.editor.saveC');
         $scope.specApi.save().then(function(data) {
             elementSaving = false;
             growl.success('Save Successful');
-            $rootScope.mms_tbApi.toggleButtonSpinner('element.editor.save');
+            if (continueEdit) 
+                return;
             var edit = $scope.specApi.getEdits();
             delete $rootScope.veEdits[$scope.elementType + '|' + (edit.sysmlid || edit.id ) + '|' + $scope.specWs];
             if (Object.keys($rootScope.veEdits).length > 0) {
@@ -293,12 +303,21 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
                 growl.warning(reason.message);
             else if (reason.type === 'error')
                 growl.error(reason.message);
-            $rootScope.mms_tbApi.toggleButtonSpinner('element.editor.save');
+        }).finally(function() {
+            if (!continueEdit)
+                $rootScope.mms_tbApi.toggleButtonSpinner('element.editor.save');
+            else
+                $rootScope.mms_tbApi.toggleButtonSpinner('element.editor.saveC');
         });
-
         $rootScope.mms_tbApi.select('element.editor');
-    });
+    };
 
+    hotkeys.bindTo($scope)
+    .add({
+        combo: 'alt+a',
+        description: 'save all',
+        callback: function() {$scope.$broadcast('element.editor.saveall');}
+    });
     var savingAll = false;
     $scope.$on('element.editor.saveall', function() {
         if (savingAll) {

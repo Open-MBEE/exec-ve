@@ -143,7 +143,11 @@ function($scope, $rootScope, $stateParams, document, time, ElementService, ViewS
         var curBranch = $rootScope.mms_treeApi.get_selected_branch();
         if (!curBranch)
             $state.go('workspace.site.document', {}, {reload:true});
-        else
-            $state.go('workspace.site.document.view', {view: curBranch.data.sysmlid});
+        else {
+            var goToId = curBranch.data.sysmlid;
+            if (curBranch.type === 'section')
+                goToId = curBranch.view;
+            $state.go('workspace.site.document.view', {view: goToId});
+        }
     };
 }]);
