@@ -383,13 +383,16 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                     return null;
                 return ViewService.getView(document.sysmlid, false, workspace, time);
             },
-            snapshot: function(configSnapshots, document, dummyLogin) {
+            snapshot: function(ConfigService, configSnapshots, document, workspace, dummyLogin) {
                 var docid = document.sysmlid;
                 var found = null;
                 configSnapshots.forEach(function(snapshot) {
                     if (docid === snapshot.sysmlid)
                         found = snapshot;
                 });
+                if (found) {
+                    return ConfigService.getSnapshot(found.id, workspace, true);
+                }
                 return found; 
             }
         },
@@ -422,13 +425,16 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                     return [];
                 return ConfigService.getProductSnapshots(document.sysmlid, site.sysmlid, workspace);
             },
-            snapshot: function(configSnapshots, document, dummyLogin) {
+            snapshot: function(ConfigService, workspace, configSnapshots, document, dummyLogin) {
                 var docid = document.sysmlid;
                 var found = null;
                 configSnapshots.forEach(function(snapshot) {
                     if (docid === snapshot.sysmlid)
                         found = snapshot;
                 });
+                if (found) {
+                    return ConfigService.getSnapshot(found.id, workspace, true);
+                }
                 return found; 
             },
             tag: function ($stateParams, ConfigService, workspace, snapshots, dummyLogin) {
