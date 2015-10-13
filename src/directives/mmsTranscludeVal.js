@@ -277,6 +277,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
 
                     elementData.then(
                         function(val) {
+                            //Filter for enumeration type
                             if (val.appliedMetatypes[0] === '_9_0_62a020a_1105704885400_895774_7947') {
                                 scope.isEnumeration = true;
                                 var fillData = ElementService.getOwnedElements(val.sysmlid, false, scope.ws, scope.version, 1);
@@ -294,7 +295,14 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                     var fillDropDown = function(data) {
                         data.then(
                             function(val) {
-                                scope.options = val;
+                                var newArray = [];
+                                //Filter only for appropriate property value
+                                for (var i = 0; i < val.length; i++) {
+                                    if( val[i].appliedMetatypes[0] === '_9_0_62a020a_1105704885423_380971_7955') {
+                                        newArray.push(val[i]);
+                                    }
+                                }
+                                scope.options = newArray;
                                 Utils.addFrame(scope,mmsViewCtrl,element,frameTemplate);
                             }
                         ).catch(
