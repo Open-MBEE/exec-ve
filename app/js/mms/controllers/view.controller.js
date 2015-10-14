@@ -267,6 +267,10 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     $scope.$on('view.add.section', function() {
         MmsAppUtils.addPresentationElement($scope, 'Section', view);
     });
+
+    $scope.$on('view.add.comment', function() {
+        MmsAppUtils.addPresentationElement($scope, 'Comment', view);
+    });
 /*
     $scope.$on('view.add.image', function() {
         addElement('Figure');
@@ -294,6 +298,10 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
 */
     $scope.$on('section.add.section', function(event, section) {
         MmsAppUtils.addPresentationElement($scope, 'Section', section);
+    });
+
+    $scope.$on('section.add.comment', function(event, section) {
+        MmsAppUtils.addPresentationElement($scope, 'Comment', section);
     });
 /*
     $scope.$on('section.add.image', function(event, section) {
