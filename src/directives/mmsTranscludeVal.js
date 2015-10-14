@@ -269,7 +269,48 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                         Utils.addFrame(scope, mmsViewCtrl, element, frameTemplate);
                     });
                 } else {
-                    Utils.addFrame(scope,mmsViewCtrl,element,frameTemplate);
+                    //The editor check occurs here; should get "not supported for now" from here
+
+                    //Get the ID, do backend call for Element data
+                    var id = scope.element.specialization.propertyType;
+                    var elementData = ElementService.getElement(id, false, scope.ws, scope.version);
+
+                    elementData.then(
+                        function(val) {
+                            //Filter for enumeration type
+                            if (val.appliedMetatypes[0] === '_9_0_62a020a_1105704885400_895774_7947') {
+                                scope.isEnumeration = true;
+                                var fillData = ElementService.getOwnedElements(val.sysmlid, false, scope.ws, scope.version, 1);
+
+                                fillDropDown(fillData);
+                            } else
+                                Utils.addFrame(scope, mmsViewCtrl, element, frameTemplate);
+                        }
+                    ).catch(
+                        function(reason) {
+                            console.log(reason);
+                        }
+                    );
+
+                    var fillDropDown = function(data) {
+                        data.then(
+                            function(val) {
+                                var newArray = [];
+                                //Filter only for appropriate property value
+                                for (var i = 0; i < val.length; i++) {
+                                    if( val[i].appliedMetatypes[0] === '_9_0_62a020a_1105704885423_380971_7955') {
+                                        newArray.push(val[i]);
+                                    }
+                                }
+                                scope.options = newArray;
+                                Utils.addFrame(scope,mmsViewCtrl,element,frameTemplate);
+                            }
+                        ).catch(
+                            function(reason) {
+                                console.log(reason);
+                            }
+                        );
+                    };
                 }
             };
 
