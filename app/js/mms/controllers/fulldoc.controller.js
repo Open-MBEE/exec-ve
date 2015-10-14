@@ -3,9 +3,10 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('FullDocCtrl', ['$scope', '$rootScope', '$state', '$stateParams', '$window', 'document', 'workspace', 'site', 'snapshot', 'time', 'ConfigService', 'UxService', 'growl', 'hotkeys',
-function($scope, $rootScope, $state, $stateParams, $window, document, workspace, site, snapshot, time, ConfigService, UxService, growl, hotkeys) {
+.controller('FullDocCtrl', ['$scope', '$rootScope', '$state', '$stateParams', '$window', 'MmsAppUtils', 'document', 'workspace', 'site', 'snapshot', 'time', 'ConfigService', 'UxService', 'growl', 'hotkeys',
+function($scope, $rootScope, $state, $stateParams, $window, MmsAppUtils, document, workspace, site, snapshot, time, ConfigService, UxService, growl, hotkeys) {
     $scope.ws = $stateParams.workspace;
+    $scope.site = site;
     var views = [];
     if (!$rootScope.veCommentsOn)
         $rootScope.veCommentsOn = false;
@@ -22,7 +23,7 @@ function($scope, $rootScope, $state, $stateParams, $window, document, workspace,
             if ($rootScope.veElementsOn) {
                 dis.toggleShowElements();
             }
-            if ($rootScope.mms_ShowEdits) {
+            if ($rootScope.mms_ShowEdits && time === 'latest') {
                 dis.toggleShowEdits();
             }
         }
@@ -42,7 +43,7 @@ function($scope, $rootScope, $state, $stateParams, $window, document, workspace,
                 if ($rootScope.veElementsOn) {
                     dis.toggleShowElements();
                 }
-                if ($rootScope.mms_ShowEdits) {
+                if ($rootScope.mms_ShowEdits && time === 'latest') {
                     dis.toggleShowEdits();
                 }
             }
@@ -242,8 +243,14 @@ function($scope, $rootScope, $state, $stateParams, $window, document, workspace,
         });
         $scope.bbApi.toggleButtonState('show.edits');
         $rootScope.mms_ShowEdits = !$rootScope.mms_ShowEdits;
-        if ($scope.filterApi.setEditing)
-            $scope.filterApi.setEditing($rootScope.mms_ShowEdits);
     });
     $rootScope.mms_fullDocMode = true;
+
+    $scope.$on('section.add.paragraph', function(event, section) {
+        MmsAppUtils.addPresentationElement($scope, 'Paragraph', section);
+    });
+
+    $scope.$on('section.add.section', function(event, section) {
+        MmsAppUtils.addPresentationElement($scope, 'Section', section);
+    });
 }]);
