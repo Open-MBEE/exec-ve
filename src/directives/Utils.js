@@ -486,6 +486,19 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
     };
 
     var isDirectChildOfPresentationElementFunc = function(element, mmsViewCtrl) {
+        var parent = element[0].parentElement;
+        while (parent && parent.nodeName !== 'MMS-VIEW-PRESENTATION-ELEM' && parent.nodeName !== 'MMS-VIEW') {
+            if (mmsViewCtrl.isTranscludedElement(parent.nodeName)) {
+                return false;
+            }
+            if (parent.nodeName === 'MMS-VIEW-TABLE' || parent.nodeName === 'MMS-VIEW-LIST' || parent.nodeName === 'MMS-VIEW-SECTION')
+                return false;
+            parent = parent.parentElement;
+        }
+        if (parent && parent.nodeName !== 'MMS-VIEW')
+            return true;
+        return false;
+/*
         var currentElement = (element[0]) ? element[0] : element;
         var viewElementCount = 0;
         while (currentElement.parentElement) {
@@ -502,6 +515,7 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
             currentElement = parent;
         }
         return false;
+        */
     };
 
     var hasHtml = function(s) {

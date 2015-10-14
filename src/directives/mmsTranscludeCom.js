@@ -71,7 +71,7 @@ function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxSe
             element.empty();
             var doc = scope.element.documentation || '(No comment)';
             doc += ' - ' + scope.element.creator;
-            element.append(doc);
+            element[0].innerHTML = doc;
             scope.recompileScope = scope.$new();
             $compile(element.contents())(scope.recompileScope); 
             if (mmsViewCtrl) {
@@ -86,7 +86,7 @@ function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxSe
             var doc = scope.edit.documentation;
             if (!doc)
                 doc = '<p ng-class="{placeholder: version!=\'latest\'}">(No Comment)</p>';
-            element.append('<div class="panel panel-info">'+doc+'</div>');
+            element[0].innerHTML = '<div class="panel panel-info">'+doc+'</div>';
             scope.recompileScope = scope.$new();
             $compile(element.contents())(scope.recompileScope); 
         };
