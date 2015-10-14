@@ -13,7 +13,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
     $scope.buttons = [];
     $scope.treeExpandLevel = 1;
     if ($state.includes('workspace.sites') && !$state.includes('workspace.site.document')) 
-        $scope.treeExpandLevel = 0;
+        $scope.treeExpandLevel = 3;
     $scope.treeSectionNumbering = false;
     if ($state.includes('workspace.site.document')) {
         $scope.treeSectionNumbering = true;
@@ -404,7 +404,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
         $scope.my_data = UtilsService.buildTreeHierarchy(workspaces, "id", 
                                                          "workspace", "parent", workspaceLevel2Func);
     } else if ($state.includes('workspace.sites') && !$state.includes('workspace.site.document')) {
-        $scope.my_data = UtilsService.buildTreeHierarchy(filter_sites(sites), "sysmlid", "site", "parent", siteInitFunc);
+        $scope.my_data = UtilsService.buildTreeHierarchy(filter_sites(sites), "sysmlid", "site", "parent", siteLevel2Func);
     } else
     {
         // this is from view editor
