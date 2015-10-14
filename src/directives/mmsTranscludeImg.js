@@ -46,7 +46,7 @@ function mmsTranscludeImg(VizService, growl) {
             .then(function(data) {
                 scope.imgUrl = data;
             }, function(reason) {
-                growl.error('Cf Image Error: ' + reason.message + ': ' + scope.mmsEid);
+                // growl.error('Cf Image Error: ' + reason.message + ': ' + scope.mmsEid);
             });
         });
     };
