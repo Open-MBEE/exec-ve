@@ -238,6 +238,8 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
 
                 if (data.specialization.type === 'Property' && angular.isArray(data.specialization.value)) {
                     scope.editValues = data.specialization.value;
+                    if (scope.isEnumeration && scope.editValues.length === 0)
+                        scope.editValues.push({type: 'InstanceValue', instance: null});
                 }
                 if (data.specialization.type === 'Constraint' && data.specialization.specification) {
                     scope.editValues = [data.specialization.specification];
@@ -389,6 +391,23 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
     };
 
     var deleteAction = function(scope, bbApi, section) {
+        var id = section ? section.sysmlid : scope.view.sysmlid;
+        ElementService.isCacheOutdated(id, scope.ws)
+        .then(function(status) {
+            if (status.status) {
+                if (section && section.specialization.instanceSpecificationSpecification && !angular.equals(section.specialization.instanceSpecificationSpecification, status.server.specialization.instanceSpecificationSpecification)) {
+                    growl.error('The view section contents is outdated, refresh the page first!');
+                    return;
+                } else if (!section && scope.view.specialization.contents && !angular.equals(scope.view.specialization.contents, status.server.specialization.contents)) {
+                    growl.error('The view contents is outdated, refresh the page first!');
+                    return;
+                }
+            } 
+            realDelete();
+        }, function(reason) {
+            growl.error('Checking if view contents is up to date failed: ' + reason.message);
+        });
+        function realDelete() {
         bbApi.toggleButtonSpinner('presentation.element.delete');
 
         scope.name = scope.edit.name;
@@ -425,6 +444,7 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
         }).finally(function() {
             bbApi.toggleButtonSpinner('presentation.element.delete');
         });
+        }
     };
 
     var leaveEditModeOrFrame = function(scope, recompile, recompileEdit, type) {
