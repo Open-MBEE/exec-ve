@@ -65,6 +65,7 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
         });
     }
 
+    // Set edit count for tracker view 
     $scope.veEditsLength = function() {
         return Object.keys($rootScope.veEdits).length;
     };
@@ -110,6 +111,17 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
         });
     };
 
+    // Check edit count and toggle appropriate save all and edit/edit-asterisk buttons
+    var cleanUpSaveAll = function() {
+        if ($scope.veEditsLength() > 0) {
+            $rootScope.mms_tbApi.setPermission('element.editor.saveall', true);
+            $rootScope.mms_tbApi.setIcon('element.editor', 'fa-edit-asterisk');
+        } else {
+            $rootScope.mms_tbApi.setPermission('element.editor.saveall', false);
+            $rootScope.mms_tbApi.setIcon('element.editor', 'fa-edit');
+        }
+    };
+
     $scope.$on('document.snapshot', function() {
         showPane('snapshots');
     });
@@ -119,7 +131,6 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
     });
 
     var cleanUpEdit = function(scope) {
-
         var ws = scope.ws;
         var edit = scope.edit;
         var key = 'element|' + edit.sysmlid + '|' + ws;
@@ -131,14 +142,7 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
         if (currentCnt <= 1 && !Utils.hasEdits(scope,null,true)) {
             delete $rootScope.veEdits[key];
             delete $scope.presentElemEditCnts[key];
-            if (Object.keys($rootScope.veEdits).length === 0) {
-                $rootScope.mms_tbApi.setIcon('element.editor', 'fa-edit');
-            }
-            if (Object.keys($rootScope.veEdits).length > 0) {
-                $rootScope.mms_tbApi.setPermission('element.editor.saveall', true); 
-            } else {
-                $rootScope.mms_tbApi.setPermission('element.editor.saveall', false);
-            }
+            cleanUpSaveAll();
         }
         else {
             $scope.presentElemEditCnts[key] = currentCnt - 1;
@@ -146,7 +150,6 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
     };
 
     $scope.$on('presentationElem.edit', function(event, scope) {
-        
         var ws = scope.ws;
         var edit = scope.edit;
         var key = 'element|' + edit.sysmlid + '|' + ws;
@@ -156,13 +159,7 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
             currentCnt = $scope.presentElemEditCnts[key] + 1;
         }
         $scope.presentElemEditCnts[key] = currentCnt;
-
-        $rootScope.mms_tbApi.setIcon('element.editor', 'fa-edit-asterisk');
-        if (Object.keys($rootScope.veEdits).length > 0) {
-            $rootScope.mms_tbApi.setPermission('element.editor.saveall', true);
-        } else {
-            $rootScope.mms_tbApi.setPermission('element.editor.saveall', false);
-        }
+        cleanUpSaveAll();
     });
 
     $scope.$on('presentationElem.save', function(event, scope) {
@@ -200,11 +197,7 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
     });
     $scope.$on('element.viewer', function() {
         $scope.specApi.setEditing(false);
-        if (Object.keys($rootScope.veEdits).length > 0) {
-            $rootScope.mms_tbApi.setPermission('element.editor.saveall', true);
-        } else {
-            $rootScope.mms_tbApi.setPermission('element.editor.saveall', false);
-        }
+        cleanUpSaveAll();
         showPane('element');
     });
     $scope.$on('element.editor', function() {
@@ -214,12 +207,7 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
         if (edit) {
             $scope.tracker.etrackerSelected = $scope.elementType + '|' + (edit.sysmlid || edit.id) + '|' + $scope.specWs;
             $rootScope.veEdits[$scope.elementType + '|' + (edit.sysmlid || edit.id) + '|' + $scope.specWs] = edit;
-            $rootScope.mms_tbApi.setIcon('element.editor', 'fa-edit-asterisk');
-            if (Object.keys($rootScope.veEdits).length > 0) {
-                $rootScope.mms_tbApi.setPermission('element.editor.saveall', true);
-            } else {
-                $rootScope.mms_tbApi.setPermission('element.editor.saveall', false);
-            }
+            cleanUpSaveAll();
         }
         if ($scope.elementType !== 'element')
             return;
@@ -291,9 +279,7 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
             } else {
                 $scope.specApi.setEditing(false);
                 $rootScope.mms_tbApi.select('element.viewer');
-                if (Object.keys($rootScope.veEdits).length === 0) {
-                    $rootScope.mms_tbApi.setIcon('element.editor', 'fa-edit');
-                }
+                cleanUpSaveAll();
             }
         }, function(reason) {
             elementSaving = false;
@@ -393,6 +379,7 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
             }
             $rootScope.mms_tbApi.toggleButtonSpinner('element.editor.saveall');
             savingAll = false;
+            cleanUpSaveAll();
 
             if (Object.keys($rootScope.veEdits).length === 0) {
                 $rootScope.mms_tbApi.setIcon('element.editor', 'fa-edit');
@@ -416,6 +403,7 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
                 $scope.specApi.setEditing(false);
                 $rootScope.mms_tbApi.select('element.viewer');
                 $rootScope.mms_tbApi.setIcon('element.editor', 'fa-edit');
+                cleanUpSaveAll();
             }
         };
         if ($scope.specApi.hasEdits()) {

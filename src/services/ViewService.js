@@ -365,7 +365,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
            if (!clone.specialization[key]) {
                 clone.specialization[key] = {
                     operand: [],
-                    type: "Expression"
+                    type: "Expression",
+                    valueExpression: null
                 };
             }
             clone.specialization[key].operand.push(elementOb);
@@ -557,7 +558,10 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 jsonBlob = paragraph;
                 jsonBlob.type = 'Equation';
             }
-
+            else if (type === 'Comment') {
+                jsonBlob = paragraph;
+                jsonBlob.type = 'Comment';
+            }
             // Special case for Section.  Doesnt use json blobs.
             if (type === "Section") {
                 presentationElem = jsonBlob;  
@@ -583,6 +587,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             realType = 'ParagraphT';
         if (type === 'Section')
             realType = 'SectionT';
+        if (type === 'Comment')
+            realType = 'ParagraphT';
         var instanceSpec = {
             name:instanceSpecName,
             specialization: {
@@ -656,7 +662,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
 
         var instanceVal = {
             instance:instanceSpecId,
-            type:"InstanceValue"
+            type:"InstanceValue",
+            valueExpression: null
         };
 
         return addElementToViewOrSection(viewOrSection.sysmlid, viewOrSection.sysmlid, workspace, instanceVal);

@@ -83,6 +83,7 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
         scope.editing = false;
         scope.editable = true;
         scope.isRestrictedVal = false;
+        scope.isEnumeration = false;
         if (scope.mmsElement) {
             scope.element = scope.mmsElement;
             if(scope.element.specialization.type === 'Expression'){
@@ -161,6 +162,7 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
                         scope.isRestrictedVal = true;
                     else
                         scope.isRestrictedVal = false;
+                    //if (scope.values && scope.values.length > 0 && scope.values[0].type === 'InstanceValue')
                 }
                 if (scope.element.specialization.type === 'Constraint')
                     scope.value = scope.element.specialization.specification;
