@@ -69,7 +69,7 @@ function($scope, $rootScope, $state, $stateParams, $window, MmsAppUtils, documen
 
     $scope.bbApi = {};
     $scope.bbApi.init = function() {
-<<<<<<< HEAD
+
         $scope.bbApi.addButton({
             id: 'print', 
             icon: 'fa-print', 
@@ -87,7 +87,7 @@ function($scope, $rootScope, $state, $stateParams, $window, MmsAppUtils, documen
                 popupWin.document.close();
             }
         });
-=======
+
         if (document && document.editable && time === 'latest') {
             $scope.bbApi.addButton(UxService.getButtonBarButton('show.edits'));
             $scope.bbApi.setToggleState('show.edits', $rootScope.mms_ShowEdits);
@@ -98,7 +98,7 @@ function($scope, $rootScope, $state, $stateParams, $window, MmsAppUtils, documen
                 callback: function() {$scope.$broadcast('show.edits');}
             });
         }
->>>>>>> develop
+
         $scope.bbApi.addButton(UxService.getButtonBarButton('show.comments'));
         $scope.bbApi.setToggleState('show.comments', $rootScope.veCommentsOn);
         $scope.bbApi.addButton(UxService.getButtonBarButton('show.elements'));
