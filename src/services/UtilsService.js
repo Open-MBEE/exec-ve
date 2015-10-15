@@ -332,6 +332,38 @@ function UtilsService(CacheService, _) {
         return '<mms-transclude-' + t + ' data-mms-eid="' + para.source + '"></mms-transclude-' + t + '>';
     };
 
+    var makeHtmlTOC = function (tree) {
+        var result = '<div>';
+
+        var root_branch = tree[0].branch;
+
+        result += '<ul style="list-style-type:none">';
+        result += '  <li>' + root_branch.section + ' ' + root_branch.label + '</li>';
+
+        root_branch.children.forEach(function (child) {
+            result += makeHtmlTOCChild(child);
+        });
+
+        result += '</ul>'; 
+
+        return result;
+    };
+
+    var makeHtmlTOCChild = function(child) {
+
+        var result = '<ul style="list-style-type:none">';
+
+        result += '  <li>' + child.section + ' ' + child.label + '</li>';
+
+        child.children.forEach(function (child2) {
+            result += makeHtmlTOCChild(child2);
+        });
+
+        result += '</ul>'; 
+
+        return result;
+    };
+
     return {
         hasCircularReference: hasCircularReference,
         cleanElement: cleanElement,
@@ -344,6 +376,7 @@ function UtilsService(CacheService, _) {
         isRestrictedValue: isRestrictedValue,
         makeHtmlTable : makeHtmlTable,
         makeHtmlPara: makeHtmlPara,
-        makeHtmlList: makeHtmlList
+        makeHtmlList: makeHtmlList,
+        makeHtmlTOC: makeHtmlTOC
     };
 }
