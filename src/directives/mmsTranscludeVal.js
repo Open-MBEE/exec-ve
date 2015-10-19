@@ -315,6 +315,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                             },
                             function(reason) {
                                 console.log(reason);
+                                growl.error('Failed to get enumeration options: ' + reason.message);
                             }
                         );
                     };
