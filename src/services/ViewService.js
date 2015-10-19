@@ -558,7 +558,10 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 jsonBlob = paragraph;
                 jsonBlob.type = 'Equation';
             }
-
+            else if (type === 'Comment') {
+                jsonBlob = paragraph;
+                jsonBlob.type = 'Comment';
+            }
             // Special case for Section.  Doesnt use json blobs.
             if (type === "Section") {
                 presentationElem = jsonBlob;  
@@ -584,6 +587,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             realType = 'ParagraphT';
         if (type === 'Section')
             realType = 'SectionT';
+        if (type === 'Comment')
+            realType = 'ParagraphT';
         var instanceSpec = {
             name:instanceSpecName,
             specialization: {

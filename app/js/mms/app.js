@@ -572,8 +572,8 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
         url: '/views/:view',
         resolve: {
             viewElements: function($stateParams, ViewService, time, dummyLogin) {
-                if (time === 'latest')
-                    return ViewService.getViewElements($stateParams.view, false, $stateParams.workspace, time);
+                //if (time === 'latest')
+                //    return ViewService.getViewElements($stateParams.view, false, $stateParams.workspace, time);
                 return [];
             },
             view: function($stateParams, ViewService, viewElements, time, dummyLogin) {
