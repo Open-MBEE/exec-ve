@@ -30,7 +30,7 @@ function StompService($rootScope, UtilsService, $window, $location, ApplicationS
                              var inCache = CacheService.exists( UtilsService.makeElementKey(value.sysmlid, workspaceId, 'latest', false) );
                              if(inCache === true)
                                 UtilsService.mergeElement(value, value.sysmlid, workspaceId, false, "all" );
-                             $rootScope.$broadcast("stomp.element", workspaceId, value.sysmlid , value.modifier, value.name);
+                             $rootScope.$broadcast("stomp.element", value, workspaceId, value.sysmlid , value.modifier, value.name);
                          });
                      }
                      if(updateWebpage.workspace2.updatedElements.length !== 0){
@@ -38,7 +38,7 @@ function StompService($rootScope, UtilsService, $window, $location, ApplicationS
                              var inCache = CacheService.exists( UtilsService.makeElementKey(value.sysmlid, workspaceId, 'latest', false) );
                              if(inCache === true)
                                 UtilsService.mergeElement(value, value.sysmlid, workspaceId, false, "all" );
-                             $rootScope.$broadcast("stomp.element", workspaceId, value.sysmlid , value.modifier, value.name);
+                             $rootScope.$broadcast("stomp.element", value, workspaceId, value.sysmlid , value.modifier, value.name);
                          });               
                      }
                  });
@@ -51,7 +51,7 @@ function StompService($rootScope, UtilsService, $window, $location, ApplicationS
          });
      }, function(error){/*on failure*/
          console.log("========== the callback for the failure is here ============");
-         console.log(error.headers.message);
+         //console.log(error.headers.message);
      }, '/');
      // TODO: server disconnects in sufficiently long enough periods of inactivity
      //"Whoops! Lost connection to " and then reconnect

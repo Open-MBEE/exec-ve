@@ -328,7 +328,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
             };
         } 
         //actions for stomp 
-        scope.$on("stomp.element", function(event, deltaWorkspaceId, deltaElementId, deltaModifier, elemName){
+        scope.$on("stomp.element", function(event, deltaSource, deltaWorkspaceId, deltaElementId, deltaModifier, elemName){
             if(deltaWorkspaceId === scope.ws && deltaElementId === scope.mmsEid){
                 if(scope.isEditing === false){
                     recompile();

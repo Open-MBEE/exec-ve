@@ -175,11 +175,11 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
             };
         }
         //actions for stomp using growl messages
-        // scope.$on("stomp.element", function(event, deltaWorkspaceId, deltaElementID){
-        //     if(deltaWorkspaceId === scope.ws && deltaElementID === scope.mmsEid){
-        //          growl.info("Transclude Name Has been updated by another user", {ttl: 10000});
-        //     }
-        // });
+        scope.$on("stomp.element", function(event, deltaSource, deltaWorkspaceId, deltaElementID, deltaModifier, deltaName){
+            if(deltaWorkspaceId === scope.ws && deltaElementID === scope.mmsEid){
+                 growl.info(" This value has been changed to: "+deltaName+" by: "+ deltaModifier, {ttl: 10000});
+            }
+        });
     };
 
     return {
