@@ -4,8 +4,8 @@
 
 angular.module('mmsApp')
 
-.controller('FullDocCtrl', ['$scope', '$rootScope', '$state', '$stateParams', '$window', 'MmsAppUtils', 'document', 'workspace', 'site', 'snapshot', 'time', 'ConfigService', 'UxService', 'UtilsService', 'growl', 'hotkeys',
-function($scope, $rootScope, $state, $stateParams, $window, MmsAppUtils, document, workspace, site, snapshot, time, ConfigService, UxService, UtilsService, growl, hotkeys) {
+.controller('FullDocCtrl', ['$scope', '$templateCache', '$compile', '$timeout', '$rootScope', '$state', '$stateParams', '$window', 'MmsAppUtils', 'document', 'workspace', 'site', 'snapshot', 'time', 'ConfigService', 'UxService', 'ViewService', 'UtilsService', 'growl', 'hotkeys',
+function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateParams, $window, MmsAppUtils, document, workspace, site, snapshot, time, ConfigService, UxService, ViewService, UtilsService, growl, hotkeys) {
 
     $scope.ws = $stateParams.workspace;
     $scope.site = site;
@@ -84,10 +84,28 @@ function($scope, $rootScope, $state, $stateParams, $window, MmsAppUtils, documen
             action: function() {
                 var tocContents = UtilsService.makeHtmlTOC($rootScope.mms_treeApi.get_rows());
                 var printContents = $window.document.getElementById('full-doc').innerHTML;
-                var popupWin = $window.open('', '_blank', 'width=300,height=300,scrollbars=1');
-                popupWin.document.open();
-                popupWin.document.write('<html><head><link href="css/ve-mms.styles.min.css" rel="stylesheet" type="text/css"></head><body style="overflow: auto">' + tocContents + printContents + '</html>');
-                popupWin.document.close();
+                var cover = "";
+                var useCover = false;
+                var templateString = $templateCache.get('partials/mms/docCover.html');
+                var templateElement = angular.element(templateString);
+                var newScope = $rootScope.$new();
+                ViewService.getDocMetadata(document.sysmlid, $scope.ws)
+                .then(function(metadata) {
+                    useCover = true;
+                    newScope.meta = metadata;
+                    var compiled = $compile(templateElement.contents())(newScope); 
+                }).finally(function() {
+                    $timeout(function() {
+                        if (useCover)
+                            cover = templateElement[0].innerHTML;
+                        newScope.$destroy();
+                        var popupWin = $window.open('', '_blank', 'width=300,height=300,scrollbars=1');
+                        popupWin.document.open();
+                        popupWin.document.write('<html><head><link href="css/ve-mms.styles.min.css" rel="stylesheet" type="text/css"></head><body style="overflow: auto">' + cover + tocContents + printContents + '</html>');
+                        popupWin.document.close();
+                    }, 0, false);
+
+                });
             }
         });
 

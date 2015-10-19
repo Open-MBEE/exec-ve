@@ -1,0 +1,63 @@
+<div>
+<h1>project title</h1>
+<h3>document title</h3>
+<h5> {{meta.version}} </h5>
+
+
+<div> harded coded paper copies? docushare link</div>
+<div> {{meta.titlelegal}}</div>
+<div> {{meta.footerlegal}}</div>
+<div> date</div>
+<div> {{meta.dnumber}}</div>
+
+<div> institution logo (jpl)</div>
+<div> institution name 2</div>
+<div> institution name</div>
+______________
+<h1>Project title</h1>
+<h1>document title</h1>
+<h4> {{meta.version}}</h4>
+
+<div>Prepared by:</div>
+<div ng-repeat="author in meta.authors">
+<div>_________________________________             ___________</div>
+<div>{{author.firstname}} {{author.lastname}}                          Date</div>
+<div>{{author.title}}, {{author.orgname}}, {{author.orgnum}}</div>
+</div>
+
+<div> Approved by:</div>
+<div ng-repeat="author in meta.approvers">
+<div>_________________________________             ___________</div>
+<div>{{author.firstname}} {{author.lastname}}                          Date</div>
+<div>{{author.title}}, {{author.orgname}}, {{author.orgnum}}</div>
+</div>
+
+<div> Confirmed by:</div>
+<div ng-repeat="author in meta.concurrences">
+<div>_________________________________             ___________</div>
+<div>{{author.firstname}} {{author.lastname}}                          Date</div>
+<div>{{author.title}}, {{author.orgname}}, {{author.orgnum}}</div>
+</div>
+
+<div> institution logo</div>
+<div> institution name 2</div>
+<div> institution name</div>
+_____________________________
+<h4>change log</h4>
+<table>
+<thead>
+<tr><td>Version</td><td>Date</td><td>Sections Changed</td><td>Author</td></tr>
+</thead>
+<tbody>
+<tr ng-repeat="revision in meta.revisions"><td>{{rev.revnum}}</td><td>{{rev.date}}</td><td>{{rev.remark}}</td><td>{{rev.firstname}} {{rev.lastname}}</td></tr>
+</tbody>
+</table>
+
+
+<h4>distribution list</h4>
+<div>emails</div>
+
+<div> institution logo (jpl)</div>
+<div> institution name 2</div>
+<div> institution name</div>
+</div>
