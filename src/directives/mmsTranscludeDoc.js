@@ -257,6 +257,19 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                 scope.tinymceType = scope.presentationElem.type;
             }
         }
+        
+        //actions for stomp 
+        scope.$on("stomp.element", function(event, deltaSource, deltaWorkspaceId, deltaElementId, deltaModifier, elemName){
+            if(deltaWorkspaceId === scope.ws && deltaElementId === scope.mmsEid){
+                if(scope.isEditing === false){
+                    recompile();
+                }
+                if(scope.isEditing === true){
+                    growl.warning("This document has been changed: " + elemName +
+                                " modified by: " + deltaModifier, {ttl: 10000});
+                }
+            }
+        });
 
     };
 
