@@ -276,22 +276,26 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
 
                     //Get the ID, do backend call for Element data
                     var id = scope.element.specialization.propertyType;
+                    if (!id || scope.element.specialization.isSlot || (scope.isEnumeration && scope.options)) {
+                        Utils.addFrame(scope, mmsViewCtrl, element, frameTemplate);
+                        return;
+                    }
                     var elementData = ElementService.getElement(id, false, scope.ws, scope.version);
 
                     elementData.then(
                         function(val) {
                             //Filter for enumeration type
-                            if (val.appliedMetatypes[0] === '_9_0_62a020a_1105704885400_895774_7947') {
+                            if (val.appliedMetatypes && val.appliedMetatypes.length > 0 && 
+                                val.appliedMetatypes[0] === '_9_0_62a020a_1105704885400_895774_7947') {
                                 scope.isEnumeration = true;
                                 var fillData = ElementService.getOwnedElements(val.sysmlid, false, scope.ws, scope.version, 1);
 
                                 fillDropDown(fillData);
                             } else
                                 Utils.addFrame(scope, mmsViewCtrl, element, frameTemplate);
-                        }
-                    ).catch(
+                        },
                         function(reason) {
-                            console.log(reason);
+                            Utils.addFrame(scope, mmsViewCtrl, element, frameTemplate);
                         }
                     );
 
@@ -301,16 +305,17 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                                 var newArray = [];
                                 //Filter only for appropriate property value
                                 for (var i = 0; i < val.length; i++) {
-                                    if( val[i].appliedMetatypes[0] === '_9_0_62a020a_1105704885423_380971_7955') {
+                                    if( val[i].appliedMetatypes && val[i].appliedMetatypes.length > 0 && 
+                                        val[i].appliedMetatypes[0] === '_9_0_62a020a_1105704885423_380971_7955') {
                                         newArray.push(val[i]);
                                     }
                                 }
                                 scope.options = newArray;
                                 Utils.addFrame(scope,mmsViewCtrl,element,frameTemplate);
-                            }
-                        ).catch(
+                            },
                             function(reason) {
                                 console.log(reason);
+                                growl.error('Failed to get enumeration options: ' + reason.message);
                             }
                         );
                     };
