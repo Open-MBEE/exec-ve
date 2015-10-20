@@ -104,7 +104,9 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
                         popupWin.document.write('<html><head><link href="css/ve-mms.styles.min.css" rel="stylesheet" type="text/css"></head><body style="overflow: auto">' + cover + tocContents + printContents + '</html>');
                         popupWin.document.close();
                 };
-                if (document.specialization.contents.length > 1 || (document.documentation && document.documentation !== '')) { //use original doc view as cover
+                if ((document.specialization.contents && document.specialization.contents.length > 1) || 
+                    (document.specialization.contains && document.specialization.contains.length > 1) ||
+                    (document.documentation && document.documentation !== '')) { //use original doc view as cover
                     cover = docView[0].outerHTML;
                     $timeout(openPopup, 0, false);
                     return;
