@@ -1,63 +1,87 @@
 <div>
-<h1>project title</h1>
-<h3>document title</h3>
-<h5> {{meta.version}} </h5>
+    <div style="page-break-after:always">
+        <div style="text-align:center; font-size:32px">{{meta.project}}</div>
+        <div style="text-align:center; font-size:30px">{{meta.title}}</div>
+        <div style="text-align:center; font-size:12px"> {{meta.version}} </div>
+        <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+
+        <div> Paper copies of this document may not be current and should not be relied on for official purposes.</div>
+        <div> {{meta.titlelegal}}</div>
+        <div> date</div>
+        <div> {{meta.dnumber}}</div>
+        <br/><br/>
+        <div ng-if="meta.instlogo"> <img ng-src="{{meta.instlogo}}"></img></div>
+        <div> {{meta.inst1}}</div>
+        <div> {{meta.inst2}}</div>
+    </div>
 
 
-<div> harded coded paper copies? docushare link</div>
-<div> {{meta.titlelegal}}</div>
-<div> {{meta.footerlegal}}</div>
-<div> date</div>
-<div> {{meta.dnumber}}</div>
+    <div style="page-break-after:always">
+        <div style="font-size:32px" ng-if="meta.project">{{meta.project}}</div>
+        <div style="font-size:30px">{{meta.title}}</div>
+        <div style="font-size:12px" ng-if="meta.version"> {{meta.version}}</div>
+        
+        <div ng-if="meta.authors.length > 0">
+            <br/><br/>
+            <div>PREPARED BY:</div>
+            <div ng-repeat="author in meta.authors">
+                <br/><br/>
+                <div><span>_____________________________________</span> <span class="pull-right">________________</span></div>
+                <div><span>{{author.firstname}} {{author.lastname}}</span><span class="pull-right">Date</span></div>
+                <div>{{author.title}}, {{author.orgname}} ({{author.orgnum}})</div>
+            </div>
+        </div>
 
-<div> institution logo (jpl)</div>
-<div> institution name 2</div>
-<div> institution name</div>
-______________
-<h1>Project title</h1>
-<h1>document title</h1>
-<h4> {{meta.version}}</h4>
+        <div ng-if="meta.approvers.length > 0"> 
+            <br/><br/>
+            <div>APPROVED BY:</div>
+            <div ng-repeat="author in meta.approvers">
+                <br/><br/>
+                <div><span>_____________________________________</span> <span class="pull-right">________________</span></div>
+                <div><span>{{author.firstname}} {{author.lastname}}</span><span class="pull-right">Date</span></div>
+                <div>{{author.title}}, {{author.orgname}} ({{author.orgnum}})</div>
+            </div>
+        </div>
 
-<div>Prepared by:</div>
-<div ng-repeat="author in meta.authors">
-<div>_________________________________             ___________</div>
-<div>{{author.firstname}} {{author.lastname}}                          Date</div>
-<div>{{author.title}}, {{author.orgname}}, {{author.orgnum}}</div>
-</div>
+        <div ng-if="meta.concurrences.length > 0">
+            <br/><br/>
+            <div>CONFIRMED BY:</div>
+            <div ng-repeat="author in meta.concurrences">
+                <br/><br/>
+                <div><span>_____________________________________</span> <span class="pull-right">________________</span></div>
+                <div><span>{{author.firstname}} {{author.lastname}}</span><span class="pull-right">Date</span></div>
+                <div>{{author.title}}, {{author.orgname}} ({{author.orgnum}})</div>
+            </div>
+        </div>
 
-<div> Approved by:</div>
-<div ng-repeat="author in meta.approvers">
-<div>_________________________________             ___________</div>
-<div>{{author.firstname}} {{author.lastname}}                          Date</div>
-<div>{{author.title}}, {{author.orgname}}, {{author.orgnum}}</div>
-</div>
+        <br/><br/>
+        <div ng-if="meta.instlogo"> <img ng-src="{{meta.instlogo}}"></img></div>
+        <div> {{meta.inst1}}</div>
+        <div> {{meta.inst2}}</div>
+    </div>
 
-<div> Confirmed by:</div>
-<div ng-repeat="author in meta.concurrences">
-<div>_________________________________             ___________</div>
-<div>{{author.firstname}} {{author.lastname}}                          Date</div>
-<div>{{author.title}}, {{author.orgname}}, {{author.orgnum}}</div>
-</div>
+    <div style="page-break-after:always">
+        <div ng-if="meta.revisions.length > 0"> 
+            <div style="text-align:center"><b>Change Log</b></div>
+            <table>
+                <thead>
+                    <tr><td>Version</td><td>Date</td><td>Sections Changed</td><td>Author</td></tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="rev in meta.revisions"><td>{{rev.revnum}}</td><td>{{rev.date}}</td><td>{{rev.remark}}</td><td>{{rev.firstname}} {{rev.lastname}}</td></tr>
+                </tbody>
+            </table>
+        </div>
 
-<div> institution logo</div>
-<div> institution name 2</div>
-<div> institution name</div>
-_____________________________
-<h4>change log</h4>
-<table>
-<thead>
-<tr><td>Version</td><td>Date</td><td>Sections Changed</td><td>Author</td></tr>
-</thead>
-<tbody>
-<tr ng-repeat="revision in meta.revisions"><td>{{rev.revnum}}</td><td>{{rev.date}}</td><td>{{rev.remark}}</td><td>{{rev.firstname}} {{rev.lastname}}</td></tr>
-</tbody>
-</table>
+        <div ng-if="meta.emails.length > 0">
+            <br/>
+            <div style="text-align:center"><b>Distribution List</b></div>
+            <div ng-repeat="email in meta.emails">{{email}}</div>
+        </div>
 
-
-<h4>distribution list</h4>
-<div>emails</div>
-
-<div> institution logo (jpl)</div>
-<div> institution name 2</div>
-<div> institution name</div>
+        <br/><br/><br/><br/><br/><br/><br/><br/>
+        <div ng-if="meta.instlogo"> <img ng-src="{{meta.instlogo}}"></img></div>
+        <div> {{meta.inst1}}</div>
+        <div> {{meta.inst2}}</div>
+    </div>
 </div>

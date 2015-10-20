@@ -44,6 +44,17 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             return '';
         return values[0].string;
     };
+    var processStrings = function(values) {
+        var res = [];
+        if (!values || values.length === 0)
+            return res;
+        values.forEach(function(value) {
+            if (value.type !== 'LiteralString' || !value.string)
+                return;
+            res.push(value.string);
+        });
+        return res;
+    };
     var processPeople = function(values) {
         if (!values || values.length === 0)
             return [];
@@ -59,7 +70,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 lastname: p[1],
                 title: p[2],
                 orgname: p[3],
-                orgdiv: p[4]
+                orgnum: p[4]
             });
         });
         return people;
@@ -124,6 +135,26 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         '_17_0_2_3_f4a035d_1366698987711_498852_36951': {
             name: 'revisions',
             process: processRevisions
+        },
+        '_17_0_2_3_f4a035d_1366696484320_980107_36953': {
+            name: 'project',
+            process: processString
+        },
+        '_17_0_2_3_f4a035d_1366647903995_864529_36998': {
+            name: 'emails',
+            process: processStrings
+        },
+        '_17_0_2_3_e9f034d_1375464775176_680884_29346': {
+            name: 'instlogo',
+            process: processString
+        },
+        '_17_0_2_3_e9f034d_1375464942934_241960_29357': {
+            name: 'inst1',
+            process: processString
+        },
+        '_17_0_2_3_e9f034d_1375464993159_319060_29362': {
+            name: 'inst2',
+            process: processString
         }
     };
     /**

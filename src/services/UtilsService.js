@@ -333,7 +333,7 @@ function UtilsService(CacheService, _) {
     };
 
     var makeHtmlTOC = function (tree) {
-        var result = '<div style="page-break-after:always">';
+        var result = '<div style="page-break-after:always"><div style="font-size:32px">Table of Contents</div>';
 
         var root_branch = tree[0].branch;
 
