@@ -15,7 +15,7 @@ function StompService($rootScope, UtilsService, $window, $location, ApplicationS
      var stompClient = {};
      var hostName = ($location.host() === 'localhost') ? 
                     'wss://ems-int-origin.jpl.nasa.gov:61614' : 
-                    'wss://' + $location.host() + '-origin.jpl.nasa.gov:61614';
+                    'wss://ems-int-origin.jpl.nasa.gov:61614';
      stompClient = Stomp.client(hostName);
      stompClient.connect("guest", "guest", function(){ // on success 
          stompClient.subscribe("/topic/master", function(message) {
@@ -35,6 +35,7 @@ function StompService($rootScope, UtilsService, $window, $location, ApplicationS
                      }
                      if(updateWebpage.workspace2.updatedElements.length !== 0){
                          angular.forEach( updateWebpage.workspace2.updatedElements, function(value, key) {
+                             //var affectedIds = value.affectedIds;
                              var inCache = CacheService.exists( UtilsService.makeElementKey(value.sysmlid, workspaceId, 'latest', false) );
                              if(inCache === true)
                                 UtilsService.mergeElement(value, value.sysmlid, workspaceId, false, "all" );
