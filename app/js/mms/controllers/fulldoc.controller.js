@@ -107,7 +107,7 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
                 if ((document.specialization.contents && document.specialization.contents.length > 1) || 
                     (document.specialization.contains && document.specialization.contains.length > 1) ||
                     (document.documentation && document.documentation !== '')) { //use original doc view as cover
-                    cover = docView[0].outerHTML;
+                    cover = '<div style="page-break-after:always">' + docView[0].outerHTML + '</div>';
                     $timeout(openPopup, 0, false);
                     return;
                 }
