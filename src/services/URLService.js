@@ -478,6 +478,10 @@ function urlService(baseUrl) {
             return url + '/versions/' + version;
     };
 
+    var getRoot = function() {
+        return root;
+    };
+
     return {
         getSiteDashboardURL: getSiteDashboardURL,
         getElementURL: getElementURL,
@@ -503,7 +507,8 @@ function urlService(baseUrl) {
         getWorkspacesURL: getWorkspacesURL,
         getWorkspaceURL: getWorkspaceURL,
         getCheckLoginURL: getCheckLoginURL,
-        isTimestamp: isTimestamp
+        isTimestamp: isTimestamp,
+        getRoot: getRoot
     };
 
 }

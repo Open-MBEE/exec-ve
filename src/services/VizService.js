@@ -40,7 +40,14 @@ function VizService($q, $http, URLService, CacheService, UtilsService) {
         }
         $http.get(URLService.getImageURL(id, n.ws, n.ver))
         .success(function(data, status, headers, config) {
-            deferred.resolve(CacheService.put(n.cacheKey, '/alfresco' + data.artifacts[0].url, false));
+            var root = URLService.getRoot();
+            var newroot = '';
+            if (root.indexOf('http') > -1) {
+                var parts = root.split('/');
+                if (parts.length >= 3)
+                    newroot = parts[0] + '/' + parts[1] + '/' + parts[2];
+             }
+            deferred.resolve(CacheService.put(n.cacheKey, newroot + '/alfresco' + data.artifacts[0].url, false));
         }).error(function(data, status, headers, config) {
             URLService.handleHttpStatus(data, status, headers, config, deferred);
         });
