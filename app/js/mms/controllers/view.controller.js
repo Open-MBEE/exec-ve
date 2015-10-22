@@ -60,7 +60,9 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     $scope.buttons = [];
 
     $scope.bbApi.init = function() {
-
+        if ($state.includes('workspace.site.document')) {
+            $scope.bbApi.addButton(UxService.getButtonBarButton('print'));
+        }
         if (view && view.editable && time === 'latest') {
             $scope.bbApi.addButton(UxService.getButtonBarButton('show.edits'));
             $scope.bbApi.setToggleState('show.edits', $rootScope.mms_ShowEdits);
@@ -402,4 +404,8 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
             $scope.viewApi.toggleShowEdits();
         }
     };
+
+    $scope.$on('print', function() {
+        MmsAppUtils.popupPrint(view, $scope.ws, false);
+    });
 }]);

@@ -72,57 +72,7 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
     $scope.bbApi = {};
     $scope.bbApi.init = function() {
 
-        $scope.bbApi.addButton({
-            id: 'print', 
-            icon: 'fa-print', 
-            selected: true, 
-            active: true, 
-            permission: true, 
-            tooltip: 'Print', 
-            spinner: false, 
-            togglable: false, 
-            action: function() {
-                var templateString = $templateCache.get('partials/mms/docCover.html');
-                var templateElement = angular.element(templateString);
-
-                var tocContents = UtilsService.makeHtmlTOC($rootScope.mms_treeApi.get_rows());
-                var printContents = $window.document.getElementById('full-doc').outerHTML;
-                var printElementCopy = angular.element(printContents);
-                //fix href links here
-                var docView = printElementCopy.find("mms-view[mms-vid='" + document.sysmlid + "']");
-                docView.remove();
-                printContents = printElementCopy[0].outerHTML;
-                var cover = '';
-                var newScope = $rootScope.$new();
-                var useCover = false;
-                var openPopup = function() {
-                        if (useCover)
-                            cover = templateElement[0].innerHTML;
-                        newScope.$destroy();
-                        var popupWin = $window.open('', '_blank', 'width=800,height=600,scrollbars=1');
-                        popupWin.document.open();
-                        popupWin.document.write('<html><head><link href="css/ve-mms.styles.min.css" rel="stylesheet" type="text/css"></head><body style="overflow: auto">' + cover + tocContents + printContents + '</html>');
-                        popupWin.document.close();
-                };
-                if ((document.specialization.contents && document.specialization.contents.length > 1) || 
-                    (document.specialization.contains && document.specialization.contains.length > 1) ||
-                    (document.documentation && document.documentation !== '')) { //use original doc view as cover
-                    cover = '<div style="page-break-after:always">' + docView[0].outerHTML + '</div>';
-                    $timeout(openPopup, 0, false);
-                    return;
-                }
-                ViewService.getDocMetadata(document.sysmlid, $scope.ws)
-                .then(function(metadata) {
-                    useCover = true;
-                    newScope.meta = metadata;
-                    newScope.meta.title = document.name;
-                    var compiled = $compile(templateElement.contents())(newScope); 
-                }).finally(function() {
-                    $timeout(openPopup, 0, false);
-                });
-                
-            }
-        });
+        $scope.bbApi.addButton(UxService.getButtonBarButton('print'));
 
         if (document && document.editable && time === 'latest') {
             $scope.bbApi.addButton(UxService.getButtonBarButton('show.edits'));
@@ -308,5 +258,9 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
 
     $scope.$on('section.add.section', function(event, section) {
         MmsAppUtils.addPresentationElement($scope, 'Section', section);
+    });
+
+    $scope.$on('print', function() {
+        MmsAppUtils.popupPrint(document, $scope.ws, true);
     });
 }]);
