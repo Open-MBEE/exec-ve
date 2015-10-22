@@ -261,6 +261,6 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
     });
 
     $scope.$on('print', function() {
-        MmsAppUtils.popupPrint(document, $scope.ws, true);
+        MmsAppUtils.popupPrintConfirm(document, $scope.ws, time, true);
     });
 }]);

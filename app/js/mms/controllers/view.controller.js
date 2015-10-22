@@ -406,6 +406,6 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     };
 
     $scope.$on('print', function() {
-        MmsAppUtils.popupPrint(view, $scope.ws, false);
+        MmsAppUtils.popupPrintConfirm(view, $scope.ws, time, false);
     });
 }]);

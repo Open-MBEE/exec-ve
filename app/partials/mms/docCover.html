@@ -7,7 +7,7 @@
 
         <div> Paper copies of this document may not be current and should not be relied on for official purposes.</div>
         <div> {{meta.titlelegal}}</div>
-        <div> date</div>
+        <div> {{time | date:'M/d/yy h:mm a'}}</div>
         <div> {{meta.dnumber}}</div>
         <br/><br/>
         <div ng-if="meta.instlogo"> <img ng-src="{{meta.instlogo}}"></img></div>
