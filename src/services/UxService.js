@@ -227,6 +227,9 @@ function UxService($rootScope) {
           case "section.add.comment":
             return {id: button, icon: 'fa-comment-o', selected: true, active: true, permission: true, tooltip: 'Add Comment', 
                     spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button, scope.section);}};
+          case "print":
+            return {id: button, icon: 'fa-print', selected: true, active: true, permission: true, tooltip: 'Print', 
+                    spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
         }
 	};
 

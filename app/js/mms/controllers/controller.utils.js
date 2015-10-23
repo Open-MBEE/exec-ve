@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mmsApp')
-.factory('MmsAppUtils', ['$q','$modal','$timeout', '$templateCache','$rootScope','$compile','WorkspaceService','ConfigService','ElementService','ViewService', 'UtilsService', 'growl','_', MmsAppUtils]);
+.factory('MmsAppUtils', ['$q','$state', '$modal','$timeout', '$location', '$window', '$templateCache','$rootScope','$compile','WorkspaceService','ConfigService','ElementService','ViewService', 'UtilsService', 'growl','_', MmsAppUtils]);
 
 /**
  * @ngdoc service
@@ -10,7 +10,7 @@ angular.module('mmsApp')
  * @description
  * Utilities
  */
-function MmsAppUtils($q, $modal, $timeout, $templateCache, $rootScope, $compile, WorkspaceService, ConfigService, ElementService, ViewService, UtilsService, growl, _) {
+function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $templateCache, $rootScope, $compile, WorkspaceService, ConfigService, ElementService, ViewService, UtilsService, growl, _) {
 
     var addElementCtrl = function($scope, $modalInstance, $filter) {
 
@@ -166,8 +166,109 @@ function MmsAppUtils($q, $modal, $timeout, $templateCache, $rootScope, $compile,
         }
     };
 
+    var popupPrintConfirm = function(ob, ws, time, isDoc) {
+        var modalInstance = $modal.open({
+            templateUrl: 'partials/mms/printConfirm.html',
+            controller: function($scope, $modalInstance, type) {
+                $scope.type = type;
+                $scope.print = function() {
+                    $modalInstance.close('print');
+                };
+                $scope.fulldoc = function() {
+                    $modalInstance.close('fulldoc');
+                };
+                $scope.cancel = function() {
+                    $modalInstance.dismiss();
+                };
+            },
+            resolve: {
+                type: function() { return isDoc ? 'DOCUMENT' : 'VIEW';}
+            },
+            backdrop: 'static',
+            keyboard: false
+        });
+        modalInstance.result.then(function(choice) {
+            if (choice === 'print')
+                popupPrint(ob, ws, time, isDoc);
+            else {
+                $rootScope.mms_fullDocMode = true;
+                $rootScope.mms_bbApi.setToggleState("tree.full.document", true);
+                $state.go('workspace.site.document.full'); 
+            }
+        });
+    };
+
+    var popupPrint = function(ob, ws, time, isDoc) {
+        var printContents = '';//$window.document.getElementById('print-div').outerHTML;
+        var printElementCopy = angular.element('#print-div').clone();//angular.element(printContents);
+        var hostname = $location.host();
+        var port = $location.port();
+        var protocol = $location.protocol();
+        var absurl = $location.absUrl();
+        var prefix = protocol + '://' + hostname + ((port == 80 || port == 443) ? '' : (':' + port));
+        var mmsIndex = absurl.indexOf('mms.html');
+        printElementCopy.find("a").attr('href', function(index, old) {
+            if (!old)
+                return old;
+            if (old.indexOf('/') === 0)
+                return prefix + old;
+            if (old.indexOf('../../') === 0)
+                return prefix + old.substring(5);
+            if (old.indexOf('../') === 0)
+                return prefix + '/alfresco' + old.substring(2);
+            if (old.indexOf('mms.html') === 0)
+                return absurl.substring(0, mmsIndex) + old;
+            return old;
+        });
+        var comments = printElementCopy.find('mms-transclude-com');
+        comments.remove();
+        var docView = printElementCopy.find("mms-view[mms-vid='" + ob.sysmlid + "']");
+        if (isDoc)
+            docView.remove();
+        var templateString = $templateCache.get('partials/mms/docCover.html');
+        var templateElement = angular.element(templateString);
+        var tocContents = '';
+        var cover = '';
+        var newScope = $rootScope.$new();
+        var useCover = false;
+        printContents = printElementCopy[0].outerHTML;
+        var openPopup = function() {
+                if (useCover)
+                    cover = templateElement[0].innerHTML;
+                newScope.$destroy();
+                var popupWin = $window.open('', '_blank', 'width=800,height=600,scrollbars=1');
+                popupWin.document.open();
+                popupWin.document.write('<html><head><link href="css/ve-mms.styles.min.css" rel="stylesheet" type="text/css"></head><body style="overflow: auto">' + cover + tocContents + printContents + '</html>');
+                popupWin.document.close();
+                popupWin.print();
+        };
+        if (isDoc) {
+            tocContents = UtilsService.makeHtmlTOC($rootScope.mms_treeApi.get_rows());
+            if ((ob.specialization.contents && ob.specialization.contents.length > 1) || 
+                (ob.specialization.contains && ob.specialization.contains.length > 1) ||
+                (ob.documentation && ob.documentation !== '')) { //use original doc view as cover
+                cover = '<div style="page-break-after:always">' + docView[0].outerHTML + '</div>';
+                $timeout(openPopup, 0, false);
+                return;
+            }
+            ViewService.getDocMetadata(ob.sysmlid, ws)
+            .then(function(metadata) {
+                useCover = true;
+                newScope.meta = metadata;
+                newScope.time = time === 'latest' ? new Date() : time;
+                newScope.meta.title = ob.name;
+                $compile(templateElement.contents())(newScope); 
+            }).finally(function() {
+                $timeout(openPopup, 0, false);
+            });
+        } else {
+            $timeout(openPopup, 0, false);
+        }
+    };
+
     return {
-        addPresentationElement: addPresentationElement
+        addPresentationElement: addPresentationElement,
+        popupPrintConfirm: popupPrintConfirm
     };
 }
     

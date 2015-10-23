@@ -3,8 +3,10 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('FullDocCtrl', ['$scope', '$rootScope', '$state', '$stateParams', '$window', 'MmsAppUtils', 'document', 'workspace', 'site', 'snapshot', 'time', 'ConfigService', 'UxService', 'growl', 'hotkeys',
-function($scope, $rootScope, $state, $stateParams, $window, MmsAppUtils, document, workspace, site, snapshot, time, ConfigService, UxService, growl, hotkeys) {
+
+.controller('FullDocCtrl', ['$scope', '$templateCache', '$compile', '$timeout', '$rootScope', '$state', '$stateParams', '$window', 'MmsAppUtils', 'document', 'workspace', 'site', 'snapshot', 'time', 'ConfigService', 'UxService', 'ViewService', 'UtilsService', 'growl', 'hotkeys',
+function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateParams, $window, MmsAppUtils, document, workspace, site, snapshot, time, ConfigService, UxService, ViewService, UtilsService, growl, hotkeys) {
+
     $scope.ws = $stateParams.workspace;
     $scope.site = site;
     var views = [];
@@ -69,6 +71,9 @@ function($scope, $rootScope, $state, $stateParams, $window, MmsAppUtils, documen
 
     $scope.bbApi = {};
     $scope.bbApi.init = function() {
+
+        $scope.bbApi.addButton(UxService.getButtonBarButton('print'));
+
         if (document && document.editable && time === 'latest') {
             $scope.bbApi.addButton(UxService.getButtonBarButton('show.edits'));
             $scope.bbApi.setToggleState('show.edits', $rootScope.mms_ShowEdits);
@@ -79,6 +84,7 @@ function($scope, $rootScope, $state, $stateParams, $window, MmsAppUtils, documen
                 callback: function() {$scope.$broadcast('show.edits');}
             });
         }
+
         $scope.bbApi.addButton(UxService.getButtonBarButton('show.comments'));
         $scope.bbApi.setToggleState('show.comments', $rootScope.veCommentsOn);
         $scope.bbApi.addButton(UxService.getButtonBarButton('show.elements'));
@@ -252,5 +258,9 @@ function($scope, $rootScope, $state, $stateParams, $window, MmsAppUtils, documen
 
     $scope.$on('section.add.section', function(event, section) {
         MmsAppUtils.addPresentationElement($scope, 'Section', section);
+    });
+
+    $scope.$on('print', function() {
+        MmsAppUtils.popupPrintConfirm(document, $scope.ws, time, true);
     });
 }]);

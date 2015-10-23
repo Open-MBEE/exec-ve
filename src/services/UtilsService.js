@@ -332,6 +332,42 @@ function UtilsService(CacheService, _) {
         return '<mms-transclude-' + t + ' data-mms-eid="' + para.source + '"></mms-transclude-' + t + '>';
     };
 
+    var makeHtmlTOC = function (tree) {
+        var result = '<div style="page-break-after:always"><div style="font-size:32px">Table of Contents</div>';
+
+        var root_branch = tree[0].branch;
+
+        result += '<ul style="list-style-type:none">';
+
+        var anchor = '<a href=#' + root_branch.data.sysmlid + '>';
+        result += '  <li>' + anchor + root_branch.section + ' ' + root_branch.label + '</a></li>';
+
+        root_branch.children.forEach(function (child) {
+            result += makeHtmlTOCChild(child);
+        });
+
+        result += '</ul>'; 
+        result += '</div>'; 
+
+        return result;
+    };
+
+    var makeHtmlTOCChild = function(child) {
+
+        var result = '<ul style="list-style-type:none">';
+
+        var anchor = '<a href=#' + child.data.sysmlid + '>';
+        result += '  <li>' + anchor + child.section + ' ' + child.label + '</a></li>';
+
+        child.children.forEach(function (child2) {
+            result += makeHtmlTOCChild(child2);
+        });
+
+        result += '</ul>'; 
+
+        return result;
+    };
+
     return {
         hasCircularReference: hasCircularReference,
         cleanElement: cleanElement,
@@ -344,6 +380,7 @@ function UtilsService(CacheService, _) {
         isRestrictedValue: isRestrictedValue,
         makeHtmlTable : makeHtmlTable,
         makeHtmlPara: makeHtmlPara,
-        makeHtmlList: makeHtmlList
+        makeHtmlList: makeHtmlList,
+        makeHtmlTOC: makeHtmlTOC
     };
 }

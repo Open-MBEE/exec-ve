@@ -81,8 +81,8 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         var deferred = $q.defer();
         if (CacheService.exists(n.cacheKey) && !n.update) {
             var cached = CacheService.get(n.cacheKey);
-            if ((cached.specialization.type === 'View' ||
-                cached.specialization.type === 'Product') &&
+            if ((cached.specialization && (cached.specialization.type === 'View' ||
+                cached.specialization.type === 'Product')) &&
                 !cached.specialization.hasOwnProperty('contains') &&
                 !cached.specialization.hasOwnProperty('contents')) {
             } else {
