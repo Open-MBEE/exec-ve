@@ -283,9 +283,9 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     $scope.$on('section.add.paragraph', function(event, section) {
         MmsAppUtils.addPresentationElement($scope, 'Paragraph', section);
     });
-/*
+
     $scope.$on('section.add.list', function(event, section) {
-        addElement('List', section);
+        MmsAppUtils.addPresentationElement($scope, 'List', section);
     });
 /*
     $scope.$on('section.add.table', function(event, section) {
