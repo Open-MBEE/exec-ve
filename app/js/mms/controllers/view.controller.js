@@ -255,11 +255,11 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     $scope.$on('view.add.paragraph', function() {
         MmsAppUtils.addPresentationElement($scope, 'Paragraph', view);
     });
-/*
-    $scope.$on('view.add.list', function() {
-        addElement('List');
-    });
 
+    $scope.$on('view.add.list', function() {
+        MmsAppUtils.addPresentationElement($scope, 'List', view);
+    });
+/*
     $scope.$on('view.add.table', function() {
         addElement('Table');
     });
@@ -287,7 +287,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     $scope.$on('section.add.list', function(event, section) {
         addElement('List', section);
     });
-
+/*
     $scope.$on('section.add.table', function(event, section) {
         addElement('Table', section);
     });
