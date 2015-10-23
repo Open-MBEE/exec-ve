@@ -119,6 +119,14 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             }
         },
         views: {
+            'menu-top': {
+                template: '<mms-nav mms-title="Model Manager" mms-ws="{{workspace}}" mms-config="tag"></mms-nav>',
+                controller: function ($scope, $rootScope, workspace, tag) {
+                    $scope.workspace = workspace;
+                    $scope.tag = tag;
+                    $rootScope.mms_title = 'Model Manager';
+                }
+            },
             'menu': {
                 template: '<mms-nav mms-title="Model Manager" mms-ws="{{workspace}}" mms-config="tag"></mms-nav>',
                 controller: function ($scope, $rootScope, workspace, tag) {
