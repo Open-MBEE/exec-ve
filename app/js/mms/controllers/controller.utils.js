@@ -199,8 +199,8 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
     };
 
     var popupPrint = function(ob, ws, time, isDoc) {
-        var printContents = $window.document.getElementById('print-div').outerHTML;
-        var printElementCopy = angular.element(printContents);
+        var printContents = '';//$window.document.getElementById('print-div').outerHTML;
+        var printElementCopy = angular.element('#print-div').clone();//angular.element(printContents);
         var hostname = $location.host();
         var port = $location.port();
         var protocol = $location.protocol();
@@ -220,8 +220,11 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
                 return absurl.substring(0, mmsIndex) + old;
             return old;
         });
-        printElementCopy.find('mms-transclude-com').remove();
+        var comments = printElementCopy.find('mms-transclude-com');
+        comments.remove();
         var docView = printElementCopy.find("mms-view[mms-vid='" + ob.sysmlid + "']");
+        if (isDoc)
+            docView.remove();
         var templateString = $templateCache.get('partials/mms/docCover.html');
         var templateElement = angular.element(templateString);
         var tocContents = '';
@@ -240,7 +243,6 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
                 popupWin.print();
         };
         if (isDoc) {
-            docView.remove();
             tocContents = UtilsService.makeHtmlTOC($rootScope.mms_treeApi.get_rows());
             if ((ob.specialization.contents && ob.specialization.contents.length > 1) || 
                 (ob.specialization.contains && ob.specialization.contains.length > 1) ||
