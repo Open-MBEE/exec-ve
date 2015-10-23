@@ -119,7 +119,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             }
         },
         views: {
-            'menu-top': {
+            'nav': {
                 template: '<mms-nav mms-title="Model Manager" mms-ws="{{workspace}}" mms-config="tag"></mms-nav>',
                 controller: function ($scope, $rootScope, workspace, tag) {
                     $scope.workspace = workspace;
@@ -128,7 +128,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 }
             },
             'menu': {
-                template: '<mms-nav mms-title="Model Manager" mms-ws="{{workspace}}" mms-config="tag"></mms-nav>',
+                template: '<mms-menu mms-title="Model Manager" mms-ws="{{workspace}}" mms-config="tag"></mms-menu>',
                 controller: function ($scope, $rootScope, workspace, tag) {
                     $scope.workspace = workspace;
                     $scope.tag = tag;
@@ -246,7 +246,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
         },
         views: {
             'menu@': {
-                template: '<mms-nav mms-title="Model Manager" mms-ws="{{workspace}}" mms-config="tag"></mms-nav>',
+                template: '<mms-menu mms-title="Model Manager" mms-ws="{{workspace}}" mms-config="tag"></mms-menu>',
                 controller: function ($scope, $rootScope, workspace, tag) {
                     $scope.workspace = workspace;
                     $scope.tag = tag;
@@ -274,7 +274,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
         parent: 'workspace',
         views: {
             'menu@': {
-                template: '<mms-nav mms-title="Portal" mms-ws="{{workspace}}" mms-site="site" mms-config="tag"></mms-nav>',
+                template: '<mms-menu mms-title="Portal" mms-ws="{{workspace}}" mms-site="site" mms-config="tag"></mms-menu>',
                 controller: function ($scope, $rootScope, workspace, site, tag, workspaceObj) {
                     $scope.workspace = workspace;
                     $scope.tag = tag;
@@ -352,7 +352,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
         },
         views: {
             'menu@': {
-                template: '<mms-nav mms-title="Portal" mms-ws="{{workspace}}" mms-site="site" mms-config="tag"></mms-nav>',
+                template: '<mms-menu mms-title="Portal" mms-ws="{{workspace}}" mms-site="site" mms-config="tag"></mms-menu>',
                 controller: function ($scope, $rootScope, workspace, site, tag, workspaceObj) {
                     $scope.workspace = workspace;
                     $scope.tag = tag;
@@ -508,7 +508,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
         },
         views: {
             'menu@': {
-                template: '<mms-nav mms-title="View Editor" mms-ws="{{workspace}}" mms-site="site" mms-doc="document" mms-config="tag" mms-snapshot-tag="{{snapshotTag}}" mms-show-tag="{{showTag}}"></mms-nav>',
+                template: '<mms-menu mms-title="View Editor" mms-ws="{{workspace}}" mms-site="site" mms-doc="document" mms-config="tag" mms-snapshot-tag="{{snapshotTag}}" mms-show-tag="{{showTag}}"></mms-menu>',
                 controller: function ($scope, $filter, $rootScope, workspace, site, document, tag, snapshots, time, docFilter) {
                     $scope.workspace = workspace;
                     $scope.tag = tag;
