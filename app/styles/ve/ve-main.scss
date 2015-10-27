@@ -14,3 +14,9 @@
 
 
 .ng-hide {display: none !important;}
+
+@media print {
+  a[href]:after {
+    content: none !important;
+  }
+}
