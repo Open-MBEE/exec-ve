@@ -160,6 +160,12 @@ function mmsView(ViewService, $templateCache, $rootScope, growl) {
                         }
                     }
                 }
+                if (data.specialization.numElements > 2000) { //threshold where getting view elements in bulk takes too long?
+                    scope.view = data;
+                    scope.modified = data.modified;
+                    scope.modifier = data.modifier;
+                    return;
+                }
                 ViewService.getViewElements(scope.mmsVid, false, scope.mmsWs, scope.mmsVersion)
                 .then(function(data2) {
                     scope.view = data;
