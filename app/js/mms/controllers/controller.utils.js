@@ -222,6 +222,7 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
         });
         var comments = printElementCopy.find('mms-transclude-com');
         comments.remove();
+        printElementCopy.find('.error').html('error');
         var docView = printElementCopy.find("mms-view[mms-vid='" + ob.sysmlid + "']");
         if (isDoc)
             docView.remove();
