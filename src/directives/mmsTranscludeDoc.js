@@ -265,8 +265,8 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                     recompile();
                 }
                 if(scope.isEditing === true){
-                    growl.warning("This document has been changed: " + elemName +
-                                " modified by: " + deltaModifier, {ttl: 10000});
+                    growl.warning("This documentation has been changed: " + elemName +
+                                " modified by: " + deltaModifier, {ttl: 30000});
                 }
             }
         });
