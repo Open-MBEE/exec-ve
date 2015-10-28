@@ -13,9 +13,12 @@ angular.module('mms')
  */
 function StompService($rootScope, UtilsService, $window, $location, ApplicationService, CacheService) {
      var stompClient = {};
-     var hostName = ($location.host() === 'localhost') ? 
-                    'wss://ems-int-origin.jpl.nasa.gov:61614' : 
-                    'wss://ems-int-origin.jpl.nasa.gov:61614';
+     /* var hostName = ($location.host() === 'localhost') ? 
+                     'wss://ems-int-origin.jpl.nasa.gov:61614':
+                     'wss://'+$location.host().split(".")[0]+'-origin.jpl.nasa.gov'; 
+                    this is used when running localhost for testing
+                    */
+     var hostName = 'wss://'+$location.host().split(".")[0]+'-origin.jpl.nasa.gov'; 
      stompClient = Stomp.client(hostName);
      stompClient.connect("guest", "guest", function(){ // on success 
          stompClient.subscribe("/topic/master", function(message) {
