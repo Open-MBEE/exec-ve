@@ -743,7 +743,6 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         res.cacheKey = UtilsService.makeElementKey(id, res.ws, res.ver, edit);
         return res;
     };
-    console.log("Element: " + ApplicationService.getSource());
     return {
         getElement: getElement,
         getElements: getElements,
