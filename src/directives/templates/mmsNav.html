@@ -9,70 +9,11 @@
   <div class="block">
 
     <ul>
+
       <!-- Brand name and document -->
-      <!-- <li class="nav-title-li">{{type}}</li> -->
+      <li class="nav-title-li">View Editor</li>
       
-      <!-- <li class="nav-doc-li">{{title}}</li> -->
-
-      <!-- Goto dropdown
-      <li ng-if="!noSites" class="goto dropdown">
-
-        <a class="dropdown-toggle" data-toggle="dropdown">
-          {{siteTitle}}<i class="nav-dropdown-icon fa fa-caret-down"></i>
-        </a>
-
-        <ul class="dropdown-menu" role="menu">
-
-          <li>
-            <a class="dash-link" href="/share/page/site/{{site}}/dashboard">Dashboard</a>
-          </li>
-
-          <li ng-if="type != 'DocWeb'">
-            <a class="docweb-link" href="docweb.html#/workspaces/{{ws}}/sites/{{site}}">DocWeb</a>
-          </li>
-        </ul>
-
-      </li> -->
-
-      <!-- Other sites dropdown 
-      <li ng-if="!noSites" class="other-sites dropdown">
-          <a class="dropdown-toggle" data-toggle="dropdown" ng-click="reset()">
-            Other Sites<i class="nav-dropdown-icon fa fa-caret-down"></i>
-          </a>
-
-          <ul class="accordion-dropdown dropdown-menu">
-
-              <accordion>
-
-                  <accordion-group ng-repeat="(cat,sites) in categories" class="category-level" is-open="sites.open">
-
-                      <accordion-heading>
-                          {{cat}}<i class="pull-right fa" ng-class="{'fa-caret-down': sites.open, 'fa-caret-right': !sites.open}"></i>
-                      </accordion-heading>
-
-                      <accordion>
-
-                          <accordion-group ng-repeat="site in sites | orderBy:'name'" class="site-level" is-open="site.isOpen">
-
-                              <accordion-heading>
-                                {{site.title}}<i class="pull-right fa" ng-class="{'fa-caret-down': site.isOpen, 'fa-caret-right': !site.isOpen}"></i>
-                              </accordion-heading>
-
-                              <div class="accordion-links">
-                                  <a class="dash-link" href="/share/page/site/{{site.name}}/dashboard">Dashboard</a><a class="docweb-link" href="docweb.html#/workspaces/{{ws}}/sites/{{site.name}}">Docweb</a>
-                              </div>
-
-                          </accordion-group>
-
-                      </accordion>
-
-                  </accordion-group>
-
-              </accordion>
-
-          </ul>
-
-      </li>  -->
+      <li class="nav-doc-li">Document</li>
 
       <!-- Dashboard, Support, Feedback, and Logout buttons -->
       <ul class="nav-btns-main pull-right">
