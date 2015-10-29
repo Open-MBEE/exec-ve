@@ -18,7 +18,7 @@ function StompService($rootScope, UtilsService, $window, $location, ApplicationS
                      'wss://'+$location.host().split(".")[0]+'-origin.jpl.nasa.gov'; 
                     this is used when running localhost for testing
                     */
-     var hostName = 'wss://'+$location.host().split(".")[0]+'-origin.jpl.nasa.gov'; 
+     var hostName = 'wss://'+$location.host().split(".")[0]+'-origin.jpl.nasa.gov:61614'; 
      stompClient = Stomp.client(hostName);
      stompClient.connect("guest", "guest", function(){ // on success 
          stompClient.subscribe("/topic/master", function(message) {
