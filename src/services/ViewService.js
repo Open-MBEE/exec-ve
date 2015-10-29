@@ -39,6 +39,124 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         SectionT: "_18_0_2_407019f_1435683487667_494971_14412"
     };
     
+    var processString = function(values) {
+        if (!values || values.length === 0 || values[0].type !== 'LiteralString')
+            return '';
+        return values[0].string;
+    };
+    var processStrings = function(values) {
+        var res = [];
+        if (!values || values.length === 0)
+            return res;
+        values.forEach(function(value) {
+            if (value.type !== 'LiteralString' || !value.string)
+                return;
+            res.push(value.string);
+        });
+        return res;
+    };
+    var processPeople = function(values) {
+        if (!values || values.length === 0)
+            return [];
+        var people = [];
+        values.forEach(function(value) {
+            if (value.type !== 'LiteralString' || !value.string)
+                return;
+            var p = value.string.split(',');
+            if (p.length !== 5)
+                return;
+            people.push({
+                firstname: p[0],
+                lastname: p[1],
+                title: p[2],
+                orgname: p[3],
+                orgnum: p[4]
+            });
+        });
+        return people;
+    };
+    var processRevisions = function(values) {
+        if (!values || values.length === 0)
+            return [];
+        var rev = [];
+        values.forEach(function(value) {
+            if (value.type !== 'LiteralString' || !value.string)
+                return;
+            var p = value.string.split('|');
+            if (p.length !== 5)
+                return;
+            rev.push({
+                revnum: p[0],
+                date: p[1],
+                firstname: p[2],
+                lastname: p[3],
+                remark: p[4]
+            });
+        });
+        return rev;
+    };
+    var docMetadataTypes = {
+        '_17_0_1_407019f_1326234342817_186479_2256': {
+            name: 'header',
+            process: processString
+        },
+        '_17_0_1_407019f_1326234349580_411867_2258': {
+            name: 'footer',
+            process: processString
+        },
+        '_17_0_2_3_f4a035d_1366647903710_685116_36989': {
+            name: 'dnumber',
+            process: processString
+        },
+        '_17_0_2_3_f4a035d_1366647903991_141146_36990': {
+            name: 'version',
+            process: processString
+        },
+        '_17_0_2_3_f4a035d_1366647903994_494629_36996': {
+            name: 'titlelegal',
+            process: processString
+        },
+        '_17_0_2_3_f4a035d_1366647903994_370992_36997': {
+            name: 'footerlegal',
+            process: processString
+        },
+        '_17_0_2_3_f4a035d_1366647903995_652492_37000': {
+            name: 'authors',
+            process: processPeople
+        },
+        '_17_0_2_3_f4a035d_1366647903996_970714_37001': {
+            name: 'approvers',
+            process: processPeople
+        },
+        '_17_0_2_3_f4a035d_1366647903996_463299_37002': {
+            name: 'concurrences',
+            process: processPeople
+        },
+        '_17_0_2_3_f4a035d_1366698987711_498852_36951': {
+            name: 'revisions',
+            process: processRevisions
+        },
+        '_17_0_2_3_f4a035d_1366696484320_980107_36953': {
+            name: 'project',
+            process: processString
+        },
+        '_17_0_2_3_f4a035d_1366647903995_864529_36998': {
+            name: 'emails',
+            process: processStrings
+        },
+        '_17_0_2_3_e9f034d_1375464775176_680884_29346': {
+            name: 'instlogo',
+            process: processString
+        },
+        '_17_0_2_3_e9f034d_1375464942934_241960_29357': {
+            name: 'inst1',
+            process: processString
+        },
+        '_17_0_2_3_e9f034d_1375464993159_319060_29362': {
+            name: 'inst2',
+            process: processString
+        }
+    };
     /**
      * @ngdoc method
      * @name mms.ViewService#getView
@@ -365,7 +483,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
            if (!clone.specialization[key]) {
                 clone.specialization[key] = {
                     operand: [],
-                    type: "Expression"
+                    type: "Expression",
+                    valueExpression: null
                 };
             }
             clone.specialization[key].operand.push(elementOb);
@@ -557,7 +676,10 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 jsonBlob = paragraph;
                 jsonBlob.type = 'Equation';
             }
-
+            else if (type === 'Comment') {
+                jsonBlob = paragraph;
+                jsonBlob.type = 'Comment';
+            }
             // Special case for Section.  Doesnt use json blobs.
             if (type === "Section") {
                 presentationElem = jsonBlob;  
@@ -583,6 +705,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             realType = 'ParagraphT';
         if (type === 'Section')
             realType = 'SectionT';
+        if (type === 'Comment')
+            realType = 'ParagraphT';
         var instanceSpec = {
             name:instanceSpecName,
             specialization: {
@@ -656,7 +780,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
 
         var instanceVal = {
             instance:instanceSpecId,
-            type:"InstanceValue"
+            type:"InstanceValue",
+            valueExpression: null
         };
 
         return addElementToViewOrSection(viewOrSection.sysmlid, viewOrSection.sysmlid, workspace, instanceVal);
@@ -992,6 +1117,28 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         return UtilsService.normalize({update: update, workspace: workspace, version: version});
     };
 
+    var getDocMetadata = function(docid, ws, version) {
+        var deferred = $q.defer();
+        var metadata = {};
+        ElementService.search(docid, ['id'], null, null, ws)
+        .then(function(data) {
+            if (data.length === 0 || data[0].sysmlid !== docid || !data[0].properties) {
+                return;
+            }
+            data[0].properties.forEach(function(prop) {
+                var feature = prop.specialization ? prop.specialization.propertyType : null;
+                var value = prop.specialization ? prop.specialization.value : null;
+                if (!feature || !docMetadataTypes[feature] || !value || value.length === 0)
+                    return;
+                metadata[docMetadataTypes[feature].name] = docMetadataTypes[feature].process(value);
+            });
+        }, function(reason) {
+        }).finally(function() {
+            deferred.resolve(metadata);
+        });
+        return deferred.promise;
+    };
+
     return {
         getView: getView,
         getViews: getViews,
@@ -1018,7 +1165,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         addInstanceSpecification: addInstanceSpecification,
         typeToClassifierId: typeToClassifierId,
         getInstanceSpecification : getInstanceSpecification,
-        getElementReferenceTree : getElementReferenceTree
+        getElementReferenceTree : getElementReferenceTree,
+        getDocMetadata: getDocMetadata
     };
 
 }

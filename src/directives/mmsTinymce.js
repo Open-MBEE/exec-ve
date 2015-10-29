@@ -423,6 +423,9 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
         var options = {
             plugins: 'autoresize charmap code fullscreen image link media nonbreaking paste table textcolor searchreplace noneditable',
             //toolbar: 'bold italic underline strikethrough | subscript superscript blockquote | formatselect | fontsizeselect | forecolor backcolor removeformat | alignleft aligncenter alignright | bullist numlist outdent indent | table | link unlink | image media | charmap searchreplace code | transclude comment vlink normalize | mvleft mvright | undo redo',
+            relative_urls: false,
+            remove_script_host: false,
+            convert_urls: false,
             toolbar: thisToolbar,
             menubar: false,
             statusbar: true,

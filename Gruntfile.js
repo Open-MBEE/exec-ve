@@ -158,6 +158,7 @@ module.exports = function(grunt) {
           angular: true,
           window: true,
           console: true,
+          Stomp:true,
           Timely: true,
           __timely: true
         }

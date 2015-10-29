@@ -4,6 +4,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
 .config(function($stateProvider, $urlRouterProvider) {
     $urlRouterProvider.rule(function ($injector, $location) {
         // determine if the url is older 2.0 format (will not have a workspace)
+        // generate some random client id
         if ($location.url().indexOf('/workspaces') === -1)
         {
             var locationPath = 'workspaces/master' + $location.url();
@@ -383,13 +384,16 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                     return null;
                 return ViewService.getView(document.sysmlid, false, workspace, time);
             },
-            snapshot: function(configSnapshots, document, dummyLogin) {
+            snapshot: function(ConfigService, configSnapshots, document, workspace, dummyLogin) {
                 var docid = document.sysmlid;
                 var found = null;
                 configSnapshots.forEach(function(snapshot) {
                     if (docid === snapshot.sysmlid)
                         found = snapshot;
                 });
+                if (found) {
+                    return ConfigService.getSnapshot(found.id, workspace, true);
+                }
                 return found; 
             }
         },
@@ -422,13 +426,16 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                     return [];
                 return ConfigService.getProductSnapshots(document.sysmlid, site.sysmlid, workspace);
             },
-            snapshot: function(configSnapshots, document, dummyLogin) {
+            snapshot: function(ConfigService, workspace, configSnapshots, document, dummyLogin) {
                 var docid = document.sysmlid;
                 var found = null;
                 configSnapshots.forEach(function(snapshot) {
                     if (docid === snapshot.sysmlid)
                         found = snapshot;
                 });
+                if (found) {
+                    return ConfigService.getSnapshot(found.id, workspace, true);
+                }
                 return found; 
             },
             tag: function ($stateParams, ConfigService, workspace, snapshots, dummyLogin) {
@@ -565,8 +572,8 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
         url: '/views/:view',
         resolve: {
             viewElements: function($stateParams, ViewService, time, dummyLogin) {
-                if (time === 'latest')
-                    return ViewService.getViewElements($stateParams.view, false, $stateParams.workspace, time);
+                //if (time === 'latest')
+                //    return ViewService.getViewElements($stateParams.view, false, $stateParams.workspace, time);
                 return [];
             },
             view: function($stateParams, ViewService, viewElements, time, dummyLogin) {

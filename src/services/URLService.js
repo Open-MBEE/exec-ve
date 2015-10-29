@@ -162,6 +162,23 @@ function urlService(baseUrl) {
 
     /**
      * @ngdoc method
+     * @name mms.URLService#getSnapshotURL
+     * @methodOf mms.URLService
+     *
+     * @description
+     * Gets url that gets a snapshot
+     *
+     * @param {string} id Id of the snapshot
+     * @param {string} workspace Workspace name
+     * @returns {string} The url
+     */
+    var getSnapshotURL = function(id, workspace) {
+        return root + "/workspaces/" + workspace + 
+                      "/snapshots/" + id;
+    };
+
+    /**
+     * @ngdoc method
      * @name mms.URLService#getConfigProductsURL
      * @methodOf mms.URLService
      *
@@ -461,6 +478,10 @@ function urlService(baseUrl) {
             return url + '/versions/' + version;
     };
 
+    var getRoot = function() {
+        return root;
+    };
+
     return {
         getSiteDashboardURL: getSiteDashboardURL,
         getElementURL: getElementURL,
@@ -476,6 +497,7 @@ function urlService(baseUrl) {
         getConfigSnapshotsURL: getConfigSnapshotsURL,
         getSiteProductsURL: getSiteProductsURL,
         getConfigURL: getConfigURL,
+        getSnapshotURL: getSnapshotURL,
         getConfigsURL: getConfigsURL,
         getConfigProductsURL : getConfigProductsURL,
         getDocumentViewsURL: getDocumentViewsURL,
@@ -485,7 +507,8 @@ function urlService(baseUrl) {
         getWorkspacesURL: getWorkspacesURL,
         getWorkspaceURL: getWorkspaceURL,
         getCheckLoginURL: getCheckLoginURL,
-        isTimestamp: isTimestamp
+        isTimestamp: isTimestamp,
+        getRoot: getRoot
     };
 
 }
