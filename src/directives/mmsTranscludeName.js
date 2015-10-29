@@ -174,7 +174,12 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
                 Utils.previewAction(scope, recompileEdit, recompile, type, element);
             };
         }
-
+        //actions for stomp using growl messages
+        scope.$on("stomp.element", function(event, deltaSource, deltaWorkspaceId, deltaElementID, deltaModifier, deltaName){
+            if(deltaWorkspaceId === scope.ws && deltaElementID === scope.mmsEid){
+                 growl.warning(" This value has been changed to: "+deltaName+" by: "+ deltaModifier, {ttl: 30000});
+            }
+        });
     };
 
     return {
