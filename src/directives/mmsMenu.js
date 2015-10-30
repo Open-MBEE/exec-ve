@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsMenu', ['SiteService', 'WorkspaceService', 'ConfigService', '$templateCache', 'growl', 'hotkeys', mmsMenu]);
+.directive('mmsMenu', ['SiteService', 'WorkspaceService', 'ConfigService', '$state', '$templateCache', 'growl', 'hotkeys', mmsMenu]);
 
 /**
  * @ngdoc directive
@@ -35,12 +35,20 @@ angular.module('mms.directives')
  * @param {object} mmsConfig tag/config object
  * @param {string} mmsTitle Title to display
  */
-function mmsMenu(SiteService, WorkspaceService, ConfigService, $templateCache, growl) {
+function mmsMenu(SiteService, WorkspaceService, ConfigService, $state, $templateCache, growl) {
     var template = $templateCache.get('mms/templates/mmsMenu.html');
 
     var mmsMenuLink = function(scope, element, attrs) {
         var catNames = [];
         var sites = {};
+
+        scope.updateWorkspace = function() {
+            $state.go($state.current.name, {workspace: scope.ws});
+        };
+
+        scope.updateTag = function() {
+            $state.go($state.current.name, {tag: scope.config.id});
+        };
 
         WorkspaceService.getWorkspace(scope.ws)
         .then(function(data) {
@@ -99,7 +107,9 @@ function mmsMenu(SiteService, WorkspaceService, ConfigService, $templateCache, g
             product: '=mmsDoc', //document object
             config: '=mmsConfig', //config object
             snapshot: '@mmsSnapshotTag', // snapshot titles (before tags - need to be backward compatible), if any
-            showTag: '@mmsShowTag'
+            showTag: '@mmsShowTag',
+            tags: '=mmsTags',
+            workspaces: '=mmsWorkspaces'
         },
         link: mmsMenuLink
     };
