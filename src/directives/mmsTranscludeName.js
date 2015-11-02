@@ -51,6 +51,10 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
         element.click(function(e) {
             if (scope.noClick)
                 return;
+            if (scope.clickHandler) {
+                scope.clickHandler();
+                return;
+            }
             if (scope.addFrame)
                 scope.addFrame();
 
@@ -191,7 +195,8 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
             mmsWs: '@',
             mmsVersion: '@',
             mmsWatchId: '@',
-            noClick: '@'
+            noClick: '@',
+            clickHandler: '&?'
         },
         require: '?^mmsView',
         controller: ['$scope', mmsTranscludeNameCtrl],
