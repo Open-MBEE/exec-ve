@@ -312,7 +312,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                                     }
                                 }
                                 scope.options = newArray;
-                                Utils.addFrame(scope,mmsViewCtrl,element,frameTemplate);
+                                Utils.addFrame(scope,mmsViewCtrl,element,frameTemplate); //For Edit view, no need for addFrame
                             },
                             function(reason) {
                                 console.log(reason);

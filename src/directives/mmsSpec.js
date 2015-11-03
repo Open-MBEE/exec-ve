@@ -160,9 +160,46 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
                     scope.values = scope.element.specialization.value;
                     if (UtilsService.isRestrictedValue(scope.values))
                         scope.isRestrictedVal = true;
-                    else
+                    else {
                         scope.isRestrictedVal = false;
-                    //if (scope.values && scope.values.length > 0 && scope.values[0].type === 'InstanceValue')
+
+                        //The editor check occurs here; should get "not supported for now" from here
+                        var id = scope.element.specialization.propertyType;
+                        var elementData = ElementService.getElement(id, false, scope.ws, scope.version);
+
+                        elementData.then(
+                            function(val) {
+                                //Filter for enumeration type
+                                if (val.appliedMetatypes && val.appliedMetatypes.length > 0 &&
+                                    val.appliedMetatypes[0] === '_9_0_62a020a_1105704885400_895774_7947') {
+                                    scope.isEnumeration = true;
+                                    var fillData = ElementService.getOwnedElements(val.sysmlid, false, scope.ws, scope.version, 1);
+
+                                    fillDropDown(fillData);
+                                }
+                            }
+                        );
+
+                        var fillDropDown = function(data) {
+                            data.then(
+                                function(val) {
+                                    var newArray = [];
+                                    //Filter only for appropriate property value
+                                    for (var i = 0; i < val.length; i++) {
+                                        if( val[i].appliedMetatypes && val[i].appliedMetatypes.length > 0 &&
+                                            val[i].appliedMetatypes[0] === '_9_0_62a020a_1105704885423_380971_7955') {
+                                            newArray.push(val[i]);
+                                        }
+                                    }
+                                    scope.options = newArray;
+                                },
+                                function(reason) {
+                                    console.log(reason);
+                                    growl.error('Failed to get enumeration options: ' + reason.message);
+                                }
+                            );
+                        };
+                    } //End of Else
                 }
                 if (scope.element.specialization.type === 'Constraint')
                     scope.value = scope.element.specialization.specification;
