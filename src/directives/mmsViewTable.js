@@ -10,11 +10,17 @@ function mmsViewTable($compile, $timeout, $templateCache, UtilsService) {
     };
 
     var mmsViewTableLink = function(scope, element, attrs) {
+
+        scope.searchTerm = '';
         var html = UtilsService.makeHtmlTable(scope.table);
+        html = '<div class="tableSearch"><input type="text" ng-model="searchTerm"></input><button ng-click="search()">search</button></div>' + html;
         element[0].innerHTML = html;
         var nextIndex = 0;
         var thead = element.find('thead');
         $compile(thead)(scope);
+        var searchbar = element.children('div');
+        $compile(searchbar)(scope);
+        //Add the search input here (before the TRS, aka the columns/rows)
         var trs = element.children('table').children('tbody').children('tr');
         var lastIndex = trs.length;
         function compile() {
@@ -30,6 +36,9 @@ function mmsViewTable($compile, $timeout, $templateCache, UtilsService) {
             }, 200, false);
         }
         compile();
+        scope.search = function() {
+            console.log(scope.searchTerm);
+        };
         return;
 
         /*scope.tableLimit = 20;
