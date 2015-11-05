@@ -84,6 +84,9 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
         scope.editable = true;
         scope.isRestrictedVal = false;
         scope.isEnumeration = false;
+        scope.propertyTypeClicked = function() {
+            scope.$emit('elementSelected', scope.element.specialization.propertyType, 'element');
+        };
         if (scope.mmsElement) {
             scope.element = scope.mmsElement;
             if(scope.element.specialization.type === 'Expression'){

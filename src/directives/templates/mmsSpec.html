@@ -95,7 +95,7 @@
         </select>
     </div>
         <h2 class="prop-title spec-view-value-heading">PROPERTY TYPE</h2>
-        <h3 class="prop"><mms-transclude-name mms-watch-id="true" mms-eid="{{element.specialization.propertyType}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></h3>
+        <h3 class="prop"><mms-transclude-name mms-watch-id="true" mms-eid="{{element.specialization.propertyType}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}" click-handler="propertyTypeClicked()"></mms-transclude-name></h3>
     </div>
 
     <div ng-if="element.specialization.type === 'Generalization' || element.specialization.type === 'Expose' || element.specialization.type === 'Dependency' || element.specialization.type === 'Conform'">
