@@ -241,7 +241,9 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
                 popupWin.document.open();
                 popupWin.document.write('<html><head><link href="css/ve-mms.styles.min.css" rel="stylesheet" type="text/css"></head><body style="overflow: auto">' + cover + tocContents + printContents + '</html>');
                 popupWin.document.close();
-                popupWin.print();
+                $timeout(function() {
+                    popupWin.print();
+                }, 1000, false);
         };
         if (isDoc) {
             tocContents = UtilsService.makeHtmlTOC($rootScope.mms_treeApi.get_rows());
