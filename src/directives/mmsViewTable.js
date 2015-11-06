@@ -37,6 +37,17 @@ function mmsViewTable($compile, $timeout, $templateCache, UtilsService) {
         }
         compile();
         scope.search = function() {
+            var text = scope.searchTerm;
+
+            var test = trs[0].getElementsByTagName("td")[0];
+            console.log(test);
+
+            console.log(trs[0].getElementsByTagName("span"));
+            console.log(trs[0].getElementsByTagName("span")[0]);
+            console.log(trs[0].getElementsByTagName("span")[0].innerHTML);
+
+            /*
+            //Toggle a Row
             var size = trs[0].getElementsByTagName("td").length;
 
             var i = 0;
@@ -50,6 +61,7 @@ function mmsViewTable($compile, $timeout, $templateCache, UtilsService) {
                     trs[0].getElementsByTagName("td")[i].style.display = "none";
                 }
             }
+            */
         };
         return;
 
