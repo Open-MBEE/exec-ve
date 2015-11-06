@@ -37,7 +37,11 @@ function mmsViewTable($compile, $timeout, $templateCache, UtilsService) {
         }
         compile();
         scope.search = function() {
-            console.log(scope.searchTerm);
+            var size = trs[0].getElementsByTagName("td").length;
+
+            for(var i = 0; i < size; i++) {
+                trs[0].getElementsByTagName("td")[i].style.display = "none";
+            }
         };
         return;
 
