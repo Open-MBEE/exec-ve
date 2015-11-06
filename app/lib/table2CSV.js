@@ -18,8 +18,9 @@ jQuery.fn.table2CSV = function(options) {
         }
     } else {
         $(el).children('thead').children('tr').each(function() {
+            tmpRow = [];
             $(this).children('th').each(function() {
-                if ($(this).css('display') != 'none') tmpRow[tmpRow.length] = formatData($(this).text());  
+                tmpRow[tmpRow.length] = formatData($(this).text());  
             });
             row2CSV(tmpRow);
         });
@@ -29,7 +30,7 @@ jQuery.fn.table2CSV = function(options) {
     $(el).children('tbody').children('tr').each(function() {
         var tmpRow = [];
         $(this).children('td').each(function() {
-            if ($(this).css('display') != 'none') tmpRow[tmpRow.length] = formatData($(this).text());
+            tmpRow[tmpRow.length] = formatData($(this).text());
         });
         row2CSV(tmpRow);
     });
