@@ -73,6 +73,7 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
     $scope.bbApi.init = function() {
 
         $scope.bbApi.addButton(UxService.getButtonBarButton('print'));
+        $scope.bbApi.addButton(UxService.getButtonBarButton('tabletocsv'));
 
         if (document && document.editable && time === 'latest') {
             $scope.bbApi.addButton(UxService.getButtonBarButton('show.edits'));
@@ -262,5 +263,9 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
 
     $scope.$on('print', function() {
         MmsAppUtils.popupPrintConfirm(document, $scope.ws, time, true);
+    });
+    
+    $scope.$on('tabletocsv', function() {
+        MmsAppUtils.tableToCsv(document, $scope.ws, time, false);
     });
 }]);

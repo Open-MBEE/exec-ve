@@ -198,6 +198,60 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
         });
     };
 
+    var tableToCsv = function(ob, ws, time, isDoc) {
+         var modalInstance = $modal.open({
+            templateUrl: 'partials/mms/tableExport.html',
+            controller: function($scope, $modalInstance, type) {
+                $scope.type = type;
+                $scope.export = function() {
+                    $modalInstance.close('export');
+                };
+                // $scope.fulldoc = function() {
+                //     $modalInstance.close('fulldoc');
+                // };
+                $scope.cancel = function() {
+                    $modalInstance.dismiss();
+                };
+            },
+            resolve: {
+                type: function() { return isDoc ? 'DOCUMENT' : 'VIEW';}
+            },
+            backdrop: 'static',
+            keyboard: false
+        });
+        modalInstance.result.then(function(choice) {
+            if (choice === 'export') {
+               var tableCSV = [];
+               // Grab all tables and run export to csv fnc
+                angular.element('#print-div').find("table").each(function(elt){
+                    var tableObj = {};
+                    if (this.caption) {
+                      tableObj.caption = this.caption.innerHTML;                        
+                    } else 
+                      tableObj.caption = 'no caption';
+                    tableObj.val = angular.element(this).table2CSV({delivery:'value'});
+                    tableCSV.push(tableObj);
+                });
+                var exportPopup = function(data) {
+                    var generator = window.open('', 'csv', 'height=600,width=800,scrollbars=1');
+                    generator.document.write('<html><head><title>Tables to CSV</title>');
+                    generator.document.write('</head><body >');
+                    generator.document.write(data);
+                    generator.document.write('</body></html>');
+                    generator.document.close();
+                    return true;
+                };
+                // generate text area content for popup
+                var genTextArea ='';
+                angular.element(tableCSV).each(function(){
+                    genTextArea += '<h2>'+ this.caption +'</h2><textArea cols=100 rows=15 wrap="off" >';
+                    genTextArea += this.val + '</textArea>';
+                });
+                exportPopup(genTextArea);
+            }
+        });
+    };
+    
     var popupPrint = function(ob, ws, time, isDoc) {
         var printContents = '';//$window.document.getElementById('print-div').outerHTML;
         var printElementCopy = angular.element('#print-div').clone();//angular.element(printContents);
@@ -269,7 +323,8 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
 
     return {
         addPresentationElement: addPresentationElement,
-        popupPrintConfirm: popupPrintConfirm
+        popupPrintConfirm: popupPrintConfirm,
+        tableToCsv: tableToCsv
     };
 }
     
