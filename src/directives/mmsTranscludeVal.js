@@ -64,6 +64,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                 return false;
             if (scope.isEditing)*/
                 e.stopPropagation();
+        
         });
 
         var recompile = function() {
@@ -311,7 +312,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                                     }
                                 }
                                 scope.options = newArray;
-                                Utils.addFrame(scope,mmsViewCtrl,element,frameTemplate);
+                                Utils.addFrame(scope,mmsViewCtrl,element,frameTemplate); //For Edit view, no need for addFrame
                             },
                             function(reason) {
                                 console.log(reason);
@@ -326,7 +327,18 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                 Utils.previewAction(scope, recompileEdit, recompile, type, element);
             };
         } 
-
+        //actions for stomp 
+        scope.$on("stomp.element", function(event, deltaSource, deltaWorkspaceId, deltaElementId, deltaModifier, elemName){
+            if(deltaWorkspaceId === scope.ws && deltaElementId === scope.mmsEid){
+                if(scope.isEditing === false){
+                    recompile();
+                }
+                if(scope.isEditing === true){
+                    growl.warning("This value has been changed: " + elemName +
+                                " modified by: " + deltaModifier, {ttl: 10000});
+                }
+            }
+        });
         if (mmsViewPresentationElemCtrl) {
             scope.delete = function() {
                 Utils.deleteAction(scope,scope.bbApi,mmsViewPresentationElemCtrl.getParentSection());

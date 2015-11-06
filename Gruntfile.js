@@ -158,6 +158,7 @@ module.exports = function(grunt) {
           angular: true,
           window: true,
           console: true,
+          Stomp:true,
           Timely: true,
           __timely: true
         }
@@ -342,6 +343,29 @@ module.exports = function(grunt) {
           {
             context: '/alfresco',  // '/api'
             host: 'europaems-int.jpl.nasa.gov',//128.149.16.152',
+            port: 443,
+            changeOrigin: true,
+            https: true,
+          },
+          {
+            context: '/',
+            host: 'localhost',
+            port: 9001
+          }
+        ]
+      },
+      arrmems: {
+        options: {
+          hostname: '*',
+          port: 9000,
+          middleware: function(connect) {
+            return [proxySnippet];
+          }
+        },
+        proxies: [
+          {
+            context: '/alfresco',  // '/api'
+            host: 'arrmems.jpl.nasa.gov',//128.149.16.152',
             port: 443,
             changeOrigin: true,
             https: true,
