@@ -266,6 +266,6 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
     });
     
     $scope.$on('tabletocsv', function() {
-        MmsAppUtils.tableToCsv(document, $scope.ws, time, false);
+        MmsAppUtils.tableToCsv(document, $scope.ws, time, true);
     });
 }]);

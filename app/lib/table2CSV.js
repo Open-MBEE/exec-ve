@@ -11,25 +11,25 @@ jQuery.fn.table2CSV = function(options) {
 
     //header
     var numCols = options.header.length;
-    var tmpRow = []; // construct header avalible array
-
+    var tmpRow = []; 
     if (numCols > 0) {
         for (var i = 0; i < numCols; i++) {
             tmpRow[tmpRow.length] = formatData(options.header[i]);
         }
     } else {
-        $(el).filter(':visible').children('thead').children('tr').children('th').each(function() {
-            if ($(this).css('display') != 'none') tmpRow[tmpRow.length] = formatData($(this).html());
+        $(el).children('thead').children('tr').each(function() {
+            $(this).children('th').each(function() {
+                if ($(this).css('display') != 'none') tmpRow[tmpRow.length] = formatData($(this).text());  
+            });
+            row2CSV(tmpRow);
         });
     }
-
-    row2CSV(tmpRow);
 
     // actual data
     $(el).children('tbody').children('tr').each(function() {
         var tmpRow = [];
-        $(this).filter(':visible').children('td').each(function() {
-            if ($(this).css('display') != 'none') tmpRow[tmpRow.length] = formatData($(this).html());
+        $(this).children('td').each(function() {
+            if ($(this).css('display') != 'none') tmpRow[tmpRow.length] = formatData($(this).text());
         });
         row2CSV(tmpRow);
     });
@@ -43,20 +43,18 @@ jQuery.fn.table2CSV = function(options) {
 
     function row2CSV(tmpRow) {
         var tmp = tmpRow.join('') // to remove any blank rows
-        // alert(tmp);
         if (tmpRow.length > 0 && tmp != '') {
             var mystr = tmpRow.join(options.separator);
             csvData[csvData.length] = mystr;
         }
     }
     function formatData(input) {
-        var cleanInput = $(input).text();
         // replace " with “
         var regexp = new RegExp(/["]/g);
-        var output = cleanInput.replace(regexp, "“");
+        var output = input.replace(regexp, "“");
         //HTML
-        var regexp = new RegExp(/\<[^\<]+\>/g);
-        var output = output.replace(regexp, "");
+        // var regexp = new RegExp(/\<[^\<]+\>/g);
+        // var output = output.replace(regexp, "");
         output = $.trim(output);
         if (output == "") return '';
         return '"' + output + '"';
