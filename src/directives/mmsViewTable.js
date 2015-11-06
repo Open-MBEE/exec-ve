@@ -40,9 +40,9 @@ function mmsViewTable($compile, $timeout, $templateCache, UtilsService) {
             var size = trs[0].getElementsByTagName("td").length;
 
             var i = 0;
-            if(trs[0].getElementsByTagName("td")[i].style.display == "none") {
+            if(trs[0].getElementsByTagName("td")[0].style.display == "none") {
                 for(i = 0; i < size; i++) {
-                    trs[0].getElementsByTagName("td")[i].style.display = "block";
+                    trs[0].getElementsByTagName("td")[i].style.display = "";
                 }
             }
             else {
