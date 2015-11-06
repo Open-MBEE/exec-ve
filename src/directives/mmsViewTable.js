@@ -39,8 +39,16 @@ function mmsViewTable($compile, $timeout, $templateCache, UtilsService) {
         scope.search = function() {
             var size = trs[0].getElementsByTagName("td").length;
 
-            for(var i = 0; i < size; i++) {
-                trs[0].getElementsByTagName("td")[i].style.display = "none";
+            var i = 0;
+            if(trs[0].getElementsByTagName("td")[i].style.display == "none") {
+                for(i = 0; i < size; i++) {
+                    trs[0].getElementsByTagName("td")[i].style.display = "block";
+                }
+            }
+            else {
+                for (i = 0; i < size; i++) {
+                    trs[0].getElementsByTagName("td")[i].style.display = "none";
+                }
             }
         };
         return;
