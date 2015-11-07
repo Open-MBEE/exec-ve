@@ -61,7 +61,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
 
     $stateProvider
     .state('workspaces', {
-        url: '/workspaces',
+        url: '/workspaces?search',
         resolve: {
             dummyLogin: function($http, URLService) {
                 return $http.get(URLService.getCheckLoginURL());
@@ -117,6 +117,34 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             },
             docFilter: function(dummyLogin) {
                 return null;
+            },
+            search: function($stateParams, ElementService, workspace, dummyLogin) {
+                if ($stateParams.search === undefined) {
+                    return null;
+                }
+
+                //TODO: add all search attributes - can you do *?
+                return ElementService.search($stateParams.search, ['id','documentation'], null, false, workspace)
+                .then(function(data) {
+
+                    // change properties arr to 2-dim to display table
+                    data.forEach(function(elem) {
+                        if (elem.properties && elem.properties[0]) {
+                            var properties = [];
+                            for (var i = 0; i < elem.properties.length; i++) {
+                                if (i % 3 === 0) {
+                                    properties.push([]);
+                                }
+                                properties[properties.length-1].push(elem.properties[i]);
+                            }
+                            elem.properties = properties;
+                        }
+                    });
+
+                    return data;
+                }, function(reason) {
+                    return null;
+                });                
             }
         },
         views: {

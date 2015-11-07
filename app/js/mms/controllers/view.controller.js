@@ -3,8 +3,8 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('ViewCtrl', ['$scope', '$rootScope', '$state', '$stateParams', '$timeout', '$modal', '$window', 'viewElements', 'MmsAppUtils', 'ElementService', 'ViewService', 'ConfigService', 'time', 'growl', 'workspace', 'site', 'document', 'view', 'tag', 'snapshot', 'UxService', 'hotkeys',
-function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, viewElements, MmsAppUtils, ElementService, ViewService, ConfigService, time, growl, workspace, site, document, view, tag, snapshot, UxService, hotkeys) {
+.controller('ViewCtrl', ['$scope', '$rootScope', '$state', '$stateParams', '$timeout', '$modal', '$window', 'viewElements', 'MmsAppUtils', 'ElementService', 'ViewService', 'ConfigService', 'time', 'search', 'growl', 'workspace', 'site', 'document', 'view', 'tag', 'snapshot', 'UxService', 'hotkeys',
+function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, viewElements, MmsAppUtils, ElementService, ViewService, ConfigService, time, search, growl, workspace, site, document, view, tag, snapshot, UxService, hotkeys) {
     
     /*$scope.$on('$viewContentLoaded', 
         function(event) {
@@ -51,6 +51,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         $rootScope.mms_ShowEdits = false;
 
     var ws = $stateParams.workspace;
+    $scope.search = search;
     $scope.ws = ws;
     $scope.view = view;
     $scope.viewElements = viewElements;
