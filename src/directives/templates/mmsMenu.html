@@ -29,7 +29,7 @@
 
         <li ng-show="ws">
           <select style="color:black" ng-change="updateTag()" ng-model="config.id">
-            <option ng-click="latestTag()">LATEST</option>
+            <option ng-click="latestTag()" value="">LATEST</option>
             <option ng-repeat="tag in tags | orderBy:'name'" value="{{tag.id}}">
               {{tag.name}}
             </option>
