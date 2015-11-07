@@ -207,10 +207,10 @@ function mmsTree($timeout, $log, $templateCache) {
                     selected_branch.selected = false;
                 branch.selected = true;
                 selected_branch = branch;
-	            if(branch.expandable === true)
+	            /*if(branch.expandable === true)
                 {
                     scope.expandCallback({ branch: branch });
-                }
+                }*/
                 expand_all_parents(branch);
                 if (branch.onSelect) {
                     $timeout(function() {
@@ -369,6 +369,18 @@ function mmsTree($timeout, $log, $templateCache) {
                 select_branch(branch);
         };
 
+        scope.user_dblclicks_branch = function(branch) {
+            if (branch.onDblclick) {
+                $timeout(function() {
+                    branch.onDblclick(branch);
+                });
+            } else if (scope.onDblclick) {
+                $timeout(function() {
+                    scope.onDblclick({branch: branch});
+                });
+            }
+        };
+
         if (angular.isObject(scope.treeControl)) {
             var tree = scope.treeControl;
             /**
@@ -489,8 +501,10 @@ function mmsTree($timeout, $log, $templateCache) {
             tree.expand_branch = function(b) {
                 if (!b)
                     b = tree.get_selected_branch();
-                if (b)
+                if (b) {
+                    scope.expandCallback({ branch: b });
                     b.expanded = true;
+                }
                 on_treeData_change();
             };
             /**
@@ -691,7 +705,8 @@ function mmsTree($timeout, $log, $templateCache) {
         scope: {
             treeData: '=',
             sectionNumbering: '=',
-            onSelect: '&',
+            onSelect: '&?',
+            onDblclick: '&?',
             initialSelection: '@',
             treeControl: '=',
             search: '=',

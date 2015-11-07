@@ -592,6 +592,17 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
         $rootScope.mms_tbApi.select('element.viewer');
     };
 
+    $scope.dblclick_tree_handler = function(branch) {
+        if ($state.includes('workspace.sites') && !$state.includes('workspace.site.document')) {
+            if (branch.type === 'site')
+                $rootScope.mms_treeApi.expand_branch(branch);
+            else if (branch.type === 'view' || branch.type === 'snapshot') {
+                var documentSiteBranch = $rootScope.mms_treeApi.get_parent_branch(branch);
+                $state.go('workspace.site.document', {site: documentSiteBranch.data.sysmlid, document: branch.data.sysmlid});
+            }
+        }
+    };
+
     // TODO: Update sort function to handle all cases
     var sortFunction = function(a, b) {
 
