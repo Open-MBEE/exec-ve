@@ -54,15 +54,15 @@
 
       <ul class="nav-btns-flyover pull-right">
         <li ng-show="site && site.sysmlid !== 'no-site' && ws" class="out-link">
-          <a ui-sref="workspace.site({site: site.sysmlid})">DocWeb</a>
+          <a ui-sref="workspace.site({site: site.sysmlid, search: undefined})">DocWeb</a>
         </li>
         
         <li ng-show="ws" class="out-link">
-          <a ui-sref="workspace.sites()">Site Portal</a>
+          <a ui-sref="workspace.sites({search: undefined})">Site Portal</a>
         </li>
         
         <li class="out-link">
-          <a ui-sref="workspace({workspace:'master'})">Model Manager</a>
+          <a ui-sref="workspace({workspace:'master', search: undefined})">Model Manager</a>
         </li>
 
         <li ng-show="site && site.sysmlid !== 'no-site'" class="out-link">

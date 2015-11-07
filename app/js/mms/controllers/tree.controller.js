@@ -125,7 +125,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
     $scope.$on('tree.reorder.view', function() {
         $rootScope.mms_fullDocMode = false;
         $scope.bbApi.setToggleState("tree.full.document", false);
-        $state.go('workspace.site.document.order');
+        $state.go('workspace.site.document.order', {search: undefined});
     });
 
     var creatingSnapshot = false;
@@ -276,9 +276,8 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
                 $scope.comparing = false;
                 return;
             }
-            $state.go('workspace.diff', {source: sourceWs, target: targetWs, sourceTime: sourceTime, targetTime: targetTime});
+            $state.go('workspace.diff', {source: sourceWs, target: targetWs, sourceTime: sourceTime, targetTime: targetTime, search: undefined});
         });
-        //$state.go('workspace.diff', {source: sourceWs, target: targetWs, sourceTime: sourceTime, targetTime: targetTime});
     };
 
     // Filter out alfresco sites
@@ -559,7 +558,6 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
             if (branch.type === 'workspace') {
                 $state.go('workspace', {workspace: branch.data.id, tag: undefined});
             } else if (branch.type === 'configuration') {
-                //$rootScope.$broadcast('elementSelected', branch.data.id, 'tag');
                 $state.go('workspace', {workspace: branch.workspace, tag: branch.data.id});
             }
         } else if ($state.includes('workspace.sites') && !$state.includes('workspace.site.document')) {
@@ -678,7 +676,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
 
                 if (itemType === 'View') {
                     viewId2node[data.sysmlid] = newbranch;
-                    $state.go('workspace.site.document.view', {view: data.sysmlid});
+                    $state.go('workspace.site.document.view', {view: data.sysmlid, search: undefined});
                 }
 
             });
@@ -774,7 +772,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
                     viewId = curBranch.view;
                 else
                     viewId = curBranch.data.sysmlid;
-                $state.go('workspace.site.document.view', {view: viewId});
+                $state.go('workspace.site.document.view', {view: viewId, search: undefined});
             }
         } else {
             if ($state.current.name === 'doc.all') {
@@ -794,13 +792,13 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
                         if (choice === 'ok') {
                             $rootScope.mms_fullDocMode = true;
                             $scope.bbApi.setToggleState("tree.full.document", true);
-                            $state.go('workspace.site.document.full'); 
+                            $state.go('workspace.site.document.full', {search: undefined}); 
                         }
                     });
                 } else {
                     $rootScope.mms_fullDocMode = true;
                     $scope.bbApi.setToggleState("tree.full.document", true);
-                    $state.go('workspace.site.document.full'); 
+                    $state.go('workspace.site.document.full', {search: undefined}); 
                 }
             }
         }
@@ -842,7 +840,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
             $scope.treeApi.remove_branch(branch);
             if ($state.includes('workspace.sites') && !$state.includes('workspace.site.document'))
                 return;
-            $state.go('^');
+            $state.go('^', {search: undefined});
         });
     };
 

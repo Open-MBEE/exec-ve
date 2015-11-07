@@ -13,7 +13,7 @@
       <ul class="nav-btns-main">
         <li ng-show="snapshot">&nbsp;&nbsp;<span class="label label-danger">SNAPSHOT</span></li>
         <li>
-          <a class="nav-btn" tooltip="Tasks and Tags" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom-left" ui-sref="workspace"><i class="fa fa-tasks"> TASK </i></a>
+          <a class="nav-btn" tooltip="Tasks and Tags" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom-left" ui-sref="workspace({search:undefined})"><i class="fa fa-tasks"> TASK </i></a>
         </li>
 
         <li ng-show="ws"> 
@@ -25,7 +25,7 @@
           <!-- <button type="button" ng-click="goBack()" class="btn btn-danger">CANCEL</button>Comparing {{config.name}} with  {{wsName}}</li> -->
 
         <li ng-show="site && site.sysmlid !== 'no-site'">
-          <a class="nav-btn" tooltip="Sites and Documents" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" ui-sref="workspace.site(site.sysmlid)"><i class="fa fa-folder"> SITE </i></a>
+          <a class="nav-btn" tooltip="Sites and Documents" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" ui-sref="workspace.site({site: site.sysmlid, search: undefined})"><i class="fa fa-folder"> SITE </i></a>
         </li>
         <li ng-show="site && site.sysmlid !== 'no-site'">
           {{site.name}} 

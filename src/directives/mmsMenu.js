@@ -43,11 +43,11 @@ function mmsMenu(SiteService, WorkspaceService, ConfigService, $state, $template
         var sites = {};
 
         scope.updateWorkspace = function() {
-            $state.go($state.current.name, {workspace: scope.ws});
+            $state.go($state.current.name, {workspace: scope.ws, tag: undefined, search: undefined});
         };
 
         scope.updateTag = function() {
-            $state.go($state.current.name, {tag: scope.config.id});
+            $state.go($state.current.name, {tag: scope.config.id, search: undefined});
         };
 
         WorkspaceService.getWorkspace(scope.ws)
