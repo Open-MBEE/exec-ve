@@ -38,12 +38,41 @@ function mmsViewTable($compile, $timeout, $templateCache, UtilsService) {
         compile();
         scope.search = function() {
             var text = scope.searchTerm;
+            var rows = trs.length;
+            var columns = trs[0].getElementsByTagName("td").length;
 
-            var test = trs[0].getElementsByTagName("td")[0];
-            console.log(test);
+            var i = 0, j = 0;
+            if(text.length === 0) { //If Search Empty, Reset all rows
+                for(i = 0; i < rows; i++) {
+                    for(j = 0; j < columns; j++) {
+                        trs[i].getElementsByTagName("td")[j].style.display = "";
+                    }
+                }
+            }
+            else if(text.length >0 && rows > 0) {
+                for(i = 0; i < rows; i++) {
+                    var toggle = true;
+                    for(j = 0; j < columns; j++) {
+                        var string = trs[i].getElementsByTagName("span")[j].innerHTML;
+                        if( string.indexOf(text) >= 0 ) {
+                            toggle = false;
+                        }
+                    }
+                    console.log('for: ' + i + ' Toggle: ' + toggle);
+                    /* */
+                    if(toggle) {
+                        for (j = 0; j < columns; j++) {
+                            trs[i].getElementsByTagName("td")[j].style.display = "none";
+                        }
+                    }
+                    else {
+                        for(j = 0; j < columns; j++) {
+                            trs[i].getElementsByTagName("td")[j].style.display = "";
+                        }
+                    }
+                }
+            }
 
-            console.log(trs[0].getElementsByTagName("span"));
-            console.log(trs[0].getElementsByTagName("span")[0]);
             console.log(trs[0].getElementsByTagName("span")[0].innerHTML);
 
             /*
