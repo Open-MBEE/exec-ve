@@ -180,7 +180,6 @@ function mmsNav($templateCache, $state, hotkeys, ElementService) {
             scope.searchClass = "fa fa-spin fa-spinner";
             $state.go($state.current.name, {search: searchText});
         };
-
     };
 
     return {

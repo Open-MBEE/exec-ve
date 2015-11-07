@@ -406,6 +406,29 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         }
     };
 
+
+    $scope.facet = '$';
+    $scope.filterQuery = "";
+    $scope.$watchGroup(['filterQuery', 'facet'], function(newVal, oldVal){
+        $scope.searchFilter = {};
+        $scope.searchFilter[$scope.facet] = $scope.filterQuery;
+    });
+
+    $scope.setFilterFacet = function(filterFacet) {
+        if(filterFacet === 'all') $scope.facet = '$';
+        else  $scope.facet = filterFacet;
+        angular.element('.search-filter-type button').removeClass('active');
+        angular.element('.btn-filter-facet-' + filterFacet).addClass('active');
+    };
+
+    $scope.updateFilter = function(filter) {
+        $scope.filterQuery = filter;
+    };
+
+    $scope.searchGoToDocument = function (documentId, viewId) {
+        $state.go('workspace.site.document.view', {document: documentId, view: viewId, tag: undefined, search: undefined});
+    };
+
     $scope.$on('print', function() {
         MmsAppUtils.popupPrintConfirm(view, $scope.ws, time, false);
     });

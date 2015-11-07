@@ -123,8 +123,9 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                     return null;
                 }
 
-                //TODO: add all search attributes - can you do *?
-                return ElementService.search($stateParams.search, ['id','documentation'], null, false, workspace)
+                // TODO: Change search attributes to '*" once implemented on MMS/Server-side
+                // TODO: 'aspect' generates 500
+                return ElementService.search($stateParams.search, ['id','documentation', 'name', 'value', 'appliedMetatypes', 'metatypes'], null, false, workspace)
                 .then(function(data) {
 
                     // change properties arr to 2-dim to display table
