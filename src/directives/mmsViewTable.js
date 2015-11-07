@@ -45,52 +45,33 @@ function mmsViewTable($compile, $timeout, $templateCache, UtilsService) {
             if(text.length === 0) { //If Search Empty, Reset all rows
                 for(i = 0; i < rows; i++) {
                     for(j = 0; j < columns; j++) {
+                        //Goes through all cells in tables and toggles them on
                         trs[i].getElementsByTagName("td")[j].style.display = "";
                     }
                 }
             }
-            else if(text.length >0 && rows > 0) {
+            else if(text.length >0 && rows > 0) { //If there is text in the search and more than 0 rows
                 for(i = 0; i < rows; i++) {
-                    var toggle = true;
-                    for(j = 0; j < columns; j++) {
-                        var string = trs[i].getElementsByTagName("span")[j].innerHTML;
-                        if( string.indexOf(text) >= 0 ) {
-                            toggle = false;
+                    var toggle = true; //This will toggle the on and off
+                    for(j = 0; j < columns; j++) { //goes through each cell in the row
+                        var string = trs[i].getElementsByTagName("span")[j].innerHTML; //Grabs text in cell
+                        if( string.indexOf(text) >= 0 ) { //if the search text is contained in the cell
+                            toggle = false; //will not toggle the row off
                         }
                     }
-                    console.log('for: ' + i + ' Toggle: ' + toggle);
-                    /* */
-                    if(toggle) {
-                        for (j = 0; j < columns; j++) {
-                            trs[i].getElementsByTagName("td")[j].style.display = "none";
+
+                    if(toggle) { //If a cell in the row was not toggled off, turn off that row
+                        for (j = 0; j < columns; j++) { //goes through each cell in that row
+                            trs[i].getElementsByTagName("td")[j].style.display = "none"; //turn off cell
                         }
                     }
-                    else {
+                    else { //in case previously turned off, always turn on by default
                         for(j = 0; j < columns; j++) {
-                            trs[i].getElementsByTagName("td")[j].style.display = "";
+                            trs[i].getElementsByTagName("td")[j].style.display = ""; // turn on cell
                         }
                     }
                 }
             }
-
-            console.log(trs[0].getElementsByTagName("span")[0].innerHTML);
-
-            /*
-            //Toggle a Row
-            var size = trs[0].getElementsByTagName("td").length;
-
-            var i = 0;
-            if(trs[0].getElementsByTagName("td")[0].style.display == "none") {
-                for(i = 0; i < size; i++) {
-                    trs[0].getElementsByTagName("td")[i].style.display = "";
-                }
-            }
-            else {
-                for (i = 0; i < size; i++) {
-                    trs[0].getElementsByTagName("td")[i].style.display = "none";
-                }
-            }
-            */
         };
         return;
 
