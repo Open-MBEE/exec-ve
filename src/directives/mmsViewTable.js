@@ -13,7 +13,7 @@ function mmsViewTable($compile, $timeout, $templateCache, UtilsService) {
 
         scope.searchTerm = '';
         var html = UtilsService.makeHtmlTable(scope.table);
-        html = '<div class="tableSearch"><input type="text" ng-model="searchTerm"></input><button ng-click="search()">search</button></div>' + html;
+        html = '<div class="tableSearch"><button ng-click="resetSearch()">reset</button><input type="text" ng-model="searchTerm"></input><button ng-click="search()">search</button></div>' + html;
         element[0].innerHTML = html;
         var nextIndex = 0;
         var thead = element.find('thead');
@@ -73,6 +73,11 @@ function mmsViewTable($compile, $timeout, $templateCache, UtilsService) {
                 }
             }
         };
+
+        scope.resetSearch = function() {
+            console.log('it worked');
+        };
+
         return;
 
         /*scope.tableLimit = 20;
