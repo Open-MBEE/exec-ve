@@ -50,6 +50,10 @@ function mmsMenu(SiteService, WorkspaceService, ConfigService, $state, $template
             $state.go($state.current.name, {tag: scope.config.id, search: undefined});
         };
 
+        scope.latestTag = function() {
+            $state.go($state.current.name, {tag: undefined, search: undefined});
+        };
+
         WorkspaceService.getWorkspace(scope.ws)
         .then(function(data) {
             scope.wsName = data.name;

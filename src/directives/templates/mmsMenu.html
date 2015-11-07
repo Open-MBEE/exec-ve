@@ -11,45 +11,51 @@
     <ul>
 
       <ul class="nav-btns-main">
-        <li ng-show="snapshot">&nbsp;&nbsp;<span class="label label-danger">SNAPSHOT</span></li>
         <li>
           <a class="nav-btn" tooltip="Tasks and Tags" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom-left" ui-sref="workspace({search:undefined})"><i class="fa fa-tasks"> TASK </i></a>
         </li>
 
-        <li ng-show="ws"> 
-          {{wsName}} 
-          <span ng-if="config.timestamp != 'latest' && showTag != 'false'">( <i class="fa fa-tag"></i> {{config.name}} )</span>
-        </li>
-
-        <!-- <li ng-if="$scope.diff=='yes'">  -->
-          <!-- <button type="button" ng-click="goBack()" class="btn btn-danger">CANCEL</button>Comparing {{config.name}} with  {{wsName}}</li> -->
-
-        <li ng-show="site && site.sysmlid !== 'no-site'">
-          <a class="nav-btn" tooltip="Sites and Documents" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" ui-sref="workspace.site({site: site.sysmlid, search: undefined})"><i class="fa fa-folder"> SITE </i></a>
-        </li>
-        <li ng-show="site && site.sysmlid !== 'no-site'">
-          {{site.name}} 
-        </li>
-
-        <li ng-show="product">
-          <a class="nav-btn"><i class="fa fa-file"> DOCUMENT </i></a>
-        </li>
-        <li ng-show="product">{{product.name}} <span ng-bind-html="snapshot"></span></li>
-
-        <li>
+        <li ng-show="ws">
           <select style="color:black" ng-change="updateWorkspace()" ng-model="ws">
-            <option ng-repeat="workspace in workspaces | orderBy:'name'" value="{{workspace.id}}">
+            <option ng-repeat="workspace in workspaces | orderBy:'qualifiedName'" value="{{workspace.id}}">
               {{workspace.qualifiedName}}
             </option>
           </select> 
         </li>
 
         <li>
+          <a class="nav-btn"><i class="fa fa-tag"> TAG </i></a>
+        </li>
+
+        <li ng-show="ws">
           <select style="color:black" ng-change="updateTag()" ng-model="config.id">
+            <option ng-click="latestTag()">LATEST</option>
             <option ng-repeat="tag in tags | orderBy:'name'" value="{{tag.id}}">
               {{tag.name}}
             </option>
           </select> 
+        </li>
+
+        <!-- ALWAYS SHOW TAG AS LATEST (DROPDOWN)
+        <li ng-show="ws"> 
+          <span ng-if="config.timestamp != 'latest' && showTag != 'false'">( <i class="fa fa-tag"></i> {{config.name}} )</span>
+        </li>
+        -->
+
+        <li ng-show="site && site.sysmlid !== 'no-site'">
+          <a class="nav-btn" tooltip="Sites and Documents" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" ui-sref="workspace.site({site: site.sysmlid, search: undefined})"><i class="fa fa-folder"> SITE </i></a>
+        </li>
+        <li ng-show="site && site.sysmlid !== 'no-site'">
+          <strong>{{site.name}}</strong> 
+        </li>
+
+        <li ng-show="product">
+          <a class="nav-btn"><i class="fa fa-file"> DOCUMENT </i></a>
+        </li>
+        <li ng-show="product">
+          <strong>{{product.name}}</strong> 
+          <span ng-bind-html="snapshot"></span>
+          <span ng-show="snapshot" class="label label-danger">SNAPSHOT</span>
         </li>
 
       </ul>
