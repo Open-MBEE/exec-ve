@@ -75,7 +75,8 @@ function mmsViewTable($compile, $timeout, $templateCache, UtilsService) {
         };
 
         scope.resetSearch = function() {
-            console.log('it worked');
+            scope.searchTerm = '';
+            scope.search();
         };
 
         return;
