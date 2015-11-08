@@ -11,21 +11,19 @@
     <ul>
 
       <!-- Brand name and document -->
-      <li class="nav-title-li">View Editor</li>
+      <li class="nav-title-li">EMS</li>
       
-      <li class="nav-doc-li">Document</li>
+      <li class="nav-doc-li">View Editor</li>
 
-      <li>
-          <form ng-submit="search(searchText)">
-              <div class="form-search input-group">
-                  <input class="form-control" type="text" ng-model="searchText" placeholder="Search for an element" />
-                  <span class="input-group-btn">                
-                      <button class="btn btn-primary" type="button" ng-click="search(searchText)">
-                      <span class="btn-text">SEARCH</span> <i class="{{searchClass}}"></i></button>
-                  </span>
-              </div>
-          </form>
-      </li>
+      <form class="nav-search-form navbar-form" style="display: inline" role="search" ng-submit="search(searchText)">
+          <div class="form-search input-group">
+              <input class="form-control" type="text" ng-model="searchText" placeholder="Search for an element" />
+              <span class="input-group-btn">                
+                  <button class="btn btn-primary" type="button" ng-click="search(searchText)">
+                  <span class="btn-text">SEARCH</span> <i class="{{searchClass}}"></i></button>
+              </span>
+          </div>
+      </form>
 
       <!-- Dashboard, Support, Feedback, and Logout buttons -->
       <ul class="nav-btns-main pull-right">
