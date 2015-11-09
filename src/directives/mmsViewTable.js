@@ -55,7 +55,6 @@ function mmsViewTable($compile, $timeout, $templateCache, UtilsService) {
                     var toggle = true; //This will toggle the on and off
                     for(j = 0; j < columns; j++) { //goes through each cell in the row
                         var string = trs[i].getElementsByTagName("span")[j].innerHTML; //Grabs text in cell
-                        var textObj = trs[i].getElementsByTagName("span")[j];
                         if( string.indexOf(text) >= 0 ) { //if the search text is contained in the cell
                             var match = /\r|\n/.exec(string);
                             if (match) {
@@ -63,12 +62,14 @@ function mmsViewTable($compile, $timeout, $templateCache, UtilsService) {
                                 var digSize = dig.length-1;
                                 var innerText = dig[digSize].innerHTML;
 
-                                console.log(innerText);
-                                //console.log( dig[digSize] );
-                                //console.log( dig[digSize].innerHTML );
-                                //console.log( trs[i].getElementsByTagName("span")[j].text() );
+                                //If false positive innterHTML does match, keep visible
+                                if( innerText.indexOf(text) >= 0 ) {
+                                    toggle = false; //will not toggle the row off
+                                }
                             }
-                            toggle = false; //will not toggle the row off
+                            else {
+                                toggle = false; //will not toggle the row off
+                            }
                         }
                     }
 
