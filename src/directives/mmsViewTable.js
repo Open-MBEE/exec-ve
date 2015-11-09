@@ -58,7 +58,22 @@ function mmsViewTable($compile, $timeout, $templateCache, UtilsService) {
                     for(j = 0; j < columns; j++) { //goes through each cell in the row
                         var string = trs[i].getElementsByTagName("span")[j].innerHTML; //Grabs text in cell
                         if( string.indexOf(text) >= 0 ) { //if the search text is contained in the cell
-                            toggle = false; //will not toggle the row off
+                            var match = /\r|\n/.exec(string);
+                            //Check for false positives if there is a nextline in the string
+                            if (match) {
+                                //Stripping out extra text in the false positive
+                                var dig = trs[i].getElementsByTagName("span")[j].getElementsByTagName("span");
+                                var digSize = dig.length-1;
+                                var innerText = dig[digSize].innerHTML;
+
+                                //If false positive innterHTML does match, keep visible
+                                if( innerText.indexOf(text) >= 0 ) {
+                                    toggle = false; //will not toggle the row off
+                                }
+                            }
+                            else {
+                                toggle = false; //will not toggle the row off
+                            }
                         }
                     }
 
