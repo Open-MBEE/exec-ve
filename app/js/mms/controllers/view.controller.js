@@ -3,8 +3,8 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('ViewCtrl', ['$scope', '$rootScope', '$state', '$stateParams', '$timeout', '$modal', '$window', 'viewElements', 'MmsAppUtils', 'ElementService', 'ViewService', 'ConfigService', 'time', 'growl', 'workspace', 'site', 'document', 'view', 'tag', 'snapshot', 'UxService', 'hotkeys',
-function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, viewElements, MmsAppUtils, ElementService, ViewService, ConfigService, time, growl, workspace, site, document, view, tag, snapshot, UxService, hotkeys) {
+.controller('ViewCtrl', ['$scope', '$rootScope', '$state', '$stateParams', '$timeout', '$modal', '$window', 'viewElements', 'MmsAppUtils', 'ElementService', 'ViewService', 'ConfigService', 'time', 'search', 'growl', 'workspace', 'site', 'document', 'view', 'tag', 'snapshot', 'UxService', 'hotkeys',
+function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, viewElements, MmsAppUtils, ElementService, ViewService, ConfigService, time, search, growl, workspace, site, document, view, tag, snapshot, UxService, hotkeys) {
     
     /*$scope.$on('$viewContentLoaded', 
         function(event) {
@@ -51,6 +51,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         $rootScope.mms_ShowEdits = false;
 
     var ws = $stateParams.workspace;
+    $scope.search = search;
     $scope.ws = ws;
     $scope.view = view;
     $scope.viewElements = viewElements;
@@ -404,6 +405,25 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         if ($rootScope.mms_ShowEdits && time === 'latest') {
             $scope.viewApi.toggleShowEdits();
         }
+    };
+
+
+    $scope.facet = '$';
+    $scope.filterQuery = {query: ""};
+    $scope.$watchGroup(['filterQuery.query', 'facet'], function(newVal, oldVal){
+        $scope.searchFilter = {};
+        $scope.searchFilter[$scope.facet] = $scope.filterQuery.query;
+    });
+
+    $scope.setFilterFacet = function(filterFacet) {
+        if(filterFacet === 'all') $scope.facet = '$';
+        else  $scope.facet = filterFacet;
+        angular.element('.search-filter-type button').removeClass('active');
+        angular.element('.btn-filter-facet-' + filterFacet).addClass('active');
+    };
+
+    $scope.searchGoToDocument = function (documentId, viewId) {
+        $state.go('workspace.site.document.view', {document: documentId, view: viewId, tag: undefined, search: undefined});
     };
 
     $scope.$on('print', function() {

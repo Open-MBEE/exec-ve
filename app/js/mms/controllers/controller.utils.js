@@ -193,7 +193,7 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
             else {
                 $rootScope.mms_fullDocMode = true;
                 $rootScope.mms_bbApi.setToggleState("tree.full.document", true);
-                $state.go('workspace.site.document.full'); 
+                $state.go('workspace.site.document.full', {search: undefined}); 
             }
         });
     };

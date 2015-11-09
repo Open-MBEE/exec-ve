@@ -125,7 +125,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
     $scope.$on('tree.reorder.view', function() {
         $rootScope.mms_fullDocMode = false;
         $scope.bbApi.setToggleState("tree.full.document", false);
-        $state.go('workspace.site.document.order');
+        $state.go('workspace.site.document.order', {search: undefined});
     });
 
     var creatingSnapshot = false;
@@ -276,9 +276,8 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
                 $scope.comparing = false;
                 return;
             }
-            $state.go('workspace.diff', {source: sourceWs, target: targetWs, sourceTime: sourceTime, targetTime: targetTime});
+            $state.go('workspace.diff', {source: sourceWs, target: targetWs, sourceTime: sourceTime, targetTime: targetTime, search: undefined});
         });
-        //$state.go('workspace.diff', {source: sourceWs, target: targetWs, sourceTime: sourceTime, targetTime: targetTime});
     };
 
     // Filter out alfresco sites
@@ -555,19 +554,19 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
     }
     // TODO: Update behavior to handle new state descriptions
     $scope.my_tree_handler = function(branch) {
+
         if ($state.includes('workspaces') && !$state.includes('workspace.sites')) {
             if (branch.type === 'workspace') {
-                $state.go('workspace', {workspace: branch.data.id, tag: undefined});
+                $state.go('workspace', {workspace: branch.data.id, tag: undefined, search: undefined});
             } else if (branch.type === 'configuration') {
-                //$rootScope.$broadcast('elementSelected', branch.data.id, 'tag');
-                $state.go('workspace', {workspace: branch.workspace, tag: branch.data.id});
+                $state.go('workspace', {workspace: branch.workspace, tag: branch.data.id, search: undefined});
             }
         } else if ($state.includes('workspace.sites') && !$state.includes('workspace.site.document')) {
             if (branch.type === 'site')
-                $state.go('workspace.site', {site: branch.data.sysmlid});
+                $state.go('workspace.site', {site: branch.data.sysmlid, search: undefined});
             else if (branch.type === 'view' || branch.type === 'snapshot') {
                 var documentSiteBranch = $rootScope.mms_treeApi.get_parent_branch(branch);
-                $state.go('workspace.site.documentpreview', {site: documentSiteBranch.data.sysmlid, document: branch.data.sysmlid});
+                $state.go('workspace.site.documentpreview', {site: documentSiteBranch.data.sysmlid, document: branch.data.sysmlid, search: undefined});
             }
         } else if ($state.includes('workspace.site.document')) {
 
@@ -580,9 +579,9 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
                 ViewService.setCurrentViewId(view);
                 $anchorScroll();
             } else if (branch.type === 'view') {
-                $state.go('workspace.site.document.view', {view: branch.data.sysmlid});
+                $state.go('workspace.site.document.view', {view: branch.data.sysmlid, search: undefined});
             } else if (branch.type === 'section') {
-                $state.go('workspace.site.document.view', {view: view});
+                $state.go('workspace.site.document.view', {view: view, search: undefined});
                 $timeout(function() {
                     $location.hash(hash);
                     $anchorScroll();
@@ -590,6 +589,17 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
             }
         }
         $rootScope.mms_tbApi.select('element.viewer');
+    };
+
+    $scope.dblclick_tree_handler = function(branch) {
+        if ($state.includes('workspace.sites') && !$state.includes('workspace.site.document')) {
+            if (branch.type === 'site')
+                $rootScope.mms_treeApi.expand_branch(branch);
+            else if (branch.type === 'view' || branch.type === 'snapshot') {
+                var documentSiteBranch = $rootScope.mms_treeApi.get_parent_branch(branch);
+                $state.go('workspace.site.document', {site: documentSiteBranch.data.sysmlid, document: branch.data.sysmlid, search: undefined});
+            }
+        }
     };
 
     // TODO: Update sort function to handle all cases
@@ -678,7 +688,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
 
                 if (itemType === 'View') {
                     viewId2node[data.sysmlid] = newbranch;
-                    $state.go('workspace.site.document.view', {view: data.sysmlid});
+                    $state.go('workspace.site.document.view', {view: data.sysmlid, search: undefined});
                 }
 
             });
@@ -774,7 +784,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
                     viewId = curBranch.view;
                 else
                     viewId = curBranch.data.sysmlid;
-                $state.go('workspace.site.document.view', {view: viewId});
+                $state.go('workspace.site.document.view', {view: viewId, search: undefined});
             }
         } else {
             if ($state.current.name === 'doc.all') {
@@ -794,13 +804,13 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
                         if (choice === 'ok') {
                             $rootScope.mms_fullDocMode = true;
                             $scope.bbApi.setToggleState("tree.full.document", true);
-                            $state.go('workspace.site.document.full'); 
+                            $state.go('workspace.site.document.full', {search: undefined}); 
                         }
                     });
                 } else {
                     $rootScope.mms_fullDocMode = true;
                     $scope.bbApi.setToggleState("tree.full.document", true);
-                    $state.go('workspace.site.document.full'); 
+                    $state.go('workspace.site.document.full', {search: undefined}); 
                 }
             }
         }
@@ -842,7 +852,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
             $scope.treeApi.remove_branch(branch);
             if ($state.includes('workspace.sites') && !$state.includes('workspace.site.document'))
                 return;
-            $state.go('^');
+            $state.go('^', {search: undefined});
         });
     };
 

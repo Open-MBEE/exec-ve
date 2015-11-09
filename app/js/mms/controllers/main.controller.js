@@ -41,7 +41,7 @@ function($scope, $location, $rootScope, $state, _, $window, growl, $http, URLSer
     });*/
 
     $rootScope.$on('$stateChangeStart', 
-    function(event, viewConfig){ 
+    function(event){ 
         $rootScope.mms_viewContentLoading = true;
     });
     

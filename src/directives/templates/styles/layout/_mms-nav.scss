@@ -41,6 +41,10 @@ mms-nav {
   background-color: $base_grey;
   color: $white;
   
+  nav-search-form {
+    display: inline-block;  
+  }
+
   li {
     display: block;
 
@@ -88,6 +92,7 @@ mms-nav {
       cursor: default;
       padding-right: 10px;
       font-weight: $bold_font_weight;
+      margin-right: 30px;
     }
 
     &.is-active a {

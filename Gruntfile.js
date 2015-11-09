@@ -160,6 +160,8 @@ module.exports = function(grunt) {
           console: true,
           Stomp:true,
           Timely: true,
+          jQuery: true,
+          $: true,
           __timely: true
         }
       }
