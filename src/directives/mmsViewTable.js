@@ -10,6 +10,8 @@ function mmsViewTable($compile, $timeout, $templateCache, UtilsService) {
     };
 
     var mmsViewTableLink = function(scope, element, attrs) {
+        if (!scope.table.showIfEmpty && scope.table.body.length === 0)
+            return;
         var html = UtilsService.makeHtmlTable(scope.table);
         element[0].innerHTML = html;
         var nextIndex = 0;
