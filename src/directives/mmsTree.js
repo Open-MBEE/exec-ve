@@ -195,7 +195,7 @@ function mmsTree($timeout, $log, $templateCache) {
          *
          * @param {Object} branch branch to select
          */
-        var select_branch = function(branch) {
+        var select_branch = function(branch, noClick) {
             if (!branch) {
                 if (selected_branch)
                     selected_branch.selected = false;
@@ -212,14 +212,16 @@ function mmsTree($timeout, $log, $templateCache) {
                     scope.expandCallback({ branch: branch });
                 }*/
                 expand_all_parents(branch);
-                if (branch.onSelect) {
-                    $timeout(function() {
-                        branch.onSelect(branch);
-                    });
-                } else if (scope.onSelect) {
-                    $timeout(function() {
-                        scope.onSelect({branch: branch});
-                    });
+                if (!noClick) {
+                    if (branch.onSelect) {
+                        $timeout(function() {
+                            branch.onSelect(branch);
+                        });
+                    } else if (scope.onSelect) {
+                        $timeout(function() {
+                            scope.onSelect({branch: branch});
+                        });
+                    }
                 }
                 if (branch.data.sysmlid) {
                     $timeout(function() {
@@ -235,8 +237,9 @@ function mmsTree($timeout, $log, $templateCache) {
         var on_initialSelection_change = function() {
             if (scope.initialSelection) {
                 for_each_branch(function(b) {
-                    if (b.data.sysmlid === scope.initialSelection || b.data.id === scope.initialSelection)
-                        select_branch(b);
+                    if (b.data.sysmlid === scope.initialSelection || b.data.id === scope.initialSelection) {
+                        select_branch(b, true);
+                    }
                 });
                 on_treeData_change();
             }

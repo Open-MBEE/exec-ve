@@ -409,10 +409,10 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
 
 
     $scope.facet = '$';
-    $scope.filterQuery = "";
-    $scope.$watchGroup(['filterQuery', 'facet'], function(newVal, oldVal){
+    $scope.filterQuery = {query: ""};
+    $scope.$watchGroup(['filterQuery.query', 'facet'], function(newVal, oldVal){
         $scope.searchFilter = {};
-        $scope.searchFilter[$scope.facet] = $scope.filterQuery;
+        $scope.searchFilter[$scope.facet] = $scope.filterQuery.query;
     });
 
     $scope.setFilterFacet = function(filterFacet) {
@@ -420,10 +420,6 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         else  $scope.facet = filterFacet;
         angular.element('.search-filter-type button').removeClass('active');
         angular.element('.btn-filter-facet-' + filterFacet).addClass('active');
-    };
-
-    $scope.updateFilter = function(filter) {
-        $scope.filterQuery = filter;
     };
 
     $scope.searchGoToDocument = function (documentId, viewId) {

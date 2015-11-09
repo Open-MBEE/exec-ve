@@ -555,26 +555,18 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
     // TODO: Update behavior to handle new state descriptions
     $scope.my_tree_handler = function(branch) {
 
-        // This is a workaround so that the initial tree loading does not clear the search
-        var search_val = $stateParams.search;
-        if ($rootScope.mms_treeInit) {
-            $rootScope.mms_treeInit = false;
-        } else {
-            search_val = undefined;            
-        }
-
         if ($state.includes('workspaces') && !$state.includes('workspace.sites')) {
             if (branch.type === 'workspace') {
-                $state.go('workspace', {workspace: branch.data.id, tag: undefined, search: search_val});
+                $state.go('workspace', {workspace: branch.data.id, tag: undefined, search: undefined});
             } else if (branch.type === 'configuration') {
-                $state.go('workspace', {workspace: branch.workspace, tag: branch.data.id, search: search_val});
+                $state.go('workspace', {workspace: branch.workspace, tag: branch.data.id, search: undefined});
             }
         } else if ($state.includes('workspace.sites') && !$state.includes('workspace.site.document')) {
             if (branch.type === 'site')
-                $state.go('workspace.site', {site: branch.data.sysmlid, search: search_val});
+                $state.go('workspace.site', {site: branch.data.sysmlid, search: undefined});
             else if (branch.type === 'view' || branch.type === 'snapshot') {
                 var documentSiteBranch = $rootScope.mms_treeApi.get_parent_branch(branch);
-                $state.go('workspace.site.documentpreview', {site: documentSiteBranch.data.sysmlid, document: branch.data.sysmlid, search: search_val});
+                $state.go('workspace.site.documentpreview', {site: documentSiteBranch.data.sysmlid, document: branch.data.sysmlid, search: undefined});
             }
         } else if ($state.includes('workspace.site.document')) {
 
@@ -587,9 +579,9 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
                 ViewService.setCurrentViewId(view);
                 $anchorScroll();
             } else if (branch.type === 'view') {
-                $state.go('workspace.site.document.view', {view: branch.data.sysmlid, search: search_val});
+                $state.go('workspace.site.document.view', {view: branch.data.sysmlid, search: undefined});
             } else if (branch.type === 'section') {
-                $state.go('workspace.site.document.view', {view: view, search: search_val});
+                $state.go('workspace.site.document.view', {view: view, search: undefined});
                 $timeout(function() {
                     $location.hash(hash);
                     $anchorScroll();
@@ -605,7 +597,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
                 $rootScope.mms_treeApi.expand_branch(branch);
             else if (branch.type === 'view' || branch.type === 'snapshot') {
                 var documentSiteBranch = $rootScope.mms_treeApi.get_parent_branch(branch);
-                $state.go('workspace.site.document', {site: documentSiteBranch.data.sysmlid, document: branch.data.sysmlid});
+                $state.go('workspace.site.document', {site: documentSiteBranch.data.sysmlid, document: branch.data.sysmlid, search: undefined});
             }
         }
     };
