@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsNav', ['$templateCache', '$state', 'hotkeys', 'ElementService', mmsNav]);
+.directive('mmsNav', ['$templateCache', '$state', 'hotkeys', 'growl', 'ElementService', mmsNav]);
 
 /**
  * @ngdoc directive
@@ -30,7 +30,7 @@ angular.module('mms.directives')
     </pre>
  * @param {string} mmsTitle Title to display
  */
-function mmsNav($templateCache, $state, hotkeys, ElementService) {
+function mmsNav($templateCache, $state, hotkeys, growl, ElementService) {
     var template = $templateCache.get('mms/templates/mmsNav.html');
 
     var mmsNavLink = function(scope, element, attrs) {
@@ -177,8 +177,16 @@ function mmsNav($templateCache, $state, hotkeys, ElementService) {
 
         scope.searchClass = "";
         scope.search = function(searchText) {
-            scope.searchClass = "fa fa-spin fa-spinner";
-            $state.go($state.current.name, {search: searchText});
+            if ($state.includes('workspace.site.document.order')) {
+                growl.warning("Please finish reorder action first.");
+                return;
+            } else if ($state.includes('workspace.diff')) {
+                growl.warning("Please finish diff action first.");
+                return;
+            } else {
+                scope.searchClass = "fa fa-spin fa-spinner";
+                $state.go($state.current.name, {search: searchText});
+            }
         };
     };
 
