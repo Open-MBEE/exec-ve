@@ -4,11 +4,12 @@
 
 angular.module('mmsApp')
 
-.controller('FullDocCtrl', ['$scope', '$templateCache', '$compile', '$timeout', '$rootScope', '$state', '$stateParams', '$window', 'MmsAppUtils', 'document', 'workspace', 'site', 'snapshot', 'time', 'ConfigService', 'UxService', 'ViewService', 'UtilsService', 'growl', 'hotkeys',
-function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateParams, $window, MmsAppUtils, document, workspace, site, snapshot, time, ConfigService, UxService, ViewService, UtilsService, growl, hotkeys) {
+.controller('FullDocCtrl', ['$scope', '$templateCache', '$compile', '$timeout', '$rootScope', '$state', '$stateParams', '$window', 'MmsAppUtils', 'document', 'workspace', 'site', 'snapshot', 'time', 'ConfigService', 'UxService', 'ViewService', 'UtilsService', 'growl', 'hotkeys', 'search',
+function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateParams, $window, MmsAppUtils, document, workspace, site, snapshot, time, ConfigService, UxService, ViewService, UtilsService, growl, hotkeys, search) {
 
     $scope.ws = $stateParams.workspace;
     $scope.site = site;
+    $scope.search = search;
     var views = [];
     if (!$rootScope.veCommentsOn)
         $rootScope.veCommentsOn = false;
@@ -268,4 +269,22 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
     $scope.$on('tabletocsv', function() {
         MmsAppUtils.tableToCsv(document, $scope.ws, time, true);
     });
+
+    $scope.facet = '$';
+    $scope.filterQuery = {query: ""};
+    $scope.$watchGroup(['filterQuery.query', 'facet'], function(newVal, oldVal){
+        $scope.searchFilter = {};
+        $scope.searchFilter[$scope.facet] = $scope.filterQuery.query;
+    });
+
+    $scope.setFilterFacet = function(filterFacet) {
+        if(filterFacet === 'all') $scope.facet = '$';
+        else  $scope.facet = filterFacet;
+        angular.element('.search-filter-type button').removeClass('active');
+        angular.element('.btn-filter-facet-' + filterFacet).addClass('active');
+    };
+
+    $scope.searchGoToDocument = function (documentId, viewId) {
+        $state.go('workspace.site.document.view', {document: documentId, view: viewId, tag: undefined, search: undefined});
+    };
 }]);
