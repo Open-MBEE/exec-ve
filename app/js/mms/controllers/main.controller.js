@@ -8,6 +8,7 @@ function($scope, $location, $rootScope, $state, _, $window, growl, $http, URLSer
     //StompService.connect("guest", "guest", function(){} ,function(){}, '/');
     $rootScope.mms_viewContentLoading = false;
     $rootScope.mms_treeInitial = '';
+    $rootScope.mms_treeInit = true;
     $rootScope.mms_title = '';
     $rootScope.mms_footer = 'JPL/Caltech PROPRIETARY — Not for Public Release or Redistribution. No export controlled documents allowed on this server.';
 
