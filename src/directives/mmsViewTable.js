@@ -59,16 +59,13 @@ function mmsViewTable($compile, $timeout, $templateCache, UtilsService) {
                         if( string.indexOf(text) >= 0 ) { //if the search text is contained in the cell
                             var match = /\r|\n/.exec(string);
                             if (match) {
-                                console.log(string);
-                                console.log('it has a line break');
-                                //console.log( eval('({' + string + '})') );
-                                console.log( trs[i].getElementsByTagName("span")[j] );
-                                //console.log( trs[i].getElementsByTagName("span")[j].text );
-                                //console.log( trs[i].getElementsByTagName("span")[j].getElementsByTagName("span") );
                                 var dig = trs[i].getElementsByTagName("span")[j].getElementsByTagName("span");
                                 var digSize = dig.length-1;
-                                console.log( dig[digSize] );
-                                console.log( dig[digSize].innerHTML );
+                                var innerText = dig[digSize].innerHTML;
+
+                                console.log(innerText);
+                                //console.log( dig[digSize] );
+                                //console.log( dig[digSize].innerHTML );
                                 //console.log( trs[i].getElementsByTagName("span")[j].text() );
                             }
                             toggle = false; //will not toggle the row off
