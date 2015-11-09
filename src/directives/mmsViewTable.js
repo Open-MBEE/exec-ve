@@ -57,7 +57,9 @@ function mmsViewTable($compile, $timeout, $templateCache, UtilsService) {
                         var string = trs[i].getElementsByTagName("span")[j].innerHTML; //Grabs text in cell
                         if( string.indexOf(text) >= 0 ) { //if the search text is contained in the cell
                             var match = /\r|\n/.exec(string);
+                            //Check for false positives if there is a nextline in the string
                             if (match) {
+                                //Stripping out extra text in the false positive
                                 var dig = trs[i].getElementsByTagName("span")[j].getElementsByTagName("span");
                                 var digSize = dig.length-1;
                                 var innerText = dig[digSize].innerHTML;
