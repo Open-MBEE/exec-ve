@@ -422,8 +422,8 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         angular.element('.btn-filter-facet-' + filterFacet).addClass('active');
     };
 
-    $scope.searchGoToDocument = function (documentId, viewId) {
-        $state.go('workspace.site.document.view', {document: documentId, view: viewId, tag: undefined, search: undefined});
+    $scope.searchGoToDocument = function (siteId, documentId, viewId) {
+        $state.go('workspace.site.document.view', {site: siteId, document: documentId, view: viewId, tag: undefined, search: undefined});
     };
 
     $scope.$on('print', function() {
