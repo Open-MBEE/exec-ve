@@ -677,16 +677,25 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
      */
     var getElementVersions = function(id, update, workspace) {
         var n = normalize(id, update, workspace, 'versions');
+
+        var key = 'getElementVersions(' + id + n.update + n.ws + ')';
+        if (inProgress.hasOwnProperty(key)) {
+            return inProgress[key];
+        }
+
         var deferred = $q.defer();
         if (CacheService.exists(n.cacheKey) && !n.update) {
             deferred.resolve(CacheService.get(n.cacheKey));
             return deferred.promise;
         }
+        inProgress[key] = deferred.promise;
         $http.get(URLService.getElementVersionsURL(id, n.ws))
         .success(function(data, statas, headers, config){
             deferred.resolve(CacheService.put(n.cacheKey, data.versions, true));
-        }).error(function(data, status, headers, config){
+            delete inProgress[key];
+        }).error(function(data, status, headers, config) {
             URLService.handleHttpStatus(data, status, headers, config, deferred);
+            delete inProgress[key];
         });
         return deferred.promise;
     };
