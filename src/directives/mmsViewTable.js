@@ -39,51 +39,21 @@ function mmsViewTable($compile, $timeout, $templateCache, UtilsService) {
         scope.search = function() {
             var text = scope.searchTerm;
             var rows = trs.length;
-            var columns = trs[0].getElementsByTagName("td").length;
 
-            var i = 0, j = 0;
+            var i = 0;
             if(text.length === 0) { //If Search Empty, Reset all rows
                 for(i = 0; i < rows; i++) {
-                    for(j = 0; j < columns; j++) {
-                        //Goes through all cells in tables and toggles them on
-                        trs[i].getElementsByTagName("td")[j].style.display = "";
-                    }
+                    $(trs[i]).show();
                 }
             }
-            else if(text.length >0 && rows > 0) { //If there is text in the search and more than 0 rows
+            else if(text.length > 0 && rows > 0) { //If there is text in the search and more than 0 rows
                 for(i = 0; i < rows; i++) {
-                    var toggle = true; //This will toggle the on and off
-                    for(j = 0; j < columns; j++) { //goes through each cell in the row
-                        var string = trs[i].getElementsByTagName("span")[j].innerHTML; //Grabs text in cell
-                        if( string.indexOf(text) >= 0 ) { //if the search text is contained in the cell
-                            var match = /\r|\n/.exec(string);
-                            //Check for false positives if there is a nextline in the string
-                            if (match) {
-                                //Stripping out extra text in the false positive
-                                var dig = trs[i].getElementsByTagName("span")[j].getElementsByTagName("span");
-                                var digSize = dig.length-1;
-                                var innerText = dig[digSize].innerHTML;
-
-                                //If false positive innterHTML does match, keep visible
-                                if( innerText.indexOf(text) >= 0 ) {
-                                    toggle = false; //will not toggle the row off
-                                }
-                            }
-                            else {
-                                toggle = false; //will not toggle the row off
-                            }
-                        }
+                    var string = $(trs[i]).text();
+                    if( string.indexOf(text) >= 0 ) { //if the search text is contained in the cell
+                        $(trs[i]).show();
                     }
-
-                    if(toggle) { //If a cell in the row was not toggled off, turn off that row
-                        for (j = 0; j < columns; j++) { //goes through each cell in that row
-                            trs[i].getElementsByTagName("td")[j].style.display = "none"; //turn off cell
-                        }
-                    }
-                    else { //in case previously turned off, always turn on by default
-                        for(j = 0; j < columns; j++) {
-                            trs[i].getElementsByTagName("td")[j].style.display = ""; // turn on cell
-                        }
+                    else {
+                        $(trs[i]).hide();
                     }
                 }
             }
