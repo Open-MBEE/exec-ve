@@ -77,6 +77,8 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
     $scope.etrackerChange = function() {
         $scope.specApi.keepMode();
         var id = $scope.tracker.etrackerSelected;
+        if (!id)
+            return;
         var info = id.split('|');
         if (info[0] === 'element') {
             $scope.eid = info[1];

@@ -3,8 +3,8 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('ViewCtrl', ['$scope', '$rootScope', '$state', '$stateParams', '$timeout', '$modal', '$window', 'viewElements', 'MmsAppUtils', 'ElementService', 'ViewService', 'ConfigService', 'time', 'growl', 'workspace', 'site', 'document', 'view', 'tag', 'snapshot', 'UxService', 'hotkeys',
-function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, viewElements, MmsAppUtils, ElementService, ViewService, ConfigService, time, growl, workspace, site, document, view, tag, snapshot, UxService, hotkeys) {
+.controller('ViewCtrl', ['$scope', '$rootScope', '$state', '$stateParams', '$timeout', '$modal', '$window', 'viewElements', 'MmsAppUtils', 'ElementService', 'ViewService', 'ConfigService', 'time', 'search', 'growl', 'workspace', 'site', 'document', 'view', 'tag', 'snapshot', 'UxService', 'hotkeys',
+function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, viewElements, MmsAppUtils, ElementService, ViewService, ConfigService, time, search, growl, workspace, site, document, view, tag, snapshot, UxService, hotkeys) {
     
     /*$scope.$on('$viewContentLoaded', 
         function(event) {
@@ -51,6 +51,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         $rootScope.mms_ShowEdits = false;
 
     var ws = $stateParams.workspace;
+    $scope.search = search;
     $scope.ws = ws;
     $scope.view = view;
     $scope.viewElements = viewElements;
@@ -62,6 +63,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     $scope.bbApi.init = function() {
         if ($state.includes('workspace.site.document')) {
             $scope.bbApi.addButton(UxService.getButtonBarButton('print'));
+            $scope.bbApi.addButton(UxService.getButtonBarButton('tabletocsv'));
         }
         if (view && view.editable && time === 'latest') {
             $scope.bbApi.addButton(UxService.getButtonBarButton('show.edits'));
@@ -405,7 +407,30 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         }
     };
 
+
+    $scope.facet = '$';
+    $scope.filterQuery = {query: ""};
+    $scope.$watchGroup(['filterQuery.query', 'facet'], function(newVal, oldVal){
+        $scope.searchFilter = {};
+        $scope.searchFilter[$scope.facet] = $scope.filterQuery.query;
+    });
+
+    $scope.setFilterFacet = function(filterFacet) {
+        if(filterFacet === 'all') $scope.facet = '$';
+        else  $scope.facet = filterFacet;
+        angular.element('.search-filter-type button').removeClass('active');
+        angular.element('.btn-filter-facet-' + filterFacet).addClass('active');
+    };
+
+    $scope.searchGoToDocument = function (documentId, viewId) {
+        $state.go('workspace.site.document.view', {document: documentId, view: viewId, tag: undefined, search: undefined});
+    };
+
     $scope.$on('print', function() {
         MmsAppUtils.popupPrintConfirm(view, $scope.ws, time, false);
+    });
+    
+    $scope.$on('tabletocsv', function() {
+        MmsAppUtils.tableToCsv(view, $scope.ws, time, false);
     });
 }]);

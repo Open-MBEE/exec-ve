@@ -168,7 +168,7 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
             if (scope.edit.specialization && scope.edit.specialization.type === 'Property' && 
                     !angular.equals(scope.edit.specialization.value, scope.element.specialization.value))
                 return true;
-            if (scope.edit.specialization.type === 'Constraint' && 
+            if (scope.edit.specialization && scope.edit.specialization.type === 'Constraint' && 
                     !angular.equals(scope.edit.specialization.specification, scope.element.specialization.specification))
                 return true;
         }

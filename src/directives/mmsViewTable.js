@@ -10,8 +10,10 @@ function mmsViewTable($compile, $timeout, $templateCache, UtilsService) {
     };
 
     var mmsViewTableLink = function(scope, element, attrs) {
-
+        if (!scope.table.showIfEmpty && scope.table.body.length === 0)
+            return;
         scope.searchTerm = '';
+
         var html = UtilsService.makeHtmlTable(scope.table);
         html = '<div class="tableSearch"><button ng-click="resetSearch()">reset</button><input type="text" ng-model="searchTerm"></input><button ng-click="search()">search</button></div>' + html;
         element[0].innerHTML = html;
