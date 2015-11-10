@@ -41,22 +41,14 @@ function mmsViewTable($compile, $timeout, $templateCache, UtilsService) {
         scope.search = function() {
             var text = scope.searchTerm;
             var rows = trs.length;
-
-            var i = 0;
-            if(text.length === 0) { //If Search Empty, Reset all rows
-                for(i = 0; i < rows; i++) {
+            // Go through each row, if match show row, else hide row
+            for(var i = 0; i < rows; i++) {
+                var string = $(trs[i]).text();
+                if( string.indexOf(text) >= 0 ) {
                     $(trs[i]).show();
                 }
-            }
-            else if(text.length > 0 && rows > 0) { //If there is text in the search and more than 0 rows
-                for(i = 0; i < rows; i++) {
-                    var string = $(trs[i]).text();
-                    if( string.indexOf(text) >= 0 ) { //if the search text is contained in the cell
-                        $(trs[i]).show();
-                    }
-                    else {
-                        $(trs[i]).hide();
-                    }
+                else {
+                    $(trs[i]).hide();
                 }
             }
         };
