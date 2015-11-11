@@ -128,7 +128,7 @@ function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxSe
                 if (reason.status === 410)
                     status = ' deleted';
                 element.html('<span class="error">comment ' + newVal + status + '</span>');
-                growl.error('Cf Comment Error: ' + reason.message + ': ' + scope.mmsEid);
+                //growl.error('Cf Comment Error: ' + reason.message + ': ' + scope.mmsEid);
             });
         });
 

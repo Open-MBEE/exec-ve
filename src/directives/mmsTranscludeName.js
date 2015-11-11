@@ -128,7 +128,7 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
                 if (reason.status === 410)
                     status = ' deleted';
                 element.html('<span class="error">name cf ' + newVal + status + '</span>');
-                growl.error('Cf Name Error: ' + reason.message + ': ' + scope.mmsEid);
+                //growl.error('Cf Name Error: ' + reason.message + ': ' + scope.mmsEid);
             });
         });
 
