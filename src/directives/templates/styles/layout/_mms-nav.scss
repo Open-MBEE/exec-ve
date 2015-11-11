@@ -49,7 +49,7 @@ mms-nav {
     display: block;
 
     a {
-      font-size: 14px;
+      font-size: 12px;
       color: $white;
       font-weight: $light_font_weight;
       line-height: 1.28571em;
@@ -556,4 +556,39 @@ mms-nav {
       opacity: 1;
     }
   }
+  #nav-form{
+      width:100% !important;
+  }
 }
+/* Start temp Laura*/
+#nav-form{
+    margin: 10px auto;
+    border:0;
+    outline:0;
+    border-bottom: 1px solid #fff !important;
+    //overflow: hidden;
+    background-color:$base_grey;
+    border-radius: 0 !important;
+    width: 355px;
+    height: 20px;
+    font-size: 12px;
+}
+#nav-form:before{
+    position:absolute;
+    font-family: "FontAwesome";
+    color: $white;
+    content: "\f002";
+}
+#button-temp{
+    background-color:transparent;
+    padding-top: 2px;
+    padding-bottom: 2px;
+}
+.btn-text{
+    text-transform: uppercase;
+}
+::-webkit-input-placeholder::before { font-family: fontAwesome; content:'\f002  '; color: $white;  float:right; }
+::-moz-placeholder::before  { font-family: fontAwesome; content:'\f002  '; color: $white; float:right; } /* firefox 19+ */
+
+
+/* end temp Laura */

@@ -1,65 +1,34 @@
-<header role="banner">
-  <div class="block">
-    <div class="banner-title">{{title}}</div>
-    <a ng-click="nav.toggleNav()" class="nav-btn"><i class="fa fa-lg fa-bars"></i></a>
-  </div>
-</header>
-
 <nav class="navbar navbar-default navbar-inverse navbar-fixed-top" role="navigation">
-  <div class="block">
-
-    <ul>
-
-      <ul class="nav-btns-main">
-        <li>
-          <a class="nav-btn" tooltip="Tasks and Tags" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom-left" ui-sref="workspace({search:undefined})"><i class="fa fa-tasks"> TASK </i></a>
-        </li>
-
-        <li ng-show="ws">
-          <select style="color:black" ng-change="updateWorkspace()" ng-model="ws">
-            <option ng-repeat="workspace in workspaces | orderBy:'qualifiedName'" value="{{workspace.id}}">
-              {{workspace.qualifiedName}}
-            </option>
-          </select> 
-        </li>
-
-        <li>
-          <a class="nav-btn"><i class="fa fa-tag"> TAG </i></a>
-        </li>
-
-        <li ng-show="ws">
-          <select style="color:black" ng-change="updateTag()" ng-model="config.id">
-            <option ng-click="latestTag()" value="">LATEST</option>
-            <option ng-repeat="tag in tags | orderBy:'name'" value="{{tag.id}}">
-              {{tag.name}}
-            </option>
-          </select> 
-        </li>
-
-        <!-- ALWAYS SHOW TAG AS LATEST (DROPDOWN)
-        <li ng-show="ws"> 
-          <span ng-if="config.timestamp != 'latest' && showTag != 'false'">( <i class="fa fa-tag"></i> {{config.name}} )</span>
-        </li>
-        -->
-
-        <li ng-show="site && site.sysmlid !== 'no-site'">
-          <a class="nav-btn" tooltip="Sites and Documents" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" ui-sref="workspace.site({site: site.sysmlid, search: undefined})"><i class="fa fa-folder"> SITE </i></a>
-        </li>
-        <li ng-show="site && site.sysmlid !== 'no-site'">
-          <strong>{{site.name}}</strong> 
-        </li>
-
-        <li ng-show="product">
-          <a class="nav-btn"><i class="fa fa-file"> DOCUMENT </i></a>
-        </li>
-        <li ng-show="product">
-          <strong>{{product.name}}</strong> 
-          <span ng-bind-html="snapshot"></span>
-          <span ng-show="snapshot" class="label label-danger">SNAPSHOT</span>
-        </li>
-
-      </ul>
-    </ul>
-
-  </div>
+    <div class="block">
+        <ul>
+            <ul class="nav-btns-main">
+                <li>
+                    <a class="nav-btn" tooltip="Tasks and Tags" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom-left" ui-sref="workspace({search:undefined})"><i class="fa fa-tasks"> TASK </i></a>
+                </li>
+                <li ng-show="ws">
+                    <select style="color:black" ng-change="updateWorkspace()" ng-model="ws">
+                        <option ng-repeat="workspace in workspaces | orderBy:'qualifiedName'" value="{{workspace.id}}">{{workspace.qualifiedName}}</option>
+                    </select>
+                </li>
+                <li><a class="nav-btn"><i class="fa fa-tag"> TAG </i></a></li>
+                <li ng-show="ws">
+                    <select style="color:black" ng-change="updateTag()" ng-model="config.id">
+                        <option ng-click="latestTag()" value="">LATEST</option>
+                        <option ng-repeat="tag in tags | orderBy:'name'" value="{{tag.id}}">{{tag.name}}</option>
+                    </select>
+                </li>
+                <!-- ALWAYS SHOW TAG AS LATEST (DROPDOWN)
+                    <li ng-show="ws"> 
+                    <span ng-if="config.timestamp != 'latest' && showTag != 'false'">( <i class="fa fa-tag"></i> {{config.name}} )</span>
+                    </li>
+                -->
+                <li ng-show="site && site.sysmlid !== 'no-site'">
+                    <a class="nav-btn" tooltip="Sites and Documents" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" ui-sref="workspace.site({site: site.sysmlid, search: undefined})"><i class="fa fa-folder"> SITE </i></a>
+                </li>
+                <li ng-show="site && site.sysmlid !== 'no-site'"><strong>{{site.name}}</strong></li>
+                <li ng-show="product"><a class="nav-btn"><i class="fa fa-file"> DOCUMENT </i></a></li>
+                <li ng-show="product"><strong>{{product.name}}</strong><span ng-bind-html="snapshot"></span><span ng-show="snapshot" class="label label-danger">SNAPSHOT</span></li>
+            </ul>
+        </ul>
+    </div>
 </nav>
