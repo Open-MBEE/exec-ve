@@ -2,21 +2,21 @@
     <div class="block">
         <ul>
             <ul class="nav-btns-main">
-                <li>
+                <!-- <li>
                     <a class="nav-btn" tooltip="Tasks and Tags" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom-left" ui-sref="workspace({search:undefined})"><i class="fa fa-tasks"> TASK </i></a>
-                </li>
-                <li ng-show="ws">
+                </li> -->
+                <!-- <li ng-show="ws">
                     <select style="color:black" ng-change="updateWorkspace()" ng-model="ws">
                         <option ng-repeat="workspace in workspaces | orderBy:'qualifiedName'" value="{{workspace.id}}">{{workspace.qualifiedName}}</option>
                     </select>
-                </li>
-                <li><a class="nav-btn"><i class="fa fa-tag"> TAG </i></a></li>
-                <li ng-show="ws">
+                </li> -->
+                <!-- <li><a class="nav-btn"><i class="fa fa-tag"> TAG </i></a></li> -->
+                <!-- <li ng-show="ws">
                     <select style="color:black" ng-change="updateTag()" ng-model="config.id">
                         <option ng-click="latestTag()" value="">LATEST</option>
                         <option ng-repeat="tag in tags | orderBy:'name'" value="{{tag.id}}">{{tag.name}}</option>
                     </select>
-                </li>
+                </li> -->
                 <!-- ALWAYS SHOW TAG AS LATEST (DROPDOWN)
                     <li ng-show="ws"> 
                     <span ng-if="config.timestamp != 'latest' && showTag != 'false'">( <i class="fa fa-tag"></i> {{config.name}} )</span>
@@ -28,6 +28,23 @@
                 <li ng-show="site && site.sysmlid !== 'no-site'"><strong>{{site.name}}</strong></li>
                 <li ng-show="product"><a class="nav-btn"><i class="fa fa-file"> DOCUMENT </i></a></li>
                 <li ng-show="product"><strong>{{product.name}}</strong><span ng-bind-html="snapshot"></span><span ng-show="snapshot" class="label label-danger">SNAPSHOT</span></li>
+            </ul>
+            <ul class="nav-btns pull-right">
+                <li><a class="nav-btn" tooltip="Tasks and Tags" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom-left" ui-sref="workspace({search:undefined})">TASK </i></a></li>
+                <li ng-show="ws">
+                    <label class="selection">
+                    <select class="menu-select-box" ng-change="updateWorkspace()" ng-model="ws" >
+                        <option ng-repeat="workspace in workspaces | orderBy:'qualifiedName'" value="{{workspace.id}}">{{workspace.qualifiedName}}</option>
+                    </select>
+                </label>
+                </li>
+                <li><a class="nav-btn">TAG</i></a></li>
+                <li ng-show="ws">
+                    <select class="menu-select-box" ng-change="updateTag()" ng-model="config.id">
+                        <option ng-click="latestTag()" value="">LATEST</option>
+                        <option ng-repeat="tag in tags | orderBy:'name'" value="{{tag.id}}">{{tag.name}} ></option>
+                    </select>
+                </li>
             </ul>
         </ul>
     </div>

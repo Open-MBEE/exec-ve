@@ -589,6 +589,18 @@ mms-nav {
 }
 ::-webkit-input-placeholder::before { font-family: fontAwesome; content:'\f002  '; color: $white;  float:right; }
 ::-moz-placeholder::before  { font-family: fontAwesome; content:'\f002  '; color: $white; float:right; } /* firefox 19+ */
+.menu-select-box{
+    border:0;
+    outline:0;
+    background-color: $base_grey;
+    color: $white;
+    border-radius: 0 !important;
+    appearance:none;
+    -moz-appearance:none; /* Firefox */
+    -webkit-appearance:none; /* Safari and Chrome */
+}
+::-webkit-select::before { font-family: fontAwesome; content:'\f002  '; color: $white;  float:right; }
+::-moz-select::before  { font-family: fontAwesome; content:'\f002  '; color: $white; float:right; } /* firefox 19+ */
 
 
 /* end temp Laura */
