@@ -45,6 +45,16 @@
                         <option ng-repeat="tag in tags | orderBy:'name'" value="{{tag.id}}">{{tag.name}} ></option>
                     </select>
                 </li>
+                <li class="dropdown" ng-show="ws">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>
+                <ul class="dropdown-menu"><!-- angular ui dropdown! -->
+                <li><a href="#">Action</a></li>
+                <li><a href="#">Another action</a></li>
+                <li><a href="#">Something else here</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a href="#">Separated link</a></li>
+                </ul>
+                </li>
             </ul>
         </ul>
     </div>
