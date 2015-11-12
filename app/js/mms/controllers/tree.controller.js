@@ -599,6 +599,8 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
                 var documentSiteBranch = $rootScope.mms_treeApi.get_parent_branch(branch);
                 $state.go('workspace.site.document', {site: documentSiteBranch.data.sysmlid, document: branch.data.sysmlid, search: undefined});
             }
+        } else if ($state.includes('workspace.site.document')) {
+            $rootScope.mms_treeApi.expand_branch(branch);
         }
     };
 
