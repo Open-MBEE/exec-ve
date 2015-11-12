@@ -812,7 +812,17 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
     var createView = function(ownerId, name, documentId, workspace, viewId, viewDoc, site) {
         var deferred = $q.defer();
         var view = {
-            specialization: {type: 'View'},
+            specialization: {
+                type: 'View',
+                allowedElements: [],
+                displayedElements: [],
+                childrenViews: [],
+                contents: {
+                    valueExpression: null,
+                    operand: [],
+                    type: 'Expression'
+                }
+            },
             owner: ownerId,
             name: !name ? 'Untitled View' : name,
             documentation: '',
@@ -827,8 +837,9 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
 
         ElementService.createElement(view, workspace, site)
         .then(function(data) {
-            data.specialization.allowedElements = [data.sysmlid];
-            data.specialization.displayedElements = [data.sysmlid];
+            /*
+            data.specialization.allowedElements = [];
+            data.specialization.displayedElements = [];
             data.specialization.childrenViews = [];
 
             var jsonBlob = {
@@ -838,19 +849,19 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 'sourceProperty': 'documentation'
             };
             addInstanceSpecification(data, workspace, "Paragraph", true, null, "View Documentation", jsonBlob, true)
-            .then(function(data2) {
+            .then(function(data2) {*/
                 if (documentId) {
-                    addViewToDocument(data.sysmlid, documentId, ownerId, workspace, data2)
+                    addViewToDocument(data.sysmlid, documentId, ownerId, workspace, data)
                     .then(function(data3) {
-                        deferred.resolve(data2);
+                        deferred.resolve(data);
                     }, function(reason) {
                         deferred.reject(reason);
                     });
                 } else
-                    deferred.resolve(data2);
-            }, function(reason) {
+                    deferred.resolve(data);
+            /*}, function(reason) {
                 deferred.reject(reason);
-            });
+            });*/
         }, function(reason) {
             deferred.reject(reason);
         });
@@ -875,7 +886,16 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
     var createDocument = function(name, site, workspace) {
         var deferred = $q.defer();
         var doc = {
-            specialization: {type: "Product"},
+            specialization: {
+                type: "Product", 
+                allowedElements: [],
+                displayedElements: [],
+                contents: {
+                    valueExpression: null,
+                    operand: [],
+                    type: 'Expression'
+                }
+            },
             name: !name ? 'Untitled Document' : name,
             documentation: '',
             appliedMetatypes: [
@@ -886,22 +906,21 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         };
         ElementService.createElement(doc, workspace, site)
         .then(function(data) {
-            data.specialization.allowedElements = [data.sysmlid];
-            data.specialization.displayedElements = [data.sysmlid];
             data.specialization.view2view = [
                 {
                     id: data.sysmlid,
                     childrenViews: []
                 }
             ];
-
+            ElementService.updateElement(data, workspace)
+            /*
             var jsonBlob = {
                 'type': 'Paragraph', 
                 'sourceType': 'reference', 
                 'source': data.sysmlid, 
                 'sourceProperty': 'documentation'
             };
-            addInstanceSpecification(data, workspace, "Paragraph", true, site, "View Documentation", jsonBlob)
+            addInstanceSpecification(data, workspace, "Paragraph", true, site, "View Documentation", jsonBlob) */
             .then(function(data2) {
                 var ws = !workspace ? 'master' : workspace;
                 var cacheKey = ['sites', ws, 'latest', site, 'products'];

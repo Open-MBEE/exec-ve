@@ -160,6 +160,8 @@ module.exports = function(grunt) {
           console: true,
           Stomp:true,
           Timely: true,
+          jQuery: true,
+          $: true,
           __timely: true
         }
       }
@@ -354,6 +356,29 @@ module.exports = function(grunt) {
           }
         ]
       },
+      arrmems: {
+        options: {
+          hostname: '*',
+          port: 9000,
+          middleware: function(connect) {
+            return [proxySnippet];
+          }
+        },
+        proxies: [
+          {
+            context: '/alfresco',  // '/api'
+            host: 'arrmems.jpl.nasa.gov',//128.149.16.152',
+            port: 443,
+            changeOrigin: true,
+            https: true,
+          },
+          {
+            context: '/',
+            host: 'localhost',
+            port: 9001
+          }
+        ]
+      },
       rnems: {
         options: {
           hostname: '*',
@@ -445,7 +470,7 @@ module.exports = function(grunt) {
         options: {
           publish: [{
             id: 'gov.nasa.jpl:evm:zip',
-            version: '0.2.2-SNAPSHOT',
+            version: '0.2.3-SNAPSHOT',
             path: 'deploy/'
           }]
         }

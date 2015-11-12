@@ -193,11 +193,65 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
             else {
                 $rootScope.mms_fullDocMode = true;
                 $rootScope.mms_bbApi.setToggleState("tree.full.document", true);
-                $state.go('workspace.site.document.full'); 
+                $state.go('workspace.site.document.full', {search: undefined}); 
             }
         });
     };
 
+    var tableToCsv = function(ob, ws, time, isDoc) {
+         var modalInstance = $modal.open({
+            templateUrl: 'partials/mms/tableExport.html',
+            controller: function($scope, $modalInstance, type) {
+                $scope.type = type;
+                $scope.export = function() {
+                    $modalInstance.close('export');
+                };
+                // $scope.fulldoc = function() {
+                //     $modalInstance.close('fulldoc');
+                // };
+                $scope.cancel = function() {
+                    $modalInstance.dismiss();
+                };
+            },
+            resolve: {
+                type: function() { return isDoc ? 'DOCUMENT' : 'VIEW';}
+            },
+            backdrop: 'static',
+            keyboard: false
+        });
+        modalInstance.result.then(function(choice) {
+            if (choice === 'export') {
+               var tableCSV = [];
+               // Grab all tables and run export to csv fnc
+                angular.element('#print-div').find("table").each(function(elt){
+                    var tableObj = {};
+                    if (this.caption) {
+                      tableObj.caption = this.caption.innerHTML;                        
+                    } else 
+                      tableObj.caption = 'no caption';
+                    tableObj.val = angular.element(this).table2CSV({delivery:'value'});
+                    tableCSV.push(tableObj);
+                });
+                var exportPopup = function(data) {
+                    var generator = window.open('', 'csv', 'height=600,width=800,scrollbars=1');
+                    generator.document.write('<html><head><title>Tables to CSV</title>');
+                    generator.document.write('</head><body >');
+                    generator.document.write(data);
+                    generator.document.write('</body></html>');
+                    generator.document.close();
+                    return true;
+                };
+                // generate text area content for popup
+                var genTextArea ='';
+                angular.element(tableCSV).each(function(){
+                    genTextArea += '<h2>'+ this.caption +'</h2><textArea cols=100 rows=15 wrap="off" >';
+                    genTextArea += this.val + '</textArea>';
+                });
+                exportPopup(genTextArea);
+            }
+        });
+    };
+    
     var popupPrint = function(ob, ws, time, isDoc) {
         var printContents = '';//$window.document.getElementById('print-div').outerHTML;
         var printElementCopy = angular.element('#print-div').clone();//angular.element(printContents);
@@ -222,6 +276,7 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
         });
         var comments = printElementCopy.find('mms-transclude-com');
         comments.remove();
+        printElementCopy.find('div.tableSearch').remove();
         printElementCopy.find('.error').html('error');
         var docView = printElementCopy.find("mms-view[mms-vid='" + ob.sysmlid + "']");
         if (isDoc)
@@ -241,7 +296,9 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
                 popupWin.document.open();
                 popupWin.document.write('<html><head><link href="css/ve-mms.styles.min.css" rel="stylesheet" type="text/css"></head><body style="overflow: auto">' + cover + tocContents + printContents + '</html>');
                 popupWin.document.close();
-                popupWin.print();
+                $timeout(function() {
+                    popupWin.print();
+                }, 1000, false);
         };
         if (isDoc) {
             tocContents = UtilsService.makeHtmlTOC($rootScope.mms_treeApi.get_rows());
@@ -269,7 +326,8 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
 
     return {
         addPresentationElement: addPresentationElement,
-        popupPrintConfirm: popupPrintConfirm
+        popupPrintConfirm: popupPrintConfirm,
+        tableToCsv: tableToCsv
     };
 }
     

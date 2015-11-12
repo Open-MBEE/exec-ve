@@ -251,25 +251,26 @@ function UtilsService(CacheService, _) {
             result.push('<caption>' + table.title + '</caption>');
         if (table.header) {
             result.push('<thead>');
-            result.push(makeTableBody(table.header));
+            result.push(makeTableBody(table.header, true));
             result.push('</thead>');
         }
         result.push('<tbody>');
-        result.push(makeTableBody(table.body));
+        result.push(makeTableBody(table.body, false));
         result.push('</tbody>');
         result.push('</table>');
         return result.join('');
 
     };
 
-    var makeTableBody = function(body) {
+    var makeTableBody = function(body, header) {
         var result = [], i, j, k, row, cell, thing;
+        var dtag = (header ? 'th' : 'td');
         for (i = 0; i < body.length; i++) {
             result.push('<tr>');
             row = body[i];
             for (j = 0; j < row.length; j++) {
                 cell = row[j];
-                result.push('<td colspan="' + cell.colspan + '" rowspan="' + cell.rowspan + '">');
+                result.push('<' + dtag + ' colspan="' + cell.colspan + '" rowspan="' + cell.rowspan + '">');
                 for (k = 0; k < cell.content.length; k++) {
                     thing = cell.content[k];
                     result.push('<div>');
@@ -284,7 +285,7 @@ function UtilsService(CacheService, _) {
                     }
                     result.push('</div>');
                 }
-                result.push('</td>');
+                result.push('</' + dtag + '>');
             }
             result.push('</tr>');
         }

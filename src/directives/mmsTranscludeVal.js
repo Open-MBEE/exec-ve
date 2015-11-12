@@ -210,7 +210,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                 if (reason.status === 410)
                     status = ' deleted';
                 element.html('<span class="error">value cf ' + newVal + status + '</span>');
-                growl.error('Cf Val Error: ' + reason.message + ': ' + scope.mmsEid);
+                //growl.error('Cf Val Error: ' + reason.message + ': ' + scope.mmsEid);
             });
         });
 
@@ -312,7 +312,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                                     }
                                 }
                                 scope.options = newArray;
-                                Utils.addFrame(scope,mmsViewCtrl,element,frameTemplate);
+                                Utils.addFrame(scope,mmsViewCtrl,element,frameTemplate); //For Edit view, no need for addFrame
                             },
                             function(reason) {
                                 console.log(reason);

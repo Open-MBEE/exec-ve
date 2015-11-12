@@ -1,3 +1,4 @@
+<div ng-if="search === null">
 <div fa-pane pane-anchor="north" pane-size="41px" pane-no-toggle="true" pane-no-scroll="true">
     <div class="pane-center-btn-group">      
         <mms-button-bar buttons="buttons" mms-bb-api="bbApi"></mms-button-bar>
@@ -10,6 +11,9 @@
     </div>
     </div>
 </div>
+</div>
 
-
+<div ng-if="search !== null">
+    <ng-include src="'partials/mms/pane-center-search.html'"></ng-include>
+</div>
 
