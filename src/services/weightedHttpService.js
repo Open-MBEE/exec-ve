@@ -44,6 +44,8 @@ function HttpService($http, $q, _) {
             else
                 queue[1].push(request); 
             cache[url] = request;// a map of requests by url key as url 
+        } else if(request.weight === 3){
+            
         }
         else {
             inProgress++;
