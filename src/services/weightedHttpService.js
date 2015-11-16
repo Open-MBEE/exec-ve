@@ -27,7 +27,7 @@ function HttpService($http, $q, _) {
      * @methodOf mms.HttpService
      * 
      * @description
-     * Put a new get request in the queue, the queue is LIFO
+     * Put a new get request in the queue, the queue is FIFO
      *
      * @param {string} url url to get
      * @param {function} success success function
@@ -35,35 +35,53 @@ function HttpService($http, $q, _) {
      * @param {string} proirity by weight
      */
     var get = function(url, success, error, weight) {
-        
+        //wrap in case for duplicate URL--- has to return to both promises
         if (inProgress >= GET_OUTBOUND_LIMIT) {// there is already more then 20 requests add it to the cache
             // push to top of list
-            var request = { url : url, success : success, error: error, weight: weight };
+            var deferred = $q.defer();
+            var request = { url : url, deferred: deferred ,weight: weight };
             if(request.weight === 0) // push new request to the end of array
                 queue[0].push(request);
             else
                 queue[1].push(request); 
-            cache[url] = request;// a map of requests by url key as url 
+            cache[url] = request;// a map of requests by url key as url
+            if(cache.hasOwnProperty(url)){
+                duplicate[url] = request;
+            } 
+            return deferred;
         } else if(request.weight === 3){
-            
+            // do I need to check for dups?
+            return $q(function(resolve, reject){
+                $http.get(url).then(function(response){
+                    if(reponse.status == 200){
+                        resolve(response.data);
+                    }
+                    else{
+                        reject(response);
+                    }
+                });
         }
         else {
             inProgress++;
             if (cache.hasOwnProperty(url)) {
                 delete cache[url];
             }
-            $http.get(url)
-                .then(function(reponse){
-                    
-                }
-                finally( function() {
-                    inProgress--;
-                    
+            return $q(function(resolve, reject){
+                $http.get(url).then(function(response){
+                    if(reponse.status == 200){
+                        resolve(response.data);
+                    }
+                    else{
+                        reject(response);
+                    }
+                }.finally( function() {
+                    inProgress--;    
                     if (queue.length > 0) {
                         var next = queue.shift();
-                        get(next.url, next.success, next.error);
+                        get(next.url, next.defer, next.weight);
                     }
-                });
+                })
+            });
         }
         // $http.get(url)
         // .then(function(response) {
@@ -78,14 +96,6 @@ function HttpService($http, $q, _) {
         //case 1: immediate 
         //case 2: medium level FIFO
         // case 3: low level FIFO
-        
-        $http.get(url)
-        .then(function(response){
-            //some code reponse.data
-        },
-        function(error){
-            // some error 
-        });
     };
     function search(cache){
         //if exists cache return true else false
