@@ -126,9 +126,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                     return null;
                 }
 
-                // TODO: Change search attributes to '*" once implemented on MMS/Server-side
-                // TODO: 'aspect' generates 500
-                return ElementService.search($stateParams.search, ['id','documentation', 'name', 'value', 'appliedMetatypes', 'metatypes'], null, false, workspace)
+                return ElementService.search($stateParams.search, ['*'], null, false, workspace)
                 .then(function(data) {
 
                     // change properties arr to 2-dim to display table
