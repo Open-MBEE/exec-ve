@@ -9,7 +9,7 @@
     <tr ng-repeat="version in history | filter:historyFilter | orderBy:'-created'">
         <td>{{version.modifier}}</td>
         <td>
-            <a ng-click="timestampClicked(version.timestamp)" ui-sref-opts="{reload: true}">{{version.timestamp | date:'M/d/yy h:mm a'}}</a>
+            <a ng-click="timestampClicked(version.timestamp)">{{version.timestamp | date:'M/d/yy h:mm a'}}</a>
         </td>
     </tr>
 </table>
