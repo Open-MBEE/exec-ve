@@ -31,30 +31,42 @@
             </ul>
             <ul class="nav-btns pull-right">
                 <li><a class="nav-btn" tooltip="Tasks and Tags" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom-left" ui-sref="workspace({search:undefined})">TASK </i></a></li>
-                <li ng-show="ws">
+                <li>
+                    <span dropdown>
+                      <a type="button" class="dropdown-toggle" dropdown-toggle>{{ws}} <i class="fa fa-sort-down"></i></a>
+                      <ul class="dropdown-menu" role="menu">
+                        <li>
+                            <a ng-repeat="workspace in workspaces | orderBy:'qualifiedName'"  type="button" ng-click="updateWorkspace(workspace.id)">{{workspace.qualifiedName}}</a>
+                        </li>
+                      </ul>
+                    </span>
+                </li>
+                
+                <!-- <li ng-show="ws">
                     <label class="selection">
                     <select class="menu-select-box" ng-change="updateWorkspace()" ng-model="ws" >
                         <option ng-repeat="workspace in workspaces | orderBy:'qualifiedName'" value="{{workspace.id}}">{{workspace.qualifiedName}}</option>
                     </select>
                 </label>
-                </li>
+                </li> -->
                 <li><a class="nav-btn">TAG</i></a></li>
-                <li ng-show="ws">
+                <li>
+                    <span dropdown>
+                      <a type="button" class="dropdown-toggle" dropdown-toggle>{{config.name}} <i class="fa fa-sort-down"></i></a>
+                      <ul class="dropdown-menu" role="menu">
+                        <li>
+                                <a ng-click="latestTag()" value="">LATEST</a>
+                                <a ng-repeat="tag in tags | orderBy:'name'"  type="button" ng-click="config.id = tag.id; updateTag()">{{tag.name}}</a>
+                        </li>
+                      </ul>
+                    </span>
+                </li>
+                <!-- <li ng-show="ws">
                     <select class="menu-select-box" ng-change="updateTag()" ng-model="config.id">
                         <option ng-click="latestTag()" value="">LATEST</option>
                         <option ng-repeat="tag in tags | orderBy:'name'" value="{{tag.id}}">{{tag.name}} ></option>
                     </select>
-                </li>
-                <li class="dropdown" ng-show="ws">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>
-                <ul class="dropdown-menu"><!-- angular ui dropdown! -->
-                <li><a href="#">Action</a></li>
-                <li><a href="#">Another action</a></li>
-                <li><a href="#">Something else here</a></li>
-                <li role="separator" class="divider"></li>
-                <li><a href="#">Separated link</a></li>
-                </ul>
-                </li>
+                </li> -->
             </ul>
         </ul>
     </div>

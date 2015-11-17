@@ -41,9 +41,11 @@ function mmsMenu(SiteService, WorkspaceService, ConfigService, $state, $template
     var mmsMenuLink = function(scope, element, attrs) {
         var catNames = [];
         var sites = {};
-
-        scope.updateWorkspace = function() {
-            $state.go($state.current.name, {workspace: scope.ws, tag: undefined, search: undefined});
+        
+        scope.currentTag = scope.config.id;
+        
+        scope.updateWorkspace = function(wsId) {
+            $state.go($state.current.name, {workspace: wsId, tag: undefined, search: undefined});
         };
 
         scope.updateTag = function() {

@@ -13,10 +13,13 @@
             <li style="padding-right: 44px;"><a style="font-size: 14px;" href="http://localhost:9000/mms.html#/workspaces/master/sites">View Editor</a></li>
             <form class="nav-search-form navbar-form" style="display: inline" role="search" ng-submit="search(searchText)">
                 <div class="form-search input-group">
-                    <input class="form-control" type="text" ng-model="searchText" placeholder="Search DeLorean Time Machine" id="nav-form" />
-                    <span class="input-group-btn">
+                    <div class="search-field">
+                        <input class="form-control" type="text" ng-model="searchText" placeholder="Search DeLorean Time Machine" id="nav-form" />
+                        <button type="button" ng-click="search(searchText)"><i class="fa fa-search {{searchClass}}"></i></button>
+                    </div>
+                    <!-- <span class="input-group-btn">
                         <button id="button-temp" class="btn btn-primary" type="button" ng-click="search(searchText)"><span class="btn-text">advanced search</span> <i class="{{searchClass}}"></i></button>
-                    </span>
+                    </span> -->
                 </div>
             </form>
             <!-- Dashboard, Support, Feedback, and Logout buttons -->

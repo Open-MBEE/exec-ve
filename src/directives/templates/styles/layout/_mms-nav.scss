@@ -559,36 +559,38 @@ mms-nav {
   #nav-form{
       width:100% !important;
   }
+  nav.navbar.navbar-default.navbar-inverse.navbar-fixed-top{
+      overflow:hidden;
+  }
 }
 /* Start temp Laura*/
 #nav-form{
-    margin: 10px auto;
     border:0;
     outline:0;
+    padding: 0px 2px 0px 2px;
     border-bottom: 1px solid #fff !important;
-    //overflow: hidden;
     background-color:$base_grey;
     border-radius: 0 !important;
     width: 355px;
     height: 20px;
     font-size: 12px;
 }
-#nav-form:before{
-    position:absolute;
-    font-family: "FontAwesome";
-    color: $white;
-    content: "\f002";
-}
-#button-temp{
-    background-color:transparent;
-    padding-top: 2px;
-    padding-bottom: 2px;
-}
-.btn-text{
-    text-transform: uppercase;
-}
-::-webkit-input-placeholder::before { font-family: fontAwesome; content:'\f002  '; color: $white;  float:right; }
-::-moz-placeholder::before  { font-family: fontAwesome; content:'\f002  '; color: $white; float:right; } /* firefox 19+ */
+// #nav-form:before{
+//     position:absolute;
+//     font-family: "FontAwesome";
+//     color: $white;
+//     content: "\f002";
+// }
+// #button-temp{
+//     background-color:transparent;
+//     padding-top: 2px;
+//     padding-bottom: 2px;
+// }
+// .btn-text{
+//     text-transform: uppercase;
+// }
+// ::-webkit-input-placeholder::before { font-family: fontAwesome; content:'\f002  '; color: $white;  float:right; }
+// ::-moz-placeholder::before  { font-family: fontAwesome; content:'\f002  '; color: $white; float:right; } /* firefox 19+ */
 .menu-select-box{
     border:0;
     outline:0;
@@ -599,8 +601,14 @@ mms-nav {
     -moz-appearance:none; /* Firefox */
     -webkit-appearance:none; /* Safari and Chrome */
 }
-::-webkit-select::before { font-family: fontAwesome; content:'\f002  '; color: $white;  float:right; }
-::-moz-select::before  { font-family: fontAwesome; content:'\f002  '; color: $white; float:right; } /* firefox 19+ */
-
-
+.search-field {
+    display: inline-block;
+}
+.search-field button {
+    background:none;
+    border:0;
+    height:20px;
+    border-bottom: 1px solid #fff !important;
+    padding:0px 0px 0px 1px;
+}
 /* end temp Laura */
