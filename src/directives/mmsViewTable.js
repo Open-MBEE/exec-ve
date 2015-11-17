@@ -43,8 +43,10 @@ function mmsViewTable($compile, $timeout, $templateCache, UtilsService) {
             var rows = trs.length;
             // Go through each row, if match show row, else hide row
             for(var i = 0; i < rows; i++) {
-                var string = $(trs[i]).text();
-                if( string.indexOf(text) >= 0 ) {
+                var string = $(trs[i]).text();      //Gets Row Text
+                var regExp = new RegExp(text, 'i'); //Added Regex Searching
+                if(regExp.test(string))
+                {
                     $(trs[i]).show();
                 }
                 else {
