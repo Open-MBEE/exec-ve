@@ -81,7 +81,7 @@
             <div ng-if="elem.relatedDocuments.length > 0" class="elem-documentation-wrapper">
                 <label>RELATED DOCUMENTS</label>
                 <div ng-repeat="relatedDocument in elem.relatedDocuments" class="elem-documentation">
-                    <a ng-repeat="relatedView in relatedDocument.parentViews" ng-click="searchGoToDocument(relatedDocument.sysmlid, relatedView.sysmlid)">
+                    <a ng-repeat="relatedView in relatedDocument.parentViews" ng-click="searchGoToDocument(relatedDocument.siteCharacterizationId, relatedDocument.sysmlid, relatedView.sysmlid)">
                         {{relatedDocument.name}} > {{relatedView.name}}
                     </a>
                 </div>
