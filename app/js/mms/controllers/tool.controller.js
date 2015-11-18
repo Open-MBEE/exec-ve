@@ -32,6 +32,7 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
 
     $scope.show = {
         element: true,
+        history: false,
         reorder: false,
         snapshots: false,
         tags: false
@@ -130,6 +131,10 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
 
     $scope.$on('tags', function() {
         showPane('tags');
+    });
+    
+    $scope.$on('element.history', function() {
+        showPane('history');
     });
 
     var cleanUpEdit = function(scope) {

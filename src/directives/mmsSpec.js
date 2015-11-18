@@ -249,9 +249,9 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
         };
         scope.changeElement = changeElement;
         scope.$watch('mmsEid', changeElement);
-        //scope.$watch('mmsType', changeElement);
+        scope.$watch('mmsVersion', changeElement);
         scope.$watch('mmsWs', changeElement);
-
+        
         /**
          * @ngdoc function
          * @name mms.directives.directive:mmsSpec#revertEdits

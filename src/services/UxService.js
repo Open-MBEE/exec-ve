@@ -29,6 +29,10 @@ function UxService($rootScope) {
 		  	return {id: button, icon: 'fa-eye', selected: true, active: true, permission:true, tooltip: 'Preview Element', 
             		spinner: false, onClick: function() {$rootScope.$broadcast(button);},
                 dynamic_buttons: [getToolbarButton("element.editor.saveall")]};
+      case "element.history":
+		  	return {id: button, icon: 'fa-history', selected: true, active: true, permission:true, tooltip: 'Element History', 
+            		spinner: false, onClick: function() {$rootScope.$broadcast(button);},
+                dynamic_buttons: [getToolbarButton("element.editor.saveall")]};
 		  case "element.editor":
 		    return {id: button, icon: 'fa-edit', selected: false, active: true, permission:false, tooltip: 'Edit Element',
 		            spinner: false, onClick: function() {$rootScope.$broadcast(button);},
