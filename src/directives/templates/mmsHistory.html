@@ -6,7 +6,7 @@
     <!-- History -- Table Header -->
     <tr><th>Modified By</th><th>Time</th></tr>
     <!-- History -- Table Body -->
-    <tr ng-repeat="version in history | filter:historyFilter | orderBy:'-created'">
+    <tr ng-repeat="version in history | filter:historyFilter">
         <td>{{version.modifier}}</td>
         <td>
             <a ng-click="timestampClicked(version.timestamp)">{{version.timestamp | date:'M/d/yy h:mm a'}}</a>
