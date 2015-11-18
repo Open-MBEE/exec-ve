@@ -346,6 +346,10 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
 
         var handleSuccess = function(n, data) {
             var resp = CacheService.put(n.cacheKey, UtilsService.cleanElement(data.elements[0]), true);
+            var history = CacheService.get(UtilsService.makeElementKey(elem.sysmlid, workspace, 'versions'));
+            if (history) {
+                history.unshift({modifier: data.elements[0].modifier, timestamp: data.elements[0].modified});
+            }
             var edit = CacheService.get(UtilsService.makeElementKey(elem.sysmlid, n.ws, null, true));
             if (edit) {
                 // Only want to merge the properties that were updated:
