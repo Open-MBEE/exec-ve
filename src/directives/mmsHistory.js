@@ -50,7 +50,8 @@ function mmsHistory(Utils, ElementService, WorkspaceService, $compile, $template
         };
         scope.timestampClicked = function(time) {
             console.log('value changed, new value is: ' + time);
-            scope.historyVer = time;
+            var hack = time.substring(0, 20) + '999' + time.substring(23);
+            scope.historyVer = hack;
         };
         scope.changeElement = changeElement;
         scope.$watch('mmsEid', changeElement);
