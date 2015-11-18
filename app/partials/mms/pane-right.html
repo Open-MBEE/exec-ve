@@ -18,6 +18,12 @@
         </div>
     </div>
     
+    <div ng-if="document !== null">
+        <div class="container-fluid" ng-show="show.history">
+          <mms-history mms-eid="{{eid}}" mms-ws="{{specWs}}" mms-type="{{elementType}}"></mms-history>
+        </div>
+    </div>
+    
     <div class="container-fluid" ng-show="show.reorder">
         <mms-view-reorder mms-vid="{{vid}}" mms-version="{{version}}" mms-order="true" mms-ws="{{ws}}" mms-view-reorder-api="viewOrderApi"></mms-view-reorder>
     </div>
@@ -49,7 +55,6 @@
                 </td>
             </tr>
         </table>
-
     </div>
 
     <div class="container-fluid container-snapshots" ng-show="show.tags">

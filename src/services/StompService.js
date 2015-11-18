@@ -42,6 +42,9 @@ function StompService($rootScope, UtilsService, $window, $location, ApplicationS
                              var inCache = CacheService.exists( UtilsService.makeElementKey(value.sysmlid, workspaceId, 'latest', false) );
                              if(inCache === true)
                                 UtilsService.mergeElement(value, value.sysmlid, workspaceId, false, "all" );
+                             var history = CacheService.get(UtilsService.makeElementKey(value.sysmlid, workspaceId, 'versions'));
+                             if (history) 
+                                history.unshift({modifier: value.modifier, timestamp: value.modified});
                              $rootScope.$broadcast("stomp.element", value, workspaceId, value.sysmlid , value.modifier, value.name);
                          });               
                      }
