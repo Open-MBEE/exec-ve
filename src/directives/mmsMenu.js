@@ -43,7 +43,8 @@ function mmsMenu(SiteService, WorkspaceService, ConfigService, $state, $template
         var sites = {};
         
         scope.isTasksAndTagsView = function(){
-             if ($state.includes('workspaces') && !$state.includes('workspace.site'))
+             if ($state.includes('workspaces') && 
+                ! ($state.includes('workspace.site') || $state.includes('workspace.sites') ))
                 return true;
             else 
                 return false;
