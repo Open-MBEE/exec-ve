@@ -23,18 +23,19 @@
                     </li>
                 -->
                 <li ng-show="site && site.sysmlid !== 'no-site'">
-                    <a class="nav-btn" tooltip="Sites and Documents" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" ui-sref="workspace.site({site: site.sysmlid, search: undefined})"><i class="fa fa-folder"> SITE </i></a>
+                    <a class="nav-btn" tooltip="Sites and Documents" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" ui-sref="workspace.site({site: site.sysmlid, search: undefined})"><i class="fa fa-folder"></i></a>
+                    </i>
                 </li>
-                <li ng-show="site && site.sysmlid !== 'no-site'"><strong>{{site.name}}</strong></li>
-                <li ng-show="product"><a class="nav-btn"><i class="fa fa-file"> DOCUMENT </i></a></li>
-                <li ng-show="product"><strong>{{product.name}}</strong><span ng-bind-html="snapshot"></span><span ng-show="snapshot" class="label label-danger">SNAPSHOT</span></li>
+                <li ng-show="site && site.sysmlid !== 'no-site'">{{site.name}} <i class="fa fa-chevron-right" style="font-size:12px;"></i></li>
+                <li ng-show="product"><a class="nav-btn"><i class="fa fa-file"></i></a></li>
+                <li ng-show="product">{{product.name}}<span ng-bind-html="snapshot"></span><span ng-show="snapshot" class="label label-danger">SNAPSHOT</span></li>
             </ul>
             <ul class="nav-btns pull-right">
                 <li><a class="nav-btn" tooltip="Tasks and Tags" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom-left" ui-sref="workspace({search:undefined})">TASK </i></a></li>
                 <li>
                     <span dropdown>
-                      <a type="button" class="dropdown-toggle" dropdown-toggle>{{ws}} <i class="fa fa-sort-down"></i></a>
-                      <ul class="dropdown-menu" role="menu">
+                      <a type="button" class="dropdown-toggle" dropdown-toggle>{{ws}} <i class="fa fa-sort-down"></i></a><!-- ws is actually still the url, not the name raffi -->
+                      <ul class="dropdown-menu pull-right" role="menu">
                         <li>
                             <a ng-repeat="workspace in workspaces | orderBy:'qualifiedName'"  type="button" ng-click="updateWorkspace(workspace.id)">{{workspace.qualifiedName}}</a>
                         </li>
@@ -53,7 +54,7 @@
                 <li>
                     <span dropdown>
                       <a type="button" class="dropdown-toggle" dropdown-toggle>{{config.name}} <i class="fa fa-sort-down"></i></a>
-                      <ul class="dropdown-menu" role="menu">
+                      <ul class="dropdown-menu pull-right" role="menu">
                         <li>
                                 <a ng-click="latestTag()" value="">LATEST</a>
                                 <a ng-repeat="tag in tags | orderBy:'name'"  type="button" ng-click="config.id = tag.id; updateTag()">{{tag.name}}</a>

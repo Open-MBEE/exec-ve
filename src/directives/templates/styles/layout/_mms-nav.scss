@@ -611,4 +611,15 @@ mms-nav {
     border-bottom: 1px solid #fff !important;
     padding:0px 0px 0px 1px;
 }
+ul.dropdown-menu {
+    min-height: 200px;
+    overflow-y: scroll;
+}
+.navbar .nav-btn { 
+    margin-left: 1em;
+    padding-left: 0px !important;
+    font-size: 10px;
+    letter-spacing: 0.01em;
+    font-weight: 500;
+}
 /* end temp Laura */
