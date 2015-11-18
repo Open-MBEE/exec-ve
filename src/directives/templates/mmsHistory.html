@@ -1,7 +1,7 @@
-<div class="history-top">
-<h1 class="prop element-title">History</h1>
+<h1 class="prop element-title">Element History</h1>
 <input class="form-control" ng-model="historyFilter" type="text" placeholder="Type here to filter history">
 <br />
+<div class="history-top">
 <table class="history-table table table-condensed">
     <!-- History -- Table Header -->
     <tr><th>Modified By</th><th>Time</th></tr>
@@ -16,4 +16,6 @@
 </div>
 
 <!-- Spec window -->
-<mms-spec class="history-bottom" mms-eid="{{mmsEid}}" mms-version="{{historyVer}}" mms-ws="{{mmsWs}}" mms-type="{{mmsType}}"></mms-spec>
+<div class="history-bottom">
+<mms-spec mms-eid="{{mmsEid}}" mms-version="{{historyVer}}" mms-ws="{{mmsWs}}" mms-type="{{mmsType}}"></mms-spec>
+</div>
