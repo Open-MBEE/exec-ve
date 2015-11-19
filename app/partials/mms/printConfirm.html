@@ -1,0 +1,24 @@
+<div class="modal-header">
+  <h4>PRINT {{type}}</h4>
+</div>
+
+<div class="modal-body">
+    <p ng-if="type == 'DOCUMENT'">
+      This will bring up a popup where you can print the contents of this document, please disable any popup blockers if you don't 
+      see the popup. 
+      <br/><br/>If you don't see certain content appearing in the popup, please wait until the full document appears in this pane before clicking print.
+    </p>
+    <p ng-if="type == 'VIEW'">
+        This will bring up a popup where you can print the contents of this view, please disable any popup blockers if you don't 
+      see the popup. 
+      <br/><br/>
+      If you don't see certain content appearing in the popup, please wait until the full document appears in this pane before clicking print.
+      <br/><br/>If you want to print the entire document instead, please click on 'GO TO FULL DOCUMENT' and click print again when it finishes loading. 
+    </p>
+</div>
+
+<div class="modal-footer">
+    <button class="btn btn-sm btn-danger" ng-click="cancel()">CANCEL</button>
+    <button ng-if="type == 'VIEW'" class="btn btn-sm btn-primary" ng-click="fulldoc()">GO TO FULL DOCUMENT</button>
+    <button class="btn btn-sm btn-primary" ng-click="print()">PRINT</button>
+</div>

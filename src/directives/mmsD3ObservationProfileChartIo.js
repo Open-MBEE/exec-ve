@@ -1,9 +1,9 @@
 'use strict';
  angular.module('mms.directives')
-    .directive('mmsD3ObservationProfileChartIo', ['ElementService', 'UtilsService','$compile', 'growl','$window', mmsD3ObservationProfileChartIo]);
-function mmsD3ObservationProfileChartIo(ElementService, UtilsService, $compile, growl, $window, mmsViewCtrl) {
+    .directive('mmsD3ObservationProfileChartIo', ['ElementService', 'UtilsService', 'TableService', '$compile', 'growl','$window', mmsD3ObservationProfileChartIo]);
+function mmsD3ObservationProfileChartIo(ElementService, UtilsService, TableService, $compile, growl, $window) {
       
-  var mmsChartLink = function(scope, element, attrs) {
+  var mmsChartLink = function(scope, element, attrs, mmsViewCtrl) {
       
     var reversed = false;
     if (scope.reversed !== undefined)
@@ -315,7 +315,7 @@ function mmsD3ObservationProfileChartIo(ElementService, UtilsService, $compile, 
     }//end of obpchartPlot()
 
     scope.render = function() {
-      if (scope.rowHeaders.length === 0) return;
+      if (scopetableColumnHeadersLabel.length === 0) return;
       svg.selectAll('*').remove();
       var groupedDataSeries = [];
       var dataValuesPerTable;
@@ -334,11 +334,11 @@ function mmsD3ObservationProfileChartIo(ElementService, UtilsService, $compile, 
             var tvalues = []; //table value for each row
             for ( var j = 0; j < dataValuesPerTable[i].length; j++){
               if (dataValuesPerTable[i][j].specialization.value[0].type === "LiteralString")
-                tvalues[scope.rowHeaders[j]] = Number(dataValuesPerTable[i][j].specialization.value[0].string);
+                tvalues[scopetableColumnHeadersLabel[k][j]] = Number(dataValuesPerTable[i][j].specialization.value[0].string);
               else if (dataValuesPerTable[i][j].specialization.value[0].type === "LiteralReal")
-                tvalues[scope.rowHeaders[j]] = dataValuesPerTable[i][j].specialization.value[0].double;
+                tvalues[scopetableColumnHeadersLabel[k][j]] = dataValuesPerTable[i][j].specialization.value[0].double;
               else if (dataValuesPerTable[i][j].specialization.value[0].type === "LiteralInteger")
-                tvalues[scope.rowHeaders[j]] = dataValuesPerTable[i][j].specialization.value[0].integer;
+                tvalues[scopetableColumnHeadersLabel[k][j]] = dataValuesPerTable[i][j].specialization.value[0].integer;
             } //end of for loop j
             var eachStates = [];
             for (var key in tvalues){
@@ -346,53 +346,55 @@ function mmsD3ObservationProfileChartIo(ElementService, UtilsService, $compile, 
             }
             states.push(eachStates);
         }//end of for loop i
+        
         dataseries= [];
         if ( reversed){     
           states = transpose(states);
-          for (i = 1; i < scope.rowHeaders.length; i++){
-            dataseries.push({name: scope.rowHeaders[i], states: states[i]});
+          for (i = 1; i < scopetableColumnHeadersLabel[k].length; i++){
+            dataseries.push({name: scopetableColumnHeadersLabel[k][i], states: states[i]});
           }
           if ( k === 0){
             axisBottomLabels = states[0];
-            axisBottomLabelTitle = scope.rowHeaders[0];
-            for( i = 0; i < scope.columnHeaders.length; i++){
-              axisTopLabels[i] = scope.columnHeaders[i].name.substring(4);
+            axisBottomLabelTitle = scopetableColumnHeadersLabel[0][0]; //scope.rowHeaders[0];
+            for( i = 0; i < scope.tableRowHeaders[k].length; i++){
+              axisTopLabels[i] = scope.tableRowHeaders[k][i].name.substring(4);
             }
           }
         }
         else { 
           for (i = 1; i < dataValuesPerTable.length; i++){
-            dataseries.push({name: scope.columnHeaders[i].name, states: states[i]});
+            dataseries.push({name: scope.tableRowHeaders[k][i].name, states: states[i]});
           }
           if ( k === 0){
             axisBottomLabels = states[0];
-            axisBottomLabelTitle = scope.columnHeaders[0].name;//.substring(2); //removing ** from front of "**AltitudeMax"
+            axisBottomLabelTitle = scope.tableRowHeaders[0][0].name;//.substring(2); //removing ** from front of "**AltitudeMax"
             //remove "Zone" from the label for axisTopLabel
-            for( i = 0; i < scope.rowHeaders.length; i++){
-              axisTopLabels[i] = scope.rowHeaders[i].substring(4);
+            for( i = 0; i < scopetableColumnHeadersLabel[k].length; i++){
+              axisTopLabels[i] = scopetableColumnHeadersLabel[k][i].substring(4);
             }
           }
         }
         if (userdefinedColor.length !== 0 && userdefinedColor[k] !== undefined)
-          groupedDataSeries.push({name: scope.dataNames[k], color: userdefinedColor[k].trim(), value: dataseries});
+          groupedDataSeries.push({name: scopeTableTitles[k], color: userdefinedColor[k].trim(), value: dataseries});
         else  
-          groupedDataSeries.push({name: scope.dataNames[k], value: dataseries});
+          groupedDataSeries.push({name: scopeTableTitles[k], value: dataseries});
 
         //axisBottomLabels must be Number
         if ( k === 0 ){
           var xmin = Math.min.apply(Math, axisBottomLabels);
-          
+
           var diff = [];
           var middleIndex = Math.floor(axisBottomLabels.length/2);
+          
           for( i = 0; i < axisBottomLabels.length; i++){
             if ( i < middleIndex){
-               diff.push(axisBottomLabels[i] - axisBottomLabels[i+1]);
+               diff.push(Number(axisBottomLabels[i]) - Number(axisBottomLabels[i+1]));
             }
             else if ( i == middleIndex){
-              diff.push( axisBottomLabels[middleIndex]);
+              diff.push( Number(axisBottomLabels[middleIndex]));
             }
             else {//i > middleIndex  
-              diff.push(axisBottomLabels[i] - axisBottomLabels[i-1]);
+              diff.push(Number(axisBottomLabels[i]) - Number(axisBottomLabels[i-1]));
             }
           }
           
@@ -487,77 +489,26 @@ function mmsD3ObservationProfileChartIo(ElementService, UtilsService, $compile, 
         }
         ]
       };*/
-      //console.log( modelData);
       obpchartPlot(modelData);
     };//end of render
  
     scope.$watch('datavalues', function(newVals, oldVals) {
         return scope.render();
     }, true);
-    
-   
-      ElementService.getElement(scope.mmsEid, false, ws, version)
-      .then(function(data) {
-            var tableContains = [];
-            var tableNames = [];
-            for ( var k = 0; k < data.specialization.contains.length; k++ ){
-              if ( data.specialization.contains[k].type ==="Table"){
-                if ( data.specialization.contains[k-1].sourceType==="text")
-                  tableNames.push(data.specialization.contains[k-1].text.replace("<p>","").replace("</p>","")); //assume it is Paragraph
-                tableContains.push(data.specialization.contains[k]);
-              }
-            }
-            var rowHeaders = tableContains[0].header[0];
-            scope.rowHeaders = [];
-            //assume first column is empty
-            for ( var i = 1; i < rowHeaders.length; i++){
-                scope.rowHeaders[i-1] = rowHeaders[i].content[0].text.replace("<p>","").replace("</p>","");
-            }
-            var columnHeadersMmsEid = [];
-            var dataValuesMmmEid =[];
-            var body;
-            var counter = 0;
-            for ( k = 0; k < tableContains.length; k++){
-              body = tableContains[k].body;
-              for (i = 0; i < body.length; i++ ){
-                if ( k === 0)
-                  columnHeadersMmsEid[i] = body[i][0].content[0].source;
-                for ( var j = 1; j < body[i].length; j++){
-                  dataValuesMmmEid[counter++] = body[i][j].content[0].source;
-                }
-              }
-            }
-          
-            ElementService.getElements(columnHeadersMmsEid, false, ws, version)
-              .then(function(columnHeaders) {
-                      ElementService.getElements(dataValuesMmmEid, false, ws, version)
-                        .then(function(values) {
-                        var dataTableValues = [];
-                        var datavalues = [];
-                        var rowCounter = 0;
-                        var eachTableValueLength = values.length/tableContains.length;
-                        var startIndex;
-                        for (k = 0; k < tableContains.length; k++){
-                          datavalues = [];
-                          rowCounter = 0;
-                          startIndex = k* eachTableValueLength;
-                          for (i = 0; i < values.length/tableContains.length; i= i + scope.rowHeaders.length){
-                            var datarow = new Array(scope.rowHeaders.length);
-                            for ( var j = 0; j < scope.rowHeaders.length; j++){
-                              datarow[j] = values[startIndex + i+j]; 
-                            }
-                            datavalues[rowCounter++]=datarow;
-                          }
-                          dataTableValues.push(datavalues);
-                        }
-                        scope.dataNames = tableNames;
-                        scope.datavalues = dataTableValues; //[][] - array
-                        scope.columnHeaders = columnHeaders;
-                        scope.render();
-                  });
-            });
-      }); //end of ElementService
-      
+    var scopeTableTitles=[];
+    var scopeTableIds = [];
+    var scopetableColumnHeadersLabel= [];
+    var dataIdFilters = [];
+
+    TableService.readTables (scope.mmsEid,ws, version)
+      .then(function(value) {
+        scopeTableTitles = value.tableTitles;
+        scopeTableIds = value.tableIds;
+        scopetableColumnHeadersLabel= value.tableColumnHeadersLabels;
+        scope.tableRowHeaders = value.tableRowHeaders;
+        scope.datavalues = value.datavalues; //[][] - array
+        dataIdFilters = value.dataIdFilters;
+    });
     }; //end of link
 
     return {

@@ -21,7 +21,15 @@ module.exports = function(grunt) {
         }
       }
     },
-    
+
+    cacheBust: {
+      assets: {
+        files: {
+          src: ['build/mms.html', 'build/mmsFullDoc.html']
+        }
+      }
+    },
+
     wiredep: {
 
       target: {
@@ -43,15 +51,27 @@ module.exports = function(grunt) {
 
     html2js: {
       options: {
-        module: 'mms.directives.tpls',
+        module: function(modulePath, taskName) {
+          if (taskName === 'directives')
+            return 'mms.directives.tpls';
+          return 'app.tpls';
+        },
+        //module: 'mms.directives.tpls',
         rename: function(modulePath) {
-          var moduleName = modulePath.replace('directives/templates/', '');
-          return 'mms/templates/' + moduleName;
+          if (modulePath.indexOf('directives/templates') > -1) {
+            var moduleName = modulePath.replace('directives/templates/', '');
+            return 'mms/templates/' + moduleName;
+          }
+          return modulePath.replace('app/', '').replace('../', '');
         }
       },
-      main: {
+      directives: {
         src: ['src/directives/templates/*.html'],
         dest: 'dist/mms.directives.tpls.js'
+      },
+      main: {
+        src: ['app/partials/mms/*.html'],
+        dest: 'build/js/mms/app.tpls.js'
       }
     },
 
@@ -105,7 +125,7 @@ module.exports = function(grunt) {
       dist : {
         files: {
           'dist/css/partials/mms.css': 'src/directives/templates/styles/mms-main.scss',
-          'dist/css/partials/mm-main.css': 'app/styles/mm/mm-main.scss',
+          //'dist/css/partials/mm-main.css': 'app/styles/mm/mm-main.scss',
           'dist/css/partials/ve-main.css': 'app/styles/ve/ve-main.scss'
         }
       }
@@ -121,8 +141,8 @@ module.exports = function(grunt) {
       },
       combine: {
         files: {
-          'dist/css/mm-mms.styles.min.css':
-            ['dist/css/partials/mms.min.css', 'dist/css/partials/mm-main.min.css'],
+          //'dist/css/mm-mms.styles.min.css':
+            //['dist/css/partials/mms.min.css', 'dist/css/partials/mm-main.min.css'],
           'dist/css/ve-mms.styles.min.css':
             ['dist/css/partials/mms.min.css', 'dist/css/partials/ve-main.min.css']
         }
@@ -138,7 +158,10 @@ module.exports = function(grunt) {
           angular: true,
           window: true,
           console: true,
+          Stomp:true,
           Timely: true,
+          jQuery: true,
+          $: true,
           __timely: true
         }
       }
@@ -146,7 +169,7 @@ module.exports = function(grunt) {
 
     ngdocs: {
       options: {
-        dest: 'docs',
+        dest: 'build/docs',
         html5Mode: false,
         title: 'MMS',
         startPage: '/api'
@@ -169,7 +192,7 @@ module.exports = function(grunt) {
         options: {
           hostname: 'localhost',
           port: 10000,
-          base: './docs',
+          base: './build/docs',
         }
       },
       ems: {
@@ -333,6 +356,29 @@ module.exports = function(grunt) {
           }
         ]
       },
+      arrmems: {
+        options: {
+          hostname: '*',
+          port: 9000,
+          middleware: function(connect) {
+            return [proxySnippet];
+          }
+        },
+        proxies: [
+          {
+            context: '/alfresco',  // '/api'
+            host: 'arrmems.jpl.nasa.gov',//128.149.16.152',
+            port: 443,
+            changeOrigin: true,
+            https: true,
+          },
+          {
+            context: '/',
+            host: 'localhost',
+            port: 9001
+          }
+        ]
+      },
       rnems: {
         options: {
           hostname: '*',
@@ -424,7 +470,7 @@ module.exports = function(grunt) {
         options: {
           publish: [{
             id: 'gov.nasa.jpl:evm:zip',
-            version: '0.2.2-SNAPSHOT',
+            version: '0.2.3-SNAPSHOT',
             path: 'deploy/'
           }]
         }
@@ -502,6 +548,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-artifactory-artifact');
   grunt.loadNpmTasks('grunt-sloc');
   grunt.loadNpmTasks('grunt-plato');  
+  grunt.loadNpmTasks('grunt-cache-bust');
   
   // grunt.registerTask('install', ['npm-install', 'bower']);
   grunt.registerTask('install', ['bower-install-simple']);
@@ -510,11 +557,11 @@ module.exports = function(grunt) {
   grunt.registerTask('minify',  ['cssmin', 'uglify']);
   grunt.registerTask('wire',    ['wiredep']);
 
-  grunt.registerTask('dev-build',     ['install', 'compile', 'lint', 'concat', 'minify', 'copy', 'wire']);
-  grunt.registerTask('release-build', ['install', 'compile', 'lint', 'concat', 'minify', 'copy', 'wire']);
+  grunt.registerTask('dev-build',     ['install', 'compile', 'lint', 'concat', 'minify', 'copy', 'wire', 'cacheBust']);
+  grunt.registerTask('release-build', ['install', 'compile', 'lint', 'concat', 'minify', 'copy', 'wire', 'cacheBust']);
   grunt.registerTask('docs-build',    ['ngdocs']);
   grunt.registerTask('default', ['dev-build']);
-  grunt.registerTask('deploy', ['dev-build', 'artifactory:client:publish']);
+  grunt.registerTask('deploy', ['dev-build', 'ngdocs', 'artifactory:client:publish']);
 
   grunt.registerTask('dev', function(arg1) {
       grunt.task.run('dev-build', 'connect:static');

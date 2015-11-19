@@ -18,6 +18,7 @@
     </div>
     <div ng-if="pane == 'outdatedDiff'" class="modal-footer">
         <button class="btn btn-primary" ng-click="startDiff()">Regenerate Differences</button>
+        <button class="btn btn-danger" ng-click="finished()">I don't care, give me the outdated diff.</button>
     </div>
 
     <div ng-if="pane == 'generating'" class="modal-body">

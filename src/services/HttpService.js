@@ -15,7 +15,7 @@ function HttpService($http, $q, _) {
     var queue = [];
     var inProgress = 0;
     var cache = {};
-    var GET_OUTBOUND_LIMIT = 8;
+    var GET_OUTBOUND_LIMIT = 20;
 
     /**
      * @ngdoc method

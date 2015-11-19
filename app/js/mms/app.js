@@ -1,9 +1,13 @@
 'use strict';
 
-angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 'ui.bootstrap', 'ui.router', 'ui.tree', 'angular-growl', 'cfp.hotkeys', 'timelyModule'])
+angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.borderLayout', 'ui.bootstrap', 'ui.router', 'ui.tree', 'angular-growl', 'cfp.hotkeys'])
 .config(function($stateProvider, $urlRouterProvider) {
+    // Change the DEFAULT state to workspace.sites on entry
+    $urlRouterProvider.when('', '/workspaces/master/sites');
+
     $urlRouterProvider.rule(function ($injector, $location) {
         // determine if the url is older 2.0 format (will not have a workspace)
+        // generate some random client id
         if ($location.url().indexOf('/workspaces') === -1)
         {
             var locationPath = 'workspaces/master' + $location.url();
@@ -60,7 +64,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
 
     $stateProvider
     .state('workspaces', {
-        url: '/workspaces',
+        url: '/workspaces?search',
         resolve: {
             dummyLogin: function($http, URLService) {
                 return $http.get(URLService.getCheckLoginURL());
@@ -116,14 +120,51 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
             },
             docFilter: function(dummyLogin) {
                 return null;
+            },
+            search: function($stateParams, ElementService, workspace, dummyLogin) {
+                if ($stateParams.search === undefined) {
+                    return null;
+                }
+
+                return ElementService.search($stateParams.search, ['*'], null, false, workspace)
+                .then(function(data) {
+
+                    // change properties arr to 2-dim to display table
+                    data.forEach(function(elem) {
+                        if (elem.properties && elem.properties[0]) {
+                            var properties = [];
+                            for (var i = 0; i < elem.properties.length; i++) {
+                                if (i % 3 === 0) {
+                                    properties.push([]);
+                                }
+                                properties[properties.length-1].push(elem.properties[i]);
+                            }
+                            elem.properties = properties;
+                        }
+                    });
+
+                    return data;
+                }, function(reason) {
+                    return null;
+                });                
             }
         },
         views: {
-            'menu': {
+            'nav': {
                 template: '<mms-nav mms-title="Model Manager" mms-ws="{{workspace}}" mms-config="tag"></mms-nav>',
                 controller: function ($scope, $rootScope, workspace, tag) {
                     $scope.workspace = workspace;
                     $scope.tag = tag;
+                    $rootScope.mms_title = 'Model Manager';
+                }
+            },
+            'menu': {
+                template: '<mms-menu mms-title="Model Manager" mms-ws="{{workspace}}" mms-workspaces="workspaces" mms-config="tag" mms-tags="tags"></mms-menu>',
+                controller: function ($scope, $rootScope, workspaces, workspace, tags, tag) {
+                    $scope.workspaces = workspaces;
+                    $scope.workspace = workspace;
+                    $scope.tag = tag;
+                    $scope.tags = tags;
                     $rootScope.mms_title = 'Model Manager';
                 }
             },
@@ -238,10 +279,12 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
         },
         views: {
             'menu@': {
-                template: '<mms-nav mms-title="Model Manager" mms-ws="{{workspace}}" mms-config="tag"></mms-nav>',
-                controller: function ($scope, $rootScope, workspace, tag) {
+                template: '<mms-menu mms-title="Model Manager" mms-ws="{{workspace}}" mms-workspaces="workspaces" mms-config="tag" mms-tags="tags"></mms-menu>',
+                controller: function ($scope, $rootScope, workspaces, workspace, tag, tags) {
+                    $scope.workspaces = workspaces;
                     $scope.workspace = workspace;
                     $scope.tag = tag;
+                    $scope.tags = tags;
                     $rootScope.mms_title = 'Model Manager';
                 }
             },
@@ -266,10 +309,12 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
         parent: 'workspace',
         views: {
             'menu@': {
-                template: '<mms-nav mms-title="Portal" mms-ws="{{workspace}}" mms-site="site" mms-config="tag"></mms-nav>',
-                controller: function ($scope, $rootScope, workspace, site, tag, workspaceObj) {
+                template: '<mms-menu mms-title="Portal" mms-ws="{{workspace}}" mms-site="site" mms-workspaces="workspaces" mms-config="tag" mms-tags="tags"></mms-menu>',
+                controller: function ($scope, $rootScope, workspaces, workspace, site, tag, tags, workspaceObj) {
+                    $scope.workspaces = workspaces;
                     $scope.workspace = workspace;
                     $scope.tag = tag;
+                    $scope.tags = tags;
                     $scope.site = site;
                     $rootScope.mms_title = 'Portal: '+workspaceObj.name;
                 }
@@ -344,10 +389,12 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
         },
         views: {
             'menu@': {
-                template: '<mms-nav mms-title="Portal" mms-ws="{{workspace}}" mms-site="site" mms-config="tag"></mms-nav>',
-                controller: function ($scope, $rootScope, workspace, site, tag, workspaceObj) {
+                template: '<mms-menu mms-title="Portal" mms-ws="{{workspace}}" mms-site="site" mms-workspaces="workspaces" mms-config="tag" mms-tags="tags"></mms-menu>',
+                controller: function ($scope, $rootScope, workspaces, workspace, site, tag, tags, workspaceObj) {
+                    $scope.workspaces = workspaces;
                     $scope.workspace = workspace;
                     $scope.tag = tag;
+                    $scope.tags = tags;
                     $scope.site = site;
                     $rootScope.mms_title = 'Portal: '+workspaceObj.name;
                 }
@@ -383,13 +430,16 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
                     return null;
                 return ViewService.getView(document.sysmlid, false, workspace, time);
             },
-            snapshot: function(configSnapshots, document, dummyLogin) {
+            snapshot: function(ConfigService, configSnapshots, document, workspace, dummyLogin) {
                 var docid = document.sysmlid;
                 var found = null;
                 configSnapshots.forEach(function(snapshot) {
                     if (docid === snapshot.sysmlid)
                         found = snapshot;
                 });
+                if (found) {
+                    return ConfigService.getSnapshot(found.id, workspace, true);
+                }
                 return found; 
             }
         },
@@ -429,6 +479,9 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
                     if (snapshot.created === time)
                         found = snapshot;
                 });
+                if (found) {
+                    return ConfigService.getSnapshot(found.id, workspace, true);
+                }
                 return found; 
             },
             tag: function ($stateParams, ConfigService, workspace, snapshots, dummyLogin) {
@@ -494,10 +547,12 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
         },
         views: {
             'menu@': {
-                template: '<mms-nav mms-title="View Editor" mms-ws="{{workspace}}" mms-site="site" mms-doc="document" mms-config="tag" mms-snapshot-tag="{{snapshotTag}}" mms-show-tag="{{showTag}}"></mms-nav>',
-                controller: function ($scope, $filter, $rootScope, workspace, site, document, tag, snapshots, time, docFilter) {
+                template: '<mms-menu mms-title="View Editor" mms-ws="{{workspace}}" mms-site="site" mms-doc="document" mms-workspaces="workspaces" mms-config="tag" mms-tags="tags" mms-snapshot-tag="{{snapshotTag}}" mms-show-tag="{{showTag}}"></mms-menu>',
+                controller: function ($scope, $filter, $rootScope, workspaces, workspace, site, document, tag, tags, snapshots, time, docFilter) {
+                    $scope.workspaces = workspaces;
                     $scope.workspace = workspace;
                     $scope.tag = tag;
+                    $scope.tags = tags;
                     $scope.site = site;
                     $scope.document = document;
 
@@ -514,7 +569,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
                                 return;
                             if (time === snapshot.created && snapshot.configurations && snapshot.configurations.length > 0)
                                 snapshot.configurations.forEach(function(config) {
-                                    tagStr += '( <i class="fa fa-tag"></i> ' + config.name + ' ) ';
+                                    //tagStr += '( <i class="fa fa-tag"></i> ' + config.name + ' ) ';
                                     $scope.tag = config;
                                 });
                         });
@@ -565,8 +620,8 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
         url: '/views/:view',
         resolve: {
             viewElements: function($stateParams, ViewService, time, dummyLogin) {
-                if (time === 'latest')
-                    return ViewService.getViewElements($stateParams.view, false, $stateParams.workspace, time);
+                //if (time === 'latest')
+                //    return ViewService.getViewElements($stateParams.view, false, $stateParams.workspace, time);
                 return [];
             },
             view: function($stateParams, ViewService, viewElements, time, dummyLogin) {
@@ -636,16 +691,26 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'fa.directive.borderLayout', 
         views: {
             'menu@': {
                 templateUrl: 'partials/mms/diff-nav.html',               
-                controller: function ($scope, $rootScope,targetName, sourceName, $stateParams, $state){
+                controller: function ($scope, $rootScope,targetName, sourceName, $stateParams, $state, $modal){
                     $scope.targetName = targetName;
                     $scope.sourceName = sourceName;
                     $rootScope.mms_title = 'Merge Differences';
 
                     $scope.goBack = function () {
-                        $state.go('workspace', {}, {reload:true}); 
-                    }; 
-
-                }                
+                        $modal.open({
+                            templateUrl: 'partials/mms/cancelModal.html',
+                            controller: function($scope, $modalInstance, $state) {      
+                                $scope.close = function() {
+                                    $modalInstance.close();
+                                };
+                                $scope.exit = function() {
+                                    $state.go('workspace', {}, {reload:true});
+                                    $modalInstance.close(); 
+                                };
+                            }
+                        });
+                    };
+                }
             },
             'pane-left@': {
                 templateUrl: 'partials/mms/diff-pane-left.html',

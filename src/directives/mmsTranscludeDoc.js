@@ -42,6 +42,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                 $scope.buttonsInit = true;
                 $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.preview", $scope));
                 $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.save", $scope));
+                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.saveC", $scope));
                 $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.cancel", $scope));
                 $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.delete", $scope));
                 $scope.bbApi.setPermission("presentation.element.delete", $scope.isDirectChildOfPresentationElement);
@@ -83,7 +84,8 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                     p = '';
                 doc = '<p>' + p + '</p>';
             }
-            element.append(doc);
+            element[0].innerHTML = doc;
+            //element.append(doc);
             scope.recompileScope = scope.$new();
             $compile(element.contents())(scope.recompileScope); 
             if (mmsViewCtrl) {
@@ -98,7 +100,8 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             var doc = scope.edit.documentation;
             if (!doc)
                 doc = '<p ng-class="{placeholder: version!=\'latest\'}">(No ' + scope.panelType + ')</p>';
-            element.append('<div class="panel panel-info">'+doc+'</div>');
+            element[0].innerHTML = '<div class="panel panel-info">'+doc+'</div>';
+            //element.append('<div class="panel panel-info">'+doc+'</div>');
             scope.recompileScope = scope.$new();
             $compile(element.contents())(scope.recompileScope); 
             if (mmsViewCtrl) {
@@ -124,6 +127,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                 if (!version)
                     version = viewVersion.version;
             }
+            element.html('(loading...)');
             scope.ws = ws;
             scope.version = version ? version : 'latest';
             ElementService.getElement(scope.mmsEid, false, ws, version)
@@ -141,8 +145,8 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                 });*/
                 //scope.$watch('element.documentation', recompile);
                 if (scope.version === 'latest') {
-                    scope.$on('element.updated', function(event, eid, ws, type) {
-                        if (eid === scope.mmsEid && ws === scope.ws && (type === 'all' || type === 'documentation'))
+                    scope.$on('element.updated', function(event, eid, ws, type, continueEdit) {
+                        if (eid === scope.mmsEid && ws === scope.ws && (type === 'all' || type === 'documentation') && !continueEdit)
                             recompile();
                     });
                 }
@@ -183,7 +187,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                 if (reason.status === 410)
                     status = ' deleted';
                 element.html('<span class="error">doc cf ' + newVal + status + '</span>');
-                growl.error('Cf Doc Error: ' + reason.message + ': ' + scope.mmsEid);
+                //growl.error('Cf Doc Error: ' + reason.message + ': ' + scope.mmsEid);
             });
         });
 
@@ -207,6 +211,10 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
 
             scope.save = function() {
                 Utils.saveAction(scope,recompile,scope.bbApi,null,type,element);
+            };
+
+            scope.saveC = function() {
+                Utils.saveAction(scope,recompile,scope.bbApi,null,type,element,true);
             };
 
             scope.cancel = function() {
@@ -249,6 +257,19 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                 scope.tinymceType = scope.presentationElem.type;
             }
         }
+        
+        //actions for stomp 
+        scope.$on("stomp.element", function(event, deltaSource, deltaWorkspaceId, deltaElementId, deltaModifier, elemName){
+            if(deltaWorkspaceId === scope.ws && deltaElementId === scope.mmsEid){
+                if(scope.isEditing === false){
+                    recompile();
+                }
+                if(scope.isEditing === true){
+                    growl.warning("This documentation has been changed: " + elemName +
+                                " modified by: " + deltaModifier, {ttl: 30000});
+                }
+            }
+        });
 
     };
 

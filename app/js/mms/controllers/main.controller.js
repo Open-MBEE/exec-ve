@@ -3,8 +3,9 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('MainCtrl', ['$scope', '$location', '$rootScope', '$state', '_', '$window', 'growl', '$http', 'URLService', 'hotkeys', 'growlMessages',
-function($scope, $location, $rootScope, $state, _, $window, growl, $http, URLService, hotkeys, growlMessages) {
+.controller('MainCtrl', ['$scope', '$location', '$rootScope', '$state', '_', '$window', 'growl', '$http', 'URLService', 'hotkeys', 'growlMessages', 'StompService', 'UtilsService',
+function($scope, $location, $rootScope, $state, _, $window, growl, $http, URLService, hotkeys, growlMessages, StompService, UtilsService) {
+    //StompService.connect("guest", "guest", function(){} ,function(){}, '/');
     $rootScope.mms_viewContentLoading = false;
     $rootScope.mms_treeInitial = '';
     $rootScope.mms_title = '';
@@ -40,8 +41,16 @@ function($scope, $location, $rootScope, $state, _, $window, growl, $http, URLSer
     });*/
 
     $rootScope.$on('$stateChangeStart', 
-    function(event, viewConfig){ 
+    function(event){ 
         $rootScope.mms_viewContentLoading = true;
+    });
+    
+    //actions for stomp checking edit mode
+    $scope.$on("stomp.element", function(event, deltaSource, deltaWorkspaceId, deltaElementID, deltaModifier, deltaName){
+        console.log("main controller=============================================================");
+        if($rootScope.veEdits['element|' + deltaElementID + '|' + deltaWorkspaceId] === undefined){
+            UtilsService.mergeElement( deltaSource, deltaElementID, deltaWorkspaceId , true , "all" );
+        }
     });
 
     $rootScope.$on('$stateChangeSuccess', 
@@ -66,4 +75,5 @@ function($scope, $location, $rootScope, $state, _, $window, growl, $http, URLSer
             $rootScope.mms_viewContentLoading = false;
         }
     );
+    
 }]);

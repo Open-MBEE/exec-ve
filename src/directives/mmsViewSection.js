@@ -38,11 +38,14 @@ function mmsViewSection($compile, $templateCache, $rootScope, ElementService, Vi
             //should not do anything if section is not an instancespec
             if (scope.addFrame)
                 scope.addFrame();
+            if (mmsViewCtrl && mmsViewPresentationElemCtrl)
+                mmsViewCtrl.transcludeClicked(scope.section.sysmlid); //show instance spec if clicked
             e.stopPropagation();
         });
 
         var recompile = function() {
-            // do nothing
+            scope.isEditing = false;
+            scope.recompileEdit = false;
         };
 
         var recompileEdit = function() {
@@ -93,6 +96,13 @@ function mmsViewSection($compile, $templateCache, $rootScope, ElementService, Vi
             scope.$on('$destroy', function() {
                 mmsViewCtrl.unRegisterPresenElemCallBack(callback);
             });
+
+            if (scope.version === 'latest') {
+                scope.$on('element.updated', function(event, eid, ws, type, continueEdit) {
+                    if (eid === scope.section.sysmlid && ws === scope.ws && (type === 'all' || type === 'name') && !continueEdit)
+                        recompile();
+                });
+            }
 
             scope.save = function() {
                 Utils.saveAction(scope,recompile,scope.bbApi,scope.section,type);

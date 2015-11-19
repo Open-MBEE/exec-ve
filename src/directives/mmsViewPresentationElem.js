@@ -45,7 +45,7 @@ function mmsViewPresentationElem(ViewService, ElementService, $templateCache, $r
         if (scope.mmsInstanceVal) {
             if (!scope.mmsInstanceVal.instance) {
                 element.html('<span class="error">Reference is null</span>');
-                growl.error("A presentation element reference is null.");
+                //growl.error("A presentation element reference is null.");
                 return;
             }
             var ws = null;
@@ -75,7 +75,7 @@ function mmsViewPresentationElem(ViewService, ElementService, $templateCache, $r
                 if (reason.status === 410)
                     status = ' deleted';
                 element.html('<span class="error">View element reference error: ' + scope.mmsInstanceVal.instance + ' ' + status + '</span>');
-                growl.error('View Element Ref Error: ' + scope.mmsInstanceVal.instance + ' ' + reason.message);
+                //growl.error('View Element Ref Error: ' + scope.mmsInstanceVal.instance + ' ' + reason.message);
             });
         } 
     };

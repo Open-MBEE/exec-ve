@@ -21,6 +21,8 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 	$scope.diff = diff;
 
 	$scope.changes = [];
+	$scope.stagedChanges = [];
+	$scope.unstagedChanges = [];
 
 	$scope.id2change = {};
 
@@ -34,6 +36,12 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 	$scope.mergeInfo = $rootScope.mergeInfo;
 
 	$scope.targetTime = $stateParams.targetTime;
+
+	if($scope.targetTime !== 'latest'){
+		$scope.targetIsTag = true;
+	} else {
+		$scope.targetIsTag = false;
+	}
 
   $scope.stagingOrder = '';
   $scope.unstagingOrder = '';
@@ -162,14 +170,22 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 
 				}
 			}
-
+			var i;
 			if (change.staged)
 			{
 				treeNode.detail.stageStatus = "apply";
+				$scope.stagedChanges.push(change);
+				i = $scope.unstagedChanges.indexOf(change);
+				if (i > -1)
+					$scope.unstagedChanges.splice(i, 1);
 			}
 			else
 			{
 				treeNode.detail.stageStatus = "ignore";
+				$scope.unstagedChanges.push(change);
+				i = $scope.stagedChanges.indexOf(change);
+				if (i > -1)
+					$scope.stagedChanges.splice(i, 1);
 			}
 
 			$rootScope.treeApi.refresh();
@@ -337,6 +353,7 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 			$rootScope.diffPerspective = 'detail';
 		
 		$rootScope.$broadcast('elementId', elementId);
+
 		highlightTreeRow(change);
 		
 // 		$state.go('workspace.diff.view', {elementId: elementId});
@@ -373,7 +390,10 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 					change.icon = changeIcon;
 					// @test var
 					change.changeTypeName = UxService.getChangeTypeName(change.type);
-					change.typeIcon = UxService.getTypeIcon(change.delta.specialization.type);
+					if (change.delta.specialization)
+						change.typeIcon = UxService.getTypeIcon(change.delta.specialization.type);
+					else
+						change.typeIcon = UxService.getTypeIcon('Element');
 
 					change.staged = false;
 					change.ws2object = ws2object;
@@ -382,10 +402,14 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 					change.properties.name = {};
 					change.properties.owner = {};
 					change.properties.documentation = {};
+					change.properties.qualifiedName = {};
+					change.properties.sysmlid = {};
 
 					updateChangeProperty(change.properties.name, "clean");
 					updateChangeProperty(change.properties.owner, "clean");
 					updateChangeProperty(change.properties.documentation, "clean");
+					updateChangeProperty(change.properties.qualifiedName, "clean");
+					updateChangeProperty(change.properties.sysmlid, "clean");
 
 					change.properties.specialization = {};
 					if (element.hasOwnProperty('specialization'))
@@ -430,7 +454,10 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 
 					node.data = element;
 					node.label = element.name;
-					node.type = element.specialization.type;
+					if (element.specialization)
+						node.type = element.specialization.type;
+					else
+						node.type = 'Element';
 					node.children = [];
 
 					// node.visible = true;
@@ -488,6 +515,8 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 				updateChangeProperty(change.properties.name, "added");
 				updateChangeProperty(change.properties.owner, "added");
 				updateChangeProperty(change.properties.documentation, "added");
+				updateChangeProperty(change.properties.qualifiedName, "added");
+				updateChangeProperty(change.properties.sysmlid, "added");
 
 				if (e.hasOwnProperty('specialization'))
 				{
@@ -499,6 +528,7 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 				}
 
 				$scope.changes.push(change);
+				$scope.unstagedChanges.push(change);
 				$scope.id2change[e.sysmlid] = change;
 
 			});
@@ -527,6 +557,8 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 				updateChangeProperty(change.properties.name, "removed");
 				updateChangeProperty(change.properties.owner, "removed");
 				updateChangeProperty(change.properties.documentation, "removed");
+				updateChangeProperty(change.properties.qualifiedName, "removed");
+				updateChangeProperty(change.properties.sysmlid, "removed");
 
 				if (deletedElement.hasOwnProperty('specialization'))
 				{
@@ -538,6 +570,7 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 				}
 
 				$scope.changes.push(change);
+				$scope.unstagedChanges.push(change);
 				$scope.id2change[e.sysmlid] = change;
 
 			});
@@ -574,6 +607,16 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 					deltaElement.documentation = e.documentation;
 					updateChangeProperty(change.properties.documentation, "updated");
 				}
+				if (e.hasOwnProperty('qualifiedName'))
+				{
+					deltaElement.qualifiedName = e.qualifiedName;
+					updateChangeProperty(change.properties.qualifiedName, "updated");
+				}
+				if (e.hasOwnProperty('sysmlid'))
+				{
+					deltaElement.sysmlid = e.sysmlid;
+					updateChangeProperty(change.properties.sysmlid, "updated");
+				}
 				if (e.hasOwnProperty('specialization'))
 				{
 					Object.keys(e.specialization).forEach(function(property)
@@ -595,6 +638,7 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
           } */
 
 				$scope.changes.push(change);
+				$scope.unstagedChanges.push(change);
 				$scope.id2change[e.sysmlid] = change;
 			});
 

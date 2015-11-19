@@ -83,6 +83,10 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
         scope.editing = false;
         scope.editable = true;
         scope.isRestrictedVal = false;
+        scope.isEnumeration = false;
+        scope.propertyTypeClicked = function() {
+            scope.$emit('elementSelected', scope.element.specialization.propertyType, 'element');
+        };
         if (scope.mmsElement) {
             scope.element = scope.mmsElement;
             if(scope.element.specialization.type === 'Expression'){
@@ -150,6 +154,7 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
                     });
                 });
             } else {
+                scope.isEnumeration = false;
             ElementService.getElement(scope.mmsEid, false, scope.mmsWs, scope.mmsVersion)
             .then(function(data) {
                 //element.empty();
@@ -159,8 +164,10 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
                     scope.values = scope.element.specialization.value;
                     if (UtilsService.isRestrictedValue(scope.values))
                         scope.isRestrictedVal = true;
-                    else
+                    else {
                         scope.isRestrictedVal = false;
+
+                    } //End of Else
                 }
                 if (scope.element.specialization.type === 'Constraint')
                     scope.value = scope.element.specialization.specification;
@@ -191,10 +198,41 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
                                 scope.values[0].operand[2].operand.forEach(function(o) {
                                     options.push(o.element);
                                 });
-                                ElementService.getElements(options, false, scope.ws, scope.version)
+                                ElementService.getElements(options, false, scope.mmsWs, scope.mmsVersion)
                                 .then(function(elements) {
                                     scope.options = elements;
                                 });
+                            } else {
+                            //The editor check occurs here; should get "not supported for now" from here
+                                var id = scope.element.specialization.propertyType;
+                                if (id && !scope.element.specialization.isSlot) {
+                                    ElementService.getElement(id, false, scope.mmsWs, scope.mmsVersion)
+                                    .then(function(val) {
+                                    //Filter for enumeration type
+                                        if (val.appliedMetatypes && val.appliedMetatypes.length > 0 &&
+                                            val.appliedMetatypes[0] === '_9_0_62a020a_1105704885400_895774_7947') {
+                                            scope.isEnumeration = true;
+                                            ElementService.getOwnedElements(val.sysmlid, false, scope.mmsWs, scope.mmsVersion, 1)
+                                            .then(function(val) {
+                                                var newArray = [];
+                                                //Filter only for appropriate property value
+                                                for (var i = 0; i < val.length; i++) {
+                                                    if( val[i].appliedMetatypes && val[i].appliedMetatypes.length > 0 &&
+                                                        val[i].appliedMetatypes[0] === '_9_0_62a020a_1105704885423_380971_7955') {
+                                                            newArray.push(val[i]);
+                                                        }
+                                                }
+                                                scope.options = newArray;
+                                                if (scope.editValues.length === 0)
+                                                    scope.editValues.push({type: 'InstanceValue', instance: null});
+                                            },
+                                            function(reason) {
+                                                console.log(reason);
+                                                growl.error('Failed to get enumeration options: ' + reason.message);
+                                            });
+                                        }
+                                    });
+                                } //end if
                             }
                         }
                         if (scope.edit.specialization.type === 'Constraint' && scope.edit.specialization.specification) {
@@ -211,9 +249,9 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
         };
         scope.changeElement = changeElement;
         scope.$watch('mmsEid', changeElement);
-        //scope.$watch('mmsType', changeElement);
+        scope.$watch('mmsVersion', changeElement);
         scope.$watch('mmsWs', changeElement);
-
+        
         /**
          * @ngdoc function
          * @name mms.directives.directive:mmsSpec#revertEdits

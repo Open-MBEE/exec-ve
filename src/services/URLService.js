@@ -162,6 +162,23 @@ function urlService(baseUrl) {
 
     /**
      * @ngdoc method
+     * @name mms.URLService#getSnapshotURL
+     * @methodOf mms.URLService
+     *
+     * @description
+     * Gets url that gets a snapshot
+     *
+     * @param {string} id Id of the snapshot
+     * @param {string} workspace Workspace name
+     * @returns {string} The url
+     */
+    var getSnapshotURL = function(id, workspace) {
+        return root + "/workspaces/" + workspace + 
+                      "/snapshots/" + id;
+    };
+
+    /**
+     * @ngdoc method
      * @name mms.URLService#getConfigProductsURL
      * @methodOf mms.URLService
      *
@@ -232,12 +249,17 @@ function urlService(baseUrl) {
         return addVersion(r, version);
     };
 
-    var getOwnedElementURL = function(id, workspace, version) {
-        
-        var r = root + '/workspaces/' + workspace + '/elements/' + id + '?recurse=true';
-        // TODO return addVersion(r, version);
-        return r;
-        
+    var getOwnedElementURL = function(id, workspace, version, depth) {
+        var recurseString = 'recurse=true';
+        if (depth && depth > 0)
+            recurseString = 'depth=' + depth;
+        var r = root + '/workspaces/' + workspace + '/elements/' + id;
+        r = addVersion(r, version);
+        if (r.indexOf('?') > 0)
+            r += '&' + recurseString;
+        else
+            r += '?' + recurseString;
+        return r;        
     };
 
     /**
@@ -299,8 +321,7 @@ function urlService(baseUrl) {
      * @returns {string} The url.
      */
     var getElementVersionsURL = function(id, workspace) {
-        return root + "/javawebscripts/elements/" + id + "/versions";
-        //return root + '/workspaces/' + workspace + '/elements/' + id + '/versions';
+        return root + '/workspaces/' + workspace + '/history/' + id;
     };
 
     /**
@@ -370,9 +391,9 @@ function urlService(baseUrl) {
         else if (status === 410)
             result.message = "Deleted";
         else if (status === 408)
-            result.message = "Timed Out (Please check network)";
+            result.message = "Timed Out";
         else
-            result.message = "Failed (Please check network)";
+            result.message = "Timed Out (Please check network)";
         deferred.reject(result);
     };
 
@@ -456,6 +477,10 @@ function urlService(baseUrl) {
             return url + '/versions/' + version;
     };
 
+    var getRoot = function() {
+        return root;
+    };
+
     return {
         getSiteDashboardURL: getSiteDashboardURL,
         getElementURL: getElementURL,
@@ -471,6 +496,7 @@ function urlService(baseUrl) {
         getConfigSnapshotsURL: getConfigSnapshotsURL,
         getSiteProductsURL: getSiteProductsURL,
         getConfigURL: getConfigURL,
+        getSnapshotURL: getSnapshotURL,
         getConfigsURL: getConfigsURL,
         getConfigProductsURL : getConfigProductsURL,
         getDocumentViewsURL: getDocumentViewsURL,
@@ -480,7 +506,8 @@ function urlService(baseUrl) {
         getWorkspacesURL: getWorkspacesURL,
         getWorkspaceURL: getWorkspaceURL,
         getCheckLoginURL: getCheckLoginURL,
-        isTimestamp: isTimestamp
+        isTimestamp: isTimestamp,
+        getRoot: getRoot
     };
 
 }
