@@ -472,7 +472,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                     return [];
                 return ConfigService.getProductSnapshots(document.sysmlid, site.sysmlid, workspace);
             },
-            snapshot: function(snapshots, document, time, dummyLogin) {
+            snapshot: function(ConfigService, workspace, snapshots, document, time, dummyLogin) {
                 var docid = document.sysmlid;
                 var found = null;
                 snapshots.forEach(function(snapshot) {
