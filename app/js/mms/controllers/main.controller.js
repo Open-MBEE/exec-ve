@@ -32,6 +32,7 @@ function($scope, $location, $rootScope, $state, _, $window, growl, $http, URLSer
 
     $scope.$on('$stateChangeError', function(event, toState, toParams, fromState, fromParams, error) {
         growl.error('Error: ' + error.message);
+        $rootScope.mms_viewContentLoading = false;
     });
 
     /*$rootScope.$on('$viewContentLoading', 
