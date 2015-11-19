@@ -569,7 +569,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                                 return;
                             if (time === snapshot.created && snapshot.configurations && snapshot.configurations.length > 0)
                                 snapshot.configurations.forEach(function(config) {
-                                    tagStr += '( <i class="fa fa-tag"></i> ' + config.name + ' ) ';
+                                    //tagStr += '( <i class="fa fa-tag"></i> ' + config.name + ' ) ';
                                     $scope.tag = config;
                                 });
                         });

@@ -16,13 +16,13 @@
                     &nbsp;
                 </li>
                 <li ng-show="product"><i class="fa fa-file"></i>&nbsp;</li>
-                <li ng-show="product">{{product.name}}<span ng-bind-html="snapshot"></span><span ng-show="snapshot" class="label label-danger">SNAPSHOT</span></li>
+                <li ng-show="product">{{product.name}}<span ng-show="snapshot" class="label label-danger" ng-bind-html="snapshot"></span></li>
             </ul>
-            <ul class="nav-btns pull-right">
+            <ul class="nav-btns pull-right" style="margin-right: 20px;">
                 <li>TASK</li>
                 <li>
                     <span dropdown>
-                      <a type="button" class="dropdown-toggle" dropdown-toggle>{{wsName}} &nbsp;<i class="fa fa-sort-down"></i></a>
+                      <a type="button" class="dropdown-toggle" dropdown-toggle>{{wsName}} &nbsp;<i class="fa fa-sort-down" style="margin: 0px 5px 0px 5px;"></i></a>
                       <ul class="dropdown-menu pull-right" role="menu">
                         <li>
                             <button class="btn btn-large btn-block btn-primary" ng-click="tasksAndTagsView()" >MANAGE</button>
@@ -34,7 +34,7 @@
                 <li>TAG</li>
                 <li>
                     <span dropdown>
-                      <a type="button" class="dropdown-toggle" dropdown-toggle>{{config.name}}&nbsp;<i class="fa fa-sort-down"></i></a>
+                      <a type="button" class="dropdown-toggle" dropdown-toggle>{{config.name}}&nbsp;<i class="fa fa-sort-down" style="margin-left:5px;"></i></a>
                       <ul class="dropdown-menu pull-right" role="menu">
                         <li>
                                 <button class="btn btn-large btn-block btn-primary" ng-click="tasksAndTagsView()">MANAGE</button>
