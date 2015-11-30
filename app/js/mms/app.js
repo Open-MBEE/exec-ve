@@ -126,9 +126,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                     return null;
                 }
 
-                // TODO: Change search attributes to '*" once implemented on MMS/Server-side
-                // TODO: 'aspect' generates 500
-                return ElementService.search($stateParams.search, ['id','documentation', 'name', 'value', 'appliedMetatypes', 'metatypes'], null, false, workspace)
+                return ElementService.search($stateParams.search, ['*'], null, false, workspace)
                 .then(function(data) {
 
                     // change properties arr to 2-dim to display table
@@ -474,11 +472,11 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                     return [];
                 return ConfigService.getProductSnapshots(document.sysmlid, site.sysmlid, workspace);
             },
-            snapshot: function(ConfigService, workspace, configSnapshots, document, dummyLogin) {
+            snapshot: function(ConfigService, workspace, snapshots, document, time, dummyLogin) {
                 var docid = document.sysmlid;
                 var found = null;
-                configSnapshots.forEach(function(snapshot) {
-                    if (docid === snapshot.sysmlid)
+                snapshots.forEach(function(snapshot) {
+                    if (snapshot.created === time)
                         found = snapshot;
                 });
                 if (found) {
@@ -522,9 +520,9 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 }
             },        
             configSnapshots: function(ConfigService, workspace, tag, dummyLogin) {
-                if (tag.timestamp === 'latest')
+                //if (tag.timestamp === 'latest')
                     return [];
-                return ConfigService.getConfigSnapshots(tag.id, workspace, false);
+                //return ConfigService.getConfigSnapshots(tag.id, workspace, false);
             },
             time: function($stateParams, ConfigService, workspace, dummyLogin) {
                 if ($stateParams.tag !== undefined) {
@@ -571,7 +569,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                                 return;
                             if (time === snapshot.created && snapshot.configurations && snapshot.configurations.length > 0)
                                 snapshot.configurations.forEach(function(config) {
-                                    tagStr += '( <i class="fa fa-tag"></i> ' + config.name + ' ) ';
+                                    //tagStr += '( <i class="fa fa-tag"></i> ' + config.name + ' ) ';
                                     $scope.tag = config;
                                 });
                         });

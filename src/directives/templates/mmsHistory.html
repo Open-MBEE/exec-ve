@@ -1,0 +1,21 @@
+<h1 class="prop element-title">Element History</h1>
+<input class="form-control" ng-model="historyFilter" type="text" placeholder="Type here to filter history">
+<br />
+<div class="history-top">
+<table class="history-table table table-condensed">
+    <!-- History -- Table Header -->
+    <tr><th>Modified By</th><th>Time</th></tr>
+    <!-- History -- Table Body -->
+    <tr ng-repeat="version in history | filter:historyFilter">
+        <td>{{version.modifier}}</td>
+        <td>
+            <a ng-click="timestampClicked(version.timestamp)">{{version.timestamp | date:'M/d/yy h:mm a'}}</a>
+        </td>
+    </tr>
+</table>
+</div>
+
+<!-- Spec window -->
+<div class="history-bottom">
+<mms-spec mms-eid="{{mmsEid}}" mms-version="{{historyVer}}" mms-ws="{{mmsWs}}" mms-type="{{mmsType}}"></mms-spec>
+</div>

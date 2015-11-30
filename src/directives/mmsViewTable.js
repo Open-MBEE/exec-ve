@@ -13,9 +13,13 @@ function mmsViewTable($compile, $timeout, $templateCache, UtilsService) {
         if (!scope.table.showIfEmpty && scope.table.body.length === 0)
             return;
         scope.searchTerm = '';
-
+        scope.showFilter = false;
         var html = UtilsService.makeHtmlTable(scope.table);
-        html = '<div class="tableSearch"><button ng-click="resetSearch()">reset</button><input type="text" ng-model="searchTerm"></input><button ng-click="search()">search</button></div>' + html;
+        html = '<div class="tableSearch">' + 
+                '<button class="btn btn-sm btn-primary" ng-click="showFilter = !showFilter">Filter Table</button>' + 
+                '<span ng-show="showFilter"><input type="text" size="80" placeholder="regex filter" ng-model="searchTerm"></input>' + 
+                '<button class="btn btn-sm btn-primary" ng-click="search()">Apply</button>' + 
+                '<button class="btn btn-sm btn-danger" ng-click="resetSearch()">Reset</button></span></div>' + html;
         element[0].innerHTML = html;
         var nextIndex = 0;
         var thead = element.find('thead');
