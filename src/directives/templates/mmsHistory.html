@@ -1,11 +1,15 @@
 <h1 class="prop element-title">Element History</h1>
 <input class="form-control" ng-model="historyFilter" type="text" placeholder="Type here to filter history">
 <br />
+
+<select class="form-control" ng-options="version.timestamp as version.modifier + ' - ' + (version.timestamp | date:'M/d/yy h:mm a') for version in history | filter:historyFilter" ng-model="selects.timestampSelected" ng-change="timestampClicked()">
+    <option value="">--- Latest ---</option>
+</select>
+
+<!--
 <div class="history-top">
 <table class="history-table table table-condensed">
-    <!-- History -- Table Header -->
     <tr><th>Modified By</th><th>Time</th></tr>
-    <!-- History -- Table Body -->
     <tr ng-repeat="version in history | filter:historyFilter">
         <td>{{version.modifier}}</td>
         <td>
@@ -14,8 +18,8 @@
     </tr>
 </table>
 </div>
-
+-->
 <!-- Spec window -->
-<div class="history-bottom">
+<!--<div class="history-bottom">-->
 <mms-spec mms-eid="{{mmsEid}}" mms-version="{{historyVer}}" mms-ws="{{mmsWs}}" mms-type="{{mmsType}}"></mms-spec>
-</div>
+<!--</div>-->
