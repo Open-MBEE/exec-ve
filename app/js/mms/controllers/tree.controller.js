@@ -973,6 +973,9 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
             $scope.configuration.now = "true";
             $scope.configuration.timestamp = new Date();
             displayName = "Tag";
+            $scope.updateTimeOpt = function () {
+                $scope.configuration.now ='false';
+            };
         }
         else if ($scope.itemType === 'Document') {
             $scope.doc = {name: ""};

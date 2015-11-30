@@ -18,9 +18,9 @@
     <div class="form-group">
       <label>Timestamp:</label>
       <input ng-model="configuration.now" value="true" type="radio"> Now</input>
-
       <input ng-model="configuration.now" value="false" type="radio"> Specified</input>
-      <input class="form-control" ng-model="configuration.timestamp" type="datetime-local" placeholder="Specify a timestamp in the following format yyyy-MM-ddTHH:mm:ss"></input>
+      <input class="form-control" ng-model="configuration.timestamp" type="datetime-local" ng-change="updateTimeOpt()"
+      placeholder="Specify a timestamp in the following format yyyy-MM-ddTHH:mm:ss"></input>
     </div>
 
   </div>
