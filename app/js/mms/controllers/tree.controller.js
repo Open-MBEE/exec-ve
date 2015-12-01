@@ -22,7 +22,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
     $rootScope.mms_fullDocMode = false;
     if ($state.includes('workspace.site.document.full'))
         $rootScope.mms_fullDocMode = true;
-
+    $scope.treeFilter = {search: ''};
     // TODO: pull in config/tags
     var config = time;
     var ws = $stateParams.workspace; // TODO this is undefined, but is being used below
@@ -45,7 +45,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
     $scope.bbApi.init = function() {
       $scope.bbApi.addButton(UxService.getButtonBarButton("tree.expand"));
       $scope.bbApi.addButton(UxService.getButtonBarButton("tree.collapse"));
-      $scope.bbApi.addButton(UxService.getButtonBarButton("tree.filter"));
+      //$scope.bbApi.addButton(UxService.getButtonBarButton("tree.filter"));
 
       if ($state.includes('workspaces') && !$state.includes('workspace.sites')) {
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree.add.task"));
