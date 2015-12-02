@@ -32,7 +32,8 @@ function mmsHistory(Utils, ElementService, WorkspaceService, $compile, $template
     var template = $templateCache.get('mms/templates/mmsHistory.html');
 
     var mmsHistoryLink = function(scope, element, attrs) {
-        scope.showSpec = false;            
+        scope.selects = {timestampSelected: null};
+        scope.historyVer = 'latest';
         /**
          * @ngdoc function
          * @name mms.directives.directive:mmsHistory#changeElement
@@ -46,10 +47,17 @@ function mmsHistory(Utils, ElementService, WorkspaceService, $compile, $template
           ElementService.getElementVersions(scope.mmsEid, false, scope.mmsWs)
             .then(function(data) {
                 scope.history = data;
+                scope.historyVer = 'latest';
+                scope.selects.timestampSelected = null;
             });
         };
-        scope.timestampClicked = function(time) {
+        scope.timestampClicked = function() {
+            var time = scope.selects.timestampSelected;
             console.log('value changed, new value is: ' + time);
+            if (!time) {
+                scope.historyVer = 'latest';
+                return;
+            }
             var hack = time.substring(0, 20) + '999' + time.substring(23);
             scope.historyVer = hack;
         };
