@@ -20,7 +20,7 @@ angular.module('mms')
  */
 function ElementService($q, $http, URLService, UtilsService, CacheService, HttpService, ApplicationService, _) {
     
-    var inProgress = {};
+    var inProgress = {};// leave for now
     /**
      * @ngdoc method
      * @name mms.ElementService#getElement
@@ -69,11 +69,13 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
      *      multiple calls to this method with the same parameters would give the
      *      same object
      */
-    var getElement = function(id, update, workspace, version) {
+    var getElement = function(id, update, workspace, version) { //add prority parameter w/default high prority 
+        if(weight === undefined)
+            weight = 1;
         var n = normalize(id, update, workspace, version);
         var key = 'getElement(' + id + n.update + n.ws + n.ver + ')';
-
-        if (inProgress.hasOwnProperty(key)) {
+        // if it's in the inProgress queue get it immediately
+        if (inProgress.hasOwnProperty(key)) {  //change to change proirity if it's already in the queue
             HttpService.ping(URLService.getElementURL(id, n.ws, n.ver));
             return inProgress[key];
         }
@@ -90,7 +92,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                 return deferred.promise;
             }
         }
-        inProgress[key] = deferred.promise;
+        inProgress[key] = deferred.promise;// edit with new function signature
         HttpService.get(URLService.getElementURL(id, n.ws, n.ver),
             function(data, status, headers, config) {
                 deferred.resolve(CacheService.put(n.cacheKey, UtilsService.cleanElement(data.elements[0]), true));
@@ -99,7 +101,8 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
             function(data, status, headers, config) {
                 URLService.handleHttpStatus(data, status, headers, config, deferred);
                 delete inProgress[key];
-            }
+            },
+            weight
         );
         return deferred.promise;
     };
