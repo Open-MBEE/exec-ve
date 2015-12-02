@@ -440,7 +440,7 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
             fix_list_elements: true,
             content_css: 'css/partials/mms.min.css',
             paste_data_images: true,
-            skin_url: 'lib/tinymce/skin/lightgray',
+            //skin_url: 'lib/tinymce/skin/lightgray',
             file_picker_callback: imageCallback,
             file_picker_types: 'image',
             setup: function(ed) {
@@ -529,7 +529,7 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                 ed.on('blur', function(e) {
                     element.blur();
                 });
-                ed.on('keydown', function(e) {
+                /*ed.on('keydown', function(e) {
                     if (e.keyCode === 9) { 
                         if (e.shiftKey) 
                             ed.execCommand('Outdent');
@@ -538,7 +538,7 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                         e.preventDefault();
                         return false;
                     }  
-                });
+                });*/
                 ed.on('keydown', function(e) {
                     if (e.shiftKey && e.keyCode === 50) {
                         autocompleteCallback(ed);
