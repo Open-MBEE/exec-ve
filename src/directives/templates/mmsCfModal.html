@@ -28,6 +28,9 @@
                 </div>
             </div>
         </form>
+        <div class="cant-find-element">
+            Can't find your element? <a ng-click="openProposeModal()" class="create-element-link">Create a new one</a>
+         </div>
         <div class="misc-form-field" ng-show="mmsCfElements && searchSuccess">
             <div class="form-filter">
                 <input class="form-control" type="text" ng-model="filterQuery" placeholder="Filter results" />
@@ -41,9 +44,7 @@
 	                <button ng-click="setFilterFacet('sysmlid')" type="button" class="btn-filter-facet-sysmlid btn-search-type btn btn-default">MDID</button>
 	            </div>
             </div>
-            <div class="cant-find-element">
-                Can't find your element? <a ng-click="openProposeModal()" class="create-element-link">Create a new one</a>
-            </div>
+            
 			<div>Showing {{filteredElms.length}} of {{mmsCfElements.length}} search results.</div>
         </div>
     </div>
