@@ -399,7 +399,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
         });
     };
     
-    var allViewLevel2Func = function() {
+    /*var allViewLevel2Func = function() {
         document.specialization.view2view.forEach(function(view, index) {
             var node = viewId2node[view.id];
             if (node)
@@ -1162,7 +1162,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
     if ($state.includes('workspace.site.document')) {
         if (document.specialization.view2view) {
             document.specialization.view2view.forEach(function(view, index) {
-                ViewService.getView(view.id, false, ws, time, 0);
+                ViewService.getView(view.id, false, ws, time, 0)
                 .then(addViewSections); //TODO add back in once we have priority queue
             });
         }
