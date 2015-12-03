@@ -37,13 +37,13 @@ function mmsTagDocs(ElementService, SiteService, ViewService, ConfigService, gro
         }
         scope.ws = ws ? ws : 'master';
 
-        ConfigService.getConfig(scope.mmsTag, scope.ws, false)
+        ConfigService.getConfig(scope.mmsTag, scope.ws, false, 1)
         .then(function(tag) {
-            ConfigService.getConfigSnapshots(scope.mmsTag, scope.ws, false)
+            ConfigService.getConfigSnapshots(scope.mmsTag, scope.ws, false, 1)
             .then(function(docs) {
                 scope.filtered = {};
                 scope.docs = docs;
-                ElementService.getElement("master_filter", false, scope.ws, tag.timestamp)
+                ElementService.getElement("master_filter", false, scope.ws, tag.timestamp, 2)
                 .then(function(filter) {
                     scope.filter = filter;
                     scope.filtered = JSON.parse(scope.filter.documentation);

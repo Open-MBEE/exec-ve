@@ -111,7 +111,7 @@ function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxSe
             }
             scope.ws = ws;
             scope.version = version ? version : 'latest';
-            ElementService.getElement(scope.mmsEid, false, ws, version)
+            ElementService.getElement(scope.mmsEid, false, ws, version, 1)
             .then(function(data) {
                 scope.element = data;
                 recompile();
