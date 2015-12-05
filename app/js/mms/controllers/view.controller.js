@@ -385,6 +385,10 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     $scope.tscClicked = function(elementId) {
         $rootScope.$broadcast('elementSelected', elementId, 'element');
     };
+    $scope.searchOptions= {};
+    $scope.searchOptions.callback = $scope.tscClicked;
+    $scope.searchOptions.type = 'center-search';
+    
     $scope.elementTranscluded = function(element, type) {
         if (type === 'Comment' && !$scope.comments.hasOwnProperty(element.sysmlid)) {
             $scope.comments[element.sysmlid] = element;
