@@ -388,6 +388,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     $scope.searchOptions= {};
     $scope.searchOptions.callback = $scope.tscClicked;
     $scope.searchOptions.type = 'center-search';
+    $scope.searchOptions.emptyDocTxt = 'This field is empty.';
     
     $scope.elementTranscluded = function(element, type) {
         if (type === 'Comment' && !$scope.comments.hasOwnProperty(element.sysmlid)) {
