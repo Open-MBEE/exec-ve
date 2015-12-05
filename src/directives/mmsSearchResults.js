@@ -20,7 +20,8 @@ function mmsSearchResults($rootScope,$templateCache) {
         angular.element('.search-filter-type button').removeClass('active');
         angular.element('.btn-filter-facet-' + filterFacet).addClass('active');
     };
-    
+
+    scope.emptyDocTxt = scope.mmsOptions.emptyDocTxt;
     scope.userResultClick = function(elementId, property, name) {
       if (scope.mmsOptions.callback && scope.mmsOptions.type === 'center-search') {
         scope.mmsOptions.callback(elementId);

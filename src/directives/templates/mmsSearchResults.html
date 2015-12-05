@@ -56,7 +56,9 @@
                 <label>DOCUMENTATION</label>
                 <div class="elem-documentation">
                     <a ng-show="elem.documentation" ng-bind-html="elem.documentation | limitTo:300" ng-click="userResultClick(elem.sysmlid, 'doc', elem.name)"></a><span class="ellipses">{{elem.documentation.length > 300 ? ' ...' : ''}}</span>
-                    <a ng-show="!elem.documentation" ng-click="userResultClick(elem.sysmlid, 'doc', elem.name)">This field is empty, but you can still click here to cross-reference a placeholder.</a>
+                    <span><a ng-show="!elem.documentation" ng-click="userResultClick(elem.sysmlid, 'doc', elem.name)">
+                      {{emptyDocTxt}}
+                      <!--This field is empty, but you can still click here to cross-reference a placeholder.--></a></span>
                 </div>
             </div>
             <div class="elem-type-wrapper">
