@@ -56,7 +56,7 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
 
     if (snapshots) {
         snapshots.forEach(function(snapshot) {
-            ElementService.getElement("master_filter", ws, false, snapshot.created)
+            ElementService.getElement("master_filter", ws, false, snapshot.created, 0)
             .then(function(filter) {
                     var json = JSON.parse(filter.documentation);
                     if (json[document.sysmlid]) {
@@ -194,7 +194,7 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
                 $rootScope.mms_tbApi.setPermission('element.editor', true);
         }
         if (type === 'element') {
-            ElementService.getElement(eid, false, ws, time).
+            ElementService.getElement(eid, false, ws, time, 2).
             then(function(element) {
                 var editable = element.editable && time === 'latest';
                 $rootScope.mms_tbApi.setPermission('element.editor', editable);
@@ -232,7 +232,7 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
         $scope.specWs = ws;
         $rootScope.mms_tbApi.select('element.viewer');
         showPane('element');
-        ElementService.getElement(vid, false, ws, time).
+        ElementService.getElement(vid, false, ws, time, 2).
         then(function(element) {
             var editable = element.editable && time === 'latest';
             $rootScope.mms_tbApi.setPermission('element.editor', editable);

@@ -63,9 +63,7 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, HttpSe
         }, function(data, status, headers, config) {
             URLService.handleHttpStatus(data, status, headers, config, deferred);
             delete inProgress[inProgressKey];
-        },
-        weight
-        );
+        }, weight);
         return deferred.promise;
     };
 
@@ -82,7 +80,7 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, HttpSe
      * @param {boolean} [update=false] update from server
      * @returns {Promise} Promise would be resolved with config object
      */
-    var getConfig = function(id, workspace, update) {
+    var getConfig = function(id, workspace, update, weight) {
         var n = normalize(update, workspace);
         var deferred = $q.defer();
         var cacheKey = ['configs', n.ws, id];
@@ -90,7 +88,7 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, HttpSe
             deferred.resolve(CacheService.get(cacheKey));
             return deferred.promise;
         }
-        getConfigs(workspace, update).then(function(data) {
+        getConfigs(workspace, update, weight).then(function(data) {
             var result = CacheService.get(cacheKey);
             if (result)
                 deferred.resolve(result);

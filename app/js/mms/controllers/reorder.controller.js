@@ -52,7 +52,7 @@ function($scope, $rootScope, $stateParams, document, time, ElementService, ViewS
         }
     };
 
-    ViewService.getDocumentViews(document.sysmlid, false, ws, time, true)
+    ViewService.getDocumentViews(document.sysmlid, false, ws, time, true, 2)
     .then(function(views) {
         up2dateViews = views;
         up2dateViews.forEach(function(view) {
