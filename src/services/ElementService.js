@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms')
-.factory('ElementService', ['$q', '$http', 'URLService', 'UtilsService', 'CacheService', 'HttpService', '_', ElementService]);
+.factory('ElementService', ['$q', '$http', 'URLService', 'UtilsService', 'CacheService', 'HttpService', 'ApplicationService','_', ElementService]);
 
 /**
  * @ngdoc service
@@ -18,7 +18,7 @@ angular.module('mms')
  *
  * For element json example, see [here](https://ems.jpl.nasa.gov/alfresco/mms/raml/index.html)
  */
-function ElementService($q, $http, URLService, UtilsService, CacheService, HttpService,  _) {
+function ElementService($q, $http, URLService, UtilsService, CacheService, HttpService, ApplicationService, _) {
     
     var inProgress = {};
     /**
@@ -81,8 +81,8 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         var deferred = $q.defer();
         if (CacheService.exists(n.cacheKey) && !n.update) {
             var cached = CacheService.get(n.cacheKey);
-            if ((cached.specialization.type === 'View' ||
-                cached.specialization.type === 'Product') &&
+            if ((cached.specialization && (cached.specialization.type === 'View' ||
+                cached.specialization.type === 'Product')) &&
                 !cached.specialization.hasOwnProperty('contains') &&
                 !cached.specialization.hasOwnProperty('contents')) {
             } else {
@@ -346,6 +346,10 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
 
         var handleSuccess = function(n, data) {
             var resp = CacheService.put(n.cacheKey, UtilsService.cleanElement(data.elements[0]), true);
+            var history = CacheService.get(UtilsService.makeElementKey(elem.sysmlid, workspace, 'versions'));
+            if (history) {
+                history.unshift({modifier: data.elements[0].modifier, timestamp: data.elements[0].modified});
+            }
             var edit = CacheService.get(UtilsService.makeElementKey(elem.sysmlid, n.ws, null, true));
             if (edit) {
                 // Only want to merge the properties that were updated:
@@ -365,7 +369,9 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
             deferred.reject('Element id not found, create element first!');
         else {
             var n = normalize(elem.sysmlid, null, workspace, null);
-            $http.post(URLService.getPostElementsURL(n.ws), {'elements': [elem]}, {timeout: 30000})
+
+            $http.post(URLService.getPostElementsURL(n.ws), {'elements': [elem],'source': ApplicationService.getSource()
+        },{timeout: 30000})
             .success(function(data, status, headers, config) {
                 handleSuccess(n, data);
             }).error(function(data, status, headers, config) {
@@ -675,16 +681,25 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
      */
     var getElementVersions = function(id, update, workspace) {
         var n = normalize(id, update, workspace, 'versions');
+
+        var key = 'getElementVersions(' + id + n.update + n.ws + ')';
+        if (inProgress.hasOwnProperty(key)) {
+            return inProgress[key];
+        }
+
         var deferred = $q.defer();
         if (CacheService.exists(n.cacheKey) && !n.update) {
             deferred.resolve(CacheService.get(n.cacheKey));
             return deferred.promise;
         }
+        inProgress[key] = deferred.promise;
         $http.get(URLService.getElementVersionsURL(id, n.ws))
         .success(function(data, statas, headers, config){
             deferred.resolve(CacheService.put(n.cacheKey, data.versions, true));
-        }).error(function(data, status, headers, config){
+            delete inProgress[key];
+        }).error(function(data, status, headers, config) {
             URLService.handleHttpStatus(data, status, headers, config, deferred);
+            delete inProgress[key];
         });
         return deferred.promise;
     };
@@ -741,7 +756,6 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         res.cacheKey = UtilsService.makeElementKey(id, res.ws, res.ver, edit);
         return res;
     };
-
     return {
         getElement: getElement,
         getElements: getElements,

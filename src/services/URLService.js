@@ -321,8 +321,7 @@ function urlService(baseUrl) {
      * @returns {string} The url.
      */
     var getElementVersionsURL = function(id, workspace) {
-        return root + "/javawebscripts/elements/" + id + "/versions";
-        //return root + '/workspaces/' + workspace + '/elements/' + id + '/versions';
+        return root + '/workspaces/' + workspace + '/history/' + id;
     };
 
     /**

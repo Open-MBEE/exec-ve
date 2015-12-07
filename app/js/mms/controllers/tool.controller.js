@@ -32,6 +32,7 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
 
     $scope.show = {
         element: true,
+        history: false,
         reorder: false,
         snapshots: false,
         tags: false
@@ -77,6 +78,8 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
     $scope.etrackerChange = function() {
         $scope.specApi.keepMode();
         var id = $scope.tracker.etrackerSelected;
+        if (!id)
+            return;
         var info = id.split('|');
         if (info[0] === 'element') {
             $scope.eid = info[1];
@@ -128,6 +131,10 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
 
     $scope.$on('tags', function() {
         showPane('tags');
+    });
+    
+    $scope.$on('element.history', function() {
+        showPane('history');
     });
 
     var cleanUpEdit = function(scope) {

@@ -3,10 +3,13 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('FullDocCtrl', ['$scope', '$rootScope', '$state', '$stateParams', '$window', 'MmsAppUtils', 'document', 'workspace', 'site', 'snapshot', 'time', 'ConfigService', 'UxService', 'growl', 'hotkeys',
-function($scope, $rootScope, $state, $stateParams, $window, MmsAppUtils, document, workspace, site, snapshot, time, ConfigService, UxService, growl, hotkeys) {
+
+.controller('FullDocCtrl', ['$scope', '$templateCache', '$compile', '$timeout', '$rootScope', '$state', '$stateParams', '$window', 'MmsAppUtils', 'document', 'workspace', 'site', 'snapshot', 'time', 'ConfigService', 'UxService', 'ViewService', 'UtilsService', 'growl', 'hotkeys', 'search',
+function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateParams, $window, MmsAppUtils, document, workspace, site, snapshot, time, ConfigService, UxService, ViewService, UtilsService, growl, hotkeys, search) {
+
     $scope.ws = $stateParams.workspace;
     $scope.site = site;
+    $scope.search = search;
     var views = [];
     if (!$rootScope.veCommentsOn)
         $rootScope.veCommentsOn = false;
@@ -69,6 +72,10 @@ function($scope, $rootScope, $state, $stateParams, $window, MmsAppUtils, documen
 
     $scope.bbApi = {};
     $scope.bbApi.init = function() {
+
+        $scope.bbApi.addButton(UxService.getButtonBarButton('print'));
+        $scope.bbApi.addButton(UxService.getButtonBarButton('tabletocsv'));
+
         if (document && document.editable && time === 'latest') {
             $scope.bbApi.addButton(UxService.getButtonBarButton('show.edits'));
             $scope.bbApi.setToggleState('show.edits', $rootScope.mms_ShowEdits);
@@ -79,6 +86,7 @@ function($scope, $rootScope, $state, $stateParams, $window, MmsAppUtils, documen
                 callback: function() {$scope.$broadcast('show.edits');}
             });
         }
+
         $scope.bbApi.addButton(UxService.getButtonBarButton('show.comments'));
         $scope.bbApi.setToggleState('show.comments', $rootScope.veCommentsOn);
         $scope.bbApi.addButton(UxService.getButtonBarButton('show.elements'));
@@ -253,4 +261,30 @@ function($scope, $rootScope, $state, $stateParams, $window, MmsAppUtils, documen
     $scope.$on('section.add.section', function(event, section) {
         MmsAppUtils.addPresentationElement($scope, 'Section', section);
     });
+
+    $scope.$on('print', function() {
+        MmsAppUtils.popupPrintConfirm(document, $scope.ws, time, true);
+    });
+    
+    $scope.$on('tabletocsv', function() {
+        MmsAppUtils.tableToCsv(document, $scope.ws, time, true);
+    });
+
+    $scope.facet = '$';
+    $scope.filterQuery = {query: ""};
+    $scope.$watchGroup(['filterQuery.query', 'facet'], function(newVal, oldVal){
+        $scope.searchFilter = {};
+        $scope.searchFilter[$scope.facet] = $scope.filterQuery.query;
+    });
+
+    $scope.setFilterFacet = function(filterFacet) {
+        if(filterFacet === 'all') $scope.facet = '$';
+        else  $scope.facet = filterFacet;
+        angular.element('.search-filter-type button').removeClass('active');
+        angular.element('.btn-filter-facet-' + filterFacet).addClass('active');
+    };
+
+    $scope.searchGoToDocument = function (documentId, viewId) {
+        $state.go('workspace.site.document.view', {document: documentId, view: viewId, tag: undefined, search: undefined});
+    };
 }]);

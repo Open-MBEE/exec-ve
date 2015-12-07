@@ -51,6 +51,10 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
         element.click(function(e) {
             if (scope.noClick)
                 return;
+            if (scope.clickHandler) {
+                scope.clickHandler();
+                return;
+            }
             if (scope.addFrame)
                 scope.addFrame();
 
@@ -124,7 +128,7 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
                 if (reason.status === 410)
                     status = ' deleted';
                 element.html('<span class="error">name cf ' + newVal + status + '</span>');
-                growl.error('Cf Name Error: ' + reason.message + ': ' + scope.mmsEid);
+                //growl.error('Cf Name Error: ' + reason.message + ': ' + scope.mmsEid);
             });
         });
 
@@ -174,7 +178,13 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
                 Utils.previewAction(scope, recompileEdit, recompile, type, element);
             };
         }
-
+        //actions for stomp using growl messages
+        scope.$on("stomp.element", function(event, deltaSource, deltaWorkspaceId, deltaElementID, deltaModifier, deltaName){
+            if(deltaWorkspaceId === scope.ws && deltaElementID === scope.mmsEid){
+                if (scope.isEditing)
+                    growl.warning(" This value has been changed to: "+deltaName+" by: "+ deltaModifier, {ttl: 30000});
+            }
+        });
     };
 
     return {
@@ -185,7 +195,8 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
             mmsWs: '@',
             mmsVersion: '@',
             mmsWatchId: '@',
-            noClick: '@'
+            noClick: '@',
+            clickHandler: '&?'
         },
         require: '?^mmsView',
         controller: ['$scope', mmsTranscludeNameCtrl],

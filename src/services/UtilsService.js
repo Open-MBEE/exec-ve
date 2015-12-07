@@ -46,8 +46,10 @@ function UtilsService(CacheService, _) {
                 //delete elem.specialization.allowedElements;
                 if (elem.specialization.contents && elem.specialization.contains)
                     delete elem.specialization.contains;
-                if (elem.specialization.displayedElements)
+                if (elem.specialization.displayedElements) {
+                    elem.specialization.numElements = elem.specialization.displayedElements.length;
                     delete elem.specialization.displayedElements;
+                }
                 if (elem.specialization.allowedElements)
                     delete elem.specialization.allowedElements;
             }
@@ -249,25 +251,26 @@ function UtilsService(CacheService, _) {
             result.push('<caption>' + table.title + '</caption>');
         if (table.header) {
             result.push('<thead>');
-            result.push(makeTableBody(table.header));
+            result.push(makeTableBody(table.header, true));
             result.push('</thead>');
         }
         result.push('<tbody>');
-        result.push(makeTableBody(table.body));
+        result.push(makeTableBody(table.body, false));
         result.push('</tbody>');
         result.push('</table>');
         return result.join('');
 
     };
 
-    var makeTableBody = function(body) {
+    var makeTableBody = function(body, header) {
         var result = [], i, j, k, row, cell, thing;
+        var dtag = (header ? 'th' : 'td');
         for (i = 0; i < body.length; i++) {
             result.push('<tr>');
             row = body[i];
             for (j = 0; j < row.length; j++) {
                 cell = row[j];
-                result.push('<td colspan="' + cell.colspan + '" rowspan="' + cell.rowspan + '">');
+                result.push('<' + dtag + ' colspan="' + cell.colspan + '" rowspan="' + cell.rowspan + '">');
                 for (k = 0; k < cell.content.length; k++) {
                     thing = cell.content[k];
                     result.push('<div>');
@@ -282,7 +285,7 @@ function UtilsService(CacheService, _) {
                     }
                     result.push('</div>');
                 }
-                result.push('</td>');
+                result.push('</' + dtag + '>');
             }
             result.push('</tr>');
         }
@@ -332,6 +335,42 @@ function UtilsService(CacheService, _) {
         return '<mms-transclude-' + t + ' data-mms-eid="' + para.source + '"></mms-transclude-' + t + '>';
     };
 
+    var makeHtmlTOC = function (tree) {
+        var result = '<div style="page-break-after:always"><div style="font-size:32px">Table of Contents</div>';
+
+        var root_branch = tree[0].branch;
+
+        result += '<ul style="list-style-type:none">';
+
+        var anchor = '<a href=#' + root_branch.data.sysmlid + '>';
+        result += '  <li>' + anchor + root_branch.section + ' ' + root_branch.label + '</a></li>';
+
+        root_branch.children.forEach(function (child) {
+            result += makeHtmlTOCChild(child);
+        });
+
+        result += '</ul>'; 
+        result += '</div>'; 
+
+        return result;
+    };
+
+    var makeHtmlTOCChild = function(child) {
+
+        var result = '<ul style="list-style-type:none">';
+
+        var anchor = '<a href=#' + child.data.sysmlid + '>';
+        result += '  <li>' + anchor + child.section + ' ' + child.label + '</a></li>';
+
+        child.children.forEach(function (child2) {
+            result += makeHtmlTOCChild(child2);
+        });
+
+        result += '</ul>'; 
+
+        return result;
+    };
+
     return {
         hasCircularReference: hasCircularReference,
         cleanElement: cleanElement,
@@ -344,6 +383,7 @@ function UtilsService(CacheService, _) {
         isRestrictedValue: isRestrictedValue,
         makeHtmlTable : makeHtmlTable,
         makeHtmlPara: makeHtmlPara,
-        makeHtmlList: makeHtmlList
+        makeHtmlList: makeHtmlList,
+        makeHtmlTOC: makeHtmlTOC
     };
 }

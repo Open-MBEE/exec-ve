@@ -187,7 +187,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                 if (reason.status === 410)
                     status = ' deleted';
                 element.html('<span class="error">doc cf ' + newVal + status + '</span>');
-                growl.error('Cf Doc Error: ' + reason.message + ': ' + scope.mmsEid);
+                //growl.error('Cf Doc Error: ' + reason.message + ': ' + scope.mmsEid);
             });
         });
 
@@ -257,6 +257,19 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                 scope.tinymceType = scope.presentationElem.type;
             }
         }
+        
+        //actions for stomp 
+        scope.$on("stomp.element", function(event, deltaSource, deltaWorkspaceId, deltaElementId, deltaModifier, elemName){
+            if(deltaWorkspaceId === scope.ws && deltaElementId === scope.mmsEid){
+                if(scope.isEditing === false){
+                    recompile();
+                }
+                if(scope.isEditing === true){
+                    growl.warning("This documentation has been changed: " + elemName +
+                                " modified by: " + deltaModifier, {ttl: 30000});
+                }
+            }
+        });
 
     };
 

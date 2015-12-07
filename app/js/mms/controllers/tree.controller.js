@@ -22,7 +22,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
     $rootScope.mms_fullDocMode = false;
     if ($state.includes('workspace.site.document.full'))
         $rootScope.mms_fullDocMode = true;
-
+    $scope.treeFilter = {search: ''};
     // TODO: pull in config/tags
     var config = time;
     var ws = $stateParams.workspace; // TODO this is undefined, but is being used below
@@ -45,7 +45,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
     $scope.bbApi.init = function() {
       $scope.bbApi.addButton(UxService.getButtonBarButton("tree.expand"));
       $scope.bbApi.addButton(UxService.getButtonBarButton("tree.collapse"));
-      $scope.bbApi.addButton(UxService.getButtonBarButton("tree.filter"));
+      //$scope.bbApi.addButton(UxService.getButtonBarButton("tree.filter"));
 
       if ($state.includes('workspaces') && !$state.includes('workspace.sites')) {
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree.add.task"));
@@ -125,7 +125,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
     $scope.$on('tree.reorder.view', function() {
         $rootScope.mms_fullDocMode = false;
         $scope.bbApi.setToggleState("tree.full.document", false);
-        $state.go('workspace.site.document.order');
+        $state.go('workspace.site.document.order', {search: undefined});
     });
 
     var creatingSnapshot = false;
@@ -276,9 +276,8 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
                 $scope.comparing = false;
                 return;
             }
-            $state.go('workspace.diff', {source: sourceWs, target: targetWs, sourceTime: sourceTime, targetTime: targetTime});
+            $state.go('workspace.diff', {source: sourceWs, target: targetWs, sourceTime: sourceTime, targetTime: targetTime, search: undefined});
         });
-        //$state.go('workspace.diff', {source: sourceWs, target: targetWs, sourceTime: sourceTime, targetTime: targetTime});
     };
 
     // Filter out alfresco sites
@@ -343,7 +342,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
 
     var siteLevel2Func = function(site, siteNode) {
         // Make sure we haven't already loaded the docs for this site
-        if(siteNode.docsLoaded) return;
+        if(siteNode.docsLoaded || siteNode.type !== 'site') return;
         // Set docs loaded attribute
         siteNode.docsLoaded = true;
         
@@ -400,6 +399,26 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
         });
     };
     
+    var allViewLevel2Func = function() {
+        document.specialization.view2view.forEach(function(view, index) {
+            var node = viewId2node[view.id];
+            if (node)
+                viewLevel2Func(view.id, node);
+        });
+    };
+    //TODO remove once we have priority queue
+    var viewLevel2Func = function(vid, branch) {
+        if (branch.type === 'view') {
+            if (!branch.loaded) {
+                branch.loaded = true;
+                ViewService.getView(vid, false, ws, time)
+                .then(function(view) {
+                    addViewSections(view);
+                });
+            }
+        }
+    };
+
     if ($state.includes('workspaces') && !$state.includes('workspace.sites')) {
         $scope.my_data = UtilsService.buildTreeHierarchy(workspaces, "id", 
                                                          "workspace", "parent", workspaceLevel2Func);
@@ -555,19 +574,19 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
     }
     // TODO: Update behavior to handle new state descriptions
     $scope.my_tree_handler = function(branch) {
+
         if ($state.includes('workspaces') && !$state.includes('workspace.sites')) {
             if (branch.type === 'workspace') {
-                $state.go('workspace', {workspace: branch.data.id, tag: undefined});
+                $state.go('workspace', {workspace: branch.data.id, tag: undefined, search: undefined});
             } else if (branch.type === 'configuration') {
-                //$rootScope.$broadcast('elementSelected', branch.data.id, 'tag');
-                $state.go('workspace', {workspace: branch.workspace, tag: branch.data.id});
+                $state.go('workspace', {workspace: branch.workspace, tag: branch.data.id, search: undefined});
             }
         } else if ($state.includes('workspace.sites') && !$state.includes('workspace.site.document')) {
             if (branch.type === 'site')
-                $state.go('workspace.site', {site: branch.data.sysmlid});
+                $state.go('workspace.site', {site: branch.data.sysmlid, search: undefined});
             else if (branch.type === 'view' || branch.type === 'snapshot') {
                 var documentSiteBranch = $rootScope.mms_treeApi.get_parent_branch(branch);
-                $state.go('workspace.site.documentpreview', {site: documentSiteBranch.data.sysmlid, document: branch.data.sysmlid});
+                $state.go('workspace.site.documentpreview', {site: documentSiteBranch.data.sysmlid, document: branch.data.sysmlid, search: undefined});
             }
         } else if ($state.includes('workspace.site.document')) {
 
@@ -575,14 +594,17 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
             var sectionId = branch.type === 'section' ? branch.data.sysmlid : null;
             var hash = sectionId ? sectionId : view;
             if ($rootScope.mms_fullDocMode) {
+                if (branch.type === 'view')
+                    viewLevel2Func(branch.data.sysmlid, branch); //TODO remove when priority queue is done
                 $location.hash(hash);
                 $rootScope.veCurrentView = view;
                 ViewService.setCurrentViewId(view);
                 $anchorScroll();
             } else if (branch.type === 'view') {
-                $state.go('workspace.site.document.view', {view: branch.data.sysmlid});
+                viewLevel2Func(branch.data.sysmlid, branch); //TODO remove when priority queue is done
+                $state.go('workspace.site.document.view', {view: branch.data.sysmlid, search: undefined});
             } else if (branch.type === 'section') {
-                $state.go('workspace.site.document.view', {view: view});
+                $state.go('workspace.site.document.view', {view: view, search: undefined});
                 $timeout(function() {
                     $location.hash(hash);
                     $anchorScroll();
@@ -590,6 +612,19 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
             }
         }
         $rootScope.mms_tbApi.select('element.viewer');
+    };
+
+    $scope.dblclick_tree_handler = function(branch) {
+        if ($state.includes('workspace.sites') && !$state.includes('workspace.site.document')) {
+            if (branch.type === 'site')
+                $rootScope.mms_treeApi.expand_branch(branch);
+            else if (branch.type === 'view' || branch.type === 'snapshot') {
+                var documentSiteBranch = $rootScope.mms_treeApi.get_parent_branch(branch);
+                $state.go('workspace.site.document', {site: documentSiteBranch.data.sysmlid, document: branch.data.sysmlid, search: undefined});
+            }
+        } else if ($state.includes('workspace.site.document')) {
+            $rootScope.mms_treeApi.expand_branch(branch);
+        }
     };
 
     // TODO: Update sort function to handle all cases
@@ -678,7 +713,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
 
                 if (itemType === 'View') {
                     viewId2node[data.sysmlid] = newbranch;
-                    $state.go('workspace.site.document.view', {view: data.sysmlid});
+                    $state.go('workspace.site.document.view', {view: data.sysmlid, search: undefined});
                 }
 
             });
@@ -774,12 +809,13 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
                     viewId = curBranch.view;
                 else
                     viewId = curBranch.data.sysmlid;
-                $state.go('workspace.site.document.view', {view: viewId});
+                $state.go('workspace.site.document.view', {view: viewId, search: undefined});
             }
         } else {
             if ($state.current.name === 'doc.all') {
                 $rootScope.mms_fullDocMode = true;
                 $scope.bbApi.setToggleState("tree.full.document", true);
+                allViewLevel2Func(); //TODO remove when priority queue is done
             } else {
                 if (document.specialization.view2view.length > 30) {
                     var instance = $modal.open({
@@ -793,14 +829,16 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
                     instance.result.then(function(choice) {
                         if (choice === 'ok') {
                             $rootScope.mms_fullDocMode = true;
+                            allViewLevel2Func(); //TODO remove when priority queue is done
                             $scope.bbApi.setToggleState("tree.full.document", true);
-                            $state.go('workspace.site.document.full'); 
+                            $state.go('workspace.site.document.full', {search: undefined}); 
                         }
                     });
                 } else {
                     $rootScope.mms_fullDocMode = true;
+                    allViewLevel2Func(); //TODO remove when priority queue is done
                     $scope.bbApi.setToggleState("tree.full.document", true);
-                    $state.go('workspace.site.document.full'); 
+                    $state.go('workspace.site.document.full', {search: undefined}); 
                 }
             }
         }
@@ -842,7 +880,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
             $scope.treeApi.remove_branch(branch);
             if ($state.includes('workspace.sites') && !$state.includes('workspace.site.document'))
                 return;
-            $state.go('^');
+            $state.go('^', {search: undefined});
         });
     };
 
@@ -935,6 +973,9 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
             $scope.configuration.now = "true";
             $scope.configuration.timestamp = new Date();
             displayName = "Tag";
+            $scope.updateTimeOpt = function () {
+                $scope.configuration.now ='false';
+            };
         }
         else if ($scope.itemType === 'Document') {
             $scope.doc = {name: ""};
@@ -1119,14 +1160,22 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
     });
 
     if ($state.includes('workspace.site.document')) {
-        var delay = 0;
         if (document.specialization.view2view) {
             document.specialization.view2view.forEach(function(view, index) {
-                //$timeout(function() {
-                    ViewService.getView(view.id, false, ws, time)
-                    .then(addViewSections);
-                //}, delay*index);
+                //ViewService.getView(view.id, false, ws, time);
+                //.then(addViewSections); //TODO add back in once we have priority queue
             });
         }
+        $timeout(function() {
+            if ($rootScope.mms_treeInitial) {
+                $rootScope.veCurrentView = $rootScope.mms_treeInitial;
+                ViewService.setCurrentViewId($rootScope.mms_treeInitial);
+                var node = viewId2node[$rootScope.mms_treeInitial];
+                if (node)
+                    viewLevel2Func($rootScope.mms_treeInitial, node);
+            }
+        }, 0, false);
     }
+    if ($rootScope.mms_fullDocMode)
+        $timeout(allViewLevel2Func, 0, false); //TODO remove when priority queue is done
 }]);

@@ -29,6 +29,10 @@ function UxService($rootScope) {
 		  	return {id: button, icon: 'fa-eye', selected: true, active: true, permission:true, tooltip: 'Preview Element', 
             		spinner: false, onClick: function() {$rootScope.$broadcast(button);},
                 dynamic_buttons: [getToolbarButton("element.editor.saveall")]};
+      case "element.history":
+		  	return {id: button, icon: 'fa-history', selected: true, active: true, permission:true, tooltip: 'Element History', 
+            		spinner: false, onClick: function() {$rootScope.$broadcast(button);},
+                dynamic_buttons: [getToolbarButton("element.editor.saveall")]};
 		  case "element.editor":
 		    return {id: button, icon: 'fa-edit', selected: false, active: true, permission:false, tooltip: 'Edit Element',
 		            spinner: false, onClick: function() {$rootScope.$broadcast(button);},
@@ -226,6 +230,12 @@ function UxService($rootScope) {
           case "section.add.comment":
             return {id: button, icon: 'fa-comment-o', selected: true, active: true, permission: true, tooltip: 'Add Comment', 
                     spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button, scope.section);}};
+          case "print":
+            return {id: button, icon: 'fa-print', selected: true, active: true, permission: true, tooltip: 'Print', 
+                    spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
+          case "tabletocsv":
+            return {id: button, icon: 'fa-table', selected: true, active: true, permission: true, tooltip: 'Table to CSV', 
+                    spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
         }
 	};
 
