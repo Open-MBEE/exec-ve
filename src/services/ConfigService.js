@@ -39,11 +39,11 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, HttpSe
      * @param {boolean} [update=false] update from server
      * @returns {Promise} Promise would be resolved with array of configuration objects
      */
-    var getConfigs = function(workspace, update) {
+    var getConfigs = function(workspace, update, weight) {
         var n = normalize(update, workspace);
         var inProgressKey = 'getConfigs.' + n.ws;
         if (inProgress.hasOwnProperty(inProgressKey)) {
-            HttpService.ping(URLService.getConfigsURL(n.ws));
+            HttpService.ping(URLService.getConfigsURL(n.ws), weight);
             return inProgress[inProgressKey];
         }
         var deferred = $q.defer();
@@ -63,7 +63,9 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, HttpSe
         }, function(data, status, headers, config) {
             URLService.handleHttpStatus(data, status, headers, config, deferred);
             delete inProgress[inProgressKey];
-        });
+        },
+        weight
+        );
         return deferred.promise;
     };
 

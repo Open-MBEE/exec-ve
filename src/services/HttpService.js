@@ -12,10 +12,12 @@ angular.module('mms')
  */
 function HttpService($http, $q, _) {
     
-    var queue = [];
+    var queue = {};
+    queue[0]= [];//high proirity
+    queue[1]=[];//low prority
+    var cache = {}; // cache url -> this is a easy key look up
     var inProgress = 0;
-    var cache = {};
-    var GET_OUTBOUND_LIMIT = 20;
+    var GET_OUTBOUND_LIMIT = 20; //max number of requests sent to the rest server at one time
 
     /**
      * @ngdoc method
@@ -23,38 +25,54 @@ function HttpService($http, $q, _) {
      * @methodOf mms.HttpService
      * 
      * @description
-     * Put a new get request in the queue, the queue is LIFO
+     * Put a new get request in the queue, the queue is FIFO
      *
      * @param {string} url url to get
      * @param {function} success success function
      * @param {function} error function
+     * @param {string} proirity by weight
      */
-    var get = function(url, success, error) {
+    var get = function(url, successCallback, errorCallback, weight) {
         if (inProgress >= GET_OUTBOUND_LIMIT) {
-            // push to top of list
-            var request = { url : url, success : success, error: error };
-            cache[url] = request;
-            queue.unshift(request);
-        }
+            var request = { url : url, sucessCallback: sucessCallback , errorCallback: errorCallback , weight: weight };
+            if(request.weight === 2)
+                immediate(request);
+            else if(request.weight === 0)
+                queue[0].push(request);
+            else
+                queue[1].push(request); 
+            if(cache.hasOwnProperty(url)){
+                 if(cache[url].weight < request.weight)
+                    cache[url].weight = request.weight;
+            }
+            else {
+                cache[url] = request;
+            } 
+        } 
         else {
             inProgress++;
-            if (cache.hasOwnProperty(url)) {
-                delete cache[url];
-            }
-            $http.get(url)
-                .success(success)
-                .error(error)
+            $http.get(url).then(
+                function(response){sucessCallback(response.data, response.status, response.headers, response.config)},
+                function(response){errorCallback(response.data, response.status, response.headers, response.config)})
                 .finally( function() {
-                    inProgress--;
-                    
-                    if (queue.length > 0) {
-                        var next = queue.shift();
-                        get(next.url, next.success, next.error);
+                    inProgress--; 
+                    var next; 
+                    if (cache.hasOwnProperty(url)) {
+                        delete cache[url];
+                    }  
+                    if (queue[1].length > 0) {
+                        next = queue[1].shift();
+                        get(next.url, next.sucessCallback, next.errorCallback, next.weight);
                     }
-                });
+                    if(queue[1].length <= 0 && queue[0].length > 0){
+                        next = queue[0].shift();
+                        get(next.url, next.sucessCallback, next.errorCallback, next.weight);
+                    }
+                })
+            });
         }
     };
-
+    
     /**
      * @ngdoc method
      * @name mms.HttpService#ping
@@ -65,17 +83,41 @@ function HttpService($http, $q, _) {
      *
      * @param {string} url url to get
      */
-    var ping = function(url) {
+    var ping = function(url, weight) { // ping should simply change the weight
         if (cache.hasOwnProperty(url)) {
             var request = cache[url];
-            var index = queue.indexOf(request);
+            var index = queue[0].indexOf(request);
+            if(request.weight === 0)// if 0 change to 1
+                request.weight = 1;
             if (index > -1) {
-                queue.splice(index, 1);
+                queue[0].splice(index, 1);
             }
-            queue.unshift(request);
+            queue[1].push(request);// move to back of 1
         }
     };
-
+    
+    /**
+     * @ngdoc method
+     * @name mms.HttpService#ping
+     * @methodOf mms.HttpService
+     * 
+     * @description Changes all requests in the Queue 1 to Queue 0
+     */
+    var transformQueue(){
+        if(queue[1].length > 0) //will the queue ever be defined?
+            for(var i = 0; i < queue[1].length; i++){
+                queue[1][i].request.weight = 0;
+                if(cache.hasOwnProperty(queue[1][i].url))
+                    cache[url].weight = 0;
+            }
+            
+    };
+    function immediate(request){
+        $http.get(url).then(
+            function(response){sucessCallback(response.data, response.status, response.headers, response.config)},
+            function(response){errorCallback(response.data, response.status, response.headers, response.config)}
+        );
+    }
     return {
         get: get,
         ping: ping
