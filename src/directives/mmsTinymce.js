@@ -81,12 +81,6 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                 angular.element('.btn-search-id').removeClass('active');
                 angular.element('.btn-search-' + searchType).addClass('active');
             };
-            $scope.setFilterFacet = function(filterFacet) {
-                if(filterFacet === 'all') $scope.facet = '$';
-                else  $scope.facet = filterFacet;
-                angular.element('.search-filter-type button').removeClass('active');
-                angular.element('.btn-filter-facet-' + filterFacet).addClass('active');
-            };
             $scope.choose = function(elementId, property, name) {
                 var tag = '<mms-transclude-' + property + ' data-mms-eid="' + elementId + '">[cf:' + name + '.' + property + ']</mms-transclude-' + property + '> ';
                 $modalInstance.close(tag);
@@ -125,6 +119,10 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
             $scope.openProposeModal = function() {
                 $modalInstance.close(false);
             };
+            // Set search result options
+            $scope.searchOptions= {};
+            $scope.searchOptions.callback = $scope.choose;
+            $scope.searchOptions.emptyDocTxt = 'This field is empty, but you can still click here to cross-reference a placeholder.';
             $scope.makeNew = function() {
                 $scope.proposeClass = "fa fa-spin fa-spinner";
                 ElementService.createElement({name: $scope.newE.name, documentation: $scope.newE.documentation, specialization: {type: 'Element'}}, scope.mmsWs, scope.mmsSite)
@@ -196,12 +194,6 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                     $modalInstance.close(false);
                 }
             };
-            
-            $scope.facet = '$';
-            $scope.$watchGroup(['filterQuery', 'facet'], function(newVal, oldVal){
-	            $scope.searchFilter = {};
-	            $scope.searchFilter[$scope.facet] = $scope.filterQuery;
-            });
         };
 
         var autocompleteCallback = function(ed) {

@@ -385,6 +385,10 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     $scope.tscClicked = function(elementId) {
         $rootScope.$broadcast('elementSelected', elementId, 'element');
     };
+    $scope.searchOptions= {};
+    $scope.searchOptions.callback = $scope.tscClicked;
+    $scope.searchOptions.emptyDocTxt = 'This field is empty.';
+
     $scope.elementTranscluded = function(element, type) {
         if (type === 'Comment' && !$scope.comments.hasOwnProperty(element.sysmlid)) {
             $scope.comments[element.sysmlid] = element;
@@ -407,24 +411,10 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         }
     };
 
-
-    $scope.facet = '$';
-    $scope.filterQuery = {query: ""};
-    $scope.$watchGroup(['filterQuery.query', 'facet'], function(newVal, oldVal){
-        $scope.searchFilter = {};
-        $scope.searchFilter[$scope.facet] = $scope.filterQuery.query;
-    });
-
-    $scope.setFilterFacet = function(filterFacet) {
-        if(filterFacet === 'all') $scope.facet = '$';
-        else  $scope.facet = filterFacet;
-        angular.element('.search-filter-type button').removeClass('active');
-        angular.element('.btn-filter-facet-' + filterFacet).addClass('active');
-    };
-
     $scope.searchGoToDocument = function (siteId, documentId, viewId) {
         $state.go('workspace.site.document.view', {site: siteId, document: documentId, view: viewId, tag: undefined, search: undefined});
     };
+    $scope.searchOptions.relatedCallback = $scope.searchGoToDocument;
 
     $scope.$on('print', function() {
         MmsAppUtils.popupPrintConfirm(view, $scope.ws, time, false);
