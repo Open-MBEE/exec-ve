@@ -266,8 +266,8 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
      * @param {string} [workspace=master] workspace associated, this will not change the url
      * @param {string} [version=latest] timestamp associated, this will not change the url
      */
-    var getGenericElements = function(url, key, update, workspace, version) {
-        var n = normalize(null, update, workspace, version, weight);
+    var getGenericElements = function(url, key, update, workspace, version, weight) {
+        var n = normalize(null, update, workspace, version);
 
         var progress = 'getGenericElements(' + url + key + n.update + n.ws + n.ver + ')';
         if (inProgress.hasOwnProperty(progress)) {

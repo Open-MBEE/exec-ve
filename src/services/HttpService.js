@@ -34,9 +34,11 @@ function HttpService($http, $q, _) {
      */
     var get = function(url, successCallback, errorCallback, weight) {
         if (inProgress >= GET_OUTBOUND_LIMIT) {
-            var request = { url : url, sucessCallback: sucessCallback , errorCallback: errorCallback , weight: weight };
+            var request = { url : url, successCallback: successCallback, errorCallback: errorCallback , weight: weight };
             if(request.weight === 2)
-                immediate(request);
+                $http.get(url).then(
+                    function(response){successCallback(response.data, response.status, response.headers, response.config);},
+                    function(response){errorCallback(response.data, response.status, response.headers, response.config);});
             else if(request.weight === 0)
                 queue[0].push(request);
             else
@@ -52,24 +54,23 @@ function HttpService($http, $q, _) {
         else {
             inProgress++;
             $http.get(url).then(
-                function(response){sucessCallback(response.data, response.status, response.headers, response.config)},
-                function(response){errorCallback(response.data, response.status, response.headers, response.config)})
+                function(response){successCallback(response.data, response.status, response.headers, response.config);},
+                function(response){errorCallback(response.data, response.status, response.headers, response.config);})
                 .finally( function() {
-                    inProgress--; 
+                    inProgress--;
                     var next; 
                     if (cache.hasOwnProperty(url)) {
                         delete cache[url];
-                    }  
+                    }
                     if (queue[1].length > 0) {
                         next = queue[1].shift();
-                        get(next.url, next.sucessCallback, next.errorCallback, next.weight);
+                        get(next.url, next.successCallback, next.errorCallback, next.weight);
                     }
                     if(queue[1].length <= 0 && queue[0].length > 0){
                         next = queue[0].shift();
-                        get(next.url, next.sucessCallback, next.errorCallback, next.weight);
+                        get(next.url, next.successCallback, next.errorCallback, next.weight);
                     }
-                })
-            });
+                });
         }
     };
     
@@ -103,21 +104,18 @@ function HttpService($http, $q, _) {
      * 
      * @description Changes all requests in the Queue 1 to Queue 0
      */
-    var transformQueue(){
+    var transformQueue = function(){
         if(queue[1].length > 0) //will the queue ever be defined?
             for(var i = 0; i < queue[1].length; i++){
                 queue[1][i].request.weight = 0;
-                if(cache.hasOwnProperty(queue[1][i].url))
-                    cache[url].weight = 0;
+                if(cache.hasOwnProperty(queue[1][i].request.url))
+                    cache[queue[1][i].request.url].weight = 0;
+                queue[0][i].push(queue[1][i].request);
+                queue[1][i].shift();
             }
             
     };
-    function immediate(request){
-        $http.get(url).then(
-            function(response){sucessCallback(response.data, response.status, response.headers, response.config)},
-            function(response){errorCallback(response.data, response.status, response.headers, response.config)}
-        );
-    }
+
     return {
         get: get,
         ping: ping
