@@ -347,7 +347,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
         siteNode.docsLoaded = true;
         
         siteNode.loading = true;
-        ViewService.getSiteDocuments(site, false, ws, config === 'latest' ? 'latest' : tag.timestamp)
+        ViewService.getSiteDocuments(site, false, ws, config === 'latest' ? 'latest' : tag.timestamp, 2)
         .then(function(docs) {
 	        
 	        // If no documents are found on a site, stop forcing expansion
@@ -399,7 +399,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
         });
     };
     
-    var allViewLevel2Func = function() {
+    /*var allViewLevel2Func = function() {
         document.specialization.view2view.forEach(function(view, index) {
             var node = viewId2node[view.id];
             if (node)
@@ -407,7 +407,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
         });
     };
     //TODO remove once we have priority queue
-    var viewLevel2Func = function(vid, branch) {
+    /*var viewLevel2Func = function(vid, branch) {
         if (branch.type === 'view') {
             if (!branch.loaded) {
                 branch.loaded = true;
@@ -417,7 +417,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
                 });
             }
         }
-    };
+    };*/
 
     if ($state.includes('workspaces') && !$state.includes('workspace.sites')) {
         $scope.my_data = UtilsService.buildTreeHierarchy(workspaces, "id", 
@@ -495,7 +495,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
         var addContentsSectionTreeNode = function(operand) {
             var instances = [];
             operand.forEach(function(instanceVal) {
-                instances.push(ViewService.parseExprRefTree(instanceVal, ws, time));
+                instances.push(ViewService.parseExprRefTree(instanceVal, ws, time, 0));
             });
             $q.all(instances).then(function(results) {
                 var k = results.length - 1;
@@ -594,14 +594,14 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
             var sectionId = branch.type === 'section' ? branch.data.sysmlid : null;
             var hash = sectionId ? sectionId : view;
             if ($rootScope.mms_fullDocMode) {
-                if (branch.type === 'view')
-                    viewLevel2Func(branch.data.sysmlid, branch); //TODO remove when priority queue is done
+                //if (branch.type === 'view')
+                //  viewLevel2Func(branch.data.sysmlid, branch); //TODO remove when priority queue is done
                 $location.hash(hash);
                 $rootScope.veCurrentView = view;
                 ViewService.setCurrentViewId(view);
                 $anchorScroll();
             } else if (branch.type === 'view') {
-                viewLevel2Func(branch.data.sysmlid, branch); //TODO remove when priority queue is done
+                //viewLevel2Func(branch.data.sysmlid, branch); //TODO remove when priority queue is done
                 $state.go('workspace.site.document.view', {view: branch.data.sysmlid, search: undefined});
             } else if (branch.type === 'section') {
                 $state.go('workspace.site.document.view', {view: view, search: undefined});
@@ -815,7 +815,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
             if ($state.current.name === 'doc.all') {
                 $rootScope.mms_fullDocMode = true;
                 $scope.bbApi.setToggleState("tree.full.document", true);
-                allViewLevel2Func(); //TODO remove when priority queue is done
+                //allViewLevel2Func(); //TODO remove when priority queue is done
             } else {
                 if (document.specialization.view2view.length > 30) {
                     var instance = $modal.open({
@@ -829,14 +829,14 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
                     instance.result.then(function(choice) {
                         if (choice === 'ok') {
                             $rootScope.mms_fullDocMode = true;
-                            allViewLevel2Func(); //TODO remove when priority queue is done
+                            //allViewLevel2Func(); //TODO remove when priority queue is done
                             $scope.bbApi.setToggleState("tree.full.document", true);
                             $state.go('workspace.site.document.full', {search: undefined}); 
                         }
                     });
                 } else {
                     $rootScope.mms_fullDocMode = true;
-                    allViewLevel2Func(); //TODO remove when priority queue is done
+                    //allViewLevel2Func(); //TODO remove when priority queue is done
                     $scope.bbApi.setToggleState("tree.full.document", true);
                     $state.go('workspace.site.document.full', {search: undefined}); 
                 }
@@ -996,7 +996,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
             //growl.info("Searching...");
             $scope.searching = true;
 
-            ElementService.search(searchText, ['name'], null, false, ws)
+            ElementService.search(searchText, ['name'], null, false, ws, 2)
             .then(function(data) {
 
                 for (var i = 0; i < data.length; i++) {
@@ -1162,20 +1162,20 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
     if ($state.includes('workspace.site.document')) {
         if (document.specialization.view2view) {
             document.specialization.view2view.forEach(function(view, index) {
-                //ViewService.getView(view.id, false, ws, time);
-                //.then(addViewSections); //TODO add back in once we have priority queue
+                ViewService.getView(view.id, false, ws, time, 0)
+                .then(addViewSections); //TODO add back in once we have priority queue
             });
         }
         $timeout(function() {
             if ($rootScope.mms_treeInitial) {
                 $rootScope.veCurrentView = $rootScope.mms_treeInitial;
                 ViewService.setCurrentViewId($rootScope.mms_treeInitial);
-                var node = viewId2node[$rootScope.mms_treeInitial];
-                if (node)
-                    viewLevel2Func($rootScope.mms_treeInitial, node);
+                //var node = viewId2node[$rootScope.mms_treeInitial];
+                //if (node)
+                //    viewLevel2Func($rootScope.mms_treeInitial, node);
             }
         }, 0, false);
     }
-    if ($rootScope.mms_fullDocMode)
-        $timeout(allViewLevel2Func, 0, false); //TODO remove when priority queue is done
+    //if ($rootScope.mms_fullDocMode)
+    //    $timeout(allViewLevel2Func, 0, false); //TODO remove when priority queue is done
 }]);

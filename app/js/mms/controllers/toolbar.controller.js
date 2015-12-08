@@ -38,6 +38,7 @@ angular.module('mmsApp').controller('ToolbarCtrl', ['$scope', '$rootScope', '$st
 			$scope.tbApi.setOptions('element.viewer', {
 				active: false
 			});
+			$scope.tbApi.setPermission('element.history', false);
 		}
 		else if ($state.includes('workspace.sites') && !$state.includes('workspace.site.document'))
 		{

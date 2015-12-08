@@ -92,7 +92,7 @@ function mmsView(ViewService, $templateCache, $rootScope, growl) {
         };
 
         this.getViewElements = function() {
-            return ViewService.getViewElements($scope.mmsVid, false, $scope.mmsWs, $scope.mmsVersion);
+            return ViewService.getViewElements($scope.mmsVid, false, $scope.mmsWs, $scope.mmsVersion, 1);
         };
 
         this.transcludeClicked = function(elementId) {
@@ -143,7 +143,7 @@ function mmsView(ViewService, $templateCache, $rootScope, growl) {
             if (!newVal || (newVal === oldVal && processed))
                 return;
             processed = true;
-            ViewService.getView(scope.mmsVid, false, scope.mmsWs, scope.mmsVersion)
+            ViewService.getView(scope.mmsVid, false, scope.mmsWs, scope.mmsVersion, 1)
             .then(function(data) {
                 if (scope.mmsVersion && scope.mmsVersion !== 'latest') {
                     if (data.specialization.contains) {
@@ -166,7 +166,7 @@ function mmsView(ViewService, $templateCache, $rootScope, growl) {
                     scope.modifier = data.modifier;
                     return;
                 }
-                ViewService.getViewElements(scope.mmsVid, false, scope.mmsWs, scope.mmsVersion)
+                ViewService.getViewElements(scope.mmsVid, false, scope.mmsWs, scope.mmsVersion, 1)
                 .then(function(data2) {
                     scope.view = data;
                     scope.modified = data.modified;

@@ -31,15 +31,15 @@ function mmsViewTable($compile, $timeout, $templateCache, UtilsService) {
         var lastIndex = trs.length;
         function compile() {
             $timeout(function() {
-                var first = lastIndex - 100;
-                if (first < 0)
-                    first = 0;
-                var now = trs.slice(first, lastIndex);
+                var first = nextIndex;
+                if (first > lastIndex)
+                    return;
+                var now = trs.slice(first, first + 100);
                 $compile(now)(scope);
-                lastIndex = lastIndex - 100;
-                if (lastIndex > 0)
+                nextIndex = first + 100;
+                if (nextIndex < lastIndex)
                     compile();
-            }, 200, false);
+            }, 100, false);
         }
         compile();
         scope.search = function() {
