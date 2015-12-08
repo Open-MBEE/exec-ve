@@ -57,11 +57,11 @@ function mmsViewPresentationElem(ViewService, ElementService, $templateCache, $r
             }
             // Parse the element reference tree for the presentation element:
             ViewService.parseExprRefTree(scope.mmsInstanceVal, ws, version)
-            .then(function(element) {
-                scope.presentationElem = element;
+            .then(function(elem) {
+                scope.presentationElem = elem;
                 // This is a kludge to get the template switch statement to work
                 // for Sections:
-                if (ViewService.isSection(element)) {
+                if (ViewService.isSection(elem)) {
                     scope.presentationElem.type = 'Section';
                 }
 
@@ -69,6 +69,11 @@ function mmsViewPresentationElem(ViewService, ElementService, $templateCache, $r
                 then(function(instanceSpec) {
                     scope.instanceSpec = instanceSpec;
                     scope.presentationElemLoading = false;
+                    element.click(function(e) {
+                        if (mmsViewCtrl)
+                            mmsViewCtrl.transcludeClicked(instanceSpec.sysmlid);
+                        e.stopPropagation();
+                    });
                 });
             }, function(reason) {
                 var status = ' not found';
