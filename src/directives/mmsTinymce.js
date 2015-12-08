@@ -196,12 +196,6 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                     $modalInstance.close(false);
                 }
             };
-            
-            $scope.facet = '$';
-            $scope.$watchGroup(['filterQuery', 'facet'], function(newVal, oldVal){
-	            $scope.searchFilter = {};
-	            $scope.searchFilter[$scope.facet] = $scope.filterQuery;
-            });
         };
 
         var autocompleteCallback = function(ed) {

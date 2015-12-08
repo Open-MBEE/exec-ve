@@ -7,19 +7,12 @@ function mmsSearchResults($rootScope,$templateCache) {
 	var template = $templateCache.get('mms/templates/mmsSearchResults.html');
 
 	var mmsSearchResultsLink = function(scope, element, attrs) {
-    scope.searchSuccess = false;
-    if (scope.mmsOptions.type === "modal-search") {
-      scope.isCfmodal = true;
-    } else {
-      scope.isCfmodal = false;
-    }
 		scope.facet = '$';
     scope.filterQuery = {query: ""};
     scope.$watchGroup(['filterQuery.query', 'facet'], function(newVal, oldVal){
         scope.searchFilter = {};
         scope.searchFilter[scope.facet] = scope.filterQuery.query;
     });
-
     scope.setFilterFacet = function(filterFacet) {
         if(filterFacet === 'all') scope.facet = '$';
         else  scope.facet = filterFacet;
@@ -27,7 +20,13 @@ function mmsSearchResults($rootScope,$templateCache) {
         angular.element('.btn-filter-facet-' + filterFacet).addClass('active');
     };
 
+    // Set options 
     scope.emptyDocTxt = scope.mmsOptions.emptyDocTxt;
+    if (scope.mmsOptions.type === "modal-search") {
+      scope.isCfmodal = true;
+    } else {
+      scope.isCfmodal = false;
+    }
     scope.userResultClick = function(elementId, property, name) {
       if (scope.mmsOptions.callback && scope.mmsOptions.type === 'center-search') {
         scope.mmsOptions.callback(elementId);
