@@ -7,6 +7,12 @@ function mmsSearchResults($rootScope,$templateCache) {
 	var template = $templateCache.get('mms/templates/mmsSearchResults.html');
 
 	var mmsSearchResultsLink = function(scope, element, attrs) {
+    scope.searchSuccess = false;
+    if (scope.mmsOptions.type === "modal-search") {
+      scope.isCfmodal = true;
+    } else {
+      scope.isCfmodal = false;
+    }
 		scope.facet = '$';
     scope.filterQuery = {query: ""};
     scope.$watchGroup(['filterQuery.query', 'facet'], function(newVal, oldVal){
