@@ -175,8 +175,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      *      multiple calls to this method with the same id would result in 
      *      references to the same object.
      */
-    var getView = function(id, update, workspace, version) { 
-        return ElementService.getElement(id, update, workspace, version);
+    var getView = function(id, update, workspace, version, weight) { 
+        return ElementService.getElement(id, update, workspace, version, weight);
     };
 
     /**
@@ -197,8 +197,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      *      multiple calls to this method with the same ids would result in an array of 
      *      references to the same objects.
      */
-    var getViews = function(ids, update, workspace, version) {
-        return ElementService.getElements(ids, update, workspace, version);
+    var getViews = function(ids, update, workspace, version, weight) {
+        return ElementService.getElements(ids, update, workspace, version, weight);
     };
 
     /**
@@ -219,8 +219,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      *      multiple calls to this method with the same id would result in 
      *      references to the same object.
      */
-    var getDocument = function(id, update, workspace, version) {
-        return ElementService.getElement(id, update, workspace, version);
+    var getDocument = function(id, update, workspace, version, weight) {
+        return ElementService.getElement(id, update, workspace, version, weight);
     };
 
     /**
@@ -322,7 +322,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @param {string} [version=latest] (optional) alfresco version number or timestamp
      * @returns {Promise} The promise will be resolved with array of element objects. 
      */
-    var getViewElements = function(id, update, workspace, version) {
+    var getViewElements = function(id, update, workspace, version, weight) {
         var n = normalize(update, workspace, version);
         var deferred = $q.defer();
         var url = URLService.getViewElementsURL(id, n.ws, n.ver);
@@ -330,7 +330,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         if (CacheService.exists(cacheKey) && !n.update) 
             deferred.resolve(CacheService.get(cacheKey));
         else {
-            ElementService.getGenericElements(url, 'elements', n.update, n.ws, n.ver).
+            ElementService.getGenericElements(url, 'elements', n.update, n.ws, n.ver, weight).
             then(function(data) {
                 deferred.resolve(CacheService.put(cacheKey, data, false));
             }, function(reason) {
@@ -358,7 +358,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @param {boolean} [simple=false] (optional) whether to get simple views
      * @returns {Promise} The promise will be resolved with array of view objects. 
      */
-    var getDocumentViews = function(id, update, workspace, version, simple) {
+    var getDocumentViews = function(id, update, workspace, version, simple, weight) {
         var n = normalize(update, workspace, version);
         var s = !simple ? false : simple; 
         var deferred = $q.defer();
@@ -367,7 +367,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         if (CacheService.exists(cacheKey) && !n.update) 
             deferred.resolve(CacheService.get(cacheKey));
         else {
-            ElementService.getGenericElements(url, 'views', n.update, n.ws, n.ver).
+            ElementService.getGenericElements(url, 'views', n.update, n.ws, n.ver, weight).
             then(function(data) {
                 deferred.resolve(CacheService.put(cacheKey, data, false));
             }, function(reason) {
@@ -398,7 +398,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         var deferred = $q.defer();
         var ws = !workspace ? 'master' : workspace;
         var docViewsCacheKey = ['products', ws, documentId, 'latest', 'views'];
-        getDocument(documentId, false, ws)
+        getDocument(documentId, false, ws, null, 2)
         .then(function(data) {  
             var clone = {};
             clone.sysmlid = data.sysmlid;
@@ -462,7 +462,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
 
         var deferred = $q.defer();
         var ws = !workspace ? 'master' : workspace;
-        ElementService.getElement(viewOrSectionId, false, ws)
+        ElementService.getElement(viewOrSectionId, false, ws, null, 2)
         .then(function(data) {  
             var clone = {};
             clone.sysmlid = data.sysmlid;
@@ -521,7 +521,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
 
         if (instanceVal) {
             var ws = !workspace ? 'master' : workspace;
-            ElementService.getElement(viewOrSecId, false, ws)
+            ElementService.getElement(viewOrSecId, false, ws, null, 2)
             .then(function(data) {  
                 var clone = {};
                 clone.sysmlid = data.sysmlid;
@@ -950,7 +950,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @param {string} [version=latest] timestamp
      * @returns {Promise} The promise will be resolved with array of document objects 
      */
-    var getSiteDocuments = function(site, update, workspace, version) {
+    var getSiteDocuments = function(site, update, workspace, version, weight) {
         var n = normalize(update, workspace, version);
         var deferred = $q.defer();
         var url = URLService.getSiteProductsURL(site, n.ws, n.ver);
@@ -958,7 +958,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         if (CacheService.exists(cacheKey) && !n.update) 
             deferred.resolve(CacheService.get(cacheKey));
         else {
-            ElementService.getGenericElements(url, 'products', n.update, n.ws, n.ver).
+            ElementService.getGenericElements(url, 'products', n.update, n.ws, n.ver, weight).
             then(function(data) {              
                 deferred.resolve(CacheService.put(cacheKey, data, false));
             }, function(reason) {
@@ -983,13 +983,13 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @returns {Promise} The promise will be resolved with a json object for the 
      *                    corresponding presentation element
      */
-    var parseExprRefTree = function(instanceVal, workspace, version) {
+    var parseExprRefTree = function(instanceVal, workspace, version, weight) {
 
         var instanceSpecId = instanceVal.instance;
         var deferred = $q.defer();
 
         // TODO do we need version?
-        ElementService.getElement(instanceSpecId, false, workspace, version)
+        ElementService.getElement(instanceSpecId, false, workspace, version, weight)
         .then(function(instanceSpec) {
 
             // InstanceSpecifcations can have instanceSpecificationSpecification 
@@ -1028,16 +1028,16 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
     };
 
 
-    var getElementReferenceTree = function (contents, workspace, version) {
+    var getElementReferenceTree = function (contents, workspace, version, weight) {
 
         var promises = [];
         angular.forEach(contents.operand, function(instanceVal) {
-            promises.push( getElementReference(instanceVal, workspace, version) );
+            promises.push( getElementReference(instanceVal, workspace, version, weight) );
         });
         return $q.all(promises);
     };
 
-    var getElementReference = function (instanceVal, workspace, version) {
+    var getElementReference = function (instanceVal, workspace, version, weight) {
         var deferred = $q.defer();
 
         var elementObject = {};
@@ -1046,11 +1046,11 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         elementObject.instanceVal = instanceVal;
         elementObject.sectionElements = [];
 
-        getInstanceSpecification(instanceVal, workspace, version).then(function(instanceSpecification) {
+        getInstanceSpecification(instanceVal, workspace, version, weight).then(function(instanceSpecification) {
 
             elementObject.instanceSpecification = instanceSpecification;
 
-            parseExprRefTree(instanceVal, workspace, version).then(function(presentationElement) {
+            parseExprRefTree(instanceVal, workspace, version, weight).then(function(presentationElement) {
 
                 elementObject.presentationElement = presentationElement;
 
@@ -1082,12 +1082,12 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @returns {Promise} The promise will be resolved with a json object for the 
      *                    corresponding presentation element
      */
-    var getInstanceSpecification = function(instanceVal, workspace, version) {
+    var getInstanceSpecification = function(instanceVal, workspace, version, weight) {
 
         var instanceSpecId = instanceVal.instance;
         var deferred = $q.defer();
 
-        ElementService.getElement(instanceSpecId, false, workspace, version)
+        ElementService.getElement(instanceSpecId, false, workspace, version, weight)
         .then(function(instanceSpec) {
             deferred.resolve(instanceSpec);
         }, function(reason) {
@@ -1136,10 +1136,10 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         return UtilsService.normalize({update: update, workspace: workspace, version: version});
     };
 
-    var getDocMetadata = function(docid, ws, version) {
+    var getDocMetadata = function(docid, ws, version, weight) {
         var deferred = $q.defer();
         var metadata = {};
-        ElementService.search(docid, ['id'], null, null, ws)
+        ElementService.search(docid, ['id'], null, null, ws, weight)
         .then(function(data) {
             if (data.length === 0 || data[0].sysmlid !== docid || !data[0].properties) {
                 return;

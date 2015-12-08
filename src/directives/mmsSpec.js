@@ -155,7 +155,7 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
                 });
             } else {
                 scope.isEnumeration = false;
-            ElementService.getElement(scope.mmsEid, false, scope.mmsWs, scope.mmsVersion)
+            ElementService.getElement(scope.mmsEid, false, scope.mmsWs, scope.mmsVersion, 2)
             .then(function(data) {
                 //element.empty();
                 //var template = null;

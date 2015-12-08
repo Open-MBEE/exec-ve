@@ -184,6 +184,8 @@ function mmsNav($templateCache, $state, hotkeys, growl, ElementService) {
                 growl.warning("Please finish diff action first.");
                 return;
             } else {
+                if ($state.params.search === searchText)
+                    return;
                 scope.searchClass = "fa fa-spin fa-spinner";
                 $state.go($state.current.name, {search: searchText});
             }

@@ -103,7 +103,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                 element[0].innerHTML = toCompile;
                 $compile(element.contents())(scope.recompileScope); 
             } else if (UtilsService.isRestrictedValue(scope.values)) {
-                ElementService.getElement(scope.values[0].operand[1].element, false, scope.ws, scope.version)
+                ElementService.getElement(scope.values[0].operand[1].element, false, scope.ws, scope.version, 2)
                 .then(function(e) {
                     scope.isRestrictedVal = true;
                     element[0].innerHTML = "<span>" + e.name + "</span>";
@@ -156,7 +156,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                 element[0].innerHTML = '<div class="panel panel-info">'+toCompile+'</div>';
                 $compile(element.contents())(scope.recompileScope); 
             } else if (UtilsService.isRestrictedValue(scope.editValues)) {
-                ElementService.getElement(scope.editValues[0].operand[1].element, false, scope.ws, scope.version)
+                ElementService.getElement(scope.editValues[0].operand[1].element, false, scope.ws, scope.version, 2)
                 .then(function(e) {
                     element[0].innerHTML = e.name;
                 });
@@ -188,7 +188,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
             }
             scope.ws = ws;
             scope.version = version ? version : 'latest';
-            ElementService.getElement(scope.mmsEid, false, ws, version)
+            ElementService.getElement(scope.mmsEid, false, ws, version, 1)
             .then(function(data) {
                 scope.element = data;
                 scope.values = scope.element.specialization.value;

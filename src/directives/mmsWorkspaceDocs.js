@@ -44,9 +44,9 @@ function mmsWorkspaceDocs(ElementService, SiteService, ViewService, growl, $q, $
             sites.forEach(function(site) {
                 var siteDeferred = $q.defer();
                 filterPromises.push(siteDeferred.promise);
-                ViewService.getSiteDocuments(site.sysmlid, false, ws, version)
+                ViewService.getSiteDocuments(site.sysmlid, false, ws, version, 1)
                 .then(function(sitedocs) {
-                    ElementService.getElement("master_filter", false, ws, version)
+                    ElementService.getElement("master_filter", false, ws, version, 2)
                     .then(function(filter) {
                         if (gotfilter)
                             return;
