@@ -122,8 +122,6 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
             // Set search result options
             $scope.searchOptions= {};
             $scope.searchOptions.callback = $scope.choose;
-            $scope.searchOptions.createEltCallback = $scope.openProposeModal;
-            $scope.searchOptions.type = 'modal-search';
             $scope.searchOptions.emptyDocTxt = 'This field is empty, but you can still click here to cross-reference a placeholder.';
             $scope.makeNew = function() {
                 $scope.proposeClass = "fa fa-spin fa-spinner";

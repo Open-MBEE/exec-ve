@@ -22,20 +22,14 @@ function mmsSearchResults($rootScope,$templateCache) {
 
     // Set options 
     scope.emptyDocTxt = scope.mmsOptions.emptyDocTxt;
-    if (scope.mmsOptions.type === "modal-search") {
-      scope.isCfmodal = true;
-    } else {
-      scope.isCfmodal = false;
-    }
     scope.userResultClick = function(elementId, property, name) {
-      if (scope.mmsOptions.callback && scope.mmsOptions.type === 'center-search') {
-        scope.mmsOptions.callback(elementId);
-      } else if (scope.mmsOptions.callback && scope.mmsOptions.type === 'modal-search')  {
+      if (scope.mmsOptions.callback) {
         scope.mmsOptions.callback(elementId,property,name);
       }
     };
-    scope.createEltClick = function() {
-      scope.mmsOptions.createEltCallback();
+    scope.userRelatedClick = function(siteId, documentId, viewId) {
+        if (scope.mmsOptions.relatedCallback)
+            scope.mmsOptions.relatedCallback(siteId, documentId, viewId);
     };
 	};
 

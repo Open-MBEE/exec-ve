@@ -31,10 +31,6 @@
 	                <button ng-click="setFilterFacet('sysmlid')" type="button" class="btn-filter-facet-sysmlid btn-search-type btn btn-default">MDID</button>
 	            </div>
             </div>
-            <!-- Use only if cf modal search -->
-            <div ng-show="isCfmodal" class="cant-find-element">
-                Can't find your element? <a ng-click="createEltClick()" class="create-element-link">Create a new one</a>
-            </div>
             <div>Showing {{filteredElms.length}} of {{search.length}} search results.</div>
         </div>
     </div>
@@ -107,7 +103,7 @@
             <div ng-if="elem.relatedDocuments.length > 0" class="elem-documentation-wrapper">
                 <label>RELATED DOCUMENTS</label>
                 <div ng-repeat="relatedDocument in elem.relatedDocuments" class="elem-documentation">
-                    <a ng-repeat="relatedView in relatedDocument.parentViews" ng-click="searchGoToDocument(relatedDocument.siteCharacterizationId, relatedDocument.sysmlid, relatedView.sysmlid)">
+                    <a ng-repeat="relatedView in relatedDocument.parentViews" ng-click="userRelatedClick(relatedDocument.siteCharacterizationId, relatedDocument.sysmlid, relatedView.sysmlid)">
                         {{relatedDocument.name}} > {{relatedView.name}}
                     </a>
                 </div>
