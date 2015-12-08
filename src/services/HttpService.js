@@ -78,7 +78,7 @@ function HttpService($http, $q, _) {
                         next = queue[1].shift();
                         get(next.url, next.successCallback, next.errorCallback, next.weight);
                     }
-                    if(queue[1].length <= 0 && queue[0].length > 0){
+                    else if(queue[0].length > 0){
                         next = queue[0].shift();
                         get(next.url, next.successCallback, next.errorCallback, next.weight);
                     }
@@ -97,6 +97,9 @@ function HttpService($http, $q, _) {
      * @param {string} url url to get
      */
     var ping = function(url, weight) { // ping should simply change the weight
+        if(weight === undefined){
+            weight = 1;
+        }
         if (cache.hasOwnProperty(url)) {
             if(weight > cache[url].weight){
                 var request = cache[url];
@@ -131,20 +134,23 @@ function HttpService($http, $q, _) {
      * @description Changes all requests in the Queue 1 to Queue 0
      */
     var transformQueue = function(){
-        if(queue[1].length > 0) //will the queue ever be defined?
+        if(queue[1].length > 0) {//will the queue ever be defined?
             for(var i = 0; i < queue[1].length; i++){
                 queue[1][i].request.weight = 0;
                 // if(cache.hasOwnProperty(queue[1][i].request.url))
                 //     cache[queue[1][i].request.url].weight = 0;
-                queue[0][i].push(queue[1][i].request);
-                queue[1][i].shift();
+                //queue[0][i].push(queue[1][i].request);
+                //queue[1][i].shift();
             }
-            
+            queue[0] = queue[0].concat(queue[1]);
+            queue[1] = [];
+        }
     };
 
     return {
         get: get,
-        ping: ping
+        ping: ping,
+        transformQueue: transformQueue
     };
 
 }
