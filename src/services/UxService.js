@@ -161,7 +161,7 @@ function UxService($rootScope) {
                     spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);},
                 	dropdown_buttons: [getButtonBarButton("view.add.paragraph"), getButtonBarButton("view.add.section"),
                   getButtonBarButton("view.add.comment"), getButtonBarButton("view.add.list"),
-                  ]
+                  getButtonBarButton("view.add.table"),getButtonBarButton("view.add.image")]
                   //, getButtonBarButton("view.add.table"),
                 		// getButtonBarButton("view.add.equation"), getButtonBarButton("view.add.image"),
                     };
@@ -205,7 +205,8 @@ function UxService($rootScope) {
             return {id: button, icon: 'fa-plus', selected: true, active: true, permission: true, tooltip: 'Add Item', 
                     spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);},
                     dropdown_buttons: [getButtonBarButton("section.add.paragraph",scope), getButtonBarButton("section.add.section", scope),
-                    getButtonBarButton("section.add.comment", scope), getButtonBarButton("section.add.list",scope)]
+                    getButtonBarButton("section.add.comment", scope), getButtonBarButton("section.add.list",scope),
+                    getButtonBarButton("section.add.table",scope), getButtonBarButton("section.add.image",scope)]
                     //, getButtonBarButton("section.add.table",scope),
                       //, getButtonBarButton("section.add.equation", scope), getButtonBarButton("section.add.image",scope),
                       };

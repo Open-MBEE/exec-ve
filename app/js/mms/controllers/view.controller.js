@@ -263,11 +263,11 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     $scope.$on('view.add.list', function() {
         MmsAppUtils.addPresentationElement($scope, 'List', view);
     });
-/*
+
     $scope.$on('view.add.table', function() {
-        addElement('Table');
+        MmsAppUtils.addPresentationElement($scope, 'Table', view);
     });
-*/
+
     $scope.$on('view.add.section', function() {
         MmsAppUtils.addPresentationElement($scope, 'Section', view);
     });
@@ -275,11 +275,11 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     $scope.$on('view.add.comment', function() {
         MmsAppUtils.addPresentationElement($scope, 'Comment', view);
     });
-/*
-    $scope.$on('view.add.image', function() {
-        addElement('Figure');
-    });
 
+    $scope.$on('view.add.image', function() {
+        MmsAppUtils.addPresentationElement($scope, 'Figure', view);
+    });
+/*
     $scope.$on('view.add.equation', function() {
         addElement('Equation');
     });
@@ -291,11 +291,11 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     $scope.$on('section.add.list', function(event, section) {
         MmsAppUtils.addPresentationElement($scope, 'List', section);
     });
-/*
-    $scope.$on('section.add.table', function(event, section) {
-        addElement('Table', section);
-    });
 
+    $scope.$on('section.add.table', function(event, section) {
+        MmsAppUtils.addPresentationElement($scope, 'Table', section);
+    });
+/*
     $scope.$on('section.add.equation', function(event, section) {
         addElement('Equation', section);
     });
@@ -307,11 +307,11 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     $scope.$on('section.add.comment', function(event, section) {
         MmsAppUtils.addPresentationElement($scope, 'Comment', section);
     });
-/*
+
     $scope.$on('section.add.image', function(event, section) {
-        addElement('Figure', section);
+        MmsAppUtils.addPresentationElement($scope, 'Figure', section);
     });
-*/
+
     $scope.$on('show.comments', function() {
         $scope.viewApi.toggleShowComments();
         $scope.bbApi.toggleButtonState('show.comments');
