@@ -33,16 +33,27 @@ function HttpService($http, $q, _) {
      * @param {string} proirity by weight
      */
     var get = function(url, successCallback, errorCallback, weight) {
+        if(weight === undefined){
+            weight = 1;
+        }
+        var request = { url : url, successCallback: successCallback, errorCallback: errorCallback , weight: weight };
         if (inProgress >= GET_OUTBOUND_LIMIT) {
-            var request = { url : url, successCallback: successCallback, errorCallback: errorCallback , weight: weight };
-            if(request.weight === 2)
+            if(request.weight === 2){
                 $http.get(url).then(
                     function(response){successCallback(response.data, response.status, response.headers, response.config);},
-                    function(response){errorCallback(response.data, response.status, response.headers, response.config);});
-            else if(request.weight === 0)
+                    function(response){errorCallback(response.data, response.status, response.headers, response.config);})
+                    .finally(function(){
+                        if (cache.hasOwnProperty(url)) {
+                            delete cache[url];
+                        }
+                    });
+            }    
+            else if(request.weight === 0){
                 queue[0].push(request);
-            else
-                queue[1].push(request); 
+            }    
+            else{
+                queue[1].push(request);
+            } 
             if(cache.hasOwnProperty(url)){
                  if(cache[url].weight < request.weight)
                     cache[url].weight = request.weight;
@@ -53,6 +64,7 @@ function HttpService($http, $q, _) {
         } 
         else {
             inProgress++;
+            cache[url] = request;
             $http.get(url).then(
                 function(response){successCallback(response.data, response.status, response.headers, response.config);},
                 function(response){errorCallback(response.data, response.status, response.headers, response.config);})
@@ -86,14 +98,28 @@ function HttpService($http, $q, _) {
      */
     var ping = function(url, weight) { // ping should simply change the weight
         if (cache.hasOwnProperty(url)) {
-            var request = cache[url];
-            var index = queue[0].indexOf(request);
-            if(request.weight === 0)// if 0 change to 1
-                request.weight = 1;
-            if (index > -1) {
-                queue[0].splice(index, 1);
+            if(weight > cache[url].weight){
+                var request = cache[url];
+                var index;
+                if(request.weight === 0)
+                    index= queue[0].indexOf(request);
+                else
+                    index= queue[1].indexOf(request);
+                if(weight === 1 && index !== -1){
+                    request.weight = 1;
+                    queue[1].push(request);
+                    queue[0].splice(index, 1);
+                }
+                else if(weight === 2 && index !== -1){
+                    if(request.weight === 0 ){
+                        queue[0].splice(index, 1);
+                    }
+                    else{
+                        queue[1].splice(index, 1);
+                    }
+                    get(cache[url].request.url, cache[url].request.successCallback, cache[url].request.url.errorCallback, weight);
+                }
             }
-            queue[1].push(request);// move to back of 1
         }
     };
     
@@ -108,8 +134,8 @@ function HttpService($http, $q, _) {
         if(queue[1].length > 0) //will the queue ever be defined?
             for(var i = 0; i < queue[1].length; i++){
                 queue[1][i].request.weight = 0;
-                if(cache.hasOwnProperty(queue[1][i].request.url))
-                    cache[queue[1][i].request.url].weight = 0;
+                // if(cache.hasOwnProperty(queue[1][i].request.url))
+                //     cache[queue[1][i].request.url].weight = 0;
                 queue[0][i].push(queue[1][i].request);
                 queue[1][i].shift();
             }
