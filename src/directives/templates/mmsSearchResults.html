@@ -32,15 +32,14 @@
 	            </div>
             </div>
             <!-- Use only if cf modal search -->
-            <div class="cant-find-element">
-                Can't find your element? <a ng-click="openProposeModal()" class="create-element-link">Create a new one</a>
+            <div ng-show="isCfmodal" class="cant-find-element">
+                Can't find your element? <a ng-click="createEltClick()" class="create-element-link">Create a new one</a>
             </div>
-			<div>Showing {{filteredElms.length}} of {{search.length}} search results.</div>
+            <div>Showing {{filteredElms.length}} of {{search.length}} search results.</div>
         </div>
     </div>
-</div>
 
-    <div class="container-fluid" ng-show="search">
+    <div class="container-fluid" ng-show="search.length > 0">
         <div class="elem-wrapper" ng-repeat="elem in filteredElms = (search | filter: searchFilter)">
             <hr>
             <div class="elem-name-wrapper">

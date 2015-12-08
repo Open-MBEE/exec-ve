@@ -35,6 +35,9 @@ function mmsSearchResults($rootScope,$templateCache) {
         scope.mmsOptions.callback(elementId,property,name);
       }
     };
+    scope.createEltClick = function() {
+      scope.mmsOptions.createEltCallback();
+    };
 	};
 
 	return {
