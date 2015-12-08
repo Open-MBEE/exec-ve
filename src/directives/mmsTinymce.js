@@ -91,6 +91,11 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                 var tag = '<mms-transclude-' + property + ' data-mms-eid="' + elementId + '">[cf:' + name + '.' + property + ']</mms-transclude-' + property + '> ';
                 $modalInstance.close(tag);
             };
+            // Set search result options
+            $scope.searchOptions= {};
+            $scope.searchOptions.callback = $scope.choose;
+            $scope.searchOptions.type = 'modal-search';
+            $scope.searchOptions.emptyDocTxt = 'This field is empty, but you can still click here to cross-reference a placeholder.';
             $scope.cancel = function() {
                 $modalInstance.dismiss();
             };
