@@ -27,7 +27,7 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
             //growl.info("Searching...");
             $scope.searching = true;
 
-            ElementService.search(searchText, ['name'], null, false, $scope.ws)
+            ElementService.search(searchText, ['name'], null, false, $scope.ws, 2)
             .then(function(data) {
                 var validClassifierIds = [];
                 if ($scope.presentationElemType === 'Table') {
@@ -309,7 +309,7 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
                 $timeout(openPopup, 0, false);
                 return;
             }
-            ViewService.getDocMetadata(ob.sysmlid, ws)
+            ViewService.getDocMetadata(ob.sysmlid, ws, null, 2)
             .then(function(metadata) {
                 useCover = true;
                 newScope.meta = metadata;

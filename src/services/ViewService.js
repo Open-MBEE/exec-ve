@@ -1136,10 +1136,10 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         return UtilsService.normalize({update: update, workspace: workspace, version: version});
     };
 
-    var getDocMetadata = function(docid, ws, version) {
+    var getDocMetadata = function(docid, ws, version, weight) {
         var deferred = $q.defer();
         var metadata = {};
-        ElementService.search(docid, ['id'], null, null, ws)
+        ElementService.search(docid, ['id'], null, null, ws, weight)
         .then(function(data) {
             if (data.length === 0 || data[0].sysmlid !== docid || !data[0].properties) {
                 return;

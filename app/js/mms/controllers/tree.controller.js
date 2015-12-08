@@ -347,7 +347,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
         siteNode.docsLoaded = true;
         
         siteNode.loading = true;
-        ViewService.getSiteDocuments(site, false, ws, config === 'latest' ? 'latest' : tag.timestamp)
+        ViewService.getSiteDocuments(site, false, ws, config === 'latest' ? 'latest' : tag.timestamp, 2)
         .then(function(docs) {
 	        
 	        // If no documents are found on a site, stop forcing expansion
@@ -996,7 +996,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
             //growl.info("Searching...");
             $scope.searching = true;
 
-            ElementService.search(searchText, ['name'], null, false, ws)
+            ElementService.search(searchText, ['name'], null, false, ws, 2)
             .then(function(data) {
 
                 for (var i = 0; i < data.length; i++) {

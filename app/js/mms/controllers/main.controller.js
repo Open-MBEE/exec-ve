@@ -3,8 +3,8 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('MainCtrl', ['$scope', '$location', '$rootScope', '$state', '_', '$window', 'growl', '$http', 'URLService', 'hotkeys', 'growlMessages', 'StompService', 'UtilsService',
-function($scope, $location, $rootScope, $state, _, $window, growl, $http, URLService, hotkeys, growlMessages, StompService, UtilsService) {
+.controller('MainCtrl', ['$scope', '$location', '$rootScope', '$state', '_', '$window', 'growl', '$http', 'URLService', 'hotkeys', 'growlMessages', 'StompService', 'UtilsService', 'HttpService',
+function($scope, $location, $rootScope, $state, _, $window, growl, $http, URLService, hotkeys, growlMessages, StompService, UtilsService, HttpService) {
     //StompService.connect("guest", "guest", function(){} ,function(){}, '/');
     $rootScope.mms_viewContentLoading = false;
     $rootScope.mms_treeInitial = '';
@@ -44,6 +44,7 @@ function($scope, $location, $rootScope, $state, _, $window, growl, $http, URLSer
     $rootScope.$on('$stateChangeStart', 
     function(event){ 
         $rootScope.mms_viewContentLoading = true;
+        HttpService.transformQueue();
     });
     
     //actions for stomp checking edit mode
