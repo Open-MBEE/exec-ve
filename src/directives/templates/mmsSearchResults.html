@@ -103,7 +103,7 @@
             <div ng-if="elem.relatedDocuments.length > 0" class="elem-documentation-wrapper">
                 <label>RELATED DOCUMENTS</label>
                 <div ng-repeat="relatedDocument in elem.relatedDocuments" class="elem-documentation">
-                    <a ng-repeat="relatedView in relatedDocument.parentViews" ng-click="userRelatedClick(relatedDocument.siteCharacterizationId, relatedDocument.sysmlid, relatedView.sysmlid)">
+                    <a ng-repeat="relatedView in relatedDocument.parentViews" ui-sref="workspace.site.document.view({document: relatedDocument.sysmlid, view: relatedView.sysmlid, site: relatedDocument.siteCharacterizationId, search: undefined})" ng-click="userRelatedClick($event, relatedDocument.siteCharacterizationId, relatedDocument.sysmlid, relatedView.sysmlid)">
                         {{relatedDocument.name}} > {{relatedView.name}}
                     </a>
                 </div>

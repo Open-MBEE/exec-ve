@@ -27,7 +27,9 @@ function mmsSearchResults($rootScope,$templateCache) {
         scope.mmsOptions.callback(elementId,property,name);
       }
     };
-    scope.userRelatedClick = function(siteId, documentId, viewId) {
+    scope.userRelatedClick = function(event, siteId, documentId, viewId) {
+        event.preventDefault();
+        event.stopPropagation();
         if (scope.mmsOptions.relatedCallback)
             scope.mmsOptions.relatedCallback(siteId, documentId, viewId);
     };
