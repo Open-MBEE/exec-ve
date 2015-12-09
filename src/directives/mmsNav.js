@@ -197,6 +197,7 @@ function mmsNav($templateCache, $state, hotkeys, growl, ElementService) {
         template: template,
         scope: {
             title: '@mmsTitle', //page title - used in mobile view only
+            site: '=mmsSite'
         },
         link: mmsNavLink
     };

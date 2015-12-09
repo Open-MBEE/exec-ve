@@ -24,8 +24,8 @@
             </form>
             <!-- Dashboard, Support, Feedback, and Logout buttons -->
             <ul class="nav-btns-main pull-right" id="nav-icons-text">
-                <li><a class="nav-btn support-btn" ng-click="toggleHelp()"><i class="fa fa-keyboard-o"></i> Shortcuts</a></li>
                 <li ng-show="site && site.sysmlid !== 'no-site'"><a class="nav-btn" href="/share/page/site/{{site.sysmlid}}/dashboard" target="_blank"><i class="fa fa-dashboard"></i> Dashboard</a></li>
+                <li><a class="nav-btn support-btn" ng-click="toggleHelp()"><i class="fa fa-keyboard-o"></i> Shortcuts</a></li>
                 <li><a class="nav-btn support-btn" href="https://ems.jpl.nasa.gov/alfresco/mmsapp/mms.html#/workspaces/master/sites/site__17_0_5_1_8660276_1410291055211_913229_25118" target="_blank"><i class="fa fa-question-circle"></i> Support</a></li>
                 <li><a class="nav-btn portal-btn"  href="https://ems.jpl.nasa.gov/share/page/site/ems-support/discussions-topiclist" target="_blank"><i class="fa fa-comments"></i> Feedback</a></li>
                 <li><a class="nav-btn logout-btn" href="/alfresco/service/logout/info?next=/alfresco/mmsapp/mms.html"><i class="fa fa-sign-out"></i> Logout</a></li>
