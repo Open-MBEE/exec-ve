@@ -120,7 +120,7 @@ function HttpService($http, $q, _) {
                     else{
                         queue[1].splice(index, 1);
                     }
-                    get(cache[url].request.url, cache[url].request.successCallback, cache[url].request.url.errorCallback, weight);
+                    get(request.url, request.successCallback, request.errorCallback, weight);
                 }
             }
         }
@@ -136,13 +136,13 @@ function HttpService($http, $q, _) {
     var transformQueue = function(){
         if(queue[1].length > 0) {//will the queue ever be defined?
             for(var i = 0; i < queue[1].length; i++){
-                queue[1][i].request.weight = 0;
+                queue[1][i].weight = 0;
                 // if(cache.hasOwnProperty(queue[1][i].request.url))
                 //     cache[queue[1][i].request.url].weight = 0;
-                //queue[0][i].push(queue[1][i].request);
+                queue[0].push(queue[1][i]);
                 //queue[1][i].shift();
             }
-            queue[0] = queue[0].concat(queue[1]);
+            //queue[0] = queue[0].concat(queue[1]);
             queue[1] = [];
         }
     };
