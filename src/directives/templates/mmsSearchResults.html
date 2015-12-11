@@ -20,7 +20,7 @@
         </form>-->
         <div class="misc-form-field" ng-show="search">
             <div class="form-filter">
-                <input class="form-control" type="text" ng-model="filterQuery.query" placeholder="Filter results" />
+                <input class="form-control" type="text" ng-model="filterQuery.query" ng-model-options="{debounce: 1000}" placeholder="Filter results" />
             </div>
             <div class="container-search-type">
 	            <div class="btn-group btn-group-xs search-filter-type">
