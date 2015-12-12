@@ -57,8 +57,9 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
 
                 scope.editable = scope.view.editable && scope.mmsVersion === 'latest';
 
-                if (data.specialization.contents) {
-                    ViewService.getElementReferenceTree(data.specialization.contents, scope.mmsWs, scope.mmsVersion).then(function(elementReferenceTree) {
+                var contents = data.specialization.contents || data.specialization.instanceSpecificationSpecification;
+                if (contents) {
+                    ViewService.getElementReferenceTree(contents, scope.mmsWs, scope.mmsVersion).then(function(elementReferenceTree) {
                         scope.elementReferenceTree = elementReferenceTree;
                         scope.originalElementReferenceTree = _.cloneDeep(elementReferenceTree);
                     });
@@ -85,12 +86,12 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
                 deferred.reject({type: 'error', message: "View isn't editable and can't be saved."});
                 return deferred.promise;
             }
-
+            var contents = scope.edit.specialization.contents || scope.edit.specialization.instanceSpecificationSpecification;
             // Update the View edit object on Save
-            if (scope.edit.specialization.contents) {
-                scope.edit.specialization.contents.operand = [];
+            if (contents) {
+                contents.operand = [];
                 for (var i = 0; i < scope.elementReferenceTree.length; i++) {
-                    scope.edit.specialization.contents.operand.push(scope.elementReferenceTree[i].instanceVal);
+                    contents.operand.push(scope.elementReferenceTree[i].instanceVal);
                 }
             }
 
@@ -136,8 +137,9 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
         };
 
         scope.refresh = function() {
-            if (scope.view.specialization.contents) {
-                ViewService.getElementReferenceTree(scope.view.specialization.contents, scope.mmsWs, scope.mmsVersion).then(function(elementReferenceTree) {
+            var contents = scope.edit.specialization.contents || scope.edit.specialization.instanceSpecificationSpecification;
+            if (contents) {
+                ViewService.getElementReferenceTree(contents, scope.mmsWs, scope.mmsVersion).then(function(elementReferenceTree) {
                     scope.elementReferenceTree = elementReferenceTree;
                     scope.originalElementReferenceTree = _.cloneDeep(elementReferenceTree);
                 });
