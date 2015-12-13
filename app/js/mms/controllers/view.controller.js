@@ -353,9 +353,10 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     });
 
     if (view) {
-        //TODO where is this used, need to not set if view is actually a section
-        ViewService.setCurrentViewId(view.sysmlid);
-        $rootScope.veCurrentView = view.sysmlid;
+        if (view.specialization.contains || view.specialization.contents) {
+            ViewService.setCurrentViewId(view.sysmlid);
+            $rootScope.veCurrentView = view.sysmlid;
+        }
         $scope.vid = view.sysmlid;
     } else {
         $rootScope.veCurrentView = '';

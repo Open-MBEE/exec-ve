@@ -604,6 +604,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
                 //viewLevel2Func(branch.data.sysmlid, branch); //TODO remove when priority queue is done
                 $state.go('workspace.site.document.view', {view: branch.data.sysmlid, search: undefined});
             } else if (branch.type === 'section') {
+                ViewService.setCurrentViewId(view);
                 $state.go('workspace.site.document.view', {view: hash, search: undefined});
                 /*$timeout(function() {
                     $location.hash(hash);
