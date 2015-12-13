@@ -442,9 +442,11 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
         $rootScope.mms_tbApi.toggleButtonSpinner('view.reorder.save');
         $scope.viewOrderApi.save().then(function(data) {
             viewSaving = false;
+            $scope.viewOrderApi.refresh();
             growl.success('Save Succesful');
             $rootScope.mms_tbApi.toggleButtonSpinner('view.reorder.save');
         }, function(reason) {
+            $scope.viewOrderApi.revertEdits();
             viewSaving = false;
             if (reason.type === 'info')
                 growl.info(reason.message);

@@ -50,11 +50,6 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
             ViewService.getView(scope.mmsVid, false, scope.mmsWs, scope.mmsVersion)
             .then(function(data) {
                 scope.view = data;
-                scope.lastModified = data.lastModified;
-                scope.author = data.author;
-                scope.edit = { sysmlid: data.sysmlid };
-                scope.edit.specialization = _.cloneDeep(scope.view.specialization);
-
                 scope.editable = scope.view.editable && scope.mmsVersion === 'latest';
 
                 var contents = data.specialization.contents || data.specialization.instanceSpecificationSpecification;
@@ -95,12 +90,28 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
         };
 
         scope.save = function() {
+            var promises = [];
+            var updateSectionElementOrder = function(elementReference) {
+                var sectionEdit = { sysmlid: elementReference.instance };
+                sectionEdit.specialization = _.cloneDeep(elementReference.instanceSpecification.specialization);
+                var operand = sectionEdit.specialization.instanceSpecificationSpecification.operand = [];
+                for (var i = 0; i < elementReference.sectionElements.length; i++) {
+                    operand.push(elementReference.sectionElements[i].instanceVal);
+                    if (elementReference.sectionElements[i].sectionElements.length > 0)
+                        updateSectionElementOrder(elementReference.sectionElements[i]);
+                }
+                promises.push(ElementService.updateElement(sectionEdit, scope.mmsWs));
+            };
+
             var deferred = $q.defer();
             if (!scope.editable || !scope.editing) {
                 deferred.reject({type: 'error', message: "View isn't editable and can't be saved."});
                 return deferred.promise;
             }
-            var contents = scope.edit.specialization.contents || scope.edit.specialization.instanceSpecificationSpecification;
+            var viewEdit = { sysmlid: scope.view.sysmlid };
+            viewEdit.specialization = _.cloneDeep(scope.view.specialization);
+
+            var contents = viewEdit.specialization.contents || viewEdit.specialization.instanceSpecificationSpecification;
             // Update the View edit object on Save
             if (contents) {
                 contents.operand = [];
@@ -108,38 +119,14 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
                     contents.operand.push(scope.elementReferenceTree[i].instanceVal);
                 }
             }
-            if (scope.edit.specialization.view2view)
-                delete scope.edit.specialization.view2view;
-            ViewService.updateView(scope.edit, scope.mmsWs)
-            .then(function(data) {
-                angular.forEach(scope.elementReferenceTree, function(elementReference) {
-                    if (elementReference.sectionElements.length > 0)
-                        updateSectionElementOrder(elementReference);
-                });
-                deferred.resolve(data);
-            }, function(reason) {
-                deferred.reject(reason);
-                growl.error('save partially failed?');
-            });
-
-            var updateSectionElementOrder = function(elementReference) {
-                var sectionEdit = { sysmlid: elementReference.instance };
-                sectionEdit.specialization = _.cloneDeep(elementReference.instanceSpecification.specialization);
-                sectionEdit.specialization.instanceSpecificationSpecification.operand = [];
-                
-                var sectionElements = elementReference.sectionElements;
-                angular.forEach(sectionElements, function(sectionElement) {
-                    sectionEdit.specialization.instanceSpecificationSpecification.operand.push(sectionElement.instanceVal);
-                    if (sectionElement.sectionElements.length > 0)
-                         updateSectionElementOrder(sectionElement);
-                });
-                ElementService.updateElement(sectionEdit, scope.mssWs)
-                .then(function(data) {
-                }, function(reason) {
-                    growl.error('save partially failed?');
-                });
-            };
-            return deferred.promise;
+            if (viewEdit.specialization.view2view)
+                delete viewEdit.specialization.view2view;
+            promises.push(ViewService.updateView(viewEdit, scope.mmsWs));
+            for (var j = 0; j < scope.elementReferenceTree.length; j++) {
+                if (scope.elementReferenceTree[j].sectionElements.length > 0)
+                    updateSectionElementOrder(scope.elementReferenceTree[j]);
+            }
+            return $q.all(promises);
         };
 
         scope.revert = function() {
