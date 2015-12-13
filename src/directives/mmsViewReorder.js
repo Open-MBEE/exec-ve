@@ -59,19 +59,33 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
 
                 var contents = data.specialization.contents || data.specialization.instanceSpecificationSpecification;
                 if (contents) {
-                    ViewService.getElementReferenceTree(contents, scope.mmsWs, scope.mmsVersion).then(function(elementReferenceTree) {
+                    ViewService.getElementReferenceTree(contents, scope.mmsWs, scope.mmsVersion)
+                    .then(function(elementReferenceTree) {
                         scope.elementReferenceTree = elementReferenceTree;
-                        scope.originalElementReferenceTree = _.cloneDeep(elementReferenceTree);
+                        scope.originalElementReferenceTree = _.cloneDeep(elementReferenceTree, function(value, key, object) {
+                            if (key === 'instance' || key === 'instanceSpecification' || key === 'presentationElement' || key === 'instanceVal')
+                                return value;
+                            return undefined;
+                        });
+                    }, function(reason) {
+                        scope.elementReferenceTree = [];
+                        scope.originalElementReferenceTree = [];
                     });
+                } else {
+                    scope.elementReferenceTree = [];
+                    scope.originalElementReferenceTree = [];
                 }
 
             }, function(reason) {
                 growl.error('View Error: ' + reason.message);
+                scope.elementReferenceTree = [];
+                scope.originalElementReferenceTree = [];
             });
         });
 
         scope.editing = false;
-        scope.elementReferenceTree = {};
+        scope.elementReferenceTree = [];
+        scope.originalElementReferenceTree = [];
 
         scope.toggleEditing = function() {
             if (!scope.editable) 
@@ -94,17 +108,18 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
                     contents.operand.push(scope.elementReferenceTree[i].instanceVal);
                 }
             }
-
+            if (scope.edit.specialization.view2view)
+                delete scope.edit.specialization.view2view;
             ViewService.updateView(scope.edit, scope.mmsWs)
             .then(function(data) {
                 angular.forEach(scope.elementReferenceTree, function(elementReference) {
-                    updateSectionElementOrder(elementReference);
+                    if (elementReference.sectionElements.length > 0)
+                        updateSectionElementOrder(elementReference);
                 });
-
                 deferred.resolve(data);
-
             }, function(reason) {
                 deferred.reject(reason);
+                growl.error('save partially failed?');
             });
 
             var updateSectionElementOrder = function(elementReference) {
@@ -115,35 +130,45 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
                 var sectionElements = elementReference.sectionElements;
                 angular.forEach(sectionElements, function(sectionElement) {
                     sectionEdit.specialization.instanceSpecificationSpecification.operand.push(sectionElement.instanceVal);
-    
                     if (sectionElement.sectionElements.length > 0)
                          updateSectionElementOrder(sectionElement);
                 });
-
                 ElementService.updateElement(sectionEdit, scope.mssWs)
                 .then(function(data) {
                 }, function(reason) {
+                    growl.error('save partially failed?');
                 });
-
             };
-
-
-
             return deferred.promise;
         };
 
         scope.revert = function() {
-            scope.elementReferenceTree = _.clone(scope.originalElementReferenceTree);
+            scope.elementReferenceTree = _.cloneDeep(scope.originalElementReferenceTree, function(value, key, object) {
+                if (key === 'instance' || key === 'instanceSpecification' || key === 'presentationElement' || key === 'instanceVal')
+                   return value;
+                return undefined;
+            });
         };
 
         scope.refresh = function() {
-            var contents = scope.edit.specialization.contents || scope.edit.specialization.instanceSpecificationSpecification;
+            var contents = scope.view.specialization.contents || scope.view.specialization.instanceSpecificationSpecification;
             if (contents) {
-                ViewService.getElementReferenceTree(contents, scope.mmsWs, scope.mmsVersion).then(function(elementReferenceTree) {
+                ViewService.getElementReferenceTree(contents, scope.mmsWs, scope.mmsVersion)
+                .then(function(elementReferenceTree) {
                     scope.elementReferenceTree = elementReferenceTree;
-                    scope.originalElementReferenceTree = _.cloneDeep(elementReferenceTree);
+                    scope.originalElementReferenceTree = _.cloneDeep(elementReferenceTree, function(value, key, object) {
+                        if (key === 'instance' || key === 'instanceSpecification' || key === 'presentationElement' || key === 'instanceVal')
+                            return value;
+                        return undefined;
+                    });
+                }, function(reason) {
+                    scope.elementReferenceTree = [];
+                    scope.originalElementReferenceTree = [];
                 });
-            }            
+            } else {
+                scope.elementReferenceTree = [];
+                scope.originalElementReferenceTree = [];
+            }        
         };
 
         if (angular.isObject(scope.mmsViewReorderApi)) {
