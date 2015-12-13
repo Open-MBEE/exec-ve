@@ -446,7 +446,7 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
             growl.success('Save Succesful');
             $rootScope.mms_tbApi.toggleButtonSpinner('view.reorder.save');
         }, function(reason) {
-            $scope.viewOrderApi.revertEdits();
+            $scope.viewOrderApi.refresh();
             viewSaving = false;
             if (reason.type === 'info')
                 growl.info(reason.message);
@@ -460,7 +460,7 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
     });
     $scope.$on('view.reorder.cancel', function() {
         $scope.specApi.setEditing(false);
-        $scope.viewOrderApi.revertEdits();
+        $scope.viewOrderApi.refresh();
         $rootScope.mms_tbApi.select('element.viewer');
         showPane('element');
     });
