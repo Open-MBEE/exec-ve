@@ -92,7 +92,11 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
         scope.save = function() {
             var promises = [];
             var updateSectionElementOrder = function(elementReference) {
-                var sectionEdit = { sysmlid: elementReference.instance };
+                var sectionEdit = { 
+                    sysmlid: elementReference.instance,
+                    read: elementReference.instanceSpecification.read,
+                    modified: elementReference.instanceSpecification.modified
+                };
                 sectionEdit.specialization = _.cloneDeep(elementReference.instanceSpecification.specialization);
                 var operand = sectionEdit.specialization.instanceSpecificationSpecification.operand = [];
                 for (var i = 0; i < elementReference.sectionElements.length; i++) {
@@ -108,7 +112,11 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
                 deferred.reject({type: 'error', message: "View isn't editable and can't be saved."});
                 return deferred.promise;
             }
-            var viewEdit = { sysmlid: scope.view.sysmlid };
+            var viewEdit = { 
+                sysmlid: scope.view.sysmlid,
+                read: scope.view.read,
+                modified: scope.view.modified
+            };
             viewEdit.specialization = _.cloneDeep(scope.view.specialization);
 
             var contents = viewEdit.specialization.contents || viewEdit.specialization.instanceSpecificationSpecification;
