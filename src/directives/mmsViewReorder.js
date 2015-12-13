@@ -99,12 +99,14 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
                 };
                 sectionEdit.specialization = _.cloneDeep(elementReference.instanceSpecification.specialization);
                 var operand = sectionEdit.specialization.instanceSpecificationSpecification.operand = [];
+                var origOperand = elementReference.instanceSpecification.specialization.instanceSpecificationSpecification.operand;
                 for (var i = 0; i < elementReference.sectionElements.length; i++) {
                     operand.push(elementReference.sectionElements[i].instanceVal);
                     if (elementReference.sectionElements[i].sectionElements.length > 0)
                         updateSectionElementOrder(elementReference.sectionElements[i]);
                 }
-                promises.push(ElementService.updateElement(sectionEdit, scope.mmsWs));
+                if (!angular.equals(operand, origOperand))
+                    promises.push(ElementService.updateElement(sectionEdit, scope.mmsWs));
             };
 
             var deferred = $q.defer();
@@ -120,6 +122,7 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
             viewEdit.specialization = _.cloneDeep(scope.view.specialization);
 
             var contents = viewEdit.specialization.contents || viewEdit.specialization.instanceSpecificationSpecification;
+            var origContents = scope.view.specialization.contents || scope.view.specialization.instanceSpecificationSpecification;
             // Update the View edit object on Save
             if (contents) {
                 contents.operand = [];
@@ -129,7 +132,8 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
             }
             if (viewEdit.specialization.view2view)
                 delete viewEdit.specialization.view2view;
-            promises.push(ViewService.updateView(viewEdit, scope.mmsWs));
+            if (contents && !angular.equals(contents.operand, origContents.operand))
+                promises.push(ViewService.updateView(viewEdit, scope.mmsWs));
             for (var j = 0; j < scope.elementReferenceTree.length; j++) {
                 if (scope.elementReferenceTree[j].sectionElements.length > 0)
                     updateSectionElementOrder(scope.elementReferenceTree[j]);
