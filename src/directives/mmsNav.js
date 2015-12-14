@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsNav', ['$templateCache', '$state', 'hotkeys', 'growl', 'ElementService', mmsNav]);
+.directive('mmsNav', ['$templateCache', '$state', 'hotkeys', 'growl', '$location', 'ElementService', mmsNav]);
 
 /**
  * @ngdoc directive
@@ -30,7 +30,7 @@ angular.module('mms.directives')
     </pre>
  * @param {string} mmsTitle Title to display
  */
-function mmsNav($templateCache, $state, hotkeys, growl, ElementService) {
+function mmsNav($templateCache, $state, hotkeys, growl, $location, ElementService) {
     var template = $templateCache.get('mms/templates/mmsNav.html');
 
     var mmsNavLink = function(scope, element, attrs) {
@@ -189,6 +189,12 @@ function mmsNav($templateCache, $state, hotkeys, growl, ElementService) {
                 scope.searchClass = "fa fa-spin fa-spinner";
                 $state.go($state.current.name, {search: searchText});
             }
+        };
+        scope.stagingView = function(){
+            var hostName = ($location.host() === 'localhost') ? 
+                         'https://cae-ems-stg.jpl.nasa.gov':
+                         'https://'+$location.host().split(".")[0]+'-stg.jpl.nasa.gov'; 
+            window.open(hostName ,'_blank');
         };
     };
 
