@@ -1027,9 +1027,30 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         return deferred.promise;
     };
 
-
+    /**
+     * @ngdoc method
+     * @name mms.ViewService#getElementReferenceTree
+     * @methodOf mms.ViewService
+     * 
+     * @description
+     * gets the presentation element tree as an array of tree nodes
+     * a tree node is this:
+     * <pre>
+        {
+            instance: id of the instance,
+            instanceVal: instanceValue object,
+            sectionElements: array of child tree nodes,
+            instanceSpecification: instance specification object of the instance,
+            presentationElement: json of the presentation element or a section instance spec with type = Section
+        }
+     * </pre>
+     * 
+     * @param {object} contents an expression object from a view or section
+     * @param {string} [workspace=master] workspace
+     * @param {string} [version=latest] timestamp
+     * @returns {Promise} The promise will be resolved with array of tree node objects
+     */
     var getElementReferenceTree = function (contents, workspace, version, weight) {
-
         var promises = [];
         angular.forEach(contents.operand, function(instanceVal) {
             promises.push( getElementReference(instanceVal, workspace, version, weight) );
@@ -1046,23 +1067,27 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         elementObject.instanceVal = instanceVal;
         elementObject.sectionElements = [];
 
-        getInstanceSpecification(instanceVal, workspace, version, weight).then(function(instanceSpecification) {
-
+        getInstanceSpecification(instanceVal, workspace, version, weight)
+        .then(function(instanceSpecification) {
             elementObject.instanceSpecification = instanceSpecification;
-
-            parseExprRefTree(instanceVal, workspace, version, weight).then(function(presentationElement) {
-
+            parseExprRefTree(instanceVal, workspace, version, weight)
+            .then(function(presentationElement) {
                 elementObject.presentationElement = presentationElement;
-
                 if (presentationElement.type === 'Section') {
-                    getElementReferenceTree(presentationElement.specialization.instanceSpecificationSpecification, workspace, version).then(function(sectionElementReferenceTree) {
+                    getElementReferenceTree(presentationElement.specialization.instanceSpecificationSpecification, workspace, version)
+                    .then(function(sectionElementReferenceTree) {
                         elementObject.sectionElements = sectionElementReferenceTree;
                         deferred.resolve(elementObject);
+                    }, function(reason) {
+                        deferred.reject(reason);
                     });
                 } else
                     deferred.resolve(elementObject);
+            }, function(reason) {
+                deferred.reject(reason); //this should never happen
             });
-
+        }, function(reason) {
+            deferred.reject(reason);
         });
         return deferred.promise;
     };

@@ -335,7 +335,7 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
             // Broadcast message for the toolCtrl:
                 $rootScope.$broadcast('presentationElem.save', scope);
             }
-            $rootScope.$broadcast('view.reorder.refresh');
+            //$rootScope.$broadcast('view.reorder.refresh');
             //recompile();
             growl.success('Save Successful');
             scrollToElement(element);
