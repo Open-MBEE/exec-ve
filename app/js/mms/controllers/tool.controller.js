@@ -56,7 +56,7 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
 
     if (snapshots) {
         snapshots.forEach(function(snapshot) {
-            ElementService.getElement("master_filter", ws, false, snapshot.created, 0)
+            ElementService.getElement("master_filter", false, ws, snapshot.created, 0)
             .then(function(filter) {
                     var json = JSON.parse(filter.documentation);
                     if (json[document.sysmlid]) {
