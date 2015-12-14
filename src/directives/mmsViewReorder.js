@@ -114,6 +114,10 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
                 deferred.reject({type: 'error', message: "View isn't editable and can't be saved."});
                 return deferred.promise;
             }
+            if (scope.elementReferenceTree.length === 0) {
+                deferred.reject({type: 'error', message: 'View contents were not initialized properly or is empty.'});
+                return deferred.promise;
+            }
             var viewEdit = { 
                 sysmlid: scope.view.sysmlid,
                 read: scope.view.read,
