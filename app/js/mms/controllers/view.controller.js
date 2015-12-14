@@ -74,7 +74,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
                 description: 'toggle edit mode',
                 callback: function() {$scope.$broadcast('show.edits');}
             });
-            if ($scope.view.specialization.contents) {
+            if ($scope.view.specialization.contents || $scope.view.specialization.type === 'InstanceSpecification') {
                 $scope.bbApi.addButton(UxService.getButtonBarButton('view.add.dropdown'));
             } else {
                 var fakeDropdown = {
@@ -153,7 +153,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
                 });
                 if ($rootScope.mms_treeApi && $rootScope.mms_treeApi.get_selected_branch) {
                     var selected_branch = $rootScope.mms_treeApi.get_selected_branch();
-                    while (selected_branch && selected_branch.type !== 'view') {
+                    while (selected_branch && selected_branch.type !== 'view' && view.specialization.type !== 'InstanceSpecification') {
                         selected_branch = $rootScope.mms_treeApi.get_parent_branch(selected_branch);
                     }
                     if (selected_branch)
@@ -353,8 +353,10 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     });
 
     if (view) {
-        ViewService.setCurrentViewId(view.sysmlid);
-        $rootScope.veCurrentView = view.sysmlid;
+        if (view.specialization.contains || view.specialization.contents) {
+            ViewService.setCurrentViewId(view.sysmlid);
+            $rootScope.veCurrentView = view.sysmlid;
+        }
         $scope.vid = view.sysmlid;
     } else {
         $rootScope.veCurrentView = '';
