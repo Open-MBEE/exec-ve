@@ -95,21 +95,6 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                 .then(function(data) {
                     $scope.searchSuccess = true;
                     $scope.searchClass = "";
-
-                    // change properties arr to 2-dim to display table
-                    data.forEach(function(elem) {
-                        if (elem.properties && elem.properties[0]) {
-                            var properties = [];
-                            for (var i = 0; i < elem.properties.length; i++) {
-                                if (i % 3 === 0) {
-                                    properties.push([]);
-                                }
-                                properties[properties.length-1].push(elem.properties[i]);
-                            }
-                            elem.properties = properties;
-                        }
-                    });
-
                     $scope.mmsCfElements = data;
                 }, function(reason) {
                     growl.error("Search Error: " + reason.message);
@@ -264,7 +249,8 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
             $scope.filter = '';
             $scope.searchText = '';
             $scope.mmsCfViewElements = [];
-            $scope.choose = function(elementId, name) {
+            
+            $scope.choose = function(elementId, unused, name) {
                 var tag = '<mms-view-link data-mms-vid="' + elementId + '">[cf:' + name + '.vlink]</mms-view-link> ';
                 $modalInstance.close(tag);
             };
@@ -279,8 +265,11 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                 .then(function(data) {
                     var views = [];
                     data.forEach(function(v) {
-                        if (v.specialization && (v.specialization.type === 'View' || v.specialization.type === 'Product'))
+                        if (v.specialization && (v.specialization.type === 'View' || v.specialization.type === 'Product')) {
+                            if (v.properties)
+                                delete v.properties;
                             views.push(v);
+                        }
                     });
                     $scope.mmsCfViewElements = views;
                     $scope.searchClass = "";
@@ -289,6 +278,8 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                     $scope.searchClass = "";
                 });
             };
+            $scope.searchOptions= {};
+            $scope.searchOptions.callback = $scope.choose;
         };
 
         var viewLinkCallback = function(ed) {

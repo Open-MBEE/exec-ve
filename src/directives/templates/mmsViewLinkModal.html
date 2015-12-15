@@ -21,16 +21,11 @@
                 </span>
             </div>
         </form>
-        <span class="show-orig-table-btn"></span>
-        <div class="misc-form-field">
-            <div class="form-filter" ng-show="mmsCfViewElements">
-                <input class="form-control" type="text" ng-model="filter" placeholder="Type here to filter elements in the table" />
-            </div>
-        </div>
+        
 
     </div>
-
-    <div class="container-fluid transclude-table">
+    <mms-search-results mms-options="searchOptions" search="mmsCfViewElements"></mms-search-results>
+    <!--<div class="container-fluid transclude-table">
         <table class="table table-bordered">
 
             <tr>
@@ -52,7 +47,7 @@
             </tr>
 
         </table>
-    </div>
+    </div> -->
 
 </div>
 
