@@ -1,9 +1,9 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsViewTable', ['$compile', '$timeout', '$templateCache', 'UtilsService', mmsViewTable]);
+.directive('mmsViewTable', ['$compile', '$timeout', '$document', '$templateCache', 'UtilsService', mmsViewTable]);
 
-function mmsViewTable($compile, $timeout, $templateCache, UtilsService) {
+function mmsViewTable($compile, $timeout, $document, $templateCache, UtilsService) {
     var template = $templateCache.get('mms/templates/mmsViewTable.html');
     
     var mmsViewTableCtrl = function ($scope, $rootScope) {
@@ -19,31 +19,36 @@ function mmsViewTable($compile, $timeout, $templateCache, UtilsService) {
             '<div class="tableSearch">' +
                 //'<div ng-app="myapp">' +
                 // '<div ng-controller="myctrl">' +
-                '<button class="btn btn-sm btn-primary" ng-csv="getArray()" csv-header="[\'Field A\', \'Field B\', \'Field C\']" filename="test.csv">Export</button> ' +
-                '<button type="button" ng-csv="getArray" filename="test.csv">Export</button>' +
-                '<button class="btn btn-default" ng-csv="getArray" filename="ralf.csv" field-separator="file,dog,house" decimal-separator="." >Export to CSV</button>' +
-                '<button class="btn btn-default" ng-csv="getArray" csv-header="getHeader()" filename="dog" field-separator="file,dog,house" decimal-separator="." >Export to CSV with header</button>' +
-                '<button class="btn btn-default" ng-csv="getArray" csv-label="true" filename="dog.csv" field-separator="file,dog,house" decimal-separator="." >Export to CSV with keys</button>' +
-                '<button class="btn btn-default" ng-csv="getArray" csv-header="getHeader()" filename="house" field-separator="file,dog,house" decimal-separator="." ng-click="clickFn()">Export with ng-click</button>' +
-                '<button class="btn btn-default" ng-csv="getArray" filename="house.csv" field-separator="file,dog,house" decimal-separator="." add-bom="true" >With BOM</button>' +
+                '<button class="btn btn-sm btn-primary" ng-click="doClick()">Export</button> ' +
                 '<button class="btn btn-sm btn-primary" ng-click="showFilter = !showFilter">Filter Table</button> ' +
                 '<span ng-show="showFilter"><form style="display: inline" ng-submit="search()"><input type="text" size="75" placeholder="regex filter" ng-model="searchTerm"></input></form>' +
                 '<button class="btn btn-sm btn-primary" ng-click="search()">Apply</button>' + 
                 '<button class="btn btn-sm btn-danger" ng-click="resetSearch()">Reset</button></span></div>' + html;
 
 
-        //var myapp = angular.module('mmsApp', ["ngSanitize", "ngCsv"]); // ng-app = "mmsApp"
-        //myapp.controller('myctrl', function($scope) { // ng-controller="myctrl"
-            scope.filename = "test";
-            scope.getArray = [{a: 1, b:2}, {a:3, b:4}];
-            scope.addRandomRow = function() {
-                scope.getArray.push({a: Math.floor((Math.random()*10)+1), b: Math.floor((Math.random()*10)+1)});
-            };
-            scope.getHeader = function () { return ["A", "B"]; };
-            scope.clickFn = function() {
-                console.log("click click click");
-            };
-        //});
+        scope.doClick = function() {
+            var charset = "utf-8";
+            var blob = new Blob(['sdfdf'], { //Blob([scope.csv]) <- is the getArray ; replace with the string
+                type: "text/csv;charset="+ charset + ";"
+            });
+
+            if (window.navigator.msSaveOrOpenBlob) {
+                navigator.msSaveBlob(blob,'flename.csv');
+            } else {
+
+                var downloadContainer = angular.element('<div data-tap-disabled="true"><a></a></div>');
+                var downloadLink = angular.element(downloadContainer.children()[0]);
+                downloadLink.attr('href', window.URL.createObjectURL(blob));
+                downloadLink.attr('download', 'flename.csv');
+                downloadLink.attr('target', '_blank');
+
+                $document.find('body').append(downloadContainer);
+                $timeout(function () {
+                    downloadLink[0].click();
+                    downloadLink.remove();
+                }, null);
+            }
+        };
 
         element[0].innerHTML = html;
         var nextIndex = 0;
