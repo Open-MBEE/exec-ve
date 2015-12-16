@@ -27,9 +27,9 @@ function mmsViewTable($compile, $timeout, $document, $templateCache, UtilsServic
 
 
         scope.doClick = function() {
-            var charset = "utf-8";
-            var blob = new Blob(['sdfdf'], { //Blob([scope.csv]) <- is the getArray ; replace with the string
-                type: "text/csv;charset="+ charset + ";"
+            var csvString = element.children('table').table2CSV({delivery:'value'});
+            var blob = new Blob([csvString], { //Blob([scope.csv]) <- is the getArray ; replace with the string
+                type: "text/csv;charset=utf-8;"
             });
 
             if (window.navigator.msSaveOrOpenBlob) {

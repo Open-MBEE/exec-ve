@@ -198,7 +198,7 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
         });
     };
 
-    var tableToCsv = function(ob, ws, time, isDoc) {
+    var tableToCsv = function(ob, ws, time, isDoc) { //Export to CSV button Pop-up Generated Here
          var modalInstance = $modal.open({
             templateUrl: 'partials/mms/tableExport.html',
             controller: function($scope, $modalInstance, type) {
@@ -241,7 +241,7 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
                     generator.document.close();
                     return true;
                 };
-                // generate text area content for popup
+                // generate text area content for popup //Add Export button here
                 var genTextArea ='';
                 angular.element(tableCSV).each(function(){
                     genTextArea += '<h2>'+ this.caption +'</h2><textArea cols=100 rows=15 wrap="off" >';
