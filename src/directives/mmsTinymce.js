@@ -250,8 +250,30 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
             $scope.searchText = '';
             $scope.mmsCfViewElements = [];
             
-            $scope.choose = function(elementId, unused, name) {
-                var tag = '<mms-view-link data-mms-vid="' + elementId + '">[cf:' + name + '.vlink]</mms-view-link> ';
+            $scope.choose = function(elementId, unused, name, elem) {
+                var did = null;
+                var vid = null;
+                var peid = null;
+                if (elem.relatedDocuments && elem.relatedDocuments.length > 0) {
+                    did = elem.relatedDocuments[0].sysmlid;
+                    if (elem.relatedDocuments[0].parentViews.length > 0)
+                        vid = elem.relatedDocuments[0].parentViews[0].sysmlid;
+                }
+                if (elem.specialization.type === 'InstanceSpecification') {
+                    if (ViewService.isSection(elem))
+                        vid = elem.sysmlid;
+                    else
+                        peid = elem.sysmlid;
+                } else 
+                    vid = elem.sysmlid;
+                var tag = '<mms-view-link';
+                if (did) 
+                    tag += ' data-mms-did="' + did + '"';
+                if (vid) 
+                    tag += ' data-mms-vid="' + vid + '"';
+                if (peid) 
+                    tag += ' data-mms-peid="' + peid + '"';
+                tag += '>[cf:' + name + '.vlink]</mms-view-link> ';
                 $modalInstance.close(tag);
             };
             $scope.cancel = function() {
@@ -265,7 +287,8 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                 .then(function(data) {
                     var views = [];
                     data.forEach(function(v) {
-                        if (v.specialization && (v.specialization.type === 'View' || v.specialization.type === 'Product')) {
+                        if (v.specialization && (v.specialization.type === 'View' || v.specialization.type === 'Product' || 
+                                (ViewService.isPresentationElement(v) && v.relatedDocuments))) {
                             if (v.properties)
                                 delete v.properties;
                             views.push(v);

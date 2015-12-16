@@ -495,12 +495,23 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
         var addContentsSectionTreeNode = function(operand) {
             var instances = [];
             operand.forEach(function(instanceVal) {
-                instances.push(ViewService.parseExprRefTree(instanceVal, ws, time, 0));
+                instances.push(ElementService.getElement(instanceVal.instance, false, ws, time, 0));
             });
             $q.all(instances).then(function(results) {
                 var k = results.length - 1;
                 for (; k >= 0; k--) {
                     var instance = results[k];
+                    instance.relatedDocuments = [
+                        {
+                            parentViews: [{
+                                name: viewNode.data.name,
+                                sysmlid: viewNode.data.sysmlid
+                            }],
+                            siteCharacterizationId: document.siteCharacterizationId,
+                            name: document.name,
+                            sysmlid: document.sysmlid
+                        }
+                    ];
                     if (ViewService.isSection(instance)) {
                         var sectionTreeNode = {
                             label : instance.name,
