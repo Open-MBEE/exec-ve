@@ -397,7 +397,7 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
             return content;
         };
 
-        var defaultToolbar = 'bold italic underline strikethrough | subscript superscript blockquote | formatselect | fontsizeselect | forecolor backcolor removeformat | alignleft aligncenter alignright | link unlink | image media | charmap searchreplace | undo redo';
+        var defaultToolbar = 'bold italic underline strikethrough | subscript superscript blockquote | formatselect | fontsizeselect | forecolor backcolor removeformat | alignleft aligncenter alignright | link unlink | charmap searchreplace | undo redo';
         var tableToolbar = ' table ';
         var listToolbar = ' bullist numlist outdent indent ';
         var codeToolbar = ' code ';
@@ -411,7 +411,9 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
         if (scope.mmsTinymceType === 'ListT')
             thisToolbar = defaultToolbar + ' | ' + listToolbar + ' | ' + codeToolbar + ' | ' + customToolbar;
         if (scope.mmsTinymceType === 'Figure')
-            thisToolbar = 'image | code ';
+            thisToolbar = 'image media | code ';
+        if (scope.mmsTinymceType === 'ParagraphT' || scope.mmsTinymceType === 'Paragraph')
+            thisToolbar = defaultToolbar + ' | ' + codeToolbar + ' | ' + customToolbar;
         var options = {
             plugins: 'autoresize charmap code fullscreen image link media nonbreaking paste table textcolor searchreplace noneditable',
             //toolbar: 'bold italic underline strikethrough | subscript superscript blockquote | formatselect | fontsizeselect | forecolor backcolor removeformat | alignleft aligncenter alignright | bullist numlist outdent indent | table | link unlink | image media | charmap searchreplace code | transclude comment vlink normalize | mvleft mvright | undo redo',

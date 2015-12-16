@@ -50,27 +50,37 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
             ViewService.getView(scope.mmsVid, false, scope.mmsWs, scope.mmsVersion)
             .then(function(data) {
                 scope.view = data;
-                scope.lastModified = data.lastModified;
-                scope.author = data.author;
-                scope.edit = { sysmlid: data.sysmlid };
-                scope.edit.specialization = _.cloneDeep(scope.view.specialization);
-
                 scope.editable = scope.view.editable && scope.mmsVersion === 'latest';
 
-                if (data.specialization.contents) {
-                    ViewService.getElementReferenceTree(data.specialization.contents, scope.mmsWs, scope.mmsVersion).then(function(elementReferenceTree) {
+                var contents = data.specialization.contents || data.specialization.instanceSpecificationSpecification;
+                if (contents) {
+                    ViewService.getElementReferenceTree(contents, scope.mmsWs, scope.mmsVersion)
+                    .then(function(elementReferenceTree) {
                         scope.elementReferenceTree = elementReferenceTree;
-                        scope.originalElementReferenceTree = _.cloneDeep(elementReferenceTree);
+                        scope.originalElementReferenceTree = _.cloneDeep(elementReferenceTree, function(value, key, object) {
+                            if (key === 'instance' || key === 'instanceSpecification' || key === 'presentationElement' || key === 'instanceVal')
+                                return value;
+                            return undefined;
+                        });
+                    }, function(reason) {
+                        scope.elementReferenceTree = [];
+                        scope.originalElementReferenceTree = [];
                     });
+                } else {
+                    scope.elementReferenceTree = [];
+                    scope.originalElementReferenceTree = [];
                 }
 
             }, function(reason) {
                 growl.error('View Error: ' + reason.message);
+                scope.elementReferenceTree = [];
+                scope.originalElementReferenceTree = [];
             });
         });
 
         scope.editing = false;
-        scope.elementReferenceTree = {};
+        scope.elementReferenceTree = [];
+        scope.originalElementReferenceTree = [];
 
         scope.toggleEditing = function() {
             if (!scope.editable) 
@@ -80,68 +90,88 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
         };
 
         scope.save = function() {
+            var promises = [];
+            var updateSectionElementOrder = function(elementReference) {
+                var sectionEdit = { 
+                    sysmlid: elementReference.instance,
+                    read: elementReference.instanceSpecification.read,
+                    modified: elementReference.instanceSpecification.modified
+                };
+                sectionEdit.specialization = _.cloneDeep(elementReference.instanceSpecification.specialization);
+                var operand = sectionEdit.specialization.instanceSpecificationSpecification.operand = [];
+                var origOperand = elementReference.instanceSpecification.specialization.instanceSpecificationSpecification.operand;
+                for (var i = 0; i < elementReference.sectionElements.length; i++) {
+                    operand.push(elementReference.sectionElements[i].instanceVal);
+                    if (elementReference.sectionElements[i].sectionElements.length > 0)
+                        updateSectionElementOrder(elementReference.sectionElements[i]);
+                }
+                if (!angular.equals(operand, origOperand))
+                    promises.push(ElementService.updateElement(sectionEdit, scope.mmsWs));
+            };
+
             var deferred = $q.defer();
             if (!scope.editable || !scope.editing) {
                 deferred.reject({type: 'error', message: "View isn't editable and can't be saved."});
                 return deferred.promise;
             }
+            if (scope.elementReferenceTree.length === 0) {
+                deferred.reject({type: 'error', message: 'View contents were not initialized properly or is empty.'});
+                return deferred.promise;
+            }
+            var viewEdit = { 
+                sysmlid: scope.view.sysmlid,
+                read: scope.view.read,
+                modified: scope.view.modified
+            };
+            viewEdit.specialization = _.cloneDeep(scope.view.specialization);
 
+            var contents = viewEdit.specialization.contents || viewEdit.specialization.instanceSpecificationSpecification;
+            var origContents = scope.view.specialization.contents || scope.view.specialization.instanceSpecificationSpecification;
             // Update the View edit object on Save
-            if (scope.edit.specialization.contents) {
-                scope.edit.specialization.contents.operand = [];
+            if (contents) {
+                contents.operand = [];
                 for (var i = 0; i < scope.elementReferenceTree.length; i++) {
-                    scope.edit.specialization.contents.operand.push(scope.elementReferenceTree[i].instanceVal);
+                    contents.operand.push(scope.elementReferenceTree[i].instanceVal);
                 }
             }
-
-            ViewService.updateView(scope.edit, scope.mmsWs)
-            .then(function(data) {
-                angular.forEach(scope.elementReferenceTree, function(elementReference) {
-                    updateSectionElementOrder(elementReference);
-                });
-
-                deferred.resolve(data);
-
-            }, function(reason) {
-                deferred.reject(reason);
-            });
-
-            var updateSectionElementOrder = function(elementReference) {
-                var sectionEdit = { sysmlid: elementReference.instance };
-                sectionEdit.specialization = _.cloneDeep(elementReference.instanceSpecification.specialization);
-                sectionEdit.specialization.instanceSpecificationSpecification.operand = [];
-                
-                var sectionElements = elementReference.sectionElements;
-                angular.forEach(sectionElements, function(sectionElement) {
-                    sectionEdit.specialization.instanceSpecificationSpecification.operand.push(sectionElement.instanceVal);
-    
-                    if (sectionElement.sectionElements.length > 0)
-                         updateSectionElementOrder(sectionElement);
-                });
-
-                ElementService.updateElement(sectionEdit, scope.mssWs)
-                .then(function(data) {
-                }, function(reason) {
-                });
-
-            };
-
-
-
-            return deferred.promise;
+            if (viewEdit.specialization.view2view)
+                delete viewEdit.specialization.view2view;
+            if (contents && !angular.equals(contents.operand, origContents.operand))
+                promises.push(ViewService.updateView(viewEdit, scope.mmsWs));
+            for (var j = 0; j < scope.elementReferenceTree.length; j++) {
+                if (scope.elementReferenceTree[j].sectionElements.length > 0)
+                    updateSectionElementOrder(scope.elementReferenceTree[j]);
+            }
+            return $q.all(promises);
         };
 
         scope.revert = function() {
-            scope.elementReferenceTree = _.clone(scope.originalElementReferenceTree);
+            scope.elementReferenceTree = _.cloneDeep(scope.originalElementReferenceTree, function(value, key, object) {
+                if (key === 'instance' || key === 'instanceSpecification' || key === 'presentationElement' || key === 'instanceVal')
+                   return value;
+                return undefined;
+            });
         };
 
         scope.refresh = function() {
-            if (scope.view.specialization.contents) {
-                ViewService.getElementReferenceTree(scope.view.specialization.contents, scope.mmsWs, scope.mmsVersion).then(function(elementReferenceTree) {
+            var contents = scope.view.specialization.contents || scope.view.specialization.instanceSpecificationSpecification;
+            if (contents) {
+                ViewService.getElementReferenceTree(contents, scope.mmsWs, scope.mmsVersion)
+                .then(function(elementReferenceTree) {
                     scope.elementReferenceTree = elementReferenceTree;
-                    scope.originalElementReferenceTree = _.cloneDeep(elementReferenceTree);
+                    scope.originalElementReferenceTree = _.cloneDeep(elementReferenceTree, function(value, key, object) {
+                        if (key === 'instance' || key === 'instanceSpecification' || key === 'presentationElement' || key === 'instanceVal')
+                            return value;
+                        return undefined;
+                    });
+                }, function(reason) {
+                    scope.elementReferenceTree = [];
+                    scope.originalElementReferenceTree = [];
                 });
-            }            
+            } else {
+                scope.elementReferenceTree = [];
+                scope.originalElementReferenceTree = [];
+            }        
         };
 
         if (angular.isObject(scope.mmsViewReorderApi)) {

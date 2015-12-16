@@ -74,7 +74,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
                 description: 'toggle edit mode',
                 callback: function() {$scope.$broadcast('show.edits');}
             });
-            if ($scope.view.specialization.contents) {
+            if ($scope.view.specialization.contents || $scope.view.specialization.type === 'InstanceSpecification') {
                 $scope.bbApi.addButton(UxService.getButtonBarButton('view.add.dropdown'));
             } else {
                 var fakeDropdown = {
@@ -153,7 +153,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
                 });
                 if ($rootScope.mms_treeApi && $rootScope.mms_treeApi.get_selected_branch) {
                     var selected_branch = $rootScope.mms_treeApi.get_selected_branch();
-                    while (selected_branch && selected_branch.type !== 'view') {
+                    while (selected_branch && selected_branch.type !== 'view' && view.specialization.type !== 'InstanceSpecification') {
                         selected_branch = $rootScope.mms_treeApi.get_parent_branch(selected_branch);
                     }
                     if (selected_branch)
@@ -259,15 +259,15 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     $scope.$on('view.add.paragraph', function() {
         MmsAppUtils.addPresentationElement($scope, 'Paragraph', view);
     });
-/*
+
     $scope.$on('view.add.list', function() {
-        addElement('List');
+        MmsAppUtils.addPresentationElement($scope, 'List', view);
     });
 
     $scope.$on('view.add.table', function() {
-        addElement('Table');
+        MmsAppUtils.addPresentationElement($scope, 'Table', view);
     });
-*/
+
     $scope.$on('view.add.section', function() {
         MmsAppUtils.addPresentationElement($scope, 'Section', view);
     });
@@ -275,11 +275,11 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     $scope.$on('view.add.comment', function() {
         MmsAppUtils.addPresentationElement($scope, 'Comment', view);
     });
-/*
-    $scope.$on('view.add.image', function() {
-        addElement('Figure');
-    });
 
+    $scope.$on('view.add.image', function() {
+        MmsAppUtils.addPresentationElement($scope, 'Figure', view);
+    });
+/*
     $scope.$on('view.add.equation', function() {
         addElement('Equation');
     });
@@ -287,15 +287,15 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     $scope.$on('section.add.paragraph', function(event, section) {
         MmsAppUtils.addPresentationElement($scope, 'Paragraph', section);
     });
-/*
+
     $scope.$on('section.add.list', function(event, section) {
-        addElement('List', section);
+        MmsAppUtils.addPresentationElement($scope, 'List', section);
     });
 
     $scope.$on('section.add.table', function(event, section) {
-        addElement('Table', section);
+        MmsAppUtils.addPresentationElement($scope, 'Table', section);
     });
-
+/*
     $scope.$on('section.add.equation', function(event, section) {
         addElement('Equation', section);
     });
@@ -307,11 +307,11 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     $scope.$on('section.add.comment', function(event, section) {
         MmsAppUtils.addPresentationElement($scope, 'Comment', section);
     });
-/*
+
     $scope.$on('section.add.image', function(event, section) {
-        addElement('Figure', section);
+        MmsAppUtils.addPresentationElement($scope, 'Figure', section);
     });
-*/
+
     $scope.$on('show.comments', function() {
         $scope.viewApi.toggleShowComments();
         $scope.bbApi.toggleButtonState('show.comments');
@@ -353,8 +353,10 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     });
 
     if (view) {
-        ViewService.setCurrentViewId(view.sysmlid);
-        $rootScope.veCurrentView = view.sysmlid;
+        if (view.specialization.contains || view.specialization.contents) {
+            ViewService.setCurrentViewId(view.sysmlid);
+            $rootScope.veCurrentView = view.sysmlid;
+        }
         $scope.vid = view.sysmlid;
     } else {
         $rootScope.veCurrentView = '';

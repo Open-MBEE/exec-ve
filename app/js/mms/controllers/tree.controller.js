@@ -604,11 +604,12 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
                 //viewLevel2Func(branch.data.sysmlid, branch); //TODO remove when priority queue is done
                 $state.go('workspace.site.document.view', {view: branch.data.sysmlid, search: undefined});
             } else if (branch.type === 'section') {
-                $state.go('workspace.site.document.view', {view: view, search: undefined});
-                $timeout(function() {
+                ViewService.setCurrentViewId(view);
+                $state.go('workspace.site.document.view', {view: hash, search: undefined});
+                /*$timeout(function() {
                     $location.hash(hash);
                     $anchorScroll();
-                }, 1000);
+                }, 1000);*/
             }
         }
         $rootScope.mms_tbApi.select('element.viewer');
@@ -805,8 +806,12 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
             var curBranch = $scope.treeApi.get_selected_branch();
             if (curBranch) {
                 var viewId;
-                if (curBranch.type == 'section')
-                    viewId = curBranch.view;
+                if (curBranch.type == 'section') {
+                    if (curBranch.data.specialization && curBranch.data.specialization.type === 'InstanceSpecification')
+                        viewId = curBranch.data.sysmlid;
+                    else
+                        viewId = curBranch.view;
+                }
                 else
                     viewId = curBranch.data.sysmlid;
                 $state.go('workspace.site.document.view', {view: viewId, search: undefined});

@@ -56,7 +56,7 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
 
     if (snapshots) {
         snapshots.forEach(function(snapshot) {
-            ElementService.getElement("master_filter", ws, false, snapshot.created, 0)
+            ElementService.getElement("master_filter", false, ws, snapshot.created, 0)
             .then(function(filter) {
                     var json = JSON.parse(filter.documentation);
                     if (json[document.sysmlid]) {
@@ -442,9 +442,11 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
         $rootScope.mms_tbApi.toggleButtonSpinner('view.reorder.save');
         $scope.viewOrderApi.save().then(function(data) {
             viewSaving = false;
+            $scope.viewOrderApi.refresh();
             growl.success('Save Succesful');
             $rootScope.mms_tbApi.toggleButtonSpinner('view.reorder.save');
         }, function(reason) {
+            $scope.viewOrderApi.refresh();
             viewSaving = false;
             if (reason.type === 'info')
                 growl.info(reason.message);
@@ -458,7 +460,7 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
     });
     $scope.$on('view.reorder.cancel', function() {
         $scope.specApi.setEditing(false);
-        $scope.viewOrderApi.revertEdits();
+        $scope.viewOrderApi.refresh();
         $rootScope.mms_tbApi.select('element.viewer');
         showPane('element');
     });
