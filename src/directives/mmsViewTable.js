@@ -24,7 +24,7 @@ function mmsViewTable($compile, $timeout, $document, $templateCache, UtilsServic
 
         scope.doClick = function() {
             var csvString = element.children('table').table2CSV({delivery:'value'});
-            var blob = new Blob([csvString], { //Blob([scope.csv]) <- is the getArray ; replace with the string
+            var blob = new Blob([csvString], {
                 type: "text/csv;charset=utf-8;"
             });
 
