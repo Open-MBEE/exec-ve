@@ -241,10 +241,10 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
             '    downloadLink.attr(\'target\', \'_blank\'); ' +
             ' ' +
             '    $(window.document).find(\'body\').append(downloadContainer); ' +
-            '    $timeout(function () { ' +
+            '    /* $timeout(function () { */ ' +
             '        downloadLink[0].click(); ' +
             '        downloadLink.remove(); ' +
-            '    }, null); ' +
+            '    /* }, null); */ ' +
             '} ' +
             '} ';
         string += '</script>';
