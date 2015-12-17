@@ -219,6 +219,36 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
             backdrop: 'static',
             keyboard: false
         });
+
+        var string = '<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>' +
+            '<script>' +
+            'console.log("load default"); ';
+        string += 'function doClick() { ' +
+            'console.log(\'touch touch touch\'); ' +
+            'var csvString = \'talk,ralf\'; ' +
+            'var blob = new Blob([\'ralf, ralf\'], { ' +
+            '    type: "text/csv;charset=utf-8;" ' +
+            '}); ' +
+            '' +
+            'if (window.navigator.msSaveOrOpenBlob) { ' +
+            '    navigator.msSaveBlob(blob,\'flename.csv\'); ' +
+            '} else { ' +
+            '' +
+            '    var downloadContainer = $(\'<div data-tap-disabled="true"><a></a></div>\'); ' +
+            '    var downloadLink = $(downloadContainer.children()[0]); ' +
+            '    downloadLink.attr(\'href\', window.URL.createObjectURL(blob)); ' +
+            '    downloadLink.attr(\'download\', \'flename.csv\'); ' +
+            '    downloadLink.attr(\'target\', \'_blank\'); ' +
+            ' ' +
+            '    $(window.document).find(\'body\').append(downloadContainer); ' +
+            '    $timeout(function () { ' +
+            '        downloadLink[0].click(); ' +
+            '        downloadLink.remove(); ' +
+            '    }, null); ' +
+            '} ' +
+            '} ';
+        string += '</script>';
+
         modalInstance.result.then(function(choice) {
             if (choice === 'export') {
                var tableCSV = [];
@@ -241,12 +271,13 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
                     generator.document.close();
                     return true;
                 };
-                // generate text area content for popup //Add Export button here
+                // generate text area content for popup
                 var genTextArea ='';
                 angular.element(tableCSV).each(function(){
-                    genTextArea += '<h2>'+ this.caption +'</h2><textArea cols=100 rows=15 wrap="off" >';
+                    genTextArea += '<h2>'+ this.caption +'</h2><button class="btn btn-sm btn-primary" onclick="doClick()">Export</button><textArea cols=100 rows=15 wrap="off" >';
                     genTextArea += this.val + '</textArea>';
                 });
+                genTextArea += string;
                 exportPopup(genTextArea);
             }
         });
