@@ -38,6 +38,16 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         ParagraphT: "_17_0_5_1_407019f_1431903758416_800749_12055",
         SectionT: "_18_0_2_407019f_1435683487667_494971_14412"
     };
+
+    function getClassifierIds() {
+        var re = [];
+        Object.keys(typeToClassifierId).forEach(function(key) {
+            re.push(typeToClassifierId[key]);
+        });
+        return re;
+    }
+
+    var classifierIds = getClassifierIds();
     
     var processString = function(values) {
         if (!values || values.length === 0 || values[0].type !== 'LiteralString')
@@ -1183,6 +1193,15 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         return deferred.promise;
     };
 
+    var isPresentationElement = function(e) {
+        if (e.specialization && e.specialization.type === 'InstanceSpecification') {
+            var classifiers = e.specialization.classifier;
+            if (classifiers.length > 0 && classifierIds.indexOf(classifiers[0]) >= 0)
+                return true;
+        }
+        return false;
+    };
+
     return {
         getView: getView,
         getViews: getViews,
@@ -1202,6 +1221,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         getCurrentDocumentId: getCurrentDocumentId,
         parseExprRefTree: parseExprRefTree,
         isSection: isSection,
+        isPresentationElement: isPresentationElement,
         addElementToViewOrSection: addElementToViewOrSection,
         createAndAddElement: createAndAddElement,
         addInstanceVal: addInstanceVal,

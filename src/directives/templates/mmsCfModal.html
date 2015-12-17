@@ -1,9 +1,9 @@
 <div class="modal-header">
 
-    <h4>INSERT A CROSS-REFERENCE</h4>
+    <h4>{{title}}</h4>
 
     <div class="transclude-modal-instructions">
-        Begin by searching for an element, then click a field to cross-reference.
+        {{description}}
     </div>
 
 </div>
@@ -28,11 +28,11 @@
                 </div>
             </div>
         </form>
-        <div class="cant-find-element">
+        <div class="cant-find-element" ng-show="showProposeLink">
             Can't find your element? <a ng-click="openProposeModal()" class="create-element-link">Create a new one</a>
          </div>
     </div>
-    <mms-search-results mms-options="searchOptions" search="mmsCfElements"></mms-search-results>
+    <mms-search-results mms-options="searchOptions" search="searchResults"></mms-search-results>
 </div>
 
 <div class="modal-footer">

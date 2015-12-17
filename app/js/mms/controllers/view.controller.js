@@ -388,7 +388,9 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         $rootScope.$broadcast('elementSelected', elementId, 'element');
     };
     $scope.searchOptions= {};
-    $scope.searchOptions.callback = $scope.tscClicked;
+    $scope.searchOptions.callback = function(elem) {
+        $scope.tscClicked(elem.sysmlid);
+    };
     $scope.searchOptions.emptyDocTxt = 'This field is empty.';
 
     $scope.elementTranscluded = function(element, type) {
@@ -413,8 +415,8 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         }
     };
 
-    $scope.searchGoToDocument = function (siteId, documentId, viewId) {
-        $state.go('workspace.site.document.view', {site: siteId, document: documentId, view: viewId, tag: undefined, search: undefined});
+    $scope.searchGoToDocument = function (doc, view, elem) {//siteId, documentId, viewId) {
+        $state.go('workspace.site.document.view', {site: doc.siteCharacterizationId, document: doc.sysmlid, view: view.sysmlid, tag: undefined, search: undefined});
     };
     $scope.searchOptions.relatedCallback = $scope.searchGoToDocument;
 

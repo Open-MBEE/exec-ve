@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsViewPresentationElem', ['ViewService', 'ElementService', '$templateCache', '$rootScope', 'growl', mmsViewPresentationElem]);
+.directive('mmsViewPresentationElem', ['ViewService', 'ElementService', '$templateCache', '$rootScope', '$timeout', '$location', '$anchorScroll', 'growl', mmsViewPresentationElem]);
 
 /**
  * @ngdoc directive
@@ -18,7 +18,7 @@ angular.module('mms.directives')
  * @param {Object} mmsInstanceVal A InstanceValue json object 
  * @param {Object} mmsParentSection the parent section if available
  */
-function mmsViewPresentationElem(ViewService, ElementService, $templateCache, $rootScope, growl) {
+function mmsViewPresentationElem(ViewService, ElementService, $templateCache, $rootScope, $timeout, $location, $anchorScroll, growl) {
     var template = $templateCache.get('mms/templates/mmsViewPresentationElem.html');
 
     var mmsViewPresentationElemCtrl = function($scope, $rootScope) {
@@ -69,6 +69,12 @@ function mmsViewPresentationElem(ViewService, ElementService, $templateCache, $r
                 then(function(instanceSpec) {
                     scope.instanceSpec = instanceSpec;
                     scope.presentationElemLoading = false;
+                    var hash = $location.hash();
+                    if (hash === instanceSpec.sysmlid) {
+                        $timeout(function() {
+                            $anchorScroll();
+                        }, 1000, false);
+                    }
                     element.click(function(e) {
                         if (mmsViewCtrl)
                             mmsViewCtrl.transcludeClicked(instanceSpec.sysmlid);

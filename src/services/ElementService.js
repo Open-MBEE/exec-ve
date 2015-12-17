@@ -647,7 +647,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                     if (properties)
                         delete element.properties;
                     var ekey = UtilsService.makeElementKey(element.sysmlid, n.ws, n.ver);
-                    CacheService.put(ekey, UtilsService.cleanElement(element), true);
+                    var cacheE = CacheService.put(ekey, UtilsService.cleanElement(element), true);
                     if (properties) {
                         properties.forEach(function(property) {
                             var pkey = UtilsService.makeElementKey(property.sysmlid, n.ws, n.ver);
@@ -656,6 +656,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                     }
                     var toAdd = JSON.parse(JSON.stringify(element));
                     toAdd.properties = properties;
+                    toAdd.relatedDocuments = cacheE.relatedDocuments;
                     result.push(toAdd);
                 }); 
                 delete inProgress[progress];
