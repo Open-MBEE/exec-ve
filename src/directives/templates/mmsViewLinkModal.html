@@ -25,34 +25,8 @@
 
     </div>
     <mms-search-results mms-options="searchOptions" search="mmsCfViewElements"></mms-search-results>
-    <!--<div class="container-fluid transclude-table">
-        <table class="table table-bordered">
-
-            <tr>
-                <th>NAME</th>
-                <th>QUALIFIED NAME</th>
-                <th>METATYPE</th>
-            </tr>
-
-            <tr ng-repeat="elem in mmsCfViewElements | filter:filter">
-                <td ng-click="choose(elem.sysmlid, elem.name)" class="clickable">
-                    {{elem.name}}
-                </td>
-                <td>
-                    {{elem.qualifiedName}}
-                </td>
-                <td>
-                    {{elem.specialization.type}}
-                </td>
-            </tr>
-
-        </table>
-    </div> -->
-
 </div>
 
 <div class="modal-footer">
-    <span class="input-group-btn">
-        
-    </span><button class="btn btn-danger" ng-click="cancel()">CANCEL</button>
+    <button class="btn btn-danger" ng-click="cancel()">CANCEL</button>
 </div>

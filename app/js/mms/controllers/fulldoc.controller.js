@@ -271,11 +271,13 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
     });
 
     $scope.searchOptions= {};
-    $scope.searchOptions.callback = $scope.tscClicked;
+    $scope.searchOptions.callback = function(elem) {
+        $scope.tscClicked(elem.sysmlid);
+    };
     $scope.searchOptions.emptyDocTxt = 'This field is empty.';
     
-    $scope.searchGoToDocument = function (siteId, documentId, viewId) {
-        $state.go('workspace.site.document.view', {site: siteId, document: documentId, view: viewId, tag: undefined, search: undefined});
+    $scope.searchGoToDocument = function (doc, view, elem) {//siteId, documentId, viewId) {
+        $state.go('workspace.site.document.view', {site: doc.siteCharacterizationId, document: doc.sysmlid, view: view.sysmlid, tag: undefined, search: undefined});
     };
     $scope.searchOptions.relatedCallback = $scope.searchGoToDocument;
 }]);

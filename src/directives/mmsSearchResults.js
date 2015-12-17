@@ -42,16 +42,16 @@ function mmsSearchResults($rootScope,$templateCache) {
 
         // Set options 
         scope.emptyDocTxt = scope.mmsOptions.emptyDocTxt;
-        scope.userResultClick = function(elementId, property, name, elem) {
+        scope.userResultClick = function(elem, property) {
             if (scope.mmsOptions.callback) {
-                scope.mmsOptions.callback(elementId, property, name, elem);
+                scope.mmsOptions.callback(elem, property);
             }
         };
-        scope.userRelatedClick = function(event, siteId, documentId, viewId, elem) {
+        scope.userRelatedClick = function(event, doc, view, elem) {
             event.preventDefault();
             event.stopPropagation();
             if (scope.mmsOptions.relatedCallback)
-                scope.mmsOptions.relatedCallback(siteId, documentId, viewId, elem);
+                scope.mmsOptions.relatedCallback(doc, view, elem);
         };
     };
 

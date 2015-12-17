@@ -61,10 +61,10 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                     $scope.autocompleteItems.push({ 'sysmlid' : cacheElement.sysmlid, 'name' : cacheElement.name + ' - value' });
                 }
             });
-
+            $scope.title = 'INSERT A CROSS REFERENCE';
+            $scope.description = 'Being by searching for an element, then click a field to cross-reference.';
             $scope.searchClass = "";
             $scope.proposeClass = "";
-            var originalElements = $scope.mmsCfElements;
             $scope.filter = '';
             $scope.searchText = '';
             $scope.newE = {name: '', documentation: ''};
@@ -72,7 +72,7 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
             $scope.requestName = false;
             $scope.requestDocumentation = false;
             $scope.searchType = 'name';
-
+            $scope.showProposeLink = true;
             $scope.setSearchType = function(searchType) {
                 $scope.searchType = searchType;
                 angular.element('.btn-search-name').removeClass('active');
@@ -81,8 +81,8 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                 angular.element('.btn-search-id').removeClass('active');
                 angular.element('.btn-search-' + searchType).addClass('active');
             };
-            $scope.choose = function(elementId, property, name) {
-                var tag = '<mms-transclude-' + property + ' data-mms-eid="' + elementId + '">[cf:' + name + '.' + property + ']</mms-transclude-' + property + '> ';
+            $scope.choose = function(elem, property) {
+                var tag = '<mms-transclude-' + property + ' data-mms-eid="' + elem.sysmlid + '">[cf:' + elem.name + '.' + property + ']</mms-transclude-' + property + '> ';
                 $modalInstance.close(tag);
             };
             $scope.cancel = function() {
@@ -95,7 +95,7 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                 .then(function(data) {
                     $scope.searchSuccess = true;
                     $scope.searchClass = "";
-                    $scope.mmsCfElements = data;
+                    $scope.searchResults = data;
                 }, function(reason) {
                     growl.error("Search Error: " + reason.message);
                     $scope.searchClass = "";
@@ -112,7 +112,7 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                 $scope.proposeClass = "fa fa-spin fa-spinner";
                 ElementService.createElement({name: $scope.newE.name, documentation: $scope.newE.documentation, specialization: {type: 'Element'}}, scope.mmsWs, scope.mmsSite)
                 .then(function(data) {
-                    $scope.mmsCfElements = [data];
+                    $scope.searchResults = [data];
                     $scope.proposeClass = "";
                 }, function(reason) {
                     growl.error("Propose Error: " + reason.message);
@@ -141,9 +141,6 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                     growl.error("Propose Error: " + reason.message);
                     $scope.proposeClass = "";
                 });
-            };
-            $scope.showOriginalElements = function() {
-                $scope.mmsCfElements = originalElements;
             };
             $scope.toggleRadio = function(field) {
                 if (field === "name") {
@@ -248,9 +245,10 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
             $scope.proposeClass = "";
             $scope.filter = '';
             $scope.searchText = '';
-            $scope.mmsCfViewElements = [];
-            
-            $scope.choose = function(elementId, unused, name, elem) {
+            $scope.searchType = 'name';
+            $scope.title = 'INSERT VIEW LINK';
+            $scope.description = 'Search for a view or content element, click on its name to insert link.';
+            $scope.choose = function(elem) {
                 var did = null;
                 var vid = null;
                 var peid = null;
@@ -273,17 +271,43 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                     tag += ' data-mms-vid="' + vid + '"';
                 if (peid) 
                     tag += ' data-mms-peid="' + peid + '"';
-                tag += '>[cf:' + name + '.vlink]</mms-view-link> ';
+                tag += '>[cf:' + elem.name + '.vlink]</mms-view-link> ';
+                $modalInstance.close(tag);
+            };
+            $scope.chooseDoc = function(doc, view, elem) {
+                var did = doc.sysmlid;
+                var vid = view.sysmlid;
+                var peid = null;
+                if (ViewService.isSection(elem))
+                    vid = elem.sysmlid;
+                else if (ViewService.isPresentationElement(elem))
+                    peid = elem.sysmlid;
+                var tag = '<mms-view-link';
+                if (did) 
+                    tag += ' data-mms-did="' + did + '"';
+                if (vid) 
+                    tag += ' data-mms-vid="' + vid + '"';
+                if (peid) 
+                    tag += ' data-mms-peid="' + peid + '"';
+                tag += '>[cf:' + elem.name + '.vlink]</mms-view-link> ';
                 $modalInstance.close(tag);
             };
             $scope.cancel = function() {
                 $modalInstance.dismiss();
             };
+            $scope.setSearchType = function(searchType) {
+                $scope.searchType = searchType;
+                angular.element('.btn-search-name').removeClass('active');
+                angular.element('.btn-search-documentation').removeClass('active');
+                angular.element('.btn-search-value').removeClass('active');
+                angular.element('.btn-search-id').removeClass('active');
+                angular.element('.btn-search-' + searchType).addClass('active');
+            };
             $scope.search = function(searchText) {
                 //var searchText = $scope.searchText; //TODO investigate why searchText isn't in $scope
                 //growl.info("Searching...");
                 $scope.searchClass = "fa fa-spin fa-spinner";
-                ElementService.search(searchText, ['name'], null, false, scope.mmsWs)
+                ElementService.search(searchText, [$scope.searchType], null, false, scope.mmsWs)
                 .then(function(data) {
                     var views = [];
                     data.forEach(function(v) {
@@ -294,7 +318,7 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                             views.push(v);
                         }
                     });
-                    $scope.mmsCfViewElements = views;
+                    $scope.searchResults = views;
                     $scope.searchClass = "";
                 }, function(reason) {
                     growl.error("Search Error: " + reason.message);
@@ -303,11 +327,12 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
             };
             $scope.searchOptions= {};
             $scope.searchOptions.callback = $scope.choose;
+            $scope.searchOptions.relatedCallback = $scope.chooseDoc;
         };
 
         var viewLinkCallback = function(ed) {
             var instance = $modal.open({
-                template: viewLinkModalTemplate,
+                template: transcludeModalTemplate,
                 scope: scope,
                 controller: ['$scope', '$modalInstance', transcludeViewLinkCtrl],
                 size: 'lg'
