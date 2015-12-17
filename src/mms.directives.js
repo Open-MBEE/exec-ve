@@ -86,4 +86,5 @@ angular.module('mms.directives', ['mms', 'mms.directives.tpls', 'ui.bootstrap', 
 }])
 .constant('go', window.go)
 .constant('tinymce', window.tinymce)
-.constant('CKEDITOR', window.CKEDITOR);
+.constant('CKEDITOR', window.CKEDITOR)
+.constant('MathJax', window.MathJax);
