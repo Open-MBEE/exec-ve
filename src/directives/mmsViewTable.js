@@ -29,13 +29,13 @@ function mmsViewTable($compile, $timeout, $document, $templateCache, UtilsServic
             });
 
             if (window.navigator.msSaveOrOpenBlob) {
-                navigator.msSaveBlob(blob,'flename.csv');
+                navigator.msSaveBlob(blob,'TableData.csv');
             } else {
 
                 var downloadContainer = angular.element('<div data-tap-disabled="true"><a></a></div>');
                 var downloadLink = angular.element(downloadContainer.children()[0]);
                 downloadLink.attr('href', window.URL.createObjectURL(blob));
-                downloadLink.attr('download', 'flename.csv');
+                downloadLink.attr('download', 'TableData.csv');
                 downloadLink.attr('target', '_blank');
 
                 $document.find('body').append(downloadContainer);

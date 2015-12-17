@@ -231,13 +231,13 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
             '}); ' +
             '' +
             'if (window.navigator.msSaveOrOpenBlob) { ' +
-            '    navigator.msSaveBlob(blob,\'flename.csv\'); ' +
+            '    navigator.msSaveBlob(blob,\'TableData.csv\'); ' +
             '} else { ' +
             '' +
             '    var downloadContainer = $(\'<div data-tap-disabled="true"><a></a></div>\'); ' +
             '    var downloadLink = $(downloadContainer.children()[0]); ' +
             '    downloadLink.attr(\'href\', window.URL.createObjectURL(blob)); ' +
-            '    downloadLink.attr(\'download\', \'flename.csv\'); ' +
+            '    downloadLink.attr(\'download\', \'TableData.csv\'); ' +
             '    downloadLink.attr(\'target\', \'_blank\'); ' +
             ' ' +
             '    $(window.document).find(\'body\').append(downloadContainer); ' +
