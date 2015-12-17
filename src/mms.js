@@ -60,4 +60,5 @@ angular.module('mms', [])
 .config(['$sceProvider', function($sceProvider) {
     $sceProvider.enabled(false);
 }])
-.constant('_', window._);
+.constant('_', window._)
+.constant('CKEDITOR', window.CKEDITOR);
