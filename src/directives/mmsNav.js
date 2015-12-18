@@ -1,41 +1,36 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsNav', ['SiteService', 'WorkspaceService', 'ConfigService', '$templateCache', 'growl', 'hotkeys', mmsNav]);
+.directive('mmsNav', ['$templateCache', '$state', 'hotkeys', 'growl', '$location', 'ElementService', mmsNav]);
 
 /**
  * @ngdoc directive
  * @name mms.directives.directive:mmsNav
  *
- * @requires mms.SiteService
  * @requires $templateCache
  *
  * @restrict E
  *
  * @description
- * A prebuilt nav bar that's customizable with current page title, current site,
+ * A prebuilt nav bar that's customizable with current page title,
  * and the "type" of page/app. Include navigation to other sites' dashboard
  * and docweb pages.
  * ## Example
  *  <pre>
-    <mms-nav mms-title="Model Manager" mms-ws="master" mms-config="tag" mms-site="europa"></mms-nav>
+    <mms-nav mms-title="Model Manager"></mms-nav>
     </pre>
  * ## Support for responsive sliding pane on small browser
  *  <pre>
     <div id="outer-wrap">
         <div id="inner-wrap">
-            <mms-nav mms-title="Model Manager" mms-ws="master" mms-config="tag" mms-site="europa"></mms-nav>
+            <mms-nav mms-title="Model Manager"></mms-nav>
             <!-- everything visible on the page should go in here -->
         </div>
     </div>
     </pre>
- * @param {string} mmsWs workspace name
- * @param {object} mmsSite site object
- * @param {object} mmsDoc document object
- * @param {object} mmsConfig tag/config object
  * @param {string} mmsTitle Title to display
  */
-function mmsNav(SiteService, WorkspaceService, ConfigService, $templateCache, growl, hotkeys) {
+function mmsNav($templateCache, $state, hotkeys, growl, $location, ElementService) {
     var template = $templateCache.get('mms/templates/mmsNav.html');
 
     var mmsNavLink = function(scope, element, attrs) {
@@ -180,51 +175,27 @@ function mmsNav(SiteService, WorkspaceService, ConfigService, $templateCache, gr
         scope.nav = new Nav();
         scope.nav.init();
 
-        WorkspaceService.getWorkspace(scope.ws)
-        .then(function(data) {
-            scope.wsName = data.name;
-        });
-        
-        /*if (scope.config && scope.config !== '' && scope.config !== 'latest') {
-            ConfigService.getConfig(scope.config, scope.ws, false)
-            .then(function(data) {
-                scope.configName = data.name;
-            });
-        } else {
-            scope.config = 'latest';
-        } */
-
-        SiteService.getSites()
-        .then(function(data) {
-            // var sites = {};
-            //var catNames = [];
-            for (var i = 0; i < data.length; i++) {
-                var site = data[i];
-                site.isOpen = true;
-                if (site.sysmlid === scope.site)
-                    scope.siteTitle = site.name;
-                // TODO: Replace with .parent
-                site.categories = ["Uncategorized"];
-                if (site.categories.length === 0)
-                    site.categories.push("Uncategorized");
-                for (var j = 0; j < site.categories.length; j++) {
-                    var cat = site.categories[j];
-                    catNames.push(cat);
-                    if (sites.hasOwnProperty(cat)) {
-                        sites[cat].push(site);
-                    } else {
-                        sites[cat] = [site];
-                    }
-                }
+        scope.searchClass = "";
+        scope.search = function(searchText) {
+            if ($state.includes('workspace.site.document.order')) {
+                growl.warning("Please finish reorder action first.");
+                return;
+            } else if ($state.includes('workspace.diff')) {
+                growl.warning("Please finish diff action first.");
+                return;
+            } else {
+                if ($state.params.search === searchText)
+                    return;
+                scope.searchClass = "fa fa-spin fa-spinner";
+                $state.go($state.current.name, {search: searchText});
             }
-            scope.categories = sites;
-            for(var k = 0; k < catNames.length; k++){
-                var str = catNames[k];
-                scope.categories[str].open = false;
-            }
-        }, function(reason) {
-            growl.error("Sites Error: " + reason.message);
-        });
+        };
+        scope.stagingView = function(){
+            var hostName = ($location.host() === 'localhost') ? 
+                         'https://cae-ems-stg.jpl.nasa.gov':
+                         'https://'+$location.host().split(".")[0]+'-stg.jpl.nasa.gov'; 
+            window.open(hostName ,'_blank');
+        };
     };
 
     return {
@@ -232,12 +203,7 @@ function mmsNav(SiteService, WorkspaceService, ConfigService, $templateCache, gr
         template: template,
         scope: {
             title: '@mmsTitle', //page title - used in mobile view only
-            ws: '@mmsWs',
-            site: '=mmsSite', //site object
-            product: '=mmsDoc', //document object
-            config: '=mmsConfig', //config object
-            snapshot: '@mmsSnapshotTag', // snapshot titles (before tags - need to be backward compatible), if any
-            showTag: '@mmsShowTag'
+            site: '=mmsSite'
         },
         link: mmsNavLink
     };

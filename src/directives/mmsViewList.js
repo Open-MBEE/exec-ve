@@ -17,13 +17,13 @@ function mmsViewList($compile, $templateCache, UtilsService) {
         },
         controller: ['$scope', '$rootScope', mmsViewListCtrl],
         link: function(scope, element, attrs) {
-            /*var html = UtilsService.makeHtmlList(scope.list);
-            element.append(html);
+            var html = UtilsService.makeHtmlList(scope.list);
+            element[0].innerHTML = html;
             $compile(element.contents())(scope);
-            return;*/
+            return;
             
-            element.append(template);
-            $compile(element.contents())(scope); 
+            //element.append(template);
+            //$compile(element.contents())(scope); 
             //var el = $compile(template)(scope);
             //element.append(el);
             

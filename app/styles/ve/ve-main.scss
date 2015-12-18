@@ -11,3 +11,25 @@
 @import "layout/_pane-center.scss";
 @import "layout/_pane-right.scss";
 @import "layout/_panes.scss";
+
+
+.ng-hide {display: none !important;}
+
+@media print {
+  a[href]:after {
+    content: none !important;
+  }
+  img {
+    max-width: 100%;
+    page-break-inside: avoid;
+    page-break-before: auto;
+    page-break-after: auto;
+    display: block;
+  }
+  tr, td, th {
+    page-break-inside: avoid;
+  }
+  thead {
+    display: table-header-group;
+  }
+}

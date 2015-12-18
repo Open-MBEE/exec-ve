@@ -6,7 +6,7 @@
 
     <div ng-if="edit.specialization.type === 'Property'">
         <h2 class="prop-title spec-view-value-heading">PROPERTY VALUE</h2>
-        <div ng-if="!isRestrictedVal">
+        <div ng-if="!isRestrictedVal && !isEnumeration">
         <div ng-if="editValues.length == 0">
             <select ng-model="addValueType" ng-options="key for (key, value) in addValueTypes"></select>
             <button class="btn btn-sm" ng-click="addValue(addValueType)">Add</button>
@@ -28,8 +28,12 @@
         </div>
         <div ng-if="isRestrictedVal">
             <select ng-model="editValues[0].operand[1].element" ng-options="el.sysmlid as el.name for el in options">
-        </select>
-    </div>
+            </select>
+        </div>
+        <div ng-if="isEnumeration">
+            <select ng-model="editValues[0].instance" ng-options="el.sysmlid as el.name for el in options">
+            </select>
+        </div>
     </div>
 
     <div ng-if="edit.specialization.type === 'Constraint'">
@@ -55,7 +59,7 @@
     <div ng-hide="mmsViewEdit">
         <h2 class="prop-title spec-view-type-heading">METATYPE</h2>
         <h3 class="prop">{{element.specialization.type || 'Element'}}</h3>
-        <h2 class="prop-title">QUALIFIED NAME</h2>
+        <h2 class="prop-title">LOCATION <i class="fa fa-folder"></i></h2>
         <h3 class="prop">{{element.qualifiedName}}</h3>
         <h2 class="prop-title">ID</h2>
         <h3 class="prop sysmlid">{{element.sysmlid}}</h3>
@@ -81,6 +85,7 @@
             <h3 class="prop" ng-switch-when="LiteralUnlimitedNatural">{{value.naturalValue}}</h3>
             <h3 class="prop" ng-switch-when="LiteralString" ng-bind-html="value.string"></h3>
             <h3 class="prop" ng-switch-when="ElementValue"><mms-transclude-name mms-watch-id="true" mms-eid="{{value.element}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></h3>
+            <h3 class="prop" ng-switch-when="InstanceValue"><mms-transclude-name mms-watch-id="true" mms-eid="{{value.instance}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></h3>
             <h3 class="prop" ng-switch-when="OpaqueExpression">{{value.expressionBody[0]}}</h3>
             <h3 class="prop" ng-switch-default>{{value}}</h3>
         </div>
@@ -90,7 +95,7 @@
         </select>
     </div>
         <h2 class="prop-title spec-view-value-heading">PROPERTY TYPE</h2>
-        <h3 class="prop"><mms-transclude-name mms-watch-id="true" mms-eid="{{element.specialization.propertyType}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></h3>
+        <h3 class="prop"><mms-transclude-name mms-watch-id="true" mms-eid="{{element.specialization.propertyType}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}" click-handler="propertyTypeClicked()"></mms-transclude-name></h3>
     </div>
 
     <div ng-if="element.specialization.type === 'Generalization' || element.specialization.type === 'Expose' || element.specialization.type === 'Dependency' || element.specialization.type === 'Conform'">
@@ -133,7 +138,7 @@
 
     <h2 class="prop-title spec-view-type-heading">METATYPE</h2>
     <h3 class="prop">{{element.specialization.type || 'Element'}}</h3>
-    <h2 class="prop-title">QUALIFIED NAME</h2>
+    <h2 class="prop-title">LOCATION <i class="fa fa-folder"></i></h2>
     <h3 class="prop">{{element.qualifiedName}}</h3>
     <h2 class="prop-title">ID</h2>
     <h3 class="prop sysmlid">{{element.sysmlid}}</h3>

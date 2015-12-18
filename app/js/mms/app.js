@@ -2,8 +2,12 @@
 
 angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.borderLayout', 'ui.bootstrap', 'ui.router', 'ui.tree', 'angular-growl', 'cfp.hotkeys'])
 .config(function($stateProvider, $urlRouterProvider) {
+    // Change the DEFAULT state to workspace.sites on entry
+    $urlRouterProvider.when('', '/workspaces/master/sites');
+
     $urlRouterProvider.rule(function ($injector, $location) {
         // determine if the url is older 2.0 format (will not have a workspace)
+        // generate some random client id
         if ($location.url().indexOf('/workspaces') === -1)
         {
             var locationPath = 'workspaces/master' + $location.url();
@@ -60,7 +64,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
 
     $stateProvider
     .state('workspaces', {
-        url: '/workspaces',
+        url: '/workspaces?search',
         resolve: {
             dummyLogin: function($http, URLService) {
                 return $http.get(URLService.getCheckLoginURL());
@@ -77,7 +81,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 return WorkspaceService.getWorkspace(workspace);
             },  
             tags: function(ConfigService, workspace, dummyLogin) {
-                return ConfigService.getConfigs(workspace, false);
+                return ConfigService.getConfigs(workspace, false, 2);
             },
             tag: function ($stateParams, ConfigService, workspace, dummyLogin) {
                 return { name: 'latest', timestamp: 'latest' };
@@ -100,7 +104,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             viewElements: function(ViewService, workspace, document, time, dummyLogin) {
                 if (document === null) 
                     return null;
-                return ViewService.getViewElements(document.sysmlid, false, workspace, time);
+                return ViewService.getViewElements(document.sysmlid, false, workspace, time, 2);
             },   
             time: function(tag, dummyLogin) {
                 return tag.timestamp;
@@ -116,14 +120,35 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             },
             docFilter: function(dummyLogin) {
                 return null;
+            },
+            search: function($stateParams, ElementService, workspace, dummyLogin) {
+                if ($stateParams.search === undefined) {
+                    return null;
+                }
+                return ElementService.search($stateParams.search, ['*'], null, false, workspace, 2)
+                .then(function(data) {
+                    return data;
+                }, function(reason) {
+                    return null;
+                });                
             }
         },
         views: {
-            'menu': {
+            'nav': {
                 template: '<mms-nav mms-title="Model Manager" mms-ws="{{workspace}}" mms-config="tag"></mms-nav>',
                 controller: function ($scope, $rootScope, workspace, tag) {
                     $scope.workspace = workspace;
                     $scope.tag = tag;
+                    $rootScope.mms_title = 'Model Manager';
+                }
+            },
+            'menu': {
+                template: '<mms-menu mms-title="Model Manager" mms-ws="{{workspace}}" mms-workspaces="workspaces" mms-config="tag" mms-tags="tags"></mms-menu>',
+                controller: function ($scope, $rootScope, workspaces, workspace, tags, tag) {
+                    $scope.workspaces = workspaces;
+                    $scope.workspace = workspace;
+                    $scope.tag = tag;
+                    $scope.tags = tags;
                     $rootScope.mms_title = 'Model Manager';
                 }
             },
@@ -168,7 +193,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 // This is a short-term work-around -- all this should be done the back-end MMS in the future
                 var wsCoverDocId = 'master_cover';
 
-                return ElementService.getElement(wsCoverDocId, false, workspace, time)
+                return ElementService.getElement(wsCoverDocId, false, workspace, time, 2)
                 .then(function(data) {
                     return data;
                 }, function(reason) {
@@ -187,7 +212,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 });
             },
             docFilter: function(ElementService, workspace, time, document, dummyLogin) {
-                return ElementService.getElement("master_filter", false, workspace, time)
+                return ElementService.getElement("master_filter", false, workspace, time, 2)
                 .then(function(data) {
                     return data;
                 }, function(reason) {
@@ -212,25 +237,25 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             viewElements: function(ViewService, workspace, document, time, dummyLogin) {
                 if (document === null) 
                     return [];
-                return ViewService.getViewElements(document.sysmlid, false, workspace, time);
+                return ViewService.getViewElements(document.sysmlid, false, workspace, time, 2);
             },    
             view: function(ViewService, workspace, document, time, dummyLogin) {
                 if (document === null) 
                     return null;
-                return ViewService.getView(document.sysmlid, false, workspace, time);
+                return ViewService.getView(document.sysmlid, false, workspace, time, 2);
             },
             tags: function(ConfigService, workspace, dummyLogin) {
-                return ConfigService.getConfigs(workspace, false);
+                return ConfigService.getConfigs(workspace, false, 2);
             },
             tag: function ($stateParams, ConfigService, workspace, dummyLogin) {
                 if ($stateParams.tag === undefined || $stateParams.tag === 'latest')
                     return { name: 'latest', timestamp: 'latest' };
-                return ConfigService.getConfig($stateParams.tag, workspace, false);
+                return ConfigService.getConfig($stateParams.tag, workspace, false, 2);
             },        
             configSnapshots: function(ConfigService, workspace, tag, dummyLogin) {
                 if (tag.timestamp === 'latest')
                     return [];
-                return ConfigService.getConfigSnapshots(tag.id, workspace, false);
+                return ConfigService.getConfigSnapshots(tag.id, workspace, false, 2);
             },
             time: function(tag, dummyLogin) {
                 return tag.timestamp;
@@ -238,10 +263,12 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
         },
         views: {
             'menu@': {
-                template: '<mms-nav mms-title="Model Manager" mms-ws="{{workspace}}" mms-config="tag"></mms-nav>',
-                controller: function ($scope, $rootScope, workspace, tag) {
+                template: '<mms-menu mms-title="Model Manager" mms-ws="{{workspace}}" mms-workspaces="workspaces" mms-config="tag" mms-tags="tags"></mms-menu>',
+                controller: function ($scope, $rootScope, workspaces, workspace, tag, tags) {
+                    $scope.workspaces = workspaces;
                     $scope.workspace = workspace;
                     $scope.tag = tag;
+                    $scope.tags = tags;
                     $rootScope.mms_title = 'Model Manager';
                 }
             },
@@ -266,10 +293,12 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
         parent: 'workspace',
         views: {
             'menu@': {
-                template: '<mms-nav mms-title="Portal" mms-ws="{{workspace}}" mms-site="site" mms-config="tag"></mms-nav>',
-                controller: function ($scope, $rootScope, workspace, site, tag, workspaceObj) {
+                template: '<mms-menu mms-title="Portal" mms-ws="{{workspace}}" mms-site="site" mms-workspaces="workspaces" mms-config="tag" mms-tags="tags"></mms-menu>',
+                controller: function ($scope, $rootScope, workspaces, workspace, site, tag, tags, workspaceObj) {
+                    $scope.workspaces = workspaces;
                     $scope.workspace = workspace;
                     $scope.tag = tag;
+                    $scope.tags = tags;
                     $scope.site = site;
                     $rootScope.mms_title = 'Portal: '+workspaceObj.name;
                 }
@@ -303,7 +332,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 else
                     siteCoverDocId = site.sysmlid + '_cover';
 
-                return ElementService.getElement(siteCoverDocId, false, workspace, time)
+                return ElementService.getElement(siteCoverDocId, false, workspace, time, 2)
                 .then(function(data) {
                     return data;
                 }, function(reason) {
@@ -329,25 +358,36 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             views: function(ViewService, workspace, document, time, dummyLogin) {
                 if (document === null) 
                     return null;
-                return ViewService.getDocumentViews(document.sysmlid, false, workspace, time, true);
+                return ViewService.getDocumentViews(document.sysmlid, false, workspace, time, true, 2);
             },
             viewElements: function(ViewService, workspace, document, time, dummyLogin) {
                 if (document === null) 
                     return null;
-                return ViewService.getViewElements(document.sysmlid, false, workspace, time);
+                return ViewService.getViewElements(document.sysmlid, false, workspace, time, 2);
             },    
             view: function(ViewService, workspace, document, time, dummyLogin) {
                 if (document === null) 
                     return null;
-                return ViewService.getView(document.sysmlid, false, workspace, time);
+                return ViewService.getView(document.sysmlid, false, workspace, time, 2);
             }
         },
         views: {
-            'menu@': {
-                template: '<mms-nav mms-title="Portal" mms-ws="{{workspace}}" mms-site="site" mms-config="tag"></mms-nav>',
-                controller: function ($scope, $rootScope, workspace, site, tag, workspaceObj) {
+            'nav@': {
+                template: '<mms-nav mms-title="Model Manager" mms-ws="{{workspace}}" mms-config="tag" mms-site="site"></mms-nav>',
+                controller: function ($scope, $rootScope, workspace, tag, site) {
                     $scope.workspace = workspace;
                     $scope.tag = tag;
+                    $rootScope.mms_title = 'Model Manager';
+                    $scope.site = site;
+                }
+            },
+            'menu@': {
+                template: '<mms-menu mms-title="Portal" mms-ws="{{workspace}}" mms-site="site" mms-workspaces="workspaces" mms-config="tag" mms-tags="tags"></mms-menu>',
+                controller: function ($scope, $rootScope, workspaces, workspace, site, tag, tags, workspaceObj) {
+                    $scope.workspaces = workspaces;
+                    $scope.workspace = workspace;
+                    $scope.tag = tag;
+                    $scope.tags = tags;
                     $scope.site = site;
                     $rootScope.mms_title = 'Portal: '+workspaceObj.name;
                 }
@@ -366,30 +406,33 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
         url: '/document/:document',
         resolve: {
             document: function($stateParams, ElementService, workspace, time, dummyLogin) {
-                return ElementService.getElement($stateParams.document, false, workspace, time);
+                return ElementService.getElement($stateParams.document, false, workspace, time, 2);
             },
             views: function(ViewService, workspace, document, time, dummyLogin) {
                 if (document === null) 
                     return null;
-                return ViewService.getDocumentViews(document.sysmlid, false, workspace, time, true);
+                return ViewService.getDocumentViews(document.sysmlid, false, workspace, time, true, 2);
             },
             viewElements: function(ViewService, workspace, document, time, dummyLogin) {
                 if (document === null) 
                     return null;
-                return ViewService.getViewElements(document.sysmlid, false, workspace, time);
+                return ViewService.getViewElements(document.sysmlid, false, workspace, time, 2);
             },    
             view: function(ViewService, workspace, document, time, dummyLogin) {
                 if (document === null) 
                     return null;
-                return ViewService.getView(document.sysmlid, false, workspace, time);
+                return ViewService.getView(document.sysmlid, false, workspace, time, 2);
             },
-            snapshot: function(configSnapshots, document, dummyLogin) {
+            snapshot: function(ConfigService, configSnapshots, document, workspace, dummyLogin) {
                 var docid = document.sysmlid;
                 var found = null;
                 configSnapshots.forEach(function(snapshot) {
                     if (docid === snapshot.sysmlid)
                         found = snapshot;
                 });
+                if (found) {
+                    return ConfigService.getSnapshot(found.id, workspace, true, 2);
+                }
                 return found; 
             }
         },
@@ -404,31 +447,34 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
         url: '/documents/:document?time',
         resolve: {
             document: function($stateParams, ElementService, time, dummyLogin) {
-                return ElementService.getElement($stateParams.document, false, $stateParams.workspace, time);
+                return ElementService.getElement($stateParams.document, false, $stateParams.workspace, time, 2);
             },
             views: function($stateParams, ViewService, document, time, dummyLogin) {
                 if (document.specialization.type !== 'Product')
                     return [];
-                return ViewService.getDocumentViews($stateParams.document, false, $stateParams.workspace, time, true);
+                return ViewService.getDocumentViews($stateParams.document, false, $stateParams.workspace, time, true, 2);
             },
             viewElements: function($stateParams, ViewService, time, dummyLogin) {
-                return ViewService.getViewElements($stateParams.document, false, $stateParams.workspace, time);
+                return ViewService.getViewElements($stateParams.document, false, $stateParams.workspace, time, 2);
             },
             view: function($stateParams, ViewService, viewElements, time, dummyLogin) {
-                return ViewService.getView($stateParams.document, false, $stateParams.workspace, time);
+                return ViewService.getView($stateParams.document, false, $stateParams.workspace, time, 2);
             },
             snapshots: function(ConfigService, workspace, site, document, dummyLogin) {
                 if (document.specialization.type !== 'Product')
                     return [];
-                return ConfigService.getProductSnapshots(document.sysmlid, site.sysmlid, workspace);
+                return ConfigService.getProductSnapshots(document.sysmlid, site.sysmlid, workspace, false, 2);
             },
-            snapshot: function(configSnapshots, document, dummyLogin) {
+            snapshot: function(ConfigService, workspace, snapshots, document, time, dummyLogin) {
                 var docid = document.sysmlid;
                 var found = null;
-                configSnapshots.forEach(function(snapshot) {
-                    if (docid === snapshot.sysmlid)
+                snapshots.forEach(function(snapshot) {
+                    if (snapshot.created === time)
                         found = snapshot;
                 });
+                if (found) {
+                    return ConfigService.getSnapshot(found.id, workspace, true, 2);
+                }
                 return found; 
             },
             tag: function ($stateParams, ConfigService, workspace, snapshots, dummyLogin) {
@@ -449,7 +495,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                                     // base the configuration tag on the first one
                                     snapshotFound = true;
 
-                                    snapshotPromise = ConfigService.getConfig(snapshot.configurations[0].id, workspace, false);
+                                    snapshotPromise = ConfigService.getConfig(snapshot.configurations[0].id, workspace, false, 2);
                                 }
                             }
                         });
@@ -463,17 +509,17 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 } else if ($stateParams.tag === 'latest') {
                     return { name: 'latest', timestamp: 'latest' };
                 } else {
-                    return ConfigService.getConfig($stateParams.tag, workspace, false);
+                    return ConfigService.getConfig($stateParams.tag, workspace, false, 2);
                 }
             },        
             configSnapshots: function(ConfigService, workspace, tag, dummyLogin) {
-                if (tag.timestamp === 'latest')
+                //if (tag.timestamp === 'latest')
                     return [];
-                return ConfigService.getConfigSnapshots(tag.id, workspace, false);
+                //return ConfigService.getConfigSnapshots(tag.id, workspace, false);
             },
             time: function($stateParams, ConfigService, workspace, dummyLogin) {
                 if ($stateParams.tag !== undefined) {
-                    return ConfigService.getConfig($stateParams.tag, workspace, false).then(function(tag) {
+                    return ConfigService.getConfig($stateParams.tag, workspace, false, 2).then(function(tag) {
                         return tag.timestamp;
                     }); 
                 }
@@ -484,7 +530,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             },
             docFilter: function($stateParams, ElementService, workspace, site, time, growl, dummyLogin) {
                 //need to redefine here since time is redefined
-                return ElementService.getElement("master_filter", false, workspace, time)
+                return ElementService.getElement("master_filter", false, workspace, time, 2)
                 .then(function(data) {
                     return data;
                 }, function(reason) {
@@ -494,10 +540,12 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
         },
         views: {
             'menu@': {
-                template: '<mms-nav mms-title="View Editor" mms-ws="{{workspace}}" mms-site="site" mms-doc="document" mms-config="tag" mms-snapshot-tag="{{snapshotTag}}" mms-show-tag="{{showTag}}"></mms-nav>',
-                controller: function ($scope, $filter, $rootScope, workspace, site, document, tag, snapshots, time, docFilter) {
+                template: '<mms-menu mms-title="View Editor" mms-ws="{{workspace}}" mms-site="site" mms-doc="document" mms-workspaces="workspaces" mms-config="tag" mms-tags="tags" mms-snapshot-tag="{{snapshotTag}}" mms-show-tag="{{showTag}}"></mms-menu>',
+                controller: function ($scope, $filter, $rootScope, workspaces, workspace, site, document, tag, tags, snapshots, time, docFilter) {
+                    $scope.workspaces = workspaces;
                     $scope.workspace = workspace;
                     $scope.tag = tag;
+                    $scope.tags = tags;
                     $scope.site = site;
                     $scope.document = document;
 
@@ -514,7 +562,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                                 return;
                             if (time === snapshot.created && snapshot.configurations && snapshot.configurations.length > 0)
                                 snapshot.configurations.forEach(function(config) {
-                                    tagStr += '( <i class="fa fa-tag"></i> ' + config.name + ' ) ';
+                                    //tagStr += '( <i class="fa fa-tag"></i> ' + config.name + ' ) ';
                                     $scope.tag = config;
                                 });
                         });
@@ -565,12 +613,12 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
         url: '/views/:view',
         resolve: {
             viewElements: function($stateParams, ViewService, time, dummyLogin) {
-                if (time === 'latest')
-                    return ViewService.getViewElements($stateParams.view, false, $stateParams.workspace, time);
+                //if (time === 'latest')
+                //    return ViewService.getViewElements($stateParams.view, false, $stateParams.workspace, time);
                 return [];
             },
             view: function($stateParams, ViewService, viewElements, time, dummyLogin) {
-                return ViewService.getView($stateParams.view, false, $stateParams.workspace, time);
+                return ViewService.getView($stateParams.view, false, $stateParams.workspace, time, 2);
             }
         },
         views: {
@@ -596,11 +644,11 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             },
 
             ws1Configs: function($stateParams, ConfigService, ws1, dummyLogin){
-                return ConfigService.getConfigs(ws1.id, false);
+                return ConfigService.getConfigs(ws1.id, false, 2);
             },
 
             ws2Configs: function($stateParams, ConfigService, ws2, dummyLogin){
-                return ConfigService.getConfigs(ws2.id, false);
+                return ConfigService.getConfigs(ws2.id, false, 2);
             },
 
             targetName: function($stateParams, ws1, ws1Configs,dummyLogin){

@@ -38,7 +38,137 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         ParagraphT: "_17_0_5_1_407019f_1431903758416_800749_12055",
         SectionT: "_18_0_2_407019f_1435683487667_494971_14412"
     };
+
+    function getClassifierIds() {
+        var re = [];
+        Object.keys(typeToClassifierId).forEach(function(key) {
+            re.push(typeToClassifierId[key]);
+        });
+        return re;
+    }
+
+    var classifierIds = getClassifierIds();
+    var opaqueClassifiers = [typeToClassifierId.Image, typeToClassifierId.List, 
+        typeToClassifierId.Paragraph, typeToClassifierId.Section, typeToClassifierId.Table];
     
+    var processString = function(values) {
+        if (!values || values.length === 0 || values[0].type !== 'LiteralString')
+            return '';
+        return values[0].string;
+    };
+    var processStrings = function(values) {
+        var res = [];
+        if (!values || values.length === 0)
+            return res;
+        values.forEach(function(value) {
+            if (value.type !== 'LiteralString' || !value.string)
+                return;
+            res.push(value.string);
+        });
+        return res;
+    };
+    var processPeople = function(values) {
+        if (!values || values.length === 0)
+            return [];
+        var people = [];
+        values.forEach(function(value) {
+            if (value.type !== 'LiteralString' || !value.string)
+                return;
+            var p = value.string.split(',');
+            if (p.length !== 5)
+                return;
+            people.push({
+                firstname: p[0],
+                lastname: p[1],
+                title: p[2],
+                orgname: p[3],
+                orgnum: p[4]
+            });
+        });
+        return people;
+    };
+    var processRevisions = function(values) {
+        if (!values || values.length === 0)
+            return [];
+        var rev = [];
+        values.forEach(function(value) {
+            if (value.type !== 'LiteralString' || !value.string)
+                return;
+            var p = value.string.split('|');
+            if (p.length !== 5)
+                return;
+            rev.push({
+                revnum: p[0],
+                date: p[1],
+                firstname: p[2],
+                lastname: p[3],
+                remark: p[4]
+            });
+        });
+        return rev;
+    };
+    var docMetadataTypes = {
+        '_17_0_1_407019f_1326234342817_186479_2256': {
+            name: 'header',
+            process: processString
+        },
+        '_17_0_1_407019f_1326234349580_411867_2258': {
+            name: 'footer',
+            process: processString
+        },
+        '_17_0_2_3_f4a035d_1366647903710_685116_36989': {
+            name: 'dnumber',
+            process: processString
+        },
+        '_17_0_2_3_f4a035d_1366647903991_141146_36990': {
+            name: 'version',
+            process: processString
+        },
+        '_17_0_2_3_f4a035d_1366647903994_494629_36996': {
+            name: 'titlelegal',
+            process: processString
+        },
+        '_17_0_2_3_f4a035d_1366647903994_370992_36997': {
+            name: 'footerlegal',
+            process: processString
+        },
+        '_17_0_2_3_f4a035d_1366647903995_652492_37000': {
+            name: 'authors',
+            process: processPeople
+        },
+        '_17_0_2_3_f4a035d_1366647903996_970714_37001': {
+            name: 'approvers',
+            process: processPeople
+        },
+        '_17_0_2_3_f4a035d_1366647903996_463299_37002': {
+            name: 'concurrences',
+            process: processPeople
+        },
+        '_17_0_2_3_f4a035d_1366698987711_498852_36951': {
+            name: 'revisions',
+            process: processRevisions
+        },
+        '_17_0_2_3_f4a035d_1366696484320_980107_36953': {
+            name: 'project',
+            process: processString
+        },
+        '_17_0_2_3_f4a035d_1366647903995_864529_36998': {
+            name: 'emails',
+            process: processStrings
+        },
+        '_17_0_2_3_e9f034d_1375464775176_680884_29346': {
+            name: 'instlogo',
+            process: processString
+        },
+        '_17_0_2_3_e9f034d_1375464942934_241960_29357': {
+            name: 'inst1',
+            process: processString
+        },
+        '_17_0_2_3_e9f034d_1375464993159_319060_29362': {
+            name: 'inst2',
+            process: processString
+        }
+    };
     /**
      * @ngdoc method
      * @name mms.ViewService#getView
@@ -57,8 +187,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      *      multiple calls to this method with the same id would result in 
      *      references to the same object.
      */
-    var getView = function(id, update, workspace, version) { 
-        return ElementService.getElement(id, update, workspace, version);
+    var getView = function(id, update, workspace, version, weight) { 
+        return ElementService.getElement(id, update, workspace, version, weight);
     };
 
     /**
@@ -79,8 +209,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      *      multiple calls to this method with the same ids would result in an array of 
      *      references to the same objects.
      */
-    var getViews = function(ids, update, workspace, version) {
-        return ElementService.getElements(ids, update, workspace, version);
+    var getViews = function(ids, update, workspace, version, weight) {
+        return ElementService.getElements(ids, update, workspace, version, weight);
     };
 
     /**
@@ -101,8 +231,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      *      multiple calls to this method with the same id would result in 
      *      references to the same object.
      */
-    var getDocument = function(id, update, workspace, version) {
-        return ElementService.getElement(id, update, workspace, version);
+    var getDocument = function(id, update, workspace, version, weight) {
+        return ElementService.getElement(id, update, workspace, version, weight);
     };
 
     /**
@@ -204,7 +334,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @param {string} [version=latest] (optional) alfresco version number or timestamp
      * @returns {Promise} The promise will be resolved with array of element objects. 
      */
-    var getViewElements = function(id, update, workspace, version) {
+    var getViewElements = function(id, update, workspace, version, weight) {
         var n = normalize(update, workspace, version);
         var deferred = $q.defer();
         var url = URLService.getViewElementsURL(id, n.ws, n.ver);
@@ -212,7 +342,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         if (CacheService.exists(cacheKey) && !n.update) 
             deferred.resolve(CacheService.get(cacheKey));
         else {
-            ElementService.getGenericElements(url, 'elements', n.update, n.ws, n.ver).
+            ElementService.getGenericElements(url, 'elements', n.update, n.ws, n.ver, weight).
             then(function(data) {
                 deferred.resolve(CacheService.put(cacheKey, data, false));
             }, function(reason) {
@@ -240,7 +370,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @param {boolean} [simple=false] (optional) whether to get simple views
      * @returns {Promise} The promise will be resolved with array of view objects. 
      */
-    var getDocumentViews = function(id, update, workspace, version, simple) {
+    var getDocumentViews = function(id, update, workspace, version, simple, weight) {
         var n = normalize(update, workspace, version);
         var s = !simple ? false : simple; 
         var deferred = $q.defer();
@@ -249,7 +379,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         if (CacheService.exists(cacheKey) && !n.update) 
             deferred.resolve(CacheService.get(cacheKey));
         else {
-            ElementService.getGenericElements(url, 'views', n.update, n.ws, n.ver).
+            ElementService.getGenericElements(url, 'views', n.update, n.ws, n.ver, weight).
             then(function(data) {
                 deferred.resolve(CacheService.put(cacheKey, data, false));
             }, function(reason) {
@@ -280,7 +410,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         var deferred = $q.defer();
         var ws = !workspace ? 'master' : workspace;
         var docViewsCacheKey = ['products', ws, documentId, 'latest', 'views'];
-        getDocument(documentId, false, ws)
+        getDocument(documentId, false, ws, null, 2)
         .then(function(data) {  
             var clone = {};
             clone.sysmlid = data.sysmlid;
@@ -344,7 +474,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
 
         var deferred = $q.defer();
         var ws = !workspace ? 'master' : workspace;
-        ElementService.getElement(viewOrSectionId, false, ws)
+        ElementService.getElement(viewOrSectionId, false, ws, null, 2)
         .then(function(data) {  
             var clone = {};
             clone.sysmlid = data.sysmlid;
@@ -365,7 +495,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
            if (!clone.specialization[key]) {
                 clone.specialization[key] = {
                     operand: [],
-                    type: "Expression"
+                    type: "Expression",
+                    valueExpression: null
                 };
             }
             clone.specialization[key].operand.push(elementOb);
@@ -402,7 +533,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
 
         if (instanceVal) {
             var ws = !workspace ? 'master' : workspace;
-            ElementService.getElement(viewOrSecId, false, ws)
+            ElementService.getElement(viewOrSecId, false, ws, null, 2)
             .then(function(data) {  
                 var clone = {};
                 clone.sysmlid = data.sysmlid;
@@ -557,7 +688,10 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 jsonBlob = paragraph;
                 jsonBlob.type = 'Equation';
             }
-
+            else if (type === 'Comment') {
+                jsonBlob = paragraph;
+                jsonBlob.type = 'Comment';
+            }
             // Special case for Section.  Doesnt use json blobs.
             if (type === "Section") {
                 presentationElem = jsonBlob;  
@@ -583,6 +717,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             realType = 'ParagraphT';
         if (type === 'Section')
             realType = 'SectionT';
+        if (type === 'Comment')
+            realType = 'ParagraphT';
         var instanceSpec = {
             name:instanceSpecName,
             specialization: {
@@ -656,7 +792,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
 
         var instanceVal = {
             instance:instanceSpecId,
-            type:"InstanceValue"
+            type:"InstanceValue",
+            valueExpression: null
         };
 
         return addElementToViewOrSection(viewOrSection.sysmlid, viewOrSection.sysmlid, workspace, instanceVal);
@@ -687,7 +824,17 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
     var createView = function(ownerId, name, documentId, workspace, viewId, viewDoc, site) {
         var deferred = $q.defer();
         var view = {
-            specialization: {type: 'View'},
+            specialization: {
+                type: 'View',
+                allowedElements: [],
+                displayedElements: [],
+                childrenViews: [],
+                contents: {
+                    valueExpression: null,
+                    operand: [],
+                    type: 'Expression'
+                }
+            },
             owner: ownerId,
             name: !name ? 'Untitled View' : name,
             documentation: '',
@@ -702,8 +849,9 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
 
         ElementService.createElement(view, workspace, site)
         .then(function(data) {
-            data.specialization.allowedElements = [data.sysmlid];
-            data.specialization.displayedElements = [data.sysmlid];
+            /*
+            data.specialization.allowedElements = [];
+            data.specialization.displayedElements = [];
             data.specialization.childrenViews = [];
 
             var jsonBlob = {
@@ -713,19 +861,19 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 'sourceProperty': 'documentation'
             };
             addInstanceSpecification(data, workspace, "Paragraph", true, null, "View Documentation", jsonBlob, true)
-            .then(function(data2) {
+            .then(function(data2) {*/
                 if (documentId) {
-                    addViewToDocument(data.sysmlid, documentId, ownerId, workspace, data2)
+                    addViewToDocument(data.sysmlid, documentId, ownerId, workspace, data)
                     .then(function(data3) {
-                        deferred.resolve(data2);
+                        deferred.resolve(data);
                     }, function(reason) {
                         deferred.reject(reason);
                     });
                 } else
-                    deferred.resolve(data2);
-            }, function(reason) {
+                    deferred.resolve(data);
+            /*}, function(reason) {
                 deferred.reject(reason);
-            });
+            });*/
         }, function(reason) {
             deferred.reject(reason);
         });
@@ -750,7 +898,16 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
     var createDocument = function(name, site, workspace) {
         var deferred = $q.defer();
         var doc = {
-            specialization: {type: "Product"},
+            specialization: {
+                type: "Product", 
+                allowedElements: [],
+                displayedElements: [],
+                contents: {
+                    valueExpression: null,
+                    operand: [],
+                    type: 'Expression'
+                }
+            },
             name: !name ? 'Untitled Document' : name,
             documentation: '',
             appliedMetatypes: [
@@ -761,22 +918,21 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         };
         ElementService.createElement(doc, workspace, site)
         .then(function(data) {
-            data.specialization.allowedElements = [data.sysmlid];
-            data.specialization.displayedElements = [data.sysmlid];
             data.specialization.view2view = [
                 {
                     id: data.sysmlid,
                     childrenViews: []
                 }
             ];
-
+            ElementService.updateElement(data, workspace)
+            /*
             var jsonBlob = {
                 'type': 'Paragraph', 
                 'sourceType': 'reference', 
                 'source': data.sysmlid, 
                 'sourceProperty': 'documentation'
             };
-            addInstanceSpecification(data, workspace, "Paragraph", true, site, "View Documentation", jsonBlob)
+            addInstanceSpecification(data, workspace, "Paragraph", true, site, "View Documentation", jsonBlob) */
             .then(function(data2) {
                 var ws = !workspace ? 'master' : workspace;
                 var cacheKey = ['sites', ws, 'latest', site, 'products'];
@@ -806,7 +962,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @param {string} [version=latest] timestamp
      * @returns {Promise} The promise will be resolved with array of document objects 
      */
-    var getSiteDocuments = function(site, update, workspace, version) {
+    var getSiteDocuments = function(site, update, workspace, version, weight) {
         var n = normalize(update, workspace, version);
         var deferred = $q.defer();
         var url = URLService.getSiteProductsURL(site, n.ws, n.ver);
@@ -814,7 +970,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         if (CacheService.exists(cacheKey) && !n.update) 
             deferred.resolve(CacheService.get(cacheKey));
         else {
-            ElementService.getGenericElements(url, 'products', n.update, n.ws, n.ver).
+            ElementService.getGenericElements(url, 'products', n.update, n.ws, n.ver, weight).
             then(function(data) {              
                 deferred.resolve(CacheService.put(cacheKey, data, false));
             }, function(reason) {
@@ -839,13 +995,13 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @returns {Promise} The promise will be resolved with a json object for the 
      *                    corresponding presentation element
      */
-    var parseExprRefTree = function(instanceVal, workspace, version) {
+    var parseExprRefTree = function(instanceVal, workspace, version, weight) {
 
         var instanceSpecId = instanceVal.instance;
         var deferred = $q.defer();
 
         // TODO do we need version?
-        ElementService.getElement(instanceSpecId, false, workspace, version)
+        ElementService.getElement(instanceSpecId, false, workspace, version, weight)
         .then(function(instanceSpec) {
 
             // InstanceSpecifcations can have instanceSpecificationSpecification 
@@ -883,17 +1039,38 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         return deferred.promise;
     };
 
-
-    var getElementReferenceTree = function (contents, workspace, version) {
-
+    /**
+     * @ngdoc method
+     * @name mms.ViewService#getElementReferenceTree
+     * @methodOf mms.ViewService
+     * 
+     * @description
+     * gets the presentation element tree as an array of tree nodes
+     * a tree node is this:
+     * <pre>
+        {
+            instance: id of the instance,
+            instanceVal: instanceValue object,
+            sectionElements: array of child tree nodes,
+            instanceSpecification: instance specification object of the instance,
+            presentationElement: json of the presentation element or a section instance spec with type = Section
+        }
+     * </pre>
+     * 
+     * @param {object} contents an expression object from a view or section
+     * @param {string} [workspace=master] workspace
+     * @param {string} [version=latest] timestamp
+     * @returns {Promise} The promise will be resolved with array of tree node objects
+     */
+    var getElementReferenceTree = function (contents, workspace, version, weight) {
         var promises = [];
         angular.forEach(contents.operand, function(instanceVal) {
-            promises.push( getElementReference(instanceVal, workspace, version) );
+            promises.push( getElementReference(instanceVal, workspace, version, weight) );
         });
         return $q.all(promises);
     };
 
-    var getElementReference = function (instanceVal, workspace, version) {
+    var getElementReference = function (instanceVal, workspace, version, weight) {
         var deferred = $q.defer();
 
         var elementObject = {};
@@ -902,23 +1079,33 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         elementObject.instanceVal = instanceVal;
         elementObject.sectionElements = [];
 
-        getInstanceSpecification(instanceVal, workspace, version).then(function(instanceSpecification) {
-
+        getInstanceSpecification(instanceVal, workspace, version, weight)
+        .then(function(instanceSpecification) {
             elementObject.instanceSpecification = instanceSpecification;
-
-            parseExprRefTree(instanceVal, workspace, version).then(function(presentationElement) {
-
+            if (instanceSpecification.specialization && instanceSpecification.specialization.classifier &&
+                    instanceSpecification.specialization.classifier.length > 0 && 
+                    opaqueClassifiers.indexOf(instanceSpecification.specialization.classifier[0]) >= 0)
+                elementObject.isOpaque = true;
+            else
+                elementObject.isOpaque = false;
+            parseExprRefTree(instanceVal, workspace, version, weight)
+            .then(function(presentationElement) {
                 elementObject.presentationElement = presentationElement;
-
                 if (presentationElement.type === 'Section') {
-                    getElementReferenceTree(presentationElement.specialization.instanceSpecificationSpecification, workspace, version).then(function(sectionElementReferenceTree) {
+                    getElementReferenceTree(presentationElement.specialization.instanceSpecificationSpecification, workspace, version)
+                    .then(function(sectionElementReferenceTree) {
                         elementObject.sectionElements = sectionElementReferenceTree;
                         deferred.resolve(elementObject);
+                    }, function(reason) {
+                        deferred.reject(reason);
                     });
                 } else
                     deferred.resolve(elementObject);
+            }, function(reason) {
+                deferred.reject(reason); //this should never happen
             });
-
+        }, function(reason) {
+            deferred.reject(reason);
         });
         return deferred.promise;
     };
@@ -938,12 +1125,12 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @returns {Promise} The promise will be resolved with a json object for the 
      *                    corresponding presentation element
      */
-    var getInstanceSpecification = function(instanceVal, workspace, version) {
+    var getInstanceSpecification = function(instanceVal, workspace, version, weight) {
 
         var instanceSpecId = instanceVal.instance;
         var deferred = $q.defer();
 
-        ElementService.getElement(instanceSpecId, false, workspace, version)
+        ElementService.getElement(instanceSpecId, false, workspace, version, weight)
         .then(function(instanceSpec) {
             deferred.resolve(instanceSpec);
         }, function(reason) {
@@ -992,6 +1179,37 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         return UtilsService.normalize({update: update, workspace: workspace, version: version});
     };
 
+    var getDocMetadata = function(docid, ws, version, weight) {
+        var deferred = $q.defer();
+        var metadata = {};
+        ElementService.search(docid, ['id'], null, null, ws, weight)
+        .then(function(data) {
+            if (data.length === 0 || data[0].sysmlid !== docid || !data[0].properties) {
+                return;
+            }
+            data[0].properties.forEach(function(prop) {
+                var feature = prop.specialization ? prop.specialization.propertyType : null;
+                var value = prop.specialization ? prop.specialization.value : null;
+                if (!feature || !docMetadataTypes[feature] || !value || value.length === 0)
+                    return;
+                metadata[docMetadataTypes[feature].name] = docMetadataTypes[feature].process(value);
+            });
+        }, function(reason) {
+        }).finally(function() {
+            deferred.resolve(metadata);
+        });
+        return deferred.promise;
+    };
+
+    var isPresentationElement = function(e) {
+        if (e.specialization && e.specialization.type === 'InstanceSpecification') {
+            var classifiers = e.specialization.classifier;
+            if (classifiers.length > 0 && classifierIds.indexOf(classifiers[0]) >= 0)
+                return true;
+        }
+        return false;
+    };
+
     return {
         getView: getView,
         getViews: getViews,
@@ -1011,6 +1229,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         getCurrentDocumentId: getCurrentDocumentId,
         parseExprRefTree: parseExprRefTree,
         isSection: isSection,
+        isPresentationElement: isPresentationElement,
         addElementToViewOrSection: addElementToViewOrSection,
         createAndAddElement: createAndAddElement,
         addInstanceVal: addInstanceVal,
@@ -1018,7 +1237,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         addInstanceSpecification: addInstanceSpecification,
         typeToClassifierId: typeToClassifierId,
         getInstanceSpecification : getInstanceSpecification,
-        getElementReferenceTree : getElementReferenceTree
+        getElementReferenceTree : getElementReferenceTree,
+        getDocMetadata: getDocMetadata
     };
 
 }

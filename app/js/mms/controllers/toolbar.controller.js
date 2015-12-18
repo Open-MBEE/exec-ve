@@ -19,8 +19,8 @@ angular.module('mmsApp').controller('ToolbarCtrl', ['$scope', '$rootScope', '$st
 
 	$scope.tbApi.init = function()
 	{
-
 		$scope.tbApi.addButton(UxService.getToolbarButton("element.viewer"));
+		$scope.tbApi.addButton(UxService.getToolbarButton("element.history"));
 		$scope.tbApi.addButton(UxService.getToolbarButton("element.editor"));
 		if ($rootScope.veEdits && Object.keys($rootScope.veEdits).length > 0)
 		{
@@ -38,6 +38,7 @@ angular.module('mmsApp').controller('ToolbarCtrl', ['$scope', '$rootScope', '$st
 			$scope.tbApi.setOptions('element.viewer', {
 				active: false
 			});
+			$scope.tbApi.setPermission('element.history', false);
 		}
 		else if ($state.includes('workspace.sites') && !$state.includes('workspace.site.document'))
 		{

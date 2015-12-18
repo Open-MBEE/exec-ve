@@ -92,7 +92,7 @@ function mmsView(ViewService, $templateCache, $rootScope, growl) {
         };
 
         this.getViewElements = function() {
-            return ViewService.getViewElements($scope.mmsVid, false, $scope.mmsWs, $scope.mmsVersion);
+            return ViewService.getViewElements($scope.mmsVid, false, $scope.mmsWs, $scope.mmsVersion, 1);
         };
 
         this.transcludeClicked = function(elementId) {
@@ -139,11 +139,12 @@ function mmsView(ViewService, $templateCache, $rootScope, growl) {
 
     var mmsViewLink = function(scope, element, attrs) {
         var processed = false;
+        scope.isSection = false;
         var changeView = function(newVal, oldVal) {
             if (!newVal || (newVal === oldVal && processed))
                 return;
             processed = true;
-            ViewService.getView(scope.mmsVid, false, scope.mmsWs, scope.mmsVersion)
+            ViewService.getView(scope.mmsVid, false, scope.mmsWs, scope.mmsVersion, 1)
             .then(function(data) {
                 if (scope.mmsVersion && scope.mmsVersion !== 'latest') {
                     if (data.specialization.contains) {
@@ -160,7 +161,20 @@ function mmsView(ViewService, $templateCache, $rootScope, growl) {
                         }
                     }
                 }
-                ViewService.getViewElements(scope.mmsVid, false, scope.mmsWs, scope.mmsVersion)
+                if (data.specialization.type === 'InstanceSpecification') {
+                    scope.isSection = true;
+                    scope.view = data;
+                    scope.modified = data.modified;
+                    scope.modifier = data.modifier;
+                    return;
+                }
+                if (data.specialization.numElements > 2000) { //threshold where getting view elements in bulk takes too long?
+                    scope.view = data;
+                    scope.modified = data.modified;
+                    scope.modifier = data.modifier;
+                    return;
+                }
+                ViewService.getViewElements(scope.mmsVid, false, scope.mmsWs, scope.mmsVersion, 1)
                 .then(function(data2) {
                     scope.view = data;
                     scope.modified = data.modified;
