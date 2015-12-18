@@ -206,7 +206,7 @@ module.exports = function(grunt) {
         proxies: [
           {
             context: '/alfresco',  // '/api'
-            host: 'ems.jpl.nasa.gov',//128.149.16.152',
+            host: 'cae-ems.jpl.nasa.gov',//128.149.16.152',
             port: 443,
             changeOrigin: true,
             https: true,
@@ -229,7 +229,7 @@ module.exports = function(grunt) {
         proxies: [
           {
             context: '/alfresco',  // '/api'
-            host: 'ems-test.jpl.nasa.gov',//128.149.16.152',
+            host: 'cae-ems-test.jpl.nasa.gov',//128.149.16.152',
             port: 443,
             changeOrigin: true,
             https: true,
@@ -252,7 +252,7 @@ module.exports = function(grunt) {
         proxies: [
           {
             context: '/alfresco',  // '/api'
-            host: 'ems-stg.jpl.nasa.gov',//128.149.16.152',
+            host: 'cae-ems-stg.jpl.nasa.gov',//128.149.16.152',
             port: 443,
             changeOrigin: true,
             https: true,

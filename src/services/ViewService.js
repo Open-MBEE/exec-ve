@@ -48,6 +48,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
     }
 
     var classifierIds = getClassifierIds();
+    var opaqueClassifiers = [typeToClassifierId.Image, typeToClassifierId.List, 
+        typeToClassifierId.Paragraph, typeToClassifierId.Section, typeToClassifierId.Table];
     
     var processString = function(values) {
         if (!values || values.length === 0 || values[0].type !== 'LiteralString')
@@ -1080,6 +1082,12 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         getInstanceSpecification(instanceVal, workspace, version, weight)
         .then(function(instanceSpecification) {
             elementObject.instanceSpecification = instanceSpecification;
+            if (instanceSpecification.specialization && instanceSpecification.specialization.classifier &&
+                    instanceSpecification.specialization.classifier.length > 0 && 
+                    opaqueClassifiers.indexOf(instanceSpecification.specialization.classifier[0]) >= 0)
+                elementObject.isOpaque = true;
+            else
+                elementObject.isOpaque = false;
             parseExprRefTree(instanceVal, workspace, version, weight)
             .then(function(presentationElement) {
                 elementObject.presentationElement = presentationElement;
