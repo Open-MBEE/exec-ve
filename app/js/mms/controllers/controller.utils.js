@@ -221,12 +221,10 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
         });
 
         var string = '<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>' +
-            '<script>' +
-            'console.log("load default"); ';
-        string += 'function doClick() { ' +
-            'console.log(\'touch touch touch\'); ' +
-            'var csvString = \'talk,ralf\'; ' +
-            'var blob = new Blob([\'ralf, ralf\'], { ' +
+            '<script>';
+            string += 'function doClick(id) { ' +
+            'var csvString = document.getElementById(id).value;' +
+            'var blob = new Blob([csvString], { ' +
             '    type: "text/csv;charset=utf-8;" ' +
             '}); ' +
             '' +
@@ -273,9 +271,11 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
                 };
                 // generate text area content for popup
                 var genTextArea ='';
+                var num = 0;
                 angular.element(tableCSV).each(function(){
-                    genTextArea += '<h2>'+ this.caption +'</h2><button class="btn btn-sm btn-primary" onclick="doClick()">Export</button><textArea cols=100 rows=15 wrap="off" >';
+                    genTextArea += '<h2>'+ this.caption +'</h2><button class="btn btn-sm btn-primary" onclick="doClick(\'textArea'+num+'\')">Export</button><textArea cols=100 rows=15 wrap="off" id="textArea'+num+'">';
                     genTextArea += this.val + '</textArea>';
+                    num++;
                 });
                 genTextArea += string;
                 exportPopup(genTextArea);
