@@ -548,7 +548,7 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                                 console.log(object.name);
                             }
                             else{
-                                //getElement
+                                //getElement()
                             }
                             console.log(inCache);
                             console.log(a);
