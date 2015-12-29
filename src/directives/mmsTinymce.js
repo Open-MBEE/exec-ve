@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsTinymce', ['ElementService', 'ViewService', 'CacheService', '$modal', '$templateCache', '$window', '$timeout', 'growl', 'tinymce', mmsTinymce]);
+.directive('mmsTinymce', ['ElementService', 'ViewService', 'CacheService', '$modal', '$templateCache', '$window', '$timeout', 'growl', 'tinymce','UtilsService', mmsTinymce]);
 
 /**
  * @ngdoc directive
@@ -30,7 +30,7 @@ angular.module('mms.directives')
  *      that can be transcluded. Regardless, transclusion allows keyword searching 
  *      elements to transclude from alfresco
  */
-function mmsTinymce(ElementService, ViewService, CacheService, $modal, $templateCache, $window, $timeout, growl, tinymce) { //depends on angular bootstrap
+function mmsTinymce(ElementService, ViewService, CacheService, $modal, $templateCache, $window, $timeout, growl, tinymce, UtilsService) { //depends on angular bootstrap
     var generatedIds = 0;
 
     var mmsTinymceLink = function(scope, element, attrs, ngModelCtrl) {
@@ -52,8 +52,9 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
 
             $scope.cacheElements = CacheService.getLatestElements(scope.mmsWs);
             $scope.autocompleteItems = [];
-
             $scope.cacheElements.forEach(function(cacheElement) {
+                //JSON.stringify(sampleObject);
+                console.log("=====THIS IS THE CACHE ===="+ JSON.stringify(cacheElement));
                 $scope.autocompleteItems.push({ 'sysmlid' : cacheElement.sysmlid, 'name' : cacheElement.name + ' - name' });
                 $scope.autocompleteItems.push({ 'sysmlid' : cacheElement.sysmlid, 'name' : cacheElement.name + ' - documentation' });
 
@@ -527,14 +528,34 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                 });
 */
                 ed.addButton('normalize', {
-                    title: 'Reset Cross References',
-                    text: 'Reset Cf',
+                    title: 'Update Cross References',
+                    text: 'Update Cf',
                     onclick: function() {
                         var body = ed.getBody();
                         body = angular.element(body);
-                        body.find('mms-transclude-name').html('[cf:name]');
-                        body.find('mms-transclude-doc').html('[cf:doc]');
-                        body.find('mms-transclude-val').html('[cf:val]');
+                        // look up cache
+                        // check server
+                        // getElement()
+                        // get latest name and assign to .html() in this format cf.elementName.transclusionType
+                        angular.forEach(body.find('mms-transclude-name'), function(value, key){
+                            var b = angular.element(value);
+                            var a = angular.element(value).attr('data-mms-eid');
+                            var inCache = CacheService.exists( UtilsService.makeElementKey(a, 'master', 'latest', false) );
+                            if(inCache){
+                                var object = CacheService.get( UtilsService.makeElementKey(a, 'master', 'latest', false) );
+                                var objectName= '[cf:' + object.name + '.name]';
+                                b.html(objectName);
+                                console.log(object.name);
+                            }
+                            else{
+                                //getElement
+                            }
+                            console.log(inCache);
+                            console.log(a);
+                        });
+                        //body.find('mms-transclude-name').html('[cf:namepoop]');
+                        body.find('mms-transclude-doc').html('[cf:docpoop]');
+                        body.find('mms-transclude-val').html('[cf:valpoop]');
                         body.find('mms-view-link').html('[cf:vlink]');
                         ed.save();
                         update();
