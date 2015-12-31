@@ -20,7 +20,16 @@
             </span>
         </div>
     </form>
-
+    <!-- start -->
+        <div class="modal-body transclude-modal transclude-modal-input container-search-type">
+            <div class="btn-group btn-group-xs">
+                <button ng-click="setSearchType('name')" type="button" class="btn-search-name btn-search-type btn btn-default active">NAME</button>
+                <button ng-click="setSearchType('documentation')" type="button" class="btn-search-documentation btn btn-search-type btn-default">DOCUMENTATION</button>
+                <button ng-click="setSearchType('value')" type="button" class="btn-search-value btn-search-type btn btn-default">VALUE</button>
+                <button ng-click="setSearchType('id')" type="button" class="btn-search-id btn-search-type btn btn-default">MDID</button>
+            </div>
+        </div>
+    <!-- end -->
     <div class="misc-form-field">
         <div class="form-filter" ng-show="mmsCfElements">
             <input class="form-control" type="text" ng-model="filter" placeholder="Type here to filter elements in the table" />

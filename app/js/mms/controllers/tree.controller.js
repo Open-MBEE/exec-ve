@@ -1007,11 +1007,12 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
             return;
         }
         $scope.searching = false;
+        $scope.searchType = 'name'; //ME
         $scope.search = function(searchText) {
             //var searchText = $scope.searchText; //TODO investigate why searchText isn't in $scope
             //growl.info("Searching...");
             $scope.searching = true;
-
+            /*ElementService.search(searchText, [$scope.searchType], null, false, scope.mmsWs) ME*/
             ElementService.search(searchText, ['name'], null, false, ws, 2)
             .then(function(data) {
 
@@ -1029,7 +1030,16 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
                 $scope.searching = false;
             });
         };
-
+        /*ME*/
+        $scope.setSearchType = function(searchType) {
+            $scope.searchType = searchType;
+            angular.element('.btn-search-name').removeClass('active');
+            angular.element('.btn-search-documentation').removeClass('active');
+            angular.element('.btn-search-value').removeClass('active');
+            angular.element('.btn-search-id').removeClass('active');
+            angular.element('.btn-search-' + searchType).addClass('active');
+        };
+        /*EndMe*/
         $scope.addView = function(viewId) {
             var documentId = $scope.document.sysmlid;
             var workspace = ws;
