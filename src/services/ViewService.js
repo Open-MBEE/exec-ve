@@ -713,14 +713,19 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             realType = 'TableT';
         if (type === 'List')
             realType = 'ListT';
-        if (type === 'Paragraph' && !viewDoc)
+        if (type === 'Paragraph')
             realType = 'ParagraphT';
         if (type === 'Section')
             realType = 'SectionT';
         if (type === 'Comment')
             realType = 'ParagraphT';
+        var documentation = '';
+        if (viewDoc) {
+            documentation = '<p>&nbsp;</p><p><mms-transclude-doc data-mms-eid="' + viewOrSection.sysmlid + '">[cf:' + viewOrSection.name + '.doc]</mms-transclude-doc></p><p>&nbsp;</p>';
+        }
         var instanceSpec = {
             name:instanceSpecName,
+            documentation: documentation,
             specialization: {
                 type:"InstanceSpecification",
                 classifier:[typeToClassifierId[realType]],
@@ -860,7 +865,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 'source': data.sysmlid, 
                 'sourceProperty': 'documentation'
             };
-            addInstanceSpecification(data, workspace, "Paragraph", true, null, "View Documentation", jsonBlob, true)
+            addInstanceSpecification(data, workspace, "Paragraph", true, null, "View Documentation", null, true)
             .then(function(data2) {
                 if (documentId) {
                     addViewToDocument(data.sysmlid, documentId, ownerId, workspace, data2)
@@ -933,7 +938,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 'source': data.sysmlid, 
                 'sourceProperty': 'documentation'
             };
-            addInstanceSpecification(data, workspace, "Paragraph", true, site, "View Documentation", jsonBlob, true) 
+            addInstanceSpecification(data, workspace, "Paragraph", true, site, "View Documentation", null, true) 
             .then(function(data2) {
                 var ws = !workspace ? 'master' : workspace;
                 var cacheKey = ['sites', ws, 'latest', site, 'products'];
