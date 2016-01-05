@@ -273,7 +273,7 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
                 var genTextArea ='';
                 var num = 0;
                 angular.element(tableCSV).each(function(){
-                    genTextArea += '<h2>'+ this.caption +'</h2><button class="btn btn-sm btn-primary" onclick="doClick(\'textArea'+num+'\')">Export</button><textArea cols=100 rows=15 wrap="off" id="textArea'+num+'">';
+                    genTextArea += '<h2>'+ this.caption +'</h2><div><button class="btn btn-sm btn-primary" onclick="doClick(\'textArea'+num+'\')">Save CSV</button></div><textArea cols=100 rows=15 wrap="off" id="textArea'+num+'">';
                     genTextArea += this.val + '</textArea>';
                     num++;
                 });

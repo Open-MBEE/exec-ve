@@ -16,7 +16,7 @@ function mmsViewTable($compile, $timeout, $document, $templateCache, UtilsServic
         scope.showFilter = false;
         var html = UtilsService.makeHtmlTable(scope.table);
         html = '<div class="tableSearch">' +
-                '<button class="btn btn-sm btn-primary" ng-click="doClick()">Export</button> ' +
+                '<button class="btn btn-sm btn-primary" ng-click="doClick()">Export CSV</button> ' +
                 '<button class="btn btn-sm btn-primary" ng-click="showFilter = !showFilter">Filter Table</button> ' +
                 '<span ng-show="showFilter"><form style="display: inline" ng-submit="search()"><input type="text" size="75" placeholder="regex filter" ng-model="searchTerm"></input></form>' +
                 '<button class="btn btn-sm btn-primary" ng-click="search()">Apply</button>' + 
