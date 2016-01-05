@@ -352,7 +352,10 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
 
     //called by transcludes
     var cancelAction = function(scope, recompile, bbApi, type, element) {
-
+        if (scope.elementSaving) {
+            growl.info('Please Wait...');
+            return;
+        }
         var cancelCleanUp = function() {
             scope.isEditing = false;
             revertEdits(scope, type);
@@ -391,6 +394,10 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
     };
 
     var deleteAction = function(scope, bbApi, section) {
+        if (scope.elementSaving) {
+            growl.info('Please Wait...');
+            return;
+        }
         var id = section ? section.sysmlid : scope.view.sysmlid;
         ElementService.isCacheOutdated(id, scope.ws)
         .then(function(status) {
@@ -467,6 +474,10 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
     };
 
     var previewAction = function(scope, recompileEdit, recompile, type, element) {
+        if (scope.elementSaving) {
+            growl.info('Please Wait...');
+            return;
+        }
         leaveEditModeOrFrame(scope, recompile, recompileEdit, type);
         scrollToElement(element);
     };
