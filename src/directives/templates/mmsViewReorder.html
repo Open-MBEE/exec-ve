@@ -1,10 +1,10 @@
 <!-- Nested node template -->
 <script type="text/ng-template" id="nodes_renderer2.html">
-    <div ui-tree-handle ng-class="{ 'text-success grab' : element.isOpaque == false }">
+    <div ui-tree-handle ng-class="{ 'text-success grab' : !element.isOpaque, 'no-grab': element.isOpaque }">
         {{element.presentationElement.type}} : {{element.instanceSpecification.name}}
     </div>
     <ol ui-tree-nodes ng-model="element.sectionElements">
-        <li ng-repeat="element in element.sectionElements" ui-tree-node ng-include="'nodes_renderer2.html'" ng-class="{ 'text-success grab' : element.isOpaque == false }">
+        <li ng-repeat="element in element.sectionElements" ui-tree-node ng-include="'nodes_renderer2.html'">
         </li>
     </ol>
 </script>
@@ -14,11 +14,17 @@
         cursor: -moz-grab;
         cursor: -webkit-grab;
     }
+    .angular-ui-tree-handle.no-grab {
+        cursor: default;
+    }
 </style>
 <div class="container-tree-reorder container-fluid">
+    <div ng-show="!elementReferenceTree || elementReferenceTree.length == 0">View contents loading or unavailable
+    </div>
+    <div ng-show="elementReferenceTree && elementReferenceTree.length > 0">Green view contents are reorderable</div>
     <div class="tree-reorder" ui-tree="treeOptions">
         <ol ui-tree-nodes class="root" ng-model="elementReferenceTree">
-            <li ng-repeat="element in elementReferenceTree" ui-tree-node ng-include="'nodes_renderer2.html'" ng-class="{ 'text-success grab' : element.isOpaque === false }"></li>
+            <li ng-repeat="element in elementReferenceTree" ui-tree-node ng-include="'nodes_renderer2.html'"></li>
         </ol>
     </div>
 </div>
