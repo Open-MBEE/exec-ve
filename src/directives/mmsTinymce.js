@@ -436,6 +436,29 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
             }
             return content;
         };
+        var resetCrossRef = function(type, typeString){
+            angular.forEach(type, function(value, key){
+                var transclusionObject = angular.element(value);
+                var transclusionId= angular.element(value).attr('data-mms-eid');
+                var transclusionKey = UtilsService.makeElementKey(transclusionId, 'master', 'latest', false);
+                var inCache = CacheService.get(transclusionKey);
+                if(inCache){
+                    transclusionObject.html('[cf:' + inCache.name + typeString);
+                }
+                else{
+                    ElementService.getElement(transclusionId, false, scope.mmsWs, 'latest', 2 ).then(function(data) {
+                        transclusionObject.html('[cf:' + data.name + typeString);
+                    }, function(reason) {
+                        var error;
+                        if (reason.status === 410)
+                            error = 'deleted';
+                        if (reason.status === 404)
+                            error = 'not found';
+                        transclusionObject.html('[cf:' + error + typeString);
+                        });
+                }
+            });
+        };
 
         var defaultToolbar = 'bold italic underline strikethrough | subscript superscript blockquote | formatselect | fontsizeselect | forecolor backcolor removeformat | alignleft aligncenter alignright | link unlink | charmap searchreplace | undo redo';
         var tableToolbar = ' table ';
@@ -533,30 +556,10 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                     onclick: function() {
                         var body = ed.getBody();
                         body = angular.element(body);
-                        // look up cache
-                        // check server
-                        // getElement()
-                        // get latest name and assign to .html() in this format cf.elementName.transclusionType
-                        angular.forEach(body.find('mms-transclude-name'), function(value, key){
-                            var b = angular.element(value);
-                            var a = angular.element(value).attr('data-mms-eid');
-                            var inCache = CacheService.exists( UtilsService.makeElementKey(a, 'master', 'latest', false) );
-                            if(inCache){
-                                var object = CacheService.get( UtilsService.makeElementKey(a, 'master', 'latest', false) );
-                                var objectName= '[cf:' + object.name + '.name]';
-                                b.html(objectName);
-                                console.log(object.name);
-                            }
-                            else{
-                                //getElement()
-                            }
-                            console.log(inCache);
-                            console.log(a);
-                        });
-                        //body.find('mms-transclude-name').html('[cf:namepoop]');
-                        body.find('mms-transclude-doc').html('[cf:docpoop]');
-                        body.find('mms-transclude-val').html('[cf:valpoop]');
-                        body.find('mms-view-link').html('[cf:vlink]');
+                        resetCrossRef(body.find('mms-transclude-name'), '.name]');
+                        resetCrossRef(body.find('mms-transclude-doc'), '.doc]');
+                        resetCrossRef(body.find('mms-transclude-val'), '.val]');
+                        resetCrossRef(body.find('mms-view-link'), '.vlink]');
                         ed.save();
                         update();
                     }
