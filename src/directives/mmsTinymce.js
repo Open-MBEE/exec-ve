@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsTinymce', ['ElementService', 'ViewService', 'CacheService', '$modal', '$templateCache', '$window', '$timeout', 'growl', 'tinymce', mmsTinymce]);
+.directive('mmsTinymce', ['ElementService', 'ViewService', 'CacheService', '$modal', '$templateCache', '$window', '$timeout', 'growl', 'tinymce','UtilsService', mmsTinymce]);
 
 /**
  * @ngdoc directive
@@ -30,7 +30,7 @@ angular.module('mms.directives')
  *      that can be transcluded. Regardless, transclusion allows keyword searching 
  *      elements to transclude from alfresco
  */
-function mmsTinymce(ElementService, ViewService, CacheService, $modal, $templateCache, $window, $timeout, growl, tinymce) { //depends on angular bootstrap
+function mmsTinymce(ElementService, ViewService, CacheService, $modal, $templateCache, $window, $timeout, growl, tinymce, UtilsService) { //depends on angular bootstrap
     var generatedIds = 0;
 
     var mmsTinymceLink = function(scope, element, attrs, ngModelCtrl) {
@@ -52,8 +52,9 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
 
             $scope.cacheElements = CacheService.getLatestElements(scope.mmsWs);
             $scope.autocompleteItems = [];
-
             $scope.cacheElements.forEach(function(cacheElement) {
+                //JSON.stringify(sampleObject);
+                console.log("=====THIS IS THE CACHE ===="+ JSON.stringify(cacheElement));
                 $scope.autocompleteItems.push({ 'sysmlid' : cacheElement.sysmlid, 'name' : cacheElement.name + ' - name' });
                 $scope.autocompleteItems.push({ 'sysmlid' : cacheElement.sysmlid, 'name' : cacheElement.name + ' - documentation' });
 
@@ -435,6 +436,29 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
             }
             return content;
         };
+        var resetCrossRef = function(type, typeString){
+            angular.forEach(type, function(value, key){
+                var transclusionObject = angular.element(value);
+                var transclusionId= angular.element(value).attr('data-mms-eid');
+                var transclusionKey = UtilsService.makeElementKey(transclusionId, 'master', 'latest', false);
+                var inCache = CacheService.get(transclusionKey);
+                if(inCache){
+                    transclusionObject.html('[cf:' + inCache.name + typeString);
+                }
+                else{
+                    ElementService.getElement(transclusionId, false, scope.mmsWs, 'latest', 2 ).then(function(data) {
+                        transclusionObject.html('[cf:' + data.name + typeString);
+                    }, function(reason) {
+                        var error;
+                        if (reason.status === 410)
+                            error = 'deleted';
+                        if (reason.status === 404)
+                            error = 'not found';
+                        transclusionObject.html('[cf:' + error + typeString);
+                        });
+                }
+            });
+        };
 
         var defaultToolbar = 'bold italic underline strikethrough | subscript superscript blockquote | formatselect | fontsizeselect | forecolor backcolor removeformat | alignleft aligncenter alignright | link unlink | charmap searchreplace | undo redo';
         var tableToolbar = ' table ';
@@ -527,15 +551,15 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                 });
 */
                 ed.addButton('normalize', {
-                    title: 'Reset Cross References',
-                    text: 'Reset Cf',
+                    title: 'Update Cross References',
+                    text: 'Update Cf',
                     onclick: function() {
                         var body = ed.getBody();
                         body = angular.element(body);
-                        body.find('mms-transclude-name').html('[cf:name]');
-                        body.find('mms-transclude-doc').html('[cf:doc]');
-                        body.find('mms-transclude-val').html('[cf:val]');
-                        body.find('mms-view-link').html('[cf:vlink]');
+                        resetCrossRef(body.find('mms-transclude-name'), '.name]');
+                        resetCrossRef(body.find('mms-transclude-doc'), '.doc]');
+                        resetCrossRef(body.find('mms-transclude-val'), '.val]');
+                        resetCrossRef(body.find('mms-view-link'), '.vlink]');
                         ed.save();
                         update();
                     }
