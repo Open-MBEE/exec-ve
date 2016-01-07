@@ -45,16 +45,16 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
         var viewLinkModalTemplate = $templateCache.get('mms/templates/mmsViewLinkModal.html');
         var proposeModalTemplate = $templateCache.get('mms/templates/mmsProposeModal.html');
 
-        var transcludeCtrl = function($scope, $modalInstance) {
+        var transcludeCtrl = function($scope, $modalInstance, autocomplete) {
             var autocompleteName;
             var autocompleteProperty;
             var autocompleteElementId;
-
+          if (autocomplete) {
             $scope.cacheElements = CacheService.getLatestElements(scope.mmsWs);
             $scope.autocompleteItems = [];
             $scope.cacheElements.forEach(function(cacheElement) {
                 //JSON.stringify(sampleObject);
-                console.log("=====THIS IS THE CACHE ===="+ JSON.stringify(cacheElement));
+                //console.log("=====THIS IS THE CACHE ===="+ JSON.stringify(cacheElement));
                 $scope.autocompleteItems.push({ 'sysmlid' : cacheElement.sysmlid, 'name' : cacheElement.name + ' - name' });
                 $scope.autocompleteItems.push({ 'sysmlid' : cacheElement.sysmlid, 'name' : cacheElement.name + ' - documentation' });
 
@@ -62,6 +62,7 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                     $scope.autocompleteItems.push({ 'sysmlid' : cacheElement.sysmlid, 'name' : cacheElement.name + ' - value' });
                 }
             });
+          }
             $scope.title = 'INSERT A CROSS REFERENCE';
             $scope.description = 'Being by searching for an element, then click a field to cross-reference.';
             $scope.searchClass = "";
@@ -183,7 +184,8 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
             var instance = $modal.open({
                 template: autocompleteModalTemplate,
                 scope: scope,
-                controller: ['$scope', '$modalInstance', transcludeCtrl],
+                resolve: {autocomplete: true},
+                controller: ['$scope', '$modalInstance', 'autocomplete', transcludeCtrl],
                 size: 'sm'
             });
 
@@ -208,7 +210,8 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
             var instance = $modal.open({
                 template: transcludeModalTemplate,
                 scope: scope,
-                controller: ['$scope', '$modalInstance', transcludeCtrl],
+                resolve: {autocomplete: false},
+                controller: ['$scope', '$modalInstance', 'autocomplete', transcludeCtrl],
                 size: 'lg'
             });
             instance.result.then(function(tag) {
