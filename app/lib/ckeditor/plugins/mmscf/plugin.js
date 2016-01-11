@@ -12,7 +12,7 @@ CKEDITOR.plugins.add( 'mmscf', {
 		// Register mmscf widget to opens CF search window and insert mmscf tag as widget.
 		editor.widgets.add( 'mmscf', {
       button: 'Insert Cross Reference',
-      allowedContent: 'mms-transclude-doc[*];',
+      allowedContent: 'mms-transclude-doc[*];mms-transclude-val[*];mms-transclude-name[*];',
 			insert: function() {
         var defaultConfig ={ 
           callbackModalFnc : function () {
@@ -26,7 +26,8 @@ CKEDITOR.plugins.add( 'mmscf', {
 			upcast: function( element ) {
 				// Return "true" (that element needs to converted to a mmscf widget)
 				// for all <mms-transclude-doc> elements.
-				return (element.name == 'mms-transclude-doc');
+				return (element.name == 'mms-transclude-doc') || (element.name == 'mms-transclude-val') || 
+          (element.name == 'mms-transclude-name');
 			},
     });
     
