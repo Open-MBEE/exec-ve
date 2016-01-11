@@ -238,9 +238,7 @@ function mmsCkeditor(ElementService, ViewService, CacheService, $modal, $templat
                 //     ed.execCommand('delete');
                 // }
                 
-                // ed.insertHtml( tag );
-                ed.insertHtml( '<mms-view-link class="mceNonEditable" data-mms-did="_17_0_5_1_407019f_1402422683509_36078_16169" data-mms-vid="_17_0_5_1_407019f_1402422683509_36078_16169" data-mms-peid="MMS_1444540978105_d8791c00-f5d9-4c23-8f08-b70ed7321313">[cf:hmm.vlink]</mms-view-link>' );
-                
+                ed.insertHtml( tag );
                 // ed.selection.collapse(false);
                 // ed.insertContent(tag);
             }, function() {
@@ -406,17 +404,17 @@ function mmsCkeditor(ElementService, ViewService, CacheService, $modal, $templat
         $timeout(function() {
           instance = CKEDITOR.replace(attrs.id, {
             customConfig: '/lib/ckeditor/config.js',
-            extraPlugins: 'mathjax,autogrow,mmstransdoc,mmscf',
+            extraPlugins: 'mathjax,autogrow,mmscf,mmscomment,',
             mmscf: {callbackModalFnc: transcludeCallback},
+            mmscomment: {callbackModalFnc: commentCallback},
             mathJaxLib: 'http://cdn.mathjax.org/mathjax/2.2-latest/MathJax.js?config=TeX-AMS_HTML',
             autoGrow_minHeight: 200,
             autoGrow_maxHeight: 500,
             autoGrow_bottomSpace: 50,
-            // allowedContent: 'mms-transclude-name(mceNonEditable)[*]',
             extraAllowedContent:'script[language|type|src]; mms-maturity-bar; tms-timely; seqr-timely; mms-d3-observation-profile-chart-io; mms-d3-parallel-axis-chart-io; mms-d3-radar-chart-io; mms-d3-horizontal-bar-chart-io; mms-site-docs; mms-workspace-docs; mms-diagram-block; mms-view-link(mceNonEditable); mms-transclude-doc(mceNonEditable); mms-transclude-name(mceNonEditable); mms-transclude-com(mceNonEditable); mms-transclude-val(mceNonEditable); mms-transclude-img(mceNonEditable); math; maction; maligngroup; malignmark; menclose;merror;mfenced;mfrac;mglyph;mi;mlabeledtr;mlongdiv;mmultiscripts;mn;mo;mover;mpadded;mphantom;mroot;mrow;ms;mscarries;mscarry;msgroup;mstack;msline;mspace;msqrt;msrow;mstyle;msub;msup;msubsup;mtable;mtd;mtext;mtr;munder;munderover',
           });
           CKEDITOR.plugins.addExternal('mmscf','/lib/ckeditor/plugins/mmscf/');
-          CKEDITOR.plugins.addExternal('mmstransdoc','/lib/ckeditor/plugins/mmstransdoc/');
+          CKEDITOR.plugins.addExternal('mmscomment','/lib/ckeditor/plugins/mmscomment/');
           instance.on( 'change', function( evt ) {
             // var data = instance.getSnapshot();
             // instance.loadSnapshot( data );
