@@ -63,6 +63,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     $scope.bbApi.init = function() {
         if ($state.includes('workspace.site.document')) {
             $scope.bbApi.addButton(UxService.getButtonBarButton('print'));
+            $scope.bbApi.addButton(UxService.getButtonBarButton('word'));
             $scope.bbApi.addButton(UxService.getButtonBarButton('tabletocsv'));
         }
         if (view && view.editable && time === 'latest') {
@@ -421,9 +422,11 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     $scope.searchOptions.relatedCallback = $scope.searchGoToDocument;
 
     $scope.$on('print', function() {
-        MmsAppUtils.popupPrintConfirm(view, $scope.ws, time, false);
+        MmsAppUtils.popupPrintConfirm(view, $scope.ws, time, false, true);
     });
-    
+    $scope.$on('word', function() {
+        MmsAppUtils.popupPrintConfirm(view, $scope.ws, time, false, false);
+    });
     $scope.$on('tabletocsv', function() {
         MmsAppUtils.tableToCsv(view, $scope.ws, time, false);
     });

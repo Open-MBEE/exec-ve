@@ -5,6 +5,7 @@
     </div>
 </div>
 <div fa-pane pane-anchor="center">
+    <i class="pane-center-spinner fa fa-5x fa-spinner fa-spin" ng-show="mms_viewContentLoading"></i>
     <div class="pane-center container-fluid" id="print-div">
     <div ng-repeat="view in views">
         <mms-view mms-vid="{{view.id}}" mms-version="{{version}}" mms-ws="{{ws}}" mms-number="{{view.number}}" mms-view-api="view.api" mms-cf-clicked="tscClicked(elementId)"></mms-view>
@@ -14,6 +15,7 @@
 </div>
 
 <div ng-if="search !== null">
-    <ng-include src="'partials/mms/pane-center-search.html'"></ng-include>
+    <i class="pane-center-spinner fa fa-5x fa-spinner fa-spin" ng-show="mms_viewContentLoading"></i>
+    <mms-search-results mms-options="searchOptions" search="search"></mms-search-results>
 </div>
 

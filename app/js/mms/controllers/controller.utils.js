@@ -166,11 +166,12 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
         }
     };
 
-    var popupPrintConfirm = function(ob, ws, time, isDoc) {
+    var popupPrintConfirm = function(ob, ws, time, isDoc, print) {
         var modalInstance = $modal.open({
             templateUrl: 'partials/mms/printConfirm.html',
             controller: function($scope, $modalInstance, type) {
                 $scope.type = type;
+                $scope.action = print ? 'print' : 'save';
                 $scope.print = function() {
                     $modalInstance.close('print');
                 };
@@ -189,7 +190,7 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
         });
         modalInstance.result.then(function(choice) {
             if (choice === 'print')
-                popupPrint(ob, ws, time, isDoc);
+                popupPrint(ob, ws, time, isDoc, print);
             else {
                 $rootScope.mms_fullDocMode = true;
                 $rootScope.mms_bbApi.setToggleState("tree.full.document", true);
@@ -198,7 +199,7 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
         });
     };
 
-    var tableToCsv = function(ob, ws, time, isDoc) {
+    var tableToCsv = function(ob, ws, time, isDoc) { //Export to CSV button Pop-up Generated Here
          var modalInstance = $modal.open({
             templateUrl: 'partials/mms/tableExport.html',
             controller: function($scope, $modalInstance, type) {
@@ -219,6 +220,34 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
             backdrop: 'static',
             keyboard: false
         });
+
+        var string = '<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>' +
+            '<script>';
+            string += 'function doClick(id) { ' +
+            'var csvString = document.getElementById(id).value;' +
+            'var blob = new Blob([csvString], { ' +
+            '    type: "text/csv;charset=utf-8;" ' +
+            '}); ' +
+            '' +
+            'if (window.navigator.msSaveOrOpenBlob) { ' +
+            '    navigator.msSaveBlob(blob,\'TableData.csv\'); ' +
+            '} else { ' +
+            '' +
+            '    var downloadContainer = $(\'<div data-tap-disabled="true"><a></a></div>\'); ' +
+            '    var downloadLink = $(downloadContainer.children()[0]); ' +
+            '    downloadLink.attr(\'href\', window.URL.createObjectURL(blob)); ' +
+            '    downloadLink.attr(\'download\', \'TableData.csv\'); ' +
+            '    downloadLink.attr(\'target\', \'_blank\'); ' +
+            ' ' +
+            '    $(window.document).find(\'body\').append(downloadContainer); ' +
+            '    /* $timeout(function () { */ ' +
+            '        downloadLink[0].click(); ' +
+            '        downloadLink.remove(); ' +
+            '    /* }, null); */ ' +
+            '} ' +
+            '} ';
+        string += '</script>';
+
         modalInstance.result.then(function(choice) {
             if (choice === 'export') {
                var tableCSV = [];
@@ -243,16 +272,19 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
                 };
                 // generate text area content for popup
                 var genTextArea ='';
+                var num = 0;
                 angular.element(tableCSV).each(function(){
-                    genTextArea += '<h2>'+ this.caption +'</h2><textArea cols=100 rows=15 wrap="off" >';
+                    genTextArea += '<h2>'+ this.caption +'</h2><div><button class="btn btn-sm btn-primary" onclick="doClick(\'textArea'+num+'\')">Save CSV</button></div><textArea cols=100 rows=15 wrap="off" id="textArea'+num+'">';
                     genTextArea += this.val + '</textArea>';
+                    num++;
                 });
+                genTextArea += string;
                 exportPopup(genTextArea);
             }
         });
     };
     
-    var popupPrint = function(ob, ws, time, isDoc) {
+    var popupPrint = function(ob, ws, time, isDoc, print) {
         var printContents = '';//$window.document.getElementById('print-div').outerHTML;
         var printElementCopy = angular.element('#print-div').clone();//angular.element(printContents);
         var hostname = $location.host();
@@ -292,13 +324,18 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
                 if (useCover)
                     cover = templateElement[0].innerHTML;
                 newScope.$destroy();
+                var inst = '';
+                if (!print)
+                    inst = "<div>(Copy and paste into Word)</div>";
                 var popupWin = $window.open('', '_blank', 'width=800,height=600,scrollbars=1');
                 popupWin.document.open();
-                popupWin.document.write('<html><head><link href="css/ve-mms.styles.min.css" rel="stylesheet" type="text/css"></head><body style="overflow: auto">' + cover + tocContents + printContents + '</html>');
+                popupWin.document.write('<html><head><link href="css/ve-mms.styles.min.css" rel="stylesheet" type="text/css"></head><body style="overflow: auto">' + inst + cover + tocContents + printContents + '</html>');
                 popupWin.document.close();
-                $timeout(function() {
-                    popupWin.print();
-                }, 1000, false);
+                if (print) {
+                    $timeout(function() {
+                        popupWin.print();
+                    }, 1000, false);
+                }
         };
         if (isDoc) {
             tocContents = UtilsService.makeHtmlTOC($rootScope.mms_treeApi.get_rows());
