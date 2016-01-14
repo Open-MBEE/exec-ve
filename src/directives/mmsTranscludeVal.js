@@ -335,7 +335,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                 }
                 if(scope.isEditing === true){
                     growl.warning("This value has been changed: " + elemName +
-                                " modified by: " + deltaModifier, {ttl: 10000});
+                                " modified by: " + deltaModifier, {ttl: -1});
                 }
             }
         });
