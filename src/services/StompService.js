@@ -40,7 +40,7 @@ function StompService($rootScope, UtilsService, $window, $location, ApplicationS
                          angular.forEach( updateWebpage.workspace2.updatedElements, function(value, key) {
                              //var affectedIds = value.affectedIds;
                              var inCache = CacheService.exists( UtilsService.makeElementKey(value.sysmlid, workspaceId, 'latest', false) );
-                             if(inCache === true)
+                             if(inCache === true && $rootScope.veEdits['element|' + value.sysmlid + '|' + workspaceId] === undefined)
                                 UtilsService.mergeElement(value, value.sysmlid, workspaceId, false, "all" );
                              var history = CacheService.get(UtilsService.makeElementKey(value.sysmlid, workspaceId, 'versions'));
                              if (history) 

@@ -182,7 +182,7 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
         scope.$on("stomp.element", function(event, deltaSource, deltaWorkspaceId, deltaElementID, deltaModifier, deltaName){
             if(deltaWorkspaceId === scope.ws && deltaElementID === scope.mmsEid){
                 if (scope.isEditing)
-                    growl.warning(" This value has been changed to: "+deltaName+" by: "+ deltaModifier, {ttl: 30000});
+                    growl.warning(" This value has been changed to: "+deltaName+" by: "+ deltaModifier, {ttl: -1});
             }
         });
     };
