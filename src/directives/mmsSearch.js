@@ -1,12 +1,12 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsSearchResults', ['$rootScope','$templateCache', mmsSearchResults]);
+.directive('mmsSearch', ['$rootScope','$templateCache', mmsSearch]);
 
-function mmsSearchResults($rootScope,$templateCache) {
-    var template = $templateCache.get('mms/templates/mmsSearchResults.html');
+function mmsSearch($rootScope,$templateCache) {
+    var template = $templateCache.get('mms/templates/mmsSearch.html');
 
-    var mmsSearchResultsLink = function(scope, element, attrs) {
+    var mmsSearchLink = function(scope, element, attrs) {
         scope.$watch('search', function(newVal) {
             if (!newVal)
                 return;
@@ -58,7 +58,7 @@ function mmsSearchResults($rootScope,$templateCache) {
     return {
         restrict: 'E', 
         template: template,
-        link: mmsSearchResultsLink,
+        link: mmsSearchLink,
         scope: {
             mmsOptions: '=',
             search: '=',
