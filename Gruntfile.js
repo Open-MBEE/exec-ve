@@ -484,18 +484,30 @@ module.exports = function(grunt) {
         port:9876,
         reporters:['progress'],
         browsers:['Chrome'],
-        background:true,
-        singleRun: false
+        singleRun: false,
+        concurrency: Infinity
       },
       dev:{
         files:
           'test/develop/unit/**/*.js'
       },
-      master:{
-        files:
-          'test/master/unit/**/*.js',
-        background:false,
-        singleRun: true
+    },
+
+    protractor: {
+      options: {
+        keepAlive: true, // If false, the grunt process stops when the test fails.
+        noColor: false, // If true, protractor will not use colors in its output.
+      },
+      develop: {   // Grunt requires at least one target to run so you can simply put 'all: {}' here too.
+        options: {
+          configFile: "config/develop/protractor.develop.conf.js" // Target-specific config file
+        }
+      },
+      suite:{
+        all:{},
+        options: {
+          configFile: "config/master/protractor.master.conf.js" // Target-specific config file
+        }
       }
     },
 
@@ -580,6 +592,7 @@ module.exports = function(grunt) {
   grunt.registerTask('default', ['dev-build']);
   grunt.registerTask('deploy', ['dev-build', 'ngdocs', 'artifactory:client:publish']);
   grunt.registerTask('test', ['karma:dev']);
+  grunt.registerTask('e2e-test', ['protractor']);
 
   grunt.registerTask('dev', function(arg1) {
       grunt.task.run('dev-build', 'connect:static');
@@ -632,4 +645,9 @@ module.exports = function(grunt) {
       grunt.task.run('test');
       grunt.task.run('server:' + arg1);
   });
+
+  grunt.registerTask('e2e',function(arg1) {
+    grunt.log.writeln("Launching Protractor");
+    grunt.task.run('e2e-test');
+  })
 };
