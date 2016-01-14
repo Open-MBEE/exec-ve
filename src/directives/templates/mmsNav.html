@@ -6,158 +6,40 @@
 </header>
 
 <nav class="navbar navbar-default navbar-inverse navbar-fixed-top" role="navigation">
-  <div class="block">
-
-    <ul>
-      <!-- Brand name and document -->
-      <!-- <li class="nav-title-li">{{type}}</li> -->
-      
-      <!-- <li class="nav-doc-li">{{title}}</li> -->
-
-      <ul class="nav-btns-main">
-        <li ng-show="snapshot">&nbsp;&nbsp;<span class="label label-danger">SNAPSHOT</span></li>
-        
-        <li><a href="index.html"><u> ARRM Home </u></a></li>
-        
-        <li class="nav-doc-li"> <a href="mms.html#/sites/site__17_0_2_1_8f40291_1359399709274_551619_13496">Go To ARRM Documents</a></li>
-
-        <li>
-          <a class="nav-btn" tooltip="Tasks and Tags" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom-left" ui-sref="workspace"><i class="fa fa-tasks"></i></a>
-        </li>
-
-        <li ng-show="ws"> <i class="fa fa-ellipsis-v"></i> {{wsName}} <span ng-if="config.timestamp != 'latest' && showTag != 'false'">( <i class="fa fa-tag"></i> {{config.name}} )</span> <i class="fa fa-angle-double-right"></i><li>
-
-        <!-- <li ng-if="$scope.diff=='yes'">  -->
-          <!-- <button type="button" ng-click="goBack()" class="btn btn-danger">CANCEL</button>Comparing {{config.name}} with  {{wsName}}</li> -->
-
-        <li ng-show="site && site.sysmlid !== 'no-site'">
-          <a class="nav-btn" tooltip="Sites and Documents" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" ui-sref="workspace.site(site.sysmlid)"><i class="fa fa-folder"></i></a>
-        </li>
-        <li ng-show="site && site.sysmlid !== 'no-site'"> <i class="fa fa-ellipsis-v"></i> {{site.name}} <i class="fa fa-angle-double-right"></i></li>
-        <li ng-show="product">
-          <a class="nav-btn"><i class="fa fa-file"></i></a>
-        </li>
-        <li ng-show="product">{{product.name}} <span ng-bind-html="snapshot"></span></li>
-
-      </ul>
-
-      <!-- Goto dropdown
-      <li ng-if="!noSites" class="goto dropdown">
-
-        <a class="dropdown-toggle" data-toggle="dropdown">
-          {{siteTitle}}<i class="nav-dropdown-icon fa fa-caret-down"></i>
-        </a>
-
-        <ul class="dropdown-menu" role="menu">
-
-          <li>
-            <a class="dash-link" href="/share/page/site/{{site}}/dashboard">Dashboard</a>
-          </li>
-
-          <li ng-if="type != 'DocWeb'">
-            <a class="docweb-link" href="docweb.html#/workspaces/{{ws}}/sites/{{site}}">DocWeb</a>
-          </li>
+    <div class="block">
+        <ul>
+            <!-- Brand name and document -->
+            <!-- <li class="nav-title-li">EMS</li> -->
+            <li style="padding-right: 44px;"><a ui-sref="workspace.sites({tag: undefined, search: undefined})">View Editor</a></li>
+            <form class="nav-search-form navbar-form" style="display: inline" role="search" ng-submit="search(searchText)">
+                <div class="form-search input-group">
+                    <div class="search-field">
+                        <input class="form-control" type="text" ng-model="searchText" placeholder="Search for an element" id="nav-form" />
+                        <button type="button" ng-click="search(searchText)"><i class="fa fa-search {{searchClass}}"></i></button>
+                    </div>
+                    <!-- <span class="input-group-btn">
+                        <button id="button-temp" class="btn btn-primary" type="button" ng-click="search(searchText)"><span class="btn-text">advanced search</span> <i class="{{searchClass}}"></i></button>
+                    </span> -->
+                </div>
+            </form>
+            <!-- Dashboard, Support, Feedback, and Logout buttons -->
+            <ul class="nav-btns-main pull-right" id="nav-icons-text">
+                <li ng-show="site && site.sysmlid !== 'no-site'"><a class="nav-btn" href="/share/page/site/{{site.sysmlid}}/dashboard" target="_blank"><i class="fa fa-dashboard"></i> Dashboard</a></li>
+                <li><a class="nav-btn support-btn" ng-click="toggleHelp()"><i class="fa fa-keyboard-o"></i> Shortcuts</a></li>
+                <li><a class="nav-btn support-btn" href="https://cae-ems.jpl.nasa.gov/alfresco/mmsapp/mms.html#/workspaces/master/sites/site__18_0_2_bec02f9_1444944898359_854_69965" target="_blank"><i class="fa fa-question-circle"></i> Support</a></li>
+                <li><a class="nav-btn portal-btn"  href="https://cae-jira.jpl.nasa.gov/browse/SSCAES" target="_blank"><i class="fa fa-comments"></i> Feedback</a></li>
+                <li><a class="nav-btn portal-btn"  ng-click="stagingView()"><i class="fa fa-child"></i> Staging</a></li>
+                <li><a class="nav-btn logout-btn" href="/alfresco/service/logout/info?next=/alfresco/mmsapp/mms.html"><i class="fa fa-sign-out"></i> Logout</a></li>
+            </ul>
+            <ul class="nav-btns-flyover pull-right">
+                <li ng-show="site && site.sysmlid !== 'no-site' && ws" class="out-link"><a ui-sref="workspace.site({site: site.sysmlid, search: undefined})">DocWeb</a></li>
+                <li ng-show="ws" class="out-link"><a ui-sref="workspace.sites({search: undefined})">Site Portal</a></li>
+                <li class="out-link"><a ui-sref="workspace({workspace:'master', search: undefined})">Model Manager</a></li>
+                <li ng-show="site && site.sysmlid !== 'no-site'" class="out-link"><a href="/share/page/site/{{site.sysmlid}}/dashboard">Dashboard</a></li>
+                <li class="out-link"><a href="https://cae-ems.jpl.nasa.gov/alfresco/mmsapp/mms.html#/workspaces/master/sites/site__18_0_2_bec02f9_1444944898359_854_69965" target="_blank">Support</a></li>
+                <li class="out-link"><a href="https://cae-jira.jpl.nasa.gov/browse/SSCAES" target="_blank">Feedback</a></li>
+                <li class="out-link"><a href="/alfresco/service/logout/info?next=/alfresco/mmsapp/mms.html">Logout</a></li>
+            </ul>
         </ul>
-
-      </li> -->
-
-      <!-- Other sites dropdown 
-      <li ng-if="!noSites" class="other-sites dropdown">
-          <a class="dropdown-toggle" data-toggle="dropdown" ng-click="reset()">
-            Other Sites<i class="nav-dropdown-icon fa fa-caret-down"></i>
-          </a>
-
-          <ul class="accordion-dropdown dropdown-menu">
-
-              <accordion>
-
-                  <accordion-group ng-repeat="(cat,sites) in categories" class="category-level" is-open="sites.open">
-
-                      <accordion-heading>
-                          {{cat}}<i class="pull-right fa" ng-class="{'fa-caret-down': sites.open, 'fa-caret-right': !sites.open}"></i>
-                      </accordion-heading>
-
-                      <accordion>
-
-                          <accordion-group ng-repeat="site in sites | orderBy:'name'" class="site-level" is-open="site.isOpen">
-
-                              <accordion-heading>
-                                {{site.title}}<i class="pull-right fa" ng-class="{'fa-caret-down': site.isOpen, 'fa-caret-right': !site.isOpen}"></i>
-                              </accordion-heading>
-
-                              <div class="accordion-links">
-                                  <a class="dash-link" href="/share/page/site/{{site.name}}/dashboard">Dashboard</a><a class="docweb-link" href="docweb.html#/workspaces/{{ws}}/sites/{{site.name}}">Docweb</a>
-                              </div>
-
-                          </accordion-group>
-
-                      </accordion>
-
-                  </accordion-group>
-
-              </accordion>
-
-          </ul>
-
-      </li>  -->
-
-      <!-- Dashboard, Support, Feedback, and Logout buttons -->
-      <ul class="nav-btns-main pull-right">
-
-        <li>
-          <a class="nav-btn support-btn" tooltip="Keyboard Shortcuts" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" ng-click="toggleHelp()"><i class="fa fa-keyboard-o"></i></a>
-        </li>
-        
-        <li ng-show="site && site.sysmlid !== 'no-site'">
-          <a class="nav-btn" tooltip="Dashboard" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" href="/share/page/site/{{site.sysmlid}}/dashboard" target="_blank"><i class="fa fa-dashboard"></i></a>
-        </li>
-
-        <li>
-          <a class="nav-btn support-btn" tooltip="Support" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" href="https://ems.jpl.nasa.gov/alfresco/mmsapp/mms.html#/workspaces/master/sites/site__17_0_5_1_8660276_1410291055211_913229_25118" target="_blank"><i class="fa fa-question-circle"></i></a>
-        </li>
-
-        <li>
-          <a class="nav-btn portal-btn" tooltip="Feedback" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" href="https://ems.jpl.nasa.gov/share/page/site/ems-support/discussions-topiclist" target="_blank"><i class="fa fa-comments"></i></a>
-        </li>
-
-        <li>
-          <a class="nav-btn logout-btn" tooltip="Logout" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" href="/alfresco/service/logout/info?next=/alfresco/mmsapp/mms.html"><i class="fa fa-sign-out"></i></a>
-        </li>
-
-      </ul>
-
-      <ul class="nav-btns-flyover pull-right">
-        <li ng-show="site && site.sysmlid !== 'no-site' && ws" class="out-link">
-          <a ui-sref="workspace.site({site: site.sysmlid})">DocWeb</a>
-        </li>
-        
-        <li ng-show="ws" class="out-link">
-          <a ui-sref="workspace.sites()">Site Portal</a>
-        </li>
-        
-        <li class="out-link">
-          <a ui-sref="workspace({workspace:'master'})">Model Manager</a>
-        </li>
-
-        <li ng-show="site && site.sysmlid !== 'no-site'" class="out-link">
-          <a href="/share/page/site/{{site.sysmlid}}/dashboard">Dashboard</a>
-        </li>
-
-        <li class="out-link">
-          <a href="https://ems.jpl.nasa.gov/alfresco/mmsapp/mms.html#/workspaces/master/sites/site__17_0_5_1_8660276_1410291055211_913229_25118" target="_blank">Support</a>
-        </li>
-
-        <li class="out-link">
-          <a href="https://ems.jpl.nasa.gov/share/page/site/ems-support/discussions-topiclist" target="_blank">Feedback</a>
-        </li>
-
-        <li class="out-link">
-          <a href="/alfresco/service/logout/info?next=/alfresco/mmsapp/mms.html">Logout</a>
-        </li>
-
-      </ul>
-
-    </ul>
-
-  </div>
+    </div>
 </nav>

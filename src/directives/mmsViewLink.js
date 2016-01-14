@@ -61,6 +61,7 @@ function mmsViewLink(ElementService, $compile, growl) {
                 var site = findSite(data);
                 scope.site = site;
                 var queryParam = '';
+                scope.name = data.name;
                 if (tag !== undefined && tag !== null && tag !== '') {
                     queryParam = '?tag=' + tag;
                 }
@@ -68,13 +69,20 @@ function mmsViewLink(ElementService, $compile, growl) {
                     queryParam = '?time=' + version;
                 }
                 scope.query = queryParam;
+                if (scope.mmsPeid && scope.mmsPeid !== '') {
+                    scope.hash = '#' + scope.mmsPeid;
+                    ElementService.getElement(scope.mmsPeid, false, ws, version)
+                    .then(function(pe) {
+                        scope.name = pe.name;
+                    });
+                }
                 if (data.specialization.type === 'Product') {
                     docid = data.sysmlid;
                     scope.docid = docid;
                     scope.vid = data.sysmlid;
                     //element.html('<a href="mms.html#/workspaces/' + ws + '/sites/' + site + '/documents/' + 
                         //docid + '/views/' + scope.mmsVid + queryParam + '">' + data.name + '</a>');
-                } else if (data.specialization.type === "View") {
+                } else if (data.specialization.type === "View" || data.specialization.type === 'InstanceSpecification') {
                     if (!docid || docid === '') {
                         docid = data.sysmlid;
                     } 
@@ -84,11 +92,11 @@ function mmsViewLink(ElementService, $compile, growl) {
                     //    docid + '/views/' + scope.mmsVid + queryParam + '">' + data.name + '</a>');
                 } else {
                     element.html('<span class="error">view link is not a view</span>');
-                    growl.error('View Link Error: not a view: ' + scope.mmsVid);
+                    //growl.error('View Link Error: not a view: ' + scope.mmsVid);
                 }
             }, function(reason) {
                 element.html('<span class="error">view link not found</span>');
-                growl.error('View Link Error: ' + reason.message + ': ' + scope.mmsVid);
+                //growl.error('View Link Error: ' + reason.message + ': ' + scope.mmsVid);
             });
         });
     };
@@ -100,10 +108,11 @@ function mmsViewLink(ElementService, $compile, growl) {
             mmsDid: '@',
             mmsWs: '@',
             mmsVersion: '@',
-            mmsTag: '@'
+            mmsTag: '@',
+            mmsPeid: '@'
         },
         require: '?^mmsView',
-        template: '<a href="mms.html#/workspaces/{{ws}}/sites/{{site}}/documents/{{docid}}/views/{{vid}}{{query}}">{{element.name || "Unnamed View"}}</a>',
+        template: '<a href="mms.html#/workspaces/{{ws}}/sites/{{site}}/documents/{{docid}}/views/{{vid}}{{query}}{{hash}}">{{name || "Unnamed View"}}</a>',
         //controller: ['$scope', controller]
         link: mmsViewLinkLink
     };

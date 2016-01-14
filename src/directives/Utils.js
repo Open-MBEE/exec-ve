@@ -168,7 +168,7 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
             if (scope.edit.specialization && scope.edit.specialization.type === 'Property' && 
                     !angular.equals(scope.edit.specialization.value, scope.element.specialization.value))
                 return true;
-            if (scope.edit.specialization.type === 'Constraint' && 
+            if (scope.edit.specialization && scope.edit.specialization.type === 'Constraint' && 
                     !angular.equals(scope.edit.specialization.specification, scope.element.specialization.specification))
                 return true;
         }
@@ -238,6 +238,8 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
 
                 if (data.specialization.type === 'Property' && angular.isArray(data.specialization.value)) {
                     scope.editValues = data.specialization.value;
+                    if (scope.isEnumeration && scope.editValues.length === 0)
+                        scope.editValues.push({type: 'InstanceValue', instance: null});
                 }
                 if (data.specialization.type === 'Constraint' && data.specialization.specification) {
                     scope.editValues = [data.specialization.specification];
@@ -333,7 +335,7 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
             // Broadcast message for the toolCtrl:
                 $rootScope.$broadcast('presentationElem.save', scope);
             }
-            $rootScope.$broadcast('view.reorder.refresh');
+            //$rootScope.$broadcast('view.reorder.refresh');
             //recompile();
             growl.success('Save Successful');
             scrollToElement(element);
@@ -350,7 +352,10 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
 
     //called by transcludes
     var cancelAction = function(scope, recompile, bbApi, type, element) {
-
+        if (scope.elementSaving) {
+            growl.info('Please Wait...');
+            return;
+        }
         var cancelCleanUp = function() {
             scope.isEditing = false;
             revertEdits(scope, type);
@@ -389,6 +394,27 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
     };
 
     var deleteAction = function(scope, bbApi, section) {
+        if (scope.elementSaving) {
+            growl.info('Please Wait...');
+            return;
+        }
+        var id = section ? section.sysmlid : scope.view.sysmlid;
+        ElementService.isCacheOutdated(id, scope.ws)
+        .then(function(status) {
+            if (status.status) {
+                if (section && section.specialization.instanceSpecificationSpecification && !angular.equals(section.specialization.instanceSpecificationSpecification, status.server.specialization.instanceSpecificationSpecification)) {
+                    growl.error('The view section contents is outdated, refresh the page first!');
+                    return;
+                } else if (!section && scope.view.specialization.contents && !angular.equals(scope.view.specialization.contents, status.server.specialization.contents)) {
+                    growl.error('The view contents is outdated, refresh the page first!');
+                    return;
+                }
+            } 
+            realDelete();
+        }, function(reason) {
+            growl.error('Checking if view contents is up to date failed: ' + reason.message);
+        });
+        function realDelete() {
         bbApi.toggleButtonSpinner('presentation.element.delete');
 
         scope.name = scope.edit.name;
@@ -425,6 +451,7 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
         }).finally(function() {
             bbApi.toggleButtonSpinner('presentation.element.delete');
         });
+        }
     };
 
     var leaveEditModeOrFrame = function(scope, recompile, recompileEdit, type) {
@@ -447,6 +474,10 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
     };
 
     var previewAction = function(scope, recompileEdit, recompile, type, element) {
+        if (scope.elementSaving) {
+            growl.info('Please Wait...');
+            return;
+        }
         leaveEditModeOrFrame(scope, recompile, recompileEdit, type);
         scrollToElement(element);
     };
@@ -466,6 +497,19 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
     };
 
     var isDirectChildOfPresentationElementFunc = function(element, mmsViewCtrl) {
+        var parent = element[0].parentElement;
+        while (parent && parent.nodeName !== 'MMS-VIEW-PRESENTATION-ELEM' && parent.nodeName !== 'MMS-VIEW') {
+            if (mmsViewCtrl.isTranscludedElement(parent.nodeName)) {
+                return false;
+            }
+            if (parent.nodeName === 'MMS-VIEW-TABLE' || parent.nodeName === 'MMS-VIEW-LIST' || parent.nodeName === 'MMS-VIEW-SECTION')
+                return false;
+            parent = parent.parentElement;
+        }
+        if (parent && parent.nodeName !== 'MMS-VIEW')
+            return true;
+        return false;
+/*
         var currentElement = (element[0]) ? element[0] : element;
         var viewElementCount = 0;
         while (currentElement.parentElement) {
@@ -482,6 +526,7 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
             currentElement = parent;
         }
         return false;
+        */
     };
 
     var hasHtml = function(s) {

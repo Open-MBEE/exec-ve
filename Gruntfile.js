@@ -158,8 +158,13 @@ module.exports = function(grunt) {
           angular: true,
           window: true,
           console: true,
+          Stomp:true,
           Timely: true,
-          __timely: true
+          jQuery: true,
+          $: true,
+          __timely: true,
+          Blob: true,
+          navigator: true
         }
       }
     },
@@ -203,7 +208,7 @@ module.exports = function(grunt) {
         proxies: [
           {
             context: '/alfresco',  // '/api'
-            host: 'ems.jpl.nasa.gov',//128.149.16.152',
+            host: 'cae-ems.jpl.nasa.gov',//128.149.16.152',
             port: 443,
             changeOrigin: true,
             https: true,
@@ -226,7 +231,7 @@ module.exports = function(grunt) {
         proxies: [
           {
             context: '/alfresco',  // '/api'
-            host: 'ems-test.jpl.nasa.gov',//128.149.16.152',
+            host: 'cae-ems-test.jpl.nasa.gov',//128.149.16.152',
             port: 443,
             changeOrigin: true,
             https: true,
@@ -249,7 +254,7 @@ module.exports = function(grunt) {
         proxies: [
           {
             context: '/alfresco',  // '/api'
-            host: 'ems-stg.jpl.nasa.gov',//128.149.16.152',
+            host: 'cae-ems-stg.jpl.nasa.gov',//128.149.16.152',
             port: 443,
             changeOrigin: true,
             https: true,
@@ -342,6 +347,29 @@ module.exports = function(grunt) {
           {
             context: '/alfresco',  // '/api'
             host: 'europaems-int.jpl.nasa.gov',//128.149.16.152',
+            port: 443,
+            changeOrigin: true,
+            https: true,
+          },
+          {
+            context: '/',
+            host: 'localhost',
+            port: 9001
+          }
+        ]
+      },
+      arrmems: {
+        options: {
+          hostname: '*',
+          port: 9000,
+          middleware: function(connect) {
+            return [proxySnippet];
+          }
+        },
+        proxies: [
+          {
+            context: '/alfresco',  // '/api'
+            host: 'arrmems.jpl.nasa.gov',//128.149.16.152',
             port: 443,
             changeOrigin: true,
             https: true,
@@ -467,7 +495,7 @@ module.exports = function(grunt) {
         options: {
           publish: [{
             id: 'gov.nasa.jpl:evm:zip',
-            version: '0.2.2.arrm-SNAPSHOT',
+            version: '0.2.3.arrm-SNAPSHOT',
             path: 'deploy/'
           }]
         }

@@ -47,11 +47,11 @@ function mmsSiteDocs(ElementService, SiteService, ViewService, growl, $q, $templ
         scope.version = version ? version : 'latest';
         scope.ws = ws ? ws : 'master';
 
-        ViewService.getSiteDocuments(scope.mmsSite, false, scope.ws, scope.version)
+        ViewService.getSiteDocuments(scope.mmsSite, false, scope.ws, scope.version, 1)
         .then(function(docs) {
             scope.siteDocs = docs;
             scope.filtered = {};
-            ElementService.getElement("master_filter", false, scope.ws, scope.version)
+            ElementService.getElement("master_filter", false, scope.ws, scope.version, 2)
             .then(function(filter) {
                 scope.filter = filter;
                 scope.filtered = JSON.parse(scope.filter.documentation);

@@ -3,8 +3,8 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('ViewCtrl', ['$scope', '$rootScope', '$state', '$stateParams', '$timeout', '$modal', '$window', 'viewElements', 'ElementService', 'ViewService', 'ConfigService', 'time', 'growl', 'workspace', 'site', 'document', 'view', 'tag', 'snapshot', 'UxService', 'hotkeys',
-function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, viewElements, ElementService, ViewService, ConfigService, time, growl, workspace, site, document, view, tag, snapshot, UxService, hotkeys) {
+.controller('ViewCtrl', ['$scope', '$rootScope', '$state', '$stateParams', '$timeout', '$modal', '$window', 'viewElements', 'MmsAppUtils', 'ElementService', 'ViewService', 'ConfigService', 'time', 'search', 'growl', 'workspace', 'site', 'document', 'view', 'tag', 'snapshot', 'UxService', 'hotkeys',
+function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, viewElements, MmsAppUtils, ElementService, ViewService, ConfigService, time, search, growl, workspace, site, document, view, tag, snapshot, UxService, hotkeys) {
     
     /*$scope.$on('$viewContentLoaded', 
         function(event) {
@@ -51,7 +51,8 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         $rootScope.mms_ShowEdits = false;
 
     var ws = $stateParams.workspace;
-
+    $scope.search = search;
+    $scope.ws = ws;
     $scope.view = view;
     $scope.viewElements = viewElements;
     $scope.site = site;
@@ -60,7 +61,11 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     $scope.buttons = [];
 
     $scope.bbApi.init = function() {
-
+        if ($state.includes('workspace.site.document')) {
+            $scope.bbApi.addButton(UxService.getButtonBarButton('print'));
+            $scope.bbApi.addButton(UxService.getButtonBarButton('word'));
+            $scope.bbApi.addButton(UxService.getButtonBarButton('tabletocsv'));
+        }
         if (view && view.editable && time === 'latest') {
             $scope.bbApi.addButton(UxService.getButtonBarButton('show.edits'));
             $scope.bbApi.setToggleState('show.edits', $rootScope.mms_ShowEdits);
@@ -70,7 +75,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
                 description: 'toggle edit mode',
                 callback: function() {$scope.$broadcast('show.edits');}
             });
-            if ($scope.view.specialization.contents) {
+            if ($scope.view.specialization.contents || $scope.view.specialization.type === 'InstanceSpecification') {
                 $scope.bbApi.addButton(UxService.getButtonBarButton('view.add.dropdown'));
             } else {
                 var fakeDropdown = {
@@ -149,6 +154,9 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
                 });
                 if ($rootScope.mms_treeApi && $rootScope.mms_treeApi.get_selected_branch) {
                     var selected_branch = $rootScope.mms_treeApi.get_selected_branch();
+                    while (selected_branch && selected_branch.type !== 'view' && view.specialization.type !== 'InstanceSpecification') {
+                        selected_branch = $rootScope.mms_treeApi.get_parent_branch(selected_branch);
+                    }
                     if (selected_branch)
                         $scope.sectionNumber = selected_branch.section;
                 }
@@ -248,207 +256,61 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     $scope.$on('download.zip', function() {
         $window.open(getZipUrl());
     });
- 
-    var handleError = function(reason) {
-        if (reason.type === 'info')
-            growl.info(reason.message);
-        else if (reason.type === 'warning')
-            growl.warning(reason.message);
-        else if (reason.type === 'error')
-            growl.error(reason.message);
-    };
-
-    var addElementCtrl = function($scope, $modalInstance, $filter, ViewService) {
-
-        $scope.oking = false;
-        $scope.newItem = {};
-        $scope.newItem.name = "";
-
-        $scope.searching = false;
-        $scope.viewOrSection = $scope.section ? $scope.section : view;
-
-        // Search for InstanceSpecs.  We are searching for InstanceSpecs b/c we only want to
-        // create a InstanceValue to point to that InstanceSpec when cross-referencing.
-        $scope.search = function(searchText) {
-            //var searchText = $scope.searchText; //TODO investigate why searchText isn't in $scope
-            //growl.info("Searching...");
-            $scope.searching = true;
-
-            ElementService.search(searchText, ['name'], null, false, ws)
-            .then(function(data) {
-                var validClassifierIds = [];
-                if ($scope.presentationElemType === 'Table') {
-                    //validClassifierIds.push(ViewService.typeToClassifierId.Table);
-                    validClassifierIds.push(ViewService.typeToClassifierId.TableT);
-                } else if ($scope.presentationElemType === 'List') {
-                    //validClassifierIds.push(ViewService.typeToClassifierId.List);
-                    validClassifierIds.push(ViewService.typeToClassifierId.ListT);
-                } else if ($scope.presentationElemType === 'Figure') {
-                    //validClassifierIds.push(ViewService.typeToClassifierId.Image);
-                    validClassifierIds.push(ViewService.typeToClassifierId.Figure);
-                } else if ($scope.presentationElemType === 'Paragraph') {
-                    //validClassifierIds.push(ViewService.typeToClassifierId.Paragraph);
-                    validClassifierIds.push(ViewService.typeToClassifierId.ParagraphT);
-                } else if ($scope.presentationElemType === 'Section') {
-                    validClassifierIds.push(ViewService.typeToClassifierId.SectionT);
-                } else {
-                    validClassifierIds.push(ViewService.typeToClassifierId[$scope.presentationElemType]);
-                }
-                // Filter out anything that is not a InstanceSpecification or not of the correct type:
-                for (var i = 0; i < data.length; i++) {
-                    if (data[i].specialization.type != 'InstanceSpecification') {
-                        data.splice(i, 1);
-                        i--;
-                    }
-                    else if (validClassifierIds.indexOf(data[i].specialization.classifier[0]) < 0) {
-                        data.splice(i, 1);
-                        i--;
-                    }
-                }
-
-                $scope.mmsCfElements = data;
-                $scope.searching = false;
-            }, function(reason) {
-                growl.error("Search Error: " + reason.message);
-                $scope.searching = false;
-            });
-        };
-
-        // Adds a InstanceValue to the view given the sysmlid of the InstanceSpecification
-        $scope.addElement = function(element) {
-
-            if ($scope.oking) {
-                growl.info("Please wait...");
-                return;
-            }
-            $scope.oking = true;  
-
-            ViewService.addInstanceVal($scope.viewOrSection, workspace, element.sysmlid).
-            then(function(data) {
-                if ($scope.presentationElemType === "Section") {
-                    // Broadcast message to TreeCtrl:
-                    $rootScope.$broadcast('viewctrl.add.section', element, $scope.viewOrSection);
-                }
-                growl.success("Adding "+$scope.presentationElemType+"  Successful");
-                $modalInstance.close(data);
-            }, function(reason) {
-                growl.error($scope.presentationElemType+" Add Error: " + reason.message);
-            }).finally(function() {
-                $scope.oking = false;
-            });            
-        };
-
-        $scope.ok = function() {
-            if ($scope.oking) {
-                growl.info("Please wait...");
-                return;
-            }
-            $scope.oking = true;
-
-            ViewService.createAndAddElement($scope.viewOrSection, workspace, true, $scope.presentationElemType, site.sysmlid, $scope.newItem.name).
-            then(function(data) {
-                $rootScope.$broadcast('view.reorder.refresh');
-                growl.success("Adding "+$scope.presentationElemType+"  Successful");
-                $modalInstance.close(data);
-            }, function(reason) {
-                growl.error($scope.presentationElemType+" Add Error: " + reason.message);
-            }).finally(function() {
-                $scope.oking = false;
-            }); 
-        };
-
-        $scope.cancel = function() {
-            $modalInstance.dismiss();
-        };
-
-    };
-
-    var addElement = function(type, section) {
-        var id = view.sysmlid;
-        if (section)
-            id = section.sysmlid;
-        ElementService.isCacheOutdated(id, ws)
-        .then(function(status) {
-            if (status.status) {
-                if (section && section.specialization.instanceSpecificationSpecification && !angular.equals(section.specialization.instanceSpecificationSpecification, status.server.specialization.instanceSpecificationSpecification)) {
-                    growl.error('The view section contents is outdated, refresh the page first!');
-                    return;
-                } else if (!section && view.specialization.contents && !angular.equals(view.specialization.contents, status.server.specialization.contents)) {
-                    growl.error('The view contents is outdated, refresh the page first!');
-                    return;
-                }
-            } 
-            realAddElement();
-
-        }, function(reason) {
-            growl.error('Checking if view contents is up to date failed: ' + reason.message);
-            realAddElement();
-        });
-
-        function realAddElement() {
-        $scope.section = section;
-        $scope.presentationElemType = type;
-        $scope.newItem = {};
-        $scope.newItem.name = "";
-        var templateUrlStr = 'partials/mms/add-item.html';
-
-        var instance = $modal.open({
-            templateUrl: templateUrlStr,
-            scope: $scope,
-            controller: ['$scope', '$modalInstance', '$filter', 'ViewService', addElementCtrl]
-        });
-        instance.result.then(function(data) {
-            // TODO: do anything here?
-        });
-        }
-    };
 
     $scope.$on('view.add.paragraph', function() {
-        addElement('Paragraph');
+        MmsAppUtils.addPresentationElement($scope, 'Paragraph', view);
     });
 
     $scope.$on('view.add.list', function() {
-        addElement('List');
+        MmsAppUtils.addPresentationElement($scope, 'List', view);
     });
 
     $scope.$on('view.add.table', function() {
-        addElement('Table');
+        MmsAppUtils.addPresentationElement($scope, 'Table', view);
     });
 
     $scope.$on('view.add.section', function() {
-        addElement('Section');
+        MmsAppUtils.addPresentationElement($scope, 'Section', view);
+    });
+
+    $scope.$on('view.add.comment', function() {
+        MmsAppUtils.addPresentationElement($scope, 'Comment', view);
     });
 
     $scope.$on('view.add.image', function() {
-        addElement('Figure');
+        MmsAppUtils.addPresentationElement($scope, 'Figure', view);
     });
-
+/*
     $scope.$on('view.add.equation', function() {
         addElement('Equation');
     });
-
+*/
     $scope.$on('section.add.paragraph', function(event, section) {
-        addElement('Paragraph', section);
+        MmsAppUtils.addPresentationElement($scope, 'Paragraph', section);
     });
 
     $scope.$on('section.add.list', function(event, section) {
-        addElement('List', section);
+        MmsAppUtils.addPresentationElement($scope, 'List', section);
     });
 
     $scope.$on('section.add.table', function(event, section) {
-        addElement('Table', section);
+        MmsAppUtils.addPresentationElement($scope, 'Table', section);
     });
-
+/*
     $scope.$on('section.add.equation', function(event, section) {
         addElement('Equation', section);
     });
-
+*/
     $scope.$on('section.add.section', function(event, section) {
-        addElement('Section', section);
+        MmsAppUtils.addPresentationElement($scope, 'Section', section);
+    });
+
+    $scope.$on('section.add.comment', function(event, section) {
+        MmsAppUtils.addPresentationElement($scope, 'Comment', section);
     });
 
     $scope.$on('section.add.image', function(event, section) {
-        addElement('Figure', section);
+        MmsAppUtils.addPresentationElement($scope, 'Figure', section);
     });
 
     $scope.$on('show.comments', function() {
@@ -492,8 +354,10 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     });
 
     if (view) {
-        ViewService.setCurrentViewId(view.sysmlid);
-        $rootScope.veCurrentView = view.sysmlid;
+        if (view.specialization.contains || view.specialization.contents) {
+            ViewService.setCurrentViewId(view.sysmlid);
+            $rootScope.veCurrentView = view.sysmlid;
+        }
         $scope.vid = view.sysmlid;
     } else {
         $rootScope.veCurrentView = '';
@@ -524,6 +388,12 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     $scope.tscClicked = function(elementId) {
         $rootScope.$broadcast('elementSelected', elementId, 'element');
     };
+    $scope.searchOptions= {};
+    $scope.searchOptions.callback = function(elem) {
+        $scope.tscClicked(elem.sysmlid);
+    };
+    $scope.searchOptions.emptyDocTxt = 'This field is empty.';
+
     $scope.elementTranscluded = function(element, type) {
         if (type === 'Comment' && !$scope.comments.hasOwnProperty(element.sysmlid)) {
             $scope.comments[element.sysmlid] = element;
@@ -541,8 +411,23 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         if ($rootScope.veElementsOn) {
             $scope.viewApi.toggleShowElements();
         }
-        if ($rootScope.mms_ShowEdits) {
+        if ($rootScope.mms_ShowEdits && time === 'latest') {
             $scope.viewApi.toggleShowEdits();
         }
     };
+
+    $scope.searchGoToDocument = function (doc, view, elem) {//siteId, documentId, viewId) {
+        $state.go('workspace.site.document.view', {site: doc.siteCharacterizationId, document: doc.sysmlid, view: view.sysmlid, tag: undefined, search: undefined});
+    };
+    $scope.searchOptions.relatedCallback = $scope.searchGoToDocument;
+
+    $scope.$on('print', function() {
+        MmsAppUtils.popupPrintConfirm(view, $scope.ws, time, false, true);
+    });
+    $scope.$on('word', function() {
+        MmsAppUtils.popupPrintConfirm(view, $scope.ws, time, false, false);
+    });
+    $scope.$on('tabletocsv', function() {
+        MmsAppUtils.tableToCsv(view, $scope.ws, time, false);
+    });
 }]);

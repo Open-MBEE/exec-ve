@@ -1,9 +1,9 @@
 <div class="modal-header">
 
-    <h4>INSERT A CROSS-REFERENCE</h4>
+    <h4>{{title}}</h4>
 
     <div class="transclude-modal-instructions">
-        Begin by searching for an element, then click a field to cross-reference.
+        {{description}}
     </div>
 
 </div>
@@ -28,96 +28,11 @@
                 </div>
             </div>
         </form>
-        <div class="misc-form-field" ng-show="mmsCfElements && searchSuccess">
-            <div class="form-filter">
-                <input class="form-control" type="text" ng-model="filterQuery" placeholder="Filter results" />
-            </div>
-            <div class="container-search-type">
-	            <div class="btn-group btn-group-xs search-filter-type">
-	                <button ng-click="setFilterFacet('all')" type="button" class="btn-filter-facet-all btn-search-type btn btn-default active">ALL</button>
-	                <button ng-click="setFilterFacet('name')" type="button" class="btn-filter-facet-name btn-search-type btn btn-default">NAME</button>
-	                <button ng-click="setFilterFacet('documentation')" type="button" class="btn-filter-facet-documentation btn btn-search-type btn-default">DOCUMENTATION</button>
-	                <!-- <button ng-click="setFilterFacet('properties')" type="button" class="btn-filter-facet-value btn-search-type btn btn-default">VALUE</button> -->
-	                <button ng-click="setFilterFacet('sysmlid')" type="button" class="btn-filter-facet-id btn-search-type btn btn-default">MDID</button>
-	            </div>
-            </div>
-            <div class="cant-find-element">
-                Can't find your element? <a ng-click="openProposeModal()" class="create-element-link">Create a new one</a>
-            </div>
-			<div>Showing {{filteredElms.length}} of {{mmsCfElements.length}} search results.</div>
-        </div>
+        <div class="cant-find-element" ng-show="showProposeLink">
+            Can't find your element? <a ng-click="openProposeModal()" class="create-element-link">Create a new one</a>
+         </div>
     </div>
-
-    <div class="container-fluid" ng-show="mmsCfElements && searchSuccess">
-        <div class="elem-wrapper" ng-repeat="elem in filteredElms = (mmsCfElements | filter: searchFilter)">
-            <hr>
-            <div class="elem-name-wrapper">
-                <a class="elem-name" ng-click="choose(elem.sysmlid, 'name', elem.name)">{{elem.name}}</a>
-                <a class="elem-name" ng-show="elem.specialization.isSlot" ng-click="choose(elem.sysmlid, 'name', elem.name)"><mms-transclude-name mms-eid="{{elem.specialization.propertyType}}"></mms-transclude-name></a>
-            </div>
-            <div class="elem-qualified-name-wrapper">
-                <div class="elem-qualified-name">
-                        {{elem.qualifiedName}}
-                </div>
-            </div>
-            <div class="elem-documentation-wrapper">
-                <label>DOCUMENTATION</label>
-                <div class="elem-documentation">
-                    <a ng-show="elem.documentation" ng-bind-html="elem.documentation | limitTo:300" ng-click="choose(elem.sysmlid, 'doc', elem.name)"></a><span class="ellipses">{{elem.documentation.length > 300 ? ' ...' : ''}}</span>
-                    <a ng-show="!elem.documentation" ng-click="choose(elem.sysmlid, 'doc', elem.name)">This field is empty, but you can still click here to cross-reference a placeholder.</a>
-                </div>
-            </div>
-            <div class="elem-type-wrapper">
-                <label>TYPE</label>
-                <div class="elem-type">
-                    {{elem.specialization.type || 'Element'}}
-                </div>
-            </div>
-            <div ng-if="elem.specialization.type === 'Property' && elem.specialization.value[0]">
-                <label>VALUE</label>
-                <div class="elem-properties">
-                    <a ng-click="choose(elem.sysmlid, 'val', elem.name)">
-                        <span ng-repeat="val in elem.specialization.value">
-                            {{val.string || val.boolean + '' || val.naturalValue || val.integer || val.double || val.expressionBody[0] || 'Default Value'}}<span class="ellipses">{{(val.expressionBody[0] && val.expressionBody.length > 1) ? ' ...' : '' }}</span>{{$last ? '' : ', '}}
-                        </span>
-                    </a>
-                </div>
-            </div>
-            <div ng-if="elem.specialization.type === 'Constraint'">
-                <label>SPECIFICATION</label>
-                <div class="elem-specification">
-                    <a ng-click="choose(elem.sysmlid, 'val', elem.name)">
-                        {{elem.specialization.specification.string || elem.specialization.specification.boolean ||
-                          elem.specialization.specification.naturalValue || elem.specialization.specification.integer ||
-                          elem.specialization.specification.double || 'Constraint Specification'}}
-                    </a>
-                </div>
-                <a ng-click="choose(elem.sysmlid, 'val', elem.name)">
-                    <div ng-repeat="str in elem.specialization.specification.expressionBody">
-                        <div class="elem-specification">{{str}}</div>
-                    </div>
-                </a>
-            </div>
-            <div ng-if="elem.properties[0]" class="elem-properties-wrapper">
-                <label>PROPERTIES</label>
-                <table>
-                    <tbody>
-                        <tr ng-repeat="row in elem.properties">
-                            <td ng-repeat="property in row">
-                                {{property.name}}<span ng-show="property.specialization.isSlot"><mms-transclude-name mms-eid="{{property.specialization.propertyType}}"></mms-transclude-name></span>: 
-                                <a ng-click="choose(property.sysmlid, 'val', property.name)"><span ng-repeat="val in property.specialization.value">{{val.string || val.boolean + '' || val.naturalValue || val.integer || val.double || val.expressionBody[0] || 'Default Value'}}<span class="ellipses">{{(val.expressionBody[0] && val.expressionBody.length > 1) ? ' ...' : '' }}</span>{{$last ? '' : ', '}}</span></a>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-    
-    <div class="container-no-results container-fluid" ng-show="mmsCfElements.length === 0 && searchSuccess">
-        <h3>NO RESULTS FOUND.</h3>
-    </div>
-
+    <mms-search-results mms-options="searchOptions" search="searchResults"></mms-search-results>
 </div>
 
 <div class="modal-footer">

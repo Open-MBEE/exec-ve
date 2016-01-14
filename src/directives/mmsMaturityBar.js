@@ -1,11 +1,11 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('arrmMaturityBar', ['$window', arrmMaturityBar]);
+.directive('mmsMaturityBar', ['$window', mmsMaturityBar]);
 
 /**
  * @ngdoc directive
- * @name mms.directives.directive:arrmMaturityBar
+ * @name mms.directives.directive:mmsMaturityBar
  *
  * @restrict E
  *
@@ -13,9 +13,9 @@ angular.module('mms.directives')
  *
  * @param {string} state The current state of the maturity bar
  */
-function arrmMaturityBar($window) {
+function mmsMaturityBar($window) {
 
-    var arrmMaturityBarLink = function(scope, element, attrs) {
+    var mmsMaturityBarLink = function(scope, element, attrs) {
      	var d3 = $window.d3;  
       	
       	var svgContainer = d3.select(element[0]).append('svg')
@@ -125,6 +125,6 @@ function arrmMaturityBar($window) {
         scope: {
             state: '@'
         },
-        link: arrmMaturityBarLink
+        link: mmsMaturityBarLink
     };
 }

@@ -53,6 +53,7 @@ function mmsTranscludeImg(VizService, growl) {
 
     return {
         restrict: 'E',
+        //template: '<figure><img ng-src="{{imgUrl}}"></img><figcaption><mms-transclude-name mms-eid="{{mmsEid}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></figcaption></figure>',
         template: '<img ng-src="{{imgUrl}}"></img>',
         scope: {
             mmsEid: '@',

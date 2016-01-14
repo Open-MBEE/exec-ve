@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsViewPresentationElem', ['ViewService', 'ElementService', '$templateCache', '$rootScope', 'growl', mmsViewPresentationElem]);
+.directive('mmsViewPresentationElem', ['ViewService', 'ElementService', '$templateCache', '$rootScope', '$timeout', '$location', '$anchorScroll', 'growl', mmsViewPresentationElem]);
 
 /**
  * @ngdoc directive
@@ -18,7 +18,7 @@ angular.module('mms.directives')
  * @param {Object} mmsInstanceVal A InstanceValue json object 
  * @param {Object} mmsParentSection the parent section if available
  */
-function mmsViewPresentationElem(ViewService, ElementService, $templateCache, $rootScope, growl) {
+function mmsViewPresentationElem(ViewService, ElementService, $templateCache, $rootScope, $timeout, $location, $anchorScroll, growl) {
     var template = $templateCache.get('mms/templates/mmsViewPresentationElem.html');
 
     var mmsViewPresentationElemCtrl = function($scope, $rootScope) {
@@ -45,7 +45,7 @@ function mmsViewPresentationElem(ViewService, ElementService, $templateCache, $r
         if (scope.mmsInstanceVal) {
             if (!scope.mmsInstanceVal.instance) {
                 element.html('<span class="error">Reference is null</span>');
-                growl.error("A presentation element reference is null.");
+                //growl.error("A presentation element reference is null.");
                 return;
             }
             var ws = null;
@@ -56,26 +56,37 @@ function mmsViewPresentationElem(ViewService, ElementService, $templateCache, $r
                 version = viewVersion.version;
             }
             // Parse the element reference tree for the presentation element:
-            ViewService.parseExprRefTree(scope.mmsInstanceVal, ws, version)
-            .then(function(element) {
-                scope.presentationElem = element;
+            ViewService.parseExprRefTree(scope.mmsInstanceVal, ws, version, 1)
+            .then(function(elem) {
+                scope.presentationElem = elem;
                 // This is a kludge to get the template switch statement to work
                 // for Sections:
-                if (ViewService.isSection(element)) {
+                if (ViewService.isSection(elem)) {
                     scope.presentationElem.type = 'Section';
                 }
 
-                ElementService.getElement(scope.mmsInstanceVal.instance, false, ws, version).
+                ElementService.getElement(scope.mmsInstanceVal.instance, false, ws, version, 1).
                 then(function(instanceSpec) {
                     scope.instanceSpec = instanceSpec;
                     scope.presentationElemLoading = false;
+                    var hash = $location.hash();
+                    if (hash === instanceSpec.sysmlid) {
+                        $timeout(function() {
+                            $anchorScroll();
+                        }, 1000, false);
+                    }
+                    element.click(function(e) {
+                        if (mmsViewCtrl)
+                            mmsViewCtrl.transcludeClicked(instanceSpec.sysmlid);
+                        e.stopPropagation();
+                    });
                 });
             }, function(reason) {
                 var status = ' not found';
                 if (reason.status === 410)
                     status = ' deleted';
                 element.html('<span class="error">View element reference error: ' + scope.mmsInstanceVal.instance + ' ' + status + '</span>');
-                growl.error('View Element Ref Error: ' + scope.mmsInstanceVal.instance + ' ' + reason.message);
+                //growl.error('View Element Ref Error: ' + scope.mmsInstanceVal.instance + ' ' + reason.message);
             });
         } 
     };
