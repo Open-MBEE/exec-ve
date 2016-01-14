@@ -279,7 +279,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                 }
                 if(scope.isEditing === true){
                     growl.warning("This documentation has been changed: " + elemName +
-                                " modified by: " + deltaModifier, {ttl: 30000});
+                                " modified by: " + deltaModifier, {ttl: -1});
                 }
             }
         });
