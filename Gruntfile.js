@@ -480,8 +480,24 @@ module.exports = function(grunt) {
     },
 
     karma: {
-      unit: {
-        configFile: 'karma.conf.js'
+      options:{
+        port:9876,
+        reporters:['progress'],
+        browsers:['Chrome'],
+        background: true,
+        singleRun: false
+      },
+      dev:{
+        files:[
+          { src: ['test/develop/unit/**/*.js']}
+        ],
+      },
+      master:{
+        files:[
+          { src: ['test/master/unit/**/*.js']}
+        ],
+        singleRun: true,
+        background:false
       }
     },
 
@@ -547,6 +563,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-bower-install-simple');
   grunt.loadNpmTasks('grunt-wiredep');
   grunt.loadNpmTasks('grunt-karma');
+  grunt.loadNpmTasks('grunt-protractor-runner');
   grunt.loadNpmTasks('grunt-artifactory-artifact');
   grunt.loadNpmTasks('grunt-sloc');
   grunt.loadNpmTasks('grunt-plato');  
@@ -564,6 +581,7 @@ module.exports = function(grunt) {
   grunt.registerTask('docs-build',    ['ngdocs']);
   grunt.registerTask('default', ['dev-build']);
   grunt.registerTask('deploy', ['dev-build', 'ngdocs', 'artifactory:client:publish']);
+  grunt.registerTask('test', ['karma'])
 
   grunt.registerTask('dev', function(arg1) {
       grunt.task.run('dev-build', 'connect:static');
@@ -610,4 +628,10 @@ module.exports = function(grunt) {
       grunt.task.run('watch:' + build);
     }
   );
+
+  grunt.registerTask('debug', function (arg1) {
+      grunt.log.writeln("Launching Karma");
+      grunt.task.run('karma');
+      grunt.task.run('server:' + arg1);
+  });
 };

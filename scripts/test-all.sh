@@ -28,5 +28,5 @@ npm install
 WEBSERVER_PID=$!
 
 
-./node_modules/karma/bin/karma start config/karma.conf.js --single-run --browsers $BROWSERS --reporters=dots --no-colors --no-color
+./node_modules/karma/bin/karma start config/karma.master.conf.js --single-run --browsers $BROWSERS --reporters=dots --no-colors --no-color
 ./node_modules/karma/bin/karma start config/karma-e2e.conf.js --browsers $BROWSERS_E2E --reporters=dots --no-colors --no-color
