@@ -31,7 +31,7 @@ function mmsMaturityBar($window) {
 		  colorRect = ["#FFAA00","#FFAA00","#FFAA00","#B0B0B0","#B0B0B0"];
 		} else if (scope.state == "Baseline") {
 		  colorRect = ["#04859E","#04859E","#04859E","#04859E","#B0B0B0"];
-		} else if (scope.state == "Final") {
+		} else if (scope.state == "Update") {
 		  colorRect = ["#00BD39","#00BD39","#00BD39","#00BD39","#00BD39"];
 		} else {
 		  colorRect = ["#B0B0B0","#B0B0B0","#B0B0B0","#B0B0B0","#B0B0B0"];			
@@ -110,7 +110,7 @@ function mmsMaturityBar($window) {
 		    .style("stroke","#fff")
 		    .style("stroke-width",3);
 		svgContainer.append("text")
-		    .text("Final")
+		    .text("Update")
 		    .attr("x",460)
 		    .attr("y",35)
 		    .attr("dy", ".35em")
