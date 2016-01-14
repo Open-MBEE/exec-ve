@@ -484,20 +484,18 @@ module.exports = function(grunt) {
         port:9876,
         reporters:['progress'],
         browsers:['Chrome'],
-        background: true,
+        background:true,
         singleRun: false
       },
       dev:{
-        files:[
-          { src: ['test/develop/unit/**/*.js']}
-        ],
+        files:
+          'test/develop/unit/**/*.js'
       },
       master:{
-        files:[
-          { src: ['test/master/unit/**/*.js']}
-        ],
-        singleRun: true,
-        background:false
+        files:
+          'test/master/unit/**/*.js',
+        background:false,
+        singleRun: true
       }
     },
 
@@ -581,7 +579,7 @@ module.exports = function(grunt) {
   grunt.registerTask('docs-build',    ['ngdocs']);
   grunt.registerTask('default', ['dev-build']);
   grunt.registerTask('deploy', ['dev-build', 'ngdocs', 'artifactory:client:publish']);
-  grunt.registerTask('test', ['karma'])
+  grunt.registerTask('test', ['karma:dev']);
 
   grunt.registerTask('dev', function(arg1) {
       grunt.task.run('dev-build', 'connect:static');
@@ -631,7 +629,7 @@ module.exports = function(grunt) {
 
   grunt.registerTask('debug', function (arg1) {
       grunt.log.writeln("Launching Karma");
-      grunt.task.run('karma');
+      grunt.task.run('test');
       grunt.task.run('server:' + arg1);
   });
 };
