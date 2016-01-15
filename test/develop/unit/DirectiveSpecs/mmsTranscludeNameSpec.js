@@ -1,7 +1,9 @@
 'use strict';
 
 describe('mmsTranscludeName directive', function() {
-    var scope, element, CacheService;
+    var scope;
+    var element;
+    var CacheService;
 
     beforeEach(module('mms.directives'));
     beforeEach(module('mms.directives.tpls'));

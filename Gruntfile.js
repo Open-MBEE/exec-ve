@@ -481,16 +481,12 @@ module.exports = function(grunt) {
 
     karma: {
       options:{
-        port:9876,
-        reporters:['progress'],
-        browsers:['Chrome'],
-        singleRun: false,
-        concurrency: Infinity
+        configFile:'config/develop/karma.develop.conf.js'
       },
       dev:{
         files:
           'test/develop/unit/**/*.js'
-      },
+      }
     },
 
     protractor: {
@@ -591,7 +587,7 @@ module.exports = function(grunt) {
   grunt.registerTask('docs-build',    ['ngdocs']);
   grunt.registerTask('default', ['dev-build']);
   grunt.registerTask('deploy', ['dev-build', 'ngdocs', 'artifactory:client:publish']);
-  grunt.registerTask('test', ['karma:dev']);
+  grunt.registerTask('test', ['karma']);
   grunt.registerTask('e2e-test', ['protractor']);
 
   grunt.registerTask('dev', function(arg1) {
@@ -640,10 +636,9 @@ module.exports = function(grunt) {
     }
   );
 
-  grunt.registerTask('debug', function (arg1) {
+  grunt.registerTask('debug', function () {
       grunt.log.writeln("Launching Karma");
       grunt.task.run('test');
-      grunt.task.run('server:' + arg1);
   });
 
   grunt.registerTask('e2e',function(arg1) {
