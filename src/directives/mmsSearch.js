@@ -1,13 +1,25 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsSearch', ['$rootScope','$templateCache', mmsSearch]);
+.directive('mmsSearch', ['ElementService', 'growl', '$rootScope','$templateCache', mmsSearch]);
 
-function mmsSearch($rootScope,$templateCache) {
+function mmsSearch(ElementService, growl, $rootScope, $templateCache) {
     var template = $templateCache.get('mms/templates/mmsSearch.html');
 
     var mmsSearchLink = function(scope, element, attrs) {
-        scope.$watch('search', function(newVal) {
+        scope.searchClass = "";
+        scope.proposeClass = "";
+        scope.filter = '';
+        scope.searchText = '';
+        scope.searchType = 'name';
+        scope.facet = '$';
+        scope.filterQuery = {query: ""};
+        
+        scope.$watchGroup(['filterQuery.query', 'facet'], function(newVal, oldVal) {
+            scope.resultFilter = {};
+            scope.resultFilter[scope.facet] = scope.filterQuery.query;
+        });
+        scope.$watch('searchResults', function(newVal) {
             if (!newVal)
                 return;
             newVal.forEach(function(elem) {
@@ -23,14 +35,15 @@ function mmsSearch($rootScope,$templateCache) {
                 }
             });
         });
-        
-        scope.facet = '$';
-        scope.filterQuery = {query: ""};
-        scope.$watchGroup(['filterQuery.query', 'facet'], function(newVal, oldVal) {
-            scope.searchFilter = {};
-            scope.searchFilter[scope.facet] = scope.filterQuery.query;
-        });
-    
+
+        scope.setSearchType = function(searchType) {
+            scope.searchType = searchType;
+            angular.element('.btn-search-name').removeClass('active');
+            angular.element('.btn-search-documentation').removeClass('active');
+            angular.element('.btn-search-value').removeClass('active');
+            angular.element('.btn-search-id').removeClass('active');
+            angular.element('.btn-search-' + searchType).addClass('active');
+        };
         scope.setFilterFacet = function(filterFacet) {
             if (filterFacet === 'all') 
                 scope.facet = '$';
@@ -38,6 +51,21 @@ function mmsSearch($rootScope,$templateCache) {
                 scope.facet = filterFacet;
             angular.element('.search-filter-type button').removeClass('active');
             angular.element('.btn-filter-facet-' + filterFacet).addClass('active');
+        };
+        scope.search = function(searchText) {
+            scope.searchClass = "fa fa-spin fa-spinner";
+            ElementService.search(searchText, [scope.searchType], null, false, scope.mmsWs)
+            .then(function(data) {
+                if (scope.mmsOptions.filterCallback) {
+                  scope.searchResults = scope.mmsOptions.filterCallback(data);
+                } else {
+                  scope.searchResults = data;
+                }
+                scope.searchClass = "";
+            }, function(reason) {
+                growl.error("Search Error: " + reason.message);
+                scope.searchClass = "";
+            });
         };
 
         // Set options 
@@ -61,7 +89,6 @@ function mmsSearch($rootScope,$templateCache) {
         link: mmsSearchLink,
         scope: {
             mmsOptions: '=',
-            search: '=',
         },
     };
 }

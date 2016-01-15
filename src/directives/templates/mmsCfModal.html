@@ -8,32 +8,10 @@
 
 </div>
 
-<div class="modal-body transclude-modal">
-
-    <div class="transclude-modal-input">
-        <form ng-submit="search(searchText)">
-            <div class="form-search input-group">
-                <input class="form-control" type="text" ng-model="searchText" placeholder="Search for an element" />
-                <span class="input-group-btn">                
-                    <button class="btn btn-primary" type="button" ng-click="search(searchText)">
-                    <span class="btn-text">SEARCH</span> <i class="{{searchClass}}"></i></button>
-                </span>
-            </div>
-            <div class="container-search-type">
-                <div class="btn-group btn-group-xs">
-                    <button ng-click="setSearchType('name')" type="button" class="btn-search-name btn-search-type btn btn-default active">NAME</button>
-                    <button ng-click="setSearchType('documentation')" type="button" class="btn-search-documentation btn btn-search-type btn-default">DOCUMENTATION</button>
-                    <button ng-click="setSearchType('value')" type="button" class="btn-search-value btn-search-type btn btn-default">VALUE</button>
-                    <button ng-click="setSearchType('id')" type="button" class="btn-search-id btn-search-type btn btn-default">MDID</button>
-                </div>
-            </div>
-        </form>
-        <div class="cant-find-element" ng-show="showProposeLink">
-            Can't find your element? <a ng-click="openProposeModal()" class="create-element-link">Create a new one</a>
-         </div>
-    </div>
-    <mms-search mms-options="searchOptions" search="searchResults"></mms-search>
-</div>
+<mms-search mms-options="searchOptions"></mms-search>
+<!--<div class="cant-find-element" ng-show="showProposeLink">
+  Can't find your element? <a ng-click="openProposeModal()" class="create-element-link">Create a new one</a>
+</div>-->
 
 <div class="modal-footer">
     </span><button class="btn btn-danger" ng-click="cancel()">CANCEL</button>

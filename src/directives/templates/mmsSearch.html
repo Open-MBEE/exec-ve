@@ -18,7 +18,10 @@
                 </div>
             </div>
         </form>
-        <div class="misc-form-field" ng-show="search">
+        <div class="cant-find-element" ng-show="showProposeLink">
+          Can't find your element? <a ng-click="openProposeModal()" class="create-element-link">Create a new one</a>
+        </div>
+        <div class="misc-form-field" ng-show="searchResults">
             <div class="form-filter">
                 <input class="form-control" type="text" ng-model="filterQuery.query" ng-model-options="{debounce: 1000}" placeholder="Filter results" />
             </div>
@@ -31,12 +34,12 @@
 	                <button ng-click="setFilterFacet('sysmlid')" type="button" class="btn-filter-facet-sysmlid btn-search-type btn btn-default">MDID</button>
 	            </div>
             </div>
-            <div>Showing {{filteredElms.length}} of {{search.length}} search results.</div>
+            <div>Showing {{filteredElms.length}} of {{searchResults.length}} search results.</div>
         </div>
     </div>
 
-    <div class="container-fluid" ng-show="search.length > 0">
-        <div class="elem-wrapper" ng-repeat="elem in filteredElms = (search | filter: searchFilter)">
+    <div class="container-fluid" ng-show="searchResults.length > 0">
+        <div class="elem-wrapper" ng-repeat="elem in filteredElms = (searchResults | filter: resultFilter)">
             <hr>
             <div class="elem-name-wrapper">
                 <a class="elem-name" ng-click="userResultClick(elem, 'name')">{{elem.name}}</a>
