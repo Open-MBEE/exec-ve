@@ -817,7 +817,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * already be in the document. The new view will be added as the last child of the 
      * parent view.
      * 
-     * @param {string} ownerId Id of the parent view
+     * @param {string} owner owner of the parent view
      * @param {string} [name=Untitled] name for the view
      * @param {string} [documentId] optional document to add to
      * @param {string} [workspace=master] workspace to use 
@@ -826,58 +826,97 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @param {string} [site] site to create under
      * @returns {Promise} The promise will be resolved with the new view. 
      */
-    var createView = function(ownerId, name, documentId, workspace, viewId, viewDoc, site) {
+    var createView = function(owner, name, documentId, workspace, viewId, viewDoc, site) {
         var deferred = $q.defer();
+        var newViewId = viewId ? viewId : UtilsService.createMmsId();
+        var newInstanceId = UtilsService.createMmsId();
+        var viewInstancePackage = null;
+        var projectId = null;
+
+        if (owner) {
+            var splitArray = owner.qualifiedId.split('/');
+            if (splitArray && splitArray.length > 2)
+                projectId = splitArray[2];
+            if (projectId && projectId.indexOf('PROJECT') >= 0) {
+                viewInstancePackage = {
+                    sysmlid: projectId.replace('PROJECT', 'View_Instances'), 
+                    name: 'View Instances', 
+                    owner: projectId,
+                    specialization: {type: 'Package'}
+                };
+            }
+        }
+
         var view = {
+            sysmlid: newViewId,
             specialization: {
                 type: 'View',
                 allowedElements: [],
-                displayedElements: [],
+                displayedElements: [newViewId],
                 childrenViews: [],
                 contents: {
                     valueExpression: null,
-                    operand: [],
+                    operand: [{
+                        instance: newInstanceId,
+                        type:"InstanceValue",
+                    }],
                     type: 'Expression'
                 }
             },
-            owner: ownerId,
             name: !name ? 'Untitled View' : name,
-            documentation: '',
+            documentation: viewDoc ? viewDoc : '',
             appliedMetatypes: [
                 "_17_0_1_232f03dc_1325612611695_581988_21583",
                 "_9_0_62a020a_1105704885343_144138_7929"
             ],
             isMetatype: false
         };
-        if (viewId) view.sysmlid = viewId;
-        if (viewDoc) view.documentation = viewDoc;
+        if (owner)
+            view.owner = owner.sysmlid;
 
-        ElementService.createElement(view, workspace, site)
+        var instanceSpecDoc = '<p>&nbsp;</p><p><mms-transclude-doc data-mms-eid="' + newViewId + '">[cf:' + view.name + '.doc]</mms-transclude-doc></p><p>&nbsp;</p>';
+        var instanceSpecSpec = {
+            'type': 'Paragraph', 
+            'sourceType': 'reference', 
+            'source': newInstanceId, 
+            'sourceProperty': 'documentation'
+        };
+        var instanceSpec = {
+            sysmlid: newInstanceId,
+            name: "View Documentation",
+            documentation: instanceSpecDoc,
+            specialization: {
+                type:"InstanceSpecification",
+                classifier:[typeToClassifierId['ParagraphT']],
+                instanceSpecificationSpecification: {
+                    string: JSON.stringify(instanceSpecSpec),
+                    type: "LiteralString"
+                }
+            },
+            appliedMetatypes: ["_9_0_62a020a_1105704885251_933969_7897"],
+            isMetatype: false
+        };
+        if (viewInstancePackage || projectId)
+            instanceSpec.owner = viewInstancePackage ? viewInstancePackage.sysmlid : projectId;
+
+        var toCreate = [instanceSpec, view];
+        if (viewInstancePackage)
+            toCreate.push(viewInstancePackage);
+        ElementService.createElements(toCreate, workspace, site)
         .then(function(data) {
-            
-            data.specialization.allowedElements = [];
-            data.specialization.displayedElements = [data.sysmlid];
-            data.specialization.childrenViews = [];
-
-            var jsonBlob = {
-                'type': 'Paragraph', 
-                'sourceType': 'reference', 
-                'source': data.sysmlid, 
-                'sourceProperty': 'documentation'
-            };
-            addInstanceSpecification(data, workspace, "Paragraph", true, null, "View Documentation", null, true)
-            .then(function(data2) {
-                if (documentId) {
-                    addViewToDocument(data.sysmlid, documentId, ownerId, workspace, data2)
-                    .then(function(data3) {
-                        deferred.resolve(data2);
-                    }, function(reason) {
-                        deferred.reject(reason);
-                    });
-                } else
-                    deferred.resolve(data2);
-            }, function(reason) {
-                deferred.reject(reason);
+            data.forEach(function(elem) {
+                if (elem.sysmlid === newViewId) {
+                    if (documentId) {
+                        addViewToDocument(newViewId, documentId, owner.sysmlid, workspace, elem)
+                        .then(function(data3) {
+                            deferred.resolve(elem);
+                        }, function(reason) {
+                            deferred.reject(reason);
+                        });
+                    } else {
+                        deferred.resolve(elem);
+                    }
+                }
             });
         }, function(reason) {
             deferred.reject(reason);

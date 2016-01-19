@@ -508,7 +508,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         var url = URLService.getPostElementsURL(n.ws);
         if (site)
             url = URLService.getPostElementsWithSiteURL(n.ws, site);
-        $http.post(url, {'elements': [elem]})
+        $http.post(url, {'elements': [elem], 'source': ApplicationService.getSource()})
         .success(function(data, status, headers, config) {
             var resp = data.elements[0];
             var key = UtilsService.makeElementKey(resp.sysmlid, n.ws, 'latest');
@@ -532,12 +532,24 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
      * @returns {Promise} The promise will be resolved with an array of created element references if 
      *      create is successful.
      */
-    var createElements = function(elems, workspace) {
-        var promises = [];
-        elems.forEach(function(elem) {
-            promises.push(createElement(elem, workspace));
+    var createElements = function(elems, workspace, site) {
+        var n = normalize(null, null, workspace, null);
+        var deferred = $q.defer();
+        var url = URLService.getPostElementsURL(n.ws);
+        if (site)
+            url = URLService.getPostElementsWithSiteURL(n.ws, site);
+        $http.post(url, {'elements': elems, 'source': ApplicationService.getSource()})
+        .success(function(data, status, headers, config) {
+            var results = [];
+            data.elements.forEach(function(resp) {
+                var key = UtilsService.makeElementKey(resp.sysmlid, n.ws, 'latest');
+                results.push(CacheService.put(key, UtilsService.cleanElement(resp), true));
+            }
+            deferred.resolve(results);
+        }).error(function(data, status, headers, config) {
+            URLService.handleHttpStatus(data, status, headers, config, deferred);
         });
-        return $q.all(promises);
+        return deferred.promise;
     };
 
     /**
