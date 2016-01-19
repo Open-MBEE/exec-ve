@@ -887,7 +887,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             documentation: instanceSpecDoc,
             specialization: {
                 type:"InstanceSpecification",
-                classifier:[typeToClassifierId['ParagraphT']],
+                classifier:[typeToClassifierId.ParagraphT],
                 instanceSpecificationSpecification: {
                     string: JSON.stringify(instanceSpecSpec),
                     type: "LiteralString"

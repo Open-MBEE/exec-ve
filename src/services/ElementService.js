@@ -544,7 +544,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
             data.elements.forEach(function(resp) {
                 var key = UtilsService.makeElementKey(resp.sysmlid, n.ws, 'latest');
                 results.push(CacheService.put(key, UtilsService.cleanElement(resp), true));
-            }
+            });
             deferred.resolve(results);
         }).error(function(data, status, headers, config) {
             URLService.handleHttpStatus(data, status, headers, config, deferred);
