@@ -824,9 +824,10 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @param {string} [viewId] optional sysmlid to be used for the view
      * @param {string} [viewDoc] optional documentation to be used for the view
      * @param {string} [site] site to create under
+     * @param {boolean} [isDoc] create Product
      * @returns {Promise} The promise will be resolved with the new view. 
      */
-    var createView = function(owner, name, documentId, workspace, viewId, viewDoc, site) {
+    var createView = function(owner, name, documentId, workspace, viewId, viewDoc, site, isDoc) {
         var deferred = $q.defer();
         var newViewId = viewId ? viewId : UtilsService.createMmsId();
         var newInstanceId = UtilsService.createMmsId();
@@ -850,7 +851,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         var view = {
             sysmlid: newViewId,
             specialization: {
-                type: 'View',
+                type: isDoc ? 'Product' : 'View',
                 allowedElements: [],
                 displayedElements: [newViewId],
                 childrenViews: [],
@@ -866,13 +867,21 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             name: !name ? 'Untitled View' : name,
             documentation: viewDoc ? viewDoc : '',
             appliedMetatypes: [
-                "_17_0_1_232f03dc_1325612611695_581988_21583",
+                (isDoc ? "_17_0_2_3_87b0275_1371477871400_792964_43374" : "_17_0_1_232f03dc_1325612611695_581988_21583"),
                 "_9_0_62a020a_1105704885343_144138_7929"
             ],
             isMetatype: false
         };
         if (owner)
             view.owner = owner.sysmlid;
+        if (isDoc) {
+            view.specialization.view2view = [
+                {
+                    id: newViewId,
+                    childrenViews: []
+                }
+            ];
+        }
 
         var instanceSpecDoc = '<p>&nbsp;</p><p><mms-transclude-doc data-mms-eid="' + newViewId + '">[cf:' + view.name + '.doc]</mms-transclude-doc></p><p>&nbsp;</p>';
         var instanceSpecSpec = {
@@ -941,43 +950,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      */
     var createDocument = function(name, site, workspace) {
         var deferred = $q.defer();
-        var doc = {
-            specialization: {
-                type: "Product", 
-                allowedElements: [],
-                displayedElements: [],
-                contents: {
-                    valueExpression: null,
-                    operand: [],
-                    type: 'Expression'
-                }
-            },
-            name: !name ? 'Untitled Document' : name,
-            documentation: '',
-            appliedMetatypes: [
-                "_17_0_2_3_87b0275_1371477871400_792964_43374",
-                "_9_0_62a020a_1105704885343_144138_7929"
-            ],
-            isMetatype: false
-        };
-        ElementService.createElement(doc, workspace, site)
-        .then(function(data) {
-            data.specialization.displayedElements = [data.sysmlid];
-            data.specialization.view2view = [
-                {
-                    id: data.sysmlid,
-                    childrenViews: []
-                }
-            ];
-            //ElementService.updateElement(data, workspace)
-            
-            var jsonBlob = {
-                'type': 'Paragraph', 
-                'sourceType': 'reference', 
-                'source': data.sysmlid, 
-                'sourceProperty': 'documentation'
-            };
-            addInstanceSpecification(data, workspace, "Paragraph", true, site, "View Documentation", null, true) 
+        createView(null, name, null, workspace, null, null, site, true)
             .then(function(data2) {
                 var ws = !workspace ? 'master' : workspace;
                 var cacheKey = ['sites', ws, 'latest', site, 'products'];
@@ -987,9 +960,6 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             }, function(reason) {
                 deferred.reject(reason);
             });
-        }, function(reason) {
-            deferred.reject(reason);
-        });
         return deferred.promise;
     };
 
