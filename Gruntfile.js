@@ -153,6 +153,7 @@ module.exports = function(grunt) {
       beforeconcat: jsFiles,
       afterconcat: ['dist/mms.js', 'dist/mms.directives.js'],
       options: {
+        evil: true, //allow eval for timely integration
         globalstrict: true,
         globals: {
           angular: true,
@@ -162,7 +163,7 @@ module.exports = function(grunt) {
           Timely: true,
           jQuery: true,
           $: true,
-          __timely: true,
+          //__timely: true,
           Blob: true,
           navigator: true
         }
