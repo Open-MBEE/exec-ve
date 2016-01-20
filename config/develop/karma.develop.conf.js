@@ -17,7 +17,7 @@ module.exports = function (config) {
         files: [
             'build/bower_components/jquery/dist/jquery.js',
             'build/bower_components/angular/angular.js',
-            'build/bower_components/angular-mocks/angular-mocks.js',
+            'node_modules/angular-mocks/angular-mocks.js',
             'build/bower_components/angular-borderlayout/src/borderLayout.js',
             'build/bower_components/angular-animate/angular-animate.js',
             'build/bower_components/angular-growl-v2/build/angular-growl.js',
