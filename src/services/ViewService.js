@@ -25,7 +25,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
     var currentDocumentId = '';
 
     // The type of opaque element to the sysmlid of the classifier:
-    var typeToClassifierId = {
+    var TYPE_TO_CLASSIFIER_ID = {
         Image: "_17_0_5_1_407019f_1430628206190_469511_11978",
         List: "_17_0_5_1_407019f_1430628190151_363897_11927",
         Paragraph: "_17_0_5_1_407019f_1430628197332_560980_11953",
@@ -41,15 +41,25 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
 
     function getClassifierIds() {
         var re = [];
-        Object.keys(typeToClassifierId).forEach(function(key) {
-            re.push(typeToClassifierId[key]);
+        Object.keys(TYPE_TO_CLASSIFIER_ID).forEach(function(key) {
+            re.push(TYPE_TO_CLASSIFIER_ID[key]);
         });
         return re;
     }
 
+    var TYPE_TO_CLASSIFIER_TYPE = {
+        Table: 'TableT',
+        Paragraph: 'ParagraphT',
+        Section: 'SectionT',
+        Comment: 'ParagraphT',
+        List: 'ListT',
+        Figure: 'Figure',
+        Equation: 'Equation'
+    };
+
     var classifierIds = getClassifierIds();
-    var opaqueClassifiers = [typeToClassifierId.Image, typeToClassifierId.List, 
-        typeToClassifierId.Paragraph, typeToClassifierId.Section, typeToClassifierId.Table];
+    var opaqueClassifiers = [TYPE_TO_CLASSIFIER_ID.Image, TYPE_TO_CLASSIFIER_ID.List, 
+        TYPE_TO_CLASSIFIER_ID.Paragraph, TYPE_TO_CLASSIFIER_ID.Section, TYPE_TO_CLASSIFIER_ID.Table];
     
     var processString = function(values) {
         if (!values || values.length === 0 || values[0].type !== 'LiteralString')
@@ -581,36 +591,6 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
     };
 
     /**
-     * Creates and adds a opaque presentation element to the passed view or section if addToView is true,
-     * otherwise, just creates the opaque element but doesnt add it the
-     * view or section
-     *
-     * @param {object} viewOrSection The View or Section to add to
-     * @param {string} [workspace=master] workspace to use
-     * @param {string} addToView true if wanting to add the element to the view
-     * @param {string} elementType The type of element that is to be created, ie 'Paragraph'
-     * @param {string} [site=null] (optional) site to post to
-     * @param {string} [name=Untitled <elementType>] (optional) InstanceSpecification name to use
-     * @returns {Promise} The promise would be resolved with updated View object if addToView is true
-     *                    otherwise the created InstanceSpecification
-    */
-    var createAndAddElement = function(viewOrSection, workspace, addToView, elementType, site, name) {
-
-        var deferred = $q.defer();
-        var defaultName = "Untitled "+elementType;
-        var instanceSpecName = name ? name : defaultName;
-
-        addInstanceSpecification(viewOrSection, workspace, elementType, addToView, site, instanceSpecName).
-        then(function(data) {
-            deferred.resolve(data);
-        }, function(reason) {
-            deferred.reject(reason);
-        });
-
-        return deferred.promise;
-    };
-
-    /**
      * Adds a InstanceVal/InstanceSpecification to the contents of the View
      *
      * @param {object} viewOrSection The View or Section to add to
@@ -623,185 +603,87 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @returns {Promise} The promise would be resolved with updated View object if addToView is true
      *                    otherwise the created InstanceSpecification
     */
-    var addInstanceSpecification = function(viewOrSection, workspace, type, addToView, site, name, json, viewDoc) {
-
+    var createInstanceSpecification = function(viewOrSection, workspace, type, site, name) {
         var deferred = $q.defer();
-        var instanceSpecName = name ? name : "Untitled InstanceSpec";
-        var presentationElem = {};
-        var splitArray = viewOrSection.qualifiedId.split('/');
+
+        var newInstanceId = UtilsService.createMmsId();
+        var viewInstancePackage = null;
         var projectId = null;
+        var realType = TYPE_TO_CLASSIFIER_TYPE[type];
 
-        if (splitArray && splitArray.length > 2)
-            projectId = splitArray[2];
-
-        var processInstanceSpec = function(createdInstanceSpecUpdate) {
-
-            if (addToView) {
-                addInstanceVal(viewOrSection, workspace, createdInstanceSpecUpdate.sysmlid).then(function(updatedView) {
-                    if (type === "Section") {
-                        // Broadcast message to TreeCtrl:
-                        $rootScope.$broadcast('viewctrl.add.section', createdInstanceSpecUpdate, viewOrSection);
-                    }
-                    deferred.resolve(updatedView);
-                }, function(reason) {
-                    deferred.reject(reason);
-                });
-            }
-            else {
-                deferred.resolve(createdInstanceSpecUpdate);
-            }
-        };
-
-        var createPresentationElem = function(createdInstanceSpec) {
-
-            // Have it reference the InstanceSpec so we dont need to create extra elements:
-            var paragraph = {
-                sourceType: "reference",
-                source: createdInstanceSpec.sysmlid,
-                sourceProperty: "documentation",
-                type: "Paragraph"
-            };
-
-            var jsonBlob = {};
-            if (type === "Paragraph") {
-                jsonBlob = paragraph;
-            }
-            else if (type === "List") {
-                jsonBlob = paragraph;
-                jsonBlob.type = 'ListT';
-            }
-            else if (type === "Table") {
-                jsonBlob = paragraph;
-                jsonBlob.type = 'TableT';
-            }
-            else if (type === "Figure") {
-                jsonBlob = paragraph;
-                jsonBlob.type = 'Figure';
-            }
-            else if (type === "Section") {
-                jsonBlob = {
-                    operand:[],  
-                    type:"Expression"
-                };
-            }
-            else if (type === "Equation") {
-                jsonBlob = paragraph;
-                jsonBlob.type = 'Equation';
-            }
-            else if (type === 'Comment') {
-                jsonBlob = paragraph;
-                jsonBlob.type = 'Comment';
-            }
-            // Special case for Section.  Doesnt use json blobs.
-            if (type === "Section") {
-                presentationElem = jsonBlob;  
-            }
-            else {
-                presentationElem = {
-                    string:JSON.stringify(jsonBlob),
-                    type:"LiteralString"
-                };
-            }
-        };
-
-        if (json) {
-            presentationElem.string = JSON.stringify(json);
-            presentationElem.type = "LiteralString";
-        }
-        var realType = type;
-        if (type === 'Table')
-            realType = 'TableT';
-        if (type === 'List')
-            realType = 'ListT';
-        if (type === 'Paragraph')
-            realType = 'ParagraphT';
-        if (type === 'Section')
-            realType = 'SectionT';
-        if (type === 'Comment')
-            realType = 'ParagraphT';
-        var documentation = '';
-        if (viewDoc) {
-            documentation = '<p>&nbsp;</p><p><mms-transclude-doc data-mms-eid="' + viewOrSection.sysmlid + '">[cf:' + viewOrSection.name + '.doc]</mms-transclude-doc></p><p>&nbsp;</p>';
-        }
-        var instanceSpec = {
-            name:instanceSpecName,
-            documentation: documentation,
-            specialization: {
-                type:"InstanceSpecification",
-                classifier:[typeToClassifierId[realType]],
-                instanceSpecificationSpecification: presentationElem
-            },
-            appliedMetatypes: ["_9_0_62a020a_1105704885251_933969_7897"],
-            isMetatype: false
-        };
-
-        var createInstanceSpecElement = function() {
-        ElementService.createElement(instanceSpec, workspace, site).then(function(createdInstanceSpec) {
-
-            // Add in the presentation element:
-            if (json) {
-                processInstanceSpec(createdInstanceSpec);
-            }
-            else {
-                createPresentationElem(createdInstanceSpec);
-                createdInstanceSpec.specialization.instanceSpecificationSpecification = presentationElem;
-
-                ElementService.updateElement(createdInstanceSpec, workspace).then(function(createdInstanceSpecUpdate) {
-                    processInstanceSpec(createdInstanceSpecUpdate);
-                }, function(reason) {
-                    deferred.reject(reason);
-                });
-            }
-        }, function(reason) {
-            deferred.reject(reason);
-        });
-        };
-
-        if (projectId) {
-            if (projectId.indexOf('PROJECT') >= 0) {
-                var viewInstancePackage = {
+        if (viewOrSection) {
+            var splitArray = viewOrSection.qualifiedId.split('/');
+            if (splitArray && splitArray.length > 2)
+                projectId = splitArray[2];
+            if (projectId && projectId.indexOf('PROJECT') >= 0) {
+                viewInstancePackage = {
                     sysmlid: projectId.replace('PROJECT', 'View_Instances'), 
                     name: 'View Instances', 
                     owner: projectId,
                     specialization: {type: 'Package'}
                 };
-                ElementService.updateElement(viewInstancePackage, workspace)
-                .then(function() {
-                    projectId = projectId.replace('PROJECT', 'View_Instances');
-                    instanceSpec.owner = projectId;
-                    createInstanceSpecElement();
-                }, function(reason) {
-                    instanceSpec.owner = projectId;
-                    createInstanceSpecElement();
-                });
-            } else {
-                instanceSpec.owner = projectId;
-                createInstanceSpecElement();
             }
-        } else {
-            createInstanceSpecElement();
         }
-        return deferred.promise;
-    };
-
-    /**
-     * Adds a InstanceValue to the contents of the View
-     *
-     * @param {object} viewOrSection The View or Section to add to
-     * @param {string} [workspace=master] workspace to use
-     * @param {string} instanceSpecId InstanceSpecification sysmlid.  This is the instance
-     #                 for the InstanceValue.
-     * @returns {Promise} The promise would be resolved with updated View object
-    */
-    var addInstanceVal = function(viewOrSection, workspace, instanceSpecId) {
-
-        var instanceVal = {
-            instance:instanceSpecId,
-            type:"InstanceValue",
-            valueExpression: null
+        var jsonType = realType;
+        if (type === 'Comment' || type === 'Paragraph')
+            jsonType = type;
+        var instanceSpecSpec = {
+            'type': jsonType, 
+            'sourceType': 'reference', 
+            'source': newInstanceId, 
+            'sourceProperty': 'documentation'
         };
+        var instanceSpec = {
+            sysmlid: newInstanceId,
+            name: name ? name : "Untitled " + type,
+            documentation: '',
+            specialization: {
+                type:"InstanceSpecification",
+                classifier:[TYPE_TO_CLASSIFIER_ID[realType]],
+                instanceSpecificationSpecification: {
+                    string: JSON.stringify(instanceSpecSpec),
+                    type: "LiteralString"
+                }
+            },
+            appliedMetatypes: ["_9_0_62a020a_1105704885251_933969_7897"],
+            isMetatype: false
+        };
+        if (type === 'Section')
+            instanceSpec.specialization.instanceSpecificationSpecification = {
+                operand: [],  
+                type: "Expression"
+            };
+        if (viewInstancePackage || projectId)
+            instanceSpec.owner = viewInstancePackage ? viewInstancePackage.sysmlid : projectId;
 
-        return addElementToViewOrSection(viewOrSection.sysmlid, viewOrSection.sysmlid, workspace, instanceVal);
+        var toCreate = [instanceSpec];
+        if (viewInstancePackage)
+            toCreate.push(viewInstancePackage);
+        ElementService.createElements(toCreate, workspace, site)
+        .then(function(data) {
+            data.forEach(function(elem) {
+                if (elem.sysmlid === newInstanceId) {
+                    var instanceVal = {
+                        instance: newInstanceId,
+                        type: "InstanceValue",
+                        valueExpression: null
+                    };
+                    addElementToViewOrSection(viewOrSection.sysmlid, viewOrSection.sysmlid, workspace, instanceVal)
+                    .then(function(data3) {
+                        if (type === "Section") {
+                        // Broadcast message to TreeCtrl:
+                           $rootScope.$broadcast('viewctrl.add.section', elem, viewOrSection);
+                        }
+                        deferred.resolve(elem);
+                    }, function(reason) {
+                        deferred.reject(reason);
+                    });
+                }
+            });
+        }, function(reason) {
+            deferred.reject(reason);
+        });
+        return deferred.promise;
     };
 
     /**
@@ -896,7 +778,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             documentation: instanceSpecDoc,
             specialization: {
                 type:"InstanceSpecification",
-                classifier:[typeToClassifierId.ParagraphT],
+                classifier:[TYPE_TO_CLASSIFIER_ID.ParagraphT],
                 instanceSpecificationSpecification: {
                     string: JSON.stringify(instanceSpecSpec),
                     type: "LiteralString"
@@ -1169,8 +1051,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
     var isSection = function(instanceSpec) {
         return instanceSpec.specialization && instanceSpec.specialization.classifier && 
                instanceSpec.specialization.classifier.length > 0 &&
-               (instanceSpec.specialization.classifier[0] === typeToClassifierId.Section ||
-                instanceSpec.specialization.classifier[0] === typeToClassifierId.SectionT);
+               (instanceSpec.specialization.classifier[0] === TYPE_TO_CLASSIFIER_ID.Section ||
+                instanceSpec.specialization.classifier[0] === TYPE_TO_CLASSIFIER_ID.SectionT);
     };
 
     //TODO remove
@@ -1246,11 +1128,11 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         isSection: isSection,
         isPresentationElement: isPresentationElement,
         addElementToViewOrSection: addElementToViewOrSection,
-        createAndAddElement: createAndAddElement,
-        addInstanceVal: addInstanceVal,
+        //createAndAddElement: createAndAddElement,
+        //addInstanceVal: addInstanceVal,
         deleteElementFromViewOrSection: deleteElementFromViewOrSection,
-        addInstanceSpecification: addInstanceSpecification,
-        typeToClassifierId: typeToClassifierId,
+        createInstanceSpecification: createInstanceSpecification,
+        TYPE_TO_CLASSIFIER_ID: TYPE_TO_CLASSIFIER_ID,
         getInstanceSpecification : getInstanceSpecification,
         getElementReferenceTree : getElementReferenceTree,
         getDocMetadata: getDocMetadata
