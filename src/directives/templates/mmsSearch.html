@@ -18,9 +18,6 @@
                 </div>
             </div>
         </form>
-        <div class="cant-find-element" ng-show="showProposeLink">
-          Can't find your element? <a ng-click="openProposeModal()" class="create-element-link">Create a new one</a>
-        </div>
         <div class="misc-form-field" ng-show="searchResults">
             <div class="form-filter">
                 <input class="form-control" type="text" ng-model="filterQuery.query" ng-model-options="{debounce: 1000}" placeholder="Filter results" />
@@ -117,5 +114,4 @@
     <div class="container-no-results container-fluid" ng-show="search.length === 0 && searchSuccess">
         <h3>NO RESULTS FOUND.</h3>
     </div>
-
 </div>

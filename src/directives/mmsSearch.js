@@ -54,7 +54,7 @@ function mmsSearch(ElementService, growl, $rootScope, $templateCache) {
         };
         scope.search = function(searchText) {
             scope.searchClass = "fa fa-spin fa-spinner";
-            ElementService.search(searchText, [scope.searchType], null, false, scope.mmsWs)
+            ElementService.search(searchText, [scope.searchType], null, false, scope.mmsWs, 2)
             .then(function(data) {
                 if (scope.mmsOptions.filterCallback) {
                   scope.searchResults = scope.mmsOptions.filterCallback(data);
@@ -89,6 +89,7 @@ function mmsSearch(ElementService, growl, $rootScope, $templateCache) {
         link: mmsSearchLink,
         scope: {
             mmsOptions: '=',
+            mmsWs: '@'
         },
     };
 }

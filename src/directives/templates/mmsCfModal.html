@@ -5,13 +5,12 @@
     <div class="transclude-modal-instructions">
         {{description}}
     </div>
-
+    <div class="cant-find-element transclude-modal-input" ng-show="showProposeLink">
+        Can't find your element? <a ng-click="openProposeModal()" class="create-element-link">Create a new one</a>
+    </div>
 </div>
-
+    
 <mms-search mms-options="searchOptions"></mms-search>
-<!--<div class="cant-find-element" ng-show="showProposeLink">
-  Can't find your element? <a ng-click="openProposeModal()" class="create-element-link">Create a new one</a>
-</div>-->
 
 <div class="modal-footer">
     </span><button class="btn btn-danger" ng-click="cancel()">CANCEL</button>
