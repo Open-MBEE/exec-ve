@@ -32,20 +32,20 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
                 var validClassifierIds = [];
                 if ($scope.presentationElemType === 'Table') {
                     //validClassifierIds.push(ViewService.typeToClassifierId.Table);
-                    validClassifierIds.push(ViewService.typeToClassifierId.TableT);
+                    validClassifierIds.push(ViewService.TYPE_TO_CLASSIFIER_ID.TableT);
                 } else if ($scope.presentationElemType === 'List') {
                     //validClassifierIds.push(ViewService.typeToClassifierId.List);
-                    validClassifierIds.push(ViewService.typeToClassifierId.ListT);
+                    validClassifierIds.push(ViewService.TYPE_TO_CLASSIFIER_ID.ListT);
                 } else if ($scope.presentationElemType === 'Figure') {
                     //validClassifierIds.push(ViewService.typeToClassifierId.Image);
-                    validClassifierIds.push(ViewService.typeToClassifierId.Figure);
+                    validClassifierIds.push(ViewService.TYPE_TO_CLASSIFIER_ID.Figure);
                 } else if ($scope.presentationElemType === 'Paragraph') {
                     //validClassifierIds.push(ViewService.typeToClassifierId.Paragraph);
-                    validClassifierIds.push(ViewService.typeToClassifierId.ParagraphT);
+                    validClassifierIds.push(ViewService.TYPE_TO_CLASSIFIER_ID.ParagraphT);
                 } else if ($scope.presentationElemType === 'Section') {
-                    validClassifierIds.push(ViewService.typeToClassifierId.SectionT);
+                    validClassifierIds.push(ViewService.TYPE_TO_CLASSIFIER_ID.SectionT);
                 } else {
-                    validClassifierIds.push(ViewService.typeToClassifierId[$scope.presentationElemType]);
+                    validClassifierIds.push(ViewService.TYPE_TO_CLASSIFIER_ID[$scope.presentationElemType]);
                 }
                 // Filter out anything that is not a InstanceSpecification or not of the correct type:
                 for (var i = 0; i < data.length; i++) {
@@ -75,8 +75,12 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
                 return;
             }
             $scope.oking = true;  
-
-            ViewService.addInstanceVal($scope.viewOrSection, $scope.ws, element.sysmlid).
+            var instanceVal = {
+                instance: element.sysmlid,
+                type: "InstanceValue",
+                valueExpression: null
+            };
+            ViewService.addElementToViewOrSection($scope.viewOrSection.sysmlid, $scope.viewOrSection.sysmlid, $scope.ws, instanceVal).
             then(function(data) {
                 if ($scope.presentationElemType === "Section") {
                     // Broadcast message to TreeCtrl:
@@ -98,7 +102,7 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
             }
             $scope.oking = true;
 
-            ViewService.createAndAddElement($scope.viewOrSection, $scope.ws, true, $scope.presentationElemType, $scope.site.sysmlid, $scope.newItem.name).
+            ViewService.createInstanceSpecification($scope.viewOrSection, $scope.ws, $scope.presentationElemType, $scope.site.sysmlid, $scope.newItem.name).
             then(function(data) {
                 $rootScope.$broadcast('view.reorder.refresh');
                 growl.success("Adding "+$scope.presentationElemType+"  Successful");
