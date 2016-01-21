@@ -69,6 +69,12 @@ function mmsSearch(ElementService, growl, $rootScope, $templateCache) {
         };
 
         // Set options 
+        if (scope.mmsOptions.searchResult) {
+          scope.searchResults = scope.mmsOptions.searchResult;          
+        }
+        if (scope.mmsOptions.searchInput) {
+          scope.searchText = scope.mmsOptions.searchInput;          
+        }
         scope.emptyDocTxt = scope.mmsOptions.emptyDocTxt;
         scope.userResultClick = function(elem, property) {
             if (scope.mmsOptions.callback) {
