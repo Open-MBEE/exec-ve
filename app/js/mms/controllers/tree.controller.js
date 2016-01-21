@@ -792,6 +792,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
                     } 
                 } 
                 $scope.createViewParentId = branch.data.sysmlid;
+                $scope.createViewParent = branch.data;
                 $scope.newView = {};
                 $scope.newView.name = "";
 
@@ -1092,7 +1093,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
                 promise = ViewService.createDocument($scope.doc.name, $scope.addDocSite, ws);
             }
             else if ($scope.itemType === 'View') {
-                promise = ViewService.createView($scope.createViewParentId, $scope.newView.name, 
+                promise = ViewService.createView($scope.createViewParent, $scope.newView.name, 
                                                  $scope.document.sysmlid, ws);
             }
             else {
