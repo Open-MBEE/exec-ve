@@ -38,8 +38,8 @@ function mmsSearch(ElementService, growl, $rootScope, $templateCache) {
 
         scope.setSearchType = function(searchType) {
             scope.searchType = searchType;
-            angular.element('.btn-search-name').removeClass('active');
-            angular.element('.btn-search-documentation').removeClass('active');
+            angular.element('.btn-search-all').removeClass('active');
+            angular.element('.btn-search-name').removeClass('active');angular.element('.btn-search-documentation').removeClass('active');
             angular.element('.btn-search-value').removeClass('active');
             angular.element('.btn-search-id').removeClass('active');
             angular.element('.btn-search-' + searchType).addClass('active');
@@ -54,6 +54,8 @@ function mmsSearch(ElementService, growl, $rootScope, $templateCache) {
         };
         scope.search = function(searchText) {
             scope.searchClass = "fa fa-spin fa-spinner";
+            if (scope.searchType === 'all')
+              scope.searchType = '*';
             ElementService.search(searchText, [scope.searchType], null, false, scope.mmsWs, 2)
             .then(function(data) {
                 if (scope.mmsOptions.filterCallback) {
