@@ -124,11 +124,38 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
      *      references to the same objects.
      */
     var getElements = function(ids, update, workspace, version, weight) {
-        var promises = [];
-        ids.forEach(function(id) {
-            promises.push(getElement(id, update, workspace, version, weight));
-        });
-        return $q.all(promises);
+        var deferred = $q.defer();
+        var request = {elements: []};
+        var existing = [];
+        var n = normalize('id', update, workspace, version);
+        for (var i = 0; i < ids.length; i++) {
+            var id = ids[i];
+            var n2 = normalize(id, update, workspace, version);
+            var exist = CacheService.get(n2.cacheKey);
+            if (exist && !n.update) {
+                existing.push(exist);
+                continue;
+            }
+            request.elements.push({sysmlid: id});
+        }
+        if (request.elements.length === 0)
+            deferred.resolve(existing);
+        else {
+            $http.put(URLService.getPostElementsURL(workspace), request)
+            .then(function(response) {
+                var data = response.data.elements;
+                for (var i = 0; i < data.length; i++) {
+                    var element = data[i];
+                    var ekey = UtilsService.makeElementKey(element.sysmlid, n.ws, n.ver);
+                    var cacheE = CacheService.put(ekey, UtilsService.cleanElement(element), true);
+                    existing.push(cacheE);
+                }
+                deferred.resolve(existing);
+            }, function(response) {
+                URLService.handleHttpStatus(response.data, response.status, response.headers, response.config, deferred);
+            });
+        }
+        return deferred.promise;
     };
 
     /**
@@ -282,12 +309,14 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         HttpService.get(url, 
             function(data, status, headers, config) {
                 var result = [];
-                data[key].forEach(function(element) {
+                var elements = data[key];
+                for (var i = 0; i < elements.length; i++) {
+                    var element = elements[i];
                     if (!element) //check for null, seen before
-                        return;
+                        continue;
                     var ekey = UtilsService.makeElementKey(element.sysmlid, n.ws, n.ver);
                     result.push(CacheService.put(ekey, UtilsService.cleanElement(element), true));
-                }); 
+                }
                 delete inProgress[progress];
                 deferred.resolve(result); 
             },
@@ -654,23 +683,25 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         HttpService.get(url, 
             function(data, status, headers, config) {
                 var result = [];
-                data.elements.forEach(function(element) {
+                for (var i = 0; i < data.elements.length; i++) {
+                    var element = data.elements[i];
                     var properties = element.properties;
                     if (properties)
                         delete element.properties;
                     var ekey = UtilsService.makeElementKey(element.sysmlid, n.ws, n.ver);
                     var cacheE = CacheService.put(ekey, UtilsService.cleanElement(element), true);
                     if (properties) {
-                        properties.forEach(function(property) {
+                        for (var j = 0; j < properties.length; j++) {
+                            var property = properties[j];
                             var pkey = UtilsService.makeElementKey(property.sysmlid, n.ws, n.ver);
                             CacheService.put(pkey, UtilsService.cleanElement(property), true);
-                        });
+                        }
                     }
                     var toAdd = JSON.parse(JSON.stringify(element));
                     toAdd.properties = properties;
                     toAdd.relatedDocuments = cacheE.relatedDocuments;
                     result.push(toAdd);
-                }); 
+                }
                 delete inProgress[progress];
                 deferred.resolve(result); 
             },
