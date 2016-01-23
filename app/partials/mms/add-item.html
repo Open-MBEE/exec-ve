@@ -4,57 +4,20 @@
   <h4>ADD NEW {{presentationElemType | uppercase}}</h4>
 </div>
 
-<div class="modal-body comment-modal">
-  
+<div class="modal-body comment-modal" ng-show="createForm">
   <div class="comment-modal-input">
-
     <div class="form-group">
       <label>Name:</label>
       <input class="form-control" ng-model="newItem.name" type="text" placeholder="Type a name for your {{presentationElemType}} here"></input>
     </div>
     <div ng-show="presentationElemType != 'Comment'">
-    <form ng-submit="search(searchText)">
-        <div class="form-search input-group">
-            <input class="form-control" type="text" ng-model="searchText" placeholder="Search for the item" />
-            <span class="input-group-btn">                
-                <button class="btn btn-primary" type="button" ng-click="search(searchText)">
-                <span class="btn-text">GO</span> <i ng-show="searching" class="fa fa-spin fa-spinner"></i></button>
-            </span>
-        </div>
-    </form>
-
-    <div class="misc-form-field">
-        <div class="form-filter" ng-show="mmsCfElements">
-            <input class="form-control" type="text" ng-model="filter" placeholder="Type here to filter elements in the table" />
-        </div>
-    </div>
-    <br>
-    <div class="container-fluid transclude-table">
-        <table class="table table-bordered">
-
-            <tr>
-                <th>NAME</th>
-                <th>QUALIFIED NAME</th>
-                <th>DOC</th>
-            </tr>
-
-            <tr ng-repeat="elem in mmsCfElements | filter:filter">
-                <td ng-click="addElement(elem)" class="clickable">
-                    {{elem.name}}
-                </td>
-                <td>
-                    {{elem.qualifiedName}}
-                </td>
-                <td>
-                    {{elem.documentation | limitTo:20}}
-                </td>
-            </tr>
-
-        </table>
-    </div>
+      <a ng-click="createForm = false" class="create-element-link">Search for existing item</a>
     </div>
   </div>
+</div>
 
+<div ng-show="!createForm">
+    <mms-search mms-options="searchOptions"></mms-search>
 </div>
 
 <div class="modal-footer">
