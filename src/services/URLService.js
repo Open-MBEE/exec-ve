@@ -339,6 +339,23 @@ function urlService(baseUrl) {
         return root + '/workspaces/' + workspace + '/elements';
     };
 
+    /**
+     * @ngdoc method
+     * @name mms.URLService#getPutElementsURL
+     * @methodOf mms.URLService
+     * 
+     * @description
+     * Gets the path for getting multiple elements (using put with body).
+     * 
+     * @param {string} workspace Workspace name
+     * @param {string} version timestamp
+     * @returns {string} The post elements url.
+     */
+    var getPutElementsURL = function(workspace, version) {
+        var r = root + '/workspaces/' + workspace + '/elements';
+        return addVersion(r, version);
+    };
+
     var getPostElementsWithSiteURL = function(workspace, site) {
         if (root && workspace && site) {
             // TODO maybe move this check elsewhere to keep this method simple
@@ -503,6 +520,7 @@ function urlService(baseUrl) {
         getViewElementsURL: getViewElementsURL,
         getWsDiffURL: getWsDiffURL,
         getPostWsDiffURL: getPostWsDiffURL,
+        getPutElementsURL: getPutElementsURL,
         getWorkspacesURL: getWorkspacesURL,
         getWorkspaceURL: getWorkspaceURL,
         getCheckLoginURL: getCheckLoginURL,

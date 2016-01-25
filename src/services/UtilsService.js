@@ -48,7 +48,8 @@ function UtilsService(CacheService, _) {
                     delete elem.specialization.contains;
                 if (elem.specialization.displayedElements) {
                     elem.specialization.numElements = elem.specialization.displayedElements.length;
-                    delete elem.specialization.displayedElements;
+                    if (elem.specialization.numElements <= 5000)
+                        delete elem.specialization.displayedElements;
                 }
                 if (elem.specialization.allowedElements)
                     delete elem.specialization.allowedElements;

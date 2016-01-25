@@ -23,6 +23,8 @@ angular.module('mms')
 function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsService, CacheService, _) {
     var currentViewId = '';
     var currentDocumentId = '';
+    var VIEW_ELEMENTS_LIMIT = 2000;
+    var inProgress = {}; //only used for view elements over limit
 
     // The type of opaque element to the sysmlid of the classifier:
     var TYPE_TO_CLASSIFIER_ID = {
@@ -344,7 +346,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @param {string} [version=latest] (optional) alfresco version number or timestamp
      * @returns {Promise} The promise will be resolved with array of element objects. 
      */
-    var getViewElements = function(id, update, workspace, version, weight) {
+    var getViewElements = function(id, update, workspace, version, weight, eids) {
         var n = normalize(update, workspace, version);
         var deferred = $q.defer();
         var url = URLService.getViewElementsURL(id, n.ws, n.ver);
@@ -352,12 +354,38 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         if (CacheService.exists(cacheKey) && !n.update) 
             deferred.resolve(CacheService.get(cacheKey));
         else {
-            ElementService.getGenericElements(url, 'elements', n.update, n.ws, n.ver, weight).
-            then(function(data) {
-                deferred.resolve(CacheService.put(cacheKey, data, false));
-            }, function(reason) {
-                deferred.reject(reason);
-            });
+            if (!eids || eids.length <= 5000) {
+                ElementService.getGenericElements(url, 'elements', n.update, n.ws, n.ver, weight).
+                then(function(data) {
+                    deferred.resolve(CacheService.put(cacheKey, data, false));
+                }, function(reason) {
+                    deferred.reject(reason);
+                });
+            } else { //if view elements too much, split into 2000 for each get
+                var key = id + n.ws + n.ver;
+                if (inProgress.hasOwnProperty(key))
+                    return inProgress[key];
+                inProgress[key] = deferred.promise;
+                var promises = [];
+                var i = 0;
+                while (i < eids.length) {
+                    var portion = eids.slice(i, i+VIEW_ELEMENTS_LIMIT);
+                    promises.push(ElementService.getElements(portion, update, workspace, version, weight));
+                    i += VIEW_ELEMENTS_LIMIT;
+                }
+                $q.all(promises)
+                .then(function(datas) {
+                    var result = [];
+                    for (i = 0; i < datas.length; i++) {
+                        Array.prototype.push.apply(result, datas[i]);
+                    }
+                    deferred.resolve(CacheService.put(cacheKey, result, false));
+                }, function(reason) {
+                    deferred.reject(reason);
+                }).finally(function() {
+                    delete inProgress[key];
+                });
+            }
         }
         return deferred.promise;
     };

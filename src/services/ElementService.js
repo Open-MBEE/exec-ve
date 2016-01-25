@@ -141,7 +141,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         if (request.elements.length === 0)
             deferred.resolve(existing);
         else {
-            $http.put(URLService.getPostElementsURL(workspace), request)
+            $http.put(URLService.getPutElementsURL(n.ws, n.ver), request)
             .then(function(response) {
                 var data = response.data.elements;
                 for (var i = 0; i < data.length; i++) {
