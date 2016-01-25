@@ -376,8 +376,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 $q.all(promises)
                 .then(function(datas) {
                     var result = [];
-                    for (i = 0; i < datas.length; i++) {
-                        Array.prototype.push.apply(result, datas[i]);
+                    for (var i = 0; i < datas.length; i++) {
+                        result.push.apply(result, datas[i]);
                     }
                     deferred.resolve(CacheService.put(cacheKey, result, false));
                 }, function(reason) {
