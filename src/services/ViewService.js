@@ -354,7 +354,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         if (CacheService.exists(cacheKey) && !n.update) 
             deferred.resolve(CacheService.get(cacheKey));
         else {
-            if (!eids || eids.length <= 5000) {
+            if (!eids || eids.length <= 5000 || n.ver !== 'latest') {
                 ElementService.getGenericElements(url, 'elements', n.update, n.ws, n.ver, weight).
                 then(function(data) {
                     deferred.resolve(CacheService.put(cacheKey, data, false));
