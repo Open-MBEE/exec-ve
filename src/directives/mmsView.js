@@ -177,7 +177,7 @@ function mmsView(ViewService, $templateCache, $rootScope, growl) {
                     scope.modifier = data.modifier;
                     return;
                 }
-                ViewService.getViewElements(scope.mmsVid, false, scope.mmsWs, scope.mmsVersion, 1, data specialization.displayedElements)
+                ViewService.getViewElements(scope.mmsVid, false, scope.mmsWs, scope.mmsVersion, 1, data.specialization.displayedElements)
                 .then(function(data2) {
                     scope.view = data;
                     scope.modified = data.modified;
