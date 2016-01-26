@@ -32,10 +32,13 @@
 	                <button ng-click="setFilterFacet('sysmlid')" type="button" class="btn-filter-facet-sysmlid btn-search-type btn btn-default">MDID</button>
 	            </div>
             </div>
-            <div>Showing {{filteredElms.length}} of {{searchResults.length}} search results.</div>
+            <div>Showing {{filteredElms.length}} <!--of {{searchResults.length}} -->search results. (Page {{currentPage + 1}})</div>
         </div>
     </div>
-
+    <div class="container-fluid">
+        <a ng-show="currentPage > 0" ng-click="prev()">&lt; Prev</a>
+        <a ng-show="searchResults.length > 0" class="pull-right" ng-click="next()">Next ></a>
+    </div>
     <div class="container-fluid" ng-show="searchResults.length > 0">
         <div class="elem-wrapper" ng-repeat="elem in filteredElms = (searchResults | filter: resultFilter)">
             <hr>
@@ -54,7 +57,7 @@
                     <a ng-show="elem.documentation" ng-bind-html="elem.documentation | limitTo:300" ng-click="userResultClick(elem, 'doc')"></a><span class="ellipses">{{elem.documentation.length > 300 ? ' ...' : ''}}</span>
                     <span><a ng-show="!elem.documentation" ng-click="userResultClick(elem, 'doc')">
                       {{emptyDocTxt}}
-                      <!--This field is empty, but you can still click here to cross-reference a placeholder.--></a></span>
+                      </a></span>
                 </div>
             </div>
             <div class="elem-type-wrapper">
@@ -110,9 +113,14 @@
                 </div>
             </div>
         </div>
+        <hr/>
     </div>
     
-    <div class="container-no-results container-fluid" ng-show="search.length === 0 && searchSuccess">
+    <div class="container-no-results container-fluid" ng-show="searchResults.length === 0">
         <h3>NO RESULTS FOUND.</h3>
+    </div>
+    <div class="container-fluid">
+        <a ng-show="currentPage > 0" ng-click="prev()">&lt; Prev</a>
+        <a ng-show="searchResults.length > 0" class="pull-right" ng-click="next()">Next ></a>
     </div>
 </div>
