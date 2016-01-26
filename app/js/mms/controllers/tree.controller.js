@@ -1060,6 +1060,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
 
         $scope.searchOptions = {};
         $scope.searchOptions.callback = $scope.addView;
+        $scope.searchOptions.itemsPerPage = 200;
         $scope.searchOptions.filterCallback = searchFilter;
 
         $scope.ok = function() {

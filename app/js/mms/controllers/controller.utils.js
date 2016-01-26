@@ -44,6 +44,9 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
                 else if (validClassifierIds.indexOf(data[i].specialization.classifier[0]) < 0) {
                     data.splice(i, 1);
                     i--;
+                } else {
+                    if (data[i].properties)
+                        delete data[i].properties;
                 }
             }
             return data;
@@ -80,6 +83,8 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
         $scope.searchOptions= {};
         $scope.searchOptions.callback = $scope.addElement;
         $scope.searchOptions.filterCallback = $scope.searchFilter;
+        $scope.searchOptions.itemsPerPage = 200;
+        
         $scope.ok = function() {
             if ($scope.oking) {
                 growl.info("Please wait...");

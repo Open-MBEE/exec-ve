@@ -11,9 +11,11 @@ function mmsSearch(ElementService, growl, $rootScope, $templateCache) {
         scope.proposeClass = "";
         scope.filter = '';
         scope.searchText = '';
-        scope.searchType = 'name';
+        scope.searchType = 'all';
         scope.facet = '$';
         scope.filterQuery = {query: ""};
+        scope.currentPage = 0;
+        scope.itemsPerPage = 50;
         
         scope.$watchGroup(['filterQuery.query', 'facet'], function(newVal, oldVal) {
             scope.resultFilter = {};
@@ -36,10 +38,19 @@ function mmsSearch(ElementService, growl, $rootScope, $templateCache) {
             });
         });
 
+        scope.next = function() {
+            scope.search(scope.searchText, scope.currentPage + 1, scope.itemsPerPage);
+        };
+
+        scope.prev = function() {
+            scope.search(scope.searchText, scope.currentPage - 1, scope.itemsPerPage);
+        };
+
         scope.setSearchType = function(searchType) {
             scope.searchType = searchType;
             angular.element('.btn-search-all').removeClass('active');
-            angular.element('.btn-search-name').removeClass('active');angular.element('.btn-search-documentation').removeClass('active');
+            angular.element('.btn-search-name').removeClass('active');
+            angular.element('.btn-search-documentation').removeClass('active');
             angular.element('.btn-search-value').removeClass('active');
             angular.element('.btn-search-id').removeClass('active');
             angular.element('.btn-search-' + searchType).addClass('active');
@@ -52,11 +63,11 @@ function mmsSearch(ElementService, growl, $rootScope, $templateCache) {
             angular.element('.search-filter-type button').removeClass('active');
             angular.element('.btn-filter-facet-' + filterFacet).addClass('active');
         };
-        scope.search = function(searchText) {
+        scope.search = function(searchText, page, numItems) {
             scope.searchClass = "fa fa-spin fa-spinner";
             if (scope.searchType === 'all')
               scope.searchType = '*';
-            ElementService.search(searchText, [scope.searchType], null, false, scope.mmsWs, 2)
+            ElementService.search(searchText, [scope.searchType], null, page, numItems, false, scope.mmsWs, 2)
             .then(function(data) {
                 if (scope.mmsOptions.filterCallback) {
                   scope.searchResults = scope.mmsOptions.filterCallback(data);
@@ -64,6 +75,7 @@ function mmsSearch(ElementService, growl, $rootScope, $templateCache) {
                   scope.searchResults = data;
                 }
                 scope.searchClass = "";
+                scope.currentPage = page;
             }, function(reason) {
                 growl.error("Search Error: " + reason.message);
                 scope.searchClass = "";
@@ -76,6 +88,9 @@ function mmsSearch(ElementService, growl, $rootScope, $templateCache) {
         }
         if (scope.mmsOptions.searchInput) {
           scope.searchText = scope.mmsOptions.searchInput;          
+        }
+        if (scope.mmsOptions.itemsPerPage) {
+            scope.itemsPerPage = scope.mmsOptions.itemsPerPage;
         }
         scope.emptyDocTxt = scope.mmsOptions.emptyDocTxt;
         scope.userResultClick = function(elem, property) {

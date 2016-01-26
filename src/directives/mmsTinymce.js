@@ -283,6 +283,7 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
             $scope.searchOptions.callback = $scope.choose;
             $scope.searchOptions.relatedCallback = $scope.chooseDoc;
             $scope.searchOptions.filterCallback = $scope.mainSearchFilter;
+            $scope.searchOptions.itemsPerPage = 200;
         };
 
         var viewLinkCallback = function(ed) {
