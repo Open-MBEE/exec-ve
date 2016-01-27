@@ -1,6 +1,6 @@
 'use strict';
 
-describe('mmsTranscludeName directive', function() {
+describe('mmsTranscludeDoc directive', function() {
     var scope; //scope when directive is called
     var element; //dom element mms-transclude-name
 
@@ -12,20 +12,21 @@ describe('mmsTranscludeName directive', function() {
         var testElement = {
             sysmlid: 'viewId',
             name: 'blah',
+            documentation: 'documentation and <mms-transclude-name mms-eid="viewId"></mms-transclude-name>',
             specialization: {
                 type: 'Element'
             }
         };
         var cacheKey = UtilsService.makeElementKey(testElement.sysmlid, 'master', 'latest', false);
         CacheService.put(cacheKey, testElement);
-        scope.view = { sysmlid: 'viewId', name: 'blah' };
-        element = angular.element('<mms-transclude-name data-mms-eid="{{view.sysmlid}}"></mms-transclude-name>');
+        scope.view = testElement;
+        element = angular.element('<mms-transclude-doc data-mms-eid="{{view.sysmlid}}"></mms-transclude-doc>');
         $compile(element)(scope);
         scope.$digest();
     }));
 
-    it('mmsTranscludeName.nominal()', inject(function() {
-        expect(element.html()).toContain('blah');
+    it('mmsTranscludeDoc.nominal()', inject(function() {
+        expect(element.html()).toContain('documentation');
+        expect(element.html()).toContain('blah'); //test recursive compilation
     }));
-
 });

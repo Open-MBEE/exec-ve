@@ -33,12 +33,14 @@ Run:
 
         npm install -g protractor
         webdriver-manager update
-        npm install -g jasmine
-        npm install -g jasmine-core
-        npm install -g karma
         
 To execute Karma tests manually use
 
+        ./node_modules/karma/bin/karma start config/develop/karma.develop.conf.js
+
+To avoid typing ./node_modules/karma/bin/karma everytime, install karma-cli globally, then karma should automatically use local karma
+
+        npm install -g karma-cli
         karma start config/develop/karma.develop.conf.js
         
 To execute Protractor tests
