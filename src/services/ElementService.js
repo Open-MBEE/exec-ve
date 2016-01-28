@@ -374,7 +374,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         else {
             var n = normalize(elem.sysmlid, null, workspace, null);
 
-            $http.post(URLService.getPostElementsURL(n.ws), {'elements': [elem],'source': ApplicationService.getSource()}, {timeout: 30000})
+            $http.post(URLService.getPostElementsURL(n.ws), {'elements': [elem],'source': ApplicationService.getSource()}, {timeout: 60000})
             .success(function(data, status, headers, config) {
                 handleSuccess(n, data);
             }).error(function(data, status, headers, config) {
@@ -508,7 +508,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         var url = URLService.getPostElementsURL(n.ws);
         if (site)
             url = URLService.getPostElementsWithSiteURL(n.ws, site);
-        $http.post(url, {'elements': [elem]})
+        $http.post(url, {'elements': [elem], 'source': ApplicationService.getSource()})
         .success(function(data, status, headers, config) {
             var resp = data.elements[0];
             var key = UtilsService.makeElementKey(resp.sysmlid, n.ws, 'latest');
@@ -532,12 +532,24 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
      * @returns {Promise} The promise will be resolved with an array of created element references if 
      *      create is successful.
      */
-    var createElements = function(elems, workspace) {
-        var promises = [];
-        elems.forEach(function(elem) {
-            promises.push(createElement(elem, workspace));
+    var createElements = function(elems, workspace, site) {
+        var n = normalize(null, null, workspace, null);
+        var deferred = $q.defer();
+        var url = URLService.getPostElementsURL(n.ws);
+        if (site)
+            url = URLService.getPostElementsWithSiteURL(n.ws, site);
+        $http.post(url, {'elements': elems, 'source': ApplicationService.getSource()})
+        .success(function(data, status, headers, config) {
+            var results = [];
+            data.elements.forEach(function(resp) {
+                var key = UtilsService.makeElementKey(resp.sysmlid, n.ws, 'latest');
+                results.push(CacheService.put(key, UtilsService.cleanElement(resp), true));
+            });
+            deferred.resolve(results);
+        }).error(function(data, status, headers, config) {
+            URLService.handleHttpStatus(data, status, headers, config, deferred);
         });
-        return $q.all(promises);
+        return deferred.promise;
     };
 
     /**
@@ -618,6 +630,8 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
      * @param {Array.<string>} [filters=null] An array of string of what to search in,
      *                                        can be name, documentation, id, value
      * @param {string} [propertyName=null] if filter is value, propertyName is used to further filter
+     * @param {integer} [page=null] page
+     * @param {integer} [items=null] items per page
      * @param {boolean} [update=false] Whether to update from server
      * @param {string} [workspace=master] (optional) workspace to use
      * @returns {Promise} The promise will be resolved with an array of element objects.
@@ -626,11 +640,11 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
      *                  but elements in the properties array will be stored in the cache
      *                  The element results returned will be a clone of the original server response and not cache references
      */
-    var search = function(query, filters, propertyName, update, workspace, weight) {
+    var search = function(query, filters, propertyName, page, items, update, workspace, weight) {
         //var n = normalize(null, update, workspace, null);
         //return getGenericElements(URLService.getElementSearchURL(query, n.ws), 'elements', n.update, n.ws, n.ver);
         var n = normalize(null, update, workspace, null);
-        var url = URLService.getElementSearchURL(query, filters, propertyName, n.ws);
+        var url = URLService.getElementSearchURL(query, filters, propertyName, page, items, n.ws);
         var progress = 'search(' + url + n.update + n.ws + ')';
         if (inProgress.hasOwnProperty(progress)) {
             HttpService.ping(url, weight);
@@ -647,7 +661,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                     if (properties)
                         delete element.properties;
                     var ekey = UtilsService.makeElementKey(element.sysmlid, n.ws, n.ver);
-                    CacheService.put(ekey, UtilsService.cleanElement(element), true);
+                    var cacheE = CacheService.put(ekey, UtilsService.cleanElement(element), true);
                     if (properties) {
                         properties.forEach(function(property) {
                             var pkey = UtilsService.makeElementKey(property.sysmlid, n.ws, n.ver);
@@ -656,6 +670,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                     }
                     var toAdd = JSON.parse(JSON.stringify(element));
                     toAdd.properties = properties;
+                    toAdd.relatedDocuments = cacheE.relatedDocuments;
                     result.push(toAdd);
                 }); 
                 delete inProgress[progress];

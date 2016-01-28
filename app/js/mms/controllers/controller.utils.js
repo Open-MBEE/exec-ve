@@ -18,55 +18,40 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
         $scope.newItem = {};
         $scope.newItem.name = "";
 
-        $scope.searching = false;
-
         // Search for InstanceSpecs.  We are searching for InstanceSpecs b/c we only want to
         // create a InstanceValue to point to that InstanceSpec when cross-referencing.
-        $scope.search = function(searchText) {
-            //var searchText = $scope.searchText; //TODO investigate why searchText isn't in $scope
-            //growl.info("Searching...");
-            $scope.searching = true;
-
-            ElementService.search(searchText, ['name'], null, false, $scope.ws, 2)
-            .then(function(data) {
-                var validClassifierIds = [];
-                if ($scope.presentationElemType === 'Table') {
-                    //validClassifierIds.push(ViewService.typeToClassifierId.Table);
-                    validClassifierIds.push(ViewService.typeToClassifierId.TableT);
-                } else if ($scope.presentationElemType === 'List') {
-                    //validClassifierIds.push(ViewService.typeToClassifierId.List);
-                    validClassifierIds.push(ViewService.typeToClassifierId.ListT);
-                } else if ($scope.presentationElemType === 'Figure') {
-                    //validClassifierIds.push(ViewService.typeToClassifierId.Image);
-                    validClassifierIds.push(ViewService.typeToClassifierId.Figure);
-                } else if ($scope.presentationElemType === 'Paragraph') {
-                    //validClassifierIds.push(ViewService.typeToClassifierId.Paragraph);
-                    validClassifierIds.push(ViewService.typeToClassifierId.ParagraphT);
-                } else if ($scope.presentationElemType === 'Section') {
-                    validClassifierIds.push(ViewService.typeToClassifierId.SectionT);
+        $scope.searchFilter = function(data) {
+            var validClassifierIds = [];
+            if ($scope.presentationElemType === 'Table') {
+                validClassifierIds.push(ViewService.TYPE_TO_CLASSIFIER_ID.TableT);
+            } else if ($scope.presentationElemType === 'List') {
+                validClassifierIds.push(ViewService.TYPE_TO_CLASSIFIER_ID.ListT);
+            } else if ($scope.presentationElemType === 'Figure') {
+                validClassifierIds.push(ViewService.TYPE_TO_CLASSIFIER_ID.Figure);
+            } else if ($scope.presentationElemType === 'Paragraph') {
+                validClassifierIds.push(ViewService.TYPE_TO_CLASSIFIER_ID.ParagraphT);
+            } else if ($scope.presentationElemType === 'Section') {
+                validClassifierIds.push(ViewService.TYPE_TO_CLASSIFIER_ID.SectionT);
+            } else {
+                validClassifierIds.push(ViewService.TYPE_TO_CLASSIFIER_ID[$scope.presentationElemType]);
+            }
+            // Filter out anything that is not a InstanceSpecification or not of the correct type:
+            for (var i = 0; i < data.length; i++) {
+                if (data[i].specialization.type != 'InstanceSpecification') {
+                    data.splice(i, 1);
+                    i--;
+                }
+                else if (validClassifierIds.indexOf(data[i].specialization.classifier[0]) < 0) {
+                    data.splice(i, 1);
+                    i--;
                 } else {
-                    validClassifierIds.push(ViewService.typeToClassifierId[$scope.presentationElemType]);
+                    if (data[i].properties)
+                        delete data[i].properties;
                 }
-                // Filter out anything that is not a InstanceSpecification or not of the correct type:
-                for (var i = 0; i < data.length; i++) {
-                    if (data[i].specialization.type != 'InstanceSpecification') {
-                        data.splice(i, 1);
-                        i--;
-                    }
-                    else if (validClassifierIds.indexOf(data[i].specialization.classifier[0]) < 0) {
-                        data.splice(i, 1);
-                        i--;
-                    }
-                }
-
-                $scope.mmsCfElements = data;
-                $scope.searching = false;
-            }, function(reason) {
-                growl.error("Search Error: " + reason.message);
-                $scope.searching = false;
-            });
+            }
+            return data;
         };
-
+        
         // Adds a InstanceValue to the view given the sysmlid of the InstanceSpecification
         $scope.addElement = function(element) {
 
@@ -75,8 +60,12 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
                 return;
             }
             $scope.oking = true;  
-
-            ViewService.addInstanceVal($scope.viewOrSection, $scope.ws, element.sysmlid).
+            var instanceVal = {
+                instance: element.sysmlid,
+                type: "InstanceValue",
+                valueExpression: null
+            };
+            ViewService.addElementToViewOrSection($scope.viewOrSection.sysmlid, $scope.viewOrSection.sysmlid, $scope.ws, instanceVal).
             then(function(data) {
                 if ($scope.presentationElemType === "Section") {
                     // Broadcast message to TreeCtrl:
@@ -91,6 +80,11 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
             });            
         };
 
+        $scope.searchOptions= {};
+        $scope.searchOptions.callback = $scope.addElement;
+        $scope.searchOptions.filterCallback = $scope.searchFilter;
+        $scope.searchOptions.itemsPerPage = 200;
+        
         $scope.ok = function() {
             if ($scope.oking) {
                 growl.info("Please wait...");
@@ -98,7 +92,7 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
             }
             $scope.oking = true;
 
-            ViewService.createAndAddElement($scope.viewOrSection, $scope.ws, true, $scope.presentationElemType, $scope.site.sysmlid, $scope.newItem.name).
+            ViewService.createInstanceSpecification($scope.viewOrSection, $scope.ws, $scope.presentationElemType, $scope.site.sysmlid, $scope.newItem.name).
             then(function(data) {
                 $rootScope.$broadcast('view.reorder.refresh');
                 growl.success("Adding "+$scope.presentationElemType+"  Successful");
@@ -149,28 +143,30 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
         });
 
         function realAddElement() {
-        $scope.viewOrSection = viewOrSection;
-        $scope.presentationElemType = type;
-        $scope.newItem = {};
-        $scope.newItem.name = "";
-        var templateUrlStr = 'partials/mms/add-item.html';
+          $scope.createForm = true;
+          $scope.viewOrSection = viewOrSection;
+          $scope.presentationElemType = type;
+          $scope.newItem = {};
+          $scope.newItem.name = "";
+          var templateUrlStr = 'partials/mms/add-item.html';
 
-        var instance = $modal.open({
-            templateUrl: templateUrlStr,
-            scope: $scope,
-            controller: ['$scope', '$modalInstance', '$filter', addElementCtrl]
-        });
-        instance.result.then(function(data) {
-            // TODO: do anything here?
-        });
+          var instance = $modal.open({
+              templateUrl: templateUrlStr,
+              scope: $scope,
+              controller: ['$scope', '$modalInstance', '$filter', addElementCtrl]
+          });
+          instance.result.then(function(data) {
+              // TODO: do anything here?
+          });
         }
     };
 
-    var popupPrintConfirm = function(ob, ws, time, isDoc) {
+    var popupPrintConfirm = function(ob, ws, time, isDoc, print) {
         var modalInstance = $modal.open({
             templateUrl: 'partials/mms/printConfirm.html',
             controller: function($scope, $modalInstance, type) {
                 $scope.type = type;
+                $scope.action = print ? 'print' : 'save';
                 $scope.print = function() {
                     $modalInstance.close('print');
                 };
@@ -189,7 +185,7 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
         });
         modalInstance.result.then(function(choice) {
             if (choice === 'print')
-                popupPrint(ob, ws, time, isDoc);
+                popupPrint(ob, ws, time, isDoc, print);
             else {
                 $rootScope.mms_fullDocMode = true;
                 $rootScope.mms_bbApi.setToggleState("tree.full.document", true);
@@ -198,7 +194,7 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
         });
     };
 
-    var tableToCsv = function(ob, ws, time, isDoc) {
+    var tableToCsv = function(ob, ws, time, isDoc) { //Export to CSV button Pop-up Generated Here
          var modalInstance = $modal.open({
             templateUrl: 'partials/mms/tableExport.html',
             controller: function($scope, $modalInstance, type) {
@@ -219,6 +215,34 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
             backdrop: 'static',
             keyboard: false
         });
+
+        var string = '<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>' +
+            '<script>';
+            string += 'function doClick(id) { ' +
+            'var csvString = document.getElementById(id).value;' +
+            'var blob = new Blob([csvString], { ' +
+            '    type: "text/csv;charset=utf-8;" ' +
+            '}); ' +
+            '' +
+            'if (window.navigator.msSaveOrOpenBlob) { ' +
+            '    navigator.msSaveBlob(blob,\'TableData.csv\'); ' +
+            '} else { ' +
+            '' +
+            '    var downloadContainer = $(\'<div data-tap-disabled="true"><a></a></div>\'); ' +
+            '    var downloadLink = $(downloadContainer.children()[0]); ' +
+            '    downloadLink.attr(\'href\', window.URL.createObjectURL(blob)); ' +
+            '    downloadLink.attr(\'download\', \'TableData.csv\'); ' +
+            '    downloadLink.attr(\'target\', \'_blank\'); ' +
+            ' ' +
+            '    $(window.document).find(\'body\').append(downloadContainer); ' +
+            '    /* $timeout(function () { */ ' +
+            '        downloadLink[0].click(); ' +
+            '        downloadLink.remove(); ' +
+            '    /* }, null); */ ' +
+            '} ' +
+            '} ';
+        string += '</script>';
+
         modalInstance.result.then(function(choice) {
             if (choice === 'export') {
                var tableCSV = [];
@@ -243,16 +267,19 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
                 };
                 // generate text area content for popup
                 var genTextArea ='';
+                var num = 0;
                 angular.element(tableCSV).each(function(){
-                    genTextArea += '<h2>'+ this.caption +'</h2><textArea cols=100 rows=15 wrap="off" >';
+                    genTextArea += '<h2>'+ this.caption +'</h2><div><button class="btn btn-sm btn-primary" onclick="doClick(\'textArea'+num+'\')">Save CSV</button></div><textArea cols=100 rows=15 wrap="off" id="textArea'+num+'">';
                     genTextArea += this.val + '</textArea>';
+                    num++;
                 });
+                genTextArea += string;
                 exportPopup(genTextArea);
             }
         });
     };
     
-    var popupPrint = function(ob, ws, time, isDoc) {
+    var popupPrint = function(ob, ws, time, isDoc, print) {
         var printContents = '';//$window.document.getElementById('print-div').outerHTML;
         var printElementCopy = angular.element('#print-div').clone();//angular.element(printContents);
         var hostname = $location.host();
@@ -292,13 +319,18 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
                 if (useCover)
                     cover = templateElement[0].innerHTML;
                 newScope.$destroy();
+                var inst = '';
+                if (!print)
+                    inst = "<div>(Copy and paste into Word)</div>";
                 var popupWin = $window.open('', '_blank', 'width=800,height=600,scrollbars=1');
                 popupWin.document.open();
-                popupWin.document.write('<html><head><link href="css/ve-mms.styles.min.css" rel="stylesheet" type="text/css"></head><body style="overflow: auto">' + cover + tocContents + printContents + '</html>');
+                popupWin.document.write('<html><head><link href="css/ve-mms.styles.min.css" rel="stylesheet" type="text/css"></head><body style="overflow: auto">' + inst + cover + tocContents + printContents + '</html>');
                 popupWin.document.close();
-                $timeout(function() {
-                    popupWin.print();
-                }, 1000, false);
+                if (print) {
+                    $timeout(function() {
+                        popupWin.print();
+                    }, 1000, false);
+                }
         };
         if (isDoc) {
             tocContents = UtilsService.makeHtmlTOC($rootScope.mms_treeApi.get_rows());

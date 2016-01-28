@@ -234,6 +234,9 @@ function UxService($rootScope) {
           case "print":
             return {id: button, icon: 'fa-print', selected: true, active: true, permission: true, tooltip: 'Print', 
                     spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
+          case "word":
+            return {id: button, icon: 'fa-file-word-o', selected: true, active: true, permission: true, tooltip: 'Save to Word', 
+                    spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
           case "tabletocsv":
             return {id: button, icon: 'fa-table', selected: true, active: true, permission: true, tooltip: 'Table to CSV', 
                     spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};

@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsTinymce', ['ElementService', 'ViewService', 'CacheService', '$modal', '$templateCache', '$window', '$timeout', 'growl', 'tinymce', mmsTinymce]);
+.directive('mmsTinymce', ['ElementService', 'ViewService', 'CacheService', '$modal', '$templateCache', '$window', '$timeout', 'growl', 'tinymce','UtilsService', mmsTinymce]);
 
 /**
  * @ngdoc directive
@@ -30,7 +30,7 @@ angular.module('mms.directives')
  *      that can be transcluded. Regardless, transclusion allows keyword searching 
  *      elements to transclude from alfresco
  */
-function mmsTinymce(ElementService, ViewService, CacheService, $modal, $templateCache, $window, $timeout, growl, tinymce) { //depends on angular bootstrap
+function mmsTinymce(ElementService, ViewService, CacheService, $modal, $templateCache, $window, $timeout, growl, tinymce, UtilsService) { //depends on angular bootstrap
     var generatedIds = 0;
 
     var mmsTinymceLink = function(scope, element, attrs, ngModelCtrl) {
@@ -45,76 +45,36 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
         var viewLinkModalTemplate = $templateCache.get('mms/templates/mmsViewLinkModal.html');
         var proposeModalTemplate = $templateCache.get('mms/templates/mmsProposeModal.html');
 
-        var transcludeCtrl = function($scope, $modalInstance) {
+        var transcludeCtrl = function($scope, $modalInstance, autocomplete) {
             var autocompleteName;
             var autocompleteProperty;
             var autocompleteElementId;
+            if (autocomplete) {
+              $scope.cacheElements = CacheService.getLatestElements(scope.mmsWs);
+              $scope.autocompleteItems = [];
+              $scope.cacheElements.forEach(function(cacheElement) {
+                  //JSON.stringify(sampleObject);
+                  //console.log("=====THIS IS THE CACHE ===="+ JSON.stringify(cacheElement));
+                  $scope.autocompleteItems.push({ 'sysmlid' : cacheElement.sysmlid, 'name' : cacheElement.name + ' - name' });
+                  $scope.autocompleteItems.push({ 'sysmlid' : cacheElement.sysmlid, 'name' : cacheElement.name + ' - documentation' });
 
-            $scope.cacheElements = CacheService.getLatestElements(scope.mmsWs);
-            $scope.autocompleteItems = [];
-
-            $scope.cacheElements.forEach(function(cacheElement) {
-                $scope.autocompleteItems.push({ 'sysmlid' : cacheElement.sysmlid, 'name' : cacheElement.name + ' - name' });
-                $scope.autocompleteItems.push({ 'sysmlid' : cacheElement.sysmlid, 'name' : cacheElement.name + ' - documentation' });
-
-                if (cacheElement.specialization && cacheElement.specialization.type === 'Property') {
-                    $scope.autocompleteItems.push({ 'sysmlid' : cacheElement.sysmlid, 'name' : cacheElement.name + ' - value' });
-                }
-            });
-
-            $scope.searchClass = "";
-            $scope.proposeClass = "";
-            var originalElements = $scope.mmsCfElements;
-            $scope.filter = '';
-            $scope.searchText = '';
+                  if (cacheElement.specialization && cacheElement.specialization.type === 'Property') {
+                      $scope.autocompleteItems.push({ 'sysmlid' : cacheElement.sysmlid, 'name' : cacheElement.name + ' - value' });
+                  }
+              });
+            }
+            $scope.title = 'INSERT A CROSS REFERENCE';
+            $scope.description = 'Begin by searching for an element, then click a field to cross-reference.';
             $scope.newE = {name: '', documentation: ''};
-            $scope.searchSuccess = false;
             $scope.requestName = false;
             $scope.requestDocumentation = false;
-            $scope.searchType = 'name';
-
-            $scope.setSearchType = function(searchType) {
-                $scope.searchType = searchType;
-                angular.element('.btn-search-name').removeClass('active');
-                angular.element('.btn-search-documentation').removeClass('active');
-                angular.element('.btn-search-value').removeClass('active');
-                angular.element('.btn-search-id').removeClass('active');
-                angular.element('.btn-search-' + searchType).addClass('active');
-            };
-            $scope.choose = function(elementId, property, name) {
-                var tag = '<mms-transclude-' + property + ' data-mms-eid="' + elementId + '">[cf:' + name + '.' + property + ']</mms-transclude-' + property + '> ';
+            $scope.showProposeLink = true;
+            $scope.choose = function(elem, property) {
+                var tag = '<mms-transclude-' + property + ' data-mms-eid="' + elem.sysmlid + '">[cf:' + elem.name + '.' + property + ']</mms-transclude-' + property + '> ';
                 $modalInstance.close(tag);
             };
             $scope.cancel = function() {
                 $modalInstance.dismiss();
-            };
-            $scope.search = function(searchText) {
-                // var searchText = $scope.searchText; //TODO investigate why searchText isn't in $scope
-                $scope.searchClass = "fa fa-spin fa-spinner";
-                ElementService.search(searchText, [$scope.searchType], null, false, scope.mmsWs)
-                .then(function(data) {
-                    $scope.searchSuccess = true;
-                    $scope.searchClass = "";
-
-                    // change properties arr to 2-dim to display table
-                    data.forEach(function(elem) {
-                        if (elem.properties && elem.properties[0]) {
-                            var properties = [];
-                            for (var i = 0; i < elem.properties.length; i++) {
-                                if (i % 3 === 0) {
-                                    properties.push([]);
-                                }
-                                properties[properties.length-1].push(elem.properties[i]);
-                            }
-                            elem.properties = properties;
-                        }
-                    });
-
-                    $scope.mmsCfElements = data;
-                }, function(reason) {
-                    growl.error("Search Error: " + reason.message);
-                    $scope.searchClass = "";
-                });
             };
             $scope.openProposeModal = function() {
                 $modalInstance.close(false);
@@ -127,7 +87,7 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                 $scope.proposeClass = "fa fa-spin fa-spinner";
                 ElementService.createElement({name: $scope.newE.name, documentation: $scope.newE.documentation, specialization: {type: 'Element'}}, scope.mmsWs, scope.mmsSite)
                 .then(function(data) {
-                    $scope.mmsCfElements = [data];
+                    $scope.searchResults = [data];
                     $scope.proposeClass = "";
                 }, function(reason) {
                     growl.error("Propose Error: " + reason.message);
@@ -156,9 +116,6 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                     growl.error("Propose Error: " + reason.message);
                     $scope.proposeClass = "";
                 });
-            };
-            $scope.showOriginalElements = function() {
-                $scope.mmsCfElements = originalElements;
             };
             $scope.toggleRadio = function(field) {
                 if (field === "name") {
@@ -200,7 +157,8 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
             var instance = $modal.open({
                 template: autocompleteModalTemplate,
                 scope: scope,
-                controller: ['$scope', '$modalInstance', transcludeCtrl],
+                resolve: {autocomplete: true},
+                controller: ['$scope', '$modalInstance', 'autocomplete', transcludeCtrl],
                 size: 'sm'
             });
 
@@ -225,7 +183,8 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
             var instance = $modal.open({
                 template: transcludeModalTemplate,
                 scope: scope,
-                controller: ['$scope', '$modalInstance', transcludeCtrl],
+                resolve: {autocomplete: false},
+                controller: ['$scope', '$modalInstance', 'autocomplete', transcludeCtrl],
                 size: 'lg'
             });
             instance.result.then(function(tag) {
@@ -259,41 +218,77 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
         };
 
         var transcludeViewLinkCtrl = function($scope, $modalInstance) {
-            $scope.searchClass = "";
-            $scope.proposeClass = "";
-            $scope.filter = '';
-            $scope.searchText = '';
-            $scope.mmsCfViewElements = [];
-            $scope.choose = function(elementId, name) {
-                var tag = '<mms-view-link data-mms-vid="' + elementId + '">[cf:' + name + '.vlink]</mms-view-link> ';
+            $scope.title = 'INSERT VIEW LINK';
+            $scope.description = 'Search for a view or content element, click on its name to insert link.';
+            $scope.choose = function(elem) {
+                var did = null;
+                var vid = null;
+                var peid = null;
+                if (elem.relatedDocuments && elem.relatedDocuments.length > 0) {
+                    did = elem.relatedDocuments[0].sysmlid;
+                    if (elem.relatedDocuments[0].parentViews.length > 0)
+                        vid = elem.relatedDocuments[0].parentViews[0].sysmlid;
+                }
+                if (elem.specialization.type === 'InstanceSpecification') {
+                    if (ViewService.isSection(elem))
+                        vid = elem.sysmlid;
+                    else
+                        peid = elem.sysmlid;
+                } else 
+                    vid = elem.sysmlid;
+                var tag = '<mms-view-link';
+                if (did) 
+                    tag += ' data-mms-did="' + did + '"';
+                if (vid) 
+                    tag += ' data-mms-vid="' + vid + '"';
+                if (peid) 
+                    tag += ' data-mms-peid="' + peid + '"';
+                tag += '>[cf:' + elem.name + '.vlink]</mms-view-link> ';
+                $modalInstance.close(tag);
+            };
+            $scope.chooseDoc = function(doc, view, elem) {
+                var did = doc.sysmlid;
+                var vid = view.sysmlid;
+                var peid = null;
+                if (ViewService.isSection(elem))
+                    vid = elem.sysmlid;
+                else if (ViewService.isPresentationElement(elem))
+                    peid = elem.sysmlid;
+                var tag = '<mms-view-link';
+                if (did) 
+                    tag += ' data-mms-did="' + did + '"';
+                if (vid) 
+                    tag += ' data-mms-vid="' + vid + '"';
+                if (peid) 
+                    tag += ' data-mms-peid="' + peid + '"';
+                tag += '>[cf:' + elem.name + '.vlink]</mms-view-link> ';
                 $modalInstance.close(tag);
             };
             $scope.cancel = function() {
                 $modalInstance.dismiss();
             };
-            $scope.search = function(searchText) {
-                //var searchText = $scope.searchText; //TODO investigate why searchText isn't in $scope
-                //growl.info("Searching...");
-                $scope.searchClass = "fa fa-spin fa-spinner";
-                ElementService.search(searchText, ['name'], null, false, scope.mmsWs)
-                .then(function(data) {
-                    var views = [];
-                    data.forEach(function(v) {
-                        if (v.specialization && (v.specialization.type === 'View' || v.specialization.type === 'Product'))
-                            views.push(v);
-                    });
-                    $scope.mmsCfViewElements = views;
-                    $scope.searchClass = "";
-                }, function(reason) {
-                    growl.error("Search Error: " + reason.message);
-                    $scope.searchClass = "";
+            $scope.mainSearchFilter = function(data) {
+                var views = [];
+                data.forEach(function(v) {
+                    if (v.specialization && (v.specialization.type === 'View' || v.specialization.type === 'Product' || 
+                            (ViewService.isPresentationElement(v) && v.relatedDocuments))) {
+                        if (v.properties)
+                            delete v.properties;
+                        views.push(v);
+                    }
                 });
+                return views;
             };
+            $scope.searchOptions= {};
+            $scope.searchOptions.callback = $scope.choose;
+            $scope.searchOptions.relatedCallback = $scope.chooseDoc;
+            $scope.searchOptions.filterCallback = $scope.mainSearchFilter;
+            $scope.searchOptions.itemsPerPage = 200;
         };
 
         var viewLinkCallback = function(ed) {
             var instance = $modal.open({
-                template: viewLinkModalTemplate,
+                template: transcludeModalTemplate,
                 scope: scope,
                 controller: ['$scope', '$modalInstance', transcludeViewLinkCtrl],
                 size: 'lg'
@@ -396,13 +391,37 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
             }
             return content;
         };
+        var resetCrossRef = function(type, typeString){
+            angular.forEach(type, function(value, key){
+                var transclusionObject = angular.element(value);
+                var transclusionId= angular.element(value).attr('data-mms-eid');
+                var transclusionKey = UtilsService.makeElementKey(transclusionId, 'master', 'latest', false);
+                var inCache = CacheService.get(transclusionKey);
+                if(inCache){
+                    transclusionObject.html('[cf:' + inCache.name + typeString);
+                }
+                else{
+                    ElementService.getElement(transclusionId, false, scope.mmsWs, 'latest', 2 ).then(function(data) {
+                        transclusionObject.html('[cf:' + data.name + typeString);
+                    }, function(reason) {
+                        var error;
+                        if (reason.status === 410)
+                            error = 'deleted';
+                        if (reason.status === 404)
+                            error = 'not found';
+                        transclusionObject.html('[cf:' + error + typeString);
+                        });
+                }
+            });
+        };
 
         var defaultToolbar = 'bold italic underline strikethrough | subscript superscript blockquote | formatselect | fontsizeselect | forecolor backcolor removeformat | alignleft aligncenter alignright | link unlink | charmap searchreplace | undo redo';
         var tableToolbar = ' table ';
         var listToolbar = ' bullist numlist outdent indent ';
         var codeToolbar = ' code ';
+        var imageToolbar = ' image media ';
         var customToolbar = ' transclude comment vlink normalize';
-        var allToolbar = defaultToolbar + ' | ' + listToolbar + ' | ' + tableToolbar + ' | ' + codeToolbar + ' | ' + customToolbar;
+        var allToolbar = defaultToolbar + ' | ' + listToolbar + ' | ' + tableToolbar + ' | ' + imageToolbar + ' | ' + codeToolbar + ' | ' + customToolbar;
         var thisToolbar = allToolbar;
         if (scope.mmsTinymceType === 'Equation')
             thisToolbar = codeToolbar;
@@ -412,8 +431,8 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
             thisToolbar = defaultToolbar + ' | ' + listToolbar + ' | ' + codeToolbar + ' | ' + customToolbar;
         if (scope.mmsTinymceType === 'Figure')
             thisToolbar = 'image media | code ';
-        if (scope.mmsTinymceType === 'ParagraphT' || scope.mmsTinymceType === 'Paragraph')
-            thisToolbar = defaultToolbar + ' | ' + codeToolbar + ' | ' + customToolbar;
+        //if (scope.mmsTinymceType === 'ParagraphT' || scope.mmsTinymceType === 'Paragraph')
+          //  thisToolbar = defaultToolbar + ' | ' + codeToolbar + ' | ' + customToolbar;
         var options = {
             plugins: 'autoresize charmap code fullscreen image link media nonbreaking paste table textcolor searchreplace noneditable',
             //toolbar: 'bold italic underline strikethrough | subscript superscript blockquote | formatselect | fontsizeselect | forecolor backcolor removeformat | alignleft aligncenter alignright | bullist numlist outdent indent | table | link unlink | image media | charmap searchreplace code | transclude comment vlink normalize | mvleft mvright | undo redo',
@@ -488,15 +507,15 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                 });
 */
                 ed.addButton('normalize', {
-                    title: 'Reset Cross References',
-                    text: 'Reset Cf',
+                    title: 'Update Cross References',
+                    text: 'Update Cf',
                     onclick: function() {
                         var body = ed.getBody();
                         body = angular.element(body);
-                        body.find('mms-transclude-name').html('[cf:name]');
-                        body.find('mms-transclude-doc').html('[cf:doc]');
-                        body.find('mms-transclude-val').html('[cf:val]');
-                        body.find('mms-view-link').html('[cf:vlink]');
+                        resetCrossRef(body.find('mms-transclude-name'), '.name]');
+                        resetCrossRef(body.find('mms-transclude-doc'), '.doc]');
+                        resetCrossRef(body.find('mms-transclude-val'), '.val]');
+                        resetCrossRef(body.find('mms-view-link'), '.vlink]');
                         ed.save();
                         update();
                     }

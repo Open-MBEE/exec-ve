@@ -153,6 +153,7 @@ module.exports = function(grunt) {
       beforeconcat: jsFiles,
       afterconcat: ['dist/mms.js', 'dist/mms.directives.js'],
       options: {
+        evil: true, //allow eval for timely integration
         globalstrict: true,
         globals: {
           angular: true,
@@ -162,7 +163,9 @@ module.exports = function(grunt) {
           Timely: true,
           jQuery: true,
           $: true,
-          __timely: true
+          //__timely: true,
+          Blob: true,
+          navigator: true
         }
       }
     },
@@ -206,7 +209,7 @@ module.exports = function(grunt) {
         proxies: [
           {
             context: '/alfresco',  // '/api'
-            host: 'ems.jpl.nasa.gov',//128.149.16.152',
+            host: 'cae-ems.jpl.nasa.gov',//128.149.16.152',
             port: 443,
             changeOrigin: true,
             https: true,
@@ -229,7 +232,7 @@ module.exports = function(grunt) {
         proxies: [
           {
             context: '/alfresco',  // '/api'
-            host: 'ems-test.jpl.nasa.gov',//128.149.16.152',
+            host: 'cae-ems-test.jpl.nasa.gov',//128.149.16.152',
             port: 443,
             changeOrigin: true,
             https: true,
@@ -252,7 +255,7 @@ module.exports = function(grunt) {
         proxies: [
           {
             context: '/alfresco',  // '/api'
-            host: 'ems-stg.jpl.nasa.gov',//128.149.16.152',
+            host: 'cae-ems-stg.jpl.nasa.gov',//128.149.16.152',
             port: 443,
             changeOrigin: true,
             https: true,
@@ -478,8 +481,30 @@ module.exports = function(grunt) {
     },
 
     karma: {
-      unit: {
-        configFile: 'karma.conf.js'
+      options:{
+        configFile:'config/develop/karma.develop.conf.js'
+      },
+      dev:{
+        files:
+          'test/develop/unit/**/*.js'
+      }
+    },
+
+    protractor: {
+      options: {
+        keepAlive: true, // If false, the grunt process stops when the test fails.
+        noColor: false, // If true, protractor will not use colors in its output.
+      },
+      develop: {   // Grunt requires at least one target to run so you can simply put 'all: {}' here too.
+        options: {
+          configFile: "config/develop/protractor.develop.conf.js" // Target-specific config file
+        }
+      },
+      suite:{
+        all:{},
+        options: {
+          configFile: "config/master/protractor.master.conf.js" // Target-specific config file
+        }
       }
     },
 
@@ -545,6 +570,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-bower-install-simple');
   grunt.loadNpmTasks('grunt-wiredep');
   grunt.loadNpmTasks('grunt-karma');
+  grunt.loadNpmTasks('grunt-protractor-runner');
   grunt.loadNpmTasks('grunt-artifactory-artifact');
   grunt.loadNpmTasks('grunt-sloc');
   grunt.loadNpmTasks('grunt-plato');  
@@ -562,6 +588,8 @@ module.exports = function(grunt) {
   grunt.registerTask('docs-build',    ['ngdocs']);
   grunt.registerTask('default', ['dev-build']);
   grunt.registerTask('deploy', ['dev-build', 'ngdocs', 'artifactory:client:publish']);
+  grunt.registerTask('test', ['karma']);
+  grunt.registerTask('e2e-test', ['protractor']);
 
   grunt.registerTask('dev', function(arg1) {
       grunt.task.run('dev-build', 'connect:static');
@@ -608,4 +636,14 @@ module.exports = function(grunt) {
       grunt.task.run('watch:' + build);
     }
   );
+
+  grunt.registerTask('debug', function () {
+      grunt.log.writeln("Launching Karma");
+      grunt.task.run('test');
+  });
+
+  grunt.registerTask('e2e',function(arg1) {
+    grunt.log.writeln("Launching Protractor");
+    grunt.task.run('e2e-test');
+  })
 };

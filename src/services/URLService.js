@@ -425,10 +425,12 @@ function urlService(baseUrl) {
      * @param {string} query Keyword query
      * @param {Array.<string>} filters if not null, put in filters
      * @param {string} propertyName if not null put in propertyName
+     * @param {integer} page page to get
+     * @param {integer} items items per page
      * @param {string} workspace Workspace name to search under
      * @returns {string} The post elements url.
      */
-    var getElementSearchURL = function(query, filters, propertyName, workspace) {
+    var getElementSearchURL = function(query, filters, propertyName, page, items, workspace) {
         var r = root + '/workspaces/' + workspace + '/search?keyword=' + query;
         if (filters) {
             var l = filters.join();
@@ -436,6 +438,11 @@ function urlService(baseUrl) {
         }
         if (propertyName) {
             r += '&propertyName=' + propertyName;
+        }
+        if (items && items > 0) {
+            r += "&maxItems=" + items;
+            if (page >= 0)
+                r += '&skipCount=' + page;
         }
         return r;
     };

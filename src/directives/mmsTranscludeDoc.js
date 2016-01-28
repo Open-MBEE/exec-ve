@@ -252,8 +252,8 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             scope.instanceSpec = mmsViewPresentationElemCtrl.getInstanceSpec();
             scope.instanceVal = mmsViewPresentationElemCtrl.getInstanceVal();
             scope.presentationElem = mmsViewPresentationElemCtrl.getPresentationElement();
-            var auto = [ViewService.typeToClassifierId.Image, ViewService.typeToClassifierId.Paragraph,
-                ViewService.typeToClassifierId.List, ViewService.typeToClassifierId.Table];
+            var auto = [ViewService.TYPE_TO_CLASSIFIER_ID.Image, ViewService.TYPE_TO_CLASSIFIER_ID.Paragraph,
+                ViewService.TYPE_TO_CLASSIFIER_ID.List, ViewService.TYPE_TO_CLASSIFIER_ID.Table];
 
             if (auto.indexOf(scope.instanceSpec.specialization.classifier[0]) >= 0)
             //do not allow model generated to be deleted
@@ -279,7 +279,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                 }
                 if(scope.isEditing === true){
                     growl.warning("This documentation has been changed: " + elemName +
-                                " modified by: " + deltaModifier, {ttl: 30000});
+                                " modified by: " + deltaModifier, {ttl: -1});
                 }
             }
         });

@@ -37,5 +37,6 @@
 </div>
 
 <div ng-if="search !== null">
-    <ng-include src="'partials/mms/pane-center-search.html'"></ng-include>
+    <i class="pane-center-spinner fa fa-5x fa-spinner fa-spin" ng-show="mms_viewContentLoading"></i>
+    <mms-search mms-options="searchOptions" search="search"></mms-search>
 </div>

@@ -125,24 +125,8 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 if ($stateParams.search === undefined) {
                     return null;
                 }
-
-                return ElementService.search($stateParams.search, ['*'], null, false, workspace, 2)
+                return ElementService.search($stateParams.search, ['*'], null, 0, 50, false, workspace, 2)
                 .then(function(data) {
-
-                    // change properties arr to 2-dim to display table
-                    data.forEach(function(elem) {
-                        if (elem.properties && elem.properties[0]) {
-                            var properties = [];
-                            for (var i = 0; i < elem.properties.length; i++) {
-                                if (i % 3 === 0) {
-                                    properties.push([]);
-                                }
-                                properties[properties.length-1].push(elem.properties[i]);
-                            }
-                            elem.properties = properties;
-                        }
-                    });
-
                     return data;
                 }, function(reason) {
                     return null;

@@ -73,9 +73,6 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
     $scope.bbApi = {};
     $scope.bbApi.init = function() {
 
-        $scope.bbApi.addButton(UxService.getButtonBarButton('print'));
-        $scope.bbApi.addButton(UxService.getButtonBarButton('tabletocsv'));
-
         if (document && document.editable && time === 'latest') {
             $scope.bbApi.addButton(UxService.getButtonBarButton('show.edits'));
             $scope.bbApi.setToggleState('show.edits', $rootScope.mms_ShowEdits);
@@ -89,6 +86,9 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
 
         $scope.bbApi.addButton(UxService.getButtonBarButton('show.comments'));
         $scope.bbApi.setToggleState('show.comments', $rootScope.veCommentsOn);
+        $scope.bbApi.addButton(UxService.getButtonBarButton('print'));
+        $scope.bbApi.addButton(UxService.getButtonBarButton('word'));
+        $scope.bbApi.addButton(UxService.getButtonBarButton('tabletocsv'));
         $scope.bbApi.addButton(UxService.getButtonBarButton('show.elements'));
         $scope.bbApi.setToggleState('show.elements', $rootScope.veElementsOn);
         hotkeys.bindTo($scope)
@@ -263,19 +263,25 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
     });
 
     $scope.$on('print', function() {
-        MmsAppUtils.popupPrintConfirm(document, $scope.ws, time, true);
+        MmsAppUtils.popupPrintConfirm(document, $scope.ws, time, true, true);
     });
-    
+    $scope.$on('word', function() {
+        MmsAppUtils.popupPrintConfirm(document, $scope.ws, time, true, false);
+    });
     $scope.$on('tabletocsv', function() {
         MmsAppUtils.tableToCsv(document, $scope.ws, time, true);
     });
 
     $scope.searchOptions= {};
-    $scope.searchOptions.callback = $scope.tscClicked;
+    $scope.searchOptions.callback = function(elem) {
+        $scope.tscClicked(elem.sysmlid);
+    };
     $scope.searchOptions.emptyDocTxt = 'This field is empty.';
-    
-    $scope.searchGoToDocument = function (siteId, documentId, viewId) {
-        $state.go('workspace.site.document.view', {site: siteId, document: documentId, view: viewId, tag: undefined, search: undefined});
+    $scope.searchOptions.searchInput = $stateParams.search;
+    $scope.searchOptions.searchResult = $scope.search;    
+
+    $scope.searchGoToDocument = function (doc, view, elem) {//siteId, documentId, viewId) {
+        $state.go('workspace.site.document.view', {site: doc.siteCharacterizationId, document: doc.sysmlid, view: view.sysmlid, tag: undefined, search: undefined});
     };
     $scope.searchOptions.relatedCallback = $scope.searchGoToDocument;
 }]);

@@ -48,24 +48,24 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
       //$scope.bbApi.addButton(UxService.getButtonBarButton("tree.filter"));
 
       if ($state.includes('workspaces') && !$state.includes('workspace.sites')) {
+        $scope.bbApi.addButton(UxService.getButtonBarButton("tree.merge"));
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree.add.task"));
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree.add.configuration"));
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree.delete"));
-        $scope.bbApi.addButton(UxService.getButtonBarButton("tree.merge"));
         $scope.bbApi.setPermission("tree.add.task", $scope.wsPerms);
         $scope.bbApi.setPermission("tree.delete", $scope.wsPerms);
         $scope.bbApi.setPermission("tree.merge", $scope.wsPerms);
       } else if ($state.includes('workspace.sites') && !$state.includes('workspace.site.document')) {
+        $scope.bbApi.addButton(UxService.getButtonBarButton("tree.showall.sites"));
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree.add.document"));
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree.delete.document"));
-        $scope.bbApi.addButton(UxService.getButtonBarButton("tree.showall.sites"));
         $scope.bbApi.setPermission("tree.add.document", config == 'latest' ? true : false);
         $scope.bbApi.setPermission("tree.delete.document", config == 'latest' ? true : false);
       } else if ($state.includes('workspace.site.document')) {
-        $scope.bbApi.addButton(UxService.getButtonBarButton("tree.add.view"));
-        $scope.bbApi.addButton(UxService.getButtonBarButton("tree.delete.view"));
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree.reorder.view"));
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree.full.document"));
+        $scope.bbApi.addButton(UxService.getButtonBarButton("tree.add.view"));
+        $scope.bbApi.addButton(UxService.getButtonBarButton("tree.delete.view"));
         $scope.bbApi.setPermission("tree.add.view", $scope.editable);
         $scope.bbApi.setPermission("tree.reorder.view", $scope.editable);
         $scope.bbApi.setPermission("tree.delete.view", $scope.editable);
@@ -495,12 +495,23 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
         var addContentsSectionTreeNode = function(operand) {
             var instances = [];
             operand.forEach(function(instanceVal) {
-                instances.push(ViewService.parseExprRefTree(instanceVal, ws, time, 0));
+                instances.push(ElementService.getElement(instanceVal.instance, false, ws, time, 0));
             });
             $q.all(instances).then(function(results) {
                 var k = results.length - 1;
                 for (; k >= 0; k--) {
                     var instance = results[k];
+                    instance.relatedDocuments = [
+                        {
+                            parentViews: [{
+                                name: viewNode.data.name,
+                                sysmlid: viewNode.data.sysmlid
+                            }],
+                            siteCharacterizationId: document.siteCharacterizationId,
+                            name: document.name,
+                            sysmlid: document.sysmlid
+                        }
+                    ];
                     if (ViewService.isSection(instance)) {
                         var sectionTreeNode = {
                             label : instance.name,
@@ -781,6 +792,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
                     } 
                 } 
                 $scope.createViewParentId = branch.data.sysmlid;
+                $scope.createViewParent = branch.data;
                 $scope.newView = {};
                 $scope.newView.name = "";
 
@@ -856,7 +868,8 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
             return;
         }
         if ($state.includes('workspace.site.document') && 
-            (branch.type !== 'view' || (branch.data.specialization && branch.data.specialization.type != 'View'))) {
+            (branch.type !== 'view' || (branch.data.specialization && 
+                branch.data.specialization.type !=='View' && branch.data.specialization.type !== 'Product'))) {
             growl.warning("Delete Error: Selected item is not a view.");
             return;
         }
@@ -959,7 +972,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
 
     // Generic add controller    
     var addItemCtrl = function($scope, $modalInstance, $filter) {
-
+        $scope.createForm = true;
         $scope.oking = false;
         var displayName = "";
 
@@ -995,31 +1008,22 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
             growl.error("Add Item of Type " + $scope.itemType + " is not supported");
             return;
         }
-        $scope.searching = false;
-        $scope.search = function(searchText) {
-            //var searchText = $scope.searchText; //TODO investigate why searchText isn't in $scope
-            //growl.info("Searching...");
-            $scope.searching = true;
 
-            ElementService.search(searchText, ['name'], null, false, ws, 2)
-            .then(function(data) {
-
-                for (var i = 0; i < data.length; i++) {
-                    if (data[i].specialization.type != 'View') {
-                        data.splice(i, 1);
-                        i--;
-                    }
+        var searchFilter = function(results) {
+            var views = [];
+            for (var i = 0; i < results.length; i++) {
+                if (results[i].specialization && 
+                        (results[i].specialization.type === 'View' || results[i].specialization.type === 'Product')) {
+                    views.push(results[i]);
+                    if (results[i].properties)
+                        delete results[i].properties;
                 }
-
-                $scope.mmsCfElements = data;
-                $scope.searching = false;
-            }, function(reason) {
-                growl.error("Search Error: " + reason.message);
-                $scope.searching = false;
-            });
+            }
+            return views;
         };
-
-        $scope.addView = function(viewId) {
+       
+        $scope.addView = function(elem) {
+            var viewId = elem.sysmlid;
             var documentId = $scope.document.sysmlid;
             var workspace = ws;
 
@@ -1054,6 +1058,11 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
             });             
         };
 
+        $scope.searchOptions = {};
+        $scope.searchOptions.callback = $scope.addView;
+        $scope.searchOptions.itemsPerPage = 200;
+        $scope.searchOptions.filterCallback = searchFilter;
+
         $scope.ok = function() {
             if ($scope.oking) {
                 growl.info("Please wait...");
@@ -1081,7 +1090,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
                 promise = ViewService.createDocument($scope.doc.name, $scope.addDocSite, ws);
             }
             else if ($scope.itemType === 'View') {
-                promise = ViewService.createView($scope.createViewParentId, $scope.newView.name, 
+                promise = ViewService.createView($scope.createViewParent, $scope.newView.name, 
                                                  $scope.document.sysmlid, ws);
             }
             else {

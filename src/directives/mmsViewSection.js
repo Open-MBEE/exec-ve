@@ -83,7 +83,7 @@ function mmsViewSection($compile, $templateCache, $rootScope, ElementService, Vi
             scope.presentationElem = mmsViewPresentationElemCtrl.getPresentationElement();
             scope.view = mmsViewCtrl.getView();
             scope.isDirectChildOfPresentationElement = Utils.isDirectChildOfPresentationElementFunc(element, mmsViewCtrl);
-            if (scope.instanceSpec.specialization.classifier[0] === ViewService.typeToClassifierId.Section)
+            if (scope.instanceSpec.specialization.classifier[0] === ViewService.TYPE_TO_CLASSIFIER_ID.Section)
                 scope.isDirectChildOfPresentationElement = false;
             var type = "name";
 
