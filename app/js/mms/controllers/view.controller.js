@@ -393,7 +393,8 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         $scope.tscClicked(elem.sysmlid);
     };
     $scope.searchOptions.emptyDocTxt = 'This field is empty.';
-
+    $scope.searchOptions.searchInput = $stateParams.search;
+    $scope.searchOptions.searchResult = $scope.search;
     $scope.elementTranscluded = function(element, type) {
         if (type === 'Comment' && !$scope.comments.hasOwnProperty(element.sysmlid)) {
             $scope.comments[element.sysmlid] = element;

@@ -1,24 +1,25 @@
 
 <div class="modal-body transclude-modal">
     <div class="transclude-modal-input">
-        <!--<form ng-submit="search(searchText)">
+        <form ng-submit="search(searchText, 0, itemsPerPage)">
             <div class="form-search input-group">
                 <input class="form-control" type="text" ng-model="searchText" placeholder="Search for an element" />
                 <span class="input-group-btn">                
-                    <button class="btn btn-primary" type="button" ng-click="search(searchText)">
+                    <button class="btn btn-primary" type="button" ng-click="search(searchText, 0, itemsPerPage)">
                     <span class="btn-text">SEARCH</span> <i class="{{searchClass}}"></i></button>
                 </span>
             </div>
             <div class="container-search-type">
                 <div class="btn-group btn-group-xs">
-                    <button ng-click="setSearchType('name')" type="button" class="btn-search-name btn-search-type btn btn-default active">NAME</button>
+                    <button ng-click="setSearchType('all')" type="button" class="btn-search-all btn-search-type btn btn-default active">ALL</button>
+                    <button ng-click="setSearchType('name')" type="button" class="btn-search-name btn-search-type btn btn-default">NAME</button>
                     <button ng-click="setSearchType('documentation')" type="button" class="btn-search-documentation btn btn-search-type btn-default">DOCUMENTATION</button>
                     <button ng-click="setSearchType('value')" type="button" class="btn-search-value btn-search-type btn btn-default">VALUE</button>
                     <button ng-click="setSearchType('id')" type="button" class="btn-search-id btn-search-type btn btn-default">MDID</button>
                 </div>
             </div>
-        </form>-->
-        <div class="misc-form-field" ng-show="search">
+        </form>
+        <div class="misc-form-field" ng-show="searchResults">
             <div class="form-filter">
                 <input class="form-control" type="text" ng-model="filterQuery.query" ng-model-options="{debounce: 1000}" placeholder="Filter results" />
             </div>
@@ -31,12 +32,15 @@
 	                <button ng-click="setFilterFacet('sysmlid')" type="button" class="btn-filter-facet-sysmlid btn-search-type btn btn-default">MDID</button>
 	            </div>
             </div>
-            <div>Showing {{filteredElms.length}} of {{search.length}} search results.</div>
+            <div>Showing {{filteredElms.length}} <!--of {{searchResults.length}} -->search results. (Page {{currentPage + 1}})</div>
         </div>
     </div>
-
-    <div class="container-fluid" ng-show="search.length > 0">
-        <div class="elem-wrapper" ng-repeat="elem in filteredElms = (search | filter: searchFilter)">
+    <div class="container-fluid">
+        <a ng-show="currentPage > 0" ng-click="prev()">&lt; Prev</a>
+        <a ng-show="searchResults.length > 0" class="pull-right" ng-click="next()">Next ></a>
+    </div>
+    <div class="container-fluid" ng-show="searchResults.length > 0">
+        <div class="elem-wrapper" ng-repeat="elem in filteredElms = (searchResults | filter: resultFilter)">
             <hr>
             <div class="elem-name-wrapper">
                 <a class="elem-name" ng-click="userResultClick(elem, 'name')">{{elem.name}}</a>
@@ -53,7 +57,7 @@
                     <a ng-show="elem.documentation" ng-bind-html="elem.documentation | limitTo:300" ng-click="userResultClick(elem, 'doc')"></a><span class="ellipses">{{elem.documentation.length > 300 ? ' ...' : ''}}</span>
                     <span><a ng-show="!elem.documentation" ng-click="userResultClick(elem, 'doc')">
                       {{emptyDocTxt}}
-                      <!--This field is empty, but you can still click here to cross-reference a placeholder.--></a></span>
+                      </a></span>
                 </div>
             </div>
             <div class="elem-type-wrapper">
@@ -109,10 +113,14 @@
                 </div>
             </div>
         </div>
+        <hr/>
     </div>
     
-    <div class="container-no-results container-fluid" ng-show="search.length === 0 && searchSuccess">
+    <div class="container-no-results container-fluid" ng-show="searchResults.length === 0">
         <h3>NO RESULTS FOUND.</h3>
     </div>
-
+    <div class="container-fluid">
+        <a ng-show="currentPage > 0" ng-click="prev()">&lt; Prev</a>
+        <a ng-show="searchResults.length > 0" class="pull-right" ng-click="next()">Next ></a>
+    </div>
 </div>

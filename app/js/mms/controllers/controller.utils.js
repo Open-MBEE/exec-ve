@@ -18,55 +18,40 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
         $scope.newItem = {};
         $scope.newItem.name = "";
 
-        $scope.searching = false;
-
         // Search for InstanceSpecs.  We are searching for InstanceSpecs b/c we only want to
         // create a InstanceValue to point to that InstanceSpec when cross-referencing.
-        $scope.search = function(searchText) {
-            //var searchText = $scope.searchText; //TODO investigate why searchText isn't in $scope
-            //growl.info("Searching...");
-            $scope.searching = true;
-
-            ElementService.search(searchText, ['name'], null, false, $scope.ws, 2)
-            .then(function(data) {
-                var validClassifierIds = [];
-                if ($scope.presentationElemType === 'Table') {
-                    //validClassifierIds.push(ViewService.typeToClassifierId.Table);
-                    validClassifierIds.push(ViewService.TYPE_TO_CLASSIFIER_ID.TableT);
-                } else if ($scope.presentationElemType === 'List') {
-                    //validClassifierIds.push(ViewService.typeToClassifierId.List);
-                    validClassifierIds.push(ViewService.TYPE_TO_CLASSIFIER_ID.ListT);
-                } else if ($scope.presentationElemType === 'Figure') {
-                    //validClassifierIds.push(ViewService.typeToClassifierId.Image);
-                    validClassifierIds.push(ViewService.TYPE_TO_CLASSIFIER_ID.Figure);
-                } else if ($scope.presentationElemType === 'Paragraph') {
-                    //validClassifierIds.push(ViewService.typeToClassifierId.Paragraph);
-                    validClassifierIds.push(ViewService.TYPE_TO_CLASSIFIER_ID.ParagraphT);
-                } else if ($scope.presentationElemType === 'Section') {
-                    validClassifierIds.push(ViewService.TYPE_TO_CLASSIFIER_ID.SectionT);
+        $scope.searchFilter = function(data) {
+            var validClassifierIds = [];
+            if ($scope.presentationElemType === 'Table') {
+                validClassifierIds.push(ViewService.TYPE_TO_CLASSIFIER_ID.TableT);
+            } else if ($scope.presentationElemType === 'List') {
+                validClassifierIds.push(ViewService.TYPE_TO_CLASSIFIER_ID.ListT);
+            } else if ($scope.presentationElemType === 'Figure') {
+                validClassifierIds.push(ViewService.TYPE_TO_CLASSIFIER_ID.Figure);
+            } else if ($scope.presentationElemType === 'Paragraph') {
+                validClassifierIds.push(ViewService.TYPE_TO_CLASSIFIER_ID.ParagraphT);
+            } else if ($scope.presentationElemType === 'Section') {
+                validClassifierIds.push(ViewService.TYPE_TO_CLASSIFIER_ID.SectionT);
+            } else {
+                validClassifierIds.push(ViewService.TYPE_TO_CLASSIFIER_ID[$scope.presentationElemType]);
+            }
+            // Filter out anything that is not a InstanceSpecification or not of the correct type:
+            for (var i = 0; i < data.length; i++) {
+                if (data[i].specialization.type != 'InstanceSpecification') {
+                    data.splice(i, 1);
+                    i--;
+                }
+                else if (validClassifierIds.indexOf(data[i].specialization.classifier[0]) < 0) {
+                    data.splice(i, 1);
+                    i--;
                 } else {
-                    validClassifierIds.push(ViewService.TYPE_TO_CLASSIFIER_ID[$scope.presentationElemType]);
+                    if (data[i].properties)
+                        delete data[i].properties;
                 }
-                // Filter out anything that is not a InstanceSpecification or not of the correct type:
-                for (var i = 0; i < data.length; i++) {
-                    if (data[i].specialization.type != 'InstanceSpecification') {
-                        data.splice(i, 1);
-                        i--;
-                    }
-                    else if (validClassifierIds.indexOf(data[i].specialization.classifier[0]) < 0) {
-                        data.splice(i, 1);
-                        i--;
-                    }
-                }
-
-                $scope.mmsCfElements = data;
-                $scope.searching = false;
-            }, function(reason) {
-                growl.error("Search Error: " + reason.message);
-                $scope.searching = false;
-            });
+            }
+            return data;
         };
-
+        
         // Adds a InstanceValue to the view given the sysmlid of the InstanceSpecification
         $scope.addElement = function(element) {
 
@@ -95,6 +80,11 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
             });            
         };
 
+        $scope.searchOptions= {};
+        $scope.searchOptions.callback = $scope.addElement;
+        $scope.searchOptions.filterCallback = $scope.searchFilter;
+        $scope.searchOptions.itemsPerPage = 200;
+        
         $scope.ok = function() {
             if ($scope.oking) {
                 growl.info("Please wait...");
@@ -153,20 +143,21 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
         });
 
         function realAddElement() {
-        $scope.viewOrSection = viewOrSection;
-        $scope.presentationElemType = type;
-        $scope.newItem = {};
-        $scope.newItem.name = "";
-        var templateUrlStr = 'partials/mms/add-item.html';
+          $scope.createForm = true;
+          $scope.viewOrSection = viewOrSection;
+          $scope.presentationElemType = type;
+          $scope.newItem = {};
+          $scope.newItem.name = "";
+          var templateUrlStr = 'partials/mms/add-item.html';
 
-        var instance = $modal.open({
-            templateUrl: templateUrlStr,
-            scope: $scope,
-            controller: ['$scope', '$modalInstance', '$filter', addElementCtrl]
-        });
-        instance.result.then(function(data) {
-            // TODO: do anything here?
-        });
+          var instance = $modal.open({
+              templateUrl: templateUrlStr,
+              scope: $scope,
+              controller: ['$scope', '$modalInstance', '$filter', addElementCtrl]
+          });
+          instance.result.then(function(data) {
+              // TODO: do anything here?
+          });
         }
     };
 

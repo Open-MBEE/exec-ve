@@ -630,6 +630,8 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
      * @param {Array.<string>} [filters=null] An array of string of what to search in,
      *                                        can be name, documentation, id, value
      * @param {string} [propertyName=null] if filter is value, propertyName is used to further filter
+     * @param {integer} [page=null] page
+     * @param {integer} [items=null] items per page
      * @param {boolean} [update=false] Whether to update from server
      * @param {string} [workspace=master] (optional) workspace to use
      * @returns {Promise} The promise will be resolved with an array of element objects.
@@ -638,11 +640,11 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
      *                  but elements in the properties array will be stored in the cache
      *                  The element results returned will be a clone of the original server response and not cache references
      */
-    var search = function(query, filters, propertyName, update, workspace, weight) {
+    var search = function(query, filters, propertyName, page, items, update, workspace, weight) {
         //var n = normalize(null, update, workspace, null);
         //return getGenericElements(URLService.getElementSearchURL(query, n.ws), 'elements', n.update, n.ws, n.ver);
         var n = normalize(null, update, workspace, null);
-        var url = URLService.getElementSearchURL(query, filters, propertyName, n.ws);
+        var url = URLService.getElementSearchURL(query, filters, propertyName, page, items, n.ws);
         var progress = 'search(' + url + n.update + n.ws + ')';
         if (inProgress.hasOwnProperty(progress)) {
             HttpService.ping(url, weight);

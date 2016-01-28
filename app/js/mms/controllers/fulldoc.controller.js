@@ -278,7 +278,9 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
         $scope.tscClicked(elem.sysmlid);
     };
     $scope.searchOptions.emptyDocTxt = 'This field is empty.';
-    
+    $scope.searchOptions.searchInput = $stateParams.search;
+    $scope.searchOptions.searchResult = $scope.search;    
+
     $scope.searchGoToDocument = function (doc, view, elem) {//siteId, documentId, viewId) {
         $state.go('workspace.site.document.view', {site: doc.siteCharacterizationId, document: doc.sysmlid, view: view.sysmlid, tag: undefined, search: undefined});
     };
