@@ -14,11 +14,11 @@ function tmsTimely($http, $q, $window) {
         }
         if (attrs.height) {
             scope.height = attrs.height;
-            scope.chart.setHeight(attrs.height);
+            scope.chart.setHeight(parseInt(attrs.height));
         }
         if (attrs.width) {
             scope.width = attrs.width;
-            scope.chart.setWidth(attrs.width);
+            scope.chart.setWidth(parseInt(attrs.width));
         }
         scope.$on('$destroy', function() {
 
@@ -55,8 +55,8 @@ function tmsTimely($http, $q, $window) {
             if (js.slice(-6) == '// ]]>' && js.slice(0, 12) == '// <![CDATA[') {
                 js = js.slice(12, -6);
             }
-            angular.element('head').append('<script> function __timely() {return {' + js + '};} </script>');
-            spec = __timely();
+            //angular.element('head').append('<script> function __timely() {return {' + js + '};} </script>');
+            spec = eval('(' + js + ')');
             //spec = eval(js);
             if (angular.isObject(spec.data)) {
                 var promises = [];
