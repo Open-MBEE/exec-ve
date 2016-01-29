@@ -125,7 +125,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 if ($stateParams.search === undefined) {
                     return null;
                 }
-                return ElementService.search($stateParams.search, ['*'], null, false, workspace, 2)
+                return ElementService.search($stateParams.search, ['*'], null, 0, 50, false, workspace, 2)
                 .then(function(data) {
                     return data;
                 }, function(reason) {

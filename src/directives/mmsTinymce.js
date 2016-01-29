@@ -49,59 +49,32 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
             var autocompleteName;
             var autocompleteProperty;
             var autocompleteElementId;
-          if (autocomplete) {
-            $scope.cacheElements = CacheService.getLatestElements(scope.mmsWs);
-            $scope.autocompleteItems = [];
-            $scope.cacheElements.forEach(function(cacheElement) {
-                //JSON.stringify(sampleObject);
-                //console.log("=====THIS IS THE CACHE ===="+ JSON.stringify(cacheElement));
-                $scope.autocompleteItems.push({ 'sysmlid' : cacheElement.sysmlid, 'name' : cacheElement.name + ' - name' });
-                $scope.autocompleteItems.push({ 'sysmlid' : cacheElement.sysmlid, 'name' : cacheElement.name + ' - documentation' });
+            if (autocomplete) {
+              $scope.cacheElements = CacheService.getLatestElements(scope.mmsWs);
+              $scope.autocompleteItems = [];
+              $scope.cacheElements.forEach(function(cacheElement) {
+                  //JSON.stringify(sampleObject);
+                  //console.log("=====THIS IS THE CACHE ===="+ JSON.stringify(cacheElement));
+                  $scope.autocompleteItems.push({ 'sysmlid' : cacheElement.sysmlid, 'name' : cacheElement.name + ' - name' });
+                  $scope.autocompleteItems.push({ 'sysmlid' : cacheElement.sysmlid, 'name' : cacheElement.name + ' - documentation' });
 
-                if (cacheElement.specialization && cacheElement.specialization.type === 'Property') {
-                    $scope.autocompleteItems.push({ 'sysmlid' : cacheElement.sysmlid, 'name' : cacheElement.name + ' - value' });
-                }
-            });
-          }
+                  if (cacheElement.specialization && cacheElement.specialization.type === 'Property') {
+                      $scope.autocompleteItems.push({ 'sysmlid' : cacheElement.sysmlid, 'name' : cacheElement.name + ' - value' });
+                  }
+              });
+            }
             $scope.title = 'INSERT A CROSS REFERENCE';
-            $scope.description = 'Being by searching for an element, then click a field to cross-reference.';
-            $scope.searchClass = "";
-            $scope.proposeClass = "";
-            $scope.filter = '';
-            $scope.searchText = '';
+            $scope.description = 'Begin by searching for an element, then click a field to cross-reference.';
             $scope.newE = {name: '', documentation: ''};
-            $scope.searchSuccess = false;
             $scope.requestName = false;
             $scope.requestDocumentation = false;
-            $scope.searchType = 'name';
             $scope.showProposeLink = true;
-            $scope.setSearchType = function(searchType) {
-                $scope.searchType = searchType;
-                angular.element('.btn-search-name').removeClass('active');
-                angular.element('.btn-search-documentation').removeClass('active');
-                angular.element('.btn-search-value').removeClass('active');
-                angular.element('.btn-search-id').removeClass('active');
-                angular.element('.btn-search-' + searchType).addClass('active');
-            };
             $scope.choose = function(elem, property) {
                 var tag = '<mms-transclude-' + property + ' data-mms-eid="' + elem.sysmlid + '">[cf:' + elem.name + '.' + property + ']</mms-transclude-' + property + '> ';
                 $modalInstance.close(tag);
             };
             $scope.cancel = function() {
                 $modalInstance.dismiss();
-            };
-            $scope.search = function(searchText) {
-                // var searchText = $scope.searchText; //TODO investigate why searchText isn't in $scope
-                $scope.searchClass = "fa fa-spin fa-spinner";
-                ElementService.search(searchText, [$scope.searchType], null, false, scope.mmsWs)
-                .then(function(data) {
-                    $scope.searchSuccess = true;
-                    $scope.searchClass = "";
-                    $scope.searchResults = data;
-                }, function(reason) {
-                    growl.error("Search Error: " + reason.message);
-                    $scope.searchClass = "";
-                });
             };
             $scope.openProposeModal = function() {
                 $modalInstance.close(false);
@@ -245,11 +218,6 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
         };
 
         var transcludeViewLinkCtrl = function($scope, $modalInstance) {
-            $scope.searchClass = "";
-            $scope.proposeClass = "";
-            $scope.filter = '';
-            $scope.searchText = '';
-            $scope.searchType = 'name';
             $scope.title = 'INSERT VIEW LINK';
             $scope.description = 'Search for a view or content element, click on its name to insert link.';
             $scope.choose = function(elem) {
@@ -299,39 +267,23 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
             $scope.cancel = function() {
                 $modalInstance.dismiss();
             };
-            $scope.setSearchType = function(searchType) {
-                $scope.searchType = searchType;
-                angular.element('.btn-search-name').removeClass('active');
-                angular.element('.btn-search-documentation').removeClass('active');
-                angular.element('.btn-search-value').removeClass('active');
-                angular.element('.btn-search-id').removeClass('active');
-                angular.element('.btn-search-' + searchType).addClass('active');
-            };
-            $scope.search = function(searchText) {
-                //var searchText = $scope.searchText; //TODO investigate why searchText isn't in $scope
-                //growl.info("Searching...");
-                $scope.searchClass = "fa fa-spin fa-spinner";
-                ElementService.search(searchText, [$scope.searchType], null, false, scope.mmsWs)
-                .then(function(data) {
-                    var views = [];
-                    data.forEach(function(v) {
-                        if (v.specialization && (v.specialization.type === 'View' || v.specialization.type === 'Product' || 
-                                (ViewService.isPresentationElement(v) && v.relatedDocuments))) {
-                            if (v.properties)
-                                delete v.properties;
-                            views.push(v);
-                        }
-                    });
-                    $scope.searchResults = views;
-                    $scope.searchClass = "";
-                }, function(reason) {
-                    growl.error("Search Error: " + reason.message);
-                    $scope.searchClass = "";
+            $scope.mainSearchFilter = function(data) {
+                var views = [];
+                data.forEach(function(v) {
+                    if (v.specialization && (v.specialization.type === 'View' || v.specialization.type === 'Product' || 
+                            (ViewService.isPresentationElement(v) && v.relatedDocuments))) {
+                        if (v.properties)
+                            delete v.properties;
+                        views.push(v);
+                    }
                 });
+                return views;
             };
             $scope.searchOptions= {};
             $scope.searchOptions.callback = $scope.choose;
             $scope.searchOptions.relatedCallback = $scope.chooseDoc;
+            $scope.searchOptions.filterCallback = $scope.mainSearchFilter;
+            $scope.searchOptions.itemsPerPage = 200;
         };
 
         var viewLinkCallback = function(ed) {
@@ -467,8 +419,9 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
         var tableToolbar = ' table ';
         var listToolbar = ' bullist numlist outdent indent ';
         var codeToolbar = ' code ';
+        var imageToolbar = ' image media ';
         var customToolbar = ' transclude comment vlink normalize';
-        var allToolbar = defaultToolbar + ' | ' + listToolbar + ' | ' + tableToolbar + ' | ' + codeToolbar + ' | ' + customToolbar;
+        var allToolbar = defaultToolbar + ' | ' + listToolbar + ' | ' + tableToolbar + ' | ' + imageToolbar + ' | ' + codeToolbar + ' | ' + customToolbar;
         var thisToolbar = allToolbar;
         if (scope.mmsTinymceType === 'Equation')
             thisToolbar = codeToolbar;
