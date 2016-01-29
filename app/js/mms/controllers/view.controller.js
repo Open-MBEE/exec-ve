@@ -391,6 +391,8 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     $scope.searchOptions= {};
     $scope.searchOptions.callback = function(elem) {
         $scope.tscClicked(elem.sysmlid);
+        if ($rootScope.mms_togglePane && $rootScope.mms_togglePane.closed)
+            $rootScope.mms_togglePane.toggle();
     };
     $scope.searchOptions.emptyDocTxt = 'This field is empty.';
     $scope.searchOptions.searchInput = $stateParams.search;
