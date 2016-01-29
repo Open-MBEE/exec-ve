@@ -725,7 +725,10 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
 
                 if (itemType === 'View') {
                     viewId2node[data.sysmlid] = newbranch;
-                    $state.go('workspace.site.document.view', {view: data.sysmlid, search: undefined});
+                    if (!$rootScope.mms_fullDocMode)
+                        $state.go('workspace.site.document.view', {view: data.sysmlid, search: undefined});
+                    else
+                        $state.go('.', {search: undefined}, {reload: true});
                 }
 
             });
