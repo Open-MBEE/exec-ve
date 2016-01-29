@@ -8,24 +8,7 @@
 
 </div>
 
-<div class="modal-body transclude-modal">
-
-    <div class="transclude-modal-input">
-
-        <form ng-submit="search(searchText)">
-            <div class="form-search input-group">
-                <input class="form-control" type="text" ng-model="searchText" placeholder="Search for a view" />
-                <span class="input-group-btn">                
-                    <button class="btn btn-primary" type="button" ng-click="search(searchText)">
-                    <span class="btn-text">GO</span> <i class="{{searchClass}}"></i></button>
-                </span>
-            </div>
-        </form>
-        
-
-    </div>
-    <mms-search-results mms-options="searchOptions" search="mmsCfViewElements"></mms-search-results>
-</div>
+ <mms-search mms-options="searchOptions" search="mmsCfViewElements"></mms-search>
 
 <div class="modal-footer">
     <button class="btn btn-danger" ng-click="cancel()">CANCEL</button>

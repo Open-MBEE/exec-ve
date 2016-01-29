@@ -61,11 +61,6 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     $scope.buttons = [];
 
     $scope.bbApi.init = function() {
-        if ($state.includes('workspace.site.document')) {
-            $scope.bbApi.addButton(UxService.getButtonBarButton('print'));
-            $scope.bbApi.addButton(UxService.getButtonBarButton('word'));
-            $scope.bbApi.addButton(UxService.getButtonBarButton('tabletocsv'));
-        }
         if (view && view.editable && time === 'latest') {
             $scope.bbApi.addButton(UxService.getButtonBarButton('show.edits'));
             $scope.bbApi.setToggleState('show.edits', $rootScope.mms_ShowEdits);
@@ -75,6 +70,10 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
                 description: 'toggle edit mode',
                 callback: function() {$scope.$broadcast('show.edits');}
             });
+        }
+        $scope.bbApi.addButton(UxService.getButtonBarButton('show.comments'));
+        $scope.bbApi.setToggleState('show.comments', $rootScope.veCommentsOn);
+        if (view && view.editable && time === 'latest') {
             if ($scope.view.specialization.contents || $scope.view.specialization.type === 'InstanceSpecification') {
                 $scope.bbApi.addButton(UxService.getButtonBarButton('view.add.dropdown'));
             } else {
@@ -94,8 +93,11 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
                 $scope.bbApi.addButton(fakeDropdown);
             }
         }
-        $scope.bbApi.addButton(UxService.getButtonBarButton('show.comments'));
-        $scope.bbApi.setToggleState('show.comments', $rootScope.veCommentsOn);
+        if ($state.includes('workspace.site.document')) {
+            $scope.bbApi.addButton(UxService.getButtonBarButton('print'));
+            $scope.bbApi.addButton(UxService.getButtonBarButton('word'));
+            $scope.bbApi.addButton(UxService.getButtonBarButton('tabletocsv'));
+        }
         $scope.bbApi.addButton(UxService.getButtonBarButton('show.elements'));
         $scope.bbApi.setToggleState('show.elements', $rootScope.veElementsOn);
         hotkeys.bindTo($scope)
@@ -397,9 +399,12 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     $scope.searchOptions= {};
     $scope.searchOptions.callback = function(elem) {
         $scope.tscClicked(elem.sysmlid);
+        if ($rootScope.mms_togglePane && $rootScope.mms_togglePane.closed)
+            $rootScope.mms_togglePane.toggle();
     };
     $scope.searchOptions.emptyDocTxt = 'This field is empty.';
-
+    $scope.searchOptions.searchInput = $stateParams.search;
+    $scope.searchOptions.searchResult = $scope.search;
     $scope.elementTranscluded = function(element, type) {
         if (type === 'Comment' && !$scope.comments.hasOwnProperty(element.sysmlid)) {
             $scope.comments[element.sysmlid] = element;

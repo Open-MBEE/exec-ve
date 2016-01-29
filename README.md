@@ -29,7 +29,27 @@ If you see some error after updating, try cleaning out the bower_components and 
 If you're sure everything is right, try running _bower cache clean_
 
 ## Testing
-_grunt karma_ - Runs our current service unit tests under /test/unit/ServiceSpecs
+Run:
+
+        npm install -g protractor
+        webdriver-manager update
+        
+To execute Karma tests manually use
+
+        ./node_modules/karma/bin/karma start config/develop/karma.develop.conf.js
+
+To avoid typing ./node_modules/karma/bin/karma everytime, install karma-cli globally, then karma should automatically use local karma
+
+        npm install -g karma-cli
+        karma start config/develop/karma.develop.conf.js
+        
+To execute Protractor tests
+
+        protractor config/develop/protractor.develop.conf.js
+        
+For Karma - place new tests within test/develop/unit/DirectiveSpecs or test/develop/unit/ServiceSpecs
+
+For Protractor - place new tests within test/develop/e2e
 
 ## Generating Docs
 * _grunt ngdocs_ - this would generate html docs based on code comments written in ngdocs style into docs/. The generated files need to be served through a webserver to work.

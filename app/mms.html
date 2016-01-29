@@ -50,6 +50,15 @@
   <!-- bower:js -->
   <!-- endbower -->
 
+  <!-- fix conflict with timely's use of underscore library -->
+  <script type="text/javascript">
+  //<![CDATA[
+    window.lodash = _.noConflict();
+    window.utc = d3.time.format.utc('%Y-%jT%H:%M:%S.%L').parse
+  //]]>
+  </script> 
+  <script src="lib/underscore-min.js"></script>
+
   <!-- GoJS and TinyMCE-->
   <script src="lib/gojs/go.js"></script>
   <script src="lib/jquery.isonscreen.js"></script>
