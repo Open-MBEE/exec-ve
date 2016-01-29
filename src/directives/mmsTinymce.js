@@ -419,8 +419,9 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
         var tableToolbar = ' table ';
         var listToolbar = ' bullist numlist outdent indent ';
         var codeToolbar = ' code ';
+        var imageToolbar = ' image media ';
         var customToolbar = ' transclude comment vlink normalize';
-        var allToolbar = defaultToolbar + ' | ' + listToolbar + ' | ' + tableToolbar + ' | ' + codeToolbar + ' | ' + customToolbar;
+        var allToolbar = defaultToolbar + ' | ' + listToolbar + ' | ' + tableToolbar + ' | ' + imageToolbar + ' | ' + codeToolbar + ' | ' + customToolbar;
         var thisToolbar = allToolbar;
         if (scope.mmsTinymceType === 'Equation')
             thisToolbar = codeToolbar;

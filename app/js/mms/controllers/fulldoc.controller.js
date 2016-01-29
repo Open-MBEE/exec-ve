@@ -73,10 +73,6 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
     $scope.bbApi = {};
     $scope.bbApi.init = function() {
 
-        $scope.bbApi.addButton(UxService.getButtonBarButton('print'));
-        $scope.bbApi.addButton(UxService.getButtonBarButton('word'));
-        $scope.bbApi.addButton(UxService.getButtonBarButton('tabletocsv'));
-
         if (document && document.editable && time === 'latest') {
             $scope.bbApi.addButton(UxService.getButtonBarButton('show.edits'));
             $scope.bbApi.setToggleState('show.edits', $rootScope.mms_ShowEdits);
@@ -90,6 +86,9 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
 
         $scope.bbApi.addButton(UxService.getButtonBarButton('show.comments'));
         $scope.bbApi.setToggleState('show.comments', $rootScope.veCommentsOn);
+        $scope.bbApi.addButton(UxService.getButtonBarButton('print'));
+        $scope.bbApi.addButton(UxService.getButtonBarButton('word'));
+        $scope.bbApi.addButton(UxService.getButtonBarButton('tabletocsv'));
         $scope.bbApi.addButton(UxService.getButtonBarButton('show.elements'));
         $scope.bbApi.setToggleState('show.elements', $rootScope.veElementsOn);
         hotkeys.bindTo($scope)

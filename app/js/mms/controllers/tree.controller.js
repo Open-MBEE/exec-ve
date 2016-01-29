@@ -48,24 +48,24 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
       //$scope.bbApi.addButton(UxService.getButtonBarButton("tree.filter"));
 
       if ($state.includes('workspaces') && !$state.includes('workspace.sites')) {
+        $scope.bbApi.addButton(UxService.getButtonBarButton("tree.merge"));
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree.add.task"));
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree.add.configuration"));
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree.delete"));
-        $scope.bbApi.addButton(UxService.getButtonBarButton("tree.merge"));
         $scope.bbApi.setPermission("tree.add.task", $scope.wsPerms);
         $scope.bbApi.setPermission("tree.delete", $scope.wsPerms);
         $scope.bbApi.setPermission("tree.merge", $scope.wsPerms);
       } else if ($state.includes('workspace.sites') && !$state.includes('workspace.site.document')) {
+        $scope.bbApi.addButton(UxService.getButtonBarButton("tree.showall.sites"));
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree.add.document"));
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree.delete.document"));
-        $scope.bbApi.addButton(UxService.getButtonBarButton("tree.showall.sites"));
         $scope.bbApi.setPermission("tree.add.document", config == 'latest' ? true : false);
         $scope.bbApi.setPermission("tree.delete.document", config == 'latest' ? true : false);
       } else if ($state.includes('workspace.site.document')) {
-        $scope.bbApi.addButton(UxService.getButtonBarButton("tree.add.view"));
-        $scope.bbApi.addButton(UxService.getButtonBarButton("tree.delete.view"));
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree.reorder.view"));
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree.full.document"));
+        $scope.bbApi.addButton(UxService.getButtonBarButton("tree.add.view"));
+        $scope.bbApi.addButton(UxService.getButtonBarButton("tree.delete.view"));
         $scope.bbApi.setPermission("tree.add.view", $scope.editable);
         $scope.bbApi.setPermission("tree.reorder.view", $scope.editable);
         $scope.bbApi.setPermission("tree.delete.view", $scope.editable);
@@ -725,7 +725,10 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
 
                 if (itemType === 'View') {
                     viewId2node[data.sysmlid] = newbranch;
-                    $state.go('workspace.site.document.view', {view: data.sysmlid, search: undefined});
+                    if (!$rootScope.mms_fullDocMode)
+                        $state.go('workspace.site.document.view', {view: data.sysmlid, search: undefined});
+                    else
+                        $state.go('.', {search: undefined}, {reload: true});
                 }
 
             });

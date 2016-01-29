@@ -20,16 +20,14 @@ angular.module('mmsApp').controller('ToolbarCtrl', ['$scope', '$rootScope', '$st
 	$scope.tbApi.init = function()
 	{
 		$scope.tbApi.addButton(UxService.getToolbarButton("element.viewer"));
-		$scope.tbApi.addButton(UxService.getToolbarButton("element.history"));
 		$scope.tbApi.addButton(UxService.getToolbarButton("element.editor"));
 		if ($rootScope.veEdits && Object.keys($rootScope.veEdits).length > 0)
 		{
 			$scope.tbApi.setIcon('element.editor', 'fa-edit-asterisk');
 			$scope.tbApi.setPermission('element.editor.saveall', true);
 		}
-
 		var editable = false;
-		
+		$scope.tbApi.addButton(UxService.getToolbarButton("element.history"));
 		if ($state.includes('workspace.diff'))
 		{
 			$scope.tbApi.addButton(UxService.getToolbarButton("diff.perspective.detail"));
@@ -50,8 +48,8 @@ angular.module('mmsApp').controller('ToolbarCtrl', ['$scope', '$rootScope', '$st
 		else if ($state.includes('workspace.site.document'))
 		{
 			editable = document.editable && time === 'latest';
-			$scope.tbApi.addButton(UxService.getToolbarButton("view.reorder"));
 			$scope.tbApi.addButton(UxService.getToolbarButton("document.snapshot"));
+			$scope.tbApi.addButton(UxService.getToolbarButton("view.reorder"));
 			$scope.tbApi.setPermission('element.editor', editable);
 			// $scope.tbApi.setPermission('document.snapshot.refresh',editable);
 			$scope.tbApi.setPermission('document.snapshot.create', editable);
