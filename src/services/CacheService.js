@@ -89,9 +89,10 @@ function CacheService(_) {
                     return a; //handle contains and contents updates manually at higher level
                 if (id === 'string')
                     return b;
-                if (angular.isArray(a) && angular.isArray(b) && b.length < a.length) {
+                if (angular.isArray(a) && angular.isArray(b) && b.length < a.length)
                     return b; 
-                }
+                if (id === 'displayedElements' && b)
+                    return b;
                 return undefined;
             });
         }
