@@ -46,10 +46,12 @@ function UtilsService(CacheService, _) {
                 //delete elem.specialization.allowedElements;
                 if (elem.specialization.contents && elem.specialization.contains)
                     delete elem.specialization.contains;
-                if (elem.specialization.displayedElements) {
+                if (Array.isArray(elem.specialization.displayedElements)) {
                     elem.specialization.numElements = elem.specialization.displayedElements.length;
                     if (elem.specialization.numElements <= 5000)
                         delete elem.specialization.displayedElements;
+                    else
+                        elem.specialization.displayedElements = JSON.stringify(elem.specialization.displayedElements);
                 }
                 if (elem.specialization.allowedElements)
                     delete elem.specialization.allowedElements;

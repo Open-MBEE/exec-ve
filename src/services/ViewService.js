@@ -346,7 +346,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @param {string} [version=latest] (optional) alfresco version number or timestamp
      * @returns {Promise} The promise will be resolved with array of element objects. 
      */
-    var getViewElements = function(id, update, workspace, version, weight, eids) {
+    var getViewElements = function(id, update, workspace, version, weight, eidss) {
         var n = normalize(update, workspace, version);
         var deferred = $q.defer();
         var url = URLService.getViewElementsURL(id, n.ws, n.ver);
@@ -354,7 +354,13 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         if (CacheService.exists(cacheKey) && !n.update) 
             deferred.resolve(CacheService.get(cacheKey));
         else {
-            if (!eids || eids.length <= 5000 || n.ver !== 'latest') {
+            var key = id + n.ws + n.ver;
+            if (inProgress.hasOwnProperty(key))
+                return inProgress[key];
+            var eids = [];
+            if (eidss)
+                eids = JSON.parse(eidss);
+            if (!eidss || eids.length <= 5000 || n.ver !== 'latest') {
                 ElementService.getGenericElements(url, 'elements', n.update, n.ws, n.ver, weight).
                 then(function(data) {
                     deferred.resolve(CacheService.put(cacheKey, data, false));
@@ -362,9 +368,6 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                     deferred.reject(reason);
                 });
             } else { //if view elements too much, split into 2000 for each get
-                var key = id + n.ws + n.ver;
-                if (inProgress.hasOwnProperty(key))
-                    return inProgress[key];
                 inProgress[key] = deferred.promise;
                 var promises = [];
                 var i = 0;
