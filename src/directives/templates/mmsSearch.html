@@ -1,18 +1,18 @@
 
 <div class="modal-body transclude-modal">
     <div class="transclude-modal-input">
-        <form ng-submit="search(searchText, 0, itemsPerPage)">
+        <form ng-submit="newSearch(searchText, 0, itemsPerPage)">
             <div class="form-search input-group">
                 <input class="form-control" type="text" ng-model="searchText" placeholder="Search for an element" />
                 <span class="input-group-btn">                
-                    <button class="btn btn-primary" type="button" ng-click="search(searchText, 0, itemsPerPage)">
+                    <button class="btn btn-primary" type="button" ng-click="newSearch(searchText, 0, itemsPerPage)">
                     <span class="btn-text">SEARCH</span> <i class="{{searchClass}}"></i></button>
                 </span>
             </div>
             <div class="container-search-type">
                 <div class="btn-group btn-group-xs">
-                    <button ng-click="setSearchType('all')" type="button" class="btn-search-all btn-search-type btn btn-default active">ALL</button>
-                    <button ng-click="setSearchType('name')" type="button" class="btn-search-name btn-search-type btn btn-default">NAME</button>
+                    <button ng-click="setSearchType('all')" type="button" class="btn-search-all btn-search-type btn btn-default">ALL</button>
+                    <button ng-click="setSearchType('name')" type="button" class="btn-search-name btn-search-type btn btn-default active">NAME</button>
                     <button ng-click="setSearchType('documentation')" type="button" class="btn-search-documentation btn btn-search-type btn-default">DOCUMENTATION</button>
                     <button ng-click="setSearchType('value')" type="button" class="btn-search-value btn-search-type btn btn-default">VALUE</button>
                     <button ng-click="setSearchType('id')" type="button" class="btn-search-id btn-search-type btn btn-default">MDID</button>
@@ -62,8 +62,8 @@
             </div>
             <div class="elem-type-wrapper">
                 <label>TYPE</label>
-                <div class="elem-type">
-                    {{elem.specialization.type || 'Element'}}
+                <div ng-repeat="type in elem.appliedMetatypes" class="elem-type">
+                    <mms-transclude-name mms-eid="{{type}}" no-click="true"></mms-transclude-name>
                 </div>
             </div>
             <div ng-if="elem.specialization.type === 'Property' && elem.specialization.value[0]">

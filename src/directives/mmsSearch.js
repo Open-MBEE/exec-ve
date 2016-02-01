@@ -7,11 +7,12 @@ function mmsSearch(ElementService, growl, $rootScope, $templateCache) {
     var template = $templateCache.get('mms/templates/mmsSearch.html');
 
     var mmsSearchLink = function(scope, element, attrs) {
+        scope.paginationCache=[];
         scope.searchClass = "";
         scope.proposeClass = "";
         scope.filter = '';
         scope.searchText = '';
-        scope.searchType = 'all';
+        scope.searchType = 'name';
         scope.facet = '$';
         scope.filterQuery = {query: ""};
         scope.currentPage = 0;
@@ -39,11 +40,23 @@ function mmsSearch(ElementService, growl, $rootScope, $templateCache) {
         });
 
         scope.next = function() {
-            scope.search(scope.searchText, scope.currentPage + 1, scope.itemsPerPage);
+            if(scope.paginationCache[scope.currentPage+1]){
+                scope.searchResults= scope.paginationCache[scope.currentPage+1];
+                scope.currentPage += 1;   
+            }
+            else{
+                scope.search(scope.searchText, scope.currentPage + 1, scope.itemsPerPage);
+            }
         };
 
         scope.prev = function() {
-            scope.search(scope.searchText, scope.currentPage - 1, scope.itemsPerPage);
+            if(scope.paginationCache[scope.currentPage-1]){
+                scope.searchResults= scope.paginationCache[scope.currentPage-1];
+                scope.currentPage -= 1;   
+            }
+            else{
+                scope.search(scope.searchText, scope.currentPage - 1, scope.itemsPerPage);
+            }
         };
 
         scope.setSearchType = function(searchType) {
@@ -76,6 +89,7 @@ function mmsSearch(ElementService, growl, $rootScope, $templateCache) {
                 }
                 scope.searchClass = "";
                 scope.currentPage = page;
+                scope.paginationCache.push(scope.searchResults);
             }, function(reason) {
                 growl.error("Search Error: " + reason.message);
                 scope.searchClass = "";
@@ -84,7 +98,8 @@ function mmsSearch(ElementService, growl, $rootScope, $templateCache) {
 
         // Set options 
         if (scope.mmsOptions.searchResult) {
-          scope.searchResults = scope.mmsOptions.searchResult;          
+          scope.searchResults = scope.mmsOptions.searchResult;
+          scope.paginationCache.push(scope.mmsOptions.searchResult);
         }
         if (scope.mmsOptions.searchInput) {
           scope.searchText = scope.mmsOptions.searchInput;          
@@ -103,6 +118,11 @@ function mmsSearch(ElementService, growl, $rootScope, $templateCache) {
             event.stopPropagation();
             if (scope.mmsOptions.relatedCallback)
                 scope.mmsOptions.relatedCallback(doc, view, elem);
+        };
+        scope.newSearch = function(searchText, page, numItems){
+            scope.paginationCache=[];
+            console.log(scope.paginationCache.length);
+            scope.search(searchText, page, numItems);
         };
     };
 
