@@ -12,7 +12,7 @@ function mmsSearch(ElementService, growl, $rootScope, $templateCache) {
         scope.proposeClass = "";
         scope.filter = '';
         scope.searchText = '';
-        scope.searchType = 'all';
+        scope.searchType = 'name';
         scope.facet = '$';
         scope.filterQuery = {query: ""};
         scope.currentPage = 0;
