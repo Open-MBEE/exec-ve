@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsCkeditor', ['ElementService', 'ViewService', 'CacheService', '$modal', '$templateCache', '$window', '$timeout', 'growl', 'CKEDITOR','tinymce', mmsCkeditor]);
+.directive('mmsCkeditor', ['ElementService', 'ViewService', 'CacheService', '$modal', '$templateCache', '$window', '$timeout', 'growl', 'CKEDITOR','UtilsService', mmsCkeditor]);
 
 /**
  * @ngdoc directive
@@ -19,10 +19,10 @@ angular.module('mms.directives')
  * @restrict A
  *
  * @description
- * Make any textarea with an ngModel attached to be a tinymce wysiwyg editor. This
- * requires the tinymce library. Transclusion is supported. ngModel is required.
+ * Make any textarea with an ngModel attached to be a ckeditor wysiwyg editor. This
+ * requires the ckeditor library. Transclusion is supported. ngModel is required.
  * ### Example
- * <pre>
+ * <pre> //TODO update 
    <textarea mms-tinymce ng-model="element.documentation"></textarea>
    </pre>
  *
@@ -30,7 +30,7 @@ angular.module('mms.directives')
  *      that can be transcluded. Regardless, transclusion allows keyword searching 
  *      elements to transclude from alfresco
  */
-function mmsCkeditor(ElementService, ViewService, CacheService, $modal, $templateCache, $window, $timeout, growl, CKEDITOR, tinymce) { //depends on angular bootstrap
+function mmsCkeditor(ElementService, ViewService, CacheService, $modal, $templateCache, $window, $timeout, growl, CKEDITOR, UtilsService) { //depends on angular bootstrap
     var generatedIds = 0;
 
     var mmsCkeditorLink = function(scope, element, attrs, ngModelCtrl) {
@@ -45,81 +45,42 @@ function mmsCkeditor(ElementService, ViewService, CacheService, $modal, $templat
           var viewLinkModalTemplate = $templateCache.get('mms/templates/mmsViewLinkModal.html');
           var proposeModalTemplate = $templateCache.get('mms/templates/mmsProposeModal.html');
 
-        var transcludeCtrl = function($scope, $modalInstance) {
+        var transcludeCtrl = function($scope, $modalInstance, autocomplete) {
             var autocompleteName;
             var autocompleteProperty;
             var autocompleteElementId;
+            if (autocomplete) {
+              $scope.cacheElements = CacheService.getLatestElements(scope.mmsWs);
+              $scope.autocompleteItems = [];
+              $scope.cacheElements.forEach(function(cacheElement) {
+                  //JSON.stringify(sampleObject);
+                  //console.log("=====THIS IS THE CACHE ===="+ JSON.stringify(cacheElement));
+                  $scope.autocompleteItems.push({ 'sysmlid' : cacheElement.sysmlid, 'name' : cacheElement.name + ' - name' });
+                  $scope.autocompleteItems.push({ 'sysmlid' : cacheElement.sysmlid, 'name' : cacheElement.name + ' - documentation' });
 
-            $scope.cacheElements = CacheService.getLatestElements(scope.mmsWs);
-            $scope.autocompleteItems = [];
+                  if (cacheElement.specialization && cacheElement.specialization.type === 'Property') {
+                      $scope.autocompleteItems.push({ 'sysmlid' : cacheElement.sysmlid, 'name' : cacheElement.name + ' - value' });
+                  }
+              });
+            }
 
-            $scope.cacheElements.forEach(function(cacheElement) {
-                $scope.autocompleteItems.push({ 'sysmlid' : cacheElement.sysmlid, 'name' : cacheElement.name + ' - name' });
-                $scope.autocompleteItems.push({ 'sysmlid' : cacheElement.sysmlid, 'name' : cacheElement.name + ' - documentation' });
-
-                if (cacheElement.specialization && cacheElement.specialization.type === 'Property') {
-                    $scope.autocompleteItems.push({ 'sysmlid' : cacheElement.sysmlid, 'name' : cacheElement.name + ' - value' });
-                }
-            });
-
-            $scope.searchClass = "";
-            $scope.proposeClass = "";
-            var originalElements = $scope.mmsCfElements;
-            $scope.filter = '';
-            $scope.searchText = '';
+            $scope.title = 'INSERT A CROSS REFERENCE';
+            $scope.description = 'Begin by searching for an element, then click a field to cross-reference.';
             $scope.newE = {name: '', documentation: ''};
-            $scope.searchSuccess = false;
             $scope.requestName = false;
             $scope.requestDocumentation = false;
-            $scope.searchType = 'name';
-
-            $scope.setSearchType = function(searchType) {
-                $scope.searchType = searchType;
-                angular.element('.btn-search-name').removeClass('active');
-                angular.element('.btn-search-documentation').removeClass('active');
-                angular.element('.btn-search-value').removeClass('active');
-                angular.element('.btn-search-id').removeClass('active');
-                angular.element('.btn-search-' + searchType).addClass('active');
-            };
-            $scope.choose = function(elementId, property, name) {
-                var tag = '<mms-transclude-' + property + ' data-mms-eid="' + elementId + '">[cf:' + name + '.' + property + ']</mms-transclude-' + property + '> ';
+            $scope.showProposeLink = true;
+            $scope.choose = function(elem, property) {
+                var tag = '<mms-transclude-' + property + ' data-mms-eid="' + elem.sysmlid + '">[cf:' + elem.name + '.' + property + ']</mms-transclude-' + property + '> ';
                 $modalInstance.close(tag);
             };
             $scope.cancel = function() {
                 $modalInstance.dismiss();
             };
-            $scope.search = function(searchText) {
-                // var searchText = $scope.searchText; //TODO investigate why searchText isn't in $scope
-                $scope.searchClass = "fa fa-spin fa-spinner";
-                ElementService.search(searchText, [$scope.searchType], null, false, scope.mmsWs)
-                .then(function(data) {
-                    $scope.searchSuccess = true;
-                    $scope.searchClass = "";
-
-                    // change properties arr to 2-dim to display table
-                    data.forEach(function(elem) {
-                        if (elem.properties && elem.properties[0]) {
-                            var properties = [];
-                            for (var i = 0; i < elem.properties.length; i++) {
-                                if (i % 3 === 0) {
-                                    properties.push([]);
-                                }
-                                properties[properties.length-1].push(elem.properties[i]);
-                            }
-                            elem.properties = properties;
-                        }
-                    });
-
-                    $scope.mmsCfElements = data;
-                }, function(reason) {
-                    growl.error("Search Error: " + reason.message);
-                    $scope.searchClass = "";
-                });
-            };
             $scope.openProposeModal = function() {
                 $modalInstance.close(false);
             };
-            // Set search result options
+             // Set search result options
             $scope.searchOptions= {};
             $scope.searchOptions.callback = $scope.choose;
             $scope.searchOptions.emptyDocTxt = 'This field is empty, but you can still click here to cross-reference a placeholder.';
@@ -127,7 +88,7 @@ function mmsCkeditor(ElementService, ViewService, CacheService, $modal, $templat
                 $scope.proposeClass = "fa fa-spin fa-spinner";
                 ElementService.createElement({name: $scope.newE.name, documentation: $scope.newE.documentation, specialization: {type: 'Element'}}, scope.mmsWs, scope.mmsSite)
                 .then(function(data) {
-                    $scope.mmsCfElements = [data];
+                    $scope.searchResults = [data];
                     $scope.proposeClass = "";
                 }, function(reason) {
                     growl.error("Propose Error: " + reason.message);
@@ -147,18 +108,15 @@ function mmsCkeditor(ElementService, ViewService, CacheService, $modal, $templat
                 ElementService.createElement({name: $scope.newE.name, documentation: $scope.newE.documentation, specialization: {type: 'Element'}}, scope.mmsWs, scope.mmsSite)
                 .then(function(data) {
                     if ($scope.requestName) {
-                        $scope.choose(data.sysmlid, 'name', $scope.newE.name);
+                        $scope.choose(data, 'name');
                     } else if ($scope.requestDocumentation) {
-                        $scope.choose(data.sysmlid, 'doc', $scope.newE.name);
+                        $scope.choose(data, 'doc');
                     }
                     $scope.proposeClass = "";
                 }, function(reason) {
                     growl.error("Propose Error: " + reason.message);
                     $scope.proposeClass = "";
                 });
-            };
-            $scope.showOriginalElements = function() {
-                $scope.mmsCfElements = originalElements;
             };
             $scope.toggleRadio = function(field) {
                 if (field === "name") {
@@ -200,7 +158,8 @@ function mmsCkeditor(ElementService, ViewService, CacheService, $modal, $templat
             var instance = $modal.open({
                 template: autocompleteModalTemplate,
                 scope: scope,
-                controller: ['$scope', '$modalInstance', transcludeCtrl],
+                resolve: {autocomplete: true},
+                controller: ['$scope', '$modalInstance', 'autocomplete', transcludeCtrl],
                 size: 'sm'
             });
 
@@ -208,13 +167,14 @@ function mmsCkeditor(ElementService, ViewService, CacheService, $modal, $templat
                 angular.element('.autocomplete-modal-typeahead').focus();
             }, 0, false);
 
+//TODO update editor function
             instance.result.then(function(tag) {
                 if (!tag) {
                     transcludeCallback(ed, true);
                 } else {
-                    ed.execCommand('delete');
-                    ed.selection.collapse(false);
-                    ed.insertContent(tag);
+                    // ed.execCommand('delete');
+                    // ed.selection.collapse(false);
+                    ed.insertHtml( tag );
                 }
             }, function() {
                 ed.focus();
@@ -225,7 +185,8 @@ function mmsCkeditor(ElementService, ViewService, CacheService, $modal, $templat
             var instance = $modal.open({
                 template: transcludeModalTemplate,
                 scope: scope,
-                controller: ['$scope', '$modalInstance', transcludeCtrl],
+                resolve: {autocomplete: false},
+                controller: ['$scope', '$modalInstance', 'autocomplete', transcludeCtrl],
                 size: 'lg'
             });
             instance.result.then(function(tag) {
@@ -234,19 +195,20 @@ function mmsCkeditor(ElementService, ViewService, CacheService, $modal, $templat
                     return;
                 }
 
-                // if (fromAutocomplete) {
-                //     ed.execCommand('delete');
-                // }
+                if (fromAutocomplete) {
+                    ed.execCommand('delete'); //focusmgr.remove?
+                }
                 
-                ed.insertHtml( tag );
                 // ed.selection.collapse(false);
-                // ed.insertContent(tag);
+                ed.insertHtml( tag );
             }, function() {
+                var focusManager = new CKEDITOR.focusManager( ed );
+                focusManager.focus();
                 // ed.focus();
             });
         };
 
-        var proposeCallback = function() {
+        var proposeCallback = function(ed) {
             var instance = $modal.open({
                 template: proposeModalTemplate,
                 scope: scope,
@@ -254,53 +216,90 @@ function mmsCkeditor(ElementService, ViewService, CacheService, $modal, $templat
                 size: 'lg'
             });
             instance.result.then(function(tag) {
-                return tag;
+                // ed.selection.collapse(false);
+                ed.insertHtml( tag );
             });
         };
 
         var transcludeViewLinkCtrl = function($scope, $modalInstance) {
-            $scope.searchClass = "";
-            $scope.proposeClass = "";
-            $scope.filter = '';
-            $scope.searchText = '';
-            $scope.mmsCfViewElements = [];
-            $scope.choose = function(elementId, name) {
-                var tag = '<mms-view-link data-mms-vid="' + elementId + '">[cf:' + name + '.vlink]</mms-view-link> ';
+            $scope.title = 'INSERT VIEW LINK';
+            $scope.description = 'Search for a view or content element, click on its name to insert link.';
+            $scope.choose = function(elem) {
+                var did = null;
+                var vid = null;
+                var peid = null;
+                if (elem.relatedDocuments && elem.relatedDocuments.length > 0) {
+                    did = elem.relatedDocuments[0].sysmlid;
+                    if (elem.relatedDocuments[0].parentViews.length > 0)
+                        vid = elem.relatedDocuments[0].parentViews[0].sysmlid;
+                }
+                if (elem.specialization.type === 'InstanceSpecification') {
+                    if (ViewService.isSection(elem))
+                        vid = elem.sysmlid;
+                    else
+                        peid = elem.sysmlid;
+                } else 
+                    vid = elem.sysmlid;
+                var tag = '<mms-view-link';
+                if (did) 
+                    tag += ' data-mms-did="' + did + '"';
+                if (vid) 
+                    tag += ' data-mms-vid="' + vid + '"';
+                if (peid) 
+                    tag += ' data-mms-peid="' + peid + '"';
+                tag += '>[cf:' + elem.name + '.vlink]</mms-view-link> ';
+                $modalInstance.close(tag);
+            };
+            $scope.chooseDoc = function(doc, view, elem) {
+                var did = doc.sysmlid;
+                var vid = view.sysmlid;
+                var peid = null;
+                if (ViewService.isSection(elem))
+                    vid = elem.sysmlid;
+                else if (ViewService.isPresentationElement(elem))
+                    peid = elem.sysmlid;
+                var tag = '<mms-view-link';
+                if (did) 
+                    tag += ' data-mms-did="' + did + '"';
+                if (vid) 
+                    tag += ' data-mms-vid="' + vid + '"';
+                if (peid) 
+                    tag += ' data-mms-peid="' + peid + '"';
+                tag += '>[cf:' + elem.name + '.vlink]</mms-view-link> ';
                 $modalInstance.close(tag);
             };
             $scope.cancel = function() {
                 $modalInstance.dismiss();
             };
-            $scope.search = function(searchText) {
-                //var searchText = $scope.searchText; //TODO investigate why searchText isn't in $scope
-                //growl.info("Searching...");
-                $scope.searchClass = "fa fa-spin fa-spinner";
-                ElementService.search(searchText, ['name'], null, false, scope.mmsWs)
-                .then(function(data) {
-                    var views = [];
-                    data.forEach(function(v) {
-                        if (v.specialization && (v.specialization.type === 'View' || v.specialization.type === 'Product'))
-                            views.push(v);
-                    });
-                    $scope.mmsCfViewElements = views;
-                    $scope.searchClass = "";
-                }, function(reason) {
-                    growl.error("Search Error: " + reason.message);
-                    $scope.searchClass = "";
+            $scope.mainSearchFilter = function(data) {
+                var views = [];
+                data.forEach(function(v) {
+                    if (v.specialization && (v.specialization.type === 'View' || v.specialization.type === 'Product' || 
+                            (ViewService.isPresentationElement(v) && v.relatedDocuments))) {
+                        if (v.properties)
+                            delete v.properties;
+                        views.push(v);
+                    }
                 });
+                return views;
             };
+            $scope.searchOptions= {};
+            $scope.searchOptions.callback = $scope.choose;
+            $scope.searchOptions.relatedCallback = $scope.chooseDoc;
+            $scope.searchOptions.filterCallback = $scope.mainSearchFilter;
+            $scope.searchOptions.itemsPerPage = 200;
         };
 
         var viewLinkCallback = function(ed) {
             var instance = $modal.open({
-                template: viewLinkModalTemplate,
+                template: transcludeModalTemplate,
                 scope: scope,
                 controller: ['$scope', '$modalInstance', transcludeViewLinkCtrl],
                 size: 'lg'
             });
             instance.result.then(function(tag) {
-                ed.selection.collapse(false);
-                ed.insertContent(tag);
+                // ed.selection.collapse(false);
+                ed.insertHtml( tag );                
             });
         };
 
@@ -344,7 +343,6 @@ function mmsCkeditor(ElementService, ViewService, CacheService, $modal, $templat
             });
             instance.result.then(function(tag) {
                 // ed.selection.collapse(false);
-                // ed.insertContent(tag);
                 ed.insertHtml( tag );
             });
         };
@@ -399,12 +397,10 @@ function mmsCkeditor(ElementService, ViewService, CacheService, $modal, $templat
             return content;
         };
 
-
-
         $timeout(function() {
           instance = CKEDITOR.replace(attrs.id, {
-            customConfig: '/lib/ckeditor/config.js',
-            extraPlugins: 'mathjax,autogrow,mmscf,mmscomment,',
+            // customConfig: '/lib/ckeditor/config.js',
+            extraPlugins: 'autogrow,mathjax,mmscf,mmscomment,mmsvlink',
             mmscf: {callbackModalFnc: transcludeCallback},
             mmscomment: {callbackModalFnc: commentCallback},
             mathJaxLib: 'http://cdn.mathjax.org/mathjax/2.2-latest/MathJax.js?config=TeX-AMS_HTML',
@@ -413,31 +409,36 @@ function mmsCkeditor(ElementService, ViewService, CacheService, $modal, $templat
             autoGrow_bottomSpace: 50,
             extraAllowedContent:'script[language|type|src]; mms-maturity-bar; tms-timely; seqr-timely; mms-d3-observation-profile-chart-io; mms-d3-parallel-axis-chart-io; mms-d3-radar-chart-io; mms-d3-horizontal-bar-chart-io; mms-site-docs; mms-workspace-docs; mms-diagram-block; mms-view-link(mceNonEditable); mms-transclude-doc(mceNonEditable); mms-transclude-name(mceNonEditable); mms-transclude-com(mceNonEditable); mms-transclude-val(mceNonEditable); mms-transclude-img(mceNonEditable); math; maction; maligngroup; malignmark; menclose;merror;mfenced;mfrac;mglyph;mi;mlabeledtr;mlongdiv;mmultiscripts;mn;mo;mover;mpadded;mphantom;mroot;mrow;ms;mscarries;mscarry;msgroup;mstack;msline;mspace;msqrt;msrow;mstyle;msub;msup;msubsup;mtable;mtd;mtext;mtr;munder;munderover',
           });
-          CKEDITOR.plugins.addExternal('mmscf','/lib/ckeditor/plugins/mmscf/');
-          CKEDITOR.plugins.addExternal('mmscomment','/lib/ckeditor/plugins/mmscomment/');
-          instance.on( 'change', function( evt ) {
-            // var data = instance.getSnapshot();
-            // instance.loadSnapshot( data );
+          // CKEDITOR.plugins.addExternal('mmscf','/lib/ckeditor/plugins/mmscf/');
+          // CKEDITOR.plugins.addExternal('mmscomment','/lib/ckeditor/plugins/mmscomment/');
+          // CKEDITOR.plugins.addExternal('autogrow','/lib/ckeditor/plugins/autogrow/');
+          // CKEDITOR.plugins.addExternal('mathjax','/lib/ckeditor/plugins/mathjax/');
+          
+          // instance.on('getData', function(e) {
+          //     e.content = fixNewLines(e.content);
+          // });
+          instance.on( 'change', function(e) {
             update();
           });
-          instance.on('undo', function(e) {
-            var data = instance.getSnapshot();
-            instance.loadSnapshot( data );
-            update();
-          });
-          instance.on('redo', function(e) {
-            var data = instance.getSnapshot();
-            instance.loadSnapshot( data );
-            update();
-          });
+          // instance.on('undo', function(e) {
+          //   var data = instance.getSnapshot();
+          //   instance.loadSnapshot( data );
+          //   update();
+          // });
+          // instance.on('redo', function(e) {
+          //   var data = instance.getSnapshot();
+          //   instance.loadSnapshot( data );
+          //   update();
+          // });
           instance.on('blur', function(e) {
             instance.focusManager.blur();
           });
-          // instance.on('key', function(e) {
-          //   if (e.data.keyCode === 50 && e.data.domEvent.$.shiftKey) {
-          //       autocompleteCallback(instance);
-          //   }
-          // });
+          
+          instance.on('key', function(e) {
+            if (e.data.domEvent.getKeystroke() == CKEDITOR.SHIFT + 50) {
+                autocompleteCallback(instance);
+            }
+          });
         }, 0, false);
         
         scope.$on('$destroy', function() {
