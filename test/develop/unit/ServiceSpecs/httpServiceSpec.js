@@ -27,7 +27,6 @@ describe('HttpService', function() {
                     HttpService.get(url+'/hello', function(){}, function(){}, 2);
                 }
               }
-            // flush response
             $httpBackend.flush();
         }));    
         //});
