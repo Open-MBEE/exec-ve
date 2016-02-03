@@ -172,7 +172,7 @@ function mmsCkeditor(ElementService, ViewService, CacheService, $modal, $templat
                 if (!tag) {
                     transcludeCallback(ed, true);
                 } else {
-                    // ed.execCommand('delete');
+                    ed.execCommand('delete');
                     // ed.selection.collapse(false);
                     ed.insertHtml( tag );
                 }
@@ -396,18 +396,106 @@ function mmsCkeditor(ElementService, ViewService, CacheService, $modal, $templat
             }
             return content;
         };
+        
+        var resetCrossRef = function(type, typeString){
+            angular.forEach(type, function(value, key){
+                var transclusionObject = angular.element(value);
+                var transclusionId= angular.element(value).attr('data-mms-eid');
+                var transclusionKey = UtilsService.makeElementKey(transclusionId, 'master', 'latest', false);
+                var inCache = CacheService.get(transclusionKey);
+                if(inCache){
+                    transclusionObject.html('[cf:' + inCache.name + typeString);
+                }
+                else{
+                    ElementService.getElement(transclusionId, false, scope.mmsWs, 'latest', 2 ).then(function(data) {
+                        transclusionObject.html('[cf:' + data.name + typeString);
+                    }, function(reason) {
+                        var error;
+                        if (reason.status === 410)
+                            error = 'deleted';
+                        if (reason.status === 404)
+                            error = 'not found';
+                        transclusionObject.html('[cf:' + error + typeString);
+                        });
+                }
+            });
+        };
+        
+        var defaultToolbar = [
+            { name: 'document',    items : [ 'Source','-','DocProps','Preview','Print','-','Templates' ] },
+            { name: 'clipboard',   items : [ 'Cut','Copy','Paste','PasteText','PasteFromWord','-','Undo','Redo' ] },
+            { name: 'editing',     items : [ 'Find','Replace','-','SelectAll','-','SpellChecker', 'Scayt' ] },
+            { name: 'forms',       items : [ 'Form', 'Checkbox', 'Radio', 'TextField', 'Textarea', 'Select', 'Button', 'ImageButton', 'HiddenField' ] },
+            '/',
+            { name: 'basicstyles', items : [ 'Bold','Italic','Underline','Strike','Subscript','Superscript','-','RemoveFormat' ] },
+            { name: 'paragraph',   items : [ 'Blockquote','CreateDiv','-','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','-','BidiLtr','BidiRtl' ] },
+            { name: 'links',       items : [ 'Link','Unlink','Anchor' ] },
+            { name: 'tools',       items : [ 'Maximize', 'ShowBlocks' ] },
+            { name: 'insert',      items : ['SpecialChar','Mathjax','PageBreak','HorizontalRule' ] },
+            '/',
+            { name: 'styles',      items : [ 'Styles','Format','Font','FontSize' ] },
+            { name: 'colors',      items : [ 'TextColor','BGColor' ] },
+            // { name: 'custom',      items : [ 'Mmscf','Mmscomment', 'Mmsvlink' ] },
+        ];
+        var tableToolbar =  { name: 'table',  items: [ 'Table' ]};
+        var listToolbar =   { name: 'list',   items: [ 'NumberedList','BulletedList','Outdent','Indent' ]};
+        // var codeToolbar = ' code ';
+        var imageToolbar =  { name: 'image',  items: [ 'Image','base64image','Smiley','Flash','IFrame'  ]};
+        var customToolbar = { name: 'custom', items : [ 'Mmscf','Mmscomment', 'Mmsvlink' ] };
+        var allToolbar = defaultToolbar.slice();
+        allToolbar.push(listToolbar);
+        allToolbar.push(tableToolbar);
+        allToolbar.push(imageToolbar);
+        // allToolbar.push(codeToolbar);
+        allToolbar.push(customToolbar);
+        var thisToolbar = allToolbar;
+        // if (scope.mmsTinymceType === 'Equation')
+            // thisToolbar = codeToolbar;
+        if (scope.mmsTinymceType === 'TableT') {
+          thisToolbar = defaultToolbar.slice();
+          thisToolbar.push(tableToolbar);
+          thisToolbar.push(customToolbar);
+        }
+        if (scope.mmsTinymceType === 'ListT') {
+          thisToolbar = defaultToolbar.slice();
+          thisToolbar.push(listToolbar);
+          thisToolbar.push(customToolbar);
+        }
+        if (scope.mmsTinymceType === 'Figure') {
+          thisToolbar = [];
+          thisToolbar.push(imageToolbar);
+        }
+        //if (scope.mmsTinymceType === 'ParagraphT' || scope.mmsTinymceType === 'Paragraph')
+          //  thisToolbar = defaultToolbar + ' | ' + codeToolbar + ' | ' + customToolbar;
 
+        var options = {
+            plugins: 'autoresize charmap code fullscreen image link media nonbreaking paste table textcolor searchreplace noneditable',
+            toolbar: thisToolbar,
+           
+            nonbreaking_force_tab: true,
+            paste_data_images: true,
+            //skin_url: 'lib/tinymce/skin/lightgray',
+            file_picker_callback: imageCallback,
+            file_picker_types: 'image',
+        };
+        
         $timeout(function() {
           instance = CKEDITOR.replace(attrs.id, {
             // customConfig: '/lib/ckeditor/config.js',
-            extraPlugins: 'autogrow,mathjax,mmscf,mmscomment,mmsvlink',
+            extraPlugins: 'autogrow,mathjax,base64image,mmscf,mmscomment,mmsvlink',
             mmscf: {callbackModalFnc: transcludeCallback},
             mmscomment: {callbackModalFnc: commentCallback},
+            mmsvlink: {callbackModalFnc: viewLinkCallback},
             mathJaxLib: 'http://cdn.mathjax.org/mathjax/2.2-latest/MathJax.js?config=TeX-AMS_HTML',
             autoGrow_minHeight: 200,
-            autoGrow_maxHeight: 500,
+            autoGrow_maxHeight: $window.innerHeight*0.65,
             autoGrow_bottomSpace: 50,
             extraAllowedContent:'script[language|type|src]; mms-maturity-bar; tms-timely; seqr-timely; mms-d3-observation-profile-chart-io; mms-d3-parallel-axis-chart-io; mms-d3-radar-chart-io; mms-d3-horizontal-bar-chart-io; mms-site-docs; mms-workspace-docs; mms-diagram-block; mms-view-link(mceNonEditable); mms-transclude-doc(mceNonEditable); mms-transclude-name(mceNonEditable); mms-transclude-com(mceNonEditable); mms-transclude-val(mceNonEditable); mms-transclude-img(mceNonEditable); math; maction; maligngroup; malignmark; menclose;merror;mfenced;mfrac;mglyph;mi;mlabeledtr;mlongdiv;mmultiscripts;mn;mo;mover;mpadded;mphantom;mroot;mrow;ms;mscarries;mscarry;msgroup;mstack;msline;mspace;msqrt;msrow;mstyle;msub;msup;msubsup;mtable;mtd;mtext;mtr;munder;munderover',
+            pasteFromWordRemoveFontStyles: false,
+            disableNativeSpellChecker: false,
+            disallowedContent: 'div,font',
+            contentsCss: 'css/partials/mms.min.css',
+            toolbar: thisToolbar
           });
           // CKEDITOR.plugins.addExternal('mmscf','/lib/ckeditor/plugins/mmscf/');
           // CKEDITOR.plugins.addExternal('mmscomment','/lib/ckeditor/plugins/mmscomment/');
