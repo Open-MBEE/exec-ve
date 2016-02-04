@@ -1119,7 +1119,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
     var getDocMetadata = function(docid, ws, version, weight) {
         var deferred = $q.defer();
         var metadata = {};
-        ElementService.search(docid, ['id'], null, null, ws, weight)
+        ElementService.search(docid, ['id'], null, null, null, null, ws, weight)
         .then(function(data) {
             if (data.length === 0 || data[0].sysmlid !== docid || !data[0].properties) {
                 return;
