@@ -26,11 +26,21 @@ function UtilsService(CacheService, _) {
         return false;
     };
 
+    var cleanValueSpec = function(vs) {
+        if (vs.hasOwnProperty('valueExpression'))
+            delete vs.valueExpression;
+        if (vs.operand) {
+            for (var i = 0; i < vs.operand.length; i++)
+                cleanValueSpec(vs.operand[i]);
+        }
+    };
+
     var cleanElement = function(elem, forEdit) {
         // hack - should fix on MMS, if name is null should include name
         if (! elem.name) {
             elem.name = '';
         }
+        var i = 0;
         if (elem.hasOwnProperty('specialization')) {
             if (elem.specialization.type === 'Property') {
                 var spec = elem.specialization;
@@ -40,6 +50,16 @@ function UtilsService(CacheService, _) {
                     if (val.hasOwnProperty('specialization'))
                         delete val.specialization;
                 });
+            }
+            if (elem.specialization.value) {
+                for (i = 0; i < elem.specialization.value.length; i++)
+                    cleanValueSpec(elem.specialization.value[i]);
+            }
+            if (elem.specialization.contents) {
+                cleanValueSpec(elem.specialization.contents);
+            }
+            if (elem.specialization.instanceSpecificationSpecification) {
+                cleanValueSpec(elem.specialization.instanceSpecificationSpecification);
             }
             if (elem.specialization.type === 'View') {
                 //delete elem.specialization.displayedElements;
@@ -60,7 +80,7 @@ function UtilsService(CacheService, _) {
                 delete elem.specialization.specialization;
             }
             if (forEdit) {
-                for (var i = 0; i < nonEditKeys.length; i++) {
+                for (i = 0; i < nonEditKeys.length; i++) {
                     if (elem.specialization.hasOwnProperty(nonEditKeys[i])) {
                         delete elem.specialization[nonEditKeys[i]];
                     }

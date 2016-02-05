@@ -202,7 +202,8 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
             $window.alert(artifactWarning);
         $scope.bbApi.toggleButtonSpinner('generate.pdf');
         $scope.bbApi.toggleButtonSpinner('generate.zip');
-
+        if (!snapshot.formats)
+            snapshot.formats = [];
         snapshot.formats.push({"type":"pdf",  "status":"Generating"});
         snapshot.formats.push({"type":"html", "status":"Generating"});
         snapshot.ws = $scope.ws;
