@@ -229,7 +229,8 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
             return;
         $scope.bbApi.toggleButtonSpinner('generate.pdf');
         $scope.bbApi.toggleButtonSpinner('generate.zip');
-
+        if (!snapshot.formats)
+            snapshot.formats = [];
         snapshot.formats.push({"type":"pdf",  "status":"Generating"});
         snapshot.formats.push({"type":"html", "status":"Generating"});
         snapshot.ws = ws;
