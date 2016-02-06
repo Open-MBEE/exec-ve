@@ -164,9 +164,10 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
     var popupPrintConfirm = function(ob, ws, time, isDoc, print) {
         var modalInstance = $modal.open({
             templateUrl: 'partials/mms/printConfirm.html',
-            controller: function($scope, $modalInstance, type) {
+            controller: function($scope, $modalInstance, type, unsaved) {
                 $scope.type = type;
                 $scope.action = print ? 'print' : 'save';
+                $scope.unsaved = unsaved;
                 $scope.print = function() {
                     $modalInstance.close('print');
                 };
@@ -178,7 +179,13 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
                 };
             },
             resolve: {
-                type: function() { return isDoc ? 'DOCUMENT' : 'VIEW';}
+                type: function() { return isDoc ? 'DOCUMENT' : 'VIEW';},
+                unsaved: function() {
+                    if ($rootScope.veEdits && !_.isEmpty($rootScope.veEdits)) {
+                        return true;
+                    }
+                    return false;
+                }
             },
             backdrop: 'static',
             keyboard: false
