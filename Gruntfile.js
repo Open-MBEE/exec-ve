@@ -479,15 +479,11 @@ module.exports = function(grunt) {
         }
       }
     },
-
+    
     karma: {
-      options:{
-        configFile:'config/develop/karma.develop.conf.js'
-      },
-      dev:{
-        files:
-          'test/develop/unit/**/*.js'
-      }
+        unit:{
+            configFile:'config/develop/karma.develop.conf.js'
+        }
     },
 
     protractor: {

@@ -25,7 +25,9 @@ function HttpService($http, $q, _) {
     var getOutboundLimit = function() {
         return GET_OUTBOUND_LIMIT;
     };
-
+    var getQueue = function(){
+        return queue;
+    };
     /**
      * @ngdoc method
      * @name mms.HttpService#get
@@ -159,6 +161,7 @@ function HttpService($http, $q, _) {
         ping: ping,
         setOutboundLimit: setOutboundLimit,
         getOutboundLimit: getOutboundLimit,
+        getQueue: getQueue,
         transformQueue: transformQueue
     };
 

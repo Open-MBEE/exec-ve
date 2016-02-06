@@ -151,6 +151,10 @@ function CacheService(_) {
     var makeKey = function(keys) {
         return keys.join('|');
     };
+    
+    var getCache = function(){
+        return cache;    
+    };
 
     return {
         get: get,
@@ -158,6 +162,7 @@ function CacheService(_) {
         put: put,
         exists: exists,
         remove: remove,
+        getCache: getCache
     };
 
 }
