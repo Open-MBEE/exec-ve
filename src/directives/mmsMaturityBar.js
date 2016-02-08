@@ -31,8 +31,9 @@ function mmsMaturityBar($window) {
 		  colorRect = ["#FFAA00","#FFAA00","#FFAA00","#B0B0B0","#B0B0B0"];
 		} else if (scope.state == "Baseline") {
 		  colorRect = ["#04859E","#04859E","#04859E","#04859E","#B0B0B0"];
-		} else if (scope.state == "Update") {
+		/* } else if (scope.state == "Update") {
 		  colorRect = ["#00BD39","#00BD39","#00BD39","#00BD39","#00BD39"];
+		  */
 		} else {
 		  colorRect = ["#B0B0B0","#B0B0B0","#B0B0B0","#B0B0B0","#B0B0B0"];			
 		}
@@ -101,7 +102,7 @@ function mmsMaturityBar($window) {
 		    .attr("fill","#fff")
 		    .attr("font-family","sans-serif")
 		    .style("text-anchor", "middle");
-		svgContainer.append("rect")
+		/* svgContainer.append("rect")
 		    .attr("x", 410)
 		    .attr("y", 10)
 		    .attr("width", 100)
@@ -116,7 +117,7 @@ function mmsMaturityBar($window) {
 		    .attr("dy", ".35em")
 		    .attr("fill","#fff")
 		    .attr("font-family","sans-serif")
-		    .style("text-anchor", "middle");
+		    .style("text-anchor", "middle"); */
     };
 
     return {
