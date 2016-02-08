@@ -122,7 +122,7 @@ describe('ElementService', function() {
             
         }));
     });
-    // describe('ElementService.updateElement method', function() {
+    // describe('ElementService.updateElement method', function() {  --talk to doris
     //     it('should update a element not in the cache without passing a workspace', inject(function() {
     //         var elem = { sysmlid: '12345', lastModified:'never' };
     // 		ElementService.updateElement(elem, undefined).then(function(response) {
