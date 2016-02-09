@@ -13,7 +13,7 @@ angular.module('mms')
  */
 function UtilsService(CacheService, _) {
     var nonEditKeys = ['contains', 'view2view', 'childrenViews', 'displayedElements',
-        'allowedElements', 'contents'];
+        'allowedElements', 'contents', 'relatedDocuments'];
 
     var hasCircularReference = function(scope, curId, curType) {
         var curscope = scope;
@@ -26,11 +26,21 @@ function UtilsService(CacheService, _) {
         return false;
     };
 
+    var cleanValueSpec = function(vs) {
+        if (vs.hasOwnProperty('valueExpression'))
+            delete vs.valueExpression;
+        if (vs.operand) {
+            for (var i = 0; i < vs.operand.length; i++)
+                cleanValueSpec(vs.operand[i]);
+        }
+    };
+
     var cleanElement = function(elem, forEdit) {
         // hack - should fix on MMS, if name is null should include name
         if (! elem.name) {
             elem.name = '';
         }
+        var i = 0;
         if (elem.hasOwnProperty('specialization')) {
             if (elem.specialization.type === 'Property') {
                 var spec = elem.specialization;
@@ -41,15 +51,36 @@ function UtilsService(CacheService, _) {
                         delete val.specialization;
                 });
             }
+            if (elem.specialization.value) {
+                for (i = 0; i < elem.specialization.value.length; i++)
+                    cleanValueSpec(elem.specialization.value[i]);
+            }
+            if (elem.specialization.contents) {
+                cleanValueSpec(elem.specialization.contents);
+            }
+            if (elem.specialization.instanceSpecificationSpecification) {
+                cleanValueSpec(elem.specialization.instanceSpecificationSpecification);
+            }
             if (elem.specialization.type === 'View') {
                 //delete elem.specialization.displayedElements;
                 //delete elem.specialization.allowedElements;
+                if (elem.specialization.contents && elem.specialization.contains)
+                    delete elem.specialization.contains;
+                if (Array.isArray(elem.specialization.displayedElements)) {
+                    elem.specialization.numElements = elem.specialization.displayedElements.length;
+                    if (elem.specialization.numElements <= 5000)
+                        delete elem.specialization.displayedElements;
+                    else
+                        elem.specialization.displayedElements = JSON.stringify(elem.specialization.displayedElements);
+                }
+                if (elem.specialization.allowedElements)
+                    delete elem.specialization.allowedElements;
             }
             if (elem.specialization.hasOwnProperty('specialization')) {
                 delete elem.specialization.specialization;
             }
             if (forEdit) {
-                for (var i = 0; i < nonEditKeys.length; i++) {
+                for (i = 0; i < nonEditKeys.length; i++) {
                     if (elem.specialization.hasOwnProperty(nonEditKeys[i])) {
                         delete elem.specialization[nonEditKeys[i]];
                     }
@@ -238,76 +269,82 @@ function UtilsService(CacheService, _) {
     }
 
     var makeHtmlTable = function(table) {
-        var result = '<table class="table table-bordered table-condensed">';
+        var result = ['<table class="table table-bordered table-condensed">'];
         if (table.title)
-            result += '<caption>' + table.title + '</caption>';
+            result.push('<caption>' + table.title + '</caption>');
         if (table.header) {
-            result += '<thead>';
-            result += makeTableBody(table.header);
-            result += '</thead>';
+            result.push('<thead>');
+            result.push(makeTableBody(table.header, true));
+            result.push('</thead>');
         }
-        result += '<tbody>';
-        result += makeTableBody(table.body);
-        result += '</tbody>';
-        result += '</table>';
-        return result;
+        result.push('<tbody>');
+        result.push(makeTableBody(table.body, false));
+        result.push('</tbody>');
+        result.push('</table>');
+        return result.join('');
 
     };
 
-    var makeTableBody = function(body) {
-        var result = '';
-        body.forEach(function(row) {
-            result += '<tr>';
-            row.forEach(function(cell) {
-                result += '<td colspan="' + cell.colspan + '" rowspan="' + cell.rowspan + '">';
-                cell.content.forEach(function(thing) {
-                    result += '<div>';
+    var makeTableBody = function(body, header) {
+        var result = [], i, j, k, row, cell, thing;
+        var dtag = (header ? 'th' : 'td');
+        for (i = 0; i < body.length; i++) {
+            result.push('<tr>');
+            row = body[i];
+            for (j = 0; j < row.length; j++) {
+                cell = row[j];
+                result.push('<' + dtag + ' colspan="' + cell.colspan + '" rowspan="' + cell.rowspan + '">');
+                for (k = 0; k < cell.content.length; k++) {
+                    thing = cell.content[k];
+                    result.push('<div>');
                     if (thing.type === 'Paragraph') {
-                        result += makeHtmlPara(thing);
+                        result.push(makeHtmlPara(thing));
                     } else if (thing.type === 'Table') {
-                        result += makeHtmlTable(thing);
+                        result.push(makeHtmlTable(thing));
                     } else if (thing.type === 'List') {
-                        result += makeHtmlList(thing);
+                        result.push(makeHtmlList(thing));
                     } else if (thing.type === 'Image') {
-                        result += '<mms-transclude-img mms-eid="' + thing.sysmlid + '"></mms-transclude-img>';
+                        result.push('<mms-transclude-img mms-eid="' + thing.sysmlid + '"></mms-transclude-img>');
                     }
-                    result += '</div>';
-                });
-                result += '</td>';
-            });
-            result += '</tr>';
-        });
-        return result;
+                    result.push('</div>');
+                }
+                result.push('</' + dtag + '>');
+            }
+            result.push('</tr>');
+        }
+        return result.join('');
     };
 
     var makeHtmlList = function(list) {
-        var result = '';
+        var result = [], i, j, item, thing;
         if (list.ordered)
-            result += '<ol>';
+            result.push('<ol>');
         else
-            result += '<ul>';
-        list.list.forEach(function(item) {
-            result += '<li>';
-            item.forEach(function(thing) {
-                result += '<div>';
+            result.push('<ul>');
+        for (i = 0; i < list.list.length; i++) {
+            item = list.list[i];
+            result.push('<li>');
+            for (j = 0; j < item.length; j++) {
+                thing = item[j];
+                result.push('<div>');
                 if (thing.type === 'Paragraph') {
-                    result += makeHtmlPara(thing);
+                    result.push(makeHtmlPara(thing));
                 } else if (thing.type === 'Table') {
-                    result += makeHtmlTable(thing);
+                    result.push(makeHtmlTable(thing));
                 } else if (thing.type === 'List') {
-                    result += makeHtmlList(thing);
+                    result.push(makeHtmlList(thing));
                 } else if (thing.type === 'Image') {
-                    result += '<mms-transclude-img mms-eid="' + thing.sysmlid + '"></mms-transclude-img>';
+                    result.push('<mms-transclude-img mms-eid="' + thing.sysmlid + '"></mms-transclude-img>');
                 }
-                result += '</div>';
-            });
-            result += '</li>';
-        });
+                result.push('</div>');
+            }
+            result.push('</li>');
+        }
         if (list.ordered)
-            result += '</ol>';
+            result.push('</ol>');
         else
-            result += '</ul>';
-        return result;
+            result.push('</ul>');
+        return result.join('');
     };
 
     var makeHtmlPara = function(para) {
@@ -319,6 +356,52 @@ function UtilsService(CacheService, _) {
         if (para.sourceProperty === 'value')
             t = 'val';
         return '<mms-transclude-' + t + ' data-mms-eid="' + para.source + '"></mms-transclude-' + t + '>';
+    };
+
+    var makeHtmlTOC = function (tree) {
+        var result = '<div style="page-break-after:always"><div style="font-size:32px">Table of Contents</div>';
+
+        var root_branch = tree[0].branch;
+
+        result += '<ul style="list-style-type:none">';
+
+        var anchor = '<a href=#' + root_branch.data.sysmlid + '>';
+        result += '  <li>' + anchor + root_branch.section + ' ' + root_branch.label + '</a></li>';
+
+        root_branch.children.forEach(function (child) {
+            result += makeHtmlTOCChild(child);
+        });
+
+        result += '</ul>'; 
+        result += '</div>'; 
+
+        return result;
+    };
+
+    var makeHtmlTOCChild = function(child) {
+
+        var result = '<ul style="list-style-type:none">';
+
+        var anchor = '<a href=#' + child.data.sysmlid + '>';
+        result += '  <li>' + anchor + child.section + ' ' + child.label + '</a></li>';
+
+        child.children.forEach(function (child2) {
+            result += makeHtmlTOCChild(child2);
+        });
+
+        result += '</ul>'; 
+
+        return result;
+    };
+
+    var createMmsId = function() {
+        var d = Date.now();
+        var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            var r = (d + Math.random()*16)%16 | 0;
+            d = Math.floor(d/16);
+            return (c=='x' ? r : (r&0x3|0x8)).toString(16);
+        });
+        return 'MMS_' + Date.now() + '_' + uuid;
     };
 
     return {
@@ -333,6 +416,8 @@ function UtilsService(CacheService, _) {
         isRestrictedValue: isRestrictedValue,
         makeHtmlTable : makeHtmlTable,
         makeHtmlPara: makeHtmlPara,
-        makeHtmlList: makeHtmlList
+        makeHtmlList: makeHtmlList,
+        makeHtmlTOC: makeHtmlTOC,
+        createMmsId: createMmsId
     };
 }

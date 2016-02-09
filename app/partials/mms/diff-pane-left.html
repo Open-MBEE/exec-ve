@@ -20,7 +20,7 @@
 
 		<div class="flex-changes">
 			<table>
-			    <tr class="diff-item-row" id="{{change.delta.sysmlid}}" ng-click="selectChange(change)" ng-repeat="change in changes | orderBy:stagingOrder | filter: {staged: false} track by change.delta.sysmlid">
+			    <tr class="diff-item-row" id="{{change.delta.sysmlid}}" ng-click="selectChange(change)" ng-repeat="change in unstagedChanges | orderBy:stagingOrder track by change.delta.sysmlid">
 			        <td tooltip="{{::change.name}}" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" tooltip-append-to-body="true">{{change.name}}</td>
 			        <td><i class="fa {{::change.icon}} icon-{{::change.type}}"></i>   {{::change.changeTypeName}}</td>
 			        <td><i class="fa {{::change.typeIcon}}"></i>{{::change.delta.specialization.type || change.original.specialization.type}}</td>
@@ -49,7 +49,7 @@
 
 		<div class="flex-changes" ng-if="!targetIsTag">
 			<table>
-			    <tr class="diff-item-row" ng-click="selectChange(change)" ng-repeat="change in changes | orderBy:unstagingOrder | filter: {staged: true} track by change.delta.sysmlid">
+			    <tr class="diff-item-row" ng-click="selectChange(change)" ng-repeat="change in stagedChanges | orderBy:unstagingOrder track by change.delta.sysmlid">
 			        <td>{{::change.name}}</td>
 			        <td><i class="fa {{::change.icon}} icon-{{::change.type}}"></i>   {{::change.changeTypeName}}</td>
 			        <td><i class="fa {{::change.typeIcon}}"></i>{{::change.delta.specialization.type || change.original.specialization.type}}</td>
@@ -61,7 +61,7 @@
 			</table>
 		</div>
 
-		<div class="flex-header" ng-if="(diff.status !== 'GENERATING' && diff.status !== 'OUTDATED') && targetTime === 'latest'">
+		<div class="flex-header" ng-if="diff.status !== 'GENERATING' && targetTime === 'latest'">
 			<div id="merge-btn-container">
 				<button type="button" ng-click="mergeStagedChanges()" class="btn btn-success" id="merge-btn">Apply Changes to {{workspace1Name}}<i class="fa fa-spin fa-spinner" ng-show="saving"></i></button>
 		   </div>

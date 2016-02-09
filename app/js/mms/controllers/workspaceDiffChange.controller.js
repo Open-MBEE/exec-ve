@@ -21,6 +21,8 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 	$scope.diff = diff;
 
 	$scope.changes = [];
+	$scope.stagedChanges = [];
+	$scope.unstagedChanges = [];
 
 	$scope.id2change = {};
 
@@ -168,14 +170,22 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 
 				}
 			}
-
+			var i;
 			if (change.staged)
 			{
 				treeNode.detail.stageStatus = "apply";
+				$scope.stagedChanges.push(change);
+				i = $scope.unstagedChanges.indexOf(change);
+				if (i > -1)
+					$scope.unstagedChanges.splice(i, 1);
 			}
 			else
 			{
 				treeNode.detail.stageStatus = "ignore";
+				$scope.unstagedChanges.push(change);
+				i = $scope.stagedChanges.indexOf(change);
+				if (i > -1)
+					$scope.stagedChanges.splice(i, 1);
 			}
 
 			$rootScope.treeApi.refresh();
@@ -380,7 +390,10 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 					change.icon = changeIcon;
 					// @test var
 					change.changeTypeName = UxService.getChangeTypeName(change.type);
-					change.typeIcon = UxService.getTypeIcon(change.delta.specialization.type);
+					if (change.delta.specialization)
+						change.typeIcon = UxService.getTypeIcon(change.delta.specialization.type);
+					else
+						change.typeIcon = UxService.getTypeIcon('Element');
 
 					change.staged = false;
 					change.ws2object = ws2object;
@@ -441,7 +454,10 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 
 					node.data = element;
 					node.label = element.name;
-					node.type = element.specialization.type;
+					if (element.specialization)
+						node.type = element.specialization.type;
+					else
+						node.type = 'Element';
 					node.children = [];
 
 					// node.visible = true;
@@ -512,6 +528,7 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 				}
 
 				$scope.changes.push(change);
+				$scope.unstagedChanges.push(change);
 				$scope.id2change[e.sysmlid] = change;
 
 			});
@@ -553,6 +570,7 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 				}
 
 				$scope.changes.push(change);
+				$scope.unstagedChanges.push(change);
 				$scope.id2change[e.sysmlid] = change;
 
 			});
@@ -620,6 +638,7 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
           } */
 
 				$scope.changes.push(change);
+				$scope.unstagedChanges.push(change);
 				$scope.id2change[e.sysmlid] = change;
 			});
 

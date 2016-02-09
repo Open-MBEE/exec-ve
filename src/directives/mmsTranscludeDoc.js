@@ -31,6 +31,9 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
 
     var template = $templateCache.get('mms/templates/mmsTranscludeDoc.html');
 
+    var fixPreSpanRegex = /<\/span>\s*<mms-transclude/g;
+    var fixPostSpanRegex = /<\/mms-transclude-(name|doc|val|com)>\s*<span[^>]*>/g;
+
     var mmsTranscludeDocCtrl = function ($scope) {
 
         $scope.bbApi = {};
@@ -42,6 +45,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                 $scope.buttonsInit = true;
                 $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.preview", $scope));
                 $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.save", $scope));
+                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.saveC", $scope));
                 $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.cancel", $scope));
                 $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.delete", $scope));
                 $scope.bbApi.setPermission("presentation.element.delete", $scope.isDirectChildOfPresentationElement);
@@ -83,7 +87,18 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                     p = '';
                 doc = '<p>' + p + '</p>';
             }
-            element.append(doc);
+            var fixSpan = /<span style="/; //<div style="display:inline;
+            doc = doc.replace(fixPreSpanRegex, "<mms-transclude");
+            doc = doc.replace(fixPostSpanRegex, "</mms-transclude-$1>");
+           /* var dom = angular.element(doc);
+            dom.find('mms-transclude-doc').parent('span').each(function() {
+                var style = $(this).attr('style');
+                var replacement = '<div style="' + style + '">' + $(this).html() + '</div>';
+                $(this).replaceWith(replacement);
+            });
+            element.append(dom);*/
+            element[0].innerHTML = doc;
+            
             scope.recompileScope = scope.$new();
             $compile(element.contents())(scope.recompileScope); 
             if (mmsViewCtrl) {
@@ -98,7 +113,8 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             var doc = scope.edit.documentation;
             if (!doc)
                 doc = '<p ng-class="{placeholder: version!=\'latest\'}">(No ' + scope.panelType + ')</p>';
-            element.append('<div class="panel panel-info">'+doc+'</div>');
+            element[0].innerHTML = '<div class="panel panel-info">'+doc+'</div>';
+            //element.append('<div class="panel panel-info">'+doc+'</div>');
             scope.recompileScope = scope.$new();
             $compile(element.contents())(scope.recompileScope); 
             if (mmsViewCtrl) {
@@ -124,9 +140,10 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                 if (!version)
                     version = viewVersion.version;
             }
+            element.html('(loading...)');
             scope.ws = ws;
             scope.version = version ? version : 'latest';
-            ElementService.getElement(scope.mmsEid, false, ws, version)
+            ElementService.getElement(scope.mmsEid, false, ws, version, 1)
             .then(function(data) {
                 scope.element = data;
                 if (!scope.panelTitle) {
@@ -141,8 +158,8 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                 });*/
                 //scope.$watch('element.documentation', recompile);
                 if (scope.version === 'latest') {
-                    scope.$on('element.updated', function(event, eid, ws, type) {
-                        if (eid === scope.mmsEid && ws === scope.ws && (type === 'all' || type === 'documentation'))
+                    scope.$on('element.updated', function(event, eid, ws, type, continueEdit) {
+                        if (eid === scope.mmsEid && ws === scope.ws && (type === 'all' || type === 'documentation') && !continueEdit)
                             recompile();
                     });
                 }
@@ -183,7 +200,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                 if (reason.status === 410)
                     status = ' deleted';
                 element.html('<span class="error">doc cf ' + newVal + status + '</span>');
-                growl.error('Cf Doc Error: ' + reason.message + ': ' + scope.mmsEid);
+                //growl.error('Cf Doc Error: ' + reason.message + ': ' + scope.mmsEid);
             });
         });
 
@@ -209,6 +226,10 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                 Utils.saveAction(scope,recompile,scope.bbApi,null,type,element);
             };
 
+            scope.saveC = function() {
+                Utils.saveAction(scope,recompile,scope.bbApi,null,type,element,true);
+            };
+
             scope.cancel = function() {
                 Utils.cancelAction(scope,recompile,scope.bbApi,type,element);
             };
@@ -231,8 +252,8 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             scope.instanceSpec = mmsViewPresentationElemCtrl.getInstanceSpec();
             scope.instanceVal = mmsViewPresentationElemCtrl.getInstanceVal();
             scope.presentationElem = mmsViewPresentationElemCtrl.getPresentationElement();
-            var auto = [ViewService.typeToClassifierId.Image, ViewService.typeToClassifierId.Paragraph,
-                ViewService.typeToClassifierId.List, ViewService.typeToClassifierId.Table];
+            var auto = [ViewService.TYPE_TO_CLASSIFIER_ID.Image, ViewService.TYPE_TO_CLASSIFIER_ID.Paragraph,
+                ViewService.TYPE_TO_CLASSIFIER_ID.List, ViewService.TYPE_TO_CLASSIFIER_ID.Table];
 
             if (auto.indexOf(scope.instanceSpec.specialization.classifier[0]) >= 0)
             //do not allow model generated to be deleted
@@ -249,6 +270,19 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                 scope.tinymceType = scope.presentationElem.type;
             }
         }
+        
+        //actions for stomp 
+        scope.$on("stomp.element", function(event, deltaSource, deltaWorkspaceId, deltaElementId, deltaModifier, elemName){
+            if(deltaWorkspaceId === scope.ws && deltaElementId === scope.mmsEid){
+                if(scope.isEditing === false){
+                    recompile();
+                }
+                if(scope.isEditing === true){
+                    growl.warning("This documentation has been changed: " + elemName +
+                                " modified by: " + deltaModifier, {ttl: -1});
+                }
+            }
+        });
 
     };
 

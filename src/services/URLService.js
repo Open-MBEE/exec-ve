@@ -162,6 +162,23 @@ function urlService(baseUrl) {
 
     /**
      * @ngdoc method
+     * @name mms.URLService#getSnapshotURL
+     * @methodOf mms.URLService
+     *
+     * @description
+     * Gets url that gets a snapshot
+     *
+     * @param {string} id Id of the snapshot
+     * @param {string} workspace Workspace name
+     * @returns {string} The url
+     */
+    var getSnapshotURL = function(id, workspace) {
+        return root + "/workspaces/" + workspace + 
+                      "/snapshots/" + id;
+    };
+
+    /**
+     * @ngdoc method
      * @name mms.URLService#getConfigProductsURL
      * @methodOf mms.URLService
      *
@@ -304,8 +321,7 @@ function urlService(baseUrl) {
      * @returns {string} The url.
      */
     var getElementVersionsURL = function(id, workspace) {
-        return root + "/javawebscripts/elements/" + id + "/versions";
-        //return root + '/workspaces/' + workspace + '/elements/' + id + '/versions';
+        return root + '/workspaces/' + workspace + '/history/' + id;
     };
 
     /**
@@ -321,6 +337,23 @@ function urlService(baseUrl) {
      */
     var getPostElementsURL = function(workspace) {
         return root + '/workspaces/' + workspace + '/elements';
+    };
+
+    /**
+     * @ngdoc method
+     * @name mms.URLService#getPutElementsURL
+     * @methodOf mms.URLService
+     * 
+     * @description
+     * Gets the path for getting multiple elements (using put with body).
+     * 
+     * @param {string} workspace Workspace name
+     * @param {string} version timestamp
+     * @returns {string} The post elements url.
+     */
+    var getPutElementsURL = function(workspace, version) {
+        var r = root + '/workspaces/' + workspace + '/elements';
+        return addVersion(r, version);
     };
 
     var getPostElementsWithSiteURL = function(workspace, site) {
@@ -375,9 +408,9 @@ function urlService(baseUrl) {
         else if (status === 410)
             result.message = "Deleted";
         else if (status === 408)
-            result.message = "Timed Out (Please check network)";
+            result.message = "Timed Out";
         else
-            result.message = "Failed (Please check network)";
+            result.message = "Timed Out (Please check network)";
         deferred.reject(result);
     };
 
@@ -409,10 +442,12 @@ function urlService(baseUrl) {
      * @param {string} query Keyword query
      * @param {Array.<string>} filters if not null, put in filters
      * @param {string} propertyName if not null put in propertyName
+     * @param {integer} page page to get
+     * @param {integer} items items per page
      * @param {string} workspace Workspace name to search under
      * @returns {string} The post elements url.
      */
-    var getElementSearchURL = function(query, filters, propertyName, workspace) {
+    var getElementSearchURL = function(query, filters, propertyName, page, items, workspace) {
         var r = root + '/workspaces/' + workspace + '/search?keyword=' + query;
         if (filters) {
             var l = filters.join();
@@ -420,6 +455,11 @@ function urlService(baseUrl) {
         }
         if (propertyName) {
             r += '&propertyName=' + propertyName;
+        }
+        if (items && items > 0) {
+            r += "&maxItems=" + items;
+            if (page >= 0)
+                r += '&skipCount=' + page;
         }
         return r;
     };
@@ -461,6 +501,10 @@ function urlService(baseUrl) {
             return url + '/versions/' + version;
     };
 
+    var getRoot = function() {
+        return root;
+    };
+
     return {
         getSiteDashboardURL: getSiteDashboardURL,
         getElementURL: getElementURL,
@@ -476,16 +520,19 @@ function urlService(baseUrl) {
         getConfigSnapshotsURL: getConfigSnapshotsURL,
         getSiteProductsURL: getSiteProductsURL,
         getConfigURL: getConfigURL,
+        getSnapshotURL: getSnapshotURL,
         getConfigsURL: getConfigsURL,
         getConfigProductsURL : getConfigProductsURL,
         getDocumentViewsURL: getDocumentViewsURL,
         getViewElementsURL: getViewElementsURL,
         getWsDiffURL: getWsDiffURL,
         getPostWsDiffURL: getPostWsDiffURL,
+        getPutElementsURL: getPutElementsURL,
         getWorkspacesURL: getWorkspacesURL,
         getWorkspaceURL: getWorkspaceURL,
         getCheckLoginURL: getCheckLoginURL,
-        isTimestamp: isTimestamp
+        isTimestamp: isTimestamp,
+        getRoot: getRoot
     };
 
 }

@@ -29,10 +29,14 @@ function UxService($rootScope) {
 		  	return {id: button, icon: 'fa-eye', selected: true, active: true, permission:true, tooltip: 'Preview Element', 
             		spinner: false, onClick: function() {$rootScope.$broadcast(button);},
                 dynamic_buttons: [getToolbarButton("element.editor.saveall")]};
+      case "element.history":
+		  	return {id: button, icon: 'fa-history', selected: true, active: true, permission:true, tooltip: 'Element History', 
+            		spinner: false, onClick: function() {$rootScope.$broadcast(button);},
+                dynamic_buttons: [getToolbarButton("element.editor.saveall")]};
 		  case "element.editor":
 		    return {id: button, icon: 'fa-edit', selected: false, active: true, permission:false, tooltip: 'Edit Element',
 		            spinner: false, onClick: function() {$rootScope.$broadcast(button);},
-		        	dynamic_buttons: [getToolbarButton("element.editor.save"), getToolbarButton("element.editor.saveall"), getToolbarButton("element.editor.cancel")]};
+		        	dynamic_buttons: [getToolbarButton("element.editor.save"), getToolbarButton('element.editor.saveC'), getToolbarButton("element.editor.saveall"), getToolbarButton("element.editor.cancel")]};
 		  case "view.reorder":
 	        return {id: button, icon: 'fa-arrows-v', selected: false, active: true, permission:false, tooltip: 'Reorder View',
 	    	        spinner: false, onClick: function() {$rootScope.$broadcast(button);},
@@ -47,6 +51,9 @@ function UxService($rootScope) {
 		  case "element.editor.save":
 			return {id: button, icon: 'fa-save', dynamic: true, selected: false, active: false, permission:true, tooltip: 'Save',
 				        spinner: false, onClick: function() {$rootScope.$broadcast(button);}};
+      case "element.editor.saveC":
+      return {id: button, icon: 'fa-send-o', dynamic: true, selected: false, active: false, permission:true, tooltip: 'Save and Continue',
+                spinner: false, onClick: function() {$rootScope.$broadcast(button);}};
 		  case "element.editor.saveall":
 			return {id: button, icon: 'fa-save-all', dynamic: true, selected: false, active: false, permission:false, tooltip: 'Save All',
 				        spinner: false, onClick: function() {$rootScope.$broadcast(button);}};
@@ -88,6 +95,9 @@ function UxService($rootScope) {
 		  case "tree.add.document":
 		  	return {id: button, icon: 'fa-plus', selected: true, active: true, permission: false, tooltip: 'Add Document', 
             		spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
+      case "tree.delete.document":
+        return {id: button, icon: 'fa-trash', selected: true, active: true, permission: false, tooltip: 'Delete Document', 
+                spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
 		  case "tree.add.view":
 		  	return {id: button, icon: 'fa-plus', selected: true, active: true, permission: false, tooltip: 'Add View', 
             		spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
@@ -149,10 +159,11 @@ function UxService($rootScope) {
           case "view.add.dropdown":
             return {id: button, icon: 'fa-plus', selected: true, active: true, permission: true, tooltip: 'Add Item', 
                     spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);},
-                	dropdown_buttons: [getButtonBarButton("view.add.paragraph"), getButtonBarButton("view.add.section")]
+                	dropdown_buttons: [getButtonBarButton("view.add.paragraph"), getButtonBarButton("view.add.section"),
+                  getButtonBarButton("view.add.comment"), getButtonBarButton("view.add.list"),
+                  getButtonBarButton("view.add.table"),getButtonBarButton("view.add.image")]
                   //, getButtonBarButton("view.add.table"),
-                		//				getButtonBarButton("view.add.list"), getButtonBarButton("view.add.equation"), getButtonBarButton("view.add.image"),
-                			//			getButtonBarButton("view.add.section")]
+                		// getButtonBarButton("view.add.equation"), getButtonBarButton("view.add.image"),
                     };
           case "view.add.table":
             return {id: button, icon: 'fa-table', selected: true, active: true, permission: true, tooltip: 'Add Table', 
@@ -172,12 +183,18 @@ function UxService($rootScope) {
           case "view.add.section":
             return {id: button, icon: 'fa-list-alt', selected: true, active: true, permission: true, tooltip: 'Add Section', 
                     spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
+          case "view.add.comment":
+            return {id: button, icon: 'fa-comment-o', selected: true, active: true, permission: true, tooltip: 'Add Comment', 
+                    spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
           case "presentation.element.delete":
             return {id: button, icon: 'fa-trash', selected: true, active: true, permission: true, tooltip: 'Delete', 
                     spinner: false, togglable: false, action: function(e) {e.stopPropagation(); scope.delete();}};
           case "presentation.element.save":
             return {id: button, icon: 'fa-save', selected: true, active: true, permission: true, tooltip: 'Save', 
                     spinner: false, togglable: false, action: function(e) {e.stopPropagation(); scope.save();}};
+          case "presentation.element.saveC":
+            return {id: button, icon: 'fa-send-o', selected: true, active: true, permission: true, tooltip: 'Save and Continue', 
+                    spinner: false, togglable: false, action: function(e) {e.stopPropagation(); scope.saveC();}};
           case "presentation.element.cancel":
             return {id: button, icon: 'fa-times', selected: true, active: true, permission: true, tooltip: 'Cancel', 
                     spinner: false, togglable: false, action: function(e) {e.stopPropagation(); scope.cancel();}};
@@ -187,10 +204,11 @@ function UxService($rootScope) {
           case "section.add.dropdown":
             return {id: button, icon: 'fa-plus', selected: true, active: true, permission: true, tooltip: 'Add Item', 
                     spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);},
-                    dropdown_buttons: [getButtonBarButton("section.add.paragraph",scope), getButtonBarButton("section.add.section", scope)]
+                    dropdown_buttons: [getButtonBarButton("section.add.paragraph",scope), getButtonBarButton("section.add.section", scope),
+                    getButtonBarButton("section.add.comment", scope), getButtonBarButton("section.add.list",scope),
+                    getButtonBarButton("section.add.table",scope), getButtonBarButton("section.add.image",scope)]
                     //, getButtonBarButton("section.add.table",scope),
-                      //                  getButtonBarButton("section.add.list",scope), getButtonBarButton("section.add.equation", scope), getButtonBarButton("section.add.image",scope),
-                        //                getButtonBarButton("section.add.section",scope)]
+                      //, getButtonBarButton("section.add.equation", scope), getButtonBarButton("section.add.image",scope),
                       };
           case "section.add.table":
             return {id: button, icon: 'fa-table', selected: true, active: true, permission: true, tooltip: 'Add Table', 
@@ -210,6 +228,18 @@ function UxService($rootScope) {
           case "section.add.section":
             return {id: button, icon: 'fa-list-alt', selected: true, active: true, permission: true, tooltip: 'Add Section', 
                     spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button, scope.section);}};
+          case "section.add.comment":
+            return {id: button, icon: 'fa-comment-o', selected: true, active: true, permission: true, tooltip: 'Add Comment', 
+                    spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button, scope.section);}};
+          case "print":
+            return {id: button, icon: 'fa-print', selected: true, active: true, permission: true, tooltip: 'Print', 
+                    spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
+          case "word":
+            return {id: button, icon: 'fa-file-word-o', selected: true, active: true, permission: true, tooltip: 'Save to Word', 
+                    spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
+          case "tabletocsv":
+            return {id: button, icon: 'fa-table', selected: true, active: true, permission: true, tooltip: 'Table to CSV', 
+                    spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
         }
 	};
 

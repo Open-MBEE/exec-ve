@@ -8,6 +8,15 @@ mms-transclude-img {
   cursor: pointer;
 }
 
+span > mms-transclude-doc, span > mms-transclude-val {
+    background-color: inherit;
+    color: inherit;
+    > p, > h1, > h2, > h3, > h4, > h5, > h6, > ol, > ul, > pre {
+      background-color: inherit;
+      color: inherit;
+    }
+}
+
 mms-view {
   mms-transclude-doc *,
   mms-transclude-name *,
@@ -100,13 +109,13 @@ mms-view:not(.reviewing) mms-transclude-com {
 }
 
 mms-spec div {
+  tms-timely,
   mms-transclude-img,
   mms-transclude-name,
   mms-transclude-val,
   mms-transclude-doc,
   mms-view-link {
     background-color: $light_blue;
-    cursor: not-allowed;
   }
 
   mms-transclude-com {
@@ -117,4 +126,8 @@ mms-spec div {
 
 .error {
   color: $red;
+}
+
+figcaption {
+  text-align: center;
 }
