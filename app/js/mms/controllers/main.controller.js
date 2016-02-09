@@ -50,7 +50,7 @@ function($scope, $location, $rootScope, $state, _, $window, growl, $http, URLSer
     //actions for stomp checking edit mode
     $scope.$on("stomp.element", function(event, deltaSource, deltaWorkspaceId, deltaElementID, deltaModifier, deltaName){
         console.log("main controller=============================================================");
-        if($rootScope.veEdits['element|' + deltaElementID + '|' + deltaWorkspaceId] === undefined){
+        if($rootScope.veEdits && $rootScope.veEdits['element|' + deltaElementID + '|' + deltaWorkspaceId] === undefined){
             UtilsService.mergeElement( deltaSource, deltaElementID, deltaWorkspaceId , true , "all" );
         }
     });
