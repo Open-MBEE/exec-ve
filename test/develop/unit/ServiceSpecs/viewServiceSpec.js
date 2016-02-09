@@ -1,17 +1,51 @@
 //ViewService: createView, createDocument, createInstanceSpecification, getViewElements
 
 'use strict';
-describe('CacheService', function() {
+describe('ViewService', function() {
 	beforeEach(module('mms', function($provide) {}));
     var root = '/alfresco/service';
     var forceFail;
-    var ViewService, $httpBackend, $rootScope;
+    var ViewService, $httpBackend, $rootScope, ownerId;
 
 	beforeEach(inject(function($injector) {
 		ViewService = $injector.get('ViewService');
         $httpBackend = $injector.get('$httpBackend');
         $rootScope = $injector.get('$rootScope');
-        
+		ownerId = {
+		    "siteCharacterizationId": "vetest",
+		    "qualifiedId": "/vetest/PROJECT-21bbdceb-a188-45d9-a585-b30bba346175/_17_0_5_1_407019f_1402422593316_200143_16117/_17_0_5_1_407019f_1402422683509_36078_16169/MMS_1442345799882_df10c451-ab83-4b99-8e40-0a8e04b38b9d",
+		    "nodeRefId": "versionStore://version2Store/9fcf1b57-dcaa-43b2-93bf-0eb6e0a2692a",
+		    "versionedRefId": "versionStore://version2Store/f94951b8-7fbd-4a33-8d29-d11876091302",
+		    "qualifiedName": "/vetest/VETest/adasdsddd3/Test64 sgfa/test opaquepara",
+		    "sysmlid": "MMS_1442345799882_df10c451-ab83-4b99-8e40-0a8e04b38b9d",
+		    "isMetatype": false,
+		    "editable": true,
+		    "creator": "dlam",
+		    "modified": "2015-12-17T12:45:15.316-0800",
+		    "modifier": "dlam",
+		    "created": "Thu Dec 17 12:25:39 PST 2015",
+		    "name": "test opaquepara",
+		    "documentation": "",
+		    "owner": "_17_0_5_1_407019f_1402422683509_36078_16169",
+		    "appliedMetatypes": [
+		        "_17_0_1_232f03dc_1325612611695_581988_21583",
+		        "_9_0_62a020a_1105704885343_144138_7929"
+		    ],
+		    "read": "2016-02-09T13:57:59.842-0800",
+		    "specialization": {
+		        "displayedElements": ["MMS_1442345799882_df10c451-ab83-4b99-8e40-0a8e04b38b9d"],
+		        "contents": {
+		            "operand": [{
+		                "type": "InstanceValue",
+		                "instance": "MMS_1442345802606_38e60e27-d4b1-47ce-b876-840a2b7e9b3c"
+		            }],
+		            "type": "Expression"
+		        },
+		        "allowedElements": [],
+		        "contains": [],
+		        "type": "View"
+		    }
+		};
         $httpBackend.whenGET('/alfresco/service/workspaces/master/views/12345/elements?timestamp=01-01-2014').respond(
             {elements: [{author:'muschek', name:'view\'s element', sysmlid:12346, owner:12345, lastModified:'01-01-2014'}, 
             {author:'muschek', name:'view\'s 2nd element', sysmlid:12347, owner:12345, lastModified:'01-01-2014'}]});
@@ -49,7 +83,6 @@ describe('CacheService', function() {
             if (!json.elements[0].sysmlid) {
                 json.elements[0].sysmlid = json.elements[0].name + 'Id';
             }
-
             return [200, json];
         });
 
@@ -60,5 +93,57 @@ describe('CacheService', function() {
                 id: 'snapshotId' } ] } ] };
                 return [200, products];
             }
-        });    
-    }));
+        });
+		}));
+		describe('Method CreateView', function() {
+			// ViewService.createView(undefined, viewName, undefined, workspace, wsCoverDocId)
+			// .then(function(data) {
+			// 	return data;
+			// }, function(reason) {
+			// 	return null;
+			// });
+			// promise = ViewService.createView($scope.createViewParent, $scope.newView.name, 
+			// 								 $scope.document.sysmlid, ws);
+			it('create a view similar to the workspace state in app.js', inject(function() {
+				ViewService.createView(undefined, 'Untitled View', undefined, 'master', 'viewDoc').then(function(data) {
+					// this is a strange ass test basically testing building a json object
+					//console.log(data.specialization.contains);
+					//console.log("The long object " + JSON.stringify(data));
+					//expect(data.owner).toEqual('ownerId');
+					expect(data.name).toEqual('Untitled View');
+					expect(data.documentation).toEqual('');
+					expect(data.specialization.type).toEqual('View');
+					// expect(data.specialization.contains).toEqual([{type:'Paragraph', sourceType:'reference',
+					// 	source: data.sysmlid, sourceProperty:'documentation'}]);
+					// expect(data.specialization.allowedElements).toEqual([data.sysmlid]);
+					// expect(data.specialization.displayedElements).toEqual([data.sysmlid]);
+					// expect(data.specialization.childrenViews).toEqual([]);
+				}, function(reason){
+					console.log("this happened" + reason);
+				}); 
+				$httpBackend.flush();//only because it might call the element service
+			}));
+			it('create a view similar to the workspace state in the tree controller', inject(function() {
+				ViewService.createView(ownerId, 'create view for tree', 'idMatchDocId', 'master').then(function(data){
+					//console.log("The long object " + JSON.stringify(data.owner));
+					expect(data.owner).toEqual('ownerId');
+				},
+				function(reason){
+					console.log("this happened" + reason);
+				});
+				$httpBackend.flush();
+			}));
+		});
+		describe('Method createDocument', function() {
+			//ViewService.createDocument($scope.doc.name, $scope.addDocSite, ws);
+			it('create a document similar to the tree Controller', inject(function() {
+				ViewService.createDocument('idMatchDocId','siteId' ,'master').then(function(data){
+					console.log("The long object " + JSON.stringify(data.owner));
+				},
+				function(reason){
+					console.log("this happened" + reason);
+				});
+			}));
+
+		});
+	});

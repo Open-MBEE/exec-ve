@@ -734,7 +734,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * already be in the document. The new view will be added as the last child of the 
      * parent view.
      * 
-     * @param {string} owner owner of the parent view
+     * @param {object} owner owner of the parent view
      * @param {string} [name=Untitled] name for the view
      * @param {string} [documentId] optional document to add to
      * @param {string} [workspace=master] workspace to use 
