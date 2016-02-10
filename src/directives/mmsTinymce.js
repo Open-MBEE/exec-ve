@@ -27,7 +27,7 @@ angular.module('mms.directives')
    </pre>
  *
  * @param {Array=} mmsCfElements Array of element objects as returned by ElementService
- *      that can be transcluded. Regardless, transclusion allows keyword searching 
+ *      that can be transcluded. Regardless, transclusion allows keyword searching
  *      elements to transclude from alfresco
  */
 function mmsTinymce(ElementService, ViewService, CacheService, $modal, $templateCache, $window, $timeout, growl, tinymce, UtilsService) { //depends on angular bootstrap
@@ -234,14 +234,14 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                         vid = elem.sysmlid;
                     else
                         peid = elem.sysmlid;
-                } else 
+                } else
                     vid = elem.sysmlid;
                 var tag = '<mms-view-link';
-                if (did) 
+                if (did)
                     tag += ' data-mms-did="' + did + '"';
-                if (vid) 
+                if (vid)
                     tag += ' data-mms-vid="' + vid + '"';
-                if (peid) 
+                if (peid)
                     tag += ' data-mms-peid="' + peid + '"';
                 tag += '>[cf:' + elem.name + '.vlink]</mms-view-link> ';
                 $modalInstance.close(tag);
@@ -255,11 +255,11 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                 else if (ViewService.isPresentationElement(elem))
                     peid = elem.sysmlid;
                 var tag = '<mms-view-link';
-                if (did) 
+                if (did)
                     tag += ' data-mms-did="' + did + '"';
-                if (vid) 
+                if (vid)
                     tag += ' data-mms-vid="' + vid + '"';
-                if (peid) 
+                if (peid)
                     tag += ' data-mms-peid="' + peid + '"';
                 tag += '>[cf:' + elem.name + '.vlink]</mms-view-link> ';
                 $modalInstance.close(tag);
@@ -270,7 +270,7 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
             $scope.mainSearchFilter = function(data) {
                 var views = [];
                 data.forEach(function(v) {
-                    if (v.specialization && (v.specialization.type === 'View' || v.specialization.type === 'Product' || 
+                    if (v.specialization && (v.specialization.type === 'View' || v.specialization.type === 'Product' ||
                             (ViewService.isPresentationElement(v) && v.relatedDocuments))) {
                         if (v.properties)
                             delete v.properties;
@@ -301,8 +301,8 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
 
         var commentCtrl = function($scope, $modalInstance) {
             $scope.comment = {
-                name: '', 
-                documentation: '', 
+                name: '',
+                documentation: '',
                 specialization: {
                     type: 'Comment'
                 }
@@ -448,8 +448,27 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
             paste_retain_style_properties: 'color background-color font-size text-align',
             browser_spellcheck: true,
             invalid_elements: 'div,font',
-            extended_valid_elements: 'script[language|type|src],mms-maturity-bar,tms-timely,seqr-timely,mms-d3-observation-profile-chart-io,mms-d3-parallel-axis-chart-io,mms-d3-radar-chart-io,mms-d3-grouped-horizontal-bar-chart-io,mms-site-docs,mms-workspace-docs,mms-diagram-block,mms-view-link[class:mceNonEditable],-mms-transclude-doc[class:mceNonEditable],-mms-transclude-name[class:mceNonEditable],-mms-transclude-com[class:mceNonEditable],-mms-transclude-val[class:mceNonEditable],-mms-transclude-img[class:mceNonEditable],math,maction,maligngroup,malignmark,menclose,merror,mfenced,mfrac,mglyph,mi,mlabeledtr,mlongdiv,mmultiscripts,mn,mo,mover,mpadded,mphantom,mroot,mrow,ms,mscarries,mscarry,msgroup,mstack,msline,mspace,msqrt,msrow,mstyle,msub,msup,msubsup,mtable,mtd,mtext,mtr,munder,munderover',
-            custom_elements: 'mms-maturity-bar,tms-timely,seqr-timely,mms-d3-observation-profile-chart-io,mms-d3-parallel-axis-chart-io,mms-d3-radar-chart-io,mms-d3-grouped-horizontal-bar-chart-io,mms-site-docs,mms-workspace-docs,mms-diagram-block,~mms-view-link,~mms-transclude-doc,~mms-transclude-name,~mms-transclude-com,~mms-transclude-val,~mms-transclude-img,math,maction,maligngroup,malignmark,menclose,merror,mfenced,mfrac,mglyph,mi,mlabeledtr,mlongdiv,mmultiscripts,mn,mo,mover,mpadded,mphantom,mroot,mrow,ms,mscarries,mscarry,msgroup,mstack,msline,mspace,msqrt,msrow,mstyle,msub,msup,msubsup,mtable,mtd,mtext,mtr,munder,munderover',
+            extended_valid_elements:
+              'script[language|type|src],mms-maturity-bar,tms-timely,seqr-timely,' +
+              'mms-d3-observation-profile-chart-io,mms-d3-parallel-axis-chart-io,' +
+              'mms-d3-radar-chart-io,mms-d3-grouped-horizontal-bar-chart-io,mms-site-docs,' +
+              'mms-workspace-docs,mms-diagram-block,mms-view-link[class:mceNonEditable],' +
+              '-mms-transclude-doc[class:mceNonEditable],-mms-transclude-name[class:mceNonEditable],' +
+              '-mms-transclude-com[class:mceNonEditable],-mms-transclude-val[class:mceNonEditable],' +
+              '-mms-transclude-img[class:mceNonEditable],math,maction,maligngroup,' +
+              'malignmark,menclose,merror,mfenced,mfrac,mglyph,mi,mlabeledtr,mlongdiv,' +
+              'mmultiscripts,mn,mo,mover,mpadded,mphantom,mroot,mrow,ms,mscarries,' +
+              'mscarry,msgroup,mstack,msline,mspace,msqrt,msrow,mstyle,msub,msup,' +
+              'msubsup,mtable,mtd,mtext,mtr,munder,munderover,mms-line-graph',
+            custom_elements:
+              'mms-maturity-bar,tms-timely,seqr-timely,mms-d3-observation-profile-chart-io,' +
+              'mms-d3-parallel-axis-chart-io,mms-d3-radar-chart-io,mms-d3-grouped-horizontal-bar-chart-io,' +
+              'mms-site-docs,mms-workspace-docs,mms-diagram-block,~mms-view-link,~mms-transclude-doc,' +
+              '~mms-transclude-name,~mms-transclude-com,~mms-transclude-val,~mms-transclude-img,math,' +
+              'maction,maligngroup,malignmark,menclose,merror,mfenced,mfrac,mglyph,mi,mlabeledtr,mlongdiv,' +
+              'mmultiscripts,mn,mo,mover,mpadded,mphantom,mroot,mrow,ms,mscarries,mscarry,msgroup,mstack,' +
+              'msline,mspace,msqrt,msrow,mstyle,msub,msup,msubsup,mtable,mtd,mtext,mtr,munder,munderover' +
+              'mms-line-graph',
             fix_list_elements: true,
             content_css: 'css/partials/mms.min.css',
             paste_data_images: true,
@@ -543,14 +562,14 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                     element.blur();
                 });
                 /*ed.on('keydown', function(e) {
-                    if (e.keyCode === 9) { 
-                        if (e.shiftKey) 
+                    if (e.keyCode === 9) {
+                        if (e.shiftKey)
                             ed.execCommand('Outdent');
-                        else 
+                        else
                             ed.execCommand('Indent');
                         e.preventDefault();
                         return false;
-                    }  
+                    }
                 });*/
                 ed.on('keydown', function(e) {
                     if (e.shiftKey && e.keyCode === 50) {
