@@ -422,35 +422,28 @@ function mmsCkeditor(ElementService, ViewService, CacheService, $modal, $templat
         };
         
         var defaultToolbar = [
-            { name: 'document',    items : [ 'Source','-','DocProps','Preview','Print','-','Templates' ] },
-            { name: 'clipboard',   items : [ 'Cut','Copy','Paste','PasteText','PasteFromWord','-','Undo','Redo' ] },
-            { name: 'editing',     items : [ 'Find','Replace','-','SelectAll','-','SpellChecker', 'Scayt' ] },
-            { name: 'forms',       items : [ 'Form', 'Checkbox', 'Radio', 'TextField', 'Textarea', 'Select', 'Button', 'ImageButton', 'HiddenField' ] },
-            '/',
-            { name: 'basicstyles', items : [ 'Bold','Italic','Underline','Strike','Subscript','Superscript','-','RemoveFormat' ] },
-            { name: 'paragraph',   items : [ 'Blockquote','CreateDiv','-','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','-','BidiLtr','BidiRtl' ] },
-            { name: 'links',       items : [ 'Link','Unlink','Anchor' ] },
+            { name: 'document',    items : [ 'Source','-','DocProps' ] },
+            { name: 'clipboard',   items : [ 'Undo','Redo' ] },
+            { name: 'editing',     items : [ 'Find','Replace','-','SelectAll' ] },
             { name: 'tools',       items : [ 'Maximize', 'ShowBlocks' ] },
-            { name: 'insert',      items : ['SpecialChar','Mathjax','PageBreak','HorizontalRule' ] },
+            // { name: 'forms',       items : [ 'Form', 'Checkbox', 'Radio', 'TextField', 'Textarea', 'Select', 'Button', 'ImageButton', 'HiddenField' ] },
+            { name: 'basicstyles', items : [ 'Bold','Italic','Underline','Strike','Subscript','Superscript','-','RemoveFormat' ] },
+            { name: 'paragraph',   items : [ 'Blockquote','-','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock' ] },
+            { name: 'links',       items : [ 'Link','Unlink' ] },
+            { name: 'insert',      items : ['SpecialChar','Mathjax','eqneditor','PageBreak','HorizontalRule','pbckcode' ] },
             '/',
-            { name: 'styles',      items : [ 'Styles','Format','Font','FontSize' ] },
-            { name: 'colors',      items : [ 'TextColor','BGColor' ] },
-            // { name: 'custom',      items : [ 'Mmscf','Mmscomment', 'Mmsvlink' ] },
+            { name: 'styles',      items : [ 'Format','FontSize','TextColor','BGColor' ] },
         ];
-        var tableToolbar =  { name: 'table',  items: [ 'Table' ]};
-        var listToolbar =   { name: 'list',   items: [ 'NumberedList','BulletedList','Outdent','Indent' ]};
-        // var codeToolbar = ' code ';
-        var imageToolbar =  { name: 'image',  items: [ 'Image','base64image','Smiley','Flash','IFrame'  ]};
-        var customToolbar = { name: 'custom', items : [ 'Mmscf','Mmscomment', 'Mmsvlink' ] };
-        var allToolbar = defaultToolbar.slice();
-        allToolbar.push(listToolbar);
-        allToolbar.push(tableToolbar);
-        allToolbar.push(imageToolbar);
-        // allToolbar.push(codeToolbar);
-        allToolbar.push(customToolbar);
-        var thisToolbar = allToolbar;
-        // if (scope.mmsTinymceType === 'Equation')
-            // thisToolbar = codeToolbar;
+        var tableToolbar =  { name: 'table',  items: [ 'Table' ] };
+        var listToolbar =   { name: 'list',   items: [ 'NumberedList','BulletedList','Outdent','Indent' ] };
+        var imageToolbar =  { name: 'image',  items: [ 'base64image','iframe','mediaembed','embed' ] };
+        var customToolbar = { name: 'custom', items : [ 'Mmscf','Mmscomment', 'Mmsvlink', 'mmsreset' ] };
+        
+        var thisToolbar = defaultToolbar.slice();
+        thisToolbar.push(listToolbar);
+        thisToolbar.push(tableToolbar);
+        thisToolbar.push(imageToolbar);
+        thisToolbar.push(customToolbar);
         if (scope.mmsTinymceType === 'TableT') {
           thisToolbar = defaultToolbar.slice();
           thisToolbar.push(tableToolbar);
@@ -478,19 +471,25 @@ function mmsCkeditor(ElementService, ViewService, CacheService, $modal, $templat
             file_picker_callback: imageCallback,
             file_picker_types: 'image',
         };
-        
+        var mmsResetCallback = {
+          update: update,
+          resetFnc: resetCrossRef
+        };
         $timeout(function() {
           instance = CKEDITOR.replace(attrs.id, {
             // customConfig: '/lib/ckeditor/config.js',
-            extraPlugins: 'autogrow,mathjax,base64image,mmscf,mmscomment,mmsvlink',
+            extraPlugins: 'autogrow,mathjax,base64image,pastebase64,iframe,mediaembed,embed,autoembed,pbckcode,eqneditor,mmscf,mmscomment,mmsvlink,mmsreset',
             mmscf: {callbackModalFnc: transcludeCallback},
             mmscomment: {callbackModalFnc: commentCallback},
             mmsvlink: {callbackModalFnc: viewLinkCallback},
+            mmsreset: {callback: mmsResetCallback},
             mathJaxLib: 'http://cdn.mathjax.org/mathjax/2.2-latest/MathJax.js?config=TeX-AMS_HTML',
             autoGrow_minHeight: 200,
             autoGrow_maxHeight: $window.innerHeight*0.65,
             autoGrow_bottomSpace: 50,
-            extraAllowedContent:'script[language|type|src]; mms-maturity-bar; tms-timely; seqr-timely; mms-d3-observation-profile-chart-io; mms-d3-parallel-axis-chart-io; mms-d3-radar-chart-io; mms-d3-horizontal-bar-chart-io; mms-site-docs; mms-workspace-docs; mms-diagram-block; mms-view-link(mceNonEditable); mms-transclude-doc(mceNonEditable); mms-transclude-name(mceNonEditable); mms-transclude-com(mceNonEditable); mms-transclude-val(mceNonEditable); mms-transclude-img(mceNonEditable); math; maction; maligngroup; malignmark; menclose;merror;mfenced;mfrac;mglyph;mi;mlabeledtr;mlongdiv;mmultiscripts;mn;mo;mover;mpadded;mphantom;mroot;mrow;ms;mscarries;mscarry;msgroup;mstack;msline;mspace;msqrt;msrow;mstyle;msub;msup;msubsup;mtable;mtd;mtext;mtr;munder;munderover',
+            
+            // extraAllowedContent: 'script[language,type,src] mms-maturity-bar',// tms-timely seqr-timely',
+            //  mms-d3-observation-profile-chart-io; mms-d3-parallel-axis-chart-io; mms-d3-radar-chart-io; mms-d3-horizontal-bar-chart-io; mms-site-docs; mms-workspace-docs; mms-diagram-block; mms-view-link(mceNonEditable); mms-transclude-doc(mceNonEditable); mms-transclude-name(mceNonEditable); mms-transclude-com(mceNonEditable); mms-transclude-val(mceNonEditable); mms-transclude-img(mceNonEditable); math; maction; maligngroup; malignmark; menclose; merror;mfenced;mfrac;mglyph;mi;mlabeledtr;mlongdiv;mmultiscripts;mn;mo;mover;mpadded;mphantom;mroot;mrow;ms;mscarries;mscarry;msgroup;mstack;msline;mspace;msqrt;msrow;mstyle;msub;msup;msubsup;mtable;mtd;mtext;mtr;munder;munderover',
             pasteFromWordRemoveFontStyles: false,
             disableNativeSpellChecker: false,
             disallowedContent: 'div,font',
