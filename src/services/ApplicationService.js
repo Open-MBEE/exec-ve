@@ -31,9 +31,9 @@
 //     };
 // });
 angular.module('mms')
-.factory('ApplicationService', [ApplicationService]);
+.factory('ApplicationService', ['URLService','$http', ApplicationService]);
 
-function ApplicationService() {
+function ApplicationService(URLService, $http) {
      var source = createUniqueId();
      function createUniqueId() {
             function s4() {
@@ -57,8 +57,18 @@ function ApplicationService() {
             return source;
     };
 
+    var getMmsVersion = function() {
+      $http.get(URLService.getMmsVersionURL())
+      .success(function(data,status,headers,config) {
+          return data;
+      }).error(function(data,status,headers,config){
+          URLService.handleHttpStatus(data, status, headers, config);
+      });
+    };
+    
     return {
-        getSource: getSource
+        getSource: getSource,
+        getMmsVersion: getMmsVersion,
     };
 
 }

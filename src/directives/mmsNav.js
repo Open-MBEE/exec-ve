@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsNav', ['$templateCache', '$state', 'hotkeys', 'growl', '$location', 'ElementService', mmsNav]);
+.directive('mmsNav', ['$templateCache', '$state', 'hotkeys', 'growl', '$location', '$modal', '$http', 'URLService', 'ApplicationService', 'ElementService', mmsNav]);
 
 /**
  * @ngdoc directive
@@ -30,7 +30,7 @@ angular.module('mms.directives')
     </pre>
  * @param {string} mmsTitle Title to display
  */
-function mmsNav($templateCache, $state, hotkeys, growl, $location, ElementService) {
+function mmsNav($templateCache, $state, hotkeys, growl, $location, $modal, $http, URLService, ApplicationService, ElementService) {
     var template = $templateCache.get('mms/templates/mmsNav.html');
 
     var mmsNavLink = function(scope, element, attrs) {
@@ -42,6 +42,29 @@ function mmsNav($templateCache, $state, hotkeys, growl, $location, ElementServic
         var sites = {};
         scope.toggleHelp = function() {
             hotkeys.toggleCheatSheet();
+        };
+        scope.toggleAbout = function() {
+          $http.get(URLService.getMmsVersionURL())
+          .success(function(data,status,headers,config) {
+              scope.mmsV = data.mmsVersion;
+              scope.veV = '2.3 rc3';
+              var instance = $modal.open({
+                  templateUrl: 'partials/mms/about.html',
+                  scope: scope,
+                  controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
+                      $scope.cancel = function() {
+                          $modalInstance.dismiss();
+                      };
+                  }]
+              });
+          }).error(function(data,status,headers,config){
+              URLService.handleHttpStatus(data, status, headers, config);
+          });
+            // scope.versions = [];
+            // var version = ApplicationService.getMmsVersion();
+            // scope.versions.push(version);
+            // scope.veV = '2.3 rc3';
+            
         };
         //Resets catagory and sites accordions
         scope.reset = function(){
@@ -205,6 +228,7 @@ function mmsNav($templateCache, $state, hotkeys, growl, $location, ElementServic
             title: '@mmsTitle', //page title - used in mobile view only
             site: '=mmsSite'
         },
+        
         link: mmsNavLink
     };
 }
