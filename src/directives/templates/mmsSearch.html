@@ -3,7 +3,7 @@
     <div class="transclude-modal-input">
         <form ng-submit="newSearch(searchText, 0, itemsPerPage)">
             <div class="form-search input-group">
-                <input class="form-control" type="text" focus-me="true" ng-model="searchText" placeholder="Search for an element" />
+                <input class="form-control" type="text" ng-model="searchText" placeholder="Search for an element" autofocus/>
                 <span class="input-group-btn">                
                     <button class="btn btn-primary" type="button" ng-click="newSearch(searchText, 0, itemsPerPage)">
                     <span class="btn-text">SEARCH</span> <i class="{{searchClass}}"></i></button>

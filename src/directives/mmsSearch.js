@@ -1,9 +1,9 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsSearch', ['ElementService', 'growl', '$timeout', '$rootScope','$templateCache', mmsSearch]);
+.directive('mmsSearch', ['ElementService', 'growl', '$rootScope','$templateCache', mmsSearch]);
 
-function mmsSearch(ElementService, growl, $timeout, $rootScope, $templateCache) {
+function mmsSearch(ElementService, growl, $rootScope, $templateCache) {
     var template = $templateCache.get('mms/templates/mmsSearch.html');
 
     var mmsSearchLink = function(scope, element, attrs) {
@@ -18,13 +18,6 @@ function mmsSearch(ElementService, growl, $timeout, $rootScope, $templateCache) 
         scope.currentPage = 0;
         scope.itemsPerPage = 50;
 
-        scope.$watch('trigger', function(value) {
-            if(value === "true") {
-                $timeout(function() {
-                    element[0].focus();
-                });
-            }
-        });
         scope.$watchGroup(['filterQuery.query', 'facet'], function(newVal, oldVal) {
             scope.resultFilter = {};
             scope.resultFilter[scope.facet] = scope.filterQuery.query;
@@ -140,7 +133,6 @@ function mmsSearch(ElementService, growl, $timeout, $rootScope, $templateCache) 
         scope: {
             mmsOptions: '=',
             mmsWs: '@',
-            trigger: '@focusMe'
         },
     };
 }
