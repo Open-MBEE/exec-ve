@@ -44,19 +44,21 @@ function mmsNav($templateCache, $state, hotkeys, growl, $location, $modal, $http
             hotkeys.toggleCheatSheet();
         };
         scope.toggleAbout = function() {
-            scope.versions = [];
+            scope.veV = '2.3 rc3';
+            scope.mmsV = 'loading...';
             ApplicationService.getMmsVersion().then(function(data) {
-              scope.mmsV = data.mmsVersion;
-              scope.veV = '2.3 rc3';
-              var instance = $modal.open({
-                  templateUrl: 'partials/mms/about.html',
-                  scope: scope,
-                  controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
-                      $scope.cancel = function() {
-                          $modalInstance.dismiss();
-                      };
-                  }]
-              }); 
+                scope.mmsV = data;
+              }, function(reason) {
+                scope.mmsV = "Could not retrieve due to failure: " +reason;
+          	});
+            var instance = $modal.open({
+                templateUrl: 'partials/mms/about.html',
+                scope: scope,
+                controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
+                    $scope.cancel = function() {
+                        $modalInstance.dismiss();
+                    };
+                }]
             });
         };
         //Resets catagory and sites accordions
