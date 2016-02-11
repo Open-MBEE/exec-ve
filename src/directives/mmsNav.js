@@ -44,8 +44,8 @@ function mmsNav($templateCache, $state, hotkeys, growl, $location, $modal, $http
             hotkeys.toggleCheatSheet();
         };
         scope.toggleAbout = function() {
-          $http.get(URLService.getMmsVersionURL())
-          .success(function(data,status,headers,config) {
+            scope.versions = [];
+            ApplicationService.getMmsVersion().then(function(data) {
               scope.mmsV = data.mmsVersion;
               scope.veV = '2.3 rc3';
               var instance = $modal.open({
@@ -56,15 +56,8 @@ function mmsNav($templateCache, $state, hotkeys, growl, $location, $modal, $http
                           $modalInstance.dismiss();
                       };
                   }]
-              });
-          }).error(function(data,status,headers,config){
-              URLService.handleHttpStatus(data, status, headers, config);
-          });
-            // scope.versions = [];
-            // var version = ApplicationService.getMmsVersion();
-            // scope.versions.push(version);
-            // scope.veV = '2.3 rc3';
-            
+              }); 
+            });
         };
         //Resets catagory and sites accordions
         scope.reset = function(){
