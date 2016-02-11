@@ -63,8 +63,8 @@ function ApplicationService($q, $http, URLService) {
         $http.get(URLService.getMmsVersionURL())
         .then(function(response) {
             deferred.resolve(response.data.mmsVersion);
-        },function(data,status,headers,config){
-            URLService.handleHttpStatus(data, status, headers, config, deferred);
+        },function(response){
+            URLService.handleHttpStatus(response.data, response.status, response.headers, response.config, deferred);
         });
         return deferred.promise;
     };
