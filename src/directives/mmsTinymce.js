@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsTinymce', ['ElementService', 'ViewService', 'CacheService', '$modal', '$templateCache', '$window', '$timeout', 'growl', 'tinymce','UtilsService', mmsTinymce]);
+.directive('mmsTinymce', ['ElementService', 'ViewService', 'CacheService', '$modal', '$templateCache', '$window', '$timeout', 'growl', 'tinymce','UtilsService','_', mmsTinymce]);
 
 /**
  * @ngdoc directive
@@ -30,7 +30,7 @@ angular.module('mms.directives')
  *      that can be transcluded. Regardless, transclusion allows keyword searching 
  *      elements to transclude from alfresco
  */
-function mmsTinymce(ElementService, ViewService, CacheService, $modal, $templateCache, $window, $timeout, growl, tinymce, UtilsService) { //depends on angular bootstrap
+function mmsTinymce(ElementService, ViewService, CacheService, $modal, $templateCache, $window, $timeout, growl, tinymce, UtilsService, _) { //depends on angular bootstrap
     var generatedIds = 0;
 
     var mmsTinymceLink = function(scope, element, attrs, ngModelCtrl) {
@@ -410,7 +410,6 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                 }
             });
         };
-
         var defaultToolbar = 'bold italic underline strikethrough | subscript superscript blockquote | formatselect | fontsizeselect | forecolor backcolor removeformat | alignleft aligncenter alignright | link unlink | charmap searchreplace | undo redo';
         var tableToolbar = ' table ';
         var listToolbar = ' bullist numlist outdent indent ';
@@ -516,6 +515,7 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                         update();
                     }
                 });
+                
                 ed.on('GetContent', function(e) {
                     e.content = fixNewLines(e.content);
                 });
@@ -523,10 +523,8 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                     ngModelCtrl.$render();
                     ngModelCtrl.$setPristine();
                 });
-                ed.on('change', function(e) {
-                    ed.save();
-                    update();
-                });
+                ed.on('change', deb);
+                var deb = _.debounce(function(e) { ed.save(); update();}, 1000);
                 ed.on('undo', function(e) {
                     ed.save();
                     update();
