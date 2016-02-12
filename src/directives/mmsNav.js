@@ -45,11 +45,11 @@ function mmsNav($templateCache, $state, hotkeys, growl, $location, $modal, $http
         };
         scope.toggleAbout = function() {
             scope.veV = '2.3 rc3';
-            scope.mmsV = 'loading...';
+            scope.mmsV = 'Loading...';
             ApplicationService.getMmsVersion().then(function(data) {
                 scope.mmsV = data;
               }, function(reason) {
-                scope.mmsV = "Could not retrieve due to failure: " +reason;
+                scope.mmsV = "Could not retrieve due to failure: " + reason.message;
           	});
             var instance = $modal.open({
                 templateUrl: 'partials/mms/about.html',
@@ -223,7 +223,6 @@ function mmsNav($templateCache, $state, hotkeys, growl, $location, $modal, $http
             title: '@mmsTitle', //page title - used in mobile view only
             site: '=mmsSite'
         },
-        
         link: mmsNavLink
     };
 }
