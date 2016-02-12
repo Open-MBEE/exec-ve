@@ -630,7 +630,6 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @param {string} addToView true if wanting to add the element to the view
      * @param {string} [site=null] (optional) site to post to
      * @param {string} [name=Untitled <elementType>] (optional) InstanceSpecification name to use
-     * @param {string} [json=null] (optional) Json blob for the presentation element
      * @returns {Promise} The promise would be resolved with updated View object if addToView is true
      *                    otherwise the created InstanceSpecification
     */

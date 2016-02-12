@@ -85,6 +85,15 @@ describe('ViewService', function() {
             }
             return [200, json];
         });
+		$httpBackend.when('POST', root + '/workspaces/master/sites/siteId/elements').respond(function(method, url, data) {
+
+			var json = JSON.parse(data);
+
+			if (!json.elements[0].sysmlid) {
+				json.elements[0].sysmlid = json.elements[0].name + 'Id';
+			}
+			return [200, json];
+		});
 
         $httpBackend.whenGET(root + '/workspaces/master/sites/ems/products').respond(function(method, url, data) {
             if (forceFail) { return [500, 'Internal Server Error']; }
@@ -126,7 +135,7 @@ describe('ViewService', function() {
 			it('create a view similar to the workspace state in the tree controller', inject(function() {
 				ViewService.createView(ownerId, 'create view for tree', 'idMatchDocId', 'master').then(function(data){
 					//console.log("The long object " + JSON.stringify(data.owner));
-					expect(data.owner).toEqual('ownerId');
+					expect(data.owner).toEqual('MMS_1442345799882_df10c451-ab83-4b99-8e40-0a8e04b38b9d');
 				},
 				function(reason){
 					console.log("this happened" + reason);
@@ -138,12 +147,33 @@ describe('ViewService', function() {
 			//ViewService.createDocument($scope.doc.name, $scope.addDocSite, ws);
 			it('create a document similar to the tree Controller', inject(function() {
 				ViewService.createDocument('idMatchDocId','siteId' ,'master').then(function(data){
-					console.log("The long object " + JSON.stringify(data.owner));
+					console.log("The long object " + JSON.stringify(data));
 				},
 				function(reason){
 					console.log("this happened" + reason);
 				});
+				$httpBackend.flush();
 			}));
-
 		});
+		describe('Method createInstanceSpecification', function() {
+			// ViewService.createInstanceSpecification($scope.viewOrSection, $scope.ws, $scope.presentationElemType, $scope.site.sysmlid, $scope.newItem.name).
+			// then(function(data) {
+			// 	$rootScope.$broadcast('view.reorder.refresh');
+			// 	growl.success("Adding "+$scope.presentationElemType+"  Successful");
+			// 	$modalInstance.close(data);
+			// }, function(reason) {
+			// 	growl.error($scope.presentationElemType+" Add Error: " + reason.message);
+			// }).finally(function() {
+			// 	$scope.oking = false;
+			// }); 
+			it('updated View object called like controller.utils', inject(function() {
+				ViewService.createInstanceSpecification('idMatchDocId','siteId' ,'master').then(function(data){
+					console.log("The long object " + JSON.stringify(data));
+				},
+				function(reason){
+					console.log("this happened" + reason);
+				});
+				//$httpBackend.flush();
+			}));
+		}):
 	});
