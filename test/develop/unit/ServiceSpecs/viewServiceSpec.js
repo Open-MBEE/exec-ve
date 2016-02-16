@@ -75,6 +75,10 @@ describe('ViewService', function() {
         $httpBackend.whenGET(root + '/workspaces/master/elements/idMatchDocId').respond(
             {elements: [{name:'doc with matching id', sysmlid:'idMatchDocId', specialization:{type:'Product',
             view2view:[{id:'nonMatchId', childrenViews:[]}, {id:'parentViewId', childrenViews:[]}]}}]});
+		$httpBackend.whenGET(root + '/workspaces/master/elements/MMS_1442345799882_df10c451-ab83-4b99-8e40-0a8e04b38b9d').respond(
+	            {elements: [{author:'muschek', name:'doc with empty view2view', sysmlid:'emptyView2ViewDocId',
+	            specialization: {type:'Product', view2view:[], noSections:[]}
+	    }]});
 
         $httpBackend.when('POST', root + '/workspaces/master/elements').respond(function(method, url, data) {
 
@@ -86,6 +90,15 @@ describe('ViewService', function() {
             return [200, json];
         });
 		$httpBackend.when('POST', root + '/workspaces/master/sites/siteId/elements').respond(function(method, url, data) {
+
+			var json = JSON.parse(data);
+
+			if (!json.elements[0].sysmlid) {
+				json.elements[0].sysmlid = json.elements[0].name + 'Id';
+			}
+			return [200, json];
+		});
+		$httpBackend.when('POST', root + '/workspaces/master/sites/vetest/elements').respond(function(method, url, data) {
 
 			var json = JSON.parse(data);
 
@@ -167,13 +180,53 @@ describe('ViewService', function() {
 			// 	$scope.oking = false;
 			// }); 
 			it('updated View object called like controller.utils', inject(function() {
-				ViewService.createInstanceSpecification('idMatchDocId','siteId' ,'master').then(function(data){
-					console.log("The long object " + JSON.stringify(data));
-				},
+					ViewService.createInstanceSpecification(ownerId,'master', 'Paragraph').then(function(data){
+						console.log("The long object " + JSON.stringify(data));
+					},
 				function(reason){
 					console.log("this happened" + reason);
 				});
-				//$httpBackend.flush();
+				$httpBackend.flush();
 			}));
-		}):
+		});
+		describe('Method getViewElements', function() {
+			// // (!viewElements.hasOwnProperty(ver) && * && *), fail
+			// ViewService.getViewElements('badId', false, 'master', '01-01-2014').then(function(response) {
+			// 	console.log('This should not be displayed');
+			// }, function(failMes) {
+			// 	expect(failMes.status).toEqual(200);
+			// });
+			
+			// (!viewElements.hasOwnProperty(ver) && * && *), success, !viewElements.hasOwnProperty(ver)
+			ViewService.getViewElements('12345', false, 'master', '01-01-2014').then(function(response) {
+				expect(response.length).toEqual(2);
+				expect(response[0]).toEqual({author:'muschek', name:'view\'s element', sysmlid:12346, owner:12345, lastModified:'01-01-2014'});
+				expect(response[1]).toEqual({author:'muschek', name:'view\'s 2nd element', sysmlid:12347, owner:12345, lastModified:'01-01-2014'});
+			}); $httpBackend.flush();
+			// viewElements['01-01-2014']['12345'] now exists
+
+			// (viewElements.hasOwnProperty(ver) && !viewElements[ver].hasOwnProperty(id) && *), success, 
+			// viewElements.hasOwnProperty(ver)
+			ViewService.getViewElements('12345', false, 'master', 'latest').then(function(response) {
+				expect(response.length).toEqual(2);
+				expect(response[0]).toEqual({author:'muschek', name:'view\'s element', sysmlid:12346, owner:12345, lastModified:'07-28-2014'});
+				expect(response[1]).toEqual({author:'muschek', name:'view\'s 2nd element', sysmlid:12347, owner:12345, lastModified:'07-28-2014'});
+			}); $httpBackend.flush();
+			// viewElements['latest']['12345'] now exists
+
+			// (viewElements.hasOwnProperty(ver) && viewElements[ver].hasOwnProperty(id) && !update)
+			ViewService.getViewElements('12345', false, 'master', '01-01-2014').then(function(response) {
+				expect(response.length).toEqual(2);
+				expect(response[0]).toEqual({author:'muschek', name:'view\'s element', sysmlid:12346, owner:12345, lastModified:'01-01-2014'});
+				expect(response[1]).toEqual({author:'muschek', name:'view\'s 2nd element', sysmlid:12347, owner:12345, lastModified:'01-01-2014'});
+			}); $rootScope.$apply();
+
+			// (viewElements.hasOwnProperty(ver) && viewElements[ver].hasOwnProperty(id) && update),
+			// success, viewElements.hasOwnProperty(ver)
+			ViewService.getViewElements('12345', true, 'master', 'latest').then(function(response) {
+				expect(response.length).toEqual(2);
+				expect(response[0]).toEqual({author:'muschek', name:'view\'s element', sysmlid:12346, owner:12345, lastModified:'07-28-2014'});
+				expect(response[1]).toEqual({author:'muschek', name:'view\'s 2nd element', sysmlid:12347, owner:12345, lastModified:'07-28-2014'});
+			});
+		});
 	});

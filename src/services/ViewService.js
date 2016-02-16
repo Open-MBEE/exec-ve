@@ -627,7 +627,6 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @param {object} viewOrSection The View or Section to add to
      * @param {string} [workspace=master] workspace to use
      * @param {string} type The type of element that is to be created, ie 'Paragraph'
-     * @param {string} addToView true if wanting to add the element to the view
      * @param {string} [site=null] (optional) site to post to
      * @param {string} [name=Untitled <elementType>] (optional) InstanceSpecification name to use
      * @returns {Promise} The promise would be resolved with updated View object if addToView is true
