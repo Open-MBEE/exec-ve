@@ -429,6 +429,7 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
         //if (scope.mmsTinymceType === 'ParagraphT' || scope.mmsTinymceType === 'Paragraph')
           //  thisToolbar = defaultToolbar + ' | ' + codeToolbar + ' | ' + customToolbar;
         var options = {
+            entity_encoding : 'raw',
             plugins: 'autoresize charmap code fullscreen image link media nonbreaking paste table textcolor searchreplace noneditable',
             //toolbar: 'bold italic underline strikethrough | subscript superscript blockquote | formatselect | fontsizeselect | forecolor backcolor removeformat | alignleft aligncenter alignright | bullist numlist outdent indent | table | link unlink | image media | charmap searchreplace code | transclude comment vlink normalize | mvleft mvright | undo redo',
             relative_urls: false,
@@ -523,8 +524,12 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                     ngModelCtrl.$render();
                     ngModelCtrl.$setPristine();
                 });
+                var deb = _.debounce(function(e) {
+                    ed.save();
+                    update();
+                    console.log("Hello World");
+                }, 2000);
                 ed.on('change', deb);
-                var deb = _.debounce(function(e) { ed.save(); update();}, 1000);
                 ed.on('undo', function(e) {
                     ed.save();
                     update();
