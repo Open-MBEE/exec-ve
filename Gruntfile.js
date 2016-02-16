@@ -22,6 +22,12 @@ module.exports = function(grunt) {
         }
     }};
   for (var key in servers) {
+    var serverPort = 443;
+    var serverHttps = true;
+    if (key == "localhost") {
+       serverPort = 8080;
+       serverHttps = false;
+    } 
     connectObject[key] = {
         options: {
           hostname: '*',
@@ -34,9 +40,9 @@ module.exports = function(grunt) {
           {
             context: '/alfresco',  // '/api'
             host: servers[key],
-            port: 443,
             changeOrigin: true,
-            https: true,
+            https: serverHttps,
+            port: serverPort
           },
           {
             context: '/',
