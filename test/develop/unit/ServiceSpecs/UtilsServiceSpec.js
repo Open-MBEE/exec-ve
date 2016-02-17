@@ -24,3 +24,16 @@
 
 describe('UtilsService', function() {
 	beforeEach(module('mms'));
+	
+	describe('Method cleanElement ', function() {
+		// 
+		// // (!viewElements.hasOwnProperty(ver) && * && *), success, !viewElements.hasOwnProperty(ver)
+		// ViewService.getViewElements('12345', false, 'master', '01-01-2014').then(function(response) {
+		// 	expect(response.length).toEqual(2);
+		// 	expect(response[0]).toEqual({author:'muschek', name:'view\'s element', sysmlid:12346, owner:12345, lastModified:'01-01-2014'});
+		// 	expect(response[1]).toEqual({author:'muschek', name:'view\'s 2nd element', sysmlid:12347, owner:12345, lastModified:'01-01-2014'});
+		// }); $httpBackend.flush();
+		// // viewElements['01-01-2014']['12345'] now exists
+
+	})
+});
