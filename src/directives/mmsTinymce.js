@@ -527,9 +527,8 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                 var deb = _.debounce(function(e) {
                     ed.save();
                     update();
-                    console.log("Hello World");
-                }, 2000);
-                ed.on('change', deb);
+                }, 1000);
+                ed.on('ExecCommand change NodeChange ObjectResized', deb);
                 ed.on('undo', function(e) {
                     ed.save();
                     update();
