@@ -162,10 +162,6 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                 size: 'sm'
             });
 
-            $timeout(function() {
-                angular.element('.autocomplete-modal-typeahead').focus();
-            }, 0, false);
-
             instance.result.then(function(tag) {
                 if (!tag) {
                     transcludeCallback(ed, true);
