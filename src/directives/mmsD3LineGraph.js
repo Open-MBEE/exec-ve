@@ -1,6 +1,28 @@
 (function() {'use strict';
   angular.module('mms.directives')
     .directive('mmsLineGraph', ['TableService', '$window', mmsLineGraph]);
+
+  /*
+   * @ngdoc directive
+   * @name mms.directive:mmsLineGraph
+   * @restrict EA
+   * @description
+   * A directive for generating a D3 line graph from opaque tables
+   *
+   * @example <caption>Example usage with a multi-series table.</caption>
+   * // Generates a velocity-over-time graph with 2 time series and a caption
+   * // '###' is the element ID of a table with columns: "Time", "Velocity1", "Velocity2"
+   * <mms-line-graph data-eid="###" data-multi-series="true" data-x-label="Time (s)" data-y-label="Velcity (m/s)">
+   *  Caption this!
+   * </mms-line-graph>
+   * @example <caption>Example usage with multiple single series tables.</caption>
+   * // Generates a velocity-over-time graph with 4 time series and a caption
+   * // '###' are the element IDs of tables with columns: "Acceleration (m/s^2), "Time (s)",
+   * // "Velocity (m/s)" and the corresponding property names: a, t, v
+   * <mms-line-graph data-eid="###,###,###,###" data-y-col="v" data-x-col="t">
+   *  Caption this!
+   * </mms-line-graph>
+   */
   function mmsLineGraph(TableService, $window) {
 
     function mmsGraphLink(scope, element, attrs, mmsViewCtrl) {
@@ -11,35 +33,43 @@
       var ws = scope.mmsWs;
       var version = scope.mmsVersion;
 
-      TableService.readTables (scope.eid, ws, version)
-      .then(function(value) {
-        var data = {
-            x: 'x',
-            columns: [
-              ['x'],
-              ['label']
-            ],
-          };
+      //if (scope.yColumn)
+      // Multiple series in a single table
+      TableService.readTableCols(scope.eid, ws, version).then(function(value) {
+        console.log(value);
 
-        scope.table = {};
-        scope.table.titles = value.tableTitles;
-        scope.table.ids = value.tableIds;
-        scope.table.columnHeaderLabels = value.tableColumnHeadersLabels;
-        scope.table.rowHeaders = value.tableRowHeaders;
-        scope.table.data = value.datavalues; //[][] - array
-        scope.table.idFilters = value.dataIdFilters;
-        //console.log(scope.table);
-        scope.table.rowHeaders[0].forEach(function(val){
-          data.columns[0].push(val.specialization.value[0].double);
+        var xCol = (scope.xCol !== undefined ? scope.xCol : value.columnKeys[0]);
+        var _chart = {
+          data: {
+            columns: value.columns,
+            names: {},
+            x: xCol
+          }
+        };
+
+        if (scope.seriesNames !== undefined) {
+          scope.seriesNames = scope.seriesNames.split(/\s*[,|]\s*/);
+          console.log(value.columnKeys);
+          console.log(scope.seriesNames);
+        }
+        var j = 0;
+        value.columnKeys.forEach(function(key, i) {
+          _chart.data.columns[i].unshift(key);
+          if (key !== xCol) {
+            if (scope.seriesNames === undefined) {
+              _chart.data.names[key] = value.columnHeaders[i];
+            } else {
+              _chart.data.names[key] = scope.seriesNames[j++];
+            }
+          }
         });
-        scope.table.data[0].forEach(function(val){
-          data.columns[1].push(val[0].specialization.value[0].double);
-        });
-        // console.log(chart);
-        var chart = c3.generate({
-          data: data
-        });
-        $(element).append(chart.element);
+
+        console.log(_chart);
+
+        var chart = c3.generate(_chart);
+        $(element).text('');
+        $(element).append('<h2>' + value.title + '</h2>');
+        var fig = $('<figure><figcaption>' + element.text() + '</figcaption></figure>').appendTo(element).append(chart.element);
       });
     }
 
@@ -47,7 +77,13 @@
       restrict: 'EA',
       require: '?^mmsView',
        scope: {
-        eid: '@'
+        eid: '@',
+        xCol: '@',
+        yCol: '@',
+        xLabel: '@',
+        yLabel: '@',
+        seriesNames: '@',
+        multiSeries: '@'
       },
       link: mmsGraphLink
     };
