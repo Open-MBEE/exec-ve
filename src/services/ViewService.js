@@ -641,11 +641,15 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         var viewInstancePackage = null;
         var projectId = null;
         var realType = TYPE_TO_CLASSIFIER_TYPE[type];
-
+        var siteId = site;
         if (viewOrSection) {
             var splitArray = viewOrSection.qualifiedId.split('/');
-            if (splitArray && splitArray.length > 2)
+            if (splitArray && splitArray.length > 2) {
                 projectId = splitArray[2];
+                siteId = splitArray[1];
+            }
+            if (viewOrSection.siteCharacterizationId)
+                siteId = viewOrSection.siteCharacterizationId;
             if (projectId && projectId.indexOf('PROJECT') >= 0) {
                 viewInstancePackage = {
                     sysmlid: projectId.replace('PROJECT', 'View_Instances'), 
@@ -684,13 +688,13 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 operand: [],  
                 type: "Expression"
             };
-        if (viewInstancePackage || projectId)
-            instanceSpec.owner = viewInstancePackage ? viewInstancePackage.sysmlid : projectId;
+        if (viewInstancePackage)
+            instanceSpec.owner = viewInstancePackage.sysmlid;
 
         var toCreate = [instanceSpec];
         if (viewInstancePackage)
             toCreate.push(viewInstancePackage);
-        ElementService.createElements(toCreate, workspace, site)
+        ElementService.createElements(toCreate, workspace, siteId)
         .then(function(data) {
             data.forEach(function(elem) {
                 if (elem.sysmlid === newInstanceId) {
@@ -746,11 +750,16 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         var newInstanceId = UtilsService.createMmsId();
         var viewInstancePackage = null;
         var projectId = null;
+        var siteId = site;
 
         if (owner) {
             var splitArray = owner.qualifiedId.split('/');
-            if (splitArray && splitArray.length > 2)
+            if (splitArray && splitArray.length > 2) {
                 projectId = splitArray[2];
+                siteId = splitArray[1];
+            }
+            if (owner.siteCharacterizationId)
+                siteId = owner.siteCharacterizationId;
             if (projectId && projectId.indexOf('PROJECT') >= 0) {
                 viewInstancePackage = {
                     sysmlid: projectId.replace('PROJECT', 'View_Instances'), 
@@ -818,13 +827,13 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             appliedMetatypes: ["_9_0_62a020a_1105704885251_933969_7897"],
             isMetatype: false
         };
-        if (viewInstancePackage || projectId)
-            instanceSpec.owner = viewInstancePackage ? viewInstancePackage.sysmlid : projectId;
+        if (viewInstancePackage)
+            instanceSpec.owner = viewInstancePackage.sysmlid;
 
         var toCreate = [instanceSpec, view];
         if (viewInstancePackage)
             toCreate.push(viewInstancePackage);
-        ElementService.createElements(toCreate, workspace, site)
+        ElementService.createElements(toCreate, workspace, siteId)
         .then(function(data) {
             data.forEach(function(elem) {
                 if (elem.sysmlid === newViewId) {
@@ -1110,7 +1119,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
     var getDocMetadata = function(docid, ws, version, weight) {
         var deferred = $q.defer();
         var metadata = {};
-        ElementService.search(docid, ['id'], null, null, ws, weight)
+        ElementService.search(docid, ['id'], null, null, null, null, ws, weight)
         .then(function(data) {
             if (data.length === 0 || data[0].sysmlid !== docid || !data[0].properties) {
                 return;
