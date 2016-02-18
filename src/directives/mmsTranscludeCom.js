@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsTranscludeCom', ['Utils', 'ElementService', 'UtilsService', 'ViewService', 'UxService', '$log', '$templateCache', '$compile', 'growl', mmsTranscludeCom]);
+.directive('mmsTranscludeCom', ['Utils', 'ElementService', 'UtilsService', 'ViewService', 'UxService', '$log', '$templateCache', '$compile', 'growl', 'MathJax', mmsTranscludeCom]);
 
 /**
  * @ngdoc directive
@@ -23,7 +23,7 @@ angular.module('mms.directives')
  * @param {string=master} mmsWs Workspace to use, defaults to master
  * @param {string=latest} mmsVersion Version can be alfresco version number or timestamp, default is latest
  */
-function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxService, $log, $templateCache, $compile, growl) {
+function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxService, $log, $templateCache, $compile, growl, MathJax) {
 
     var template = $templateCache.get('mms/templates/mmsTranscludeDoc.html');
 
@@ -72,6 +72,7 @@ function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxSe
             var doc = scope.element.documentation || '(No comment)';
             doc += ' - ' + scope.element.creator;
             element[0].innerHTML = doc;
+            MathJax.Hub.Queue(["Typeset", MathJax.Hub, element[0]]);
             scope.recompileScope = scope.$new();
             $compile(element.contents())(scope.recompileScope); 
             if (mmsViewCtrl) {
