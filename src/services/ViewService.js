@@ -638,7 +638,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         var deferred = $q.defer();
 
         var newInstanceId = UtilsService.createMmsId();
-        var viewInstancePackage = null;
+        var holdingBinId = null;
         var projectId = null;
         var realType = TYPE_TO_CLASSIFIER_TYPE[type];
         var siteId = site;
@@ -651,14 +651,11 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             if (viewOrSection.siteCharacterizationId)
                 siteId = viewOrSection.siteCharacterizationId;
             if (projectId && projectId.indexOf('PROJECT') >= 0) {
-                viewInstancePackage = {
-                    sysmlid: projectId.replace('PROJECT', 'View_Instances'), 
-                    name: 'View Instances', 
-                    owner: projectId,
-                    specialization: {type: 'Package'}
-                };
+                holdingBinId = 'holding_bin_' + projectId;
             }
         }
+        if (!holdingBinId && siteId)
+            holdingBinId = 'holding_bin_' + siteId + '_no_project';
         var jsonType = realType;
         if (type === 'Comment' || type === 'Paragraph')
             jsonType = type;
@@ -688,12 +685,10 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 operand: [],  
                 type: "Expression"
             };
-        if (viewInstancePackage)
-            instanceSpec.owner = viewInstancePackage.sysmlid;
+        if (holdingBinId)
+            instanceSpec.owner = holdingBinId;
 
         var toCreate = [instanceSpec];
-        if (viewInstancePackage)
-            toCreate.push(viewInstancePackage);
         ElementService.createElements(toCreate, workspace, siteId)
         .then(function(data) {
             data.forEach(function(elem) {
@@ -748,7 +743,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         var deferred = $q.defer();
         var newViewId = viewId ? viewId : UtilsService.createMmsId();
         var newInstanceId = UtilsService.createMmsId();
-        var viewInstancePackage = null;
+        var holdingBinId = null;
         var projectId = null;
         var siteId = site;
 
@@ -761,15 +756,12 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             if (owner.siteCharacterizationId)
                 siteId = owner.siteCharacterizationId;
             if (projectId && projectId.indexOf('PROJECT') >= 0) {
-                viewInstancePackage = {
-                    sysmlid: projectId.replace('PROJECT', 'View_Instances'), 
-                    name: 'View Instances', 
-                    owner: projectId,
-                    specialization: {type: 'Package'}
-                };
+                holdingBinId = 'holding_bin_' + projectId;
             }
         }
-
+        if (!holdingBinId && siteId) {
+            holdingBinId = 'holding_bin_' + siteId + '_no_project';
+        }
         var view = {
             sysmlid: newViewId,
             specialization: {
@@ -827,12 +819,10 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             appliedMetatypes: ["_9_0_62a020a_1105704885251_933969_7897"],
             isMetatype: false
         };
-        if (viewInstancePackage)
-            instanceSpec.owner = viewInstancePackage.sysmlid;
+        if (holdingBinId)
+            instanceSpec.owner = holdingBinId;
 
         var toCreate = [instanceSpec, view];
-        if (viewInstancePackage)
-            toCreate.push(viewInstancePackage);
         ElementService.createElements(toCreate, workspace, siteId)
         .then(function(data) {
             data.forEach(function(elem) {
