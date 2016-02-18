@@ -487,9 +487,6 @@ function mmsCkeditor(ElementService, ViewService, CacheService, $modal, $templat
             autoGrow_minHeight: 200,
             autoGrow_maxHeight: $window.innerHeight*0.65,
             autoGrow_bottomSpace: 50,
-            
-            // extraAllowedContent: 'script[language,type,src] mms-maturity-bar',// tms-timely seqr-timely',
-            //  mms-d3-observation-profile-chart-io; mms-d3-parallel-axis-chart-io; mms-d3-radar-chart-io; mms-d3-horizontal-bar-chart-io; mms-site-docs; mms-workspace-docs; mms-diagram-block; mms-view-link(mceNonEditable); mms-transclude-doc(mceNonEditable); mms-transclude-name(mceNonEditable); mms-transclude-com(mceNonEditable); mms-transclude-val(mceNonEditable); mms-transclude-img(mceNonEditable); math; maction; maligngroup; malignmark; menclose; merror;mfenced;mfrac;mglyph;mi;mlabeledtr;mlongdiv;mmultiscripts;mn;mo;mover;mpadded;mphantom;mroot;mrow;ms;mscarries;mscarry;msgroup;mstack;msline;mspace;msqrt;msrow;mstyle;msub;msup;msubsup;mtable;mtd;mtext;mtr;munder;munderover',
             pasteFromWordRemoveFontStyles: false,
             disableNativeSpellChecker: false,
             disallowedContent: 'div,font',
