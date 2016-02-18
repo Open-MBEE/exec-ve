@@ -730,7 +730,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
                         $state.go('workspace.site.document.view', {view: data.sysmlid, search: undefined});
                     else{
                       var curNum = branch.children[branch.children.length-1].section;
-                      if (curLastChild) {
+                      if (curLastChild && curLastChild.type === 'view') {
                         $rootScope.$broadcast('newViewAdded', data.sysmlid, curNum, curLastChild.data.sysmlid);
                       } else {
                         $rootScope.$broadcast('newViewAdded', data.sysmlid, curNum, branch.data.sysmlid);
