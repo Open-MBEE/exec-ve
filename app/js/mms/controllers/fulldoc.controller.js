@@ -4,8 +4,8 @@
 
 angular.module('mmsApp')
 
-.controller('FullDocCtrl', ['$scope', '$templateCache', '$compile', '$timeout', '$rootScope', '$state', '$stateParams', '$window', 'MmsAppUtils', 'document', 'workspace', 'site', 'snapshot', 'time', 'ConfigService', 'UxService', 'ViewService', 'UtilsService', 'growl', 'hotkeys', 'search',
-function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateParams, $window, MmsAppUtils, document, workspace, site, snapshot, time, ConfigService, UxService, ViewService, UtilsService, growl, hotkeys, search) {
+.controller('FullDocCtrl', ['$scope', '$templateCache', '$compile', '$timeout', '$rootScope', '$state', '$stateParams', '$window', 'MmsAppUtils', 'document', 'workspace', 'site', 'snapshot', 'time', 'ConfigService', 'UxService', 'ViewService', 'UtilsService', 'growl', 'hotkeys', 'search', '_',
+function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateParams, $window, MmsAppUtils, document, workspace, site, snapshot, time, ConfigService, UxService, ViewService, UtilsService, growl, hotkeys, search, _) {
 
     $scope.ws = $stateParams.workspace;
     $scope.site = site;
@@ -37,8 +37,8 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
         view2children[view.id] = view.childrenViews;
     });
 
-    var addToArray = function(viewId, curSection) {
-        views.push({id: viewId, api: {
+    var buildViewElt = function(vId, curSec) {
+      return {id: vId, api: {
             init: function(dis) {
                 if ($rootScope.veCommentsOn) {
                     dis.toggleShowComments();
@@ -50,7 +50,10 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
                     dis.toggleShowEdits();
                 }
             }
-        }, number: curSection});
+        }, number: curSec};
+    };
+    var addToArray = function(viewId, curSection) {
+        views.push( buildViewElt(viewId, curSection) );
         if (view2children[viewId]) {
             var num = 1;
             view2children[viewId].forEach(function(cid) {
@@ -70,6 +73,11 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
         $rootScope.$broadcast('elementSelected', elementId, 'element');
     };
 
+    $scope.$on('newViewAdded', function(event, vId, curSec, prevSibId) {
+        var sibIndex = _.findIndex(views, {id: prevSibId});
+        views.splice(sibIndex+1, 0, buildViewElt(vId, curSec) );
+    });
+    
     $scope.bbApi = {};
     $scope.bbApi.init = function() {
 
