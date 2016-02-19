@@ -1,13 +1,22 @@
 (function() {'use strict';
   angular.module('mms.directives')
-    .directive('mmsLineGraph', ['TableService', '$window', mmsLineGraph]);
+    .directive('mmsLineGraph', ['TableService', '$window', '$q', mmsLineGraph]);
 
   /*
    * @ngdoc directive
    * @name mms.directive:mmsLineGraph
    * @restrict EA
+   * @scope
+   * @param {string} eid Element ID or comma separated IDs to table elements
+   * @param {boolean=true} multiSeries Whether to treat each column as a separate series
+   * @param {string[]=} seriesNames Manually label each series in the legend
+   * @param {string=} xCol Manually specify X axis column (first column by default)
+   * @param {string=} yCol Manually specify Y axis column (for single series tables)
+   * @param {string[]=} yCols Manually specify Y axis columns (multi-series tables)
    * @description
-   * A directive for generating a D3 line graph from opaque tables
+   * A directive for generating a D3 line graph from opaque tables. Element text
+   * is used as caption. If element text is "$title", the table title will be used
+   * instead. Use "{''}" to generate an empty caption.
    *
    * @example <caption>Example usage with a multi-series table.</caption>
    * // Generates a velocity-over-time graph with 2 time series and a caption
@@ -23,7 +32,7 @@
    *  Caption this!
    * </mms-line-graph>
    */
-  function mmsLineGraph(TableService, $window) {
+  function mmsLineGraph(TableService, $window, $q) {
 
     function mmsGraphLink(scope, element, attrs, mmsViewCtrl) {
       console.log('mmsGraphLink()');
@@ -33,43 +42,59 @@
       var ws = scope.mmsWs;
       var version = scope.mmsVersion;
 
-      //if (scope.yColumn)
-      // Multiple series in a single table
-      TableService.readTableCols(scope.eid, ws, version).then(function(value) {
-        console.log(value);
+      var promises = [];
+      var eids = scope.eid.split(','); // split by comma or |
+      eids.forEach(function(eid) {
+        promises.push(TableService.readTableCols(eid, ws, version));
+      });
 
-        var xCol = (scope.xCol !== undefined ? scope.xCol : value.columnKeys[0]);
+      $q.all(promises).then(function(values) {
+        console.log(values);
+        var xCol;
         var _chart = {
           data: {
-            columns: value.columns,
-            names: {},
-            x: xCol
+            columns: [],
+            names: {}
           }
         };
-
-        if (scope.seriesNames !== undefined) {
-          scope.seriesNames = scope.seriesNames.split(/\s*[,|]\s*/);
-          console.log(value.columnKeys);
-          console.log(scope.seriesNames);
+        if (values.length > 1) {
+          _chart.data.xs = [];
         }
-        var j = 0;
-        value.columnKeys.forEach(function(key, i) {
-          _chart.data.columns[i].unshift(key);
-          if (key !== xCol) {
-            if (scope.seriesNames === undefined) {
-              _chart.data.names[key] = value.columnHeaders[i];
-            } else {
-              _chart.data.names[key] = scope.seriesNames[j++];
+        var j = 0; // series count
+        values.forEach(function(value, k) {
+          var k2 = k + 1;
+          if (k === 0) {
+            _chart.title = value.title;
+            xCol = (scope.xCol !== undefined ? scope.xCol : value.columnKeys[0]);
+            if (values.length === 1 && !scope.xCols) {
+              _chart.data.x = xCol + k2;
             }
           }
+
+          value.columnKeys.forEach(function(key, i) {
+            if (key !== xCol) {
+              if (scope.seriesNames === undefined || scope.seriesNames[j++]) {
+                _chart.data.names[key + k2] = value.columnHeaders[i];
+              } else {
+                _chart.data.names[key + k2] = scope.seriesNames[j];
+              }
+            }
+            value.columns[i].unshift(key + k2);
+            if (values.length > 1) {
+              _chart.data.xs[key + k2] = xCol + k2;
+            }
+          });
+          _chart.data.columns = _chart.data.columns.concat(value.columns);
         });
 
         console.log(_chart);
 
         var chart = c3.generate(_chart);
-        $(element).text('');
-        $(element).append('<h2>' + value.title + '</h2>');
-        var fig = $('<figure><figcaption>' + element.text() + '</figcaption></figure>').appendTo(element).append(chart.element);
+        scope.caption = element.text();
+        // $title hack is necessary because tinyMCE strips out empty tags
+        scope.caption = (scope.caption === '$title')? _chart.title : scope.caption;
+        element.text('');
+        var fig = $('<figure><figcaption>' + scope.caption + '</figcaption></figure>').appendTo(element).append(chart.element);
       });
     }
 
@@ -79,11 +104,13 @@
        scope: {
         eid: '@',
         xCol: '@',
+        xCols: '=',
         yCol: '@',
+        yCols: '=',
         xLabel: '@',
         yLabel: '@',
-        seriesNames: '@',
-        multiSeries: '@'
+        seriesNames: '=',
+        multiSeries: '=',
       },
       link: mmsGraphLink
     };
