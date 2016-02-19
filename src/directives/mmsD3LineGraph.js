@@ -8,29 +8,45 @@
    * @restrict EA
    * @scope
    * @param {string} eid Element ID or comma separated IDs to table elements
-   * @param {boolean=true} multiSeries Whether to treat each column as a separate series
    * @param {string[]=} seriesNames Manually label each series in the legend
    * @param {string=} xCol Manually specify X axis column (first column by default)
+   * @param {string[]=} xCols Manually specify X axis columns (multi-series tables)
    * @param {string=} yCol Manually specify Y axis column (for single series tables)
    * @param {string[]=} yCols Manually specify Y axis columns (multi-series tables)
    * @description
-   * A directive for generating a D3 line graph from opaque tables. Element text
-   * is used as caption. If element text is "$title", the table title will be used
-   * instead. Use "{''}" to generate an empty caption.
+   * A directive for generating a D3 line graph from opaque tables.
+   * Element text is used as caption. If element text is "$title", the table title
+   * will be used instead. Use "{''}" to generate an empty caption.
    *
    * @example <caption>Example usage with a multi-series table.</caption>
-   * // Generates a velocity-over-time graph with 2 time series and a caption
-   * // '###' is the element ID of a table with columns: "Time", "Velocity1", "Velocity2"
-   * <mms-line-graph data-eid="###" data-multi-series="true" data-x-label="Time (s)" data-y-label="Velcity (m/s)">
-   *  Caption this!
+   * // Generates a velocity vs. time graph with 2 time series and uses the table
+   * // title as caption.
+   * // '###' is the element ID of a table with columns:
+   * // "Time (s)", "Velocity" and "Acceleration".
+   * // The first column is assumed to be the x column, and its column header is
+   * // used as the x-axis label by default.
+   * <mms-line-graph data-eid="###" data-y-label="Velocity (m/s)">
+   *  $title
    * </mms-line-graph>
-   * @example <caption>Example usage with multiple single series tables.</caption>
+   * @example <caption>Example usage with a multi-series table with distinct x-columns.</caption>
+   * // Generates a velocity vs. time graph with 2 unaligned time series by explicitly
+   * // specifying the x- and y-columns.
+   * // '###' is the element ID of a table with columns:
+   * // "Time1", "Time2", "Velocity1", "Acceleration1", "Velocity2", "Acceleration2"
+   * <mms-line-graph data-eid="###" data-x-cols="['Time1','Time2']"
+   *  data-y-cols="['Velocity1','Velocity2']" data-x-label="Time (s)"
+   *  data-y-label="Velocity (m/s)">
+   *  $title
+   * </mms-line-graph>
+   * @example <caption>Example usage with multiple single-series tables.</caption>
    * // Generates a velocity-over-time graph with 4 time series and a caption
    * // '###' are the element IDs of tables with columns: "Acceleration (m/s^2), "Time (s)",
    * // "Velocity (m/s)" and the corresponding property names: a, t, v
    * <mms-line-graph data-eid="###,###,###,###" data-y-col="v" data-x-col="t">
    *  Caption this!
    * </mms-line-graph>
+   *
+   * @TODO: Support xCols and yCols
    */
   function mmsLineGraph(TableService, $window, $q) {
 
@@ -60,28 +76,31 @@
         if (values.length > 1) {
           _chart.data.xs = [];
         }
-        var j = 0; // series count
-        values.forEach(function(value, k) {
-          var k2 = k + 1;
-          if (k === 0) {
+        var sc = 0; // series count
+        values.forEach(function(value, tc) {
+          if (tc === 0) {
             _chart.title = value.title;
-            xCol = (scope.xCol !== undefined ? scope.xCol : value.columnKeys[0]);
+            if (scope.xCols) {
+              xCol = scope.xCols[sc % scope.xCols.length];
+            } else {
+              xCol = (scope.xCol !== undefined ? scope.xCol : value.columnHeaders[0]);
+            }
             if (values.length === 1 && !scope.xCols) {
-              _chart.data.x = xCol + k2;
+              _chart.data.x = xCol + tc;
             }
           }
 
-          value.columnKeys.forEach(function(key, i) {
+          value.columnHeaders.forEach(function(key, i) {
             if (key !== xCol) {
-              if (scope.seriesNames === undefined || scope.seriesNames[j++]) {
-                _chart.data.names[key + k2] = value.columnHeaders[i];
+              if (scope.seriesNames === undefined || scope.seriesNames[sc++]) {
+                _chart.data.names[key + tc] = key;
               } else {
-                _chart.data.names[key + k2] = scope.seriesNames[j];
+                _chart.data.names[key + tc] = scope.seriesNames[sc];
               }
             }
-            value.columns[i].unshift(key + k2);
+            value.columns[i].unshift(key + tc);
             if (values.length > 1) {
-              _chart.data.xs[key + k2] = xCol + k2;
+              _chart.data.xs[key + tc] = xCol + tc;
             }
           });
           _chart.data.columns = _chart.data.columns.concat(value.columns);
@@ -109,8 +128,7 @@
         yCols: '=',
         xLabel: '@',
         yLabel: '@',
-        seriesNames: '=',
-        multiSeries: '=',
+        seriesNames: '='
       },
       link: mmsGraphLink
     };
