@@ -314,7 +314,7 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                 $scope.oking = true;
                 if (ViewService.getCurrentViewId())
                     $scope.comment.owner = ViewService.getCurrentViewId();
-                ElementService.createElement($scope.comment, scope.mmsWs)
+                ElementService.createElement($scope.comment, scope.mmsWs, scope.mmsSite)
                 .then(function(data) {
                     var tag = '<mms-transclude-com data-mms-eid="' + data.sysmlid + '">comment:' + data.creator + '</mms-transclude-com> ';
                     $modalInstance.close(tag);

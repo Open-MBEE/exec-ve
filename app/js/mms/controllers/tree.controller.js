@@ -520,6 +520,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
                             data : instance,
                             children: []
                         };
+                        viewId2node[instance.sysmlid] = sectionTreeNode;
                         parentNode.children.unshift(sectionTreeNode);
                         addSectionElements(instance, viewNode, sectionTreeNode);
                     }
@@ -1193,8 +1194,14 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
         }
         $timeout(function() {
             if ($rootScope.mms_treeInitial) {
-                $rootScope.veCurrentView = $rootScope.mms_treeInitial;
-                ViewService.setCurrentViewId($rootScope.mms_treeInitial);
+                var node = viewId2node[$rootScope.mms_treeInitial];
+                if (node && node.type === 'view') {
+                    $rootScope.veCurrentView = $rootScope.mms_treeInitial;
+                    ViewService.setCurrentViewId($rootScope.mms_treeInitial);
+                } else if (node && node.type === 'section') {
+                    $rootScope.veCurrentView = node.view;
+                    ViewService.setCurrentViewId(node.view);
+                }
                 //var node = viewId2node[$rootScope.mms_treeInitial];
                 //if (node)
                 //    viewLevel2Func($rootScope.mms_treeInitial, node);
