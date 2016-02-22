@@ -537,7 +537,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 clone.specialization[key] = {
                     operand: [],
                     type: "Expression",
-                    valueExpression: null
+                    //valueExpression: null
                 };
             }
             clone.specialization[key].operand.push(elementOb);
@@ -696,7 +696,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                     var instanceVal = {
                         instance: newInstanceId,
                         type: "InstanceValue",
-                        valueExpression: null
+                        //valueExpression: null
                     };
                     addElementToViewOrSection(viewOrSection.sysmlid, viewOrSection.sysmlid, workspace, instanceVal)
                     .then(function(data3) {
@@ -770,7 +770,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 displayedElements: [newViewId],
                 childrenViews: [],
                 contents: {
-                    valueExpression: null,
+                    //valueExpression: null,
                     operand: [{
                         instance: newInstanceId,
                         type:"InstanceValue",

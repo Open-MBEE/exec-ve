@@ -297,11 +297,13 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
 
         var commentCtrl = function($scope, $modalInstance) {
             $scope.comment = {
-                name: '', 
+                name: 'Comment ' + new Date().toISOString(), 
                 documentation: '', 
                 specialization: {
                     type: 'Comment'
-                }
+                },
+                appliedMetatypes: ["_9_0_62a020a_1105704885343_144138_7929"],
+                isMetatype: false
             };
             $scope.oking = false;
             $scope.ok = function() {
