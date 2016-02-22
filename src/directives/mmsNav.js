@@ -44,7 +44,7 @@ function mmsNav($templateCache, $state, hotkeys, growl, $location, $modal, $http
             hotkeys.toggleCheatSheet();
         };
         scope.toggleAbout = function() {
-            scope.veV = '2.3 rc3';
+            scope.veV = '2.3 rc4';
             scope.mmsV = 'Loading...';
             ApplicationService.getMmsVersion().then(function(data) {
                 scope.mmsV = data;
@@ -209,10 +209,11 @@ function mmsNav($templateCache, $state, hotkeys, growl, $location, $modal, $http
             }
         };
         scope.stagingView = function(){
-            var hostName = ($location.host() === 'localhost') ? 
-                         'https://cae-ems-stg.jpl.nasa.gov':
-                         'https://'+$location.host().split(".")[0]+'-stg.jpl.nasa.gov'; 
-            window.open(hostName ,'_blank');
+            var hostName = $location.host();
+            var address = "https://cae-ems-uat.jpl.nasa.gov";
+            if (hostName !== 'localhost' && hostName.split('.')[0].substr(-3) !== 'uat')
+                address = 'https://' + hostName.split('.')[0] + '-uat.jpl.nasa.gov';
+            window.open(address ,'_blank');
         };
     };
 
