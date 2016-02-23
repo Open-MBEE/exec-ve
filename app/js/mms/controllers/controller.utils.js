@@ -320,19 +320,23 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
         var newScope = $rootScope.$new();
         var useCover = false;
         printContents = printElementCopy[0].outerHTML;
+        var header = '';
+        var footer = '';
         ViewService.getDocMetadata(ob.sysmlid, ws, null, 2)
         .then(function(metadata) {
             useCover = true;
             newScope.meta = metadata;
             newScope.time = time === 'latest' ? new Date() : time;
             newScope.meta.title = ob.name;
+            header = metadata.header ? metadata.header : header;
+            footer = metadata.footer ? metadata.footer : footer;
             $compile(templateElement.contents())(newScope); 
         }).finally(function() {
             $timeout(function() {
                 if (useCover) {
                     cover = templateElement[0].innerHTML;
                 }
-                deferred.resolve({cover: cover, contents: printContents});
+                deferred.resolve({cover: cover, contents: printContents, header: header, footer: footer});
             }, 0, false);
         });
         return deferred.promise;

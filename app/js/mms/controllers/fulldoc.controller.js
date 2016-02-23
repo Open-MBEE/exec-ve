@@ -212,6 +212,8 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
                 var html = ob.contents;
                 var doc = {};
                 doc.docId = document.sysmlid;
+                doc.header = ob.header;
+                doc.footer = ob.footer;
                 doc.html = html;
                 doc.cover = cover;
                 doc.time = time;
