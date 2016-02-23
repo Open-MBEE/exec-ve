@@ -4,8 +4,8 @@
 
 angular.module('mmsApp')
 
-.controller('FullDocCtrl', ['$scope', '$templateCache', '$compile', '$timeout', '$rootScope', '$state', '$stateParams', '$window', 'MmsAppUtils', 'document', 'workspace', 'site', 'snapshot', 'time', 'ConfigService', 'UxService', 'ViewService', 'UtilsService', 'growl', 'hotkeys', 'search', '_',
-function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateParams, $window, MmsAppUtils, document, workspace, site, snapshot, time, ConfigService, UxService, ViewService, UtilsService, growl, hotkeys, search, _) {
+.controller('FullDocCtrl', ['$scope', '$templateCache', '$compile', '$timeout', '$rootScope', '$state', '$stateParams', '$window', 'MmsAppUtils', 'document', 'workspace', 'site', 'snapshot', 'time', 'tag', 'ConfigService', 'UxService', 'ViewService', 'UtilsService', 'growl', 'hotkeys', 'search', '_',
+function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateParams, $window, MmsAppUtils, document, workspace, site, snapshot, time, tag, ConfigService, UxService, ViewService, UtilsService, growl, hotkeys, search, _) {
 
     $scope.ws = $stateParams.workspace;
     $scope.site = site;
@@ -204,19 +204,25 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
     };
 
     $scope.$on('convert.pdf', function() {
-        try{
+        //try{
             // $scope.bbApi.toggleButtonSpinner('convert.pdf');
-            var html = MmsAppUtils.generateHtml(document, $scope.ws, time, false);
-            var doc = {};
-            doc.docId = document.sysmlid;
-            doc.html = html;
-            doc.time = time;
-            doc.workspace = $scope.ws;
-            doc.name = document.sysmlid + '_' + time + '_' + new Date().getTime();
-            if(time == 'latest') doc.tagId = time;
-            else{
-                if($scope.tagId) doc.tagId = $scope.tagId;
-            }
+            MmsAppUtils.generateHtml(document, $scope.ws, time, false)
+            .then(function(ob) {
+                var cover = ob.cover;
+                var html = ob.contents;
+                var doc = {};
+                doc.docId = document.sysmlid;
+                doc.html = html;
+                doc.cover = cover;
+                doc.time = time;
+                doc.workspace = $scope.ws;
+                doc.name = document.sysmlid + '_' + time + '_' + new Date().getTime();
+                if(time == 'latest') 
+                    doc.tagId = time;
+                else {
+                    if(tag) 
+                        doc.tagId = tag.name;
+                }
 
             // MmsAppUtils.popupPrintConfirm(document, $scope.ws, time, true, false);
             ConfigService.convertHtmlToPdf(doc, site.sysmlid, $scope.ws).then(
@@ -228,10 +234,12 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
                     growl.error("Failed to convert HHTML to PDF: " + reason.message);
                 }
             );
-        }
-        catch(error){
-            growl.info(error.message);
-        }
+            });
+            
+        //}
+        //catch(error){
+         //   growl.info(error.message);
+        //}
         
         // try{
         //     growl.info(window.document.body.outerHTML);

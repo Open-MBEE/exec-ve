@@ -288,7 +288,7 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
     
 
     var generateHtml = function(ob, ws, time, isDoc) {
-        // var deferred = $q.defer();
+        var deferred = $q.defer();
         var printContents = '';//$window.document.getElementById('print-div').outerHTML;
         var printElementCopy = angular.element('#print-div').clone();//angular.element(printContents);
         var hostname = $location.host();
@@ -314,24 +314,12 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
         comments.remove();
         printElementCopy.find('div.tableSearch').remove();
         printElementCopy.find('.error').html('error');
-
-        var tocContents = '';
+        var templateString = $templateCache.get('partials/mms/docCover.html');
+        var templateElement = angular.element(templateString);
         var cover = '';
         var newScope = $rootScope.$new();
         var useCover = false;
-
-        var templateString = $templateCache.get('partials/mms/docCover.html');
-        var templateElement = angular.element(templateString);
-        
-        var docView = printElementCopy.find("mms-view[mms-vid='" + ob.sysmlid + "']");
-
-        if ((ob.specialization.contents && ob.specialization.contents.length > 1) || 
-            (ob.specialization.contains && ob.specialization.contains.length > 1) ||
-            (ob.documentation && ob.documentation !== '')) { //use original doc view as cover
-            cover = '<div style="page-break-after:always">' + docView[0].outerHTML + '</div>';
-        }
-
-        /*
+        printContents = printElementCopy[0].outerHTML;
         ViewService.getDocMetadata(ob.sysmlid, ws, null, 2)
         .then(function(metadata) {
             useCover = true;
@@ -340,16 +328,14 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
             newScope.meta.title = ob.name;
             $compile(templateElement.contents())(newScope); 
         }).finally(function() {
-            if (useCover)
-                cover = templateElement[0].innerHTML;
-            var toReturn = '<html><head><link href="css/ve-mms.styles.min.css" rel="stylesheet" type="text/css"></head><body style="overflow: auto">' + cover + printContents + '</html>';
-            // var toReturn    = '<html><body>this is a test!</body></html>';
-            deferred.resolve(toReturn);
+            $timeout(function() {
+                if (useCover) {
+                    cover = templateElement[0].innerHTML;
+                }
+                deferred.resolve({cover: cover, contents: printContents});
+            }, 0, false);
         });
-        */
-        
-        return cover + printElementCopy[0].outerHTML;
-        // return deferred.promise;
+        return deferred.promise;
     };
 
     var popupPrint = function(ob, ws, time, isDoc, print) {
