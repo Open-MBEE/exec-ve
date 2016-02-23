@@ -312,9 +312,9 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
         comments.remove();
         printElementCopy.find('div.tableSearch').remove();
         printElementCopy.find('.error').html('error');
-        var docView = printElementCopy.find("mms-view[mms-vid='" + ob.sysmlid + "']");
-        if (isDoc)
-            docView.remove();
+        //var docView = printElementCopy.find("mms-view[mms-vid='" + ob.sysmlid + "']");
+        //if (isDoc)
+        //    docView.remove();
         var templateString = $templateCache.get('partials/mms/docCover.html');
         var templateElement = angular.element(templateString);
         var tocContents = '';
@@ -341,13 +341,13 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
         };
         if (isDoc) {
             tocContents = UtilsService.makeHtmlTOC($rootScope.mms_treeApi.get_rows());
-            if ((ob.specialization.contents && ob.specialization.contents.length > 1) || 
+            /*if ((ob.specialization.contents && ob.specialization.contents.length > 1) || 
                 (ob.specialization.contains && ob.specialization.contains.length > 1) ||
                 (ob.documentation && ob.documentation !== '')) { //use original doc view as cover
                 cover = '<div style="page-break-after:always">' + docView[0].outerHTML + '</div>';
                 $timeout(openPopup, 0, false);
                 return;
-            }
+            }*/
             ViewService.getDocMetadata(ob.sysmlid, ws, null, 2)
             .then(function(metadata) {
                 useCover = true;
