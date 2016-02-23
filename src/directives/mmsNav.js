@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsNav', ['$templateCache', '$state', 'hotkeys', 'growl', '$location', 'ElementService', mmsNav]);
+.directive('mmsNav', ['$templateCache', '$state', 'hotkeys', 'growl', '$location', '$modal', '$http', 'URLService', 'ApplicationService', 'ElementService', mmsNav]);
 
 /**
  * @ngdoc directive
@@ -30,7 +30,7 @@ angular.module('mms.directives')
     </pre>
  * @param {string} mmsTitle Title to display
  */
-function mmsNav($templateCache, $state, hotkeys, growl, $location, ElementService) {
+function mmsNav($templateCache, $state, hotkeys, growl, $location, $modal, $http, URLService, ApplicationService, ElementService) {
     var template = $templateCache.get('mms/templates/mmsNav.html');
 
     var mmsNavLink = function(scope, element, attrs) {
@@ -42,6 +42,24 @@ function mmsNav($templateCache, $state, hotkeys, growl, $location, ElementServic
         var sites = {};
         scope.toggleHelp = function() {
             hotkeys.toggleCheatSheet();
+        };
+        scope.toggleAbout = function() {
+            scope.veV = '2.3 rc4';
+            scope.mmsV = 'Loading...';
+            ApplicationService.getMmsVersion().then(function(data) {
+                scope.mmsV = data;
+              }, function(reason) {
+                scope.mmsV = "Could not retrieve due to failure: " + reason.message;
+          	});
+            var instance = $modal.open({
+                templateUrl: 'partials/mms/about.html',
+                scope: scope,
+                controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
+                    $scope.cancel = function() {
+                        $modalInstance.dismiss();
+                    };
+                }]
+            });
         };
         //Resets catagory and sites accordions
         scope.reset = function(){
@@ -191,10 +209,11 @@ function mmsNav($templateCache, $state, hotkeys, growl, $location, ElementServic
             }
         };
         scope.stagingView = function(){
-            var hostName = ($location.host() === 'localhost') ? 
-                         'https://cae-ems-stg.jpl.nasa.gov':
-                         'https://'+$location.host().split(".")[0]+'-stg.jpl.nasa.gov'; 
-            window.open(hostName ,'_blank');
+            var hostName = $location.host();
+            var address = "https://cae-ems-uat.jpl.nasa.gov";
+            if (hostName !== 'localhost' && hostName.split('.')[0].substr(-3) !== 'uat')
+                address = 'https://' + hostName.split('.')[0] + '-uat.jpl.nasa.gov';
+            window.open(address ,'_blank');
         };
     };
 

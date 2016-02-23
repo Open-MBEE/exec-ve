@@ -57,6 +57,20 @@ function urlService(baseUrl) {
 
     /**
      * @ngdoc method
+     * @name mms.URLService#getMmsVersionURL
+     * @methodOf mms.URLService
+     * 
+     * @description
+     * self explanatory
+     *
+     * @returns {object} Returns object with mmsversion
+     */
+    var getMmsVersionURL = function() {
+        return root + "/mmsversion";
+    };
+
+    /**
+     * @ngdoc method
      * @name mms.URLService#getConfigSnapshotsURL
      * @methodOf mms.URLService
      *
@@ -526,6 +540,7 @@ function urlService(baseUrl) {
     };
 
     return {
+        getMmsVersionURL: getMmsVersionURL,
         getSiteDashboardURL: getSiteDashboardURL,
         getElementURL: getElementURL,
         getOwnedElementURL: getOwnedElementURL,
