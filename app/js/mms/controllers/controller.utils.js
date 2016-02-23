@@ -286,6 +286,62 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
         });
     };
     
+
+    var generateHtml = function(ob, ws, time, isDoc) {
+        var deferred = $q.defer();
+        var printContents = '';//$window.document.getElementById('print-div').outerHTML;
+        var printElementCopy = angular.element('#print-div').clone();//angular.element(printContents);
+        var hostname = $location.host();
+        var port = $location.port();
+        var protocol = $location.protocol();
+        var absurl = $location.absUrl();
+        var prefix = protocol + '://' + hostname + ((port == 80 || port == 443) ? '' : (':' + port));
+        var mmsIndex = absurl.indexOf('mms.html');
+        printElementCopy.find("a").attr('href', function(index, old) {
+            if (!old)
+                return old;
+            if (old.indexOf('/') === 0)
+                return prefix + old;
+            if (old.indexOf('../../') === 0)
+                return prefix + old.substring(5);
+            if (old.indexOf('../') === 0)
+                return prefix + '/alfresco' + old.substring(2);
+            if (old.indexOf('mms.html') === 0)
+                return absurl.substring(0, mmsIndex) + old;
+            return old;
+        });
+        var comments = printElementCopy.find('mms-transclude-com');
+        comments.remove();
+        printElementCopy.find('div.tableSearch').remove();
+        printElementCopy.find('.error').html('error');
+        var templateString = $templateCache.get('partials/mms/docCover.html');
+        var templateElement = angular.element(templateString);
+        var cover = '';
+        var newScope = $rootScope.$new();
+        var useCover = false;
+        printContents = printElementCopy[0].outerHTML;
+        var header = '';
+        var footer = '';
+        ViewService.getDocMetadata(ob.sysmlid, ws, null, 2)
+        .then(function(metadata) {
+            useCover = true;
+            newScope.meta = metadata;
+            newScope.time = time === 'latest' ? new Date() : time;
+            newScope.meta.title = ob.name;
+            header = metadata.header ? metadata.header : header;
+            footer = metadata.footer ? metadata.footer : footer;
+            $compile(templateElement.contents())(newScope); 
+        }).finally(function() {
+            $timeout(function() {
+                if (useCover) {
+                    cover = templateElement[0].innerHTML;
+                }
+                deferred.resolve({cover: cover, contents: printContents, header: header, footer: footer});
+            }, 0, false);
+        });
+        return deferred.promise;
+    };
+
     var popupPrint = function(ob, ws, time, isDoc, print) {
         var printContents = '';//$window.document.getElementById('print-div').outerHTML;
         var printElementCopy = angular.element('#print-div').clone();//angular.element(printContents);
@@ -312,9 +368,9 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
         comments.remove();
         printElementCopy.find('div.tableSearch').remove();
         printElementCopy.find('.error').html('error');
-        var docView = printElementCopy.find("mms-view[mms-vid='" + ob.sysmlid + "']");
-        if (isDoc)
-            docView.remove();
+        //var docView = printElementCopy.find("mms-view[mms-vid='" + ob.sysmlid + "']");
+        //if (isDoc)
+        //    docView.remove();
         var templateString = $templateCache.get('partials/mms/docCover.html');
         var templateElement = angular.element(templateString);
         var tocContents = '';
@@ -341,13 +397,13 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
         };
         if (isDoc) {
             tocContents = UtilsService.makeHtmlTOC($rootScope.mms_treeApi.get_rows());
-            if ((ob.specialization.contents && ob.specialization.contents.length > 1) || 
+            /*if ((ob.specialization.contents && ob.specialization.contents.length > 1) || 
                 (ob.specialization.contains && ob.specialization.contains.length > 1) ||
                 (ob.documentation && ob.documentation !== '')) { //use original doc view as cover
                 cover = '<div style="page-break-after:always">' + docView[0].outerHTML + '</div>';
                 $timeout(openPopup, 0, false);
                 return;
-            }
+            }*/
             ViewService.getDocMetadata(ob.sysmlid, ws, null, 2)
             .then(function(metadata) {
                 useCover = true;
@@ -366,7 +422,8 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
     return {
         addPresentationElement: addPresentationElement,
         popupPrintConfirm: popupPrintConfirm,
-        tableToCsv: tableToCsv
+        tableToCsv: tableToCsv,
+        generateHtml: generateHtml
     };
 }
     
