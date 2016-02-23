@@ -202,8 +202,13 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
         }
         return null;
     };
-
+    var converting = false;
     $scope.$on('convert.pdf', function() {
+        if (converting) {
+            growl.info("Please wait...");
+        }
+        converting = true;
+        $scope.bbApi.toggleButtonSpinner('convert.pdf');
         //try{
             // $scope.bbApi.toggleButtonSpinner('convert.pdf');
             MmsAppUtils.generateHtml(document, $scope.ws, time, false)
@@ -227,15 +232,19 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
                 }
 
             // MmsAppUtils.popupPrintConfirm(document, $scope.ws, time, true, false);
-            ConfigService.convertHtmlToPdf(doc, site.sysmlid, $scope.ws).then(
-                function(reuslt){
+                ConfigService.convertHtmlToPdf(doc, site.sysmlid, $scope.ws)
+                .then(
+                    function(reuslt){
                     growl.info('Converting HTML to PDF...Please wait for a completion email');
                     // $scope.bbApi.toggleButtonSpinner('convert.pdf');
-                },
-                function(reason){
-                    growl.error("Failed to convert HHTML to PDF: " + reason.message);
-                }
-            );
+                    },
+                    function(reason){
+                    growl.error("Failed to convert HTML to PDF: " + reason.message);
+                    }
+                ).finally(function() {
+                    converting = false;
+                    $scope.bbApi.toggleButtonSpinner('convert.pdf');
+                });
             });
             
         //}
