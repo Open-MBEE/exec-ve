@@ -17,18 +17,22 @@ describe('HttpService', function() {
 		$q = $injector.get('$q');
         $httpBackend = $injector.get('$httpBackend');
 		queue = HttpService.getQueue();
-        $httpBackend.whenGET(url+'/hello').respond( function(method, url, data) {
-            return [200, 'okay'];
-        });
-		$httpBackend.whenGET(url+'/world').respond( function(method, url, data) {
-			return [200, 'okay'];
+		$httpBackend.whenRoute('GET', url+ '/:eid')
+		  .respond(function(method, url, data, headers, params) {
+		    return [200, 'okay'];
 		});
-		$httpBackend.whenGET(url+'/foo').respond( function(method, url, data) {
-			return [200, 'okay'];
-		});
-		$httpBackend.whenGET(url+'/bar').respond( function(method, url, data) {
-			return [200, 'okay'];
-		});
+        // $httpBackend.whenGET(url+'/hello').respond( function(method, url, data) {
+        //     return [200, 'okay'];
+        // });
+		// $httpBackend.whenGET(url+'/world').respond( function(method, url, data) {
+		// 	return [200, 'okay'];
+		// });
+		// $httpBackend.whenGET(url+'/foo').respond( function(method, url, data) {
+		// 	return [200, 'okay'];
+		// });
+		// $httpBackend.whenGET(url+'/bar').respond( function(method, url, data) {
+		// 	return [200, 'okay'];
+		// });
         HttpService.setOutboundLimit(2);
 		// var checkQueue = function(queue, priority){
 		// 	for(var i = 0; i < queue[priority].length; i++){

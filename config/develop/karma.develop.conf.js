@@ -55,8 +55,20 @@ module.exports = function (config) {
         // test results reporter to use
         // possible values: 'dots', 'progress'
         // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-        reporters: ['progress'],
-
+        //reporters: ['progress'],
+        reporters: ['nyan'],
+        nyanReporter: {
+        //   // suppress the error report at the end of the test run 
+        //   suppressErrorReport: true,
+          // 
+        //   // suppress the red background on errors in the error 
+        //   // report at the end of the test run 
+        //   suppressErrorHighlighting: true,
+ 
+          // increase the number of rainbow lines displayed 
+          // enforced min = 4, enforced max = terminal height - 1 
+        //   numberOfRainbowLines: 25, // default is 4 
+        },
         // web server port
         port: 9876,
 
@@ -78,7 +90,7 @@ module.exports = function (config) {
         // start these browsers
         // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
         browsers: ['Chrome'],
-        plugins : ['karma-chrome-launcher', 'karma-jasmine'],
+        plugins : ['karma-chrome-launcher', 'karma-jasmine', 'karma-nyan-reporter'],
 
         // Continuous Integration mode
         // if true, Karma captures browsers, runs the tests and exits
