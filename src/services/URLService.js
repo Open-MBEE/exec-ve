@@ -95,6 +95,26 @@ function urlService(baseUrl) {
 
     /**
      * @ngdoc method
+     * @name mms.URLService#getHtmlToPdfURL
+     * @methodOf mms.URLService
+     *
+     * @description
+     * Gets url that to convert HTML to PDF
+     *
+     * @param {string} docId Id of the document
+     * @param {string} site Site name
+     * @param {string} workspace Workspace name
+     * @returns {string} The url
+     */
+    var getHtmlToPdfURL = function(docId, site, workspace) {
+        return root + "/workspaces/" + workspace +
+                      "/sites/" + site +
+                      "/documents/" + docId +
+                      "/htmlToPdf/123456789";  
+    };
+
+    /**
+     * @ngdoc method
      * @name mms.URLService#getCheckLoginURL
      * @methodOf mms.URLService
      *
@@ -517,6 +537,7 @@ function urlService(baseUrl) {
         getElementSearchURL: getElementSearchURL,
         getImageURL: getImageURL,
         getProductSnapshotsURL: getProductSnapshotsURL,
+        getHtmlToPdfURL: getHtmlToPdfURL,
         getConfigSnapshotsURL: getConfigSnapshotsURL,
         getSiteProductsURL: getSiteProductsURL,
         getConfigURL: getConfigURL,

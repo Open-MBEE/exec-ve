@@ -87,6 +87,7 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
         $scope.bbApi.addButton(UxService.getButtonBarButton('show.comments'));
         $scope.bbApi.setToggleState('show.comments', $rootScope.veCommentsOn);
         $scope.bbApi.addButton(UxService.getButtonBarButton('print'));
+        $scope.bbApi.addButton(UxService.getButtonBarButton('convert.pdf'));
         $scope.bbApi.addButton(UxService.getButtonBarButton('word'));
         $scope.bbApi.addButton(UxService.getButtonBarButton('tabletocsv'));
         $scope.bbApi.addButton(UxService.getButtonBarButton('show.elements'));
@@ -105,33 +106,33 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
         // **WARNING** IF YOU CHANGE THIS CODE, NEED TO UPDATE IN VIEW CTRL TOO
 
         if ($state.includes('workspace.site.document') || $state.includes('workspace.site.documentpreview')) {
-            if (snapshot !== null) {
-                var pdfUrl = getPDFUrl();
-                if (pdfUrl !== null && pdfUrl !== undefined) {
-                    $scope.bbApi.addButton(UxService.getButtonBarButton('download.pdf'));                
-                } else {
-                    $scope.bbApi.addButton(UxService.getButtonBarButton('generate.pdf'));
+            // if (snapshot !== null) {
+            //     var pdfUrl = getPDFUrl();
+            //     if (pdfUrl !== null && pdfUrl !== undefined) {
+            //         $scope.bbApi.addButton(UxService.getButtonBarButton('download.pdf'));                
+            //     } else {
+            //         $scope.bbApi.addButton(UxService.getButtonBarButton('generate.pdf'));
 
-                    var pdfStatus = getPDFStatus();
-                    if (pdfStatus === 'Generating...')
-                        $scope.bbApi.toggleButtonSpinner('generate.pdf');
-                    else if (pdfStatus !== null)
-                        $scope.bbApi.setTooltip('generate.pdf', pdfStatus);
-                }
+            //         var pdfStatus = getPDFStatus();
+            //         if (pdfStatus === 'Generating...')
+            //             $scope.bbApi.toggleButtonSpinner('generate.pdf');
+            //         else if (pdfStatus !== null)
+            //             $scope.bbApi.setTooltip('generate.pdf', pdfStatus);
+            //     }
 
-                var zipUrl = getZipUrl();
-                if (zipUrl !== null && zipUrl !== undefined) {
-                    $scope.bbApi.addButton(UxService.getButtonBarButton('download.zip'));                
-                } else {
-                    $scope.bbApi.addButton(UxService.getButtonBarButton('generate.zip'));
+            //     var zipUrl = getZipUrl();
+            //     if (zipUrl !== null && zipUrl !== undefined) {
+            //         $scope.bbApi.addButton(UxService.getButtonBarButton('download.zip'));                
+            //     } else {
+            //         $scope.bbApi.addButton(UxService.getButtonBarButton('generate.zip'));
 
-                    var zipStatus = getZipStatus();
-                    if (zipStatus === 'Generating...')
-                        $scope.bbApi.toggleButtonSpinner('generate.zip');
-                    else if (zipStatus !== null)
-                        $scope.bbApi.setTooltip('generate.zip', zipStatus);
-                }
-            }
+            //         var zipStatus = getZipStatus();
+            //         if (zipStatus === 'Generating...')
+            //             $scope.bbApi.toggleButtonSpinner('generate.zip');
+            //         else if (zipStatus !== null)
+            //             $scope.bbApi.setTooltip('generate.zip', zipStatus);
+            //     }
+            // }
         }
     };
 
@@ -193,6 +194,44 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
         }
         return null;
     };
+
+    $scope.$on('convert.pdf', function() {
+        try{
+            // $scope.bbApi.toggleButtonSpinner('convert.pdf');
+            var html = MmsAppUtils.generateHtml(document, $scope.ws, time, false);
+            var doc = {};
+            doc.docId = document.sysmlid;
+            doc.html = html;
+            doc.time = time;
+            doc.workspace = $scope.ws;
+            doc.name = document.sysmlid + '_' + time + '_' + new Date().getTime();
+            if(time == 'latest') doc.tagId = time;
+            else{
+                if($scope.tagId) doc.tagId = $scope.tagId;
+            }
+
+            // MmsAppUtils.popupPrintConfirm(document, $scope.ws, time, true, false);
+            ConfigService.convertHtmlToPdf(doc, site.sysmlid, $scope.ws).then(
+                function(reuslt){
+                    growl.info('Converting HTML to PDF...Please wait for a completion email');
+                    // $scope.bbApi.toggleButtonSpinner('convert.pdf');
+                },
+                function(reason){
+                    growl.error("Failed to convert HHTML to PDF: " + reason.message);
+                }
+            );
+        }
+        catch(error){
+            growl.info(error.message);
+        }
+        
+        // try{
+        //     growl.info(window.document.body.outerHTML);
+        // }catch(error){
+        //     growl.info(error.message);
+        // }
+    });
+
 
     $scope.$on('generate.pdf', function() {
         if (getPDFStatus() === 'Generating...')
