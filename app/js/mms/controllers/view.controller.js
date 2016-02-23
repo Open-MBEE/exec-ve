@@ -252,7 +252,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         //     }
         // );
     });
-
+/*
     $scope.$on('generate.zip', function() {
         $rootScope.$broadcast('generate.pdf');        
     });
@@ -269,7 +269,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
             $window.alert(artifactWarning);
         $window.open(getZipUrl());
     });
-
+*/
     $scope.$on('view.add.paragraph', function() {
         MmsAppUtils.addPresentationElement($scope, 'Paragraph', view);
     });
