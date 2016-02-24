@@ -187,7 +187,9 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
      * @param {string} type name/documentation/value
      * @param {boolean} revertAll revert all properties
      */
-    var revertEdits = function(scope, type, revertAll) {
+    var revertEdits = function(scope, type, revertAll, editorApi) {
+        if (editorApi && editorApi.destroy)
+            editorApi.destroy();
         if (scope.mmsType === 'workspace') {
             scope.edit.name = scope.element.name;
         } 

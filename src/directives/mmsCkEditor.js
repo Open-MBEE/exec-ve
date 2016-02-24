@@ -22,8 +22,8 @@ angular.module('mms.directives')
  * Make any textarea with an ngModel attached to be a ckeditor wysiwyg editor. This
  * requires the ckeditor library. Transclusion is supported. ngModel is required.
  * ### Example
- * <pre> //TODO update 
-   <textarea mms-tinymce ng-model="element.documentation"></textarea>
+ * <pre>
+   <textarea mms-ckeditor ng-model="element.documentation"></textarea>
    </pre>
  *
  * @param {Array=} mmsCfElements Array of element objects as returned by ElementService
@@ -44,6 +44,7 @@ function mmsCkeditor(ElementService, ViewService, CacheService, $modal, $templat
           var chooseImageModalTemplate = $templateCache.get('mms/templates/mmsChooseImageModal.html');
           var viewLinkModalTemplate = $templateCache.get('mms/templates/mmsViewLinkModal.html');
           var proposeModalTemplate = $templateCache.get('mms/templates/mmsProposeModal.html');
+
 
         var transcludeCtrl = function($scope, $modalInstance, autocomplete) {
             var autocompleteName;
@@ -368,8 +369,8 @@ function mmsCkeditor(ElementService, ViewService, CacheService, $modal, $templat
 
         var imageCallback = function(callback, value, meta) {
             angular.element('#mce-modal-block').css('z-index', 98);
-            var tinymceModalId = $window.tinymce.activeEditor.windowManager.getWindows()[0]._id;
-            angular.element('#' + tinymceModalId).css('z-index', 99);
+            var ckeditorModalId = $window.ckeditor.activeEditor.windowManager.getWindows()[0]._id;
+            angular.element('#' + ckeditorModalId).css('z-index', 99);
             var instance = $modal.open({
                 template: chooseImageModalTemplate,
                 scope: scope,
@@ -444,21 +445,21 @@ function mmsCkeditor(ElementService, ViewService, CacheService, $modal, $templat
         thisToolbar.push(tableToolbar);
         thisToolbar.push(imageToolbar);
         thisToolbar.push(customToolbar);
-        if (scope.mmsTinymceType === 'TableT') {
+        if (scope.mmsEditorType === 'TableT') {
           thisToolbar = defaultToolbar.slice();
           thisToolbar.push(tableToolbar);
           thisToolbar.push(customToolbar);
         }
-        if (scope.mmsTinymceType === 'ListT') {
+        if (scope.mmsEditorType === 'ListT') {
           thisToolbar = defaultToolbar.slice();
           thisToolbar.push(listToolbar);
           thisToolbar.push(customToolbar);
         }
-        if (scope.mmsTinymceType === 'Figure') {
+        if (scope.mmsEditorType === 'Figure') {
           thisToolbar = [];
           thisToolbar.push(imageToolbar);
         }
-        //if (scope.mmsTinymceType === 'ParagraphT' || scope.mmsTinymceType === 'Paragraph')
+        //if (scope.mmsEditorType === 'ParagraphT' || scope.mmsEditorType === 'Paragraph')
           //  thisToolbar = defaultToolbar + ' | ' + codeToolbar + ' | ' + customToolbar;
 
         var options = {
@@ -542,8 +543,8 @@ function mmsCkeditor(ElementService, ViewService, CacheService, $modal, $templat
             mmsEid: '@',
             mmsWs: '@',
             mmsSite: '@',
-            mmsTinymceType: '@',
-            mmsTinymceApi: '='
+            mmsEditorType: '@',
+            mmsEditorApi: '='
         },
         link: mmsCkeditorLink
     };

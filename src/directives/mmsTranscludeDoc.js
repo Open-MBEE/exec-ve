@@ -267,7 +267,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                     scope.panelType = 'Text';
             }
             if (scope.presentationElem) {
-                scope.tinymceType = scope.presentationElem.type;
+                scope.editorType = scope.presentationElem.type;
             }
         }
         
