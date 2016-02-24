@@ -83,7 +83,7 @@ describe('UtilsService', function() {
 				expect(dirtyElement3.specialization.value[0].valueExpression).not.toBeDefined();
 		}));
 		it('for every value of elem.specialization.contents if there\'s a valueExpression in any of its children delete it', inject(function() {
-			
+			// :TODO what does this object look like? 
 		}));
 		it('for every value of elem.specialization.instanceSpecificationSpecification if there\'s a valueExpression in any of its children delete it', inject(function() {
 			
