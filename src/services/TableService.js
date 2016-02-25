@@ -54,6 +54,8 @@ function TableService($q, $http, URLService, UtilsService, CacheService, _, Elem
                 val = cell.specialization.value[0].double;
               } else if (cell.specialization.value[0].integer !== undefined) {
                 val = cell.specialization.value[0].integer;
+              } else if (cell.specialization.value[0].expressionBody !== undefined) {
+                val = cell.specialization.value[0].expressionBody[0];
               } else {
                 val = cell.specialization.value[0].string;
               }

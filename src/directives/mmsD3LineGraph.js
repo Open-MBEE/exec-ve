@@ -55,41 +55,40 @@
   function mmsLineGraph(TableService, $window, $q) {
 
     function mmsGraphLink(scope, element, attrs, mmsViewCtrl) {
-      console.log('mmsGraphLink()');
       var d3 = $window.d3;
       var c3 = $window.c3;
 
       var ws = scope.mmsWs;
       var version = scope.mmsVersion;
-      var xyCols = [];
       var promises = [];
-      var eids = scope.eid.split(','); // split by comma or |
+      var eids = scope.eid.split(',');
+      var xCols = [], yCols = [];
+
+      // Initiate REST calls
       eids.forEach(function(eid) {
         promises.push(TableService.readTableCols(eid, ws, version));
       });
-      var xCols = [], yCols = [];
-      if (!scope.xCols) {
-        if (scope.xCol) {
-          xCols.push(scope.xCol);
-        }
-      } else {
+
+      // Get column settings
+      if (scope.xCols) {
         xCols = scope.xCols;
+      } else if (scope.xCol) {
+        xCols.push(scope.xCol);
       }
-      if (!scope.yCols) {
-        if (scope.yCol) {
-          yCols.push(scope.yCol);
-        }
-      } else {
+      if (scope.yCols) {
         yCols = scope.yCols;
+      } else if (scope.yCol) {
+        yCols.push(scope.yCol);
       }
 
+      // When REST calls return...
       $q.all(promises).then(function(values) {
-        console.log(values);
-        var xCol;
-        var _chart = {
+        var sc = 0, // series count
+        _chart = {  // C3 config
           data: {
             columns: [],
-            names: {}
+            names: {},
+            order: 'asc'
           },
           axis: {
             x: {
@@ -103,32 +102,40 @@
         if (values.length > 1) {
           _chart.data.xs = [];
         }
-        var sc = 0; // series count
 
+        // Process each table
         values.forEach(function(value, tc) {
+          var xCol;
+
+          // Determine x column for the table
+          if (xCols.length > 0) {
+            xCol = xCols[tc % xCols.length];
+          } else {
+            xCol = value.columnHeaders[0];
+            xCols.push(xCol);
+          }
+
+          // Set chart title and universal x column (if only one is provided)
           if (tc === 0) {
             _chart.title = value.title;
-            if (xCols.length > 0) {
-              xCol = xCols[sc % xCols.length];
-            } else {
-              xCol = value.columnHeaders[0];
-              xCols.push(xCol);
-            }
             if (values.length === 1 && !scope.xCols) {
               _chart.data.x = xCol + tc;
             }
           }
 
-          var isY = false, col, ci = value.columnHeaders.length - 1;
+          var isY = false,
+              col,
+              ci = value.columnHeaders.length - 1;
+
           while (ci >= 0) {
             col = value.columnHeaders[ci];
-            if (xCols.includes(col) || (isY = (yCols.length === 0 || yCols.includes(col)))) {
+            if (col === xCol || (isY = (yCols.length === 0 || yCols.includes(col)))) {
               if (isY) {
                 // assign name
                 if (scope.seriesNames === undefined || scope.seriesNames[sc] === undefined) {
                   _chart.data.names[col + tc] = col;
                 } else {
-                  _chart.data.names[col + tc] = scope.seriesNames[sc];
+                  _chart.data.names[col + tc] = scope.seriesNames[scope.seriesNames.length - sc - 1];
                 }
                 // assign x column if more than one
                 if (values.length > 1) {
