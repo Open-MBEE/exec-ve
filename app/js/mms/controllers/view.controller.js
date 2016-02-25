@@ -95,6 +95,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         }
         if ($state.includes('workspace.site.document')) {
             $scope.bbApi.addButton(UxService.getButtonBarButton('print'));
+            $scope.bbApi.addButton(UxService.getButtonBarButton('convert.pdf'));
             $scope.bbApi.addButton(UxService.getButtonBarButton('word'));
             $scope.bbApi.addButton(UxService.getButtonBarButton('tabletocsv'));
         }
@@ -114,33 +115,33 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         // **WARNING** IF YOU CHANGE THIS CODE, NEED TO UPDATE IN FULL DOC CTRL TOO
 
         if ($state.includes('workspace.site.document') || $state.includes('workspace.site.documentpreview')) {
-            if (snapshot !== null) {
-                var pdfUrl = getPDFUrl();
-                if (pdfUrl !== null && pdfUrl !== undefined) {
-                    $scope.bbApi.addButton(UxService.getButtonBarButton('download.pdf'));                
-                } else {
-                    $scope.bbApi.addButton(UxService.getButtonBarButton('generate.pdf'));
+            // if (snapshot !== null) {
+            //     var pdfUrl = getPDFUrl();
+            //     if (pdfUrl !== null && pdfUrl !== undefined) {
+            //         $scope.bbApi.addButton(UxService.getButtonBarButton('download.pdf'));                
+            //     } else {
+            //         $scope.bbApi.addButton(UxService.getButtonBarButton('generate.pdf'));
 
-                    var pdfStatus = getPDFStatus();
-                    if (pdfStatus === 'Generating...')
-                        $scope.bbApi.toggleButtonSpinner('generate.pdf');
-                    else if (pdfStatus !== null)
-                        $scope.bbApi.setTooltip('generate.pdf', pdfStatus);
-                }
+            //         var pdfStatus = getPDFStatus();
+            //         if (pdfStatus === 'Generating...')
+            //             $scope.bbApi.toggleButtonSpinner('generate.pdf');
+            //         else if (pdfStatus !== null)
+            //             $scope.bbApi.setTooltip('generate.pdf', pdfStatus);
+            //     }
 
-                var zipUrl = getZipUrl();
-                if (zipUrl !== null && zipUrl !== undefined) {
-                    $scope.bbApi.addButton(UxService.getButtonBarButton('download.zip'));                
-                } else {
-                    $scope.bbApi.addButton(UxService.getButtonBarButton('generate.zip'));
+            //     var zipUrl = getZipUrl();
+            //     if (zipUrl !== null && zipUrl !== undefined) {
+            //         $scope.bbApi.addButton(UxService.getButtonBarButton('download.zip'));                
+            //     } else {
+            //         $scope.bbApi.addButton(UxService.getButtonBarButton('generate.zip'));
 
-                    var zipStatus = getZipStatus();
-                    if (zipStatus === 'Generating...')
-                        $scope.bbApi.toggleButtonSpinner('generate.zip');
-                    else if (zipStatus !== null)
-                        $scope.bbApi.setTooltip('generate.zip', zipStatus);
-                }
-            }
+            //         var zipStatus = getZipStatus();
+            //         if (zipStatus === 'Generating...')
+            //             $scope.bbApi.toggleButtonSpinner('generate.zip');
+            //         else if (zipStatus !== null)
+            //             $scope.bbApi.setTooltip('generate.zip', zipStatus);
+            //     }
+            // }
             if ($state.includes('workspace.site.document')) {
                 $scope.bbApi.addButton(UxService.getButtonBarButton('center.previous'));
                 $scope.bbApi.addButton(UxService.getButtonBarButton('center.next'));
@@ -224,27 +225,33 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         return null;
     };
 
+    $scope.$on('convert.pdf', function() {
+        MmsAppUtils.popupPrintConfirm(view, $scope.ws, time, false, false);
+    });
+
     $scope.$on('generate.pdf', function() {
-        if (getPDFStatus() === 'Generating...')
-            return;
-        $scope.bbApi.toggleButtonSpinner('generate.pdf');
-        $scope.bbApi.toggleButtonSpinner('generate.zip');
-        if (!snapshot.formats)
-            snapshot.formats = [];
-        snapshot.formats.push({"type":"pdf",  "status":"Generating"});
-        snapshot.formats.push({"type":"html", "status":"Generating"});
-        snapshot.ws = ws;
-        snapshot.site = site.sysmlid;
-        snapshot.time = time;
+        MmsAppUtils.popupPrintConfirm(view, $scope.ws, time, false, false);
+
+        // if (getPDFStatus() === 'Generating...')
+        //     return;
+        // $scope.bbApi.toggleButtonSpinner('generate.pdf');
+        // $scope.bbApi.toggleButtonSpinner('generate.zip');
+        // if (!snapshot.formats)
+        //     snapshot.formats = [];
+        // snapshot.formats.push({"type":"pdf",  "status":"Generating"});
+        // snapshot.formats.push({"type":"html", "status":"Generating"});
+        // snapshot.ws = ws;
+        // snapshot.site = site.sysmlid;
+        // snapshot.time = time;
         
-        ConfigService.createSnapshotArtifact(snapshot, site.sysmlid, workspace).then(
-            function(result){
-                growl.info('Generating artifacts...Please wait for a completion email and reload the page.');
-            },
-            function(reason){
-                growl.error('Failed to generate artifacts: ' + reason.message);
-            }
-        );
+        // ConfigService.createSnapshotArtifact(snapshot, site.sysmlid, workspace).then(
+        //     function(result){
+        //         growl.info('Generating artifacts...Please wait for a completion email and reload the page.');
+        //     },
+        //     function(reason){
+        //         growl.error('Failed to generate artifacts: ' + reason.message);
+        //     }
+        // );
     });
 
     $scope.$on('generate.zip', function() {
@@ -436,4 +443,5 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     $scope.$on('tabletocsv', function() {
         MmsAppUtils.tableToCsv(view, $scope.ws, time, false);
     });
+    
 }]);
