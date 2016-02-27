@@ -105,8 +105,8 @@ describe('UtilsService', function() {
 		//given element object a and element object b, returns new object with b data minus keys not in a
 		it('it should return a new object with b data minus keys not in a for elements a and b', inject(function() {
 			//used to updateElements checking a object in the cache (that has been updated) with the same object from the server.... B - A
-			var a = {specialization:{specialization:{hello:'world'}}}
-			var b = {specialization:{specialization:{hello:'world', foo:'bar'}}}
+			var a = {specialization:{specialization:{hello:'world'}}};
+			var b = {specialization:{specialization:{hello:'world', foo:'bar'}}};
 			//console.log("This is b before"+ JSON.stringify(b.specialization.specialization));
 			var result = UtilsService.filterProperties(a, b);
 			//console.log("This is result after"+ JSON.stringify(result));
@@ -121,10 +121,22 @@ describe('UtilsService', function() {
 		// put in cacheService element object and its edit object, modify edit
 		// object's name/doc/val, call mergeElement with updateEdit = true with 
 		//property argument = all/name/documentation/value and check edit object only has that specific property updated
-		// hasConflict
 
-		it('it should return a new object with b data minus keys not in a for elements a and b', inject(function() {
-			CacheService.put("hello world", "I am the ghost", true);
+		it('it should update the element in the cache after editing', inject(function() {
+			var a = {creator: "gcgandhi", modified: "2015-07-27T16:32:42.272-0700",modifier: "dlam",
+			         created: "Mon May 18 14:38:12 PDT 2015", name: "vetest Cover Page", documentation: "",
+                     owner: "holding_bin_vetest_PROJECT-21bbdceb-a188-45d9-a585-b30bba346175"};
+			var b = {creator: "dlam", modified: "2015-07-27T16:32:42.272-0700",modifier: "dlam",
+		 			 created: "Mon May 18 14:38:12 PDT 2015", name: "ve", documentation: "",
+		             owner: "holding_bin_vetest_PROJECT-21bbdceb-a188-45d9-a585-b30bba346175"};
+			//   var mergeElement = function(source, eid, workspace, updateEdit, property) {
+			CacheService.put('element|master|objectToEdit|latest', a, true);
+			UtilsService.mergeElement(b, 'objectToEdit', 'master',true, 'all');
+			var c = CacheService.get('element|master|objectToEdit|latest');
+			console.log("after :::::::::::" + c.name);
+			expect(a.name).toEqual('ve');
+			
+			//UtilsService.filterProperties(a, b);
 		}));
 		
 	});

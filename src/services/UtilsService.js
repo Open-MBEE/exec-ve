@@ -217,12 +217,12 @@ function UtilsService(CacheService, _) {
      * @description
      * Make key for element for use in CacheService
      *
-     * @param {object} element object
+     * @param {object} source the element object to merge in 
      * @param {string} eid id of element
      * @param {string} [workspace=master] workspace
      * @param {boolean} [updateEdit=false] 
-     * @param {string} property 
-     * @returns {} 
+     * @param {string} property type of property, ie transclusion or not
+     * @returns void 
      */
 
     var mergeElement = function(source, eid, workspace, updateEdit, property) {
