@@ -79,6 +79,7 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
     var template = $templateCache.get('mms/templates/mmsSpec.html');
 
     var mmsSpecLink = function(scope, element, attrs) {
+        var ran = false;
         var keepMode = false;
         scope.editing = false;
         scope.editable = true;
@@ -115,10 +116,11 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
          * @param {string} newVal new element id
          */
         var changeElement = function(newVal, oldVal) {
-            if (!newVal) {
+            if (!newVal || newVal === oldVal && ran) {
                 //element.empty();
                 return;
             }
+            ran = true;
             WorkspaceService.getWorkspace(scope.mmsWs)
             .then(function(data) {
                 scope.workspace = data;

@@ -40,10 +40,11 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
     };
 
     var mmsViewReorderLink = function(scope, element, attrs) {
+        var ran = false;
         scope.$watch('mmsVid', function(newVal, oldVal) {
-            if (!newVal)
+            if (!newVal || newVal == oldVal && ran)
                 return;
-            
+            ran = true;
             ViewService.getView(scope.mmsVid, false, scope.mmsWs, scope.mmsVersion)
             .then(function(data) {
                 scope.view = data;

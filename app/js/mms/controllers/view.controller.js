@@ -385,7 +385,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     if (view && $state.current.name !== 'workspace') {
         $timeout(function() {
             $rootScope.$broadcast('viewSelected', $scope.vid, viewElements);
-        }, 225);
+        }, 1000);
     }
 
     $scope.filterApi = {}; //for site doc filter
