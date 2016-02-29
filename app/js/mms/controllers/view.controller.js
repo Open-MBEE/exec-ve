@@ -364,8 +364,12 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     });
 
     if (view) {
+        //since view can also be a "fake" view like section instance spec only set view if it's a real view,
+        //otherwise other code can create things under instance specs that can't be owned by instance spec
         if (view.specialization.contains || view.specialization.contents) {
-            ViewService.setCurrentView(view);
+            ViewService.setCurrentView(view); 
+        } else if (document && document.specialization.contains || document.specialization.contents) {
+            ViewService.setCurrentView(document);
         }
         $scope.vid = view.sysmlid;
     } else {
