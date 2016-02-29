@@ -41,12 +41,16 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
 
     var mmsViewReorderLink = function(scope, element, attrs) {
         var ran = false;
+        var lastid = null; //race condition if view id changes fast and getting data for old id returns later than last id
         scope.$watch('mmsVid', function(newVal, oldVal) {
             if (!newVal || newVal == oldVal && ran)
                 return;
             ran = true;
+            lastid = newVal;
             ViewService.getView(scope.mmsVid, false, scope.mmsWs, scope.mmsVersion)
             .then(function(data) {
+                if (newVal !== lastid)
+                    return;
                 scope.view = data;
                 scope.editable = scope.view.editable && scope.mmsVersion === 'latest';
 
@@ -54,6 +58,8 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
                 if (contents) {
                     ViewService.getElementReferenceTree(contents, scope.mmsWs, scope.mmsVersion)
                     .then(function(elementReferenceTree) {
+                        if (newVal !== lastid)
+                            return;
                         scope.elementReferenceTree = elementReferenceTree;
                         scope.originalElementReferenceTree = _.cloneDeep(elementReferenceTree, function(value, key, object) {
                             if (key === 'instance' || key === 'instanceSpecification' || key === 'presentationElement' || key === 'instanceVal')
@@ -61,6 +67,8 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
                             return undefined;
                         });
                     }, function(reason) {
+                        if (newVal !== lastid)
+                            return;
                         scope.elementReferenceTree = [];
                         scope.originalElementReferenceTree = [];
                     });
@@ -70,6 +78,8 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
                 }
 
             }, function(reason) {
+                if (newVal !== lastid)
+                    return;
                 growl.error('View Error: ' + reason.message);
                 scope.elementReferenceTree = [];
                 scope.originalElementReferenceTree = [];

@@ -80,6 +80,7 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
 
     var mmsSpecLink = function(scope, element, attrs) {
         var ran = false;
+        var lastid = null; //race condition check
         var keepMode = false;
         scope.editing = false;
         scope.editable = true;
@@ -121,8 +122,11 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
                 return;
             }
             ran = true;
+            lastid = newVal;
             WorkspaceService.getWorkspace(scope.mmsWs)
             .then(function(data) {
+                if (newVal !== lastid)
+                    return;
                 scope.workspace = data;
             }, function(reason) {scope.workspace = null;});
             if (scope.edit && scope.tinymceApi.save)
@@ -130,10 +134,14 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
             if (scope.mmsType === 'workspace') {
                 WorkspaceService.getWorkspace(scope.mmsEid)
                 .then(function(data) {
+                    if (newVal !== lastid)
+                        return;
                     scope.element = data;
                     scope.editable = true;
                     WorkspaceService.getWorkspaceForEdit(scope.mmsEid)
                     .then(function(data) {
+                        if (newVal !== lastid)
+                            return;
                         scope.edit = data;
                         scope.editable = true;
                         if (!keepMode)
@@ -144,10 +152,14 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
             } else if (scope.mmsType === 'tag') {
                 ConfigService.getConfig(scope.mmsEid, scope.mmsWs, false)
                 .then(function(data) {
+                    if (newVal !== lastid)
+                        return;
                     scope.element = data;
                     scope.editable = true;
                     ConfigService.getConfigForEdit(scope.mmsEid, scope.mmsWs)
                     .then(function(data) {
+                        if (newVal !== lastid)
+                            return;
                         scope.edit = data;
                         scope.editable = true;
                         if (!keepMode)
@@ -161,6 +173,8 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
             .then(function(data) {
                 //element.empty();
                 //var template = null;
+                if (newVal !== lastid)
+                    return;
                 scope.element = data;
                 if (scope.element.specialization.type === 'Property') {
                     scope.values = scope.element.specialization.value;
@@ -186,6 +200,8 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
                 } else {
                     ElementService.getElementForEdit(scope.mmsEid, false, scope.mmsWs)
                     .then(function(data) {
+                        if (newVal !== lastid)
+                            return;
                         scope.edit = data;
                         scope.editable = true;
                         if (!keepMode)
@@ -202,6 +218,8 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
                                 });
                                 ElementService.getElements(options, false, scope.mmsWs, scope.mmsVersion)
                                 .then(function(elements) {
+                                    if (newVal !== lastid)
+                                        return;
                                     scope.options = elements;
                                 });
                             } else {
@@ -211,11 +229,15 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
                                     ElementService.getElement(id, false, scope.mmsWs, scope.mmsVersion)
                                     .then(function(val) {
                                     //Filter for enumeration type
+                                        if (newVal !== lastid)
+                                            return;
                                         if (val.appliedMetatypes && val.appliedMetatypes.length > 0 &&
                                             val.appliedMetatypes[0] === '_9_0_62a020a_1105704885400_895774_7947') {
                                             scope.isEnumeration = true;
                                             ElementService.getOwnedElements(val.sysmlid, false, scope.mmsWs, scope.mmsVersion, 1)
                                             .then(function(val) {
+                                                if (newVal !== lastid)
+                                                    return;
                                                 var newArray = [];
                                                 //Filter only for appropriate property value
                                                 for (var i = 0; i < val.length; i++) {

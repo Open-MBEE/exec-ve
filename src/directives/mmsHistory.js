@@ -33,6 +33,7 @@ function mmsHistory(Utils, ElementService, WorkspaceService, $compile, $template
 
     var mmsHistoryLink = function(scope, element, attrs) {
         var ran = false;
+        var lastid = null;
         scope.selects = {timestampSelected: null};
         scope.historyVer = 'latest';
         /**
@@ -48,8 +49,11 @@ function mmsHistory(Utils, ElementService, WorkspaceService, $compile, $template
             if (!newVal || (newVal == oldVal && ran))
                 return;
             ran = true;
-          ElementService.getElementVersions(scope.mmsEid, false, scope.mmsWs)
+            lastid = newVal;
+            ElementService.getElementVersions(scope.mmsEid, false, scope.mmsWs)
             .then(function(data) {
+                if (newVal !== lastid) //race condition to prevent old data from overwriting new data
+                    return;
                 scope.history = data;
                 scope.historyVer = 'latest';
                 scope.selects.timestampSelected = null;
