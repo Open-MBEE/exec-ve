@@ -37,6 +37,7 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
         view2children[view.id] = view.childrenViews;
     });
 
+    ViewService.setCurrentView(document);
     var buildViewElt = function(vId, curSec) {
       return {id: vId, api: {
             init: function(dis) {

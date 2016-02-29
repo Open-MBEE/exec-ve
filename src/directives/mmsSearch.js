@@ -3,6 +3,16 @@
 angular.module('mms.directives')
 .directive('mmsSearch', ['ElementService', 'growl', '$rootScope','$templateCache', mmsSearch]);
 
+/**
+ * @ngdoc directive
+ * @name mms.directives.directive:mmsSearch
+ *
+ * @restrict E
+ *
+ * @description
+ * TBA
+ *
+ */
 function mmsSearch(ElementService, growl, $rootScope, $templateCache) {
     var template = $templateCache.get('mms/templates/mmsSearch.html');
 
