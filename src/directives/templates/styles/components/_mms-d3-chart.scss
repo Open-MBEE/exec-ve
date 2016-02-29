@@ -9,6 +9,19 @@
 .c3-axis text {
 	font-size: 10px;
 }
+.c3-grid {
+	.log-grid {
+		line {
+			stroke-dasharray: 1,1;
+			stroke-width: 1px;
+			stroke-opacity: .5;
+		}
+    text {
+			opacity: .5;
+	    font-size: 6px;
+		}
+	}
+}
 
 
 // @TODO: EVERYTHING BELOW NEEDS TO BE CLEANED UP OR REMOVED
