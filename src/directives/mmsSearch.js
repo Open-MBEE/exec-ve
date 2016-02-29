@@ -22,7 +22,7 @@ function mmsSearch(ElementService, growl, $rootScope, $templateCache) {
         scope.proposeClass = "";
         scope.filter = '';
         scope.searchText = '';
-        scope.searchType = 'name';
+        scope.searchType = 'all';
         scope.facet = '$';
         scope.filterQuery = {query: ""};
         scope.currentPage = 0;
@@ -44,7 +44,7 @@ function mmsSearch(ElementService, growl, $rootScope, $templateCache) {
                         }
                         properties[properties.length-1].push(elem.properties[i]);
                     }
-                    elem.properties = properties;
+                    elem.properties2 = properties;
                 }
             });
         });
