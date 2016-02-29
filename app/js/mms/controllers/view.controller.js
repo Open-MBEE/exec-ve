@@ -365,12 +365,10 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
 
     if (view) {
         if (view.specialization.contains || view.specialization.contents) {
-            ViewService.setCurrentViewId(view.sysmlid);
-            $rootScope.veCurrentView = view.sysmlid;
+            ViewService.setCurrentView(view);
         }
         $scope.vid = view.sysmlid;
     } else {
-        $rootScope.veCurrentView = '';
         $scope.vid = '';        
     }
     $scope.ws = ws;
