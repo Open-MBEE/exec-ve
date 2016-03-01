@@ -23,6 +23,7 @@ angular.module('mms')
 function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsService, CacheService, _) {
     var currentViewId = '';
     var currentDocumentId = '';
+    var currentView = null;
     var VIEW_ELEMENTS_LIMIT = 2000;
     var inProgress = {}; //only used for view elements over limit
 
@@ -743,25 +744,11 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         var deferred = $q.defer();
         var newViewId = viewId ? viewId : UtilsService.createMmsId();
         var newInstanceId = UtilsService.createMmsId();
-        var holdingBinId = null;
-        var projectId = null;
-        var siteId = site;
+        var ids = UtilsService.getIdInfo(owner, site);
+        var holdingBinId = ids.holdingBinId;
+        var projectId = ids.projectId;
+        var siteId = ids.siteId;
 
-        if (owner) {
-            var splitArray = owner.qualifiedId.split('/');
-            if (splitArray && splitArray.length > 2) {
-                projectId = splitArray[2];
-                siteId = splitArray[1];
-            }
-            if (owner.siteCharacterizationId)
-                siteId = owner.siteCharacterizationId;
-            if (projectId && projectId.indexOf('PROJECT') >= 0) {
-                holdingBinId = 'holding_bin_' + projectId;
-            }
-        }
-        if (!holdingBinId && siteId) {
-            holdingBinId = 'holding_bin_' + siteId + '_no_project';
-        }
         var view = {
             sysmlid: newViewId,
             specialization: {
@@ -1090,12 +1077,20 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         currentViewId = id;
     };
 
+    var setCurrentView = function(v) {
+        currentView = v;
+    };
+
     var setCurrentDocumentId = function(id) {
         currentDocumentId = id;
     };
 
     var getCurrentViewId = function() {
         return currentViewId;
+    };
+
+    var getCurrentView = function() {
+        return currentView;
     };
 
     var getCurrentDocumentId = function() {
@@ -1151,8 +1146,10 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         getDocumentViews: getDocumentViews,
         getSiteDocuments: getSiteDocuments,
         setCurrentViewId: setCurrentViewId,
+        setCurrentView: setCurrentView,
         setCurrentDocumentId: setCurrentDocumentId,
         getCurrentViewId: getCurrentViewId,
+        getCurrentView: getCurrentView,
         getCurrentDocumentId: getCurrentDocumentId,
         parseExprRefTree: parseExprRefTree,
         isSection: isSection,

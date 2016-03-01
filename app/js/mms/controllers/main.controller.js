@@ -28,6 +28,10 @@ function($scope, $location, $rootScope, $state, _, $window, growl, $http, URLSer
             combo: 'alt+m',
             description: 'close all messages',
             callback: function() {growlMessages.destroyAllMessages();}
+        }).add({
+            combo: '@',
+            description: 'fast cf in editor',
+            callback: function() {}
         });
 
     $scope.$on('$stateChangeError', function(event, toState, toParams, fromState, fromParams, error) {
