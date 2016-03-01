@@ -111,37 +111,8 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
             description: 'toggle show elements',
             callback: function() {$scope.$broadcast('show.elements');}
         });
-        // TODO: This code is duplicated in the FullDocCtrl
-        // **WARNING** IF YOU CHANGE THIS CODE, NEED TO UPDATE IN FULL DOC CTRL TOO
-
+      
         if ($state.includes('workspace.site.document') || $state.includes('workspace.site.documentpreview')) {
-            // if (snapshot !== null) {
-            //     var pdfUrl = getPDFUrl();
-            //     if (pdfUrl !== null && pdfUrl !== undefined) {
-            //         $scope.bbApi.addButton(UxService.getButtonBarButton('download.pdf'));                
-            //     } else {
-            //         $scope.bbApi.addButton(UxService.getButtonBarButton('generate.pdf'));
-
-            //         var pdfStatus = getPDFStatus();
-            //         if (pdfStatus === 'Generating...')
-            //             $scope.bbApi.toggleButtonSpinner('generate.pdf');
-            //         else if (pdfStatus !== null)
-            //             $scope.bbApi.setTooltip('generate.pdf', pdfStatus);
-            //     }
-
-            //     var zipUrl = getZipUrl();
-            //     if (zipUrl !== null && zipUrl !== undefined) {
-            //         $scope.bbApi.addButton(UxService.getButtonBarButton('download.zip'));                
-            //     } else {
-            //         $scope.bbApi.addButton(UxService.getButtonBarButton('generate.zip'));
-
-            //         var zipStatus = getZipStatus();
-            //         if (zipStatus === 'Generating...')
-            //             $scope.bbApi.toggleButtonSpinner('generate.zip');
-            //         else if (zipStatus !== null)
-            //             $scope.bbApi.setTooltip('generate.zip', zipStatus);
-            //     }
-            // }
             if ($state.includes('workspace.site.document')) {
                 $scope.bbApi.addButton(UxService.getButtonBarButton('center.previous'));
                 $scope.bbApi.addButton(UxService.getButtonBarButton('center.next'));
@@ -167,104 +138,8 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         }
     };
 
-    // TODO: This code is duplicated in the FullDocCtrl
-    // **WARNING** IF YOU CHANGE THIS CODE, NEED TO UPDATE IN FULL DOC CTRL TOO
-    var getPDFStatus = function(){
-        if(!snapshot) return null;
-        var formats = snapshot.formats;
-        if(!formats || formats.length===0) return null;
-        for(var i=0; i < formats.length; i++){
-            if(formats[i].type=='pdf') {
-                var status = formats[i].status;
-                if(status == 'Generating') status = 'Generating...';
-                else if(status == 'Error') status = 'Regenerate PDF';
-                return status;
-            }
-        }
-        return null;
-    };
-
-    var getPDFUrl = function(){
-        if(!snapshot) return null;
-        var formats = snapshot.formats;
-        if(!formats || formats.length===0) return null;
-        for(var i=0; i < formats.length; i++){
-            if(formats[i].type=='pdf'){
-                return formats[i].url;
-            }
-        }
-        return null;
-    };
-
-    var getZipStatus = function(){
-        if(!snapshot) return null;
-        var formats = snapshot.formats;
-        if(!formats || formats.length===0) return null;
-        for(var i=0; i < formats.length; i++){
-            if(formats[i].type=='html') {
-                var status = formats[i].status;
-                if(status == 'Generating') status = 'Generating...';
-                else if(status == 'Error') status = 'Regenerate Zip';
-                return status;
-            }
-        }
-        return null;
-    };
-
-    var getZipUrl = function(){
-        if(angular.isUndefined(snapshot)) return null;
-        if(snapshot===null) return null;
-        
-        var formats = snapshot.formats;
-        if(formats===undefined || formats===null || formats.length===0) return null;
-        for(var i=0; i < formats.length; i++){
-            if(formats[i].type=='html'){
-                return formats[i].url;  
-            } 
-        }
-        return null;
-    };
-
     $scope.$on('convert.pdf', function() {
         MmsAppUtils.popupPrintConfirm(view, $scope.ws, time, false, false);
-    });
-
-    $scope.$on('generate.pdf', function() {
-        MmsAppUtils.popupPrintConfirm(view, $scope.ws, time, false, false);
-
-        // if (getPDFStatus() === 'Generating...')
-        //     return;
-        // $scope.bbApi.toggleButtonSpinner('generate.pdf');
-        // $scope.bbApi.toggleButtonSpinner('generate.zip');
-        // if (!snapshot.formats)
-        //     snapshot.formats = [];
-        // snapshot.formats.push({"type":"pdf",  "status":"Generating"});
-        // snapshot.formats.push({"type":"html", "status":"Generating"});
-        // snapshot.ws = ws;
-        // snapshot.site = site.sysmlid;
-        // snapshot.time = time;
-        
-        // ConfigService.createSnapshotArtifact(snapshot, site.sysmlid, workspace).then(
-        //     function(result){
-        //         growl.info('Generating artifacts...Please wait for a completion email and reload the page.');
-        //     },
-        //     function(reason){
-        //         growl.error('Failed to generate artifacts: ' + reason.message);
-        //     }
-        // );
-    });
-
-    $scope.$on('generate.zip', function() {
-        $rootScope.$broadcast('generate.pdf');        
-    });
-
-    $scope.$on('download.pdf', function() {
-        $window.open(getPDFUrl());
-
-    });
-
-    $scope.$on('download.zip', function() {
-        $window.open(getZipUrl());
     });
 
     $scope.$on('view.add.paragraph', function() {
