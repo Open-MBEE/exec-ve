@@ -33,6 +33,6 @@ describe('CacheService', function() {
 	it('should put in an element with the same key and different values w/ merge set to true', function() {
 		 CacheService.put("hello world", "float with me", true);
 		 expect(CacheService.get("hello world")).toEqual("float with me");
-		 console.log(CacheService.getCache());
+		 //console.log(CacheService.getCache());
 	});
 });

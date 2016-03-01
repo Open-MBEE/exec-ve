@@ -109,7 +109,7 @@ describe('ElementService', function() {
             // Couple valid ids
             ids = ['12345', '12346'];
             ElementService.getElements(ids, undefined, undefined, undefined).then(function(response) {
-                console.log(response);
+                //console.log(response);
                 expect(response.length).toEqual(2);
     
                 expect(response[0].sysmlid).toEqual(12345);

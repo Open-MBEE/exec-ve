@@ -280,6 +280,25 @@ function UtilsService(CacheService, _) {
         }
         return res;
     };
+    /**
+     * @ngdoc method
+     * @name mms.UtilsService#hasConflict
+     * @methodOf mms.UtilsService
+     * 
+     * @description		
+     *  Checks if sever and cache version of the element are
+     *  the same so that the user is aware that they are overriding 
+     *  changes to the element that they have not seen in the cache element.
+     *  Given edit object with only keys that were edited,
+     * 'orig' object and 'server' object, should only return true 
+     *	if key is in edit object and value in orig object is different 
+     *  from value in server object. 
+     *
+     * @param {Object} elem An object that contains element id and any property changes to be saved.
+     * @param {Object} orig version of elem object in cache.
+     * @param {Object} server version of elem object from server.
+     * @returns {Boolean} true if conflict, false if not
+     */
 
     var hasConflict = function(edit, orig, server) {
         for (var i in edit) {

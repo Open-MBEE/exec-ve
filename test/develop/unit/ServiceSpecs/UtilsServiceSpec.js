@@ -45,10 +45,10 @@ describe('UtilsService', function() {
 			var dirtyElement = {author:'muschek', sysmlid:12345, name:'dirtyElement', owner:'otherElement', 
 				specialization: {type:'Property', isDerived:false, isSlot:false, propertyType:'anotherElementID', 
 				value: 'not an array'}};
-			console.log('before value:' + dirtyElement.specialization.value);
+			//console.log('before value:' + dirtyElement.specialization.value);
 			UtilsService.cleanElement(dirtyElement);
 			expect(dirtyElement.specialization.value).toEqual([]);
-			console.log('value:' + dirtyElement.specialization.value);
+			//console.log('value:' + dirtyElement.specialization.value);
 		}));
 		// it('should return a empty array when elem.specialization.value is not a array and specialization.type is a property', inject(function() {
 		// 
@@ -117,27 +117,69 @@ describe('UtilsService', function() {
 		}));
 		
 	});
-	describe('Method mergeElement ', function() {
-		// put in cacheService element object and its edit object, modify edit
-		// object's name/doc/val, call mergeElement with updateEdit = true with 
-		//property argument = all/name/documentation/value and check edit object only has that specific property updated
-
-		it('it should update the element in the cache after editing', inject(function() {
-			var a = {creator: "gcgandhi", modified: "2015-07-27T16:32:42.272-0700",modifier: "dlam",
-			         created: "Mon May 18 14:38:12 PDT 2015", name: "vetest Cover Page", documentation: "",
-                     owner: "holding_bin_vetest_PROJECT-21bbdceb-a188-45d9-a585-b30bba346175"};
-			var b = {creator: "dlam", modified: "2015-07-27T16:32:42.272-0700",modifier: "dlam",
-		 			 created: "Mon May 18 14:38:12 PDT 2015", name: "ve", documentation: "",
-		             owner: "holding_bin_vetest_PROJECT-21bbdceb-a188-45d9-a585-b30bba346175"};
-			//   var mergeElement = function(source, eid, workspace, updateEdit, property) {
-			CacheService.put('element|master|objectToEdit|latest', a, true);
-			UtilsService.mergeElement(b, 'objectToEdit', 'master',true, 'all');
-			var c = CacheService.get('element|master|objectToEdit|latest');
-			console.log("after :::::::::::" + c.name);
-			expect(a.name).toEqual('ve');
-			
-			//UtilsService.filterProperties(a, b);
+	// describe('Method mergeElement ', function() {
+	// 	// put in cacheService element object and its edit object, modify edit
+	// 	// object's name/doc/val, call mergeElement with updateEdit = true with 
+	// 	//property argument = all/name/documentation/value and check edit object only has that specific property updated
+	// 
+	// 	it('it should update the element in the cache after editing', inject(function() {
+	// 		var a = {creator: "gcgandhi", modified: "2015-07-27T16:32:42.272-0700",modifier: "dlam",
+	// 		         created: "Mon May 18 14:38:12 PDT 2015", name: "vetest Cover Page", documentation: "",
+    //                  owner: "holding_bin_vetest_PROJECT-21bbdceb-a188-45d9-a585-b30bba346175"};
+	// 		var b = {creator: "dlam", modified: "2015-07-27T16:32:42.272-0700",modifier: "dlam",
+	// 	 			 created: "Mon May 18 14:38:12 PDT 2015", name: "ve", documentation: "",
+	// 	             owner: "holding_bin_vetest_PROJECT-21bbdceb-a188-45d9-a585-b30bba346175"};
+	// 		//   var mergeElement = function(source, eid, workspace, updateEdit, property) {
+	// 		CacheService.put('element|master|objectToEdit|latest', a, true);
+	// 		UtilsService.mergeElement(b, 'objectToEdit', 'master',true, 'all');
+	// 		var c = CacheService.get('element|master|objectToEdit|latest');
+	// 		console.log("after :::::::::::" + c.name);
+	// 		expect(a.name).toEqual('ve');
+	// 		
+	// 		//UtilsService.filterProperties(a, b);
+	// 	}));
+	// 	
+	// });
+	describe('Method hasConflict ', function() {
+		// hasConflict
+		// given edit object with only keys that were edited,
+		// 'orig' object and 'server' object, should only return true 
+		// if key is in edit object and value in orig object is different from value in server object
+		// ex hasConflict( {name: 'blah'}
+		// ,
+		// {name: 'first', doc: 'a' }
+		// ,
+		// {name: 'first', doc: 'b'}
+		// ) should be false and hasConflict(
+		// {name: 'blah'}
+		// ,
+		// {name: 'first', doc: 'a'}
+		// ,
+		// {name: 'second', doc: 'a'}
+		// ) should be true
+		it('should return false because there\s no conflict', inject(function() {
+			var orig = { name: "VE", documentation: "a"};
+			var server = { name: "VE", documentation: "a"};
+			var edit = { name: "EMS", documentation: "b"};
+			var hasConflict = UtilsService.hasConflict(edit, orig, server);
+			expect(hasConflict).toBe(false);
 		}));
-		
+		it('should return true because there\s conflict', inject(function() {
+			var orig = { name: "VE", documentation: "a"};
+			var server = { name: "MBSE", documentation: "a"};
+			var edit = { name: "EMS", documentation: "b"};
+			var hasConflict = UtilsService.hasConflict(edit, orig, server);
+			expect(hasConflict).toBe(true);
+		}));
+		it('should return true because there\s conflict in the specialization object', inject(function() {
+			var orig = { name: "VE", documentation: "a", specialization: 
+			{type:'Property',value: 'cache'}};
+			var server = { name: "VE", documentation: "a", specialization: 
+			{type:'Property',value: 'server'}};
+			var edit = { name: "VE", documentation: "a", specialization: 
+			{type:'Property',value: 'edit'}};
+			var hasConflict = UtilsService.hasConflict(edit, orig, server);
+			expect(hasConflict).toBe(true);
+		}));
 	});
 });
