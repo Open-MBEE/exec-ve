@@ -14,6 +14,7 @@ CKEDITOR.plugins.add( 'mmsvlink', {
 		editor.widgets.add( 'mmsvlink', {
       button: 'Insert View Link',
       allowedContent: 'mms-view-link[*];',
+      inline: true,
 			insert: function() {
         var defaultConfig ={ 
           callbackModalFnc : function () {

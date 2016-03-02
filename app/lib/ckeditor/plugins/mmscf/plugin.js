@@ -13,6 +13,7 @@ CKEDITOR.plugins.add( 'mmscf', {
 		editor.widgets.add( 'mmscf', {
       button: 'Insert Cross Reference',
       allowedContent: 'mms-transclude-doc[*];mms-transclude-val[*];mms-transclude-name[*];',
+      inline: true,
 			insert: function() {
         var defaultConfig ={ 
           callbackModalFnc : function () {
