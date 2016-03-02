@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsTinymce', ['ElementService', 'ViewService', 'CacheService', '$modal', '$templateCache', '$window', '$timeout', 'growl', 'tinymce','UtilsService', mmsTinymce]);
+.directive('mmsTinymce', ['ElementService', 'ViewService', 'CacheService', '$modal', '$templateCache', '$window', '$timeout', 'growl', 'tinymce','UtilsService','_', mmsTinymce]);
 
 /**
  * @ngdoc directive
@@ -30,7 +30,7 @@ angular.module('mms.directives')
  *      that can be transcluded. Regardless, transclusion allows keyword searching 
  *      elements to transclude from alfresco
  */
-function mmsTinymce(ElementService, ViewService, CacheService, $modal, $templateCache, $window, $timeout, growl, tinymce, UtilsService) { //depends on angular bootstrap
+function mmsTinymce(ElementService, ViewService, CacheService, $modal, $templateCache, $window, $timeout, growl, tinymce, UtilsService, _) { //depends on angular bootstrap
     var generatedIds = 0;
 
     var mmsTinymceLink = function(scope, element, attrs, ngModelCtrl) {
@@ -83,17 +83,7 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
             $scope.searchOptions= {};
             $scope.searchOptions.callback = $scope.choose;
             $scope.searchOptions.emptyDocTxt = 'This field is empty, but you can still click here to cross-reference a placeholder.';
-            $scope.makeNew = function() {
-                $scope.proposeClass = "fa fa-spin fa-spinner";
-                ElementService.createElement({name: $scope.newE.name, documentation: $scope.newE.documentation, specialization: {type: 'Element'}}, scope.mmsWs, scope.mmsSite)
-                .then(function(data) {
-                    $scope.searchResults = [data];
-                    $scope.proposeClass = "";
-                }, function(reason) {
-                    growl.error("Propose Error: " + reason.message);
-                    $scope.proposeClass = "";
-                });
-            };
+
             $scope.makeNewAndChoose = function() {
                 if (!$scope.newE.name) {
                     growl.error('Error: A name for your new element is required.');
@@ -102,14 +92,28 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                     growl.error('Error: Selection of a property to cross-reference is required.');
                     return;
                 }
-
                 $scope.proposeClass = "fa fa-spin fa-spinner";
-                ElementService.createElement({name: $scope.newE.name, documentation: $scope.newE.documentation, specialization: {type: 'Element'}}, scope.mmsWs, scope.mmsSite)
+                var sysmlid = UtilsService.createMmsId();
+                var currentView = ViewService.getCurrentView();
+                var ids = UtilsService.getIdInfo(currentView, scope.mmsSite);
+                var currentSiteId = ids.siteId;
+                var ownerId = ids.holdingBinId;
+                var toCreate = {
+                    sysmlid: sysmlid,
+                    name: $scope.newE.name, 
+                    documentation: $scope.newE.documentation, 
+                    specialization: {type: 'Element'},
+                    appliedMetatypes: ['_9_0_62a020a_1105704885343_144138_7929'],
+                    isMetatype: false
+                };
+                if (ownerId)
+                    toCreate.owner = ownerId;
+                ElementService.createElement(toCreate, scope.mmsWs, currentSiteId)
                 .then(function(data) {
                     if ($scope.requestName) {
-                        $scope.choose(data.sysmlid, 'name', $scope.newE.name);
+                        $scope.choose(data, 'name');
                     } else if ($scope.requestDocumentation) {
-                        $scope.choose(data.sysmlid, 'doc', $scope.newE.name);
+                        $scope.choose(data, 'doc');
                     }
                     $scope.proposeClass = "";
                 }, function(reason) {
@@ -296,12 +300,16 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
         };
 
         var commentCtrl = function($scope, $modalInstance) {
+            var sysmlid = UtilsService.createMmsId();
             $scope.comment = {
-                name: '', 
+                sysmlid: sysmlid,
+                name: 'Comment ' + new Date().toISOString(), 
                 documentation: '', 
                 specialization: {
                     type: 'Comment'
-                }
+                },
+                appliedMetatypes: ["_9_0_62a020a_1105704885343_144138_7929"],
+                isMetatype: false
             };
             $scope.oking = false;
             $scope.ok = function() {
@@ -310,9 +318,9 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                     return;
                 }
                 $scope.oking = true;
-                if (ViewService.getCurrentViewId())
-                    $scope.comment.owner = ViewService.getCurrentViewId();
-                ElementService.createElement($scope.comment, scope.mmsWs)
+                if (ViewService.getCurrentView())
+                    $scope.comment.owner = ViewService.getCurrentView().sysmlid;
+                ElementService.createElement($scope.comment, scope.mmsWs, scope.mmsSite)
                 .then(function(data) {
                     var tag = '<mms-transclude-com data-mms-eid="' + data.sysmlid + '">comment:' + data.creator + '</mms-transclude-com> ';
                     $modalInstance.close(tag);
@@ -410,7 +418,6 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                 }
             });
         };
-
         var defaultToolbar = 'bold italic underline strikethrough | subscript superscript blockquote | formatselect | fontsizeselect | forecolor backcolor removeformat | alignleft aligncenter alignright | link unlink | charmap searchreplace | undo redo';
         var tableToolbar = ' table ';
         var listToolbar = ' bullist numlist outdent indent ';
@@ -430,6 +437,7 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
         //if (scope.mmsTinymceType === 'ParagraphT' || scope.mmsTinymceType === 'Paragraph')
           //  thisToolbar = defaultToolbar + ' | ' + codeToolbar + ' | ' + customToolbar;
         var options = {
+            entity_encoding : 'raw',
             plugins: 'autoresize charmap code fullscreen image link media nonbreaking paste table textcolor searchreplace noneditable',
             //toolbar: 'bold italic underline strikethrough | subscript superscript blockquote | formatselect | fontsizeselect | forecolor backcolor removeformat | alignleft aligncenter alignright | bullist numlist outdent indent | table | link unlink | image media | charmap searchreplace code | transclude comment vlink normalize | mvleft mvright | undo redo',
             relative_urls: false,
@@ -516,6 +524,7 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                         update();
                     }
                 });
+                
                 ed.on('GetContent', function(e) {
                     e.content = fixNewLines(e.content);
                 });
@@ -523,10 +532,11 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                     ngModelCtrl.$render();
                     ngModelCtrl.$setPristine();
                 });
-                ed.on('change', function(e) {
+                var deb = _.debounce(function(e) {
                     ed.save();
                     update();
-                });
+                }, 1000);
+                ed.on('ExecCommand change NodeChange ObjectResized', deb);
                 ed.on('undo', function(e) {
                     ed.save();
                     update();

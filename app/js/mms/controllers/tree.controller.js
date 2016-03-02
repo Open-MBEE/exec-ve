@@ -3,10 +3,10 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('TreeCtrl', ['$anchorScroll' , '$q', '$filter', '$location', '$modal', '$scope', '$rootScope', '$state', '$stateParams', '$timeout', 'growl', 
+.controller('TreeCtrl', ['$anchorScroll' , '$q', '$filter', '$location', '$modal', '$scope', '$rootScope', '$state', '$stateParams', '$compile','$timeout', 'growl', 
                           'UxService', 'ConfigService', 'ElementService', 'UtilsService', 'WorkspaceService', 'ViewService',
                           'workspaces', 'workspaceObj', 'tag', 'sites', 'site', 'document', 'views', 'view', 'time', 'configSnapshots', 'docFilter',
-function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $state, $stateParams, $timeout, growl, UxService, ConfigService, ElementService, UtilsService, WorkspaceService, ViewService, workspaces, workspaceObj, tag, sites, site, document, views, view, time, configSnapshots, docFilter) {
+function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $state, $stateParams, $compile, $timeout, growl, UxService, ConfigService, ElementService, UtilsService, WorkspaceService, ViewService, workspaces, workspaceObj, tag, sites, site, document, views, view, time, configSnapshots, docFilter) {
 
     $rootScope.mms_bbApi = $scope.bbApi = {};
     $rootScope.mms_treeApi = $scope.treeApi = {};
@@ -520,6 +520,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
                             data : instance,
                             children: []
                         };
+                        viewId2node[instance.sysmlid] = sectionTreeNode;
                         parentNode.children.unshift(sectionTreeNode);
                         addSectionElements(instance, viewNode, sectionTreeNode);
                     }
@@ -608,14 +609,11 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
                 //if (branch.type === 'view')
                 //  viewLevel2Func(branch.data.sysmlid, branch); //TODO remove when priority queue is done
                 $location.hash(hash);
-                $rootScope.veCurrentView = view;
-                ViewService.setCurrentViewId(view);
                 $anchorScroll();
             } else if (branch.type === 'view') {
                 //viewLevel2Func(branch.data.sysmlid, branch); //TODO remove when priority queue is done
                 $state.go('workspace.site.document.view', {view: branch.data.sysmlid, search: undefined});
             } else if (branch.type === 'section') {
-                ViewService.setCurrentViewId(view);
                 $state.go('workspace.site.document.view', {view: hash, search: undefined});
                 /*$timeout(function() {
                     $location.hash(hash);
@@ -696,7 +694,8 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
         var branch = $scope.treeApi.get_selected_branch();
         var templateUrlStr = "";
         var branchType = "";
-
+        var curLastChild = branch.children[branch.children.length-1];
+        
         // Adds the branch:
         var myAddBranch = function() {
             var instance = $modal.open({
@@ -725,10 +724,17 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
 
                 if (itemType === 'View') {
                     viewId2node[data.sysmlid] = newbranch;
-                    if (!$rootScope.mms_fullDocMode)
+                    if (!$rootScope.mms_fullDocMode) 
                         $state.go('workspace.site.document.view', {view: data.sysmlid, search: undefined});
-                    else
-                        $state.go('.', {search: undefined}, {reload: true});
+                    else{
+                      var curNum = branch.children[branch.children.length-1].section;
+                      if (curLastChild && curLastChild.type === 'view') {
+                        $rootScope.$broadcast('newViewAdded', data.sysmlid, curNum, curLastChild.data.sysmlid);
+                      } else {
+                        $rootScope.$broadcast('newViewAdded', data.sysmlid, curNum, branch.data.sysmlid);
+                      }
+                    }
+                    // $state.go('.', {search: undefined}, {reload: true});
                 }
 
             });
@@ -1185,8 +1191,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
         }
         $timeout(function() {
             if ($rootScope.mms_treeInitial) {
-                $rootScope.veCurrentView = $rootScope.mms_treeInitial;
-                ViewService.setCurrentViewId($rootScope.mms_treeInitial);
+                var node = viewId2node[$rootScope.mms_treeInitial];
                 //var node = viewId2node[$rootScope.mms_treeInitial];
                 //if (node)
                 //    viewLevel2Func($rootScope.mms_treeInitial, node);

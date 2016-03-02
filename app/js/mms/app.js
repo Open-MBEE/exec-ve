@@ -8,9 +8,10 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
     $urlRouterProvider.rule(function ($injector, $location) {
         // determine if the url is older 2.0 format (will not have a workspace)
         // generate some random client id
-        if ($location.url().indexOf('/workspaces') === -1)
+        var locationPath = $location.url();
+        if (locationPath.indexOf('/workspaces') === -1)
         {
-            var locationPath = 'workspaces/master' + $location.url();
+            locationPath = 'workspaces/master' + locationPath;
 
             var queryParams = '';
             var pathArr = locationPath.split('/');
@@ -56,9 +57,14 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 locationPath += '?' + queryParams;
             }
 
-            $location.url(locationPath);
+            //$location.url(locationPath);
         }
-
+        if (locationPath.indexOf('full%23') > 0)
+            locationPath = locationPath.replace('full%23', 'full#');
+        if (locationPath[0] !== '/')
+            locationPath = '/' + locationPath;
+        if (locationPath !== $location.url())
+            $location.url(locationPath);
     });
     
 
@@ -125,7 +131,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 if ($stateParams.search === undefined) {
                     return null;
                 }
-                return ElementService.search($stateParams.search, ['name'], null, 0, 50, false, workspace, 2)
+                return ElementService.search($stateParams.search, ['*'], null, 0, 50, false, workspace, 2)
                 .then(function(data) {
                     return data;
                 }, function(reason) {
