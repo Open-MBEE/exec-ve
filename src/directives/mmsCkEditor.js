@@ -469,14 +469,13 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $m
           $(element).val(ngModelCtrl.$modelValue);
           instance = CKEDITOR.replace(attrs.id, {
             // customConfig: '/lib/ckeditor/config.js',
-            // extraPlugins: 'mathjax,base64image,pastebase64,iframe,mediaembed,embed,autoembed,pbckcode,eqneditor,mmscf,mmscomment,mmsvlink,mmsreset',
             mmscf: {callbackModalFnc: transcludeCallback},
             mmscomment: {callbackModalFnc: commentCallback},
             mmsvlink: {callbackModalFnc: viewLinkCallback},
             mmsreset: {callback: mmsResetCallback},
-            // autoGrow_minHeight: 200,
+            autoGrow_minHeight: 200,
             autoGrow_maxHeight: $window.innerHeight*0.65,
-            // autoGrow_bottomSpace: 50, 
+            autoGrow_bottomSpace: 50, 
             contentsCss: 'css/partials/mms.min.css',
             toolbar: thisToolbar,
           });
