@@ -7,9 +7,16 @@ CKEDITOR.editorConfig = function( config ) {
 	// Define changes to default configuration here. For example:
 	// config.language = 'fr';
 	// config.uiColor = '#AADC6E';
-  config.extraAllowedContent = 'script[language,type,src]; mms-maturity-bar[*] tms-timely[*] seqr-timely[*] mms-d3-observation-profile-chart-io[*]  mms-d3-parallel-axis-chart-io[*] mms-d3-radar-chart-io[*] mms-d3-horizontal-bar-chart-io[*] mms-site-docs[*] mms-workspace-docs[*] mms-diagram-block[*] mms-view-link(mceNonEditable); mms-transclude-doc(mceNonEditable); mms-transclude-name(mceNonEditable); mms-transclude-com(mceNonEditable); mms-transclude-val(mceNonEditable); mms-transclude-img(mceNonEditable); iframe[*]; math[*]; maction maligngroup malignmark menclose merror mfenced mfrac mglyph mi mlabeledtr mlongdiv mmultiscripts mn mo mover mpadded mphantom mroot mrow ms mscarries mscarry msgroup mstack msline mspace msqrt msrow mstyle msub msup msubsup mtable mtd mtext mtr munder munderover';
- 
-config.fullPage = false;
-// config.resize_enabled = false;
-config.removePlugins = 'resize';
+  config.autoGrow_minHeight = 200;
+  config.autoGrow_bottomSpace = 50; 
+  config.pasteFromWordRemoveFontStyles = false;
+  config.disableNativeSpellChecker = false;
+  config.fullPage = false;
+  // config.resize_enabled = false;
+  config.removePlugins = 'resize';
+  config.extraPlugins = 'mathjax,base64image,pastebase64,iframe,mediaembed,embed,pbckcode,eqneditor,mmscf,mmscomment,mmsvlink,mmsreset';
+  config.mathJaxLib = 'http://cdn.mathjax.org/mathjax/2.2-latest/MathJax.js?config=TeX-AMS_HTML';
+  config.disallowedContent = 'div,font';
+  config.extraAllowedContent = 'script[language,type,src]; mms-maturity-bar[*] tms-timely[*] seqr-timely[*] mms-d3-observation-profile-chart-io[*]  mms-d3-parallel-axis-chart-io[*] mms-d3-radar-chart-io[*] mms-d3-horizontal-bar-chart-io[*] mms-site-docs[*] mms-workspace-docs[*] mms-diagram-block[*] mms-view-link(mceNonEditable); mms-transclude-doc(mceNonEditable); mms-transclude-name(mceNonEditable); mms-transclude-com(mceNonEditable); mms-transclude-val(mceNonEditable); mms-transclude-img(mceNonEditable); math[*] maction maligngroup malignmark menclose merror mfenced mfrac mglyph mi mlabeledtr mlongdiv mmultiscripts mn mo mover mpadded mphantom mroot mrow ms mscarries mscarry msgroup mstack msline mspace msqrt msrow mstyle msub msup msubsup mtable mtd mtext mtr munder munderover';
+
 };
