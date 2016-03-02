@@ -42,7 +42,8 @@ module.exports = function (config) {
             'build/js/mms/app.tpls.js',
             'build/js/mms/app.js',
             'build/js/mms/controllers.js',
-            'test/develop/unit/**/*.js'
+            'test/develop/unit/**/*.js',
+            'test/mock-data/*.js'
         ],
 
         // list of files to exclude

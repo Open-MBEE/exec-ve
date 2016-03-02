@@ -1,17 +1,15 @@
 'use strict';
-/* HttpService: test adding requests with different priority, 
+/* HttpService Unit Tests: 
+ * Includes: test adding requests with different priority, 
  *  when queue is empty and full, changing request priority
  */
+
 describe('HttpService', function() {
 	beforeEach(module('mms'));
 	
 	var HttpService, $httpBackend, $q, httpMock, queue;
     var url = "/alfresco/services/workspaces/master/elements";
-	// beforeEach(function () {
-	// 	module(function($provide) {
-	//         $provide.value('queue', 'TEST_VER');
-	//       });
-	// });
+	
 	beforeEach(inject(function($injector) {
 		HttpService = $injector.get('HttpService');
 		$q = $injector.get('$q');
@@ -21,24 +19,7 @@ describe('HttpService', function() {
 		  .respond(function(method, url, data, headers, params) {
 		    return [200, 'okay'];
 		});
-        // $httpBackend.whenGET(url+'/hello').respond( function(method, url, data) {
-        //     return [200, 'okay'];
-        // });
-		// $httpBackend.whenGET(url+'/world').respond( function(method, url, data) {
-		// 	return [200, 'okay'];
-		// });
-		// $httpBackend.whenGET(url+'/foo').respond( function(method, url, data) {
-		// 	return [200, 'okay'];
-		// });
-		// $httpBackend.whenGET(url+'/bar').respond( function(method, url, data) {
-		// 	return [200, 'okay'];
-		// });
-        HttpService.setOutboundLimit(2);
-		// var checkQueue = function(queue, priority){
-		// 	for(var i = 0; i < queue[priority].length; i++){
-		// 		console.log("queue " + priority + " : " + queue[priority][i].weight);
-		// 	}
-		// };         
+        HttpService.setOutboundLimit(2);       
     }));
 	
 	afterEach(function() {

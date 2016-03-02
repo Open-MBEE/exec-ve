@@ -1,27 +1,9 @@
 'use strict';
-// UtilsService: mergeElement, filterProperties, hasConflict
-// cleanElement
-// give element object with [encountered] bad stuff in them and check they're removed
-// filterProperties
-// given element object a and element object b, returns new object with b data minus keys not in a
-// mergeElement
-// put in cacheService element object and its edit object, modify edit object's name/doc/val, call mergeElement with updateEdit = true with property argument = all/name/documentation/value and check edit object only has that specific property updated
-// hasConflict
-// given edit object with only keys that were edited, 'orig' object and 'server' object, should only return true if key is in edit object and value in orig object is different from value in server object
-// ex hasConflict( {name: 'blah'}
-// ,
-// {name: 'first', doc: 'a' }
-// ,
-// {name: 'first', doc: 'b'}
-// ) should be false and hasConflict(
-// {name: 'blah'}
-// ,
-// {name: 'first', doc: 'a'}
-// ,
-// {name: 'second', doc: 'a'}
-// ) should be true
-
-
+/*UtilsService Unit Tests:
+ * Includes: MergeElement, filterProperties, hasConflict
+ *
+ *
+ */
 describe('UtilsService', function() {
 	beforeEach(module('mms'));
 	
@@ -33,38 +15,15 @@ describe('UtilsService', function() {
 	}));
 	
 	describe('Method cleanElement ', function() {
-		// 
-		// // (!viewElements.hasOwnProperty(ver) && * && *), success, !viewElements.hasOwnProperty(ver)
-		// ViewService.getViewElements('12345', false, 'master', '01-01-2014').then(function(response) {
-		// 	expect(response.length).toEqual(2);
-		// 	expect(response[0]).toEqual({author:'muschek', name:'view\'s element', sysmlid:12346, owner:12345, lastModified:'01-01-2014'});
-		// 	expect(response[1]).toEqual({author:'muschek', name:'view\'s 2nd element', sysmlid:12347, owner:12345, lastModified:'01-01-2014'});
-		// }); $httpBackend.flush();
-		// // viewElements['01-01-2014']['12345'] now exists
 		it('should return a empty array when elem.specialization.value is not a array and specialization.type is a property', inject(function() {
 			var dirtyElement = {author:'muschek', sysmlid:12345, name:'dirtyElement', owner:'otherElement', 
 				specialization: {type:'Property', isDerived:false, isSlot:false, propertyType:'anotherElementID', 
 				value: 'not an array'}};
-			//console.log('before value:' + dirtyElement.specialization.value);
 			UtilsService.cleanElement(dirtyElement);
 			expect(dirtyElement.specialization.value).toEqual([]);
-			//console.log('value:' + dirtyElement.specialization.value);
 		}));
-		// it('should return a empty array when elem.specialization.value is not a array and specialization.type is a property', inject(function() {
-		// 
-		// }));
+
 		it('should remove all specialization\'s  from specialization.value[] when specialization.type is a property', inject(function() {
-			// 		{"elements": [{
-			// "specialization": {
-			//     "propertyType": "_11_5EAPbeta_be00301_1147873226632_528960_2311",
-			//     "isSlot": true,
-			//     "isDerived": false,
-			//     "value": [{
-			//         "valueExpression": null,
-			//         "string": "<p>The Spacecraft shall measure and telemeter Payload interface temperatures.<\/p>",
-			//         "type": "LiteralString"
-			//     }],"type": "Property"}
-		    //     }]}
 			var dirtyElement2 = {author:'muschek', sysmlid:12346, name:'dirtyElement2', owner:'otherElement', 
 				specialization: {type:'Property', isDerived:false, isSlot:false, propertyType:'anotherElementID',
 				value:[{type:'ValueWithSpec', specialization:{type:'Unknown'}}, 
@@ -74,8 +33,6 @@ describe('UtilsService', function() {
 				expect(dirtyElement2.specialization.value[1].specialization).not.toBeDefined();
 		}));
 		it('for every value of elem.specialization.value if there\'s a valueExpression in any of its children delete it', inject(function() {
-			// going to need Operands for each of its children.....in json string
-			// I think these all can be bundled in one assertion
 			var dirtyElement3 = {author:'muschek', sysmlid:12346, name:'dirtyElement2', owner:'otherElement', 
 				specialization: {type:'Property', isDerived:false, isSlot:false, propertyType:'anotherElementID',
 				value:[{valueExpression:'valueExpression', type:'ValueWithSpec', specialization:{type:'Unknown'}}]}};

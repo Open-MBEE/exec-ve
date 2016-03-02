@@ -1,6 +1,11 @@
-//ViewService: createView, createDocument, createInstanceSpecification, getViewElements
-
 'use strict';
+/*ViewService Unit Tests
+ *
+ * Tested Functions: createView, createDocument, createInstanceSpecification, getViewElements
+ * Note: We should test the siteId's that are generated when we create views,
+ *       as per Doris, this can be complex b/c some views are not attached to 
+ *       a site URL.
+*/
 describe('ViewService', function() {
 	beforeEach(module('mms', function($provide) {}));
     var root = '/alfresco/service/workspaces/master';
@@ -27,49 +32,82 @@ describe('ViewService', function() {
 				$httpBackend.flush();
 			}));
 		});
-		describe('Method createDocument', function() {
-			//ViewService.createDocument($scope.doc.name, $scope.addDocSite, ws);
-			it('create a document similar to the tree Controller', inject(function() {
-				ViewService.createDocument('newDocument','siteId' ,'master').then(function(data){
-					console.log("The long object " + JSON.stringify(data));
-					expect(data.name).toEqual('newDocument');
-					//should add a except statement to find if view2view exists
-				},
-				function(reason){
-					console.log("this happened" + reason);
-				});
-				$httpBackend.flush();
-			}));
-		});
-		describe('Method createInstanceSpecification', function() {
-			// ViewService.createInstanceSpecification($scope.viewOrSection, $scope.ws, $scope.presentationElemType, $scope.site.sysmlid, $scope.newItem.name).
-			// then(function(data) {
-			// 	$rootScope.$broadcast('view.reorder.refresh');
-			// 	growl.success("Adding "+$scope.presentationElemType+"  Successful");
-			// 	$modalInstance.close(data);
-			// }, function(reason) {
-			// 	growl.error($scope.presentationElemType+" Add Error: " + reason.message);
-			// }).finally(function() {
-			// 	$scope.oking = false;
-			// }); 
-			it('updated View object called like controller.utils', inject(function() {
-					ViewService.createInstanceSpecification(ownerId,'master', 'Paragraph').then(function(data){
-						//console.log("The long object " + JSON.stringify(data));
-					},
-				function(reason){
-					console.log("this happened" + reason);
-				});
-				$httpBackend.flush();
-			}));
-		});
-		// describe('Method getViewElements', function() {
-		// 	// getViewElements = function(id, update, workspace, version, weight, eidss) 
-		// 	// (!viewElements.hasOwnProperty(ver) && * && *), fail
-		// 	// ViewService.getViewElements('badId', false, 'master', '01-01-2014').then(function(response) {
-		// 	// 	console.log('This should not be displayed');
-		// 	// }, function(failMes) {
-		// 	// 	expect(failMes.status).toEqual(200);
-		// 	// });
+	describe('Method createDocument', function() {
+		it('create a document similar to the tree Controller', inject(function() {
+			ViewService.createDocument('newDocument','siteId' ,'master').then(function(data){
+				//console.log("The long object " + JSON.stringify(data, null, " "));
+				expect(data.name).toEqual('newDocument');
+				expect(data.specialization.view2view).toBeDefined();
+				expect(data.specialization.contents.operand).toBeDefined();
+			},
+			function(reason){
+				console.log("this happened" + reason);
+			});
+			$httpBackend.flush();
+		}));
+		it('should create a document without passing a name', inject(function() {
+			ViewService.createDocument(undefined,'siteId' ,'master').then(function(data){
+				//console.log("The long object " + JSON.stringify(data, null, " "));
+				expect(data.name).toEqual('Untitled View');
+			},
+			function(reason){
+				console.log("this happened" + reason);
+			});
+			$httpBackend.flush();
+		}));
+	});
+	describe('Method createInstanceSpecification', function() {
+		it('should update View object called like controller.utils without a name', inject(function() {
+			ViewService.createInstanceSpecification(ownerId,'master', 'Paragraph').then(function(data){
+				//console.log("The long object " + JSON.stringify(data, null, " "));
+				expect(data.specialization.type).toEqual('InstanceSpecification');
+				expect(data.name).toEqual('Untitled Paragraph');
+			},
+			function(reason){
+				console.log("this happened" + reason);
+			});
+			$httpBackend.flush();
+		}));
+		it('should update view object without a site name, but with a name', inject(function() {
+			ViewService.createInstanceSpecification(ownerId,'master', 'Paragraph', null, 'named').then(function(data){
+				//console.log("The long object " + JSON.stringify(data, null, " "));
+				expect(data.specialization.type).toEqual('InstanceSpecification');
+				expect(data.name).toEqual('named');
+			},
+			function(reason){
+				console.log("this happened" + reason);
+			});
+			$httpBackend.flush();
+		}));
+		it('should update view object with a site name and with a name', inject(function() {
+			ViewService.createInstanceSpecification(ownerId,'master', 'Paragraph', 'siteId', 'named').then(function(data){
+				//console.log("The long object " + JSON.stringify(data, null, " "));
+				expect(data.specialization.type).toEqual('InstanceSpecification');
+				expect(data.name).toEqual('named');
+			},
+			function(reason){
+				console.log("this happened" + reason);
+			});
+			$httpBackend.flush();
+		}));
+	});
+	describe('Method getViewElements', function() {
+		it('', inject(function() {
+			ViewService.getViewElements('badId', false, 'master', '01-01-2014').then(function(response) {
+				console.log('This should not be displayed');
+			}, function(failMes) {
+				expect(failMes.status).toEqual(200);
+		
+		}));
+	
+	});	
+			// getViewElements = function(id, update, workspace, version, weight, eidss) 
+			// (!viewElements.hasOwnProperty(ver) && * && *), fail
+			// ViewService.getViewElements('badId', false, 'master', '01-01-2014').then(function(response) {
+			// 	console.log('This should not be displayed');
+			// }, function(failMes) {
+			// 	expect(failMes.status).toEqual(200);
+			// });
 		// 	
 		// 	// (!viewElements.hasOwnProperty(ver) && * && *), success, !viewElements.hasOwnProperty(ver)
 		// 	ViewService.getViewElements('12345', false, 'master', '01-01-2014').then(function(response) {

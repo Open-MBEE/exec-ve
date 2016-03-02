@@ -195,6 +195,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      *      it's displayed, except for the editables)
      * @param {string} [workspace=master] (optional) workspace to use
      * @param {string} [version=latest] (optional) alfresco version number or timestamp
+     * @param {int} weight the priority of the request
      * @returns {Promise} The promise will be resolved with the view object, 
      *      multiple calls to this method with the same id would result in 
      *      references to the same object.
@@ -217,6 +218,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      *      it's displayed, except for the editables)
      * @param {string} [workspace=master] (optional) workspace to use
      * @param {string} [version=latest] (optional) alfresco version number or timestamp
+     * @param {int} weight the priority of the request
      * @returns {Promise} The promise will be resolved with an array of view objects, 
      *      multiple calls to this method with the same ids would result in an array of 
      *      references to the same objects.
@@ -239,6 +241,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      *      it's displayed, except for the editables)
      * @param {string} [workspace=master] (optional) workspace to use
      * @param {string} [version=latest] (optional) alfresco version number or timestamp
+     * @param {int} weight the priority of the request
      * @returns {Promise} The promise will be resolved with the document object, 
      *      multiple calls to this method with the same id would result in 
      *      references to the same object.
@@ -344,6 +347,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      *      it's displayed, except for the editables)
      * @param {string} [workspace=master] (optional) workspace to use
      * @param {string} [version=latest] (optional) alfresco version number or timestamp
+     * @param {int} weight the priority of the request
+     * @param {string} eidss
      * @returns {Promise} The promise will be resolved with array of element objects. 
      */
     var getViewElements = function(id, update, workspace, version, weight, eidss) {
@@ -409,6 +414,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @param {string} [workspace=master] (optional) workspace to use
      * @param {string} [version=latest] (optional) alfresco version number or timestamp
      * @param {boolean} [simple=false] (optional) whether to get simple views
+     * @param {int} weight the priority of the request
      * @returns {Promise} The promise will be resolved with array of view objects. 
      */
     var getDocumentViews = function(id, update, workspace, version, simple, weight) {
@@ -895,6 +901,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @param {boolean} [update=false] Update latest
      * @param {string} [workspace=master] workspace to use 
      * @param {string} [version=latest] timestamp
+     * @param {int} weight the priority of the request
      * @returns {Promise} The promise will be resolved with array of document objects 
      */
     var getSiteDocuments = function(site, update, workspace, version, weight) {
@@ -927,6 +934,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @param {object} instanceVal instance value object
      * @param {string} [workspace=master] workspace
      * @param {string} [version=latest] timestamp
+     * @param {int} weight the priority of the request
      * @returns {Promise} The promise will be resolved with a json object for the 
      *                    corresponding presentation element
      */
@@ -995,6 +1003,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @param {object} contents an expression object from a view or section
      * @param {string} [workspace=master] workspace
      * @param {string} [version=latest] timestamp
+     * @param {int} weight the priority of the request
      * @returns {Promise} The promise will be resolved with array of tree node objects
      */
     var getElementReferenceTree = function (contents, workspace, version, weight) {
@@ -1057,6 +1066,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @param {object} instanceVal instance value object
      * @param {string} [workspace=master] workspace
      * @param {string} [version=latest] timestamp
+     * @param {int} weight the priority of the request
      * @returns {Promise} The promise will be resolved with a json object for the 
      *                    corresponding presentation element
      */

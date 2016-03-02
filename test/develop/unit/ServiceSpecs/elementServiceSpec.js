@@ -1,5 +1,6 @@
 'use strict';
-/* ElementService: test get and update element, update element that results in 
+/* ElementService Unit Tests: 
+ * Includes: test get and update element, update element that results in 
  * server giving back conflict but in fact not a conflict
  * ElementService - gets:
  * getElement
