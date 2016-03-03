@@ -243,7 +243,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         //otherwise other code can create things under instance specs that can't be owned by instance spec
         if (view.specialization.contains || view.specialization.contents) {
             ViewService.setCurrentView(view); 
-        } else if (document && document.specialization.contains || document.specialization.contents) {
+        } else if (document && (document.specialization.contains || document.specialization.contents)) {
             ViewService.setCurrentView(document);
         }
         $scope.vid = view.sysmlid;
