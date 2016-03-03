@@ -476,7 +476,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $m
             autoGrow_minHeight: 200,
             autoGrow_maxHeight: $window.innerHeight*0.65,
             autoGrow_bottomSpace: 50, 
-            contentsCss: 'css/partials/mms.min.css',
+            contentsCss: '/lib/ckeditor/contents.css',
             toolbar: thisToolbar,
           });
           // CKEDITOR.plugins.addExternal('mmscf','/lib/ckeditor/plugins/mmscf/');
