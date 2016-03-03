@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms')
-.factory('ViewService', ['$q', '$http', 'URLService', 'ElementService', 'UtilsService', 'CacheService', '_', ViewService]);
+.factory('ViewService', ['$q', '$http', '$rootScope','URLService', 'ElementService', 'UtilsService', 'CacheService', '_', ViewService]);
 
 /**
  * @ngdoc service
@@ -20,10 +20,168 @@ angular.module('mms')
  *
  * For View and Product json object schemas, see [here](https://ems.jpl.nasa.gov/alfresco/mms/raml/index.html)
  */
-function ViewService($q, $http, URLService, ElementService, UtilsService, CacheService, _) {
+function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsService, CacheService, _) {
     var currentViewId = '';
     var currentDocumentId = '';
+    var currentView = null;
+    var VIEW_ELEMENTS_LIMIT = 2000;
+    var inProgress = {}; //only used for view elements over limit
+
+    // The type of opaque element to the sysmlid of the classifier:
+    var TYPE_TO_CLASSIFIER_ID = {
+        Image: "_17_0_5_1_407019f_1430628206190_469511_11978",
+        List: "_17_0_5_1_407019f_1430628190151_363897_11927",
+        Paragraph: "_17_0_5_1_407019f_1430628197332_560980_11953",
+        Table: "_17_0_5_1_407019f_1430628178633_708586_11903",
+        Section: "_17_0_5_1_407019f_1430628211976_255218_12002",
+        ListT: "_17_0_5_1_407019f_1431903739087_549326_12013",
+        TableT: "_17_0_5_1_407019f_1431903724067_825986_11992",
+        Figure: "_17_0_5_1_407019f_1431903748021_2367_12034",  //manual images + timely, etc
+        Equation: "_17_0_5_1_407019f_1431905053808_352752_11992",
+        ParagraphT: "_17_0_5_1_407019f_1431903758416_800749_12055",
+        SectionT: "_18_0_2_407019f_1435683487667_494971_14412"
+    };
+
+    function getClassifierIds() {
+        var re = [];
+        Object.keys(TYPE_TO_CLASSIFIER_ID).forEach(function(key) {
+            re.push(TYPE_TO_CLASSIFIER_ID[key]);
+        });
+        return re;
+    }
+
+    var TYPE_TO_CLASSIFIER_TYPE = {
+        Table: 'TableT',
+        Paragraph: 'ParagraphT',
+        Section: 'SectionT',
+        Comment: 'ParagraphT',
+        List: 'ListT',
+        Figure: 'Figure',
+        Equation: 'Equation'
+    };
+
+    var classifierIds = getClassifierIds();
+    var opaqueClassifiers = [TYPE_TO_CLASSIFIER_ID.Image, TYPE_TO_CLASSIFIER_ID.List, 
+        TYPE_TO_CLASSIFIER_ID.Paragraph, TYPE_TO_CLASSIFIER_ID.Section, TYPE_TO_CLASSIFIER_ID.Table];
     
+    var processString = function(values) {
+        if (!values || values.length === 0 || values[0].type !== 'LiteralString')
+            return '';
+        return values[0].string;
+    };
+    var processStrings = function(values) {
+        var res = [];
+        if (!values || values.length === 0)
+            return res;
+        values.forEach(function(value) {
+            if (value.type !== 'LiteralString' || !value.string)
+                return;
+            res.push(value.string);
+        });
+        return res;
+    };
+    var processPeople = function(values) {
+        if (!values || values.length === 0)
+            return [];
+        var people = [];
+        values.forEach(function(value) {
+            if (value.type !== 'LiteralString' || !value.string)
+                return;
+            var p = value.string.split(',');
+            if (p.length !== 5)
+                return;
+            people.push({
+                firstname: p[0],
+                lastname: p[1],
+                title: p[2],
+                orgname: p[3],
+                orgnum: p[4]
+            });
+        });
+        return people;
+    };
+    var processRevisions = function(values) {
+        if (!values || values.length === 0)
+            return [];
+        var rev = [];
+        values.forEach(function(value) {
+            if (value.type !== 'LiteralString' || !value.string)
+                return;
+            var p = value.string.split('|');
+            if (p.length !== 5)
+                return;
+            rev.push({
+                revnum: p[0],
+                date: p[1],
+                firstname: p[2],
+                lastname: p[3],
+                remark: p[4]
+            });
+        });
+        return rev;
+    };
+    var docMetadataTypes = {
+        '_17_0_1_407019f_1326234342817_186479_2256': {
+            name: 'header',
+            process: processString
+        },
+        '_17_0_1_407019f_1326234349580_411867_2258': {
+            name: 'footer',
+            process: processString
+        },
+        '_17_0_2_3_f4a035d_1366647903710_685116_36989': {
+            name: 'dnumber',
+            process: processString
+        },
+        '_17_0_2_3_f4a035d_1366647903991_141146_36990': {
+            name: 'version',
+            process: processString
+        },
+        '_17_0_2_3_f4a035d_1366647903994_494629_36996': {
+            name: 'titlelegal',
+            process: processString
+        },
+        '_17_0_2_3_f4a035d_1366647903994_370992_36997': {
+            name: 'footerlegal',
+            process: processString
+        },
+        '_17_0_2_3_f4a035d_1366647903995_652492_37000': {
+            name: 'authors',
+            process: processPeople
+        },
+        '_17_0_2_3_f4a035d_1366647903996_970714_37001': {
+            name: 'approvers',
+            process: processPeople
+        },
+        '_17_0_2_3_f4a035d_1366647903996_463299_37002': {
+            name: 'concurrences',
+            process: processPeople
+        },
+        '_17_0_2_3_f4a035d_1366698987711_498852_36951': {
+            name: 'revisions',
+            process: processRevisions
+        },
+        '_17_0_2_3_f4a035d_1366696484320_980107_36953': {
+            name: 'project',
+            process: processString
+        },
+        '_17_0_2_3_f4a035d_1366647903995_864529_36998': {
+            name: 'emails',
+            process: processStrings
+        },
+        '_17_0_2_3_e9f034d_1375464775176_680884_29346': {
+            name: 'instlogo',
+            process: processString
+        },
+        '_17_0_2_3_e9f034d_1375464942934_241960_29357': {
+            name: 'inst1',
+            process: processString
+        },
+        '_17_0_2_3_e9f034d_1375464993159_319060_29362': {
+            name: 'inst2',
+            process: processString
+        }
+    };
     /**
      * @ngdoc method
      * @name mms.ViewService#getView
@@ -42,8 +200,8 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
      *      multiple calls to this method with the same id would result in 
      *      references to the same object.
      */
-    var getView = function(id, update, workspace, version) { 
-        return ElementService.getElement(id, update, workspace, version);
+    var getView = function(id, update, workspace, version, weight) { 
+        return ElementService.getElement(id, update, workspace, version, weight);
     };
 
     /**
@@ -64,8 +222,8 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
      *      multiple calls to this method with the same ids would result in an array of 
      *      references to the same objects.
      */
-    var getViews = function(ids, update, workspace, version) {
-        return ElementService.getElements(ids, update, workspace, version);
+    var getViews = function(ids, update, workspace, version, weight) {
+        return ElementService.getElements(ids, update, workspace, version, weight);
     };
 
     /**
@@ -86,8 +244,8 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
      *      multiple calls to this method with the same id would result in 
      *      references to the same object.
      */
-    var getDocument = function(id, update, workspace, version) {
-        return ElementService.getElement(id, update, workspace, version);
+    var getDocument = function(id, update, workspace, version, weight) {
+        return ElementService.getElement(id, update, workspace, version, weight);
     };
 
     /**
@@ -128,6 +286,52 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
 
     /**
      * @ngdoc method
+     * @name mms.ViewService#downgradeDocument
+     * @methodOf mms.ViewService
+     * 
+     * @description
+     * Demote document to a view
+     * 
+     * @param {Object} document A document object
+     * @param {string} [workspace=master] (optional) workspace to use
+     * @param {string} [site] (optional) site id if present will remove doc from site docs list
+     * @returns {Promise} The promise will be resolved with the downgraded view
+     */
+    var downgradeDocument = function(document, workspace, site) {
+        var clone = {};
+        clone.sysmlid = document.sysmlid;
+        clone.specialization = {
+            type: 'View', 
+            contents: document.specialization.contents,
+            contains: document.specialization.contains
+        };
+        return ElementService.updateElement(clone, workspace).then(
+            function(data) {
+                if (site) {
+                    var ws = workspace;
+                    if (!workspace)
+                        ws = 'master';
+                    var cacheKey = ['sites', ws, 'latest', site, 'products'];
+                    var index = -1;
+                    var found = false;
+                    var sitedocs = CacheService.get(cacheKey);
+                    if (sitedocs) {
+                        for (index = 0; index < sitedocs.length; index++) {
+                            if (sitedocs[index].sysmlid === document.sysmlid)
+                                break;
+                        }
+                        if (index >= 0)
+                            sitedocs.splice(index, 1);
+                    }
+                }
+                return data;
+            }, function(reason) {
+                return reason;
+            });
+    };
+
+    /**
+     * @ngdoc method
      * @name mms.ViewService#getViewElements
      * @methodOf mms.ViewService
      * 
@@ -143,7 +347,7 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
      * @param {string} [version=latest] (optional) alfresco version number or timestamp
      * @returns {Promise} The promise will be resolved with array of element objects. 
      */
-    var getViewElements = function(id, update, workspace, version) {
+    var getViewElements = function(id, update, workspace, version, weight, eidss) {
         var n = normalize(update, workspace, version);
         var deferred = $q.defer();
         var url = URLService.getViewElementsURL(id, n.ws, n.ver);
@@ -151,12 +355,41 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
         if (CacheService.exists(cacheKey) && !n.update) 
             deferred.resolve(CacheService.get(cacheKey));
         else {
-            ElementService.getGenericElements(url, 'elements', n.update, n.ws, n.ver).
-            then(function(data) {
-                deferred.resolve(CacheService.put(cacheKey, data, false));
-            }, function(reason) {
-                deferred.reject(reason);
-            });
+            var key = id + n.ws + n.ver;
+            if (inProgress.hasOwnProperty(key))
+                return inProgress[key];
+            var eids = [];
+            if (eidss)
+                eids = JSON.parse(eidss);
+            if (!eidss || eids.length <= 5000 || n.ver !== 'latest') {
+                ElementService.getGenericElements(url, 'elements', n.update, n.ws, n.ver, weight).
+                then(function(data) {
+                    deferred.resolve(CacheService.put(cacheKey, data, false));
+                }, function(reason) {
+                    deferred.reject(reason);
+                });
+            } else { //if view elements too much, split into 2000 for each get
+                inProgress[key] = deferred.promise;
+                var promises = [];
+                var i = 0;
+                while (i < eids.length) {
+                    var portion = eids.slice(i, i+VIEW_ELEMENTS_LIMIT);
+                    promises.push(ElementService.getElements(portion, update, workspace, version, weight));
+                    i += VIEW_ELEMENTS_LIMIT;
+                }
+                $q.all(promises)
+                .then(function(datas) {
+                    var result = [];
+                    for (var i = 0; i < datas.length; i++) {
+                        result.push.apply(result, datas[i]);
+                    }
+                    deferred.resolve(CacheService.put(cacheKey, result, false));
+                }, function(reason) {
+                    deferred.reject(reason);
+                }).finally(function() {
+                    delete inProgress[key];
+                });
+            }
         }
         return deferred.promise;
     };
@@ -176,9 +409,10 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
      *      it's displayed, except for the editables)
      * @param {string} [workspace=master] (optional) workspace to use
      * @param {string} [version=latest] (optional) alfresco version number or timestamp
+     * @param {boolean} [simple=false] (optional) whether to get simple views
      * @returns {Promise} The promise will be resolved with array of view objects. 
      */
-    var getDocumentViews = function(id, update, workspace, version, simple) {
+    var getDocumentViews = function(id, update, workspace, version, simple, weight) {
         var n = normalize(update, workspace, version);
         var s = !simple ? false : simple; 
         var deferred = $q.defer();
@@ -187,7 +421,7 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
         if (CacheService.exists(cacheKey) && !n.update) 
             deferred.resolve(CacheService.get(cacheKey));
         else {
-            ElementService.getGenericElements(url, 'views', n.update, n.ws, n.ver).
+            ElementService.getGenericElements(url, 'views', n.update, n.ws, n.ver, weight).
             then(function(data) {
                 deferred.resolve(CacheService.put(cacheKey, data, false));
             }, function(reason) {
@@ -211,19 +445,23 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
      * @param {string} parentViewId Id of the parent view, this view should 
      *      already be in the document
      * @param {string} [workspace=master] workspace to use
+     * @param {Object} [viewOb=null] if present, adds to document views cache array
      * @returns {Promise} The promise would be resolved with updated document object
      */
     var addViewToDocument = function(viewId, documentId, parentViewId, workspace, viewOb) {
         var deferred = $q.defer();
         var ws = !workspace ? 'master' : workspace;
         var docViewsCacheKey = ['products', ws, documentId, 'latest', 'views'];
-        getDocument(documentId, false, ws)
+        getDocument(documentId, false, ws, null, 2)
         .then(function(data) {  
             var clone = {};
             clone.sysmlid = data.sysmlid;
             //clone.read = data.read;
             clone.specialization = _.cloneDeep(data.specialization);
-            delete clone.specialization.contains;
+            if (clone.specialization.contains)
+                delete clone.specialization.contains;
+            if (clone.specialization.contents)
+                delete clone.specialization.contents;
             for (var i = 0; i < clone.specialization.view2view.length; i++) {
                 if (clone.specialization.view2view[i].id === parentViewId) {
                     clone.specialization.view2view[i].childrenViews.push(viewId);
@@ -237,7 +475,7 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
                     CacheService.get(docViewsCacheKey).push(viewOb);
                 deferred.resolve(data2);
             }, function(reason) {
-                if (reason.status === 409) {
+                /*if (reason.status === 409) {
                     clone.read = reason.data.elements[0].read;
                     clone.modified = reason.data.elements[0].modified;
                     updateDocument(clone, ws)
@@ -249,7 +487,229 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
                         deferred.reject(reason2);
                     });
                 } else
+                    deferred.reject(reason);*/
+                deferred.reject(reason);
+            });
+        }, function(reason) {
+            deferred.reject(reason);
+        });
+        return deferred.promise;
+    };
+
+    /**
+     * @ngdoc method
+     * @name mms.ViewService#addElementToViewOrSection
+     * @methodOf mms.ViewService
+     *
+     * @description
+     * This updates a view or section to include a new element, the new element must be a child
+     * of an existing element in the view
+     * 
+     * @param {string} viewOrSectionId Id of the View or Section to add the element to
+     * @param {string} parentElementId Id of the parent element, this element should 
+     *      already be in the document
+     * @param {string} [workspace=master] workspace to use
+     * @param {Object} elementOb the element object to add (for element ref tree this should be an instanceValue)
+     * @returns {Promise} The promise would be resolved with updated document object
+     */
+    var addElementToViewOrSection = function(viewOrSectionId, parentElementId, workspace, elementOb) {
+
+        var deferred = $q.defer();
+        var ws = !workspace ? 'master' : workspace;
+        ElementService.getElement(viewOrSectionId, false, ws, null, 2)
+        .then(function(data) {  
+            var clone = {};
+            clone.sysmlid = data.sysmlid;
+            clone.read = data.read;
+            clone.modified = data.modified;
+            clone.specialization = _.cloneDeep(data.specialization);
+
+            var key;
+            if (isSection(data)) {
+                key = "instanceSpecificationSpecification";
+            }
+            else {
+                if (clone.specialization.contains)
+                    delete clone.specialization.contains;
+                key = "contents";
+            }
+
+           if (!clone.specialization[key]) {
+                clone.specialization[key] = {
+                    operand: [],
+                    type: "Expression",
+                    //valueExpression: null
+                };
+            }
+            clone.specialization[key].operand.push(elementOb);
+
+            // TODO add to parentElement also if needed 
+            ElementService.updateElement(clone, ws)
+            .then(function(data2) {
+                deferred.resolve(data2);
+            }, function(reason) {
+                deferred.reject(reason);
+            });
+        }, function(reason) {
+            deferred.reject(reason);
+        });
+        return deferred.promise;
+    };
+
+    /**
+     * @ngdoc method
+     * @name mms.ViewService#deleteElementFromViewOrSection
+     * @methodOf mms.ViewService
+     *
+     * @description
+     * This deletes the specified instanceVal from the contents of the View or Section
+     * 
+     * @param {string} viewOrSecId Id of the View or Section to delete the element from
+     * @param {string} [workspace=master] workspace to use
+     * @param {string} instanceVal to remove from the View or Section
+     * @returns {Promise} The promise would be resolved with updated View or Section object
+     */
+    var deleteElementFromViewOrSection = function(viewOrSecId, workspace, instanceVal) {
+
+        var deferred = $q.defer();
+
+        if (instanceVal) {
+            var ws = !workspace ? 'master' : workspace;
+            ElementService.getElement(viewOrSecId, false, ws, null, 2)
+            .then(function(data) {  
+                var clone = {};
+                clone.sysmlid = data.sysmlid;
+                clone.read = data.read;
+                clone.modified = data.modified;
+                clone.specialization = _.cloneDeep(data.specialization);
+
+                var key;
+                if (isSection(data)) {
+                    key = "instanceSpecificationSpecification";
+                }
+                else {
+                    if (clone.specialization.contains)
+                        delete clone.specialization.contains;
+                    key = "contents";
+                }
+
+                if (clone.specialization[key] && clone.specialization[key].operand) {
+                    var operands = data.specialization[key].operand;
+                    //var index = operands.indexOf(instanceVal);
+                    //if (index >= 0)
+                    //    operands.splice(index, 1); 
+                    for (var i = 0; i < operands.length; i++) {
+                        if (instanceVal.instance === operands[i].instance) {
+                            clone.specialization[key].operand.splice(i,1);
+                            break; 
+                        }
+                    }
+                }
+                
+                // Note:  We decided we do not need to delete the instanceVal, just remove from
+                //         contents.
+
+                ElementService.updateElement(clone, ws)
+                .then(function(data2) {
+                    deferred.resolve(data2);
+                }, function(reason) {
                     deferred.reject(reason);
+                });
+            }, function(reason) {
+                deferred.reject(reason);
+            });
+        }
+        return deferred.promise;
+    };
+
+    /**
+     * Adds a InstanceVal/InstanceSpecification to the contents of the View
+     *
+     * @param {object} viewOrSection The View or Section to add to
+     * @param {string} [workspace=master] workspace to use
+     * @param {string} type The type of element that is to be created, ie 'Paragraph'
+     * @param {string} addToView true if wanting to add the element to the view
+     * @param {string} [site=null] (optional) site to post to
+     * @param {string} [name=Untitled <elementType>] (optional) InstanceSpecification name to use
+     * @param {string} [json=null] (optional) Json blob for the presentation element
+     * @returns {Promise} The promise would be resolved with updated View object if addToView is true
+     *                    otherwise the created InstanceSpecification
+    */
+    var createInstanceSpecification = function(viewOrSection, workspace, type, site, name) {
+        var deferred = $q.defer();
+
+        var newInstanceId = UtilsService.createMmsId();
+        var holdingBinId = null;
+        var projectId = null;
+        var realType = TYPE_TO_CLASSIFIER_TYPE[type];
+        var siteId = site;
+        if (viewOrSection) {
+            var splitArray = viewOrSection.qualifiedId.split('/');
+            if (splitArray && splitArray.length > 2) {
+                projectId = splitArray[2];
+                siteId = splitArray[1];
+            }
+            if (viewOrSection.siteCharacterizationId)
+                siteId = viewOrSection.siteCharacterizationId;
+            if (projectId && projectId.indexOf('PROJECT') >= 0) {
+                holdingBinId = 'holding_bin_' + projectId;
+            }
+        }
+        if (!holdingBinId && siteId)
+            holdingBinId = 'holding_bin_' + siteId + '_no_project';
+        var jsonType = realType;
+        if (type === 'Comment' || type === 'Paragraph')
+            jsonType = type;
+        var instanceSpecSpec = {
+            'type': jsonType, 
+            'sourceType': 'reference', 
+            'source': newInstanceId, 
+            'sourceProperty': 'documentation'
+        };
+        var instanceSpec = {
+            sysmlid: newInstanceId,
+            name: name ? name : "Untitled " + type,
+            documentation: '',
+            specialization: {
+                type:"InstanceSpecification",
+                classifier:[TYPE_TO_CLASSIFIER_ID[realType]],
+                instanceSpecificationSpecification: {
+                    string: JSON.stringify(instanceSpecSpec),
+                    type: "LiteralString"
+                }
+            },
+            appliedMetatypes: ["_9_0_62a020a_1105704885251_933969_7897"],
+            isMetatype: false
+        };
+        if (type === 'Section')
+            instanceSpec.specialization.instanceSpecificationSpecification = {
+                operand: [],  
+                type: "Expression"
+            };
+        if (holdingBinId)
+            instanceSpec.owner = holdingBinId;
+
+        var toCreate = [instanceSpec];
+        ElementService.createElements(toCreate, workspace, siteId)
+        .then(function(data) {
+            data.forEach(function(elem) {
+                if (elem.sysmlid === newInstanceId) {
+                    var instanceVal = {
+                        instance: newInstanceId,
+                        type: "InstanceValue",
+                        //valueExpression: null
+                    };
+                    addElementToViewOrSection(viewOrSection.sysmlid, viewOrSection.sysmlid, workspace, instanceVal)
+                    .then(function(data3) {
+                        if (type === "Section") {
+                        // Broadcast message to TreeCtrl:
+                           $rootScope.$broadcast('viewctrl.add.section', elem, viewOrSection);
+                        }
+                        deferred.resolve(elem);
+                    }, function(reason) {
+                        deferred.reject(reason);
+                    });
+                }
             });
         }, function(reason) {
             deferred.reject(reason);
@@ -264,52 +724,118 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
      * 
      * @description
      * Create a new view, owner must be specified (parent view), id cannot be specified,
-     * if name isn't specified, "Untitled" will be used, a default contains with 
+     * if name isn't specified, "Untitled" will be used, a default contents with 
      * paragraph of the view documentation will be used. If a document is specified, 
      * will also add the view to the document, in this case the parent view should 
      * already be in the document. The new view will be added as the last child of the 
      * parent view.
      * 
-     * @param {string} ownerId Id of the parent view
+     * @param {string} owner owner of the parent view
      * @param {string} [name=Untitled] name for the view
      * @param {string} [documentId] optional document to add to
      * @param {string} [workspace=master] workspace to use 
+     * @param {string} [viewId] optional sysmlid to be used for the view
+     * @param {string} [viewDoc] optional documentation to be used for the view
+     * @param {string} [site] site to create under
+     * @param {boolean} [isDoc] create Product
      * @returns {Promise} The promise will be resolved with the new view. 
      */
-    var createView = function(ownerId, name, documentId, workspace) {
+    var createView = function(owner, name, documentId, workspace, viewId, viewDoc, site, isDoc) {
         var deferred = $q.defer();
+        var newViewId = viewId ? viewId : UtilsService.createMmsId();
+        var newInstanceId = UtilsService.createMmsId();
+        var ids = UtilsService.getIdInfo(owner, site);
+        var holdingBinId = ids.holdingBinId;
+        var projectId = ids.projectId;
+        var siteId = ids.siteId;
+
         var view = {
-            specialization: {type: 'View', contains: []},
-            owner: ownerId,
+            sysmlid: newViewId,
+            specialization: {
+                type: isDoc ? 'Product' : 'View',
+                allowedElements: [],
+                displayedElements: [newViewId],
+                childrenViews: [],
+                contents: {
+                    //valueExpression: null,
+                    operand: [{
+                        instance: newInstanceId,
+                        type:"InstanceValue",
+                    }],
+                    type: 'Expression'
+                }
+            },
             name: !name ? 'Untitled View' : name,
-            documentation: '',
+            documentation: viewDoc ? viewDoc : '',
+            appliedMetatypes: [
+                (isDoc ? "_17_0_2_3_87b0275_1371477871400_792964_43374" : "_17_0_1_232f03dc_1325612611695_581988_21583"),
+                "_9_0_62a020a_1105704885343_144138_7929"
+            ],
+            isMetatype: false
         };
-        ElementService.createElement(view, workspace)
-        .then(function(data) {
-            data.specialization.contains = [
+        if (owner)
+            view.owner = owner.sysmlid;
+        if (isDoc) {
+            view.specialization.view2view = [
                 {
-                    'type': 'Paragraph', 
-                    'sourceType': 'reference', 
-                    'source': data.sysmlid, 
-                    'sourceProperty': 'documentation'
+                    id: newViewId,
+                    childrenViews: []
                 }
             ];
-            data.specialization.allowedElements = [data.sysmlid];
-            data.specialization.displayedElements = [data.sysmlid];
-            data.specialization.childrenViews = [];
-            ElementService.updateElement(data, workspace)
-            .then(function(data2) {
-                if (documentId) {
-                    addViewToDocument(data.sysmlid, documentId, ownerId, workspace, data2)
-                    .then(function(data3) {
-                        deferred.resolve(data2);
-                    }, function(reason) {
-                        deferred.reject(reason);
-                    });
-                } else
-                    deferred.resolve(data2);
-            }, function(reason) {
-                deferred.reject(reason);
+        }
+
+        var instanceSpecDoc = '<p>&nbsp;</p><p><mms-transclude-doc data-mms-eid="' + newViewId + '">[cf:' + view.name + '.doc]</mms-transclude-doc></p><p>&nbsp;</p>';
+        var instanceSpecSpec = {
+            'type': 'Paragraph', 
+            'sourceType': 'reference', 
+            'source': newInstanceId, 
+            'sourceProperty': 'documentation'
+        };
+        var instanceSpec = {
+            sysmlid: newInstanceId,
+            name: "View Documentation",
+            documentation: instanceSpecDoc,
+            specialization: {
+                type:"InstanceSpecification",
+                classifier:[TYPE_TO_CLASSIFIER_ID.ParagraphT],
+                instanceSpecificationSpecification: {
+                    string: JSON.stringify(instanceSpecSpec),
+                    type: "LiteralString"
+                }
+            },
+            appliedMetatypes: ["_9_0_62a020a_1105704885251_933969_7897"],
+            isMetatype: false
+        };
+        if (holdingBinId)
+            instanceSpec.owner = holdingBinId;
+        var asi = { //create applied stereotype instance
+            sysmlid: newViewId + '_asi',
+            owner: newViewId,
+            documentation: '',
+            name: '',
+            specialization: {
+                type: 'InstanceSpecification',
+                classifier: [(isDoc ? "_17_0_2_3_87b0275_1371477871400_792964_43374" : "_17_0_1_232f03dc_1325612611695_581988_21583")]
+            },
+            appliedMetatypes: ["_9_0_62a020a_1105704885251_933969_7897"],
+            isMetatype: false
+        };
+        var toCreate = [instanceSpec, view, asi];
+        ElementService.createElements(toCreate, workspace, siteId)
+        .then(function(data) {
+            data.forEach(function(elem) {
+                if (elem.sysmlid === newViewId) {
+                    if (documentId) {
+                        addViewToDocument(newViewId, documentId, owner.sysmlid, workspace, elem)
+                        .then(function(data3) {
+                            deferred.resolve(elem);
+                        }, function(reason) {
+                            deferred.reject(reason);
+                        });
+                    } else {
+                        deferred.resolve(elem);
+                    }
+                }
             });
         }, function(reason) {
             deferred.reject(reason);
@@ -317,32 +843,24 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
         return deferred.promise;
     };
 
+    /**
+     * @ngdoc method
+     * @name mms.ViewService#createDocument
+     * @methodOf mms.ViewService
+     * 
+     * @description
+     * Create a new document,
+     * if name isn't specified, "Untitled" will be used, a default contents with 
+     * paragraph of the view documentation will be used. 
+     * 
+     * @param {string} [name=Untitled] name for the Document
+     * @param {string} [site] site name
+     * @param {string} [workspace=master] workspace to use 
+     * @returns {Promise} The promise will be resolved with the new view. 
+     */
     var createDocument = function(name, site, workspace) {
         var deferred = $q.defer();
-        var doc = {
-            specialization: {type: "Product"},
-            name: !name ? 'Untitled Document' : name,
-            documentation: ''
-        };
-        ElementService.createElement(doc, workspace, site)
-        .then(function(data) {
-            data.specialization.contains = [
-                {
-                    'type': 'Paragraph',
-                    'sourceType': 'reference',
-                    'source': data.sysmlid,
-                    'sourceProperty': 'documentation'
-                }
-            ];
-            data.specialization.allowedElements = [data.sysmlid];
-            data.specialization.displayedElements = [data.sysmlid];
-            data.specialization.view2view = [
-                {
-                    id: data.sysmlid,
-                    childrenViews: []
-                }
-            ];
-            ElementService.updateElement(data, workspace)
+        createView(null, name, null, workspace, null, null, site, true)
             .then(function(data2) {
                 var ws = !workspace ? 'master' : workspace;
                 var cacheKey = ['sites', ws, 'latest', site, 'products'];
@@ -352,9 +870,6 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
             }, function(reason) {
                 deferred.reject(reason);
             });
-        }, function(reason) {
-            deferred.reject(reason);
-        });
         return deferred.promise;
     };
 
@@ -369,9 +884,10 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
      * @param {string} site Site name
      * @param {boolean} [update=false] Update latest
      * @param {string} [workspace=master] workspace to use 
+     * @param {string} [version=latest] timestamp
      * @returns {Promise} The promise will be resolved with array of document objects 
      */
-    var getSiteDocuments = function(site, update, workspace, version) {
+    var getSiteDocuments = function(site, update, workspace, version, weight) {
         var n = normalize(update, workspace, version);
         var deferred = $q.defer();
         var url = URLService.getSiteProductsURL(site, n.ws, n.ver);
@@ -379,7 +895,7 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
         if (CacheService.exists(cacheKey) && !n.update) 
             deferred.resolve(CacheService.get(cacheKey));
         else {
-            ElementService.getGenericElements(url, 'products', n.update, n.ws, n.ver).
+            ElementService.getGenericElements(url, 'products', n.update, n.ws, n.ver, weight).
             then(function(data) {              
                 deferred.resolve(CacheService.put(cacheKey, data, false));
             }, function(reason) {
@@ -389,9 +905,191 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
         return deferred.promise;
     };
 
+    /**
+     * @ngdoc method
+     * @name mms.ViewService#parseExprRefTree
+     * @methodOf mms.ViewService
+     * 
+     * @description
+     * Parses a InstanceValue node of the expression reference tree in the contents
+     * of a View, and returns the corresponding presentation element json object.
+     * 
+     * @param {object} instanceVal instance value object
+     * @param {string} [workspace=master] workspace
+     * @param {string} [version=latest] timestamp
+     * @returns {Promise} The promise will be resolved with a json object for the 
+     *                    corresponding presentation element
+     */
+    var parseExprRefTree = function(instanceVal, workspace, version, weight) {
+
+        var instanceSpecId = instanceVal.instance;
+        var deferred = $q.defer();
+
+        // TODO do we need version?
+        ElementService.getElement(instanceSpecId, false, workspace, version, weight)
+        .then(function(instanceSpec) {
+
+            // InstanceSpecifcations can have instanceSpecificationSpecification 
+            // for opaque presentation elements, or slots:
+
+            var instanceSpecSpec = instanceSpec.specialization.instanceSpecificationSpecification;
+            var type = instanceSpecSpec.type;
+
+            // If it is a Opaque List, Paragraph, Table, Image, List:
+            if (type === 'LiteralString') {
+                var jsonString = instanceSpecSpec.string;
+                deferred.resolve(JSON.parse(jsonString)); 
+            }
+            // If it is a Opaque Section, or a Expression:
+            else if (type === 'Expression') {
+                // If it is a Opaque Section then we want the instanceSpec:
+                if (isSection(instanceSpec)) {
+                    instanceSpec.type = "Section";
+                    deferred.resolve(instanceSpec);
+                }
+                // Will we ever have an Expression otherwise?
+                else {
+                    deferred.resolve(instanceSpecSpec);
+                }
+            }
+
+            // If it is a non-Opaque presentation element:
+            if (instanceSpec.slots) {
+                // TODO
+            }        
+        }, function(reason) {
+            deferred.reject(reason);
+        });
+
+        return deferred.promise;
+    };
+
+    /**
+     * @ngdoc method
+     * @name mms.ViewService#getElementReferenceTree
+     * @methodOf mms.ViewService
+     * 
+     * @description
+     * gets the presentation element tree as an array of tree nodes
+     * a tree node is this:
+     * <pre>
+        {
+            instance: id of the instance,
+            instanceVal: instanceValue object,
+            sectionElements: array of child tree nodes,
+            instanceSpecification: instance specification object of the instance,
+            presentationElement: json of the presentation element or a section instance spec with type = Section
+        }
+     * </pre>
+     * 
+     * @param {object} contents an expression object from a view or section
+     * @param {string} [workspace=master] workspace
+     * @param {string} [version=latest] timestamp
+     * @returns {Promise} The promise will be resolved with array of tree node objects
+     */
+    var getElementReferenceTree = function (contents, workspace, version, weight) {
+        var promises = [];
+        angular.forEach(contents.operand, function(instanceVal) {
+            promises.push( getElementReference(instanceVal, workspace, version, weight) );
+        });
+        return $q.all(promises);
+    };
+
+    var getElementReference = function (instanceVal, workspace, version, weight) {
+        var deferred = $q.defer();
+
+        var elementObject = {};
+
+        elementObject.instance = instanceVal.instance;
+        elementObject.instanceVal = instanceVal;
+        elementObject.sectionElements = [];
+
+        getInstanceSpecification(instanceVal, workspace, version, weight)
+        .then(function(instanceSpecification) {
+            elementObject.instanceSpecification = instanceSpecification;
+            if (instanceSpecification.specialization && instanceSpecification.specialization.classifier &&
+                    instanceSpecification.specialization.classifier.length > 0 && 
+                    opaqueClassifiers.indexOf(instanceSpecification.specialization.classifier[0]) >= 0)
+                elementObject.isOpaque = true;
+            else
+                elementObject.isOpaque = false;
+            parseExprRefTree(instanceVal, workspace, version, weight)
+            .then(function(presentationElement) {
+                elementObject.presentationElement = presentationElement;
+                if (presentationElement.type === 'Section') {
+                    getElementReferenceTree(presentationElement.specialization.instanceSpecificationSpecification, workspace, version)
+                    .then(function(sectionElementReferenceTree) {
+                        elementObject.sectionElements = sectionElementReferenceTree;
+                        deferred.resolve(elementObject);
+                    }, function(reason) {
+                        deferred.reject(reason);
+                    });
+                } else
+                    deferred.resolve(elementObject);
+            }, function(reason) {
+                deferred.reject(reason); //this should never happen
+            });
+        }, function(reason) {
+            deferred.reject(reason);
+        });
+        return deferred.promise;
+    };
+
+    /**
+     * @ngdoc method
+     * @name mms.ViewService#getInstanceSpecification
+     * @methodOf mms.ViewService
+     * 
+     * @description
+     * Parses a InstanceValue node of the expression reference tree in the contents
+     * of a View, and returns the corresponding instance specification
+     * 
+     * @param {object} instanceVal instance value object
+     * @param {string} [workspace=master] workspace
+     * @param {string} [version=latest] timestamp
+     * @returns {Promise} The promise will be resolved with a json object for the 
+     *                    corresponding presentation element
+     */
+    var getInstanceSpecification = function(instanceVal, workspace, version, weight) {
+
+        var instanceSpecId = instanceVal.instance;
+        var deferred = $q.defer();
+
+        ElementService.getElement(instanceSpecId, false, workspace, version, weight)
+        .then(function(instanceSpec) {
+            deferred.resolve(instanceSpec);
+        }, function(reason) {
+            deferred.reject(reason);
+        });
+
+        return deferred.promise;
+    };
+
+    /**
+     * @ngdoc method
+     * @name mms.ViewService#isSection
+     * @methodOf mms.ViewService
+     * 
+     * @description
+     * Returns true if the passed InstanceSpecification is a Section
+     * 
+     * @param {Object} instanceSpec A InstanceSpecification json object
+     * @returns {boolean} whether it's a section
+     */
+    var isSection = function(instanceSpec) {
+        return instanceSpec.specialization && instanceSpec.specialization.classifier && 
+               instanceSpec.specialization.classifier.length > 0 &&
+               (instanceSpec.specialization.classifier[0] === TYPE_TO_CLASSIFIER_ID.Section ||
+                instanceSpec.specialization.classifier[0] === TYPE_TO_CLASSIFIER_ID.SectionT);
+    };
+
     //TODO remove
     var setCurrentViewId = function(id) {
         currentViewId = id;
+    };
+
+    var setCurrentView = function(v) {
+        currentView = v;
     };
 
     var setCurrentDocumentId = function(id) {
@@ -402,12 +1100,47 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
         return currentViewId;
     };
 
+    var getCurrentView = function() {
+        return currentView;
+    };
+
     var getCurrentDocumentId = function() {
         return currentDocumentId;
     };
 
     var normalize = function(update, workspace, version) {
         return UtilsService.normalize({update: update, workspace: workspace, version: version});
+    };
+
+    var getDocMetadata = function(docid, ws, version, weight) {
+        var deferred = $q.defer();
+        var metadata = {};
+        ElementService.search(docid, ['id'], null, null, null, null, ws, weight)
+        .then(function(data) {
+            if (data.length === 0 || data[0].sysmlid !== docid || !data[0].properties) {
+                return;
+            }
+            data[0].properties.forEach(function(prop) {
+                var feature = prop.specialization ? prop.specialization.propertyType : null;
+                var value = prop.specialization ? prop.specialization.value : null;
+                if (!feature || !docMetadataTypes[feature] || !value || value.length === 0)
+                    return;
+                metadata[docMetadataTypes[feature].name] = docMetadataTypes[feature].process(value);
+            });
+        }, function(reason) {
+        }).finally(function() {
+            deferred.resolve(metadata);
+        });
+        return deferred.promise;
+    };
+
+    var isPresentationElement = function(e) {
+        if (e.specialization && e.specialization.type === 'InstanceSpecification') {
+            var classifiers = e.specialization.classifier;
+            if (classifiers.length > 0 && classifierIds.indexOf(classifiers[0]) >= 0)
+                return true;
+        }
+        return false;
     };
 
     return {
@@ -419,13 +1152,28 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
         getViewElements: getViewElements,
         createView: createView,
         createDocument: createDocument,
+        downgradeDocument: downgradeDocument,
         addViewToDocument: addViewToDocument,
         getDocumentViews: getDocumentViews,
         getSiteDocuments: getSiteDocuments,
         setCurrentViewId: setCurrentViewId,
+        setCurrentView: setCurrentView,
         setCurrentDocumentId: setCurrentDocumentId,
         getCurrentViewId: getCurrentViewId,
-        getCurrentDocumentId: getCurrentDocumentId
+        getCurrentView: getCurrentView,
+        getCurrentDocumentId: getCurrentDocumentId,
+        parseExprRefTree: parseExprRefTree,
+        isSection: isSection,
+        isPresentationElement: isPresentationElement,
+        addElementToViewOrSection: addElementToViewOrSection,
+        //createAndAddElement: createAndAddElement,
+        //addInstanceVal: addInstanceVal,
+        deleteElementFromViewOrSection: deleteElementFromViewOrSection,
+        createInstanceSpecification: createInstanceSpecification,
+        TYPE_TO_CLASSIFIER_ID: TYPE_TO_CLASSIFIER_ID,
+        getInstanceSpecification : getInstanceSpecification,
+        getElementReferenceTree : getElementReferenceTree,
+        getDocMetadata: getDocMetadata
     };
 
 }

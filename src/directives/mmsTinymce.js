@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsTinymce', ['ElementService', 'ViewService', '$modal', '$templateCache', '$window', '$timeout', 'growl', 'tinymce', mmsTinymce]);
+.directive('mmsTinymce', ['ElementService', 'ViewService', 'CacheService', '$modal', '$templateCache', '$window', '$timeout', 'growl', 'tinymce','UtilsService','_', mmsTinymce]);
 
 /**
  * @ngdoc directive
@@ -30,7 +30,7 @@ angular.module('mms.directives')
  *      that can be transcluded. Regardless, transclusion allows keyword searching 
  *      elements to transclude from alfresco
  */
-function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window, $timeout, growl, tinymce) { //depends on angular bootstrap
+function mmsTinymce(ElementService, ViewService, CacheService, $modal, $templateCache, $window, $timeout, growl, tinymce, UtilsService, _) { //depends on angular bootstrap
     var generatedIds = 0;
 
     var mmsTinymceLink = function(scope, element, attrs, ngModelCtrl) {
@@ -38,57 +38,175 @@ function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window
             attrs.$set('id', 'mmsTinymce' + generatedIds++);
         var instance = null;
 
+        var autocompleteModalTemplate = $templateCache.get('mms/templates/mmsAutocompleteModal.html');
         var transcludeModalTemplate = $templateCache.get('mms/templates/mmsCfModal.html');
         var commentModalTemplate = $templateCache.get('mms/templates/mmsCommentModal.html');
         var chooseImageModalTemplate = $templateCache.get('mms/templates/mmsChooseImageModal.html');
         var viewLinkModalTemplate = $templateCache.get('mms/templates/mmsViewLinkModal.html');
+        var proposeModalTemplate = $templateCache.get('mms/templates/mmsProposeModal.html');
 
-        var transcludeCtrl = function($scope, $modalInstance) {
-            $scope.searchClass = "";
-            $scope.proposeClass = "";
-            var originalElements = $scope.mmsCfElements;
-            $scope.filter = '';
-            $scope.searchText = '';
+        var transcludeCtrl = function($scope, $modalInstance, autocomplete) {
+            var autocompleteName;
+            var autocompleteProperty;
+            var autocompleteElementId;
+            if (autocomplete) {
+              $scope.cacheElements = CacheService.getLatestElements(scope.mmsWs);
+              $scope.autocompleteItems = [];
+              $scope.cacheElements.forEach(function(cacheElement) {
+                  //JSON.stringify(sampleObject);
+                  //console.log("=====THIS IS THE CACHE ===="+ JSON.stringify(cacheElement));
+                  $scope.autocompleteItems.push({ 'sysmlid' : cacheElement.sysmlid, 'name' : cacheElement.name + ' - name' });
+                  $scope.autocompleteItems.push({ 'sysmlid' : cacheElement.sysmlid, 'name' : cacheElement.name + ' - documentation' });
+
+                  if (cacheElement.specialization && cacheElement.specialization.type === 'Property') {
+                      $scope.autocompleteItems.push({ 'sysmlid' : cacheElement.sysmlid, 'name' : cacheElement.name + ' - value' });
+                  }
+              });
+            }
+            $scope.title = 'INSERT A CROSS REFERENCE';
+            $scope.description = 'Begin by searching for an element, then click a field to cross-reference.';
             $scope.newE = {name: '', documentation: ''};
-            $scope.choose = function(elementId, property, name) {
-                var tag = '<mms-transclude-' + property + ' data-mms-eid="' + elementId + '">[cf:' + name + '.' + property + ']</mms-transclude-' + property + '> ';
+            $scope.requestName = false;
+            $scope.requestDocumentation = false;
+            $scope.showProposeLink = true;
+            $scope.choose = function(elem, property) {
+                var tag = '<mms-transclude-' + property + ' data-mms-eid="' + elem.sysmlid + '">[cf:' + elem.name + '.' + property + ']</mms-transclude-' + property + '> ';
                 $modalInstance.close(tag);
             };
             $scope.cancel = function() {
                 $modalInstance.dismiss();
             };
-            $scope.search = function(searchText) {
-                //var searchText = $scope.searchText; //TODO investigate why searchText isn't in $scope
-                //growl.info("Searching...");
-                $scope.searchClass = "fa fa-spin fa-spinner";
-                ElementService.search(searchText, false, scope.mmsWs)
-                .then(function(data) {
-                    $scope.mmsCfElements = data;
-                    $scope.searchClass = "";
-                }, function(reason) {
-                    growl.error("Search Error: " + reason.message);
-                    $scope.searchClass = "";
-                });
+            $scope.openProposeModal = function() {
+                $modalInstance.close(false);
             };
-            $scope.makeNew = function() {
+            // Set search result options
+            $scope.searchOptions= {};
+            $scope.searchOptions.callback = $scope.choose;
+            $scope.searchOptions.emptyDocTxt = 'This field is empty, but you can still click here to cross-reference a placeholder.';
+
+            $scope.makeNewAndChoose = function() {
+                if (!$scope.newE.name) {
+                    growl.error('Error: A name for your new element is required.');
+                    return;
+                } else if (!$scope.requestName && !$scope.requestDocumentation) {
+                    growl.error('Error: Selection of a property to cross-reference is required.');
+                    return;
+                }
                 $scope.proposeClass = "fa fa-spin fa-spinner";
-                ElementService.createElement({name: $scope.newE.name, documentation: $scope.newE.documentation, specialization: {type: 'Element'}}, scope.mmsWs, scope.mmsSite)
+                var sysmlid = UtilsService.createMmsId();
+                var currentView = ViewService.getCurrentView();
+                var ids = UtilsService.getIdInfo(currentView, scope.mmsSite);
+                var currentSiteId = ids.siteId;
+                var ownerId = ids.holdingBinId;
+                var toCreate = {
+                    sysmlid: sysmlid,
+                    name: $scope.newE.name, 
+                    documentation: $scope.newE.documentation, 
+                    specialization: {type: 'Element'},
+                    appliedMetatypes: ['_9_0_62a020a_1105704885343_144138_7929'],
+                    isMetatype: false
+                };
+                if (ownerId)
+                    toCreate.owner = ownerId;
+                ElementService.createElement(toCreate, scope.mmsWs, currentSiteId)
                 .then(function(data) {
-                    $scope.mmsCfElements = [data];
+                    if ($scope.requestName) {
+                        $scope.choose(data, 'name');
+                    } else if ($scope.requestDocumentation) {
+                        $scope.choose(data, 'doc');
+                    }
                     $scope.proposeClass = "";
                 }, function(reason) {
                     growl.error("Propose Error: " + reason.message);
                     $scope.proposeClass = "";
                 });
             };
-            $scope.showOriginalElements = function() {
-                $scope.mmsCfElements = originalElements;
+            $scope.toggleRadio = function(field) {
+                if (field === "name") {
+                    $scope.requestName = true;
+                    $scope.requestDocumentation = false;
+                } else if (field === "documentation") {
+                    $scope.requestName = false;
+                    $scope.requestDocumentation = true;
+                }
+            };
+            $scope.autocompleteOnSelect = function($item, $model, $label) {
+                autocompleteElementId = $item.sysmlid;
+
+                var lastIndexOfName = $item.name.lastIndexOf(" ");
+                autocompleteName = $item.name.substring(0, lastIndexOfName);
+
+                var property = $label.split(' ');
+                property = property[property.length - 1];
+
+                if (property === 'name') {
+                    autocompleteProperty = 'name';
+                } else if (property === 'documentation') {
+                    autocompleteProperty = 'doc';
+                } else if (property === 'value') {
+                    autocompleteProperty = 'val';
+                }
+            };
+            $scope.autocomplete = function(success) {
+                if (success) {
+                    var tag = '<mms-transclude-' + autocompleteProperty + ' data-mms-eid="' + autocompleteElementId + '">[cf:' + autocompleteName + '.' + autocompleteProperty + ']</mms-transclude-' + autocompleteProperty + '> ';
+                    $modalInstance.close(tag);
+                } else {
+                    $modalInstance.close(false);
+                }
             };
         };
 
-        var transcludeCallback = function(ed) {
+        var autocompleteCallback = function(ed) {
+            var instance = $modal.open({
+                template: autocompleteModalTemplate,
+                scope: scope,
+                resolve: {autocomplete: true},
+                controller: ['$scope', '$modalInstance', 'autocomplete', transcludeCtrl],
+                size: 'sm'
+            });
+
+            instance.result.then(function(tag) {
+                if (!tag) {
+                    transcludeCallback(ed, true);
+                } else {
+                    ed.execCommand('delete');
+                    ed.selection.collapse(false);
+                    ed.insertContent(tag);
+                }
+            }, function() {
+                ed.focus();
+            });
+        };
+
+        var transcludeCallback = function(ed, fromAutocomplete) {
             var instance = $modal.open({
                 template: transcludeModalTemplate,
+                scope: scope,
+                resolve: {autocomplete: false},
+                controller: ['$scope', '$modalInstance', 'autocomplete', transcludeCtrl],
+                size: 'lg'
+            });
+            instance.result.then(function(tag) {
+                if (!tag) {
+                    proposeCallback(ed);
+                    return;
+                }
+
+                if (fromAutocomplete) {
+                    ed.execCommand('delete');
+                }
+
+                ed.selection.collapse(false);
+                ed.insertContent(tag);
+            }, function() {
+                ed.focus();
+            });
+        };
+
+        var proposeCallback = function(ed) {
+            var instance = $modal.open({
+                template: proposeModalTemplate,
                 scope: scope,
                 controller: ['$scope', '$modalInstance', transcludeCtrl],
                 size: 'lg'
@@ -100,41 +218,77 @@ function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window
         };
 
         var transcludeViewLinkCtrl = function($scope, $modalInstance) {
-            $scope.searchClass = "";
-            $scope.proposeClass = "";
-            $scope.filter = '';
-            $scope.searchText = '';
-            $scope.mmsCfViewElements = [];
-            $scope.choose = function(elementId, name) {
-                var tag = '<mms-view-link data-mms-vid="' + elementId + '">[cf:' + name + '.vlink]</mms-view-link> ';
+            $scope.title = 'INSERT VIEW LINK';
+            $scope.description = 'Search for a view or content element, click on its name to insert link.';
+            $scope.choose = function(elem) {
+                var did = null;
+                var vid = null;
+                var peid = null;
+                if (elem.relatedDocuments && elem.relatedDocuments.length > 0) {
+                    did = elem.relatedDocuments[0].sysmlid;
+                    if (elem.relatedDocuments[0].parentViews.length > 0)
+                        vid = elem.relatedDocuments[0].parentViews[0].sysmlid;
+                }
+                if (elem.specialization.type === 'InstanceSpecification') {
+                    if (ViewService.isSection(elem))
+                        vid = elem.sysmlid;
+                    else
+                        peid = elem.sysmlid;
+                } else 
+                    vid = elem.sysmlid;
+                var tag = '<mms-view-link';
+                if (did) 
+                    tag += ' data-mms-did="' + did + '"';
+                if (vid) 
+                    tag += ' data-mms-vid="' + vid + '"';
+                if (peid) 
+                    tag += ' data-mms-peid="' + peid + '"';
+                tag += '>[cf:' + elem.name + '.vlink]</mms-view-link> ';
+                $modalInstance.close(tag);
+            };
+            $scope.chooseDoc = function(doc, view, elem) {
+                var did = doc.sysmlid;
+                var vid = view.sysmlid;
+                var peid = null;
+                if (ViewService.isSection(elem))
+                    vid = elem.sysmlid;
+                else if (ViewService.isPresentationElement(elem))
+                    peid = elem.sysmlid;
+                var tag = '<mms-view-link';
+                if (did) 
+                    tag += ' data-mms-did="' + did + '"';
+                if (vid) 
+                    tag += ' data-mms-vid="' + vid + '"';
+                if (peid) 
+                    tag += ' data-mms-peid="' + peid + '"';
+                tag += '>[cf:' + elem.name + '.vlink]</mms-view-link> ';
                 $modalInstance.close(tag);
             };
             $scope.cancel = function() {
                 $modalInstance.dismiss();
             };
-            $scope.search = function(searchText) {
-                //var searchText = $scope.searchText; //TODO investigate why searchText isn't in $scope
-                //growl.info("Searching...");
-                $scope.searchClass = "fa fa-spin fa-spinner";
-                ElementService.search(searchText, false, scope.mmsWs)
-                .then(function(data) {
-                    var views = [];
-                    data.forEach(function(v) {
-                        if (v.specialization && (v.specialization.type === 'View' || v.specialization.type === 'Product'))
-                            views.push(v);
-                    });
-                    $scope.mmsCfViewElements = views;
-                    $scope.searchClass = "";
-                }, function(reason) {
-                    growl.error("Search Error: " + reason.message);
-                    $scope.searchClass = "";
+            $scope.mainSearchFilter = function(data) {
+                var views = [];
+                data.forEach(function(v) {
+                    if (v.specialization && (v.specialization.type === 'View' || v.specialization.type === 'Product' || 
+                            (ViewService.isPresentationElement(v) && v.relatedDocuments))) {
+                        if (v.properties)
+                            delete v.properties;
+                        views.push(v);
+                    }
                 });
+                return views;
             };
+            $scope.searchOptions= {};
+            $scope.searchOptions.callback = $scope.choose;
+            $scope.searchOptions.relatedCallback = $scope.chooseDoc;
+            $scope.searchOptions.filterCallback = $scope.mainSearchFilter;
+            $scope.searchOptions.itemsPerPage = 200;
         };
 
         var viewLinkCallback = function(ed) {
             var instance = $modal.open({
-                template: viewLinkModalTemplate,
+                template: transcludeModalTemplate,
                 scope: scope,
                 controller: ['$scope', '$modalInstance', transcludeViewLinkCtrl],
                 size: 'lg'
@@ -146,12 +300,16 @@ function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window
         };
 
         var commentCtrl = function($scope, $modalInstance) {
+            var sysmlid = UtilsService.createMmsId();
             $scope.comment = {
-                name: '', 
+                sysmlid: sysmlid,
+                name: 'Comment ' + new Date().toISOString(), 
                 documentation: '', 
                 specialization: {
                     type: 'Comment'
-                }
+                },
+                appliedMetatypes: ["_9_0_62a020a_1105704885343_144138_7929"],
+                isMetatype: false
             };
             $scope.oking = false;
             $scope.ok = function() {
@@ -160,9 +318,9 @@ function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window
                     return;
                 }
                 $scope.oking = true;
-                if (ViewService.getCurrentViewId())
-                    $scope.comment.owner = ViewService.getCurrentViewId();
-                ElementService.createElement($scope.comment, scope.mmsWs)
+                if (ViewService.getCurrentView())
+                    $scope.comment.owner = ViewService.getCurrentView().sysmlid;
+                ElementService.createElement($scope.comment, scope.mmsWs, scope.mmsSite)
                 .then(function(data) {
                     var tag = '<mms-transclude-com data-mms-eid="' + data.sysmlid + '">comment:' + data.creator + '</mms-transclude-com> ';
                     $modalInstance.close(tag);
@@ -228,9 +386,64 @@ function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window
             ngModelCtrl.$setViewValue(element.val());
         };
 
+        //fix <br> in pre blocks
+        var fixNewLines = function(content) {
+            var codeBlocks = content.match(/<pre.*?>[^]*?<\/pre>/mg);
+            if(!codeBlocks) return content;
+            for(var index=0; index < codeBlocks.length; index++) {
+                content = content.replace(codeBlocks[index], codeBlocks[index].replace(/<br\s*\/?>/mgi, "\n"));
+            }
+            return content;
+        };
+        var resetCrossRef = function(type, typeString){
+            angular.forEach(type, function(value, key){
+                var transclusionObject = angular.element(value);
+                var transclusionId= angular.element(value).attr('data-mms-eid');
+                var transclusionKey = UtilsService.makeElementKey(transclusionId, 'master', 'latest', false);
+                var inCache = CacheService.get(transclusionKey);
+                if(inCache){
+                    transclusionObject.html('[cf:' + inCache.name + typeString);
+                }
+                else{
+                    ElementService.getElement(transclusionId, false, scope.mmsWs, 'latest', 2 ).then(function(data) {
+                        transclusionObject.html('[cf:' + data.name + typeString);
+                    }, function(reason) {
+                        var error;
+                        if (reason.status === 410)
+                            error = 'deleted';
+                        if (reason.status === 404)
+                            error = 'not found';
+                        transclusionObject.html('[cf:' + error + typeString);
+                        });
+                }
+            });
+        };
+        var defaultToolbar = 'bold italic underline strikethrough | subscript superscript blockquote | formatselect | fontsizeselect | forecolor backcolor removeformat | alignleft aligncenter alignright | link unlink | charmap searchreplace | undo redo';
+        var tableToolbar = ' table ';
+        var listToolbar = ' bullist numlist outdent indent ';
+        var codeToolbar = ' code ';
+        var imageToolbar = ' image media ';
+        var customToolbar = ' transclude comment vlink normalize';
+        var allToolbar = defaultToolbar + ' | ' + listToolbar + ' | ' + tableToolbar + ' | ' + imageToolbar + ' | ' + codeToolbar + ' | ' + customToolbar;
+        var thisToolbar = allToolbar;
+        if (scope.mmsTinymceType === 'Equation')
+            thisToolbar = codeToolbar;
+        if (scope.mmsTinymceType === 'TableT')
+            thisToolbar = defaultToolbar + ' | ' + tableToolbar + ' | ' + codeToolbar + ' | ' + customToolbar;
+        if (scope.mmsTinymceType === 'ListT')
+            thisToolbar = defaultToolbar + ' | ' + listToolbar + ' | ' + codeToolbar + ' | ' + customToolbar;
+        if (scope.mmsTinymceType === 'Figure')
+            thisToolbar = 'image media | code ';
+        //if (scope.mmsTinymceType === 'ParagraphT' || scope.mmsTinymceType === 'Paragraph')
+          //  thisToolbar = defaultToolbar + ' | ' + codeToolbar + ' | ' + customToolbar;
         var options = {
-            plugins: 'autoresize charmap code fullscreen image link media nonbreaking paste table textcolor searchreplace',
-            toolbar: 'bold italic underline strikethrough | subscript superscript blockquote | formatselect | fontsizeselect | forecolor backcolor removeformat | alignleft aligncenter alignright | bullist numlist outdent indent | table | link unlink | image media | charmap searchreplace code | transclude comment vlink normalize | mvleft mvright | undo redo',
+            entity_encoding : 'raw',
+            plugins: 'autoresize charmap code fullscreen image link media nonbreaking paste table textcolor searchreplace noneditable',
+            //toolbar: 'bold italic underline strikethrough | subscript superscript blockquote | formatselect | fontsizeselect | forecolor backcolor removeformat | alignleft aligncenter alignright | bullist numlist outdent indent | table | link unlink | image media | charmap searchreplace code | transclude comment vlink normalize | mvleft mvright | undo redo',
+            relative_urls: false,
+            remove_script_host: false,
+            convert_urls: false,
+            toolbar: thisToolbar,
             menubar: false,
             statusbar: true,
             nonbreaking_force_tab: true,
@@ -238,13 +451,13 @@ function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window
             autoresize_max_height: $window.innerHeight*0.65,
             paste_retain_style_properties: 'color background-color font-size text-align',
             browser_spellcheck: true,
-            invalid_elements: 'br,div,font',
-            extended_valid_elements: 'seqr-timely,mms-d3-observation-profile-chart-io,mms-d3-parallel-axis-chart-io,mms-d3-radar-chart-io,mms-d3-horizontal-bar-chart-io,mms-site-docs,mms-workspace-docs,mms-diagram-block,mms-view-link,-mms-transclude-doc,-mms-transclude-name,-mms-transclude-com,-mms-transclude-val,-mms-transclude-img,math,maction,maligngroup,malignmark,menclose,merror,mfenced,mfrac,mglyph,mi,mlabeledtr,mlongdiv,mmultiscripts,mn,mo,mover,mpadded,mphantom,mroot,mrow,ms,mscarries,mscarry,msgroup,mstack,msline,mspace,msqrt,msrow,mstyle,msub,msup,msubsup,mtable,mtd,mtext,mtr,munder,munderover',
-            custom_elements: 'seqr-timely,mms-d3-observation-profile-chart-io,mms-d3-parallel-axis-chart-io,mms-d3-radar-chart-io,mms-d3-horizontal-bar-chart-io,mms-site-docs,mms-workspace-docs,mms-diagram-block,~mms-view-link,~mms-transclude-doc,~mms-transclude-name,~mms-transclude-com,~mms-transclude-val,~mms-transclude-img,math,maction,maligngroup,malignmark,menclose,merror,mfenced,mfrac,mglyph,mi,mlabeledtr,mlongdiv,mmultiscripts,mn,mo,mover,mpadded,mphantom,mroot,mrow,ms,mscarries,mscarry,msgroup,mstack,msline,mspace,msqrt,msrow,mstyle,msub,msup,msubsup,mtable,mtd,mtext,mtr,munder,munderover',
+            invalid_elements: 'div,font',
+            extended_valid_elements: 'script[language|type|src],mms-maturity-bar,tms-timely,seqr-timely,mms-d3-observation-profile-chart-io,mms-d3-parallel-axis-chart-io,mms-d3-radar-chart-io,mms-d3-grouped-horizontal-bar-chart-io,mms-site-docs,mms-workspace-docs,mms-diagram-block,mms-view-link[class:mceNonEditable],-mms-transclude-doc[class:mceNonEditable],-mms-transclude-name[class:mceNonEditable],-mms-transclude-com[class:mceNonEditable],-mms-transclude-val[class:mceNonEditable],-mms-transclude-img[class:mceNonEditable],math,maction,maligngroup,malignmark,menclose,merror,mfenced,mfrac,mglyph,mi,mlabeledtr,mlongdiv,mmultiscripts,mn,mo,mover,mpadded,mphantom,mroot,mrow,ms,mscarries,mscarry,msgroup,mstack,msline,mspace,msqrt,msrow,mstyle,msub,msup,msubsup,mtable,mtd,mtext,mtr,munder,munderover',
+            custom_elements: 'mms-maturity-bar,tms-timely,seqr-timely,mms-d3-observation-profile-chart-io,mms-d3-parallel-axis-chart-io,mms-d3-radar-chart-io,mms-d3-grouped-horizontal-bar-chart-io,mms-site-docs,mms-workspace-docs,mms-diagram-block,~mms-view-link,~mms-transclude-doc,~mms-transclude-name,~mms-transclude-com,~mms-transclude-val,~mms-transclude-img,math,maction,maligngroup,malignmark,menclose,merror,mfenced,mfrac,mglyph,mi,mlabeledtr,mlongdiv,mmultiscripts,mn,mo,mover,mpadded,mphantom,mroot,mrow,ms,mscarries,mscarry,msgroup,mstack,msline,mspace,msqrt,msrow,mstyle,msub,msup,msubsup,mtable,mtd,mtext,mtr,munder,munderover',
             fix_list_elements: true,
             content_css: 'css/partials/mms.min.css',
             paste_data_images: true,
-            skin_url: 'lib/tinymce/skin/lightgray',
+            //skin_url: 'lib/tinymce/skin/lightgray',
             file_picker_callback: imageCallback,
             file_picker_types: 'image',
             setup: function(ed) {
@@ -252,7 +465,7 @@ function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window
                     title: 'Cross Reference',
                     text: 'Cf',
                     onclick: function() {
-                        transcludeCallback(ed);
+                        transcludeCallback(ed, false);
                     }
                 });
                 ed.addButton('comment', {
@@ -268,7 +481,8 @@ function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window
                     onclick: function() {
                         viewLinkCallback(ed);
                     }
-                });
+                });/* Likely not necessary any more due to non-editable elements
+
                 ed.addButton('mvleft', {
                     title: 'Move Left of Cf',
                     text: '<-',
@@ -295,28 +509,34 @@ function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window
                         }
                     }
                 });
+*/
                 ed.addButton('normalize', {
-                    title: 'Reset Cross References',
-                    text: 'Reset Cf',
+                    title: 'Update Cross References',
+                    text: 'Update Cf',
                     onclick: function() {
                         var body = ed.getBody();
                         body = angular.element(body);
-                        body.find('mms-transclude-name').html('[cf:name]');
-                        body.find('mms-transclude-doc').html('[cf:doc]');
-                        body.find('mms-transclude-val').html('[cf:val]');
-                        body.find('mms-view-link').html('[cf:vlink]');
+                        resetCrossRef(body.find('mms-transclude-name'), '.name]');
+                        resetCrossRef(body.find('mms-transclude-doc'), '.doc]');
+                        resetCrossRef(body.find('mms-transclude-val'), '.val]');
+                        resetCrossRef(body.find('mms-view-link'), '.vlink]');
                         ed.save();
                         update();
                     }
+                });
+                
+                ed.on('GetContent', function(e) {
+                    e.content = fixNewLines(e.content);
                 });
                 ed.on('init', function(args) {
                     ngModelCtrl.$render();
                     ngModelCtrl.$setPristine();
                 });
-                ed.on('change', function(e) {
+                var deb = _.debounce(function(e) {
                     ed.save();
                     update();
-                });
+                }, 1000);
+                ed.on('ExecCommand change NodeChange ObjectResized', deb);
                 ed.on('undo', function(e) {
                     ed.save();
                     update();
@@ -328,7 +548,7 @@ function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window
                 ed.on('blur', function(e) {
                     element.blur();
                 });
-                ed.on('keydown', function(e) {
+                /*ed.on('keydown', function(e) {
                     if (e.keyCode === 9) { 
                         if (e.shiftKey) 
                             ed.execCommand('Outdent');
@@ -337,6 +557,11 @@ function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window
                         e.preventDefault();
                         return false;
                     }  
+                });*/
+                ed.on('keydown', function(e) {
+                    if (e.shiftKey && e.keyCode === 50) {
+                        autocompleteCallback(ed);
+                    }
                 });
                 if (scope.mmsTinymceApi) {
                     scope.mmsTinymceApi.save = function() {
@@ -349,7 +574,8 @@ function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window
 
         $timeout(function() {
             tinymce.init(options);
-        });
+            //tinymce.get(attrs.id).focus();
+        }, 0, false);
 
         ngModelCtrl.$render = function() {
             if (!instance)
@@ -385,6 +611,7 @@ function mmsTinymce(ElementService, ViewService, $modal, $templateCache, $window
             mmsEid: '@',
             mmsWs: '@',
             mmsSite: '@',
+            mmsTinymceType: '@',
             mmsTinymceApi: '='
         },
         link: mmsTinymceLink

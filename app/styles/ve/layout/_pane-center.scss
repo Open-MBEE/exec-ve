@@ -4,6 +4,19 @@
 
 $pane_center_btn_group_width: 120px;
 
+/* start of fullDoc page styles */
+body.fullDoc{
+  text-rendering: optimizeLegibility;
+  overflow:scroll;
+  font-family: "Times New Roman", Serif;
+}
+
+tr {
+  page-break-inside: avoid !important;
+}
+/* end of fullDoc page styles */
+
+
 .clickable:hover {
   cursor: pointer;
   background-color: $light_blue;
@@ -11,6 +24,7 @@ $pane_center_btn_group_width: 120px;
   
 .pane-center {
   margin-right: -11px;
+  font-size: 16px;
 
   .pane-center {
     margin-right: 0;
@@ -25,7 +39,7 @@ $pane_center_btn_group_width: 120px;
   .pane-center-btn-group {
     float: right;
     padding-top: 9px;
-    padding-right: 0;
+    padding-right: 75px;
     min-width: $pane_center_btn_group_width;
   }
 
@@ -58,7 +72,6 @@ $pane_center_btn_group_width: 120px;
   margin-bottom: 24px;
 
   .tree-reorder {
-    width: 40%;
     margin: 0 auto;
     padding-top: 12px;
     padding-bottom: 24px;
@@ -75,5 +88,129 @@ $pane_center_btn_group_width: 120px;
 
   .angular-ui-tree-handle {
     font-family: $font-family-sans-serif;
+  }
+}
+
+.diff-pane-center {
+  /*margin-right: -14px;*/
+
+  > .pane-center {
+    @include box-shadow(-4px 0px 2px -2px rgba(0, 0, 0, .24));
+    margin-right: 0;
+
+
+  }
+
+  .pane-center-header,
+  .pane-center-heading-element {
+    margin-top: 40px;
+  }
+
+  table {
+    th {
+      background-color: $tertiary_grey;
+      border-bottom: 0 !important;
+      padding: 0;
+      vertical-align: middle !important;
+      /*font-size: 16px;*/
+    }
+
+    tbody {
+      td {
+        border-bottom: 1px solid #f3f3f3;
+        padding: 0;
+        /*font-size: 14px;*/
+      }
+
+      tr {
+        background-color: inherit;
+
+        td:nth-child(1) {
+          font-weight: $bold_font_weight;
+        }
+      }
+    }
+  }
+}
+
+@media screen and (min-width: 768px) {
+  .diff-pane-center {
+    .pane-center-header {
+      font-size: 40px;
+    }
+
+    .pane-center-heading {
+      font-size: 28px;
+    }
+
+    table {
+      th {
+        font-size: 14px;
+      }
+      
+      thead {
+        tr {
+          height: 30px;
+        }
+      }
+
+      tbody {
+        td {
+          font-size: 14px;
+        }
+
+        tr {
+          td:nth-child(1) {
+            padding: 10px;
+          }
+
+          td:nth-child(2),
+          td:nth-child(3) {
+            padding: 10px;
+          }
+        }
+      }
+    } 
+  }
+}
+
+@media screen and (min-width: 1500px) {
+  .diff-pane-center {
+    /*.pane-center-header {
+      font-size: 56px;
+    }
+
+    .pane-center-heading {
+      font-size: 41px;
+    }
+
+    table {
+      th {
+        font-size: 20px;
+      }
+      
+      thead {
+        tr {
+          height: 50px;
+        }
+      }
+
+      tbody {
+        td {
+          font-size: 20px;
+        }
+
+        tr {
+          td:nth-child(1) {
+            padding: 20px 0 20px 50px;
+          }
+
+          td:nth-child(2),
+          td:nth-child(3) {
+            padding: 20px 20px 20px 0;
+          }
+        }
+      }
+    } */
   }
 }

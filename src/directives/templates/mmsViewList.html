@@ -1,20 +1,20 @@
 <ol ng-if="list.ordered"> 
-    <li ng-repeat="listitem in list.list"> 
-        <div ng-repeat="thing in listitem" ng-switch on="thing.type">
-            <mms-view-para data-mms-para="thing" ng-switch-when="Paragraph"></mms-view-para>
-            <mms-view-table data-mms-table="thing" ng-switch-when="Table"></mms-view-table>
-            <mms-view-list data-mms-list="thing" ng-switch-when="List"></mms-view-list>
-            <mms-view-img data-mms-image="thing" ng-switch-when="Image"></mms-view-img>
+    <li ng-repeat="listitem in ::list.list"> 
+        <div ng-repeat="thing in ::listitem" ng-switch on="thing.type">
+            <mms-view-para data-mms-para="::thing" ng-switch-when="Paragraph"></mms-view-para>
+            <mms-view-table data-mms-table="::thing" ng-switch-when="Table"></mms-view-table>
+            <mms-view-list data-mms-list="::thing" ng-switch-when="List"></mms-view-list>
+            <mms-view-img data-mms-image="::thing" ng-switch-when="Image"></mms-view-img>
         </div>
     </li> 
 </ol> 
 <ul ng-if="!(list.ordered)"> 
-    <li ng-repeat="listitem in list.list"> 
-        <div ng-repeat="thing in listitem" ng-switch on="thing.type">
-            <mms-view-para data-mms-para="thing" ng-switch-when="Paragraph"></mms-view-para>
-            <mms-view-table data-mms-table="thing" ng-switch-when="Table"></mms-view-table>
-            <mms-view-list data-mms-list="thing" ng-switch-when="List"></mms-view-list>
-            <mms-view-img data-mms-image="thing" ng-switch-when="Image"></mms-view-img>
+    <li ng-repeat="listitem in ::list.list"> 
+        <div ng-repeat="thing in ::listitem" ng-switch on="thing.type">
+            <mms-view-para data-mms-para="::thing" ng-switch-when="Paragraph"></mms-view-para>
+            <mms-view-table data-mms-table="::thing" ng-switch-when="Table"></mms-view-table>
+            <mms-view-list data-mms-list="::thing" ng-switch-when="List"></mms-view-list>
+            <mms-view-img data-mms-image="::thing" ng-switch-when="Image"></mms-view-img>
         </div>
     </li> 
 </ul>

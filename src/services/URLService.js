@@ -57,6 +57,20 @@ function urlService(baseUrl) {
 
     /**
      * @ngdoc method
+     * @name mms.URLService#getMmsVersionURL
+     * @methodOf mms.URLService
+     * 
+     * @description
+     * self explanatory
+     *
+     * @returns {object} Returns object with mmsversion
+     */
+    var getMmsVersionURL = function() {
+        return root + "/mmsversion";
+    };
+
+    /**
+     * @ngdoc method
      * @name mms.URLService#getConfigSnapshotsURL
      * @methodOf mms.URLService
      *
@@ -64,7 +78,6 @@ function urlService(baseUrl) {
      * Gets url that gets or posts snapshots for a configuration in a site
      *
      * @param {string} id Id of the configuration
-     * @param {string} site Site name
      * @param {string} workspace Workspace name
      * @returns {string} The url
      */
@@ -92,6 +105,26 @@ function urlService(baseUrl) {
                       "/sites/" + site +
                       "/products/" + id +
                       "/snapshots";                
+    };
+
+    /**
+     * @ngdoc method
+     * @name mms.URLService#getHtmlToPdfURL
+     * @methodOf mms.URLService
+     *
+     * @description
+     * Gets url that to convert HTML to PDF
+     *
+     * @param {string} docId Id of the document
+     * @param {string} site Site name
+     * @param {string} workspace Workspace name
+     * @returns {string} The url
+     */
+    var getHtmlToPdfURL = function(docId, site, workspace) {
+        return root + "/workspaces/" + workspace +
+                      "/sites/" + site +
+                      "/documents/" + docId +
+                      "/htmlToPdf/123456789";  
     };
 
     /**
@@ -163,6 +196,23 @@ function urlService(baseUrl) {
 
     /**
      * @ngdoc method
+     * @name mms.URLService#getSnapshotURL
+     * @methodOf mms.URLService
+     *
+     * @description
+     * Gets url that gets a snapshot
+     *
+     * @param {string} id Id of the snapshot
+     * @param {string} workspace Workspace name
+     * @returns {string} The url
+     */
+    var getSnapshotURL = function(id, workspace) {
+        return root + "/workspaces/" + workspace + 
+                      "/snapshots/" + id;
+    };
+
+    /**
+     * @ngdoc method
      * @name mms.URLService#getConfigProductsURL
      * @methodOf mms.URLService
      *
@@ -171,6 +221,7 @@ function urlService(baseUrl) {
      *
      * @param {string} site Site name
      * @param {string} workspace Workspace name
+     * @param {string} version timestamp
      * @returns {string} The url
      */
     var getSiteProductsURL = function(site, workspace, version) {
@@ -232,12 +283,17 @@ function urlService(baseUrl) {
         return addVersion(r, version);
     };
 
-    var getOwnedElementURL = function(id, workspace, version) {
-        
-        var r = root + '/workspaces/' + workspace + '/elements/' + id + '?recurse=true';
-        // TODO return addVersion(r, version);
-        return r;
-        
+    var getOwnedElementURL = function(id, workspace, version, depth) {
+        var recurseString = 'recurse=true';
+        if (depth && depth > 0)
+            recurseString = 'depth=' + depth;
+        var r = root + '/workspaces/' + workspace + '/elements/' + id;
+        r = addVersion(r, version);
+        if (r.indexOf('?') > 0)
+            r += '&' + recurseString;
+        else
+            r += '?' + recurseString;
+        return r;        
     };
 
     /**
@@ -251,6 +307,7 @@ function urlService(baseUrl) {
      * @param {string} id The document id.
      * @param {string} workspace Workspace name
      * @param {string} version Timestamp or version number
+     * @param {boolean} simple Whether to get simple views (without specialization, for performance reasons)
      * @returns {string} The url.
      */
     var getDocumentViewsURL = function(id, workspace, version, simple) {
@@ -298,8 +355,7 @@ function urlService(baseUrl) {
      * @returns {string} The url.
      */
     var getElementVersionsURL = function(id, workspace) {
-        return root + "/javawebscripts/elements/" + id + "/versions";
-        //return root + '/workspaces/' + workspace + '/elements/' + id + '/versions';
+        return root + '/workspaces/' + workspace + '/history/' + id;
     };
 
     /**
@@ -317,8 +373,31 @@ function urlService(baseUrl) {
         return root + '/workspaces/' + workspace + '/elements';
     };
 
+    /**
+     * @ngdoc method
+     * @name mms.URLService#getPutElementsURL
+     * @methodOf mms.URLService
+     * 
+     * @description
+     * Gets the path for getting multiple elements (using put with body).
+     * 
+     * @param {string} workspace Workspace name
+     * @param {string} version timestamp
+     * @returns {string} The post elements url.
+     */
+    var getPutElementsURL = function(workspace, version) {
+        var r = root + '/workspaces/' + workspace + '/elements';
+        return addVersion(r, version);
+    };
+
     var getPostElementsWithSiteURL = function(workspace, site) {
-        return root + '/workspaces/' + workspace + '/sites/' + site + '/elements';
+        if (root && workspace && site) {
+            // TODO maybe move this check elsewhere to keep this method simple
+            if (site === 'no-site') {
+                site = 'no_site';
+            }
+            return root + '/workspaces/' + workspace + '/sites/' + site + '/elements';
+        }
     };
 
     /**
@@ -349,16 +428,23 @@ function urlService(baseUrl) {
         var result = {status: status, data: data};
         if (status === 404)
             result.message = "Not Found";
-        else if (status === 500)
-            result.message = "Server Error";
-        else if (status === 401 || status === 403)
+        else if (status === 500) {
+            if (angular.isString(data) && data.indexOf("ENOTFOUND") >= 0)
+                result.message = "Network Error (Please check network)";
+            else
+                result.message = "Server Error";
+        } else if (status === 401 || status === 403)
             result.message = "Permission Error";
         else if (status === 409)
             result.message = "Conflict";
         else if (status === 400)
             result.message = "Bad Request";
+        else if (status === 410)
+            result.message = "Deleted";
+        else if (status === 408)
+            result.message = "Timed Out";
         else
-            result.message = "Failed";
+            result.message = "Timed Out (Please check network)";
         deferred.reject(result);
     };
 
@@ -370,6 +456,8 @@ function urlService(baseUrl) {
      * @description
      * Gets the url to query sites.
      * 
+     * @param {string} workspace the workspace
+     * @param {string} version timestamp
      * @returns {string} The url.
      */
     var getSitesURL = function(workspace, version) {
@@ -386,11 +474,28 @@ function urlService(baseUrl) {
      * Gets the url for element keyword search.
      * 
      * @param {string} query Keyword query
+     * @param {Array.<string>} filters if not null, put in filters
+     * @param {string} propertyName if not null put in propertyName
+     * @param {integer} page page to get
+     * @param {integer} items items per page
      * @param {string} workspace Workspace name to search under
      * @returns {string} The post elements url.
      */
-    var getElementSearchURL = function(query, workspace) {
-        return root + '/workspaces/' + workspace + '/search?keyword=' + query;
+    var getElementSearchURL = function(query, filters, propertyName, page, items, workspace) {
+        var r = root + '/workspaces/' + workspace + '/search?keyword=' + query;
+        if (filters) {
+            var l = filters.join();
+            r += '&filters=' + l;
+        }
+        if (propertyName) {
+            r += '&propertyName=' + propertyName;
+        }
+        if (items && items > 0) {
+            r += "&maxItems=" + items;
+            if (page >= 0)
+                r += '&skipCount=' + page;
+        }
+        return r;
     };
 
     var getWorkspacesURL = function() {
@@ -401,13 +506,16 @@ function urlService(baseUrl) {
         return root + '/workspaces/' + ws;
     };
 
-    var getWsDiffURL = function(ws1, ws2, ws1time, ws2time) {
-        var r = root + '/diff?workspace1=' + ws1 + '&workspace2=' + ws2;
-        if (ws1time && ws1time !== 'latest')
+    var getWsDiffURL = function(ws1, ws2, ws1time, ws2time, recalc) {
+        var diffUrl =  root + '/diff/' + ws1 + '/' + ws2 + '/' + ws1time + '/' + ws2time  + '?background=true';
+        if(recalc === true) diffUrl += '&recalculate=true';
+        
+        return diffUrl;
+        /*if (ws1time && ws1time !== 'latest')
             r += '&timestamp1=' + ws1time;
         if (ws2time && ws2time !== 'latest')
             r += '&timestamp2=' + ws2time;
-        return r;
+        return r;*/
     };
 
     var getPostWsDiffURL = function(sourcetime) {
@@ -427,7 +535,12 @@ function urlService(baseUrl) {
             return url + '/versions/' + version;
     };
 
+    var getRoot = function() {
+        return root;
+    };
+
     return {
+        getMmsVersionURL: getMmsVersionURL,
         getSiteDashboardURL: getSiteDashboardURL,
         getElementURL: getElementURL,
         getOwnedElementURL: getOwnedElementURL,
@@ -439,19 +552,23 @@ function urlService(baseUrl) {
         getElementSearchURL: getElementSearchURL,
         getImageURL: getImageURL,
         getProductSnapshotsURL: getProductSnapshotsURL,
+        getHtmlToPdfURL: getHtmlToPdfURL,
         getConfigSnapshotsURL: getConfigSnapshotsURL,
         getSiteProductsURL: getSiteProductsURL,
         getConfigURL: getConfigURL,
+        getSnapshotURL: getSnapshotURL,
         getConfigsURL: getConfigsURL,
         getConfigProductsURL : getConfigProductsURL,
         getDocumentViewsURL: getDocumentViewsURL,
         getViewElementsURL: getViewElementsURL,
         getWsDiffURL: getWsDiffURL,
         getPostWsDiffURL: getPostWsDiffURL,
+        getPutElementsURL: getPutElementsURL,
         getWorkspacesURL: getWorkspacesURL,
         getWorkspaceURL: getWorkspaceURL,
         getCheckLoginURL: getCheckLoginURL,
-        isTimestamp: isTimestamp
+        isTimestamp: isTimestamp,
+        getRoot: getRoot
     };
 
 }

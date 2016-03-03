@@ -3,14 +3,20 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('FullDocCtrl', ['$scope', '$rootScope', '$state', '$stateParams', '$window', 'document', 'workspace', 'site', 'snapshot', 'time', 'ConfigService', 'UxService', 'growl',
-function($scope, $rootScope, $state, $stateParams, $window, document, workspace, site, snapshot, time, ConfigService, UxService, growl) {
+
+.controller('FullDocCtrl', ['$scope', '$templateCache', '$compile', '$timeout', '$rootScope', '$state', '$stateParams', '$window', 'MmsAppUtils', 'document', 'workspace', 'site', 'snapshot', 'time', 'tag', 'ConfigService', 'UxService', 'ViewService', 'UtilsService', 'growl', 'hotkeys', 'search', '_',
+function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateParams, $window, MmsAppUtils, document, workspace, site, snapshot, time, tag, ConfigService, UxService, ViewService, UtilsService, growl, hotkeys, search, _) {
+
     $scope.ws = $stateParams.workspace;
+    $scope.site = site;
+    $scope.search = search;
     var views = [];
     if (!$rootScope.veCommentsOn)
         $rootScope.veCommentsOn = false;
     if (!$rootScope.veElementsOn)
         $rootScope.veElementsOn = false;
+    if (!$rootScope.mms_ShowEdits)
+        $rootScope.mms_ShowEdits = false;
     $scope.buttons = [];
     views.push({id: document.sysmlid, api: {
         init: function(dis) {
@@ -20,6 +26,9 @@ function($scope, $rootScope, $state, $stateParams, $window, document, workspace,
             if ($rootScope.veElementsOn) {
                 dis.toggleShowElements();
             }
+            if ($rootScope.mms_ShowEdits && time === 'latest') {
+                dis.toggleShowEdits();
+            }
         }
     }});
     var view2view = document.specialization.view2view;
@@ -28,8 +37,9 @@ function($scope, $rootScope, $state, $stateParams, $window, document, workspace,
         view2children[view.id] = view.childrenViews;
     });
 
-    var addToArray = function(viewId, curSection) {
-        views.push({id: viewId, api: {
+    ViewService.setCurrentView(document);
+    var buildViewElt = function(vId, curSec) {
+      return {id: vId, api: {
             init: function(dis) {
                 if ($rootScope.veCommentsOn) {
                     dis.toggleShowComments();
@@ -37,8 +47,14 @@ function($scope, $rootScope, $state, $stateParams, $window, document, workspace,
                 if ($rootScope.veElementsOn) {
                     dis.toggleShowElements();
                 }
+                if ($rootScope.mms_ShowEdits && time === 'latest') {
+                    dis.toggleShowEdits();
+                }
             }
-        }, number: curSection});
+        }, number: curSec};
+    };
+    var addToArray = function(viewId, curSection) {
+        views.push( buildViewElt(viewId, curSection) );
         if (view2children[viewId]) {
             var num = 1;
             view2children[viewId].forEach(function(cid) {
@@ -58,135 +74,87 @@ function($scope, $rootScope, $state, $stateParams, $window, document, workspace,
         $rootScope.$broadcast('elementSelected', elementId, 'element');
     };
 
+    $scope.$on('newViewAdded', function(event, vId, curSec, prevSibId) {
+        var sibIndex = _.findIndex(views, {id: prevSibId});
+        views.splice(sibIndex+1, 0, buildViewElt(vId, curSec) );
+    });
+    
     $scope.bbApi = {};
     $scope.bbApi.init = function() {
+
+        if (document && document.editable && time === 'latest') {
+            $scope.bbApi.addButton(UxService.getButtonBarButton('show.edits'));
+            $scope.bbApi.setToggleState('show.edits', $rootScope.mms_ShowEdits);
+            hotkeys.bindTo($scope)
+            .add({
+                combo: 'alt+d',
+                description: 'toggle edit mode',
+                callback: function() {$scope.$broadcast('show.edits');}
+            });
+        }
+
         $scope.bbApi.addButton(UxService.getButtonBarButton('show.comments'));
         $scope.bbApi.setToggleState('show.comments', $rootScope.veCommentsOn);
+        $scope.bbApi.addButton(UxService.getButtonBarButton('print'));
+        $scope.bbApi.addButton(UxService.getButtonBarButton('convert.pdf'));
+        $scope.bbApi.addButton(UxService.getButtonBarButton('word'));
+        $scope.bbApi.addButton(UxService.getButtonBarButton('tabletocsv'));
         $scope.bbApi.addButton(UxService.getButtonBarButton('show.elements'));
         $scope.bbApi.setToggleState('show.elements', $rootScope.veElementsOn);
+        hotkeys.bindTo($scope)
+        .add({
+            combo: 'alt+c',
+            description: 'toggle show comments',
+            callback: function() {$scope.$broadcast('show.comments');}
+        }).add({
+            combo: 'alt+e',
+            description: 'toggle show elements',
+            callback: function() {$scope.$broadcast('show.elements');}
+        });
+    };
 
-        // TODO: This code is duplicated in the ViewCtrl
-        // **WARNING** IF YOU CHANGE THIS CODE, NEED TO UPDATE IN VIEW CTRL TOO
-
-        if ($state.includes('workspace.site.document') || $state.includes('workspace.site.documentpreview')) {
-            if (snapshot !== null) {
-                var pdfUrl = getPDFUrl();
-                if (pdfUrl !== null && pdfUrl !== undefined) {
-                    $scope.bbApi.addButton(UxService.getButtonBarButton('download.pdf'));                
-                } else {
-                    $scope.bbApi.addButton(UxService.getButtonBarButton('generate.pdf'));
-
-                    var pdfStatus = getPDFStatus();
-                    if (pdfStatus === 'Generating...')
-                        $scope.bbApi.toggleButtonSpinner('generate.pdf');
-                    else if (pdfStatus !== null)
-                        $scope.bbApi.setTooltip('generate.pdf', pdfStatus);
+    var converting = false;
+    $scope.$on('convert.pdf', function() {
+        if (converting) {
+            growl.info("Please wait...");
+        }
+        converting = true;
+        $scope.bbApi.toggleButtonSpinner('convert.pdf');
+        MmsAppUtils.generateHtml(document, $scope.ws, time, false)
+        .then(function(ob) {
+            var cover = ob.cover;
+            var html = ob.contents;
+            var doc = {};
+            doc.docId = document.sysmlid;
+            doc.header = ob.header;
+            doc.footer = ob.footer;
+            doc.html = html;
+            doc.cover = cover;
+            doc.time = time;
+            doc.version = ob.version;
+            doc.dnum = ob.dnum;
+            doc.displayTime = ob.time;
+            doc.workspace = $scope.ws;
+            doc.name = document.sysmlid + '_' + time + '_' + new Date().getTime();
+            if(time == 'latest') 
+                doc.tagId = time;
+            else {
+                if(tag) 
+                    doc.tagId = tag.name;
+            }
+            ConfigService.convertHtmlToPdf(doc, site.sysmlid, $scope.ws)
+            .then(
+                function(reuslt){
+                    growl.info('Converting HTML to PDF...Please wait for a completion email');
+                },
+                function(reason){
+                    growl.error("Failed to convert HTML to PDF: " + reason.message);
                 }
-
-                var zipUrl = getZipUrl();
-                if (zipUrl !== null && zipUrl !== undefined) {
-                    $scope.bbApi.addButton(UxService.getButtonBarButton('download.zip'));                
-                } else {
-                    $scope.bbApi.addButton(UxService.getButtonBarButton('generate.zip'));
-
-                    var zipStatus = getZipStatus();
-                    if (zipStatus === 'Generating...')
-                        $scope.bbApi.toggleButtonSpinner('generate.zip');
-                    else if (zipStatus !== null)
-                        $scope.bbApi.setTooltip('generate.zip', zipStatus);
-                }
-            }
-        }
-    };
-
-    // TODO: This code is duplicated in the ViewCtrl
-    // **WARNING** IF YOU CHANGE THIS CODE, NEED TO UPDATE IN VIEW CTRL TOO
-
-    var getPDFStatus = function(){
-        if(!snapshot) return null;
-        var formats = snapshot.formats;
-        if(!formats || formats.length===0) return null;
-        for(var i=0; i < formats.length; i++){
-            if(formats[i].type=='pdf') {
-                var status = formats[i].status;
-                if(status == 'Generating') status = 'Generating...';
-                else if(status == 'Error') status = 'Regenerate PDF';
-                return status;
-            }
-        }
-        return null;
-    };
-
-    var getPDFUrl = function(){
-        if(!snapshot) return null;
-        var formats = snapshot.formats;
-        if(!formats || formats.length===0) return null;
-        for(var i=0; i < formats.length; i++){
-            if(formats[i].type=='pdf'){
-                return formats[i].url;
-            }
-        }
-        return null;
-    };
-
-    var getZipStatus = function(){
-        if(!snapshot) return null;
-        var formats = snapshot.formats;
-        if(!formats || formats.length===0) return null;
-        for(var i=0; i < formats.length; i++){
-            if(formats[i].type=='html') {
-                var status = formats[i].status;
-                if(status == 'Generating') status = 'Generating...';
-                else if(status == 'Error') status = 'Regenerate Zip';
-                return status;
-            }
-        }
-        return null;
-    };
-
-    var getZipUrl = function(){
-        if(angular.isUndefined(snapshot)) return null;
-        if(snapshot===null) return null;
-        
-        var formats = snapshot.formats;
-        if(formats===undefined || formats===null || formats.length===0) return null;
-        for(var i=0; i < formats.length; i++){
-            if(formats[i].type=='html'){
-                return formats[i].url;  
-            } 
-        }
-        return null;
-    };
-
-    $scope.$on('generate.pdf', function() {
-        if (getPDFStatus() === 'Generating...')
-            return;
-        $scope.bbApi.toggleButtonSpinner('generate.pdf');
-        $scope.bbApi.toggleButtonSpinner('generate.zip');
-
-        snapshot.formats.push({"type":"pdf",  "status":"Generating"});
-        snapshot.formats.push({"type":"html", "status":"Generating"});
-        ConfigService.createSnapshotArtifact(snapshot, site.sysmlid, workspace).then(
-            function(result){
-                growl.info('Generating artifacts...Please wait for a completion email and reload the page.');
-            },
-            function(reason){
-                growl.error('Failed to generate artifacts: ' + reason.message);
-            }
-        );
-    });
-
-    $scope.$on('generate.zip', function() {
-        $rootScope.$broadcast('generate.pdf');        
-    });
-
-    $scope.$on('download.pdf', function() {
-        $window.open(getPDFUrl());
-
-    });
-
-    $scope.$on('download.zip', function() {
-        $window.open(getZipUrl());
+            ).finally(function() {
+                converting = false;
+                $scope.bbApi.toggleButtonSpinner('convert.pdf');
+            });
+        });
     });
 
     $scope.$on('show.comments', function() {
@@ -204,5 +172,44 @@ function($scope, $rootScope, $state, $stateParams, $window, document, workspace,
         $scope.bbApi.toggleButtonState('show.elements');
         $rootScope.veElementsOn = !$rootScope.veElementsOn;
     });
+
+    $scope.$on('show.edits', function() {
+        $scope.views.forEach(function(view) {
+            view.api.toggleShowEdits();
+        });
+        $scope.bbApi.toggleButtonState('show.edits');
+        $rootScope.mms_ShowEdits = !$rootScope.mms_ShowEdits;
+    });
     $rootScope.mms_fullDocMode = true;
+
+    $scope.$on('section.add.paragraph', function(event, section) {
+        MmsAppUtils.addPresentationElement($scope, 'Paragraph', section);
+    });
+
+    $scope.$on('section.add.section', function(event, section) {
+        MmsAppUtils.addPresentationElement($scope, 'Section', section);
+    });
+
+    $scope.$on('print', function() {
+        MmsAppUtils.popupPrintConfirm(document, $scope.ws, time, true, true);
+    });
+    $scope.$on('word', function() {
+        MmsAppUtils.popupPrintConfirm(document, $scope.ws, time, true, false);
+    });
+    $scope.$on('tabletocsv', function() {
+        MmsAppUtils.tableToCsv(document, $scope.ws, time, true);
+    });
+
+    $scope.searchOptions= {};
+    $scope.searchOptions.callback = function(elem) {
+        $scope.tscClicked(elem.sysmlid);
+    };
+    $scope.searchOptions.emptyDocTxt = 'This field is empty.';
+    $scope.searchOptions.searchInput = $stateParams.search;
+    $scope.searchOptions.searchResult = $scope.search;    
+
+    $scope.searchGoToDocument = function (doc, view, elem) {//siteId, documentId, viewId) {
+        $state.go('workspace.site.document.view', {site: doc.siteCharacterizationId, document: doc.sysmlid, view: view.sysmlid, tag: undefined, search: undefined});
+    };
+    $scope.searchOptions.relatedCallback = $scope.searchGoToDocument;
 }]);

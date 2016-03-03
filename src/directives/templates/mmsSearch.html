@@ -1,0 +1,126 @@
+
+<div class="modal-body transclude-modal">
+    <div class="transclude-modal-input">
+        <form ng-submit="newSearch(searchText, 0, itemsPerPage)">
+            <div class="form-search input-group">
+                <input class="form-control" type="text" ng-model="searchText" placeholder="Search for an element" autofocus/>
+                <span class="input-group-btn">                
+                    <button class="btn btn-primary" type="button" ng-click="newSearch(searchText, 0, itemsPerPage)">
+                    <span class="btn-text">SEARCH</span> <i class="{{searchClass}}"></i></button>
+                </span>
+            </div>
+            <div class="container-search-type">
+                <div class="btn-group btn-group-xs">
+                    <button ng-click="setSearchType('all')" type="button" class="btn-search-all btn-search-type btn btn-default active">ALL</button>
+                    <button ng-click="setSearchType('name')" type="button" class="btn-search-name btn-search-type btn btn-default">NAME</button>
+                    <button ng-click="setSearchType('documentation')" type="button" class="btn-search-documentation btn btn-search-type btn-default">DOCUMENTATION</button>
+                    <button ng-click="setSearchType('value')" type="button" class="btn-search-value btn-search-type btn btn-default">VALUE</button>
+                    <button ng-click="setSearchType('id')" type="button" class="btn-search-id btn-search-type btn btn-default">MDID</button>
+                </div>
+            </div>
+        </form>
+        <div class="misc-form-field" ng-show="searchResults">
+            <div class="form-filter">
+                <input class="form-control" type="text" ng-model="filterQuery.query" ng-model-options="{debounce: 1000}" placeholder="Filter results" />
+            </div>
+            <div class="container-search-type">
+	            <div class="btn-group btn-group-xs search-filter-type">
+	                <button ng-click="setFilterFacet('all')" type="button" class="btn-filter-facet-all btn-search-type btn btn-default active">ALL</button>
+	                <button ng-click="setFilterFacet('name')" type="button" class="btn-filter-facet-name btn-search-type btn btn-default">NAME</button>
+	                <button ng-click="setFilterFacet('documentation')" type="button" class="btn-filter-facet-documentation btn btn-search-type btn-default">DOCUMENTATION</button>
+	                <!-- <button ng-click="setFilterFacet('properties')" type="button" class="btn-filter-facet-value btn-search-type btn btn-default">VALUE</button> -->
+	                <button ng-click="setFilterFacet('sysmlid')" type="button" class="btn-filter-facet-sysmlid btn-search-type btn btn-default">MDID</button>
+	            </div>
+            </div>
+            <div>Showing {{filteredElms.length}} <!--of {{searchResults.length}} -->search results. (Page {{currentPage + 1}})</div>
+        </div>
+    </div>
+    <div class="container-fluid">
+        <a ng-show="currentPage > 0" ng-click="prev()">&lt; Prev</a>
+        <a ng-show="searchResults.length > 0" class="pull-right" ng-click="next()">Next ></a>
+    </div>
+    <div class="container-fluid" ng-show="searchResults.length > 0">
+        <div class="elem-wrapper" ng-repeat="elem in filteredElms = (searchResults | filter: resultFilter)">
+            <hr>
+            <div class="elem-name-wrapper">
+                <a class="elem-name" ng-click="userResultClick(elem, 'name')">{{elem.name}}</a>
+                <a class="elem-name" ng-show="elem.specialization.isSlot" ng-click="userResultClick(elem, 'name')"><mms-transclude-name mms-eid="{{elem.specialization.propertyType}}"></mms-transclude-name></a>
+            </div>
+            <div class="elem-qualified-name-wrapper">
+                <div class="elem-qualified-name">
+                        {{elem.qualifiedName}}
+                </div>
+            </div>
+            <div class="elem-documentation-wrapper">
+                <label>DOCUMENTATION</label>
+                <div class="elem-documentation">
+                    <a ng-show="elem.documentation" ng-bind-html="elem.documentation | limitTo:300" ng-click="userResultClick(elem, 'doc')"></a><span class="ellipses">{{elem.documentation.length > 300 ? ' ...' : ''}}</span>
+                    <span><a ng-show="!elem.documentation" ng-click="userResultClick(elem, 'doc')">
+                      {{emptyDocTxt}}
+                      </a></span>
+                </div>
+            </div>
+            <div class="elem-type-wrapper">
+                <label>METATYPE</label>
+                <div ng-repeat="type in elem.appliedMetatypes" class="elem-type">
+                    <mms-transclude-name mms-eid="{{type}}" no-click="true"></mms-transclude-name>
+                </div>
+            </div>
+            <div ng-if="elem.specialization.type === 'Property' && elem.specialization.value[0]">
+                <label>VALUE</label>
+                <div class="elem-properties">
+                    <a ng-click="userResultClick(elem, 'val')">
+                        <span ng-repeat="val in elem.specialization.value">
+                            {{val.string || val.boolean + '' || val.naturalValue || val.integer || val.double || val.expressionBody[0] || 'Default Value'}}<span class="ellipses">{{(val.expressionBody[0] && val.expressionBody.length > 1) ? ' ...' : '' }}</span>{{$last ? '' : ', '}}
+                        </span>
+                    </a>
+                </div>
+            </div>
+            <div ng-if="elem.specialization.type === 'Constraint'">
+                <label>SPECIFICATION</label>
+                <div class="elem-specification">
+                    <a ng-click="userResultClick(elem, 'val')">
+                        {{elem.specialization.specification.string || elem.specialization.specification.boolean ||
+                          elem.specialization.specification.naturalValue || elem.specialization.specification.integer ||
+                          elem.specialization.specification.double || 'Constraint Specification'}}
+                    </a>
+                </div>
+                <a ng-click="userResultClick(elem, 'val')">
+                    <div ng-repeat="str in elem.specialization.specification.expressionBody">
+                        <div class="elem-specification">{{str}}</div>
+                    </div>
+                </a>
+            </div>
+            <div ng-if="elem.properties[0]" class="elem-properties-wrapper">
+                <label>PROPERTIES</label>
+                <table>
+                    <tbody>
+                        <tr ng-repeat="row in elem.properties2">
+                            <td ng-repeat="property in row">
+                                {{property.name}}<span ng-show="property.specialization.isSlot"><mms-transclude-name mms-eid="{{property.specialization.propertyType}}"></mms-transclude-name></span>: 
+                                <a ng-click="userResultClick(property, 'val')"><span ng-repeat="val in property.specialization.value">{{val.string || val.boolean + '' || val.naturalValue || val.integer || val.double || val.expressionBody[0] || 'Default Value'}}<span class="ellipses">{{(val.expressionBody[0] && val.expressionBody.length > 1) ? ' ...' : '' }}</span>{{$last ? '' : ', '}}</span></a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div ng-if="elem.relatedDocuments.length > 0" class="elem-documentation-wrapper">
+                <label>RELATED DOCUMENTS</label>
+                <div ng-repeat="relatedDocument in elem.relatedDocuments" class="elem-documentation">
+                    <a ng-repeat="relatedView in relatedDocument.parentViews" ui-sref="workspace.site.document.view({document: relatedDocument.sysmlid, view: relatedView.sysmlid, site: relatedDocument.siteCharacterizationId, search: undefined})" ng-click="userRelatedClick($event, relatedDocument, relatedView, elem)">
+                        {{relatedDocument.name}} > {{relatedView.name}}<br/>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <hr/>
+    </div>
+    
+    <div class="container-no-results container-fluid" ng-show="searchResults.length === 0">
+        <h3>NO RESULTS FOUND.</h3>
+    </div>
+    <div class="container-fluid">
+        <a ng-show="currentPage > 0" ng-click="prev()">&lt; Prev</a>
+        <a ng-show="searchResults.length > 0" class="pull-right" ng-click="next()">Next ></a>
+    </div>
+</div>

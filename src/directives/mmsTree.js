@@ -91,6 +91,7 @@ angular.module('mms.directives')
     </pre>
  *
  * @param {Array} treeData Array of root nodes
+ * @param {Array} treeData Array of root nodes
  * @param {Object=} treeControl Empty object to populate with api
  * @param {Object=} options Options object to customize icons for types and statuses
  * @param {expression=} onSelect Handler for branch selected
@@ -133,11 +134,24 @@ function mmsTree($timeout, $log, $templateCache) {
             }
         };
 
-        var remove_branch = function (branch) {
+        var remove_branch_impl = function (branch, singleBranch) {
             var parent_branch = get_parent(branch);
-            for (var i = 0; i < parent_branch.children.length; i++)
-                if (parent_branch.children[i].uid === branch.uid)
+            for (var i = 0; i < parent_branch.children.length; i++) {
+                if (parent_branch.children[i].uid === branch.uid) {
                     parent_branch.children.splice(i,1);
+                    if (singleBranch) {
+                        break;
+                    }
+                }
+            }
+        };
+
+        var remove_branch = function (branch) {
+            remove_branch_impl(branch, false);
+        };
+
+        var remove_single_branch = function (branch) {
+            remove_branch_impl(branch, true);
         };
 
         var get_parent = function(child) {
@@ -162,6 +176,10 @@ function mmsTree($timeout, $log, $templateCache) {
 
         var expand_all_parents = function(child) {
             for_all_ancestors(child, function(b) {
+	            if(b.expandable === true)
+                {
+                    scope.expandCallback({ branch: b });
+                }
                 b.expanded = true;
             });
         };
@@ -177,7 +195,7 @@ function mmsTree($timeout, $log, $templateCache) {
          *
          * @param {Object} branch branch to select
          */
-        var select_branch = function(branch) {
+        var select_branch = function(branch, noClick) {
             if (!branch) {
                 if (selected_branch)
                     selected_branch.selected = false;
@@ -189,15 +207,29 @@ function mmsTree($timeout, $log, $templateCache) {
                     selected_branch.selected = false;
                 branch.selected = true;
                 selected_branch = branch;
+	            /*if(branch.expandable === true)
+                {
+                    scope.expandCallback({ branch: branch });
+                }*/
                 expand_all_parents(branch);
-                if (branch.onSelect) {
+                if (!noClick) {
+                    if (branch.onSelect) {
+                        $timeout(function() {
+                            branch.onSelect(branch);
+                        });
+                    } else if (scope.onSelect) {
+                        $timeout(function() {
+                            scope.onSelect({branch: branch});
+                        });
+                    }
+                }
+                if (branch.data.sysmlid) {
                     $timeout(function() {
-                        branch.onSelect(branch);
-                    });
-                } else if (scope.onSelect) {
-                    $timeout(function() {
-                        scope.onSelect({branch: branch});
-                    });
+                        var el = angular.element('#tree-branch-' + branch.data.sysmlid);
+                        if (!el.isOnScreen()) {
+                            el.get(0).scrollIntoView();
+                        }
+                    }, 500, false);
                 }
             }
         };
@@ -205,8 +237,9 @@ function mmsTree($timeout, $log, $templateCache) {
         var on_initialSelection_change = function() {
             if (scope.initialSelection) {
                 for_each_branch(function(b) {
-                    if (b.data.sysmlid === scope.initialSelection || b.data.id === scope.initialSelection)
-                        select_branch(b);
+                    if (b.data.sysmlid === scope.initialSelection || b.data.id === scope.initialSelection) {
+                        select_branch(b, true);
+                    }
                 });
                 on_treeData_change();
             }
@@ -230,31 +263,30 @@ function mmsTree($timeout, $log, $templateCache) {
                 var expand_icon = "";
                 var type_icon = "";
                 var status_properties = { style: "" };
-                var button_properties = "";
 
                 if (!branch.expanded)
                     branch.expanded = false;
-                if (branch.children && branch.children.length > 0) {
-                    if (branch.expanded) 
+                if ((branch.children && branch.children.length > 0) || (branch.expandable === true)) {
+                    if (branch.expanded) {
                         expand_icon = attrs.iconCollapse;
-                    else
+                    } else {
                         expand_icon = attrs.iconExpand;
+                    }
                 } else
                     expand_icon = "fa fa-lg fa-fw";
 
                 if (branch.loading)
                     type_icon = "fa fa-spinner fa-spin";
-                else if (scope.options && scope.options.types && scope.options.types[branch.type])
+                else if (scope.options && scope.options.types && scope.options.types[branch.type.toLowerCase()])
                     type_icon = scope.options.types[branch.type.toLowerCase()];
                 else
                     type_icon = attrs.iconDefault;
 
                 if (scope.options && scope.options.statuses && scope.options.statuses[branch.status]) {
                     status_properties = scope.options.statuses[branch.status];
-                    if (scope.options.buttons && scope.options.buttons[status_properties.button]) {
-                        button_properties = scope.options.buttons[status_properties.button];
-                    }
                 }
+                
+                branch.section = section;
 
                 scope.tree_rows.push({
                     level: level,
@@ -265,7 +297,6 @@ function mmsTree($timeout, $log, $templateCache) {
                     visible: visible,
                     status: branch.status,
                     status_properties: status_properties,
-                    button_properties: button_properties,
                     type_icon: type_icon
                 });
                 if (branch.children) {
@@ -301,6 +332,18 @@ function mmsTree($timeout, $log, $templateCache) {
             }
 
         };
+        
+        scope.expandCallback = function(obj, e){
+            if(!obj.branch.expanded && scope.options.expandCallback) {
+               scope.options.expandCallback(obj.branch.data.sysmlid, obj.branch, false);
+            }
+            obj.branch.expanded = !obj.branch.expanded;
+            if (e) {
+                e.stopPropagation();
+                on_treeData_change();
+            }
+        };
+
         scope.on_treeData_change = on_treeData_change;
         scope.$watch('treeData', on_treeData_change, false);
         scope.$watch('initialSelection', on_initialSelection_change);
@@ -329,6 +372,18 @@ function mmsTree($timeout, $log, $templateCache) {
                 select_branch(branch);
         };
 
+        scope.user_dblclicks_branch = function(branch) {
+            if (branch.onDblclick) {
+                $timeout(function() {
+                    branch.onDblclick(branch);
+                });
+            } else if (scope.onDblclick) {
+                $timeout(function() {
+                    scope.onDblclick({branch: branch});
+                });
+            }
+        };
+
         if (angular.isObject(scope.treeControl)) {
             var tree = scope.treeControl;
             /**
@@ -341,6 +396,7 @@ function mmsTree($timeout, $log, $templateCache) {
              */
             tree.expand_all = function() {
                 for_each_branch(function(b, level) {
+                    scope.expandCallback({ branch: b });
                     b.expanded = true;
                 });
                 on_treeData_change();
@@ -427,6 +483,11 @@ function mmsTree($timeout, $log, $templateCache) {
                 on_treeData_change();
             };
 
+            tree.remove_single_branch = function(branch) {
+                remove_single_branch(branch);
+                on_treeData_change();
+            };
+
             tree.add_root_branch = function(new_branch) {
                 tree.add_branch(null, new_branch);
             };
@@ -443,8 +504,10 @@ function mmsTree($timeout, $log, $templateCache) {
             tree.expand_branch = function(b) {
                 if (!b)
                     b = tree.get_selected_branch();
-                if (b)
+                if (b) {
+                    scope.expandCallback({ branch: b });
                     b.expanded = true;
+                }
                 on_treeData_change();
             };
             /**
@@ -609,6 +672,32 @@ function mmsTree($timeout, $log, $templateCache) {
             tree.sort_branch = function(b, sortFunction) {
                 b.children.sort(sortFunction);
             };
+
+            /**
+             * @ngdoc function
+             * @name mms.directives.directive:mmsTree#get_branch
+             * @methodOf mms.directives.directive:mmsTree
+             * 
+             * @description 
+             * Returns the branch with the specified data
+             */
+            tree.get_branch = function(data) {
+                var branch = null;
+                for_each_branch(function(b) {
+                    // if (angular.equals(b.data,data)) {
+                    //     branch = b;
+                    // }
+                    if (b.data.sysmlid === data.sysmlid) {
+                        branch = b;
+                    }
+                });
+                return branch;
+            };
+            
+            tree.get_rows = function()
+            {
+	            return scope.tree_rows;
+            };
         }
     };
 
@@ -619,7 +708,8 @@ function mmsTree($timeout, $log, $templateCache) {
         scope: {
             treeData: '=',
             sectionNumbering: '=',
-            onSelect: '&',
+            onSelect: '&?',
+            onDblclick: '&?',
             initialSelection: '@',
             treeControl: '=',
             search: '=',

@@ -5,8 +5,8 @@
 angular.module('mmsApp')
 .controller('ToolCtrl', ['$scope', '$rootScope', '$state', '$modal', '$q', '$stateParams',
             'ConfigService', 'ElementService', 'WorkspaceService', 'growl', 
-            'workspaceObj', 'tags', 'tag', 'snapshots', 'site', 'document', 'time',
-function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, ElementService, WorkspaceService, growl, workspaceObj, tags, tag, snapshots, site, document, time) {
+            'workspaceObj', 'tags', 'tag', 'snapshots', 'site', 'document', 'time', 'Utils', 'hotkeys',
+function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, ElementService, WorkspaceService, growl, workspaceObj, tags, tag, snapshots, site, document, time, Utils, hotkeys) {
 
     // TODO rename variable ws
     var ws = $stateParams.workspace;
@@ -26,11 +26,13 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
 
     $scope.vid = $scope.eid;
     $scope.specApi = {};
+    $scope.viewApi = {};
     $scope.viewOrderApi = {};
     $rootScope.mms_togglePane = $scope.$pane;
 
     $scope.show = {
         element: true,
+        history: false,
         reorder: false,
         snapshots: false,
         tags: false
@@ -38,6 +40,7 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
     $scope.tracker = {};
     if (!$rootScope.veEdits)
         $rootScope.veEdits = {};
+    $scope.presentElemEditCnts = {};
 
     // TODO: for editing of workspace/tag elements
     if ($state.current.name === 'workspace') {
@@ -53,7 +56,7 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
 
     if (snapshots) {
         snapshots.forEach(function(snapshot) {
-            ElementService.getElement("master_filter", ws, false, snapshot.created)
+            ElementService.getElement("master_filter", false, ws, snapshot.created, 0)
             .then(function(filter) {
                     var json = JSON.parse(filter.documentation);
                     if (json[document.sysmlid]) {
@@ -63,6 +66,7 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
         });
     }
 
+    // Set edit count for tracker view 
     $scope.veEditsLength = function() {
         return Object.keys($rootScope.veEdits).length;
     };
@@ -74,6 +78,8 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
     $scope.etrackerChange = function() {
         $scope.specApi.keepMode();
         var id = $scope.tracker.etrackerSelected;
+        if (!id)
+            return;
         var info = id.split('|');
         if (info[0] === 'element') {
             $scope.eid = info[1];
@@ -108,12 +114,67 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
         });
     };
 
+    // Check edit count and toggle appropriate save all and edit/edit-asterisk buttons
+    var cleanUpSaveAll = function() {
+        if ($scope.veEditsLength() > 0) {
+            $rootScope.mms_tbApi.setPermission('element.editor.saveall', true);
+            $rootScope.mms_tbApi.setIcon('element.editor', 'fa-edit-asterisk');
+        } else {
+            $rootScope.mms_tbApi.setPermission('element.editor.saveall', false);
+            $rootScope.mms_tbApi.setIcon('element.editor', 'fa-edit');
+        }
+    };
+
     $scope.$on('document.snapshot', function() {
         showPane('snapshots');
     });
 
     $scope.$on('tags', function() {
         showPane('tags');
+    });
+    
+    $scope.$on('element.history', function() {
+        showPane('history');
+    });
+
+    var cleanUpEdit = function(scope) {
+        var ws = scope.ws;
+        var edit = scope.edit;
+        var key = 'element|' + edit.sysmlid + '|' + ws;
+        var currentCnt = 0;
+
+        if ($scope.presentElemEditCnts.hasOwnProperty(key)) {
+            currentCnt = $scope.presentElemEditCnts[key];
+        }
+        if (currentCnt <= 1 && !Utils.hasEdits(scope,null,true)) {
+            delete $rootScope.veEdits[key];
+            delete $scope.presentElemEditCnts[key];
+            cleanUpSaveAll();
+        }
+        else {
+            $scope.presentElemEditCnts[key] = currentCnt - 1;
+        }
+    };
+
+    $scope.$on('presentationElem.edit', function(event, scope) {
+        var ws = scope.ws;
+        var edit = scope.edit;
+        var key = 'element|' + edit.sysmlid + '|' + ws;
+        var currentCnt = 1;
+        $rootScope.veEdits[key] = edit;
+        if ($scope.presentElemEditCnts.hasOwnProperty(key)) {
+            currentCnt = $scope.presentElemEditCnts[key] + 1;
+        }
+        $scope.presentElemEditCnts[key] = currentCnt;
+        cleanUpSaveAll();
+    });
+
+    $scope.$on('presentationElem.save', function(event, scope) {
+        cleanUpEdit(scope);
+    });
+
+    $scope.$on('presentationElem.cancel', function(event, scope) {
+        cleanUpEdit(scope);           
     });
 
     $scope.$on('elementSelected', function(event, eid, type) {
@@ -133,7 +194,7 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
                 $rootScope.mms_tbApi.setPermission('element.editor', true);
         }
         if (type === 'element') {
-            ElementService.getElement(eid, false, ws, time).
+            ElementService.getElement(eid, false, ws, time, 2).
             then(function(element) {
                 var editable = element.editable && time === 'latest';
                 $rootScope.mms_tbApi.setPermission('element.editor', editable);
@@ -143,6 +204,7 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
     });
     $scope.$on('element.viewer', function() {
         $scope.specApi.setEditing(false);
+        cleanUpSaveAll();
         showPane('element');
     });
     $scope.$on('element.editor', function() {
@@ -152,12 +214,7 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
         if (edit) {
             $scope.tracker.etrackerSelected = $scope.elementType + '|' + (edit.sysmlid || edit.id) + '|' + $scope.specWs;
             $rootScope.veEdits[$scope.elementType + '|' + (edit.sysmlid || edit.id) + '|' + $scope.specWs] = edit;
-            $rootScope.mms_tbApi.setIcon('element.editor', 'fa-edit-asterisk');
-            if (Object.keys($rootScope.veEdits).length > 1) {
-                $rootScope.mms_tbApi.setPermission('element.editor.saveall', true);
-            } else {
-                $rootScope.mms_tbApi.setPermission('element.editor.saveall', false);
-            }
+            cleanUpSaveAll();
         }
         if ($scope.elementType !== 'element')
             return;
@@ -175,7 +232,7 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
         $scope.specWs = ws;
         $rootScope.mms_tbApi.select('element.viewer');
         showPane('element');
-        ElementService.getElement(vid, false, ws, time).
+        ElementService.getElement(vid, false, ws, time, 2).
         then(function(element) {
             var editable = element.editable && time === 'latest';
             $rootScope.mms_tbApi.setPermission('element.editor', editable);
@@ -184,6 +241,11 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
         });
         $scope.specApi.setEditing(false);
     });
+
+    $scope.$on('view.reorder.refresh', function() {
+        $scope.viewOrderApi.refresh();
+    });
+
     $scope.$on('view.reorder', function() {
         $scope.viewOrderApi.setEditing(true);
         showPane('reorder');
@@ -191,16 +253,26 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
     
     var elementSaving = false;
     $scope.$on('element.editor.save', function() {
+        save(false);
+    });
+    $scope.$on('element.editor.saveC', function() {
+        save(true);
+    });
+    var save = function(continueEdit) {
         if (elementSaving) {
             growl.info('Please Wait...');
             return;
         }
         elementSaving = true;
-        $rootScope.mms_tbApi.toggleButtonSpinner('element.editor.save');
+        if (!continueEdit)
+            $rootScope.mms_tbApi.toggleButtonSpinner('element.editor.save');
+        else
+            $rootScope.mms_tbApi.toggleButtonSpinner('element.editor.saveC');
         $scope.specApi.save().then(function(data) {
             elementSaving = false;
             growl.success('Save Successful');
-            $rootScope.mms_tbApi.toggleButtonSpinner('element.editor.save');
+            if (continueEdit) 
+                return;
             var edit = $scope.specApi.getEdits();
             delete $rootScope.veEdits[$scope.elementType + '|' + (edit.sysmlid || edit.id ) + '|' + $scope.specWs];
             if (Object.keys($rootScope.veEdits).length > 0) {
@@ -214,9 +286,7 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
             } else {
                 $scope.specApi.setEditing(false);
                 $rootScope.mms_tbApi.select('element.viewer');
-                if (Object.keys($rootScope.veEdits).length === 0) {
-                    $rootScope.mms_tbApi.setIcon('element.editor', 'fa-edit');
-                }
+                cleanUpSaveAll();
             }
         }, function(reason) {
             elementSaving = false;
@@ -226,12 +296,21 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
                 growl.warning(reason.message);
             else if (reason.type === 'error')
                 growl.error(reason.message);
-            $rootScope.mms_tbApi.toggleButtonSpinner('element.editor.save');
+        }).finally(function() {
+            if (!continueEdit)
+                $rootScope.mms_tbApi.toggleButtonSpinner('element.editor.save');
+            else
+                $rootScope.mms_tbApi.toggleButtonSpinner('element.editor.saveC');
         });
-
         $rootScope.mms_tbApi.select('element.editor');
-    });
+    };
 
+    hotkeys.bindTo($scope)
+    .add({
+        combo: 'alt+a',
+        description: 'save all',
+        callback: function() {$scope.$broadcast('element.editor.saveall');}
+    });
     var savingAll = false;
     $scope.$on('element.editor.saveall', function() {
         if (savingAll) {
@@ -282,9 +361,11 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
             var failedType = 'element';
             var failedWs = 'master';
             results.forEach(function(ob) {
-                if (ob.status === 200)
+                if (ob.status === 200) {
                     delete $rootScope.veEdits[ob.type + '|' + ob.id + '|' + ob.ws];
-                else {
+                    if (ob.type === 'element')
+                        $rootScope.$broadcast('element.updated', ob.id, ob.ws, 'all');
+                } else {
                     somefail = true;
                     failedId = ob.id;
                     failedType = ob.type;
@@ -305,6 +386,7 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
             }
             $rootScope.mms_tbApi.toggleButtonSpinner('element.editor.saveall');
             savingAll = false;
+            cleanUpSaveAll();
 
             if (Object.keys($rootScope.veEdits).length === 0) {
                 $rootScope.mms_tbApi.setIcon('element.editor', 'fa-edit');
@@ -328,6 +410,7 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
                 $scope.specApi.setEditing(false);
                 $rootScope.mms_tbApi.select('element.viewer');
                 $rootScope.mms_tbApi.setIcon('element.editor', 'fa-edit');
+                cleanUpSaveAll();
             }
         };
         if ($scope.specApi.hasEdits()) {
@@ -359,9 +442,11 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
         $rootScope.mms_tbApi.toggleButtonSpinner('view.reorder.save');
         $scope.viewOrderApi.save().then(function(data) {
             viewSaving = false;
+            $scope.viewOrderApi.refresh();
             growl.success('Save Succesful');
             $rootScope.mms_tbApi.toggleButtonSpinner('view.reorder.save');
         }, function(reason) {
+            $scope.viewOrderApi.refresh();
             viewSaving = false;
             if (reason.type === 'info')
                 growl.info(reason.message);
@@ -375,7 +460,7 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
     });
     $scope.$on('view.reorder.cancel', function() {
         $scope.specApi.setEditing(false);
-        $scope.viewOrderApi.revertEdits();
+        $scope.viewOrderApi.refresh();
         $rootScope.mms_tbApi.select('element.viewer');
         showPane('element');
     });

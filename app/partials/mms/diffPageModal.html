@@ -1,0 +1,33 @@
+<div class="assistModal">
+	<div ng-if="pane == 'diffInProgress'" class="modal-body">
+        <h3>Recalculating Differences</h3>
+        <div>
+	        The differences between these two items are being recalculated.
+        </div>
+        <br>
+        <div>
+	        User "{{originator}}" started this operation on {{diffStartTime | date:'M/d/yy h:mm a'}}. Contact {{originator}} at {{originatorEmail}} for more information.
+        </div>
+    </div>
+
+    <div ng-if="pane == 'outdatedDiff'" class="modal-body">
+        <h3>Differences are outdated!</h3>
+        <div>
+	        One or both of these items have had changes since this diff was created. 
+        </div>
+    </div>
+    <div ng-if="pane == 'outdatedDiff'" class="modal-footer">
+        <button class="btn btn-primary" ng-click="startDiff()">Regenerate Differences</button>
+        <button class="btn btn-danger" ng-click="finished()">I don't care, give me the outdated diff.</button>
+    </div>
+
+    <div ng-if="pane == 'generating'" class="modal-body">
+        <h3>Recalculating Differences</h3>
+        <div>
+            The differences between these two items are now being recalculated. You will receive an email once the job has completed.
+        </div>
+    </div>
+    <div ng-if="pane == 'generating'" class="modal-footer">
+        <button class="btn btn-primary" ng-click="finished()">Done</button>
+    </div>
+</div>

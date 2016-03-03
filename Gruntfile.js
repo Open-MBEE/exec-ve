@@ -4,6 +4,55 @@ module.exports = function(grunt) {
 
   var jsFiles = ['app/js/**/*.js', 'src/**/*.js'];
 
+  var servers = grunt.file.readJSON('ems-config/angular-mms-grunt-servers.json');
+  var artifactory = grunt.file.readJSON('ems-config/artifactory.json');
+  var connectObject = {
+    'static': {
+      options: {
+        hostname: 'localhost',
+        port: 9001,
+        base: './build'
+      }
+    },
+    docs: {
+        options: {
+          hostname: 'localhost',
+          port: 10000,
+          base: './build/docs',
+        }
+    }};
+  for (var key in servers) {
+    var serverPort = 443;
+    var serverHttps = true;
+    if (key == "localhost") {
+       serverPort = 8080;
+       serverHttps = false;
+    } 
+    connectObject[key] = {
+        options: {
+          hostname: '*',
+          port: 9000,
+          middleware: function(connect) {
+            return [proxySnippet];
+          }
+        },
+        proxies: [
+          {
+            context: '/alfresco',  // '/api'
+            host: servers[key],
+            changeOrigin: true,
+            https: serverHttps,
+            port: serverPort
+          },
+          {
+            context: '/',
+            host: 'localhost',
+            port: 9001
+          }
+        ] 
+    };
+  }
+
   // Project configuration.
   grunt.initConfig({
     
@@ -21,7 +70,15 @@ module.exports = function(grunt) {
         }
       }
     },
-    
+
+    cacheBust: {
+      assets: {
+        files: {
+          src: ['build/mms.html', 'build/mmsFullDoc.html']
+        }
+      }
+    },
+
     wiredep: {
 
       target: {
@@ -43,15 +100,27 @@ module.exports = function(grunt) {
 
     html2js: {
       options: {
-        module: 'mms.directives.tpls',
+        module: function(modulePath, taskName) {
+          if (taskName === 'directives')
+            return 'mms.directives.tpls';
+          return 'app.tpls';
+        },
+        //module: 'mms.directives.tpls',
         rename: function(modulePath) {
-          var moduleName = modulePath.replace('directives/templates/', '');
-          return 'mms/templates/' + moduleName;
+          if (modulePath.indexOf('directives/templates') > -1) {
+            var moduleName = modulePath.replace('directives/templates/', '');
+            return 'mms/templates/' + moduleName;
+          }
+          return modulePath.replace('app/', '').replace('../', '');
         }
       },
-      main: {
+      directives: {
         src: ['src/directives/templates/*.html'],
         dest: 'dist/mms.directives.tpls.js'
+      },
+      main: {
+        src: ['app/partials/mms/*.html'],
+        dest: 'build/js/mms/app.tpls.js'
       }
     },
 
@@ -105,7 +174,7 @@ module.exports = function(grunt) {
       dist : {
         files: {
           'dist/css/partials/mms.css': 'src/directives/templates/styles/mms-main.scss',
-          'dist/css/partials/mm-main.css': 'app/styles/mm/mm-main.scss',
+          //'dist/css/partials/mm-main.css': 'app/styles/mm/mm-main.scss',
           'dist/css/partials/ve-main.css': 'app/styles/ve/ve-main.scss'
         }
       }
@@ -121,8 +190,8 @@ module.exports = function(grunt) {
       },
       combine: {
         files: {
-          'dist/css/mm-mms.styles.min.css':
-            ['dist/css/partials/mms.min.css', 'dist/css/partials/mm-main.min.css'],
+          //'dist/css/mm-mms.styles.min.css':
+            //['dist/css/partials/mms.min.css', 'dist/css/partials/mm-main.min.css'],
           'dist/css/ve-mms.styles.min.css':
             ['dist/css/partials/mms.min.css', 'dist/css/partials/ve-main.min.css']
         }
@@ -133,18 +202,26 @@ module.exports = function(grunt) {
       beforeconcat: jsFiles,
       afterconcat: ['dist/mms.js', 'dist/mms.directives.js'],
       options: {
+        evil: true, //allow eval for timely integration
         globalstrict: true,
         globals: {
           angular: true,
           window: true,
-          console: true
+          console: true,
+          Stomp:true,
+          Timely: true,
+          jQuery: true,
+          $: true,
+          //__timely: true,
+          Blob: true,
+          navigator: true
         }
       }
     },
 
     ngdocs: {
       options: {
-        dest: 'docs',
+        dest: 'build/docs',
         html5Mode: false,
         title: 'MMS',
         startPage: '/api'
@@ -155,206 +232,7 @@ module.exports = function(grunt) {
       }
     },
 
-    connect: {
-      'static': {
-        options: {
-          hostname: 'localhost',
-          port: 9001,
-          base: './build',
-        }
-      },
-      docs: {
-        options: {
-          hostname: 'localhost',
-          port: 10000,
-          base: './docs',
-        }
-      },
-      ems: {
-        options: {
-          hostname: '*',
-          port: 9000,
-          middleware: function(connect) {
-            return [proxySnippet];
-          }
-        },
-        proxies: [
-          {
-            context: '/alfresco',  // '/api'
-            host: 'ems.jpl.nasa.gov',//128.149.16.152',
-            port: 443,
-            changeOrigin: true,
-            https: true,
-          },
-          {
-            context: '/',
-            host: 'localhost',
-            port: 9001
-          }
-        ]
-      },
-      emstest: {
-        options: {
-          hostname: '*',
-          port: 9000,
-          middleware: function(connect) {
-            return [proxySnippet];
-          }
-        },
-        proxies: [
-          {
-            context: '/alfresco',  // '/api'
-            host: 'ems-test.jpl.nasa.gov',//128.149.16.152',
-            port: 443,
-            changeOrigin: true,
-            https: true,
-          },
-          {
-            context: '/',
-            host: 'localhost',
-            port: 9001
-          }
-        ]
-      },
-      emsstg: {
-        options: {
-          hostname: '*',
-          port: 9000,
-          middleware: function(connect) {
-            return [proxySnippet];
-          }
-        },
-        proxies: [
-          {
-            context: '/alfresco',  // '/api'
-            host: 'ems-stg.jpl.nasa.gov',//128.149.16.152',
-            port: 443,
-            changeOrigin: true,
-            https: true,
-          },
-          {
-            context: '/',
-            host: 'localhost',
-            port: 9001
-          }
-        ]
-      },
-      emsint: {
-        options: {
-          hostname: '*',
-          port: 9000,
-          middleware: function(connect) {
-            return [proxySnippet];
-          }
-        },
-        proxies: [
-          {
-            context: '/alfresco',  // '/api'
-            host: 'ems-int.jpl.nasa.gov',//128.149.16.152',
-            port: 443,
-            changeOrigin: true,
-            https: true,
-          },
-          {
-            context: '/',
-            host: 'localhost',
-            port: 9001
-          }
-        ]
-      },      
-      europaemsstg: {
-        options: {
-          hostname: '*',
-          port: 9000,
-          middleware: function(connect) {
-            return [proxySnippet];
-          }
-        },
-        proxies: [
-          {
-            context: '/alfresco',  // '/api'
-            host: 'europaems-stg.jpl.nasa.gov',//128.149.16.152',
-            port: 443,
-            changeOrigin: true,
-            https: true,
-          },
-          {
-            context: '/',
-            host: 'localhost',
-            port: 9001
-          }
-        ]
-      },
-      europaems: {
-        options: {
-          hostname: '*',
-          port: 9000,
-          middleware: function(connect) {
-            return [proxySnippet];
-          }
-        },
-        proxies: [
-          {
-            context: '/alfresco',  // '/api'
-            host: 'europaems.jpl.nasa.gov',//128.149.16.152',
-            port: 443,
-            changeOrigin: true,
-            https: true,
-          },
-          {
-            context: '/',
-            host: 'localhost',
-            port: 9001
-          }
-        ]
-      },
-      europaemsint: {
-        options: {
-          hostname: '*',
-          port: 9000,
-          middleware: function(connect) {
-            return [proxySnippet];
-          }
-        },
-        proxies: [
-          {
-            context: '/alfresco',  // '/api'
-            host: 'europaems-int.jpl.nasa.gov',//128.149.16.152',
-            port: 443,
-            changeOrigin: true,
-            https: true,
-          },
-          {
-            context: '/',
-            host: 'localhost',
-            port: 9001
-          }
-        ]
-      },
-      localhost: {
-        options: {
-          hostname: '*',
-          port: 9000,
-          middleware: function(connect) {
-            return [proxySnippet];
-          }
-        },
-        proxies: [
-          {
-            context: '/alfresco',  // '/api'
-            host: 'localhost',//128.149.16.152',
-            port: 8080,
-            changeOrigin: false,
-            https: false,
-          },
-          {
-            context: '/',
-            host: 'localhost',
-            port: 9001
-          }
-        ]
-      }
-    },
+    connect: connectObject,
 
     watch: {
       dev: {
@@ -371,7 +249,7 @@ module.exports = function(grunt) {
       },
     },
 
-    clean: ["build", "dist", "docs"],
+    clean: ["app/bower_components", "build", "dist", "docs"],
 
     copy: {
       main: {
@@ -387,10 +265,10 @@ module.exports = function(grunt) {
 
     artifactory: {
       options: {
-        url: 'http://europambee-build.jpl.nasa.gov:8082',
+        url: artifactory.url,
         repository: 'libs-snapshot-local',
-        username: 'admin',
-        password: 'password'
+        username: artifactory.username,
+        password: artifactory.password
       },
       client: {
         files: [{
@@ -399,7 +277,7 @@ module.exports = function(grunt) {
         options: {
           publish: [{
             id: 'gov.nasa.jpl:evm:zip',
-            version: '0.2.1-SNAPSHOT',
+            version: '0.2.3-SNAPSHOT',
             path: 'deploy/'
           }]
         }
@@ -407,8 +285,30 @@ module.exports = function(grunt) {
     },
 
     karma: {
-      unit: {
-        configFile: 'karma.conf.js'
+      options:{
+        configFile:'config/develop/karma.develop.conf.js'
+      },
+      dev:{
+        files:
+          'test/develop/unit/**/*.js'
+      }
+    },
+
+    protractor: {
+      options: {
+        keepAlive: true, // If false, the grunt process stops when the test fails.
+        noColor: false, // If true, protractor will not use colors in its output.
+      },
+      develop: {   // Grunt requires at least one target to run so you can simply put 'all: {}' here too.
+        options: {
+          configFile: "config/develop/protractor.develop.conf.js" // Target-specific config file
+        }
+      },
+      suite:{
+        all:{},
+        options: {
+          configFile: "config/master/protractor.master.conf.js" // Target-specific config file
+        }
       }
     },
 
@@ -474,9 +374,11 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-bower-install-simple');
   grunt.loadNpmTasks('grunt-wiredep');
   grunt.loadNpmTasks('grunt-karma');
+  grunt.loadNpmTasks('grunt-protractor-runner');
   grunt.loadNpmTasks('grunt-artifactory-artifact');
   grunt.loadNpmTasks('grunt-sloc');
   grunt.loadNpmTasks('grunt-plato');  
+  grunt.loadNpmTasks('grunt-cache-bust');
   
   // grunt.registerTask('install', ['npm-install', 'bower']);
   grunt.registerTask('install', ['bower-install-simple']);
@@ -485,11 +387,13 @@ module.exports = function(grunt) {
   grunt.registerTask('minify',  ['cssmin', 'uglify']);
   grunt.registerTask('wire',    ['wiredep']);
 
-  grunt.registerTask('dev-build',     ['install', 'compile', 'lint', 'concat', 'minify', 'copy', 'wire']);
-  grunt.registerTask('release-build', ['install', 'compile', 'lint', 'concat', 'minify', 'copy', 'wire']);
+  grunt.registerTask('dev-build',     ['install', 'compile', 'lint', 'concat', 'minify', 'copy', 'wire', 'cacheBust']);
+  grunt.registerTask('release-build', ['install', 'compile', 'lint', 'concat', 'minify', 'copy', 'wire', 'cacheBust']);
   grunt.registerTask('docs-build',    ['ngdocs']);
   grunt.registerTask('default', ['dev-build']);
-  grunt.registerTask('deploy', ['dev-build', 'artifactory:client:publish']);
+  grunt.registerTask('deploy', ['dev-build', 'ngdocs', 'artifactory:client:publish']);
+  grunt.registerTask('test', ['karma']);
+  grunt.registerTask('e2e-test', ['protractor']);
 
   grunt.registerTask('dev', function(arg1) {
       grunt.task.run('dev-build', 'connect:static');
@@ -536,4 +440,14 @@ module.exports = function(grunt) {
       grunt.task.run('watch:' + build);
     }
   );
+
+  grunt.registerTask('debug', function () {
+      grunt.log.writeln("Launching Karma");
+      grunt.task.run('test');
+  });
+
+  grunt.registerTask('e2e',function(arg1) {
+    grunt.log.writeln("Launching Protractor");
+    grunt.task.run('e2e-test');
+  })
 };

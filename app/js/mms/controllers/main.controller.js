@@ -3,19 +3,18 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('MainCtrl', ['$scope', '$location', '$rootScope', '$state', '_', '$window', 'growl', '$http', 'URLService',
-function($scope, $location, $rootScope, $state, _, $window, growl, $http, URLService) {
+.controller('MainCtrl', ['$scope', '$location', '$rootScope', '$state', '_', '$window', 'growl', '$http', 'URLService', 'hotkeys', 'growlMessages', 'StompService', 'UtilsService', 'HttpService',
+function($scope, $location, $rootScope, $state, _, $window, growl, $http, URLService, hotkeys, growlMessages, StompService, UtilsService, HttpService) {
+    //StompService.connect("guest", "guest", function(){} ,function(){}, '/');
     $rootScope.mms_viewContentLoading = false;
     $rootScope.mms_treeInitial = '';
     $rootScope.mms_title = '';
-    $rootScope.mms_footer = 'The technical data in this document is controlled under the U.S. Export Regulations, release to foreign persons may require an export authorization.';
+    $rootScope.mms_footer = 'JPL/Caltech PROPRIETARY — Not for Public Release or Redistribution. No export controlled documents allowed on this server.';
 
     var host = $location.host();
-    if ($location.host().indexOf('rn-ems') !== -1) {
-        // special footer for rn-ems
-        $rootScope.mms_footer = 'JPL/Caltech PROPRIETARY — Not for Public Release or Redistribution. No export controlled documents allowed on this server.';
+    if ($location.host().indexOf('europaems') !== -1) {
+        $rootScope.mms_footer = 'The technical data in this document is controlled under the U.S. Export Regulations, release to foreign persons may require an export authorization.';
     }
-
     $window.addEventListener('beforeunload', function(event) {
         if ($rootScope.veEdits && !_.isEmpty($rootScope.veEdits)) {
             var message = 'You may have unsaved changes, are you sure you want to leave?';
@@ -24,26 +23,40 @@ function($scope, $location, $rootScope, $state, _, $window, growl, $http, URLSer
         }
     });
 
-    // Per CMED-737, always check the login first, so we can authenticate into the server 
-    // before making any more calls.
-    /*$http.get(URLService.getCheckLoginURL())
-    .success(function(data, status, headers, config) {
-        // Do nothing
-    }).error(function(data, status, headers, config) {
-        // On error, re-load the page:
-        // Note: this may not be needed b/c the browser will keep prompting for credentials till
-        //       they are correct
-        $state.reload();
-    });*/
+    hotkeys.bindTo($scope)
+        .add({
+            combo: 'alt+m',
+            description: 'close all messages',
+            callback: function() {growlMessages.destroyAllMessages();}
+        }).add({
+            combo: '@',
+            description: 'fast cf in editor',
+            callback: function() {}
+        });
 
     $scope.$on('$stateChangeError', function(event, toState, toParams, fromState, fromParams, error) {
         growl.error('Error: ' + error.message);
+        $rootScope.mms_viewContentLoading = false;
     });
 
-    $rootScope.$on('$viewContentLoading', 
+    /*$rootScope.$on('$viewContentLoading', 
     function(event, viewConfig){ 
         if (viewConfig.view.controller === 'ViewCtrl')
             $rootScope.mms_viewContentLoading = true;
+    });*/
+
+    $rootScope.$on('$stateChangeStart', 
+    function(event){ 
+        $rootScope.mms_viewContentLoading = true;
+        HttpService.transformQueue();
+    });
+    
+    //actions for stomp checking edit mode
+    $scope.$on("stomp.element", function(event, deltaSource, deltaWorkspaceId, deltaElementID, deltaModifier, deltaName){
+        console.log("main controller=============================================================");
+        if($rootScope.veEdits && $rootScope.veEdits['element|' + deltaElementID + '|' + deltaWorkspaceId] === undefined){
+            UtilsService.mergeElement( deltaSource, deltaElementID, deltaWorkspaceId , true , "all" );
+        }
     });
 
     $rootScope.$on('$stateChangeSuccess', 
@@ -65,6 +78,8 @@ function($scope, $location, $rootScope, $state, _, $window, growl, $http, URLSer
                 else
                     $rootScope.mms_treeInitial = toParams.document;
             }
+            $rootScope.mms_viewContentLoading = false;
         }
     );
+    
 }]);

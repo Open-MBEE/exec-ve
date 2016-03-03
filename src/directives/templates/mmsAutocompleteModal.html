@@ -1,0 +1,6 @@
+<div class="modal-body">
+  <input typeahead="autocompleteItem.name for autocompleteItem in autocompleteItems | filter:$viewValue | limitTo:10" typeahead-on-select='autocompleteOnSelect($item, $model, $label)' ng-model="selected" ng-keyup="$event.keyCode === 13 && autocomplete(true)" class="autocomplete-modal-typeahead form-control" placeholder="Type an element name to Cf" autofocus />
+  <div class="autocomplete-modal-help">
+    Can't find what you're looking for? <a ng-click="autocomplete(false)">Search</a>
+  </div>
+</div>
