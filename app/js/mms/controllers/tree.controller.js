@@ -609,14 +609,11 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
                 //if (branch.type === 'view')
                 //  viewLevel2Func(branch.data.sysmlid, branch); //TODO remove when priority queue is done
                 $location.hash(hash);
-                $rootScope.veCurrentView = view;
-                ViewService.setCurrentViewId(view);
                 $anchorScroll();
             } else if (branch.type === 'view') {
                 //viewLevel2Func(branch.data.sysmlid, branch); //TODO remove when priority queue is done
                 $state.go('workspace.site.document.view', {view: branch.data.sysmlid, search: undefined});
             } else if (branch.type === 'section') {
-                ViewService.setCurrentViewId(view);
                 $state.go('workspace.site.document.view', {view: hash, search: undefined});
                 /*$timeout(function() {
                     $location.hash(hash);
@@ -1195,13 +1192,6 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
         $timeout(function() {
             if ($rootScope.mms_treeInitial) {
                 var node = viewId2node[$rootScope.mms_treeInitial];
-                if (node && node.type === 'view') {
-                    $rootScope.veCurrentView = $rootScope.mms_treeInitial;
-                    ViewService.setCurrentViewId($rootScope.mms_treeInitial);
-                } else if (node && node.type === 'section') {
-                    $rootScope.veCurrentView = node.view;
-                    ViewService.setCurrentViewId(node.view);
-                }
                 //var node = viewId2node[$rootScope.mms_treeInitial];
                 //if (node)
                 //    viewLevel2Func($rootScope.mms_treeInitial, node);

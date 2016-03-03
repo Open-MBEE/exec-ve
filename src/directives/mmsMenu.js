@@ -5,7 +5,7 @@ angular.module('mms.directives')
 
 /**
  * @ngdoc directive
- * @name mms.directives.directive:mmsNav
+ * @name mms.directives.directive:mmsMenu
  *
  * @requires mms.SiteService
  * @requires $templateCache
@@ -13,27 +13,8 @@ angular.module('mms.directives')
  * @restrict E
  *
  * @description
- * A prebuilt nav bar that's customizable with current page title, current site,
- * and the "type" of page/app. Include navigation to other sites' dashboard
- * and docweb pages.
- * ## Example
- *  <pre>
-    <mms-nav mms-title="Model Manager" mms-ws="master" mms-config="tag" mms-site="europa"></mms-nav>
-    </pre>
- * ## Support for responsive sliding pane on small browser
- *  <pre>
-    <div id="outer-wrap">
-        <div id="inner-wrap">
-            <mms-nav mms-title="Model Manager" mms-ws="master" mms-config="tag" mms-site="europa"></mms-nav>
-            <!-- everything visible on the page should go in here -->
-        </div>
-    </div>
-    </pre>
- * @param {string} mmsWs workspace name
- * @param {object} mmsSite site object
- * @param {object} mmsDoc document object
- * @param {object} mmsConfig tag/config object
- * @param {string} mmsTitle Title to display
+ * TBA
+ *
  */
 function mmsMenu(SiteService, WorkspaceService, ConfigService, $state, $templateCache, growl) {
     var template = $templateCache.get('mms/templates/mmsMenu.html');

@@ -83,17 +83,7 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
             $scope.searchOptions= {};
             $scope.searchOptions.callback = $scope.choose;
             $scope.searchOptions.emptyDocTxt = 'This field is empty, but you can still click here to cross-reference a placeholder.';
-            $scope.makeNew = function() {
-                $scope.proposeClass = "fa fa-spin fa-spinner";
-                ElementService.createElement({name: $scope.newE.name, documentation: $scope.newE.documentation, specialization: {type: 'Element'}}, scope.mmsWs, scope.mmsSite)
-                .then(function(data) {
-                    $scope.searchResults = [data];
-                    $scope.proposeClass = "";
-                }, function(reason) {
-                    growl.error("Propose Error: " + reason.message);
-                    $scope.proposeClass = "";
-                });
-            };
+
             $scope.makeNewAndChoose = function() {
                 if (!$scope.newE.name) {
                     growl.error('Error: A name for your new element is required.');
@@ -102,14 +92,28 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                     growl.error('Error: Selection of a property to cross-reference is required.');
                     return;
                 }
-
                 $scope.proposeClass = "fa fa-spin fa-spinner";
-                ElementService.createElement({name: $scope.newE.name, documentation: $scope.newE.documentation, specialization: {type: 'Element'}}, scope.mmsWs, scope.mmsSite)
+                var sysmlid = UtilsService.createMmsId();
+                var currentView = ViewService.getCurrentView();
+                var ids = UtilsService.getIdInfo(currentView, scope.mmsSite);
+                var currentSiteId = ids.siteId;
+                var ownerId = ids.holdingBinId;
+                var toCreate = {
+                    sysmlid: sysmlid,
+                    name: $scope.newE.name, 
+                    documentation: $scope.newE.documentation, 
+                    specialization: {type: 'Element'},
+                    appliedMetatypes: ['_9_0_62a020a_1105704885343_144138_7929'],
+                    isMetatype: false
+                };
+                if (ownerId)
+                    toCreate.owner = ownerId;
+                ElementService.createElement(toCreate, scope.mmsWs, currentSiteId)
                 .then(function(data) {
                     if ($scope.requestName) {
-                        $scope.choose(data.sysmlid, 'name', $scope.newE.name);
+                        $scope.choose(data, 'name');
                     } else if ($scope.requestDocumentation) {
-                        $scope.choose(data.sysmlid, 'doc', $scope.newE.name);
+                        $scope.choose(data, 'doc');
                     }
                     $scope.proposeClass = "";
                 }, function(reason) {
@@ -296,7 +300,9 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
         };
 
         var commentCtrl = function($scope, $modalInstance) {
+            var sysmlid = UtilsService.createMmsId();
             $scope.comment = {
+                sysmlid: sysmlid,
                 name: 'Comment ' + new Date().toISOString(), 
                 documentation: '', 
                 specialization: {
@@ -312,8 +318,8 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                     return;
                 }
                 $scope.oking = true;
-                if (ViewService.getCurrentViewId())
-                    $scope.comment.owner = ViewService.getCurrentViewId();
+                if (ViewService.getCurrentView())
+                    $scope.comment.owner = ViewService.getCurrentView().sysmlid;
                 ElementService.createElement($scope.comment, scope.mmsWs, scope.mmsSite)
                 .then(function(data) {
                     var tag = '<mms-transclude-com data-mms-eid="' + data.sysmlid + '">comment:' + data.creator + '</mms-transclude-com> ';

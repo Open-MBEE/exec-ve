@@ -11,8 +11,8 @@
             </div>
             <div class="container-search-type">
                 <div class="btn-group btn-group-xs">
-                    <button ng-click="setSearchType('all')" type="button" class="btn-search-all btn-search-type btn btn-default">ALL</button>
-                    <button ng-click="setSearchType('name')" type="button" class="btn-search-name btn-search-type btn btn-default active">NAME</button>
+                    <button ng-click="setSearchType('all')" type="button" class="btn-search-all btn-search-type btn btn-default active">ALL</button>
+                    <button ng-click="setSearchType('name')" type="button" class="btn-search-name btn-search-type btn btn-default">NAME</button>
                     <button ng-click="setSearchType('documentation')" type="button" class="btn-search-documentation btn btn-search-type btn-default">DOCUMENTATION</button>
                     <button ng-click="setSearchType('value')" type="button" class="btn-search-value btn-search-type btn btn-default">VALUE</button>
                     <button ng-click="setSearchType('id')" type="button" class="btn-search-id btn-search-type btn btn-default">MDID</button>
@@ -61,7 +61,7 @@
                 </div>
             </div>
             <div class="elem-type-wrapper">
-                <label>TYPE</label>
+                <label>METATYPE</label>
                 <div ng-repeat="type in elem.appliedMetatypes" class="elem-type">
                     <mms-transclude-name mms-eid="{{type}}" no-click="true"></mms-transclude-name>
                 </div>
@@ -95,7 +95,7 @@
                 <label>PROPERTIES</label>
                 <table>
                     <tbody>
-                        <tr ng-repeat="row in elem.properties">
+                        <tr ng-repeat="row in elem.properties2">
                             <td ng-repeat="property in row">
                                 {{property.name}}<span ng-show="property.specialization.isSlot"><mms-transclude-name mms-eid="{{property.specialization.propertyType}}"></mms-transclude-name></span>: 
                                 <a ng-click="userResultClick(property, 'val')"><span ng-repeat="val in property.specialization.value">{{val.string || val.boolean + '' || val.naturalValue || val.integer || val.double || val.expressionBody[0] || 'Default Value'}}<span class="ellipses">{{(val.expressionBody[0] && val.expressionBody.length > 1) ? ' ...' : '' }}</span>{{$last ? '' : ', '}}</span></a>

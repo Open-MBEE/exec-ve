@@ -37,6 +37,7 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
         view2children[view.id] = view.childrenViews;
     });
 
+    ViewService.setCurrentView(document);
     var buildViewElt = function(vId, curSec) {
       return {id: vId, api: {
             init: function(dis) {
@@ -110,98 +111,8 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
             description: 'toggle show elements',
             callback: function() {$scope.$broadcast('show.elements');}
         });
-        // TODO: This code is duplicated in the ViewCtrl
-        // **WARNING** IF YOU CHANGE THIS CODE, NEED TO UPDATE IN VIEW CTRL TOO
-
-        if ($state.includes('workspace.site.document') || $state.includes('workspace.site.documentpreview')) {
-            // if (snapshot !== null) {
-            //     var pdfUrl = getPDFUrl();
-            //     if (pdfUrl !== null && pdfUrl !== undefined) {
-            //         $scope.bbApi.addButton(UxService.getButtonBarButton('download.pdf'));                
-            //     } else {
-            //         $scope.bbApi.addButton(UxService.getButtonBarButton('generate.pdf'));
-
-            //         var pdfStatus = getPDFStatus();
-            //         if (pdfStatus === 'Generating...')
-            //             $scope.bbApi.toggleButtonSpinner('generate.pdf');
-            //         else if (pdfStatus !== null)
-            //             $scope.bbApi.setTooltip('generate.pdf', pdfStatus);
-            //     }
-
-            //     var zipUrl = getZipUrl();
-            //     if (zipUrl !== null && zipUrl !== undefined) {
-            //         $scope.bbApi.addButton(UxService.getButtonBarButton('download.zip'));                
-            //     } else {
-            //         $scope.bbApi.addButton(UxService.getButtonBarButton('generate.zip'));
-
-            //         var zipStatus = getZipStatus();
-            //         if (zipStatus === 'Generating...')
-            //             $scope.bbApi.toggleButtonSpinner('generate.zip');
-            //         else if (zipStatus !== null)
-            //             $scope.bbApi.setTooltip('generate.zip', zipStatus);
-            //     }
-            // }
-        }
     };
 
-    // TODO: This code is duplicated in the ViewCtrl
-    // **WARNING** IF YOU CHANGE THIS CODE, NEED TO UPDATE IN VIEW CTRL TOO
-
-    var getPDFStatus = function(){
-        if(!snapshot) return null;
-        var formats = snapshot.formats;
-        if(!formats || formats.length===0) return null;
-        for(var i=0; i < formats.length; i++){
-            if(formats[i].type=='pdf') {
-                var status = formats[i].status;
-                if(status == 'Generating') status = 'Generating...';
-                else if(status == 'Error') status = 'Regenerate PDF';
-                return status;
-            }
-        }
-        return null;
-    };
-
-    var getPDFUrl = function(){
-        if(!snapshot) return null;
-        var formats = snapshot.formats;
-        if(!formats || formats.length===0) return null;
-        for(var i=0; i < formats.length; i++){
-            if(formats[i].type=='pdf'){
-                return formats[i].url;
-            }
-        }
-        return null;
-    };
-
-    var getZipStatus = function(){
-        if(!snapshot) return null;
-        var formats = snapshot.formats;
-        if(!formats || formats.length===0) return null;
-        for(var i=0; i < formats.length; i++){
-            if(formats[i].type=='html') {
-                var status = formats[i].status;
-                if(status == 'Generating') status = 'Generating...';
-                else if(status == 'Error') status = 'Regenerate Zip';
-                return status;
-            }
-        }
-        return null;
-    };
-
-    var getZipUrl = function(){
-        if(angular.isUndefined(snapshot)) return null;
-        if(snapshot===null) return null;
-        
-        var formats = snapshot.formats;
-        if(formats===undefined || formats===null || formats.length===0) return null;
-        for(var i=0; i < formats.length; i++){
-            if(formats[i].type=='html'){
-                return formats[i].url;  
-            } 
-        }
-        return null;
-    };
     var converting = false;
     $scope.$on('convert.pdf', function() {
         if (converting) {
@@ -209,91 +120,41 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
         }
         converting = true;
         $scope.bbApi.toggleButtonSpinner('convert.pdf');
-        //try{
-            // $scope.bbApi.toggleButtonSpinner('convert.pdf');
-            MmsAppUtils.generateHtml(document, $scope.ws, time, false)
-            .then(function(ob) {
-                var cover = ob.cover;
-                var html = ob.contents;
-                var doc = {};
-                doc.docId = document.sysmlid;
-                doc.header = ob.header;
-                doc.footer = ob.footer;
-                doc.html = html;
-                doc.cover = cover;
-                doc.time = time;
-                doc.workspace = $scope.ws;
-                doc.name = document.sysmlid + '_' + time + '_' + new Date().getTime();
-                if(time == 'latest') 
-                    doc.tagId = time;
-                else {
-                    if(tag) 
-                        doc.tagId = tag.name;
-                }
-
-            // MmsAppUtils.popupPrintConfirm(document, $scope.ws, time, true, false);
-                ConfigService.convertHtmlToPdf(doc, site.sysmlid, $scope.ws)
-                .then(
-                    function(reuslt){
-                    growl.info('Converting HTML to PDF...Please wait for a completion email');
-                    // $scope.bbApi.toggleButtonSpinner('convert.pdf');
-                    },
-                    function(reason){
-                    growl.error("Failed to convert HTML to PDF: " + reason.message);
-                    }
-                ).finally(function() {
-                    converting = false;
-                    $scope.bbApi.toggleButtonSpinner('convert.pdf');
-                });
-            });
-            
-        //}
-        //catch(error){
-         //   growl.info(error.message);
-        //}
-        
-        // try{
-        //     growl.info(window.document.body.outerHTML);
-        // }catch(error){
-        //     growl.info(error.message);
-        // }
-    });
-
-
-    $scope.$on('generate.pdf', function() {
-        if (getPDFStatus() === 'Generating...')
-            return;
-        $scope.bbApi.toggleButtonSpinner('generate.pdf');
-        $scope.bbApi.toggleButtonSpinner('generate.zip');
-        if (!snapshot.formats)
-            snapshot.formats = [];
-        snapshot.formats.push({"type":"pdf",  "status":"Generating"});
-        snapshot.formats.push({"type":"html", "status":"Generating"});
-        snapshot.ws = $scope.ws;
-        snapshot.site = site.sysmlid;
-        snapshot.time = time;
-        
-        ConfigService.createSnapshotArtifact(snapshot, site.sysmlid, workspace).then(
-            function(result){
-                growl.info('Generating artifacts...Please wait for a completion email and reload the page.');
-            },
-            function(reason){
-                growl.error('Failed to generate artifacts: ' + reason.message);
+        MmsAppUtils.generateHtml(document, $scope.ws, time, false)
+        .then(function(ob) {
+            var cover = ob.cover;
+            var html = ob.contents;
+            var doc = {};
+            doc.docId = document.sysmlid;
+            doc.header = ob.header;
+            doc.footer = ob.footer;
+            doc.html = html;
+            doc.cover = cover;
+            doc.time = time;
+            doc.version = ob.version;
+            doc.dnum = ob.dnum;
+            doc.displayTime = ob.time;
+            doc.workspace = $scope.ws;
+            doc.name = document.sysmlid + '_' + time + '_' + new Date().getTime();
+            if(time == 'latest') 
+                doc.tagId = time;
+            else {
+                if(tag) 
+                    doc.tagId = tag.name;
             }
-        );
-    });
-
-    $scope.$on('generate.zip', function() {
-        $rootScope.$broadcast('generate.pdf');        
-    });
-
-    $scope.$on('download.pdf', function() {
-        $window.open(getPDFUrl());
-
-    });
-
-    $scope.$on('download.zip', function() {
-        $window.open(getZipUrl());
+            ConfigService.convertHtmlToPdf(doc, site.sysmlid, $scope.ws)
+            .then(
+                function(reuslt){
+                    growl.info('Converting HTML to PDF...Please wait for a completion email');
+                },
+                function(reason){
+                    growl.error("Failed to convert HTML to PDF: " + reason.message);
+                }
+            ).finally(function() {
+                converting = false;
+                $scope.bbApi.toggleButtonSpinner('convert.pdf');
+            });
+        });
     });
 
     $scope.$on('show.comments', function() {
