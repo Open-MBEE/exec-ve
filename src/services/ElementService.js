@@ -539,7 +539,16 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
             url = URLService.getPostElementsWithSiteURL(n.ws, site);
         $http.post(url, {'elements': [elem], 'source': ApplicationService.getSource()})
         .success(function(data, status, headers, config) {
-            var resp = data.elements[0];
+            var resp = null;
+            if (data.elements.length > 1 && elem.sysmlid) {
+                for (var i = 0; i < data.elements.length; i++) {
+                    if (data.elements[i].sysmlid === elem.sysmlid)
+                        resp = data.elements[i];
+                }
+                if (!resp)
+                    resp = data.elements[0];
+            } else
+                resp = data.elements[0];
             var key = UtilsService.makeElementKey(resp.sysmlid, n.ws, 'latest');
             deferred.resolve(CacheService.put(key, UtilsService.cleanElement(resp), true));
         }).error(function(data, status, headers, config) {

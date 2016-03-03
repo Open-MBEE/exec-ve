@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mmsApp')
-.factory('MmsAppUtils', ['$q','$state', '$modal','$timeout', '$location', '$window', '$templateCache','$rootScope','$compile','WorkspaceService','ConfigService','ElementService','ViewService', 'UtilsService', 'growl','_', MmsAppUtils]);
+.factory('MmsAppUtils', ['$q','$state', '$modal','$timeout', '$location', '$window', '$templateCache','$rootScope','$compile', '$filter', 'WorkspaceService','ConfigService','ElementService','ViewService', 'UtilsService', 'growl','_', MmsAppUtils]);
 
 /**
  * @ngdoc service
@@ -10,7 +10,7 @@ angular.module('mmsApp')
  * @description
  * Utilities
  */
-function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $templateCache, $rootScope, $compile, WorkspaceService, ConfigService, ElementService, ViewService, UtilsService, growl, _) {
+function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $templateCache, $rootScope, $compile, $filter, WorkspaceService, ConfigService, ElementService, ViewService, UtilsService, growl, _) {
 
     var addElementCtrl = function($scope, $modalInstance, $filter) {
 
@@ -322,21 +322,29 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
         printContents = printElementCopy[0].outerHTML;
         var header = '';
         var footer = '';
+        var displayTime = '';
+        var dnum = '';
+        var version = '';
         ViewService.getDocMetadata(ob.sysmlid, ws, null, 2)
         .then(function(metadata) {
             useCover = true;
             newScope.meta = metadata;
             newScope.time = time === 'latest' ? new Date() : time;
+            displayTime = $filter('date')(newScope.time, 'M/d/yy h:mm a');
             newScope.meta.title = ob.name;
             header = metadata.header ? metadata.header : header;
             footer = metadata.footer ? metadata.footer : footer;
+            if (metadata.dnumber)
+                dnum = metadata.dnumber;
+            if (metadata.version)
+                version = metadata.version;
             $compile(templateElement.contents())(newScope); 
         }).finally(function() {
             $timeout(function() {
                 if (useCover) {
                     cover = templateElement[0].innerHTML;
                 }
-                deferred.resolve({cover: cover, contents: printContents, header: header, footer: footer});
+                deferred.resolve({cover: cover, contents: printContents, header: header, footer: footer, time: displayTime, dnum: dnum, version: version});
             }, 0, false);
         });
         return deferred.promise;
