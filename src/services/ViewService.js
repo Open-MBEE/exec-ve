@@ -349,7 +349,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @param {string} [workspace=master] (optional) workspace to use
      * @param {string} [version=latest] (optional) alfresco version number or timestamp
      * @param {int} weight the priority of the request
-     * @param {string} eidss
+     * @param {string} eidss displayedElements
      * @returns {Promise} The promise will be resolved with array of element objects. 
      */
     var getViewElements = function(id, update, workspace, version, weight, eidss) {
@@ -357,7 +357,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         var deferred = $q.defer();
         var url = URLService.getViewElementsURL(id, n.ws, n.ver);
         var cacheKey = ['views', n.ws, id, n.ver, 'elements'];
-        if (CacheService.exists(cacheKey) && !n.update) 
+        if (CacheService.exists(cacheKey) && !n.update)
             deferred.resolve(CacheService.get(cacheKey));
         else {
             var key = id + n.ws + n.ver;
@@ -1139,6 +1139,20 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         }
         return false;
     };
+    // var promiseFail = function(id, update, workspace, version) {
+    //     var n = normalize(update, workspace, version);
+    //     var deferred = $q.defer();
+    //     var url = URLService.getViewElementsURL(id, n.ws, n.ver);
+    //     var cacheKey = ['views', n.ws, id, n.ver, 'elements'];
+    //     //return CacheService.exists(cacheKey);
+    //     //return !n.update;
+    //     if (CacheService.exists(cacheKey) && !n.update){ 
+    //          return CacheService.get(cacheKey);
+    //     }
+    //     else {
+    //       return null;
+    //     }
+    // };
 
     return {
         getView: getView,
