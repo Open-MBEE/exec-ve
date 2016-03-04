@@ -812,8 +812,19 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         };
         if (holdingBinId)
             instanceSpec.owner = holdingBinId;
-
-        var toCreate = [instanceSpec, view];
+        var asi = { //create applied stereotype instance
+            sysmlid: newViewId + '_asi',
+            owner: newViewId,
+            documentation: '',
+            name: '',
+            specialization: {
+                type: 'InstanceSpecification',
+                classifier: [(isDoc ? "_17_0_2_3_87b0275_1371477871400_792964_43374" : "_17_0_1_232f03dc_1325612611695_581988_21583")]
+            },
+            appliedMetatypes: ["_9_0_62a020a_1105704885251_933969_7897"],
+            isMetatype: false
+        };
+        var toCreate = [instanceSpec, view, asi];
         ElementService.createElements(toCreate, workspace, siteId)
         .then(function(data) {
             data.forEach(function(elem) {
