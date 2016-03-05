@@ -50,24 +50,42 @@ function TableService($q, $http, URLService, UtilsService, CacheService, _, Elem
               var val;
               // LiteralReal => double
               // Number, integer, etc.?
-              if (cell.specialization.value[0].double !== undefined) {
-                val = cell.specialization.value[0].double;
-              } else if (cell.specialization.value[0].integer !== undefined) {
-                val = cell.specialization.value[0].integer;
-              } else if (cell.specialization.value[0].expressionBody !== undefined) {
-                val = cell.specialization.value[0].expressionBody[0];
-              } else {
-                val = cell.specialization.value[0].string;
+              if (typeof cell.specialization.value !== 'undefined') {
+                if (typeof cell.specialization.value[0].double !== 'undefined') {
+                  val = cell.specialization.value[0].double;
+                } else if (typeof cell.specialization.value[0].integer !== 'undefined') {
+                  val = cell.specialization.value[0].integer;
+                } else if (typeof cell.specialization.value[0].expressionBody !== 'undefined') {
+                  val = cell.specialization.value[0].expressionBody[0];
+                } else if (typeof cell.specialization.value[0].string !== 'undefined') {
+                  val = cell.specialization.value[0].string;
+                }
+                if (val !== undefined) {
+                  if (keys[i] === undefined) {
+                    keys[i] = cell.name;
+                  }
+                  columns[i].push(val);
+                } else {
+                  // unknown value
+                  console.log('No value found:');
+                  console.log(cell);
+                }
               }
-              if (keys[i] === undefined) {
-                keys[i] = cell.name;
-              }
-              columns[i].push(val);
             });
           }));
         });
 
         $q.all(promises).then(function(){
+          // strip out non-value columns (these are just counters/indices generated from the row name)
+          var cc = columns.length - 1;
+          while (cc >= 0) {
+            if (columns[cc].length === 0) {
+              headers.splice(cc, 1);
+              columns.splice(cc, 1);
+              // no key will exist, no splicing needed from keys
+            }
+            cc--;
+          }
           var value = {
             columns: columns,
             columnHeaders: headers,

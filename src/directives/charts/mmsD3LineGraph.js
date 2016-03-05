@@ -17,9 +17,12 @@
    * @param {string=} xLabelPos Specify X axis label position
    * @param {string=} yLabel Manually specify Y axis label (first Y column header by default)
    * @param {string=} yLabelPos Specify Y axis label position
-   * @param {string|number|boolean=false} logScale Desired base of the logarithmic scale to use. Put "e" in quotes.
+   * @param {string|number=} logScale Logarithmic scale base to use on both axes. Put "e" in quotes.
+   * @param {string|number=} logScaleX Logarithmic scale base to use on X axis.
+   * @param {string|number=} logScaleX Logarithmic scale base to use on Y axis.
    * @param {boolean=true} logScaleLabel Whether to render labels for log grid
-   * @param {string=="line"} type Type of graph to render (line, spline, step, area, area-spline, area-step, ...)
+   * @param {string=="line"} type Type of graph to render (line, spline, step, step-before, step-after, area, area-spline, area-step, ...).
+   * @param {object=} padding Set the top/right/bottom/left margin.
    * @description
    * A directive for generating a D3 line graph from opaque tables.
    * Element text is used as caption. If element text is "$title", the table title
@@ -68,13 +71,16 @@
         close: '</tspan>'
       },
       SVG_CONTAINER: {
-        open: '<figure id="$id">',
+        open: '<figure class="line-graph">',
         close: '</figure>'
       },
       SVG_CAPTION: {
         open: '<figcaption>',
         close: '</figcaption>'
-      }
+      },
+      GRAPH_MARGIN: 1,
+      GRAPH_MARGIN_CROP: 0.2,
+      LOGSCALE_MIN: 0.00001  // Convert 0 values to this number to avoid -Infinity
     };
 
     function wrapTag(tag, text, attrs) {
@@ -90,6 +96,20 @@
     var sup = wrapTag.bind({}, DEFAULT.SVG_SUP);
     var figure = wrapTag.bind({}, DEFAULT.SVG_CONTAINER);
     var figCaption = wrapTag.bind({}, DEFAULT.SVG_CAPTION);
+
+    function getUnit(label) {
+      var res = label.match(/\((.+)\)/);
+      if (res) {
+        return ' ' + res[1];
+      }
+      return '';
+    }
+
+    var unitX = '', unitY = '';
+    var xs, ys,                         // column keys
+      xComps, yComps,                   // key-data composites
+      xData, yData,                     // column data
+      xColHeads, yColHeads;   // column headers
 
     function generateGraphSettings(scope) {
       var deferred = $q.defer();
@@ -121,7 +141,7 @@
       }
 
       // When REST calls return...
-      $q.all(promises).then(function(values) {
+      $q.all(promises).then(function(tables) {
         var sc = 0, // series count
         _chart = {  // C3 config
           data: {
@@ -135,64 +155,76 @@
               tick : {}
             },
             y: {
-              label : {}
+              label : {},
+              tick : {}
             }
-          }
+          },
+          line: {},
+          tooltip: {
+            format: {}
+          },
+          _onrendered: [],
+          _postrender: []
         };
-        if (values.length > 1) {
+        if (tables.length > 1) {
           _chart.data.xs = {};
         }
 
         // Process each table
-        values.forEach(function(value, tc) {
+        tables.forEach(function(table, tc) {
           var xCol;
 
           // Determine x column for the table
           if (xCols.length > 0) {
             xCol = xCols[tc % xCols.length];
           } else {
-            xCol = value.columnHeaders[0];
+            xCol = table.columnHeaders[0];
             xCols.push(xCol);
           }
 
           // Set chart title and universal x column (if only one is provided)
           if (tc === 0) {
-            _chart.title = value.title;
-            if (values.length === 1 && !scope.xCols) {
+            _chart.title = table.title;
+            if (tables.length === 1 && !scope.xCols) {
               _chart.data.x = xCol + tc;
             }
           }
 
           var isY = false,
               col,
-              ci = value.columnHeaders.length - 1,
+              ci = table.columnHeaders.length - 1,
               yColKeys = [],  // this table's y column keys
               _sc = 0;        // this table's series counter
 
           // Process columns in reverse to mutate while looping
+          xColHeads = [];
+          yColHeads = [];
           while (ci >= 0) {
-            col = value.columnHeaders[ci];
+            col = table.columnHeaders[ci];
             if (col === xCol || (isY = (yCols.length === 0 || yCols.includes(col)))) {
               if (isY) {
                 // assign x column if more than one
-                if (values.length > 1) {
+                if (tables.length > 1) {
                   _chart.data.xs[col + tc] = xCol + tc;
                 }
+                yColHeads.push(col);
                 yColKeys.push(col + tc);
                 isY = false;
+              } else {
+                xColHeads.push(col);
               }
               // Prepend data columns with column key
-              value.columns[ci].unshift(col + tc);
+              table.columns[ci].unshift(col + tc);
             } else {
               // Remove unused column
-              value.columnHeaders.splice(ci, 1);
-              value.columns.splice(ci, 1);
+              table.columnHeaders.splice(ci, 1);
+              table.columns.splice(ci, 1);
             }
             ci -= 1;
           }
 
           // Name the y columns in order
-          value.columns.forEach(function(column) {
+          table.columns.forEach(function(column) {
             if (yColKeys.includes(column[0])) {
               if (scope.seriesNames === undefined || scope.seriesNames[sc] === undefined) {
                 _chart.data.names[column[0]] = column[0];
@@ -204,28 +236,78 @@
           });
           sc += yColKeys.length;
 
-          _chart.data.columns = _chart.data.columns.concat(value.columns);
+          _chart.data.columns = _chart.data.columns.concat(table.columns);
         });
 
+        // Identify X columns and Y columns
+        if (_chart.data.xs) {
+          xs = _.map(_chart.data.xs);
+        } else {
+          xs = [_chart.data.x];
+        }
+        xComps = _.filter(_chart.data.columns, function(o) {
+          return xs.includes(o[0]);
+        });
+        xData = _.flatten(_.map(xComps, function(o) {
+          return o.slice(1);
+        }));
+        yComps = _.reject(_chart.data.columns, function(o) {
+          return xs.includes(o[0]);
+        });
+        ys = _.map(yComps, function(o) {return o[0];});
+        yData = _.flatten(_.map(yComps, function(o) {
+          return o.slice(1);
+        }));
+
         // label/position axes
-        _chart.axis.x.label.text = scope.xLabel ? scope.xLabel : xCols[0];
+        _chart.axis.x.label.text = scope.xLabel ? scope.xLabel : xColHeads[0];
         if (scope.xLabelPos) {
           _chart.axis.x.label.position = scope.xLabelPos;
         }
-        _chart.axis.y.label.text = scope.yLabel ? scope.yLabel : yCols[0];
+        _chart.axis.y.label.text = scope.yLabel ? scope.yLabel : yColHeads[0];
         if (scope.yLabelPos) {
           _chart.axis.y.label.position = scope.yLabelPos;
         }
 
         // Graph types
         if (scope.type) {
+          scope.type = processType(scope.type);
           _chart.data.type = scope.type;
         } else if (scope.types) {
+          scope.types = scope.types.map(processType);
           _chart.data.types = scope.types;
         }
 
+        // Graph appearance
+        if (typeof scope.padding !== "undefined") {
+          _chart.padding = scope.padding;
+        }
+
+        // Define units for tooltips
+        unitX = getUnit(_chart.axis.x.label.text);
+        unitY = getUnit(_chart.axis.y.label.text);
+        _chart.tooltip.format.title = function(x) {
+          return x + unitX;
+        };
+        _chart.tooltip.format.value = function(y, ratio, id, index) {
+          return y + unitY;
+        };
+
         // console.log(_chart);
         deferred.resolve(_chart);
+
+        // Handle step-before or step-after types
+        function processType(type) {
+          if (type === 'step-before' || type === 'step-after') {
+            _chart.line.step = {type: type};
+            type = 'step';
+          } else if (type === 'area-step-before' || type === 'area-step-after') {
+            var arr = type.split('-');
+            type = arr[0] + '-' + arr[1];
+            _chart.line.step = {type: arr[1] + '-' + arr[2]};
+          }
+          return type;
+        }
       });
 
       return deferred.promise;
@@ -242,82 +324,137 @@
       scope.fig = $(html).appendTo(element).append(scope.chart.element);
     }
 
-    // @TODO: Add support for Y log scale
-    function makeLogScale(scope, element, _chart) {
-      var logFn, powFn, logBase;
-
-      _chart.axis.x.tick.fit = true;
-
+    function logScale(base) {
+      var logFn, safeLogFn, powFn, baseNum;
       // @TODO: Fix decimal rounding
-      function logCustom(base, x) {
-        return Math.log(x) / Math.log(base);
+      function logCustom(base, val) {
+        return Math.log(val) / Math.log(base);
       }
 
       // Choose log function
       // @TODO: Add log1p and log2 support
-      if (typeof scope.logScale === 'string' && scope.logScale.toLowerCase() === 'e') {
+      if (typeof base === 'string' && base.toLowerCase() === 'e') {
         logFn = Math.log;
         powFn = Math.exp;
-        logBase = Math.E;
-      } else if (typeof scope.logScale === 'number') {
-        logBase = scope.logScale;
-        if (logBase === 10) {
+        baseNum = Math.E;
+      } else if (typeof base === 'number') {
+        baseNum = base;
+        if (base === 10) {
           logFn = Math.log10;
         } else if (logBase === 2) {
           logFn = Math.log2;
         } else {
-          logFn = logCustom.bind({}, logBase);
+          logFn = logCustom.bind({}, baseNum);
         }
-        powFn = Math.pow.bind({}, logBase);
+        powFn = Math.pow.bind({}, baseNum);
+      } else {
+        console.warn('Unknown log base: "' + base + '"');
       }
 
+      safeLogFn = function (val) {
+        val = (val < DEFAULT.LOGSCALE_MIN ? DEFAULT.LOGSCALE_MIN : val);
+        return logFn(val);
+      };
+
+      return {
+        log: safeLogFn,
+        pow: powFn,
+        base: baseNum
+      };
+    }
+
+    // @TODO: Add support for Y log scale
+    function makeLogScale(base, scope, element, _chart, axis) {
+      console.log('Making ' + axis + ' log-base-' + base);
+      var logFn, powFn, scale;
+      var axisData, axisKeys;
+
+      scale = logScale(base);
+      logFn = scale.log;
+      powFn = scale.pow;
+
+      axisData = axis === 'x' ? xData : yData;
+      axisKeys = axis === 'x' ? xs : ys;
+      var min = _.min(axisData);
+      var max = _.max(axisData);
+      min = (min < DEFAULT.LOGSCALE_MIN ? DEFAULT.LOGSCALE_MIN : min);
+      var logMin = logFn(min);
+      var logMax = logFn(max);
+      console.log("Min: " + logMin);
+      console.log("Max: " + logMax);
+      var logVal = Math.floor(logMin) - DEFAULT.GRAPH_MARGIN;
+      _chart.axis[axis].tick.values = [];
+      while (logVal <= Math.ceil(logMax) + DEFAULT.GRAPH_MARGIN) {
+        _chart.axis[axis].tick.values.push(logVal++);
+      }
+      _chart.axis[axis].padding = {
+        right: DEFAULT.GRAPH_MARGIN_CROP,
+        left: DEFAULT.GRAPH_MARGIN_CROP
+      };
+
+      // Format tooltip
+      // @TODO: Unit can also be derived from different X columns
+      if (axis === 'x') {
+        _chart.tooltip.format.title = function(x) {
+          return (Math.round(powFn(x)*100)/100) + unitX;
+        };
+      } else if (axis === 'y') {
+        _chart.tooltip.format.value = function(y, ratio, id, index) {
+          return (Math.round(powFn(y)*100)/100) + unitY;
+        };
+      }
       // Format ticks and add grid lines
       var firstRender = true;
-      _chart.onrendered = function() {
+      var gridDrawFn = function() {
         if (firstRender) {
           firstRender = false;
           // Add grid lines
-          scope.chart.xgrids.add(logGrid(scope.chart, scope.logScale, this.xAxis.tickValues(), 'log-grid'));
-          $(this.axes.x[0]).find('.tick>text>tspan').html(function(i, power) {
-            // @TODO: Refactor SVG exponent/superscript rendering
-            return scope.logScale + sup(power);
-          });
+          scope.chart[axis+'grids'].add(logGrid(scope.chart, this[axis+'Axis'].tickValues(), 'log-grid'));
         }
       };
+      var tickModded = false;
+      var tickModFn = function() {
+        if (!tickModded) {
+          $(this.axes[axis][0]).find('.tick>text>tspan').html(function(i, power) {
+            // @TODO: Refactor SVG exponent/superscript rendering
+            return base + sup(power);
+          });
+          tickModded = true;
+        }
+      };
+      _chart._onrendered.push(gridDrawFn);
+      _chart._postrender.push(tickModFn);
 
-      // identify x columns
-      var xs = [];
-      if (_chart.data.xs) {
-        xs = _.map(_chart.data.xs);
-      } else {
-        xs.push(_chart.data.x);
-      }
-      // Convert x values to log values
+      // Convert log axis values to log values
       _chart.data.columns.forEach(function(column) {
         var i;
-        if (xs.includes(column[0])) {
+        if (axisKeys.includes(column[0])) {
           for (i = 1; i < column.length; i++) {
             column[i] = logFn(column[i]);
           }
         }
       });
 
-      function logGrid(chart, logScale, ticks, className) {
+      function logGrid(chart, ticks, className) {
         var powLast, grids = [];
         // Passing undefined to logGridLine() will use the position value
         var gridLabel = (scope.logScaleLabel === false ? '' : undefined);
 
         // Generate grid lines
-        ticks.forEach(function(power, i) {
-          if (i > 0) {
-            // Between ticks
-            grids = grids.concat(logGridSect(logFn, powFn, DEFAULT.LOG_GRID_SUBDIVS, powLast, power));
-          }
-          powLast = power;
-        });
-        // Last line
-        grids.push(logGridLine(powFn(ticks[ticks.length - 1]), className, gridLabel));
-        // console.log(grids);
+        if (ticks !== undefined) {
+          ticks.forEach(function(power, i) {
+            if (i > 0) {
+              // Between ticks
+              grids = grids.concat(logGridSect(logFn, powFn, DEFAULT.LOG_GRID_SUBDIVS, powLast, power));
+            }
+            powLast = power;
+          });
+          // Last line
+          grids.push(logGridLine(powFn(ticks[ticks.length - 1]), className, gridLabel));
+          // console.log(grids);
+        } else {
+          console.warn('No ticks found.');
+        }
 
         function logGridSect(logFn, powFn, num, powStart, powEnd) {
           var grids = [], grid;
@@ -360,8 +497,28 @@
       generateGraphSettings(scope).then(function(_chart) {
         // Handle logarithmic scales
         if (scope.logScale) {
-          makeLogScale(scope, element, _chart);
+          // Both axes use same log base
+          makeLogScale(scope.logScale, scope, element, _chart, 'x');
+          makeLogScale(scope.logScale, scope, element, _chart, 'y');
+        } else {
+          // Single axes or both with distinct bases
+          if (scope.logScaleX) {
+            makeLogScale(scope.logScaleX, scope, element, _chart, 'x');
+          }
+          if (scope.logScaleY) {
+            makeLogScale(scope.logScaleY, scope, element, _chart, 'y');
+          }
         }
+        // execute postrender callbacks (e.g. gridl lines and tick modifications)
+        _chart.onrendered = function(){
+          for (var i in _chart._onrendered) {
+            _chart._onrendered[i].call(this);
+          }
+          for (i in _chart._postrender) {
+            _chart._postrender[i].call(this);
+          }
+        };
+        console.log(_chart);
         renderGraph(scope, element, _chart);
       });
     }
@@ -381,9 +538,12 @@
         yLabelPos: '@',
         seriesNames: '=',
         logScale: '=',
+        logScaleX: '=',
+        logScaleY: '=',
         logScaleLabel: '=',
         type: '@',
-        types: '='
+        types: '=',
+        padding: '='
       },
       link: mmsGraphLink
     };
