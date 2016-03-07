@@ -5,7 +5,7 @@ angular.module('mms.directives')
 
 /**
  * @ngdoc directive
- * @name mms.directives.directive:mmsNav
+ * @name mms.directives.directive:mmsMenu
  *
  * @requires mms.SiteService
  * @requires $templateCache
@@ -41,17 +41,17 @@ function mmsMenu(SiteService, WorkspaceService, ConfigService, $state, $template
     var mmsMenuLink = function(scope, element, attrs) {
         var catNames = [];
         var sites = {};
-        
+
         scope.isTasksAndTagsView = function(){
-             if ($state.includes('workspaces') && 
+             if ($state.includes('workspaces') &&
                 ! ($state.includes('workspace.site') || $state.includes('workspace.sites') ))
                 return true;
-            else 
+            else
                 return false;
         };
         scope.tasksAndTagsView = function(){
             $state.go('workspaces', {search: undefined});
-        };        
+        };
         scope.updateWorkspace = function(wsId) {
             $state.go($state.current.name, {workspace: wsId, tag: undefined, search: undefined});
         };
@@ -68,7 +68,7 @@ function mmsMenu(SiteService, WorkspaceService, ConfigService, $state, $template
         .then(function(data) {
             scope.wsName = data.name;
         });
-        
+
         /*if (scope.config && scope.config !== '' && scope.config !== 'latest') {
             ConfigService.getConfig(scope.config, scope.ws, false)
             .then(function(data) {
