@@ -1,4 +1,5 @@
-(function() {'use strict';
+(function() {
+  'use strict';
   angular.module('mms.directives')
     .directive('mmsLineGraph', ['TableService', '$window', '$q', mmsLineGraph]);
 
@@ -80,7 +81,7 @@
       },
       GRAPH_MARGIN: 1,
       GRAPH_MARGIN_CROP: 0.2,
-      LOGSCALE_MIN: 0.00001  // Convert 0 values to this number to avoid -Infinity
+      LOGSCALE_MIN: 0.0001  // Convert 0 values to this number to avoid -Infinity
     };
 
     function wrapTag(tag, text, attrs) {
@@ -109,8 +110,11 @@
     var xs, ys,                         // column keys
       xComps, yComps,                   // key-data composites
       xData, yData,                     // column data
-      xColHeads, yColHeads;   // column headers
+      xColHeads, yColHeads;             // column headers
 
+    /**
+     * Generate C3 configurations for the table
+     */
     function generateGraphSettings(scope) {
       var deferred = $q.defer();
 
@@ -128,7 +132,7 @@
         promises.push(TableService.readTableCols(eid, ws, version));
       });
 
-      // Get column settings
+      // Collect column settings
       if (scope.xCols) {
         xCols = scope.xCols;
       } else if (scope.xCol) {
@@ -227,8 +231,10 @@
           table.columns.forEach(function(column) {
             if (yColKeys.includes(column[0])) {
               if (scope.seriesNames === undefined || scope.seriesNames[sc] === undefined) {
+                // Use column header as series name
                 _chart.data.names[column[0]] = column[0];
               } else {
+                // Use user-supplied series name
                 _chart.data.names[column[0]] = scope.seriesNames[sc + _sc];
                 _sc++;
               }
