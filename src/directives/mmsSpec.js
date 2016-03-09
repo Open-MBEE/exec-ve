@@ -459,7 +459,8 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
             mmsElement: '=',
             mmsSpecApi: '=',
             mmsViewEdit: '=',
-            mmsType: '@'
+            mmsType: '@',
+            noEdit: '@'
         },
         link: mmsSpecLink
     };
