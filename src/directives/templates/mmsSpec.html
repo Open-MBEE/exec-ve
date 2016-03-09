@@ -1,4 +1,4 @@
-<div ng-if="mmsType=='element'" ng-show="editing" class="editing">
+<div ng-if="mmsType=='element' && !noEdit && editing" class="editing">
     <h1 class="prop"><input class="form-control" type="text" ng-model="edit.name"></input></h1>
 
     <h2 ng-hide="mmsViewEdit" class="prop-title">LAST MODIFICATION</h2>

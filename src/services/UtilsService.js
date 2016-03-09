@@ -421,9 +421,9 @@ function UtilsService(CacheService, _) {
                 holdingBinId = 'holding_bin_' + projectId;
             }
         }
-        if (!holdingBinId && siteId) {
-            holdingBinId = 'holding_bin_' + siteId + '_no_project';
-        }
+        //if (!holdingBinId && siteId) {
+        //    holdingBinId = 'holding_bin_' + siteId + '_no_project';
+        //}
         return {holdingBinId: holdingBinId, projectId: projectId, siteId: siteId};
     };
 
