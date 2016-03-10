@@ -33,6 +33,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
 
     var fixPreSpanRegex = /<\/span>\s*<mms-transclude/g;
     var fixPostSpanRegex = /<\/mms-transclude-(name|doc|val|com)>\s*<span[^>]*>/g;
+    var emptyRegex = /^\s*$/;
 
     var mmsTranscludeDocCtrl = function ($scope) {
 
@@ -81,8 +82,8 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             scope.isEditing = false;
             element.empty();
             var doc = scope.element.documentation;
-            if (!doc) {
-                var p = '(No ' + scope.panelType + ')';
+            if (!doc || emptyRegex.test(doc)) {
+                var p = '<span class="no-print">(No ' + scope.panelType + ')</span>';
                 if (scope.version !== 'latest')
                     p = '';
                 doc = '<p>' + p + '</p>';
@@ -112,7 +113,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             element.empty();
             var doc = scope.edit.documentation;
             if (!doc)
-                doc = '<p ng-class="{placeholder: version!=\'latest\'}">(No ' + scope.panelType + ')</p>';
+                doc = '<p class="no-print" ng-class="{placeholder: version!=\'latest\'}">(No ' + scope.panelType + ')</p>';
             element[0].innerHTML = '<div class="panel panel-info">'+doc+'</div>';
             //element.append('<div class="panel panel-info">'+doc+'</div>');
             scope.recompileScope = scope.$new();
