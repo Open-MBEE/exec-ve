@@ -16,13 +16,7 @@ CKEDITOR.plugins.add( 'mmsreset', {
           }
         }
         var config = CKEDITOR.tools.extend(defaultConfig, editor.config.mmsreset || {}, true);
-        var body = editor.getData();
-        config.callback.resetFnc(body,'mms-transclude-name', '.name]');
-        // config.callback.resetFnc(body.find('mms-transclude-doc'), '.doc]');
-        // config.callback.resetFnc(body.find('mms-transclude-val'), '.val]');
-        // config.callback.resetFnc(body.find('mms-view-link'), '.vlink]');
-        editor.save();
-        config.callback.update();
+        config.callback(editor);
       }
     });
       
