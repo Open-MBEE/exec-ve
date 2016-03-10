@@ -19,7 +19,7 @@ function mmsMaturityBar($window) {
      	var d3 = $window.d3;  
       	
       	var svgContainer = d3.select(element[0]).append('svg')
-		                                  .attr("width", 520)
+		                                  .attr("width", 416)
 		                                  .attr("height", 70);
 		var colorRect;
 
