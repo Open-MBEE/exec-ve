@@ -26,7 +26,7 @@ angular.module('mms.directives')
 function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxService, $log, $templateCache, $compile, growl) {
 
     var template = $templateCache.get('mms/templates/mmsTranscludeDoc.html');
-
+    
     var mmsTranscludeComCtrl = function ($scope) {
 
         $scope.bbApi = {};
@@ -85,7 +85,7 @@ function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxSe
             element.empty();
             var doc = scope.edit.documentation;
             if (!doc)
-                doc = '<p ng-class="{placeholder: version!=\'latest\'}">(No Comment)</p>';
+                doc = '<p class="no-print" ng-class="{placeholder: version!=\'latest\'}">(No Comment)</p>';
             element[0].innerHTML = '<div class="panel panel-info">'+doc+'</div>';
             scope.recompileScope = scope.$new();
             $compile(element.contents())(scope.recompileScope); 
