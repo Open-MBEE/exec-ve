@@ -421,10 +421,10 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $m
             // { name: 'forms',       items : [ 'Form', 'Checkbox', 'Radio', 'TextField', 'Textarea', 'Select', 'Button', 'ImageButton', 'HiddenField' ] },
             { name: 'basicstyles', items : [ 'Bold','Italic','Underline','Strike','Subscript','Superscript','-','RemoveFormat' ] },
             { name: 'paragraph',   items : [ 'Blockquote','-','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock' ] },
-            { name: 'links',       items : [ 'Link','Unlink' ] },
             { name: 'insert',      items : ['SpecialChar','Mathjax','eqneditor','PageBreak','HorizontalRule','pbckcode' ] },
             '/',
             { name: 'styles',      items : [ 'Format','FontSize','TextColor','BGColor' ] },
+            { name: 'links',       items : [ 'Link','Unlink' ] },
         ];
         var tableToolbar =  { name: 'table',  items: [ 'Table' ] };
         var listToolbar =   { name: 'list',   items: [ 'NumberedList','BulletedList','Outdent','Indent' ] };
@@ -483,8 +483,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $m
           // CKEDITOR.plugins.addExternal('mmscomment','/lib/ckeditor/plugins/mmscomment/');
           // CKEDITOR.plugins.addExternal('autogrow','/lib/ckeditor/plugins/autogrow/');
           // CKEDITOR.plugins.addExternal('mathjax','/lib/ckeditor/plugins/mathjax/');
-          
-          
+
           instance.on( 'init', function(args) {
               ngModelCtrl.$setPristine();
           });
@@ -522,17 +521,9 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $m
                 callUpdate = false;
                 // var bookmarks = instance.getSelection().createBookmarks();
                 var ranges = instance.getSelection().getRanges();
-
                 instance.setData(ngModelCtrl.$viewValue || '');
                 // instance.getSelection().selectBookmarks( bookmarks );
                 instance.getSelection().selectRanges( ranges );
-                // instance.undoManager.clear();
-                // var doc = instance.document;
-                // if (instance.dom.getStyle(doc, 'overflow-y', true) !== 'auto')
-                //     instance.dom.setStyle(doc, 'overflow-y', 'auto');
-                // var iframe = instance.getContainer().getElementsByTagName('iframe')[0];
-                // if (instance.dom.getStyle(iframe, 'height', true) === '0px')
-                //     instance.dom.setStyle(iframe, 'height', $window.innerHeight*0.65);
             }
         };
         

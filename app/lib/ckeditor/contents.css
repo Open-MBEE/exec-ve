@@ -130,3 +130,55 @@ a > img {
 	border: none;
 	outline: 1px solid #0782C1;
 }
+
+/*.cke_editable {*/
+  /*p {
+    font-family: $font-family-sans-serif;
+  }*/
+
+  blockquote {
+    font-weight: 200;
+    font-style: italic;
+  }
+
+  /*table, .mce-item-table {
+
+    @extend .content-table;
+    font-family: $font-family-sans-serif;
+
+    td {
+      font-size: 14px;
+    }
+  }*/
+
+  mms-transclude-name,
+  mms-transclude-doc,
+  mms-transclude-val,
+  mms-view-link,
+  tms-timely,
+  mms-d3-observation-profile-chart-io,
+  mms-d3-parallel-axis-chart-io,
+  mms-d3-radar-chart-io,
+  mms-d3-grouped-horizontal-bar-chart-io,
+  mms-site-docs,
+  mms-workspace-docs {
+    background-color: lightblue;
+    margin-top: 0;
+    margin-bottom: 0 !important;
+    padding: 3px !important;
+    border: 1px solid black !important;
+    z-index: 0;
+    cursor: not-allowed;
+  }
+
+  mms-transclude-com {
+    background-color: yellow;
+    margin-top: 0;
+    margin-bottom: 0 !important;
+    padding: 3px !important;
+    border: 1px solid black !important;
+    z-index: 0;
+    cursor: not-allowed;
+  }
+/*}*/
+
