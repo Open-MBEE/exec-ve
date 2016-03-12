@@ -354,45 +354,15 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $m
             });
         };
 
-        var imageCtrl = function($scope, $modalInstance) {
-            $scope.fileChanged = function(input) {
-                var file = input.files[0];
-                var reader = new $window.FileReader();
-                reader.onload = function() {
-                    var data = reader.result;
-                    $scope.image.src = data;
-                };
-                reader.readAsDataURL(file);
-            };
-            $scope.image = {src: ''};
-            $scope.ok = function() {
-                $modalInstance.close($scope.image);
-            };
-            $scope.cancel = function() {
-                $modalInstance.dismiss();
-            };
-        };
-
-        var imageCallback = function(callback, value, meta) {
-            angular.element('#mce-modal-block').css('z-index', 98);
-            var ckeditorModalId = $window.ckeditor.activeEditor.windowManager.getWindows()[0]._id;
-            angular.element('#' + ckeditorModalId).css('z-index', 99);
-            var instance = $modal.open({
-                template: chooseImageModalTemplate,
-                scope: scope,
-                controller: ['$scope', '$modalInstance', imageCtrl]
-            });
-            instance.result.then(function(image) {
-                callback(image.src);
-            }, function() {
-                callback('');
-            });
-        };
-
-        var resetCrossRef = function(type, typeString){
-            angular.forEach(type, function(value, key){
+        var resetCrossRef = function(type, typeString) {
+            angular.forEach(type, function(value, key) {
                 var transclusionObject = angular.element(value);
-                var transclusionId= angular.element(value).attr('data-mms-eid');
+                var transclusionId = '';
+                // check if view link and use mms-vid attr
+                if (value.localName == 'mms-view-link')
+                  transclusionId = transclusionObject.attr('data-mms-vid');
+                else 
+                  transclusionId= transclusionObject.attr('data-mms-eid');
                 var transclusionKey = UtilsService.makeElementKey(transclusionId, 'master', 'latest', false);
                 var inCache = CacheService.get(transclusionKey);
                 if(inCache){
@@ -412,7 +382,26 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $m
                 }
             });
         };
+
+        var mmsResetCallback = function(ed) {
+          var body = ed.document.getBody();
+          resetCrossRef(body.find('mms-transclude-name').$, '.name]');
+          resetCrossRef(body.find('mms-transclude-doc').$, '.doc]');
+          resetCrossRef(body.find('mms-transclude-val').$, '.val]');
+          resetCrossRef(body.find('mms-view-link').$, '.vlink]');
+          update();
+        };
         
+        var update = function() {
+          if (callUpdate) {
+            // getData() returns CKEditor's HTML content.
+            ngModelCtrl.$setViewValue(instance.getData());
+          } else {
+            callUpdate = true;
+          }
+        };
+        
+        // Formatting editor toolbar
         var defaultToolbar = [
             { name: 'document',    items : [ 'Source','-','DocProps' ] },
             { name: 'clipboard',   items : [ 'Undo','Redo' ] },
@@ -430,7 +419,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $m
         var listToolbar =   { name: 'list',   items: [ 'NumberedList','BulletedList','Outdent','Indent' ] };
         var imageToolbar =  { name: 'image',  items: [ 'base64image','Iframe' ] };
         var customToolbar = { name: 'custom', items : [ 'Mmscf','Mmscomment', 'Mmsvlink', 'mmsreset' ] };
-        
+        //Set toolbar based on editor type
         var thisToolbar = defaultToolbar.slice();
         thisToolbar.push(listToolbar);
         thisToolbar.push(tableToolbar);
@@ -450,22 +439,9 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $m
           thisToolbar = [];
           thisToolbar.push(imageToolbar);
         }
-        //if (scope.mmsEditorType === 'ParagraphT' || scope.mmsEditorType === 'Paragraph')
-          //  thisToolbar = defaultToolbar + ' | ' + codeToolbar + ' | ' + customToolbar;
 
-        var mmsResetCallback = {
-          update: update,
-          resetFnc: resetCrossRef
-        };
-        var update = function() {
-          if (callUpdate) {
-            // getData() returns CKEditor's HTML content.
-            ngModelCtrl.$setViewValue(instance.getData());
-          } else {
-            callUpdate = true;
-          }
-        };
         $timeout(function() {
+          // Initialize ckeditor and set event handlers
           $(element).val(ngModelCtrl.$modelValue);
           instance = CKEDITOR.replace(attrs.id, {
             // customConfig: '/lib/ckeditor/config.js',
@@ -495,7 +471,6 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $m
           instance.on( 'resize', deb);
           instance.on( 'destroy', deb);
           instance.on( 'blur', function(e) {
-            // deb();
             instance.focusManager.blur();
           });
           instance.on( 'key', function(e) {
