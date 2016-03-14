@@ -139,7 +139,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     };
 
     $scope.$on('convert.pdf', function() {
-        MmsAppUtils.popupPrintConfirm(view, $scope.ws, time, false, false);
+        MmsAppUtils.popupPrintConfirm(view, $scope.ws, time, false, false, true);
     });
 
     $scope.$on('view.add.paragraph', function() {
@@ -312,10 +312,10 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     $scope.searchOptions.relatedCallback = $scope.searchGoToDocument;
 
     $scope.$on('print', function() {
-        MmsAppUtils.popupPrintConfirm(view, $scope.ws, time, false, true);
+        MmsAppUtils.popupPrintConfirm(view, $scope.ws, time, false, true, false);
     });
     $scope.$on('word', function() {
-        MmsAppUtils.popupPrintConfirm(view, $scope.ws, time, false, false);
+        MmsAppUtils.popupPrintConfirm(view, $scope.ws, time, false, false, false);
     });
     $scope.$on('tabletocsv', function() {
         MmsAppUtils.tableToCsv(view, $scope.ws, time, false);
