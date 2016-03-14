@@ -21,6 +21,7 @@ function StompService($rootScope, UtilsService, $window, $location, ApplicationS
         hostName = 'wss://localhost:61614';
      }
      stompClient = Stomp.client(hostName);
+     stompClient.debug = null;
      stompClient.connect("guest", "guest", function(){ // on success 
          stompClient.subscribe("/topic/master", function(message) {
              var updateWebpage = angular.fromJson(message.body);

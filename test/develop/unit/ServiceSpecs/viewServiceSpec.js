@@ -94,31 +94,25 @@ describe('ViewService', function() {
 	});
 	describe('Method getViewElements', function() {
 		// getViewElements = function(id, update, workspace, version, weight, eidss) 
-		it('should return the latest element in the cache', inject(function() {
+		it('should return the latest element in the cache', function(done) {
+			jasmine.DEFAULT_TIMEOUT_INTERVAL = 100000;
 			var elem = {sysmlid:"elemId",specialization:{type:"View",childrenViews:[],name:"elemId",
 			           documentation:"",appliedMetatypes:["7929"],isMetatype:false}};
 			CacheService.put('views|master|elemId|lastest|elements', elem );
-			//console.log(CacheService.get('views|master|elemId|lastest|elements'));
-			// ViewService.getViewElements('elemId', false, 'master','latest').then(function(data) {
-			// 	console.log("The long object " + JSON.stringify(data, null, " "));
-			// }, function(reason) {
-			// 	console.log("this happened" + reason);
-			//$rootScope.$digest();
-			var thing = ViewService.getViewElements('elemId', false, 'master','latest');
-			scope.$digest();
-			scope.$apply();
-		    //done();
-			console.log(thing);
-			//});
-			//$httpBackend.flush();
-		}));	
-		it('should return the latest element in the cache', inject(function() {
-			var elem = {sysmlid:"elemId",specialization:{type:"View",childrenViews:[],name:"elemId",
-					   documentation:"",appliedMetatypes:["7929"],isMetatype:false}};
-			CacheService.put('views|master|elemId|lastest|elements', elem );
-			console.log(ViewService.barf('elemId', false, 'master', 'lastest'));
-			//$httpBackend.flush();
-		}));	
+			console.log(CacheService.get('views|master|elemId|lastest|elements'));
+			ViewService.getViewElements('elemId', true, 'master','latest').then(function(data) {
+				console.log("The long object " + JSON.stringify(data, null, " "));
+				done();
+			});
+			$httpBackend.flush();
+		});	
+		// it('should return the latest element in the cache', inject(function() {
+		// 	var elem = {sysmlid:"elemId",specialization:{type:"View",childrenViews:[],name:"elemId",
+		// 			   documentation:"",appliedMetatypes:["7929"],isMetatype:false}};
+		// 	CacheService.put('views|master|elemId|lastest|elements', elem );
+		// 	console.log(ViewService.barf('elemId', false, 'master', 'lastest'));
+		// 	//$httpBackend.flush();
+		// }));	
 	});	
 			// getViewElements = function(id, update, workspace, version, weight, eidss) 
 			// (!viewElements.hasOwnProperty(ver) && * && *), fail
@@ -164,9 +158,6 @@ describe('ViewService', function() {
 			ViewService = $injector.get('ViewService');
 			CacheService = $injector.get('CacheService');
 			$httpBackend = $injector.get('$httpBackend');
-			$rootScope = $injector.get('$rootScope');
-			
-			scope = $rootScope.$new();
 
 			ownerId = getOwner();
 			$httpBackend.whenGET(root + '/elements/idMatchDocId').respond(
