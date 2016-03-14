@@ -161,18 +161,23 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
         }
     };
 
-    var popupPrintConfirm = function(ob, ws, time, isDoc, print) {
+    var popupPrintConfirm = function(ob, ws, time, isDoc, print, genpdf) {
+        var deferred = $q.defer();
         var modalInstance = $modal.open({
             templateUrl: 'partials/mms/printConfirm.html',
             controller: function($scope, $modalInstance, type, unsaved) {
                 $scope.type = type;
                 $scope.action = print ? 'print' : 'save';
+                if (genpdf)
+                    $scope.action = 'generate pdf';
+                $scope.genpdf = genpdf;
                 $scope.unsaved = unsaved;
+                $scope.model = {genCover: true};
                 $scope.print = function() {
-                    $modalInstance.close('print');
+                    $modalInstance.close(['print', $scope.model.genCover]);
                 };
                 $scope.fulldoc = function() {
-                    $modalInstance.close('fulldoc');
+                    $modalInstance.close(['fulldoc']);
                 };
                 $scope.cancel = function() {
                     $modalInstance.dismiss();
@@ -191,14 +196,20 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
             keyboard: false
         });
         modalInstance.result.then(function(choice) {
-            if (choice === 'print')
-                popupPrint(ob, ws, time, isDoc, print);
-            else {
+            if (choice[0] === 'print' && !genpdf)
+                popupPrint(ob, ws, time, isDoc, print, choice[1]);
+            else if (choice[0] === 'print' && genpdf) {
+                generateHtml(ob, ws, time, true, choice[1])
+                .then(function(ob) {
+                    deferred.resolve(ob);
+                });
+            } else {
                 $rootScope.mms_fullDocMode = true;
                 $rootScope.mms_bbApi.setToggleState("tree.full.document", true);
                 $state.go('workspace.site.document.full', {search: undefined}); 
             }
         });
+        return deferred.promise;
     };
 
     var tableToCsv = function(ob, ws, time, isDoc) { //Export to CSV button Pop-up Generated Here
@@ -287,7 +298,7 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
     };
     
 
-    var generateHtml = function(ob, ws, time, isDoc) {
+    var generateHtml = function(ob, ws, time, isDoc, genCover) {
         var deferred = $q.defer();
         var printContents = '';//$window.document.getElementById('print-div').outerHTML;
         var printElementCopy = angular.element('#print-div').clone();//angular.element(printContents);
@@ -315,11 +326,17 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
         printElementCopy.find('div.tableSearch').remove();
         printElementCopy.find('.error').html('error');
         printElementCopy.find('.no-print').remove();
+        printElementCopy.find('.ng-hide').remove();
         var templateString = $templateCache.get('partials/mms/docCover.html');
         var templateElement = angular.element(templateString);
         var cover = '';
+        if (!genCover) {
+            cover = printElementCopy.find("mms-view[mms-vid='" + ob.sysmlid + "']");
+            cover.remove();
+            cover = cover[0].outerHTML;
+        }
         var newScope = $rootScope.$new();
-        var useCover = false;
+        //var useCover = false;
         printContents = printElementCopy[0].outerHTML;
         var header = '';
         var footer = '';
@@ -328,7 +345,7 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
         var version = '';
         ViewService.getDocMetadata(ob.sysmlid, ws, null, 2)
         .then(function(metadata) {
-            useCover = true;
+            //useCover = true;
             newScope.meta = metadata;
             newScope.time = time === 'latest' ? new Date() : time;
             displayTime = $filter('date')(newScope.time, 'M/d/yy h:mm a');
@@ -342,7 +359,7 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
             $compile(templateElement.contents())(newScope); 
         }).finally(function() {
             $timeout(function() {
-                if (useCover) {
+                if (genCover) {
                     cover = templateElement[0].innerHTML;
                 }
                 deferred.resolve({cover: cover, contents: printContents, header: header, footer: footer, time: displayTime, dnum: dnum, version: version});
@@ -351,7 +368,7 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
         return deferred.promise;
     };
 
-    var popupPrint = function(ob, ws, time, isDoc, print) {
+    var popupPrint = function(ob, ws, time, isDoc, print, genCover) {
         var printContents = '';//$window.document.getElementById('print-div').outerHTML;
         var printElementCopy = angular.element('#print-div').clone();//angular.element(printContents);
         var hostname = $location.host();
@@ -378,6 +395,7 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
         printElementCopy.find('div.tableSearch').remove();
         printElementCopy.find('.error').html('error');
         printElementCopy.find('.no-print').remove();
+        printElementCopy.find('.ng-hide').remove();
         //var docView = printElementCopy.find("mms-view[mms-vid='" + ob.sysmlid + "']");
         //if (isDoc)
         //    docView.remove();
@@ -385,11 +403,16 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
         var templateElement = angular.element(templateString);
         var tocContents = '';
         var cover = '';
+        if (!genCover && isDoc) {
+            cover = printElementCopy.find("mms-view[mms-vid='" + ob.sysmlid + "']");
+            cover.remove();
+            cover = cover[0].outerHTML;
+        }
         var newScope = $rootScope.$new();
-        var useCover = false;
+        //var useCover = false;
         printContents = printElementCopy[0].outerHTML;
         var openPopup = function() {
-                if (useCover)
+                if (genCover && isDoc)
                     cover = templateElement[0].innerHTML;
                 newScope.$destroy();
                 var inst = '';
@@ -416,7 +439,7 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
             }*/
             ViewService.getDocMetadata(ob.sysmlid, ws, null, 2)
             .then(function(metadata) {
-                useCover = true;
+                //useCover = true;
                 newScope.meta = metadata;
                 newScope.time = time === 'latest' ? new Date() : time;
                 newScope.meta.title = ob.name;
