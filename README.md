@@ -12,8 +12,10 @@
 ## Building and Running (also see links below)
 
 * install node.js
+* install ruby
 * install grunt (_sudo npm install -g grunt-cli_)
 * install bower (_sudo npm install -g bower_)
+* install sass (_gem install sass_)
 * cd into angular-mms root dir
 * _npm install_ (install all node module dependencies specified in package.json - these will install into a local node_modules folder)
 * _grunt_ - default task - this will create a dist and build directory, the dist contains concatenated and minified versions of our module js code and css, build directory contains all necessary files to run the application from a server
