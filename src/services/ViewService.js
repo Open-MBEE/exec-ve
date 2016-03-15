@@ -1150,20 +1150,6 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         }
         return false;
     };
-    // var promiseFail = function(id, update, workspace, version) {
-    //     var n = normalize(update, workspace, version);
-    //     var deferred = $q.defer();
-    //     var url = URLService.getViewElementsURL(id, n.ws, n.ver);
-    //     var cacheKey = ['views', n.ws, id, n.ver, 'elements'];
-    //     //return CacheService.exists(cacheKey);
-    //     //return !n.update;
-    //     if (CacheService.exists(cacheKey) && !n.update){ 
-    //          return CacheService.get(cacheKey);
-    //     }
-    //     else {
-    //       return null;
-    //     }
-    // };
 
     return {
         getView: getView,

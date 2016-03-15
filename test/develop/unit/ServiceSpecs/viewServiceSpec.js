@@ -94,25 +94,33 @@ describe('ViewService', function() {
 	});
 	describe('Method getViewElements', function() {
 		// getViewElements = function(id, update, workspace, version, weight, eidss) 
-		it('should return the latest element in the cache', function(done) {
-			jasmine.DEFAULT_TIMEOUT_INTERVAL = 100000;
+		it('should return the latest element in the cache', function() {
 			var elem = {sysmlid:"elemId",specialization:{type:"View",childrenViews:[],name:"elemId",
 			           documentation:"",appliedMetatypes:["7929"],isMetatype:false}};
-			CacheService.put('views|master|elemId|lastest|elements', elem );
-			console.log(CacheService.get('views|master|elemId|lastest|elements'));
-			ViewService.getViewElements('elemId', true, 'master','latest').then(function(data) {
-				console.log("The long object " + JSON.stringify(data, null, " "));
-				done();
+			CacheService.put('views|master|elemId|latest|elements', elem );
+			//console.log(CacheService.get('views|master|elemId|latest|elements'));
+			ViewService.getViewElements('elemId', false, 'master','latest').then(function(data) {
+				//console.log("The long object " + JSON.stringify(data, null, " "));
+				expect(data.sysmlid).toEqual('elemId');
+			}, function(){
+				console.log('fail');
 			});
-			$httpBackend.flush();
+			$rootScope.$apply();
+			//$httpBackend.flush();
+		});
+		it('should return promise from the inProgress queue', function() {
+			//inProgress structure should be replaced
 		});	
-		// it('should return the latest element in the cache', inject(function() {
-		// 	var elem = {sysmlid:"elemId",specialization:{type:"View",childrenViews:[],name:"elemId",
-		// 			   documentation:"",appliedMetatypes:["7929"],isMetatype:false}};
-		// 	CacheService.put('views|master|elemId|lastest|elements', elem );
-		// 	console.log(ViewService.barf('elemId', false, 'master', 'lastest'));
-		// 	//$httpBackend.flush();
-		// }));	
+		it('should return the element from the mock server', function() {
+			// get generic elements logic, returns a list of elements when you call by the url alone---applys to products and such
+			ViewService.getViewElements('elemId', false, 'master','latest').then(function(data) {
+				//console.log("The long object " + JSON.stringify(data, null, " "));
+			}, function(){
+				console.log('fail');
+			});
+			$rootScope.$apply();
+			//$httpBackend.flush();
+		});	
 	});	
 			// getViewElements = function(id, update, workspace, version, weight, eidss) 
 			// (!viewElements.hasOwnProperty(ver) && * && *), fail
@@ -158,6 +166,7 @@ describe('ViewService', function() {
 			ViewService = $injector.get('ViewService');
 			CacheService = $injector.get('CacheService');
 			$httpBackend = $injector.get('$httpBackend');
+			$rootScope = $injector.get('$rootScope');
 
 			ownerId = getOwner();
 			$httpBackend.whenGET(root + '/elements/idMatchDocId').respond(
