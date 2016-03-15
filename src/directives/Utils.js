@@ -284,9 +284,9 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
             return;
         }
         if (!continueEdit)
-            bbApi.toggleButtonSpinner('presentation.element.save');
+            bbApi.toggleButtonSpinner('presentation-element-save');
         else
-            bbApi.toggleButtonSpinner('presentation.element.saveC');
+            bbApi.toggleButtonSpinner('presentation-element-saveC');
         scope.elementSaving = true;
         var id = editObj ? editObj.sysmlid : scope.mmsEid;
 
@@ -335,7 +335,7 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
             // Broadcast message for the toolCtrl:
                 $rootScope.$broadcast('presentationElem.save', scope);
             }
-            //$rootScope.$broadcast('view.reorder.refresh');
+            //$rootScope.$broadcast('view-reorder.refresh');
             //recompile();
             growl.success('Save Successful');
             scrollToElement(element);
@@ -344,9 +344,9 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
             handleError(reason);
         }).finally(function() {
             if (!continueEdit)
-                bbApi.toggleButtonSpinner('presentation.element.save');
+                bbApi.toggleButtonSpinner('presentation-element-save');
             else
-                bbApi.toggleButtonSpinner('presentation.element.saveC');
+                bbApi.toggleButtonSpinner('presentation-element-saveC');
         });
     };
 
@@ -365,7 +365,7 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
             scrollToElement(element);
         };
 
-        bbApi.toggleButtonSpinner('presentation.element.cancel');
+        bbApi.toggleButtonSpinner('presentation-element-cancel');
 
         // Only need to confirm the cancellation if edits have been made:
         if (hasEdits(scope, type)) {
@@ -384,12 +384,12 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
             instance.result.then(function() {
                 cancelCleanUp();
             }).finally(function() {
-                bbApi.toggleButtonSpinner('presentation.element.cancel');
+                bbApi.toggleButtonSpinner('presentation-element-cancel');
             });
         }
         else {
             cancelCleanUp();
-            bbApi.toggleButtonSpinner('presentation.element.cancel');
+            bbApi.toggleButtonSpinner('presentation-element-cancel');
         }
     };
 
@@ -415,7 +415,7 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
             growl.error('Checking if view contents is up to date failed: ' + reason.message);
         });
         function realDelete() {
-        bbApi.toggleButtonSpinner('presentation.element.delete');
+        bbApi.toggleButtonSpinner('presentation-element-delete');
 
         scope.name = scope.edit.name;
 
@@ -440,7 +440,7 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
                     $rootScope.$broadcast('viewctrl.delete.section', scope.presentationElem);
                 }
 
-                $rootScope.$broadcast('view.reorder.refresh');
+                $rootScope.$broadcast('view-reorder.refresh');
 
                  // Broadcast message for the ToolCtrl:
                 $rootScope.$broadcast('presentationElem.cancel',scope);
@@ -449,7 +449,7 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
             }, handleError);
 
         }).finally(function() {
-            bbApi.toggleButtonSpinner('presentation.element.delete');
+            bbApi.toggleButtonSpinner('presentation-element-delete');
         });
         }
     };

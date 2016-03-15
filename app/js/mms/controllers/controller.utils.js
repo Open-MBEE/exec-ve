@@ -94,7 +94,7 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
 
             ViewService.createInstanceSpecification($scope.viewOrSection, $scope.ws, $scope.presentationElemType, $scope.site.sysmlid, $scope.newItem.name).
             then(function(data) {
-                $rootScope.$broadcast('view.reorder.refresh');
+                $rootScope.$broadcast('view-reorder.refresh');
                 growl.success("Adding "+$scope.presentationElemType+"  Successful");
                 $modalInstance.close(data);
             }, function(reason) {
@@ -205,7 +205,7 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
                 });
             } else {
                 $rootScope.mms_fullDocMode = true;
-                $rootScope.mms_bbApi.setToggleState("tree.full.document", true);
+                $rootScope.mms_bbApi.setToggleState("tree-full-document", true);
                 $state.go('workspace.site.document.full', {search: undefined}); 
             }
         });
