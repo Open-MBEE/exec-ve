@@ -130,4 +130,11 @@ mms-spec div {
 
 figcaption {
   text-align: center;
+  font-weight: bold;
+}
+
+mms-transclude-img img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
