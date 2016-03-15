@@ -694,7 +694,9 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
         var branch = $scope.treeApi.get_selected_branch();
         var templateUrlStr = "";
         var branchType = "";
-        var curLastChild = branch.children[branch.children.length-1];
+        var curLastChild = null;
+        if(branch)
+            curLastChild = branch.children[branch.children.length-1];
         
         // Adds the branch:
         var myAddBranch = function() {
