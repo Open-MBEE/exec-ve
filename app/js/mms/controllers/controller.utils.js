@@ -238,7 +238,7 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
             '<script>';
             string += 'function doClick(id) { ' +
             'var csvString = document.getElementById(id).value;' +
-            'var blob = new Blob([csvString], { ' +
+            'var blob = new Blob(["\\uFEFF" + csvString], { ' +
             '    type: "text/csv;charset=utf-8;" ' +
             '}); ' +
             '' +
