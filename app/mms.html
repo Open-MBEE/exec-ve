@@ -65,24 +65,10 @@
 
 <!-- CKEDITOR Settings -->
   <script type="text/javascript">
-  function includeJS(uri) {
-    var def = $.Deferred();
-    var script = document.createElement('script');
-    script.src = uri;
-    script.onload = function() {
-        def.resolve();
-    }
-    script.onerror = function() {
-        def.reject();
-    }
-    document.body.appendChild(script);
-    return def.promise();
-  }
   var url_root = location.pathname.split("mms.html")[0];
   var CKEDITOR_BASEPATH = url_root + 'lib/ckeditor/';
-  var CKEDITOR_JS = CKEDITOR_BASEPATH + "ckeditor.js";
-  includeJS(CKEDITOR_JS);
   </script>
+  <script src="lib/ckeditor/ckeditor.js"></script>
   <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
       
   <!-- MMS Services and Directives-->
