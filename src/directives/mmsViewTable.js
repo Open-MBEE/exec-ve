@@ -26,7 +26,7 @@ function mmsViewTable($compile, $timeout, $document, $templateCache, UtilsServic
             var csvString = element.children('table').table2CSV({delivery:'value'});
             var bom = "\xEF\xBB\xBF"; //just for excel
             var bom2 = "\uFEFF";      //just for excel
-            var blob = new Blob([bom + csvString], {
+            var blob = new Blob([bom2 + csvString], {
                 type: "text/csv;charset=utf-8;"
             });
 
