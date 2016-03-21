@@ -120,7 +120,7 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
         }
         converting = true;
         $scope.bbApi.toggleButtonSpinner('convert.pdf');
-        MmsAppUtils.generateHtml(document, $scope.ws, time, false)
+        MmsAppUtils.popupPrintConfirm(document, $scope.ws, time, true, false, true)
         .then(function(ob) {
             var cover = ob.cover;
             var html = ob.contents;
@@ -191,10 +191,10 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
     });
 
     $scope.$on('print', function() {
-        MmsAppUtils.popupPrintConfirm(document, $scope.ws, time, true, true);
+        MmsAppUtils.popupPrintConfirm(document, $scope.ws, time, true, true, false);
     });
     $scope.$on('word', function() {
-        MmsAppUtils.popupPrintConfirm(document, $scope.ws, time, true, false);
+        MmsAppUtils.popupPrintConfirm(document, $scope.ws, time, true, false, false);
     });
     $scope.$on('tabletocsv', function() {
         MmsAppUtils.tableToCsv(document, $scope.ws, time, true);

@@ -27,6 +27,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
     var valTemplate = $templateCache.get('mms/templates/mmsTranscludeVal.html');
     var frameTemplate = $templateCache.get('mms/templates/mmsTranscludeValFrame.html');
     var editTemplate = $templateCache.get('mms/templates/mmsTranscludeValEdit.html');
+    var emptyRegex = /^\s*$/;
 
     var mmsTranscludeCtrl = function ($scope, $rootScope) {
 
@@ -93,11 +94,11 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
             element.empty();
             scope.recompileScope = scope.$new();
             if (scope.values.length === 0 || Object.keys(scope.values[0]).length < 2)
-                element[0].innerHTML = '<span>' + ((scope.version === 'latest') ? '(no value)' : '') + '</span>';
+                element[0].innerHTML = '<span class="no-print">' + ((scope.version === 'latest') ? '(no value)' : '') + '</span>';
             else if (areStrings) {
                 var toCompile = toCompileList.join(' ');
-                if (toCompile === '') {
-                    element[0].innerHTML = '<span>' + ((scope.version === 'latest') ? '(no value)' : '') + '</span>';
+                if (toCompile === '' || emptyRegex.test(toCompile)) {
+                    element[0].innerHTML = '<span class="no-print">' + ((scope.version === 'latest') ? '(no value)' : '') + '</span>';
                     return;
                 }
                 element[0].innerHTML = toCompile;
@@ -150,7 +151,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                 element[0].innerHTML = '<span' + ((scope.version === 'latest') ? '' : ' class="placeholder"') + '>(no value)</span>';
             else if (areStrings) {
                 var toCompile = toCompileList.join(' ');
-                if (toCompile === '') {
+                if (toCompile === '' || /^\s*$/.test(toCompile)) {
                     element[0].innerHTML = '<span' + ((scope.version === 'latest') ? '' : ' class="placeholder"') + '>(no value)</span>';
                     return;
                 }
