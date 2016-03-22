@@ -114,12 +114,22 @@ describe('ViewService', function() {
 		it('should return the element from the mock server', function() {
 			// get generic elements logic, returns a list of elements when you call by the url alone---applys to products and such
 			ViewService.getViewElements('elemId', false, 'master','latest').then(function(data) {
-				//console.log("The long object " + JSON.stringify(data, null, " "));
+				console.log("The long object " + JSON.stringify(data, null, " "));
 			}, function(){
 				console.log('fail');
 			});
 			$rootScope.$apply();
-			//$httpBackend.flush();
+			$httpBackend.flush();
+		});	
+		it('should return the element from the generic element method', function() {
+			// get generic elements logic, returns a list of elements when you call by the url alone---applys to products and such
+			ViewService.getViewElements('elemId', false, 'master','latest').then(function(data) {
+				console.log("The long object " + JSON.stringify(data, null, " "));
+			}, function(){
+				console.log('fail');
+			});
+			$rootScope.$apply();
+			$httpBackend.flush();
 		});	
 	});	
 			// getViewElements = function(id, update, workspace, version, weight, eidss) 
