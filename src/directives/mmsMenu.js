@@ -1,27 +1,35 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsMenu', ['SiteService', 'WorkspaceService', 'ConfigService', '$state', '$templateCache', 'growl', 'hotkeys', mmsMenu]);
+.directive('mmsMenu', ['SiteService', 'WorkspaceService', 'ConfigService', '$state', '$templateCache', 'growl', mmsMenu]);
 
 /**
  * @ngdoc directive
  * @name mms.directives.directive:mmsMenu
  *
  * @requires mms.SiteService
+ * @requires mms.WorkspaceService
+ * @requires mms.ConfigService
+ * @requires $state
  * @requires $templateCache
+ * @requires growl
  *
  * @restrict E
  *
  * @description
- * TBA
+ * //TODO - update
+ * mmsMenu is responsible for gathering all breadcrumbs for current view and
+ * displaying breadcrumbs accordingly. When a specific product is selected,
+ * the product name will be displayed as well. Breadcrumb list is truncated to
+ * to fit window width.
+ * mmsMenu is also repsonsible for gathering and displaying all tasks and tags
+ * for specific view.
  *
  */
 function mmsMenu(SiteService, WorkspaceService, ConfigService, $state, $templateCache, growl) {
     var template = $templateCache.get('mms/templates/mmsMenu.html');
 
     var mmsMenuLink = function(scope, element, attrs) {
-        var catNames = [];
-        var sites = {};
         
         scope.isTasksAndTagsView = function(){
              if ($state.includes('workspaces') && 
@@ -61,6 +69,7 @@ function mmsMenu(SiteService, WorkspaceService, ConfigService, $state, $template
         var isCharacterization = scope.site.isCharacterization;
         var breadcrumbs = [];
         breadcrumbs.push({name: scope.site.name, sysmlid: scope.site.sysmlid});
+        var eltWidth = element.parent().width();
         
         SiteService.getSites()
         .then(function(data) {
@@ -75,6 +84,13 @@ function mmsMenu(SiteService, WorkspaceService, ConfigService, $state, $template
                   }
                 }
             }
+            scope.breadcrumbs = breadcrumbs.reverse();
+            var Bcount = scope.breadcrumbs.length;
+            if (scope.product) {
+              Bcount++;
+            }
+            var liWidth = (eltWidth*0.75)/Bcount;
+            scope.truncateStyle={'max-width':liWidth};
         }, function(reason) {
             growl.error("Sites Error: " + reason.message);
         });
