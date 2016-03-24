@@ -36,11 +36,9 @@ function mmsMenu(SiteService, WorkspaceService, ConfigService, $state, $template
         scope.updateWorkspace = function(wsId) {
             $state.go($state.current.name, {workspace: wsId, tag: undefined, search: undefined});
         };
-
         scope.updateTag = function() {
             $state.go($state.current.name, {tag: scope.config.id, search: undefined});
         };
-
         scope.latestTag = function() {
             $state.go($state.current.name, {tag: undefined, search: undefined});
         };
@@ -59,33 +57,23 @@ function mmsMenu(SiteService, WorkspaceService, ConfigService, $state, $template
             scope.config = 'latest';
         } */
 
+        var currSiteParentId = scope.site.parent;
+        var isCharacterization = scope.site.isCharacterization;
+        var breadcrumbs = [];
+        breadcrumbs.push({name: scope.site.name, sysmlid: scope.site.sysmlid});
+        
         SiteService.getSites()
         .then(function(data) {
-            // var sites = {};
-            //var catNames = [];
-            for (var i = 0; i < data.length; i++) {
+            for (var i = data.length -1 ; i >= 0; i--) {
                 var site = data[i];
-                site.isOpen = true;
-                if (site.sysmlid === scope.site)
-                    scope.siteTitle = site.name;
-                // TODO: Replace with .parent
-                site.categories = ["Uncategorized"];
-                if (site.categories.length === 0)
-                    site.categories.push("Uncategorized");
-                for (var j = 0; j < site.categories.length; j++) {
-                    var cat = site.categories[j];
-                    catNames.push(cat);
-                    if (sites.hasOwnProperty(cat)) {
-                        sites[cat].push(site);
-                    } else {
-                        sites[cat] = [site];
-                    }
+                var siteParent = site.parent;
+                var siteIsChara = site.isCharacterization;
+                if (site.sysmlid == currSiteParentId && isCharacterization === siteIsChara) {
+                  breadcrumbs.push({name: site.name, sysmlid: site.sysmlid});
+                  if (site.parent) {
+                    currSiteParentId = site.parent;
+                  }
                 }
-            }
-            scope.categories = sites;
-            for(var k = 0; k < catNames.length; k++){
-                var str = catNames[k];
-                scope.categories[str].open = false;
             }
         }, function(reason) {
             growl.error("Sites Error: " + reason.message);

@@ -4,14 +4,10 @@
             <ul class="nav-btns-main">
                 <li ng-show="isTasksAndTagsView()">
                     <a ui-sref="workspace.sites({workspace: ws, search: undefined})"><i class="fa fa-arrow-left"></i> back to sites &amp; documents</a>
-                </li>    
-                <li ng-show="site && site.sysmlid !== 'no-site'">
-                    <a class="nav-btn" tooltip="Sites and Documents" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" ui-sref="workspace.site({site: site.sysmlid, search: undefined})"><i class="fa fa-folder"></i></a>
-                    </i>
                 </li>
-                <li ng-show="site && site.sysmlid !== 'no-site'">
-                    <a ui-sref="workspace.site({site: site.sysmlid, search: undefined})">{{site.name}}</a>
-                    &nbsp;
+                <li ng-repeat="breadcrumb in breadcrumbs" ng-show="site && site.sysmlid !== 'no-site'">
+                    <a class="nav-btn" tooltip="{{breadcrumb.name}}" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" ui-sref="workspace.site({site: breadcrumb.sysmlid, search: undefined})">
+                    <i class="fa fa-folder"></i>&nbsp;{{breadcrumb.name}}</a>&nbsp;
                     <i class="fa fa-chevron-right" style="font-size:12px;"></i>
                 </li>
                 <li ng-show="product">
