@@ -5,6 +5,7 @@
                 <li ng-show="isTasksAndTagsView()">
                     <a ui-sref="workspace.sites({workspace: ws, search: undefined})"><i class="fa fa-arrow-left"></i> back to sites &amp; documents</a>
                 </li>
+                <li class="nav_breadcrumb"><span ng-show="snapshot" class="label label-danger" ng-bind-html="snapshot"></span></li>
                 <span ng-repeat="breadcrumb in breadcrumbs" ng-show="site && site.sysmlid !== 'no-site'">
                     <li  class="nav_breadcrumb" ng-style="truncateStyle">
                     <a class="nav-btn" ng-style="{'padding-left': $index == 0 ? '5px' : '0px'}" ui-sref="workspace.site({site: breadcrumb.sysmlid, search: undefined})">
@@ -16,7 +17,6 @@
                 <li class="nav_breadcrumb" ng-show="product" ng-style="truncateStyle">
                     <a tooltip="{{product.name}}" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="left" ui-sref=".({search: undefined})">
                       <i class="fa fa-file"></i>&nbsp;{{product.name}}</a>
-                    <span ng-show="snapshot" class="label label-danger" ng-bind-html="snapshot"></span>
                 </li>
             </ul>
             <ul class="nav-btns navbar-right" style="margin-right: 20px;">
