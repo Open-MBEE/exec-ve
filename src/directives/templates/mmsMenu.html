@@ -4,24 +4,22 @@
             <ul class="nav-btns-main">
                 <li ng-show="isTasksAndTagsView()">
                     <a ui-sref="workspace.sites({workspace: ws, search: undefined})"><i class="fa fa-arrow-left"></i> back to sites &amp; documents</a>
-                </li>    
-                <li ng-show="site && site.sysmlid !== 'no-site'">
-                    <a class="nav-btn" tooltip="Sites and Documents" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" ui-sref="workspace.site({site: site.sysmlid, search: undefined})"><i class="fa fa-folder"></i></a>
-                    </i>
                 </li>
-                <li ng-show="site && site.sysmlid !== 'no-site'">
-                    <a ui-sref="workspace.site({site: site.sysmlid, search: undefined})">{{site.name}}</a>
-                    &nbsp;
-                    <i class="fa fa-chevron-right" style="font-size:12px;"></i>
-                </li>
-                <li ng-show="product">
-                    <a ui-sref=".({search: undefined})"><i class="fa fa-file"></i></a></li>
-                <li ng-show="product">
-                    <a ui-sref=".({search: undefined})">{{product.name}}</a>
+                <span ng-repeat="breadcrumb in breadcrumbs" ng-show="site && site.sysmlid !== 'no-site'">
+                    <li  class="nav_breadcrumb" ng-style="truncateStyle">
+                    <a class="nav-btn" ng-style="{'padding-left': $index == 0 ? '5px' : '0px'}" ui-sref="workspace.site({site: breadcrumb.sysmlid, search: undefined})">
+                    <i class="fa fa-folder" tooltip="{{breadcrumb.name}}" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom"></i>&nbsp;{{breadcrumb.name}}</a>
+                    </li>
+                    
+                  <li class="nav_breadcrumb"> <i class="fa fa-chevron-right" style="font-size:12px; margin-left: 5px;"></i></li>
+                </span>
+                <li class="nav_breadcrumb" ng-show="product" ng-style="truncateStyle">
+                    <a tooltip="{{product.name}}" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="left" ui-sref=".({search: undefined})">
+                      <i class="fa fa-file"></i>&nbsp;{{product.name}}</a>
                     <span ng-show="snapshot" class="label label-danger" ng-bind-html="snapshot"></span>
                 </li>
             </ul>
-            <ul class="nav-btns pull-right" style="margin-right: 20px;">
+            <ul class="nav-btns navbar-right" style="margin-right: 20px;">
                 <li>TASK</li>
                 <li>
                     <span dropdown>
