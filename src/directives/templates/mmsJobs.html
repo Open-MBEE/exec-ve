@@ -1,0 +1,51 @@
+<br>
+<a ng-click="gotoAdd()">New Job</a>
+<h2>Jobs</h2>
+<table class="snapshot-table table table-condensed"> <!-- add ng-if for NO JOBS -->
+    <thead>
+        <tr>
+            <td>
+                <a ng-click="sortType = 'name'; sortReverse = !sortReverse">
+                    Name
+                    <span ng-show="sortType == 'name'" class="fa fa-caret-down"></span>
+                    <span ng-show="sortType == 'name' && sortReverse" class="fa fa-caret-up"></span>
+                </a>
+            </td>
+            <td>
+                <a ng-click="sortType = 'status'; sortReverse = !sortReverse">
+                    Status
+                    <span ng-show="sortType == 'status'" class="fa fa-caret-down"></span>
+                    <span ng-show="sortType == 'status' && sortReverse" class="fa fa-caret-up"></span>
+                </a>
+            </td>
+            <td>
+                <a ng-click="sortType = 'schedule'; sortReverse = !sortReverse">
+                    Recurrence
+                    <span ng-show="sortType == 'schedule'" class="fa fa-caret-down"></span>
+                    <span ng-show="sortType == 'schedule' && sortReverse" class="fa fa-caret-up"></span>
+                </a>
+            </td>
+        </tr>
+    </thead>
+    <tbody>
+    <tr ng-repeat="job in jobs | orderBy:'status' | orderBy:sortType:sortReverse">
+        <td><a ng-attr-href="{{job.url}}" target="_blank">{{job.name}}</a></td>
+        <td>{{job.status}}</td>
+        <td>{{job.schedule}}</td>
+    </tr>
+    </tbody>
+</table>
+<hr>
+<h4 id="addSection">Add Job</h4>
+<form name="addForm" ng-submit="addJob()">
+    <label>Name:
+        <!-- :TODO check out ng-pattern -->
+        <input type="text" name="input" ng-model="jobInput.jobName" ng-required="true" ng-trim="false" id="inputName">
+    </label>
+    <label>Schedule: <br>
+        <div id='cronOptions'></div>
+    </label>
+    <br>
+    <!-- :TODO pass name in addjob function -->
+    <button type= "submit" >Submit</button>
+</form>

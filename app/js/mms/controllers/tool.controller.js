@@ -25,6 +25,8 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
         $scope.eid = null;
 
     $scope.vid = $scope.eid;
+    if($scope.document)
+        $scope.docId = $scope.document.sysmlid;
     $scope.specApi = {};
     $scope.viewApi = {};
     $scope.viewOrderApi = {};
