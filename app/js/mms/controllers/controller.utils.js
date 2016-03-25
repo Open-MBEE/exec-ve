@@ -161,13 +161,23 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
         }
     };
 
-    var popupPrintConfirm = function(ob, ws, time, isDoc, print, genpdf) {
+    /*
+        ob = document or view object
+        ws = workspace
+        time = timestamp
+        isDoc = if ob is view or doc
+        print = if this is print or save to word
+        genpdf = if this is convert pdf
+        docOption = if view whether to give option to go to full doc
+    */
+    var popupPrintConfirm = function(ob, ws, time, isDoc, print, genpdf, docOption) {
         var deferred = $q.defer();
         var modalInstance = $modal.open({
             templateUrl: 'partials/mms/printConfirm.html',
             controller: function($scope, $modalInstance, type, unsaved) {
                 $scope.type = type;
                 $scope.action = print ? 'print' : 'save';
+                $scope.docOption = docOption;
                 if (genpdf)
                     $scope.action = 'generate pdf';
                 $scope.genpdf = genpdf;

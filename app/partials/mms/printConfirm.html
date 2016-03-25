@@ -13,7 +13,7 @@
       see the popup. 
       <br/><br/>
       If you don't see certain content appearing in the popup, please wait until the full document appears in this pane before clicking {{action}}.
-      <br/><br/>If you want to {{action}} the entire document instead, please click on 'GO TO FULL DOCUMENT' and click {{action}} again when it finishes loading. 
+      <br/><br/><span ng-show="docOption">If you want to {{action}} the entire document instead, please click on 'GO TO FULL DOCUMENT' and click {{action}} again when it finishes loading.</span>
     </p>
     <p ng-if="type == 'VIEW' && genpdf">
       Please click on GO TO FULL DOCUMENT
@@ -28,7 +28,7 @@
 </div>
 
 <div class="modal-footer">
-    <button ng-if="type == 'VIEW'" class="btn btn-sm btn-primary" ng-click="fulldoc()">GO TO FULL DOCUMENT</button>
+    <button ng-if="type == 'VIEW' && docOption" class="btn btn-sm btn-primary" ng-click="fulldoc()">GO TO FULL DOCUMENT</button>
     <button ng-if="type == 'DOCUMENT' || !genpdf" class="btn btn-sm btn-primary" ng-click="print()">{{action | uppercase}}</button>
     <button class="btn btn-sm btn-danger" ng-click="cancel()">CANCEL</button>
 </div>
