@@ -1,7 +1,7 @@
 <br>
 <a ng-click="gotoAdd()">New Job</a>
 <h2>Jobs</h2>
-<table class="snapshot-table table table-condensed"> <!-- add ng-if for NO JOBS -->
+<table class="snapshot-table table table-condensed" ng-if="jobs"> <!-- add ng-if for NO JOBS -->
     <thead>
         <tr>
             <td>
@@ -35,6 +35,7 @@
     </tr>
     </tbody>
 </table>
+<h3 ng-if="!jobs">No Jobs for {{docId}}</h3>
 <hr>
 <h4 id="addSection">Add Job</h4>
 <form name="addForm" ng-submit="addJob()">

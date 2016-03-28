@@ -33,6 +33,17 @@ function mmsJobs($templateCache, $http, $location, $anchorScroll) {
     var mmsJobsLink = function(scope, element, attrs) {
         var cron_value;
         scope.jobInput = { jobName:' '};
+        scope.jobs = getJobs();
+        scope.$watch('mmsDocId', changeDocument);
+        
+        var changeDocument = function(newVal, oldVal) {
+            if (newVal !== oldVal)
+                return;
+            else{//do I need to clear the scoped object? 
+                scope.jobs = getJobs();
+            }
+        };
+         
         //:TODO Add something for loading...        
         //id of the element to assign to anchored scrolling
         scope.gotoAdd = function() {
@@ -65,42 +76,36 @@ function mmsJobs($templateCache, $http, $location, $anchorScroll) {
             }, function(error){
                 console.log("FAILED TO POST" + error.status);
             });
-        };
-        // This is updating the job every 5 seconds, needs to be replaced with stomp logic
-        // window.setInterval(function() {
-        //     var id = scope.DocId; // view id or document id 
-        //     // in the tool controller set the docuement id and pass it in 
-        //     var link = '/alfresco/service/workspaces/master/jobs/'+ id + '?recurse=1';
-        //     var finished;
-        //     $http.get(link).then(function(data){
-        //         finished = success(data);
-        //         console.log("get request is successful");
-        //     }, function(error){
-        //         finished = error;
-        //         console.log("get request has FAILED");
-        //     });
-        // },5000); 
+        }; 
         //actions for stomp 
         scope.$on("stomp.job", function(event, jobs){
 
         });
-        // gets vid info from the url that runs every five seconds
-        function success(data) {
-            var jobs = data.data.jobs; // get jobs json
-            var jobs_size = data.data.jobs.length; // get length of jobs array
-            
-            var newJobs = [];
-            for (var i = 0; i < jobs_size; i++) {
-                newJobs.push({
-                    name: jobs[i].name,
-                    status: jobs[i].status,
-                    schedule: jobs[i].schedule,
-                    url: jobs[i].url,
-                    command: jobs[i].command
-                });
-            }
-            scope.jobs = newJobs;
-        }
+        var getJobs = function(){//called first time or when id changes
+            var id = scope.DocId; // view id or document id 
+            var link = '/alfresco/service/workspaces/master/jobs/'+ id + '?recurse=1';
+            var finished;
+            $http.get(link).then(function(data){
+                var jobs = data.data.jobs; // get jobs json
+                var jobs_size = data.data.jobs.length; // get length of jobs array
+                var newJobs = [];
+                for (var i = 0; i < jobs_size; i++) {
+                    newJobs.push({
+                        name: jobs[i].name,
+                        status: jobs[i].status,
+                        schedule: jobs[i].schedule,
+                        url: jobs[i].url,
+                        command: jobs[i].command
+                    });
+                }
+                finished = newJobs;
+                console.log("get request is successful");
+            }, function(error){
+                // growl message?? error;
+                console.log("you currently have no jobs for this document");
+            });
+            return finished;
+        };
         // :TODO This jquery library needs to be replaced with https://github.com/jacobscarter/angular-cron-jobs
         $('#cronOptions').cron({
             initial: "0 0 * * *",
