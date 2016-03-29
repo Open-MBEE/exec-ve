@@ -20,13 +20,6 @@ describe('CacheService', function() {
     //     $httpBackend.verifyNoOutstandingRequest();
     // });
     
-    // it('should have defined functions', function() {
-    //     expect(CacheService.get).toBeDefined();
-    //     expect(CacheService.getLatestElements).toBeDefined();
-    //     expect(CacheService.put).toBeDefined();
-    //     expect(CacheService.remove).toBeDefined();
-    //     expect(CacheService.exists).toBeDefined();
-    // });
 	it('should put in an element and return it', function() {
 		 CacheService.put("hello world", "I am the ghost", true);
 		 expect(CacheService.get("hello world")).toEqual("I am the ghost");
