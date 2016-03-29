@@ -74,29 +74,29 @@ describe('UtilsService', function() {
 		}));
 		
 	});
-	// describe('Method mergeElement ', function() {
-	// 	// put in cacheService element object and its edit object, modify edit
-	// 	// object's name/doc/val, call mergeElement with updateEdit = true with 
-	// 	//property argument = all/name/documentation/value and check edit object only has that specific property updated
-	// 
-	// 	it('it should update the element in the cache after editing', inject(function() {
-	// 		var a = {creator: "gcgandhi", modified: "2015-07-27T16:32:42.272-0700",modifier: "dlam",
-	// 		         created: "Mon May 18 14:38:12 PDT 2015", name: "vetest Cover Page", documentation: "",
-    //                  owner: "holding_bin_vetest_PROJECT-21bbdceb-a188-45d9-a585-b30bba346175"};
-	// 		var b = {creator: "dlam", modified: "2015-07-27T16:32:42.272-0700",modifier: "dlam",
-	// 	 			 created: "Mon May 18 14:38:12 PDT 2015", name: "ve", documentation: "",
-	// 	             owner: "holding_bin_vetest_PROJECT-21bbdceb-a188-45d9-a585-b30bba346175"};
-	// 		//   var mergeElement = function(source, eid, workspace, updateEdit, property) {
-	// 		CacheService.put('element|master|objectToEdit|latest', a, true);
-	// 		UtilsService.mergeElement(b, 'objectToEdit', 'master',true, 'all');
-	// 		var c = CacheService.get('element|master|objectToEdit|latest');
-	// 		console.log("after :::::::::::" + c.name);
-	// 		expect(a.name).toEqual('ve');
-	// 		
-	// 		//UtilsService.filterProperties(a, b);
-	// 	}));
-	// 	
-	// });
+	describe('Method mergeElement ', function() {
+		// put in cacheService element object and its edit object, modify edit
+		// object's name/doc/val, call mergeElement with updateEdit = true with 
+		//property argument = all/name/documentation/value and check edit object only has that specific property updated
+	
+		it('it should update the element in the cache after editing', inject(function() {
+			var a = {creator: "gcgandhi", modified: "2015-07-27T16:32:42.272-0700",modifier: "dlam",
+			         created: "Mon May 18 14:38:12 PDT 2015", name: "vetest Cover Page", documentation: "",
+                     owner: "holding_bin_vetest_PROJECT-21bbdceb-a188-45d9-a585-b30bba346175"};
+			var b = {creator: "dlam", modified: "2015-07-27T16:32:42.272-0700",modifier: "dlam",
+		 			 created: "Mon May 18 14:38:12 PDT 2015", name: "ve", documentation: "",
+		             owner: "holding_bin_vetest_PROJECT-21bbdceb-a188-45d9-a585-b30bba346175"};
+			//   var mergeElement = function(source, eid, workspace, updateEdit, property) {
+			CacheService.put('element|master|objectToEdit|latest', a, true);
+			UtilsService.mergeElement(b, 'objectToEdit', 'master',true, 'all');
+			var c = CacheService.get('element|master|objectToEdit|latest');
+			console.log("after :::::::::::" + c.name);
+			expect(a.name).toEqual('ve');
+			
+			//UtilsService.filterProperties(a, b);
+		}));
+		
+	});
 	describe('Method hasConflict ', function() {
 		// hasConflict
 		// given edit object with only keys that were edited,
