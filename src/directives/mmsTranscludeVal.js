@@ -285,38 +285,42 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                     var elementData = ElementService.getElement(id, false, scope.ws, scope.version);
                     if (scope.element.specialization.isSlot) 
                       scope.isSlot = true;
-                    
+
                     elementData.then(
                         function(val) {
-                            //Filter for enumeration type
-                            if (val.appliedMetatypes && val.appliedMetatypes.length > 0 && 
-                                val.appliedMetatypes[0] === '_9_0_62a020a_1105704885400_895774_7947') {
-                                scope.isEnumeration = true;
-                                var fillData = ElementService.getOwnedElements(val.sysmlid, false, scope.ws, scope.version, 1);
-
-                                fillDropDown(fillData);
-                            } else if (scope.isSlot) {
-                                var slotData = ElementService.getElement(val.specialization.propertyType, false, scope.ws, scope.version);
-                                slotData.then(
-                                    function(val) {
-                                        //Filter for enumeration type
-                                        if (val.appliedMetatypes && val.appliedMetatypes.length > 0 && 
-                                            val.appliedMetatypes[0] === '_9_0_62a020a_1105704885400_895774_7947') {
-                                            scope.isEnumeration = true;
-                                            var fillData = ElementService.getOwnedElements(val.sysmlid, false, scope.ws, scope.version, 1);
-
-                                            fillDropDown(fillData);
-                                        } else
-                                            Utils.addFrame(scope, mmsViewCtrl, element, frameTemplate);
-                                    },
-                                    function(reason) {
+                            if (scope.isSlot) {
+                              var slotData = ElementService.getElement(val.specialization.propertyType, 
+                                  false, scope.ws, scope.version);
+                              slotData.then(
+                                  function(val) {
+                                    var enumValues = Utils.isEnumeration(val,scope);
+                                    enumValues.then( function(value) {
+                                      if (value.isEnumeration) {
+                                          scope.isEnumeration = value.isEnumeration;
+                                          scope.options = value.options;
+                                      }
+                                    }, function(reason) {
                                         Utils.addFrame(scope, mmsViewCtrl, element, frameTemplate);
-                                    }
-                                );
-                            } else
+                                        growl.error('Failed to get enumeration options: ' + reason.message);
+                                    });
+                              }, function(reason) {
+                                  Utils.addFrame(scope, mmsViewCtrl, element, frameTemplate);
+                              });
+                            } else{
+                                var enumValues = Utils.isEnumeration(val,scope);
+                                enumValues.then( function(value) {
+                                  if (value.isEnumeration) {
+                                      scope.isEnumeration = value.isEnumeration;
+                                      scope.options = value.options;
+                                  }
+                                }, function(reason) {
+                                    Utils.addFrame(scope, mmsViewCtrl, element, frameTemplate);
+                                    growl.error('Failed to get enumeration options: ' + reason.message);
+                                });
+                            }
+
                                 Utils.addFrame(scope, mmsViewCtrl, element, frameTemplate);
-                        },
-                        function(reason) {
+                        }, function(reason) {
                             Utils.addFrame(scope, mmsViewCtrl, element, frameTemplate);
                         }
                     );
