@@ -20,8 +20,11 @@ angular.module('mms.directives')
  *
  */
 function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, WorkspaceService, ConfigService, ElementService, ViewService, UtilsService, growl, _) {
-    
-     var conflictCtrl = function($scope, $modalInstance) {
+  
+    var ENUM_ID = '_9_0_62a020a_1105704885400_895774_7947';
+    var ENUM_LITERAL = '_9_0_62a020a_1105704885423_380971_7955';
+  
+    var conflictCtrl = function($scope, $modalInstance) {
         $scope.ok = function() {
             $modalInstance.close('ok');
         };
@@ -223,6 +226,46 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
             growl.warning(reason.message);
         else if (reason.type === 'error')
             growl.error(reason.message);
+    };
+
+    /**
+     * @ngdoc function
+     * @name mms.directives.Utils#isEnumeration
+     * @methodOf mms.directives.Utils
+     * 
+     * @description 
+     * Check if element is enumeration and if true get enumerable options 
+     * 
+     * @param {object} elt element object
+     * @param {object} scope scope with common properties
+     * @return {Promise} promise would be resolved with options and if object is enumerable.
+     *      For unsuccessful saves, it will be rejected with an object with reason.
+     */
+    var isEnumeration = function(elt, scope) {
+        var deferred = $q.defer();
+        if (elt.appliedMetatypes && elt.appliedMetatypes.length > 0 && 
+            elt.appliedMetatypes[0] === ENUM_ID) {
+            var isEnumeration = true;
+            var fillData = ElementService.getOwnedElements(elt.sysmlid, false, scope.ws, scope.version, 1);
+            var options = fillData.then(
+              function(val) {
+                  var newArray = [];
+                 // Filter for enumeration type
+                  for (var i = 0; i < val.length; i++) {
+                      if( val[i].appliedMetatypes && val[i].appliedMetatypes.length > 0 && 
+                          val[i].appliedMetatypes[0] === ENUM_LITERAL) {
+                          newArray.push(val[i]);
+                      }
+                  }
+                  deferred.resolve({options:newArray,isEnumeration: isEnumeration});
+              },
+              function(reason) {
+                  console.log(reason);
+                  deferred.reject(reason);
+              }
+            );
+        }
+        return deferred.promise;
     };
 
     var addFrame = function(scope, mmsViewCtrl, element, template, editObj, doNotScroll) {
@@ -556,6 +599,7 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
         showEditCallBack: showEditCallBack,
         isDirectChildOfPresentationElementFunc: isDirectChildOfPresentationElementFunc,
         hasHtml: hasHtml,
+        isEnumeration: isEnumeration,
     };
 
 }
