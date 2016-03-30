@@ -37,7 +37,8 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
         history: false,
         reorder: false,
         snapshots: false,
-        tags: false
+        tags: false,
+        loads: false
     };
     $scope.tracker = {};
     if (!$rootScope.veEdits)
@@ -133,6 +134,10 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
 
     $scope.$on('tags', function() {
         showPane('tags');
+    });
+    
+    $scope.$on('loads', function() {
+        showPane('loads');
     });
     
     $scope.$on('element.history', function() {

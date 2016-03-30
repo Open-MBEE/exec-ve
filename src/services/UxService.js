@@ -48,6 +48,9 @@ function UxService($rootScope) {
       case "tags":
             return {id: button, icon: 'fa-tag', selected: false, active: true, permission: true, tooltip: 'Tags',
                     spinner: false, onClick: function() {$rootScope.$broadcast(button);}};
+      case "loads":
+            return {id: button, icon: 'fa-sort-amount-desc', selected: true, active: true, permission:true, tooltip: 'Jobs',
+                    spinner: false, onClick: function() {$rootScope.$broadcast(button);}};
       case "element.editor.save":
       return {id: button, icon: 'fa-save', dynamic: true, selected: false, active: false, permission:true, tooltip: 'Save',
                 spinner: false, onClick: function() {$rootScope.$broadcast(button);}};

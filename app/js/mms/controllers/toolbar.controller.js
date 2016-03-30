@@ -28,6 +28,8 @@ angular.module('mmsApp').controller('ToolbarCtrl', ['$scope', '$rootScope', '$st
 		}
 		var editable = false;
 		$scope.tbApi.addButton(UxService.getToolbarButton("element.history"));
+		if($state.includes('workspace.site.document'))
+			$scope.tbApi.addButton(UxService.getToolbarButton("loads"));
 		if ($state.includes('workspace.diff'))
 		{
 			$scope.tbApi.addButton(UxService.getToolbarButton("diff.perspective.detail"));

@@ -1,7 +1,6 @@
-<br>
-<a ng-click="gotoAdd()">New Job</a>
 <h2>Jobs</h2>
-<table class="snapshot-table table table-condensed" ng-if="jobs"> <!-- add ng-if for NO JOBS -->
+<i class="pane-center-spinner fa fa-5x fa-spinner fa-spin" style="display: inline-block; width: 100%;" ng-if="loading"></i>
+<table class="snapshot-table table table-condensed" ng-if="!loading && hasJobs"> <!-- add ng-if for NO JOBS -->
     <thead>
         <tr>
             <td>
@@ -35,18 +34,16 @@
     </tr>
     </tbody>
 </table>
-<h3 ng-if="!jobs">No Jobs for {{docId}}</h3>
+<h3 ng-if="!hasJobs"> No Jobs for {{docName}}</h3>
 <hr>
 <h4 id="addSection">Add Job</h4>
 <form name="addForm" ng-submit="addJob()">
-    <label>Name:
+    <label style="width:100%;">Name:
         <!-- :TODO check out ng-pattern -->
-        <input type="text" name="input" ng-model="jobInput.jobName" ng-required="true" ng-trim="false" id="inputName">
-    </label>
-    <label>Schedule: <br>
-        <div id='cronOptions'></div>
-    </label>
-    <br>
-    <!-- :TODO pass name in addjob function -->
-    <button type= "submit" >Submit</button>
+        <input type="text" name="input" ng-model="jobInput.jobName" ng-trim="false" id="inputName" required> </label>
+        <h1>{{addForm.input.$valid}}</h1>
+    <label>Choose your options for scheduling a new job:</label>
+        <div id='cronOptions' style="margin-top:20px; margin-bottom:20px;"></div>
+    <button type="sumbit" class="btn btn-large btn-success" href="#"><i class="icon-flag icon-2x pull-left"></i> CREATE JOB </button>
+    <!-- <button type= "submit"  class="btn btn-large btn-block" style="margin-top:5px;">SCHEDULE</button>-->
 </form>

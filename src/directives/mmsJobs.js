@@ -1,8 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsJobs', ['$templateCache','$http', '$location', '$anchorScroll', mmsJobs]);
-//'$location', '$anchorScroll','Utils','ElementService', 'WorkspaceService', '$compile', '$templateCache', '$modal', '$http', '$q', '_', newMmsJobs
+.directive('mmsJobs', ['$templateCache','$http', '$location', 'ElementService','UtilsService', mmsJobs]);
 /**
  * @ngdoc directive
  * @name mms.directives.directive:mmsJobs
@@ -10,7 +9,6 @@ angular.module('mms.directives')
  * @requires $templateCache
  * @requires $http
  * @requires $location
- * @requires $anchorScroll
  *
  * @restrict E
  *
@@ -27,36 +25,75 @@ angular.module('mms.directives')
  * @param {string=master} mmsWs Workspace to use, defaults to master
  * @param {string=?:TODO?} mmsDocId 
  */
-function mmsJobs($templateCache, $http, $location, $anchorScroll) {
+function mmsJobs($templateCache, $http, $location, ElementService, UtilsService) {
     var template = $templateCache.get('mms/templates/mmsJobs.html');
 
     var mmsJobsLink = function(scope, element, attrs) {
         var cron_value;
+        var documentName;
+        var project;
         scope.jobInput = { jobName:' '};
-        scope.jobs = getJobs();
+        
+        // get all the jobs for current document
+        var getJobs = function(){
+            var id = scope.mmsDocId;  
+            var link = '/alfresco/service/workspaces/master/jobs/'+ id + '?recurse=1';
+            scope.loading = true;
+            scope.hasJobs = false;
+            $http.get(link).then(function(data){
+                var jobs = data.data.jobs; // get jobs json
+                var jobs_size = data.data.jobs.length; // get length of jobs array
+                var newJobs = [];
+                for (var i = 0; i < jobs_size; i++) {
+                    console.log("hello"+jobs);
+                    newJobs.push({
+                        name: jobs[i].name,
+                        status: jobs[i].status,
+                        schedule: jobs[i].schedule,
+                        url: jobs[i].url,
+                        command: jobs[i].command
+                    });
+                }
+                if(newJobs.length > 0)
+                    scope.hasJobs = true;
+                scope.loading = false;
+                scope.jobs = newJobs;
+            }, function(error){
+                // growl message?? error;
+                console.log("you currently have no jobs for this document");
+            });
+            
+        };
+        
+        //Callback function for document change
+        var changeDocument = function(newVal, oldVal) {// check if the right pane is reloaded everytime
+            if (!newVal || (newVal == oldVal && ran))
+                return;
+            ran = true;
+            lastid = newVal;
+            ElementService.getElement(scope.mmsDocId, false, 'master', 'latest', 2)
+            .then(function(document) {
+                if (newVal !== lastid)
+                    return;
+                if(!document.specialization || document.specialization.type !== 'Product')
+                    return;
+                documentName = document.name;
+                project = UtilsService.getIdInfo(document, null);
+                scope.docName = documentName;
+                getJobs();
+            });
+        };
+        
+        // watch for the docuement to change
         scope.$watch('mmsDocId', changeDocument);
         
-        var changeDocument = function(newVal, oldVal) {
-            if (newVal !== oldVal)
-                return;
-            else{//do I need to clear the scoped object? 
-                scope.jobs = getJobs();
-            }
-        };
-         
-        //:TODO Add something for loading...        
-        //id of the element to assign to anchored scrolling
-        scope.gotoAdd = function() {
-            $location.hash('addSection');
-            $anchorScroll();
-        };
-        
-        // logic for adding a new job -- triggers on button
+        // logic for adding a new job 
         scope.addJob = function() {
-            var id = scope.docId;
+            var id = scope.mmsDocId;    
             var post = {
                 jobs: [{
                     name: scope.jobInput.jobName,
+                    command: 'Jenkins,DocWeb,' + documentName + ',' + project.projectName,
                     schedule: cron_value,
                     status: 'waiting',
                     url: 'sample_initial_url',
@@ -68,7 +105,7 @@ function mmsJobs($templateCache, $http, $location, $anchorScroll) {
                     }
                 }]
             };
-            //Did not pass through start time for some reason
+
             var link = '/alfresco/service/workspaces/master/jobs';
             $http.post(link, post).then(function(){
                     console.log("POSTED");
@@ -77,35 +114,11 @@ function mmsJobs($templateCache, $http, $location, $anchorScroll) {
                 console.log("FAILED TO POST" + error.status);
             });
         }; 
+        
         //actions for stomp 
         scope.$on("stomp.job", function(event, jobs){
 
         });
-        var getJobs = function(){//called first time or when id changes
-            var id = scope.DocId; // view id or document id 
-            var link = '/alfresco/service/workspaces/master/jobs/'+ id + '?recurse=1';
-            var finished;
-            $http.get(link).then(function(data){
-                var jobs = data.data.jobs; // get jobs json
-                var jobs_size = data.data.jobs.length; // get length of jobs array
-                var newJobs = [];
-                for (var i = 0; i < jobs_size; i++) {
-                    newJobs.push({
-                        name: jobs[i].name,
-                        status: jobs[i].status,
-                        schedule: jobs[i].schedule,
-                        url: jobs[i].url,
-                        command: jobs[i].command
-                    });
-                }
-                finished = newJobs;
-                console.log("get request is successful");
-            }, function(error){
-                // growl message?? error;
-                console.log("you currently have no jobs for this document");
-            });
-            return finished;
-        };
         // :TODO This jquery library needs to be replaced with https://github.com/jacobscarter/angular-cron-jobs
         $('#cronOptions').cron({
             initial: "0 0 * * *",

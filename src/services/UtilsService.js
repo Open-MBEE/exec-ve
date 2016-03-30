@@ -407,10 +407,12 @@ function UtilsService(CacheService, _) {
     var getIdInfo = function(elem, siteid) { //elem is element object with qualified id with project in it
         var holdingBinId = null;
         var projectId = null;
+        var projectName = null;
         var siteId = siteid;
 
         if (elem) {
             var splitArray = elem.qualifiedId.split('/');
+            var projectNameArray = elem.qualifiedName.split('/');
             if (splitArray && splitArray.length > 2) {
                 projectId = splitArray[2];
                 siteId = splitArray[1];
@@ -419,12 +421,14 @@ function UtilsService(CacheService, _) {
                 siteId = elem.siteCharacterizationId;
             if (projectId && projectId.indexOf('PROJECT') >= 0) {
                 holdingBinId = 'holding_bin_' + projectId;
+                projectName = projectNameArray[2];
+                
             }
         }
         //if (!holdingBinId && siteId) {
         //    holdingBinId = 'holding_bin_' + siteId + '_no_project';
         //}
-        return {holdingBinId: holdingBinId, projectId: projectId, siteId: siteId};
+        return {holdingBinId: holdingBinId, projectId: projectId, siteId: siteId, projectName: projectName};
     };
 
     return {
