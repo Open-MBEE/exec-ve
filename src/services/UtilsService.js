@@ -404,6 +404,29 @@ function UtilsService(CacheService, _) {
         return 'MMS_' + Date.now() + '_' + uuid;
     };
 
+    var getIdInfo = function(elem, siteid) { //elem is element object with qualified id with project in it
+        var holdingBinId = null;
+        var projectId = null;
+        var siteId = siteid;
+
+        if (elem) {
+            var splitArray = elem.qualifiedId.split('/');
+            if (splitArray && splitArray.length > 2) {
+                projectId = splitArray[2];
+                siteId = splitArray[1];
+            }
+            if (elem.siteCharacterizationId)
+                siteId = elem.siteCharacterizationId;
+            if (projectId && projectId.indexOf('PROJECT') >= 0) {
+                holdingBinId = 'holding_bin_' + projectId;
+            }
+        }
+        //if (!holdingBinId && siteId) {
+        //    holdingBinId = 'holding_bin_' + siteId + '_no_project';
+        //}
+        return {holdingBinId: holdingBinId, projectId: projectId, siteId: siteId};
+    };
+
     return {
         hasCircularReference: hasCircularReference,
         cleanElement: cleanElement,
@@ -418,6 +441,7 @@ function UtilsService(CacheService, _) {
         makeHtmlPara: makeHtmlPara,
         makeHtmlList: makeHtmlList,
         makeHtmlTOC: makeHtmlTOC,
-        createMmsId: createMmsId
+        createMmsId: createMmsId,
+        getIdInfo: getIdInfo
     };
 }
