@@ -32,7 +32,10 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService)
         var cron_value;
         var documentName;
         var project;
-        scope.jobInput = { jobName:' '};
+        var ran = false;
+        var lastid = null;
+        
+        scope.jobInput = { jobName:''};
         
         // get all the jobs for current document
         var getJobs = function(){
@@ -59,10 +62,10 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService)
                 scope.loading = false;
                 scope.jobs = newJobs;
             }, function(error){
+                scope.loading = false;
                 // growl message?? error;
-                console.log("you currently have no jobs for this document");
-            });
-            
+                //console.log("you currently have no jobs for this document");
+            });    
         };
         
         //Callback function for document change
@@ -109,15 +112,26 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService)
             var link = '/alfresco/service/workspaces/master/jobs';
             $http.post(link, post).then(function(){
                     console.log("POSTED");
-                    scope.$setPristine(true);
+                    //scope.$setPristine(true);
+                    scope.jobInput = { jobName:''};
             }, function(error){
                 console.log("FAILED TO POST" + error.status);
             });
         }; 
         
         //actions for stomp 
-        scope.$on("stomp.job", function(event, jobs){
-
+        scope.$on("stomp.job", function(event, newJob){
+            var jobs = newJob; // get jobs json
+            //:TODO check that the owner is the same!!!! jobs.owner !== docId
+            if(jobs.owner !== scope.mmsDocId){
+                scope.jobs.push({
+                    name: newJob.name,
+                    status: newJob.status,
+                    schedule: newJob.schedule,
+                    url: newJob.url,
+                    command: newJob.command
+                });
+            }
         });
         // :TODO This jquery library needs to be replaced with https://github.com/jacobscarter/angular-cron-jobs
         $('#cronOptions').cron({

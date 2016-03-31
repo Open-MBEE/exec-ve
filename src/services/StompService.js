@@ -14,12 +14,13 @@ angular.module('mms')
 function StompService($rootScope, UtilsService, $window, $location, ApplicationService, CacheService) {
      var stompClient = {};
      var host = $location.host();
-     var hostName = 'wss://'+$location.host().split(".")[0]+'-origin.jpl.nasa.gov:61614'; 
-     if (host == '127.0.0.1') {
-        hostName = 'wss://127.0.0.1:61614'; 
-     } else if (host == 'localhost') {
-        hostName = 'wss://localhost:61614';
-     }
+    //  var hostName = 'wss://'+$location.host().split(".")[0]+'-origin.jpl.nasa.gov:61614'; 
+    //  if (host == '127.0.0.1') {
+    //     hostName = 'wss://127.0.0.1:61614'; 
+    //  } else if (host == 'localhost') {
+    //     hostName = 'wss://localhost:61614';
+    //  }
+     var hostName = 'wss://cae-ems-uat-origin.jpl.nasa.gov:61614'; 
      stompClient = Stomp.client(hostName);
      stompClient.connect("guest", "guest", function(){ // on success 
          stompClient.subscribe("/topic/master", function(message) {
@@ -50,6 +51,10 @@ function StompService($rootScope, UtilsService, $window, $location, ApplicationS
                          });               
                      }
                  });
+             }
+             if(updateWebpage.workspace2.addedJobs.length !== 0){//check length of added jobs > 0
+                 var newJob = updateWebpage.workspace2.addedJobs[0];
+                 $rootScope.$broadcast("stomp.job", newJob);
              }
              // this should happen in where...
              $rootScope.$on('$destroy', function() {
