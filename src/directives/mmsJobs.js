@@ -48,7 +48,6 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService)
                 var jobs_size = data.data.jobs.length; // get length of jobs array
                 var newJobs = [];
                 for (var i = 0; i < jobs_size; i++) {
-                    console.log("hello"+jobs);
                     newJobs.push({
                         name: jobs[i].name,
                         status: jobs[i].status,
@@ -62,9 +61,8 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService)
                 scope.loading = false;
                 scope.jobs = newJobs;
             }, function(error){
+                // display some error? 
                 scope.loading = false;
-                // growl message?? error;
-                //console.log("you currently have no jobs for this document");
             });    
         };
         
@@ -123,7 +121,7 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService)
         scope.$on("stomp.job", function(event, newJob){
             var jobs = newJob; // get jobs json
             //:TODO check that the owner is the same!!!! jobs.owner !== docId
-            if(jobs.owner !== scope.mmsDocId){
+            if(jobs.owner === scope.mmsDocId){
                 scope.jobs.push({
                     name: newJob.name,
                     status: newJob.status,
