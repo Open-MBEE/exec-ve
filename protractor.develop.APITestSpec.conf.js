@@ -1,4 +1,4 @@
-var json;
+// var api;
 
 exports.config = {
   directConnect: true,
@@ -24,14 +24,16 @@ exports.config = {
   },
   onPrepare: function() {
     browser.manage().window().maximize();
-    json = require('../cred-getter').init();
-  },
+    // json = require('../cred-getter');
+    // var api = require('../agave');
+    // api.parse('./node_modules/parser-agave/Uxparsed.txt');
 
-  params: {
-    login: {
-      user: json.username,
-      password: json.password
-    }
   }
+  // params: {
+  //   login: {
+  //     user: json.username,
+  //     password: json.password
+  //   }
+  // }
 
 };
