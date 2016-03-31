@@ -46,6 +46,10 @@ angular.module('mmsApp').controller('ToolbarCtrl', ['$scope', '$rootScope', '$st
 			$scope.tbApi.setPermission('element.editor', editable);
 			$scope.tbApi.addButton(UxService.getToolbarButton("tags"));
 			$scope.tbApi.setPermission('tags', true);
+			if ($state.includes('workspace.site')) {
+				$scope.tbApi.addButton(UxService.getToolbarButton("view.reorder"));
+				$scope.tbApi.setPermission("view.reorder", editable);
+			}
 		}
 		else if ($state.includes('workspace.site.document'))
 		{
