@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsJobs', ['$templateCache','$http', '$location', 'ElementService','UtilsService', mmsJobs]);
+.directive('mmsJobs', ['$templateCache','$http', '$location', 'ElementService','UtilsService','growl', mmsJobs]);
 /**
  * @ngdoc directive
  * @name mms.directives.directive:mmsJobs
@@ -25,7 +25,7 @@ angular.module('mms.directives')
  * @param {string=master} mmsWs Workspace to use, defaults to master
  * @param {string=?:TODO?} mmsDocId 
  */
-function mmsJobs($templateCache, $http, $location, ElementService, UtilsService) {
+function mmsJobs($templateCache, $http, $location, ElementService, UtilsService, growl) {
     var template = $templateCache.get('mms/templates/mmsJobs.html');
 
     var mmsJobsLink = function(scope, element, attrs) {
@@ -109,11 +109,14 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService)
 
             var link = '/alfresco/service/workspaces/master/jobs';
             $http.post(link, post).then(function(){
-                    console.log("POSTED");
-                    //scope.$setPristine(true);
-                    scope.jobInput = { jobName:''};
-            }, function(error){
-                console.log("FAILED TO POST" + error.status);
+                console.log("POSTED");
+                //scope.$setPristine(true);
+                scope.jobInput = { jobName:''};
+                growl.success('Your job has posted');
+            
+            }, function(fail){
+                growl.error('Your job failed to post: ' + fail.status);
+                console.log("FAILED TO POST" + fail.status);
             });
         }; 
         
