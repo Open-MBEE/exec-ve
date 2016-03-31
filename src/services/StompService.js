@@ -20,7 +20,6 @@ function StompService($rootScope, UtilsService, $window, $location, ApplicationS
      } else if (host == 'localhost') {
         hostName = 'wss://localhost:61614';
      }
-     //var hostName = 'wss://cae-ems-uat-origin.jpl.nasa.gov:61614'; 
      stompClient = Stomp.client(hostName);
      stompClient.connect("guest", "guest", function(){ // on success 
          stompClient.subscribe("/topic/master", function(message) {
