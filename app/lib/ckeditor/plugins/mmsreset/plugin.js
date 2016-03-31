@@ -21,7 +21,7 @@ CKEDITOR.plugins.add( 'mmsreset', {
     });
       
     editor.ui.addButton( 'mmsreset', {
-        label: 'Update Cross Reference',
+        label: 'Update Cross Ref',
         command: 'resetCF',
     });
 	}
