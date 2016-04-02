@@ -156,11 +156,15 @@
           axis: {
             x: {
               label : {},
-              tick : {}
+              tick : {
+                fit: false
+              },
             },
             y: {
               label : {},
-              tick : {}
+              tick : {
+                fit: false
+              }
             }
           },
           line: {},
@@ -172,6 +176,10 @@
         };
         if (tables.length > 1) {
           _chart.data.xs = {};
+        }
+        if (typeof scope.tickFit === 'string') {
+          _chart.axis.x.tick.fit = scope.tickFit.toLowerCase().indexOf('x') >= 0;
+          _chart.axis.y.tick.fit = scope.tickFit.toLowerCase().indexOf('y') >= 0;
         }
 
         // Process each table
@@ -198,27 +206,29 @@
               col,
               ci = table.columnHeaders.length - 1,
               yColKeys = [],  // this table's y column keys
-              _sc = 0;        // this table's series counter
+              _sc = 0,        // this table's series counter
+              ck;             // temporary colKey
 
           // Process columns in reverse to mutate while looping
           xColHeads = [];
           yColHeads = [];
           while (ci >= 0) {
             col = table.columnHeaders[ci];
+            ck = col + tc;
             if (col === xCol || (isY = (yCols.length === 0 || yCols.includes(col)))) {
               if (isY) {
                 // assign x column if more than one
                 if (tables.length > 1) {
-                  _chart.data.xs[col + tc] = xCol + tc;
+                  _chart.data.xs[ck] = xCol + tc;
                 }
                 yColHeads.push(col);
-                yColKeys.push(col + tc);
+                yColKeys.push(ck);
                 isY = false;
               } else {
                 xColHeads.push(col);
               }
               // Prepend data columns with column key
-              table.columns[ci].unshift(col + tc);
+              table.columns[ci].unshift(ck);
             } else {
               // Remove unused column
               table.columnHeaders.splice(ci, 1);
@@ -228,16 +238,18 @@
           }
 
           // Name the y columns in order
+          var yci = 0;
           table.columns.forEach(function(column) {
             if (yColKeys.includes(column[0])) {
               if (scope.seriesNames === undefined || scope.seriesNames[sc] === undefined) {
-                // Use column header as series name
-                _chart.data.names[column[0]] = column[0];
+                // Use column header as series name (don't append index to first one)
+                _chart.data.names[column[0]] = tc === 0 ? yColHeads[yci] : column[0];
               } else {
                 // Use user-supplied series name
                 _chart.data.names[column[0]] = scope.seriesNames[sc + _sc];
                 _sc++;
               }
+              yci++;
             }
           });
           sc += yColKeys.length;
@@ -547,6 +559,10 @@
         logScaleX: '=',
         logScaleY: '=',
         logScaleLabel: '=',
+        tickFit: '@', // accepted values: '', 'xy', 'yx', 'x', 'y'
+        grid: '=', // @todo {number|number[2]|undefined}
+        tickPrecision: '@', // @todo
+        legend: '=', // @todo {boolean}
         type: '@',
         types: '=',
         padding: '='
