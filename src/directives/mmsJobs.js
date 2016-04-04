@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsJobs', ['$templateCache','$http', '$location', 'ElementService','UtilsService','growl', mmsJobs]);
+.directive('mmsJobs', ['$templateCache','$http', '$location', 'ElementService','UtilsService','growl',  mmsJobs]);
 /**
  * @ngdoc directive
  * @name mms.directives.directive:mmsJobs
@@ -23,7 +23,7 @@ angular.module('mms.directives')
  * </pre>
  *
  * @param {string=master} mmsWs Workspace to use, defaults to master
- * @param {string=?:TODO?} mmsDocId 
+ * @param {string=null} mmsDocId 
  */
 function mmsJobs($templateCache, $http, $location, ElementService, UtilsService, growl) {
     var template = $templateCache.get('mms/templates/mmsJobs.html');
@@ -61,7 +61,8 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
                 scope.loading = false;
                 scope.jobs = newJobs;
             }, function(error){
-                // display some error? 
+                // display some error?
+                growl.error('There was a error in retrieving your jobs: ' + error.status); 
                 scope.loading = false;
             });    
         };
@@ -109,21 +110,18 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
 
             var link = '/alfresco/service/workspaces/master/jobs';
             $http.post(link, post).then(function(){
-                console.log("POSTED");
                 //scope.$setPristine(true);
                 scope.jobInput = { jobName:''};
                 growl.success('Your job has posted');
             
             }, function(fail){
                 growl.error('Your job failed to post: ' + fail.status);
-                console.log("FAILED TO POST" + fail.status);
             });
         }; 
         
         //actions for stomp 
         scope.$on("stomp.job", function(event, newJob){
             var jobs = newJob; // get jobs json
-            //:TODO check that the owner is the same!!!! jobs.owner !== docId
             if(jobs.owner === scope.mmsDocId){
                 scope.jobs.push({
                     name: newJob.name,
