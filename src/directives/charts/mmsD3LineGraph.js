@@ -3,9 +3,9 @@
   angular.module('mms.directives')
     .directive('mmsLineGraph', ['TableService', '$window', '$q', mmsLineGraph]);
 
-  /*
+  /**
    * @ngdoc directive
-   * @name mms.directive:mmsLineGraph
+   * @name mms.directives.directive:mmsLineGraph
    * @restrict EA
    * @scope
    * @param {string} eid Element ID or comma separated IDs to table elements
@@ -22,7 +22,8 @@
    * @param {string|number=} logScaleX Logarithmic scale base to use on X axis.
    * @param {string|number=} logScaleX Logarithmic scale base to use on Y axis.
    * @param {boolean=true} logScaleLabel Whether to render labels for log grid
-   * @param {string=="line"} type Type of graph to render (line, spline, step, step-before, step-after, area, area-spline, area-step, ...).
+   * @param {string=} tickFit  Whether to fit tick marks to data. Accepted values: '', 'xy', 'yx', 'x', 'y'
+   * @param {string="line"} type Type of graph to render (line, spline, step, step-before, step-after, area, area-spline, area-step, ...).
    * @param {object=} padding Set the top/right/bottom/left margin.
    * @description
    * A directive for generating a D3 line graph from opaque tables.
@@ -30,7 +31,7 @@
    * will be used instead. Use "{''}" to generate an empty caption.
    *
    * @example <caption>Example usage with a multi-series table.</caption>
-   * // Generates a velocity vs. time graph with 2 time series and uses the table
+   * <pre>// Generates a velocity vs. time graph with 2 time series and uses the table
    * // title as caption.
    * // '###' is the element ID of a table with columns:
    * // "Time (s)", "Velocity" and "Acceleration".
@@ -38,9 +39,9 @@
    * // used as the x-axis label by default.
    * <mms-line-graph data-eid="###" data-y-label="Velocity (m/s)">
    *  $title
-   * </mms-line-graph>
+   * </mms-line-graph></pre>
    * @example <caption>Example usage with a multi-series table with distinct x-columns.</caption>
-   * // Generates a velocity vs. time graph with 2 unaligned time series by explicitly
+   * <pre>// Generates a velocity vs. time graph with 2 unaligned time series by explicitly
    * // specifying the x- and y-columns.
    * // '###' is the element ID of a table with columns:
    * // "Time1", "Time2", "Velocity1", "Acceleration1", "Velocity2", "Acceleration2"
@@ -48,16 +49,16 @@
    *  data-y-cols="['Velocity1','Velocity2']" data-x-label="Time (s)"
    *  data-y-label="Velocity (m/s)">
    *  $title
-   * </mms-line-graph>
+   * </mms-line-graph></pre>
    * @example <caption>Example usage with multiple single-series tables.</caption>
-   * // Generates a velocity-over-time graph with 4 time series and a caption
+   * <pre>// Generates a velocity-over-time graph with 4 time series and a caption
    * // '###' are the element IDs of tables with columns:
    * // "Acceleration (m/s^2), "Time (s)", "Velocity (m/s)"
    * // and:
    * // "Acceleration (m/s^2), "Time", "Velocity (m/s)"
    * <mms-line-graph data-eid="###,###,###,###" data-y-col="Velocity" data-x-cols="['Time (s)', 'Time']">
    *  Caption this!
-   * </mms-line-graph>
+   * </mms-line-graph></pre>
    *
    * @TODO: Add data types support (spline, area-spline, area-line, etc.)
    * @TODO: Find way to avoid using onrendered callback for log scale
@@ -121,7 +122,9 @@
       var ws = scope.mmsWs;
       var version = scope.mmsVersion;
       var promises = [];
-      var eids = scope.eid.split(',');
+      var eids = scope.eid.split(',').map(function (val) {
+        return val.trim();
+      });
       var xCols = [], yCols = [];
 
       // Generate figure element's ID
@@ -180,6 +183,9 @@
         if (typeof scope.tickFit === 'string') {
           _chart.axis.x.tick.fit = scope.tickFit.toLowerCase().indexOf('x') >= 0;
           _chart.axis.y.tick.fit = scope.tickFit.toLowerCase().indexOf('y') >= 0;
+        }
+        if (typeof scope.legend === 'boolean' && !scope.legend) {
+          _chart.legend = {hide: true};
         }
 
         // Process each table
