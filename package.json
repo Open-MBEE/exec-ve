@@ -32,7 +32,6 @@
     "karma-jasmine": "~0.3.6",
     "karma-junit-reporter": "~0.3.8",
     "karma-phantomjs-launcher": "~0.2.3",
-    "parser-agave": "file:///Users/syferris/Development/git/Parser",
     "phantomjs": "~2.1.2",
     "protractor": "~3.0.0"
   },
