@@ -2,6 +2,8 @@ describe('Users on the View Editor in respect to Saving', function()
 {
   var api = require('../../../node_modules/agave');
   api.parse('../../node_modules/parser-agave/Uxparsed.txt');
+  var cred = require('../../../ems-config/ems-password.json');
+
 
   var siteName = "CAEDVO-2927";
   var docName = 'DocTwo';
@@ -51,16 +53,17 @@ describe('Users on the View Editor in respect to Saving', function()
     {
       browser.browserName = cap.caps_.browserName;
 
+      var firefoxURL = 'https://' + cred.username + ':' + cred.password + '@cae-ems-autotest.jpl.nasa.gov/alfresco/buttonBuild/mms.html#/workspaces/master/sites/caedvo-2927/documents/MMS_1455316044605_9d07b04a-b7c7-4b60-a2cd-2e1ca3043178/views/MMS_1455316044605_9d07b04a-b7c7-4b60-a2cd-2e1ca3043178';
       if(browser.browserName === 'firefox')
       {
-        browser.get('https://mmsAdmin:letmein@cae-ems-autotest.jpl.nasa.gov/alfresco/buttonBuild/mms.html#/workspaces/master/sites/caedvo-2927/documents/MMS_1455316044605_9d07b04a-b7c7-4b60-a2cd-2e1ca3043178/views/MMS_1455316044605_9d07b04a-b7c7-4b60-a2cd-2e1ca3043178');
+        browser.get(firefoxURL);
         wait(1000);
       }
-      else if(browser.browserName === 'chrome')
-      {
-        browser.get('https://mmsAdmin:letmein@cae-ems-autotest.jpl.nasa.gov:8443/alfresco/buttonBuild/mms.html#/workspaces/master/sites/caedvo-2927/documents/MMS_1455316044605_9d07b04a-b7c7-4b60-a2cd-2e1ca3043178/views/MMS_1455316044605_9d07b04a-b7c7-4b60-a2cd-2e1ca3043178');
-        wait(1000);
-      }
+      // else if(browser.browserName === 'chrome')
+      // {
+      //   browser.get('https://mmsAdmin:letmein@cae-ems-autotest.jpl.nasa.gov:8443/alfresco/buttonBuild/mms.html#/workspaces/master/sites/caedvo-2927/documents/MMS_1455316044605_9d07b04a-b7c7-4b60-a2cd-2e1ca3043178/views/MMS_1455316044605_9d07b04a-b7c7-4b60-a2cd-2e1ca3043178');
+      //   wait(1000);
+      // }
 
       console.log('Browser:', browser.browserName);
     });
