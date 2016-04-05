@@ -72,6 +72,10 @@
         open: '<tspan dy="-.5em" font-size="75%">',
         close: '</tspan>'
       },
+      TOOLTIP_SUP: {
+        open: '<sup>',
+        close: '</sup>'
+      },
       SVG_CONTAINER: {
         open: '<figure class="line-graph">',
         close: '</figure>'
@@ -82,7 +86,9 @@
       },
       GRAPH_MARGIN: 1,
       GRAPH_MARGIN_CROP: 0.2,
-      LOGSCALE_MIN: 0.0001  // Convert 0 values to this number to avoid -Infinity
+      LOGSCALE_MIN: 0.0001,  // Convert 0 values to this number to avoid -Infinity
+      RESIZE_MARGIN_H: 20,    // Allow graph to shrink with window
+      RESIZE_MARGIN_W: 20
     };
 
     function wrapTag(tag, text, attrs) {
@@ -96,13 +102,19 @@
     }
 
     var sup = wrapTag.bind({}, DEFAULT.SVG_SUP);
+    var sup2 = wrapTag.bind({}, DEFAULT.TOOLTIP_SUP);
     var figure = wrapTag.bind({}, DEFAULT.SVG_CONTAINER);
     var figCaption = wrapTag.bind({}, DEFAULT.SVG_CAPTION);
 
     function getUnit(label) {
       var res = label.match(/\((.+)\)/);
       if (res) {
-        return ' ' + res[1];
+        /**
+         * @TODO: Add superscript support for SVG text (axes labels)
+         */
+        var unit = res[1].replace(/\d/g, sup2('$&'));
+        console.log(label + " : " + unit);
+        return ' ' + unit;
       }
       return '';
     }
