@@ -286,27 +286,12 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                     if (scope.element.specialization.isSlot) 
                       scope.isSlot = true;
 
-                    elementData.then(
-                        function(val) {
-                            if (scope.isSlot) {
-                              var slotData = ElementService.getElement(val.specialization.propertyType, 
-                                  false, scope.ws, scope.version);
-                              slotData.then(
-                                  function(val) {
-                                    var enumValues = Utils.isEnumeration(val,scope);
-                                    enumValues.then( function(value) {
-                                      if (value.isEnumeration) {
-                                          scope.isEnumeration = value.isEnumeration;
-                                          scope.options = value.options;
-                                      }
-                                    }, function(reason) {
-                                        Utils.addFrame(scope, mmsViewCtrl, element, frameTemplate);
-                                        growl.error('Failed to get enumeration options: ' + reason.message);
-                                    });
-                              }, function(reason) {
-                                  Utils.addFrame(scope, mmsViewCtrl, element, frameTemplate);
-                              });
-                            } else{
+                    elementData.then(function(val) {
+                        if (scope.isSlot) {
+                          var slotData = ElementService.getElement(val.specialization.propertyType, 
+                              false, scope.ws, scope.version);
+                          slotData.then(
+                              function(val) {
                                 var enumValues = Utils.isEnumeration(val,scope);
                                 enumValues.then( function(value) {
                                   if (value.isEnumeration) {
@@ -317,12 +302,25 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                                     Utils.addFrame(scope, mmsViewCtrl, element, frameTemplate);
                                     growl.error('Failed to get enumeration options: ' + reason.message);
                                 });
-                            }
-
+                          }, function(reason) {
+                              Utils.addFrame(scope, mmsViewCtrl, element, frameTemplate);
+                          });
+                        } else {
+                            var enumValues = Utils.isEnumeration(val,scope);
+                            enumValues.then( function(value) {
+                              if (value.isEnumeration) {
+                                  scope.isEnumeration = value.isEnumeration;
+                                  scope.options = value.options;
+                              }
+                            }, function(reason) {
                                 Utils.addFrame(scope, mmsViewCtrl, element, frameTemplate);
-                        }, function(reason) {
-                            Utils.addFrame(scope, mmsViewCtrl, element, frameTemplate);
+                                growl.error('Failed to get enumeration options: ' + reason.message);
+                            });
                         }
+                        Utils.addFrame(scope, mmsViewCtrl, element, frameTemplate);
+                      }, function(reason) {
+                          Utils.addFrame(scope, mmsViewCtrl, element, frameTemplate);
+                      }
                     );
 
                     var fillDropDown = function(data) {
