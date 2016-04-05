@@ -410,7 +410,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $m
             // { name: 'forms',       items : [ 'Form', 'Checkbox', 'Radio', 'TextField', 'Textarea', 'Select', 'Button', 'ImageButton', 'HiddenField' ] },
             { name: 'basicstyles', items : [ 'Bold','Italic','Underline','Strike','Subscript','Superscript','-','RemoveFormat' ] },
             { name: 'paragraph',   items : [ 'Blockquote','-','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock' ] },
-            { name: 'insert',      items : ['SpecialChar','Mathjax','eqneditor','PageBreak','HorizontalRule','pbckcode' ] },
+            { name: 'insert',      items : ['SpecialChar','Mathjax','PageBreak','HorizontalRule','CodeSnippet' ] },
             '/',
             { name: 'styles',      items : [ 'Format','FontSize','TextColor','BGColor' ] },
             { name: 'links',       items : [ 'Link','Unlink' ] },
