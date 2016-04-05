@@ -519,7 +519,7 @@
           var posLog = logFn(pos);
           return {
             value: posLog,
-            text:  (typeof text === 'undefined') ? pos : text,
+            text:  (typeof text === 'undefined') ? Math.round(pos*100)/100 : text,
             class: className
           };
         }
