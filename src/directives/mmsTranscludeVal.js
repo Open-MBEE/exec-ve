@@ -231,6 +231,10 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                 scope.editValues.push({type: type, double: 0.0});
         };
         scope.addValueType = 'LiteralString';
+        
+        scope.addEnumerationValue = function() {
+          scope.editValues.push({type: "InstanceValue", instance: scope.options[0]});
+        };
 
         if (mmsViewCtrl) { 
             

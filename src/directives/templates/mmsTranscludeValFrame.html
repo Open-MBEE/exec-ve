@@ -26,6 +26,9 @@
             </div>
             <div ng-switch-default>Editing not supported for now</div>
         </span>
+        <div ng-if="editValues.length != 0 && isSlot">
+          <button class="btn btn-sm" ng-click="addValue(editValues[0].type)">Add</button>
+        </div>
     </div>
     <div ng-if="isRestrictedVal">
         <select ng-model="editValues[0].operand[1].element" ng-options="el.sysmlid as el.name for el in options">
@@ -35,6 +38,9 @@
     <div ng-if="isEnumeration" ng-repeat="val in editValues">
         <select ng-model="val.instance" ng-options="el.sysmlid as el.name for el in options">
         </select>
+    </div>
+    <div ng-if="isSlot && isEnumeration && editValues.length != 0">
+      <button class="btn btn-sm" ng-click="addEnumerationValue()">Add</button>
     </div>
 </div>
 </div>
