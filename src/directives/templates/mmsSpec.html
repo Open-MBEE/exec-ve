@@ -30,8 +30,8 @@
             <select ng-model="editValues[0].operand[1].element" ng-options="el.sysmlid as el.name for el in options">
             </select>
         </div>
-        <div ng-if="isEnumeration">
-            <select ng-model="editValues[0].instance" ng-options="el.sysmlid as el.name for el in options">
+        <div ng-if="isEnumeration" ng-repeat="val in editValues">
+            <select ng-model="val.instance" ng-options="el.sysmlid as el.name for el in options">
             </select>
         </div>
     </div>
