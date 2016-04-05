@@ -549,13 +549,20 @@
           }
         }
         // execute postrender callbacks (e.g. gridl lines and tick modifications)
-        _chart.onrendered = function(){
+        _chart.onrendered = function() {
           for (var i in _chart._onrendered) {
             _chart._onrendered[i].call(this);
           }
           for (i in _chart._postrender) {
             _chart._postrender[i].call(this);
           }
+        };
+        // handle window resize
+        _chart.onresize = function() {
+          this.api.resize({
+            width: element.offsetWidth - DEFAULT.RESIZE_MARGIN_W,
+            height: element.offsetHeight - DEFAULT.RESIZE_MARGIN_H
+          });
         };
         console.log(_chart);
         renderGraph(scope, element, _chart);
