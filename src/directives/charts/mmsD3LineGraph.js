@@ -190,21 +190,23 @@
 
         // Process each table
         tables.forEach(function(table, tc) {
-          var xCol;
+          var xCol, xColKey;
 
           // Determine x column for the table
           if (xCols.length > 0) {
+            // use manually-specified xCol headers
             xCol = xCols[tc % xCols.length];
           } else {
             xCol = table.columnHeaders[0];
             xCols.push(xCol);
           }
+          xColKey = xCol + tc;
 
           // Set chart title and universal x column (if only one is provided)
           if (tc === 0) {
             _chart.title = table.title;
             if (tables.length === 1 && !scope.xCols) {
-              _chart.data.x = xCol + tc;
+              _chart.data.x = xColKey;
             }
           }
 
@@ -215,22 +217,23 @@
               _sc = 0,        // this table's series counter
               ck;             // temporary colKey
 
-          // Process columns in reverse to mutate while looping
+          // x- and y-columns found in this table;
           xColHeads = [];
           yColHeads = [];
+          // Process columns in reverse to mutate while looping
           while (ci >= 0) {
             col = table.columnHeaders[ci];
             ck = col + tc;
-            if (col === xCol || (isY = (yCols.length === 0 || yCols.includes(col)))) {
-              if (isY) {
+            if (col === xCol || yCols.length === 0 || yCols.includes(col)) {
+              if (col !== xCol) { // is a Y-column
                 // assign x column if more than one
                 if (tables.length > 1) {
-                  _chart.data.xs[ck] = xCol + tc;
+                  _chart.data.xs[ck] = xColKey;
                 }
                 yColHeads.push(col);
                 yColKeys.push(ck);
                 isY = false;
-              } else {
+              } else { // is X-column
                 xColHeads.push(col);
               }
               // Prepend data columns with column key
