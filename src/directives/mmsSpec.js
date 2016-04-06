@@ -224,44 +224,16 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
                                     scope.options = elements;
                                 });
                             } else {
-                            //The editor check occurs here; should get "not supported for now" from here
-                                var id = scope.element.specialization.propertyType;
-                                if (scope.element.specialization.isSlot) 
-                                  scope.isSlot = true;
+                                //The editor check occurs here; should get "not supported for now" from here
                                   
-                                ElementService.getElement(id, false, scope.mmsWs, scope.mmsVersion)
-                                .then(function(val) {
-                                    if (newVal !== lastid)
-                                        return;
-                                        
-                                    if (scope.isSlot) {
-                                      var slotData = ElementService.getElement(val.specialization.propertyType, 
-                                          false, scope.ws, scope.version);
-                                      slotData.then(function(val) {
-                                          var enumValues = Utils.isEnumeration(val,scope);
-                                          enumValues.then( function(value) {
-                                            if (value.isEnumeration) {
-                                                scope.isEnumeration = value.isEnumeration;
-                                                scope.options = value.options;
-                                            }
-                                          }, function(reason) {
-                                              growl.error('Failed to get enumeration options: ' + reason.message);
-                                          });
-                                      }, function(reason) {
-                                          growl.error('Failed to get slot data: ' + reason.message);
-                                      });
-                                    } else {
-                                        var enumValues = Utils.isEnumeration(val,scope);
-                                        enumValues.then( function(value) {
-                                          if (value.isEnumeration) {
-                                              scope.isEnumeration = value.isEnumeration;
-                                              scope.options = value.options;
-                                          }
-                                        }, function(reason) {
-                                            // Utils.addFrame(scope, mmsViewCtrl, element, frameTemplate);
-                                            growl.error('Failed to get enumeration options: ' + reason.message);
-                                        });
-                                    }
+                                Utils.getPropertySpec(scope.element, scope.mmsWs, scope.mmsVersion)
+                                .then( function(value) {
+                                    scope.isEnumeration = value.isEnumeration;
+                                    scope.isSlot = value.isSlot;
+                                    scope.options = value.options;
+                                }, function(reason) {
+                                    // Utils.addFrame(scope, mmsViewCtrl, element, frameTemplate);
+                                    growl.error('Failed to get property spec: ' + reason.message);
                                 });
                             }
                         }

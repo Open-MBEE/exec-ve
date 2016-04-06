@@ -280,73 +280,24 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                 } else {
                     //The editor check occurs here; should get "not supported for now" from here
 
-                    //Get the ID, do backend call for Element data
+                    // check if data has been loaded for specified id
                     var id = scope.element.specialization.propertyType;
                     if (!id || (scope.isEnumeration && scope.options)) {
                         Utils.addFrame(scope, mmsViewCtrl, element, frameTemplate);
                         return;
                     }
-                    var elementData = ElementService.getElement(id, false, scope.ws, scope.version);
-                    if (scope.element.specialization.isSlot) 
-                      scope.isSlot = true;
-
-                    elementData.then(function(val) {
-                        if (scope.isSlot) {
-                          var slotData = ElementService.getElement(val.specialization.propertyType, 
-                              false, scope.ws, scope.version);
-                          slotData.then(
-                              function(val) {
-                                var enumValues = Utils.isEnumeration(val,scope);
-                                enumValues.then( function(value) {
-                                  if (value.isEnumeration) {
-                                      scope.isEnumeration = value.isEnumeration;
-                                      scope.options = value.options;
-                                  }
-                                }, function(reason) {
-                                    Utils.addFrame(scope, mmsViewCtrl, element, frameTemplate);
-                                    growl.error('Failed to get enumeration options: ' + reason.message);
-                                });
-                          }, function(reason) {
-                              Utils.addFrame(scope, mmsViewCtrl, element, frameTemplate);
-                          });
-                        } else {
-                            var enumValues = Utils.isEnumeration(val,scope);
-                            enumValues.then( function(value) {
-                              if (value.isEnumeration) {
-                                  scope.isEnumeration = value.isEnumeration;
-                                  scope.options = value.options;
-                              }
-                            }, function(reason) {
-                                Utils.addFrame(scope, mmsViewCtrl, element, frameTemplate);
-                                growl.error('Failed to get enumeration options: ' + reason.message);
-                            });
-                        }
-                        Utils.addFrame(scope, mmsViewCtrl, element, frameTemplate);
+                    // otherwise get property spec 
+                    Utils.getPropertySpec(scope.element,scope.ws,scope.version)
+                      .then( function(value) {
+                          scope.isEnumeration = value.isEnumeration;
+                          scope.isSlot = value.isSlot;
+                          scope.options = value.options;
+                          if ( !scope.isSlot || !scope.isEnumeration)
+                            Utils.addFrame(scope, mmsViewCtrl, element, frameTemplate);
                       }, function(reason) {
                           Utils.addFrame(scope, mmsViewCtrl, element, frameTemplate);
-                      }
-                    );
-
-                    var fillDropDown = function(data) {
-                        data.then(
-                            function(val) {
-                                var newArray = [];
-                                //Filter only for appropriate property value
-                                for (var i = 0; i < val.length; i++) {
-                                    if( val[i].appliedMetatypes && val[i].appliedMetatypes.length > 0 && 
-                                        val[i].appliedMetatypes[0] === '_9_0_62a020a_1105704885423_380971_7955') {
-                                        newArray.push(val[i]);
-                                    }
-                                }
-                                scope.options = newArray;
-                                Utils.addFrame(scope,mmsViewCtrl,element,frameTemplate); //For Edit view, no need for addFrame
-                            },
-                            function(reason) {
-                                console.log(reason);
-                                growl.error('Failed to get enumeration options: ' + reason.message);
-                            }
-                        );
-                    };
+                          growl.error('Failed to get property spec: ' + reason.message);
+                      });
                 }
             };
 

@@ -241,13 +241,12 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
      * @return {Promise} promise would be resolved with options and if object is enumerable.
      *      For unsuccessful saves, it will be rejected with an object with reason.
      */
-    var isEnumeration = function(elt, scope) {
+    var isEnumeration = function(elt, ws, version) {
         var deferred = $q.defer();
         if (elt.appliedMetatypes && elt.appliedMetatypes.length > 0 && 
             elt.appliedMetatypes[0] === ENUM_ID) {
             var isEnumeration = true;
-            var fillData = ElementService.getOwnedElements(elt.sysmlid, false, scope.ws, scope.version, 1);
-            var options = fillData.then(
+            ElementService.getOwnedElements(elt.sysmlid, false, ws, version, 1).then(
               function(val) {
                   var newArray = [];
                  // Filter for enumeration type
@@ -264,13 +263,53 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
                   deferred.reject(reason);
               }
             );
-        }
+        } else {deferred.resolve({options:[],isEnumeration: false});}
         return deferred.promise;
     };
 
+    var getPropertySpec = function(elt, ws, version) {
+      var deferred = $q.defer();
+      var id = elt.specialization.propertyType;
+      var isSlot = false;
+      var isEnum = false;
+      var options = [];
+      if (elt.specialization.isSlot) 
+          isSlot = true;
+      
+      // Get element specialization propertyType info 
+      ElementService.getElement(id,false,ws,version).then(function(value){
+        if (isSlot) {
+          //if specialization is a slot  
+          ElementService.getElement(value.specialization.propertyType,false,ws,version)
+            .then(function(val) {
+              isEnumeration(val).then( function(enumValue) {
+                if (enumValue.isEnumeration) {
+                    isEnum = enumValue.isEnumeration;
+                    options = enumValue.options;
+                }
+                deferred.resolve({ options:options, isEnumeration:isEnum, isSlot:isSlot });
+              }, function(reason) {
+                deferred.reject(reason);
+              });
+          });
+        } else {
+          isEnumeration(value).then( function(enumValue) {
+            if (enumValue.isEnumeration) {
+                isEnum = enumValue.isEnumeration;
+                options = enumValue.options;
+            }
+            deferred.resolve({ options:options, isEnumeration:isEnum, isSlot:isSlot });
+          }, function(reason) {
+            deferred.reject(reason);
+          });
+        }
+      });
+      return deferred.promise;
+    };
+    
     var addFrame = function(scope, mmsViewCtrl, element, template, editObj, doNotScroll) {
 
-        if (mmsViewCtrl.isEditable() && !scope.isEditing && scope.element.editable && scope.version === 'latest') { // && !scope.cleanUp) {
+        if (mmsViewCtrl.isEditable() && !scope.isEditing && scope.element.editable && scope.version === 'latest') { 
 
             var id = editObj ? editObj.sysmlid : scope.mmsEid;
             ElementService.getElementForEdit(id, false, scope.ws)
@@ -600,6 +639,7 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
         isDirectChildOfPresentationElementFunc: isDirectChildOfPresentationElementFunc,
         hasHtml: hasHtml,
         isEnumeration: isEnumeration,
+        getPropertySpec: getPropertySpec,
     };
 
 }
