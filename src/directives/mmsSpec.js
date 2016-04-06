@@ -331,6 +331,10 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
         };
         scope.addValueType = 'LiteralString';
 
+        scope.addEnumerationValue = function() {
+          scope.editValues.push({type: "InstanceValue", instance: scope.options[0]});
+        };
+        
         if (angular.isObject(scope.mmsSpecApi)) {
             var api = scope.mmsSpecApi;
             /**

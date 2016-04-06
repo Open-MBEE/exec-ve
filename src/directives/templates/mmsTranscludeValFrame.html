@@ -39,7 +39,7 @@
         <select ng-model="val.instance" ng-options="el.sysmlid as el.name for el in options">
         </select>
     </div>
-    <div ng-if="isSlot && isEnumeration && editValues.length != 0">
+    <div ng-if="isSlot && isEnumeration">
       <button class="btn btn-sm" ng-click="addEnumerationValue()">Add</button>
     </div>
 </div>

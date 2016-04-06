@@ -247,64 +247,77 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
             elt.appliedMetatypes[0] === ENUM_ID) {
             var isEnumeration = true;
             ElementService.getOwnedElements(elt.sysmlid, false, ws, version, 1).then(
-              function(val) {
-                  var newArray = [];
-                 // Filter for enumeration type
-                  for (var i = 0; i < val.length; i++) {
-                      if( val[i].appliedMetatypes && val[i].appliedMetatypes.length > 0 && 
-                          val[i].appliedMetatypes[0] === ENUM_LITERAL) {
-                          newArray.push(val[i]);
-                      }
-                  }
-                  deferred.resolve({options:newArray,isEnumeration: isEnumeration});
-              },
-              function(reason) {
-                  console.log(reason);
-                  deferred.reject(reason);
-              }
+                function(val) {
+                    var newArray = [];
+                     // Filter for enumeration type
+                    for (var i = 0; i < val.length; i++) {
+                        if( val[i].appliedMetatypes && val[i].appliedMetatypes.length > 0 && 
+                            val[i].appliedMetatypes[0] === ENUM_LITERAL) {
+                            newArray.push(val[i]);
+                        }
+                    }
+                    deferred.resolve({options:newArray,isEnumeration: isEnumeration});
+                },
+                function(reason) {
+                    deferred.reject(reason);
+                }
             );
-        } else {deferred.resolve({options:[],isEnumeration: false});}
+        } else {
+            deferred.resolve({options:[],isEnumeration: false});
+        }
         return deferred.promise;
     };
 
     var getPropertySpec = function(elt, ws, version) {
-      var deferred = $q.defer();
-      var id = elt.specialization.propertyType;
-      var isSlot = false;
-      var isEnum = false;
-      var options = [];
-      if (elt.specialization.isSlot) 
-          isSlot = true;
-      
-      // Get element specialization propertyType info 
-      ElementService.getElement(id,false,ws,version).then(function(value){
-        if (isSlot) {
-          //if specialization is a slot  
-          ElementService.getElement(value.specialization.propertyType,false,ws,version)
-            .then(function(val) {
-              isEnumeration(val).then( function(enumValue) {
-                if (enumValue.isEnumeration) {
-                    isEnum = enumValue.isEnumeration;
-                    options = enumValue.options;
-                }
-                deferred.resolve({ options:options, isEnumeration:isEnum, isSlot:isSlot });
-              }, function(reason) {
-                deferred.reject(reason);
-              });
-          });
-        } else {
-          isEnumeration(value).then( function(enumValue) {
-            if (enumValue.isEnumeration) {
-                isEnum = enumValue.isEnumeration;
-                options = enumValue.options;
-            }
-            deferred.resolve({ options:options, isEnumeration:isEnum, isSlot:isSlot });
-          }, function(reason) {
-            deferred.reject(reason);
-          });
+        var deferred = $q.defer();
+        var id = elt.specialization.propertyType;
+        var isSlot = false;
+        var isEnum = false;
+        var options = [];
+        if (elt.specialization.isSlot) 
+            isSlot = true;
+        if (!id) { //no property type, will not be enum
+            deferred.resolve({options: options, isEnumeration: isEnum, isSlot: isSlot});
+            return deferred.promise;
         }
-      });
-      return deferred.promise;
+        // Get element specialization propertyType info 
+        ElementService.getElement(id,false,ws,version)
+        .then(function(value){
+            if (isSlot) {
+                if (!value.specialization || !value.specialization.propertyType) {
+                    deferred.resolve({options: options, isEnumeration: isEnum, isSlot: isSlot});
+                    return;
+                }
+                //if specialization is a slot  
+                ElementService.getElement(value.specialization.propertyType,false,ws,version)
+                .then(function(val) {
+                    isEnumeration(val)
+                    .then(function(enumValue) {
+                        if (enumValue.isEnumeration) {
+                            isEnum = enumValue.isEnumeration;
+                            options = enumValue.options;
+                        }
+                        deferred.resolve({options: options, isEnumeration: isEnum, isSlot: isSlot});
+                    }, function(reason) {
+                        deferred.resolve({options: options, isEnumeration: isEnum, isSlot: isSlot});
+                    });
+                });
+            } else {
+                isEnumeration(value)
+                .then( function(enumValue) {
+                    if (enumValue.isEnumeration) {
+                        isEnum = enumValue.isEnumeration;
+                        options = enumValue.options;
+                    }
+                    deferred.resolve({ options:options, isEnumeration:isEnum, isSlot:isSlot });
+                }, function(reason) {
+                    deferred.reject(reason);
+                });
+            }
+        }, function(reason) {
+            deferred.resolve({options: options, isEnumeration: isEnum, isSlot: isSlot});
+        });
+        return deferred.promise;
     };
     
     var addFrame = function(scope, mmsViewCtrl, element, template, editObj, doNotScroll) {

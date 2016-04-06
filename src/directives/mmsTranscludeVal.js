@@ -288,16 +288,16 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                     }
                     // otherwise get property spec 
                     Utils.getPropertySpec(scope.element,scope.ws,scope.version)
-                      .then( function(value) {
-                          scope.isEnumeration = value.isEnumeration;
-                          scope.isSlot = value.isSlot;
-                          scope.options = value.options;
-                          if ( !scope.isSlot || !scope.isEnumeration)
-                            Utils.addFrame(scope, mmsViewCtrl, element, frameTemplate);
-                      }, function(reason) {
-                          Utils.addFrame(scope, mmsViewCtrl, element, frameTemplate);
-                          growl.error('Failed to get property spec: ' + reason.message);
-                      });
+                    .then( function(value) {
+                        scope.isEnumeration = value.isEnumeration;
+                        scope.isSlot = value.isSlot;
+                        scope.options = value.options;
+                      //if ( !scope.isSlot || !scope.isEnumeration)
+                        Utils.addFrame(scope, mmsViewCtrl, element, frameTemplate);
+                    }, function(reason) {
+                        Utils.addFrame(scope, mmsViewCtrl, element, frameTemplate);
+                        growl.error('Failed to get property spec: ' + reason.message);
+                    });
                 }
             };
 
