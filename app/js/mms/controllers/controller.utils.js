@@ -318,6 +318,7 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
         var absurl = $location.absUrl();
         var prefix = protocol + '://' + hostname + ((port == 80 || port == 443) ? '' : (':' + port));
         var mmsIndex = absurl.indexOf('mms.html');
+        var toc = UtilsService.makeHtmlTOC($rootScope.mms_treeApi.get_rows());
         printElementCopy.find("a").attr('href', function(index, old) {
             if (!old)
                 return old;
@@ -372,7 +373,7 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
                 if (genCover) {
                     cover = templateElement[0].innerHTML;
                 }
-                deferred.resolve({cover: cover, contents: printContents, header: header, footer: footer, time: displayTime, dnum: dnum, version: version});
+                deferred.resolve({cover: cover, contents: printContents, header: header, footer: footer, time: displayTime, dnum: dnum, version: version, toc: toc});
             }, 0, false);
         });
         return deferred.promise;

@@ -134,6 +134,7 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
             doc.version = ob.version;
             doc.dnum = ob.dnum;
             doc.displayTime = ob.time;
+            doc.toc = ob.toc;
             doc.workspace = $scope.ws;
             doc.name = document.sysmlid + '_' + time + '_' + new Date().getTime();
             if(time == 'latest') 
