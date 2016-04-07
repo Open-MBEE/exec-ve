@@ -136,6 +136,7 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
             doc.displayTime = ob.time;
             doc.toc = ob.toc;
             doc.workspace = $scope.ws;
+            doc.customCss = "img {max-width: 100%; page-break-inside: avoid; page-break-before: auto; page-break-after: auto; display: block;} tr, td, th { page-break-inside: avoid;} thead {display: table-header-group;}";
             doc.name = document.sysmlid + '_' + time + '_' + new Date().getTime();
             if(time == 'latest') 
                 doc.tagId = time;
