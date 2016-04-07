@@ -338,6 +338,8 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
         printElementCopy.find('.error').html('error');
         printElementCopy.find('.no-print').remove();
         printElementCopy.find('.ng-hide').remove();
+        printElementCopy.find('script').remove();
+        printElementCopy.find('.MJX_Assistive_MathML').remove();
         var templateString = $templateCache.get('partials/mms/docCover.html');
         var templateElement = angular.element(templateString);
         var cover = '';
@@ -407,6 +409,8 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
         printElementCopy.find('.error').html('error');
         printElementCopy.find('.no-print').remove();
         printElementCopy.find('.ng-hide').remove();
+        printElementCopy.find('script').remove();
+        printElementCopy.find('.MJX_Assistive_MathML').remove();
         //var docView = printElementCopy.find("mms-view[mms-vid='" + ob.sysmlid + "']");
         //if (isDoc)
         //    docView.remove();
