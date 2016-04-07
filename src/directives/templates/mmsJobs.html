@@ -37,7 +37,7 @@
 <h3 ng-if="!hasJobs && !loading"> No Jobs for {{docName}}</h3>
 <hr>
 <h4 id="addSection">Add Job</h4>
-<form name="addForm" ng-submit="addJob()">
+<form name="addForm">
     <!-- :TODO check out ng-pattern -->
     <input type="text" name="input" style="width:100%;" ng-model="jobInput.jobName" ng-trim="false" id="inputName"
         placeholder="Give your job a name" required>
@@ -45,6 +45,8 @@
     <p ng-show="addForm.input.$invalid && !addForm.input.$pristine" style="color:red;">A name is required.</p>
     <label style="margin: 10px 0px 0px 0px;">Schedule how often your job runs:</label>
     <div id='cronOptions' style="margin: 20px 0px 20px 0px;"></div>
-    <button type="submit" class="btn btn-small btn-success pull-right"><strong>CREATE JOB</stong></button>
+    <button type="submit" class="btn-link pull-right" ng-click="addForm.$valid && createJob()"><strong>CREATE JOB</stong></button>
+    <button type="submit"  class="btn-link pull-left" ng-click="addForm.$valid && runNow()"><strong>RUN NOW</stong></button>
     <!-- <button type= "submit"  class="btn btn-large btn-block" style="margin-top:5px;">SCHEDULE</button>-->
 </form>
+

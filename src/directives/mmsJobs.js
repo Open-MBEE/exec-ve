@@ -53,7 +53,8 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
                         status: jobs[i].status,
                         schedule: jobs[i].schedule,
                         url: jobs[i].url,
-                        command: jobs[i].command
+                        command: jobs[i].command,
+                        sysmlid: jobs[i].sysmlid
                     });
                 }
                 if(newJobs.length > 0)
@@ -89,8 +90,27 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
         // watch for the docuement to change
         scope.$watch('mmsDocId', changeDocument);
         
+        // logic for running a job immediately 
+        scope.runNow = function(){
+            if(scope.jobs.length < 1){
+                scope.createJob();
+            }else{
+                console.log(scope.jobs[0].sysmlid);
+                jenkinsRun();
+            }
+        };
+        var jenkinsRun = function() {
+            var link = '';
+            //http://localhost:8080/alfresco/service/workspaces/master/jobs/scope.jobs[0].sysmlid/execute
+            $http.post(link, ' ').then(function(){
+                growl.success('Your job has posted');
+            }, function(fail){
+                growl.error('Your job failed to post: ' + fail.status);
+            });
+        };
+        
         // logic for adding a new job 
-        scope.addJob = function() {
+        scope.createJob = function() {
             var id = scope.mmsDocId;    
             var post = {
                 jobs: [{
