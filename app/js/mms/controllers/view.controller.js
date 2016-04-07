@@ -166,11 +166,11 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     $scope.$on('view.add.image', function() {
         MmsAppUtils.addPresentationElement($scope, 'Figure', view);
     });
-/*
+
     $scope.$on('view.add.equation', function() {
-        addElement('Equation');
+        MmsAppUtils.addPresentationElement($scope, 'Equation', view);
     });
-*/
+
     $scope.$on('section.add.paragraph', function(event, section) {
         MmsAppUtils.addPresentationElement($scope, 'Paragraph', section);
     });
@@ -182,11 +182,11 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     $scope.$on('section.add.table', function(event, section) {
         MmsAppUtils.addPresentationElement($scope, 'Table', section);
     });
-/*
+
     $scope.$on('section.add.equation', function(event, section) {
-        addElement('Equation', section);
+        MmsAppUtils.addPresentationElement($scope, 'Equation', section);
     });
-*/
+
     $scope.$on('section.add.section', function(event, section) {
         MmsAppUtils.addPresentationElement($scope, 'Section', section);
     });

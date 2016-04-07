@@ -416,8 +416,10 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $m
             { name: 'links',       items : [ 'Link','Unlink' ] },
         ];
         var tableToolbar =  { name: 'table',  items: [ 'Table' ] };
+        var sourceToolbar = { name: 'source', items: ['Source']};
         var listToolbar =   { name: 'list',   items: [ 'NumberedList','BulletedList','Outdent','Indent' ] };
         var imageToolbar =  { name: 'image',  items: [ 'base64image','Iframe' ] };
+        var equationToolbar = { name: 'equation', items: [ 'Mathjax']};
         var customToolbar = { name: 'custom', items : [ 'Mmscf','Mmscomment', 'Mmsvlink', 'mmsreset' ] };
         //Set toolbar based on editor type
         var thisToolbar = defaultToolbar.slice();
@@ -436,8 +438,10 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $m
           thisToolbar.push(customToolbar);
         }
         if (scope.mmsEditorType === 'Figure') {
-          thisToolbar = [];
-          thisToolbar.push(imageToolbar);
+          thisToolbar = [sourceToolbar, imageToolbar];
+        }
+        if (scope.mmsEditorType === 'Equation') {
+            thisToolbar = [sourceToolbar, equationToolbar];
         }
 
         $timeout(function() {
