@@ -12,6 +12,7 @@ CKEDITOR.plugins.add( 'mmscomment', {
 		// Register mmscomment widget to opens CF search window and insert mmscomment tag as widget.
 		editor.widgets.add( 'mmscomment', {
       button: 'Insert Comment',
+      inline: true,
       allowedContent: 'mms-transclude-com(mceNonEditable)[*];',
 			insert: function() {
         var defaultConfig ={ 

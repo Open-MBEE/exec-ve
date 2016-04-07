@@ -41,7 +41,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $m
         if (!attrs.id)
             attrs.$set('id', 'mmsCkEditor' + generatedIds++);
         var instance = null;
-        var callUpdate = true;
+        //var callUpdate = true;
 
           var autocompleteModalTemplate = $templateCache.get('mms/templates/mmsAutocompleteModal.html');
           var transcludeModalTemplate = $templateCache.get('mms/templates/mmsCfModal.html');
@@ -393,12 +393,12 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $m
         };
         
         var update = function() {
-          if (callUpdate) {
+          //if (callUpdate) {
             // getData() returns CKEditor's HTML content.
             ngModelCtrl.$setViewValue(instance.getData());
-          } else {
-            callUpdate = true;
-          }
+          //} else {
+          //  callUpdate = true;
+          //}
         };
         
         // Formatting editor toolbar
@@ -493,7 +493,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $m
             if (!instance)
                 instance = CKEDITOR.instances[attrs.id];
             if (instance) {
-                callUpdate = false;
+                //callUpdate = false;
                 // var bookmarks = instance.getSelection().createBookmarks();
                 var ranges = instance.getSelection().getRanges();
                 instance.setData(ngModelCtrl.$viewValue || '');
