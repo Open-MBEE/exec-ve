@@ -12,16 +12,17 @@
               <button class="btn btn-sm" ng-click="addValue(addValueType)">Add</button>
           </div>
           <div ng-repeat="value in editValues" ng-switch on="value.type">
-              <div ng-switch-when="LiteralInteger"><input type="number" ng-model="value.integer"></input></div>
-              <div ng-switch-when="LiteralUnlimitedNatural"><input type="number" ng-model="value.naturalValue"></input></div>
-              <div ng-switch-when="LiteralBoolean"><input type="checkbox" ng-model="value.boolean"></input> {{value.boolean}}</div>
-              <div ng-switch-when="LiteralReal"><input type="number" ng-model="value.double" step="any"></input></div>
+              <div ng-switch-when="LiteralInteger"><input type="number" ng-model="value.integer"></input><a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a></div>
+              <div ng-switch-when="LiteralUnlimitedNatural"><input type="number" ng-model="value.naturalValue"></input> <a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a></div>
+              <div ng-switch-when="LiteralBoolean"><input type="checkbox" ng-model="value.boolean"></input> {{value.boolean}} <a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a></div>
+              <div ng-switch-when="LiteralReal"><input type="number" ng-model="value.double" step="any"></input><a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a></div>
               <div ng-switch-when="LiteralString">
                   <textarea ng-if="hasHtml(value.string)" mms-tinymce mms-ws="{{mmsWs}}" mms-site="{{mmsSite}}" ng-model="value.string" mms-cf-elements="mmsCfElements" mms-eid="{{element.sysmlid}}"></textarea>
                   <textarea ng-if="!hasHtml(value.string)" ng-model="value.string"></textarea>
+                  <a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a>
               </div>
               <div ng-switch-when="OpaqueExpression">
-                  <textarea ng-model="value.expressionBody[0]"></textarea>
+                  <textarea ng-model="value.expressionBody[0]"></textarea><a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a>
               </div>
               <div ng-switch-default>Editing not supported for now</div>
           </div>
@@ -35,7 +36,7 @@
         </div>
         <div ng-if="isEnumeration" ng-repeat="val in editValues">
             <select ng-model="val.instance" ng-options="el.sysmlid as el.name for el in options">
-            </select>
+            </select><a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a>
         </div>
         <div ng-if="isSlot && isEnumeration">
           <button class="btn btn-sm" ng-click="addEnumerationValue()">Add</button>
