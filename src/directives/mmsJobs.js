@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsJobs', ['$templateCache','$http', '$location', 'ElementService','UtilsService','growl',  mmsJobs]);
+.directive('mmsJobs', ['$templateCache','$http', '$location', 'ElementService','UtilsService','growl', mmsJobs]);
 /**
  * @ngdoc directive
  * @name mms.directives.directive:mmsJobs
@@ -29,12 +29,16 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
     var template = $templateCache.get('mms/templates/mmsJobs.html');
 
     var mmsJobsLink = function(scope, element, attrs) {
-        var cron_value;
+        //var cron_value;
         var documentName;
         var project;
         var ran = false;
         var lastid = null;
-        
+        //scope.serverData = "0 0 * * *";
+        // scope.test = function(){
+        //         console.log('Hello');
+        //         console.log(scope.myOutput);
+        // };
         scope.jobInput = { jobName:''};
         
         // get all the jobs for current document
@@ -94,18 +98,19 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
         scope.runNow = function(){
             if(scope.jobs.length < 1){
                 scope.createJob();
+                jenkinsRun();
             }else{
                 console.log(scope.jobs[0].sysmlid);
                 jenkinsRun();
             }
         };
         var jenkinsRun = function() {
-            var link = '';
+            var link = '/alfresco/service/workspaces/master/jobs/'+scope.jobs[0].sysmlid+'/execute';
             //http://localhost:8080/alfresco/service/workspaces/master/jobs/scope.jobs[0].sysmlid/execute
             $http.post(link, ' ').then(function(){
-                growl.success('Your job has posted');
+                growl.success('Your job is running!');
             }, function(fail){
-                growl.error('Your job failed to post: ' + fail.status);
+                growl.error('Your job failed run: ' + fail.status);
             });
         };
         
@@ -116,7 +121,7 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
                 jobs: [{
                     name: scope.jobInput.jobName,
                     command: 'Jenkins,DocWeb,' + documentName + ',' + project.projectName,
-                    schedule: cron_value,
+                    schedule: scope.myOutput,
                     status: 'waiting',
                     url: 'sample_initial_url',
                     owner: id,
@@ -142,6 +147,7 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
         //actions for stomp 
         scope.$on("stomp.job", function(event, newJob){
             var jobs = newJob; // get jobs json
+            scope.hasJobs = true;
             if(jobs.owner === scope.mmsDocId){
                 scope.jobs.push({
                     name: newJob.name,
@@ -166,12 +172,18 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
             }
         });
         // :TODO This jquery library needs to be replaced with https://github.com/jacobscarter/angular-cron-jobs
-        $('#cronOptions').cron({
-            initial: "0 0 * * *",
-            onChange: function() {
-                cron_value = $(this).cron("value");
-            },
-        });       
+        // $('#cronOptions').cron({
+        //     initial: "0 0 * * *",
+        //     onChange: function() {
+        //         cron_value = $(this).cron("value");
+        //     },
+        // });
+        scope.myConfig = {
+            options : {
+                allowMinute : false,
+                allowHour : false
+            }
+        };      
     };
 
     return {

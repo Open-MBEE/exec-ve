@@ -36,6 +36,9 @@
 </table>
 <h3 ng-if="!hasJobs && !loading"> No Jobs for {{docName}}</h3>
 <hr>
+<div class="row" style="margin-right:0px;">
+<button type="submit"  class="btn-link pull-right" ng-click="runNow()"><strong>RUN NOW</stong></button>
+</div>
 <h4 id="addSection">Add Job</h4>
 <form name="addForm">
     <!-- :TODO check out ng-pattern -->
@@ -44,9 +47,12 @@
     <!-- <h1>{{addForm.input.$valid}}</h1> -->
     <p ng-show="addForm.input.$invalid && !addForm.input.$pristine" style="color:red;">A name is required.</p>
     <label style="margin: 10px 0px 0px 0px;">Schedule how often your job runs:</label>
-    <div id='cronOptions' style="margin: 20px 0px 20px 0px;"></div>
-    <button type="submit" class="btn-link pull-right" ng-click="addForm.$valid && createJob()"><strong>CREATE JOB</stong></button>
-    <button type="submit"  class="btn-link pull-left" ng-click="addForm.$valid && runNow()"><strong>RUN NOW</stong></button>
+    <!--<div id='cronOptions' style="margin: 20px 0px 20px 0px;"></div>-->
+    <cron-selection output="myOutput" config="myConfig" init="serverData"></cron-selection>
+    <div style="padding: 15px 0px 0px 0px">
+        <button type="submit" class="btn-link pull-right" ng-click="addForm.$valid && createJob()"><strong>CREATE JOB</stong></button>
+    </div>
+    <!-- <button type="submit"  class="btn-link pull-left" ng-click="test()"><strong>test</stong></button> -->
     <!-- <button type= "submit"  class="btn btn-large btn-block" style="margin-top:5px;">SCHEDULE</button>-->
 </form>
 

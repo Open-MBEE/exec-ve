@@ -1,7 +1,7 @@
 'use strict';
 
-angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.borderLayout', 'ui.bootstrap', 'ui.router', 'ui.tree', 'angular-growl', 'cfp.hotkeys'])
-.config(function($stateProvider, $urlRouterProvider) {
+angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.borderLayout', 'ui.bootstrap', 'ui.router', 'ui.tree', 'angular-growl', 'cfp.hotkeys', 'angular-cron-jobs'])
+.config(function($stateProvider, $urlRouterProvider) { 
     // Change the DEFAULT state to workspace.sites on entry
     $urlRouterProvider.when('', '/workspaces/master/sites');
 
