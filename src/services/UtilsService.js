@@ -414,17 +414,25 @@ function UtilsService(CacheService, _) {
 
     var makeTablesAndFiguresTOCChild = function(child, printElement, ob) {
         var sysmlid = child.data.sysmlid;
+        var el = printElement.find('#' + sysmlid);
         if (child.type === 'table') {
             ob.tableCount++;
             ob.tables += '<li><a href="#' + sysmlid + '">' + ob.tableCount + '. ' + child.label + '</a></li>';
-            var el = printElement.find('#' + sysmlid).find('table > caption');
-            el.html('Table ' + ob.tableCount + '. ' + el.html());
+            var cap = el.find('table > caption');
+            cap.html('Table ' + ob.tableCount + '. ' + cap.html());
+            if (cap.length === 0) {
+
+            }
         } 
         if (child.type === 'figure') {
             ob.figureCount++;
             ob.figures += '<li><a href="#' + sysmlid + '">' + ob.figureCount + '. ' + child.label + '</a></li>';
-            var el2 = printElement.find('#' + sysmlid).find('figure > figcaption');
-            el2.html('Figure ' + ob.figureCount + '. ' + el2.html());
+            var cap2 = el.find('figure > figcaption');
+            cap2.html('Figure ' + ob.figureCount + '. ' + cap2.html());
+            if (cap2.length === 0) {
+                var image = el.find('img');
+                image.wrap('<figure></figure>').after('<figcaption>' + ob.figureCount + '. ' + child.label + '</figcaption>');
+            }
         }
         child.children.forEach(function(child2) {
             makeTablesAndFiguresTOCChild(child2, printElement, ob);
