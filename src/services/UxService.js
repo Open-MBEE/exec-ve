@@ -246,7 +246,7 @@ function UxService($rootScope) {
         }
   };
 
-  var MetaTypes = ['configuration', 'connector', 'dependency', 'directedrelationship', 'element', 'property', 'generalization', 'package', 'section', 'site', 'snapshot', 'view', 'workspace' ];
+  var MetaTypes = ['configuration', 'connector', 'dependency', 'directedrelationship', 'element', 'property', 'generalization', 'package', 'section', 'site', 'snapshot', 'view', 'workspace', 'table', 'figure' ];
 
   var getTreeTypes = function() {
     var treeTypes = {};
@@ -292,6 +292,10 @@ function UxService($rootScope) {
         return "fa-file";
       case "workspace":
         return "fa-tasks";
+      case "table":
+        return "fa-table";
+      case "figure":
+        return "fa-image";
       default:
         return "fa-square";
         }

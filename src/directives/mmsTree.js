@@ -311,7 +311,9 @@ function mmsTree($timeout, $log, $templateCache) {
                             sectionChar = '';
                         if (branch.children[i].type === 'section')
                             add_branch_to_list(level + 1, '§ ', branch.children[i], child_visible);
-                        else {
+                        else if (branch.children[i].type === 'figure' || branch.children[i].type === 'table') {
+                            add_branch_to_list(level + 1, '', branch.children[i], child_visible);
+                        } else {
                             j++;
                             if (scope.sectionNumbering) {
                                 sectionValue = section + sectionChar + j;

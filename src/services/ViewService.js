@@ -1083,6 +1083,21 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 instanceSpec.specialization.classifier[0] === TYPE_TO_CLASSIFIER_ID.SectionT);
     };
 
+    var isTable = function(instanceSpec) {
+        return instanceSpec.specialization && instanceSpec.specialization.classifier && 
+               instanceSpec.specialization.classifier.length > 0 &&
+               (instanceSpec.specialization.classifier[0] === TYPE_TO_CLASSIFIER_ID.Table ||
+                instanceSpec.specialization.classifier[0] === TYPE_TO_CLASSIFIER_ID.TableT);
+    };
+
+    var isFigure = function(instanceSpec) {
+        return instanceSpec.specialization && instanceSpec.specialization.classifier && 
+               instanceSpec.specialization.classifier.length > 0 &&
+               (instanceSpec.specialization.classifier[0] === TYPE_TO_CLASSIFIER_ID.Figure ||
+                instanceSpec.specialization.classifier[0] === TYPE_TO_CLASSIFIER_ID.Image ||
+                instanceSpec.specialization.classifier[0] === TYPE_TO_CLASSIFIER_ID.Equation);
+    };
+
     //TODO remove
     var setCurrentViewId = function(id) {
         currentViewId = id;
@@ -1164,6 +1179,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         getCurrentDocumentId: getCurrentDocumentId,
         parseExprRefTree: parseExprRefTree,
         isSection: isSection,
+        isFigure: isFigure,
+        isTable: isTable,
         isPresentationElement: isPresentationElement,
         addElementToViewOrSection: addElementToViewOrSection,
         //createAndAddElement: createAndAddElement,

@@ -523,6 +523,24 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
                         viewId2node[instance.sysmlid] = sectionTreeNode;
                         parentNode.children.unshift(sectionTreeNode);
                         addSectionElements(instance, viewNode, sectionTreeNode);
+                    } else if (ViewService.isFigure(instance)) {
+                        var figureTreeNode = {
+                            label : instance.name,
+                            type : "figure",
+                            view : viewNode.data.sysmlid,
+                            data : instance,
+                            children: []
+                        };
+                        parentNode.children.unshift(figureTreeNode);
+                    } else if (ViewService.isTable(instance)) {
+                        var tableTreeNode = {
+                            label : instance.name,
+                            type : "table",
+                            view : viewNode.data.sysmlid,
+                            data : instance,
+                            children: []
+                        };
+                        parentNode.children.unshift(tableTreeNode);
                     }
                 }
                 $scope.treeApi.refresh();
@@ -601,24 +619,20 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
                 $state.go('workspace.site.documentpreview', {site: documentSiteBranch.data.sysmlid, document: branch.data.sysmlid, search: undefined});
             }
         } else if ($state.includes('workspace.site.document')) {
-
-            var view = branch.type === 'section' ? branch.view : branch.data.sysmlid;
+            var view = (branch.type === 'section' || branch.type === 'figure' || branch.type === 'table') ? branch.view : branch.data.sysmlid;
             var sectionId = branch.type === 'section' ? branch.data.sysmlid : null;
-            var hash = sectionId ? sectionId : view;
+            var hash = branch.data.sysmlid;
             if ($rootScope.mms_fullDocMode) {
-                //if (branch.type === 'view')
-                //  viewLevel2Func(branch.data.sysmlid, branch); //TODO remove when priority queue is done
                 $location.hash(hash);
                 $anchorScroll();
-            } else if (branch.type === 'view') {
-                //viewLevel2Func(branch.data.sysmlid, branch); //TODO remove when priority queue is done
+            } else if (branch.type === 'view' || branch.type === 'section') {
                 $state.go('workspace.site.document.view', {view: branch.data.sysmlid, search: undefined});
-            } else if (branch.type === 'section') {
-                $state.go('workspace.site.document.view', {view: hash, search: undefined});
-                /*$timeout(function() {
+            } else {
+                $state.go('workspace.site.document.view', {view: view, search: undefined});
+                $timeout(function() {
                     $location.hash(hash);
                     $anchorScroll();
-                }, 1000);*/
+                }, 1000, false);
             }
         }
         $rootScope.mms_tbApi.select('element.viewer');
@@ -829,8 +843,8 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
             var curBranch = $scope.treeApi.get_selected_branch();
             if (curBranch) {
                 var viewId;
-                if (curBranch.type == 'section') {
-                    if (curBranch.data.specialization && curBranch.data.specialization.type === 'InstanceSpecification')
+                if (curBranch.type == 'section' || curBranch.type == 'table' || curBranch.type == 'figure') {
+                    if (curBranch.type == 'section' && curBranch.data.specialization && curBranch.data.specialization.type === 'InstanceSpecification')
                         viewId = curBranch.data.sysmlid;
                     else
                         viewId = curBranch.view;

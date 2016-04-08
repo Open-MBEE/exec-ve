@@ -379,7 +379,8 @@ function UtilsService(CacheService, _) {
     };
 
     var makeHtmlTOCChild = function(child) {
-
+        if (child.type !== 'view' && child.type !== 'section')
+            return '';
         var result = '<ul style="list-style-type:none">';
 
         var anchor = '<a href=#' + child.data.sysmlid + '>';
