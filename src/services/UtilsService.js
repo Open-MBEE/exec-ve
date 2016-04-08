@@ -395,6 +395,42 @@ function UtilsService(CacheService, _) {
         return result;
     };
 
+    var makeTablesAndFiguresTOC = function(tree, printElement) {
+        var ob = {
+            tables: '<div style="page-break-after:always"><div style="font-size:32px">List of Tables</div><ul style="list-style-type:none">',
+            figures: '<div style="page-break-after:always"><div style="font-size:32px">List of Figures</div><ul style="list-style-type:none">',
+            tableCount: 0,
+            figureCount: 0
+        };
+        var root_branch = tree[0].branch;
+        root_branch.children.forEach(function (child) {
+            makeTablesAndFiguresTOCChild(child, printElement, ob);
+        });
+
+        ob.tables += '</ul></div>'; 
+        ob.figures += '</ul></div>'; 
+        return ob;
+    };
+
+    var makeTablesAndFiguresTOCChild = function(child, printElement, ob) {
+        var sysmlid = child.data.sysmlid;
+        if (child.type === 'table') {
+            ob.tableCount++;
+            ob.tables += '<li><a href="#' + sysmlid + '">' + ob.tableCount + '. ' + child.label + '</a></li>';
+            var el = printElement.find('#' + sysmlid).find('table > caption');
+            el.html('Table ' + ob.tableCount + '. ' + el.html());
+        } 
+        if (child.type === 'figure') {
+            ob.figureCount++;
+            ob.figures += '<li><a href="#' + sysmlid + '">' + ob.figureCount + '. ' + child.label + '</a></li>';
+            var el2 = printElement.find('#' + sysmlid).find('figure > figcaption');
+            el2.html('Figure ' + ob.figureCount + '. ' + el2.html());
+        }
+        child.children.forEach(function(child2) {
+            makeTablesAndFiguresTOCChild(child2, printElement, ob);
+        });
+    };
+
     var createMmsId = function() {
         var d = Date.now();
         var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -442,6 +478,7 @@ function UtilsService(CacheService, _) {
         makeHtmlPara: makeHtmlPara,
         makeHtmlList: makeHtmlList,
         makeHtmlTOC: makeHtmlTOC,
+        makeTablesAndFiguresTOC: makeTablesAndFiguresTOC,
         createMmsId: createMmsId,
         getIdInfo: getIdInfo
     };

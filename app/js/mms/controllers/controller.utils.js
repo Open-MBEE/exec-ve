@@ -319,6 +319,7 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
         var prefix = protocol + '://' + hostname + ((port == 80 || port == 443) ? '' : (':' + port));
         var mmsIndex = absurl.indexOf('mms.html');
         var toc = UtilsService.makeHtmlTOC($rootScope.mms_treeApi.get_rows());
+        var figuresAndTables = UtilsService.makeTablesAndFiguresTOC($rootScope.mms_treeApi.get_rows(), printElementCopy);
         printElementCopy.find("a").attr('href', function(index, old) {
             if (!old)
                 return old;
@@ -413,11 +414,18 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
         var templateString = $templateCache.get('partials/mms/docCover.html');
         var templateElement = angular.element(templateString);
         var tocContents = '';
+        var tableToc = '';
+        var figuresToc = '';
         var cover = '';
         if (!genCover && isDoc) {
             cover = printElementCopy.find("mms-view[mms-vid='" + ob.sysmlid + "']");
             cover.remove();
             cover = cover[0].outerHTML;
+        }
+        if (isDoc) {
+            var figuresAndTables = UtilsService.makeTablesAndFiguresTOC($rootScope.mms_treeApi.get_rows(), printElementCopy);
+            tableToc = figuresAndTables.tables;
+            figuresToc = figuresAndTables.figures;
         }
         var newScope = $rootScope.$new();
         //var useCover = false;
@@ -431,7 +439,7 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
                     inst = "<div>(Copy and paste into Word)</div>";
                 var popupWin = $window.open('', '_blank', 'width=800,height=600,scrollbars=1');
                 popupWin.document.open();
-                popupWin.document.write('<html><head><link href="css/ve-mms.styles.min.css" rel="stylesheet" type="text/css"></head><body style="overflow: auto">' + inst + cover + tocContents + printContents + '</html>');
+                popupWin.document.write('<html><head><link href="css/ve-mms.styles.min.css" rel="stylesheet" type="text/css"></head><body style="overflow: auto">' + inst + cover + tocContents + tableToc + figuresToc + printContents + '</html>');
                 popupWin.document.close();
                 if (print) {
                     $timeout(function() {
