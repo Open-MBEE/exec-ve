@@ -34,7 +34,7 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
         var project;
         var ran = false;
         var lastid = null;
-        //scope.serverData = "0 0 * * *";
+        //scope.serverData = " ";
         // scope.test = function(){
         //         console.log('Hello');
         //         console.log(scope.myOutput);
@@ -116,12 +116,16 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
         
         // logic for adding a new job 
         scope.createJob = function() {
-            var id = scope.mmsDocId;    
+            var id = scope.mmsDocId;
+            var thisSchedule = ' '; 
+            console.log(scope.myOutput);
+            if(scope.myOutput !== '* * * * *')
+                    thisSchedule = scope.myOutput;
             var post = {
                 jobs: [{
                     name: scope.jobInput.jobName,
                     command: 'Jenkins,DocWeb,' + documentName + ',' + project.projectName,
-                    schedule: scope.myOutput,
+                    schedule: thisSchedule,
                     status: 'waiting',
                     url: 'sample_initial_url',
                     owner: id,
