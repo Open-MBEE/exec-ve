@@ -140,7 +140,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     };
 
     $scope.$on('convert.pdf', function() {
-        MmsAppUtils.popupPrintConfirm(view, $scope.ws, time, false, false, true);
+        MmsAppUtils.popupPrintConfirm(view, $scope.ws, time, false, false, true, true);
     });
 
     $scope.$on('view.add.paragraph', function() {

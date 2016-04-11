@@ -2,7 +2,7 @@
     <div style="page-break-after:always">
         <div style="text-align:center; font-size:32px">{{meta.project}}</div>
         <div style="text-align:center; font-size:30px">{{meta.title}}</div>
-        <div style="text-align:center; font-size:12px"> {{meta.version}} </div>
+        <div style="text-align:center; font-size:12px"> {{meta.version}} {{tag.name}}</div>
         <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
 
         <div> Paper copies of this document may not be current and should not be relied on for official purposes.</div>
@@ -19,7 +19,7 @@
     <div style="page-break-after:always">
         <div style="font-size:32px" ng-if="meta.project">{{meta.project}}</div>
         <div style="font-size:30px">{{meta.title}}</div>
-        <div style="font-size:12px" ng-if="meta.version"> {{meta.version}}</div>
+        <div style="font-size:12px"><span ng-if="meta.version">{{meta.version}}</span> {{tag.name}}</div>
         
         <div ng-if="meta.authors.length > 0">
             <br/><br/>
