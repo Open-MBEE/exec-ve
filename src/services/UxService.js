@@ -182,7 +182,7 @@ function UxService($rootScope) {
             return {id: button, icon: 'fa-paragraph', selected: true, active: true, permission: true, tooltip: 'Add Text', 
                     spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
           case "view.add.image":
-            return {id: button, icon: 'fa-image', selected: true, active: true, permission: true, tooltip: 'Add Figure', 
+            return {id: button, icon: 'fa-image', selected: true, active: true, permission: true, tooltip: 'Add Image', 
                     spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
           case "view.add.section":
             return {id: button, icon: 'fa-list-alt', selected: true, active: true, permission: true, tooltip: 'Add Section', 
@@ -228,7 +228,7 @@ function UxService($rootScope) {
             return {id: button, icon: 'fa-paragraph', selected: true, active: true, permission: true, tooltip: 'Add Text', 
                     spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button, scope.section);}};
           case "section.add.image":
-            return {id: button, icon: 'fa-image', selected: true, active: true, permission: true, tooltip: 'Add Figure', 
+            return {id: button, icon: 'fa-image', selected: true, active: true, permission: true, tooltip: 'Add Image', 
                     spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button, scope.section);}};
           case "section.add.section":
             return {id: button, icon: 'fa-list-alt', selected: true, active: true, permission: true, tooltip: 'Add Section', 

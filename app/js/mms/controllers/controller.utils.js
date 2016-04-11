@@ -26,7 +26,7 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
                 validClassifierIds.push(ViewService.TYPE_TO_CLASSIFIER_ID.TableT);
             } else if ($scope.presentationElemType === 'List') {
                 validClassifierIds.push(ViewService.TYPE_TO_CLASSIFIER_ID.ListT);
-            } else if ($scope.presentationElemType === 'Figure') {
+            } else if ($scope.presentationElemType === 'Image') {
                 validClassifierIds.push(ViewService.TYPE_TO_CLASSIFIER_ID.Figure);
             } else if ($scope.presentationElemType === 'Paragraph') {
                 validClassifierIds.push(ViewService.TYPE_TO_CLASSIFIER_ID.ParagraphT);

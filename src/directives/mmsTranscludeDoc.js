@@ -266,6 +266,8 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                     scope.panelType = scope.panelType.substring(0, scope.panelType.length-1);
                 if (scope.panelType === 'Paragraph')
                     scope.panelType = 'Text';
+                if (scope.panelType === 'Figure')
+                    scope.panelType = 'Image';
             }
             if (scope.presentationElem) {
                 scope.editorType = scope.presentationElem.type;

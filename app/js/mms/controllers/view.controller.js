@@ -164,7 +164,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     });
 
     $scope.$on('view.add.image', function() {
-        MmsAppUtils.addPresentationElement($scope, 'Figure', view);
+        MmsAppUtils.addPresentationElement($scope, 'Image', view);
     });
 
     $scope.$on('view.add.equation', function() {
@@ -196,7 +196,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     });
 
     $scope.$on('section.add.image', function(event, section) {
-        MmsAppUtils.addPresentationElement($scope, 'Figure', section);
+        MmsAppUtils.addPresentationElement($scope, 'Image', section);
     });
 
     $scope.$on('show.comments', function() {

@@ -56,7 +56,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         Section: 'SectionT',
         Comment: 'ParagraphT',
         List: 'ListT',
-        Figure: 'Figure',
+        Image: 'Figure',
         Equation: 'Equation'
     };
 
