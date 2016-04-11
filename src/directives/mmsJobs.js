@@ -160,7 +160,9 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
                     url: newJob.url,
                     command: newJob.command
                 });
+                scope.$apply();
             }
+            
         });
         scope.$on("stomp.updateJob", function(event, updateJob){
             if(updateJob.owner === scope.mmsDocId){
@@ -173,6 +175,7 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
                         value.command = updateJob.command;
                     }
                 });
+                scope.$apply();
             }
         });
         // :TODO This jquery library needs to be replaced with https://github.com/jacobscarter/angular-cron-jobs
