@@ -136,7 +136,15 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
             doc.displayTime = ob.time;
             doc.toc = ob.toc;
             doc.workspace = $scope.ws;
-            doc.customCss = "img {max-width: 100%; page-break-inside: avoid; page-break-before: auto; page-break-after: auto; display: block;} tr, td, th { page-break-inside: avoid;} thead {display: table-header-group;}";
+            doc.customCss = "img {max-width: 100%; page-break-inside: avoid; page-break-before: auto; page-break-after: auto; display: block;} " + 
+                " tr, td, th { page-break-inside: avoid;} thead {display: table-header-group;} " + 
+                "li > a[href]::after {content: leader(\".\") target-counter(attr(href), page);} " + 
+                ".pull-right {float: right;} " + 
+                "table {width: 100%; border-collapse: collapse;} " + 
+                "table, th, td {border: 1px solid black;} " +
+                "h1 {font-size: 20px;} " +
+                ".ng-hide {display: none;} " +
+                "body {font-size: 12px;} ";
             doc.name = document.sysmlid + '_' + time + '_' + new Date().getTime();
             if(time == 'latest') 
                 doc.tagId = time;
