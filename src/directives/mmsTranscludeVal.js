@@ -231,6 +231,14 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                 scope.editValues.push({type: type, double: 0.0});
         };
         scope.addValueType = 'LiteralString';
+        
+        scope.addEnumerationValue = function() {
+          scope.editValues.push({type: "InstanceValue", instance: scope.options[0]});
+        };
+
+        scope.removeVal = function(i) {
+            scope.editValues.splice(i, 1);
+        };
 
         if (mmsViewCtrl) { 
             
@@ -276,51 +284,24 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                 } else {
                     //The editor check occurs here; should get "not supported for now" from here
 
-                    //Get the ID, do backend call for Element data
+                    // check if data has been loaded for specified id
                     var id = scope.element.specialization.propertyType;
-                    if (!id || scope.element.specialization.isSlot || (scope.isEnumeration && scope.options)) {
+                    if (!id || (scope.isEnumeration && scope.options)) {
                         Utils.addFrame(scope, mmsViewCtrl, element, frameTemplate);
                         return;
                     }
-                    var elementData = ElementService.getElement(id, false, scope.ws, scope.version);
-
-                    elementData.then(
-                        function(val) {
-                            //Filter for enumeration type
-                            if (val.appliedMetatypes && val.appliedMetatypes.length > 0 && 
-                                val.appliedMetatypes[0] === '_9_0_62a020a_1105704885400_895774_7947') {
-                                scope.isEnumeration = true;
-                                var fillData = ElementService.getOwnedElements(val.sysmlid, false, scope.ws, scope.version, 1);
-
-                                fillDropDown(fillData);
-                            } else
-                                Utils.addFrame(scope, mmsViewCtrl, element, frameTemplate);
-                        },
-                        function(reason) {
-                            Utils.addFrame(scope, mmsViewCtrl, element, frameTemplate);
-                        }
-                    );
-
-                    var fillDropDown = function(data) {
-                        data.then(
-                            function(val) {
-                                var newArray = [];
-                                //Filter only for appropriate property value
-                                for (var i = 0; i < val.length; i++) {
-                                    if( val[i].appliedMetatypes && val[i].appliedMetatypes.length > 0 && 
-                                        val[i].appliedMetatypes[0] === '_9_0_62a020a_1105704885423_380971_7955') {
-                                        newArray.push(val[i]);
-                                    }
-                                }
-                                scope.options = newArray;
-                                Utils.addFrame(scope,mmsViewCtrl,element,frameTemplate); //For Edit view, no need for addFrame
-                            },
-                            function(reason) {
-                                console.log(reason);
-                                growl.error('Failed to get enumeration options: ' + reason.message);
-                            }
-                        );
-                    };
+                    // otherwise get property spec 
+                    Utils.getPropertySpec(scope.element,scope.ws,scope.version)
+                    .then( function(value) {
+                        scope.isEnumeration = value.isEnumeration;
+                        scope.isSlot = value.isSlot;
+                        scope.options = value.options;
+                      //if ( !scope.isSlot || !scope.isEnumeration)
+                        Utils.addFrame(scope, mmsViewCtrl, element, frameTemplate);
+                    }, function(reason) {
+                        Utils.addFrame(scope, mmsViewCtrl, element, frameTemplate);
+                        growl.error('Failed to get property spec: ' + reason.message);
+                    });
                 }
             };
 
