@@ -144,7 +144,10 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
                 "table, th, td {border: 1px solid black;} " +
                 "h1 {font-size: 20px;} " +
                 ".ng-hide {display: none;} " +
-                "body {font-size: 12px;} ";
+                "body {font-size: 12px;} " + 
+                ".tof, .tot {page-break-after:always} " +
+                ".tof .header, .tot .header { font-size:32px; } " + 
+                ".tof UL, .tot UL {list-style-type:none;} ";
             doc.name = document.sysmlid + '_' + time + '_' + new Date().getTime();
             if(time == 'latest') 
                 doc.tagId = time;
