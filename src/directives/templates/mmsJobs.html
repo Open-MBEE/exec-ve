@@ -1,58 +1,51 @@
-<h2>Jobs</h2>
-<i class="pane-center-spinner fa fa-5x fa-spinner fa-spin" style="margin-left: 38px;" ng-if="loading"></i>
+<h2>Job</h2>
+<i class="pane-center-spinner fa fa-5x fa-spinner fa-spin" style="margin-left: 50%;" ng-if="loading"></i>
 <table class="snapshot-table table table-condensed" ng-if="!loading && hasJobs"> <!-- add ng-if for NO JOBS -->
     <thead>
         <tr>
-            <td>
-                <a ng-click="sortType = 'name'; sortReverse = !sortReverse">
-                    Name
-                    <span ng-show="sortType == 'name'" class="fa fa-caret-down"></span>
-                    <span ng-show="sortType == 'name' && sortReverse" class="fa fa-caret-up"></span>
-                </a>
-            </td>
-            <td>
-                <a ng-click="sortType = 'status'; sortReverse = !sortReverse">
-                    Status
-                    <span ng-show="sortType == 'status'" class="fa fa-caret-down"></span>
-                    <span ng-show="sortType == 'status' && sortReverse" class="fa fa-caret-up"></span>
-                </a>
-            </td>
-            <td>
-                <a ng-click="sortType = 'schedule'; sortReverse = !sortReverse">
-                    Recurrence
-                    <span ng-show="sortType == 'schedule'" class="fa fa-caret-down"></span>
-                    <span ng-show="sortType == 'schedule' && sortReverse" class="fa fa-caret-up"></span>
-                </a>
-            </td>
+            <td>Name</td>
+            <td>Status</td>
+            <td>Created</td>
+            <td>Log</td>
         </tr>
     </thead>
     <tbody>
-    <tr ng-repeat="job in jobs | orderBy:'status' | orderBy:sortType:sortReverse">
-        <td><a ng-attr-href="{{job.url}}" target="_blank">{{job.name}}</a></td>
-        <td>{{job.status}}</td>
-        <td>{{job.schedule}}</td>
+    <tr>
+        <td>
+            <div ng-hide="editorEnabled">
+                <!-- <a ng-attr-href="{{job.url}}" target="_blank" ng-click="enableEditor()">{{job.name}}</a> -->
+                <a ng-click="enableEditor()">{{job.name}}</a>
+            </div>
+            <div ng-show="editorEnabled">
+                <input ng-model="editableName" ng-show="editorEnabled">
+                <a ng-click="save()">Save</a>
+                or
+                <a ng-click="disableEditor()">Cancel</a>
+            </div>
+        </td>
+        <td>{{job.status}} 
+            <!-- :TODO if status is not...ng-hide <button type="submit"  class="btn-link pull-right" ng-click="runNow()"><strong>RUN NOW</stong></button> -->
+        </td>
+        <td>{{job.create}}</td>
+        <td><a ng-attr-href="{{job.url}}" target="_blank" ng-click="enableEditor()">log</a></td>
     </tr>
     </tbody>
 </table>
 <h3 ng-if="!hasJobs && !loading"> No Jobs for {{docName}}</h3>
 <hr>
 <div class="row" style="margin-right:0px;">
-<button type="submit"  class="btn-link pull-right" ng-click="runNow()"><strong>RUN NOW</stong></button>
+<!-- icon in button <i class="pane-center-spinner fa fa-5x fa-spinner fa-spin" style="margin-left: 38px;" ng-if="loading"></i> -->
+<button type="submit"  class="btn-link pull-right" ng-if="!hasJobs && !loading" ng-click="runNow()"><strong>RUN NOW</stong></button>
 </div>
-<h4 id="addSection">Add Job</h4>
+<!--<h4 id="addSection">Add Job</h4>
 <form name="addForm">
-    <!-- :TODO check out ng-pattern -->
     <input type="text" name="input" style="width:100%;" ng-model="jobInput.jobName" ng-trim="false" id="inputName"
         placeholder="Give your job a name" required>
-    <!-- <h1>{{addForm.input.$valid}}</h1> -->
     <p ng-show="addForm.input.$invalid && !addForm.input.$pristine" style="color:red;">A name is required.</p>
     <label style="margin: 10px 0px 0px 0px;">Schedule how often your job runs:</label>
-    <!--<div id='cronOptions' style="margin: 20px 0px 20px 0px;"></div>-->
     <cron-selection output="myOutput" config="myConfig" init="serverData"></cron-selection>
     <div style="padding: 15px 0px 0px 0px">
         <button type="submit" class="btn-link pull-right" ng-click="addForm.$valid && createJob()"><strong>CREATE JOB</stong></button>
     </div>
-    <!-- <button type="submit"  class="btn-link pull-left" ng-click="test()"><strong>test</stong></button> -->
-    <!-- <button type= "submit"  class="btn btn-large btn-block" style="margin-top:5px;">SCHEDULE</button>-->
-</form>
+</form>-->
 

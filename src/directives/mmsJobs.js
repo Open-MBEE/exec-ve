@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsJobs', ['$templateCache','$http', '$location', 'ElementService','UtilsService','growl', mmsJobs]);
+.directive('mmsJobs', ['$templateCache','$http', '$location', 'ElementService','UtilsService','growl','_', mmsJobs]);
 /**
  * @ngdoc directive
  * @name mms.directives.directive:mmsJobs
@@ -9,6 +9,7 @@ angular.module('mms.directives')
  * @requires $templateCache
  * @requires $http
  * @requires $location
+ * @requires _
  *
  * @restrict E
  *
@@ -25,7 +26,7 @@ angular.module('mms.directives')
  * @param {string=master} mmsWs Workspace to use, defaults to master
  * @param {string=null} mmsDocId 
  */
-function mmsJobs($templateCache, $http, $location, ElementService, UtilsService, growl) {
+function mmsJobs($templateCache, $http, $location, ElementService, UtilsService, growl, _) {
     var template = $templateCache.get('mms/templates/mmsJobs.html');
 
     var mmsJobsLink = function(scope, element, attrs) {
@@ -34,12 +35,14 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
         var project;
         var ran = false;
         var lastid = null;
+        scope.editorEnabled = false;
         //scope.serverData = " ";
         // scope.test = function(){
         //         console.log('Hello');
         //         console.log(scope.myOutput);
         // };
-        scope.jobInput = { jobName:''};
+        //scope.jobInput = { jobName:''};
+
         
         // get all the jobs for current document
         var getJobs = function(){
@@ -50,24 +53,27 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
             $http.get(link).then(function(data){
                 var jobs = data.data.jobs; // get jobs json
                 var jobs_size = data.data.jobs.length; // get length of jobs array
-                var newJobs = [];
+                var newJobs = {};
                 for (var i = 0; i < jobs_size; i++) {
-                    newJobs.push({
-                        name: jobs[i].name,
-                        status: jobs[i].status,
-                        schedule: jobs[i].schedule,
-                        url: jobs[i].url,
-                        command: jobs[i].command,
-                        sysmlid: jobs[i].sysmlid
-                    });
+                    if(jobs[i].name.endsWith('_job')){
+                        newJobs = { 
+                            name: jobs[i].name,
+                            status: jobs[i].status,
+                            schedule: jobs[i].schedule,
+                            url: jobs[i].url,
+                            command: jobs[i].command,
+                            create: jobs[i].created,
+                            sysmlid: jobs[i].sysmlid
+                        };
+                    }
                 }
-                if(newJobs.length > 0)
+                if(!_.isEmpty(newJobs))
                     scope.hasJobs = true;
                 scope.loading = false;
-                scope.jobs = newJobs;
+                scope.job = newJobs;
             }, function(error){
                 // display some error?
-                growl.error('There was a error in retrieving your jobs: ' + error.status); 
+                growl.error('There was a error in retrieving your job: ' + error.status); 
                 scope.loading = false;
             });    
         };
@@ -114,39 +120,73 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
             });
         };
         
+        //:TODO have cases for each null; "running"; "failed"; "completed"; "aborted";"unstable"; "disabled"; "waiting";
+        
         // logic for adding a new job 
-        scope.createJob = function() {
+        // scope.createJob = function() {
+        //     var id = scope.mmsDocId;
+        //     var thisSchedule = ' '; 
+        //     console.log(scope.myOutput);
+        //     if(scope.myOutput !== '* * * * *')
+        //             thisSchedule = scope.myOutput;
+        //     var post = {
+        //         jobs: [{
+        //             name: scope.jobInput.jobName,
+        //             command: 'Jenkins,DocWeb,' + documentName + ',' + project.projectName,
+        //             schedule: thisSchedule,
+        //             status: 'waiting',
+        //             url: 'sample_initial_url',
+        //             owner: id,
+        //             isMetatype: false,
+        //             documentation: '',
+        //             specialization: {
+        //               type: 'Element'
+        //             }
+        //         }]
+        //     };
+        // 
+        //     var link = '/alfresco/service/workspaces/master/jobs';
+        //     $http.post(link, post).then(function(){
+        //         //scope.$setPristine(true);
+        //         scope.jobInput = { jobName:''};
+        //         growl.success('Your job has posted');
+        //     
+        //     }, function(fail){
+        //         growl.error('Your job failed to post: ' + fail.status);
+        //     });
+        // };
+         
+        var updateJob = function() {
             var id = scope.mmsDocId;
-            var thisSchedule = ' '; 
-            console.log(scope.myOutput);
-            if(scope.myOutput !== '* * * * *')
-                    thisSchedule = scope.myOutput;
             var post = {
                 jobs: [{
-                    name: scope.jobInput.jobName,
-                    command: 'Jenkins,DocWeb,' + documentName + ',' + project.projectName,
-                    schedule: thisSchedule,
-                    status: 'waiting',
-                    url: 'sample_initial_url',
-                    owner: id,
-                    isMetatype: false,
-                    documentation: '',
-                    specialization: {
-                      type: 'Element'
-                    }
+                    sysmlid: scope.jobInput.sysmlid,
+                    name: scope.jobInput.jobName
                 }]
             };
-
             var link = '/alfresco/service/workspaces/master/jobs';
             $http.post(link, post).then(function(){
                 //scope.$setPristine(true);
-                scope.jobInput = { jobName:''};
+                //scope.jobInput = { jobName:''};
                 growl.success('Your job has posted');
-            
-            }, function(fail){
-                growl.error('Your job failed to post: ' + fail.status);
-            });
-        }; 
+                }, function(fail){
+                    growl.error('Your job failed to post: ' + fail.status);
+                });
+        };
+        
+        scope.enableEditor = function() {
+                //temp.replace('_job','');
+                scope.editorEnabled = true;
+                scope.editableName = scope.job.name.replace('_job','');
+            };
+        scope.disableEditor = function() {
+            scope.editorEnabled = false;
+        };
+        scope.save = function() {
+            scope.job.name = scope.editableName+'_job';
+            updateJob();
+            scope.disableEditor();
+        };
         
         //actions for stomp 
         scope.$on("stomp.job", function(event, newJob){
