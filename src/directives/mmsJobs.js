@@ -36,12 +36,13 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
         var ran = false;
         var lastid = null;
         scope.editorEnabled = false;
+        scope.buttonEnabled = true;
         //scope.serverData = " ";
         // scope.test = function(){
         //         console.log('Hello');
         //         console.log(scope.myOutput);
         // };
-        //scope.jobInput = { jobName:''};
+        scope.jobInput = { jobName:''};
 
         
         // get all the jobs for current document
@@ -54,8 +55,14 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
                 var jobs = data.data.jobs; // get jobs json
                 var jobs_size = data.data.jobs.length; // get length of jobs array
                 var newJobs = {};
+    
                 for (var i = 0; i < jobs_size; i++) {
                     if(jobs[i].name.endsWith('_job')){
+                        if(jobs[i].status !== 'waiting' || jobs[i].status !== 'completed' || jobs[i].status !== 'failed'){
+                            scope.buttonEnabled = false;
+                        }else{
+                            scope.buttonEnabled = true;
+                        }
                         newJobs = { 
                             name: jobs[i].name,
                             status: jobs[i].status,
@@ -102,16 +109,15 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
         
         // logic for running a job immediately 
         scope.runNow = function(){
-            if(scope.jobs.length < 1){
+            if(!scope.job.name){
                 scope.createJob();
                 jenkinsRun();
             }else{
-                console.log(scope.jobs[0].sysmlid);
                 jenkinsRun();
             }
         };
         var jenkinsRun = function() {
-            var link = '/alfresco/service/workspaces/master/jobs/'+scope.jobs[0].sysmlid+'/execute';
+            var link = '/alfresco/service/workspaces/master/jobs/'+scope.job[0].sysmlid+'/execute';
             //http://localhost:8080/alfresco/service/workspaces/master/jobs/scope.jobs[0].sysmlid/execute
             $http.post(link, ' ').then(function(){
                 growl.success('Your job is running!');
@@ -123,38 +129,42 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
         //:TODO have cases for each null; "running"; "failed"; "completed"; "aborted";"unstable"; "disabled"; "waiting";
         
         // logic for adding a new job 
-        // scope.createJob = function() {
-        //     var id = scope.mmsDocId;
-        //     var thisSchedule = ' '; 
-        //     console.log(scope.myOutput);
-        //     if(scope.myOutput !== '* * * * *')
-        //             thisSchedule = scope.myOutput;
-        //     var post = {
-        //         jobs: [{
-        //             name: scope.jobInput.jobName,
-        //             command: 'Jenkins,DocWeb,' + documentName + ',' + project.projectName,
-        //             schedule: thisSchedule,
-        //             status: 'waiting',
-        //             url: 'sample_initial_url',
-        //             owner: id,
-        //             isMetatype: false,
-        //             documentation: '',
-        //             specialization: {
-        //               type: 'Element'
-        //             }
-        //         }]
-        //     };
-        // 
-        //     var link = '/alfresco/service/workspaces/master/jobs';
-        //     $http.post(link, post).then(function(){
-        //         //scope.$setPristine(true);
-        //         scope.jobInput = { jobName:''};
-        //         growl.success('Your job has posted');
-        //     
-        //     }, function(fail){
-        //         growl.error('Your job failed to post: ' + fail.status);
-        //     });
-        // };
+        scope.createJob = function() {
+            var id = scope.mmsDocId;
+            var defaultName = scope.jobInput.jobName;
+            if(!scope.jobInput.jobName){
+                defaultName = scope.docName + "_job";
+            }
+            var thisSchedule = ' '; 
+            console.log(scope.myOutput);
+            if(scope.myOutput !== '* * * * *' && scope.myOutput)
+                    thisSchedule = scope.myOutput;
+            var post = {
+                jobs: [{
+                    name: defaultName,
+                    command: 'Jenkins,DocWeb,' + documentName + ',' + project.projectName,
+                    schedule: thisSchedule,
+                    status: 'waiting',
+                    url: 'sample_initial_url',
+                    owner: id,
+                    isMetatype: false,
+                    documentation: '',
+                    specialization: {
+                      type: 'Element'
+                    }
+                }]
+            };
+        
+            var link = '/alfresco/service/workspaces/master/jobs';
+            $http.post(link, post).then(function(){
+                //scope.$setPristine(true);
+                scope.jobInput = { jobName:''};
+                growl.success('Your job has posted');
+            
+            }, function(fail){
+                growl.error('Your job failed to post: ' + fail.status);
+            });
+        };
          
         var updateJob = function() {
             var id = scope.mmsDocId;
@@ -192,19 +202,29 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
         scope.$on("stomp.job", function(event, newJob){
             var jobs = newJob; // get jobs json
             scope.hasJobs = true;
-            if(jobs.owner === scope.mmsDocId){
-                scope.jobs.push({
+            if(newJob.status !== 'waiting' || newJob.status !== 'completed' || newJob.status !== 'failed'){
+                    scope.buttonEnabled = false;
+            }else{
+                scope.buttonEnabled = true;
+            }
+            if(jobs.owner === scope.mmsDocId){            
+                scope.job = {
                     name: newJob.name,
                     status: newJob.status,
-                    schedule: newJob.schedule,
+                    //schedule: newJob.schedule,
                     url: newJob.url,
-                    command: newJob.command
-                });
+                    //command: newJob.command
+                };
                 scope.$apply();
             }
             
         });
         scope.$on("stomp.updateJob", function(event, updateJob){
+            if(updateJob.status !== 'waiting' || updateJob.status !== 'completed' || updateJob.status !== 'failed'){
+                    scope.buttonEnabled = false;
+            }else{
+                scope.buttonEnabled = true;
+            }
             if(updateJob.owner === scope.mmsDocId){
                 angular.forEach(scope.jobs, function(value, key) {
                     if(value.url === updateJob.url){
@@ -218,13 +238,6 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
                 scope.$apply();
             }
         });
-        // :TODO This jquery library needs to be replaced with https://github.com/jacobscarter/angular-cron-jobs
-        // $('#cronOptions').cron({
-        //     initial: "0 0 * * *",
-        //     onChange: function() {
-        //         cron_value = $(this).cron("value");
-        //     },
-        // });
         scope.myConfig = {
             options : {
                 allowMinute : false,

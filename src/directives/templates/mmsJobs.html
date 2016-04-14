@@ -23,7 +23,12 @@
                 <a ng-click="disableEditor()">Cancel</a>
             </div>
         </td>
-        <td>{{job.status}} 
+        <td>
+            <div ng-if="buttonEnabled">
+                <button type="submit" class="btn-link" ng-click="runNow()"><strong>RUN NOW</stong></button>
+            </div>
+            <!-- <div ng-if="!buttonEnabled">{{job.status}}</div>  -->
+            <div>{{job.status}}</div> 
             <!-- :TODO if status is not...ng-hide <button type="submit"  class="btn-link pull-right" ng-click="runNow()"><strong>RUN NOW</stong></button> -->
         </td>
         <td>{{job.create}}</td>
