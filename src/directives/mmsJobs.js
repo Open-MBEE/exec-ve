@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsJobs', ['$templateCache','$http', '$location', 'ElementService','UtilsService','growl','_', mmsJobs]);
+.directive('mmsJobs', ['$templateCache','$http', '$location', 'ElementService','UtilsService','growl','_','$q', mmsJobs]);
 /**
  * @ngdoc directive
  * @name mms.directives.directive:mmsJobs
@@ -26,7 +26,7 @@ angular.module('mms.directives')
  * @param {string=master} mmsWs Workspace to use, defaults to master
  * @param {string=null} mmsDocId 
  */
-function mmsJobs($templateCache, $http, $location, ElementService, UtilsService, growl, _) {
+function mmsJobs($templateCache, $http, $location, ElementService, UtilsService, growl, _ , $q) {
     var template = $templateCache.get('mms/templates/mmsJobs.html');
 
     var mmsJobsLink = function(scope, element, attrs) {
@@ -107,17 +107,8 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
         // watch for the docuement to change
         scope.$watch('mmsDocId', changeDocument);
         
-        // logic for running a job immediately 
-        scope.runNow = function(){
-            if(!scope.job.name){
-                scope.createJob();
-                jenkinsRun();
-            }else{
-                jenkinsRun();
-            }
-        };
         var jenkinsRun = function() {
-            var link = '/alfresco/service/workspaces/master/jobs/'+scope.job[0].sysmlid+'/execute';
+            var link = '/alfresco/service/workspaces/master/jobs/'+scope.job.sysmlid+'/execute';
             //http://localhost:8080/alfresco/service/workspaces/master/jobs/scope.jobs[0].sysmlid/execute
             $http.post(link, ' ').then(function(){
                 growl.success('Your job is running!');
@@ -126,17 +117,29 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
             });
         };
         
+        // logic for running a job immediately 
+        scope.runNow = function(){
+            if(!scope.job.name){
+                scope.createJob().then(function(){
+                    jenkinsRun();
+                });
+                //jenkinsRun();
+            }else{
+                jenkinsRun();
+            }
+        };    
         //:TODO have cases for each null; "running"; "failed"; "completed"; "aborted";"unstable"; "disabled"; "waiting";
         
         // logic for adding a new job 
         scope.createJob = function() {
+            var deferred = $q.defer();
             var id = scope.mmsDocId;
             var defaultName = scope.jobInput.jobName;
             if(!scope.jobInput.jobName){
                 defaultName = scope.docName + "_job";
             }
             var thisSchedule = ' '; 
-            console.log(scope.myOutput);
+            //console.log(scope.myOutput);
             if(scope.myOutput !== '* * * * *' && scope.myOutput)
                     thisSchedule = scope.myOutput;
             var post = {
@@ -156,14 +159,23 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
             };
         
             var link = '/alfresco/service/workspaces/master/jobs';
-            $http.post(link, post).then(function(){
+            $http.post(link, post).then(function(data){
                 //scope.$setPristine(true);
                 scope.jobInput = { jobName:''};
                 growl.success('Your job has posted');
-            
+                var job = data.data.elements;
+                var job_size = data.data.elements.length;
+                for (var i = 0; i < job_size; i++) {
+                    if(job[i].specialization.type === 'Element'){
+                        scope.job.sysmlid = job[i].sysmlid;    
+                    }
+                }
+                console.log("TTTTTTTTTTTTTTTTT" +scope.job.sysmlid+"TTTTTTTTTTTTT");
+                deferred.resolve();
             }, function(fail){
                 growl.error('Your job failed to post: ' + fail.status);
             });
+            return deferred.promise;
         };
          
         var updateJob = function() {
