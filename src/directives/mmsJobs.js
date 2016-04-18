@@ -58,10 +58,10 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
     
                 for (var i = 0; i < jobs_size; i++) {
                     if(jobs[i].name.endsWith('_job')){
-                        if(jobs[i].status !== 'waiting' || jobs[i].status !== 'completed' || jobs[i].status !== 'failed'){
-                            scope.buttonEnabled = false;
-                        }else{
+                        if(jobs[i].status === 'waiting' || jobs[i].status === 'completed' || jobs[i].status === 'failed'){
                             scope.buttonEnabled = true;
+                        }else{
+                            scope.buttonEnabled = false;
                         }
                         newJobs = { 
                             name: jobs[i].name,
@@ -170,7 +170,6 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
                         scope.job.sysmlid = job[i].sysmlid;    
                     }
                 }
-                console.log("TTTTTTTTTTTTTTTTT" +scope.job.sysmlid+"TTTTTTTTTTTTT");
                 deferred.resolve();
             }, function(fail){
                 growl.error('Your job failed to post: ' + fail.status);
@@ -180,14 +179,14 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
          
         var updateJob = function() {
             var id = scope.mmsDocId;
-            var post = {
+            var updatePost = {
                 jobs: [{
-                    sysmlid: scope.jobInput.sysmlid,
-                    name: scope.jobInput.jobName
+                    sysmlid: scope.job.sysmlid,
+                    name: scope.jobInput.jobName+'_job'
                 }]
             };
             var link = '/alfresco/service/workspaces/master/jobs';
-            $http.post(link, post).then(function(){
+            $http.post(link, updatePost).then(function(){
                 //scope.$setPristine(true);
                 //scope.jobInput = { jobName:''};
                 growl.success('Your job has posted');
@@ -199,13 +198,13 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
         scope.enableEditor = function() {
                 //temp.replace('_job','');
                 scope.editorEnabled = true;
-                scope.editableName = scope.job.name.replace('_job','');
+                scope.jobInput.jobName = scope.job.name.replace('_job','');
             };
         scope.disableEditor = function() {
             scope.editorEnabled = false;
         };
         scope.save = function() {
-            scope.job.name = scope.editableName+'_job';
+            scope.job.name = scope.jobInput.jobName+'_job';
             updateJob();
             scope.disableEditor();
         };
@@ -214,10 +213,10 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
         scope.$on("stomp.job", function(event, newJob){
             var jobs = newJob; // get jobs json
             scope.hasJobs = true;
-            if(newJob.status !== 'waiting' || newJob.status !== 'completed' || newJob.status !== 'failed'){
-                    scope.buttonEnabled = false;
+            if(newJob.status === 'waiting' || newJob.status === 'completed' || newJob.status === 'failed'){
+                    scope.buttonEnabled = true;
             }else{
-                scope.buttonEnabled = true;
+                scope.buttonEnabled = false;
             }
             if(jobs.owner === scope.mmsDocId){            
                 scope.job = {
@@ -232,10 +231,10 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
             
         });
         scope.$on("stomp.updateJob", function(event, updateJob){
-            if(updateJob.status !== 'waiting' || updateJob.status !== 'completed' || updateJob.status !== 'failed'){
-                    scope.buttonEnabled = false;
+            if(updateJob.status === 'waiting' || updateJob.status === 'completed' || updateJob.status === 'failed'){
+                    scope.buttonEnabled = true;
             }else{
-                scope.buttonEnabled = true;
+                scope.buttonEnabled = false;
             }
             if(updateJob.owner === scope.mmsDocId){
                 angular.forEach(scope.jobs, function(value, key) {

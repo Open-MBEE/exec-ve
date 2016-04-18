@@ -17,7 +17,7 @@
                 <a ng-click="enableEditor()">{{job.name}}</a>
             </div>
             <div ng-show="editorEnabled">
-                <input ng-model="editableName" ng-show="editorEnabled">
+                <input ng-model="jobInput.jobName" ng-show="editorEnabled">
                 <a ng-click="save()">Save</a>
                 or
                 <a ng-click="disableEditor()">Cancel</a>
@@ -36,6 +36,7 @@
     </tr>
     </tbody>
 </table>
+<!-- RUN NOW FOR documentName-->
 <h3 ng-if="!hasJobs && !loading"> No Jobs for {{docName}}</h3>
 <hr>
 <div class="row" style="margin-right:0px;">
