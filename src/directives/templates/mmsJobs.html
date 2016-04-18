@@ -7,6 +7,8 @@
             <td>Status</td>
             <td>Created</td>
             <td>Log</td>
+            <td></td>
+            <td></td>
         </tr>
     </thead>
     <tbody>
@@ -24,15 +26,17 @@
             </div>
         </td>
         <td>
-            <div ng-if="buttonEnabled">
-                <button type="submit" class="btn-link" ng-click="runNow()"><strong>RUN NOW</stong></button>
-            </div>
-            <!-- <div ng-if="!buttonEnabled">{{job.status}}</div>  -->
             <div>{{job.status}}</div> 
             <!-- :TODO if status is not...ng-hide <button type="submit"  class="btn-link pull-right" ng-click="runNow()"><strong>RUN NOW</stong></button> -->
         </td>
         <td>{{job.create}}</td>
         <td><a ng-attr-href="{{job.url}}" target="_blank" ng-click="enableEditor()">log</a></td>
+        <td>
+            <div ng-if="buttonEnabled">
+                <button type="submit" class="btn-link" ng-click="runNow()"><strong>RUN NOW</stong></button>
+            </div>
+        </td>
+        <td><button type="submit" class="btn-link" ng-click="deleteJob()"><strong>DELETE JOB</stong></button></td>
     </tr>
     </tbody>
 </table>

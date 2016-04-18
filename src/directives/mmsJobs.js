@@ -189,10 +189,26 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
             $http.post(link, updatePost).then(function(){
                 //scope.$setPristine(true);
                 //scope.jobInput = { jobName:''};
-                growl.success('Your job has posted');
+                growl.success('Your job has been updated');
                 }, function(fail){
-                    growl.error('Your job failed to post: ' + fail.status);
+                    growl.error('Your job failed to update: ' + fail.status);
                 });
+        };
+        var deleteJob = function(){
+            var id = scope.mmsDocId;
+            var jobDelete = {
+                jobs: [{
+                    sysmlid: scope.job.sysmlid
+                }]
+            };
+            var link = '/alfresco/service/workspaces/master/jobs';
+            $http.delete(link, jobDelete).then(function(){
+                //scope.$setPristine(true);
+                //scope.jobInput = { jobName:''};
+                growl.success('Your job has been deleted');
+                }, function(fail){
+                    growl.error('Your job failed to be deleted: ' + fail.status);
+                });    
         };
         
         scope.enableEditor = function() {
