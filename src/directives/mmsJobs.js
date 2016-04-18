@@ -255,14 +255,12 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
                 scope.$apply();
             }
         });
-        scope.myConfig = {
-            options : {
-                allowMinute : false,
-                allowHour : false
-            }
-        };      
+        scope.$on("stomp.deleteJob", function(event, deleteJob){
+            scope.buttonEnabled = false;
+            scope.hasJobs = false;
+            scope.job = null;
+        });
     };
-
     return {
         restrict: 'E',
         template: template,

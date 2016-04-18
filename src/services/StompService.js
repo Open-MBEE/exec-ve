@@ -59,6 +59,10 @@ function StompService($rootScope, UtilsService, $window, $location, ApplicationS
             var updateJob = updateWebpage.workspace2.updatedJobs[0];
             $rootScope.$broadcast("stomp.updateJob", updateJob);
         }
+        if(updateWebpage.workspace2.deletedJobs  && updateWebpage.workspace2.deletedJobs.length > 0 ){//check length of added jobs > 0
+            var deleteJob = updateWebpage.workspace2.deleteJobs[0];
+            $rootScope.$broadcast("stomp.deleteJob", deleteJob);
+        }
         // this should happen in where...
         $rootScope.$on('$destroy', function() {
             stompClient.unsubscribe('/topic/master'/*, whatToDoWhenUnsubscribe*/);
