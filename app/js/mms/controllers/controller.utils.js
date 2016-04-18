@@ -182,7 +182,7 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
                     $scope.action = 'generate pdf';
                 $scope.genpdf = genpdf;
                 $scope.unsaved = unsaved;
-                $scope.model = {genCover: true};
+                $scope.model = {genCover: false};
                 $scope.print = function() {
                     $modalInstance.close(['print', $scope.model.genCover]);
                 };
