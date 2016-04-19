@@ -363,16 +363,10 @@ function UtilsService(CacheService, _) {
 
         var root_branch = tree[0].branch;
 
-        result += '<ul style="list-style-type:none">';
-
-        var anchor = '<a href=#' + root_branch.data.sysmlid + '>';
-        result += '  <li>' + anchor + root_branch.section + ' ' + root_branch.label + '</a></li>';
-
         root_branch.children.forEach(function (child) {
             result += makeHtmlTOCChild(child);
         });
 
-        result += '</ul>'; 
         result += '</div>'; 
 
         return result;
@@ -380,7 +374,7 @@ function UtilsService(CacheService, _) {
 
     var makeHtmlTOCChild = function(child) {
 
-        var result = '<ul style="list-style-type:none">';
+        var result = '<ul style="list-style-type:none; padding-left:1em;">';
 
         var anchor = '<a href=#' + child.data.sysmlid + '>';
         result += '  <li>' + anchor + child.section + ' ' + child.label + '</a></li>';
