@@ -52,16 +52,20 @@ function StompService($rootScope, UtilsService, $window, $location, ApplicationS
             });
         }
         if(updateWebpage.workspace2.addedJobs  && updateWebpage.workspace2.addedJobs.length > 0 ){//check length of added jobs > 0
-            var newJob = updateWebpage.workspace2.addedJobs[0];
+            var newJob = updateWebpage.workspace2.addedJobs;
             $rootScope.$broadcast("stomp.job", newJob);
         }
         if(updateWebpage.workspace2.updatedJobs  && updateWebpage.workspace2.updatedJobs.length > 0 ){//check length of added jobs > 0
-            var updateJob = updateWebpage.workspace2.updatedJobs[0];
+            var updateJob = updateWebpage.workspace2.updatedJobs;
             $rootScope.$broadcast("stomp.updateJob", updateJob);
         }
         if(updateWebpage.workspace2.deletedJobs  && updateWebpage.workspace2.deletedJobs.length > 0 ){//check length of added jobs > 0
-            var deleteJob = updateWebpage.workspace2.deleteJobs[0];
+            var deleteJob = updateWebpage.workspace2.deletedJobs;
             $rootScope.$broadcast("stomp.deleteJob", deleteJob);
+        }
+        if(updateWebpage.workspace2.deletedElements  && updateWebpage.workspace2.deletedElements.length > 0 ){//check length of added jobs > 0
+            var deleteElement = updateWebpage.workspace2.deletedElements;
+            $rootScope.$broadcast("stomp.deleteElement", deleteElement);
         }
         // this should happen in where...
         $rootScope.$on('$destroy', function() {
