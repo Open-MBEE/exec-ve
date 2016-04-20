@@ -359,7 +359,7 @@ function UtilsService(CacheService, _) {
     };
 
     var makeHtmlTOC = function (tree) {
-        var result = '<div style="page-break-after:always"><div style="font-size:32px">Table of Contents</div>';
+        var result = '<div class="toc"><div class="header">Table of Contents</div>';
 
         var root_branch = tree[0].branch;
 
@@ -374,7 +374,7 @@ function UtilsService(CacheService, _) {
 
     var makeHtmlTOCChild = function(child) {
 
-        var result = '<ul style="list-style-type:none; padding-left:1em;">';
+        var result = '<ul>';
 
         var anchor = '<a href=#' + child.data.sysmlid + '>';
         result += '  <li>' + anchor + child.section + ' ' + child.label + '</a></li>';
