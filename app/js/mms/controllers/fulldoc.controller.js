@@ -136,8 +136,8 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
             doc.dnum = ob.dnum;
             doc.displayTime = ob.time;
             doc.toc = ob.toc;
-            doc.tof = "";
-            doc.tot = "";
+            doc.tof = '<div style="display:none"></div>';
+            doc.tot = '<div style="display:none"></div>';
             doc.workspace = $scope.ws;
             doc.customCss = UtilsService.getPrintCss();
 
