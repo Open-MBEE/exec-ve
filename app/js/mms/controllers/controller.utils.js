@@ -182,9 +182,9 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
                     $scope.action = 'generate pdf';
                 $scope.genpdf = genpdf;
                 $scope.unsaved = unsaved;
-                $scope.model = {genCover: true};
+                $scope.model = {genCover: true, genTotf: true};
                 $scope.print = function() {
-                    $modalInstance.close(['print', $scope.model.genCover]);
+                    $modalInstance.close(['print', $scope.model.genCover, $scope.model.genTotf]);
                 };
                 $scope.fulldoc = function() {
                     $modalInstance.close(['fulldoc']);
@@ -209,7 +209,7 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
             if (choice[0] === 'print' && !genpdf)
                 popupPrint(ob, ws, time, isDoc, print, choice[1], tag);
             else if (choice[0] === 'print' && genpdf) {
-                generateHtml(ob, ws, time, true, choice[1], tag)
+                generateHtml(ob, ws, time, true, choice[1], choice[2], tag)
                 .then(function(ob) {
                     deferred.resolve(ob);
                 });
@@ -310,7 +310,7 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
     };
     
 
-    var generateHtml = function(ob, ws, time, isDoc, genCover, tag) {
+    var generateHtml = function(ob, ws, time, isDoc, genCover, genTotf, tag) {
         var deferred = $q.defer();
         var printContents = '';//$window.document.getElementById('print-div').outerHTML;
         var printElementCopy = angular.element('#print-div').clone();//angular.element(printContents);
@@ -376,7 +376,7 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
                 if (genCover) {
                     cover = templateElement[0].innerHTML;
                 }
-                deferred.resolve({cover: cover, contents: printContents, header: header, footer: footer, time: displayTime, dnum: dnum, version: version, toc: toc});
+                deferred.resolve({cover: cover, contents: printContents, header: header, footer: footer, time: displayTime, dnum: dnum, version: version, toc: toc, genTotf: genTotf});
             }, 0, false);
         });
         return deferred.promise;

@@ -138,6 +138,10 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
             doc.toc = ob.toc;
             doc.workspace = $scope.ws;
             doc.customCss = UtilsService.getPrintCss();
+            if (!ob.genTotf) {
+                doc.tof = '<div style="display:none;"></div>';
+                doc.tot = '<div style="display:none;"></div>';
+            }
 
             doc.name = document.sysmlid + '_' + time + '_' + new Date().getTime();
             if(time == 'latest') 
