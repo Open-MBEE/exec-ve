@@ -118,6 +118,7 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
     $scope.$on('convert.pdf', function() {
         if (converting) {
             growl.info("Please wait...");
+            return;
         }
         converting = true;
         $scope.bbApi.toggleButtonSpinner('convert.pdf');
@@ -136,10 +137,12 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
             doc.dnum = ob.dnum;
             doc.displayTime = ob.time;
             doc.toc = ob.toc;
-            doc.tof = '<div style="display:none"></div>';
-            doc.tot = '<div style="display:none"></div>';
             doc.workspace = $scope.ws;
             doc.customCss = UtilsService.getPrintCss();
+            if (!ob.genTotf) {
+                doc.tof = '<div style="display:none;"></div>';
+                doc.tot = '<div style="display:none;"></div>';
+            }
 
             doc.name = document.sysmlid + '_' + time + '_' + new Date().getTime();
             if(time == 'latest') 
@@ -160,6 +163,9 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
                 converting = false;
                 $scope.bbApi.toggleButtonSpinner('convert.pdf');
             });
+        }, function() {
+            converting = false;
+            $scope.bbApi.toggleButtonSpinner('convert.pdf');
         });
     });
 
