@@ -117,6 +117,7 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
     $scope.$on('convert.pdf', function() {
         if (converting) {
             growl.info("Please wait...");
+            return;
         }
         converting = true;
         $scope.bbApi.toggleButtonSpinner('convert.pdf');
@@ -136,18 +137,12 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
             doc.displayTime = ob.time;
             doc.toc = ob.toc;
             doc.workspace = $scope.ws;
-            doc.customCss = "img {max-width: 100%; page-break-inside: avoid; page-break-before: auto; page-break-after: auto; display: block;} " + 
-                " tr, td, th { page-break-inside: avoid;} thead {display: table-header-group;} " + 
-                "li > a[href]::after {content: leader(\".\") target-counter(attr(href), page);} " + 
-                ".pull-right {float: right;} " + 
-                "table {width: 100%; border-collapse: collapse;} " + 
-                "table, th, td {border: 1px solid black;} " +
-                "h1 {font-size: 20px;} " +
-                ".ng-hide {display: none;} " +
-                "body {font-size: 12px;} " + 
-                ".tof, .tot {page-break-after:always} " +
-                ".tof .header, .tot .header { font-size:32px; } " + 
-                ".tof UL, .tot UL {list-style-type:none;} ";
+            doc.customCss = UtilsService.getPrintCss();
+            if (!ob.genTotf) {
+                doc.tof = '<div style="display:none;"></div>';
+                doc.tot = '<div style="display:none;"></div>';
+            }
+
             doc.name = document.sysmlid + '_' + time + '_' + new Date().getTime();
             if(time == 'latest') 
                 doc.tagId = time;
@@ -167,6 +162,9 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
                 converting = false;
                 $scope.bbApi.toggleButtonSpinner('convert.pdf');
             });
+        }, function() {
+            converting = false;
+            $scope.bbApi.toggleButtonSpinner('convert.pdf');
         });
     });
 

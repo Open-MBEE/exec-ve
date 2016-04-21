@@ -182,9 +182,9 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
                     $scope.action = 'generate pdf';
                 $scope.genpdf = genpdf;
                 $scope.unsaved = unsaved;
-                $scope.model = {genCover: true};
+                $scope.model = {genCover: true, genTotf: true};
                 $scope.print = function() {
-                    $modalInstance.close(['print', $scope.model.genCover]);
+                    $modalInstance.close(['print', $scope.model.genCover, $scope.model.genTotf]);
                 };
                 $scope.fulldoc = function() {
                     $modalInstance.close(['fulldoc']);
@@ -209,7 +209,7 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
             if (choice[0] === 'print' && !genpdf)
                 popupPrint(ob, ws, time, isDoc, print, choice[1], tag);
             else if (choice[0] === 'print' && genpdf) {
-                generateHtml(ob, ws, time, true, choice[1], tag)
+                generateHtml(ob, ws, time, true, choice[1], choice[2], tag)
                 .then(function(ob) {
                     deferred.resolve(ob);
                 });
@@ -218,6 +218,8 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
                 $rootScope.mms_bbApi.setToggleState("tree.full.document", true);
                 $state.go('workspace.site.document.full', {search: undefined}); 
             }
+        }, function() {
+            deferred.reject();
         });
         return deferred.promise;
     };
@@ -308,7 +310,7 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
     };
     
 
-    var generateHtml = function(ob, ws, time, isDoc, genCover, tag) {
+    var generateHtml = function(ob, ws, time, isDoc, genCover, genTotf, tag) {
         var deferred = $q.defer();
         var printContents = '';//$window.document.getElementById('print-div').outerHTML;
         var printElementCopy = angular.element('#print-div').clone();//angular.element(printContents);
@@ -374,7 +376,7 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
                 if (genCover) {
                     cover = templateElement[0].innerHTML;
                 }
-                deferred.resolve({cover: cover, contents: printContents, header: header, footer: footer, time: displayTime, dnum: dnum, version: version, toc: toc});
+                deferred.resolve({cover: cover, contents: printContents, header: header, footer: footer, time: displayTime, dnum: dnum, version: version, toc: toc, genTotf: genTotf});
             }, 0, false);
         });
         return deferred.promise;
@@ -432,7 +434,7 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
                     inst = "<div>(Copy and paste into Word)</div>";
                 var popupWin = $window.open('', '_blank', 'width=800,height=600,scrollbars=1');
                 popupWin.document.open();
-                popupWin.document.write('<html><head><link href="css/ve-mms.styles.min.css" rel="stylesheet" type="text/css"></head><body style="overflow: auto">' + inst + cover + tocContents + printContents + '</html>');
+                popupWin.document.write('<html><head><style>' + UtilsService.getPrintCss() + '</style></head><body style="overflow: auto">' + inst + cover + tocContents + printContents + '</html>');
                 popupWin.document.close();
                 if (print) {
                     $timeout(function() {

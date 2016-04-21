@@ -359,20 +359,14 @@ function UtilsService(CacheService, _) {
     };
 
     var makeHtmlTOC = function (tree) {
-        var result = '<div style="page-break-after:always"><div style="font-size:32px">Table of Contents</div>';
+        var result = '<div class="toc"><div class="header">Table of Contents</div>';
 
         var root_branch = tree[0].branch;
-
-        result += '<ul style="list-style-type:none">';
-
-        var anchor = '<a href=#' + root_branch.data.sysmlid + '>';
-        result += '  <li>' + anchor + root_branch.section + ' ' + root_branch.label + '</a></li>';
 
         root_branch.children.forEach(function (child) {
             result += makeHtmlTOCChild(child);
         });
 
-        result += '</ul>'; 
         result += '</div>'; 
 
         return result;
@@ -380,7 +374,7 @@ function UtilsService(CacheService, _) {
 
     var makeHtmlTOCChild = function(child) {
 
-        var result = '<ul style="list-style-type:none">';
+        var result = '<ul>';
 
         var anchor = '<a href=#' + child.data.sysmlid + '>';
         result += '  <li>' + anchor + child.section + ' ' + child.label + '</a></li>';
@@ -427,6 +421,26 @@ function UtilsService(CacheService, _) {
         return {holdingBinId: holdingBinId, projectId: projectId, siteId: siteId};
     };
 
+    var getPrintCss = function() {
+        return "img {max-width: 100%; page-break-inside: avoid; page-break-before: auto; page-break-after: auto; display: block;} " + 
+                " tr, td, th { page-break-inside: avoid; } thead {display: table-header-group;} " + 
+                ".pull-right {float: right;} " + 
+                "table {width: 100%; border-collapse: collapse;} " + 
+                "table, th, td {border: 1px solid black; padding: 4px;} " +
+                "h1 {font-size: 20px; padding: 0px; margin: 4px;} " +
+                ".ng-hide {display: none;} " +
+                "body {font-size: 12px;} " + 
+                "caption, figcaption {text-align: center; font-weight: bold;}" +
+                ".toc, .tof, .tot {page-break-after:always;} " +
+                ".toc a, .tof a, .tot a { text-decoration:none; color: #000; font-size:14px; }" + 
+                ".toc .header, .tof .header, .tot .header { margin-bottom: 4px; font-weight: bold; font-size:24px; } " + 
+                ".toc ul, .tof ul, .tot ul {list-style-type:none; margin: 0; } " +
+                ".tof ul, .tot ul {padding-left:0;}" +
+                ".toc ul {padding-left:4em;}" +
+                ".toc > ul {padding-left:0;}" +
+                ".toc li > a[href]::after {content: leader('.') target-counter(attr(href), page);} ";
+    };
+
     return {
         hasCircularReference: hasCircularReference,
         cleanElement: cleanElement,
@@ -442,6 +456,7 @@ function UtilsService(CacheService, _) {
         makeHtmlList: makeHtmlList,
         makeHtmlTOC: makeHtmlTOC,
         createMmsId: createMmsId,
-        getIdInfo: getIdInfo
+        getIdInfo: getIdInfo,
+        getPrintCss: getPrintCss
     };
 }
