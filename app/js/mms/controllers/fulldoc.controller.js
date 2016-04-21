@@ -117,6 +117,7 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
     $scope.$on('convert.pdf', function() {
         if (converting) {
             growl.info("Please wait...");
+            return;
         }
         converting = true;
         $scope.bbApi.toggleButtonSpinner('convert.pdf');
@@ -157,6 +158,9 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
                 converting = false;
                 $scope.bbApi.toggleButtonSpinner('convert.pdf');
             });
+        }, function() {
+            converting = false;
+            $scope.bbApi.toggleButtonSpinner('convert.pdf');
         });
     });
 
