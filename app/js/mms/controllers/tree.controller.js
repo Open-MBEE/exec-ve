@@ -1185,12 +1185,14 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
     });
 
     if ($state.includes('workspace.site.document')) {
+        $timeout(function() {
         if (document.specialization.view2view) {
             document.specialization.view2view.forEach(function(view, index) {
                 ViewService.getView(view.id, false, ws, time, 0)
                 .then(addViewSections); //TODO add back in once we have priority queue
             });
         }
+    }, 8000, false);
         $timeout(function() {
             if ($rootScope.mms_treeInitial) {
                 var node = viewId2node[$rootScope.mms_treeInitial];
