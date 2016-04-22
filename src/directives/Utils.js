@@ -385,6 +385,7 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
         scope.elementSaving = true;
         var id = editObj ? editObj.sysmlid : scope.mmsEid;
 
+        $timeout(function() {
         // If it is a Section, then merge the changes b/c deletions to the Section's contents
         // are not done on the scope.edit.
         if (editObj && ViewService.isSection(editObj)) {
@@ -443,6 +444,7 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
             else
                 bbApi.toggleButtonSpinner('presentation.element.saveC');
         });
+        }, 1000, false);
     };
 
     //called by transcludes
