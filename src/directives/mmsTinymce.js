@@ -535,7 +535,7 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                 var deb = _.debounce(function(e) {
                     ed.save();
                     update();
-                }, 1000);
+                }, 850);
                 ed.on('ExecCommand change NodeChange ObjectResized', deb);
                 ed.on('undo', function(e) {
                     ed.save();
