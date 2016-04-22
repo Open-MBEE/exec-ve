@@ -82,11 +82,14 @@ function mmsViewPresentationElem(ViewService, ElementService, $templateCache, $r
                     });
                 });
             }, function(reason) {
-                var status = ' not found';
-                if (reason.status === 410)
-                    status = ' deleted';
-                element.html('<span class="error">View element reference error: ' + scope.mmsInstanceVal.instance + ' ' + status + '</span>');
-                //growl.error('View Element Ref Error: ' + scope.mmsInstanceVal.instance + ' ' + reason.message);
+                if (reason.status === 500) {
+                    element.html('<span class="error">View element reference error: ' + scope.mmsInstanceVal.instance + ' invalid specification</span>');
+                } else {
+                    var status = ' not found';
+                    if (reason.status === 410)
+                        status = ' deleted';
+                    element.html('<span class="error">View element reference error: ' + scope.mmsInstanceVal.instance + ' ' + status + '</span>');
+                }//growl.error('View Element Ref Error: ' + scope.mmsInstanceVal.instance + ' ' + reason.message);
             });
         } 
     };

@@ -283,9 +283,9 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 return ConfigService.getConfig($stateParams.tag, workspace, false, 2);
             },        
             configSnapshots: function(ConfigService, workspace, tag, dummyLogin) {
-                if (tag.timestamp === 'latest')
+                //if (tag.timestamp === 'latest')
                     return [];
-                return ConfigService.getConfigSnapshots(tag.id, workspace, false, 2);
+                //return ConfigService.getConfigSnapshots(tag.id, workspace, false, 2);
             },
             time: function(tag, dummyLogin) {
                 return tag.timestamp;
@@ -544,7 +544,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             },        
             configSnapshots: function(ConfigService, workspace, tag, dummyLogin) {
                 //if (tag.timestamp === 'latest')
-                    return [];
+                    return []; //TODO revert when server is faster
                 //return ConfigService.getConfigSnapshots(tag.id, workspace, false);
             },
             time: function($stateParams, ConfigService, workspace, dummyLogin) {
