@@ -44,7 +44,7 @@ function mmsNav($templateCache, $state, hotkeys, growl, $location, $modal, $http
             hotkeys.toggleCheatSheet();
         };
         scope.toggleAbout = function() {
-            scope.veV = '2.3.4';
+            scope.veV = '2.3.5';
             scope.mmsV = 'Loading...';
             ApplicationService.getMmsVersion().then(function(data) {
                 scope.mmsV = data;
