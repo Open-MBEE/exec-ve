@@ -3,10 +3,10 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('ToolCtrl', ['$scope', '$rootScope', '$state', '$modal', '$q', '$stateParams',
+.controller('ToolCtrl', ['$scope', '$rootScope', '$state', '$modal', '$q', '$stateParams', '$timeout',
             'ConfigService', 'ElementService', 'WorkspaceService', 'growl', 
             'workspaceObj', 'tags', 'tag', 'snapshots', 'site', 'document', 'time', 'Utils', 'hotkeys',
-function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, ElementService, WorkspaceService, growl, workspaceObj, tags, tag, snapshots, site, document, time, Utils, hotkeys) {
+function($scope, $rootScope, $state, $modal, $q, $stateParams, $timeout, ConfigService, ElementService, WorkspaceService, growl, workspaceObj, tags, tag, snapshots, site, document, time, Utils, hotkeys) {
 
     // TODO rename variable ws
     var ws = $stateParams.workspace;
@@ -268,6 +268,7 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
             $rootScope.mms_tbApi.toggleButtonSpinner('element.editor.save');
         else
             $rootScope.mms_tbApi.toggleButtonSpinner('element.editor.saveC');
+        $timeout(function() {
         $scope.specApi.save().then(function(data) {
             elementSaving = false;
             growl.success('Save Successful');
@@ -302,6 +303,7 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
             else
                 $rootScope.mms_tbApi.toggleButtonSpinner('element.editor.saveC');
         });
+        }, 1000, false);
         $rootScope.mms_tbApi.select('element.editor');
     };
 
