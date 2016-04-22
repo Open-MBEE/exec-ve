@@ -933,6 +933,10 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             // for opaque presentation elements, or slots:
 
             var instanceSpecSpec = instanceSpec.specialization.instanceSpecificationSpecification;
+            if (!instanceSpecSpec) {
+                deferred.reject({status: 500, message: 'missing specification'});
+                return;
+            }
             var type = instanceSpecSpec.type;
 
             // If it is a Opaque List, Paragraph, Table, Image, List:
