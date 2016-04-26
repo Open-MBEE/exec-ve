@@ -45,6 +45,11 @@ module.exports = function(grunt) {
             port: serverPort
           },
           {
+            context: '/Basic',
+            host: 'localhost',
+            port: 8080
+          },
+          {
             context: '/',
             host: 'localhost',
             port: 9001
