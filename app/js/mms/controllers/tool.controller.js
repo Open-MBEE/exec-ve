@@ -38,7 +38,7 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, $timeout, ConfigS
         reorder: false,
         snapshots: false,
         tags: false,
-        loads: false
+        jobs: false
     };
     $scope.tracker = {};
     if (!$rootScope.veEdits)
@@ -136,8 +136,8 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, $timeout, ConfigS
         showPane('tags');
     });
     
-    $scope.$on('loads', function() {
-        showPane('loads');
+    $scope.$on('jobs', function() {
+        showPane('jobs');
     });
     
     $scope.$on('element.history', function() {
