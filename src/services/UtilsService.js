@@ -274,8 +274,13 @@ function UtilsService(CacheService, _) {
             result.push('<caption>' + table.title + '</caption>');
         if (table.colwidths && table.colwidths.length > 0) {
             result.push('<colgroup>');
-            for (var i = 0; i < table.colwidths.length; i++)
-                result.push('<col style="width: ' + table.colwidths[i] + '">');
+            for (var i = 0; i < table.colwidths.length; i++) {
+                if (table.colwidths[i])
+                    result.push('<col style="width: ' + table.colwidths[i] + '">');
+                else {
+                    result.push('<col>');
+                }
+            }
             result.push('</colgroup>');
         }
         if (table.header) {
