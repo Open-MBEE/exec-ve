@@ -267,16 +267,6 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
                 if(deleteJob[i].owner === scope.mmsDocId){
                     scope.buttonEnabled = false;
                     scope.hasJobs = false;
-                    scope.job = null;
-                    scope.$apply();
-                }
-            }
-        });
-        scope.$on("stomp.deleteElement", function(event, deleteElement){
-            for (var i = 0; i < deleteElement.length; i++) {
-                if(deleteElement[i].owner === scope.mmsDocId){
-                    scope.buttonEnabled = false;
-                    scope.hasJobs = false;
                     scope.job = ' ';
                     scope.$apply();
                 }
