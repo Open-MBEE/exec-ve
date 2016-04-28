@@ -24,7 +24,7 @@ angular.module('mms.directives')
  * </pre>
  *
  * @param {string=master} mmsWs Workspace to use, defaults to master
- * @param {string=null} mmsDocId 
+ * @param {string=null} mmsDocId the id of the current document under which the job is being run
  */
 function mmsJobs($templateCache, $http, $location, ElementService, UtilsService, growl, _ , $q) {
     var template = $templateCache.get('mms/templates/mmsJobs.html');
