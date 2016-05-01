@@ -219,7 +219,8 @@ module.exports = function(grunt) {
           $: true,
           //__timely: true,
           Blob: true,
-          navigator: true
+          navigator: true,
+          invokePerspectivesCommand: true
         }
       }
     },
