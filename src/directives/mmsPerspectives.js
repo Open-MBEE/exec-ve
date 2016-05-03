@@ -99,26 +99,28 @@ function mmsPerspectives(SiteService, WorkspaceService, ConfigService, $state, $
                     "data": [
                         {
                             "command": "SetModelAttribute",
-                            "attributeName": "Elements To Add",
-                            "attributeValue": "eid",
-                            "modelID": 'model-' + id,
-                            "module": "MMS",
-                            "project": id,
-                            "viewID": "view-" + id,
-                            "viewName": "Drawing View 1",
+                            "data": {
+                                "attributeName": "Elements To Add",
+                                "attributeValue": eid,
+                                "modelID": 'model-' + id,
+                                "module": "MMS",
+                                "project": id,
+                                "viewID": "view-" + id,
+                                "viewName": "Drawing View 1"
+                            },
                             "onsuccess":"onPerspectivesAddElementSuccess",
-                             "onfailure":"onPerspectivesCommandFailure",
+                            "onfailure":"onPerspectivesCommandFailure",
                         },
-                        // {
-                        //     "command":"Update",
-                        //     "onsuccess":"onPerspectivesAddElementSuccess",
-                        //     "onfailure":"onPerspectivesCommandFailure",
-                        //     "data": {
-                        //         "project": id,
-                        //         "module":"MMS",
-                        //         "integratorIDs":["int-rest-" + id]
-                        //     }
-                        // },
+                        {
+                            "command":"Update",
+                            "onsuccess":"onPerspectivesAddElementSuccess",
+                            "onfailure":"onPerspectivesCommandFailure",
+                            "data": {
+                                "project": id,
+                                "module":"MMS",
+                                "integratorIDs":["int-rest-" + id]
+                            }
+                        },
                     ]
                 };
                 invokePerspectivesCommand(groupCommand);
@@ -130,20 +132,17 @@ function mmsPerspectives(SiteService, WorkspaceService, ConfigService, $state, $
             "onready":"onPerspectivesProjectReady", //quirk?
             "onfailure":"onPerspectivesCommandFailure",
             "onsuccess":"onPerspectivesCommandSuccess",
-            "data":
-            [
+            "data": [
                 {
                     "command":"LoadProject",
-                    "data":
-                    {
+                    "data": {
                         "project": id,
                         "filename":"project/MMS.tsp"
                     }
                 },
                 {
                     "command":"NewDefaultModel",
-                    "data":
-                    {
+                    "data": {
                         "project": id,
                         "module":"MMS",
                         "modelID":"model-" + id
@@ -151,30 +150,29 @@ function mmsPerspectives(SiteService, WorkspaceService, ConfigService, $state, $
                 },
                 {
                     "command":"NewIntegrator",
-                    "data":
-                    {
+                    "data": {
                         "project": id,
                         "module":"MMS",
                         "modelID":"model-" + id,
                         "integratorName":"MMS INIT",
-                        "integratorID":"int-init-" + id
+                        "integratorID":"int-init-" + id,
+                        "integratorFileLocation": "https://cae-ems.jpl.nasa.gov/alfresco/service"
                     }
                 },
                 {
                     "command":"NewIntegrator",
-                    "data":
-                    {
+                    "data": {
                         "project": id,
                         "module":"MMS",
                         "modelID":"model-" + id,
                         "integratorName":"MMS REST",
-                        "integratorID":"int-rest-" + id
+                        "integratorID":"int-rest-" + id,
+                        "integratorFileLocation": "https://cae-ems.jpl.nasa.gov/alfresco/service"
                     }
                 },
                 {
                     "command":"NewView",
-                    "data":
-                    {
+                    "data": {
                         "project": id,
                         "module":"MMS",
                         "modelID":"model-" + id,
