@@ -171,6 +171,11 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         addElement('Equation');
     });
 */
+    
+    $scope.$on('section.add.tsp', function() {
+        MmsAppUtils.addPresentationElement($scope, 'Tsp', view);
+    });
+
     $scope.$on('section.add.paragraph', function(event, section) {
         MmsAppUtils.addPresentationElement($scope, 'Paragraph', section);
     });

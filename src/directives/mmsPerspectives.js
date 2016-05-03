@@ -112,6 +112,18 @@ function mmsPerspectives(SiteService, WorkspaceService, ConfigService, $state, $
                             "onfailure":"onPerspectivesCommandFailure",
                         },
                         {
+                            "command": "Custom",
+                            "data": {
+                                "serverClassName": "gov.nasa.jpl.mbee.ems.ResetIntegratorCommandImpl",
+                                "args": ["int-rest-" + id],
+                                "modelID": 'model-' + id,
+                                "module": "MMS",
+                                "project": id,
+                                "viewID": "view-" + id,
+                                "viewName": "Drawing View 1"
+                            }
+                        },
+                        {
                             "command":"Update",
                             "onsuccess":"onPerspectivesAddElementSuccess",
                             "onfailure":"onPerspectivesCommandFailure",
@@ -156,7 +168,7 @@ function mmsPerspectives(SiteService, WorkspaceService, ConfigService, $state, $
                         "modelID":"model-" + id,
                         "integratorName":"MMS INIT",
                         "integratorID":"int-init-" + id,
-                        "integratorFileLocation": "https://cae-ems.jpl.nasa.gov/alfresco/service"
+                        //"integratorFileLocation": "https://cae-ems.jpl.nasa.gov/alfresco/service"
                     }
                 },
                 {
@@ -167,7 +179,7 @@ function mmsPerspectives(SiteService, WorkspaceService, ConfigService, $state, $
                         "modelID":"model-" + id,
                         "integratorName":"MMS REST",
                         "integratorID":"int-rest-" + id,
-                        "integratorFileLocation": "https://cae-ems.jpl.nasa.gov/alfresco/service"
+                        //"integratorFileLocation": "https://cae-ems.jpl.nasa.gov/alfresco/service"
                     }
                 },
                 {
@@ -187,15 +199,46 @@ function mmsPerspectives(SiteService, WorkspaceService, ConfigService, $state, $
             ]
         };
         var updateCommand = {
-    		"command":"Update",
-            "onsuccess":"onPerspectivesCommandSuccess",
-            "onfailure":"onPerspectivesCommandFailure",
-    		"data": {
-    			"project": id,
-    			"module":"MMS",
-    			"integratorIDs":["int-init-" + id]
-    		}
-    	};
+            "command": "Group",
+            "data": [
+                {
+                    "command": "Custom",
+                    "data": {
+                        "serverClassName": "gov.nasa.jpl.mbee.ems.SetMmsRestBaseUrlCommandImpl",
+                        "args": ["int-init-" + id, "https://cae-ems.jpl.nasa.gov/alfresco/service"],
+                        "modelID": 'model-' + id,
+                        "module": "MMS",
+                        "project": id,
+                        "viewID": "view-" + id,
+                        "viewName": "Drawing View 1"
+                    },
+                    "onsuccess":"onPerspectivesAddElementSuccess",
+                    "onfailure":"onPerspectivesCommandFailure",
+                }, {
+                    "command": "Custom",
+                    "data": {
+                        "serverClassName": "gov.nasa.jpl.mbee.ems.SetMmsRestBaseUrlCommandImpl",
+                        "args": ["int-rest-" + id, "https://cae-ems.jpl.nasa.gov/alfresco/service"],
+                        "modelID": 'model-' + id,
+                        "module": "MMS",
+                        "project": id,
+                        "viewID": "view-" + id,
+                        "viewName": "Drawing View 1"
+                    },
+                    "onsuccess":"onPerspectivesAddElementSuccess",
+                    "onfailure":"onPerspectivesCommandFailure",
+                },{
+            		"command":"Update",
+                    "onsuccess":"onPerspectivesCommandSuccess",
+                    "onfailure":"onPerspectivesCommandFailure",
+            		"data": {
+            			"project": id,
+            			"module":"MMS",
+            			"integratorIDs":["int-init-" + id]
+		            }
+	           }
+            ]
+        };
         mapping[id] = updateCommand;
         invokePerspectivesCommand(webProjectCommand);
     };
@@ -206,6 +249,8 @@ function mmsPerspectives(SiteService, WorkspaceService, ConfigService, $state, $
         scope: {
             mmsWs: '@',
             mmsVersion: '@',
+            mmsTspSpec: '=',
+            mmsPeid: '@'
         },
         link: mmsPerspectivesLink
     };
