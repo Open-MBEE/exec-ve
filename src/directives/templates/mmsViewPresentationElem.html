@@ -9,5 +9,6 @@
     <mms-view-section data-mms-section="presentationElem" ng-switch-when="Section"></mms-view-section>
     <mms-view-equation data-mms-para="presentationElem" ng-switch-when="Equation"></mms-view-equation>
     <mms-view-figure data-mms-para="presentationElem" ng-switch-when="Figure"></mms-view-figure>
+    <mms-view-tsp mms-peid="{{instanceSpec.sysmlid}}" data-mms-tsp-spec="presentationElem", ng-switch-when="Tsp"></mms-view-tsp>
     <mms-transclude-com mms-eid="{{presentationElem.source}}" ng-switch-when="Comment"></mms-transclude-com>
 </div>

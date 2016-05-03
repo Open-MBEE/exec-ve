@@ -39,7 +39,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         Figure: "_17_0_5_1_407019f_1431903748021_2367_12034",  //manual images + timely, etc
         Equation: "_17_0_5_1_407019f_1431905053808_352752_11992",
         ParagraphT: "_17_0_5_1_407019f_1431903758416_800749_12055",
-        SectionT: "_18_0_2_407019f_1435683487667_494971_14412"
+        SectionT: "_18_0_2_407019f_1435683487667_494971_14412",
+        Tsp: "_17_0_5_1_407019f_1431903748021_2367_12034"
     };
 
     function getClassifierIds() {
@@ -57,7 +58,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         Comment: 'ParagraphT',
         List: 'ListT',
         Figure: 'Figure',
-        Equation: 'Equation'
+        Equation: 'Equation',
+        Tsp: 'Tsp'
     };
 
     var classifierIds = getClassifierIds();

@@ -164,8 +164,8 @@ function UxService($rootScope) {
                     spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);},
                   dropdown_buttons: [getButtonBarButton("view.add.paragraph"), getButtonBarButton("view.add.section"),
                   getButtonBarButton("view.add.comment"), getButtonBarButton("view.add.list"),
-                  getButtonBarButton("view.add.table"),getButtonBarButton("view.add.image")]
-                  //, getButtonBarButton("view.add.table"),
+                  getButtonBarButton("view.add.table"),getButtonBarButton("view.add.image"),
+                  getButtonBarButton("view.add.tsp")]
                     // getButtonBarButton("view.add.equation"), getButtonBarButton("view.add.image"),
                     };
           case "view.add.table":
@@ -188,6 +188,9 @@ function UxService($rootScope) {
                     spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
           case "view.add.comment":
             return {id: button, icon: 'fa-comment-o', selected: true, active: true, permission: true, tooltip: 'Add Comment', 
+                    spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
+          case "view.add.tsp":
+            return {id: button, icon: 'fa-image', selected: true, active: true, permission: true, tooltip: 'Add Tom Sawyer View', 
                     spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
           case "presentation.element.delete":
             return {id: button, icon: 'fa-trash', selected: true, active: true, permission: true, tooltip: 'Delete', 
