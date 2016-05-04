@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsPerspectives', ['SiteService', 'WorkspaceService', 'ConfigService', '$state', '$templateCache', '$window', 'growl', 'ApplicationService', '$modal', mmsPerspectives]);
+.directive('mmsPerspectives', ['SiteService', 'ElementService', 'WorkspaceService', 'ConfigService', '$state', '$templateCache', '$window', 'growl', 'ApplicationService', '$modal', mmsPerspectives]);
 
 /**
  * @ngdoc directive
@@ -22,10 +22,11 @@ angular.module('mms.directives')
  * Tom Saywer Persectives JS library.
  *
  */
-function mmsPerspectives(SiteService, WorkspaceService, ConfigService, $state, $templateCache, $window, growl, ApplicationService, $modal) {
+function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigService, $state, $templateCache, $window, growl, ApplicationService, $modal) {
     var template = $templateCache.get('mms/templates/mmsPerspectives.html');
     var mapping = {};
     var promises = {};
+    var projectId2Peid = {};
     $window.onPerspectivesCommandSuccess = function(successfulCommand) {
         console.log("Perspectives command: " +
            successfulCommand.command +
@@ -35,6 +36,25 @@ function mmsPerspectives(SiteService, WorkspaceService, ConfigService, $state, $
         console.log("Perspectives command: " +
            successfulCommand.command +
            " completed successfully");
+    };
+    $window.onPerspectivesSaveElementSuccess = function(successfulCommand, result) {
+        
+        console.log("Perspectives command: " +
+           successfulCommand.command +
+           " completed successfully");
+        var projectId = successfulCommand.data.project;
+        var eid = projectId2Peid[projectId];
+        var elementsList = JSON.parse(result);
+        ElementService.updateElement({
+            "sysmlid": eid, 
+            "specialization": {
+                "type": "InstanceSpecification",
+                "instanceSpecificationSpecification": {
+                    "type": "LiteralString",
+                    "string": JSON.stringify({elements: elementsList, type: "Tsp"})
+                }
+            }
+        });
     };
     $window.onPerspectivesCommandFailure = function(failedCommand, message, callstack) {
         console.log("Perspectives command " + failedCommand.commmand +
@@ -86,6 +106,36 @@ function mmsPerspectives(SiteService, WorkspaceService, ConfigService, $state, $
         var initElements = ["_17_0_5_1_407019f_1402422711365_292853_16371"];
         if (scope.mmsTspSpec && scope.mmsTspSpec.elements)
             initElements = scope.mmsTspSpec.elements;
+
+        scope.saveElement = function() {
+
+            // var saveCommand = {
+            //     "command":"Update",
+            //     "onsuccess":"onPerspectivesAddElementSuccess",
+            //     "onfailure":"onPerspectivesCommandFailure",
+            //     "data": {
+            //         "project": id,
+            //         "module":"MMS",
+            //         "integratorIDs":["int-save-" + id]
+            //     }
+            // };
+            var saveCommand = {
+                    "command": "Custom",
+                    "data": {
+                        "serverClassName": "gov.nasa.jpl.mbee.ems.GetElementIdsCommandImpl",
+                        "args": [],
+                        "modelID": 'model-' + id,
+                        "module": "MMS",
+                        "project": id,
+                        "viewID": "view-" + id,
+                        "viewName": "Drawing View 1"
+                    },
+                    "onsuccess": "onPerspectivesSaveElementSuccess",
+                    "onfailure":"onPerspectivesCommandFailure",
+                };
+                    
+            invokePerspectivesCommand(saveCommand);
+        };
 
         scope.addElement = function() {
             var instance = $modal.open({
@@ -186,6 +236,17 @@ function mmsPerspectives(SiteService, WorkspaceService, ConfigService, $state, $
                     }
                 },
                 {
+                    "command":"NewIntegrator",
+                    "data": {
+                        "project": id,
+                        "module":"MMS",
+                        "modelID":"model-" + id,
+                        "integratorName":"MMS SAVE",
+                        "integratorID":"int-save-" + id,
+                        //"integratorFileLocation": "https://cae-ems.jpl.nasa.gov/alfresco/service"
+                    }
+                },
+                {
                     "command":"NewView",
                     "data": {
                         "project": id,
@@ -221,6 +282,18 @@ function mmsPerspectives(SiteService, WorkspaceService, ConfigService, $state, $
                     "data": {
                         "serverClassName": "gov.nasa.jpl.mbee.ems.SetMmsRestBaseUrlCommandImpl",
                         "args": ["int-rest-" + id, "https://cae-ems-uat.jpl.nasa.gov/alfresco/service"],
+                        "modelID": 'model-' + id,
+                        "module": "MMS",
+                        "project": id,
+                        "viewID": "view-" + id,
+                        "viewName": "Drawing View 1"
+                    }
+                },
+                {
+                    "command": "Custom",
+                    "data": {
+                        "serverClassName": "gov.nasa.jpl.mbee.ems.SetMmsRestBaseUrlCommandImpl",
+                        "args": ["int-save-" + id, "https://cae-ems-uat.jpl.nasa.gov/alfresco/service"],
                         "modelID": 'model-' + id,
                         "module": "MMS",
                         "project": id,
@@ -267,6 +340,7 @@ function mmsPerspectives(SiteService, WorkspaceService, ConfigService, $state, $
             ]
         };
         mapping[id] = updateCommand;
+        projectId2Peid[id] = scope.mmsPeid;
         invokePerspectivesCommand(webProjectCommand);
     };
 
