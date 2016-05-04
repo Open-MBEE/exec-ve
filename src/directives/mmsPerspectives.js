@@ -83,6 +83,9 @@ function mmsPerspectives(SiteService, WorkspaceService, ConfigService, $state, $
     var mmsPerspectivesLink = function(scope, element, attrs) {
         var id = ApplicationService.createUniqueId();
         scope.viewId = "view-" + id;
+        var initElements = ["_17_0_5_1_407019f_1402422711365_292853_16371"];
+        if (scope.mmsTspSpec && scope.mmsTspSpec.elements)
+            initElements = scope.mmsTspSpec.elements;
 
         scope.addElement = function() {
             var instance = $modal.open({
@@ -100,7 +103,7 @@ function mmsPerspectives(SiteService, WorkspaceService, ConfigService, $state, $
                         {
                             "command": "SetModelAttribute",
                             "data": {
-                                "attributeName": "Elements To Add",
+                                "attributeName": "AddElements",
                                 "attributeValue": eid,
                                 "modelID": 'model-' + id,
                                 "module": "MMS",
@@ -205,38 +208,62 @@ function mmsPerspectives(SiteService, WorkspaceService, ConfigService, $state, $
                     "command": "Custom",
                     "data": {
                         "serverClassName": "gov.nasa.jpl.mbee.ems.SetMmsRestBaseUrlCommandImpl",
-                        "args": ["int-init-" + id, "https://cae-ems.jpl.nasa.gov/alfresco/service"],
+                        "args": ["int-init-" + id, "https://cae-ems-uat.jpl.nasa.gov/alfresco/service"],
                         "modelID": 'model-' + id,
                         "module": "MMS",
                         "project": id,
                         "viewID": "view-" + id,
                         "viewName": "Drawing View 1"
-                    },
-                    "onsuccess":"onPerspectivesAddElementSuccess",
-                    "onfailure":"onPerspectivesCommandFailure",
-                }, {
+                    }
+                }, 
+                {
                     "command": "Custom",
                     "data": {
                         "serverClassName": "gov.nasa.jpl.mbee.ems.SetMmsRestBaseUrlCommandImpl",
-                        "args": ["int-rest-" + id, "https://cae-ems.jpl.nasa.gov/alfresco/service"],
+                        "args": ["int-rest-" + id, "https://cae-ems-uat.jpl.nasa.gov/alfresco/service"],
+                        "modelID": 'model-' + id,
+                        "module": "MMS",
+                        "project": id,
+                        "viewID": "view-" + id,
+                        "viewName": "Drawing View 1"
+                    }
+                },
+                {
+                    "command": "SetModelAttribute",
+                    "data": {
+                        "attributeName": "InitElements",
+                        "attributeValue": initElements[0],
                         "modelID": 'model-' + id,
                         "module": "MMS",
                         "project": id,
                         "viewID": "view-" + id,
                         "viewName": "Drawing View 1"
                     },
-                    "onsuccess":"onPerspectivesAddElementSuccess",
                     "onfailure":"onPerspectivesCommandFailure",
-                },{
-            		"command":"Update",
+                },
+                {
+                    "command": "SetModelAttribute",
+                    "data": {
+                        "attributeName": "Peid",
+                        "attributeValue": scope.mmsPeid,
+                        "modelID": 'model-' + id,
+                        "module": "MMS",
+                        "project": id,
+                        "viewID": "view-" + id,
+                        "viewName": "Drawing View 1"
+                    },
+                    "onfailure":"onPerspectivesCommandFailure",
+                },
+                {
+                    "command":"Update",
                     "onsuccess":"onPerspectivesCommandSuccess",
                     "onfailure":"onPerspectivesCommandFailure",
-            		"data": {
-            			"project": id,
-            			"module":"MMS",
-            			"integratorIDs":["int-init-" + id]
-		            }
-	           }
+                    "data": {
+                        "project": id,
+                        "module":"MMS",
+                        "integratorIDs":["int-init-" + id]
+                    }
+               }
             ]
         };
         mapping[id] = updateCommand;

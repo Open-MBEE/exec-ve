@@ -668,6 +668,12 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             'source': newInstanceId, 
             'sourceProperty': 'documentation'
         };
+        if (type === 'Tsp') {
+            instanceSpecSpec = {
+                elements: ['_17_0_5_1_407019f_1402422711365_292853_16371'], //element in vetest
+                type: 'Tsp'
+            };
+        }
         var instanceSpec = {
             sysmlid: newInstanceId,
             name: name ? name : "Untitled " + type,
