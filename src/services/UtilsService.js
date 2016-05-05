@@ -272,6 +272,17 @@ function UtilsService(CacheService, _) {
         var result = ['<table class="table table-bordered table-condensed">'];
         if (table.title)
             result.push('<caption>' + table.title + '</caption>');
+        if (table.colwidths && table.colwidths.length > 0) {
+            result.push('<colgroup>');
+            for (var i = 0; i < table.colwidths.length; i++) {
+                if (table.colwidths[i])
+                    result.push('<col style="width: ' + table.colwidths[i] + '">');
+                else {
+                    result.push('<col>');
+                }
+            }
+            result.push('</colgroup>');
+        }
         if (table.header) {
             result.push('<thead>');
             result.push(makeTableBody(table.header, true));
