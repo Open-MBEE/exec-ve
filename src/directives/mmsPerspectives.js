@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsPerspectives', ['SiteService', 'ElementService', 'WorkspaceService', 'ConfigService', '$state', '$templateCache', '$window', 'growl', 'ApplicationService', '$modal', mmsPerspectives]);
+.directive('mmsPerspectives', ['SiteService', 'ElementService', 'WorkspaceService', 'ConfigService', '$state', '$templateCache', '$window', 'growl', 'ApplicationService', '$modal', '$q', mmsPerspectives]);
 
 /**
  * @ngdoc directive
@@ -22,11 +22,14 @@ angular.module('mms.directives')
  * Tom Saywer Persectives JS library.
  *
  */
-function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigService, $state, $templateCache, $window, growl, ApplicationService, $modal) {
+function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigService, $state, $templateCache, $window, growl, ApplicationService, $modal, $q) {
     var template = $templateCache.get('mms/templates/mmsPerspectives.html');
     var mapping = {};
-    var promises = {};
+    var deferreds = {};
     var projectId2Peid = {};
+    function getElementsArrayString(elements) {
+        return '[{"sysmlid": "' + elements.join('"}, {"sysmlid": "') + '"}]';
+    }
     $window.onPerspectivesCommandSuccess = function(successfulCommand) {
         console.log("Perspectives command: " +
            successfulCommand.command +
@@ -54,6 +57,8 @@ function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigSe
                     "string": JSON.stringify({elements: elementsList, type: "Tsp"})
                 }
             }
+        }).then(function() {
+            deferreds[projectId].resolve("ok");
         });
     };
     $window.onPerspectivesCommandFailure = function(failedCommand, message, callstack) {
@@ -108,7 +113,7 @@ function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigSe
             initElements = scope.mmsTspSpec.elements;
 
         scope.saveElement = function() {
-
+            var deferred = $q.defer();
             // var saveCommand = {
             //     "command":"Update",
             //     "onsuccess":"onPerspectivesAddElementSuccess",
@@ -119,6 +124,10 @@ function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigSe
             //         "integratorIDs":["int-save-" + id]
             //     }
             // };
+            deferreds[id] = deferred;
+            deferred.promise.then(function() {
+                growl.info("saved!");
+            });
             var saveCommand = {
                     "command": "Custom",
                     "data": {
@@ -154,7 +163,7 @@ function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigSe
                             "command": "SetModelAttribute",
                             "data": {
                                 "attributeName": "AddElements",
-                                "attributeValue": eid,
+                                "attributeValue": getElementsArrayString([eid]),
                                 "modelID": 'model-' + id,
                                 "module": "MMS",
                                 "project": id,
@@ -305,7 +314,7 @@ function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigSe
                     "command": "SetModelAttribute",
                     "data": {
                         "attributeName": "InitElements",
-                        "attributeValue": initElements[0],
+                        "attributeValue": getElementsArrayString(initElements),
                         "modelID": 'model-' + id,
                         "module": "MMS",
                         "project": id,
