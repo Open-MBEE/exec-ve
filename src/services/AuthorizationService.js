@@ -9,7 +9,7 @@ function AuthorizationService($q, $http, URLService) {
     var getAuthorized = function (credentials) {
         var loginURL = '/alfresco/service/api/login';
         return $http.post(loginURL, credentials).then(function (success) {
-            URLService.setTicket(success.ticket);
+            URLService.setTicket(success.data.data.ticket);
             ticket = success.ticket;
         }, function(fail){
             // something happens
