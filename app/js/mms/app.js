@@ -82,7 +82,9 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                       username: '',
                       password: ''
                     };
+                    $scope.spin = false;
                     $scope.login = function (credentials) {
+                        $scope.spin = true;
                       var credentialsJSON = {"username":credentials.username, "password":credentials.password};
                       AuthorizationService.getAuthorized(credentialsJSON).then(function (user) {
                         if ($rootScope.mmsRedirect) {
@@ -93,6 +95,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                           $state.go('workspace.sites', {workspace: 'master'});
                       }
                       }, function (reason) {
+                        $scope.spin = false;
                             growl.error(reason.message);
                       });
                     };
