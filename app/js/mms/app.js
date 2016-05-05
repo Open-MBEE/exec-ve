@@ -13,33 +13,33 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
     //     if (locationPath.indexOf('/workspaces') === -1)
     //     {
     //         locationPath = 'workspaces/master' + locationPath;
-    // 
+    
     //         var queryParams = '';
     //         var pathArr = locationPath.split('/');
     //         // var diff = '';
-    // 
+    
     //         // determine if this came from docweb.html or ve.html, is there a product?
     //         if (locationPath.indexOf('/products/') !== -1) {
-    // 
+    
     //             // replace products with documents
     //             locationPath = locationPath.replace('/products/', '/documents/');
     //             locationPath = locationPath.replace('/view/', '/views/');
     //             locationPath = locationPath.replace('/all', '/full');
-    // 
+    
     //             // if there is a view, there should be a time in the url prior
     //             pathArr = locationPath.split('/');
-    // 
+    
     //             // get the time param and remove it from the array
     //             var time = pathArr[6]; 
     //             pathArr.splice(6,1);
-    // 
+    
     //             // add time as query param if it is not latest
     //             if (time && time !== 'latest') {
     //                 queryParams += 'time=' + time;
     //             }
-    // 
+    
     //         }
-    // 
+    
     //         // if there is a config, remove it and add it as a tag query param
     //         var idxOfTag = pathArr.indexOf('config');    
     //         if (idxOfTag !== -1) {
@@ -50,14 +50,14 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
     //             if (idxOfSite !== -1)
     //                 pathArr.splice(idxOfSite, 2);
     //         }
-    // 
+    
     //         locationPath = pathArr.join('/');
-    // 
-    // 
+    
+    
     //         if (queryParams !== '') {
     //             locationPath += '?' + queryParams;
     //         }
-    // 
+    
     //         //$location.url(locationPath);
     //     }
     //     if (locationPath.indexOf('full%23') > 0)
@@ -77,7 +77,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
         views: {
             'pane-center': {
                 templateUrl: 'partials/mms/login.html',
-                controller: function ($scope, $rootScope, $state, AuthorizationService) {
+                controller: function ($scope, $rootScope, $state, AuthorizationService, growl) {
                     $scope.credentials = {
                       username: '',
                       password: ''
@@ -85,25 +85,11 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                     $scope.login = function (credentials) {
                       var credentialsJSON = {"username":credentials.username, "password":credentials.password};
                       AuthorizationService.getAuthorized(credentialsJSON).then(function (user) {
-                          $state.go('workspace.sites', {workspace: 'master'}, {});
-                      }, function () {
+                          $state.go('workspace.sites', {workspace: 'master'});
+                      }, function (reason) {
+                            growl.error(reason.message);
                       });
                     };
-                },
-                'nav': {
-                    template: ''
-                },
-                'menu': {
-                    template: ''
-                },
-                'pane-left': {
-                    template: ''
-                },
-                'pane-right': {
-                    template: ''
-                },
-                'toolbar-right': {
-                    template: ''
                 }
             }
         }

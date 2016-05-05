@@ -5,24 +5,28 @@ angular.module('mms')
 
 function AuthorizationService($q, $http, URLService) {
     
-    var ticket = 'no ticket';
+    var ticket;
     var getAuthorized = function (credentials) {
+        var deferred = $q.defer();
         var loginURL = '/alfresco/service/api/login';
-        return $http.post(loginURL, credentials).then(function (success) {
+        $http.post(loginURL, credentials).then(function (success) {
             URLService.setTicket(success.data.data.ticket);
-            ticket = success.ticket;
+            ticket = success.data.data.ticket;
+            deferred.resolve(ticket);
         }, function(fail){
-            // something happens
-            //403
+            URLService.handleHttpStatus(fail.data, fail.status, fail.header, fail.config, deferred);
         });
+        return deferred.promise;
     };
+
     var getTicket = function(){
         return ticket;
     };
 
     
     return {
-        getAuthorized: getAuthorized,        
+        getAuthorized: getAuthorized,    
+        getTicket: getTicket    
     };
 
 }

@@ -1,9 +1,59 @@
-<form name="loginForm" ng-submit="login(credentials)">
-    <label for="username">Username:</label>
-    <input type="text" id="username"
-           ng-model="credentials.username">
-    <label for="password">Password:</label>
-    <input type="password" id="password"
-           ng-model="credentials.password">
-    <button type= "submit" >Submit</button>
-</form>
+
+    <style>
+      @import url(https://fonts.googleapis.com/css?family=Roboto);
+      body {
+        font-family: 'Roboto', sans-serif;
+        background-color:rgba(40,40,44,1);
+        color: white;
+      }
+      .account-wall{
+        margin-top: 20px;
+        padding: 40px 0px 20px 0px;
+        -moz-box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+        -webkit-box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+        box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+      }
+      form {
+          width: 80%;
+          margin: auto;
+      }
+
+     .form-control {
+          margin: 10px auto;
+          border-bottom: 1px solid #fff !important;
+          overflow: hidden;
+          background-color:rgba(40,40,44,1);
+          border-radius: 0 !important;
+     }
+    input {
+      background-color: rgba(40,40,44,1);
+      font-weight: 200;
+      outline: none !important;
+      border: none !important;
+    }
+    button{
+        background-color:white !important;
+        color: rgba(40,40,44,1) !important;
+    }
+    </style>
+    
+    <div>
+        <div class="row">
+            <div class="col-sm-6 col-md-8 col-md-offset-2">
+                <div class = "account-wall">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h2 style="padding-left:10px;">View Editor Login</h2>
+                        </div>
+                        <div class="col-md-4">
+                            <form name="loginForm" ng-submit="login(credentials)">
+                                <input type="text" class="form-control" ng-model="credentials.username" placeholder="JPL">
+                                <input type="password" class="form-control" ng-model="credentials.password" placeholder="Password">
+                                <button class="btn btn-block" type="submit">LOG IN</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
