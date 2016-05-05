@@ -5,7 +5,6 @@
 angular.module('mmsApp')
 .controller('MainCtrl', ['$scope', '$location', '$rootScope', '$state', '_', '$window', 'growl', '$http', 'URLService', 'hotkeys', 'growlMessages', 'StompService', 'UtilsService', 'HttpService',
 function($scope, $location, $rootScope, $state, _, $window, growl, $http, URLService, hotkeys, growlMessages, StompService, UtilsService, HttpService) {
-    //StompService.connect("guest", "guest", function(){} ,function(){}, '/');
     $rootScope.mms_viewContentLoading = false;
     $rootScope.mms_treeInitial = '';
     $rootScope.mms_title = '';
@@ -53,7 +52,6 @@ function($scope, $location, $rootScope, $state, _, $window, growl, $http, URLSer
     
     //actions for stomp checking edit mode
     $scope.$on("stomp.element", function(event, deltaSource, deltaWorkspaceId, deltaElementID, deltaModifier, deltaName){
-        console.log("main controller=============================================================");
         if($rootScope.veEdits && $rootScope.veEdits['element|' + deltaElementID + '|' + deltaWorkspaceId] === undefined){
             UtilsService.mergeElement( deltaSource, deltaElementID, deltaWorkspaceId , true , "all" );
         }
