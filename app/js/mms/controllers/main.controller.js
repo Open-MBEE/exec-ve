@@ -3,8 +3,8 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('MainCtrl', ['$scope', '$location', '$rootScope', '$state', '_', '$window', 'growl', '$http', 'URLService', 'hotkeys', 'growlMessages', 'StompService', 'UtilsService', 'HttpService',
-function($scope, $location, $rootScope, $state, _, $window, growl, $http, URLService, hotkeys, growlMessages, StompService, UtilsService, HttpService) {
+.controller('MainCtrl', ['$scope', '$location', '$rootScope', '$state', '_', '$window', 'growl', '$http', 'URLService', 'hotkeys', 'growlMessages', 'StompService', 'UtilsService', 'HttpService', 'AuthorizationService',
+function($scope, $location, $rootScope, $state, _, $window, growl, $http, URLService, hotkeys, growlMessages, StompService, UtilsService, HttpService, AuthorizationService) {
     $rootScope.mms_viewContentLoading = false;
     $rootScope.mms_treeInitial = '';
     $rootScope.mms_title = '';
@@ -45,9 +45,15 @@ function($scope, $location, $rootScope, $state, _, $window, growl, $http, URLSer
     });*/
 
     $rootScope.$on('$stateChangeStart', 
-    function(event){ 
+    function(event, toState, toParams, fromState, fromParams){ 
         $rootScope.mms_viewContentLoading = true;
         HttpService.transformQueue();
+        if (!AuthorizationService.getTicket() && toState.name !== 'login') {
+            event.preventDefault();
+            $rootScope.mmsRedirect = {toState: toState, toParams: toParams};
+            //$location.url('/login');
+            $state.go('login', {notify: false});
+        }
     });
     
     //actions for stomp checking edit mode

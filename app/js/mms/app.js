@@ -85,7 +85,13 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                     $scope.login = function (credentials) {
                       var credentialsJSON = {"username":credentials.username, "password":credentials.password};
                       AuthorizationService.getAuthorized(credentialsJSON).then(function (user) {
+                        if ($rootScope.mmsRedirect) {
+                            var toState = $rootScope.mmsRedirect.toState;
+                            var toParams = $rootScope.mmsRedirect.toParams;
+                            $state.go(toState, toParams);
+                        } else {
                           $state.go('workspace.sites', {workspace: 'master'});
+                      }
                       }, function (reason) {
                             growl.error(reason.message);
                       });
