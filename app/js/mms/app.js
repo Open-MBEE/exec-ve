@@ -1,11 +1,11 @@
 'use strict';
 
-angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.borderLayout', 'ui.bootstrap', 'ui.router', 'ui.tree', 'angular-growl', 'cfp.hotkeys'])
+angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.borderLayout', 'ui.bootstrap', 'ui.router', 'ui.tree', 'angular-growl', 'cfp.hotkeys','ngCookies'])
 .config(function($stateProvider, $urlRouterProvider) {
     // Change the DEFAULT state to workspace.sites on entry
     //$urlRouterProvider.when('', '/workspaces/master/site');
     $urlRouterProvider.when('', '/login');
-
+    //$cookieStoreage
     // $urlRouterProvider.rule(function ($injector, $location) {
     //     // determine if the url is older 2.0 format (will not have a workspace)
     //     // generate some random client id
@@ -77,27 +77,28 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
         views: {
             'pane-center': {
                 templateUrl: 'partials/mms/login.html',
-                controller: function ($scope, $rootScope, $state, AuthorizationService, growl) {
+                controller: function ($scope, $rootScope, $state, AuthorizationService, growl, $cookieStore) {
                     $scope.credentials = {
                       username: '',
                       password: ''
                     };
+                    var cookie = $cookieStore.get('ticket');
                     $scope.spin = false;
                     $scope.login = function (credentials) {
-                        $scope.spin = true;
+                      $scope.spin = true;
                       var credentialsJSON = {"username":credentials.username, "password":credentials.password};
-                      AuthorizationService.getAuthorized(credentialsJSON).then(function (user) {
-                        if ($rootScope.mmsRedirect) {
-                            var toState = $rootScope.mmsRedirect.toState;
-                            var toParams = $rootScope.mmsRedirect.toParams;
-                            $state.go(toState, toParams);
-                        } else {
-                          $state.go('workspace.sites', {workspace: 'master'});
-                      }
-                      }, function (reason) {
-                        $scope.spin = false;
-                            growl.error(reason.message);
-                      });
+                          AuthorizationService.getAuthorized(credentialsJSON).then(function (user) {
+                            if ($rootScope.mmsRedirect) {
+                                var toState = $rootScope.mmsRedirect.toState;
+                                var toParams = $rootScope.mmsRedirect.toParams;
+                                $state.go(toState, toParams);
+                            } else {
+                              $state.go('workspace.sites', {workspace: 'master'});
+                          }
+                          }, function (reason) {
+                            $scope.spin = false;
+                                growl.error(reason.message);
+                          });
                     };
                 }
             }
@@ -764,4 +765,4 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             }
         }
     });
-});
+}).run(function(AuthorizationService){});
