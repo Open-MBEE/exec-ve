@@ -7,21 +7,20 @@ angular.module('mms')
  * @ngdoc service
  * @name mms.StompService
  * @requires _
- * 
+ *
  * @description
  * Provides messages from the activemq JMS bus
  */
 function StompService($rootScope, UtilsService, $window, $location, ApplicationService, CacheService) {
      var stompClient = {};
      var host = $location.host();
-    //  var hostName = 'wss://'+$location.host().split(".")[0]+'-origin.jpl.nasa.gov:61614'; 
-    //  if (host == '127.0.0.1') {
-    //     hostName = 'wss://127.0.0.1:61614'; 
-    //  } else if (host == 'localhost') {
-    //     hostName = 'wss://localhost:61614';
-    //  }
-    var hostName = 'wss://cae-ems-uat-origin.jpl.nasa.gov:61614'; 
-    
+     var hostName = 'wss://'+$location.host().split(".")[0]+'-origin.jpl.nasa.gov:61614';
+     if (host == '127.0.0.1') {
+        hostName = 'wss://127.0.0.1:61614';
+     } else if (host == 'localhost') {
+        hostName = 'wss://localhost:61614';
+     }
+
     var stompSuccessCallback = function(message){
         var updateWebpage = angular.fromJson(message.body);
         var workspaceId = updateWebpage.workspace2.id;
@@ -47,7 +46,7 @@ function StompService($rootScope, UtilsService, $window, $location, ApplicationS
                         if (history)
                             history.unshift({modifier: value.modifier, timestamp: value.modified});
                         $rootScope.$broadcast("stomp.element", value, workspaceId, value.sysmlid , value.modifier, value.name);
-                    });               
+                    });
                 }
             });
         }
@@ -75,19 +74,17 @@ function StompService($rootScope, UtilsService, $window, $location, ApplicationS
     };
     var stompConnect = function(){
         stompClient = Stomp.client(hostName);
-        stompClient.connect("guest", "guest", function(){ // on success 
+        stompClient.connect("guest", "guest", function(){ // on success
             stompClient.subscribe("/topic/master", stompSuccessCallback );
         }, stompFailureCallback, '/');
     };
     //inital connection call
     stompConnect();
-     
+
      // TODO: server disconnects in sufficiently long enough periods of inactivity
      //"Whoops! Lost connection to " and then reconnect
      //http://stackoverflow.com/questions/22361917/automatic-reconnect-with-stomp-js-in-node-js-application/22403521#22403521
      return {
-         
+
      };
  }
-
-
