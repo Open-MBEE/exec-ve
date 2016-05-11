@@ -18,7 +18,7 @@ function StompService($rootScope, UtilsService, $window, $location, ApplicationS
      if (host == '127.0.0.1') {
         hostName = 'wss://127.0.0.1:61614';
      } else if (host == 'localhost') {
-        hostName = 'wss://localhost:61614';
+         hostName = 'wss://localhost:61614';
      }
 
     var stompSuccessCallback = function(message){
