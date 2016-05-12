@@ -18,6 +18,7 @@ function($scope, $location, $rootScope, $state, _, $window, growl, $http, URLSer
         if ($rootScope.veEdits && !_.isEmpty($rootScope.veEdits)) {
             var message = 'You may have unsaved changes, are you sure you want to leave?';
             event.returnValue = message;
+            $window.localStorage.clear();//this is to remove the ticket from local storage
             return message;
         }
     });
@@ -63,7 +64,6 @@ function($scope, $location, $rootScope, $state, _, $window, growl, $http, URLSer
             UtilsService.mergeElement( deltaSource, deltaElementID, deltaWorkspaceId , true , "all" );
         }
     });
-
     $rootScope.$on('$stateChangeSuccess', 
         function(event, toState, toParams, fromState, fromParams) {
         

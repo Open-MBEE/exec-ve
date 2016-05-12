@@ -1,19 +1,19 @@
 'use strict';
 
-angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.borderLayout', 'ui.bootstrap', 'ui.router', 'ui.tree', 'angular-growl', 'cfp.hotkeys','ngCookies'])
+angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.borderLayout', 'ui.bootstrap', 'ui.router', 'ui.tree', 'angular-growl', 'cfp.hotkeys'])
 .config(function($stateProvider, $urlRouterProvider) {
     // Change the DEFAULT state to workspace.sites on entry
     //$urlRouterProvider.when('', '/workspaces/master/sites');
     //$urlRouterProvider.when('', '/login');
-    //$urlRouterProvider.otherwise('/');// when the url isn't mapped go here
-    $urlRouterProvider.rule(function ($injector, $location, $state) {
-        var $cookieStore = $injector.get('$cookieStore');
-        var loggedIn = $cookieStore.get('ticket');
+    $urlRouterProvider.rule(function ($injector, $location) {
+        var $window = $injector.get('$window');
+        var loggedIn = $window.localStorage.getItem('ticket');
         var path = $location.path(), normalized = path.toLowerCase();
         if (!loggedIn && path.indexOf('login') === -1) {
             $location.path('/login');
         }
     });
+    $urlRouterProvider.otherwise('/workspaces/master/sites');// when the url isn't mapped go here
 
     $stateProvider
     .state('login', {
@@ -23,15 +23,6 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             'pane-center': {
                 templateUrl: 'partials/mms/login.html',
                 controller: function ($scope, $rootScope, $state, AuthorizationService, growl) {
-                    // if(authorized){
-                    //     if ($rootScope.mmsRedirect) {
-                    //         var toState = $rootScope.mmsRedirect.toState;
-                    //         var toParams = $rootScope.mmsRedirect.toParams;
-                    //         $state.go(toState, toParams);
-                    //     } else {
-                    //       $state.go('workspace.sites', {workspace: 'master'});
-                    //   }
-                    // }
                     $scope.credentials = {
                       username: '',
                       password: ''
@@ -59,66 +50,69 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
     })
     .state('workspaces', {
         url: '/workspaces?search',
-        //parent: login, remove dummyLogin to parent
+        //parent: login, remove ticket to parent
         resolve: {
-            dummyLogin: function($http, URLService) {
-                //login redirect if no ticket, otherwise okay
-                // url service append ticket
-                return $http.get(URLService.getCheckLoginURL());
+            // dummyLogin: function($http, URLService) {
+            //     //login redirect if no ticket, otherwise okay
+            //     // url service append ticket
+            //     return $http.get(URLService.getCheckLoginURL());
+            // },
+            ticket: function($window, URLService) {
+                return URLService.setTicket($window.localStorage.getItem('ticket'));
             },
-            workspaces: function(WorkspaceService, dummyLogin) {
+            workspaces: function(WorkspaceService, ticket) {
                 return WorkspaceService.getWorkspaces();
             },
-            workspace: function (dummyLogin) {
+            workspace: function (ticket) {
                 return 'master';
             },
-            workspaceObj: function (WorkspaceService, workspace, dummyLogin) {
+            workspaceObj: function (WorkspaceService, workspace, ticket) {
                 // TODO; replace workspace with workspaceObj, but first all controllers
                 // need to be adapted to handle workspace as an object and not a string
                 return WorkspaceService.getWorkspace(workspace);
             },  
-            tags: function(ConfigService, workspace, dummyLogin) {
+            tags: function(ConfigService, workspace, ticket) {
                 return ConfigService.getConfigs(workspace, false, 2);
             },
-            tag: function ($stateParams, ConfigService, workspace, dummyLogin) {
+            tag: function ($stateParams, ConfigService, workspace, ticket) {
                 return { name: 'latest', timestamp: 'latest' };
             },  
-            sites: function(SiteService, dummyLogin) {                 
+            sites: function(SiteService, ticket) {                 
                return SiteService.getSites();
             },
-            site: function(SiteService, dummyLogin) {
+            site: function(SiteService, ticket) {
                 return SiteService.getSite('no_site');
             },
-            document : function(ElementService, workspace, time, growl, dummyLogin) {
+            document : function(ElementService, workspace, time, growl, ticket) {
                 return null;
             },
-            views: function(dummyLogin) {
+            views: function(ticket) {
                 return null;
             },
-            view: function(dummyLogin) {
+            view: function(ticket) {
                 return null;
             },
-            viewElements: function(ViewService, workspace, document, time, dummyLogin) {
+            viewElements: function(ViewService, workspace, document, time, ticket) {
                 if (document === null) 
                     return null;
                 return ViewService.getViewElements(document.sysmlid, false, workspace, time, 2);
             },   
-            time: function(tag, dummyLogin) {
+            time: function(tag, ticket) {
                 return tag.timestamp;
             },
-            configSnapshots: function(ConfigService, workspace, tag, dummyLogin) {
+            configSnapshots: function(ConfigService, workspace, tag, ticket) {
                 return [];
             },
-            snapshots: function(dummyLogin) {
+            snapshots: function(ticket) {
                 return [];        
             },
-            snapshot: function(dummyLogin) {
+            snapshot: function(ticket) {
                 return null;
             },
-            docFilter: function(dummyLogin) {
+            docFilter: function(ticket) {
                 return null;
             },
-            search: function($stateParams, ElementService, workspace, dummyLogin) {
+            search: function($stateParams, ElementService, workspace, ticket) {
                 if ($stateParams.search === undefined) {
                     return null;
                 }
@@ -174,18 +168,18 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             workspace: function ($stateParams) {
                 return $stateParams.workspace;
             },
-            workspaceObj: function (WorkspaceService, workspace, dummyLogin) {
+            workspaceObj: function (WorkspaceService, workspace, ticket) {
                 return WorkspaceService.getWorkspace(workspace);
             },
-            sites: function(SiteService, time, dummyLogin) {                 
+            sites: function(SiteService, time, ticket) {                 
                 if (time === 'latest')
                     return SiteService.getSites();
                 return SiteService.getSites(time);
             },
-            site: function(SiteService, dummyLogin) {
+            site: function(SiteService, ticket) {
                 return SiteService.getSite('no_site');
             },
-            document : function(ViewService, ElementService, workspace, time, growl, workspaceObj, dummyLogin) {
+            document : function(ViewService, ElementService, workspace, time, growl, workspaceObj, ticket) {
             
                 // This is a short-term work-around -- all this should be done the back-end MMS in the future
                 var wsCoverDocId = 'master_cover';
@@ -208,7 +202,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                     });
                 });
             },
-            docFilter: function(ElementService, workspace, time, document, dummyLogin) {
+            docFilter: function(ElementService, workspace, time, document, ticket) {
                 return ElementService.getElement("master_filter", false, workspace, time, 2)
                 .then(function(data) {
                     return data;
@@ -228,33 +222,33 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                     });
                 });
             },
-            views: function(ViewService, workspace, document, time, dummyLogin) {
+            views: function(ViewService, workspace, document, time, ticket) {
                 return [];
             },
-            viewElements: function(ViewService, workspace, document, time, dummyLogin) {
+            viewElements: function(ViewService, workspace, document, time, ticket) {
                 if (document === null) 
                     return [];
                 return ViewService.getViewElements(document.sysmlid, false, workspace, time, 2);
             },    
-            view: function(ViewService, workspace, document, time, dummyLogin) {
+            view: function(ViewService, workspace, document, time, ticket) {
                 if (document === null) 
                     return null;
                 return ViewService.getView(document.sysmlid, false, workspace, time, 2);
             },
-            tags: function(ConfigService, workspace, dummyLogin) {
+            tags: function(ConfigService, workspace, ticket) {
                 return ConfigService.getConfigs(workspace, false, 2);
             },
-            tag: function ($stateParams, ConfigService, workspace, dummyLogin) {
+            tag: function ($stateParams, ConfigService, workspace, ticket) {
                 if ($stateParams.tag === undefined || $stateParams.tag === 'latest')
                     return { name: 'latest', timestamp: 'latest' };
                 return ConfigService.getConfig($stateParams.tag, workspace, false, 2);
             },        
-            configSnapshots: function(ConfigService, workspace, tag, dummyLogin) {
+            configSnapshots: function(ConfigService, workspace, tag, ticket) {
                 //if (tag.timestamp === 'latest')
                     return [];
                 //return ConfigService.getConfigSnapshots(tag.id, workspace, false, 2);
             },
-            time: function(tag, dummyLogin) {
+            time: function(tag, ticket) {
                 return tag.timestamp;
             }
         },
@@ -318,10 +312,10 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
         url: '/:site',
         parent: 'workspace.sites',
         resolve: {
-            site: function($stateParams, SiteService, dummyLogin) {
+            site: function($stateParams, SiteService, ticket) {
                 return SiteService.getSite($stateParams.site);
             },
-            document : function($stateParams, ViewService, ElementService, workspace, site, time, growl, dummyLogin) {
+            document : function($stateParams, ViewService, ElementService, workspace, site, time, growl, ticket) {
                 var siteCoverDocId;
                 if ($stateParams.site === 'no_site')
                     return null;
@@ -352,17 +346,17 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                     });
                 });
             },
-            views: function(ViewService, workspace, document, time, dummyLogin) {
+            views: function(ViewService, workspace, document, time, ticket) {
                 if (document === null) 
                     return null;
                 return ViewService.getDocumentViews(document.sysmlid, false, workspace, time, true, 2);
             },
-            viewElements: function(ViewService, workspace, document, time, dummyLogin) {
+            viewElements: function(ViewService, workspace, document, time, ticket) {
                 if (document === null) 
                     return null;
                 return ViewService.getViewElements(document.sysmlid, false, workspace, time, 2);
             },    
-            view: function(ViewService, workspace, document, time, dummyLogin) {
+            view: function(ViewService, workspace, document, time, ticket) {
                 if (document === null) 
                     return null;
                 return ViewService.getView(document.sysmlid, false, workspace, time, 2);
@@ -402,25 +396,25 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
     .state('workspace.site.documentpreview', {
         url: '/document/:document',
         resolve: {
-            document: function($stateParams, ElementService, workspace, time, dummyLogin) {
+            document: function($stateParams, ElementService, workspace, time, ticket) {
                 return ElementService.getElement($stateParams.document, false, workspace, time, 2);
             },
-            views: function(ViewService, workspace, document, time, dummyLogin) {
+            views: function(ViewService, workspace, document, time, ticket) {
                 if (document === null) 
                     return null;
                 return ViewService.getDocumentViews(document.sysmlid, false, workspace, time, true, 2);
             },
-            viewElements: function(ViewService, workspace, document, time, dummyLogin) {
+            viewElements: function(ViewService, workspace, document, time, ticket) {
                 if (document === null) 
                     return null;
                 return ViewService.getViewElements(document.sysmlid, false, workspace, time, 2);
             },    
-            view: function(ViewService, workspace, document, time, dummyLogin) {
+            view: function(ViewService, workspace, document, time, ticket) {
                 if (document === null) 
                     return null;
                 return ViewService.getView(document.sysmlid, false, workspace, time, 2);
             },
-            snapshot: function(ConfigService, configSnapshots, document, workspace, dummyLogin) {
+            snapshot: function(ConfigService, configSnapshots, document, workspace, ticket) {
                 var docid = document.sysmlid;
                 var found = null;
                 configSnapshots.forEach(function(snapshot) {
@@ -443,26 +437,26 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
     .state('workspace.site.document', {
         url: '/documents/:document?time',
         resolve: {
-            document: function($stateParams, ElementService, time, dummyLogin) {
+            document: function($stateParams, ElementService, time, ticket) {
                 return ElementService.getElement($stateParams.document, false, $stateParams.workspace, time, 2);
             },
-            views: function($stateParams, ViewService, document, time, dummyLogin) {
+            views: function($stateParams, ViewService, document, time, ticket) {
                 if (document.specialization.type !== 'Product')
                     return [];
                 return ViewService.getDocumentViews($stateParams.document, false, $stateParams.workspace, time, true, 2);
             },
-            viewElements: function($stateParams, ViewService, time, dummyLogin) {
+            viewElements: function($stateParams, ViewService, time, ticket) {
                 return ViewService.getViewElements($stateParams.document, false, $stateParams.workspace, time, 2);
             },
-            view: function($stateParams, ViewService, viewElements, time, dummyLogin) {
+            view: function($stateParams, ViewService, viewElements, time, ticket) {
                 return ViewService.getView($stateParams.document, false, $stateParams.workspace, time, 2);
             },
-            snapshots: function(ConfigService, workspace, site, document, dummyLogin) {
+            snapshots: function(ConfigService, workspace, site, document, ticket) {
                 if (document.specialization.type !== 'Product')
                     return [];
                 return ConfigService.getProductSnapshots(document.sysmlid, site.sysmlid, workspace, false, 2);
             },
-            snapshot: function(ConfigService, workspace, snapshots, document, time, dummyLogin) {
+            snapshot: function(ConfigService, workspace, snapshots, document, time, ticket) {
                 var docid = document.sysmlid;
                 var found = null;
                 snapshots.forEach(function(snapshot) {
@@ -474,7 +468,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 }
                 return found; 
             },
-            tag: function ($stateParams, ConfigService, workspace, snapshots, dummyLogin) {
+            tag: function ($stateParams, ConfigService, workspace, snapshots, ticket) {
                 if ($stateParams.tag === undefined)
                 {
                     if ($stateParams.time !== undefined && $stateParams.time !== 'latest') {
@@ -509,12 +503,12 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                     return ConfigService.getConfig($stateParams.tag, workspace, false, 2);
                 }
             },        
-            configSnapshots: function(ConfigService, workspace, tag, dummyLogin) {
+            configSnapshots: function(ConfigService, workspace, tag, ticket) {
                 //if (tag.timestamp === 'latest')
                     return []; //TODO revert when server is faster
                 //return ConfigService.getConfigSnapshots(tag.id, workspace, false);
             },
-            time: function($stateParams, ConfigService, workspace, dummyLogin) {
+            time: function($stateParams, ConfigService, workspace, ticket) {
                 if ($stateParams.tag !== undefined) {
                     return ConfigService.getConfig($stateParams.tag, workspace, false, 2).then(function(tag) {
                         return tag.timestamp;
@@ -525,7 +519,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 else
                     return "latest";
             },
-            docFilter: function($stateParams, ElementService, workspace, site, time, growl, dummyLogin) {
+            docFilter: function($stateParams, ElementService, workspace, site, time, growl, ticket) {
                 //need to redefine here since time is redefined
                 return ElementService.getElement("master_filter", false, workspace, time, 2)
                 .then(function(data) {
@@ -609,12 +603,12 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
     .state('workspace.site.document.view', {
         url: '/views/:view',
         resolve: {
-            viewElements: function($stateParams, ViewService, time, dummyLogin) {
+            viewElements: function($stateParams, ViewService, time, ticket) {
                 //if (time === 'latest')
                 //    return ViewService.getViewElements($stateParams.view, false, $stateParams.workspace, time);
                 return [];
             },
-            view: function($stateParams, ViewService, viewElements, time, dummyLogin) {
+            view: function($stateParams, ViewService, viewElements, time, ticket) {
                 return ViewService.getView($stateParams.view, false, $stateParams.workspace, time, 2);
             }
         },
@@ -628,27 +622,27 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
     .state('workspace.diff', {
         url: '/diff/:source/:sourceTime/:target/:targetTime',
         resolve: {
-            diff: function($stateParams, WorkspaceService, dummyLogin) {
+            diff: function($stateParams, WorkspaceService, ticket) {
                 return WorkspaceService.diff($stateParams.target, $stateParams.source, $stateParams.targetTime, $stateParams.sourceTime);
             },
 
-            ws1: function( $stateParams, WorkspaceService, dummyLogin){ //ws1:target because that's what DiffElementChangeController has
+            ws1: function( $stateParams, WorkspaceService, ticket){ //ws1:target because that's what DiffElementChangeController has
                 return WorkspaceService.getWorkspace($stateParams.target); 
             },
 
-            ws2: function( $stateParams, WorkspaceService, dummyLogin){ //ws2:source because that's what DiffElementChangeController has
+            ws2: function( $stateParams, WorkspaceService, ticket){ //ws2:source because that's what DiffElementChangeController has
                 return WorkspaceService.getWorkspace($stateParams.source);
             },
 
-            ws1Configs: function($stateParams, ConfigService, ws1, dummyLogin){
+            ws1Configs: function($stateParams, ConfigService, ws1, ticket){
                 return ConfigService.getConfigs(ws1.id, false, 2);
             },
 
-            ws2Configs: function($stateParams, ConfigService, ws2, dummyLogin){
+            ws2Configs: function($stateParams, ConfigService, ws2, ticket){
                 return ConfigService.getConfigs(ws2.id, false, 2);
             },
 
-            targetName: function($stateParams, ws1, ws1Configs,dummyLogin){
+            targetName: function($stateParams, ws1, ws1Configs,ticket){
                 var result = null;
                 if(ws1.id === 'master'){
                     result = 'master';
@@ -663,7 +657,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 return result;
             },
 
-            sourceName: function($stateParams, ws2, ws2Configs,dummyLogin){
+            sourceName: function($stateParams, ws2, ws2Configs,ticket){
                 var result = null ;
                 if(ws2.id === 'master'){
                     result = 'master';
@@ -720,16 +714,3 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
         }
     });
 });
-// re-include this? 
-// .run(function($rootScope, $state, $cookieStore){
-//         $rootScope.$on("$stateChangeStart",function(event, toState, toParams, fromState, fromParams, $location) {
-//             console.log(toState.authenticate);
-//             console.log($cookieStore.get('ticket'));
-//             //if (!$cookieStore.get('ticket')){//toState.authenticate && 
-//                 //$state.go('login');
-//                 //event.preventDefault();
-//                 //$location.path('/login');
-//                 //event.preventDefault();
-//             //}
-//         });
-//});

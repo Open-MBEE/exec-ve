@@ -37,7 +37,7 @@ angular.module('mms')
  */
 function urlService(baseUrl) {
     var root = baseUrl;
-    var ticket = '';
+    var ticket;
     /**
      * @ngdoc method
      * @name mms.URLService#isTimestamp
