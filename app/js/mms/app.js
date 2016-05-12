@@ -3,86 +3,39 @@
 angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.borderLayout', 'ui.bootstrap', 'ui.router', 'ui.tree', 'angular-growl', 'cfp.hotkeys','ngCookies'])
 .config(function($stateProvider, $urlRouterProvider) {
     // Change the DEFAULT state to workspace.sites on entry
-    //$urlRouterProvider.when('', '/workspaces/master/site');
-    $urlRouterProvider.when('', '/login');
-    //$cookieStoreage
-    // $urlRouterProvider.rule(function ($injector, $location) {
-    //     // determine if the url is older 2.0 format (will not have a workspace)
-    //     // generate some random client id
-    //     var locationPath = $location.url();
-    //     if (locationPath.indexOf('/workspaces') === -1)
-    //     {
-    //         locationPath = 'workspaces/master' + locationPath;
-    
-    //         var queryParams = '';
-    //         var pathArr = locationPath.split('/');
-    //         // var diff = '';
-    
-    //         // determine if this came from docweb.html or ve.html, is there a product?
-    //         if (locationPath.indexOf('/products/') !== -1) {
-    
-    //             // replace products with documents
-    //             locationPath = locationPath.replace('/products/', '/documents/');
-    //             locationPath = locationPath.replace('/view/', '/views/');
-    //             locationPath = locationPath.replace('/all', '/full');
-    
-    //             // if there is a view, there should be a time in the url prior
-    //             pathArr = locationPath.split('/');
-    
-    //             // get the time param and remove it from the array
-    //             var time = pathArr[6]; 
-    //             pathArr.splice(6,1);
-    
-    //             // add time as query param if it is not latest
-    //             if (time && time !== 'latest') {
-    //                 queryParams += 'time=' + time;
-    //             }
-    
-    //         }
-    
-    //         // if there is a config, remove it and add it as a tag query param
-    //         var idxOfTag = pathArr.indexOf('config');    
-    //         if (idxOfTag !== -1) {
-    //             var tag = pathArr[idxOfTag+1];
-    //             queryParams += 'tag=' + tag;
-    //             pathArr.splice(idxOfTag, 2);
-    //             var idxOfSite = pathArr.indexOf('sites'); //redirect old config page to tag landing page
-    //             if (idxOfSite !== -1)
-    //                 pathArr.splice(idxOfSite, 2);
-    //         }
-    
-    //         locationPath = pathArr.join('/');
-    
-    
-    //         if (queryParams !== '') {
-    //             locationPath += '?' + queryParams;
-    //         }
-    
-    //         //$location.url(locationPath);
-    //     }
-    //     if (locationPath.indexOf('full%23') > 0)
-    //         locationPath = locationPath.replace('full%23', 'full#');
-    //     if (locationPath[0] !== '/')
-    //         locationPath = '/' + locationPath;
-    //     if (locationPath !== $location.url())
-    //         $location.url(locationPath);
-    // });
-    
+    //$urlRouterProvider.when('', '/workspaces/master/sites');
+    //$urlRouterProvider.when('', '/login');
+    //$urlRouterProvider.otherwise('/');// when the url isn't mapped go here
+    $urlRouterProvider.rule(function ($injector, $location, $state) {
+        var $cookieStore = $injector.get('$cookieStore');
+        var loggedIn = $cookieStore.get('ticket');
+        var path = $location.path(), normalized = path.toLowerCase();
+        if (!loggedIn && path.indexOf('login') === -1) {
+            $location.path('/login');
+        }
+    });
 
     $stateProvider
     .state('login', {
         url: '/login',
-        resolve: {
-        },
+        resolve: { },
         views: {
             'pane-center': {
                 templateUrl: 'partials/mms/login.html',
-                controller: function ($scope, $rootScope, $state, AuthorizationService, growl, $cookieStore) {
+                controller: function ($scope, $rootScope, $state, AuthorizationService, growl) {
+                    // if(authorized){
+                    //     if ($rootScope.mmsRedirect) {
+                    //         var toState = $rootScope.mmsRedirect.toState;
+                    //         var toParams = $rootScope.mmsRedirect.toParams;
+                    //         $state.go(toState, toParams);
+                    //     } else {
+                    //       $state.go('workspace.sites', {workspace: 'master'});
+                    //   }
+                    // }
                     $scope.credentials = {
                       username: '',
                       password: ''
                     };
-                    var cookie = $cookieStore.get('ticket');
                     $scope.spin = false;
                     $scope.login = function (credentials) {
                       $scope.spin = true;
@@ -100,12 +53,13 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                                 growl.error(reason.message);
                           });
                     };
-                }
+                }   
             }
         }
     })
     .state('workspaces', {
         url: '/workspaces?search',
+        //parent: login, remove dummyLogin to parent
         resolve: {
             dummyLogin: function($http, URLService) {
                 //login redirect if no ticket, otherwise okay
@@ -211,7 +165,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 template: '<mms-toolbar buttons="buttons" on-click="onClick(button)" mms-tb-api="tbApi"></mms-toolbar>',
                 controller: 'ToolbarCtrl'
             } 
-        }        
+        }       
     })
     .state('workspace', {
         parent: 'workspaces',
@@ -329,7 +283,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             }    
         }
     })
-    .state('workspace.sites', {
+    .state('workspace.sites', {//base
         url: '/sites',
         resolve: {
         },
@@ -358,7 +312,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 template: '<mms-toolbar buttons="buttons" on-click="onClick(button)" mms-tb-api="tbApi"></mms-toolbar>',
                 controller: 'ToolbarCtrl'
             }
-        }  
+        }
     })
     .state('workspace.site', {
         url: '/:site',
@@ -477,7 +431,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                     return ConfigService.getSnapshot(found.id, workspace, true, 2);
                 }
                 return found; 
-            }
+            } 
         },
         views: {
             'pane-center@': {
@@ -579,7 +533,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 }, function(reason) {
                     return null;
                 });
-            },
+            }
         },
         views: {
             'menu@': {
@@ -632,7 +586,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 template: '<mms-toolbar buttons="buttons" on-click="onClick(button)" mms-tb-api="tbApi"></mms-toolbar>',
                 controller: 'ToolbarCtrl'
             }
-         }
+        }
     })
     .state('workspace.site.document.order', {
         url: '/order',
@@ -722,7 +676,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                         result = config.name; 
                 });
                 return result;
-            }
+            } 
         },
         views: {
             'menu@': {
@@ -765,4 +719,17 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             }
         }
     });
-}).run(function(AuthorizationService){});
+});
+// re-include this? 
+// .run(function($rootScope, $state, $cookieStore){
+//         $rootScope.$on("$stateChangeStart",function(event, toState, toParams, fromState, fromParams, $location) {
+//             console.log(toState.authenticate);
+//             console.log($cookieStore.get('ticket'));
+//             //if (!$cookieStore.get('ticket')){//toState.authenticate && 
+//                 //$state.go('login');
+//                 //event.preventDefault();
+//                 //$location.path('/login');
+//                 //event.preventDefault();
+//             //}
+//         });
+//});

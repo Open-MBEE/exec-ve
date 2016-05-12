@@ -48,12 +48,13 @@ function($scope, $location, $rootScope, $state, _, $window, growl, $http, URLSer
     function(event, toState, toParams, fromState, fromParams){ 
         $rootScope.mms_viewContentLoading = true;
         HttpService.transformQueue();
-        if (!AuthorizationService.getTicket() && toState.name !== 'login') {
-            event.preventDefault();
-            $rootScope.mmsRedirect = {toState: toState, toParams: toParams};
-            //$location.url('/login');
-            $state.go('login', {notify: false});
-        }
+        console.log("main controller oauth" + AuthorizationService.getTicket());
+        // if (!AuthorizationService.getTicket() && toState.name !== 'login') {
+        //     event.preventDefault();
+        //     $rootScope.mmsRedirect = {toState: toState, toParams: toParams};
+        //     //$location.url('/login');
+        //     $state.go('login', {notify: false});
+        // }
     });
     
     //actions for stomp checking edit mode
