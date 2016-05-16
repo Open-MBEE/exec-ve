@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.borderLayout', 'ui.bootstrap', 'ui.router', 'ui.tree', 'angular-growl', 'cfp.hotkeys'])
-.config(function($stateProvider, $urlRouterProvider) {
+.config(function($stateProvider, $urlRouterProvider, $httpProvider) {
     // Change the DEFAULT state to workspace.sites on entry
     //$urlRouterProvider.when('', '/workspaces/master/sites');
     //$urlRouterProvider.when('', '/login');
@@ -712,5 +712,22 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 controller: 'ToolbarCtrl'
             }
         }
+    });
+    // anonymous factory intercepts requests
+    $httpProvider.interceptors.push(function($q, $location, $injector) {
+        return {
+            'request': function(config) {
+                return config;
+            },
+            'response': function(response) {
+                if(response.status === 401){
+                    var AuthorizationService = $injector.get('AuthorizationService');
+                    var isExpired = AuthorizationService.checklogin();
+                    if(isExpired)
+                        $location.path('/login');
+                }
+                return response;        
+            }
+        };
     });
 });

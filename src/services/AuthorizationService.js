@@ -5,12 +5,13 @@ angular.module('mms')
 
 function AuthorizationService($q, $http, URLService, $window) {
     
-    var ticket;
+    var ticket= $window.localStorage.getItem('ticket');
     var getAuthorized = function (credentials) {
         var deferred = $q.defer();
         var loginURL = '/alfresco/service/api/login';
+        //var encode = $window.btoa(credentials.username + ' ' + credentials.password);
+        //$http.defaults.headers.common.Authorization = 'Basic ' + $window.btoa(credentials.username + ' ' + credentials.password);
         $http.post(loginURL, credentials).then(function (success) {
-            console.log("AuthorizationService ticket is: " + success.data.data.ticket);
             URLService.setTicket(success.data.data.ticket);
             ticket = success.data.data.ticket;
             $window.localStorage.setItem('ticket', ticket);
@@ -20,15 +21,33 @@ function AuthorizationService($q, $http, URLService, $window) {
         });
         return deferred.promise;
     };
+    
+    var removeTicket = function(){
+        $window.localStorage.clear();
+    };
 
     var getTicket = function(){
         return ticket;
+    };
+    var checkLogin = function($window){
+        var checkLogin = '/alfresco/service/api/login/'+$window.localStorage.getItem('ticket');
+        $http.get(checkLogin).then(function (success) {
+            return true;
+        }, function(fail){
+            if(fail.data.message === "04041105 Login failed")
+                return false;
+            else {
+                return true;
+            }
+        });    
     };
 
     
     return {
         getAuthorized: getAuthorized,    
-        getTicket: getTicket    
+        getTicket: getTicket,
+        removeTicket: removeTicket,
+        checkLogin: checkLogin    
     };
 
 }

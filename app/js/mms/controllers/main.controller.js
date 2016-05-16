@@ -18,7 +18,6 @@ function($scope, $location, $rootScope, $state, _, $window, growl, $http, URLSer
         if ($rootScope.veEdits && !_.isEmpty($rootScope.veEdits)) {
             var message = 'You may have unsaved changes, are you sure you want to leave?';
             event.returnValue = message;
-            $window.localStorage.clear();//this is to remove the ticket from local storage
             return message;
         }
     });
@@ -49,7 +48,6 @@ function($scope, $location, $rootScope, $state, _, $window, growl, $http, URLSer
     function(event, toState, toParams, fromState, fromParams){ 
         $rootScope.mms_viewContentLoading = true;
         HttpService.transformQueue();
-        console.log("main controller oauth" + AuthorizationService.getTicket());
         // if (!AuthorizationService.getTicket() && toState.name !== 'login') {
         //     event.preventDefault();
         //     $rootScope.mmsRedirect = {toState: toState, toParams: toParams};
