@@ -10,7 +10,7 @@ function AuthorizationService($q, $http, URLService, $window) {
         var deferred = $q.defer();
         var loginURL = '/alfresco/service/api/login';
         //var encode = $window.btoa(credentials.username + ' ' + credentials.password);
-        //$http.defaults.headers.common.Authorization = 'Basic ' + $window.btoa(credentials.username + ' ' + credentials.password);
+        //$http.defaults.headers.common.Authorization = 'Basic ' + $window.btoa(credentials.username + ':' + credentials.password);
         $http.post(loginURL, credentials).then(function (success) {
             URLService.setTicket(success.data.data.ticket);
             ticket = success.data.data.ticket;
@@ -29,17 +29,16 @@ function AuthorizationService($q, $http, URLService, $window) {
     var getTicket = function(){
         return ticket;
     };
-    var checkLogin = function($window){
-        var checkLogin = '/alfresco/service/api/login/'+$window.localStorage.getItem('ticket');
+    var checkLogin = function(){
+        var checkLogin = '/alfresco/service/api/login/ticket/'+ticket+'?alf_ticket='+ticket;
+        var deferred = $q.defer();//:TODO
         $http.get(checkLogin).then(function (success) {
-            return true;
+            deferred.resolve(false);
         }, function(fail){
-            if(fail.data.message === "04041105 Login failed")
-                return false;
-            else {
-                return true;
-            }
-        });    
+            if(fail.status === 401)
+                deferred.resolve(true);
+        });  
+        return deferred.promise;  
     };
 
     

@@ -720,13 +720,17 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 return config;
             },
             'response': function(response) {
-                if(response.status === 401){
-                    var AuthorizationService = $injector.get('AuthorizationService');
-                    var isExpired = AuthorizationService.checklogin();
-                    if(isExpired)
-                        $location.path('/login');
-                }
                 return response;        
+            },
+            'responseError': function(rejection) {
+                if(rejection.status === 401){
+                    var AuthorizationService = $injector.get('AuthorizationService');
+                    var isExpired = AuthorizationService.checkLogin();
+                    isExpired.then(function(){
+                        $location.path('/login');
+                    });//:TODO   
+                }
+                return $q.reject(rejection);
             }
         };
     });
