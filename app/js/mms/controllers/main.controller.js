@@ -34,8 +34,16 @@ function($scope, $location, $rootScope, $state, _, $window, growl, $http, URLSer
         });
 
     $scope.$on('$stateChangeError', function(event, toState, toParams, fromState, fromParams, error) {
-        growl.error('Error: ' + error.message);
+        
         $rootScope.mms_viewContentLoading = false;
+        //check if error is ticket error
+        if (!error || error.status === 401 || error.status === 404) { //check if 404 if checking valid ticket
+            event.preventDefault();
+            $rootScope.mmsRedirect = {toState: toState, toParams: toParams};
+            $state.go('login', {notify: false});
+            return;
+        }
+        growl.error('Error: ' + error.message);
     });
 
     /*$rootScope.$on('$viewContentLoading', 

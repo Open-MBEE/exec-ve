@@ -57,8 +57,17 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             //     // url service append ticket
             //     return $http.get(URLService.getCheckLoginURL());
             // },
-            ticket: function($window, URLService) {
-                return URLService.setTicket($window.localStorage.getItem('ticket'));
+            ticket: function($window, URLService, AuthorizationService, $location, $q) {
+                var deferred = $q.defer();
+                AuthorizationService.checkLogin().then(function() {
+                    URLService.setTicket($window.localStorage.getItem('ticket'));
+                    deferred.resolve($window.localStorage.getItem('ticket'));
+                }, function(rejection) {
+                    //$location.path('/login');
+                    deferred.reject(rejection);
+                });
+                return deferred.promise;
+                //return URLService.setTicket($window.localStorage.getItem('ticket'));
             },
             workspaces: function(WorkspaceService, ticket) {
                 return WorkspaceService.getWorkspaces();
@@ -179,48 +188,64 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             site: function(SiteService, ticket) {
                 return SiteService.getSite('no_site');
             },
-            document : function(ViewService, ElementService, workspace, time, growl, workspaceObj, ticket) {
+            document : function(ViewService, ElementService, $q, workspace, time, growl, workspaceObj, ticket) {
             
                 // This is a short-term work-around -- all this should be done the back-end MMS in the future
                 var wsCoverDocId = 'master_cover';
-
-                return ElementService.getElement(wsCoverDocId, false, workspace, time, 2)
+                var deferred = $q.defer();
+                ElementService.getElement(wsCoverDocId, false, workspace, time, 2)
                 .then(function(data) {
-                    return data;
+                    deferred.resolve(data);
                 }, function(reason) {
-
+                    if (reason.status === 401) {
+                        deferred.reject(reason);
+                        return;
+                    }
                     // if it is an error, other than a 404 (element not found) then stop and return
-                    if ((reason.status !== 404 && reason.status !== 410) || time !== 'latest') return null;
+                    if ((reason.status !== 404 && reason.status !== 410) || time !== 'latest') {
+                        deferred.resolve(null);
+                        return;
+                    }
 
                     var viewName = 'Workspace ' + workspaceObj.name + ' Cover Page';
 
-                    return ViewService.createView(undefined, viewName, undefined, workspace, wsCoverDocId)
+                    ViewService.createView(undefined, viewName, undefined, workspace, wsCoverDocId)
                     .then(function(data) {
-                        return data;
+                        deferred.resolve(data);
                     }, function(reason) {
-                        return null;
+                        deferred.resolve(null);
                     });
                 });
+                return deferred.promise;
             },
-            docFilter: function(ElementService, workspace, time, document, ticket) {
-                return ElementService.getElement("master_filter", false, workspace, time, 2)
+            docFilter: function(ElementService, $q,  workspace, time, document, ticket) {
+                var deferred = $q.defer();
+                ElementService.getElement("master_filter", false, workspace, time, 2)
                 .then(function(data) {
-                    return data;
+                    deferred.resolve(data);
                 }, function(reason) {
-                    if (reason.status !== 404 || time !== 'latest') return null;
+                    if (reason.status === 401) {
+                        deferred.reject(reason);
+                        return;
+                    }
+                    if (reason.status !== 404 || time !== 'latest') {
+                        deferred.resolve(null);
+                        return;
+                    }
                     var siteDocs = {
                         specialization: {type: "Element"},
                         name: 'Filtered Docs',
                         documentation: '{}'
                     };
                     siteDocs.sysmlid = "master_filter";
-                    return ElementService.createElement(siteDocs, workspace, null)
+                    ElementService.createElement(siteDocs, workspace, null)
                     .then(function(data) {
-                        return data;
+                        deferred.resolve(data);
                     }, function(reason) {
-                        return null;
+                        deferred.resolve(null);
                     });
                 });
+                return deferred.promise;
             },
             views: function(ViewService, workspace, document, time, ticket) {
                 return [];
@@ -315,36 +340,39 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             site: function($stateParams, SiteService, ticket) {
                 return SiteService.getSite($stateParams.site);
             },
-            document : function($stateParams, ViewService, ElementService, workspace, site, time, growl, ticket) {
+            document : function($stateParams, ViewService, ElementService, $q, workspace, site, time, growl, ticket) {
                 var siteCoverDocId;
                 if ($stateParams.site === 'no_site')
                     return null;
                     //siteCoverDocId = 'master_cover';
                 else
                     siteCoverDocId = site.sysmlid + '_cover';
-
-                return ElementService.getElement(siteCoverDocId, false, workspace, time, 2)
+                var deferred = $q.defer();
+                ElementService.getElement(siteCoverDocId, false, workspace, time, 2)
                 .then(function(data) {
-                    return data;
+                    deferred.resolve(data);
                 }, function(reason) {
-
+                    if (reason.status === 401) {
+                        deferred.reject(reason);
+                        return;
+                    }
                     // if it is an error, other than a 404 (element not found) then stop and return
-                    if ((reason.status !== 404 && reason.status !== 410) || time !== 'latest') return null;
-                    
-                    // if it is a tag look-up, then don't create element
-                    if (time !== 'latest') 
-                        return null;
+                    if ((reason.status !== 404 && reason.status !== 410) || time !== 'latest') {
+                        deferred.resolve(null);
+                        return;
+                    }
 
                     var viewName = site.name + ' Cover Page';
                     var viewDoc = '<mms-site-docs data-mms-site="' + site.sysmlid + '">[cf:site docs]</mms-site-docs>';
 
-                    return ViewService.createView(undefined, viewName, undefined, workspace, siteCoverDocId, viewDoc, site.sysmlid)
+                    ViewService.createView(undefined, viewName, undefined, workspace, siteCoverDocId, viewDoc, site.sysmlid)
                     .then(function(data) {
-                        return data;
+                        deferred.resolve(data);
                     }, function(reason) {
-                        return null;
+                        deferred.resolve(null);
                     });
                 });
+                return deferred.promise;
             },
             views: function(ViewService, workspace, document, time, ticket) {
                 if (document === null) 
@@ -714,7 +742,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
         }
     });
     // anonymous factory intercepts requests
-    $httpProvider.interceptors.push(function($q, $location, $injector) {
+    /*$httpProvider.interceptors.push(function($q, $location, $injector) {
         return {
             'request': function(config) {
                 return config;
@@ -733,5 +761,5 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 return $q.reject(rejection);
             }
         };
-    });
+    });*/
 });

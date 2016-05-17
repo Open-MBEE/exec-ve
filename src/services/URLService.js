@@ -138,7 +138,7 @@ function urlService(baseUrl) {
      * @returns {string} The url
      */
     var getCheckLoginURL = function() {
-        return addTicket(root + "/checklogin");
+        return root + "/checklogin";
     };
 
     /**
@@ -525,7 +525,14 @@ function urlService(baseUrl) {
         return addTicket(r);
     };
 
-
+    var getLogoutURL = function() {
+        return addTicket(root + '/api/login/ticket/' + ticket);
+    };
+    
+    var getCheckTicketURL = function(t) {
+        return root + '/api/login/ticket/' + t + '?alf_ticket=' + t; //TODO remove when server returns 404
+    };
+    
     var addVersion = function(url, version) {
         if (version === 'latest')
             return url;
@@ -577,6 +584,8 @@ function urlService(baseUrl) {
         getWorkspacesURL: getWorkspacesURL,
         getWorkspaceURL: getWorkspaceURL,
         getCheckLoginURL: getCheckLoginURL,
+        getCheckTicketURL: getCheckTicketURL,
+        getLogoutURL: getLogoutURL,
         isTimestamp: isTimestamp,
         getRoot: getRoot,
         setTicket: setTicket

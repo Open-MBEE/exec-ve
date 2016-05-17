@@ -72,10 +72,8 @@ function mmsNav($templateCache, $state, hotkeys, growl, $location, $modal, $http
             }
         };
         scope.logout = function(){
-            var logoutService = '/alfresco/service/api/login/ticket/'+ AuthorizationService.getTicket();
-            $http.delete(logoutService).then(function(success) {
-                AuthorizationService.removeTicket();
-                $location.path('/login');
+            AuthorizationService.logout().then(function() {
+                $state.go('login');
             }, function(failure) {
                 growl.error('You were not logged out');
             });
