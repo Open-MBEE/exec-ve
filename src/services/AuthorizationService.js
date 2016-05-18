@@ -17,7 +17,8 @@ function AuthorizationService($q, $http, URLService, $window) {
             $window.localStorage.setItem('ticket', ticket);
             $http.get(URLService.getCheckLoginURL(), {
                 headers: {
-                    'Authorization': 'Basic ' + $window.btoa(credentials.username + ':' + credentials.password)
+                    'Authorization': 'Basic ' + $window.btoa(credentials.username + ':' + credentials.password),
+                    'withCredentials' : 'true'
                 }
             });
             deferred.resolve(ticket);
