@@ -6,13 +6,73 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
     //$urlRouterProvider.when('', '/workspaces/master/sites');
     //$urlRouterProvider.when('', '/login');
     $urlRouterProvider.rule(function ($injector, $location) {
-        var $window = $injector.get('$window');
+    // determine if the url is older 2.0 format (will not have a workspace)
+         // generate some random client id
+         var locationPath = $location.url();
+         if (locationPath.indexOf('/workspaces') === -1)
+         {
+             locationPath = 'workspaces/master' + locationPath;
+ 
+             var queryParams = '';
+             var pathArr = locationPath.split('/');
+             // var diff = '';
+ 
+             // determine if this came from docweb.html or ve.html, is there a product?
+             if (locationPath.indexOf('/products/') !== -1) {
+ 
+                 // replace products with documents
+                 locationPath = locationPath.replace('/products/', '/documents/');
+                 locationPath = locationPath.replace('/view/', '/views/');
+                 locationPath = locationPath.replace('/all', '/full');
+ 
+                 // if there is a view, there should be a time in the url prior
+                 pathArr = locationPath.split('/');
+ 
+                 // get the time param and remove it from the array
+                 var time = pathArr[6]; 
+                 pathArr.splice(6,1);
+ 
+                 // add time as query param if it is not latest
+                 if (time && time !== 'latest') {
+                     queryParams += 'time=' + time;
+                 }
+ 
+             }
+ 
+             // if there is a config, remove it and add it as a tag query param
+             var idxOfTag = pathArr.indexOf('config');    
+             if (idxOfTag !== -1) {
+                 var tag = pathArr[idxOfTag+1];
+                 queryParams += 'tag=' + tag;
+                 pathArr.splice(idxOfTag, 2);
+                 var idxOfSite = pathArr.indexOf('sites'); //redirect old config page to tag landing page
+                 if (idxOfSite !== -1)
+                     pathArr.splice(idxOfSite, 2);
+             }
+ 
+             locationPath = pathArr.join('/');
+ 
+ 
+             if (queryParams !== '') {
+                 locationPath += '?' + queryParams;
+             }
+ 
+             //$location.url(locationPath);
+         }
+         if (locationPath.indexOf('full%23') > 0)
+             locationPath = locationPath.replace('full%23', 'full#');
+         if (locationPath[0] !== '/')
+             locationPath = '/' + locationPath;
+         if (locationPath !== $location.url())
+             $location.url(locationPath);
+     });
+        /*var $window = $injector.get('$window');
         var loggedIn = $window.localStorage.getItem('ticket');
         var path = $location.path(), normalized = path.toLowerCase();
         if (!loggedIn && path.indexOf('login') === -1) {
             $location.path('/login');
         }
-    });
+    });*/
     $urlRouterProvider.otherwise('/workspaces/master/sites');// when the url isn't mapped go here
 
     $stateProvider
