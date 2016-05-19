@@ -15,12 +15,12 @@ function AuthorizationService($q, $http, URLService, $window) {
             URLService.setTicket(success.data.data.ticket);
             ticket = success.data.data.ticket;
             $window.localStorage.setItem('ticket', ticket);
-            $http.get(URLService.getCheckLoginURL(), {
-                headers: {
-                    'Authorization': 'Basic ' + $window.btoa(credentials.username + ':' + credentials.password),
-                    'withCredentials' : 'true'
-                }
-            });
+            // $http.get(URLService.getCheckLoginURL(), {
+            //     headers: {
+            //         'Authorization': 'Basic ' + $window.btoa(credentials.username + ':' + credentials.password),
+            //         'withCredentials' : 'true'
+            //     }
+            // });
             deferred.resolve(ticket);
         }, function(fail){
             URLService.handleHttpStatus(fail.data, fail.status, fail.header, fail.config, deferred);
@@ -32,6 +32,7 @@ function AuthorizationService($q, $http, URLService, $window) {
     var removeTicket = function(){
         $window.localStorage.removeItem('ticket');
         ticket = undefined;
+        URLService.setTicket(null);
     };
 
     var getTicket = function(){

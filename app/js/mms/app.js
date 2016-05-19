@@ -9,7 +9,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
     // determine if the url is older 2.0 format (will not have a workspace)
          // generate some random client id
          var locationPath = $location.url();
-         if (locationPath.indexOf('/workspaces') === -1)
+         if (locationPath.indexOf('/workspaces') === -1 && locationPath.indexOf('/login') === -1)
          {
              locationPath = 'workspaces/master' + locationPath;
  
@@ -802,24 +802,20 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
         }
     });
     // anonymous factory intercepts requests
-    /*$httpProvider.interceptors.push(function($q, $location, $injector) {
+    $httpProvider.interceptors.push(function($q, $location, $rootScope, $injector) {
         return {
-            'request': function(config) {
-                return config;
-            },
-            'response': function(response) {
-                return response;        
-            },
             'responseError': function(rejection) {
-                if(rejection.status === 401){
-                    var AuthorizationService = $injector.get('AuthorizationService');
-                    var isExpired = AuthorizationService.checkLogin();
-                    isExpired.then(function(){
-                        $location.path('/login');
-                    });//:TODO   
+                if(rejection.status === 401){ //rejection.config.url
+                    $rootScope.$broadcast("mms.unauthorized", rejection);
+                    // var AuthorizationService = $injector.get('AuthorizationService');
+                    // var isExpired = AuthorizationService.checkLogin();
+                    // isExpired.then(function(){
+                    // }, function() {
+                    //     $state.go("login", {notify: false});
+                    // });//:TODO   
                 }
                 return $q.reject(rejection);
             }
         };
-    });*/
+    });
 });

@@ -3,8 +3,8 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('MainCtrl', ['$scope', '$location', '$rootScope', '$state', '_', '$window', 'growl', '$http', 'URLService', 'hotkeys', 'growlMessages', 'StompService', 'UtilsService', 'HttpService', 'AuthorizationService',
-function($scope, $location, $rootScope, $state, _, $window, growl, $http, URLService, hotkeys, growlMessages, StompService, UtilsService, HttpService, AuthorizationService) {
+.controller('MainCtrl', ['$scope', '$location', '$rootScope', '$state', '_', '$window', '$modal', 'growl', '$http', 'URLService', 'hotkeys', 'growlMessages', 'StompService', 'UtilsService', 'HttpService', 'AuthorizationService',
+function($scope, $location, $rootScope, $state, _, $window, $modal, growl, $http, URLService, hotkeys, growlMessages, StompService, UtilsService, HttpService, AuthorizationService) {
     $rootScope.mms_viewContentLoading = false;
     $rootScope.mms_treeInitial = '';
     $rootScope.mms_title = '';
@@ -34,10 +34,10 @@ function($scope, $location, $rootScope, $state, _, $window, growl, $http, URLSer
         });
 
     $scope.$on('$stateChangeError', function(event, toState, toParams, fromState, fromParams, error) {
-        
+        $rootScope.mms_stateChanging = false;
         $rootScope.mms_viewContentLoading = false;
         //check if error is ticket error
-        if (!error || error.status === 401 || error.status === 404) { //check if 404 if checking valid ticket
+        if (!error || error.status === 401 || (error.status === 404 && error.config && error.config.url && error.config.url.indexOf('/login/ticket') !== -1)) { //check if 404 if checking valid ticket
             event.preventDefault();
             $rootScope.mmsRedirect = {toState: toState, toParams: toParams};
             $state.go('login', {notify: false});
@@ -52,10 +52,10 @@ function($scope, $location, $rootScope, $state, _, $window, growl, $http, URLSer
             $rootScope.mms_viewContentLoading = true;
     });*/
 
-    $rootScope.$on('$stateChangeStart', 
-    function(event, toState, toParams, fromState, fromParams){ 
+    $rootScope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams){ 
         $rootScope.mms_viewContentLoading = true;
         HttpService.transformQueue();
+        $rootScope.mms_stateChanging = true;
         // if (!AuthorizationService.getTicket() && toState.name !== 'login') {
         //     event.preventDefault();
         //     $rootScope.mmsRedirect = {toState: toState, toParams: toParams};
@@ -64,6 +64,40 @@ function($scope, $location, $rootScope, $state, _, $window, growl, $http, URLSer
         // }
     });
     
+    $rootScope.$on("mms.unauthorized", function(event, response) {
+        if ($state.$current.name === 'login' || $rootScope.mms_stateChanging)
+            return;
+        AuthorizationService.checkLogin().then(function(){}, function() {
+            var instance = $modal.open({
+                template: '<div class="modal-header">You have been looged out, login again.</div><div class="modal-body"><form name="loginForm" ng-submit="login(credentials)">' + 
+                                '<input type="text" class="form-control" ng-model="credentials.username" placeholder="Username">' + 
+                                '<input type="password" class="form-control" ng-model="credentials.password" placeholder="Password">' + 
+                                '<button class="btn btn-block" type="submit">LOG IN <span ng-if="spin" ><i class="fa fa-spin fa-spinner"></i>' + 
+                            '</span></button></form></div>',
+                scope: $scope,
+                controller: ['$scope', '$modalInstance', function ($scope, $modalInstance) {
+                    $scope.credentials = {
+                      username: '',
+                      password: ''
+                    };
+                    $scope.spin = false;
+                    $scope.login = function (credentials) {
+                        $scope.spin = true;
+                        var credentialsJSON = {"username":credentials.username, "password":credentials.password};
+                            AuthorizationService.getAuthorized(credentialsJSON).then(function (user) {
+                                growl.success("Logged in");
+                                $modalInstance.dismiss();
+                            }, function (reason) {
+                                $scope.spin = false;
+                                growl.error(reason.message);
+                            });
+                        };
+                    }],
+                size: 'md'
+            });
+        });
+    });
+
     //actions for stomp checking edit mode
     $scope.$on("stomp.element", function(event, deltaSource, deltaWorkspaceId, deltaElementID, deltaModifier, deltaName){
         if($rootScope.veEdits && $rootScope.veEdits['element|' + deltaElementID + '|' + deltaWorkspaceId] === undefined){
@@ -72,7 +106,7 @@ function($scope, $location, $rootScope, $state, _, $window, growl, $http, URLSer
     });
     $rootScope.$on('$stateChangeSuccess', 
         function(event, toState, toParams, fromState, fromParams) {
-        
+            $rootScope.mms_stateChanging = false;
             // set the initial tree selection
             if ($state.includes('workspaces') && !$state.includes('workspace.sites')) {
                 if (toParams.tag !== undefined && toParams.tag !== 'latest')

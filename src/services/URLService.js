@@ -530,7 +530,7 @@ function urlService(baseUrl) {
     };
     
     var getCheckTicketURL = function(t) {
-        return root + '/api/login/ticket/' + t + '?alf_ticket=' + t; //TODO remove when server returns 404
+        return root + '/mms/login/ticket/' + t;//+ '?alf_ticket=' + t; //TODO remove when server returns 404
     };
     
     var addVersion = function(url, version) {
@@ -543,6 +543,8 @@ function urlService(baseUrl) {
     };
     var addTicket = function(url) {
         var r = url;
+        if (!ticket)
+            return r;
         if (r.indexOf('?') > 0)
             r += '&alf_ticket=' + ticket;
         else
