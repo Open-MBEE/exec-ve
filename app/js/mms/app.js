@@ -9,7 +9,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
     // determine if the url is older 2.0 format (will not have a workspace)
          // generate some random client id
          var locationPath = $location.url();
-         if (locationPath.indexOf('/workspaces') === -1 && locationPath.indexOf('/login') === -1)
+         if (locationPath.indexOf('/workspaces') === -1 && locationPath.indexOf('/login') === -1 && locationPath !== '' && locationPath !== '/')
          {
              locationPath = 'workspaces/master' + locationPath;
  
