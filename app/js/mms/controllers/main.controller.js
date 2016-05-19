@@ -3,13 +3,14 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('MainCtrl', ['$scope', '$location', '$rootScope', '$state', '_', '$window', '$modal', 'growl', '$http', 'URLService', 'hotkeys', 'growlMessages', 'StompService', 'UtilsService', 'HttpService', 'AuthService',
-function($scope, $location, $rootScope, $state, _, $window, $modal, growl, $http, URLService, hotkeys, growlMessages, StompService, UtilsService, HttpService, AuthService) {
+.controller('MainCtrl', ['$scope', '$location', '$rootScope', '$state', '_', '$window', '$modal', 'growl', '$http', 'URLService', 'hotkeys', 'growlMessages', 'StompService', 'UtilsService', 'HttpService', 'AuthService', '$interval',
+function($scope, $location, $rootScope, $state, _, $window, $modal, growl, $http, URLService, hotkeys, growlMessages, StompService, UtilsService, HttpService, AuthService, $interval) {
     $rootScope.mms_viewContentLoading = false;
     $rootScope.mms_treeInitial = '';
     $rootScope.mms_title = '';
     $rootScope.mms_footer = 'JPL/Caltech PROPRIETARY — Not for Public Release or Redistribution. No export controlled documents allowed on this server.';
-
+    
+    var modalOpen = false;
     var host = $location.host();
     if ($location.host().indexOf('europaems') !== -1) {
         $rootScope.mms_footer = 'The technical data in this document is controlled under the U.S. Export Regulations, release to foreign persons may require an export authorization.';
@@ -62,17 +63,18 @@ function($scope, $location, $rootScope, $state, _, $window, $modal, growl, $http
         //     //$location.url('/login');
         //     $state.go('login', {notify: false});
         // }
-    });
-    
+    }); 
     $rootScope.$on("mms.unauthorized", function(event, response) {
-        if ($state.$current.name === 'login' || $rootScope.mms_stateChanging)
+        // add a boolean to the 'or' statement to check for modal window
+        if ($state.$current.name === 'login' || $rootScope.mms_stateChanging || modalOpen)
             return;
         AuthService.checkLogin().then(function(){}, function() {
+            modalOpen = true;
             var instance = $modal.open({
-                template: '<div class="modal-header">You have been looged out, login again.</div><div class="modal-body"><form name="loginForm" ng-submit="login(credentials)">' + 
-                                '<input type="text" class="form-control" ng-model="credentials.username" placeholder="Username">' + 
-                                '<input type="password" class="form-control" ng-model="credentials.password" placeholder="Password">' + 
-                                '<button class="btn btn-block" type="submit">LOG IN <span ng-if="spin" ><i class="fa fa-spin fa-spinner"></i>' + 
+                template: '<div class="modal-header">You have been logged out, please login again.</div><div class="modal-body"><form name="loginForm" ng-submit="login(credentials)">' + 
+                                '<input type="text" class="form-control login-icons" ng-model="credentials.username" placeholder="&#xf007; Username" style="margin-bottom: 1.5em; padding-top:24px; padding-bottom:24px;">' + 
+                                '<input type="password" class="form-control login-icons" ng-model="credentials.password" placeholder="&#xf084; Password" style="margin-bottom: 1.5em; padding-top:24px; padding-bottom:24px;">' + 
+                                '<button class="btn btn-block" type="submit" style="background: #2f889a; padding-top:16px; padding-bottom:16px; color:white;">LOG IN <span ng-if="spin" ><i class="fa fa-spin fa-spinner"></i>' + 
                             '</span></button></form></div>',
                 scope: $scope,
                 controller: ['$scope', '$modalInstance', function ($scope, $modalInstance) {
@@ -94,9 +96,15 @@ function($scope, $location, $rootScope, $state, _, $window, $modal, growl, $http
                         };
                     }],
                 size: 'md'
+            }).result.finally(function(){
+                modalOpen = false;
             });
         });
     });
+    // broadcast mms.unauthorized every minute with interval service
+    $interval(function() {
+        $rootScope.$broadcast("mms.unauthorized");
+    }, 60000);
 
     //actions for stomp checking edit mode
     $scope.$on("stomp.element", function(event, deltaSource, deltaWorkspaceId, deltaElementID, deltaModifier, deltaName){
