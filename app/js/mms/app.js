@@ -82,7 +82,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
         views: {
             'pane-center': {
                 templateUrl: 'partials/mms/login.html',
-                controller: function ($scope, $rootScope, $state, AuthorizationService, growl) {
+                controller: function ($scope, $rootScope, $state, AuthService, growl) {
                     $scope.credentials = {
                       username: '',
                       password: ''
@@ -91,7 +91,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                     $scope.login = function (credentials) {
                       $scope.spin = true;
                       var credentialsJSON = {"username":credentials.username, "password":credentials.password};
-                          AuthorizationService.getAuthorized(credentialsJSON).then(function (user) {
+                          AuthService.getAuthorized(credentialsJSON).then(function (user) {
                             if ($rootScope.mmsRedirect) {
                                 var toState = $rootScope.mmsRedirect.toState;
                                 var toParams = $rootScope.mmsRedirect.toParams;
@@ -117,9 +117,9 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             //     // url service append ticket
             //     return $http.get(URLService.getCheckLoginURL());
             // },
-            ticket: function($window, URLService, AuthorizationService, $location, $q) {
+            ticket: function($window, URLService, AuthService, $location, $q) {
                 var deferred = $q.defer();
-                AuthorizationService.checkLogin().then(function() {
+                AuthService.checkLogin().then(function() {
                     URLService.setTicket($window.localStorage.getItem('ticket'));
                     deferred.resolve($window.localStorage.getItem('ticket'));
                 }, function(rejection) {
@@ -807,8 +807,8 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             'responseError': function(rejection) {
                 if(rejection.status === 401){ //rejection.config.url
                     $rootScope.$broadcast("mms.unauthorized", rejection);
-                    // var AuthorizationService = $injector.get('AuthorizationService');
-                    // var isExpired = AuthorizationService.checkLogin();
+                    // var AuthService = $injector.get('AuthService');
+                    // var isExpired = AuthService.checkLogin();
                     // isExpired.then(function(){
                     // }, function() {
                     //     $state.go("login", {notify: false});

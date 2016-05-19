@@ -3,8 +3,8 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('MainCtrl', ['$scope', '$location', '$rootScope', '$state', '_', '$window', '$modal', 'growl', '$http', 'URLService', 'hotkeys', 'growlMessages', 'StompService', 'UtilsService', 'HttpService', 'AuthorizationService',
-function($scope, $location, $rootScope, $state, _, $window, $modal, growl, $http, URLService, hotkeys, growlMessages, StompService, UtilsService, HttpService, AuthorizationService) {
+.controller('MainCtrl', ['$scope', '$location', '$rootScope', '$state', '_', '$window', '$modal', 'growl', '$http', 'URLService', 'hotkeys', 'growlMessages', 'StompService', 'UtilsService', 'HttpService', 'AuthService',
+function($scope, $location, $rootScope, $state, _, $window, $modal, growl, $http, URLService, hotkeys, growlMessages, StompService, UtilsService, HttpService, AuthService) {
     $rootScope.mms_viewContentLoading = false;
     $rootScope.mms_treeInitial = '';
     $rootScope.mms_title = '';
@@ -56,7 +56,7 @@ function($scope, $location, $rootScope, $state, _, $window, $modal, growl, $http
         $rootScope.mms_viewContentLoading = true;
         HttpService.transformQueue();
         $rootScope.mms_stateChanging = true;
-        // if (!AuthorizationService.getTicket() && toState.name !== 'login') {
+        // if (!AuthService.getTicket() && toState.name !== 'login') {
         //     event.preventDefault();
         //     $rootScope.mmsRedirect = {toState: toState, toParams: toParams};
         //     //$location.url('/login');
@@ -67,7 +67,7 @@ function($scope, $location, $rootScope, $state, _, $window, $modal, growl, $http
     $rootScope.$on("mms.unauthorized", function(event, response) {
         if ($state.$current.name === 'login' || $rootScope.mms_stateChanging)
             return;
-        AuthorizationService.checkLogin().then(function(){}, function() {
+        AuthService.checkLogin().then(function(){}, function() {
             var instance = $modal.open({
                 template: '<div class="modal-header">You have been looged out, login again.</div><div class="modal-body"><form name="loginForm" ng-submit="login(credentials)">' + 
                                 '<input type="text" class="form-control" ng-model="credentials.username" placeholder="Username">' + 
@@ -84,7 +84,7 @@ function($scope, $location, $rootScope, $state, _, $window, $modal, growl, $http
                     $scope.login = function (credentials) {
                         $scope.spin = true;
                         var credentialsJSON = {"username":credentials.username, "password":credentials.password};
-                            AuthorizationService.getAuthorized(credentialsJSON).then(function (user) {
+                            AuthService.getAuthorized(credentialsJSON).then(function (user) {
                                 growl.success("Logged in");
                                 $modalInstance.dismiss();
                             }, function (reason) {

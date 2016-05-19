@@ -1,9 +1,9 @@
 'use strict';
 
 angular.module('mms')
-.factory('AuthorizationService', ['$q', '$http', 'URLService','$window', AuthorizationService]);
+.factory('AuthService', ['$q', '$http', 'URLService','$window', AuthService]);
 
-function AuthorizationService($q, $http, URLService, $window) {
+function AuthService($q, $http, URLService, $window) {
     
     var ticket= $window.localStorage.getItem('ticket');
     var getAuthorized = function (credentials) {
@@ -60,7 +60,7 @@ function AuthorizationService($q, $http, URLService, $window) {
     var logout = function() {
         var deferred = $q.defer();
         checkLogin().then(function() {
-            //var logoutService = '/alfresco/service/api/login/ticket/'+ AuthorizationService.getTicket() + '?alf_ticket=' + AuthorizationService.getTicket();
+            //var logoutService = '/alfresco/service/api/login/ticket/'+ AuthService.getTicket() + '?alf_ticket=' + AuthService.getTicket();
             $http.delete(URLService.getLogoutURL()).then(function(success) {
                 removeTicket();
                 //$location.path('/login');
