@@ -69,6 +69,8 @@ function($scope, $location, $rootScope, $state, _, $window, $modal, growl, $http
         if ($state.$current.name === 'login' || $rootScope.mms_stateChanging || modalOpen)
             return;
         AuthService.checkLogin().then(function(){}, function() {
+            if ($state.$current.name === 'login' || modalOpen)
+                return;
             modalOpen = true;
             var instance = $modal.open({
                 template: '<div class="modal-header">You have been logged out, please login again.</div><div class="modal-body"><form name="loginForm" ng-submit="login(credentials)">' + 
