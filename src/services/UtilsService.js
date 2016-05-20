@@ -438,6 +438,8 @@ function UtilsService(CacheService, _) {
                 ".pull-right {float: right;} " + 
                 "table {width: 100%; border-collapse: collapse;} " + 
                 "table, th, td {border: 1px solid black; padding: 4px;} " +
+                "table, th, td > p {margin: 0px; padding: 0px;} " +
+                "table, th, td > div > p {margin: 0px; padding: 0px;} " +
                 "h1 {font-size: 20px; padding: 0px; margin: 4px;} " +
                 ".ng-hide {display: none;} " +
                 "body {font-size: 12px;} " + 
