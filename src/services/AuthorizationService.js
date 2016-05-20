@@ -66,10 +66,10 @@ function AuthService($q, $http, URLService, HttpService, ElementService, ViewSer
     var logout = function() {
         var deferred = $q.defer();
         checkLogin().then(function() {
+            var logouturl = URLService.getLogoutURL();
+            removeTicket();
             //var logoutService = '/alfresco/service/api/login/ticket/'+ AuthService.getTicket() + '?alf_ticket=' + AuthService.getTicket();
-            $http.delete(URLService.getLogoutURL()).then(function(success) {
-                removeTicket();
-                //$location.path('/login');
+            $http.delete(logouturl).then(function(success) {
                 deferred.resolve(true);
                 //$state.go('login');
             }, function(failure) {

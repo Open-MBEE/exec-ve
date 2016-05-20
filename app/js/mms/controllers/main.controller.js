@@ -105,7 +105,7 @@ function($scope, $location, $rootScope, $state, _, $window, $modal, growl, $http
     // broadcast mms.unauthorized every minute with interval service
     $interval(function() {
         $rootScope.$broadcast("mms.unauthorized");
-    }, 60000);
+    }, 60000, 0, false);
 
     //actions for stomp checking edit mode
     $scope.$on("stomp.element", function(event, deltaSource, deltaWorkspaceId, deltaElementID, deltaModifier, deltaName){
