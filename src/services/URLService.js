@@ -82,9 +82,9 @@ function urlService(baseUrl) {
      * @returns {string} The url
      */
     var getConfigSnapshotsURL = function(id, workspace) {
-        return addTicket(root + "/workspaces/" + workspace +
+        return root + "/workspaces/" + workspace +
                       "/configurations/" + id +
-                      "/snapshots");                
+                      "/snapshots";                
     };
 
     /**
@@ -171,10 +171,10 @@ function urlService(baseUrl) {
      * @returns {string} The url
      */
     var getConfigProductsURL = function (id, site, workspace) {
-        return addTicket(root + "/workspaces/" + workspace +
+        return root + "/workspaces/" + workspace +
                       "/sites/" + site +
                       "/configurations/" + id +
-                      "/products");                        
+                      "/products";                        
     };
 
     /**
@@ -544,6 +544,8 @@ function urlService(baseUrl) {
     var addTicket = function(url) {
         var r = url;
         if (!ticket)
+            return r;
+        if (r.indexOf('timestamp') > 0)
             return r;
         if (r.indexOf('?') > 0)
             r += '&alf_ticket=' + ticket;
