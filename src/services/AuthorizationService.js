@@ -1,9 +1,9 @@
 'use strict';
 
 angular.module('mms')
-.factory('AuthService', ['$q', '$http', 'URLService','$window', AuthService]);
+.factory('AuthService', ['$q', '$http', 'URLService','HttpService', 'ElementService', 'ViewService', 'ConfigService', 'WorkspaceService', 'SiteService', '$window', AuthService]);
 
-function AuthService($q, $http, URLService, $window) {
+function AuthService($q, $http, URLService, HttpService, ElementService, ViewService, ConfigService, WorkspaceService, SiteService, $window) {
     
     var ticket= $window.localStorage.getItem('ticket');
     var getAuthorized = function (credentials) {
@@ -33,6 +33,12 @@ function AuthService($q, $http, URLService, $window) {
         $window.localStorage.removeItem('ticket');
         ticket = undefined;
         URLService.setTicket(null);
+        HttpService.dropAll();
+        ElementService.reset();
+        ViewService.reset();
+        WorkspaceService.reset();
+        SiteService.reset();
+        ConfigService.reset();
     };
 
     var getTicket = function(){

@@ -825,6 +825,11 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         res.cacheKey = UtilsService.makeElementKey(id, res.ws, res.ver, edit);
         return res;
     };
+
+    var reset = function() {
+        inProgress = {};
+    };
+
     return {
         getElement: getElement,
         getElements: getElements,
@@ -841,6 +846,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         deleteElements: deleteElements,
         isCacheOutdated: isCacheOutdated,
         isDirty: isDirty,
-        search: search
+        search: search,
+        reset: reset
     };
 }
