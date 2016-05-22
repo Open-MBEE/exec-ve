@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsNav', ['$templateCache', '$state', 'hotkeys', 'growl', '$location', '$modal', '$http', 'URLService', 'ApplicationService', 'ElementService', mmsNav]);
+.directive('mmsNav', ['$templateCache', '$state', 'hotkeys', 'growl', '$location', '$modal', '$http', 'URLService', 'ApplicationService', 'ElementService','AuthService', mmsNav]);
 
 /**
  * @ngdoc directive
@@ -30,7 +30,7 @@ angular.module('mms.directives')
     </pre>
  * @param {string} mmsTitle Title to display
  */
-function mmsNav($templateCache, $state, hotkeys, growl, $location, $modal, $http, URLService, ApplicationService, ElementService) {
+function mmsNav($templateCache, $state, hotkeys, growl, $location, $modal, $http, URLService, ApplicationService, ElementService, AuthService) {
     var template = $templateCache.get('mms/templates/mmsNav.html');
 
     var mmsNavLink = function(scope, element, attrs) {
@@ -70,6 +70,13 @@ function mmsNav($templateCache, $state, hotkeys, growl, $location, $modal, $http
                     scope.categories[str][k].isOpen = false;
                 }
             }
+        };
+        scope.logout = function(){
+            AuthService.logout().then(function() {
+                $state.go('login');
+            }, function(failure) {
+                growl.error('You were not logged out');
+            });
         };
         // Define a few helper functions
         var Helper = {

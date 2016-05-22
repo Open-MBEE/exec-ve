@@ -241,6 +241,10 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService, _
         return create(ws, true);
     };
 
+    var reset = function() {
+        inProgress = {};
+    };
+    
     return {
         getWorkspaces: getWorkspaces,
         getWorkspace: getWorkspace,
@@ -249,7 +253,8 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService, _
         merge: merge,
         deleteWorkspace: deleteWorkspace,
         create: create,
-        update: update
+        update: update,
+        reset: reset
     };
 
 }
