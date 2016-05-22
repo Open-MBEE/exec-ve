@@ -438,6 +438,8 @@ function UtilsService(CacheService, _) {
                 ".pull-right {float: right;} " + 
                 "table {width: 100%; border-collapse: collapse;} " + 
                 "table, th, td {border: 1px solid black; padding: 4px;} " +
+                "table, th, td > p {margin: 0px; padding: 0px;} " +
+                "table, th, td > div > p {margin: 0px; padding: 0px;} " +
                 "h1 {font-size: 20px; padding: 0px; margin: 4px;} " +
                 ".ng-hide {display: none;} " +
                 "body {font-size: 12px;} " + 
@@ -449,7 +451,8 @@ function UtilsService(CacheService, _) {
                 ".tof ul, .tot ul {padding-left:0;}" +
                 ".toc ul {padding-left:4em;}" +
                 ".toc > ul {padding-left:0;}" +
-                ".toc li > a[href]::after {content: leader('.') target-counter(attr(href), page);} ";
+                ".toc li > a[href]::after {content: leader('.') target-counter(attr(href), page);}" +
+                "@page{prince-shrink-to-fit:auto;size: A4 portrait;margin-left:8mm;margin-right:8mm;}";
     };
 
     return {

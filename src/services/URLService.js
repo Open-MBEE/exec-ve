@@ -37,7 +37,7 @@ angular.module('mms')
  */
 function urlService(baseUrl) {
     var root = baseUrl;
-
+    var ticket;
     /**
      * @ngdoc method
      * @name mms.URLService#isTimestamp
@@ -66,7 +66,7 @@ function urlService(baseUrl) {
      * @returns {object} Returns object with mmsversion
      */
     var getMmsVersionURL = function() {
-        return root + "/mmsversion";
+        return addTicket(root + "/mmsversion");
     };
 
     /**
@@ -101,10 +101,10 @@ function urlService(baseUrl) {
      * @returns {string} The url
      */
     var getProductSnapshotsURL = function(id, site, workspace) {
-        return root + "/workspaces/" + workspace +
+        return addTicket(root + "/workspaces/" + workspace +
                       "/sites/" + site +
                       "/products/" + id +
-                      "/snapshots";                
+                      "/snapshots");                
     };
 
     /**
@@ -121,10 +121,10 @@ function urlService(baseUrl) {
      * @returns {string} The url
      */
     var getHtmlToPdfURL = function(docId, site, workspace) {
-        return root + "/workspaces/" + workspace +
+        return addTicket(root + "/workspaces/" + workspace +
                       "/sites/" + site +
                       "/documents/" + docId +
-                      "/htmlToPdf/123456789";  
+                      "/htmlToPdf/123456789");  
     };
 
     /**
@@ -153,8 +153,8 @@ function urlService(baseUrl) {
      * @returns {string} The url
      */
     var getConfigsURL = function(workspace) {
-        return root + "/workspaces/" + workspace +
-                      "/configurations";
+        return addTicket(root + "/workspaces/" + workspace +
+                      "/configurations");
     };
 
     /**
@@ -190,8 +190,8 @@ function urlService(baseUrl) {
      * @returns {string} The url
      */
     var getConfigURL = function(id, workspace) {
-        return root + "/workspaces/" + workspace + 
-                      "/configurations/" + id;
+        return addTicket(root + "/workspaces/" + workspace + 
+                      "/configurations/" + id);
     };
 
     /**
@@ -207,8 +207,8 @@ function urlService(baseUrl) {
      * @returns {string} The url
      */
     var getSnapshotURL = function(id, workspace) {
-        return root + "/workspaces/" + workspace + 
-                      "/snapshots/" + id;
+        return addTicket(root + "/workspaces/" + workspace + 
+                      "/snapshots/" + id);
     };
 
     /**
@@ -228,7 +228,7 @@ function urlService(baseUrl) {
         var r = root + "/workspaces/" + workspace + 
                       "/sites/" + site + 
                       "/products";
-        return addVersion(r, version);
+        return addTicket(addVersion(r, version));
     };
 
     /**
@@ -247,7 +247,7 @@ function urlService(baseUrl) {
      */
     var getImageURL = function(id, workspace, version) {
         var r = root + '/workspaces/' + workspace + '/artifacts/' + id;
-        return addVersion(r, version);
+        return addTicket(addVersion(r, version));
     };
 
     /**
@@ -262,7 +262,7 @@ function urlService(baseUrl) {
      * @returns {string} The path for site dashboard.
      */
     var getSiteDashboardURL = function(site) {
-        return "/share/page/site/" + site + "/dashboard";
+        return addTicket("/share/page/site/" + site + "/dashboard");
     };
 
     /**
@@ -280,7 +280,7 @@ function urlService(baseUrl) {
      */
     var getElementURL = function(id, workspace, version) {        
         var r = root + '/workspaces/' + workspace + '/elements/' + id;
-        return addVersion(r, version);
+        return addTicket(addVersion(r, version));
     };
 
     var getOwnedElementURL = function(id, workspace, version, depth) {
@@ -320,7 +320,7 @@ function urlService(baseUrl) {
             else
                 r += '?simple=true';
         }
-        return r;
+        return addTicket(r);
     };
 
     /**
@@ -339,7 +339,7 @@ function urlService(baseUrl) {
     var getViewElementsURL = function(id, workspace, version) {
         //var r = root + "/javawebscripts/views/" + id + "/elements";
         var r = root + "/workspaces/" + workspace + "/views/" + id + "/elements";
-        return addVersion(r, version);
+        return addTicket(addVersion(r, version));
     };
 
     /**
@@ -355,7 +355,7 @@ function urlService(baseUrl) {
      * @returns {string} The url.
      */
     var getElementVersionsURL = function(id, workspace) {
-        return root + '/workspaces/' + workspace + '/history/' + id;
+        return addTicket(root + '/workspaces/' + workspace + '/history/' + id);
     };
 
     /**
@@ -370,7 +370,7 @@ function urlService(baseUrl) {
      * @returns {string} The post elements url.
      */
     var getPostElementsURL = function(workspace) {
-        return root + '/workspaces/' + workspace + '/elements';
+        return addTicket(root + '/workspaces/' + workspace + '/elements');
     };
 
     /**
@@ -387,7 +387,7 @@ function urlService(baseUrl) {
      */
     var getPutElementsURL = function(workspace, version) {
         var r = root + '/workspaces/' + workspace + '/elements';
-        return addVersion(r, version);
+        return addTicket(addVersion(r, version));
     };
 
     var getPostElementsWithSiteURL = function(workspace, site) {
@@ -396,7 +396,7 @@ function urlService(baseUrl) {
             if (site === 'no-site') {
                 site = 'no_site';
             }
-            return root + '/workspaces/' + workspace + '/sites/' + site + '/elements';
+            return addTicket(root + '/workspaces/' + workspace + '/sites/' + site + '/elements');
         }
     };
 
@@ -462,7 +462,7 @@ function urlService(baseUrl) {
      */
     var getSitesURL = function(workspace, version) {
         var r = root + '/workspaces/' + workspace + '/sites';
-        return addVersion(r, version);
+        return addTicket(addVersion(r, version));
     };
 
     /**
@@ -495,22 +495,22 @@ function urlService(baseUrl) {
             if (page >= 0)
                 r += '&skipCount=' + page;
         }
-        return r;
+        return addTicket(r);
     };
 
     var getWorkspacesURL = function() {
-        return root + '/workspaces';
+        return addTicket(root + '/workspaces');
     };
 
     var getWorkspaceURL = function(ws) {
-        return root + '/workspaces/' + ws;
+        return addTicket(root + '/workspaces/' + ws);
     };
 
     var getWsDiffURL = function(ws1, ws2, ws1time, ws2time, recalc) {
         var diffUrl =  root + '/diff/' + ws1 + '/' + ws2 + '/' + ws1time + '/' + ws2time  + '?background=true';
         if(recalc === true) diffUrl += '&recalculate=true';
         
-        return diffUrl;
+        return addTicket(diffUrl);
         /*if (ws1time && ws1time !== 'latest')
             r += '&timestamp1=' + ws1time;
         if (ws2time && ws2time !== 'latest')
@@ -522,10 +522,17 @@ function urlService(baseUrl) {
         var r = root + '/diff';
         if (sourcetime && isTimestamp(sourcetime))
             r += '?timestamp2=' + sourcetime;
-        return r;
+        return addTicket(r);
     };
 
-
+    var getLogoutURL = function() {
+        return addTicket(root + '/api/login/ticket/' + ticket);
+    };
+    
+    var getCheckTicketURL = function(t) {
+        return root + '/mms/login/ticket/' + t;//+ '?alf_ticket=' + t; //TODO remove when server returns 404
+    };
+    
     var addVersion = function(url, version) {
         if (version === 'latest')
             return url;
@@ -534,11 +541,25 @@ function urlService(baseUrl) {
         else
             return url + '/versions/' + version;
     };
-
+    var addTicket = function(url) {
+        var r = url;
+        if (!ticket)
+            return r;
+        if (r.indexOf('timestamp') > 0)
+            return r;
+        if (r.indexOf('?') > 0)
+            r += '&alf_ticket=' + ticket;
+        else
+            r += '?alf_ticket=' + ticket;
+        return r;    
+    };
     var getRoot = function() {
         return root;
     };
 
+    var setTicket = function(t) {
+        ticket = t;
+    };
     return {
         getMmsVersionURL: getMmsVersionURL,
         getSiteDashboardURL: getSiteDashboardURL,
@@ -567,8 +588,11 @@ function urlService(baseUrl) {
         getWorkspacesURL: getWorkspacesURL,
         getWorkspaceURL: getWorkspaceURL,
         getCheckLoginURL: getCheckLoginURL,
+        getCheckTicketURL: getCheckTicketURL,
+        getLogoutURL: getLogoutURL,
         isTimestamp: isTimestamp,
-        getRoot: getRoot
+        getRoot: getRoot,
+        setTicket: setTicket
     };
 
 }

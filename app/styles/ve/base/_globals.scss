@@ -12,7 +12,9 @@ $background_hover_transition: background-color .2s linear;
 $navHeight: 40px;
 $treeMarginTop: 15px;
 $mainViewShadowColor: rgba(0,0,0,.26);
-
+.login-icons{
+    font-family: "FontAwesome";
+}
 .clean {
   background-color: $white !important;
 }

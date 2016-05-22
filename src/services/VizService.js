@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms')
-.factory('VizService', ['$q', '$http', 'URLService', 'CacheService', 'UtilsService', VizService]);
+.factory('VizService', ['$q', '$http', 'URLService', 'CacheService', 'UtilsService', 'AuthService', VizService]);
 
 /**
  * @ngdoc service
@@ -15,7 +15,7 @@ angular.module('mms')
  * @description
  * This service handles visualization needs and diagramming (TBD)
  */
-function VizService($q, $http, URLService, CacheService, UtilsService) {
+function VizService($q, $http, URLService, CacheService, UtilsService, AuthService) {
 
     /**
      * @ngdoc method
@@ -46,8 +46,9 @@ function VizService($q, $http, URLService, CacheService, UtilsService) {
                 var parts = root.split('/');
                 if (parts.length >= 3)
                     newroot = parts[0] + '/' + parts[1] + '/' + parts[2];
-             }
-            deferred.resolve(CacheService.put(n.cacheKey, newroot + '/alfresco' + data.artifacts[0].url, false));
+            }
+            var url = CacheService.put(n.cacheKey, newroot + '/alfresco' + data.artifacts[0].url, false);
+            deferred.resolve(url + '?alf_ticket=' + AuthService.getTicket());
         }).error(function(data, status, headers, config) {
             URLService.handleHttpStatus(data, status, headers, config, deferred);
         });
