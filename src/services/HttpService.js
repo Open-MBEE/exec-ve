@@ -147,10 +147,18 @@ function HttpService($http, $q, _) {
         }
     };
 
+    var dropAll = function() {
+        queue[1].length = 0;
+        queue[0].length = 0;
+        cache = {};
+        inProgress = 0;
+    };
+
     return {
         get: get,
         ping: ping,
-        transformQueue: transformQueue
+        transformQueue: transformQueue,
+        dropAll: dropAll
     };
 
 }
