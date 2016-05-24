@@ -139,13 +139,9 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         }
     };
 
-<<<<<<< HEAD
+
     $scope.$on('convert-pdf', function() {
-        MmsAppUtils.popupPrintConfirm(view, $scope.ws, time, false, false, true);
-=======
-    $scope.$on('convert.pdf', function() {
         MmsAppUtils.popupPrintConfirm(view, $scope.ws, time, false, false, true, true);
->>>>>>> develop
     });
 
     $scope.$on('view-add-paragraph', function() {
