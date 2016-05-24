@@ -34,9 +34,5 @@
     "karma-phantomjs-launcher": "~0.2.3",
     "phantomjs": "~2.1.2",
     "protractor": "~3.0.0"
-  },
-  "dependencies": {
-    "agave": "file:///Users/syferris/Development/git/AGAVE",
-    "parser-agave": "file:///Users/syferris/Development/git/Parser"
   }
 }
