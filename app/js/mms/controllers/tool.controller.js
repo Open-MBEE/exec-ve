@@ -3,10 +3,10 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('ToolCtrl', ['$scope', '$rootScope', '$state', '$modal', '$q', '$stateParams', '$timeout',
+.controller('ToolCtrl', ['$scope', '$rootScope', '$state', '$uibModal', '$q', '$stateParams', '$timeout',
             'ConfigService', 'ElementService', 'WorkspaceService', 'growl', 
             'workspaceObj', 'tags', 'tag', 'snapshots', 'site', 'document', 'time', 'Utils', 'hotkeys',
-function($scope, $rootScope, $state, $modal, $q, $stateParams, $timeout, ConfigService, ElementService, WorkspaceService, growl, workspaceObj, tags, tag, snapshots, site, document, time, Utils, hotkeys) {
+function($scope, $rootScope, $state, $uibModal, $q, $stateParams, $timeout, ConfigService, ElementService, WorkspaceService, growl, workspaceObj, tags, tag, snapshots, site, document, time, Utils, hotkeys) {
 
     // TODO rename variable ws
     var ws = $stateParams.workspace;
@@ -416,15 +416,15 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, $timeout, ConfigS
             }
         };
         if ($scope.specApi.hasEdits()) {
-            var instance = $modal.open({
+            var instance = $uibModal.open({
                 templateUrl: 'partials/mms/cancelConfirm.html',
                 scope: $scope,
-                controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
+                controller: ['$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
                     $scope.ok = function() {
-                        $modalInstance.close('ok');
+                        $uibModalInstance.close('ok');
                     };
                     $scope.cancel = function() {
-                        $modalInstance.dismiss();
+                        $uibModalInstance.dismiss();
                     };
                 }]
             });

@@ -763,21 +763,21 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
         views: {
             'menu@': {
                 templateUrl: 'partials/mms/diff-nav.html',               
-                controller: function ($scope, $rootScope,targetName, sourceName, $stateParams, $state, $modal){
+                controller: function ($scope, $rootScope,targetName, sourceName, $stateParams, $state, $uibModal){
                     $scope.targetName = targetName;
                     $scope.sourceName = sourceName;
                     $rootScope.mms_title = 'Merge Differences';
 
                     $scope.goBack = function () {
-                        $modal.open({
+                        $uibModal.open({
                             templateUrl: 'partials/mms/cancelModal.html',
-                            controller: function($scope, $modalInstance, $state) {      
+                            controller: function($scope, $uibModalInstance, $state) {      
                                 $scope.close = function() {
-                                    $modalInstance.close();
+                                    $uibModalInstance.close();
                                 };
                                 $scope.exit = function() {
                                     $state.go('workspace', {}, {reload:true});
-                                    $modalInstance.close(); 
+                                    $uibModalInstance.close(); 
                                 };
                             }
                         });

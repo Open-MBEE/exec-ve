@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsCkeditor', ['CacheService', 'ElementService', 'UtilsService', 'ViewService', '$modal', '$templateCache', '$window', '$timeout', 'growl', 'CKEDITOR', '_', mmsCkeditor]);
+.directive('mmsCkeditor', ['CacheService', 'ElementService', 'UtilsService', 'ViewService', '$uibModal', '$templateCache', '$window', '$timeout', 'growl', 'CKEDITOR', '_', mmsCkeditor]);
 
 /**
  * @ngdoc directive
@@ -12,7 +12,7 @@ angular.module('mms.directives')
  * @requires mms.ElementService
  * @requires mms.UtilsService
  * @requires mms.ViewService
- * @requires $modal
+ * @requires $uibModal
  * @requires $templateCache
  * @requires $window
  * @requires $timeout
@@ -34,7 +34,7 @@ angular.module('mms.directives')
  *      that can be transcluded. Regardless, transclusion allows keyword searching 
  *      elements to transclude from alfresco
  */
-function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $modal, $templateCache, $window, $timeout, growl, CKEDITOR, _) { //depends on angular bootstrap
+function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $uibModal, $templateCache, $window, $timeout, growl, CKEDITOR, _) { //depends on angular bootstrap
     var generatedIds = 0;
 
     var mmsCkeditorLink = function(scope, element, attrs, ngModelCtrl) {
@@ -51,7 +51,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $m
           var proposeModalTemplate = $templateCache.get('mms/templates/mmsProposeModal.html');
 
 
-        var transcludeCtrl = function($scope, $modalInstance, autocomplete) {
+        var transcludeCtrl = function($scope, $uibModalInstance, autocomplete) {
             var autocompleteName;
             var autocompleteProperty;
             var autocompleteElementId;
@@ -78,13 +78,13 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $m
             $scope.showProposeLink = true;
             $scope.choose = function(elem, property) {
                 var tag = '<mms-transclude-' + property + ' data-mms-eid="' + elem.sysmlid + '">[cf:' + elem.name + '.' + property + ']</mms-transclude-' + property + '> ';
-                $modalInstance.close(tag);
+                $uibModalInstance.close(tag);
             };
             $scope.cancel = function() {
-                $modalInstance.dismiss();
+                $uibModalInstance.dismiss();
             };
             $scope.openProposeModal = function() {
-                $modalInstance.close(false);
+                $uibModalInstance.close(false);
             };
              // Set search result options
             $scope.searchOptions= {};
@@ -157,19 +157,19 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $m
             $scope.autocomplete = function(success) {
                 if (success) {
                     var tag = '<mms-transclude-' + autocompleteProperty + ' data-mms-eid="' + autocompleteElementId + '">[cf:' + autocompleteName + '.' + autocompleteProperty + ']</mms-transclude-' + autocompleteProperty + '> ';
-                    $modalInstance.close(tag);
+                    $uibModalInstance.close(tag);
                 } else {
-                    $modalInstance.close(false);
+                    $uibModalInstance.close(false);
                 }
             };
         };
 
         var autocompleteCallback = function(ed) {
-            var instance = $modal.open({
+            var instance = $uibModal.open({
                 template: autocompleteModalTemplate,
                 scope: scope,
                 resolve: {autocomplete: true},
-                controller: ['$scope', '$modalInstance', 'autocomplete', transcludeCtrl],
+                controller: ['$scope', '$uibModalInstance', 'autocomplete', transcludeCtrl],
                 size: 'sm'
             });
 
@@ -188,11 +188,11 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $m
         };
 
         var transcludeCallback = function(ed, fromAutocomplete) {
-            var instance = $modal.open({
+            var instance = $uibModal.open({
                 template: transcludeModalTemplate,
                 scope: scope,
                 resolve: {autocomplete: false},
-                controller: ['$scope', '$modalInstance', 'autocomplete', transcludeCtrl],
+                controller: ['$scope', '$uibModalInstance', 'autocomplete', transcludeCtrl],
                 size: 'lg'
             });
             instance.result.then(function(tag) {
@@ -212,10 +212,10 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $m
         };
 
         var proposeCallback = function(ed) {
-            var instance = $modal.open({
+            var instance = $uibModal.open({
                 template: proposeModalTemplate,
                 scope: scope,
-                controller: ['$scope', '$modalInstance', transcludeCtrl],
+                controller: ['$scope', '$uibModalInstance', transcludeCtrl],
                 size: 'lg'
             });
             instance.result.then(function(tag) {
@@ -224,7 +224,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $m
             });
         };
 
-        var transcludeViewLinkCtrl = function($scope, $modalInstance) {
+        var transcludeViewLinkCtrl = function($scope, $uibModalInstance) {
             $scope.title = 'INSERT VIEW LINK';
             $scope.description = 'Search for a view or content element, click on its name to insert link.';
             $scope.choose = function(elem) {
@@ -251,7 +251,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $m
                 if (peid) 
                     tag += ' data-mms-peid="' + peid + '"';
                 tag += '>[cf:' + elem.name + '.vlink]</mms-view-link> ';
-                $modalInstance.close(tag);
+                $uibModalInstance.close(tag);
             };
             $scope.chooseDoc = function(doc, view, elem) {
                 var did = doc.sysmlid;
@@ -269,10 +269,10 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $m
                 if (peid) 
                     tag += ' data-mms-peid="' + peid + '"';
                 tag += '>[cf:' + elem.name + '.vlink]</mms-view-link> ';
-                $modalInstance.close(tag);
+                $uibModalInstance.close(tag);
             };
             $scope.cancel = function() {
-                $modalInstance.dismiss();
+                $uibModalInstance.dismiss();
             };
             $scope.mainSearchFilter = function(data) {
                 var views = [];
@@ -294,10 +294,10 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $m
         };
 
         var viewLinkCallback = function(ed) {
-            var instance = $modal.open({
+            var instance = $uibModal.open({
                 template: transcludeModalTemplate,
                 scope: scope,
-                controller: ['$scope', '$modalInstance', transcludeViewLinkCtrl],
+                controller: ['$scope', '$uibModalInstance', transcludeViewLinkCtrl],
                 size: 'lg'
             });
             instance.result.then(function(tag) {
@@ -306,7 +306,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $m
             });
         };
 
-        var commentCtrl = function($scope, $modalInstance) {
+        var commentCtrl = function($scope, $uibModalInstance) {
             var sysmlid = UtilsService.createMmsId();
             $scope.comment = {
                 sysmlid: sysmlid,
@@ -330,7 +330,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $m
                 ElementService.createElement($scope.comment, scope.mmsWs, scope.mmsSite)
                 .then(function(data) {
                     var tag = '<mms-transclude-com data-mms-eid="' + data.sysmlid + '">comment:' + data.creator + '</mms-transclude-com> ';
-                    $modalInstance.close(tag);
+                    $uibModalInstance.close(tag);
                 }, function(reason) {
                     growl.error("Comment Error: " + reason.message);
                 }).finally(function() {
@@ -338,15 +338,15 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $m
                 });
             };
             $scope.cancel = function() {
-                $modalInstance.dismiss();
+                $uibModalInstance.dismiss();
             };
         };
 
         var commentCallback = function(ed) {
-            var instance = $modal.open({
+            var instance = $uibModal.open({
                 template: commentModalTemplate,
                 scope: scope,
-                controller: ['$scope', '$modalInstance', commentCtrl]
+                controller: ['$scope', '$uibModalInstance', commentCtrl]
             });
             instance.result.then(function(tag) {
                 // ed.selection.collapse(false);

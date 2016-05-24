@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsHistory', ['Utils','ElementService', 'WorkspaceService', '$compile', '$templateCache', '$modal', '$q', '_', mmsHistory]);
+.directive('mmsHistory', ['Utils','ElementService', 'WorkspaceService', '$compile', '$templateCache', '$uibModal', '$q', '_', mmsHistory]);
 
 /**
  * @ngdoc directive
@@ -28,7 +28,7 @@ angular.module('mms.directives')
  * @param {string=master} mmsWs Workspace to use, defaults to master
  * @param {string=latest} mmsVersion Version can be alfresco version number or timestamp, default is latest
  */
-function mmsHistory(Utils, ElementService, WorkspaceService, $compile, $templateCache, $modal, $q, _) {
+function mmsHistory(Utils, ElementService, WorkspaceService, $compile, $templateCache, $uibModal, $q, _) {
     var template = $templateCache.get('mms/templates/mmsHistory.html');
 
     var mmsHistoryLink = function(scope, element, attrs) {

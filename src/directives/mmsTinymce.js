@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsTinymce', ['ElementService', 'ViewService', 'CacheService', '$modal', '$templateCache', '$window', '$timeout', 'growl', 'tinymce','UtilsService','_', mmsTinymce]);
+.directive('mmsTinymce', ['ElementService', 'ViewService', 'CacheService', '$uibModal', '$templateCache', '$window', '$timeout', 'growl', 'tinymce','UtilsService','_', mmsTinymce]);
 
 /**
  * @ngdoc directive
@@ -10,7 +10,7 @@ angular.module('mms.directives')
  *
  * @requires mms.ElementService
  * @requires mms.ViewService
- * @requires $modal
+ * @requires $uibModal
  * @requires $templateCache
  * @requires $window
  * @requires $timeout
@@ -30,7 +30,7 @@ angular.module('mms.directives')
  *      that can be transcluded. Regardless, transclusion allows keyword searching 
  *      elements to transclude from alfresco
  */
-function mmsTinymce(ElementService, ViewService, CacheService, $modal, $templateCache, $window, $timeout, growl, tinymce, UtilsService, _) { //depends on angular bootstrap
+function mmsTinymce(ElementService, ViewService, CacheService, $uibModal, $templateCache, $window, $timeout, growl, tinymce, UtilsService, _) { //depends on angular bootstrap
     var generatedIds = 0;
 
     var mmsTinymceLink = function(scope, element, attrs, ngModelCtrl) {
@@ -45,7 +45,7 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
         var viewLinkModalTemplate = $templateCache.get('mms/templates/mmsViewLinkModal.html');
         var proposeModalTemplate = $templateCache.get('mms/templates/mmsProposeModal.html');
 
-        var transcludeCtrl = function($scope, $modalInstance, autocomplete) {
+        var transcludeCtrl = function($scope, $uibModalInstance, autocomplete) {
             var autocompleteName;
             var autocompleteProperty;
             var autocompleteElementId;
@@ -71,13 +71,13 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
             $scope.showProposeLink = true;
             $scope.choose = function(elem, property) {
                 var tag = '<mms-transclude-' + property + ' data-mms-eid="' + elem.sysmlid + '">[cf:' + elem.name + '.' + property + ']</mms-transclude-' + property + '> ';
-                $modalInstance.close(tag);
+                $uibModalInstance.close(tag);
             };
             $scope.cancel = function() {
-                $modalInstance.dismiss();
+                $uibModalInstance.dismiss();
             };
             $scope.openProposeModal = function() {
-                $modalInstance.close(false);
+                $uibModalInstance.close(false);
             };
             // Set search result options
             $scope.searchOptions= {};
@@ -150,19 +150,19 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
             $scope.autocomplete = function(success) {
                 if (success) {
                     var tag = '<mms-transclude-' + autocompleteProperty + ' data-mms-eid="' + autocompleteElementId + '">[cf:' + autocompleteName + '.' + autocompleteProperty + ']</mms-transclude-' + autocompleteProperty + '> ';
-                    $modalInstance.close(tag);
+                    $uibModalInstance.close(tag);
                 } else {
-                    $modalInstance.close(false);
+                    $uibModalInstance.close(false);
                 }
             };
         };
 
         var autocompleteCallback = function(ed) {
-            var instance = $modal.open({
+            var instance = $uibModal.open({
                 template: autocompleteModalTemplate,
                 scope: scope,
                 resolve: {autocomplete: true},
-                controller: ['$scope', '$modalInstance', 'autocomplete', transcludeCtrl],
+                controller: ['$scope', '$uibModalInstance', 'autocomplete', transcludeCtrl],
                 size: 'sm'
             });
 
@@ -180,11 +180,11 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
         };
 
         var transcludeCallback = function(ed, fromAutocomplete) {
-            var instance = $modal.open({
+            var instance = $uibModal.open({
                 template: transcludeModalTemplate,
                 scope: scope,
                 resolve: {autocomplete: false},
-                controller: ['$scope', '$modalInstance', 'autocomplete', transcludeCtrl],
+                controller: ['$scope', '$uibModalInstance', 'autocomplete', transcludeCtrl],
                 size: 'lg'
             });
             instance.result.then(function(tag) {
@@ -205,10 +205,10 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
         };
 
         var proposeCallback = function(ed) {
-            var instance = $modal.open({
+            var instance = $uibModal.open({
                 template: proposeModalTemplate,
                 scope: scope,
-                controller: ['$scope', '$modalInstance', transcludeCtrl],
+                controller: ['$scope', '$uibModalInstance', transcludeCtrl],
                 size: 'lg'
             });
             instance.result.then(function(tag) {
@@ -217,7 +217,7 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
             });
         };
 
-        var transcludeViewLinkCtrl = function($scope, $modalInstance) {
+        var transcludeViewLinkCtrl = function($scope, $uibModalInstance) {
             $scope.title = 'INSERT VIEW LINK';
             $scope.description = 'Search for a view or content element, click on its name to insert link.';
             $scope.choose = function(elem) {
@@ -244,7 +244,7 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                 if (peid) 
                     tag += ' data-mms-peid="' + peid + '"';
                 tag += '>[cf:' + elem.name + '.vlink]</mms-view-link> ';
-                $modalInstance.close(tag);
+                $uibModalInstance.close(tag);
             };
             $scope.chooseDoc = function(doc, view, elem) {
                 var did = doc.sysmlid;
@@ -262,10 +262,10 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                 if (peid) 
                     tag += ' data-mms-peid="' + peid + '"';
                 tag += '>[cf:' + elem.name + '.vlink]</mms-view-link> ';
-                $modalInstance.close(tag);
+                $uibModalInstance.close(tag);
             };
             $scope.cancel = function() {
-                $modalInstance.dismiss();
+                $uibModalInstance.dismiss();
             };
             $scope.mainSearchFilter = function(data) {
                 var views = [];
@@ -287,10 +287,10 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
         };
 
         var viewLinkCallback = function(ed) {
-            var instance = $modal.open({
+            var instance = $uibModal.open({
                 template: transcludeModalTemplate,
                 scope: scope,
-                controller: ['$scope', '$modalInstance', transcludeViewLinkCtrl],
+                controller: ['$scope', '$uibModalInstance', transcludeViewLinkCtrl],
                 size: 'lg'
             });
             instance.result.then(function(tag) {
@@ -299,7 +299,7 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
             });
         };
 
-        var commentCtrl = function($scope, $modalInstance) {
+        var commentCtrl = function($scope, $uibModalInstance) {
             var sysmlid = UtilsService.createMmsId();
             $scope.comment = {
                 sysmlid: sysmlid,
@@ -323,7 +323,7 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                 ElementService.createElement($scope.comment, scope.mmsWs, scope.mmsSite)
                 .then(function(data) {
                     var tag = '<mms-transclude-com data-mms-eid="' + data.sysmlid + '">comment:' + data.creator + '</mms-transclude-com> ';
-                    $modalInstance.close(tag);
+                    $uibModalInstance.close(tag);
                 }, function(reason) {
                     growl.error("Comment Error: " + reason.message);
                 }).finally(function() {
@@ -331,15 +331,15 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
                 });
             };
             $scope.cancel = function() {
-                $modalInstance.dismiss();
+                $uibModalInstance.dismiss();
             };
         };
 
         var commentCallback = function(ed) {
-            var instance = $modal.open({
+            var instance = $uibModal.open({
                 template: commentModalTemplate,
                 scope: scope,
-                controller: ['$scope', '$modalInstance', commentCtrl]
+                controller: ['$scope', '$uibModalInstance', commentCtrl]
             });
             instance.result.then(function(tag) {
                 ed.selection.collapse(false);
@@ -347,7 +347,7 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
             });
         };
 
-        var imageCtrl = function($scope, $modalInstance) {
+        var imageCtrl = function($scope, $uibModalInstance) {
             $scope.fileChanged = function(input) {
                 var file = input.files[0];
                 var reader = new $window.FileReader();
@@ -359,10 +359,10 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
             };
             $scope.image = {src: ''};
             $scope.ok = function() {
-                $modalInstance.close($scope.image);
+                $uibModalInstance.close($scope.image);
             };
             $scope.cancel = function() {
-                $modalInstance.dismiss();
+                $uibModalInstance.dismiss();
             };
         };
 
@@ -370,10 +370,10 @@ function mmsTinymce(ElementService, ViewService, CacheService, $modal, $template
             angular.element('#mce-modal-block').css('z-index', 98);
             var tinymceModalId = $window.tinymce.activeEditor.windowManager.getWindows()[0]._id;
             angular.element('#' + tinymceModalId).css('z-index', 99);
-            var instance = $modal.open({
+            var instance = $uibModal.open({
                 template: chooseImageModalTemplate,
                 scope: scope,
-                controller: ['$scope', '$modalInstance', imageCtrl]
+                controller: ['$scope', '$uibModalInstance', imageCtrl]
             });
             instance.result.then(function(image) {
                 callback(image.src);

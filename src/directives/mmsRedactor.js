@@ -1,15 +1,15 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsRedactor', ['ElementService', 'ViewService', '$modal', '$templateCache', '$window', 'growl', mmsRedactor]);
+.directive('mmsRedactor', ['ElementService', 'ViewService', '$uibModal', '$templateCache', '$window', 'growl', mmsRedactor]);
 
-function mmsRedactor(ElementService, ViewService, $modal, $templateCache, $window, growl) { //depends on angular bootstrap
+function mmsRedactor(ElementService, ViewService, $uibModal, $templateCache, $window, growl) { //depends on angular bootstrap
 
     var mmsRedactorLink = function(scope, element, attrs, ngModelCtrl) {
         var transcludeModalTemplate = $templateCache.get('mms/templates/mmsCfModal.html');
         var commentModalTemplate = $templateCache.get('mms/templates/mmsCommentModal.html');
 
-        var transcludeCtrl = function($scope, $modalInstance) {
+        var transcludeCtrl = function($scope, $uibModalInstance) {
             $scope.searchClass = "";
             $scope.proposeClass = "";
             var originalElements = $scope.mmsCfElements;
@@ -17,10 +17,10 @@ function mmsRedactor(ElementService, ViewService, $modal, $templateCache, $windo
             $scope.searchText = '';
             $scope.choose = function(elementId, property, name) {
                 var tag = '<mms-transclude-' + property + ' data-mms-eid="' + elementId + '">[cf:' + name + '.' + property + ']</mms-transclude-' + property + '>&nbsp;';
-                $modalInstance.close(tag);
+                $uibModalInstance.close(tag);
             };
             $scope.cancel = function() {
-                $modalInstance.dismiss();
+                $uibModalInstance.dismiss();
             };
             $scope.search = function(searchText) {
                 //var searchText = $scope.searchText; //TODO investigate why searchText isn't in $scope
@@ -51,7 +51,7 @@ function mmsRedactor(ElementService, ViewService, $modal, $templateCache, $windo
             };
         };
 
-        var commentCtrl = function($scope, $modalInstance) {
+        var commentCtrl = function($scope, $uibModalInstance) {
             $scope.comment = {
                 name: '', 
                 documentation: '', 
@@ -65,22 +65,22 @@ function mmsRedactor(ElementService, ViewService, $modal, $templateCache, $windo
                 ElementService.createElement($scope.comment)
                 .then(function(data) {
                     var tag = '<mms-transclude-com data-mms-eid="' + data.sysmlid + '">comment:' + data.author + '</mms-transclude-com> ';
-                    $modalInstance.close(tag);
+                    $uibModalInstance.close(tag);
                 }, function(reason) {
                     growl.error("Comment Error: " + reason.message);
                 });
             };
             $scope.cancel = function() {
-                $modalInstance.dismiss();
+                $uibModalInstance.dismiss();
             };
         };
 
         var transcludeCallback = function() {
             element.redactor('selectionSave'); //this is needed to preserve element.redactor(selection used by insertHTML
-            var instance = $modal.open({
+            var instance = $uibModal.open({
                 template: transcludeModalTemplate,
                 scope: scope,
-                controller: ['$scope', '$modalInstance', transcludeCtrl],
+                controller: ['$scope', '$uibModalInstance', transcludeCtrl],
                 size: 'lg'
             });
             instance.result.then(function(tag) {
@@ -95,10 +95,10 @@ function mmsRedactor(ElementService, ViewService, $modal, $templateCache, $windo
 
         var commentCallback = function() {
             element.redactor('selectionSave');
-            var instance = $modal.open({
+            var instance = $uibModal.open({
                 template: commentModalTemplate,
                 scope: scope,
-                controller: ['$scope', '$modalInstance', commentCtrl],
+                controller: ['$scope', '$uibModalInstance', commentCtrl],
             });
             instance.result.then(function(tag) {
                 element.redactor('selectionRestore');

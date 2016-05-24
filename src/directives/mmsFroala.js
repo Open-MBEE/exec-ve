@@ -1,23 +1,23 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsFroala', ['ElementService', 'ViewService', '$modal', '$templateCache', mmsFroala]);
+.directive('mmsFroala', ['ElementService', 'ViewService', '$uibModal', '$templateCache', mmsFroala]);
 
-function mmsFroala(ElementService, ViewService, $modal, $templateCache) { //depends on angular bootstrap
+function mmsFroala(ElementService, ViewService, $uibModal, $templateCache) { //depends on angular bootstrap
     
     var mmsFroalaLink = function(scope, element, attrs, ngModelCtrl) {
         var transcludeModalTemplate = $templateCache.get('mms/templates/mmsCfModal.html');
         var commentModalTemplate = $templateCache.get('mms/templates/mmsCommentModal.html');
 
-        var modalCtrl = function($scope, $modalInstance) {
+        var modalCtrl = function($scope, $uibModalInstance) {
             $scope.filter = '';
             $scope.searchText = '';
             $scope.choose = function(elementId, property, name) {
                 var tag = '<mms-transclude-' + property + ' data-mms-eid="' + elementId + '">[cf:' + name + '.' + property + ']</mms-transclude-' + property + '>';
-                $modalInstance.close(tag);
+                $uibModalInstance.close(tag);
             };
             $scope.cancel = function() {
-                $modalInstance.dismiss();
+                $uibModalInstance.dismiss();
             };
             $scope.search = function(searchText) {
                 //var searchText = $scope.searchText; //TODO investigate why searchText isn't in $scope
@@ -33,7 +33,7 @@ function mmsFroala(ElementService, ViewService, $modal, $templateCache) { //depe
             };
         };
 
-        var commentCtrl = function($scope, $modalInstance) {
+        var commentCtrl = function($scope, $uibModalInstance) {
             $scope.comment = {
                 name: '', 
                 documentation: '', 
@@ -42,19 +42,19 @@ function mmsFroala(ElementService, ViewService, $modal, $templateCache) { //depe
                 }
             };
             $scope.ok = function() {
-                $modalInstance.close($scope.comment);
+                $uibModalInstance.close($scope.comment);
             };
             $scope.cancel = function() {
-                $modalInstance.dismiss();
+                $uibModalInstance.dismiss();
             };
         };
 
         var transcludeCallback = function(editor) {
             editor.saveSelection(); //this is needed to preserve editor selection used by insertHTML
-            var instance = $modal.open({
+            var instance = $uibModal.open({
                 template: transcludeModalTemplate,
                 scope: scope,
-                controller: ['$scope', '$modalInstance', modalCtrl],
+                controller: ['$scope', '$uibModalInstance', modalCtrl],
                 size: 'lg'
             });
             instance.result.then(function(tag) {
@@ -68,10 +68,10 @@ function mmsFroala(ElementService, ViewService, $modal, $templateCache) { //depe
 
         var commentCallback = function(editor) {
             editor.saveSelection();
-            var instance = $modal.open({
+            var instance = $uibModal.open({
                 template: commentModalTemplate,
                 scope: scope,
-                controller: ['$scope', '$modalInstance', commentCtrl],
+                controller: ['$scope', '$uibModalInstance', commentCtrl],
             });
             instance.result.then(function(comment) {
                 if (ViewService.getCurrentViewId())
