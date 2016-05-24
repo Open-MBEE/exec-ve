@@ -18,12 +18,12 @@ function mmsViewSection($compile, $templateCache, $rootScope, ElementService, Vi
         $scope.bbApi.init = function() {
             if (!$scope.buttonsInit) {
                 $scope.buttonsInit = true;
-                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.preview", $scope));
-                $scope.bbApi.addButton(UxService.getButtonBarButton("section.add.dropdown", $scope));
-                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.save", $scope));
-                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.cancel", $scope));
-                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.delete", $scope));
-                $scope.bbApi.setPermission("presentation.element.delete", $scope.isDirectChildOfPresentationElement);
+                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-preview", $scope));
+                $scope.bbApi.addButton(UxService.getButtonBarButton("section-add-dropdown", $scope));
+                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-save", $scope));
+                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-cancel", $scope));
+                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-delete", $scope));
+                $scope.bbApi.setPermission("presentation-element-delete", $scope.isDirectChildOfPresentationElement);
             }     
         };
 
