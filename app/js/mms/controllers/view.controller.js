@@ -95,7 +95,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         }
         if ($state.includes('workspace.site')) {
             $scope.bbApi.addButton(UxService.getButtonBarButton('print'));
-            if ($state.includes('workspace-site-document'))
+            if ($state.includes('workspace.site.document'))
                 $scope.bbApi.addButton(UxService.getButtonBarButton('convert-pdf'));
             $scope.bbApi.addButton(UxService.getButtonBarButton('word'));
             $scope.bbApi.addButton(UxService.getButtonBarButton('tabletocsv'));

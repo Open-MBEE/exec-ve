@@ -164,7 +164,7 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
             });
         }, function() {
             converting = false;
-            $scope.bbApi.toggleButtonSpinner('convert.pdf');
+            $scope.bbApi.toggleButtonSpinner('convert-pdf');
         });
     });
 
