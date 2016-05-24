@@ -93,9 +93,10 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
                 $scope.bbApi.addButton(fakeDropdown);
             }
         }
-        if ($state.includes('workspace.site.document')) {
+        if ($state.includes('workspace.site')) {
             $scope.bbApi.addButton(UxService.getButtonBarButton('print'));
-            $scope.bbApi.addButton(UxService.getButtonBarButton('convert-pdf'));
+            if ($state.includes('workspace-site-document'))
+                $scope.bbApi.addButton(UxService.getButtonBarButton('convert-pdf'));
             $scope.bbApi.addButton(UxService.getButtonBarButton('word'));
             $scope.bbApi.addButton(UxService.getButtonBarButton('tabletocsv'));
         }
@@ -138,8 +139,13 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         }
     };
 
+<<<<<<< HEAD
     $scope.$on('convert-pdf', function() {
         MmsAppUtils.popupPrintConfirm(view, $scope.ws, time, false, false, true);
+=======
+    $scope.$on('convert.pdf', function() {
+        MmsAppUtils.popupPrintConfirm(view, $scope.ws, time, false, false, true, true);
+>>>>>>> develop
     });
 
     $scope.$on('view-add-paragraph', function() {
@@ -311,11 +317,14 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     };
     $scope.searchOptions.relatedCallback = $scope.searchGoToDocument;
 
+    var docOption = false;
+    if ($state.includes('workspace.site.document'))
+        docOption = true;
     $scope.$on('print', function() {
-        MmsAppUtils.popupPrintConfirm(view, $scope.ws, time, false, true, false);
+        MmsAppUtils.popupPrintConfirm(view, $scope.ws, time, false, true, false, docOption);
     });
     $scope.$on('word', function() {
-        MmsAppUtils.popupPrintConfirm(view, $scope.ws, time, false, false, false);
+        MmsAppUtils.popupPrintConfirm(view, $scope.ws, time, false, false, false, docOption);
     });
     $scope.$on('tabletocsv', function() {
         MmsAppUtils.tableToCsv(view, $scope.ws, time, false);

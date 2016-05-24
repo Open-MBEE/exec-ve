@@ -117,10 +117,11 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
     $scope.$on('convert-pdf', function() {
         if (converting) {
             growl.info("Please wait...");
+            return;
         }
         converting = true;
         $scope.bbApi.toggleButtonSpinner('convert-pdf');
-        MmsAppUtils.popupPrintConfirm(document, $scope.ws, time, true, false, true)
+        MmsAppUtils.popupPrintConfirm(document, $scope.ws, time, true, false, true, false, tag)
         .then(function(ob) {
             var cover = ob.cover;
             var html = ob.contents;
@@ -134,7 +135,14 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
             doc.version = ob.version;
             doc.dnum = ob.dnum;
             doc.displayTime = ob.time;
+            doc.toc = ob.toc;
             doc.workspace = $scope.ws;
+            doc.customCss = UtilsService.getPrintCss();
+            if (!ob.genTotf) {
+                doc.tof = '<div style="display:none;"></div>';
+                doc.tot = '<div style="display:none;"></div>';
+            }
+
             doc.name = document.sysmlid + '_' + time + '_' + new Date().getTime();
             if(time == 'latest') 
                 doc.tagId = time;
@@ -154,6 +162,9 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
                 converting = false;
                 $scope.bbApi.toggleButtonSpinner('convert-pdf');
             });
+        }, function() {
+            converting = false;
+            $scope.bbApi.toggleButtonSpinner('convert.pdf');
         });
     });
 
@@ -191,10 +202,10 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
     });
 
     $scope.$on('print', function() {
-        MmsAppUtils.popupPrintConfirm(document, $scope.ws, time, true, true, false);
+        MmsAppUtils.popupPrintConfirm(document, $scope.ws, time, true, true, false, false, tag);
     });
     $scope.$on('word', function() {
-        MmsAppUtils.popupPrintConfirm(document, $scope.ws, time, true, false, false);
+        MmsAppUtils.popupPrintConfirm(document, $scope.ws, time, true, false, false, false, tag);
     });
     $scope.$on('tabletocsv', function() {
         MmsAppUtils.tableToCsv(document, $scope.ws, time, true);

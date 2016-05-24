@@ -14,7 +14,14 @@
 
 
 .ng-hide {display: none !important;}
-
+.nav_breadcrumb {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+div.tooltip-inner {
+  white-space: normal;
+}
 @media print {
   a[href]:after {
     content: none !important;

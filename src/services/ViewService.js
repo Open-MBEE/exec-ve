@@ -933,6 +933,10 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             // for opaque presentation elements, or slots:
 
             var instanceSpecSpec = instanceSpec.specialization.instanceSpecificationSpecification;
+            if (!instanceSpecSpec) {
+                deferred.reject({status: 500, message: 'missing specification'});
+                return;
+            }
             var type = instanceSpecSpec.type;
 
             // If it is a Opaque List, Paragraph, Table, Image, List:
@@ -1143,6 +1147,10 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         return false;
     };
 
+    var reset = function() {
+        inProgress = {};
+    };
+    
     return {
         getView: getView,
         getViews: getViews,
@@ -1173,7 +1181,9 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         TYPE_TO_CLASSIFIER_ID: TYPE_TO_CLASSIFIER_ID,
         getInstanceSpecification : getInstanceSpecification,
         getElementReferenceTree : getElementReferenceTree,
-        getDocMetadata: getDocMetadata
+        getDocMetadata: getDocMetadata,
+
+        reset: reset
     };
 
 }
