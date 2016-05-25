@@ -105,6 +105,9 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                           });
                     };
                 }   
+            },
+            'menu':{
+                template: '<p class="pull-left" style="font-weight: 200; line-height: 1.28571em; padding-left:10px;">View Editor</p>'
             }
         }
     })
