@@ -313,7 +313,14 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
     var generateHtml = function(ob, ws, time, isDoc, genCover, genTotf, tag) {
         var deferred = $q.defer();
         var printContents = '';//$window.document.getElementById('print-div').outerHTML;
-        var printElementCopy = angular.element('#print-div').clone();//angular.element(printContents);
+        var printElementCopy = angular.element('#print-div');
+        printElementCopy.find('table').addClass(function() {
+            if ($(this).width() > 1400) {
+                return "big-table";
+            }
+            return "";
+        });
+        printElementCopy = printElementCopy.clone();//angular.element(printContents);
         var hostname = $location.host();
         var port = $location.port();
         var protocol = $location.protocol();
@@ -384,7 +391,14 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
 
     var popupPrint = function(ob, ws, time, isDoc, print, genCover, tag) {
         var printContents = '';//$window.document.getElementById('print-div').outerHTML;
-        var printElementCopy = angular.element('#print-div').clone();//angular.element(printContents);
+        var printElementCopy = angular.element('#print-div');//angular.element(printContents);
+        printElementCopy.find('table').addClass(function() {
+            if ($(this).width() > 1400) {
+                return "big-table";
+            }
+            return "";
+        });
+        printElementCopy = printElementCopy.clone();//angular.element(printContents);
         var hostname = $location.host();
         var port = $location.port();
         var protocol = $location.protocol();

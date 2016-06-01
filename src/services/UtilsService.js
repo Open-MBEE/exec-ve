@@ -452,7 +452,9 @@ function UtilsService(CacheService, _) {
                 ".toc ul {padding-left:4em;}" +
                 ".toc > ul {padding-left:0;}" +
                 ".toc li > a[href]::after {content: leader('.') target-counter(attr(href), page);}" +
-                "@page{prince-shrink-to-fit:auto;size: A4 portrait;margin-left:8mm;margin-right:8mm;}";
+                "@page big_table { size: 11in 8.5in; prince-shrink-to-fit:auto;}" + 
+                ".big-table {page: big_table;}";
+                //"@page{prince-shrink-to-fit:auto;size: A4 portrait;margin-left:8mm;margin-right:8mm;}";
     };
 
     return {
