@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsPerspectives', ['SiteService', 'ElementService', 'WorkspaceService', 'ConfigService', '$state', '$templateCache', '$window', 'growl', 'ApplicationService', '$modal', '$q', mmsPerspectives]);
+.directive('mmsPerspectives', ['SiteService', 'ElementService', 'WorkspaceService', 'ConfigService', '$state', '$templateCache', '$window', 'growl', 'ApplicationService', 'AuthService', '$modal', '$q', mmsPerspectives]);
 
 /**
  * @ngdoc directive
@@ -22,7 +22,7 @@ angular.module('mms.directives')
  * Tom Saywer Persectives JS library.
  *
  */
-function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigService, $state, $templateCache, $window, growl, ApplicationService, $modal, $q) {
+function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigService, $state, $templateCache, $window, growl, ApplicationService, AuthService, $modal, $q) {
     var template = $templateCache.get('mms/templates/mmsPerspectives.html');
     var mapping = {};
     var deferreds = {};
@@ -177,7 +177,7 @@ function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigSe
                             "command": "Custom",
                             "data": {
                                 "serverClassName": "gov.nasa.jpl.mbee.ems.ResetIntegratorCommandImpl",
-                                "args": ["int-rest-" + id],
+                                "args": ["int-add-" + id],
                                 "modelID": 'model-' + id,
                                 "module": "MMS",
                                 "project": id,
@@ -192,7 +192,7 @@ function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigSe
                             "data": {
                                 "project": id,
                                 "module":"MMS",
-                                "integratorIDs":["int-rest-" + id]
+                                "integratorIDs":["int-add-" + id]
                             }
                         },
                     ]
@@ -228,30 +228,8 @@ function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigSe
                         "project": id,
                         "module":"MMS",
                         "modelID":"model-" + id,
-                        "integratorName":"MMS INIT",
-                        "integratorID":"int-init-" + id,
-                        //"integratorFileLocation": "https://cae-ems.jpl.nasa.gov/alfresco/service"
-                    }
-                },
-                {
-                    "command":"NewIntegrator",
-                    "data": {
-                        "project": id,
-                        "module":"MMS",
-                        "modelID":"model-" + id,
-                        "integratorName":"MMS REST",
-                        "integratorID":"int-rest-" + id,
-                        //"integratorFileLocation": "https://cae-ems.jpl.nasa.gov/alfresco/service"
-                    }
-                },
-                {
-                    "command":"NewIntegrator",
-                    "data": {
-                        "project": id,
-                        "module":"MMS",
-                        "modelID":"model-" + id,
-                        "integratorName":"MMS SAVE",
-                        "integratorID":"int-save-" + id,
+                        "integratorName":"MMS ADD",
+                        "integratorID":"int-add-" + id,
                         //"integratorFileLocation": "https://cae-ems.jpl.nasa.gov/alfresco/service"
                     }
                 },
@@ -278,7 +256,7 @@ function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigSe
                     "command": "Custom",
                     "data": {
                         "serverClassName": "gov.nasa.jpl.mbee.ems.SetMmsRestBaseUrlCommandImpl",
-                        "args": ["int-init-" + id, "https://cae-ems-uat.jpl.nasa.gov/alfresco/service"],
+                        "args": ["int-add-" + id, "https://cae-ems-uat.jpl.nasa.gov/alfresco/service"],
                         "modelID": 'model-' + id,
                         "module": "MMS",
                         "project": id,
@@ -287,33 +265,9 @@ function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigSe
                     }
                 }, 
                 {
-                    "command": "Custom",
-                    "data": {
-                        "serverClassName": "gov.nasa.jpl.mbee.ems.SetMmsRestBaseUrlCommandImpl",
-                        "args": ["int-rest-" + id, "https://cae-ems-uat.jpl.nasa.gov/alfresco/service"],
-                        "modelID": 'model-' + id,
-                        "module": "MMS",
-                        "project": id,
-                        "viewID": "view-" + id,
-                        "viewName": "Drawing View 1"
-                    }
-                },
-                {
-                    "command": "Custom",
-                    "data": {
-                        "serverClassName": "gov.nasa.jpl.mbee.ems.SetMmsRestBaseUrlCommandImpl",
-                        "args": ["int-save-" + id, "https://cae-ems-uat.jpl.nasa.gov/alfresco/service"],
-                        "modelID": 'model-' + id,
-                        "module": "MMS",
-                        "project": id,
-                        "viewID": "view-" + id,
-                        "viewName": "Drawing View 1"
-                    }
-                },
-                {
                     "command": "SetModelAttribute",
                     "data": {
-                        "attributeName": "InitElements",
+                        "attributeName": "AddElements",
                         "attributeValue": getElementsArrayString(initElements),
                         "modelID": 'model-' + id,
                         "module": "MMS",
@@ -326,8 +280,8 @@ function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigSe
                 {
                     "command": "SetModelAttribute",
                     "data": {
-                        "attributeName": "Peid",
-                        "attributeValue": scope.mmsPeid,
+                        "attributeName": "Ticket",
+                        "attributeValue": AuthService.getTicket(),
                         "modelID": 'model-' + id,
                         "module": "MMS",
                         "project": id,
@@ -343,7 +297,7 @@ function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigSe
                     "data": {
                         "project": id,
                         "module":"MMS",
-                        "integratorIDs":["int-init-" + id]
+                        "integratorIDs":["int-add-" + id]
                     }
                }
             ]
