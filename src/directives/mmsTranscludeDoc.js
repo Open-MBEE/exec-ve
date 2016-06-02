@@ -53,11 +53,20 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             }     
         };
 
+        this.getWsAndVersion = function() {
+            return {
+                workspace: $scope.ws, 
+                version: $scope.version,
+                tag: undefined
+            };
+        };
     };
 
     var mmsTranscludeDocLink = function(scope, element, attrs, controllers) {
         var mmsViewCtrl = controllers[0];
         var mmsViewPresentationElemCtrl = controllers[1];
+        var mmsCfDocCtrl = controllers[2];
+        var mmsCfValCtrl = controllers[3];
         scope.recompileScope = null;
         var processed = false;
         scope.cfType = 'doc';
@@ -134,6 +143,20 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             }
             var ws = scope.mmsWs;
             var version = scope.mmsVersion;
+            if (mmsCfValCtrl) {
+                var cfvVersion = mmsCfValCtrl.getWsAndVersion();
+                if (!ws)
+                    ws = cfvVersion.workspace;
+                if (!version)
+                    version = cfvVersion.version;
+            }
+            if (mmsCfDocCtrl) {
+                var cfdVersion = mmsCfDocCtrl.getWsAndVersion();
+                if (!ws)
+                    ws = cfdVersion.workspace;
+                if (!version)
+                    version = cfdVersion.version;
+            }
             if (mmsViewCtrl) {
                 var viewVersion = mmsViewCtrl.getWsAndVersion();
                 if (!ws)
@@ -162,6 +185,18 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                     scope.$on('element.updated', function(event, eid, ws, type, continueEdit) {
                         if (eid === scope.mmsEid && ws === scope.ws && (type === 'all' || type === 'documentation') && !continueEdit)
                             recompile();
+                    });
+                    //actions for stomp 
+                    scope.$on("stomp.element", function(event, deltaSource, deltaWorkspaceId, deltaElementId, deltaModifier, elemName){
+                        if(deltaWorkspaceId === scope.ws && deltaElementId === scope.mmsEid){
+                            if(scope.isEditing === false){
+                                recompile();
+                            }
+                            if(scope.isEditing === true){
+                                growl.warning("This documentation has been changed: " + elemName +
+                                            " modified by: " + deltaModifier, {ttl: -1});
+                            }
+                        }
                     });
                 }
                 // TODO: below has issues when having edits.  For some reason this is
@@ -271,20 +306,6 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                 scope.tinymceType = scope.presentationElem.type;
             }
         }
-        
-        //actions for stomp 
-        scope.$on("stomp.element", function(event, deltaSource, deltaWorkspaceId, deltaElementId, deltaModifier, elemName){
-            if(deltaWorkspaceId === scope.ws && deltaElementId === scope.mmsEid){
-                if(scope.isEditing === false){
-                    recompile();
-                }
-                if(scope.isEditing === true){
-                    growl.warning("This documentation has been changed: " + elemName +
-                                " modified by: " + deltaModifier, {ttl: -1});
-                }
-            }
-        });
-
     };
 
     return {
@@ -294,7 +315,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             mmsWs: '@',
             mmsVersion: '@'
         },
-        require: ['?^mmsView','?^mmsViewPresentationElem'],
+        require: ['?^^mmsView','?^^mmsViewPresentationElem', '?^^mmsTranscludeDoc', '?^^mmsTranscludeVal'],
         controller: ['$scope', mmsTranscludeDocCtrl],
         link: mmsTranscludeDocLink
     };

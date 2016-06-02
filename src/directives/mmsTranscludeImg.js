@@ -20,7 +20,10 @@ angular.module('mms.directives')
  */
 function mmsTranscludeImg(VizService, growl) {
 
-    var mmsTranscludeImgLink = function(scope, element, attrs, mmsViewCtrl) {
+    var mmsTranscludeImgLink = function(scope, element, attrs, controllers) {
+        var mmsViewCtrl = controllers[0];
+        var mmsCfDocCtrl = controllers[1];
+        var mmsCfValCtrl = controllers[2];
         var processed = false;
         element.click(function(e) {
             if (!mmsViewCtrl)
@@ -35,6 +38,20 @@ function mmsTranscludeImg(VizService, growl) {
             processed = true;
             var ws = scope.mmsWs;
             var version = scope.mmsVersion;
+            if (mmsCfValCtrl) {
+                var cfvVersion = mmsCfValCtrl.getWsAndVersion();
+                if (!ws)
+                    ws = cfvVersion.workspace;
+                if (!version)
+                    version = cfvVersion.version;
+            }
+            if (mmsCfDocCtrl) {
+                var cfdVersion = mmsCfDocCtrl.getWsAndVersion();
+                if (!ws)
+                    ws = cfdVersion.workspace;
+                if (!version)
+                    version = cfdVersion.version;
+            }
             if (mmsViewCtrl) {
                 var viewVersion = mmsViewCtrl.getWsAndVersion();
                 if (!ws)
@@ -60,7 +77,7 @@ function mmsTranscludeImg(VizService, growl) {
             mmsVersion: '@',
             mmsWs: '@'
         },
-        require: '?^mmsView',
+        require: ['?^^mmsView', '?^^mmsTranscludeDoc', '?^^mmsTranscludeVal'],
         //controller: ['$scope', controller]
         link: mmsTranscludeImgLink
     };
