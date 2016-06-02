@@ -45,7 +45,10 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
 
     };
 
-    var mmsTranscludeNameLink = function(scope, element, attrs, mmsViewCtrl) {
+    var mmsTranscludeNameLink = function(scope, element, attrs, controllers) {
+        var mmsViewCtrl = controllers[0];
+        var mmsCfDocCtrl = controllers[1];
+        var mmsCfValCtrl = controllers[2];
         var processed = false;
         scope.recompileScope = null;
         element.click(function(e) {
@@ -100,6 +103,20 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
                 idwatch();
             var ws = scope.mmsWs;
             var version = scope.mmsVersion;
+            if (mmsCfValCtrl) {
+                var cfvVersion = mmsCfValCtrl.getWsAndVersion();
+                if (!ws)
+                    ws = cfvVersion.workspace;
+                if (!version)
+                    version = cfvVersion.version;
+            }
+            if (mmsCfDocCtrl) {
+                var cfdVersion = mmsCfDocCtrl.getWsAndVersion();
+                if (!ws)
+                    ws = cfdVersion.workspace;
+                if (!version)
+                    version = cfdVersion.version;
+            }
             if (mmsViewCtrl) {
                 var viewVersion = mmsViewCtrl.getWsAndVersion();
                 if (!ws)
@@ -198,7 +215,7 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
             noClick: '@',
             clickHandler: '&?'
         },
-        require: '?^mmsView',
+        require: ['?^^mmsView', '?^^mmsTranscludeDoc', '?^^mmsTranscludeVal'],
         controller: ['$scope', mmsTranscludeNameCtrl],
         link: mmsTranscludeNameLink
     };
