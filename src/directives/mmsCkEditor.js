@@ -61,11 +61,11 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
               $scope.cacheElements.forEach(function(cacheElement) {
                   //JSON.stringify(sampleObject);
                   //console.log("=====THIS IS THE CACHE ===="+ JSON.stringify(cacheElement));
-                  $scope.autocompleteItems.push({ 'sysmlid' : cacheElement.sysmlid, 'name' : cacheElement.name + ' - name' });
-                  $scope.autocompleteItems.push({ 'sysmlid' : cacheElement.sysmlid, 'name' : cacheElement.name + ' - documentation' });
+                  $scope.autocompleteItems.push({ 'sysmlid' : cacheElement.sysmlid, 'name' : cacheElement.name , 'type': ' - name' });
+                  $scope.autocompleteItems.push({ 'sysmlid' : cacheElement.sysmlid, 'name' : cacheElement.name , 'type': ' - documentation' });
 
                   if (cacheElement.specialization && cacheElement.specialization.type === 'Property') {
-                      $scope.autocompleteItems.push({ 'sysmlid' : cacheElement.sysmlid, 'name' : cacheElement.name + ' - value' });
+                      $scope.autocompleteItems.push({ 'sysmlid' : cacheElement.sysmlid, 'name' : cacheElement.name , 'type': ' - value' });
                   }
               });
             }
