@@ -229,6 +229,18 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                         if (eid === scope.mmsEid && ws === scope.ws && (type === 'all' || type === 'value') && !continueEdit)
                             recompile();
                     });
+                    //actions for stomp 
+                    scope.$on("stomp.element", function(event, deltaSource, deltaWorkspaceId, deltaElementId, deltaModifier, elemName){
+                        if(deltaWorkspaceId === scope.ws && deltaElementId === scope.mmsEid){
+                            if(scope.isEditing === false){
+                                recompile();
+                            }
+                            if(scope.isEditing === true){
+                                growl.warning("This value has been changed: " + elemName +
+                                            " modified by: " + deltaModifier, {ttl: -1});
+                            }
+                        }
+                    });
                 }
             }, function(reason) {
                 var status = ' not found';
@@ -333,18 +345,6 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                 Utils.previewAction(scope, recompileEdit, recompile, type, element);
             };
         } 
-        //actions for stomp 
-        scope.$on("stomp.element", function(event, deltaSource, deltaWorkspaceId, deltaElementId, deltaModifier, elemName){
-            if(deltaWorkspaceId === scope.ws && deltaElementId === scope.mmsEid){
-                if(scope.isEditing === false){
-                    recompile();
-                }
-                if(scope.isEditing === true){
-                    growl.warning("This value has been changed: " + elemName +
-                                " modified by: " + deltaModifier, {ttl: -1});
-                }
-            }
-        });
         if (mmsViewPresentationElemCtrl) {
             scope.delete = function() {
                 Utils.deleteAction(scope,scope.bbApi,mmsViewPresentationElemCtrl.getParentSection());

@@ -186,6 +186,18 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                         if (eid === scope.mmsEid && ws === scope.ws && (type === 'all' || type === 'documentation') && !continueEdit)
                             recompile();
                     });
+                    //actions for stomp 
+                    scope.$on("stomp.element", function(event, deltaSource, deltaWorkspaceId, deltaElementId, deltaModifier, elemName){
+                        if(deltaWorkspaceId === scope.ws && deltaElementId === scope.mmsEid){
+                            if(scope.isEditing === false){
+                                recompile();
+                            }
+                            if(scope.isEditing === true){
+                                growl.warning("This documentation has been changed: " + elemName +
+                                            " modified by: " + deltaModifier, {ttl: -1});
+                            }
+                        }
+                    });
                 }
                 // TODO: below has issues when having edits.  For some reason this is
                 //       entered twice, once and the frame is added, and then again
@@ -294,20 +306,6 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                 scope.tinymceType = scope.presentationElem.type;
             }
         }
-        
-        //actions for stomp 
-        scope.$on("stomp.element", function(event, deltaSource, deltaWorkspaceId, deltaElementId, deltaModifier, elemName){
-            if(deltaWorkspaceId === scope.ws && deltaElementId === scope.mmsEid){
-                if(scope.isEditing === false){
-                    recompile();
-                }
-                if(scope.isEditing === true){
-                    growl.warning("This documentation has been changed: " + elemName +
-                                " modified by: " + deltaModifier, {ttl: -1});
-                }
-            }
-        });
-
     };
 
     return {

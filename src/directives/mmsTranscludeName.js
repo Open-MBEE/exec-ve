@@ -139,6 +139,13 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
                         if (eid === scope.mmsEid && ws === scope.ws && (type === 'all' || type === 'name') && !continueEdit)
                             recompile();
                     });
+                    //actions for stomp using growl messages
+                    scope.$on("stomp.element", function(event, deltaSource, deltaWorkspaceId, deltaElementID, deltaModifier, deltaName){
+                        if(deltaWorkspaceId === scope.ws && deltaElementID === scope.mmsEid){
+                            if (scope.isEditing)
+                                growl.warning(" This value has been changed to: "+deltaName+" by: "+ deltaModifier, {ttl: -1});
+                        }
+                    });
                 }
             }, function(reason) {
                 var status = ' not found';
@@ -195,13 +202,6 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
                 Utils.previewAction(scope, recompileEdit, recompile, type, element);
             };
         }
-        //actions for stomp using growl messages
-        scope.$on("stomp.element", function(event, deltaSource, deltaWorkspaceId, deltaElementID, deltaModifier, deltaName){
-            if(deltaWorkspaceId === scope.ws && deltaElementID === scope.mmsEid){
-                if (scope.isEditing)
-                    growl.warning(" This value has been changed to: "+deltaName+" by: "+ deltaModifier, {ttl: -1});
-            }
-        });
     };
 
     return {
