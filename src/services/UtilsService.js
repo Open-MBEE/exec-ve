@@ -432,29 +432,40 @@ function UtilsService(CacheService, _) {
         return {holdingBinId: holdingBinId, projectId: projectId, siteId: siteId};
     };
 
-    var getPrintCss = function() {
-        return "img {max-width: 100%; page-break-inside: avoid; page-break-before: auto; page-break-after: auto; display: block;} " + 
-                " tr, td, th { page-break-inside: avoid; } thead {display: table-header-group;} " + 
-                ".pull-right {float: right;} " + 
-                "table {width: 100%; border-collapse: collapse;} " + 
-                "table, th, td {border: 1px solid black; padding: 4px;} " +
-                "table, th, td > p {margin: 0px; padding: 0px;} " +
-                "table, th, td > div > p {margin: 0px; padding: 0px;} " +
-                "h1 {font-size: 20px; padding: 0px; margin: 4px;} " +
-                ".ng-hide {display: none;} " +
-                "body {font-size: 12px;} " + 
-                "caption, figcaption {text-align: center; font-weight: bold;}" +
-                ".toc, .tof, .tot {page-break-after:always;} " +
-                ".toc a, .tof a, .tot a { text-decoration:none; color: #000; font-size:14px; }" + 
-                ".toc .header, .tof .header, .tot .header { margin-bottom: 4px; font-weight: bold; font-size:24px; } " + 
-                ".toc ul, .tof ul, .tot ul {list-style-type:none; margin: 0; } " +
-                ".tof ul, .tot ul {padding-left:0;}" +
-                ".toc ul {padding-left:4em;}" +
-                ".toc > ul {padding-left:0;}" +
-                ".toc li > a[href]::after {content: leader('.') target-counter(attr(href), page);}" +
-                "@page big_table { size: 11in 8.5in; prince-shrink-to-fit:auto;}" + 
-                ".big-table {page: big_table;}";
+    var getPrintCss = function(header, footer, dnum, tag) {
+        var ret = "img {max-width: 100%; page-break-inside: avoid; page-break-before: auto; page-break-after: auto; display: block;}\n" + 
+                " tr, td, th { page-break-inside: avoid; } thead {display: table-header-group;}\n" + 
+                ".pull-right {float: right;}\n" + 
+                "table {width: 100%; border-collapse: collapse;}\n" + 
+                "table, th, td {border: 1px solid black; padding: 4px;}\n" +
+                "table, th, td > p {margin: 0px; padding: 0px;}\n" +
+                "table, th, td > div > p {margin: 0px; padding: 0px;}\n" +
+                "h1 {font-size: 20px; padding: 0px; margin: 4px;}\n" +
+                ".ng-hide {display: none;}\n" +
+                "body {font-size: 12px; font-family: Georgia, 'Times New Roman', serif; }\n" + 
+                "caption, figcaption {text-align: center; font-weight: bold;}\n" +
+                ".toc, .tof, .tot {page-break-after:always;}\n" +
+                ".toc a, .tof a, .tot a { text-decoration:none; color: #000; font-size:14px; }\n" + 
+                ".toc .header, .tof .header, .tot .header { margin-bottom: 4px; font-weight: bold; font-size:24px; }\n" + 
+                ".toc ul, .tof ul, .tot ul {list-style-type:none; margin: 0; }\n" +
+                ".tof ul, .tot ul {padding-left:0;}\n" +
+                ".toc ul {padding-left:4em;}\n" +
+                ".toc > ul {padding-left:0;}\n" +
+                ".toc li > a[href]::after {content: leader('.') target-counter(attr(href), page);}\n" +
+                "@page big_table { size: 11in 8.5in; prince-shrink-to-fit:auto;}\n" + 
+                ".big-table {page: big_table;}\n";
+        if (header) {
+            ret += '@page { @top { font-size: 10px; content: "' + header + '";}}\n';
+        }
+        if (footer) {
+            ret += '@page { @bottom { font-size: 10px; content: "' + footer + '";}}\n';
+        }
+        ret += "@page { @bottom-right { content: counter(page); }}\n";
+        if (tag && tag !== 'latest') {
+            ret += "@page { @top-right { font-size: 10px; content: '" + tag + "';}}\n";
+        }
                 //"@page{prince-shrink-to-fit:auto;size: A4 portrait;margin-left:8mm;margin-right:8mm;}";
+        return ret;
     };
 
     return {
