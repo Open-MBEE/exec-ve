@@ -273,13 +273,13 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
                 $scope.model = {genCover: false, genTotf: true};
                 $scope.print = function() {
                     $modalInstance.close(['ok', $scope.model.genCover, $scope.model.genTotf]);
-                }
+                };
                 $scope.fulldoc = function() {
                     $modalInstance.close(['fulldoc']);
-                }
+                };
                 $scope.cancel = function() {
                     $modalInstance.dismiss();
-                }
+                };
             },
             backdrop: 'static',
             keyboard: false
@@ -349,12 +349,34 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
         return deferred.promise;
     };
 
+    /*
+        ob = document or view object
+        ws = workspace id
+        time = timestamp or latest
+        tag = tag object
+        isDoc = ob is view or doc
+        genCover = generate default cover page
+        genTotf = whether to gen table of figures and tables
+        mode: 1 = print, 2 = word, 3 = pdf
+        returns promise that resolves with
+        {
+            cover: cover page html
+            contents: main content html
+            header: header string or ''
+            footer: footer string or ''
+            displayTime: human readable time
+            dnum: document d number
+            version: version string from doc tag
+            toc: toc html
+            tag: tagname or ''
+        }
+    */
     var printOrGenerate = function(ob, ws, time, tag, isDoc, genCover, genTotf, mode) {
         var deferred = $q.defer();
         var printContents = '';
         var printElementCopy = angular.element("#print-div");
         printElementCopy.find('table').addClass(function() {
-            if ($this.width() > 1400) {
+            if ($(this).width() > 1400) {
                 return 'big-table';
             }
             return '';
@@ -389,7 +411,7 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
         printElementCopy.find('.no-print').remove();
         printElementCopy.find('.ng-hide').remove();
         var coverTemplateString = $templateCache.get('partials/mms/docCover.html');
-        var coverTemplateElement = angular.element(templateString);
+        var coverTemplateElement = angular.element(coverTemplateString);
         var cover = '';
         if (!genCover && isDoc) {
             cover = printElementCopy.find("mms-view[mms-vid='" + ob.sysmlid + "']");
@@ -404,8 +426,11 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
         var displayTime = '';
         var dnum = '';
         var version = '';
+        var tagname = '';
+        if (tag)
+            tagname = tag.name;
         if (!isDoc) {
-            deferred.resolve({cover: cover, contents: printContents, header: header, footer: footer, displayTime: displayTime, dnum: dnum, version: version, toc: toc, tag: tag});
+            deferred.resolve({cover: cover, contents: printContents, header: header, footer: footer, displayTime: displayTime, dnum: dnum, version: version, toc: toc, tag: tagname});
             return deferred.promise;
         }
         ViewService.getDocMetadata(ob.sysmlid, ws, null, 2)
@@ -428,7 +453,7 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
                 if (genCover) {
                     cover = coverTemplateElement[0].innerHTML;
                 }
-                deferred.resolve({cover: cover, contents: printContents, header: header, footer: footer, displayTime: displayTime, dnum: dnum, version: version, toc: toc, tag: tag});
+                deferred.resolve({cover: cover, contents: printContents, header: header, footer: footer, displayTime: displayTime, dnum: dnum, version: version, toc: toc, tag: tagname});
             }, 0, false);
         });
         return deferred.promise;

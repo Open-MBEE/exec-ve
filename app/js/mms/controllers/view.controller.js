@@ -141,7 +141,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
 
 
     $scope.$on('convert-pdf', function() {
-        MmsAppUtils.printModal(view, $scope.ws, site, time, tag false, 3);
+        MmsAppUtils.printModal(view, $scope.ws, site, time, tag, false, 3);
     });
 
     $scope.$on('view-add-paragraph', function() {
