@@ -141,7 +141,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
 
 
     $scope.$on('convert-pdf', function() {
-        MmsAppUtils.popupPrintConfirm(view, $scope.ws, time, false, false, true, true);
+        MmsAppUtils.printModal(view, $scope.ws, site, time, tag false, 3);
     });
 
     $scope.$on('view-add-paragraph', function() {
@@ -317,10 +317,10 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     if ($state.includes('workspace.site.document'))
         docOption = true;
     $scope.$on('print', function() {
-        MmsAppUtils.popupPrintConfirm(view, $scope.ws, time, false, true, false, docOption);
+        MmsAppUtils.printModal(view, $scope.ws, site, time, tag, false, 1);
     });
     $scope.$on('word', function() {
-        MmsAppUtils.popupPrintConfirm(view, $scope.ws, time, false, false, false, docOption);
+        MmsAppUtils.printModal(view, $scope.ws, site, time, tag, false, 2);
     });
     $scope.$on('tabletocsv', function() {
         MmsAppUtils.tableToCsv(view, $scope.ws, time, false);
