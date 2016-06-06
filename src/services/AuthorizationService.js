@@ -53,7 +53,7 @@ function AuthService($q, $http, URLService, HttpService, ElementService, ViewSer
         //var checkLogin = '/alfresco/service/api/login/ticket/'+ticket+'?alf_ticket='+ticket;
         
         $http.get(URLService.getCheckTicketURL(ticket)).then(function (success) {
-            deferred.resolve(true);
+            deferred.resolve(success.data.username);
         }, function(fail){
             //if(fail.status === 401) {
                 deferred.reject(fail);
