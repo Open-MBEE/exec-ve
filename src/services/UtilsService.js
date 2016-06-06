@@ -432,7 +432,7 @@ function UtilsService(CacheService, _) {
         return {holdingBinId: holdingBinId, projectId: projectId, siteId: siteId};
     };
 
-    var getPrintCss = function(header, footer, dnum, tag) {
+    var getPrintCss = function(header, footer, dnum, tag, displayTime) {
         var ret = "img {max-width: 100%; page-break-inside: avoid; page-break-before: auto; page-break-after: auto; display: block;}\n" + 
                 " tr, td, th { page-break-inside: avoid; } thead {display: table-header-group;}\n" + 
                 ".pull-right {float: right;}\n" + 
@@ -454,15 +454,17 @@ function UtilsService(CacheService, _) {
                 ".toc li > a[href]::after {content: leader('.') target-counter(attr(href), page);}\n" +
                 "@page big_table { size: 11in 8.5in; prince-shrink-to-fit:auto;}\n" + 
                 ".big-table {page: big_table;}\n";
-        if (header) {
+        if (header && header !== '') {
             ret += '@page { @top { font-size: 10px; content: "' + header + '";}}\n';
         }
-        if (footer) {
+        if (footer && footer !== '') {
             ret += '@page { @bottom { font-size: 10px; content: "' + footer + '";}}\n';
         }
         ret += "@page { @bottom-right { content: counter(page); }}\n";
-        if (tag && tag !== 'latest') {
+        if (tag && tag !== 'latest' && tag !== '') {
             ret += "@page { @top-right { font-size: 10px; content: '" + tag + "';}}\n";
+        } else {
+            ret += "@page { @top-right { font-size: 10px; content: '" + displayTime + "';}}\n";
         }
                 //"@page{prince-shrink-to-fit:auto;size: A4 portrait;margin-left:8mm;margin-right:8mm;}";
         return ret;
