@@ -274,8 +274,8 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     $scope.numComments = 0;
     $scope.lastCommented = "";
     $scope.lastCommentedBy = "";
-    $scope.tscClicked = function(elementId) {
-        $rootScope.$broadcast('elementSelected', elementId, 'element');
+    $scope.tscClicked = function(elementId, ws, version) {
+        $rootScope.$broadcast('elementSelected', elementId, 'element', ws, version);
     };
     $scope.searchOptions= {};
     $scope.searchOptions.callback = function(elem) {

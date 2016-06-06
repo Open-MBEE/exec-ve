@@ -58,7 +58,7 @@ function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxSe
                 scope.addFrame();
 
             if (mmsViewCtrl)
-                mmsViewCtrl.transcludeClicked(scope.mmsEid);
+                mmsViewCtrl.transcludeClicked(scope.mmsEid, scope.ws, scope.version);
             //if (e.target.tagName !== 'A')
               //  return false;
               e.stopPropagation();
