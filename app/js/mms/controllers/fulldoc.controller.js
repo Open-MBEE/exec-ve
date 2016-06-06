@@ -149,6 +149,13 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
     });
 
     $scope.$on('show-edits', function() {
+        if( ($rootScope.veElementsOn && $rootScope.mms_ShowEdits) || (!$rootScope.veElementsOn && !$rootScope.mms_ShowEdits) ){
+            $scope.views.forEach(function(view) {
+                view.api.toggleShowElements();
+            });
+            $scope.bbApi.toggleButtonState('show-elements');
+            $rootScope.veElementsOn = !$rootScope.veElementsOn;
+        }
         $scope.views.forEach(function(view) {
             view.api.toggleShowEdits();
         });

@@ -213,6 +213,11 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     });
 
     $scope.$on('show-edits', function() {
+        if( ($rootScope.veElementsOn && $rootScope.mms_ShowEdits) || (!$rootScope.veElementsOn && !$rootScope.mms_ShowEdits) ){
+            $scope.viewApi.toggleShowElements();
+            $scope.bbApi.toggleButtonState('show-elements');
+            $rootScope.veElementsOn = !$rootScope.veElementsOn;
+        }
         $scope.viewApi.toggleShowEdits();
         $scope.bbApi.toggleButtonState('show-edits');
         $rootScope.mms_ShowEdits = !$rootScope.mms_ShowEdits;
