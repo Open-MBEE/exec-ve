@@ -410,6 +410,10 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
         printElementCopy.find('.mms-error').html('error');
         printElementCopy.find('.no-print').remove();
         printElementCopy.find('.ng-hide').remove();
+        if (mode === 2)
+            printElementCopy.find('.mms-svg').remove();
+        else
+            printElementCopy.find('.mms-png').remove();
         var coverTemplateString = $templateCache.get('partials/mms/docCover.html');
         var coverTemplateElement = angular.element(coverTemplateString);
         var cover = '';

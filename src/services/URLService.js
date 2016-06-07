@@ -245,8 +245,8 @@ function urlService(baseUrl) {
      * @param {string} version Timestamp or version number
      * @returns {string} The path for image url queries.
      */
-    var getImageURL = function(id, workspace, version) {
-        var r = root + '/workspaces/' + workspace + '/artifacts/' + id;
+    var getImageURL = function(id, ext, workspace, version) {
+        var r = root + '/workspaces/' + workspace + '/artifacts/' + id + '?extension=' + ext;
         return addTicket(addVersion(r, version));
     };
 
