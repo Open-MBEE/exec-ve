@@ -97,7 +97,7 @@ function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxSe
             idwatch();
             if (UtilsService.hasCircularReference(scope, scope.mmsEid, 'doc')) {
                 //$log.log("prevent circular dereference!");
-                element.html('<span class="error">Circular Reference!</span>');
+                element.html('<span class="mms-error">Circular Reference!</span>');
                 return;
             }
             var ws = scope.mmsWs;
@@ -127,7 +127,7 @@ function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxSe
                 var status = ' not found';
                 if (reason.status === 410)
                     status = ' deleted';
-                element.html('<span class="error">comment ' + newVal + status + '</span>');
+                element.html('<span class="mms-error">comment ' + newVal + status + '</span>');
                 //growl.error('Cf Comment Error: ' + reason.message + ': ' + scope.mmsEid);
             });
         });

@@ -137,7 +137,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                 return;
             idwatch();
             if (UtilsService.hasCircularReference(scope, scope.mmsEid, 'doc')) {
-                element.html('<span class="error">Circular Reference!</span>');
+                element.html('<span class="mms-error">Circular Reference!</span>');
                 //$log.log("prevent circular dereference!");
                 return;
             }
@@ -227,7 +227,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                 //     }
 
                 // }, function(reason) {
-                //     element.html('<span class="error">doc cf ' + newVal + ' not found</span>');
+                //     element.html('<span class="mms-error">doc cf ' + newVal + ' not found</span>');
                 //     growl.error('Cf Doc Error: ' + reason.message + ': ' + scope.mmsEid);
                 // });
 
@@ -235,7 +235,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                 var status = ' not found';
                 if (reason.status === 410)
                     status = ' deleted';
-                element.html('<span class="error">doc cf ' + newVal + status + '</span>');
+                element.html('<span class="mms-error">doc cf ' + newVal + status + '</span>');
                 //growl.error('Cf Doc Error: ' + reason.message + ': ' + scope.mmsEid);
             });
         });

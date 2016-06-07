@@ -407,7 +407,7 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
         var comments = printElementCopy.find('mms-transclude-com');
         comments.remove();
         printElementCopy.find('div.tableSearch').remove();
-        printElementCopy.find('.error').html('error');
+        printElementCopy.find('.mms-error').html('error');
         printElementCopy.find('.no-print').remove();
         printElementCopy.find('.ng-hide').remove();
         var coverTemplateString = $templateCache.get('partials/mms/docCover.html');

@@ -184,7 +184,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
             idwatch();
             if (UtilsService.hasCircularReference(scope, scope.mmsEid, 'val')) {
                 //$log.log("prevent circular dereference!");
-                element.html('<span class="error">Circular Reference!</span>');
+                element.html('<span class="mms-error">Circular Reference!</span>');
                 return;
             }
             element.html('(loading...)');
@@ -246,7 +246,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                 var status = ' not found';
                 if (reason.status === 410)
                     status = ' deleted';
-                element.html('<span class="error">value cf ' + newVal + status + '</span>');
+                element.html('<span class="mms-error">value cf ' + newVal + status + '</span>');
                 //growl.error('Cf Val Error: ' + reason.message + ': ' + scope.mmsEid);
             });
         });
