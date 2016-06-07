@@ -19,52 +19,52 @@ angular.module('mmsApp').controller('ToolbarCtrl', ['$scope', '$rootScope', '$st
 
 	$scope.tbApi.init = function()
 	{
-		$scope.tbApi.addButton(UxService.getToolbarButton("element.viewer"));
-		$scope.tbApi.addButton(UxService.getToolbarButton("element.editor"));
+		$scope.tbApi.addButton(UxService.getToolbarButton("element-viewer"));
+		$scope.tbApi.addButton(UxService.getToolbarButton("element-editor"));
 		if ($rootScope.veEdits && Object.keys($rootScope.veEdits).length > 0)
 		{
-			$scope.tbApi.setIcon('element.editor', 'fa-edit-asterisk');
-			$scope.tbApi.setPermission('element.editor.saveall', true);
+			$scope.tbApi.setIcon('element-editor', 'fa-edit-asterisk');
+			$scope.tbApi.setPermission('element-editor-saveall', true);
 		}
 		var editable = false;
-		$scope.tbApi.addButton(UxService.getToolbarButton("element.history"));
+		$scope.tbApi.addButton(UxService.getToolbarButton("element-history"));
 		if ($state.includes('workspace.diff'))
 		{
-			$scope.tbApi.addButton(UxService.getToolbarButton("diff.perspective.detail"));
-			$scope.tbApi.addButton(UxService.getToolbarButton("diff.perspective.tree"));
+			$scope.tbApi.addButton(UxService.getToolbarButton("diff-perspective-detail"));
+			$scope.tbApi.addButton(UxService.getToolbarButton("diff-perspective-tree"));
 			
-			$scope.tbApi.setOptions('element.viewer', {
+			$scope.tbApi.setOptions('element-viewer', {
 				active: false
 			});
-			$scope.tbApi.setPermission('element.history', false);
+			$scope.tbApi.setPermission('element-history', false);
 		}
 		else if ($state.includes('workspace.sites') && !$state.includes('workspace.site.document'))
 		{
 			editable = document && time === 'latest';
-			$scope.tbApi.setPermission('element.editor', editable);
+			$scope.tbApi.setPermission('element-editor', editable);
 			$scope.tbApi.addButton(UxService.getToolbarButton("tags"));
 			$scope.tbApi.setPermission('tags', true);
 			if ($state.includes('workspace.site')) {
-				$scope.tbApi.addButton(UxService.getToolbarButton("view.reorder"));
-				$scope.tbApi.setPermission("view.reorder", editable);
+				$scope.tbApi.addButton(UxService.getToolbarButton("view-reorder"));
+				$scope.tbApi.setPermission("view-reorder", editable);
 			}
 		}
 		else if ($state.includes('workspace.site.document'))
 		{
 			editable = document.editable && time === 'latest';
-			$scope.tbApi.addButton(UxService.getToolbarButton("document.snapshot"));
-			$scope.tbApi.addButton(UxService.getToolbarButton("view.reorder"));
-			$scope.tbApi.setPermission('element.editor', editable);
-			// $scope.tbApi.setPermission('document.snapshot.refresh',editable);
-			$scope.tbApi.setPermission('document.snapshot.create', editable);
-			$scope.tbApi.setPermission("view.reorder", editable);
+			$scope.tbApi.addButton(UxService.getToolbarButton("document-snapshot"));
+			$scope.tbApi.addButton(UxService.getToolbarButton("view-reorder"));
+			$scope.tbApi.setPermission('element-editor', editable);
+			// $scope.tbApi.setPermission('document-snapshot-refresh',editable);
+			$scope.tbApi.setPermission('document-snapshot-create', editable);
+			$scope.tbApi.setPermission("view-reorder", editable);
 		}
 		else if ($state.includes('workspaces') && !$state.includes('workspace.sites'))
 		{
 			if (workspace === 'master' && tag.timestamp === 'latest') // do not allow edit of master workspace
 			editable = false;
 			else editable = true;
-			$scope.tbApi.setPermission('element.editor', editable);
+			$scope.tbApi.setPermission('element-editor', editable);
 		}
 	};
 }]);

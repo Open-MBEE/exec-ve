@@ -38,19 +38,29 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
         $scope.bbApi.init = function() {
             if (!$scope.buttonsInit) {
                 $scope.buttonsInit = true;
-                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.preview", $scope));
-                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.save", $scope));
-                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.saveC", $scope));
-                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.cancel", $scope));
-                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.delete", $scope));
-                $scope.bbApi.setPermission("presentation.element.delete", $scope.isDirectChildOfPresentationElement);
+                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-preview", $scope));
+                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-save", $scope));
+                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-saveC", $scope));
+                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-cancel", $scope));
+                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-delete", $scope));
+                $scope.bbApi.setPermission("presentation-element-delete", $scope.isDirectChildOfPresentationElement);
             }     
+        };
+
+        this.getWsAndVersion = function() {
+            return {
+                workspace: $scope.ws, 
+                version: $scope.version,
+                tag: undefined
+            };
         };
     };
 
     var mmsTranscludeValLink = function(scope, element, attrs, controllers) {
         var mmsViewCtrl = controllers[0];
         var mmsViewPresentationElemCtrl = controllers[1];
+        var mmsCfDocCtrl = controllers[2];
+        var mmsCfValCtrl = controllers[3];
         scope.recompileScope = null;
         var processed = false;
         scope.cfType = 'val';
@@ -180,6 +190,20 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
             element.html('(loading...)');
             var ws = scope.mmsWs;
             var version = scope.mmsVersion;
+            if (mmsCfValCtrl) {
+                var cfvVersion = mmsCfValCtrl.getWsAndVersion();
+                if (!ws)
+                    ws = cfvVersion.workspace;
+                if (!version)
+                    version = cfvVersion.version;
+            }
+            if (mmsCfDocCtrl) {
+                var cfdVersion = mmsCfDocCtrl.getWsAndVersion();
+                if (!ws)
+                    ws = cfdVersion.workspace;
+                if (!version)
+                    version = cfdVersion.version;
+            }
             if (mmsViewCtrl) {
                 var viewVersion = mmsViewCtrl.getWsAndVersion();
                 if (!ws)
@@ -204,6 +228,18 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                     scope.$on('element.updated', function(event, eid, ws, type, continueEdit) {
                         if (eid === scope.mmsEid && ws === scope.ws && (type === 'all' || type === 'value') && !continueEdit)
                             recompile();
+                    });
+                    //actions for stomp 
+                    scope.$on("stomp.element", function(event, deltaSource, deltaWorkspaceId, deltaElementId, deltaModifier, elemName){
+                        if(deltaWorkspaceId === scope.ws && deltaElementId === scope.mmsEid){
+                            if(scope.isEditing === false){
+                                recompile();
+                            }
+                            if(scope.isEditing === true){
+                                growl.warning("This value has been changed: " + elemName +
+                                            " modified by: " + deltaModifier, {ttl: -1});
+                            }
+                        }
                     });
                 }
             }, function(reason) {
@@ -309,18 +345,6 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                 Utils.previewAction(scope, recompileEdit, recompile, type, element);
             };
         } 
-        //actions for stomp 
-        scope.$on("stomp.element", function(event, deltaSource, deltaWorkspaceId, deltaElementId, deltaModifier, elemName){
-            if(deltaWorkspaceId === scope.ws && deltaElementId === scope.mmsEid){
-                if(scope.isEditing === false){
-                    recompile();
-                }
-                if(scope.isEditing === true){
-                    growl.warning("This value has been changed: " + elemName +
-                                " modified by: " + deltaModifier, {ttl: -1});
-                }
-            }
-        });
         if (mmsViewPresentationElemCtrl) {
             scope.delete = function() {
                 Utils.deleteAction(scope,scope.bbApi,mmsViewPresentationElemCtrl.getParentSection());
@@ -339,7 +363,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
             mmsWs: '@',
             mmsVersion: '@'
         },
-        require: ['?^mmsView','?^mmsViewPresentationElem'],
+        require: ['?^^mmsView','?^^mmsViewPresentationElem', '?^^mmsTranscludeDoc', '?^^mmsTranscludeVal'],
         controller: ['$scope', mmsTranscludeCtrl],
         link: mmsTranscludeValLink
     };

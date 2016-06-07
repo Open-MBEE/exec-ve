@@ -35,6 +35,7 @@ angular.module('mms')
 
 function ApplicationService($q, $http, URLService) {
      var source = createUniqueId();
+     var username;
      
      function createUniqueId() {
         function s4() {
@@ -69,10 +70,19 @@ function ApplicationService($q, $http, URLService) {
         return deferred.promise;
     };
     
+    var setUserName = function(user) {
+        username = user;
+    };
+    var getUserName = function(){
+        return username;
+    };
+    
     return {
         getSource: getSource,
         getMmsVersion: getMmsVersion,
-        createUniqueId: createUniqueId
+        createUniqueId: createUniqueId,
+        setUserName: setUserName,
+        getUserName: getUserName
     };
 
 }
