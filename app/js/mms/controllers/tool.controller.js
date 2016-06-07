@@ -98,6 +98,7 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, $timeout, ConfigS
             $scope.specWs = info[2];
             $scope.specVersion = 'latest';
         }
+        $rootScope.mms_tbApi.setPermission('element-editor', true);
     };
 
     $scope.showTracker = function() {
