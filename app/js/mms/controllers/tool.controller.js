@@ -11,6 +11,7 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, $timeout, ConfigS
     // TODO rename variable ws
     var ws = $stateParams.workspace;
     $scope.specWs = ws;
+    $scope.specVersion = time;
     $scope.document = document;
     $scope.ws = ws;
     $scope.editable = document && document.editable && time === 'latest';
@@ -85,15 +86,19 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, $timeout, ConfigS
             $scope.eid = info[1];
             $scope.elementType = 'element';
             $scope.specWs = info[2];
+            $scope.specVersion = 'latest';
         } else if (info[0] === 'workspace') {
             $scope.eid = info[1];
             $scope.elementType = 'workspace';
             $scope.specWs = info[1];
+            $scope.specVersion = 'latest';
         } else if (info[0] === 'tag') {
             $scope.eid = info[1];
             $scope.elementType = 'tag';
             $scope.specWs = info[2];
+            $scope.specVersion = 'latest';
         }
+        $rootScope.mms_tbApi.setPermission('element-editor', true);
     };
 
     $scope.showTracker = function() {
@@ -177,7 +182,7 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, $timeout, ConfigS
         cleanUpEdit(scope);           
     });
 
-    $scope.$on('elementSelected', function(event, eid, type) {
+    $scope.$on('elementSelected', function(event, eid, type, ws, version) {
         $scope.elementType = type;
         $scope.eid = eid;
         $rootScope.mms_tbApi.select('element-viewer');
@@ -194,12 +199,17 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, $timeout, ConfigS
                 $rootScope.mms_tbApi.setPermission('element-editor', true);
         }
         if (type === 'element') {
-            ElementService.getElement(eid, false, ws, time, 2).
+            $scope.specWs = ws;
+            $scope.specVersion = version;
+            ElementService.getElement(eid, false, ws, version, 2).
             then(function(element) {
-                var editable = element.editable && time === 'latest';
+                var editable = element.editable && version === 'latest';
                 $rootScope.mms_tbApi.setPermission('element-editor', editable);
                 $rootScope.mms_tbApi.setPermission("document-snapshot-create", editable);
             });
+        } else {
+            $scope.specWs = $scope.ws;
+            $scope.specVersion = $scope.version;
         }
     });
     $scope.$on('element-viewer', function() {
@@ -230,6 +240,7 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, $timeout, ConfigS
         $scope.viewElements = viewElements;
         $scope.elementType = 'element';
         $scope.specWs = ws;
+        $scope.specVersion = time;
         $rootScope.mms_tbApi.select('element-viewer');
         showPane('element');
         ElementService.getElement(vid, false, ws, time, 2).
@@ -383,6 +394,7 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, $timeout, ConfigS
                 $scope.specApi.keepMode();
                 $scope.eid = failedId;
                 $scope.specWs = failedWs;
+                $scope.specVersion = 'latest';
                 $scope.elementType = failedType;
                 growl.error("Some elements failed to save, resolve individually in edit pane");
             }
@@ -407,6 +419,7 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, $timeout, ConfigS
                 $scope.specApi.keepMode();
                 $scope.eid = id[1];
                 $scope.specWs = id[2];
+                $scope.specVersion = 'latest';
                 $scope.elementType = id[0];
             } else {
                 $scope.specApi.setEditing(false);

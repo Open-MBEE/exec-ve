@@ -69,7 +69,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                 scope.addFrame();
 
             if (mmsViewCtrl)
-                mmsViewCtrl.transcludeClicked(scope.mmsEid);
+                mmsViewCtrl.transcludeClicked(scope.mmsEid, scope.ws, scope.version);
 
             /*if (e.target.tagName !== 'A' && e.target.tagName !== 'INPUT' && !scope.isEditing) //need review for inline editing (boolean and nested)
                 return false;

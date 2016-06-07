@@ -28,7 +28,7 @@ function mmsTranscludeImg(VizService, growl) {
         element.click(function(e) {
             if (!mmsViewCtrl)
                 return false;
-            mmsViewCtrl.transcludeClicked(scope.mmsEid);
+            mmsViewCtrl.transcludeClicked(scope.mmsEid, scope.ws, scope.version);
             return false;
         });
 
