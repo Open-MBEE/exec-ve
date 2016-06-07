@@ -206,6 +206,9 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, $timeout, ConfigS
                 $rootScope.mms_tbApi.setPermission('element-editor', editable);
                 $rootScope.mms_tbApi.setPermission("document-snapshot-create", editable);
             });
+        } else {
+            $scope.specWs = $scope.ws;
+            $scope.specVersion = $scope.version;
         }
     });
     $scope.$on('element-viewer', function() {
