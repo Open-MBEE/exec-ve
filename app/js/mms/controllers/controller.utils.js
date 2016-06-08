@@ -376,7 +376,7 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
         var printContents = '';
         var printElementCopy = angular.element("#print-div");
         printElementCopy.find('table').addClass(function() {
-            if ($(this).width() > 1400) {
+            if ($(this).find('table').length > 0 || $(this).find('img').length > 0) {
                 return 'big-table';
             }
             return '';
@@ -414,6 +414,12 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
             printElementCopy.find('.mms-svg').remove();
         else
             printElementCopy.find('.mms-png').remove();
+        printElementCopy.find('p:empty').remove();
+        printElementCopy.find('p').each(function() {
+            var $this = $(this);
+            if ($this.html().replace(/\s|&nbsp;/g, '').length === 0)
+                $this.remove();
+        });
         var coverTemplateString = $templateCache.get('partials/mms/docCover.html');
         var coverTemplateElement = angular.element(coverTemplateString);
         var cover = '';

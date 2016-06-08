@@ -51,7 +51,7 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
                     dis.toggleShowEdits();
                 }
             }
-        }, number: curSec};
+        }, number: curSec, topLevel: (curSec ? (curSec.toString().indexOf('.') === -1 && curSec !== 1) : false)};
     };
     var addToArray = function(viewId, curSection) {
         views.push( buildViewElt(viewId, curSection) );

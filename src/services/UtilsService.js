@@ -432,14 +432,24 @@ function UtilsService(CacheService, _) {
         return {holdingBinId: holdingBinId, projectId: projectId, siteId: siteId};
     };
 
+    /*
+    header = header slot on doc
+    footer = footer slot on doc
+    dnum = dnumber slot on doc
+    tag = ve tag name if available
+    displayTime = tag time or generation time as mm/dd/yy hh:mm am/pm
+    */
     var getPrintCss = function(header, footer, dnum, tag, displayTime) {
         var ret = "img {max-width: 100%; page-break-inside: avoid; page-break-before: auto; page-break-after: auto; display: block;}\n" + 
                 " tr, td, th { page-break-inside: avoid; } thead {display: table-header-group;}\n" + 
                 ".pull-right {float: right;}\n" + 
+                ".view-title {margin-top: 5pt}\n" +
+                ".chapter {page-break-before: always}\n" + 
                 "table {width: 100%; border-collapse: collapse;}\n" + 
                 "table, th, td {border: 1px solid black; padding: 4px;}\n" +
-                "table, th, td > p {margin: 0px; padding: 0px;}\n" +
-                "table, th, td > div > p {margin: 0px; padding: 0px;}\n" +
+                "table, th > p, td > p {margin: 0px; padding: 0px;}\n" +
+                "table, th > div > p, td > div > p {margin: 0px; padding: 0px;}\n" +
+                //"table p {word-break: break-all;}\n" + 
                 "h1 {font-size: 20px; padding: 0px; margin: 4px;}\n" +
                 ".ng-hide {display: none;}\n" +
                 "body {font-size: 12px; font-family: Georgia, 'Times New Roman', serif; }\n" + 
@@ -452,8 +462,8 @@ function UtilsService(CacheService, _) {
                 ".toc ul {padding-left:4em;}\n" +
                 ".toc > ul {padding-left:0;}\n" +
                 ".toc li > a[href]::after {content: leader('.') target-counter(attr(href), page);}\n" +
-                "@page big_table { size: 11in 8.5in; prince-shrink-to-fit:auto;}\n" + 
-                ".big-table {page: big_table;}\n";
+                "@page big_table {  size: 11in 8.5in; margin: 0.75in; prince-shrink-to-fit:auto;}\n" +  //size: 11in 8.5in;
+                ".big-table {page: big_table; max-width: 1100px; }\n";
         if (header && header !== '') {
             ret += '@page { @top { font-size: 10px; content: "' + header + '";}}\n';
         }
