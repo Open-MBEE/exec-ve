@@ -420,6 +420,10 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
             if ($this.html().replace(/\s|&nbsp;/g, '').length === 0)
                 $this.remove();
         });
+        printElementCopy.find('[width]').removeAttr('width');
+        printElementCopy.find('[style]').each(function() {
+            this.style.removeProperty('font-size');
+        });
         var coverTemplateString = $templateCache.get('partials/mms/docCover.html');
         var coverTemplateElement = angular.element(coverTemplateString);
         var cover = '';

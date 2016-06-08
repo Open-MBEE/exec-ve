@@ -443,27 +443,27 @@ function UtilsService(CacheService, _) {
         var ret = "img {max-width: 100%; page-break-inside: avoid; page-break-before: auto; page-break-after: auto; display: block;}\n" + 
                 " tr, td, th { page-break-inside: avoid; } thead {display: table-header-group;}\n" + 
                 ".pull-right {float: right;}\n" + 
-                ".view-title {margin-top: 5pt}\n" +
+                ".view-title {margin-top: 10pt}\n" +
                 ".chapter {page-break-before: always}\n" + 
-                "table {width: 100%; border-collapse: collapse;}\n" + 
+                "table {width: 100%; border-collapse: collapse; font-size: 12pt;}\n" + 
                 "table, th, td {border: 1px solid black; padding: 4px;}\n" +
                 "table, th > p, td > p {margin: 0px; padding: 0px;}\n" +
                 "table, th > div > p, td > div > p {margin: 0px; padding: 0px;}\n" +
                 //"table p {word-break: break-all;}\n" + 
                 "h1 {font-size: 20px; padding: 0px; margin: 4px;}\n" +
                 ".ng-hide {display: none;}\n" +
-                "body {font-size: 12px; font-family: Georgia, 'Times New Roman', serif; }\n" + 
+                "body {font-size: 12pt; font-family: Georgia, 'Times New Roman', serif; }\n" + 
                 "caption, figcaption {text-align: center; font-weight: bold;}\n" +
                 ".toc, .tof, .tot {page-break-after:always;}\n" +
-                ".toc a, .tof a, .tot a { text-decoration:none; color: #000; font-size:14px; }\n" + 
+                ".toc a, .tof a, .tot a { text-decoration:none; color: #000; font-size:12pt; }\n" + 
                 ".toc .header, .tof .header, .tot .header { margin-bottom: 4px; font-weight: bold; font-size:24px; }\n" + 
                 ".toc ul, .tof ul, .tot ul {list-style-type:none; margin: 0; }\n" +
                 ".tof ul, .tot ul {padding-left:0;}\n" +
                 ".toc ul {padding-left:4em;}\n" +
                 ".toc > ul {padding-left:0;}\n" +
-                ".toc li > a[href]::after {content: leader('.') target-counter(attr(href), page);}\n" +
-                "@page big_table {  size: 11in 8.5in; margin: 0.75in; prince-shrink-to-fit:auto;}\n" +  //size: 11in 8.5in;
-                ".big-table {page: big_table; max-width: 1100px; }\n";
+                ".toc li > a[href]::after {content: leader('.') target-counter(attr(href), page);}\n";
+                //"@page big_table {  size: 8.5in 11in; margin: 0.75in; prince-shrink-to-fit:auto;}\n" +  //size: 11in 8.5in;
+                //".big-table {page: big_table; max-width: 1100px; }\n";
         if (header && header !== '') {
             ret += '@page { @top { font-size: 10px; content: "' + header + '";}}\n';
         }
