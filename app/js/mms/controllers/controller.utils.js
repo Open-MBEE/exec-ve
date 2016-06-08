@@ -270,7 +270,7 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
                     $scope.genpdf = true;
                 }
                 $scope.docOption = (!isDoc && mode === 3);
-                $scope.model = {genCover: false, genTotf: true};
+                $scope.model = {genCover: false, genTotf: false};
                 $scope.print = function() {
                     $modalInstance.close(['ok', $scope.model.genCover, $scope.model.genTotf]);
                 };
