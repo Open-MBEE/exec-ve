@@ -69,6 +69,13 @@ function AuthService($q, $http, URLService, HttpService, ElementService, ViewSer
             var logouturl = URLService.getLogoutURL();
             removeTicket();
             //var logoutService = '/alfresco/service/api/login/ticket/'+ AuthService.getTicket() + '?alf_ticket=' + AuthService.getTicket();
+            $http.post('/Basic/mms/cookieAuth?op=Sign Out').then(
+                function(data){
+                    // growl.success(data.status + ': ' + data.statusText); 
+                }, function(failure) {
+                    URLService.handleHttpStatus(failure.data, failure.status, failure.headers, failure.config, deferred);
+                }
+            );
             $http.delete(logouturl).then(function(success) {
                 deferred.resolve(true);
                 //$state.go('login');

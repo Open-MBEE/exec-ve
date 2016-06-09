@@ -82,7 +82,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
         views: {
             'pane-center': {
                 templateUrl: 'partials/mms/login.html',
-                controller: function ($scope, $rootScope, $state, AuthService, growl) {
+                controller: function ($scope, $rootScope, $state, $http, AuthService, growl) {
                     $scope.credentials = {
                       username: '',
                       password: ''
@@ -98,7 +98,16 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                                 $state.go(toState, toParams);
                             } else {
                               $state.go('workspace.sites', {workspace: 'master'});
-                          }
+                            }
+                            // Initialize tom sawyer license
+                            var username = $scope.credentials.username;
+                            $http.post('/Basic/mms/cookieAuth?op=Sign In&username='+username).then(
+                                function(data){
+                                    // growl.success(data.status + ': ' + data.statusText); 
+                                }, function(reason) {
+                                    growl.error("TSP license can not be activated: " + reason.message);
+                                }
+                            );
                           }, function (reason) {
                             $scope.spin = false;
                                 growl.error(reason.message);
