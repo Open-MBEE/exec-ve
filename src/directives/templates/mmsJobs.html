@@ -27,10 +27,10 @@
             <div>{{job.status}} <a ng-attr-href="{{job.url}}" target="_blank" ng-show="buttonEnabled">log</a></div> 
         </td>
         <td>{{job.create}}</td>
-        <td><button class="btn-link" ng-click="deleteJob()"><strong><span ng-show="deleteCleared">DELETE JOB</span></stong><i ng-show="!deleteCleared" class="fa fa-spin fa-spinner"></i></button></td>
+        <td><button class="btn-link" ng-click="deleteJob()"><strong><span ng-show="deleteCleared">DELETE JOB</span></stong></button><i ng-show="!deleteCleared" class="fa fa-spin fa-spinner"></i></td>
         <td>
-            <div ng-if="buttonEnabled">
-                <button type="submit" class="btn-link" ng-click="runNow()"><strong><span ng-show="runCleared">RUN NOW</span></stong><i ng-show="!runCleared" class="fa fa-spin fa-spinner"></i></button>
+            <div ng-if="buttonEnabled && deleteCleared">
+                <button type="submit" class="btn-link" ng-click="runNow()"><strong><span ng-show="runCleared">RUN NOW</span></stong></button><i ng-show="!runCleared" class="fa fa-spin fa-spinner"></i>
             </div>
         </td>
         

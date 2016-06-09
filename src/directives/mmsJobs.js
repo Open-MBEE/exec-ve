@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsJobs', ['$templateCache','$http', '$location', 'ElementService','UtilsService','growl','_','$q', mmsJobs]);
+.directive('mmsJobs', ['$templateCache','$http', '$location', 'ElementService','UtilsService','growl','_','$q','URLService', mmsJobs]);
 /**
  * @ngdoc directive
  * @name mms.directives.directive:mmsJobs
@@ -26,7 +26,7 @@ angular.module('mms.directives')
  * @param {string=master} mmsWs Workspace to use, defaults to master
  * @param {string=null} mmsDocId the id of the current document under which the job is being run
  */
-function mmsJobs($templateCache, $http, $location, ElementService, UtilsService, growl, _ , $q) {
+function mmsJobs($templateCache, $http, $location, ElementService, UtilsService, growl, _ , $q, URLService) {
     var template = $templateCache.get('mms/templates/mmsJobs.html');
     //:TODO have cases for each null; "running"; "failed"; "completed"; "aborted";"unstable"; "disabled"; "waiting";
     var mmsJobsLink = function(scope, element, attrs) {
@@ -44,7 +44,7 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
         // get all the jobs for current document
         var getJobs = function(){
             var id = scope.mmsDocId;
-            var link = '/alfresco/service/workspaces/master/jobs/'+ id + '?recurse=1';
+            var link = URLService.getJobs(id);
             scope.loading = true;
             scope.hasJobs = false;
             scope.responseCleared = false;
@@ -110,7 +110,7 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
         scope.$watch('mmsDocId', changeDocument);
 
         var jenkinsRun = function() {
-            var link = '/alfresco/service/workspaces/master/jobs/'+scope.job.sysmlid+'/execute';
+            var link = URLService.getJenkinsRun(scope.job.sysmlid);
             //http://localhost:8080/alfresco/service/workspaces/master/jobs/scope.jobs[0].sysmlid/execute
             scope.runCleared = false;
             $http.post(link, ' ').then(function(){
@@ -161,7 +161,7 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
                 }]
             };
 
-            var link = '/alfresco/service/workspaces/master/jobs';
+            var link = URLService.getCreateJob();
             $http.post(link, post).then(function(data){
                 scope.jobInput = { jobName:''};
                 growl.success('Your job has posted');
@@ -189,7 +189,7 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
                     name: scope.jobInput.jobName+'_job'
                 }]
             };
-            var link = '/alfresco/service/workspaces/master/jobs';
+            var link = URLService.getCreateJob();
             $http.post(link, updatePost).then(function(){
                 growl.success('Your job has been updated');
                 }, function(fail){
@@ -202,7 +202,7 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
                     sysmlid: scope.job.sysmlid
                 }]
             };
-            var link = '/alfresco/service/workspaces/master/jobs/'+scope.job.sysmlid;
+            var link = URLService.getJob(scope.job.sysmlid);
             scope.deleteCleared = false;
             $http.delete(link, jobDelete).then(function(){
                 growl.success('Your job has been deleted');

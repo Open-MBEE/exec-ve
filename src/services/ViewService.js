@@ -1119,12 +1119,13 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
     var getDocMetadata = function(docid, ws, version, weight) {
         var deferred = $q.defer();
         var metadata = {};
-        ElementService.search(docid, ['id'], null, null, null, null, ws, weight)
+        //ElementService.search(docid, ['id'], null, null, null, null, ws, weight)
+        ElementService.getOwnedElements(docid, false, ws, version, 2, weight)
         .then(function(data) {
-            if (data.length === 0 || data[0].sysmlid !== docid || !data[0].properties) {
+            if (data.length === 0) {
                 return;
             }
-            data[0].properties.forEach(function(prop) {
+            data.forEach(function(prop) {
                 var feature = prop.specialization ? prop.specialization.propertyType : null;
                 var value = prop.specialization ? prop.specialization.value : null;
                 if (!feature || !docMetadataTypes[feature] || !value || value.length === 0)
@@ -1147,6 +1148,10 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         return false;
     };
 
+    var reset = function() {
+        inProgress = {};
+    };
+    
     return {
         getView: getView,
         getViews: getViews,
@@ -1177,7 +1182,9 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         TYPE_TO_CLASSIFIER_ID: TYPE_TO_CLASSIFIER_ID,
         getInstanceSpecification : getInstanceSpecification,
         getElementReferenceTree : getElementReferenceTree,
-        getDocMetadata: getDocMetadata
+        getDocMetadata: getDocMetadata,
+
+        reset: reset
     };
 
 }
