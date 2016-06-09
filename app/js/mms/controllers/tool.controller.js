@@ -140,11 +140,11 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, $timeout, ConfigS
     $scope.$on('tags', function() {
         showPane('tags');
     });
-    
 
     $scope.$on('jobs', function() {
         showPane('jobs');
     });
+
     $scope.$on('element-history', function() {
         showPane('history');
     });
