@@ -12,6 +12,8 @@
 
   <!-- <link href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic,700italic" rel="stylesheet" type="text/css"> -->
   <link href="css/ve-mms.styles.min.css" rel="stylesheet" type="text/css">
+  
+  
 
 </head>
 
@@ -73,6 +75,52 @@
   <script src="js/mms/app.tpls.js"></script>
   <script src="js/mms/app.js"></script>
   <script src="js/mms/controllers.js"></script>
-
+  
+  <script type="text/javascript">
+   function getHostname() {
+       var host = location.hostname.slice(0,location.hostname.indexOf('.'));
+       var idSite;
+       switch(host) { 
+        case 'cae-ems':
+            idSite = 78;
+            break;
+        //case 'localhos': uncomment to test locally
+            //idSite = 78;
+            //break;
+        case 'europaems':
+            idSite = 79;
+            break;
+        case 'arrmems':
+            idSite = 80;
+            break;
+        case 'msmems':
+            idSite = 81;
+            break;
+        case 'fn-cae-ems':
+            idSite = 82;
+            break;
+        default:
+            idSite = -1;
+    }
+    return idSite;   
+   }
+   </script>
+   <!-- Piwik -->
+   <script type="text/javascript">
+   var _paq = _paq || [];
+   var host = getHostname();
+   _paq.push(['trackPageView']);
+   _paq.push(['enableLinkTracking']);
+   if(host !== -1){
+       (function() {
+           var u="//piwik.jpl.nasa.gov/";
+           _paq.push(['setTrackerUrl', u+'piwik.php']);
+           _paq.push(['setSiteId', host]);
+           var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+           g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
+       })();
+   }
+   </script>
+<!-- End Piwik Code -->
 </body>
 </html>

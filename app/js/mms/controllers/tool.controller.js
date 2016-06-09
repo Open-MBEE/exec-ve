@@ -3,14 +3,15 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('ToolCtrl', ['$scope', '$rootScope', '$state', '$modal', '$q', '$stateParams',
+.controller('ToolCtrl', ['$scope', '$rootScope', '$state', '$modal', '$q', '$stateParams', '$timeout',
             'ConfigService', 'ElementService', 'WorkspaceService', 'growl', 
             'workspaceObj', 'tags', 'tag', 'snapshots', 'site', 'document', 'time', 'Utils', 'hotkeys',
-function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, ElementService, WorkspaceService, growl, workspaceObj, tags, tag, snapshots, site, document, time, Utils, hotkeys) {
+function($scope, $rootScope, $state, $modal, $q, $stateParams, $timeout, ConfigService, ElementService, WorkspaceService, growl, workspaceObj, tags, tag, snapshots, site, document, time, Utils, hotkeys) {
 
     // TODO rename variable ws
     var ws = $stateParams.workspace;
     $scope.specWs = ws;
+    $scope.specVersion = time;
     $scope.document = document;
     $scope.ws = ws;
     $scope.editable = document && document.editable && time === 'latest';
@@ -85,15 +86,19 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
             $scope.eid = info[1];
             $scope.elementType = 'element';
             $scope.specWs = info[2];
+            $scope.specVersion = 'latest';
         } else if (info[0] === 'workspace') {
             $scope.eid = info[1];
             $scope.elementType = 'workspace';
             $scope.specWs = info[1];
+            $scope.specVersion = 'latest';
         } else if (info[0] === 'tag') {
             $scope.eid = info[1];
             $scope.elementType = 'tag';
             $scope.specWs = info[2];
+            $scope.specVersion = 'latest';
         }
+        $rootScope.mms_tbApi.setPermission('element-editor', true);
     };
 
     $scope.showTracker = function() {
@@ -117,15 +122,15 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
     // Check edit count and toggle appropriate save all and edit/edit-asterisk buttons
     var cleanUpSaveAll = function() {
         if ($scope.veEditsLength() > 0) {
-            $rootScope.mms_tbApi.setPermission('element.editor.saveall', true);
-            $rootScope.mms_tbApi.setIcon('element.editor', 'fa-edit-asterisk');
+            $rootScope.mms_tbApi.setPermission('element-editor-saveall', true);
+            $rootScope.mms_tbApi.setIcon('element-editor', 'fa-edit-asterisk');
         } else {
-            $rootScope.mms_tbApi.setPermission('element.editor.saveall', false);
-            $rootScope.mms_tbApi.setIcon('element.editor', 'fa-edit');
+            $rootScope.mms_tbApi.setPermission('element-editor-saveall', false);
+            $rootScope.mms_tbApi.setIcon('element-editor', 'fa-edit');
         }
     };
 
-    $scope.$on('document.snapshot', function() {
+    $scope.$on('document-snapshot', function() {
         showPane('snapshots');
     });
 
@@ -133,7 +138,7 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
         showPane('tags');
     });
     
-    $scope.$on('element.history', function() {
+    $scope.$on('element-history', function() {
         showPane('history');
     });
 
@@ -177,10 +182,10 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
         cleanUpEdit(scope);           
     });
 
-    $scope.$on('elementSelected', function(event, eid, type) {
+    $scope.$on('elementSelected', function(event, eid, type, ws, version) {
         $scope.elementType = type;
         $scope.eid = eid;
-        $rootScope.mms_tbApi.select('element.viewer');
+        $rootScope.mms_tbApi.select('element-viewer');
         if ($rootScope.togglePane && $rootScope.togglePane.closed)
             $rootScope.togglePane.toggle();
 
@@ -189,25 +194,30 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
             $scope.specApi.setEditing(false);
         if (type !== 'element') {
             if (type === 'workspace' && eid === 'master')
-                $rootScope.mms_tbApi.setPermission('element.editor', false);
+                $rootScope.mms_tbApi.setPermission('element-editor', false);
             else
-                $rootScope.mms_tbApi.setPermission('element.editor', true);
+                $rootScope.mms_tbApi.setPermission('element-editor', true);
         }
         if (type === 'element') {
-            ElementService.getElement(eid, false, ws, time, 2).
+            $scope.specWs = ws;
+            $scope.specVersion = version;
+            ElementService.getElement(eid, false, ws, version, 2).
             then(function(element) {
-                var editable = element.editable && time === 'latest';
-                $rootScope.mms_tbApi.setPermission('element.editor', editable);
-                $rootScope.mms_tbApi.setPermission("document.snapshot.create", editable);
+                var editable = element.editable && version === 'latest';
+                $rootScope.mms_tbApi.setPermission('element-editor', editable);
+                $rootScope.mms_tbApi.setPermission("document-snapshot-create", editable);
             });
+        } else {
+            $scope.specWs = $scope.ws;
+            $scope.specVersion = $scope.version;
         }
     });
-    $scope.$on('element.viewer', function() {
+    $scope.$on('element-viewer', function() {
         $scope.specApi.setEditing(false);
         cleanUpSaveAll();
         showPane('element');
     });
-    $scope.$on('element.editor', function() {
+    $scope.$on('element-editor', function() {
         $scope.specApi.setEditing(true);
         showPane('element');
         var edit = $scope.specApi.getEdits();
@@ -230,32 +240,33 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
         $scope.viewElements = viewElements;
         $scope.elementType = 'element';
         $scope.specWs = ws;
-        $rootScope.mms_tbApi.select('element.viewer');
+        $scope.specVersion = time;
+        $rootScope.mms_tbApi.select('element-viewer');
         showPane('element');
         ElementService.getElement(vid, false, ws, time, 2).
         then(function(element) {
             var editable = element.editable && time === 'latest';
-            $rootScope.mms_tbApi.setPermission('element.editor', editable);
-            $rootScope.mms_tbApi.setPermission('view.reorder', editable);
-            $rootScope.mms_tbApi.setPermission("document.snapshot.create", editable);
+            $rootScope.mms_tbApi.setPermission('element-editor', editable);
+            $rootScope.mms_tbApi.setPermission('view-reorder', editable);
+            $rootScope.mms_tbApi.setPermission("document-snapshot-create", editable);
         });
         $scope.specApi.setEditing(false);
     });
 
-    $scope.$on('view.reorder.refresh', function() {
+    $scope.$on('view-reorder.refresh', function() {
         $scope.viewOrderApi.refresh();
     });
 
-    $scope.$on('view.reorder', function() {
+    $scope.$on('view-reorder', function() {
         $scope.viewOrderApi.setEditing(true);
         showPane('reorder');
     });
     
     var elementSaving = false;
-    $scope.$on('element.editor.save', function() {
+    $scope.$on('element-editor-save', function() {
         save(false);
     });
-    $scope.$on('element.editor.saveC', function() {
+    $scope.$on('element-editor-saveC', function() {
         save(true);
     });
     var save = function(continueEdit) {
@@ -265,9 +276,10 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
         }
         elementSaving = true;
         if (!continueEdit)
-            $rootScope.mms_tbApi.toggleButtonSpinner('element.editor.save');
+            $rootScope.mms_tbApi.toggleButtonSpinner('element-editor-save');
         else
-            $rootScope.mms_tbApi.toggleButtonSpinner('element.editor.saveC');
+            $rootScope.mms_tbApi.toggleButtonSpinner('element-editor-saveC');
+        $timeout(function() {
         $scope.specApi.save().then(function(data) {
             elementSaving = false;
             growl.success('Save Successful');
@@ -285,7 +297,7 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
                 $scope.elementType = id[0];
             } else {
                 $scope.specApi.setEditing(false);
-                $rootScope.mms_tbApi.select('element.viewer');
+                $rootScope.mms_tbApi.select('element-viewer');
                 cleanUpSaveAll();
             }
         }, function(reason) {
@@ -298,21 +310,22 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
                 growl.error(reason.message);
         }).finally(function() {
             if (!continueEdit)
-                $rootScope.mms_tbApi.toggleButtonSpinner('element.editor.save');
+                $rootScope.mms_tbApi.toggleButtonSpinner('element-editor-save');
             else
-                $rootScope.mms_tbApi.toggleButtonSpinner('element.editor.saveC');
+                $rootScope.mms_tbApi.toggleButtonSpinner('element-editor-saveC');
         });
-        $rootScope.mms_tbApi.select('element.editor');
+        }, 1000, false);
+        $rootScope.mms_tbApi.select('element-editor');
     };
 
     hotkeys.bindTo($scope)
     .add({
         combo: 'alt+a',
         description: 'save all',
-        callback: function() {$scope.$broadcast('element.editor.saveall');}
+        callback: function() {$scope.$broadcast('element-editor-saveall');}
     });
     var savingAll = false;
-    $scope.$on('element.editor.saveall', function() {
+    $scope.$on('element-editor-saveall', function() {
         if (savingAll) {
             growl.info('Please wait...');
             return;
@@ -324,7 +337,7 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
         if ($scope.specApi && $scope.specApi.tinymceSave)
             $scope.specApi.tinymceSave();
         savingAll = true;
-        $rootScope.mms_tbApi.toggleButtonSpinner('element.editor.saveall');
+        $rootScope.mms_tbApi.toggleButtonSpinner('element-editor-saveall');
         var promises = [];
         angular.forEach($rootScope.veEdits, function(value, key) {
             var defer = $q.defer();
@@ -374,26 +387,27 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
             });
             if (!somefail) {
                 growl.success("Save All Successful");
-                $rootScope.mms_tbApi.select('element.viewer');
+                $rootScope.mms_tbApi.select('element-viewer');
                 $scope.specApi.setEditing(false);
             } else {
                 $scope.tracker.etrackerSelected = failedType + '|' + failedId + '|' + failedWs;
                 $scope.specApi.keepMode();
                 $scope.eid = failedId;
                 $scope.specWs = failedWs;
+                $scope.specVersion = 'latest';
                 $scope.elementType = failedType;
                 growl.error("Some elements failed to save, resolve individually in edit pane");
             }
-            $rootScope.mms_tbApi.toggleButtonSpinner('element.editor.saveall');
+            $rootScope.mms_tbApi.toggleButtonSpinner('element-editor-saveall');
             savingAll = false;
             cleanUpSaveAll();
 
             if (Object.keys($rootScope.veEdits).length === 0) {
-                $rootScope.mms_tbApi.setIcon('element.editor', 'fa-edit');
+                $rootScope.mms_tbApi.setIcon('element-editor', 'fa-edit');
             }
         });
     });
-    $scope.$on('element.editor.cancel', function() {
+    $scope.$on('element-editor-cancel', function() {
         var go = function() {
             var edit = $scope.specApi.getEdits();
             delete $rootScope.veEdits[$scope.elementType + '|' + (edit.sysmlid || edit.id) + '|' + $scope.specWs];
@@ -405,11 +419,12 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
                 $scope.specApi.keepMode();
                 $scope.eid = id[1];
                 $scope.specWs = id[2];
+                $scope.specVersion = 'latest';
                 $scope.elementType = id[0];
             } else {
                 $scope.specApi.setEditing(false);
-                $rootScope.mms_tbApi.select('element.viewer');
-                $rootScope.mms_tbApi.setIcon('element.editor', 'fa-edit');
+                $rootScope.mms_tbApi.select('element-viewer');
+                $rootScope.mms_tbApi.setIcon('element-editor', 'fa-edit');
                 cleanUpSaveAll();
             }
         };
@@ -433,18 +448,18 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
             go();
     });
     var viewSaving = false;
-    $scope.$on('view.reorder.save', function() {
+    $scope.$on('view-reorder-save', function() {
         if (viewSaving) {
             growl.info('Please Wait...');
             return;
         }
         viewSaving = true;
-        $rootScope.mms_tbApi.toggleButtonSpinner('view.reorder.save');
+        $rootScope.mms_tbApi.toggleButtonSpinner('view-reorder-save');
         $scope.viewOrderApi.save().then(function(data) {
             viewSaving = false;
             $scope.viewOrderApi.refresh();
             growl.success('Save Succesful');
-            $rootScope.mms_tbApi.toggleButtonSpinner('view.reorder.save');
+            $rootScope.mms_tbApi.toggleButtonSpinner('view-reorder-save');
         }, function(reason) {
             $scope.viewOrderApi.refresh();
             viewSaving = false;
@@ -454,14 +469,14 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, ConfigService, El
                 growl.warning(reason.message);
             else if (reason.type === 'error')
                 growl.error(reason.message);
-            $rootScope.mms_tbApi.toggleButtonSpinner('view.reorder.save');
+            $rootScope.mms_tbApi.toggleButtonSpinner('view-reorder-save');
         });
-        $rootScope.mms_tbApi.select('view.reorder');
+        $rootScope.mms_tbApi.select('view-reorder');
     });
-    $scope.$on('view.reorder.cancel', function() {
+    $scope.$on('view-reorder-cancel', function() {
         $scope.specApi.setEditing(false);
         $scope.viewOrderApi.refresh();
-        $rootScope.mms_tbApi.select('element.viewer');
+        $rootScope.mms_tbApi.select('element-viewer');
         showPane('element');
     });
 }]);

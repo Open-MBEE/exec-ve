@@ -44,20 +44,29 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
         $scope.bbApi.init = function() {
             if (!$scope.buttonsInit) {
                 $scope.buttonsInit = true;
-                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.preview", $scope));
-                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.save", $scope));
-                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.saveC", $scope));
-                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.cancel", $scope));
-                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.delete", $scope));
-                $scope.bbApi.setPermission("presentation.element.delete", $scope.isDirectChildOfPresentationElement);
+                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-preview", $scope));
+                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-save", $scope));
+                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-saveC", $scope));
+                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-cancel", $scope));
+                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-delete", $scope));
+                $scope.bbApi.setPermission("presentation-element-delete", $scope.isDirectChildOfPresentationElement);
             }     
         };
 
+        this.getWsAndVersion = function() {
+            return {
+                workspace: $scope.ws, 
+                version: $scope.version,
+                tag: undefined
+            };
+        };
     };
 
     var mmsTranscludeDocLink = function(scope, element, attrs, controllers) {
         var mmsViewCtrl = controllers[0];
         var mmsViewPresentationElemCtrl = controllers[1];
+        var mmsCfDocCtrl = controllers[2];
+        var mmsCfValCtrl = controllers[3];
         scope.recompileScope = null;
         var processed = false;
         scope.cfType = 'doc';
@@ -67,7 +76,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                 scope.addFrame();
 
             if (mmsViewCtrl)
-                mmsViewCtrl.transcludeClicked(scope.mmsEid);
+                mmsViewCtrl.transcludeClicked(scope.mmsEid, scope.ws, scope.version);
 
             /*if (e.target.tagName !== 'A' && e.target.tagName !== 'INPUT' && !scope.isEditing)
                 return false;
@@ -128,12 +137,26 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                 return;
             idwatch();
             if (UtilsService.hasCircularReference(scope, scope.mmsEid, 'doc')) {
-                element.html('<span class="error">Circular Reference!</span>');
+                element.html('<span class="mms-error">Circular Reference!</span>');
                 //$log.log("prevent circular dereference!");
                 return;
             }
             var ws = scope.mmsWs;
             var version = scope.mmsVersion;
+            if (mmsCfValCtrl) {
+                var cfvVersion = mmsCfValCtrl.getWsAndVersion();
+                if (!ws)
+                    ws = cfvVersion.workspace;
+                if (!version)
+                    version = cfvVersion.version;
+            }
+            if (mmsCfDocCtrl) {
+                var cfdVersion = mmsCfDocCtrl.getWsAndVersion();
+                if (!ws)
+                    ws = cfdVersion.workspace;
+                if (!version)
+                    version = cfdVersion.version;
+            }
             if (mmsViewCtrl) {
                 var viewVersion = mmsViewCtrl.getWsAndVersion();
                 if (!ws)
@@ -162,6 +185,18 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                     scope.$on('element.updated', function(event, eid, ws, type, continueEdit) {
                         if (eid === scope.mmsEid && ws === scope.ws && (type === 'all' || type === 'documentation') && !continueEdit)
                             recompile();
+                    });
+                    //actions for stomp 
+                    scope.$on("stomp.element", function(event, deltaSource, deltaWorkspaceId, deltaElementId, deltaModifier, elemName){
+                        if(deltaWorkspaceId === scope.ws && deltaElementId === scope.mmsEid){
+                            if(scope.isEditing === false){
+                                recompile();
+                            }
+                            if(scope.isEditing === true){
+                                growl.warning("This documentation has been changed: " + elemName +
+                                            " modified by: " + deltaModifier, {ttl: -1});
+                            }
+                        }
                     });
                 }
                 // TODO: below has issues when having edits.  For some reason this is
@@ -192,7 +227,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                 //     }
 
                 // }, function(reason) {
-                //     element.html('<span class="error">doc cf ' + newVal + ' not found</span>');
+                //     element.html('<span class="mms-error">doc cf ' + newVal + ' not found</span>');
                 //     growl.error('Cf Doc Error: ' + reason.message + ': ' + scope.mmsEid);
                 // });
 
@@ -200,7 +235,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                 var status = ' not found';
                 if (reason.status === 410)
                     status = ' deleted';
-                element.html('<span class="error">doc cf ' + newVal + status + '</span>');
+                element.html('<span class="mms-error">doc cf ' + newVal + status + '</span>');
                 //growl.error('Cf Doc Error: ' + reason.message + ': ' + scope.mmsEid);
             });
         });
@@ -271,20 +306,6 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                 scope.tinymceType = scope.presentationElem.type;
             }
         }
-        
-        //actions for stomp 
-        scope.$on("stomp.element", function(event, deltaSource, deltaWorkspaceId, deltaElementId, deltaModifier, elemName){
-            if(deltaWorkspaceId === scope.ws && deltaElementId === scope.mmsEid){
-                if(scope.isEditing === false){
-                    recompile();
-                }
-                if(scope.isEditing === true){
-                    growl.warning("This documentation has been changed: " + elemName +
-                                " modified by: " + deltaModifier, {ttl: -1});
-                }
-            }
-        });
-
     };
 
     return {
@@ -294,7 +315,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             mmsWs: '@',
             mmsVersion: '@'
         },
-        require: ['?^mmsView','?^mmsViewPresentationElem'],
+        require: ['?^^mmsView','?^^mmsViewPresentationElem', '?^^mmsTranscludeDoc', '?^^mmsTranscludeVal'],
         controller: ['$scope', mmsTranscludeDocCtrl],
         link: mmsTranscludeDocLink
     };

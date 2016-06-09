@@ -14,7 +14,8 @@ th {
 // Baseline styles
 
 .table {
-  width: 100%;
+  //width: 100%; this is commented out to support VE-266's table width heruistic in
+  //determining whether table should be on its own page in pdf, as well as not making small tables look huge
   max-width: 100%;
   margin-bottom: $line-height-computed;
   // Cells

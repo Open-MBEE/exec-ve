@@ -17,7 +17,7 @@ function HttpService($http, $q, _) {
     queue[1]=[];//low prority
     var cache = {}; // cache url -> this is a easy key look up
     var inProgress = 0;
-    var GET_OUTBOUND_LIMIT = 50; //max number of requests sent to the rest server at one time
+    var GET_OUTBOUND_LIMIT = 25; //max number of requests sent to the rest server at one time
 
     /**
      * @ngdoc method
@@ -147,10 +147,18 @@ function HttpService($http, $q, _) {
         }
     };
 
+    var dropAll = function() {
+        queue[1].length = 0;
+        queue[0].length = 0;
+        cache = {};
+        inProgress = 0;
+    };
+
     return {
         get: get,
         ping: ping,
-        transformQueue: transformQueue
+        transformQueue: transformQueue,
+        dropAll: dropAll
     };
 
 }
