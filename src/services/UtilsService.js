@@ -384,10 +384,6 @@ function UtilsService(CacheService, _) {
     };
 
     var makeHtmlTOCChild = function(child) {
-        // TODO check if still needed
-        // if (child.type !== 'view' && child.type !== 'section')
-        //     return '';
-
         var result = '<ul>';
 
         var anchor = '<a href=#' + child.data.sysmlid + '>';

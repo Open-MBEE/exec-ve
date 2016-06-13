@@ -391,10 +391,6 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
         var toc = '';
         if (isDoc)
             toc = UtilsService.makeHtmlTOC($rootScope.mms_treeApi.get_rows());
-
-//TODO figure out where this should go
-        var figuresAndTables = UtilsService.makeTablesAndFiguresTOC($rootScope.mms_treeApi.get_rows(), printElementCopy);
-
         printElementCopy.find("a").attr('href', function(index, old) {
             if (!old)
                 return old;
