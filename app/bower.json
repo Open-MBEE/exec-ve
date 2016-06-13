@@ -25,6 +25,7 @@
   "dependencies": {
     "jquery": "~2.1.4",
     "angular": "~1.4.0",
+    "angular-cookies": "~1.4.0",
     "angular-animate": "~1.4.0",
     "angular-borderlayout": "https://github.com/dlamoris/angular-borderlayout.git#master",
     "angular-ui-router": "~0.2.15",
