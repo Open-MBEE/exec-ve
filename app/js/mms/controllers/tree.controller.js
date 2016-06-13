@@ -1159,8 +1159,8 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
         //}
     }
 
-    // ViewCtrl creates this event when adding sections to the view
-    $scope.$on('viewctrl.add.section', function(event, instanceSpec, parentBranchData) {
+    // MmsAppUtils.addElementCtrl creates this event when adding sections, table and figures to the view
+    $scope.$on('viewctrl.add.element', function(event, instanceSpec, elemType, parentBranchData) {
 
         var branch = $scope.treeApi.get_branch(parentBranchData);
         var viewid = null;
@@ -1170,12 +1170,11 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
             viewid = branch.data.sysmlid;
         var newbranch = {
             label: instanceSpec.name,
-            type: "section",
+            type: elemType,
             view: viewid,
             data: instanceSpec,
             children: [],
         };
-        //$scope.treeApi.add_branch(branch, newbranch, false);
         var i = 0;
         var lastSection = -1;
         for (i = 0; i < branch.children.length; i++) {
@@ -1184,8 +1183,11 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
                 break;
             }
         }
+        if (lastSection == -1) 
+            lastSection = branch.children.length-1;
         branch.children.splice(lastSection+1, 0, newbranch);
-        addSectionElements(instanceSpec, viewId2node[viewid], newbranch);
+        if (elemType == 'section') 
+            addSectionElements(instanceSpec, viewId2node[viewid], newbranch);
         $scope.treeApi.refresh();
 
     });

@@ -69,7 +69,7 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
             then(function(data) {
                 if ($scope.presentationElemType === "Section") {
                     // Broadcast message to TreeCtrl:
-                    $rootScope.$broadcast('viewctrl.add.section', element, $scope.viewOrSection);
+                    $rootScope.$broadcast('viewctrl.add.element', element, $scope.presentationElemType.toLowerCase(), $scope.viewOrSection);
                 }
                 growl.success("Adding "+$scope.presentationElemType+"  Successful");
                 $modalInstance.close(data);
@@ -94,6 +94,8 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
 
             ViewService.createInstanceSpecification($scope.viewOrSection, $scope.ws, $scope.presentationElemType, $scope.site.sysmlid, $scope.newItem.name).
             then(function(data) {
+                var elemType = $scope.presentationElemType.toLowerCase();
+                $rootScope.$broadcast('viewctrl.add.element', data, elemType, $scope.viewOrSection);
                 $rootScope.$broadcast('view-reorder.refresh');
                 growl.success("Adding "+$scope.presentationElemType+"  Successful");
                 $modalInstance.close(data);
@@ -112,7 +114,7 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
 
     /**
      * @ngdoc method
-     * @name mmsApp.MmsAppUtils#getPresentationElement
+     * @name mmsApp.MmsAppUtils#addPresentationElement
      * @methodOf mmsApp.MmsAppUtils
      *
      * @description
