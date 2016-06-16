@@ -24,7 +24,7 @@
     <p ng-if="unsaved" class="error">
       WARNING: You currently have unsaved changes in the session that may not be reflected.
     </p>
-    <br/><div ng-if="type == 'DOCUMENT'">Generate Standard Cover Page: <input type="checkbox" ng-model="model.genCover"></div>
+    <br/> <div ng-if="type == 'DOCUMENT'">Generate Standard Cover Page: <input type="checkbox" ng-model="model.genCover"></div> 
     <div ng-if="type == 'DOCUMENT' && genpdf">Generate List of Tables and Figures: <input type="checkbox" ng-model="model.genTotf"></div>
 </div>
 

@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.borderLayout', 'ui.bootstrap', 'ui.router', 'ui.tree', 'angular-growl', 'cfp.hotkeys'])
+angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.borderLayout', 'ui.bootstrap', 'ui.router', 'ui.tree', 'angular-growl', 'cfp.hotkeys', 'angulartics', 'angulartics.piwik'])
 .config(function($stateProvider, $urlRouterProvider, $httpProvider) {
     // Change the DEFAULT state to workspace.sites on entry
     //$urlRouterProvider.when('', '/workspaces/master/sites');
@@ -128,9 +128,10 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             //     // url service append ticket
             //     return $http.get(URLService.getCheckLoginURL());
             // },
-            ticket: function($window, URLService, AuthService, $location, $q) {
+            ticket: function($window, URLService, AuthService, $location, $q, ApplicationService) {
                 var deferred = $q.defer();
-                AuthService.checkLogin().then(function() {
+                AuthService.checkLogin().then(function(data) {
+                    ApplicationService.setUserName(data);
                     URLService.setTicket($window.localStorage.getItem('ticket'));
                     deferred.resolve($window.localStorage.getItem('ticket'));
                 }, function(rejection) {
