@@ -62,23 +62,23 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
 
     $scope.bbApi.init = function() {
         if (view && view.editable && time === 'latest') {
-            $scope.bbApi.addButton(UxService.getButtonBarButton('show.edits'));
-            $scope.bbApi.setToggleState('show.edits', $rootScope.mms_ShowEdits);
+            $scope.bbApi.addButton(UxService.getButtonBarButton('show-edits'));
+            $scope.bbApi.setToggleState('show-edits', $rootScope.mms_ShowEdits);
             hotkeys.bindTo($scope)
             .add({
                 combo: 'alt+d',
                 description: 'toggle edit mode',
-                callback: function() {$scope.$broadcast('show.edits');}
+                callback: function() {$scope.$broadcast('show-edits');}
             });
         }
-        $scope.bbApi.addButton(UxService.getButtonBarButton('show.comments'));
-        $scope.bbApi.setToggleState('show.comments', $rootScope.veCommentsOn);
+        $scope.bbApi.addButton(UxService.getButtonBarButton('show-comments'));
+        $scope.bbApi.setToggleState('show-comments', $rootScope.veCommentsOn);
         if (view && view.editable && time === 'latest') {
             if ($scope.view.specialization.contents || $scope.view.specialization.type === 'InstanceSpecification') {
-                $scope.bbApi.addButton(UxService.getButtonBarButton('view.add.dropdown'));
+                $scope.bbApi.addButton(UxService.getButtonBarButton('view-add-dropdown'));
             } else {
                 var fakeDropdown = {
-                    id: 'view.add.dropdown.fake', 
+                    id: 'view-add-dropdown-fake', 
                     icon: 'fa-plus', 
                     selected: true, 
                     active: true, 
@@ -96,36 +96,36 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         if ($state.includes('workspace.site')) {
             $scope.bbApi.addButton(UxService.getButtonBarButton('print'));
             if ($state.includes('workspace.site.document'))
-                $scope.bbApi.addButton(UxService.getButtonBarButton('convert.pdf'));
+                $scope.bbApi.addButton(UxService.getButtonBarButton('convert-pdf'));
             $scope.bbApi.addButton(UxService.getButtonBarButton('word'));
             $scope.bbApi.addButton(UxService.getButtonBarButton('tabletocsv'));
         }
-        $scope.bbApi.addButton(UxService.getButtonBarButton('show.elements'));
-        $scope.bbApi.setToggleState('show.elements', $rootScope.veElementsOn);
+        $scope.bbApi.addButton(UxService.getButtonBarButton('show-elements'));
+        $scope.bbApi.setToggleState('show-elements', $rootScope.veElementsOn);
         hotkeys.bindTo($scope)
         .add({
             combo: 'alt+c',
             description: 'toggle show comments',
-            callback: function() {$scope.$broadcast('show.comments');}
+            callback: function() {$scope.$broadcast('show-comments');}
         }).add({
             combo: 'alt+e',
             description: 'toggle show elements',
-            callback: function() {$scope.$broadcast('show.elements');}
+            callback: function() {$scope.$broadcast('show-elements');}
         });
       
         if ($state.includes('workspace.site.document') || $state.includes('workspace.site.documentpreview')) {
             if ($state.includes('workspace.site.document')) {
-                $scope.bbApi.addButton(UxService.getButtonBarButton('center.previous'));
-                $scope.bbApi.addButton(UxService.getButtonBarButton('center.next'));
+                $scope.bbApi.addButton(UxService.getButtonBarButton('center-previous'));
+                $scope.bbApi.addButton(UxService.getButtonBarButton('center-next'));
                 hotkeys.bindTo($scope)
                 .add({
                     combo: 'alt+.',
                     description: 'next',
-                    callback: function() {$scope.$broadcast('center.next');}
+                    callback: function() {$scope.$broadcast('center-next');}
                 }).add({
                     combo: 'alt+,',
                     description: 'previous',
-                    callback: function() {$scope.$broadcast('center.previous');}
+                    callback: function() {$scope.$broadcast('center-previous');}
                 });
                 if ($rootScope.mms_treeApi && $rootScope.mms_treeApi.get_selected_branch) {
                     var selected_branch = $rootScope.mms_treeApi.get_selected_branch();
@@ -139,104 +139,110 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         }
     };
 
-    $scope.$on('convert.pdf', function() {
-        MmsAppUtils.popupPrintConfirm(view, $scope.ws, time, false, false, true, true);
+
+    $scope.$on('convert-pdf', function() {
+        MmsAppUtils.printModal(view, $scope.ws, site, time, tag, false, 3);
     });
 
-    $scope.$on('view.add.paragraph', function() {
+    $scope.$on('view-add-paragraph', function() {
         MmsAppUtils.addPresentationElement($scope, 'Paragraph', view);
     });
 
-    $scope.$on('view.add.list', function() {
+    $scope.$on('view-add-list', function() {
         MmsAppUtils.addPresentationElement($scope, 'List', view);
     });
 
-    $scope.$on('view.add.table', function() {
+    $scope.$on('view-add-table', function() {
         MmsAppUtils.addPresentationElement($scope, 'Table', view);
     });
 
-    $scope.$on('view.add.section', function() {
+    $scope.$on('view-add-section', function() {
         MmsAppUtils.addPresentationElement($scope, 'Section', view);
     });
 
-    $scope.$on('view.add.comment', function() {
+    $scope.$on('view-add-comment', function() {
         MmsAppUtils.addPresentationElement($scope, 'Comment', view);
     });
 
-    $scope.$on('view.add.image', function() {
-        MmsAppUtils.addPresentationElement($scope, 'Image', view);
+    $scope.$on('view-add-image', function() {
+        MmsAppUtils.addPresentationElement($scope, 'Figure', view);
     });
-
-    $scope.$on('view.add.equation', function() {
-        MmsAppUtils.addPresentationElement($scope, 'Equation', view);
+/*
+    $scope.$on('view-add-equation', function() {
+        addElement('Equation');
     });
-
-    $scope.$on('section.add.paragraph', function(event, section) {
+*/
+    $scope.$on('section-add-paragraph', function(event, section) {
         MmsAppUtils.addPresentationElement($scope, 'Paragraph', section);
     });
 
-    $scope.$on('section.add.list', function(event, section) {
+    $scope.$on('section-add-list', function(event, section) {
         MmsAppUtils.addPresentationElement($scope, 'List', section);
     });
 
-    $scope.$on('section.add.table', function(event, section) {
+    $scope.$on('section-add-table', function(event, section) {
         MmsAppUtils.addPresentationElement($scope, 'Table', section);
     });
-
-    $scope.$on('section.add.equation', function(event, section) {
-        MmsAppUtils.addPresentationElement($scope, 'Equation', section);
+/*
+    $scope.$on('section-add-equation', function(event, section) {
+        addElement('Equation', section);
     });
-
-    $scope.$on('section.add.section', function(event, section) {
+*/
+    $scope.$on('section-add-section', function(event, section) {
         MmsAppUtils.addPresentationElement($scope, 'Section', section);
     });
 
-    $scope.$on('section.add.comment', function(event, section) {
+    $scope.$on('section-add-comment', function(event, section) {
         MmsAppUtils.addPresentationElement($scope, 'Comment', section);
     });
 
-    $scope.$on('section.add.image', function(event, section) {
-        MmsAppUtils.addPresentationElement($scope, 'Image', section);
+    $scope.$on('section-add-image', function(event, section) {
+        MmsAppUtils.addPresentationElement($scope, 'Figure', section);
     });
 
-    $scope.$on('show.comments', function() {
+    $scope.$on('show-comments', function() {
         $scope.viewApi.toggleShowComments();
-        $scope.bbApi.toggleButtonState('show.comments');
+        $scope.bbApi.toggleButtonState('show-comments');
         $rootScope.veCommentsOn = !$rootScope.veCommentsOn;
     });
 
-    $scope.$on('show.elements', function() {
+    $scope.$on('show-elements', function() {
         $scope.viewApi.toggleShowElements();
-        $scope.bbApi.toggleButtonState('show.elements');
+        $scope.bbApi.toggleButtonState('show-elements');
         $rootScope.veElementsOn = !$rootScope.veElementsOn;
     });
 
-    $scope.$on('show.edits', function() {
+    $scope.$on('show-edits', function() {
+        if( ($rootScope.veElementsOn && $rootScope.mms_ShowEdits) || (!$rootScope.veElementsOn && !$rootScope.mms_ShowEdits) ){
+            $scope.viewApi.toggleShowElements();
+            $scope.bbApi.toggleButtonState('show-elements');
+            $rootScope.veElementsOn = !$rootScope.veElementsOn;
+        }
         $scope.viewApi.toggleShowEdits();
-        $scope.bbApi.toggleButtonState('show.edits');
+        $scope.bbApi.toggleButtonState('show-edits');
         $rootScope.mms_ShowEdits = !$rootScope.mms_ShowEdits;
         if ($scope.filterApi.setEditing)
             $scope.filterApi.setEditing($rootScope.mms_ShowEdits);
     });
 
-    $scope.$on('center.previous', function() {
+    $scope.$on('center-previous', function() {
         var prev = $rootScope.mms_treeApi.get_prev_branch($rootScope.mms_treeApi.get_selected_branch());
         if (!prev)
             return;
-        $scope.bbApi.toggleButtonSpinner('center.previous');
+        $scope.bbApi.toggleButtonSpinner('center-previous');
         $rootScope.mms_treeApi.select_branch(prev);
         if (prev.type === 'section')
-            $scope.bbApi.toggleButtonSpinner('center.previous');
+            $scope.bbApi.toggleButtonSpinner('center-previous');
     });
 
-    $scope.$on('center.next', function() {
+    $scope.$on('center-next', function() {
         var next = $rootScope.mms_treeApi.get_next_branch($rootScope.mms_treeApi.get_selected_branch());
         if (!next)
             return;
-        $scope.bbApi.toggleButtonSpinner('center.next');
+        $scope.bbApi.toggleButtonSpinner('center-next');
         $rootScope.mms_treeApi.select_branch(next);
         if (next.type === 'section')
-            $scope.bbApi.toggleButtonSpinner('center.next');
+            $scope.bbApi.toggleButtonSpinner('center-next');
     });
 
     if (view) {
@@ -273,8 +279,8 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     $scope.numComments = 0;
     $scope.lastCommented = "";
     $scope.lastCommentedBy = "";
-    $scope.tscClicked = function(elementId) {
-        $rootScope.$broadcast('elementSelected', elementId, 'element');
+    $scope.tscClicked = function(elementId, ws, version) {
+        $rootScope.$broadcast('elementSelected', elementId, 'element', ws, version);
     };
     $scope.searchOptions= {};
     $scope.searchOptions.callback = function(elem) {
@@ -316,10 +322,10 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     if ($state.includes('workspace.site.document'))
         docOption = true;
     $scope.$on('print', function() {
-        MmsAppUtils.popupPrintConfirm(view, $scope.ws, time, false, true, false, docOption);
+        MmsAppUtils.printModal(view, $scope.ws, site, time, tag, false, 1);
     });
     $scope.$on('word', function() {
-        MmsAppUtils.popupPrintConfirm(view, $scope.ws, time, false, false, false, docOption);
+        MmsAppUtils.printModal(view, $scope.ws, site, time, tag, false, 2);
     });
     $scope.$on('tabletocsv', function() {
         MmsAppUtils.tableToCsv(view, $scope.ws, time, false);

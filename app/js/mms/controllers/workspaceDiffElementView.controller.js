@@ -5,7 +5,7 @@
 angular.module('mmsApp')
 .controller('WorkspaceDiffElementViewController', ["_", "$timeout", "$scope", "$rootScope", "$state", "$stateParams", "$modal", "growl", "WorkspaceService", "ElementService", "diff", "UxService", 'sourceName', 'targetName',
 function(_, $timeout, $scope, $rootScope, $state, $stateParams, $modal, growl, WorkspaceService, ElementService, diff, UxService, sourceName, targetName) {
-    $rootScope.tbApi.select('diff.perspective.detail');
+    $rootScope.tbApi.select('diff-perspective-detail');
     
     $scope.source = $stateParams.source;
     $scope.target = $stateParams.target;
