@@ -532,7 +532,7 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
 
             var viewOrSecId = section ? section.sysmlid : scope.view.sysmlid;
             ViewService.deleteElementFromViewOrSection(viewOrSecId, scope.ws, scope.instanceVal).then(function(data) {
-                if (ViewService.isSection(scope.presentationElem)) {
+                if (ViewService.isSection(scope.presentationElem) || ViewService.isTable(scope.edit) || ViewService.isFigure(scope.edit)) {
                     // Broadcast message to TreeCtrl:
                     $rootScope.$broadcast('viewctrl.delete.section', scope.presentationElem);
                 }
