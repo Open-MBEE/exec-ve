@@ -51,7 +51,7 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
                     dis.toggleShowEdits();
                 }
             }
-        }, number: curSec};
+        }, number: curSec, topLevel: (curSec ? (curSec.toString().indexOf('.') === -1 && curSec !== 1) : false)};
     };
     var addToArray = function(viewId, curSection) {
         views.push( buildViewElt(viewId, curSection) );
@@ -70,8 +70,8 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
     });
     $scope.version = time;
     $scope.views = views;
-    $scope.tscClicked = function(elementId) {
-        $rootScope.$broadcast('elementSelected', elementId, 'element');
+    $scope.tscClicked = function(elementId, ws, version) {
+        $rootScope.$broadcast('elementSelected', elementId, 'element', ws, version);
     };
 
     $scope.$on('newViewAdded', function(event, vId, curSec, prevSibId) {
@@ -83,130 +83,100 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
     $scope.bbApi.init = function() {
 
         if (document && document.editable && time === 'latest') {
-            $scope.bbApi.addButton(UxService.getButtonBarButton('show.edits'));
-            $scope.bbApi.setToggleState('show.edits', $rootScope.mms_ShowEdits);
+            $scope.bbApi.addButton(UxService.getButtonBarButton('show-edits'));
+            $scope.bbApi.setToggleState('show-edits', $rootScope.mms_ShowEdits);
             hotkeys.bindTo($scope)
             .add({
                 combo: 'alt+d',
                 description: 'toggle edit mode',
-                callback: function() {$scope.$broadcast('show.edits');}
+                callback: function() {$scope.$broadcast('show-edits');}
             });
         }
 
-        $scope.bbApi.addButton(UxService.getButtonBarButton('show.comments'));
-        $scope.bbApi.setToggleState('show.comments', $rootScope.veCommentsOn);
+        $scope.bbApi.addButton(UxService.getButtonBarButton('show-comments'));
+        $scope.bbApi.setToggleState('show-comments', $rootScope.veCommentsOn);
         $scope.bbApi.addButton(UxService.getButtonBarButton('print'));
-        $scope.bbApi.addButton(UxService.getButtonBarButton('convert.pdf'));
+        $scope.bbApi.addButton(UxService.getButtonBarButton('convert-pdf'));
         $scope.bbApi.addButton(UxService.getButtonBarButton('word'));
         $scope.bbApi.addButton(UxService.getButtonBarButton('tabletocsv'));
-        $scope.bbApi.addButton(UxService.getButtonBarButton('show.elements'));
-        $scope.bbApi.setToggleState('show.elements', $rootScope.veElementsOn);
+        $scope.bbApi.addButton(UxService.getButtonBarButton('show-elements'));
+        $scope.bbApi.setToggleState('show-elements', $rootScope.veElementsOn);
         hotkeys.bindTo($scope)
         .add({
             combo: 'alt+c',
             description: 'toggle show comments',
-            callback: function() {$scope.$broadcast('show.comments');}
+            callback: function() {$scope.$broadcast('show-comments');}
         }).add({
             combo: 'alt+e',
             description: 'toggle show elements',
-            callback: function() {$scope.$broadcast('show.elements');}
+            callback: function() {$scope.$broadcast('show-elements');}
         });
     };
 
     var converting = false;
-
-    $scope.$on('convert.pdf', function() {
+    $scope.$on('convert-pdf', function() {
         if (converting) {
             growl.info("Please wait...");
             return;
         }
         converting = true;
-        $scope.bbApi.toggleButtonSpinner('convert.pdf');
-        MmsAppUtils.popupPrintConfirm(document, $scope.ws, time, true, false, true, false, tag)
+        $scope.bbApi.toggleButtonSpinner('convert-pdf');
+        MmsAppUtils.printModal(document, $scope.ws, site, time, tag, true, 3)
         .then(function(ob) {
-            var cover = ob.cover;
-            var html = ob.contents;
-            var doc = {};
-            doc.docId = document.sysmlid;
-            doc.header = ob.header;
-            doc.footer = ob.footer;
-            doc.html = html;
-            doc.cover = cover;
-            doc.time = time;
-            doc.version = ob.version;
-            doc.dnum = ob.dnum;
-            doc.displayTime = ob.time;
-            doc.toc = ob.toc;
-            doc.workspace = $scope.ws;
-            doc.customCss = UtilsService.getPrintCss();
-            if (!ob.genTotf) {
-                doc.tof = '<div style="display:none;"></div>';
-                doc.tot = '<div style="display:none;"></div>';
-            }
-
-            doc.name = document.sysmlid + '_' + time + '_' + new Date().getTime();
-            if(time == 'latest') 
-                doc.tagId = time;
-            else {
-                if(tag) 
-                    doc.tagId = tag.name;
-            }
-            ConfigService.convertHtmlToPdf(doc, site.sysmlid, $scope.ws)
-            .then(
-                function(reuslt){
-                    growl.info('Converting HTML to PDF...Please wait for a completion email');
-                },
-                function(reason){
-                    growl.error("Failed to convert HTML to PDF: " + reason.message);
-                }
-            ).finally(function() {
-                converting = false;
-                $scope.bbApi.toggleButtonSpinner('convert.pdf');
-            });
-        }, function() {
+            growl.info('Converting HTML to PDF...Please wait for a completion email');
+        }, function(reason){
+            growl.error("Failed to convert HTML to PDF: " + reason.message);
+        }).finally(function() {
             converting = false;
-            $scope.bbApi.toggleButtonSpinner('convert.pdf');
+            $scope.bbApi.toggleButtonSpinner('convert-pdf');
         });
     });
 
-    $scope.$on('show.comments', function() {
+    $scope.$on('show-comments', function() {
         $scope.views.forEach(function(view) {
             view.api.toggleShowComments();
         });
-        $scope.bbApi.toggleButtonState('show.comments');
+        $scope.bbApi.toggleButtonState('show-comments');
         $rootScope.veCommentsOn = !$rootScope.veCommentsOn;
     });
 
-    $scope.$on('show.elements', function() {
+    $scope.$on('show-elements', function() {
         $scope.views.forEach(function(view) {
             view.api.toggleShowElements();
         });
-        $scope.bbApi.toggleButtonState('show.elements');
+        $scope.bbApi.toggleButtonState('show-elements');
         $rootScope.veElementsOn = !$rootScope.veElementsOn;
     });
 
-    $scope.$on('show.edits', function() {
+    $scope.$on('show-edits', function() {
+        if( ($rootScope.veElementsOn && $rootScope.mms_ShowEdits) || (!$rootScope.veElementsOn && !$rootScope.mms_ShowEdits) ){
+            $scope.views.forEach(function(view) {
+                view.api.toggleShowElements();
+            });
+            $scope.bbApi.toggleButtonState('show-elements');
+            $rootScope.veElementsOn = !$rootScope.veElementsOn;
+        }
         $scope.views.forEach(function(view) {
             view.api.toggleShowEdits();
         });
-        $scope.bbApi.toggleButtonState('show.edits');
+        $scope.bbApi.toggleButtonState('show-edits');
         $rootScope.mms_ShowEdits = !$rootScope.mms_ShowEdits;
     });
     $rootScope.mms_fullDocMode = true;
 
-    $scope.$on('section.add.paragraph', function(event, section) {
+    $scope.$on('section-add-paragraph', function(event, section) {
         MmsAppUtils.addPresentationElement($scope, 'Paragraph', section);
     });
 
-    $scope.$on('section.add.section', function(event, section) {
+    $scope.$on('section-add-section', function(event, section) {
         MmsAppUtils.addPresentationElement($scope, 'Section', section);
     });
 
     $scope.$on('print', function() {
-        MmsAppUtils.popupPrintConfirm(document, $scope.ws, time, true, true, false, false, tag);
+        MmsAppUtils.printModal(document, $scope.ws, site, time, tag, true, 1);
     });
     $scope.$on('word', function() {
-        MmsAppUtils.popupPrintConfirm(document, $scope.ws, time, true, false, false, false, tag);
+        MmsAppUtils.printModal(document, $scope.ws, site, time, tag, true, 2);
     });
     $scope.$on('tabletocsv', function() {
         MmsAppUtils.tableToCsv(document, $scope.ws, time, true);
