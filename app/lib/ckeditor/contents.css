@@ -18,6 +18,14 @@ body
 	margin: 20px;
 }
 
+.cke_editable
+{
+	line-height: 1.6;
+
+	/* Fix for missing scrollbars with RTL texts. (#10488) */
+	word-wrap: break-word;
+}
+
 blockquote
 {
 	font-style: italic;
@@ -125,27 +133,6 @@ a > img {
 	outline: 1px solid #0782C1;
 }
 
-/*.cke_editable {*/
-  /*p {
-    font-family: $font-family-sans-serif;
-  }*/
-
-  blockquote {
-    font-weight: 200;
-    font-style: italic;
-  }
-
-  /*table, .mce-item-table {
-
-    @extend .content-table;
-    font-family: $font-family-sans-serif;
-
-    td {
-      font-size: 14px;
-    }
-  }*/
-
-
 /*
  * Transclude custom css
 */
@@ -178,5 +165,3 @@ a > img {
     z-index: 0;
     cursor: not-allowed;
   }
-/*}*/
-
