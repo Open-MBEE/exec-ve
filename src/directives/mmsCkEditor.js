@@ -384,48 +384,45 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $m
         };
 
         var mmsResetCallback = function(ed) {
-          var body = ed.document.getBody();
-          resetCrossRef(body.find('mms-transclude-name').$, '.name]');
-          resetCrossRef(body.find('mms-transclude-doc').$, '.doc]');
-          resetCrossRef(body.find('mms-transclude-val').$, '.val]');
-          resetCrossRef(body.find('mms-view-link').$, '.vlink]');
-          update();
+            var body = ed.document.getBody();
+            resetCrossRef(body.find('mms-transclude-name').$, '.name]');
+            resetCrossRef(body.find('mms-transclude-doc').$, '.doc]');
+            resetCrossRef(body.find('mms-transclude-val').$, '.val]');
+            resetCrossRef(body.find('mms-view-link').$, '.vlink]');
+            update();
         };
         
         var update = function() {
-          //if (callUpdate) {
             // getData() returns CKEditor's HTML content.
             ngModelCtrl.$setViewValue(instance.getData());
-          //} else {
-          //  callUpdate = true;
-          //}
         };
         
         // Formatting editor toolbar
         var defaultToolbar = [
-            { name: 'document',    items : [ 'Source','-','DocProps' ] },
+            { name: 'basicstyles', items : [ 'Bold','Italic','Underline','Strike','-','Subscript','Superscript','Blockquote','-','RemoveFormat' ] },
+            { name: 'paragraph',   items : [ 'JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock' ] },
             { name: 'clipboard',   items : [ 'Undo','Redo' ] },
             { name: 'editing',     items : [ 'Find','Replace','-','SelectAll' ] },
             { name: 'tools',       items : [ 'Maximize', 'ShowBlocks' ] },
-            // { name: 'forms',       items : [ 'Form', 'Checkbox', 'Radio', 'TextField', 'Textarea', 'Select', 'Button', 'ImageButton', 'HiddenField' ] },
-            { name: 'basicstyles', items : [ 'Bold','Italic','Underline','Strike','Subscript','Superscript','-','RemoveFormat' ] },
-            { name: 'paragraph',   items : [ 'Blockquote','-','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock' ] },
-            { name: 'insert',      items : ['SpecialChar','Mathjax','PageBreak','HorizontalRule','CodeSnippet' ] },
+            { name: 'document',    items : [ 'Source' ] },
             '/',
             { name: 'styles',      items : [ 'Format','FontSize','TextColor','BGColor' ] },
             { name: 'links',       items : [ 'Link','Unlink' ] },
+            { name: 'insert',      items : [ 'PageBreak','HorizontalRule','CodeSnippet' ] },
         ];
-        var tableToolbar =  { name: 'table',  items: [ 'Table' ] };
-        var sourceToolbar = { name: 'source', items: ['Source']};
-        var listToolbar =   { name: 'list',   items: [ 'NumberedList','BulletedList','Outdent','Indent' ] };
-        var imageToolbar =  { name: 'image',  items: [ 'base64image','Iframe' ] };
-        var equationToolbar = { name: 'equation', items: [ 'Mathjax']};
-        var customToolbar = { name: 'custom', items : [ 'Mmscf','Mmscomment', 'Mmsvlink', 'mmsreset' ] };
+        var listToolbar =     { name: 'list',     items: [ 'NumberedList','BulletedList','Outdent','Indent' ] };
+        var tableToolbar =    { name: 'table',    items: [ 'Table' ] };
+        var imageToolbar =    { name: 'image',    items: [ 'base64image','Iframe' ] };
+        var equationToolbar = { name: 'equation', items: [ 'Mathjax','SpecialChar' ]};
+        var customToolbar =   { name: 'custom',   items: [ 'Mmscf', 'mmsreset', 'Mmscomment', 'Mmsvlink' ] };
+        var sourceToolbar =   { name: 'source',   items: ['Source']};
+
         //Set toolbar based on editor type
         var thisToolbar = defaultToolbar.slice();
         thisToolbar.push(listToolbar);
         thisToolbar.push(tableToolbar);
         thisToolbar.push(imageToolbar);
+        thisToolbar.push(equationToolbar);
         thisToolbar.push(customToolbar);
         if (scope.mmsEditorType === 'TableT') {
           thisToolbar = defaultToolbar.slice();
