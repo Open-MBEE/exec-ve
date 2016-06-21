@@ -13,10 +13,10 @@
  * (1) http://ckeditor.com/builder
  *     Visit online builder to build CKEditor from scratch.
  *
- * (2) http://ckeditor.com/builder/c3348cbea3a7110a4a9b482aac425464
+ * (2) http://ckeditor.com/builder/1d018dc69431b1290347c8c1ccbf65f5
  *     Visit online builder to build CKEditor, starting with the same setup as before.
  *
- * (3) http://ckeditor.com/builder/download/c3348cbea3a7110a4a9b482aac425464
+ * (3) http://ckeditor.com/builder/download/1d018dc69431b1290347c8c1ccbf65f5
  *     Straight download link to the latest version of CKEditor (Optimized) with the same setup as before.
  *
  * NOTE:
@@ -26,7 +26,7 @@
 
 var CKBUILDER_CONFIG = {
 	skin: 'moono',
-	preset: 'full',
+	preset: 'standard',
 	ignore: [
 		'.bender',
 		'bender.js',
@@ -51,30 +51,24 @@ var CKBUILDER_CONFIG = {
 	],
 	plugins : {
 		'a11yhelp' : 1,
-		'about' : 1,
 		'autoembed' : 1,
 		'autogrow' : 1,
 		'base64image' : 1,
 		'basicstyles' : 1,
 		'blockquote' : 1,
 		'clipboard' : 1,
+		'codesnippet' : 1,
 		'colorbutton' : 1,
-		'colordialog' : 1,
 		'contextmenu' : 1,
-		'dialogadvtab' : 1,
-		'div' : 1,
 		'elementspath' : 1,
 		'embed' : 1,
 		'enterkey' : 1,
 		'entities' : 1,
-		'eqneditor' : 1,
 		'filebrowser' : 1,
 		'find' : 1,
 		'flash' : 1,
 		'floatingspace' : 1,
-		'font' : 1,
 		'format' : 1,
-		'forms' : 1,
 		'horizontalrule' : 1,
 		'htmlwriter' : 1,
 		'iframe' : 1,
@@ -84,25 +78,20 @@ var CKBUILDER_CONFIG = {
 		'justify' : 1,
 		'link' : 1,
 		'list' : 1,
-		'liststyle' : 1,
 		'magicline' : 1,
 		'mathjax' : 1,
 		'maximize' : 1,
-		'mediaembed' : 1,
 		'pagebreak' : 1,
 		'pastebase64' : 1,
 		'pastetext' : 1,
-		'pbckcode' : 1,
 		'removeformat' : 1,
 		'resize' : 1,
-		'save' : 1,
 		'selectall' : 1,
 		'showblocks' : 1,
 		'showborders' : 1,
 		'sourcearea' : 1,
 		'specialchar' : 1,
 		'stylescombo' : 1,
-		'symbol' : 1,
 		'tab' : 1,
 		'table' : 1,
 		'tabletools' : 1,
