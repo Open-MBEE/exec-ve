@@ -393,7 +393,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $m
         };
         
         var update = function() {
-            // getData() returns CKEditor's HTML content.
+            // getData() returns CKEditor's processed/clean HTML content.
             ngModelCtrl.$setViewValue(instance.getData());
         };
         
@@ -482,9 +482,8 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $m
                 autocompleteCallback(instance);
             }
           });
-          if (scope.mmsTinymceApi) {
-              scope.mmsTinymceApi.save = function() {
-                  instance.save();
+          if (scope.mmsEditorApi) {
+              scope.mmsEditorApi.save = function() {
                   update();
               };
           }
