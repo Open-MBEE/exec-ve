@@ -20,7 +20,7 @@ body
 
 .cke_editable
 {
-	line-height: 1.6;
+	line-height: 1.4;
 
 	/* Fix for missing scrollbars with RTL texts. (#10488) */
 	word-wrap: break-word;
@@ -28,14 +28,14 @@ body
 
 blockquote
 {
+	font-weight: 200;
 	font-style: italic;
-	font-family: Georgia, Times, "Times New Roman", serif;
-	padding: 2px 0;
-	border-style: solid;
-	border-color: #ccc;
-	border-width: 0;
+	padding: 2px 22px;
+	margin: 0 0 22px;
+	font-size: 16px;
+	border-left: 5px solid #eee;
 }
-
+/*
 .cke_contents_ltr blockquote
 {
 	padding-left: 20px;
@@ -48,7 +48,7 @@ blockquote
 	padding-left: 8px;
 	padding-right: 20px;
 	border-right-width: 5px;
-}
+}*/
 
 a
 {
@@ -65,8 +65,11 @@ ol,ul,dl
 
 h1,h2,h3,h4,h5,h6
 {
-	font-weight: normal;
-	line-height: 1.2;
+	font-family: HelveticaNeue-Light,"Helvetica Neue Light","Helvetica Neue",Helvetica,Arial,sans-serif;
+	font-weight: 200;
+	line-height: 1.22;
+	margin-top: 22px;
+	margin-bottom: 11px;
 }
 
 hr
