@@ -297,7 +297,7 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
                         if (mode === 2) {
                             inst = "<div>(Copy and paste into Word)</div>";
                         }
-                        var popupWin = $window.open('', '_blank', 'width=800,height=600,scrollbars=1');
+                        var popupWin = $window.open('about:blank', '_blank', 'width=800,height=600,scrollbars=1,status=1,toolbar=1,menubar=1');
                         popupWin.document.open();
                         popupWin.document.write('<html><head><style>' + css + '</style></head><body style="overflow: auto">' + inst + cover + toc + contents + '</body></html>');
                         popupWin.document.close();
