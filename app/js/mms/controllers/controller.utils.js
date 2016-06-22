@@ -26,7 +26,7 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
                 validClassifierIds.push(ViewService.TYPE_TO_CLASSIFIER_ID.TableT);
             } else if ($scope.presentationElemType === 'List') {
                 validClassifierIds.push(ViewService.TYPE_TO_CLASSIFIER_ID.ListT);
-            } else if ($scope.presentationElemType === 'Figure') {
+            } else if ($scope.presentationElemType === 'Image') {
                 validClassifierIds.push(ViewService.TYPE_TO_CLASSIFIER_ID.Figure);
             } else if ($scope.presentationElemType === 'Paragraph') {
                 validClassifierIds.push(ViewService.TYPE_TO_CLASSIFIER_ID.ParagraphT);
@@ -425,7 +425,9 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
             this.style.removeProperty('font-size');
             this.style.removeProperty('width');
         });
-        printElementCopy.find('.math').remove();
+        printElementCopy.find('.math').remove(); //this won't work in chrome for popups since chrome can't display mathml
+        printElementCopy.find('script').remove();
+        //printElementCopy.find('.MJX_Assistive_MathML').remove(); //pdf generation need mathml version
         var coverTemplateString = $templateCache.get('partials/mms/docCover.html');
         var coverTemplateElement = angular.element(coverTemplateString);
         var cover = '';
