@@ -425,6 +425,7 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
             this.style.removeProperty('font-size');
             this.style.removeProperty('width');
         });
+        printElementCopy.find('.math').remove();
         var coverTemplateString = $templateCache.get('partials/mms/docCover.html');
         var coverTemplateElement = angular.element(coverTemplateString);
         var cover = '';
