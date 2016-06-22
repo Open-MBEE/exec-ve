@@ -120,7 +120,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                     element[0].innerHTML = "<span>" + e.name + "</span>";
                 });
             } else if (isExpression) {
-                $http.get(URLService.getElementURL(scope.mmsEid, scope.ws, scope.version) + '?evaluate')
+                $http.get(URLService.getElementURL(scope.mmsEid, scope.ws, scope.version) + '&evaluate')
                 .success(function(data,status,headers,config) {
                     element[0].innerHTML = data.elements[0].evaluationResult;
                 }).error(function(data,status,headers,config){
