@@ -23,6 +23,7 @@ angular.module('mms')
 function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsService, CacheService, _) {
     var currentViewId = '';
     var currentDocumentId = '';
+    var currentView = null;
     var VIEW_ELEMENTS_LIMIT = 2000;
     var inProgress = {}; //only used for view elements over limit
 
@@ -537,7 +538,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 clone.specialization[key] = {
                     operand: [],
                     type: "Expression",
-                    valueExpression: null
+                    //valueExpression: null
                 };
             }
             clone.specialization[key].operand.push(elementOb);
@@ -638,7 +639,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         var deferred = $q.defer();
 
         var newInstanceId = UtilsService.createMmsId();
-        var viewInstancePackage = null;
+        var holdingBinId = null;
         var projectId = null;
         var realType = TYPE_TO_CLASSIFIER_TYPE[type];
         var siteId = site;
@@ -651,14 +652,11 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             if (viewOrSection.siteCharacterizationId)
                 siteId = viewOrSection.siteCharacterizationId;
             if (projectId && projectId.indexOf('PROJECT') >= 0) {
-                viewInstancePackage = {
-                    sysmlid: projectId.replace('PROJECT', 'View_Instances'), 
-                    name: 'View Instances', 
-                    owner: projectId,
-                    specialization: {type: 'Package'}
-                };
+                holdingBinId = 'holding_bin_' + projectId;
             }
         }
+        if (!holdingBinId && siteId)
+            holdingBinId = 'holding_bin_' + siteId + '_no_project';
         var jsonType = realType;
         if (type === 'Comment' || type === 'Paragraph')
             jsonType = type;
@@ -688,12 +686,10 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 operand: [],  
                 type: "Expression"
             };
-        if (viewInstancePackage)
-            instanceSpec.owner = viewInstancePackage.sysmlid;
+        if (holdingBinId)
+            instanceSpec.owner = holdingBinId;
 
         var toCreate = [instanceSpec];
-        if (viewInstancePackage)
-            toCreate.push(viewInstancePackage);
         ElementService.createElements(toCreate, workspace, siteId)
         .then(function(data) {
             data.forEach(function(elem) {
@@ -701,7 +697,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                     var instanceVal = {
                         instance: newInstanceId,
                         type: "InstanceValue",
-                        valueExpression: null
+                        //valueExpression: null
                     };
                     addElementToViewOrSection(viewOrSection.sysmlid, viewOrSection.sysmlid, workspace, instanceVal)
                     .then(function(data3) {
@@ -748,27 +744,10 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         var deferred = $q.defer();
         var newViewId = viewId ? viewId : UtilsService.createMmsId();
         var newInstanceId = UtilsService.createMmsId();
-        var viewInstancePackage = null;
-        var projectId = null;
-        var siteId = site;
-
-        if (owner) {
-            var splitArray = owner.qualifiedId.split('/');
-            if (splitArray && splitArray.length > 2) {
-                projectId = splitArray[2];
-                siteId = splitArray[1];
-            }
-            if (owner.siteCharacterizationId)
-                siteId = owner.siteCharacterizationId;
-            if (projectId && projectId.indexOf('PROJECT') >= 0) {
-                viewInstancePackage = {
-                    sysmlid: projectId.replace('PROJECT', 'View_Instances'), 
-                    name: 'View Instances', 
-                    owner: projectId,
-                    specialization: {type: 'Package'}
-                };
-            }
-        }
+        var ids = UtilsService.getIdInfo(owner, site);
+        var holdingBinId = ids.holdingBinId;
+        var projectId = ids.projectId;
+        var siteId = ids.siteId;
 
         var view = {
             sysmlid: newViewId,
@@ -778,7 +757,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 displayedElements: [newViewId],
                 childrenViews: [],
                 contents: {
-                    valueExpression: null,
+                    //valueExpression: null,
                     operand: [{
                         instance: newInstanceId,
                         type:"InstanceValue",
@@ -827,12 +806,21 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             appliedMetatypes: ["_9_0_62a020a_1105704885251_933969_7897"],
             isMetatype: false
         };
-        if (viewInstancePackage)
-            instanceSpec.owner = viewInstancePackage.sysmlid;
-
-        var toCreate = [instanceSpec, view];
-        if (viewInstancePackage)
-            toCreate.push(viewInstancePackage);
+        if (holdingBinId)
+            instanceSpec.owner = holdingBinId;
+        var asi = { //create applied stereotype instance
+            sysmlid: newViewId + '_asi',
+            owner: newViewId,
+            documentation: '',
+            name: '',
+            specialization: {
+                type: 'InstanceSpecification',
+                classifier: [(isDoc ? "_17_0_2_3_87b0275_1371477871400_792964_43374" : "_17_0_1_232f03dc_1325612611695_581988_21583")]
+            },
+            appliedMetatypes: ["_9_0_62a020a_1105704885251_933969_7897"],
+            isMetatype: false
+        };
+        var toCreate = [instanceSpec, view, asi];
         ElementService.createElements(toCreate, workspace, siteId)
         .then(function(data) {
             data.forEach(function(elem) {
@@ -945,6 +933,10 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             // for opaque presentation elements, or slots:
 
             var instanceSpecSpec = instanceSpec.specialization.instanceSpecificationSpecification;
+            if (!instanceSpecSpec) {
+                deferred.reject({status: 500, message: 'missing specification'});
+                return;
+            }
             var type = instanceSpecSpec.type;
 
             // If it is a Opaque List, Paragraph, Table, Image, List:
@@ -1100,12 +1092,20 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         currentViewId = id;
     };
 
+    var setCurrentView = function(v) {
+        currentView = v;
+    };
+
     var setCurrentDocumentId = function(id) {
         currentDocumentId = id;
     };
 
     var getCurrentViewId = function() {
         return currentViewId;
+    };
+
+    var getCurrentView = function() {
+        return currentView;
     };
 
     var getCurrentDocumentId = function() {
@@ -1119,12 +1119,13 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
     var getDocMetadata = function(docid, ws, version, weight) {
         var deferred = $q.defer();
         var metadata = {};
-        ElementService.search(docid, ['id'], null, null, null, null, ws, weight)
+        //ElementService.search(docid, ['id'], null, null, null, null, ws, weight)
+        ElementService.getOwnedElements(docid, false, ws, version, 2, weight)
         .then(function(data) {
-            if (data.length === 0 || data[0].sysmlid !== docid || !data[0].properties) {
+            if (data.length === 0) {
                 return;
             }
-            data[0].properties.forEach(function(prop) {
+            data.forEach(function(prop) {
                 var feature = prop.specialization ? prop.specialization.propertyType : null;
                 var value = prop.specialization ? prop.specialization.value : null;
                 if (!feature || !docMetadataTypes[feature] || !value || value.length === 0)
@@ -1147,6 +1148,10 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         return false;
     };
 
+    var reset = function() {
+        inProgress = {};
+    };
+    
     return {
         getView: getView,
         getViews: getViews,
@@ -1161,8 +1166,10 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         getDocumentViews: getDocumentViews,
         getSiteDocuments: getSiteDocuments,
         setCurrentViewId: setCurrentViewId,
+        setCurrentView: setCurrentView,
         setCurrentDocumentId: setCurrentDocumentId,
         getCurrentViewId: getCurrentViewId,
+        getCurrentView: getCurrentView,
         getCurrentDocumentId: getCurrentDocumentId,
         parseExprRefTree: parseExprRefTree,
         isSection: isSection,
@@ -1175,7 +1182,9 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         TYPE_TO_CLASSIFIER_ID: TYPE_TO_CLASSIFIER_ID,
         getInstanceSpecification : getInstanceSpecification,
         getElementReferenceTree : getElementReferenceTree,
-        getDocMetadata: getDocMetadata
+        getDocMetadata: getDocMetadata,
+
+        reset: reset
     };
 
 }

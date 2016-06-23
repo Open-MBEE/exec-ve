@@ -3,6 +3,16 @@
 angular.module('mms.directives')
 .directive('mmsSearch', ['ElementService', 'growl', '$rootScope','$templateCache', mmsSearch]);
 
+/**
+ * @ngdoc directive
+ * @name mms.directives.directive:mmsSearch
+ *
+ * @restrict E
+ *
+ * @description
+ * TBA
+ *
+ */
 function mmsSearch(ElementService, growl, $rootScope, $templateCache) {
     var template = $templateCache.get('mms/templates/mmsSearch.html');
 
@@ -12,12 +22,12 @@ function mmsSearch(ElementService, growl, $rootScope, $templateCache) {
         scope.proposeClass = "";
         scope.filter = '';
         scope.searchText = '';
-        scope.searchType = 'name';
+        scope.searchType = 'all';
         scope.facet = '$';
         scope.filterQuery = {query: ""};
         scope.currentPage = 0;
         scope.itemsPerPage = 50;
-        
+
         scope.$watchGroup(['filterQuery.query', 'facet'], function(newVal, oldVal) {
             scope.resultFilter = {};
             scope.resultFilter[scope.facet] = scope.filterQuery.query;
@@ -34,7 +44,7 @@ function mmsSearch(ElementService, growl, $rootScope, $templateCache) {
                         }
                         properties[properties.length-1].push(elem.properties[i]);
                     }
-                    elem.properties = properties;
+                    elem.properties2 = properties;
                 }
             });
         });
@@ -132,7 +142,7 @@ function mmsSearch(ElementService, growl, $rootScope, $templateCache) {
         link: mmsSearchLink,
         scope: {
             mmsOptions: '=',
-            mmsWs: '@'
+            mmsWs: '@',
         },
     };
 }

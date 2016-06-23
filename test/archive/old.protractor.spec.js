@@ -115,7 +115,7 @@ var MMSApp = function() {
     //get Tommy's site
     this.getTommysSite = function() {
 
- browser.get('https://mmsAdmin:letmein@cae-ems-stg.jpl.nasa.gov/alfresco/mmsapp/mms.html#/workspaces/master/sites/protractortesting/documents/MMS_1452545245762_f7bb0f37-f129-4add-a42b-285fbbdca73f/views/MMS_1452545255717_9f86acdf-4406-4d8b-a4a2-527240a5f1c2');
+ browser.get('https://cae-ems-stg.jpl.nasa.gov/alfresco/mmsapp/mms.html#/workspaces/master/sites/protractortesting/documents/MMS_1452545245762_f7bb0f37-f129-4add-a42b-285fbbdca73f/views/MMS_1452545255717_9f86acdf-4406-4d8b-a4a2-527240a5f1c2');
     }
 
 

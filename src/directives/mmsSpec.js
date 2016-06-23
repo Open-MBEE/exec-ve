@@ -79,6 +79,8 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
     var template = $templateCache.get('mms/templates/mmsSpec.html');
 
     var mmsSpecLink = function(scope, element, attrs) {
+        var ran = false;
+        var lastid = null; //race condition check
         var keepMode = false;
         scope.editing = false;
         scope.editable = true;
@@ -115,12 +117,16 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
          * @param {string} newVal new element id
          */
         var changeElement = function(newVal, oldVal) {
-            if (!newVal) {
+            if (!newVal || newVal === oldVal && ran) {
                 //element.empty();
                 return;
             }
+            ran = true;
+            lastid = newVal;
             WorkspaceService.getWorkspace(scope.mmsWs)
             .then(function(data) {
+                if (newVal !== lastid)
+                    return;
                 scope.workspace = data;
             }, function(reason) {scope.workspace = null;});
             if (scope.edit && scope.tinymceApi.save)
@@ -128,10 +134,14 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
             if (scope.mmsType === 'workspace') {
                 WorkspaceService.getWorkspace(scope.mmsEid)
                 .then(function(data) {
+                    if (newVal !== lastid)
+                        return;
                     scope.element = data;
                     scope.editable = true;
                     WorkspaceService.getWorkspaceForEdit(scope.mmsEid)
                     .then(function(data) {
+                        if (newVal !== lastid)
+                            return;
                         scope.edit = data;
                         scope.editable = true;
                         if (!keepMode)
@@ -142,10 +152,14 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
             } else if (scope.mmsType === 'tag') {
                 ConfigService.getConfig(scope.mmsEid, scope.mmsWs, false)
                 .then(function(data) {
+                    if (newVal !== lastid)
+                        return;
                     scope.element = data;
                     scope.editable = true;
                     ConfigService.getConfigForEdit(scope.mmsEid, scope.mmsWs)
                     .then(function(data) {
+                        if (newVal !== lastid)
+                            return;
                         scope.edit = data;
                         scope.editable = true;
                         if (!keepMode)
@@ -155,10 +169,13 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
                 });
             } else {
                 scope.isEnumeration = false;
+                scope.isSlot = false;
             ElementService.getElement(scope.mmsEid, false, scope.mmsWs, scope.mmsVersion, 2)
             .then(function(data) {
                 //element.empty();
                 //var template = null;
+                if (newVal !== lastid)
+                    return;
                 scope.element = data;
                 if (scope.element.specialization.type === 'Property') {
                     scope.values = scope.element.specialization.value;
@@ -184,6 +201,8 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
                 } else {
                     ElementService.getElementForEdit(scope.mmsEid, false, scope.mmsWs)
                     .then(function(data) {
+                        if (newVal !== lastid)
+                            return;
                         scope.edit = data;
                         scope.editable = true;
                         if (!keepMode)
@@ -200,46 +219,27 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
                                 });
                                 ElementService.getElements(options, false, scope.mmsWs, scope.mmsVersion)
                                 .then(function(elements) {
+                                    if (newVal !== lastid)
+                                        return;
                                     scope.options = elements;
                                 });
                             } else {
-                            //The editor check occurs here; should get "not supported for now" from here
-                                var id = scope.element.specialization.propertyType;
-                                if (id && !scope.element.specialization.isSlot) {
-                                    ElementService.getElement(id, false, scope.mmsWs, scope.mmsVersion)
-                                    .then(function(val) {
-                                    //Filter for enumeration type
-                                        if (val.appliedMetatypes && val.appliedMetatypes.length > 0 &&
-                                            val.appliedMetatypes[0] === '_9_0_62a020a_1105704885400_895774_7947') {
-                                            scope.isEnumeration = true;
-                                            ElementService.getOwnedElements(val.sysmlid, false, scope.mmsWs, scope.mmsVersion, 1)
-                                            .then(function(val) {
-                                                var newArray = [];
-                                                //Filter only for appropriate property value
-                                                for (var i = 0; i < val.length; i++) {
-                                                    if( val[i].appliedMetatypes && val[i].appliedMetatypes.length > 0 &&
-                                                        val[i].appliedMetatypes[0] === '_9_0_62a020a_1105704885423_380971_7955') {
-                                                            newArray.push(val[i]);
-                                                        }
-                                                }
-                                                scope.options = newArray;
-                                                if (scope.editValues.length === 0)
-                                                    scope.editValues.push({type: 'InstanceValue', instance: null});
-                                            },
-                                            function(reason) {
-                                                console.log(reason);
-                                                growl.error('Failed to get enumeration options: ' + reason.message);
-                                            });
-                                        }
-                                    });
-                                } //end if
+                                //The editor check occurs here; should get "not supported for now" from here
+                                  
+                                Utils.getPropertySpec(scope.element, scope.mmsWs, scope.mmsVersion)
+                                .then( function(value) {
+                                    scope.isEnumeration = value.isEnumeration;
+                                    scope.isSlot = value.isSlot;
+                                    scope.options = value.options;
+                                }, function(reason) {
+                                    // Utils.addFrame(scope, mmsViewCtrl, element, frameTemplate);
+                                    growl.error('Failed to get property spec: ' + reason.message);
+                                });
                             }
                         }
                         if (scope.edit.specialization.type === 'Constraint' && scope.edit.specialization.specification) {
                             scope.editValue = scope.edit.specialization.specification;
                         }
-                        //element.append(template);
-                        //$compile(element.contents())(scope);
                     });
                 }
             }, function(reason) {
@@ -331,6 +331,14 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
         };
         scope.addValueType = 'LiteralString';
 
+        scope.addEnumerationValue = function() {
+          scope.editValues.push({type: "InstanceValue", instance: scope.options[0]});
+        };
+
+        scope.removeVal = function(i) {
+            scope.editValues.splice(i, 1);
+        };
+        
         if (angular.isObject(scope.mmsSpecApi)) {
             var api = scope.mmsSpecApi;
             /**
@@ -435,7 +443,8 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
             mmsElement: '=',
             mmsSpecApi: '=',
             mmsViewEdit: '=',
-            mmsType: '@'
+            mmsType: '@',
+            noEdit: '@'
         },
         link: mmsSpecLink
     };

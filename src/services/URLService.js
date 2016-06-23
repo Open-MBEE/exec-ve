@@ -37,7 +37,7 @@ angular.module('mms')
  */
 function urlService(baseUrl) {
     var root = baseUrl;
-
+    var ticket;
     /**
      * @ngdoc method
      * @name mms.URLService#isTimestamp
@@ -53,6 +53,20 @@ function urlService(baseUrl) {
         if (String(version).indexOf('-') >= 0)
             return true;
         return false;
+    };
+
+    /**
+     * @ngdoc method
+     * @name mms.URLService#getMmsVersionURL
+     * @methodOf mms.URLService
+     * 
+     * @description
+     * self explanatory
+     *
+     * @returns {object} Returns object with mmsversion
+     */
+    var getMmsVersionURL = function() {
+        return addTicket(root + "/mmsversion");
     };
 
     /**
@@ -87,10 +101,30 @@ function urlService(baseUrl) {
      * @returns {string} The url
      */
     var getProductSnapshotsURL = function(id, site, workspace) {
-        return root + "/workspaces/" + workspace +
+        return addTicket(root + "/workspaces/" + workspace +
                       "/sites/" + site +
                       "/products/" + id +
-                      "/snapshots";                
+                      "/snapshots");                
+    };
+
+    /**
+     * @ngdoc method
+     * @name mms.URLService#getHtmlToPdfURL
+     * @methodOf mms.URLService
+     *
+     * @description
+     * Gets url that to convert HTML to PDF
+     *
+     * @param {string} docId Id of the document
+     * @param {string} site Site name
+     * @param {string} workspace Workspace name
+     * @returns {string} The url
+     */
+    var getHtmlToPdfURL = function(docId, site, workspace) {
+        return addTicket(root + "/workspaces/" + workspace +
+                      "/sites/" + site +
+                      "/documents/" + docId +
+                      "/htmlToPdf/123456789");  
     };
 
     /**
@@ -119,8 +153,8 @@ function urlService(baseUrl) {
      * @returns {string} The url
      */
     var getConfigsURL = function(workspace) {
-        return root + "/workspaces/" + workspace +
-                      "/configurations";
+        return addTicket(root + "/workspaces/" + workspace +
+                      "/configurations");
     };
 
     /**
@@ -156,8 +190,8 @@ function urlService(baseUrl) {
      * @returns {string} The url
      */
     var getConfigURL = function(id, workspace) {
-        return root + "/workspaces/" + workspace + 
-                      "/configurations/" + id;
+        return addTicket(root + "/workspaces/" + workspace + 
+                      "/configurations/" + id);
     };
 
     /**
@@ -173,8 +207,8 @@ function urlService(baseUrl) {
      * @returns {string} The url
      */
     var getSnapshotURL = function(id, workspace) {
-        return root + "/workspaces/" + workspace + 
-                      "/snapshots/" + id;
+        return addTicket(root + "/workspaces/" + workspace + 
+                      "/snapshots/" + id);
     };
 
     /**
@@ -194,7 +228,7 @@ function urlService(baseUrl) {
         var r = root + "/workspaces/" + workspace + 
                       "/sites/" + site + 
                       "/products";
-        return addVersion(r, version);
+        return addTicket(addVersion(r, version));
     };
 
     /**
@@ -211,9 +245,9 @@ function urlService(baseUrl) {
      * @param {string} version Timestamp or version number
      * @returns {string} The path for image url queries.
      */
-    var getImageURL = function(id, workspace, version) {
-        var r = root + '/workspaces/' + workspace + '/artifacts/' + id;
-        return addVersion(r, version);
+    var getImageURL = function(id, ext, workspace, version) {
+        var r = root + '/workspaces/' + workspace + '/artifacts/' + id + '?extension=' + ext;
+        return addTicket(addVersion(r, version));
     };
 
     /**
@@ -228,7 +262,7 @@ function urlService(baseUrl) {
      * @returns {string} The path for site dashboard.
      */
     var getSiteDashboardURL = function(site) {
-        return "/share/page/site/" + site + "/dashboard";
+        return addTicket("/share/page/site/" + site + "/dashboard");
     };
 
     /**
@@ -246,7 +280,7 @@ function urlService(baseUrl) {
      */
     var getElementURL = function(id, workspace, version) {        
         var r = root + '/workspaces/' + workspace + '/elements/' + id;
-        return addVersion(r, version);
+        return addTicket(addVersion(r, version));
     };
 
     var getOwnedElementURL = function(id, workspace, version, depth) {
@@ -286,7 +320,7 @@ function urlService(baseUrl) {
             else
                 r += '?simple=true';
         }
-        return r;
+        return addTicket(r);
     };
 
     /**
@@ -305,7 +339,7 @@ function urlService(baseUrl) {
     var getViewElementsURL = function(id, workspace, version) {
         //var r = root + "/javawebscripts/views/" + id + "/elements";
         var r = root + "/workspaces/" + workspace + "/views/" + id + "/elements";
-        return addVersion(r, version);
+        return addTicket(addVersion(r, version));
     };
 
     /**
@@ -321,7 +355,7 @@ function urlService(baseUrl) {
      * @returns {string} The url.
      */
     var getElementVersionsURL = function(id, workspace) {
-        return root + '/workspaces/' + workspace + '/history/' + id;
+        return addTicket(root + '/workspaces/' + workspace + '/history/' + id);
     };
 
     /**
@@ -336,7 +370,7 @@ function urlService(baseUrl) {
      * @returns {string} The post elements url.
      */
     var getPostElementsURL = function(workspace) {
-        return root + '/workspaces/' + workspace + '/elements';
+        return addTicket(root + '/workspaces/' + workspace + '/elements');
     };
 
     /**
@@ -353,7 +387,7 @@ function urlService(baseUrl) {
      */
     var getPutElementsURL = function(workspace, version) {
         var r = root + '/workspaces/' + workspace + '/elements';
-        return addVersion(r, version);
+        return addTicket(addVersion(r, version));
     };
 
     var getPostElementsWithSiteURL = function(workspace, site) {
@@ -362,7 +396,7 @@ function urlService(baseUrl) {
             if (site === 'no-site') {
                 site = 'no_site';
             }
-            return root + '/workspaces/' + workspace + '/sites/' + site + '/elements';
+            return addTicket(root + '/workspaces/' + workspace + '/sites/' + site + '/elements');
         }
     };
 
@@ -428,7 +462,7 @@ function urlService(baseUrl) {
      */
     var getSitesURL = function(workspace, version) {
         var r = root + '/workspaces/' + workspace + '/sites';
-        return addVersion(r, version);
+        return addTicket(addVersion(r, version));
     };
 
     /**
@@ -461,22 +495,22 @@ function urlService(baseUrl) {
             if (page >= 0)
                 r += '&skipCount=' + page;
         }
-        return r;
+        return addTicket(r);
     };
 
     var getWorkspacesURL = function() {
-        return root + '/workspaces';
+        return addTicket(root + '/workspaces');
     };
 
     var getWorkspaceURL = function(ws) {
-        return root + '/workspaces/' + ws;
+        return addTicket(root + '/workspaces/' + ws);
     };
 
     var getWsDiffURL = function(ws1, ws2, ws1time, ws2time, recalc) {
         var diffUrl =  root + '/diff/' + ws1 + '/' + ws2 + '/' + ws1time + '/' + ws2time  + '?background=true';
         if(recalc === true) diffUrl += '&recalculate=true';
         
-        return diffUrl;
+        return addTicket(diffUrl);
         /*if (ws1time && ws1time !== 'latest')
             r += '&timestamp1=' + ws1time;
         if (ws2time && ws2time !== 'latest')
@@ -488,10 +522,32 @@ function urlService(baseUrl) {
         var r = root + '/diff';
         if (sourcetime && isTimestamp(sourcetime))
             r += '?timestamp2=' + sourcetime;
-        return r;
+        return addTicket(r);
+    };
+    
+    var getJobs = function(id) {
+        return addTicket(root + '/workspaces/master/jobs/' + id + '?recurse=1');
+    };
+    var getJob = function(jobSyml){
+        return addTicket(root + '/workspaces/master/jobs/' + jobSyml);
+    };
+    var getJenkinsRun = function(jobSyml) {
+        return addTicket(root + '/workspaces/master/jobs/'+ jobSyml + '/execute');
+    };
+    
+    var getCreateJob = function() {
+        var link = '/alfresco/service/workspaces/master/jobs';
+        return addTicket(root + '/workspaces/master/jobs');
     };
 
-
+    var getLogoutURL = function() {
+        return addTicket(root + '/api/login/ticket/' + ticket);
+    };
+    
+    var getCheckTicketURL = function(t) {
+        return root + '/mms/login/ticket/' + t;//+ '?alf_ticket=' + t; //TODO remove when server returns 404
+    };
+    
     var addVersion = function(url, version) {
         if (version === 'latest')
             return url;
@@ -500,12 +556,27 @@ function urlService(baseUrl) {
         else
             return url + '/versions/' + version;
     };
-
+    var addTicket = function(url) {
+        var r = url;
+        if (!ticket)
+            return r;
+        if (r.indexOf('timestamp') > 0)
+            return r;
+        if (r.indexOf('?') > 0)
+            r += '&alf_ticket=' + ticket;
+        else
+            r += '?alf_ticket=' + ticket;
+        return r;    
+    };
     var getRoot = function() {
         return root;
     };
 
+    var setTicket = function(t) {
+        ticket = t;
+    };
     return {
+        getMmsVersionURL: getMmsVersionURL,
         getSiteDashboardURL: getSiteDashboardURL,
         getElementURL: getElementURL,
         getOwnedElementURL: getOwnedElementURL,
@@ -517,6 +588,7 @@ function urlService(baseUrl) {
         getElementSearchURL: getElementSearchURL,
         getImageURL: getImageURL,
         getProductSnapshotsURL: getProductSnapshotsURL,
+        getHtmlToPdfURL: getHtmlToPdfURL,
         getConfigSnapshotsURL: getConfigSnapshotsURL,
         getSiteProductsURL: getSiteProductsURL,
         getConfigURL: getConfigURL,
@@ -527,12 +599,19 @@ function urlService(baseUrl) {
         getViewElementsURL: getViewElementsURL,
         getWsDiffURL: getWsDiffURL,
         getPostWsDiffURL: getPostWsDiffURL,
+        getJobs: getJobs,
+        getJob: getJob,
+        getJenkinsRun: getJenkinsRun,
+        getCreateJob: getCreateJob,
         getPutElementsURL: getPutElementsURL,
         getWorkspacesURL: getWorkspacesURL,
         getWorkspaceURL: getWorkspaceURL,
         getCheckLoginURL: getCheckLoginURL,
+        getCheckTicketURL: getCheckTicketURL,
+        getLogoutURL: getLogoutURL,
         isTimestamp: isTimestamp,
-        getRoot: getRoot
+        getRoot: getRoot,
+        setTicket: setTicket
     };
 
 }

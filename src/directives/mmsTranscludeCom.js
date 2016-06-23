@@ -26,7 +26,7 @@ angular.module('mms.directives')
 function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxService, $log, $templateCache, $compile, growl) {
 
     var template = $templateCache.get('mms/templates/mmsTranscludeDoc.html');
-
+    
     var mmsTranscludeComCtrl = function ($scope) {
 
         $scope.bbApi = {};
@@ -36,12 +36,12 @@ function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxSe
         $scope.bbApi.init = function() {
             if (!$scope.buttonsInit) {
                 $scope.buttonsInit = true;
-                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.preview", $scope));
-                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.save", $scope));
-                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.saveC", $scope));
-                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.cancel", $scope));
-                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.delete", $scope));
-                $scope.bbApi.setPermission("presentation.element.delete", $scope.isDirectChildOfPresentationElement);
+                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-preview", $scope));
+                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-save", $scope));
+                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-saveC", $scope));
+                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-cancel", $scope));
+                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-delete", $scope));
+                $scope.bbApi.setPermission("presentation-element-delete", $scope.isDirectChildOfPresentationElement);
             }     
         };
     };
@@ -58,7 +58,7 @@ function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxSe
                 scope.addFrame();
 
             if (mmsViewCtrl)
-                mmsViewCtrl.transcludeClicked(scope.mmsEid);
+                mmsViewCtrl.transcludeClicked(scope.mmsEid, scope.ws, scope.version);
             //if (e.target.tagName !== 'A')
               //  return false;
               e.stopPropagation();
@@ -85,7 +85,7 @@ function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxSe
             element.empty();
             var doc = scope.edit.documentation;
             if (!doc)
-                doc = '<p ng-class="{placeholder: version!=\'latest\'}">(No Comment)</p>';
+                doc = '<p class="no-print" ng-class="{placeholder: version!=\'latest\'}">(No Comment)</p>';
             element[0].innerHTML = '<div class="panel panel-info">'+doc+'</div>';
             scope.recompileScope = scope.$new();
             $compile(element.contents())(scope.recompileScope); 
@@ -97,7 +97,7 @@ function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxSe
             idwatch();
             if (UtilsService.hasCircularReference(scope, scope.mmsEid, 'doc')) {
                 //$log.log("prevent circular dereference!");
-                element.html('<span class="error">Circular Reference!</span>');
+                element.html('<span class="mms-error">Circular Reference!</span>');
                 return;
             }
             var ws = scope.mmsWs;
@@ -127,7 +127,7 @@ function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxSe
                 var status = ' not found';
                 if (reason.status === 410)
                     status = ' deleted';
-                element.html('<span class="error">comment ' + newVal + status + '</span>');
+                element.html('<span class="mms-error">comment ' + newVal + status + '</span>');
                 //growl.error('Cf Comment Error: ' + reason.message + ': ' + scope.mmsEid);
             });
         });

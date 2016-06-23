@@ -12,7 +12,7 @@
     <form>
         <div class="form-propose">
             <div>Name <span class="star-mandatory">*</span></div>
-            <input class="form-control" type="text" ng-model="newE.name" placeholder="Name your new element" />
+            <input class="form-control" type="text" ng-model="newE.name" placeholder="Name your new element" autofocus/>
         </div>
         <div class="label-documentation">Documentation</div>
         <textarea mms-tinymce ng-model="newE.documentation" mms-ws="{{mmsWs}}" mms-site="{{mmsSite}}" class="textarea-transclude-modal"></textarea>

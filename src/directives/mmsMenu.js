@@ -1,46 +1,35 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsMenu', ['SiteService', 'WorkspaceService', 'ConfigService', '$state', '$templateCache', 'growl', 'hotkeys', mmsMenu]);
+.directive('mmsMenu', ['SiteService', 'WorkspaceService', 'ConfigService', '$state', '$templateCache', 'growl', mmsMenu]);
 
 /**
  * @ngdoc directive
- * @name mms.directives.directive:mmsNav
+ * @name mms.directives.directive:mmsMenu
  *
  * @requires mms.SiteService
+ * @requires mms.WorkspaceService
+ * @requires mms.ConfigService
+ * @requires $state
  * @requires $templateCache
+ * @requires growl
  *
  * @restrict E
  *
  * @description
- * A prebuilt nav bar that's customizable with current page title, current site,
- * and the "type" of page/app. Include navigation to other sites' dashboard
- * and docweb pages.
- * ## Example
- *  <pre>
-    <mms-nav mms-title="Model Manager" mms-ws="master" mms-config="tag" mms-site="europa"></mms-nav>
-    </pre>
- * ## Support for responsive sliding pane on small browser
- *  <pre>
-    <div id="outer-wrap">
-        <div id="inner-wrap">
-            <mms-nav mms-title="Model Manager" mms-ws="master" mms-config="tag" mms-site="europa"></mms-nav>
-            <!-- everything visible on the page should go in here -->
-        </div>
-    </div>
-    </pre>
- * @param {string} mmsWs workspace name
- * @param {object} mmsSite site object
- * @param {object} mmsDoc document object
- * @param {object} mmsConfig tag/config object
- * @param {string} mmsTitle Title to display
+ * //TODO - update
+ * mmsMenu is responsible for gathering all breadcrumbs for current view and
+ * displaying breadcrumbs accordingly. When a specific product is selected,
+ * the product name will be displayed as well. Breadcrumb list is truncated to
+ * to fit window width.
+ * mmsMenu is also repsonsible for gathering and displaying all tasks and tags
+ * for specific view.
+ *
  */
 function mmsMenu(SiteService, WorkspaceService, ConfigService, $state, $templateCache, growl) {
     var template = $templateCache.get('mms/templates/mmsMenu.html');
 
     var mmsMenuLink = function(scope, element, attrs) {
-        var catNames = [];
-        var sites = {};
         
         scope.isTasksAndTagsView = function(){
              if ($state.includes('workspaces') && 
@@ -55,13 +44,11 @@ function mmsMenu(SiteService, WorkspaceService, ConfigService, $state, $template
         scope.updateWorkspace = function(wsId) {
             $state.go($state.current.name, {workspace: wsId, tag: undefined, search: undefined});
         };
-
         scope.updateTag = function() {
-            $state.go($state.current.name, {tag: scope.config.id, search: undefined});
+            $state.go($state.current.name, {tag: scope.config.id, time: undefined, search: undefined});
         };
-
         scope.latestTag = function() {
-            $state.go($state.current.name, {tag: undefined, search: undefined});
+            $state.go($state.current.name, {tag: undefined, time: undefined, search: undefined});
         };
 
         WorkspaceService.getWorkspace(scope.ws)
@@ -78,34 +65,32 @@ function mmsMenu(SiteService, WorkspaceService, ConfigService, $state, $template
             scope.config = 'latest';
         } */
 
+        var currSiteParentId = scope.site.parent;
+        var isCharacterization = scope.site.isCharacterization;
+        var breadcrumbs = [];
+        breadcrumbs.push({name: scope.site.name, sysmlid: scope.site.sysmlid});
+        var eltWidth = element.parent().width();
+        
         SiteService.getSites()
         .then(function(data) {
-            // var sites = {};
-            //var catNames = [];
-            for (var i = 0; i < data.length; i++) {
+            for (var i = data.length -1 ; i >= 0; i--) {
                 var site = data[i];
-                site.isOpen = true;
-                if (site.sysmlid === scope.site)
-                    scope.siteTitle = site.name;
-                // TODO: Replace with .parent
-                site.categories = ["Uncategorized"];
-                if (site.categories.length === 0)
-                    site.categories.push("Uncategorized");
-                for (var j = 0; j < site.categories.length; j++) {
-                    var cat = site.categories[j];
-                    catNames.push(cat);
-                    if (sites.hasOwnProperty(cat)) {
-                        sites[cat].push(site);
-                    } else {
-                        sites[cat] = [site];
-                    }
+                var siteParent = site.parent;
+                var siteIsChara = site.isCharacterization;
+                if (site.sysmlid == currSiteParentId && isCharacterization === siteIsChara) {
+                  breadcrumbs.push({name: site.name, sysmlid: site.sysmlid});
+                  if (site.parent) {
+                    currSiteParentId = site.parent;
+                  }
                 }
             }
-            scope.categories = sites;
-            for(var k = 0; k < catNames.length; k++){
-                var str = catNames[k];
-                scope.categories[str].open = false;
+            scope.breadcrumbs = breadcrumbs.reverse();
+            var Bcount = scope.breadcrumbs.length;
+            if (scope.product) {
+              Bcount++;
             }
+            var liWidth = (eltWidth*0.75)/Bcount;
+            scope.truncateStyle={'max-width':liWidth};
         }, function(reason) {
             growl.error("Sites Error: " + reason.message);
         });

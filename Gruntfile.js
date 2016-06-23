@@ -4,6 +4,55 @@ module.exports = function(grunt) {
 
   var jsFiles = ['app/js/**/*.js', 'src/**/*.js'];
 
+  var servers = grunt.file.readJSON('ems-config/angular-mms-grunt-servers.json');
+  var artifactory = grunt.file.readJSON('ems-config/artifactory.json');
+  var connectObject = {
+    'static': {
+      options: {
+        hostname: 'localhost',
+        port: 9001,
+        base: './build'
+      }
+    },
+    docs: {
+        options: {
+          hostname: 'localhost',
+          port: 10000,
+          base: './build/docs',
+        }
+    }};
+  for (var key in servers) {
+    var serverPort = 443;
+    var serverHttps = true;
+    if (key == "localhost") {
+       serverPort = 8080;
+       serverHttps = false;
+    } 
+    connectObject[key] = {
+        options: {
+          hostname: '*',
+          port: 9000,
+          middleware: function(connect) {
+            return [proxySnippet];
+          }
+        },
+        proxies: [
+          {
+            context: '/alfresco',  // '/api'
+            host: servers[key],
+            changeOrigin: true,
+            https: serverHttps,
+            port: serverPort
+          },
+          {
+            context: '/',
+            host: 'localhost',
+            port: 9001
+          }
+        ] 
+    };
+  }
+
   // Project configuration.
   grunt.initConfig({
     
@@ -183,252 +232,7 @@ module.exports = function(grunt) {
       }
     },
 
-    connect: {
-      'static': {
-        options: {
-          hostname: 'localhost',
-          port: 9001,
-          base: './build',
-        }
-      },
-      docs: {
-        options: {
-          hostname: 'localhost',
-          port: 10000,
-          base: './build/docs',
-        }
-      },
-      ems: {
-        options: {
-          hostname: '*',
-          port: 9000,
-          middleware: function(connect) {
-            return [proxySnippet];
-          }
-        },
-        proxies: [
-          {
-            context: '/alfresco',  // '/api'
-            host: 'cae-ems.jpl.nasa.gov',//128.149.16.152',
-            port: 443,
-            changeOrigin: true,
-            https: true,
-          },
-          {
-            context: '/',
-            host: 'localhost',
-            port: 9001
-          }
-        ]
-      },
-      emstest: {
-        options: {
-          hostname: '*',
-          port: 9000,
-          middleware: function(connect) {
-            return [proxySnippet];
-          }
-        },
-        proxies: [
-          {
-            context: '/alfresco',  // '/api'
-            host: 'cae-ems-test.jpl.nasa.gov',//128.149.16.152',
-            port: 443,
-            changeOrigin: true,
-            https: true,
-          },
-          {
-            context: '/',
-            host: 'localhost',
-            port: 9001
-          }
-        ]
-      },
-      emsstg: {
-        options: {
-          hostname: '*',
-          port: 9000,
-          middleware: function(connect) {
-            return [proxySnippet];
-          }
-        },
-        proxies: [
-          {
-            context: '/alfresco',  // '/api'
-            host: 'cae-ems-stg.jpl.nasa.gov',//128.149.16.152',
-            port: 443,
-            changeOrigin: true,
-            https: true,
-          },
-          {
-            context: '/',
-            host: 'localhost',
-            port: 9001
-          }
-        ]
-      },
-      emsint: {
-        options: {
-          hostname: '*',
-          port: 9000,
-          middleware: function(connect) {
-            return [proxySnippet];
-          }
-        },
-        proxies: [
-          {
-            context: '/alfresco',  // '/api'
-            host: 'ems-int.jpl.nasa.gov',//128.149.16.152',
-            port: 443,
-            changeOrigin: true,
-            https: true,
-          },
-          {
-            context: '/',
-            host: 'localhost',
-            port: 9001
-          }
-        ]
-      },      
-      europaemsstg: {
-        options: {
-          hostname: '*',
-          port: 9000,
-          middleware: function(connect) {
-            return [proxySnippet];
-          }
-        },
-        proxies: [
-          {
-            context: '/alfresco',  // '/api'
-            host: 'europaems-stg.jpl.nasa.gov',//128.149.16.152',
-            port: 443,
-            changeOrigin: true,
-            https: true,
-          },
-          {
-            context: '/',
-            host: 'localhost',
-            port: 9001
-          }
-        ]
-      },
-      europaems: {
-        options: {
-          hostname: '*',
-          port: 9000,
-          middleware: function(connect) {
-            return [proxySnippet];
-          }
-        },
-        proxies: [
-          {
-            context: '/alfresco',  // '/api'
-            host: 'europaems.jpl.nasa.gov',//128.149.16.152',
-            port: 443,
-            changeOrigin: true,
-            https: true,
-          },
-          {
-            context: '/',
-            host: 'localhost',
-            port: 9001
-          }
-        ]
-      },
-      europaemsint: {
-        options: {
-          hostname: '*',
-          port: 9000,
-          middleware: function(connect) {
-            return [proxySnippet];
-          }
-        },
-        proxies: [
-          {
-            context: '/alfresco',  // '/api'
-            host: 'europaems-int.jpl.nasa.gov',//128.149.16.152',
-            port: 443,
-            changeOrigin: true,
-            https: true,
-          },
-          {
-            context: '/',
-            host: 'localhost',
-            port: 9001
-          }
-        ]
-      },
-      arrmems: {
-        options: {
-          hostname: '*',
-          port: 9000,
-          middleware: function(connect) {
-            return [proxySnippet];
-          }
-        },
-        proxies: [
-          {
-            context: '/alfresco',  // '/api'
-            host: 'arrmems.jpl.nasa.gov',//128.149.16.152',
-            port: 443,
-            changeOrigin: true,
-            https: true,
-          },
-          {
-            context: '/',
-            host: 'localhost',
-            port: 9001
-          }
-        ]
-      },
-      rnems: {
-        options: {
-          hostname: '*',
-          port: 9000,
-          middleware: function(connect) {
-            return [proxySnippet];
-          }
-        },
-        proxies: [
-          {
-            context: '/alfresco',  // '/api'
-            host: 'rn-ems.jpl.nasa.gov',//128.149.16.152',
-            port: 443,
-            changeOrigin: true,
-            https: true,
-          },
-          {
-            context: '/',
-            host: 'localhost',
-            port: 9001
-          }
-        ]
-      },
-      localhost: {
-        options: {
-          hostname: '*',
-          port: 9000,
-          middleware: function(connect) {
-            return [proxySnippet];
-          }
-        },
-        proxies: [
-          {
-            context: '/alfresco',  // '/api'
-            host: 'localhost',//128.149.16.152',
-            port: 8080,
-            changeOrigin: false,
-            https: false,
-          },
-          {
-            context: '/',
-            host: 'localhost',
-            port: 9001
-          }
-        ]
-      }
-    },
+    connect: connectObject,
 
     watch: {
       dev: {
@@ -461,10 +265,10 @@ module.exports = function(grunt) {
 
     artifactory: {
       options: {
-        url: 'http://europambee-build.jpl.nasa.gov:8082',
-        repository: 'libs-snapshot-local',
-        username: 'admin',
-        password: 'password'
+        url: artifactory.url,
+        repository: 'libs-release-local',
+        username: artifactory.username,
+        password: artifactory.password
       },
       client: {
         files: [{
@@ -473,7 +277,7 @@ module.exports = function(grunt) {
         options: {
           publish: [{
             id: 'gov.nasa.jpl:evm:zip',
-            version: '0.2.3-SNAPSHOT',
+            version: '2.3.7',
             path: 'deploy/'
           }]
         }
@@ -563,8 +367,8 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-cssmin');
-  grunt.loadNpmTasks('grunt-contrib-sass');
   grunt.loadNpmTasks('grunt-connect-proxy');
+  grunt.loadNpmTasks('grunt-sass');
   grunt.loadNpmTasks('grunt-ngdocs');
   grunt.loadNpmTasks('grunt-html2js');
   grunt.loadNpmTasks('grunt-bower-install-simple');

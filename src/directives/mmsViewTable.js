@@ -18,13 +18,16 @@ function mmsViewTable($compile, $timeout, $document, $templateCache, UtilsServic
         html = '<div class="tableSearch">' +
                 '<button class="btn btn-sm btn-primary" ng-click="doClick()">Export CSV</button> ' +
                 '<button class="btn btn-sm btn-primary" ng-click="showFilter = !showFilter">Filter Table</button> ' +
-                '<span ng-show="showFilter"><form style="display: inline" ng-submit="search()"><input type="text" size="75" placeholder="regex filter" ng-model="searchTerm"></input></form>' +
+                '<span ng-show="showFilter"><span>Showing {{numFiltered}} of {{numTotal}} Rows </span>' + 
+                    '<form style="display: inline" ng-submit="search()"><input type="text" size="75" placeholder="regex filter" ng-model="searchTerm"></input></form>' +
                 '<button class="btn btn-sm btn-primary" ng-click="search()">Apply</button>' + 
                 '<button class="btn btn-sm btn-danger" ng-click="resetSearch()">Reset</button></span></div>' + html;
 
         scope.doClick = function() {
             var csvString = element.children('table').table2CSV({delivery:'value'});
-            var blob = new Blob([csvString], {
+            var bom = "\xEF\xBB\xBF"; //just for excel
+            var bom2 = "\uFEFF";      //just for excel
+            var blob = new Blob([bom2 + csvString], {
                 type: "text/csv;charset=utf-8;"
             });
 
@@ -55,6 +58,8 @@ function mmsViewTable($compile, $timeout, $document, $templateCache, UtilsServic
         //Add the search input here (before the TRS, aka the columns/rows)
         var trs = element.children('table').children('tbody').children('tr');
         var lastIndex = trs.length;
+        scope.numFiltered = lastIndex;
+        scope.numTotal = lastIndex;
         function compile() {
             $timeout(function() {
                 var first = nextIndex;
@@ -69,6 +74,7 @@ function mmsViewTable($compile, $timeout, $document, $templateCache, UtilsServic
         }
         compile();
         scope.search = function() {
+            scope.numFiltered = 0;
             var text = scope.searchTerm;
             var rows = trs.length;
             // Go through each row, if match show row, else hide row
@@ -78,6 +84,7 @@ function mmsViewTable($compile, $timeout, $document, $templateCache, UtilsServic
                 if(regExp.test(string))
                 {
                     $(trs[i]).show();
+                    scope.numFiltered++;
                 }
                 else {
                     $(trs[i]).hide();

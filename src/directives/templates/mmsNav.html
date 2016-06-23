@@ -1,6 +1,6 @@
 <header role="banner">
   <div class="block">
-    <div class="banner-title">{{title}}</div>
+    <div class="banner-title">View Editor</div>
     <a ng-click="nav.toggleNav()" class="nav-btn"><i class="fa fa-lg fa-bars"></i></a>
   </div>
 </header>
@@ -22,23 +22,24 @@
                     </span> -->
                 </div>
             </form>
-            <!-- Dashboard, Support, Feedback, and Logout buttons -->
+            <!-- Dashboard, Shortcuts, Support, Feedback, Staging, About and Logout buttons -->
             <ul class="nav-btns-main pull-right" id="nav-icons-text">
                 <li ng-show="site && site.sysmlid !== 'no-site'"><a class="nav-btn" href="/share/page/site/{{site.sysmlid}}/dashboard" target="_blank"><i class="fa fa-dashboard"></i> Dashboard</a></li>
-                <li><a class="nav-btn support-btn" ng-click="toggleHelp()"><i class="fa fa-keyboard-o"></i> Shortcuts</a></li>
+                <li><a class="nav-btn shortcuts-btn" ng-click="toggleHelp()"><i class="fa fa-keyboard-o"></i> Shortcuts</a></li>
                 <li><a class="nav-btn support-btn" href="https://cae-ems.jpl.nasa.gov/alfresco/mmsapp/mms.html#/workspaces/master/sites/site__18_0_2_bec02f9_1446154915939_541002_41021/documents/_18_0_2_8630260_1446850132083_177552_51111/views/_18_0_2_8630260_1446850132083_177552_51111" target="_blank"><i class="fa fa-question-circle"></i> Support</a></li>
                 <li><a class="nav-btn portal-btn"  href="https://cae-jira.jpl.nasa.gov/browse/SSCAES" target="_blank"><i class="fa fa-comments"></i> Feedback</a></li>
-                <li><a class="nav-btn portal-btn"  ng-click="stagingView()"><i class="fa fa-child"></i> Staging</a></li>
-                <li><a class="nav-btn logout-btn" href="/alfresco/service/logout/info?next=/alfresco/mmsapp/mms.html"><i class="fa fa-sign-out"></i> Logout</a></li>
+                <li><a class="nav-btn portal-btn"  ng-click="stagingView()"><i class="fa fa-child"></i> UAT</a></li>
+                <li><a class="nav-btn about-btn" ng-click="toggleAbout()"><i class="fa fa-info-circle"></i> About</a></li>
+                <li><a class="nav-btn logout-btn" ng-click="logout()"><i class="fa fa-sign-out"></i> Logout</a></li>
             </ul>
             <ul class="nav-btns-flyover pull-right">
-                <li ng-show="site && site.sysmlid !== 'no-site' && ws" class="out-link"><a ui-sref="workspace.site({site: site.sysmlid, search: undefined})">DocWeb</a></li>
-                <li ng-show="ws" class="out-link"><a ui-sref="workspace.sites({search: undefined})">Site Portal</a></li>
-                <li class="out-link"><a ui-sref="workspace({workspace:'master', search: undefined})">Model Manager</a></li>
                 <li ng-show="site && site.sysmlid !== 'no-site'" class="out-link"><a href="/share/page/site/{{site.sysmlid}}/dashboard">Dashboard</a></li>
+                <li class="out-link"><a ui-sref="workspace({workspace:'master', search: undefined})">Tasks and Tags</a></li>
                 <li class="out-link"><a href="https://cae-ems.jpl.nasa.gov/alfresco/mmsapp/mms.html#/workspaces/master/sites/site__18_0_2_bec02f9_1446154915939_541002_41021/documents/_18_0_2_8630260_1446850132083_177552_51111/views/_18_0_2_8630260_1446850132083_177552_51111" target="_blank">Support</a></li>
                 <li class="out-link"><a href="https://cae-jira.jpl.nasa.gov/browse/SSCAES" target="_blank">Feedback</a></li>
-                <li class="out-link"><a href="/alfresco/service/logout/info?next=/alfresco/mmsapp/mms.html">Logout</a></li>
+                <li class="out-link"><a ng-click="toggleAbout()">About</a></li>
+                <li class="out-link"><a ng-click="logout()">Logout</a></li>
+                <li class="out-link"><a class="nav-btn about-btn"></a></li>
             </ul>
         </ul>
     </div>

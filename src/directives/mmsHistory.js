@@ -32,6 +32,8 @@ function mmsHistory(Utils, ElementService, WorkspaceService, $compile, $template
     var template = $templateCache.get('mms/templates/mmsHistory.html');
 
     var mmsHistoryLink = function(scope, element, attrs) {
+        var ran = false;
+        var lastid = null;
         scope.selects = {timestampSelected: null};
         scope.historyVer = 'latest';
         /**
@@ -43,9 +45,15 @@ function mmsHistory(Utils, ElementService, WorkspaceService, $compile, $template
          * Change scope history when another element is selected
          *
          */
-        var changeElement = function() {
-          ElementService.getElementVersions(scope.mmsEid, false, scope.mmsWs)
+        var changeElement = function(newVal, oldVal) {
+            if (!newVal || (newVal == oldVal && ran))
+                return;
+            ran = true;
+            lastid = newVal;
+            ElementService.getElementVersions(scope.mmsEid, false, scope.mmsWs)
             .then(function(data) {
+                if (newVal !== lastid) 
+                    return;
                 scope.history = data;
                 scope.historyVer = 'latest';
                 scope.selects.timestampSelected = null;

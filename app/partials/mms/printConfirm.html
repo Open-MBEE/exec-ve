@@ -3,25 +3,33 @@
 </div>
 
 <div class="modal-body">
-    <p ng-if="type == 'DOCUMENT'">
+    <p ng-if="type == 'DOCUMENT' && !genpdf">
       This will bring up a popup where you can {{action}} the contents of this document, please disable any popup blockers if you don't 
       see the popup. 
       <br/><br/>If you don't see certain content appearing in the popup, please wait until the full document appears in this pane before clicking {{action}}.
     </p>
-    <p ng-if="type == 'VIEW'">
+    <p ng-if="type == 'VIEW' && !genpdf">
         This will bring up a popup where you can {{action}} the contents of this view, please disable any popup blockers if you don't 
       see the popup. 
       <br/><br/>
       If you don't see certain content appearing in the popup, please wait until the full document appears in this pane before clicking {{action}}.
-      <br/><br/>If you want to {{action}} the entire document instead, please click on 'GO TO FULL DOCUMENT' and click {{action}} again when it finishes loading. 
+      <br/><br/><span ng-show="docOption">If you want to {{action}} the entire document instead, please click on 'GO TO FULL DOCUMENT' and click {{action}} again when it finishes loading.</span>
+    </p>
+    <p ng-if="type == 'VIEW' && genpdf">
+      Please click on GO TO FULL DOCUMENT
+    </p>
+    <p ng-if="type == 'DOCUMENT' && genpdf">
+      Please note that you should wait until the full document appears in this pane before continuing.
     </p>
     <p ng-if="unsaved" class="error">
       WARNING: You currently have unsaved changes in the session that may not be reflected.
     </p>
+    <br/> <div ng-if="type == 'DOCUMENT'">Generate Standard Cover Page: <input type="checkbox" ng-model="model.genCover"></div> 
+    <div ng-if="type == 'DOCUMENT' && genpdf">Generate List of Tables and Figures: <input type="checkbox" ng-model="model.genTotf"></div>
 </div>
 
 <div class="modal-footer">
+    <button ng-if="type == 'VIEW' && docOption" class="btn btn-sm btn-primary" ng-click="fulldoc()">GO TO FULL DOCUMENT</button>
+    <button ng-if="type == 'DOCUMENT' || !genpdf" class="btn btn-sm btn-primary" ng-click="print()">{{action | uppercase}}</button>
     <button class="btn btn-sm btn-danger" ng-click="cancel()">CANCEL</button>
-    <button ng-if="type == 'VIEW'" class="btn btn-sm btn-primary" ng-click="fulldoc()">GO TO FULL DOCUMENT</button>
-    <button class="btn btn-sm btn-primary" ng-click="print()">{{action | uppercase}}</button>
 </div>

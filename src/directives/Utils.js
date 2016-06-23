@@ -20,8 +20,11 @@ angular.module('mms.directives')
  *
  */
 function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, WorkspaceService, ConfigService, ElementService, ViewService, UtilsService, growl, _) {
-    
-     var conflictCtrl = function($scope, $modalInstance) {
+  
+    var ENUM_ID = '_9_0_62a020a_1105704885400_895774_7947';
+    var ENUM_LITERAL = '_9_0_62a020a_1105704885423_380971_7955';
+  
+    var conflictCtrl = function($scope, $modalInstance) {
         $scope.ok = function() {
             $modalInstance.close('ok');
         };
@@ -225,9 +228,101 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
             growl.error(reason.message);
     };
 
+    /**
+     * @ngdoc function
+     * @name mms.directives.Utils#isEnumeration
+     * @methodOf mms.directives.Utils
+     * 
+     * @description 
+     * Check if element is enumeration and if true get enumerable options 
+     * 
+     * @param {object} elt element object
+     * @param {object} scope scope with common properties
+     * @return {Promise} promise would be resolved with options and if object is enumerable.
+     *      For unsuccessful saves, it will be rejected with an object with reason.
+     */
+    var isEnumeration = function(elt, ws, version) {
+        var deferred = $q.defer();
+        if (elt.appliedMetatypes && elt.appliedMetatypes.length > 0 && 
+            elt.appliedMetatypes[0] === ENUM_ID) {
+            var isEnumeration = true;
+            ElementService.getOwnedElements(elt.sysmlid, false, ws, version, 1).then(
+                function(val) {
+                    var newArray = [];
+                     // Filter for enumeration type
+                    for (var i = 0; i < val.length; i++) {
+                        if( val[i].appliedMetatypes && val[i].appliedMetatypes.length > 0 && 
+                            val[i].appliedMetatypes[0] === ENUM_LITERAL) {
+                            newArray.push(val[i]);
+                        }
+                    }
+                    deferred.resolve({options:newArray,isEnumeration: isEnumeration});
+                },
+                function(reason) {
+                    deferred.reject(reason);
+                }
+            );
+        } else {
+            deferred.resolve({options:[],isEnumeration: false});
+        }
+        return deferred.promise;
+    };
+
+    var getPropertySpec = function(elt, ws, version) {
+        var deferred = $q.defer();
+        var id = elt.specialization.propertyType;
+        var isSlot = false;
+        var isEnum = false;
+        var options = [];
+        if (elt.specialization.isSlot) 
+            isSlot = true;
+        if (!id) { //no property type, will not be enum
+            deferred.resolve({options: options, isEnumeration: isEnum, isSlot: isSlot});
+            return deferred.promise;
+        }
+        // Get element specialization propertyType info 
+        ElementService.getElement(id,false,ws,version)
+        .then(function(value){
+            if (isSlot) {
+                if (!value.specialization || !value.specialization.propertyType) {
+                    deferred.resolve({options: options, isEnumeration: isEnum, isSlot: isSlot});
+                    return;
+                }
+                //if specialization is a slot  
+                ElementService.getElement(value.specialization.propertyType,false,ws,version)
+                .then(function(val) {
+                    isEnumeration(val)
+                    .then(function(enumValue) {
+                        if (enumValue.isEnumeration) {
+                            isEnum = enumValue.isEnumeration;
+                            options = enumValue.options;
+                        }
+                        deferred.resolve({options: options, isEnumeration: isEnum, isSlot: isSlot});
+                    }, function(reason) {
+                        deferred.resolve({options: options, isEnumeration: isEnum, isSlot: isSlot});
+                    });
+                });
+            } else {
+                isEnumeration(value)
+                .then( function(enumValue) {
+                    if (enumValue.isEnumeration) {
+                        isEnum = enumValue.isEnumeration;
+                        options = enumValue.options;
+                    }
+                    deferred.resolve({ options:options, isEnumeration:isEnum, isSlot:isSlot });
+                }, function(reason) {
+                    deferred.reject(reason);
+                });
+            }
+        }, function(reason) {
+            deferred.resolve({options: options, isEnumeration: isEnum, isSlot: isSlot});
+        });
+        return deferred.promise;
+    };
+    
     var addFrame = function(scope, mmsViewCtrl, element, template, editObj, doNotScroll) {
 
-        if (mmsViewCtrl.isEditable() && !scope.isEditing && scope.element.editable && scope.version === 'latest') { // && !scope.cleanUp) {
+        if (mmsViewCtrl.isEditable() && !scope.isEditing && scope.element.editable && scope.version === 'latest') { 
 
             var id = editObj ? editObj.sysmlid : scope.mmsEid;
             ElementService.getElementForEdit(id, false, scope.ws)
@@ -284,12 +379,13 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
             return;
         }
         if (!continueEdit)
-            bbApi.toggleButtonSpinner('presentation.element.save');
+            bbApi.toggleButtonSpinner('presentation-element-save');
         else
-            bbApi.toggleButtonSpinner('presentation.element.saveC');
+            bbApi.toggleButtonSpinner('presentation-element-saveC');
         scope.elementSaving = true;
         var id = editObj ? editObj.sysmlid : scope.mmsEid;
 
+        $timeout(function() {
         // If it is a Section, then merge the changes b/c deletions to the Section's contents
         // are not done on the scope.edit.
         if (editObj && ViewService.isSection(editObj)) {
@@ -335,7 +431,7 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
             // Broadcast message for the toolCtrl:
                 $rootScope.$broadcast('presentationElem.save', scope);
             }
-            //$rootScope.$broadcast('view.reorder.refresh');
+            //$rootScope.$broadcast('view-reorder.refresh');
             //recompile();
             growl.success('Save Successful');
             scrollToElement(element);
@@ -344,10 +440,11 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
             handleError(reason);
         }).finally(function() {
             if (!continueEdit)
-                bbApi.toggleButtonSpinner('presentation.element.save');
+                bbApi.toggleButtonSpinner('presentation-element-save');
             else
-                bbApi.toggleButtonSpinner('presentation.element.saveC');
+                bbApi.toggleButtonSpinner('presentation-element-saveC');
         });
+        }, 1000, false);
     };
 
     //called by transcludes
@@ -365,7 +462,7 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
             scrollToElement(element);
         };
 
-        bbApi.toggleButtonSpinner('presentation.element.cancel');
+        bbApi.toggleButtonSpinner('presentation-element-cancel');
 
         // Only need to confirm the cancellation if edits have been made:
         if (hasEdits(scope, type)) {
@@ -384,12 +481,12 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
             instance.result.then(function() {
                 cancelCleanUp();
             }).finally(function() {
-                bbApi.toggleButtonSpinner('presentation.element.cancel');
+                bbApi.toggleButtonSpinner('presentation-element-cancel');
             });
         }
         else {
             cancelCleanUp();
-            bbApi.toggleButtonSpinner('presentation.element.cancel');
+            bbApi.toggleButtonSpinner('presentation-element-cancel');
         }
     };
 
@@ -415,7 +512,7 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
             growl.error('Checking if view contents is up to date failed: ' + reason.message);
         });
         function realDelete() {
-        bbApi.toggleButtonSpinner('presentation.element.delete');
+        bbApi.toggleButtonSpinner('presentation-element-delete');
 
         scope.name = scope.edit.name;
 
@@ -440,7 +537,7 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
                     $rootScope.$broadcast('viewctrl.delete.section', scope.presentationElem);
                 }
 
-                $rootScope.$broadcast('view.reorder.refresh');
+                $rootScope.$broadcast('view-reorder.refresh');
 
                  // Broadcast message for the ToolCtrl:
                 $rootScope.$broadcast('presentationElem.cancel',scope);
@@ -449,7 +546,7 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
             }, handleError);
 
         }).finally(function() {
-            bbApi.toggleButtonSpinner('presentation.element.delete');
+            bbApi.toggleButtonSpinner('presentation-element-delete');
         });
         }
     };
@@ -556,6 +653,8 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
         showEditCallBack: showEditCallBack,
         isDirectChildOfPresentationElementFunc: isDirectChildOfPresentationElementFunc,
         hasHtml: hasHtml,
+        isEnumeration: isEnumeration,
+        getPropertySpec: getPropertySpec,
     };
 
 }

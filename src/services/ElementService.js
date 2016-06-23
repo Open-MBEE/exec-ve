@@ -378,10 +378,20 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         var deferred = $q.defer();
 
         var handleSuccess = function(n, data) {
-            var resp = CacheService.put(n.cacheKey, UtilsService.cleanElement(data.elements[0]), true);
+            var e = null;
+            if (data.elements.length > 1 && elem.sysmlid) {
+                for (var i = 0; i < data.elements.length; i++) {
+                    if (data.elements[i].sysmlid === elem.sysmlid)
+                        e = data.elements[i];
+                }
+                if (!e)
+                    e = data.elements[0];
+            } else
+                e = data.elements[0];
+            var resp = CacheService.put(n.cacheKey, UtilsService.cleanElement(e), true);
             var history = CacheService.get(UtilsService.makeElementKey(elem.sysmlid, workspace, 'versions'));
             if (history) {
-                history.unshift({modifier: data.elements[0].modifier, timestamp: data.elements[0].modified});
+                history.unshift({modifier: e.modifier, timestamp: e.modified});
             }
             var edit = CacheService.get(UtilsService.makeElementKey(elem.sysmlid, n.ws, null, true));
             if (edit) {
@@ -539,7 +549,16 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
             url = URLService.getPostElementsWithSiteURL(n.ws, site);
         $http.post(url, {'elements': [elem], 'source': ApplicationService.getSource()})
         .success(function(data, status, headers, config) {
-            var resp = data.elements[0];
+            var resp = null;
+            if (data.elements.length > 1 && elem.sysmlid) {
+                for (var i = 0; i < data.elements.length; i++) {
+                    if (data.elements[i].sysmlid === elem.sysmlid)
+                        resp = data.elements[i];
+                }
+                if (!resp)
+                    resp = data.elements[0];
+            } else
+                resp = data.elements[0];
             var key = UtilsService.makeElementKey(resp.sysmlid, n.ws, 'latest');
             deferred.resolve(CacheService.put(key, UtilsService.cleanElement(resp), true));
         }).error(function(data, status, headers, config) {
@@ -806,6 +825,11 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         res.cacheKey = UtilsService.makeElementKey(id, res.ws, res.ver, edit);
         return res;
     };
+
+    var reset = function() {
+        inProgress = {};
+    };
+
     return {
         getElement: getElement,
         getElements: getElements,
@@ -822,6 +846,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         deleteElements: deleteElements,
         isCacheOutdated: isCacheOutdated,
         isDirty: isDirty,
-        search: search
+        search: search,
+        reset: reset
     };
 }
