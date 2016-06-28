@@ -11,7 +11,7 @@ CKEDITOR.plugins.add( 'mmscf', {
 	init: function( editor ) {
 		// Register mmscf widget to opens CF search window and insert mmscf tag as widget.
 		editor.widgets.add( 'mmscf', {
-      button: 'Cross Ref',
+      button: 'Insert Cross Ref',
       allowedContent: 'mms-transclude-doc[*];mms-transclude-val[*];mms-transclude-name[*];',
       inline: true,
 			insert: function() {
