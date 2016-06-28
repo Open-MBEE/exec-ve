@@ -95,9 +95,9 @@ function mmsView(ViewService, $templateCache, $rootScope, growl) {
             return ViewService.getViewElements($scope.mmsVid, false, $scope.mmsWs, $scope.mmsVersion, 1);
         };
 
-        this.transcludeClicked = function(elementId) {
+        this.transcludeClicked = function(elementId, ws, version) {
             if ($scope.mmsCfClicked)
-                $scope.mmsCfClicked({elementId: elementId});
+                $scope.mmsCfClicked({elementId: elementId, ws: ws, version: version});
         };
 
         this.elementTranscluded = function(elem, type) {

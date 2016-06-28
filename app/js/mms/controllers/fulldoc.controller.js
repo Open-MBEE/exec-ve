@@ -51,7 +51,7 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
                     dis.toggleShowEdits();
                 }
             }
-        }, number: curSec};
+        }, number: curSec, topLevel: (curSec ? (curSec.toString().indexOf('.') === -1 && curSec !== 1) : false)};
     };
     var addToArray = function(viewId, curSection) {
         views.push( buildViewElt(viewId, curSection) );
@@ -70,8 +70,8 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
     });
     $scope.version = time;
     $scope.views = views;
-    $scope.tscClicked = function(elementId) {
-        $rootScope.$broadcast('elementSelected', elementId, 'element');
+    $scope.tscClicked = function(elementId, ws, version) {
+        $rootScope.$broadcast('elementSelected', elementId, 'element', ws, version);
     };
 
     $scope.$on('newViewAdded', function(event, vId, curSec, prevSibId) {

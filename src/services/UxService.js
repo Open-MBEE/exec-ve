@@ -48,6 +48,9 @@ function UxService($rootScope) {
       case "tags":
             return {id: button, icon: 'fa-tag', selected: false, active: true, permission: true, tooltip: 'Tags',
                     spinner: false, onClick: function() {$rootScope.$broadcast(button);}};
+      case "jobs":
+            return {id: button, icon: 'fa-sort-amount-desc', selected: true, active: true, permission:true, tooltip: 'Jobs',
+                    spinner: false, onClick: function() {$rootScope.$broadcast(button);}};
       case "element-editor-save":
       return {id: button, icon: 'fa-save', dynamic: true, selected: false, active: false, permission:true, tooltip: 'Save',
                 spinner: false, onClick: function() {$rootScope.$broadcast(button);}};
@@ -165,9 +168,9 @@ function UxService($rootScope) {
                   dropdown_buttons: [getButtonBarButton("view-add-paragraph"), getButtonBarButton("view-add-section"),
                   getButtonBarButton("view-add-comment"), getButtonBarButton("view-add-list"),
                   getButtonBarButton("view-add-table"), getButtonBarButton("view-add-image"),
-                  getButtonBarButton("view-add-tsp")]
-                  //, getButtonBarButton("view-add-table"), getButtonBarButton("view-add-equation"), 
-                  // getButtonBarButton("view-add-image"),
+                  getButtonBarButton("view-add-equation"), getButtonBarButton("view-add-tsp")]
+                  //, getButtonBarButton("view-add-table"),
+                    // getButtonBarButton("view-add-equation"), getButtonBarButton("view-add-image"),
                     };
           case "view-add-table":
             return {id: button, icon: 'fa-table', selected: true, active: true, permission: true, tooltip: 'Add Table', 
@@ -182,16 +185,13 @@ function UxService($rootScope) {
             return {id: button, icon: 'fa-paragraph', selected: true, active: true, permission: true, tooltip: 'Add Text', 
                     spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
           case "view-add-image":
-            return {id: button, icon: 'fa-image', selected: true, active: true, permission: true, tooltip: 'Add Figure', 
+            return {id: button, icon: 'fa-image', selected: true, active: true, permission: true, tooltip: 'Add Image', 
                     spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
           case "view-add-section":
             return {id: button, icon: 'fa-list-alt', selected: true, active: true, permission: true, tooltip: 'Add Section', 
                     spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
           case "view-add-comment":
             return {id: button, icon: 'fa-comment-o', selected: true, active: true, permission: true, tooltip: 'Add Comment', 
-                    spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
-          case "view-add-tsp":
-            return {id: button, icon: 'fa-image', selected: true, active: true, permission: true, tooltip: 'Add Tom Sawyer View', 
                     spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
           case "presentation-element-delete":
             return {id: button, icon: 'fa-trash', selected: true, active: true, permission: true, tooltip: 'Delete', 
@@ -213,7 +213,8 @@ function UxService($rootScope) {
                     spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);},
                     dropdown_buttons: [getButtonBarButton("section-add-paragraph",scope), getButtonBarButton("section-add-section", scope),
                     getButtonBarButton("section-add-comment", scope), getButtonBarButton("section-add-list",scope),
-                    getButtonBarButton("section-add-table",scope), getButtonBarButton("section-add-image",scope)]
+                    getButtonBarButton("section-add-table",scope), getButtonBarButton("section-add-image",scope),
+                    getButtonBarButton("section-add-equation", scope)]
                     //, getButtonBarButton("section-add-table",scope),
                       //, getButtonBarButton("section-add-equation", scope), getButtonBarButton("section-add-image",scope),
                       };
@@ -230,7 +231,7 @@ function UxService($rootScope) {
             return {id: button, icon: 'fa-paragraph', selected: true, active: true, permission: true, tooltip: 'Add Text', 
                     spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button, scope.section);}};
           case "section-add-image":
-            return {id: button, icon: 'fa-image', selected: true, active: true, permission: true, tooltip: 'Add Figure', 
+            return {id: button, icon: 'fa-image', selected: true, active: true, permission: true, tooltip: 'Add Image', 
                     spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button, scope.section);}};
           case "section-add-section":
             return {id: button, icon: 'fa-list-alt', selected: true, active: true, permission: true, tooltip: 'Add Section', 

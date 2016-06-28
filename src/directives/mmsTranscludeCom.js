@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsTranscludeCom', ['Utils', 'ElementService', 'UtilsService', 'ViewService', 'UxService', '$log', '$templateCache', '$compile', 'growl', mmsTranscludeCom]);
+.directive('mmsTranscludeCom', ['Utils', 'ElementService', 'UtilsService', 'ViewService', 'UxService', '$log', '$templateCache', '$compile', 'growl', 'MathJax', mmsTranscludeCom]);
 
 /**
  * @ngdoc directive
@@ -23,7 +23,7 @@ angular.module('mms.directives')
  * @param {string=master} mmsWs Workspace to use, defaults to master
  * @param {string=latest} mmsVersion Version can be alfresco version number or timestamp, default is latest
  */
-function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxService, $log, $templateCache, $compile, growl) {
+function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxService, $log, $templateCache, $compile, growl, MathJax) {
 
     var template = $templateCache.get('mms/templates/mmsTranscludeDoc.html');
     
@@ -58,7 +58,7 @@ function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxSe
                 scope.addFrame();
 
             if (mmsViewCtrl)
-                mmsViewCtrl.transcludeClicked(scope.mmsEid);
+                mmsViewCtrl.transcludeClicked(scope.mmsEid, scope.ws, scope.version);
             //if (e.target.tagName !== 'A')
               //  return false;
               e.stopPropagation();
@@ -72,6 +72,7 @@ function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxSe
             var doc = scope.element.documentation || '(No comment)';
             doc += ' - ' + scope.element.creator;
             element[0].innerHTML = doc;
+            MathJax.Hub.Queue(["Typeset", MathJax.Hub, element[0]]);
             scope.recompileScope = scope.$new();
             $compile(element.contents())(scope.recompileScope); 
             if (mmsViewCtrl) {
@@ -97,7 +98,7 @@ function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxSe
             idwatch();
             if (UtilsService.hasCircularReference(scope, scope.mmsEid, 'doc')) {
                 //$log.log("prevent circular dereference!");
-                element.html('<span class="error">Circular Reference!</span>');
+                element.html('<span class="mms-error">Circular Reference!</span>');
                 return;
             }
             var ws = scope.mmsWs;
@@ -127,7 +128,7 @@ function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxSe
                 var status = ' not found';
                 if (reason.status === 410)
                     status = ' deleted';
-                element.html('<span class="error">comment ' + newVal + status + '</span>');
+                element.html('<span class="mms-error">comment ' + newVal + status + '</span>');
                 //growl.error('Cf Comment Error: ' + reason.message + ': ' + scope.mmsEid);
             });
         });

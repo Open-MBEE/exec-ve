@@ -63,7 +63,7 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
 
             if (!mmsViewCtrl)
                 return false;
-            mmsViewCtrl.transcludeClicked(scope.mmsEid);
+            mmsViewCtrl.transcludeClicked(scope.mmsEid, scope.ws, scope.version);
             //return false;
             e.stopPropagation();
         });
@@ -151,7 +151,7 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
                 var status = ' not found';
                 if (reason.status === 410)
                     status = ' deleted';
-                element.html('<span class="error">name cf ' + newVal + status + '</span>');
+                element.html('<span class="mms-error">name cf ' + newVal + status + '</span>');
                 //growl.error('Cf Name Error: ' + reason.message + ': ' + scope.mmsEid);
             });
         });

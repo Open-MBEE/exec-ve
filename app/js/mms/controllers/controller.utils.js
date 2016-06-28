@@ -26,7 +26,7 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
                 validClassifierIds.push(ViewService.TYPE_TO_CLASSIFIER_ID.TableT);
             } else if ($scope.presentationElemType === 'List') {
                 validClassifierIds.push(ViewService.TYPE_TO_CLASSIFIER_ID.ListT);
-            } else if ($scope.presentationElemType === 'Figure') {
+            } else if ($scope.presentationElemType === 'Image') {
                 validClassifierIds.push(ViewService.TYPE_TO_CLASSIFIER_ID.Figure);
             } else if ($scope.presentationElemType === 'Paragraph') {
                 validClassifierIds.push(ViewService.TYPE_TO_CLASSIFIER_ID.ParagraphT);
@@ -270,7 +270,7 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
                     $scope.genpdf = true;
                 }
                 $scope.docOption = (!isDoc && mode === 3);
-                $scope.model = {genCover: false, genTotf: true};
+                $scope.model = {genCover: false, genTotf: false};
                 $scope.print = function() {
                     $modalInstance.close(['ok', $scope.model.genCover, $scope.model.genTotf]);
                 };
@@ -297,7 +297,7 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
                         if (mode === 2) {
                             inst = "<div>(Copy and paste into Word)</div>";
                         }
-                        var popupWin = $window.open('', '_blank', 'width=800,height=600,scrollbars=1');
+                        var popupWin = $window.open('about:blank', '_blank', 'width=800,height=600,scrollbars=1,status=1,toolbar=1,menubar=1');
                         popupWin.document.open();
                         popupWin.document.write('<html><head><style>' + css + '</style></head><body style="overflow: auto">' + inst + cover + toc + contents + '</body></html>');
                         popupWin.document.close();
@@ -376,7 +376,7 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
         var printContents = '';
         var printElementCopy = angular.element("#print-div");
         printElementCopy.find('table').addClass(function() {
-            if ($(this).width() > 1400) {
+            if ($(this).find('table').length > 0 || $(this).find('img').length > 0) {
                 return 'big-table';
             }
             return '';
@@ -407,9 +407,27 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
         var comments = printElementCopy.find('mms-transclude-com');
         comments.remove();
         printElementCopy.find('div.tableSearch').remove();
-        printElementCopy.find('.error').html('error');
+        printElementCopy.find('.mms-error').html('error');
         printElementCopy.find('.no-print').remove();
         printElementCopy.find('.ng-hide').remove();
+        if (mode === 2)
+            printElementCopy.find('.mms-svg').remove();
+        else
+            printElementCopy.find('.mms-png').remove();
+        printElementCopy.find('p:empty').remove();
+        printElementCopy.find('p').each(function() {
+            var $this = $(this);
+            if ($this.html().replace(/\s|&nbsp;/g, '').length === 0)
+                $this.remove();
+        });
+        printElementCopy.find('[width]').not('img').removeAttr('width');
+        printElementCopy.find('[style]').each(function() {
+            this.style.removeProperty('font-size');
+            this.style.removeProperty('width');
+        });
+        printElementCopy.find('.math').remove(); //this won't work in chrome for popups since chrome can't display mathml
+        printElementCopy.find('script').remove();
+        //printElementCopy.find('.MJX_Assistive_MathML').remove(); //pdf generation need mathml version
         var coverTemplateString = $templateCache.get('partials/mms/docCover.html');
         var coverTemplateElement = angular.element(coverTemplateString);
         var cover = '';

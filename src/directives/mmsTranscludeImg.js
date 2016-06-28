@@ -28,7 +28,7 @@ function mmsTranscludeImg(VizService, growl) {
         element.click(function(e) {
             if (!mmsViewCtrl)
                 return false;
-            mmsViewCtrl.transcludeClicked(scope.mmsEid);
+            mmsViewCtrl.transcludeClicked(scope.mmsEid, scope.ws, scope.version);
             return false;
         });
 
@@ -59,11 +59,17 @@ function mmsTranscludeImg(VizService, growl) {
                 if (!version)
                     version = viewVersion.version;
             }
-            VizService.getImageURL(scope.mmsEid, false, ws, version)
+            VizService.getImageURL(scope.mmsEid, 'svg', false, ws, version)
             .then(function(data) {
-                scope.imgUrl = data;
+                scope.svgImgUrl = data;
             }, function(reason) {
                 growl.error('Cf Image Error: ' + reason.message + ': ' + scope.mmsEid);
+            });
+            VizService.getImageURL(scope.mmsEid, 'png', false, ws, version)
+            .then(function(data) {
+                scope.pngImgUrl = data;
+            }, function(reason) {
+                //growl.error('Cf Image Error: ' + reason.message + ': ' + scope.mmsEid);
             });
         });
     };
@@ -71,7 +77,7 @@ function mmsTranscludeImg(VizService, growl) {
     return {
         restrict: 'E',
         //template: '<figure><img ng-src="{{imgUrl}}"></img><figcaption><mms-transclude-name mms-eid="{{mmsEid}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></figcaption></figure>',
-        template: '<img ng-src="{{imgUrl}}"></img>',
+        template: '<img class="mms-svg" ng-src="{{svgImgUrl}}"></img><img class="mms-png" ng-src="{{pngImgUrl}}"></img>',
         scope: {
             mmsEid: '@',
             mmsVersion: '@',

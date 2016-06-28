@@ -245,8 +245,8 @@ function urlService(baseUrl) {
      * @param {string} version Timestamp or version number
      * @returns {string} The path for image url queries.
      */
-    var getImageURL = function(id, workspace, version) {
-        var r = root + '/workspaces/' + workspace + '/artifacts/' + id;
+    var getImageURL = function(id, ext, workspace, version) {
+        var r = root + '/workspaces/' + workspace + '/artifacts/' + id + '?extension=' + ext;
         return addTicket(addVersion(r, version));
     };
 
@@ -524,6 +524,21 @@ function urlService(baseUrl) {
             r += '?timestamp2=' + sourcetime;
         return addTicket(r);
     };
+    
+    var getJobs = function(id) {
+        return addTicket(root + '/workspaces/master/jobs/' + id + '?recurse=1');
+    };
+    var getJob = function(jobSyml){
+        return addTicket(root + '/workspaces/master/jobs/' + jobSyml);
+    };
+    var getJenkinsRun = function(jobSyml) {
+        return addTicket(root + '/workspaces/master/jobs/'+ jobSyml + '/execute');
+    };
+    
+    var getCreateJob = function() {
+        var link = '/alfresco/service/workspaces/master/jobs';
+        return addTicket(root + '/workspaces/master/jobs');
+    };
 
     var getLogoutURL = function() {
         return addTicket(root + '/api/login/ticket/' + ticket);
@@ -536,9 +551,12 @@ function urlService(baseUrl) {
     var addVersion = function(url, version) {
         if (version === 'latest')
             return url;
-        if (isTimestamp(version))
-            return url + '?timestamp=' + version;
-        else
+        if (isTimestamp(version)) {
+            if (url.indexOf('?') > 0)
+                return url + '&timestamp=' + version;
+            else
+                return url + '?timestamp=' + version;
+        } else
             return url + '/versions/' + version;
     };
     var addTicket = function(url) {
@@ -584,6 +602,10 @@ function urlService(baseUrl) {
         getViewElementsURL: getViewElementsURL,
         getWsDiffURL: getWsDiffURL,
         getPostWsDiffURL: getPostWsDiffURL,
+        getJobs: getJobs,
+        getJob: getJob,
+        getJenkinsRun: getJenkinsRun,
+        getCreateJob: getCreateJob,
         getPutElementsURL: getPutElementsURL,
         getWorkspacesURL: getWorkspacesURL,
         getWorkspaceURL: getWorkspaceURL,

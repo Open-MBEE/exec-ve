@@ -165,18 +165,17 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     });
 
     $scope.$on('view-add-image', function() {
-        MmsAppUtils.addPresentationElement($scope, 'Figure', view);
+        MmsAppUtils.addPresentationElement($scope, 'Image', view);
     });
-/*
+
     $scope.$on('view-add-equation', function() {
-        addElement('Equation');
+        MmsAppUtils.addPresentationElement($scope, 'Equation', view);
     });
-*/
 
     $scope.$on('view-add-tsp', function() {
         MmsAppUtils.addPresentationElement($scope, 'Tsp', view);
     });
-    
+
     $scope.$on('section-add-paragraph', function(event, section) {
         MmsAppUtils.addPresentationElement($scope, 'Paragraph', section);
     });
@@ -188,11 +187,11 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     $scope.$on('section-add-table', function(event, section) {
         MmsAppUtils.addPresentationElement($scope, 'Table', section);
     });
-/*
+
     $scope.$on('section-add-equation', function(event, section) {
-        addElement('Equation', section);
+        MmsAppUtils.addPresentationElement($scope, 'Equation', section);
     });
-*/
+
     $scope.$on('section-add-section', function(event, section) {
         MmsAppUtils.addPresentationElement($scope, 'Section', section);
     });
@@ -202,7 +201,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     });
 
     $scope.$on('section-add-image', function(event, section) {
-        MmsAppUtils.addPresentationElement($scope, 'Figure', section);
+        MmsAppUtils.addPresentationElement($scope, 'Image', section);
     });
 
     $scope.$on('show-comments', function() {
@@ -284,8 +283,8 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     $scope.numComments = 0;
     $scope.lastCommented = "";
     $scope.lastCommentedBy = "";
-    $scope.tscClicked = function(elementId) {
-        $rootScope.$broadcast('elementSelected', elementId, 'element');
+    $scope.tscClicked = function(elementId, ws, version) {
+        $rootScope.$broadcast('elementSelected', elementId, 'element', ws, version);
     };
     $scope.searchOptions= {};
     $scope.searchOptions.callback = function(elem) {
