@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsTranscludeVal', ['ElementService', 'UtilsService', 'UxService', 'Utils', 'URLService', '$http', '_', '$log', '$compile', '$templateCache', 'growl', mmsTranscludeVal]);
+.directive('mmsTranscludeVal', ['ElementService', 'UtilsService', 'UxService', 'Utils', 'URLService', '$http', '_', '$log', '$compile', '$templateCache', 'growl', 'MathJax', mmsTranscludeVal]);
 
 /**
  * @ngdoc directive
@@ -23,7 +23,7 @@ angular.module('mms.directives')
  * @param {string=master} mmsWs Workspace to use, defaults to master
  * @param {string=latest} mmsVersion Version can be alfresco version number or timestamp, default is latest
  */
-function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLService, $http, _, $log, $compile, $templateCache, growl) {
+function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLService, $http, _, $log, $compile, $templateCache, growl, MathJax) {
     var valTemplate = $templateCache.get('mms/templates/mmsTranscludeVal.html');
     var frameTemplate = $templateCache.get('mms/templates/mmsTranscludeValFrame.html');
     var editTemplate = $templateCache.get('mms/templates/mmsTranscludeValEdit.html');
@@ -112,6 +112,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                     return;
                 }
                 element[0].innerHTML = toCompile;
+                MathJax.Hub.Queue(["Typeset", MathJax.Hub, element[0]]);
                 $compile(element.contents())(scope.recompileScope); 
             } else if (UtilsService.isRestrictedValue(scope.values)) {
                 ElementService.getElement(scope.values[0].operand[1].element, false, scope.ws, scope.version, 2)
@@ -120,7 +121,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                     element[0].innerHTML = "<span>" + e.name + "</span>";
                 });
             } else if (isExpression) {
-                $http.get(URLService.getElementURL(scope.mmsEid, scope.ws, scope.version) + '?evaluate')
+                $http.get(URLService.getElementURL(scope.mmsEid, scope.ws, scope.version) + '&evaluate')
                 .success(function(data,status,headers,config) {
                     element[0].innerHTML = data.elements[0].evaluationResult;
                 }).error(function(data,status,headers,config){

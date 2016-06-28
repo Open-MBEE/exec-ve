@@ -105,7 +105,7 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
             //$compile(element.contents())(scope);
             return;
         }
-        scope.tinymceApi = {};
+        scope.editorApi = {};
         /**
          * @ngdoc function
          * @name mms.directives.directive:mmsSpec#changeElement
@@ -129,8 +129,8 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
                     return;
                 scope.workspace = data;
             }, function(reason) {scope.workspace = null;});
-            if (scope.edit && scope.tinymceApi.save)
-                scope.tinymceApi.save();
+            if (scope.edit && scope.editorApi.save)
+                scope.editorApi.save();
             if (scope.mmsType === 'workspace') {
                 WorkspaceService.getWorkspace(scope.mmsEid)
                 .then(function(data) {
@@ -295,7 +295,7 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
          *      the original save failed. Error means an actual error occured.
          */
         scope.save = function() {
-            return Utils.save(scope.edit, scope.mmsWs, scope.mmsType, scope.mmsEid, scope.tinymceApi, scope, 'all');
+            return Utils.save(scope.edit, scope.mmsWs, scope.mmsType, scope.mmsEid, scope.editorApi, scope, 'all');
         };
 
         scope.hasHtml = function(s) {
@@ -423,9 +423,9 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
                 keepMode = true;
             };
 
-            api.tinymceSave = function() {
-                if (scope.edit && scope.tinymceApi.save)
-                    scope.tinymceApi.save();
+            api.editorSave = function() {
+                if (scope.edit && scope.editorApi.save)
+                    scope.editorApi.save();
             };
         }
     };

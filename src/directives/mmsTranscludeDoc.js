@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsTranscludeDoc', ['Utils','ElementService', 'UtilsService', 'ViewService', 'UxService', '$compile', '$log', '$templateCache', '$rootScope', '$modal', 'growl', '_', mmsTranscludeDoc]);
+.directive('mmsTranscludeDoc', ['Utils','ElementService', 'UtilsService', 'ViewService', 'UxService', '$compile', '$log', '$templateCache', '$rootScope', '$modal', 'growl', '_', 'MathJax', mmsTranscludeDoc]);
 
 /**
  * @ngdoc directive
@@ -27,7 +27,7 @@ angular.module('mms.directives')
  * @param {string=master} mmsWs Workspace to use, defaults to master
  * @param {string=latest} mmsVersion Version can be alfresco version number or timestamp, default is latest
  */
-function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxService, $compile, $log, $templateCache, $rootScope, $modal, growl, _) {
+function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxService, $compile, $log, $templateCache, $rootScope, $modal, growl, _, MathJax) {
 
     var template = $templateCache.get('mms/templates/mmsTranscludeDoc.html');
 
@@ -108,7 +108,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             });
             element.append(dom);*/
             element[0].innerHTML = doc;
-            
+            MathJax.Hub.Queue(["Typeset", MathJax.Hub, element[0]]);
             scope.recompileScope = scope.$new();
             $compile(element.contents())(scope.recompileScope); 
             if (mmsViewCtrl) {
@@ -301,9 +301,11 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                     scope.panelType = scope.panelType.substring(0, scope.panelType.length-1);
                 if (scope.panelType === 'Paragraph')
                     scope.panelType = 'Text';
+                if (scope.panelType === 'Figure')
+                    scope.panelType = 'Image';
             }
             if (scope.presentationElem) {
-                scope.tinymceType = scope.presentationElem.type;
+                scope.editorType = scope.presentationElem.type;
             }
         }
     };

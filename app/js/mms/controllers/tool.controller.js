@@ -26,6 +26,8 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, $timeout, ConfigS
         $scope.eid = null;
 
     $scope.vid = $scope.eid;
+    if($scope.document)
+        $scope.docId = $scope.document.sysmlid;
     $scope.specApi = {};
     $scope.viewApi = {};
     $scope.viewOrderApi = {};
@@ -36,7 +38,8 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, $timeout, ConfigS
         history: false,
         reorder: false,
         snapshots: false,
-        tags: false
+        tags: false,
+        jobs: false
     };
     $scope.tracker = {};
     if (!$rootScope.veEdits)
@@ -137,7 +140,11 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, $timeout, ConfigS
     $scope.$on('tags', function() {
         showPane('tags');
     });
-    
+
+    $scope.$on('jobs', function() {
+        showPane('jobs');
+    });
+
     $scope.$on('element-history', function() {
         showPane('history');
     });
@@ -334,8 +341,8 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, $timeout, ConfigS
             growl.info('Nothing to save');
             return;
         }
-        if ($scope.specApi && $scope.specApi.tinymceSave)
-            $scope.specApi.tinymceSave();
+        if ($scope.specApi && $scope.specApi.editorSave)
+            $scope.specApi.editorSave();
         savingAll = true;
         $rootScope.mms_tbApi.toggleButtonSpinner('element-editor-saveall');
         var promises = [];
