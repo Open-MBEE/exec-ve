@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mmsApp')
-.factory('MmsAppUtils', ['$q','$state', '$modal','$timeout', '$location', '$window', '$templateCache','$rootScope','$compile', '$filter', 'WorkspaceService','ConfigService','ElementService','ViewService', 'UtilsService', 'growl','_', MmsAppUtils]);
+.factory('MmsAppUtils', ['$q','$state', '$modal','$timeout', '$location', '$window', '$templateCache','$rootScope','$compile', '$filter', 'WorkspaceService','ConfigService','ElementService','ViewService', 'UtilsService', 'growl','_','$http', '$interval', MmsAppUtils]);
 
 /**
  * @ngdoc service
@@ -10,13 +10,14 @@ angular.module('mmsApp')
  * @description
  * Utilities
  */
-function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $templateCache, $rootScope, $compile, $filter, WorkspaceService, ConfigService, ElementService, ViewService, UtilsService, growl, _) {
+function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $templateCache, $rootScope, $compile, $filter, WorkspaceService, ConfigService, ElementService, ViewService, UtilsService, growl, _, $http, $interval) {
 
     var addElementCtrl = function($scope, $modalInstance, $filter) {
 
         $scope.oking = false;
         $scope.newItem = {};
         $scope.newItem.name = "";
+        $scope.isLoading = true;
 
         // Search for InstanceSpecs.  We are searching for InstanceSpecs b/c we only want to
         // create a InstanceValue to point to that InstanceSpec when cross-referencing.
@@ -258,7 +259,9 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
         var deferred = $q.defer();
         var modalInstance = $modal.open({
             templateUrl: 'partials/mms/printConfirm.html',
-            controller: function($scope, $modalInstance) {
+            controller: function($scope, $modalInstance, $http, $interval) {
+                $interval(function() {if($http.pendingRequests.length === 0){$scope.isLoading = false; $interval.cancel();}}, 100);
+                
                 $scope.type = isDoc ? 'DOCUMENT' : 'VIEW';
                 $scope.action = 'print';
                 $scope.genpdf = false;
