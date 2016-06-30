@@ -551,9 +551,12 @@ function urlService(baseUrl) {
     var addVersion = function(url, version) {
         if (version === 'latest')
             return url;
-        if (isTimestamp(version))
-            return url + '?timestamp=' + version;
-        else
+        if (isTimestamp(version)) {
+            if (url.indexOf('?') > 0)
+                return url + '&timestamp=' + version;
+            else
+                return url + '?timestamp=' + version;
+        } else
             return url + '/versions/' + version;
     };
     var addTicket = function(url) {
