@@ -251,7 +251,7 @@ function UxService($rootScope) {
         }
   };
 
-  var MetaTypes = ['configuration', 'connector', 'dependency', 'directedrelationship', 'element', 'property', 'generalization', 'package', 'section', 'site', 'snapshot', 'view', 'workspace', 'table', 'figure' ];
+  var MetaTypes = ['configuration', 'connector', 'dependency', 'directedrelationship', 'element', 'property', 'generalization', 'package', 'section', 'site', 'snapshot', 'view', 'workspace', 'table', 'figure', 'equation' ];
 
   var getTreeTypes = function() {
     var treeTypes = {};
@@ -300,6 +300,8 @@ function UxService($rootScope) {
       case "table":
         return "fa-table";
       case "figure":
+        return "fa-image";
+      case "equation":
         return "fa-image";
       default:
         return "fa-square";

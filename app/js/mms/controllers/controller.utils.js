@@ -391,11 +391,12 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
         var prefix = protocol + '://' + hostname + ((port == 80 || port == 443) ? '' : (':' + port));
         var mmsIndex = absurl.indexOf('mms.html');
         var toc = '';
-        if (isDoc)
+        if (isDoc) {
             toc = UtilsService.makeHtmlTOC($rootScope.mms_treeApi.get_rows());
-        toc = UtilsService.makeTablesAndFiguresTOC($rootScope.mms_treeApi.get_rows(), printElementCopy);
-        toc = toc.figures + toc.tables;
-        angular.element(toc).find("a").attr('href', function(index, old) {
+            var tableAndFigTOC = UtilsService.makeTablesAndFiguresTOC($rootScope.mms_treeApi.get_rows(), printElementCopy);
+            toc = toc + tableAndFigTOC.figures + tableAndFigTOC.tables;
+        }
+        angular.element(printElementCopy).find("a").attr('href', function(index, old) {
             if (!old)
                 return old;
             if (old.indexOf('/') === 0)
