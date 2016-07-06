@@ -241,7 +241,7 @@ function UxService($rootScope) {
                     spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button, scope.section);}};
           case "print":
             return {id: button, icon: 'fa-print', selected: true, active: true, permission: true, tooltip: 'Print', 
-                    spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
+                    spinner: false, togglable: true, toggle_icon:'fa-ban', toggle_tooltip:'Not Loaded', action: function() {$rootScope.$broadcast(button);}};
           case "word":
             return {id: button, icon: 'fa-file-word-o', selected: true, active: true, permission: true, tooltip: 'Save to Word', 
                     spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};

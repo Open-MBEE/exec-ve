@@ -125,6 +125,7 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
                     version = viewVersion.version;
             }
             element.html('(loading...)');
+            element.addClass("isLoading");
             scope.ws = ws;
             scope.version = version ? version : 'latest';
             ElementService.getElement(scope.mmsEid, false, ws, version, 1)
@@ -153,6 +154,8 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
                     status = ' deleted';
                 element.html('<span class="mms-error">name cf ' + newVal + status + '</span>');
                 //growl.error('Cf Name Error: ' + reason.message + ': ' + scope.mmsEid);
+            }).finally(function() {
+                element.removeClass("isLoading");
             });
         });
 

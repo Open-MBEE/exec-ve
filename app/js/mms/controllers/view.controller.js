@@ -3,8 +3,8 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('ViewCtrl', ['$scope', '$rootScope', '$state', '$stateParams', '$timeout', '$modal', '$window', 'viewElements', 'MmsAppUtils', 'ElementService', 'ViewService', 'ConfigService', 'time', 'search', 'growl', 'workspace', 'site', 'document', 'view', 'tag', 'snapshot', 'UxService', 'hotkeys',
-function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, viewElements, MmsAppUtils, ElementService, ViewService, ConfigService, time, search, growl, workspace, site, document, view, tag, snapshot, UxService, hotkeys) {
+.controller('ViewCtrl', ['$scope', '$rootScope', '$state', '$stateParams', '$timeout', '$modal', '$window', 'viewElements', 'MmsAppUtils', 'ElementService', 'ViewService', 'ConfigService', 'time', 'search', 'growl', 'workspace', 'site', 'document', 'view', 'tag', 'snapshot', 'UxService', 'hotkeys', '$element',
+function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, viewElements, MmsAppUtils, ElementService, ViewService, ConfigService, time, search, growl, workspace, site, document, view, tag, snapshot, UxService, hotkeys, $element) {
     
     /*$scope.$on('$viewContentLoaded', 
         function(event) {
@@ -94,7 +94,20 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
             }
         }
         if ($state.includes('workspace.site')) {
+            console.log($element);
             $scope.bbApi.addButton(UxService.getButtonBarButton('print'));
+            if($element.hasClass('isLoading'))
+                $scope.bbApi.setToggleState('print', $rootScope.veElementsOn);
+                // var test = function(){
+                //     var catchReq =  $interval(function() {
+                //         var req = $http.pendingRequests.length;
+                //         var blah = "blah";
+                //         if(req === 0){
+                //             $scope.isLoading = false; 
+                //             $interval.cancel(catchReq);}
+                //         }, 100);
+                // };
+                // test();
             if ($state.includes('workspace.site.document'))
                 $scope.bbApi.addButton(UxService.getButtonBarButton('convert-pdf'));
             $scope.bbApi.addButton(UxService.getButtonBarButton('word'));

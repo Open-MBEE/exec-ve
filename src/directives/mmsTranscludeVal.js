@@ -189,6 +189,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                 return;
             }
             element.html('(loading...)');
+            element.addClass("isLoading");
             var ws = scope.mmsWs;
             var version = scope.mmsVersion;
             if (mmsCfValCtrl) {
@@ -249,6 +250,8 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                     status = ' deleted';
                 element.html('<span class="mms-error">value cf ' + newVal + status + '</span>');
                 //growl.error('Cf Val Error: ' + reason.message + ': ' + scope.mmsEid);
+            }).finally(function() {
+                element.removeClass("isLoading");
             });
         });
 
