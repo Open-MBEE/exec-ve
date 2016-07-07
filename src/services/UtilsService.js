@@ -384,6 +384,8 @@ function UtilsService(CacheService, _) {
     };
 
     var makeHtmlTOCChild = function(child) {
+        if (child.type !== 'view' && child.type !== 'section')
+            return '';
         var result = '<ul>';
 
         var anchor = '<a href=#' + child.data.sysmlid + '>';
@@ -400,8 +402,8 @@ function UtilsService(CacheService, _) {
 
     var makeTablesAndFiguresTOC = function(tree, printElement) {
         var ob = {
-            tables: '<div style="page-break-after:always"><div style="font-size:32px">List of Tables</div><ul style="list-style-type:none">',
-            figures: '<div style="page-break-after:always"><div style="font-size:32px">List of Figures</div><ul style="list-style-type:none">',
+            tables: '<div class="tot"><div class="header">List of Tables</div><ul>',
+            figures: '<div class="tof"><div class="header">List of Figures</div><ul>',
             tableCount: 0,
             figureCount: 0
         };
@@ -510,6 +512,8 @@ function UtilsService(CacheService, _) {
                 ".toc ul {padding-left:4em;}\n" +
                 ".toc > ul {padding-left:0;}\n" +
                 ".toc li > a[href]::after {content: leader('.') target-counter(attr(href), page);}\n" + 
+                ".tot li > a[href]::after {content: leader('.') target-counter(attr(href), page);}\n" + 
+                ".tof li > a[href]::after {content: leader('.') target-counter(attr(href), page);}\n" + 
                 "@page {margin: 0.5in;}\n";
                 //"@page big_table {  size: 8.5in 11in; margin: 0.75in; prince-shrink-to-fit:auto;}\n" +  //size: 11in 8.5in;
                 //".big-table {page: big_table; max-width: 1100px; }\n";
