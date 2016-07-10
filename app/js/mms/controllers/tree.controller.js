@@ -418,16 +418,55 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
             }
         }
     };*/
+    var viewId2node = {};
+    function handleChildViews(v, aggr) {
+        var deferred = $q.defer();
+        var curNode = viewId2node[v.sysmlid];
+        if (!curNode) {
+            curNode = {
+                label: v.name,
+                type: 'view',
+                data: v,
+                children: [],
+                loading: false
+            };
+            viewId2node[v.sysmlid] = curNode;
+        }
+        var childIds = [];
+        var childAggrs = [];
+        if (!v.specialization.childViews || v.specialization.childViews.length === 0 || aggr === 'NONE') {
+            deferred.resolve(curNode);
+            return deferred.promise;
+        }
+        v.specialization.childViews.forEach(function(child) {
+            childIds.push(child.id);
+            childAggrs.push(child.aggregation);
+        });
+        ElementService.getElements(childIds, false, ws, time, 2).then(function(childViews) {
+            var childPromises = [];
+            for (var i = 0; i < childViews.length; i++) {
+                childPromises.push(handleChildViews(childViews[i], childAggrs[i]));
+            }
+            $q.all(childPromises).then(function(childNodes) {
+                curNode.children.push.apply(curNode.children, childNodes);
+                deferred.resolve(curNode);
+            }, function(reason) {
+                deferred.reject(reason);
+            });
+
+        }, function(reason) {
+            deferred.reject(reason);
+        });
+        return deferred.promise;
+    }
 
     if ($state.includes('workspaces') && !$state.includes('workspace.sites')) {
         $scope.my_data = UtilsService.buildTreeHierarchy(workspaces, "id", 
                                                          "workspace", "parent", workspaceLevel2Func);
     } else if ($state.includes('workspace.sites') && !$state.includes('workspace.site.document')) {
         $scope.my_data = UtilsService.buildTreeHierarchy(filter_sites(sites), "sysmlid", "site", "parent", siteInitFunc);
-    } else
-    {
+    } else {
         // this is from view editor
-        var viewId2node = {};
         viewId2node[document.sysmlid] = {
             label: document.name,
             type: 'view',
@@ -448,9 +487,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
         });
 
         var seenChild = {};
-        if (!document.specialization.view2view) {
-            document.specialization.view2view = [{id: document.sysmlid, childrenViews: []}];
-        }
+      if (document.specialization.view2view) {
         document.specialization.view2view.forEach(function(view) {
             var viewid = view.id;
             view.childrenViews.forEach(function(childId) {
@@ -470,6 +507,18 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
                 seenChild[childId] = viewId2node[childId];
             });
         });
+      } else {
+        if (!document.specialization.childViews)
+            document.specialization.childViews = [];
+        handleChildViews(document, 'COMPOSITE').then(function(node) {
+            $scope.treeApi.refresh();
+            for (var i in viewId2node) {
+                addSectionElements(viewId2node[i].data, viewId2node[i], viewId2node[i]);
+            }
+        }, function(reason) {
+            console.log(reason);
+        });
+      }
         $scope.my_data = [viewId2node[document.sysmlid]];
     }
 
@@ -705,6 +754,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
         // TODO: combine templateUrlStr into one .html
 
         $scope.itemType = itemType;
+        $scope.newViewAggr = {type: 'SHARED'};
         var branch = $scope.treeApi.get_selected_branch();
         var templateUrlStr = "";
         var branchType = "";
@@ -740,6 +790,10 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
 
                 if (itemType === 'View') {
                     viewId2node[data.sysmlid] = newbranch;
+                    handleChildViews(data, $scope.newViewAggr.type)
+                    .then(function(node) {
+                        //TODO show view sections for new views, handle full doc mode
+                    });
                     if (!$rootScope.mms_fullDocMode) 
                         $state.go('workspace.site.document.view', {view: data.sysmlid, search: undefined});
                     else{
@@ -808,14 +862,14 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
             templateUrlStr = 'partials/mms/new-view.html';
             branchType = 'view';
 
-            ElementService.isCacheOutdated(document.sysmlid, ws)
-            .then(function(status) {
-                if (status.status) {
-                    if (!angular.equals(document.specialization.view2view, status.server.specialization.view2view)) {
-                        growl.error('The document hierarchy is outdated, refresh the page first!');
-                        return;
-                    } 
-                } 
+            //ElementService.isCacheOutdated(document.sysmlid, ws)
+            //.then(function(status) {
+            //    if (status.status) {
+            //        if (!angular.equals(document.specialization.view2view, status.server.specialization.view2view)) {
+            //            growl.error('The document hierarchy is outdated, refresh the page first!');
+            //            return;
+            //        } 
+            //    } 
                 $scope.createViewParentId = branch.data.sysmlid;
                 $scope.createViewParent = branch.data;
                 $scope.newView = {};
@@ -823,9 +877,9 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
 
                 myAddBranch();
 
-            }, function(reason) {
-                growl.error('Checking if document hierarchy is up to date failed: ' + reason.message);
-            });
+            //}, function(reason) {
+            //    growl.error('Checking if document hierarchy is up to date failed: ' + reason.message);
+            //});
         } 
         else {
             growl.error("Add Item of Type " + itemType + " is not supported");
@@ -924,6 +978,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
             if ($state.includes('workspace.sites') && !$state.includes('workspace.site.document'))
                 return;
             $state.go('^', {search: undefined});
+            //TODO handle full doc mode??
         });
     };
 
@@ -954,31 +1009,14 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
             } else if (branch.type === "configuration") {
                 promise = ConfigService.deleteConfig(branch.data.id);
             } else if (branch.type === 'view') {
+                var parentBranch = $scope.treeApi.get_parent_branch(branch);
                 if (!$state.includes('workspace.site.document')) {
-                    var parentSiteBranch = $scope.treeApi.get_parent_branch(branch);
-                    if (parentSiteBranch && parentSiteBranch.type === 'site')
-                        promise = ViewService.downgradeDocument(branch.data, ws, parentSiteBranch.data.sysmlid);
+                    if (parentBranch && parentBranch.type === 'site')
+                        promise = ViewService.downgradeDocument(branch.data, ws, parentBranch.data.sysmlid);
                     else
                         promise = ViewService.downgradeDocument(branch.data, ws);
                 } else {
-                var product = $scope.document;
-                for (var i = 0; i < product.specialization.view2view.length; i++) {
-                    var view = product.specialization.view2view[i];
-                    if (branch.data.sysmlid === view.id ) {
-                    // remove 
-                        product.specialization.view2view.splice(i,1);
-                        i--;
-                    }
-                    for (var j = 0; j < view.childrenViews.length; j++) {
-                        var childViewId = view.childrenViews[j];
-                        if (branch.data.sysmlid === childViewId) {
-                        // remove child view
-                            view.childrenViews.splice(j,1);
-                            j--;
-                        }
-                    }
-                }
-                promise = ViewService.updateDocument(product, ws);
+                    promise = ViewService.deleteViewFromParentView(branch.data.sysmlid, parentBranch.data.sysmlid, ws);
                 }
             }
             promise.then(function(data) {
@@ -1066,7 +1104,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
                 
                 var viewOb = data;
 
-                ViewService.addViewToDocument(viewId, documentId, parentViewId, workspace, viewOb)
+                ViewService.addViewToParentView(viewId, documentId, parentViewId, $scope.newViewAggr.type, workspace, viewOb)
                 .then(function(data) {
                     growl.success("View Added");
                     $modalInstance.close(viewOb);

@@ -498,6 +498,68 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
 
     /**
      * @ngdoc method
+     * @name mms.ViewService#addViewToParentView
+     * @methodOf mms.ViewService
+     *
+     * @description
+     * This updates a document to include a new view, the new view must be a child
+     * of an existing view in the document
+     * 
+     * @param {string} viewid Id of the view to add
+     * @param {string} documentId Id of the document to add the view to
+     * @param {string} parentViewId Id of the parent view, this view should 
+     *      already be in the document
+     * @param {string} aggr Aggregation can be COMPOSITE, NONE, or SHARED
+     * @param {string} [workspace=master] workspace to use
+     * @param {Object} [viewOb=null] if present, adds to document views cache array
+     * @returns {Promise} The promise would be resolved with updated document object
+     */
+    var addViewToParentView = function(viewId, documentId, parentViewId, aggr, workspace, viewOb) {
+        var deferred = $q.defer();
+        var ws = !workspace ? 'master' : workspace;
+        var docViewsCacheKey = ['products', ws, documentId, 'latest', 'views'];
+        getView(parentViewId, false, ws, null, 2)
+        .then(function(data) {  
+            var clone = {};
+            clone.sysmlid = data.sysmlid;
+            //clone.read = data.read;
+            clone.specialization = _.cloneDeep(data.specialization);
+            if (clone.specialization.contains)
+                delete clone.specialization.contains;
+            if (clone.specialization.contents)
+                delete clone.specialization.contents;
+            if (!clone.specialization.childViews)
+                clone.specialization.childViews = [];
+            clone.specialization.childViews.push({id: viewId, aggregation: aggr});
+            updateView(clone, ws)
+            .then(function(data2) {
+                if (CacheService.exists(docViewsCacheKey) && viewOb)
+                    CacheService.get(docViewsCacheKey).push(viewOb);
+                deferred.resolve(data2);
+            }, function(reason) {
+                /*if (reason.status === 409) {
+                    clone.read = reason.data.elements[0].read;
+                    clone.modified = reason.data.elements[0].modified;
+                    updateDocument(clone, ws)
+                    .then(function(data3) {
+                        if (CacheService.exists(docViewsCacheKey) && viewOb)
+                            CacheService.get(docViewsCacheKey).push(viewOb);
+                        deferred.resolve(data3);
+                    }, function(reason2) {
+                        deferred.reject(reason2);
+                    });
+                } else
+                    deferred.reject(reason);*/
+                deferred.reject(reason);
+            });
+        }, function(reason) {
+            deferred.reject(reason);
+        });
+        return deferred.promise;
+    };
+
+    /**
+     * @ngdoc method
      * @name mms.ViewService#addElementToViewOrSection
      * @methodOf mms.ViewService
      *
@@ -619,6 +681,50 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 deferred.reject(reason);
             });
         }
+        return deferred.promise;
+    };
+
+    /**
+     * @ngdoc method
+     * @name mms.ViewService#deleteViewFromParentView
+     * @methodOf mms.ViewService
+     *
+     * @description
+     * This deletes the specified view from the parent view
+     * 
+     * @param {string} viewId Id of the View to remove from parent
+     * @param {string} parentViewId Id of the parent view
+     * @param {string} [workspace=master] workspace to use
+     * @returns {Promise} The promise would be resolved with updated parent View object
+     */
+    var deleteViewFromParentView = function(viewId, parentViewId, workspace) {
+        var deferred = $q.defer();
+        var ws = !workspace ? 'master' : workspace;
+        ElementService.getElement(parentViewId, false, ws, null, 2)
+        .then(function(data) {  
+            if (data.specialization.childViews) {
+                var clone = {};
+                clone.sysmlid = data.sysmlid;
+                clone.specialization = {
+                    childViews: [],
+                    type: 'View'
+                };
+                data.specialization.childViews.forEach(function(child) {
+                    if (child.id !== viewId)
+                        clone.specialization.childViews.push(child);
+                });
+                updateView(clone, ws)
+                .then(function(data2) {
+                    deferred.resolve(data2);
+                }, function(reason) {
+                    deferred.reject(reason);
+                });
+            } else {
+                deferred.resolve(data);
+            }
+        }, function(reason) {
+            deferred.reject(reason);
+        });
         return deferred.promise;
     };
 
@@ -826,7 +932,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             data.forEach(function(elem) {
                 if (elem.sysmlid === newViewId) {
                     if (documentId) {
-                        addViewToDocument(newViewId, documentId, owner.sysmlid, workspace, elem)
+                        addViewToParentView(newViewId, documentId, owner.sysmlid, 'COMPOSITE', workspace, elem)
                         .then(function(data3) {
                             deferred.resolve(elem);
                         }, function(reason) {
@@ -1178,6 +1284,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         createDocument: createDocument,
         downgradeDocument: downgradeDocument,
         addViewToDocument: addViewToDocument,
+        addViewToParentView: addViewToParentView,
         getDocumentViews: getDocumentViews,
         getSiteDocuments: getSiteDocuments,
         setCurrentViewId: setCurrentViewId,
@@ -1195,6 +1302,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         //createAndAddElement: createAndAddElement,
         //addInstanceVal: addInstanceVal,
         deleteElementFromViewOrSection: deleteElementFromViewOrSection,
+        deleteViewFromParentView: deleteViewFromParentView,
         createInstanceSpecification: createInstanceSpecification,
         TYPE_TO_CLASSIFIER_ID: TYPE_TO_CLASSIFIER_ID,
         getInstanceSpecification : getInstanceSpecification,

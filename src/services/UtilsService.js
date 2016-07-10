@@ -460,7 +460,7 @@ function UtilsService(CacheService, _) {
         var projectName = null;
         var siteId = siteid;
 
-        if (elem) {
+        if (elem && elem.qualifiedId && elem.qualifiedName) {
             var splitArray = elem.qualifiedId.split('/');
             var projectNameArray = elem.qualifiedName.split('/');
             if (splitArray && splitArray.length > 2) {
