@@ -29,7 +29,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
 
     if (document !== null) {
         $scope.document = document;
-        $scope.editable = $scope.document.editable && time === 'latest' && $scope.document.specialization.type === 'Product';
+        $scope.editable = $scope.document.editable && time === 'latest' && $scope.document.specialization.type === 'Product' || $scope.document.specialization.type === 'View';
     }
 
     // If it is not the master workspace, then retrieve it:
@@ -438,14 +438,21 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
             deferred.resolve(curNode);
             return deferred.promise;
         }
-        v.specialization.childViews.forEach(function(child) {
-            childIds.push(child.id);
-            childAggrs.push(child.aggregation);
-        });
-        ElementService.getElements(childIds, false, ws, time, 2).then(function(childViews) {
-            var childPromises = [];
+        for (var i = 0; i < v.specialization.childViews.length; i++) {
+            childIds.push(v.specialization.childViews[i].id);
+            childAggrs.push(v.specialization.childViews[i].aggregation);
+        }
+        ElementService.getElements(childIds, false, ws, time, 2)
+        .then(function(childViews) {
+            var mapping = {};
             for (var i = 0; i < childViews.length; i++) {
-                childPromises.push(handleChildViews(childViews[i], childAggrs[i]));
+                mapping[childViews[i].sysmlid] = childViews[i];
+            }
+            var childPromises = [];
+            for (i = 0; i < childIds.length; i++) {
+                var child = mapping[childIds[i]];
+                if (child) //what if not found??
+                    childPromises.push(handleChildViews(child, childAggrs[i]));
             }
             $q.all(childPromises).then(function(childNodes) {
                 curNode.children.push.apply(curNode.children, childNodes);
@@ -747,7 +754,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
     $timeout(function() {
         $scope.treeApi.refresh();
     }, 5000);
-    
+
 
     $scope.addItem = function(itemType) {
 
@@ -792,7 +799,8 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
                     viewId2node[data.sysmlid] = newbranch;
                     handleChildViews(data, $scope.newViewAggr.type)
                     .then(function(node) {
-                        //TODO show view sections for new views, handle full doc mode
+                        //TODO handle full doc mode
+                        addViewSectionsRecursivelyForNode(node);
                     });
                     if (!$rootScope.mms_fullDocMode) 
                         $state.go('workspace.site.document.view', {view: data.sysmlid, search: undefined});
@@ -1197,6 +1205,14 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
         //}
     }
 
+    function addViewSectionsRecursivelyForNode(node) {
+        addViewSections(node.data);
+        for (var i = 0; i < node.children.length; i++) {
+            if (node.children[i].type === 'view') {
+                addViewSectionsRecursivelyForNode(node.children[i]);
+            }
+        }
+    }
     // MmsAppUtils.addElementCtrl creates this event when adding sections, table and figures to the view
     $scope.$on('viewctrl.add.element', function(event, instanceSpec, elemType, parentBranchData) {
 
