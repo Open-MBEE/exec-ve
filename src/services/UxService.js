@@ -193,6 +193,9 @@ function UxService($rootScope) {
           case "view-add-comment":
             return {id: button, icon: 'fa-comment-o', selected: true, active: true, permission: true, tooltip: 'Add Comment', 
                     spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
+          case "view-add-tsp":
+            return {id: button, icon: 'fa-image', selected: true, active: true, permission: true, tooltip: 'Add Tom Sawyer View', 
+                    spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
           case "presentation-element-delete":
             return {id: button, icon: 'fa-trash', selected: true, active: true, permission: true, tooltip: 'Delete', 
                     spinner: false, togglable: false, action: function(e) {e.stopPropagation(); scope.delete();}};
@@ -214,7 +217,7 @@ function UxService($rootScope) {
                     dropdown_buttons: [getButtonBarButton("section-add-paragraph",scope), getButtonBarButton("section-add-section", scope),
                     getButtonBarButton("section-add-comment", scope), getButtonBarButton("section-add-list",scope),
                     getButtonBarButton("section-add-table",scope), getButtonBarButton("section-add-image",scope),
-                    getButtonBarButton("section-add-equation", scope)]
+                    getButtonBarButton("section-add-equation", scope), getButtonBarButton("section-add-tsp", scope)]
                     //, getButtonBarButton("section-add-table",scope),
                       //, getButtonBarButton("section-add-equation", scope), getButtonBarButton("section-add-image",scope),
                       };
@@ -238,6 +241,9 @@ function UxService($rootScope) {
                     spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button, scope.section);}};
           case "section-add-comment":
             return {id: button, icon: 'fa-comment-o', selected: true, active: true, permission: true, tooltip: 'Add Comment', 
+                    spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button, scope.section);}};
+          case "section-add-tsp":
+            return {id: button, icon: 'fa-image', selected: true, active: true, permission: true, tooltip: 'Add Tom Sawyer View', 
                     spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button, scope.section);}};
           case "print":
             return {id: button, icon: 'fa-print', selected: true, active: true, permission: true, tooltip: 'Print', 

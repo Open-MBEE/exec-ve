@@ -108,7 +108,8 @@ function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigSe
     var mmsPerspectivesLink = function(scope, element, attrs) {
         var id = ApplicationService.createUniqueId();
         scope.viewId = "view-" + id;
-        var initElements = ["_17_0_5_1_407019f_1402422711365_292853_16371"];
+        //var initElements = ["_17_0_5_1_407019f_1402422711365_292853_16371"];
+        var initElements = [];
         if (scope.mmsTspSpec && scope.mmsTspSpec.elements)
             initElements = scope.mmsTspSpec.elements;
 
