@@ -530,9 +530,12 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 return ElementService.getElement($stateParams.document, false, $stateParams.workspace, time, 2);
             },
             views: function($stateParams, ViewService, document, time, ticket) {
-                if (document.specialization.type !== 'Product')
+                if (document.specialization.type !== 'Product' && document.specialization.type !== 'View')
                     return [];
-                return ViewService.getDocumentViews($stateParams.document, false, $stateParams.workspace, time, true, 2);
+                if (document.specialization.type === 'Product' && document.specialization.view2view)
+                    return ViewService.getDocumentViews($stateParams.document, false, $stateParams.workspace, time, true, 2);
+                else
+                    return ViewService.getDocumentViews($stateParams.document, false, $stateParams.workspace, time, false, 2);
             },
             viewElements: function($stateParams, ViewService, time, ticket) {
                 return ViewService.getViewElements($stateParams.document, false, $stateParams.workspace, time, 2);
