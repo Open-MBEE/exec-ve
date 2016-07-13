@@ -14,7 +14,7 @@
 
 ( function() {
 	CKEDITOR.plugins.add( 'imagedrop', {
-		requires: 'uploadwidget,fileTools',
+		requires: 'uploadwidget',
 
 		onLoad: function() {
 			CKEDITOR.addCss(
