@@ -20,7 +20,7 @@ body
 
 .cke_editable
 {
-	line-height: 1.4;
+	line-height: 1.8;
 
 	/* Fix for missing scrollbars with RTL texts. (#10488) */
 	word-wrap: break-word;
