@@ -1,14 +1,20 @@
 /**
  * imagedrop plugin for CKEDITOR
  * @author Shakeh Khudikyan
- * This plugin requires uploadwidget to 
+ * This plugin requires uploadwidget and fileTools to get clipboard data and 
+ * create a paste event. The upload widget helps to handle content that is 
+ * uploaded asynchronously inside the editor. The imagedrop plugin grabs the 
+ * data sent to the clipboard and calls the onPaste function once the 'paste'
+ * event is fired. It checks the clipboard data and uses the readImageAsBase64
+ * function to load the image source as base64 data. The user call double click
+ * image and have a dialog box to edit attributes.
  */
 
 'use strict';
 
 ( function() {
 	CKEDITOR.plugins.add( 'imagedrop', {
-		requires: 'uploadwidget',
+		requires: 'uploadwidget,fileTools',
 
 		onLoad: function() {
 			CKEDITOR.addCss(
@@ -120,11 +126,5 @@
 	var loadingImage = 'data:image/gif;base64,R0lGODlhDgAOAIAAAAAAAP///yH5BAAAAAAALAAAAAAOAA4AAAIMhI+py+0Po5y02qsKADs=';
 	// jscs:enable maximumLineLength
 
-	/**
-	 * The URL where images should be uploaded.
-	 *
-	 * @since 4.5
-	 * @cfg {String} [imageUploadUrl='' (empty string = disabled)]
-	 * @member CKEDITOR.config
-	 */
+
 } )();
