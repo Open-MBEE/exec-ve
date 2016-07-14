@@ -70,7 +70,7 @@
 	function onPaste(event) {
         var editor = event.listenerData && event.listenerData.editor;
 		var $event = event.data.dataTransfer.$;
-        var clipboardData = $event.items;
+        var clipboardData = $event.files;
         var found = false;
         var imageType = /^image/;
 		var img = event.data.dataValue;
@@ -97,11 +97,11 @@
     }
 
     function readImageAsBase64(item, editor) {
-        if (!item || typeof item.getAsFile !== 'function') {
+        if (!item || typeof item !== 'object') {
             return;
         }
 
-        var file = item.getAsFile();
+        var file = item;
         var reader = new FileReader();
 
         reader.onload = function (evt) {
