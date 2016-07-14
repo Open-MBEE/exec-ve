@@ -478,7 +478,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $m
             instance.focusManager.blur();
           });
           instance.on( 'key', function(e) {
-            if (e.data.domEvent.getKeystroke() == 2228240) { //shift + tab
+            if (e.data.domEvent.getKeystroke() == CKEDITOR.SHIFT + 9) { //shift + tab
                 // try {
                 //     e.data.$.preventDefault();
                 // } catch(err) {}
