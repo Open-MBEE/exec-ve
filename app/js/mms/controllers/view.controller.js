@@ -5,12 +5,16 @@
 angular.module('mmsApp')
 .controller('ViewCtrl', ['$scope', '$rootScope', '$state', '$stateParams', '$timeout', '$modal', '$window', 'viewElements', 'MmsAppUtils', 'ElementService', 'ViewService', 'ConfigService', 'time', 'search', 'growl', 'workspace', 'site', 'document', 'view', 'tag', 'snapshot', 'UxService', 'hotkeys', '$element',
 function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, viewElements, MmsAppUtils, ElementService, ViewService, ConfigService, time, search, growl, workspace, site, document, view, tag, snapshot, UxService, hotkeys, $element) {
-    
-    /*$scope.$on('$viewContentLoaded', 
-        function(event) {
-            $rootScope.mms_viewContentLoading = false; 
+    console.log($element);
+    function searchLoading(){
+        if($element.find('.isLoading').length > 0){
+            growl.warning("Still loading!");
+            return true;
         }
-    );*/
+        else {
+            return false;
+        }
+    }
 
     if ($state.includes('workspace') && !$state.includes('workspace.sites')) {
         $rootScope.mms_showSiteDocLink = true;
@@ -94,20 +98,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
             }
         }
         if ($state.includes('workspace.site')) {
-            console.log($element);
             $scope.bbApi.addButton(UxService.getButtonBarButton('print'));
-            if($element.hasClass('isLoading'))
-                $scope.bbApi.setToggleState('print', $rootScope.veElementsOn);
-                // var test = function(){
-                //     var catchReq =  $interval(function() {
-                //         var req = $http.pendingRequests.length;
-                //         var blah = "blah";
-                //         if(req === 0){
-                //             $scope.isLoading = false; 
-                //             $interval.cancel(catchReq);}
-                //         }, 100);
-                // };
-                // test();
             if ($state.includes('workspace.site.document'))
                 $scope.bbApi.addButton(UxService.getButtonBarButton('convert-pdf'));
             $scope.bbApi.addButton(UxService.getButtonBarButton('word'));
@@ -154,7 +145,9 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
 
 
     $scope.$on('convert-pdf', function() {
-        MmsAppUtils.printModal(view, $scope.ws, site, time, tag, false, 3);
+        if(!searchLoading()){
+            MmsAppUtils.printModal(view, $scope.ws, site, time, tag, false, 3);
+        }
     });
 
     $scope.$on('view-add-paragraph', function() {
@@ -335,10 +328,14 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     if ($state.includes('workspace.site.document'))
         docOption = true;
     $scope.$on('print', function() {
-        MmsAppUtils.printModal(view, $scope.ws, site, time, tag, false, 1);
+        if(!searchLoading()){
+            MmsAppUtils.printModal(view, $scope.ws, site, time, tag, false, 1);
+        }
     });
     $scope.$on('word', function() {
-        MmsAppUtils.printModal(view, $scope.ws, site, time, tag, false, 2);
+        if(!searchLoading()){
+            MmsAppUtils.printModal(view, $scope.ws, site, time, tag, false, 2);
+        }
     });
     $scope.$on('tabletocsv', function() {
         MmsAppUtils.tableToCsv(view, $scope.ws, time, false);

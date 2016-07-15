@@ -4,12 +4,23 @@
 
 angular.module('mmsApp')
 
-.controller('FullDocCtrl', ['$scope', '$templateCache', '$compile', '$timeout', '$rootScope', '$state', '$stateParams', '$window', 'MmsAppUtils', 'document', 'workspace', 'site', 'snapshot', 'time', 'tag', 'ConfigService', 'UxService', 'ViewService', 'UtilsService', 'growl', 'hotkeys', 'search', '_',
-function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateParams, $window, MmsAppUtils, document, workspace, site, snapshot, time, tag, ConfigService, UxService, ViewService, UtilsService, growl, hotkeys, search, _) {
+.controller('FullDocCtrl', ['$scope', '$templateCache', '$compile', '$timeout', '$rootScope', '$state', '$stateParams', '$window', 'MmsAppUtils', 'document', 'workspace', 'site', 'snapshot', 'time', 'tag', 'ConfigService', 'UxService', 'ViewService', 'UtilsService', 'growl', 'hotkeys', 'search', '_', '$element',
+function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateParams, $window, MmsAppUtils, document, workspace, site, snapshot, time, tag, ConfigService, UxService, ViewService, UtilsService, growl, hotkeys, search, _, $element) {
 
     $scope.ws = $stateParams.workspace;
     $scope.site = site;
     $scope.search = search;
+    
+    function searchLoading(){
+        // or from center pane
+        if($element.find('.isLoading').length > 0){
+            growl.warning("Still loading!");
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
     var views = [];
     if (!$rootScope.veCommentsOn)
         $rootScope.veCommentsOn = false;
@@ -115,21 +126,23 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
 
     var converting = false;
     $scope.$on('convert-pdf', function() {
-        if (converting) {
-            growl.info("Please wait...");
-            return;
-        }
-        converting = true;
-        $scope.bbApi.toggleButtonSpinner('convert-pdf');
-        MmsAppUtils.printModal(document, $scope.ws, site, time, tag, true, 3)
-        .then(function(ob) {
-            growl.info('Converting HTML to PDF...Please wait for a completion email');
-        }, function(reason){
-            growl.error("Failed to convert HTML to PDF: " + reason.message);
-        }).finally(function() {
-            converting = false;
+        if(!searchLoading()){
+            if (converting) {
+                growl.info("Please wait...");
+                return;
+            }
+            converting = true;
             $scope.bbApi.toggleButtonSpinner('convert-pdf');
-        });
+            MmsAppUtils.printModal(document, $scope.ws, site, time, tag, true, 3)
+            .then(function(ob) {
+                growl.info('Converting HTML to PDF...Please wait for a completion email');
+            }, function(reason){
+                growl.error("Failed to convert HTML to PDF: " + reason.message);
+            }).finally(function() {
+                converting = false;
+                $scope.bbApi.toggleButtonSpinner('convert-pdf');
+            });
+        }
     });
 
     $scope.$on('show-comments', function() {
@@ -173,10 +186,14 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
     });
 
     $scope.$on('print', function() {
-        MmsAppUtils.printModal(document, $scope.ws, site, time, tag, true, 1);
+        if(!searchLoading()){
+            MmsAppUtils.printModal(document, $scope.ws, site, time, tag, true, 1);
+        }
     });
     $scope.$on('word', function() {
-        MmsAppUtils.printModal(document, $scope.ws, site, time, tag, true, 2);
+        if(!searchLoading()){
+            MmsAppUtils.printModal(document, $scope.ws, site, time, tag, true, 2);
+        }
     });
     $scope.$on('tabletocsv', function() {
         MmsAppUtils.tableToCsv(document, $scope.ws, time, true);
