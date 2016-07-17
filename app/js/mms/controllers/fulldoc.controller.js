@@ -4,8 +4,8 @@
 
 angular.module('mmsApp')
 
-.controller('FullDocCtrl', ['$scope', '$templateCache', '$compile', '$timeout', '$rootScope', '$state', '$stateParams', '$window', 'MmsAppUtils', 'document', 'workspace', 'site', 'snapshot', 'time', 'tag', 'ConfigService', 'UxService', 'ViewService', 'UtilsService', 'growl', 'hotkeys', 'search', '_',
-function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateParams, $window, MmsAppUtils, document, workspace, site, snapshot, time, tag, ConfigService, UxService, ViewService, UtilsService, growl, hotkeys, search, _) {
+.controller('FullDocCtrl', ['$scope', '$templateCache', '$compile', '$timeout', '$rootScope', '$state', '$stateParams', '$window', 'MmsAppUtils', 'document', 'workspace', 'site', 'snapshot', 'time', 'tag', 'ConfigService', 'UxService', 'ViewService', 'UtilsService', 'ElementService', '$q', 'growl', 'hotkeys', 'search', '_',
+function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateParams, $window, MmsAppUtils, document, workspace, site, snapshot, time, tag, ConfigService, UxService, ViewService, UtilsService, ElementService, $q, growl, hotkeys, search, _) {
 
     $scope.ws = $stateParams.workspace;
     $scope.site = site;
@@ -33,10 +33,6 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
     }});
     var view2view = document.specialization.view2view;
     var view2children = {};
-    view2view.forEach(function(view) {
-        view2children[view.id] = view.childrenViews;
-    });
-
     ViewService.setCurrentView(document);
     var buildViewElt = function(vId, curSec) {
       return {id: vId, api: {
@@ -64,10 +60,63 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
         }
     };
     var num = 1;
+    function handleFullDocChildViews(v, aggr) {
+        var deferred = $q.defer();
+        var childIds = [];
+        var childAggrs = [];
+        if (!v.specialization.childViews || v.specialization.childViews.length === 0 || aggr === 'NONE') {
+            deferred.resolve();
+            return deferred.promise;
+        }
+        for (var i = 0; i < v.specialization.childViews.length; i++) {
+            childIds.push(v.specialization.childViews[i].id);
+            childAggrs.push(v.specialization.childViews[i].aggregation);
+        }
+        view2children[v.sysmlid] = childIds;
+        ElementService.getElements(childIds, false, $scope.ws, time, 2)
+        .then(function(childViews) {
+            var mapping = {};
+            for (var i = 0; i < childViews.length; i++) {
+                mapping[childViews[i].sysmlid] = childViews[i];
+            }
+            var childPromises = [];
+            for (i = 0; i < childIds.length; i++) {
+                var child = mapping[childIds[i]];
+                if (child) //what if not found??
+                    childPromises.push(handleFullDocChildViews(child, childAggrs[i]));
+            }
+            $q.all(childPromises).then(function(childNodes) {
+                deferred.resolve(childIds);
+            }, function(reason) {
+                deferred.reject(reason);
+            });
+
+        }, function(reason) {
+            deferred.reject(reason);
+        });
+        return deferred.promise;
+    }
+
+  if (view2view) {
+    view2view.forEach(function(view) {
+        view2children[view.id] = view.childrenViews;
+    });
+  
     view2children[document.sysmlid].forEach(function(cid) {
         addToArray(cid, num);
         num = num + 1;
     });
+  } else {
+    if (!document.specialization.childViews)
+        document.specialization.childViews = [];
+    handleFullDocChildViews(document, 'COMPOSITE', num)
+    .then(function(childIds) {
+        for (var i = 0; i < childIds.length; i++) {
+            addToArray(childIds[i], num);
+            num = num + 1;
+        }
+    });
+  }
     $scope.version = time;
     $scope.views = views;
     $scope.tscClicked = function(elementId, ws, version) {

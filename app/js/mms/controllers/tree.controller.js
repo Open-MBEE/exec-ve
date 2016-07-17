@@ -921,7 +921,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
                 $scope.bbApi.setToggleState("tree-full-document", true);
                 //allViewLevel2Func(); //TODO remove when priority queue is done
             } else {
-                if (document.specialization.view2view.length > 30) {
+                if (document.specialization.view2view && document.specialization.view2view.length > 30) {
                     var instance = $modal.open({
                         templateUrl: 'partials/mms/fullDocWarn.html',
                         controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
