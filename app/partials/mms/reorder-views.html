@@ -1,7 +1,7 @@
 <!-- Nested node template -->
 <script type="text/ng-template" id="nodes_renderer.html">
     <div ui-tree-handle>
-        {{node.old}} -> {{node.new}}   {{node.name}}
+        {{node.old}} &rarr; {{node.new}}   {{node.name}}
     </div>
     <ol ui-tree-nodes="" ng-model="node.children">
         <li ng-repeat="node in node.children" ui-tree-node ng-include="'nodes_renderer.html'">

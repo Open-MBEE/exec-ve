@@ -65,7 +65,7 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
         var childIds = [];
         var childAggrs = [];
         if (!v.specialization.childViews || v.specialization.childViews.length === 0 || aggr === 'NONE') {
-            deferred.resolve();
+            deferred.resolve([]);
             return deferred.promise;
         }
         for (var i = 0; i < v.specialization.childViews.length; i++) {
@@ -109,7 +109,7 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
   } else {
     if (!document.specialization.childViews)
         document.specialization.childViews = [];
-    handleFullDocChildViews(document, 'COMPOSITE', num)
+    handleFullDocChildViews(document, 'COMPOSITE')
     .then(function(childIds) {
         for (var i = 0; i < childIds.length; i++) {
             addToArray(childIds[i], num);

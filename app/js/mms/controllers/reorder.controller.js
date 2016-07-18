@@ -3,8 +3,8 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('ReorderCtrl', ['$scope', '$rootScope', '$stateParams', 'document', 'time', 'ElementService', 'ViewService', '$state', 'growl', '_',
-function($scope, $rootScope, $stateParams, document, time, ElementService, ViewService, $state, growl, _) {
+.controller('ReorderCtrl', ['$scope', '$rootScope', '$stateParams', 'document', 'time', 'ElementService', 'ViewService', '$state', 'growl', '$q', '_',
+function($scope, $rootScope, $stateParams, document, time, ElementService, ViewService, $state, growl, $q, _) {
     $scope.doc = document;
     var ws = $stateParams.workspace;
     ElementService.isCacheOutdated(document.sysmlid, ws)
@@ -21,6 +21,7 @@ function($scope, $rootScope, $stateParams, document, time, ElementService, ViewS
     viewIds2node[document.sysmlid] = {
         name: document.name,
         id: document.sysmlid,
+        aggr: 'COMPOSITE',
         children: []
     };
     var up2dateViews = null;
@@ -52,7 +53,64 @@ function($scope, $rootScope, $stateParams, document, time, ElementService, ViewS
         }
     };
 
-    ViewService.getDocumentViews(document.sysmlid, false, ws, time, true, 2)
+    function handleChildViews(v, aggr) {
+        var deferred = $q.defer();
+        var curNode = viewIds2node[v.sysmlid];
+        if (!curNode) {
+            curNode = {
+                name: v.name,
+                id: v.sysmlid,
+                aggr: aggr,
+                children: []
+            };
+            viewIds2node[v.sysmlid] = curNode;
+        }
+        var childIds = [];
+        var childAggrs = [];
+        if (!v.specialization.childViews || v.specialization.childViews.length === 0 || aggr === 'NONE') {
+            deferred.resolve(curNode);
+            return deferred.promise;
+        }
+        for (var i = 0; i < v.specialization.childViews.length; i++) {
+            childIds.push(v.specialization.childViews[i].id);
+            childAggrs.push(v.specialization.childViews[i].aggregation);
+        }
+        ElementService.getElements(childIds, false, ws, time, 2)
+        .then(function(childViews) {
+            var mapping = {};
+            for (var i = 0; i < childViews.length; i++) {
+                mapping[childViews[i].sysmlid] = childViews[i];
+            }
+            var childPromises = [];
+            for (i = 0; i < childIds.length; i++) {
+                var child = mapping[childIds[i]];
+                if (child) //what if not found??
+                    childPromises.push(handleChildViews(child, childAggrs[i]));
+            }
+            $q.all(childPromises).then(function(childNodes) {
+                curNode.children.push.apply(curNode.children, childNodes);
+                deferred.resolve(curNode);
+            }, function(reason) {
+                deferred.reject(reason);
+            });
+
+        }, function(reason) {
+            deferred.reject(reason);
+        });
+        return deferred.promise;
+    }
+
+    handleChildViews(document, 'COMPOSITE')
+    .then(function(docNode) {
+        var num = 1;
+        docNode.children.forEach(function(node) {
+            updateNumber(node, num + '', 'old');
+            updateNumber(node, num + '', 'new');
+            num++;
+        });
+        $scope.tree = [docNode];
+    });
+    /*ViewService.getDocumentViews(document.sysmlid, false, ws, time, true, 2)
     .then(function(views) {
         up2dateViews = views;
         up2dateViews.forEach(function(view) {
@@ -77,7 +135,7 @@ function($scope, $rootScope, $stateParams, document, time, ElementService, ViewS
             num++;
         });
         $scope.tree = [viewIds2node[document.sysmlid]];
-    });
+    });*/
     $scope.saveClass = "";
     $scope.save = function() {
         $scope.saveClass = "fa fa-spin fa-spinner";
