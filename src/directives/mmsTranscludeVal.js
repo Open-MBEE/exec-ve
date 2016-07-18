@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsTranscludeVal', ['ElementService', 'UtilsService', 'UxService', 'Utils', 'URLService', '$http', '_', '$log', '$compile', '$templateCache', 'growl', mmsTranscludeVal]);
+.directive('mmsTranscludeVal', ['ElementService', 'UtilsService', 'UxService', 'Utils', 'URLService', '$http', '_', '$log', '$compile', '$templateCache', 'growl', 'MathJax', mmsTranscludeVal]);
 
 /**
  * @ngdoc directive
@@ -23,7 +23,7 @@ angular.module('mms.directives')
  * @param {string=master} mmsWs Workspace to use, defaults to master
  * @param {string=latest} mmsVersion Version can be alfresco version number or timestamp, default is latest
  */
-function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLService, $http, _, $log, $compile, $templateCache, growl) {
+function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLService, $http, _, $log, $compile, $templateCache, growl, MathJax) {
     var valTemplate = $templateCache.get('mms/templates/mmsTranscludeVal.html');
     var frameTemplate = $templateCache.get('mms/templates/mmsTranscludeValFrame.html');
     var editTemplate = $templateCache.get('mms/templates/mmsTranscludeValEdit.html');
@@ -38,19 +38,29 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
         $scope.bbApi.init = function() {
             if (!$scope.buttonsInit) {
                 $scope.buttonsInit = true;
-                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.preview", $scope));
-                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.save", $scope));
-                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.saveC", $scope));
-                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.cancel", $scope));
-                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation.element.delete", $scope));
-                $scope.bbApi.setPermission("presentation.element.delete", $scope.isDirectChildOfPresentationElement);
+                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-preview", $scope));
+                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-save", $scope));
+                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-saveC", $scope));
+                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-cancel", $scope));
+                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-delete", $scope));
+                $scope.bbApi.setPermission("presentation-element-delete", $scope.isDirectChildOfPresentationElement);
             }     
+        };
+
+        this.getWsAndVersion = function() {
+            return {
+                workspace: $scope.ws, 
+                version: $scope.version,
+                tag: undefined
+            };
         };
     };
 
     var mmsTranscludeValLink = function(scope, element, attrs, controllers) {
         var mmsViewCtrl = controllers[0];
         var mmsViewPresentationElemCtrl = controllers[1];
+        var mmsCfDocCtrl = controllers[2];
+        var mmsCfValCtrl = controllers[3];
         scope.recompileScope = null;
         var processed = false;
         scope.cfType = 'val';
@@ -59,7 +69,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                 scope.addFrame();
 
             if (mmsViewCtrl)
-                mmsViewCtrl.transcludeClicked(scope.mmsEid);
+                mmsViewCtrl.transcludeClicked(scope.mmsEid, scope.ws, scope.version);
 
             /*if (e.target.tagName !== 'A' && e.target.tagName !== 'INPUT' && !scope.isEditing) //need review for inline editing (boolean and nested)
                 return false;
@@ -102,6 +112,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                     return;
                 }
                 element[0].innerHTML = toCompile;
+                MathJax.Hub.Queue(["Typeset", MathJax.Hub, element[0]]);
                 $compile(element.contents())(scope.recompileScope); 
             } else if (UtilsService.isRestrictedValue(scope.values)) {
                 ElementService.getElement(scope.values[0].operand[1].element, false, scope.ws, scope.version, 2)
@@ -110,7 +121,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                     element[0].innerHTML = "<span>" + e.name + "</span>";
                 });
             } else if (isExpression) {
-                $http.get(URLService.getElementURL(scope.mmsEid, scope.ws, scope.version) + '?evaluate')
+                $http.get(URLService.getElementURL(scope.mmsEid, scope.ws, scope.version) + '&evaluate')
                 .success(function(data,status,headers,config) {
                     element[0].innerHTML = data.elements[0].evaluationResult;
                 }).error(function(data,status,headers,config){
@@ -174,12 +185,26 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
             idwatch();
             if (UtilsService.hasCircularReference(scope, scope.mmsEid, 'val')) {
                 //$log.log("prevent circular dereference!");
-                element.html('<span class="error">Circular Reference!</span>');
+                element.html('<span class="mms-error">Circular Reference!</span>');
                 return;
             }
             element.html('(loading...)');
             var ws = scope.mmsWs;
             var version = scope.mmsVersion;
+            if (mmsCfValCtrl) {
+                var cfvVersion = mmsCfValCtrl.getWsAndVersion();
+                if (!ws)
+                    ws = cfvVersion.workspace;
+                if (!version)
+                    version = cfvVersion.version;
+            }
+            if (mmsCfDocCtrl) {
+                var cfdVersion = mmsCfDocCtrl.getWsAndVersion();
+                if (!ws)
+                    ws = cfdVersion.workspace;
+                if (!version)
+                    version = cfdVersion.version;
+            }
             if (mmsViewCtrl) {
                 var viewVersion = mmsViewCtrl.getWsAndVersion();
                 if (!ws)
@@ -205,12 +230,24 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                         if (eid === scope.mmsEid && ws === scope.ws && (type === 'all' || type === 'value') && !continueEdit)
                             recompile();
                     });
+                    //actions for stomp 
+                    scope.$on("stomp.element", function(event, deltaSource, deltaWorkspaceId, deltaElementId, deltaModifier, elemName){
+                        if(deltaWorkspaceId === scope.ws && deltaElementId === scope.mmsEid){
+                            if(scope.isEditing === false){
+                                recompile();
+                            }
+                            if(scope.isEditing === true){
+                                growl.warning("This value has been changed: " + elemName +
+                                            " modified by: " + deltaModifier, {ttl: -1});
+                            }
+                        }
+                    });
                 }
             }, function(reason) {
                 var status = ' not found';
                 if (reason.status === 410)
                     status = ' deleted';
-                element.html('<span class="error">value cf ' + newVal + status + '</span>');
+                element.html('<span class="mms-error">value cf ' + newVal + status + '</span>');
                 //growl.error('Cf Val Error: ' + reason.message + ': ' + scope.mmsEid);
             });
         });
@@ -231,6 +268,14 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                 scope.editValues.push({type: type, double: 0.0});
         };
         scope.addValueType = 'LiteralString';
+        
+        scope.addEnumerationValue = function() {
+          scope.editValues.push({type: "InstanceValue", instance: scope.options[0]});
+        };
+
+        scope.removeVal = function(i) {
+            scope.editValues.splice(i, 1);
+        };
 
         if (mmsViewCtrl) { 
             
@@ -276,51 +321,24 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                 } else {
                     //The editor check occurs here; should get "not supported for now" from here
 
-                    //Get the ID, do backend call for Element data
+                    // check if data has been loaded for specified id
                     var id = scope.element.specialization.propertyType;
-                    if (!id || scope.element.specialization.isSlot || (scope.isEnumeration && scope.options)) {
+                    if (!id || (scope.isEnumeration && scope.options)) {
                         Utils.addFrame(scope, mmsViewCtrl, element, frameTemplate);
                         return;
                     }
-                    var elementData = ElementService.getElement(id, false, scope.ws, scope.version);
-
-                    elementData.then(
-                        function(val) {
-                            //Filter for enumeration type
-                            if (val.appliedMetatypes && val.appliedMetatypes.length > 0 && 
-                                val.appliedMetatypes[0] === '_9_0_62a020a_1105704885400_895774_7947') {
-                                scope.isEnumeration = true;
-                                var fillData = ElementService.getOwnedElements(val.sysmlid, false, scope.ws, scope.version, 1);
-
-                                fillDropDown(fillData);
-                            } else
-                                Utils.addFrame(scope, mmsViewCtrl, element, frameTemplate);
-                        },
-                        function(reason) {
-                            Utils.addFrame(scope, mmsViewCtrl, element, frameTemplate);
-                        }
-                    );
-
-                    var fillDropDown = function(data) {
-                        data.then(
-                            function(val) {
-                                var newArray = [];
-                                //Filter only for appropriate property value
-                                for (var i = 0; i < val.length; i++) {
-                                    if( val[i].appliedMetatypes && val[i].appliedMetatypes.length > 0 && 
-                                        val[i].appliedMetatypes[0] === '_9_0_62a020a_1105704885423_380971_7955') {
-                                        newArray.push(val[i]);
-                                    }
-                                }
-                                scope.options = newArray;
-                                Utils.addFrame(scope,mmsViewCtrl,element,frameTemplate); //For Edit view, no need for addFrame
-                            },
-                            function(reason) {
-                                console.log(reason);
-                                growl.error('Failed to get enumeration options: ' + reason.message);
-                            }
-                        );
-                    };
+                    // otherwise get property spec 
+                    Utils.getPropertySpec(scope.element,scope.ws,scope.version)
+                    .then( function(value) {
+                        scope.isEnumeration = value.isEnumeration;
+                        scope.isSlot = value.isSlot;
+                        scope.options = value.options;
+                      //if ( !scope.isSlot || !scope.isEnumeration)
+                        Utils.addFrame(scope, mmsViewCtrl, element, frameTemplate);
+                    }, function(reason) {
+                        Utils.addFrame(scope, mmsViewCtrl, element, frameTemplate);
+                        growl.error('Failed to get property spec: ' + reason.message);
+                    });
                 }
             };
 
@@ -328,18 +346,6 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                 Utils.previewAction(scope, recompileEdit, recompile, type, element);
             };
         } 
-        //actions for stomp 
-        scope.$on("stomp.element", function(event, deltaSource, deltaWorkspaceId, deltaElementId, deltaModifier, elemName){
-            if(deltaWorkspaceId === scope.ws && deltaElementId === scope.mmsEid){
-                if(scope.isEditing === false){
-                    recompile();
-                }
-                if(scope.isEditing === true){
-                    growl.warning("This value has been changed: " + elemName +
-                                " modified by: " + deltaModifier, {ttl: -1});
-                }
-            }
-        });
         if (mmsViewPresentationElemCtrl) {
             scope.delete = function() {
                 Utils.deleteAction(scope,scope.bbApi,mmsViewPresentationElemCtrl.getParentSection());
@@ -358,7 +364,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
             mmsWs: '@',
             mmsVersion: '@'
         },
-        require: ['?^mmsView','?^mmsViewPresentationElem'],
+        require: ['?^^mmsView','?^^mmsViewPresentationElem', '?^^mmsTranscludeDoc', '?^^mmsTranscludeVal'],
         controller: ['$scope', mmsTranscludeCtrl],
         link: mmsTranscludeValLink
     };

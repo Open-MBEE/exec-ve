@@ -124,10 +124,21 @@ mms-spec div {
   }
 }
 
-.error {
+.mms-error {
   color: $red;
+}
+
+.mms-png {
+  display: none;
 }
 
 figcaption {
   text-align: center;
+  font-weight: bold;
+}
+
+mms-transclude-img img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }

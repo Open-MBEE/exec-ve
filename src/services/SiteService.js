@@ -97,12 +97,17 @@ function SiteService($q, $http, URLService, CacheService, _) {
     var getSiteProjects = function(site) {
 
     };
+
+    var reset = function() {
+        inProgress = {};
+    };
     
     return {
         getCurrentSite: getCurrentSite,
         setCurrentSite: setCurrentSite,
         getSites: getSites,
         getSite: getSite,
-        getSiteProjects: getSiteProjects
+        getSiteProjects: getSiteProjects,
+        reset: reset
     };
 }

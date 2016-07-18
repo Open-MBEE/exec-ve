@@ -7,32 +7,39 @@
     <div ng-if="edit.specialization.type === 'Property'">
         <h2 class="prop-title spec-view-value-heading">PROPERTY VALUE</h2>
         <div ng-if="!isRestrictedVal && !isEnumeration">
-        <div ng-if="editValues.length == 0">
-            <select ng-model="addValueType" ng-options="key for (key, value) in addValueTypes"></select>
-            <button class="btn btn-sm" ng-click="addValue(addValueType)">Add</button>
-        </div>
-        <div ng-repeat="value in editValues" ng-switch on="value.type">
-            <div ng-switch-when="LiteralInteger"><input type="number" ng-model="value.integer"></input></div>
-            <div ng-switch-when="LiteralUnlimitedNatural"><input type="number" ng-model="value.naturalValue"></input></div>
-            <div ng-switch-when="LiteralBoolean"><input type="checkbox" ng-model="value.boolean"></input></div>
-            <div ng-switch-when="LiteralReal"><input type="number" ng-model="value.double" step="any"></input></div>
-            <div ng-switch-when="LiteralString">
-                <textarea ng-if="hasHtml(value.string)" mms-tinymce mms-ws="{{mmsWs}}" mms-site="{{mmsSite}}" ng-model="value.string" mms-cf-elements="mmsCfElements" mms-eid="{{element.sysmlid}}"></textarea>
-                <textarea ng-if="!hasHtml(value.string)" ng-model="value.string"></textarea>
-            </div>
-            <div ng-switch-when="OpaqueExpression">
-                <textarea ng-model="value.expressionBody[0]"></textarea>
-            </div>
-            <div ng-switch-default>Editing not supported for now</div>
-        </div>
+          <div ng-if="editValues.length == 0">
+              <select ng-model="addValueType" ng-options="key for (key, value) in addValueTypes"></select>
+              <button class="btn btn-sm" ng-click="addValue(addValueType)">Add</button>
+          </div>
+          <div ng-repeat="value in editValues" ng-switch on="value.type">
+              <div ng-switch-when="LiteralInteger"><input type="number" ng-model="value.integer"></input><a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a></div>
+              <div ng-switch-when="LiteralUnlimitedNatural"><input type="number" ng-model="value.naturalValue"></input> <a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a></div>
+              <div ng-switch-when="LiteralBoolean"><input type="checkbox" ng-model="value.boolean"></input> {{value.boolean}} <a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a></div>
+              <div ng-switch-when="LiteralReal"><input type="number" ng-model="value.double" step="any"></input><a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a></div>
+              <div ng-switch-when="LiteralString">
+                  <textarea ng-if="hasHtml(value.string)" mms-ckeditor mms-ws="{{mmsWs}}" mms-site="{{mmsSite}}" ng-model="value.string" mms-cf-elements="mmsCfElements" mms-eid="{{element.sysmlid}}"></textarea>
+                  <textarea ng-if="!hasHtml(value.string)" ng-model="value.string"></textarea>
+                  <a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a>
+              </div>
+              <div ng-switch-when="OpaqueExpression">
+                  <textarea ng-model="value.expressionBody[0]"></textarea><a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a>
+              </div>
+              <div ng-switch-default>Editing not supported for now</div>
+          </div>
+          <div ng-if="editValues.length != 0 && isSlot">
+            <button class="btn btn-sm" ng-click="addValue(editValues[0].type)">Add</button>
+          </div>
         </div>
         <div ng-if="isRestrictedVal">
             <select ng-model="editValues[0].operand[1].element" ng-options="el.sysmlid as el.name for el in options">
             </select>
         </div>
-        <div ng-if="isEnumeration">
-            <select ng-model="editValues[0].instance" ng-options="el.sysmlid as el.name for el in options">
-            </select>
+        <div ng-if="isEnumeration" ng-repeat="val in editValues">
+            <select ng-model="val.instance" ng-options="el.sysmlid as el.name for el in options">
+            </select><a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a>
+        </div>
+        <div ng-if="isSlot && isEnumeration">
+          <button class="btn btn-sm" ng-click="addEnumerationValue()">Add</button>
         </div>
     </div>
 
@@ -54,7 +61,7 @@
     </div>
 
     <h2 ng-hide="mmsViewEdit" class="prop-title spec-view-doc-heading">DOCUMENTATION</h2>
-    <textarea ng-model="edit.documentation" mms-tinymce mms-tinymce-api="tinymceApi" mms-ws="{{mmsWs}}" mms-site="{{mmsSite}}" mms-cf-elements="mmsCfElements" mms-eid="{{element.sysmlid}}"></textarea>
+    <textarea ng-model="edit.documentation" mms-ckeditor mms-editor-api="editorApi" mms-ws="{{mmsWs}}" mms-site="{{mmsSite}}" mms-cf-elements="mmsCfElements" mms-eid="{{element.sysmlid}}"></textarea>
 
     <div ng-hide="mmsViewEdit">
         <h2 class="prop-title spec-view-type-heading">METATYPE</h2>
@@ -144,12 +151,14 @@
     <h3 class="prop sysmlid">{{element.sysmlid}}</h3>
     <h2 class="prop-title">WORKSPACE</h2>
     <h3 class="prop">{{workspace.name}}</h3>
+    <h2 class="prop-title">FORMATTED MODIFIED TIME</h2>
+    <h3 class="prop">{{element.modified}}</h3>
 </div>
 
 <div ng-if="mmsType=='workspace'" ng-show="editing" class="editing">
     <h1 class="prop"><input class="form-control" type="text" ng-model="edit.name"></input></h1>
     <h2 class="prop-title">DESCRIPTION</h2>
-    <textarea mms-tinymce mms-ws="{{mmsWs}}" ng-model="edit.description"></textarea>
+    <textarea mms-ckeditor mms-ws="{{mmsWs}}" ng-model="edit.description"></textarea>
     <h2 class="prop-title">TASK AUTHOR</h2>
     <h3 class="prop">{{element.creator}}</h3>
     <h2 class="prop-title">DATE CREATED</h2>
@@ -174,7 +183,7 @@
 <div ng-if="mmsType=='tag'" ng-show="editing" class="editing">
     <h1 class="prop"><input class="form-control" type="text" ng-model="edit.name"></input></h1>
     <h2 class="prop-title">DESCRIPTION</h2>
-    <textarea mms-tinymce mms-ws="{{mmsWs}}" ng-model="edit.description"></textarea>
+    <textarea mms-ckeditor mms-ws="{{mmsWs}}" ng-model="edit.description"></textarea>
     <h2 class="prop-title">TIMESTAMP</h2>
     <h3 class="prop">{{element.timestamp | date:'M/d/yy h:mm a'}}</h3>
     <h2 class="prop-title">WORKSPACE</h2>

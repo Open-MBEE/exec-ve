@@ -30,7 +30,7 @@ module.exports = function (config) {
             "build/bower_components/d3/d3.js",
             "build/bower_components/c3/c3.js",
             //"build/bower_components/timely/timely.js",
-            "build/bower_components/tinymce/tinymce.js",
+            // "build/bower_components/tinymce/tinymce.js",
 
             "build/lib/jquery.isonscreen.js",
             "build/lib/table2CSV.js",

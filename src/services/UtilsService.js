@@ -331,6 +331,17 @@ function UtilsService(CacheService, _) {
         var result = ['<table class="table table-bordered table-condensed">'];
         if (table.title)
             result.push('<caption>' + table.title + '</caption>');
+        if (table.colwidths && table.colwidths.length > 0) {
+            result.push('<colgroup>');
+            for (var i = 0; i < table.colwidths.length; i++) {
+                if (table.colwidths[i])
+                    result.push('<col style="width: ' + table.colwidths[i] + '">');
+                else {
+                    result.push('<col>');
+                }
+            }
+            result.push('</colgroup>');
+        }
         if (table.header) {
             result.push('<thead>');
             result.push(makeTableBody(table.header, true));
@@ -418,20 +429,14 @@ function UtilsService(CacheService, _) {
     };
 
     var makeHtmlTOC = function (tree) {
-        var result = '<div style="page-break-after:always"><div style="font-size:32px">Table of Contents</div>';
+        var result = '<div class="toc"><div class="header">Table of Contents</div>';
 
         var root_branch = tree[0].branch;
-
-        result += '<ul style="list-style-type:none">';
-
-        var anchor = '<a href=#' + root_branch.data.sysmlid + '>';
-        result += '  <li>' + anchor + root_branch.section + ' ' + root_branch.label + '</a></li>';
 
         root_branch.children.forEach(function (child) {
             result += makeHtmlTOCChild(child);
         });
 
-        result += '</ul>'; 
         result += '</div>'; 
 
         return result;
@@ -439,7 +444,7 @@ function UtilsService(CacheService, _) {
 
     var makeHtmlTOCChild = function(child) {
 
-        var result = '<ul style="list-style-type:none">';
+        var result = '<ul>';
 
         var anchor = '<a href=#' + child.data.sysmlid + '>';
         result += '  <li>' + anchor + child.section + ' ' + child.label + '</a></li>';
@@ -466,10 +471,12 @@ function UtilsService(CacheService, _) {
     var getIdInfo = function(elem, siteid) { //elem is element object with qualified id with project in it
         var holdingBinId = null;
         var projectId = null;
+        var projectName = null;
         var siteId = siteid;
 
         if (elem) {
             var splitArray = elem.qualifiedId.split('/');
+            var projectNameArray = elem.qualifiedName.split('/');
             if (splitArray && splitArray.length > 2) {
                 projectId = splitArray[2];
                 siteId = splitArray[1];
@@ -478,12 +485,64 @@ function UtilsService(CacheService, _) {
                 siteId = elem.siteCharacterizationId;
             if (projectId && projectId.indexOf('PROJECT') >= 0) {
                 holdingBinId = 'holding_bin_' + projectId;
+                projectName = projectNameArray[2];
+                
             }
         }
         //if (!holdingBinId && siteId) {
         //    holdingBinId = 'holding_bin_' + siteId + '_no_project';
         //}
-        return {holdingBinId: holdingBinId, projectId: projectId, siteId: siteId};
+        return {holdingBinId: holdingBinId, projectId: projectId, siteId: siteId, projectName: projectName};
+    };
+
+    /*
+    header = header slot on doc
+    footer = footer slot on doc
+    dnum = dnumber slot on doc
+    tag = ve tag name if available
+    displayTime = tag time or generation time as mm/dd/yy hh:mm am/pm
+    */
+    var getPrintCss = function(header, footer, dnum, tag, displayTime) {
+        var ret = "img {max-width: 100%; page-break-inside: avoid; page-break-before: auto; page-break-after: auto; display: block;}\n" + 
+                " tr, td, th { page-break-inside: avoid; } thead {display: table-header-group;}\n" + 
+                ".pull-right {float: right;}\n" + 
+                ".view-title {margin-top: 10pt}\n" +
+                ".chapter {page-break-before: always}\n" + 
+                "table {width: 100%; border-collapse: collapse;}\n" + 
+                "table, th, td {border: 1px solid black; padding: 4px;}\n" +
+                "table, th > p, td > p {margin: 0px; padding: 0px;}\n" +
+                "table, th > div > p, td > div > p {margin: 0px; padding: 0px;}\n" +
+                //"table p {word-break: break-all;}\n" + 
+                "th {background-color: #f2f3f2;}\n" + 
+                "h1 {font-size: 20px; padding: 0px; margin: 4px;}\n" +
+                ".ng-hide {display: none;}\n" +
+                "body {font-size: 9pt; font-family: 'Times New Roman', Times, serif; }\n" + 
+                "caption, figcaption {text-align: center; font-weight: bold;}\n" +
+                ".toc, .tof, .tot {page-break-after:always;}\n" +
+                ".toc a, .tof a, .tot a { text-decoration:none; color: #000; font-size:9pt; }\n" + 
+                ".toc .header, .tof .header, .tot .header { margin-bottom: 4px; font-weight: bold; font-size:24px; }\n" + 
+                ".toc ul, .tof ul, .tot ul {list-style-type:none; margin: 0; }\n" +
+                ".tof ul, .tot ul {padding-left:0;}\n" +
+                ".toc ul {padding-left:4em;}\n" +
+                ".toc > ul {padding-left:0;}\n" +
+                ".toc li > a[href]::after {content: leader('.') target-counter(attr(href), page);}\n" + 
+                "@page {margin: 0.5in;}\n";
+                //"@page big_table {  size: 8.5in 11in; margin: 0.75in; prince-shrink-to-fit:auto;}\n" +  //size: 11in 8.5in;
+                //".big-table {page: big_table; max-width: 1100px; }\n";
+        if (header && header !== '') {
+            ret += '@page { @top { font-size: 10px; content: "' + header + '";}}\n';
+        }
+        if (footer && footer !== '') {
+            ret += '@page { @bottom { font-size: 10px; content: "' + footer + '";}}\n';
+        }
+        ret += "@page { @bottom-right { content: counter(page); }}\n";
+        if (tag && tag !== 'latest' && tag !== '') {
+            ret += "@page { @top-right { font-size: 10px; content: '" + tag + "';}}\n";
+        } else {
+            ret += "@page { @top-right { font-size: 10px; content: '" + displayTime + "';}}\n";
+        }
+                //"@page{prince-shrink-to-fit:auto;size: A4 portrait;margin-left:8mm;margin-right:8mm;}";
+        return ret;
     };
 
     return {
@@ -501,6 +560,7 @@ function UtilsService(CacheService, _) {
         makeHtmlList: makeHtmlList,
         makeHtmlTOC: makeHtmlTOC,
         createMmsId: createMmsId,
-        getIdInfo: getIdInfo
+        getIdInfo: getIdInfo,
+        getPrintCss: getPrintCss
     };
 }

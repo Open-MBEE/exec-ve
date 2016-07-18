@@ -52,7 +52,7 @@ function mmsHistory(Utils, ElementService, WorkspaceService, $compile, $template
             lastid = newVal;
             ElementService.getElementVersions(scope.mmsEid, false, scope.mmsWs)
             .then(function(data) {
-                if (newVal !== lastid) //race condition to prevent old data from overwriting new data
+                if (newVal !== lastid) 
                     return;
                 scope.history = data;
                 scope.historyVer = 'latest';

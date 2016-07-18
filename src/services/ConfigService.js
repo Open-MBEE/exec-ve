@@ -345,6 +345,10 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, HttpSe
         return createConfig(config, workspace, true);
     };
 
+    var reset = function() {
+        inProgress = {};
+    };
+
     return {
         getConfigs : getConfigs,
         createConfig : createConfig,
@@ -357,5 +361,6 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, HttpSe
         convertHtmlToPdf: convertHtmlToPdf,
         update : update,
         getProductSnapshots: getProductSnapshots,
+        reset: reset
     };
 }

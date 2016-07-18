@@ -43,99 +43,99 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
     }
 
     $scope.bbApi.init = function() {
-      $scope.bbApi.addButton(UxService.getButtonBarButton("tree.expand"));
-      $scope.bbApi.addButton(UxService.getButtonBarButton("tree.collapse"));
-      //$scope.bbApi.addButton(UxService.getButtonBarButton("tree.filter"));
+      $scope.bbApi.addButton(UxService.getButtonBarButton("tree-expand"));
+      $scope.bbApi.addButton(UxService.getButtonBarButton("tree-collapse"));
+      //$scope.bbApi.addButton(UxService.getButtonBarButton("tree-filter"));
 
       if ($state.includes('workspaces') && !$state.includes('workspace.sites')) {
-        $scope.bbApi.addButton(UxService.getButtonBarButton("tree.merge"));
-        $scope.bbApi.addButton(UxService.getButtonBarButton("tree.add.task"));
-        $scope.bbApi.addButton(UxService.getButtonBarButton("tree.add.configuration"));
-        $scope.bbApi.addButton(UxService.getButtonBarButton("tree.delete"));
-        $scope.bbApi.setPermission("tree.add.task", $scope.wsPerms);
-        $scope.bbApi.setPermission("tree.delete", $scope.wsPerms);
-        $scope.bbApi.setPermission("tree.merge", $scope.wsPerms);
+        $scope.bbApi.addButton(UxService.getButtonBarButton("tree-merge"));
+        $scope.bbApi.addButton(UxService.getButtonBarButton("tree-add-task"));
+        $scope.bbApi.addButton(UxService.getButtonBarButton("tree-add-configuration"));
+        $scope.bbApi.addButton(UxService.getButtonBarButton("tree-delete"));
+        $scope.bbApi.setPermission("tree-add-task", $scope.wsPerms);
+        $scope.bbApi.setPermission("tree-delete", $scope.wsPerms);
+        $scope.bbApi.setPermission("tree-merge", $scope.wsPerms);
       } else if ($state.includes('workspace.sites') && !$state.includes('workspace.site.document')) {
-        $scope.bbApi.addButton(UxService.getButtonBarButton("tree.showall.sites"));
-        $scope.bbApi.addButton(UxService.getButtonBarButton("tree.add.document"));
-        $scope.bbApi.addButton(UxService.getButtonBarButton("tree.delete.document"));
-        $scope.bbApi.setPermission("tree.add.document", config == 'latest' ? true : false);
-        $scope.bbApi.setPermission("tree.delete.document", config == 'latest' ? true : false);
+        $scope.bbApi.addButton(UxService.getButtonBarButton("tree-showall-sites"));
+        $scope.bbApi.addButton(UxService.getButtonBarButton("tree-add-document"));
+        $scope.bbApi.addButton(UxService.getButtonBarButton("tree-delete-document"));
+        $scope.bbApi.setPermission("tree-add-document", config == 'latest' ? true : false);
+        $scope.bbApi.setPermission("tree-delete-document", config == 'latest' ? true : false);
       } else if ($state.includes('workspace.site.document')) {
-        $scope.bbApi.addButton(UxService.getButtonBarButton("tree.reorder.view"));
-        $scope.bbApi.addButton(UxService.getButtonBarButton("tree.full.document"));
-        $scope.bbApi.addButton(UxService.getButtonBarButton("tree.add.view"));
-        $scope.bbApi.addButton(UxService.getButtonBarButton("tree.delete.view"));
-        $scope.bbApi.setPermission("tree.add.view", $scope.editable);
-        $scope.bbApi.setPermission("tree.reorder.view", $scope.editable);
-        $scope.bbApi.setPermission("tree.delete.view", $scope.editable);
+        $scope.bbApi.addButton(UxService.getButtonBarButton("tree-reorder-view"));
+        $scope.bbApi.addButton(UxService.getButtonBarButton("tree-full-document"));
+        $scope.bbApi.addButton(UxService.getButtonBarButton("tree-add-view"));
+        $scope.bbApi.addButton(UxService.getButtonBarButton("tree-delete-view"));
+        $scope.bbApi.setPermission("tree-add-view", $scope.editable);
+        $scope.bbApi.setPermission("tree-reorder-view", $scope.editable);
+        $scope.bbApi.setPermission("tree-delete-view", $scope.editable);
         if ($rootScope.mms_fullDocMode)
-            $scope.bbApi.setToggleState('tree.full.document', true);
+            $scope.bbApi.setToggleState('tree-full-document', true);
       }
     };
 
-    $scope.$on('tree.expand', function() {
+    $scope.$on('tree-expand', function() {
         $scope.treeApi.expand_all();
     });
 
-    $scope.$on('tree.collapse', function() {
+    $scope.$on('tree-collapse', function() {
         $scope.treeApi.collapse_all();
     });
 
-    $scope.$on('tree.filter', function() {
+    $scope.$on('tree-filter', function() {
         $scope.toggleFilter();
     });
 
-    $scope.$on('tree.showall.sites', function() {
+    $scope.$on('tree-showall-sites', function() {
         $scope.toggleShowAllSites();
     });
 
-    $scope.$on('tree.add.task', function() {
+    $scope.$on('tree-add-task', function() {
         $scope.addItem('Workspace');
     });
 
-    $scope.$on('tree.add.configuration', function() {
+    $scope.$on('tree-add-configuration', function() {
         $scope.addItem('Tag');
     });
 
-    $scope.$on('tree.add.document', function() {
+    $scope.$on('tree-add-document', function() {
         $scope.addItem('Document');
     });
 
-    $scope.$on('tree.delete.document', function() {
+    $scope.$on('tree-delete-document', function() {
         $scope.deleteItem();
     });
 
-    $scope.$on('tree.add.view', function() {
+    $scope.$on('tree-add-view', function() {
         $scope.addItem('View');
     });
 
-    $scope.$on('tree.delete', function() {
+    $scope.$on('tree-delete', function() {
         $scope.deleteItem();
     });
 
-    $scope.$on('tree.delete.view', function() {
+    $scope.$on('tree-delete-view', function() {
         $scope.deleteItem();
     });
 
-    $scope.$on('tree.merge', function() {
+    $scope.$on('tree-merge', function() {
         $scope.mergeAssist();
     });
 
-    $scope.$on('tree.reorder.view', function() {
+    $scope.$on('tree-reorder-view', function() {
         $rootScope.mms_fullDocMode = false;
-        $scope.bbApi.setToggleState("tree.full.document", false);
+        $scope.bbApi.setToggleState("tree-full-document", false);
         $state.go('workspace.site.document.order', {search: undefined});
     });
 
     var creatingSnapshot = false;
-    $scope.$on('document.snapshot.create', function() {
+    $scope.$on('document-snapshot-create', function() {
         if (creatingSnapshot) {
             growl.info('Please Wait...');
             return;
         }
         creatingSnapshot = true;
-        $rootScope.mms_tbApi.toggleButtonSpinner('document.snapshot.create');
+        $rootScope.mms_tbApi.toggleButtonSpinner('document-snapshot-create');
 
         $scope.itemType = 'Tag';
         $scope.createConfigParentId = workspaceObj.id;
@@ -155,15 +155,15 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
             growl.error("Snapshot Creation failed: " + reason.message);
         }).finally(function() {
             creatingSnapshot = false;
-            $rootScope.mms_tbApi.toggleButtonSpinner('document.snapshot.create');
+            $rootScope.mms_tbApi.toggleButtonSpinner('document-snapshot-create');
         });
 
-        $rootScope.mms_tbApi.select('document.snapshot');
+        $rootScope.mms_tbApi.select('document-snapshot');
 
     });
 
     /* var refreshSnapshots = function() {
-        $rootScope.mms_tbApi.toggleButtonSpinner('document.snapshot.refresh');
+        $rootScope.mms_tbApi.toggleButtonSpinner('document-snapshot-refresh');
         ConfigService.getProductSnapshots(document.sysmlid, site.sysmlid, workspaceObj.id, true)
         .then(function(result) {
             $scope.snapshots = result;
@@ -171,24 +171,24 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
             growl.error("Refresh Failed: " + reason.message);
         })
         .finally(function() {
-            $rootScope.mms_tbApi.toggleButtonSpinner('document.snapshot.refresh');
-            $rootScope.mms_tbApi.select('document.snapshot');
+            $rootScope.mms_tbApi.toggleButtonSpinner('document-snapshot-refresh');
+            $rootScope.mms_tbApi.select('document-snapshot');
 
         });
     };
 
-    $scope.$on('document.snapshot.refresh', refreshSnapshots); */
+    $scope.$on('document-snapshot-refresh', refreshSnapshots); */
 
-    $scope.$on('tree.full.document', function() {
+    $scope.$on('tree-full-document', function() {
         $scope.fullDocMode();
     });
 
     $scope.toggleFilter = function() {
-        $scope.bbApi.toggleButtonState('tree.filter');
+        $scope.bbApi.toggleButtonState('tree-filter');
     };
 
     $scope.toggleShowAllSites = function() {
-        $scope.bbApi.toggleButtonState('tree.showall.sites');
+        $scope.bbApi.toggleButtonState('tree-showall-sites');
         $scope.my_data = UtilsService.buildTreeHierarchy(filter_sites(sites), "sysmlid", "site", "parent", siteInitFunc);
         $scope.mms_treeApi.clear_selected_branch();
     };
@@ -284,7 +284,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
     var filter_sites = function(site_array) {
         var ret_array = [];
 
-        if ($scope.bbApi.getToggleState && $scope.bbApi.getToggleState('tree.showall.sites')) {
+        if ($scope.bbApi.getToggleState && $scope.bbApi.getToggleState('tree-showall-sites')) {
             ret_array = site_array;
         }
         else {
@@ -621,7 +621,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
                 }, 1000);*/
             }
         }
-        $rootScope.mms_tbApi.select('element.viewer');
+        $rootScope.mms_tbApi.select('element-viewer');
     };
 
     $scope.dblclick_tree_handler = function(branch) {
@@ -694,7 +694,9 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
         var branch = $scope.treeApi.get_selected_branch();
         var templateUrlStr = "";
         var branchType = "";
-        var curLastChild = branch.children[branch.children.length-1];
+        var curLastChild = null;
+        if(branch)
+            curLastChild = branch.children[branch.children.length-1];
         
         // Adds the branch:
         var myAddBranch = function() {
@@ -823,7 +825,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
     $scope.fullDocMode = function() {
         if ($rootScope.mms_fullDocMode) {
             $rootScope.mms_fullDocMode = false;
-            $scope.bbApi.setToggleState("tree.full.document", false);
+            $scope.bbApi.setToggleState("tree-full-document", false);
             var curBranch = $scope.treeApi.get_selected_branch();
             if (curBranch) {
                 var viewId;
@@ -840,7 +842,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
         } else {
             if ($state.current.name === 'doc.all') {
                 $rootScope.mms_fullDocMode = true;
-                $scope.bbApi.setToggleState("tree.full.document", true);
+                $scope.bbApi.setToggleState("tree-full-document", true);
                 //allViewLevel2Func(); //TODO remove when priority queue is done
             } else {
                 if (document.specialization.view2view.length > 30) {
@@ -856,14 +858,14 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
                         if (choice === 'ok') {
                             $rootScope.mms_fullDocMode = true;
                             //allViewLevel2Func(); //TODO remove when priority queue is done
-                            $scope.bbApi.setToggleState("tree.full.document", true);
+                            $scope.bbApi.setToggleState("tree-full-document", true);
                             $state.go('workspace.site.document.full', {search: undefined}); 
                         }
                     });
                 } else {
                     $rootScope.mms_fullDocMode = true;
                     //allViewLevel2Func(); //TODO remove when priority queue is done
-                    $scope.bbApi.setToggleState("tree.full.document", true);
+                    $scope.bbApi.setToggleState("tree-full-document", true);
                     $state.go('workspace.site.document.full', {search: undefined}); 
                 }
             }
@@ -1183,12 +1185,14 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
     });
 
     if ($state.includes('workspace.site.document')) {
+        $timeout(function() {
         if (document.specialization.view2view) {
             document.specialization.view2view.forEach(function(view, index) {
                 ViewService.getView(view.id, false, ws, time, 0)
                 .then(addViewSections); //TODO add back in once we have priority queue
             });
         }
+    }, 8000, false);
         $timeout(function() {
             if ($rootScope.mms_treeInitial) {
                 var node = viewId2node[$rootScope.mms_treeInitial];

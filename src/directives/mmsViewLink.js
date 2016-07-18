@@ -91,11 +91,11 @@ function mmsViewLink(ElementService, $compile, growl) {
                     //element.html('<a href="mms.html#/workspaces/' + ws + '/sites/' + site + '/documents/' + 
                     //    docid + '/views/' + scope.mmsVid + queryParam + '">' + data.name + '</a>');
                 } else {
-                    element.html('<span class="error">view link is not a view</span>');
+                    element.html('<span class="mms-error">view link is not a view</span>');
                     //growl.error('View Link Error: not a view: ' + scope.mmsVid);
                 }
             }, function(reason) {
-                element.html('<span class="error">view link not found</span>');
+                element.html('<span class="mms-error">view link not found</span>');
                 //growl.error('View Link Error: ' + reason.message + ': ' + scope.mmsVid);
             });
         });

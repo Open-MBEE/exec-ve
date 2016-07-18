@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms')
-.factory('VizService', ['$q', '$http', 'URLService', 'CacheService', 'UtilsService', VizService]);
+.factory('VizService', ['$q', '$http', 'URLService', 'CacheService', 'UtilsService', 'AuthService', VizService]);
 
 /**
  * @ngdoc service
@@ -15,7 +15,7 @@ angular.module('mms')
  * @description
  * This service handles visualization needs and diagramming (TBD)
  */
-function VizService($q, $http, URLService, CacheService, UtilsService) {
+function VizService($q, $http, URLService, CacheService, UtilsService, AuthService) {
 
     /**
      * @ngdoc method
@@ -31,14 +31,14 @@ function VizService($q, $http, URLService, CacheService, UtilsService) {
      * @param {string} [version=latest] timestamp or version
      * @returns {Promise} The promise will be resolved with the latest image url
      */
-    var getImageURL = function(id, update, workspace, version) {
+    var getImageURL = function(id, ext, update, workspace, version) {
         var n = normalize(id, update, workspace, version);
         var deferred = $q.defer();
-        if (CacheService.exists(n.cacheKey) && !n.update) {
-            deferred.resolve(CacheService.get(n.cacheKey));
+        if (CacheService.exists(n.cacheKey + '|' + ext) && !n.update) {
+            deferred.resolve(CacheService.get(n.cacheKey + '|' + ext));
             return deferred.promise;
         }
-        $http.get(URLService.getImageURL(id, n.ws, n.ver))
+        $http.get(URLService.getImageURL(id, ext, n.ws, n.ver))
         .success(function(data, status, headers, config) {
             var root = URLService.getRoot();
             var newroot = '';
@@ -46,8 +46,9 @@ function VizService($q, $http, URLService, CacheService, UtilsService) {
                 var parts = root.split('/');
                 if (parts.length >= 3)
                     newroot = parts[0] + '/' + parts[1] + '/' + parts[2];
-             }
-            deferred.resolve(CacheService.put(n.cacheKey, newroot + '/alfresco' + data.artifacts[0].url, false));
+            }
+            var url = CacheService.put(n.cacheKey + '|' + ext, newroot + '/alfresco' + data.artifacts[0].url, false);
+            deferred.resolve(url + '?alf_ticket=' + AuthService.getTicket());
         }).error(function(data, status, headers, config) {
             URLService.handleHttpStatus(data, status, headers, config, deferred);
         });

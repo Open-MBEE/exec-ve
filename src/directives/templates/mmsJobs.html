@@ -1,0 +1,44 @@
+<h2>Jobs</h2>
+<i class="pane-center-spinner fa fa-5x fa-spinner fa-spin" style="margin-left: 50%;" ng-if="loading"></i>
+<table class="snapshot-table table table-condensed" ng-if="!loading && hasJobs">
+    <thead>
+        <tr>
+            <td>Name</td>
+            <td>Status</td>
+            <td>Created</td>
+            <td></td>
+            <td></td>
+        </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td>
+            <div ng-hide="editorEnabled">
+                <a ng-click="enableEditor()">{{job.name}}</a>
+            </div>
+            <div ng-show="editorEnabled">
+                <input ng-model="jobInput.jobName" ng-show="editorEnabled">
+                <a ng-click="save()">Save</a>
+                or
+                <a ng-click="disableEditor()">Cancel</a>
+            </div>
+        </td>
+        <td>
+            <div>{{job.status}} <a ng-attr-href="{{job.url}}" target="_blank" ng-show="buttonEnabled">log</a></div> 
+        </td>
+        <td>{{job.create}}</td>
+        <td><button class="btn-link" ng-click="deleteJob()"><strong><span ng-show="deleteCleared">DELETE JOB</span></stong></button><i ng-show="!deleteCleared" class="fa fa-spin fa-spinner"></i></td>
+        <td>
+            <div ng-if="buttonEnabled && deleteCleared">
+                <button type="submit" class="btn-link" ng-click="runNow()"><strong><span ng-show="runCleared">RUN NOW</span></stong></button><i ng-show="!runCleared" class="fa fa-spin fa-spinner"></i>
+            </div>
+        </td>
+        
+    </tr>
+    </tbody>
+</table>
+<h3 ng-if="!hasJobs && !loading"> No Current Jobs</h3>
+<hr>
+<div class="row" style="margin-right:0px;">
+<button type="submit"  class="btn-link pull-right" ng-if="!hasJobs && !loading" ng-click="runNow()" style="text-transform: uppercase;"><strong><span ng-show="responseCleared">RUN JOB FOR {{docName}}</span></stong><i ng-show="!responseCleared" class="fa fa-spin fa-spinner"></i></button>
+</div>
