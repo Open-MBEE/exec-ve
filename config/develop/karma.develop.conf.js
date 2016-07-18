@@ -34,6 +34,9 @@ module.exports = function (config) {
 
             "build/lib/jquery.isonscreen.js",
             "build/lib/table2CSV.js",
+            "build/lib/ckeditor/ckeditor.js",
+            //"build/lib/ckeditor/plugins/mathjax/dialogs/mathjax.js",
+            "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML",
 
             'build/mms.js',
             'build/mms.directives.tpls.js',
