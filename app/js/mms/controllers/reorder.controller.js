@@ -3,8 +3,8 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('ReorderCtrl', ['$scope', '$rootScope', '$stateParams', 'document', 'time', 'ElementService', 'ViewService', '$state', 'growl', '$q', '_',
-function($scope, $rootScope, $stateParams, document, time, ElementService, ViewService, $state, growl, $q, _) {
+.controller('ReorderCtrl', ['$scope', '$rootScope', '$stateParams', 'document', 'time', 'ElementService', 'ViewService', 'MmsAppUtils', '$state', 'growl', '$q', '_',
+function($scope, $rootScope, $stateParams, document, time, ElementService, ViewService, MmsAppUtils, $state, growl, $q, _) {
     $scope.doc = document;
     var ws = $stateParams.workspace;
     ElementService.isCacheOutdated(document.sysmlid, ws)
@@ -53,8 +53,7 @@ function($scope, $rootScope, $stateParams, document, time, ElementService, ViewS
         }
     };
 
-    function handleChildViews(v, aggr) {
-        var deferred = $q.defer();
+    function handleSingleView(v, aggr) {
         var curNode = viewIds2node[v.sysmlid];
         if (!curNode) {
             curNode = {
@@ -65,42 +64,14 @@ function($scope, $rootScope, $stateParams, document, time, ElementService, ViewS
             };
             viewIds2node[v.sysmlid] = curNode;
         }
-        var childIds = [];
-        var childAggrs = [];
-        if (!v.specialization.childViews || v.specialization.childViews.length === 0 || aggr === 'NONE') {
-            deferred.resolve(curNode);
-            return deferred.promise;
-        }
-        for (var i = 0; i < v.specialization.childViews.length; i++) {
-            childIds.push(v.specialization.childViews[i].id);
-            childAggrs.push(v.specialization.childViews[i].aggregation);
-        }
-        ElementService.getElements(childIds, false, ws, time, 2)
-        .then(function(childViews) {
-            var mapping = {};
-            for (var i = 0; i < childViews.length; i++) {
-                mapping[childViews[i].sysmlid] = childViews[i];
-            }
-            var childPromises = [];
-            for (i = 0; i < childIds.length; i++) {
-                var child = mapping[childIds[i]];
-                if (child) //what if not found??
-                    childPromises.push(handleChildViews(child, childAggrs[i]));
-            }
-            $q.all(childPromises).then(function(childNodes) {
-                curNode.children.push.apply(curNode.children, childNodes);
-                deferred.resolve(curNode);
-            }, function(reason) {
-                deferred.reject(reason);
-            });
-
-        }, function(reason) {
-            deferred.reject(reason);
-        });
-        return deferred.promise;
+        return curNode;
     }
 
-    handleChildViews(document, 'COMPOSITE')
+    function handleChildren(curNode, childNodes) {
+        curNode.children.push.apply(curNode.children, childNodes);
+    }
+
+    MmsAppUtils.handleChildViews(document, 'COMPOSITE', ws, time, handleSingleView, handleChildren)
     .then(function(docNode) {
         var num = 1;
         docNode.children.forEach(function(node) {

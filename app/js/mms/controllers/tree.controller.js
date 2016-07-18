@@ -4,9 +4,9 @@
 
 angular.module('mmsApp')
 .controller('TreeCtrl', ['$anchorScroll' , '$q', '$filter', '$location', '$modal', '$scope', '$rootScope', '$state', '$stateParams', '$compile','$timeout', 'growl', 
-                          'UxService', 'ConfigService', 'ElementService', 'UtilsService', 'WorkspaceService', 'ViewService',
+                          'UxService', 'ConfigService', 'ElementService', 'UtilsService', 'WorkspaceService', 'ViewService', 'MmsAppUtils',
                           'workspaces', 'workspaceObj', 'tag', 'sites', 'site', 'document', 'views', 'view', 'time', 'configSnapshots', 'docFilter',
-function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $state, $stateParams, $compile, $timeout, growl, UxService, ConfigService, ElementService, UtilsService, WorkspaceService, ViewService, workspaces, workspaceObj, tag, sites, site, document, views, view, time, configSnapshots, docFilter) {
+function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $state, $stateParams, $compile, $timeout, growl, UxService, ConfigService, ElementService, UtilsService, WorkspaceService, ViewService, MmsAppUtils, workspaces, workspaceObj, tag, sites, site, document, views, view, time, configSnapshots, docFilter) {
 
     $rootScope.mms_bbApi = $scope.bbApi = {};
     $rootScope.mms_treeApi = $scope.treeApi = {};
@@ -419,8 +419,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
         }
     };*/
     var viewId2node = {};
-    function handleChildViews(v, aggr) {
-        var deferred = $q.defer();
+    var handleSingleView = function(v, aggr) {
         var curNode = viewId2node[v.sysmlid];
         if (!curNode) {
             curNode = {
@@ -428,44 +427,16 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
                 type: 'view',
                 data: v,
                 children: [],
-                loading: false
+                loading: false,
+                aggr: aggr
             };
             viewId2node[v.sysmlid] = curNode;
         }
-        var childIds = [];
-        var childAggrs = [];
-        if (!v.specialization.childViews || v.specialization.childViews.length === 0 || aggr === 'NONE') {
-            deferred.resolve(curNode);
-            return deferred.promise;
-        }
-        for (var i = 0; i < v.specialization.childViews.length; i++) {
-            childIds.push(v.specialization.childViews[i].id);
-            childAggrs.push(v.specialization.childViews[i].aggregation);
-        }
-        ElementService.getElements(childIds, false, ws, time, 2)
-        .then(function(childViews) {
-            var mapping = {};
-            for (var i = 0; i < childViews.length; i++) {
-                mapping[childViews[i].sysmlid] = childViews[i];
-            }
-            var childPromises = [];
-            for (i = 0; i < childIds.length; i++) {
-                var child = mapping[childIds[i]];
-                if (child) //what if not found??
-                    childPromises.push(handleChildViews(child, childAggrs[i]));
-            }
-            $q.all(childPromises).then(function(childNodes) {
-                curNode.children.push.apply(curNode.children, childNodes);
-                deferred.resolve(curNode);
-            }, function(reason) {
-                deferred.reject(reason);
-            });
-
-        }, function(reason) {
-            deferred.reject(reason);
-        });
-        return deferred.promise;
-    }
+        return curNode;
+    };
+    var handleChildren = function(curNode, childNodes) {
+        curNode.children.push.apply(curNode.children, childNodes);
+    };
 
     if ($state.includes('workspaces') && !$state.includes('workspace.sites')) {
         $scope.my_data = UtilsService.buildTreeHierarchy(workspaces, "id", 
@@ -517,7 +488,8 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
       } else {
         if (!document.specialization.childViews)
             document.specialization.childViews = [];
-        handleChildViews(document, 'COMPOSITE').then(function(node) {
+        MmsAppUtils.handleChildViews(document, 'COMPOSITE', ws, time, handleSingleView, handleChildren)
+        .then(function(node) {
             $scope.treeApi.refresh();
             for (var i in viewId2node) {
                 addSectionElements(viewId2node[i].data, viewId2node[i], viewId2node[i]);
@@ -797,7 +769,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
 
                 if (itemType === 'View') {
                     viewId2node[data.sysmlid] = newbranch;
-                    handleChildViews(data, $scope.newViewAggr.type)
+                    MmsAppUtils.handleChildViews(data, $scope.newViewAggr.type, ws, time, handleSingleView, handleChildren)
                     .then(function(node) {
                         //TODO handle full doc mode
                         addViewSectionsRecursivelyForNode(node);

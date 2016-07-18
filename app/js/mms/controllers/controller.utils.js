@@ -482,10 +482,50 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
         return deferred.promise;
     };
 
+    var handleChildViews = function(v, aggr, ws, time, curItemFunc, childrenFunc) {
+        var deferred = $q.defer();
+        var curItem = curItemFunc(v, aggr);
+        var childIds = [];
+        var childAggrs = [];
+        if (!v.specialization.childViews || v.specialization.childViews.length === 0 || aggr === 'NONE') {
+            deferred.resolve(curItem);
+            return deferred.promise;
+        }
+        for (var i = 0; i < v.specialization.childViews.length; i++) {
+            childIds.push(v.specialization.childViews[i].id);
+            childAggrs.push(v.specialization.childViews[i].aggregation);
+        }
+        ElementService.getElements(childIds, false, ws, time, 2)
+        .then(function(childViews) {
+            var mapping = {};
+            for (var i = 0; i < childViews.length; i++) {
+                mapping[childViews[i].sysmlid] = childViews[i];
+            }
+            var childPromises = [];
+            for (i = 0; i < childIds.length; i++) {
+                var child = mapping[childIds[i]];
+                if (child) //what if not found??
+                    childPromises.push(handleChildViews(child, childAggrs[i], ws, time, curItemFunc, childrenFunc));
+            }
+            $q.all(childPromises).then(function(childNodes) {
+                childrenFunc(curItem, childNodes);
+                //curNode.children.push.apply(curNode.children, childNodes);
+                deferred.resolve(curItem);
+            }, function(reason) {
+                deferred.reject(reason);
+            });
+
+        }, function(reason) {
+            deferred.reject(reason);
+        });
+        return deferred.promise;
+    };
+
     return {
         addPresentationElement: addPresentationElement,
         printModal: printModal,
         tableToCsv: tableToCsv,
+        handleChildViews: handleChildViews
     };
 }
     
