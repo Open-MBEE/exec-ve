@@ -74,6 +74,7 @@ function StompService($rootScope, UtilsService, $window, $location, ApplicationS
     };
     var stompConnect = function(){
         stompClient = Stomp.client(hostName);
+        stompClient.debug = null;
         stompClient.connect("guest", "guest", function(){ // on success
             stompClient.subscribe("/topic/master", stompSuccessCallback );
         }, stompFailureCallback, '/');

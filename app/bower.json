@@ -38,7 +38,6 @@
     "d3": "~3.5.6",
     "c3": "~0.4.10",
     "timely": "git@github.jpl.nasa.gov:SEQR/timely.git#master",
-    "tinymce": "~4.3.1",
     "angulartics": "~1.0.3",
     "angulartics-piwik": "~1.0.2"
   },

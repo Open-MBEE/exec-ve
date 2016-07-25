@@ -59,6 +59,8 @@ function mmsTranscludeImg(VizService, growl) {
                 if (!version)
                     version = viewVersion.version;
             }
+            scope.ws = ws;
+            scope.version = version;
             VizService.getImageURL(scope.mmsEid, 'svg', false, ws, version)
             .then(function(data) {
                 scope.svgImgUrl = data;
