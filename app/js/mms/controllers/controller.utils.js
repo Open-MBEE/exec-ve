@@ -17,7 +17,7 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
         $scope.oking = false;
         $scope.newItem = {};
         $scope.newItem.name = "";
-
+        $scope.newItem.tomsawyerType = "IBD";
         // Search for InstanceSpecs.  We are searching for InstanceSpecs b/c we only want to
         // create a InstanceValue to point to that InstanceSpec when cross-referencing.
         $scope.searchFilter = function(data) {
@@ -92,7 +92,7 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
             }
             $scope.oking = true;
 
-            ViewService.createInstanceSpecification($scope.viewOrSection, $scope.ws, $scope.presentationElemType, $scope.site.sysmlid, $scope.newItem.name).
+            ViewService.createInstanceSpecification($scope.viewOrSection, $scope.ws, $scope.presentationElemType, $scope.site.sysmlid, $scope.newItem.name, $scope.newItem.tomsawyerType).
             then(function(data) {
                 $rootScope.$broadcast('view-reorder.refresh');
                 growl.success("Adding "+$scope.presentationElemType+"  Successful");

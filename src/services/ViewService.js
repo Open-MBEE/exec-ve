@@ -637,7 +637,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @returns {Promise} The promise would be resolved with updated View object if addToView is true
      *                    otherwise the created InstanceSpecification
     */
-    var createInstanceSpecification = function(viewOrSection, workspace, type, site, name) {
+    var createInstanceSpecification = function(viewOrSection, workspace, type, site, name, tomsawyerType) {
         var deferred = $q.defer();
 
         var newInstanceId = UtilsService.createMmsId();
@@ -671,7 +671,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         if (type === 'Tsp') {
             instanceSpecSpec = {
                 elements: [], //element in vetest
-                type: 'Tsp'
+                type: 'Tsp',
+                tstype: tomsawyerType
             };
         }
 
