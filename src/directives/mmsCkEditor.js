@@ -177,8 +177,11 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $m
                 if (!tag) {
                     transcludeCallback(ed, true);
                 } else {
-                    ed.execCommand('undo');
-                    // ed.selection.collapse(false);
+                    //ed.focus();
+                    //ed.document.designMode = 'on';
+                    //console.log(ed.execCommand('delete'));
+                    //ed.execCommand('delete');
+                    //ed.selection.collapse(false);
                     ed.insertHtml( tag );
                 }
             }, function() {
@@ -475,12 +478,9 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $m
             instance.focusManager.blur();
           });
           instance.on( 'key', function(e) {
-            if (e.data.domEvent.getKeystroke() == CKEDITOR.SHIFT + 50) {
-                // try {
-                //     e.data.$.preventDefault();
-                // } catch(err) {}
+            if (e.data.domEvent.getKeystroke() == CKEDITOR.SHIFT + 9) { //shift + tab
                 autocompleteCallback(instance);
-            }
+            } else { deb(e); }
           });
           if (scope.mmsEditorApi) {
               scope.mmsEditorApi.save = function() {
