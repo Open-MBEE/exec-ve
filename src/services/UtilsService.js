@@ -13,7 +13,7 @@ angular.module('mms')
  */
 function UtilsService(CacheService, _) {
     var nonEditKeys = ['contains', 'view2view', 'childrenViews', 'displayedElements',
-        'allowedElements', 'contents', 'relatedDocuments'];
+        'allowedElements', 'contents', 'relatedDocuments', 'childViews'];
 
     var hasCircularReference = function(scope, curId, curType) {
         var curscope = scope;

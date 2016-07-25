@@ -67,10 +67,8 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
             };
             ViewService.addElementToViewOrSection($scope.viewOrSection.sysmlid, $scope.viewOrSection.sysmlid, $scope.ws, instanceVal).
             then(function(data) {
-                if ($scope.presentationElemType === "Section") {
-                    // Broadcast message to TreeCtrl:
-                    $rootScope.$broadcast('viewctrl.add.element', element, $scope.presentationElemType.toLowerCase(), $scope.viewOrSection);
-                }
+                // Broadcast message to TreeCtrl:
+                $rootScope.$broadcast('viewctrl.add.element', element, $scope.presentationElemType.toLowerCase(), $scope.viewOrSection);
                 growl.success("Adding "+$scope.presentationElemType+"  Successful");
                 $modalInstance.close(data);
             }, function(reason) {

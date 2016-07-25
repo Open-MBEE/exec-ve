@@ -293,8 +293,6 @@ function UxService($rootScope) {
         return "fa-camera";
       case "view":
         return "fa-file";
-      case "view":
-        return "fa-file";
       case "workspace":
         return "fa-tasks";
       case "table":

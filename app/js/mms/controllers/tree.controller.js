@@ -490,10 +490,10 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
             document.specialization.childViews = [];
         MmsAppUtils.handleChildViews(document, 'COMPOSITE', ws, time, handleSingleView, handleChildren)
         .then(function(node) {
-            $scope.treeApi.refresh();
             for (var i in viewId2node) {
                 addSectionElements(viewId2node[i].data, viewId2node[i], viewId2node[i]);
             }
+            $scope.treeApi.refresh();
         }, function(reason) {
             console.log(reason);
         });
@@ -1187,7 +1187,8 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
     }
     // MmsAppUtils.addElementCtrl creates this event when adding sections, table and figures to the view
     $scope.$on('viewctrl.add.element', function(event, instanceSpec, elemType, parentBranchData) {
-
+        if (elemType === 'paragraph' || elemType === 'list' || elemType === 'comment')
+            return;
         var branch = $scope.treeApi.get_branch(parentBranchData);
         var viewid = null;
         if (branch.type === 'section')
@@ -1196,20 +1197,22 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
             viewid = branch.data.sysmlid;
         var newbranch = {
             label: instanceSpec.name,
-            type: elemType,
+            type: (elemType === 'image' ? 'figure' : elemType),
             view: viewid,
             data: instanceSpec,
             children: [],
         };
         var i = 0;
         var lastSection = -1;
+        var childViewFound = false;
         for (i = 0; i < branch.children.length; i++) {
             if (branch.children[i].type === 'view') {
                 lastSection = i-1;
+                childViewFound = true;
                 break;
             }
         }
-        if (lastSection == -1) 
+        if (lastSection == -1 && !childViewFound) //case when first child is view
             lastSection = branch.children.length-1;
         branch.children.splice(lastSection+1, 0, newbranch);
         if (elemType == 'section') 
@@ -1218,12 +1221,12 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
 
     });
 
-    // ViewCtrl creates this event when deleting sections from the view
-    $scope.$on('viewctrl.delete.section', function(event, sectionData) {
+    // Utils creates this event when deleting instances from the view
+    $scope.$on('viewctrl.delete.element', function(event, elementData) {
 
-        var branch = $scope.treeApi.get_branch(sectionData);
-
-        $scope.treeApi.remove_single_branch(branch);
+        var branch = $scope.treeApi.get_branch(elementData);
+        if (branch)
+            $scope.treeApi.remove_single_branch(branch);
     });
 
     if ($state.includes('workspace.site.document')) {
