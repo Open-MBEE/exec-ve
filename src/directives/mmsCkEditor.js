@@ -479,11 +479,8 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $m
           });
           instance.on( 'key', function(e) {
             if (e.data.domEvent.getKeystroke() == CKEDITOR.SHIFT + 9) { //shift + tab
-                // try {
-                //     e.data.$.preventDefault();
-                // } catch(err) {}
                 autocompleteCallback(instance);
-            }
+            } else { deb(e); }
           });
           if (scope.mmsEditorApi) {
               scope.mmsEditorApi.save = function() {
