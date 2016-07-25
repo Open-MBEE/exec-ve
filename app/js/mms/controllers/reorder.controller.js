@@ -140,9 +140,10 @@ function($scope, $rootScope, $stateParams, document, time, ElementService, ViewS
                 (orig.specialization.childViews && !angular.equals(orig.specialization.childViews, childViews))) {
                 toSave.push({
                     sysmlid: id,
-                    name: orig.name,
+                    //name: orig.name,
                     specialization: {
-                        childViews: childViews
+                        childViews: childViews,
+                        type: orig.specialization.type
                     }
                 });
             }
