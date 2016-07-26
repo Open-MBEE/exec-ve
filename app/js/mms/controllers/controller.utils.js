@@ -270,9 +270,9 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
                     $scope.genpdf = true;
                 }
                 $scope.docOption = (!isDoc && mode === 3);
-                $scope.model = {genCover: false, genTotf: false};
+                $scope.model = {genCover: false, genTotf: false, landscape: false};
                 $scope.print = function() {
-                    $modalInstance.close(['ok', $scope.model.genCover, $scope.model.genTotf]);
+                    $modalInstance.close(['ok', $scope.model.genCover, $scope.model.genTotf, $scope.model.landscape]);
                 };
                 $scope.fulldoc = function() {
                     $modalInstance.close(['fulldoc']);
@@ -286,9 +286,9 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
         });
         modalInstance.result.then(function(choice) {
             if (choice[0] === 'ok') {
-                printOrGenerate(ob, ws, time, tag, isDoc, choice[1], choice[2], mode)
+                printOrGenerate(ob, ws, time, tag, isDoc, choice[1], choice[2], mode, choice[3])
                 .then(function(result) {
-                    var css = UtilsService.getPrintCss(result.header, result.footer, result.dnum, result.tag, result.displayTime);
+                    var css = UtilsService.getPrintCss(result.header, result.footer, result.dnum, result.tag, result.displayTime, choice[3]);
                     var cover = result.cover;
                     var toc = result.toc;
                     var contents = result.contents;
@@ -371,7 +371,7 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
             tag: tagname or ''
         }
     */
-    var printOrGenerate = function(ob, ws, time, tag, isDoc, genCover, genTotf, mode) {
+    var printOrGenerate = function(ob, ws, time, tag, isDoc, genCover, genTotf, mode, landscape) {
         var deferred = $q.defer();
         var printContents = '';
         var printElementCopy = angular.element("#print-div");

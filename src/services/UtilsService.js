@@ -492,7 +492,7 @@ function UtilsService(CacheService, _) {
     tag = ve tag name if available
     displayTime = tag time or generation time as mm/dd/yy hh:mm am/pm
     */
-    var getPrintCss = function(header, footer, dnum, tag, displayTime) {
+    var getPrintCss = function(header, footer, dnum, tag, displayTime, landscape) {
         var ret = "img {max-width: 100%; page-break-inside: avoid; page-break-before: auto; page-break-after: auto; display: block;}\n" + 
                 " tr, td, th { page-break-inside: avoid; } thead {display: table-header-group;}\n" + 
                 ".pull-right {float: right;}\n" + 
@@ -533,6 +533,8 @@ function UtilsService(CacheService, _) {
         } else {
             ret += "@page { @top-right { font-size: 10px; content: '" + displayTime + "';}}\n";
         }
+        if (landscape)
+            ret += "@page {size: 11in 8.5in;}";
                 //"@page{prince-shrink-to-fit:auto;size: A4 portrait;margin-left:8mm;margin-right:8mm;}";
         return ret;
     };
