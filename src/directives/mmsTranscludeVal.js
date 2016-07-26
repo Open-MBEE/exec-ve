@@ -77,7 +77,9 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                 e.stopPropagation();
         
         });
-
+        scope.addHtml = function(value) {
+            value.string = "<p>" + value.string + "</p>";
+        };
         var recompile = function() {
             if (scope.recompileScope)
                 scope.recompileScope.$destroy();
