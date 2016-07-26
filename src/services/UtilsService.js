@@ -420,14 +420,16 @@ function UtilsService(CacheService, _) {
     var makeTablesAndFiguresTOCChild = function(child, printElement, ob) {
         var sysmlid = child.data.sysmlid;
         var el = printElement.find('#' + sysmlid);
+        var refs = printElement.find('mms-view-link[data-mms-peid="' + sysmlid + '"]');
         if (child.type === 'table') {
             ob.tableCount++;
             ob.tables += '<li><a href="#' + sysmlid + '">' + ob.tableCount + '. ' + child.label + '</a></li>';
             var cap = el.find('table > caption');
             cap.html('Table ' + ob.tableCount + '. ' + cap.html());
             if (cap.length === 0) {
-
+                //var table = el.find('table');
             }
+            refs.html('<a href="#' + sysmlid + '">' + cap.text() + '</a>');
         } 
         if (child.type === 'figure') {
             ob.figureCount++;
@@ -436,8 +438,10 @@ function UtilsService(CacheService, _) {
             cap2.html('Figure ' + ob.figureCount + '. ' + cap2.html());
             if (cap2.length === 0) {
                 var image = el.find('img');
-                image.wrap('<figure></figure>').after('<figcaption>' + ob.figureCount + '. ' + child.label + '</figcaption>');
+                image.wrap('<figure></figure>').after('<figcaption>Figure ' + ob.figureCount + '. ' + child.label + '</figcaption>');
+                cap2 = el.find('figure > figcaption');
             }
+            refs.html('<a href="#' + sysmlid + '">' + cap2.text() + '</a>');
         }
         child.children.forEach(function(child2) {
             makeTablesAndFiguresTOCChild(child2, printElement, ob);
