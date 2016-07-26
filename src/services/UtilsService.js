@@ -423,9 +423,9 @@ function UtilsService(CacheService, _) {
         var refs = printElement.find('mms-view-link[data-mms-peid="' + sysmlid + '"]');
         if (child.type === 'table') {
             ob.tableCount++;
-            ob.tables += '<li><a href="#' + sysmlid + '">' + ob.tableCount + '. ' + child.label + '</a></li>';
+            ob.tables += '<li><a href="#' + sysmlid + '">' + ob.tableCount + '. ' + child.data.name + '</a></li>';
             var cap = el.find('table > caption');
-            cap.html('Table ' + ob.tableCount + '. ' + cap.html());
+            cap.html('Table ' + ob.tableCount + '. ' + child.data.name);//cap.html());
             if (cap.length === 0) {
                 //var table = el.find('table');
             }
@@ -433,12 +433,12 @@ function UtilsService(CacheService, _) {
         } 
         if (child.type === 'figure') {
             ob.figureCount++;
-            ob.figures += '<li><a href="#' + sysmlid + '">' + ob.figureCount + '. ' + child.label + '</a></li>';
+            ob.figures += '<li><a href="#' + sysmlid + '">' + ob.figureCount + '. ' + child.data.name + '</a></li>';
             var cap2 = el.find('figure > figcaption');
-            cap2.html('Figure ' + ob.figureCount + '. ' + cap2.html());
+            cap2.html('Figure ' + ob.figureCount + '. ' + child.data.name);//cap2.html());
             if (cap2.length === 0) {
                 var image = el.find('img');
-                image.wrap('<figure></figure>').after('<figcaption>Figure ' + ob.figureCount + '. ' + child.label + '</figcaption>');
+                image.wrap('<figure></figure>').after('<figcaption>Figure ' + ob.figureCount + '. ' + child.data.name + '</figcaption>');
                 cap2 = el.find('figure > figcaption');
             }
             refs.html('<a href="#' + sysmlid + '">' + cap2.text() + '</a>');
