@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsSpec', ['Utils','ElementService', 'WorkspaceService', 'ConfigService', 'UtilsService', '$compile', '$templateCache', '$modal', '$q', 'growl', '_', mmsSpec]);
+.directive('mmsSpec', ['Utils','ElementService', 'WorkspaceService', 'ConfigService', 'UtilsService', '$compile', '$templateCache', '$uibModal', '$q', 'growl', '_', mmsSpec]);
 
 /**
  * @ngdoc directive
@@ -10,7 +10,7 @@ angular.module('mms.directives')
  * @requires mms.ElementService
  * @requires $compile
  * @requires $templateCache
- * @requires $modal
+ * @requires $uibModal
  * @requires $q
  * @requires growl
  * @requires _
@@ -73,7 +73,7 @@ angular.module('mms.directives')
  * @param {Object=} mmsElement An element object, if this is provided, a read only
  *      element spec for it would be shown, this will not use mms services to get the element
  */
-function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsService, $compile, $templateCache, $modal, $q, growl, _) {
+function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsService, $compile, $templateCache, $uibModal, $q, growl, _) {
     //var readTemplate = $templateCache.get('mms/templates/mmsSpec.html');
     //var editTemplate = $templateCache.get('mms/templates/mmsSpecEdit.html');
     var template = $templateCache.get('mms/templates/mmsSpec.html');
@@ -268,18 +268,18 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
             Utils.revertEdits(scope, null, true);
         };
 
-        var conflictCtrl = function($scope, $modalInstance) {
+        var conflictCtrl = function($scope, $uibModalInstance) {
             $scope.ok = function() {
-                $modalInstance.close('ok');
+                $uibModalInstance.close('ok');
             };
             $scope.cancel = function() {
-                $modalInstance.close('cancel');
+                $uibModalInstance.close('cancel');
             };
             $scope.force = function() {
-                $modalInstance.close('force');
+                $uibModalInstance.close('force');
             };
             $scope.merge = function() {
-                $modalInstance.close('merge');
+                $uibModalInstance.close('merge');
             };
         };
 

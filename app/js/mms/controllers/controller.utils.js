@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mmsApp')
-.factory('MmsAppUtils', ['$q','$state', '$modal','$timeout', '$location', '$window', '$templateCache','$rootScope','$compile', '$filter', 'WorkspaceService','ConfigService','ElementService','ViewService', 'UtilsService', 'growl','_', MmsAppUtils]);
+.factory('MmsAppUtils', ['$q','$state', '$uibModal','$timeout', '$location', '$window', '$templateCache','$rootScope','$compile', '$filter', 'WorkspaceService','ConfigService','ElementService','ViewService', 'UtilsService', 'growl','_', MmsAppUtils]);
 
 /**
  * @ngdoc service
@@ -10,9 +10,9 @@ angular.module('mmsApp')
  * @description
  * Utilities
  */
-function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $templateCache, $rootScope, $compile, $filter, WorkspaceService, ConfigService, ElementService, ViewService, UtilsService, growl, _) {
+function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templateCache, $rootScope, $compile, $filter, WorkspaceService, ConfigService, ElementService, ViewService, UtilsService, growl, _) {
 
-    var addElementCtrl = function($scope, $modalInstance, $filter) {
+    var addElementCtrl = function($scope, $uibModalInstance, $filter) {
 
         $scope.oking = false;
         $scope.newItem = {};
@@ -70,7 +70,7 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
                 // Broadcast message to TreeCtrl:
                 $rootScope.$broadcast('viewctrl.add.element', element, $scope.presentationElemType.toLowerCase(), $scope.viewOrSection);
                 growl.success("Adding "+$scope.presentationElemType+"  Successful");
-                $modalInstance.close(data);
+                $uibModalInstance.close(data);
             }, function(reason) {
                 growl.error($scope.presentationElemType+" Add Error: " + reason.message);
             }).finally(function() {
@@ -96,7 +96,7 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
                 $rootScope.$broadcast('viewctrl.add.element', data, elemType, $scope.viewOrSection);
                 $rootScope.$broadcast('view-reorder.refresh');
                 growl.success("Adding "+$scope.presentationElemType+"  Successful");
-                $modalInstance.close(data);
+                $uibModalInstance.close(data);
             }, function(reason) {
                 growl.error($scope.presentationElemType+" Add Error: " + reason.message);
             }).finally(function() {
@@ -105,7 +105,7 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
         };
 
         $scope.cancel = function() {
-            $modalInstance.dismiss();
+            $uibModalInstance.dismiss();
         };
 
     };
@@ -150,10 +150,10 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
           $scope.newItem.name = "";
           var templateUrlStr = 'partials/mms/add-item.html';
 
-          var instance = $modal.open({
+          var instance = $uibModal.open({
               templateUrl: templateUrlStr,
               scope: $scope,
-              controller: ['$scope', '$modalInstance', '$filter', addElementCtrl]
+              controller: ['$scope', '$uibModalInstance', '$filter', addElementCtrl]
           });
           instance.result.then(function(data) {
               // TODO: do anything here?
@@ -162,18 +162,18 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
     };
 
     var tableToCsv = function(ob, ws, time, isDoc) { //Export to CSV button Pop-up Generated Here
-         var modalInstance = $modal.open({
+         var modalInstance = $uibModal.open({
             templateUrl: 'partials/mms/tableExport.html',
-            controller: function($scope, $modalInstance, type) {
+            controller: function($scope, $uibModalInstance, type) {
                 $scope.type = type;
                 $scope.export = function() {
-                    $modalInstance.close('export');
+                    $uibModalInstance.close('export');
                 };
                 // $scope.fulldoc = function() {
-                //     $modalInstance.close('fulldoc');
+                //     $uibModalInstance.close('fulldoc');
                 // };
                 $scope.cancel = function() {
-                    $modalInstance.dismiss();
+                    $uibModalInstance.dismiss();
                 };
             },
             resolve: {
@@ -256,9 +256,9 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
     */
     var printModal = function(ob, ws, site, time, tag, isDoc, mode) {
         var deferred = $q.defer();
-        var modalInstance = $modal.open({
+        var modalInstance = $uibModal.open({
             templateUrl: 'partials/mms/printConfirm.html',
-            controller: function($scope, $modalInstance) {
+            controller: function($scope, $uibModalInstance) {
                 $scope.type = isDoc ? 'DOCUMENT' : 'VIEW';
                 $scope.action = 'print';
                 $scope.genpdf = false;
@@ -272,13 +272,13 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
                 $scope.docOption = (!isDoc && mode === 3);
                 $scope.model = {genCover: false, genTotf: false, landscape: false};
                 $scope.print = function() {
-                    $modalInstance.close(['ok', $scope.model.genCover, $scope.model.genTotf, $scope.model.landscape]);
+                    $uibModalInstance.close(['ok', $scope.model.genCover, $scope.model.genTotf, $scope.model.landscape]);
                 };
                 $scope.fulldoc = function() {
-                    $modalInstance.close(['fulldoc']);
+                    $uibModalInstance.close(['fulldoc']);
                 };
                 $scope.cancel = function() {
-                    $modalInstance.dismiss();
+                    $uibModalInstance.dismiss();
                 };
             },
             backdrop: 'static',

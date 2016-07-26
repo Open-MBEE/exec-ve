@@ -3,10 +3,10 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('TreeCtrl', ['$anchorScroll' , '$q', '$filter', '$location', '$modal', '$scope', '$rootScope', '$state', '$stateParams', '$compile','$timeout', 'growl', 
+.controller('TreeCtrl', ['$anchorScroll' , '$q', '$filter', '$location', '$uibModal', '$scope', '$rootScope', '$state', '$stateParams', '$compile','$timeout', 'growl', 
                           'UxService', 'ConfigService', 'ElementService', 'UtilsService', 'WorkspaceService', 'ViewService', 'MmsAppUtils',
                           'workspaces', 'workspaceObj', 'tag', 'sites', 'site', 'document', 'views', 'view', 'time', 'configSnapshots', 'docFilter',
-function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $state, $stateParams, $compile, $timeout, growl, UxService, ConfigService, ElementService, UtilsService, WorkspaceService, ViewService, MmsAppUtils, workspaces, workspaceObj, tag, sites, site, document, views, view, time, configSnapshots, docFilter) {
+function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $stateParams, $compile, $timeout, growl, UxService, ConfigService, ElementService, UtilsService, WorkspaceService, ViewService, MmsAppUtils, workspaces, workspaceObj, tag, sites, site, document, views, view, time, configSnapshots, docFilter) {
 
     $rootScope.mms_bbApi = $scope.bbApi = {};
     $rootScope.mms_treeApi = $scope.treeApi = {};
@@ -144,10 +144,10 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
         var templateUrlStr = 'partials/mms/new-tag.html';
         var branchType = 'configuration';
 
-        var instance = $modal.open({
+        var instance = $uibModal.open({
             templateUrl: templateUrlStr,
             scope: $scope,
-            controller: ['$scope', '$modalInstance', '$filter', addItemCtrl]
+            controller: ['$scope', '$uibModalInstance', '$filter', addItemCtrl]
         });
         instance.result.then(function(data) {
 
@@ -227,7 +227,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
             }
         }
                 
-        var modalInstance = $modal.open({
+        var modalInstance = $uibModal.open({
 	        templateUrl: 'partials/mms/merge_assistant.html',
 	        controller: 'WorkspaceMergeAssistant'
         });
@@ -743,10 +743,10 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
         
         // Adds the branch:
         var myAddBranch = function() {
-            var instance = $modal.open({
+            var instance = $uibModal.open({
                 templateUrl: templateUrlStr,
                 scope: $scope,
-                controller: ['$scope', '$modalInstance', '$filter', addItemCtrl]
+                controller: ['$scope', '$uibModalInstance', '$filter', addItemCtrl]
             });
             instance.result.then(function(data) {
                 var newbranch = {
@@ -894,11 +894,11 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
                 //allViewLevel2Func(); //TODO remove when priority queue is done
             } else {
                 if (document.specialization.view2view && document.specialization.view2view.length > 30) {
-                    var instance = $modal.open({
+                    var instance = $uibModal.open({
                         templateUrl: 'partials/mms/fullDocWarn.html',
-                        controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
-                            $scope.ok = function() {$modalInstance.close('ok');};
-                            $scope.cancel = function() {$modalInstance.close('cancel');};
+                        controller: ['$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
+                            $scope.ok = function() {$uibModalInstance.close('ok');};
+                            $scope.cancel = function() {$uibModalInstance.close('cancel');};
                         }],
                         size: 'sm'
                     });
@@ -940,10 +940,10 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
         }
         // TODO: do not pass selected branch in scope, move page to generic location
         $scope.deleteBranch = branch;
-        var instance = $modal.open({
+        var instance = $uibModal.open({
             templateUrl: 'partials/mms/delete.html',
             scope: $scope,
-            controller: ['$scope', '$modalInstance', deleteCtrl]
+            controller: ['$scope', '$uibModalInstance', deleteCtrl]
         });
         instance.result.then(function(data) {
             // If the deleted item is a configration, then all of its child workspaces
@@ -963,7 +963,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
     };
 
     // TODO: Make this a generic delete controller
-    var deleteCtrl = function($scope, $modalInstance) {
+    var deleteCtrl = function($scope, $uibModalInstance) {
         $scope.oking = false;
         var branch = $scope.deleteBranch;
         if (branch.type === 'workspace')
@@ -1001,7 +1001,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
             }
             promise.then(function(data) {
                 growl.success($scope.type + " Deleted");
-                $modalInstance.close('ok');
+                $uibModalInstance.close('ok');
             }, function(reason) {
                 growl.error($scope.type + ' Delete Error: ' + reason.message);
             }).finally(function() {
@@ -1009,12 +1009,12 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
             });
         };
         $scope.cancel = function() {
-            $modalInstance.dismiss();
+            $uibModalInstance.dismiss();
         };
     };
 
     // Generic add controller    
-    var addItemCtrl = function($scope, $modalInstance, $filter) {
+    var addItemCtrl = function($scope, $uibModalInstance, $filter) {
         $scope.createForm = true;
         $scope.oking = false;
         var displayName = "";
@@ -1087,7 +1087,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
                 ViewService.addViewToParentView(viewId, documentId, parentViewId, $scope.newViewAggr.type, workspace, viewOb)
                 .then(function(data) {
                     growl.success("View Added");
-                    $modalInstance.close(viewOb);
+                    $uibModalInstance.close(viewOb);
                 }, function(reason) {
                     growl.error("View Add Error: " + reason.message);
                 }).finally(function() {
@@ -1152,7 +1152,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
                     growl.info('Please wait for a completion email prior to viewing of the tag.');
                 }
 
-                $modalInstance.close(data);
+                $uibModalInstance.close(data);
             }, function(reason) {
                 growl.error("Create "+displayName+" Error: " + reason.message);
             }).finally(function() {
@@ -1161,7 +1161,7 @@ function($anchorScroll, $q, $filter, $location, $modal, $scope, $rootScope, $sta
         };
 
         $scope.cancel = function() {
-            $modalInstance.dismiss();
+            $uibModalInstance.dismiss();
         };
 
     };
