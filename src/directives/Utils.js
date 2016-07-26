@@ -410,6 +410,8 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
                      };
         if (type === 'name' || type === 'documentation') {
             myEdit[type] = scope.edit[type];
+            if (scope.edit.name !== scope.element.name) //if editing presentation element name
+                myEdit.name = scope.edit.name;
         } else if (type === 'value') {
             if (scope.edit.specialization.type === 'Property' && angular.isArray(scope.edit.specialization.value)) {
                 myEdit.specialization = {
