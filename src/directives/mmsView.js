@@ -298,9 +298,9 @@ function mmsView(ViewService, $templateCache, $rootScope, growl) {
             mmsVersion: '@',
             mmsTag: '@',
             mmsNumber: '@',
-            mmsLink: '=',
+            mmsLink: '<',
             mmsCfClicked: '&',
-            mmsViewApi: '=',
+            mmsViewApi: '<',
             mmsTranscluded: '&'
         },
         controller: ['$scope', mmsViewCtrl],

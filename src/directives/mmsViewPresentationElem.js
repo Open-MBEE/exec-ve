@@ -99,8 +99,8 @@ function mmsViewPresentationElem(ViewService, ElementService, $templateCache, $r
         template: template,
         require: '?^mmsView',
         scope: {
-            mmsInstanceVal: '=',
-            mmsParentSection: '=',
+            mmsInstanceVal: '<',
+            mmsParentSection: '<',
         },
         controller: ['$scope', '$rootScope', mmsViewPresentationElemCtrl],
         link: mmsViewPresentationElemLink

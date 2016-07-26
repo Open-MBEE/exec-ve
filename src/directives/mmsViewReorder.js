@@ -203,8 +203,7 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
             mmsVid: '@',
             mmsWs: '@',
             mmsVersion: '@',
-            mmsOrder: '=',
-            mmsViewReorderApi: '='
+            mmsViewReorderApi: '<'
         },
         controller: ['$scope', 'ViewService', mmsViewReorderCtrl],
         link: mmsViewReorderLink

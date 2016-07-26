@@ -229,7 +229,7 @@ function mmsNav($templateCache, $state, hotkeys, growl, $location, $uibModal, $h
         template: template,
         scope: {
             title: '@mmsTitle', //page title - used in mobile view only
-            site: '=mmsSite'
+            site: '<mmsSite'
         },
         link: mmsNavLink
     };

@@ -30,9 +30,6 @@ angular.module('mms.directives')
    <textarea mms-ckeditor ng-model="element.documentation"></textarea>
    </pre>
  *
- * @param {Array=} mmsCfElements Array of element objects as returned by ElementService
- *      that can be transcluded. Regardless, transclusion allows keyword searching 
- *      elements to transclude from alfresco
  */
 function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $uibModal, $templateCache, $window, $timeout, growl, CKEDITOR, _) { //depends on angular bootstrap
     var generatedIds = 0;
@@ -517,12 +514,11 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
         restrict: 'A',
         require: 'ngModel',
         scope: {
-            mmsCfElements: '=',
             mmsEid: '@',
             mmsWs: '@',
             mmsSite: '@',
             mmsEditorType: '@',
-            mmsEditorApi: '='
+            mmsEditorApi: '<?'
         },
         link: mmsCkeditorLink
     };

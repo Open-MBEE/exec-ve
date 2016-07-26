@@ -708,14 +708,14 @@ function mmsTree($timeout, $log, $templateCache) {
         template: $templateCache.get('mms/templates/mmsTree.html'),
         // replace: true,
         scope: {
-            treeData: '=',
-            sectionNumbering: '=',
+            treeData: '<',
+            sectionNumbering: '<',
             onSelect: '&?',
             onDblclick: '&?',
             initialSelection: '@',
-            treeControl: '=',
-            search: '=',
-            options: '='
+            treeControl: '<',
+            search: '<',
+            options: '<'
         },
         link: mmsTreeLink
     };

@@ -141,7 +141,7 @@ function mmsSearch(ElementService, growl, $rootScope, $templateCache) {
         template: template,
         link: mmsSearchLink,
         scope: {
-            mmsOptions: '=',
+            mmsOptions: '<',
             mmsWs: '@',
         },
     };

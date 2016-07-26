@@ -67,9 +67,6 @@ angular.module('mms.directives')
  * @param {string=latest} mmsVersion Version can be alfresco version number or timestamp, default is latest
  * @param {string=all} mmsEditField "all" or "none"
  * @param {Object=} mmsSpecApi An empty object that'll be populated with api methods
- * @param {Array=} mmsCfElements Array of element objects as returned by ElementService
- *      that can be transcluded into documentation or string values. Regardless, transclusion
- *      allows keyword searching elements to transclude from alfresco
  * @param {Object=} mmsElement An element object, if this is provided, a read only
  *      element spec for it would be shown, this will not use mms services to get the element
  */
@@ -442,10 +439,8 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
             mmsWs: '@',
             mmsSite: '@',
             mmsVersion: '@',
-            mmsCfElements: '=', //array of element objects
-            mmsElement: '=',
-            mmsSpecApi: '=',
-            mmsViewEdit: '=',
+            mmsElement: '<?',
+            mmsSpecApi: '<?',
             mmsType: '@',
             noEdit: '@'
         },

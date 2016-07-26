@@ -120,7 +120,7 @@ function mmsViewTable($compile, $timeout, $document, $templateCache, UtilsServic
         restrict: 'E',
         //template: template,
         scope: {
-            table: '=mmsTable'
+            table: '<mmsTable'
         },
         controller: ['$scope', '$rootScope', mmsViewTableCtrl],
         link: mmsViewTableLink

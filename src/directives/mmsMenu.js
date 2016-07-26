@@ -102,13 +102,13 @@ function mmsMenu(SiteService, WorkspaceService, ConfigService, $state, $template
         scope: {
             title: '@mmsTitle', //page title - used in mobile view only
             ws: '@mmsWs',
-            site: '=mmsSite', //site object
-            product: '=mmsDoc', //document object
-            config: '=mmsConfig', //config object
+            site: '<mmsSite', //site object
+            product: '<mmsDoc', //document object
+            config: '<mmsConfig', //config object
             snapshot: '@mmsSnapshotTag', // snapshot titles (before tags - need to be backward compatible), if any
             showTag: '@mmsShowTag',
-            tags: '=mmsTags',
-            workspaces: '=mmsWorkspaces'
+            tags: '<mmsTags',
+            workspaces: '<mmsWorkspaces'
         },
         link: mmsMenuLink
     };
