@@ -233,20 +233,30 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $uibModal, $window,
         var prev = $rootScope.mms_treeApi.get_prev_branch($rootScope.mms_treeApi.get_selected_branch());
         if (!prev)
             return;
+        while (prev.type !== 'view' && prev.type !== 'section') {
+            prev = $rootScope.mms_treeApi.get_prev_branch(prev);
+            if (!prev)
+                return;
+        }
         $scope.bbApi.toggleButtonSpinner('center-previous');
         $rootScope.mms_treeApi.select_branch(prev);
-        if (prev.type === 'section')
-            $scope.bbApi.toggleButtonSpinner('center-previous');
+        //if (prev.type === 'section')
+        $scope.bbApi.toggleButtonSpinner('center-previous');
     });
 
     $scope.$on('center-next', function() {
         var next = $rootScope.mms_treeApi.get_next_branch($rootScope.mms_treeApi.get_selected_branch());
         if (!next)
             return;
+        while (next.type !== 'view' && next.type !== 'section') {
+            next = $rootScope.mms_treeApi.get_next_branch(next);
+            if (!next)
+                return;
+        }
         $scope.bbApi.toggleButtonSpinner('center-next');
         $rootScope.mms_treeApi.select_branch(next);
-        if (next.type === 'section')
-            $scope.bbApi.toggleButtonSpinner('center-next');
+        //if (next.type === 'section')
+        $scope.bbApi.toggleButtonSpinner('center-next');
     });
 
     if (view) {
