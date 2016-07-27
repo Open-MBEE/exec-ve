@@ -77,7 +77,7 @@ function mmsViewPresentationElem(ViewService, ElementService, $templateCache, $r
                     }
                     element.click(function(e) {
                         if (mmsViewCtrl)
-                            mmsViewCtrl.transcludeClicked(instanceSpec.sysmlid);
+                            mmsViewCtrl.transcludeClicked(instanceSpec.sysmlid, ws, version);
                         e.stopPropagation();
                     });
                 });
