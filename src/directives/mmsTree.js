@@ -287,7 +287,8 @@ function mmsTree($timeout, $log, $templateCache) {
                 }
                 
                 branch.section = section;
-
+                if (branch.hide)
+                    visible = false;
                 scope.tree_rows.push({
                     level: level,
                     section: section,

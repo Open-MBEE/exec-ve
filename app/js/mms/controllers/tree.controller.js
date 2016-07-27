@@ -10,6 +10,8 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
 
     $rootScope.mms_bbApi = $scope.bbApi = {};
     $rootScope.mms_treeApi = $scope.treeApi = {};
+    if (!$rootScope.veTreeShowPe)
+        $rootScope.veTreeShowPe = false;
     $scope.buttons = [];
     $scope.treeExpandLevel = 1;
     if ($state.includes('workspace.sites') && !$state.includes('workspace.site.document')) 
@@ -62,6 +64,8 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         $scope.bbApi.setPermission("tree-add-document", config == 'latest' ? true : false);
         $scope.bbApi.setPermission("tree-delete-document", config == 'latest' ? true : false);
       } else if ($state.includes('workspace.site.document')) {
+        $scope.bbApi.addButton(UxService.getButtonBarButton("tree-show-pe"));
+        $scope.bbApi.setToggleState('tree-show-pe', $rootScope.veTreeShowPe);
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree-reorder-view"));
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree-full-document"));
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree-add-view"));
@@ -126,6 +130,13 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         $rootScope.mms_fullDocMode = false;
         $scope.bbApi.setToggleState("tree-full-document", false);
         $state.go('workspace.site.document.order', {search: undefined});
+    });
+
+    $scope.$on('tree-show-pe', function() {
+        $scope.bbApi.toggleButtonState('tree-show-pe');
+        $rootScope.veTreeShowPe = !$rootScope.veTreeShowPe;
+        setPeVisibility(viewId2node[document.sysmlid]);
+        $scope.treeApi.refresh();
     });
 
     var creatingSnapshot = false;
@@ -529,6 +540,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 var k = results.length - 1;
                 for (; k >= 0; k--) {
                     var instance = results[k];
+                    var hide = !$rootScope.veTreeShowPe;
                     instance.relatedDocuments = [
                         {
                             parentViews: [{
@@ -557,6 +569,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                             type : "figure",
                             view : viewNode.data.sysmlid,
                             data : instance,
+                            hide: hide,
                             children: []
                         };
                         parentNode.children.unshift(figureTreeNode);
@@ -566,6 +579,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                             type : "table",
                             view : viewNode.data.sysmlid,
                             data : instance,
+                            hide: hide,
                             children: []
                         };
                         parentNode.children.unshift(tableTreeNode);
@@ -1185,6 +1199,16 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             }
         }
     }
+
+    function setPeVisibility(branch) {
+        if (branch.type === 'figure' || branch.type === 'table') {
+            branch.hide = !$rootScope.veTreeShowPe;
+        }
+        for (var i = 0; i < branch.children.length; i++) {
+            setPeVisibility(branch.children[i]);
+        }
+    }
+
     // MmsAppUtils.addElementCtrl creates this event when adding sections, table and figures to the view
     $scope.$on('viewctrl.add.element', function(event, instanceSpec, elemType, parentBranchData) {
         if (elemType === 'paragraph' || elemType === 'list' || elemType === 'comment')
@@ -1200,6 +1224,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             type: (elemType === 'image' ? 'figure' : elemType),
             view: viewid,
             data: instanceSpec,
+            hide: !$rootScope.veTreeShowPe,
             children: [],
         };
         var i = 0;
