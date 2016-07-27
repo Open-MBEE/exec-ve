@@ -341,8 +341,8 @@ function($scope, $rootScope, $state, $modal, $q, $stateParams, $timeout, ConfigS
             growl.info('Nothing to save');
             return;
         }
-        if ($scope.specApi && $scope.specApi.tinymceSave)
-            $scope.specApi.tinymceSave();
+        if ($scope.specApi && $scope.specApi.editorSave)
+            $scope.specApi.editorSave();
         savingAll = true;
         $rootScope.mms_tbApi.toggleButtonSpinner('element-editor-saveall');
         var promises = [];

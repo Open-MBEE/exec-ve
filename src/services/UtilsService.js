@@ -457,7 +457,7 @@ function UtilsService(CacheService, _) {
                 "th {background-color: #f2f3f2;}\n" + 
                 "h1 {font-size: 20px; padding: 0px; margin: 4px;}\n" +
                 ".ng-hide {display: none;}\n" +
-                "body {font-size: 9pt; font-family: Georgia, 'Times New Roman', serif; }\n" + 
+                "body {font-size: 9pt; font-family: 'Times New Roman', Times, serif; }\n" + 
                 "caption, figcaption {text-align: center; font-weight: bold;}\n" +
                 ".toc, .tof, .tot {page-break-after:always;}\n" +
                 ".toc a, .tof a, .tot a { text-decoration:none; color: #000; font-size:9pt; }\n" + 

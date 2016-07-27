@@ -31,7 +31,7 @@ function($scope, $location, $rootScope, $state, _, $window, $modal, growl, $http
             description: 'close all messages',
             callback: function() {growlMessages.destroyAllMessages();}
         }).add({
-            combo: '@',
+            combo: 'shift+tab',
             description: 'fast cf in editor',
             callback: function() {}
         });
