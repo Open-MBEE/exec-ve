@@ -291,6 +291,8 @@ function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templ
                     var css = UtilsService.getPrintCss(result.header, result.footer, result.dnum, result.tag, result.displayTime, choice[3]);
                     var cover = result.cover;
                     var toc = result.toc;
+                    var tof = result.tof;
+                    var tot = result.tot;
                     var contents = result.contents;
                     if (mode === 1 || mode === 2) {
                         var inst = '';
@@ -299,7 +301,7 @@ function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templ
                         }
                         var popupWin = $window.open('about:blank', '_blank', 'width=800,height=600,scrollbars=1,status=1,toolbar=1,menubar=1');
                         popupWin.document.open();
-                        popupWin.document.write('<html><head><style>' + css + '</style></head><body style="overflow: auto">' + inst + cover + toc + contents + '</body></html>');
+                        popupWin.document.write('<html><head><style>' + css + '</style></head><body style="overflow: auto">' + inst + cover + toc + tot + tof + contents + '</body></html>');
                         popupWin.document.close();
                         if (mode === 1) {
                             $timeout(function() {
@@ -316,6 +318,8 @@ function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templ
                             time: time,
                             displayTime: result.displayTime,
                             toc: result.toc,
+                            tof: result.tof,
+                            tot: result.tot,
                             dnum: result.dnum,
                             workspace: ws,
                             customCss: css,
@@ -389,10 +393,13 @@ function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templ
         var prefix = protocol + '://' + hostname + ((port == 80 || port == 443) ? '' : (':' + port));
         var mmsIndex = absurl.indexOf('mms.html');
         var toc = '';
+        var tof = '';
+        var tot = '';
         if (isDoc) {
             toc = UtilsService.makeHtmlTOC($rootScope.mms_treeApi.get_rows());
             var tableAndFigTOC = UtilsService.makeTablesAndFiguresTOC($rootScope.mms_treeApi.get_rows(), printElementCopy);
-            toc = toc + tableAndFigTOC.figures + tableAndFigTOC.tables;
+            tof = tableAndFigTOC.figures;
+            tot = tableAndFigTOC.tables;
         }
         angular.element(printElementCopy).find("a").attr('href', function(index, old) {
             if (!old)
@@ -451,7 +458,7 @@ function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templ
         if (tag)
             tagname = tag.name;
         if (!isDoc) {
-            deferred.resolve({cover: cover, contents: printContents, header: header, footer: footer, displayTime: displayTime, dnum: dnum, version: version, toc: toc, tag: tagname});
+            deferred.resolve({cover: cover, contents: printContents, header: header, footer: footer, displayTime: displayTime, dnum: dnum, version: version, toc: toc, tag: tagname, tof: tof, tot: tot});
             return deferred.promise;
         }
         ViewService.getDocMetadata(ob.sysmlid, ws, null, 2)
@@ -474,7 +481,7 @@ function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templ
                 if (genCover) {
                     cover = coverTemplateElement[0].innerHTML;
                 }
-                deferred.resolve({cover: cover, contents: printContents, header: header, footer: footer, displayTime: displayTime, dnum: dnum, version: version, toc: toc, tag: tagname});
+                deferred.resolve({cover: cover, contents: printContents, header: header, footer: footer, displayTime: displayTime, dnum: dnum, version: version, toc: toc, tag: tagname, tof: tof, tot: tot});
             }, 0, false);
         });
         return deferred.promise;
