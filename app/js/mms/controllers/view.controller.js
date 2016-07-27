@@ -3,14 +3,16 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('ViewCtrl', ['$scope', '$rootScope', '$state', '$stateParams', '$timeout', '$uibModal', '$window', 'viewElements', 'MmsAppUtils', 'ElementService', 'ViewService', 'ConfigService', 'time', 'search', 'growl', 'workspace', 'site', 'document', 'view', 'tag', 'snapshot', 'UxService', 'hotkeys',
-function($scope, $rootScope, $state, $stateParams, $timeout, $uibModal, $window, viewElements, MmsAppUtils, ElementService, ViewService, ConfigService, time, search, growl, workspace, site, document, view, tag, snapshot, UxService, hotkeys) {
+.controller('ViewCtrl', ['$scope', '$rootScope', '$state', '$stateParams', '$timeout', '$uibModal', '$window', 'viewElements', 'MmsAppUtils', 'ElementService', 'ViewService', 'ConfigService', 'time', 'search', 'growl', 'workspace', 'site', 'document', 'view', 'tag', 'snapshot', 'UxService', 'hotkeys', '$element',
+function($scope, $rootScope, $state, $stateParams, $timeout, $uibModal, $window, viewElements, MmsAppUtils, ElementService, ViewService, ConfigService, time, search, growl, workspace, site, document, view, tag, snapshot, UxService, hotkeys, $element) {
     
-    /*$scope.$on('$viewContentLoaded', 
-        function(event) {
-            $rootScope.mms_viewContentLoading = false; 
+    function searchLoading() {
+        if ($element.find('.isLoading').length > 0) {
+            growl.warning("Still loading!");
+            return true;
         }
-    );*/
+        return false;
+    }
 
     if ($state.includes('workspace') && !$state.includes('workspace.sites')) {
         $rootScope.mms_showSiteDocLink = true;
@@ -141,6 +143,8 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $uibModal, $window,
 
 
     $scope.$on('convert-pdf', function() {
+        if (searchLoading())
+            return;
         MmsAppUtils.printModal(view, $scope.ws, site, time, tag, false, 3);
     });
 
@@ -322,9 +326,13 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $uibModal, $window,
     if ($state.includes('workspace.site.document'))
         docOption = true;
     $scope.$on('print', function() {
+        if (searchLoading())
+            return;
         MmsAppUtils.printModal(view, $scope.ws, site, time, tag, false, 1);
     });
     $scope.$on('word', function() {
+        if (searchLoading())
+            return;
         MmsAppUtils.printModal(view, $scope.ws, site, time, tag, false, 2);
     });
     $scope.$on('tabletocsv', function() {

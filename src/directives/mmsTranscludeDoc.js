@@ -165,6 +165,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                     version = viewVersion.version;
             }
             element.html('(loading...)');
+            element.addClass("isLoading");
             scope.ws = ws;
             scope.version = version ? version : 'latest';
             ElementService.getElement(scope.mmsEid, false, ws, version, 1)
@@ -237,6 +238,8 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                     status = ' deleted';
                 element.html('<span class="mms-error">doc cf ' + newVal + status + '</span>');
                 //growl.error('Cf Doc Error: ' + reason.message + ': ' + scope.mmsEid);
+            }).finally(function() {
+                element.removeClass("isLoading");
             });
         });
 

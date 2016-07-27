@@ -144,6 +144,7 @@ function mmsView(ViewService, $templateCache, $rootScope, growl) {
             if (!newVal || (newVal === oldVal && processed))
                 return;
             processed = true;
+            element.addClass('isLoading');
             ViewService.getView(scope.mmsVid, false, scope.mmsWs, scope.mmsVersion, 1)
             .then(function(data) {
                 if (scope.mmsVersion && scope.mmsVersion !== 'latest') {
@@ -186,9 +187,14 @@ function mmsView(ViewService, $templateCache, $rootScope, growl) {
                     scope.view = data;
                     scope.modified = data.modified;
                     scope.modifier = data.modifier;
+                }).finally(function() {
+                    element.removeClass('isLoading');
                 });
             }, function(reason) {
                 growl.error('Getting View Error: ' + reason.message + ': ' + scope.mmsVid);
+            }).finally(function() {
+                if (scope.view)
+                    element.removeClass('isLoading');
             });
         };
         scope.$watch('mmsVid', changeView);

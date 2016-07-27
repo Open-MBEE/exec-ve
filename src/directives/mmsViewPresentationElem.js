@@ -56,6 +56,7 @@ function mmsViewPresentationElem(ViewService, ElementService, $templateCache, $r
                 version = viewVersion.version;
             }
             // Parse the element reference tree for the presentation element:
+            element.addClass("isLoading");
             ViewService.parseExprRefTree(scope.mmsInstanceVal, ws, version, 1)
             .then(function(elem) {
                 scope.presentationElem = elem;
@@ -90,7 +91,9 @@ function mmsViewPresentationElem(ViewService, ElementService, $templateCache, $r
                         status = ' deleted';
                     element.html('<span class="mms-error">View element reference error: ' + scope.mmsInstanceVal.instance + ' ' + status + '</span>');
                 }//growl.error('View Element Ref Error: ' + scope.mmsInstanceVal.instance + ' ' + reason.message);
-            });
+            }).finally(function() {
+                element.removeClass("isLoading");
+            }); 
         } 
     };
 

@@ -4,12 +4,22 @@
 
 angular.module('mmsApp')
 
-.controller('FullDocCtrl', ['$scope', '$templateCache', '$compile', '$timeout', '$rootScope', '$state', '$stateParams', '$window', 'MmsAppUtils', 'document', 'workspace', 'site', 'snapshot', 'time', 'tag', 'ConfigService', 'UxService', 'ViewService', 'UtilsService', 'ElementService', '$q', 'growl', 'hotkeys', 'search', '_',
-function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateParams, $window, MmsAppUtils, document, workspace, site, snapshot, time, tag, ConfigService, UxService, ViewService, UtilsService, ElementService, $q, growl, hotkeys, search, _) {
+.controller('FullDocCtrl', ['$scope', '$templateCache', '$compile', '$timeout', '$rootScope', '$state', '$stateParams', '$window', 'MmsAppUtils', 'document', 'workspace', 'site', 'snapshot', 'time', 'tag', 'ConfigService', 'UxService', 'ViewService', 'UtilsService', 'ElementService', '$q', 'growl', 'hotkeys', 'search', '_', '$element',
+function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateParams, $window, MmsAppUtils, document, workspace, site, snapshot, time, tag, ConfigService, UxService, ViewService, UtilsService, ElementService, $q, growl, hotkeys, search, _, $element) {
 
     $scope.ws = $stateParams.workspace;
     $scope.site = site;
     $scope.search = search;
+    
+    function searchLoading(){
+        // or from center pane
+        if ($element.find('.isLoading').length > 0) {
+            growl.warning("Still loading!");
+            return true;
+        }
+        return false;
+    }
+
     var views = [];
     if (!$rootScope.veCommentsOn)
         $rootScope.veCommentsOn = false;
@@ -144,6 +154,8 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
 
     var converting = false;
     $scope.$on('convert-pdf', function() {
+        if (searchLoading())
+            return;
         if (converting) {
             growl.info("Please wait...");
             return;
@@ -202,9 +214,13 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
     });
 
     $scope.$on('print', function() {
+        if (searchLoading())
+            return;
         MmsAppUtils.printModal(document, $scope.ws, site, time, tag, true, 1);
     });
     $scope.$on('word', function() {
+        if (searchLoading())
+            return;
         MmsAppUtils.printModal(document, $scope.ws, site, time, tag, true, 2);
     });
     $scope.$on('tabletocsv', function() {
