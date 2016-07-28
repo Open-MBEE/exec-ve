@@ -392,14 +392,12 @@ function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templ
         var absurl = $location.absUrl();
         var prefix = protocol + '://' + hostname + ((port == 80 || port == 443) ? '' : (':' + port));
         var mmsIndex = absurl.indexOf('mms.html');
-        var toc = '';
-        var tof = '';
-        var tot = '';
-        if (isDoc) {
-            toc = UtilsService.makeHtmlTOC($rootScope.mms_treeApi.get_rows());
-            var tableAndFigTOC = UtilsService.makeTablesAndFiguresTOC($rootScope.mms_treeApi.get_rows(), printElementCopy);
-            tof = tableAndFigTOC.figures;
-            tot = tableAndFigTOC.tables;
+        var toc = UtilsService.makeHtmlTOC($rootScope.mms_treeApi.get_rows());
+        var tableAndFigTOC = UtilsService.makeTablesAndFiguresTOC($rootScope.mms_treeApi.get_rows(), printElementCopy);
+        var tof = tableAndFigTOC.figures;
+        var tot = tableAndFigTOC.tables;
+        if (!isDoc) {
+            toc = tof = tot = '';
         }
         angular.element(printElementCopy).find("a").attr('href', function(index, old) {
             if (!old)
