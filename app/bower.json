@@ -39,7 +39,8 @@
     "c3": "~0.4.10",
     "timely": "git@github.jpl.nasa.gov:SEQR/timely.git#master",
     "angulartics": "~1.0.3",
-    "angulartics-piwik": "~1.0.2"
+    "angulartics-piwik": "~1.0.2",
+    "angular-diff-match-patch": "~0.2.4"
   },
   "resolutions": {
     "lodash": "3.9.3",

@@ -1,10 +1,11 @@
 'use strict';
 
-angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.borderLayout', 'ui.bootstrap', 'ui.router', 'ui.tree', 'angular-growl', 'cfp.hotkeys', 'angulartics', 'angulartics.piwik'])
+angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.borderLayout', 'ui.bootstrap', 'ui.router', 'ui.tree', 'angular-growl', 'cfp.hotkeys', 'angulartics', 'angulartics.piwik', 'diff-match-patch'])
 .config(function($stateProvider, $urlRouterProvider, $httpProvider) {
     // Change the DEFAULT state to workspace.sites on entry
     //$urlRouterProvider.when('', '/workspaces/master/sites');
     //$urlRouterProvider.when('', '/login');
+    
     $urlRouterProvider.rule(function ($injector, $location) {
     // determine if the url is older 2.0 format (will not have a workspace)
          // generate some random client id
