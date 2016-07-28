@@ -29,8 +29,8 @@ function mmsDiffAttr(ElementService) {
         
         //call element at v1 and v2, if v2 empty look at viewController to see inherited timestamp if empty use latest
         // get WS from mmsview
-        var leftElem;
-        var rightElem;
+        var origElem;
+        var compElem;
         // TODO: error checking for missing elements -- util function for http error?? 
         console.log("This is the workspace" + scope.mmsWs);
         console.log("This is the version" + scope.mmsVersionOne);
@@ -43,9 +43,9 @@ function mmsDiffAttr(ElementService) {
             scope.compElem = findElemType(data); 
         });
         var findElemType = function(elem){
-            if(elem.hasOwnProperty('name')){//the key is included and blank
+            if(scope.mmsAttr === 'name'){//the key is included and blank
                 return elem.name;
-            }else if (elem.hasOwnProperty('documentation')) {
+            }else if (scope.mmsAttr === 'doc') {
                 return elem.documentation;
             }else{
                 if(elem.specialization.value[0].type === "LiteralString"){
