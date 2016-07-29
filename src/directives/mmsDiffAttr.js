@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsDiffAttr', ['ElementService', mmsDiffAttr]);
+.directive('mmsDiffAttr', ['ElementService', 'ConfigService', 'URLService','$q', mmsDiffAttr]);
 
 /**
  * @ngdoc directive
@@ -14,38 +14,56 @@ angular.module('mms.directives')
  * @description
  *  Compares a element at two different times and generates a pretty diff. 
  * ## Example
- *  <pre>
-    <mms-diff-attr mms-eid="element-id" mms-attr="name/doc/val" mms-version1="timestamp/latest/tag?" mms-version2="timestamp/latest/tag?"></mms-diff-attr>
-    </pre>
+ * 
+ * <mms-diff-attr mms-eid="element-id" mms-attr="name/doc/val" mms-version1="timestamp/latest/tag?" mms-version2="timestamp/latest/tag?"></mms-diff-attr>
  *
  * @param {string} mmsEid The id of the element whose doc to transclude
  * @param {string=master} mmsWs Workspace to use, defaults to master
  * @param {string=latest} mmsVersion Version can be alfresco version number or timestamp, default is latest
  */
-function mmsDiffAttr(ElementService) {
+function mmsDiffAttr(ElementService, ConfigService, URLService, $q) {
 
-    var mmsDiffAttrLink = function(scope, element, attrs, controllers) {
-        // after complation dom and event handlers
-        
-        //call element at v1 and v2, if v2 empty look at viewController to see inherited timestamp if empty use latest
-        // get WS from mmsview
-        var origElem;
-        var compElem;
+    var mmsDiffAttrLink = function(scope, element, attrs, mmsViewCtrl) {
         // TODO: error checking for missing elements -- util function for http error?? 
-        console.log("This is the workspace" + scope.mmsWs);
-        console.log("This is the version" + scope.mmsVersionOne);
-        ElementService.getElement(scope.mmsEid, false, scope.mmsWs, scope.mmsVersionOne).then(function(data){
-            console.log(data);
-            scope.origElem = findElemType(data);
-        });
-        ElementService.getElement(scope.mmsEid, false, scope.mmsWs, scope.mmsVersionTwo).then(function(data){
-            console.log(data);
-            scope.compElem = findElemType(data); 
-        });
+        var ws = scope.mmsWs;
+        if (mmsViewCtrl) {
+            var viewVersion = mmsViewCtrl.getWsAndVersion();
+            if (!ws)
+                ws = viewVersion.workspace;
+        }
+                
+        // Check if input is a tag, timestamp or neither        
+        var tagOrTimestamp = function(version){
+            var deferred = $q.defer();
+            if(!URLService.isTimestamp(version) && version !== 'latest'){
+                ConfigService.getConfigs(version).then(function(data){
+                        deferred.resolve(data.timestamp);
+                }, function(reason) {
+                    deferred.reject(null);
+                });
+            }else{
+                deferred.resolve(version);
+            }
+            return deferred.promise;
+        };
+        
+        // Get the text to compare for diff
+        var getComparsionText = function(version){
+            var deferred = $q.defer();
+            ElementService.getElement(scope.mmsEid, false, ws, version).then(function(data){
+                deferred.resolve(findElemType(data));
+            }, function(reason) {
+                element.html('<span class="mms-error">'+reason.status+'</span>');
+                deferred.reject(null);
+            });
+            return deferred.promise;
+        };
+        
+        // Find the right key to fetch text
         var findElemType = function(elem){
-            if(scope.mmsAttr === 'name'){//the key is included and blank
+            if(scope.mmsAttr === 'Name'){//the key is included and blank
                 return elem.name;
-            }else if (scope.mmsAttr === 'doc') {
+            }else if (scope.mmsAttr === 'Documentation') {
                 return elem.documentation;
             }else{
                 if(elem.specialization.value[0].type === "LiteralString"){
@@ -55,16 +73,35 @@ function mmsDiffAttr(ElementService) {
                 }else if(elem.specialization.value[0].type === "LiteralBoolean"){
                     return elem.specialization.value[0].integer;
                 }else{
-                    return 'Not Supported';
+                    element.html('<span class="mms-error">Not Supported</span>');
+                    return null;
                 }
                 
             }            
         };
-
-        // Two Jsons: keys are either name and documentaiton string depending on the attribute, then a separte case is value
-        // if value, check for either string, integer, boolean as the key inside the array specialization => 'value':[]
         // example http://localhost:9000/mms.html#/workspaces/master/sites/vetest/documents/_17_0_5_1_407019f_1402422683509_36078_16169/views/_17_0_5_1_407019f_1402422692412_131628_16263
-        
+        var versionOne;
+        var versionTwo;
+        tagOrTimestamp(scope.mmsVersionOne).then(function(data){
+            versionOne = data;
+            getComparsionText(versionOne).then(function(data){
+                scope.origElem = data;
+            }, function(reject){
+                scope.origElem = reject;
+            });
+        }, function(reject){
+            element.html('<span class="mms-error">Not a valid tag or timestamp</span>');
+        });
+        tagOrTimestamp(scope.mmsVersionTwo).then(function(data){
+            versionTwo = data;
+            getComparsionText(versionTwo).then(function(data){
+                scope.compElem = data;
+            }, function(reject){
+                scope.compElem = reject;
+            });
+        }, function(reject){
+            element.html('<span class="mms-error">Not a valid tag or timestamp</span>');
+        });
     };
 
     return {
@@ -76,7 +113,7 @@ function mmsDiffAttr(ElementService) {
             mmsVersionOne: '@',
             mmsVersionTwo: '@'
         },
-        template: '<style>del{color: black;background: #ffbbbb;} ins{color: black;background: #bbffbb;}</style><pre semantic-diff left-obj="origElem" right-obj="compElem"></pre>',
+        template: '<style>del{color: black;background: #ffbbbb;} ins{color: black;background: #bbffbb;}</style><div semantic-diff left-obj="origElem" right-obj="compElem"></div>',
         require: '?^^mmsView',
         link: mmsDiffAttrLink
     };
