@@ -48,13 +48,14 @@ function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigSe
         var projectId = successfulCommand.data.project;
         var eid = projectId2Peid[projectId];
         var elementsList = JSON.parse(result);
+        var tstypeName = successfulCommand.data.args[0];
         ElementService.updateElement({
             "sysmlid": eid, 
             "specialization": {
                 "type": "InstanceSpecification",
                 "instanceSpecificationSpecification": {
                     "type": "LiteralString",
-                    "string": JSON.stringify({elements: elementsList, type: "Tsp"})
+                    "string": JSON.stringify({elements: elementsList, type: "Tsp", tstype: tstypeName})
                 }
             }
         }).then(function() {
@@ -110,6 +111,40 @@ function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigSe
         scope.viewId = "view-" + id;
         //var initElements = ["_17_0_5_1_407019f_1402422711365_292853_16371"];
         var initElements = [];
+        var viewName;
+        var viewType;
+        
+        switch(scope.mmsTspSpec.tstype) {
+        case "IBD":
+            viewName = "Internal Block Diagram";
+            viewType = "tsDrawingView";
+            break;
+        case "BDD":
+            viewName = "Block Definition Diagram";
+            viewType = "tsDrawingView";
+            break;
+        case "State Machine":
+            viewName = "State Machine";
+            viewType = "tsDrawingView";
+            break;
+        case "Activity Diagram":
+            viewName = "Activity Diagram";
+            viewType = "tsDrawingView";
+            break;
+        case "Sequence Diagram":
+            viewName = "Sequence Diagram";
+            viewType = "tsDrawingView";
+            break;
+        case "Table":
+            viewName = "Table";
+            viewType = "tsTableView";
+            break;
+        default:
+        	viewName = "Drawing View 1";
+        	viewType = "tsDrawingView";
+        }
+      //scope.mmsTspSpec.tstype
+        
         if (scope.mmsTspSpec && scope.mmsTspSpec.elements)
             initElements = scope.mmsTspSpec.elements;
 
@@ -132,13 +167,13 @@ function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigSe
             var saveCommand = {
                     "command": "Custom",
                     "data": {
-                        "serverClassName": "gov.nasa.jpl.mbee.ems.GetElementIdsCommandImpl",
-                        "args": [],
+                        "serverClassName": "gov.nasa.jpl.mbee.ems.action.GetElementIdsCommandImpl",
+                        "args": [scope.mmsTspSpec.tstype],
                         "modelID": 'model-' + id,
                         "module": "MMS",
                         "project": id,
                         "viewID": "view-" + id,
-                        "viewName": "Drawing View 1"
+                        "viewName": viewName
                     },
                     "onsuccess": "onPerspectivesSaveElementSuccess",
                     "onfailure":"onPerspectivesCommandFailure",
@@ -169,7 +204,7 @@ function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigSe
                                 "module": "MMS",
                                 "project": id,
                                 "viewID": "view-" + id,
-                                "viewName": "Drawing View 1"
+                                "viewName": viewName
                             },
                             "onsuccess":"onPerspectivesAddElementSuccess",
                             "onfailure":"onPerspectivesCommandFailure",
@@ -177,13 +212,13 @@ function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigSe
                         {
                             "command": "Custom",
                             "data": {
-                                "serverClassName": "gov.nasa.jpl.mbee.ems.ResetIntegratorCommandImpl",
+                                "serverClassName": "gov.nasa.jpl.mbee.ems.action.ResetIntegratorCommandImpl",
                                 "args": ["int-add-" + id],
                                 "modelID": 'model-' + id,
                                 "module": "MMS",
                                 "project": id,
                                 "viewID": "view-" + id,
-                                "viewName": "Drawing View 1"
+                                "viewName": viewName
                             }
                         },
                         {
@@ -241,8 +276,8 @@ function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigSe
                         "module":"MMS",
                         "modelID":"model-" + id,
                         "viewID":"view-" + id,
-                        "viewName":"Drawing View 1",
-                        "viewClass":"tsDrawingView",
+                        "viewName": viewName,
+                        "viewClass":viewType,
                         "onload":"onPerspectivesViewLoaded",
                         "onupdate":"onPerspectivesViewUpdated",
                         "oncanvasrendered":"onPerspectivesViewCanvasRendered"
@@ -256,13 +291,13 @@ function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigSe
                 {
                     "command": "Custom",
                     "data": {
-                        "serverClassName": "gov.nasa.jpl.mbee.ems.SetMmsRestBaseUrlCommandImpl",
+                        "serverClassName": "gov.nasa.jpl.mbee.ems.action.SetMmsRestBaseUrlCommandImpl",
                         "args": ["int-add-" + id, "https://cae-ems-uat.jpl.nasa.gov/alfresco/service"],
                         "modelID": 'model-' + id,
                         "module": "MMS",
                         "project": id,
                         "viewID": "view-" + id,
-                        "viewName": "Drawing View 1"
+                        "viewName": viewName
                     }
                 }, 
                 {
@@ -274,7 +309,7 @@ function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigSe
                         "module": "MMS",
                         "project": id,
                         "viewID": "view-" + id,
-                        "viewName": "Drawing View 1"
+                        "viewName": viewName
                     },
                     "onfailure":"onPerspectivesCommandFailure",
                 },
@@ -287,7 +322,7 @@ function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigSe
                         "module": "MMS",
                         "project": id,
                         "viewID": "view-" + id,
-                        "viewName": "Drawing View 1"
+                        "viewName": viewName
                     },
                     "onfailure":"onPerspectivesCommandFailure",
                 },
