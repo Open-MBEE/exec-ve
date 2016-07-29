@@ -173,23 +173,6 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
 
     });
 
-    /* var refreshSnapshots = function() {
-        $rootScope.mms_tbApi.toggleButtonSpinner('document-snapshot-refresh');
-        ConfigService.getProductSnapshots(document.sysmlid, site.sysmlid, workspaceObj.id, true)
-        .then(function(result) {
-            $scope.snapshots = result;
-        }, function(reason) {
-            growl.error("Refresh Failed: " + reason.message);
-        })
-        .finally(function() {
-            $rootScope.mms_tbApi.toggleButtonSpinner('document-snapshot-refresh');
-            $rootScope.mms_tbApi.select('document-snapshot');
-
-        });
-    };
-
-    $scope.$on('document-snapshot-refresh', refreshSnapshots); */
-
     $scope.$on('tree-full-document', function() {
         $scope.fullDocMode();
     });
@@ -203,26 +186,6 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         $scope.my_data = UtilsService.buildTreeHierarchy(filter_sites(sites), "sysmlid", "site", "parent", siteInitFunc);
         $scope.mms_treeApi.clear_selected_branch();
     };
-
-    // BEGIN @DEPRECATED
-    $scope.mergeOn = false;
-    $scope.toggleMerge = function() {
-        var branch = $scope.mms_treeApi.get_selected_branch();
-        if (!branch) {
-            growl.warning("Compare Error: Select task or tag to compare from");
-            return;
-        }
-        var parent_branch = $scope.mms_treeApi.get_parent_branch(branch);
-        while (parent_branch.type != 'workspace') {
-            parent_branch = $scope.mms_treeApi.get_parent_branch(parent_branch);
-        }
-
-        $scope.mergeOn = !$scope.mergeOn;
-        $scope.mergeFrom = branch;
-        $scope.mergeTo = parent_branch;
-    };
-    
-    // END @DEPRECATED
     
     $scope.mergeAssist = function() {
 	    $rootScope.mergeInfo = {
@@ -410,25 +373,6 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         });
     };
     
-    /*var allViewLevel2Func = function() {
-        document.specialization.view2view.forEach(function(view, index) {
-            var node = viewId2node[view.id];
-            if (node)
-                viewLevel2Func(view.id, node);
-        });
-    };
-    //TODO remove once we have priority queue
-    /*var viewLevel2Func = function(vid, branch) {
-        if (branch.type === 'view') {
-            if (!branch.loaded) {
-                branch.loaded = true;
-                ViewService.getView(vid, false, ws, time)
-                .then(function(view) {
-                    addViewSections(view);
-                });
-            }
-        }
-    };*/
     var viewId2node = {};
     var handleSingleView = function(v, aggr) {
         var curNode = viewId2node[v.sysmlid];
@@ -476,7 +420,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         });
 
         var seenChild = {};
-      if (document.specialization.view2view) {
+      if (document.specialization.view2view && document.specialization.view2view.length > 0) {
         document.specialization.view2view.forEach(function(view) {
             var viewid = view.id;
             view.childrenViews.forEach(function(childId) {
@@ -589,20 +533,6 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             }, function(reason) {
                 //view is bad
             });
-           /*ViewService.parseExprRefTree(instanceVal, $scope.workspace)
-           .then(function(containedElement) {
-               if (ViewService.isSection(containedElement)) {
-                    var sectionTreeNode = { 
-                        label : containedElement.name, 
-                        type : "section",
-                        view : viewNode.data.sysmlid,
-                        data : containedElement, 
-                        children : [] 
-                    };
-                    parentNode.children.unshift(sectionTreeNode);
-                    addSectionElements(containedElement, viewNode, sectionTreeNode);
-                }
-            });*/
         };
 
         if (element.specialization) {
@@ -619,15 +549,6 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 contains = element.specialization.contains;
             }
         }
-        /*else {
-
-            if (element.contents) {
-                contents = element.contents;
-            }
-            else if (element.contains) {
-                contains = element.contains;
-            }
-        }*/
 
         var j;
         if (contains) {
@@ -638,10 +559,6 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         }
         if (contents && contents.operand) {
             addContentsSectionTreeNode(contents.operand);
-            /*j = contents.operand.length - 1;
-            for (; j >= 0; j--) {
-                addContentsSectionTreeNode(contents.operand[j]);
-            }*/
         }
     }
     // TODO: Update behavior to handle new state descriptions
@@ -1274,22 +1191,12 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
 
     if ($state.includes('workspace.site.document')) {
         $timeout(function() {
-        if (document.specialization.view2view) {
-            document.specialization.view2view.forEach(function(view, index) {
-                ViewService.getView(view.id, false, ws, time, 0)
-                .then(addViewSections); //TODO add back in once we have priority queue
-            });
-        }
-    }, 8000, false);
-        $timeout(function() {
-            if ($rootScope.mms_treeInitial) {
-                var node = viewId2node[$rootScope.mms_treeInitial];
-                //var node = viewId2node[$rootScope.mms_treeInitial];
-                //if (node)
-                //    viewLevel2Func($rootScope.mms_treeInitial, node);
+            if (document.specialization.view2view) {
+                document.specialization.view2view.forEach(function(view, index) {
+                    ViewService.getView(view.id, false, ws, time, 0)
+                    .then(addViewSections); //TODO add back in once we have priority queue
+                });
             }
-        }, 0, false);
+        }, 8000, false);
     }
-    //if ($rootScope.mms_fullDocMode)
-    //    $timeout(allViewLevel2Func, 0, false); //TODO remove when priority queue is done
 }]);
