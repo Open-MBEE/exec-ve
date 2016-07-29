@@ -13,7 +13,7 @@ angular.module('mms')
  */
 function UtilsService(CacheService, _) {
     var nonEditKeys = ['contains', 'view2view', 'childrenViews', 'displayedElements',
-        'allowedElements', 'contents', 'relatedDocuments'];
+        'allowedElements', 'contents', 'relatedDocuments', 'childViews'];
 
     var hasCircularReference = function(scope, curId, curType) {
         var curscope = scope;
@@ -384,7 +384,8 @@ function UtilsService(CacheService, _) {
     };
 
     var makeHtmlTOCChild = function(child) {
-
+        if (child.type !== 'view' && child.type !== 'section')
+            return '';
         var result = '<ul>';
 
         var anchor = '<a href=#' + child.data.sysmlid + '>';
@@ -397,6 +398,54 @@ function UtilsService(CacheService, _) {
         result += '</ul>'; 
 
         return result;
+    };
+
+    var makeTablesAndFiguresTOC = function(tree, printElement) {
+        var ob = {
+            tables: '<div class="tot"><div class="header">List of Tables</div><ul>',
+            figures: '<div class="tof"><div class="header">List of Figures</div><ul>',
+            tableCount: 0,
+            figureCount: 0
+        };
+        var root_branch = tree[0].branch;
+        root_branch.children.forEach(function (child) {
+            makeTablesAndFiguresTOCChild(child, printElement, ob);
+        });
+
+        ob.tables += '</ul></div>'; 
+        ob.figures += '</ul></div>'; 
+        return ob;
+    };
+
+    var makeTablesAndFiguresTOCChild = function(child, printElement, ob) {
+        var sysmlid = child.data.sysmlid;
+        var el = printElement.find('#' + sysmlid);
+        var refs = printElement.find('mms-view-link[data-mms-peid="' + sysmlid + '"]');
+        if (child.type === 'table') {
+            ob.tableCount++;
+            ob.tables += '<li><a href="#' + sysmlid + '">' + ob.tableCount + '. ' + child.data.name + '</a></li>';
+            var cap = el.find('table > caption');
+            cap.html('Table ' + ob.tableCount + '. ' + child.data.name);//cap.html());
+            if (cap.length === 0) {
+                //var table = el.find('table');
+            }
+            refs.html('<a href="#' + sysmlid + '">' + cap.text() + '</a>');
+        } 
+        if (child.type === 'figure') {
+            ob.figureCount++;
+            ob.figures += '<li><a href="#' + sysmlid + '">' + ob.figureCount + '. ' + child.data.name + '</a></li>';
+            var cap2 = el.find('figure > figcaption');
+            cap2.html('Figure ' + ob.figureCount + '. ' + child.data.name);//cap2.html());
+            if (cap2.length === 0) {
+                var image = el.find('img');
+                image.wrap('<figure></figure>').after('<figcaption>Figure ' + ob.figureCount + '. ' + child.data.name + '</figcaption>');
+                cap2 = el.find('figure > figcaption');
+            }
+            refs.html('<a href="#' + sysmlid + '">' + cap2.text() + '</a>');
+        }
+        child.children.forEach(function(child2) {
+            makeTablesAndFiguresTOCChild(child2, printElement, ob);
+        });
     };
 
     var createMmsId = function() {
@@ -415,7 +464,7 @@ function UtilsService(CacheService, _) {
         var projectName = null;
         var siteId = siteid;
 
-        if (elem) {
+        if (elem && elem.qualifiedId && elem.qualifiedName) {
             var splitArray = elem.qualifiedId.split('/');
             var projectNameArray = elem.qualifiedName.split('/');
             if (splitArray && splitArray.length > 2) {
@@ -443,7 +492,7 @@ function UtilsService(CacheService, _) {
     tag = ve tag name if available
     displayTime = tag time or generation time as mm/dd/yy hh:mm am/pm
     */
-    var getPrintCss = function(header, footer, dnum, tag, displayTime) {
+    var getPrintCss = function(header, footer, dnum, tag, displayTime, landscape) {
         var ret = "img {max-width: 100%; page-break-inside: avoid; page-break-before: auto; page-break-after: auto; display: block;}\n" + 
                 " tr, td, th { page-break-inside: avoid; } thead {display: table-header-group;}\n" + 
                 ".pull-right {float: right;}\n" + 
@@ -467,6 +516,8 @@ function UtilsService(CacheService, _) {
                 ".toc ul {padding-left:4em;}\n" +
                 ".toc > ul {padding-left:0;}\n" +
                 ".toc li > a[href]::after {content: leader('.') target-counter(attr(href), page);}\n" + 
+                ".tot li > a[href]::after {content: leader('.') target-counter(attr(href), page);}\n" + 
+                ".tof li > a[href]::after {content: leader('.') target-counter(attr(href), page);}\n" + 
                 "@page {margin: 0.5in;}\n";
                 //"@page big_table {  size: 8.5in 11in; margin: 0.75in; prince-shrink-to-fit:auto;}\n" +  //size: 11in 8.5in;
                 //".big-table {page: big_table; max-width: 1100px; }\n";
@@ -482,6 +533,8 @@ function UtilsService(CacheService, _) {
         } else {
             ret += "@page { @top-right { font-size: 10px; content: '" + displayTime + "';}}\n";
         }
+        if (landscape)
+            ret += "@page {size: 11in 8.5in;}";
                 //"@page{prince-shrink-to-fit:auto;size: A4 portrait;margin-left:8mm;margin-right:8mm;}";
         return ret;
     };
@@ -500,6 +553,7 @@ function UtilsService(CacheService, _) {
         makeHtmlPara: makeHtmlPara,
         makeHtmlList: makeHtmlList,
         makeHtmlTOC: makeHtmlTOC,
+        makeTablesAndFiguresTOC: makeTablesAndFiguresTOC,
         createMmsId: createMmsId,
         getIdInfo: getIdInfo,
         getPrintCss: getPrintCss

@@ -9,21 +9,21 @@
                 <span ng-repeat="breadcrumb in breadcrumbs" ng-show="site && site.sysmlid !== 'no-site'">
                     <li  class="nav_breadcrumb" ng-style="truncateStyle">
                     <a class="nav-btn" ng-style="{'padding-left': $index == 0 ? '5px' : '0px'}" ui-sref="workspace.site({site: breadcrumb.sysmlid, search: undefined})">
-                    <i class="fa fa-folder" tooltip="{{breadcrumb.name}}" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom"></i>&nbsp;{{breadcrumb.name}}</a>
+                    <i class="fa fa-folder" uib-tooltip="{{breadcrumb.name}}" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom"></i>&nbsp;{{breadcrumb.name}}</a>
                     </li>
                     
                   <li class="nav_breadcrumb"> <i class="fa fa-chevron-right" style="font-size:12px; margin-left: 5px;"></i></li>
                 </span>
                 <li class="nav_breadcrumb" ng-show="product" ng-style="truncateStyle">
-                    <a tooltip="{{product.name}}" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" ui-sref=".({search: undefined})">
+                    <a uib-tooltip="{{product.name}}" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" ui-sref=".({search: undefined})">
                       <i class="fa fa-file"></i>&nbsp;{{product.name}}</a>
                 </li>
             </ul>
             <ul class="nav-btns navbar-right" style="margin-right: 20px;">
                 <li>TASK</li>
                 <li>
-                    <span dropdown>
-                      <a type="button" class="dropdown-toggle" dropdown-toggle>{{wsName}} &nbsp;<i class="fa fa-sort-down" style="margin: 0px 5px 0px 5px;"></i></a>
+                    <span uib-dropdown>
+                      <a type="button" class="dropdown-toggle" uib-dropdown-toggle>{{wsName}} &nbsp;<i class="fa fa-sort-down" style="margin: 0px 5px 0px 5px;"></i></a>
                       <ul class="dropdown-menu pull-right" role="menu">
                         <li>
                             <button class="btn btn-large btn-block btn-primary" ng-click="tasksAndTagsView()" >MANAGE</button>
@@ -34,8 +34,8 @@
                 </li>                
                 <li>TAG</li>
                 <li>
-                    <span dropdown>
-                      <a type="button" class="dropdown-toggle" dropdown-toggle>{{config.name}}&nbsp;<i class="fa fa-sort-down" style="margin-left:5px;"></i></a>
+                    <span uib-dropdown>
+                      <a type="button" class="dropdown-toggle" uib-dropdown-toggle>{{config.name}}&nbsp;<i class="fa fa-sort-down" style="margin-left:5px;"></i></a>
                       <ul class="dropdown-menu pull-right" role="menu">
                         <li>
                                 <button class="btn btn-large btn-block btn-primary" ng-click="tasksAndTagsView()">MANAGE</button>

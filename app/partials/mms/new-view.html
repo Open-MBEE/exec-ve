@@ -12,6 +12,7 @@
 </div>
 
 <div ng-show="!createForm">
+  <input type="radio" ng-model="newViewAggr.type" value="SHARED">SHARED - Add view and its children<input type="radio" ng-model="newViewAggr.type" value="NONE">NONE - Add view only
     <mms-search mms-options="searchOptions"></mms-search>
 </div>
 

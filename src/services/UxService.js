@@ -129,6 +129,10 @@ function UxService($rootScope) {
             return {id: button, icon: 'fa-eye', selected: true, active: true, permission: true, tooltip: 'Show Alfresco Sites', 
                     spinner: false, togglable: true, toggle_icon: 'fa-eye-slash', toggle_tooltip: 'Hide Alfresco Sites',
                     action: function() {$rootScope.$broadcast(button);}};
+           case "tree-show-pe":
+            return {id: button, icon: 'fa-codepen', selected: true, active: true, permission: true, tooltip: 'Show Tables and Figures', 
+                    spinner: false, togglable: true, toggle_icon: 'fa-cube', toggle_tooltip: 'Hide Tables and Figures',
+                    action: function() {$rootScope.$broadcast(button);}};
            case "show-comments":
             return {id: button, icon: 'fa-comment-o', selected: true, active: true, permission: true, tooltip: 'Show Comments', 
                     spinner: false, togglable: true, toggle_icon: 'fa-comment', toggle_tooltip: 'Hide Comments',
@@ -251,7 +255,7 @@ function UxService($rootScope) {
         }
   };
 
-  var MetaTypes = ['configuration', 'connector', 'dependency', 'directedrelationship', 'element', 'property', 'generalization', 'package', 'section', 'site', 'snapshot', 'view', 'workspace' ];
+  var MetaTypes = ['configuration', 'connector', 'dependency', 'directedrelationship', 'element', 'property', 'generalization', 'package', 'section', 'site', 'snapshot', 'view', 'workspace', 'table', 'figure', 'equation' ];
 
   var getTreeTypes = function() {
     var treeTypes = {};
@@ -293,10 +297,14 @@ function UxService($rootScope) {
         return "fa-camera";
       case "view":
         return "fa-file";
-      case "view":
-        return "fa-file";
       case "workspace":
         return "fa-tasks";
+      case "table":
+        return "fa-table";
+      case "figure":
+        return "fa-image";
+      case "equation":
+        return "fa-image";
       default:
         return "fa-square";
         }

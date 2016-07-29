@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsTranscludeName', ['ElementService', 'UxService', '$compile', 'growl', '$templateCache', '$rootScope', '$modal', 'Utils', mmsTranscludeName]);
+.directive('mmsTranscludeName', ['ElementService', 'UxService', '$compile', 'growl', '$templateCache', '$rootScope', '$uibModal', 'Utils', mmsTranscludeName]);
 
 /**
  * @ngdoc directive
@@ -21,7 +21,7 @@ angular.module('mms.directives')
  * @param {string=master} mmsWs Workspace to use, defaults to master
  * @param {string=latest} mmsVersion Version can be alfresco version number or timestamp, default is latest
  */
-function mmsTranscludeName(ElementService, UxService, $compile, growl, $templateCache, $rootScope, $modal, Utils) {
+function mmsTranscludeName(ElementService, UxService, $compile, growl, $templateCache, $rootScope, $uibModal, Utils) {
 
     var template = $templateCache.get('mms/templates/mmsTranscludeName.html');
     var defaultTemplate = '<span ng-if="element.name">{{element.name}}</span><span ng-if="!element.name" class="no-print" ng-class="{placeholder: version!=\'latest\'}">(no name)</span>';
@@ -125,6 +125,7 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
                     version = viewVersion.version;
             }
             element.html('(loading...)');
+            element.addClass("isLoading");
             scope.ws = ws;
             scope.version = version ? version : 'latest';
             ElementService.getElement(scope.mmsEid, false, ws, version, 1)
@@ -153,6 +154,8 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
                     status = ' deleted';
                 element.html('<span class="mms-error">name cf ' + newVal + status + '</span>');
                 //growl.error('Cf Name Error: ' + reason.message + ': ' + scope.mmsEid);
+            }).finally(function() {
+                element.removeClass("isLoading");
             });
         });
 

@@ -3,8 +3,8 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('MainCtrl', ['$scope', '$location', '$rootScope', '$state', '_', '$window', '$modal', 'growl', '$http', 'URLService', 'hotkeys', 'growlMessages', 'StompService', 'UtilsService', 'HttpService', 'AuthService', '$interval',
-function($scope, $location, $rootScope, $state, _, $window, $modal, growl, $http, URLService, hotkeys, growlMessages, StompService, UtilsService, HttpService, AuthService, $interval) {
+.controller('MainCtrl', ['$scope', '$location', '$rootScope', '$state', '_', '$window', '$uibModal', 'growl', '$http', 'URLService', 'hotkeys', 'growlMessages', 'StompService', 'UtilsService', 'HttpService', 'AuthService', '$interval',
+function($scope, $location, $rootScope, $state, _, $window, $uibModal, growl, $http, URLService, hotkeys, growlMessages, StompService, UtilsService, HttpService, AuthService, $interval) {
     $rootScope.mms_viewContentLoading = false;
     $rootScope.mms_treeInitial = '';
     $rootScope.mms_title = '';
@@ -72,7 +72,7 @@ function($scope, $location, $rootScope, $state, _, $window, $modal, growl, $http
             if ($state.$current.name === 'login' || modalOpen)
                 return;
             modalOpen = true;
-            var instance = $modal.open({
+            var instance = $uibModal.open({
                 template: '<div class="modal-header">You have been logged out, please login again.</div><div class="modal-body"><form name="loginForm" ng-submit="login(credentials)">' + 
                                 '<input type="text" class="form-control login-icons" ng-model="credentials.username" placeholder="&#xf007; JPL Username" style="margin-bottom: 1.5em;" autofocus>' + 
                                 '<input type="password" class="form-control login-icons" ng-model="credentials.password" placeholder="&#xf084; Password" style="margin-bottom: 1.5em;">' + 
@@ -80,7 +80,7 @@ function($scope, $location, $rootScope, $state, _, $window, $modal, growl, $http
                             '</span></button></form></div>',
                 scope: $scope,
                 backdrop: 'static',
-                controller: ['$scope', '$modalInstance', function ($scope, $modalInstance) {
+                controller: ['$scope', '$uibModalInstance', function ($scope, $uibModalInstance) {
                     $scope.credentials = {
                       username: '',
                       password: ''
@@ -91,7 +91,7 @@ function($scope, $location, $rootScope, $state, _, $window, $modal, growl, $http
                         var credentialsJSON = {"username":credentials.username, "password":credentials.password};
                             AuthService.getAuthorized(credentialsJSON).then(function (user) {
                                 growl.success("Logged in");
-                                $modalInstance.dismiss();
+                                $uibModalInstance.dismiss();
                             }, function (reason) {
                                 $scope.spin = false;
                                 growl.error(reason.message);

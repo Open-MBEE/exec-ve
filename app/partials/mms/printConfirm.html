@@ -1,3 +1,8 @@
+<style>
+    button:disabled {
+        background-color:background: #dddddd;
+    }
+</style>
 <div class="modal-header">
   <h4>{{action | uppercase}} {{type}}</h4>
 </div>
@@ -24,12 +29,13 @@
     <p ng-if="unsaved" class="error">
       WARNING: You currently have unsaved changes in the session that may not be reflected.
     </p>
-    <br/> <div ng-if="type == 'DOCUMENT'">Generate Standard Cover Page: <input type="checkbox" ng-model="model.genCover"></div> 
+    <br/> <!--<div ng-if="type == 'DOCUMENT'">Generate Standard Cover Page: <input type="checkbox" ng-model="model.genCover"></div> -->
     <div ng-if="type == 'DOCUMENT' && genpdf">Generate List of Tables and Figures: <input type="checkbox" ng-model="model.genTotf"></div>
+    <div ng-if="genpdf">Landscape: <input type="checkbox" ng-model="model.landscape"></div>
 </div>
 
 <div class="modal-footer">
     <button ng-if="type == 'VIEW' && docOption" class="btn btn-sm btn-primary" ng-click="fulldoc()">GO TO FULL DOCUMENT</button>
-    <button ng-if="type == 'DOCUMENT' || !genpdf" class="btn btn-sm btn-primary" ng-click="print()">{{action | uppercase}}</button>
+    <button class="btn btn-sm btn-primary" ng-click="print()">{{action | uppercase}}</button>
     <button class="btn btn-sm btn-danger" ng-click="cancel()">CANCEL</button>
 </div>

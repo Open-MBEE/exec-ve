@@ -287,7 +287,8 @@ function mmsTree($timeout, $log, $templateCache) {
                 }
                 
                 branch.section = section;
-
+                if (branch.hide)
+                    visible = false;
                 scope.tree_rows.push({
                     level: level,
                     section: section,
@@ -311,7 +312,9 @@ function mmsTree($timeout, $log, $templateCache) {
                             sectionChar = '';
                         if (branch.children[i].type === 'section')
                             add_branch_to_list(level + 1, '§ ', branch.children[i], child_visible);
-                        else {
+                        else if (branch.children[i].type === 'figure' || branch.children[i].type === 'table' || branch.children[i].type === 'equation') {
+                            add_branch_to_list(level + 1, '', branch.children[i], child_visible);
+                        } else {
                             j++;
                             if (scope.sectionNumbering) {
                                 sectionValue = section + sectionChar + j;
@@ -706,14 +709,14 @@ function mmsTree($timeout, $log, $templateCache) {
         template: $templateCache.get('mms/templates/mmsTree.html'),
         // replace: true,
         scope: {
-            treeData: '=',
-            sectionNumbering: '=',
+            treeData: '<',
+            sectionNumbering: '<',
             onSelect: '&?',
             onDblclick: '&?',
             initialSelection: '@',
-            treeControl: '=',
-            search: '=',
-            options: '='
+            treeControl: '<',
+            search: '<',
+            options: '<'
         },
         link: mmsTreeLink
     };
