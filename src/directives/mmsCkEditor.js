@@ -415,7 +415,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $m
         ];
         var listToolbar =     { name: 'list',     items: [ 'NumberedList','BulletedList','Outdent','Indent' ] };
         var tableToolbar =    { name: 'table',    items: [ 'Table' ] };
-        var imageToolbar =    { name: 'image',    items: [ 'base64image','Iframe' ] };
+        var imageToolbar =    { name: 'image',    items: [ 'Image','Iframe' ] };
         var equationToolbar = { name: 'equation', items: [ 'Mathjax','SpecialChar' ]};
         var customToolbar =   { name: 'custom',   items: [ 'Mmscf', 'mmsreset', 'Mmscomment', 'Mmsvlink' ] };
         var sourceToolbar =   { name: 'source',   items: ['Source']};

@@ -120,83 +120,11 @@ CKEDITOR.dialog.add( 'image2', function( editor ) {
 				callback( null );
 			} );
 
-			image.setAttribute( 'src',
-				( config.baseHref || '' ) + src + '?' + Math.random().toString( 16 ).substring( 2 ) );
+			image.$.src = src;
 		};
 	}
 
-	// This function updates width and height fields once the
-	// "src" field is altered. Along with dimensions, also the
-	// dimensions lock is adjusted.
-	function onChangeSrc(t) {
-		var value = null;
-		if (this){
-			value = this.getValue();
-		} else {
-			value = t.getValue();
-		}
 
-		toggleDimensions( false );
-		if (widget.data.previewSrc){
-			value = widget.data.previewSrc;
-		}
-
-		// Remember that src is different than default.
-		if ( value !== widget.data.src ) {
-			// Update dimensions of the image once it's preloaded.
-			preLoader( value, function( image, width, height ) {
-				// Re-enable width and height fields.
-				toggleDimensions( true );
-
-				// There was problem loading the image. Unlock ratio.
-				if ( !image )
-					return toggleLockRatio( false );
-
-				// Fill width field with the width of the new image.
-				widthField.setValue( editor.config.image2_prefillDimensions === false ? 0 : width );
-
-				// Fill height field with the height of the new image.
-				heightField.setValue( editor.config.image2_prefillDimensions === false ? 0 : height );
-
-				// Cache the new width.
-				preLoadedWidth = width;
-
-				// Cache the new height.
-				preLoadedHeight = height;
-
-				// Check for new lock value if image exist.
-				toggleLockRatio( helpers.checkHasNaturalRatio( image ) );
-			} );
-
-			// Render preview
-			// imagePreview(src);
-			srcChanged = true;
-		}
-
-		// Value is the same as in widget data but is was
-		// modified back in time. Roll back dimensions when restoring
-		// default src.
-		else if ( srcChanged ) {
-			// Re-enable width and height fields.
-			toggleDimensions( true );
-
-			// Restore width field with cached width.
-			widthField.setValue( domWidth );
-
-			// Restore height field with cached height.
-			heightField.setValue( domHeight );
-
-			// Src equals default one back again.
-			srcChanged = false;
-		}
-
-		// Value is the same as in widget data and it hadn't
-		// been modified.
-		else {
-			// Re-enable width and height fields.
-			toggleDimensions( true );
-		}
-	}
 
 	function onChangeDimension() {
 		// If ratio is un-locked, then we don't care what's next.
@@ -367,88 +295,103 @@ CKEDITOR.dialog.add( 'image2', function( editor ) {
 	}
 	var fsupport = fileSupport();
 
-	/* Load preview image */
+	/* Load preview image and set image attr */
+	// This function updates width and height fields once the
+	// "src" field is altered. Along with dimensions, also the
+	// dimensions lock is adjusted.
 	function imagePreviewLoad(s) {
-		
-		/* no preview */
+		// value will store url or base64 of image
+		var value = null; 
+
+		/* if no string passed - no preview */
 		if(typeof(s) != "string" || !s) {
 			imgPreview.getElement().setHtml("");
 			return;
-		}
-		
-		/* Create image */
-		var i = new Image();
-		
-		/* Display loading text in preview element */
-		imgPreview.getElement().setHtml("Loading...");
-		
-		/* When image is loaded */
-		i.onload = function() {
-			
-			/* Remove preview */
-			imgPreview.getElement().setHtml("");
-			
-			if ( image.$.naturalWidth ) {
-				preLoadedWidth = image.$.naturalWidth;
-				// dimensions = {
-				// 	width: image.$.naturalWidth,
-				// 	height: image.$.naturalHeight
-				// };
-			}
-			/* Set attributes */ //TODO match with image2 settings
-			// if(orgWidth == null || orgHeight == null) {
-				// t.setValueOf("tab-properties", "width", this.width);
-				// t.setValueOf("tab-properties", "height", this.height);
+		} else 
+			value = s; // set value to string
+
+		toggleDimensions( false ); // Disable dimension options
+
+		// Remember that src is different than default.
+		if ( value !== widget.data.src ) {
+			// Update dimensions of the image once it's preloaded.
+			preLoader( value, function( image, width, height ) {
+				// Re-enable width and height fields.
+				toggleDimensions( true );
+
+				// There was problem loading the image. Unlock ratio.
+				if ( !image )
+					return toggleLockRatio( false );
+
+				// Fill width field with the width of the new image.
+				widthField.setValue( editor.config.image2_prefillDimensions === false ? 0 : width );
+
+				// Fill height field with the height of the new image.
+				heightField.setValue( editor.config.image2_prefillDimensions === false ? 0 : height );
+
 				// Cache the new width.
-				var dimensions = getNatural( image );
-				preLoader.call( scope, i, this.width, this.height );
-				preLoadedWidth = this.width;
+				preLoadedWidth = width;
 
 				// Cache the new height.
-				preLoadedHeight = this.height;
-				// imgScal = 1;
-				// if(this.height > 0 && this.width > 0) imgScal = this.width / this.height;
-				// if(imgScal <= 0) imgScal = 1;
-			// } else {
-			// 	orgWidth = null;
-			// 	orgHeight = null;
-			// }
-			this.id = editor.id+"previewimage";
-			this.setAttribute("style", "max-width:400px;max-height:100px;");
-			this.setAttribute("alt", "");
-			
-			/* Insert preview image */
-			try {
-				var p = imgPreview.getElement().$;
-				if(p) p.appendChild(this);
-			} catch(e) {}
-			
-		};
-		
-		/* Error Function */
-		i.onerror = function(){ imgPreview.getElement().setHtml(""); };
-		i.onabort = function(){ imgPreview.getElement().setHtml(""); };
-		
-		/* Load image */
-		i.src = s;
+				preLoadedHeight = height;
+
+				// Check for new lock value if image exist.
+				toggleLockRatio( helpers.checkHasNaturalRatio( image ) );
+
+				/* Insert preview image */
+				try {
+					var p = imgPreview.getElement().$;
+					image.setAttribute("style","max-width:400px;max-height:100px")
+					if (p) p.appendChild(image.$);
+				} catch (e)  {console.log("Error when adding preview to ")}
+			} );
+
+			srcChanged = true;
+		}
+
+		// Value is the same as in widget data but is was
+		// modified back in time. Roll back dimensions when restoring
+		// default src.
+		else if ( srcChanged ) {
+			// Re-enable width and height fields.
+			toggleDimensions( true );
+
+			// Restore width field with cached width.
+			widthField.setValue( domWidth );
+
+			// Restore height field with cached height.
+			heightField.setValue( domHeight );
+
+			// Src equals default one back again.
+			srcChanged = false;
+		}
+
+		// Value is the same as in widget data and it hadn't
+		// been modified.
+		else {
+			// Re-enable width and height fields.
+			toggleDimensions( true );
+		}
+
+	  /* Set image src within widget data */
 		widget.data.previewSrc = s;
 	}
 
-	/* Change input values and preview image */
-	function imagePreview(src){
+	/* Change image input values and load preview image */
+	function onChangeSrc(src){
 		
 		/* Remove preview */
 		imgPreview.getElement().setHtml("");
 		
 		if(src == "base64") {
 			
-			/* Disable Checkboxes */
+			/* Toggle checkboxes */
 			if(urlCB) urlCB.setValue(false, true);
 			if(fileCB) fileCB.setValue(false, true);
 			
 		} else if(src == "url") {
 			
-			/* Ensable Image URL Checkbox */
+			/* Toggle checkboxes */
 			if(urlCB) urlCB.setValue(true, true);
 			if(fileCB) fileCB.setValue(false, true);
 			
@@ -456,11 +399,13 @@ CKEDITOR.dialog.add( 'image2', function( editor ) {
 			if(urlI) imagePreviewLoad(urlI.getValue());
 			
 		} else if(fsupport) {
+
+			/* If url is defined clear textbox, file browse is enabled */
+			if ( urlI.getValue() ) urlI.setValue("");
 			
 			/* Ensable Image File Checkbox */
 			if(urlCB) urlCB.setValue(false, true);
 			if(fileCB) fileCB.setValue(true, true);
-			urlI.setValue("");
 			
 			/* Read file and load preview */
 			var fileI = t.getContentElement("info", "file");
@@ -499,10 +444,11 @@ CKEDITOR.dialog.add( 'image2', function( editor ) {
 						id: 'src',
 						type: 'text',
 						label: commonLang.url,
-						onKeyup: onChangeSrc,
+						// onKeyup: onChangeSrc,
 						onChange:function(){ 
-							imagePreview("url"); 
-							onChangeSrc(this); },
+							onChangeSrc("url"); 
+							// onChangeSrc(this,"url"); 
+						},
 						setup: function( widget ) {
 							this.setValue( widget.data.src );
 						},
@@ -529,8 +475,8 @@ CKEDITOR.dialog.add( 'image2', function( editor ) {
 						label: "",
 						// onChange: onChangeSrc,
 						onChange: function(widget){
-							 imagePreview("file"); 
-							 onChangeSrc(this);
+							 onChangeSrc("file"); 
+							//  onChangeSrc(this,"file");
 						},
 						commit: function( widget ) {
 							widget.setData( 'file', widget.data.previewSrc );
@@ -567,8 +513,8 @@ CKEDITOR.dialog.add( 'image2', function( editor ) {
 			if(fsupport) {
 				urlCB  = this.getContentElement("info", "urlcheckbox");
 				fileCB = this.getContentElement("info", "filecheckbox");
-				urlCB.getInputElement().on("click", function(){ imagePreview("url"); });
-				fileCB.getInputElement().on("click", function(){ imagePreview("file"); });
+				urlCB.getInputElement().on("click", function(){ onChangeSrc("url"); });
+				fileCB.getInputElement().on("click", function(){ onChangeSrc("file"); });
 			}
 
 			/* Get url input element */
@@ -690,30 +636,31 @@ CKEDITOR.dialog.add( 'image2', function( editor ) {
 							}
 						]
 					},
-					{
-						type: 'hbox',
-						id: 'alignment',
-						requiredContent: features.align.requiredContent,
-						children: [
-							{
-								id: 'align',
-								type: 'radio',
-								items: [
-									[ commonLang.alignNone, 'none' ],
-									[ commonLang.alignLeft, 'left' ],
-									[ commonLang.alignCenter, 'center' ],
-									[ commonLang.alignRight, 'right' ]
-								],
-								label: commonLang.align,
-								setup: function( widget ) {
-									this.setValue( widget.data.align );
-								},
-								commit: function( widget ) {
-									widget.setData( 'align', this.getValue() );
-								}
-							}
-						]
-					},
+					// Alignment not working properly TODO update with proper alignment in center pane
+					// {
+					// 	type: 'hbox',
+					// 	id: 'alignment',
+					// 	requiredContent: features.align.requiredContent,
+					// 	children: [
+					// 		{
+					// 			id: 'align',
+					// 			type: 'radio',
+					// 			items: [
+					// 				[ commonLang.alignNone, 'none' ],
+					// 				[ commonLang.alignLeft, 'left' ],
+					// 				[ commonLang.alignCenter, 'center' ],
+					// 				[ commonLang.alignRight, 'right' ]
+					// 			],
+					// 			label: commonLang.align,
+					// 			setup: function( widget ) {
+					// 				this.setValue( widget.data.align );
+					// 			},
+					// 			commit: function( widget ) {
+					// 				widget.setData( 'align', this.getValue() );
+					// 			}
+					// 		}
+					// 	]
+					// },
 					{
 						id: 'hasCaption',
 						type: 'checkbox',
