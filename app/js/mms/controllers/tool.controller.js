@@ -467,6 +467,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $stateParams, $timeout, Conf
             $scope.viewOrderApi.refresh();
             growl.success('Save Succesful');
             $rootScope.mms_tbApi.toggleButtonSpinner('view-reorder-save');
+            $rootScope.$broadcast('view.reorder.saved', $scope.vid);
         }, function(reason) {
             $scope.viewOrderApi.refresh();
             viewSaving = false;

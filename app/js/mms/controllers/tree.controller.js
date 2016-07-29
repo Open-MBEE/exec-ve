@@ -1254,6 +1254,24 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             $scope.treeApi.remove_single_branch(branch);
     });
 
+    $scope.$on('view.reorder.saved', function(event, vid) {
+        var node = viewId2node[vid];
+        var viewNode = node;
+        var newChildren = [];
+        for (var i = 0; i < node.children.length; i++) {
+            var child = node.children[i];
+            if (child.type === 'view')
+                newChildren.push(child);
+        }
+        node.children = newChildren;
+        if (node.type === 'section') {
+            viewNode = viewId2node[node.view];
+            if (!viewNode)
+                viewNode = node;
+        }
+        addSectionElements(node.data, viewNode, node);
+    });
+
     if ($state.includes('workspace.site.document')) {
         $timeout(function() {
         if (document.specialization.view2view) {
