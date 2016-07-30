@@ -139,6 +139,7 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
         $scope.bbApi.addButton(UxService.getButtonBarButton('word'));
         $scope.bbApi.addButton(UxService.getButtonBarButton('tabletocsv'));
         $scope.bbApi.addButton(UxService.getButtonBarButton('show-elements'));
+        $scope.bbApi.addButton(UxService.getButtonBarButton('refresh-numbering'));
         $scope.bbApi.setToggleState('show-elements', $rootScope.veElementsOn);
         hotkeys.bindTo($scope)
         .add({
@@ -225,6 +226,10 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
     });
     $scope.$on('tabletocsv', function() {
         MmsAppUtils.tableToCsv(document, $scope.ws, time, true);
+    });
+    $scope.$on('refresh-numbering', function() {
+        var printElementCopy = angular.element("#print-div");
+        MmsAppUtils.refreshNumbering($rootScope.mms_treeApi.get_rows(),printElementCopy);
     });
 
     $scope.searchOptions= {};
