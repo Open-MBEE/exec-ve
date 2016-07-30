@@ -101,6 +101,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $uibModal, $window,
                 $scope.bbApi.addButton(UxService.getButtonBarButton('convert-pdf'));
             $scope.bbApi.addButton(UxService.getButtonBarButton('word'));
             $scope.bbApi.addButton(UxService.getButtonBarButton('tabletocsv'));
+            $scope.bbApi.addButton(UxService.getButtonBarButton('refresh-numbering'));
         }
         $scope.bbApi.addButton(UxService.getButtonBarButton('show-elements'));
         $scope.bbApi.setToggleState('show-elements', $rootScope.veElementsOn);
@@ -347,6 +348,10 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $uibModal, $window,
     });
     $scope.$on('tabletocsv', function() {
         MmsAppUtils.tableToCsv(view, $scope.ws, time, false);
+    });
+    $scope.$on('refresh-numbering', function() {
+        var printElementCopy = angular.element("#print-div");
+        MmsAppUtils.refreshNumbering($rootScope.mms_treeApi.get_rows(),printElementCopy);
     });
     
 }]);

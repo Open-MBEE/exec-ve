@@ -252,6 +252,9 @@ function UxService($rootScope) {
           case "tabletocsv":
             return {id: button, icon: 'fa-table', selected: true, active: true, permission: true, tooltip: 'Table to CSV', 
                     spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
+          case "refresh-numbering":
+            return {id: button, icon: 'fa-sort-numeric-asc', selected: true, active: true, permission: true, tooltip: 'Refresh Figure Numbering', 
+                    spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
         }
   };
 

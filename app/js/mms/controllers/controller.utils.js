@@ -524,11 +524,16 @@ function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templ
         return deferred.promise;
     };
 
+    var refreshNumbering = function(tree, centerElement) {
+        UtilsService.makeTablesAndFiguresTOC(tree, centerElement );
+    };
+
     return {
         addPresentationElement: addPresentationElement,
         printModal: printModal,
         tableToCsv: tableToCsv,
-        handleChildViews: handleChildViews
+        handleChildViews: handleChildViews,
+        refreshNumbering: refreshNumbering
     };
 }
     
