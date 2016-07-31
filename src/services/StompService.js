@@ -14,7 +14,7 @@ angular.module('mms')
 function StompService($rootScope, UtilsService, $window, $location, ApplicationService, CacheService) {
      var stompClient = {};
      var host = $location.host();
-     var hostName = 'wss://cae-ems-origin.jpl.nasa.gov:61614';
+     var hostName = 'wss://'+$location.host().split(".")[0]+'-origin.jpl.nasa.gov:61614';
     //  if (host == '127.0.0.1') {
     //     hostName = 'wss://127.0.0.1:61614';
     //  } else if (host == 'localhost') {
