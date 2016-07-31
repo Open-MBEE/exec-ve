@@ -19,7 +19,8 @@ angular.module('mms.directives')
  *
  * @param {string} mmsEid The id of the element whose doc to transclude
  * @param {string=master} mmsWs Workspace to use, defaults to master
- * @param {string=latest} mmsVersion Version can be alfresco version number or timestamp, default is latest
+ * @param {string=latest} mmsVersionOne  can be 'latest', timestamp or tag id, default is latest
+ * @param {string=latest} mmsVersionTwo  can be 'latest', timestamp or tag id, default is latest
  */
 function mmsDiffAttr(ElementService, ConfigService, URLService, $q) {
 
@@ -36,7 +37,7 @@ function mmsDiffAttr(ElementService, ConfigService, URLService, $q) {
         var tagOrTimestamp = function(version){
             var deferred = $q.defer();
             if(!URLService.isTimestamp(version) && version !== 'latest'){
-                ConfigService.getConfigs(version).then(function(data){
+                ConfigService.getConfig(version, ws, false).then(function(data){
                         deferred.resolve(data.timestamp);
                 }, function(reason) {
                     deferred.reject(null);
@@ -53,7 +54,7 @@ function mmsDiffAttr(ElementService, ConfigService, URLService, $q) {
             ElementService.getElement(scope.mmsEid, false, ws, version).then(function(data){
                 deferred.resolve(findElemType(data));
             }, function(reason) {
-                element.html('<span class="mms-error">'+reason.status+'</span>');
+                element.html('<span class="mms-error">'+reason.message+'</span>');
                 deferred.reject(null);
             });
             return deferred.promise;
@@ -61,9 +62,9 @@ function mmsDiffAttr(ElementService, ConfigService, URLService, $q) {
         
         // Find the right key to fetch text
         var findElemType = function(elem){
-            if(scope.mmsAttr === 'Name'){//the key is included and blank
+            if(scope.mmsAttr === 'name'){//the key is included and blank
                 return elem.name;
-            }else if (scope.mmsAttr === 'Documentation') {
+            }else if (scope.mmsAttr === 'doc') {
                 return elem.documentation;
             }else{
                 if(elem.specialization.value[0].type === "LiteralString"){
@@ -71,9 +72,11 @@ function mmsDiffAttr(ElementService, ConfigService, URLService, $q) {
                 }else if(elem.specialization.value[0].type === "LiteralReal"){
                     return elem.specialization.value[0].double;
                 }else if(elem.specialization.value[0].type === "LiteralBoolean"){
+                    return elem.specialization.value[0].boolean;
+                } else if (elem.specialization.value[0].type === 'LiteralInteger') {
                     return elem.specialization.value[0].integer;
                 }else{
-                    element.html('<span class="mms-error">Not Supported</span>');
+                    element.html('<span class="mms-error">Value type not supported for now</span>');
                     return null;
                 }
                 
@@ -90,7 +93,7 @@ function mmsDiffAttr(ElementService, ConfigService, URLService, $q) {
                 scope.origElem = reject;
             });
         }, function(reject){
-            element.html('<span class="mms-error">Not a valid tag or timestamp</span>');
+            element.html('<span class="mms-error">Version one not a valid tag or timestamp</span>');
         });
         tagOrTimestamp(scope.mmsVersionTwo).then(function(data){
             versionTwo = data;
@@ -100,7 +103,7 @@ function mmsDiffAttr(ElementService, ConfigService, URLService, $q) {
                 scope.compElem = reject;
             });
         }, function(reject){
-            element.html('<span class="mms-error">Not a valid tag or timestamp</span>');
+            element.html('<span class="mms-error">Version two not a valid tag or timestamp</span>');
         });
     };
 
