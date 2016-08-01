@@ -1136,6 +1136,18 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             viewid = branch.view;
         else
             viewid = branch.data.sysmlid;
+        var viewNode = viewId2node[viewid];
+        instanceSpec.relatedDocuments = [
+            {
+                parentViews: [{
+                    name: viewNode.data.name,
+                    sysmlid: viewNode.data.sysmlid
+                }],
+                siteCharacterizationId: document.siteCharacterizationId,
+                name: document.name,
+                sysmlid: document.sysmlid
+            }
+        ];
         var newbranch = {
             label: instanceSpec.name,
             type: (elemType === 'image' ? 'figure' : elemType),
@@ -1158,9 +1170,8 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             lastSection = branch.children.length-1;
         branch.children.splice(lastSection+1, 0, newbranch);
         if (elemType == 'section') 
-            addSectionElements(instanceSpec, viewId2node[viewid], newbranch);
+            addSectionElements(instanceSpec, viewNode, newbranch);
         $scope.treeApi.refresh();
-
     });
 
     // Utils creates this event when deleting instances from the view
