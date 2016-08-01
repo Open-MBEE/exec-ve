@@ -400,7 +400,7 @@ function UtilsService(CacheService, _) {
         return result;
     };
 
-    var makeTablesAndFiguresTOC = function(tree, printElement) {
+    var makeTablesAndFiguresTOC = function(tree, printElement, live) {
         var ob = {
             tables: '<div class="tot"><div class="header">List of Tables</div><ul>',
             figures: '<div class="tof"><div class="header">List of Figures</div><ul>',
@@ -409,7 +409,7 @@ function UtilsService(CacheService, _) {
         };
         var root_branch = tree[0].branch;
         root_branch.children.forEach(function (child) {
-            makeTablesAndFiguresTOCChild(child, printElement, ob);
+            makeTablesAndFiguresTOCChild(child, printElement, ob, live);
         });
 
         ob.tables += '</ul></div>'; 
@@ -417,34 +417,43 @@ function UtilsService(CacheService, _) {
         return ob;
     };
 
-    var makeTablesAndFiguresTOCChild = function(child, printElement, ob) {
+    var makeTablesAndFiguresTOCChild = function(child, printElement, ob, live) {
         var sysmlid = child.data.sysmlid;
         var el = printElement.find('#' + sysmlid);
         var refs = printElement.find('mms-view-link[data-mms-peid="' + sysmlid + '"]');
+        var cap = '';
         if (child.type === 'table') {
             ob.tableCount++;
-            ob.tables += '<li><a href="#' + sysmlid + '">' + ob.tableCount + '. ' + child.data.name + '</a></li>';
-            var cap = el.find('table > caption');
-            cap.html('Table ' + ob.tableCount + '. ' + child.data.name);//cap.html());
-            if (cap.length === 0) {
+            cap = ob.tableCount + '. ' + child.data.name;
+            ob.tables += '<li><a href="#' + sysmlid + '">' + cap + '</a></li>';
+            var cap1 = el.find('table > caption');
+            cap1.html('Table ' + cap);//cap.html());
+            if (cap1.length === 0) {
                 //var table = el.find('table');
             }
-            refs.html('<a href="#' + sysmlid + '">' + cap.text() + '</a>');
+            if (live)
+                refs.find('a').html('Table ' + cap);
+            else
+                refs.html('<a href="#' + sysmlid + '">Table ' + cap + '</a>');
         } 
         if (child.type === 'figure') {
             ob.figureCount++;
-            ob.figures += '<li><a href="#' + sysmlid + '">' + ob.figureCount + '. ' + child.data.name + '</a></li>';
+            cap = ob.figureCount + '. ' + child.data.name;
+            ob.figures += '<li><a href="#' + sysmlid + '">' + cap + '</a></li>';
             var cap2 = el.find('figure > figcaption');
-            cap2.html('Figure ' + ob.figureCount + '. ' + child.data.name);//cap2.html());
+            cap2.html('Figure ' + cap);//cap2.html());
             if (cap2.length === 0) {
                 var image = el.find('img');
-                image.wrap('<figure></figure>').after('<figcaption>Figure ' + ob.figureCount + '. ' + child.data.name + '</figcaption>');
+                image.wrap('<figure></figure>').after('<figcaption>Figure ' + cap + '</figcaption>');
                 cap2 = el.find('figure > figcaption');
             }
-            refs.html('<a href="#' + sysmlid + '">' + cap2.text() + '</a>');
+            if (live)
+                refs.find('a').html('Figure ' + cap);
+            else
+                refs.html('<a href="#' + sysmlid + '">Figure ' + cap + '</a>');
         }
         child.children.forEach(function(child2) {
-            makeTablesAndFiguresTOCChild(child2, printElement, ob);
+            makeTablesAndFiguresTOCChild(child2, printElement, ob, live);
         });
     };
 

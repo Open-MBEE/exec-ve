@@ -525,7 +525,7 @@ function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templ
     };
 
     var refreshNumbering = function(tree, centerElement) {
-        UtilsService.makeTablesAndFiguresTOC(tree, centerElement );
+        UtilsService.makeTablesAndFiguresTOC(tree, centerElement, true);
     };
 
     return {
