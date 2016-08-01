@@ -745,7 +745,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         var deferred = $q.defer();
 
         var newInstanceId = UtilsService.createMmsId();
-        newInstanceId = newInstanceId + "-pei";
+        newInstanceId = newInstanceId + "_pei";
         var holdingBinId = null;
         var projectId = null;
         var realType = TYPE_TO_CLASSIFIER_TYPE[type];
