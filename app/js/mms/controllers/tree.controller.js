@@ -64,7 +64,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         $scope.bbApi.setPermission("tree-add-document", config == 'latest' ? true : false);
         $scope.bbApi.setPermission("tree-delete-document", config == 'latest' ? true : false);
       } else if ($state.includes('workspace.site.document')) {
-        $scope.bbApi.addButton(UxService.getButtonBarButton("tree-show-pe"));
+        $scope.bbApi.addButton(UxService.getButtonBarButton("view-mode-dropdown"));
         $scope.bbApi.setToggleState('tree-show-pe', $rootScope.veTreeShowPe);
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree-reorder-view"));
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree-full-document"));
