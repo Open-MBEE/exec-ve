@@ -63,18 +63,20 @@ function mmsDiffAttr(ElementService, ConfigService, URLService, $q) {
         // Find the right key to fetch text
         var findElemType = function(elem){
             if(scope.mmsAttr === 'name'){//the key is included and blank
-                return elem.name;
+                return elem.name + '';
             }else if (scope.mmsAttr === 'doc') {
-                return elem.documentation;
+                return elem.documentation + '';
             }else{
+                if (!elem.specialization || !elem.specialization.value || !elem.specialization.value[0])
+                    return '';
                 if(elem.specialization.value[0].type === "LiteralString"){
-                    return elem.specialization.value[0].string;
+                    return elem.specialization.value[0].string + '';
                 }else if(elem.specialization.value[0].type === "LiteralReal"){
-                    return elem.specialization.value[0].double;
+                    return elem.specialization.value[0].double + '';
                 }else if(elem.specialization.value[0].type === "LiteralBoolean"){
-                    return elem.specialization.value[0].boolean;
+                    return elem.specialization.value[0].boolean + '' ;
                 } else if (elem.specialization.value[0].type === 'LiteralInteger') {
-                    return elem.specialization.value[0].integer;
+                    return elem.specialization.value[0].integer + '';
                 }else{
                     element.html('<span class="mms-error">Value type not supported for now</span>');
                     return null;
