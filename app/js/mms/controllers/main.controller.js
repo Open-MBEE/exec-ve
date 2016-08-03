@@ -29,7 +29,7 @@ function($scope, $location, $rootScope, $state, _, $window, $uibModal, growl, $h
             description: 'close all messages',
             callback: function() {growlMessages.destroyAllMessages();}
         }).add({
-            combo: 'shift+tab',
+            combo: 'ctrl+`',
             description: 'fast cf in editor',
             callback: function() {}
         });

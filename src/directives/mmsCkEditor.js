@@ -475,7 +475,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
             instance.focusManager.blur();
           });
           instance.on( 'key', function(e) {
-            if (e.data.domEvent.getKeystroke() == CKEDITOR.SHIFT + 9) { //shift + tab
+            if (e.data.domEvent.getKeystroke() == (CKEDITOR.CTRL + 192)) { //little tilde
                 autocompleteCallback(instance);
             } else { deb(e); }
           });
