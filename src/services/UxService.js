@@ -135,18 +135,15 @@ function UxService($rootScope) {
         return {id: button, icon: 'fa-gear', selected: true, active: true, permission: true, tooltip: 'View Mode',
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);},
                 dropdown_buttons: [ getButtonBarButton("tree-show-views"), getButtonBarButton("tree-show-pe"),
-                    getButtonBarButton("tree-show-tables"), getButtonBarButton("tree-show-figures") ]};
+                    getButtonBarButton("tree-show-tablesAndFigures") ]};
       case "tree-show-views":
         return {id: button, selected: true, active: true, permission: true, tooltip: 'Show Views',
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
       case "tree-show-pe":
         return {id: button, selected: true, active: true, permission: true, tooltip: 'Show All',
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
-      case "tree-show-tables":
-        return {id: button, selected: true, active: true, permission: true, tooltip: 'Show Tables',
-                spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
-      case "tree-show-figures":
-        return {id: button, selected: true, active: true, permission: true, tooltip: 'Show Figures',
+      case "tree-show-tablesAndFigures":
+        return {id: button, selected: true, active: true, permission: true, tooltip: 'Show Tables and Figures',
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
       case "show-comments":
         return {id: button, icon: 'fa-comment-o', selected: true, active: true, permission: true, tooltip: 'Show Comments',

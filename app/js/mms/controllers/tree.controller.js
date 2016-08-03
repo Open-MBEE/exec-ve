@@ -133,11 +133,35 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     });
 
     $scope.$on('tree-show-pe', function() {
-        $scope.bbApi.toggleButtonState('tree-show-pe');
-        $rootScope.veTreeShowPe = !$rootScope.veTreeShowPe;
+        $scope.showTandF = false;
+        $rootScope.veTreeShowPe = true;
         setPeVisibility(viewId2node[document.sysmlid]);
         $scope.treeApi.refresh();
     });
+
+    $scope.$on('tree-show-views', function() {
+        $scope.showTandF = false;
+        $rootScope.veTreeShowPe = false;
+        setPeVisibility(viewId2node[document.sysmlid]);
+        $scope.treeApi.refresh();
+    });
+
+    $scope.tableList = [];
+    $scope.figureList = [];
+    $scope.$on('tree-show-tablesAndFigures', function() {
+        $scope.showTandF = true;
+        getPeTreeList(viewId2node[document.sysmlid], 'table',  $scope.tableList);
+        getPeTreeList(viewId2node[document.sysmlid], 'figure', $scope.figureList);
+    });
+
+    function getPeTreeList(branch, type, list) {
+        if ( branch.type === type) {
+            list.push(branch);
+        }
+        for (var i = 0; i < branch.children.length; i++) {
+            getPeTreeList(branch.children[i], type, list);
+        }
+    }
 
     var creatingSnapshot = false;
     $scope.$on('document-snapshot-create', function() {
@@ -1210,4 +1234,11 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             }
         }, 8000, false);
     }
+
+
+    //TODO refresh table and fig list when new item added, deleted or reordered
+    $scope.user_clicks_branch = function(branch) {
+        $rootScope.mms_treeApi.user_clicks_branch(branch);
+    };
+
 }]);
