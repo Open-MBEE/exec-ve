@@ -440,12 +440,12 @@ function UtilsService(CacheService, _) {
             ob.figureCount++;
             cap = ob.figureCount + '. ' + child.data.name;
             ob.figures += '<li><a href="#' + sysmlid + '">' + cap + '</a></li>';
-            var cap2 = el.find('figure > figcaption');
+            var cap2 = el.find('figure > figcaption, .mms-equation-caption');
             cap2.html('Figure ' + cap);//cap2.html());
             if (cap2.length === 0) {
-                var image = el.find('img');
-                image.wrap('<figure></figure>').after('<figcaption>Figure ' + cap + '</figcaption>');
-                cap2 = el.find('figure > figcaption');
+                //var image = el.find('img');
+                el.find('img').wrap('<figure></figure>').after('<figcaption>Figure ' + cap + '</figcaption>');
+                el.find('mms-view-equation').after('<div class="mms-equation-caption">Figure ' + cap + '</div>');
             }
             if (live)
                 refs.find('a').html('Figure ' + cap);
