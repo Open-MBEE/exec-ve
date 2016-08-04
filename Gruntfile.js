@@ -286,7 +286,10 @@ module.exports = function(grunt) {
     
     karma: {
         unit:{
-            configFile:'config/develop/karma.develop.conf.js'
+            configFile:'config/develop/karma.develop.conf.js',
+            singleRun: true,
+            browsers: ['PhantomJS']
+            //logLevel: 'ERROR'
         }
     },
 
@@ -375,6 +378,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-sloc');
   grunt.loadNpmTasks('grunt-plato');  
   grunt.loadNpmTasks('grunt-cache-bust');
+  grunt.loadNpmTasks('grunt-phantom');
   
   // grunt.registerTask('install', ['npm-install', 'bower']);
   grunt.registerTask('install', ['bower-install-simple']);
