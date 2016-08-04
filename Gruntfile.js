@@ -277,7 +277,7 @@ module.exports = function(grunt) {
         options: {
           publish: [{
             id: 'gov.nasa.jpl:evm:zip',
-            version: '2.3-SNAPSHOT',
+            version: '2.4-SNAPSHOT',
             path: 'deploy/'
           }]
         }
