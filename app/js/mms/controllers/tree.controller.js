@@ -64,7 +64,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         $scope.bbApi.setPermission("tree-add-document", config == 'latest' ? true : false);
         $scope.bbApi.setPermission("tree-delete-document", config == 'latest' ? true : false);
       } else if ($state.includes('workspace.site.document')) {
-        $scope.bbApi.addButton(UxService.getButtonBarButton("tree-show-pe"));
+        $scope.bbApi.addButton(UxService.getButtonBarButton("view-mode-dropdown"));
         $scope.bbApi.setToggleState('tree-show-pe', $rootScope.veTreeShowPe);
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree-reorder-view"));
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree-full-document"));
@@ -137,11 +137,48 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     });
 
     $scope.$on('tree-show-pe', function() {
-        $scope.bbApi.toggleButtonState('tree-show-pe');
-        $rootScope.veTreeShowPe = !$rootScope.veTreeShowPe;
+        $scope.showTandF = false;
+        $rootScope.veTreeShowPe = true;
         setPeVisibility(viewId2node[document.sysmlid]);
         $scope.treeApi.refresh();
     });
+
+    $scope.$on('tree-show-views', function() {
+        $scope.showTandF = false;
+        $rootScope.veTreeShowPe = false;
+        setPeVisibility(viewId2node[document.sysmlid]);
+        $scope.treeApi.refresh();
+    });
+
+    $scope.tableList = [];
+    $scope.figureList = [];
+    $scope.$on('tree-show-tablesAndFigures', function() {
+        $scope.showTandF = true;
+        getPeTreeList(viewId2node[document.sysmlid], 'table',  $scope.tableList);
+        getPeTreeList(viewId2node[document.sysmlid], 'figure', $scope.figureList);
+    });
+
+    // Get a list of specific PE type from branch
+    function getPeTreeList(branch, type, list) {
+        if ( branch.type === type) {
+            list.push(branch);
+        }
+        for (var i = 0; i < branch.children.length; i++) {
+            getPeTreeList(branch.children[i], type, list);
+        }
+    }
+
+    // Function to refresh table and figure list when new item added, deleted or reordered
+    function resetPeList(elemType) {
+        if (elemType == 'table' || elemType == 'all') {
+            $scope.tableList = [];
+            getPeTreeList(viewId2node[document.sysmlid], 'table', $scope.tableList);
+        }
+        if (elemType == 'figure' || elemType == 'image' || elemType == 'equation' || elemType == 'all') {
+            $scope.figureList = [];
+            getPeTreeList(viewId2node[document.sysmlid], 'figure', $scope.figureList);
+        }
+    }
 
     var creatingSnapshot = false;
     $scope.$on('document-snapshot-create', function() {
@@ -477,6 +514,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 addSectionElements(containedElement, viewNode, sectionTreeNode);
             }
             $scope.treeApi.refresh();
+            resetPeList('all');
         };
 
         var addContentsSectionTreeNode = function(operand) {
@@ -534,6 +572,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                     }
                 }
                 $scope.treeApi.refresh();
+                resetPeList('all');
             }, function(reason) {
                 //view is bad
             });
@@ -1184,7 +1223,9 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         branch.children.splice(lastSection+1, 0, newbranch);
         if (elemType == 'section') 
             addSectionElements(instanceSpec, viewNode, newbranch);
+
         $scope.treeApi.refresh();
+        resetPeList(elemType);
     });
 
     // Utils creates this event when deleting instances from the view
@@ -1193,6 +1234,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         var branch = $scope.treeApi.get_branch(elementData);
         if (branch)
             $scope.treeApi.remove_single_branch(branch);
+        resetPeList(branch.type);
     });
 
     $scope.$on('view.reorder.saved', function(event, vid) {
@@ -1223,4 +1265,11 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             }
         }, 8000, false);
     }
+
+
+    //TODO refresh table and fig list when new item added, deleted or reordered
+    $scope.user_clicks_branch = function(branch) {
+        $rootScope.mms_treeApi.user_clicks_branch(branch);
+    };
+
 }]);

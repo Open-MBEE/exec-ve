@@ -176,7 +176,7 @@ function mmsTree($timeout, $log, $templateCache) {
 
         var expand_all_parents = function(child) {
             for_all_ancestors(child, function(b) {
-	            if(b.expandable === true)
+                if(b.expandable === true)
                 {
                     scope.expandCallback({ branch: b });
                 }
@@ -207,7 +207,7 @@ function mmsTree($timeout, $log, $templateCache) {
                     selected_branch.selected = false;
                 branch.selected = true;
                 selected_branch = branch;
-	            /*if(branch.expandable === true)
+                /*if(branch.expandable === true)
                 {
                     scope.expandCallback({ branch: branch });
                 }*/
@@ -697,10 +697,14 @@ function mmsTree($timeout, $log, $templateCache) {
                 return branch;
             };
             
-            tree.get_rows = function()
-            {
-	            return scope.tree_rows;
+            tree.get_rows = function() {
+                return scope.tree_rows;
             };
+
+            tree.user_clicks_branch = function(branch) {
+                return scope.user_clicks_branch(branch);
+            };
+
         }
     };
 
