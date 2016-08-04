@@ -13,7 +13,7 @@ angular.module('mms')
  */
 function UtilsService(CacheService, _) {
     var nonEditKeys = ['contains', 'view2view', 'childrenViews', 'displayedElements',
-        'allowedElements', 'contents', 'relatedDocuments'];
+        'allowedElements', 'contents', 'relatedDocuments', 'childViews'];
 
     var hasCircularReference = function(scope, curId, curType) {
         var curscope = scope;
@@ -443,7 +443,8 @@ function UtilsService(CacheService, _) {
     };
 
     var makeHtmlTOCChild = function(child) {
-
+        if (child.type !== 'view' && child.type !== 'section')
+            return '';
         var result = '<ul>';
 
         var anchor = '<a href=#' + child.data.sysmlid + '>';
@@ -456,6 +457,63 @@ function UtilsService(CacheService, _) {
         result += '</ul>'; 
 
         return result;
+    };
+
+    var makeTablesAndFiguresTOC = function(tree, printElement, live) {
+        var ob = {
+            tables: '<div class="tot"><div class="header">List of Tables</div><ul>',
+            figures: '<div class="tof"><div class="header">List of Figures</div><ul>',
+            tableCount: 0,
+            figureCount: 0
+        };
+        var root_branch = tree[0].branch;
+        root_branch.children.forEach(function (child) {
+            makeTablesAndFiguresTOCChild(child, printElement, ob, live);
+        });
+
+        ob.tables += '</ul></div>'; 
+        ob.figures += '</ul></div>'; 
+        return ob;
+    };
+
+    var makeTablesAndFiguresTOCChild = function(child, printElement, ob, live) {
+        var sysmlid = child.data.sysmlid;
+        var el = printElement.find('#' + sysmlid);
+        var refs = printElement.find('mms-view-link[data-mms-peid="' + sysmlid + '"]');
+        var cap = '';
+        if (child.type === 'table') {
+            ob.tableCount++;
+            cap = ob.tableCount + '. ' + child.data.name;
+            ob.tables += '<li><a href="#' + sysmlid + '">' + cap + '</a></li>';
+            var cap1 = el.find('table > caption');
+            cap1.html('Table ' + cap);//cap.html());
+            if (cap1.length === 0) {
+                //var table = el.find('table');
+            }
+            if (live)
+                refs.find('a').html('Table ' + cap);
+            else
+                refs.html('<a href="#' + sysmlid + '">Table ' + cap + '</a>');
+        } 
+        if (child.type === 'figure') {
+            ob.figureCount++;
+            cap = ob.figureCount + '. ' + child.data.name;
+            ob.figures += '<li><a href="#' + sysmlid + '">' + cap + '</a></li>';
+            var cap2 = el.find('figure > figcaption, .mms-equation-caption');
+            cap2.html('Figure ' + cap);//cap2.html());
+            if (cap2.length === 0) {
+                //var image = el.find('img');
+                el.find('img').wrap('<figure></figure>').after('<figcaption>Figure ' + cap + '</figcaption>');
+                el.find('mms-view-equation').after('<div class="mms-equation-caption">Figure ' + cap + '</div>');
+            }
+            if (live)
+                refs.find('a').html('Figure ' + cap);
+            else
+                refs.html('<a href="#' + sysmlid + '">Figure ' + cap + '</a>');
+        }
+        child.children.forEach(function(child2) {
+            makeTablesAndFiguresTOCChild(child2, printElement, ob, live);
+        });
     };
 
     var createMmsId = function() {
@@ -474,7 +532,7 @@ function UtilsService(CacheService, _) {
         var projectName = null;
         var siteId = siteid;
 
-        if (elem) {
+        if (elem && elem.qualifiedId && elem.qualifiedName) {
             var splitArray = elem.qualifiedId.split('/');
             var projectNameArray = elem.qualifiedName.split('/');
             if (splitArray && splitArray.length > 2) {
@@ -502,7 +560,7 @@ function UtilsService(CacheService, _) {
     tag = ve tag name if available
     displayTime = tag time or generation time as mm/dd/yy hh:mm am/pm
     */
-    var getPrintCss = function(header, footer, dnum, tag, displayTime) {
+    var getPrintCss = function(header, footer, dnum, tag, displayTime, landscape) {
         var ret = "img {max-width: 100%; page-break-inside: avoid; page-break-before: auto; page-break-after: auto; display: block;}\n" + 
                 " tr, td, th { page-break-inside: avoid; } thead {display: table-header-group;}\n" + 
                 ".pull-right {float: right;}\n" + 
@@ -517,7 +575,7 @@ function UtilsService(CacheService, _) {
                 "h1 {font-size: 20px; padding: 0px; margin: 4px;}\n" +
                 ".ng-hide {display: none;}\n" +
                 "body {font-size: 9pt; font-family: 'Times New Roman', Times, serif; }\n" + 
-                "caption, figcaption {text-align: center; font-weight: bold;}\n" +
+                "caption, figcaption, .mms-equation-caption {text-align: center; font-weight: bold;}\n" +
                 ".toc, .tof, .tot {page-break-after:always;}\n" +
                 ".toc a, .tof a, .tot a { text-decoration:none; color: #000; font-size:9pt; }\n" + 
                 ".toc .header, .tof .header, .tot .header { margin-bottom: 4px; font-weight: bold; font-size:24px; }\n" + 
@@ -526,6 +584,8 @@ function UtilsService(CacheService, _) {
                 ".toc ul {padding-left:4em;}\n" +
                 ".toc > ul {padding-left:0;}\n" +
                 ".toc li > a[href]::after {content: leader('.') target-counter(attr(href), page);}\n" + 
+                ".tot li > a[href]::after {content: leader('.') target-counter(attr(href), page);}\n" + 
+                ".tof li > a[href]::after {content: leader('.') target-counter(attr(href), page);}\n" + 
                 "@page {margin: 0.5in;}\n";
                 //"@page big_table {  size: 8.5in 11in; margin: 0.75in; prince-shrink-to-fit:auto;}\n" +  //size: 11in 8.5in;
                 //".big-table {page: big_table; max-width: 1100px; }\n";
@@ -541,6 +601,8 @@ function UtilsService(CacheService, _) {
         } else {
             ret += "@page { @top-right { font-size: 10px; content: '" + displayTime + "';}}\n";
         }
+        if (landscape)
+            ret += "@page {size: 11in 8.5in;}";
                 //"@page{prince-shrink-to-fit:auto;size: A4 portrait;margin-left:8mm;margin-right:8mm;}";
         return ret;
     };
@@ -559,6 +621,7 @@ function UtilsService(CacheService, _) {
         makeHtmlPara: makeHtmlPara,
         makeHtmlList: makeHtmlList,
         makeHtmlTOC: makeHtmlTOC,
+        makeTablesAndFiguresTOC: makeTablesAndFiguresTOC,
         createMmsId: createMmsId,
         getIdInfo: getIdInfo,
         getPrintCss: getPrintCss
