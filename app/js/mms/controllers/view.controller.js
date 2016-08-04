@@ -101,7 +101,6 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $uibModal, $window,
                 $scope.bbApi.addButton(UxService.getButtonBarButton('convert-pdf'));
             $scope.bbApi.addButton(UxService.getButtonBarButton('word'));
             $scope.bbApi.addButton(UxService.getButtonBarButton('tabletocsv'));
-            $scope.bbApi.addButton(UxService.getButtonBarButton('refresh-numbering'));
         }
         $scope.bbApi.addButton(UxService.getButtonBarButton('show-elements'));
         $scope.bbApi.setToggleState('show-elements', $rootScope.veElementsOn);
@@ -118,6 +117,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $uibModal, $window,
       
         if ($state.includes('workspace.site.document') || $state.includes('workspace.site.documentpreview')) {
             if ($state.includes('workspace.site.document')) {
+                $scope.bbApi.addButton(UxService.getButtonBarButton('refresh-numbering'));
                 $scope.bbApi.addButton(UxService.getButtonBarButton('center-previous'));
                 $scope.bbApi.addButton(UxService.getButtonBarButton('center-next'));
                 hotkeys.bindTo($scope)

@@ -127,6 +127,10 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     });
 
     $scope.$on('tree-reorder-view', function() {
+        if (document.specialization && document.specialization.view2view && document.specialization.view2view.length > 0) {
+            growl.warning("Add View Error: This document hierarchy has not been migrated to support reordering views.");
+            return;
+        }
         $rootScope.mms_fullDocMode = false;
         $scope.bbApi.setToggleState("tree-full-document", false);
         $state.go('workspace.site.document.order', {search: undefined});
@@ -802,6 +806,10 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             branchType = 'view';
         } 
         else if (itemType === 'View') {
+            if (document.specialization && document.specialization.view2view && document.specialization.view2view.length > 0) {
+                growl.warning("Add View Error: This document hierarchy has not been migrated to support adding views.");
+                return;
+            }
             if (!branch) {
                 growl.warning("Add View Error: Select parent view first");
                 return;
@@ -896,11 +904,16 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             growl.warning("Delete Error: Select item to delete.");
             return;
         }
-        if ($state.includes('workspace.site.document') && 
-            (branch.type !== 'view' || (branch.data.specialization && 
-                branch.data.specialization.type !=='View' && branch.data.specialization.type !== 'Product'))) {
-            growl.warning("Delete Error: Selected item is not a view.");
-            return;
+        if ($state.includes('workspace.site.document')) { 
+            if (branch.type !== 'view' || (branch.data.specialization && 
+                    branch.data.specialization.type !=='View' && branch.data.specialization.type !== 'Product')) {
+                growl.warning("Delete Error: Selected item is not a view.");
+                return;
+            }
+            if (document.specialization && document.specialization.view2view && document.specialization.view2view.length > 0) {
+                growl.warning("Delete View Error: This document hierarchy has not been migrated to support deleting views.");
+                return;
+            }
         }
         if ($state.includes('workspace.sites') && !$state.includes('workspace.site.document')) {
             if (branch.type !== 'view' || (branch.data.specialization && branch.data.specialization.type !== 'Product')) {

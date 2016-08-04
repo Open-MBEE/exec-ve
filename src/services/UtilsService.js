@@ -440,12 +440,12 @@ function UtilsService(CacheService, _) {
             ob.figureCount++;
             cap = ob.figureCount + '. ' + child.data.name;
             ob.figures += '<li><a href="#' + sysmlid + '">' + cap + '</a></li>';
-            var cap2 = el.find('figure > figcaption');
+            var cap2 = el.find('figure > figcaption, .mms-equation-caption');
             cap2.html('Figure ' + cap);//cap2.html());
             if (cap2.length === 0) {
-                var image = el.find('img');
-                image.wrap('<figure></figure>').after('<figcaption>Figure ' + cap + '</figcaption>');
-                cap2 = el.find('figure > figcaption');
+                //var image = el.find('img');
+                el.find('img').wrap('<figure></figure>').after('<figcaption>Figure ' + cap + '</figcaption>');
+                el.find('mms-view-equation').after('<div class="mms-equation-caption">Figure ' + cap + '</div>');
             }
             if (live)
                 refs.find('a').html('Figure ' + cap);
@@ -516,7 +516,7 @@ function UtilsService(CacheService, _) {
                 "h1 {font-size: 20px; padding: 0px; margin: 4px;}\n" +
                 ".ng-hide {display: none;}\n" +
                 "body {font-size: 9pt; font-family: 'Times New Roman', Times, serif; }\n" + 
-                "caption, figcaption {text-align: center; font-weight: bold;}\n" +
+                "caption, figcaption, .mms-equation-caption {text-align: center; font-weight: bold;}\n" +
                 ".toc, .tof, .tot {page-break-after:always;}\n" +
                 ".toc a, .tof a, .tot a { text-decoration:none; color: #000; font-size:9pt; }\n" + 
                 ".toc .header, .tof .header, .tot .header { margin-bottom: 4px; font-weight: bold; font-size:24px; }\n" + 
