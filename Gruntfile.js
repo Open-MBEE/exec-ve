@@ -378,7 +378,6 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-sloc');
   grunt.loadNpmTasks('grunt-plato');  
   grunt.loadNpmTasks('grunt-cache-bust');
-  grunt.loadNpmTasks('grunt-phantom');
   
   // grunt.registerTask('install', ['npm-install', 'bower']);
   grunt.registerTask('install', ['bower-install-simple']);
