@@ -154,12 +154,25 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         getPeTreeList(viewId2node[document.sysmlid], 'figure', $scope.figureList);
     });
 
+    // Get a list of specific PE type from branch
     function getPeTreeList(branch, type, list) {
         if ( branch.type === type) {
             list.push(branch);
         }
         for (var i = 0; i < branch.children.length; i++) {
             getPeTreeList(branch.children[i], type, list);
+        }
+    }
+
+    // Function to refresh table and figure list when new item added, deleted or reordered
+    function resetPeList(elemType) {
+        if (elemType == 'table' || elemType == 'all') {
+            $scope.tableList = [];
+            getPeTreeList(viewId2node[document.sysmlid], 'table', $scope.tableList);
+        }
+        if (elemType == 'figure' || elemType == 'image' || elemType == 'equation' || elemType == 'all') {
+            $scope.figureList = [];
+            getPeTreeList(viewId2node[document.sysmlid], 'figure', $scope.figureList);
         }
     }
 
@@ -497,6 +510,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 addSectionElements(containedElement, viewNode, sectionTreeNode);
             }
             $scope.treeApi.refresh();
+            resetPeList('all');
         };
 
         var addContentsSectionTreeNode = function(operand) {
@@ -554,6 +568,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                     }
                 }
                 $scope.treeApi.refresh();
+                resetPeList('all');
             }, function(reason) {
                 //view is bad
             });
@@ -1195,7 +1210,9 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         branch.children.splice(lastSection+1, 0, newbranch);
         if (elemType == 'section') 
             addSectionElements(instanceSpec, viewNode, newbranch);
+
         $scope.treeApi.refresh();
+        resetPeList(elemType);
     });
 
     // Utils creates this event when deleting instances from the view
@@ -1204,6 +1221,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         var branch = $scope.treeApi.get_branch(elementData);
         if (branch)
             $scope.treeApi.remove_single_branch(branch);
+        resetPeList(branch.type);
     });
 
     $scope.$on('view.reorder.saved', function(event, vid) {
