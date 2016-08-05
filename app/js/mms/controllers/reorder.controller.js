@@ -106,6 +106,8 @@ function($scope, $rootScope, $stateParams, document, time, ElementService, ViewS
                 toSave.push({
                     sysmlid: id,
                     //name: orig.name,
+                    read: orig.read,
+                    modified: orig.modified,
                     specialization: {
                         childViews: childViews,
                         type: orig.specialization.type
@@ -118,7 +120,10 @@ function($scope, $rootScope, $stateParams, document, time, ElementService, ViewS
             growl.success('Reorder Successful');
             $state.go('workspace.site.document', {}, {reload:true});
         }, function(reason) {
-
+            if (reason.status === 409)
+                growl.error("conflict!");
+            else
+                growl.error('bad! ' + reason.status);
         }).finally(function() {
             $scope.saveClass = "";
             saving = false;
