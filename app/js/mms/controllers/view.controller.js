@@ -299,7 +299,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $uibModal, $window,
     };
     $scope.searchOptions= {};
     $scope.searchOptions.callback = function(elem) {
-        $scope.tscClicked(elem.sysmlid);
+        $scope.tscClicked(elem.sysmlid, ws, time);
         if ($rootScope.mms_togglePane && $rootScope.mms_togglePane.closed)
             $rootScope.mms_togglePane.toggle();
     };
