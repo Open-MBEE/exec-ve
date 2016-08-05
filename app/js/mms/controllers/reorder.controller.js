@@ -121,9 +121,9 @@ function($scope, $rootScope, $stateParams, document, time, ElementService, ViewS
             $state.go('workspace.site.document', {}, {reload:true});
         }, function(reason) {
             if (reason.status === 409)
-                growl.error("conflict!");
+                growl.error("There's a conflict in the views you're trying to change!");
             else
-                growl.error('bad! ' + reason.status);
+                growl.error(reason.message);
         }).finally(function() {
             $scope.saveClass = "";
             saving = false;
