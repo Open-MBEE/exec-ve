@@ -522,7 +522,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         .then(function(data) {  
             var clone = {};
             clone.sysmlid = data.sysmlid;
-            //clone.read = data.read;
+            clone.read = data.read;
+            clone.modified = data.modified;
             clone.specialization = _.cloneDeep(data.specialization);
             if (clone.specialization.contains)
                 delete clone.specialization.contains;
@@ -850,7 +851,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
     var createView = function(owner, name, documentId, workspace, viewId, viewDoc, site, isDoc) {
         var deferred = $q.defer();
         var newViewId = viewId ? viewId : UtilsService.createMmsId();
-        var newInstanceId = UtilsService.createMmsId();
+        var newInstanceId = UtilsService.createMmsId() + '_pei';
         var ids = UtilsService.getIdInfo(owner, site);
         var holdingBinId = ids.holdingBinId;
         var projectId = ids.projectId;
