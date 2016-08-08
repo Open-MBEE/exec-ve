@@ -161,7 +161,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 return null;
             },
             views: function(ticket) {
-                return null;
+                return [];
             },
             view: function(ticket) {
                 return null;
@@ -440,9 +440,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 return deferred.promise;
             },
             views: function(ViewService, workspace, document, time, ticket) {
-                if (document === null) 
-                    return null;
-                return ViewService.getDocumentViews(document.sysmlid, false, workspace, time, true, 2);
+                return [];
             },
             viewElements: function(ViewService, workspace, document, time, ticket) {
                 if (document === null) 
@@ -493,9 +491,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 return ElementService.getElement($stateParams.document, false, workspace, time, 2);
             },
             views: function(ViewService, workspace, document, time, ticket) {
-                if (document === null) 
-                    return null;
-                return ViewService.getDocumentViews(document.sysmlid, false, workspace, time, true, 2);
+                return [];
             },
             viewElements: function(ViewService, workspace, document, time, ticket) {
                 if (document === null) 
