@@ -440,60 +440,58 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     } else if ($state.includes('workspace.sites') && !$state.includes('workspace.site.document')) {
         $scope.my_data = UtilsService.buildTreeHierarchy(filter_sites(sites), "sysmlid", "site", "parent", siteInitFunc);
     } else {
-        // this is from view editor
-        viewId2node[document.sysmlid] = {
-            label: document.name,
-            type: 'view',
-            data: document,
-            children: [],
-            loading: false
-        };
-        views.forEach(function(view) {
-            var viewTreeNode = { 
-                label : view.name, 
-                type : "view",
-                data : view, 
-                children : [], 
-                loading: false
-            };
-            viewId2node[view.sysmlid] = viewTreeNode;
-            //addSectionElements(elements[i], viewTreeNode, viewTreeNode);
-        });
-
         var seenChild = {};
-      if (document.specialization.view2view && document.specialization.view2view.length > 0) {
-        document.specialization.view2view.forEach(function(view) {
-            var viewid = view.id;
-            view.childrenViews.forEach(function(childId) {
-                if (seenChild[childId]) {
-                    growl.error("You have a view called " + seenChild[childId].label + " that's a child of multiple parents! Please fix in the model.");
-                    return;
-                }
-                if (!viewId2node[childId]) {
-                    growl.error("View " + childId + " not found.");
-                    return;
-                }
-                if (!viewId2node[viewid]) {
-                    growl.error("View " + viewid + " not found.");
-                    return;
-                }
-                viewId2node[viewid].children.push(viewId2node[childId]);
-                seenChild[childId] = viewId2node[childId];
+        if (document.specialization.view2view && document.specialization.view2view.length > 0) {
+            viewId2node[document.sysmlid] = {
+                label: document.name,
+                type: 'view',
+                data: document,
+                children: [],
+                loading: false,
+            };
+            views.forEach(function(view) {
+                var viewTreeNode = { 
+                    label : view.name, 
+                    type : "view",
+                    data : view, 
+                    children : [], 
+                    loading: false
+                };
+                viewId2node[view.sysmlid] = viewTreeNode;
+                    //addSectionElements(elements[i], viewTreeNode, viewTreeNode);
             });
-        });
-      } else {
-        if (!document.specialization.childViews)
-            document.specialization.childViews = [];
-        MmsAppUtils.handleChildViews(document, 'COMPOSITE', ws, time, handleSingleView, handleChildren)
-        .then(function(node) {
-            for (var i in viewId2node) {
-                addSectionElements(viewId2node[i].data, viewId2node[i], viewId2node[i]);
-            }
-            $scope.treeApi.refresh();
-        }, function(reason) {
-            console.log(reason);
-        });
-      }
+            document.specialization.view2view.forEach(function(view) {
+                var viewid = view.id;
+                view.childrenViews.forEach(function(childId) {
+                    if (seenChild[childId]) {
+                        growl.error("You have a view called " + seenChild[childId].label + " that's a child of multiple parents! Please fix in the model.");
+                        return;
+                    }
+                    if (!viewId2node[childId]) {
+                        growl.error("View " + childId + " not found.");
+                        return;
+                    }
+                    if (!viewId2node[viewid]) {
+                        growl.error("View " + viewid + " not found.");
+                        return;
+                    }
+                    viewId2node[viewid].children.push(viewId2node[childId]);
+                    seenChild[childId] = viewId2node[childId];
+                });
+            });
+        } else {
+            if (!document.specialization.childViews)
+                document.specialization.childViews = [];
+            MmsAppUtils.handleChildViews(document, 'COMPOSITE', ws, time, handleSingleView, handleChildren)
+            .then(function(node) {
+                for (var i in viewId2node) {
+                    addSectionElements(viewId2node[i].data, viewId2node[i], viewId2node[i]);
+                }
+                $scope.treeApi.refresh();
+            }, function(reason) {
+                console.log(reason);
+            });
+        }
         $scope.my_data = [viewId2node[document.sysmlid]];
     }
 
@@ -815,6 +813,9 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 return;
             } else if (branch.type === "section") {
                 growl.warning("Add View Error: Cannot add a child view to a section");
+                return;
+            } else if (branch.aggr === 'NONE') {
+                growl.warning("Add View Error: Cannot add a child view to a non-owned and non-shared view.");
                 return;
             }
             templateUrlStr = 'partials/mms/new-view.html';
