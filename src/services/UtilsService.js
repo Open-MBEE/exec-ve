@@ -404,27 +404,34 @@ function UtilsService(CacheService, _) {
         var ob = {
             tables: '<div class="tot"><div class="header">List of Tables</div><ul>',
             figures: '<div class="tof"><div class="header">List of Figures</div><ul>',
+            equations: '<div class="tof"><div class="header">List of Equations</div><ul>',
             tableCount: 0,
-            figureCount: 0
+            figureCount: 0,
+            equationCount: 0
         };
         var root_branch = tree[0].branch;
         root_branch.children.forEach(function (child) {
             makeTablesAndFiguresTOCChild(child, printElement, ob, live);
         });
 
-        ob.tables += '</ul></div>'; 
-        ob.figures += '</ul></div>'; 
+        ob.tables += '</ul></div>';
+        ob.figures += '</ul></div>';
+        ob.equations += '</ul></div>';
         return ob;
     };
 
     var makeTablesAndFiguresTOCChild = function(child, printElement, ob, live) {
+        var showRefName = true;
         var sysmlid = child.data.sysmlid;
         var el = printElement.find('#' + sysmlid);
         var refs = printElement.find('mms-view-link[data-mms-peid="' + sysmlid + '"]');
         var cap = '';
         if (child.type === 'table') {
             ob.tableCount++;
-            cap = ob.tableCount + '. ' + child.data.name;
+            if (showRefName) {
+                cap = ob.tableCount + '. ' + child.data.name;
+            } else cap = ob.tableCount;
+            // cap = ob.tableCount + '. ' + child.data.name;
             ob.tables += '<li><a href="#' + sysmlid + '">' + cap + '</a></li>';
             var cap1 = el.find('table > caption');
             cap1.html('Table ' + cap);//cap.html());
@@ -435,22 +442,42 @@ function UtilsService(CacheService, _) {
                 refs.find('a').html('Table ' + cap);
             else
                 refs.html('<a href="#' + sysmlid + '">Table ' + cap + '</a>');
-        } 
+        }
         if (child.type === 'figure') {
-            ob.figureCount++;
-            cap = ob.figureCount + '. ' + child.data.name;
-            ob.figures += '<li><a href="#' + sysmlid + '">' + cap + '</a></li>';
-            var cap2 = el.find('figure > figcaption, .mms-equation-caption');
-            cap2.html('Figure ' + cap);//cap2.html());
-            if (cap2.length === 0) {
-                //var image = el.find('img');
-                el.find('img').wrap('<figure></figure>').after('<figcaption>Figure ' + cap + '</figcaption>');
-                el.find('mms-view-equation').after('<div class="mms-equation-caption">Figure ' + cap + '</div>');
+            if (el.find('mms-view-equation').length){
+                ob.equationCount++;
+                if (showRefName) {
+                    cap = ob.equationCount + '. ' + child.data.name;
+                } else cap = ob.equationCount;
+                // cap = ob.figureCount + '. ' + child.data.name;
+                ob.equations += '<li><a href="#' + sysmlid + '">' + cap + '</a></li>';
+                var cap2 = el.find('.mms-equation-caption');
+                cap2.html('Eq. ' + cap);
+                if (cap2.length === 0) {
+                    el.find('mms-view-equation').after('<div class="mms-equation-caption">Eq. ' + cap + '</div>');
+                }
+                if (live)
+                    refs.find('a').html('Eq. ' + cap);
+                else
+                    refs.html('<a href="#' + sysmlid + '">Eq. ' + cap + '</a>');
+            } else {
+                ob.figureCount++;
+                if (showRefName) {
+                    cap = ob.figureCount + '. ' + child.data.name;
+                } else cap = ob.figureCount;
+                // cap = ob.figureCount + '. ' + child.data.name;
+                ob.figures += '<li><a href="#' + sysmlid + '">' + cap + '</a></li>';
+                var cap3 = el.find('figure > figcaption, .mms-equation-caption');
+                cap3.html('Figure ' + cap);
+                if (cap3.length === 0) {
+                    el.find('img').wrap('<figure></figure>').after('<figcaption>Figure ' + cap + '</figcaption>');
+                    // el.find('mms-view-equation').after('<div class="mms-equation-caption">Figure ' + cap + '</div>');
+                }
+                if (live)
+                    refs.find('a').html('Figure ' + cap);
+                else
+                    refs.html('<a href="#' + sysmlid + '">Figure ' + cap + '</a>');
             }
-            if (live)
-                refs.find('a').html('Figure ' + cap);
-            else
-                refs.html('<a href="#' + sysmlid + '">Figure ' + cap + '</a>');
         }
         child.children.forEach(function(child2) {
             makeTablesAndFiguresTOCChild(child2, printElement, ob, live);
