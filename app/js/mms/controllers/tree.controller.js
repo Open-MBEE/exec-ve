@@ -1258,7 +1258,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
 
     if ($state.includes('workspace.site.document')) {
         $timeout(function() {
-            if (document.specialization.view2view) {
+            if (document.specialization.view2view && document.specialization.view2view.length > 0) {
                 document.specialization.view2view.forEach(function(view, index) {
                     ViewService.getView(view.id, false, ws, time, 0)
                     .then(addViewSections); //TODO add back in once we have priority queue
