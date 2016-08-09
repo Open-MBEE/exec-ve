@@ -55,6 +55,17 @@
                     </div>
                 </li>
             </ul>
+            <h5 style="margin: 3px 0px 3px 10px;">List of Equations</h5>
+            <ul class="nav nav-list nav-pills nav-stacked abn-tree">
+                <li ng-repeat=" row in equationList | filter:treeFilter.search " class="abn-tree-row">
+                    <div class="arrow" ng-click="user_clicks_branch(row)" ng-class="{'active-text': row.branch.selected}" id="tree-branch-{{row.data.sysmlid}}">
+                        <a class="tree-item" style="padding-left: 20px; position:relative;" ng-click="my_tree_handler(row)">
+                            <i ng-class="{'active-text': row.branch.selected}" class="indented tree-icon fa fa-image" ></i>
+                            <span class="indented tree-label" ng-class="{'active-text': row.branch.selected}">{{row.data.name}}</span>
+                        </a>
+                    </div>
+                </li>
+            </ul>
         </div>
     </div>
 </div>
