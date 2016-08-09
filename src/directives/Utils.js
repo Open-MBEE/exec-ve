@@ -51,7 +51,7 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
      * @param {string} mmsWs workspace
      * @param {string} mmsType workspace/tag/element
      * @param {string} mmsEid id of element
-     * @param {object} [tinymceApi=null] optional tinymce api
+     * @param {object} [editorApi=null] optional editor api
      * @param {object} scope angular scope that has common functions
      * @param {string} type name/documentation/value/all
      * @return {Promise} promise would be resolved with updated element if save is successful.
@@ -60,7 +60,7 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
      *      or force save. If the user decides to discord or merge, type will be info even though 
      *      the original save failed. Error means an actual error occured. 
      */
-    var save = function(edit, mmsWs, mmsType, mmsEid, tinymceApi, scope, type, continueEdit) {
+    var save = function(edit, mmsWs, mmsType, mmsEid, editorApi, scope, type, continueEdit) {
         var deferred = $q.defer();
         // TODO: put this back when removed scope.editing from view documentation edit
         /* if (!scope.editable || !scope.editing) {
@@ -68,8 +68,8 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
             return deferred.promise;
         } */
 
-        if (tinymceApi && tinymceApi.save)
-            tinymceApi.save();
+        if (editorApi && editorApi.save)
+            editorApi.save();
         if (mmsType === 'workspace') {
             WorkspaceService.update(edit)
             .then(function(data) {
@@ -123,7 +123,7 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
                         } else if (choice === 'force') {
                             edit.read = scope.latest.read;
                             edit.modified = scope.latest.modified;
-                            save(edit, mmsWs, mmsType, mmsEid, tinymceApi, scope, type).then(function(resolved) {
+                            save(edit, mmsWs, mmsType, mmsEid, editorApi, scope, type).then(function(resolved) {
                                 deferred.resolve(resolved);
                             }, function(error) {
                                 deferred.reject(error);
@@ -190,7 +190,9 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
      * @param {string} type name/documentation/value
      * @param {boolean} revertAll revert all properties
      */
-    var revertEdits = function(scope, type, revertAll) {
+    var revertEdits = function(scope, type, revertAll, editorApi) {
+        if (editorApi && editorApi.destroy)
+            editorApi.destroy();
         if (scope.mmsType === 'workspace') {
             scope.edit.name = scope.element.name;
         } 
