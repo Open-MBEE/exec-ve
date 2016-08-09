@@ -74,7 +74,7 @@ function($scope, $location, $rootScope, $state, _, $window, $uibModal, growl, $h
             modalOpen = true;
             var instance = $uibModal.open({
                 template: '<div class="modal-header">You have been logged out, please login again.</div><div class="modal-body"><form name="loginForm" ng-submit="login(credentials)">' + 
-                                '<input type="text" class="form-control login-icons" ng-model="credentials.username" placeholder="&#xf007; JPL Username" style="margin-bottom: 1.5em;" autofocus>' + 
+                                '<input type="text" class="form-control login-icons" ng-model="credentials.username" placeholder="&#xf007; Username" style="margin-bottom: 1.5em;" autofocus>' + 
                                 '<input type="password" class="form-control login-icons" ng-model="credentials.password" placeholder="&#xf084; Password" style="margin-bottom: 1.5em;">' + 
                                 '<button class="btn btn-block" type="submit" style="background: #2f889a; color:white;">LOG IN <span ng-if="spin" ><i class="fa fa-spin fa-spinner"></i>' + 
                             '</span></button></form></div>',
