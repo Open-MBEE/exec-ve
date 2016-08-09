@@ -15,7 +15,7 @@ angular.module('mms.directives')
  *  Compares a element at two different times and generates a pretty diff. 
  * ## Example
  * 
- * <mms-diff-attr mms-eid="element-id" mms-attr="name/doc/val" mms-version1="timestamp/latest/tag?" mms-version2="timestamp/latest/tag?"></mms-diff-attr>
+ * <mms-diff-attr mms-eid="element-id" mms-attr="name/doc/val" mms-version-one="timestamp/latest/tag?" mms-version-two="timestamp/latest/tag?"></mms-diff-attr>
  *
  * @param {string} mmsEid The id of the element whose doc to transclude
  * @param {string=master} mmsWs Workspace to use, defaults to master
