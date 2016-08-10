@@ -1215,8 +1215,25 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         return instanceSpec.specialization && instanceSpec.specialization.classifier && 
                instanceSpec.specialization.classifier.length > 0 &&
                (instanceSpec.specialization.classifier[0] === TYPE_TO_CLASSIFIER_ID.Figure ||
-                instanceSpec.specialization.classifier[0] === TYPE_TO_CLASSIFIER_ID.Image ||
-                instanceSpec.specialization.classifier[0] === TYPE_TO_CLASSIFIER_ID.Equation);
+                instanceSpec.specialization.classifier[0] === TYPE_TO_CLASSIFIER_ID.Image);
+    };
+
+    var isEquation = function(instanceSpec) {
+        return instanceSpec.specialization && instanceSpec.specialization.classifier && 
+               instanceSpec.specialization.classifier.length > 0 &&
+               instanceSpec.specialization.classifier[0] === TYPE_TO_CLASSIFIER_ID.Equation;
+    };
+
+    var getTreeType = function(instanceSpec) {
+        if (isSection(instanceSpec))
+            return 'section';
+        if (isTable(instanceSpec))
+            return 'table';
+        if (isFigure(instanceSpec))
+            return 'figure';
+        if (isEquation(instanceSpec))
+            return 'equation';
+        return null;
     };
 
     //TODO remove
@@ -1308,6 +1325,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         isSection: isSection,
         isFigure: isFigure,
         isTable: isTable,
+        isEquation: isEquation,
+        getTreeType: getTreeType,
         isPresentationElement: isPresentationElement,
         addElementToViewOrSection: addElementToViewOrSection,
         //createAndAddElement: createAndAddElement,
