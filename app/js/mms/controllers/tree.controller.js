@@ -177,21 +177,21 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     toggle('showTree');
 
     $scope.$on('tree-show-tables', function() {
-        $scope.tableList = [];
-        getPeTreeList(viewId2node[document.sysmlid], 'table',  $scope.tableList);
-        $scope.treeViewModes[0].branchList = $scope.tableList;
+        //$scope.tableList.length = 0;
+        //getPeTreeList(viewId2node[document.sysmlid], 'table',  $scope.tableList);
+        //$scope.treeViewModes[0].branchList = $scope.tableList;
         toggle('table');
     });
     $scope.$on('tree-show-figures', function() {
-        $scope.figureList = [];
-        getPeTreeList(viewId2node[document.sysmlid], 'figure', $scope.figureList);
-        $scope.treeViewModes[1].branchList = $scope.figureList;
+        //$scope.figureList.length = 0;
+        //getPeTreeList(viewId2node[document.sysmlid], 'figure', $scope.figureList);
+        //$scope.treeViewModes[1].branchList = $scope.figureList;
         toggle('figure');
     });
     $scope.$on('tree-show-equations', function() {
-        $scope.equationList = [];
-        getPeTreeList(viewId2node[document.sysmlid], 'equation', $scope.equationList);
-        $scope.treeViewModes[2].branchList = $scope.equationList;
+        //$scope.equationList.length = 0;
+        //getPeTreeList(viewId2node[document.sysmlid], 'equation', $scope.equationList);
+        //$scope.treeViewModes[2].branchList = $scope.equationList;
         toggle('equation');
     });
 
@@ -208,12 +208,16 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     // Function to refresh table and figure list when new item added, deleted or reordered
     function resetPeList(elemType) {
         if (elemType == 'table' || elemType == 'all') {
-            $scope.tableList = [];
+            $scope.tableList.length = 0;
             getPeTreeList(viewId2node[document.sysmlid], 'table', $scope.tableList);
         }
-        if (elemType == 'figure' || elemType == 'image' || elemType == 'equation' || elemType == 'all') {
-            $scope.figureList = [];
+        if (elemType == 'figure' || elemType == 'image' || elemType == 'all') {
+            $scope.figureList.length = 0;
             getPeTreeList(viewId2node[document.sysmlid], 'figure', $scope.figureList);
+        }
+        if (elemType == 'equation' || elemType == 'all') {
+            $scope.equationList.length = 0;
+            getPeTreeList(viewId2node[document.sysmlid], 'equation', $scope.equationList);
         }
     }
 
