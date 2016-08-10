@@ -137,14 +137,14 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     });
 
     $scope.$on('tree-show-pe', function() {
-        $scope.showTandF = false;
+        toggle('showTree');
         $rootScope.veTreeShowPe = true;
         setPeVisibility(viewId2node[document.sysmlid]);
         $scope.treeApi.refresh();
     });
 
     $scope.$on('tree-show-views', function() {
-        $scope.showTandF = false;
+        toggle('showTree');
         $rootScope.veTreeShowPe = false;
         setPeVisibility(viewId2node[document.sysmlid]);
         $scope.treeApi.refresh();
@@ -152,10 +152,47 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
 
     $scope.tableList = [];
     $scope.figureList = [];
-    $scope.$on('tree-show-tablesAndFigures', function() {
-        $scope.showTandF = true;
+    $scope.equationList = [];
+    $scope.treeViewModes = [{
+        id: 'table',
+        title: 'Tables',
+        icon: 'fa-table',
+        branchList: $scope.tableList,
+    }, {
+        id: 'figure',
+        title: 'Figures',
+        icon: 'fa-image',
+        branchList: $scope.figureList,
+    }, {
+        id: 'equation',
+        title: 'Equations',
+        icon: 'fa-superscript',
+        branchList: $scope.equationList,
+    }];
+
+    var toggle = function (id) {
+        $scope.activeMenu = id;
+    };
+    // Set active tree view to tree
+    toggle('showTree');
+
+    $scope.$on('tree-show-tables', function() {
+        $scope.tableList = [];
         getPeTreeList(viewId2node[document.sysmlid], 'table',  $scope.tableList);
+        $scope.treeViewModes[0].branchList = $scope.tableList;
+        toggle('table');
+    });
+    $scope.$on('tree-show-figures', function() {
+        $scope.figureList = [];
         getPeTreeList(viewId2node[document.sysmlid], 'figure', $scope.figureList);
+        $scope.treeViewModes[1].branchList = $scope.figureList;
+        toggle('figure');
+    });
+    $scope.$on('tree-show-equations', function() {
+        $scope.equationList = [];
+        getPeTreeList(viewId2node[document.sysmlid], 'equation', $scope.equationList);
+        $scope.treeViewModes[2].branchList = $scope.equationList;
+        toggle('equation');
     });
 
     // Get a list of specific PE type from branch
