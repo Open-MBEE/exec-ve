@@ -320,7 +320,7 @@ function UxService($rootScope) {
       case "figure":
         return "fa-image";
       case "equation":
-        return "fa-image";
+        return "fa-superscript";
       default:
         return "fa-square";
         }

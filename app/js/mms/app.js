@@ -532,7 +532,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             views: function($stateParams, ViewService, document, time, ticket) {
                 if (document.specialization.type !== 'Product' && document.specialization.type !== 'View')
                     return [];
-                if (document.specialization.type === 'Product' && document.specialization.view2view)
+                if (document.specialization.type === 'Product' && document.specialization.view2view && document.specialization.view2view.length > 0)
                     return ViewService.getDocumentViews($stateParams.document, false, $stateParams.workspace, time, true, 2);
                 else
                     return ViewService.getDocumentViews($stateParams.document, false, $stateParams.workspace, time, false, 2);

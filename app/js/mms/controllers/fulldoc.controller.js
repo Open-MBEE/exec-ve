@@ -87,7 +87,7 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
         return childIds;
     }
 
-  if (view2view) {
+  if (view2view && view2view.length > 0) {
     view2view.forEach(function(view) {
         view2children[view.id] = view.childrenViews;
     });
@@ -97,6 +97,7 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
         num = num + 1;
     });
   } else {
+    view2children[document.sysmlid] = [];
     if (!document.specialization.childViews)
         document.specialization.childViews = [];
     MmsAppUtils.handleChildViews(document, 'COMPOSITE', $scope.ws, time, handleSingleView, handleChildren)

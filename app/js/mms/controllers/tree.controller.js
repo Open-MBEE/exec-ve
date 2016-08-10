@@ -590,26 +590,16 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                         viewId2node[instance.sysmlid] = sectionTreeNode;
                         parentNode.children.unshift(sectionTreeNode);
                         addSectionElements(instance, viewNode, sectionTreeNode);
-                    } else if (ViewService.isFigure(instance)) {
-                        var figureTreeNode = {
+                    } else if (ViewService.getTreeType(instance)) {
+                        var otherTreeNode = {
                             label : instance.name,
-                            type : "figure",
+                            type : ViewService.getTreeType(instance),
                             view : viewNode.data.sysmlid,
                             data : instance,
                             hide: hide,
                             children: []
                         };
-                        parentNode.children.unshift(figureTreeNode);
-                    } else if (ViewService.isTable(instance)) {
-                        var tableTreeNode = {
-                            label : instance.name,
-                            type : "table",
-                            view : viewNode.data.sysmlid,
-                            data : instance,
-                            hide: hide,
-                            children: []
-                        };
-                        parentNode.children.unshift(tableTreeNode);
+                        parentNode.children.unshift(otherTreeNode);
                     }
                 }
                 $scope.treeApi.refresh();
@@ -662,7 +652,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 $state.go('workspace.site.documentpreview', {site: documentSiteBranch.data.sysmlid, document: branch.data.sysmlid, search: undefined});
             }
         } else if ($state.includes('workspace.site.document')) {
-            var view = (branch.type === 'section' || branch.type === 'figure' || branch.type === 'table') ? branch.view : branch.data.sysmlid;
+            var view = (branch.type !== 'view') ? branch.view : branch.data.sysmlid;
             var sectionId = branch.type === 'section' ? branch.data.sysmlid : null;
             var hash = branch.data.sysmlid;
             if ($rootScope.mms_fullDocMode) {
@@ -899,7 +889,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             var curBranch = $scope.treeApi.get_selected_branch();
             if (curBranch) {
                 var viewId;
-                if (curBranch.type == 'section' || curBranch.type == 'table' || curBranch.type == 'figure') {
+                if (curBranch.type !== 'view') {
                     if (curBranch.type == 'section' && curBranch.data.specialization && curBranch.data.specialization.type === 'InstanceSpecification')
                         viewId = curBranch.data.sysmlid;
                     else
@@ -1214,7 +1204,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     }
 
     function setPeVisibility(branch) {
-        if (branch.type === 'figure' || branch.type === 'table') {
+        if (branch.type === 'figure' || branch.type === 'table' || branch.type === 'equation') {
             branch.hide = !$rootScope.veTreeShowPe;
         }
         for (var i = 0; i < branch.children.length; i++) {
@@ -1301,7 +1291,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
 
     if ($state.includes('workspace.site.document')) {
         $timeout(function() {
-            if (document.specialization.view2view) {
+            if (document.specialization.view2view && document.specialization.view2view.length > 0) {
                 document.specialization.view2view.forEach(function(view, index) {
                     ViewService.getView(view.id, false, ws, time, 0)
                     .then(addViewSections); //TODO add back in once we have priority queue
