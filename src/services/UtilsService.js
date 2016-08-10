@@ -447,10 +447,10 @@ function UtilsService(CacheService, _) {
             ob.figureCount++;
             cap = ob.figureCount + '. ' + child.data.name;
             ob.figures += '<li><a href="#' + sysmlid + '">' + cap + '</a></li>';
-            var cap3 = el.find('figure > figcaption, .mms-equation-caption');
-            cap3.html('Fig. ' + cap);
+            var cap3 = el.find('figure > figcaption');
+            cap3.html('Figure ' + cap);
             if (cap3.length === 0) {
-                el.find('img').wrap('<figure></figure>').after('<figcaption>Fig. ' + cap + '</figcaption>');
+                el.find('img').wrap('<figure></figure>').after('<figcaption>Figure ' + cap + '</figcaption>');
             }
             // Change cap value based on showRefName true/false
             if (showRefName) {
@@ -466,9 +466,9 @@ function UtilsService(CacheService, _) {
             cap = ob.equationCount + '. ' + child.data.name;
             ob.equations += '<li><a href="#' + sysmlid + '">' + cap + '</a></li>';
             var cap2 = el.find('.mms-equation-caption');
-            cap2.html('Eq. ' + cap);
+            cap2.html('Equation ' + cap);
             if (cap2.length === 0) {
-                el.find('mms-view-equation').after('<div class="mms-equation-caption">Eq. ' + cap + '</div>');
+                el.find('mms-view-equation').after('<div class="mms-equation-caption">Equation ' + cap + '</div>');
             }
             // Change cap value based on showRefName true/false
             if (showRefName) {
