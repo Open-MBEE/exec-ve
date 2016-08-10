@@ -197,13 +197,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
 
     // Get a list of specific PE type from branch
     function getPeTreeList(branch, type, list) {
-        if (type === 'equation' && branch.type === 'figure') { // Special case for equation as it is grouped with type 'figure'
-            if (branch.data.specialization.classifier[0] === ViewService.TYPE_TO_CLASSIFIER_ID.Equation)
-                list.push(branch);
-        }
         if ( branch.type === type) {
-            if ( (type == 'figure' && branch.data.specialization.classifier[0] != ViewService.TYPE_TO_CLASSIFIER_ID.Equation) ||
-                 (type == 'table'  && branch.data.specialization.classifier[0] != ViewService.TYPE_TO_CLASSIFIER_ID.Equation) )
             list.push(branch);
         }
         for (var i = 0; i < branch.children.length; i++) {
