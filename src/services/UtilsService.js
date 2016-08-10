@@ -444,41 +444,40 @@ function UtilsService(CacheService, _) {
                 refs.html('<a href="#' + sysmlid + '">Table ' + cap + '</a>');
         }
         if (child.type === 'figure') {
-            if (el.find('mms-view-equation').length){
-                ob.equationCount++;
-                cap = ob.equationCount + '. ' + child.data.name;
-                ob.equations += '<li><a href="#' + sysmlid + '">' + cap + '</a></li>';
-                var cap2 = el.find('.mms-equation-caption');
-                cap2.html('Eq. ' + cap);
-                if (cap2.length === 0) {
-                    el.find('mms-view-equation').after('<div class="mms-equation-caption">Eq. ' + cap + '</div>');
-                }
-                // Change cap value based on showRefName true/false
-                if (showRefName) {
-                    cap = ob.equationCount + '. ' + child.data.name;
-                } else cap = ob.equationCount;
-                if (live)
-                    refs.find('a').html('Eq. ' + cap);
-                else
-                    refs.html('<a href="#' + sysmlid + '">Eq. ' + cap + '</a>');
-            } else {
-                ob.figureCount++;
-                cap = ob.figureCount + '. ' + child.data.name;
-                ob.figures += '<li><a href="#' + sysmlid + '">' + cap + '</a></li>';
-                var cap3 = el.find('figure > figcaption, .mms-equation-caption');
-                cap3.html('Fig. ' + cap);
-                if (cap3.length === 0) {
-                    el.find('img').wrap('<figure></figure>').after('<figcaption>Fig. ' + cap + '</figcaption>');
-                }
-                // Change cap value based on showRefName true/false
-                if (showRefName) {
-                    cap = ob.figureCount + '. ' + child.data.name;
-                } else cap = ob.figureCount;
-                if (live)
-                    refs.find('a').html('Fig. ' + cap);
-                else
-                    refs.html('<a href="#' + sysmlid + '">Fig. ' + cap + '</a>');
+            ob.figureCount++;
+            cap = ob.figureCount + '. ' + child.data.name;
+            ob.figures += '<li><a href="#' + sysmlid + '">' + cap + '</a></li>';
+            var cap3 = el.find('figure > figcaption, .mms-equation-caption');
+            cap3.html('Fig. ' + cap);
+            if (cap3.length === 0) {
+                el.find('img').wrap('<figure></figure>').after('<figcaption>Fig. ' + cap + '</figcaption>');
             }
+            // Change cap value based on showRefName true/false
+            if (showRefName) {
+                cap = ob.figureCount + '. ' + child.data.name;
+            } else cap = ob.figureCount;
+            if (live)
+                refs.find('a').html('Fig. ' + cap);
+            else
+                refs.html('<a href="#' + sysmlid + '">Fig. ' + cap + '</a>');
+        }
+        if (child.type === 'equation') {
+            ob.equationCount++;
+            cap = ob.equationCount + '. ' + child.data.name;
+            ob.equations += '<li><a href="#' + sysmlid + '">' + cap + '</a></li>';
+            var cap2 = el.find('.mms-equation-caption');
+            cap2.html('Eq. ' + cap);
+            if (cap2.length === 0) {
+                el.find('mms-view-equation').after('<div class="mms-equation-caption">Eq. ' + cap + '</div>');
+            }
+            // Change cap value based on showRefName true/false
+            if (showRefName) {
+                cap = ob.equationCount + '. ' + child.data.name;
+            } else cap = ob.equationCount;
+            if (live)
+                refs.find('a').html('Eq. ' + cap);
+            else
+                refs.html('<a href="#' + sysmlid + '">Eq. ' + cap + '</a>');
         }
         child.children.forEach(function(child2) {
             makeTablesAndFiguresTOCChild(child2, printElement, ob, live, showRefName);
