@@ -782,6 +782,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
 
                 if (itemType === 'View') {
                     viewId2node[data.sysmlid] = newbranch;
+                    seenViewIds[data.sysmlid] = newbranch;
                     MmsAppUtils.handleChildViews(data, $scope.newViewAggr.type, ws, time, handleSingleView, handleChildren)
                     .then(function(node) {
                         //TODO handle full doc mode
@@ -1093,7 +1094,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         $scope.addView = function(elem) {
             var viewId = elem.sysmlid;
             if (seenViewIds[viewId]) {
-                growl.error("Error: This view is already in this document.");
+                growl.error("Error: View " + elem.name + " is already in this document.");
                 return;
             }
             var documentId = $scope.document.sysmlid;
