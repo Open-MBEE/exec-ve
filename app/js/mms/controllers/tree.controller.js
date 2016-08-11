@@ -1092,6 +1092,10 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
        
         $scope.addView = function(elem) {
             var viewId = elem.sysmlid;
+            if (seenViewIds[viewId]) {
+                growl.error("Error: This view is already in this document.");
+                return;
+            }
             var documentId = $scope.document.sysmlid;
             var workspace = ws;
 
