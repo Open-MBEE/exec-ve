@@ -46,6 +46,7 @@ function($scope, $rootScope, $stateParams, document, time, ElementService, ViewS
         }
     };
 
+    var seenViewIds = {};
     function handleSingleView(v, aggr) {
         var curNode = viewIds2node[v.sysmlid];
         if (!curNode) {
@@ -62,7 +63,15 @@ function($scope, $rootScope, $stateParams, document, time, ElementService, ViewS
     }
 
     function handleChildren(curNode, childNodes) {
-        curNode.children.push.apply(curNode.children, childNodes);
+        var newChildNodes = [];
+        childNodes.forEach(function(node) {
+            if (seenViewIds[node.id]) {
+                return;
+            }
+            seenViewIds[node.id] = node;
+            newChildNodes.push(node);
+        });
+        curNode.children.push.apply(curNode.children, newChildNodes);
     }
 
     MmsAppUtils.handleChildViews(document, 'COMPOSITE', ws, time, handleSingleView, handleChildren)

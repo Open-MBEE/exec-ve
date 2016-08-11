@@ -456,6 +456,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     };
     
     var viewId2node = {};
+    var seenViewIds = {};
     var handleSingleView = function(v, aggr) {
         var curNode = viewId2node[v.sysmlid];
         if (!curNode) {
@@ -472,7 +473,16 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         return curNode;
     };
     var handleChildren = function(curNode, childNodes) {
-        curNode.children.push.apply(curNode.children, childNodes);
+        var newChildNodes = [];
+        childNodes.forEach(function(node) {
+            if (seenViewIds[node.data.sysmlid]) {
+                growl.error("Warning: View " + node.data.name + " have multiple parents! Duplicates not shown.");
+                return;
+            }
+            seenViewIds[node.data.sysmlid] = node;
+            newChildNodes.push(node);
+        });
+        curNode.children.push.apply(curNode.children, newChildNodes);
     };
 
     if ($state.includes('workspaces') && !$state.includes('workspace.sites')) {

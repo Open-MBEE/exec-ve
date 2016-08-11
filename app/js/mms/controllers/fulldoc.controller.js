@@ -71,13 +71,19 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
     };
     var num = 1;
 
+    var seenViewIds = {};
     function handleSingleView(v, aggr) {
-        var childIds = [];
+        var childIds = view2children[v.sysmlid];
+        if (!childIds)
+            childIds = [];
         view2children[v.sysmlid] = childIds;
         if (!v.specialization.childViews || v.specialization.childViews.length === 0 || aggr === 'NONE') {
             return childIds;
         }
         for (var i = 0; i < v.specialization.childViews.length; i++) {
+            if (seenViewIds[v.specialization.childViews[i].id])
+                continue;
+            seenViewIds[v.specialization.childViews[i].id] = true;
             childIds.push(v.specialization.childViews[i].id);
         }
         return childIds;
