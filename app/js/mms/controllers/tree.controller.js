@@ -484,7 +484,16 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         });
         curNode.children.push.apply(curNode.children, newChildNodes);
     };
-
+    var processDeletedViewBranch = function(branch) {
+        var sysmlid = branch.data.sysmlid;
+        if (seenViewIds[sysmlid])
+            delete seenViewIds[sysmlid];
+        if (viewId2node[sysmlid])
+            delete viewId2node[sysmlid];
+        for (var i = 0; i < branch.children.length; i++) {
+            processDeletedViewBranch(branch.children[i]);
+        }
+    };
     if ($state.includes('workspaces') && !$state.includes('workspace.sites')) {
         $scope.my_data = UtilsService.buildTreeHierarchy(workspaces, "id", 
                                                          "workspace", "parent", workspaceLevel2Func);
@@ -981,6 +990,9 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 });
             }
             $scope.treeApi.remove_branch(branch);
+            if ($state.includes('workspace.site.document') && branch.type === 'view') {
+                processDeletedViewBranch(branch);
+            }
             if ($state.includes('workspace.sites') && !$state.includes('workspace.site.document'))
                 return;
             $state.go('^', {search: undefined});
