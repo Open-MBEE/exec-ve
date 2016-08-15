@@ -36,6 +36,20 @@
 
 <div class="modal-footer">
     <button ng-if="type == 'VIEW' && docOption" class="btn btn-sm btn-primary" ng-click="fulldoc()">GO TO FULL DOCUMENT</button>
+    <form role="form">
+        <div class="form-group">
+         <label for="header" style="text-align:center;">Header:</label>
+         <input type="text" class="form-control" ng-model="" placeholder="Left">
+         <input type="text" class="form-control" ng-model="" placeholder="Center">
+         <input type="text" class="form-control" ng-model="" placeholder="Right">
+      </div>
+      <div class="form-group">
+       <label for="footer" style="text-align:center;" >Footer:</label>
+       <input type="text" class="form-control" ng-model="" placeholder="Left">
+       <input type="text" class="form-control" ng-model="" placeholder="Center">
+       <input type="text" class="form-control" ng-model="" placeholder="Right">
+    </div>
+    </form>
     <button class="btn btn-sm btn-primary" ng-click="print()">{{action | uppercase}}</button>
     <button class="btn btn-sm btn-danger" ng-click="cancel()">CANCEL</button>
 </div>
