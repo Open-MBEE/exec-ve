@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mmsApp')
-.factory('MmsAppUtils', ['$q','$state', '$modal','$timeout', '$location', '$window', '$templateCache','$rootScope','$compile', '$filter', 'WorkspaceService','ConfigService','ElementService','ViewService', 'UtilsService', 'growl','_', MmsAppUtils]);
+.factory('MmsAppUtils', ['$q','$state', '$uibModal','$timeout', '$location', '$window', '$templateCache','$rootScope','$compile', '$filter', 'WorkspaceService','ConfigService','ElementService','ViewService', 'UtilsService', 'growl','_', MmsAppUtils]);
 
 /**
  * @ngdoc service
@@ -10,9 +10,9 @@ angular.module('mmsApp')
  * @description
  * Utilities
  */
-function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $templateCache, $rootScope, $compile, $filter, WorkspaceService, ConfigService, ElementService, ViewService, UtilsService, growl, _) {
+function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templateCache, $rootScope, $compile, $filter, WorkspaceService, ConfigService, ElementService, ViewService, UtilsService, growl, _) {
 
-    var addElementCtrl = function($scope, $modalInstance, $filter) {
+    var addElementCtrl = function($scope, $uibModalInstance, $filter) {
 
         $scope.oking = false;
         $scope.newItem = {};
@@ -67,12 +67,10 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
             };
             ViewService.addElementToViewOrSection($scope.viewOrSection.sysmlid, $scope.viewOrSection.sysmlid, $scope.ws, instanceVal).
             then(function(data) {
-                if ($scope.presentationElemType === "Section") {
-                    // Broadcast message to TreeCtrl:
-                    $rootScope.$broadcast('viewctrl.add.section', element, $scope.viewOrSection);
-                }
+                // Broadcast message to TreeCtrl:
+                $rootScope.$broadcast('viewctrl.add.element', element, $scope.presentationElemType.toLowerCase(), $scope.viewOrSection);
                 growl.success("Adding "+$scope.presentationElemType+"  Successful");
-                $modalInstance.close(data);
+                $uibModalInstance.close(data);
             }, function(reason) {
                 growl.error($scope.presentationElemType+" Add Error: " + reason.message);
             }).finally(function() {
@@ -94,9 +92,11 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
 
             ViewService.createInstanceSpecification($scope.viewOrSection, $scope.ws, $scope.presentationElemType, $scope.site.sysmlid, $scope.newItem.name, $scope.newItem.tomsawyerType).
             then(function(data) {
+                var elemType = $scope.presentationElemType.toLowerCase();
+                $rootScope.$broadcast('viewctrl.add.element', data, elemType, $scope.viewOrSection);
                 $rootScope.$broadcast('view-reorder.refresh');
                 growl.success("Adding "+$scope.presentationElemType+"  Successful");
-                $modalInstance.close(data);
+                $uibModalInstance.close(data);
             }, function(reason) {
                 growl.error($scope.presentationElemType+" Add Error: " + reason.message);
             }).finally(function() {
@@ -105,14 +105,14 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
         };
 
         $scope.cancel = function() {
-            $modalInstance.dismiss();
+            $uibModalInstance.dismiss();
         };
 
     };
 
     /**
      * @ngdoc method
-     * @name mmsApp.MmsAppUtils#getPresentationElement
+     * @name mmsApp.MmsAppUtils#addPresentationElement
      * @methodOf mmsApp.MmsAppUtils
      *
      * @description
@@ -150,10 +150,10 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
           $scope.newItem.name = "";
           var templateUrlStr = 'partials/mms/add-item.html';
 
-          var instance = $modal.open({
+          var instance = $uibModal.open({
               templateUrl: templateUrlStr,
               scope: $scope,
-              controller: ['$scope', '$modalInstance', '$filter', addElementCtrl]
+              controller: ['$scope', '$uibModalInstance', '$filter', addElementCtrl]
           });
           instance.result.then(function(data) {
               // TODO: do anything here?
@@ -162,18 +162,18 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
     };
 
     var tableToCsv = function(ob, ws, time, isDoc) { //Export to CSV button Pop-up Generated Here
-         var modalInstance = $modal.open({
+         var modalInstance = $uibModal.open({
             templateUrl: 'partials/mms/tableExport.html',
-            controller: function($scope, $modalInstance, type) {
+            controller: function($scope, $uibModalInstance, type) {
                 $scope.type = type;
                 $scope.export = function() {
-                    $modalInstance.close('export');
+                    $uibModalInstance.close('export');
                 };
                 // $scope.fulldoc = function() {
-                //     $modalInstance.close('fulldoc');
+                //     $uibModalInstance.close('fulldoc');
                 // };
                 $scope.cancel = function() {
-                    $modalInstance.dismiss();
+                    $uibModalInstance.dismiss();
                 };
             },
             resolve: {
@@ -256,9 +256,9 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
     */
     var printModal = function(ob, ws, site, time, tag, isDoc, mode) {
         var deferred = $q.defer();
-        var modalInstance = $modal.open({
+        var modalInstance = $uibModal.open({
             templateUrl: 'partials/mms/printConfirm.html',
-            controller: function($scope, $modalInstance) {
+            controller: function($scope, $uibModalInstance) {
                 $scope.type = isDoc ? 'DOCUMENT' : 'VIEW';
                 $scope.action = 'print';
                 $scope.genpdf = false;
@@ -270,15 +270,15 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
                     $scope.genpdf = true;
                 }
                 $scope.docOption = (!isDoc && mode === 3);
-                $scope.model = {genCover: false, genTotf: false};
+                $scope.model = {genCover: false, genTotf: false, landscape: false, htmlTotf: false};
                 $scope.print = function() {
-                    $modalInstance.close(['ok', $scope.model.genCover, $scope.model.genTotf]);
+                    $uibModalInstance.close(['ok', $scope.model.genCover, $scope.model.genTotf, $scope.model.htmlTotf, $scope.model.landscape]);
                 };
                 $scope.fulldoc = function() {
-                    $modalInstance.close(['fulldoc']);
+                    $uibModalInstance.close(['fulldoc']);
                 };
                 $scope.cancel = function() {
-                    $modalInstance.dismiss();
+                    $uibModalInstance.dismiss();
                 };
             },
             backdrop: 'static',
@@ -286,11 +286,14 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
         });
         modalInstance.result.then(function(choice) {
             if (choice[0] === 'ok') {
-                printOrGenerate(ob, ws, time, tag, isDoc, choice[1], choice[2], mode)
+                printOrGenerate(ob, ws, time, tag, isDoc, choice[1], choice[2], choice[3], mode, choice[4])
                 .then(function(result) {
-                    var css = UtilsService.getPrintCss(result.header, result.footer, result.dnum, result.tag, result.displayTime);
+                    var css = UtilsService.getPrintCss(result.header, result.footer, result.dnum, result.tag, result.displayTime, choice[4]);
                     var cover = result.cover;
                     var toc = result.toc;
+                    var tof = result.tof;
+                    var tot = result.tot;
+                    var toe = result.toe;
                     var contents = result.contents;
                     if (mode === 1 || mode === 2) {
                         var inst = '';
@@ -299,7 +302,7 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
                         }
                         var popupWin = $window.open('about:blank', '_blank', 'width=800,height=600,scrollbars=1,status=1,toolbar=1,menubar=1');
                         popupWin.document.open();
-                        popupWin.document.write('<html><head><style>' + css + '</style></head><body style="overflow: auto">' + inst + cover + toc + contents + '</body></html>');
+                        popupWin.document.write('<html><head><style>' + css + '</style></head><body style="overflow: auto">' + inst + cover + toc + tot + tof + toe + contents + '</body></html>');
                         popupWin.document.close();
                         if (mode === 1) {
                             $timeout(function() {
@@ -316,6 +319,8 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
                             time: time,
                             displayTime: result.displayTime,
                             toc: result.toc,
+                            tof: result.tof,
+                            tot: result.tot,
                             dnum: result.dnum,
                             workspace: ws,
                             customCss: css,
@@ -325,6 +330,9 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
                         if (!choice[2]) {
                             doc.tof = '<div style="display:none;"></div>';
                             doc.tot = '<div style="display:none;"></div>';
+                        } else if (choice[3]) { //let server scrape html for now
+                            doc.tof = '';
+                            doc.tot = '';
                         }
                         if (time == 'latest')
                             doc.tagId = time;
@@ -371,7 +379,7 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
             tag: tagname or ''
         }
     */
-    var printOrGenerate = function(ob, ws, time, tag, isDoc, genCover, genTotf, mode) {
+    var printOrGenerate = function(ob, ws, time, tag, isDoc, genCover, genTotf, htmlTotf, mode, landscape) {
         var deferred = $q.defer();
         var printContents = '';
         var printElementCopy = angular.element("#print-div");
@@ -388,10 +396,15 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
         var absurl = $location.absUrl();
         var prefix = protocol + '://' + hostname + ((port == 80 || port == 443) ? '' : (':' + port));
         var mmsIndex = absurl.indexOf('mms.html');
-        var toc = '';
-        if (isDoc)
-            toc = UtilsService.makeHtmlTOC($rootScope.mms_treeApi.get_rows());
-        printElementCopy.find("a").attr('href', function(index, old) {
+        var toc = UtilsService.makeHtmlTOC($rootScope.mms_treeApi.get_rows());
+        var tableAndFigTOC = UtilsService.makeTablesAndFiguresTOC($rootScope.mms_treeApi.get_rows(), printElementCopy, false, htmlTotf);
+        var tof = tableAndFigTOC.figures;
+        var tot = tableAndFigTOC.tables;
+        var toe = tableAndFigTOC.equations;
+        if (!isDoc) {
+            toc = tof = tot = toe = '';
+        }
+        angular.element(printElementCopy).find("a").attr('href', function(index, old) {
             if (!old)
                 return old;
             if (old.indexOf('/') === 0)
@@ -448,7 +461,7 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
         if (tag)
             tagname = tag.name;
         if (!isDoc) {
-            deferred.resolve({cover: cover, contents: printContents, header: header, footer: footer, displayTime: displayTime, dnum: dnum, version: version, toc: toc, tag: tagname});
+            deferred.resolve({cover: cover, contents: printContents, header: header, footer: footer, displayTime: displayTime, dnum: dnum, version: version, toc: toc, tag: tagname, tof: tof, tot: tot, toe: toe});
             return deferred.promise;
         }
         ViewService.getDocMetadata(ob.sysmlid, ws, null, 2)
@@ -471,16 +484,61 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
                 if (genCover) {
                     cover = coverTemplateElement[0].innerHTML;
                 }
-                deferred.resolve({cover: cover, contents: printContents, header: header, footer: footer, displayTime: displayTime, dnum: dnum, version: version, toc: toc, tag: tagname});
+                deferred.resolve({cover: cover, contents: printContents, header: header, footer: footer, displayTime: displayTime, dnum: dnum, version: version, toc: toc, tag: tagname, tof: tof, tot: tot, toe: toe});
             }, 0, false);
         });
         return deferred.promise;
+    };
+
+    var handleChildViews = function(v, aggr, ws, time, curItemFunc, childrenFunc) {
+        var deferred = $q.defer();
+        var curItem = curItemFunc(v, aggr);
+        var childIds = [];
+        var childAggrs = [];
+        if (!v.specialization.childViews || v.specialization.childViews.length === 0 || aggr === 'NONE') {
+            deferred.resolve(curItem);
+            return deferred.promise;
+        }
+        for (var i = 0; i < v.specialization.childViews.length; i++) {
+            childIds.push(v.specialization.childViews[i].id);
+            childAggrs.push(v.specialization.childViews[i].aggregation);
+        }
+        ElementService.getElements(childIds, false, ws, time, 2)
+        .then(function(childViews) {
+            var mapping = {};
+            for (var i = 0; i < childViews.length; i++) {
+                mapping[childViews[i].sysmlid] = childViews[i];
+            }
+            var childPromises = [];
+            for (i = 0; i < childIds.length; i++) {
+                var child = mapping[childIds[i]];
+                if (child) //what if not found??
+                    childPromises.push(handleChildViews(child, childAggrs[i], ws, time, curItemFunc, childrenFunc));
+            }
+            $q.all(childPromises).then(function(childNodes) {
+                childrenFunc(curItem, childNodes);
+                //curNode.children.push.apply(curNode.children, childNodes);
+                deferred.resolve(curItem);
+            }, function(reason) {
+                deferred.reject(reason);
+            });
+
+        }, function(reason) {
+            deferred.reject(reason);
+        });
+        return deferred.promise;
+    };
+
+    var refreshNumbering = function(tree, centerElement) {
+        UtilsService.makeTablesAndFiguresTOC(tree, centerElement, true, false);
     };
 
     return {
         addPresentationElement: addPresentationElement,
         printModal: printModal,
         tableToCsv: tableToCsv,
+        handleChildViews: handleChildViews,
+        refreshNumbering: refreshNumbering
     };
 }
     

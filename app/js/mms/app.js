@@ -1,10 +1,11 @@
 'use strict';
 
-angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.borderLayout', 'ui.bootstrap', 'ui.router', 'ui.tree', 'angular-growl', 'cfp.hotkeys', 'angulartics', 'angulartics.piwik', 'ngCookies'])
+angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.borderLayout', 'ui.bootstrap', 'ui.router', 'ui.tree', 'angular-growl', 'cfp.hotkeys', 'angulartics', 'angulartics.piwik', 'diff-match-patch', 'ngCookies'])
 .config(function($stateProvider, $urlRouterProvider, $httpProvider) {
     // Change the DEFAULT state to workspace.sites on entry
     //$urlRouterProvider.when('', '/workspaces/master/sites');
     //$urlRouterProvider.when('', '/login');
+    
     $urlRouterProvider.rule(function ($injector, $location) {
     // determine if the url is older 2.0 format (will not have a workspace)
          // generate some random client id
@@ -105,7 +106,10 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                           });
                     };
                 }   
-            }
+            },
+            //'menu':{
+             //   template: '<p class="pull-left" style="font-weight: 200; line-height: 1.28571em; padding-left:10px;">View Editor</p>'
+            //}
         }
     })
     .state('workspaces', {
@@ -164,7 +168,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 return null;
             },
             views: function(ticket) {
-                return null;
+                return [];
             },
             view: function(ticket) {
                 return null;
@@ -443,9 +447,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 return deferred.promise;
             },
             views: function(ViewService, workspace, document, time, ticket) {
-                if (document === null) 
-                    return null;
-                return ViewService.getDocumentViews(document.sysmlid, false, workspace, time, true, 2);
+                return [];
             },
             viewElements: function(ViewService, workspace, document, time, ticket) {
                 if (document === null) 
@@ -496,9 +498,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 return ElementService.getElement($stateParams.document, false, workspace, time, 2);
             },
             views: function(ViewService, workspace, document, time, ticket) {
-                if (document === null) 
-                    return null;
-                return ViewService.getDocumentViews(document.sysmlid, false, workspace, time, true, 2);
+                return [];
             },
             viewElements: function(ViewService, workspace, document, time, ticket) {
                 if (document === null) 
@@ -537,9 +537,12 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 return ElementService.getElement($stateParams.document, false, $stateParams.workspace, time, 2);
             },
             views: function($stateParams, ViewService, document, time, ticket) {
-                if (document.specialization.type !== 'Product')
+                if (document.specialization.type !== 'Product' && document.specialization.type !== 'View')
                     return [];
-                return ViewService.getDocumentViews($stateParams.document, false, $stateParams.workspace, time, true, 2);
+                if (document.specialization.type === 'Product' && document.specialization.view2view && document.specialization.view2view.length > 0)
+                    return ViewService.getDocumentViews($stateParams.document, false, $stateParams.workspace, time, true, 2);
+                else
+                    return ViewService.getDocumentViews($stateParams.document, false, $stateParams.workspace, time, false, 2);
             },
             viewElements: function($stateParams, ViewService, time, ticket) {
                 return ViewService.getViewElements($stateParams.document, false, $stateParams.workspace, time, 2);
@@ -771,21 +774,21 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
         views: {
             'menu@': {
                 templateUrl: 'partials/mms/diff-nav.html',               
-                controller: function ($scope, $rootScope,targetName, sourceName, $stateParams, $state, $modal){
+                controller: function ($scope, $rootScope,targetName, sourceName, $stateParams, $state, $uibModal){
                     $scope.targetName = targetName;
                     $scope.sourceName = sourceName;
                     $rootScope.mms_title = 'Merge Differences';
 
                     $scope.goBack = function () {
-                        $modal.open({
+                        $uibModal.open({
                             templateUrl: 'partials/mms/cancelModal.html',
-                            controller: function($scope, $modalInstance, $state) {      
+                            controller: function($scope, $uibModalInstance, $state) {      
                                 $scope.close = function() {
-                                    $modalInstance.close();
+                                    $uibModalInstance.close();
                                 };
                                 $scope.exit = function() {
                                     $state.go('workspace', {}, {reload:true});
-                                    $modalInstance.close(); 
+                                    $uibModalInstance.close(); 
                                 };
                             }
                         });

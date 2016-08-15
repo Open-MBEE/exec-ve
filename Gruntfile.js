@@ -283,21 +283,20 @@ module.exports = function(grunt) {
         options: {
           publish: [{
             id: 'gov.nasa.jpl:evm:zip',
-            version: '2.3-SNAPSHOT',
+            version: '2.4-SNAPSHOT',
             path: 'deploy/'
           }]
         }
       }
     },
-
+    
     karma: {
-      options:{
-        configFile:'config/develop/karma.develop.conf.js'
-      },
-      dev:{
-        files:
-          'test/develop/unit/**/*.js'
-      }
+        unit:{
+            configFile:'config/develop/karma.develop.conf.js',
+            singleRun: true,
+            browsers: ['PhantomJS']
+            //logLevel: 'ERROR'
+        }
     },
 
     protractor: {

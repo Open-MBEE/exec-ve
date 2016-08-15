@@ -129,7 +129,7 @@ function mmsViewSection($compile, $templateCache, $rootScope, ElementService, Vi
     return {
         restrict: 'E',
         scope: {
-            section: '=mmsSection' //this is json if contains, the instancespec if contents
+            section: '<mmsSection' //this is json if contains, the instancespec if contents
         },
         require: ['?^mmsView','?^mmsViewPresentationElem'],
         controller: ['$scope', '$rootScope', mmsViewSectionCtrl],

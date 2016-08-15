@@ -3,8 +3,8 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('WorkspaceMergeAssistant', ["_", "$timeout", "$scope", "$rootScope", "$modal", "growl", "ElementService", "UxService", "$modalInstance", "$state", "WorkspaceService",
-function(_, $timeout, $scope, $rootScope, $modal, growl, ElementService, UxService, $modalInstance, $state, WorkspaceService) {
+.controller('WorkspaceMergeAssistant', ["_", "$timeout", "$scope", "$rootScope", "$uibModal", "growl", "ElementService", "UxService", "$uibModalInstance", "$state", "WorkspaceService",
+function(_, $timeout, $scope, $rootScope, $uibModal, growl, ElementService, UxService, $uibModalInstance, $state, WorkspaceService) {
 
     $scope.pane = $rootScope.mergeInfo.pane;
     $scope.pane = $rootScope.mergeInfo.pane;
@@ -55,7 +55,7 @@ function(_, $timeout, $scope, $rootScope, $modal, growl, ElementService, UxServi
             if(data.status === 'COMPLETED')
             {
 	            // Close modal
-	            $modalInstance.close();
+	            $uibModalInstance.close();
 	            
 	            // Redirect to diffs page
 	            $state.go('workspace.diff', {
@@ -87,7 +87,7 @@ function(_, $timeout, $scope, $rootScope, $modal, growl, ElementService, UxServi
     $scope.mergeAssistCancelConfirm = function()
     {
 	    // Provide cancellation functionality
-	    var dmCancelModal = $modal.open({
+	    var dmCancelModal = $uibModal.open({
 		    controller: 'WorkspaceMergeAssistant',
 		    size: 'sm',
 		    templateUrl: 'partials/mms/merge_assistant-cancel.html'
@@ -96,7 +96,7 @@ function(_, $timeout, $scope, $rootScope, $modal, growl, ElementService, UxServi
     
     $scope.finished = function()
     {
-	    $modalInstance.close();
+	    $uibModalInstance.close();
     };
     
 }]);

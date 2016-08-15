@@ -59,11 +59,16 @@ function mmsTranscludeImg(VizService, growl) {
                 if (!version)
                     version = viewVersion.version;
             }
+            scope.ws = ws;
+            scope.version = version;
+            element.addClass('isLoading');
             VizService.getImageURL(scope.mmsEid, 'svg', false, ws, version)
             .then(function(data) {
                 scope.svgImgUrl = data;
             }, function(reason) {
                 growl.error('Cf Image Error: ' + reason.message + ': ' + scope.mmsEid);
+            }).finally(function() {
+                element.removeClass('isLoading');
             });
             VizService.getImageURL(scope.mmsEid, 'png', false, ws, version)
             .then(function(data) {

@@ -12,7 +12,7 @@ CKEDITOR.plugins.add( 'mmsvlink', {
 		// Register mmsvlink widget to opens view link search window 
     // and insert mmsvlink tag as widget.
 		editor.widgets.add( 'mmsvlink', {
-      button: 'View Link',
+      button: 'Insert View Link',
       allowedContent: 'mms-view-link[*];',
       inline: true,
 			insert: function() {

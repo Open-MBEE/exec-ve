@@ -27,6 +27,7 @@ function mmsSearch(ElementService, growl, $rootScope, $templateCache) {
         scope.filterQuery = {query: ""};
         scope.currentPage = 0;
         scope.itemsPerPage = 50;
+        scope.ws = scope.mmsWs ? scope.mmsWs : 'master';
 
         scope.$watchGroup(['filterQuery.query', 'facet'], function(newVal, oldVal) {
             scope.resultFilter = {};
@@ -141,7 +142,7 @@ function mmsSearch(ElementService, growl, $rootScope, $templateCache) {
         template: template,
         link: mmsSearchLink,
         scope: {
-            mmsOptions: '=',
+            mmsOptions: '<',
             mmsWs: '@',
         },
     };

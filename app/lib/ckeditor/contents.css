@@ -7,7 +7,7 @@ body
 {
 	/* Font */
 	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
-	font-size: 16px;
+	font-size: 14px;
 
 	/* Text color */
 	color: #333;
@@ -20,7 +20,8 @@ body
 
 .cke_editable
 {
-	line-height: 1.4;
+	font-size: 16px;
+	line-height: 1.8;
 
 	/* Fix for missing scrollbars with RTL texts. (#10488) */
 	word-wrap: break-word;
@@ -35,8 +36,8 @@ blockquote
 	font-size: 16px;
 	border-left: 5px solid #eee;
 }
-/*
-.cke_contents_ltr blockquote
+
+/*.cke_contents_ltr blockquote
 {
 	padding-left: 20px;
 	padding-right: 8px;
@@ -139,32 +140,32 @@ a > img {
 /*
  * Transclude custom css
 */
-  mms-transclude-name,
-  mms-transclude-doc,
-  mms-transclude-val,
-  mms-view-link,
-  tms-timely,
-  mms-d3-observation-profile-chart-io,
-  mms-d3-parallel-axis-chart-io,
-  mms-d3-radar-chart-io,
-  mms-d3-grouped-horizontal-bar-chart-io,
-  mms-site-docs,
-  mms-workspace-docs {
-    background-color: lightblue;
-    margin-top: 0;
-    margin-bottom: 0 !important;
-    padding: 3px !important;
-    border: 1px solid black !important;
-    z-index: 0;
-    cursor: not-allowed;
-  }
+mms-transclude-name,
+mms-transclude-doc,
+mms-transclude-val,
+mms-view-link,
+tms-timely,
+mms-d3-observation-profile-chart-io,
+mms-d3-parallel-axis-chart-io,
+mms-d3-radar-chart-io,
+mms-d3-grouped-horizontal-bar-chart-io,
+mms-site-docs,
+mms-workspace-docs {
+	background-color: lightblue;
+	margin-top: 0;
+	margin-bottom: 0 !important;
+	padding: 3px !important;
+	border: 1px solid black !important;
+	z-index: 0;
+	cursor: not-allowed;
+}
 
-  mms-transclude-com {
-    background-color: yellow;
-    margin-top: 0;
-    margin-bottom: 0 !important;
-    padding: 3px !important;
-    border: 1px solid black !important;
-    z-index: 0;
-    cursor: not-allowed;
-  }
+mms-transclude-com {
+	background-color: yellow;
+	margin-top: 0;
+	margin-bottom: 0 !important;
+	padding: 3px !important;
+	border: 1px solid black !important;
+	z-index: 0;
+	cursor: not-allowed;
+}

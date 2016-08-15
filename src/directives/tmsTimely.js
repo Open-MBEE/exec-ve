@@ -89,8 +89,8 @@ function tmsTimely($http, $q, $window) {
     return {
         restrict: 'E',
         scope: {
-            tmsSpec: '=',
-            tmsApi: '='
+            tmsSpec: '<',
+            tmsApi: '<'
         },
         link: tmsTimelyLink
     };

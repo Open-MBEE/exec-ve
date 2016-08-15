@@ -54,8 +54,11 @@
     div.footer{
         color:white;
     }
+    .pane-center.fa-pane.pane-.fa-pane.pane-{
+        right:0px;
+        left:0px;
+    }
     </style>
-    
     <div>
         <div class="row">
             <div class="col-sm-6 col-md-8 col-md-offset-2">
@@ -66,7 +69,7 @@
                         </div>
                         <div class="col-md-4">
                             <form name="loginForm" ng-submit="login(credentials)">
-                                <input type="text" class="form-control" ng-model="credentials.username" placeholder="JPL Username" autofocus>
+                                <input type="text" class="form-control" ng-model="credentials.username" placeholder="Username" autofocus>
                                 <input type="password" class="form-control" ng-model="credentials.password" placeholder="Password">
                                 <button class="btn btn-block" type="submit">LOG IN <span ng-if="spin" ><i class="fa fa-spin fa-spinner"></i>
 </span></button>
