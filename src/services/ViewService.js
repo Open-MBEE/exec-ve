@@ -744,7 +744,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         var deferred = $q.defer();
 
         var newInstanceId = UtilsService.createMmsId();
-        newInstanceId = newInstanceId + "_pei";
+        newInstanceId = '_hidden_' + newInstanceId + "_pei";
         var holdingBinId = null;
         var projectId = null;
         var realType = TYPE_TO_CLASSIFIER_TYPE[type];
@@ -849,7 +849,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
     var createView = function(owner, name, documentId, workspace, viewId, viewDoc, site, isDoc) {
         var deferred = $q.defer();
         var newViewId = viewId ? viewId : UtilsService.createMmsId();
-        var newInstanceId = UtilsService.createMmsId() + '_pei';
+        var newInstanceId = '_hidden_' + UtilsService.createMmsId() + '_pei';
         var ids = UtilsService.getIdInfo(owner, site);
         var holdingBinId = ids.holdingBinId;
         var projectId = ids.projectId;
