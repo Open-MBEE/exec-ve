@@ -34,6 +34,9 @@ module.exports = function (config) {
 
             "build/lib/jquery.isonscreen.js",
             "build/lib/table2CSV.js",
+            "build/lib/ckeditor/ckeditor.js",
+            //"build/lib/ckeditor/plugins/mathjax/dialogs/mathjax.js",
+            "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML",
 
             'build/mms.js',
             'build/mms.directives.tpls.js',
@@ -42,7 +45,8 @@ module.exports = function (config) {
             'build/js/mms/app.tpls.js',
             'build/js/mms/app.js',
             'build/js/mms/controllers.js',
-            'test/develop/unit/**/*.js'
+            'test/develop/unit/**/*.js',
+            'test/mock-data/*.js'
         ],
 
         // list of files to exclude
@@ -55,8 +59,20 @@ module.exports = function (config) {
         // test results reporter to use
         // possible values: 'dots', 'progress'
         // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-        reporters: ['progress'],
-
+        //reporters: ['progress'],
+        reporters: ['nyan'],
+        nyanReporter: {
+        //   // suppress the error report at the end of the test run 
+        //   suppressErrorReport: true,
+          // 
+        //   // suppress the red background on errors in the error 
+        //   // report at the end of the test run 
+        //   suppressErrorHighlighting: true,
+ 
+          // increase the number of rainbow lines displayed 
+          // enforced min = 4, enforced max = terminal height - 1 
+        //   numberOfRainbowLines: 25, // default is 4 
+        },
         // web server port
         port: 9876,
 
@@ -78,7 +94,7 @@ module.exports = function (config) {
         // start these browsers
         // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
         browsers: ['Chrome'],
-        plugins : ['karma-chrome-launcher', 'karma-jasmine'],
+        plugins : ['karma-chrome-launcher', 'karma-jasmine', 'karma-nyan-reporter', 'karma-phantomjs-launcher'],
 
         // Continuous Integration mode
         // if true, Karma captures browsers, runs the tests and exits

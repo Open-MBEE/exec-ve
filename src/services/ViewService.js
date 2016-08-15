@@ -196,6 +196,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      *      it's displayed, except for the editables)
      * @param {string} [workspace=master] (optional) workspace to use
      * @param {string} [version=latest] (optional) alfresco version number or timestamp
+     * @param {int} weight the priority of the request
      * @returns {Promise} The promise will be resolved with the view object, 
      *      multiple calls to this method with the same id would result in 
      *      references to the same object.
@@ -218,6 +219,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      *      it's displayed, except for the editables)
      * @param {string} [workspace=master] (optional) workspace to use
      * @param {string} [version=latest] (optional) alfresco version number or timestamp
+     * @param {int} weight the priority of the request
      * @returns {Promise} The promise will be resolved with an array of view objects, 
      *      multiple calls to this method with the same ids would result in an array of 
      *      references to the same objects.
@@ -240,6 +242,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      *      it's displayed, except for the editables)
      * @param {string} [workspace=master] (optional) workspace to use
      * @param {string} [version=latest] (optional) alfresco version number or timestamp
+     * @param {int} weight the priority of the request
      * @returns {Promise} The promise will be resolved with the document object, 
      *      multiple calls to this method with the same id would result in 
      *      references to the same object.
@@ -345,6 +348,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      *      it's displayed, except for the editables)
      * @param {string} [workspace=master] (optional) workspace to use
      * @param {string} [version=latest] (optional) alfresco version number or timestamp
+     * @param {int} weight the priority of the request
+     * @param {string} eidss displayedElements
      * @returns {Promise} The promise will be resolved with array of element objects. 
      */
     var getViewElements = function(id, update, workspace, version, weight, eidss) {
@@ -352,7 +357,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         var deferred = $q.defer();
         var url = URLService.getViewElementsURL(id, n.ws, n.ver);
         var cacheKey = ['views', n.ws, id, n.ver, 'elements'];
-        if (CacheService.exists(cacheKey) && !n.update) 
+        if (CacheService.exists(cacheKey) && !n.update)
             deferred.resolve(CacheService.get(cacheKey));
         else {
             var key = id + n.ws + n.ver;
@@ -410,6 +415,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @param {string} [workspace=master] (optional) workspace to use
      * @param {string} [version=latest] (optional) alfresco version number or timestamp
      * @param {boolean} [simple=false] (optional) whether to get simple views
+     * @param {int} weight the priority of the request
      * @returns {Promise} The promise will be resolved with array of view objects. 
      */
     var getDocumentViews = function(id, update, workspace, version, simple, weight) {
@@ -733,10 +739,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @param {object} viewOrSection The View or Section to add to
      * @param {string} [workspace=master] workspace to use
      * @param {string} type The type of element that is to be created, ie 'Paragraph'
-     * @param {string} addToView true if wanting to add the element to the view
      * @param {string} [site=null] (optional) site to post to
      * @param {string} [name=Untitled <elementType>] (optional) InstanceSpecification name to use
-     * @param {string} [json=null] (optional) Json blob for the presentation element
      * @returns {Promise} The promise would be resolved with updated View object if addToView is true
      *                    otherwise the created InstanceSpecification
     */
@@ -1002,6 +1006,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @param {boolean} [update=false] Update latest
      * @param {string} [workspace=master] workspace to use 
      * @param {string} [version=latest] timestamp
+     * @param {int} weight the priority of the request
      * @returns {Promise} The promise will be resolved with array of document objects 
      */
     var getSiteDocuments = function(site, update, workspace, version, weight) {
@@ -1034,6 +1039,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @param {object} instanceVal instance value object
      * @param {string} [workspace=master] workspace
      * @param {string} [version=latest] timestamp
+     * @param {int} weight the priority of the request
      * @returns {Promise} The promise will be resolved with a json object for the 
      *                    corresponding presentation element
      */
@@ -1106,6 +1112,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @param {object} contents an expression object from a view or section
      * @param {string} [workspace=master] workspace
      * @param {string} [version=latest] timestamp
+     * @param {int} weight the priority of the request
      * @returns {Promise} The promise will be resolved with array of tree node objects
      */
     var getElementReferenceTree = function (contents, workspace, version, weight) {
@@ -1168,6 +1175,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @param {object} instanceVal instance value object
      * @param {string} [workspace=master] workspace
      * @param {string} [version=latest] timestamp
+     * @param {int} weight the priority of the request
      * @returns {Promise} The promise will be resolved with a json object for the 
      *                    corresponding presentation element
      */

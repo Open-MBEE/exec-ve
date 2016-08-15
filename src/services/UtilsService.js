@@ -34,7 +34,19 @@ function UtilsService(CacheService, _) {
                 cleanValueSpec(vs.operand[i]);
         }
     };
-
+    
+    /**
+     * @ngdoc method
+     * @name mms.UtilsService#cleanElement
+     * @methodOf mms.UtilsService
+     * 
+     * @description
+     * Cleans 
+     *
+     * @param {Object} elem the element object to be cleaned 
+     * @param {boolean} [forEdit=false] (optional) forEdit.  If true deletes nonEditKeys from elem.
+     * @returns {Object} clean elem
+     */
     var cleanElement = function(elem, forEdit) {
         // hack - should fix on MMS, if name is null should include name
         if (! elem.name) {
@@ -197,6 +209,21 @@ function UtilsService(CacheService, _) {
         else
             return ['elements', ws, id, ver];
     };
+    /**
+     * @ngdoc method
+     * @name mms.UtilsService#mergeElement
+     * @methodOf mms.UtilsService
+     * 
+     * @description
+     * Make key for element for use in CacheService
+     *
+     * @param {object} source the element object to merge in 
+     * @param {string} eid id of element
+     * @param {string} [workspace=master] workspace
+     * @param {boolean} [updateEdit=false] 
+     * @param {string} property type of property, ie transclusion or not
+     * @returns void 
+     */
 
     var mergeElement = function(source, eid, workspace, updateEdit, property) {
         var ws = workspace ? workspace : 'master';
@@ -227,7 +254,20 @@ function UtilsService(CacheService, _) {
             cleanElement(edit, true);
         }
     };
-
+    /**
+     * @ngdoc method
+     * @name mms.UtilsService#filterProperties
+     * @methodOf mms.UtilsService
+     * 
+     * @description
+     * given element object a and element object b,
+     * returns new object with b data minus keys not in a 
+     * (set notation A intersect B)
+     *
+     * @param {Object} a Element Object
+     * @param {Object} b Element Object
+     * @returns {Object} 
+     */
     var filterProperties = function(a, b) {
         var res = {};
         for (var key in a) {
@@ -240,6 +280,25 @@ function UtilsService(CacheService, _) {
         }
         return res;
     };
+    /**
+     * @ngdoc method
+     * @name mms.UtilsService#hasConflict
+     * @methodOf mms.UtilsService
+     * 
+     * @description		
+     *  Checks if sever and cache version of the element are
+     *  the same so that the user is aware that they are overriding 
+     *  changes to the element that they have not seen in the cache element.
+     *  Given edit object with only keys that were edited,
+     * 'orig' object and 'server' object, should only return true 
+     *	if key is in edit object and value in orig object is different 
+     *  from value in server object. 
+     *
+     * @param {Object} elem An object that contains element id and any property changes to be saved.
+     * @param {Object} orig version of elem object in cache.
+     * @param {Object} server version of elem object from server.
+     * @returns {Boolean} true if conflict, false if not
+     */
 
     var hasConflict = function(edit, orig, server) {
         for (var i in edit) {
