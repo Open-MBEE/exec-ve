@@ -137,14 +137,14 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     });
 
     $scope.$on('tree-show-pe', function() {
-        $scope.showTandF = false;
+        toggle('showTree');
         $rootScope.veTreeShowPe = true;
         setPeVisibility(viewId2node[document.sysmlid]);
         $scope.treeApi.refresh();
     });
 
     $scope.$on('tree-show-views', function() {
-        $scope.showTandF = false;
+        toggle('showTree');
         $rootScope.veTreeShowPe = false;
         setPeVisibility(viewId2node[document.sysmlid]);
         $scope.treeApi.refresh();
@@ -152,10 +152,47 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
 
     $scope.tableList = [];
     $scope.figureList = [];
-    $scope.$on('tree-show-tablesAndFigures', function() {
-        $scope.showTandF = true;
-        getPeTreeList(viewId2node[document.sysmlid], 'table',  $scope.tableList);
-        getPeTreeList(viewId2node[document.sysmlid], 'figure', $scope.figureList);
+    $scope.equationList = [];
+    $scope.treeViewModes = [{
+        id: 'table',
+        title: 'Tables',
+        icon: 'fa-table',
+        branchList: $scope.tableList,
+    }, {
+        id: 'figure',
+        title: 'Figures',
+        icon: 'fa-image',
+        branchList: $scope.figureList,
+    }, {
+        id: 'equation',
+        title: 'Equations',
+        icon: 'fa-superscript',
+        branchList: $scope.equationList,
+    }];
+
+    var toggle = function (id) {
+        $scope.activeMenu = id;
+    };
+    // Set active tree view to tree
+    toggle('showTree');
+
+    $scope.$on('tree-show-tables', function() {
+        //$scope.tableList.length = 0;
+        //getPeTreeList(viewId2node[document.sysmlid], 'table',  $scope.tableList);
+        //$scope.treeViewModes[0].branchList = $scope.tableList;
+        toggle('table');
+    });
+    $scope.$on('tree-show-figures', function() {
+        //$scope.figureList.length = 0;
+        //getPeTreeList(viewId2node[document.sysmlid], 'figure', $scope.figureList);
+        //$scope.treeViewModes[1].branchList = $scope.figureList;
+        toggle('figure');
+    });
+    $scope.$on('tree-show-equations', function() {
+        //$scope.equationList.length = 0;
+        //getPeTreeList(viewId2node[document.sysmlid], 'equation', $scope.equationList);
+        //$scope.treeViewModes[2].branchList = $scope.equationList;
+        toggle('equation');
     });
 
     // Get a list of specific PE type from branch
@@ -171,12 +208,16 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     // Function to refresh table and figure list when new item added, deleted or reordered
     function resetPeList(elemType) {
         if (elemType == 'table' || elemType == 'all') {
-            $scope.tableList = [];
+            $scope.tableList.length = 0;
             getPeTreeList(viewId2node[document.sysmlid], 'table', $scope.tableList);
         }
-        if (elemType == 'figure' || elemType == 'image' || elemType == 'equation' || elemType == 'all') {
-            $scope.figureList = [];
+        if (elemType == 'figure' || elemType == 'image' || elemType == 'all') {
+            $scope.figureList.length = 0;
             getPeTreeList(viewId2node[document.sysmlid], 'figure', $scope.figureList);
+        }
+        if (elemType == 'equation' || elemType == 'all') {
+            $scope.equationList.length = 0;
+            getPeTreeList(viewId2node[document.sysmlid], 'equation', $scope.equationList);
         }
     }
 
@@ -415,6 +456,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     };
     
     var viewId2node = {};
+    var seenViewIds = {};
     var handleSingleView = function(v, aggr) {
         var curNode = viewId2node[v.sysmlid];
         if (!curNode) {
@@ -431,69 +473,85 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         return curNode;
     };
     var handleChildren = function(curNode, childNodes) {
-        curNode.children.push.apply(curNode.children, childNodes);
+        var newChildNodes = [];
+        childNodes.forEach(function(node) {
+            if (seenViewIds[node.data.sysmlid]) {
+                growl.error("Warning: View " + node.data.name + " have multiple parents! Duplicates not shown.");
+                return;
+            }
+            seenViewIds[node.data.sysmlid] = node;
+            newChildNodes.push(node);
+        });
+        curNode.children.push.apply(curNode.children, newChildNodes);
     };
-
+    var processDeletedViewBranch = function(branch) {
+        var sysmlid = branch.data.sysmlid;
+        if (seenViewIds[sysmlid])
+            delete seenViewIds[sysmlid];
+        if (viewId2node[sysmlid])
+            delete viewId2node[sysmlid];
+        for (var i = 0; i < branch.children.length; i++) {
+            processDeletedViewBranch(branch.children[i]);
+        }
+    };
     if ($state.includes('workspaces') && !$state.includes('workspace.sites')) {
         $scope.my_data = UtilsService.buildTreeHierarchy(workspaces, "id", 
                                                          "workspace", "parent", workspaceLevel2Func);
     } else if ($state.includes('workspace.sites') && !$state.includes('workspace.site.document')) {
         $scope.my_data = UtilsService.buildTreeHierarchy(filter_sites(sites), "sysmlid", "site", "parent", siteInitFunc);
     } else {
-        // this is from view editor
-        viewId2node[document.sysmlid] = {
-            label: document.name,
-            type: 'view',
-            data: document,
-            children: [],
-            loading: false
-        };
-        views.forEach(function(view) {
-            var viewTreeNode = { 
-                label : view.name, 
-                type : "view",
-                data : view, 
-                children : [], 
-                loading: false
-            };
-            viewId2node[view.sysmlid] = viewTreeNode;
-            //addSectionElements(elements[i], viewTreeNode, viewTreeNode);
-        });
-
         var seenChild = {};
-      if (document.specialization.view2view && document.specialization.view2view.length > 0) {
-        document.specialization.view2view.forEach(function(view) {
-            var viewid = view.id;
-            view.childrenViews.forEach(function(childId) {
-                if (seenChild[childId]) {
-                    growl.error("You have a view called " + seenChild[childId].label + " that's a child of multiple parents! Please fix in the model.");
-                    return;
-                }
-                if (!viewId2node[childId]) {
-                    growl.error("View " + childId + " not found.");
-                    return;
-                }
-                if (!viewId2node[viewid]) {
-                    growl.error("View " + viewid + " not found.");
-                    return;
-                }
-                viewId2node[viewid].children.push(viewId2node[childId]);
-                seenChild[childId] = viewId2node[childId];
+        if (document.specialization.view2view && document.specialization.view2view.length > 0) {
+            viewId2node[document.sysmlid] = {
+                label: document.name,
+                type: 'view',
+                data: document,
+                children: [],
+                loading: false,
+            };
+            views.forEach(function(view) {
+                var viewTreeNode = { 
+                    label : view.name, 
+                    type : "view",
+                    data : view, 
+                    children : [], 
+                    loading: false
+                };
+                viewId2node[view.sysmlid] = viewTreeNode;
+                    //addSectionElements(elements[i], viewTreeNode, viewTreeNode);
             });
-        });
-      } else {
-        if (!document.specialization.childViews)
-            document.specialization.childViews = [];
-        MmsAppUtils.handleChildViews(document, 'COMPOSITE', ws, time, handleSingleView, handleChildren)
-        .then(function(node) {
-            for (var i in viewId2node) {
-                addSectionElements(viewId2node[i].data, viewId2node[i], viewId2node[i]);
-            }
-            $scope.treeApi.refresh();
-        }, function(reason) {
-            console.log(reason);
-        });
-      }
+            document.specialization.view2view.forEach(function(view) {
+                var viewid = view.id;
+                view.childrenViews.forEach(function(childId) {
+                    if (seenChild[childId]) {
+                        growl.error("You have a view called " + seenChild[childId].label + " that's a child of multiple parents! Please fix in the model.");
+                        return;
+                    }
+                    if (!viewId2node[childId]) {
+                        growl.error("View " + childId + " not found.");
+                        return;
+                    }
+                    if (!viewId2node[viewid]) {
+                        growl.error("View " + viewid + " not found.");
+                        return;
+                    }
+                    viewId2node[viewid].children.push(viewId2node[childId]);
+                    seenChild[childId] = viewId2node[childId];
+                });
+            });
+        } else {
+            if (!document.specialization.childViews)
+                document.specialization.childViews = [];
+            MmsAppUtils.handleChildViews(document, 'COMPOSITE', ws, time, handleSingleView, handleChildren)
+            .then(function(node) {
+                for (var i in viewId2node) {
+                    addSectionElements(viewId2node[i].data, viewId2node[i], viewId2node[i]);
+                }
+                $scope.treeApi.refresh();
+            }, function(reason) {
+                console.log(reason);
+            });
+        }
         $scope.my_data = [viewId2node[document.sysmlid]];
     }
 
@@ -549,26 +607,16 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                         viewId2node[instance.sysmlid] = sectionTreeNode;
                         parentNode.children.unshift(sectionTreeNode);
                         addSectionElements(instance, viewNode, sectionTreeNode);
-                    } else if (ViewService.isFigure(instance)) {
-                        var figureTreeNode = {
+                    } else if (ViewService.getTreeType(instance)) {
+                        var otherTreeNode = {
                             label : instance.name,
-                            type : "figure",
+                            type : ViewService.getTreeType(instance),
                             view : viewNode.data.sysmlid,
                             data : instance,
                             hide: hide,
                             children: []
                         };
-                        parentNode.children.unshift(figureTreeNode);
-                    } else if (ViewService.isTable(instance)) {
-                        var tableTreeNode = {
-                            label : instance.name,
-                            type : "table",
-                            view : viewNode.data.sysmlid,
-                            data : instance,
-                            hide: hide,
-                            children: []
-                        };
-                        parentNode.children.unshift(tableTreeNode);
+                        parentNode.children.unshift(otherTreeNode);
                     }
                 }
                 $scope.treeApi.refresh();
@@ -621,7 +669,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 $state.go('workspace.site.documentpreview', {site: documentSiteBranch.data.sysmlid, document: branch.data.sysmlid, search: undefined});
             }
         } else if ($state.includes('workspace.site.document')) {
-            var view = (branch.type === 'section' || branch.type === 'figure' || branch.type === 'table') ? branch.view : branch.data.sysmlid;
+            var view = (branch.type !== 'view') ? branch.view : branch.data.sysmlid;
             var sectionId = branch.type === 'section' ? branch.data.sysmlid : null;
             var hash = branch.data.sysmlid;
             if ($rootScope.mms_fullDocMode) {
@@ -743,6 +791,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
 
                 if (itemType === 'View') {
                     viewId2node[data.sysmlid] = newbranch;
+                    seenViewIds[data.sysmlid] = newbranch;
                     MmsAppUtils.handleChildViews(data, $scope.newViewAggr.type, ws, time, handleSingleView, handleChildren)
                     .then(function(node) {
                         //TODO handle full doc mode
@@ -816,6 +865,9 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             } else if (branch.type === "section") {
                 growl.warning("Add View Error: Cannot add a child view to a section");
                 return;
+            } else if (branch.aggr === 'NONE') {
+                growl.warning("Add View Error: Cannot add a child view to a non-owned and non-shared view.");
+                return;
             }
             templateUrlStr = 'partials/mms/new-view.html';
             branchType = 'view';
@@ -855,7 +907,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             var curBranch = $scope.treeApi.get_selected_branch();
             if (curBranch) {
                 var viewId;
-                if (curBranch.type == 'section' || curBranch.type == 'table' || curBranch.type == 'figure') {
+                if (curBranch.type !== 'view') {
                     if (curBranch.type == 'section' && curBranch.data.specialization && curBranch.data.specialization.type === 'InstanceSpecification')
                         viewId = curBranch.data.sysmlid;
                     else
@@ -938,6 +990,9 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 });
             }
             $scope.treeApi.remove_branch(branch);
+            if ($state.includes('workspace.site.document') && branch.type === 'view') {
+                processDeletedViewBranch(branch);
+            }
             if ($state.includes('workspace.sites') && !$state.includes('workspace.site.document'))
                 return;
             $state.go('^', {search: undefined});
@@ -1050,6 +1105,10 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
        
         $scope.addView = function(elem) {
             var viewId = elem.sysmlid;
+            if (seenViewIds[viewId]) {
+                growl.error("Error: View " + elem.name + " is already in this document.");
+                return;
+            }
             var documentId = $scope.document.sysmlid;
             var workspace = ws;
 
@@ -1170,7 +1229,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     }
 
     function setPeVisibility(branch) {
-        if (branch.type === 'figure' || branch.type === 'table') {
+        if (branch.type === 'figure' || branch.type === 'table' || branch.type === 'equation') {
             branch.hide = !$rootScope.veTreeShowPe;
         }
         for (var i = 0; i < branch.children.length; i++) {
@@ -1257,7 +1316,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
 
     if ($state.includes('workspace.site.document')) {
         $timeout(function() {
-            if (document.specialization.view2view) {
+            if (document.specialization.view2view && document.specialization.view2view.length > 0) {
                 document.specialization.view2view.forEach(function(view, index) {
                     ViewService.getView(view.id, false, ws, time, 0)
                     .then(addViewSections); //TODO add back in once we have priority queue

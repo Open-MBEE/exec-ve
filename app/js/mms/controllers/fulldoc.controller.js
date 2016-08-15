@@ -71,13 +71,19 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
     };
     var num = 1;
 
+    var seenViewIds = {};
     function handleSingleView(v, aggr) {
-        var childIds = [];
+        var childIds = view2children[v.sysmlid];
+        if (!childIds)
+            childIds = [];
         view2children[v.sysmlid] = childIds;
         if (!v.specialization.childViews || v.specialization.childViews.length === 0 || aggr === 'NONE') {
             return childIds;
         }
         for (var i = 0; i < v.specialization.childViews.length; i++) {
+            if (seenViewIds[v.specialization.childViews[i].id])
+                continue;
+            seenViewIds[v.specialization.childViews[i].id] = true;
             childIds.push(v.specialization.childViews[i].id);
         }
         return childIds;
@@ -87,7 +93,7 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
         return childIds;
     }
 
-  if (view2view) {
+  if (view2view && view2view.length > 0) {
     view2view.forEach(function(view) {
         view2children[view.id] = view.childrenViews;
     });
@@ -97,6 +103,7 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
         num = num + 1;
     });
   } else {
+    view2children[document.sysmlid] = [];
     if (!document.specialization.childViews)
         document.specialization.childViews = [];
     MmsAppUtils.handleChildViews(document, 'COMPOSITE', $scope.ws, time, handleSingleView, handleChildren)

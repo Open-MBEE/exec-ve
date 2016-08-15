@@ -46,6 +46,7 @@ function($scope, $rootScope, $stateParams, document, time, ElementService, ViewS
         }
     };
 
+    var seenViewIds = {};
     function handleSingleView(v, aggr) {
         var curNode = viewIds2node[v.sysmlid];
         if (!curNode) {
@@ -62,7 +63,15 @@ function($scope, $rootScope, $stateParams, document, time, ElementService, ViewS
     }
 
     function handleChildren(curNode, childNodes) {
-        curNode.children.push.apply(curNode.children, childNodes);
+        var newChildNodes = [];
+        childNodes.forEach(function(node) {
+            if (seenViewIds[node.id]) {
+                return;
+            }
+            seenViewIds[node.id] = node;
+            newChildNodes.push(node);
+        });
+        curNode.children.push.apply(curNode.children, newChildNodes);
     }
 
     MmsAppUtils.handleChildViews(document, 'COMPOSITE', ws, time, handleSingleView, handleChildren)
@@ -106,6 +115,8 @@ function($scope, $rootScope, $stateParams, document, time, ElementService, ViewS
                 toSave.push({
                     sysmlid: id,
                     //name: orig.name,
+                    read: orig.read,
+                    modified: orig.modified,
                     specialization: {
                         childViews: childViews,
                         type: orig.specialization.type
@@ -118,7 +129,10 @@ function($scope, $rootScope, $stateParams, document, time, ElementService, ViewS
             growl.success('Reorder Successful');
             $state.go('workspace.site.document', {}, {reload:true});
         }, function(reason) {
-
+            if (reason.status === 409)
+                growl.error("There's a conflict in the views you're trying to change!");
+            else
+                growl.error(reason.message);
         }).finally(function() {
             $scope.saveClass = "";
             saving = false;
