@@ -459,7 +459,7 @@ function UtilsService(CacheService, _) {
         return result;
     };
 
-    var makeTablesAndFiguresTOC = function(tree, printElement, live) {
+    var makeTablesAndFiguresTOC = function(tree, printElement, live, html) {
         var ob = {
             tables: '<div class="tot"><div class="header">List of Tables</div><ul>',
             figures: '<div class="tof"><div class="header">List of Figures</div><ul>',
@@ -468,6 +468,8 @@ function UtilsService(CacheService, _) {
             figureCount: 0,
             equationCount: 0
         };
+        if (html)
+            return ob; //let server handle it for now
         var root_branch = tree[0].branch;
         root_branch.children.forEach(function (child) {
             makeTablesAndFiguresTOCChild(child, printElement, ob, live, false);

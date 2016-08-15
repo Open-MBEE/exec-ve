@@ -31,6 +31,7 @@
     </p>
     <br/> <!--<div ng-if="type == 'DOCUMENT'">Generate Standard Cover Page: <input type="checkbox" ng-model="model.genCover"></div> -->
     <div ng-if="type == 'DOCUMENT' && genpdf">Generate List of Tables and Figures: <input type="checkbox" ng-model="model.genTotf"></div>
+    <div ng-if="model.genTotf">Use HTML for List of Tables and Figures (will not include equations and may differ from web numbering): <input type="checkbox" ng-model="model.htmlTotf"></div>
     <div ng-if="genpdf">Landscape: <input type="checkbox" ng-model="model.landscape"></div>
 </div>
 
