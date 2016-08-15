@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsPerspectives', ['SiteService', 'ElementService', 'WorkspaceService', 'ConfigService', '$state', '$templateCache', '$window', 'growl', 'ApplicationService', 'AuthService', '$modal', '$q', mmsPerspectives]);
+.directive('mmsPerspectives', ['SiteService', 'ElementService', 'WorkspaceService', 'ConfigService', '$state', '$templateCache', '$window', 'growl', 'ApplicationService', 'AuthService', '$uibModal', '$q', mmsPerspectives]);
 
 /**
  * @ngdoc directive
@@ -22,7 +22,7 @@ angular.module('mms.directives')
  * Tom Saywer Persectives JS library.
  *
  */
-function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigService, $state, $templateCache, $window, growl, ApplicationService, AuthService, $modal, $q) {
+function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigService, $state, $templateCache, $window, growl, ApplicationService, AuthService, $uibModal, $q) {
     var template = $templateCache.get('mms/templates/mmsPerspectives.html');
     var mapping = {};
     var deferreds = {};
@@ -94,12 +94,12 @@ function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigSe
         }
     };
 
-    function tspAddElementCtrl($scope, $modalInstance) {
+    function tspAddElementCtrl($scope, $uibModalInstance) {
         $scope.choose = function(elem, property) {
-            $modalInstance.close(elem.sysmlid);
+            $uibModalInstance.close(elem.sysmlid);
         };
         $scope.cancel = function() {
-            $modalInstance.dismiss();
+            $uibModalInstance.dismiss();
         };
         $scope.searchOptions= {};
         $scope.searchOptions.callback = $scope.choose;
@@ -183,10 +183,10 @@ function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigSe
         };
 
         scope.addElement = function() {
-            var instance = $modal.open({
+            var instance = $uibModal.open({
                 template: '<mms-search mms-options="searchOptions"></mms-search><div class="modal-footer"></span><button class="btn btn-danger" ng-click="cancel()">CANCEL</button></div>',
                 scope: scope,
-                controller: ['$scope', '$modalInstance', tspAddElementCtrl],
+                controller: ['$scope', '$uibModalInstance', tspAddElementCtrl],
                 size: 'lg'
             });
             instance.result.then(function(eid) {
