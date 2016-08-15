@@ -270,9 +270,9 @@ function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templ
                     $scope.genpdf = true;
                 }
                 $scope.docOption = (!isDoc && mode === 3);
-                $scope.model = {genCover: false, genTotf: false, landscape: false};
+                $scope.model = {genCover: false, genTotf: false, landscape: false, htmlTotf: false};
                 $scope.print = function() {
-                    $uibModalInstance.close(['ok', $scope.model.genCover, $scope.model.genTotf, $scope.model.landscape]);
+                    $uibModalInstance.close(['ok', $scope.model.genCover, $scope.model.genTotf, $scope.model.htmlTotf, $scope.model.landscape]);
                 };
                 $scope.fulldoc = function() {
                     $uibModalInstance.close(['fulldoc']);
@@ -286,9 +286,9 @@ function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templ
         });
         modalInstance.result.then(function(choice) {
             if (choice[0] === 'ok') {
-                printOrGenerate(ob, ws, time, tag, isDoc, choice[1], choice[2], mode, choice[3])
+                printOrGenerate(ob, ws, time, tag, isDoc, choice[1], choice[2], choice[3], mode, choice[4])
                 .then(function(result) {
-                    var css = UtilsService.getPrintCss(result.header, result.footer, result.dnum, result.tag, result.displayTime, choice[3]);
+                    var css = UtilsService.getPrintCss(result.header, result.footer, result.dnum, result.tag, result.displayTime, choice[4]);
                     var cover = result.cover;
                     var toc = result.toc;
                     var tof = result.tof;
@@ -330,6 +330,9 @@ function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templ
                         if (!choice[2]) {
                             doc.tof = '<div style="display:none;"></div>';
                             doc.tot = '<div style="display:none;"></div>';
+                        } else if (choice[3]) { //let server scrape html for now
+                            doc.tof = '';
+                            doc.tot = '';
                         }
                         if (time == 'latest')
                             doc.tagId = time;
@@ -376,7 +379,7 @@ function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templ
             tag: tagname or ''
         }
     */
-    var printOrGenerate = function(ob, ws, time, tag, isDoc, genCover, genTotf, mode, landscape) {
+    var printOrGenerate = function(ob, ws, time, tag, isDoc, genCover, genTotf, htmlTotf, mode, landscape) {
         var deferred = $q.defer();
         var printContents = '';
         var printElementCopy = angular.element("#print-div");
@@ -394,7 +397,7 @@ function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templ
         var prefix = protocol + '://' + hostname + ((port == 80 || port == 443) ? '' : (':' + port));
         var mmsIndex = absurl.indexOf('mms.html');
         var toc = UtilsService.makeHtmlTOC($rootScope.mms_treeApi.get_rows());
-        var tableAndFigTOC = UtilsService.makeTablesAndFiguresTOC($rootScope.mms_treeApi.get_rows(), printElementCopy);
+        var tableAndFigTOC = UtilsService.makeTablesAndFiguresTOC($rootScope.mms_treeApi.get_rows(), printElementCopy, false, htmlTotf);
         var tof = tableAndFigTOC.figures;
         var tot = tableAndFigTOC.tables;
         var toe = tableAndFigTOC.equations;
@@ -527,7 +530,7 @@ function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templ
     };
 
     var refreshNumbering = function(tree, centerElement) {
-        UtilsService.makeTablesAndFiguresTOC(tree, centerElement, true);
+        UtilsService.makeTablesAndFiguresTOC(tree, centerElement, true, false);
     };
 
     return {
