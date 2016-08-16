@@ -46,7 +46,10 @@ module.exports = function (config) {
             'build/js/mms/app.js',
             'build/js/mms/controllers.js',
             'test/develop/unit/**/*.js',
-            'test/mock-data/*.js'
+            'test/mock-data/*.js',
+            // Fixtures -- This is how you can load JSON Data as mock data
+            {pattern: 'test/mock-data/*.json', watched: true, served: true, included: false}
+
         ],
 
         // list of files to exclude
