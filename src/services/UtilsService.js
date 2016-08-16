@@ -222,7 +222,7 @@ function UtilsService(CacheService, _) {
      * @param {string} [workspace=master] workspace
      * @param {boolean} [updateEdit=false] updateEdit
      * @param {string} property type of property, ie transclusion or not
-     * @returns void 
+     * @returns {void} nothing 
      */
 
     var mergeElement = function(source, eid, workspace, updateEdit, property) {
