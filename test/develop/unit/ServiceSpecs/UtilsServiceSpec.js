@@ -129,16 +129,31 @@ describe('UtilsService', function() {
         }));
     });
 
-    describe('Method buildTreeHierarchy', function () {
-        // $scope.my_data = UtilsService.buildTreeHierarchy(filter_sites(sites), "sysmlid", "site", "parent", siteInitFunc);
-
-        // $scope.my_data = UtilsService.buildTreeHierarchy(workspaces, "id",
-        //     "workspace", "parent", workspaceLevel2Func);
+    describe('Method filterProperties ', function() {
+        //given element object a and element object b, returns new object with b data minus keys not in a
+        it('it should return a new object with b data minus keys not in a for elements a and b', inject(function() {
+            //used to updateElements checking a object in the cache (that has been updated) with the same object from the server.... B - A
+            var a = {specialization:{specialization:{hello:'world'}}};
+            var b = {specialization:{specialization:{hello:'world', foo:'bar'}}};
+            //console.log("This is b before"+ JSON.stringify(b.specialization.specialization));
+            var result = UtilsService.filterProperties(a, b);
+            //console.log("This is result after"+ JSON.stringify(result));
+            expect(result.specialization.specialization.foo).toBeUndefined();
+            expect(result.specialization.specialization.hello).toEqual('world');
+            //result should equal just foo.....
+            // this is used to merge in only the keys that are new!
+        }));
     });
 
-    describe('Method normalize', function () {});
+    xdescribe('Method buildTreeHierarchy', function () {
+        // $scope.my_data = UtilsService.buildTreeHierarchy(filter_sites(sites), "sysmlid", "site", "parent", siteInitFunc);
+        // $scope.my_data = UtilsService.buildTreeHierarchy(workspaces, "id", "workspace", "parent", workspaceLevel2Func);
 
-    describe('Method makeElementKey', function () {});
+    });
+
+    xdescribe('Method normalize', function () {});
+
+    xdescribe('Method makeElementKey', function () {});
 
     describe('Method mergeElement ', function() {
         // put in cacheService element object and its edit object, modify edit
@@ -164,24 +179,8 @@ describe('UtilsService', function() {
 
     });
 
-    describe('Method filterProperties ', function() {
-        //given element object a and element object b, returns new object with b data minus keys not in a
-        it('it should return a new object with b data minus keys not in a for elements a and b', inject(function() {
-            //used to updateElements checking a object in the cache (that has been updated) with the same object from the server.... B - A
-            var a = {specialization:{specialization:{hello:'world'}}};
-            var b = {specialization:{specialization:{hello:'world', foo:'bar'}}};
-            //console.log("This is b before"+ JSON.stringify(b.specialization.specialization));
-            var result = UtilsService.filterProperties(a, b);
-            //console.log("This is result after"+ JSON.stringify(result));
-            expect(result.specialization.specialization.foo).toBeUndefined();
-            expect(result.specialization.specialization.hello).toEqual('world');
-            //result should equal just foo.....
-            // this is used to merge in only the keys that are new!
-        }));
-
-    });
-
-    describe('Method hasConflict ', function() {
+    /*
+    xdescribe('Method hasConflict ', function() {
         // hasConflict
         // given edit object with only keys that were edited,
         // 'orig' object and 'server' object, should only return true
@@ -224,28 +223,29 @@ describe('UtilsService', function() {
         }));
     });
 
-    describe('Function isRestrictedValue', function () {});
+    xdescribe('Function isRestrictedValue', function () {});
 
-    describe('Method makeHtmlTable', function () {});
+    xdescribe('Method makeHtmlTable', function () {});
 
-    describe('Method makeTableBody', function () {});
+    xdescribe('Method makeTableBody', function () {});
 
-    describe('Method makeHtmlList', function () {});
+    xdescribe('Method makeHtmlList', function () {});
 
-    describe('Method makeHtmlPara', function () {});
+    xdescribe('Method makeHtmlPara', function () {});
 
-    describe('Method makeHtmlTOC', function () {});
+    xdescribe('Method makeHtmlTOC', function () {});
 
-    describe('Method makeHtmlTOCChild', function () {});
+    xdescribe('Method makeHtmlTOCChild', function () {});
 
-    describe('Method makeTablesAndFiguresTOC', function () {});
+    xdescribe('Method makeTablesAndFiguresTOC', function () {});
 
-    describe('Method makeTablesAndFiguresTOCChild', function () {});
+    xdescribe('Method makeTablesAndFiguresTOCChild', function () {});
 
-    describe('Method createMmsId', function () {});
+    xdescribe('Method createMmsId', function () {});
 
-    describe('Method getIdInfo', function () {});
+    xdescribe('Method getIdInfo', function () {});
 
-    describe('Method getPrintCss', function () {});
-
+    xdescribe('Method getPrintCss', function () {});
+    */
 });
+
