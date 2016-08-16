@@ -220,7 +220,7 @@ function UtilsService(CacheService, _) {
      * @param {object} source the element object to merge in 
      * @param {string} eid id of element
      * @param {string} [workspace=master] workspace
-     * @param {boolean} [updateEdit=false] 
+     * @param {boolean} [updateEdit=false] updateEdit
      * @param {string} property type of property, ie transclusion or not
      * @returns void 
      */
