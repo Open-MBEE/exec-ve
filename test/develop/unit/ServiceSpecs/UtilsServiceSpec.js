@@ -145,9 +145,11 @@ describe('UtilsService', function() {
         }));
     });
 
-    xdescribe('Method buildTreeHierarchy', function () {
+    describe('Method buildTreeHierarchy', function () {
+
         // $scope.my_data = UtilsService.buildTreeHierarchy(filter_sites(sites), "sysmlid", "site", "parent", siteInitFunc);
-        // $scope.my_data = UtilsService.buildTreeHierarchy(workspaces, "id", "workspace", "parent", workspaceLevel2Func);
+
+        var my_data = UtilsService.buildTreeHierarchy(workspaces, "id", "workspace", "parent", TreeCtrl.workspaceLevel2Func);
 
     });
 
