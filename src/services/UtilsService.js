@@ -266,7 +266,7 @@ function UtilsService(CacheService, _) {
      *
      * @param {Object} a Element Object
      * @param {Object} b Element Object
-     * @returns {Object} 
+     * @returns {Object} new object
      */
     var filterProperties = function(a, b) {
         var res = {};
