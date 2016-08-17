@@ -198,7 +198,7 @@ describe('UtilsService', function() {
             UtilsService.mergeElement(b, 'objectToEdit', 'master', true, 'all');
 
             var c = CacheService.get('elements|master|objectToEdit|latest');
-            console.log("after :::::::::::" + c.name);
+            // console.log("after :::::::::::" + c.name);
 
             expect(a.name).toEqual('ve');
         }));
@@ -279,12 +279,25 @@ describe('UtilsService', function() {
     });
 
     describe('Function isRestrictedValue', function () {
-        it('should')
+        var jsonObject1;
+        var jsonObject2;
+
+        $.getJSON('base/test/mock-data/isRestrictedValue.json', function (data) {
+            jsonObject1 = [data[0]];
+            jsonObject2 = [data[1]];
+        });
+        it('should check that the values of the element is restricted', inject(function () {
+            expect(UtilsService.isRestrictedValue(jsonObject1)).toBeTruthy();
+        }));
+
+        it('should check that the values of the element is NOT restricted', inject(function () {
+            expect(UtilsService.isRestrictedValue(jsonObject2)).toBeFalsy();
+        }));
     });
 
-    /*
-    xdescribe('Method makeHtmlTable', function () {});
+    describe('Method makeHtmlTable', function () {});
 
+    /*
     xdescribe('Method makeTableBody', function () {});
 
     xdescribe('Method makeHtmlList', function () {});

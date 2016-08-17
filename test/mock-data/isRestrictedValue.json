@@ -1,0 +1,53 @@
+[
+    {
+        "valueExpression": null,
+        "operand": [
+            {
+                "valueExpression": null,
+                "string": "RestrictedValue"
+            },
+            {
+                "valueExpression": null,
+                "type": "ElementValue",
+                "string": "RestrictedValue"
+            },
+            {
+                "valueExpression": null,
+                "type": "Expression",
+                "instance": "_18_0_5_407019f_1468188892970_158569_14563",
+                "string": "RestrictedValue",
+                "operand": {
+                    "length":2
+                }
+            }
+        ],
+        "type": "Expression",
+        "length":3
+    },
+    {
+        "valueExpression": null,
+        "operand": [
+            {
+                "valueExpression": null,
+                "string": "Not a RestrictedValue"
+            },
+            {
+                "valueExpression": null,
+                "type": "ElementValue",
+                "string": "RestrictedValue"
+            },
+            {
+                "valueExpression": null,
+                "type": "Expression",
+                "instance": "_18_0_5_407019f_1468188892970_158569_14563",
+                "string": "RestrictedValue",
+                "operand": {
+                    "length":2
+                }
+            }
+        ],
+        "type": "Expression",
+        "length":3
+    }
+]
+
