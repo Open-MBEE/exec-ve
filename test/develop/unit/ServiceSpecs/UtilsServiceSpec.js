@@ -17,7 +17,7 @@ describe('UtilsService', function() {
     /*
       1. hasCircularReference cannot be tested
       2. cleanValueSpec is tested inherently by cleanElement method
-      3.
+      3. makeElementKey is tested through mergeElement function
      */
 
     describe('Method cleanElement ', function() {
@@ -146,16 +146,39 @@ describe('UtilsService', function() {
     });
 
     describe('Method buildTreeHierarchy', function () {
+        // Test will generate a mock tree hierarchy based on a list of elements given
+        it('it should create a tree hierarchy json based on ', inject(function () {
+            // Create 2 objects
+            var obj1 = {
+                name      : "CharacterizationTest",
+                sysmlid           : "site__18_0_5_83a025f_1456506201488_656065_12275",
+                isCharacterization: true
+            };
+            var obj2 = {
+                name: "nri-characterization",
+                sysmlid: "nri-characterization",
+                isCharacterization: false
+            };
+            var childObject1 = {
+                name: "sub-nri-characterization",
+                sysmlid: "sub-nri-characterization",
+                parent:"nri-characterization",
+                isCharacterization: false
+            };
 
-        // $scope.my_data = UtilsService.buildTreeHierarchy(filter_sites(sites), "sysmlid", "site", "parent", siteInitFunc);
+            // Add the objects into an array because the buildTreeHierarchy expects an array of nodes
+            var siteData = [obj1, obj2, childObject1];
 
-        var my_data = UtilsService.buildTreeHierarchy(workspaces, "id", "workspace", "parent", TreeCtrl.workspaceLevel2Func);
+            // This will generate a nested JSON structure based on sysmlid and parent configuration.
+            var myData = UtilsService.buildTreeHierarchy(siteData, 'sysmlid', 'site', 'parent', null);
+            // Check the output to make sure it's correct, if needed
+            // console.log(JSON.stringify(myData,null,2));
 
+            $.getJSON('base/test/mock-data/buildTreeHierarchy.json', function (data) {
+                expect(myData).toMatch(data);
+            });
+        }));
     });
-
-    xdescribe('Method normalize', function () {});
-
-    xdescribe('Method makeElementKey', function () {});
 
     describe('Method mergeElement ', function() {
         // put in cacheService element object and its edit object, modify edit
@@ -166,23 +189,53 @@ describe('UtilsService', function() {
             var a = {creator: "gcgandhi", modified: "2015-07-27T16:32:42.272-0700",modifier: "dlam",
                 created: "Mon May 18 14:38:12 PDT 2015", name: "vetest Cover Page", documentation: "",
                 owner: "holding_bin_vetest_PROJECT-21bbdceb-a188-45d9-a585-b30bba346175"};
-            var b = {creator: "dlam", modified: "2015-07-27T16:32:42.272-0700",modifier: "dlam",
-                created: "Mon May 18 14:38:12 PDT 2015", name: "ve", documentation: "",
+            var b = {creator: "dlam", modified: "2015-07-27T16:52:42.272-0700",modifier: "dlam",
+                created: "Mon May 18 14:38:12 PDT 2015", name: "ve", documentation: "Some Docs",
                 owner: "holding_bin_vetest_PROJECT-21bbdceb-a188-45d9-a585-b30bba346175"};
             //   var mergeElement = function(source, eid, workspace, updateEdit, property) {
-            CacheService.put('element|master|objectToEdit|latest', a, true);
-            UtilsService.mergeElement(b, 'objectToEdit', 'master',true, 'all');
-            var c = CacheService.get('element|master|objectToEdit|latest');
-            console.log("after :::::::::::" + c.name);
-            expect(a.name).toEqual('ve');
+            // CacheService.put('element|master|objectToEdit|latest', a, true);
+            CacheService.put('elements|master|objectToEdit|latest', a, true);
+            UtilsService.mergeElement(b, 'objectToEdit', 'master', true, 'all');
 
-            //UtilsService.filterProperties(a, b);
+            var c = CacheService.get('elements|master|objectToEdit|latest');
+            console.log("after :::::::::::" + c.name);
+
+            expect(a.name).toEqual('ve');
         }));
 
     });
 
-    /*
-    xdescribe('Method hasConflict ', function() {
+    describe('Method normalize', function () {
+        it('should normalize common arguments on an object with all null values', inject(function(){
+            var someSillyNullRiddenObject = { update:null,workspace:null,ver:null};
+            var compareObject = JSON.stringify({update:false, ws:'master', ver:'latest'});
+            var res = JSON.stringify(UtilsService.normalize(someSillyNullRiddenObject));
+
+            expect(res).toMatch(compareObject);
+        }));
+
+        it('should normalize common arguments on an object with some null values', inject(function(){
+            var someSillyPartialNullRiddenObject = { update:null,workspace:"not-master",version:null};
+            var wrongObject = JSON.stringify({update:false, ws:'master', ver:'not-latest'});
+            var correctObject = JSON.stringify({update:false, ws:'not-master', ver:'latest'});
+            var res = JSON.stringify(UtilsService.normalize(someSillyPartialNullRiddenObject));
+
+            expect(res).toMatch(correctObject);
+            expect(res).not.toMatch(wrongObject);
+        }));
+
+        it('should NOT normalize common arguments on an object with all given values', inject(function(){
+            var someSillyObject = { update:true,workspace:"not-master",version:"not-latest"};
+            var wrongObject = JSON.stringify({update:false, ws:null, ver:'latest'});
+            var correctObject = JSON.stringify({update:true, ws:'not-master', ver:'not-latest'});
+            var res = JSON.stringify(UtilsService.normalize(someSillyObject));
+
+            expect(res).toMatch(correctObject);
+            expect(res).not.toMatch(wrongObject);
+        }));
+    });
+
+    describe('Method hasConflict ', function() {
         // hasConflict
         // given edit object with only keys that were edited,
         // 'orig' object and 'server' object, should only return true
@@ -225,8 +278,11 @@ describe('UtilsService', function() {
         }));
     });
 
-    xdescribe('Function isRestrictedValue', function () {});
+    describe('Function isRestrictedValue', function () {
+        it('should')
+    });
 
+    /*
     xdescribe('Method makeHtmlTable', function () {});
 
     xdescribe('Method makeTableBody', function () {});
