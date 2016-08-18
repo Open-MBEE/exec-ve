@@ -493,7 +493,7 @@ function UtilsService(CacheService, _) {
             var cap1 = el.find('table > caption');
             cap1.html('Table ' + cap);//cap.html());
             if (cap1.length === 0) {
-                //var table = el.find('table');
+                el.find('table').prepend('<caption>Table ' + cap + '</caption>');
             }
             // Change cap value based on showRefName true/false
             if (showRefName) {
