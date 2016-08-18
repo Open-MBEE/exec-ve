@@ -995,8 +995,13 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             }
             if ($state.includes('workspace.sites') && !$state.includes('workspace.site.document'))
                 return;
-            $state.go('^', {search: undefined});
-            //TODO handle full doc mode??
+
+            // handle full doc mode
+            if ($rootScope.mms_fullDocMode) {
+                $state.go('workspace.site.document.full', {search: undefined});
+                $state.reload();
+            } else
+                $state.go('^', {search: undefined});
         });
     };
 
