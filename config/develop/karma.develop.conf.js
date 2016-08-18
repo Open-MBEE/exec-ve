@@ -48,7 +48,7 @@ module.exports = function (config) {
             'test/develop/unit/**/*.js',
             'test/mock-data/*.js',
             // Fixtures -- This is how you can load JSON Data as mock data
-            {pattern: 'test/mock-data/*.json', watched: true, served: true, included: false}
+            {pattern: 'test/mock-data/**/*.json', watched: true, served: true, included: false}
 
         ],
 

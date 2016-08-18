@@ -17,12 +17,12 @@
                 "instance": "_18_0_5_407019f_1468188892970_158569_14563",
                 "string": "RestrictedValue",
                 "operand": {
-                    "length":2
+                    "length": 2
                 }
             }
         ],
         "type": "Expression",
-        "length":3
+        "length": 3
     },
     {
         "valueExpression": null,
@@ -42,12 +42,12 @@
                 "instance": "_18_0_5_407019f_1468188892970_158569_14563",
                 "string": "RestrictedValue",
                 "operand": {
-                    "length":2
+                    "length": 2
                 }
             }
         ],
         "type": "Expression",
-        "length":3
+        "length": 3
     }
 ]
 

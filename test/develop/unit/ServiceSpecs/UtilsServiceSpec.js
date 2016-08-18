@@ -85,7 +85,7 @@ describe('UtilsService', function() {
             // Test will load a json object that has less than 5000 elements and verify that it has more than 1 but
             //  less than 5000 elements. Then it will clean the element and check that the displayedElements were
             //  removed from the element.
-            $.getJSON('base/test/mock-data/lessthan5000elements.json', function (data) {
+            $.getJSON('base/test/mock-data/UtilsService/lessthan5000elements.json', function (data) {
                 expect(data.specialization.displayedElements.length).toBeGreaterThan(1);
                 expect(data.specialization.displayedElements.length).toBeLessThan(5000);
                 UtilsService.cleanElement(data);
@@ -94,7 +94,7 @@ describe('UtilsService', function() {
         }));
 
         it('If elem.specialization.type is view and has a Array of (key) displayed elements whose length is greater then 5000 convert the array to JSON', inject(function() {
-            $.getJSON('base/test/mock-data/morethan5000elements.json', function (data) {
+            $.getJSON('base/test/mock-data/UtilsService/morethan5000elements.json', function (data) {
                 expect(data.specialization.displayedElements.length).toBeGreaterThan(5000);
                 UtilsService.cleanElement(data);
                 expect(data.specialization.displayedElements).not.toBeUndefined();
@@ -103,7 +103,7 @@ describe('UtilsService', function() {
 
         it('should delete any nonEditable keys from the object', inject(function() {
             // ['contains', 'view2view', 'childrenViews', 'displayedElements','allowedElements', 'contents', 'relatedDocuments']
-            $.getJSON('base/test/mock-data/utilsservice-noneditblekeys.json', function (data) {
+            $.getJSON('base/test/mock-data/UtilsService/utilsservice-noneditblekeys.json', function (data) {
                 // Verify that all the data is in the json first. This JSON is technically malformed but serves the
                 //  purpose for testing.
                 expect(data.specialization.displayedElements).toBeDefined();
@@ -174,7 +174,7 @@ describe('UtilsService', function() {
             // Check the output to make sure it's correct, if needed
             // console.log(JSON.stringify(myData,null,2));
 
-            $.getJSON('base/test/mock-data/buildTreeHierarchy.json', function (data) {
+            $.getJSON('base/test/mock-data/UtilsService/buildTreeHierarchy.json', function (data) {
                 expect(myData).toMatch(data);
             });
         }));
@@ -202,7 +202,6 @@ describe('UtilsService', function() {
 
             expect(a.name).toEqual('ve');
         }));
-
     });
 
     describe('Method normalize', function () {
@@ -282,10 +281,11 @@ describe('UtilsService', function() {
         var jsonObject1;
         var jsonObject2;
 
-        $.getJSON('base/test/mock-data/isRestrictedValue.json', function (data) {
+        $.getJSON('base/test/mock-data/UtilsService/isRestrictedValue.json', function (data) {
             jsonObject1 = [data[0]];
             jsonObject2 = [data[1]];
         });
+
         it('should check that the values of the element is restricted', inject(function () {
             expect(UtilsService.isRestrictedValue(jsonObject1)).toBeTruthy();
         }));
@@ -295,7 +295,21 @@ describe('UtilsService', function() {
         }));
     });
 
-    describe('Method makeHtmlTable', function () {});
+    describe('Method makeHtmlTable', function () {
+        var aTable, rapidTable, htmlTable;
+
+        $.getJSON('base/test/mock-data/UtilsService/makeHtmlTable.json', function (data) {
+            aTable = data;
+
+            rapidTable = UtilsService.makeHtmlTable(aTable);
+            htmlTable  = "<table class=\'table table-bordered table-condensed\'><thead class=\'ng-scope\'><tr><th colspan=\'1\' rowspan=\'1\'><div><p>Name</p></div></th></tr></thead><tbody><tr class=\'ng-scope\'><td colspan=\'1\' rowspan=\'1\'><div><mms-transclude-name data-mms-eid=\'_18_0_5_83a025f_1466012437229_386460_15622\' class=\'ng-isolate-scope\'><!-- ngIf: element.name --><span ng-if=\'element.name\' class=\'ng-binding ng-scope\'>Block 1</span><!-- end ngIf: element.name --><!-- ngIf: !element.name --></mms-transclude-name></div></td></tr><tr class=\'ng-scope\'><td colspan=\'1\' rowspan=\'1\'><div><mms-transclude-name data-mms-eid=\'_18_0_5_83a025f_1466012437230_335931_15623\' class=\'ng-isolate-scope\'><!-- ngIf: element.name --><span ng-if=\'element.name\' class=\'ng-binding ng-scope\'>Block 2</span><!-- end ngIf: element.name --><!-- ngIf: !element.name --></mms-transclude-name></div></td></tr><tr class=\'ng-scope\'><td colspan=\'1\' rowspan=\'1\'><div><mms-transclude-name data-mms-eid=\'_18_0_5_83a025f_1466012437230_859596_15624\' class=\'ng-isolate-scope\'><!-- ngIf: element.name --><span ng-if=\'element.name\' class=\'ng-binding ng-scope\'>Block 3</span><!-- end ngIf: element.name --><!-- ngIf: !element.name --></mms-transclude-name></div></td></tr><tr class=\'ng-scope\'><td colspan=\'1\' rowspan=\'1\'><div><mms-transclude-name data-mms-eid=\'_18_0_5_83a025f_1466012437230_502576_15625\' class=\'ng-isolate-scope\'><!-- ngIf: element.name --><span ng-if=\'element.name\' class=\'ng-binding ng-scope\'>Block 4</span><!-- end ngIf: element.name --><!-- ngIf: !element.name --></mms-transclude-name></div></td></tr><tr class=\'ng-scope\'><td colspan=\'1\' rowspan=\'1\'><div><mms-transclude-name data-mms-eid=\'_18_0_5_83a025f_1466012437230_893378_15626\' class=\'ng-isolate-scope\'><!-- ngIf: element.name --><span ng-if=\'element.name\' class=\'ng-binding ng-scope\'>Block 5</span><!-- end ngIf: element.name --><!-- ngIf: !element.name --></mms-transclude-name></div></td></tr></tbody></table>"
+
+        });
+
+        it('should generate a html table from the json that represents a rapid from MagicDraw', inject(function () {
+            expect(htmlTable).toMatch(rapidTable);
+        }));
+    });
 
     /*
     xdescribe('Method makeTableBody', function () {});
