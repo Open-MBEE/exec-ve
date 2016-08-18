@@ -319,7 +319,7 @@ function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templ
                             time: time,
                             displayTime: result.displayTime,
                             toc: result.toc,
-                            tof: result.tof,
+                            tof: result.tof + result.toe,
                             tot: result.tot,
                             dnum: result.dnum,
                             workspace: ws,
