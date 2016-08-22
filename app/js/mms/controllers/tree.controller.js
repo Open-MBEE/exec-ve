@@ -918,35 +918,9 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 $state.go('workspace.site.document.view', {view: viewId, search: undefined});
             }
         } else {
-            if ($state.current.name === 'doc.all') {
-                $rootScope.mms_fullDocMode = true;
-                $scope.bbApi.setToggleState("tree-full-document", true);
-                //allViewLevel2Func(); //TODO remove when priority queue is done
-            } else {
-                if (document.specialization.view2view && document.specialization.view2view.length > 30) {
-                    var instance = $uibModal.open({
-                        templateUrl: 'partials/mms/fullDocWarn.html',
-                        controller: ['$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
-                            $scope.ok = function() {$uibModalInstance.close('ok');};
-                            $scope.cancel = function() {$uibModalInstance.close('cancel');};
-                        }],
-                        size: 'sm'
-                    });
-                    instance.result.then(function(choice) {
-                        if (choice === 'ok') {
-                            $rootScope.mms_fullDocMode = true;
-                            //allViewLevel2Func(); //TODO remove when priority queue is done
-                            $scope.bbApi.setToggleState("tree-full-document", true);
-                            $state.go('workspace.site.document.full', {search: undefined}); 
-                        }
-                    });
-                } else {
-                    $rootScope.mms_fullDocMode = true;
-                    //allViewLevel2Func(); //TODO remove when priority queue is done
-                    $scope.bbApi.setToggleState("tree-full-document", true);
-                    $state.go('workspace.site.document.full', {search: undefined}); 
-                }
-            }
+            $rootScope.mms_fullDocMode = true;
+            $scope.bbApi.setToggleState("tree-full-document", true);
+            $state.go('workspace.site.document.full', {search: undefined}); 
         }
     };
 
