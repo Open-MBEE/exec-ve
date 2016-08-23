@@ -490,9 +490,13 @@ function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templ
         return deferred.promise;
     };
 
-    var handleChildViews = function(v, aggr, ws, time, curItemFunc, childrenFunc) {
+    var handleChildViews = function(v, aggr, ws, time, curItemFunc, childrenFunc, seen) {
+        var seenViews = seen;
+        if (!seenViews)
+            seenViews = {};
         var deferred = $q.defer();
         var curItem = curItemFunc(v, aggr);
+        seenViews[v.sysmlid] = v;
         var childIds = [];
         var childAggrs = [];
         if (!v.specialization.childViews || v.specialization.childViews.length === 0 || aggr === 'NONE') {
@@ -500,6 +504,8 @@ function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templ
             return deferred.promise;
         }
         for (var i = 0; i < v.specialization.childViews.length; i++) {
+            if (seenViews[v.specialization.childViews[i].id])
+                continue;
             childIds.push(v.specialization.childViews[i].id);
             childAggrs.push(v.specialization.childViews[i].aggregation);
         }
@@ -513,7 +519,7 @@ function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templ
             for (i = 0; i < childIds.length; i++) {
                 var child = mapping[childIds[i]];
                 if (child) //what if not found??
-                    childPromises.push(handleChildViews(child, childAggrs[i], ws, time, curItemFunc, childrenFunc));
+                    childPromises.push(handleChildViews(child, childAggrs[i], ws, time, curItemFunc, childrenFunc, seenViews));
             }
             $q.all(childPromises).then(function(childNodes) {
                 childrenFunc(curItem, childNodes);
