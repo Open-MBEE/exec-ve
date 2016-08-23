@@ -286,7 +286,8 @@ module.exports = function(grunt) {
     
     karma: {
         unit:{
-            configFile:'config/develop/karma.develop.conf.js'
+            configFile:'config/develop/karma.develop.conf.js',
+            // frameworks: ['jasmine']
         },
         continuous:{
           configFile:'config/develop/karma.develop.conf.js',

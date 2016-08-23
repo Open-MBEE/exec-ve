@@ -6,7 +6,6 @@
  */
 describe('UtilsService', function() {
     beforeEach(module('mms'));
-
     var UtilsService, CacheService;
 
     beforeEach(inject(function($injector) {
@@ -184,7 +183,6 @@ describe('UtilsService', function() {
         // put in cacheService element object and its edit object, modify edit
         // object's name/doc/val, call mergeElement with updateEdit = true with
         //property argument = all/name/documentation/value and check edit object only has that specific property updated
-
         it('it should update the element in the cache after editing', inject(function() {
             var a = {creator: "gcgandhi", modified: "2015-07-27T16:32:42.272-0700",modifier: "dlam",
                 created: "Mon May 18 14:38:12 PDT 2015", name: "vetest Cover Page", documentation: "",
@@ -296,26 +294,53 @@ describe('UtilsService', function() {
     });
 
     describe('Method makeHtmlTable', function () {
-        var aTable, rapidTable, htmlTable;
-
-        $.getJSON('base/test/mock-data/UtilsService/makeHtmlTable.json', function (data) {
-            aTable = data;
-
-            rapidTable = UtilsService.makeHtmlTable(aTable);
-            htmlTable  = "<table class=\'table table-bordered table-condensed\'><thead class=\'ng-scope\'><tr><th colspan=\'1\' rowspan=\'1\'><div><p>Name</p></div></th></tr></thead><tbody><tr class=\'ng-scope\'><td colspan=\'1\' rowspan=\'1\'><div><mms-transclude-name data-mms-eid=\'_18_0_5_83a025f_1466012437229_386460_15622\' class=\'ng-isolate-scope\'><!-- ngIf: element.name --><span ng-if=\'element.name\' class=\'ng-binding ng-scope\'>Block 1</span><!-- end ngIf: element.name --><!-- ngIf: !element.name --></mms-transclude-name></div></td></tr><tr class=\'ng-scope\'><td colspan=\'1\' rowspan=\'1\'><div><mms-transclude-name data-mms-eid=\'_18_0_5_83a025f_1466012437230_335931_15623\' class=\'ng-isolate-scope\'><!-- ngIf: element.name --><span ng-if=\'element.name\' class=\'ng-binding ng-scope\'>Block 2</span><!-- end ngIf: element.name --><!-- ngIf: !element.name --></mms-transclude-name></div></td></tr><tr class=\'ng-scope\'><td colspan=\'1\' rowspan=\'1\'><div><mms-transclude-name data-mms-eid=\'_18_0_5_83a025f_1466012437230_859596_15624\' class=\'ng-isolate-scope\'><!-- ngIf: element.name --><span ng-if=\'element.name\' class=\'ng-binding ng-scope\'>Block 3</span><!-- end ngIf: element.name --><!-- ngIf: !element.name --></mms-transclude-name></div></td></tr><tr class=\'ng-scope\'><td colspan=\'1\' rowspan=\'1\'><div><mms-transclude-name data-mms-eid=\'_18_0_5_83a025f_1466012437230_502576_15625\' class=\'ng-isolate-scope\'><!-- ngIf: element.name --><span ng-if=\'element.name\' class=\'ng-binding ng-scope\'>Block 4</span><!-- end ngIf: element.name --><!-- ngIf: !element.name --></mms-transclude-name></div></td></tr><tr class=\'ng-scope\'><td colspan=\'1\' rowspan=\'1\'><div><mms-transclude-name data-mms-eid=\'_18_0_5_83a025f_1466012437230_893378_15626\' class=\'ng-isolate-scope\'><!-- ngIf: element.name --><span ng-if=\'element.name\' class=\'ng-binding ng-scope\'>Block 5</span><!-- end ngIf: element.name --><!-- ngIf: !element.name --></mms-transclude-name></div></td></tr></tbody></table>"
-
-        });
+        // makeHtmlTable is a method for generating HTML tables based on rapid tables that are modeled in MagicDraw
+        var rapidTable;
+        var baseline;
+        var fixture = jasmine.getFixtures();
 
         it('should generate a html table from the json that represents a rapid from MagicDraw', inject(function () {
-            expect(htmlTable).toMatch(rapidTable);
+            // Retrieve the JSON data that the function will use to generate the table
+            $.getJSON('base/test/mock-data/UtilsService/makeHtmlTable.json', function (data) {
+                rapidTable = (UtilsService.makeHtmlTable(data));
+                // Check that it was generated
+                expect(rapidTable).toBeDefined();
+            });
+
+            // Load the baseline html file
+
+
+            $.get("base/test/mock-data/UtilsService/baselineMakeHtmlTable.html", function (data) {
+                // Compare against the generated html table
+                baseline = data;
+                // console.log("Baseline " + baseline);
+            });
+        }));
+        it('should have a match with the baseline from the generated html table', function(){
+            // expect(false).toBe(true);
+            console.log("BASELINE " + baseline);
+            expect(baseline).toMatch(rapidTable);
+        })
+    });
+
+    describe('Method makeHtmlList', function () {
+        var htmlList;
+
+        $.getJSON('base/test/mock-data/UtilsService/makeHtmlList_Unordered.json', function (data) {
+            // console.log(JSON.stringify(data, null, 2));
+            htmlList = (UtilsService.makeHtmlList(data));
+            expect(htmlList).toBeDefined();
+            // console.log(htmlList);
+        });
+        it('should generate an html UNORDERED list based on a given list of items', inject(function () {
+
+            $.get('base/test/mock-data/UtilsService/baselineMakeHtmlList_Unordered.html', function (data) {
+                expect(data).toMatch(htmlList);
+            });
         }));
     });
 
     /*
-    xdescribe('Method makeTableBody', function () {});
-
-    xdescribe('Method makeHtmlList', function () {});
-
     xdescribe('Method makeHtmlPara', function () {});
 
     xdescribe('Method makeHtmlTOC', function () {});

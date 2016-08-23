@@ -10,14 +10,14 @@ module.exports = function (config) {
 
         // frameworks to use
         // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-        frameworks: ['jasmine'],
+        frameworks: ['jasmine-jquery', 'jasmine', 'fixture'],
 
         // list of files / patterns to load in the browser
         // Take note of the order of how each JS file is placed.
         files: [
             "build/bower_components/jquery/dist/jquery.js",
             "build/bower_components/angular/angular.js",
-            'node_modules/angular-mocks/angular-mocks.js',
+            'build/bower_components/angular-mocks/angular-mocks.js',
             "build/bower_components/angular-animate/angular-animate.js",
             "build/bower_components/angular-borderlayout/src/borderLayout.js",
             "build/bower_components/angular-ui-router/release/angular-ui-router.js",
@@ -48,7 +48,8 @@ module.exports = function (config) {
             'test/develop/unit/**/*.js',
             'test/mock-data/*.js',
             // Fixtures -- This is how you can load JSON Data as mock data
-            {pattern: 'test/mock-data/**/*.json', watched: true, served: true, included: false}
+            {pattern: 'test/mock-data/**/*.json', watched: true, served: true, included: false},
+            {pattern: 'test/mock-data/**/*.html', watched: true, served: true, included: false}
 
         ],
 
@@ -57,7 +58,10 @@ module.exports = function (config) {
 
         // preprocess matching files before serving them to the browser
         // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
-        preprocessors: {},
+        preprocessors: {
+            // '**/*.html'   : ['html2js'],
+            // '**/*.json'   : ['json_fixtures']
+        },
 
         // test results reporter to use
         // possible values: 'dots', 'progress'
@@ -94,10 +98,23 @@ module.exports = function (config) {
         // enable / disable watching file and executing tests whenever any file changes
         autoWatch: true,
 
+        jsonFixturesPreprocessor: {
+            variableName: '__json__'
+        },
+
         // start these browsers
         // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
         browsers: ['Chrome'],
-        plugins : ['karma-chrome-launcher', 'karma-jasmine', 'karma-nyan-reporter', 'karma-phantomjs-launcher'],
+        plugins : [
+            'karma-chrome-launcher',
+            'karma-jasmine',
+            'karma-nyan-reporter',
+            'karma-phantomjs-launcher',
+            'karma-fixture',
+            'karma-jasmine-jquery',
+            'karma-html2js-preprocessor',
+            'karma-json-fixtures-preprocessor'
+        ],
 
         // Continuous Integration mode
         // if true, Karma captures browsers, runs the tests and exits
