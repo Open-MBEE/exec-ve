@@ -361,33 +361,64 @@ describe('UtilsService', function () {
     describe('Method makeHtmlList', function () {
         var unorderedHtmlList     = getJSONFixture('makeHtmlList_Unordered.json');
         var unorderedBaselineHtml = jasmine.getFixtures().read('html/baselineMakeHtmlList_Unordered.html');
-        // var orderedHtmlListJson   = getJSONFixture('makeHtmlList_Ordered.json');
-        // var orderedBaselineHtml   = jasmine.getFixtures().read('baselineMakeHtmlList_Ordered.html');
+        var orderedHtmlList       = getJSONFixture('makeHtmlList_Ordered.json');
+        var orderedBaselineHtml   = jasmine.getFixtures().read('html/baselineMakeHtmlList_Ordered.html');
 
-        it('makeHtmlList() should create an unordered html list based on the provided json data', function () {
+        it('makeHtmlList() should create an UNORDERED html list based on the provided json data', function () {
             unorderedHtmlList = (UtilsService.makeHtmlList(unorderedHtmlList));
             expect(unorderedHtmlList).toBeDefined();
             expect(unorderedHtmlList).toMatch(unorderedBaselineHtml);
         });
 
+        it('makeHtmlList() should create an ORDERED html list based on the provided json data', function () {
+            orderedHtmlList = (UtilsService.makeHtmlList(orderedHtmlList));
+            expect(orderedHtmlList).toBeDefined();
+            expect(orderedHtmlList).toMatch(orderedBaselineHtml);
+        });
+
+        it('should check that makeHtmlPara was used while generating the HTML list', function () {
+            expect(orderedHtmlList).toContain("mms-transclude-name");
+            expect(unorderedHtmlList).toContain("mms-transclude-name");
+        });
     });
 
-    /*
-     xdescribe('Method makeHtmlPara', function () {});
+    xdescribe('Method makeHtmlTOC', function () {
+        //TODO: Not sure on how to replicate the data needed to test this function
+        it("should generate a HTML Table of Contents", function () {
+        });
+    });
 
-     xdescribe('Method makeHtmlTOC', function () {});
+    xdescribe('Method makeTablesAndFiguresTOC', function () {
+        //TODO: Not sure on how to replicate the data needed to test this function
+        it("should generate a HTML Tables and Figures TOC", function () {
+        });
+    });
 
-     xdescribe('Method makeHtmlTOCChild', function () {});
+    xdescribe('Method makeTablesAndFiguresTOCChild', function () {
+        //TODO: Not sure on how to replicate the data needed to test this function
+        it("should generate a HTML Tables and Figures TOC CHILD", function () {
+        });
+    });
 
-     xdescribe('Method makeTablesAndFiguresTOC', function () {});
+    describe('Method createMmsId', function () {
+        // This method is a little funky to test because it uses a randomly generated MmsId
+        it('should create a randomly generated MMS ID', inject(function () {
+            var randomId = UtilsService.createMmsId();
+            expect(randomId).toBeDefined();
+            console.log(randomId);
+            expect(randomId).toMatch(/MMS_[0-9]+_[a-zA-Z0-9]+-[a-zA-Z0-9]+-[a-zA-Z0-9]+-[a-zA-Z0-9]+-[a-zA-Z0-9]+/g);
+        }));
+    });
 
-     xdescribe('Method makeTablesAndFiguresTOCChild', function () {});
+    describe('Method getIdInfo', function () {
+        var element = getJSONFixture('getIdInfo.json');
+        it('should generate a new element with holdingBin, projectId, siteId, and projectName', inject(function () {
+            var result = UtilsService.getIdInfo(element, "MERP");
+            expect(result).toBeDefined();
 
-     xdescribe('Method createMmsId', function () {});
-
-     xdescribe('Method getIdInfo', function () {});
-
-     xdescribe('Method getPrintCss', function () {});
-     */
+            var baseline = {holdingBinId: null, projectId: 'test-site_no_project', siteId: 'test-site', projectName: null};
+            expect(JSON.stringify(baseline)).toMatch(JSON.stringify(result));
+        }));
+    });
 });
 
