@@ -5,8 +5,8 @@
 angular.module('mmsApp')
 .controller('TreeCtrl', ['$anchorScroll' , '$q', '$filter', '$location', '$uibModal', '$scope', '$rootScope', '$state', '$stateParams', '$compile','$timeout', 'growl', 
                           'UxService', 'ConfigService', 'ElementService', 'UtilsService', 'WorkspaceService', 'ViewService', 'MmsAppUtils',
-                          'workspaces', 'workspaceObj', 'tag', 'sites', 'site', 'document', 'views', 'view', 'time', 'configSnapshots', 'docFilter',
-function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $stateParams, $compile, $timeout, growl, UxService, ConfigService, ElementService, UtilsService, WorkspaceService, ViewService, MmsAppUtils, workspaces, workspaceObj, tag, sites, site, document, views, view, time, configSnapshots, docFilter) {
+                          'workspaces', 'workspaceObj', 'tag', 'sites', 'site', 'document', 'views', 'view', 'time', 'configSnapshots', 'docFilter', 'rootSites',
+function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $stateParams, $compile, $timeout, growl, UxService, ConfigService, ElementService, UtilsService, WorkspaceService, ViewService, MmsAppUtils, workspaces, workspaceObj, tag, sites, site, document, views, view, time, configSnapshots, docFilter, rootSites) {
 
     $rootScope.mms_bbApi = $scope.bbApi = {};
     $rootScope.mms_treeApi = $scope.treeApi = {};
@@ -336,20 +336,35 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         });
     };
 
+    var isSiteInProject = function(sitesMapping, site) {
+        if (rootSites.length === 0)
+            return true;
+        var getRootSite = function(s) {
+            var ret = s;
+            while (ret.isCharacterization) {
+                ret = sitesMapping[ret.parent];
+            }
+            return ret;
+        };
+        var root = getRootSite(site);
+        if (rootSites.indexOf(root.sysmlid) >= 0)
+            return true;
+        return false;
+    };
     // Filter out alfresco sites
     var filter_sites = function(site_array) {
         var ret_array = [];
-
-        if ($scope.bbApi.getToggleState && $scope.bbApi.getToggleState('tree-showall-sites')) {
-            ret_array = site_array;
+        var sitesMapping = {};
+        var i;
+        for (i = 0; i < site_array.length; i++) {
+            sitesMapping[site_array[i].sysmlid] = site_array[i];
         }
-        else {
-            for (var i=0; i < site_array.length; i++) {
-                var obj = site_array[i];
-                // If it is a site characterization:
-                if (obj.isCharacterization) {
-                    ret_array.push(obj);
-                }
+        for (i = 0; i < site_array.length; i++) {
+            var obj = site_array[i];
+            if ((($scope.bbApi.getToggleState && $scope.bbApi.getToggleState('tree-showall-sites')) || 
+                    obj.isCharacterization) && 
+                    isSiteInProject(sitesMapping, obj)) {
+                ret_array.push(obj);
             }
         }
         return ret_array;

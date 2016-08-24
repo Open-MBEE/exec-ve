@@ -822,4 +822,5 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             }
         };
     });
-});
+})
+.constant('rootSites', []);
