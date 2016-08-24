@@ -118,7 +118,9 @@ module.exports = function (config) {
         ],
 
         junitReporter: {
-            outputFile: 'test-results.xml'
+            outputDir: 'test-results',
+            outputFile: 'test-output.xml',
+            useBrowserName: false
         },
 
         // Continuous Integration mode

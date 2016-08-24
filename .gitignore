@@ -13,3 +13,4 @@ app/bower_components_target
 .idea
 PhantomJS_*
 Chrome_*
+test-results/

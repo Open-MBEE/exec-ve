@@ -4,85 +4,123 @@
  *
  *
  */
-describe('UtilsService', function() {
+describe('UtilsService', function () {
     beforeEach(module('mms'));
     var UtilsService, CacheService;
-    jasmine.getFixtures().fixturesPath = 'base/test/mock-data/UtilsService';
+    jasmine.getFixtures().fixturesPath     = 'base/test/mock-data/UtilsService';
     jasmine.getJSONFixtures().fixturesPath = 'base/test/mock-data/UtilsService';
 
-    beforeEach(inject(function($injector) {
+    beforeEach(inject(function ($injector) {
         UtilsService = $injector.get('UtilsService');
         CacheService = $injector.get('CacheService');
     }));
 
     /*
-      1. hasCircularReference cannot be tested
-      2. cleanValueSpec is tested inherently by cleanElement method
-      3. makeElementKey is tested through mergeElement function
+     1. hasCircularReference cannot be tested
+     2. cleanValueSpec is tested inherently by cleanElement method
+     3. makeElementKey is tested through mergeElement function
      */
 
-    describe('Method cleanElement ', function() {
+    describe('Method cleanElement ', function () {
         // This test also tests the cleanValueSpec function as well
-        it('cleanElement() should return a empty array when elem.specialization.value is not a array and specialization.type is a property', inject(function() {
-            var dirtyElement = {author:'muschek', sysmlid:12345, name:'dirtyElement', owner:'otherElement',
-                specialization: {type:'Property', isDerived:false, isSlot:false, propertyType:'anotherElementID',
-                value: 'not an array'}};
+        it('cleanElement() should return a empty array when elem.specialization.value is not a array and specialization.type is a property', inject(function () {
+            var dirtyElement = {
+                author        : 'muschek', sysmlid: 12345, name: 'dirtyElement', owner: 'otherElement',
+                specialization: {
+                    type : 'Property', isDerived: false, isSlot: false, propertyType: 'anotherElementID',
+                    value: 'not an array'
+                }
+            };
             UtilsService.cleanElement(dirtyElement);
             expect(dirtyElement.specialization.value).toEqual([]);
         }));
 
-        it('cleanElement() should remove all specialization\'s  from specialization.value[] when specialization.type is a property', inject(function() {
-            var dirtyElement2 = {author:'muschek', sysmlid:12346, name:'dirtyElement2', owner:'otherElement',
-                specialization: {type:'Property', isDerived:false, isSlot:false, propertyType:'anotherElementID',
-                value:[{type:'ValueWithSpec', specialization:{type:'Unknown'}},
-                {type:'ValueWithSpec', specialization:{type:'Unknown'}}]}};
-                UtilsService.cleanElement(dirtyElement2);
-                expect(dirtyElement2.specialization.value[0].specialization).not.toBeDefined();
-                expect(dirtyElement2.specialization.value[1].specialization).not.toBeDefined();
+        it('cleanElement() should remove all specialization\'s  from specialization.value[] when specialization.type is a property', inject(function () {
+            var dirtyElement2 = {
+                author        : 'muschek', sysmlid: 12346, name: 'dirtyElement2', owner: 'otherElement',
+                specialization: {
+                    type : 'Property', isDerived: false, isSlot: false, propertyType: 'anotherElementID',
+                    value: [{type: 'ValueWithSpec', specialization: {type: 'Unknown'}},
+                        {type: 'ValueWithSpec', specialization: {type: 'Unknown'}}]
+                }
+            };
+            UtilsService.cleanElement(dirtyElement2);
+            expect(dirtyElement2.specialization.value[0].specialization).not.toBeDefined();
+            expect(dirtyElement2.specialization.value[1].specialization).not.toBeDefined();
         }));
 
-        it('cleanElement() for every value of elem.specialization.value if there\'s a valueExpression in any of its children delete it', inject(function() {
-            var dirtyElement3 = {author:'muschek', sysmlid:12346, name:'dirtyElement2', owner:'otherElement',
-                specialization: {type:'Property', isDerived:false, isSlot:false, propertyType:'anotherElementID',
-                value:[{valueExpression:'valueExpression', type:'ValueWithSpec', specialization:{type:'Unknown'}}]}};
-                UtilsService.cleanElement(dirtyElement3);
-                expect(dirtyElement3.specialization.value[0].valueExpression).not.toBeDefined();
+        it('cleanElement() for every value of elem.specialization.value if there\'s a valueExpression in any of its children delete it', inject(function () {
+            var dirtyElement3 = {
+                author        : 'muschek', sysmlid: 12346, name: 'dirtyElement2', owner: 'otherElement',
+                specialization: {
+                    type : 'Property', isDerived: false, isSlot: false, propertyType: 'anotherElementID',
+                    value: [{
+                        valueExpression: 'valueExpression',
+                        type           : 'ValueWithSpec',
+                        specialization : {type: 'Unknown'}
+                    }]
+                }
+            };
+            UtilsService.cleanElement(dirtyElement3);
+            expect(dirtyElement3.specialization.value[0].valueExpression).not.toBeDefined();
         }));
 
-        it('cleanElement() for every value of elem.specialization.contents if there\'s a valueExpression in any of its children delete it', inject(function() {
+        it('cleanElement() for every value of elem.specialization.contents if there\'s a valueExpression in any of its children delete it', inject(function () {
             // Test will provide an element with valueExpression with an ID and an operand with a valueExpression ID.
             //  cleanElement will remove both the contents valueExpression and the nested operand valueExpression.
-            var dirtyElement4  = { name: "dirtyElement4", owner: "otherElement", sysmlid: 38742, documentation: "",
-                author: "muschek", specialization: {contents: {valueExpression: "Super_duper_awesomesauce_value_expression_hya!", operand: [{
-                    valueExpression: "Super_duper_awesomesauce_operand_value_expression_hya!"}], type: "Expression"}}};
+            var dirtyElement4 = {
+                name  : "dirtyElement4", owner: "otherElement", sysmlid: 38742, documentation: "",
+                author: "muschek", specialization: {
+                    contents: {
+                        valueExpression: "Super_duper_awesomesauce_value_expression_hya!", operand: [{
+                            valueExpression: "Super_duper_awesomesauce_operand_value_expression_hya!"
+                        }], type       : "Expression"
+                    }
+                }
+            };
             UtilsService.cleanElement(dirtyElement4);
             expect(dirtyElement4.specialization.contents.valueExpression).toBeUndefined();
         }));
 
-        it('cleanElement() for every value of elem.specialization.instanceSpecificationSpecification if there\'s a valueExpression in any of its children delete it', inject(function() {
+        it('cleanElement() for every value of elem.specialization.instanceSpecificationSpecification if there\'s a valueExpression in any of its children delete it', inject(function () {
             // Test will check if the instanceSpecificationSpecification has a valueExpression, if so, remove it
-            var dirtyViewDocument =    { name: "View Documentation", sysmlid: "Farfignuggen",
-                documentation: "Merpity Merp merp", owner: "Some_weird_silly_id_should_be_here",
+            var dirtyViewDocument = {
+                name            : "View Documentation", sysmlid: "Farfignuggen",
+                documentation   : "Merpity Merp merp", owner: "Some_weird_silly_id_should_be_here",
                 appliedMetatypes: ["Not_your_applied_metatype"], specialization: {
-                instanceSpecificationSpecification: {valueExpression: "Oh No There is a value expression here!",
-                    type: "LiteralString"}, type: "InstanceSpecification"}, isMetatype: false};
+                    instanceSpecificationSpecification: {
+                        valueExpression: "Oh No There is a value expression here!",
+                        type           : "LiteralString"
+                    }, type                           : "InstanceSpecification"
+                }, isMetatype   : false
+            };
             UtilsService.cleanElement(dirtyViewDocument);
             expect(dirtyViewDocument.specialization.instanceSpecificationSpecification.valueExpression).toBeUndefined();
         }));
 
-        it('cleanElement() If elem.specialization.type is view and has both keys contents and contains delete contains', inject(function() {
+        it('cleanElement() If elem.specialization.type is view and has both keys contents and contains delete contains', inject(function () {
             var elDirtayElemente =
-                {sysmlid: "3301", specialization: {"displayedElements": ["301","302", "303"],
-                    allowedElements: ["301","302", "303"], childrenViews: ["304"], contains: [{"type": "Paragraph",
-                        sourceType: "reference", source: "301", sourceProperty: "documentation"}]},
-                    contents: {valueExpression: null, operand: [{valueExpression: null, type: "InstanceValue",
-                        instance: "_18_0_5_407019f_1468188892956_831936_14503"}], type: "Expression"}};
+                {
+                    sysmlid : "3301", specialization: {
+                    "displayedElements": ["301", "302", "303"],
+                    allowedElements    : ["301", "302", "303"], childrenViews: ["304"], contains: [{
+                        "type"    : "Paragraph",
+                        sourceType: "reference", source: "301", sourceProperty: "documentation"
+                    }]
+                },
+                    contents: {
+                        valueExpression: null, operand: [{
+                            valueExpression: null, type: "InstanceValue",
+                            instance       : "_18_0_5_407019f_1468188892956_831936_14503"
+                        }], type       : "Expression"
+                    }
+                };
             UtilsService.cleanElement(elDirtayElemente);
             expect(elDirtayElemente.specialization.contents).toBeUndefined();
 
         }));
 
-        it('cleanElement() If elem.specialization.type is view and has a Array of (key) displayed elements whose length is less then 5000 delete it', inject(function() {
+        it('cleanElement() If elem.specialization.type is view and has a Array of (key) displayed elements whose length is less then 5000 delete it', inject(function () {
             // Test will load a json object that has less than 5000 elements and verify that it has more than 1 but
             //  less than 5000 elements. Then it will clean the element and check that the displayedElements were
             //  removed from the element.
@@ -94,7 +132,7 @@ describe('UtilsService', function() {
             });
         }));
 
-        it('cleanElement() If elem.specialization.type is view and has a Array of (key) displayed elements whose length is greater then 5000 convert the array to JSON', inject(function() {
+        it('cleanElement() If elem.specialization.type is view and has a Array of (key) displayed elements whose length is greater then 5000 convert the array to JSON', inject(function () {
             $.getJSON('base/test/mock-data/UtilsService/morethan5000elements.json', function (data) {
                 expect(data.specialization.displayedElements.length).toBeGreaterThan(5000);
                 UtilsService.cleanElement(data);
@@ -102,7 +140,7 @@ describe('UtilsService', function() {
             });
         }));
 
-        it('cleanElement() should delete any nonEditable keys from the object', inject(function() {
+        it('cleanElement() should delete any nonEditable keys from the object', inject(function () {
             // ['contains', 'view2view', 'childrenViews', 'displayedElements','allowedElements', 'contents', 'relatedDocuments']
             $.getJSON('base/test/mock-data/UtilsService/utilsservice-noneditblekeys.json', function (data) {
                 // Verify that all the data is in the json first. This JSON is technically malformed but serves the
@@ -116,7 +154,7 @@ describe('UtilsService', function() {
                 expect(data.relatedDocuments).toBeDefined();
 
                 // Have to pass in true to enable forEdit that removes any noneditable keys
-                UtilsService.cleanElement(data,true);
+                UtilsService.cleanElement(data, true);
 
                 // Verify that all of the non editable keys have been removed from the JSON
                 expect(data.specialization.displayedElements).toBeUndefined();
@@ -130,12 +168,12 @@ describe('UtilsService', function() {
         }));
     });
 
-    describe('Method filterProperties ', function() {
+    describe('Method filterProperties ', function () {
         //given element object a and element object b, returns new object with b data minus keys not in a
-        it('filterProperties() it should return a new object with b data minus keys not in a for elements a and b', inject(function() {
+        it('filterProperties() it should return a new object with b data minus keys not in a for elements a and b', inject(function () {
             //used to updateElements checking a object in the cache (that has been updated) with the same object from the server.... B - A
-            var a = {specialization:{specialization:{hello:'world'}}};
-            var b = {specialization:{specialization:{hello:'world', foo:'bar'}}};
+            var a      = {specialization: {specialization: {hello: 'world'}}};
+            var b      = {specialization: {specialization: {hello: 'world', foo: 'bar'}}};
             //console.log("This is b before"+ JSON.stringify(b.specialization.specialization));
             var result = UtilsService.filterProperties(a, b);
             //console.log("This is result after"+ JSON.stringify(result));
@@ -150,20 +188,20 @@ describe('UtilsService', function() {
         // Test will generate a mock tree hierarchy based on a list of elements given
         it('buildTreeHierarchy() it should create a tree hierarchy json based on ', inject(function () {
             // Create 2 objects
-            var obj1 = {
-                name      : "CharacterizationTest",
+            var obj1         = {
+                name              : "CharacterizationTest",
                 sysmlid           : "site__18_0_5_83a025f_1456506201488_656065_12275",
                 isCharacterization: true
             };
-            var obj2 = {
-                name: "nri-characterization",
-                sysmlid: "nri-characterization",
+            var obj2         = {
+                name              : "nri-characterization",
+                sysmlid           : "nri-characterization",
                 isCharacterization: false
             };
             var childObject1 = {
-                name: "sub-nri-characterization",
-                sysmlid: "sub-nri-characterization",
-                parent:"nri-characterization",
+                name              : "sub-nri-characterization",
+                sysmlid           : "sub-nri-characterization",
+                parent            : "nri-characterization",
                 isCharacterization: false
             };
 
@@ -181,17 +219,21 @@ describe('UtilsService', function() {
         }));
     });
 
-    describe('Method mergeElement ', function() {
+    describe('Method mergeElement ', function () {
         // put in cacheService element object and its edit object, modify edit
         // object's name/doc/val, call mergeElement with updateEdit = true with
         //property argument = all/name/documentation/value and check edit object only has that specific property updated
-        it('mergeElement() it should update the element in the cache after editing', inject(function() {
-            var a = {creator: "gcgandhi", modified: "2015-07-27T16:32:42.272-0700",modifier: "dlam",
+        it('mergeElement() it should update the element in the cache after editing', inject(function () {
+            var a = {
+                creator: "gcgandhi", modified: "2015-07-27T16:32:42.272-0700", modifier: "dlam",
                 created: "Mon May 18 14:38:12 PDT 2015", name: "vetest Cover Page", documentation: "",
-                owner: "holding_bin_vetest_PROJECT-21bbdceb-a188-45d9-a585-b30bba346175"};
-            var b = {creator: "dlam", modified: "2015-07-27T16:52:42.272-0700",modifier: "dlam",
+                owner  : "holding_bin_vetest_PROJECT-21bbdceb-a188-45d9-a585-b30bba346175"
+            };
+            var b = {
+                creator: "dlam", modified: "2015-07-27T16:52:42.272-0700", modifier: "dlam",
                 created: "Mon May 18 14:38:12 PDT 2015", name: "ve", documentation: "Some Docs",
-                owner: "holding_bin_vetest_PROJECT-21bbdceb-a188-45d9-a585-b30bba346175"};
+                owner  : "holding_bin_vetest_PROJECT-21bbdceb-a188-45d9-a585-b30bba346175"
+            };
             //   var mergeElement = function(source, eid, workspace, updateEdit, property) {
             // CacheService.put('element|master|objectToEdit|latest', a, true);
             CacheService.put('elements|master|objectToEdit|latest', a, true);
@@ -205,36 +247,36 @@ describe('UtilsService', function() {
     });
 
     describe('Method normalize', function () {
-        it('normalize() should normalize common arguments on an object with all null values', inject(function(){
-            var someSillyNullRiddenObject = { update:null,workspace:null,ver:null};
-            var compareObject = JSON.stringify({update:false, ws:'master', ver:'latest'});
-            var res = JSON.stringify(UtilsService.normalize(someSillyNullRiddenObject));
+        it('normalize() should normalize common arguments on an object with all null values', inject(function () {
+            var someSillyNullRiddenObject = {update: null, workspace: null, ver: null};
+            var compareObject             = JSON.stringify({update: false, ws: 'master', ver: 'latest'});
+            var res                       = JSON.stringify(UtilsService.normalize(someSillyNullRiddenObject));
 
             expect(res).toMatch(compareObject);
         }));
 
-        it('normalize() should normalize common arguments on an object with some null values', inject(function(){
-            var someSillyPartialNullRiddenObject = { update:null,workspace:"not-master",version:null};
-            var wrongObject = JSON.stringify({update:false, ws:'master', ver:'not-latest'});
-            var correctObject = JSON.stringify({update:false, ws:'not-master', ver:'latest'});
-            var res = JSON.stringify(UtilsService.normalize(someSillyPartialNullRiddenObject));
+        it('normalize() should normalize common arguments on an object with some null values', inject(function () {
+            var someSillyPartialNullRiddenObject = {update: null, workspace: "not-master", version: null};
+            var wrongObject                      = JSON.stringify({update: false, ws: 'master', ver: 'not-latest'});
+            var correctObject                    = JSON.stringify({update: false, ws: 'not-master', ver: 'latest'});
+            var res                              = JSON.stringify(UtilsService.normalize(someSillyPartialNullRiddenObject));
 
             expect(res).toMatch(correctObject);
             expect(res).not.toMatch(wrongObject);
         }));
 
-        it('normalize() should NOT normalize common arguments on an object with all given values', inject(function(){
-            var someSillyObject = { update:true,workspace:"not-master",version:"not-latest"};
-            var wrongObject = JSON.stringify({update:false, ws:null, ver:'latest'});
-            var correctObject = JSON.stringify({update:true, ws:'not-master', ver:'not-latest'});
-            var res = JSON.stringify(UtilsService.normalize(someSillyObject));
+        it('normalize() should NOT normalize common arguments on an object with all given values', inject(function () {
+            var someSillyObject = {update: true, workspace: "not-master", version: "not-latest"};
+            var wrongObject     = JSON.stringify({update: false, ws: null, ver: 'latest'});
+            var correctObject   = JSON.stringify({update: true, ws: 'not-master', ver: 'not-latest'});
+            var res             = JSON.stringify(UtilsService.normalize(someSillyObject));
 
             expect(res).toMatch(correctObject);
             expect(res).not.toMatch(wrongObject);
         }));
     });
 
-    describe('Method hasConflict ', function() {
+    describe('Method hasConflict ', function () {
         // hasConflict
         // given edit object with only keys that were edited,
         // 'orig' object and 'server' object, should only return true
@@ -251,27 +293,30 @@ describe('UtilsService', function() {
         // ,
         // {name: 'second', doc: 'a'}
         // ) should be true
-        it('hasConflict() should return false because there\s no conflict', inject(function() {
-            var orig = { name: "VE", documentation: "a"};
-            var server = { name: "VE", documentation: "a"};
-            var edit = { name: "EMS", documentation: "b"};
+        it('hasConflict() should return false because there\s no conflict', inject(function () {
+            var orig        = {name: "VE", documentation: "a"};
+            var server      = {name: "VE", documentation: "a"};
+            var edit        = {name: "EMS", documentation: "b"};
             var hasConflict = UtilsService.hasConflict(edit, orig, server);
             expect(hasConflict).toBe(false);
         }));
-        it('hasConflict() should return true because there\s conflict', inject(function() {
-            var orig = { name: "VE", documentation: "a"};
-            var server = { name: "MBSE", documentation: "a"};
-            var edit = { name: "EMS", documentation: "b"};
+        it('hasConflict() should return true because there\s conflict', inject(function () {
+            var orig        = {name: "VE", documentation: "a"};
+            var server      = {name: "MBSE", documentation: "a"};
+            var edit        = {name: "EMS", documentation: "b"};
             var hasConflict = UtilsService.hasConflict(edit, orig, server);
             expect(hasConflict).toBe(true);
         }));
-        it('hasConflict() should return true because there\s conflict in the specialization object', inject(function() {
-            var orig = { name: "VE", documentation: "a", specialization:
-            {type:'Property',value: 'cache'}};
-            var server = { name: "VE", documentation: "a", specialization:
-            {type:'Property',value: 'server'}};
-            var edit = { name: "VE", documentation: "a", specialization:
-            {type:'Property',value: 'edit'}};
+        it('hasConflict() should return true because there\s conflict in the specialization object', inject(function () {
+            var orig        = {
+                name: "VE", documentation: "a", specialization: {type: 'Property', value: 'cache'}
+            };
+            var server      = {
+                name: "VE", documentation: "a", specialization: {type: 'Property', value: 'server'}
+            };
+            var edit        = {
+                name: "VE", documentation: "a", specialization: {type: 'Property', value: 'edit'}
+            };
             var hasConflict = UtilsService.hasConflict(edit, orig, server);
             expect(hasConflict).toBe(true);
         }));
@@ -298,8 +343,7 @@ describe('UtilsService', function() {
     describe('Method makeHtmlTable', function () {
         // makeHtmlTable is a method for generating HTML tables based on rapid tables that are modeled in MagicDraw
         var rapidTable;
-        var baseline = jasmine.getFixtures().read('html/baselineMakeHtmlTable.html');
-        // var rapidTableJson = jasmine.getFixtures().load('makeHtmlTable.json');
+        var baseline       = jasmine.getFixtures().read('html/baselineMakeHtmlTable.html');
         var rapidTableJson = getJSONFixture('makeHtmlTable.json');
 
         it('makeHtmlTable() should generate a html table from the json that represents a rapid from MagicDraw', inject(function () {
@@ -309,45 +353,41 @@ describe('UtilsService', function() {
             expect(rapidTable).toBeDefined();
         }));
         // Load the baseline html file
-        it('makeHtmlTable() should have a match with the baseline from the generated html table', function(){
-            // expect(baseline).toMatch(rapidTable);
+        it('makeHtmlTable() should have a match with the baseline from the generated html table', inject(function () {
             expect(baseline).toMatch(rapidTable);
-        })
-    });
-
-    xdescribe('Method makeHtmlList', function () {
-        var htmlList;
-
-        $.getJSON('base/test/mock-data/UtilsService/makeHtmlList_Unordered.json', function (data) {
-            // console.log(JSON.stringify(data, null, 2));
-            htmlList = (UtilsService.makeHtmlList(data));
-            expect(htmlList).toBeDefined();
-            // console.log(htmlList);
-        });
-        it('should generate an html UNORDERED list based on a given list of items', inject(function () {
-
-            $.get('base/test/mock-data/UtilsService/baselineMakeHtmlList_Unordered.html', function (data) {
-                expect(data).toMatch(htmlList);
-            });
         }));
     });
 
+    describe('Method makeHtmlList', function () {
+        var unorderedHtmlList     = getJSONFixture('makeHtmlList_Unordered.json');
+        var unorderedBaselineHtml = jasmine.getFixtures().read('html/baselineMakeHtmlList_Unordered.html');
+        // var orderedHtmlListJson   = getJSONFixture('makeHtmlList_Ordered.json');
+        // var orderedBaselineHtml   = jasmine.getFixtures().read('baselineMakeHtmlList_Ordered.html');
+
+        it('makeHtmlList() should create an unordered html list based on the provided json data', function () {
+            unorderedHtmlList = (UtilsService.makeHtmlList(unorderedHtmlList));
+            expect(unorderedHtmlList).toBeDefined();
+            expect(unorderedHtmlList).toMatch(unorderedBaselineHtml);
+        });
+
+    });
+
     /*
-    xdescribe('Method makeHtmlPara', function () {});
+     xdescribe('Method makeHtmlPara', function () {});
 
-    xdescribe('Method makeHtmlTOC', function () {});
+     xdescribe('Method makeHtmlTOC', function () {});
 
-    xdescribe('Method makeHtmlTOCChild', function () {});
+     xdescribe('Method makeHtmlTOCChild', function () {});
 
-    xdescribe('Method makeTablesAndFiguresTOC', function () {});
+     xdescribe('Method makeTablesAndFiguresTOC', function () {});
 
-    xdescribe('Method makeTablesAndFiguresTOCChild', function () {});
+     xdescribe('Method makeTablesAndFiguresTOCChild', function () {});
 
-    xdescribe('Method createMmsId', function () {});
+     xdescribe('Method createMmsId', function () {});
 
-    xdescribe('Method getIdInfo', function () {});
+     xdescribe('Method getIdInfo', function () {});
 
-    xdescribe('Method getPrintCss', function () {});
-    */
+     xdescribe('Method getPrintCss', function () {});
+     */
 });
 
