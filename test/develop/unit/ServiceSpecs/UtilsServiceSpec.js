@@ -405,7 +405,6 @@ describe('UtilsService', function () {
         it('should create a randomly generated MMS ID', inject(function () {
             var randomId = UtilsService.createMmsId();
             expect(randomId).toBeDefined();
-            console.log(randomId);
             expect(randomId).toMatch(/MMS_[0-9]+_[a-zA-Z0-9]+-[a-zA-Z0-9]+-[a-zA-Z0-9]+-[a-zA-Z0-9]+-[a-zA-Z0-9]+/g);
         }));
     });
