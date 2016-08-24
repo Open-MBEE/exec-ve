@@ -787,15 +787,16 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 $scope.treeApi.add_branch(branch, newbranch, top);
 
                 var addToFullDocView = function(node, curSection, prevSysml) {
+                    var lastChild = prevSysml;
                     if (node.children) {
                         var num = 1;
                         node.children.forEach(function(cNode) {
-                            $rootScope.$broadcast('newViewAdded', cNode.data.sysmlid, curSection + '.' + num, prevSysml);
-                            addToFullDocView(cNode, curSection + '.' + num);
+                            $rootScope.$broadcast('newViewAdded', cNode.data.sysmlid, curSection + '.' + num, lastChild);
+                            lastChild = addToFullDocView(cNode, curSection + '.' + num, cNode.data.sysmlid);
                             num = num + 1;
-                            prevSysml = cNode.data.sysmlid;
                         });
                     }
+                    return lastChild;
                 };
 
                 if (itemType === 'View') {
