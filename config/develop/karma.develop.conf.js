@@ -119,7 +119,7 @@ module.exports = function (config) {
 
         junitReporter: {
             outputDir: 'test-results',
-            outputFile: 'test-output.xml',
+            outputFile: 'karma-test-output.xml',
             useBrowserName: false
         },
 
