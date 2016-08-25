@@ -1,53 +1,70 @@
 [
     {
-        "valueExpression": null,
+        "type": "Expression",
         "operand": [
             {
-                "valueExpression": null,
-                "string": "RestrictedValue"
-            },
-            {
-                "valueExpression": null,
-                "type": "ElementValue",
-                "string": "RestrictedValue"
-            },
-            {
-                "valueExpression": null,
-                "type": "Expression",
-                "instance": "_18_0_5_407019f_1468188892970_158569_14563",
                 "string": "RestrictedValue",
-                "operand": {
-                    "length": 2
-                }
+                "type": "LiteralString"
+            },
+            {
+                "element": "_18_0_2_bec02f9_1446713991926_191570_38794",
+                "type": "ElementValue"
+            },
+            {
+                "operand": [
+                    {
+                        "element": "_18_0_2_bec02f9_1446713871485_437521_38792",
+                        "type": "ElementValue"
+                    },
+                    {
+                        "element": "_18_0_2_bec02f9_1446713991926_191570_38794",
+                        "type": "ElementValue"
+                    },
+                    {
+                        "element": "_18_0_2_bec02f9_1446714001310_722167_38795",
+                        "type": "ElementValue"
+                    }
+                ],
+                "type": "Expression"
             }
-        ],
-        "type": "Expression",
-        "length": 3
+        ]
     },
     {
-        "valueExpression": null,
+        "type": "Expression",
         "operand": [
             {
-                "valueExpression": null,
-                "string": "Not a RestrictedValue"
-            },
-            {
-                "valueExpression": null,
-                "type": "ElementValue",
-                "string": "RestrictedValue"
-            },
-            {
-                "valueExpression": null,
-                "type": "Expression",
-                "instance": "_18_0_5_407019f_1468188892970_158569_14563",
                 "string": "RestrictedValue",
-                "operand": {
-                    "length": 2
-                }
+                "type": "LiteralString"
+            },
+            {
+                "element": "_18_0_2_bec02f9_1446713991926_191570_38794",
+                "type": "ElementValue"
+            },
+            {
+                "operand": [
+                    {
+                        "element": "_18_0_2_bec02f9_1446713871485_437521_38792",
+                        "type": "ElementValue"
+                    },
+                    {
+                        "element": "_18_0_2_bec02f9_1446713991926_191570_38794",
+                        "type": "ElementValue"
+                    },
+                    {
+                        "element": "_18_0_2_bec02f9_1446714001310_722167_38795",
+                        "type": "ElementValue"
+                    },
+                    {
+                        "element": "_18_0_2_bec02f9_1451944545899_21327_57048",
+                        "type": "ElementValue"
+                    },
+                    {
+                        "element": "_18_0_2_bec02f9_1451944571449_226746_57049",
+                        "type": "ElementValue"
+                    }
+                ],
+                "type": "Expression"
             }
-        ],
-        "type": "Expression",
-        "length": 3
+        ]
     }
 ]
-
