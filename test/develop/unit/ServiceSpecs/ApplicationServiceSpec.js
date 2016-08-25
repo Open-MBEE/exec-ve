@@ -7,22 +7,30 @@
 describe('ApplicationService', function () {
     beforeEach(module('mms'));
 
-    var ApplicationService;
+    var ApplicationService, URLService, $httpBackend, $rootScope, $http;
     var root = '/alfresco/service';
 
     beforeEach(inject(function ($injector) {
         ApplicationService = $injector.get('ApplicationService');
-        $httpBackend = $injector.get('$httpBackend');
-        $rootScope = $injector.get('$rootScope');
-        $httpBackend.whenGET(root + '/mmsversion').respond(
-            {mmsVersion: "2.3.8"}
+        $http              = $injector.get('$http');
+        URLService         = $injector.get('URLService');
+        $httpBackend       = $injector.get('$httpBackend');
+        $rootScope         = $injector.get('$rootScope');
+
+        $httpBackend.when('GET', root + '/mmsversion').respond(
+            function (method, url, data) {
+                return [200, {mmsVersion: "2.3.8"}];
+            }
         );
     }));
+
+    afterEach(function () {
+        $httpBackend.verifyNoOutstandingRequest();
+    });
 
     describe('Method CreateUniqueId', function () {
         it('should create a unique id by retrieving the source object from ApplicationService', function () {
             var source = ApplicationService.getSource();
-            // console.log("Source " + source);
             expect(source).toBeDefined();
             expect(source[14]).toMatch("4");
             expect(source[13]).toMatch("-");
@@ -31,16 +39,17 @@ describe('ApplicationService', function () {
         });
     });
 
-    describe('Method getMmsVersion', function () {
+    xdescribe('Method getMmsVersion', function () {
         "use strict";
         var mmsV;
+
         it('should retrieve the mmsVersion from the application', inject(function () {
-            ApplicationService.getMmsVersion().then(function(data) {
+            ApplicationService.getMmsVersion().then(function (data, response) {
                 mmsV = data;
-            }, function(reason) {
+            }, function (reason) {
                 mmsV = "Could not retrieve due to failure: " + reason.message;
             });
-            // console.log("MMS Version " + mmsV);
+            console.log("MMS Version " + mmsV);
             // var instance = $uibModal.open({
             //     templateUrl: 'partials/mms/about.html',
             //     scope: scope,
