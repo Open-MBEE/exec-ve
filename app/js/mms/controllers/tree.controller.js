@@ -5,8 +5,8 @@
 angular.module('mmsApp')
 .controller('TreeCtrl', ['$anchorScroll' , '$q', '$filter', '$location', '$uibModal', '$scope', '$rootScope', '$state', '$stateParams', '$compile','$timeout', 'growl', 
                           'UxService', 'ConfigService', 'ElementService', 'UtilsService', 'WorkspaceService', 'ViewService', 'MmsAppUtils',
-                          'workspaces', 'workspaceObj', 'tag', 'sites', 'site', 'document', 'views', 'view', 'time', 'configSnapshots', 'docFilter', 'rootSites',
-function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $stateParams, $compile, $timeout, growl, UxService, ConfigService, ElementService, UtilsService, WorkspaceService, ViewService, MmsAppUtils, workspaces, workspaceObj, tag, sites, site, document, views, view, time, configSnapshots, docFilter, rootSites) {
+                          'workspaces', 'workspaceObj', 'tag', 'sites', 'site', 'document', 'views', 'view', 'time', 'configSnapshots', 'docFilter', 'mmsRootSites',
+function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $stateParams, $compile, $timeout, growl, UxService, ConfigService, ElementService, UtilsService, WorkspaceService, ViewService, MmsAppUtils, workspaces, workspaceObj, tag, sites, site, document, views, view, time, configSnapshots, docFilter, mmsRootSites) {
 
     $rootScope.mms_bbApi = $scope.bbApi = {};
     $rootScope.mms_treeApi = $scope.treeApi = {};
@@ -337,7 +337,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     };
 
     var isSiteInProject = function(sitesMapping, site) {
-        if (rootSites.length === 0)
+        if (mmsRootSites.length === 0)
             return true;
         var getRootSite = function(s) {
             var ret = s;
@@ -347,7 +347,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             return ret;
         };
         var root = getRootSite(site);
-        if (rootSites.indexOf(root.sysmlid) >= 0)
+        if (mmsRootSites.indexOf(root.sysmlid) >= 0)
             return true;
         return false;
     };
