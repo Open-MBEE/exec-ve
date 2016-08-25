@@ -405,10 +405,10 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         siteNode.loading = true;
         ViewService.getSiteDocuments(site, false, ws, config === 'latest' ? 'latest' : tag.timestamp, 2)
         .then(function(docs) {
-	        
-	        // If no documents are found on a site, stop forcing expansion
-	        if(docs.length === 0) siteNode.expandable = false;
-	        
+
+            // If no documents are found on a site, stop forcing expansion
+            if(docs.length === 0) siteNode.expandable = false;
+
             var filteredDocs = {};
             if (docFilter)
                 filteredDocs = JSON.parse(docFilter.documentation);
@@ -759,9 +759,6 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         var branch = $scope.treeApi.get_selected_branch();
         var templateUrlStr = "";
         var branchType = "";
-        var curLastChild = null;
-        if(branch)
-            curLastChild = branch.children[branch.children.length-1];
         
         // Adds the branch:
         var myAddBranch = function() {
@@ -775,7 +772,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                     label: data.name,
                     type: branchType,
                     data: data,
-                    children: [],
+                    children: []
                 };
                 
                 var top = false;
@@ -789,25 +786,43 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
 
                 $scope.treeApi.add_branch(branch, newbranch, top);
 
+                var addToFullDocView = function(node, curSection, prevSysml) {
+                    var lastChild = prevSysml;
+                    if (node.children) {
+                        var num = 1;
+                        node.children.forEach(function(cNode) {
+                            $rootScope.$broadcast('newViewAdded', cNode.data.sysmlid, curSection + '.' + num, lastChild);
+                            lastChild = addToFullDocView(cNode, curSection + '.' + num, cNode.data.sysmlid);
+                            num = num + 1;
+                        });
+                    }
+                    return lastChild;
+                };
+
                 if (itemType === 'View') {
                     viewId2node[data.sysmlid] = newbranch;
                     seenViewIds[data.sysmlid] = newbranch;
+                    var curNum = branch.children[branch.children.length-1].section;
+                    var prevBranch = $scope.treeApi.get_prev_branch(newbranch);
+                    while (prevBranch.type != 'view') {
+                        prevBranch = $scope.treeApi.get_prev_branch(prevBranch);
+                    }
                     MmsAppUtils.handleChildViews(data, $scope.newViewAggr.type, ws, time, handleSingleView, handleChildren)
-                    .then(function(node) {
-                        //TODO handle full doc mode
-                        addViewSectionsRecursivelyForNode(node);
+                      .then(function(node) {
+                          // handle full doc mode
+                          if ($rootScope.mms_fullDocMode)
+                              addToFullDocView(node, curNum, newbranch.data.sysmlid);
+                          addViewSectionsRecursivelyForNode(node);
                     });
                     if (!$rootScope.mms_fullDocMode) 
                         $state.go('workspace.site.document.view', {view: data.sysmlid, search: undefined});
-                    else{
-                      var curNum = branch.children[branch.children.length-1].section;
-                      if (curLastChild && curLastChild.type === 'view') {
-                        $rootScope.$broadcast('newViewAdded', data.sysmlid, curNum, curLastChild.data.sysmlid);
-                      } else {
-                        $rootScope.$broadcast('newViewAdded', data.sysmlid, curNum, branch.data.sysmlid);
-                      }
+                    else {
+                        if (prevBranch) {
+                            $rootScope.$broadcast('newViewAdded', data.sysmlid, curNum, prevBranch.data.sysmlid);
+                        } else {
+                            $rootScope.$broadcast('newViewAdded', data.sysmlid, curNum, branch.data.sysmlid);
+                        }
                     }
-                    // $state.go('.', {search: undefined}, {reload: true});
                 }
 
             });
@@ -918,35 +933,9 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 $state.go('workspace.site.document.view', {view: viewId, search: undefined});
             }
         } else {
-            if ($state.current.name === 'doc.all') {
-                $rootScope.mms_fullDocMode = true;
-                $scope.bbApi.setToggleState("tree-full-document", true);
-                //allViewLevel2Func(); //TODO remove when priority queue is done
-            } else {
-                if (document.specialization.view2view && document.specialization.view2view.length > 30) {
-                    var instance = $uibModal.open({
-                        templateUrl: 'partials/mms/fullDocWarn.html',
-                        controller: ['$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
-                            $scope.ok = function() {$uibModalInstance.close('ok');};
-                            $scope.cancel = function() {$uibModalInstance.close('cancel');};
-                        }],
-                        size: 'sm'
-                    });
-                    instance.result.then(function(choice) {
-                        if (choice === 'ok') {
-                            $rootScope.mms_fullDocMode = true;
-                            //allViewLevel2Func(); //TODO remove when priority queue is done
-                            $scope.bbApi.setToggleState("tree-full-document", true);
-                            $state.go('workspace.site.document.full', {search: undefined}); 
-                        }
-                    });
-                } else {
-                    $rootScope.mms_fullDocMode = true;
-                    //allViewLevel2Func(); //TODO remove when priority queue is done
-                    $scope.bbApi.setToggleState("tree-full-document", true);
-                    $state.go('workspace.site.document.full', {search: undefined}); 
-                }
-            }
+            $rootScope.mms_fullDocMode = true;
+            $scope.bbApi.setToggleState("tree-full-document", true);
+            $state.go('workspace.site.document.full', {search: undefined}); 
         }
     };
 
@@ -995,8 +984,13 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             }
             if ($state.includes('workspace.sites') && !$state.includes('workspace.site.document'))
                 return;
-            $state.go('^', {search: undefined});
-            //TODO handle full doc mode??
+
+            // handle full doc mode
+            if ($rootScope.mms_fullDocMode) {
+                $state.go('workspace.site.document.full', {search: undefined});
+                $state.reload();
+            } else
+                $state.go('^', {search: undefined});
         });
     };
 
