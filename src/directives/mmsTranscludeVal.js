@@ -65,7 +65,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
         var processed = false;
         scope.cfType = 'val';
         element.click(function(e) {
-            if (scope.addFrame)
+            if (scope.addFrame && !scope.nonEditable)
                 scope.addFrame();
 
             if (mmsViewCtrl)
@@ -367,7 +367,8 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
         scope: {
             mmsEid: '@',
             mmsWs: '@',
-            mmsVersion: '@'
+            mmsVersion: '@',
+            nonEditable: '='
         },
         require: ['?^^mmsView','?^^mmsViewPresentationElem', '?^^mmsTranscludeDoc', '?^^mmsTranscludeVal'],
         controller: ['$scope', mmsTranscludeCtrl],

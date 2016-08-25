@@ -72,7 +72,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
         scope.cfType = 'doc';
 
         element.click(function(e) {
-            if (scope.addFrame)
+            if (scope.addFrame && !scope.nonEditable)
                 scope.addFrame();
 
             if (mmsViewCtrl)
@@ -318,7 +318,8 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
         scope: {
             mmsEid: '@',
             mmsWs: '@',
-            mmsVersion: '@'
+            mmsVersion: '@',
+            nonEditable: '='
         },
         require: ['?^^mmsView','?^^mmsViewPresentationElem', '?^^mmsTranscludeDoc', '?^^mmsTranscludeVal'],
         controller: ['$scope', mmsTranscludeDocCtrl],
