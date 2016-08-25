@@ -530,7 +530,7 @@ function UtilsService(CacheService, _) {
             var cap2 = el.find('.mms-equation-caption');
             cap2.html(equationCap);
             if (cap2.length === 0) {
-                el.find('mms-view-equation').after('<div class="mms-equation-caption pull-right">' + equationCap + '</div>');
+                el.find('mms-view-equation').append('<div class="mms-equation-caption pull-right">' + equationCap + '</div>');
             }
             // Change cap value based on showRefName true/false
             if (showRefName) {
@@ -607,6 +607,7 @@ function UtilsService(CacheService, _) {
                 "body {font-size: 9pt; font-family: 'Times New Roman', Times, serif; }\n" + 
                 "caption, figcaption, .mms-equation-caption {text-align: center; font-weight: bold;}\n" +
                 ".mms-equation-caption {float: right;}\n" +
+                "mms-view-equation, mms-view-figure, mms-view-image {page-break-inside: avoid;}" + 
                 ".toc, .tof, .tot {page-break-after:always;}\n" +
                 ".toc a, .tof a, .tot a { text-decoration:none; color: #000; font-size:9pt; }\n" + 
                 ".toc .header, .tof .header, .tot .header { margin-bottom: 4px; font-weight: bold; font-size:24px; }\n" + 
