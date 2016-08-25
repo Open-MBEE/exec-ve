@@ -1,11 +1,12 @@
 <div class="panel panel-danger">
   <div class="panel-heading clearfix">
-    <h3 class="panel-title pull-left">{{panelType}} : <span ng-if="!isDirectChildOfPresentationElement">{{panelTitle}}</span> <span ng-if="isDirectChildOfPresentationElement"><input type="text" ng-model="edit.name"></input></span></h3>
+    <h3 class="panel-title pull-left">{{panelType}} : <span ng-if="!isDirectChildOfPresentationElement">{{panelTitle}}</span>
+      <span ng-if="isDirectChildOfPresentationElement"><input type="text" ng-model="edit.name" /></span></h3>
     <div class="btn-group pull-right">      
-        <mms-button-bar buttons="buttons" mms-bb-api="bbApi"></mms-button-bar>
+      <mms-button-bar buttons="buttons" mms-bb-api="bbApi"></mms-button-bar>
     </div>
   </div>
   <div class="inner panel-body">
     <textarea ng-model="edit.documentation" mms-ckeditor mms-editor-type="{{editorType}}" mms-editor-api="editorApi" mms-ws="{{ws}}" mms-site="{{mmsSite}}" mms-eid="{{element.sysmlid}}"></textarea>
-</div>
+  </div>
 </div>
