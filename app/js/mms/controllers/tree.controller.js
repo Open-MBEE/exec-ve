@@ -591,6 +591,12 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         };
 
         var addContentsSectionTreeNode = function(operand) {
+            var bulkGet = [];
+            operand.forEach(function(instanceVal) {
+                bulkGet.push(instanceVal.instance);
+            });
+          ElementService.getElements(bulkGet, false, ws, time, 0)
+          .then(function(ignore) {
             var instances = [];
             operand.forEach(function(instanceVal) {
                 instances.push(ElementService.getElement(instanceVal.instance, false, ws, time, 0));
@@ -639,6 +645,8 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             }, function(reason) {
                 //view is bad
             });
+          }, function(reason) {
+          });
         };
 
         if (element.specialization) {
