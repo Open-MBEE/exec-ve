@@ -7,14 +7,14 @@
                     <div class="form-group">
                         <label class="col-sm-3 control-label">Edits ({{veEditsLength()}}):</label>
                         <div class="col-sm-9">
-                            <select class="form-control" ng-options="eid as edit.specialization.type + ': ' + edit.name for (eid, edit) in veEdits" ng-model="tracker.etrackerSelected" ng-change="etrackerChange()">
+                            <select class="form-control" ng-options="eid as edit.type + ': ' + edit.name for (eid, edit) in veEdits" ng-model="tracker.etrackerSelected" ng-change="etrackerChange()">
                             <!-- <option value="">--- Choose Open Edits ---</option> -->
                             </select>
                         </div>
                     </div>
                 </form>
             </div>
-            <mms-spec mms-eid="{{eid}}" mms-edit-field="all" mms-version="{{specVersion}}" mms-ws="{{specWs}}" mms-site="{{site.sysmlid}}" mms-spec-api="specApi" mms-type="{{elementType}}"></mms-spec>
+            <mms-spec mms-eid="{{eid}}" mms-edit-field="all" mms-version="{{specVersion}}" mms-ws="{{specWs}}" mms-site="{{site.sysmlId}}" mms-spec-api="specApi" mms-type="{{elementType}}"></mms-spec>
         </div>
     </div>
     

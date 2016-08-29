@@ -84,18 +84,20 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
         scope.isRestrictedVal = false;
         scope.isEnumeration = false;
         scope.propertyTypeClicked = function() {
-            scope.$emit('elementSelected', scope.element.specialization.propertyType, 'element');
+            scope.$emit('elementSelected', scope.element.typeId, 'element');
         };
         if (scope.mmsElement) {
             scope.element = scope.mmsElement;
-            if(scope.element.specialization.type === 'Expression'){
+            if(scope.element.type === 'Expression'){
                 scope.values = null;
                 scope.value = null;
             }
-            if (scope.element.specialization.type === 'Property')
-                scope.values = scope.element.specialization.value;
-            if (scope.element.specialization.type === 'Constraint')
-                scope.value = scope.element.specialization.specification;
+            if (scope.element.type === 'Property' || scope.element.type === 'Port')
+                scope.values = [scope.element.defaultValue];
+            if (scope.element.type === 'Slot')
+                scope.values = scope.element.value;
+            if (scope.element.type === 'Constraint')
+                scope.value = scope.element.specification;
             scope.editable = false;
             //element.empty();
             //element.append(readTemplate);
@@ -103,7 +105,7 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
             return;
         }
         scope.addHtml = function(value) {
-            value.string = "<p>" + value.string + "</p>";
+            value.string = "<p>" + value.value + "</p>";
         };
         scope.editorApi = {};
         /**
@@ -177,17 +179,26 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
                 if (newVal !== lastid)
                     return;
                 scope.element = data;
-                if (scope.element.specialization.type === 'Property') {
-                    scope.values = scope.element.specialization.value;
+                if (scope.element.type === 'Property' || scope.element.type === 'Port') {
+                    if (scope.element.defaultValue)
+                        scope.values = [scope.element.defaultValue];
+                    else
+                        scope.values = [];
                     if (UtilsService.isRestrictedValue(scope.values))
                         scope.isRestrictedVal = true;
                     else {
                         scope.isRestrictedVal = false;
-
                     } //End of Else
                 }
-                if (scope.element.specialization.type === 'Constraint')
-                    scope.value = scope.element.specialization.specification;
+                if (scope.element.type === 'Slot') {
+                    scope.values = scope.element.value;
+                    if (UtilsService.isRestrictedValue(scope.values))
+                        scope.isRestrictedVal = true;
+                    else 
+                        scope.isRestrictedVal = false;
+                }
+                if (scope.element.type === 'Constraint')
+                    scope.value = scope.element.specification;
                 if (scope.mmsEditField === 'none' ||
                         !scope.element.editable ||
                         (scope.mmsVersion !== 'latest' && scope.mmsVersion)) {
@@ -210,12 +221,17 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
                         keepMode = false;
                         //template = editTemplate;
                         //scope.$emit('elementEditability', scope.editable);
-                        if (scope.edit.specialization.type === 'Property' && angular.isArray(scope.edit.specialization.value)) {
-                            scope.editValues = scope.edit.specialization.value;
+                        if (scope.edit.type === 'Property' || scope.edit.type === 'Port' || scope.edit.type === 'Slot') {// angular.isArray(scope.edit.value)) {
+                            if (scope.edit.defaultValue)
+                                scope.editValues = [scope.edit.defaultValue];
+                            else if (scope.edit.value)
+                                scope.editValues = scope.edit.value;
+                            else
+                                scope.editValues = [];
                             if (scope.isRestrictedVal) {
                                 var options = [];
                                 scope.values[0].operand[2].operand.forEach(function(o) {
-                                    options.push(o.element);
+                                    options.push(o.elementId);
                                 });
                                 ElementService.getElements(options, false, scope.mmsWs, scope.mmsVersion)
                                 .then(function(elements) {
@@ -237,8 +253,8 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
                                 });
                             }
                         }
-                        if (scope.edit.specialization.type === 'Constraint' && scope.edit.specialization.specification) {
-                            scope.editValue = scope.edit.specialization.specification;
+                        if (scope.edit.type === 'Constraint' && scope.edit.specification) {
+                            scope.editValue = scope.edit.specification;
                         }
                     });
                 }
@@ -321,18 +337,18 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
         scope.addValueTypes = {string: 'LiteralString', boolean: 'LiteralBoolean', integer: 'LiteralInteger', real: 'LiteralReal'};
         scope.addValue = function(type) {
             if (type === 'LiteralBoolean')
-                scope.editValues.push({type: type, boolean: false});
+                scope.editValues.push({type: type, value: false});
             else if (type === 'LiteralInteger')
-                scope.editValues.push({type: type, integer: 0});
+                scope.editValues.push({type: type, value: 0});
             else if (type === 'LiteralString')
-                scope.editValues.push({type: type, string: ''});
+                scope.editValues.push({type: type, value: ''});
             else if (type === 'LiteralReal')
-                scope.editValues.push({type: type, double: 0.0});
+                scope.editValues.push({type: type, value: 0.0});
         };
         scope.addValueType = 'LiteralString';
 
         scope.addEnumerationValue = function() {
-          scope.editValues.push({type: "InstanceValue", instance: scope.options[0]});
+          scope.editValues.push({type: "InstanceValue", instanceId: scope.options[0]});
         };
 
         scope.removeVal = function(i) {

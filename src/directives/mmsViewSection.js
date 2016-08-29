@@ -39,7 +39,7 @@ function mmsViewSection($compile, $templateCache, $rootScope, ElementService, Vi
             if (scope.addFrame)
                 scope.addFrame();
             if (mmsViewCtrl && mmsViewPresentationElemCtrl)
-                mmsViewCtrl.transcludeClicked(scope.section.sysmlid); //show instance spec if clicked
+                mmsViewCtrl.transcludeClicked(scope.section.sysmlId); //show instance spec if clicked
             e.stopPropagation();
         });
 
@@ -83,7 +83,7 @@ function mmsViewSection($compile, $templateCache, $rootScope, ElementService, Vi
             scope.presentationElem = mmsViewPresentationElemCtrl.getPresentationElement();
             scope.view = mmsViewCtrl.getView();
             scope.isDirectChildOfPresentationElement = Utils.isDirectChildOfPresentationElementFunc(element, mmsViewCtrl);
-            if (scope.instanceSpec.specialization.classifier[0] === ViewService.TYPE_TO_CLASSIFIER_ID.Section)
+            if (scope.instanceSpec.classifierIds[0] === ViewService.TYPE_TO_CLASSIFIER_ID.Section)
                 scope.isDirectChildOfPresentationElement = false;
             var type = "name";
 
@@ -99,7 +99,7 @@ function mmsViewSection($compile, $templateCache, $rootScope, ElementService, Vi
 
             if (scope.version === 'latest') {
                 scope.$on('element.updated', function(event, eid, ws, type, continueEdit) {
-                    if (eid === scope.section.sysmlid && ws === scope.ws && (type === 'all' || type === 'name') && !continueEdit)
+                    if (eid === scope.section.sysmlId && ws === scope.ws && (type === 'all' || type === 'name') && !continueEdit)
                         recompile();
                 });
             }

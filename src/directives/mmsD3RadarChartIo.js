@@ -52,21 +52,21 @@
               for ( k = 0; k < scope.datavalues.length; k++){
                 dataValuesPerTable = scope.datavalues[k];
                 var rowvalues=[];
-                var rowsysmlids=[];
+                var rowsysmlIds=[];
                 for ( i = 0; i < dataValuesPerTable.length; i++){
                     var tvalues = [];
-                    //var sysmlids = []; //not used but possible to use for filter
+                    //var sysmlIds = []; //not used but possible to use for filter
                     for ( j = 0; j < dataValuesPerTable[i].length; j++){
-                      //sysmlids[j] =  dataValuesPerTable[i][j].sysmlid;
-                      if (dataValuesPerTable[i][j].specialization.value[0].type === "LiteralString")
-                        tvalues[j] = {axis: scopetableColumnHeadersLabel[k][j],  value:dataValuesPerTable[i][j].specialization.value[0].string};
-                      else if (dataValuesPerTable[i][j].specialization.value[0].type === "LiteralReal")
-                        tvalues[j] = {axis: scopetableColumnHeadersLabel[k][j],  value:dataValuesPerTable[i][j].specialization.value[0].double};
-                      else if (dataValuesPerTable[i][j].specialization.value[0].type === "LiteralInteger")
-                        tvalues[j] = {axis: scopetableColumnHeadersLabel[k][j],  value:dataValuesPerTable[i][j].specialization.value[0].integer};
+                      //sysmlIds[j] =  dataValuesPerTable[i][j].sysmlId;
+                      if (dataValuesPerTable[i][j].value[0].type === "LiteralString")
+                        tvalues[j] = {axis: scopetableColumnHeadersLabel[k][j],  value:dataValuesPerTable[i][j].value[0].string};
+                      else if (dataValuesPerTable[i][j].value[0].type === "LiteralReal")
+                        tvalues[j] = {axis: scopetableColumnHeadersLabel[k][j],  value:dataValuesPerTable[i][j].value[0].double};
+                      else if (dataValuesPerTable[i][j].value[0].type === "LiteralInteger")
+                        tvalues[j] = {axis: scopetableColumnHeadersLabel[k][j],  value:dataValuesPerTable[i][j].value[0].integer};
                     }
                     rowvalues[i] = tvalues;
-                    //rowsysmlids[i] =sysmlids;
+                    //rowsysmlIds[i] =sysmlIds;
                 }
                 d3.select("."+ scopeTableIds[k]).remove();
                 var dataIdDiv = divchart.append('div').attr("class", scopeTableIds[k])

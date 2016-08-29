@@ -37,11 +37,11 @@ function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templ
             }
             // Filter out anything that is not a InstanceSpecification or not of the correct type:
             for (var i = 0; i < data.length; i++) {
-                if (data[i].specialization.type != 'InstanceSpecification') {
+                if (data[i].type != 'InstanceSpecification') {
                     data.splice(i, 1);
                     i--;
                 }
-                else if (validClassifierIds.indexOf(data[i].specialization.classifier[0]) < 0) {
+                else if (validClassifierIds.indexOf(data[i].classifierIds[0]) < 0) {
                     data.splice(i, 1);
                     i--;
                 } else {
@@ -52,7 +52,7 @@ function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templ
             return data;
         };
         
-        // Adds a InstanceValue to the view given the sysmlid of the InstanceSpecification
+        // Adds a InstanceValue to the view given the sysmlId of the InstanceSpecification
         $scope.addElement = function(element) {
 
             if ($scope.oking) {
@@ -61,11 +61,11 @@ function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templ
             }
             $scope.oking = true;  
             var instanceVal = {
-                instance: element.sysmlid,
+                instance: element.sysmlId,
                 type: "InstanceValue",
                 valueExpression: null
             };
-            ViewService.addElementToViewOrSection($scope.viewOrSection.sysmlid, $scope.viewOrSection.sysmlid, $scope.ws, instanceVal).
+            ViewService.addElementToViewOrSection($scope.viewOrSection.sysmlId, $scope.viewOrSection.sysmlId, $scope.ws, instanceVal).
             then(function(data) {
                 // Broadcast message to TreeCtrl:
                 $rootScope.$broadcast('viewctrl.add.element', element, $scope.presentationElemType.toLowerCase(), $scope.viewOrSection);
@@ -90,7 +90,7 @@ function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templ
             }
             $scope.oking = true;
 
-            ViewService.createInstanceSpecification($scope.viewOrSection, $scope.ws, $scope.presentationElemType, $scope.site.sysmlid, $scope.newItem.name).
+            ViewService.createInstanceSpecification($scope.viewOrSection, $scope.ws, $scope.presentationElemType, $scope.site.sysmlId, $scope.newItem.name).
             then(function(data) {
                 var elemType = $scope.presentationElemType.toLowerCase();
                 $rootScope.$broadcast('viewctrl.add.element', data, elemType, $scope.viewOrSection);
@@ -123,14 +123,14 @@ function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templ
      * @param {Object} viewOrSection the view or section (instance spec) object
      */
     var addPresentationElement = function($scope, type, viewOrSection) {
-        var id = viewOrSection.sysmlid;
+        var id = viewOrSection.sysmlId;
         ElementService.isCacheOutdated(id, $scope.ws)
         .then(function(status) {
             if (status.status) {
-                if (viewOrSection.specialization.instanceSpecificationSpecification && !angular.equals(viewOrSection.specialization.instanceSpecificationSpecification, status.server.specialization.instanceSpecificationSpecification)) {
+                if (viewOrSection.specification && !angular.equals(viewOrSection.specification, status.server.specification)) {
                     growl.error('The view section contents is outdated, refresh the page first!');
                     return;
-                } else if (viewOrSection.specialization.contents && !angular.equals(viewOrSection.specialization.contents, status.server.specialization.contents)) {
+                } else if (viewOrSection.contents && !angular.equals(viewOrSection.contents, status.server.contents)) {
                     growl.error('The view contents is outdated, refresh the page first!');
                     return;
                 }
@@ -311,7 +311,7 @@ function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templ
                         }
                     } else {
                         var doc = {
-                            docId: ob.sysmlid,
+                            docId: ob.sysmlId,
                             header: result.header,
                             footer: result.footer,
                             html: result.contents,
@@ -325,7 +325,7 @@ function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templ
                             workspace: ws,
                             customCss: css,
                             version: result.version,
-                            name: ob.sysmlid + '_' + time + '_' + new Date().getTime()
+                            name: ob.sysmlId + '_' + time + '_' + new Date().getTime()
                         };
                         if (!choice[2]) {
                             doc.tof = '<div style="display:none;"></div>';
@@ -338,7 +338,7 @@ function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templ
                             doc.tagId = time;
                         else if (tag)
                             doc.tagId = tag.name;
-                        ConfigService.convertHtmlToPdf(doc, site.sysmlid, ws)
+                        ConfigService.convertHtmlToPdf(doc, site.sysmlId, ws)
                         .then(function(reuslt) {
                             deferred.resolve(result);
                         }, function(reason){
@@ -445,7 +445,7 @@ function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templ
         var coverTemplateElement = angular.element(coverTemplateString);
         var cover = '';
         if (!genCover && isDoc) {
-            cover = printElementCopy.find("mms-view[mms-vid='" + ob.sysmlid + "']");
+            cover = printElementCopy.find("mms-view[mms-vid='" + ob.sysmlId + "']");
             cover.remove();
             cover = cover[0].outerHTML;
         }
@@ -464,7 +464,7 @@ function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templ
             deferred.resolve({cover: cover, contents: printContents, header: header, footer: footer, displayTime: displayTime, dnum: dnum, version: version, toc: toc, tag: tagname, tof: tof, tot: tot, toe: toe});
             return deferred.promise;
         }
-        ViewService.getDocMetadata(ob.sysmlid, ws, null, 2)
+        ViewService.getDocMetadata(ob.sysmlId, ws, null, 2)
         .then(function(metadata) {
             //useCover = true;
             newScope.meta = metadata;
@@ -496,24 +496,24 @@ function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templ
             seenViews = {};
         var deferred = $q.defer();
         var curItem = curItemFunc(v, aggr);
-        seenViews[v.sysmlid] = v;
+        seenViews[v.sysmlId] = v;
         var childIds = [];
         var childAggrs = [];
-        if (!v.specialization.childViews || v.specialization.childViews.length === 0 || aggr === 'NONE') {
+        if (!v.childViews || v.childViews.length === 0 || aggr === 'NONE') {
             deferred.resolve(curItem);
             return deferred.promise;
         }
-        for (var i = 0; i < v.specialization.childViews.length; i++) {
-            if (seenViews[v.specialization.childViews[i].id])
+        for (var i = 0; i < v.childViews.length; i++) {
+            if (seenViews[v.childViews[i].id])
                 continue;
-            childIds.push(v.specialization.childViews[i].id);
-            childAggrs.push(v.specialization.childViews[i].aggregation);
+            childIds.push(v.childViews[i].id);
+            childAggrs.push(v.childViews[i].aggregation);
         }
         ElementService.getElements(childIds, false, ws, time, 2)
         .then(function(childViews) {
             var mapping = {};
             for (var i = 0; i < childViews.length; i++) {
-                mapping[childViews[i].sysmlid] = childViews[i];
+                mapping[childViews[i].sysmlId] = childViews[i];
             }
             var childPromises = [];
             for (i = 0; i < childIds.length; i++) {

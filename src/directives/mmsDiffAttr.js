@@ -67,16 +67,16 @@ function mmsDiffAttr(ElementService, ConfigService, URLService, $q) {
             }else if (scope.mmsAttr === 'doc') {
                 return elem.documentation + '';
             }else{
-                if (!elem.specialization || !elem.specialization.value || !elem.specialization.value[0])
+                if (!elem.value || !elem.value[0])
                     return '';
-                if(elem.specialization.value[0].type === "LiteralString"){
-                    return elem.specialization.value[0].string + '';
-                }else if(elem.specialization.value[0].type === "LiteralReal"){
-                    return elem.specialization.value[0].double + '';
-                }else if(elem.specialization.value[0].type === "LiteralBoolean"){
-                    return elem.specialization.value[0].boolean + '' ;
-                } else if (elem.specialization.value[0].type === 'LiteralInteger') {
-                    return elem.specialization.value[0].integer + '';
+                if(elem.value[0].type === "LiteralString"){
+                    return elem.value[0].string + '';
+                }else if(elem.value[0].type === "LiteralReal"){
+                    return elem.value[0].double + '';
+                }else if(elem.value[0].type === "LiteralBoolean"){
+                    return elem.value[0].boolean + '' ;
+                } else if (elem.value[0].type === 'LiteralInteger') {
+                    return elem.value[0].integer + '';
                 }else{
                     element.html('<span class="mms-error">Value type not supported for now</span>');
                     return null;

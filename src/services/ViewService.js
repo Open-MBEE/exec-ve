@@ -27,7 +27,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
     var VIEW_ELEMENTS_LIMIT = 2000;
     var inProgress = {}; //only used for view elements over limit
 
-    // The type of opaque element to the sysmlid of the classifier:
+    // The type of opaque element to the sysmlId of the classifierIds:
     var TYPE_TO_CLASSIFIER_ID = {
         Image: "_17_0_5_1_407019f_1430628206190_469511_11978",
         List: "_17_0_5_1_407019f_1430628190151_363897_11927",
@@ -60,7 +60,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         Equation: 'Equation'
     };
 
-    var classifierIds = getClassifierIds();
+    var classifierIdsIds = getClassifierIds();
     var opaqueClassifiers = [TYPE_TO_CLASSIFIER_ID.Image, TYPE_TO_CLASSIFIER_ID.List, 
         TYPE_TO_CLASSIFIER_ID.Paragraph, TYPE_TO_CLASSIFIER_ID.Section, TYPE_TO_CLASSIFIER_ID.Table];
     
@@ -301,12 +301,11 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @returns {Promise} The promise will be resolved with the downgraded view
      */
     var downgradeDocument = function(document, workspace, site) {
-        var clone = {};
-        clone.sysmlid = document.sysmlid;
-        clone.specialization = {
+        var clone = {
+            sysmlId: document.sysmlId,
             type: 'View', 
-            contents: document.specialization.contents,
-            contains: document.specialization.contains
+            contents: document.contents,
+            contains: document.contains
         };
         return ElementService.updateElement(clone, workspace).then(
             function(data) {
@@ -320,7 +319,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                     var sitedocs = CacheService.get(cacheKey);
                     if (sitedocs) {
                         for (index = 0; index < sitedocs.length; index++) {
-                            if (sitedocs[index].sysmlid === document.sysmlid)
+                            if (sitedocs[index].sysmlId === document.sysmlId)
                                 break;
                         }
                         if (index >= 0)
@@ -439,72 +438,6 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
 
     /**
      * @ngdoc method
-     * @name mms.ViewService#addViewToDocument
-     * @methodOf mms.ViewService
-     *
-     * @description
-     * DEPRECATED
-     * This updates a document to include a new view, the new view must be a child
-     * of an existing view in the document
-     * 
-     * @param {string} viewid Id of the view to add
-     * @param {string} documentId Id of the document to add the view to
-     * @param {string} parentViewId Id of the parent view, this view should 
-     *      already be in the document
-     * @param {string} [workspace=master] workspace to use
-     * @param {Object} [viewOb=null] if present, adds to document views cache array
-     * @returns {Promise} The promise would be resolved with updated document object
-     */
-    var addViewToDocument = function(viewId, documentId, parentViewId, workspace, viewOb) {
-        var deferred = $q.defer();
-        var ws = !workspace ? 'master' : workspace;
-        var docViewsCacheKey = ['products', ws, documentId, 'latest', 'views'];
-        getDocument(documentId, false, ws, null, 2)
-        .then(function(data) {  
-            var clone = {};
-            clone.sysmlid = data.sysmlid;
-            //clone.read = data.read;
-            clone.specialization = _.cloneDeep(data.specialization);
-            if (clone.specialization.contains)
-                delete clone.specialization.contains;
-            if (clone.specialization.contents)
-                delete clone.specialization.contents;
-            for (var i = 0; i < clone.specialization.view2view.length; i++) {
-                if (clone.specialization.view2view[i].id === parentViewId) {
-                    clone.specialization.view2view[i].childrenViews.push(viewId);
-                    break;
-                }
-            } 
-            clone.specialization.view2view.push({id: viewId, childrenViews: []});
-            updateDocument(clone, ws)
-            .then(function(data2) {
-                if (CacheService.exists(docViewsCacheKey) && viewOb)
-                    CacheService.get(docViewsCacheKey).push(viewOb);
-                deferred.resolve(data2);
-            }, function(reason) {
-                /*if (reason.status === 409) {
-                    clone.read = reason.data.elements[0].read;
-                    clone.modified = reason.data.elements[0].modified;
-                    updateDocument(clone, ws)
-                    .then(function(data3) {
-                        if (CacheService.exists(docViewsCacheKey) && viewOb)
-                            CacheService.get(docViewsCacheKey).push(viewOb);
-                        deferred.resolve(data3);
-                    }, function(reason2) {
-                        deferred.reject(reason2);
-                    });
-                } else
-                    deferred.reject(reason);*/
-                deferred.reject(reason);
-            });
-        }, function(reason) {
-            deferred.reject(reason);
-        });
-        return deferred.promise;
-    };
-
-    /**
-     * @ngdoc method
      * @name mms.ViewService#addViewToParentView
      * @methodOf mms.ViewService
      *
@@ -528,19 +461,15 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         getView(parentViewId, false, ws, null, 2)
         .then(function(data) {  
             var clone = {
-                sysmlid: data.sysmlid,
+                sysmlId: data.sysmlId,
                 read: data.read,
                 modified: data.modified,
-                specialization: {
-                    childViews: []
-                }
+                childViews: [],
+                type: data.type
             };
-            if (data.specialization) {
-                clone.specialization.type = data.specialization.type;
-                if (data.specialization.childViews)
-                    clone.specialization.childViews = _.cloneDeep(data.specialization.childViews);
-            }
-            clone.specialization.childViews.push({id: viewId, aggregation: aggr});
+            if (data.childViews)
+                clone.childViews = _.cloneDeep(data.childViews);
+            clone.childViews.push({id: viewId, aggregation: aggr});
             updateView(clone, ws)
             .then(function(data2) {
                 if (CacheService.exists(docViewsCacheKey) && viewOb)
@@ -591,28 +520,26 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         ElementService.getElement(viewOrSectionId, false, ws, null, 2)
         .then(function(data) {  
             var clone = {
-                sysmlid: data.sysmlid,
+                sysmlId: data.sysmlId,
                 read: data.read,
                 modified: data.modified,
-                specialization: {
-                    type: data.specialization.type
-                }
+                type: data.type
             };
             var key;
             if (isSection(data)) {
-                key = "instanceSpecificationSpecification";
+                key = "specification";
             }
             else {
                 key = "contents";
             }
-            clone.specialization[key] = _.cloneDeep(data.specialization[key]);
-            if (!clone.specialization[key]) {
-                clone.specialization[key] = {
+            clone[key] = _.cloneDeep(data[key]);
+            if (!clone[key]) {
+                clone[key] = {
                     operand: [],
                     type: "Expression",
                 };
             }
-            clone.specialization[key].operand.push(elementOb);
+            clone[key].operand.push(elementOb);
 
             // TODO add to parentElement also if needed 
             ElementService.updateElement(clone, ws)
@@ -649,26 +576,24 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             ElementService.getElement(viewOrSecId, false, ws, null, 2)
             .then(function(data) {  
                 var clone = {
-                    sysmlid: data.sysmlid,
+                    sysmlId: data.sysmlId,
                     read: data.read,
                     modified: data.modified,
-                    specialization: {
-                        type: data.specialization.type
-                    }
+                    type: data.type
                 };
                 var key;
                 if (isSection(data)) {
-                    key = "instanceSpecificationSpecification";
+                    key = "specification";
                 }
                 else {
                     key = "contents";
                 }
-                clone.specialization[key] = _.cloneDeep(data.specialization[key]);
-                if (clone.specialization[key] && clone.specialization[key].operand) {
-                    var operands = data.specialization[key].operand;
+                clone[key] = _.cloneDeep(data[key]);
+                if (clone[key] && clone[key].operand) {
+                    var operands = data[key].operand;
                     for (var i = 0; i < operands.length; i++) {
                         if (instanceVal.instance === operands[i].instance) {
-                            clone.specialization[key].operand.splice(i,1);
+                            clone[key].operand.splice(i,1);
                             break; 
                         }
                     }
@@ -704,19 +629,17 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         var ws = !workspace ? 'master' : workspace;
         ElementService.getElement(parentViewId, false, ws, null, 2)
         .then(function(data) {  
-            if (data.specialization.childViews) {
+            if (data.childViews) {
                 var clone = {
-                    sysmlid: data.sysmlid,
+                    sysmlId: data.sysmlId,
                     read: data.read,
                     modified: data.modified,
-                    specialization: {
-                        childViews: [],
-                        type: data.specialization.type
-                    }
+                    childViews: [],
+                    type: data.type
                 };
-                data.specialization.childViews.forEach(function(child) {
+                data.childViews.forEach(function(child) {
                     if (child.id !== viewId)
-                        clone.specialization.childViews.push(child);
+                        clone.childViews.push(child);
                 });
                 updateView(clone, ws)
                 .then(function(data2) {
@@ -777,39 +700,37 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             'sourceProperty': 'documentation'
         };
         var instanceSpec = {
-            sysmlid: newInstanceId,
+            sysmlId: newInstanceId,
             name: name ? name : "Untitled " + type,
             documentation: '',
-            specialization: {
-                type:"InstanceSpecification",
-                classifier:[TYPE_TO_CLASSIFIER_ID[realType]],
-                instanceSpecificationSpecification: {
-                    string: JSON.stringify(instanceSpecSpec),
-                    type: "LiteralString"
-                }
+            type: "InstanceSpecification",
+            classifierIds: [TYPE_TO_CLASSIFIER_ID[realType]],
+            specification: {
+                string: JSON.stringify(instanceSpecSpec),
+                type: "LiteralString"
             },
             appliedMetatypes: ["_9_0_62a020a_1105704885251_933969_7897"],
             isMetatype: false
         };
         if (type === 'Section')
-            instanceSpec.specialization.instanceSpecificationSpecification = {
+            instanceSpec.specification = {
                 operand: [],  
                 type: "Expression"
             };
         if (holdingBinId)
-            instanceSpec.owner = holdingBinId;
+            instanceSpec.ownerId = holdingBinId;
 
         var toCreate = [instanceSpec];
         ElementService.createElements(toCreate, workspace, siteId)
         .then(function(data) {
             data.forEach(function(elem) {
-                if (elem.sysmlid === newInstanceId) {
+                if (elem.sysmlId === newInstanceId) {
                     var instanceVal = {
                         instance: newInstanceId,
                         type: "InstanceValue",
                         //valueExpression: null
                     };
-                    addElementToViewOrSection(viewOrSection.sysmlid, viewOrSection.sysmlid, workspace, instanceVal)
+                    addElementToViewOrSection(viewOrSection.sysmlId, viewOrSection.sysmlId, workspace, instanceVal)
                     .then(function(data3) {
                         if (type === "Section") {
                         // Broadcast message to TreeCtrl:
@@ -844,7 +765,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @param {string} [name=Untitled] name for the view
      * @param {string} [documentId] optional document to add to
      * @param {string} [workspace=master] workspace to use 
-     * @param {string} [viewId] optional sysmlid to be used for the view
+     * @param {string} [viewId] optional sysmlId to be used for the view
      * @param {string} [viewDoc] optional documentation to be used for the view
      * @param {string} [site] site to create under
      * @param {boolean} [isDoc] create Product
@@ -860,20 +781,18 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         var siteId = ids.siteId;
 
         var view = {
-            sysmlid: newViewId,
-            specialization: {
-                type: isDoc ? 'Product' : 'View',
-                allowedElements: [],
-                displayedElements: [newViewId],
-                childViews: [],
-                contents: {
-                    //valueExpression: null,
-                    operand: [{
-                        instance: newInstanceId,
-                        type:"InstanceValue",
-                    }],
-                    type: 'Expression'
-                }
+            sysmlId: newViewId,
+            type: isDoc ? 'Product' : 'View',
+            allowedElements: [],
+            displayedElements: [newViewId],
+            childViews: [],
+            contents: {
+                //valueExpression: null,
+                operand: [{
+                    instance: newInstanceId,
+                    type:"InstanceValue",
+                }],
+                type: 'Expression'
             },
             name: !name ? 'Untitled View' : name,
             documentation: viewDoc ? viewDoc : '',
@@ -885,22 +804,18 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         };
         var parentView = null;
         if (owner) {
-            view.owner = owner.sysmlid;
+            view.ownerId = owner.sysmlId;
             parentView = {
-                sysmlid: owner.sysmlid,
+                sysmlId: owner.sysmlId,
                 modified: owner.modified,
                 read: owner.read,
-                specialization: {
-                    childViews: [],
-                }
+                childViews: [],
             };
-            if (owner.specialization) {
-                if (owner.specialization.type)
-                    parentView.specialization.type = owner.specialization.type;
-                if (owner.specialization.childViews)
-                    parentView.specialization.childViews = _.cloneDeep(owner.specialization.childViews);
-                parentView.specialization.childViews.push({id: newViewId, aggregation: "COMPOSITE"});
-            }
+                if (owner.type)
+                    parentView.type = owner.type;
+                if (owner.childViews)
+                    parentView.childViews = _.cloneDeep(owner.childViews);
+                parentView.childViews.push({id: newViewId, aggregation: "COMPOSITE"});
         }
 
         var instanceSpecDoc = '<p>&nbsp;</p><p><mms-transclude-doc data-mms-eid="' + newViewId + '">[cf:' + view.name + '.doc]</mms-transclude-doc></p><p>&nbsp;</p>';
@@ -911,31 +826,27 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             'sourceProperty': 'documentation'
         };
         var instanceSpec = {
-            sysmlid: newInstanceId,
+            sysmlId: newInstanceId,
             name: "View Documentation",
             documentation: instanceSpecDoc,
-            specialization: {
-                type:"InstanceSpecification",
-                classifier:[TYPE_TO_CLASSIFIER_ID.ParagraphT],
-                instanceSpecificationSpecification: {
-                    string: JSON.stringify(instanceSpecSpec),
-                    type: "LiteralString"
-                }
+            type:"InstanceSpecification",
+            classifierIds:[TYPE_TO_CLASSIFIER_ID.ParagraphT],
+            specification: {
+                string: JSON.stringify(instanceSpecSpec),
+                type: "LiteralString"
             },
             appliedMetatypes: ["_9_0_62a020a_1105704885251_933969_7897"],
             isMetatype: false
         };
         if (holdingBinId)
-            instanceSpec.owner = holdingBinId;
+            instanceSpec.ownerId = holdingBinId;
         var asi = { //create applied stereotype instance
-            sysmlid: newViewId + '_asi',
-            owner: newViewId,
+            sysmlId: newViewId + '_asi',
+            ownerId: newViewId,
             documentation: '',
             name: '',
-            specialization: {
-                type: 'InstanceSpecification',
-                classifier: [(isDoc ? "_17_0_2_3_87b0275_1371477871400_792964_43374" : "_17_0_1_232f03dc_1325612611695_581988_21583")]
-            },
+            type: 'InstanceSpecification',
+            classifierIds: [(isDoc ? "_17_0_2_3_87b0275_1371477871400_792964_43374" : "_17_0_1_232f03dc_1325612611695_581988_21583")],
             appliedMetatypes: ["_9_0_62a020a_1105704885251_933969_7897"],
             isMetatype: false
         };
@@ -945,9 +856,9 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         ElementService.createElements(toCreate, workspace, siteId)
         .then(function(data) {
             data.forEach(function(elem) {
-                if (elem.sysmlid === newViewId) {
+                if (elem.sysmlId === newViewId) {
                     /*if (documentId) {
-                        addViewToParentView(newViewId, documentId, owner.sysmlid, 'COMPOSITE', workspace, elem)
+                        addViewToParentView(newViewId, documentId, owner.sysmlId, 'COMPOSITE', workspace, elem)
                         .then(function(data3) {
                             deferred.resolve(elem);
                         }, function(reason) {
@@ -1052,10 +963,10 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         ElementService.getElement(instanceSpecId, false, workspace, version, weight)
         .then(function(instanceSpec) {
 
-            // InstanceSpecifcations can have instanceSpecificationSpecification 
+            // InstanceSpecifcations can have specification 
             // for opaque presentation elements, or slots:
 
-            var instanceSpecSpec = instanceSpec.specialization.instanceSpecificationSpecification;
+            var instanceSpecSpec = instanceSpec.specification;
             if (!instanceSpecSpec) {
                 deferred.reject({status: 500, message: 'missing specification'});
                 return;
@@ -1135,9 +1046,9 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         getInstanceSpecification(instanceVal, workspace, version, weight)
         .then(function(instanceSpecification) {
             elementObject.instanceSpecification = instanceSpecification;
-            if (instanceSpecification.specialization && instanceSpecification.specialization.classifier &&
-                    instanceSpecification.specialization.classifier.length > 0 && 
-                    opaqueClassifiers.indexOf(instanceSpecification.specialization.classifier[0]) >= 0)
+            if (instanceSpecification.classifierIds &&
+                    instanceSpecification.classifierIds.length > 0 && 
+                    opaqueClassifiers.indexOf(instanceSpecification.classifierIds[0]) >= 0)
                 elementObject.isOpaque = true;
             else
                 elementObject.isOpaque = false;
@@ -1145,7 +1056,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             .then(function(presentationElement) {
                 elementObject.presentationElement = presentationElement;
                 if (presentationElement.type === 'Section') {
-                    getElementReferenceTree(presentationElement.specialization.instanceSpecificationSpecification, workspace, version)
+                    getElementReferenceTree(presentationElement.specification, workspace, version)
                     .then(function(sectionElementReferenceTree) {
                         elementObject.sectionElements = sectionElementReferenceTree;
                         deferred.resolve(elementObject);
@@ -1206,30 +1117,30 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @returns {boolean} whether it's a section
      */
     var isSection = function(instanceSpec) {
-        return instanceSpec.specialization && instanceSpec.specialization.classifier && 
-               instanceSpec.specialization.classifier.length > 0 &&
-               (instanceSpec.specialization.classifier[0] === TYPE_TO_CLASSIFIER_ID.Section ||
-                instanceSpec.specialization.classifier[0] === TYPE_TO_CLASSIFIER_ID.SectionT);
+        return instanceSpec.classifierIds && 
+               instanceSpec.classifierIds.length > 0 &&
+               (instanceSpec.classifierIds[0] === TYPE_TO_CLASSIFIER_ID.Section ||
+                instanceSpec.classifierIds[0] === TYPE_TO_CLASSIFIER_ID.SectionT);
     };
 
     var isTable = function(instanceSpec) {
-        return instanceSpec.specialization && instanceSpec.specialization.classifier && 
-               instanceSpec.specialization.classifier.length > 0 &&
-               (instanceSpec.specialization.classifier[0] === TYPE_TO_CLASSIFIER_ID.Table ||
-                instanceSpec.specialization.classifier[0] === TYPE_TO_CLASSIFIER_ID.TableT);
+        return instanceSpec.classifierIds && 
+               instanceSpec.classifierIds.length > 0 &&
+               (instanceSpec.classifierIds[0] === TYPE_TO_CLASSIFIER_ID.Table ||
+                instanceSpec.classifierIds[0] === TYPE_TO_CLASSIFIER_ID.TableT);
     };
 
     var isFigure = function(instanceSpec) {
-        return instanceSpec.specialization && instanceSpec.specialization.classifier && 
-               instanceSpec.specialization.classifier.length > 0 &&
-               (instanceSpec.specialization.classifier[0] === TYPE_TO_CLASSIFIER_ID.Figure ||
-                instanceSpec.specialization.classifier[0] === TYPE_TO_CLASSIFIER_ID.Image);
+        return instanceSpec.classifierIds && 
+               instanceSpec.classifierIds.length > 0 &&
+               (instanceSpec.classifierIds[0] === TYPE_TO_CLASSIFIER_ID.Figure ||
+                instanceSpec.classifierIds[0] === TYPE_TO_CLASSIFIER_ID.Image);
     };
 
     var isEquation = function(instanceSpec) {
-        return instanceSpec.specialization && instanceSpec.specialization.classifier && 
-               instanceSpec.specialization.classifier.length > 0 &&
-               instanceSpec.specialization.classifier[0] === TYPE_TO_CLASSIFIER_ID.Equation;
+        return instanceSpec.classifierIds && 
+               instanceSpec.classifierIds.length > 0 &&
+               instanceSpec.classifierIds[0] === TYPE_TO_CLASSIFIER_ID.Equation;
     };
 
     var getTreeType = function(instanceSpec) {
@@ -1283,8 +1194,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 return;
             }
             data.forEach(function(prop) {
-                var feature = prop.specialization ? prop.specialization.propertyType : null;
-                var value = prop.specialization ? prop.specialization.value : null;
+                var feature = prop.typeId ? prop.typeId : null;
+                var value = prop.value ? prop.value : null;
                 if (!feature || !docMetadataTypes[feature] || !value || value.length === 0)
                     return;
                 metadata[docMetadataTypes[feature].name] = docMetadataTypes[feature].process(value);
@@ -1297,9 +1208,9 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
     };
 
     var isPresentationElement = function(e) {
-        if (e.specialization && e.specialization.type === 'InstanceSpecification') {
-            var classifiers = e.specialization.classifier;
-            if (classifiers.length > 0 && classifierIds.indexOf(classifiers[0]) >= 0)
+        if (e.type === 'InstanceSpecification') {
+            var classifierIdss = e.classifierIds;
+            if (classifierIdss.length > 0 && classifierIdsIds.indexOf(classifierIdss[0]) >= 0)
                 return true;
         }
         return false;
@@ -1319,7 +1230,6 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         createView: createView,
         createDocument: createDocument,
         downgradeDocument: downgradeDocument,
-        addViewToDocument: addViewToDocument,
         addViewToParentView: addViewToParentView,
         getDocumentViews: getDocumentViews,
         getSiteDocuments: getSiteDocuments,

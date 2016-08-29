@@ -24,19 +24,19 @@ function TableService($q, $http, URLService, UtilsService, CacheService, _, Elem
         var dataValuesMmmEid =[];
 
         var i, j, k;
-        if ( data.specialization.contents !==  undefined){ //use contents if exist
+        if ( data.contents !==  undefined){ //use contents if exist
         //if ( data.specialization.contains ===  undefined){  
           var tempMmsEid = [];
-          for ( k = 0; k < data.specialization.contents.operand.length; k++ ){
-            tempMmsEid.push(data.specialization.contents.operand[k].instance);
+          for ( k = 0; k < data.contents.operand.length; k++ ){
+            tempMmsEid.push(data.contents.operand[k].instance);
           }
           ElementService.getElements(tempMmsEid, false, ws, version)
             .then(function(values) {
               for ( k = 0; k < values.length; k++){
-                var s = JSON.parse(values[k].specialization.instanceSpecificationSpecification.string);
+                var s = JSON.parse(values[k].specification.string);
                 if ( s.type === "Table"){
                   tableTitles.push(s.title !== undefined ? s.title : "");
-                  tableIds.push(values[k].sysmlid);
+                  tableIds.push(values[k].sysmlId);
                   var columnHeaders = [];
                   //ignore 1st column
                   for (i = 1; i < s.header[0].length; i++ ){
@@ -58,22 +58,22 @@ function TableService($q, $http, URLService, UtilsService, CacheService, _, Elem
         }
         else {
           var tableContains = [];
-          for ( k = 0; k < data.specialization.contains.length; k++ ){
-            if ( data.specialization.contains[k].type ==="Table"){
+          for ( k = 0; k < data.contains.length; k++ ){
+            if ( data.contains[k].type ==="Table"){
               //use table title or text before the table as tableTitles
-              if ( data.specialization.contains[k].title !== undefined &&  data.specialization.contains[k].title.length !== 0)
-                tableTitles.push(toValidId(data.specialization.contains[k].title)); 
-              else if ( data.specialization.contains[k-1].sourceType==="text")
-                tableTitles.push(toValidId(data.specialization.contains[k-1].text.replace("<p>","").replace("</p>","").replace(" ", ""))); //assume it is Paragraph
+              if ( data.contains[k].title !== undefined &&  data.contains[k].title.length !== 0)
+                tableTitles.push(toValidId(data.contains[k].title)); 
+              else if ( data.contains[k-1].sourceType==="text")
+                tableTitles.push(toValidId(data.contains[k-1].text.replace("<p>","").replace("</p>","").replace(" ", ""))); //assume it is Paragraph
               else
                 tableTitles.push("");
 
               tableIds.push("_" + Math.floor((Math.random() * 1000) + 1)); //a random between 1 and 1000
-              tableContains.push(data.specialization.contains[k]);
+              tableContains.push(data.contains[k]);
               var columnHeaders = [];
               //assume first column is empty
-              for ( var kk = 1; kk < data.specialization.contains[k].header[0].length; kk++){
-                columnHeaders[kk-1] = data.specialization.contains[k].header[0][kk].content[0].text.replace("<p>","").replace("</p>","");
+              for ( var kk = 1; kk < data.contains[k].header[0].length; kk++){
+                columnHeaders[kk-1] = data.contains[k].header[0][kk].content[0].text.replace("<p>","").replace("</p>","");
               }  
               tableColumnHeadersLabels.push(columnHeaders); //xxx, yyy, mass,cost, power in string
             }

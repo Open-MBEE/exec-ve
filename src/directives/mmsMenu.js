@@ -68,7 +68,7 @@ function mmsMenu(SiteService, WorkspaceService, ConfigService, $state, $template
         var currSiteParentId = scope.site.parent;
         var isCharacterization = scope.site.isCharacterization;
         var breadcrumbs = [];
-        breadcrumbs.push({name: scope.site.name, sysmlid: scope.site.sysmlid});
+        breadcrumbs.push({name: scope.site.name, sysmlId: scope.site.sysmlId});
         var eltWidth = element.parent().width();
         
         SiteService.getSites()
@@ -77,8 +77,8 @@ function mmsMenu(SiteService, WorkspaceService, ConfigService, $state, $template
                 var site = data[i];
                 var siteParent = site.parent;
                 var siteIsChara = site.isCharacterization;
-                if (site.sysmlid == currSiteParentId && isCharacterization === siteIsChara) {
-                  breadcrumbs.push({name: site.name, sysmlid: site.sysmlid});
+                if (site.sysmlId == currSiteParentId && isCharacterization === siteIsChara) {
+                  breadcrumbs.push({name: site.name, sysmlId: site.sysmlId});
                   if (site.parent) {
                     currSiteParentId = site.parent;
                   }

@@ -196,7 +196,7 @@ function mmsD3GroupedHorizontalBarChartIo(ElementService, UtilsService, TableSer
                     counter++;
                     if (datalegendsfilter[TableService.toValidId(data.legends[j])]){
                       filteredDataValues.push(Number(data.values[j][i]));
-                      filteredDataSysmlids.push(data.valuesysmlids[j][i]);
+                      filteredDataSysmlids.push(data.valuesysmlIds[j][i]);
                       filteredDataColors.push(getColor(data ,counter % data.legends.length));
                       filteredDataLegends.push(TableService.toValidId(data.legends[j]));
                     }
@@ -354,28 +354,28 @@ function mmsD3GroupedHorizontalBarChartIo(ElementService, UtilsService, TableSer
             }
             //var dataseries= [];
             var rowvalues=[];
-            var rowsysmlids=[];
+            var rowsysmlIds=[];
             //var datavalues=[];
-            //var datasysmlids=[];
+            //var datasysmlIds=[];
             for ( var i = 0; i < dataValuesPerTable.length; i++){
                 var tvalues = [];
-                var sysmlids = [];
+                var sysmlIds = [];
 
                 for ( var j = 0; j < dataValuesPerTable[i].length; j++){
-                  sysmlids[j] =  dataValuesPerTable[i][j].sysmlid;
-                  //datasysmlids.push(dataValuesPerTable[i][j].sysmlid);
-                  if (dataValuesPerTable[i][j].specialization.value[0].type === "LiteralString")
+                  sysmlIds[j] =  dataValuesPerTable[i][j].sysmlId;
+                  //datasysmlIds.push(dataValuesPerTable[i][j].sysmlId);
+                  if (dataValuesPerTable[i][j].value[0].type === "LiteralString")
                     //datavalues.push(Number(dataValuesPerTable[i][j].specialization.value[0].string));
-                    tvalues[j] = dataValuesPerTable[i][j].specialization.value[0].string;
-                  else if (dataValuesPerTable[i][j].specialization.value[0].type === "LiteralReal")
+                    tvalues[j] = dataValuesPerTable[i][j].value[0].string;
+                  else if (dataValuesPerTable[i][j].value[0].type === "LiteralReal")
                     //datavalues.push(Number(dataValuesPerTable[i][j].specialization.value[0].double));
-                    tvalues[j] = dataValuesPerTable[i][j].specialization.value[0].double;
-                  else if (dataValuesPerTable[i][j].specialization.value[0].type === "LiteralInteger")
+                    tvalues[j] = dataValuesPerTable[i][j].value[0].double;
+                  else if (dataValuesPerTable[i][j].value[0].type === "LiteralInteger")
                     //datavalues.push(Number(dataValuesPerTable[i][j].specialization.value[0].integer));
-                    tvalues[j] = dataValuesPerTable[i][j].specialization.value[0].integer;
+                    tvalues[j] = dataValuesPerTable[i][j].value[0].integer;
                 }
                 rowvalues[i] = tvalues;
-                rowsysmlids[i] =sysmlids;
+                rowsysmlIds[i] =sysmlIds;
                 //dataseries[i] = tvalues;
              }
             var achartdata = {
@@ -385,7 +385,7 @@ function mmsD3GroupedHorizontalBarChartIo(ElementService, UtilsService, TableSer
               legends: legends,
               colors: udcolors[k],
               values:rowvalues,//2D array [i][j] where i = rowIndex, j = columnIndex
-              valuesysmlids: rowsysmlids
+              valuesysmlIds: rowsysmlIds
              };
              chartdata[achartdata.id] = achartdata;
              

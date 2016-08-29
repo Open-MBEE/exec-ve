@@ -6,9 +6,9 @@
                     <a ui-sref="workspace.sites({workspace: ws, search: undefined})"><i class="fa fa-arrow-left"></i> back to sites &amp; documents</a>
                 </li>
                 <li class="nav_breadcrumb"><span ng-show="snapshot" class="label label-danger" ng-bind-html="snapshot"></span></li>
-                <span ng-repeat="breadcrumb in breadcrumbs" ng-show="site && site.sysmlid !== 'no-site'">
+                <span ng-repeat="breadcrumb in breadcrumbs" ng-show="site && site.sysmlId !== 'no-site'">
                     <li  class="nav_breadcrumb" ng-style="truncateStyle">
-                    <a class="nav-btn" ng-style="{'padding-left': $index == 0 ? '5px' : '0px'}" ui-sref="workspace.site({site: breadcrumb.sysmlid, search: undefined})">
+                    <a class="nav-btn" ng-style="{'padding-left': $index == 0 ? '5px' : '0px'}" ui-sref="workspace.site({site: breadcrumb.sysmlId, search: undefined})">
                     <i class="fa fa-folder" uib-tooltip="{{breadcrumb.name}}" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom"></i>&nbsp;{{breadcrumb.name}}</a>
                     </li>
                     

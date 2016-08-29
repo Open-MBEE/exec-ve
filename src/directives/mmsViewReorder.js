@@ -54,7 +54,7 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
                 scope.view = data;
                 scope.editable = scope.view.editable && scope.mmsVersion === 'latest';
 
-                var contents = data.specialization.contents || data.specialization.instanceSpecificationSpecification;
+                var contents = data.specialization.contents || data.specialization.specification;
                 if (contents) {
                     ViewService.getElementReferenceTree(contents, scope.mmsWs, scope.mmsVersion)
                     .then(function(elementReferenceTree) {
@@ -101,13 +101,13 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
             var promises = [];
             var updateSectionElementOrder = function(elementReference) {
                 var sectionEdit = { 
-                    sysmlid: elementReference.instance,
+                    sysmlId: elementReference.instance,
                     read: elementReference.instanceSpecification.read,
                     modified: elementReference.instanceSpecification.modified
                 };
                 sectionEdit.specialization = _.cloneDeep(elementReference.instanceSpecification.specialization);
-                var operand = sectionEdit.specialization.instanceSpecificationSpecification.operand = [];
-                var origOperand = elementReference.instanceSpecification.specialization.instanceSpecificationSpecification.operand;
+                var operand = sectionEdit.specialization.specification.operand = [];
+                var origOperand = elementReference.instanceSpecification.specialization.specification.operand;
                 for (var i = 0; i < elementReference.sectionElements.length; i++) {
                     operand.push(elementReference.sectionElements[i].instanceVal);
                     if (elementReference.sectionElements[i].sectionElements.length > 0)
@@ -127,14 +127,14 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
                 return deferred.promise;
             }
             var viewEdit = { 
-                sysmlid: scope.view.sysmlid,
+                sysmlId: scope.view.sysmlId,
                 read: scope.view.read,
                 modified: scope.view.modified
             };
             viewEdit.specialization = _.cloneDeep(scope.view.specialization);
 
-            var contents = viewEdit.specialization.contents || viewEdit.specialization.instanceSpecificationSpecification;
-            var origContents = scope.view.specialization.contents || scope.view.specialization.instanceSpecificationSpecification;
+            var contents = viewEdit.specialization.contents || viewEdit.specialization.specification;
+            var origContents = scope.view.specialization.contents || scope.view.specialization.specification;
             // Update the View edit object on Save
             if (contents) {
                 contents.operand = [];
@@ -162,7 +162,7 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
         };
 
         scope.refresh = function() {
-            var contents = scope.view.specialization.contents || scope.view.specialization.instanceSpecificationSpecification;
+            var contents = scope.view.specialization.contents || scope.view.specialization.specification;
             if (contents) {
                 ViewService.getElementReferenceTree(contents, scope.mmsWs, scope.mmsVersion)
                 .then(function(elementReferenceTree) {

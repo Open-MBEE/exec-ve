@@ -169,7 +169,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             viewElements: function(ViewService, workspace, document, time, ticket) {
                 if (document === null) 
                     return null;
-                return ViewService.getViewElements(document.sysmlid, false, workspace, time, 2);
+                return ViewService.getViewElements(document.sysmlId, false, workspace, time, 2);
             },   
             time: function(tag, ticket) {
                 return tag.timestamp;
@@ -298,11 +298,11 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                         return;
                     }
                     var siteDocs = {
-                        specialization: {type: "Element"},
+                        type: "Element",
                         name: 'Filtered Docs',
                         documentation: '{}'
                     };
-                    siteDocs.sysmlid = "master_filter";
+                    siteDocs.sysmlId = "master_filter";
                     ElementService.createElement(siteDocs, workspace, null)
                     .then(function(data) {
                         deferred.resolve(data);
@@ -318,12 +318,12 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             viewElements: function(ViewService, workspace, document, time, ticket) {
                 if (document === null) 
                     return [];
-                return ViewService.getViewElements(document.sysmlid, false, workspace, time, 2);
+                return ViewService.getViewElements(document.sysmlId, false, workspace, time, 2);
             },    
             view: function(ViewService, workspace, document, time, ticket) {
                 if (document === null) 
                     return null;
-                return ViewService.getView(document.sysmlid, false, workspace, time, 2);
+                return ViewService.getView(document.sysmlId, false, workspace, time, 2);
             },
             tags: function(ConfigService, workspace, ticket) {
                 return ConfigService.getConfigs(workspace, false, 2);
@@ -411,7 +411,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                     return null;
                     //siteCoverDocId = 'master_cover';
                 else
-                    siteCoverDocId = site.sysmlid + '_cover';
+                    siteCoverDocId = site.sysmlId + '_cover';
                 var deferred = $q.defer();
                 ElementService.getElement(siteCoverDocId, false, workspace, time, 2)
                 .then(function(data) {
@@ -428,9 +428,9 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                     }
 
                     var viewName = site.name + ' Cover Page';
-                    var viewDoc = '<mms-site-docs data-mms-site="' + site.sysmlid + '">[cf:site docs]</mms-site-docs>';
+                    var viewDoc = '<mms-site-docs data-mms-site="' + site.sysmlId + '">[cf:site docs]</mms-site-docs>';
 
-                    ViewService.createView(undefined, viewName, undefined, workspace, siteCoverDocId, viewDoc, site.sysmlid)
+                    ViewService.createView(undefined, viewName, undefined, workspace, siteCoverDocId, viewDoc, site.sysmlId)
                     .then(function(data) {
                         deferred.resolve(data);
                     }, function(reason) {
@@ -445,12 +445,12 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             viewElements: function(ViewService, workspace, document, time, ticket) {
                 if (document === null) 
                     return null;
-                return ViewService.getViewElements(document.sysmlid, false, workspace, time, 2);
+                return ViewService.getViewElements(document.sysmlId, false, workspace, time, 2);
             },    
             view: function(ViewService, workspace, document, time, ticket) {
                 if (document === null) 
                     return null;
-                return ViewService.getView(document.sysmlid, false, workspace, time, 2);
+                return ViewService.getView(document.sysmlId, false, workspace, time, 2);
             }
         },
         views: {
@@ -496,18 +496,18 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             viewElements: function(ViewService, workspace, document, time, ticket) {
                 if (document === null) 
                     return null;
-                return ViewService.getViewElements(document.sysmlid, false, workspace, time, 2);
+                return ViewService.getViewElements(document.sysmlId, false, workspace, time, 2);
             },    
             view: function(ViewService, workspace, document, time, ticket) {
                 if (document === null) 
                     return null;
-                return ViewService.getView(document.sysmlid, false, workspace, time, 2);
+                return ViewService.getView(document.sysmlId, false, workspace, time, 2);
             },
             snapshot: function(ConfigService, configSnapshots, document, workspace, ticket) {
-                var docid = document.sysmlid;
+                var docid = document.sysmlId;
                 var found = null;
                 configSnapshots.forEach(function(snapshot) {
-                    if (docid === snapshot.sysmlid)
+                    if (docid === snapshot.sysmlId)
                         found = snapshot;
                 });
                 if (found) {
@@ -530,9 +530,9 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 return ElementService.getElement($stateParams.document, false, $stateParams.workspace, time, 2);
             },
             views: function($stateParams, ViewService, document, time, ticket) {
-                if (document.specialization.type !== 'Product' && document.specialization.type !== 'View')
+                if (document.type !== 'Product' && document.type !== 'View')
                     return [];
-                if (document.specialization.type === 'Product' && document.specialization.view2view && document.specialization.view2view.length > 0)
+                if (document.type === 'Product' && document.view2view && document.view2view.length > 0)
                     return ViewService.getDocumentViews($stateParams.document, false, $stateParams.workspace, time, true, 2);
                 else
                     return ViewService.getDocumentViews($stateParams.document, false, $stateParams.workspace, time, false, 2);
@@ -544,12 +544,12 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 return ViewService.getView($stateParams.document, false, $stateParams.workspace, time, 2);
             },
             snapshots: function(ConfigService, workspace, site, document, ticket) {
-                if (document.specialization.type !== 'Product')
+                if (document.type !== 'Product')
                     return [];
-                return ConfigService.getProductSnapshots(document.sysmlid, site.sysmlid, workspace, false, 2);
+                return ConfigService.getProductSnapshots(document.sysmlId, site.sysmlId, workspace, false, 2);
             },
             snapshot: function(ConfigService, workspace, snapshots, document, time, ticket) {
-                var docid = document.sysmlid;
+                var docid = document.sysmlId;
                 var found = null;
                 snapshots.forEach(function(snapshot) {
                     if (snapshot.created === time)
@@ -641,7 +641,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                     var tagStr = '';
                     if (time !== 'latest') {
                         snapshots.forEach(function(snapshot) {
-                            if (filtered[document.sysmlid])
+                            if (filtered[document.sysmlId])
                                 return;
                             if (time === snapshot.created && snapshot.configurations && snapshot.configurations.length > 0)
                                 snapshot.configurations.forEach(function(config) {
@@ -650,7 +650,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                                 });
                         });
                         tagStr += '( <i class="fa fa-camera"></i> ' + $filter('date')(time, 'M/d/yy h:mm a') + ' )';
-                        if (filtered[document.sysmlid])
+                        if (filtered[document.sysmlId])
                             $scope.showTag = false;
                         $scope.snapshotTag = ' ' + tagStr;
                     }                                        

@@ -148,9 +148,9 @@ function mmsView(ViewService, $templateCache, $rootScope, growl) {
             ViewService.getView(scope.mmsVid, false, scope.mmsWs, scope.mmsVersion, 1)
             .then(function(data) {
                 if (scope.mmsVersion && scope.mmsVersion !== 'latest') {
-                    if (data.specialization.contains) {
+                    if (data.contains) {
                         var hasDiagram = false;
-                        data.specialization.contains.forEach(function(contain) {
+                        data.contains.forEach(function(contain) {
                             if (contain.type === 'Image')
                                 hasDiagram = true;
                         });
@@ -162,14 +162,14 @@ function mmsView(ViewService, $templateCache, $rootScope, growl) {
                         }
                     }
                 }
-                if (data.specialization.type === 'InstanceSpecification') {
+                if (data.type === 'InstanceSpecification') {
                     scope.isSection = true;
                     scope.view = data;
                     scope.modified = data.modified;
                     scope.modifier = data.modifier;
                     return;
                 }
-                if (data.specialization.numElements && data.specialization.numElements > 5000 &&
+                if (data.numElements && data.numElements > 5000 &&
                         scope.mmsVersion && scope.mmsVersion !== 'latest') { 
                     //threshold where getting view elements in bulk takes too long and it's not latest
                     //getting cached individual elements should be faster
@@ -178,7 +178,7 @@ function mmsView(ViewService, $templateCache, $rootScope, growl) {
                     scope.modifier = data.modifier;
                     return;
                 }
-                ViewService.getViewElements(scope.mmsVid, false, scope.mmsWs, scope.mmsVersion, 1, data.specialization.displayedElements)
+                ViewService.getViewElements(scope.mmsVid, false, scope.mmsWs, scope.mmsVersion, 1, data.displayedElements)
                 .then(function(data2) {
                     scope.view = data;
                     scope.modified = data.modified;

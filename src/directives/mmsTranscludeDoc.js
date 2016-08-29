@@ -178,7 +178,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
 
                 recompile();
                 /*scope.$on('presentationElem.save', function(event, edit, ws, type) {
-                    if (edit.sysmlid === scope.element.sysmlid && ws === scope.ws && type === 'documentation')
+                    if (edit.sysmlId === scope.element.sysmlId && ws === scope.ws && type === 'documentation')
                         recompile();
                 });*/
                 //scope.$watch('element.documentation', recompile);
@@ -294,7 +294,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             var auto = [ViewService.TYPE_TO_CLASSIFIER_ID.Image, ViewService.TYPE_TO_CLASSIFIER_ID.Paragraph,
                 ViewService.TYPE_TO_CLASSIFIER_ID.List, ViewService.TYPE_TO_CLASSIFIER_ID.Table];
 
-            if (auto.indexOf(scope.instanceSpec.specialization.classifier[0]) >= 0)
+            if (auto.indexOf(scope.instanceSpec.classifierIds[0]) >= 0)
             //do not allow model generated to be deleted
                 scope.isDirectChildOfPresentationElement = false;
             if (scope.isDirectChildOfPresentationElement) {

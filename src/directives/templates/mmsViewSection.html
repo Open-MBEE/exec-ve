@@ -1,4 +1,4 @@
-<div ng-if="!section.specialization">
+<div ng-if="!section.specification">
     <h4>{{section.name}}</h4> 
     <div ng-repeat="contain in ::section.contains" ng-switch on="contain.type"> 
         <mms-view-para data-mms-para="::contain" ng-switch-when="Paragraph"></mms-view-para>
@@ -9,7 +9,7 @@
     </div>
 </div>
 
-<div ng-if="section.specialization.instanceSpecificationSpecification">
+<div ng-if="section.specification">
 <div ng-show="! isEditing">
     <h4 ng-hide="recompileEdit">{{section.name}}</h4>
     <div ng-show="recompileEdit" class="panel panel-info"><h4>{{edit.name}}</h4></div>
@@ -24,7 +24,7 @@
     </div>
   </div>
   <div ng-class="{'panel-body' :  isEditing}" class="inner">
-       <div ng-repeat="instanceVal in section.specialization.instanceSpecificationSpecification.operand track by instanceVal.instance"> 
+       <div ng-repeat="instanceVal in section.specification.operand track by instanceVal.instance"> 
         <mms-view-presentation-elem data-mms-instance-val="::instanceVal" data-mms-parent-section="::section"></mms-view-presentation-elem>
       </div>
   </div>

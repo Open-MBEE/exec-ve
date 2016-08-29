@@ -290,7 +290,7 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, HttpSe
     var createSnapshotArtifact = function(snapshot, site, workspace){
         var n = normalize(null, workspace);
         var deferred = $q.defer();
-        $http.post(URLService.getProductSnapshotsURL(snapshot.sysmlid, site, n.ws), {'snapshots': [snapshot]})
+        $http.post(URLService.getProductSnapshotsURL(snapshot.sysmlId, site, n.ws), {'snapshots': [snapshot]})
         .success(function(data, status, headers, config){
             deferred.resolve('ok');
         }).error(function(data, status, headers, config){

@@ -48,7 +48,7 @@ function SiteService($q, $http, URLService, CacheService, _) {
             if (result)
                 deferred.resolve(result);
             else if (site === 'no_site')
-                deferred.resolve({name:'No Site', sysmlid:'no-site'});
+                deferred.resolve({name:'No Site', sysmlId:'no-site'});
             else
                 deferred.reject({status: 404, data: '', message: "Site not found"});
         }, function(reason) {
@@ -81,7 +81,7 @@ function SiteService($q, $http, URLService, CacheService, _) {
             $http.get(URLService.getSitesURL('master', ver))
             .success(function(data, status, headers, config) {
                 CacheService.put(cacheKey, data.sites, false, function(site, i) {
-                    return {key: ['sites', 'master', ver, site.sysmlid], value: site, merge: true};
+                    return {key: ['sites', 'master', ver, site.sysmlId], value: site, merge: true};
                 });
                 deferred.resolve(CacheService.get(cacheKey));
                 delete inProgress[ver];

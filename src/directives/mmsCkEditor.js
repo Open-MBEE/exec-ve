@@ -58,11 +58,11 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
               $scope.cacheElements.forEach(function(cacheElement) {
                   //JSON.stringify(sampleObject);
                   //console.log("=====THIS IS THE CACHE ===="+ JSON.stringify(cacheElement));
-                  $scope.autocompleteItems.push({ 'sysmlid' : cacheElement.sysmlid, 'name' : cacheElement.name , 'type': ' - name' });
-                  $scope.autocompleteItems.push({ 'sysmlid' : cacheElement.sysmlid, 'name' : cacheElement.name , 'type': ' - documentation' });
+                  $scope.autocompleteItems.push({ 'sysmlId' : cacheElement.sysmlId, 'name' : cacheElement.name , 'type': ' - name' });
+                  $scope.autocompleteItems.push({ 'sysmlId' : cacheElement.sysmlId, 'name' : cacheElement.name , 'type': ' - documentation' });
 
-                  if (cacheElement.specialization && cacheElement.specialization.type === 'Property') {
-                      $scope.autocompleteItems.push({ 'sysmlid' : cacheElement.sysmlid, 'name' : cacheElement.name , 'type': ' - value' });
+                  if (cacheElement.type === 'Property') {
+                      $scope.autocompleteItems.push({ 'sysmlId' : cacheElement.sysmlId, 'name' : cacheElement.name , 'type': ' - value' });
                   }
               });
             }
@@ -74,7 +74,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
             $scope.requestDocumentation = false;
             $scope.showProposeLink = true;
             $scope.choose = function(elem, property) {
-                var tag = '<mms-transclude-' + property + ' data-mms-eid="' + elem.sysmlid + '">[cf:' + elem.name + '.' + property + ']</mms-transclude-' + property + '> ';
+                var tag = '<mms-transclude-' + property + ' data-mms-eid="' + elem.sysmlId + '">[cf:' + elem.name + '.' + property + ']</mms-transclude-' + property + '> ';
                 $uibModalInstance.close(tag);
             };
             $scope.cancel = function() {
@@ -97,21 +97,21 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
                     return;
                 }
                 $scope.proposeClass = "fa fa-spin fa-spinner";
-                var sysmlid = UtilsService.createMmsId();
+                var sysmlId = UtilsService.createMmsId();
                 var currentView = ViewService.getCurrentView();
                 var ids = UtilsService.getIdInfo(currentView, scope.mmsSite);
                 var currentSiteId = ids.siteId;
                 var ownerId = ids.holdingBinId;
                 var toCreate = {
-                    sysmlid: sysmlid,
+                    sysmlId: sysmlId,
                     name: $scope.newE.name, 
                     documentation: $scope.newE.documentation, 
-                    specialization: {type: 'Element'},
+                    type: 'Element',
                     appliedMetatypes: ['_9_0_62a020a_1105704885343_144138_7929'],
                     isMetatype: false
                 };
                 if (ownerId)
-                    toCreate.owner = ownerId;
+                    toCreate.ownerId = ownerId;
                 ElementService.createElement(toCreate, scope.mmsWs, currentSiteId)
                 .then(function(data) {
                     if ($scope.requestName) {
@@ -135,7 +135,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
                 }
             };
             $scope.autocompleteOnSelect = function($item, $model, $label) {
-                autocompleteElementId = $item.sysmlid;
+                autocompleteElementId = $item.sysmlId;
 
                 var lastIndexOfName = $item.name.lastIndexOf(" ");
                 autocompleteName = $item.name.substring(0, lastIndexOfName);
@@ -232,17 +232,17 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
                 var vid = null;
                 var peid = null;
                 if (elem.relatedDocuments && elem.relatedDocuments.length > 0) {
-                    did = elem.relatedDocuments[0].sysmlid;
+                    did = elem.relatedDocuments[0].sysmlId;
                     if (elem.relatedDocuments[0].parentViews.length > 0)
-                        vid = elem.relatedDocuments[0].parentViews[0].sysmlid;
+                        vid = elem.relatedDocuments[0].parentViews[0].sysmlId;
                 }
-                if (elem.specialization.type === 'InstanceSpecification') {
+                if (elem.type === 'InstanceSpecification') {
                     if (ViewService.isSection(elem))
-                        vid = elem.sysmlid;
+                        vid = elem.sysmlId;
                     else
-                        peid = elem.sysmlid;
+                        peid = elem.sysmlId;
                 } else 
-                    vid = elem.sysmlid;
+                    vid = elem.sysmlId;
                 var tag = '<mms-view-link';
                 if (did) 
                     tag += ' data-mms-did="' + did + '"';
@@ -254,13 +254,13 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
                 $uibModalInstance.close(tag);
             };
             $scope.chooseDoc = function(doc, view, elem) {
-                var did = doc.sysmlid;
-                var vid = view.sysmlid;
+                var did = doc.sysmlId;
+                var vid = view.sysmlId;
                 var peid = null;
                 if (ViewService.isSection(elem))
-                    vid = elem.sysmlid;
+                    vid = elem.sysmlId;
                 else if (ViewService.isPresentationElement(elem))
-                    peid = elem.sysmlid;
+                    peid = elem.sysmlId;
                 var tag = '<mms-view-link';
                 if (did) 
                     tag += ' data-mms-did="' + did + '"';
@@ -277,8 +277,8 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
             $scope.mainSearchFilter = function(data) {
                 var views = [];
                 data.forEach(function(v) {
-                    if (v.specialization && (v.specialization.type === 'View' || v.specialization.type === 'Product' || 
-                            (ViewService.isPresentationElement(v) && v.relatedDocuments))) {
+                    if (v.type === 'View' || v.type === 'Product' || 
+                            (ViewService.isPresentationElement(v) && v.relatedDocuments)) {
                         if (v.properties)
                             delete v.properties;
                         views.push(v);
@@ -307,14 +307,12 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
         };
 
         var commentCtrl = function($scope, $uibModalInstance) {
-            var sysmlid = UtilsService.createMmsId();
+            var sysmlId = UtilsService.createMmsId();
             $scope.comment = {
-                sysmlid: sysmlid,
+                sysmlId: sysmlId,
                 name: 'Comment ' + new Date().toISOString(), 
                 documentation: '', 
-                specialization: {
-                    type: 'Comment'
-                },
+                type: 'Comment',
                 appliedMetatypes: ["_9_0_62a020a_1105704885343_144138_7929"],
                 isMetatype: false
             };
@@ -326,10 +324,10 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
                 }
                 $scope.oking = true;
                 if (ViewService.getCurrentView())
-                    $scope.comment.owner = ViewService.getCurrentView().sysmlid;
+                    $scope.comment.ownerId = ViewService.getCurrentView().sysmlId;
                 ElementService.createElement($scope.comment, scope.mmsWs, scope.mmsSite)
                 .then(function(data) {
-                    var tag = '<mms-transclude-com data-mms-eid="' + data.sysmlid + '">comment:' + data.creator + '</mms-transclude-com> ';
+                    var tag = '<mms-transclude-com data-mms-eid="' + data.sysmlId + '">comment:' + data.creator + '</mms-transclude-com> ';
                     $uibModalInstance.close(tag);
                 }, function(reason) {
                     growl.error("Comment Error: " + reason.message);

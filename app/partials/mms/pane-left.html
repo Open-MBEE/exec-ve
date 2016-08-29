@@ -36,7 +36,7 @@
             <h5 style="margin: 3px 0px 3px 10px;">List of {{view.title}}</h5>
             <ul class="nav nav-list nav-pills nav-stacked abn-tree">
                 <li ng-repeat=" row in view.branchList | filter:treeFilter.search track by $index  " class="abn-tree-row">
-                    <div class="arrow" ng-click="user_clicks_branch(row)" ng-class="{'active-text': row.branch.selected}" id="tree-branch-{{view.id}}-{{row.data.sysmlid}}">
+                    <div class="arrow" ng-click="user_clicks_branch(row)" ng-class="{'active-text': row.branch.selected}" id="tree-branch-{{view.id}}-{{row.data.sysmlId}}">
                         <a class="tree-item" style="padding-left: 20px; position:relative;" ng-click="my_tree_handler(row)">
                             <i ng-class="{'active-text': row.branch.selected}" class="indented tree-icon fa {{view.icon}}" ></i> 
                             <!-- TODO active branch -->

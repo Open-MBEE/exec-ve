@@ -10,9 +10,9 @@ function($scope, $rootScope, $stateParams, document, time, ElementService, ViewS
 
     var viewIds2node = {};
     var origViews = {};
-    viewIds2node[document.sysmlid] = {
+    viewIds2node[document.sysmlId] = {
         name: document.name,
-        id: document.sysmlid,
+        id: document.sysmlId,
         aggr: 'COMPOSITE',
         children: []
     };
@@ -48,17 +48,17 @@ function($scope, $rootScope, $stateParams, document, time, ElementService, ViewS
 
     var seenViewIds = {};
     function handleSingleView(v, aggr) {
-        var curNode = viewIds2node[v.sysmlid];
+        var curNode = viewIds2node[v.sysmlId];
         if (!curNode) {
             curNode = {
                 name: v.name,
-                id: v.sysmlid,
+                id: v.sysmlId,
                 aggr: aggr,
                 children: []
             };
-            viewIds2node[v.sysmlid] = curNode;
+            viewIds2node[v.sysmlId] = curNode;
         }
-        origViews[v.sysmlid] = v;
+        origViews[v.sysmlId] = v;
         return curNode;
     }
 
@@ -92,7 +92,7 @@ function($scope, $rootScope, $stateParams, document, time, ElementService, ViewS
             growl.info("please wait");
             return;
         }
-        if ($scope.tree.length > 1 || $scope.tree[0].id !== document.sysmlid) {
+        if ($scope.tree.length > 1 || $scope.tree[0].id !== document.sysmlId) {
             growl.error('Views cannot be re-ordered outside the context of the current document.');
             return;
         }
@@ -110,17 +110,15 @@ function($scope, $rootScope, $stateParams, document, time, ElementService, ViewS
                 });
             }
             var orig = origViews[id];
-            if (((!orig.specialization.childViews || orig.specialization.childViews.length === 0) && childViews.length > 0) ||
-                (orig.specialization.childViews && !angular.equals(orig.specialization.childViews, childViews))) {
+            if (((!orig.childViews || orig.childViews.length === 0) && childViews.length > 0) ||
+                (orig.childViews && !angular.equals(orig.childViews, childViews))) {
                 toSave.push({
-                    sysmlid: id,
+                    sysmlId: id,
                     //name: orig.name,
                     read: orig.read,
                     modified: orig.modified,
-                    specialization: {
-                        childViews: childViews,
-                        type: orig.specialization.type
-                    }
+                    childViews: childViews,
+                    type: orig.type
                 });
             }
         });
@@ -144,7 +142,7 @@ function($scope, $rootScope, $stateParams, document, time, ElementService, ViewS
         if (!curBranch)
             $state.go('workspace.site.document', {}, {reload:true});
         else {
-            var goToId = curBranch.data.sysmlid;
+            var goToId = curBranch.data.sysmlId;
             if (curBranch.type === 'section')
                 goToId = curBranch.view;
             $state.go('workspace.site.document.view', {view: goToId});

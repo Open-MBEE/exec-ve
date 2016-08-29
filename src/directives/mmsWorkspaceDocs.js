@@ -44,7 +44,7 @@ function mmsWorkspaceDocs(ElementService, SiteService, ViewService, growl, $q, $
             sites.forEach(function(site) {
                 var siteDeferred = $q.defer();
                 filterPromises.push(siteDeferred.promise);
-                ViewService.getSiteDocuments(site.sysmlid, false, ws, version, 1)
+                ViewService.getSiteDocuments(site.sysmlId, false, ws, version, 1)
                 .then(function(sitedocs) {
                     ElementService.getElement("master_filter", false, ws, version, 2)
                     .then(function(filter) {
@@ -55,9 +55,9 @@ function mmsWorkspaceDocs(ElementService, SiteService, ViewService, growl, $q, $
                     }, function(reason) {
                     }).finally(function() {
                         sitedocs.forEach(function(doc) {
-                            if (!filtered[doc.sysmlid]) {
-                                if (!docsKey[doc.sysmlid]) {
-                                    docsKey[doc.sysmlid] = doc;
+                            if (!filtered[doc.sysmlId]) {
+                                if (!docsKey[doc.sysmlId]) {
+                                    docsKey[doc.sysmlId] = doc;
                                     docs.push(doc);
                                 }
                             }

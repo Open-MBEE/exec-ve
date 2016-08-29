@@ -76,18 +76,18 @@ function mmsViewLink(ElementService, $compile, growl) {
                         scope.name = pe.name;
                     });
                 }
-                if (data.specialization.type === 'Product') {
-                    docid = data.sysmlid;
+                if (data.type === 'Product') {
+                    docid = data.sysmlId;
                     scope.docid = docid;
-                    scope.vid = data.sysmlid;
+                    scope.vid = data.sysmlId;
                     //element.html('<a href="mms.html#/workspaces/' + ws + '/sites/' + site + '/documents/' + 
                         //docid + '/views/' + scope.mmsVid + queryParam + '">' + data.name + '</a>');
-                } else if (data.specialization.type === "View" || data.specialization.type === 'InstanceSpecification') {
+                } else if (data.type === "View" || data.type === 'InstanceSpecification') {
                     if (!docid || docid === '') {
-                        docid = data.sysmlid;
+                        docid = data.sysmlId;
                     } 
                     scope.docid = docid;
-                    scope.vid = data.sysmlid;
+                    scope.vid = data.sysmlId;
                     //element.html('<a href="mms.html#/workspaces/' + ws + '/sites/' + site + '/documents/' + 
                     //    docid + '/views/' + scope.mmsVid + queryParam + '">' + data.name + '</a>');
                 } else {

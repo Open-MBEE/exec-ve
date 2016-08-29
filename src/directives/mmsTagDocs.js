@@ -23,7 +23,7 @@ function mmsTagDocs(ElementService, SiteService, ViewService, ConfigService, gro
         var update = function() {
             var filteredDocs = [];
             scope.docs.forEach(function(snapshot) {
-                if (!scope.filtered[snapshot.sysmlid])
+                if (!scope.filtered[snapshot.sysmlId])
                     filteredDocs.push(snapshot);
             });
             scope.snapshots = filteredDocs;

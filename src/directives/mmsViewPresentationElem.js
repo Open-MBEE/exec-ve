@@ -71,14 +71,14 @@ function mmsViewPresentationElem(ViewService, ElementService, $templateCache, $r
                     scope.instanceSpec = instanceSpec;
                     scope.presentationElemLoading = false;
                     var hash = $location.hash();
-                    if (hash === instanceSpec.sysmlid) {
+                    if (hash === instanceSpec.sysmlId) {
                         $timeout(function() {
                             $anchorScroll();
                         }, 1000, false);
                     }
                     element.click(function(e) {
                         if (mmsViewCtrl)
-                            mmsViewCtrl.transcludeClicked(instanceSpec.sysmlid, ws, version);
+                            mmsViewCtrl.transcludeClicked(instanceSpec.sysmlId, ws, version);
                         e.stopPropagation();
                     });
                 });

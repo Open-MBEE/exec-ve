@@ -1,6 +1,6 @@
 <table class="table table-condensed">
     <tr><th>Document(s)</th><!--<th>Last Modified</th><th>Last Modified By</th><th>Created</th>--></tr>
     <tr ng-repeat="doc in snapshots | orderBy: 'sysmlname'">
-        <td><mms-view-link mms-did="{{doc.sysmlid}}" mms-vid="{{doc.sysmlid}}" mms-ws="{{ws}}" mms-version="{{doc.created}}">{{doc.sysmlname}}</mms-view-link></td>
+        <td><mms-view-link mms-did="{{doc.sysmlId}}" mms-vid="{{doc.sysmlId}}" mms-ws="{{ws}}" mms-version="{{doc.created}}">{{doc.sysmlname}}</mms-view-link></td>
     </tr>
 </table>

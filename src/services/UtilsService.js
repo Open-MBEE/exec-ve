@@ -53,52 +53,55 @@ function UtilsService(CacheService, _) {
             elem.name = '';
         }
         var i = 0;
-        if (elem.hasOwnProperty('specialization')) {
-            if (elem.specialization.type === 'Property') {
-                var spec = elem.specialization;
-                if (!_.isArray(spec.value))
-                    spec.value = [];
-                spec.value.forEach(function(val) {
+        //if (elem.hasOwnProperty('specialization')) {
+            if (elem.type === 'Property' || elem.type === 'Port') {
+                if (!elem.defaultValue)
+                    elem.defaultValue = null;
+            }
+            if (elem.type === 'Slot') {
+                if (!_.isArray(elem.value))
+                    elem.value = [];
+                elem.value.forEach(function(val) {
                     if (val.hasOwnProperty('specialization'))
                         delete val.specialization;
                 });
             }
-            if (elem.specialization.value) {
-                for (i = 0; i < elem.specialization.value.length; i++)
-                    cleanValueSpec(elem.specialization.value[i]);
+            if (elem.value) {
+                for (i = 0; i < elem.value.length; i++)
+                    cleanValueSpec(elem.value[i]);
             }
-            if (elem.specialization.contents) {
-                cleanValueSpec(elem.specialization.contents);
+            if (elem.contents) {
+                cleanValueSpec(elem.contents);
             }
-            if (elem.specialization.instanceSpecificationSpecification) {
-                cleanValueSpec(elem.specialization.instanceSpecificationSpecification);
+            if (elem.specification) {
+                cleanValueSpec(elem.specification);
             }
-            if (elem.specialization.type === 'View') {
+            if (elem.type === 'View') {
                 //delete elem.specialization.displayedElements;
                 //delete elem.specialization.allowedElements;
-                if (elem.specialization.contents && elem.specialization.contains)
-                    delete elem.specialization.contains;
-                if (Array.isArray(elem.specialization.displayedElements)) {
-                    elem.specialization.numElements = elem.specialization.displayedElements.length;
-                    if (elem.specialization.numElements <= 5000)
-                        delete elem.specialization.displayedElements;
+                if (elem.contents && elem.contains)
+                    delete elem.contains;
+                if (Array.isArray(elem.displayedElements)) {
+                    elem.numElements = elem.displayedElements.length;
+                    if (elem.numElements <= 5000)
+                        delete elem.displayedElements;
                     else
-                        elem.specialization.displayedElements = JSON.stringify(elem.specialization.displayedElements);
+                        elem.displayedElements = JSON.stringify(elem.displayedElements);
                 }
-                if (elem.specialization.allowedElements)
-                    delete elem.specialization.allowedElements;
+                if (elem.allowedElements)
+                    delete elem.allowedElements;
             }
-            if (elem.specialization.hasOwnProperty('specialization')) {
-                delete elem.specialization.specialization;
+            if (elem.hasOwnProperty('specialization')) {
+                delete elem.specialization;
             }
             if (forEdit) {
                 for (i = 0; i < nonEditKeys.length; i++) {
-                    if (elem.specialization.hasOwnProperty(nonEditKeys[i])) {
-                        delete elem.specialization[nonEditKeys[i]];
+                    if (elem.hasOwnProperty(nonEditKeys[i])) {
+                        delete elem[nonEditKeys[i]];
                     }
                 }
             }
-        }
+        //}
         return elem;
     };
 
@@ -242,7 +245,7 @@ function UtilsService(CacheService, _) {
             else if (property === 'documentation')
                 edit.documentation = clean.documentation;
             else if (property === 'value') {
-                _.merge(edit.specialization, clean.specialization, function(a,b,id) {
+                _.merge(edit, clean, function(a,b,id) {
                     if ((id === 'contents' || id === 'contains') && a)
                         return a; //handle contains and contents updates manually at higher level
                     if (angular.isArray(a) && angular.isArray(b) && b.length < a.length) {
@@ -272,9 +275,9 @@ function UtilsService(CacheService, _) {
         var res = {};
         for (var key in a) {
             if (a.hasOwnProperty(key) && b.hasOwnProperty(key)) {
-                if (key === 'specialization')
-                    res.specialization = filterProperties(a.specialization, b.specialization);
-                else
+                //if (key === 'specialization')
+                //    res.specialization = filterProperties(a.specialization, b.specialization);
+                //else
                     res[key] = b[key];
             }
         }
@@ -306,13 +309,13 @@ function UtilsService(CacheService, _) {
                     i === 'creator' || i === 'created')
                 continue;
             if (edit.hasOwnProperty(i) && orig.hasOwnProperty(i) && server.hasOwnProperty(i)) {
-                if (i === 'specialization') {
-                    if (hasConflict(edit[i], orig[i], server[i]))
-                        return true;
-                } else {
+                //if (i === 'specialization') {
+                //    if (hasConflict(edit[i], orig[i], server[i]))
+                //        return true;
+                //} else {
                     if (!angular.equals(orig[i], server[i]))
                         return true;
-                }
+                //}
             }
         }
         return false;
@@ -374,7 +377,7 @@ function UtilsService(CacheService, _) {
                     } else if (thing.type === 'List') {
                         result.push(makeHtmlList(thing));
                     } else if (thing.type === 'Image') {
-                        result.push('<mms-transclude-img mms-eid="' + thing.sysmlid + '"></mms-transclude-img>');
+                        result.push('<mms-transclude-img mms-eid="' + thing.sysmlId + '"></mms-transclude-img>');
                     }
                     result.push('</div>');
                 }
@@ -404,7 +407,7 @@ function UtilsService(CacheService, _) {
                 } else if (thing.type === 'List') {
                     result.push(makeHtmlList(thing));
                 } else if (thing.type === 'Image') {
-                    result.push('<mms-transclude-img mms-eid="' + thing.sysmlid + '"></mms-transclude-img>');
+                    result.push('<mms-transclude-img mms-eid="' + thing.sysmlId + '"></mms-transclude-img>');
                 }
                 result.push('</div>');
             }
@@ -447,7 +450,7 @@ function UtilsService(CacheService, _) {
             return '';
         var result = '<ul>';
 
-        var anchor = '<a href=#' + child.data.sysmlid + '>';
+        var anchor = '<a href=#' + child.data.sysmlId + '>';
         result += '  <li>' + anchor + child.section + ' ' + child.label + '</a></li>';
 
         child.children.forEach(function (child2) {
@@ -482,14 +485,14 @@ function UtilsService(CacheService, _) {
     };
 
     var makeTablesAndFiguresTOCChild = function(child, printElement, ob, live, showRefName) {
-        var sysmlid = child.data.sysmlid;
-        var el = printElement.find('#' + sysmlid);
-        var refs = printElement.find('mms-view-link[data-mms-peid="' + sysmlid + '"]');
+        var sysmlId = child.data.sysmlId;
+        var el = printElement.find('#' + sysmlId);
+        var refs = printElement.find('mms-view-link[data-mms-peid="' + sysmlId + '"]');
         var cap = '';
         if (child.type === 'table') {
             ob.tableCount++;
             cap = ob.tableCount + '. ' + child.data.name;
-            ob.tables += '<li><a href="#' + sysmlid + '">' + cap + '</a></li>';
+            ob.tables += '<li><a href="#' + sysmlId + '">' + cap + '</a></li>';
             var cap1 = el.find('table > caption');
             cap1.html('Table ' + cap);//cap.html());
             if (cap1.length === 0) {
@@ -502,12 +505,12 @@ function UtilsService(CacheService, _) {
             if (live)
                 refs.find('a').html('Table ' + cap);
             else
-                refs.html('<a href="#' + sysmlid + '">Table ' + cap + '</a>');
+                refs.html('<a href="#' + sysmlId + '">Table ' + cap + '</a>');
         }
         if (child.type === 'figure') {
             ob.figureCount++;
             cap = ob.figureCount + '. ' + child.data.name;
-            ob.figures += '<li><a href="#' + sysmlid + '">' + cap + '</a></li>';
+            ob.figures += '<li><a href="#' + sysmlId + '">' + cap + '</a></li>';
             var cap3 = el.find('figure > figcaption');
             cap3.html('Figure ' + cap);
             if (cap3.length === 0) {
@@ -520,12 +523,12 @@ function UtilsService(CacheService, _) {
             if (live)
                 refs.find('a').html('Fig. ' + cap);
             else
-                refs.html('<a href="#' + sysmlid + '">Fig. ' + cap + '</a>');
+                refs.html('<a href="#' + sysmlId + '">Fig. ' + cap + '</a>');
         }
         if (child.type === 'equation') {
             ob.equationCount++;
             cap = ob.equationCount + '. ' + child.data.name;
-            ob.equations += '<li><a href="#' + sysmlid + '">' + cap + '</a></li>';
+            ob.equations += '<li><a href="#' + sysmlId + '">' + cap + '</a></li>';
             var equationCap = '(' + ob.equationCount + ')';
             var cap2 = el.find('.mms-equation-caption');
             cap2.html(equationCap);
@@ -539,7 +542,7 @@ function UtilsService(CacheService, _) {
             if (live)
                 refs.find('a').html('Eq. ' + equationCap);
             else
-                refs.html('<a href="#' + sysmlid + '">Eq. ' + equationCap + '</a>');
+                refs.html('<a href="#' + sysmlId + '">Eq. ' + equationCap + '</a>');
         }
         child.children.forEach(function(child2) {
             makeTablesAndFiguresTOCChild(child2, printElement, ob, live, showRefName);

@@ -64,7 +64,7 @@ function mmsSiteDocFilter(ElementService, ViewService, growl, $templateCache, $q
         var updateSiteDocs = function(cacheSiteDocs) {
             scope.siteDocs = [];
             cacheSiteDocs.forEach(function(doc) {
-                scope.siteDocs.push({show: !scope.filtered[doc.sysmlid], doc: doc});
+                scope.siteDocs.push({show: !scope.filtered[doc.sysmlId], doc: doc});
             });
         };
 
@@ -80,7 +80,7 @@ function mmsSiteDocFilter(ElementService, ViewService, growl, $templateCache, $q
             if (orig) {
                 scope.filtered = JSON.parse(orig.documentation);
                 scope.siteDocs.forEach(function(doc) {
-                    if (scope.filtered[doc.doc.sysmlid])
+                    if (scope.filtered[doc.doc.sysmlId])
                         doc.show = false;
                     else
                         doc.show = true;
@@ -101,7 +101,7 @@ function mmsSiteDocFilter(ElementService, ViewService, growl, $templateCache, $q
                 return deferred.promise;
             }
             ElementService.updateElement({
-                sysmlid: "master_filter", 
+                sysmlId: "master_filter", 
                 documentation: JSON.stringify(scope.filtered)
             }, scope.mmsWs).then(function(data) {
                 //updateSiteDocsFiltered();
@@ -125,7 +125,7 @@ function mmsSiteDocFilter(ElementService, ViewService, growl, $templateCache, $q
             //scope.checkall = !scope.checkall;
             scope.siteDocs.forEach(function(sitedoc) {
                 sitedoc.show = scope.checkall;
-                scope.filtered[sitedoc.doc.sysmlid] = !scope.checkall;
+                scope.filtered[sitedoc.doc.sysmlId] = !scope.checkall;
             });
             //updateSiteDocsFiltered();
         };

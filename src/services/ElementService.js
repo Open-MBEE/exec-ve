@@ -83,10 +83,10 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         var deferred = $q.defer();
         if (CacheService.exists(n.cacheKey) && !n.update) {
             var cached = CacheService.get(n.cacheKey);
-            if ((cached.specialization && (cached.specialization.type === 'View' ||
-                cached.specialization.type === 'Product')) &&
-                !cached.specialization.hasOwnProperty('contains') &&
-                !cached.specialization.hasOwnProperty('contents')) {
+            if ((cached.type === 'View' ||
+                cached.type === 'Product') &&
+                !cached.hasOwnProperty('contains') &&
+                !cached.hasOwnProperty('contents')) {
             } else {
                 deferred.resolve(cached);
                 return deferred.promise;
@@ -136,7 +136,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                 existing.push(exist);
                 continue;
             }
-            request.elements.push({sysmlid: id});
+            request.elements.push({sysmlId: id});
         }
         if (request.elements.length === 0)
             deferred.resolve(existing);
@@ -146,7 +146,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                 var data = response.data.elements;
                 for (var i = 0; i < data.length; i++) {
                     var element = data[i];
-                    var ekey = UtilsService.makeElementKey(element.sysmlid, n.ws, n.ver);
+                    var ekey = UtilsService.makeElementKey(element.sysmlId, n.ws, n.ver);
                     var cacheE = CacheService.put(ekey, UtilsService.cleanElement(element), true);
                     existing.push(cacheE);
                 }
@@ -314,7 +314,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                     var element = elements[i];
                     if (!element) //check for null, seen before
                         continue;
-                    var ekey = UtilsService.makeElementKey(element.sysmlid, n.ws, n.ver);
+                    var ekey = UtilsService.makeElementKey(element.sysmlId, n.ws, n.ver);
                     result.push(CacheService.put(ekey, UtilsService.cleanElement(element), true));
                 }
                 delete inProgress[progress];
@@ -344,7 +344,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
      * ## Example
      *  <pre>
         var update = {
-            'sysmlid': 'element_id',
+            'sysmlId': 'element_id',
             'read': '2014-07-01T08:57:36.915-0700', //time the element was last read from the server
             'name': 'updated name',
             'documentation': '<p>updated doc</p>',
@@ -379,9 +379,9 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
 
         var handleSuccess = function(n, data) {
             var e = null;
-            if (data.elements.length > 1 && elem.sysmlid) {
+            if (data.elements.length > 1 && elem.sysmlId) {
                 for (var i = 0; i < data.elements.length; i++) {
-                    if (data.elements[i].sysmlid === elem.sysmlid)
+                    if (data.elements[i].sysmlId === elem.sysmlId)
                         e = data.elements[i];
                 }
                 if (!e)
@@ -389,29 +389,26 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
             } else
                 e = data.elements[0];
             var resp = CacheService.put(n.cacheKey, UtilsService.cleanElement(e), true);
-            var history = CacheService.get(UtilsService.makeElementKey(elem.sysmlid, workspace, 'versions'));
+            var history = CacheService.get(UtilsService.makeElementKey(elem.sysmlId, workspace, 'versions'));
             if (history) {
                 history.unshift({modifier: e.modifier, timestamp: e.modified});
             }
-            var edit = CacheService.get(UtilsService.makeElementKey(elem.sysmlid, n.ws, null, true));
+            var edit = CacheService.get(UtilsService.makeElementKey(elem.sysmlId, n.ws, null, true));
             if (edit) {
                 // Only want to merge the properties that were updated:
                 var updated = UtilsService.filterProperties(elem, resp);
                 _.merge(edit, updated);
                 UtilsService.cleanElement(edit, true);
             }
-            //special case for products view2view updates and view contents
-            if (elem.specialization && elem.specialization.view2view)
-                resp.specialization.view2view = elem.specialization.view2view;
-            if (elem.specialization && elem.specialization.contents)
-                resp.specialization.contents = elem.specialization.contents;
+            if (elem.contents)
+                resp.contents = elem.contents;
             deferred.resolve(resp);
         };
 
-        if (!elem.hasOwnProperty('sysmlid'))
+        if (!elem.hasOwnProperty('sysmlId'))
             deferred.reject('Element id not found, create element first!');
         else {
-            var n = normalize(elem.sysmlid, null, workspace, null);
+            var n = normalize(elem.sysmlId, null, workspace, null);
 
             $http.post(URLService.getPostElementsURL(n.ws), {'elements': [elem],'source': ApplicationService.getSource()}, {timeout: 60000})
             .success(function(data, status, headers, config) {
@@ -420,7 +417,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                 if (status === 409) {
                     var server = data.elements[0];
                     UtilsService.cleanElement(server);
-                    var orig = CacheService.get(UtilsService.makeElementKey(elem.sysmlid, n.ws, null, false));
+                    var orig = CacheService.get(UtilsService.makeElementKey(elem.sysmlId, n.ws, null, false));
                     if (!orig) {
                         URLService.handleHttpStatus(data, status, headers, config, deferred);
                     } else {
@@ -469,13 +466,9 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         $http.post(URLService.getPostElementsURL(ws), {'elements': elems})
         .success(function(data, status, headers, config) {
             data.elements.forEach(function(elem) {
-                var cacheKey = UtilsService.makeElementKey(elem.sysmlid, ws, null, false);
+                var cacheKey = UtilsService.makeElementKey(elem.sysmlId, ws, null, false);
                 var resp = CacheService.put(cacheKey, UtilsService.cleanElement(elem), true);
-                //special case for products view2view updates 
-                if (resp.specialization && resp.specialization.view2view &&
-                    elem.specialization && elem.specialization.view2view)
-                    resp.specialization.view2view = elem.specialization.view2view;
-                var edit = CacheService.get(UtilsService.makeElementKey(elem.sysmlid, ws, null, true));
+                var edit = CacheService.get(UtilsService.makeElementKey(elem.sysmlId, ws, null, true));
                 if (edit) {
                     _.merge(edit, resp);
                     UtilsService.cleanElement(edit, true);
@@ -500,7 +493,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
      *  <pre>
         var create = {
             'name': 'new name',
-            'owner': 'owner_id',
+            'ownerId': 'owner_id',
             'documentation': '<p>new doc</p>',
             'specialization': {
                 'type': 'Property',
@@ -514,7 +507,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         };
         ElementService.createElement(create).then(
             function(createdElement) { //this element will have a generated id
-                alert('create successful with id: ' + createdElement.sysmlid);
+                alert('create successful with id: ' + createdElement.sysmlId);
             },
             function(reason) {
                 alert('create failed: ' + reason.message);
@@ -533,13 +526,13 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         var n = normalize(null, null, workspace, null);
 
         var deferred = $q.defer();
-        //if (!elem.hasOwnProperty('owner')) {
+        //if (!elem.hasOwnProperty('ownerId')) {
         //    deferred.reject('Element create needs an owner'); //relax this?
         //    return deferred.promise;
-        //    elem.owner = 'holding_bin_project'; //hardcode a holding bin for owner for propose element
+        //    elem.ownerId = 'holding_bin_project'; //hardcode a holding bin for owner for propose element
         //}
         
-        /*if (elem.hasOwnProperty('sysmlid')) {
+        /*if (elem.hasOwnProperty('sysmlId')) {
             deferred.reject({status: 400, message: 'Element create cannot have id'});
             return deferred.promise;
         }*/
@@ -550,16 +543,16 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         $http.post(url, {'elements': [elem], 'source': ApplicationService.getSource()})
         .success(function(data, status, headers, config) {
             var resp = null;
-            if (data.elements.length > 1 && elem.sysmlid) {
+            if (data.elements.length > 1 && elem.sysmlId) {
                 for (var i = 0; i < data.elements.length; i++) {
-                    if (data.elements[i].sysmlid === elem.sysmlid)
+                    if (data.elements[i].sysmlId === elem.sysmlId)
                         resp = data.elements[i];
                 }
                 if (!resp)
                     resp = data.elements[0];
             } else
                 resp = data.elements[0];
-            var key = UtilsService.makeElementKey(resp.sysmlid, n.ws, 'latest');
+            var key = UtilsService.makeElementKey(resp.sysmlId, n.ws, 'latest');
             deferred.resolve(CacheService.put(key, UtilsService.cleanElement(resp), true));
         }).error(function(data, status, headers, config) {
             URLService.handleHttpStatus(data, status, headers, config, deferred);
@@ -590,7 +583,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         .success(function(data, status, headers, config) {
             var results = [];
             data.elements.forEach(function(resp) {
-                var key = UtilsService.makeElementKey(resp.sysmlid, n.ws, 'latest');
+                var key = UtilsService.makeElementKey(resp.sysmlId, n.ws, 'latest');
                 results.push(CacheService.put(key, UtilsService.cleanElement(resp), true));
             });
             deferred.resolve(results);
@@ -709,12 +702,12 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                     var properties = element.properties;
                     if (properties)
                         delete element.properties;
-                    var ekey = UtilsService.makeElementKey(element.sysmlid, n.ws, n.ver);
+                    var ekey = UtilsService.makeElementKey(element.sysmlId, n.ws, n.ver);
                     var cacheE = CacheService.put(ekey, UtilsService.cleanElement(element), true);
                     if (properties) {
                         for (var j = 0; j < properties.length; j++) {
                             var property = properties[j];
-                            var pkey = UtilsService.makeElementKey(property.sysmlid, n.ws, n.ver);
+                            var pkey = UtilsService.makeElementKey(property.sysmlId, n.ws, n.ver);
                             CacheService.put(pkey, UtilsService.cleanElement(property), true);
                         }
                     }

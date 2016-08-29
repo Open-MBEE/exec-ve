@@ -184,7 +184,7 @@ function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxSe
             var auto = [ViewService.TYPE_TO_CLASSIFIER_ID.Image, ViewService.TYPE_TO_CLASSIFIER_ID.Paragraph,
                 ViewService.TYPE_TO_CLASSIFIER_ID.List, ViewService.TYPE_TO_CLASSIFIER_ID.Table];
 
-            if (auto.indexOf(scope.instanceSpec.specialization.classifier[0]) >= 0)
+            if (auto.indexOf(scope.instanceSpec.classifierIds[0]) >= 0)
             //do not allow model generated to be deleted
                 scope.isDirectChildOfPresentationElement = false;
             if (scope.isDirectChildOfPresentationElement)

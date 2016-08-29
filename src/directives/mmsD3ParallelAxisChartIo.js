@@ -300,12 +300,12 @@ function mmsD3ParallelAxisChartIo(ElementService, UtilsService, TableService, $c
             tickColor = undefined; //reset
             var tvalues = [];
             for ( var j = 0; j < scope.datavalues[k][i].length; j++){
-              if (scope.datavalues[k][i][j].specialization.value[0].type === "LiteralString")
-                tvalues[scopetableColumnHeadersLabel[k][j]] = Number(scope.datavalues[k][i][j].specialization.value[0].string);
-              else if (scope.datavalues[k][i][j].specialization.value[0].type === "LiteralReal")
-                tvalues[scopetableColumnHeadersLabel[k][j]]  = scope.datavalues[k][i][j].specialization.value[0].double;
-              else if (scope.datavalues[k][i][j].specialization.value[0].type === "LiteralInteger")
-                tvalues[scopetableColumnHeadersLabel[k][j]]  = scope.datavalues[k][i][j].specialization.value[0].integer;
+              if (scope.datavalues[k][i][j].value[0].type === "LiteralString")
+                tvalues[scopetableColumnHeadersLabel[k][j]] = Number(scope.datavalues[k][i][j].value[0].string);
+              else if (scope.datavalues[k][i][j].value[0].type === "LiteralReal")
+                tvalues[scopetableColumnHeadersLabel[k][j]]  = scope.datavalues[k][i][j].value[0].double;
+              else if (scope.datavalues[k][i][j].value[0].type === "LiteralInteger")
+                tvalues[scopetableColumnHeadersLabel[k][j]]  = scope.datavalues[k][i][j].value[0].integer;
             }
             if (scope.tableRowHeaders[k][i].name === scope.tick1){
                tickColor = scope.tick1color;

@@ -21,13 +21,13 @@ function($scope, $rootScope, $state, $uibModal, $q, $stateParams, $timeout, Conf
     $scope.version = time;
 
     if (document)
-        $scope.eid = $scope.document.sysmlid;
+        $scope.eid = $scope.document.sysmlId;
     else
         $scope.eid = null;
 
     $scope.vid = $scope.eid;
     if($scope.document)
-        $scope.docId = $scope.document.sysmlid;
+        $scope.docId = $scope.document.sysmlId;
     $scope.specApi = {};
     $scope.viewApi = {};
     $scope.viewOrderApi = {};
@@ -63,7 +63,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $stateParams, $timeout, Conf
             ElementService.getElement("master_filter", false, ws, snapshot.created, 0)
             .then(function(filter) {
                     var json = JSON.parse(filter.documentation);
-                    if (json[document.sysmlid]) {
+                    if (json[document.sysmlId]) {
                         snapshot.hideTag = true;
                     }
             });
@@ -152,7 +152,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $stateParams, $timeout, Conf
     var cleanUpEdit = function(scope) {
         var ws = scope.ws;
         var edit = scope.edit;
-        var key = 'element|' + edit.sysmlid + '|' + ws;
+        var key = 'element|' + edit.sysmlId + '|' + ws;
         var currentCnt = 0;
 
         if ($scope.presentElemEditCnts.hasOwnProperty(key)) {
@@ -171,7 +171,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $stateParams, $timeout, Conf
     $scope.$on('presentationElem.edit', function(event, scope) {
         var ws = scope.ws;
         var edit = scope.edit;
-        var key = 'element|' + edit.sysmlid + '|' + ws;
+        var key = 'element|' + edit.sysmlId + '|' + ws;
         var currentCnt = 1;
         $rootScope.veEdits[key] = edit;
         if ($scope.presentElemEditCnts.hasOwnProperty(key)) {
@@ -229,8 +229,8 @@ function($scope, $rootScope, $state, $uibModal, $q, $stateParams, $timeout, Conf
         showPane('element');
         var edit = $scope.specApi.getEdits();
         if (edit) {
-            $scope.tracker.etrackerSelected = $scope.elementType + '|' + (edit.sysmlid || edit.id) + '|' + $scope.specWs;
-            $rootScope.veEdits[$scope.elementType + '|' + (edit.sysmlid || edit.id) + '|' + $scope.specWs] = edit;
+            $scope.tracker.etrackerSelected = $scope.elementType + '|' + (edit.sysmlId || edit.id) + '|' + $scope.specWs;
+            $rootScope.veEdits[$scope.elementType + '|' + (edit.sysmlId || edit.id) + '|' + $scope.specWs] = edit;
             cleanUpSaveAll();
         }
         if ($scope.elementType !== 'element')
@@ -293,7 +293,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $stateParams, $timeout, Conf
             if (continueEdit) 
                 return;
             var edit = $scope.specApi.getEdits();
-            delete $rootScope.veEdits[$scope.elementType + '|' + (edit.sysmlid || edit.id ) + '|' + $scope.specWs];
+            delete $rootScope.veEdits[$scope.elementType + '|' + (edit.sysmlId || edit.id ) + '|' + $scope.specWs];
             if (Object.keys($rootScope.veEdits).length > 0) {
                 var next = Object.keys($rootScope.veEdits)[0];
                 var id = next.split('|');
@@ -355,9 +355,9 @@ function($scope, $rootScope, $state, $uibModal, $q, $stateParams, $timeout, Conf
             if (elementType === 'element') {
                 ElementService.updateElement(value, elementWs)
                 .then(function(e) {
-                    defer.resolve({status: 200, id: e.sysmlid, type: elementType, ws: elementWs});
+                    defer.resolve({status: 200, id: e.sysmlId, type: elementType, ws: elementWs});
                 }, function(reason) {
-                    defer.resolve({status: reason.status, id: value.sysmlid});
+                    defer.resolve({status: reason.status, id: value.sysmlId});
                 });
             } else if (elementType === 'tag') {
                 ConfigService.update(value, elementWs)
@@ -417,7 +417,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $stateParams, $timeout, Conf
     $scope.$on('element-editor-cancel', function() {
         var go = function() {
             var edit = $scope.specApi.getEdits();
-            delete $rootScope.veEdits[$scope.elementType + '|' + (edit.sysmlid || edit.id) + '|' + $scope.specWs];
+            delete $rootScope.veEdits[$scope.elementType + '|' + (edit.sysmlId || edit.id) + '|' + $scope.specWs];
             $scope.specApi.revertEdits();
             if (Object.keys($rootScope.veEdits).length > 0) {
                 var next = Object.keys($rootScope.veEdits)[0];

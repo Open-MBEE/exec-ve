@@ -76,7 +76,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $uibModal, $window,
         $scope.bbApi.addButton(UxService.getButtonBarButton('show-comments'));
         $scope.bbApi.setToggleState('show-comments', $rootScope.veCommentsOn);
         if (view && view.editable && time === 'latest') {
-            if ($scope.view.specialization.contents || $scope.view.specialization.type === 'InstanceSpecification') {
+            if ($scope.view.contents || $scope.view.type === 'InstanceSpecification') {
                 $scope.bbApi.addButton(UxService.getButtonBarButton('view-add-dropdown'));
             } else {
                 var fakeDropdown = {
@@ -132,7 +132,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $uibModal, $window,
                 });
                 if ($rootScope.mms_treeApi && $rootScope.mms_treeApi.get_selected_branch) {
                     var selected_branch = $rootScope.mms_treeApi.get_selected_branch();
-                    while (selected_branch && selected_branch.type !== 'view' && view.specialization.type !== 'InstanceSpecification') {
+                    while (selected_branch && selected_branch.type !== 'view' && view.type !== 'InstanceSpecification') {
                         selected_branch = $rootScope.mms_treeApi.get_parent_branch(selected_branch);
                     }
                     if (selected_branch)
@@ -263,12 +263,12 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $uibModal, $window,
     if (view) {
         //since view can also be a "fake" view like section instance spec only set view if it's a real view,
         //otherwise other code can create things under instance specs that can't be owned by instance spec
-        if (view.specialization.contains || view.specialization.contents) {
+        if (view.contains || view.contents) {
             ViewService.setCurrentView(view); 
-        } else if (document && (document.specialization.contains || document.specialization.contents)) {
+        } else if (document && (document.contains || document.contents)) {
             ViewService.setCurrentView(document);
         }
-        $scope.vid = view.sysmlid;
+        $scope.vid = view.sysmlId;
     } else {
         $scope.vid = '';        
     }
@@ -299,7 +299,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $uibModal, $window,
     };
     $scope.searchOptions= {};
     $scope.searchOptions.callback = function(elem) {
-        $scope.tscClicked(elem.sysmlid, ws, time);
+        $scope.tscClicked(elem.sysmlId, ws, time);
         if ($rootScope.mms_togglePane && $rootScope.mms_togglePane.closed)
             $rootScope.mms_togglePane.toggle();
     };
@@ -307,8 +307,8 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $uibModal, $window,
     $scope.searchOptions.searchInput = $stateParams.search;
     $scope.searchOptions.searchResult = $scope.search;
     $scope.elementTranscluded = function(element, type) {
-        if (type === 'Comment' && !$scope.comments.hasOwnProperty(element.sysmlid)) {
-            $scope.comments[element.sysmlid] = element;
+        if (type === 'Comment' && !$scope.comments.hasOwnProperty(element.sysmlId)) {
+            $scope.comments[element.sysmlId] = element;
             $scope.numComments++;
             if (element.modified > $scope.lastCommented) {
                 $scope.lastCommented = element.modified;
@@ -329,7 +329,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $uibModal, $window,
     };
 
     $scope.searchGoToDocument = function (doc, view, elem) {//siteId, documentId, viewId) {
-        $state.go('workspace.site.document.view', {site: doc.siteCharacterizationId, document: doc.sysmlid, view: view.sysmlid, tag: undefined, search: undefined});
+        $state.go('workspace.site.document.view', {site: doc.siteCharacterizationId, document: doc.sysmlId, view: view.sysmlId, tag: undefined, search: undefined});
     };
     $scope.searchOptions.relatedCallback = $scope.searchGoToDocument;
 

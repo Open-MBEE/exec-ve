@@ -91,7 +91,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
             for (var i = 0; i < scope.values.length; i++) {
                 if (scope.values[i].type === 'LiteralString') {
                     areStrings = true;
-                    var s = scope.values[i].string;
+                    var s = scope.values[i].value;
                     if (s.indexOf('<p>') === -1) {
                         s = s.replace('<', '&lt;');
                     }
@@ -148,7 +148,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
             for (var i = 0; i < scope.editValues.length; i++) {
                 if (scope.editValues[i].type === 'LiteralString') {
                     areStrings = true;
-                    var s = scope.editValues[i].string;
+                    var s = scope.editValues[i].value;
                     if (s.indexOf('<p>') === -1) {
                         s = s.replace('<', '&lt;');
                     }
@@ -220,11 +220,19 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
             ElementService.getElement(scope.mmsEid, false, ws, version, 1)
             .then(function(data) {
                 scope.element = data;
-                scope.values = scope.element.specialization.value;
-                if (scope.element.specialization.type === 'Constraint' && scope.element.specialization.specification)
-                    scope.values = [scope.element.specialization.specification];
-                if (scope.element.specialization.type==='Expression') {
-                    scope.values = [scope.element.specialization];
+                if (scope.element.type === 'Property' || scope.element.type === 'Port') {
+                    if (scope.element.defaultValue)
+                        scope.values = [scope.element.defaultValue];
+                    else
+                        scope.values = [];
+                }
+                if (scope.element.type === 'Slot') {
+                    scope.values = scope.element.value;
+                }
+                if (scope.element.type === 'Constraint' && scope.element.specification)
+                    scope.values = [scope.element.specification];
+                if (scope.element.type==='Expression') {
+                    scope.values = scope.element.operand;
                 }
                 recompile();
                 //scope.$watch('values', recompile, true);
@@ -264,18 +272,18 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
         scope.addValueTypes = {string: 'LiteralString', boolean: 'LiteralBoolean', integer: 'LiteralInteger', real: 'LiteralReal'};
         scope.addValue = function(type) {
             if (type === 'LiteralBoolean')
-                scope.editValues.push({type: type, boolean: false});
+                scope.editValues.push({type: type, value: false});
             else if (type === 'LiteralInteger')
-                scope.editValues.push({type: type, integer: 0});
+                scope.editValues.push({type: type, value: 0});
             else if (type === 'LiteralString')
-                scope.editValues.push({type: type, string: ''});
+                scope.editValues.push({type: type, value: ''});
             else if (type === 'LiteralReal')
-                scope.editValues.push({type: type, double: 0.0});
+                scope.editValues.push({type: type, value: 0.0});
         };
         scope.addValueType = 'LiteralString';
         
         scope.addEnumerationValue = function() {
-          scope.editValues.push({type: "InstanceValue", instance: scope.options[0]});
+          scope.editValues.push({type: "InstanceValue", instanceId: scope.options[0]});
         };
 
         scope.removeVal = function(i) {
@@ -327,7 +335,9 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                     //The editor check occurs here; should get "not supported for now" from here
 
                     // check if data has been loaded for specified id
-                    var id = scope.element.specialization.propertyType;
+                    var id = scope.element.typeId;
+                    if (scope.element.type === 'Slot')
+                        id = scope.element.definingFeatureId;
                     if (!id || (scope.isEnumeration && scope.options)) {
                         Utils.addFrame(scope, mmsViewCtrl, element, frameTemplate);
                         return;

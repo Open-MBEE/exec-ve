@@ -88,7 +88,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Wo
             ElementService.updateElement(edit, mmsWs)
             .then(function(data) {
                 deferred.resolve(data);
-                $rootScope.$broadcast('element.updated', edit.sysmlid, (mmsWs ? mmsWs : 'master'), type, continueEdit);
+                $rootScope.$broadcast('element.updated', edit.sysmlId, (mmsWs ? mmsWs : 'master'), type, continueEdit);
                 //growl.success("Save successful");
                 //scope.editing = false;
             }, function(reason) {
@@ -168,11 +168,13 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Wo
                 return true;
         }
         if (type === 'value' || checkAll) {
-            if (scope.edit.specialization && scope.edit.specialization.type === 'Property' && 
-                    !angular.equals(scope.edit.specialization.value, scope.element.specialization.value))
+            if ((scope.edit.type === 'Property' || scope.edit.type === 'Port') && 
+                    !angular.equals(scope.edit.defaultValue, scope.element.defaultValue))
                 return true;
-            if (scope.edit.specialization && scope.edit.specialization.type === 'Constraint' && 
-                    !angular.equals(scope.edit.specialization.specification, scope.element.specialization.specification))
+            if (scope.eidt.type === 'Slot' && !angular.equals(scope.edit.value, scope.element.value))
+                return true; 
+            if (scope.edit.type === 'Constraint' && 
+                    !angular.equals(scope.edit.specification, scope.element.specification))
                 return true;
         }
         return false;
@@ -208,14 +210,21 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Wo
                 scope.edit.documentation = scope.element.documentation;
             }
             if (type === 'value' || revertAll) {
-                if (scope.edit.specialization && scope.edit.specialization.type === 'Property' && angular.isArray(scope.edit.specialization.value)) {
-                    scope.edit.specialization.value = _.cloneDeep(scope.element.specialization.value);
-                    scope.editValues = scope.edit.specialization.value;
+                if (scope.edit.type === 'Property' || scope.edit.type === 'Port') { //&& angular.isArray(scope.edit.value)) {
+                    scope.edit.defaultValue = _.cloneDeep(scope.element.defaultValue);
+                    if (scope.edit.defaultValue)
+                        scope.editValues = [scope.edit.defaultValue];
+                    else
+                        scope.editValues = [];
                 }
-                if (scope.edit.specialization && scope.edit.specialization.type === 'Constraint' && scope.edit.specialization.specification) {
-                    scope.edit.specialization.specification = _.cloneDeep(scope.element.specialization.specification);
-                    scope.editValues = [scope.edit.specialization.specification];
-                    scope.editValue = scope.edit.specialization.specification;
+                if (scope.edit.type === 'Slot' && angular.isArray(scope.edit.value)) {
+                    scope.edit.value = _.cloneDeep(scope.element.value);
+                    scope.editValues = scope.edit.value;
+                }
+                if (scope.edit.type === 'Constraint' && scope.edit.specification) {
+                    scope.edit.specification = _.cloneDeep(scope.element.specification);
+                    scope.editValues = [scope.edit.specification];
+                    scope.editValue = scope.edit.specification;
                 }
             }
         }
@@ -245,40 +254,40 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Wo
      */
     var isEnumeration = function(elt, ws, version) {
         var deferred = $q.defer();
-        if (elt.appliedMetatypes && elt.appliedMetatypes.length > 0 && 
-            elt.appliedMetatypes[0] === ENUM_ID) {
+        if (elt.type === 'Enumeration') {
             var isEnumeration = true;
-            ElementService.getOwnedElements(elt.sysmlid, false, ws, version, 1).then(
+            ElementService.getOwnedElements(elt.sysmlId, false, ws, version, 1).then(
                 function(val) {
                     var newArray = [];
                      // Filter for enumeration type
                     for (var i = 0; i < val.length; i++) {
-                        if( val[i].appliedMetatypes && val[i].appliedMetatypes.length > 0 && 
-                            val[i].appliedMetatypes[0] === ENUM_LITERAL) {
+                        if( val[i].type === 'EnumerationLiteral') {
                             newArray.push(val[i]);
                         }
                     }
-                    deferred.resolve({options:newArray,isEnumeration: isEnumeration});
+                    deferred.resolve({options: newArray, isEnumeration: isEnumeration});
                 },
                 function(reason) {
                     deferred.reject(reason);
                 }
             );
         } else {
-            deferred.resolve({options:[],isEnumeration: false});
+            deferred.resolve({options: [], isEnumeration: false});
         }
         return deferred.promise;
     };
 
     var getPropertySpec = function(elt, ws, version) {
         var deferred = $q.defer();
-        var id = elt.specialization.propertyType;
+        var id = elt.typeId;
         var isSlot = false;
         var isEnum = false;
         var options = [];
-        if (elt.specialization.isSlot) 
+        if (elt.type === 'Slot') {
             isSlot = true;
-        if (!id) { //no property type, will not be enum
+            id = elt.definingFeatureId;
+        }
+        if (!id)) { //no property type, will not be enum
             deferred.resolve({options: options, isEnumeration: isEnum, isSlot: isSlot});
             return deferred.promise;
         }
@@ -286,12 +295,12 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Wo
         ElementService.getElement(id,false,ws,version)
         .then(function(value){
             if (isSlot) {
-                if (!value.specialization || !value.specialization.propertyType) {
+                if (!value.typeId) {
                     deferred.resolve({options: options, isEnumeration: isEnum, isSlot: isSlot});
                     return;
                 }
                 //if specialization is a slot  
-                ElementService.getElement(value.specialization.propertyType,false,ws,version)
+                ElementService.getElement(value.typeId,false,ws,version)
                 .then(function(val) {
                     isEnumeration(val)
                     .then(function(enumValue) {
@@ -326,20 +335,20 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Wo
 
         if (mmsViewCtrl.isEditable() && !scope.isEditing && scope.element.editable && scope.version === 'latest') { 
 
-            var id = editObj ? editObj.sysmlid : scope.mmsEid;
+            var id = editObj ? editObj.sysmlId : scope.mmsEid;
             ElementService.getElementForEdit(id, false, scope.ws)
             .then(function(data) {
                 scope.isEditing = true;
                 scope.recompileEdit = false;
                 scope.edit = data;
 
-                if (data.specialization.type === 'Property' && angular.isArray(data.specialization.value)) {
-                    scope.editValues = data.specialization.value;
+                if (data.type === 'Property' && angular.isArray(data.value)) {
+                    scope.editValues = data.value;
                     if (scope.isEnumeration && scope.editValues.length === 0)
                         scope.editValues.push({type: 'InstanceValue', instance: null});
                 }
-                if (data.specialization.type === 'Constraint' && data.specialization.specification) {
-                    scope.editValues = [data.specialization.specification];
+                if (data.type === 'Constraint' && data.specification) {
+                    scope.editValues = [data.specification];
                 }
 
                 if (template) {
@@ -385,7 +394,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Wo
         else
             bbApi.toggleButtonSpinner('presentation-element-saveC');
         scope.elementSaving = true;
-        var id = editObj ? editObj.sysmlid : scope.mmsEid;
+        var id = editObj ? editObj.sysmlId : scope.mmsEid;
 
         $timeout(function() {
         // If it is a Section, then merge the changes b/c deletions to the Section's contents
@@ -404,7 +413,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Wo
 
         // Want the save object to contain only what properties were edited:
         var myEdit = {
-                        sysmlid: scope.edit.sysmlid,
+                        sysmlId: scope.edit.sysmlId,
                         modified: scope.edit.modified,
                         read: scope.edit.read
                      };
@@ -413,17 +422,17 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Wo
             if (scope.edit.name !== scope.element.name) //if editing presentation element name
                 myEdit.name = scope.edit.name;
         } else if (type === 'value') {
-            if (scope.edit.specialization.type === 'Property' && angular.isArray(scope.edit.specialization.value)) {
-                myEdit.specialization = {
-                                            value: scope.edit.specialization.value,
-                                            type: 'Property'
-                                        };
+            if (scope.edit.type === 'Property' || scope.edit.type === 'Port') {// && angular.isArray(scope.edit.value)) {
+                myEdit.defaultValue = scope.edit.defaultValue;
+                myEdit.type = scope.edit.type;
             }
-            if (scope.edit.specialization.type === 'Constraint' && scope.edit.specialization.specification) {
-                myEdit.specialization = {
-                                            specification: scope.edit.specialization.specification,
-                                            type: 'Constraint'
-                                        };
+            if (scope.edit.type === 'Slot' && angular.isArray(scope.edit.value)) {
+                myEdit.value = scope.edit.value;
+                myEdit.type = 'Slot';
+            }
+            if (scope.edit.type === 'Constraint' && scope.edit.specification) {
+                myEdit.specification: scope.edit.specification;
+                myEdit.type = 'Constraint';
             }
         } else {
             myEdit = scope.edit;
@@ -499,14 +508,14 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Wo
             growl.info('Please Wait...');
             return;
         }
-        var id = section ? section.sysmlid : scope.view.sysmlid;
+        var id = section ? section.sysmlId : scope.view.sysmlId;
         ElementService.isCacheOutdated(id, scope.ws)
         .then(function(status) {
             if (status.status) {
-                if (section && section.specialization.instanceSpecificationSpecification && !angular.equals(section.specialization.instanceSpecificationSpecification, status.server.specialization.instanceSpecificationSpecification)) {
+                if (section && section.specification && !angular.equals(section.specification, status.server.specification)) {
                     growl.error('The view section contents is outdated, refresh the page first!');
                     return;
-                } else if (!section && scope.view.specialization.contents && !angular.equals(scope.view.specialization.contents, status.server.specialization.contents)) {
+                } else if (!section && scope.view.contents && !angular.equals(scope.view.contents, status.server.contents)) {
                     growl.error('The view contents is outdated, refresh the page first!');
                     return;
                 }
@@ -534,7 +543,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Wo
         });
         instance.result.then(function() {
 
-            var viewOrSecId = section ? section.sysmlid : scope.view.sysmlid;
+            var viewOrSecId = section ? section.sysmlId : scope.view.sysmlId;
             ViewService.deleteElementFromViewOrSection(viewOrSecId, scope.ws, scope.instanceVal).then(function(data) {
                 if (ViewService.isSection(scope.instanceSpec) || ViewService.isTable(scope.instanceSpec) || ViewService.isFigure(scope.instanceSpec)) {
                     // Broadcast message to TreeCtrl:

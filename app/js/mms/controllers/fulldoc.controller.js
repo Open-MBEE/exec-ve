@@ -28,7 +28,7 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
     if (!$rootScope.mms_ShowEdits)
         $rootScope.mms_ShowEdits = false;
     $scope.buttons = [];
-    views.push({id: document.sysmlid, api: {
+    views.push({id: document.sysmlId, api: {
         init: function(dis) {
             if ($rootScope.veCommentsOn) {
                 dis.toggleShowComments();
@@ -41,7 +41,7 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
             }
         }
     }});
-    var view2view = document.specialization.view2view;
+    var view2view = document.view2view;
     var view2children = {};
     ViewService.setCurrentView(document);
     var buildViewElt = function(vId, curSec) {
@@ -73,18 +73,18 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
 
     var seenViewIds = {};
     function handleSingleView(v, aggr) {
-        var childIds = view2children[v.sysmlid];
+        var childIds = view2children[v.sysmlId];
         if (!childIds)
             childIds = [];
-        view2children[v.sysmlid] = childIds;
-        if (!v.specialization.childViews || v.specialization.childViews.length === 0 || aggr === 'NONE') {
+        view2children[v.sysmlId] = childIds;
+        if (!v.childViews || v.childViews.length === 0 || aggr === 'NONE') {
             return childIds;
         }
-        for (var i = 0; i < v.specialization.childViews.length; i++) {
-            if (seenViewIds[v.specialization.childViews[i].id])
+        for (var i = 0; i < v.childViews.length; i++) {
+            if (seenViewIds[v.childViews[i].id])
                 continue;
-            seenViewIds[v.specialization.childViews[i].id] = true;
-            childIds.push(v.specialization.childViews[i].id);
+            seenViewIds[v.childViews[i].id] = true;
+            childIds.push(v.childViews[i].id);
         }
         return childIds;
     }
@@ -98,14 +98,14 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
         view2children[view.id] = view.childrenViews;
     });
   
-    view2children[document.sysmlid].forEach(function(cid) {
+    view2children[document.sysmlId].forEach(function(cid) {
         addToArray(cid, num);
         num = num + 1;
     });
   } else {
-    view2children[document.sysmlid] = [];
-    if (!document.specialization.childViews)
-        document.specialization.childViews = [];
+    view2children[document.sysmlId] = [];
+    if (!document.childViews)
+        document.childViews = [];
     MmsAppUtils.handleChildViews(document, 'COMPOSITE', $scope.ws, time, handleSingleView, handleChildren)
     .then(function(childIds) {
         for (var i = 0; i < childIds.length; i++) {
@@ -241,14 +241,14 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
 
     $scope.searchOptions= {};
     $scope.searchOptions.callback = function(elem) {
-        $scope.tscClicked(elem.sysmlid);
+        $scope.tscClicked(elem.sysmlId);
     };
     $scope.searchOptions.emptyDocTxt = 'This field is empty.';
     $scope.searchOptions.searchInput = $stateParams.search;
     $scope.searchOptions.searchResult = $scope.search;    
 
     $scope.searchGoToDocument = function (doc, view, elem) {//siteId, documentId, viewId) {
-        $state.go('workspace.site.document.view', {site: doc.siteCharacterizationId, document: doc.sysmlid, view: view.sysmlid, tag: undefined, search: undefined});
+        $state.go('workspace.site.document.view', {site: doc.siteCharacterizationId, document: doc.sysmlId, view: view.sysmlId, tag: undefined, search: undefined});
     };
     $scope.searchOptions.relatedCallback = $scope.searchGoToDocument;
 }]);
