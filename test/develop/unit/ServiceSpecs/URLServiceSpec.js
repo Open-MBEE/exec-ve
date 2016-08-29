@@ -97,8 +97,49 @@ describe("URLService", function () {
 
     describe('Method getOwnedElementURL', function () {
         it('should create the url for all owned elements', inject(function () {
-            
+            var id        = "54352";
+            var workspace = "master";
+            var version   = "19";
+            var depth     = 15;
+            var url       = URLService.getOwnedElementURL(id, workspace, version, depth);
+            expect(url).toEqual("/alfresco/service/workspaces/" + workspace + "/elements/" + id + "/versions/" + version + "?depth=" + depth);
+
+            version = "latest";
+            url     = URLService.getOwnedElementURL(id, workspace, version, depth);
+            expect(url).toEqual("/alfresco/service/workspaces/" + workspace + "/elements/" + id + "?depth=" + depth);
+
+            version = "8008-13-80T08:13:14.666-1232";
+            url     = URLService.getOwnedElementURL(id, workspace, version, depth);
+            expect(url).toEqual("/alfresco/service/workspaces/" + workspace + "/elements/" + id + "?timestamp=" + version + "&depth=" + depth);
         }));
     });
 
+    describe('Method getDocumentViewsURL', function () {
+        it('should create the url for the document views', inject(function () {
+            var id        = "54352";
+            var workspace = "master";
+            var version   = "19";
+            var url       = URLService.getDocumentViewsURL(id, workspace, version, false);
+            expect(url).toBe(root + "/workspaces/" + workspace + "/products/" + id + "/views/versions/" + version);
+
+            url = URLService.getDocumentViewsURL(id, workspace, version, true);
+            expect(url).toBe(root + "/workspaces/" + workspace + "/products/" + id + "/views/versions/" + version + "?simple=true");
+        }));
+    });
+
+    describe('Method getViewsElementsURL', function () {
+        it('should create the url for the view elements', inject(function () {
+
+            var id        = "35881";
+            var workspace = "minion";
+            var version   = "latest";
+
+            var url = URLService.getViewElementsURL(id, workspace, version);
+            expect(url).toBe(root + "/workspaces/" + workspace + "/views/" + id + "/elements");
+
+            version = "666";
+            url = URLService.getViewElementsURL(id, workspace, version);
+            expect(url).toBe(root + "/workspaces/" + workspace + "/views/" + id + "/elements/versions/" + version);
+        }));
+    });
 });
