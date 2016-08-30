@@ -175,7 +175,6 @@ describe('UtilsService', function () {
             var a      = {specialization: {specialization: {hello: 'world'}}};
             var b      = {specialization: {specialization: {hello: 'world', foo: 'bar'}}};
             var result = UtilsService.filterProperties(a, b);
-            console.log("result.specialization.specialization.foo -- " + result.specialization.specialization.foo);
             expect(result.specialization.specialization.hello).toEqual('world');
             //result should equal just foo.....
             // this is used to merge in only the keys that are new!
