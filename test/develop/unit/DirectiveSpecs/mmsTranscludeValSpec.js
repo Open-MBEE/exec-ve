@@ -1,6 +1,6 @@
 'use strict';
 
-describe('mmsTranscludeName directive', function () {
+describe('mmsTranscludeVal directive', function () {
     var scope; //scope when directive is called
     var element; //dom element mms-transclude-name
     var $rootScope, $compile, CacheService, UtilsService, $httpBackend, requestHandler;
@@ -219,16 +219,11 @@ describe('mmsTranscludeName directive', function () {
         var cacheKey = UtilsService.makeElementKey(scope.testElement.sysmlid, 'master', 'latest', false);
         CacheService.put(cacheKey, scope.testElement);
 
-        // $httpBackend
-        //     .expectGET('/alfresco/service/workspaces/master/elements/valueViewId')
-        //     .respond(merpElement);
         element = angular.element('<mms-transclude-val data-mms-eid="{{testElement.sysmlid}}"></mms-transclude-val>');
         $compile(element)(scope);
         scope.$digest();
 
-        // console.log(element.html());
         expect(element.html()).toContain("foo8");
         expect(element.html()).toContain('ng-switch-when="OpaqueExpression"');
-        // $httpBackend.flush();
     }));
 });
