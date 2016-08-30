@@ -45,13 +45,10 @@ describe('mmsTranscludeVal directive', function () {
                     "string"         : "RestrictedValue"
                 }]
             }];
-
             scope.version    = "latest";
             scope.editValues = [43, 42, 55, 2532];
             scope.view       = {sysmlid: 'valueViewId', name: 'merpity', values: [43221, 5432]};
-
         });
-
     });
 
     afterEach(function () {
