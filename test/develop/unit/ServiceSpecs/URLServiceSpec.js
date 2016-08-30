@@ -6,13 +6,14 @@
 describe("URLService", function () {
     beforeEach(module('mms'));
 
-    var ApplicationService, URLService, $httpBackend, $rootScope, $http, root;
+    var ApplicationService, URLService, $httpBackend, $rootScope, $http, $q, root;
 
     beforeEach(inject(function ($injector) {
         URLService   = $injector.get('URLService');
         $http        = $injector.get('$http');
         $httpBackend = $injector.get('$httpBackend');
         $rootScope   = $injector.get('$rootScope');
+        $q           = $injector.get('$q');
         it('should get the root url', inject(function () {
             root = URLService.getRoot();
             expect(root).toBeDefined();
@@ -129,7 +130,6 @@ describe("URLService", function () {
 
     describe('Method getViewsElementsURL', function () {
         it('should create the url for the view elements', inject(function () {
-
             var id        = "35881";
             var workspace = "minion";
             var version   = "latest";
@@ -138,8 +138,26 @@ describe("URLService", function () {
             expect(url).toBe(root + "/workspaces/" + workspace + "/views/" + id + "/elements");
 
             version = "666";
-            url = URLService.getViewElementsURL(id, workspace, version);
+            url     = URLService.getViewElementsURL(id, workspace, version);
             expect(url).toBe(root + "/workspaces/" + workspace + "/views/" + id + "/elements/versions/" + version);
+        }));
+    });
+
+    xdescribe('Method handleHttpStatus', function () {
+        it('should do something silly', inject(function () {
+            var data     = "merp";
+            var statuses = [404, 500, 401, 403, 409, 400, 410, 408];
+            var header   = {"merp": "derp"};
+            var config   = "This is a config";
+            var deferred = $q.defer();
+            var promise = deferred.promise;
+            var result = [];
+            for (var i = 0; i < statuses.length; i++) {
+                console.log("Status " + statuses[i]);
+                URLService.handleHttpStatus(data, statuses[i], header, config, deferred);
+                console.log(JSON.stringify(deferred));
+                deferred.resolve();
+            }
         }));
     });
 });
