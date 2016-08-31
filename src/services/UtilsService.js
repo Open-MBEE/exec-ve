@@ -590,7 +590,7 @@ function UtilsService(CacheService, _) {
     tag = ve tag name if available
     displayTime = tag time or generation time as mm/dd/yy hh:mm am/pm
     */
-    var getPrintCss = function(header, footer, dnum, tag, displayTime, landscape) {
+    var getPrintCss = function(header, footer, dnum, tag, displayTime, landscape, meta) {
         var ret = "img {max-width: 100%; page-break-inside: avoid; page-break-before: auto; page-break-after: auto; display: block;}\n" + 
                 " tr, td, th { page-break-inside: avoid; } thead {display: table-header-group;}\n" + 
                 ".pull-right {float: right;}\n" + 
@@ -621,7 +621,19 @@ function UtilsService(CacheService, _) {
                 "@page {margin: 0.5in;}\n";
                 //"@page big_table {  size: 8.5in 11in; margin: 0.75in; prince-shrink-to-fit:auto;}\n" +  //size: 11in 8.5in;
                 //".big-table {page: big_table; max-width: 1100px; }\n";
-        if (header && header !== '') {
+        Object.keys(meta).forEach(function(key) {
+            var content = '""';
+            if (meta[key]) {
+                if (meta[key] === 'counter(page)')
+                    content = meta[key];
+                else
+                    content = '"' + meta[key] + '"';
+                ret += '@page {@' + key + ' {font-size: 10px; content: ' + content + ';}}\n';
+            }
+        });
+        //ret += "@page { @bottom-right { content: counter(page); }}\n";
+
+        /*if (header && header !== '') {
             ret += '@page { @top { font-size: 10px; content: "' + header + '";}}\n';
         }
         if (footer && footer !== '') {
@@ -632,7 +644,7 @@ function UtilsService(CacheService, _) {
             ret += "@page { @top-right { font-size: 10px; content: '" + tag + "';}}\n";
         } else {
             ret += "@page { @top-right { font-size: 10px; content: '" + displayTime + "';}}\n";
-        }
+        }*/
         if (landscape)
             ret += "@page {size: 11in 8.5in;}";
                 //"@page{prince-shrink-to-fit:auto;size: A4 portrait;margin-left:8mm;margin-right:8mm;}";
