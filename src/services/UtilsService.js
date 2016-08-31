@@ -220,9 +220,9 @@ function UtilsService(CacheService, _) {
      * @param {object} source the element object to merge in 
      * @param {string} eid id of element
      * @param {string} [workspace=master] workspace
-     * @param {boolean} [updateEdit=false] 
+     * @param {boolean} [updateEdit=false] updateEdit
      * @param {string} property type of property, ie transclusion or not
-     * @returns void 
+     * @returns {void} nothing 
      */
 
     var mergeElement = function(source, eid, workspace, updateEdit, property) {
@@ -266,7 +266,7 @@ function UtilsService(CacheService, _) {
      *
      * @param {Object} a Element Object
      * @param {Object} b Element Object
-     * @returns {Object} 
+     * @returns {Object} new object
      */
     var filterProperties = function(a, b) {
         var res = {};
@@ -493,7 +493,7 @@ function UtilsService(CacheService, _) {
             var cap1 = el.find('table > caption');
             cap1.html('Table ' + cap);//cap.html());
             if (cap1.length === 0) {
-                //var table = el.find('table');
+                el.find('table').prepend('<caption>Table ' + cap + '</caption>');
             }
             // Change cap value based on showRefName true/false
             if (showRefName) {
@@ -526,19 +526,20 @@ function UtilsService(CacheService, _) {
             ob.equationCount++;
             cap = ob.equationCount + '. ' + child.data.name;
             ob.equations += '<li><a href="#' + sysmlid + '">' + cap + '</a></li>';
+            var equationCap = '(' + ob.equationCount + ')';
             var cap2 = el.find('.mms-equation-caption');
-            cap2.html('Equation ' + cap);
+            cap2.html(equationCap);
             if (cap2.length === 0) {
-                el.find('mms-view-equation').after('<div class="mms-equation-caption">Equation ' + cap + '</div>');
+                el.find('mms-view-equation').append('<div class="mms-equation-caption pull-right">' + equationCap + '</div>');
             }
             // Change cap value based on showRefName true/false
             if (showRefName) {
                 cap = ob.equationCount + '. ' + child.data.name;
             } else cap = ob.equationCount;
             if (live)
-                refs.find('a').html('Eq. ' + cap);
+                refs.find('a').html('Eq. ' + equationCap);
             else
-                refs.html('<a href="#' + sysmlid + '">Eq. ' + cap + '</a>');
+                refs.html('<a href="#' + sysmlid + '">Eq. ' + equationCap + '</a>');
         }
         child.children.forEach(function(child2) {
             makeTablesAndFiguresTOCChild(child2, printElement, ob, live, showRefName);
@@ -605,6 +606,8 @@ function UtilsService(CacheService, _) {
                 ".ng-hide {display: none;}\n" +
                 "body {font-size: 9pt; font-family: 'Times New Roman', Times, serif; }\n" + 
                 "caption, figcaption, .mms-equation-caption {text-align: center; font-weight: bold;}\n" +
+                ".mms-equation-caption {float: right;}\n" +
+                "mms-view-equation, mms-view-figure, mms-view-image {page-break-inside: avoid;}" + 
                 ".toc, .tof, .tot {page-break-after:always;}\n" +
                 ".toc a, .tof a, .tot a { text-decoration:none; color: #000; font-size:9pt; }\n" + 
                 ".toc .header, .tof .header, .tot .header { margin-bottom: 4px; font-weight: bold; font-size:24px; }\n" + 

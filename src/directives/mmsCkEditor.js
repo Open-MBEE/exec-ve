@@ -410,6 +410,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
             { name: 'links',       items : [ 'Link','Unlink' ] },
             { name: 'insert',      items : [ 'PageBreak','HorizontalRule','CodeSnippet' ] },
         ];
+        var justifyToolbar =  { name: 'paragraph',   items : [ 'JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock' ] };
         var listToolbar =     { name: 'list',     items: [ 'NumberedList','BulletedList','Outdent','Indent' ] };
         var tableToolbar =    { name: 'table',    items: [ 'Table' ] };
         var imageToolbar =    { name: 'image',    items: [ 'Image','Iframe' ] };
@@ -438,7 +439,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
           thisToolbar = [sourceToolbar, imageToolbar];
         }
         if (scope.mmsEditorType === 'Equation') {
-            thisToolbar = [sourceToolbar, equationToolbar];
+            thisToolbar = [sourceToolbar, equationToolbar, justifyToolbar];
         }
 
         $timeout(function() {

@@ -262,23 +262,40 @@ function mmsTree($timeout, $log, $templateCache) {
             var add_branch_to_list = function(level, section, branch, visible) {
                 var expand_icon = "";
                 var type_icon = "";
+                var aggr = branch.aggr;
+                if (!aggr)
+                    aggr = "";
+                else
+                    aggr = '-' + aggr.toLowerCase();
                 var status_properties = { style: "" };
-
+                var i, j = 0;
                 if (!branch.expanded)
                     branch.expanded = false;
                 if ((branch.children && branch.children.length > 0) || (branch.expandable === true)) {
-                    if (branch.expanded) {
-                        expand_icon = attrs.iconCollapse;
-                    } else {
-                        expand_icon = attrs.iconExpand;
+                    var haveVisibleChild = false;
+                    if (branch.type !== 'view' && branch.type !== 'section')
+                        haveVisibleChild = true;
+                    for (i = 0; i < branch.children.length; i++) {
+                        if (!branch.children[i].hide) {
+                            haveVisibleChild = true;
+                            break;
+                        }
                     }
+                    if (haveVisibleChild) {
+                        if (branch.expanded) {
+                            expand_icon = attrs.iconCollapse;
+                        } else {
+                            expand_icon = attrs.iconExpand;
+                        }
+                    } else
+                        expand_icon = "fa fa-lg fa-fw";
                 } else
                     expand_icon = "fa fa-lg fa-fw";
 
                 if (branch.loading)
                     type_icon = "fa fa-spinner fa-spin";
-                else if (scope.options && scope.options.types && scope.options.types[branch.type.toLowerCase()])
-                    type_icon = scope.options.types[branch.type.toLowerCase()];
+                else if (scope.options && scope.options.types && scope.options.types[branch.type.toLowerCase() + aggr])
+                    type_icon = scope.options.types[branch.type.toLowerCase() + aggr];
                 else
                     type_icon = attrs.iconDefault;
 
@@ -304,7 +321,7 @@ function mmsTree($timeout, $log, $templateCache) {
                     if (scope.options.sort) {
                         branch.children.sort(scope.options.sort);
                     }
-                    for (var i = 0, j = 0; i < branch.children.length; i++) {
+                    for (i = 0, j = 0; i < branch.children.length; i++) {
                         var child_visible = visible && branch.expanded;
                         var sectionChar = '.';
                         var sectionValue = '';
