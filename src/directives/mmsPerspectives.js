@@ -156,7 +156,7 @@ function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigSe
             //     "onfailure":"onPerspectivesCommandFailure",
             //     "data": {
             //         "project": id,
-            //         "module":"MMS",
+            //         "module": "SysML",
             //         "integratorIDs":["int-save-" + id]
             //     }
             // };
@@ -170,7 +170,7 @@ function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigSe
                         "serverClassName": "gov.nasa.jpl.mbee.ems.action.GetElementIdsCommandImpl",
                         "args": [scope.mmsTspSpec.tstype],
                         "modelID": 'model-' + id,
-                        "module": "MMS",
+                        "module": "SysML",
                         "project": id,
                         "viewID": "view-" + id,
                         "viewName": viewName
@@ -201,7 +201,7 @@ function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigSe
                                 "attributeName": "AddElements",
                                 "attributeValue": getElementsArrayString([eid]),
                                 "modelID": 'model-' + id,
-                                "module": "MMS",
+                                "module": "SysML",
                                 "project": id,
                                 "viewID": "view-" + id,
                                 "viewName": viewName
@@ -215,7 +215,7 @@ function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigSe
                                 "serverClassName": "gov.nasa.jpl.mbee.ems.action.ResetIntegratorCommandImpl",
                                 "args": ["int-add-" + id],
                                 "modelID": 'model-' + id,
-                                "module": "MMS",
+                                "module": "SysML",
                                 "project": id,
                                 "viewID": "view-" + id,
                                 "viewName": viewName
@@ -227,7 +227,7 @@ function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigSe
                             "onfailure":"onPerspectivesCommandFailure",
                             "data": {
                                 "project": id,
-                                "module":"MMS",
+                                "module": "SysML",
                                 "integratorIDs":["int-add-" + id]
                             }
                         },
@@ -254,7 +254,7 @@ function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigSe
                     "command":"NewDefaultModel",
                     "data": {
                         "project": id,
-                        "module":"MMS",
+                        "module": "SysML",
                         "modelID":"model-" + id
                     }
                 },
@@ -262,18 +262,40 @@ function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigSe
                     "command":"NewIntegrator",
                     "data": {
                         "project": id,
-                        "module":"MMS",
+                        "module": "SysML",
                         "modelID":"model-" + id,
                         "integratorName":"MMS ADD",
-                        "integratorID":"int-add-" + id,
+                        "integratorID":"int-add-" + id
                         //"integratorFileLocation": "https://cae-ems.jpl.nasa.gov/alfresco/service"
+                    }
+                },
+                //temporary until new json format is implemented 
+                {
+                    "command":"NewIntegrator",
+                    "data": {
+                        "project": id,
+                        "module": "SysML",
+                        "modelID":"model-" + id,
+                        "integratorName":"System Model Data",
+                        "integratorID":"int-smd-" + id
+                    }
+                },
+                {
+                    "command":"NewIntegrator",
+                    "data": {
+                        "project": id,
+                        "module": "SysML",
+                        "modelID":"model-" + id,
+                        "integratorName":"Filter Control Data",
+                        "integratorID":"int-fcd-" + id,
+                        "integratorFileLocation": "data/SysMLFilterDefaults.xlsx"
                     }
                 },
                 {
                     "command":"NewView",
                     "data": {
                         "project": id,
-                        "module":"MMS",
+                        "module": "SysML",
                         "modelID":"model-" + id,
                         "viewID":"view-" + id,
                         "viewName": viewName,
@@ -294,7 +316,7 @@ function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigSe
                         "serverClassName": "gov.nasa.jpl.mbee.ems.action.SetMmsRestBaseUrlCommandImpl",
                         "args": ["int-add-" + id, "https://cae-ems-uat.jpl.nasa.gov/alfresco/service"],
                         "modelID": 'model-' + id,
-                        "module": "MMS",
+                        "module": "SysML",
                         "project": id,
                         "viewID": "view-" + id,
                         "viewName": viewName
@@ -306,7 +328,7 @@ function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigSe
                         "attributeName": "AddElements",
                         "attributeValue": getElementsArrayString(initElements),
                         "modelID": 'model-' + id,
-                        "module": "MMS",
+                        "module": "SysML",
                         "project": id,
                         "viewID": "view-" + id,
                         "viewName": viewName
@@ -319,7 +341,7 @@ function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigSe
                         "attributeName": "Ticket",
                         "attributeValue": AuthService.getTicket(),
                         "modelID": 'model-' + id,
-                        "module": "MMS",
+                        "module": "SysML",
                         "project": id,
                         "viewID": "view-" + id,
                         "viewName": viewName
@@ -332,8 +354,9 @@ function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigSe
                     "onfailure":"onPerspectivesCommandFailure",
                     "data": {
                         "project": id,
-                        "module":"MMS",
-                        "integratorIDs":["int-add-" + id]
+                        "module": "SysML",
+                        //"integratorIDs":["int-add-" + id]
+                        "integratorIDs":["int-smd-" + id, "int-fcd-" + id]
                     }
                }
             ]
