@@ -37,16 +37,16 @@
       <h6>Header and Footer</h6>
       <div>Use 'counter(page)' for page number.</div>
         <div class="form-group">
-            <label for="header" style="text-align:center;">Header:</label>
-            <input type="text" class="form-control" ng-model="meta['top-left']" placeholder="Left">
-            <input type="text" class="form-control" ng-model="meta.top" placeholder="Center">
-            <input type="text" class="form-control" ng-model="meta['top-right']" placeholder="Right">
+            <div style="text-align:center;">Header:</div>
+            <input type="text" ng-model="meta['top-left']" size="11" placeholder="Left">
+            <input type="text" ng-model="meta.top" size="55" placeholder="Center">
+            <input type="text" ng-model="meta['top-right']" size="11" placeholder="Right">
         </div>
         <div class="form-group">
-            <label for="footer" style="text-align:center;" >Footer:</label>
-            <input type="text" class="form-control" ng-model="meta['bottom-left']" placeholder="Left">
-            <input type="text" class="form-control" ng-model="meta.bottom" placeholder="Center">
-            <input type="text" class="form-control" ng-model="meta['bottom-right']" placeholder="Right">
+            <div for="footer" style="text-align:center;" >Footer:</div>
+            <input type="text" ng-model="meta['bottom-left']" size="11" placeholder="Left">
+            <input type="text" ng-model="meta.bottom" size="55" placeholder="Center">
+            <input type="text" ng-model="meta['bottom-right']" size="11" placeholder="Right">
         </div>
     </form>
 </div>
