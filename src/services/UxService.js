@@ -40,7 +40,7 @@ function UxService($rootScope) {
                     getToolbarButton("element-editor-save"), getToolbarButton('element-editor-saveC'),
                     getToolbarButton("element-editor-saveall"), getToolbarButton("element-editor-cancel") ]};
       case "view-reorder":
-        return {id: button, icon: 'fa-arrows-v', selected: false, active: true, permission:false, tooltip: 'Reorder View',
+        return {id: button, icon: 'fa-arrows-v', selected: false, active: true, permission:false, tooltip: 'Reorder Content',
                 spinner: false, onClick: function() {$rootScope.$broadcast(button);},
                 dynamic_buttons: [getToolbarButton("view-reorder-save"), getToolbarButton("view-reorder-cancel")]};
       case "document-snapshot":
