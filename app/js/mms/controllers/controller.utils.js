@@ -263,24 +263,29 @@ function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templ
                 $scope.action = 'print';
                 $scope.genpdf = false;
                 $scope.meta = {
-                    headerLeft: '', headerCenter: '', headerRight: '',
-                    footerLeft: '', footerCenter: '', footerRight: ''
+                    'top-left': 'loading...', top: 'loading...', 'top-right': 'loading...',
+                    'bottom-left': 'loading...', bottom: 'loading...', 'bottom-right': 'loading...'
                 };
                 if (isDoc) {
                     ViewService.getDocMetadata(ob.sysmlid, ws, null, 2)
                     .then(function(metadata) {
-                        $scope.meta.headerCenter = metadata.header ? metadata.header : '';
-                        $scope.meta.footerCenter = metadata.footer ? metadata.footer : '';
-                        $scope.meta.headerLeft = metadata.dnumber ? metadata.dnumber : '';
-                        $scope.meta.headerRight = metadata.version ? metadata.version : '';
+                        $scope.meta.top = metadata.header ? metadata.header : '';
+                        $scope.meta.bottom = metadata.footer ? metadata.footer : '';
+                        $scope.meta['top-left'] = metadata.dnumber ? metadata.dnumber : '';
+                        $scope.meta['top-right'] = metadata.version ? metadata.version : '';
                         if (tag && tag.name !== 'latest')
-                            $scope.meta.headerRight = $scope.meta.headerRight + ' ' + tag.name;
+                            $scope.meta['top-right'] = $scope.meta['top-right'] + ' ' + tag.name;
                         var displayTime = time;
                         if (displayTime === 'latest') {
                             displayTime = new Date();
                             displayTime = $filter('date')(displayTime, 'M/d/yy h:mm a');
                         }
-                        $scope.meta.headerRight = $scope.meta.headerRight + ' ' + displayTime;
+                        $scope.meta['top-right'] = $scope.meta['top-right'] + ' ' + displayTime;
+                        $scope.meta['bottom-left'] = '';
+                        $scope.meta['bottom-right'] = 'counter(page)';
+                    }, function(reason) {
+                        $scope.meta['top-left'] = $scope.meta.top = $scope.meta['top-right'] = $scope.meta['bottom-left'] = $scope.meta.bottom = '';
+                        $scope.meta['bottom-right'] = 'counter(page)';
                     });
                 }
                 $scope.unsaved = ($rootScope.veEdits && !_.isEmpty($rootScope.veEdits));

@@ -621,17 +621,17 @@ function UtilsService(CacheService, _) {
                 "@page {margin: 0.5in;}\n";
                 //"@page big_table {  size: 8.5in 11in; margin: 0.75in; prince-shrink-to-fit:auto;}\n" +  //size: 11in 8.5in;
                 //".big-table {page: big_table; max-width: 1100px; }\n";
-        if (meta.headerCenter)
-            ret += '@page {@top {font-size: 10px; content: "' + meta.headerCenter + '";}}\n';
-        if (meta.footerCenter)
-            ret += '@page {@bottom { font-size: 10px; content: "' + meta.footerCenter + '";}}\n';
-        if (meta.headerLeft)
-            ret += '@page {@top-left {font-size: 10px; content: "' + meta.headerLeft + '";}}\n';
-        if (meta.headerRight)
-            ret += '@page {@top-right {font-size: 10px; content: "' + meta.headerRight + '";}}\n';
-        if (meta.footerLeft)
-            ret += '@page {@bottom-left {font-size: 10px; content: "' + meta.footerLeft + '";}}\n';
-        ret += "@page { @bottom-right { content: counter(page); }}\n";
+        Object.keys(meta).forEach(function(key) {
+            var content = '""';
+            if (meta[key]) {
+                if (meta[key] === 'counter(page)')
+                    content = meta[key];
+                else
+                    content = '"' + meta[key] + '"';
+                ret += '@page {@' + key + ' {font-size: 10px; content: ' + content + ';}}\n';
+            }
+        });
+        //ret += "@page { @bottom-right { content: counter(page); }}\n";
 
         /*if (header && header !== '') {
             ret += '@page { @top { font-size: 10px; content: "' + header + '";}}\n';
