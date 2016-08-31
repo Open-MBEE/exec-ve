@@ -5,8 +5,8 @@
 angular.module('mmsApp')
 .controller('TreeCtrl', ['$anchorScroll' , '$q', '$filter', '$location', '$uibModal', '$scope', '$rootScope', '$state', '$stateParams', '$compile','$timeout', 'growl', 
                           'UxService', 'ConfigService', 'ElementService', 'UtilsService', 'WorkspaceService', 'ViewService', 'MmsAppUtils',
-                          'workspaces', 'workspaceObj', 'tag', 'sites', 'site', 'document', 'views', 'view', 'time', 'configSnapshots', 'docFilter',
-function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $stateParams, $compile, $timeout, growl, UxService, ConfigService, ElementService, UtilsService, WorkspaceService, ViewService, MmsAppUtils, workspaces, workspaceObj, tag, sites, site, document, views, view, time, configSnapshots, docFilter) {
+                          'workspaces', 'workspaceObj', 'tag', 'sites', 'site', 'document', 'views', 'view', 'time', 'configSnapshots', 'docFilter', 'mmsRootSites',
+function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $stateParams, $compile, $timeout, growl, UxService, ConfigService, ElementService, UtilsService, WorkspaceService, ViewService, MmsAppUtils, workspaces, workspaceObj, tag, sites, site, document, views, view, time, configSnapshots, docFilter, mmsRootSites) {
 
     $rootScope.mms_bbApi = $scope.bbApi = {};
     $rootScope.mms_treeApi = $scope.treeApi = {};
@@ -336,20 +336,35 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         });
     };
 
+    var isSiteInProject = function(sitesMapping, site) {
+        if (mmsRootSites.length === 0)
+            return true;
+        var getRootSite = function(s) {
+            var ret = s;
+            while (ret.isCharacterization) {
+                ret = sitesMapping[ret.parent];
+            }
+            return ret;
+        };
+        var root = getRootSite(site);
+        if (mmsRootSites.indexOf(root.sysmlid) >= 0)
+            return true;
+        return false;
+    };
     // Filter out alfresco sites
     var filter_sites = function(site_array) {
         var ret_array = [];
-
-        if ($scope.bbApi.getToggleState && $scope.bbApi.getToggleState('tree-showall-sites')) {
-            ret_array = site_array;
+        var sitesMapping = {};
+        var i;
+        for (i = 0; i < site_array.length; i++) {
+            sitesMapping[site_array[i].sysmlid] = site_array[i];
         }
-        else {
-            for (var i=0; i < site_array.length; i++) {
-                var obj = site_array[i];
-                // If it is a site characterization:
-                if (obj.isCharacterization) {
-                    ret_array.push(obj);
-                }
+        for (i = 0; i < site_array.length; i++) {
+            var obj = site_array[i];
+            if ((($scope.bbApi.getToggleState && $scope.bbApi.getToggleState('tree-showall-sites')) || 
+                    obj.isCharacterization) && 
+                    isSiteInProject(sitesMapping, obj)) {
+                ret_array.push(obj);
             }
         }
         return ret_array;
@@ -508,6 +523,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 data: document,
                 children: [],
                 loading: false,
+                aggr: 'COMPOSITE'
             };
             views.forEach(function(view) {
                 var viewTreeNode = { 
@@ -515,7 +531,8 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                     type : "view",
                     data : view, 
                     children : [], 
-                    loading: false
+                    loading: false,
+                    aggr: 'COMPOSITE'
                 };
                 viewId2node[view.sysmlid] = viewTreeNode;
                     //addSectionElements(elements[i], viewTreeNode, viewTreeNode);
@@ -576,6 +593,12 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         };
 
         var addContentsSectionTreeNode = function(operand) {
+            var bulkGet = [];
+            operand.forEach(function(instanceVal) {
+                bulkGet.push(instanceVal.instance);
+            });
+          ElementService.getElements(bulkGet, false, ws, time, 0)
+          .then(function(ignore) {
             var instances = [];
             operand.forEach(function(instanceVal) {
                 instances.push(ElementService.getElement(instanceVal.instance, false, ws, time, 0));
@@ -624,6 +647,8 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             }, function(reason) {
                 //view is bad
             });
+          }, function(reason) {
+          });
         };
 
         if (element.specialization) {
@@ -802,6 +827,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 if (itemType === 'View') {
                     viewId2node[data.sysmlid] = newbranch;
                     seenViewIds[data.sysmlid] = newbranch;
+                    newbranch.aggr = $scope.newViewAggr.type;
                     var curNum = branch.children[branch.children.length-1].section;
                     var prevBranch = $scope.treeApi.get_prev_branch(newbranch);
                     while (prevBranch.type != 'view') {

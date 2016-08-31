@@ -262,6 +262,11 @@ function mmsTree($timeout, $log, $templateCache) {
             var add_branch_to_list = function(level, section, branch, visible) {
                 var expand_icon = "";
                 var type_icon = "";
+                var aggr = branch.aggr;
+                if (!aggr)
+                    aggr = "";
+                else
+                    aggr = '-' + aggr.toLowerCase();
                 var status_properties = { style: "" };
                 var i, j = 0;
                 if (!branch.expanded)
@@ -289,8 +294,8 @@ function mmsTree($timeout, $log, $templateCache) {
 
                 if (branch.loading)
                     type_icon = "fa fa-spinner fa-spin";
-                else if (scope.options && scope.options.types && scope.options.types[branch.type.toLowerCase()])
-                    type_icon = scope.options.types[branch.type.toLowerCase()];
+                else if (scope.options && scope.options.types && scope.options.types[branch.type.toLowerCase() + aggr])
+                    type_icon = scope.options.types[branch.type.toLowerCase() + aggr];
                 else
                     type_icon = attrs.iconDefault;
 

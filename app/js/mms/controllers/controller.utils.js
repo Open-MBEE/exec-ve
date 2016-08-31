@@ -325,7 +325,8 @@ function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templ
                             workspace: ws,
                             customCss: css,
                             version: result.version,
-                            name: ob.sysmlid + '_' + time + '_' + new Date().getTime()
+                            name: ob.sysmlid + '_' + time + '_' + new Date().getTime(),
+                            disabledCoverPage: isDoc ? false : true
                         };
                         if (!choice[2]) {
                             doc.tof = '<div style="display:none;"></div>';
