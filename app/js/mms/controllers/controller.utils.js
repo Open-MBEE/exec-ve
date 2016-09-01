@@ -499,7 +499,7 @@ function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templ
         seenViews[v.sysmlId] = v;
         var childIds = [];
         var childAggrs = [];
-        if (!v.childViews || v.childViews.length === 0 || aggr === 'NONE') {
+        if (!v.childViews || v.childViews.length === 0 || aggr === 'none') {
             deferred.resolve(curItem);
             return deferred.promise;
         }

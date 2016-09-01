@@ -40,7 +40,7 @@ function($scope, $rootScope, $stateParams, document, time, ElementService, ViewS
         accept: function(sourceNodeScope, destNodeScope, destIndex) {
             if (destNodeScope.$element.hasClass('root'))
                 return false; //don't allow moving to outside doc
-            if (destNodeScope.node.aggr == 'NONE')
+            if (destNodeScope.node.aggr == 'none')
                 return false;
             return true;
         }
@@ -74,7 +74,7 @@ function($scope, $rootScope, $stateParams, document, time, ElementService, ViewS
         curNode.children.push.apply(curNode.children, newChildNodes);
     }
 
-    MmsAppUtils.handleChildViews(document, 'COMPOSITE', ws, time, handleSingleView, handleChildren)
+    MmsAppUtils.handleChildViews(document, 'composite', ws, time, handleSingleView, handleChildren)
     .then(function(docNode) {
         var num = 1;
         docNode.children.forEach(function(node) {
@@ -100,7 +100,7 @@ function($scope, $rootScope, $stateParams, document, time, ElementService, ViewS
         $scope.saveClass = "fa fa-spin fa-spinner";
         var toSave = [];
         angular.forEach(viewIds2node, function(node, id) {
-            if (node.aggr == 'NONE') //cannot process views whose aggr is none since their children are not shown
+            if (node.aggr == 'none') //cannot process views whose aggr is none since their children are not shown
                 return;
             var childViews = [];
             for (var i = 0; i < node.children.length; i++) {

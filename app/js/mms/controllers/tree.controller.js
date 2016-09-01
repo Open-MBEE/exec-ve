@@ -557,7 +557,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         } else {
             if (!document.childViews)
                 document.childViews = [];
-            MmsAppUtils.handleChildViews(document, 'COMPOSITE', ws, time, handleSingleView, handleChildren)
+            MmsAppUtils.handleChildViews(document, 'composite', ws, time, handleSingleView, handleChildren)
             .then(function(node) {
                 for (var i in viewId2node) {
                     addSectionElements(viewId2node[i].data, viewId2node[i], viewId2node[i]);
@@ -776,7 +776,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         // TODO: combine templateUrlStr into one .html
 
         $scope.itemType = itemType;
-        $scope.newViewAggr = {type: 'SHARED'};
+        $scope.newViewAggr = {type: 'shared'};
         var branch = $scope.treeApi.get_selected_branch();
         var templateUrlStr = "";
         var branchType = "";
@@ -901,7 +901,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             } else if (branch.type === "section") {
                 growl.warning("Add View Error: Cannot add a child view to a section");
                 return;
-            } else if (branch.aggr === 'NONE') {
+            } else if (branch.aggr === 'none') {
                 growl.warning("Add View Error: Cannot add a child view to a non-owned and non-shared view.");
                 return;
             }

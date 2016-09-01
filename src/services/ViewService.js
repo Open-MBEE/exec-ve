@@ -814,7 +814,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                     parentView.type = owner.type;
                 if (owner.childViews)
                     parentView.childViews = _.cloneDeep(owner.childViews);
-                parentView.childViews.push({id: newViewId, aggregation: "COMPOSITE"});
+                parentView.childViews.push({id: newViewId, aggregation: "composite"});
         }
 
         var instanceSpecDoc = '<p>&nbsp;</p><p><mms-transclude-doc data-mms-eid="' + newViewId + '">[cf:' + view.name + '.doc]</mms-transclude-doc></p><p>&nbsp;</p>';

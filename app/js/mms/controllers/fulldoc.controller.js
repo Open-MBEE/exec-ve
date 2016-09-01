@@ -77,7 +77,7 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
         if (!childIds)
             childIds = [];
         view2children[v.sysmlId] = childIds;
-        if (!v.childViews || v.childViews.length === 0 || aggr === 'NONE') {
+        if (!v.childViews || v.childViews.length === 0 || aggr === 'none') {
             return childIds;
         }
         for (var i = 0; i < v.childViews.length; i++) {
@@ -106,7 +106,7 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
     view2children[document.sysmlId] = [];
     if (!document.childViews)
         document.childViews = [];
-    MmsAppUtils.handleChildViews(document, 'COMPOSITE', $scope.ws, time, handleSingleView, handleChildren)
+    MmsAppUtils.handleChildViews(document, 'composite', $scope.ws, time, handleSingleView, handleChildren)
     .then(function(childIds) {
         for (var i = 0; i < childIds.length; i++) {
             addToArray(childIds[i], num);
