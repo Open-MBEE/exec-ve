@@ -262,6 +262,32 @@ function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templ
                 $scope.type = isDoc ? 'DOCUMENT' : 'VIEW';
                 $scope.action = 'print';
                 $scope.genpdf = false;
+                $scope.meta = {
+                    'top-left': 'loading...', top: 'loading...', 'top-right': 'loading...',
+                    'bottom-left': 'loading...', bottom: 'loading...', 'bottom-right': 'loading...'
+                };
+                if (isDoc) {
+                    ViewService.getDocMetadata(ob.sysmlid, ws, null, 2)
+                    .then(function(metadata) {
+                        $scope.meta.top = metadata.header ? metadata.header : '';
+                        $scope.meta.bottom = metadata.footer ? metadata.footer : '';
+                        $scope.meta['top-left'] = metadata.dnumber ? metadata.dnumber : '';
+                        $scope.meta['top-right'] = metadata.version ? metadata.version : '';
+                        if (tag && tag.name !== 'latest')
+                            $scope.meta['top-right'] = $scope.meta['top-right'] + ' ' + tag.name;
+                        var displayTime = time;
+                        if (displayTime === 'latest') {
+                            displayTime = new Date();
+                            displayTime = $filter('date')(displayTime, 'M/d/yy h:mm a');
+                        }
+                        $scope.meta['top-right'] = $scope.meta['top-right'] + ' ' + displayTime;
+                        $scope.meta['bottom-left'] = '';
+                        $scope.meta['bottom-right'] = 'counter(page)';
+                    }, function(reason) {
+                        $scope.meta['top-left'] = $scope.meta.top = $scope.meta['top-right'] = $scope.meta['bottom-left'] = $scope.meta.bottom = '';
+                        $scope.meta['bottom-right'] = 'counter(page)';
+                    });
+                }
                 $scope.unsaved = ($rootScope.veEdits && !_.isEmpty($rootScope.veEdits));
                 if (mode === 2)
                     $scope.action = 'save';
@@ -272,7 +298,7 @@ function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templ
                 $scope.docOption = (!isDoc && mode === 3);
                 $scope.model = {genCover: false, genTotf: false, landscape: false, htmlTotf: false};
                 $scope.print = function() {
-                    $uibModalInstance.close(['ok', $scope.model.genCover, $scope.model.genTotf, $scope.model.htmlTotf, $scope.model.landscape]);
+                    $uibModalInstance.close(['ok', $scope.model.genCover, $scope.model.genTotf, $scope.model.htmlTotf, $scope.model.landscape, $scope.meta]);
                 };
                 $scope.fulldoc = function() {
                     $uibModalInstance.close(['fulldoc']);
@@ -288,7 +314,7 @@ function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templ
             if (choice[0] === 'ok') {
                 printOrGenerate(ob, ws, time, tag, isDoc, choice[1], choice[2], choice[3], mode, choice[4])
                 .then(function(result) {
-                    var css = UtilsService.getPrintCss(result.header, result.footer, result.dnum, result.tag, result.displayTime, choice[4]);
+                    var css = UtilsService.getPrintCss(result.header, result.footer, result.dnum, result.tag, result.displayTime, choice[4], choice[5]);
                     var cover = result.cover;
                     var toc = result.toc;
                     var tof = result.tof;
