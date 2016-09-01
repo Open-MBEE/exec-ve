@@ -421,11 +421,15 @@ function UtilsService(CacheService, _) {
         if (para.sourceType === 'text')
             return para.text;
         var t = 'doc';
+        var attr = '';
         if (para.sourceProperty === 'name')
             t = 'name';
         if (para.sourceProperty === 'value')
             t = 'val';
-        return '<mms-transclude-' + t + ' data-mms-eid="' + para.source + '"></mms-transclude-' + t + '>';
+        if (para.nonEditable) {
+            attr = ' data-non-editable="' + para.nonEditable + '"';
+        }
+        return '<mms-transclude-' + t + ' data-mms-eid="' + para.source + '"' + attr + '></mms-transclude-' + t + '>';
     };
 
     var makeHtmlTOC = function (tree) {
