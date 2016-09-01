@@ -140,7 +140,7 @@ function mmsSearch(ElementService, growl, $rootScope, $templateCache, mmsRootSit
         scope.emptyDocTxt = scope.mmsOptions.emptyDocTxt;
         scope.userResultClick = function(elem, property) {
             if (scope.mmsOptions.callback) {
-                scope.mmsOptions.callback(elem, property);
+                scope.mmsOptions.callback(elem, property, scope.mmsOptions.nonEditableCheckbox);
             }
         };
         scope.userRelatedClick = function(event, doc, view, elem) {

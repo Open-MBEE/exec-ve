@@ -73,8 +73,13 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
             $scope.requestName = false;
             $scope.requestDocumentation = false;
             $scope.showProposeLink = true;
-            $scope.choose = function(elem, property) {
-                var tag = '<mms-transclude-' + property + ' data-mms-eid="' + elem.sysmlid + '">[cf:' + elem.name + '.' + property + ']</mms-transclude-' + property + '> ';
+            $scope.nonEditableCheckbox = false;
+            $scope.showEditableOp = true;
+            $scope.changeEditable = function() {
+                $scope.searchOptions.nonEditableCheckbox = $scope.nonEditableCheckbox;
+            };
+            $scope.choose = function(elem, property, nonEditable) {
+                var tag = '<mms-transclude-' + property + ' data-mms-eid="' + elem.sysmlid + '"' + ' data-non-editable="' + nonEditable + '">[cf:' + elem.name + '.' + property + ']</mms-transclude-' + property + '> ';
                 $uibModalInstance.close(tag);
             };
             $scope.cancel = function() {
@@ -83,10 +88,12 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
             $scope.openProposeModal = function() {
                 $uibModalInstance.close(false);
             };
+
              // Set search result options
             $scope.searchOptions= {};
             $scope.searchOptions.callback = $scope.choose;
             $scope.searchOptions.emptyDocTxt = 'This field is empty, but you can still click here to cross-reference a placeholder.';
+            $scope.searchOptions.nonEditableCheckbox = $scope.nonEditableCheckbox;
 
             $scope.makeNewAndChoose = function() {
                 if (!$scope.newE.name) {
