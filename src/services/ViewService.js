@@ -709,7 +709,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 string: JSON.stringify(instanceSpecSpec),
                 type: "LiteralString"
             },
-            appliedMetatypes: ["_9_0_62a020a_1105704885251_933969_7897"],
+            appliedStereotypeIds: [],
             isMetatype: false
         };
         if (type === 'Section')
@@ -782,7 +782,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
 
         var view = {
             sysmlId: newViewId,
-            type: isDoc ? 'Product' : 'View',
+            type: 'Class',
             allowedElements: [],
             displayedElements: [newViewId],
             childViews: [],
@@ -796,9 +796,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             },
             name: !name ? 'Untitled View' : name,
             documentation: viewDoc ? viewDoc : '',
-            appliedMetatypes: [
-                (isDoc ? "_17_0_2_3_87b0275_1371477871400_792964_43374" : "_17_0_1_232f03dc_1325612611695_581988_21583"),
-                "_9_0_62a020a_1105704885343_144138_7929"
+            appliedStereotypeIds: [
+                (isDoc ? "_17_0_2_3_87b0275_1371477871400_792964_43374" : "_17_0_1_232f03dc_1325612611695_581988_21583")
             ],
             isMetatype: false
         };
@@ -835,7 +834,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 string: JSON.stringify(instanceSpecSpec),
                 type: "LiteralString"
             },
-            appliedMetatypes: ["_9_0_62a020a_1105704885251_933969_7897"],
+            appliedStereotypeIds: [],
             isMetatype: false
         };
         if (holdingBinId)
@@ -847,7 +846,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             name: '',
             type: 'InstanceSpecification',
             classifierIds: [(isDoc ? "_17_0_2_3_87b0275_1371477871400_792964_43374" : "_17_0_1_232f03dc_1325612611695_581988_21583")],
-            appliedMetatypes: ["_9_0_62a020a_1105704885251_933969_7897"],
+            appliedStereotypeIds: [],
             isMetatype: false
         };
         var toCreate = [instanceSpec, view, asi];

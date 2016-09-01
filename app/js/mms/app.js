@@ -298,7 +298,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                         return;
                     }
                     var siteDocs = {
-                        type: "Element",
+                        type: "Class",
                         name: 'Filtered Docs',
                         documentation: '{}'
                     };
@@ -529,10 +529,10 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             document: function($stateParams, ElementService, time, ticket) {
                 return ElementService.getElement($stateParams.document, false, $stateParams.workspace, time, 2);
             },
-            views: function($stateParams, ViewService, document, time, ticket) {
-                if (document.type !== 'Product' && document.type !== 'View')
+            views: function($stateParams, ViewService, UtilsService, document, time, ticket) {
+                if (!UtilsService.isView(document))
                     return [];
-                if (document.type === 'Product' && document.view2view && document.view2view.length > 0)
+                if (UtilsService.isDocument(document) && document.view2view && document.view2view.length > 0)
                     return ViewService.getDocumentViews($stateParams.document, false, $stateParams.workspace, time, true, 2);
                 else
                     return ViewService.getDocumentViews($stateParams.document, false, $stateParams.workspace, time, false, 2);
@@ -543,8 +543,8 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             view: function($stateParams, ViewService, viewElements, time, ticket) {
                 return ViewService.getView($stateParams.document, false, $stateParams.workspace, time, 2);
             },
-            snapshots: function(ConfigService, workspace, site, document, ticket) {
-                if (document.type !== 'Product')
+            snapshots: function(UtilsService, ConfigService, workspace, site, document, ticket) {
+                if (!UtilsService.isDocument(document))
                     return [];
                 return ConfigService.getProductSnapshots(document.sysmlId, site.sysmlId, workspace, false, 2);
             },

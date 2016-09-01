@@ -106,8 +106,8 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
                     sysmlId: sysmlId,
                     name: $scope.newE.name, 
                     documentation: $scope.newE.documentation, 
-                    type: 'Element',
-                    appliedMetatypes: ['_9_0_62a020a_1105704885343_144138_7929'],
+                    type: 'Class',
+                    appliedStereotypeIds: [],
                     isMetatype: false
                 };
                 if (ownerId)
@@ -277,7 +277,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
             $scope.mainSearchFilter = function(data) {
                 var views = [];
                 data.forEach(function(v) {
-                    if (v.type === 'View' || v.type === 'Product' || 
+                    if (UtilsService.isView(v) || 
                             (ViewService.isPresentationElement(v) && v.relatedDocuments)) {
                         if (v.properties)
                             delete v.properties;
@@ -312,8 +312,8 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
                 sysmlId: sysmlId,
                 name: 'Comment ' + new Date().toISOString(), 
                 documentation: '', 
-                type: 'Comment',
-                appliedMetatypes: ["_9_0_62a020a_1105704885343_144138_7929"],
+                type: 'Class',
+                appliedStereotypeIds: [],
                 isMetatype: false
             };
             $scope.oking = false;

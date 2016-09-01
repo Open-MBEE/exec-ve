@@ -97,7 +97,7 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
             .then(function(document) {
                 if (newVal !== lastid)
                     return;
-                if(document.type !== 'Product')
+                if(!UtilsService.isDocument(document))
                     return;
                 documentName = document.name;
                 project = UtilsService.getIdInfo(document, null);

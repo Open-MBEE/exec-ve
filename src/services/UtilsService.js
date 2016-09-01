@@ -12,6 +12,8 @@ angular.module('mms')
  * Utilities
  */
 function UtilsService(CacheService, _) {
+    var VIEW_SID = '_17_0_1_232f03dc_1325612611695_581988_21583';
+    var DOCUMENT_SID = '_17_0_2_3_87b0275_1371477871400_792964_43374';
     var nonEditKeys = ['contains', 'view2view', 'childrenViews', 'displayedElements',
         'allowedElements', 'contents', 'relatedDocuments', 'childViews'];
 
@@ -642,6 +644,19 @@ function UtilsService(CacheService, _) {
         return ret;
     };
 
+    var isView = function(e) {
+        if (e.appliedStereotypeIds && (e.appliedStereotypeIds.indexOf(VIEW_SID) >= 0 || 
+            e.appliedStereotypeIds.indexOf(DOCUMENT_SID) >= 0))
+            return true;
+        return false;
+    };
+
+    var isDocument = function(e) {
+        if (e.appliedStereotypeIds && e.appliedStereotypeIds.indexOf(DOCUMENT_SID) >= 0)
+            return true;
+        return false;
+    };
+
     return {
         hasCircularReference: hasCircularReference,
         cleanElement: cleanElement,
@@ -659,6 +674,8 @@ function UtilsService(CacheService, _) {
         makeTablesAndFiguresTOC: makeTablesAndFiguresTOC,
         createMmsId: createMmsId,
         getIdInfo: getIdInfo,
-        getPrintCss: getPrintCss
+        getPrintCss: getPrintCss,
+        isView: isView,
+        isDocument: isDocument,
     };
 }

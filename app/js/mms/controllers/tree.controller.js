@@ -31,7 +31,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
 
     if (document !== null) {
         $scope.document = document;
-        $scope.editable = $scope.document.editable && time === 'latest' && $scope.document.type === 'Product' || $scope.document.type === 'View';
+        $scope.editable = $scope.document.editable && time === 'latest' && UtilsService.isView($scope.document);
     }
 
     // If it is not the master workspace, then retrieve it:
@@ -967,7 +967,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             return;
         }
         if ($state.includes('workspace.site.document')) { 
-            if (branch.type !== 'view' || (branch.data.type !=='View' && branch.data.type !== 'Product')) {
+            if (branch.type !== 'view' || (!UtilsService.isView(branch.data))) {
                 growl.warning("Delete Error: Selected item is not a view.");
                 return;
             }
@@ -977,7 +977,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             }
         }
         if ($state.includes('workspace.sites') && !$state.includes('workspace.site.document')) {
-            if (branch.type !== 'view' || (branch.data.type !== 'Product')) {
+            if (branch.type !== 'view' || (!UtilsService.isDocument(branch.data))) {
                 growl.warning("Delete Error: Selected item is not a document.");
                 return;
             }
@@ -1024,7 +1024,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             $scope.type = 'Tag';
         if (branch.type === 'view') {
             $scope.type = 'View';
-            if (branch.data.type === 'Product')
+            if (UtilsService.isDocument(branch.data))
                 $scope.type = 'Document';
         }
         //$scope.type = branch.type === 'workspace' ? 'task' : 'tag';
@@ -1107,7 +1107,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         var searchFilter = function(results) {
             var views = [];
             for (var i = 0; i < results.length; i++) {
-                if (results[i].type === 'View' || results[i].type === 'Product') {
+                if (ViewService.isView(results[i])) {
                     views.push(results[i]);
                     if (results[i].properties)
                         delete results[i].properties;

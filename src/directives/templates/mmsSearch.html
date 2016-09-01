@@ -62,16 +62,24 @@
             </div>
             <div class="elem-type-wrapper">
                 <label>METATYPE</label>
-                <div ng-repeat="type in elem.appliedMetatypes" class="elem-type">
+                <div ng-repeat="type in elem.appliedStereotypeIds" class="elem-type">
                     <mms-transclude-name mms-eid="{{type}}" no-click="true"></mms-transclude-name>
                 </div>
             </div>
-            <div ng-if="elem.type === 'Property' && elem.value[0]">
+            <div ng-if="(elem.type === 'Property' || elem.type === 'Port') && elem.defaultValue">
+                <label>VALUE</label>
+                <div class="elem-properties">
+                    <a ng-click="userResultClick(elem, 'val')">
+                            {{elem.defaultValue.value + '' || elem.defaultValue.body[0] || 'Default Value'}}<span class="ellipses">{{(elem.defaultValue.body[0] && elem.defaultValue.body.length > 1) ? ' ...' : '' }}</span>
+                    </a>
+                </div>
+            </div>
+            <div ng-if="elem.type === 'Slot' && elem.value">
                 <label>VALUE</label>
                 <div class="elem-properties">
                     <a ng-click="userResultClick(elem, 'val')">
                         <span ng-repeat="val in elem.value">
-                            {{val.string || val.boolean + '' || val.naturalValue || val.integer || val.double || val.expressionBody[0] || 'Default Value'}}<span class="ellipses">{{(val.expressionBody[0] && val.expressionBody.length > 1) ? ' ...' : '' }}</span>{{$last ? '' : ', '}}
+                            {{val.value + '' || val.body[0] || 'Default Value'}}<span class="ellipses">{{(val.body[0] && val.body.length > 1) ? ' ...' : '' }}</span>{{$last ? '' : ', '}}
                         </span>
                     </a>
                 </div>
@@ -80,13 +88,11 @@
                 <label>SPECIFICATION</label>
                 <div class="elem-specification">
                     <a ng-click="userResultClick(elem, 'val')">
-                        {{elem.specification.string || elem.specification.boolean ||
-                          elem.specification.naturalValue || elem.specification.integer ||
-                          elem.specification.double || 'Constraint Specification'}}
+                        {{elem.specification.value + '' || 'Constraint Specification'}}
                     </a>
                 </div>
                 <a ng-click="userResultClick(elem, 'val')">
-                    <div ng-repeat="str in elem.specification.expressionBody">
+                    <div ng-repeat="str in elem.specification.body">
                         <div class="elem-specification">{{str}}</div>
                     </div>
                 </a>
@@ -97,8 +103,8 @@
                     <tbody>
                         <tr ng-repeat="row in elem.properties2">
                             <td ng-repeat="property in row">
-                                {{property.name}}<span ng-show="property.isSlot"><mms-transclude-name mms-eid="{{property.typeId}}"></mms-transclude-name></span>: 
-                                <a ng-click="userResultClick(property, 'val')"><span ng-repeat="val in property.value">{{val.string || val.boolean + '' || val.naturalValue || val.integer || val.double || val.expressionBody[0] || 'Default Value'}}<span class="ellipses">{{(val.expressionBody[0] && val.expressionBody.length > 1) ? ' ...' : '' }}</span>{{$last ? '' : ', '}}</span></a>
+                                {{property.name}}<span ng-show="property.type === 'Slot'"><mms-transclude-name mms-eid="{{property.definingFeatureId}}"></mms-transclude-name></span>: 
+                                <a ng-click="userResultClick(property, 'val')"><span ng-repeat="val in property.value">{{val.value + '' || val.body[0] || 'Default Value'}}<span class="ellipses">{{(val.body[0] && val.body.length > 1) ? ' ...' : '' }}</span>{{$last ? '' : ', '}}</span></a>
                             </td>
                         </tr>
                     </tbody>

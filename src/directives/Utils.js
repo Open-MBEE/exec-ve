@@ -287,7 +287,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Wo
             isSlot = true;
             id = elt.definingFeatureId;
         }
-        if (!id)) { //no property type, will not be enum
+        if (!id) { //no property type, will not be enum
             deferred.resolve({options: options, isEnumeration: isEnum, isSlot: isSlot});
             return deferred.promise;
         }
@@ -431,7 +431,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Wo
                 myEdit.type = 'Slot';
             }
             if (scope.edit.type === 'Constraint' && scope.edit.specification) {
-                myEdit.specification: scope.edit.specification;
+                myEdit.specification = scope.edit.specification;
                 myEdit.type = 'Constraint';
             }
         } else {

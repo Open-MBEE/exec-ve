@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsViewLink', ['ElementService', '$compile', 'growl', mmsViewLink]);
+.directive('mmsViewLink', ['ElementService', 'UtilsService', '$compile', 'growl', mmsViewLink]);
 
 /**
  * @ngdoc directive
@@ -20,7 +20,7 @@ angular.module('mms.directives')
  * @param {string=latest} mmsVersion Version can be alfresco version number or timestamp, default is latest
  * @param {string=} mmsDid Document context of view
  */
-function mmsViewLink(ElementService, $compile, growl) {
+function mmsViewLink(ElementService, UtilsService, $compile, growl) {
 
     function findSite(element) {
         if (element.siteCharacterizationId)
@@ -76,13 +76,13 @@ function mmsViewLink(ElementService, $compile, growl) {
                         scope.name = pe.name;
                     });
                 }
-                if (data.type === 'Product') {
+                if (UtilsService.isDocument(data)) {
                     docid = data.sysmlId;
                     scope.docid = docid;
                     scope.vid = data.sysmlId;
                     //element.html('<a href="mms.html#/workspaces/' + ws + '/sites/' + site + '/documents/' + 
                         //docid + '/views/' + scope.mmsVid + queryParam + '">' + data.name + '</a>');
-                } else if (data.type === "View" || data.type === 'InstanceSpecification') {
+                } else if (UtilsService.isView(data) || data.type === 'InstanceSpecification') {
                     if (!docid || docid === '') {
                         docid = data.sysmlId;
                     } 
