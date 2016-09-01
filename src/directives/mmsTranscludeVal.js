@@ -70,6 +70,9 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
 
             if (mmsViewCtrl)
                 mmsViewCtrl.transcludeClicked(scope.mmsEid, scope.ws, scope.version);
+            if (scope.nonEditable) {
+                growl.warning("Cross Reference is not editable.");
+            }
 
             /*if (e.target.tagName !== 'A' && e.target.tagName !== 'INPUT' && !scope.isEditing) //need review for inline editing (boolean and nested)
                 return false;
@@ -368,7 +371,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
             mmsEid: '@',
             mmsWs: '@',
             mmsVersion: '@',
-            nonEditable: '='
+            nonEditable: '<'
         },
         require: ['?^^mmsView','?^^mmsViewPresentationElem', '?^^mmsTranscludeDoc', '?^^mmsTranscludeVal'],
         controller: ['$scope', mmsTranscludeCtrl],
