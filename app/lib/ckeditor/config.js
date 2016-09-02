@@ -12,7 +12,7 @@ CKEDITOR.editorConfig = function( config ) {
 	config.fullPage = false;
   config.removePlugins = 'resize';
 	// config.extraPlugins = 'iframe,mediaembed,embed,
-	config.extraPlugins = 'image2,imagedrop,mmscf,mmscomment,mmsvlink,mmsreset';
+	config.extraPlugins = 'image2,imagedrop,mmscf,mmscomment,mmsvlink,mmsreset,tableresize';
   config.mathJaxLib = 'https://cdn.mathjax.org/mathjax/2.2-latest/MathJax.js?config=TeX-AMS_HTML';
 	config.extraAllowedContent = 'audio[*]; video[*]; source[*]; mms-diff-attr[*]; script[language,type,src]; jira-issue-collector[*]; mms-maturity-bar[*]; tms-timely[*]; seqr-timely[*]; mms-d3-observation-profile-chart-io[*];  mms-d3-parallel-axis-chart-io[*]; mms-d3-radar-chart-io[*]; mms-d3-grouped-horizontal-bar-chart-io[*]; mms-site-docs[*]; mms-workspace-docs[*]; mms-diagram-block[*]; mms-view-link[*]; mms-transclude-doc[*]; mms-transclude-name[*]; mms-transclude-com[*]; mms-transclude-val[*]; mms-transclude-img[*]; math[*]; maction[*]; maligngroup[*]; malignmark[*]; menclose[*]; merror[*]; mfenced[*]; mfrac[*]; mglyph[*]; mi[*]; mlabeledtr[*]; mlongdiv[*]; mmultiscripts[*]; mn[*]; mo[*]; mover[*]; mpadded[*]; mphantom[*]; mroot[*]; mrow[*]; ms[*]; mscarries[*]; mscarry[*]; msgroup[*]; mstack[*]; msline[*]; mspace[*]; msqrt[*]; msrow[*]; mstyle[*]; msub[*]; msup[*]; msubsup[*]; mtable[*]; mtd[*]; mtext[*]; mtr[*]; munder[*]; munderover[*];';
 
