@@ -54,7 +54,7 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
         element.click(function(e) {
             if (scope.noClick)
                 return;
-            if (scope.clickHandler && !scope.nonEditable) {
+            if (scope.clickHandler) {
                 scope.clickHandler();
                 return;
             }
