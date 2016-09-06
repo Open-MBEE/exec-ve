@@ -50,13 +50,11 @@ function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigSe
         var elementsList = JSON.parse(result);
         var tstypeName = successfulCommand.data.args[0];
         ElementService.updateElement({
-            "sysmlid": eid, 
-            "specialization": {
-                "type": "InstanceSpecification",
-                "instanceSpecificationSpecification": {
-                    "type": "LiteralString",
-                    "string": JSON.stringify({elements: elementsList, type: "Tsp", tstype: tstypeName})
-                }
+            "sysmlId": eid, 
+            "type": "InstanceSpecification",
+            "specification": {
+                "type": "LiteralString",
+                "value": JSON.stringify({elements: elementsList, type: "Tsp", tstype: tstypeName})
             }
         }).then(function() {
             deferreds[projectId].resolve("ok");
@@ -372,7 +370,7 @@ function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigSe
         scope: {
             mmsWs: '@',
             mmsVersion: '@',
-            mmsTspSpec: '=',
+            mmsTspSpec: '<',
             mmsPeid: '@'
         },
         link: mmsPerspectivesLink
