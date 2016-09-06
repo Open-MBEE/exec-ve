@@ -1,9 +1,9 @@
 'use strict';
 
 angular.module('mms')
-.factory('AuthService', ['$q', '$http', 'URLService','HttpService', 'ElementService', 'ViewService', 'ConfigService', 'WorkspaceService', 'SiteService', '$window', AuthService]);
+.factory('AuthService', ['$q', '$http', 'URLService','HttpService', 'ElementService', 'ViewService', 'ConfigService', 'WorkspaceService', 'SiteService', '$window', '$cookies', AuthService]);
 
-function AuthService($q, $http, URLService, HttpService, ElementService, ViewService, ConfigService, WorkspaceService, SiteService, $window) {
+function AuthService($q, $http, URLService, HttpService, ElementService, ViewService, ConfigService, WorkspaceService, SiteService, $window, $cookies) {
     
     var ticket= $window.localStorage.getItem('ticket');
     var getAuthorized = function (credentials) {
@@ -69,6 +69,13 @@ function AuthService($q, $http, URLService, HttpService, ElementService, ViewSer
             var logouturl = URLService.getLogoutURL();
             removeTicket();
             //var logoutService = '/alfresco/service/api/login/ticket/'+ AuthService.getTicket() + '?alf_ticket=' + AuthService.getTicket();
+            $http.post('/Basic/mms/cookieAuth?op=Sign Out').then(
+                function(data){
+                    $cookies.remove('com.tomsawyer.web.license.user');
+                }, function(failure) {
+                    URLService.handleHttpStatus(failure.data, failure.status, failure.headers, failure.config, deferred);
+                }
+            );
             $http.delete(logouturl).then(function(success) {
                 deferred.resolve(true);
                 //$state.go('login');

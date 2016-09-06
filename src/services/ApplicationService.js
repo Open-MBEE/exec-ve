@@ -80,6 +80,7 @@ function ApplicationService($q, $http, URLService) {
     return {
         getSource: getSource,
         getMmsVersion: getMmsVersion,
+        createUniqueId: createUniqueId,
         setUserName: setUserName,
         getUserName: getUserName
     };

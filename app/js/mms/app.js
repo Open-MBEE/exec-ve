@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.borderLayout', 'ui.bootstrap', 'ui.router', 'ui.tree', 'angular-growl', 'cfp.hotkeys', 'angulartics', 'angulartics.piwik', 'diff-match-patch'])
+angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.borderLayout', 'ui.bootstrap', 'ui.router', 'ui.tree', 'angular-growl', 'cfp.hotkeys', 'angulartics', 'angulartics.piwik', 'diff-match-patch', 'ngCookies'])
 .config(function($stateProvider, $urlRouterProvider, $httpProvider) {
     // Change the DEFAULT state to workspace.sites on entry
     //$urlRouterProvider.when('', '/workspaces/master/sites');
@@ -75,7 +75,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
         }
     });*/
     $urlRouterProvider.otherwise('/workspaces/master/sites');// when the url isn't mapped go here
-
+    $httpProvider.defaults.withCredentials = true;
     $stateProvider
     .state('login', {
         url: '/login',
@@ -83,7 +83,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
         views: {
             'pane-center': {
                 templateUrl: 'partials/mms/login.html',
-                controller: function ($scope, $rootScope, $state, AuthService, growl) {
+                controller: function ($scope, $rootScope, $state, $http, AuthService, growl) {
                     $scope.credentials = {
                       username: '',
                       password: ''
@@ -99,7 +99,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                                 $state.go(toState, toParams);
                             } else {
                               $state.go('workspace.sites', {workspace: 'master'});
-                          }
+                            }
                           }, function (reason) {
                             $scope.spin = false;
                                 growl.error(reason.message);
@@ -121,12 +121,19 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             //     // url service append ticket
             //     return $http.get(URLService.getCheckLoginURL());
             // },
-            ticket: function($window, URLService, AuthService, $location, $q, ApplicationService) {
+            ticket: function($window, URLService, AuthService, $location, $q, $http, growl, ApplicationService, $cookies) {
                 var deferred = $q.defer();
                 AuthService.checkLogin().then(function(data) {
                     ApplicationService.setUserName(data);
                     URLService.setTicket($window.localStorage.getItem('ticket'));
                     deferred.resolve($window.localStorage.getItem('ticket'));
+                    $http.post('/Basic/mms/cookieAuth?op=Sign In&username='+data).then(
+                        function(data2){
+                            $cookies.put('com.tomsawyer.web.license.user', data);
+                        }, function(reason) {
+                            growl.error("TSP license can not be activated: " + reason.message);
+                        }
+                    );
                 }, function(rejection) {
                     //$location.path('/login');
                     deferred.reject(rejection);

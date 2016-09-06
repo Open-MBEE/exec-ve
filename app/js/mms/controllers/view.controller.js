@@ -177,6 +177,10 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $uibModal, $window,
         MmsAppUtils.addPresentationElement($scope, 'Equation', view);
     });
 
+    $scope.$on('view-add-tsp', function() {
+        MmsAppUtils.addPresentationElement($scope, 'Tsp', view);
+    });
+
     $scope.$on('section-add-paragraph', function(event, section) {
         MmsAppUtils.addPresentationElement($scope, 'Paragraph', section);
     });
