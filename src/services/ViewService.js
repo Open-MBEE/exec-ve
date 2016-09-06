@@ -1203,7 +1203,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 return;
             }
             data.forEach(function(prop) {
-                var feature = prop.typeId ? prop.typeId : null;
+                var feature = prop.definingFeatureId ? prop.definingFeatureId : null;
                 var value = prop.value ? prop.value : null;
                 if (!feature || !docMetadataTypes[feature] || !value || value.length === 0)
                     return;

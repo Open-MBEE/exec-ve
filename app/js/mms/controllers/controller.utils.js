@@ -267,7 +267,7 @@ function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templ
                     'bottom-left': 'loading...', bottom: 'loading...', 'bottom-right': 'loading...'
                 };
                 if (isDoc) {
-                    ViewService.getDocMetadata(ob.sysmlid, ws, null, 2)
+                    ViewService.getDocMetadata(ob.sysmlId, ws, null, 2)
                     .then(function(metadata) {
                         $scope.meta.top = metadata.header ? metadata.header : '';
                         $scope.meta.bottom = metadata.footer ? metadata.footer : '';
