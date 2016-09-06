@@ -22,17 +22,16 @@ function mmsC3(ElementService, UtilsService, TableService, $compile, growl, $win
         if (!version)
             version = viewVersion.version;
     }
-    function vf_pplot(_columns, _index, _is_x_value_number, _has_column_header) {
+    function vf_pplot(_columns, _index, _is_x_value_number) {
 
-      console.log('c3datatypes: ' + scope.c3datatypes);
       //console.log("vfxxxxx: " + scope.c3datatype);
       svg.append('div').attr("id", 'c3chart' + _index);
       var c3json = {
          bindto: '#c3chart' + _index,
          data: {
-          //x: 'x',
+          x: 'x',
           columns:  _columns, //including column heading
-          //type: scope.c3datatype
+          type: scope.c3datatype
         }
         /*,
         axis: {
@@ -48,40 +47,25 @@ function mmsC3(ElementService, UtilsService, TableService, $compile, growl, $win
         //width: 100 // this makes bar width 100px
         } */
       };
-      if ( _has_column_header){
-        c3json.data.x = 'x';  
-      }
-      if (_is_x_value_number === false){ //row 1 is heading but not numbers (column0 is ignored)
+     
+      if (scope.c3datatype === 'line'){
+        console.log("_is_x_value_number: " + _is_x_value_number);
+        if (_is_x_value_number === false){
           setAxisAsCategory(c3json);
-      }
-      if (scope.c3datatypes === undefined){
-        c3json.data.type = scope.c3datatype;
-        if (scope.c3datatype === 'line'){
-          //if (_is_x_value_number === false){ //row 1 is heading but not numbers (column0 is ignored)
-            //setAxisAsCategory(c3json);
-          //}
         }
-         //optional: c3barwidthratio, c3barwidth
-        else if ( scope.c3datatype === 'bar'){
-          //setAxisAsCategory(c3json);
-          c3json.bar ={};
-          c3json.bar.width = {};
-          if ( scope.c3barwidth !== undefined)
-            c3json.bar.width = scope.c3barwidth;
-          if (scope.c3barwidthratio !== undefined)
-            c3json.bar.width.ratio = scope.c3barwidthratio;
-        }//end of bar 
-       } else { //mix
-        var _c3datatypes = scope.c3datatypes.split(':');
-        if (_c3datatypes.length === scope.tableRowHeaders[_index].length){
-          var _c3datatype_i_name;
-          c3json.data.types = {};
-          for ( var ii = 0; ii < _c3datatypes.length; ii++) {    
-            _c3datatype_i_name = scope.tableRowHeaders[_index][ii].name;
-            c3json.data.types[_c3datatype_i_name] = _c3datatypes[ii];
-          }
-        } 
       }
+     if ( scope.c3datatype === 'bar'){
+      //optional: c3barwidthratio, c3barwidth
+     
+        c3json = setAxisAsCategory(c3json);
+      c3json.bar ={};
+      c3json.bar.width = {};
+      if ( scope.c3barwidth !== undefined)
+        c3json.bar.width = scope.c3barwidth;
+      if (scope.c3barwidthratio !== undefined)
+        c3json.bar.width.ratio = scope.c3barwidthratio;
+        
+     }//end of bar 
     
     var json = JSON.stringify(c3json);
     console.log(json);
@@ -89,48 +73,54 @@ function mmsC3(ElementService, UtilsService, TableService, $compile, growl, $win
       
 
 		var zz = {
-      bindto: '#c3chart' + _index,
+      bindto: '#c3chart',
+
       data: {
         x: 'x',
         columns: [
-          ['x', 'x1', 'y', 'x8', 'x2'],
-          ['data1', 25, 25, 25, 45],
-          ['data2', 5, 10, 10, 5],
-          ['data3', 10,20,30,40]
+            ['x', 1, 10, 50, 200],
+          ['**target', 25, 25, 25, 45],
+          ['**threshold', 5, 10, 10, 5],
+          ['InstanceD1', 10,20,30,40]
         ],
-        types: {
-          data1: 'line',
-          data2: 'area-step',
-          data3: 'area-step'
-        }
-      },
+        type: 'line'
+      }/*,
       axis: {
         x: {
-          type: 'category' // tick distance becomes same
+          type: 'category' // this needed to load string x value
         }
-      }
+      },
+      bar: {
+          width: {
+            ratio: 0.5 // this makes bar width 50% of length between ticks
+          }
+        // or
+        //width: 100 // this makes bar width 100px
+        }
+        */ 
     };
     /*var json2 = JSON.stringify(zz);
     console.log(json2);
     c3.generate(zz);
-    */
+    *///var chart = c3.generate(zz);
 
 	}//end of vf_pplot()
-
-  /*      axis: {
-          x: {
-            type: 'category' // this needed to load string x value
-          } */
   function setAxisAsCategory(_c3json){
       _c3json.axis = {};
       _c3json.axis.x = {};
       _c3json.axis.x.type = 'category';
       return _c3json;
   }
-  
-  scope.render = function() {
+    scope.render = function() {
 
-    if (scopetableColumnHeadersLabel.length === 0) return;
+      console.log("333333333333333");
+      console.log(scope.datavalues);
+      console.log("44444444444444444");
+    console.log('scopetableColumnHeadersLabel');
+    console.log(scopetableColumnHeadersLabel);
+
+
+      if (scopetableColumnHeadersLabel.length === 0) return;
       svg.selectAll('*').remove();
       
 	/*console.log("columnHeader");  
@@ -140,8 +130,7 @@ function mmsC3(ElementService, UtilsService, TableService, $compile, growl, $win
 	console.log("datavalues");
 	console.log(scope.datavalues);
 	*/  
-	var is_x_value_number = true;  //column headings are number (not check 1st column)
-  var has_column_header = true;
+	var is_x_value_number = true; 
   for ( var k = 0; k < scopeTableIds.length; k++){
 		var c3_data=[];
 
@@ -169,10 +158,10 @@ function mmsC3(ElementService, UtilsService, TableService, $compile, growl, $win
      	c3_data[i+1] = [scope.tableRowHeaders[k][i].name].concat(c3_data_row);
     } //end of i
 
-    console.log("&&&&&&&&&:     " + k);
-    console.log(c3_data);
+  console.log("&&&&&&&&&:     " + k);
+  console.log(c3_data);
 
-   vf_pplot(c3_data, k, is_x_value_number, has_column_header); //c3_columns
+   vf_pplot(c3_data, k, is_x_value_number); //c3_columns
    }//end of k (each table)
   };//end of render
 
@@ -189,10 +178,16 @@ function mmsC3(ElementService, UtilsService, TableService, $compile, growl, $win
       .then(function(value) {
         scopeTableTitles = value.tableTitles;
         scopeTableIds = value.tableIds;
-        scopetableColumnHeadersLabel = value.tableColumnHeadersLabels;
+        scopetableColumnHeadersLabel= value.tableColumnHeadersLabels;
         scope.tableRowHeaders = value.tableRowHeaders;
         scope.datavalues = value.datavalues; //[][] - array
         dataIdFilters = value.dataIdFilters;
+
+        console.log("11111111111111111111111111111111");
+        console.log(scopetableColumnHeadersLabel);
+        console.log(scope.datavalues);
+        console.log("22222222222222222222222222222222");
+		
       });
     }; //end of link
 
@@ -202,9 +197,9 @@ function mmsC3(ElementService, UtilsService, TableService, $compile, growl, $win
        scope: {
         mmsEid: '@',
         c3datatype: '@',
-        c3datatypes: '@',
         c3barwidth: '@',
         c3barwidthratio: '@',
+        tick2: '@',
         tick2color: '@',
         tick3: '@',
         tick3Color: '@'
