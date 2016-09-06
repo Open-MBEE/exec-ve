@@ -44,7 +44,7 @@
             <hr>
             <div class="elem-name-wrapper">
                 <a class="elem-name" ng-click="userResultClick(elem, 'name')">{{elem.name}}</a>
-                <a class="elem-name" ng-show="elem.isSlot" ng-click="userResultClick(elem, 'name')"><mms-transclude-name mms-eid="{{elem.typeId}}"></mms-transclude-name></a>
+                <a class="elem-name" ng-show="elem.type == 'Slot'" ng-click="userResultClick(elem, 'name')"><mms-transclude-name mms-eid="{{elem.definingFeatureId}}"></mms-transclude-name></a>
             </div>
             <div class="elem-qualified-name-wrapper">
                 <div class="elem-qualified-name">
