@@ -65,11 +65,14 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
         var processed = false;
         scope.cfType = 'val';
         element.click(function(e) {
-            if (scope.addFrame)
+            if (scope.addFrame && !scope.nonEditable)
                 scope.addFrame();
 
             if (mmsViewCtrl)
                 mmsViewCtrl.transcludeClicked(scope.mmsEid, scope.ws, scope.version);
+            if (scope.nonEditable) {
+                growl.warning("Cross Reference is not editable.");
+            }
 
             /*if (e.target.tagName !== 'A' && e.target.tagName !== 'INPUT' && !scope.isEditing) //need review for inline editing (boolean and nested)
                 return false;
@@ -377,7 +380,8 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
         scope: {
             mmsEid: '@',
             mmsWs: '@',
-            mmsVersion: '@'
+            mmsVersion: '@',
+            nonEditable: '<'
         },
         require: ['?^^mmsView','?^^mmsViewPresentationElem', '?^^mmsTranscludeDoc', '?^^mmsTranscludeVal'],
         controller: ['$scope', mmsTranscludeCtrl],

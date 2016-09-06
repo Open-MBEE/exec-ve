@@ -40,7 +40,7 @@ function UxService($rootScope) {
                     getToolbarButton("element-editor-save"), getToolbarButton('element-editor-saveC'),
                     getToolbarButton("element-editor-saveall"), getToolbarButton("element-editor-cancel") ]};
       case "view-reorder":
-        return {id: button, icon: 'fa-arrows-v', selected: false, active: true, permission:false, tooltip: 'Reorder View',
+        return {id: button, icon: 'fa-arrows-v', selected: false, active: true, permission:false, tooltip: 'Reorder Content',
                 spinner: false, onClick: function() {$rootScope.$broadcast(button);},
                 dynamic_buttons: [getToolbarButton("view-reorder-save"), getToolbarButton("view-reorder-cancel")]};
       case "document-snapshot":
@@ -271,7 +271,7 @@ function UxService($rootScope) {
     }
   };
 
-  var MetaTypes = ['configuration', 'connector', 'dependency', 'directedrelationship', 'element', 'property', 'generalization', 'package', 'section', 'site', 'snapshot', 'view', 'workspace', 'table', 'figure', 'equation' ];
+  var MetaTypes = ['configuration', 'connector', 'dependency', 'directedrelationship', 'element', 'property', 'generalization', 'package', 'section', 'site', 'snapshot', 'view', 'workspace', 'table', 'figure', 'equation', 'view-composite', 'view-shared', 'view-none' ];
 
   var getTreeTypes = function() {
     var treeTypes = {};
@@ -306,13 +306,19 @@ function UxService($rootScope) {
       case "package":
         return "fa-folder";
       case "section":
-        return "fa-file-o";
+        return "fa-square-o";//"fa-file-o";
       case "site":
         return "fa-folder";
       case "snapshot":
         return "fa-camera";
       case "view":
         return "fa-file";
+      case "view-composite":
+        return "fa-file";
+      case "view-shared":
+        return "fa-file-o";
+      case "view-none":
+        return "fa-file-o";
       case "workspace":
         return "fa-tasks";
       case "table":

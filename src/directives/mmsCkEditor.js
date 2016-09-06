@@ -73,8 +73,10 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
             $scope.requestName = false;
             $scope.requestDocumentation = false;
             $scope.showProposeLink = true;
+            $scope.nonEditableCheckbox = false;
+            $scope.showEditableOp = true;
             $scope.choose = function(elem, property) {
-                var tag = '<mms-transclude-' + property + ' data-mms-eid="' + elem.sysmlId + '">[cf:' + elem.name + '.' + property + ']</mms-transclude-' + property + '> ';
+                var tag = '<mms-transclude-' + property + ' data-mms-eid="' + elem.sysmlId + '"' + ' data-non-editable="' + $scope.nonEditableCheckbox + '">[cf:' + elem.name + '.' + property + ']</mms-transclude-' + property + '> ';
                 $uibModalInstance.close(tag);
             };
             $scope.cancel = function() {
@@ -83,6 +85,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
             $scope.openProposeModal = function() {
                 $uibModalInstance.close(false);
             };
+
              // Set search result options
             $scope.searchOptions= {};
             $scope.searchOptions.callback = $scope.choose;

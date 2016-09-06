@@ -523,6 +523,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 data: document,
                 children: [],
                 loading: false,
+                aggr: 'composite'
             };
             views.forEach(function(view) {
                 var viewTreeNode = { 
@@ -530,7 +531,8 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                     type : "view",
                     data : view, 
                     children : [], 
-                    loading: false
+                    loading: false,
+                    aggr: 'composite'
                 };
                 viewId2node[view.sysmlId] = viewTreeNode;
                     //addSectionElements(elements[i], viewTreeNode, viewTreeNode);
@@ -823,6 +825,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 if (itemType === 'View') {
                     viewId2node[data.sysmlId] = newbranch;
                     seenViewIds[data.sysmlId] = newbranch;
+                    newbranch.aggr = $scope.newViewAggr.type;
                     var curNum = branch.children[branch.children.length-1].section;
                     var prevBranch = $scope.treeApi.get_prev_branch(newbranch);
                     while (prevBranch.type != 'view') {

@@ -58,11 +58,14 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
                 scope.clickHandler();
                 return;
             }
-            if (scope.addFrame)
+            if (scope.addFrame && !scope.nonEditable)
                 scope.addFrame();
 
             if (!mmsViewCtrl)
                 return false;
+            if (scope.nonEditable) {
+                growl.warning("Cross Reference is not editable.");
+            }
             mmsViewCtrl.transcludeClicked(scope.mmsEid, scope.ws, scope.version);
             //return false;
             e.stopPropagation();
@@ -216,6 +219,7 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
             mmsVersion: '@',
             mmsWatchId: '@',
             noClick: '@',
+            nonEditable: '<',
             clickHandler: '&?'
         },
         require: ['?^^mmsView', '?^^mmsTranscludeDoc', '?^^mmsTranscludeVal'],
