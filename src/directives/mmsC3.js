@@ -37,12 +37,24 @@ function mmsC3(ElementService, UtilsService, TableService, $compile, growl, $win
         c3json.data.xs = JSON.parse( scope.c3dataxs.replace(/'/g, '"'));
       }
       //temporary remove to test multiple xyline
-     /* if ( _has_column_header){
+      if ( _has_column_header && scope.c3dataxs === undefined){
         c3json.data.x = 'x';  
-      }*/
-     /* if (_is_x_value_number === false){ //row 1 is heading but not numbers (column0 is ignored)
-          setAxisAsCategory(c3json);
-      }*/
+      }
+      if (_is_x_value_number === false && scope.c3dataxs === undefined){ //row 1 is heading but not numbers (column0 is ignored)
+           c3json.axis = {};
+           c3json.axis.x = {};
+           c3json.axis.x.type = 'category';
+      }
+      if ( scope.c3axisxlabel !== undefined){
+          if (c3json.axis === undefined) c3json.axis = {};
+          if (c3json.axis.x === undefined) c3json.axis.x = {};
+          c3json.axis.x.label = scope.c3axisxlabel;
+      }
+      if ( scope.c3axisylabel !== undefined){
+          if (c3json.axis === undefined) c3json.axis = {};
+          if (c3json.axis.y === undefined) c3json.axis.y = {};
+          c3json.axis.y.label = scope.c3axisylabel;
+      }
       if ( scope.c3datatype !== undefined) 
         c3json.data.type = scope.c3datatype;
       if ( scope.c3datatypes !== undefined ) {//mix, scope.c3datatypes defined
@@ -106,17 +118,6 @@ function mmsC3(ElementService, UtilsService, TableService, $compile, growl, $win
 
 	}//end of vf_pplot()
 
-  /*      axis: {
-          x: {
-            type: 'category' // this needed to load string x value
-          } */
-  function setAxisAsCategory(_c3json){
-      _c3json.axis = {};
-      _c3json.axis.x = {};
-      _c3json.axis.x.type = 'category';
-      return _c3json;
-  }
-  
   scope.render = function() {
 
     if (scopetableColumnHeadersLabel.length === 0) return;
@@ -131,11 +132,19 @@ function mmsC3(ElementService, UtilsService, TableService, $compile, growl, $win
 	*/  
 	var is_x_value_number = true;  //column headings are number (not check 1st column)
   var has_column_header = true;
+  var start_index; //0 if column header is included as data, -1 if column header is not included as data
   for ( var k = 0; k < scopeTableIds.length; k++){
 		var c3_data=[];
 
-
-    c3_data[0] = ['x'].concat(scopetableColumnHeadersLabel[k]);
+    console.log("scope.c3dataxs" + scope.c3dataxs);
+    if ( scope.c3dataxs === undefined) {
+      c3_data[0] = ['x'].concat(scopetableColumnHeadersLabel[k]);
+      start_index = 0;
+    }
+    else {//Assume if xs is defined, no column header
+      has_column_header = false;
+      start_index = -1;
+    }
     //console.log("not a number?: ");
     //console.log(isNaN(scopetableColumnHeadersLabel[k][0]));
     if (isNaN(scopetableColumnHeadersLabel[k][0]))
@@ -155,15 +164,18 @@ function mmsC3(ElementService, UtilsService, TableService, $compile, growl, $win
            c3_data_row[j] = scope.datavalues[k][i][j].specialization.value[0].integer;
         }
       } //end of j
-     	c3_data[i+1] = [scope.tableRowHeaders[k][i].name].concat(c3_data_row);
+     	c3_data[1+start_index++] = [scope.tableRowHeaders[k][i].name].concat(c3_data_row);
     } //end of i
     ////////////////////temporary remove column header///////////////
-    var temp = [];
+    /*var temp = [];
     for (var jj = 1; jj < c3_data.length; jj++){
       temp[jj-1] = c3_data[jj];
     }
     c3_data = temp;
     if ( c3_data.length === 5)
+    */
+    console.log("c3_data");
+    console.log(c3_data);
     //////////////////////////////////
     vf_pplot(c3_data, k, is_x_value_number, has_column_header); //c3_columns
    }//end of k (each table)
@@ -201,7 +213,8 @@ function mmsC3(ElementService, UtilsService, TableService, $compile, growl, $win
         c3barwidthratio: '@',
         c3dataregions: '@',
         c3dataxs: '@',
-        tick3Color: '@'
+        c3axisxlabel: '@',
+        c3axisylabel: '@'
       },
       link: mmsChartLink
     }; //return
