@@ -1,7 +1,7 @@
 'use strict';
  angular.module('mms.directives')
-    .directive('mmsC3', ['ElementService', 'UtilsService', 'TableService', '$compile', 'growl','$window', mmsC3]);
-function mmsC3(ElementService, UtilsService, TableService, $compile, growl, $window) {
+    .directive('mmsC3v1', ['ElementService', 'UtilsService', 'TableService', '$compile', 'growl','$window', mmsC3v1]);
+function mmsC3v1(ElementService, UtilsService, TableService, $compile, growl, $window) {
       
   var mmsChartLink = function(scope, element, attrs, mmsViewCtrl) {
    
@@ -24,12 +24,15 @@ function mmsC3(ElementService, UtilsService, TableService, $compile, growl, $win
     }
     function vf_pplot(_columns, _index, _is_x_value_number, _has_column_header) {
 
-     
+      console.log('c3datatypes: ' + scope.c3datatypes);
+      //console.log("vfxxxxx: " + scope.c3datatype);
       svg.append('div').attr("id", 'c3chart' + _index);
       var c3json = {
          bindto: '#c3chart' + _index,
          data: {
+          //x: 'x',
           columns:  _columns, //including column heading
+          //type: scope.c3datatype
         }
         /*,
         axis: {
@@ -51,9 +54,15 @@ function mmsC3(ElementService, UtilsService, TableService, $compile, growl, $win
       if (_is_x_value_number === false){ //row 1 is heading but not numbers (column0 is ignored)
           setAxisAsCategory(c3json);
       }
-      /*if (scope.c3datatypes === undefined){
+      if (scope.c3datatypes === undefined){
         c3json.data.type = scope.c3datatype;
-        if ( scope.c3datatype === 'bar'){
+        if (scope.c3datatype === 'line'){
+          //if (_is_x_value_number === false){ //row 1 is heading but not numbers (column0 is ignored)
+            //setAxisAsCategory(c3json);
+          //}
+        }
+         //optional: c3barwidthratio, c3barwidth
+        else if ( scope.c3datatype === 'bar'){
           //setAxisAsCategory(c3json);
           c3json.bar ={};
           c3json.bar.width = {};
@@ -62,35 +71,33 @@ function mmsC3(ElementService, UtilsService, TableService, $compile, growl, $win
           if (scope.c3barwidthratio !== undefined)
             c3json.bar.width.ratio = scope.c3barwidthratio;
         }//end of bar 
-       }*/
-      if ( scope.c3datatype !== undefined) 
-        c3json.data.type = scope.c3datatype;
-      if ( scope.c3datatypes !== undefined ) {//mix, scope.c3datatypes defined
-        //{'a1':'step', 'a2':'area-step'}
-        //to
-        //{"a1":"step", "a2":"area-step"}
-        c3json.data.types = JSON.parse( scope.c3datatypes.replace(/'/g, '"'));
+       } else { //mix
+        var _c3datatypes = scope.c3datatypes.split(',');
+        if (_c3datatypes.length === scope.tableRowHeaders[_index].length){
+          var _c3datatype_i_name;
+          c3json.data.types = {};
+          for ( var ii = 0; ii < _c3datatypes.length; ii++) {    
+            _c3datatype_i_name = scope.tableRowHeaders[_index][ii].name;
+            c3json.data.types[_c3datatype_i_name] = _c3datatypes[ii];
+          }
+        } 
       }
       if (scope.c3datagroups !== undefined){
         console.log("scope.c3datagroups");
-        c3json.data.groups = JSON.parse( scope.c3datagroups.replace(/'/g, '"'));
-      }
-      if ( scope.c3dataregions !== undefined){
-        //modify
-        // {'a1':[{'start':1, 'end':2, 'style':'dashed'},{'start':3}],'a2':[{'end':3}]}
-        //to 
-        //{"a1":[{"start":1, "end":2, "style":"dashed"},{"start":3}],"a2":[{"end":3}]}
-        c3json.data.regions = JSON.parse(scope.c3dataregions.replace(/'/g, '"'));
-      }
-      //bar - width or ratio
-      if ( scope.c3barwidth !== undefined){
-        c3json.bar = {};
-        c3json.bar.width = {};
-        c3json.bar.width = scope.c3barwidth;
-      } else if ( scope.c3barwidthratio !== undefined){
-        c3json.bar = {};
-        c3json.bar.width = {};
-        c3json.bar.width.ratio = scope.c3barwidthratio;
+        c3json.data.groups = [];
+
+        var temp;
+        var _c3datagroups = scope.c3datagroups.split(':');
+        _c3datagroups.forEach( function(_c3datagroup){
+          temp = [];
+          var _c3datagroup_i = _c3datagroup.split(',');
+          _c3datagroup_i.forEach(function(value){
+            temp.push(value);
+            console.log(value);
+            console.log(temp);
+          } );
+          c3json.data.groups.push(temp);
+        });
       }
     
     var json = JSON.stringify(c3json);
@@ -177,6 +184,10 @@ function mmsC3(ElementService, UtilsService, TableService, $compile, growl, $win
       } //end of j
      	c3_data[i+1] = [scope.tableRowHeaders[k][i].name].concat(c3_data_row);
     } //end of i
+
+    console.log("&&&&&&&&&:     " + k);
+    console.log(c3_data);
+
    vf_pplot(c3_data, k, is_x_value_number, has_column_header); //c3_columns
    }//end of k (each table)
   };//end of render
@@ -211,7 +222,7 @@ function mmsC3(ElementService, UtilsService, TableService, $compile, growl, $win
         c3datagroups:  '@',
         c3barwidth: '@',
         c3barwidthratio: '@',
-        c3dataregions: '@',
+        tick2color: '@',
         tick3: '@',
         tick3Color: '@'
       },
