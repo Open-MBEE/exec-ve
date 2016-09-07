@@ -9,11 +9,7 @@ describe('mmsTranscludeVal directive', function () {
         $compile,
         CacheService,
         UtilsService,
-        $httpBackend,
-        ViewService,
-        URLService,
-        httpService,
-        $http;
+        $httpBackend;
 
     beforeEach(function () {
         module('mms.directives');
@@ -24,13 +20,10 @@ describe('mmsTranscludeVal directive', function () {
             $httpBackend = $injector.get('$httpBackend');
             CacheService = $injector.get('CacheService');
             UtilsService = $injector.get('UtilsService');
-            ViewService = $injector.get('ViewService');
-            URLService = $injector.get('URLService');
-            httpService = $injector.get('HttpService');
-            $http = $injector.get('$http');
             scope = $rootScope.$new();
-            var tableJson = jasmine.getFixtures().read('html/baselineMakeHtmlTable.html');
+            var tableJson = getJSONFixture('makeHtmlTable.json');
 
+            // This is regular view that contains a single element as a document
             var testElement = {
                 elements: [{
                     name: "Test Element",
@@ -40,8 +33,6 @@ describe('mmsTranscludeVal directive', function () {
                     documentation: '<mms-transclude-doc mms-eid="301"></mms-transclude-doc>',
                     specialization: {
                         type: "View",
-                        // displayedElements : ['301'],
-                        // contains         : [],
                         contents: {
                             valueExpression: null,
                             operand: [{
@@ -51,10 +42,7 @@ describe('mmsTranscludeVal directive', function () {
                             }],
                             type: "Expression"
                         },
-
-                        view2view: [
-                            {childrenViews: [], id: "301"}
-                        ],
+                        view2view: [{childrenViews: [], id: "301"}],
                         childViews: [{
                             childrenViews: [],
                             id: "301"
@@ -63,6 +51,7 @@ describe('mmsTranscludeVal directive', function () {
                 }]
             };
 
+            // This element reference another document
             var element301 = {
                 elements: [{
                     name: "301 Element",
@@ -100,11 +89,33 @@ describe('mmsTranscludeVal directive', function () {
                 }]
             };
 
+            var sectionView = {
+                elements: [{
+                    name: "Section View Element",
+                    sysmlid: "sectionView",
+                    modified: "2016-05-25T12:16:06.856-0700",
+                    modifier: "catTester",
+                    documentation: '<mms-tansclude-doc mms-eid="sectionElement"></mms-tansclude-doc>',
+                    specialization: {
+                        type: "View",
+                        contents: {
+                            valueExpression: null,
+                            operand: [{
+                                valueExpression: null,
+                                type: "InstanceValue",
+                                instance: "sectionElement"
+                            }],
+                            type: "Expression"
+                        }
+                    }
+                }]
+            };
+
             var sectionElement = {
                 elements: [{
                     name: "Section Element",
                     sysmlid: "sectionElement",
-                    documentation: 'This is a section element\!',
+                    documentation: 'Super Sleezy Secular Section',
                     appliedMetatypes: ["How Meta...."],
                     specialization: {
                         instanceSpecificationSpecification: {
@@ -116,7 +127,7 @@ describe('mmsTranscludeVal directive', function () {
                                 instance: "tableElement"
                             }]
                         },
-                        classifier: ["Tank Class Please"],
+                        classifier: ["_17_0_5_1_407019f_1430628211976_255218_12002"],
                         type: "InstanceSpecification"
                     },
                     isMetatype: false
@@ -127,49 +138,37 @@ describe('mmsTranscludeVal directive', function () {
                 elements: [{
                     name: "Table Element",
                     sysmlid: "tableElement",
-                    documentation: 'Omg I have this working\!\!\!\!',
+                    documentation: 'This is a table element\!',
                     appliedMetatypes: ["How Meta...."],
                     specialization: {
                         instanceSpecificationSpecification: {
-                            valueExpression: null,
+                            // string: tableJson,
                             string: JSON.stringify(tableJson),
                             type: "LiteralString"
                         },
+                        slots:[],
+                        classifier: ["_17_0_5_1_407019f_1430628178633_708586_11903"],
                         type: "InstanceSpecification"
                     },
                     isMetatype: false
                 }]
             };
 
-            var tableDocument = {
-                elements: [{
-                    name: "Table Document",
-                    sysmlid: "tableDocument",
-                    documentation: 'Merp Table Doc',
-                    specialization: {
-                        instanceSpecificationSpecification: {
-                            valueExpression: null,
-                            string: "{\"sourceProperty\":\"documentation\",\"source\":\"tableDocument\",\"type\":\"Paragraph\"}",
-                            type: "LiteralString"
-                        },
-                        classifier: ["Classify this!"],
-                        type: "InstanceSpecification"
-                    },
-                    isMetatype: false
-                }]
-            };
 
             $httpBackend.when('GET', /alfresco\/service\/workspaces\/master\/elements\/8008/).respond(200, testElement);
             $httpBackend.when('GET', /alfresco\/service\/workspaces\/master\/elements\/301/).respond(200, element301);
             $httpBackend.when('GET', /alfresco\/service\/workspaces\/master\/elements\/302/).respond(200, element302);
-
+            $httpBackend.when('GET', /alfresco\/service\/workspaces\/master\/elements\/sectionView/).respond(200, sectionView);
             $httpBackend.when('GET', /alfresco\/service\/workspaces\/master\/elements\/sectionElement/).respond(200, sectionElement);
             $httpBackend.when('GET', /alfresco\/service\/workspaces\/master\/elements\/tableElement/).respond(200, tableElement);
+
             $httpBackend.when('GET', /alfresco\/service\/workspaces\/master\/views\/8008\/elements/).respond(200,
-                {elements: [element301.elements[0], sectionElement.elements[0], tableElement.elements[0]]}
+                {elements: [element301.elements[0]]}
             );
 
-            $httpBackend.when('GET', /alfresco\/service\/workspaces\/master\/elements\/tableDocument/).respond(200, tableDocument);
+            $httpBackend.when('GET', /alfresco\/service\/workspaces\/master\/views\/sectionView\/elements/).respond(200,
+                {elements: [sectionElement.elements[0], tableElement.elements[0]]}
+            );
 
             var cacheKey = UtilsService.makeElementKey(testElement.elements[0].sysmlid, 'master', 'latest', false);
             CacheService.put(cacheKey, testElement.elements[0]);
@@ -180,14 +179,15 @@ describe('mmsTranscludeVal directive', function () {
             cacheKey = UtilsService.makeElementKey(element302.elements[0].sysmlid, 'master', 'latest', false);
             CacheService.put(cacheKey, element302.elements[0]);
 
+            cacheKey = UtilsService.makeElementKey(sectionView.elements[0].sysmlid, 'master', 'latest', false);
+            CacheService.put(cacheKey, sectionView.elements[0]);
+
             cacheKey = UtilsService.makeElementKey(sectionElement.elements[0].sysmlid, 'master', 'latest', false);
             CacheService.put(cacheKey, sectionElement.elements[0]);
 
             cacheKey = UtilsService.makeElementKey(tableElement.elements[0].sysmlid, 'master', 'latest', false);
             CacheService.put(cacheKey, tableElement.elements[0]);
 
-            cacheKey = UtilsService.makeElementKey(tableDocument.elements[0].sysmlid, 'master', 'latest', false);
-            CacheService.put(cacheKey, tableDocument.elements[0]);
         });
     });
 
@@ -214,6 +214,27 @@ describe('mmsTranscludeVal directive', function () {
         expect(element.html()).toContain("Last Modified");
         expect(element.html()).toContain("by catTester");
         expect(element.html()).toContain("5/25/16 12:16");
-        console.log(element.html());
+        // console.log(element.html());
+    }));
+
+    it('mmsView should transclude an view section with a table within it', inject(function () {
+        scope.view = {
+            sysmlid: "sectionView",
+            sectionNumber: "666",
+            ws: "master",
+            version: "latest"
+        };
+
+        element = angular.element('<mms-view mms-vid="{{view.sysmlid}}" mms-version="{{view.version}}" mms-ws="{{view.ws}}" ></mms-view>');
+        $compile(element)(scope);
+
+        scope.$apply();
+        $httpBackend.flush();
+        // console.log(element.html());
+        expect(element.html()).toContain('<mms-transclude-name data-mms-eid=\"sectionView\"');
+        expect(element.html()).toContain(">Section View Element<");
+        expect(element.html()).toContain("<mms-view-section data-mms-section=\"presentationElem\"");
+        expect(element.html()).toContain("<div id=\"tableElement\" ng-if=\"\!presentationElemLoading\"");
+        expect(element.html()).toContain("<mms-view-table data-mms-table=\"presentationElem\"");
     }));
 });
