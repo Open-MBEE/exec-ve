@@ -2,7 +2,7 @@
 
 describe('mmsTranscludeVal directive', function () {
     var scope; //scope when directive is called
-    jasmine.getFixtures().fixturesPath     = 'base/test/mock-data/UtilsService';
+    jasmine.getFixtures().fixturesPath = 'base/test/mock-data/UtilsService';
     jasmine.getJSONFixtures().fixturesPath = 'base/test/mock-data/UtilsService';
     var element; //dom element mms-transclude-name
     var $rootScope,
@@ -19,45 +19,45 @@ describe('mmsTranscludeVal directive', function () {
         module('mms.directives');
         module('mms');
         inject(function ($injector) {
-            $rootScope    = $injector.get('$rootScope');
-            $compile      = $injector.get('$compile');
-            $httpBackend  = $injector.get('$httpBackend');
-            CacheService  = $injector.get('CacheService');
-            UtilsService  = $injector.get('UtilsService');
-            ViewService   = $injector.get('ViewService');
-            URLService    = $injector.get('URLService');
-            httpService   = $injector.get('HttpService');
-            $http         = $injector.get('$http');
-            scope         = $rootScope.$new();
+            $rootScope = $injector.get('$rootScope');
+            $compile = $injector.get('$compile');
+            $httpBackend = $injector.get('$httpBackend');
+            CacheService = $injector.get('CacheService');
+            UtilsService = $injector.get('UtilsService');
+            ViewService = $injector.get('ViewService');
+            URLService = $injector.get('URLService');
+            httpService = $injector.get('HttpService');
+            $http = $injector.get('$http');
+            scope = $rootScope.$new();
             var tableJson = jasmine.getFixtures().read('html/baselineMakeHtmlTable.html');
 
             var testElement = {
                 elements: [{
-                    name          : "Test Element",
-                    sysmlid       : "8008",
-                    modified      : "2016-05-25T12:16:06.856-0700",
-                    modifier      : "catTester",
-                    documentation : '<mms-transclude-doc mms-eid="301"></mms-transclude-doc>',
+                    name: "Test Element",
+                    sysmlid: "8008",
+                    modified: "2016-05-25T12:16:06.856-0700",
+                    modifier: "catTester",
+                    documentation: '<mms-transclude-doc mms-eid="301"></mms-transclude-doc>',
                     specialization: {
-                        type    : "View",
-                        displayedElements : ['301'],
+                        type: "View",
+                        // displayedElements : ['301'],
                         // contains         : [],
                         contents: {
                             valueExpression: null,
-                            operand        : [{
+                            operand: [{
                                 valueExpression: null,
-                                type           : "InstanceValue",
-                                instance       : "301"
+                                type: "InstanceValue",
+                                instance: "301"
                             }],
-                            type           : "Expression"
+                            type: "Expression"
                         },
 
-                        view2view : [
+                        view2view: [
                             {childrenViews: [], id: "301"}
                         ],
                         childViews: [{
                             childrenViews: [],
-                            id           : "301"
+                            id: "301"
                         }]
                     }
                 }]
@@ -65,98 +65,97 @@ describe('mmsTranscludeVal directive', function () {
 
             var element301 = {
                 elements: [{
-                    name          : "301 Element",
-                    sysmlid       : "301",
-                    documentation : '<mms-transclude-doc data-mms-eid="302"></mms-transclude-doc>',
+                    name: "301 Element",
+                    sysmlid: "301",
+                    documentation: '<mms-transclude-doc data-mms-eid="302"></mms-transclude-doc>',
                     specialization: {
                         instanceSpecificationSpecification: {
                             valueExpression: null,
-                            string         : "{\"sourceProperty\":\"documentation\",\"source\":\"302\",\"type\":\"Paragraph\"}",
-                            type           : "LiteralString"
+                            string: "{\"sourceProperty\":\"documentation\",\"source\":\"302\",\"type\":\"Paragraph\"}",
+                            type: "LiteralString"
                         },
-                        classifier                        : ["Classify this!"],
-                        type                              : "InstanceSpecification"
+                        classifier: ["Classify this!"],
+                        type: "InstanceSpecification"
                     },
-                    isMetatype    : false
+                    isMetatype: false
                 }]
             };
 
             var element302 = {
                 elements: [{
-                    name            : "302 Element",
-                    sysmlid         : "302",
-                    documentation   : 'Omg I have this working\!\!\!\!',
-                    appliedMetatypes: ["How Meta...."
-                    ],
-                    specialization  : {
+                    name: "302 Element",
+                    sysmlid: "302",
+                    documentation: 'Omg I have this working\!\!\!\!',
+                    appliedMetatypes: ["How Meta...."],
+                    specialization: {
                         instanceSpecificationSpecification: {
                             valueExpression: null,
-                            string         : "{\"sourceProperty\":\"documentation\",\"source\":\"302\",\"type\":\"Paragraph\"}",
-                            type           : "LiteralString"
+                            string: "{\"sourceProperty\":\"documentation\",\"source\":\"302\",\"type\":\"Paragraph\"}",
+                            type: "LiteralString"
                         },
-                        classifier                        : ["Too Classy for you"],
-                        type                              : "InstanceSpecification"
+                        classifier: ["Too Classy for you"],
+                        type: "InstanceSpecification"
                     },
-                    isMetatype      : false
+                    isMetatype: false
                 }]
             };
 
             var sectionElement = {
                 elements: [{
-                    name            : "Section Element",
-                    sysmlid         : "sectionElement",
-                    documentation   : 'This is a section element\!',
+                    name: "Section Element",
+                    sysmlid: "sectionElement",
+                    documentation: 'This is a section element\!',
                     appliedMetatypes: ["How Meta...."],
-                    specialization  : {
+                    specialization: {
                         instanceSpecificationSpecification: {
                             valueExpression: null,
-                            type           : "Expression",
-                            operand        : [{
+                            type: "Expression",
+                            operand: [{
                                 valueExpression: null,
-                                type           : "InstanceValue",
-                                instance       : "tableElement"
+                                type: "InstanceValue",
+                                instance: "tableElement"
                             }]
                         },
-                        classifier                        : ["_17_0_5_1_407019f_1431903758416_800749_12055"],
-                        type                              : "InstanceSpecification"
+                        classifier: ["Tank Class Please"],
+                        type: "InstanceSpecification"
                     },
-                    isMetatype      : false
+                    isMetatype: false
                 }]
             };
 
             var tableElement = {
                 elements: [{
-                    name            : "Table ELement",
-                    sysmlid         : "tableElement",
-                    documentation   : 'Omg I have this working\!\!\!\!',
+                    name: "Table Element",
+                    sysmlid: "tableElement",
+                    documentation: 'Omg I have this working\!\!\!\!',
                     appliedMetatypes: ["How Meta...."],
-                    specialization  : {
+                    specialization: {
                         instanceSpecificationSpecification: {
                             valueExpression: null,
-                            string         : JSON.stringify(tableJson),
-                            type           : "LiteralString"
+                            string: JSON.stringify(tableJson),
+                            type: "LiteralString"
                         },
-                        type                              : "InstanceSpecification"
+                        type: "InstanceSpecification"
                     },
-                    isMetatype      : false
+                    isMetatype: false
                 }]
             };
 
             var tableDocument = {
                 elements: [{
-                    name          : "Table Document",
-                    sysmlid       : "tableDocument",
-                    documentation : 'Merp Table Doc',
+                    name: "Table Document",
+                    sysmlid: "tableDocument",
+                    documentation: 'Merp Table Doc',
                     specialization: {
                         instanceSpecificationSpecification: {
                             valueExpression: null,
-                            string         : "{\"sourceProperty\":\"documentation\",\"source\":\"302\",\"type\":\"Paragraph\"}",
-                            type           : "LiteralString"
+                            string: "{\"sourceProperty\":\"documentation\",\"source\":\"tableDocument\",\"type\":\"Paragraph\"}",
+                            type: "LiteralString"
                         },
-                        classifier                        : ["Classify this!"],
-                        type                              : "InstanceSpecification"
+                        classifier: ["Classify this!"],
+                        type: "InstanceSpecification"
                     },
-                    isMetatype    : false
+                    isMetatype: false
                 }]
             };
 
@@ -197,27 +196,24 @@ describe('mmsTranscludeVal directive', function () {
         $httpBackend.verifyNoOutstandingRequest();
     });
 
-    // TODO: NEEDS TO BE FINISHED
     it('mmsView should transclude a basic view', inject(function () {
         scope.view = {
-            sysmlid      : "8008",
+            sysmlid: "8008",
             sectionNumber: "3241",
-            ws           : "master",
-            version      : "latest"
+            ws: "master",
+            version: "latest"
         };
 
         element = angular.element('<mms-view mms-vid="{{view.sysmlid}}" data-mms-section="{{view.sectionNumber}}" mms-version="{{view.version}}" mms-ws="{{view.ws}}" ></mms-view>');
         $compile(element)(scope);
 
         scope.$apply();
-        console.log(element.html());
-
+        $httpBackend.flush();
         expect(element.html()).toContain('data-mms-eid="8008"');
         expect(element.html()).toContain(">Test Element<");
         expect(element.html()).toContain("Last Modified");
         expect(element.html()).toContain("by catTester");
         expect(element.html()).toContain("5/25/16 12:16");
-
-        $httpBackend.flush();
+        console.log(element.html());
     }));
 });
