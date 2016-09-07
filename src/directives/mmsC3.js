@@ -10,7 +10,6 @@ function mmsC3(ElementService, UtilsService, TableService, $compile, growl, $win
     var d3 = $window.d3;  
     var svg = d3.select(element[0])
       .append('div');
-      //.attr("id", "c3chart");
     
     var processed = false;
     var ws = scope.mmsWs;
@@ -31,19 +30,6 @@ function mmsC3(ElementService, UtilsService, TableService, $compile, growl, $win
          data: {
           columns:  _columns, //including column heading
         }
-        /*,
-        axis: {
-          x: {
-            type: 'category' // this needed to load string x value
-          }
-        }*//*,
-        bar: {
-          width: {
-            ratio: 0.5 // this makes bar width 50% of length between ticks
-          }
-        // or
-        //width: 100 // this makes bar width 100px
-        } */
       };
       if ( _has_column_header){
         c3json.data.x = 'x';  
@@ -51,18 +37,6 @@ function mmsC3(ElementService, UtilsService, TableService, $compile, growl, $win
       if (_is_x_value_number === false){ //row 1 is heading but not numbers (column0 is ignored)
           setAxisAsCategory(c3json);
       }
-      /*if (scope.c3datatypes === undefined){
-        c3json.data.type = scope.c3datatype;
-        if ( scope.c3datatype === 'bar'){
-          //setAxisAsCategory(c3json);
-          c3json.bar ={};
-          c3json.bar.width = {};
-          if ( scope.c3barwidth !== undefined)
-            c3json.bar.width = scope.c3barwidth;
-          if (scope.c3barwidthratio !== undefined)
-            c3json.bar.width.ratio = scope.c3barwidthratio;
-        }//end of bar 
-       }*/
       if ( scope.c3datatype !== undefined) 
         c3json.data.type = scope.c3datatype;
       if ( scope.c3datatypes !== undefined ) {//mix, scope.c3datatypes defined
