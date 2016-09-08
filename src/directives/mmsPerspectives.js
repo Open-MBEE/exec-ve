@@ -45,7 +45,7 @@ function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigSe
         console.log("Perspectives command: " +
            successfulCommand.command +
            " completed successfully");
-        var projectId = successfulCommand.data.project;
+        /*var projectId = successfulCommand.data.project;
         var eid = projectId2Peid[projectId];
         var elementsList = JSON.parse(result);
         var tstypeName = successfulCommand.data.args[0];
@@ -58,7 +58,7 @@ function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigSe
             }
         }).then(function() {
             deferreds[projectId].resolve("ok");
-        });
+        });*/
     };
     $window.onPerspectivesCommandFailure = function(failedCommand, message, callstack) {
         console.log("Perspectives command " + failedCommand.commmand +
@@ -108,7 +108,7 @@ function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigSe
         var id = ApplicationService.createUniqueId();
         scope.viewId = "view-" + id;
         //var initElements = ["_17_0_5_1_407019f_1402422711365_292853_16371"];
-        var initElements = [];
+        scope.initElements = [];
         var viewName;
         var viewType;
         
@@ -144,7 +144,7 @@ function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigSe
       //scope.mmsTspSpec.tstype
         
         if (scope.mmsTspSpec && scope.mmsTspSpec.elements)
-            initElements = scope.mmsTspSpec.elements;
+            scope.initElements = scope.mmsTspSpec.elements;
         if (scope.mmsTspSpec && scope.mmsTspSpec.context)
             scope.context = scope.mmsTspSpec.context;
 
@@ -186,7 +186,7 @@ function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigSe
                 "type": "InstanceSpecification",
                 "specification": {
                     "type": "LiteralString",
-                    "value": JSON.stringify({context: scope.context, type: "Tsp", tstype: scope.mmsTspSpec.tstype})
+                    "value": JSON.stringify({context: scope.context, type: "Tsp", tstype: scope.mmsTspSpec.tstype, elements: scope.initElements})
                 }
             }).then(function() {
                 growl.info("saved!");
@@ -259,6 +259,7 @@ function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigSe
             instance.result.then(function(eid) {
                 console.log("element chosen: " + eid);
                 console.log("project id: " + id);
+                scope.initElements.push(eid);
                 var groupCommand = {
                     "command": "Group",
                     "data": [
@@ -416,7 +417,7 @@ function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigSe
                     "command": "SetModelAttribute",
                     "data": {
                         "attributeName": "AddElements",
-                        "attributeValue": getElementsArrayString(initElements),
+                        "attributeValue": getElementsArrayString(scope.initElements),
                         "modelID": 'model-' + id,
                         "module": "SysML",
                         "project": id,
