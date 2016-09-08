@@ -65,7 +65,7 @@ function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templ
                 type: "InstanceValue",
                 valueExpression: null
             };
-            ViewService.addElementToViewOrSection($scope.viewOrSection.sysmlid, $scope.viewOrSection.sysmlid, $scope.ws, instanceVal).
+            ViewService.addElementToViewOrSection($scope.viewOrSection.sysmlid, $scope.viewOrSection.sysmlid, $scope.ws, instanceVal, $scope.addPeIndex).
             then(function(data) {
                 // Broadcast message to TreeCtrl:
                 $rootScope.$broadcast('viewctrl.add.element', element, $scope.presentationElemType.toLowerCase(), $scope.viewOrSection);
@@ -90,7 +90,7 @@ function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templ
             }
             $scope.oking = true;
 
-            ViewService.createInstanceSpecification($scope.viewOrSection, $scope.ws, $scope.presentationElemType, $scope.site.sysmlid, $scope.newItem.name).
+            ViewService.createInstanceSpecification($scope.viewOrSection, $scope.ws, $scope.presentationElemType, null, $scope.newItem.name, $scope.addPeIndex).
             then(function(data) {
                 var elemType = $scope.presentationElemType.toLowerCase();
                 $rootScope.$broadcast('viewctrl.add.element', data, elemType, $scope.viewOrSection);
