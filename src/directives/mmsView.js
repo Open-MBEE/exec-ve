@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsView', ['ViewService', '$templateCache', '$rootScope', 'growl', mmsView]);
+.directive('mmsView', ['ViewService', 'MmsAppUtils', '$templateCache', '$rootScope', 'growl', mmsView]);
 
 /**
  * @ngdoc directive
@@ -50,7 +50,7 @@ angular.module('mms.directives')
  * @param {expression=} mmsCfClicked The expression to handle transcluded elements 
  *     in the view being clicked, this should be a function whose argument is 'elementId'
  */
-function mmsView(ViewService, $templateCache, $rootScope, growl) {
+function mmsView(ViewService, MmsAppUtils, $templateCache, $rootScope, growl) {
     var template = $templateCache.get('mms/templates/mmsView.html');
 
     var mmsViewCtrl = function($scope) {
@@ -139,6 +139,7 @@ function mmsView(ViewService, $templateCache, $rootScope, growl) {
 
     var mmsViewLink = function(scope, element, attrs) {
         var processed = false;
+        
         scope.isSection = false;
         var changeView = function(newVal, oldVal) {
             if (!newVal || (newVal === oldVal && processed))
@@ -211,8 +212,9 @@ function mmsView(ViewService, $templateCache, $rootScope, growl) {
          * Add specified element at the defined 'index' 
          */
         scope.addEltAction = function (index, type) {
-             growl.warning("Here is the type " + type);
-             MmsAppUtils.addPresentationElement(scope, type, view);
+             scope.ws = scope.mmsWs;
+             scope.addPeIndex = index + 1;
+             MmsAppUtils.addPresentationElement(scope, type, scope.view);
         };
 
         /**
