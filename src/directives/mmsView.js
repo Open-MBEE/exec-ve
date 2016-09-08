@@ -204,6 +204,19 @@ function mmsView(ViewService, $templateCache, $rootScope, growl) {
 
         /**
          * @ngdoc function
+         * @name mms.directives.directive:mmsView#addEltAction
+         * @methodOf mms.directives.directive:mmsView
+         * 
+         * @description 
+         * Add specified element at the defined 'index' 
+         */
+        scope.addEltAction = function (index, type) {
+             growl.warning("Here is the type " + type);
+             MmsAppUtils.addPresentationElement(scope, type, view);
+        };
+
+        /**
+         * @ngdoc function
          * @name mms.directives.directive:mmsView#toggleShowElements
          * @methodOf mms.directives.directive:mmsView
          * 
@@ -214,6 +227,7 @@ function mmsView(ViewService, $templateCache, $rootScope, growl) {
             scope.showElements = !scope.showElements;
             element.toggleClass('editing');
         };
+
         /**
          * @ngdoc function
          * @name mms.directives.directive:mmsView#toggleShowComments
