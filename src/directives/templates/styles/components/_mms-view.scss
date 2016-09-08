@@ -10,4 +10,12 @@ mms-view {
   table {
     @extend .content-table;
   }
+
+  .add-buttons-container {
+    margin: 10px 0;
+  }
+
+  .add-element-button {
+    margin: 0 25px;
+  }
 }
