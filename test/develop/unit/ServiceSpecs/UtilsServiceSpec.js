@@ -7,8 +7,8 @@
 describe('UtilsService', function () {
     beforeEach(module('mms'));
     var UtilsService, CacheService;
-    jasmine.getFixtures().fixturesPath     = 'base/test/mock-data/UtilsService';
-    jasmine.getJSONFixtures().fixturesPath = 'base/test/mock-data/UtilsService';
+    jasmine.getFixtures().fixturesPath     = 'base/test/mock-data';
+    jasmine.getJSONFixtures().fixturesPath = 'base/test/mock-data';
 
     beforeEach(inject(function ($injector) {
         UtilsService = $injector.get('UtilsService');
@@ -124,7 +124,7 @@ describe('UtilsService', function () {
             // Test will load a json object that has less than 5000 elements and verify that it has more than 1 but
             //  less than 5000 elements. Then it will clean the element and check that the displayedElements were
             //  removed from the element.
-            var data = getJSONFixture('lessthan5000elements.json');
+            var data = getJSONFixture('UtilsService/lessthan5000elements.json');
             // $.getJSON('base/test/mock-data/UtilsService/lessthan5000elements.json', function (data) {
             expect(data.specialization.displayedElements.length).toBeGreaterThan(1);
             expect(data.specialization.displayedElements.length).toBeLessThan(5000);
@@ -134,7 +134,7 @@ describe('UtilsService', function () {
         }));
 
         it('cleanElement() If elem.specialization.type is view and has a Array of (key) displayed elements whose length is greater then 5000 convert the array to JSON', inject(function () {
-            var data = getJSONFixture('morethan5000elements.json');
+            var data = getJSONFixture('UtilsService/morethan5000elements.json');
             // $.getJSON('base/test/mock-data/UtilsService/morethan5000elements.json', function (data) {
             expect(data.specialization.displayedElements.length).toBeGreaterThan(5000);
             UtilsService.cleanElement(data);
@@ -144,7 +144,7 @@ describe('UtilsService', function () {
 
         it('cleanElement() should delete any nonEditable keys from the object', inject(function () {
             // ['contains', 'view2view', 'childrenViews', 'displayedElements','allowedElements', 'contents', 'relatedDocuments']
-            var data = getJSONFixture('utilsservice-noneditablekeys.json');
+            var data = getJSONFixture('UtilsService/utilsservice-noneditablekeys.json');
             // Verify that all the data is in the json first. This JSON is technically malformed but serves the
             //  purpose for testing.
             expect(data.specialization.displayedElements).toBeDefined();
@@ -209,7 +209,7 @@ describe('UtilsService', function () {
             var myData = UtilsService.buildTreeHierarchy(siteData, 'sysmlid', 'site', 'parent', null);
             // Check the output to make sure it's correct, if needed
 
-            var data = getJSONFixture('buildTreeHierarchy.json');
+            var data = getJSONFixture('UtilsService/buildTreeHierarchy.json');
             expect(myData).toEqual(data);
         }));
     });
@@ -318,8 +318,8 @@ describe('UtilsService', function () {
     });
 
     describe('Function isRestrictedValue', function () {
-        var jsonObject1 = getJSONFixture('isRestrictedValue.json')[0];
-        var jsonObject2 = getJSONFixture('isRestrictedValue.json')[1];
+        var jsonObject1 = getJSONFixture('UtilsService/isRestrictedValue.json')[0];
+        var jsonObject2 = getJSONFixture('UtilsService/isRestrictedValue.json')[1];
         var restrictedVal;
 
         it('isRestrictedValue() should check that the values of the element is restricted', inject(function () {
@@ -337,8 +337,8 @@ describe('UtilsService', function () {
     describe('Method makeHtmlTable', function () {
         // makeHtmlTable is a method for generating HTML tables based on rapid tables that are modeled in MagicDraw
         var rapidTable;
-        var baseline       = jasmine.getFixtures().read('html/baselineMakeHtmlTable.html');
-        var rapidTableJson = getJSONFixture('makeHtmlTable.json');
+        var baseline       = jasmine.getFixtures().read('UtilsService/html/baselineMakeHtmlTable.html');
+        var rapidTableJson = getJSONFixture('UtilsService/makeHtmlTable.json');
 
         it('makeHtmlTable() should generate a html table from the json that represents a rapid from MagicDraw', inject(function () {
             // Retrieve the JSON data that the function will use to generate the table
@@ -353,10 +353,10 @@ describe('UtilsService', function () {
     });
 
     describe('Method makeHtmlList', function () {
-        var unorderedHtmlList     = getJSONFixture('makeHtmlList_Unordered.json');
-        var unorderedBaselineHtml = jasmine.getFixtures().read('html/baselineMakeHtmlList_Unordered.html');
-        var orderedHtmlList       = getJSONFixture('makeHtmlList_Ordered.json');
-        var orderedBaselineHtml   = jasmine.getFixtures().read('html/baselineMakeHtmlList_Ordered.html');
+        var unorderedHtmlList     = getJSONFixture('UtilsService/makeHtmlList_Unordered.json');
+        var unorderedBaselineHtml = jasmine.getFixtures().read('UtilsService/html/baselineMakeHtmlList_Unordered.html');
+        var orderedHtmlList       = getJSONFixture('UtilsService/makeHtmlList_Ordered.json');
+        var orderedBaselineHtml   = jasmine.getFixtures().read('UtilsService/html/baselineMakeHtmlList_Ordered.html');
 
         it('makeHtmlList() should create an UNORDERED html list based on the provided json data', inject(function () {
             unorderedHtmlList = (UtilsService.makeHtmlList(unorderedHtmlList));
@@ -386,7 +386,7 @@ describe('UtilsService', function () {
     });
 
     describe('Method getIdInfo', function () {
-        var element = getJSONFixture('getIdInfo.json');
+        var element = getJSONFixture('UtilsService/getIdInfo.json');
         it('should generate a new element with holdingBin, projectId, siteId, and projectName', inject(function () {
             var result = UtilsService.getIdInfo(element, "MERP");
             expect(result).toBeDefined();

@@ -21,7 +21,7 @@ describe('mmsTranscludeVal directive', function () {
             CacheService = $injector.get('CacheService');
             UtilsService = $injector.get('UtilsService');
             scope = $rootScope.$new();
-            var tableJson = getJSONFixture('makeHtmlTable.json');
+            var tableJson = getJSONFixture('UtilsService/makeHtmlTable.json');
 
             // This is regular view that contains a single element as a document
             var testElement = {

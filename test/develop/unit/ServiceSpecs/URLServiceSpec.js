@@ -65,7 +65,7 @@ describe("URLService", function () {
         var tmpWorkspace = "my_silly_workspace";
         var tmpSite      = "Super_cat_memes_aahoooy";
         var productSnapshotUrl;
-        it('should generate a configuration snapshot url', inject(function () {
+        it('should generate a Product snapshot url', inject(function () {
             productSnapshotUrl = root + "/workspaces/" + tmpWorkspace + "/sites/" + tmpSite + "/products/" + tmpId + "/snapshots";
             expect(productSnapshotUrl).toMatch(URLService.getProductSnapshotsURL(tmpId, tmpSite, tmpWorkspace));
         }));
@@ -76,7 +76,7 @@ describe("URLService", function () {
         var tmpWorkspace = "this_isnt_your_workspace";
         var tmpSite      = "dont_go_to_this_site";
         var htmlToPdfURL;
-        it('should generate a configuration snapshot url', inject(function () {
+        it('should generate a Html to PDF url', inject(function () {
             htmlToPdfURL = root + "/workspaces/" + tmpWorkspace + "/sites/" + tmpSite + "/documents/" + tmpId + "/htmlToPdf/123456789";
             expect(htmlToPdfURL).toMatch(URLService.getHtmlToPdfURL(tmpId, tmpSite, tmpWorkspace));
         }));
