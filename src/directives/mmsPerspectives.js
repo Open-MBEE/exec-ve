@@ -393,7 +393,7 @@ function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigSe
                     "command": "Custom",
                     "data": {
                         "serverClassName": "gov.nasa.jpl.mbee.ems.action.SetMmsRestBaseUrlCommandImpl",
-                        "args": ["int-add-" + id, "https://cae-ems-uat.jpl.nasa.gov/alfresco/service"],
+                        "args": ["int-add-" + id, "https://cae-ems-alf5int.jpl.nasa.gov/alfresco/service"],
                         "modelID": 'model-' + id,
                         "module": "SysML",
                         "project": id,
@@ -405,7 +405,7 @@ function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigSe
                     "command": "Custom",
                     "data": {
                         "serverClassName": "gov.nasa.jpl.mbee.ems.action.SetMmsRestBaseUrlCommandImpl",
-                        "args": ["int-context-" + id, "https://cae-ems-uat.jpl.nasa.gov/alfresco/service"],
+                        "args": ["int-context-" + id, "https://cae-ems-alf5int.jpl.nasa.gov/alfresco/service"],
                         "modelID": 'model-' + id,
                         "module": "SysML",
                         "project": id,

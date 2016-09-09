@@ -691,7 +691,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             }
         }
         if (!holdingBinId && siteId)
-            holdingBinId = 'holding_bin_' + siteId + '_no_project';
+            holdingBinId = 'holding_bin_' + siteId;//+ '_no_project';
         var jsonType = realType;
         if (type === 'Comment' || type === 'Paragraph')
             jsonType = type;
