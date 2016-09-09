@@ -31,19 +31,46 @@ function mmsC3(ElementService, UtilsService, TableService, $compile, growl, $win
           columns:  _columns, //including column heading
         }
       };
+      //Data
+      if (scope.c3datanames)
+        c3json.data.names = JSON.parse( scope.c3datanames.replace(/'/g, '"')); 
+      if (scope.c3dataclasses)
+        c3json.data.classes = JSON.parse( scope.c3dataclasses.replace(/'/g, '"')); 
       
-      if (scope.c3dataxs){
-        console.log(scope.c3dataxs);
+      if (scope.c3datalabelsformat){
+        if (c3json.data.labels === undefined) c3json.data.labels = {};
+        console.log(scope.c3datalabelsformat);
+        c3json.data.labels.format = eval("(" + scope.c3datalabelsformat + ")");
+        console.log(c3json.data.labels.format);
+      }
+      else if (scope.c3datalabels)
+        c3json.data.labels = Boolean(scope.c3datalabels);
+      
+      if (scope.c3dataxs)
         c3json.data.xs = JSON.parse( scope.c3dataxs.replace(/'/g, '"'));
+      
+      if (scope.c3dataaxes){
+        c3json.data.axes = JSON.parse( scope.c3dataaxes.replace(/'/g, '"')); 
       }
       //temporary remove to test multiple xyline
       if ( _has_column_header && scope.c3dataxs === undefined){
         c3json.data.x = 'x';  
       }
+      //x or xs
       if (_is_x_value_number === false && scope.c3dataxs === undefined){ //row 1 is heading but not numbers (column0 is ignored)
-           c3json.axis = {};
-           c3json.axis.x = {};
+           if (c3json.axis === undefined)  c3json.axis = {};
+           if (c3json.axis.x === undefined) c3json.axis.x = {};
            c3json.axis.x.type = 'category';
+      }
+      if ( scope.c3gridylines !== undefined){
+        if (c3json.grid === undefined) c3json.grid = {};
+        if (c3json.grid.y === undefined) c3json.grid.y = {};
+        c3json.grid.y.lines = JSON.parse( scope.c3gridylines.replace(/'/g, '"'));
+      }
+      if ( scope.c3axisy2show !== undefined){
+        if (c3json.axis === undefined) c3json.axis = {};
+        if (c3json.axis.y2 === undefined) c3json.axis.y2 = {};
+        c3json.axis.y2.show = Boolean(scope.c3axisy2show);
       }
       if ( scope.c3axisxlabel !== undefined){
           if (c3json.axis === undefined) c3json.axis = {};
@@ -206,15 +233,22 @@ function mmsC3(ElementService, UtilsService, TableService, $compile, growl, $win
       require: '?^mmsView',
        scope: {
         mmsEid: '@',
+        c3datanames: '@',
+        c3dataclasses: '@',
+        c3datagroups:  '@',
+        c3dataaxes: '@',
         c3datatype: '@',
         c3datatypes: '@',
-        c3datagroups:  '@',
+        c3datalabels: '@',
+        c3datalabelsformat: '@',
         c3barwidth: '@',
         c3barwidthratio: '@',
         c3dataregions: '@',
         c3dataxs: '@',
+        c3axisy2show: '@',
         c3axisxlabel: '@',
-        c3axisylabel: '@'
+        c3axisylabel: '@',
+        c3gridylines: '@'
       },
       link: mmsChartLink
     }; //return
