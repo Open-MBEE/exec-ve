@@ -105,7 +105,7 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
             return;
         }
         scope.addHtml = function(value) {
-            value.string = "<p>" + value.value + "</p>";
+            value.value = "<p>" + value.value + "</p>";
         };
         scope.editorApi = {};
         /**

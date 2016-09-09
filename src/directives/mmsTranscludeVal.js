@@ -81,7 +81,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
         
         });
         scope.addHtml = function(value) {
-            value.string = "<p>" + value.string + "</p>";
+            value.value = "<p>" + value.value + "</p>";
         };
         var recompile = function() {
             if (scope.recompileScope)

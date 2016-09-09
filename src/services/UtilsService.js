@@ -325,7 +325,7 @@ function UtilsService(CacheService, _) {
 
     function isRestrictedValue(values) {
         if (values.length > 0 && values[0].type === 'Expression' &&
-            values[0].operand.length === 3 && values[0].operand[0].string === 'RestrictedValue' &&
+            values[0].operand.length === 3 && values[0].operand[0].value === 'RestrictedValue' &&
             values[0].operand[2].type === 'Expression' && values[0].operand[2].operand.length > 0 &&
             values[0].operand[1].type === 'ElementValue')
                     return true;
