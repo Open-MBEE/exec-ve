@@ -67,21 +67,14 @@ function mmsDiffAttr(ElementService, ConfigService, URLService, $q) {
             }else if (scope.mmsAttr === 'doc') {
                 return elem.documentation + '';
             }else{
-                if (!elem.value || !elem.value[0])
+                if (!elem.defaultValue && (!elem.value || !elem.value[0]))
                     return '';
-                if(elem.value[0].type === "LiteralString"){
-                    return elem.value[0].string + '';
-                }else if(elem.value[0].type === "LiteralReal"){
-                    return elem.value[0].double + '';
-                }else if(elem.value[0].type === "LiteralBoolean"){
-                    return elem.value[0].boolean + '' ;
-                } else if (elem.value[0].type === 'LiteralInteger') {
-                    return elem.value[0].integer + '';
-                }else{
-                    element.html('<span class="mms-error">Value type not supported for now</span>');
-                    return null;
-                }
-                
+                if (elem.defaultValue.value)
+                    return elem.defaultValue.value + '';
+                if (elem.value[0].value)
+                    return elem.value[0].value + '';                
+                element.html('<span class="mms-error">Value type not supported for now</span>');
+                return null;
             }            
         };
         // example http://localhost:9000/mms.html#/workspaces/master/sites/vetest/documents/_17_0_5_1_407019f_1402422683509_36078_16169/views/_17_0_5_1_407019f_1402422692412_131628_16263

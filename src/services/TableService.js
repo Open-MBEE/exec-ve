@@ -33,7 +33,7 @@ function TableService($q, $http, URLService, UtilsService, CacheService, _, Elem
           ElementService.getElements(tempMmsEid, false, ws, version)
             .then(function(values) {
               for ( k = 0; k < values.length; k++){
-                var s = JSON.parse(values[k].specification.string);
+                var s = JSON.parse(values[k].specification.value);
                 if ( s.type === "Table"){
                   tableTitles.push(s.title !== undefined ? s.title : "");
                   tableIds.push(values[k].sysmlId);

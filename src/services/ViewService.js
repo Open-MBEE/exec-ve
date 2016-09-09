@@ -67,16 +67,16 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
     var processString = function(values) {
         if (!values || values.length === 0 || values[0].type !== 'LiteralString')
             return '';
-        return values[0].string;
+        return values[0].value;
     };
     var processStrings = function(values) {
         var res = [];
         if (!values || values.length === 0)
             return res;
         values.forEach(function(value) {
-            if (value.type !== 'LiteralString' || !value.string)
+            if (value.type !== 'LiteralString' || !value.value)
                 return;
-            res.push(value.string);
+            res.push(value.value);
         });
         return res;
     };
@@ -85,9 +85,9 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             return [];
         var people = [];
         values.forEach(function(value) {
-            if (value.type !== 'LiteralString' || !value.string)
+            if (value.type !== 'LiteralString' || !value.value)
                 return;
-            var p = value.string.split(',');
+            var p = value.value.split(',');
             if (p.length !== 5)
                 return;
             people.push({
@@ -105,9 +105,9 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             return [];
         var rev = [];
         values.forEach(function(value) {
-            if (value.type !== 'LiteralString' || !value.string)
+            if (value.type !== 'LiteralString' || !value.value)
                 return;
-            var p = value.string.split('|');
+            var p = value.value.split('|');
             if (p.length !== 5)
                 return;
             rev.push({
@@ -974,7 +974,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
 
             // If it is a Opaque List, Paragraph, Table, Image, List:
             if (type === 'LiteralString') {
-                var jsonString = instanceSpecSpec.string;
+                var jsonString = instanceSpecSpec.value;
                 deferred.resolve(JSON.parse(jsonString)); 
             }
             // If it is a Opaque Section, or a Expression:
