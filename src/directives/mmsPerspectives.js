@@ -94,7 +94,7 @@ function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigSe
 
     function tspAddElementCtrl($scope, $uibModalInstance) {
         $scope.choose = function(elem, property) {
-            $uibModalInstance.close(elem.sysmlid);
+            $uibModalInstance.close(elem.sysmlId);
         };
         $scope.cancel = function() {
             $uibModalInstance.dismiss();
@@ -446,7 +446,7 @@ function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigSe
                     "data": {
                         "project": id,
                         "module": "SysML",
-                        "integratorIDs":["int-add-" + id, 'int-context-' + id]
+                        "integratorIDs":["int-add-" + id, 'int-context-' + id, 'int-fcd-' + id]
                         //"integratorIDs":["int-smd-" + id, "int-fcd-" + id]
                     }
                }
