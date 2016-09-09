@@ -453,7 +453,7 @@ function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigSe
             ]
         };
         if (scope.context) {
-            updateCommand.splice(3, 0, {
+            updateCommand.data.splice(3, 0, {
                 "command": "SetModelAttribute",
                 "data": {
                     "attributeName": "Context",
