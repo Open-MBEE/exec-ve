@@ -28,7 +28,7 @@ function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigSe
     var deferreds = {};
     var projectId2Peid = {};
     function getElementsArrayString(elements) {
-        return '[{"sysmlid": "' + elements.join('"}, {"sysmlid": "') + '"}]';
+        return '[{"sysmlId": "' + elements.join('"}, {"sysmlId": "') + '"}]';
     }
     $window.onPerspectivesCommandSuccess = function(successfulCommand) {
         console.log("Perspectives command: " +
