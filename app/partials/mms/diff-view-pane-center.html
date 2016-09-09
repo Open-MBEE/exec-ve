@@ -107,26 +107,26 @@
           <td>VALUE : VALUE TYPE</td>
           <td>
             <div ng-repeat="value in change.original.value" ng-switch on="value.type">
-              <span ng-switch-when="LiteralInteger">{{value.integer}} : {{value.type}}</span>
-              <span ng-switch-when="LiteralBoolean">{{value.boolean}} : {{value.type}}</span>
-              <span ng-switch-when="LiteralReal">{{value.double}} : {{value.type}}</span>
-              <span ng-switch-when="LiteralUnlimitedNatural">{{value.naturalValue}} : {{value.type}}</span>
-              <span ng-switch-when="LiteralString" ng-bind-html="value.string"></span>
+              <span ng-switch-when="LiteralInteger">{{value.value}} : {{value.type}}</span>
+              <span ng-switch-when="LiteralBoolean">{{value.value}} : {{value.type}}</span>
+              <span ng-switch-when="LiteralReal">{{value.value}} : {{value.type}}</span>
+              <span ng-switch-when="LiteralUnlimitedNatural">{{value.value}} : {{value.type}}</span>
+              <span ng-switch-when="LiteralString" ng-bind-html="value.value"></span>
               <span ng-switch-when="Expression">{{value.operand}}</span>
               <span ng-switch-when="ElementValue">
-                <mms-transclude-name mms-watch-id="true" mms-version="{{sourceTime}}" mms-ws="{{source}}" mms-eid="{{value.element}}"></mms-transclude-name>
+                <mms-transclude-name mms-watch-id="true" mms-version="{{sourceTime}}" mms-ws="{{source}}" mms-eid="{{value.elementId}}"></mms-transclude-name>
               </span>
             </div>
           <td>
             <div ng-repeat="value in change.delta.value" ng-switch on="value.type">
-              <span ng-switch-when="LiteralInteger">{{value.integer}} : {{value.type}}</span>
-              <span ng-switch-when="LiteralBoolean">{{value.boolean}} : {{value.type}}</span>
-              <span ng-switch-when="LiteralReal">{{value.double}} : {{value.type}}</span>
-              <span ng-switch-when="LiteralUnlimitedNatural">{{value.naturalValue}} : {{value.type}}</span>
-              <span ng-switch-when="LiteralString" ng-bind-html="value.string"></span>
+              <span ng-switch-when="LiteralInteger">{{value.value}} : {{value.type}}</span>
+              <span ng-switch-when="LiteralBoolean">{{value.value}} : {{value.type}}</span>
+              <span ng-switch-when="LiteralReal">{{value.value}} : {{value.type}}</span>
+              <span ng-switch-when="LiteralUnlimitedNatural">{{value.value}} : {{value.type}}</span>
+              <span ng-switch-when="LiteralString" ng-bind-html="value.value"></span>
               <span ng-switch-when="Expression">{{value.operand}}</span>
               <span ng-switch-when="ElementValue">
-                <mms-transclude-name mms-watch-id="true" mms-version="{{targetTime}}" mms-ws="{{target}}" mms-eid="{{value.element}}"></mms-transclude-name>
+                <mms-transclude-name mms-watch-id="true" mms-version="{{targetTime}}" mms-ws="{{target}}" mms-eid="{{value.elementId}}"></mms-transclude-name>
               </span>
             </div>
           </td>
