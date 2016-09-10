@@ -25,8 +25,8 @@
     </div>
     <div ng-if="view.specialization.contents">
         <!-- Cant use track by instanceVal.instance b/c of possible duplicate entries -->
-        <div ng-repeat="instanceVal in view.specialization.contents.operand track by $index"> 
-            <mms-view-presentation-elem data-mms-instance-val="::instanceVal"></mms-view-presentation-elem>
+        <div ng-repeat="instanceVal in view.specialization.contents.operand"> 
+            <mms-view-presentation-elem data-mms-instance-val="instanceVal"></mms-view-presentation-elem>
             <div class="add-buttons-container">
                 <a ng-show="showEdits" type="button" class="add-element-button center view-add-paragraph" ng-click="addEltAction($index, 'Paragraph')">
                 <i class="fa fa-paragraph"></i><small><strong> ADD TEXT</strong></small></a>
