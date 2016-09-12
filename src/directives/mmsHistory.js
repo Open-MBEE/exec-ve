@@ -50,6 +50,7 @@ function mmsHistory(Utils, ElementService, WorkspaceService, $compile, $template
                 return;
             ran = true;
             lastid = newVal;
+            scope.gettingHistory = true;
             ElementService.getElementVersions(scope.mmsEid, false, scope.mmsWs)
             .then(function(data) {
                 if (newVal !== lastid) 
@@ -57,6 +58,8 @@ function mmsHistory(Utils, ElementService, WorkspaceService, $compile, $template
                 scope.history = data;
                 scope.historyVer = 'latest';
                 scope.selects.timestampSelected = null;
+            }).finally(function() {
+                scope.gettingHistory = false;
             });
         };
         scope.timestampClicked = function() {
