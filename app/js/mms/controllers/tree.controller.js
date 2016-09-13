@@ -1258,7 +1258,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     }
 
     // MmsAppUtils.addElementCtrl creates this event when adding sections, table and figures to the view
-    $scope.$on('viewctrl.add.element', function(event, instanceSpec, elemType, parentBranchData) {
+    $scope.$on('viewctrl.add.element', function(event, instanceSpec, elemType, parentBranchData, addPeIndex) {
         if (elemType === 'paragraph' || elemType === 'list' || elemType === 'comment')
             return;
         var branch = $scope.treeApi.get_branch(parentBranchData);
@@ -1288,18 +1288,26 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             children: [],
         };
         var i = 0;
-        var lastSection = -1;
+        var indexToAddPe = -1;
         var childViewFound = false;
-        for (i = 0; i < branch.children.length; i++) {
-            if (branch.children[i].type === 'view') {
-                lastSection = i-1;
-                childViewFound = true;
-                break;
+        // If addPeIndex is within branch children length add in addPeIndex
+        if (addPeIndex < branch.children.length) {
+            indexToAddPe = addPeIndex - 2; // sub 2 since branch is 0 indexed
+        } else {
+
+            // otherwise add to the end
+            for (i = 0; i < branch.children.length; i++) {
+                if (branch.children[i].type === 'view') {
+                    indexToAddPe = i-1;
+                    childViewFound = true;
+                    break;
+                }
             }
         }
-        if (lastSection == -1 && !childViewFound) //case when first child is view
-            lastSection = branch.children.length-1;
-        branch.children.splice(lastSection+1, 0, newbranch);
+
+        if (indexToAddPe == -1 && !childViewFound) //case when first child is view
+            indexToAddPe = branch.children.length-1;
+        branch.children.splice(indexToAddPe+1, 0, newbranch);
         if (elemType == 'section') 
             addSectionElements(instanceSpec, viewNode, newbranch);
 
