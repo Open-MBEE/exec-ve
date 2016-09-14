@@ -19,7 +19,7 @@
     </div>
     
     <div ng-if="document !== null">
-        <div class="container-fluid" ng-show="show.history">
+        <div class="container-fluid" ng-if="show.history">
           <mms-history mms-eid="{{eid}}" mms-ws="{{specWs}}" mms-type="{{elementType}}"></mms-history>
         </div>
     </div>

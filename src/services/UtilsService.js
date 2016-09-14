@@ -627,7 +627,8 @@ function UtilsService(CacheService, _) {
                 ".toc li > a[href]::after {content: leader('.') target-counter(attr(href), page);}\n" + 
                 ".tot li > a[href]::after {content: leader('.') target-counter(attr(href), page);}\n" + 
                 ".tof li > a[href]::after {content: leader('.') target-counter(attr(href), page);}\n" + 
-                "@page {margin: 0.5in;}\n";
+                "@page {margin: 0.5in;}\n" + 
+                "@page:first {@top {content: ''} @bottom {content: ''} @top-left {content: ''} @top-right {content: ''} @bottom-left {content: ''} @bottom-right {content: ''}}\n";
                 //"@page big_table {  size: 8.5in 11in; margin: 0.75in; prince-shrink-to-fit:auto;}\n" +  //size: 11in 8.5in;
                 //".big-table {page: big_table; max-width: 1100px; }\n";
         Object.keys(meta).forEach(function(key) {
