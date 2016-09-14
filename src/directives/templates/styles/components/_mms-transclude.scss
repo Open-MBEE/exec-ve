@@ -23,11 +23,17 @@ mms-view {
   mms-transclude-val * {
     @include transition(background-color, .2s, linear);
   }
+  .add-buttons-container {
+    display: none;
+  }
 }
 
 mms-view.editing {
   color: #000;
 
+  .add-buttons-container {
+    display: block;
+  }
   /* Level 1 transclusions */
   mms-transclude-doc>*,
   mms-transclude-name>*,

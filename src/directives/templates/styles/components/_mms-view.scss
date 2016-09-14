@@ -11,11 +11,11 @@ mms-view {
     @extend .content-table;
   }
 
-  .add-buttons-container {
-    margin: 10px 0;
+  .add-pe-buttons {
+    margin: 10px 5px;
   }
 
   .add-element-button {
-    margin: 0 25px;
+    margin-right: 25px;
   }
 }
