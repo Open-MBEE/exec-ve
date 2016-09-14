@@ -831,7 +831,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             type:"InstanceSpecification",
             classifierIds:[TYPE_TO_CLASSIFIER_ID.ParagraphT],
             specification: {
-                string: JSON.stringify(instanceSpecSpec),
+                value: JSON.stringify(instanceSpecSpec),
                 type: "LiteralString"
             },
             appliedStereotypeIds: [],
