@@ -345,7 +345,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Wo
                 if (data.type === 'Property' && angular.isArray(data.value)) {
                     scope.editValues = data.value;
                     if (scope.isEnumeration && scope.editValues.length === 0)
-                        scope.editValues.push({type: 'InstanceValue', instance: null});
+                        scope.editValues.push({type: 'InstanceValue', instanceId: null});
                 }
                 if (data.type === 'Constraint' && data.specification) {
                     scope.editValues = [data.specification];
