@@ -1038,7 +1038,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
 
         var elementObject = {};
 
-        elementObject.instance = instanceVal.instance;
+        elementObject.instance = instanceVal.instanceId;
         elementObject.instanceVal = instanceVal;
         elementObject.sectionElements = [];
 
