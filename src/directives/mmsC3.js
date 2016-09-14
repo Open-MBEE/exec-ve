@@ -39,13 +39,59 @@ function mmsC3(ElementService, UtilsService, TableService, $compile, growl, $win
       
       if (scope.c3datalabelsformat){
         if (c3json.data.labels === undefined) c3json.data.labels = {};
-        console.log(scope.c3datalabelsformat);
         c3json.data.labels.format = eval("(" + scope.c3datalabelsformat + ")");
-        console.log(c3json.data.labels.format);
       }
       else if (scope.c3datalabels)
         c3json.data.labels = Boolean(scope.c3datalabels);
-      
+      if ( scope.c3dataorder){ //pie and docut -asc not working
+        if ( scope.c3dataorder === "null")
+          c3json.data.order = null;
+        else 
+          c3json.data.order = scope.c3dataorder;
+      }
+      if (scope.c3datacolors){
+        c3json.data.colors = JSON.parse( scope.c3datacolors.replace(/'/g, '"')); 
+      }   
+      if (scope.c3datacolor){
+        c3json.data.color = eval("(" + scope.c3datacolor + ")");
+      }   
+      if (scope.c3datahide){
+        if (scope.c3datahide instanceof Boolean)
+          c3json.data.hide = Boolean(scope.c3datahide);
+        else
+          c3json.data.hide = eval("(" + scope.c3datahide + ")");
+      }
+      if (scope.c3dataemptylabeltext){
+        if(c3json.data.empty === undefined) c3json.data.empty = {};
+        if(c3json.data.empty.label === undefined) c3json.data.empty.label = {};
+        c3json.data.empty.label.text = scope.c3dataemptylabeltext;
+      }
+      if (scope.c3dataselectionenabled){
+        if ( c3json.data.selection === undefined) c3json.data.selection = {};
+        c3json.data.selection.enabled = Boolean(scope.c3dataselectionenabled);
+      }
+      if (scope.c3dataselectiongrouped){
+        if ( c3json.data.selection === undefined) c3json.data.selection = {};
+        c3json.data.selection.grouped = Boolean(scope.c3dataselectiongrouped);
+      }
+      if (scope.c3dataselectionmultiple){
+        if ( c3json.data.selection === undefined) c3json.data.selection = {};
+        c3json.data.selection.multiple = Boolean(scope.c3dataselectionmultiple);
+      }
+      if (scope.c3dataselectiondraggable){
+        if ( c3json.data.selection === undefined) c3json.data.selection = {};
+        c3json.data.selection.draggable = Boolean(scope.c3dataselectiondraggable); 
+      }
+      if (scope.c3dataselectionisselectable){
+        if ( c3json.data.selection === undefined) c3json.data.selection = {};
+        c3json.data.selection.isselectable = eval("(" + scope.c3dataselectionisselectable + ")");
+      }
+      if (scope.c3dataonclick)
+          c3json.data.onclick = eval("(" + scope.c3dataonclick + ")");
+      if (scope.c3dataonmouseover)
+         c3json.data.onmouseover = eval("(" + scope.c3dataonmouseover + ")");
+      if (scope.c3dataonmouseout)
+         c3json.data.onmouseout = eval("(" + scope.c3dataonmouseout + ")");
       if (scope.c3dataxs)
         c3json.data.xs = JSON.parse( scope.c3dataxs.replace(/'/g, '"'));
       
@@ -241,6 +287,19 @@ function mmsC3(ElementService, UtilsService, TableService, $compile, growl, $win
         c3datatypes: '@',
         c3datalabels: '@',
         c3datalabelsformat: '@',
+        c3dataorder: '@',
+        c3datacolors: '@',
+        c3datacolor: '@',
+        c3datahide: '@',
+        c3dataemptylabeltext: '@',
+        c3dataselectionenabled: '@',
+        c3dataselectiongrouped: '@',
+        c3dataselectionmultiple: '@',
+        c3dataselectiondraggable: '@',
+        c3dataselectionisselectable: '@',
+        c3dataonclick: '@',
+        c3dataonmouseover: '@',
+        c3dataonmouseout: '@',
         c3barwidth: '@',
         c3barwidthratio: '@',
         c3dataregions: '@',
