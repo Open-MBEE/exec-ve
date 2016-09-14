@@ -595,13 +595,13 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         var addContentsSectionTreeNode = function(operand) {
             var bulkGet = [];
             operand.forEach(function(instanceVal) {
-                bulkGet.push(instanceVal.instance);
+                bulkGet.push(instanceVal.instanceId);
             });
           ElementService.getElements(bulkGet, false, ws, time, 0)
           .then(function(ignore) {
             var instances = [];
             operand.forEach(function(instanceVal) {
-                instances.push(ElementService.getElement(instanceVal.instance, false, ws, time, 0));
+                instances.push(ElementService.getElement(instanceVal.instanceId, false, ws, time, 0));
             });
             $q.all(instances).then(function(results) {
                 var k = results.length - 1;

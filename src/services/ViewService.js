@@ -592,7 +592,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 if (clone[key] && clone[key].operand) {
                     var operands = data[key].operand;
                     for (var i = 0; i < operands.length; i++) {
-                        if (instanceVal.instance === operands[i].instance) {
+                        if (instanceVal.instanceId === operands[i].instanceId) {
                             clone[key].operand.splice(i,1);
                             break; 
                         }
@@ -955,7 +955,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      */
     var parseExprRefTree = function(instanceVal, workspace, version, weight) {
 
-        var instanceSpecId = instanceVal.instance;
+        var instanceSpecId = instanceVal.instanceId;
         var deferred = $q.defer();
 
         // TODO do we need version?
@@ -1091,7 +1091,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      */
     var getInstanceSpecification = function(instanceVal, workspace, version, weight) {
 
-        var instanceSpecId = instanceVal.instance;
+        var instanceSpecId = instanceVal.instanceId;
         var deferred = $q.defer();
 
         ElementService.getElement(instanceSpecId, false, workspace, version, weight)

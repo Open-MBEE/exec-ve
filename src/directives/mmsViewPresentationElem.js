@@ -43,7 +43,7 @@ function mmsViewPresentationElem(ViewService, ElementService, $templateCache, $r
 
     var mmsViewPresentationElemLink = function(scope, element, attrs, mmsViewCtrl) {
         if (scope.mmsInstanceVal) {
-            if (!scope.mmsInstanceVal.instance) {
+            if (!scope.mmsInstanceVal.instanceId) {
                 element.html('<span class="mms-error">Reference is null</span>');
                 //growl.error("A presentation element reference is null.");
                 return;
@@ -66,7 +66,7 @@ function mmsViewPresentationElem(ViewService, ElementService, $templateCache, $r
                     scope.presentationElem.type = 'Section';
                 }
 
-                ElementService.getElement(scope.mmsInstanceVal.instance, false, ws, version, 1).
+                ElementService.getElement(scope.mmsInstanceVal.instanceId, false, ws, version, 1).
                 then(function(instanceSpec) {
                     scope.instanceSpec = instanceSpec;
                     scope.presentationElemLoading = false;
@@ -84,12 +84,12 @@ function mmsViewPresentationElem(ViewService, ElementService, $templateCache, $r
                 });
             }, function(reason) {
                 if (reason.status === 500) {
-                    element.html('<span class="mms-error">View element reference error: ' + scope.mmsInstanceVal.instance + ' invalid specification</span>');
+                    element.html('<span class="mms-error">View element reference error: ' + scope.mmsInstanceVal.instanceId + ' invalid specification</span>');
                 } else {
                     var status = ' not found';
                     if (reason.status === 410)
                         status = ' deleted';
-                    element.html('<span class="mms-error">View element reference error: ' + scope.mmsInstanceVal.instance + ' ' + status + '</span>');
+                    element.html('<span class="mms-error">View element reference error: ' + scope.mmsInstanceVal.instanceId + ' ' + status + '</span>');
                 }//growl.error('View Element Ref Error: ' + scope.mmsInstanceVal.instance + ' ' + reason.message);
             }).finally(function() {
                 element.removeClass("isLoading");
