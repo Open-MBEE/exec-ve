@@ -615,7 +615,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 };
             }
             if (addPeIndex)
-                clone.specialization[key].operand.splice(addPeIndex, 0, elementOb);
+                clone.specialization[key].operand.splice(addPeIndex+1, 0, elementOb);
             else
                 clone.specialization[key].operand.push(elementOb);
 
