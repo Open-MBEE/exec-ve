@@ -213,7 +213,7 @@ function mmsView(ViewService, MmsAppUtils, $templateCache, $rootScope, growl) {
          */
         scope.addEltAction = function (index, type) {
              scope.ws = scope.mmsWs;
-             scope.addPeIndex = index + 1;
+             scope.addPeIndex = index;
              MmsAppUtils.addPresentationElement(scope, type, scope.view);
         };
 
