@@ -41,6 +41,25 @@ function mmsC3(ElementService, UtilsService, TableService, $compile, growl, $win
            if (c3json.axis.x === undefined) c3json.axis.x = {};
            c3json.axis.x.type = 'category';
       }
+      if ( scope.c3datatype !== undefined) 
+        c3json.data.type = scope.c3datatype;
+      if ( scope.c3datatypes !== undefined ) {//mix, scope.c3datatypes defined
+        //{'a1':'step', 'a2':'area-step'}
+        //to
+        //{"a1":"step", "a2":"area-step"}
+        c3json.data.types = JSON.parse( scope.c3datatypes.replace(/'/g, '"'));
+      }
+      if (scope.c3datagroups !== undefined){
+        c3json.data.groups = JSON.parse( scope.c3datagroups.replace(/'/g, '"'));
+      }
+      if ( scope.c3dataregions !== undefined){
+        //modify
+        // {'a1':[{'start':1, 'end':2, 'style':'dashed'},{'start':3}],'a2':[{'end':3}]}
+        //to 
+        //{"a1":[{"start":1, "end":2, "style":"dashed"},{"start":3}],"a2":[{"end":3}]}
+        c3json.data.regions = JSON.parse(scope.c3dataregions.replace(/'/g, '"'));
+      }
+
       if (scope.c3dataaxes)
         c3json.data.axes = JSON.parse( scope.c3dataaxes.replace(/'/g, '"')); 
       if (scope.c3datanames){
@@ -401,25 +420,44 @@ function mmsC3(ElementService, UtilsService, TableService, $compile, growl, $win
       //c3gridyticks: '@', - not implemented in c3
       //c3gridfocusshow: '@',- not implemented in c3
       //c3gridlinesfront: '@',- not implemented in c3
-      if ( scope.c3datatype !== undefined) 
-        c3json.data.type = scope.c3datatype;
-      if ( scope.c3datatypes !== undefined ) {//mix, scope.c3datatypes defined
-        //{'a1':'step', 'a2':'area-step'}
-        //to
-        //{"a1":"step", "a2":"area-step"}
-        c3json.data.types = JSON.parse( scope.c3datatypes.replace(/'/g, '"'));
+      if ( scope.c3legendshow){ //boolen
+        if (c3json.legend === undefined) c3json.legend = {};
+        c3json.legend.show = eval("(" + scope.c3legendshow  + ")");
+      } 
+      if ( scope.c3legendhide){ //boolen, string(c3legendhide="'data1'") or array(['data1', 'data2'])
+        if (c3json.legend === undefined) c3json.legend = {};
+        c3json.legend.hide = eval("(" + scope.c3legendhide  + ")");
+      } 
+      if ( scope.c3legendposition){ //c3datalegendposition = "bottom" //  "right" or "inset"
+        if (c3json.legend === undefined) c3json.legend = {};
+        c3json.legend.position = scope.c3legendposition ; 
+      } 
+      /* c3legendinset = 
+          "{'anchor': 'top-right',
+            'x': 20,
+            'y': 10,
+            'step': 2 }"
+      */
+      if ( scope.c3legendinset){ 
+        if (c3json.legend === undefined) c3json.legend = {};
+        c3json.legend.inset = JSON.parse( scope.c3legendinset.replace(/'/g, '"')); 
+      } 
+      if (scope.c3legenditemonclick){
+        if (c3json.legend === undefined) c3json.legend = {};
+        if (c3json.legend.item === undefined) c3json.legend.item = {};
+        c3json.legend.item.onclick = eval("(" + scope.c3legenditemonclick + ")");
       }
-      if (scope.c3datagroups !== undefined){
-        console.log("scope.c3datagroups");
-        c3json.data.groups = JSON.parse( scope.c3datagroups.replace(/'/g, '"'));
+      if (scope.c3legenditemonmouseover){
+        if (c3json.legend === undefined) c3json.legend = {};
+        if (c3json.legend.item === undefined) c3json.legend.item = {};
+        c3json.legend.item.onmouseover = eval("(" + scope.c3legenditemonmouseover + ")");
       }
-      if ( scope.c3dataregions !== undefined){
-        //modify
-        // {'a1':[{'start':1, 'end':2, 'style':'dashed'},{'start':3}],'a2':[{'end':3}]}
-        //to 
-        //{"a1":[{"start":1, "end":2, "style":"dashed"},{"start":3}],"a2":[{"end":3}]}
-        c3json.data.regions = JSON.parse(scope.c3dataregions.replace(/'/g, '"'));
+      if (scope.c3legenditemonmouseout){
+        if (c3json.legend === undefined) c3json.legend = {};
+        if (c3json.legend.item === undefined) c3json.legend.item = {};
+        c3json.legend.item.onmouseout = eval("(" + scope.c3legenditemonmouseout + ")");
       }
+  
       //bar - width or ratio
       if ( scope.c3barwidth !== undefined){
         c3json.bar = {};
