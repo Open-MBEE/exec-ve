@@ -309,27 +309,98 @@ function mmsC3(ElementService, UtilsService, TableService, $compile, growl, $win
         if (c3json.axis.y2 === undefined) c3json.axis.y2 = {};
         c3json.axis.y2.inner = eval("(" + scope.c3axisy2inner  + ")");
       }    
-        c3axisy2max: '@',
-        c3axisy2min: '@',
-        c3axisy2inverted: '@',
-        c3axisy2center: '@',
-        c3axisy2label: '@',
-        c3axisy2tickformat: '@',
-        c3axisy2tickouter: '@',
-        c3axisy2tickvalues: '@',
-        c3axisy2tickcount: '@',
-        c3axisy2padding: '@',
-        c3axisy2default: '@',
-
-
-      if ( scope.c3gridylines !== undefined){
+      if (scope.c3axisy2max){
+        if (c3json.axis === undefined) c3json.axis = {};
+        if (c3json.axis.y2 === undefined) c3json.axis.y2 = {};
+        c3json.axis.y2.max = scope.c3axisy2max;
+      }
+      if (scope.c3axisy2min){
+        if (c3json.axis === undefined) c3json.axis = {};
+        if (c3json.axis.y2 === undefined) c3json.axis.y2 = {};
+        c3json.axis.y2.min = scope.c3axisy2min;
+      }    
+      if (scope.c3axisy2inverted){
+        if (c3json.axis === undefined) c3json.axis = {};
+        if (c3json.axis.y2 === undefined) c3json.axis.y2 = {};
+        c3json.axis.y2.inverted = scope.c3axisy2inverted;
+      }  
+      if (scope.c3axisy2center){
+        if (c3json.axis === undefined) c3json.axis = {};
+        if (c3json.axis.y2 === undefined) c3json.axis.y2 = {};
+        c3json.axis.y2.center = scope.c3axisy2center;
+      }
+      if ( scope.c3axisy2label !== undefined){
+          if (c3json.axis === undefined) c3json.axis = {};
+          if (c3json.axis.y2 === undefined) c3json.axis.y2 = {};
+          if (scope.c3axisy2label.startsWith("{"))
+            c3json.axis.y2.label = JSON.parse(scope.c3axisy2label.replace(/'/g, '"')); 
+          else
+            c3json.axis.y2.label = scope.c3axisy2label;
+      } 
+      if (scope.c3axisy2tickformat){//function(d){}
+        if (c3json.axis === undefined) c3json.axis = {};
+        if (c3json.axis.y2 === undefined) c3json.axis.y2 = {};
+        if (c3json.axis.y2.tick === undefined) c3json.axis.y2.tick = {};
+        if (scope.c3axisy2tickformat.trim().startsWith("function"))
+          c3json.axis.y2.tick.format = eval("(" + scope.c3axisy2tickformat + ")");
+        else if (scope.c3axisy2tickformat.indexOf('%') !== -1)
+          c3json.axis.y2.tick.format = scope.c3axisy2tickformat;
+      }
+      if (scope.c3axisy2tickouter){
+        if (c3json.axis === undefined) c3json.axis = {};
+        if (c3json.axis.y2 === undefined) c3json.axis.y2 = {};
+        if (c3json.axis.y2.tick === undefined) c3json.axis.y2.tick = {};
+        c3json.axis.y2.tick.outer = eval("(" + scope.c3axisy2tickouter + ")");
+      }
+      if (scope.c3axisy2tickvalues){
+        if (c3json.axis === undefined) c3json.axis = {};
+        if (c3json.axis.y2 === undefined) c3json.axis.y2 = {};
+        if (c3json.axis.y2.tick === undefined) c3json.axis.y2.tick = {};
+        c3json.axis.y2.tick.values = eval("(" + scope.c3axisy2tickvalues + ")");
+      }  
+      if (scope.c3axisy2tickcount){ 
+        if (c3json.axis === undefined) c3json.axis = {};
+        if (c3json.axis.y2 === undefined) c3json.axis.y2 = {};
+        if (c3json.axis.y2.tick === undefined) c3json.axis.y2.tick = {};
+        c3json.axis.y2.tick.count = scope.c3axisy2tickcount;
+      }  
+        //c3axisyticktimevalue: '@',
+        //c3axisyticktimeinterval: '@',
+      if (scope.c3axisy2padding){ //{'top': '0', 'bottom': '0'}
+        if (c3json.axis === undefined) c3json.axis = {};
+        if (c3json.axis.y2 === undefined) c3json.axis.y2 = {};
+        c3json.axis.y2.padding = JSON.parse( scope.c3axisy2padding.replace(/'/g, '"')); 
+      }  
+      if (scope.c3axisy2default){
+        if (c3json.axis === undefined) c3json.axis = {};
+        if (c3json.axis.y2 === undefined) c3json.axis.y2 = {};
+        if (c3json.axis.y2.tick === undefined) c3json.axis.y2.tick = {};
+        c3json.axis.y2.default = eval("(" + scope.c3axisy2default + ")");
+      }   
+    //Grid 
+      if ( scope.c3gridxshow){ //boolen
+        if (c3json.grid === undefined) c3json.grid = {};
+        if (c3json.grid.x === undefined) c3json.grid.x = {};
+        c3json.grid.x.show = eval("(" + scope.c3gridxshow  + ")");
+      }  
+      if ( scope.c3gridxlines !== undefined){ //[{value:2, text:'label2'}, {...},{...}]
+        if (c3json.grid === undefined) c3json.grid = {};
+        if (c3json.grid.x === undefined) c3json.grid.x = {};
+        c3json.grid.x.lines = JSON.parse( scope.c3gridxlines.replace(/'/g, '"'));
+      }
+      if ( scope.c3gridyshow){ //boolen
+        if (c3json.grid === undefined) c3json.grid = {};
+        if (c3json.grid.y === undefined) c3json.grid.y = {};
+        c3json.grid.y.show = eval("(" + scope.c3gridyshow  + ")");
+      } 
+      if ( scope.c3gridylines !== undefined){ //[{value:2, text:'label2'}, {...},{...}]
         if (c3json.grid === undefined) c3json.grid = {};
         if (c3json.grid.y === undefined) c3json.grid.y = {};
         c3json.grid.y.lines = JSON.parse( scope.c3gridylines.replace(/'/g, '"'));
       }
-      
-      
-      
+      //c3gridyticks: '@', - not implemented in c3
+      //c3gridfocusshow: '@',- not implemented in c3
+      //c3gridlinesfront: '@',- not implemented in c3
       if ( scope.c3datatype !== undefined) 
         c3json.data.type = scope.c3datatype;
       if ( scope.c3datatypes !== undefined ) {//mix, scope.c3datatypes defined
@@ -505,7 +576,7 @@ function mmsC3(ElementService, UtilsService, TableService, $compile, growl, $win
         c3dataonmouseover: '@',
         c3dataonmouseout: '@',
         c3axisrotated: '@',
-        //axis.x
+      //Axis.x
         c3axisxshow: '@',
         c3axisxtype: '@',
         c3axisxlocaltime: '@',
@@ -527,9 +598,9 @@ function mmsC3(ElementService, UtilsService, TableService, $compile, growl, $win
         c3axisxheight: '@',
         c3axisxextent: '@',
         c3axisxlabel: '@',
-        //axis.y
+      //Axis.y
         c3axisyshow: '@',
-        //c3axisytype: '@',
+        //c3axisytype: '@',-- not supported by c3 yet
         c3axisyinner: '@',
         c3axisymax: '@',
         c3axisymin: '@',
@@ -540,8 +611,8 @@ function mmsC3(ElementService, UtilsService, TableService, $compile, growl, $win
         c3axisytickouter: '@',
         c3axisytickvalues: '@',
         c3axisytickcount: '@',
-        //c3axisyticktimevalue: '@',
-        //c3axisyticktimeinterval: '@',
+        //c3axisyticktimevalue: '@',-- not supported by c3 yet
+        //c3axisyticktimeinterval: '@',-- not supported by c3 yet
         c3axisypadding: '@',
         c3axisydefault: '@',
         c3axisy2show: '@',
@@ -557,12 +628,67 @@ function mmsC3(ElementService, UtilsService, TableService, $compile, growl, $win
         c3axisy2tickcount: '@',
         c3axisy2padding: '@',
         c3axisy2default: '@',
-        
+      //Grid
+        c3gridxshow: '@',
+        c3gridxlines: '@',
+        c3gridyshow: '@',
         c3gridylines: '@',
+        //c3gridyticks: '@',- not implemented in c3
+        //c3gridfocusshow: '@',- not implemented in c3
+        //c3gridlinesfront: '@',- not implemented in c3
+      //Regions
+        //c3regions: '@', - css change required to use the regions
+      //Legend 
+        c3legendshow: '@',
+        c3legendhide: '@',
+        c3legendposition: '@',
+        c3legendinset: '@',
+        c3legenditemonclick: '@',
+        c3legenditemonmouseover: '@',
+        c3legenditemonmouseout: '@',
+       //Tooltip
+        c3tooltipshow: '@',
+        c3tooltipgrouped: '@',
+        c3tooltipformattitle: '@',
+        c3tooltipformatname: '@',
+        c3tooltipformatvalue: '@',
+        c3tooltipposition: '@',
+        c3tooltipcontents: '@',
+      //Point
+        c3pointshow: '@',
+        c3pointr: '@',
+        c3pointfocusexpandenabled: '@',
+        c3pointfocusexpandr: '@',
+        c3pointselectr: '@',
+      //Line
+        c3lineconnectNull: '@',
+        c3linestep_type: '@',
+      //Area
+        c3areazerobased: '@',
+      //Bar  
         c3barwidth: '@',
-        c3barwidthratio: '@'
-        
-       
+        c3barwidthratio: '@',
+        c3barzerobased: '@',
+      //Pie
+        c3pielabelshow: '@',
+        c3pielabelformat: '@',
+        c3pielabelthreshold: '@',
+        c3pieexpand: '@',
+      //Donut
+        c3donutlabelshow: '@',
+        c3donutlabelformat: '@',
+        c3donutlabelthreshold: '@',
+        c3donutexpand: '@',
+        c3donutwidth: '@',
+        c3donuttitle: '@',
+      //Gauge  
+        c3gaugelabelshow: '@',
+        c3gaugelabelformat: '@',
+        c3gaugeexpand: '@',
+        c3gaugemin: '@',
+        c3gaugemax: '@',
+        c3gaugeunits: '@',
+        c3gaugewidth: '@'
       },
       link: mmsChartLink
     }; //return
