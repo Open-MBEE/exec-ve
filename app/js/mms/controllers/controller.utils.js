@@ -61,7 +61,7 @@ function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templ
             }
             $scope.oking = true;  
             var instanceVal = {
-                instance: element.sysmlId,
+                instanceId: element.sysmlId,
                 type: "InstanceValue",
                 valueExpression: null
             };

@@ -594,7 +594,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 if (clone[key] && clone[key].operand) {
                     var operands = data[key].operand;
                     for (var i = 0; i < operands.length; i++) {
-                        if (instanceVal.instance === operands[i].instance) {
+                        if (instanceVal.instanceId === operands[i].instanceId) {
                             clone[key].operand.splice(i,1);
                             break; 
                         }
@@ -716,7 +716,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             type: "InstanceSpecification",
             classifierIds: [TYPE_TO_CLASSIFIER_ID[realType]],
             specification: {
-                string: JSON.stringify(instanceSpecSpec),
+                value: JSON.stringify(instanceSpecSpec),
                 type: "LiteralString"
             },
             appliedStereotypeIds: [],
@@ -736,7 +736,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             data.forEach(function(elem) {
                 if (elem.sysmlId === newInstanceId) {
                     var instanceVal = {
-                        instance: newInstanceId,
+                        instanceId: newInstanceId,
                         type: "InstanceValue",
                         //valueExpression: null
                     };
@@ -799,7 +799,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             contents: {
                 //valueExpression: null,
                 operand: [{
-                    instance: newInstanceId,
+                    instanceId: newInstanceId,
                     type:"InstanceValue",
                 }],
                 type: 'Expression'
@@ -841,7 +841,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             type:"InstanceSpecification",
             classifierIds:[TYPE_TO_CLASSIFIER_ID.ParagraphT],
             specification: {
-                string: JSON.stringify(instanceSpecSpec),
+                value: JSON.stringify(instanceSpecSpec),
                 type: "LiteralString"
             },
             appliedStereotypeIds: [],
@@ -965,7 +965,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      */
     var parseExprRefTree = function(instanceVal, workspace, version, weight) {
 
-        var instanceSpecId = instanceVal.instance;
+        var instanceSpecId = instanceVal.instanceId;
         var deferred = $q.defer();
 
         // TODO do we need version?
@@ -1048,7 +1048,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
 
         var elementObject = {};
 
-        elementObject.instance = instanceVal.instance;
+        elementObject.instance = instanceVal.instanceId;
         elementObject.instanceVal = instanceVal;
         elementObject.sectionElements = [];
 
@@ -1101,7 +1101,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      */
     var getInstanceSpecification = function(instanceVal, workspace, version, weight) {
 
-        var instanceSpecId = instanceVal.instance;
+        var instanceSpecId = instanceVal.instanceId;
         var deferred = $q.defer();
 
         ElementService.getElement(instanceSpecId, false, workspace, version, weight)
