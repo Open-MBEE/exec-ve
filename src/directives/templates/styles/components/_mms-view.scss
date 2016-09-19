@@ -1,3 +1,29 @@
+.tsMenuBarItem
+{
+	background-color: white;
+	font-weight: normal;
+	font-size: 85%;
+	padding: 2px !important;
+}
+
+.gwt-MenuBarPopup table {
+//     border-collapse: separate !important;
+//     border-spacing: 0 !important;
+//     border: none !important;
+    margin: unset;
+//     width: auto !important;
+//     background:transparent !important;
+}
+  
+.gwt-MenuBarPopup td,
+.gwt-MenuBarPopup th {
+    padding: unset;
+    border: unset;
+}
+
+
+
+  
 mms-view {
   .view-title {
     font-family: $light-font-family-sans-serif;
@@ -1330,7 +1356,6 @@ input[type="text"].tsSearchBoxInput-watermark
 	text-align: center;
 	color: DarkGray;
 }
-
 
 /******************************************************************************
  * Dialog box component styles. Modifications to default GWT Dialog box style.
