@@ -536,7 +536,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Wo
 
             var viewOrSecId = section ? section.sysmlid : scope.view.sysmlid;
             ViewService.deleteElementFromViewOrSection(viewOrSecId, scope.ws, scope.instanceVal).then(function(data) {
-                if (ViewService.isSection(scope.instanceSpec) || ViewService.isTable(scope.instanceSpec) || ViewService.isFigure(scope.instanceSpec)) {
+                if (ViewService.isSection(scope.instanceSpec) || ViewService.isTable(scope.instanceSpec) || ViewService.isFigure(scope.instanceSpec) || ViewService.isEquation(scope.instanceSpec)) {
                     // Broadcast message to TreeCtrl:
                     $rootScope.$broadcast('viewctrl.delete.element', scope.instanceSpec);
                 }
