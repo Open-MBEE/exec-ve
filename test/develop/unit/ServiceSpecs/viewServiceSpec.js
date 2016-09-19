@@ -38,7 +38,7 @@ describe('ViewService', function() {
 			ViewService.createDocument('newDocument','siteId' ,'master').then(function(data){
 				//console.log("The long object " + JSON.stringify(data, null, " "));
 				expect(data.name).toEqual('newDocument');
-				expect(data.specialization.view2view).toBeDefined();
+				expect(data.specialization.view2view).toBeUndefined();
 				expect(data.specialization.contents.operand).toBeDefined();
 			},
 			function(reason){

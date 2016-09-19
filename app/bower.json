@@ -46,5 +46,8 @@
     "lodash": "3.9.3",
     "d3": "~3.5.6",
     "angular": "~1.5.5"
+  },
+  "devDependencies": {
+    "angular-mocks": "^1.5.8"
   }
 }
