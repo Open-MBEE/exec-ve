@@ -1288,26 +1288,19 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             children: [],
         };
         var i = 0;
-        var indexToAddPe = -1;
+        var indexToAddPe = -2;
         var childViewFound = false;
-        // If addPeIndex is within branch children length add in addPeIndex
-        if (addPeIndex < branch.children.length) {
-            indexToAddPe = addPeIndex - 2; // sub 2 since branch is 0 indexed
-        } else {
+        // $scope.treeApi.remove_branch(branch);
+        // Remove all non view children from branch
 
-            // otherwise add to the end
-            for (i = 0; i < branch.children.length; i++) {
-                if (branch.children[i].type === 'view') {
-                    indexToAddPe = i-1;
-                    childViewFound = true;
-                    break;
-                }
+        // check if branch is view otherwise get parent view
+        for (i = 0; i < branch.children.length; i++) {
+            if (branch.children[i].type != 'view') {
+                branch.children.splice(i, 1);
+                --i;
             }
         }
-
-        if (indexToAddPe == -1 && !childViewFound) //case when first child is view
-            indexToAddPe = branch.children.length-1;
-        branch.children.splice(indexToAddPe+1, 0, newbranch);
+        addViewSections(parentBranchData);
         if (elemType == 'section') 
             addSectionElements(instanceSpec, viewNode, newbranch);
 
