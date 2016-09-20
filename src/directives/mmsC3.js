@@ -30,6 +30,14 @@ function mmsC3(ElementService, UtilsService, TableService, $compile, growl, $win
           columns:  _columns, //including column heading
         }
       };
+      if ( scope.c3sizewidth){
+        if (c3json.size === undefined) c3json.size = {};
+        c3json.size.width = eval("(" + scope.c3sizewidth + ")");
+      }
+       if ( scope.c3sizeheight){
+        if (c3json.size === undefined) c3json.size = {};
+        c3json.size.height = eval("(" + scope.c3sizeheight + ")");
+      }
       //Data
       if (scope.c3dataxs)
         c3json.data.xs = JSON.parse( scope.c3dataxs.replace(/'/g, '"'));
@@ -623,14 +631,12 @@ function mmsC3(ElementService, UtilsService, TableService, $compile, growl, $win
         if (c3json.gauge === undefined ) c3json.gauge = {};
         c3json.gauge.width = eval("(" + scope.c3gaugewidth  + ")");
       }
-     
-  
+   
     var json = JSON.stringify(c3json);
-    console.log(json);
+    //console.log(json);
     var chart = c3.generate(c3json);
     
-
-    var zz2 = {bindto:'#c3chart' + _index ,
+    /*var zz2 = {bindto:'#c3chart' + _index ,
     data: {
         columns: [
             ['data1', 30, 20, 50, 40, 60, 50],
@@ -651,10 +657,10 @@ function mmsC3(ElementService, UtilsService, TableService, $compile, growl, $win
         ]
     }
   };
-
     //var json2 = JSON.stringify(zz);
     //console.log(json2);
     //c3.generate(zz);
+    */
 
 	}//end of vf_pplot()
 
@@ -663,20 +669,13 @@ function mmsC3(ElementService, UtilsService, TableService, $compile, growl, $win
     if (scopetableColumnHeadersLabel.length === 0) return;
       svg.selectAll('*').remove();
       
-	/*console.log("columnHeader");  
-	console.log(scopetableColumnHeadersLabel);
-	console.log("rowHeader");
-	console.log(scope.tableRowHeaders);
-	console.log("datavalues");
-	console.log(scope.datavalues);
-	*/  
+	
 	var is_x_value_number = true;  //column headings are number (not check 1st column)
   var has_column_header = true;
   var start_index; //0 if column header is included as data, -1 if column header is not included as data
   for ( var k = 0; k < scopeTableIds.length; k++){
 		var c3_data=[];
 
-    console.log("scope.c3dataxs" + scope.c3dataxs);
     if ( scope.c3dataxs === undefined) {
       c3_data[0] = ['x'].concat(scopetableColumnHeadersLabel[k]);
       start_index = 0;
@@ -685,8 +684,6 @@ function mmsC3(ElementService, UtilsService, TableService, $compile, growl, $win
       has_column_header = false;
       start_index = -1;
     }
-    //console.log("not a number?: ");
-    //console.log(isNaN(scopetableColumnHeadersLabel[k][0]));
     if (isNaN(scopetableColumnHeadersLabel[k][0]))
       is_x_value_number = false;
 
@@ -714,8 +711,7 @@ function mmsC3(ElementService, UtilsService, TableService, $compile, growl, $win
     c3_data = temp;
     if ( c3_data.length === 5)
     */
-    console.log("c3_data");
-    console.log(c3_data);
+   
     //////////////////////////////////
     vf_pplot(c3_data, k, is_x_value_number, has_column_header); //c3_columns
    }//end of k (each table)
@@ -746,6 +742,8 @@ function mmsC3(ElementService, UtilsService, TableService, $compile, growl, $win
       require: '?^mmsView',
        scope: {
         mmsEid: '@',
+        c3sizewidth: '@',
+        c3sizeheight: '@',
         c3dataxs: '@',
         c3datanames: '@',
         c3dataclasses: '@',
