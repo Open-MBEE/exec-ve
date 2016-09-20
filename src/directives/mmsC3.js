@@ -442,7 +442,7 @@ function mmsC3(ElementService, UtilsService, TableService, $compile, growl, $win
         if (c3json.legend === undefined) c3json.legend = {};
         c3json.legend.inset = JSON.parse( scope.c3legendinset.replace(/'/g, '"')); 
       } 
-      if (scope.c3legenditemonclick){
+      if (scope.c3legenditemonclick){ //function(d){...}
         if (c3json.legend === undefined) c3json.legend = {};
         if (c3json.legend.item === undefined) c3json.legend.item = {};
         c3json.legend.item.onclick = eval("(" + scope.c3legenditemonclick + ")");
@@ -457,18 +457,174 @@ function mmsC3(ElementService, UtilsService, TableService, $compile, growl, $win
         if (c3json.legend.item === undefined) c3json.legend.item = {};
         c3json.legend.item.onmouseout = eval("(" + scope.c3legenditemonmouseout + ")");
       }
-  
+      //Tooltip
+      if ( scope.c3tooltipshow){ //boolen, string(c3legendhide="'data1'") or array(['data1', 'data2'])
+        if (c3json.tooltip === undefined) c3json.tooltip = {};
+        c3json.tooltip.show = eval("(" + scope.c3tooltipshow  + ")");
+      }
+      if ( scope.c3tooltipgrouped){ //boolen, string(c3legendhide="'data1'") or array(['data1', 'data2'])
+        if (c3json.tooltip === undefined) c3json.tooltip = {};
+        c3json.tooltip.grouped = eval("(" + scope.c3tooltipgrouped  + ")");
+      } 
+      if (scope.c3tooltipformattitle){ //function(d){...}
+        if (c3json.tooltip === undefined) c3json.tooltip = {};
+        if (c3json.tooltip.format === undefined) c3json.tooltip.format = {};
+        c3json.tooltip.format.title = eval("(" + scope.c3tooltipformattitle + ")");
+      }
+      if (scope.c3tooltipformatname){ //function(d){...}
+        if (c3json.tooltip === undefined) c3json.tooltip = {};
+        if (c3json.tooltip.format === undefined) c3json.tooltip.format = {};
+        c3json.tooltip.format.name = eval("(" + scope.c3tooltipformatname + ")");
+      }
+      if (scope.c3tooltipformatvalue){ //function(d){...}
+        if (c3json.tooltip === undefined) c3json.tooltip = {};
+        if (c3json.tooltip.format === undefined) c3json.tooltip.format = {};
+        c3json.tooltip.format.value = eval("(" + scope.c3tooltipformatvalue + ")");
+      }
+      if (scope.c3tooltipposition){ //function(d){...}
+        if (c3json.tooltip === undefined) c3json.tooltip = {};
+        c3json.tooltip.position = eval("(" + scope.c3tooltipposition + ")");
+      }
+      if (scope.c3tooltipcontents){ //function(d){...}
+        if (c3json.tooltip === undefined) c3json.tooltip = {};
+        c3json.tooltip.contents = eval("(" + scope.c3tooltipcontents + ")");
+      }
+      //Point
+      if ( scope.c3pointshow){ //boolen
+        if (c3json.point === undefined) c3json.point = {};
+        c3json.point.show = eval("(" + scope.c3pointshow  + ")");
+      } 
+      if ( scope.c3pointr){ // number
+        if (c3json.point === undefined) c3json.point = {};
+        c3json.point.r = eval("(" + scope.c3pointr  + ")");
+      } 
+      if ( scope.c3pointfocusexpandenabled){ //boolen
+        if (c3json.point === undefined) c3json.point = {};
+        if (c3json.point.focus === undefined) c3json.point.focus = {};
+        if (c3json.point.focus.expand === undefined) c3json.point.focus.expand = {};
+        c3json.point.focus.expand.enabled = eval("(" + scope.c3pointfocusexpandenabled  + ")");
+      } 
+      if ( scope.c3pointfocusexpandr){ //number
+        if (c3json.point === undefined) c3json.point = {};
+        if (c3json.point.focus === undefined) c3json.point.focus = {};
+        if (c3json.point.focus.expand === undefined) c3json.point.focus.expand = {};
+        c3json.point.focus.expand.r = eval("(" + scope.c3pointfocusexpandr  + ")");
+      } 
+      if ( scope.c3pointselectr){ // number
+        if (c3json.point === undefined) c3json.point = {};
+        if (c3json.point.select === undefined) c3json.point.select = {};
+        c3json.point.select.r = eval("(" + scope.c3pointselectr  + ")");
+      } 
+      //Line
+      if ( scope.c3lineconnectnull){ //boolen
+        if (c3json.line === undefined) c3json.line = {};
+        c3json.connectNull = eval("(" + scope.c3lineconnectnull  + ")");
+      }   
+      //seems not working.  Get error step not defined
+      if ( scope.c3linesteptype){ // number
+        if (c3json.line === undefined) c3json.line = {};
+        c3json.line.step_type = eval("(" + scope.c3linesteptype  + ")");
+      }
+      if ( scope.c3areazerobased){ // number
+        if (c3json.area === undefined) c3json.area = {};
+        c3json.area.zerobased = eval("(" + scope.c3areazerobased  + ")");
+      }
       //bar - width or ratio
       if ( scope.c3barwidth !== undefined){
-        c3json.bar = {};
-        c3json.bar.width = {};
+        if (c3json.bar === undefined ) c3json.bar = {};
+        if (c3json.bar.width === undefined) c3json.bar.width = {};
         c3json.bar.width = scope.c3barwidth;
-      } else if ( scope.c3barwidthratio !== undefined){
-        c3json.bar = {};
-        c3json.bar.width = {};
+      } 
+      if ( scope.c3barwidthratio !== undefined){
+        if (c3json.bar === undefined ) c3json.bar = {};
+        if (c3json.bar.width === undefined) c3json.bar.width = {};
         c3json.bar.width.ratio = scope.c3barwidthratio;
       }
-    
+      if ( scope.c3barzerobased){ // number
+        if (c3json.bar === undefined ) c3json.bar = {};
+        c3json.bar.zerobased = eval("(" + scope.c3barzerobased  + ")");
+      }
+      //Pie
+      if ( scope.c3pielabelshow){ 
+        if (c3json.pie === undefined ) c3json.pie = {};
+        if (c3json.pie.label === undefined ) c3json.pie.label = {};
+        c3json.pie.label.show = eval("(" + scope.c3pielabelshow  + ")");
+      }
+      if ( scope.c3pielabelformat){ 
+        if (c3json.pie === undefined ) c3json.pie = {};
+        if (c3json.pie.label === undefined ) c3json.pie.label = {};
+        c3json.pie.label.format = eval("(" + scope.c3pielabelformat  + ")");
+      }
+      if ( scope.c3pielabelthreshold){ 
+        if (c3json.pie === undefined ) c3json.pie = {};
+        if (c3json.pie.label === undefined ) c3json.pie.label = {};
+        c3json.pie.label.threshold = eval("(" + scope.c3pielabelthreshold  + ")");
+      }
+      if ( scope.c3pieexpand){ 
+        if (c3json.pie === undefined ) c3json.pie = {};
+        c3json.pie.expand = eval("(" + scope.c3pieexpand  + ")");
+      }
+      //Donut
+      if ( scope.c3donutlabelshow){ 
+        if (c3json.donut === undefined ) c3json.donut = {};
+        if (c3json.donut.label === undefined ) c3json.donut.label = {};
+        c3json.donut.label.show = eval("(" + scope.c3donutlabelshow  + ")");
+      }
+      if ( scope.c3donutlabelformat){ 
+        if (c3json.donut === undefined ) c3json.donut = {};
+        if (c3json.donut.label === undefined ) c3json.donut.label = {};
+        c3json.donut.label.format = eval("(" + scope.c3donutlabelformat  + ")");
+      }
+      if ( scope.c3donutlabelthreshold){ 
+        if (c3json.donut === undefined ) c3json.donut = {};
+        if (c3json.donut.label === undefined ) c3json.donut.label = {};
+        c3json.donut.label.threshold = eval("(" + scope.c3donutlabelthreshold  + ")");
+      }
+      if ( scope.c3donutexpand){ 
+        if (c3json.donut === undefined ) c3json.donut = {};
+        c3json.donut.expand = eval("(" + scope.c3donutexpand  + ")");
+      }
+      if ( scope.c3donutwidth){ 
+        if (c3json.donut === undefined ) c3json.donut = {};
+        c3json.donut.width = eval("(" + scope.c3donutwidth  + ")");
+      }
+      if ( scope.c3donuttitle){ 
+        if (c3json.donut === undefined ) c3json.donut = {};
+        c3json.donut.title = scope.c3donuttitle;
+      }
+      //Gauge
+      if ( scope.c3gaugelabelshow){ 
+        if (c3json.gauge === undefined ) c3json.gauge = {};
+        if (c3json.gauge.label === undefined ) c3json.gauge.label = {};
+        c3json.gauge.label.show = eval("(" + scope.c3gaugelabelshow  + ")");
+      }
+      if ( scope.c3gaugelabelformat){ 
+        if (c3json.gauge === undefined ) c3json.gauge = {};
+        if (c3json.gauge.label === undefined ) c3json.gauge.label = {};
+        c3json.gauge.label.format = eval("(" + scope.c3gaugelabelformat  + ")");
+      }
+      if ( scope.c3gaugeexpand){ 
+        if (c3json.gauge === undefined ) c3json.gauge = {};
+        c3json.gauge.expand = eval("(" + scope.c3gaugeexpand  + ")");
+      }
+      if ( scope.c3gaugemin){ 
+        if (c3json.gauge === undefined ) c3json.gauge = {};
+        c3json.gauge.min = eval("(" + scope.c3gaugemin  + ")");
+      }
+      if ( scope.c3gaugemax){ 
+        if (c3json.gauge === undefined ) c3json.gauge = {};
+        c3json.gauge.max = eval("(" + scope.c3gaugemax  + ")");
+      }
+      if ( scope.c3gaugeunits){ 
+        if (c3json.gauge === undefined ) c3json.gauge = {};
+        c3json.gauge.units = scope.c3gaugeunits;
+      }
+      if ( scope.c3gaugewidth){ 
+        if (c3json.gauge === undefined ) c3json.gauge = {};
+        c3json.gauge.width = eval("(" + scope.c3gaugewidth  + ")");
+      }
+     
+  
     var json = JSON.stringify(c3json);
     console.log(json);
     var chart = c3.generate(c3json);
@@ -699,8 +855,8 @@ function mmsC3(ElementService, UtilsService, TableService, $compile, growl, $win
         c3pointfocusexpandr: '@',
         c3pointselectr: '@',
       //Line
-        c3lineconnectNull: '@',
-        c3linestep_type: '@',
+        c3lineconnectnull: '@',
+        c3linesteptype: '@',
       //Area
         c3areazerobased: '@',
       //Bar  
