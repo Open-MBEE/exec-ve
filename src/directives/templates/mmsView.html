@@ -34,6 +34,7 @@
         <!-- Cant use track by instanceVal.instance b/c of possible duplicate entries -->
         <div ng-repeat="instanceVal in view.specialization.instanceSpecificationSpecification.operand"> 
             <mms-view-presentation-elem data-mms-instance-val="::instanceVal"></mms-view-presentation-elem>
+            <div class="add-buttons-container" ng-include="'mms/templates/mmsAddPeButton.html'"></div>
         </div>
     </div>
 </div>
