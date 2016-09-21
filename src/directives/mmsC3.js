@@ -46,7 +46,7 @@ function mmsC3(ElementService, UtilsService, TableService, $compile, growl, $win
       }
       else { //data from table
         c3json.data.columns = _columns;
-        if ( _has_column_header && scope.c3dataxs === undefined)
+        if ( _has_column_header && scope.c3dataxs === undefined && scope.c3axisxcategories === undefined)
           c3json.data.x = 'x';  
       }
       //Chart
@@ -217,11 +217,16 @@ function mmsC3(ElementService, UtilsService, TableService, $compile, growl, $win
         c3json.axis.x.localtime = eval("(" + scope.c3axisxlocaltime + ")");
       }
       //TODO: data.x vs. axis.x.categories - how to handle with column heading data
-      /*if (scope.c3axisxcategories){ //['a1', 'b1']
+      //overwrite the header?
+      if (scope.c3axisxcategories){ //['a1', 'b1']
         if (c3json.axis === undefined) c3json.axis = {};
         if (c3json.axis.x === undefined) c3json.axis.x = {};
         c3json.axis.x.categories = eval("(" + scope.c3axisxcategories + ")");
-      }*/
+        //remove x from data.columns: [[x, column1, column2....], [a1, 1,2,3]...] 
+        //x is created from column header
+        if (c3json.data.columns[0][0] === 'x')
+          c3json.data.columns.shift();
+      }
       if (scope.c3axisxtickcentered){ 
         if (c3json.axis === undefined) c3json.axis = {};
         if (c3json.axis.x === undefined) c3json.axis.x = {};
