@@ -1258,7 +1258,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     }
 
     // MmsAppUtils.addElementCtrl creates this event when adding sections, table and figures to the view
-    $scope.$on('viewctrl.add.element', function(event, instanceSpec, elemType, parentBranchData, addPeIndex) {
+    $scope.$on('viewctrl.add.element', function(event, instanceSpec, elemType, parentBranchData) {
         if (elemType === 'paragraph' || elemType === 'list' || elemType === 'comment')
             return;
         var branch = $scope.treeApi.get_branch(parentBranchData);
@@ -1287,14 +1287,9 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             hide: !$rootScope.veTreeShowPe,
             children: [],
         };
-        var i = 0;
-        var indexToAddPe = -2;
-        var childViewFound = false;
-        // $scope.treeApi.remove_branch(branch);
-        // Remove all non view children from branch
 
-        // check if branch is view otherwise get parent view
-        for (i = 0; i < branch.children.length; i++) {
+        // Remove all non view children from branch
+        for ( var i = 0; i < branch.children.length; i++) {
             if (branch.children[i].type != 'view') {
                 branch.children.splice(i, 1);
                 --i;
