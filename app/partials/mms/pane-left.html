@@ -1,39 +1,51 @@
 
-
-
 <div fa-pane pane-anchor="north" pane-size="76px" pane-no-toggle="true" pane-no-scroll="true">
-  <div class="pane-left">
-  <div class="pane-left-toolbar-wrap">
-    <div class="toolbar pane-left-btn-group">
-      <mms-button-bar buttons="buttons" mms-bb-api="bbApi"></mms-button-bar>
-    </div> 
-  </div>
-  <div>
-      <input class="input-filter-tree form-control" ng-model-optoins="{debounce: 1000}" ng-model="treeFilter.search" type="text" placeholder="Type here to filter items in the tree" ng-change="treeApi.expand_all()">
-  </div>
+    <div class="pane-left">
+        <div class="pane-left-toolbar-wrap">
+            <div class="toolbar pane-left-btn-group">
+                <mms-button-bar buttons="buttons" mms-bb-api="bbApi"></mms-button-bar>
+            </div>
+        </div>
+        <div>
+            <input class="input-filter-tree form-control" ng-model-optoins="{debounce: 1000}" ng-model="treeFilter.search" type="text" placeholder="Type here to filter items in the tree" ng-change="treeApi.expand_all()">
+        </div>
+    </div>
 </div>
-</div>
+
 <div fa-pane pane-anchor="center" pane-no-toggle="true">
-  <div class="pane-left" style="display:table;">
+    <div class="pane-left" style="display:table;">
 
 
+        <!--
+          <div ng-show="mergeOn">
+            <div>From: <span ng-if="mergeFrom.type == 'configuration'">Tag {{mergeFrom.data.name}}</span>
+                      <span ng-if="mergeFrom.type == 'workspace'">Task {{mergeFrom.data.name}}</span>
+                      <a tooltip="Change to selected" tooltip-append-to-body="true" tooltip-trigger="mouseenter" tooltip-popup-delay="400" ng-click="pickNew('from', treeApi.get_selected_branch())"><i class="fa fa-pencil"></i></a>
+            </div>
+            <div>To: <span ng-if="mergeTo.type == 'configuration'">Tag {{mergeTo.data.name}}</span>
+                    <span ng-if="mergeTo.type == 'workspace'">Task {{mergeTo.data.name}}</span>
+                    <a tooltip="Change to selected" tooltip-append-to-body="true" tooltip-trigger="mouseenter" tooltip-popup-delay="400" ng-click="pickNew('to', treeApi.get_selected_branch())"><i class="fa fa-pencil"></i></a>
+            </div>
 
-  
-<!--
-  <div ng-show="mergeOn">
-    <div>From: <span ng-if="mergeFrom.type == 'configuration'">Tag {{mergeFrom.data.name}}</span>
-              <span ng-if="mergeFrom.type == 'workspace'">Task {{mergeFrom.data.name}}</span>
-              <a tooltip="Change to selected" tooltip-append-to-body="true" tooltip-trigger="mouseenter" tooltip-popup-delay="400" ng-click="pickNew('from', treeApi.get_selected_branch())"><i class="fa fa-pencil"></i></a>
+             <a class="btn btn-success btn-xs" ng-click="compare()">COMPARE <i ng-show="comparing" class="fa fa-spin fa-spinner"></i></a>
+          </div>
+        -->
+        <mms-tree ng-show="'showTree'==(activeMenu)" search="treeFilter.search" tree-data="my_data" section-numbering="treeSectionNumbering" tree-control="treeApi" on-select="my_tree_handler(branch)" on-dblclick="dblclick_tree_handler(branch)" expand-level="{{treeExpandLevel}}" initial-selection="{{mms_treeInitial}}" options="tree_options"></mms-tree>
+
+        <div data-ng-repeat="view in ::treeViewModes" ng-show="view.id==(activeMenu)">
+            <h5 style="margin: 3px 0px 3px 10px;">List of {{view.title}}</h5>
+            <ul class="nav nav-list nav-pills nav-stacked abn-tree">
+                <li ng-repeat=" row in view.branchList | filter:treeFilter.search track by $index  " class="abn-tree-row">
+                    <div class="arrow" ng-click="user_clicks_branch(row)" ng-class="{'active-text': row.branch.selected}" id="tree-branch-{{view.id}}-{{row.data.sysmlid}}">
+                        <a class="tree-item" style="padding-left: 20px; position:relative;" ng-click="my_tree_handler(row)">
+                            <i ng-class="{'active-text': row.branch.selected}" class="indented tree-icon fa {{view.icon}}" ></i> 
+                            <!-- TODO active branch -->
+                            <span class="indented tree-label" ng-class="{'active-text': row.branch.selected}">{{row.data.name}}</span>
+                        </a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
     </div>
-    <div>To: <span ng-if="mergeTo.type == 'configuration'">Tag {{mergeTo.data.name}}</span>
-            <span ng-if="mergeTo.type == 'workspace'">Task {{mergeTo.data.name}}</span>
-            <a tooltip="Change to selected" tooltip-append-to-body="true" tooltip-trigger="mouseenter" tooltip-popup-delay="400" ng-click="pickNew('to', treeApi.get_selected_branch())"><i class="fa fa-pencil"></i></a>
-    </div>
- 
-	 <a class="btn btn-success btn-xs" ng-click="compare()">COMPARE <i ng-show="comparing" class="fa fa-spin fa-spinner"></i></a>
-  </div>
--->
- <mms-tree search="treeFilter.search" tree-data="my_data" section-numbering="treeSectionNumbering" tree-control="treeApi" on-select="my_tree_handler(branch)" on-dblclick="dblclick_tree_handler(branch)" expand-level="{{treeExpandLevel}}" initial-selection="{{mms_treeInitial}}" options="tree_options"></mms-tree>
-
-</div>
 </div>

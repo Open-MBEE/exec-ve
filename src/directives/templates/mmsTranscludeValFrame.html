@@ -18,8 +18,8 @@
             <div ng-switch-when="LiteralBoolean"><input type="checkbox" ng-model="value.boolean"> {{value.boolean}}</input><a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a></div>
             <div ng-switch-when="LiteralReal"><input type="number" ng-model="value.double" step="any"></input><a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a></div>
             <div ng-switch-when="LiteralString">
-                <textarea ng-if="hasHtml(value.string)" mms-ckeditor mms-ws="{{mmsWs}}" mms-site="{{mmsSite}}" ng-model="value.string" mms-cf-elements="mmsCfElements" mms-eid="{{element.sysmlid}}"></textarea>
-                <textarea ng-if="!hasHtml(value.string)" ng-model="value.string"></textarea>
+                <textarea ng-if="hasHtml(value.string)" mms-ckeditor mms-ws="{{mmsWs}}" mms-site="{{mmsSite}}" ng-model="value.string" mms-eid="{{element.sysmlid}}"></textarea>
+                <div ng-if="!hasHtml(value.string)"><textarea ng-model="value.string"></textarea><a ng-click="addHtml(value)"><i class="fa fa-html5"></i></a></div>
                 <a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a>
             </div>
             <div ng-switch-when="OpaqueExpression">

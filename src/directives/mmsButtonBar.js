@@ -159,8 +159,8 @@ function mmsButtonBar($templateCache) {
         link: mmsButtonBarLink,
         controller: ['$scope', mmsButtonBarCtrl],
         scope: {
-            buttons: '=',
-            mmsBbApi: '=',
+            buttons: '<',
+            mmsBbApi: '<',
             direction: '@'
         }
     };

@@ -8,9 +8,12 @@
     <div class="cant-find-element transclude-modal-input" ng-show="showProposeLink">
         Can't find your element? <a ng-click="openProposeModal()" class="create-element-link">Create a new one</a>
     </div>
+    <label ng-show="showEditableOp">Restrict editing
+        <input type="checkbox" ng-model="nonEditableCheckbox">
+    </label>
 </div>
-    
-<mms-search mms-options="searchOptions"></mms-search>
+
+<mms-search mms-options="searchOptions" mms-ws="{{mmsWs}}"></mms-search>
 
 <div class="modal-footer">
     </span><button class="btn btn-danger" ng-click="cancel()">CANCEL</button>
