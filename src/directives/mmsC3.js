@@ -44,6 +44,11 @@ function mmsC3(ElementService, UtilsService, TableService, $compile, growl, $win
       else if (scope.c3datacolumns){
         c3json.data.columns = eval("(" + scope.c3datacolumns + ")");
       }
+      else if (scope.c3tablereverse){
+        c3json.data.rows = _columns;
+        if ( _has_column_header && scope.c3dataxs === undefined && scope.c3axisxcategories === undefined)
+          c3json.data.x = 'x';
+      }
       else { //data from table
         c3json.data.columns = _columns;
         if ( _has_column_header && scope.c3dataxs === undefined && scope.c3axisxcategories === undefined)
@@ -199,6 +204,7 @@ function mmsC3(ElementService, UtilsService, TableService, $compile, growl, $win
       }
       if (scope.c3axisxshow){
         if (c3json.axis === undefined) c3json.axis = {};
+        if (c3json.axis.x === undefined) c3json.axis.x = {};
         c3json.axis.x.show = eval("(" + scope.c3axisxshow  + ")");
       }
       if (scope.c3axisxtype){ //timeseries, category, or indexed
@@ -740,8 +746,15 @@ function mmsC3(ElementService, UtilsService, TableService, $compile, growl, $win
 
   scope.render = function() {
 
-    if (scopetableColumnHeadersLabel.length === 0) return;
-      svg.selectAll('*').remove();
+    if (scope.mmsEid === undefined) { //data is not from table
+      vf_pplot([], 0, false, false);
+      return;
+    }
+    /*if (scopetableColumnHeadersLabel.length === 0) {
+      return;
+    }*/
+
+    svg.selectAll('*').remove();
       
 	
 	var is_x_value_number = true;  //column headings are number (not check 1st column)
@@ -800,6 +813,7 @@ function mmsC3(ElementService, UtilsService, TableService, $compile, growl, $win
     var scopetableColumnHeadersLabel= [];
     var dataIdFilters = [];
 
+    
     TableService.readTables (scope.mmsEid, ws, version)
       .then(function(value) {
         scopeTableTitles = value.tableTitles;
@@ -809,13 +823,15 @@ function mmsC3(ElementService, UtilsService, TableService, $compile, growl, $win
         scope.datavalues = value.datavalues; //[][] - array
         dataIdFilters = value.dataIdFilters;
       });
-    }; //end of link
+    
+  }; //end of link
 
     return {
       restrict: 'EA',
       require: '?^mmsView',
        scope: {
         mmsEid: '@',
+        c3tablereverse: '@',
         c3sizewidth: '@',
         c3sizeheight: '@',
         c3paddingtop: '@',
