@@ -76,7 +76,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         var key = 'getElement(' + id + n.update + n.ws + n.ver + ')';
         // if it's in the inProgress queue get it immediately
         if (inProgress.hasOwnProperty(key)) {  //change to change proirity if it's already in the queue
-            HttpService.ping(URLService.getElementURL(id, n.ws, n.ver, weight));
+            HttpService.ping(URLService.getElementURL(id, n.ws, n.ver), weight);
             return inProgress[key];
         }
 
