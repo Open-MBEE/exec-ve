@@ -25,6 +25,7 @@
     </div>
     <div ng-if="view.specialization.contents">
         <!-- Cant use track by instanceVal.instance b/c of possible duplicate entries -->
+        <div class="add-buttons-container" ng-init="$index = -1" ng-include="'mms/templates/mmsAddPeButton.html'"></div>
         <div ng-repeat="instanceVal in view.specialization.contents.operand"> 
             <mms-view-presentation-elem data-mms-instance-val="instanceVal"></mms-view-presentation-elem>
             <div class="add-buttons-container" ng-include="'mms/templates/mmsAddPeButton.html'"></div>
@@ -32,6 +33,7 @@
     </div>
     <div ng-if="view.specialization.instanceSpecificationSpecification">
         <!-- Cant use track by instanceVal.instance b/c of possible duplicate entries -->
+        <div class="add-buttons-container" ng-init="$index = -1" ng-include="'mms/templates/mmsAddPeButton.html'"></div>
         <div ng-repeat="instanceVal in view.specialization.instanceSpecificationSpecification.operand"> 
             <mms-view-presentation-elem data-mms-instance-val="::instanceVal"></mms-view-presentation-elem>
             <div class="add-buttons-container" ng-include="'mms/templates/mmsAddPeButton.html'"></div>
