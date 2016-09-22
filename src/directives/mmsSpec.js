@@ -170,7 +170,7 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
             } else {
                 scope.isEnumeration = false;
                 scope.isSlot = false;
-            ElementService.getElement(scope.mmsEid, false, scope.mmsWs, scope.mmsVersion, 2)
+            ElementService.getElement(scope.mmsEid, false, scope.mmsWs, scope.mmsVersion, 2, true)
             .then(function(data) {
                 //element.empty();
                 //var template = null;
