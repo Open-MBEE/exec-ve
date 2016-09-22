@@ -429,7 +429,10 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Wo
                 myEdit.name = scope.edit.name;
         } else if (type === 'value') {
             if (scope.edit.type === 'Property' || scope.edit.type === 'Port') {// && angular.isArray(scope.edit.value)) {
-                myEdit.defaultValue = scope.edit.defaultValue;
+                if (scope.edit.defaultValue)
+                    myEdit.defaultValue = scope.edit.defaultValue;
+                else if (scope.editValues && scope.editValues.length > 0)
+                    myEdit.defaultValue = scope.editValues[0];
                 myEdit.type = scope.edit.type;
             }
             if (scope.edit.type === 'Slot' && angular.isArray(scope.edit.value)) {
