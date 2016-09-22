@@ -1,8 +1,8 @@
 <div ng-if="mmsType=='element' && !noEdit && editing" class="editing">
     <h1 class="prop"><input class="form-control" type="text" ng-model="edit.name"></input></h1>
 
-    <h2 ng-hide="mmsViewEdit" class="prop-title">LAST MODIFICATION</h2>
-    <h3 ng-hide="mmsViewEdit" class="prop">{{element.modified | date:'M/d/yy h:mm a'}} by {{element.modifier}}</h3>
+    <h2 class="prop-title">LAST MODIFICATION</h2>
+    <h3 class="prop">{{element.modified | date:'M/d/yy h:mm a'}} by {{element.modifier}}</h3>
 
     <div ng-if="edit.specialization.type === 'Property'">
         <h2 class="prop-title spec-view-value-heading">PROPERTY VALUE</h2>
@@ -17,8 +17,8 @@
               <div ng-switch-when="LiteralBoolean"><input type="checkbox" ng-model="value.boolean"></input> {{value.boolean}} <a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a></div>
               <div ng-switch-when="LiteralReal"><input type="number" ng-model="value.double" step="any"></input><a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a></div>
               <div ng-switch-when="LiteralString">
-                  <textarea ng-if="hasHtml(value.string)" mms-ckeditor mms-ws="{{mmsWs}}" mms-site="{{mmsSite}}" ng-model="value.string" mms-cf-elements="mmsCfElements" mms-eid="{{element.sysmlid}}"></textarea>
-                  <textarea ng-if="!hasHtml(value.string)" ng-model="value.string"></textarea>
+                  <textarea ng-if="hasHtml(value.string)" mms-ckeditor mms-ws="{{mmsWs}}" mms-site="{{mmsSite}}" ng-model="value.string" mms-eid="{{element.sysmlid}}"></textarea>
+                  <div ng-if="!hasHtml(value.string)"><textarea ng-model="value.string"></textarea><a ng-click="addHtml(value)"><i class="fa fa-html5"></i></a></div>
                   <a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a>
               </div>
               <div ng-switch-when="OpaqueExpression">
@@ -60,10 +60,10 @@
         </div>
     </div>
 
-    <h2 ng-hide="mmsViewEdit" class="prop-title spec-view-doc-heading">DOCUMENTATION</h2>
-    <textarea ng-model="edit.documentation" mms-ckeditor mms-editor-api="editorApi" mms-ws="{{mmsWs}}" mms-site="{{mmsSite}}" mms-cf-elements="mmsCfElements" mms-eid="{{element.sysmlid}}"></textarea>
+    <h2 class="prop-title spec-view-doc-heading">DOCUMENTATION</h2>
+    <textarea ng-model="edit.documentation" mms-ckeditor mms-editor-api="editorApi" mms-ws="{{mmsWs}}" mms-site="{{mmsSite}}" mms-eid="{{element.sysmlid}}"></textarea>
 
-    <div ng-hide="mmsViewEdit">
+    <div>
         <h2 class="prop-title spec-view-type-heading">METATYPE</h2>
         <h3 ng-repeat="type in element.appliedMetatypes" class="prop"><mms-transclude-name mms-eid="{{type}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}" no-click="true"></mms-transclude-name></h3>
         <h2 class="prop-title">LOCATION <i class="fa fa-folder"></i></h2>
@@ -140,8 +140,9 @@
         </div>
     </div>
 
-    <h2 class="prop-title spec-view-doc-heading">DOCUMENTATION</h2>
-    <p ng-bind-html="element.documentation" class="doc-text"></p>
+    <h2 class="prop-title spec-view-doc-heading">DOCUMENTATION <a ng-click="showDocHTML = !showDocHTML"><i class="fa fa-code"></i></a></h2>
+    <p ng-show="!showDocHTML" ng-bind-html="element.documentation" class="doc-text"></p>
+    <div ng-show="showDocHTML">{{element.documentation}}</div>
 
     <h2 class="prop-title spec-view-type-heading">METATYPE</h2>
     <h3 ng-repeat="type in element.appliedMetatypes" class="prop"><mms-transclude-name mms-eid="{{type}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}" no-click="true"></mms-transclude-name></h3>

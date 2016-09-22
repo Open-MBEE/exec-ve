@@ -18,6 +18,16 @@ function HttpService($http, $q, _) {
     var cache = {}; // cache url -> this is a easy key look up
     var inProgress = 0;
     var GET_OUTBOUND_LIMIT = 25; //max number of requests sent to the rest server at one time
+    
+    var setOutboundLimit = function(limit){
+        GET_OUTBOUND_LIMIT = limit;
+    };
+    var getOutboundLimit = function() {
+        return GET_OUTBOUND_LIMIT;
+    };
+    var getQueue = function(){
+        return queue;
+    };
 
     /**
      * @ngdoc method
@@ -157,6 +167,9 @@ function HttpService($http, $q, _) {
     return {
         get: get,
         ping: ping,
+        setOutboundLimit: setOutboundLimit,
+        getOutboundLimit: getOutboundLimit,
+        getQueue: getQueue,
         transformQueue: transformQueue,
         dropAll: dropAll
     };
