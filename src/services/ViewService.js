@@ -303,9 +303,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
     var downgradeDocument = function(document, workspace, site) {
         var clone = {
             sysmlId: document.sysmlId,
-            type: 'View', 
-            contents: document.contents,
-            contains: document.contains
+            appliedStereotypeIds: ['_17_0_1_232f03dc_1325612611695_581988_21583']
         };
         return ElementService.updateElement(clone, workspace).then(
             function(data) {

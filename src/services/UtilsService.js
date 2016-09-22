@@ -78,7 +78,7 @@ function UtilsService(CacheService, _) {
             if (elem.specification) {
                 cleanValueSpec(elem.specification);
             }
-            if (elem.type === 'View') {
+            if (elem.type === 'Class') {
                 //delete elem.specialization.displayedElements;
                 //delete elem.specialization.allowedElements;
                 if (elem.contents && elem.contains)
@@ -249,10 +249,12 @@ function UtilsService(CacheService, _) {
                 edit.documentation = clean.documentation;
             else if (property === 'value') {
                 _.merge(edit, clean, function(a,b,id) {
-                    if ((id === 'contents' || id === 'contains') && a)
-                        return a; //handle contains and contents updates manually at higher level
+                    //if ((id === 'contents' || id === 'contains') && a)
+                    //    return a; //handle contains and contents updates manually at higher level
                     if (angular.isArray(a) && angular.isArray(b) && b.length < a.length) {
-                        return b; 
+                        a.length = 0;
+                        Array.prototype.push.apply(a, b);
+                        return a; 
                     }
                     return undefined;
                 });

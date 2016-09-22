@@ -330,6 +330,25 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         return deferred.promise;
     };
 
+    var fillInElement = function(elem, workspace) {
+        var deferred = $q.defer();
+        getElement(elem.sysmlId, false, workspace, 'latest', 2)
+        .then(function(data) {
+            var ob = JSON.parse(JSON.stringify(data));
+            for (var key in elem) {
+                ob[key] = elem[key];
+            }
+            if (ob.displayedElements)
+                delete ob.displayedElements;
+            if (ob.allowedElements)
+                delete ob.allowedElements;
+            deferred.resolve(ob);
+        }, function() {
+            deferred.resolve(elem);
+        });
+        return deferred.promise;
+    };
+
     /**
      * @ngdoc method
      * @name mms.ElementService#updateElement
@@ -409,8 +428,9 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
             deferred.reject('Element id not found, create element first!');
         else {
             var n = normalize(elem.sysmlId, null, workspace, null);
-
-            $http.post(URLService.getPostElementsURL(n.ws), {'elements': [elem],'source': ApplicationService.getSource()}, {timeout: 60000})
+          fillInElement(elem, workspace)
+          .then(function(postElem) {
+            $http.post(URLService.getPostElementsURL(n.ws), {'elements': [postElem],'source': ApplicationService.getSource()}, {timeout: 60000})
             .success(function(data, status, headers, config) {
                 handleSuccess(n, data);
             }).error(function(data, status, headers, config) {
@@ -422,7 +442,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                         URLService.handleHttpStatus(data, status, headers, config, deferred);
                     } else {
                         UtilsService.cleanElement(orig);
-                        if (!UtilsService.hasConflict(elem, orig, server)) {
+                        if (!UtilsService.hasConflict(postElem, orig, server)) {
                             elem.read = server.read;
                             elem.modified = server.modified;
                             updateElement(elem, workspace)
@@ -438,6 +458,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                 } else
                     URLService.handleHttpStatus(data, status, headers, config, deferred);
             });
+          }); 
         } 
         return deferred.promise;
     };
@@ -463,14 +484,30 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         return $q.all(promises);*/
         var deferred = $q.defer();
         var ws = !workspace ? 'master' : workspace;
-        $http.post(URLService.getPostElementsURL(ws), {'elements': elems})
+        var elemsMapping = {};
+        var fillAllPromises = [];
+        for (var i = 0; i < elems.length; i++) {
+            fillAllPromises.push(fillInElement(elems[i], workspace));
+            elemsMapping[elems[i].sysmlId] = elems[i];
+        }
+      $q.all(fillAllPromises)
+      .then(function(filledElems) {
+        $http.post(URLService.getPostElementsURL(ws), {'elements': filledElems})
         .success(function(data, status, headers, config) {
             data.elements.forEach(function(elem) {
                 var cacheKey = UtilsService.makeElementKey(elem.sysmlId, ws, null, false);
                 var resp = CacheService.put(cacheKey, UtilsService.cleanElement(elem), true);
+
+                var history = CacheService.get(UtilsService.makeElementKey(elem.sysmlId, workspace, 'versions'));
+                if (history) {
+                    history.unshift({modifier: elem.modifier, timestamp: elem.modified});
+                }
+                var orig = elemsMapping[elem.sysmlId];
                 var edit = CacheService.get(UtilsService.makeElementKey(elem.sysmlId, ws, null, true));
-                if (edit) {
-                    _.merge(edit, resp);
+                if (edit && orig) {
+                // Only want to merge the properties that were updated:
+                    var updated = UtilsService.filterProperties(orig, resp);
+                    _.merge(edit, updated);
                     UtilsService.cleanElement(edit, true);
                 }
             });
@@ -478,6 +515,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         }).error(function(data, status, headers, config) {
             URLService.handleHttpStatus(data, status, headers, config, deferred);
         });
+      });
         return deferred.promise;
     };
 
