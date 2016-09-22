@@ -100,7 +100,7 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
                 if(!UtilsService.isDocument(document))
                     return;
                 documentName = document.name;
-                project = UtilsService.getIdInfo(document, null);
+                project = ElementService.getIdInfo(document, null);
                 scope.docName = documentName;
                 getJobs();
             });

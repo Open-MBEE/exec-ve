@@ -201,8 +201,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      *      multiple calls to this method with the same id would result in 
      *      references to the same object.
      */
-    var getView = function(id, update, workspace, version, weight) { 
-        return ElementService.getElement(id, update, workspace, version, weight);
+    var getView = function(id, update, workspace, version, weight, extended) { 
+        return ElementService.getElement(id, update, workspace, version, weight, extended);
     };
 
     /**
@@ -224,8 +224,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      *      multiple calls to this method with the same ids would result in an array of 
      *      references to the same objects.
      */
-    var getViews = function(ids, update, workspace, version, weight) {
-        return ElementService.getElements(ids, update, workspace, version, weight);
+    var getViews = function(ids, update, workspace, version, weight, extended) {
+        return ElementService.getElements(ids, update, workspace, version, weight, extended);
     };
 
     /**
@@ -247,8 +247,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      *      multiple calls to this method with the same id would result in 
      *      references to the same object.
      */
-    var getDocument = function(id, update, workspace, version, weight) {
-        return ElementService.getElement(id, update, workspace, version, weight);
+    var getDocument = function(id, update, workspace, version, weight, extended) {
+        return ElementService.getElement(id, update, workspace, version, weight, extended);
     };
 
     /**
@@ -351,15 +351,15 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @param {string} eidss displayedElements
      * @returns {Promise} The promise will be resolved with array of element objects. 
      */
-    var getViewElements = function(id, update, workspace, version, weight, eidss) {
-        var n = normalize(update, workspace, version);
+    var getViewElements = function(id, update, workspace, version, weight, eidss, extended) {
+        var n = normalize(update, workspace, version, extended);
         var deferred = $q.defer();
-        var url = URLService.getViewElementsURL(id, n.ws, n.ver);
+        var url = URLService.getViewElementsURL(id, n.ws, n.ver, n.extended);
         var cacheKey = ['views', n.ws, id, n.ver, 'elements'];
         if (CacheService.exists(cacheKey) && !n.update)
             deferred.resolve(CacheService.get(cacheKey));
         else {
-            var key = id + n.ws + n.ver;
+            var key = id + n.ws + n.ver + n.extended;
             if (inProgress.hasOwnProperty(key))
                 return inProgress[key];
             var eids = [];
@@ -378,7 +378,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 var i = 0;
                 while (i < eids.length) {
                     var portion = eids.slice(i, i+VIEW_ELEMENTS_LIMIT);
-                    promises.push(ElementService.getElements(portion, update, workspace, version, weight));
+                    promises.push(ElementService.getElements(portion, update, workspace, version, weight, extended));
                     i += VIEW_ELEMENTS_LIMIT;
                 }
                 $q.all(promises)
@@ -417,11 +417,11 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @param {int} weight the priority of the request
      * @returns {Promise} The promise will be resolved with array of view objects. 
      */
-    var getDocumentViews = function(id, update, workspace, version, simple, weight) {
-        var n = normalize(update, workspace, version);
+    var getDocumentViews = function(id, update, workspace, version, simple, weight, extended) {
+        var n = normalize(update, workspace, version, extended);
         var s = !simple ? false : simple; 
         var deferred = $q.defer();
-        var url = URLService.getDocumentViewsURL(id, n.ws, n.ver, s);
+        var url = URLService.getDocumentViewsURL(id, n.ws, n.ver, s, n.extended);
         var cacheKey = ['products', n.ws, id, n.ver, 'views'];
         if (CacheService.exists(cacheKey) && !n.update) 
             deferred.resolve(CacheService.get(cacheKey));
@@ -672,22 +672,14 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
 
         var newInstanceId = UtilsService.createMmsId();
         newInstanceId = '_hidden_' + newInstanceId + "_pei";
-        var holdingBinId = null;
-        var projectId = null;
+
+      ElementService.getIdInfo(viewOrSection, site, workspace, 'latest', 2)
+      .then(function(ids) {
+        var holdingBinId = ids.holdingBinId;
+        var projectId = ids.projectId;
+        var siteId = ids.siteId;
+
         var realType = TYPE_TO_CLASSIFIER_TYPE[type];
-        var siteId = site;
-        if (viewOrSection) {
-            var splitArray = viewOrSection.qualifiedId.split('/');
-            if (splitArray && splitArray.length > 2) {
-                projectId = splitArray[2];
-                siteId = splitArray[1];
-            }
-            if (viewOrSection.siteCharacterizationId)
-                siteId = viewOrSection.siteCharacterizationId;
-            if (projectId && projectId.indexOf('PROJECT') >= 0) {
-                holdingBinId = 'holding_bin_' + projectId;
-            }
-        }
         if (!holdingBinId && siteId)
             holdingBinId = 'holding_bin_' + siteId + '_no_project';
         var jsonType = realType;
@@ -745,6 +737,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         }, function(reason) {
             deferred.reject(reason);
         });
+      });
         return deferred.promise;
     };
 
@@ -775,7 +768,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         var deferred = $q.defer();
         var newViewId = viewId ? viewId : UtilsService.createMmsId();
         var newInstanceId = '_hidden_' + UtilsService.createMmsId() + '_pei';
-        var ids = UtilsService.getIdInfo(owner, site);
+      ElementService.getIdInfo(owner, site, workspace, 'latest', 2)
+      .then(function(ids) {
         var holdingBinId = ids.holdingBinId;
         var projectId = ids.projectId;
         var siteId = ids.siteId;
@@ -871,6 +865,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         }, function(reason) {
             deferred.reject(reason);
         });
+      });
         return deferred.promise;
     };
 
@@ -919,10 +914,10 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @param {int} weight the priority of the request
      * @returns {Promise} The promise will be resolved with array of document objects 
      */
-    var getSiteDocuments = function(site, update, workspace, version, weight) {
-        var n = normalize(update, workspace, version);
+    var getSiteDocuments = function(site, update, workspace, version, weight, extended) {
+        var n = normalize(update, workspace, version, extended);
         var deferred = $q.defer();
-        var url = URLService.getSiteProductsURL(site, n.ws, n.ver);
+        var url = URLService.getSiteProductsURL(site, n.ws, n.ver, n.extended);
         var cacheKey = ['sites', n.ws, n.ver, site, 'products'];
         if (CacheService.exists(cacheKey) && !n.update) 
             deferred.resolve(CacheService.get(cacheKey));
@@ -1179,8 +1174,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         return currentDocumentId;
     };
 
-    var normalize = function(update, workspace, version) {
-        return UtilsService.normalize({update: update, workspace: workspace, version: version});
+    var normalize = function(update, workspace, version, extended) {
+        return UtilsService.normalize({update: update, workspace: workspace, version: version, extended: extended});
     };
 
     var getDocMetadata = function(docid, ws, version, weight) {
