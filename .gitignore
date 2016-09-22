@@ -11,3 +11,6 @@ app/bower_components
 app/bower_components_target
 .sass-cache
 .idea
+PhantomJS_*
+Chrome_*
+test-results/

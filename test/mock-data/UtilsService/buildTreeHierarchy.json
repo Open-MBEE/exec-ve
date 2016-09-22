@@ -1,0 +1,37 @@
+[
+    {
+        "label": "CharacterizationTest",
+        "type": "site",
+        "data": {
+            "name": "CharacterizationTest",
+            "sysmlid": "site__18_0_5_83a025f_1456506201488_656065_12275",
+            "isCharacterization": true
+        },
+        "children": [],
+        "level": 1
+    },
+    {
+        "label": "nri-characterization",
+        "type": "site",
+        "data": {
+            "name": "nri-characterization",
+            "sysmlid": "nri-characterization",
+            "isCharacterization": false
+        },
+        "children": [
+            {
+                "label": "sub-nri-characterization",
+                "type": "site",
+                "data": {
+                    "name": "sub-nri-characterization",
+                    "sysmlid": "sub-nri-characterization",
+                    "parent": "nri-characterization",
+                    "isCharacterization": false
+                },
+                "children": [],
+                "level": 2
+            }
+        ],
+        "level": 1
+    }
+]
