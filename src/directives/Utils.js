@@ -342,15 +342,21 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Wo
                 scope.recompileEdit = false;
                 scope.edit = data;
 
-                if (data.type === 'Property' && angular.isArray(data.value)) {
-                    scope.editValues = data.value;
-                    if (scope.isEnumeration && scope.editValues.length === 0)
-                        scope.editValues.push({type: 'InstanceValue', instanceId: null});
+                if (data.type === 'Property' || data.type === 'Port') {
+                    if (scope.edit.defaultValue)
+                        scope.editValues = [scope.edit.defaultValue];
+                }
+                if (data.type === 'Slot') {
+                    if (angular.isArray(data.value))
+                        scope.editValues = data.value;
                 }
                 if (data.type === 'Constraint' && data.specification) {
                     scope.editValues = [data.specification];
                 }
-
+                if (!scope.editValues)
+                    scope.editValues = [];
+                if (scope.isEnumeration && scope.editValues.length === 0)
+                    scope.editValues.push({type: 'InstanceValue', instanceId: null});
                 if (template) {
                     if (scope.recompileScope)
                         scope.recompileScope.$destroy();
