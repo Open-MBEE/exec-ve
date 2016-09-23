@@ -78,7 +78,7 @@ function UtilsService(CacheService, _) {
             if (elem.specification) {
                 cleanValueSpec(elem.specification);
             }
-            if (elem.type === 'View') {
+            if (elem.type === 'Class') {
                 //delete elem.specialization.displayedElements;
                 //delete elem.specialization.allowedElements;
                 if (elem.contents && elem.contains)
@@ -186,9 +186,10 @@ function UtilsService(CacheService, _) {
      */
     var normalize = function(ob) {
         var res = {};
-        res.update = !ob.update? false : ob.update;
+        res.update = !ob.update ? false : ob.update;
         res.ws = !ob.workspace ? 'master' : ob.workspace;
         res.ver = !ob.version ? 'latest' : ob.version;
+        res.extended = !ob.extended ? false : true;
         return res;
     };
 
@@ -248,10 +249,12 @@ function UtilsService(CacheService, _) {
                 edit.documentation = clean.documentation;
             else if (property === 'value') {
                 _.merge(edit, clean, function(a,b,id) {
-                    if ((id === 'contents' || id === 'contains') && a)
-                        return a; //handle contains and contents updates manually at higher level
+                    //if ((id === 'contents' || id === 'contains') && a)
+                    //    return a; //handle contains and contents updates manually at higher level
                     if (angular.isArray(a) && angular.isArray(b) && b.length < a.length) {
-                        return b; 
+                        a.length = 0;
+                        Array.prototype.push.apply(a, b);
+                        return a; 
                     }
                     return undefined;
                 });
@@ -565,33 +568,6 @@ function UtilsService(CacheService, _) {
         return 'MMS_' + Date.now() + '_' + uuid;
     };
 
-    var getIdInfo = function(elem, siteid) { //elem is element object with qualified id with project in it
-        var holdingBinId = null;
-        var projectId = null;
-        var projectName = null;
-        var siteId = siteid;
-
-        if (elem && elem.qualifiedId && elem.qualifiedName) {
-            var splitArray = elem.qualifiedId.split('/');
-            var projectNameArray = elem.qualifiedName.split('/');
-            if (splitArray && splitArray.length > 2) {
-                projectId = splitArray[2];
-                siteId = splitArray[1];
-            }
-            if (elem.siteCharacterizationId)
-                siteId = elem.siteCharacterizationId;
-            if (projectId && projectId.indexOf('PROJECT') >= 0) {
-                holdingBinId = 'holding_bin_' + projectId;
-                projectName = projectNameArray[2];
-                
-            }
-        }
-        //if (!holdingBinId && siteId) {
-        //    holdingBinId = 'holding_bin_' + siteId + '_no_project';
-        //}
-        return {holdingBinId: holdingBinId, projectId: projectId, siteId: siteId, projectName: projectName};
-    };
-
     /*
     header = header slot on doc
     footer = footer slot on doc
@@ -690,7 +666,6 @@ function UtilsService(CacheService, _) {
         makeHtmlTOC: makeHtmlTOC,
         makeTablesAndFiguresTOC: makeTablesAndFiguresTOC,
         createMmsId: createMmsId,
-        getIdInfo: getIdInfo,
         getPrintCss: getPrintCss,
         isView: isView,
         isDocument: isDocument,

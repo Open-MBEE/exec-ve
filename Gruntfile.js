@@ -293,9 +293,13 @@ module.exports = function(grunt) {
     karma: {
         unit:{
             configFile:'config/develop/karma.develop.conf.js',
-            singleRun: true,
-            browsers: ['PhantomJS']
-            //logLevel: 'ERROR'
+            // frameworks: ['jasmine']
+        },
+        continuous:{
+          configFile:'config/develop/karma.develop.conf.js',
+          singleRun: true,
+          browsers: ['PhantomJS'],
+          logLevel: 'ERROR'
         }
     },
 
@@ -397,7 +401,8 @@ module.exports = function(grunt) {
   grunt.registerTask('docs-build',    ['ngdocs']);
   grunt.registerTask('default', ['dev-build']);
   grunt.registerTask('deploy', ['dev-build', 'ngdocs', 'artifactory:client:publish']);
-  grunt.registerTask('test', ['karma']);
+  grunt.registerTask('test', ['karma:unit']);
+  grunt.registerTask('continuous', ['karma:continuous']);
   grunt.registerTask('e2e-test', ['protractor']);
 
   grunt.registerTask('dev', function(arg1) {
