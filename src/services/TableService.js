@@ -28,7 +28,7 @@ function TableService($q, $http, URLService, UtilsService, CacheService, _, Elem
         //if ( data.specialization.contains ===  undefined){  
           var tempMmsEid = [];
           for ( k = 0; k < data.contents.operand.length; k++ ){
-            tempMmsEid.push(data.contents.operand[k].instance);
+            tempMmsEid.push(data.contents.operand[k].instanceId);
           }
           ElementService.getElements(tempMmsEid, false, ws, version)
             .then(function(values) {

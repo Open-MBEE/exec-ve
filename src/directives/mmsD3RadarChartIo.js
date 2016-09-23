@@ -58,12 +58,13 @@
                     //var sysmlIds = []; //not used but possible to use for filter
                     for ( j = 0; j < dataValuesPerTable[i].length; j++){
                       //sysmlIds[j] =  dataValuesPerTable[i][j].sysmlId;
-                      if (dataValuesPerTable[i][j].value[0].type === "LiteralString")
-                        tvalues[j] = {axis: scopetableColumnHeadersLabel[k][j],  value:dataValuesPerTable[i][j].value[0].string};
-                      else if (dataValuesPerTable[i][j].value[0].type === "LiteralReal")
-                        tvalues[j] = {axis: scopetableColumnHeadersLabel[k][j],  value:dataValuesPerTable[i][j].value[0].double};
-                      else if (dataValuesPerTable[i][j].value[0].type === "LiteralInteger")
-                        tvalues[j] = {axis: scopetableColumnHeadersLabel[k][j],  value:dataValuesPerTable[i][j].value[0].integer};
+                      var datavalue = null;
+                      if (dataValuesPerTable[i][j].type === "Property" || dataValuesPerTable[i][j].type === "Port")
+                          datavalue = dataValuesPerTable[i][j].defaultValue;
+                      else if (dataValuesPerTable[i][j].type === 'Slot')
+                          datavalue = dataValuesPerTable[i][j].value[0];
+                      if (datavalue)
+                         tvalues[j] = {axis: scopetableColumnHeadersLabel[k][j],  value: datavalue.value};
                     }
                     rowvalues[i] = tvalues;
                     //rowsysmlIds[i] =sysmlIds;

@@ -778,15 +778,15 @@ function mmsC3(ElementService, UtilsService, TableService, $compile, growl, $win
 	     var c3_data_row=[];
        
       for ( var j = 0; j < scope.datavalues[k][i].length; j++){
-			  if (scope.datavalues[k][i][j].specialization.value[0].type === "LiteralString"){
-          c3_data_row[j] = Number(scope.datavalues[k][i][j].specialization.value[0].string);
-        }
-        else if (scope.datavalues[k][i][j].specialization.value[0].type === "LiteralReal"){
-          c3_data_row[j] = scope.datavalues[k][i][j].specialization.value[0].double;
-        }
-        else if (scope.datavalues[k][i][j].specialization.value[0].type === "LiteralInteger"){
-           c3_data_row[j] = scope.datavalues[k][i][j].specialization.value[0].integer;
-        }
+        var datavalue = null;
+        if (scope.datavalues[k][i][j].type === "Property" || scope.datavalues[k][i][j].type === "Port")
+          datavalue = scope.datavalues[k][i][j].defaultValue;
+        else if (scope.datavalues[k][i][j].type === "Slot")
+          datavalue = scope.datavalues[k][i][j].value[0];
+        if (datavalue && datavalue.type === "LiteralString")
+          c3_data_row[j] = Number(datavalue.value);
+        else if (datavalue && (datavalue.type === "LiteralReal" || datavalue.type === "LiteralInteger"))
+          c3_data_row[j] = datavalue.value;
       } //end of j
      	c3_data[1+start_index++] = [scope.tableRowHeaders[k][i].name].concat(c3_data_row);
     } //end of i

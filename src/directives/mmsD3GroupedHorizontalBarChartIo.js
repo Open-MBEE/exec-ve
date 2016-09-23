@@ -363,16 +363,13 @@ function mmsD3GroupedHorizontalBarChartIo(ElementService, UtilsService, TableSer
 
                 for ( var j = 0; j < dataValuesPerTable[i].length; j++){
                   sysmlIds[j] =  dataValuesPerTable[i][j].sysmlId;
-                  //datasysmlIds.push(dataValuesPerTable[i][j].sysmlId);
-                  if (dataValuesPerTable[i][j].value[0].type === "LiteralString")
-                    //datavalues.push(Number(dataValuesPerTable[i][j].specialization.value[0].string));
-                    tvalues[j] = dataValuesPerTable[i][j].value[0].string;
-                  else if (dataValuesPerTable[i][j].value[0].type === "LiteralReal")
-                    //datavalues.push(Number(dataValuesPerTable[i][j].specialization.value[0].double));
-                    tvalues[j] = dataValuesPerTable[i][j].value[0].double;
-                  else if (dataValuesPerTable[i][j].value[0].type === "LiteralInteger")
-                    //datavalues.push(Number(dataValuesPerTable[i][j].specialization.value[0].integer));
-                    tvalues[j] = dataValuesPerTable[i][j].value[0].integer;
+                  var datavalue = null;
+                  if (dataValuesPerTable[i][j].type === "Property" || dataValuesPerTable[i][j].type === "Port")
+                    datavalue = dataValuesPerTable[i][j].defaultValue;
+                  else if (dataValuesPerTable[i][j].type === 'Slot')
+                    datavalue = dataValuesPerTable[i][j].value[0];
+                  if (datavalue)
+                    tvalues[j] = datavalue.value;
                 }
                 rowvalues[i] = tvalues;
                 rowsysmlIds[i] =sysmlIds;
