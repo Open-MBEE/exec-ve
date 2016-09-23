@@ -1,0 +1,55 @@
+{
+  "name": "Cat Wellington",
+  "sysmlid": "dilmsys sdrawkcab",
+  "documentation": "",
+  "owner": "Nyan Cat",
+  "appliedMetatypes": [
+    "Superman powers"
+  ],
+  "specialization": {
+    "displayedElements": [
+      "SomeRandomDisplayElement_1",
+      "SomeRandomDisplayElement_2",
+      "SomeRandomDisplayElement_3",
+      "SomeRandomDisplayElement_4",
+      "SomeRandomDisplayElement_5",
+      "SomeRandomDisplayElement_6",
+      "SomeRandomDisplayElement_7",
+      "SomeRandomDisplayElement_8",
+      "SomeRandomDisplayElement_9",
+      "SomeRandomDisplayElement_10",
+      "SomeRandomDisplayElement_11",
+      "SomeRandomDisplayElement_12",
+      "SomeRandomDisplayElement_13",
+      "SomeRandomDisplayElement_14",
+      "SomeRandomDisplayElement_15",
+      "SomeRandomDisplayElement_16",
+      "SomeRandomDisplayElement_17",
+      "SomeRandomDisplayElement_18",
+      "SomeRandomDisplayElement_19",
+      "SomeRandomDisplayElement_20",
+      "SomeRandomDisplayElement_21",
+      "SomeRandomDisplayElement_22",
+      "SomeRandomDisplayElement_23",
+      "SomeRandomDisplayElement_24",
+      "SomeRandomDisplayElement_25",
+      "SomeRandomDisplayElement_26"
+    ],
+    "contents": {
+      "valueExpression": null,
+      "operand": [
+        {
+          "valueExpression": null,
+          "type": "InstanceValue",
+          "instance": "_18_0_5_407019f_1468188892970_158569_14563"
+        }
+      ],
+      "type": "Expression"
+    },
+    "allowedElements": [
+    ],
+    "contains": [
+    ],
+    "type": "View"
+  }
+}
