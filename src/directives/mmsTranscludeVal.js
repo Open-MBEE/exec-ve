@@ -116,6 +116,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                     element[0].innerHTML = '<span class="no-print">' + ((scope.version === 'latest') ? '(no value)' : '') + '</span>';
                     return;
                 }
+                element.addClass('val-block');
                 element[0].innerHTML = toCompile;
                 MathJax.Hub.Queue(["Typeset", MathJax.Hub, element[0]]);
                 $compile(element.contents())(scope.recompileScope); 
