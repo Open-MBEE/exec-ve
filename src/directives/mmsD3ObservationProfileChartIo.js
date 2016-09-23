@@ -333,12 +333,15 @@ function mmsD3ObservationProfileChartIo(ElementService, UtilsService, TableServi
         for ( var i = 0; i < dataValuesPerTable.length; i++){
             var tvalues = []; //table value for each row
             for ( var j = 0; j < dataValuesPerTable[i].length; j++){
-              if (dataValuesPerTable[i][j].value[0].type === "LiteralString")
-                tvalues[scopetableColumnHeadersLabel[k][j]] = Number(dataValuesPerTable[i][j].value[0].string);
-              else if (dataValuesPerTable[i][j].value[0].type === "LiteralReal")
-                tvalues[scopetableColumnHeadersLabel[k][j]] = dataValuesPerTable[i][j].value[0].double;
-              else if (dataValuesPerTable[i][j].value[0].type === "LiteralInteger")
-                tvalues[scopetableColumnHeadersLabel[k][j]] = dataValuesPerTable[i][j].value[0].integer;
+              var datavalue = null;
+              if (dataValuesPerTable[i][j].type === "Property" || dataValuesPerTable[i][j].type === "Port")
+                  datavalue = dataValuesPerTable[i][j].defaultValue;
+              else if (dataValuesPerTable[i][j].type === 'Slot')
+                  datavalue = dataValuesPerTable[i][j].value[0];
+              if (datavalue && datavalue.type === 'LiteralString')
+                 tvalues[scopetableColumnHeadersLabel[k][j]] = Number(datavalue.value);
+              else if (datavalue && (datavalue.type === 'LiteralReal' || datavalue.type === 'LiteralInteger'))
+                 tvalues[scopetableColumnHeadersLabel[k][j]] = datavalue.value;
             } //end of for loop j
             var eachStates = [];
             for (var key in tvalues){
