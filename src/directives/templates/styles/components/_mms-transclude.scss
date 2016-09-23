@@ -39,6 +39,11 @@ mms-view.editing {
   .val-block {
     display: block;
   }
+
+  textarea, input {
+    color: #000;
+  }
+
   /* Level 1 transclusions */
   mms-transclude-doc,
   mms-transclude-name,
