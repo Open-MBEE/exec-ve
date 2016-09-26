@@ -585,7 +585,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                         if (snapshotFound)
                             return snapshotPromise;
                         else 
-                            return { name: 'latest', timestamp: 'latest' };
+                            return { name: 'n/a', timestamp: $stateParams.time };
                     } else {
                         return { name: 'latest', timestamp: 'latest' };
                     }
