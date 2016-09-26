@@ -44,15 +44,15 @@ function mmsC3(ElementService, UtilsService, TableService, $compile, growl, $win
       else if (scope.c3datacolumns){
         c3json.data.columns = eval("(" + scope.c3datacolumns + ")");
       }
-      else if (scope.c3tablereverse){
-        c3json.data.rows = _columns;
-        if ( _has_column_header && scope.c3dataxs === undefined && scope.c3axisxcategories === undefined)
-          c3json.data.x = 'x';
-      }
-      else { //data from table
-        c3json.data.columns = _columns;
-        if ( _has_column_header && scope.c3dataxs === undefined && scope.c3axisxcategories === undefined)
-          c3json.data.x = 'x';  
+      else {
+         if (scope.c3tablereverse){
+          c3json.data.rows = _columns;
+        }
+        else { //data from table
+          c3json.data.columns = _columns;
+        }
+        if(_has_column_header === true && scope.c3dataxs === undefined && scope.c3axisxcategories === undefined)
+          c3json.data.x = 'x'; 
       }
       //Chart
       if ( scope.c3sizewidth){
@@ -212,7 +212,7 @@ function mmsC3(ElementService, UtilsService, TableService, $compile, growl, $win
         if (c3json.axis.x === undefined) c3json.axis.x = {};
         c3json.axis.x.type = scope.c3axisxtype; 
       }
-      else if (_is_x_value_number === false && scope.c3dataxs === undefined){ //row 1 is heading but not numbers (column0 is ignored)
+      else if (_has_column_header === true && _is_x_value_number === false && scope.c3dataxs === undefined){ //row 1 is heading but not numbers (column0 is ignored)
            if (c3json.axis === undefined)  c3json.axis = {};
            if (c3json.axis.x === undefined) c3json.axis.x = {};
            c3json.axis.x.type = 'category';
@@ -222,8 +222,6 @@ function mmsC3(ElementService, UtilsService, TableService, $compile, growl, $win
         if (c3json.axis.x === undefined) c3json.axis.x = {};
         c3json.axis.x.localtime = eval("(" + scope.c3axisxlocaltime + ")");
       }
-      //TODO: data.x vs. axis.x.categories - how to handle with column heading data
-      //overwrite the header?
       if (scope.c3axisxcategories){ //['a1', 'b1']
         if (c3json.axis === undefined) c3json.axis = {};
         if (c3json.axis.x === undefined) c3json.axis.x = {};
@@ -248,14 +246,12 @@ function mmsC3(ElementService, UtilsService, TableService, $compile, growl, $win
         else if (scope.c3axisxtickformat.indexOf('%') !== -1)
           c3json.axis.x.tick.format = scope.c3axisxtickformat;
       }
-      //TODO: test with no column headers
       if (scope.c3axisxtickculling){ 
         if (c3json.axis === undefined) c3json.axis = {};
         if (c3json.axis.x === undefined) c3json.axis.x = {};
         if (c3json.axis.x.tick === undefined) c3json.axis.x.tick = {};
          c3json.axis.x.tick.culling = eval("(" + scope.c3axisxtickculling  + ")");
       }
-      //TODO: test with no column headers
       if (scope.c3axisxtickcullingmax){ 
         if (c3json.axis === undefined) c3json.axis = {};
         if (c3json.axis.x === undefined) c3json.axis.x = {};
@@ -750,28 +746,29 @@ function mmsC3(ElementService, UtilsService, TableService, $compile, growl, $win
       vf_pplot([], 0, false, false);
       return;
     }
-    /*if (scopetableColumnHeadersLabel.length === 0) {
-      return;
-    }*/
-
     svg.selectAll('*').remove();
       
 	
 	var is_x_value_number = true;  //column headings are number (not check 1st column)
-  var has_column_header = true;
+  var has_column_header;
   var start_index; //0 if column header is included as data, -1 if column header is not included as data
   for ( var k = 0; k < scopeTableIds.length; k++){
 		var c3_data=[];
 
-    if ( scope.c3dataxs === undefined) {
+    if (scopetableColumnHeadersLabel[k] === undefined) {//no column header 
+        has_column_header = false;
+        start_index = -1;    
+    }
+    else if ( scope.c3dataxs === undefined) {
       c3_data[0] = ['x'].concat(scopetableColumnHeadersLabel[k]);
       start_index = 0;
+      has_column_header = true;
     }
-    else {//Assume if xs is defined, no column header
+    else {//Assume if xs is defined, column header is ignored even exist
       has_column_header = false;
       start_index = -1;
     }
-    if (isNaN(scopetableColumnHeadersLabel[k][0]))
+    if (scopetableColumnHeadersLabel[k] !== undefined && isNaN(scopetableColumnHeadersLabel[k][0]))
       is_x_value_number = false;
 
     for ( var i = 0; i < scope.datavalues[k].length; i++){
@@ -790,15 +787,7 @@ function mmsC3(ElementService, UtilsService, TableService, $compile, growl, $win
       } //end of j
      	c3_data[1+start_index++] = [scope.tableRowHeaders[k][i].name].concat(c3_data_row);
     } //end of i
-    ////////////////////temporary remove column header///////////////
-    /*var temp = [];
-    for (var jj = 1; jj < c3_data.length; jj++){
-      temp[jj-1] = c3_data[jj];
-    }
-    c3_data = temp;
-    if ( c3_data.length === 5)
-    */
-   
+    
     //////////////////////////////////
     vf_pplot(c3_data, k, is_x_value_number, has_column_header); //c3_columns
    }//end of k (each table)
