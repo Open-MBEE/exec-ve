@@ -92,8 +92,8 @@ function mmsSearch(ElementService, growl, $rootScope, $templateCache, mmsRootSit
             var qualified, i;
             if (mmsRootSites && mmsRootSites.length > 0) {
                 for (i = 0; i < data.length; i++) {
-                    if (data[i].qualifiedId) {
-                        qualified = data[i].qualifiedId.split('/');
+                    if (data[i]._qualifiedId) {
+                        qualified = data[i]._qualifiedId.split('/');
                         if (qualified.length > 1 && mmsRootSites.indexOf(qualified[1]) >= 0) {
                             data1.push(data[i]);
                         }

@@ -31,7 +31,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
 
     if (document !== null) {
         $scope.document = document;
-        $scope.editable = $scope.document.editable && time === 'latest' && UtilsService.isView($scope.document);
+        $scope.editable = $scope.document._editable && time === 'latest' && UtilsService.isView($scope.document);
     }
 
     // If it is not the master workspace, then retrieve it:
@@ -614,7 +614,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                                 name: viewNode.data.name,
                                 sysmlId: viewNode.data.sysmlId
                             }],
-                            siteCharacterizationId: document.siteCharacterizationId,
+                            _siteCharacterizationId: document._siteCharacterizationId,
                             name: document.name,
                             sysmlId: document.sysmlId
                         }
@@ -1270,7 +1270,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                     name: viewNode.data.name,
                     sysmlId: viewNode.data.sysmlId
                 }],
-                siteCharacterizationId: document.siteCharacterizationId,
+                _siteCharacterizationId: document._siteCharacterizationId,
                 name: document.name,
                 sysmlId: document.sysmlId
             }

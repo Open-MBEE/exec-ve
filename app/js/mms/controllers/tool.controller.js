@@ -14,7 +14,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $stateParams, $timeout, Conf
     $scope.specVersion = time;
     $scope.document = document;
     $scope.ws = ws;
-    $scope.editable = document && document.editable && time === 'latest';
+    $scope.editable = document && document._editable && time === 'latest';
     $scope.snapshots = snapshots;
     $scope.tags = tags;
     $scope.site = site;
@@ -210,7 +210,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $stateParams, $timeout, Conf
             $scope.specVersion = version;
             ElementService.getElement(eid, false, ws, version, 2).
             then(function(element) {
-                var editable = element.editable && version === 'latest';
+                var editable = element._editable && version === 'latest';
                 $rootScope.mms_tbApi.setPermission('element-editor', editable);
                 $rootScope.mms_tbApi.setPermission("document-snapshot-create", editable);
             });
@@ -237,7 +237,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $stateParams, $timeout, Conf
             return;
         ElementService.isCacheOutdated($scope.eid, $scope.specWs)
         .then(function(data) {
-            if (data.status && data.server.modified > data.cache.modified)
+            if (data.status && data.server._modified > data.cache._modified)
                 growl.error('This element has been updated on the server. Please refresh the page to get the latest version.');
         });
     });
@@ -252,7 +252,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $stateParams, $timeout, Conf
         showPane('element');
         ElementService.getElement(vid, false, ws, time, 2).
         then(function(element) {
-            var editable = element.editable && time === 'latest';
+            var editable = element._editable && time === 'latest';
             $rootScope.mms_tbApi.setPermission('element-editor', editable);
             $rootScope.mms_tbApi.setPermission('view-reorder', editable);
             $rootScope.mms_tbApi.setPermission("document-snapshot-create", editable);

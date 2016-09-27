@@ -33,7 +33,7 @@ function StompService($rootScope, UtilsService, $window, $location, ApplicationS
                         var inCache = CacheService.exists( UtilsService.makeElementKey(value.sysmlId, workspaceId, 'latest', false) );
                         if(inCache === true)
                             UtilsService.mergeElement(value, value.sysmlId, workspaceId, false, "all" );
-                        $rootScope.$broadcast("stomp.element", value, workspaceId, value.sysmlId , value.modifier, value.name);
+                        $rootScope.$broadcast("stomp.element", value, workspaceId, value.sysmlId , value._modifier, value.name);
                     });
                 }
                 if(updateWebpage.workspace2.updatedElements && updateWebpage.workspace2.updatedElements.length > 0){
@@ -44,8 +44,8 @@ function StompService($rootScope, UtilsService, $window, $location, ApplicationS
                             UtilsService.mergeElement(value, value.sysmlId, workspaceId, false, "all" );
                         var history = CacheService.get(UtilsService.makeElementKey(value.sysmlId, workspaceId, 'versions'));
                         if (history)
-                            history.unshift({modifier: value.modifier, timestamp: value.modified});
-                        $rootScope.$broadcast("stomp.element", value, workspaceId, value.sysmlId , value.modifier, value.name);
+                            history.unshift({modifier: value._modifier, timestamp: value._modified});
+                        $rootScope.$broadcast("stomp.element", value, workspaceId, value.sysmlId , value._modifier, value.name);
                     });
                 }
             });

@@ -102,10 +102,10 @@ function mmsView(ViewService, $templateCache, $rootScope, growl) {
 
         this.elementTranscluded = function(elem, type) {
             if (elem) {
-                if (elem.modified > $scope.modified && type !== 'Comment') { 
-                    $scope.modified = elem.modified;
-                    if (elem.modifier)
-                        $scope.modifier = elem.modifier;
+                if (elem._modified > $scope.modified && type !== 'Comment') { 
+                    $scope.modified = elem._modified;
+                    if (elem._modifier)
+                        $scope.modifier = elem._modifier;
                 }
                 if ($scope.mmsTranscluded)
                     $scope.mmsTranscluded({element: elem, type: type});
@@ -156,8 +156,8 @@ function mmsView(ViewService, $templateCache, $rootScope, growl) {
                         });
                         if (hasDiagram) {
                             scope.view = data;
-                            scope.modified = data.modified;
-                            scope.modifier = data.modifier;
+                            scope.modified = data._modified;
+                            scope.modifier = data._modifier;
                             return;
                         }
                     }
@@ -165,8 +165,8 @@ function mmsView(ViewService, $templateCache, $rootScope, growl) {
                 if (data.type === 'InstanceSpecification') {
                     scope.isSection = true;
                     scope.view = data;
-                    scope.modified = data.modified;
-                    scope.modifier = data.modifier;
+                    scope.modified = data._modified;
+                    scope.modifier = data._modifier;
                     return;
                 }
                 if (data.numElements && data.numElements > 5000 &&
@@ -174,19 +174,19 @@ function mmsView(ViewService, $templateCache, $rootScope, growl) {
                     //threshold where getting view elements in bulk takes too long and it's not latest
                     //getting cached individual elements should be faster
                     scope.view = data;
-                    scope.modified = data.modified;
-                    scope.modifier = data.modifier;
+                    scope.modified = data._modified;
+                    scope.modifier = data._modifier;
                     return;
                 }
                 ViewService.getViewElements(scope.mmsVid, false, scope.mmsWs, scope.mmsVersion, 1, data.displayedElements)
                 .then(function(data2) {
                     scope.view = data;
-                    scope.modified = data.modified;
-                    scope.modifier = data.modifier;
+                    scope.modified = data._modified;
+                    scope.modifier = data._modifier;
                 }, function(reason) {
                     scope.view = data;
-                    scope.modified = data.modified;
-                    scope.modifier = data.modifier;
+                    scope.modified = data._modified;
+                    scope.modifier = data._modifier;
                 }).finally(function() {
                     element.removeClass('isLoading');
                 });

@@ -38,7 +38,7 @@ function mmsSiteDocFilter(ElementService, ViewService, growl, $templateCache, $q
         .then(function(data) {
             orig = data;
             scope.filtered = JSON.parse(data.documentation);
-            if (!data.editable)
+            if (!data._editable)
                 editable = false;
             ViewService.getSiteDocuments(scope.mmsSite, false, scope.mmsWs, scope.mmsVersion)
             .then(function(docs) {

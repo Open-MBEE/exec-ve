@@ -239,8 +239,8 @@ function UtilsService(CacheService, _) {
         CacheService.put(key, clean, true);
         var edit = CacheService.get(keyEdit);
         if (updateEdit && edit) {
-            edit.read = clean.read;
-            edit.modified = clean.modified;
+            edit._read = clean._read;
+            edit._modified = clean._modified;
             if (property === 'all')
                 CacheService.put(keyEdit, clean, true);
             else if (property === 'name')

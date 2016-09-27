@@ -128,7 +128,7 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
     $scope.bbApi = {};
     $scope.bbApi.init = function() {
 
-        if (document && document.editable && time === 'latest') {
+        if (document && document._editable && time === 'latest') {
             $scope.bbApi.addButton(UxService.getButtonBarButton('show-edits'));
             $scope.bbApi.setToggleState('show-edits', $rootScope.mms_ShowEdits);
             hotkeys.bindTo($scope)
@@ -248,7 +248,7 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
     $scope.searchOptions.searchResult = $scope.search;    
 
     $scope.searchGoToDocument = function (doc, view, elem) {//siteId, documentId, viewId) {
-        $state.go('workspace.site.document.view', {site: doc.siteCharacterizationId, document: doc.sysmlId, view: view.sysmlId, tag: undefined, search: undefined});
+        $state.go('workspace.site.document.view', {site: doc._siteCharacterizationId, document: doc.sysmlId, view: view.sysmlId, tag: undefined, search: undefined});
     };
     $scope.searchOptions.relatedCallback = $scope.searchGoToDocument;
 }]);

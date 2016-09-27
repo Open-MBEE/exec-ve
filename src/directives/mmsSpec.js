@@ -200,7 +200,7 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
                 if (scope.element.type === 'Constraint')
                     scope.value = scope.element.specification;
                 if (scope.mmsEditField === 'none' ||
-                        !scope.element.editable ||
+                        !scope.element._editable ||
                         (scope.mmsVersion !== 'latest' && scope.mmsVersion)) {
                     scope.editable = false;
                     scope.edit = null;
