@@ -52,7 +52,7 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
                 if (newVal !== lastid)
                     return;
                 scope.view = data;
-                scope.editable = scope.view.editable && scope.mmsVersion === 'latest';
+                scope.editable = scope.view._editable && scope.mmsVersion === 'latest';
 
                 var contents = data.contents || data.specification;
                 if (contents) {
@@ -102,8 +102,8 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
             var updateSectionElementOrder = function(elementReference) {
                 var sectionEdit = { 
                     sysmlId: elementReference.instance,
-                    read: elementReference.instanceSpecification.read,
-                    modified: elementReference.instanceSpecification.modified,
+                    _read: elementReference.instanceSpecification._read,
+                    _modified: elementReference.instanceSpecification._modified,
                     type: elementReference.instanceSpecification.type,
                     specification: {
                         type: "Expression"
@@ -132,8 +132,8 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
             }
             var viewEdit = { 
                 sysmlId: scope.view.sysmlId,
-                read: scope.view.read,
-                modified: scope.view.modified,
+                _read: scope.view._read,
+                _modified: scope.view._modified,
                 type: scope.view.type
             };
             //viewEdit.specialization = _.cloneDeep(scope.view.specialization);

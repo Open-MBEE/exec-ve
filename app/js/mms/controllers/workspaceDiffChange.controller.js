@@ -258,8 +258,8 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 				else if (change.type === 'updated')
 				{
 					object.workspace2.updatedElements.push(change.ws2object);
-					delete change.ws2object.read;
-					delete change.ws2object.modified;
+					delete change.ws2object._read;
+					delete change.ws2object._modified;
 					//delete change.delta.read;
 					//changedElements.push(change.delta);
 				}

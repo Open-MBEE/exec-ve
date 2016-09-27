@@ -53,7 +53,7 @@ angular.module('mmsApp').controller('ToolbarCtrl', ['$scope', '$rootScope', '$st
 		}
 		else if ($state.includes('workspace.site.document'))
 		{
-			editable = document.editable && time === 'latest';
+			editable = document._editable && time === 'latest';
 			$scope.tbApi.addButton(UxService.getToolbarButton("document-snapshot"));
 			$scope.tbApi.addButton(UxService.getToolbarButton("view-reorder"));
 			$scope.tbApi.setPermission('element-editor', editable);

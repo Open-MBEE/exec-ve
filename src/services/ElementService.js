@@ -86,7 +86,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
             if (UtilsService.isView(cached) &&
                 !cached.hasOwnProperty('contains') &&
                 !cached.hasOwnProperty('contents')) {
-            } else if (extended && !cached.qualifiedId) {
+            } else if (extended && !cached._qualifiedId) {
             } else {
                 deferred.resolve(cached);
                 return deferred.promise;
@@ -132,7 +132,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
             var id = ids[i];
             var n2 = normalize(id, update, workspace, version, false, extended);
             var exist = CacheService.get(n2.cacheKey);
-            if (exist && !n.update && (!extended || (extended && exist.qualifiedId))) {
+            if (exist && !n.update && (!extended || (extended && exist._qualifiedId))) {
                 existing.push(exist);
                 continue;
             }
@@ -410,7 +410,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
             var resp = CacheService.put(n.cacheKey, UtilsService.cleanElement(e), true);
             var history = CacheService.get(UtilsService.makeElementKey(elem.sysmlId, workspace, 'versions'));
             if (history) {
-                history.unshift({modifier: e.modifier, timestamp: e.modified});
+                history.unshift({modifier: e._modifier, timestamp: e._modified});
             }
             var edit = CacheService.get(UtilsService.makeElementKey(elem.sysmlId, n.ws, null, true));
             if (edit) {
@@ -443,8 +443,8 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                     } else {
                         UtilsService.cleanElement(orig);
                         if (!UtilsService.hasConflict(postElem, orig, server)) {
-                            elem.read = server.read;
-                            elem.modified = server.modified;
+                            elem._read = server._read;
+                            elem._modified = server._modified;
                             updateElement(elem, workspace)
                             .then(function(good){
                                 deferred.resolve(good);
@@ -500,7 +500,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
 
                 var history = CacheService.get(UtilsService.makeElementKey(elem.sysmlId, workspace, 'versions'));
                 if (history) {
-                    history.unshift({modifier: elem.modifier, timestamp: elem.modified});
+                    history.unshift({modifier: elem._modifier, timestamp: elem._modified});
                 }
                 var orig = elemsMapping[elem.sysmlId];
                 var edit = CacheService.get(UtilsService.makeElementKey(elem.sysmlId, ws, null, true));
@@ -656,14 +656,14 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         $http.get(URLService.getElementURL(id, ws, 'latest'))
         .success(function(data, status, headers, config) {
             var server = _.cloneDeep(data.elements[0]);
-            delete server.modified;
-            delete server.read;
-            delete server.creator;
+            delete server._modified;
+            delete server._read;
+            delete server._creator;
             UtilsService.cleanElement(server);
             var current = _.cloneDeep(orig);
-            delete current.modified;
-            delete current.read;
-            delete current.creator;
+            delete current._modified;
+            delete current._read;
+            delete current._creator;
             UtilsService.cleanElement(current);
             if (angular.equals(server, current)) {
                 deferred.resolve({status: false});
@@ -867,15 +867,15 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         var projectName = null;
         var siteId = siteid;
 
-        if (elem && elem.qualifiedId && elem.qualifiedName) {
-            var splitArray = elem.qualifiedId.split('/');
-            var projectNameArray = elem.qualifiedName.split('/');
+        if (elem && elem._qualifiedId && elem._qualifiedName) {
+            var splitArray = elem._qualifiedId.split('/');
+            var projectNameArray = elem._qualifiedName.split('/');
             if (splitArray && splitArray.length > 2) {
                 projectId = splitArray[2];
                 siteId = splitArray[1];
             }
-            if (elem.siteCharacterizationId)
-                siteId = elem.siteCharacterizationId;
+            if (elem._siteCharacterizationId)
+                siteId = elem._siteCharacterizationId;
             if (projectId && projectId.indexOf('PROJECT') >= 0) {
                 holdingBinId = 'holding_bin_' + projectId;
                 projectName = projectNameArray[2];
@@ -887,7 +887,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
     var getIdInfo = function(elem, siteid, workspace, version, weight) { //elem is element object with qualified id with project in it
         var deferred = $q.defer();
 
-        if (!elem || (elem && elem.qualifiedId && elem.qualifiedName)) {
+        if (!elem || (elem && elem._qualifiedId && elem._qualifiedName)) {
             deferred.resolve(getIdInfoReal(elem, siteid));
         } else {
             getElement(elem.sysmlId, false, workspace, version, weight, true)

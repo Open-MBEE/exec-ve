@@ -460,8 +460,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         .then(function(data) {  
             var clone = {
                 sysmlId: data.sysmlId,
-                read: data.read,
-                modified: data.modified,
+                _read: data._read,
+                _modified: data._modified,
                 childViews: [],
                 type: data.type
             };
@@ -519,8 +519,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         .then(function(data) {  
             var clone = {
                 sysmlId: data.sysmlId,
-                read: data.read,
-                modified: data.modified,
+                _read: data._read,
+                _modified: data._modified,
                 type: data.type
             };
             var key;
@@ -575,8 +575,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             .then(function(data) {  
                 var clone = {
                     sysmlId: data.sysmlId,
-                    read: data.read,
-                    modified: data.modified,
+                    _read: data._read,
+                    _modified: data._modified,
                     type: data.type
                 };
                 var key;
@@ -630,8 +630,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             if (data.childViews) {
                 var clone = {
                     sysmlId: data.sysmlId,
-                    read: data.read,
-                    modified: data.modified,
+                    _read: data._read,
+                    _modified: data._modified,
                     childViews: [],
                     type: data.type
                 };
@@ -798,8 +798,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             view.ownerId = owner.sysmlId;
             parentView = {
                 sysmlId: owner.sysmlId,
-                modified: owner.modified,
-                read: owner.read,
+                _modified: owner._modified,
+                _read: owner._read,
                 childViews: [],
             };
                 if (owner.type)

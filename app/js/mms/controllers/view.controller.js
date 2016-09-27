@@ -63,7 +63,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $uibModal, $window,
     $scope.buttons = [];
 
     $scope.bbApi.init = function() {
-        if (view && view.editable && time === 'latest') {
+        if (view && view._editable && time === 'latest') {
             $scope.bbApi.addButton(UxService.getButtonBarButton('show-edits'));
             $scope.bbApi.setToggleState('show-edits', $rootScope.mms_ShowEdits);
             hotkeys.bindTo($scope)
@@ -75,7 +75,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $uibModal, $window,
         }
         $scope.bbApi.addButton(UxService.getButtonBarButton('show-comments'));
         $scope.bbApi.setToggleState('show-comments', $rootScope.veCommentsOn);
-        if (view && view.editable && time === 'latest') {
+        if (view && view._editable && time === 'latest') {
             if ($scope.view.contents || $scope.view.type === 'InstanceSpecification') {
                 $scope.bbApi.addButton(UxService.getButtonBarButton('view-add-dropdown'));
             } else {
@@ -310,9 +310,9 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $uibModal, $window,
         if (type === 'Comment' && !$scope.comments.hasOwnProperty(element.sysmlId)) {
             $scope.comments[element.sysmlId] = element;
             $scope.numComments++;
-            if (element.modified > $scope.lastCommented) {
-                $scope.lastCommented = element.modified;
-                $scope.lastCommentedBy = element.modifier;
+            if (element._modified > $scope.lastCommented) {
+                $scope.lastCommented = element._modified;
+                $scope.lastCommentedBy = element._modifier;
             }
         }
     };
@@ -329,7 +329,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $uibModal, $window,
     };
 
     $scope.searchGoToDocument = function (doc, view, elem) {//siteId, documentId, viewId) {
-        $state.go('workspace.site.document.view', {site: doc.siteCharacterizationId, document: doc.sysmlId, view: view.sysmlId, tag: undefined, search: undefined});
+        $state.go('workspace.site.document.view', {site: doc._siteCharacterizationId, document: doc.sysmlId, view: view.sysmlId, tag: undefined, search: undefined});
     };
     $scope.searchOptions.relatedCallback = $scope.searchGoToDocument;
 

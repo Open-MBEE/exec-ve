@@ -23,9 +23,9 @@ angular.module('mms.directives')
 function mmsViewLink(ElementService, UtilsService, $compile, growl) {
 
     function findSite(element) {
-        if (element.siteCharacterizationId)
-            return element.siteCharacterizationId;
-        var path = element.qualifiedId.split('/');
+        if (element._siteCharacterizationId)
+            return element._siteCharacterizationId;
+        var path = element._qualifiedId.split('/');
         return path[1];
     }
 

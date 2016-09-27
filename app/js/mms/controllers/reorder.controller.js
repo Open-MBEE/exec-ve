@@ -115,8 +115,8 @@ function($scope, $rootScope, $stateParams, document, time, ElementService, ViewS
                 toSave.push({
                     sysmlId: id,
                     //name: orig.name,
-                    read: orig.read,
-                    modified: orig.modified,
+                    _read: orig._read,
+                    _modified: orig._modified,
                     childViews: childViews,
                     type: orig.type
                 });

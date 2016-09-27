@@ -74,7 +74,7 @@ function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxSe
             scope.isEditing = false;
             element.empty();
             var doc = scope.element.documentation || '(No comment)';
-            doc += ' - ' + scope.element.creator;
+            doc += ' - ' + scope.element._creator;
             element[0].innerHTML = doc;
             MathJax.Hub.Queue(["Typeset", MathJax.Hub, element[0]]);
             scope.recompileScope = scope.$new();

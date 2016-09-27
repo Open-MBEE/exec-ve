@@ -111,8 +111,8 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Wo
                                 currentEdit.name = scope.latest.name + ' MERGE ' + currentEdit.name;
                             if (scope.latest.documentation !== currentEdit.documentation && (type === 'documentation' || type === 'all'))
                                 currentEdit.documentation = scope.latest.documentation + '<p>MERGE</p>' + currentEdit.documentation;
-                            currentEdit.read = scope.latest.read;
-                            currentEdit.modified = scope.latest.modified;
+                            currentEdit._read = scope.latest._read;
+                            currentEdit._modified = scope.latest._modified;
                                 //growl.info("Element name and doc merged");
                             var message = 'Element name and doc merged';
                             if (type === 'name')
@@ -121,8 +121,8 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Wo
                                 message = 'Element documentation merged';
                             deferred.reject({type: 'info', message: message});
                         } else if (choice === 'force') {
-                            edit.read = scope.latest.read;
-                            edit.modified = scope.latest.modified;
+                            edit._read = scope.latest._read;
+                            edit._modified = scope.latest._modified;
                             save(edit, mmsWs, mmsType, mmsEid, editorApi, scope, type).then(function(resolved) {
                                 deferred.resolve(resolved);
                             }, function(error) {
@@ -333,7 +333,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Wo
     
     var addFrame = function(scope, mmsViewCtrl, element, template, editObj, doNotScroll) {
 
-        if (mmsViewCtrl.isEditable() && !scope.isEditing && scope.element.editable && scope.version === 'latest') { 
+        if (mmsViewCtrl.isEditable() && !scope.isEditing && scope.element._editable && scope.version === 'latest') { 
 
             var id = editObj ? editObj.sysmlId : scope.mmsEid;
             ElementService.getElementForEdit(id, false, scope.ws)
@@ -382,7 +382,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Wo
             // Will need to unravel until the end to check all references
             ElementService.isCacheOutdated(id, scope.ws)
             .then(function(data) {
-                if (data.status && data.server.modified > data.cache.modified)
+                if (data.status && data.server._modified > data.cache._modified)
                     growl.warning('This element has been updated on the server');
             });
         }
@@ -420,8 +420,8 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Wo
         // Want the save object to contain only what properties were edited:
         var myEdit = {
                         sysmlId: scope.edit.sysmlId,
-                        modified: scope.edit.modified,
-                        read: scope.edit.read
+                        _modified: scope.edit._modified,
+                        _read: scope.edit._read
                      };
         if (type === 'name' || type === 'documentation') {
             myEdit[type] = scope.edit[type];

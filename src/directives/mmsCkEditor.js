@@ -332,7 +332,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
                     $scope.comment.ownerId = ViewService.getCurrentView().sysmlId;
                 ElementService.createElement($scope.comment, scope.mmsWs, scope.mmsSite)
                 .then(function(data) {
-                    var tag = '<mms-transclude-com data-mms-eid="' + data.sysmlId + '">comment:' + data.creator + '</mms-transclude-com> ';
+                    var tag = '<mms-transclude-com data-mms-eid="' + data.sysmlId + '">comment:' + data._creator + '</mms-transclude-com> ';
                     $uibModalInstance.close(tag);
                 }, function(reason) {
                     growl.error("Comment Error: " + reason.message);
