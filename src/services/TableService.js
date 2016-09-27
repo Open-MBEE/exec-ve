@@ -19,10 +19,11 @@ function TableService($q, $http, URLService, UtilsService, CacheService, _, Elem
         var tableTitles = []; //used only for display
         var tableIds = []; //used as filter id
         var tableColumnHeadersLabels=[];
+        var numOfDataColumn = []; //to know the number of data columns in case not column header lables.
         var numOfRowHeadersPerTable = [];
         var rowHeadersMmsEid = []; 
         var dataValuesMmmEid =[];
-
+        var columnCounter;
         var i, j, k;
         if ( data.contents !==  undefined){ //use contents if exist
         //if ( data.specialization.contains ===  undefined){  
@@ -39,20 +40,24 @@ function TableService($q, $http, URLService, UtilsService, CacheService, _, Elem
                   tableIds.push(values[k].sysmlId);
                   var columnHeaders = [];
                   //ignore 1st column
-                  for (i = 1; i < s.header[0].length; i++ ){
-                    columnHeaders.push(s.header[0][i].content[0].text.replace("<p>","").replace("</p>","").replace(" ", ""));    
+                  if ( s.header !== undefined){
+                    for (i = 1; i < s.header[0].length; i++ ){
+                      columnHeaders.push(s.header[0][i].content[0].text.replace("<p>","").replace("</p>","").replace(" ", ""));    
+                    }
+                    tableColumnHeadersLabels.push(columnHeaders);
                   }
-                  tableColumnHeadersLabels.push(columnHeaders);
-                  var rowHeaders = [];
                   numOfRowHeadersPerTable.push(s.body.length);
                   for ( i = 0; i < s.body.length; i++){
                     rowHeadersMmsEid.push(s.body[i][0].content[0].source);
                     for ( j = 1; j < s.body[i].length; j++ ){
                       dataValuesMmmEid.push(s.body[i][j].content[0].source);
                     }
+                    if (i === 0)
+                      columnCounter = s.body[i].length - 1; //-1 to remove row header
                   }
-                }
-              }
+                  numOfDataColumn.push(columnCounter);
+                } //end of if (s.type === "Table")
+              }//end of for k
               readTablesCommon();
             });
         }
@@ -79,6 +84,7 @@ function TableService($q, $http, URLService, UtilsService, CacheService, _, Elem
             }
           }
           var body;
+          
           for ( k = 0; k < tableContains.length; k++){
               body = tableContains[k].body;
               numOfRowHeadersPerTable.push( body.length);
@@ -86,9 +92,12 @@ function TableService($q, $http, URLService, UtilsService, CacheService, _, Elem
                 rowHeadersMmsEid.push(body[i][0].content[0].source);
                 for ( j = 1; j < body[i].length; j++){
                   dataValuesMmmEid.push(body[i][j].content[0].source);
+                if ( i === 0)
+                  columnCounter = body[i].length - 1;// -1 to remove row header
               }
+              numOfDataColumn.push(columnCounter);
             }
-          }
+          } //end of for k
           readTablesCommon();
         }
         
@@ -99,19 +108,18 @@ function TableService($q, $http, URLService, UtilsService, CacheService, _, Elem
           ElementService.getElements(rowHeadersMmsEid, false, ws, version)
           .then(function(rowHeaders) {
               ElementService.getElements(dataValuesMmmEid, false, ws, version)
-                  .then(function(values) {
-                    var dataIdFilters=[];
-                    var dataTableValues = [];
-                    var datavalues = [];
-                    var startIndex = 0;
-                    var counter = 0;
-                    for (k = 0; k < numOfTables; k++){
-                    //for (k = 0; k < tableContains.length; k++){
+                .then(function(values) {
+                  var dataIdFilters=[];
+                  var dataTableValues = [];
+                  var datavalues = [];
+                  var startIndex = 0;
+                  var counter = 0;
+                  for (k = 0; k < numOfTables; k++){
                     datavalues = [];
-                    var valueLength = tableColumnHeadersLabels[k].length* numOfRowHeadersPerTable[k];//rowHeadersMmsEid.length;
-                    for (i = 0; i < valueLength; i= i + tableColumnHeadersLabels[k].length){
+                    var valueLength = numOfDataColumn[k]* numOfRowHeadersPerTable[k];//rowHeadersMmsEid.length;
+                    for (i = 0; i < valueLength; i= i + numOfDataColumn[k]){
                       var datarow =[];// new Array(tableColumnHeadersLabels[k].length);
-                      for ( var j = 0; j < tableColumnHeadersLabels[k].length; j++){
+                      for ( var j = 0; j < numOfDataColumn[k]; j++){
                         datarow.push(values[counter++]); 
                       }
                       datavalues.push(datarow);
@@ -135,11 +143,13 @@ function TableService($q, $http, URLService, UtilsService, CacheService, _, Elem
                     for ( i = 0; i < tableRowHeaders[k].length; i++){
                          filterRowHeaders[toValidId(tableRowHeaders[k][i].name)] = true;
                     }
-                    for ( i = 0; i < tableColumnHeadersLabels[k].length; i++){
-                       filterColumnHeaders[toValidId(tableColumnHeadersLabels[k][i])] = true;
+                    if (tableColumnHeadersLabels[k] !== undefined){
+                      for ( i = 0; i < tableColumnHeadersLabels[k].length; i++){
+                         filterColumnHeaders[toValidId(tableColumnHeadersLabels[k][i])] = true;
+                      }
                     }
                     filters.push(filterRowHeaders);
-                    filters.push(filterColumnHeaders);
+                    filters.push(filterColumnHeaders); 
                     dataIdFilters[tableIds[k]]=filters;
                   }
                   var r =  {
