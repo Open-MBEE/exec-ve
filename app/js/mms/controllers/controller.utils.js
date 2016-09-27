@@ -18,6 +18,13 @@ function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templ
         $scope.newItem = {};
         $scope.newItem.name = "";
         $scope.newItem.tomsawyerType = "IBD";
+        $scope.tsMapping = {
+            "IBD": "Internal Block Diagram",
+            "BDD": "Block Definition Diagram",
+            "SMD": "State Machine Diagram",
+            "AD": "Activity Diagram",
+            "SD": "Sequence Diagram",
+        };
         // Search for InstanceSpecs.  We are searching for InstanceSpecs b/c we only want to
         // create a InstanceValue to point to that InstanceSpec when cross-referencing.
         $scope.searchFilter = function(data) {

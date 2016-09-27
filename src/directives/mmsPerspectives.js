@@ -121,15 +121,15 @@ function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigSe
             viewName = "Block Definition Diagram";
             viewType = "tsDrawingView";
             break;
-        case "State Machine":
+        case "SMD":
             viewName = "State Machine";
             viewType = "tsDrawingView";
             break;
-        case "Activity Diagram":
+        case "AD":
             viewName = "Activity Diagram";
             viewType = "tsDrawingView";
             break;
-        case "Sequence Diagram":
+        case "SD":
             viewName = "Sequence Diagram";
             viewType = "tsDrawingView";
             break;
