@@ -93,14 +93,17 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
                 return;
             ran = true;
             lastid = newVal;
-            ElementService.getElement(scope.mmsDocId, false, 'master', 'latest', 2)
+            ElementService.getElement(scope.mmsDocId, false, 'master', 'latest', 2, true)
             .then(function(document) {
                 if (newVal !== lastid)
                     return;
                 if(!UtilsService.isDocument(document))
                     return;
                 documentName = document.name;
-                project = ElementService.getIdInfo(document, null);
+                ElementService.getIdInfo(document, null)
+                .then(function(data) {
+                    project = data;
+                });
                 scope.docName = documentName;
                 getJobs();
             });
