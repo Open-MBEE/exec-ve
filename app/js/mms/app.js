@@ -560,7 +560,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 }
                 return found; 
             },
-            tag: function ($stateParams, ConfigService, workspace, snapshots, ticket) {
+            tag: function ($stateParams, ConfigService, workspace, snapshots, ticket, tags) {
                 if ($stateParams.tag === undefined)
                 {
                     if ($stateParams.time !== undefined && $stateParams.time !== 'latest') {
@@ -584,8 +584,17 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                         });
                         if (snapshotFound)
                             return snapshotPromise;
-                        else 
-                            return { name: 'latest', timestamp: 'latest' };
+                        if (tags) {
+                            tags.forEach(function(tag) {
+                                if ($stateParams.time === tag.timestamp) {
+                                    snapshotFound = true;
+                                    snapshotPromise = tag;
+                                }
+                            });
+                        }
+                        if (snapshotFound)
+                            return snapshotPromise;
+                        return { name: 'n/a', timestamp: $stateParams.time };
                     } else {
                         return { name: 'latest', timestamp: 'latest' };
                     }
