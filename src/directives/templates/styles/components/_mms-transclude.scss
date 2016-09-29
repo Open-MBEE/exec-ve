@@ -9,12 +9,13 @@ mms-transclude-img {
 }
 
 span > mms-transclude-doc, span > mms-transclude-val {
+  background-color: inherit;
+  color: inherit;
+
+  > p, > h1, > h2, > h3, > h4, > h5, > h6, > ol, > ul, > pre {
     background-color: inherit;
     color: inherit;
-    > p, > h1, > h2, > h3, > h4, > h5, > h6, > ol, > ul, > pre {
-      background-color: inherit;
-      color: inherit;
-    }
+  }
 }
 
 mms-view {
@@ -23,10 +24,10 @@ mms-view {
   mms-transclude-val * {
     @include transition(background-color, .2s, linear);
   }
+
   .add-buttons-container {
     display: none;
   }
-
 }
 
 mms-view.editing {
@@ -53,11 +54,19 @@ mms-view.editing {
     border-radius: 5px;
     cursor: pointer;
     margin-bottom: 5px;
-    padding: 2px 0;
+    // padding: 2px 0;
   }
-
+  
   mms-transclude-doc {
-      display: block;
+    display: block;
+
+    > div > div.panel-heading {
+      padding: 0;
+    }
+
+    .transclude-doc-bb {
+      margin: 8px 0;
+    }
   }
 
   /* Level 2 transclusions */
