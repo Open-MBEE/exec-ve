@@ -693,7 +693,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         //var n = normalize(null, update, workspace, null);
         //return getGenericElements(URLService.getElementSearchURL(query, n.ws), 'elements', n.update, n.ws, n.ver);
         var n = normalize(null, update, workspace, null, false, extended);
-        var url = URLService.getElementSearchURL(query, filters, propertyName, page, items, n.ws, n.extended);
+        var url = URLService.getElementSearchURL(query, filters, propertyName, page, items, n.ws, true);
         var progress = 'search(' + url + n.update + n.ws + ')';
         if (inProgress.hasOwnProperty(progress)) {
             HttpService.ping(url, weight);
