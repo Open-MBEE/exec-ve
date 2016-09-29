@@ -15,7 +15,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     $scope.buttons = [];
     $scope.treeExpandLevel = 1;
     if ($state.includes('workspace.sites') && !$state.includes('workspace.site.document')) 
-        $scope.treeExpandLevel = 3;
+        $scope.treeExpandLevel = 2;
     $scope.treeSectionNumbering = false;
     if ($state.includes('workspace.site.document')) {
         $scope.treeSectionNumbering = true;
