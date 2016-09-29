@@ -15,6 +15,7 @@
     <i ng-hide="view" class="fa fa-2x fa-spinner fa-spin"></i>
 
     <div ng-if="!isSection && view.specialization.contents == null">
+        <div class="add-buttons-container" ng-init="$index = -1" ng-include="'mms/templates/mmsAddPeButton.html'"></div>
         <div ng-repeat="contain in ::view.specialization.contains" ng-switch on="contain.type">  
             <mms-view-para data-mms-para="::contain" ng-switch-when="Paragraph"></mms-view-para>
             <mms-view-table data-mms-table="::contain" ng-switch-when="Table"></mms-view-table>
