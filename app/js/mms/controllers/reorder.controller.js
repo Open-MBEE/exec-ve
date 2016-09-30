@@ -58,7 +58,7 @@ function($scope, $rootScope, $stateParams, document, time, ElementService, ViewS
             };
             viewIds2node[v.sysmlid] = curNode;
         }
-        origViews[v.sysmlid] = v;
+        origViews[v.sysmlid] = _.cloneDeep(v);
         return curNode;
     }
 
