@@ -69,14 +69,14 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
      *      multiple calls to this method with the same parameters would give the
      *      same object
      */
-    var getElement = function(id, update, workspace, version, weight) { //add prority parameter w/default high prority 
+    var getElement = function(id, update, workspace, version, weight, extended) { //add prority parameter w/default normal prority 
         if(weight === undefined)
             weight = 1;
-        var n = normalize(id, update, workspace, version);
-        var key = 'getElement(' + id + n.update + n.ws + n.ver + ')';
+        var n = normalize(id, update, workspace, version, false, extended);
+        var key = 'getElement(' + id + n.update + n.ws + n.ver + n.extended + ')';
         // if it's in the inProgress queue get it immediately
         if (inProgress.hasOwnProperty(key)) {  //change to change proirity if it's already in the queue
-            HttpService.ping(URLService.getElementURL(id, n.ws, n.ver), weight);
+            HttpService.ping(URLService.getElementURL(id, n.ws, n.ver, n.extended), weight);
             return inProgress[key];
         }
 
@@ -87,13 +87,14 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                 cached.specialization.type === 'Product')) &&
                 !cached.specialization.hasOwnProperty('contains') &&
                 !cached.specialization.hasOwnProperty('contents')) {
+            } else if (extended && !cached.qualifiedId) {
             } else {
                 deferred.resolve(cached);
                 return deferred.promise;
             }
         }
         inProgress[key] = deferred.promise;// edit with new function signature
-        HttpService.get(URLService.getElementURL(id, n.ws, n.ver, weight),
+        HttpService.get(URLService.getElementURL(id, n.ws, n.ver, extended),
             function(data, status, headers, config) {
                 deferred.resolve(CacheService.put(n.cacheKey, UtilsService.cleanElement(data.elements[0]), true));
                 delete inProgress[key];
@@ -123,16 +124,16 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
      *      multiple calls to this method with the same ids would result in an array of 
      *      references to the same objects.
      */
-    var getElements = function(ids, update, workspace, version, weight) {
+    var getElements = function(ids, update, workspace, version, weight, extended) {
         var deferred = $q.defer();
         var request = {elements: []};
         var existing = [];
-        var n = normalize('id', update, workspace, version);
+        var n = normalize('id', update, workspace, version, false, extended);
         for (var i = 0; i < ids.length; i++) {
             var id = ids[i];
-            var n2 = normalize(id, update, workspace, version);
+            var n2 = normalize(id, update, workspace, version, false, extended);
             var exist = CacheService.get(n2.cacheKey);
-            if (exist && !n.update) {
+            if (exist && !n.update && (!extended || (extended && exist.qualifiedId))) {
                 existing.push(exist);
                 continue;
             }
@@ -141,7 +142,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         if (request.elements.length === 0)
             deferred.resolve(existing);
         else {
-            $http.put(URLService.getPutElementsURL(n.ws, n.ver), request)
+            $http.put(URLService.getPutElementsURL(n.ws, n.ver, n.extended), request)
             .then(function(response) {
                 var data = response.data.elements;
                 for (var i = 0; i < data.length; i++) {
@@ -260,9 +261,9 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
      * @returns {Promise} The promise will be resolved with an array of 
      * element objects 
      */
-    var getOwnedElements = function(id, update, workspace, version, depth, weight) {
-        var n = normalize(id, update, workspace, version);
-        return getGenericElements(URLService.getOwnedElementURL(id, n.ws, n.ver, depth), 'elements', n.update, n.ws, n.ver, weight);
+    var getOwnedElements = function(id, update, workspace, version, depth, weight, extended) {
+        var n = normalize(id, update, workspace, version, false, extended);
+        return getGenericElements(URLService.getOwnedElementURL(id, n.ws, n.ver, depth, n.extended), 'elements', n.update, n.ws, n.ver, weight);
     };
 
     /**
@@ -688,11 +689,11 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
      *                  but elements in the properties array will be stored in the cache
      *                  The element results returned will be a clone of the original server response and not cache references
      */
-    var search = function(query, filters, propertyName, page, items, update, workspace, weight) {
+    var search = function(query, filters, propertyName, page, items, update, workspace, weight, extended) {
         //var n = normalize(null, update, workspace, null);
         //return getGenericElements(URLService.getElementSearchURL(query, n.ws), 'elements', n.update, n.ws, n.ver);
-        var n = normalize(null, update, workspace, null);
-        var url = URLService.getElementSearchURL(query, filters, propertyName, page, items, n.ws);
+        var n = normalize(null, update, workspace, null, false, extended);
+        var url = URLService.getElementSearchURL(query, filters, propertyName, page, items, n.ws, true);
         var progress = 'search(' + url + n.update + n.ws + ')';
         if (inProgress.hasOwnProperty(progress)) {
             HttpService.ping(url, weight);
@@ -718,7 +719,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                             CacheService.put(pkey, UtilsService.cleanElement(property), true);
                         }
                     }
-                    var toAdd = JSON.parse(JSON.stringify(element));
+                    var toAdd = JSON.parse(JSON.stringify(element)); //make clone
                     toAdd.properties = properties;
                     toAdd.relatedDocuments = cacheE.relatedDocuments;
                     result.push(toAdd);
@@ -820,14 +821,56 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         return $q.all(promises);
     };
 
-    var normalize = function(id, update, workspace, version, edit) {
-        var res = UtilsService.normalize({update: update, workspace: workspace, version: version});
+    var normalize = function(id, update, workspace, version, edit, extended) {
+        var res = UtilsService.normalize({update: update, workspace: workspace, version: version, extended: extended});
         res.cacheKey = UtilsService.makeElementKey(id, res.ws, res.ver, edit);
         return res;
     };
 
     var reset = function() {
         inProgress = {};
+    };
+
+    var getIdInfoReal = function(elem, siteid) {
+        var holdingBinId = null;
+        var projectId = null;
+        var projectName = null;
+        var siteId = siteid;
+
+        if (elem && elem.qualifiedId && elem.qualifiedName) {
+            var splitArray = elem.qualifiedId.split('/');
+            var projectNameArray = elem.qualifiedName.split('/');
+            if (splitArray && splitArray.length > 2) {
+                projectId = splitArray[2];
+                siteId = splitArray[1];
+            }
+            if (elem.siteCharacterizationId)
+                siteId = elem.siteCharacterizationId;
+            if (projectId && projectId.indexOf('PROJECT') >= 0) {
+                holdingBinId = 'holding_bin_' + projectId;
+                projectName = projectNameArray[2];
+            }
+        } 
+        return {holdingBinId: holdingBinId, projectId: projectId, siteId: siteId, projectName: projectName};
+    };
+
+    var getIdInfo = function(elem, siteid, workspace, version, weight) { //elem is element object with qualified id with project in it
+        var deferred = $q.defer();
+
+        if (elem && elem.qualifiedId && elem.qualifiedName) {
+            deferred.resolve(getIdInfoReal(elem, siteid));
+        } else {
+            getElement(elem.sysmlid, false, workspace, version, weight, true)
+            .then(function(data) {
+                deferred.resolve(getIdInfoReal(data, siteid));
+            }, function() {
+                deferred.resolve(getIdInfoReal(elem, siteid));
+            });
+        }
+        //if (!holdingBinId && siteId) {
+        //    holdingBinId = 'holding_bin_' + siteId + '_no_project';
+        //}
+        return deferred.promise;
     };
 
     return {
@@ -847,6 +890,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         isCacheOutdated: isCacheOutdated,
         isDirty: isDirty,
         search: search,
-        reset: reset
+        reset: reset,
+        getIdInfo: getIdInfo
     };
 }

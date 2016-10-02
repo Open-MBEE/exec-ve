@@ -258,7 +258,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 // This is a short-term work-around -- all this should be done the back-end MMS in the future
                 var wsCoverDocId = 'master_cover';
                 var deferred = $q.defer();
-                ElementService.getElement(wsCoverDocId, false, workspace, time, 2)
+                ElementService.getElement(wsCoverDocId, false, workspace, time, 2, true)
                 .then(function(data) {
                     deferred.resolve(data);
                 }, function(reason) {
@@ -323,7 +323,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             view: function(ViewService, workspace, document, time, ticket) {
                 if (document === null) 
                     return null;
-                return ViewService.getView(document.sysmlid, false, workspace, time, 2);
+                return ViewService.getView(document.sysmlid, false, workspace, time, 2, true);
             },
             tags: function(ConfigService, workspace, ticket) {
                 return ConfigService.getConfigs(workspace, false, 2);
@@ -413,7 +413,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 else
                     siteCoverDocId = site.sysmlid + '_cover';
                 var deferred = $q.defer();
-                ElementService.getElement(siteCoverDocId, false, workspace, time, 2)
+                ElementService.getElement(siteCoverDocId, false, workspace, time, 2, true)
                 .then(function(data) {
                     deferred.resolve(data);
                 }, function(reason) {
@@ -450,7 +450,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             view: function(ViewService, workspace, document, time, ticket) {
                 if (document === null) 
                     return null;
-                return ViewService.getView(document.sysmlid, false, workspace, time, 2);
+                return ViewService.getView(document.sysmlid, false, workspace, time, 2, true);
             }
         },
         views: {
@@ -488,7 +488,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
         url: '/document/:document',
         resolve: {
             document: function($stateParams, ElementService, workspace, time, ticket) {
-                return ElementService.getElement($stateParams.document, false, workspace, time, 2);
+                return ElementService.getElement($stateParams.document, false, workspace, time, 2, true);
             },
             views: function(ViewService, workspace, document, time, ticket) {
                 return [];
@@ -501,7 +501,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             view: function(ViewService, workspace, document, time, ticket) {
                 if (document === null) 
                     return null;
-                return ViewService.getView(document.sysmlid, false, workspace, time, 2);
+                return ViewService.getView(document.sysmlid, false, workspace, time, 2, true);
             },
             snapshot: function(ConfigService, configSnapshots, document, workspace, ticket) {
                 var docid = document.sysmlid;
@@ -527,7 +527,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
         url: '/documents/:document?time',
         resolve: {
             document: function($stateParams, ElementService, time, ticket) {
-                return ElementService.getElement($stateParams.document, false, $stateParams.workspace, time, 2);
+                return ElementService.getElement($stateParams.document, false, $stateParams.workspace, time, 2, true);
             },
             views: function($stateParams, ViewService, document, time, ticket) {
                 if (document.specialization.type !== 'Product' && document.specialization.type !== 'View')
@@ -541,7 +541,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 return ViewService.getViewElements($stateParams.document, false, $stateParams.workspace, time, 2);
             },
             view: function($stateParams, ViewService, viewElements, time, ticket) {
-                return ViewService.getView($stateParams.document, false, $stateParams.workspace, time, 2);
+                return ViewService.getView($stateParams.document, false, $stateParams.workspace, time, 2, true);
             },
             snapshots: function(ConfigService, workspace, site, document, ticket) {
                 if (document.specialization.type !== 'Product')
