@@ -32,7 +32,7 @@
 	                <button ng-click="setFilterFacet('sysmlid')" type="button" class="btn-filter-facet-sysmlid btn-search-type btn btn-default">MDID</button>
 	            </div>
             </div>
-            <div>Showing {{filteredElms.length}} <!--of {{searchResults.length}} -->search results. (Page {{currentPage + 1}})</div>
+            <div>Showing {{filteredElms.length}} <!--of {{searchResults.length}} -->search results. (Page {{currentPage + 1}}) <span class="mms-error" ng-if="ws !== 'master'">WARNING: Results shown are from master branch.</span></div>
         </div>
     </div>
     <div class="container-fluid">

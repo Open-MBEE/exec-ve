@@ -14,12 +14,12 @@
                     </div>
                 </form>
             </div>
-            <mms-spec mms-eid="{{eid}}" mms-cf-elements="viewElements" mms-edit-field="all" mms-version="{{specVersion}}" mms-ws="{{specWs}}" mms-site="{{site.sysmlid}}" mms-spec-api="specApi" mms-type="{{elementType}}"></mms-spec>
+            <mms-spec mms-eid="{{eid}}" mms-edit-field="all" mms-version="{{specVersion}}" mms-ws="{{specWs}}" mms-site="{{site.sysmlid}}" mms-spec-api="specApi" mms-type="{{elementType}}"></mms-spec>
         </div>
     </div>
     
     <div ng-if="document !== null">
-        <div class="container-fluid" ng-show="show.history">
+        <div class="container-fluid" ng-if="show.history">
           <mms-history mms-eid="{{eid}}" mms-ws="{{specWs}}" mms-type="{{elementType}}"></mms-history>
         </div>
     </div>

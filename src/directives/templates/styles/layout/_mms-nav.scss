@@ -571,10 +571,16 @@ mms-nav {
     border-bottom: 1px solid #fff !important;
     background-color:$base_grey;
     border-radius: 0 !important;
-    width: 355px;
+    width: 280px;
     height: 20px;
     font-size: 12px;
     color:$white;
+    -webkit-transition: width .5s ease;
+    -moz-transition: width .5s ease;
+    transition: width .5s ease;
+}
+#nav-form:focus{
+    width: 355px;
 }
 // ::-moz-placeholder { /* Mozilla Firefox 19+ */
 //    color: $white;

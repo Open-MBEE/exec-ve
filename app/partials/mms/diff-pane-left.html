@@ -12,7 +12,7 @@
 						<select class="sorting-options" ng-model="stagingOrder" ng-show="unstagedCounter" ng-init="stagingOrder = 'name'">
 							<option value="{{orderValue.value}}" ng-repeat="orderValue in orderValues">{{orderValue.name}}</option>
 						</select>
-						<button ng-show="unstagedCounter" ng-click="stageAllUnstaged(changes)" type="button" class="btn btn-staging btn-stage-all"  tooltip="Stage All Changes" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="right" tooltip-append-to-body="true" ng-if="!targetIsTag"><i class="fa fa-2x fa-arrow-circle-o-down"></i>Apply All</button>
+						<button ng-show="unstagedCounter" ng-click="stageAllUnstaged(changes)" type="button" class="btn btn-staging btn-stage-all"  uib-tooltip="Stage All Changes" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="right" tooltip-append-to-body="true" ng-if="!targetIsTag"><i class="fa fa-2x fa-arrow-circle-o-down"></i>Apply All</button>
 					</td>
 				</tr>
 			</table>
@@ -21,7 +21,7 @@
 		<div class="flex-changes">
 			<table>
 			    <tr class="diff-item-row" id="{{change.delta.sysmlid}}" ng-click="selectChange(change)" ng-repeat="change in unstagedChanges | orderBy:stagingOrder track by change.delta.sysmlid">
-			        <td tooltip="{{::change.name}}" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" tooltip-append-to-body="true">{{change.name}}</td>
+			        <td uib-tooltip="{{::change.name}}" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" tooltip-append-to-body="true">{{change.name}}</td>
 			        <td><i class="fa {{::change.icon}} icon-{{::change.type}}"></i>   {{::change.changeTypeName}}</td>
 			        <td><i class="fa {{::change.typeIcon}}"></i>{{::change.delta.specialization.type || change.original.specialization.type}}</td>
 			        <td>{{::change.delta.modifier}}</td>
@@ -41,7 +41,7 @@
 						<select class="sorting-options" ng-model="unstagingOrder" ng-show="stagedCounter" ng-init="unstagingOrder = 'name'">
 							<option value="{{orderValue.value}}" ng-repeat="orderValue in orderValues">{{orderValue.name}}</option>
 						</select>
-						<button ng-show="stagedCounter" ng-click="unstageAllStaged(changes)" type="button" class="btn btn-staging btn-unstage-all"  tooltip="Unstage All Changes" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="right" tooltip-append-to-body="true"><i class="fa fa-2x fa-arrow-circle-o-up"></i>Ignore All</button>
+						<button ng-show="stagedCounter" ng-click="unstageAllStaged(changes)" type="button" class="btn btn-staging btn-unstage-all"  uib-tooltip="Unstage All Changes" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="right" tooltip-append-to-body="true"><i class="fa fa-2x fa-arrow-circle-o-up"></i>Ignore All</button>
 					</td>
 				</tr>
 			</table>

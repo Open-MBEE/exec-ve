@@ -2,7 +2,7 @@
 
 /* Controllers */
 
-angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$timeout", "$scope", "$rootScope", "$state", "$stateParams", "$modal", "growl", "WorkspaceService", "ElementService", "diff", "UxService", "paneManager", "targetName", function(_, $timeout, $scope, $rootScope, $state, $stateParams, $modal, growl, WorkspaceService, ElementService, diff, UxService, paneManager, targetName)
+angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$timeout", "$scope", "$rootScope", "$state", "$stateParams", "$uibModal", "growl", "WorkspaceService", "ElementService", "diff", "UxService", "paneManager", "targetName", function(_, $timeout, $scope, $rootScope, $state, $stateParams, $uibModal, growl, WorkspaceService, ElementService, diff, UxService, paneManager, targetName)
 {
 
 	var ws1 = $stateParams.target;
@@ -75,7 +75,7 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 	};
 
 	if($scope.diff.status === "GENERATING" || $scope.diff.status === "OUTDATED"){
-		var modalInstance = $modal.open({
+		var modalInstance = $uibModal.open({
 			templateUrl: 'partials/mms/diffPageModal.html',
 			controller: 'diffPageModalCtrl',
 			resolve: {
