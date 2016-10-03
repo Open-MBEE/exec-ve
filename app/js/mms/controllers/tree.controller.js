@@ -1191,6 +1191,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 promise = ViewService.createDocument($scope.doc.name, $scope.addDocSite, ws);
             }
             else if ($scope.itemType === 'View') {
+                $scope.newViewAggr.type = "composite";
                 promise = ViewService.createView($scope.createViewParent, $scope.newView.name, 
                                                  $scope.document.sysmlId, ws);
             }
