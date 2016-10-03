@@ -88,6 +88,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                       username: '',
                       password: ''
                     };
+                    $rootScope.mms_title = 'View Editor: Login';
                     $scope.spin = false;
                     $scope.login = function (credentials) {
                       $scope.spin = true;
@@ -204,7 +205,6 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 controller: function ($scope, $rootScope, workspace, tag) {
                     $scope.workspace = workspace;
                     $scope.tag = tag;
-                    $rootScope.mms_title = 'Model Manager';
                 }
             },
             'menu': {
@@ -214,7 +214,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                     $scope.workspace = workspace;
                     $scope.tag = tag;
                     $scope.tags = tags;
-                    $rootScope.mms_title = 'Model Manager';
+                    $rootScope.mms_title = 'View Editor: Model Manager';
                 }
             },
             'pane-left': {
@@ -345,12 +345,12 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
         views: {
             'menu@': {
                 template: '<mms-menu mms-title="Model Manager" mms-ws="{{workspace}}" mms-workspaces="workspaces" mms-config="tag" mms-tags="tags"></mms-menu>',
-                controller: function ($scope, $rootScope, workspaces, workspace, tag, tags) {
+                controller: function ($scope, $rootScope, workspaces, workspace, tag, tags, workspaceObj) {
                     $scope.workspaces = workspaces;
                     $scope.workspace = workspace;
                     $scope.tag = tag;
                     $scope.tags = tags;
-                    $rootScope.mms_title = 'Model Manager';
+                    $rootScope.mms_title = 'View Editor: ' + workspaceObj.name;
                 }
             },
             'pane-center@': {
@@ -381,7 +381,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                     $scope.tag = tag;
                     $scope.tags = tags;
                     $scope.site = site;
-                    $rootScope.mms_title = 'Portal: '+workspaceObj.name;
+                    $rootScope.mms_title = 'View Editor: Sites';
                 }
             },
             'pane-left@': {
@@ -459,7 +459,6 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 controller: function ($scope, $rootScope, workspace, tag, site) {
                     $scope.workspace = workspace;
                     $scope.tag = tag;
-                    $rootScope.mms_title = 'Model Manager';
                     $scope.site = site;
                 }
             },
@@ -471,7 +470,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                     $scope.tag = tag;
                     $scope.tags = tags;
                     $scope.site = site;
-                    $rootScope.mms_title = 'Portal: '+workspaceObj.name;
+                    $rootScope.mms_title = 'View Editor: ' + site.name;
                 }
             },
             'pane-center@': {
@@ -779,7 +778,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 controller: function ($scope, $rootScope,targetName, sourceName, $stateParams, $state, $uibModal){
                     $scope.targetName = targetName;
                     $scope.sourceName = sourceName;
-                    $rootScope.mms_title = 'Merge Differences';
+                    $rootScope.mms_title = 'View Editor: Diff';
 
                     $scope.goBack = function () {
                         $uibModal.open({
