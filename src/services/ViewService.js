@@ -676,7 +676,6 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         var holdingBinId = ids.holdingBinId;
         var projectId = ids.projectId;
         var siteId = ids.siteId;
-
         var realType = TYPE_TO_CLASSIFIER_TYPE[type];
         if (!holdingBinId && siteId)
             holdingBinId = 'holding_bin_' + siteId + '_no_project';
