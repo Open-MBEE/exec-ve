@@ -857,7 +857,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
     var getIdInfo = function(elem, siteid, workspace, version, weight) { //elem is element object with qualified id with project in it
         var deferred = $q.defer();
 
-        if (elem && elem.qualifiedId && elem.qualifiedName) {
+        if (!elem || (elem && elem.qualifiedId && elem.qualifiedName)) {
             deferred.resolve(getIdInfoReal(elem, siteid));
         } else {
             getElement(elem.sysmlid, false, workspace, version, weight, true)
