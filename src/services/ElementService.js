@@ -737,9 +737,9 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                 var result = [];
                 for (var i = 0; i < data.elements.length; i++) {
                     var element = data.elements[i];
-                    var properties = element.properties;
+                    var properties = element._properties;
                     if (properties)
-                        delete element.properties;
+                        delete element._properties;
                     var ekey = UtilsService.makeElementKey(element.sysmlId, n.ws, n.ver);
                     var cacheE = CacheService.put(ekey, UtilsService.cleanElement(element), true);
                     if (properties) {
@@ -750,8 +750,8 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                         }
                     }
                     var toAdd = JSON.parse(JSON.stringify(element)); //make clone
-                    toAdd.properties = properties;
-                    toAdd.relatedDocuments = cacheE.relatedDocuments;
+                    toAdd._properties = properties;
+                    toAdd._relatedDocuments = cacheE._relatedDocuments;
                     result.push(toAdd);
                 }
                 delete inProgress[progress];

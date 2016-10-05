@@ -608,9 +608,9 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 for (; k >= 0; k--) {
                     var instance = results[k];
                     var hide = !$rootScope.veTreeShowPe;
-                    instance.relatedDocuments = [
+                    instance._relatedDocuments = [
                         {
-                            parentViews: [{
+                            _parentViews: [{
                                 name: viewNode.data.name,
                                 sysmlId: viewNode.data.sysmlId
                             }],
@@ -1265,9 +1265,9 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         else
             viewid = branch.data.sysmlId;
         var viewNode = viewId2node[viewid];
-        instanceSpec.relatedDocuments = [
+        instanceSpec._relatedDocuments = [
             {
-                parentViews: [{
+                _parentViews: [{
                     name: viewNode.data.name,
                     sysmlId: viewNode.data.sysmlId
                 }],

@@ -97,11 +97,11 @@
                     </div>
                 </a>
             </div>
-            <div ng-if="elem.properties[0]" class="elem-properties-wrapper">
+            <div ng-if="elem._properties[0]" class="elem-properties-wrapper">
                 <label>PROPERTIES</label>
                 <table>
                     <tbody>
-                        <tr ng-repeat="row in elem.properties2">
+                        <tr ng-repeat="row in elem._properties2">
                             <td ng-repeat="property in row">
                                 {{property.name}}<span ng-show="property.type === 'Slot'"><mms-transclude-name mms-eid="{{property.definingFeatureId}}"></mms-transclude-name></span>: 
                                 <a ng-click="userResultClick(property, 'val')"><span ng-repeat="val in property.value">{{val.value + '' || val.body[0] || 'Default Value'}}<span class="ellipses">{{(val.body[0] && val.body.length > 1) ? ' ...' : '' }}</span>{{$last ? '' : ', '}}</span></a>
@@ -110,10 +110,10 @@
                     </tbody>
                 </table>
             </div>
-            <div ng-if="elem.relatedDocuments.length > 0" class="elem-documentation-wrapper">
+            <div ng-if="elem._relatedDocuments.length > 0" class="elem-documentation-wrapper">
                 <label>RELATED DOCUMENTS</label>
-                <div ng-repeat="relatedDocument in elem.relatedDocuments" class="elem-documentation">
-                    <a ng-repeat="relatedView in relatedDocument.parentViews" ui-sref="workspace.site.document.view({document: relatedDocument.sysmlId, view: relatedView.sysmlId, site: relatedDocument._siteCharacterizationId, search: undefined})" ng-click="userRelatedClick($event, relatedDocument, relatedView, elem)">
+                <div ng-repeat="relatedDocument in elem._relatedDocuments" class="elem-documentation">
+                    <a ng-repeat="relatedView in relatedDocument._parentViews" ui-sref="workspace.site.document.view({document: relatedDocument.sysmlId, view: relatedView.sysmlId, site: relatedDocument._siteCharacterizationId, search: undefined})" ng-click="userRelatedClick($event, relatedDocument, relatedView, elem)">
                         {{relatedDocument.name}} > {{relatedView.name}}<br/>
                     </a>
                 </div>
