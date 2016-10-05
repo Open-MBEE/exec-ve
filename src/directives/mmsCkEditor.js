@@ -111,7 +111,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
                     name: $scope.newE.name, 
                     documentation: $scope.newE.documentation, 
                     type: 'Class',
-                    appliedStereotypeIds: [],
+                    _appliedStereotypeIds: [],
                     isMetatype: false
                 };
                 if (ownerId)
@@ -318,7 +318,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
                 name: 'Comment ' + new Date().toISOString(), 
                 documentation: '', 
                 type: 'Class',
-                appliedStereotypeIds: [],
+                _appliedStereotypeIds: [],
                 isMetatype: false
             };
             $scope.oking = false;

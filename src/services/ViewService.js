@@ -303,7 +303,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
     var downgradeDocument = function(document, workspace, site) {
         var clone = {
             sysmlId: document.sysmlId,
-            appliedStereotypeIds: ['_17_0_1_232f03dc_1325612611695_581988_21583']
+            _appliedStereotypeIds: ['_17_0_1_232f03dc_1325612611695_581988_21583']
         };
         return ElementService.updateElement(clone, workspace).then(
             function(data) {
@@ -528,7 +528,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 key = "specification";
             }
             else {
-                key = "contents";
+                key = "_contents";
             }
             clone[key] = _.cloneDeep(data[key]);
             if (!clone[key]) {
@@ -584,7 +584,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                     key = "specification";
                 }
                 else {
-                    key = "contents";
+                    key = "_contents";
                 }
                 clone[key] = _.cloneDeep(data[key]);
                 if (clone[key] && clone[key].operand) {
@@ -698,7 +698,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 value: JSON.stringify(instanceSpecSpec),
                 type: "LiteralString"
             },
-            appliedStereotypeIds: [],
+            _appliedStereotypeIds: [],
             isMetatype: false
         };
         if (type === 'Section')
@@ -774,10 +774,10 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         var view = {
             sysmlId: newViewId,
             type: 'Class',
-            allowedElements: [],
-            displayedElements: [newViewId],
-            childViews: [],
-            contents: {
+            _allowedElements: [],
+            _displayedElements: [newViewId],
+            _childViews: [],
+            _contents: {
                 //valueExpression: null,
                 operand: [{
                     instanceId: newInstanceId,
@@ -787,10 +787,9 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             },
             name: !name ? 'Untitled View' : name,
             documentation: viewDoc ? viewDoc : '',
-            appliedStereotypeIds: [
+            _appliedStereotypeIds: [
                 (isDoc ? "_17_0_2_3_87b0275_1371477871400_792964_43374" : "_17_0_1_232f03dc_1325612611695_581988_21583")
-            ],
-            isMetatype: false
+            ]
         };
         var parentView = null;
         if (owner) {
@@ -825,7 +824,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 value: JSON.stringify(instanceSpecSpec),
                 type: "LiteralString"
             },
-            appliedStereotypeIds: [],
+            _appliedStereotypeIds: [],
             isMetatype: false
         };
         if (holdingBinId)
@@ -837,7 +836,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             name: '',
             type: 'InstanceSpecification',
             classifierIds: [(isDoc ? "_17_0_2_3_87b0275_1371477871400_792964_43374" : "_17_0_1_232f03dc_1325612611695_581988_21583")],
-            appliedStereotypeIds: [],
+            _appliedStereotypeIds: [],
             isMetatype: false
         };
         var toCreate = [instanceSpec, view, asi];

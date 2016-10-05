@@ -652,8 +652,8 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         };
 
           
-        if (element.contents) {
-            contents = element.contents;
+        if (element._contents) {
+            contents = element._contents;
         }
         // For Sections, the contents expression is the specification:
         else if (ViewService.isSection(element) &&

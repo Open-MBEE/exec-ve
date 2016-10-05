@@ -76,7 +76,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $uibModal, $window,
         $scope.bbApi.addButton(UxService.getButtonBarButton('show-comments'));
         $scope.bbApi.setToggleState('show-comments', $rootScope.veCommentsOn);
         if (view && view._editable && time === 'latest') {
-            if ($scope.view.contents || $scope.view.type === 'InstanceSpecification') {
+            if ($scope.view._contents || $scope.view.type === 'InstanceSpecification') {
                 $scope.bbApi.addButton(UxService.getButtonBarButton('view-add-dropdown'));
             } else {
                 var fakeDropdown = {
@@ -263,9 +263,9 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $uibModal, $window,
     if (view) {
         //since view can also be a "fake" view like section instance spec only set view if it's a real view,
         //otherwise other code can create things under instance specs that can't be owned by instance spec
-        if (view.contains || view.contents) {
+        if (view.contains || view._contents) {
             ViewService.setCurrentView(view); 
-        } else if (document && (document.contains || document.contents)) {
+        } else if (document && (document.contains || document._contents)) {
             ViewService.setCurrentView(document);
         }
         $scope.vid = view.sysmlId;

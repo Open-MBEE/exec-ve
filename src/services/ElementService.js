@@ -85,7 +85,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
             var cached = CacheService.get(n.cacheKey);
             if (UtilsService.isView(cached) &&
                 !cached.hasOwnProperty('contains') &&
-                !cached.hasOwnProperty('contents')) {
+                !cached.hasOwnProperty('_contents')) {
             } else if (extended && !cached._qualifiedId) {
             } else {
                 deferred.resolve(cached);
@@ -338,10 +338,10 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
             for (var key in elem) {
                 ob[key] = elem[key];
             }
-            if (ob.displayedElements)
-                delete ob.displayedElements;
-            if (ob.allowedElements)
-                delete ob.allowedElements;
+            if (ob._displayedElements)
+                delete ob._displayedElements;
+            if (ob._allowedElements)
+                delete ob._allowedElements;
             deferred.resolve(ob);
         }, function() {
             deferred.resolve(elem);
@@ -419,8 +419,8 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                 _.merge(edit, updated);
                 UtilsService.cleanElement(edit, true);
             }
-            if (elem.contents)
-                resp.contents = elem.contents;
+            if (elem._contents)
+                resp._contents = elem._contents;
             deferred.resolve(resp);
         };
 

@@ -54,7 +54,7 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
                 scope.view = data;
                 scope.editable = scope.view._editable && scope.mmsVersion === 'latest';
 
-                var contents = data.contents || data.specification;
+                var contents = data._contents || data.specification;
                 if (contents) {
                     ViewService.getElementReferenceTree(contents, scope.mmsWs, scope.mmsVersion)
                     .then(function(elementReferenceTree) {
@@ -137,12 +137,12 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
                 type: scope.view.type
             };
             //viewEdit.specialization = _.cloneDeep(scope.view.specialization);
-            if (scope.view.contents)
-                viewEdit.contents = _.cloneDeep(scope.view.contents);
+            if (scope.view._contents)
+                viewEdit._contents = _.cloneDeep(scope.view._contents);
             if (scope.view.specification)
                 viewEdit.specification = _.cloneDeep(scope.view.specification);
-            var contents = viewEdit.contents || viewEdit.specification;
-            var origContents = scope.view.contents || scope.view.specification;
+            var contents = viewEdit._contents || viewEdit.specification;
+            var origContents = scope.view._contents || scope.view.specification;
             // Update the View edit object on Save
             if (contents) {
                 contents.operand = [];
@@ -170,7 +170,7 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
         };
 
         scope.refresh = function() {
-            var contents = scope.view.contents || scope.view.specification;
+            var contents = scope.view._contents || scope.view.specification;
             if (contents) {
                 ViewService.getElementReferenceTree(contents, scope.mmsWs, scope.mmsVersion)
                 .then(function(elementReferenceTree) {

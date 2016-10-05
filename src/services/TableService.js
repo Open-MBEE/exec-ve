@@ -25,11 +25,11 @@ function TableService($q, $http, URLService, UtilsService, CacheService, _, Elem
         var dataValuesMmmEid =[];
         var columnCounter;
         var i, j, k;
-        if ( data.contents !==  undefined){ //use contents if exist
+        if ( data._contents !==  undefined){ //use contents if exist
         //if ( data.specialization.contains ===  undefined){  
           var tempMmsEid = [];
-          for ( k = 0; k < data.contents.operand.length; k++ ){
-            tempMmsEid.push(data.contents.operand[k].instanceId);
+          for ( k = 0; k < data._contents.operand.length; k++ ){
+            tempMmsEid.push(data._contents.operand[k].instanceId);
           }
           ElementService.getElements(tempMmsEid, false, ws, version)
             .then(function(values) {
