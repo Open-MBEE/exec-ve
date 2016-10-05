@@ -88,6 +88,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                       username: '',
                       password: ''
                     };
+                    $rootScope.mms_title = 'View Editor: Login';
                     $scope.spin = false;
                     $scope.login = function (credentials) {
                       $scope.spin = true;
@@ -204,7 +205,6 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 controller: function ($scope, $rootScope, workspace, tag) {
                     $scope.workspace = workspace;
                     $scope.tag = tag;
-                    $rootScope.mms_title = 'Model Manager';
                 }
             },
             'menu': {
@@ -214,7 +214,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                     $scope.workspace = workspace;
                     $scope.tag = tag;
                     $scope.tags = tags;
-                    $rootScope.mms_title = 'Model Manager';
+                    $rootScope.mms_title = 'View Editor: Model Manager';
                 }
             },
             'pane-left': {
@@ -258,7 +258,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 // This is a short-term work-around -- all this should be done the back-end MMS in the future
                 var wsCoverDocId = 'master_cover';
                 var deferred = $q.defer();
-                ElementService.getElement(wsCoverDocId, false, workspace, time, 2)
+                ElementService.getElement(wsCoverDocId, false, workspace, time, 2, true)
                 .then(function(data) {
                     deferred.resolve(data);
                 }, function(reason) {
@@ -323,7 +323,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             view: function(ViewService, workspace, document, time, ticket) {
                 if (document === null) 
                     return null;
-                return ViewService.getView(document.sysmlid, false, workspace, time, 2);
+                return ViewService.getView(document.sysmlid, false, workspace, time, 2, true);
             },
             tags: function(ConfigService, workspace, ticket) {
                 return ConfigService.getConfigs(workspace, false, 2);
@@ -345,12 +345,12 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
         views: {
             'menu@': {
                 template: '<mms-menu mms-title="Model Manager" mms-ws="{{workspace}}" mms-workspaces="workspaces" mms-config="tag" mms-tags="tags"></mms-menu>',
-                controller: function ($scope, $rootScope, workspaces, workspace, tag, tags) {
+                controller: function ($scope, $rootScope, workspaces, workspace, tag, tags, workspaceObj) {
                     $scope.workspaces = workspaces;
                     $scope.workspace = workspace;
                     $scope.tag = tag;
                     $scope.tags = tags;
-                    $rootScope.mms_title = 'Model Manager';
+                    $rootScope.mms_title = 'View Editor: ' + workspaceObj.name;
                 }
             },
             'pane-center@': {
@@ -381,7 +381,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                     $scope.tag = tag;
                     $scope.tags = tags;
                     $scope.site = site;
-                    $rootScope.mms_title = 'Portal: '+workspaceObj.name;
+                    $rootScope.mms_title = 'View Editor: Sites';
                 }
             },
             'pane-left@': {
@@ -413,7 +413,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 else
                     siteCoverDocId = site.sysmlid + '_cover';
                 var deferred = $q.defer();
-                ElementService.getElement(siteCoverDocId, false, workspace, time, 2)
+                ElementService.getElement(siteCoverDocId, false, workspace, time, 2, true)
                 .then(function(data) {
                     deferred.resolve(data);
                 }, function(reason) {
@@ -450,7 +450,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             view: function(ViewService, workspace, document, time, ticket) {
                 if (document === null) 
                     return null;
-                return ViewService.getView(document.sysmlid, false, workspace, time, 2);
+                return ViewService.getView(document.sysmlid, false, workspace, time, 2, true);
             }
         },
         views: {
@@ -459,7 +459,6 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 controller: function ($scope, $rootScope, workspace, tag, site) {
                     $scope.workspace = workspace;
                     $scope.tag = tag;
-                    $rootScope.mms_title = 'Model Manager';
                     $scope.site = site;
                 }
             },
@@ -471,7 +470,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                     $scope.tag = tag;
                     $scope.tags = tags;
                     $scope.site = site;
-                    $rootScope.mms_title = 'Portal: '+workspaceObj.name;
+                    $rootScope.mms_title = 'View Editor: ' + site.name;
                 }
             },
             'pane-center@': {
@@ -488,7 +487,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
         url: '/document/:document',
         resolve: {
             document: function($stateParams, ElementService, workspace, time, ticket) {
-                return ElementService.getElement($stateParams.document, false, workspace, time, 2);
+                return ElementService.getElement($stateParams.document, false, workspace, time, 2, true);
             },
             views: function(ViewService, workspace, document, time, ticket) {
                 return [];
@@ -501,7 +500,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             view: function(ViewService, workspace, document, time, ticket) {
                 if (document === null) 
                     return null;
-                return ViewService.getView(document.sysmlid, false, workspace, time, 2);
+                return ViewService.getView(document.sysmlid, false, workspace, time, 2, true);
             },
             snapshot: function(ConfigService, configSnapshots, document, workspace, ticket) {
                 var docid = document.sysmlid;
@@ -527,7 +526,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
         url: '/documents/:document?time',
         resolve: {
             document: function($stateParams, ElementService, time, ticket) {
-                return ElementService.getElement($stateParams.document, false, $stateParams.workspace, time, 2);
+                return ElementService.getElement($stateParams.document, false, $stateParams.workspace, time, 2, true);
             },
             views: function($stateParams, ViewService, document, time, ticket) {
                 if (document.specialization.type !== 'Product' && document.specialization.type !== 'View')
@@ -541,7 +540,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 return ViewService.getViewElements($stateParams.document, false, $stateParams.workspace, time, 2);
             },
             view: function($stateParams, ViewService, viewElements, time, ticket) {
-                return ViewService.getView($stateParams.document, false, $stateParams.workspace, time, 2);
+                return ViewService.getView($stateParams.document, false, $stateParams.workspace, time, 2, true);
             },
             snapshots: function(ConfigService, workspace, site, document, ticket) {
                 if (document.specialization.type !== 'Product')
@@ -779,7 +778,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 controller: function ($scope, $rootScope,targetName, sourceName, $stateParams, $state, $uibModal){
                     $scope.targetName = targetName;
                     $scope.sourceName = sourceName;
-                    $rootScope.mms_title = 'Merge Differences';
+                    $rootScope.mms_title = 'View Editor: Diff';
 
                     $scope.goBack = function () {
                         $uibModal.open({
