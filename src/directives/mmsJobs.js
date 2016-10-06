@@ -156,7 +156,6 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
                     status: 'in queue',
                     url: 'sample_initial_url',
                     ownerId: id,
-                    isMetatype: false,
                     documentation: '',
                     type: 'Element'
                 }]

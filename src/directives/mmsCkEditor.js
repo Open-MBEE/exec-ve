@@ -112,7 +112,6 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
                     documentation: $scope.newE.documentation, 
                     type: 'Class',
                     _appliedStereotypeIds: [],
-                    isMetatype: false
                 };
                 if (ownerId)
                     toCreate.ownerId = ownerId;
@@ -319,7 +318,6 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
                 documentation: '', 
                 type: 'Class',
                 _appliedStereotypeIds: [],
-                isMetatype: false
             };
             $scope.oking = false;
             $scope.ok = function() {

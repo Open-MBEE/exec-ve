@@ -699,7 +699,6 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 type: "LiteralString"
             },
             _appliedStereotypeIds: [],
-            isMetatype: false
         };
         if (type === 'Section')
             instanceSpec.specification = {
@@ -825,7 +824,6 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 type: "LiteralString"
             },
             _appliedStereotypeIds: [],
-            isMetatype: false
         };
         if (holdingBinId)
             instanceSpec.ownerId = holdingBinId;
@@ -837,7 +835,6 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             type: 'InstanceSpecification',
             classifierIds: [(isDoc ? "_17_0_2_3_87b0275_1371477871400_792964_43374" : "_17_0_1_232f03dc_1325612611695_581988_21583")],
             _appliedStereotypeIds: [],
-            isMetatype: false
         };
         var toCreate = [instanceSpec, view, asi];
         if (parentView)
