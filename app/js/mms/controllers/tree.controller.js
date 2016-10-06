@@ -608,9 +608,9 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 for (; k >= 0; k--) {
                     var instance = results[k];
                     var hide = !$rootScope.veTreeShowPe;
-                    instance.relatedDocuments = [
+                    instance._relatedDocuments = [
                         {
-                            parentViews: [{
+                            _parentViews: [{
                                 name: viewNode.data.name,
                                 sysmlId: viewNode.data.sysmlId
                             }],
@@ -652,8 +652,8 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         };
 
           
-        if (element.contents) {
-            contents = element.contents;
+        if (element._contents) {
+            contents = element._contents;
         }
         // For Sections, the contents expression is the specification:
         else if (ViewService.isSection(element) &&
@@ -1191,6 +1191,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 promise = ViewService.createDocument($scope.doc.name, $scope.addDocSite, ws);
             }
             else if ($scope.itemType === 'View') {
+                $scope.newViewAggr.type = "composite";
                 promise = ViewService.createView($scope.createViewParent, $scope.newView.name, 
                                                  $scope.document.sysmlId, ws);
             }
@@ -1264,9 +1265,9 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         else
             viewid = branch.data.sysmlId;
         var viewNode = viewId2node[viewid];
-        instanceSpec.relatedDocuments = [
+        instanceSpec._relatedDocuments = [
             {
-                parentViews: [{
+                _parentViews: [{
                     name: viewNode.data.name,
                     sysmlId: viewNode.data.sysmlId
                 }],
@@ -1280,7 +1281,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             type: (elemType === 'image' ? 'figure' : elemType),
             view: viewid,
             data: instanceSpec,
-            hide: !$rootScope.veTreeShowPe,
+            hide: !$rootScope.veTreeShowPe && elemType !== 'section',
             children: [],
         };
         var i = 0;

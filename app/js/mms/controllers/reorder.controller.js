@@ -13,7 +13,7 @@ function($scope, $rootScope, $stateParams, document, time, ElementService, ViewS
     viewIds2node[document.sysmlId] = {
         name: document.name,
         id: document.sysmlId,
-        aggr: 'COMPOSITE',
+        aggr: 'composite',
         children: []
     };
 
@@ -58,7 +58,7 @@ function($scope, $rootScope, $stateParams, document, time, ElementService, ViewS
             };
             viewIds2node[v.sysmlId] = curNode;
         }
-        origViews[v.sysmlId] = v;
+        origViews[v.sysmlId] = _.cloneDeep(v);
         return curNode;
     }
 

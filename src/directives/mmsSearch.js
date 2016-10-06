@@ -37,15 +37,15 @@ function mmsSearch(ElementService, growl, $rootScope, $templateCache, mmsRootSit
             if (!newVal)
                 return;
             newVal.forEach(function(elem) {
-                if (elem.properties && elem.properties[0]) {
+                if (elem._properties && elem._properties[0]) {
                     var properties = [];
-                    for (var i = 0; i < elem.properties.length; i++) {
+                    for (var i = 0; i < elem._properties.length; i++) {
                         if (i % 3 === 0) {
                             properties.push([]);
                         }
-                        properties[properties.length-1].push(elem.properties[i]);
+                        properties[properties.length-1].push(elem._properties[i]);
                     }
-                    elem.properties2 = properties;
+                    elem._properties2 = properties;
                 }
             });
         });

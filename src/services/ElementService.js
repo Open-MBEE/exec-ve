@@ -85,7 +85,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
             var cached = CacheService.get(n.cacheKey);
             if (UtilsService.isView(cached) &&
                 !cached.hasOwnProperty('contains') &&
-                !cached.hasOwnProperty('contents')) {
+                !cached.hasOwnProperty('_contents')) {
             } else if (extended && !cached._qualifiedId) {
             } else {
                 deferred.resolve(cached);
@@ -261,7 +261,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
      * element objects 
      */
     var getOwnedElements = function(id, update, workspace, version, depth, weight, extended) {
-        var n = normalize(id, update, workspace, version, extended);
+        var n = normalize(id, update, workspace, version, false, extended);
         return getGenericElements(URLService.getOwnedElementURL(id, n.ws, n.ver, depth, n.extended), 'elements', n.update, n.ws, n.ver, weight);
     };
 
@@ -338,10 +338,10 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
             for (var key in elem) {
                 ob[key] = elem[key];
             }
-            if (ob.displayedElements)
-                delete ob.displayedElements;
-            if (ob.allowedElements)
-                delete ob.allowedElements;
+            if (ob._displayedElements)
+                delete ob._displayedElements;
+            if (ob._allowedElements)
+                delete ob._allowedElements;
             deferred.resolve(ob);
         }, function() {
             deferred.resolve(elem);
@@ -419,8 +419,8 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                 _.merge(edit, updated);
                 UtilsService.cleanElement(edit, true);
             }
-            if (elem.contents)
-                resp.contents = elem.contents;
+            if (elem._contents)
+                resp._contents = elem._contents;
             deferred.resolve(resp);
         };
 
@@ -723,7 +723,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         //var n = normalize(null, update, workspace, null);
         //return getGenericElements(URLService.getElementSearchURL(query, n.ws), 'elements', n.update, n.ws, n.ver);
         var n = normalize(null, update, workspace, null, false, extended);
-        var url = URLService.getElementSearchURL(query, filters, propertyName, page, items, n.ws, n.extended);
+        var url = URLService.getElementSearchURL(query, filters, propertyName, page, items, n.ws, true);
         var progress = 'search(' + url + n.update + n.ws + ')';
         if (inProgress.hasOwnProperty(progress)) {
             HttpService.ping(url, weight);
@@ -737,9 +737,9 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                 var result = [];
                 for (var i = 0; i < data.elements.length; i++) {
                     var element = data.elements[i];
-                    var properties = element.properties;
+                    var properties = element._properties;
                     if (properties)
-                        delete element.properties;
+                        delete element._properties;
                     var ekey = UtilsService.makeElementKey(element.sysmlId, n.ws, n.ver);
                     var cacheE = CacheService.put(ekey, UtilsService.cleanElement(element), true);
                     if (properties) {
@@ -750,8 +750,8 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                         }
                     }
                     var toAdd = JSON.parse(JSON.stringify(element)); //make clone
-                    toAdd.properties = properties;
-                    toAdd.relatedDocuments = cacheE.relatedDocuments;
+                    toAdd._properties = properties;
+                    toAdd._relatedDocuments = cacheE._relatedDocuments;
                     result.push(toAdd);
                 }
                 delete inProgress[progress];

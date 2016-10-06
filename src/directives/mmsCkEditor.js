@@ -111,8 +111,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
                     name: $scope.newE.name, 
                     documentation: $scope.newE.documentation, 
                     type: 'Class',
-                    appliedStereotypeIds: [],
-                    isMetatype: false
+                    _appliedStereotypeIds: [],
                 };
                 if (ownerId)
                     toCreate.ownerId = ownerId;
@@ -236,10 +235,10 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
                 var did = null;
                 var vid = null;
                 var peid = null;
-                if (elem.relatedDocuments && elem.relatedDocuments.length > 0) {
-                    did = elem.relatedDocuments[0].sysmlId;
-                    if (elem.relatedDocuments[0].parentViews.length > 0)
-                        vid = elem.relatedDocuments[0].parentViews[0].sysmlId;
+                if (elem._relatedDocuments && elem._relatedDocuments.length > 0) {
+                    did = elem._relatedDocuments[0].sysmlId;
+                    if (elem._relatedDocuments[0]._parentViews.length > 0)
+                        vid = elem._relatedDocuments[0]._parentViews[0].sysmlId;
                 }
                 if (elem.type === 'InstanceSpecification') {
                     if (ViewService.isSection(elem))
@@ -283,9 +282,9 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
                 var views = [];
                 data.forEach(function(v) {
                     if (UtilsService.isView(v) || 
-                            (ViewService.isPresentationElement(v) && v.relatedDocuments)) {
-                        if (v.properties)
-                            delete v.properties;
+                            (ViewService.isPresentationElement(v) && v._relatedDocuments)) {
+                        if (v._properties)
+                            delete v._properties;
                         views.push(v);
                     }
                 });
@@ -318,8 +317,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
                 name: 'Comment ' + new Date().toISOString(), 
                 documentation: '', 
                 type: 'Class',
-                appliedStereotypeIds: [],
-                isMetatype: false
+                _appliedStereotypeIds: [],
             };
             $scope.oking = false;
             $scope.ok = function() {

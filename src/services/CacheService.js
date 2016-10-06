@@ -94,7 +94,7 @@ function CacheService(_) {
                     Array.prototype.push.apply(a, b);
                     return a; 
                 }
-                if (id === 'displayedElements' && b)
+                if (id === '_displayedElements' && b)
                     return b;
                 return undefined;
             });

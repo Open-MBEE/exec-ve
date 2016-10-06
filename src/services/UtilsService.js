@@ -14,8 +14,8 @@ angular.module('mms')
 function UtilsService(CacheService, _) {
     var VIEW_SID = '_17_0_1_232f03dc_1325612611695_581988_21583';
     var DOCUMENT_SID = '_17_0_2_3_87b0275_1371477871400_792964_43374';
-    var nonEditKeys = ['contains', 'view2view', 'childrenViews', 'displayedElements',
-        'allowedElements', 'contents', 'relatedDocuments', 'childViews'];
+    var nonEditKeys = ['contains', 'view2view', 'childrenViews', '_displayedElements',
+        '_allowedElements', '_contents', '_relatedDocuments', '_childViews'];
 
     var hasCircularReference = function(scope, curId, curType) {
         var curscope = scope;
@@ -72,8 +72,8 @@ function UtilsService(CacheService, _) {
                 for (i = 0; i < elem.value.length; i++)
                     cleanValueSpec(elem.value[i]);
             }
-            if (elem.contents) {
-                cleanValueSpec(elem.contents);
+            if (elem._contents) {
+                cleanValueSpec(elem._contents);
             }
             if (elem.specification) {
                 cleanValueSpec(elem.specification);
@@ -81,17 +81,17 @@ function UtilsService(CacheService, _) {
             if (elem.type === 'Class') {
                 //delete elem.specialization.displayedElements;
                 //delete elem.specialization.allowedElements;
-                if (elem.contents && elem.contains)
+                if (elem._contents && elem.contains)
                     delete elem.contains;
-                if (Array.isArray(elem.displayedElements)) {
-                    elem.numElements = elem.displayedElements.length;
-                    if (elem.numElements <= 5000)
-                        delete elem.displayedElements;
+                if (Array.isArray(elem._displayedElements)) {
+                    elem._numElements = elem._displayedElements.length;
+                    if (elem._numElements <= 5000)
+                        delete elem._displayedElements;
                     else
-                        elem.displayedElements = JSON.stringify(elem.displayedElements);
+                        elem._displayedElements = JSON.stringify(elem._displayedElements);
                 }
-                if (elem.allowedElements)
-                    delete elem.allowedElements;
+                if (elem._allowedElements)
+                    delete elem._allowedElements;
             }
             if (elem.hasOwnProperty('specialization')) {
                 delete elem.specialization;
@@ -638,14 +638,14 @@ function UtilsService(CacheService, _) {
     };
 
     var isView = function(e) {
-        if (e.appliedStereotypeIds && (e.appliedStereotypeIds.indexOf(VIEW_SID) >= 0 || 
-            e.appliedStereotypeIds.indexOf(DOCUMENT_SID) >= 0))
+        if (e._appliedStereotypeIds && (e._appliedStereotypeIds.indexOf(VIEW_SID) >= 0 || 
+            e._appliedStereotypeIds.indexOf(DOCUMENT_SID) >= 0))
             return true;
         return false;
     };
 
     var isDocument = function(e) {
-        if (e.appliedStereotypeIds && e.appliedStereotypeIds.indexOf(DOCUMENT_SID) >= 0)
+        if (e._appliedStereotypeIds && e._appliedStereotypeIds.indexOf(DOCUMENT_SID) >= 0)
             return true;
         return false;
     };

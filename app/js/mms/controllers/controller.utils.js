@@ -137,7 +137,7 @@ function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templ
                 if (viewOrSection.specification && !angular.equals(viewOrSection.specification, status.server.specification)) {
                     growl.error('The view section contents is outdated, refresh the page first!');
                     return;
-                } else if (viewOrSection.contents && !angular.equals(viewOrSection.contents, status.server.contents)) {
+                } else if (viewOrSection._contents && !angular.equals(viewOrSection._contents, status.server._contents)) {
                     growl.error('The view contents is outdated, refresh the page first!');
                     return;
                 }

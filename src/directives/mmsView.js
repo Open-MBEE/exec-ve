@@ -169,7 +169,7 @@ function mmsView(ViewService, $templateCache, $rootScope, growl) {
                     scope.modifier = data._modifier;
                     return;
                 }
-                if (data.numElements && data.numElements > 5000 &&
+                if (data._numElements && data._numElements > 5000 &&
                         scope.mmsVersion && scope.mmsVersion !== 'latest') { 
                     //threshold where getting view elements in bulk takes too long and it's not latest
                     //getting cached individual elements should be faster
@@ -178,7 +178,7 @@ function mmsView(ViewService, $templateCache, $rootScope, growl) {
                     scope.modifier = data._modifier;
                     return;
                 }
-                ViewService.getViewElements(scope.mmsVid, false, scope.mmsWs, scope.mmsVersion, 1, data.displayedElements)
+                ViewService.getViewElements(scope.mmsVid, false, scope.mmsWs, scope.mmsVersion, 1, data._displayedElements)
                 .then(function(data2) {
                     scope.view = data;
                     scope.modified = data._modified;
