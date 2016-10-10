@@ -102,7 +102,8 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
                 $scope.proposeClass = "fa fa-spin fa-spinner";
                 var sysmlid = UtilsService.createMmsId();
                 var currentView = ViewService.getCurrentView();
-                var ids = UtilsService.getIdInfo(currentView, scope.mmsSite);
+              ElementService.getIdInfo(currentView, scope.mmsSite, scope.mmsWs, 'latest', 2)
+              .then(function(ids) {
                 var currentSiteId = ids.siteId;
                 var ownerId = ids.holdingBinId;
                 var toCreate = {
@@ -127,6 +128,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
                     growl.error("Propose Error: " + reason.message);
                     $scope.proposeClass = "";
                 });
+              });
             };
             $scope.toggleRadio = function(field) {
                 if (field === "name") {
