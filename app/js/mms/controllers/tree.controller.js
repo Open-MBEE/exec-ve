@@ -1285,7 +1285,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             type: (elemType === 'image' ? 'figure' : elemType),
             view: viewid,
             data: instanceSpec,
-            hide: !$rootScope.veTreeShowPe,
+            hide: !$rootScope.veTreeShowPe && elemType !== 'section',
             children: [],
         };
         var i = 0;
