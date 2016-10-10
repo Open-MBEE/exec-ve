@@ -110,14 +110,14 @@ function($scope, $rootScope, $stateParams, document, time, ElementService, ViewS
                 });
             }
             var orig = origViews[id];
-            if (((!orig.childViews || orig.childViews.length === 0) && childViews.length > 0) ||
-                (orig.childViews && !angular.equals(orig.childViews, childViews))) {
+            if (((!orig._childViews || orig._childViews.length === 0) && childViews.length > 0) ||
+                (orig._childViews && !angular.equals(orig._childViews, childViews))) {
                 toSave.push({
                     sysmlId: id,
                     //name: orig.name,
                     _read: orig._read,
                     _modified: orig._modified,
-                    childViews: childViews,
+                    _childViews: childViews,
                     type: orig.type
                 });
             }
