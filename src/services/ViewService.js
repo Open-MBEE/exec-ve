@@ -843,7 +843,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         var toCreate = [instanceSpec, view, asi];
         if (parentView)
             toCreate.push(parentView);
-        ElementService.createElements(toCreate, workspace, rootSiteId)
+        ElementService.createElements(toCreate, workspace, rootSiteId, true)
         .then(function(data) {
             data.forEach(function(elem) {
                 if (elem.sysmlId === newViewId) {

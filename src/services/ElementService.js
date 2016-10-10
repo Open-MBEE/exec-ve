@@ -560,7 +560,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
      * @returns {Promise} The promise will be resolved with the created element references if 
      *      create is successful.
      */
-    var createElement = function(elem, workspace, site) {
+    var createElement = function(elem, workspace, site, extended) {
         var n = normalize(null, null, workspace, null);
 
         var deferred = $q.defer();
@@ -575,9 +575,9 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
             return deferred.promise;
         }*/
 
-        var url = URLService.getPostElementsURL(n.ws);
+        var url = URLService.getPostElementsURL(n.ws, extended);
         if (site)
-            url = URLService.getPostElementsWithSiteURL(n.ws, site);
+            url = URLService.getPostElementsWithSiteURL(n.ws, site, extended);
         $http.post(url, {'elements': [elem], 'source': ApplicationService.getSource()})
         .success(function(data, status, headers, config) {
             var resp = null;
@@ -611,12 +611,12 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
      * @returns {Promise} The promise will be resolved with an array of created element references if 
      *      create is successful.
      */
-    var createElements = function(elems, workspace, site) {
+    var createElements = function(elems, workspace, site, extended) {
         var n = normalize(null, null, workspace, null);
         var deferred = $q.defer();
-        var url = URLService.getPostElementsURL(n.ws);
+        var url = URLService.getPostElementsURL(n.ws, extended);
         if (site)
-            url = URLService.getPostElementsWithSiteURL(n.ws, site);
+            url = URLService.getPostElementsWithSiteURL(n.ws, site, extended);
         $http.post(url, {'elements': elems, 'source': ApplicationService.getSource()})
         .success(function(data, status, headers, config) {
             var results = [];
