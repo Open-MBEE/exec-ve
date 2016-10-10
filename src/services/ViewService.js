@@ -813,7 +813,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                     parentView._childViews = _.cloneDeep(owner._childViews);
                 parentView._childViews.push({id: newViewId, aggregation: "composite"});
         }
-        if (isDoc && siteId !== rootSiteId) {
+        else if (siteId !== rootSiteId) {
             view.ownerId = siteId;
         }
         var instanceSpecDoc = '<p>&nbsp;</p><p><mms-transclude-doc data-mms-eid="' + newViewId + '">[cf:' + view.name + '.doc]</mms-transclude-doc></p><p>&nbsp;</p>';
@@ -849,7 +849,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         var toCreate = [instanceSpec, view, asi];
         if (parentView)
             toCreate.push(parentView);
-        ElementService.createElements(toCreate, workspace, rootSiteId)
+        ElementService.createElements(toCreate, workspace, rootSiteId, true)
         .then(function(data) {
             data.forEach(function(elem) {
                 if (elem.sysmlId === newViewId) {
