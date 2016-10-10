@@ -882,6 +882,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                 holdingBinId = 'holding_bin_' + projectId;
                 projectName = projectNameArray[2];
             }
+            deferred.resolve({holdingBinId: holdingBinId, projectId: projectId, siteId: siteId, rootSiteId: rootSiteId, projectName: projectName});
         } else if (siteid) {
             SiteService.getRootSiteForSite(siteid)
             .then(function(data) {
