@@ -890,6 +890,8 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
             }).finally(function() {
                 deferred.resolve({holdingBinId: holdingBinId, projectId: projectId, siteId: siteId, rootSiteId: rootSiteId, projectName: projectName});
             });
+        } else {
+            deferred.resolve({holdingBinId: holdingBinId, projectId: projectId, siteId: siteId, rootSiteId: rootSiteId, projectName: projectName});
         }
         return deferred.promise;
     };
