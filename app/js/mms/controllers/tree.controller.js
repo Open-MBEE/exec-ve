@@ -1265,7 +1265,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         else
             viewid = branch.data.sysmlId;
         var viewNode = viewId2node[viewid];
-        instanceSpec._relatedDocuments = [
+        /*instanceSpec._relatedDocuments = [
             {
                 _parentViews: [{
                     name: viewNode.data.name,
@@ -1284,22 +1284,18 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             hide: !$rootScope.veTreeShowPe && elemType !== 'section',
             children: [],
         };
-        var i = 0;
-        var lastSection = -1;
-        var childViewFound = false;
-        for (i = 0; i < branch.children.length; i++) {
-            if (branch.children[i].type === 'view') {
-                lastSection = i-1;
-                childViewFound = true;
-                break;
+        */
+        // Remove all non view children from branch
+        for ( var i = 0; i < branch.children.length; i++) {
+            if (branch.children[i].type != 'view') {
+                branch.children.splice(i, 1);
+                --i;
             }
         }
-        if (lastSection == -1 && !childViewFound) //case when first child is view
-            lastSection = branch.children.length-1;
-        branch.children.splice(lastSection+1, 0, newbranch);
-        if (elemType == 'section') 
-            addSectionElements(instanceSpec, viewNode, newbranch);
-
+        if (branch.type === 'section')
+            addSectionElements(branch.data, viewNode, branch);
+        else if (branch.type === 'view')
+            addViewSections(branch.data);
         $scope.treeApi.refresh();
         resetPeList(elemType);
     });

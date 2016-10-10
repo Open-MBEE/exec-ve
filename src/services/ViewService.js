@@ -509,9 +509,11 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      *      already be in the document
      * @param {string} [workspace=master] workspace to use
      * @param {Object} elementOb the element object to add (for element ref tree this should be an instanceValue)
+     * @param {number} addPeIndex the index of where to add view or section (instance spec) object
      * @returns {Promise} The promise would be resolved with updated document object
      */
-    var addElementToViewOrSection = function(viewOrSectionId, parentElementId, workspace, elementOb) {
+    //TODO remove parentElementId - no longer need
+    var addElementToViewOrSection = function(viewOrSectionId, parentElementId, workspace, elementOb, addPeIndex) {
 
         var deferred = $q.defer();
         var ws = !workspace ? 'master' : workspace;
@@ -537,7 +539,10 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                     type: "Expression",
                 };
             }
-            clone[key].operand.push(elementOb);
+            if (addPeIndex >= -1)
+                clone[key].operand.splice(addPeIndex+1, 0, elementOb);
+            else
+                clone[key].operand.push(elementOb);
 
             // TODO add to parentElement also if needed 
             ElementService.updateElement(clone, ws)
@@ -662,10 +667,11 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @param {string} type The type of element that is to be created, ie 'Paragraph'
      * @param {string} [site=null] (optional) site to post to
      * @param {string} [name=Untitled <elementType>] (optional) InstanceSpecification name to use
+     * @param {number} addPeIndex the index of where to add view or section (instance spec) object
      * @returns {Promise} The promise would be resolved with updated View object if addToView is true
      *                    otherwise the created InstanceSpecification
     */
-    var createInstanceSpecification = function(viewOrSection, workspace, type, site, name) {
+    var createInstanceSpecification = function(viewOrSection, workspace, type, site, name, addPeIndex) {
         var deferred = $q.defer();
 
         var newInstanceId = UtilsService.createMmsId();
@@ -719,7 +725,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                         type: "InstanceValue",
                         //valueExpression: null
                     };
-                    addElementToViewOrSection(viewOrSection.sysmlId, viewOrSection.sysmlId, workspace, instanceVal)
+                    addElementToViewOrSection(viewOrSection.sysmlId, viewOrSection.sysmlId, workspace, instanceVal, addPeIndex)
                     .then(function(data3) {
                         if (type === "Section") {
                         // Broadcast message to TreeCtrl:

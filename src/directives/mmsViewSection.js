@@ -1,9 +1,9 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsViewSection', ['$compile', '$templateCache', '$rootScope', 'ElementService', 'ViewService', 'UxService', 'Utils', mmsViewSection]);
+.directive('mmsViewSection', ['$compile', '$templateCache', '$rootScope', 'ElementService', 'ViewService', 'UxService', 'Utils', 'MmsAppUtils', mmsViewSection]);
 
-function mmsViewSection($compile, $templateCache, $rootScope, ElementService, ViewService, UxService, Utils) {
+function mmsViewSection($compile, $templateCache, $rootScope, ElementService, ViewService, UxService, Utils, MmsAppUtils) {
 
     var defaultTemplate = $templateCache.get('mms/templates/mmsViewSection.html');
 
@@ -73,7 +73,7 @@ function mmsViewSection($compile, $templateCache, $rootScope, ElementService, Vi
         }
 
         if (mmsViewCtrl && mmsViewPresentationElemCtrl) {
-            
+
             scope.isEditing = false;
             scope.recompileEdit = false;
             scope.elementSaving = false;
@@ -88,7 +88,7 @@ function mmsViewSection($compile, $templateCache, $rootScope, ElementService, Vi
             var type = "name";
 
             var callback = function() {
-                Utils.showEditCallBack(scope,mmsViewCtrl,element,null,recompile,recompileEdit,type,scope.section);
+                Utils.showEditCallBack(scope, mmsViewCtrl, element, null, recompile, recompileEdit, type, scope.section);
             };
 
             mmsViewCtrl.registerPresenElemCallBack(callback);
@@ -105,25 +105,39 @@ function mmsViewSection($compile, $templateCache, $rootScope, ElementService, Vi
             }
 
             scope.save = function() {
-                Utils.saveAction(scope,recompile,scope.bbApi,scope.section,type);
+                Utils.saveAction(scope, recompile, scope.bbApi, scope.section, type);
             };
 
             scope.cancel = function() {
-                Utils.cancelAction(scope,recompile,scope.bbApi,type);
+                Utils.cancelAction(scope, recompile, scope.bbApi, type);
             };
 
             scope.delete = function() {
-                Utils.deleteAction(scope,scope.bbApi,mmsViewPresentationElemCtrl.getParentSection());
+                Utils.deleteAction(scope, scope.bbApi, mmsViewPresentationElemCtrl.getParentSection());
             };
 
             scope.addFrame = function() {
-                Utils.addFrame(scope,mmsViewCtrl,element,null,scope.section);
+                Utils.addFrame(scope, mmsViewCtrl, element, null, scope.section);
             };
 
             scope.preview = function() {
                 Utils.previewAction(scope, recompileEdit, recompile, type);
             };
-        } 
+        }
+
+        /**
+         * @ngdoc function
+         * @name mms.directives.directive:mmsViewSection#addEltAction
+         * @methodOf mms.directives.directive:mmsViewSection
+         *
+         * @description
+         * Add specified element at the defined 'index'
+         */
+        scope.addEltAction = function(index, type) {
+            scope.addPeIndex = index;
+            MmsAppUtils.addPresentationElement(scope, type, scope.section);
+        };
+
     };
 
     return {
