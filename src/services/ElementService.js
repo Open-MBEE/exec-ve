@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms')
-.factory('ElementService', ['$q', '$http', 'URLService', 'UtilsService', 'CacheService', 'HttpService', 'ApplicationService','_', ElementService]);
+.factory('ElementService', ['$q', '$http', 'URLService', 'UtilsService', 'CacheService', 'HttpService', 'ApplicationService', 'SiteService', '_', ElementService]);
 
 /**
  * @ngdoc service
@@ -18,7 +18,7 @@ angular.module('mms')
  *
  * For element json example, see [here](https://ems.jpl.nasa.gov/alfresco/mms/raml/index.html)
  */
-function ElementService($q, $http, URLService, UtilsService, CacheService, HttpService, ApplicationService, _) {
+function ElementService($q, $http, URLService, UtilsService, CacheService, HttpService, ApplicationService, SiteService, _) {
     
     var inProgress = {};// leave for now
     /**
@@ -866,13 +866,15 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         var projectId = null;
         var projectName = null;
         var siteId = siteid;
-
+        var rootSiteId = null;
+        var deferred = $q.defer();
         if (elem && elem._qualifiedId && elem._qualifiedName) {
             var splitArray = elem._qualifiedId.split('/');
             var projectNameArray = elem._qualifiedName.split('/');
             if (splitArray && splitArray.length > 2) {
                 projectId = splitArray[2];
                 siteId = splitArray[1];
+                rootSiteId = siteId;
             }
             if (elem._siteCharacterizationId)
                 siteId = elem._siteCharacterizationId;
@@ -880,21 +882,34 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                 holdingBinId = 'holding_bin_' + projectId;
                 projectName = projectNameArray[2];
             }
-        } 
-        return {holdingBinId: holdingBinId, projectId: projectId, siteId: siteId, projectName: projectName};
+        } else if (siteid) {
+            SiteService.getRootSiteForSite(siteid)
+            .then(function(data) {
+                rootSiteId = data;
+            }).finally(function() {
+                deferred.resolve({holdingBinId: holdingBinId, projectId: projectId, siteId: siteId, rootSiteId: rootSiteId, projectName: projectName});
+            });
+        }
+        return deferred.promise;
     };
 
     var getIdInfo = function(elem, siteid, workspace, version, weight) { //elem is element object with qualified id with project in it
         var deferred = $q.defer();
 
         if (!elem || (elem && elem._qualifiedId && elem._qualifiedName)) {
-            deferred.resolve(getIdInfoReal(elem, siteid));
+            return getIdInfoReal(elem, siteid);
         } else {
             getElement(elem.sysmlId, false, workspace, version, weight, true)
             .then(function(data) {
-                deferred.resolve(getIdInfoReal(data, siteid));
+                getIdInfoReal(data, siteid)
+                .then(function(data) {
+                    deferred.resolve(data);
+                });
             }, function() {
-                deferred.resolve(getIdInfoReal(elem, siteid));
+                getIdInfoReal(elem, siteid)
+                .then(function(data) {
+                    deferred.resolve(data);
+                });
             });
         }
         //if (!holdingBinId && siteId) {

@@ -93,6 +93,22 @@ function SiteService($q, $http, URLService, CacheService, _) {
         return deferred.promise;
     };
 
+    var getRootSiteForSite = function(siteid, version) {
+        var deferred = $q.defer();
+        var ver = !version ? 'latest' : version;
+        getSites(version).then(function(data) {
+            var currentSite = siteid;
+            var result = CacheService.get(['sites', 'master', ver, currentSite]);
+            while (result && result.isCharacterization) {
+                currentSite = result.parent;
+                result = CacheService.get(['sites', 'master', ver, currentSite]);
+            }
+            deferred.resolve(currentSite);
+        }, function(reason) {
+            deferred.reject(reason);
+        });
+        return deferred.promise;
+    };
 
     var getSiteProjects = function(site) {
 
@@ -108,6 +124,7 @@ function SiteService($q, $http, URLService, CacheService, _) {
         getSites: getSites,
         getSite: getSite,
         getSiteProjects: getSiteProjects,
-        reset: reset
+        reset: reset,
+        getRootSiteForSite: getRootSiteForSite
     };
 }

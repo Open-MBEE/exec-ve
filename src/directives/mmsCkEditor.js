@@ -105,7 +105,8 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
               ElementService.getIdInfo(currentView, scope.mmsSite, scope.mmsWs, 'latest', 2)
               .then(function(ids) {
                 var currentSiteId = ids.siteId;
-                var ownerId = ids.holdingBinId;
+                var rootSiteId = ids.rootSiteId;
+                //var ownerId = ids.holdingBinId;
                 var toCreate = {
                     sysmlId: sysmlId,
                     name: $scope.newE.name, 
@@ -113,9 +114,9 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
                     type: 'Class',
                     _appliedStereotypeIds: [],
                 };
-                if (ownerId)
-                    toCreate.ownerId = ownerId;
-                ElementService.createElement(toCreate, scope.mmsWs, currentSiteId)
+                if (currentSiteId !== rootSiteId)
+                    toCreate.ownerId = currentSiteId;
+                ElementService.createElement(toCreate, scope.mmsWs, rootSiteId)
                 .then(function(data) {
                     if ($scope.requestName) {
                         $scope.choose(data, 'name');

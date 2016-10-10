@@ -676,9 +676,10 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         var holdingBinId = ids.holdingBinId;
         var projectId = ids.projectId;
         var siteId = ids.siteId;
+        var rootSiteId = ids.rootSiteId;
         var realType = TYPE_TO_CLASSIFIER_TYPE[type];
-        if (!holdingBinId && siteId)
-            holdingBinId = 'holding_bin_' + siteId + '_no_project';
+        //if (!holdingBinId && siteId)
+         //   holdingBinId = 'holding_bin_' + siteId + '_no_project';
         var jsonType = realType;
         if (type === 'Comment' || type === 'Paragraph')
             jsonType = type;
@@ -705,11 +706,11 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 operand: [],  
                 type: "Expression"
             };
-        if (holdingBinId)
-            instanceSpec.ownerId = holdingBinId;
+        if (siteId !== rootSiteId)
+            instanceSpec.ownerId = siteId;
 
         var toCreate = [instanceSpec];
-        ElementService.createElements(toCreate, workspace, siteId)
+        ElementService.createElements(toCreate, workspace, rootSiteId)
         .then(function(data) {
             data.forEach(function(elem) {
                 if (elem.sysmlId === newInstanceId) {
@@ -769,6 +770,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         var holdingBinId = ids.holdingBinId;
         var projectId = ids.projectId;
         var siteId = ids.siteId;
+        var rootSiteId = ids.rootSiteId;
 
         var view = {
             sysmlId: newViewId,
@@ -805,7 +807,9 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                     parentView.childViews = _.cloneDeep(owner.childViews);
                 parentView.childViews.push({id: newViewId, aggregation: "composite"});
         }
-
+        if (isDoc && siteId !== rootSiteId) {
+            view.ownerId = siteId;
+        }
         var instanceSpecDoc = '<p>&nbsp;</p><p><mms-transclude-doc data-mms-eid="' + newViewId + '">[cf:' + view.name + '.doc]</mms-transclude-doc></p><p>&nbsp;</p>';
         var instanceSpecSpec = {
             'type': 'Paragraph', 
@@ -825,8 +829,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             },
             _appliedStereotypeIds: [],
         };
-        if (holdingBinId)
-            instanceSpec.ownerId = holdingBinId;
+        if (siteId !== rootSiteId)
+            instanceSpec.ownerId = siteId;
         var asi = { //create applied stereotype instance
             sysmlId: newViewId + '_asi',
             ownerId: newViewId,
@@ -839,7 +843,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         var toCreate = [instanceSpec, view, asi];
         if (parentView)
             toCreate.push(parentView);
-        ElementService.createElements(toCreate, workspace, siteId)
+        ElementService.createElements(toCreate, workspace, rootSiteId)
         .then(function(data) {
             data.forEach(function(elem) {
                 if (elem.sysmlId === newViewId) {
@@ -873,7 +877,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * paragraph of the view documentation will be used. 
      * 
      * @param {string} [name=Untitled] name for the Document
-     * @param {string} [site] site name
+     * @param {string} [site] site id
      * @param {string} [workspace=master] workspace to use 
      * @returns {Promise} The promise will be resolved with the new view. 
      */
