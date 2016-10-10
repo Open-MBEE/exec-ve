@@ -171,7 +171,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Wo
             if ((scope.edit.type === 'Property' || scope.edit.type === 'Port') && 
                     !angular.equals(scope.edit.defaultValue, scope.element.defaultValue))
                 return true;
-            if (scope.eidt.type === 'Slot' && !angular.equals(scope.edit.value, scope.element.value))
+            if (scope.edit.type === 'Slot' && !angular.equals(scope.edit.value, scope.element.value))
                 return true; 
             if (scope.edit.type === 'Constraint' && 
                     !angular.equals(scope.edit.specification, scope.element.specification))
