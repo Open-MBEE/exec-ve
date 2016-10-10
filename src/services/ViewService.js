@@ -462,12 +462,12 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 sysmlId: data.sysmlId,
                 _read: data._read,
                 _modified: data._modified,
-                childViews: [],
+                _childViews: [],
                 type: data.type
             };
-            if (data.childViews)
-                clone.childViews = _.cloneDeep(data.childViews);
-            clone.childViews.push({id: viewId, aggregation: aggr});
+            if (data._childViews)
+                clone._childViews = _.cloneDeep(data._childViews);
+            clone._childViews.push({id: viewId, aggregation: aggr});
             updateView(clone, ws)
             .then(function(data2) {
                 if (CacheService.exists(docViewsCacheKey) && viewOb)
@@ -627,17 +627,17 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         var ws = !workspace ? 'master' : workspace;
         ElementService.getElement(parentViewId, false, ws, null, 2)
         .then(function(data) {  
-            if (data.childViews) {
+            if (data._childViews) {
                 var clone = {
                     sysmlId: data.sysmlId,
                     _read: data._read,
                     _modified: data._modified,
-                    childViews: [],
+                    _childViews: [],
                     type: data.type
                 };
-                data.childViews.forEach(function(child) {
+                data._childViews.forEach(function(child) {
                     if (child.id !== viewId)
-                        clone.childViews.push(child);
+                        clone._childViews.push(child);
                 });
                 updateView(clone, ws)
                 .then(function(data2) {
@@ -799,13 +799,13 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 sysmlId: owner.sysmlId,
                 _modified: owner._modified,
                 _read: owner._read,
-                childViews: [],
+                _childViews: [],
             };
                 if (owner.type)
                     parentView.type = owner.type;
-                if (owner.childViews)
-                    parentView.childViews = _.cloneDeep(owner.childViews);
-                parentView.childViews.push({id: newViewId, aggregation: "composite"});
+                if (owner._childViews)
+                    parentView._childViews = _.cloneDeep(owner._childViews);
+                parentView._childViews.push({id: newViewId, aggregation: "composite"});
         }
         if (isDoc && siteId !== rootSiteId) {
             view.ownerId = siteId;

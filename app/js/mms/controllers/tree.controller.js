@@ -557,8 +557,8 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 });
             });
         } else {
-            if (!document.childViews)
-                document.childViews = [];
+            if (!document._childViews)
+                document._childViews = [];
             MmsAppUtils.handleChildViews(document, 'composite', ws, time, handleSingleView, handleChildren)
             .then(function(node) {
                 for (var i in viewId2node) {

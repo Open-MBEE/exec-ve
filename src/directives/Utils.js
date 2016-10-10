@@ -524,7 +524,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Wo
                 if (section && section.specification && !angular.equals(section.specification, status.server.specification)) {
                     growl.error('The view section contents is outdated, refresh the page first!');
                     return;
-                } else if (!section && scope.view.contents && !angular.equals(scope.view.contents, status.server.contents)) {
+                } else if (!section && scope.view._contents && !angular.equals(scope.view._contents, status.server._contents)) {
                     growl.error('The view contents is outdated, refresh the page first!');
                     return;
                 }
