@@ -419,8 +419,8 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                 _.merge(edit, updated);
                 UtilsService.cleanElement(edit, true);
             }
-            if (elem._contents)
-                resp._contents = elem._contents;
+            //if (elem._contents)
+            //    resp._contents = elem._contents;
             deferred.resolve(resp);
         };
 

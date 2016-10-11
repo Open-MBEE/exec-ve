@@ -85,9 +85,9 @@ function CacheService(_) {
             realkey = makeKey(key);
         if (cache.hasOwnProperty(realkey) && m) {
             _.merge(cache[realkey], value, function(a,b,id) {
-                /*if ((id === 'contents' || id === 'contains') && a)
-                    return a; //handle contains and contents updates manually at higher level
-                if (id === 'string')
+                if ((id === '_contents' || id === 'contains' || id === 'specification') && b && b.type === 'Expression')
+                    return b; //handle contains and contents updates manually at higher level
+                /*if (id === 'string')
                     return b;*/
                 if (angular.isArray(a) && angular.isArray(b) && b.length < a.length) {
                     a.length = 0;
