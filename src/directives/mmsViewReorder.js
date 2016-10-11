@@ -32,7 +32,7 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
                     return false;
                 if (destNodeScope.$element.hasClass('root'))
                     return true;
-                if (destNodeScope.element.presentationElement.type === 'Section')
+                if (ViewService.isSection(destNodeScope.element.presentationElement))
                     return true;
                 return false;
             }

@@ -32,7 +32,7 @@
         </div>
         <div ng-class="{'panel-body' :  isEditing}" class="inner">
             <div class="add-buttons-container" ng-init="$index = -1" ng-include="'mms/templates/mmsAddPeButton.html'"></div>
-            <div ng-repeat="instanceVal in section.specification.operand track by instanceVal.instanceId"> 
+            <div ng-repeat="instanceVal in section.specification.operand"> 
                 <mms-view-presentation-elem data-mms-instance-val="::instanceVal" data-mms-parent-section="::section"></mms-view-presentation-elem>
                 <div class="add-buttons-container" ng-include="'mms/templates/mmsAddPeButton.html'">
             </div>

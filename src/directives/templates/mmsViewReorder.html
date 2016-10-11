@@ -1,7 +1,7 @@
 <!-- Nested node template -->
 <script type="text/ng-template" id="nodes_renderer2.html">
     <div ui-tree-handle ng-class="{ 'text-success grab' : !element.isOpaque, 'no-grab': element.isOpaque }">
-        {{element.presentationElement.type}} : {{element.instanceSpecification.name}}
+        {{element.presentationElement.type === 'InstanceSpecification' ? 'Section' : element.presentationElement.type}} : {{element.instanceSpecification.name}}
     </div>
     <ol ui-tree-nodes ng-model="element.sectionElements">
         <li ng-repeat="element in element.sectionElements" ui-tree-node ng-include="'nodes_renderer2.html'">

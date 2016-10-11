@@ -796,7 +796,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             documentation: viewDoc ? viewDoc : '',
             _appliedStereotypeIds: [
                 (isDoc ? "_17_0_2_3_87b0275_1371477871400_792964_43374" : "_17_0_1_232f03dc_1325612611695_581988_21583")
-            ]
+            ],
+            appliedStereotypeInstanceId: newViewId + '_asi'
         };
         var parentView = null;
         if (owner) {
@@ -845,6 +846,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             type: 'InstanceSpecification',
             classifierIds: [(isDoc ? "_17_0_2_3_87b0275_1371477871400_792964_43374" : "_17_0_1_232f03dc_1325612611695_581988_21583")],
             _appliedStereotypeIds: [],
+            stereotypedElementId: newViewId
         };
         var toCreate = [instanceSpec, view, asi];
         if (parentView)
@@ -979,7 +981,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             else if (type === 'Expression') {
                 // If it is a Opaque Section then we want the instanceSpec:
                 if (isSection(instanceSpec)) {
-                    instanceSpec.type = "Section";
+                    //instanceSpec.type = "Section";
                     deferred.resolve(instanceSpec);
                 }
                 // Will we ever have an Expression otherwise?
@@ -1052,7 +1054,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             parseExprRefTree(instanceVal, workspace, version, weight)
             .then(function(presentationElement) {
                 elementObject.presentationElement = presentationElement;
-                if (presentationElement.type === 'Section') {
+                if (isSection(presentationElement)) {
                     getElementReferenceTree(presentationElement.specification, workspace, version)
                     .then(function(sectionElementReferenceTree) {
                         elementObject.sectionElements = sectionElementReferenceTree;
