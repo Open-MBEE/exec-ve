@@ -781,6 +781,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         var view = {
             sysmlId: newViewId,
             type: 'Class',
+            ownedAttributeIds: [],
             _allowedElements: [],
             _displayedElements: [newViewId],
             _childViews: [],

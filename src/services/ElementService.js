@@ -342,6 +342,8 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                 delete ob._displayedElements;
             if (ob._allowedElements)
                 delete ob._allowedElements;
+            if (ob._childViews && !elem._childViews)
+                delete ob._childViews;
             deferred.resolve(ob);
         }, function() {
             deferred.resolve(elem);
