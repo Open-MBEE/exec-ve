@@ -178,7 +178,13 @@
             y: {
               label : {},
               tick : {
-                fit: false
+                fit: false,
+                format: function (val) {
+                  console.log("Y tick value: ", val);
+                  val = Math.round(val * 100) / 100;
+                  console.log("New value: ", val);
+                  return val;
+                }
               }
             }
           },
@@ -187,7 +193,8 @@
             format: {}
           },
           _onrendered: [],
-          _postrender: []
+          _postrender: [],
+          _onresized: []
         };
         if (tables.length > 1) {
           _chart.data.xs = {};
@@ -463,6 +470,9 @@
       };
       _chart._onrendered.push(gridDrawFn);
       _chart._postrender.push(tickModFn);
+      _chart._onresized.push(function () {
+        tickModded = false;
+      });
 
       // Convert log axis values to log values
       _chart.data.columns.forEach(function(column) {
@@ -562,6 +572,9 @@
           this.api.resize({
             width: element.offsetWidth - DEFAULT.RESIZE_MARGIN_W,
             height: element.offsetHeight - DEFAULT.RESIZE_MARGIN_H
+          });
+          _chart._onresized.map(function (cb) {
+            cb();
           });
         };
         console.log(_chart);
