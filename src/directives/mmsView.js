@@ -95,9 +95,9 @@ function mmsView(ViewService, $templateCache, $rootScope, growl) {
             return ViewService.getViewElements($scope.mmsVid, false, $scope.mmsWs, $scope.mmsVersion, 1);
         };
 
-        this.transcludeClicked = function(elementId) {
+        this.transcludeClicked = function(elementId, ws, version) {
             if ($scope.mmsCfClicked)
-                $scope.mmsCfClicked({elementId: elementId});
+                $scope.mmsCfClicked({elementId: elementId, ws: ws, version: version});
         };
 
         this.elementTranscluded = function(elem, type) {
@@ -144,6 +144,7 @@ function mmsView(ViewService, $templateCache, $rootScope, growl) {
             if (!newVal || (newVal === oldVal && processed))
                 return;
             processed = true;
+            element.addClass('isLoading');
             ViewService.getView(scope.mmsVid, false, scope.mmsWs, scope.mmsVersion, 1)
             .then(function(data) {
                 if (scope.mmsVersion && scope.mmsVersion !== 'latest') {
@@ -186,9 +187,14 @@ function mmsView(ViewService, $templateCache, $rootScope, growl) {
                     scope.view = data;
                     scope.modified = data.modified;
                     scope.modifier = data.modifier;
+                }).finally(function() {
+                    element.removeClass('isLoading');
                 });
             }, function(reason) {
                 growl.error('Getting View Error: ' + reason.message + ': ' + scope.mmsVid);
+            }).finally(function() {
+                if (scope.view)
+                    element.removeClass('isLoading');
             });
         };
         scope.$watch('mmsVid', changeView);
@@ -298,9 +304,9 @@ function mmsView(ViewService, $templateCache, $rootScope, growl) {
             mmsVersion: '@',
             mmsTag: '@',
             mmsNumber: '@',
-            mmsLink: '=',
+            mmsLink: '<',
             mmsCfClicked: '&',
-            mmsViewApi: '=',
+            mmsViewApi: '<',
             mmsTranscluded: '&'
         },
         controller: ['$scope', mmsViewCtrl],

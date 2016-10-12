@@ -124,11 +124,15 @@ mms-spec div {
   }
 }
 
-.error {
+.mms-error {
   color: $red;
 }
 
-figcaption {
+.mms-png {
+  display: none;
+}
+
+figcaption, .mms-equation-caption, caption {
   text-align: center;
   font-weight: bold;
 }

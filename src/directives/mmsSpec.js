@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsSpec', ['Utils','ElementService', 'WorkspaceService', 'ConfigService', 'UtilsService', '$compile', '$templateCache', '$modal', '$q', 'growl', '_', mmsSpec]);
+.directive('mmsSpec', ['Utils','ElementService', 'WorkspaceService', 'ConfigService', 'UtilsService', '$compile', '$templateCache', '$uibModal', '$q', 'growl', '_', mmsSpec]);
 
 /**
  * @ngdoc directive
@@ -10,7 +10,7 @@ angular.module('mms.directives')
  * @requires mms.ElementService
  * @requires $compile
  * @requires $templateCache
- * @requires $modal
+ * @requires $uibModal
  * @requires $q
  * @requires growl
  * @requires _
@@ -67,13 +67,10 @@ angular.module('mms.directives')
  * @param {string=latest} mmsVersion Version can be alfresco version number or timestamp, default is latest
  * @param {string=all} mmsEditField "all" or "none"
  * @param {Object=} mmsSpecApi An empty object that'll be populated with api methods
- * @param {Array=} mmsCfElements Array of element objects as returned by ElementService
- *      that can be transcluded into documentation or string values. Regardless, transclusion
- *      allows keyword searching elements to transclude from alfresco
  * @param {Object=} mmsElement An element object, if this is provided, a read only
  *      element spec for it would be shown, this will not use mms services to get the element
  */
-function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsService, $compile, $templateCache, $modal, $q, growl, _) {
+function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsService, $compile, $templateCache, $uibModal, $q, growl, _) {
     //var readTemplate = $templateCache.get('mms/templates/mmsSpec.html');
     //var editTemplate = $templateCache.get('mms/templates/mmsSpecEdit.html');
     var template = $templateCache.get('mms/templates/mmsSpec.html');
@@ -105,7 +102,10 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
             //$compile(element.contents())(scope);
             return;
         }
-        scope.tinymceApi = {};
+        scope.addHtml = function(value) {
+            value.string = "<p>" + value.string + "</p>";
+        };
+        scope.editorApi = {};
         /**
          * @ngdoc function
          * @name mms.directives.directive:mmsSpec#changeElement
@@ -129,8 +129,8 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
                     return;
                 scope.workspace = data;
             }, function(reason) {scope.workspace = null;});
-            if (scope.edit && scope.tinymceApi.save)
-                scope.tinymceApi.save();
+            if (scope.edit && scope.editorApi.save)
+                scope.editorApi.save();
             if (scope.mmsType === 'workspace') {
                 WorkspaceService.getWorkspace(scope.mmsEid)
                 .then(function(data) {
@@ -169,7 +169,8 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
                 });
             } else {
                 scope.isEnumeration = false;
-            ElementService.getElement(scope.mmsEid, false, scope.mmsWs, scope.mmsVersion, 2)
+                scope.isSlot = false;
+            ElementService.getElement(scope.mmsEid, false, scope.mmsWs, scope.mmsVersion, 2, true)
             .then(function(data) {
                 //element.empty();
                 //var template = null;
@@ -223,47 +224,22 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
                                     scope.options = elements;
                                 });
                             } else {
-                            //The editor check occurs here; should get "not supported for now" from here
-                                var id = scope.element.specialization.propertyType;
-                                if (id && !scope.element.specialization.isSlot) {
-                                    ElementService.getElement(id, false, scope.mmsWs, scope.mmsVersion)
-                                    .then(function(val) {
-                                    //Filter for enumeration type
-                                        if (newVal !== lastid)
-                                            return;
-                                        if (val.appliedMetatypes && val.appliedMetatypes.length > 0 &&
-                                            val.appliedMetatypes[0] === '_9_0_62a020a_1105704885400_895774_7947') {
-                                            scope.isEnumeration = true;
-                                            ElementService.getOwnedElements(val.sysmlid, false, scope.mmsWs, scope.mmsVersion, 1)
-                                            .then(function(val) {
-                                                if (newVal !== lastid)
-                                                    return;
-                                                var newArray = [];
-                                                //Filter only for appropriate property value
-                                                for (var i = 0; i < val.length; i++) {
-                                                    if( val[i].appliedMetatypes && val[i].appliedMetatypes.length > 0 &&
-                                                        val[i].appliedMetatypes[0] === '_9_0_62a020a_1105704885423_380971_7955') {
-                                                            newArray.push(val[i]);
-                                                        }
-                                                }
-                                                scope.options = newArray;
-                                                if (scope.editValues.length === 0)
-                                                    scope.editValues.push({type: 'InstanceValue', instance: null});
-                                            },
-                                            function(reason) {
-                                                console.log(reason);
-                                                growl.error('Failed to get enumeration options: ' + reason.message);
-                                            });
-                                        }
-                                    });
-                                } //end if
+                                //The editor check occurs here; should get "not supported for now" from here
+                                  
+                                Utils.getPropertySpec(scope.element, scope.mmsWs, scope.mmsVersion)
+                                .then( function(value) {
+                                    scope.isEnumeration = value.isEnumeration;
+                                    scope.isSlot = value.isSlot;
+                                    scope.options = value.options;
+                                }, function(reason) {
+                                    // Utils.addFrame(scope, mmsViewCtrl, element, frameTemplate);
+                                    growl.error('Failed to get property spec: ' + reason.message);
+                                });
                             }
                         }
                         if (scope.edit.specialization.type === 'Constraint' && scope.edit.specialization.specification) {
                             scope.editValue = scope.edit.specialization.specification;
                         }
-                        //element.append(template);
-                        //$compile(element.contents())(scope);
                     });
                 }
             }, function(reason) {
@@ -289,18 +265,18 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
             Utils.revertEdits(scope, null, true);
         };
 
-        var conflictCtrl = function($scope, $modalInstance) {
+        var conflictCtrl = function($scope, $uibModalInstance) {
             $scope.ok = function() {
-                $modalInstance.close('ok');
+                $uibModalInstance.close('ok');
             };
             $scope.cancel = function() {
-                $modalInstance.close('cancel');
+                $uibModalInstance.close('cancel');
             };
             $scope.force = function() {
-                $modalInstance.close('force');
+                $uibModalInstance.close('force');
             };
             $scope.merge = function() {
-                $modalInstance.close('merge');
+                $uibModalInstance.close('merge');
             };
         };
 
@@ -319,7 +295,7 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
          *      the original save failed. Error means an actual error occured.
          */
         scope.save = function() {
-            return Utils.save(scope.edit, scope.mmsWs, scope.mmsType, scope.mmsEid, scope.tinymceApi, scope, 'all');
+            return Utils.save(scope.edit, scope.mmsWs, scope.mmsType, scope.mmsEid, scope.editorApi, scope, 'all');
         };
 
         scope.hasHtml = function(s) {
@@ -355,6 +331,14 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
         };
         scope.addValueType = 'LiteralString';
 
+        scope.addEnumerationValue = function() {
+          scope.editValues.push({type: "InstanceValue", instance: scope.options[0]});
+        };
+
+        scope.removeVal = function(i) {
+            scope.editValues.splice(i, 1);
+        };
+        
         if (angular.isObject(scope.mmsSpecApi)) {
             var api = scope.mmsSpecApi;
             /**
@@ -439,9 +423,9 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
                 keepMode = true;
             };
 
-            api.tinymceSave = function() {
-                if (scope.edit && scope.tinymceApi.save)
-                    scope.tinymceApi.save();
+            api.editorSave = function() {
+                if (scope.edit && scope.editorApi.save)
+                    scope.editorApi.save();
             };
         }
     };
@@ -455,10 +439,8 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
             mmsWs: '@',
             mmsSite: '@',
             mmsVersion: '@',
-            mmsCfElements: '=', //array of element objects
-            mmsElement: '=',
-            mmsSpecApi: '=',
-            mmsViewEdit: '=',
+            mmsElement: '<?',
+            mmsSpecApi: '<?',
             mmsType: '@',
             noEdit: '@'
         },

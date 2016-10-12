@@ -3,8 +3,8 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('diffPageModalCtrl', ["_", "$timeout", "$scope", "$rootScope", "$modal", "growl", "ElementService", "UxService", "$modalInstance", "$state", "WorkspaceService", "diff",
-function(_, $timeout, $scope, $rootScope, $modal, growl, ElementService, UxService, $modalInstance, $state, WorkspaceService, diff) {
+.controller('diffPageModalCtrl', ["_", "$timeout", "$scope", "$rootScope", "$uibModal", "growl", "ElementService", "UxService", "$uibModalInstance", "$state", "WorkspaceService", "diff",
+function(_, $timeout, $scope, $rootScope, $uibModal, growl, ElementService, UxService, $uibModalInstance, $state, WorkspaceService, diff) {
 
 	$scope.diff = diff;
 	
@@ -36,7 +36,7 @@ function(_, $timeout, $scope, $rootScope, $modal, growl, ElementService, UxServi
 		WorkspaceService.diff($scope.targetWsId, $scope.sourceWsId, $scope.targetTime, $scope.sourceTime, true)
 		.then(function(data){
 			if(data.status === 'COMPLETED'){
-				$modalInstance.close();
+				$uibModalInstance.close();
 
 				$state.go('workspace.diff', {
 					source: $scope.sourceWsId,
@@ -51,7 +51,7 @@ function(_, $timeout, $scope, $rootScope, $modal, growl, ElementService, UxServi
 	};
 
 	$scope.finished = function() {
-		$modalInstance.close();
+		$uibModalInstance.close();
 	};
 
 }]);

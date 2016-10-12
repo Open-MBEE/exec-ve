@@ -225,8 +225,8 @@ function mmsToolbar($templateCache, $rootScope)
 		controller: ['$scope', mmsToolbarCtrl],
 		link: mmsToolbarLink,
 		scope: {
-			buttons: '=',
-			mmsTbApi: '=',
+			buttons: '<',
+			mmsTbApi: '<',
 			onClick: '&',
 			direction: '@'
 		}

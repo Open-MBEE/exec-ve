@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsNav', ['$templateCache', '$state', 'hotkeys', 'growl', '$location', '$modal', '$http', 'URLService', 'ApplicationService', 'ElementService', mmsNav]);
+.directive('mmsNav', ['$templateCache', '$state', 'hotkeys', 'growl', '$location', '$uibModal', '$http', 'URLService', 'ApplicationService', 'ElementService','AuthService', mmsNav]);
 
 /**
  * @ngdoc directive
@@ -30,7 +30,7 @@ angular.module('mms.directives')
     </pre>
  * @param {string} mmsTitle Title to display
  */
-function mmsNav($templateCache, $state, hotkeys, growl, $location, $modal, $http, URLService, ApplicationService, ElementService) {
+function mmsNav($templateCache, $state, hotkeys, growl, $location, $uibModal, $http, URLService, ApplicationService, ElementService, AuthService) {
     var template = $templateCache.get('mms/templates/mmsNav.html');
 
     var mmsNavLink = function(scope, element, attrs) {
@@ -44,19 +44,19 @@ function mmsNav($templateCache, $state, hotkeys, growl, $location, $modal, $http
             hotkeys.toggleCheatSheet();
         };
         scope.toggleAbout = function() {
-            scope.veV = '2.3.3';
+            scope.veV = '2.4.1';
             scope.mmsV = 'Loading...';
             ApplicationService.getMmsVersion().then(function(data) {
                 scope.mmsV = data;
               }, function(reason) {
                 scope.mmsV = "Could not retrieve due to failure: " + reason.message;
           	});
-            var instance = $modal.open({
+            var instance = $uibModal.open({
                 templateUrl: 'partials/mms/about.html',
                 scope: scope,
-                controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
+                controller: ['$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
                     $scope.cancel = function() {
-                        $modalInstance.dismiss();
+                        $uibModalInstance.dismiss();
                     };
                 }]
             });
@@ -70,6 +70,13 @@ function mmsNav($templateCache, $state, hotkeys, growl, $location, $modal, $http
                     scope.categories[str][k].isOpen = false;
                 }
             }
+        };
+        scope.logout = function(){
+            AuthService.logout().then(function() {
+                $state.go('login');
+            }, function(failure) {
+                growl.error('You were not logged out');
+            });
         };
         // Define a few helper functions
         var Helper = {
@@ -222,7 +229,7 @@ function mmsNav($templateCache, $state, hotkeys, growl, $location, $modal, $http
         template: template,
         scope: {
             title: '@mmsTitle', //page title - used in mobile view only
-            site: '=mmsSite'
+            site: '<mmsSite'
         },
         link: mmsNavLink
     };

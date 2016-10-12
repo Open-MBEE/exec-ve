@@ -44,7 +44,7 @@ function mmsViewPresentationElem(ViewService, ElementService, $templateCache, $r
     var mmsViewPresentationElemLink = function(scope, element, attrs, mmsViewCtrl) {
         if (scope.mmsInstanceVal) {
             if (!scope.mmsInstanceVal.instance) {
-                element.html('<span class="error">Reference is null</span>');
+                element.html('<span class="mms-error">Reference is null</span>');
                 //growl.error("A presentation element reference is null.");
                 return;
             }
@@ -56,6 +56,7 @@ function mmsViewPresentationElem(ViewService, ElementService, $templateCache, $r
                 version = viewVersion.version;
             }
             // Parse the element reference tree for the presentation element:
+            element.addClass("isLoading");
             ViewService.parseExprRefTree(scope.mmsInstanceVal, ws, version, 1)
             .then(function(elem) {
                 scope.presentationElem = elem;
@@ -77,17 +78,22 @@ function mmsViewPresentationElem(ViewService, ElementService, $templateCache, $r
                     }
                     element.click(function(e) {
                         if (mmsViewCtrl)
-                            mmsViewCtrl.transcludeClicked(instanceSpec.sysmlid);
+                            mmsViewCtrl.transcludeClicked(instanceSpec.sysmlid, ws, version);
                         e.stopPropagation();
                     });
                 });
             }, function(reason) {
-                var status = ' not found';
-                if (reason.status === 410)
-                    status = ' deleted';
-                element.html('<span class="error">View element reference error: ' + scope.mmsInstanceVal.instance + ' ' + status + '</span>');
-                //growl.error('View Element Ref Error: ' + scope.mmsInstanceVal.instance + ' ' + reason.message);
-            });
+                if (reason.status === 500) {
+                    element.html('<span class="mms-error">View element reference error: ' + scope.mmsInstanceVal.instance + ' invalid specification</span>');
+                } else {
+                    var status = ' not found';
+                    if (reason.status === 410)
+                        status = ' deleted';
+                    element.html('<span class="mms-error">View element reference error: ' + scope.mmsInstanceVal.instance + ' ' + status + '</span>');
+                }//growl.error('View Element Ref Error: ' + scope.mmsInstanceVal.instance + ' ' + reason.message);
+            }).finally(function() {
+                element.removeClass("isLoading");
+            }); 
         } 
     };
 
@@ -96,8 +102,8 @@ function mmsViewPresentationElem(ViewService, ElementService, $templateCache, $r
         template: template,
         require: '?^mmsView',
         scope: {
-            mmsInstanceVal: '=',
-            mmsParentSection: '=',
+            mmsInstanceVal: '<',
+            mmsParentSection: '<',
         },
         controller: ['$scope', '$rootScope', mmsViewPresentationElemCtrl],
         link: mmsViewPresentationElemLink

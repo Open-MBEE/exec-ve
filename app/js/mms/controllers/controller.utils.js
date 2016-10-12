@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mmsApp')
-.factory('MmsAppUtils', ['$q','$state', '$modal','$timeout', '$location', '$window', '$templateCache','$rootScope','$compile', '$filter', 'WorkspaceService','ConfigService','ElementService','ViewService', 'UtilsService', 'growl','_', MmsAppUtils]);
+.factory('MmsAppUtils', ['$q','$state', '$uibModal','$timeout', '$location', '$window', '$templateCache','$rootScope','$compile', '$filter', 'WorkspaceService','ConfigService','ElementService','ViewService', 'UtilsService', 'growl','_', MmsAppUtils]);
 
 /**
  * @ngdoc service
@@ -10,9 +10,9 @@ angular.module('mmsApp')
  * @description
  * Utilities
  */
-function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $templateCache, $rootScope, $compile, $filter, WorkspaceService, ConfigService, ElementService, ViewService, UtilsService, growl, _) {
+function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templateCache, $rootScope, $compile, $filter, WorkspaceService, ConfigService, ElementService, ViewService, UtilsService, growl, _) {
 
-    var addElementCtrl = function($scope, $modalInstance, $filter) {
+    var addElementCtrl = function($scope, $uibModalInstance, $filter) {
 
         $scope.oking = false;
         $scope.newItem = {};
@@ -26,7 +26,7 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
                 validClassifierIds.push(ViewService.TYPE_TO_CLASSIFIER_ID.TableT);
             } else if ($scope.presentationElemType === 'List') {
                 validClassifierIds.push(ViewService.TYPE_TO_CLASSIFIER_ID.ListT);
-            } else if ($scope.presentationElemType === 'Figure') {
+            } else if ($scope.presentationElemType === 'Image') {
                 validClassifierIds.push(ViewService.TYPE_TO_CLASSIFIER_ID.Figure);
             } else if ($scope.presentationElemType === 'Paragraph') {
                 validClassifierIds.push(ViewService.TYPE_TO_CLASSIFIER_ID.ParagraphT);
@@ -67,12 +67,10 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
             };
             ViewService.addElementToViewOrSection($scope.viewOrSection.sysmlid, $scope.viewOrSection.sysmlid, $scope.ws, instanceVal).
             then(function(data) {
-                if ($scope.presentationElemType === "Section") {
-                    // Broadcast message to TreeCtrl:
-                    $rootScope.$broadcast('viewctrl.add.section', element, $scope.viewOrSection);
-                }
+                // Broadcast message to TreeCtrl:
+                $rootScope.$broadcast('viewctrl.add.element', element, $scope.presentationElemType.toLowerCase(), $scope.viewOrSection);
                 growl.success("Adding "+$scope.presentationElemType+"  Successful");
-                $modalInstance.close(data);
+                $uibModalInstance.close(data);
             }, function(reason) {
                 growl.error($scope.presentationElemType+" Add Error: " + reason.message);
             }).finally(function() {
@@ -94,9 +92,11 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
 
             ViewService.createInstanceSpecification($scope.viewOrSection, $scope.ws, $scope.presentationElemType, $scope.site.sysmlid, $scope.newItem.name).
             then(function(data) {
-                $rootScope.$broadcast('view.reorder.refresh');
+                var elemType = $scope.presentationElemType.toLowerCase();
+                $rootScope.$broadcast('viewctrl.add.element', data, elemType, $scope.viewOrSection);
+                $rootScope.$broadcast('view-reorder.refresh');
                 growl.success("Adding "+$scope.presentationElemType+"  Successful");
-                $modalInstance.close(data);
+                $uibModalInstance.close(data);
             }, function(reason) {
                 growl.error($scope.presentationElemType+" Add Error: " + reason.message);
             }).finally(function() {
@@ -105,14 +105,14 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
         };
 
         $scope.cancel = function() {
-            $modalInstance.dismiss();
+            $uibModalInstance.dismiss();
         };
 
     };
 
     /**
      * @ngdoc method
-     * @name mmsApp.MmsAppUtils#getPresentationElement
+     * @name mmsApp.MmsAppUtils#addPresentationElement
      * @methodOf mmsApp.MmsAppUtils
      *
      * @description
@@ -150,10 +150,10 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
           $scope.newItem.name = "";
           var templateUrlStr = 'partials/mms/add-item.html';
 
-          var instance = $modal.open({
+          var instance = $uibModal.open({
               templateUrl: templateUrlStr,
               scope: $scope,
-              controller: ['$scope', '$modalInstance', '$filter', addElementCtrl]
+              controller: ['$scope', '$uibModalInstance', '$filter', addElementCtrl]
           });
           instance.result.then(function(data) {
               // TODO: do anything here?
@@ -161,80 +161,19 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
         }
     };
 
-    /*
-        ob = document or view object
-        ws = workspace
-        time = timestamp
-        isDoc = if ob is view or doc
-        print = if this is print or save to word
-        genpdf = if this is convert pdf
-        docOption = if view whether to give option to go to full doc
-    */
-    var popupPrintConfirm = function(ob, ws, time, isDoc, print, genpdf, docOption) {
-        var deferred = $q.defer();
-        var modalInstance = $modal.open({
-            templateUrl: 'partials/mms/printConfirm.html',
-            controller: function($scope, $modalInstance, type, unsaved) {
-                $scope.type = type;
-                $scope.action = print ? 'print' : 'save';
-                $scope.docOption = docOption;
-                if (genpdf)
-                    $scope.action = 'generate pdf';
-                $scope.genpdf = genpdf;
-                $scope.unsaved = unsaved;
-                $scope.model = {genCover: true};
-                $scope.print = function() {
-                    $modalInstance.close(['print', $scope.model.genCover]);
-                };
-                $scope.fulldoc = function() {
-                    $modalInstance.close(['fulldoc']);
-                };
-                $scope.cancel = function() {
-                    $modalInstance.dismiss();
-                };
-            },
-            resolve: {
-                type: function() { return isDoc ? 'DOCUMENT' : 'VIEW';},
-                unsaved: function() {
-                    if ($rootScope.veEdits && !_.isEmpty($rootScope.veEdits)) {
-                        return true;
-                    }
-                    return false;
-                }
-            },
-            backdrop: 'static',
-            keyboard: false
-        });
-        modalInstance.result.then(function(choice) {
-            if (choice[0] === 'print' && !genpdf)
-                popupPrint(ob, ws, time, isDoc, print, choice[1]);
-            else if (choice[0] === 'print' && genpdf) {
-                generateHtml(ob, ws, time, true, choice[1])
-                .then(function(ob) {
-                    deferred.resolve(ob);
-                });
-            } else {
-                $rootScope.mms_fullDocMode = true;
-                $rootScope.mms_bbApi.setToggleState("tree.full.document", true);
-                $state.go('workspace.site.document.full', {search: undefined}); 
-            }
-        });
-        return deferred.promise;
-    };
-
     var tableToCsv = function(ob, ws, time, isDoc) { //Export to CSV button Pop-up Generated Here
-         var modalInstance = $modal.open({
+         var modalInstance = $uibModal.open({
             templateUrl: 'partials/mms/tableExport.html',
-            controller: function($scope, $modalInstance, type) {
+            controller: function($scope, $uibModalInstance, type) {
                 $scope.type = type;
                 $scope.export = function() {
-                    $modalInstance.close('export');
+                    $uibModalInstance.close('export');
                 };
                 // $scope.fulldoc = function() {
-                //     $modalInstance.close('fulldoc');
+                //     $uibModalInstance.close('fulldoc');
                 // };
                 $scope.cancel = function() {
-                    $modalInstance.dismiss();
+                    $uibModalInstance.dismiss();
                 };
             },
             resolve: {
@@ -306,19 +245,193 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
             }
         });
     };
-    
 
-    var generateHtml = function(ob, ws, time, isDoc, genCover) {
+    /*
+        ob = document or view object
+        ws = workspace
+        time = timestamp
+        tag = tag object
+        isDoc = if ob is view or doc
+        mode: 1 = browser print, 2 = word, 3 = pdf
+    */
+    var printModal = function(ob, ws, site, time, tag, isDoc, mode) {
         var deferred = $q.defer();
-        var printContents = '';//$window.document.getElementById('print-div').outerHTML;
-        var printElementCopy = angular.element('#print-div').clone();//angular.element(printContents);
+        var modalInstance = $uibModal.open({
+            templateUrl: 'partials/mms/printConfirm.html',
+            controller: function($scope, $uibModalInstance) {
+                $scope.type = isDoc ? 'DOCUMENT' : 'VIEW';
+                $scope.action = 'print';
+                $scope.genpdf = false;
+                $scope.meta = {
+                    'top-left': 'loading...', top: 'loading...', 'top-right': 'loading...',
+                    'bottom-left': 'loading...', bottom: 'loading...', 'bottom-right': 'loading...'
+                };
+                if (isDoc) {
+                    ViewService.getDocMetadata(ob.sysmlid, ws, null, 2)
+                    .then(function(metadata) {
+                        $scope.meta.top = metadata.header ? metadata.header : '';
+                        $scope.meta.bottom = metadata.footer ? metadata.footer : '';
+                        $scope.meta['top-left'] = metadata.dnumber ? metadata.dnumber : '';
+                        $scope.meta['top-right'] = metadata.version ? metadata.version : '';
+                        if (tag && tag.name !== 'latest')
+                            $scope.meta['top-right'] = $scope.meta['top-right'] + ' ' + tag.name;
+                        var displayTime = time;
+                        if (displayTime === 'latest') {
+                            displayTime = new Date();
+                            displayTime = $filter('date')(displayTime, 'M/d/yy h:mm a');
+                        }
+                        $scope.meta['top-right'] = $scope.meta['top-right'] + ' ' + displayTime;
+                        $scope.meta['bottom-left'] = '';
+                        $scope.meta['bottom-right'] = 'counter(page)';
+                    }, function(reason) {
+                        $scope.meta['top-left'] = $scope.meta.top = $scope.meta['top-right'] = $scope.meta['bottom-left'] = $scope.meta.bottom = '';
+                        $scope.meta['bottom-right'] = 'counter(page)';
+                    });
+                }
+                $scope.unsaved = ($rootScope.veEdits && !_.isEmpty($rootScope.veEdits));
+                if (mode === 2)
+                    $scope.action = 'save';
+                if (mode === 3) {
+                    $scope.action = 'generate pdf';
+                    $scope.genpdf = true;
+                }
+                $scope.docOption = (!isDoc && mode === 3);
+                $scope.model = {genCover: false, genTotf: false, landscape: false, htmlTotf: false};
+                $scope.print = function() {
+                    $uibModalInstance.close(['ok', $scope.model.genCover, $scope.model.genTotf, $scope.model.htmlTotf, $scope.model.landscape, $scope.meta]);
+                };
+                $scope.fulldoc = function() {
+                    $uibModalInstance.close(['fulldoc']);
+                };
+                $scope.cancel = function() {
+                    $uibModalInstance.dismiss();
+                };
+            },
+            backdrop: 'static',
+            keyboard: false
+        });
+        modalInstance.result.then(function(choice) {
+            if (choice[0] === 'ok') {
+                printOrGenerate(ob, ws, time, tag, isDoc, choice[1], choice[2], choice[3], mode, choice[4])
+                .then(function(result) {
+                    var css = UtilsService.getPrintCss(result.header, result.footer, result.dnum, result.tag, result.displayTime, choice[4], choice[5]);
+                    var cover = result.cover;
+                    var toc = result.toc;
+                    var tof = result.tof;
+                    var tot = result.tot;
+                    var toe = result.toe;
+                    var contents = result.contents;
+                    if (mode === 1 || mode === 2) {
+                        var inst = '';
+                        if (mode === 2) {
+                            inst = "<div>(Copy and paste into Word)</div>";
+                        }
+                        var popupWin = $window.open('about:blank', '_blank', 'width=800,height=600,scrollbars=1,status=1,toolbar=1,menubar=1');
+                        popupWin.document.open();
+                        popupWin.document.write('<html><head><style>' + css + '</style></head><body style="overflow: auto">' + inst + cover + toc + tot + tof + toe + contents + '</body></html>');
+                        popupWin.document.close();
+                        if (mode === 1) {
+                            $timeout(function() {
+                                popupWin.print();
+                            }, 1000, false);
+                        }
+                    } else {
+                        var doc = {
+                            docId: ob.sysmlid,
+                            header: result.header,
+                            footer: result.footer,
+                            html: result.contents,
+                            cover: result.cover,
+                            time: time,
+                            displayTime: result.displayTime,
+                            toc: result.toc,
+                            tof: result.tof + result.toe,
+                            tot: result.tot,
+                            dnum: result.dnum,
+                            workspace: ws,
+                            customCss: css,
+                            version: result.version,
+                            name: ob.sysmlid + '_' + time + '_' + new Date().getTime(),
+                            disabledCoverPage: isDoc ? false : true
+                        };
+                        if (!choice[2]) {
+                            doc.tof = '<div style="display:none;"></div>';
+                            doc.tot = '<div style="display:none;"></div>';
+                        } else if (choice[3]) { //let server scrape html for now
+                            doc.tof = '';
+                            doc.tot = '';
+                        }
+                        if (time == 'latest')
+                            doc.tagId = time;
+                        else if (tag)
+                            doc.tagId = tag.name;
+                        ConfigService.convertHtmlToPdf(doc, site.sysmlid, ws)
+                        .then(function(reuslt) {
+                            deferred.resolve(result);
+                        }, function(reason){
+                            deferred.reject(reason);
+                        });
+                    }
+                });
+            } else {
+                $rootScope.mms_fullDocMode = true;
+                $rootScope.mms_bbApi.setToggleState('tree-full-document', true);
+                $state.go('workspace.site.document.full', {search: undefined});
+            }
+        }, function() {
+            deferred.reject();
+        });
+        return deferred.promise;
+    };
+
+    /*
+        ob = document or view object
+        ws = workspace id
+        time = timestamp or latest
+        tag = tag object
+        isDoc = ob is view or doc
+        genCover = generate default cover page
+        genTotf = whether to gen table of figures and tables
+        mode: 1 = print, 2 = word, 3 = pdf
+        returns promise that resolves with
+        {
+            cover: cover page html
+            contents: main content html
+            header: header string or ''
+            footer: footer string or ''
+            displayTime: human readable time
+            dnum: document d number
+            version: version string from doc tag
+            toc: toc html
+            tag: tagname or ''
+        }
+    */
+    var printOrGenerate = function(ob, ws, time, tag, isDoc, genCover, genTotf, htmlTotf, mode, landscape) {
+        var deferred = $q.defer();
+        var printContents = '';
+        var printElementCopy = angular.element("#print-div");
+        printElementCopy.find('table').addClass(function() {
+            if ($(this).find('table').length > 0 || $(this).find('img').length > 0) {
+                return 'big-table';
+            }
+            return '';
+        });
+        printElementCopy = printElementCopy.clone();
         var hostname = $location.host();
         var port = $location.port();
         var protocol = $location.protocol();
         var absurl = $location.absUrl();
         var prefix = protocol + '://' + hostname + ((port == 80 || port == 443) ? '' : (':' + port));
         var mmsIndex = absurl.indexOf('mms.html');
-        printElementCopy.find("a").attr('href', function(index, old) {
+        var toc = UtilsService.makeHtmlTOC($rootScope.mms_treeApi.get_rows());
+        var tableAndFigTOC = UtilsService.makeTablesAndFiguresTOC($rootScope.mms_treeApi.get_rows(), printElementCopy, false, htmlTotf);
+        var tof = tableAndFigTOC.figures;
+        var tot = tableAndFigTOC.tables;
+        var toe = tableAndFigTOC.equations;
+        if (!isDoc) {
+            toc = tof = tot = toe = '';
+        }
+        angular.element(printElementCopy).find("a").attr('href', function(index, old) {
             if (!old)
                 return old;
             if (old.indexOf('/') === 0)
@@ -334,13 +447,31 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
         var comments = printElementCopy.find('mms-transclude-com');
         comments.remove();
         printElementCopy.find('div.tableSearch').remove();
-        printElementCopy.find('.error').html('error');
+        printElementCopy.find('.mms-error').html('error');
         printElementCopy.find('.no-print').remove();
         printElementCopy.find('.ng-hide').remove();
-        var templateString = $templateCache.get('partials/mms/docCover.html');
-        var templateElement = angular.element(templateString);
+        if (mode === 2)
+            printElementCopy.find('.mms-svg').remove();
+        else
+            printElementCopy.find('.mms-png').remove();
+        printElementCopy.find('p:empty').remove();
+        printElementCopy.find('p').each(function() {
+            var $this = $(this);
+            if ($this.html().replace(/\s|&nbsp;/g, '').length === 0)
+                $this.remove();
+        });
+        printElementCopy.find('[width]').not('img').removeAttr('width');
+        printElementCopy.find('[style]').each(function() {
+            this.style.removeProperty('font-size');
+            this.style.removeProperty('width');
+        });
+        printElementCopy.find('.math').remove(); //this won't work in chrome for popups since chrome can't display mathml
+        printElementCopy.find('script').remove();
+        //printElementCopy.find('.MJX_Assistive_MathML').remove(); //pdf generation need mathml version
+        var coverTemplateString = $templateCache.get('partials/mms/docCover.html');
+        var coverTemplateElement = angular.element(coverTemplateString);
         var cover = '';
-        if (!genCover) {
+        if (!genCover && isDoc) {
             cover = printElementCopy.find("mms-view[mms-vid='" + ob.sysmlid + "']");
             cover.remove();
             cover = cover[0].outerHTML;
@@ -353,10 +484,18 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
         var displayTime = '';
         var dnum = '';
         var version = '';
+        var tagname = '';
+        if (tag)
+            tagname = tag.name;
+        if (!isDoc) {
+            deferred.resolve({cover: cover, contents: printContents, header: header, footer: footer, displayTime: displayTime, dnum: dnum, version: version, toc: toc, tag: tagname, tof: tof, tot: tot, toe: toe});
+            return deferred.promise;
+        }
         ViewService.getDocMetadata(ob.sysmlid, ws, null, 2)
         .then(function(metadata) {
             //useCover = true;
             newScope.meta = metadata;
+            newScope.tag = tag;
             newScope.time = time === 'latest' ? new Date() : time;
             displayTime = $filter('date')(newScope.time, 'M/d/yy h:mm a');
             newScope.meta.title = ob.name;
@@ -366,107 +505,73 @@ function MmsAppUtils($q, $state, $modal, $timeout, $location, $window, $template
                 dnum = metadata.dnumber;
             if (metadata.version)
                 version = metadata.version;
-            $compile(templateElement.contents())(newScope); 
+            $compile(coverTemplateElement.contents())(newScope); 
         }).finally(function() {
             $timeout(function() {
                 if (genCover) {
-                    cover = templateElement[0].innerHTML;
+                    cover = coverTemplateElement[0].innerHTML;
                 }
-                deferred.resolve({cover: cover, contents: printContents, header: header, footer: footer, time: displayTime, dnum: dnum, version: version});
+                deferred.resolve({cover: cover, contents: printContents, header: header, footer: footer, displayTime: displayTime, dnum: dnum, version: version, toc: toc, tag: tagname, tof: tof, tot: tot, toe: toe});
             }, 0, false);
         });
         return deferred.promise;
     };
 
-    var popupPrint = function(ob, ws, time, isDoc, print, genCover) {
-        var printContents = '';//$window.document.getElementById('print-div').outerHTML;
-        var printElementCopy = angular.element('#print-div').clone();//angular.element(printContents);
-        var hostname = $location.host();
-        var port = $location.port();
-        var protocol = $location.protocol();
-        var absurl = $location.absUrl();
-        var prefix = protocol + '://' + hostname + ((port == 80 || port == 443) ? '' : (':' + port));
-        var mmsIndex = absurl.indexOf('mms.html');
-        printElementCopy.find("a").attr('href', function(index, old) {
-            if (!old)
-                return old;
-            if (old.indexOf('/') === 0)
-                return prefix + old;
-            if (old.indexOf('../../') === 0)
-                return prefix + old.substring(5);
-            if (old.indexOf('../') === 0)
-                return prefix + '/alfresco' + old.substring(2);
-            if (old.indexOf('mms.html') === 0)
-                return absurl.substring(0, mmsIndex) + old;
-            return old;
-        });
-        var comments = printElementCopy.find('mms-transclude-com');
-        comments.remove();
-        printElementCopy.find('div.tableSearch').remove();
-        printElementCopy.find('.error').html('error');
-        printElementCopy.find('.no-print').remove();
-        printElementCopy.find('.ng-hide').remove();
-        //var docView = printElementCopy.find("mms-view[mms-vid='" + ob.sysmlid + "']");
-        //if (isDoc)
-        //    docView.remove();
-        var templateString = $templateCache.get('partials/mms/docCover.html');
-        var templateElement = angular.element(templateString);
-        var tocContents = '';
-        var cover = '';
-        if (!genCover && isDoc) {
-            cover = printElementCopy.find("mms-view[mms-vid='" + ob.sysmlid + "']");
-            cover.remove();
-            cover = cover[0].outerHTML;
+    var handleChildViews = function(v, aggr, ws, time, curItemFunc, childrenFunc, seen) {
+        var seenViews = seen;
+        if (!seenViews)
+            seenViews = {};
+        var deferred = $q.defer();
+        var curItem = curItemFunc(v, aggr);
+        seenViews[v.sysmlid] = v;
+        var childIds = [];
+        var childAggrs = [];
+        if (!v.specialization.childViews || v.specialization.childViews.length === 0 || aggr === 'NONE') {
+            deferred.resolve(curItem);
+            return deferred.promise;
         }
-        var newScope = $rootScope.$new();
-        //var useCover = false;
-        printContents = printElementCopy[0].outerHTML;
-        var openPopup = function() {
-                if (genCover && isDoc)
-                    cover = templateElement[0].innerHTML;
-                newScope.$destroy();
-                var inst = '';
-                if (!print)
-                    inst = "<div>(Copy and paste into Word)</div>";
-                var popupWin = $window.open('', '_blank', 'width=800,height=600,scrollbars=1');
-                popupWin.document.open();
-                popupWin.document.write('<html><head><link href="css/ve-mms.styles.min.css" rel="stylesheet" type="text/css"></head><body style="overflow: auto">' + inst + cover + tocContents + printContents + '</html>');
-                popupWin.document.close();
-                if (print) {
-                    $timeout(function() {
-                        popupWin.print();
-                    }, 1000, false);
-                }
-        };
-        if (isDoc) {
-            tocContents = UtilsService.makeHtmlTOC($rootScope.mms_treeApi.get_rows());
-            /*if ((ob.specialization.contents && ob.specialization.contents.length > 1) || 
-                (ob.specialization.contains && ob.specialization.contains.length > 1) ||
-                (ob.documentation && ob.documentation !== '')) { //use original doc view as cover
-                cover = '<div style="page-break-after:always">' + docView[0].outerHTML + '</div>';
-                $timeout(openPopup, 0, false);
-                return;
-            }*/
-            ViewService.getDocMetadata(ob.sysmlid, ws, null, 2)
-            .then(function(metadata) {
-                //useCover = true;
-                newScope.meta = metadata;
-                newScope.time = time === 'latest' ? new Date() : time;
-                newScope.meta.title = ob.name;
-                $compile(templateElement.contents())(newScope); 
-            }).finally(function() {
-                $timeout(openPopup, 0, false);
+        for (var i = 0; i < v.specialization.childViews.length; i++) {
+            if (seenViews[v.specialization.childViews[i].id])
+                continue;
+            childIds.push(v.specialization.childViews[i].id);
+            childAggrs.push(v.specialization.childViews[i].aggregation);
+        }
+        ElementService.getElements(childIds, false, ws, time, 2)
+        .then(function(childViews) {
+            var mapping = {};
+            for (var i = 0; i < childViews.length; i++) {
+                mapping[childViews[i].sysmlid] = childViews[i];
+            }
+            var childPromises = [];
+            for (i = 0; i < childIds.length; i++) {
+                var child = mapping[childIds[i]];
+                if (child) //what if not found??
+                    childPromises.push(handleChildViews(child, childAggrs[i], ws, time, curItemFunc, childrenFunc, seenViews));
+            }
+            $q.all(childPromises).then(function(childNodes) {
+                childrenFunc(curItem, childNodes);
+                //curNode.children.push.apply(curNode.children, childNodes);
+                deferred.resolve(curItem);
+            }, function(reason) {
+                deferred.reject(reason);
             });
-        } else {
-            $timeout(openPopup, 0, false);
-        }
+
+        }, function(reason) {
+            deferred.reject(reason);
+        });
+        return deferred.promise;
+    };
+
+    var refreshNumbering = function(tree, centerElement) {
+        UtilsService.makeTablesAndFiguresTOC(tree, centerElement, true, false);
     };
 
     return {
         addPresentationElement: addPresentationElement,
-        popupPrintConfirm: popupPrintConfirm,
+        printModal: printModal,
         tableToCsv: tableToCsv,
-        generateHtml: generateHtml
+        handleChildViews: handleChildViews,
+        refreshNumbering: refreshNumbering
     };
 }
     

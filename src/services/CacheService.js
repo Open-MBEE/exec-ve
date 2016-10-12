@@ -89,8 +89,11 @@ function CacheService(_) {
                     return a; //handle contains and contents updates manually at higher level
                 if (id === 'string')
                     return b;
-                if (angular.isArray(a) && angular.isArray(b) && b.length < a.length)
-                    return b; 
+                if (angular.isArray(a) && angular.isArray(b) && b.length < a.length) {
+                    a.length = 0;
+                    Array.prototype.push.apply(a, b);
+                    return a; 
+                }
                 if (id === 'displayedElements' && b)
                     return b;
                 return undefined;
@@ -151,6 +154,10 @@ function CacheService(_) {
     var makeKey = function(keys) {
         return keys.join('|');
     };
+    
+    var getCache = function(){
+        return cache;    
+    };
 
     return {
         get: get,
@@ -158,6 +165,7 @@ function CacheService(_) {
         put: put,
         exists: exists,
         remove: remove,
+        getCache: getCache
     };
 
 }
