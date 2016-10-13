@@ -1,7 +1,7 @@
 (function() {
   'use strict';
   angular.module('mms.directives')
-    .directive('mmsLineGraph', ['TableService', '$window', '$q', mmsLineGraph]);
+    .directive('mmsLineGraph', ['TableService', '$window', '$q', '$log', mmsLineGraph]);
 
   /**
    * @ngdoc directive
@@ -63,7 +63,7 @@
    * @TODO: Add data types support (spline, area-spline, area-line, etc.)
    * @TODO: Find way to avoid using onrendered callback for log scale
    */
-  function mmsLineGraph(TableService, $window, $q) {
+  function mmsLineGraph(TableService, $window, $q, $log) {
 
     var graphCount = 0;
     var DEFAULT = {
@@ -107,13 +107,16 @@
     var figCaption = wrapTag.bind({}, DEFAULT.SVG_CAPTION);
 
     function getUnit(label) {
+      if (label === undefined) {
+        return '';
+      }
       var res = label.match(/\((.+)\)/);
       if (res) {
         /**
          * @TODO: Add superscript support for SVG text (axes labels)
          */
         var unit = res[1].replace(/\d/g, sup2('$&'));
-        console.log(label + " : " + unit);
+        $log.log(label + " : " + unit);
         return ' ' + unit;
       }
       return '';
@@ -141,6 +144,8 @@
 
       // Generate figure element's ID
       scope.figId = 'LineGraph' + graphCount++;
+      // Emit busy event
+      scope.$emit('busy', scope.figId);
 
       // Initiate REST calls
       eids.forEach(function(eid) {
@@ -180,9 +185,7 @@
               tick : {
                 fit: false,
                 format: function (val) {
-                  console.log("Y tick value: ", val);
                   val = Math.round(val * 100) / 100;
-                  console.log("New value: ", val);
                   return val;
                 }
               }
@@ -192,13 +195,21 @@
           tooltip: {
             format: {}
           },
+          legend: {
+            item: {}
+          },
           _onrendered: [],
           _postrender: [],
           _onresized: []
         };
+        $log.log('Rendering tables: ', tables);
         if (tables.length > 1) {
+                        console.log('i\'m right here---render table' );
           _chart.data.xs = {};
         }
+
+
+
         if (typeof scope.tickFit === 'string') {
           _chart.axis.x.tick.fit = scope.tickFit.toLowerCase().indexOf('x') >= 0;
           _chart.axis.y.tick.fit = scope.tickFit.toLowerCase().indexOf('y') >= 0;
@@ -224,6 +235,7 @@
           // Set chart title and universal x column (if only one is provided)
           if (tc === 0) {
             _chart.title = table.title;
+
             if (tables.length === 1 && !scope.xCols) {
               _chart.data.x = xColKey;
             }
@@ -243,35 +255,51 @@
           while (ci >= 0) {
             col = table.columnHeaders[ci];
             ck = col + tc;
+
+
+              $log.log("col = " + col);
+              $log.log("ck = " + ck);
+
             if (col === xCol || yCols.length === 0 || yCols.includes(col)) {
               if (col !== xCol) { // is a Y-column
+                $log.log('Processing ' + col + ' as y...');
                 // assign x column if more than one
                 if (tables.length > 1) {
                   _chart.data.xs[ck] = xColKey;
+                } else {
+                  _chart.data.x = xColKey;
                 }
                 yColHeads.push(col);
                 yColKeys.push(ck);
                 isY = false;
               } else { // is X-column
+                $log.log('Processing ' + col + ' as x...');
                 xColHeads.push(col);
               }
               // Prepend data columns with column key
               table.columns[ci].unshift(ck);
             } else {
+              $log.log('Removing ' + table.columnHeaders[ci] + ' !== ' + xCol);
               // Remove unused column
               table.columnHeaders.splice(ci, 1);
               table.columns.splice(ci, 1);
             }
             ci -= 1;
           }
+          $log.log('xColHeads:', xColHeads);
 
           // Name the y columns in order
           var yci = 0;
           table.columns.forEach(function(column) {
             if (yColKeys.includes(column[0])) {
               if (scope.seriesNames === undefined || scope.seriesNames[sc] === undefined) {
-                // Use column header as series name (don't append index to first one)
-                _chart.data.names[column[0]] = tc === 0 ? yColHeads[yci] : column[0];
+                // If more than one ycol, use column header as series name (don't append index to first table)
+                if (yColHeads.length > 1) {
+                  _chart.data.names[column[0]] = tc === 0 ? yColHeads[yci] : column[0];
+                } else {
+                  // Otherwise, use table titles as series names
+                  _chart.data.names[column[0]] = table.title;
+                }
               } else {
                 // Use user-supplied series name
                 _chart.data.names[column[0]] = scope.seriesNames[sc + _sc];
@@ -291,19 +319,27 @@
         } else {
           xs = [_chart.data.x];
         }
+        $log.log('yColHeads:', yColHeads);
+        $log.log('_chart.data.xs:', _chart.data.xs);
+        $log.log('xs:', xs);
         xComps = _.filter(_chart.data.columns, function(o) {
           return xs.includes(o[0]);
         });
+        $log.log('xComps:', xComps);
         xData = _.flatten(_.map(xComps, function(o) {
           return o.slice(1);
         }));
+        $log.log('xData:', xData);
         yComps = _.reject(_chart.data.columns, function(o) {
           return xs.includes(o[0]);
         });
+        $log.log('yComps:', yComps);
         ys = _.map(yComps, function(o) {return o[0];});
+        $log.log('ys:', ys);
         yData = _.flatten(_.map(yComps, function(o) {
           return o.slice(1);
         }));
+        $log.log('yData:', yData);
 
         // label/position axes
         _chart.axis.x.label.text = scope.xLabel ? scope.xLabel : xColHeads[0];
@@ -339,7 +375,7 @@
           return y + unitY;
         };
 
-        // console.log(_chart);
+        // $log.log(_chart);
         deferred.resolve(_chart);
 
         // Handle step-before or step-after types
@@ -411,7 +447,7 @@
 
     // @TODO: Add support for Y log scale
     function makeLogScale(base, scope, element, _chart, axis) {
-      console.log('Making ' + axis + ' log-base-' + base);
+      $log.log('Making ' + axis + ' log-base-' + base);
       var logFn, powFn, scale;
       var axisData, axisKeys;
 
@@ -426,8 +462,8 @@
       min = (min < DEFAULT.LOGSCALE_MIN ? DEFAULT.LOGSCALE_MIN : min);
       var logMin = logFn(min);
       var logMax = logFn(max);
-      console.log("Min: " + logMin);
-      console.log("Max: " + logMax);
+      $log.log("Min: " + logMin);
+      $log.log("Max: " + logMax);
       var logVal = Math.floor(logMin) - DEFAULT.GRAPH_MARGIN;
       _chart.axis[axis].tick.values = [];
       while (logVal <= Math.ceil(logMax) + DEFAULT.GRAPH_MARGIN) {
@@ -470,6 +506,10 @@
       };
       _chart._onrendered.push(gridDrawFn);
       _chart._postrender.push(tickModFn);
+      _chart.legend.item.onclick = function (id) {
+        scope.chart.toggle(id);
+        tickModded = false;
+      };
       _chart._onresized.push(function () {
         tickModded = false;
       });
@@ -500,7 +540,7 @@
           });
           // Last line
           grids.push(logGridLine(powFn(ticks[ticks.length - 1]), className, gridLabel));
-          // console.log(grids);
+          // $log.log(grids);
         } else {
           console.warn('No ticks found.');
         }
@@ -512,9 +552,9 @@
           endTick = powFn(powEnd);
           diff = endTick - startTick;
           gridInt = diff / num;
-          // console.log("Draw lines from pow("+powStart+")/"+startTick+" to pow("+powEnd+")/"+endTick);
-          // console.log("diff: " + diff);
-          // console.log("tickInt: " + tickInt);
+          // $log.log("Draw lines from pow("+powStart+")/"+startTick+" to pow("+powEnd+")/"+endTick);
+          // $log.log("diff: " + diff);
+          // $log.log("tickInt: " + tickInt);
           for (gridPos = startTick; gridPos < endTick; gridPos += gridInt) {
             grids.push(logGridLine(gridPos, className, gridLabel));
           }
@@ -560,16 +600,18 @@
         }
         // execute postrender callbacks (e.g. gridl lines and tick modifications)
         _chart.onrendered = function() {
+          $log.debug('onrendered()');
           for (var i in _chart._onrendered) {
             _chart._onrendered[i].call(this);
           }
           for (i in _chart._postrender) {
             _chart._postrender[i].call(this);
           }
+          scope.$emit('ready', scope.figId);
         };
         // handle window resize
         _chart.onresize = function() {
-          this.api.resize({
+          scope.chart.resize({
             width: element.offsetWidth - DEFAULT.RESIZE_MARGIN_W,
             height: element.offsetHeight - DEFAULT.RESIZE_MARGIN_H
           });
@@ -577,7 +619,7 @@
             cb();
           });
         };
-        console.log(_chart);
+        $log.log('_chart:', _chart);
         renderGraph(scope, element, _chart);
       });
     }
