@@ -99,9 +99,9 @@ mms-nav {
       color: $white;
     }
 
-    &.dropdown.open > a { 
-      background-color: $secondary_grey;
-    }
+    // &.dropdown.open > a { 
+    //   background-color: $secondary_grey;
+    // }
   }
 
   ul {
@@ -606,7 +606,7 @@ mms-nav {
     padding:0px 0px 0px 1px;
 }
 ul.dropdown-menu {
-    min-height: 200px;
+    // min-height: 200px;
     overflow-y: scroll;
 }
 //.navbar .nav-btn {
