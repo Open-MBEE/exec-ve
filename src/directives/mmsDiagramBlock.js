@@ -60,7 +60,7 @@ function mmsDiagramBlock(go, growl, ElementService) {
 
           if (elem.type === 'Dependency') {
 
-            var edge = { from: elem.sourceId, to: elem.targetId};
+            var edge = { from: elem._sourceIds[0], to: elem._targetIds[0]};
 
             edges.push(edge);
           }

@@ -533,15 +533,15 @@ function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templ
         seenViews[v.sysmlId] = v;
         var childIds = [];
         var childAggrs = [];
-        if (!v.childViews || v.childViews.length === 0 || aggr === 'none') {
+        if (!v._childViews || v._childViews.length === 0 || aggr === 'none') {
             deferred.resolve(curItem);
             return deferred.promise;
         }
-        for (var i = 0; i < v.childViews.length; i++) {
-            if (seenViews[v.childViews[i].id])
+        for (var i = 0; i < v._childViews.length; i++) {
+            if (seenViews[v._childViews[i].id])
                 continue;
-            childIds.push(v.childViews[i].id);
-            childAggrs.push(v.childViews[i].aggregation);
+            childIds.push(v._childViews[i].id);
+            childAggrs.push(v._childViews[i].aggregation);
         }
         ElementService.getElements(childIds, false, ws, time, 2)
         .then(function(childViews) {

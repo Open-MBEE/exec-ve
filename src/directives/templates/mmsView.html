@@ -14,7 +14,7 @@
 
     <i ng-hide="view" class="fa fa-2x fa-spinner fa-spin"></i>
 
-    <div ng-if="!isSection && view._contents == null">
+    <div ng-if="!isSection && !view._contents">
         <div ng-repeat="contain in ::view.contains" ng-switch on="contain.type">  
             <mms-view-para data-mms-para="::contain" ng-switch-when="Paragraph"></mms-view-para>
             <mms-view-table data-mms-table="::contain" ng-switch-when="Table"></mms-view-table>

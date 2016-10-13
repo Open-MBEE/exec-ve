@@ -464,12 +464,12 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 sysmlId: data.sysmlId,
                 _read: data._read,
                 _modified: data._modified,
-                childViews: [],
+                _childViews: [],
                 type: data.type
             };
-            if (data.childViews)
-                clone.childViews = _.cloneDeep(data.childViews);
-            clone.childViews.push({id: viewId, aggregation: aggr});
+            if (data._childViews)
+                clone._childViews = _.cloneDeep(data._childViews);
+            clone._childViews.push({id: viewId, aggregation: aggr});
             updateView(clone, ws)
             .then(function(data2) {
                 if (CacheService.exists(docViewsCacheKey) && viewOb)
@@ -629,17 +629,17 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         var ws = !workspace ? 'master' : workspace;
         ElementService.getElement(parentViewId, false, ws, null, 2)
         .then(function(data) {  
-            if (data.childViews) {
+            if (data._childViews) {
                 var clone = {
                     sysmlId: data.sysmlId,
                     _read: data._read,
                     _modified: data._modified,
-                    childViews: [],
+                    _childViews: [],
                     type: data.type
                 };
-                data.childViews.forEach(function(child) {
+                data._childViews.forEach(function(child) {
                     if (child.id !== viewId)
-                        clone.childViews.push(child);
+                        clone._childViews.push(child);
                 });
                 updateView(clone, ws)
                 .then(function(data2) {
@@ -678,9 +678,10 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         var holdingBinId = ids.holdingBinId;
         var projectId = ids.projectId;
         var siteId = ids.siteId;
+        var rootSiteId = ids.rootSiteId;
         var realType = TYPE_TO_CLASSIFIER_TYPE[type];
-        if (!holdingBinId && siteId)
-            holdingBinId = 'holding_bin_' + siteId;//+ '_no_project';
+        //if (!holdingBinId && siteId)
+         //   holdingBinId = 'holding_bin_' + siteId + '_no_project';
         var jsonType = realType;
         if (type === 'Comment' || type === 'Paragraph')
             jsonType = type;
@@ -715,11 +716,11 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 operand: [],  
                 type: "Expression"
             };
-        if (holdingBinId)
-            instanceSpec.ownerId = holdingBinId;
+        if (siteId !== rootSiteId)
+            instanceSpec.ownerId = siteId;
 
         var toCreate = [instanceSpec];
-        ElementService.createElements(toCreate, workspace, siteId)
+        ElementService.createElements(toCreate, workspace, rootSiteId)
         .then(function(data) {
             data.forEach(function(elem) {
                 if (elem.sysmlId === newInstanceId) {
@@ -779,10 +780,12 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         var holdingBinId = ids.holdingBinId;
         var projectId = ids.projectId;
         var siteId = ids.siteId;
+        var rootSiteId = ids.rootSiteId;
 
         var view = {
             sysmlId: newViewId,
             type: 'Class',
+            ownedAttributeIds: [],
             _allowedElements: [],
             _displayedElements: [newViewId],
             _childViews: [],
@@ -798,7 +801,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             documentation: viewDoc ? viewDoc : '',
             _appliedStereotypeIds: [
                 (isDoc ? "_17_0_2_3_87b0275_1371477871400_792964_43374" : "_17_0_1_232f03dc_1325612611695_581988_21583")
-            ]
+            ],
+            appliedStereotypeInstanceId: newViewId + '_asi'
         };
         var parentView = null;
         if (owner) {
@@ -807,15 +811,17 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 sysmlId: owner.sysmlId,
                 _modified: owner._modified,
                 _read: owner._read,
-                childViews: [],
+                _childViews: [],
             };
                 if (owner.type)
                     parentView.type = owner.type;
-                if (owner.childViews)
-                    parentView.childViews = _.cloneDeep(owner.childViews);
-                parentView.childViews.push({id: newViewId, aggregation: "composite"});
+                if (owner._childViews)
+                    parentView._childViews = _.cloneDeep(owner._childViews);
+                parentView._childViews.push({id: newViewId, aggregation: "composite"});
         }
-
+        else if (siteId !== rootSiteId) {
+            view.ownerId = siteId;
+        }
         var instanceSpecDoc = '<p>&nbsp;</p><p><mms-transclude-doc data-mms-eid="' + newViewId + '">[cf:' + view.name + '.doc]</mms-transclude-doc></p><p>&nbsp;</p>';
         var instanceSpecSpec = {
             'type': 'Paragraph', 
@@ -835,8 +841,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             },
             _appliedStereotypeIds: [],
         };
-        if (holdingBinId)
-            instanceSpec.ownerId = holdingBinId;
+        if (siteId !== rootSiteId)
+            instanceSpec.ownerId = siteId;
         var asi = { //create applied stereotype instance
             sysmlId: newViewId + '_asi',
             ownerId: newViewId,
@@ -845,11 +851,12 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             type: 'InstanceSpecification',
             classifierIds: [(isDoc ? "_17_0_2_3_87b0275_1371477871400_792964_43374" : "_17_0_1_232f03dc_1325612611695_581988_21583")],
             _appliedStereotypeIds: [],
+            stereotypedElementId: newViewId
         };
         var toCreate = [instanceSpec, view, asi];
         if (parentView)
             toCreate.push(parentView);
-        ElementService.createElements(toCreate, workspace, siteId)
+        ElementService.createElements(toCreate, workspace, rootSiteId, true)
         .then(function(data) {
             data.forEach(function(elem) {
                 if (elem.sysmlId === newViewId) {
@@ -883,7 +890,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * paragraph of the view documentation will be used. 
      * 
      * @param {string} [name=Untitled] name for the Document
-     * @param {string} [site] site name
+     * @param {string} [site] site id
      * @param {string} [workspace=master] workspace to use 
      * @returns {Promise} The promise will be resolved with the new view. 
      */
@@ -979,7 +986,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             else if (type === 'Expression') {
                 // If it is a Opaque Section then we want the instanceSpec:
                 if (isSection(instanceSpec)) {
-                    instanceSpec.type = "Section";
+                    //instanceSpec.type = "Section";
                     deferred.resolve(instanceSpec);
                 }
                 // Will we ever have an Expression otherwise?
@@ -1052,7 +1059,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             parseExprRefTree(instanceVal, workspace, version, weight)
             .then(function(presentationElement) {
                 elementObject.presentationElement = presentationElement;
-                if (presentationElement.type === 'Section') {
+                if (isSection(presentationElement)) {
                     getElementReferenceTree(presentationElement.specification, workspace, version)
                     .then(function(sectionElementReferenceTree) {
                         elementObject.sectionElements = sectionElementReferenceTree;

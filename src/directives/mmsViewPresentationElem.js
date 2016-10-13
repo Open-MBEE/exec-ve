@@ -62,9 +62,9 @@ function mmsViewPresentationElem(ViewService, ElementService, $templateCache, $r
                 scope.presentationElem = elem;
                 // This is a kludge to get the template switch statement to work
                 // for Sections:
-                if (ViewService.isSection(elem)) {
-                    scope.presentationElem.type = 'Section';
-                }
+                //if (ViewService.isSection(elem)) {
+                //    scope.presentationElem.type = 'Section';
+                //}
 
                 ElementService.getElement(scope.mmsInstanceVal.instanceId, false, ws, version, 1).
                 then(function(instanceSpec) {

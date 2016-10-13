@@ -105,25 +105,25 @@
         <h3 class="prop"><mms-transclude-name mms-watch-id="true" mms-eid="{{element.typeId}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}" click-handler="propertyTypeClicked()"></mms-transclude-name></h3>
     </div>
 
-    <div ng-if="element.type === 'Generalization' || element.type === 'Expose' || element.type === 'Dependency' || element.type === 'Conform'">
+    <div ng-if="element.type === 'Generalization' || element.type === 'Dependency'">
         <h2 class="prop-title">SOURCE</h2>
-        <h3 class="prop"><mms-transclude-name mms-watch-id="true" mms-eid="{{element.sourceId}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></h3>
+        <h3 class="prop"><mms-transclude-name mms-watch-id="true" mms-eid="{{element._sourceIds[0]}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></h3>
         <h2 class="prop-title">TARGET</h2>
-        <h3 class="prop"><mms-transclude-name mms-watch-id="true" mms-eid="{{element.targetId}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></h3>
+        <h3 class="prop"><mms-transclude-name mms-watch-id="true" mms-eid="{{element._targetIds[0]}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></h3>
     </div>
 
     <div ng-if="element.type === 'Connector'">
         <h2 class="prop-title">PATH 1</h2>
-        <h3 class="prop" ng-repeat="path in element.endAPathIds"><mms-transclude-name mms-watch-id="true" mms-eid="{{path}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></h3>
+        <h3 class="prop" ng-repeat="path in element._propertyPathIds[0]"><mms-transclude-name mms-watch-id="true" mms-eid="{{path}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></h3>
         <h2 class="prop-title">PATH 2</h2>
-        <h3 class="prop" ng-repeat="path in element.endBPathIds"><mms-transclude-name mms-watch-id="true" mms-eid="{{path}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></h3>
+        <h3 class="prop" ng-repeat="path in element._propertyPathIds[1]"><mms-transclude-name mms-watch-id="true" mms-eid="{{path}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></h3>
     </div>
 
     <div ng-if="element.type === 'Association'">
         <h2 class="prop-title">ROLE 1</h2>
-        <h3 class="prop"><mms-transclude-name mms-watch-id="true" mms-eid="{{element.sourceId}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></h3>
+        <h3 class="prop"><mms-transclude-name mms-watch-id="true" mms-eid="{{element.memberEndIds[0]}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></h3>
         <h2 class="prop-title">ROLE 2</h2>
-        <h3 class="prop"><mms-transclude-name mms-watch-id="true" mms-eid="{{element.targetId}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></h3>
+        <h3 class="prop"><mms-transclude-name mms-watch-id="true" mms-eid="{{element.memberEndIds[1]}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></h3>
     </div>
 
     <div ng-if="element.type === 'Constraint'">

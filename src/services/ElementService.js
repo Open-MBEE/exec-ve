@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms')
-.factory('ElementService', ['$q', '$http', 'URLService', 'UtilsService', 'CacheService', 'HttpService', 'ApplicationService','_', ElementService]);
+.factory('ElementService', ['$q', '$http', 'URLService', 'UtilsService', 'CacheService', 'HttpService', 'ApplicationService', 'SiteService', '_', ElementService]);
 
 /**
  * @ngdoc service
@@ -18,7 +18,7 @@ angular.module('mms')
  *
  * For element json example, see [here](https://ems.jpl.nasa.gov/alfresco/mms/raml/index.html)
  */
-function ElementService($q, $http, URLService, UtilsService, CacheService, HttpService, ApplicationService, _) {
+function ElementService($q, $http, URLService, UtilsService, CacheService, HttpService, ApplicationService, SiteService, _) {
     
     var inProgress = {};// leave for now
     /**
@@ -342,6 +342,8 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                 delete ob._displayedElements;
             if (ob._allowedElements)
                 delete ob._allowedElements;
+            if (ob._childViews && !elem._childViews)
+                delete ob._childViews;
             deferred.resolve(ob);
         }, function() {
             deferred.resolve(elem);
@@ -419,8 +421,8 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                 _.merge(edit, updated);
                 UtilsService.cleanElement(edit, true);
             }
-            if (elem._contents)
-                resp._contents = elem._contents;
+            //if (elem._contents)
+            //    resp._contents = elem._contents;
             deferred.resolve(resp);
         };
 
@@ -560,7 +562,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
      * @returns {Promise} The promise will be resolved with the created element references if 
      *      create is successful.
      */
-    var createElement = function(elem, workspace, site) {
+    var createElement = function(elem, workspace, site, extended) {
         var n = normalize(null, null, workspace, null);
 
         var deferred = $q.defer();
@@ -575,9 +577,9 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
             return deferred.promise;
         }*/
 
-        var url = URLService.getPostElementsURL(n.ws);
+        var url = URLService.getPostElementsURL(n.ws, extended);
         if (site)
-            url = URLService.getPostElementsWithSiteURL(n.ws, site);
+            url = URLService.getPostElementsWithSiteURL(n.ws, site, extended);
         $http.post(url, {'elements': [elem], 'source': ApplicationService.getSource()})
         .success(function(data, status, headers, config) {
             var resp = null;
@@ -611,12 +613,12 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
      * @returns {Promise} The promise will be resolved with an array of created element references if 
      *      create is successful.
      */
-    var createElements = function(elems, workspace, site) {
+    var createElements = function(elems, workspace, site, extended) {
         var n = normalize(null, null, workspace, null);
         var deferred = $q.defer();
-        var url = URLService.getPostElementsURL(n.ws);
+        var url = URLService.getPostElementsURL(n.ws, extended);
         if (site)
-            url = URLService.getPostElementsWithSiteURL(n.ws, site);
+            url = URLService.getPostElementsWithSiteURL(n.ws, site, extended);
         $http.post(url, {'elements': elems, 'source': ApplicationService.getSource()})
         .success(function(data, status, headers, config) {
             var results = [];
@@ -866,13 +868,15 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         var projectId = null;
         var projectName = null;
         var siteId = siteid;
-
+        var rootSiteId = null;
+        var deferred = $q.defer();
         if (elem && elem._qualifiedId && elem._qualifiedName) {
             var splitArray = elem._qualifiedId.split('/');
             var projectNameArray = elem._qualifiedName.split('/');
             if (splitArray && splitArray.length > 2) {
                 projectId = splitArray[2];
                 siteId = splitArray[1];
+                rootSiteId = siteId;
             }
             if (elem._siteCharacterizationId)
                 siteId = elem._siteCharacterizationId;
@@ -880,21 +884,37 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                 holdingBinId = 'holding_bin_' + projectId;
                 projectName = projectNameArray[2];
             }
-        } 
-        return {holdingBinId: holdingBinId, projectId: projectId, siteId: siteId, projectName: projectName};
+            deferred.resolve({holdingBinId: holdingBinId, projectId: projectId, siteId: siteId, rootSiteId: rootSiteId, projectName: projectName});
+        } else if (siteid) {
+            SiteService.getRootSiteForSite(siteid)
+            .then(function(data) {
+                rootSiteId = data;
+            }).finally(function() {
+                deferred.resolve({holdingBinId: holdingBinId, projectId: projectId, siteId: siteId, rootSiteId: rootSiteId, projectName: projectName});
+            });
+        } else {
+            deferred.resolve({holdingBinId: holdingBinId, projectId: projectId, siteId: siteId, rootSiteId: rootSiteId, projectName: projectName});
+        }
+        return deferred.promise;
     };
 
     var getIdInfo = function(elem, siteid, workspace, version, weight) { //elem is element object with qualified id with project in it
         var deferred = $q.defer();
 
         if (!elem || (elem && elem._qualifiedId && elem._qualifiedName)) {
-            deferred.resolve(getIdInfoReal(elem, siteid));
+            return getIdInfoReal(elem, siteid);
         } else {
             getElement(elem.sysmlId, false, workspace, version, weight, true)
             .then(function(data) {
-                deferred.resolve(getIdInfoReal(data, siteid));
+                getIdInfoReal(data, siteid)
+                .then(function(data) {
+                    deferred.resolve(data);
+                });
             }, function() {
-                deferred.resolve(getIdInfoReal(elem, siteid));
+                getIdInfoReal(elem, siteid)
+                .then(function(data) {
+                    deferred.resolve(data);
+                });
             });
         }
         //if (!holdingBinId && siteId) {

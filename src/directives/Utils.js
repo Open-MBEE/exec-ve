@@ -171,7 +171,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Wo
             if ((scope.edit.type === 'Property' || scope.edit.type === 'Port') && 
                     !angular.equals(scope.edit.defaultValue, scope.element.defaultValue))
                 return true;
-            if (scope.eidt.type === 'Slot' && !angular.equals(scope.edit.value, scope.element.value))
+            if (scope.edit.type === 'Slot' && !angular.equals(scope.edit.value, scope.element.value))
                 return true; 
             if (scope.edit.type === 'Constraint' && 
                     !angular.equals(scope.edit.specification, scope.element.specification))
@@ -524,7 +524,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Wo
                 if (section && section.specification && !angular.equals(section.specification, status.server.specification)) {
                     growl.error('The view section contents is outdated, refresh the page first!');
                     return;
-                } else if (!section && scope.view.contents && !angular.equals(scope.view.contents, status.server.contents)) {
+                } else if (!section && scope.view._contents && !angular.equals(scope.view._contents, status.server._contents)) {
                     growl.error('The view contents is outdated, refresh the page first!');
                     return;
                 }

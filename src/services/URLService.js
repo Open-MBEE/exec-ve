@@ -373,8 +373,8 @@ function urlService(baseUrl) {
      * @param {string} workspace Workspace name
      * @returns {string} The post elements url.
      */
-    var getPostElementsURL = function(workspace) {
-        return addTicket(root + '/workspaces/' + workspace + '/elements');
+    var getPostElementsURL = function(workspace, extended) {
+        return addExtended(addTicket(root + '/workspaces/' + workspace + '/elements'), extended);
     };
 
     /**
@@ -394,13 +394,13 @@ function urlService(baseUrl) {
         return addExtended(addTicket(addVersion(r, version)), extended);
     };
 
-    var getPostElementsWithSiteURL = function(workspace, site) {
+    var getPostElementsWithSiteURL = function(workspace, site, extended) {
         if (root && workspace && site) {
             // TODO maybe move this check elsewhere to keep this method simple
             if (site === 'no-site') {
                 site = 'no_site';
             }
-            return addTicket(root + '/workspaces/' + workspace + '/sites/' + site + '/elements');
+            return addExtended(addTicket(root + '/workspaces/' + workspace + '/sites/' + site + '/elements'), extended);
         }
     };
 
