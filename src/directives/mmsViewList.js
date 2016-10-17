@@ -13,7 +13,7 @@ function mmsViewList($compile, $templateCache, UtilsService) {
         restrict: 'E',
         //template: template,
         scope: {
-            list: '=mmsList'
+            list: '<mmsList'
         },
         controller: ['$scope', '$rootScope', mmsViewListCtrl],
         link: function(scope, element, attrs) {

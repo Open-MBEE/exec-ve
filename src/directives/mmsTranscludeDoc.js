@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsTranscludeDoc', ['Utils','ElementService', 'UtilsService', 'ViewService', 'UxService', '$compile', '$log', '$templateCache', '$rootScope', '$modal', 'growl', '_', mmsTranscludeDoc]);
+.directive('mmsTranscludeDoc', ['Utils','ElementService', 'UtilsService', 'ViewService', 'UxService', '$compile', '$log', '$templateCache', '$rootScope', '$uibModal', 'growl', '_', 'MathJax', mmsTranscludeDoc]);
 
 /**
  * @ngdoc directive
@@ -27,7 +27,7 @@ angular.module('mms.directives')
  * @param {string=master} mmsWs Workspace to use, defaults to master
  * @param {string=latest} mmsVersion Version can be alfresco version number or timestamp, default is latest
  */
-function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxService, $compile, $log, $templateCache, $rootScope, $modal, growl, _) {
+function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxService, $compile, $log, $templateCache, $rootScope, $uibModal, growl, _, MathJax) {
 
     var template = $templateCache.get('mms/templates/mmsTranscludeDoc.html');
 
@@ -72,11 +72,14 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
         scope.cfType = 'doc';
 
         element.click(function(e) {
-            if (scope.addFrame)
+            if (scope.addFrame && !scope.nonEditable)
                 scope.addFrame();
 
             if (mmsViewCtrl)
                 mmsViewCtrl.transcludeClicked(scope.mmsEid, scope.ws, scope.version);
+            if (scope.nonEditable) {
+                growl.warning("Cross Reference is not editable.");
+            }
 
             /*if (e.target.tagName !== 'A' && e.target.tagName !== 'INPUT' && !scope.isEditing)
                 return false;
@@ -108,7 +111,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             });
             element.append(dom);*/
             element[0].innerHTML = doc;
-            
+            MathJax.Hub.Queue(["Typeset", MathJax.Hub, element[0]]);
             scope.recompileScope = scope.$new();
             $compile(element.contents())(scope.recompileScope); 
             if (mmsViewCtrl) {
@@ -165,6 +168,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                     version = viewVersion.version;
             }
             element.html('(loading...)');
+            element.addClass("isLoading");
             scope.ws = ws;
             scope.version = version ? version : 'latest';
             ElementService.getElement(scope.mmsEid, false, ws, version, 1)
@@ -237,6 +241,8 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                     status = ' deleted';
                 element.html('<span class="mms-error">doc cf ' + newVal + status + '</span>');
                 //growl.error('Cf Doc Error: ' + reason.message + ': ' + scope.mmsEid);
+            }).finally(function() {
+                element.removeClass("isLoading");
             });
         });
 
@@ -301,9 +307,11 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                     scope.panelType = scope.panelType.substring(0, scope.panelType.length-1);
                 if (scope.panelType === 'Paragraph')
                     scope.panelType = 'Text';
+                if (scope.panelType === 'Figure')
+                    scope.panelType = 'Image';
             }
             if (scope.presentationElem) {
-                scope.tinymceType = scope.presentationElem.type;
+                scope.editorType = scope.presentationElem.type;
             }
         }
     };
@@ -313,7 +321,8 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
         scope: {
             mmsEid: '@',
             mmsWs: '@',
-            mmsVersion: '@'
+            mmsVersion: '@',
+            nonEditable: '<'
         },
         require: ['?^^mmsView','?^^mmsViewPresentationElem', '?^^mmsTranscludeDoc', '?^^mmsTranscludeVal'],
         controller: ['$scope', mmsTranscludeDocCtrl],

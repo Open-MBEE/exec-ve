@@ -156,7 +156,7 @@ function mmsSiteDocFilter(ElementService, ViewService, growl, $templateCache, $q
             mmsSite: '@',
             mmsWs: '@',
             mmsVersion: '@',
-            mmsApi: '='
+            mmsApi: '<?'
         },
         link: mmsSiteDocFilterLink
     };

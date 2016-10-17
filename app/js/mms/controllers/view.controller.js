@@ -3,14 +3,16 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('ViewCtrl', ['$scope', '$rootScope', '$state', '$stateParams', '$timeout', '$modal', '$window', 'viewElements', 'MmsAppUtils', 'ElementService', 'ViewService', 'ConfigService', 'time', 'search', 'growl', 'workspace', 'site', 'document', 'view', 'tag', 'snapshot', 'UxService', 'hotkeys',
-function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, viewElements, MmsAppUtils, ElementService, ViewService, ConfigService, time, search, growl, workspace, site, document, view, tag, snapshot, UxService, hotkeys) {
+.controller('ViewCtrl', ['$scope', '$rootScope', '$state', '$stateParams', '$timeout', '$uibModal', '$window', 'viewElements', 'MmsAppUtils', 'ElementService', 'ViewService', 'ConfigService', 'time', 'search', 'growl', 'workspace', 'site', 'document', 'view', 'tag', 'snapshot', 'UxService', 'hotkeys', '$element',
+function($scope, $rootScope, $state, $stateParams, $timeout, $uibModal, $window, viewElements, MmsAppUtils, ElementService, ViewService, ConfigService, time, search, growl, workspace, site, document, view, tag, snapshot, UxService, hotkeys, $element) {
     
-    /*$scope.$on('$viewContentLoaded', 
-        function(event) {
-            $rootScope.mms_viewContentLoading = false; 
+    function searchLoading() {
+        if ($element.find('.isLoading').length > 0) {
+            growl.warning("Still loading!");
+            return true;
         }
-    );*/
+        return false;
+    }
 
     if ($state.includes('workspace') && !$state.includes('workspace.sites')) {
         $rootScope.mms_showSiteDocLink = true;
@@ -115,6 +117,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
       
         if ($state.includes('workspace.site.document') || $state.includes('workspace.site.documentpreview')) {
             if ($state.includes('workspace.site.document')) {
+                $scope.bbApi.addButton(UxService.getButtonBarButton('refresh-numbering'));
                 $scope.bbApi.addButton(UxService.getButtonBarButton('center-previous'));
                 $scope.bbApi.addButton(UxService.getButtonBarButton('center-next'));
                 hotkeys.bindTo($scope)
@@ -141,6 +144,8 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
 
 
     $scope.$on('convert-pdf', function() {
+        if (searchLoading())
+            return;
         MmsAppUtils.printModal(view, $scope.ws, site, time, tag, false, 3);
     });
 
@@ -165,13 +170,13 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     });
 
     $scope.$on('view-add-image', function() {
-        MmsAppUtils.addPresentationElement($scope, 'Figure', view);
+        MmsAppUtils.addPresentationElement($scope, 'Image', view);
     });
-/*
+
     $scope.$on('view-add-equation', function() {
-        addElement('Equation');
+        MmsAppUtils.addPresentationElement($scope, 'Equation', view);
     });
-*/
+
     $scope.$on('section-add-paragraph', function(event, section) {
         MmsAppUtils.addPresentationElement($scope, 'Paragraph', section);
     });
@@ -183,11 +188,11 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     $scope.$on('section-add-table', function(event, section) {
         MmsAppUtils.addPresentationElement($scope, 'Table', section);
     });
-/*
+
     $scope.$on('section-add-equation', function(event, section) {
-        addElement('Equation', section);
+        MmsAppUtils.addPresentationElement($scope, 'Equation', section);
     });
-*/
+
     $scope.$on('section-add-section', function(event, section) {
         MmsAppUtils.addPresentationElement($scope, 'Section', section);
     });
@@ -197,7 +202,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     });
 
     $scope.$on('section-add-image', function(event, section) {
-        MmsAppUtils.addPresentationElement($scope, 'Figure', section);
+        MmsAppUtils.addPresentationElement($scope, 'Image', section);
     });
 
     $scope.$on('show-comments', function() {
@@ -229,20 +234,30 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
         var prev = $rootScope.mms_treeApi.get_prev_branch($rootScope.mms_treeApi.get_selected_branch());
         if (!prev)
             return;
+        while (prev.type !== 'view' && prev.type !== 'section') {
+            prev = $rootScope.mms_treeApi.get_prev_branch(prev);
+            if (!prev)
+                return;
+        }
         $scope.bbApi.toggleButtonSpinner('center-previous');
         $rootScope.mms_treeApi.select_branch(prev);
-        if (prev.type === 'section')
-            $scope.bbApi.toggleButtonSpinner('center-previous');
+        //if (prev.type === 'section')
+        $scope.bbApi.toggleButtonSpinner('center-previous');
     });
 
     $scope.$on('center-next', function() {
         var next = $rootScope.mms_treeApi.get_next_branch($rootScope.mms_treeApi.get_selected_branch());
         if (!next)
             return;
+        while (next.type !== 'view' && next.type !== 'section') {
+            next = $rootScope.mms_treeApi.get_next_branch(next);
+            if (!next)
+                return;
+        }
         $scope.bbApi.toggleButtonSpinner('center-next');
         $rootScope.mms_treeApi.select_branch(next);
-        if (next.type === 'section')
-            $scope.bbApi.toggleButtonSpinner('center-next');
+        //if (next.type === 'section')
+        $scope.bbApi.toggleButtonSpinner('center-next');
     });
 
     if (view) {
@@ -284,7 +299,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     };
     $scope.searchOptions= {};
     $scope.searchOptions.callback = function(elem) {
-        $scope.tscClicked(elem.sysmlid);
+        $scope.tscClicked(elem.sysmlid, ws, time);
         if ($rootScope.mms_togglePane && $rootScope.mms_togglePane.closed)
             $rootScope.mms_togglePane.toggle();
     };
@@ -322,13 +337,21 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $modal, $window, vi
     if ($state.includes('workspace.site.document'))
         docOption = true;
     $scope.$on('print', function() {
+        if (searchLoading())
+            return;
         MmsAppUtils.printModal(view, $scope.ws, site, time, tag, false, 1);
     });
     $scope.$on('word', function() {
+        if (searchLoading())
+            return;
         MmsAppUtils.printModal(view, $scope.ws, site, time, tag, false, 2);
     });
     $scope.$on('tabletocsv', function() {
         MmsAppUtils.tableToCsv(view, $scope.ws, time, false);
+    });
+    $scope.$on('refresh-numbering', function() {
+        var printElementCopy = angular.element("#print-div");
+        MmsAppUtils.refreshNumbering($rootScope.mms_treeApi.get_rows(),printElementCopy);
     });
     
 }]);

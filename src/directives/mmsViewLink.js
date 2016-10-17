@@ -55,7 +55,7 @@ function mmsViewLink(ElementService, $compile, growl) {
                 version = 'latest';
             scope.ws = ws;
 
-            ElementService.getElement(scope.mmsVid, false, ws, version)
+            ElementService.getElement(scope.mmsVid, false, ws, version, 1, true)
             .then(function(data) {
                 scope.element = data;
                 var site = findSite(data);

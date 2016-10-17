@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsTranscludeVal', ['ElementService', 'UtilsService', 'UxService', 'Utils', 'URLService', '$http', '_', '$log', '$compile', '$templateCache', 'growl', mmsTranscludeVal]);
+.directive('mmsTranscludeVal', ['ElementService', 'UtilsService', 'UxService', 'Utils', 'URLService', '$http', '_', '$log', '$compile', '$templateCache', 'growl', 'MathJax', mmsTranscludeVal]);
 
 /**
  * @ngdoc directive
@@ -23,7 +23,7 @@ angular.module('mms.directives')
  * @param {string=master} mmsWs Workspace to use, defaults to master
  * @param {string=latest} mmsVersion Version can be alfresco version number or timestamp, default is latest
  */
-function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLService, $http, _, $log, $compile, $templateCache, growl) {
+function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLService, $http, _, $log, $compile, $templateCache, growl, MathJax) {
     var valTemplate = $templateCache.get('mms/templates/mmsTranscludeVal.html');
     var frameTemplate = $templateCache.get('mms/templates/mmsTranscludeValFrame.html');
     var editTemplate = $templateCache.get('mms/templates/mmsTranscludeValEdit.html');
@@ -65,11 +65,14 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
         var processed = false;
         scope.cfType = 'val';
         element.click(function(e) {
-            if (scope.addFrame)
+            if (scope.addFrame && !scope.nonEditable)
                 scope.addFrame();
 
             if (mmsViewCtrl)
                 mmsViewCtrl.transcludeClicked(scope.mmsEid, scope.ws, scope.version);
+            if (scope.nonEditable) {
+                growl.warning("Cross Reference is not editable.");
+            }
 
             /*if (e.target.tagName !== 'A' && e.target.tagName !== 'INPUT' && !scope.isEditing) //need review for inline editing (boolean and nested)
                 return false;
@@ -77,7 +80,9 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                 e.stopPropagation();
         
         });
-
+        scope.addHtml = function(value) {
+            value.string = "<p>" + value.string + "</p>";
+        };
         var recompile = function() {
             if (scope.recompileScope)
                 scope.recompileScope.$destroy();
@@ -112,6 +117,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                     return;
                 }
                 element[0].innerHTML = toCompile;
+                MathJax.Hub.Queue(["Typeset", MathJax.Hub, element[0]]);
                 $compile(element.contents())(scope.recompileScope); 
             } else if (UtilsService.isRestrictedValue(scope.values)) {
                 ElementService.getElement(scope.values[0].operand[1].element, false, scope.ws, scope.version, 2)
@@ -120,7 +126,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                     element[0].innerHTML = "<span>" + e.name + "</span>";
                 });
             } else if (isExpression) {
-                $http.get(URLService.getElementURL(scope.mmsEid, scope.ws, scope.version) + '?evaluate')
+                $http.get(URLService.getElementURL(scope.mmsEid, scope.ws, scope.version) + '&evaluate')
                 .success(function(data,status,headers,config) {
                     element[0].innerHTML = data.elements[0].evaluationResult;
                 }).error(function(data,status,headers,config){
@@ -188,6 +194,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                 return;
             }
             element.html('(loading...)');
+            element.addClass("isLoading");
             var ws = scope.mmsWs;
             var version = scope.mmsVersion;
             if (mmsCfValCtrl) {
@@ -248,6 +255,8 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                     status = ' deleted';
                 element.html('<span class="mms-error">value cf ' + newVal + status + '</span>');
                 //growl.error('Cf Val Error: ' + reason.message + ': ' + scope.mmsEid);
+            }).finally(function() {
+                element.removeClass("isLoading");
             });
         });
 
@@ -361,7 +370,8 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
         scope: {
             mmsEid: '@',
             mmsWs: '@',
-            mmsVersion: '@'
+            mmsVersion: '@',
+            nonEditable: '<'
         },
         require: ['?^^mmsView','?^^mmsViewPresentationElem', '?^^mmsTranscludeDoc', '?^^mmsTranscludeVal'],
         controller: ['$scope', mmsTranscludeCtrl],

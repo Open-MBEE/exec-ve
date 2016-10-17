@@ -15,11 +15,11 @@ function StompService($rootScope, UtilsService, $window, $location, ApplicationS
      var stompClient = {};
      var host = $location.host();
      var hostName = 'wss://'+$location.host().split(".")[0]+'-origin.jpl.nasa.gov:61614';
-     if (host == '127.0.0.1') {
-        hostName = 'wss://127.0.0.1:61614';
-     } else if (host == 'localhost') {
-         hostName = 'wss://localhost:61614';
-     }
+    //  if (host == '127.0.0.1') {
+    //     hostName = 'wss://127.0.0.1:61614';
+    //  } else if (host == 'localhost') {
+    //      hostName = 'wss://localhost:61614';
+    //  }
 
     var stompSuccessCallback = function(message){
         var updateWebpage = angular.fromJson(message.body);
@@ -74,6 +74,7 @@ function StompService($rootScope, UtilsService, $window, $location, ApplicationS
     };
     var stompConnect = function(){
         stompClient = Stomp.client(hostName);
+        stompClient.debug = null;
         stompClient.connect("guest", "guest", function(){ // on success
             stompClient.subscribe("/topic/master", stompSuccessCallback );
         }, stompFailureCallback, '/');

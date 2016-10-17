@@ -1,0 +1,154 @@
+{
+  "elements": [
+    {
+      "nodeRefId": "workspace://SpacesStore/6666-bbbbb-aaaaa-22222",
+      "qualifiedId": "/someElement",
+      "siteCharacterizationId": "site_super_duper_awesome_site",
+      "versionedRefId": "versionStore://version2Store/1234567890-dsahfjkdl-dhjsakl-2dfjuf2",
+      "qualifiedName": "/Tank Volume Margins",
+      "sysmlid": "someElement",
+      "editable": true,
+      "creator": "catAdmin",
+      "modified": "2015-12-14T15:28:09.698-0800",
+      "modifier": "sillyAdmin",
+      "created": "Thu Dec 18 10:05:58 PST 2014",
+      "name": "Volume Margins",
+      "owner": "notThisGuy",
+      "documentation": "",
+      "read": "2016-09-08T12:24:29.899-0700",
+      "specialization": {
+        "childViews": [],
+        "displayedElements": [
+          "_17_0_5_1_897027c_1416368105695_450895_88232"
+        ],
+        "allowedElements": [
+          "_17_0_5_1_897027c_1416368105695_450895_88232"
+        ],
+        "contains": [
+          {
+            "sourceType": "reference",
+            "source": "SomeSourceElement",
+            "sourceProperty": "documentation",
+            "type": "Paragraph"
+          },
+          {
+            "sourceType": "text",
+            "text": "<p>Volume Margin<\/p>",
+            "type": "Paragraph"
+          },
+          {
+            "body": [
+              [
+                {
+                  "content": [
+                    {
+                      "sourceType": "text",
+                      "text": "<p>Fuel Prices <\/p>",
+                      "type": "Paragraph"
+                    }
+                  ],
+                  "colspan": "1",
+                  "rowspan": "1"
+                },
+                {
+                  "content": [
+                    {
+                      "sourceType": "text",
+                      "text": "<p>3.99<\/p>",
+                      "type": "Paragraph"
+                    }
+                  ],
+                  "colspan": "1",
+                  "rowspan": "1"
+                }
+              ],
+              [
+                {
+                  "content": [
+                    {
+                      "sourceType": "text",
+                      "text": "<p>Tank Mass<\/p>",
+                      "type": "Paragraph"
+                    }
+                  ],
+                  "colspan": "1",
+                  "rowspan": "1"
+                },
+                {
+                  "content": [
+                    {
+                      "sourceType": "text",
+                      "text": "<p>-22.00<\/p>",
+                      "type": "Paragraph"
+                    }
+                  ],
+                  "colspan": "1",
+                  "rowspan": "1"
+                }
+              ],
+              [
+                {
+                  "content": [
+                    {
+                      "sourceType": "text",
+                      "text": "<p>Pressurant<\/p>",
+                      "type": "Paragraph"
+                    }
+                  ],
+                  "colspan": "1",
+                  "rowspan": "1"
+                },
+                {
+                  "content": [
+                    {
+                      "sourceType": "text",
+                      "text": "<p>6.534<\/p>",
+                      "type": "Paragraph"
+                    }
+                  ],
+                  "colspan": "1",
+                  "rowspan": "1"
+                }
+              ]
+            ],
+            "title": "Margins",
+            "style": "normal",
+            "type": "Table",
+            "header": [
+              [
+                {
+                  "content": [
+                    {
+                      "sourceType": "text",
+                      "text": "<p><\/p>",
+                      "type": "Paragraph"
+                    }
+                  ],
+                  "colspan": "1",
+                  "rowspan": "1"
+                },
+                {
+                  "content": [
+                    {
+                      "sourceType": "text",
+                      "text": "<p>Margin [%]<\/p>",
+                      "type": "Paragraph"
+                    }
+                  ],
+                  "colspan": "1",
+                  "rowspan": "1"
+                }
+              ]
+            ]
+          },
+          {
+            "sourceType": "text",
+            "text": "<p>Volume Margin<\/p>",
+            "type": "Paragraph"
+          }
+        ],
+        "type": "View"
+      }
+    }
+  ]
+}

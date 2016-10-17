@@ -1,13 +1,13 @@
 'use strict';
 
 angular.module('mms.directives')
-.factory('Utils', ['$q','$modal','$timeout', '$templateCache','$rootScope','$compile','WorkspaceService','ConfigService','ElementService','ViewService', 'UtilsService', 'growl','_', Utils]);
+.factory('Utils', ['$q','$uibModal','$timeout', '$templateCache','$rootScope','$compile','WorkspaceService','ConfigService','ElementService','ViewService', 'UtilsService', 'growl','_', Utils]);
 
 /**
  * @ngdoc service
  * @name mms.directives.Utils
  * @requires $q
- * @requires $modal
+ * @requires $uibModal
  * @requires $templateCache
  * @requires mms.WorkspaceService
  * @requires mms.ConfigService
@@ -19,23 +19,23 @@ angular.module('mms.directives')
  * WARNING These are intended to be internal utility functions and not designed to be used as api
  *
  */
-function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, WorkspaceService, ConfigService, ElementService, ViewService, UtilsService, growl, _) {
+function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, WorkspaceService, ConfigService, ElementService, ViewService, UtilsService, growl, _) {
   
     var ENUM_ID = '_9_0_62a020a_1105704885400_895774_7947';
     var ENUM_LITERAL = '_9_0_62a020a_1105704885423_380971_7955';
   
-    var conflictCtrl = function($scope, $modalInstance) {
+    var conflictCtrl = function($scope, $uibModalInstance) {
         $scope.ok = function() {
-            $modalInstance.close('ok');
+            $uibModalInstance.close('ok');
         };
         $scope.cancel = function() {
-            $modalInstance.close('cancel');
+            $uibModalInstance.close('cancel');
         };
         $scope.force = function() {
-            $modalInstance.close('force');
+            $uibModalInstance.close('force');
         };
         $scope.merge = function() {
-            $modalInstance.close('merge');
+            $uibModalInstance.close('merge');
         };
     };
 
@@ -51,7 +51,7 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
      * @param {string} mmsWs workspace
      * @param {string} mmsType workspace/tag/element
      * @param {string} mmsEid id of element
-     * @param {object} [tinymceApi=null] optional tinymce api
+     * @param {object} [editorApi=null] optional editor api
      * @param {object} scope angular scope that has common functions
      * @param {string} type name/documentation/value/all
      * @return {Promise} promise would be resolved with updated element if save is successful.
@@ -60,7 +60,7 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
      *      or force save. If the user decides to discord or merge, type will be info even though 
      *      the original save failed. Error means an actual error occured. 
      */
-    var save = function(edit, mmsWs, mmsType, mmsEid, tinymceApi, scope, type, continueEdit) {
+    var save = function(edit, mmsWs, mmsType, mmsEid, editorApi, scope, type, continueEdit) {
         var deferred = $q.defer();
         // TODO: put this back when removed scope.editing from view documentation edit
         /* if (!scope.editable || !scope.editing) {
@@ -68,8 +68,8 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
             return deferred.promise;
         } */
 
-        if (tinymceApi && tinymceApi.save)
-            tinymceApi.save();
+        if (editorApi && editorApi.save)
+            editorApi.save();
         if (mmsType === 'workspace') {
             WorkspaceService.update(edit)
             .then(function(data) {
@@ -94,9 +94,9 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
             }, function(reason) {
                 if (reason.status === 409) {
                     scope.latest = reason.data.elements[0];
-                    var instance = $modal.open({
+                    var instance = $uibModal.open({
                         template: $templateCache.get('mms/templates/saveConflict.html'),
-                        controller: ['$scope', '$modalInstance', conflictCtrl],
+                        controller: ['$scope', '$uibModalInstance', conflictCtrl],
                         scope: scope,
                         size: 'lg'
                     });
@@ -123,7 +123,7 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
                         } else if (choice === 'force') {
                             edit.read = scope.latest.read;
                             edit.modified = scope.latest.modified;
-                            save(edit, mmsWs, mmsType, mmsEid, tinymceApi, scope, type).then(function(resolved) {
+                            save(edit, mmsWs, mmsType, mmsEid, editorApi, scope, type).then(function(resolved) {
                                 deferred.resolve(resolved);
                             }, function(error) {
                                 deferred.reject(error);
@@ -190,7 +190,9 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
      * @param {string} type name/documentation/value
      * @param {boolean} revertAll revert all properties
      */
-    var revertEdits = function(scope, type, revertAll) {
+    var revertEdits = function(scope, type, revertAll, editorApi) {
+        if (editorApi && editorApi.destroy)
+            editorApi.destroy();
         if (scope.mmsType === 'workspace') {
             scope.edit.name = scope.element.name;
         } 
@@ -408,6 +410,8 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
                      };
         if (type === 'name' || type === 'documentation') {
             myEdit[type] = scope.edit[type];
+            if (scope.edit.name !== scope.element.name) //if editing presentation element name
+                myEdit.name = scope.edit.name;
         } else if (type === 'value') {
             if (scope.edit.specialization.type === 'Property' && angular.isArray(scope.edit.specialization.value)) {
                 myEdit.specialization = {
@@ -466,15 +470,15 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
 
         // Only need to confirm the cancellation if edits have been made:
         if (hasEdits(scope, type)) {
-            var instance = $modal.open({
+            var instance = $uibModal.open({
                 templateUrl: 'partials/mms/cancelConfirm.html',
                 scope: scope,
-                controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
+                controller: ['$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
                     $scope.ok = function() {
-                        $modalInstance.close('ok');
+                        $uibModalInstance.close('ok');
                     };
                     $scope.cancel = function() {
-                        $modalInstance.dismiss();
+                        $uibModalInstance.dismiss();
                     };
                 }]
             });
@@ -516,15 +520,15 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
 
         scope.name = scope.edit.name;
 
-        var instance = $modal.open({
+        var instance = $uibModal.open({
             templateUrl: 'partials/mms/delete.html',
             scope: scope,
-            controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
+            controller: ['$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
                 $scope.ok = function() {
-                    $modalInstance.close('ok');
+                    $uibModalInstance.close('ok');
                 };
                 $scope.cancel = function() {
-                    $modalInstance.dismiss();
+                    $uibModalInstance.dismiss();
                 };
             }]
         });
@@ -532,9 +536,9 @@ function Utils($q, $modal, $timeout, $templateCache, $rootScope, $compile, Works
 
             var viewOrSecId = section ? section.sysmlid : scope.view.sysmlid;
             ViewService.deleteElementFromViewOrSection(viewOrSecId, scope.ws, scope.instanceVal).then(function(data) {
-                if (ViewService.isSection(scope.presentationElem)) {
+                if (ViewService.isSection(scope.instanceSpec) || ViewService.isTable(scope.instanceSpec) || ViewService.isFigure(scope.instanceSpec) || ViewService.isEquation(scope.instanceSpec)) {
                     // Broadcast message to TreeCtrl:
-                    $rootScope.$broadcast('viewctrl.delete.section', scope.presentationElem);
+                    $rootScope.$broadcast('viewctrl.delete.element', scope.instanceSpec);
                 }
 
                 $rootScope.$broadcast('view-reorder.refresh');

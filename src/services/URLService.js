@@ -50,9 +50,13 @@ function urlService(baseUrl) {
      * @returns {boolean} Returns true if the string has '-' in it
      */
     var isTimestamp = function(version) {
-        if (String(version).indexOf('-') >= 0)
+        if(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}[+]?-\d{4}$/.test(version.trim()))
             return true;
         return false;
+        
+        // if (String(version).indexOf('-') >= 0)
+        //     return true;
+        // return false;
     };
 
     /**
@@ -224,11 +228,11 @@ function urlService(baseUrl) {
      * @param {string} version timestamp
      * @returns {string} The url
      */
-    var getSiteProductsURL = function(site, workspace, version) {
+    var getSiteProductsURL = function(site, workspace, version, extended) {
         var r = root + "/workspaces/" + workspace + 
                       "/sites/" + site + 
                       "/products";
-        return addTicket(addVersion(r, version));
+        return addExtended(addTicket(addVersion(r, version)), extended);
     };
 
     /**
@@ -278,12 +282,12 @@ function urlService(baseUrl) {
      * @param {string} version Timestamp or version number
      * @returns {string} The url.
      */
-    var getElementURL = function(id, workspace, version) {        
+    var getElementURL = function(id, workspace, version, extended) {        
         var r = root + '/workspaces/' + workspace + '/elements/' + id;
-        return addTicket(addVersion(r, version));
+        return addExtended(addTicket(addVersion(r, version)), extended);
     };
 
-    var getOwnedElementURL = function(id, workspace, version, depth) {
+    var getOwnedElementURL = function(id, workspace, version, depth, extended) {
         var recurseString = 'recurse=true';
         if (depth && depth > 0)
             recurseString = 'depth=' + depth;
@@ -293,7 +297,7 @@ function urlService(baseUrl) {
             r += '&' + recurseString;
         else
             r += '?' + recurseString;
-        return r;        
+        return addExtended(r, extended);        
     };
 
     /**
@@ -310,7 +314,7 @@ function urlService(baseUrl) {
      * @param {boolean} simple Whether to get simple views (without specialization, for performance reasons)
      * @returns {string} The url.
      */
-    var getDocumentViewsURL = function(id, workspace, version, simple) {
+    var getDocumentViewsURL = function(id, workspace, version, simple, extended) {
         //var r = root + "/javawebscripts/products/" + id + "/views";
         var r = root + "/workspaces/" + workspace + "/products/" + id + "/views";
         r = addVersion(r, version);
@@ -320,7 +324,7 @@ function urlService(baseUrl) {
             else
                 r += '?simple=true';
         }
-        return addTicket(r);
+        return addExtended(addTicket(r), extended);
     };
 
     /**
@@ -336,10 +340,10 @@ function urlService(baseUrl) {
      * @param {string} version Timestamp or version number
      * @returns {string} The url.
      */
-    var getViewElementsURL = function(id, workspace, version) {
+    var getViewElementsURL = function(id, workspace, version, extended) {
         //var r = root + "/javawebscripts/views/" + id + "/elements";
         var r = root + "/workspaces/" + workspace + "/views/" + id + "/elements";
-        return addTicket(addVersion(r, version));
+        return addExtended(addTicket(addVersion(r, version)), extended);
     };
 
     /**
@@ -385,9 +389,9 @@ function urlService(baseUrl) {
      * @param {string} version timestamp
      * @returns {string} The post elements url.
      */
-    var getPutElementsURL = function(workspace, version) {
+    var getPutElementsURL = function(workspace, version, extended) {
         var r = root + '/workspaces/' + workspace + '/elements';
-        return addTicket(addVersion(r, version));
+        return addExtended(addTicket(addVersion(r, version)), extended);
     };
 
     var getPostElementsWithSiteURL = function(workspace, site) {
@@ -481,7 +485,7 @@ function urlService(baseUrl) {
      * @param {string} workspace Workspace name to search under
      * @returns {string} The post elements url.
      */
-    var getElementSearchURL = function(query, filters, propertyName, page, items, workspace) {
+    var getElementSearchURL = function(query, filters, propertyName, page, items, workspace, extended) {
         var r = root + '/workspaces/' + workspace + '/search?keyword=' + query;
         if (filters) {
             var l = filters.join();
@@ -495,7 +499,7 @@ function urlService(baseUrl) {
             if (page >= 0)
                 r += '&skipCount=' + page;
         }
-        return addTicket(r);
+        return addExtended(addTicket(r), true);
     };
 
     var getWorkspacesURL = function() {
@@ -571,6 +575,17 @@ function urlService(baseUrl) {
             r += '?alf_ticket=' + ticket;
         return r;    
     };
+    var addExtended = function(url, extended) {
+        var r = url;
+        if (!extended)
+            return r;
+        if (r.indexOf('?') > 0)
+            r += '&extended=true';
+        else
+            r += '?extended=true';
+        return r;
+    };
+
     var getRoot = function() {
         return root;
     };
