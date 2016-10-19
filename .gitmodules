@@ -1,3 +1,6 @@
+[submodule "ems-config/ems-config"]
+	path = ems-config/ems-config
+	url = https://github.jpl.nasa.gov/mbee-dev/ems-config.git
 [submodule "ems-config"]
 	path = ems-config
-	url = git@github.jpl.nasa.gov:mbee-dev/ems-config.git
+	url = https://github.jpl.nasa.gov/mbee-dev/ems-config.git
