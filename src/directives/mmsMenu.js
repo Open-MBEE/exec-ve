@@ -30,17 +30,17 @@ function mmsMenu(SiteService, WorkspaceService, ConfigService, $state, $template
     var template = $templateCache.get('mms/templates/mmsMenu.html');
 
     var mmsMenuLink = function(scope, element, attrs) {
-        
+
         scope.isTasksAndTagsView = function(){
-             if ($state.includes('workspaces') && 
+             if ($state.includes('workspaces') &&
                 ! ($state.includes('workspace.site') || $state.includes('workspace.sites') ))
                 return true;
-            else 
+            else
                 return false;
         };
         scope.tasksAndTagsView = function(){
             $state.go('workspaces', {search: undefined});
-        };        
+        };
         scope.updateWorkspace = function(wsId) {
             $state.go($state.current.name, {workspace: wsId, tag: undefined, search: undefined});
         };
@@ -55,7 +55,7 @@ function mmsMenu(SiteService, WorkspaceService, ConfigService, $state, $template
         .then(function(data) {
             scope.wsName = data.name;
         });
-        
+
         /*if (scope.config && scope.config !== '' && scope.config !== 'latest') {
             ConfigService.getConfig(scope.config, scope.ws, false)
             .then(function(data) {
@@ -70,7 +70,7 @@ function mmsMenu(SiteService, WorkspaceService, ConfigService, $state, $template
         var breadcrumbs = [];
         breadcrumbs.push({name: scope.site.name, sysmlid: scope.site.sysmlid});
         var eltWidth = element.parent().width();
-        
+
         SiteService.getSites()
         .then(function(data) {
             for (var i = data.length -1 ; i >= 0; i--) {
