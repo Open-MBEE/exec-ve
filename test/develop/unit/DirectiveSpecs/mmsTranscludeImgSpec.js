@@ -23,9 +23,9 @@ describe('mmsTranscludeCImg directive', function () {
 
             scope.version = "latest";
             var testElement = {
-                sysmlid      : "MMS_1472590814846_dcdac26c-e4c5-4b7d-8d3a-77387ecf2214",
+                sysmlId      : "MMS_1472590814846_dcdac26c-e4c5-4b7d-8d3a-77387ecf2214",
                 name         : "Merpity Merp Merp",
-                owner        : "HH_14_DD_30_MM_7_YY_2016_dank-testing_no_project",
+                ownerId        : "HH_14_DD_30_MM_7_YY_2016_dank-testing_no_project",
                 documentation: "<p><img src=\"/alfresco/service/api/node/content/workspace/SpacesStore/7ba7cd9b-f78f-4357-bc0c-6240d194da85/img_1472590831071.png\"/><\/p>\n"
             };
 
@@ -34,10 +34,10 @@ describe('mmsTranscludeCImg directive', function () {
             //     return {artifacts: [{url: "merpity"}]};
             // });
 
-            var cacheKey = UtilsService.makeElementKey(testElement.sysmlid, 'master', 'latest', false);
+            var cacheKey = UtilsService.makeElementKey(testElement.sysmlId, 'master', 'latest', false);
             CacheService.put(cacheKey, testElement);
 
-            element = angular.element('<mms-transclude-img mms-eid="{{testElement.sysmlid}}"></mms-transclude-img>');
+            element = angular.element('<mms-transclude-img mms-eid="{{testElement.sysmlId}}"></mms-transclude-img>');
             $compile(element)(scope);
             scope.$digest();
         });

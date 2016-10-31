@@ -32,14 +32,14 @@ describe('ElementService', function() {
 
 		// GetElement responses
 		$httpBackend.whenGET(root + '/workspaces/master/elements/12345?timestamp=01-01-2014').respond(
-			{ elements: [ { sysmlid:12345, specialization: { type:'Comment' }, lastModified: '01-01-2014' } ] } );
+			{ elements: [ { sysmlId:12345, type:'Comment', _modified: '01-01-2014' } ] } );
 		$httpBackend.whenGET(root + '/workspaces/master/elements/12345').respond( function(method, url, data) {
 			var elements;
 			if (forceEmpty)
 				elements = { elements: [] };
 			else {
-				elements = {elements: [ { sysmlid:12345, specialization: { type:'Comment' },
-					lastModified: '07-30-2014'} ] };
+				elements = {elements: [ { sysmlId:12345,  type:'Comment',
+					_modified: '07-30-2014'} ] };
 			}
 			return [200, elements];});
 		$httpBackend.whenGET(root + '/workspaces/master/elements/12346').respond( function(method, url, data) {
@@ -47,7 +47,7 @@ describe('ElementService', function() {
 				return [500, undefined, {status: {code:500, name:'Internal Error',
 					description:'An error inside the HTTP server which prevented it from fulfilling the request.'}}];
 			} else {
-				return [200, { elements: [ { sysmlid: 12346, specialization: { type:'Package'} } ] } ];
+				return [200, { elements: [ { sysmlId: 12346, type:'Package' } ] } ];
 			}});
 
 		// GetElement misc responses
@@ -56,22 +56,22 @@ describe('ElementService', function() {
 			return [404, error];});
 		$httpBackend.whenGET(root + '/workspaces/master/elements/emptyId').respond( { elements: [] });
 		$httpBackend.whenGET(root + '/workspaces/master/elements').respond(
-			{elements:[ {sysmlid:12345, name:'commentElement', documentation:'old documentation',
-			specialization:{type:'Comment'}}, {sysmlid:12346, name:'packageElement',
-			specialization:{type:'Package'}}]});
+			{elements:[ {sysmlId:12345, name:'commentElement', documentation:'old documentation',
+			type:'Comment'}, {sysmlId:12346, name:'packageElement',
+			type:'Package'}]});
         $httpBackend.whenPUT(root + '/workspaces/master/elements').respond(
-    		{elements:[ {sysmlid:12345, name:'commentElement', documentation:'old documentation',
-    		specialization:{type:'Comment'}}, {sysmlid:12346, name:'packageElement',
-    		specialization:{type:'Package'}}]});
+    		{elements:[ {sysmlId:12345, name:'commentElement', documentation:'old documentation',
+    		type:'Comment'}, {sysmlId:12346, name:'packageElement',
+    		type:'Package'}]});
 
 		$httpBackend.whenGET(root + '/workspaces/master/elements/noSpecialization').respond(
-			{ elements: [ { sysmlid: 'noSpecialization', documentation: 'has no specialization' } ] } );
+			{ elements: [ { sysmlId: 'noSpecialization', documentation: 'has no specialization' } ] } );
 		$httpBackend.whenGET(root + '/workspaces/master/elements/operationId').respond(
-			{ elements: [ { sysmlid: 'operationId', specialization: { type: 'Operation',
-			parameters: [ 'paramId', 'paramId2' ], expresion: 'expressionId' } } ] } );
+			{ elements: [ { sysmlId: 'operationId', type: 'Operation',
+			parameterIds: [ 'paramId', 'paramId2' ], expressionId: 'expressionId'  } ] } );
 		$httpBackend.whenGET(root + '/workspaces/master/elements/productId').respond(
-			{ elements: [ { sysmlid: 'productId', specialization: { type: 'Product',
-			view2view: [ { sysmlid: 'viewId', childrenViews:[] } ], noSections: [] } } ] } );
+			{ elements: [ { sysmlId: 'productId', type: 'Class',
+			view2view: [ { sysmlId: 'viewId', childrenViews:[] } ]} ] } );
 
 		// UpdateElement response
 		$httpBackend.whenPOST(root + '/workspaces/master/elements').respond(function(method, url, data) {
@@ -80,16 +80,16 @@ describe('ElementService', function() {
 			}
 
 			var json = JSON.parse(data);
-			if (json.elements[0].sysmlid === 'badId') {
+			if (json.elements[0].sysmlId === 'badId') {
 				return [500, 'Internal Server Error'];
 			} else {
-				if (json.elements[0].specialization) {
-					if (json.elements[0].specialization.type  === 'Pop-Up') {
+				if (json.elements[0]) {
+					if (json.elements[0].type  === 'Pop-Up') {
 						return [400, 'Invalid element type'];
 					}
 				}
-				if (!json.elements[0].sysmlid) {
-					json.elements[0].sysmlid = json.elements[0].name;
+				if (!json.elements[0].sysmlId) {
+					json.elements[0].sysmlId = json.elements[0].name;
 				}
 				return [200, json];
 			} });
@@ -97,9 +97,9 @@ describe('ElementService', function() {
     describe('ElementService.getElement() method', function() {
     	it('should get an element not in the cache', inject(function() {
             ElementService.getElement(12345, undefined, undefined, '01-01-2014').then(function(response) {
-				expect(response.sysmlid).toEqual( 12345 );
-				expect(response.specialization).toEqual( { type: 'Comment' } );
-				expect(response.lastModified).toEqual( '01-01-2014' );
+				expect(response.sysmlId).toEqual( 12345 );
+				expect(response.type).toEqual('Comment');
+				expect(response._modified).toEqual( '01-01-2014' );
 			}); //$httpBackend.flush();
 
     	}));
@@ -113,24 +113,24 @@ describe('ElementService', function() {
                 //console.log(response);
                 expect(response.length).toEqual(2);
 
-                expect(response[0].sysmlid).toEqual(12345);
-                expect(response[0].specialization).toEqual( { type: 'Comment' } );
+                expect(response[0].sysmlId).toEqual(12345);
+                expect(response[0].type).toEqual('Comment');
                 //expect(response[0].lastModified).toEqual( '07-30-2014' );
 
-                expect(response[1].sysmlid).toEqual(12346);
-                expect(response[1].specialization).toEqual( { type: 'Package' } );
+                expect(response[1].sysmlId).toEqual(12346);
+                expect(response[1].type).toEqual( 'Package');
             }); //$httpBackend.flush();
 
         }));
     });
     describe('ElementService.updateElement method', function() {  //--talk to doris
         it('should update a element not in the cache without passing a workspace', inject(function() {
-            var elem = { sysmlid: '12345', lastModified:'never' };
+            var elem = { sysmlId: '12345', _modified:'never' };
     		ElementService.updateElement(elem, undefined).then(function(response) {
     			expect(response).toEqual(elem);
     		});
             ElementService.getElement(12345).then(function(response) {
-				expect(response.lastModified).toEqual( 'never' );
+				expect(response._modified).toEqual( 'never' );
 			}); //$httpBackend.flush();
         }));
     });
