@@ -70,6 +70,7 @@ thead td, table caption {
   }
 }
 
+// Workaround for tables with no borders
 table[border='0']{
  
  border: 0;
