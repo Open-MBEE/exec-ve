@@ -23,6 +23,12 @@ mms-view {
   mms-transclude-val * {
     @include transition(background-color, .2s, linear);
   }
+
+  mms-transclude-doc {
+    > p:first-child {
+      display: inline;
+    }
+  }
 }
 
 mms-view.editing {
