@@ -75,44 +75,6 @@ function urlService(baseUrl) {
 
     /**
      * @ngdoc method
-     * @name mms.URLService#getConfigSnapshotsURL
-     * @methodOf mms.URLService
-     *
-     * @description
-     * Gets url that gets or posts snapshots for a configuration in a site
-     *
-     * @param {string} id Id of the configuration
-     * @param {string} workspace Workspace name
-     * @returns {string} The url
-     */
-    var getConfigSnapshotsURL = function(id, workspace) {
-        return root + "/workspaces/" + workspace +
-                      "/configurations/" + id +
-                      "/snapshots";                
-    };
-
-    /**
-     * @ngdoc method
-     * @name mms.URLService#getProductSnapshotsURL
-     * @methodOf mms.URLService
-     *
-     * @description
-     * Gets url that gets or creates snapshots for a product in a site
-     *
-     * @param {string} id Id of the product
-     * @param {string} site Site name
-     * @param {string} workspace Workspace name
-     * @returns {string} The url
-     */
-    var getProductSnapshotsURL = function(id, site, workspace) {
-        return addTicket(root + "/workspaces/" + workspace +
-                      "/sites/" + site +
-                      "/products/" + id +
-                      "/snapshots");                
-    };
-
-    /**
-     * @ngdoc method
      * @name mms.URLService#getHtmlToPdfURL
      * @methodOf mms.URLService
      *
@@ -163,26 +125,6 @@ function urlService(baseUrl) {
 
     /**
      * @ngdoc method
-     * @name mms.URLService#getConfigProductsURL
-     * @methodOf mms.URLService
-     *
-     * @description
-     * Gets url that gets or posts products in a configuration
-     *
-     * @param {string} id Id of the configuration
-     * @param {string} site Site name
-     * @param {string} workspace Workspace name
-     * @returns {string} The url
-     */
-    var getConfigProductsURL = function (id, site, workspace) {
-        return root + "/workspaces/" + workspace +
-                      "/sites/" + site +
-                      "/configurations/" + id +
-                      "/products";                        
-    };
-
-    /**
-     * @ngdoc method
      * @name mms.URLService#getConfigURL
      * @methodOf mms.URLService
      *
@@ -200,24 +142,7 @@ function urlService(baseUrl) {
 
     /**
      * @ngdoc method
-     * @name mms.URLService#getSnapshotURL
-     * @methodOf mms.URLService
-     *
-     * @description
-     * Gets url that gets a snapshot
-     *
-     * @param {string} id Id of the snapshot
-     * @param {string} workspace Workspace name
-     * @returns {string} The url
-     */
-    var getSnapshotURL = function(id, workspace) {
-        return addTicket(root + "/workspaces/" + workspace + 
-                      "/snapshots/" + id);
-    };
-
-    /**
-     * @ngdoc method
-     * @name mms.URLService#getConfigProductsURL
+     * @name mms.URLService#getSiteProductsURL
      * @methodOf mms.URLService
      *
      * @description
@@ -555,19 +480,20 @@ function urlService(baseUrl) {
     var addVersion = function(url, version) {
         if (version === 'latest')
             return url;
-        if (isTimestamp(version)) {
+        else if (version) {
             if (url.indexOf('?') > 0)
-                return url + '&timestamp=' + version;
+                return url + '&commitId=' + version;
             else
-                return url + '?timestamp=' + version;
-        } else
-            return url + '/versions/' + version;
+                return url + '?commitId=' + version;
+        } 
+        return url;
     };
+
     var addTicket = function(url) {
         var r = url;
         if (!ticket)
             return r;
-        if (r.indexOf('timestamp') > 0)
+        if (r.indexOf('commitId') > 0)
             return r;
         if (r.indexOf('?') > 0)
             r += '&alf_ticket=' + ticket;
@@ -605,14 +531,10 @@ function urlService(baseUrl) {
         getSitesURL: getSitesURL,
         getElementSearchURL: getElementSearchURL,
         getImageURL: getImageURL,
-        getProductSnapshotsURL: getProductSnapshotsURL,
         getHtmlToPdfURL: getHtmlToPdfURL,
-        getConfigSnapshotsURL: getConfigSnapshotsURL,
         getSiteProductsURL: getSiteProductsURL,
         getConfigURL: getConfigURL,
-        getSnapshotURL: getSnapshotURL,
         getConfigsURL: getConfigsURL,
-        getConfigProductsURL : getConfigProductsURL,
         getDocumentViewsURL: getDocumentViewsURL,
         getViewElementsURL: getViewElementsURL,
         getWsDiffURL: getWsDiffURL,

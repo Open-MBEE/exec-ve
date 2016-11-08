@@ -44,8 +44,6 @@ function mmsViewLink(ElementService, UtilsService, $compile, growl) {
                 var viewVersion = mmsViewCtrl.getWsAndVersion();
                 if (!ws)
                     ws = viewVersion.workspace;
-                if (!version && !tag) //if a time is passed in manually, ignore the tag on the surrounding view
-                    tag = viewVersion.tag;
                 if (!version)
                     version = viewVersion.version;
             }
@@ -91,7 +89,7 @@ function mmsViewLink(ElementService, UtilsService, $compile, growl) {
                     //element.html('<a href="mms.html#/workspaces/' + ws + '/sites/' + site + '/documents/' + 
                     //    docid + '/views/' + scope.mmsVid + queryParam + '">' + data.name + '</a>');
                 } else {
-                    element.html('<span class="mms-error">view link is not a view</span>');
+                    element.html("<span class=\"mms-error\">view link doesn't refer to a view</span>");
                     //growl.error('View Link Error: not a view: ' + scope.mmsVid);
                 }
             }, function(reason) {

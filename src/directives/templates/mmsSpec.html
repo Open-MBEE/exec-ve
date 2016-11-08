@@ -72,6 +72,10 @@
         <h3 class="prop sysmlId">{{element.sysmlId}}</h3>
         <h2 class="prop-title">WORKSPACE</h2>
         <h3 class="prop">{{workspace.name}}</h3>
+        <h2 class="prop-title">FORMATTED MODIFIED TIME</h2>
+        <h3 class="prop">{{element._modified}}</h3>
+        <h2 class="prop-title">COMMIT</h2>
+        <h3 class="prop">{{element._commitId}}</h3>
     </div>
 
 </div>
@@ -159,6 +163,8 @@
     <h3 class="prop">{{workspace.name}}</h3>
     <h2 class="prop-title">FORMATTED MODIFIED TIME</h2>
     <h3 class="prop">{{element._modified}}</h3>
+    <h2 class="prop-title">COMMIT</h2>
+    <h3 class="prop">{{element._commitId}}</h3>
 </div>
 
 <div ng-if="mmsType=='workspace'" ng-show="editing" class="editing">
@@ -192,6 +198,8 @@
     <textarea mms-ckeditor mms-ws="{{mmsWs}}" ng-model="edit.description"></textarea>
     <h2 class="prop-title">TIMESTAMP</h2>
     <h3 class="prop">{{element.timestamp | date:'M/d/yy h:mm a'}}</h3>
+    <h2 class="prop-title">COMMIT</h2>
+    <h3 class="prop">{{element.commitId}}</h3>
     <h2 class="prop-title">WORKSPACE</h2>
     <h3 class="prop">{{workspace.name}}</h3>
 </div>
@@ -202,6 +210,8 @@
     <p class="doc-text" ng-bind-html="element.description"></p>
     <h2 class="prop-title">TIMESTAMP</h2>
     <h3 class="prop">{{element.timestamp | date:'M/d/yy h:mm a'}}</h3>
+    <h2 class="prop-title">COMMIT</h2>
+    <h3 class="prop">{{element.commitId}}</h3>
     <h2 class="prop-title">WORKSPACE</h2>
     <h3 class="prop">{{workspace.name}}</h3>
 </div>

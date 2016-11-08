@@ -51,7 +51,6 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
             return {
                 workspace: $scope.ws, 
                 version: $scope.version,
-                tag: undefined
             };
         };
     };

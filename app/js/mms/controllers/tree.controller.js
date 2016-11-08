@@ -5,8 +5,8 @@
 angular.module('mmsApp')
 .controller('TreeCtrl', ['$anchorScroll' , '$q', '$filter', '$location', '$uibModal', '$scope', '$rootScope', '$state', '$stateParams', '$compile','$timeout', 'growl', 
                           'UxService', 'ConfigService', 'ElementService', 'UtilsService', 'WorkspaceService', 'ViewService', 'MmsAppUtils',
-                          'workspaces', 'workspaceObj', 'tag', 'sites', 'site', 'document', 'views', 'view', 'time', 'configSnapshots', 'docFilter', 'mmsRootSites',
-function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $stateParams, $compile, $timeout, growl, UxService, ConfigService, ElementService, UtilsService, WorkspaceService, ViewService, MmsAppUtils, workspaces, workspaceObj, tag, sites, site, document, views, view, time, configSnapshots, docFilter, mmsRootSites) {
+                          'workspaces', 'workspaceObj', 'tag', 'sites', 'site', 'document', 'views', 'view', 'commit', 'mmsRootSites',
+function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $stateParams, $compile, $timeout, growl, UxService, ConfigService, ElementService, UtilsService, WorkspaceService, ViewService, MmsAppUtils, workspaces, workspaceObj, tag, sites, site, document, views, view, commit, mmsRootSites) {
 
     $rootScope.mms_bbApi = $scope.bbApi = {};
     $rootScope.mms_treeApi = $scope.treeApi = {};
@@ -26,12 +26,12 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         $rootScope.mms_fullDocMode = true;
     $scope.treeFilter = {search: ''};
     // TODO: pull in config/tags
-    var config = time;
+    var config = commit;
     var ws = $stateParams.workspace; // TODO this is undefined, but is being used below
 
     if (document !== null) {
         $scope.document = document;
-        $scope.editable = $scope.document._editable && time === 'latest' && UtilsService.isView($scope.document);
+        $scope.editable = $scope.document._editable && commit === 'latest' && UtilsService.isView($scope.document);
     }
 
     // If it is not the master workspace, then retrieve it:
@@ -388,7 +388,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 for (var i = 0; i < workspaceTreeNode.children.length; i++) {
                     var childWorkspaceTreeNode = workspaceTreeNode.children[i];
                     if (childWorkspaceTreeNode.type === 'workspace') {
-                        if (childWorkspaceTreeNode.data.branched === config.timestamp) {
+                        if (childWorkspaceTreeNode.data.branched === config.commitId) {
                             configTreeNode.children.push(childWorkspaceTreeNode);
                             
                             workspaceTreeNode.children.splice(i, 1);
@@ -413,58 +413,30 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
 
     var siteLevel2Func = function(site, siteNode) {
         // Make sure we haven't already loaded the docs for this site
-        if(siteNode.docsLoaded || siteNode.type !== 'site') return;
+        if (siteNode.docsLoaded || siteNode.type !== 'site') 
+            return;
         // Set docs loaded attribute
         siteNode.docsLoaded = true;
         
         siteNode.loading = true;
-        ViewService.getSiteDocuments(site, false, ws, config === 'latest' ? 'latest' : tag.timestamp, 2)
+        ViewService.getSiteDocuments(site, false, ws, config === 'latest' ? 'latest' : tag.commitId, 2)
         .then(function(docs) {
-
             // If no documents are found on a site, stop forcing expansion
-            if(docs.length === 0) siteNode.expandable = false;
-
-            var filteredDocs = {};
-            if (docFilter)
-                filteredDocs = JSON.parse(docFilter.documentation);
-            
-                if (config === 'latest') {
-                    docs.forEach(function(doc) {
-                        if (filteredDocs[doc.sysmlId])
-                            return;
-                        var docNode = {
-                            label : doc.name,
-                            type : 'view',
-                            data : doc,
-                            site : site,
-                            children : []
-                        };
-                        siteNode.children.unshift(docNode);
-                    });
-                } else {
-                    var docids = [];
-                    docs.forEach(function(doc) {
-                        if (filteredDocs[doc.sysmlId])
-                            return;
-                        docids.push(doc.sysmlId);
-                    });
-                    configSnapshots.forEach(function(snapshot) {
-                        if (docids.indexOf(snapshot.sysmlId) > -1) {
-                            snapshot.name = snapshot.sysmlname;
-                            var snapshotNode = {
-                                label : snapshot.sysmlname,
-                                type : 'snapshot',
-                                data : snapshot,
-                                site : site,
-                                children : []
-                            };
-                            siteNode.children.unshift(snapshotNode);
-                        }
-                    });
-                }
-                siteNode.loading = false;
-                if ($scope.treeApi.refresh)
-                    $scope.treeApi.refresh();
+            if (docs.length === 0) 
+                siteNode.expandable = false;            
+            docs.forEach(function(doc) {
+                var docNode = {
+                    label : doc.name,
+                    type : config === 'latest' ? 'view' : 'snapshot',
+                    data : doc,
+                    site : site,
+                    children : []
+                };
+                siteNode.children.unshift(docNode);
+            });
+            siteNode.loading = false;
+            if ($scope.treeApi.refresh)
+                $scope.treeApi.refresh();
         }, function(reason) {
             growl.error(reason.message);
         });
@@ -559,7 +531,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         } else {
             if (!document._childViews)
                 document._childViews = [];
-            MmsAppUtils.handleChildViews(document, 'composite', ws, time, handleSingleView, handleChildren)
+            MmsAppUtils.handleChildViews(document, 'composite', ws, commit, handleSingleView, handleChildren)
             .then(function(node) {
                 for (var i in viewId2node) {
                     addSectionElements(viewId2node[i].data, viewId2node[i], viewId2node[i]);
@@ -597,11 +569,11 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             operand.forEach(function(instanceVal) {
                 bulkGet.push(instanceVal.instanceId);
             });
-          ElementService.getElements(bulkGet, false, ws, time, 0)
+          ElementService.getElements(bulkGet, false, ws, commit, 0)
           .then(function(ignore) {
             var instances = [];
             operand.forEach(function(instanceVal) {
-                instances.push(ElementService.getElement(instanceVal.instanceId, false, ws, time, 0));
+                instances.push(ElementService.getElement(instanceVal.instanceId, false, ws, commit, 0));
             });
             $q.all(instances).then(function(results) {
                 var k = results.length - 1;
@@ -831,7 +803,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                     while (prevBranch.type != 'view') {
                         prevBranch = $scope.treeApi.get_prev_branch(prevBranch);
                     }
-                    MmsAppUtils.handleChildViews(data, $scope.newViewAggr.type, ws, time, handleSingleView, handleChildren)
+                    MmsAppUtils.handleChildViews(data, $scope.newViewAggr.type, ws, commit, handleSingleView, handleChildren)
                       .then(function(node) {
                           // handle full doc mode
                           if ($rootScope.mms_fullDocMode)
@@ -1335,7 +1307,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         $timeout(function() {
             if (document.view2view && document.view2view.length > 0) {
                 document.view2view.forEach(function(view, index) {
-                    ViewService.getView(view.id, false, ws, time, 0)
+                    ViewService.getView(view.id, false, ws, commit, 0)
                     .then(addViewSections); //TODO add back in once we have priority queue
                 });
             }
