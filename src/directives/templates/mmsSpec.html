@@ -140,6 +140,11 @@
         </div>
     </div>
 
+    <div ng-if="element.type === 'InstanceSpecification'">
+        <h2 class="prop-title">CLASSIFIERS</h2>
+        <h3 class="prop" ng-repeat="path in element.classifierIds"><mms-transclude-name mms-watch-id="true" mms-eid="{{path}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></h3>
+    </div>
+
     <h2 class="prop-title spec-view-doc-heading">DOCUMENTATION <a ng-click="showDocHTML = !showDocHTML"><i class="fa fa-code"></i></a></h2>
     <p ng-show="!showDocHTML" ng-bind-html="element.documentation" class="doc-text"></p>
     <div ng-show="showDocHTML">{{element.documentation}}</div>

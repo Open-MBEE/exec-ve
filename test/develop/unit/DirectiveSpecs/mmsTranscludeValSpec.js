@@ -21,19 +21,19 @@ describe('mmsTranscludeVal directive', function () {
 
             var responseTestElement = {
                 name   : "responseTestElement",
-                sysmlid: "_18_0_5_407019f_1468188892970_158569_14563"
+                sysmlId: "_18_0_5_407019f_1468188892970_158569_14563"
             };
 
-            var cacheKey = UtilsService.makeElementKey(responseTestElement.sysmlid, 'master', 'latest', false);
+            var cacheKey = UtilsService.makeElementKey(responseTestElement.sysmlId, 'master', 'latest', false);
             CacheService.put(cacheKey, responseTestElement);
-
+//TODO these values are very messed up
             scope.values = [{
                 type   : 'LiteralString',
-                string : '431413',
+                value : '431413',
                 operand: [{
                     "valueExpression": null,
                     "type"           : "InstanceValue",
-                    "instance"       : "_18_0_5_407019f_1468188892965_490446_14539"
+                    "instanceId"       : "_18_0_5_407019f_1468188892965_490446_14539"
                 }]
             }, {
                 type   : 'LiteralInteger',
@@ -41,13 +41,12 @@ describe('mmsTranscludeVal directive', function () {
                 operand: [{
                     "valueExpression": null,
                     "type"           : "InstanceValue",
-                    "instance"       : "_18_0_5_407019f_1468188892965_490446_14539",
-                    "string"         : "RestrictedValue"
+                    "instanceId"       : "_18_0_5_407019f_1468188892965_490446_14539",
                 }]
             }];
             scope.version    = "latest";
             scope.editValues = [43, 42, 55, 2532];
-            scope.view       = {sysmlid: 'valueViewId', name: 'merpity', values: [43221, 5432]};
+            scope.view       = {sysmlId: 'valueViewId', name: 'merpity', values: [43221, 5432]};
         });
     });
 
@@ -58,18 +57,16 @@ describe('mmsTranscludeVal directive', function () {
 
     it('mmsTranscludeVal should transclude a LiteralInteger', inject(function () {
         var testElement = {
-            sysmlid       : 'valueViewId',
+            sysmlId       : 'valueViewId',
             name          : 'merpity',
-            specialization: {
-                type : 'Element',
-                value: [{type: 'LiteralInteger', integer: 34314}]
-            }
+            type : 'Slot',
+            value: [{type: 'LiteralInteger', value: 34314}]
         };
 
-        var cacheKey = UtilsService.makeElementKey(testElement.sysmlid, 'master', 'latest', false);
+        var cacheKey = UtilsService.makeElementKey(testElement.sysmlId, 'master', 'latest', false);
         CacheService.put(cacheKey, testElement);
 
-        element = angular.element('<mms-transclude-val data-mms-eid="{{view.sysmlid}}"></mms-transclude-val>');
+        element = angular.element('<mms-transclude-val data-mms-eid="{{view.sysmlId}}"></mms-transclude-val>');
         $compile(element)(scope);
         scope.$digest();
 
@@ -79,18 +76,16 @@ describe('mmsTranscludeVal directive', function () {
 
     it('mmsTranscludeVal should transclude a LiteralBoolean', inject(function () {
         var testElement = {
-            sysmlid       : 'valueViewId',
+            sysmlId       : 'valueViewId',
             name          : 'merpity',
-            specialization: {
-                type : 'Element',
-                value: [{type: 'LiteralBoolean', boolean: true}]
-            }
+            type : 'Slot',
+            value: [{type: 'LiteralBoolean', value: true}]
         };
 
-        var cacheKey = UtilsService.makeElementKey(testElement.sysmlid, 'master', 'latest', false);
+        var cacheKey = UtilsService.makeElementKey(testElement.sysmlId, 'master', 'latest', false);
         CacheService.put(cacheKey, testElement);
 
-        element = angular.element('<mms-transclude-val data-mms-eid="{{view.sysmlid}}"></mms-transclude-val>');
+        element = angular.element('<mms-transclude-val data-mms-eid="{{view.sysmlId}}"></mms-transclude-val>');
         $compile(element)(scope);
         scope.$digest();
 
@@ -100,18 +95,16 @@ describe('mmsTranscludeVal directive', function () {
 
     it('mmsTranscludeVal should transclude a LiteralReal', inject(function () {
         var testElement = {
-            sysmlid       : 'valueViewId',
+            sysmlId       : 'valueViewId',
             name          : 'merpity',
-            specialization: {
-                type : 'Element',
-                value: [{type: 'LiteralReal', double: 433, valueExpression: null}]
-            }
+            type : 'Slot',
+            value: [{type: 'LiteralReal', value: 433, valueExpression: null}]
         };
 
-        var cacheKey = UtilsService.makeElementKey(testElement.sysmlid, 'master', 'latest', false);
+        var cacheKey = UtilsService.makeElementKey(testElement.sysmlId, 'master', 'latest', false);
         CacheService.put(cacheKey, testElement);
 
-        element = angular.element('<mms-transclude-val data-mms-eid="{{view.sysmlid}}"></mms-transclude-val>');
+        element = angular.element('<mms-transclude-val data-mms-eid="{{view.sysmlId}}"></mms-transclude-val>');
         $compile(element)(scope);
         scope.$digest();
 
@@ -121,18 +114,16 @@ describe('mmsTranscludeVal directive', function () {
 
     it('mmsTranscludeVal should transclude a LiteralUnlimitedNatural', inject(function () {
         var testElement = {
-            sysmlid       : 'valueViewId',
+            sysmlId       : 'valueViewId',
             name          : 'merpity',
-            specialization: {
-                type : 'Element',
-                value: [{type: 'LiteralUnlimitedNatural', naturalValue: 433, valueExpression: null}]
-            }
+            type : 'Slot',
+            value: [{type: 'LiteralUnlimitedNatural', value: 433, valueExpression: null}]
         };
 
-        var cacheKey = UtilsService.makeElementKey(testElement.sysmlid, 'master', 'latest', false);
+        var cacheKey = UtilsService.makeElementKey(testElement.sysmlId, 'master', 'latest', false);
         CacheService.put(cacheKey, testElement);
 
-        element = angular.element('<mms-transclude-val data-mms-eid="{{view.sysmlid}}"></mms-transclude-val>');
+        element = angular.element('<mms-transclude-val data-mms-eid="{{view.sysmlId}}"></mms-transclude-val>');
         $compile(element)(scope);
         scope.$digest();
 
@@ -144,30 +135,28 @@ describe('mmsTranscludeVal directive', function () {
         // ElementValue will check to see if there is another element nested within itself. If it finds one, it will
         //  perform a transclude name on the sysmlid
         var testElement = {
-            sysmlid       : 'valueViewId',
+            sysmlId       : 'valueViewId',
             name          : 'merpity',
-            specialization: {
-                type : 'Element',
-                value: [{type: 'ElementValue', element: "otherElement", valueExpression: null}]
-            }
+            type : 'Slot',
+            value: [{type: 'ElementValue', elementId: "otherElement", valueExpression: null}]
+            
         };
 
         var anotherElement = {
-            sysmlid       : 'otherElement',
+            sysmlId       : 'otherElement',
             name          : 'Other Element',
-            specialization: {
-                type : 'Element',
-                value: [{type: 'ElementValue', element: "Id_of_element", valueExpression: null}]
-            }
+            type : 'Slot',
+            value: [{type: 'ElementValue', elementId: "Id_of_element", valueExpression: null}]
+            
         };
 
-        var cacheKey = UtilsService.makeElementKey(testElement.sysmlid, 'master', 'latest', false);
+        var cacheKey = UtilsService.makeElementKey(testElement.sysmlId, 'master', 'latest', false);
         CacheService.put(cacheKey, testElement);
 
-        cacheKey = UtilsService.makeElementKey(anotherElement.sysmlid, 'master', 'latest', false);
+        cacheKey = UtilsService.makeElementKey(anotherElement.sysmlId, 'master', 'latest', false);
         CacheService.put(cacheKey, anotherElement);
 
-        element = angular.element('<mms-transclude-val data-mms-eid="{{view.sysmlid}}"></mms-transclude-val>');
+        element = angular.element('<mms-transclude-val data-mms-eid="{{view.sysmlId}}"></mms-transclude-val>');
         $compile(element)(scope);
         scope.$digest();
 
@@ -180,16 +169,14 @@ describe('mmsTranscludeVal directive', function () {
         var testElement = {
             sysmlid       : 'valueViewId',
             name          : 'merpity',
-            specialization: {
-                type : 'Element',
-                value: [{type: 'InstanceValue', instance: "_18_0_5_407019f_1468188892970_158569_14563"}]
-            }
+            type : 'Slot',
+            value: [{type: 'InstanceValue', instanceId: "_18_0_5_407019f_1468188892970_158569_14563"}]
         };
 
-        var cacheKey = UtilsService.makeElementKey(testElement.sysmlid, 'master', 'latest', false);
+        var cacheKey = UtilsService.makeElementKey(testElement.sysmlId, 'master', 'latest', false);
         CacheService.put(cacheKey, testElement);
 
-        element = angular.element('<mms-transclude-val data-mms-eid="{{view.sysmlid}}"></mms-transclude-val>');
+        element = angular.element('<mms-transclude-val data-mms-eid="{{view.sysmlId}}"></mms-transclude-val>');
         $compile(element)(scope);
         scope.$digest();
 
@@ -201,22 +188,20 @@ describe('mmsTranscludeVal directive', function () {
     it('mmsTranscludeVal should transclude an OpaqueExpression', inject(function () {
         scope.testElement = {
             documentation : "",
-            sysmlid       : "notInThePast",
+            sysmlId       : "notInThePast",
             name          : "notInThePast",
-            owner         : "PROJECT-123456",
-            specialization: {
-                type         : "Constraint",
-                specification: {
-                    type          : "OpaqueExpression",
-                    expressionBody: ["foo8"]
-                }
+            ownerId         : "PROJECT-123456",
+            type         : "Constraint",
+            specification: {
+                type          : "OpaqueExpression",
+                body: ["foo8"]
             }
         };
 
-        var cacheKey = UtilsService.makeElementKey(scope.testElement.sysmlid, 'master', 'latest', false);
+        var cacheKey = UtilsService.makeElementKey(scope.testElement.sysmlId, 'master', 'latest', false);
         CacheService.put(cacheKey, scope.testElement);
 
-        element = angular.element('<mms-transclude-val data-mms-eid="{{testElement.sysmlid}}"></mms-transclude-val>');
+        element = angular.element('<mms-transclude-val data-mms-eid="{{testElement.sysmlId}}"></mms-transclude-val>');
         $compile(element)(scope);
         scope.$digest();
 

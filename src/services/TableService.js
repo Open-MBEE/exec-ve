@@ -4,24 +4,112 @@ angular.module('mms')
   .factory('TableService', ['$q', '$http', 'URLService', 'UtilsService', 'CacheService', '_', 'ElementService', TableService]);
 
 function TableService($q, $http, URLService, UtilsService, CacheService, _, ElementService) {
-   
+
    //make only a-zA-Z0-9_ because id or class does not support special characters(ie., ())
-    var toValidId = function(original) { 
+    var toValidId = function(original) {
         return original.replace(/[^a-zA-Z0-9_]/gi, '');
     };
-  
-    var readTables = function(mmsEid, ws, version) {
-      var deferred = $q.defer();  
-      
+
+    /*
+     * Generic read table function that returns column arrays keyed to labels
+     * from the first row
+     *
+     * @param {string} mmsEid SysML ID of a table instance
+     */
+    var readTableCols = function(mmsEid, ws, version) {
+      var deferred = $q.defer();
       ElementService.getElement(mmsEid, false, ws, version)
       .then(function(data) {
-        
+        var ids = [];
+        var columns = [];
+        var keys = [];
+
+        data = JSON.parse(data.specialization.instanceSpecificationSpecification.string);
+
+        var headers = data.header[0].map(function(val) {
+          // Why is HTML being injected by MagicDraw in the first place?
+          return val.content[0].text.replace('<p>', '').replace('</p>', '');
+        });
+
+        var title = data.title;
+
+        // rotate row-based 2D array into col-based 2D array
+        ids = _.unzip(data.body).map(function(col) {
+          return col.map(function(cell) {
+            // extract only the SysML ID
+            return cell.content[0].source;
+          });
+        });
+
+        var promises = [];
+        ids.forEach(function(col, i) {
+          columns[i] = [];
+          promises.push(ElementService.getElements(col, false, ws, version)
+          .then(function(data) {
+            data.forEach(function(cell) {
+              var val;
+              // LiteralReal => double
+              // Number, integer, etc.?
+              if (typeof cell.specialization.value !== 'undefined') {
+                if (typeof cell.specialization.value[0].double !== 'undefined') {
+                  val = cell.specialization.value[0].double;
+                } else if (typeof cell.specialization.value[0].integer !== 'undefined') {
+                  val = cell.specialization.value[0].integer;
+                } else if (typeof cell.specialization.value[0].expressionBody !== 'undefined') {
+                  val = cell.specialization.value[0].expressionBody[0];
+                } else if (typeof cell.specialization.value[0].string !== 'undefined') {
+                  val = cell.specialization.value[0].string;
+                }
+                if (val !== undefined) {
+                  if (keys[i] === undefined) {
+                    keys[i] = cell.name;
+                  }
+                  columns[i].push(val);
+                } else {
+                  // unknown value
+                  console.log('No value found:');
+                  console.log(cell);
+                }
+              }
+            });
+          }));
+        });
+
+        $q.all(promises).then(function(){
+          // strip out non-value columns (these are just counters/indices generated from the row name)
+          var cc = columns.length - 1;
+          while (cc >= 0) {
+            if (columns[cc].length === 0) {
+              headers.splice(cc, 1);
+              columns.splice(cc, 1);
+              // no key will exist, no splicing needed from keys
+            }
+            cc--;
+          }
+          var value = {
+            columns: columns,
+            columnHeaders: headers,
+            columnKeys: keys,
+            title: title
+          };
+          deferred.resolve(value);
+        });
+      });
+      return deferred.promise;
+    };
+
+    var readTables = function(mmsEid, ws, version) {
+      var deferred = $q.defer();
+
+      ElementService.getElement(mmsEid, false, ws, version)
+      .then(function(data) {
+
         var tableTitles = []; //used only for display
         var tableIds = []; //used as filter id
         var tableColumnHeadersLabels=[];
         var numOfDataColumn = []; //to know the number of data columns in case not column header lables.
         var numOfRowHeadersPerTable = [];
-        var rowHeadersMmsEid = []; 
+        var rowHeadersMmsEid = [];
         var dataValuesMmmEid =[];
         var columnCounter;
         var i, j, k;
@@ -100,7 +188,7 @@ function TableService($q, $http, URLService, UtilsService, CacheService, _, Elem
           } //end of for k
           readTablesCommon();
         }
-        
+
         //requires numOfRowHeadersPerTable, rowHeadersMmsEid, dataValuesMmmEid, tableIds(to get number of tables)
         //common function to read 2.2 and previous version JSON
         function readTablesCommon(){
@@ -163,9 +251,9 @@ function TableService($q, $http, URLService, UtilsService, CacheService, _, Elem
                 deferred.resolve(r);
             });//ElementService.getElements - dataValuesMmEid
           });//ElementService.getElements - rowHeadersMmsEid
-        } //end of function 
-       
-        
+        } //end of function
+
+
       }); //end of ElementService
       return deferred.promise;
     }; //end of getTables
@@ -173,7 +261,8 @@ function TableService($q, $http, URLService, UtilsService, CacheService, _, Elem
 
     return {
         readTables: readTables,
-        toValidId: toValidId
+        toValidId: toValidId,
+        readTableCols: readTableCols
     };
 
 }

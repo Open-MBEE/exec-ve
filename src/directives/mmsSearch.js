@@ -76,7 +76,7 @@ function mmsSearch(ElementService, growl, $rootScope, $templateCache, mmsRootSit
             angular.element('.btn-search-name').removeClass('active');
             angular.element('.btn-search-documentation').removeClass('active');
             angular.element('.btn-search-value').removeClass('active');
-            angular.element('.btn-search-id').removeClass('active');
+            angular.element('.btn-search-sysmlId').removeClass('active');
             angular.element('.btn-search-' + searchType).addClass('active');
         };
         scope.setFilterFacet = function(filterFacet) {
@@ -108,7 +108,9 @@ function mmsSearch(ElementService, growl, $rootScope, $templateCache, mmsRootSit
             scope.searchClass = "fa fa-spin fa-spinner";
             if (scope.searchType === 'all')
               scope.searchType = '*';
-            ElementService.search(searchText, [scope.searchType], null, page, numItems, false, scope.mmsWs, 2)
+            if (scope.searchType === 'value')
+                scope.searchType = 'defaultValue.value,value.value,specification.value';
+            ElementService.search(searchText, scope.searchType.split(','), null, page, numItems, false, scope.mmsWs, 2)
             .then(function(data) {
                 var data1 = filterBySites(data);
                 if (scope.mmsOptions.filterCallback) {
