@@ -25,6 +25,12 @@ mms-view {
     @include transition(background-color, .2s, linear);
   }
 
+  mms-transclude-doc {
+    > p:first-child {
+      display: inline;
+    }
+  }
+
   .add-buttons-container {
     display: none;
   }
