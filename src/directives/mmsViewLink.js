@@ -39,7 +39,6 @@ function mmsViewLink(ElementService, UtilsService, $compile, growl) {
             var ws = scope.mmsWs;
             var version = scope.mmsVersion;
             var docid = scope.mmsDid;
-            var tag = scope.mmsTag;
             if (mmsViewCtrl) {
                 var viewVersion = mmsViewCtrl.getWsAndVersion();
                 if (!ws)
@@ -53,20 +52,26 @@ function mmsViewLink(ElementService, UtilsService, $compile, growl) {
                 version = 'latest';
             scope.ws = ws;
 
+            ConfigService.getConfigs(ws, false, 1)
+            .then(function(tags) {
+                var queryParam = '';
+                var tagId = '';
+                tags.forEach(function(tag) {
+                    if (tag.commitId === version)
+                        tagId = tag.id;
+                });
+                if (tagId !== '')
+                    queryParam = '?tag=' + tagId;
+                scope.query = queryParam;
+            });
+
             ElementService.getElement(scope.mmsVid, false, ws, version, 1, true)
             .then(function(data) {
                 scope.element = data;
                 var site = findSite(data);
                 scope.site = site;
-                var queryParam = '';
                 scope.name = data.name;
-                if (tag !== undefined && tag !== null && tag !== '') {
-                    queryParam = '?tag=' + tag;
-                }
-                else if (version !== 'latest') {
-                    queryParam = '?time=' + version;
-                }
-                scope.query = queryParam;
+
                 if (scope.mmsPeid && scope.mmsPeid !== '') {
                     scope.hash = '#' + scope.mmsPeid;
                     ElementService.getElement(scope.mmsPeid, false, ws, version)
