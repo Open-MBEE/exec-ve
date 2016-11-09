@@ -25,6 +25,12 @@ mms-view {
     @include transition(background-color, .2s, linear);
   }
 
+  mms-transclude-doc {
+    > p:first-child {
+      display: inline;
+    }
+  }
+
   .add-buttons-container {
     display: none;
   }
@@ -69,64 +75,6 @@ mms-view.editing {
     }
   }
 
-  /* Level 2 transclusions */
-  /*mms-transclude-doc,
-  mms-transclude-name,
-  mms-transclude-val {
-
-    mms-transclude-doc,
-    mms-transclude-name,
-    mms-transclude-val {
-    // mms-transclude-doc>*,
-    // mms-transclude-name>*,
-    // mms-transclude-val>* {
-      border: 2px solid darken($tertiary_grey, 25%);
-    }
-  }*/
-
-  /* Level 3 transclusions */
-  /*mms-transclude-doc,
-  mms-transclude-name,
-  mms-transclude-val {
-
-    mms-transclude-doc,
-    mms-transclude-name,
-    mms-transclude-val {
-
-      mms-transclude-doc,
-      mms-transclude-name,
-      mms-transclude-val {
-      // mms-transclude-doc>*,
-      // mms-transclude-name>*,
-      // mms-transclude-val>* {
-        color: darken($white, 10%);
-        border: 2px solid darken($tertiary_grey, 50%);
-      }
-    }
-  }*/
-
-  /* Level 4 transclusions */
-  /*mms-transclude-doc,
-  mms-transclude-name,
-  mms-transclude-val {
-
-    mms-transclude-doc,
-    mms-transclude-name,
-    mms-transclude-val {
-
-      mms-transclude-doc,
-      mms-transclude-name,
-      mms-transclude-val {
-        
-        mms-transclude-doc,
-        mms-transclude-name,
-        mms-transclude-val {
-          color: darken($white, 20%);
-          border: 2px solid darken($tertiary_grey, 65%);
-        }
-      }
-    }
-  }*/
 }
 
 /* comments */
