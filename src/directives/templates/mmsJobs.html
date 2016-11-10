@@ -27,9 +27,9 @@
             <div>{{job.status}} <a ng-attr-href="{{job.url}}" target="_blank" ng-show="buttonEnabled">log</a></div> 
         </td>
         <td>{{job.create}}</td>
-        <td><button class="btn-link" ng-click="deleteJob()"><strong><span ng-show="deleteCleared">DELETE JOB</span></stong></button><i ng-show="!deleteCleared" class="fa fa-spin fa-spinner"></i></td>
+        <td><button class="btn-link" ng-if="docEditable" ng-click="deleteJob()"><strong><span ng-show="deleteCleared">DELETE JOB</span></stong></button><i ng-show="!deleteCleared" class="fa fa-spin fa-spinner"></i></td>
         <td>
-            <div ng-if="buttonEnabled && deleteCleared">
+            <div ng-if="buttonEnabled && deleteCleared && docEditable">
                 <button type="submit" class="btn-link" ng-click="runNow()"><strong><span ng-show="runCleared">RUN NOW</span></stong></button><i ng-show="!runCleared" class="fa fa-spin fa-spinner"></i>
             </div>
         </td>
@@ -40,5 +40,5 @@
 <h3 ng-if="!hasJobs && !loading"> No Current Jobs</h3>
 <hr>
 <div class="row" style="margin-right:0px;">
-<button type="submit"  class="btn-link pull-right" ng-if="!hasJobs && !loading" ng-click="runNow()" style="text-transform: uppercase;"><strong><span ng-show="responseCleared">RUN JOB FOR {{docName}}</span></stong><i ng-show="!responseCleared" class="fa fa-spin fa-spinner"></i></button>
+<button type="submit"  class="btn-link pull-right" ng-if="!hasJobs && !loading && docEditable" ng-click="runNow()" style="text-transform: uppercase;"><strong><span ng-show="responseCleared">RUN JOB FOR {{docName}}</span></stong><i ng-show="!responseCleared" class="fa fa-spin fa-spinner"></i></button>
 </div>
