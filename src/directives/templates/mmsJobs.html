@@ -42,3 +42,6 @@
 <div class="row" style="margin-right:0px;">
 <button type="submit"  class="btn-link pull-right" ng-if="!hasJobs && !loading && docEditable" ng-click="runNow()" style="text-transform: uppercase;"><strong><span ng-show="responseCleared">RUN JOB FOR {{docName}}</span></stong><i ng-show="!responseCleared" class="fa fa-spin fa-spinner"></i></button>
 </div>
+<div ng-if="docEditable">
+    <a href="/share/page/document-details?nodeRef={{doc.nodeRefId}}" target="_blank">Edit Permissions</a>
+</div>

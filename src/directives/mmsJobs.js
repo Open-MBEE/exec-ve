@@ -99,6 +99,7 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
                     return;
                 if(!document.specialization || document.specialization.type !== 'Product')
                     return;
+                scope.doc = document;
                 documentName = document.name;
                 scope.docEditable = document.editable;
                 ElementService.getIdInfo(document, null)
