@@ -4,8 +4,8 @@
 
 angular.module('mmsApp')
 
-.controller('FullDocCtrl', ['$scope', '$templateCache', '$compile', '$timeout', '$rootScope', '$state', '$stateParams', '$window', 'MmsAppUtils', 'document', 'workspace', 'site', 'snapshot', 'commit', 'tag', 'ConfigService', 'UxService', 'ViewService', 'UtilsService', 'ElementService', '$q', 'growl', 'hotkeys', 'search', '_', '$element',
-function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateParams, $window, MmsAppUtils, document, workspace, site, snapshot, commit, tag, ConfigService, UxService, ViewService, UtilsService, ElementService, $q, growl, hotkeys, search, _, $element) {
+.controller('FullDocCtrl', ['$scope', '$templateCache', '$compile', '$timeout', '$rootScope', '$state', '$stateParams', '$window', 'MmsAppUtils', 'document', 'workspace', 'site', 'commit', 'tag', 'ConfigService', 'UxService', 'ViewService', 'UtilsService', 'ElementService', '$q', 'growl', 'hotkeys', 'search', '_', '$element',
+function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateParams, $window, MmsAppUtils, document, workspace, site, commit, tag, ConfigService, UxService, ViewService, UtilsService, ElementService, $q, growl, hotkeys, search, _, $element) {
 
     $scope.ws = $stateParams.workspace;
     $scope.site = site;

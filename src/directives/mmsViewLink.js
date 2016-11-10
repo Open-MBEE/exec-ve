@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsViewLink', ['ElementService', 'UtilsService', '$compile', 'growl', mmsViewLink]);
+.directive('mmsViewLink', ['ElementService', 'UtilsService', 'ConfigService', '$compile', 'growl', mmsViewLink]);
 
 /**
  * @ngdoc directive
@@ -20,7 +20,7 @@ angular.module('mms.directives')
  * @param {string=latest} mmsVersion Version can be alfresco version number or timestamp, default is latest
  * @param {string=} mmsDid Document context of view
  */
-function mmsViewLink(ElementService, UtilsService, $compile, growl) {
+function mmsViewLink(ElementService, UtilsService, ConfigService, $compile, growl) {
 
     function findSite(element) {
         if (element._siteCharacterizationId)
