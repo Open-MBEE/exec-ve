@@ -29,7 +29,7 @@ function StompService($rootScope, UtilsService, $window, $location, ApplicationS
 
     var stompSuccessCallback = function(message){
         var updateWebpage = angular.fromJson(message.body);
-        var workspaceId = updateWebpage.workspace2.id;
+        var workspaceId = message.headers.workspace;
         if(updateWebpage.source !== ApplicationService.getSource()){
             $rootScope.$apply( function(){
                 if(updateWebpage.workspace2.addedElements && updateWebpage.workspace2.addedElements.length > 0){
