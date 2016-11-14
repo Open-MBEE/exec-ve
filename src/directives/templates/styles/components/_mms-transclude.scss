@@ -9,12 +9,13 @@ mms-transclude-img {
 }
 
 span > mms-transclude-doc, span > mms-transclude-val {
+  background-color: inherit;
+  color: inherit;
+
+  > p, > h1, > h2, > h3, > h4, > h5, > h6, > ol, > ul, > pre {
     background-color: inherit;
     color: inherit;
-    > p, > h1, > h2, > h3, > h4, > h5, > h6, > ol, > ul, > pre {
-      background-color: inherit;
-      color: inherit;
-    }
+  }
 }
 
 mms-view {
@@ -29,72 +30,51 @@ mms-view {
       display: inline;
     }
   }
+
+  .add-buttons-container {
+    display: none;
+  }
 }
 
 mms-view.editing {
   color: #000;
 
+  .add-buttons-container {
+    display: block;
+  }
+
+  .val-block {
+    display: block;
+  }
+
+  textarea, input {
+    color: #000;
+  }
+
   /* Level 1 transclusions */
-  mms-transclude-doc>*,
-  mms-transclude-name>*,
-  mms-transclude-val>* {
-    @include transition(background-color, .2s, linear);
-    background-color: $tertiary_grey;
+  mms-transclude-doc,
+  mms-transclude-name,
+  mms-transclude-val {
+    @include transition(border, .3s, linear);
+    border: 2px solid $tertiary_grey;
+    border-radius: 5px;
     cursor: pointer;
+    margin-bottom: 5px;
+    // padding: 2px 0;
   }
+  
+  mms-transclude-doc {
+    display: block;
 
-  /* Level 2 transclusions */
-  mms-transclude-doc,
-  mms-transclude-name,
-  mms-transclude-val {
+    > div > div.panel-heading {
+      padding: 0;
+    }
 
-    mms-transclude-doc>*,
-    mms-transclude-name>*,
-    mms-transclude-val>* {
-      background-color: darken($tertiary_grey, 25%);
+    .transclude-doc-bb {
+      margin: 8px 0;
     }
   }
 
-  /* Level 3 transclusions */
-  mms-transclude-doc,
-  mms-transclude-name,
-  mms-transclude-val {
-
-    mms-transclude-doc,
-    mms-transclude-name,
-    mms-transclude-val {
-
-      mms-transclude-doc>*,
-      mms-transclude-name>*,
-      mms-transclude-val>* {
-        color: darken($white, 10%);
-        background-color: darken($tertiary_grey, 50%);
-      }
-    }
-  }
-
-  /* Level 4 transclusions */
-  mms-transclude-doc,
-  mms-transclude-name,
-  mms-transclude-val {
-
-    mms-transclude-doc,
-    mms-transclude-name,
-    mms-transclude-val {
-
-      mms-transclude-doc,
-      mms-transclude-name,
-      mms-transclude-val {
-        
-        mms-transclude-doc>*,
-        mms-transclude-name>*,
-        mms-transclude-val>* {
-          color: darken($white, 20%);
-          background-color: darken($tertiary_grey, 65%);
-        }
-      }
-    }
-  }
 }
 
 /* comments */

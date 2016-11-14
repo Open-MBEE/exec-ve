@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms')
-.factory('StompService', ['$rootScope', 'UtilsService', '$window', '$location','ApplicationService', 'CacheService', StompService]);
+.factory('StompService', ['$rootScope', 'UtilsService', '$window', '$location','ApplicationService', 'CacheService', 'URLService','$http', StompService]);
 
 /**
  * @ngdoc service
@@ -11,19 +11,25 @@ angular.module('mms')
  * @description
  * Provides messages from the activemq JMS bus
  */
-function StompService($rootScope, UtilsService, $window, $location, ApplicationService, CacheService) {
+function StompService($rootScope, UtilsService, $window, $location, ApplicationService, CacheService, URLService, $http) {
      var stompClient = {};
-     var host = $location.host();
-     var hostName = 'wss://'+$location.host().split(".")[0]+'.jpl.nasa.gov:61614';
-    //  if (host == '127.0.0.1') {
-    //     hostName = 'wss://127.0.0.1:61614';
-    //  } else if (host == 'localhost') {
-    //      hostName = 'wss://localhost:61614';
-    //  }
+     var host;
+
+    $http.get(URLService.getJMSHostname()).then(function successCallback(response) {
+        if(response.data.connections[0].hasOwnProperty("uri")){
+            var removeProtocol = response.data.connections[0].uri.replace(/.*?:\/\//g, "");
+            host = 'wss://' + removeProtocol.substring(0, removeProtocol.length-6) + ':61614';
+            stompConnect();
+        }else{
+            console.log('JSON does not contain the right key.  STOMP failed.');
+        }
+    }, function errorCallback(failed) {
+        console.log("failed to connect to the JMS:  " + failed.status);
+    });
 
     var stompSuccessCallback = function(message){
         var updateWebpage = angular.fromJson(message.body);
-        var workspaceId = updateWebpage.workspace2.id;
+        var workspaceId = message.headers.workspace;
         if(updateWebpage.source !== ApplicationService.getSource()){
             $rootScope.$apply( function(){
                 if(updateWebpage.workspace2.addedElements && updateWebpage.workspace2.addedElements.length > 0){
@@ -73,18 +79,13 @@ function StompService($rootScope, UtilsService, $window, $location, ApplicationS
         console.log('STOMP: Reconecting in 10 seconds');
     };
     var stompConnect = function(){
-        stompClient = Stomp.client(hostName);
+        stompClient = Stomp.client(host);
         stompClient.debug = null;
         stompClient.connect("guest", "guest", function(){ // on success
             stompClient.subscribe("/topic/master", stompSuccessCallback );
         }, stompFailureCallback, '/');
     };
-    //inital connection call
-    stompConnect();
 
-     // TODO: server disconnects in sufficiently long enough periods of inactivity
-     //"Whoops! Lost connection to " and then reconnect
-     //http://stackoverflow.com/questions/22361917/automatic-reconnect-with-stomp-js-in-node-js-application/22403521#22403521
      return {
 
      };

@@ -172,7 +172,7 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
         $scope.bbApi.toggleButtonSpinner('convert-pdf');
         MmsAppUtils.printModal(document, $scope.ws, site, commit, tag, true, 3)
         .then(function(ob) {
-            growl.info('Converting HTML to PDF...Please wait for a completion email');
+            growl.info('Converting HTML to PDF...Please wait for a completion email.',{ttl: -1});
         }, function(reason){
             growl.error("Failed to convert HTML to PDF: " + reason.message);
         }).finally(function() {
