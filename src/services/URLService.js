@@ -593,6 +593,10 @@ function urlService(baseUrl) {
     var setTicket = function(t) {
         ticket = t;
     };
+    
+    var getJMSHostname = function(){
+        return root + '/connection/jms';
+    };
     return {
         getMmsVersionURL: getMmsVersionURL,
         getSiteDashboardURL: getSiteDashboardURL,
@@ -629,7 +633,8 @@ function urlService(baseUrl) {
         getLogoutURL: getLogoutURL,
         isTimestamp: isTimestamp,
         getRoot: getRoot,
-        setTicket: setTicket
+        setTicket: setTicket,
+        getJMSHostname: getJMSHostname
     };
 
 }
