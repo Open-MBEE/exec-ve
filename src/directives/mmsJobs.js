@@ -99,7 +99,9 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
                     return;
                 if(!document.specialization || document.specialization.type !== 'Product')
                     return;
+                scope.doc = document;
                 documentName = document.name;
+                scope.docEditable = document.editable;
                 ElementService.getIdInfo(document, null)
                 .then(function(data) {
                     project = data;
@@ -217,6 +219,8 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
         };
 
         scope.enableEditor = function() {
+            if (!scope.docEditable)
+                return;
             scope.editorEnabled = true;
             scope.jobInput.jobName = scope.job.name.replace('_job','');
         };
