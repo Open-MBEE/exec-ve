@@ -64,7 +64,8 @@ function mmsMenu(SiteService, WorkspaceService, ConfigService, $state, $template
         } else {
             scope.config = 'latest';
         } */
-
+        if (!scope.site)
+            return;
         var currSiteParentId = scope.site.parent;
         var isCharacterization = scope.site.isCharacterization;
         var breadcrumbs = [];

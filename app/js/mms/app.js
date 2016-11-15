@@ -152,7 +152,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 return ConfigService.getConfigs(workspace, false, 2);
             },
             tag: function ($stateParams, ConfigService, workspace, ticket) {
-                return { name: 'latest', timestamp: 'latest', commitId: 'latest'};
+                return { name: 'latest', _timestamp: 'latest', commitId: 'latest'};
             },  
             sites: function(SiteService, ticket) {                 
                return SiteService.getSites();
@@ -291,7 +291,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             },
             tag: function ($stateParams, ConfigService, workspace, ticket) {
                 if ($stateParams.tag === undefined || $stateParams.tag === 'latest')
-                    return { name: 'latest', timestamp: 'latest', commitId: 'latest'};
+                    return { name: 'latest', _timestamp: 'latest', commitId: 'latest'};
                 return ConfigService.getConfig($stateParams.tag, workspace, false, 2);
             },        
             commit: function(tag, ticket) {
@@ -485,22 +485,6 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             },
             view: function($stateParams, ViewService, viewElements, commit, ticket) {
                 return ViewService.getView($stateParams.document, false, $stateParams.workspace, commit, 2, true);
-            },
-            tag: function ($stateParams, ConfigService, workspace, ticket, tags) {
-                if ($stateParams.tag === undefined) {    
-                     return { name: 'latest', timestamp: 'latest', commitId: 'latest' };
-                } else {
-                    return ConfigService.getConfig($stateParams.tag, workspace, false, 2);
-                }
-            },        
-            commit: function($stateParams, ConfigService, workspace, ticket) {
-                if ($stateParams.tag !== undefined) {
-                    return ConfigService.getConfig($stateParams.tag, workspace, false, 2).then(function(tag) {
-                        return tag.commitId;
-                    }); 
-                }
-                else
-                    return "latest";
             }
         },
         views: {
@@ -518,8 +502,8 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                     $rootScope.mms_title = 'View Editor: '+document.name;
                     
                     var tagStr = '';
-                    if (tag.timestamp !== 'latest') {
-                        tagStr += '( <i class="fa fa-camera"></i> ' + $filter('date')(tag.timestamp, 'M/d/yy h:mm a') + ' )';
+                    if (tag._timestamp !== 'latest') {
+                        tagStr += '( <i class="fa fa-camera"></i> ' + $filter('date')(tag._timestamp, 'M/d/yy h:mm a') + ' )';
                         $scope.snapshotTag = ' ' + tagStr;
                     }                                        
                 }
