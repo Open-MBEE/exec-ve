@@ -471,6 +471,7 @@ function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templ
         printElementCopy.find('[style]').each(function() {
             this.style.removeProperty('font-size');
             this.style.removeProperty('width');
+            this.style.removeProperty('min-width');
         });
         printElementCopy.find('.math').remove(); //this won't work in chrome for popups since chrome can't display mathml
         printElementCopy.find('script').remove();

@@ -1,39 +1,37 @@
 {
-    "owner": "holding_bin_test-site_no_project",
-    "creator": "admin",
-    "read": "2015-08-19T10:17:55.880-0700",
-    "created": "Wed Aug 19 10:17:46 PDT 2015",
-    "qualifiedName": "/test-site/test-site_no_project/holding_bin/Create Document",
-    "editable": true,
-    "modifier": "admin",
+    "ownerId": "holding_bin_test-site_no_project",
+    "_creator": "admin",
+    "_read": "2015-08-19T10:17:55.880-0700",
+    "_created": "2015-08-19T10:17:55.880-0700",
+    "_qualifiedName": "/test-site/test-site_no_project/holding_bin/Create Document",
+    "_editable": true,
+    "_modifier": "admin",
     "documentation": "",
-    "siteCharacterizationId": "test-site",
-    "sysmlid": "MMS_1440004666224_40c9834a-d6d0-47ff-bfe3-54d25e0462d0",
-    "qualifiedId": "/test-site/test-site_no_project/holding_bin_test-site_no_project/MMS_1440004666224_40c9834a-d6d0-47ff-bfe3-54d25e0462d0",
+    "_siteCharacterizationId": "test-site",
+    "sysmlId": "MMS_1440004666224_40c9834a-d6d0-47ff-bfe3-54d25e0462d0",
+    "_qualifiedId": "/test-site/test-site_no_project/holding_bin_test-site_no_project/MMS_1440004666224_40c9834a-d6d0-47ff-bfe3-54d25e0462d0",
     "name": "Create Document",
-    "modified": "2015-08-19T10:17:55.726-0700",
-    "specialization": {
-        "type": "Product",
-        "allowedElements": [
-            "MMS_1440004666224_40c9834a-d6d0-47ff-bfe3-54d25e0462d0"
-        ],
-        "displayedElements": [
-            "MMS_1440004666224_40c9834a-d6d0-47ff-bfe3-54d25e0462d0"
-        ],
-        "view2view": [
+    "_modified": "2015-08-19T10:17:55.726-0700",
+    "type": "Class",
+    "_allowedElements": [
+        "MMS_1440004666224_40c9834a-d6d0-47ff-bfe3-54d25e0462d0"
+    ],
+    "_displayedElements": [
+        "MMS_1440004666224_40c9834a-d6d0-47ff-bfe3-54d25e0462d0"
+    ],
+    "_view2view": [
+        {
+            "id": "MMS_1440004666224_40c9834a-d6d0-47ff-bfe3-54d25e0462d0",
+            "childrenViews": []
+        }
+    ],
+    "_contents": {
+        "operand": [
             {
-                "id": "MMS_1440004666224_40c9834a-d6d0-47ff-bfe3-54d25e0462d0",
-                "childrenViews": []
+                "instanceId": "MMS_1440004666408_1ad841a8-ca81-4306-ba9b-cacc493d8e6d",
+                "type": "InstanceValue"
             }
         ],
-        "contents": {
-            "operand": [
-                {
-                    "instance": "MMS_1440004666408_1ad841a8-ca81-4306-ba9b-cacc493d8e6d",
-                    "type": "InstanceValue"
-                }
-            ],
-            "type": "Expression"
-        }
+        "type": "Expression"
     }
 }

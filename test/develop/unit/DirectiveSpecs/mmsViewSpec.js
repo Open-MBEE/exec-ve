@@ -27,27 +27,21 @@ describe('mmsTranscludeVal directive', function () {
             var testElement = {
                 elements: [{
                     name: "Test Element",
-                    sysmlid: "8008",
-                    modified: "2016-05-25T12:16:06.856-0700",
-                    modifier: "catTester",
+                    sysmlId: "8008",
+                    _modified: "2016-05-25T12:16:06.856-0700",
+                    _modifier: "catTester",
                     documentation: '<mms-transclude-doc mms-eid="301"></mms-transclude-doc>',
-                    specialization: {
-                        type: "View",
-                        contents: {
+                    type: "Class",
+                    _contents: {
+                        valueExpression: null,
+                        operand: [{
                             valueExpression: null,
-                            operand: [{
-                                valueExpression: null,
-                                type: "InstanceValue",
-                                instance: "301"
-                            }],
-                            type: "Expression"
-                        },
-                        view2view: [{childrenViews: [], id: "301"}],
-                        childViews: [{
-                            childrenViews: [],
-                            id: "301"
-                        }]
-                    }
+                            type: "InstanceValue",
+                            instanceId: "301"
+                        }],
+                        type: "Expression"
+                    },
+                    _view2view: [{childrenViews: [], id: "301"}]
                 }]
             };
 
@@ -55,17 +49,15 @@ describe('mmsTranscludeVal directive', function () {
             var element301 = {
                 elements: [{
                     name: "301 Element",
-                    sysmlid: "301",
+                    sysmlId: "301",
                     documentation: '<mms-transclude-doc data-mms-eid="302"></mms-transclude-doc>',
-                    specialization: {
-                        instanceSpecificationSpecification: {
-                            valueExpression: null,
-                            string: "{\"sourceProperty\":\"documentation\",\"source\":\"302\",\"type\":\"Paragraph\"}",
-                            type: "LiteralString"
-                        },
-                        classifier: ["Classify this!"],
-                        type: "InstanceSpecification"
+                    specification: {
+                        valueExpression: null,
+                        value: "{\"sourceProperty\":\"documentation\",\"source\":\"302\",\"type\":\"Paragraph\"}",
+                        type: "LiteralString"
                     },
+                    classifierIds: ["Classify this!"],
+                    type: "InstanceSpecification",
                     isMetatype: false
                 }]
             };
@@ -73,40 +65,35 @@ describe('mmsTranscludeVal directive', function () {
             var element302 = {
                 elements: [{
                     name: "302 Element",
-                    sysmlid: "302",
+                    sysmlId: "302",
                     documentation: 'Omg I have this working\!\!\!\!',
-                    appliedMetatypes: ["How Meta...."],
-                    specialization: {
-                        instanceSpecificationSpecification: {
-                            valueExpression: null,
-                            string: "{\"sourceProperty\":\"documentation\",\"source\":\"302\",\"type\":\"Paragraph\"}",
-                            type: "LiteralString"
-                        },
-                        classifier: ["Too Classy for you"],
-                        type: "InstanceSpecification"
+                    _appliedStereotypeIds: ["How Meta...."],
+                    specification: {
+                        valueExpression: null,
+                        value: "{\"sourceProperty\":\"documentation\",\"source\":\"302\",\"type\":\"Paragraph\"}",
+                        type: "LiteralString"
                     },
-                    isMetatype: false
+                    classifierIds: ["Too Classy for you"],
+                    type: "InstanceSpecification"
                 }]
             };
 
             var sectionView = {
                 elements: [{
                     name: "Section View Element",
-                    sysmlid: "sectionView",
-                    modified: "2016-05-25T12:16:06.856-0700",
-                    modifier: "catTester",
+                    sysmlId: "sectionView",
+                    _modified: "2016-05-25T12:16:06.856-0700",
+                    _modifier: "catTester",
                     documentation: '<mms-tansclude-doc mms-eid="sectionElement"></mms-tansclude-doc>',
-                    specialization: {
-                        type: "View",
-                        contents: {
+                    type: "Class",
+                    _contents: {
+                        valueExpression: null,
+                        operand: [{
                             valueExpression: null,
-                            operand: [{
-                                valueExpression: null,
-                                type: "InstanceValue",
-                                instance: "sectionElement"
-                            }],
-                            type: "Expression"
-                        }
+                            type: "InstanceValue",
+                            instanceId: "sectionElement"
+                        }],
+                        type: "Expression"
                     }
                 }]
             };
@@ -114,43 +101,36 @@ describe('mmsTranscludeVal directive', function () {
             var sectionElement = {
                 elements: [{
                     name: "Section Element",
-                    sysmlid: "sectionElement",
+                    sysmlId: "sectionElement",
                     documentation: 'Super Sleezy Secular Section',
-                    appliedMetatypes: ["How Meta...."],
-                    specialization: {
-                        instanceSpecificationSpecification: {
+                    _appliedStereotypeIds: ["How Meta...."],
+                    specification: {
+                        valueExpression: null,
+                        type: "Expression",
+                        operand: [{
                             valueExpression: null,
-                            type: "Expression",
-                            operand: [{
-                                valueExpression: null,
-                                type: "InstanceValue",
-                                instance: "tableElement"
-                            }]
-                        },
-                        classifier: ["_17_0_5_1_407019f_1430628211976_255218_12002"],
-                        type: "InstanceSpecification"
+                            type: "InstanceValue",
+                            instanceId: "tableElement"
+                        }]
                     },
-                    isMetatype: false
+                    classifierIds: ["_17_0_5_1_407019f_1430628211976_255218_12002"],
+                    type: "InstanceSpecification"
                 }]
             };
 
             var tableElement = {
                 elements: [{
                     name: "Table Element",
-                    sysmlid: "tableElement",
+                    sysmlId: "tableElement",
                     documentation: 'This is a table element\!',
-                    appliedMetatypes: ["How Meta...."],
-                    specialization: {
-                        instanceSpecificationSpecification: {
-                            // string: tableJson,
-                            string: JSON.stringify(tableJson),
-                            type: "LiteralString"
-                        },
-                        slots:[],
-                        classifier: ["_17_0_5_1_407019f_1430628178633_708586_11903"],
-                        type: "InstanceSpecification"
+                    _appliedStereotypeIds: ["How Meta...."],
+                    specification: {
+                        // string: tableJson,
+                        value: JSON.stringify(tableJson),
+                        type: "LiteralString"
                     },
-                    isMetatype: false
+                    classifierIds: ["_17_0_5_1_407019f_1430628178633_708586_11903"],
+                    type: "InstanceSpecification"
                 }]
             };
 
@@ -170,22 +150,22 @@ describe('mmsTranscludeVal directive', function () {
                 {elements: [sectionElement.elements[0], tableElement.elements[0]]}
             );
 
-            var cacheKey = UtilsService.makeElementKey(testElement.elements[0].sysmlid, 'master', 'latest', false);
+            var cacheKey = UtilsService.makeElementKey(testElement.elements[0].sysmlId, 'master', 'latest', false);
             CacheService.put(cacheKey, testElement.elements[0]);
 
-            cacheKey = UtilsService.makeElementKey(element301.elements[0].sysmlid, 'master', 'latest', false);
+            cacheKey = UtilsService.makeElementKey(element301.elements[0].sysmlId, 'master', 'latest', false);
             CacheService.put(cacheKey, element301.elements[0]);
 
-            cacheKey = UtilsService.makeElementKey(element302.elements[0].sysmlid, 'master', 'latest', false);
+            cacheKey = UtilsService.makeElementKey(element302.elements[0].sysmlId, 'master', 'latest', false);
             CacheService.put(cacheKey, element302.elements[0]);
 
-            cacheKey = UtilsService.makeElementKey(sectionView.elements[0].sysmlid, 'master', 'latest', false);
+            cacheKey = UtilsService.makeElementKey(sectionView.elements[0].sysmlId, 'master', 'latest', false);
             CacheService.put(cacheKey, sectionView.elements[0]);
 
-            cacheKey = UtilsService.makeElementKey(sectionElement.elements[0].sysmlid, 'master', 'latest', false);
+            cacheKey = UtilsService.makeElementKey(sectionElement.elements[0].sysmlId, 'master', 'latest', false);
             CacheService.put(cacheKey, sectionElement.elements[0]);
 
-            cacheKey = UtilsService.makeElementKey(tableElement.elements[0].sysmlid, 'master', 'latest', false);
+            cacheKey = UtilsService.makeElementKey(tableElement.elements[0].sysmlId, 'master', 'latest', false);
             CacheService.put(cacheKey, tableElement.elements[0]);
 
         });
