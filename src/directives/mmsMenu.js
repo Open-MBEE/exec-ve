@@ -42,13 +42,13 @@ function mmsMenu(SiteService, WorkspaceService, ConfigService, $state, $template
             $state.go('workspaces', {search: undefined});
         };
         scope.updateWorkspace = function(wsId) {
-            $state.go($state.current.name, {workspace: wsId, tag: undefined, search: undefined});
+            $state.go($state.current.name, {workspace: wsId, tag: undefined, search: undefined}, {reload:true});
         };
         scope.updateTag = function() {
-            $state.go($state.current.name, {tag: scope.config.id, search: undefined});
+            $state.go($state.current.name, {tag: scope.config.id, search: undefined}, {reload:true});
         };
         scope.latestTag = function() {
-            $state.go($state.current.name, {tag: undefined, search: undefined});
+            $state.go($state.current.name, {tag: undefined, search: undefined}, {reload:true});
         };
 
         WorkspaceService.getWorkspace(scope.ws)
