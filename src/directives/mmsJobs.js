@@ -101,7 +101,7 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
                     return;
                 scope.doc = document;
                 documentName = document.name;
-                scope.docEditable = document.editable;
+                scope.docEditable = document.editable && scope.mmsWs === 'master';
                 ElementService.getIdInfo(document, null)
                 .then(function(data) {
                     project = data;
@@ -153,7 +153,7 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
             var post = {
                 jobs: [{
                     name: defaultName,
-                    command: 'Jenkins,DocWeb,' + id + ',' + project.projectName,
+                    command: 'Jenkins,DocWeb,' + id + ',' + project.projectId,
                     schedule: thisSchedule,
                     status: 'in queue',
                     url: 'sample_initial_url',
