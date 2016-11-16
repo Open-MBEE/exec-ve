@@ -153,7 +153,7 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
             var post = {
                 jobs: [{
                     name: defaultName,
-                    command: 'Jenkins,DocWeb,' + id + ',' + project.projectName,
+                    command: 'Jenkins,DocWeb,' + id + ',' + project.projectId,
                     schedule: thisSchedule,
                     status: 'in queue',
                     url: 'sample_initial_url',
