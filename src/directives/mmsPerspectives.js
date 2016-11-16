@@ -393,7 +393,7 @@ function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigSe
                     "command": "Custom",
                     "data": {
                         "serverClassName": "gov.nasa.jpl.mbee.ems.action.SetMmsRestBaseUrlCommandImpl",
-                        "args": ["int-add-" + id, "https://cae-ems-alf5int.jpl.nasa.gov/alfresco/service"],
+                        "args": ["int-add-" + id, "https://opencae-int.jpl.nasa.gov/alfresco/service"],
                         "modelID": 'model-' + id,
                         "module": "SysML",
                         "project": id,
@@ -405,26 +405,13 @@ function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigSe
                     "command": "Custom",
                     "data": {
                         "serverClassName": "gov.nasa.jpl.mbee.ems.action.SetMmsRestBaseUrlCommandImpl",
-                        "args": ["int-context-" + id, "https://cae-ems-alf5int.jpl.nasa.gov/alfresco/service"],
+                        "args": ["int-context-" + id, "https://opencae-int.jpl.nasa.gov/alfresco/service"],
                         "modelID": 'model-' + id,
                         "module": "SysML",
                         "project": id,
                         "viewID": "view-" + id,
                         "viewName": viewName
                     }
-                },
-                {
-                    "command": "SetModelAttribute",
-                    "data": {
-                        "attributeName": "AddElements",
-                        "attributeValue": getElementsArrayString(scope.initElements),
-                        "modelID": 'model-' + id,
-                        "module": "SysML",
-                        "project": id,
-                        "viewID": "view-" + id,
-                        "viewName": viewName
-                    },
-                    "onfailure":"onPerspectivesCommandFailure",
                 },
                 {
                     "command": "SetModelAttribute",
@@ -438,33 +425,55 @@ function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigSe
                         "viewName": viewName
                     },
                     "onfailure":"onPerspectivesCommandFailure",
-                },
-                {
-                    "command":"Update",
-                    "onsuccess":"onPerspectivesCommandSuccess",
-                    "onfailure":"onPerspectivesCommandFailure",
-                    "data": {
-                        "project": id,
-                        "module": "SysML",
-                        "integratorIDs":["int-add-" + id, 'int-context-' + id, 'int-fcd-' + id]
-                        //"integratorIDs":["int-smd-" + id, "int-fcd-" + id]
-                    }
-               }
+                }
             ]
         };
-        if (scope.context) {
-            updateCommand.data.splice(3, 0, {
-                "command": "SetModelAttribute",
-                "data": {
-                    "attributeName": "Context",
-                    "attributeValue": scope.context,
-                    "modelID": 'model-' + id,
-                    "module": "SysML",
-                    "project": id,
-                    "viewID": "view-" + id,
-                    "viewName": viewName
-                },
+        if (scope.context || (scope.initElements.length > 0)) {
+            var initialIntegratorIds = [];
+            if (scope.context) {
+                updateCommand.data.push({
+                    "command": "SetModelAttribute",
+                    "data": {
+                        "attributeName": "Context",
+                        "attributeValue": scope.context,
+                        "modelID": 'model-' + id,
+                        "module": "SysML",
+                        "project": id,
+                        "viewID": "view-" + id,
+                        "viewName": viewName
+                    },
+                    "onfailure":"onPerspectivesCommandFailure",
+                });
+                initialIntegratorIds.push('int-context-' + id);
+            }
+            if (scope.initElements.length > 0) {
+                updateCommand.data.push({
+                    "command": "SetModelAttribute",
+                    "data": {
+                        "attributeName": "AddElements",
+                        "attributeValue": getElementsArrayString(scope.initElements),
+                        "modelID": 'model-' + id,
+                        "module": "SysML",
+                        "project": id,
+                        "viewID": "view-" + id,
+                        "viewName": viewName
+                    },
+                    "onfailure":"onPerspectivesCommandFailure",
+                });
+                initialIntegratorIds.push('int-add-' + id);
+            }
+            initialIntegratorIds.push('int-fcd-' + id);
+            updateCommand.data.push({
+                "command":"Update",
+                "onsuccess":"onPerspectivesCommandSuccess",
                 "onfailure":"onPerspectivesCommandFailure",
+                "data": {
+                    "project": id,
+                    "module": "SysML",
+                    "integratorIDs": initialIntegratorIds
+                    //"integratorIDs":["int-add-" + id, 'int-context-' + id, 'int-fcd-' + id]
+                    //"integratorIDs":["int-smd-" + id, "int-fcd-" + id]
+                }
             });
         }
         mapping[id] = updateCommand;
