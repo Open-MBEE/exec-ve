@@ -101,7 +101,7 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
                     return;
                 scope.doc = document;
                 documentName = document.name;
-                scope.docEditable = document.editable;
+                scope.docEditable = document.editable && scope.mmsWs === 'master';
                 ElementService.getIdInfo(document, null)
                 .then(function(data) {
                     project = data;
