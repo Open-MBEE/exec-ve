@@ -774,6 +774,13 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 if (itemType === 'Tag') {
                     newbranch.workspace = branch.data.id;
                     top = true;
+                    //cannot go to it yet because there's no id
+                    growl.info("Tag is being created, please wait for a notification.");
+                    return;
+                }
+                if (itemType === 'Workspace') {
+                    growl.info("Workspace is being created, please wait for a notification.");
+                    return;
                 }
                 else if (itemType === 'Document') {
                     newbranch.site = branch.data.sysmlId;

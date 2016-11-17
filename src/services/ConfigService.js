@@ -146,6 +146,10 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, HttpSe
         } */
         $http.post(URLService.getConfigsURL(n.ws), {'configurations': [config]})
         .success(function(data, status, headers, config) {
+            if (!data.id) {
+                deferred.resolve(data);
+                return;
+            }
             deferred.resolve(CacheService.put(['configs', n.ws, data.id], data, true));
             if (!update) {
                 if (CacheService.exists(['workspaces', n.ws, 'configs'])) {
