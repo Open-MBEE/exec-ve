@@ -396,7 +396,8 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
         
         var update = function() {
             // getData() returns CKEditor's processed/clean HTML content.
-            ngModelCtrl.$setViewValue(instance.getData());
+            if (angular.isDefined(instance) && instance !== null)
+                ngModelCtrl.$setViewValue(instance.getData());
         };
         
         // Formatting editor toolbar
