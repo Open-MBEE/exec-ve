@@ -5,20 +5,19 @@
 angular.module('mmsApp')
 .controller('ToolCtrl', ['$scope', '$rootScope', '$state', '$uibModal', '$q', '$stateParams', '$timeout',
             'ConfigService', 'ElementService', 'WorkspaceService', 'growl', 
-            'workspaceObj', 'tags', 'tag', 'snapshots', 'site', 'document', 'time', 'Utils', 'hotkeys',
-function($scope, $rootScope, $state, $uibModal, $q, $stateParams, $timeout, ConfigService, ElementService, WorkspaceService, growl, workspaceObj, tags, tag, snapshots, site, document, time, Utils, hotkeys) {
+            'workspaceObj', 'tags', 'tag', 'site', 'document', 'commit', 'Utils', 'hotkeys',
+function($scope, $rootScope, $state, $uibModal, $q, $stateParams, $timeout, ConfigService, ElementService, WorkspaceService, growl, workspaceObj, tags, tag, site, document, commit, Utils, hotkeys) {
 
     // TODO rename variable ws
     var ws = $stateParams.workspace;
     $scope.specWs = ws;
-    $scope.specVersion = time;
+    $scope.specVersion = commit;
     $scope.document = document;
     $scope.ws = ws;
-    $scope.editable = document && document._editable && time === 'latest';
-    $scope.snapshots = snapshots;
+    $scope.editable = document && document._editable && commit === 'latest';
     $scope.tags = tags;
     $scope.site = site;
-    $scope.version = time;
+    $scope.version = commit;
 
     if (document)
         $scope.eid = $scope.document.sysmlId;
@@ -56,18 +55,6 @@ function($scope, $rootScope, $state, $uibModal, $q, $stateParams, $timeout, Conf
             $scope.document = workspaceObj;
             $scope.eid = workspaceObj.id;            
         }
-    }
-
-    if (snapshots) {
-        snapshots.forEach(function(snapshot) {
-            ElementService.getElement("master_filter", false, ws, snapshot.created, 0)
-            .then(function(filter) {
-                    var json = JSON.parse(filter.documentation);
-                    if (json[document.sysmlId]) {
-                        snapshot.hideTag = true;
-                    }
-            });
-        });
     }
 
     // Set edit count for tracker view 
@@ -247,12 +234,12 @@ function($scope, $rootScope, $state, $uibModal, $q, $stateParams, $timeout, Conf
         $scope.viewElements = viewElements;
         $scope.elementType = 'element';
         $scope.specWs = ws;
-        $scope.specVersion = time;
+        $scope.specVersion = commit;
         $rootScope.mms_tbApi.select('element-viewer');
         showPane('element');
-        ElementService.getElement(vid, false, ws, time, 2).
+        ElementService.getElement(vid, false, ws, commit, 2).
         then(function(element) {
-            var editable = element._editable && time === 'latest';
+            var editable = element._editable && commit === 'latest';
             $rootScope.mms_tbApi.setPermission('element-editor', editable);
             $rootScope.mms_tbApi.setPermission('view-reorder', editable);
             $rootScope.mms_tbApi.setPermission("document-snapshot-create", editable);

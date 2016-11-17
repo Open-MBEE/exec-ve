@@ -57,7 +57,6 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             return {
                 workspace: $scope.ws, 
                 version: $scope.version,
-                tag: undefined
             };
         };
     };

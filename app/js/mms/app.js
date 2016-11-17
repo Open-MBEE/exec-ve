@@ -10,6 +10,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
     // determine if the url is older 2.0 format (will not have a workspace)
          // generate some random client id
          var locationPath = $location.url();
+         /*
          if (locationPath.indexOf('/workspaces') === -1 && locationPath.indexOf('/login') === -1 && locationPath !== '' && locationPath !== '/')
          {
              locationPath = 'workspaces/master' + locationPath;
@@ -60,6 +61,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
  
              //$location.url(locationPath);
          }
+         */
          if (locationPath.indexOf('full%23') > 0)
              locationPath = locationPath.replace('full%23', 'full#');
          if (locationPath[0] !== '/')
@@ -150,7 +152,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 return ConfigService.getConfigs(workspace, false, 2);
             },
             tag: function ($stateParams, ConfigService, workspace, ticket) {
-                return { name: 'latest', timestamp: 'latest' };
+                return { name: 'latest', _timestamp: 'latest', commitId: 'latest'};
             },  
             sites: function(SiteService, ticket) {                 
                return SiteService.getSites();
@@ -158,7 +160,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             site: function(SiteService, ticket) {
                 return SiteService.getSite('no_site');
             },
-            document : function(ElementService, workspace, time, growl, ticket) {
+            document : function(ElementService, workspace, commit, growl, ticket) {
                 return null;
             },
             views: function(ticket) {
@@ -167,25 +169,13 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             view: function(ticket) {
                 return null;
             },
-            viewElements: function(ViewService, workspace, document, time, ticket) {
+            viewElements: function(ViewService, workspace, document, commit, ticket) {
                 if (document === null) 
                     return null;
-                return ViewService.getViewElements(document.sysmlId, false, workspace, time, 2);
+                return ViewService.getViewElements(document.sysmlId, false, workspace, commit, 2);
             },   
-            time: function(tag, ticket) {
-                return tag.timestamp;
-            },
-            configSnapshots: function(ConfigService, workspace, tag, ticket) {
-                return [];
-            },
-            snapshots: function(ticket) {
-                return [];        
-            },
-            snapshot: function(ticket) {
-                return null;
-            },
-            docFilter: function(ticket) {
-                return null;
+            commit: function(tag, ticket) {
+                return tag.commitId;
             },
             search: function($stateParams, ElementService, workspace, ticket) {
                 if ($stateParams.search === undefined) {
@@ -245,20 +235,20 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             workspaceObj: function (WorkspaceService, workspace, ticket) {
                 return WorkspaceService.getWorkspace(workspace);
             },
-            sites: function(SiteService, time, ticket) {                 
-                if (time === 'latest')
+            sites: function(SiteService, commit, ticket) {                 
+                if (commit === 'latest')
                     return SiteService.getSites();
-                return SiteService.getSites(time);
+                return SiteService.getSites(commit);
             },
             site: function(SiteService, ticket) {
                 return SiteService.getSite('no_site');
             },
-            document : function(ViewService, ElementService, $q, workspace, time, growl, workspaceObj, ticket) {
+            document : function(ViewService, ElementService, $q, workspace, commit, growl, workspaceObj, ticket) {
             
                 // This is a short-term work-around -- all this should be done the back-end MMS in the future
                 var wsCoverDocId = 'master_cover';
                 var deferred = $q.defer();
-                ElementService.getElement(wsCoverDocId, false, workspace, time, 2, true)
+                ElementService.getElement(wsCoverDocId, false, workspace, commit, 2, true)
                 .then(function(data) {
                     deferred.resolve(data);
                 }, function(reason) {
@@ -267,7 +257,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                         return;
                     }
                     // if it is an error, other than a 404 (element not found) then stop and return
-                    if ((reason.status !== 404 && reason.status !== 410) || time !== 'latest') {
+                    if ((reason.status !== 404 && reason.status !== 410) || commit !== 'latest') {
                         deferred.resolve(null);
                         return;
                     }
@@ -283,63 +273,29 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 });
                 return deferred.promise;
             },
-            docFilter: function(ElementService, $q,  workspace, time, document, ticket) {
-                var deferred = $q.defer();
-                ElementService.getElement("master_filter", false, workspace, time, 2)
-                .then(function(data) {
-                    deferred.resolve(data);
-                }, function(reason) {
-                    if (reason.status === 401) {
-                        deferred.reject(reason);
-                        return;
-                    }
-                    if (reason.status !== 404 || time !== 'latest') {
-                        deferred.resolve(null);
-                        return;
-                    }
-                    var siteDocs = {
-                        type: "Class",
-                        name: 'Filtered Docs',
-                        documentation: '{}'
-                    };
-                    siteDocs.sysmlId = "master_filter";
-                    ElementService.createElement(siteDocs, workspace, null)
-                    .then(function(data) {
-                        deferred.resolve(data);
-                    }, function(reason) {
-                        deferred.resolve(null);
-                    });
-                });
-                return deferred.promise;
-            },
-            views: function(ViewService, workspace, document, time, ticket) {
+            views: function(ViewService, workspace, document, commit, ticket) {
                 return [];
             },
-            viewElements: function(ViewService, workspace, document, time, ticket) {
+            viewElements: function(ViewService, workspace, document, commit, ticket) {
                 if (document === null) 
                     return [];
-                return ViewService.getViewElements(document.sysmlId, false, workspace, time, 2);
+                return ViewService.getViewElements(document.sysmlId, false, workspace, commit, 2);
             },    
-            view: function(ViewService, workspace, document, time, ticket) {
+            view: function(ViewService, workspace, document, commit, ticket) {
                 if (document === null) 
                     return null;
-                return ViewService.getView(document.sysmlId, false, workspace, time, 2, true);
+                return ViewService.getView(document.sysmlId, false, workspace, commit, 2, true);
             },
             tags: function(ConfigService, workspace, ticket) {
                 return ConfigService.getConfigs(workspace, false, 2);
             },
             tag: function ($stateParams, ConfigService, workspace, ticket) {
                 if ($stateParams.tag === undefined || $stateParams.tag === 'latest')
-                    return { name: 'latest', timestamp: 'latest' };
+                    return { name: 'latest', _timestamp: 'latest', commitId: 'latest'};
                 return ConfigService.getConfig($stateParams.tag, workspace, false, 2);
             },        
-            configSnapshots: function(ConfigService, workspace, tag, ticket) {
-                //if (tag.timestamp === 'latest')
-                    return [];
-                //return ConfigService.getConfigSnapshots(tag.id, workspace, false, 2);
-            },
-            time: function(tag, ticket) {
-                return tag.timestamp;
+            commit: function(tag, ticket) {
+                return tag.commitId;
             }
         },
         views: {
@@ -405,7 +361,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             site: function($stateParams, SiteService, ticket) {
                 return SiteService.getSite($stateParams.site);
             },
-            document : function($stateParams, ViewService, ElementService, $q, workspace, site, time, growl, ticket) {
+            document : function($stateParams, ViewService, ElementService, $q, workspace, site, commit, growl, ticket) {
                 var siteCoverDocId;
                 if ($stateParams.site === 'no_site')
                     return null;
@@ -413,7 +369,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 else
                     siteCoverDocId = site.sysmlId + '_cover';
                 var deferred = $q.defer();
-                ElementService.getElement(siteCoverDocId, false, workspace, time, 2, true)
+                ElementService.getElement(siteCoverDocId, false, workspace, commit, 2, true)
                 .then(function(data) {
                     deferred.resolve(data);
                 }, function(reason) {
@@ -422,7 +378,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                         return;
                     }
                     // if it is an error, other than a 404 (element not found) then stop and return
-                    if ((reason.status !== 404 && reason.status !== 410) || time !== 'latest') {
+                    if ((reason.status !== 404 && reason.status !== 410) || commit !== 'latest') {
                         deferred.resolve(null);
                         return;
                     }
@@ -439,18 +395,18 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 });
                 return deferred.promise;
             },
-            views: function(ViewService, workspace, document, time, ticket) {
+            views: function(ViewService, workspace, document, commit, ticket) {
                 return [];
             },
-            viewElements: function(ViewService, workspace, document, time, ticket) {
+            viewElements: function(ViewService, workspace, document, commit, ticket) {
                 if (document === null) 
                     return null;
-                return ViewService.getViewElements(document.sysmlId, false, workspace, time, 2);
+                return ViewService.getViewElements(document.sysmlId, false, workspace, commit, 2);
             },    
-            view: function(ViewService, workspace, document, time, ticket) {
+            view: function(ViewService, workspace, document, commit, ticket) {
                 if (document === null) 
                     return null;
-                return ViewService.getView(document.sysmlId, false, workspace, time, 2, true);
+                return ViewService.getView(document.sysmlId, false, workspace, commit, 2, true);
             }
         },
         views: {
@@ -486,34 +442,22 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
     .state('workspace.site.documentpreview', {
         url: '/document/:document',
         resolve: {
-            document: function($stateParams, ElementService, workspace, time, ticket) {
-                return ElementService.getElement($stateParams.document, false, workspace, time, 2, true);
+            document: function($stateParams, ElementService, workspace, commit, ticket) {
+                return ElementService.getElement($stateParams.document, false, workspace, commit, 2, true);
             },
-            views: function(ViewService, workspace, document, time, ticket) {
+            views: function(ViewService, workspace, document, commit, ticket) {
                 return [];
             },
-            viewElements: function(ViewService, workspace, document, time, ticket) {
+            viewElements: function(ViewService, workspace, document, commit, ticket) {
                 if (document === null) 
                     return null;
-                return ViewService.getViewElements(document.sysmlId, false, workspace, time, 2);
+                return ViewService.getViewElements(document.sysmlId, false, workspace, commit, 2);
             },    
-            view: function(ViewService, workspace, document, time, ticket) {
+            view: function(ViewService, workspace, document, commit, ticket) {
                 if (document === null) 
                     return null;
-                return ViewService.getView(document.sysmlId, false, workspace, time, 2, true);
-            },
-            snapshot: function(ConfigService, configSnapshots, document, workspace, ticket) {
-                var docid = document.sysmlId;
-                var found = null;
-                configSnapshots.forEach(function(snapshot) {
-                    if (docid === snapshot.sysmlId)
-                        found = snapshot;
-                });
-                if (found) {
-                    return ConfigService.getSnapshot(found.id, workspace, true, 2);
-                }
-                return found; 
-            } 
+                return ViewService.getView(document.sysmlId, false, workspace, commit, 2, true);
+            }
         },
         views: {
             'pane-center@': {
@@ -523,116 +467,30 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
         }
     })
     .state('workspace.site.document', {
-        url: '/documents/:document?time',
+        url: '/documents/:document',
         resolve: {
-            document: function($stateParams, ElementService, time, ticket) {
-                return ElementService.getElement($stateParams.document, false, $stateParams.workspace, time, 2, true);
+            document: function($stateParams, ElementService, commit, ticket) {
+                return ElementService.getElement($stateParams.document, false, $stateParams.workspace, commit, 2, true);
             },
-            views: function($stateParams, ViewService, UtilsService, document, time, ticket) {
+            views: function($stateParams, ViewService, UtilsService, document, commit, ticket) {
                 if (!UtilsService.isView(document))
                     return [];
                 if (UtilsService.isDocument(document) && document.view2view && document.view2view.length > 0)
-                    return ViewService.getDocumentViews($stateParams.document, false, $stateParams.workspace, time, true, 2);
+                    return ViewService.getDocumentViews($stateParams.document, false, $stateParams.workspace, commit, true, 2);
                 else
-                    return ViewService.getDocumentViews($stateParams.document, false, $stateParams.workspace, time, false, 2);
+                    return ViewService.getDocumentViews($stateParams.document, false, $stateParams.workspace, commit, false, 2);
             },
-            viewElements: function($stateParams, ViewService, time, ticket) {
-                return ViewService.getViewElements($stateParams.document, false, $stateParams.workspace, time, 2);
+            viewElements: function($stateParams, ViewService, commit, ticket) {
+                return ViewService.getViewElements($stateParams.document, false, $stateParams.workspace, commit, 2);
             },
-            view: function($stateParams, ViewService, viewElements, time, ticket) {
-                return ViewService.getView($stateParams.document, false, $stateParams.workspace, time, 2, true);
-            },
-            snapshots: function(UtilsService, ConfigService, workspace, site, document, ticket) {
-                if (!UtilsService.isDocument(document))
-                    return [];
-                return ConfigService.getProductSnapshots(document.sysmlId, site.sysmlId, workspace, false, 2);
-            },
-            snapshot: function(ConfigService, workspace, snapshots, document, time, ticket) {
-                var docid = document.sysmlId;
-                var found = null;
-                snapshots.forEach(function(snapshot) {
-                    if (snapshot.created === time)
-                        found = snapshot;
-                });
-                if (found) {
-                    return ConfigService.getSnapshot(found.id, workspace, true, 2);
-                }
-                return found; 
-            },
-            tag: function ($stateParams, ConfigService, workspace, snapshots, ticket, tags) {
-                if ($stateParams.tag === undefined)
-                {
-                    if ($stateParams.time !== undefined && $stateParams.time !== 'latest') {
-                        
-                        var snapshotFound = false;
-                        var snapshotPromise;
-                        // if time is defined, then do a reverse look-up from the
-                        // product snapshots to determine if there is a match tag
-                        snapshots.forEach(function(snapshot) {
-                            if (snapshot.created === $stateParams.time) {
-                                // product snapshot found based on time, 
-                                // next see if there is a configuration for the snapshot
-                                if (snapshot.configurations && snapshot.configurations.length > 0) {
-                                    // there may be 0 or more, if there is more than 1, 
-                                    // base the configuration tag on the first one
-                                    snapshotFound = true;
-
-                                    snapshotPromise = ConfigService.getConfig(snapshot.configurations[0].id, workspace, false, 2);
-                                }
-                            }
-                        });
-                        if (snapshotFound)
-                            return snapshotPromise;
-                        if (tags) {
-                            tags.forEach(function(tag) {
-                                if ($stateParams.time === tag.timestamp) {
-                                    snapshotFound = true;
-                                    snapshotPromise = tag;
-                                }
-                            });
-                        }
-                        if (snapshotFound)
-                            return snapshotPromise;
-                        return { name: 'n/a', timestamp: $stateParams.time };
-                    } else {
-                        return { name: 'latest', timestamp: 'latest' };
-                    }
-                } else if ($stateParams.tag === 'latest') {
-                    return { name: 'latest', timestamp: 'latest' };
-                } else {
-                    return ConfigService.getConfig($stateParams.tag, workspace, false, 2);
-                }
-            },        
-            configSnapshots: function(ConfigService, workspace, tag, ticket) {
-                //if (tag.timestamp === 'latest')
-                    return []; //TODO revert when server is faster
-                //return ConfigService.getConfigSnapshots(tag.id, workspace, false);
-            },
-            time: function($stateParams, ConfigService, workspace, ticket) {
-                if ($stateParams.tag !== undefined) {
-                    return ConfigService.getConfig($stateParams.tag, workspace, false, 2).then(function(tag) {
-                        return tag.timestamp;
-                    }); 
-                }
-                else if ($stateParams.time !== undefined)
-                    return $stateParams.time;
-                else
-                    return "latest";
-            },
-            docFilter: function($stateParams, ElementService, workspace, site, time, growl, ticket) {
-                //need to redefine here since time is redefined
-                return ElementService.getElement("master_filter", false, workspace, time, 2)
-                .then(function(data) {
-                    return data;
-                }, function(reason) {
-                    return null;
-                });
+            view: function($stateParams, ViewService, viewElements, commit, ticket) {
+                return ViewService.getView($stateParams.document, false, $stateParams.workspace, commit, 2, true);
             }
         },
         views: {
             'menu@': {
                 template: '<mms-menu mms-title="View Editor" mms-ws="{{workspace}}" mms-site="site" mms-doc="document" mms-workspaces="workspaces" mms-config="tag" mms-tags="tags" mms-snapshot-tag="{{snapshotTag}}" mms-show-tag="{{showTag}}"></mms-menu>',
-                controller: function ($scope, $filter, $rootScope, workspaces, workspace, site, document, tag, tags, snapshots, time, docFilter) {
+                controller: function ($scope, $filter, $rootScope, workspaces, workspace, site, document, tag, tags) {
                     $scope.workspaces = workspaces;
                     $scope.workspace = workspace;
                     $scope.tag = tag;
@@ -642,24 +500,10 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
 
                     $scope.showTag = true;
                     $rootScope.mms_title = 'View Editor: '+document.name;
-                    var filtered = {};
-                    if (docFilter)
-                        filtered = JSON.parse(docFilter.documentation);
-
+                    
                     var tagStr = '';
-                    if (time !== 'latest') {
-                        snapshots.forEach(function(snapshot) {
-                            if (filtered[document.sysmlId])
-                                return;
-                            if (time === snapshot.created && snapshot.configurations && snapshot.configurations.length > 0)
-                                snapshot.configurations.forEach(function(config) {
-                                    //tagStr += '( <i class="fa fa-tag"></i> ' + config.name + ' ) ';
-                                    $scope.tag = config;
-                                });
-                        });
-                        tagStr += '( <i class="fa fa-camera"></i> ' + $filter('date')(time, 'M/d/yy h:mm a') + ' )';
-                        if (filtered[document.sysmlId])
-                            $scope.showTag = false;
+                    if (tag._timestamp !== 'latest') {
+                        tagStr += '( <i class="fa fa-camera"></i> ' + $filter('date')(tag._timestamp, 'M/d/yy h:mm a') + ' )';
                         $scope.snapshotTag = ' ' + tagStr;
                     }                                        
                 }
@@ -703,13 +547,13 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
     .state('workspace.site.document.view', {
         url: '/views/:view',
         resolve: {
-            viewElements: function($stateParams, ViewService, time, ticket) {
+            viewElements: function($stateParams, ViewService, commit, ticket) {
                 //if (time === 'latest')
                 //    return ViewService.getViewElements($stateParams.view, false, $stateParams.workspace, time);
                 return [];
             },
-            view: function($stateParams, ViewService, viewElements, time, ticket) {
-                return ViewService.getView($stateParams.view, false, $stateParams.workspace, time, 2);
+            view: function($stateParams, ViewService, viewElements, commit, ticket) {
+                return ViewService.getView($stateParams.view, false, $stateParams.workspace, commit, 2);
             }
         },
         views: {

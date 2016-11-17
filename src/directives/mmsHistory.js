@@ -34,7 +34,7 @@ function mmsHistory(Utils, ElementService, WorkspaceService, $compile, $template
     var mmsHistoryLink = function(scope, element, attrs) {
         var ran = false;
         var lastid = null;
-        scope.selects = {timestampSelected: null};
+        scope.selects = {commitSelected: null};
         scope.historyVer = 'latest';
         /**
          * @ngdoc function
@@ -57,20 +57,19 @@ function mmsHistory(Utils, ElementService, WorkspaceService, $compile, $template
                     return;
                 scope.history = data;
                 scope.historyVer = 'latest';
-                scope.selects.timestampSelected = null;
+                scope.selects.commitSelected = null;
             }).finally(function() {
                 scope.gettingHistory = false;
             });
         };
-        scope.timestampClicked = function() {
-            var time = scope.selects.timestampSelected;
-            console.log('value changed, new value is: ' + time);
-            if (!time) {
+        scope.commitClicked = function() {
+            var commit = scope.selects.commitSelected;
+            if (!commit) {
                 scope.historyVer = 'latest';
                 return;
             }
-            var hack = time.substring(0, 20) + '999' + time.substring(23);
-            scope.historyVer = hack;
+            //var hack = time.substring(0, 20) + '999' + time.substring(23);
+            scope.historyVer = commit;
         };
         scope.changeElement = changeElement;
         scope.$watch('mmsEid', changeElement);

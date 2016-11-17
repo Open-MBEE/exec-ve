@@ -116,7 +116,6 @@ function mmsView(ViewService, $templateCache, $rootScope, growl) {
             return {
                 workspace: $scope.mmsWs, 
                 version: $scope.mmsVersion,
-                tag: $scope.mmsTag
             };
         };
 
@@ -134,7 +133,6 @@ function mmsView(ViewService, $templateCache, $rootScope, growl) {
             if (idx >= 0)
                 $scope.presentationElemCleanUpFncs.splice(idx, 1);
         };
-
     };
 
     var mmsViewLink = function(scope, element, attrs) {
@@ -302,7 +300,6 @@ function mmsView(ViewService, $templateCache, $rootScope, growl) {
             mmsVid: '@',
             mmsWs: '@',
             mmsVersion: '@',
-            mmsTag: '@',
             mmsNumber: '@',
             mmsLink: '<',
             mmsCfClicked: '&',

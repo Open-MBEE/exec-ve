@@ -126,38 +126,6 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, HttpSe
 
     /**
      * @ngdoc method
-     * @name mms.ConfigService#getConfigSnapshots
-     * @methodOf mms.ConfigService
-     *
-     * @description
-     * Get snapshots of a config
-     *
-     * @param {string} id Config id
-     * @param {string} [workspace=master] Workspace name
-     * @param {boolean} [update=false] update from server
-     * @returns {Promise} Promise would be resolved with array of snapshot objects
-     */
-    var getConfigSnapshots = function(id, workspace, update) {
-        var n = normalize(update, workspace);
-        var deferred = $q.defer();
-        var cacheKey = ['configs', n.ws, id, 'snapshots'];
-        if (CacheService.exists(cacheKey) && !n.update) {
-            deferred.resolve(CacheService.get(cacheKey));
-            return deferred.promise;
-        }
-        $http.get(URLService.getConfigSnapshotsURL(id, n.ws))
-        .success(function(data, status, headers, config) {
-            CacheService.put(cacheKey, data.snapshots, false, function(val, k) {
-                return {key: ['snapshots', n.ws, val.id], value: val, merge: true};
-            });
-            deferred.resolve(CacheService.get(cacheKey));
-        }).error(function(data, status, headers, config) {
-            URLService.handleHttpStatus(data, status, headers, config, deferred);
-        });
-        return deferred.promise;
-    };
-    /**
-     * @ngdoc method
      * @name mms.ConfigService#createConfig
      * @methodOf mms.ConfigService
      *
@@ -224,83 +192,6 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, HttpSe
 
     /**
      * @ngdoc method
-     * @name mms.ConfigService#getProductSnapshots
-     * @methodOf mms.ConfigService
-     *
-     * @description
-     * Get snapshots of a product
-     *
-     * @param {string} id Product id
-     * @param {string} site Site name
-     * @param {string} [workspace=master] Workspace name
-     * @param {boolean} [update=false] update from server
-     * @returns {Promise} Promise would be resolved with array of snapshot objects
-     */
-    var getProductSnapshots = function(id, site, workspace, update) {
-        var n = normalize(update, workspace);
-        var deferred = $q.defer();
-        var cacheKey = ['products', n.ws, id, 'snapshots'];
-        if (CacheService.exists(cacheKey) && !n.update) {
-            deferred.resolve(CacheService.get(cacheKey));
-            return deferred.promise;
-        }
-        $http.get(URLService.getProductSnapshotsURL(id, site, n.ws))
-        .success(function(data, status, headers, config) {
-            CacheService.put(cacheKey, data.snapshots, false, function(val, k) {
-                return {key: ['snapshots', n.ws, val.id], value: val, merge: true};
-            });
-            deferred.resolve(CacheService.get(cacheKey));
-        }).error(function(data, status, headers, config) {
-            URLService.handleHttpStatus(data, status, headers, config, deferred);
-        });
-        return deferred.promise;
-    };
-
-    var getSnapshot = function(id, workspace, update) {
-        var n = normalize(update, workspace);
-        var deferred = $q.defer();
-        var cacheKey = ['snapshots', n.ws, id];
-        if (CacheService.exists(cacheKey) && !n.update) {
-            deferred.resolve(CacheService.get(cacheKey));
-            return deferred.promise;
-        }
-        $http.get(URLService.getSnapshotURL(id, n.ws))
-        .success(function(data, status, headers, config) {
-            CacheService.put(cacheKey, data.snapshots, true);
-            deferred.resolve(CacheService.get(cacheKey));
-        }).error(function(data, status, headers, config) {
-            URLService.handleHttpStatus(data, status, headers, config, deferred);
-        });
-        return deferred.promise;
-    };
-
-    /**
-     * @ngdoc method
-     * @name mms.ConfigService#createSnapshotArtifact
-     * @methodOf mms.ConfigService
-     *
-     * @description
-     * Create artifacts for a snapshot
-     *
-     * @param {Object} snapshot The snapshot object with artifact types to create
-     * @param {string} site The site name
-     * @param {string} [workspace=master] Workspace name
-     * @returns {Promise} Promise would be resolved with 'ok', the server will send an email to user when done
-     */
-    var createSnapshotArtifact = function(snapshot, site, workspace){
-        var n = normalize(null, workspace);
-        var deferred = $q.defer();
-        $http.post(URLService.getProductSnapshotsURL(snapshot.sysmlId, site, n.ws), {'snapshots': [snapshot]})
-        .success(function(data, status, headers, config){
-            deferred.resolve('ok');
-        }).error(function(data, status, headers, config){
-            URLService.handleHttpStatus(data, status, headers, config, deferred);
-        });
-        return deferred.promise;
-    };
-
-    /**
-     * @ngdoc method
      * @name mms.ConfigService#convertHtmlToPdf
      * @methodOf mms.ConfigService
      *
@@ -354,13 +245,9 @@ function ConfigService($q, $http, URLService, CacheService, UtilsService, HttpSe
         createConfig : createConfig,
         deleteConfig : deleteConfig,
         getConfig : getConfig,
-        getSnapshot: getSnapshot,
         getConfigForEdit : getConfigForEdit,
-        getConfigSnapshots : getConfigSnapshots,
-        createSnapshotArtifact: createSnapshotArtifact,
         convertHtmlToPdf: convertHtmlToPdf,
         update : update,
-        getProductSnapshots: getProductSnapshots,
         reset: reset
     };
 }
