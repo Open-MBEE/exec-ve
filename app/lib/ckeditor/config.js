@@ -11,6 +11,7 @@ CKEDITOR.editorConfig = function( config ) {
 	config.disableNativeSpellChecker = false;
 	config.fullPage = false;
   config.removePlugins = 'resize';
+	config.tabSpaces = 4;
 	// config.extraPlugins = 'iframe,mediaembed,embed,
 	config.extraPlugins = 'font,image2,imagedrop,mmscf,mmscomment,mmsvlink,mmsreset,tableresize';
   config.mathJaxLib = 'https://cdn.mathjax.org/mathjax/2.2-latest/MathJax.js?config=TeX-AMS_HTML';
