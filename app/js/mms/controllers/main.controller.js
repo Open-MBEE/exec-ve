@@ -8,13 +8,16 @@ function($scope, $location, $rootScope, $state, _, $window, $uibModal, growl, $h
     $rootScope.mms_viewContentLoading = false;
     $rootScope.mms_treeInitial = '';
     $rootScope.mms_title = '';
-    $rootScope.mms_footer = 'JPL/Caltech PROPRIETARY — Not for Public Release or Redistribution. No export controlled documents allowed on this server.';
-    
+    $rootScope.mms_footer = '';
+
     var modalOpen = false;
     var host = $location.host();
-    if ($location.host().indexOf('europaems') !== -1) {
+    if (host.indexOf('europaems') !== -1 || host.indexOf('arrmems') !== -1 || host.indexOf('msmems') !== -1) {
         $rootScope.mms_footer = 'The technical data in this document is controlled under the U.S. Export Regulations, release to foreign persons may require an export authorization.';
     }
+    if (host.indexOf('fn') !== -1)
+        $rootScope.mms_footer = 'JPL/Caltech PROPRIETARY — Not for Public Release or Redistribution. No export controlled documents allowed on this server.';
+
     $window.addEventListener('beforeunload', function(event) {
         if ($rootScope.veEdits && !_.isEmpty($rootScope.veEdits)) {
             var message = 'You may have unsaved changes, are you sure you want to leave?';
