@@ -4,8 +4,8 @@
 
 angular.module('mmsApp')
 
-.controller('FullDocCtrl', ['$scope', '$templateCache', '$compile', '$timeout', '$rootScope', '$state', '$stateParams', '$window', 'MmsAppUtils', 'document', 'workspace', 'site', 'snapshot', 'time', 'tag', 'ConfigService', 'UxService', 'ViewService', 'UtilsService', 'ElementService', '$q', 'growl', 'hotkeys', 'search', '_', '$element',
-function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateParams, $window, MmsAppUtils, document, workspace, site, snapshot, time, tag, ConfigService, UxService, ViewService, UtilsService, ElementService, $q, growl, hotkeys, search, _, $element) {
+.controller('FullDocCtrl', ['$scope', '$templateCache', '$compile', '$timeout', '$rootScope', '$state', '$stateParams', '$window', 'MmsAppUtils', 'document', 'workspace', 'site', 'commit', 'tag', 'ConfigService', 'UxService', 'ViewService', 'UtilsService', 'ElementService', '$q', 'growl', 'hotkeys', 'search', '_', '$element',
+function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateParams, $window, MmsAppUtils, document, workspace, site, commit, tag, ConfigService, UxService, ViewService, UtilsService, ElementService, $q, growl, hotkeys, search, _, $element) {
 
     $scope.ws = $stateParams.workspace;
     $scope.site = site;
@@ -36,7 +36,7 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
             if ($rootScope.veElementsOn) {
                 dis.toggleShowElements();
             }
-            if ($rootScope.mms_ShowEdits && time === 'latest') {
+            if ($rootScope.mms_ShowEdits && commit === 'latest') {
                 dis.toggleShowEdits();
             }
         }
@@ -53,7 +53,7 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
                 if ($rootScope.veElementsOn) {
                     dis.toggleShowElements();
                 }
-                if ($rootScope.mms_ShowEdits && time === 'latest') {
+                if ($rootScope.mms_ShowEdits && commit === 'latest') {
                     dis.toggleShowEdits();
                 }
             }
@@ -106,7 +106,7 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
     view2children[document.sysmlId] = [];
     if (!document._childViews)
         document._childViews = [];
-    MmsAppUtils.handleChildViews(document, 'composite', $scope.ws, time, handleSingleView, handleChildren)
+    MmsAppUtils.handleChildViews(document, 'composite', $scope.ws, commit, handleSingleView, handleChildren)
     .then(function(childIds) {
         for (var i = 0; i < childIds.length; i++) {
             addToArray(childIds[i], num);
@@ -114,7 +114,7 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
         }
     });
   }
-    $scope.version = time;
+    $scope.version = commit;
     $scope.views = views;
     $scope.tscClicked = function(elementId, ws, version) {
         $rootScope.$broadcast('elementSelected', elementId, 'element', ws, version);
@@ -128,7 +128,7 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
     $scope.bbApi = {};
     $scope.bbApi.init = function() {
 
-        if (document && document._editable && time === 'latest') {
+        if (document && document._editable && commit === 'latest') {
             $scope.bbApi.addButton(UxService.getButtonBarButton('show-edits'));
             $scope.bbApi.setToggleState('show-edits', $rootScope.mms_ShowEdits);
             hotkeys.bindTo($scope)
@@ -170,7 +170,7 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
         }
         converting = true;
         $scope.bbApi.toggleButtonSpinner('convert-pdf');
-        MmsAppUtils.printModal(document, $scope.ws, site, time, tag, true, 3)
+        MmsAppUtils.printModal(document, $scope.ws, site, commit, tag, true, 3)
         .then(function(ob) {
             growl.info('Converting HTML to PDF...Please wait for a completion email.',{ttl: -1});
         }, function(reason){
@@ -224,15 +224,15 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
     $scope.$on('print', function() {
         if (searchLoading())
             return;
-        MmsAppUtils.printModal(document, $scope.ws, site, time, tag, true, 1);
+        MmsAppUtils.printModal(document, $scope.ws, site, commit, tag, true, 1);
     });
     $scope.$on('word', function() {
         if (searchLoading())
             return;
-        MmsAppUtils.printModal(document, $scope.ws, site, time, tag, true, 2);
+        MmsAppUtils.printModal(document, $scope.ws, site, commit, tag, true, 2);
     });
     $scope.$on('tabletocsv', function() {
-        MmsAppUtils.tableToCsv(document, $scope.ws, time, true);
+        MmsAppUtils.tableToCsv(document, $scope.ws, commit, true);
     });
     $scope.$on('refresh-numbering', function() {
         var printElementCopy = angular.element("#print-div");

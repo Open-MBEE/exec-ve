@@ -32,26 +32,22 @@
         <h1>Snapshots <i class="{{snapshotLoading}}"></i></h1>
         <input class="form-control" ng-model="snapshotsFilter" type="text" placeholder="Type here to filter snapshots">
         <table class="snapshot-table table table-condensed">
-            <tr><th>Time</th><th>Created By</th><th>Tag(s)</th></tr>
+            <tr><th>Time</th><th>Created By</th><th>Tag</th></tr>
             <tr>
                 <td>
-                    <a ui-sref="workspace.site.document({time: undefined, tag: undefined, search: undefined})" ui-sref-opts="{reload: true}" ng-click="snapshotClicked()">Latest</a>
+                    <a ui-sref="workspace.site.document({tag: undefined, search: undefined})" ui-sref-opts="{reload: true}" ng-click="snapshotClicked()">Latest</a>
                 </td>
                 <td></td>
                 <td></td>
             </tr>
-            <tr ng-repeat="snapshot in snapshots | filter:snapshotsFilter | orderBy:'-created'">
+            <tr ng-repeat="tag in tags | filter:snapshotsFilter | orderBy:'-_timestamp'">
                 <td>
-                    <a ui-sref="workspace.site.document({time: snapshot.created, tag: undefined, search: undefined})" ui-sref-opts="{reload: true}" ng-click="snapshotClicked()">{{snapshot.created | date:'M/d/yy h:mm a'}}</a>
+                    <a ui-sref="workspace.site.document({tag: tag.id, search: undefined})" ui-sref-opts="{reload: true}" ng-click="snapshotClicked()">{{tag._timestamp | date:'M/d/yy h:mm a'}}</a>
                 </td>
-                <td>{{snapshot.creator}}
+                <td>{{tag._creator}}
                 </td>
                 <td>
-                    <div ng-hide="snapshot.hideTag">
-                        <div ng-repeat="config in snapshot.configurations | orderBy:'name'">
-                            <a ui-sref="workspace.site({tag: config.id, search: undefined})" ui-sref-opts="{reload: true}">{{config.name}}</a>
-                        </div>
-                    </div>
+                    <a ui-sref="workspace.site({tag: tag.id, search: undefined})" ui-sref-opts="{reload: true}">{{tag.name}}</a>
                 </td>
             </tr>
         </table>
@@ -61,23 +57,24 @@
         <h1>Tags <i class="{{snapshotLoading}}"></i></h1>
 
         <table class="snapshot-table table table-condensed">
-            <tr><th>Name</th><th>Time</th></tr>
+            <tr><th>Name</th><th>Time</th><th>Commit</th></tr>
             <tr>
                 <td>
                     <a ui-sref="workspace.sites({tag: undefined, search: undefined})" ui-sref-opts="{reload: true}">Latest</a>
                 </td>
-                <td></td>
+                <td></td><td></td>
             </tr>
-            <tr ng-repeat="tag in tags | orderBy:'-timestamp'">
+            <tr ng-repeat="tag in tags | orderBy:'-_timestamp'">
                 <td>
                     <a ui-sref="workspace.sites({tag: tag.id, search: undefined})" ui-sref-opts="{reload: true}">{{tag.name}}</a>
                 </td>
-                <td>{{tag.timestamp | date:'M/d/yy h:mm a'}}
+                <td>{{tag._timestamp | date:'M/d/yy h:mm a'}}
                 </td>
+                <td>{{tag.commitId}}</td>
             </tr>
         </table>
     </div>
     <div class="container-fluid" ng-show="show.jobs">
-        <mms-jobs mms-doc-id="{{docId}}"></mms-jobs>
+        <mms-jobs mms-doc-id="{{docId}}" mms-ws="{{ws}}"></mms-jobs>
     </div>
 </div>

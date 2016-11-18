@@ -2,7 +2,7 @@
 
 /* Controllers */
 
-angular.module('mmsApp').controller('ToolbarCtrl', ['$scope', '$rootScope', '$state', '$timeout', 'UxService', 'workspace', 'tag', 'document', 'time', function($scope, $rootScope, $state, $timeout, UxService, workspace, tag, document, time)
+angular.module('mmsApp').controller('ToolbarCtrl', ['$scope', '$rootScope', '$state', '$timeout', 'UxService', 'workspace', 'tag', 'document', 'commit', function($scope, $rootScope, $state, $timeout, UxService, workspace, tag, document, commit)
 {
 
 	$scope.tbApi = {};
@@ -42,7 +42,7 @@ angular.module('mmsApp').controller('ToolbarCtrl', ['$scope', '$rootScope', '$st
 		}
 		else if ($state.includes('workspace.sites') && !$state.includes('workspace.site.document'))
 		{
-			editable = document && time === 'latest';
+			editable = document && commit === 'latest';
 			$scope.tbApi.setPermission('element-editor', editable);
 			$scope.tbApi.addButton(UxService.getToolbarButton("tags"));
 			$scope.tbApi.setPermission('tags', true);
@@ -53,7 +53,7 @@ angular.module('mmsApp').controller('ToolbarCtrl', ['$scope', '$rootScope', '$st
 		}
 		else if ($state.includes('workspace.site.document'))
 		{
-			editable = document._editable && time === 'latest';
+			editable = document._editable && commit === 'latest';
 			$scope.tbApi.addButton(UxService.getToolbarButton("document-snapshot"));
 			$scope.tbApi.addButton(UxService.getToolbarButton("view-reorder"));
 			$scope.tbApi.setPermission('element-editor', editable);

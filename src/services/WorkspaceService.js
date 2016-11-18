@@ -210,6 +210,10 @@ function WorkspaceService($http, $q, URLService, ElementService, CacheService, _
         $http.post(URLService.getWorkspacesURL(ws), {'workspaces': [ws]} )
         .success(function(data, status, headers, config) {
             var workspace = data.workspaces[0];
+            if (!workspace.id) {
+                deferred.resolve(workspace);
+                return;
+            }
             var cacheKey = ['workspaces', workspace.id];
             CacheService.put(cacheKey, workspace, true);
             if (!update) {

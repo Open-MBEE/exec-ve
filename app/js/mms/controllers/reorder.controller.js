@@ -3,8 +3,8 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('ReorderCtrl', ['$scope', '$rootScope', '$stateParams', 'document', 'time', 'ElementService', 'ViewService', 'MmsAppUtils', '$state', 'growl', '$q', '_',
-function($scope, $rootScope, $stateParams, document, time, ElementService, ViewService, MmsAppUtils, $state, growl, $q, _) {
+.controller('ReorderCtrl', ['$scope', '$rootScope', '$stateParams', 'document', 'commit', 'ElementService', 'ViewService', 'MmsAppUtils', '$state', 'growl', '$q', '_',
+function($scope, $rootScope, $stateParams, document, commit, ElementService, ViewService, MmsAppUtils, $state, growl, $q, _) {
     $scope.doc = document;
     var ws = $stateParams.workspace;
 
@@ -74,7 +74,7 @@ function($scope, $rootScope, $stateParams, document, time, ElementService, ViewS
         curNode.children.push.apply(curNode.children, newChildNodes);
     }
 
-    MmsAppUtils.handleChildViews(document, 'composite', ws, time, handleSingleView, handleChildren)
+    MmsAppUtils.handleChildViews(document, 'composite', ws, commit, handleSingleView, handleChildren)
     .then(function(docNode) {
         var num = 1;
         docNode.children.forEach(function(node) {

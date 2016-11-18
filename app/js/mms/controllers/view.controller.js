@@ -3,8 +3,8 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('ViewCtrl', ['$scope', '$rootScope', '$state', '$stateParams', '$timeout', '$uibModal', '$window', 'viewElements', 'MmsAppUtils', 'ElementService', 'ViewService', 'ConfigService', 'time', 'search', 'growl', 'workspace', 'site', 'document', 'view', 'tag', 'snapshot', 'UxService', 'hotkeys', '$element',
-function($scope, $rootScope, $state, $stateParams, $timeout, $uibModal, $window, viewElements, MmsAppUtils, ElementService, ViewService, ConfigService, time, search, growl, workspace, site, document, view, tag, snapshot, UxService, hotkeys, $element) {
+.controller('ViewCtrl', ['$scope', '$rootScope', '$state', '$stateParams', '$timeout', '$uibModal', '$window', 'viewElements', 'MmsAppUtils', 'ElementService', 'ViewService', 'ConfigService', 'commit', 'search', 'growl', 'workspace', 'site', 'document', 'view', 'tag', 'UxService', 'hotkeys', '$element',
+function($scope, $rootScope, $state, $stateParams, $timeout, $uibModal, $window, viewElements, MmsAppUtils, ElementService, ViewService, ConfigService, commit, search, growl, workspace, site, document, view, tag, UxService, hotkeys, $element) {
     
     function searchLoading() {
         if ($element.find('.isLoading').length > 0) {
@@ -25,7 +25,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $uibModal, $window,
     if ($state.includes('workspace') && !$state.includes('workspace.sites')) {
         // if document is null, and there is a tag, then save the tag to be used for
         // the tag cover page
-        if (document === null && time !== 'latest' && tag !== null) {
+        if (document === null && commit !== 'latest' && tag !== null) {
             $rootScope.mms_showTagDescriptionFix = true;
             $rootScope.mms_showSiteDocLink = false;
             $scope.tag = tag;
@@ -63,7 +63,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $uibModal, $window,
     $scope.buttons = [];
 
     $scope.bbApi.init = function() {
-        if (view && view._editable && time === 'latest') {
+        if (view && view._editable && commit === 'latest') {
             $scope.bbApi.addButton(UxService.getButtonBarButton('show-edits'));
             $scope.bbApi.setToggleState('show-edits', $rootScope.mms_ShowEdits);
             hotkeys.bindTo($scope)
@@ -75,7 +75,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $uibModal, $window,
         }
         $scope.bbApi.addButton(UxService.getButtonBarButton('show-comments'));
         $scope.bbApi.setToggleState('show-comments', $rootScope.veCommentsOn);
-        if (view && view._editable && time === 'latest') {
+        if (view && view._editable && commit === 'latest') {
             if ($scope.view._contents || $scope.view.type === 'InstanceSpecification') {
                 $scope.bbApi.addButton(UxService.getButtonBarButton('view-add-dropdown'));
             } else {
@@ -146,7 +146,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $uibModal, $window,
     $scope.$on('convert-pdf', function() {
         if (searchLoading())
             return;
-        MmsAppUtils.printModal(view, $scope.ws, site, time, tag, false, 3);
+        MmsAppUtils.printModal(view, $scope.ws, site, commit, tag, false, 3);
     });
 
     $scope.$on('view-add-paragraph', function() {
@@ -277,7 +277,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $uibModal, $window,
         $scope.vid = '';        
     }
     $scope.ws = ws;
-    $scope.version = time;
+    $scope.version = commit;
     $scope.editing = false;
 
     if ($state.current.name === 'workspace' && !tag.id) {
@@ -303,7 +303,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $uibModal, $window,
     };
     $scope.searchOptions= {};
     $scope.searchOptions.callback = function(elem) {
-        $scope.tscClicked(elem.sysmlId, ws, time);
+        $scope.tscClicked(elem.sysmlId, ws, commit);
         if ($rootScope.mms_togglePane && $rootScope.mms_togglePane.closed)
             $rootScope.mms_togglePane.toggle();
     };
@@ -327,7 +327,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $uibModal, $window,
         if ($rootScope.veElementsOn) {
             $scope.viewApi.toggleShowElements();
         }
-        if ($rootScope.mms_ShowEdits && time === 'latest') {
+        if ($rootScope.mms_ShowEdits && commit === 'latest') {
             $scope.viewApi.toggleShowEdits();
         }
     };
@@ -343,15 +343,15 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $uibModal, $window,
     $scope.$on('print', function() {
         if (searchLoading())
             return;
-        MmsAppUtils.printModal(view, $scope.ws, site, time, tag, false, 1);
+        MmsAppUtils.printModal(view, $scope.ws, site, commit, tag, false, 1);
     });
     $scope.$on('word', function() {
         if (searchLoading())
             return;
-        MmsAppUtils.printModal(view, $scope.ws, site, time, tag, false, 2);
+        MmsAppUtils.printModal(view, $scope.ws, site, commit, tag, false, 2);
     });
     $scope.$on('tabletocsv', function() {
-        MmsAppUtils.tableToCsv(view, $scope.ws, time, false);
+        MmsAppUtils.tableToCsv(view, $scope.ws, commit, false);
     });
     $scope.$on('refresh-numbering', function() {
         var printElementCopy = angular.element("#print-div");

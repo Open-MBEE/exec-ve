@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsViewLink', ['ElementService', 'UtilsService', '$compile', 'growl', mmsViewLink]);
+.directive('mmsViewLink', ['ElementService', 'UtilsService', 'ConfigService', '$compile', 'growl', mmsViewLink]);
 
 /**
  * @ngdoc directive
@@ -20,7 +20,7 @@ angular.module('mms.directives')
  * @param {string=latest} mmsVersion Version can be alfresco version number or timestamp, default is latest
  * @param {string=} mmsDid Document context of view
  */
-function mmsViewLink(ElementService, UtilsService, $compile, growl) {
+function mmsViewLink(ElementService, UtilsService, ConfigService, $compile, growl) {
 
     function findSite(element) {
         if (element._siteCharacterizationId)
@@ -39,13 +39,10 @@ function mmsViewLink(ElementService, UtilsService, $compile, growl) {
             var ws = scope.mmsWs;
             var version = scope.mmsVersion;
             var docid = scope.mmsDid;
-            var tag = scope.mmsTag;
             if (mmsViewCtrl) {
                 var viewVersion = mmsViewCtrl.getWsAndVersion();
                 if (!ws)
                     ws = viewVersion.workspace;
-                if (!version && !tag) //if a time is passed in manually, ignore the tag on the surrounding view
-                    tag = viewVersion.tag;
                 if (!version)
                     version = viewVersion.version;
             }
@@ -55,20 +52,26 @@ function mmsViewLink(ElementService, UtilsService, $compile, growl) {
                 version = 'latest';
             scope.ws = ws;
 
+            ConfigService.getConfigs(ws, false, 1)
+            .then(function(tags) {
+                var queryParam = '';
+                var tagId = '';
+                tags.forEach(function(tag) {
+                    if (tag.commitId === version)
+                        tagId = tag.id;
+                });
+                if (tagId !== '')
+                    queryParam = '?tag=' + tagId;
+                scope.query = queryParam;
+            });
+
             ElementService.getElement(scope.mmsVid, false, ws, version, 1, true)
             .then(function(data) {
                 scope.element = data;
                 var site = findSite(data);
                 scope.site = site;
-                var queryParam = '';
                 scope.name = data.name;
-                if (tag !== undefined && tag !== null && tag !== '') {
-                    queryParam = '?tag=' + tag;
-                }
-                else if (version !== 'latest') {
-                    queryParam = '?time=' + version;
-                }
-                scope.query = queryParam;
+
                 if (scope.mmsPeid && scope.mmsPeid !== '') {
                     scope.hash = '#' + scope.mmsPeid;
                     ElementService.getElement(scope.mmsPeid, false, ws, version)
@@ -91,7 +94,7 @@ function mmsViewLink(ElementService, UtilsService, $compile, growl) {
                     //element.html('<a href="mms.html#/workspaces/' + ws + '/sites/' + site + '/documents/' + 
                     //    docid + '/views/' + scope.mmsVid + queryParam + '">' + data.name + '</a>');
                 } else {
-                    element.html('<span class="mms-error">view link is not a view</span>');
+                    element.html("<span class=\"mms-error\">view link doesn't refer to a view</span>");
                     //growl.error('View Link Error: not a view: ' + scope.mmsVid);
                 }
             }, function(reason) {

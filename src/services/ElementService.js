@@ -412,7 +412,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
             var resp = CacheService.put(n.cacheKey, UtilsService.cleanElement(e), true);
             var history = CacheService.get(UtilsService.makeElementKey(elem.sysmlId, workspace, 'versions'));
             if (history) {
-                history.unshift({modifier: e._modifier, timestamp: e._modified});
+                history.unshift({modifier: e._modifier, timestamp: e._modified, commitId: e._commitId});
             }
             var edit = CacheService.get(UtilsService.makeElementKey(elem.sysmlId, n.ws, null, true));
             if (edit) {
@@ -502,7 +502,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
 
                 var history = CacheService.get(UtilsService.makeElementKey(elem.sysmlId, workspace, 'versions'));
                 if (history) {
-                    history.unshift({modifier: elem._modifier, timestamp: elem._modified});
+                    history.unshift({modifier: elem._modifier, timestamp: elem._modified, commitId: elem._commitId});
                 }
                 var orig = elemsMapping[elem.sysmlId];
                 var edit = CacheService.get(UtilsService.makeElementKey(elem.sysmlId, ws, null, true));
