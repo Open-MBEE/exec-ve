@@ -134,4 +134,20 @@ describe('ElementService', function() {
 			}); //$httpBackend.flush();
         }));
     });
+		
+		describe('Method getIdInfo', function () {
+        var element = getJSONFixture('UtilsService/getIdInfo.json'); //TODO move json to ElementService mock data
+        it('should generate a new element with holdingBin, projectId, siteId, and projectName', inject(function () {
+            var result = ElementService.getIdInfo(element, "MERP");
+            expect(result).toBeDefined();
+
+            var baseline = {
+                holdingBinId: null,
+                projectId   : 'test-site_no_project',
+                siteId      : 'test-site',
+                projectName : null
+            };
+            expect(JSON.stringify(baseline)).toMatch(JSON.stringify(result));
+        }));
+    });
 });
