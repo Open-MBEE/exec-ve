@@ -123,7 +123,7 @@ describe('ElementService', function() {
 
         }));
     });
-    describe('ElementService.updateElement method', function() {  //--talk to doris
+    describe('ElementService.updateElement() method', function() {  //--talk to doris
         it('should update a element not in the cache without passing a workspace', inject(function() {
             var elem = { sysmlid: '12345', lastModified:'never' };
     		ElementService.updateElement(elem, undefined).then(function(response) {
@@ -135,7 +135,7 @@ describe('ElementService', function() {
         }));
     });
 		
-		describe('Method getIdInfo', function () {
+		describe('ElementService.getIdInfo() method', function () {
         var element = getJSONFixture('UtilsService/getIdInfo.json'); //TODO move json to ElementService mock data
         it('should generate a new element with holdingBin, projectId, siteId, and projectName', inject(function () {
             var result = ElementService.getIdInfo(element, "MERP");
@@ -147,7 +147,7 @@ describe('ElementService', function() {
                 siteId      : 'test-site',
                 projectName : null
             };
-            expect(JSON.stringify(baseline)).toMatch(JSON.stringify(result));
+            expect(JSON.stringify(baseline)).toMatch(JSON.stringify(result["$$state"]["value"]));
         }));
     });
 });
