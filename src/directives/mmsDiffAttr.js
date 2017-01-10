@@ -118,23 +118,23 @@ function mmsDiffAttr(ElementService, ConfigService, URLService, $q, $compile, $r
             }            
         };
         // example http://localhost:9000/mms.html#/workspaces/master/sites/vetest/documents/_17_0_5_1_407019f_1402422683509_36078_16169/views/_17_0_5_1_407019f_1402422692412_131628_16263
-        var versionOne;
-        var versionTwo;
-        // scope.htmlv1 = null;
-        // scope.htmlv2 = null;
+        var data1CheckForBreak = false;
+        var data2CheckForBreak = false;
 
-        // scope.$watch('htmlv1', function() {
-        //     scope.origElem = angular.element(scope.htmlv1).text();
-        // });
-        // scope.$watch('htmlv2', function() {
-        //     scope.compElem = angular.element(scope.htmlv2).text();
-        // });
+
         tagOrTimestamp(scope.mmsVersionOne).then(function(versionOrTs){
             getComparsionText(versionOrTs).then(function(data){
                 scope.origElem = angular.element(data).text();
                 // run on interval to check when data gets changed. once it changes set to origElem and break out of interval
-                 $interval(
+                 var promise1 = $interval(
                     function(){
+                        if (scope.origElem == angular.element(data).text() && data1CheckForBreak) {
+                            console.log("data1 did not change again cancel out of interval : " +scope.origElem);
+                            $interval.cancel(promise1);
+                        } else if ( scope.origElem == angular.element(data).text() && !data1CheckForBreak ) {
+                            data1CheckForBreak = true;
+                            console.log("data1 did not change make data change true : " +data1CheckForBreak);
+                        }
                         scope.origElem = angular.element(data).text();
                         console.log("here is the changed text: " +scope.origElem);
                     }, 5000);
@@ -147,9 +147,17 @@ function mmsDiffAttr(ElementService, ConfigService, URLService, $q, $compile, $r
         tagOrTimestamp(scope.mmsVersionTwo).then(function(versionOrTs){
             getComparsionText(versionOrTs).then(function(data){
                 scope.compElem = angular.element(data).text();
-                $interval(
+                var promise2 = $interval(
                     function(){
+                        if (scope.compElem == angular.element(data).text() && data2CheckForBreak) {
+                            console.log("data2 did not change again cancel out of interval : " +scope.compElem);
+                            $interval.cancel(promise2);
+                        } else if ( scope.compElem == angular.element(data).text() && !data2CheckForBreak ) {
+                            data2CheckForBreak = true;
+                            console.log("data2 did not change make data change true : " +data2CheckForBreak);
+                        }
                         scope.compElem = angular.element(data).text();
+                        console.log("here is the changed text: " +scope.compElem);
                     }, 5000);
             }, function(reject){
                 scope.compElem = reject;
@@ -168,7 +176,7 @@ function mmsDiffAttr(ElementService, ConfigService, URLService, $q, $compile, $r
             mmsVersionOne: '@',
             mmsVersionTwo: '@'
         },
-        template: '<style>del{color: black;background: #ffbbbb;} ins{color: black;background: #bbffbb;}</style><div semantic-diff left-obj="origElem" right-obj="compElem"></div>',
+        template: '<style>del{color: black;background: #ffbbbb;} ins{color: black;background: #bbffbb;} .match,.textdiff span {color: gray;}</style><div class="textdiff"  processing-diff left-obj="origElem" right-obj="compElem" ></div>',
         require: '?^^mmsView',
         link: mmsDiffAttrLink
     };
