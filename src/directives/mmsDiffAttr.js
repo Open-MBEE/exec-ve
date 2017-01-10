@@ -48,6 +48,17 @@ function mmsDiffAttr(ElementService, ConfigService, URLService, $q, $compile, $r
             return deferred.promise;
         };
         
+        // Get current element and update to use proper ws and ts if not already defined in html
+        var setVersionWs = function(elt, ts){
+            var transcludeElm = angular.element(elt);
+            if ( !transcludeElm.attr('mms-ws') || !transcludeElm.attr('data-mms-ws') ) {
+                transcludeElm.attr("mms-ws", ws);
+            }
+            if ( !transcludeElm.attr('mms-version') || !transcludeElm.attr('data-mms-version') ) {
+                transcludeElm.attr("mms-version", ts);
+            }
+        };
+
         // Get the text to compare for diff
         var getComparsionText = function(ts){
             var deferred = $q.defer();
@@ -56,34 +67,16 @@ function mmsDiffAttr(ElementService, ConfigService, URLService, $q, $compile, $r
 
                 // inject workspace and timestamp - check for data-mms-* and mms-*
                 htmlData.find("mms-transclude-doc").each(function() {
-                    var transcludeElm = angular.element(this);
-                    if ( !transcludeElm.attr('mms-ws') || !transcludeElm.attr('data-mms-ws') ) {
-                        transcludeElm.attr("mms-ws", ws);
-                    }
-                    if ( !transcludeElm.attr('mms-version') || !transcludeElm.attr('data-mms-version') ) {
-                        transcludeElm.attr("mms-version", ts);
-                    }
+                    setVersionWs(this, ts);
                 });
+
                 htmlData.find("mms-transclude-name").each(function() {
-                    var transcludeElm = angular.element(this);
-                    if ( !transcludeElm.attr('mms-ws') || !transcludeElm.attr('data-mms-ws') ) {
-                        transcludeElm.attr("mms-ws", ws);
-                    }
-                    if ( !transcludeElm.attr('mms-version') || !transcludeElm.attr('data-mms-version') ) {
-                        transcludeElm.attr("mms-version", ts);
-                    }
+                    setVersionWs(this, ts);
                 });
                 
                 htmlData.find("mms-transclude-val").each(function() {
-                    var transcludeElm = angular.element(this);
-                    if ( !transcludeElm.attr('mms-ws') || !transcludeElm.attr('data-mms-ws') ) {
-                        transcludeElm.attr("mms-ws", ws);
-                    }
-                    if ( !transcludeElm.attr('mms-version') || !transcludeElm.attr('data-mms-version') ) {
-                        transcludeElm.attr("mms-version", ts);
-                    }
+                    setVersionWs(this, ts);
                 });
-
                 $compile(htmlData)($rootScope.$new());
                 deferred.resolve(htmlData);
             }, function(reason) {
@@ -129,14 +122,14 @@ function mmsDiffAttr(ElementService, ConfigService, URLService, $q, $compile, $r
                  var promise1 = $interval(
                     function(){
                         if (scope.origElem == angular.element(data).text() && data1CheckForBreak) {
-                            console.log("data1 did not change again cancel out of interval : " +scope.origElem);
+                            // console.log("data1 did not change again cancel out of interval : " +scope.origElem);
                             $interval.cancel(promise1);
                         } else if ( scope.origElem == angular.element(data).text() && !data1CheckForBreak ) {
                             data1CheckForBreak = true;
-                            console.log("data1 did not change make data change true : " +data1CheckForBreak);
+                            // console.log("data1 did not change make data change true : " +data1CheckForBreak);
                         }
                         scope.origElem = angular.element(data).text();
-                        console.log("here is the changed text: " +scope.origElem);
+                        // console.log("here is the changed text: " +scope.origElem);
                     }, 5000);
             }, function(reject){
                 scope.origElem = reject;
@@ -150,14 +143,14 @@ function mmsDiffAttr(ElementService, ConfigService, URLService, $q, $compile, $r
                 var promise2 = $interval(
                     function(){
                         if (scope.compElem == angular.element(data).text() && data2CheckForBreak) {
-                            console.log("data2 did not change again cancel out of interval : " +scope.compElem);
+                            // console.log("data2 did not change again cancel out of interval : " +scope.compElem);
                             $interval.cancel(promise2);
                         } else if ( scope.compElem == angular.element(data).text() && !data2CheckForBreak ) {
                             data2CheckForBreak = true;
-                            console.log("data2 did not change make data change true : " +data2CheckForBreak);
+                            // console.log("data2 did not change make data change true : " +data2CheckForBreak);
                         }
                         scope.compElem = angular.element(data).text();
-                        console.log("here is the changed text: " +scope.compElem);
+                        // console.log("here is the changed text: " +scope.compElem);
                     }, 5000);
             }, function(reject){
                 scope.compElem = reject;
