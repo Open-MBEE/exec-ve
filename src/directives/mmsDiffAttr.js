@@ -51,10 +51,10 @@ function mmsDiffAttr(ElementService, ConfigService, URLService, $q, $compile, $r
         // Get current element and update to use proper ws and ts if not already defined in html
         var setVersionWs = function(elt, ts){
             var transcludeElm = angular.element(elt);
-            if ( !transcludeElm.attr('mms-ws') || !transcludeElm.attr('data-mms-ws') ) {
+            if ( !transcludeElm.attr('mms-ws') && !transcludeElm.attr('data-mms-ws') ) {
                 transcludeElm.attr("mms-ws", ws);
             }
-            if ( !transcludeElm.attr('mms-version') || !transcludeElm.attr('data-mms-version') ) {
+            if ( !transcludeElm.attr('mms-version') && !transcludeElm.attr('data-mms-version') ) {
                 transcludeElm.attr("mms-version", ts);
             }
         };
