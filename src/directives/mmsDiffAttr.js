@@ -35,7 +35,7 @@ function mmsDiffAttr(ElementService, WorkspaceService, ConfigService, URLService
             var viewVersion = mmsViewCtrl.getWsAndVersion();
 
             if (!wsOne) {
-                wsOne = viewVersion.workspace; //ws one and two
+                wsOne = viewVersion.workspace;
             }
             else {
                 WorkspaceService.getWorkspace(wsOne).then(function(data) {
@@ -52,7 +52,7 @@ function mmsDiffAttr(ElementService, WorkspaceService, ConfigService, URLService
                 WorkspaceService.getWorkspace(wsTwo).then(function(data) {
               }, function(reason) {
                 wsTwoFlag = true;
-                
+
                 if(wsOneFlag && wsTwoFlag)
                   element.html('<span class="mms-error">Workspace One & Two do not exist.</span>');
                 else {
@@ -60,8 +60,6 @@ function mmsDiffAttr(ElementService, WorkspaceService, ConfigService, URLService
                 }
               });
             }
-
-
           }
 
         // Check if input is a tag, timestamp or neither
@@ -86,7 +84,7 @@ function mmsDiffAttr(ElementService, WorkspaceService, ConfigService, URLService
                 transcludeElm.attr("mms-ws", ws);
             }
             if ( !transcludeElm.attr('mms-version') && !transcludeElm.attr('data-mms-version') ) {
-                transcludeElm.attr("mms-version", ts); //version one and two
+                transcludeElm.attr("mms-version", ts);
             }
         };
 
@@ -146,7 +144,7 @@ function mmsDiffAttr(ElementService, WorkspaceService, ConfigService, URLService
         var data2CheckForBreak = false;
 
 
-        tagOrTimestamp(scope.mmsVersionOne, scope.mmsWsOne).then(function(versionOrTs){ //wsOne
+        tagOrTimestamp(scope.mmsVersionOne, scope.mmsWsOne).then(function(versionOrTs){
             getComparsionText(versionOrTs, scope.mmsWsOne).then(function(data){
                 scope.origElem = angular.element(data).text();
                 // run on interval to check when data gets changed. once it changes set to origElem and break out of interval
@@ -195,9 +193,9 @@ function mmsDiffAttr(ElementService, WorkspaceService, ConfigService, URLService
         restrict: 'E',
         scope: {
             mmsEid: '@',
-            mmsWsOne: '@', //ws 1 and 2
+            mmsWsOne: '@',
             mmsWsTwo: '@',
-            mmsAttr: '@', //name or doc
+            mmsAttr: '@',
             mmsVersionOne: '@',
             mmsVersionTwo: '@'
         },
