@@ -179,11 +179,13 @@ function mmsDiffAttr(ElementService, WorkspaceService, ConfigService, URLService
             element.html('<span class="mms-error">Version One not valid tag or timestamp.</span>');
         });
 
+        var getElement;
+
         tagOrTimestamp(scope.mmsVersionTwo, scope.mmsWsTwo).then(function(versionOrTs){
 
             getComparsionText(versionOrTs, scope.mmsWsTwo).then(function(data){
                 scope.compElem = angular.element(data).text();
-
+                getElement = data;
                 var promise2 = $interval(
                     function(){
                         if (scope.compElem == angular.element(data).text() && data2CheckForBreak) {
@@ -199,7 +201,7 @@ function mmsDiffAttr(ElementService, WorkspaceService, ConfigService, URLService
                     }, 5000);
 
                   if(origNotFound){
-                    angular.element(data).prepend('<span class="mms-error"> This element is a new element: </span>');
+                    element.prepend('<span class="mms-error"> This element is a new element: </span>');
                   }
 
             }, function(reject){
@@ -209,9 +211,9 @@ function mmsDiffAttr(ElementService, WorkspaceService, ConfigService, URLService
                   compNotFound = true;
                   scope.compElem = '';
                   if(origNotFound && compNotFound)
-                    angular.element(data).prepend('<span class="mms-error">This element does not exist at either point in time.</span>');
+                    element.prepend('<span class="mms-error">This element does not exist at either point in time.</span>');
                   else {
-                    angular.element(data).prepend('<span class="mms-error">This element has been deleted: </span>');
+                    element.prepend('<span class="mms-error">This element has been deleted: </span>');
                   }
                 }
             });
