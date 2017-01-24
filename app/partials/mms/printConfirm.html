@@ -21,10 +21,10 @@
       <br/><br/><span ng-show="docOption">If you want to {{action}} the entire document instead, please click on 'GO TO FULL DOCUMENT' and click {{action}} again when it finishes loading.</span>
     </p>
     <p ng-if="type == 'VIEW' && genpdf">
-      Click on GENERATE PDF to generate a pdf of this view (it will not include table of contents or cover pages). If you want the full document instead, please click on GO TO FULL DOCUMENT.
+      Click on GENERATE PDF to generate a pdf of this view (it will not include table of contents or cover pages). You will receive an email with subject line "HTML to PDF generation completed" with a link to the generated PDF. If you want the full document instead, please click on GO TO FULL DOCUMENT.
     </p>
     <p ng-if="type == 'DOCUMENT' && genpdf">
-      Please note that you should wait until the full document appears in this pane before continuing.
+      Please note that you should wait until the full document appears in this pane before continuing. You will receive an email with subject line "HTML to PDF generation completed" with a link to the generated PDF.
     </p>
     <p ng-if="unsaved" class="error">
       WARNING: You currently have unsaved changes in the session that may not be reflected.
@@ -33,7 +33,7 @@
     <div ng-if="type == 'DOCUMENT' && genpdf">Generate List of Tables and Figures: <input type="checkbox" ng-model="model.genTotf"></div>
     <div ng-if="model.genTotf">Use HTML for List of Tables and Figures (will not include equations and may differ from web numbering): <input type="checkbox" ng-model="model.htmlTotf"></div>
     <div ng-if="genpdf">Landscape: <input type="checkbox" ng-model="model.landscape"></div>
-    <form ng-if="type == 'DOCUMENT'" role="form">
+    <form ng-if="type == 'DOCUMENT' && genpdf" role="form">
       <h6>Header and Footer</h6>
       <div>Use 'counter(page)' for page number.</div>
         <div class="form-group">

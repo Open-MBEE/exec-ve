@@ -27,7 +27,7 @@ module.exports = function(grunt) {
     if (key == "localhost") {
        serverPort = 8080;
        serverHttps = false;
-    } 
+    }
     connectObject[key] = {
         options: {
           hostname: '*',
@@ -49,13 +49,13 @@ module.exports = function(grunt) {
             host: 'localhost',
             port: 9001
           }
-        ] 
+        ]
     };
   }
 
   // Project configuration.
   grunt.initConfig({
-    
+
     pkg: grunt.file.readJSON('package.json'),
 
     'bower-install-simple': {
@@ -138,7 +138,7 @@ module.exports = function(grunt) {
         dest: 'dist/mms.js'
       },
       mmsdirs: {
-        src: ['src/mms.directives.js', 'src/directives/*.js'],
+        src: ['src/mms.directives.js', 'src/directives/**/*.js'],
         dest: 'dist/mms.directives.js'
       },
       mmsapp: {
@@ -277,7 +277,7 @@ module.exports = function(grunt) {
         options: {
           publish: [{
             id: 'gov.nasa.jpl:evm:zip',
-            version: '2.4.1',
+            version: '2.4.3',
             path: 'deploy/'
           }]
         }
@@ -317,11 +317,11 @@ module.exports = function(grunt) {
 
     sloc: {
       options: {
-        // Task-specific options go here. 
+        // Task-specific options go here.
       },
       'all-files': {
         files: {
-          // Target-specific file lists and/or options go here. 
+          // Target-specific file lists and/or options go here.
           'app/js': [ '**.js'],
           'app': [ '*.html', 'partials/**', 'styles/**'],
           'src/directives': [ '**.js', '**.html'],
@@ -350,10 +350,10 @@ module.exports = function(grunt) {
 
    plato: {
       options: {
-        // Task-specific options go here. 
+        // Task-specific options go here.
       },
       your_target: {
-        // Target-specific file lists and/or options go here. 
+        // Target-specific file lists and/or options go here.
         files: {
           'reports/plato': [ 'app/js/**/*.js', 'src/directives/**/*.js', 'src/directives/**/*.js','src/services/**/*.js' ],
         }
@@ -380,9 +380,9 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-protractor-runner');
   grunt.loadNpmTasks('grunt-artifactory-artifact');
   grunt.loadNpmTasks('grunt-sloc');
-  grunt.loadNpmTasks('grunt-plato');  
+  grunt.loadNpmTasks('grunt-plato');
   grunt.loadNpmTasks('grunt-cache-bust');
-  
+
   // grunt.registerTask('install', ['npm-install', 'bower']);
   grunt.registerTask('install', ['bower-install-simple']);
   grunt.registerTask('compile', ['html2js', 'sass']);
