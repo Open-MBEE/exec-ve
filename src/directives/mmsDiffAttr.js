@@ -19,7 +19,7 @@ angular.module('mms.directives')
  *
  * @param {string} mmsEid The id of the element whose doc to transclude
  * @param {string=master} mmsWs Workspace to use, defaults to master
- * @param {string=latest} mmsVersionOne  can be 'latest', timestamp or tag id, default is latest
+ * @param {string=latest} mmsversionOneFlag  can be 'latest', timestamp or tag id, default is latest
  * @param {string=latest} mmsVersionTwo  can be 'latest', timestamp or tag id, default is latest
  */
 function mmsDiffAttr(ElementService, WorkspaceService, ConfigService, URLService, $q, $compile, $rootScope, $interval) {
@@ -141,16 +141,27 @@ function mmsDiffAttr(ElementService, WorkspaceService, ConfigService, URLService
 
             }
         };
+
         // example http://localhost:9000/mms.html#/workspaces/master/sites/vetest/documents/_17_0_5_1_407019f_1402422683509_36078_16169/views/_17_0_5_1_407019f_1402422692412_131628_16263
         var data1CheckForBreak = false;
         var data2CheckForBreak = false;
 
-        var tagOrTimestampFlagOne = false;
-        var tagOrTimestampFlagTwo = false;
-        var origNotFound = false;
-        var compNotFound = false;
+        var versionOneFlag = 0;
+        var versionTwoFlag = 0;
+        var origNotFound = 0;
+        var compNotFound = 0;
 
-        tagOrTimestamp(scope.mmsVersionOne, scope.mmsWsOne).then(function(versionOrTs){
+        var elExistence = [[]];
+        elExistence[0][0] = '<span class="mms-error"> This element does not exist at any point in time. </span>';
+        elExistence[0][1] = '<span class="mms-error"> This is a new element. </span>';
+        elExistence[1][0] = '<span class="mms-error"> This element has been deleted. </span>';
+
+        var vRExistence = [[]];
+        vRExistence[0][0] = '<span class="mms-error"> Version One and Version Two not valid tags/timestamps. </span>';
+        vRExistence[0][1] = '<span class="mms-error"> Version One not a valid tag/timestamp. </span>';
+        vRExistence[1][0] = '<span class="mms-error"> Version Two not a valid tag/timestamp. </span>';
+
+        tagOrTimestamp(scope.mmsversionOneFlag, scope.mmsWsOne).then(function(versionOrTs){
 
             getComparsionText(versionOrTs, scope.mmsWsOne).then(function(data){
                 scope.origElem = angular.element(data).text();
@@ -170,13 +181,13 @@ function mmsDiffAttr(ElementService, WorkspaceService, ConfigService, URLService
             }, function(reject){
                 scope.origElem = reject; //why?
                 if(reject.toLowerCase() == "not found") {
-                  origNotFound = true;
+                  origNotFound = 1;
                   scope.origElem = '';
                 }
             });
         }, function(reject){
-            tagOrTimestampFlagOne = true;
-            element.html('<span class="mms-error">Version One not valid tag or timestamp.</span>');
+            versionOneFlag = 1;
+            // element.html('<span class="mms-error">Version One not valid tag or timestamp.</span>');
         });
 
         tagOrTimestamp(scope.mmsVersionTwo, scope.mmsWsTwo).then(function(versionOrTs){
@@ -208,7 +219,7 @@ function mmsDiffAttr(ElementService, WorkspaceService, ConfigService, URLService
                 scope.compElem = '';
 
                 if(reject.toLowerCase() == "not found") {
-                  compNotFound = true;
+                  compNotFound = 1;
 
                   if(origNotFound && compNotFound)
                     element.html('<span class="mms-error">This element does not exist at either point in time.</span>');
@@ -217,13 +228,20 @@ function mmsDiffAttr(ElementService, WorkspaceService, ConfigService, URLService
                   element.prepend('<span class="mms-error">This element has been deleted: </span>');
             });
         }, function(reject){
-            tagOrTimestampFlagTwo = true;
+            versionTwoFlag = 1;
 
-            if(tagOrTimestampFlagOne && tagOrTimestampFlagTwo)
+            if(versionOneFlag && versionTwoFlag)
               element.html('<span class="mms-error">Version One & Two not valid tags or timestamps.</span>');
             else
               element.html('<span class="mms-error">Version Two not valid tag or timestamp.</span>');
+
+        }).then(function(origNotFound, compNotFound, versionOneFlag, versionTwoFlag){
+
+          element
+
         });
+
+
     };
 
     return {
@@ -233,7 +251,7 @@ function mmsDiffAttr(ElementService, WorkspaceService, ConfigService, URLService
             mmsWsOne: '@',
             mmsWsTwo: '@',
             mmsAttr: '@',
-            mmsVersionOne: '@',
+            mmsversionOneFlag: '@',
             mmsVersionTwo: '@'
         },
         template: '<style>del{color: black;background: #ffbbbb;} ins{color: black;background: #bbffbb;} .match,.textdiff span {color: gray;}</style><div class="textdiff"  processing-diff left-obj="origElem" right-obj="compElem" ></div>',
