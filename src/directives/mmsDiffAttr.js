@@ -179,13 +179,11 @@ function mmsDiffAttr(ElementService, WorkspaceService, ConfigService, URLService
             element.html('<span class="mms-error">Version One not valid tag or timestamp.</span>');
         });
 
-        var getElement;
-
         tagOrTimestamp(scope.mmsVersionTwo, scope.mmsWsTwo).then(function(versionOrTs){
 
             getComparsionText(versionOrTs, scope.mmsWsTwo).then(function(data){
                 scope.compElem = angular.element(data).text();
-                getElement = data;
+
                 var promise2 = $interval(
                     function(){
                         if (scope.compElem == angular.element(data).text() && data2CheckForBreak) {
@@ -200,31 +198,29 @@ function mmsDiffAttr(ElementService, WorkspaceService, ConfigService, URLService
                         // console.log("here is the changed text: " +scope.compElem);
                     }, 5000);
 
-                  if(origNotFound){
+                  if((origNotFound && scope.compElem !== "") || (scope.origElem === "" && scope.compElem !== ""))
                     element.prepend('<span class="mms-error"> This element is a new element: </span>');
-                  }
 
             }, function(reject){
                 scope.compElem = reject; //why?
+                scope.compElem = '';
 
                 if(reject.toLowerCase() == "not found") {
                   compNotFound = true;
-                  scope.compElem = '';
+
                   if(origNotFound && compNotFound)
-                    element.prepend('<span class="mms-error">This element does not exist at either point in time.</span>');
-                  else {
-                    element.prepend('<span class="mms-error">This element has been deleted: </span>');
-                  }
-                }
+                    element.html('<span class="mms-error">This element does not exist at either point in time.</span>');
+                }  
+                else if(reject.toLowerCase() == "deleted")
+                  element.prepend('<span class="mms-error">This element has been deleted: </span>');
             });
         }, function(reject){
             tagOrTimestampFlagTwo = true;
 
             if(tagOrTimestampFlagOne && tagOrTimestampFlagTwo)
               element.html('<span class="mms-error">Version One & Two not valid tags or timestamps.</span>');
-            else{
+            else
               element.html('<span class="mms-error">Version Two not valid tag or timestamp.</span>');
-            }
         });
     };
 
