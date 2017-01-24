@@ -198,8 +198,10 @@ function mmsDiffAttr(ElementService, WorkspaceService, ConfigService, URLService
                         // console.log("here is the changed text: " +scope.compElem);
                     }, 5000);
 
-                  if((origNotFound && scope.compElem !== "") || (scope.origElem === "" && scope.compElem !== ""))
+                  if(origNotFound && scope.compElem !== "")
                     element.prepend('<span class="mms-error"> This element is a new element: </span>');
+                  else if(origNotFound && !compNotFound && scope.compElem === "")
+                    element.html('<span class="mms-error"> This element is a new element with no content. </span>');
 
             }, function(reject){
                 scope.compElem = reject; //why?
@@ -210,7 +212,7 @@ function mmsDiffAttr(ElementService, WorkspaceService, ConfigService, URLService
 
                   if(origNotFound && compNotFound)
                     element.html('<span class="mms-error">This element does not exist at either point in time.</span>');
-                }  
+                }
                 else if(reject.toLowerCase() == "deleted")
                   element.prepend('<span class="mms-error">This element has been deleted: </span>');
             });
