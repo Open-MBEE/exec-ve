@@ -57,9 +57,9 @@ function mmsViewPresentationElem(ViewService, ElementService, $templateCache, $r
             }
             // Parse the element reference tree for the presentation element:
             element.addClass("isLoading");
-            ViewService.parseExprRefTree(scope.mmsInstanceVal, ws, version, 1)
+            ElementService.getElement(scope.mmsInstanceVal.instanceId, ws, version, 1)
             .then(function(elem) {
-                scope.presentationElem = elem;
+                scope.presentationElem = ViewService.getPresentationElementSpec(elem);
                 // This is a kludge to get the template switch statement to work
                 // for Sections:
                 //if (ViewService.isSection(elem)) {

@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms')
-.factory('ElementService', ['$q', '$http', 'URLService', 'UtilsService', 'CacheService', 'HttpService', 'ApplicationService', 'SiteService', '_', ElementService]);
+.factory('ElementService', ['$q', '$http', 'URLService', 'UtilsService', 'CacheService', 'HttpService', 'ApplicationService', ElementService]);
 
 /**
  * @ngdoc service
@@ -11,14 +11,14 @@ angular.module('mms')
  * @requires mms.URLService
  * @requires mms.UtilsService
  * @requires mms.CacheService
- * @requires _
+ * @requires mms.HttpService
  * 
  * @description
  * An element CRUD service with additional convenience methods for managing edits.
  *
  * For element json example, see [here](https://ems.jpl.nasa.gov/alfresco/mms/raml/index.html)
  */
-function ElementService($q, $http, URLService, UtilsService, CacheService, HttpService, ApplicationService, SiteService, _) {
+function ElementService($q, $http, URLService, UtilsService, CacheService, HttpService, ApplicationService) {
     
     var inProgress = {};// leave for now
     /**
@@ -27,7 +27,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
      * @methodOf mms.ElementService
      * 
      * @description
-     * Gets an element object by id. If the element object is already in the cache,
+     * Gets an element object by projectId and elementId. If the element object is already in the cache,
      * resolve the existing reference, if not or update is true, request it from server, 
      * add/merge into the cache. 
      * 
@@ -37,7 +37,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
      *
      * ## Example Usage
      *  <pre>
-        ElementService.getElement('element_id').then(
+        ElementService.getElement({projectId: 'projectId', elementId: 'element_id'}).then(
             function(element) { //element is an element object (see json schema)
                 alert('got ' + element.name);
             }, 
@@ -49,7 +49,13 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         </pre>
      * ## Example with timestamp
      *  <pre>
-        ElementService.getElement('element_id', false, 'master', '2014-07-01T08:57:36.915-0700').then(
+        ElementService.getElement({
+            projectId: 'projectId', 
+            elementId: 'elementId', 
+            refId: 'refId',         //default 'master'
+            commitId: 'commitId',   //default 'latest'
+            extended: true          //default false (extended includes _qualifiedName, _qualifiedId, _childViews)
+        }).then(
             function(element) { //element is an element object (see json schema)
                 alert('got ' + element.name);
             }, 
@@ -60,42 +66,42 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         );
         </pre>
      * 
-     * @param {string} id The id of the element to get.
+     * @param {object} reqOb object with keys as described in function description.
+     * @param {integer} [weight=1] priority of request (2 is immediate, 1 is normal, 0 is low)
      * @param {boolean} [update=false] (optional) whether to always get the latest 
      *      from server, even if it's already in cache (this will update the cache if exists)
-     * @param {string} [workspace=master] (optional) workspace to use
-     * @param {string} [version=latest] (optional) alfresco version number or timestamp
      * @returns {Promise} The promise will be resolved with the element object, 
      *      multiple calls to this method with the same parameters would give the
      *      same object
      */
-    var getElement = function(id, update, workspace, version, weight, extended) { //add prority parameter w/default normal prority 
-        if(weight === undefined)
-            weight = 1;
-        var n = normalize(id, update, workspace, version, false, extended);
-        var key = 'getElement(' + id + n.update + n.ws + n.ver + n.extended + ')';
+    var getElement = function(reqOb, weight, update) { 
+        UtilsService.normalize(reqOb);
+        var requestCacheKey = getElementKey(reqOb);
+        var key = URLService.getElementURL(reqOb);
         // if it's in the inProgress queue get it immediately
         if (inProgress.hasOwnProperty(key)) {  //change to change proirity if it's already in the queue
-            HttpService.ping(URLService.getElementURL(id, n.ws, n.ver, n.extended), weight);
+            HttpService.ping(key, weight);
             return inProgress[key];
         }
-
         var deferred = $q.defer();
-        if (CacheService.exists(n.cacheKey) && !n.update) {
-            var cached = CacheService.get(n.cacheKey);
+        var cached = CacheService.get(requestCacheKey);
+        if (cached && !update && (!reqOb.extended || (reqOb.extended && cached._qualifiedId))) {
             if (UtilsService.isView(cached) &&
-                !cached.hasOwnProperty('contains') &&
+                //!cached.hasOwnProperty('contains') &&
                 !cached.hasOwnProperty('_contents')) {
-            } else if (extended && !cached._qualifiedId) {
             } else {
                 deferred.resolve(cached);
                 return deferred.promise;
             }
         }
-        inProgress[key] = deferred.promise;// edit with new function signature
-        HttpService.get(URLService.getElementURL(id, n.ws, n.ver, extended),
+        inProgress[key] = deferred.promise;
+        HttpService.get(key,
             function(data, status, headers, config) {
-                deferred.resolve(CacheService.put(n.cacheKey, UtilsService.cleanElement(data.elements[0]), true));
+                if (angular.isArray(data.elements) && data.elements.length > 0) {
+                    deferred.resolve(cacheElement(reqOb, data.elements[0]));
+                } else {
+                    deferred.reject({}); //TODO 
+                }
                 delete inProgress[key];
             },
             function(data, status, headers, config) {
@@ -115,47 +121,81 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
      * @description
      * Same as getElement, but for multiple ids.
      * 
-     * @param {Array.<string>} ids The ids of the elements to get.
-     * @param {boolean} [update=false] (optional) whether to always get latest from server.
-     * @param {string} [workspace=master] (optional) workspace to use
-     * @param {string} [version=latest] (optional) alfresco version number or timestamp
+     * @param {object} reqOb keys - {projectId, refId, elementIds (array of ids), commitId, extended}
+     * @param {integer} [weight=1] priority of request (2 is immediate, 1 is normal, 0 is low)
+     * @param {boolean} [update=false] (optional) whether to always get the latest 
+     *      from server, even if it's already in cache (this will update the cache if exists)
      * @returns {Promise} The promise will be resolved with an array of element objects, 
-     *      multiple calls to this method with the same ids would result in an array of 
-     *      references to the same objects.
+     *      multiple calls to this method with the same parameters would give the
+     *      same objects
      */
-    var getElements = function(ids, update, workspace, version, weight, extended) {
+    var getElements = function(reqOb, weight, update) {
         var deferred = $q.defer();
         var request = {elements: []};
         var existing = [];
-        var n = normalize('id', update, workspace, version, false, extended);
-        for (var i = 0; i < ids.length; i++) {
-            var id = ids[i];
-            var n2 = normalize(id, update, workspace, version, false, extended);
-            var exist = CacheService.get(n2.cacheKey);
-            if (exist && !n.update && (!extended || (extended && exist._qualifiedId))) {
+        UtilsService.normalize(reqOb);
+        for (var i = 0; i < reqOb.elementIds.length; i++) {
+            var id = reqOb.elementIds[i];
+            var requestCacheKey = getElementKey(reqOb, id);
+            var exist = CacheService.get(requestCacheKey);
+            if (exist && !update && (!reqOb.extended || (reqOb.extended && exist._qualifiedId))) {
                 existing.push(exist);
                 continue;
             }
             request.elements.push({sysmlId: id});
         }
-        if (request.elements.length === 0)
+        if (request.elements.length === 0) {
             deferred.resolve(existing);
-        else {
-            $http.put(URLService.getPutElementsURL(n.ws, n.ver, n.extended), request)
-            .then(function(response) {
-                var data = response.data.elements;
-                for (var i = 0; i < data.length; i++) {
-                    var element = data[i];
-                    var ekey = UtilsService.makeElementKey(element.sysmlId, n.ws, n.ver);
-                    var cacheE = CacheService.put(ekey, UtilsService.cleanElement(element), true);
-                    existing.push(cacheE);
-                }
-                deferred.resolve(existing);
-            }, function(response) {
-                URLService.handleHttpStatus(response.data, response.status, response.headers, response.config, deferred);
-            });
+            return deferred.promise;
         }
+        $http.put(URLService.getPutElementsURL(reqOb), request)
+        .then(function(response) {
+            var data = response.data.elements;
+            for (var i = 0; i < data.length; i++) {
+                existing.push(cacheElement(reqOb, data[i]));
+            }
+            deferred.resolve(existing);
+        }, function(response) {
+            URLService.handleHttpStatus(response.data, response.status, response.headers, response.config, deferred);
+        });
         return deferred.promise;
+    };
+
+    /**
+     * @ngdoc method
+     * @name mms.ElementService#cacheElement
+     * @methodOf mms.ElementService
+     * 
+     * @description
+     * handles caching of element objects - in case the metadata of reqOb is different
+     * from the element's canonical projectId/refId/commitId (due to being requested 
+     * from a different project context), it'll become an alias
+     * 
+     * @param {object} reqOb request keys - {projectId, refId, elementId, commitId, extended}
+     * @param {object} elementOb object to cache
+     * @param {boolean} [edit=false] whether object to cache is for editing
+     * @returns {object} cached object
+     */
+    var cacheElement = function(reqOb, elementOb, edit) {
+        var result = UtilsService.cleanElement(elementOb, edit);
+        var requestCacheKey = getElementKey(reqOb, result.sysmlId, edit);
+        var origResultCommit = result._commitId;
+        if (reqOb.commitId === 'latest') { 
+            var resultCommitCopy = JSON.parse(JSON.stringify(result));
+            result._commitId = 'latest'; //so realCacheKey is right later
+            var commitCacheKey = UtilsService.makeElementKey(resultCommitCopy); //save historic element
+            if (!edit)
+                CacheService.put(commitCacheKey, resultCommitCopy, true);
+        }
+        var realCacheKey = UtilsService.makeElementKey(result, result.sysmlId, edit);
+        result._commitId = origResultCommit; //restore actual commitId
+        if (realCacheKey === requestCacheKey)
+            result = CacheService.put(requestCacheKey, result, true);
+        else {
+            CacheService.put(requestCacheKey, realCacheKey);
+            result = CacheService.put(realCacheKey, result, true);
+        }
+        return result;
     };
 
     /**
@@ -171,7 +211,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
      * 
      * ## Example
      *  <pre>
-        ElementService.getElementForEdit('element_id').then(
+        ElementService.getElementForEdit(reqOb).then(
             function(editableElement) {
                 editableElement.name = 'changed name'; //immediately change a name and save
                 ElementService.updateElement(editableElement).then(
@@ -189,59 +229,38 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         );
         </pre>
      * 
-     * @param {string} id The id of the element to get.
-     * @param {boolean} [update=false] Get the latest from server first, 
-     *      else just make a copy of what's in the element cache
-     * @param {string} [workspace=master] (optional) workspace to use
+     * @param {object} reqOb see description of getElement.
+     * @param {integer} [weight=1] priority
+     * @param {boolean} [update=false] update from server
      * @returns {Promise} The promise will be resolved with the element object, 
      *      multiple calls to this method with the same id would result in 
      *      references to the same object. This object can be edited without
      *      affecting the same element object that's used for displays
      */
-    var getElementForEdit = function(id, update, workspace, weight) {
-        var n = normalize(id, update, workspace, null, true);
-        var key = 'getElementForEdit(' + id + n.update + n.ws + ')';
+    var getElementForEdit = function(reqOb, weight, update) {
+        UtilsService.normalize(reqOb);
+        var requestCacheKey = getElementKey(reqOb, reqOb.elementId, true);
+        var key = URLService.getElementURL(reqOb) + 'edit';
         if (inProgress.hasOwnProperty(key))
             return inProgress[key];
-        var deferred = $q.defer();
-        
-        if (CacheService.exists(n.cacheKey) && !n.update)
-            deferred.resolve(CacheService.get(n.cacheKey));
-        else {
-            inProgress[key] = deferred.promise;
-            getElement(id, n.update, n.ws, null, weight)
-            .then(function(data) {
-                var edit = _.cloneDeep(data);
-                deferred.resolve(CacheService.put(n.cacheKey, UtilsService.cleanElement(edit, true), true));
-                delete inProgress[key];
-            }, function(reason) {
-                deferred.reject(reason);
-                delete inProgress[key];
-            });
-        }
-        return deferred.promise;
-    };
 
-    /**
-     * @ngdoc method
-     * @name mms.ElementService#getElementsForEdit
-     * @methodOf mms.ElementService
-     * 
-     * @description
-     * Gets element objects to edit by ids. 
-     * 
-     * @param {Array.<string>} ids The ids of the elements to get for edit.
-     * @param {boolean} [update=false] Get latest from server first
-     * @param {string} [workspace=master] (optional) workspace to use
-     * @returns {Promise} The promise will be resolved with an array of editable
-     * element objects that won't affect the corresponding displays
-     */
-    var getElementsForEdit = function(ids, update, workspace, weight) {
-        var promises = [];
-        ids.forEach(function(id) {
-            promises.push(getElementForEdit(id, update, workspace, weight));
+        var deferred = $q.defer();
+        var cached = CacheService.get(requestCacheKey);
+        if (cached && !update) {
+            deferred.resolve(cached);
+            return deferred.promise;
+        }
+        inProgress[key] = deferred.promise;
+        getElement(reqOb, weight, update)
+        .then(function(result) {
+            var copy = JSON.parse(JSON.stringify(result));
+            deferred.resolve(cacheElement(reqOb, result, true));
+        }, function(reason) {
+            deferred.reject(reason);
+        }).finally(function() {
+            delete inProgress[key];
         });
-        return $q.all(promises);
+        return deferred.promise;
     };
 
     /**
@@ -252,17 +271,17 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
      * @description
      * Gets element's owned element objects. TBD (stub)
      * 
-     * @param {string} id The id of the elements to get owned elements for
-     * @param {boolean} [update=false] update elements from server
-     * @param {string} [workspace=master] (optional) workspace to use
-     * @param {string} [version=latest] (optional) alfresco version number or timestamp
-     * @param {integer} [depth=0] depth, 0 is infinite, will include this element
+     * @param {object} reqOb see description of getElement, add 'depth' key.
+     * @param {integer} [weight=1] priority
+     * @param {boolean} [update=false] update from server
      * @returns {Promise} The promise will be resolved with an array of 
      * element objects 
      */
-    var getOwnedElements = function(id, update, workspace, version, depth, weight, extended) {
-        var n = normalize(id, update, workspace, version, false, extended);
-        return getGenericElements(URLService.getOwnedElementURL(id, n.ws, n.ver, depth, n.extended), 'elements', n.update, n.ws, n.ver, weight);
+    var getOwnedElements = function(reqOb, weight, update) {
+        UtilsService.normalize(reqOb);
+        if (!reqOb.depth)
+            reqOb.depth = -1;
+        return getGenericElements(URLService.getOwnedElementURL(reqOb), reqOb, 'elements', weight, update);
     };
 
     /**
@@ -274,79 +293,67 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
      * This is a method to call a predefined url that returns elements json.
      * A key provides the key of the json that has the elements array. 
      *
-     * ## Example (used by ViewService to get products in a site)
-     *  <pre>
-        ElementService.getGenericElements('/alfresco/service/sites/europa/products', 'products')
-        .then(
-            function(products) {
-                alert('got ' + products.length + ' products');
-            },
-            function(reason) {
-                alert('failed: ' + reason.message);
-            }
-        );
-        </pre>
-     *
      * @param {string} url the url to get
-     * @param {string} key json key that has the element array value
-     * @param {boolean} [update=false] update cache
-     * @param {string} [workspace=master] workspace associated, this will not change the url
-     * @param {string} [version=latest] timestamp associated, this will not change the url
+     * @param {object} reqOb see description of getElement.
+     * @param {string} jsonKey json key that has the element array value
+     * @param {integer} [weight=1] priority
+     * @param {boolean} [update=false] update from server
      */
-    var getGenericElements = function(url, key, update, workspace, version, weight) {
-        var n = normalize(null, update, workspace, version);
+    var getGenericElements = function(url, reqOb, jsonKey, weight, update) {
+        UtilsService.normalize(reqOb);
 
-        var progress = 'getGenericElements(' + url + key + n.update + n.ws + n.ver + ')';
-        if (inProgress.hasOwnProperty(progress)) {
+        if (inProgress.hasOwnProperty(url)) {
             HttpService.ping(url, weight);
-            return inProgress[progress];
+            return inProgress[url];
         }
 
         var deferred = $q.defer();
-       
-        inProgress[progress] = deferred.promise;
+        inProgress[url] = deferred.promise;
         
         HttpService.get(url, 
             function(data, status, headers, config) {
-                var result = [];
-                var elements = data[key];
+                var results = [];
+                var elements = data[jsonKey];
                 for (var i = 0; i < elements.length; i++) {
                     var element = elements[i];
-                    if (!element) //check for null, seen before
+                    if (!element) //check for possible null
                         continue;
-                    var ekey = UtilsService.makeElementKey(element.sysmlId, n.ws, n.ver);
-                    result.push(CacheService.put(ekey, UtilsService.cleanElement(element), true));
+                    results.push(cacheElement(reqOb, element));
                 }
-                delete inProgress[progress];
-                deferred.resolve(result); 
+                delete inProgress[url];
+                deferred.resolve(results); 
             },
             function(data, status, headers, config) {
                 URLService.handleHttpStatus(data, status, headers, config, deferred);
-                delete inProgress[progress];
+                delete inProgress[url];
             },
             weight
         );
-
         return deferred.promise;
     };
 
-    var fillInElement = function(elem, workspace) {
+    var fillInElement = function(elementOb) {
         var deferred = $q.defer();
-        getElement(elem.sysmlId, false, workspace, 'latest', 2)
+        getElement({
+            projectId: elementOb._projectId, 
+            elementId: elementOb.sysmlId, 
+            commitId: 'latest',
+            refId: elementOb._refId
+        }, 2)
         .then(function(data) {
             var ob = JSON.parse(JSON.stringify(data));
-            for (var key in elem) {
-                ob[key] = elem[key];
+            for (var key in elementOb) {
+                ob[key] = elementOb[key];
             }
             if (ob._displayedElements)
                 delete ob._displayedElements;
             if (ob._allowedElements)
                 delete ob._allowedElements;
-            if (ob._childViews && !elem._childViews)
+            if (ob._childViews && !elementOb._childViews)
                 delete ob._childViews;
             deferred.resolve(ob);
         }, function() {
-            deferred.resolve(elem);
+            deferred.resolve(elementOb);
         });
         return deferred.promise;
     };
@@ -357,111 +364,91 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
      * @methodOf mms.ElementService
      * 
      * @description
-     * Save element to alfresco and update the cache if successful, the element object
+     * Save element to mms and update the cache if successful, the element object
      * must have an id, and whatever property that needs to be updated.
      * 
      * {@link mms.ElementService#methods_getElementForEdit see also getElementForEdit}
      *
-     * ## Example
-     *  <pre>
-        var update = {
-            'sysmlId': 'element_id',
-            'read': '2014-07-01T08:57:36.915-0700', //time the element was last read from the server
-            'name': 'updated name',
-            'documentation': '<p>updated doc</p>',
-            'specialization': {
-                'type': 'Property',
-                'value': [
-                    {
-                        'type': 'LiteralString', 
-                        'string': 'updated string value'
-                    }
-                ]
-            }
-        };
-        ElementService.updateElement(update).then(
-            function(updatedElement) { //this element will have the latest info as well as read time
-                alert('update successful');
-            },
-            function(reason) {
-                alert('update failed: ' + reason.message);
-            }
-        );
-        </pre>
-     * 
-     * @param {Object} elem An object that contains element id and any property changes to be saved.
-     * @param {string} [workspace=master] (optional) workspace to use
+     * @param {object} elementOb An object that contains projectId, sysmlId and any property changes to be saved.
      * @returns {Promise} The promise will be resolved with the updated cache element reference if 
      *      update is successful. If a conflict occurs, the promise will be rejected with status of 409
      */
-    var updateElement = function(elem, workspace) {
+    var updateElement = function(elementOb) { //elementOb should have the keys needed to make url
 
         var deferred = $q.defer();
 
-        var handleSuccess = function(n, data) {
+        var handleSuccess = function(data) {
             var e = null;
-            if (data.elements.length > 1 && elem.sysmlId) {
+            if (data.elements.length > 1 && elementOb.sysmlId) {
                 for (var i = 0; i < data.elements.length; i++) {
-                    if (data.elements[i].sysmlId === elem.sysmlId)
+                    if (data.elements[i].sysmlId === elementOb.sysmlId)
                         e = data.elements[i];
                 }
-                if (!e)
+                if (!e) //TODO shouldn't happen
                     e = data.elements[0];
             } else
                 e = data.elements[0];
-            var resp = CacheService.put(n.cacheKey, UtilsService.cleanElement(e), true);
-            var history = CacheService.get(UtilsService.makeElementKey(elem.sysmlId, workspace, 'versions'));
+            var metaOb = {
+                projectId: e._projectId, 
+                refId: e._refId, 
+                commitId: 'latest', 
+                elementId: e.sysmlId
+            };
+            var resp = cacheElement(metaOb, e);
+            var editCopy = JSON.parse(JSON.stringify(e));
+            cacheElement(metaOb, editCopy, true);
+            var history = CacheService.get(['history', metaOb.projectId, metaOb.refId, metaOb.elementId]);
             if (history) {
-                history.unshift({modifier: e._modifier, timestamp: e._modified, commitId: e._commitId});
+                history.unshift({_creator: e._modifier, _timestamp: e._modified, commitId: e._commitId});
             }
-            var edit = CacheService.get(UtilsService.makeElementKey(elem.sysmlId, n.ws, null, true));
-            if (edit) {
-                // Only want to merge the properties that were updated:
-                var updated = UtilsService.filterProperties(elem, resp);
-                _.merge(edit, updated);
-                UtilsService.cleanElement(edit, true);
-            }
-            //if (elem._contents)
-            //    resp._contents = elem._contents;
             deferred.resolve(resp);
         };
 
-        if (!elem.hasOwnProperty('sysmlId'))
-            deferred.reject('Element id not found, create element first!');
-        else {
-            var n = normalize(elem.sysmlId, null, workspace, null);
-          fillInElement(elem, workspace)
-          .then(function(postElem) {
-            $http.post(URLService.getPostElementsURL(n.ws), {'elements': [postElem],'source': ApplicationService.getSource()}, {timeout: 60000})
-            .success(function(data, status, headers, config) {
-                handleSuccess(n, data);
-            }).error(function(data, status, headers, config) {
-                if (status === 409) {
-                    var server = data.elements[0];
+        if (!elementOb.hasOwnProperty('sysmlId')) {
+            deferred.reject('Element id not found, create element first!'); //TODO check reject message
+            return deferred.promise;
+        }
+        fillInElement(elementOb)
+        .then(function(postElem) {
+            $http.post(URLService.getPostElementsURL({
+                    projectId: postElem._projectId, 
+                    refId: postElem._refId
+                }), {
+                    elements: [postElem],
+                    source: ApplicationService.getSource()
+                }, {timeout: 60000})
+            .then(function(response) {
+                if (!angular.isArray(response.data.elements) || response.data.elements.length === 0) {
+                    deferred.reject({}); //TODO fill in error message
+                    return;
+                }
+                handleSuccess(response.data);
+            }, function(response) {
+                if (response.status === 409) {
+                    var server = response.data.elements[0];
                     UtilsService.cleanElement(server);
-                    var orig = CacheService.get(UtilsService.makeElementKey(elem.sysmlId, n.ws, null, false));
+                    var orig = CacheService.get(UtilsService.makeElementKey(elementOb)); //TODO should be latest?
                     if (!orig) {
-                        URLService.handleHttpStatus(data, status, headers, config, deferred);
+                        URLService.handleHttpStatus(response.data, response.status, response.headers, response.config, deferred);
+                        return;
+                    } 
+                    UtilsService.cleanElement(orig);
+                    if (!UtilsService.hasConflict(postElem, orig, server)) {
+                        elementOb._read = server._read;
+                        elementOb._modified = server._modified;
+                        updateElement(elementOb)
+                        .then(function(good){
+                            deferred.resolve(good);
+                        }, function(reason) {
+                            deferred.reject(reason);
+                        });
                     } else {
-                        UtilsService.cleanElement(orig);
-                        if (!UtilsService.hasConflict(postElem, orig, server)) {
-                            elem._read = server._read;
-                            elem._modified = server._modified;
-                            updateElement(elem, workspace)
-                            .then(function(good){
-                                deferred.resolve(good);
-                            }, function(reason) {
-                                deferred.reject(reason);
-                            });
-                        } else {
-                            URLService.handleHttpStatus(data, status, headers, config, deferred);
-                        }
+                        URLService.handleHttpStatus(response.data, response.status, response.headers, response.config, deferred);
                     }
                 } else
-                    URLService.handleHttpStatus(data, status, headers, config, deferred);
+                    URLService.handleHttpStatus(response.data, response.status, response.headers, response.config, deferred);
             });
-          }); 
-        } 
+        }); 
         return deferred.promise;
     };
 
@@ -474,51 +461,15 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
      * Save elements to alfresco and update the cache if successful.
      * 
      * @param {Array.<Object>} elems Array of element objects that contains element id and any property changes to be saved.
-     * @param {string} [workspace=master] (optional) workspace to use
      * @returns {Promise} The promise will be resolved with an array of updated element references if 
      *      update is successful.
      */
-    var updateElements = function(elems, workspace) {
-        /*var promises = [];
-        elems.forEach(function(elem) {
-            promises.push(updateElement(elem, workspace));
+    var updateElements = function(elementObs) { //do individual updates for now since post need to be given canonical project and ref
+        var promises = [];
+        elementObs.forEach(function(e) {
+            promises.push(updateElement(e));
         });
-        return $q.all(promises);*/
-        var deferred = $q.defer();
-        var ws = !workspace ? 'master' : workspace;
-        var elemsMapping = {};
-        var fillAllPromises = [];
-        for (var i = 0; i < elems.length; i++) {
-            fillAllPromises.push(fillInElement(elems[i], workspace));
-            elemsMapping[elems[i].sysmlId] = elems[i];
-        }
-      $q.all(fillAllPromises)
-      .then(function(filledElems) {
-        $http.post(URLService.getPostElementsURL(ws), {'elements': filledElems})
-        .success(function(data, status, headers, config) {
-            data.elements.forEach(function(elem) {
-                var cacheKey = UtilsService.makeElementKey(elem.sysmlId, ws, null, false);
-                var resp = CacheService.put(cacheKey, UtilsService.cleanElement(elem), true);
-
-                var history = CacheService.get(UtilsService.makeElementKey(elem.sysmlId, workspace, 'versions'));
-                if (history) {
-                    history.unshift({modifier: elem._modifier, timestamp: elem._modified, commitId: elem._commitId});
-                }
-                var orig = elemsMapping[elem.sysmlId];
-                var edit = CacheService.get(UtilsService.makeElementKey(elem.sysmlId, ws, null, true));
-                if (edit && orig) {
-                // Only want to merge the properties that were updated:
-                    var updated = UtilsService.filterProperties(orig, resp);
-                    _.merge(edit, updated);
-                    UtilsService.cleanElement(edit, true);
-                }
-            });
-            deferred.resolve(data.elements);
-        }).error(function(data, status, headers, config) {
-            URLService.handleHttpStatus(data, status, headers, config, deferred);
-        });
-      });
-        return deferred.promise;
+        return $q.all(promises);
     };
 
     /**
@@ -527,75 +478,37 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
      * @methodOf mms.ElementService
      * 
      * @description
-     * Create element on alfresco.
-     *
-     * ## Example
-     *  <pre>
-        var create = {
-            'name': 'new name',
-            'ownerId': 'owner_id',
-            'documentation': '<p>new doc</p>',
-            'specialization': {
-                'type': 'Property',
-                'value': [
-                    {
-                        'type': 'LiteralString', 
-                        'string': 'new value'
-                    }
-                ]
-            }
-        };
-        ElementService.createElement(create).then(
-            function(createdElement) { //this element will have a generated id
-                alert('create successful with id: ' + createdElement.sysmlId);
-            },
-            function(reason) {
-                alert('create failed: ' + reason.message);
-            }
-        );
-        </pre>
+     * Create element on mms.
      * 
-     * @param {Object} elem Element object that must have an owner id.
-     * @param {string} [workspace=master] (optional) workspace to use
-     * @param {string} [site=null] (optional) site to post to (if the element has no predefined owner,
-     *      give the site argument so the server can put it in the site's holding bin)
+     * @param {object} reqOb see description of getElement, instead of elementId, 'element' key should be 
+     *                  the element object to create
      * @returns {Promise} The promise will be resolved with the created element references if 
      *      create is successful.
      */
-    var createElement = function(elem, workspace, site, extended) {
-        var n = normalize(null, null, workspace, null);
-
+    var createElement = function(reqOb) {
+        UtilsService.normalize(reqOb);
         var deferred = $q.defer();
-        //if (!elem.hasOwnProperty('ownerId')) {
-        //    deferred.reject('Element create needs an owner'); //relax this?
-        //    return deferred.promise;
-        //    elem.ownerId = 'holding_bin_project'; //hardcode a holding bin for owner for propose element
-        //}
-        
-        /*if (elem.hasOwnProperty('sysmlId')) {
-            deferred.reject({status: 400, message: 'Element create cannot have id'});
-            return deferred.promise;
-        }*/
 
-        var url = URLService.getPostElementsURL(n.ws, extended);
-        if (site)
-            url = URLService.getPostElementsWithSiteURL(n.ws, site, extended);
-        $http.post(url, {'elements': [elem], 'source': ApplicationService.getSource()})
-        .success(function(data, status, headers, config) {
+        var url = URLService.getPostElementsURL(reqOb);
+        $http.post(url, {'elements': [reqOb.element], 'source': ApplicationService.getSource()})
+        .then(function(response) {
+            if (!angular.isArray(response.data.elements) || response.data.elements.length === 0) {
+                deferred.reject({}); //TODO fill in error message
+                return;
+            }
             var resp = null;
-            if (data.elements.length > 1 && elem.sysmlId) {
-                for (var i = 0; i < data.elements.length; i++) {
-                    if (data.elements[i].sysmlId === elem.sysmlId)
-                        resp = data.elements[i];
+            if (response.data.elements.length > 1 && reqOb.element.sysmlId) {
+                for (var i = 0; i < response.data.elements.length; i++) {
+                    if (response.data.elements[i].sysmlId === reqOb.element.sysmlId)
+                        resp = response.data.elements[i];
                 }
-                if (!resp)
-                    resp = data.elements[0];
+                if (!resp) //shouldn't happen!
+                    resp = response.data.elements[0];
             } else
-                resp = data.elements[0];
-            var key = UtilsService.makeElementKey(resp.sysmlId, n.ws, 'latest');
-            deferred.resolve(CacheService.put(key, UtilsService.cleanElement(resp), true));
-        }).error(function(data, status, headers, config) {
-            URLService.handleHttpStatus(data, status, headers, config, deferred);
+                resp = response.data.elements[0];
+            deferred.resolve(cacheElement(reqOb, resp));
+        }, function(response) {
+            URLService.handleHttpStatus(response.data, response.status, response.headers, response.config, deferred);
         });
         return deferred.promise;
     };
@@ -608,27 +521,28 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
      * @description
      * Create elements to alfresco and update the cache if successful.
      * 
-     * @param {Array.<Object>} elems Array of element objects that must contain owner id.
-     * @param {string} [workspace=master] (optional) workspace to use
+     * @param {object} reqOb see description of getElement, instead of elementId, 'elements' key should be 
+     *                  the array of element object to create
      * @returns {Promise} The promise will be resolved with an array of created element references if 
      *      create is successful.
      */
-    var createElements = function(elems, workspace, site, extended) {
-        var n = normalize(null, null, workspace, null);
+    var createElements = function(reqOb) {
+        UtilsService.normalize(reqOb);
         var deferred = $q.defer();
-        var url = URLService.getPostElementsURL(n.ws, extended);
-        if (site)
-            url = URLService.getPostElementsWithSiteURL(n.ws, site, extended);
-        $http.post(url, {'elements': elems, 'source': ApplicationService.getSource()})
-        .success(function(data, status, headers, config) {
+        var url = URLService.getPostElementsURL(reqOb);
+        $http.post(url, {'elements': reqOb.elements, 'source': ApplicationService.getSource()})
+        .then(function(response) {
+            if (!angular.isArray(response.data.elements) || response.data.elements.length === 0) {
+                deferred.reject({}); //TODO fill in error message
+                return;
+            }
             var results = [];
-            data.elements.forEach(function(resp) {
-                var key = UtilsService.makeElementKey(resp.sysmlId, n.ws, 'latest');
-                results.push(CacheService.put(key, UtilsService.cleanElement(resp), true));
+            response.data.elements.forEach(function(e) {
+                results.push(cacheElement(reqOb, e));
             });
             deferred.resolve(results);
-        }).error(function(data, status, headers, config) {
-            URLService.handleHttpStatus(data, status, headers, config, deferred);
+        }, function(response) {
+            URLService.handleHttpStatus(response.data, response.status, response.headers, response.config, deferred);
         });
         return deferred.promise;
     };
@@ -647,9 +561,10 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
      * @returns {Promise} Resolved with {status: false} if cache is up to date, 
      *      Resolved with {status: true, server: server element, cache: cache element} if cache is outdated
      */
-    var isCacheOutdated = function(id, workspace) {
+    var isCacheOutdated = function(id, workspace) {//TODO
         var deferred = $q.defer();
-        var ws = !workspace ? 'master' : workspace;
+        deferred.resolve({status: false});
+        /*var ws = !workspace ? 'master' : workspace;
         var orig = CacheService.get(UtilsService.makeElementKey(id, ws, null, false));
         if (!orig) {
             deferred.resolve({status: false});
@@ -674,29 +589,8 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
             }
         }).error(function(data, status, headers, config) {
             URLService.handleHttpStatus(data, status, headers, config, deferred);
-        });
+        });*/
         return deferred.promise;
-    };
-
-    /**
-     * @ngdoc method
-     * @name mms.ElementService#isDirty
-     * @methodOf mms.ElementService
-     * 
-     * @description
-     * TBD, do not use. Check if element has been edited and not saved to server
-     * 
-     * @param {string} id Element id
-     * @returns {boolean} Whether element is dirty
-     */
-    var isDirty = function(id, workspace) {
-        var editKey = UtilsService.makeElementKey(id, workspace, null, true);
-        var normalKey = UtilsService.makeElementKey(id, workspace);
-        var normal = CacheService.get(normalKey);
-        var edit = CacheService.get(editKey);
-        if (edit && !_.isEqual(normal, edit))
-            return true;
-        return false;
     };
 
     /**
@@ -707,33 +601,30 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
      * @description
      * Search for elements based on some query
      * 
+     * @param {object} reqOb see description of getElement
      * @param {string} query A keyword
      * @param {Array.<string>} [filters=null] An array of string of what to search in,
      *                                        can be name, documentation, id, value
      * @param {string} [propertyName=null] if filter is value, propertyName is used to further filter
      * @param {integer} [page=null] page
      * @param {integer} [items=null] items per page
-     * @param {boolean} [update=false] Whether to update from server
-     * @param {string} [workspace=master] (optional) workspace to use
+     * @param {integer} [weight=1] priority
      * @returns {Promise} The promise will be resolved with an array of element objects.
      *                  the server will return each element's properties as another array of element objects
      *                  in each object's 'properties' key, the array isn't stored in the cache with the element
      *                  but elements in the properties array will be stored in the cache
      *                  The element results returned will be a clone of the original server response and not cache references
      */
-    var search = function(query, filters, propertyName, page, items, update, workspace, weight, extended) {
-        //var n = normalize(null, update, workspace, null);
-        //return getGenericElements(URLService.getElementSearchURL(query, n.ws), 'elements', n.update, n.ws, n.ver);
-        var n = normalize(null, update, workspace, null, false, extended);
-        var url = URLService.getElementSearchURL(query, filters, propertyName, page, items, n.ws, true);
-        var progress = 'search(' + url + n.update + n.ws + ')';
-        if (inProgress.hasOwnProperty(progress)) {
+    var search = function(reqOb, query, filters, propertyName, page, items, weight) {
+        UtilsService.normalize(reqOb);
+        var url = URLService.getElementSearchURL(reqOb, query, filters, propertyName, page, items);
+        if (inProgress.hasOwnProperty(url)) {
             HttpService.ping(url, weight);
-            return inProgress[progress];
+            return inProgress[url];
         }
 
         var deferred = $q.defer();
-        inProgress[progress] = deferred.promise;
+        inProgress[url] = deferred.promise;
         HttpService.get(url, 
             function(data, status, headers, config) {
                 var result = [];
@@ -742,13 +633,11 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                     var properties = element._properties;
                     if (properties)
                         delete element._properties;
-                    var ekey = UtilsService.makeElementKey(element.sysmlId, n.ws, n.ver);
-                    var cacheE = CacheService.put(ekey, UtilsService.cleanElement(element), true);
+                    var cacheE = cacheElement(reqOb, element);
                     if (properties) {
                         for (var j = 0; j < properties.length; j++) {
                             var property = properties[j];
-                            var pkey = UtilsService.makeElementKey(property.sysmlId, n.ws, n.ver);
-                            CacheService.put(pkey, UtilsService.cleanElement(property), true);
+                            cacheElement(reqOb, property);
                         }
                     }
                     var toAdd = JSON.parse(JSON.stringify(element)); //make clone
@@ -756,14 +645,12 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                     toAdd._relatedDocuments = cacheE._relatedDocuments;
                     result.push(toAdd);
                 }
-                delete inProgress[progress];
+                delete inProgress[url];
                 deferred.resolve(result); 
-            },
-            function(data, status, headers, config) {
+            }, function(data, status, headers, config) {
                 URLService.handleHttpStatus(data, status, headers, config, deferred);
-                delete inProgress[progress];
-            },
-            weight
+                delete inProgress[url];
+            }, weight
         );
         return deferred.promise;
     };
@@ -776,171 +663,64 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
      * @description
      * Queries for an element's entire version history
      *
-     * @param {string} id The id of the element
-     * @param {boolean} [update=false] update element version cache
-     * @param {string} [workspace=master] workspace
-     * @returns {Promise} The promise will be resolved with an array of version objects.
+     * @param {object} reqOb see getElement
+     * @param {integer} [weight=1] priority
+     * @param {boolean} [update=false] update from server
+     * @returns {Promise} The promise will be resolved with an array of commit objects.
      */
-    var getElementVersions = function(id, update, workspace) {
-        var n = normalize(id, update, workspace, 'versions');
+    var getElementHistory = function(reqOb, weight, update) {
+        UtilsService.normalize(reqOb);
 
-        var key = 'getElementVersions(' + id + n.update + n.ws + ')';
+        var key = URLService.getElementHistoryURL(reqOb);
         if (inProgress.hasOwnProperty(key)) {
             return inProgress[key];
         }
-
+        var requestCacheKey = ['history', reqOb.projectId, reqOb.refId, reqOb.elementId];
         var deferred = $q.defer();
-        if (CacheService.exists(n.cacheKey) && !n.update) {
-            deferred.resolve(CacheService.get(n.cacheKey));
+        if (CacheService.exists(requestCacheKey) && !update) {
+            deferred.resolve(CacheService.get(requestCacheKey));
             return deferred.promise;
         }
         inProgress[key] = deferred.promise;
-        $http.get(URLService.getElementVersionsURL(id, n.ws))
-        .success(function(data, statas, headers, config){
-            deferred.resolve(CacheService.put(n.cacheKey, data.versions, true));
+        $http.get(URLService.getElementHistoryURL(reqOb))
+        .then(function(response){
+            deferred.resolve(CacheService.put(requestCacheKey, response.data.history, true));
             delete inProgress[key];
-        }).error(function(data, status, headers, config) {
-            URLService.handleHttpStatus(data, status, headers, config, deferred);
+        }, function(response) {
+            URLService.handleHttpStatus(response.data, response.status, response.headers, response.config, deferred);
             delete inProgress[key];
         });
         return deferred.promise;
     };
 
-    /**
-     * @ngdoc method
-     * @name mms.ElementService#deleteElement
-     * @methodOf mms.ElementService
-     * 
-     * @description
-     * Delete an element 
-     *
-     * @param {string} id The id of the element
-     * @param {string} [workspace=master] workspace
-     * @returns {Promise} The promise will be resolved with server response if delete is successful.
-     */
-    var deleteElement = function(id, workspace) {
-        var ws = !workspace ? 'master' : workspace;
-        var deferred = $q.defer();
-        var key = UtilsService.makeElementKey(id, ws, null, false);
-        $http.delete(URLService.getElementURL(id, ws, 'latest'))
-        .success(function(data, status, headers, config) {
-            CacheService.remove(key);
-            deferred.resolve(data);
-        }).error(function(data, status, headers, config) {
-            URLService.handleHttpStatus(data, status, headers, config, deferred);
-        });
-        return deferred.promise;
-    };
-
-    /**
-     * @ngdoc method
-     * @name mms.ElementService#deleteElements
-     * @methodOf mms.ElementService
-     * 
-     * @description
-     * Delete elements from alfresco and update the cache if successful.
-     * 
-     * @param {Array.<string>} ids Array of element ids to delete
-     * @param {string} [workspace=master] (optional) workspace to use
-     * @returns {Promise} The promise will be resolved with an array of updated element references if 
-     *      delete is successful.
-     */
-    var deleteElements = function(ids, workspace) {
-        var promises = [];
-        ids.forEach(function(id) {
-            promises.push(deleteElement(id, workspace));
-        });
-        return $q.all(promises);
-    };
-
-    var normalize = function(id, update, workspace, version, edit, extended) {
-        var res = UtilsService.normalize({update: update, workspace: workspace, version: version, extended: extended});
-        res.cacheKey = UtilsService.makeElementKey(id, res.ws, res.ver, edit);
-        return res;
+    var getElementKey = function(reqOb, id, edit) {
+        var cacheKey = UtilsService.makeElementKey({
+            _projectId: reqOb.projectId, 
+            sysmlId: reqOb.elementId ? reqOb.elementId : id, 
+            _commitId: reqOb.commitId, 
+            _refId: reqOb.refId
+        }, edit);
+        return cacheKey;
     };
 
     var reset = function() {
         inProgress = {};
     };
 
-    var getIdInfoReal = function(elem, siteid) {
-        var holdingBinId = null;
-        var projectId = null;
-        var projectName = null;
-        var siteId = siteid;
-        var rootSiteId = null;
-        var deferred = $q.defer();
-        if (elem && elem._qualifiedId && elem._qualifiedName) {
-            var splitArray = elem._qualifiedId.split('/');
-            var projectNameArray = elem._qualifiedName.split('/');
-            if (splitArray && splitArray.length > 2) {
-                projectId = splitArray[2];
-                siteId = splitArray[1];
-                rootSiteId = siteId;
-            }
-            if (elem._siteCharacterizationId)
-                siteId = elem._siteCharacterizationId;
-            if (projectId && projectId.indexOf('PROJECT') >= 0) {
-                holdingBinId = 'holding_bin_' + projectId;
-                projectName = projectNameArray[2];
-            }
-            deferred.resolve({holdingBinId: holdingBinId, projectId: projectId, siteId: siteId, rootSiteId: rootSiteId, projectName: projectName});
-        } else if (siteid) {
-            SiteService.getRootSiteForSite(siteid)
-            .then(function(data) {
-                rootSiteId = data;
-            }).finally(function() {
-                deferred.resolve({holdingBinId: holdingBinId, projectId: projectId, siteId: siteId, rootSiteId: rootSiteId, projectName: projectName});
-            });
-        } else {
-            deferred.resolve({holdingBinId: holdingBinId, projectId: projectId, siteId: siteId, rootSiteId: rootSiteId, projectName: projectName});
-        }
-        return deferred.promise;
-    };
-
-    var getIdInfo = function(elem, siteid, workspace, version, weight) { //elem is element object with qualified id with project in it
-        var deferred = $q.defer();
-
-        if (!elem || (elem && elem._qualifiedId && elem._qualifiedName)) {
-            return getIdInfoReal(elem, siteid);
-        } else {
-            getElement(elem.sysmlId, false, workspace, version, weight, true)
-            .then(function(data) {
-                getIdInfoReal(data, siteid)
-                .then(function(data) {
-                    deferred.resolve(data);
-                });
-            }, function() {
-                getIdInfoReal(elem, siteid)
-                .then(function(data) {
-                    deferred.resolve(data);
-                });
-            });
-        }
-        //if (!holdingBinId && siteId) {
-        //    holdingBinId = 'holding_bin_' + siteId + '_no_project';
-        //}
-        return deferred.promise;
-    };
-
     return {
         getElement: getElement,
         getElements: getElements,
         getElementForEdit: getElementForEdit,
-        getElementsForEdit: getElementsForEdit,
         getOwnedElements: getOwnedElements,
         updateElement: updateElement,
         updateElements: updateElements,
         createElement: createElement,
         createElements: createElements,
         getGenericElements: getGenericElements,
-        getElementVersions: getElementVersions,
-        deleteElement: deleteElement,
-        deleteElements: deleteElements,
+        getElementHistory: getElementHistory,
         isCacheOutdated: isCacheOutdated,
-        isDirty: isDirty,
+        cacheElement: cacheElement,
         search: search,
-        reset: reset,
-        getIdInfo: getIdInfo
+        reset: reset
     };
 }

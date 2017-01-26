@@ -84,11 +84,11 @@ function UtilsService(CacheService, _) {
                 if (elem._contents && elem.contains)
                     delete elem.contains;
                 if (Array.isArray(elem._displayedElements)) {
-                    elem._numElements = elem._displayedElements.length;
-                    if (elem._numElements <= 5000)
-                        delete elem._displayedElements;
-                    else
-                        elem._displayedElements = JSON.stringify(elem._displayedElements);
+                    //elem._numElements = elem._displayedElements.length;
+                    //if (elem._numElements <= 5000)
+                     //   delete elem._displayedElements;
+                    //else
+                    elem._displayedElements = JSON.stringify(elem._displayedElements);
                 }
                 if (elem._allowedElements)
                     delete elem._allowedElements;
@@ -184,13 +184,11 @@ function UtilsService(CacheService, _) {
      * @returns {Object} object with update, ws, ver keys based on the input.
      *      default values: {update: false, ws: 'master', ver: 'latest'}
      */
-    var normalize = function(ob) {
-        var res = {};
-        res.update = !ob.update ? false : ob.update;
-        res.ws = !ob.workspace ? 'master' : ob.workspace;
-        res.ver = !ob.version ? 'latest' : ob.version;
-        res.extended = !ob.extended ? false : true;
-        return res;
+    var normalize = function(reqOb) {
+        reqOb.extended = !reqOb.extended ? false : true;
+        reqOb.refId = !reqOb.refId ? 'master' : reqOb.refId;
+        reqOb.commitId = !reqOb.commitId ? 'latest' : reqOb.commitId;
+        return reqOb;
     };
 
     /**
@@ -207,13 +205,13 @@ function UtilsService(CacheService, _) {
      * @param {boolean} [edited=false] element is to be edited
      * @returns {Array} key to be used in CacheService
      */
-    var makeElementKey = function(id, workspace, version, edited) {
-        var ws = !workspace ? 'master' : workspace;
-        var ver = !version ? 'latest' : version;
-        if (edited)
-            return ['elements', ws, id, ver, 'edit'];
-        else
-            return ['elements', ws, id, ver];
+    var makeElementKey = function(elementOb, edit) {
+        var refId = !elementOb._refId ? 'master' : elementOb._refId;
+        var commitId = !elementOb._commitId ? 'latest' : elementOb._commitId;
+        var key = ['elements', elementOb._projectId, elementOb._refId, elementOb.sysmlId, elementOb._commitId];
+        if (edit)
+            key.push('edit');
+        return key;
     };
     /**
      * @ngdoc method
@@ -280,10 +278,7 @@ function UtilsService(CacheService, _) {
         var res = {};
         for (var key in a) {
             if (a.hasOwnProperty(key) && b.hasOwnProperty(key)) {
-                //if (key === 'specialization')
-                //    res.specialization = filterProperties(a.specialization, b.specialization);
-                //else
-                    res[key] = b[key];
+                res[key] = b[key];
             }
         }
         return res;
@@ -310,17 +305,12 @@ function UtilsService(CacheService, _) {
 
     var hasConflict = function(edit, orig, server) {
         for (var i in edit) {
-            if (i === 'read' || i === 'modified' || i === 'modifier' || 
-                    i === 'creator' || i === 'created')
+            if (i === '_read' || i === '_modified' || i === '_modifier' || 
+                    i === '_creator' || i === '_created')
                 continue;
             if (edit.hasOwnProperty(i) && orig.hasOwnProperty(i) && server.hasOwnProperty(i)) {
-                //if (i === 'specialization') {
-                //    if (hasConflict(edit[i], orig[i], server[i]))
-                //        return true;
-                //} else {
-                    if (!angular.equals(orig[i], server[i]))
-                        return true;
-                //}
+                if (!angular.equals(orig[i], server[i]))
+                    return true;
             }
         }
         return false;

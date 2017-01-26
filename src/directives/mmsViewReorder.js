@@ -62,7 +62,7 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
                             return;
                         scope.elementReferenceTree = elementReferenceTree;
                         scope.originalElementReferenceTree = _.cloneDeep(elementReferenceTree, function(value, key, object) {
-                            if (key === 'instance' || key === 'instanceSpecification' || key === 'presentationElement' || key === 'instanceVal')
+                            if (key === 'instanceId' || key === 'instanceSpecification' || key === 'presentationElement' || key === 'instanceVal')
                                 return value;
                             return undefined;
                         });
@@ -101,7 +101,7 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
             var promises = [];
             var updateSectionElementOrder = function(elementReference) {
                 var sectionEdit = { 
-                    sysmlId: elementReference.instance,
+                    sysmlId: elementReference.instanceId,
                     _read: elementReference.instanceSpecification._read,
                     _modified: elementReference.instanceSpecification._modified,
                     type: elementReference.instanceSpecification.type,
@@ -163,7 +163,7 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
 
         scope.revert = function() {
             scope.elementReferenceTree = _.cloneDeep(scope.originalElementReferenceTree, function(value, key, object) {
-                if (key === 'instance' || key === 'instanceSpecification' || key === 'presentationElement' || key === 'instanceVal')
+                if (key === 'instanceId' || key === 'instanceSpecification' || key === 'presentationElement' || key === 'instanceVal')
                    return value;
                 return undefined;
             });
@@ -176,7 +176,7 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
                 .then(function(elementReferenceTree) {
                     scope.elementReferenceTree = elementReferenceTree;
                     scope.originalElementReferenceTree = _.cloneDeep(elementReferenceTree, function(value, key, object) {
-                        if (key === 'instance' || key === 'instanceSpecification' || key === 'presentationElement' || key === 'instanceVal')
+                        if (key === 'instanceId' || key === 'instanceSpecification' || key === 'presentationElement' || key === 'instanceVal')
                             return value;
                         return undefined;
                     });
