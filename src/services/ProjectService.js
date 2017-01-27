@@ -242,6 +242,52 @@ function ProjectService($q, $http, URLService, CacheService, ApplicationService)
         return deferred.promise;
     };
 
+    var getGroups = function(projectId, refId) {
+        refId = refId ? refId : 'master';
+        var cacheKey = ['groups', projectId, refId];
+        var url = URLService.getGroupsURL(projectId, refId);
+        if (inProgress.hasOwnProperty(url))
+            return inProgress[url];
+        var deferred = $q.defer();
+        if (CacheService.exists(cacheKey)) {
+            deferred.resolve(CacheService.get(cacheKey));
+        } else {
+            inProgress[url] = deferred.promise;
+            $http.get(url).then(function(response) {
+                if (!angular.isArray(response.data.groups)) {
+                    deferred.reject({status: 500, data: '', message: "Server Error: empty response"});
+                    return;
+                }
+                var groups = [];
+                for (var group in response.data.groups) {
+                    CacheService.put(['group', projectId, refId, group.sysmlId], group, true);
+                    groups.push(CacheService.get(['group', projectId, refId, group.sysmlId]));
+                }
+                CacheService.put(cacheKey, groups, false);
+                deferred.resolve(CacheService.get(cacheKey));
+            }, function(response) {
+                URLService.handleHttpStatus(response.data, response.status, response.headers, response.config, deferred);
+            }).finally(function() {
+                delete inProgress[url];
+            });
+        }
+        return deferred.promise;
+    };
+
+    var getGroup = function(sysmlId, projectId, refId) {
+        var deferred = $q.defer();
+        getGroups(projectId, refId).then(function(data) {
+            var result = CacheService.get(['group', projectId, refId, sysmlId]);
+            if (result)
+                deferred.resolve(result);
+            else
+                deferred.reject({status: 404, data: '', message: "Group not found"});
+        }, function(reason) {
+            deferred.reject(reason);
+        });
+        return deferred.promise;
+    };
+
     var reset = function() {
         inProgress = {};
     };
@@ -253,6 +299,8 @@ function ProjectService($q, $http, URLService, CacheService, ApplicationService)
         getOrg: getOrg,
         getRefs: getRefs,
         getRef: getRef,
+        getGroups: getGroups,
+        getGroup: getGroup,
         createRef: createRef,
         updateRef: updateRef,
         deleteRef: deleteRef,
