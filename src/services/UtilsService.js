@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms')
-.factory('UtilsService', ['CacheService', '_', UtilsService]);
+.factory('UtilsService', ['$q', '$http', 'CacheService', 'URLService', '_', UtilsService]);
 
 /**
  * @ngdoc service
@@ -11,7 +11,7 @@ angular.module('mms')
  * @description
  * Utilities
  */
-function UtilsService(CacheService, _) {
+function UtilsService($q, $http, CacheService, URLService, _) {
     var VIEW_SID = '_17_0_1_232f03dc_1325612611695_581988_21583';
     var DOCUMENT_SID = '_17_0_2_3_87b0275_1371477871400_792964_43374';
     var nonEditKeys = ['contains', 'view2view', 'childrenViews', '_displayedElements',
@@ -208,7 +208,7 @@ function UtilsService(CacheService, _) {
     var makeElementKey = function(elementOb, edit) {
         var refId = !elementOb._refId ? 'master' : elementOb._refId;
         var commitId = !elementOb._commitId ? 'latest' : elementOb._commitId;
-        var key = ['elements', elementOb._projectId, elementOb._refId, elementOb.sysmlId, elementOb._commitId];
+        var key = ['element', elementOb._projectId, elementOb._refId, elementOb.sysmlId, elementOb._commitId];
         if (edit)
             key.push('edit');
         return key;
@@ -640,6 +640,31 @@ function UtilsService(CacheService, _) {
         return false;
     };
 
+    /**
+     * @ngdoc method
+     * @name mms.ConfigService#convertHtmlToPdf
+     * @methodOf mms.ConfigService
+     *
+     * @description
+     * Converts HTML to PDF
+     *
+     * @param {Object} doc The document object with Id and HTML payload that will be converted to PDF
+     * @param {string} site The site name
+     * @param {string} [workspace=master] Workspace name
+     * @returns {Promise} Promise would be resolved with 'ok', the server will send an email to user when done
+     */
+    var convertHtmlToPdf = function(doc, site, workspace){
+        var n = UtilsService.normalize(null, workspace);
+        var deferred = $q.defer();
+        $http.post(URLService.getHtmlToPdfURL(doc.docId, site, n.ws), {'documents': [doc]})
+        .success(function(data, status, headers, config){
+            deferred.resolve('ok');
+        }).error(function(data, status, headers, config){
+            URLService.handleHttpStatus(data, status, headers, config, deferred);
+        });
+        return deferred.promise;
+    };
+
     return {
         hasCircularReference: hasCircularReference,
         cleanElement: cleanElement,
@@ -659,5 +684,6 @@ function UtilsService(CacheService, _) {
         getPrintCss: getPrintCss,
         isView: isView,
         isDocument: isDocument,
+        convertHtmlToPdf: convertHtmlToPdf
     };
 }

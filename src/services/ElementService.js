@@ -369,7 +369,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
      * 
      * {@link mms.ElementService#methods_getElementForEdit see also getElementForEdit}
      *
-     * @param {object} elementOb An object that contains projectId, sysmlId and any property changes to be saved.
+     * @param {object} elementOb An object that contains _projectId, _refId, sysmlId and any property changes to be saved.
      * @returns {Promise} The promise will be resolved with the updated cache element reference if 
      *      update is successful. If a conflict occurs, the promise will be rejected with status of 409
      */

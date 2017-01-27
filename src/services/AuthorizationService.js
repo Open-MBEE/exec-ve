@@ -9,18 +9,10 @@ function AuthService($q, $http, URLService, HttpService, ElementService, ViewSer
     var getAuthorized = function (credentials) {
         var deferred = $q.defer();
         var loginURL = '/alfresco/service/api/login';
-        //var encode = $window.btoa(credentials.username + ' ' + credentials.password);
-        //$http.defaults.headers.common.Authorization = 'Basic ' + $window.btoa(credentials.username + ':' + credentials.password);
         $http.post(loginURL, credentials).then(function (success) {
             URLService.setTicket(success.data.data.ticket);
             ticket = success.data.data.ticket;
             $window.localStorage.setItem('ticket', ticket);
-            // $http.get(URLService.getCheckLoginURL(), {
-            //     headers: {
-            //         'Authorization': 'Basic ' + $window.btoa(credentials.username + ':' + credentials.password),
-            //         'withCredentials' : 'true'
-            //     }
-            // });
             deferred.resolve(ticket);
         }, function(fail){
             URLService.handleHttpStatus(fail.data, fail.status, fail.header, fail.config, deferred);
@@ -42,21 +34,19 @@ function AuthService($q, $http, URLService, HttpService, ElementService, ViewSer
     var getTicket = function(){
         return ticket;
     };
+    
     var checkLogin = function(){
-        var deferred = $q.defer();//:TODO
+        var deferred = $q.defer();
         if (!ticket) {
             deferred.reject(false);
             return deferred.promise;
         }
-        //var checkLogin = '/alfresco/service/api/login/ticket/'+ticket+'?alf_ticket='+ticket;
         
         $http.get(URLService.getCheckTicketURL(ticket)).then(function (success) {
             deferred.resolve(success.data.username);
         }, function(fail){
-            //if(fail.status === 401) {
-                deferred.reject(fail);
-                removeTicket();
-            //}
+            deferred.reject(fail);
+            removeTicket();
         });  
         return deferred.promise;  
     };
@@ -66,13 +56,10 @@ function AuthService($q, $http, URLService, HttpService, ElementService, ViewSer
         checkLogin().then(function() {
             var logouturl = URLService.getLogoutURL();
             removeTicket();
-            //var logoutService = '/alfresco/service/api/login/ticket/'+ AuthService.getTicket() + '?alf_ticket=' + AuthService.getTicket();
             $http.delete(logouturl).then(function(success) {
                 deferred.resolve(true);
-                //$state.go('login');
             }, function(failure) {
                 URLService.handleHttpStatus(failure.data, failure.status, failure.headers, failure.config, deferred);
-                //growl.error('You were not logged out');
             });
         }, function() {
             removeTicket();
