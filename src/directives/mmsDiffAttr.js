@@ -142,8 +142,7 @@ function mmsDiffAttr(ElementService, WorkspaceService, ConfigService, URLService
             }
         };
 
-        var elementState = function(origNotFound, compNotFound, vrOneInvalidFlag, vrTwoInvalidFlag, deletedFlag){
-
+        var checkElement = function(origNotFound, compNotFound, deletedFlag){
           switch(origNotFound){
             case 0:
               if (compNotFound == 1)
@@ -161,7 +160,9 @@ function mmsDiffAttr(ElementService, WorkspaceService, ConfigService, URLService
               else if (compNotFound == 1)
                 element.html('<span class="mms-error">This element does not exist at either point in time. </span>');
           }
+        };
 
+        var checkVersion = function(vrOneInvalidFlag, vrTwoInvalidFlag){
           switch(vrOneInvalidFlag){
             case 0:
               if (vrTwoInvalidFlag == 1)
@@ -185,7 +186,6 @@ function mmsDiffAttr(ElementService, WorkspaceService, ConfigService, URLService
         var deletedFlag = 0;
 
         tagOrTimestamp(scope.mmsVersionOne, scope.mmsWsOne).then(function(versionOrTs){
-
             getComparsionText(versionOrTs, scope.mmsWsOne).then(function(data){
                 scope.origElem = angular.element(data).text();
                 // run on interval to check when data gets changed. once it changes set to origElem and break out of interval
@@ -213,10 +213,8 @@ function mmsDiffAttr(ElementService, WorkspaceService, ConfigService, URLService
         });
 
         tagOrTimestamp(scope.mmsVersionTwo, scope.mmsWsTwo).then(function(versionOrTs){
-
             getComparsionText(versionOrTs, scope.mmsWsTwo).then(function(data){
                 scope.compElem = angular.element(data).text();
-
                 var promise2 = $interval(
                     function(){
                         if (scope.compElem == angular.element(data).text() && data2CheckForBreak) {
@@ -226,11 +224,9 @@ function mmsDiffAttr(ElementService, WorkspaceService, ConfigService, URLService
                             data2CheckForBreak = true;
                             // console.log("data2 did not change make data change true : " +data2CheckForBreak);
                         }
-
                         scope.compElem = angular.element(data).text();
                         // console.log("here is the changed text: " +scope.compElem);
                     }, 5000);
-
             }, function(reject){
                 scope.compElem = reject;
                 scope.compElem = '';
@@ -238,18 +234,11 @@ function mmsDiffAttr(ElementService, WorkspaceService, ConfigService, URLService
                   compNotFound = 1;
                 else if(reject.toLowerCase() == "deleted")
                   deletedFlag = 1;
+                elementCheck(origNotFound, compNotFound, deletedFlag);
             });
         }, function(reject){
             vrTwoInvalidFlag = 1;
-
-        }).then(function(){
-          console.log("Orig: " + origNotFound);
-          console.log("Comp: " + compNotFound);
-          console.log("vr One: " + vrOneInvalidFlag);
-          console.log("vr Two: " + vrTwoInvalidFlag);
-          console.log("deleted: " + deletedFlag);
-
-          elementState(origNotFound, compNotFound, vrOneInvalidFlag, vrTwoInvalidFlag, deletedFlag);
+            versionCheck(vrOneInvalidFlag, vrTwoInvalidFlag);
         });
     };
 
