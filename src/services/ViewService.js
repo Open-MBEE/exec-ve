@@ -500,7 +500,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         };
         var instanceSpec = {
             sysmlId: newInstanceId,
-            ownerId: viewOrSectionOb._projectId + '_holding_bin', //TODO check
+            ownerId: 'holding_bin_' + viewOrSectionOb._projectId,
             name: name ? name : "Untitled " + type,
             documentation: '',
             type: "InstanceSpecification",
@@ -517,33 +517,34 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 type: "Expression"
             };
 
-        var toCreate = [instanceSpec];
+        var clone = JSON.parse(JSON.stringify(viewOrSectionOb));
+        var key = '_contents';
+        if (isSection(clone)) 
+            key = "specification";
+        if (!clone[key]) {
+            clone[key] = {
+                operand: [],
+                type: "Expression",
+            };
+        }
+        clone[key].operand.push({instanceId: newInstanceId, type: "InstanceValue"});
+        var toCreate = [instanceSpec, clone];
         var reqOb = {
             projectId: viewOrSectionOb._projectId,
             refId: viewOrSectionOb._refId,
             elements: toCreate,
-            elementId: viewOrSectionOb.sysmlId
         };
         ElementService.createElements(reqOb)
         .then(function(data) {
-            data.forEach(function(elem) {
+            for (var i = 0; i < data.length; i++) {
+                var elem = data[i];
                 if (elem.sysmlId === newInstanceId) {
-                    var instanceVal = {
-                        instanceId: newInstanceId,
-                        type: "InstanceValue",
-                    };
-                    addElementToViewOrSection(reqOb, instanceVal)
-                    .then(function(data3) {
-                        if (type === "Section") {
-                        // Broadcast message to TreeCtrl:
-                           $rootScope.$broadcast('viewctrl.add.section', elem, viewOrSectionOb);
-                        }
-                        deferred.resolve(elem);
-                    }, function(reason) {
-                        deferred.reject(reason);
-                    });
+                    if (type === "Section") 
+                        $rootScope.$broadcast('viewctrl.add.section', elem, viewOrSectionOb);
+                    deferred.resolve(elem);
+                    return;
                 }
-            });
+            }
         }, function(reason) {
             deferred.reject(reason);
         });
@@ -568,7 +569,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      *                          creating the new view, boolean isDoc indicate whether it's a document
      * @returns {Promise} The promise will be resolved with the new view. 
      */
-    var createView = function(ownerOb, viewOb) {//TODO check owners
+    var createView = function(ownerOb, viewOb) {
         var deferred = $q.defer();
 
         var newViewId = viewOb.viewId ? viewOb.viewId : UtilsService.createMmsId();
@@ -583,7 +584,6 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             _displayedElements: [newViewId],
             _childViews: [],
             _contents: {
-                //valueExpression: null,
                 operand: [{
                     instanceId: newInstanceId,
                     type:"InstanceValue",
@@ -611,7 +611,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         };
         var instanceSpec = {
             sysmlId: newInstanceId,
-            ownerId: ownerOb._projectId + '_holding_bin',
+            ownerId: 'holding_bin_' + ownerOb._projectId,
             name: "View Documentation",
             documentation: instanceSpecDoc,
             type: "InstanceSpecification",

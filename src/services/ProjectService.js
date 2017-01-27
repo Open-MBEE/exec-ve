@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms')
-.factory('ProjectService', ['$q', '$http', 'URLService', 'CacheService', ProjectService]);
+.factory('ProjectService', ['$q', '$http', 'URLService', 'CacheService', 'ApplicationService', ProjectService]);
 
 /**
  * @ngdoc service
@@ -14,7 +14,7 @@ angular.module('mms')
  * @description
  * This is a utility service for getting project, ref, commit information
  */
-function ProjectService($q, $http, URLService, CacheService) {
+function ProjectService($q, $http, URLService, CacheService, ApplicationService) {
     var inProgress = {};
 
     /**
@@ -89,7 +89,7 @@ function ProjectService($q, $http, URLService, CacheService) {
             inProgress[url] = deferred.promise;
             $http.get(url).then(function(response) {
                 if (!angular.isArray(response.data.projects)) {
-                    deferred.reject({}); //TODO add error message
+                    deferred.reject({status: 500, data: '', message: "Server Error: empty response"});
                     return;
                 }
                 var projects = [];
@@ -120,7 +120,7 @@ function ProjectService($q, $http, URLService, CacheService) {
             inProgress[url] = deferred.promise;
             $http.get(url).then(function(response) {
                 if (!angular.isArray(response.data.projects) || response.data.projects.length === 0) {
-                    deferred.reject({}); //TODO add error message
+                    deferred.reject({status: 500, data: '', message: "Server Error: empty response"});
                     return;
                 }
                 CacheService.put(cacheKey, response.data.projects[0], true);
@@ -145,7 +145,7 @@ function ProjectService($q, $http, URLService, CacheService) {
             inProgress[url] = deferred.promise;
             $http.get(url).then(function(response) {
                 if (!angular.isArray(response.data.refs)) {
-                    deferred.reject({}); //TODO add error message
+                    deferred.reject({status: 500, data: '', message: "Server Error: empty response"});
                     return;
                 }
                 var refs = [];
@@ -179,15 +179,67 @@ function ProjectService($q, $http, URLService, CacheService) {
     };
 
     var createRef = function(refOb, projectId) {
+        var deferred = $q.defer();
 
+        var url = URLService.getRefsURL(projectId);
+        $http.post(url, {'refs': [refOb], 'source': ApplicationService.getSource()})
+        .then(function(response) {
+            if (!angular.isArray(response.data.refs) || response.data.refs.length === 0) {
+                deferred.reject({status: 500, data: '', message: "Server Error: empty response"});
+                return;
+            }
+            var resp = response.data.refs[0];
+            var list = CacheService.get(['refs', projectId]);
+            if (list)
+                list.push(resp);
+            deferred.resolve(CacheService.put(['ref', projectId, resp.id], resp));
+        }, function(response) {
+            URLService.handleHttpStatus(response.data, response.status, response.headers, response.config, deferred);
+        });
+        return deferred.promise;
     };
 
     var updateRef = function(refOb, projectId) {
+        var deferred = $q.defer();
 
+        var url = URLService.getRefsURL(projectId);
+        $http.post(url, {'refs': [refOb], 'source': ApplicationService.getSource()})
+        .then(function(response) {
+            if (!angular.isArray(response.data.refs) || response.data.refs.length === 0) {
+                deferred.reject({status: 500, data: '', message: "Server Error: empty response"});
+                return;
+            }
+            var resp = response.data.refs[0];
+            deferred.resolve(CacheService.put(['ref', projectId, resp.id], resp, true));
+        }, function(response) {
+            URLService.handleHttpStatus(response.data, response.status, response.headers, response.config, deferred);
+        });
+        return deferred.promise;
     };
 
     var deleteRef = function(refId, projectId) {
-
+        var deferred = $q.defer();
+        var url = URLService.getRefURL(projectId, refId);
+        $http.delete(url).then(function(response) {
+            var key = ['ref', projectId, refId];
+            var refOb = CacheService.get(key);
+            if (refOb) {
+                CacheService.remove(key);
+                var list = CacheService.get(['refs', projectId]);
+                if (list) {
+                    for (var i = 0; i < list.length; i++) {
+                        if (list[i].id === refOb.id) {
+                            list.splice(i, 1);
+                            break;
+                        }
+                    }
+                }
+            }
+            deferred.resolve('');
+        }, function(response) {
+            URLService.handleHttpStatus(response.data, response.status, response.headers, response.config, deferred);
+        });
+        return deferred.promise;
     };
 
     var reset = function() {

@@ -100,7 +100,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                 if (angular.isArray(data.elements) && data.elements.length > 0) {
                     deferred.resolve(cacheElement(reqOb, data.elements[0]));
                 } else {
-                    deferred.reject({}); //TODO 
+                    deferred.reject({status: 500, data: '', message: "Server Error: empty response"}); //TODO 
                 }
                 delete inProgress[key];
             },
@@ -405,7 +405,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         };
 
         if (!elementOb.hasOwnProperty('sysmlId')) {
-            deferred.reject('Element id not found, create element first!'); //TODO check reject message
+            deferred.reject({status: 400, data: '', message: 'Element id not found, create element first!'});
             return deferred.promise;
         }
         fillInElement(elementOb)
@@ -419,7 +419,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                 }, {timeout: 60000})
             .then(function(response) {
                 if (!angular.isArray(response.data.elements) || response.data.elements.length === 0) {
-                    deferred.reject({}); //TODO fill in error message
+                    deferred.reject({status: 500, data: '', message: "Server Error: empty response"});
                     return;
                 }
                 handleSuccess(response.data);
@@ -427,7 +427,10 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                 if (response.status === 409) {
                     var server = response.data.elements[0];
                     UtilsService.cleanElement(server);
-                    var orig = CacheService.get(UtilsService.makeElementKey(elementOb)); //TODO should be latest?
+                    var origCommit = elementOb._commitId;
+                    elementOb._commitId = 'latest';
+                    var orig = CacheService.get(UtilsService.makeElementKey(elementOb));
+                    elementOb._commitId = origCommit;
                     if (!orig) {
                         URLService.handleHttpStatus(response.data, response.status, response.headers, response.config, deferred);
                         return;
@@ -493,7 +496,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         $http.post(url, {'elements': [reqOb.element], 'source': ApplicationService.getSource()})
         .then(function(response) {
             if (!angular.isArray(response.data.elements) || response.data.elements.length === 0) {
-                deferred.reject({}); //TODO fill in error message
+                deferred.reject({status: 500, data: '', message: "Server Error: empty response"});
                 return;
             }
             var resp = null;
@@ -533,7 +536,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         $http.post(url, {'elements': reqOb.elements, 'source': ApplicationService.getSource()})
         .then(function(response) {
             if (!angular.isArray(response.data.elements) || response.data.elements.length === 0) {
-                deferred.reject({}); //TODO fill in error message
+                deferred.reject({status: 500, data: '', message: "Server Error: empty response"});
                 return;
             }
             var results = [];
