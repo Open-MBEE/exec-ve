@@ -70,6 +70,39 @@ thead td, table caption {
   }
 }
 
+.table[border='0']{
+
+  border: 0;
+  // Cells
+  > thead,
+  > tbody,
+  > tfoot {
+    > tr {
+      > th,
+      > td {
+        border: none;
+      }
+    }
+  }
+
+    // Remove top border from thead by default
+  > captionthead,
+  > colgroupthead,
+  > thead:first-child {
+    > tr:first-child {
+      > th,
+      > td {
+        border: 0;
+      }
+    }
+  }
+  // Account for multiple tbody instances
+  > tbodytbody {
+    border-top: none;
+  }
+}
+
+
 .tooltip {
   .tooltip-inner {
     font-size: 12px;
