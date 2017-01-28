@@ -70,6 +70,7 @@ thead td, table caption {
   }
 }
 
+// Workaround for tables with no borders
 .table[border='0']{
 
   border: 0;
@@ -85,9 +86,9 @@ thead td, table caption {
     }
   }
 
-    // Remove top border from thead by default
-  > captionthead,
-  > colgroupthead,
+  // Remove top border from thead by default
+  > caption + thead,
+  > colgroup + thead,
   > thead:first-child {
     > tr:first-child {
       > th,
@@ -97,7 +98,7 @@ thead td, table caption {
     }
   }
   // Account for multiple tbody instances
-  > tbodytbody {
+  > tbody + tbody {
     border-top: none;
   }
 }
