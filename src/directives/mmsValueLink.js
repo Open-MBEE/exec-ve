@@ -40,16 +40,17 @@ function mmsValueLink(ElementService, $compile, growl) {
 
         ElementService.getElement(scope.mmsEid, false, ws, version)
         .then(function(data) {
-            if (data.specialization.type === 'Property') {
+            if (data.specialization && data.specialization.type === 'Property') {
                 var value = data.specialization.value;
-                if (value.length !== 0) {
+                if (angular.isArray(value) && value.length !== 0) {
                     scope.url = value[0].string;
                 }
             } else {
                 if (scope.mmsErrorText){
                     element.html('<span class="mms-error">'+ scope.mmsErrorText +'</span>');
-                } else
+                } else {
                     element.html('<span class="mms-error">Element does not provide link value.</span>');
+                }
             }
         }, function(reason) {
             if (scope.mmsErrorText){
@@ -69,7 +70,7 @@ function mmsValueLink(ElementService, $compile, growl) {
             mmsLinkText: '@',
         },
         require: '?^mmsView',
-        template: '<a href="{{url}}">{{mmsLinkText}}</a>',
+        template: '<a ng-href="{{url}}">{{mmsLinkText}}</a>',
         link: mmsValueLinkLink
     };
 }
