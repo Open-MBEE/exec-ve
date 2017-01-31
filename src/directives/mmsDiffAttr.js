@@ -18,8 +18,10 @@ angular.module('mms.directives')
  * <mms-diff-attr mms-eid="element-id" mms-attr="name/doc/val" mms-version-one="timestamp/latest/tag?" mms-version-two="timestamp/latest/tag?"></mms-diff-attr>
  *
  * @param {string} mmsEid The id of the element whose doc to transclude
- * @param {string=master} mmsWs Workspace to use, defaults to master
- * @param {string=latest} mmsvrOneInvalidFlag  can be 'latest', timestamp or tag id, default is latest
+ * @param {string=master} mmsAttr Attribute to use, ie name, doc, value
+ * @param {string=master} mmsWsOne Workspace to use, defaults to current ws or master
+ * @param {string=master} mmsWsTwo Workspace to use, defaults to current ws or master
+ * @param {string=latest} mmsVersionOne  can be 'latest', timestamp or tag id, default is latest
  * @param {string=latest} mmsVersionTwo  can be 'latest', timestamp or tag id, default is latest
  */
 function mmsDiffAttr(ElementService, WorkspaceService, ConfigService, URLService, $q, $compile, $rootScope, $interval) {
