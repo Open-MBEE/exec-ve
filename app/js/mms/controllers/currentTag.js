@@ -6,10 +6,12 @@ angular.module('mmsApp')
 function currentTag($rootScope){
 
   var currentTagLink = function(scope, element, attrs){
-    scope.tag = $rootScope.mmsTag;
-
-    if (scope.tag === "")
+    var tag = $rootScope.mms_tag;
+    if (!tag)
       scope.tag = 'latest';
+    else {
+      scope.tag = tag.name;
+    }
   };
 
   return {
