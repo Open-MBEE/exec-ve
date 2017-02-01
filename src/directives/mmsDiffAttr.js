@@ -32,37 +32,103 @@ function mmsDiffAttr(ElementService, WorkspaceService, ConfigService, URLService
         var wsTwo = scope.mmsWsTwo;
         var wsOneFlag = false;
         var wsTwoFlag = false;
+        var viewVersion = null;
 
-        if (mmsViewCtrl) {
-            var viewVersion = mmsViewCtrl.getWsAndVersion();
+        var data1CheckForBreak = false;
+        var data2CheckForBreak = false;
+        var vrOneInvalidFlag = false;
+        var vrTwoInvalidFlag = false;
+        var origNotFound = false;
+        var compNotFound = false;
+        var deletedFlag = false;
 
-            if (!wsOne) {
-                wsOne = viewVersion.workspace;
-            }
+        if (mmsViewCtrl)
+            viewVersion = mmsViewCtrl.getWsAndVersion();
+
+        if (!wsOne && viewVersion) {
+            wsOne = viewVersion.workspace;
+        } else if (!wsOne && !viewVersion) {
+            wsOne = 'master';
+        }
+
+        if (!wsTwo && viewVersion) {
+            wsTwo = viewVersion.workspace;
+        } else if (!wsTwo && viewVersion) {
+            wsTwo = 'master';
+        }
+
+        WorkspaceService.getWorkspace(wsOne).then(function(data) {
+            tagOrTimestamp(scope.mmsVersionOne, wsOne).then(function(versionOrTs){
+                getComparsionText(versionOrTs, wsOne).then(function(data){
+                    scope.origElem = angular.element(data).text();
+                    // run on interval to check when data gets changed. once it changes set to origElem and break out of interval
+                    var promise1 = $interval(
+                        function(){
+                            if (scope.origElem == angular.element(data).text() && data1CheckForBreak) {
+                                // console.log("data1 did not change again cancel out of interval : " +scope.origElem);
+                                $interval.cancel(promise1);
+                            } else if ( scope.origElem == angular.element(data).text() && !data1CheckForBreak ) {
+                                data1CheckForBreak = true;
+                                // console.log("data1 did not change make data change true : " +data1CheckForBreak);
+                            }
+                            scope.origElem = angular.element(data).text();
+                            // console.log("here is the changed text: " +scope.origElem);
+                        }, 5000);
+                }, function(reject){
+                    scope.origElem = reject;
+                    if(reject.toLowerCase() == "not found") {
+                    origNotFound = true;
+                    scope.origElem = '';
+                    }
+                });
+            }, function(reject){
+                vrOneInvalidFlag = true;
+            });
+        }, function(reason) {
+            wsOneFlag = true;
+            element.html('<span class="mms-error">Workspace One does not exist.</span>');
+        });
+
+
+        WorkspaceService.getWorkspace(wsTwo).then(function(data) {
+            tagOrTimestamp(scope.mmsVersionTwo, scope.mmsWsTwo).then(function(versionOrTs){
+                getComparsionText(versionOrTs, scope.mmsWsTwo).then(function(data){
+                    scope.compElem = angular.element(data).text();
+                    var promise2 = $interval(
+                        function(){
+                            if (scope.compElem == angular.element(data).text() && data2CheckForBreak) {
+                                // console.log("data2 did not change again cancel out of interval : " +scope.compElem);
+                                $interval.cancel(promise2);
+                            } else if ( scope.compElem == angular.element(data).text() && !data2CheckForBreak ) {
+                                data2CheckForBreak = true;
+                                // console.log("data2 did not change make data change true : " +data2CheckForBreak);
+                            }
+                            scope.compElem = angular.element(data).text();
+                            // console.log("here is the changed text: " +scope.compElem);
+                        }, 5000);
+                        checkElement(origNotFound, compNotFound, deletedFlag);
+                }, function(reject){
+                    scope.compElem = reject;
+                    scope.compElem = '';
+                    if(reject.toLowerCase() == "not found"){
+                    compNotFound = true;
+                    }else if(reject.toLowerCase() == "deleted")
+                    deletedFlag = true;
+                    checkElement(origNotFound, compNotFound, deletedFlag);
+                });
+            }, function(reject){
+                vrTwoInvalidFlag = true;
+                checkVersion(vrOneInvalidFlag, vrTwoInvalidFlag);
+            });
+        }, function(reason) {
+            wsTwoFlag = true;
+
+            if(wsOneFlag && wsTwoFlag)
+            element.html('<span class="mms-error">Workspace One & Two do not exist.</span>');
             else {
-                WorkspaceService.getWorkspace(wsOne).then(function(data) {
-              }, function(reason) {
-                wsOneFlag = true;
-                element.html('<span class="mms-error">Workspace One does not exist.</span>');
-              });
+            element.html('<span class="mms-error">Workspace Two does not exist.</span>');
             }
-
-            if (!wsTwo) {
-                wsTwo = viewVersion.workspace;
-            }
-            else {
-                WorkspaceService.getWorkspace(wsTwo).then(function(data) {
-              }, function(reason) {
-                wsTwoFlag = true;
-
-                if(wsOneFlag && wsTwoFlag)
-                  element.html('<span class="mms-error">Workspace One & Two do not exist.</span>');
-                else {
-                  element.html('<span class="mms-error">Workspace Two does not exist.</span>');
-                }
-              });
-            }
-          }
+        });
 
         // Check if input is a tag, timestamp or neither
         var tagOrTimestamp = function(version, ws){
@@ -178,71 +244,6 @@ function mmsDiffAttr(ElementService, WorkspaceService, ConfigService, URLService
           }
         };
 
-        // example http://localhost:9000/mms.html#/workspaces/master/sites/vetest/documents/_17_0_5_1_407019f_1402422683509_36078_16169/views/_17_0_5_1_407019f_1402422692412_131628_16263
-        var data1CheckForBreak = false;
-        var data2CheckForBreak = false;
-        var vrOneInvalidFlag = false;
-        var vrTwoInvalidFlag = false;
-        var origNotFound = false;
-        var compNotFound = false;
-        var deletedFlag = false;
-
-        tagOrTimestamp(scope.mmsVersionOne, scope.mmsWsOne).then(function(versionOrTs){
-            getComparsionText(versionOrTs, scope.mmsWsOne).then(function(data){
-                scope.origElem = angular.element(data).text();
-                // run on interval to check when data gets changed. once it changes set to origElem and break out of interval
-                 var promise1 = $interval(
-                    function(){
-                        if (scope.origElem == angular.element(data).text() && data1CheckForBreak) {
-                            // console.log("data1 did not change again cancel out of interval : " +scope.origElem);
-                            $interval.cancel(promise1);
-                        } else if ( scope.origElem == angular.element(data).text() && !data1CheckForBreak ) {
-                            data1CheckForBreak = true;
-                            // console.log("data1 did not change make data change true : " +data1CheckForBreak);
-                        }
-                        scope.origElem = angular.element(data).text();
-                        // console.log("here is the changed text: " +scope.origElem);
-                    }, 5000);
-            }, function(reject){
-                scope.origElem = reject;
-                if(reject.toLowerCase() == "not found") {
-                  origNotFound = true;
-                  scope.origElem = '';
-                }
-            });
-        }, function(reject){
-            vrOneInvalidFlag = true;
-        });
-
-        tagOrTimestamp(scope.mmsVersionTwo, scope.mmsWsTwo).then(function(versionOrTs){
-            getComparsionText(versionOrTs, scope.mmsWsTwo).then(function(data){
-                scope.compElem = angular.element(data).text();
-                var promise2 = $interval(
-                    function(){
-                        if (scope.compElem == angular.element(data).text() && data2CheckForBreak) {
-                            // console.log("data2 did not change again cancel out of interval : " +scope.compElem);
-                            $interval.cancel(promise2);
-                        } else if ( scope.compElem == angular.element(data).text() && !data2CheckForBreak ) {
-                            data2CheckForBreak = true;
-                            // console.log("data2 did not change make data change true : " +data2CheckForBreak);
-                        }
-                        scope.compElem = angular.element(data).text();
-                        // console.log("here is the changed text: " +scope.compElem);
-                    }, 5000);
-                    checkElement(origNotFound, compNotFound, deletedFlag);
-            }, function(reject){
-                scope.compElem = reject;
-                scope.compElem = '';
-                if(reject.toLowerCase() == "not found"){
-                  compNotFound = true;
-                }else if(reject.toLowerCase() == "deleted")
-                  deletedFlag = true;
-                checkElement(origNotFound, compNotFound, deletedFlag);
-            });
-        }, function(reject){
-            vrTwoInvalidFlag = true;
-            checkVersion(vrOneInvalidFlag, vrTwoInvalidFlag);
-        });
     };
 
     return {
