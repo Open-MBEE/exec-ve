@@ -76,9 +76,9 @@ function mmsDiffAttr(ElementService, WorkspaceService, ConfigService, URLService
                         }, 5000);
                 }, function(reject){
                     scope.origElem = reject;
-                    if(reject.toLowerCase() == "not found") {
-                    origNotFound = true;
-                    scope.origElem = '';
+                    if (reject.toLowerCase() == "not found") {
+                        origNotFound = true;
+                        scope.origElem = '';
                     }
                 });
             }, function(reject){
@@ -110,10 +110,11 @@ function mmsDiffAttr(ElementService, WorkspaceService, ConfigService, URLService
                 }, function(reject){
                     scope.compElem = reject;
                     scope.compElem = '';
-                    if(reject.toLowerCase() == "not found"){
-                    compNotFound = true;
-                    }else if(reject.toLowerCase() == "deleted")
-                    deletedFlag = true;
+                    if (reject.toLowerCase() == "not found") {
+                        compNotFound = true;
+                    } else if (reject.toLowerCase() == "deleted")
+                        deletedFlag = true;
+
                     checkElement(origNotFound, compNotFound, deletedFlag);
                 });
             }, function(reject){
@@ -123,17 +124,17 @@ function mmsDiffAttr(ElementService, WorkspaceService, ConfigService, URLService
         }, function(reason) {
             wsTwoFlag = true;
 
-            if(wsOneFlag && wsTwoFlag)
-            element.html('<span class="mms-error">Workspace One & Two do not exist.</span>');
+            if (wsOneFlag && wsTwoFlag)
+                element.html('<span class="mms-error">Workspace One & Two do not exist.</span>');
             else {
-            element.html('<span class="mms-error">Workspace Two does not exist.</span>');
+                element.html('<span class="mms-error">Workspace Two does not exist.</span>');
             }
         });
 
         // Check if input is a tag, timestamp or neither
         var tagOrTimestamp = function(version, ws){
             var deferred = $q.defer();
-            if(!URLService.isTimestamp(version) && version !== 'latest'){
+            if (!URLService.isTimestamp(version) && version !== 'latest'){
                 ConfigService.getConfig(version, ws, false).then(function(data){
                         deferred.resolve(data.timestamp);
                 }, function(reason) {
@@ -177,7 +178,7 @@ function mmsDiffAttr(ElementService, WorkspaceService, ConfigService, URLService
                 $compile(htmlData)($rootScope.$new());
                 deferred.resolve(htmlData);
             }, function(reason) {
-                if(reason.message)
+                if (reason.message)
                   deferred.reject(reason.message);
 
                 deferred.reject(null);
@@ -187,18 +188,18 @@ function mmsDiffAttr(ElementService, WorkspaceService, ConfigService, URLService
 
         // Find the right key to fetch text
         var findElemType = function(elem){
-            if(scope.mmsAttr === 'name'){//the key is included and blank
+            if (scope.mmsAttr === 'name'){//the key is included and blank
                 return elem.name + '';
             }else if (scope.mmsAttr === 'doc') {
                 return elem.documentation + '';
             }else{
                 if (!elem.specialization || !elem.specialization.value || !elem.specialization.value[0])
                     return '';
-                if(elem.specialization.value[0].type === "LiteralString"){
+                if (elem.specialization.value[0].type === "LiteralString"){
                     return elem.specialization.value[0].string + '';
-                }else if(elem.specialization.value[0].type === "LiteralReal"){
+                }else if (elem.specialization.value[0].type === "LiteralReal"){
                     return elem.specialization.value[0].double + '';
-                }else if(elem.specialization.value[0].type === "LiteralBoolean"){
+                }else if (elem.specialization.value[0].type === "LiteralBoolean"){
                     return elem.specialization.value[0].boolean + '' ;
                 } else if (elem.specialization.value[0].type === 'LiteralInteger') {
                     return elem.specialization.value[0].integer + '';
@@ -237,9 +238,9 @@ function mmsDiffAttr(ElementService, WorkspaceService, ConfigService, URLService
                 element.html('<span class="mms-error"> Version Two not a valid tag/timestamp. </span>');
               break;
             default:
-              if(vrTwoInvalidFlag === false)
+              if (vrTwoInvalidFlag === false)
                 element.html('<span class="mms-error"> Version One not a valid tag/timestamp. </span>');
-              else if(vrTwoInvalidFlag === true)
+              else if (vrTwoInvalidFlag === true)
                 element.html('<span class="mms-error"> Version One and Version Two not valid tags/timestamps. ');
           }
         };
