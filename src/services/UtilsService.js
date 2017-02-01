@@ -572,7 +572,7 @@ function UtilsService($q, $http, CacheService, URLService, _) {
                 ".view-title {margin-top: 10pt}\n" +
                 ".chapter {page-break-before: always}\n" + 
                 "table {width: 100%; border-collapse: collapse;}\n" + 
-                "table, th, td {border: 1px solid black; padding: 4px;}\n" +
+                "table :not(table[border='0']), th, td {border: 1px solid black; padding: 4px;}\n" +
                 "table, th > p, td > p {margin: 0px; padding: 0px;}\n" +
                 "table, th > div > p, td > div > p {margin: 0px; padding: 0px;}\n" +
                 //"table p {word-break: break-all;}\n" + 
