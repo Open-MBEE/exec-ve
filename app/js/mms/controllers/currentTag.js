@@ -1,11 +1,11 @@
 'use strict';
 
 angular.module('mmsApp')
-.directive('currentTag',['$rootScope', currentTag]);
+.directive('mmsCurrentTag',['$rootScope', mmsCurrentTag]);
 
 /**
 * @ngdoc directive
-* @name mmsApp.directive:currentTag
+* @name mmsApp.directive:mmsCurrentTag
 *
 * @restrict E
 *
@@ -13,12 +13,12 @@ angular.module('mmsApp')
 * Displays the current tag in which the view resides
 *
 * ##Example
-* <current-tag></current-tag>
+* <mms-current-tag></mms-current-tag>
 *
 */
-function currentTag($rootScope){
+function mmsCurrentTag($rootScope){
 
-  var currentTagLink = function(scope, element, attrs){
+  var mmsCurrentTagLink = function(scope, element, attrs){
     var tag = $rootScope.mms_tag;
     if (!tag || tag.name === 'latest') //if undefined (latest may be undefined)
       scope.tag = 'Latest';
@@ -30,7 +30,7 @@ function currentTag($rootScope){
   return {
     restrict: 'E',
     scope: {},
-    template: 'Current Tag: {{ tag }}',
-    link: currentTagLink
+    template: '{{ tag }}',
+    link: mmsCurrentTagLink
   };
 }
