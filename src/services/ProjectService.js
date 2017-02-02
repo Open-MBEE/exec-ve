@@ -290,8 +290,8 @@ function ProjectService($q, $http, URLService, CacheService, ApplicationService)
 
     /** TODO not supported
      * @ngdoc method
-     * @name mms.WorkspaceService#diff
-     * @methodOf mms.WorkspaceService
+     * @name mms.ProjectService#diff
+     * @methodOf mms.ProjectService
      *
      * @description
      * Get workspace diff
