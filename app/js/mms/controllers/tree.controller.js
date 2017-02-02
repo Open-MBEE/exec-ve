@@ -3,9 +3,10 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('TreeCtrl', ['$anchorScroll' , '$q', '$filter', '$location', '$uibModal', '$scope', '$rootScope', '$state', '$stateParams', '$compile','$timeout', 'growl', 
-                          'UxService', 'ConfigService', 'ElementService', 'UtilsService', 'WorkspaceService', 'ViewService', 'MmsAppUtils',
-                          'workspaces', 'workspaceObj', 'tag', 'sites', 'site', 'document', 'views', 'view', 'commit', 'mmsRootSites',
+.controller('TreeCtrl', ['$anchorScroll' , '$q', '$filter', '$location', '$uibModal', '$scope', '$rootScope', '$state',
+                         '$stateParams', '$compile','$timeout', 'growl', 'UxService', 'ConfigService', 'ElementService',
+                         'UtilsService', 'WorkspaceService', 'ViewService', 'MmsAppUtils', 'workspaces', 'workspaceObj',
+                         'tag', 'sites', 'site', 'document', 'views', 'view', 'commit', 'mmsRootSites',
 function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $stateParams, $compile, $timeout, growl, UxService, ConfigService, ElementService, UtilsService, WorkspaceService, ViewService, MmsAppUtils, workspaces, workspaceObj, tag, sites, site, document, views, view, commit, mmsRootSites) {
 
     $rootScope.mms_tag = tag;
@@ -26,7 +27,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     if ($state.includes('workspace.site.document.full'))
         $rootScope.mms_fullDocMode = true;
     $scope.treeFilter = {search: ''};
-    // TODO: pull in config/tags
+    //TODO: pull in config/tags
     var config = commit;
     var ws = $stateParams.workspace; // TODO this is undefined, but is being used below
 
@@ -158,17 +159,17 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         id: 'table',
         title: 'Tables',
         icon: 'fa-table',
-        branchList: $scope.tableList,
+        branchList: $scope.tableList
     }, {
         id: 'figure',
         title: 'Figures',
         icon: 'fa-image',
-        branchList: $scope.figureList,
+        branchList: $scope.figureList
     }, {
         id: 'equation',
         title: 'Equations',
         icon: 'fa-superscript',
-        branchList: $scope.equationList,
+        branchList: $scope.equationList
     }];
 
     var toggle = function (id) {
@@ -363,8 +364,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         for (i = 0; i < site_array.length; i++) {
             var obj = site_array[i];
             if ((($scope.bbApi.getToggleState && $scope.bbApi.getToggleState('tree-showall-sites')) ||
-                    obj.isCharacterization) && 
-                    isSiteInProject(sitesMapping, obj)) {
+                    obj.isCharacterization) && isSiteInProject(sitesMapping, obj)) {
                 ret_array.push(obj);
             }
         }
@@ -415,16 +415,14 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         // Make sure we haven't already loaded the docs for this site
         if (siteNode.docsLoaded || siteNode.type !== 'site') 
             return;
-
         // Set docs loaded attribute
         siteNode.docsLoaded = true;
-
         siteNode.loading = true;
         ViewService.getSiteDocuments(site, false, ws, config === 'latest' ? 'latest' : tag.commitId, 2)
         .then(function(docs) {
             // If no documents are found on a site, stop forcing expansion
             if (docs.length === 0) 
-                siteNode.expandable = false;            
+                siteNode.expandable = false;
             docs.forEach(function(doc) {
                 var docNode = {
                     label : doc.name,
@@ -482,7 +480,6 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             processDeletedViewBranch(branch.children[i]);
         }
     };
-
     if ($state.includes('workspaces') && !$state.includes('workspace.sites')) {
         $scope.my_data = UtilsService.buildTreeHierarchy(workspaces, "id",
                                                          "workspace", "parent", workspaceLevel2Func);
@@ -667,7 +664,6 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             }
         } else if ($state.includes('workspace.site.document')) {
             var view = (branch.type !== 'view') ? branch.view : branch.data.sysmlId;
-            var sectionId = branch.type === 'section' ? branch.data.sysmlId : null;
             var hash = branch.data.sysmlId;
             if ($rootScope.mms_fullDocMode) {
                 $location.hash(hash);
@@ -1180,7 +1176,6 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 return;
             }
 
-
             // Handle the promise:
             promise
             .then(function(data) {
@@ -1261,7 +1256,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             view: viewid,
             data: instanceSpec,
             hide: !$rootScope.veTreeShowPe && elemType !== 'section',
-            children: [],
+            children: []
         };
         var i = 0;
         var lastSection = -1;
