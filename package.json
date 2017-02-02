@@ -1,7 +1,7 @@
 {
   "name": "mms",
   "description": "mms module",
-  "repository": "https://mbse.jpl.nasa.gov/stash/projects/MBEE/repos/angular-mms",
+  "repository": "https://github.com/Open-MBEE/EMS-Webapp.git",
   "devDependencies": {
     "angular-mocks": "^1.5.0",
     "grunt": "^0.4.5",
