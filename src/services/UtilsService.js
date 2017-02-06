@@ -591,7 +591,7 @@ function UtilsService(CacheService, _) {
                 ".toc .header, .tof .header, .tot .header { margin-bottom: 4px; font-weight: bold; font-size:24px; }\n" + 
                 ".toc ul, .tof ul, .tot ul {list-style-type:none; margin: 0; }\n" +
                 ".tof ul, .tot ul {padding-left:0;}\n" +
-                ".toc ul {padding-left:4em;}\n" +
+                ".toc ul {padding-left:2em;}\n" +
                 ".toc > ul {padding-left:0;}\n" +
                 ".toc li > a[href]::after {content: leader('.') target-counter(attr(href), page);}\n" + 
                 ".tot li > a[href]::after {content: leader('.') target-counter(attr(href), page);}\n" + 
