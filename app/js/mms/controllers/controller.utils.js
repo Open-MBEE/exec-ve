@@ -296,7 +296,7 @@ function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templ
                     $scope.genpdf = true;
                 }
                 $scope.docOption = (!isDoc && mode === 3);
-                $scope.model = {genCover: false, genTotf: true, landscape: false, htmlTotf: false};
+                $scope.model = {genCover: false, genTotf: true, landscape: false, htmlTotf: true};
                 $scope.print = function() {
                     $uibModalInstance.close(['ok', $scope.model.genCover, $scope.model.genTotf, $scope.model.htmlTotf, $scope.model.landscape, $scope.meta]);
                 };
