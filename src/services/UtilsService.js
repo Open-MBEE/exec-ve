@@ -586,6 +586,7 @@ function UtilsService(CacheService, _) {
                 "caption, figcaption, .mms-equation-caption {text-align: center; font-weight: bold;}\n" +
                 ".mms-equation-caption {float: right;}\n" +
                 "mms-view-equation, mms-view-figure, mms-view-image {page-break-inside: avoid;}" + 
+                ".toc { counter-reset: table-counter figure-counter;}\n" +
                 ".toc, .tof, .tot {page-break-after:always;}\n" +
                 ".toc a, .tof a, .tot a { text-decoration:none; color: #000; font-size:9pt; }\n" + 
                 ".toc .header, .tof .header, .tot .header { margin-bottom: 4px; font-weight: bold; font-size:24px; }\n" + 
@@ -596,6 +597,10 @@ function UtilsService(CacheService, _) {
                 ".toc li > a[href]::after {content: leader('.') target-counter(attr(href), page);}\n" + 
                 ".tot li > a[href]::after {content: leader('.') target-counter(attr(href), page);}\n" + 
                 ".tof li > a[href]::after {content: leader('.') target-counter(attr(href), page);}\n" + 
+                "figure { counter-increment: figure-counter; }\n" +
+                "figcaption::before {content: \"Figure \" counter(figure-counter) \": \"; }\n" +
+                "table { counter-increment: table-counter; }\n" +
+                "caption::before {content: \"Table \" counter(table-counter) \": \"; }\n" +
                 "@page {margin: 0.5in;}\n" + 
                 "@page:first {@top {content: ''} @bottom {content: ''} @top-left {content: ''} @top-right {content: ''} @bottom-left {content: ''} @bottom-right {content: ''}}\n";
                 //"@page big_table {  size: 8.5in 11in; margin: 0.75in; prince-shrink-to-fit:auto;}\n" +  //size: 11in 8.5in;
