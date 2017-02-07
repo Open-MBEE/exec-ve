@@ -10,7 +10,8 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
     $scope.ws = $stateParams.workspace;
     $scope.site = site;
     $scope.search = search;
-    
+    $scope.latestElement = "";
+
     function searchLoading(){
         // or from center pane
         if ($element.find('.isLoading').length > 0) {
@@ -59,7 +60,16 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
             }
         }, number: curSec, topLevel: (curSec ? (curSec.toString().indexOf('.') === -1 && curSec !== 1) : false)};
     };
+
+    $scope.findLatestElement = function(elem, type) {
+        if (elem) {
+            if (elem.modified > $scope.latestElement)
+                $scope.latestElement = elem.modified;
+        }
+    };
+
     var addToArray = function(viewId, curSection) {
+
         views.push( buildViewElt(viewId, curSection) );
         if (view2children[viewId]) {
             var num = 1;
@@ -97,7 +107,7 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
     view2view.forEach(function(view) {
         view2children[view.id] = view.childrenViews;
     });
-  
+
     view2children[document.sysmlid].forEach(function(cid) {
         addToArray(cid, num);
         num = num + 1;
@@ -124,7 +134,7 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
         var sibIndex = _.findIndex(views, {id: prevSibId});
         views.splice(sibIndex+1, 0, buildViewElt(vId, curSec) );
     });
-    
+
     $scope.bbApi = {};
     $scope.bbApi.init = function() {
 
@@ -245,7 +255,7 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
     };
     $scope.searchOptions.emptyDocTxt = 'This field is empty.';
     $scope.searchOptions.searchInput = $stateParams.search;
-    $scope.searchOptions.searchResult = $scope.search;    
+    $scope.searchOptions.searchResult = $scope.search;
 
     $scope.searchGoToDocument = function (doc, view, elem) {//siteId, documentId, viewId) {
         $state.go('workspace.site.document.view', {site: doc.siteCharacterizationId, document: doc.sysmlid, view: view.sysmlid, tag: undefined, search: undefined});
