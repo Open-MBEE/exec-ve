@@ -6,7 +6,7 @@
     </div>
     <div fa-pane pane-anchor="center">
         <i class="pane-center-spinner fa fa-5x fa-spinner fa-spin" ng-show="mms_viewContentLoading"></i>
-        <div>{{ latestElement }}</div>
+        <div> Document Last Modified {{ latestElement | date:'M/d/yy h:mm a' }}</div>
         <div class="pane-center container-fluid" id="print-div">
             <div ng-repeat="view in views" ng-class="{chapter: view.topLevel}">
                 <mms-view mms-vid="{{view.id}}" mms-version="{{version}}" mms-ws="{{ws}}" mms-number="{{view.number}}" mms-view-api="view.api" mms-cf-clicked="tscClicked(elementId, ws, version)" mms-transcluded="findLatestElement(element,type)"></mms-view>

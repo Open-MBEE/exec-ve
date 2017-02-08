@@ -14,9 +14,9 @@ angular.module('mms.directives')
  * @restrict E
  *
  * @description
- * Given an element id, puts in the element's value binding, if there's a parent 
+ * Given an element id, puts in the element's value binding, if there's a parent
  * mmsView directive, will notify parent view of transclusion on init and val change,
- * and on click. The element should be a Property. Nested transclusions within 
+ * and on click. The element should be a Property. Nested transclusions within
  * string values will also be registered.
  *
  * @param {string} mmsEid The id of the element whose value to transclude
@@ -44,12 +44,12 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                 $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-cancel", $scope));
                 $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-delete", $scope));
                 $scope.bbApi.setPermission("presentation-element-delete", $scope.isDirectChildOfPresentationElement);
-            }     
+            }
         };
 
         this.getWsAndVersion = function() {
             return {
-                workspace: $scope.ws, 
+                workspace: $scope.ws,
                 version: $scope.version,
                 tag: undefined
             };
@@ -78,7 +78,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                 return false;
             if (scope.isEditing)*/
                 e.stopPropagation();
-        
+
         });
         scope.addHtml = function(value) {
             value.string = "<p>" + value.string + "</p>";
@@ -105,7 +105,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                 } else {
                     break;
                 }
-            } 
+            }
             element.empty();
             scope.recompileScope = scope.$new();
             if (scope.values.length === 0 || Object.keys(scope.values[0]).length < 2)
@@ -118,7 +118,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                 }
                 element[0].innerHTML = toCompile;
                 MathJax.Hub.Queue(["Typeset", MathJax.Hub, element[0]]);
-                $compile(element.contents())(scope.recompileScope); 
+                $compile(element.contents())(scope.recompileScope);
             } else if (UtilsService.isRestrictedValue(scope.values)) {
                 ElementService.getElement(scope.values[0].operand[1].element, false, scope.ws, scope.version, 2)
                 .then(function(e) {
@@ -140,6 +140,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
             }
             if (mmsViewCtrl) {
                 mmsViewCtrl.elementTranscluded(scope.element);
+                mmsViewCtrl.findLatestElement(scope.element);
             }
         };
 
@@ -159,7 +160,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                 } else {
                     break;
                 }
-            } 
+            }
             element.empty();
             scope.recompileScope = scope.$new();
             if (scope.editValues.length === 0 || Object.keys(scope.editValues[0]).length < 2)
@@ -171,7 +172,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                     return;
                 }
                 element[0].innerHTML = '<div class="panel panel-info">'+toCompile+'</div>';
-                $compile(element.contents())(scope.recompileScope); 
+                $compile(element.contents())(scope.recompileScope);
             } else if (UtilsService.isRestrictedValue(scope.editValues)) {
                 ElementService.getElement(scope.editValues[0].operand[1].element, false, scope.ws, scope.version, 2)
                 .then(function(e) {
@@ -236,7 +237,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                         if (eid === scope.mmsEid && ws === scope.ws && (type === 'all' || type === 'value') && !continueEdit)
                             recompile();
                     });
-                    //actions for stomp 
+                    //actions for stomp
                     scope.$on("stomp.element", function(event, deltaSource, deltaWorkspaceId, deltaElementId, deltaModifier, elemName){
                         if(deltaWorkspaceId === scope.ws && deltaElementId === scope.mmsEid){
                             if(scope.isEditing === false){
@@ -276,7 +277,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                 scope.editValues.push({type: type, double: 0.0});
         };
         scope.addValueType = 'LiteralString';
-        
+
         scope.addEnumerationValue = function() {
           scope.editValues.push({type: "InstanceValue", instance: scope.options[0]});
         };
@@ -285,8 +286,8 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
             scope.editValues.splice(i, 1);
         };
 
-        if (mmsViewCtrl) { 
-            
+        if (mmsViewCtrl) {
+
             scope.isEditing = false;
             scope.elementSaving = false;
             scope.isDirectChildOfPresentationElement = Utils.isDirectChildOfPresentationElementFunc(element, mmsViewCtrl);
@@ -296,7 +297,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
             var callback = function() {
                 Utils.showEditCallBack(scope, mmsViewCtrl, element, frameTemplate, recompile, recompileEdit, type);
             };
-            
+
             mmsViewCtrl.registerPresenElemCallBack(callback);
 
             scope.$on('$destroy', function() {
@@ -335,7 +336,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                         Utils.addFrame(scope, mmsViewCtrl, element, frameTemplate);
                         return;
                     }
-                    // otherwise get property spec 
+                    // otherwise get property spec
                     Utils.getPropertySpec(scope.element,scope.ws,scope.version)
                     .then( function(value) {
                         scope.isEnumeration = value.isEnumeration;
@@ -353,7 +354,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
             scope.preview = function() {
                 Utils.previewAction(scope, recompileEdit, recompile, type, element);
             };
-        } 
+        }
         if (mmsViewPresentationElemCtrl) {
             scope.delete = function() {
                 Utils.deleteAction(scope,scope.bbApi,mmsViewPresentationElemCtrl.getParentSection());

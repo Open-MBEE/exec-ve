@@ -61,7 +61,7 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
         }, number: curSec, topLevel: (curSec ? (curSec.toString().indexOf('.') === -1 && curSec !== 1) : false)};
     };
 
-    $scope.findLatestElement = function(elem, type) {
+    $scope.findLatestElement = function(elem) {
         if (elem) {
             if (elem.modified > $scope.latestElement)
                 $scope.latestElement = elem.modified;
