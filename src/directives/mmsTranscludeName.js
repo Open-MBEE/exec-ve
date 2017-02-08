@@ -1,14 +1,18 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsTranscludeName', ['ElementService', 'UxService', '$compile', 'growl', '$templateCache', '$rootScope', '$uibModal', 'Utils', mmsTranscludeName]);
+.directive('mmsTranscludeName', ['ElementService', 'UxService', '$compile', 'growl', '$templateCache', 'Utils', mmsTranscludeName]);
 
 /**
  * @ngdoc directive
  * @name mms.directives.directive:mmsTranscludeName
  *
  * @requires mms.ElementService
+ * @requires mms.UxService
+ * @requires mms.Utils
  * @requires $compile
+ * @requires $templateCache
+ * @requires growl
  *
  * @restrict E
  *
@@ -17,11 +21,12 @@ angular.module('mms.directives')
  * mmsView directive, will notify parent view of transclusion on init and name change,
  * and on click
  *
- * @param {string} mmsEid The id of the element whose name to transclude
- * @param {string=master} mmsWs Workspace to use, defaults to master
- * @param {string=latest} mmsVersion Version can be alfresco version number or timestamp, default is latest
+ * @param {string} mmsElementId The id of the view
+ * @param {string} mmsProjectId The project id for the view
+ * @param {string=master} mmsRefId Reference to use, defaults to master
+ * @param {string=latest} mmsCommitId Commit ID, default is latest
  */
-function mmsTranscludeName(ElementService, UxService, $compile, growl, $templateCache, $rootScope, $uibModal, Utils) {
+function mmsTranscludeName(ElementService, UxService, $compile, growl, $templateCache, Utils) {
 
     var template = $templateCache.get('mms/templates/mmsTranscludeName.html');
     var defaultTemplate = '<span ng-if="element.name">{{element.name}}</span><span ng-if="!element.name" class="no-print" ng-class="{placeholder: version!=\'latest\'}">(no name)</span>';
@@ -40,7 +45,7 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
                 $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-save", $scope));
                 $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-saveC", $scope));
                 $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-cancel", $scope));
-            }     
+            }
         };
 
     };
@@ -54,6 +59,7 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
         element.click(function(e) {
             if (scope.noClick)
                 return;
+
             if (scope.clickHandler) {
                 scope.clickHandler();
                 return;
@@ -63,11 +69,11 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
 
             if (!mmsViewCtrl)
                 return false;
+
             if (scope.nonEditable) {
                 growl.warning("Cross Reference is not editable.");
             }
-            mmsViewCtrl.transcludeClicked(scope.mmsEid, scope.ws, scope.version);
-            //return false;
+            mmsViewCtrl.transcludeClicked(scope.mmsElementId, scope.projectId, scope.refId, scope.commitId);
             e.stopPropagation();
         });
 
@@ -77,7 +83,6 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
             scope.isEditing = false;
             element.empty();
             element[0].innerHTML = defaultTemplate;
-            //element.append(defaultTemplate);
             scope.recompileScope = scope.$new();
             $compile(element.contents())(scope.recompileScope); 
             if (mmsViewCtrl) {
@@ -90,7 +95,6 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
                 scope.recompileScope.$destroy();
             element.empty();
             element[0].innerHTML = '<div class="panel panel-info">'+editTemplate+'</div>';
-            //element.append('<div class="panel panel-info">'+editTemplate+'</div>');
             scope.recompileScope = scope.$new();
             $compile(element.contents())(scope.recompileScope); 
             if (mmsViewCtrl) {
@@ -99,39 +103,49 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
         };
 
 
-        var idwatch = scope.$watch('mmsEid', function(newVal, oldVal) {
+        var idwatch = scope.$watch('mmsElementId', function(newVal, oldVal) {
             if (!newVal)
                 return;
             if (!scope.mmsWatchId)
                 idwatch();
-            var ws = scope.mmsWs;
-            var version = scope.mmsVersion;
+            var projectId = scope.mmsProjectId;
+            var refId = scope.mmsRefId;
+            var commitId = scope.mmsCommitId;
             if (mmsCfValCtrl) {
-                var cfvVersion = mmsCfValCtrl.getWsAndVersion();
-                if (!ws)
-                    ws = cfvVersion.workspace;
-                if (!version)
-                    version = cfvVersion.version;
+                var cfvVersion = mmsCfValCtrl.getElementOrigin();
+                if (!projectId)
+                    projectId = cfvVersion.projectId;
+                if (!refId)
+                    refId = cfvVersion.refId;
+                if (!commitId)
+                    commitId = cfvVersion.commitId;
             }
             if (mmsCfDocCtrl) {
-                var cfdVersion = mmsCfDocCtrl.getWsAndVersion();
-                if (!ws)
-                    ws = cfdVersion.workspace;
-                if (!version)
-                    version = cfdVersion.version;
+                var cfdVersion = mmsCfDocCtrl.getElementOrigin();
+                if (!projectId)
+                    projectId = mmsCfDocCtrl.projectId;
+                if (!refId)
+                    refId = mmsCfDocCtrl.refId;
+                if (!commitId)
+                    commitId = mmsCfDocCtrl.commitId;
             }
             if (mmsViewCtrl) {
-                var viewVersion = mmsViewCtrl.getWsAndVersion();
-                if (!ws)
-                    ws = viewVersion.workspace;
-                if (!version)
-                    version = viewVersion.version;
+                var viewVersion = mmsViewCtrl.getElementOrigin();
+                if (!projectId)
+                    projectId = viewVersion.projectId;
+                if (!refId)
+                    refId = viewVersion.refId;
+                if (!commitId)
+                    commitId = viewVersion.commitId;
             }
             element.html('(loading...)');
             element.addClass("isLoading");
-            scope.ws = ws;
-            scope.version = version ? version : 'latest';
-            ElementService.getElement(scope.mmsEid, false, ws, version, 1)
+
+            scope.projectId = projectId;
+            scope.refId = refId;
+            scope.commitId = commitId ? commitId : 'latest';
+            scope.reqOb = {elementId: scope.mmsElementId, projectId: scope.projectId, refId: scope.refId, commitId: scope.commitId};
+            ElementService.getElement(scope.reqOb, 1, false)
             .then(function(data) {
                 scope.element = data;
                 recompile();
@@ -139,13 +153,14 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
                     mmsViewCtrl.elementTranscluded(scope.element);
                 }
                 if (scope.version === 'latest') {
-                    scope.$on('element.updated', function(event, eid, ws, type, continueEdit) {
-                        if (eid === scope.mmsEid && ws === scope.ws && (type === 'all' || type === 'name') && !continueEdit)
+                    scope.$on('element.updated', function(event, eid, refId, type, continueEdit) {
+                        //TODO check projectId ===scope.projectId or commit?
+                        if (eid === scope.mmsElementId && refId === scope.refId && (type === 'all' || type === 'name') && !continueEdit)
                             recompile();
                     });
                     //actions for stomp using growl messages
                     scope.$on("stomp.element", function(event, deltaSource, deltaWorkspaceId, deltaElementID, deltaModifier, deltaName){
-                        if(deltaWorkspaceId === scope.ws && deltaElementID === scope.mmsEid){
+                        if(deltaWorkspaceId === scope.refId && deltaElementID === scope.mmsElementId){
                             if (scope.isEditing)
                                 growl.warning(" This value has been changed to: "+deltaName+" by: "+ deltaModifier, {ttl: -1});
                         }
@@ -156,17 +171,11 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
                 if (reason.status === 410)
                     status = ' deleted';
                 element.html('<span class="mms-error">name cf ' + newVal + status + '</span>');
-                //growl.error('Cf Name Error: ' + reason.message + ': ' + scope.mmsEid);
             }).finally(function() {
                 element.removeClass("isLoading");
             });
         });
 
-        /*scope.$watch('element.name', function(newVal) {
-            if (mmsViewCtrl && newVal) {
-                mmsViewCtrl.elementTranscluded(scope.element);
-            }
-        });*/
 
 
         if (mmsViewCtrl) {
@@ -177,7 +186,7 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
             var type = "name";
 
             var callback = function() {
-                Utils.showEditCallBack(scope,mmsViewCtrl,element,template,recompile,recompileEdit,type);
+                Utils.showEditCallBack(scope, mmsViewCtrl, element, template, recompile, recompileEdit, type);
             };
             
             mmsViewCtrl.registerPresenElemCallBack(callback);
@@ -187,19 +196,19 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
             });
 
             scope.save = function() {
-                Utils.saveAction(scope,recompile,scope.bbApi,null,type,element);
+                Utils.saveAction(scope, recompile, scope.bbApi, null, type, element);
             };
 
             scope.saveC = function() {
-                Utils.saveAction(scope,recompile,scope.bbApi,null,type,element,true);
+                Utils.saveAction(scope, recompile, scope.bbApi, null, type, element, true);
             };
 
             scope.cancel = function() {
-                Utils.cancelAction(scope,recompile,scope.bbApi,type,element);
+                Utils.cancelAction(scope, recompile, scope.bbApi, type, element);
             };
 
             scope.addFrame = function() {
-                Utils.addFrame(scope,mmsViewCtrl,element,template);
+                Utils.addFrame(scope, mmsViewCtrl, element, template);
             };
 
             // TODO: will we ever want a delete?
@@ -212,11 +221,11 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
 
     return {
         restrict: 'E',
-        //template: '<span ng-if="element.name">{{element.name}}</span><span ng-if="!element.name" ng-class="{placeholder: version!=\'latest\'}">(no name)</span>',
         scope: {
-            mmsEid: '@',
-            mmsWs: '@',
-            mmsVersion: '@',
+            mmsElementId: '@',
+            mmsProjectId: '@',
+            mmsRefId: '@',
+            mmsCommitId: '@',
             mmsWatchId: '@',
             noClick: '@',
             nonEditable: '<',
