@@ -14,7 +14,7 @@ angular.module('mms.directives')
  * @restrict E
  *
  * @description
- * Given an element id, puts in the element's documentation binding, if there's a parent 
+ * Given an element id, puts in the element's documentation binding, if there's a parent
  * mmsView directive, will notify parent view of transclusion on init and doc change,
  * and on click. Nested transclusions inside the documentation will also be registered.
  * (This is different from mmsTranscludeDoc because of special styles applied to comments)
@@ -26,7 +26,7 @@ angular.module('mms.directives')
 function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxService, $log, $templateCache, $compile, growl, MathJax) {
 
     var template = $templateCache.get('mms/templates/mmsTranscludeDoc.html');
-    
+
     var mmsTranscludeComCtrl = function ($scope) {
 
         $scope.bbApi = {};
@@ -42,7 +42,7 @@ function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxSe
                 $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-cancel", $scope));
                 $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-delete", $scope));
                 $scope.bbApi.setPermission("presentation-element-delete", $scope.isDirectChildOfPresentationElement);
-            }     
+            }
         };
     };
 
@@ -78,9 +78,10 @@ function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxSe
             element[0].innerHTML = doc;
             MathJax.Hub.Queue(["Typeset", MathJax.Hub, element[0]]);
             scope.recompileScope = scope.$new();
-            $compile(element.contents())(scope.recompileScope); 
+            $compile(element.contents())(scope.recompileScope);
             if (mmsViewCtrl) {
                 mmsViewCtrl.elementTranscluded(scope.element, 'Comment');
+                mmsViewCtrl.findLatestElement(scope.element);
             }
         };
 
@@ -93,7 +94,7 @@ function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxSe
                 doc = '<p class="no-print" ng-class="{placeholder: version!=\'latest\'}">(No Comment)</p>';
             element[0].innerHTML = '<div class="panel panel-info">'+doc+'</div>';
             scope.recompileScope = scope.$new();
-            $compile(element.contents())(scope.recompileScope); 
+            $compile(element.contents())(scope.recompileScope);
         };
 
         var idwatch = scope.$watch('mmsEid', function(newVal, oldVal) {
@@ -174,7 +175,7 @@ function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxSe
             scope.preview = function() {
                 Utils.previewAction(scope, recompileEdit, recompile, type,element);
             };
-        } 
+        }
 
         if (mmsViewPresentationElemCtrl) {
 
@@ -193,7 +194,7 @@ function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxSe
                 scope.isDirectChildOfPresentationElement = false;
             if (scope.isDirectChildOfPresentationElement)
                 scope.panelTitle = scope.instanceSpec.name;
-            scope.panelType = 'Comment'; 
+            scope.panelType = 'Comment';
         }
     };
 

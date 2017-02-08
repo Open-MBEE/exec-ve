@@ -13,7 +13,7 @@ angular.module('mms.directives')
  * @restrict E
  *
  * @description
- * Given an element id, puts in the element's name binding, if there's a parent 
+ * Given an element id, puts in the element's name binding, if there's a parent
  * mmsView directive, will notify parent view of transclusion on init and name change,
  * and on click
  *
@@ -40,7 +40,7 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
                 $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-save", $scope));
                 $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-saveC", $scope));
                 $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-cancel", $scope));
-            }     
+            }
         };
 
     };
@@ -79,9 +79,10 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
             element[0].innerHTML = defaultTemplate;
             //element.append(defaultTemplate);
             scope.recompileScope = scope.$new();
-            $compile(element.contents())(scope.recompileScope); 
+            $compile(element.contents())(scope.recompileScope);
             if (mmsViewCtrl) {
                 mmsViewCtrl.elementTranscluded(scope.element);
+                mmsViewCtrl.findLatestElement(scope.element);
             }
         };
 
@@ -92,9 +93,10 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
             element[0].innerHTML = '<div class="panel panel-info">'+editTemplate+'</div>';
             //element.append('<div class="panel panel-info">'+editTemplate+'</div>');
             scope.recompileScope = scope.$new();
-            $compile(element.contents())(scope.recompileScope); 
+            $compile(element.contents())(scope.recompileScope);
             if (mmsViewCtrl) {
                 mmsViewCtrl.elementTranscluded(scope.edit);
+                mmsViewCtrl.findLatestElement(scope.edit);
             }
         };
 
@@ -137,6 +139,7 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
                 recompile();
                 if (mmsViewCtrl) {
                     mmsViewCtrl.elementTranscluded(scope.element);
+                    mmsViewCtrl.findLatestElement(scope.element);
                 }
                 if (scope.version === 'latest') {
                     scope.$on('element.updated', function(event, eid, ws, type, continueEdit) {
@@ -179,7 +182,7 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
             var callback = function() {
                 Utils.showEditCallBack(scope,mmsViewCtrl,element,template,recompile,recompileEdit,type);
             };
-            
+
             mmsViewCtrl.registerPresenElemCallBack(callback);
 
             scope.$on('$destroy', function() {
