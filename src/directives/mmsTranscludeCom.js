@@ -81,7 +81,6 @@ function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxSe
             $compile(element.contents())(scope.recompileScope);
             if (mmsViewCtrl) {
                 mmsViewCtrl.elementTranscluded(scope.element, 'Comment');
-                mmsViewCtrl.findLatestElement(scope.element);
             }
         };
 

@@ -116,7 +116,6 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             $compile(element.contents())(scope.recompileScope);
             if (mmsViewCtrl) {
                 mmsViewCtrl.elementTranscluded(scope.element);
-                mmsViewCtrl.findLatestElement(scope.element);
             }
         };
 
@@ -133,7 +132,6 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             $compile(element.contents())(scope.recompileScope);
             if (mmsViewCtrl) {
                 mmsViewCtrl.elementTranscluded(scope.edit);
-                mmsViewCtrl.findLatestElement(scope.edit);
             }
         };
 

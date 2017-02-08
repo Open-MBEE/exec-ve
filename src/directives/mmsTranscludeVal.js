@@ -140,7 +140,6 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
             }
             if (mmsViewCtrl) {
                 mmsViewCtrl.elementTranscluded(scope.element);
-                mmsViewCtrl.findLatestElement(scope.element);
             }
         };
 

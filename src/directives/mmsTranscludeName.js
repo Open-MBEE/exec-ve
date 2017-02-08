@@ -82,7 +82,6 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
             $compile(element.contents())(scope.recompileScope);
             if (mmsViewCtrl) {
                 mmsViewCtrl.elementTranscluded(scope.element);
-                mmsViewCtrl.findLatestElement(scope.element);
             }
         };
 
@@ -96,7 +95,6 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
             $compile(element.contents())(scope.recompileScope);
             if (mmsViewCtrl) {
                 mmsViewCtrl.elementTranscluded(scope.edit);
-                mmsViewCtrl.findLatestElement(scope.edit);
             }
         };
 
@@ -139,7 +137,6 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
                 recompile();
                 if (mmsViewCtrl) {
                     mmsViewCtrl.elementTranscluded(scope.element);
-                    mmsViewCtrl.findLatestElement(scope.element);
                 }
                 if (scope.version === 'latest') {
                     scope.$on('element.updated', function(event, eid, ws, type, continueEdit) {
