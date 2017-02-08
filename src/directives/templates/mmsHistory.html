@@ -6,19 +6,6 @@
     <option value="">--- Latest ---</option>
 </select>
 
-<!--
-<div class="history-top">
-<table class="history-table table table-condensed">
-    <tr><th>Modified By</th><th>Time</th></tr>
-    <tr ng-repeat="version in history | filter:historyFilter">
-        <td>{{version.modifier}}</td>
-        <td>
-            <a ng-click="timestampClicked(version.timestamp)">{{version.timestamp | date:'M/d/yy h:mm a'}}</a>
-        </td>
-    </tr>
-</table>
-</div>
--->
 <!-- Spec window -->
 <!--<div class="history-bottom">-->
 <mms-spec mms-eid="{{mmsEid}}" mms-version="{{historyVer}}" mms-ws="{{mmsWs}}" mms-type="{{mmsType}}" no-edit="true"></mms-spec>

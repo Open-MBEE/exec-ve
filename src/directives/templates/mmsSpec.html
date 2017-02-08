@@ -1,4 +1,5 @@
 <div ng-if="mmsType=='element' && !noEdit && editing" class="editing">
+
     <h1 class="prop"><input class="form-control" type="text" ng-model="edit.name"></input></h1>
 
     <h2 class="prop-title">LAST MODIFICATION</h2>
@@ -77,6 +78,9 @@
 </div>
 
 <div ng-if="mmsType=='element'" ng-hide="editing" class="reading">
+    <span ng-show="gettingSpec"><i class="fa fa-spin fa-spinner"></i></span>
+
+    <div ng-hide="gettingSpec">
     <h1 class="prop element-title">{{element.name}}</h1>
 
     <h2 class="prop-title">LAST MODIFICATION</h2>
@@ -154,6 +158,7 @@
     <h3 class="prop">{{workspace.name}}</h3>
     <h2 class="prop-title">FORMATTED MODIFIED TIME</h2>
     <h3 class="prop">{{element.modified}}</h3>
+    </div>
 </div>
 
 <div ng-if="mmsType=='workspace'" ng-show="editing" class="editing">

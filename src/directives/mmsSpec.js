@@ -81,6 +81,7 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
         var keepMode = false;
         scope.editing = false;
         scope.editable = true;
+        scope.gettingSpec = false;
         scope.isRestrictedVal = false;
         scope.isEnumeration = false;
         scope.propertyTypeClicked = function() {
@@ -170,6 +171,7 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
             } else {
                 scope.isEnumeration = false;
                 scope.isSlot = false;
+                scope.gettingSpec = true;
             ElementService.getElement(scope.mmsEid, false, scope.mmsWs, scope.mmsVersion, 2, true)
             .then(function(data) {
                 //element.empty();
@@ -242,7 +244,9 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
                         }
                     });
                 }
+                scope.gettingSpec = false;
             }, function(reason) {
+                scope.gettingSpec = false;
                 //growl.error("Getting Element Error: " + reason.message);
             });
             }
