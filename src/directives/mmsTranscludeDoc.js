@@ -173,10 +173,10 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             element.html('(loading...)');
             element.addClass("isLoading");
             scope.projectId = projectId;
-            scope.refId = refId;
+            scope.refId = refId ? refId : 'master';
             scope.commitId = commitId ? commitId : 'latest';
-            scope.reqOb = {elementId: scope.mmsElementId, projectId: scope.projectId, refId: scope.refId, commitId: scope.commitId};
-            ElementService.getElement(scope.reqOb, 1, false)
+            var reqOb = {elementId: scope.mmsElementId, projectId: scope.projectId, refId: scope.refId, commitId: scope.commitId};
+            ElementService.getElement(reqOb, 1, false)
             .then(function(data) {
                 scope.element = data;
                 if (!scope.panelTitle) {
@@ -257,12 +257,6 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             var callback = function() {
                 Utils.showEditCallBack(scope,mmsViewCtrl,element,template,recompile,recompileEdit,type);
             };
-
-            mmsViewCtrl.registerPresenElemCallBack(callback);
-
-            scope.$on('$destroy', function() {
-                mmsViewCtrl.unRegisterPresenElemCallBack(callback);
-            });
 
             scope.save = function() {
                 Utils.saveAction(scope, recompile, scope.bbApi, null, type, element);

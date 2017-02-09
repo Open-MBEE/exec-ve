@@ -121,10 +121,10 @@ function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxSe
                     commitId = viewVersion.commitId;
             }
             scope.projectId = projectId;
-            scope.refId = refId;
+            scope.refId = refId ? refId : 'master';
             scope.commitId = commitId ? commitId : 'latest';
-            scope.reqOb = {elementId: scope.mmsElementId, projectId: scope.projectId, refId: scope.refId, commitId: scope.commitId};
-            ElementService.getElement(scope.reqOb, 1, false)
+            var reqOb = {elementId: scope.mmsElementId, projectId: scope.projectId, refId: scope.refId, commitId: scope.commitId};
+            ElementService.getElement(reqOb, 1, false)
             .then(function(data) {
                 scope.element = data;
                 recompile();
@@ -151,16 +151,6 @@ function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxSe
             scope.view = mmsViewCtrl.getView();
             scope.isDirectChildOfPresentationElement = Utils.isDirectChildOfPresentationElementFunc(element, mmsViewCtrl);
             var type = "documentation";
-
-            var callback = function() {
-                Utils.showEditCallBack(scope,mmsViewCtrl,element,template,recompile,recompileEdit,type);
-            };
-
-            mmsViewCtrl.registerPresenElemCallBack(callback);
-
-            scope.$on('$destroy', function() {
-                mmsViewCtrl.unRegisterPresenElemCallBack(callback);
-            });
 
             scope.save = function() {
                 Utils.saveAction(scope,recompile,scope.bbApi,null,type,element);

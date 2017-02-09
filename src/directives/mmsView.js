@@ -97,10 +97,6 @@ function mmsView(ViewService, ElementService, $templateCache, $rootScope, growl)
             return $scope.showEdits;
         };
 
-        this.getViewElements = function() {
-            return ViewService.getViewElements($scope.reqOb, 1);
-        };
-
         this.transcludeClicked = function(elementOb) {
             if ($scope.mmsViewApi && $scope.mmsViewApi.elementClicked)
                 $scope.mmsViewApi.elementClicked(elementOb);
@@ -130,17 +126,6 @@ function mmsView(ViewService, ElementService, $templateCache, $rootScope, growl)
         this.getView = function() {
             // scope view gets set in the viewlink fnc
             return $scope.view;
-        };
-
-        // These register and unregister fncs are called from transclude directives
-        this.registerPresenElemCallBack = function(callback) {
-            $scope.presentationElemCleanUpFncs.push(callback);
-        };
-
-        this.unRegisterPresenElemCallBack = function(callback) {
-            var idx = $scope.presentationElemCleanUpFncs.indexOf(callback);
-            if (idx >= 0)
-                $scope.presentationElemCleanUpFncs.splice(idx, 1);
         };
     };
 

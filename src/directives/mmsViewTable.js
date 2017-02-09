@@ -1,13 +1,9 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsViewTable', ['$compile', '$timeout', '$document', '$templateCache', 'UtilsService', mmsViewTable]);
+.directive('mmsViewTable', ['$compile', '$timeout', '$document', 'UtilsService', mmsViewTable]);
 
-function mmsViewTable($compile, $timeout, $document, $templateCache, UtilsService) {
-    var template = $templateCache.get('mms/templates/mmsViewTable.html');
-    
-    var mmsViewTableCtrl = function ($scope, $rootScope) {
-    };
+function mmsViewTable($compile, $timeout, $document, UtilsService) {
 
     var mmsViewTableLink = function(scope, element, attrs) {
         if (!scope.table.showIfEmpty && scope.table.body.length === 0)
@@ -98,27 +94,10 @@ function mmsViewTable($compile, $timeout, $document, $templateCache, UtilsServic
         };
 
         return;
-
-        /*scope.tableLimit = 20;
-
-        var addLimit = function() {
-            if (scope.tableLimit < scope.table.body.length) {
-                scope.tableLimit += 25;
-                $timeout(addLimit, 100);
-            }
-        };
-
-        element.append(template);
-        $timeout(function() {
-            $compile(element.contents())(scope);
-            addLimit();
-            }, 100);
-*/
     };
 
     return {
         restrict: 'E',
-        //template: template,
         scope: {
             table: '<mmsTable'
         },

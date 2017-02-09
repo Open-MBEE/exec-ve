@@ -8,7 +8,15 @@ angular.module('mms.directives')
  * @name mms.directives.directive:mmsViewPresentationElem
  *
  * @requires mms.ViewService
+ * @requires mms.ElementService
  * @requires $templateCache
+ * @requires $location
+ * @requires $timeout
+ * @requires $rootScope
+ * @requires $anchorScroll
+ * @requires growl
+ *
+ *
  * @restrict E
  *
  * @description
@@ -45,42 +53,38 @@ function mmsViewPresentationElem(ViewService, ElementService, $templateCache, $r
         if (scope.mmsInstanceVal) {
             if (!scope.mmsInstanceVal.instanceId) {
                 element.html('<span class="mms-error">Reference is null</span>');
-                //growl.error("A presentation element reference is null.");
                 return;
             }
-            var ws = null;
-            var version = null;
+            var projectId = null;
+            var refId = null;
+            var commitId = null;
             if (mmsViewCtrl) {
-                var viewVersion = mmsViewCtrl.getWsAndVersion();
-                ws = viewVersion.workspace;
-                version = viewVersion.version;
+                var viewVersion = mmsViewCtrl.getElementOrigin();
+                projectId = viewVersion.projectId;
+                refId = viewVersion.refId;
+                commitId = viewVersion.commitId;
             }
             // Parse the element reference tree for the presentation element:
             element.addClass("isLoading");
-            ElementService.getElement(scope.mmsInstanceVal.instanceId, ws, version, 1)
-            .then(function(elem) {
-                scope.presentationElem = ViewService.getPresentationElementSpec(elem);
-                // This is a kludge to get the template switch statement to work
-                // for Sections:
-                //if (ViewService.isSection(elem)) {
-                //    scope.presentationElem.type = 'Section';
-                //}
-
-                ElementService.getElement(scope.mmsInstanceVal.instanceId, false, ws, version, 1).
-                then(function(instanceSpec) {
-                    scope.instanceSpec = instanceSpec;
-                    scope.presentationElemLoading = false;
-                    var hash = $location.hash();
-                    if (hash === instanceSpec.sysmlId) {
-                        $timeout(function() {
-                            $anchorScroll();
-                        }, 1000, false);
-                    }
-                    element.click(function(e) {
-                        if (mmsViewCtrl)
-                            mmsViewCtrl.transcludeClicked(instanceSpec.sysmlId, ws, version);
-                        e.stopPropagation();
-                    });
+            scope.reqOb = {elementId: scope.mmsInstanceVal.instanceId, projectId: projectId, refId: refId, commitId: commitId};
+            ElementService.getElement(reqOb, 1)
+            .then(function(instanceSpec) {
+                scope.presentationElem = ViewService.getPresentationElementSpec(instanceSpec);
+                scope.instanceSpec = instanceSpec;
+                scope.presentationElemLoading = false;
+                var hash = $location.hash();
+                if (hash === instanceSpec.sysmlId) {
+                    $timeout(function() {
+                        $anchorScroll();
+                    }, 1000, false);
+                }
+                if (mmsViewCtrl) {
+                    mmsViewCtrl.elementTranscluded(instanceSpec);
+                }
+                element.click(function(e) {
+                    if (mmsViewCtrl)
+                        mmsViewCtrl.transcludeClicked(instanceSpec);
+                    e.stopPropagation();
                 });
             }, function(reason) {
                 if (reason.status === 500) {
@@ -90,7 +94,7 @@ function mmsViewPresentationElem(ViewService, ElementService, $templateCache, $r
                     if (reason.status === 410)
                         status = ' deleted';
                     element.html('<span class="mms-error">View element reference error: ' + scope.mmsInstanceVal.instanceId + ' ' + status + '</span>');
-                }//growl.error('View Element Ref Error: ' + scope.mmsInstanceVal.instance + ' ' + reason.message);
+                }
             }).finally(function() {
                 element.removeClass("isLoading");
             }); 

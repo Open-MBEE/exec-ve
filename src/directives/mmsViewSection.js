@@ -1,9 +1,9 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsViewSection', ['$compile', '$templateCache', '$rootScope', 'ElementService', 'ViewService', 'UxService', 'Utils', mmsViewSection]);
+.directive('mmsViewSection', ['$compile', '$templateCache', '$rootScope', 'ViewService', 'UxService', 'Utils', mmsViewSection]);
 
-function mmsViewSection($compile, $templateCache, $rootScope, ElementService, ViewService, UxService, Utils) {
+function mmsViewSection($compile, $templateCache, $rootScope, ViewService, UxService, Utils) {
 
     var defaultTemplate = $templateCache.get('mms/templates/mmsViewSection.html');
 
@@ -86,16 +86,6 @@ function mmsViewSection($compile, $templateCache, $rootScope, ElementService, Vi
             if (scope.instanceSpec.classifierIds[0] === ViewService.TYPE_TO_CLASSIFIER_ID.Section)
                 scope.isDirectChildOfPresentationElement = false;
             var type = "name";
-
-            var callback = function() {
-                Utils.showEditCallBack(scope,mmsViewCtrl,element,null,recompile,recompileEdit,type,scope.section);
-            };
-
-            mmsViewCtrl.registerPresenElemCallBack(callback);
-
-            scope.$on('$destroy', function() {
-                mmsViewCtrl.unRegisterPresenElemCallBack(callback);
-            });
 
             if (scope.version === 'latest') {
                 scope.$on('element.updated', function(event, eid, ws, type, continueEdit) {

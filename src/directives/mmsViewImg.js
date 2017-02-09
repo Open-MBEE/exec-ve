@@ -9,9 +9,8 @@ function mmsViewImg() {
         restrict: 'E',
         template: template,
         scope: {
-            image: '<mmsImage',
+            image: '<mmsImage'
         },
-        //controller: ['$scope', controller]
         link: function(scope, element, attrs) {
         }
     };
