@@ -112,13 +112,6 @@ function mmsView(ViewService, $templateCache, $rootScope, growl) {
             }
         };
 
-        this.findLatestElement = function(elem) {
-            if (elem) {
-                if($scope.mmsTranscluded)
-                    $scope.mmsTranscluded({element: elem});
-            }
-        };
-
         this.getWsAndVersion = function() {
             return {
                 workspace: $scope.mmsWs,
