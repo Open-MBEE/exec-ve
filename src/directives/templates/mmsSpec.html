@@ -78,7 +78,8 @@
 </div>
 
 <div ng-if="mmsType=='element'" ng-hide="editing" class="reading">
-    <span ng-show="gettingSpec"><i class="fa fa-spin fa-spinner"></i></span>
+    <hr/>
+    <p class="text-center" ng-show="gettingSpec"><i class="fa fa-3x fa-spin fa-spinner"></i></p>
 
     <div ng-hide="gettingSpec">
     <h1 class="prop element-title">{{element.name}}</h1>
