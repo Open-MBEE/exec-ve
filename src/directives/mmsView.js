@@ -101,10 +101,9 @@ function mmsView(ViewService, ElementService, $templateCache, $rootScope, growl)
             return ViewService.getViewElements($scope.reqOb, 1);
         };
 
-        this.transcludeClicked = function(elementId, projectId, refId, commitId) {
-            var clickedOb = {elementId: elementId, projectId: projectId, refId: refId, commitId: commitId};
-            if ($scope.mmsCfClicked)
-                $scope.mmsCfClicked(clickedOb);
+        this.transcludeClicked = function(elementOb) {
+            if ($scope.mmsViewApi && $scope.mmsViewApi.elementClicked)
+                $scope.mmsViewApi.elementClicked(elementOb);
         };
 
         this.elementTranscluded = function(elem, type) {
@@ -114,8 +113,8 @@ function mmsView(ViewService, ElementService, $templateCache, $rootScope, growl)
                     if (elem._modifier)
                         $scope.modifier = elem._modifier;
                 }
-                if ($scope.mmsTranscluded)
-                    $scope.mmsTranscluded({element: elem, type: type});
+                if ($scope.mmsViewApi && $scope.mmsViewApi.elementTranscluded)
+                    $scope.mmsViewApi.elementTranscluded(elem, type);
             }
         };
 
@@ -302,9 +301,7 @@ function mmsView(ViewService, ElementService, $templateCache, $rootScope, growl)
             mmsCommitId: '@',
             mmsNumber: '@',
             mmsLink: '<',
-            mmsCfClicked: '&',
-            mmsViewApi: '<',
-            mmsTranscluded: '&'
+            mmsViewApi: '<'
         },
         controller: ['$scope', mmsViewCtrl],
         link: mmsViewLink

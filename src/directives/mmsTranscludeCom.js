@@ -65,7 +65,7 @@ function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxSe
                 scope.addFrame();
 
             if (mmsViewCtrl)
-                mmsViewCtrl.transcludeClicked(scope.mmsElementId, scope.projectId, scope.refId, scope.commitId);
+                mmsViewCtrl.transcludeClicked(scope.element);
             if (scope.nonEditable) {
                 growl.warning("Cross Reference is not editable.");
             }
