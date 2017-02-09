@@ -14,8 +14,8 @@ angular.module('mms.directives')
  *
  * @description
  * Given a view id, renders the view according to the json given by mms.ViewService
- * The view have a text edit mode, where transclusions can be clicked. The view's last 
- * modified time and author is the latest of any transcluded element modified time. 
+ * The view have a text edit mode, where transclusions can be clicked. The view's last
+ * modified time and author is the latest of any transcluded element modified time.
  * For available api methods, see methods section.
  *
  * ## Example
@@ -47,7 +47,7 @@ angular.module('mms.directives')
  * @param {string} mmsVid The id of the view
  * @param {string=master} mmsWs Workspace to use, defaults to master
  * @param {string=latest} mmsVersion Version can be alfresco version number or timestamp, default is latest
- * @param {expression=} mmsCfClicked The expression to handle transcluded elements 
+ * @param {expression=} mmsCfClicked The expression to handle transcluded elements
  *     in the view being clicked, this should be a function whose argument is 'elementId'
  */
 function mmsView(ViewService, $templateCache, $rootScope, growl) {
@@ -102,7 +102,7 @@ function mmsView(ViewService, $templateCache, $rootScope, growl) {
 
         this.elementTranscluded = function(elem, type) {
             if (elem) {
-                if (elem.modified > $scope.modified && type !== 'Comment') { 
+                if (elem.modified > $scope.modified && type !== 'Comment') {
                     $scope.modified = elem.modified;
                     if (elem.modifier)
                         $scope.modifier = elem.modifier;
@@ -114,7 +114,7 @@ function mmsView(ViewService, $templateCache, $rootScope, growl) {
 
         this.getWsAndVersion = function() {
             return {
-                workspace: $scope.mmsWs, 
+                workspace: $scope.mmsWs,
                 version: $scope.mmsVersion,
                 tag: $scope.mmsTag
             };
@@ -170,7 +170,7 @@ function mmsView(ViewService, $templateCache, $rootScope, growl) {
                     return;
                 }
                 if (data.specialization.numElements && data.specialization.numElements > 5000 &&
-                        scope.mmsVersion && scope.mmsVersion !== 'latest') { 
+                        scope.mmsVersion && scope.mmsVersion !== 'latest') {
                     //threshold where getting view elements in bulk takes too long and it's not latest
                     //getting cached individual elements should be faster
                     scope.view = data;
@@ -206,9 +206,9 @@ function mmsView(ViewService, $templateCache, $rootScope, growl) {
          * @ngdoc function
          * @name mms.directives.directive:mmsView#toggleShowElements
          * @methodOf mms.directives.directive:mmsView
-         * 
-         * @description 
-         * toggle elements highlighting 
+         *
+         * @description
+         * toggle elements highlighting
          */
         scope.toggleShowElements = function() {
             scope.showElements = !scope.showElements;
@@ -218,8 +218,8 @@ function mmsView(ViewService, $templateCache, $rootScope, growl) {
          * @ngdoc function
          * @name mms.directives.directive:mmsView#toggleShowComments
          * @methodOf mms.directives.directive:mmsView
-         * 
-         * @description 
+         *
+         * @description
          * toggle comments visibility
          */
         scope.toggleShowComments = function() {
@@ -231,9 +231,9 @@ function mmsView(ViewService, $templateCache, $rootScope, growl) {
          * @ngdoc function
          * @name mms.directives.directive:mmsView#toggleShowEdits
          * @methodOf mms.directives.directive:mmsView
-         * 
-         * @description 
-         * toggle elements editing panel 
+         *
+         * @description
+         * toggle elements editing panel
          */
         scope.toggleShowEdits = function() {
             scope.showEdits = !scope.showEdits;
@@ -253,8 +253,8 @@ function mmsView(ViewService, $templateCache, $rootScope, growl) {
              * @ngdoc function
              * @name mms.directives.directive:mmsView#setShowElements
              * @methodOf mms.directives.directive:mmsView
-             * 
-             * @description 
+             *
+             * @description
              * self explanatory
              *
              * @param {boolean} mode arg
@@ -271,14 +271,14 @@ function mmsView(ViewService, $templateCache, $rootScope, growl) {
              * @ngdoc function
              * @name mms.directives.directive:mmsView#setShowComments
              * @methodOf mms.directives.directive:mmsView
-             * 
-             * @description 
+             *
+             * @description
              * self explanatory
              *
              * @param {boolean} mode arg
              */
             api.setShowComments = function(mode) {
-                scope.showComments = mode; 
+                scope.showComments = mode;
                 if (mode)
                     element.addClass('reviewing');
                 else

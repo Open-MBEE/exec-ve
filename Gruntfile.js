@@ -202,6 +202,7 @@ module.exports = function(grunt) {
       beforeconcat: jsFiles,
       afterconcat: ['dist/mms.js', 'dist/mms.directives.js'],
       options: {
+        reporterOutput: '',
         evil: true, //allow eval for timely integration
         globalstrict: true,
         globals: {

@@ -14,10 +14,10 @@ angular.module('mms.directives')
  * @restrict E
  *
  * @description
- * Given an element id, puts in the element's documentation binding, if there's a parent 
+ * Given an element id, puts in the element's documentation binding, if there's a parent
  * mmsView directive, will notify parent view of transclusion on init and doc change,
  * and on click. Nested transclusions inside the documentation will also be registered.
- * 
+ *
  * ## Example
  *  <pre>
     <mms-transclude-doc mms-eid="element_id"></mms-transclude-doc>
@@ -50,12 +50,12 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                 $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-cancel", $scope));
                 $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-delete", $scope));
                 $scope.bbApi.setPermission("presentation-element-delete", $scope.isDirectChildOfPresentationElement);
-            }     
+            }
         };
 
         this.getWsAndVersion = function() {
             return {
-                workspace: $scope.ws, 
+                workspace: $scope.ws,
                 version: $scope.version,
                 tag: undefined
             };
@@ -113,7 +113,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             element[0].innerHTML = doc;
             MathJax.Hub.Queue(["Typeset", MathJax.Hub, element[0]]);
             scope.recompileScope = scope.$new();
-            $compile(element.contents())(scope.recompileScope); 
+            $compile(element.contents())(scope.recompileScope);
             if (mmsViewCtrl) {
                 mmsViewCtrl.elementTranscluded(scope.element);
             }
@@ -129,7 +129,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             element[0].innerHTML = '<div class="panel panel-info">'+doc+'</div>';
             //element.append('<div class="panel panel-info">'+doc+'</div>');
             scope.recompileScope = scope.$new();
-            $compile(element.contents())(scope.recompileScope); 
+            $compile(element.contents())(scope.recompileScope);
             if (mmsViewCtrl) {
                 mmsViewCtrl.elementTranscluded(scope.edit);
             }
@@ -190,7 +190,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                         if (eid === scope.mmsEid && ws === scope.ws && (type === 'all' || type === 'documentation') && !continueEdit)
                             recompile();
                     });
-                    //actions for stomp 
+                    //actions for stomp
                     scope.$on("stomp.element", function(event, deltaSource, deltaWorkspaceId, deltaElementId, deltaModifier, elemName){
                         if(deltaWorkspaceId === scope.ws && deltaElementId === scope.mmsEid){
                             if(scope.isEditing === false){
@@ -205,13 +205,13 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                 }
                 // TODO: below has issues when having edits.  For some reason this is
                 //       entered twice, once and the frame is added, and then again
-                //       and recompileEdit is ran! 
-                
+                //       and recompileEdit is ran!
+
                 // // We cant count on scope.edit or scope.isEditing in the case that the
                 // // view name is saved while the view documenation is being edited, so
                 // // no way to know if there should be a frame or not based on that, so
                 // // get the edit object from the cache and check the editable state
-                // // and if we have any edits: 
+                // // and if we have any edits:
                 // ElementService.getElementForEdit(scope.mmsEid, false, ws)
                 // .then(function(edit) {
 
@@ -283,7 +283,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             scope.preview = function() {
                 Utils.previewAction(scope, recompileEdit, recompile, type,element);
             };
-        } 
+        }
 
         if (mmsViewPresentationElemCtrl) {
 
