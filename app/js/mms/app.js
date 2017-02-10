@@ -218,6 +218,12 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             viewOb: function(documentOb) {
                 return documentOb;
             }
+        },
+        views: {
+            'pane-center@': {
+                templateUrl: 'partials/mms/pane-center.html',
+                controller: 'ViewCtrl'
+            }
         }
     })
     .state('project.ref.document', {
@@ -242,6 +248,30 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             viewOb: function(documentOb) {
                 return documentOb;
             }
+        },
+        views: {
+            'menu@': {
+                template: '<mms-menu mms-title="View Editor"></mms-menu>',
+                controller: function ($scope, $filter, $rootScope) {
+                    //TODO                                   
+                }
+            },
+            'pane-left@': {
+                templateUrl: 'partials/mms/pane-left.html',
+                controller: 'TreeCtrl'
+            },          
+            'pane-center@': {
+                templateUrl: 'partials/mms/pane-center.html',
+                controller: 'ViewCtrl'
+            },
+            'pane-right@': {
+                templateUrl: 'partials/mms/pane-right.html',
+                controller: 'ToolCtrl'
+            },
+            'toolbar-right@': {
+                template: '<mms-toolbar buttons="buttons" on-click="onClick(button)" mms-tb-api="tbApi"></mms-toolbar>',
+                controller: 'ToolbarCtrl'
+            }
         }
     })
     .state('project.ref.document.view', {
@@ -254,6 +284,12 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                     extended: true,
                     elementId: $stateParams.viewId
                 }, 2);
+            }
+        },
+        views: {
+            'pane-center@': {
+                templateUrl: 'partials/mms/pane-center.html',
+                controller: 'ViewCtrl'
             }
         }
     })
