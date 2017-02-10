@@ -1,7 +1,8 @@
 'use strict';
 
 angular.module('mmsApp')
-.factory('MmsAppUtils', ['$q','$state', '$uibModal','$timeout', '$location', '$window', '$templateCache','$rootScope','$compile', '$filter', 'WorkspaceService','ConfigService','ElementService','ViewService', 'UtilsService', 'growl','_', MmsAppUtils]);
+.factory('MmsAppUtils', ['$q', '$uibModal','$timeout', '$location', '$window', '$templateCache',
+    '$rootScope','$compile', '$filter', '$state', 'ElementService','ViewService', 'UtilsService', 'growl','_', MmsAppUtils]);
 
 /**
  * @ngdoc service
@@ -10,78 +11,70 @@ angular.module('mmsApp')
  * @description
  * Utilities
  */
-function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templateCache, $rootScope, $compile, $filter, WorkspaceService, ConfigService, ElementService, ViewService, UtilsService, growl, _) {
+function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache, 
+    $rootScope, $compile, $filter, $state, ElementService, ViewService, UtilsService, growl, _) {
 
-    var addElementCtrl = function($scope, $uibModalInstance, $filter) {
+    var addPeCtrl = function($scope, $uibModalInstance, $filter) {
 
         $scope.oking = false;
-        $scope.newItem = {};
-        $scope.newItem.name = "";
-
-        // Search for InstanceSpecs.  We are searching for InstanceSpecs b/c we only want to
-        // create a InstanceValue to point to that InstanceSpec when cross-referencing.
-        $scope.searchFilter = function(data) {
-            var validClassifierIds = [];
-            if ($scope.presentationElemType === 'Table') {
-                validClassifierIds.push(ViewService.TYPE_TO_CLASSIFIER_ID.TableT);
-            } else if ($scope.presentationElemType === 'List') {
-                validClassifierIds.push(ViewService.TYPE_TO_CLASSIFIER_ID.ListT);
-            } else if ($scope.presentationElemType === 'Image') {
-                validClassifierIds.push(ViewService.TYPE_TO_CLASSIFIER_ID.Figure);
-            } else if ($scope.presentationElemType === 'Paragraph') {
-                validClassifierIds.push(ViewService.TYPE_TO_CLASSIFIER_ID.ParagraphT);
-            } else if ($scope.presentationElemType === 'Section') {
-                validClassifierIds.push(ViewService.TYPE_TO_CLASSIFIER_ID.SectionT);
-            } else {
-                validClassifierIds.push(ViewService.TYPE_TO_CLASSIFIER_ID[$scope.presentationElemType]);
-            }
-            // Filter out anything that is not a InstanceSpecification or not of the correct type:
-            for (var i = 0; i < data.length; i++) {
-                if (data[i].type != 'InstanceSpecification') {
-                    data.splice(i, 1);
-                    i--;
+        $scope.newPe = {name:''};
+        $scope.createForm = true;
+        $scope.searchOptions = {
+            callback: function(elementOb) {
+                if ($scope.oking) {
+                    growl.info("Please wait...");
+                    return;
                 }
-                else if (validClassifierIds.indexOf(data[i].classifierIds[0]) < 0) {
-                    data.splice(i, 1);
-                    i--;
+                $scope.oking = true;  
+                var instanceVal = {
+                    instanceId: elementOb.sysmlId,
+                    type: "InstanceValue",
+                };
+                ViewService.addElementToViewOrSection($scope.viewOrSection, instanceVal).
+                then(function(data) {
+                    // Broadcast message to TreeCtrl:
+                    $rootScope.$broadcast('viewctrl.add.element', elementOb, $scope.presentationElemType.toLowerCase(), $scope.viewOrSection);
+                    growl.success("Adding "+$scope.presentationElemType+"  Successful");
+                    $uibModalInstance.close(data);
+                }, function(reason) {
+                    growl.error($scope.presentationElemType+" Add Error: " + reason.message);
+                }).finally(function() {
+                    $scope.oking = false;
+                });
+            },
+            filterCallback: function(data) {
+                var validClassifierIds = [];
+                if ($scope.presentationElemType === 'Table') {
+                    validClassifierIds.push(ViewService.TYPE_TO_CLASSIFIER_ID.TableT);
+                } else if ($scope.presentationElemType === 'List') {
+                    validClassifierIds.push(ViewService.TYPE_TO_CLASSIFIER_ID.ListT);
+                } else if ($scope.presentationElemType === 'Image') {
+                    validClassifierIds.push(ViewService.TYPE_TO_CLASSIFIER_ID.Figure);
+                } else if ($scope.presentationElemType === 'Paragraph') {
+                    validClassifierIds.push(ViewService.TYPE_TO_CLASSIFIER_ID.ParagraphT);
+                } else if ($scope.presentationElemType === 'Section') {
+                    validClassifierIds.push(ViewService.TYPE_TO_CLASSIFIER_ID.SectionT);
                 } else {
-                    if (data[i].properties)
-                        delete data[i].properties;
+                    validClassifierIds.push(ViewService.TYPE_TO_CLASSIFIER_ID[$scope.presentationElemType]);
                 }
-            }
-            return data;
+                // Filter out anything that is not a InstanceSpecification or not of the correct type:
+                for (var i = 0; i < data.length; i++) {
+                    if (data[i].type != 'InstanceSpecification') {
+                        data.splice(i, 1);
+                        i--;
+                    }
+                    else if (validClassifierIds.indexOf(data[i].classifierIds[0]) < 0) {
+                        data.splice(i, 1);
+                        i--;
+                    } else {
+                        if (data[i].properties)
+                            delete data[i].properties;
+                    }
+                }
+                return data;
+            },
+            itemsPerPage: 200
         };
-        
-        // Adds a InstanceValue to the view given the sysmlId of the InstanceSpecification
-        $scope.addElement = function(element) {
-
-            if ($scope.oking) {
-                growl.info("Please wait...");
-                return;
-            }
-            $scope.oking = true;  
-            var instanceVal = {
-                instanceId: element.sysmlId,
-                type: "InstanceValue",
-                valueExpression: null
-            };
-            ViewService.addElementToViewOrSection($scope.viewOrSection.sysmlId, $scope.viewOrSection.sysmlId, $scope.ws, instanceVal).
-            then(function(data) {
-                // Broadcast message to TreeCtrl:
-                $rootScope.$broadcast('viewctrl.add.element', element, $scope.presentationElemType.toLowerCase(), $scope.viewOrSection);
-                growl.success("Adding "+$scope.presentationElemType+"  Successful");
-                $uibModalInstance.close(data);
-            }, function(reason) {
-                growl.error($scope.presentationElemType+" Add Error: " + reason.message);
-            }).finally(function() {
-                $scope.oking = false;
-            });            
-        };
-
-        $scope.searchOptions= {};
-        $scope.searchOptions.callback = $scope.addElement;
-        $scope.searchOptions.filterCallback = $scope.searchFilter;
-        $scope.searchOptions.itemsPerPage = 200;
         
         $scope.ok = function() {
             if ($scope.oking) {
@@ -90,7 +83,7 @@ function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templ
             }
             $scope.oking = true;
 
-            ViewService.createInstanceSpecification($scope.viewOrSection, $scope.ws, $scope.presentationElemType, $scope.site.sysmlId, $scope.newItem.name).
+            ViewService.createInstanceSpecification($scope.viewOrSection, $scope.presentationElemType, $scope.newPe.name).
             then(function(data) {
                 var elemType = $scope.presentationElemType.toLowerCase();
                 $rootScope.$broadcast('viewctrl.add.element', data, elemType, $scope.viewOrSection);
@@ -107,7 +100,6 @@ function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templ
         $scope.cancel = function() {
             $uibModalInstance.dismiss();
         };
-
     };
 
     /**
@@ -122,46 +114,22 @@ function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templ
      * @param {string} type type of presentation element (Paragraph, Section)
      * @param {Object} viewOrSection the view or section (instance spec) object
      */
-    var addPresentationElement = function($scope, type, viewOrSection) {
-        var id = viewOrSection.sysmlId;
-        ElementService.isCacheOutdated(id, $scope.ws)
-        .then(function(status) {
-            if (status.status) {
-                if (viewOrSection.specification && !angular.equals(viewOrSection.specification, status.server.specification)) {
-                    growl.error('The view section contents is outdated, refresh the page first!');
-                    return;
-                } else if (viewOrSection._contents && !angular.equals(viewOrSection._contents, status.server._contents)) {
-                    growl.error('The view contents is outdated, refresh the page first!');
-                    return;
-                }
-            } 
-            realAddElement();
+    var addPresentationElement = function($scope, type, viewOrSectionOb) {
+        $scope.viewOrSectionOb = viewOrSectionOb;
+        $scope.presentationElemType = type;
+        var templateUrlStr = 'partials/mms/add-pe.html';
 
-        }, function(reason) {
-            growl.error('Checking if view contents is up to date failed: ' + reason.message);
-            realAddElement();
+        var instance = $uibModal.open({
+            templateUrl: templateUrlStr,
+            scope: $scope,
+            controller: ['$scope', '$uibModalInstance', '$filter', addPeCtrl]
         });
-
-        function realAddElement() {
-          $scope.createForm = true;
-          $scope.viewOrSection = viewOrSection;
-          $scope.presentationElemType = type;
-          $scope.newItem = {};
-          $scope.newItem.name = "";
-          var templateUrlStr = 'partials/mms/add-item.html';
-
-          var instance = $uibModal.open({
-              templateUrl: templateUrlStr,
-              scope: $scope,
-              controller: ['$scope', '$uibModalInstance', '$filter', addElementCtrl]
-          });
-          instance.result.then(function(data) {
+        instance.result.then(function(data) {
               // TODO: do anything here?
-          });
-        }
+        });
     };
 
-    var tableToCsv = function(ob, ws, time, isDoc) { //Export to CSV button Pop-up Generated Here
+    var tableToCsv = function(isDoc) { //Export to CSV button Pop-up Generated Here
          var modalInstance = $uibModal.open({
             templateUrl: 'partials/mms/tableExport.html',
             controller: function($scope, $uibModalInstance, type) {
@@ -169,9 +137,6 @@ function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templ
                 $scope.export = function() {
                     $uibModalInstance.close('export');
                 };
-                // $scope.fulldoc = function() {
-                //     $uibModalInstance.close('fulldoc');
-                // };
                 $scope.cancel = function() {
                     $uibModalInstance.dismiss();
                 };
@@ -254,7 +219,7 @@ function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templ
         isDoc = if ob is view or doc
         mode: 1 = browser print, 2 = word, 3 = pdf
     */
-    var printModal = function(ob, ws, site, time, tag, isDoc, mode) {
+    var printModal = function(viewOrDocOb, refOb, isDoc, mode) {
         var deferred = $q.defer();
         var modalInstance = $uibModal.open({
             templateUrl: 'partials/mms/printConfirm.html',
@@ -267,15 +232,18 @@ function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templ
                     'bottom-left': 'loading...', bottom: 'loading...', 'bottom-right': 'loading...'
                 };
                 if (isDoc) {
-                    ViewService.getDocMetadata(ob.sysmlId, ws, null, 2)
-                    .then(function(metadata) {
+                    ViewService.getDocMetadata({
+                        elementId: viewOrDocOb.sysmlId,
+                        projectId: viewOrDocOb._projectId,
+                        refId: viewOrDocOb._refId
+                    }, 2).then(function(metadata) {
                         $scope.meta.top = metadata.header ? metadata.header : '';
                         $scope.meta.bottom = metadata.footer ? metadata.footer : '';
                         $scope.meta['top-left'] = metadata.dnumber ? metadata.dnumber : '';
                         $scope.meta['top-right'] = metadata.version ? metadata.version : '';
-                        if (tag && tag.name !== 'latest')
-                            $scope.meta['top-right'] = $scope.meta['top-right'] + ' ' + tag.name;
-                        var displayTime = time;
+                        if (refOb && refOb.isTag)
+                            $scope.meta['top-right'] = $scope.meta['top-right'] + ' ' + refOb.name;
+                        var displayTime = refOb.isTag ? refOb._timestamp : 'latest';
                         if (displayTime === 'latest') {
                             displayTime = new Date();
                             displayTime = $filter('date')(displayTime, 'M/d/yy h:mm a');
@@ -288,7 +256,7 @@ function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templ
                         $scope.meta['bottom-right'] = 'counter(page)';
                     });
                 }
-                $scope.unsaved = ($rootScope.veEdits && !_.isEmpty($rootScope.veEdits));
+                $scope.unsaved = ($rootScope.ve_edits && !_.isEmpty($rootScope.ve_edits));
                 if (mode === 2)
                     $scope.action = 'save';
                 if (mode === 3) {
@@ -312,7 +280,7 @@ function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templ
         });
         modalInstance.result.then(function(choice) {
             if (choice[0] === 'ok') {
-                printOrGenerate(ob, ws, time, tag, isDoc, choice[1], choice[2], choice[3], mode, choice[4])
+                printOrGenerate(viewOrDocOb, refOb, isDoc, choice[1], choice[2], choice[3], mode, choice[4])
                 .then(function(result) {
                     var css = UtilsService.getPrintCss(result.header, result.footer, result.dnum, result.tag, result.displayTime, choice[4], choice[5]);
                     var cover = result.cover;
@@ -335,23 +303,23 @@ function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templ
                                 popupWin.print();
                             }, 1000, false);
                         }
-                    } else {
+                    } else {//TODO server changes for doc object
                         var doc = {
-                            docId: ob.sysmlId,
+                            docId: viewOrDocOb.sysmlId,
                             header: result.header,
                             footer: result.footer,
                             html: result.contents,
                             cover: result.cover,
-                            time: time,
+                            time: result.displayTime,
                             displayTime: result.displayTime,
                             toc: result.toc,
                             tof: result.tof + result.toe,
                             tot: result.tot,
                             dnum: result.dnum,
-                            workspace: ws,
+                            workspace: refOb.id,
                             customCss: css,
                             version: result.version,
-                            name: ob.sysmlId + '_' + time + '_' + new Date().getTime(),
+                            name: viewOrDocOb.sysmlId + '_' + refOb.id + '_' + new Date().getTime(),
                             disabledCoverPage: isDoc ? false : true
                         };
                         if (!choice[2]) {
@@ -361,11 +329,11 @@ function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templ
                             doc.tof = '';
                             doc.tot = '';
                         }
-                        if (time == 'latest')
-                            doc.tagId = time;
-                        else if (tag)
-                            doc.tagId = tag.name;
-                        ConfigService.convertHtmlToPdf(doc, site.sysmlId, ws)
+                        if (!refOb.isTag)
+                            doc.tagId = 'Latest';
+                        else
+                            doc.tagId = refOb.name;
+                        UtilsService.convertHtmlToPdf(doc)
                         .then(function(reuslt) {
                             deferred.resolve(result);
                         }, function(reason){
@@ -374,9 +342,9 @@ function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templ
                     }
                 });
             } else {
-                $rootScope.mms_fullDocMode = true;
-                $rootScope.mms_bbApi.setToggleState('tree-full-document', true);
-                $state.go('workspace.site.document.full', {search: undefined});
+                $rootScope.ve_fullDocMode = true;
+                $rootScope.ve_bbApi.setToggleState('tree-full-document', true);
+                $state.go('project.ref.document.full', {search: undefined});
             }
         }, function() {
             deferred.reject();
@@ -406,7 +374,7 @@ function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templ
             tag: tagname or ''
         }
     */
-    var printOrGenerate = function(ob, ws, time, tag, isDoc, genCover, genTotf, htmlTotf, mode, landscape) {
+    var printOrGenerate = function(viewOrDocOb, refOb, isDoc, genCover, genTotf, htmlTotf, mode, landscape) {
         var deferred = $q.defer();
         var printContents = '';
         var printElementCopy = angular.element("#print-div");
@@ -423,8 +391,8 @@ function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templ
         var absurl = $location.absUrl();
         var prefix = protocol + '://' + hostname + ((port == 80 || port == 443) ? '' : (':' + port));
         var mmsIndex = absurl.indexOf('mms.html');
-        var toc = UtilsService.makeHtmlTOC($rootScope.mms_treeApi.get_rows());
-        var tableAndFigTOC = UtilsService.makeTablesAndFiguresTOC($rootScope.mms_treeApi.get_rows(), printElementCopy, false, htmlTotf);
+        var toc = UtilsService.makeHtmlTOC($rootScope.ve_treeApi.get_rows());
+        var tableAndFigTOC = UtilsService.makeTablesAndFiguresTOC($rootScope.ve_treeApi.get_rows(), printElementCopy, false, htmlTotf);
         var tof = tableAndFigTOC.figures;
         var tot = tableAndFigTOC.tables;
         var toe = tableAndFigTOC.equations;
@@ -473,7 +441,7 @@ function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templ
         var coverTemplateElement = angular.element(coverTemplateString);
         var cover = '';
         if (!genCover && isDoc) {
-            cover = printElementCopy.find("mms-view[mms-vid='" + ob.sysmlId + "']");
+            cover = printElementCopy.find("mms-view[mms-vid='" + viewOrDocOb.sysmlId + "']");
             cover.remove();
             cover = cover[0].outerHTML;
         }
@@ -486,20 +454,23 @@ function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templ
         var dnum = '';
         var version = '';
         var tagname = '';
-        if (tag)
-            tagname = tag.name;
+        if (refOb)
+            tagname = refOb.name;
         if (!isDoc) {
             deferred.resolve({cover: cover, contents: printContents, header: header, footer: footer, displayTime: displayTime, dnum: dnum, version: version, toc: toc, tag: tagname, tof: tof, tot: tot, toe: toe});
             return deferred.promise;
         }
-        ViewService.getDocMetadata(ob.sysmlId, ws, null, 2)
-        .then(function(metadata) {
+        ViewService.getDocMetadata({
+            elementId: viewOrDocOb.sysmlId,
+            projectId: viewOrDocOb._projectId,
+            refId: viewOrDocOb._refId
+        }, 2).then(function(metadata) {
             //useCover = true;
             newScope.meta = metadata;
-            newScope.tag = tag;
-            newScope.time = time === 'latest' ? new Date() : time;
+            newScope.tag = refOb;
+            newScope.time = !refOb.isTag ? new Date() : refOb._timestamp;
             displayTime = $filter('date')(newScope.time, 'M/d/yy h:mm a');
-            newScope.meta.title = ob.name;
+            newScope.meta.title = viewOrDocOb.name;
             header = metadata.header ? metadata.header : header;
             footer = metadata.footer ? metadata.footer : footer;
             if (metadata.dnumber)
@@ -518,7 +489,7 @@ function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templ
         return deferred.promise;
     };
 
-    var handleChildViews = function(v, aggr, ws, time, curItemFunc, childrenFunc, seen) {
+    var handleChildViews = function(v, aggr, projectId, refId, curItemFunc, childrenFunc, seen) {
         var seenViews = seen;
         if (!seenViews)
             seenViews = {};
@@ -537,8 +508,12 @@ function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templ
             childIds.push(v._childViews[i].id);
             childAggrs.push(v._childViews[i].aggregation);
         }
-        ElementService.getElements(childIds, false, ws, time, 2)
-        .then(function(childViews) {
+        ElementService.getElements({
+            elementIds: childIds, 
+            extended: true,
+            projectId: projectId,
+            refId: refId
+        }, 2).then(function(childViews) {
             var mapping = {};
             for (var i = 0; i < childViews.length; i++) {
                 mapping[childViews[i].sysmlId] = childViews[i];
@@ -547,7 +522,7 @@ function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templ
             for (i = 0; i < childIds.length; i++) {
                 var child = mapping[childIds[i]];
                 if (child) //what if not found??
-                    childPromises.push(handleChildViews(child, childAggrs[i], ws, time, curItemFunc, childrenFunc, seenViews));
+                    childPromises.push(handleChildViews(child, childAggrs[i], projectId, refId, curItemFunc, childrenFunc, seenViews));
             }
             $q.all(childPromises).then(function(childNodes) {
                 childrenFunc(curItem, childNodes);
@@ -556,7 +531,6 @@ function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templ
             }, function(reason) {
                 deferred.reject(reason);
             });
-
         }, function(reason) {
             deferred.reject(reason);
         });

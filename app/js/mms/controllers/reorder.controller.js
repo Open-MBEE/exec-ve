@@ -3,16 +3,15 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('ReorderCtrl', ['$scope', '$rootScope', '$stateParams', 'document', 'commit', 'ElementService', 'ViewService', 'MmsAppUtils', '$state', 'growl', '$q', '_',
-function($scope, $rootScope, $stateParams, document, commit, ElementService, ViewService, MmsAppUtils, $state, growl, $q, _) {
-    $scope.doc = document;
-    var ws = $stateParams.workspace;
+.controller('ReorderCtrl', ['$scope', '$rootScope', 'documentOb', 'ElementService', 'ViewService', 'MmsAppUtils', '$state', 'growl', '$q', '_',
+function($scope, $rootScope, documentOb, ElementService, ViewService, MmsAppUtils, $state, growl, $q, _) {
+    $scope.doc = documentOb;
 
     var viewIds2node = {};
     var origViews = {};
-    viewIds2node[document.sysmlId] = {
-        name: document.name,
-        id: document.sysmlId,
+    viewIds2node[documentOb.sysmlId] = {
+        name: documentOb.name,
+        id: documentOb.sysmlId,
         aggr: 'composite',
         children: []
     };
@@ -58,7 +57,7 @@ function($scope, $rootScope, $stateParams, document, commit, ElementService, Vie
             };
             viewIds2node[v.sysmlId] = curNode;
         }
-        origViews[v.sysmlId] = _.cloneDeep(v);
+        origViews[v.sysmlId] = JSON.parse(JSON.stringify(v));
         return curNode;
     }
 
@@ -74,7 +73,8 @@ function($scope, $rootScope, $stateParams, document, commit, ElementService, Vie
         curNode.children.push.apply(curNode.children, newChildNodes);
     }
 
-    MmsAppUtils.handleChildViews(document, 'composite', ws, commit, handleSingleView, handleChildren)
+    MmsAppUtils.handleChildViews(documentOb, 'composite', documentOb._projectId, 
+        documentOb._refId, handleSingleView, handleChildren)
     .then(function(docNode) {
         var num = 1;
         docNode.children.forEach(function(node) {
@@ -92,7 +92,7 @@ function($scope, $rootScope, $stateParams, document, commit, ElementService, Vie
             growl.info("please wait");
             return;
         }
-        if ($scope.tree.length > 1 || $scope.tree[0].id !== document.sysmlId) {
+        if ($scope.tree.length > 1 || $scope.tree[0].id !== documentOb.sysmlId) {
             growl.error('Views cannot be re-ordered outside the context of the current document.');
             return;
         }
@@ -118,14 +118,16 @@ function($scope, $rootScope, $stateParams, document, commit, ElementService, Vie
                     _read: orig._read,
                     _modified: orig._modified,
                     _childViews: childViews,
+                    _projectId: orig._projectId,
+                    _refId: orig._refId,
                     type: orig.type
                 });
             }
         });
-        ElementService.updateElements(toSave, ws)
+        ElementService.updateElements(toSave)
         .then(function() {
             growl.success('Reorder Successful');
-            $state.go('workspace.site.document', {}, {reload:true});
+            $state.go('project.ref.document', {}, {reload:true});
         }, function(reason) {
             if (reason.status === 409)
                 growl.error("There's a conflict in the views you're trying to change!");
@@ -138,14 +140,14 @@ function($scope, $rootScope, $stateParams, document, commit, ElementService, Vie
     };
     
     $scope.cancel = function() {
-        var curBranch = $rootScope.mms_treeApi.get_selected_branch();
+        var curBranch = $rootScope.ve_treeApi.get_selected_branch();
         if (!curBranch)
-            $state.go('workspace.site.document', {}, {reload:true});
+            $state.go('project.ref.document', {}, {reload:true});
         else {
             var goToId = curBranch.data.sysmlId;
             if (curBranch.type === 'section')
-                goToId = curBranch.view;
-            $state.go('workspace.site.document.view', {view: goToId});
+                goToId = curBranch.viewId;
+            $state.go('project.ref.document.view', {viewId: goToId});
         }
     };
 }]);

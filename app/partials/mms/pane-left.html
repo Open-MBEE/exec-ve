@@ -30,7 +30,7 @@
              <a class="btn btn-success btn-xs" ng-click="compare()">COMPARE <i ng-show="comparing" class="fa fa-spin fa-spinner"></i></a>
           </div>
         -->
-        <mms-tree ng-show="'showTree'==(activeMenu)" search="treeFilter.search" tree-data="my_data" section-numbering="treeSectionNumbering" tree-control="treeApi" on-select="my_tree_handler(branch)" on-dblclick="dblclick_tree_handler(branch)" expand-level="{{treeExpandLevel}}" initial-selection="{{mms_treeInitial}}" options="tree_options"></mms-tree>
+        <mms-tree ng-show="'showTree'==(activeMenu)" search="treeFilter.search" tree-data="treeData" section-numbering="treeSectionNumbering" tree-control="treeApi" on-select="treeClickHandler(branch)" on-dblclick="treeDblclickHandler(branch)" expand-level="{{treeExpandLevel}}" initial-selection="{{ve_treeInitial}}" options="treeOptions"></mms-tree>
 
         <div data-ng-repeat="view in ::treeViewModes" ng-show="view.id==(activeMenu)">
             <h5 style="margin: 3px 0px 3px 10px;">List of {{view.title}}</h5>
