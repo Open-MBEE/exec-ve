@@ -12,7 +12,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
 
     $rootScope.mms_refOb = refOb;
     $rootScope.mms_bbApi = $scope.bbApi = {};
-    $rootScope.mms_treeApi = $scope.treeApi = {};
+    $rootScope.ve_treeApi = $scope.treeApi = {};
     if (!$rootScope.veTreeShowPe)
         $rootScope.veTreeShowPe = false;
     $scope.buttons = [];
@@ -236,12 +236,12 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     $scope.mergeAssist = function() {
         $rootScope.mergeInfo = {
             pane: 'fromToChooser',
-            tree_rows: $rootScope.mms_treeApi.get_rows()
+            tree_rows: $rootScope.ve_treeApi.get_rows()
         };
 
         for (var rowItem in $rootScope.mergeInfo.tree_rows){
-            if($rootScope.mms_treeApi.get_parent_branch($rootScope.mergeInfo.tree_rows[rowItem].branch) !== null){
-                $rootScope.mergeInfo.tree_rows[rowItem].parentInfo = $rootScope.mms_treeApi.get_parent_branch($rootScope.mergeInfo.tree_rows[rowItem].branch);
+            if($rootScope.ve_treeApi.get_parent_branch($rootScope.mergeInfo.tree_rows[rowItem].branch) !== null){
+                $rootScope.mergeInfo.tree_rows[rowItem].parentInfo = $rootScope.ve_treeApi.get_parent_branch($rootScope.mergeInfo.tree_rows[rowItem].branch);
             } else {
                 $rootScope.mergeInfo.tree_rows[rowItem].parentInfo = null;
             }
@@ -538,12 +538,12 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     $scope.treeDblclickHandler = function(branch) {
         if ($state.includes('project.ref') && !$state.includes('project.ref.document')) {
             if (branch.type === 'group')
-                $rootScope.mms_treeApi.expand_branch(branch);
+                $rootScope.ve_treeApi.expand_branch(branch);
             else if (branch.type === 'view' || branch.type === 'snapshot') {
                 $state.go('project.ref.document', {documentId: branch.data.sysmlId, search: undefined});
             }
         } else if ($state.includes('project.ref.document')) {
-            $rootScope.mms_treeApi.expand_branch(branch);
+            $rootScope.ve_treeApi.expand_branch(branch);
         }
     };
 
@@ -1082,6 +1082,6 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
 
     //TODO refresh table and fig list when new item added, deleted or reordered
     $scope.user_clicks_branch = function(branch) {
-        $rootScope.mms_treeApi.user_clicks_branch(branch);
+        $rootScope.ve_treeApi.user_clicks_branch(branch);
     };
 }]);
