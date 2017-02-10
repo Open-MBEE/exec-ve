@@ -10,6 +10,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     UxService, ElementService, UtilsService, ViewService, ProjectService, MmsAppUtils, documentOb, viewOb,
     orgOb, projectOb, refOb, refObs, groupObs, documentObs) {
 
+    $rootScope.mms_refOb = refOb;
     $rootScope.mms_bbApi = $scope.bbApi = {};
     $rootScope.mms_treeApi = $scope.treeApi = {};
     if (!$rootScope.veTreeShowPe)
@@ -23,11 +24,10 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         $scope.treeSectionNumbering = true;
         $scope.treeExpandLevel = 3;
     }
-    $rootScope.mms_fullDocMode = false;
+    $rootScope.ve_fullDocMode = false;
     if ($state.includes('project.ref.document.full'))
-        $rootScope.mms_fullDocMode = true;
+        $rootScope.ve_fullDocMode = true;
     $scope.treeFilter = {search: ''};
-
     var docEditable = documentOb && documentOb._editable && refOb && !refOb.isTag && UtilsService.isView(documentOb);
 
     var wsPerms = refOb.workspaceOperationsPermission; //TODO still needed?
@@ -59,7 +59,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             $scope.bbApi.setPermission("tree-add-view", docEditable);
             $scope.bbApi.setPermission("tree-reorder-view", docEditable);
             $scope.bbApi.setPermission("tree-delete-view", docEditable);
-            if ($rootScope.mms_fullDocMode) {
+            if ($rootScope.ve_fullDocMode) {
                 $scope.bbApi.setToggleState('tree-full-document', true);
             }
         }
@@ -110,7 +110,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     });
 
     $scope.$on('tree-reorder-view', function() {
-        $rootScope.mms_fullDocMode = false;
+        $rootScope.ve_fullDocMode = false;
         $scope.bbApi.setToggleState("tree-full-document", false);
         $state.go('project.ref.document.order', {search: undefined});
     });
@@ -136,17 +136,17 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         id: 'table',
         title: 'Tables',
         icon: 'fa-table',
-        branchList: $scope.tableList,
+        branchList: $scope.tableList
     }, {
         id: 'figure',
         title: 'Figures',
         icon: 'fa-image',
-        branchList: $scope.figureList,
+        branchList: $scope.figureList
     }, {
         id: 'equation',
         title: 'Equations',
         icon: 'fa-superscript',
-        branchList: $scope.equationList,
+        branchList: $scope.equationList
     }];
 
     var toggle = function (id) {
@@ -234,9 +234,9 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     };
     /* //TODO refactor merge
     $scope.mergeAssist = function() {
-	    $rootScope.mergeInfo = {
-	      pane: 'fromToChooser',
-	      tree_rows: $rootScope.mms_treeApi.get_rows()
+        $rootScope.mergeInfo = {
+            pane: 'fromToChooser',
+            tree_rows: $rootScope.mms_treeApi.get_rows()
         };
 
         for (var rowItem in $rootScope.mergeInfo.tree_rows){
@@ -246,10 +246,10 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 $rootScope.mergeInfo.tree_rows[rowItem].parentInfo = null;
             }
         }
-                
+
         var modalInstance = $uibModal.open({
-	        templateUrl: 'partials/mms/merge_assistant.html',
-	        controller: 'WorkspaceMergeAssistant'
+            templateUrl: 'partials/mms/merge_assistant.html',
+            controller: 'WorkspaceMergeAssistant'
         });
     };
 
@@ -305,8 +305,8 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         refNode.loading = true;
         ProjectService.getConfigs().then (function (data) {
             data.forEach(function (config) {
-                var configTreeNode = { 
-                    label : config.name, 
+                var configTreeNode = {
+                    label : config.name,
                     type : "configuration",
                     data : config, 
                     workspace: refOb.id,
@@ -320,13 +320,11 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                     if (childWorkspaceTreeNode.type === 'workspace') {
                         if (childWorkspaceTreeNode.data.branched === config.commitId) {
                             configTreeNode.children.push(childWorkspaceTreeNode);
-                            
                             refNode.children.splice(i, 1);
                             i--;
                         }
                     }
                 }
-
                 refNode.children.unshift(configTreeNode); 
             });
             refNode.loading = false;
@@ -521,7 +519,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             var viewId = (branch.type !== 'view') ? branch.viewId : branch.data.sysmlId;
             var sectionId = branch.type === 'section' ? branch.data.sysmlId : null;
             var hash = branch.data.sysmlId;
-            if ($rootScope.mms_fullDocMode) {
+            if ($rootScope.ve_fullDocMode) {
                 $location.hash(hash);
                 $anchorScroll();
             } else if (branch.type === 'view' || branch.type === 'section') {
@@ -594,8 +592,8 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     }, 5000);
 
     $scope.fullDocMode = function() {
-        if ($rootScope.mms_fullDocMode) {
-            $rootScope.mms_fullDocMode = false;
+        if ($rootScope.ve_fullDocMode) {
+            $rootScope.ve_fullDocMode = false;
             $scope.bbApi.setToggleState("tree-full-document", false);
             var curBranch = $scope.treeApi.get_selected_branch();
             if (curBranch) {
@@ -611,7 +609,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 $state.go('project.ref.document.view', {viewId: viewId, search: undefined});
             }
         } else {
-            $rootScope.mms_fullDocMode = true;
+            $rootScope.ve_fullDocMode = true;
             $scope.bbApi.setToggleState("tree-full-document", true);
             $state.go('project.ref.document.full', {search: undefined}); 
         }
@@ -732,11 +730,11 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 MmsAppUtils.handleChildViews(data, $scope.newViewAggr.type, projectOb.id, refOb.id, handleSingleView, handleChildren)
                   .then(function(node) {
                       // handle full doc mode
-                      if ($rootScope.mms_fullDocMode)
+                      if ($rootScope.ve_fullDocMode)
                           addToFullDocView(node, curNum, newbranch.data.sysmlId);
                       addViewSectionsRecursivelyForNode(node);
                 });
-                if (!$rootScope.mms_fullDocMode) 
+                if (!$rootScope.ve_fullDocMode) 
                     $state.go('project.ref.document.view', {viewId: data.sysmlId, search: undefined});
                 else {
                     if (prevBranch) {
@@ -923,7 +921,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             if ($state.includes('project.ref') && !$state.includes('project.ref.document')) {
                 return;
             }
-            if ($rootScope.mms_fullDocMode) {
+            if ($rootScope.ve_fullDocMode) {
                 $state.go('project.ref.document.full', {search: undefined});
                 $state.reload();
             } else {
@@ -1033,7 +1031,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             viewId: viewId,
             data: instanceSpec,
             hide: !$rootScope.veTreeShowPe && elemType !== 'section',
-            children: [],
+            children: []
         };
         var i = 0;
         var lastSection = -1;
