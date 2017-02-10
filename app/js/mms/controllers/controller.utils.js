@@ -30,10 +30,10 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
                     instanceId: elementOb.sysmlId,
                     type: "InstanceValue",
                 };
-                ViewService.addElementToViewOrSection($scope.viewOrSection, instanceVal).
+                ViewService.addElementToViewOrSection($scope.viewOrSectionOb, instanceVal).
                 then(function(data) {
                     // Broadcast message to TreeCtrl:
-                    $rootScope.$broadcast('viewctrl.add.element', elementOb, $scope.presentationElemType.toLowerCase(), $scope.viewOrSection);
+                    $rootScope.$broadcast('viewctrl.add.element', elementOb, $scope.presentationElemType.toLowerCase(), $scope.viewOrSectionOb);
                     growl.success("Adding "+$scope.presentationElemType+"  Successful");
                     $uibModalInstance.close(data);
                 }, function(reason) {
@@ -83,10 +83,10 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
             }
             $scope.oking = true;
 
-            ViewService.createInstanceSpecification($scope.viewOrSection, $scope.presentationElemType, $scope.newPe.name).
+            ViewService.createInstanceSpecification($scope.viewOrSectionOb, $scope.presentationElemType, $scope.newPe.name).
             then(function(data) {
                 var elemType = $scope.presentationElemType.toLowerCase();
-                $rootScope.$broadcast('viewctrl.add.element', data, elemType, $scope.viewOrSection);
+                $rootScope.$broadcast('viewctrl.add.element', data, elemType, $scope.viewOrSectionOb);
                 $rootScope.$broadcast('view-reorder.refresh');
                 growl.success("Adding "+$scope.presentationElemType+"  Successful");
                 $uibModalInstance.close(data);
