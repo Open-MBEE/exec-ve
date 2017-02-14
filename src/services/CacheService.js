@@ -57,7 +57,7 @@ function CacheService(_) {
         for (var key in cache) {
             if (!cache.hasOwnProperty(key)) 
                 continue;
-            if (key.indexOf('|latest') >= 0 && key.indexOf('elements|') >= 0 && 
+            if (key.indexOf('|latest') >= 0 && key.indexOf('element|') >= 0 && 
                     key.indexOf(refId) >= 0 && key.indexOf(projectId) >= 0) {
                 var val = get(key);
                 if (val)

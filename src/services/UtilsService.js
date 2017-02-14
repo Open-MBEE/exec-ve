@@ -113,9 +113,8 @@ function UtilsService($q, $http, CacheService, URLService, _) {
 
         // make first pass to create all nodes
         array.forEach(function(data) {
-            data2Node[data[id]] = 
-            { 
-                label : data.name, 
+            data2Node[data[id]] = { 
+                label : data.name || data._name, 
                 type : type,
                 data : data, 
                 children : [] 
@@ -135,26 +134,21 @@ function UtilsService($q, $http, CacheService, URLService, _) {
         });
         
         // Recursive function which sets the level of all nodes passed
-        var determineLevelOfNodes = function(nodes, initialLevel)
-        {
-	        nodes.forEach(function(node)
-	        {
-		        node.level = initialLevel;
-		        if(node.children && node.children.length > 0)
-		        {
-			        determineLevelOfNodes(node.children, initialLevel + 1);
-		        }
-	        });
+        var determineLevelOfNodes = function(nodes, initialLevel) {
+            nodes.forEach(function(node) {
+                node.level = initialLevel;
+                if (node.children && node.children.length > 0) {
+                    determineLevelOfNodes(node.children, initialLevel + 1);
+                }
+            });
         };
-        
         determineLevelOfNodes(rootNodes, 1);
 
         // Get documents and apply them to the tree structure
         if (level2_Func) {
-            
             array.forEach(function(data) {
                 var level1_parentNode = data2Node[data[id]];
-                level2_Func(data[id], level1_parentNode);
+                level2_Func(data, level1_parentNode);
             });
         }
 
@@ -165,10 +159,7 @@ function UtilsService($q, $http, CacheService, URLService, _) {
             if(a.label.toLowerCase() > b.label.toLowerCase()) return 1;
             return 0;
         };
-
-        // sort root notes
         rootNodes.sort(sortFunction);
-
         return rootNodes;
     };
 

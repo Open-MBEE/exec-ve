@@ -289,7 +289,7 @@ function UxService($rootScope) {
       t = "unknown";
     t = t.toLowerCase();
     switch (t) {
-      case "configuration":
+      case "tag":
         return "fa-tag";
       case "connector":
         return "fa-expand";
@@ -307,7 +307,7 @@ function UxService($rootScope) {
         return "fa-folder";
       case "section":
         return "fa-square-o";//"fa-file-o";
-      case "site":
+      case "group":
         return "fa-folder";
       case "snapshot":
         return "fa-camera";
@@ -319,7 +319,7 @@ function UxService($rootScope) {
         return "fa-file-o";
       case "view-none":
         return "fa-file-o";
-      case "workspace":
+      case "branch":
         return "fa-tasks";
       case "table":
         return "fa-table";
