@@ -3,18 +3,18 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('TreeCtrl', ['$anchorScroll' , '$q', '$filter', '$location', '$uibModal', '$scope', '$rootScope', '$state', '$stateParams', '$compile','$timeout', 'growl', 
+.controller('TreeCtrl', ['$anchorScroll' , '$q', '$filter', '$location', '$uibModal', '$scope', '$rootScope', '$state', '$stateParams', '$compile','$timeout', 'growl',
                           'UxService', 'ConfigService', 'ElementService', 'UtilsService', 'WorkspaceService', 'ViewService', 'MmsAppUtils',
                           'workspaces', 'workspaceObj', 'tag', 'sites', 'site', 'document', 'views', 'view', 'time', 'configSnapshots', 'docFilter', 'mmsRootSites',
 function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $stateParams, $compile, $timeout, growl, UxService, ConfigService, ElementService, UtilsService, WorkspaceService, ViewService, MmsAppUtils, workspaces, workspaceObj, tag, sites, site, document, views, view, time, configSnapshots, docFilter, mmsRootSites) {
-
+  $rootScope.mms_tag = tag;
     $rootScope.mms_bbApi = $scope.bbApi = {};
     $rootScope.mms_treeApi = $scope.treeApi = {};
     if (!$rootScope.veTreeShowPe)
         $rootScope.veTreeShowPe = false;
     $scope.buttons = [];
     $scope.treeExpandLevel = 1;
-    if ($state.includes('workspace.sites') && !$state.includes('workspace.site.document')) 
+    if ($state.includes('workspace.sites') && !$state.includes('workspace.site.document'))
         $scope.treeExpandLevel = 0;
     $scope.treeSectionNumbering = false;
     if ($state.includes('workspace.site.document')) {
@@ -268,7 +268,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         $scope.my_data = UtilsService.buildTreeHierarchy(filter_sites(sites), "sysmlid", "site", "parent", siteInitFunc);
         $scope.mms_treeApi.clear_selected_branch();
     };
-    
+
     $scope.mergeAssist = function() {
 	    $rootScope.mergeInfo = {
 	      pane: 'fromToChooser',
@@ -282,7 +282,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 $rootScope.mergeInfo.tree_rows[rowItem].parentInfo = null;
             }
         }
-                
+
         var modalInstance = $uibModal.open({
 	        templateUrl: 'partials/mms/merge_assistant.html',
 	        controller: 'WorkspaceMergeAssistant'
@@ -361,26 +361,26 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         }
         for (i = 0; i < site_array.length; i++) {
             var obj = site_array[i];
-            if ((($scope.bbApi.getToggleState && $scope.bbApi.getToggleState('tree-showall-sites')) || 
-                    obj.isCharacterization) && 
+            if ((($scope.bbApi.getToggleState && $scope.bbApi.getToggleState('tree-showall-sites')) ||
+                    obj.isCharacterization) &&
                     isSiteInProject(sitesMapping, obj)) {
                 ret_array.push(obj);
             }
         }
         return ret_array;
     };
- 
+
     // TODO: Make this section generic
     var workspaceLevel2Func = function(workspaceId, workspaceTreeNode) {
         workspaceTreeNode.loading = true;
         ConfigService.getConfigs(workspaceId).then (function (data) {
             data.forEach(function (config) {
-                var configTreeNode = { 
-                    label : config.name, 
+                var configTreeNode = {
+                    label : config.name,
                     type : "configuration",
-                    data : config, 
+                    data : config,
                     workspace: workspaceId,
-                    children : [] 
+                    children : []
                 };
 
                 // check all the children of the workspace to see if any tasks match the timestamp of the config
@@ -390,14 +390,14 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                     if (childWorkspaceTreeNode.type === 'workspace') {
                         if (childWorkspaceTreeNode.data.branched === config.timestamp) {
                             configTreeNode.children.push(childWorkspaceTreeNode);
-                            
+
                             workspaceTreeNode.children.splice(i, 1);
                             i--;
                         }
                     }
                 }
 
-                workspaceTreeNode.children.unshift(configTreeNode); 
+                workspaceTreeNode.children.unshift(configTreeNode);
             });
             workspaceTreeNode.loading = false;
             if ($scope.treeApi.refresh)
@@ -416,7 +416,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         if(siteNode.docsLoaded || siteNode.type !== 'site') return;
         // Set docs loaded attribute
         siteNode.docsLoaded = true;
-        
+
         siteNode.loading = true;
         ViewService.getSiteDocuments(site, false, ws, config === 'latest' ? 'latest' : tag.timestamp, 2)
         .then(function(docs) {
@@ -427,7 +427,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             var filteredDocs = {};
             if (docFilter)
                 filteredDocs = JSON.parse(docFilter.documentation);
-            
+
                 if (config === 'latest') {
                     docs.forEach(function(doc) {
                         if (filteredDocs[doc.sysmlid])
@@ -469,7 +469,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             growl.error(reason.message);
         });
     };
-    
+
     var viewId2node = {};
     var seenViewIds = {};
     var handleSingleView = function(v, aggr) {
@@ -510,7 +510,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         }
     };
     if ($state.includes('workspaces') && !$state.includes('workspace.sites')) {
-        $scope.my_data = UtilsService.buildTreeHierarchy(workspaces, "id", 
+        $scope.my_data = UtilsService.buildTreeHierarchy(workspaces, "id",
                                                          "workspace", "parent", workspaceLevel2Func);
     } else if ($state.includes('workspace.sites') && !$state.includes('workspace.site.document')) {
         $scope.my_data = UtilsService.buildTreeHierarchy(filter_sites(sites), "sysmlid", "site", "parent", siteInitFunc);
@@ -526,11 +526,11 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 aggr: 'COMPOSITE'
             };
             views.forEach(function(view) {
-                var viewTreeNode = { 
-                    label : view.name, 
+                var viewTreeNode = {
+                    label : view.name,
                     type : "view",
-                    data : view, 
-                    children : [], 
+                    data : view,
+                    children : [],
                     loading: false,
                     aggr: 'COMPOSITE'
                 };
@@ -578,12 +578,12 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
 
         var addContainsSectionTreeNode = function(containedElement) {
            if (containedElement.type === "Section") {
-                var sectionTreeNode = { 
-                    label : containedElement.name, 
+                var sectionTreeNode = {
+                    label : containedElement.name,
                     type : "section",
                     view : viewNode.data.sysmlid,
-                    data : containedElement, 
-                    children : [] 
+                    data : containedElement,
+                    children : []
                 };
                 parentNode.children.unshift(sectionTreeNode);
                 addSectionElements(containedElement, viewNode, sectionTreeNode);
@@ -652,7 +652,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         };
 
         if (element.specialization) {
-          
+
             if (element.specialization.contents) {
                 contents = element.specialization.contents;
             }
@@ -769,7 +769,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         $scope.tree_options.sort = sortFunction;
     if ($state.includes('workspace.sites') && !$state.includes('workspace.site.document'))
         $scope.tree_options.expandCallback = siteLevel2Func;
-    // TODO: this is a hack, need to resolve in alternate way    
+    // TODO: this is a hack, need to resolve in alternate way
     $timeout(function() {
         $scope.treeApi.refresh();
     }, 5000);
@@ -784,7 +784,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         var branch = $scope.treeApi.get_selected_branch();
         var templateUrlStr = "";
         var branchType = "";
-        
+
         // Adds the branch:
         var myAddBranch = function() {
             var instance = $uibModal.open({
@@ -799,7 +799,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                     data: data,
                     children: []
                 };
-                
+
                 var top = false;
                 if (itemType === 'Tag') {
                     newbranch.workspace = branch.data.id;
@@ -840,7 +840,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                               addToFullDocView(node, curNum, newbranch.data.sysmlid);
                           addViewSectionsRecursivelyForNode(node);
                     });
-                    if (!$rootScope.mms_fullDocMode) 
+                    if (!$rootScope.mms_fullDocMode)
                         $state.go('workspace.site.document.view', {view: data.sysmlid, search: undefined});
                     else {
                         if (prevBranch) {
@@ -885,7 +885,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             $scope.configuration.now = true;
             templateUrlStr = 'partials/mms/new-tag.html';
             branchType = 'configuration';
-        } 
+        }
         else if (itemType === 'Document') {
             if (!branch || branch.type !== 'site') {
                 growl.warning("Select a site to add document under");
@@ -894,7 +894,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             $scope.addDocSite = branch.data.sysmlid;
             templateUrlStr = 'partials/mms/new-doc.html';
             branchType = 'view';
-        } 
+        }
         else if (itemType === 'View') {
             if (document.specialization && document.specialization.view2view && document.specialization.view2view.length > 0) {
                 growl.warning("Add View Error: This document hierarchy has not been migrated to support adding views.");
@@ -919,8 +919,8 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             //        if (!angular.equals(document.specialization.view2view, status.server.specialization.view2view)) {
             //            growl.error('The document hierarchy is outdated, refresh the page first!');
             //            return;
-            //        } 
-            //    } 
+            //        }
+            //    }
                 $scope.createViewParentId = branch.data.sysmlid;
                 $scope.createViewParent = branch.data;
                 $scope.newView = {};
@@ -931,7 +931,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             //}, function(reason) {
             //    growl.error('Checking if document hierarchy is up to date failed: ' + reason.message);
             //});
-        } 
+        }
         else {
             growl.error("Add Item of Type " + itemType + " is not supported");
         }
@@ -961,7 +961,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         } else {
             $rootScope.mms_fullDocMode = true;
             $scope.bbApi.setToggleState("tree-full-document", true);
-            $state.go('workspace.site.document.full', {search: undefined}); 
+            $state.go('workspace.site.document.full', {search: undefined});
         }
     };
 
@@ -971,8 +971,8 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             growl.warning("Delete Error: Select item to delete.");
             return;
         }
-        if ($state.includes('workspace.site.document')) { 
-            if (branch.type !== 'view' || (branch.data.specialization && 
+        if ($state.includes('workspace.site.document')) {
+            if (branch.type !== 'view' || (branch.data.specialization &&
                     branch.data.specialization.type !=='View' && branch.data.specialization.type !== 'Product')) {
                 growl.warning("Delete Error: Selected item is not a view.");
                 return;
@@ -1071,7 +1071,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         };
     };
 
-    // Generic add controller    
+    // Generic add controller
     var addItemCtrl = function($scope, $uibModalInstance, $filter) {
         $scope.createForm = true;
         $scope.oking = false;
@@ -1113,7 +1113,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         var searchFilter = function(results) {
             var views = [];
             for (var i = 0; i < results.length; i++) {
-                if (results[i].specialization && 
+                if (results[i].specialization &&
                         (results[i].specialization.type === 'View' || results[i].specialization.type === 'Product')) {
                     views.push(results[i]);
                     if (results[i].properties)
@@ -1122,7 +1122,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             }
             return views;
         };
-       
+
         $scope.addView = function(elem) {
             var viewId = elem.sysmlid;
             if (seenViewIds[viewId]) {
@@ -1139,11 +1139,11 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 growl.info("Please wait...");
                 return;
             }
-            $scope.oking = true;  
+            $scope.oking = true;
 
             ViewService.getView(viewId, false, workspace)
             .then(function (data) {
-                
+
                 var viewOb = data;
 
                 ViewService.addViewToParentView(viewId, documentId, parentViewId, $scope.newViewAggr.type, workspace, viewOb)
@@ -1154,13 +1154,13 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                     growl.error("View Add Error: " + reason.message);
                 }).finally(function() {
                     $scope.oking = false;
-                }); 
+                });
 
             }, function(reason) {
                 growl.error("View Add Error: " + reason.message);
             }).finally(function() {
                 $scope.oking = false;
-            });             
+            });
         };
 
         $scope.searchOptions = {};
@@ -1196,7 +1196,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             }
             else if ($scope.itemType === 'View') {
                 $scope.newViewAggr.type = "COMPOSITE";
-                promise = ViewService.createView($scope.createViewParent, $scope.newView.name, 
+                promise = ViewService.createView($scope.createViewParent, $scope.newView.name,
                                                  $scope.document.sysmlid, ws);
             }
             else {
@@ -1205,7 +1205,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 return;
             }
 
-            
+
             // Handle the promise:
             promise
             .then(function(data) {
@@ -1301,7 +1301,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         if (lastSection == -1 && !childViewFound) //case when first child is view
             lastSection = branch.children.length-1;
         branch.children.splice(lastSection+1, 0, newbranch);
-        if (elemType == 'section') 
+        if (elemType == 'section')
             addSectionElements(instanceSpec, viewNode, newbranch);
 
         $scope.treeApi.refresh();

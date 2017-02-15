@@ -202,6 +202,7 @@ module.exports = function(grunt) {
       beforeconcat: jsFiles,
       afterconcat: ['dist/mms.js', 'dist/mms.directives.js'],
       options: {
+        reporterOutput: '',
         evil: true, //allow eval for timely integration
         globalstrict: true,
         globals: {
@@ -277,7 +278,7 @@ module.exports = function(grunt) {
         options: {
           publish: [{
             id: 'gov.nasa.jpl:evm:zip',
-            version: '2.4.3.europa',
+            version: '2.5.0.europa',
             path: 'deploy/'
           }]
         }

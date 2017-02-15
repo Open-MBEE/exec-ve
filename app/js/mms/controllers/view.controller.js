@@ -5,7 +5,7 @@
 angular.module('mmsApp')
 .controller('ViewCtrl', ['$scope', '$rootScope', '$state', '$stateParams', '$timeout', '$uibModal', '$window', 'viewElements', 'MmsAppUtils', 'ElementService', 'ViewService', 'ConfigService', 'time', 'search', 'growl', 'workspace', 'site', 'document', 'view', 'tag', 'snapshot', 'UxService', 'hotkeys', '$element',
 function($scope, $rootScope, $state, $stateParams, $timeout, $uibModal, $window, viewElements, MmsAppUtils, ElementService, ViewService, ConfigService, time, search, growl, workspace, site, document, view, tag, snapshot, UxService, hotkeys, $element) {
-    
+
     function searchLoading() {
         if ($element.find('.isLoading').length > 0) {
             growl.warning("Still loading!");
@@ -20,7 +20,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $uibModal, $window,
         $rootScope.mms_showSiteDocLink = false;
     }
 
-    // show the tag descriptions if document is null 
+    // show the tag descriptions if document is null
     $rootScope.mms_showTagDescriptionFix = false;
     if ($state.includes('workspace') && !$state.includes('workspace.sites')) {
         // if document is null, and there is a tag, then save the tag to be used for
@@ -35,7 +35,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $uibModal, $window,
     $scope.showFilter = false;
     if ($state.current.name === 'workspace.site')
         $scope.showFilter = true;
-    
+
     $scope.vidLink = false;
     if ($state.includes('workspace.site.documentpreview')) {
         $scope.vidLink = true;
@@ -80,14 +80,14 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $uibModal, $window,
                 $scope.bbApi.addButton(UxService.getButtonBarButton('view-add-dropdown'));
             } else {
                 var fakeDropdown = {
-                    id: 'view-add-dropdown-fake', 
-                    icon: 'fa-plus', 
-                    selected: true, 
-                    active: true, 
-                    permission: true, 
-                    tooltip: 'Add New Element Disabled', 
-                    spinner: false, 
-                    togglable: false, 
+                    id: 'view-add-dropdown-fake',
+                    icon: 'fa-plus',
+                    selected: true,
+                    active: true,
+                    permission: true,
+                    tooltip: 'Add New Element Disabled',
+                    spinner: false,
+                    togglable: false,
                     action: function() {
                         growl.warning("This view hasn't been converted to support adding new elements.");
                     }
@@ -114,7 +114,7 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $uibModal, $window,
             description: 'toggle show elements',
             callback: function() {$scope.$broadcast('show-elements');}
         });
-      
+
         if ($state.includes('workspace.site.document') || $state.includes('workspace.site.documentpreview')) {
             if ($state.includes('workspace.site.document')) {
                 $scope.bbApi.addButton(UxService.getButtonBarButton('refresh-numbering'));
@@ -264,13 +264,13 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $uibModal, $window,
         //since view can also be a "fake" view like section instance spec only set view if it's a real view,
         //otherwise other code can create things under instance specs that can't be owned by instance spec
         if (view.specialization.contains || view.specialization.contents) {
-            ViewService.setCurrentView(view); 
+            ViewService.setCurrentView(view);
         } else if (document && (document.specialization.contains || document.specialization.contents)) {
             ViewService.setCurrentView(document);
         }
         $scope.vid = view.sysmlid;
     } else {
-        $scope.vid = '';        
+        $scope.vid = '';
     }
     $scope.ws = ws;
     $scope.version = time;
@@ -353,5 +353,5 @@ function($scope, $rootScope, $state, $stateParams, $timeout, $uibModal, $window,
         var printElementCopy = angular.element("#print-div");
         MmsAppUtils.refreshNumbering($rootScope.mms_treeApi.get_rows(),printElementCopy);
     });
-    
+
 }]);
