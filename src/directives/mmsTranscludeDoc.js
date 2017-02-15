@@ -92,43 +92,35 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             e.stopPropagation();
         });
 
-        var recompile = function() {
-            if (scope.recompileScope)
+        var recompile = function(preview) {
+            if (scope.recompileScope) {
                 scope.recompileScope.$destroy();
-            scope.isEditing = false;
+            }
             element.empty();
-            var doc = scope.element.documentation;
+            var doc = preview ? scope.edit.documentation : scope.element.documentation;
             if (!doc || emptyRegex.test(doc)) {
+                if (preview) {
+                    doc = '<p class="no-print" ng-class="{placeholder: commitId!=\'latest\'}">(No ' + scope.panelType + ')</p>';
+                }
                 var p = '<span class="no-print">(No ' + scope.panelType + ')</span>';
-                if (scope.version !== 'latest')
+                if (scope.commitId !== 'latest')
                     p = '';
                 doc = '<p>' + p + '</p>';
             }
-            var fixSpan = /<span style="/; //<div style="display:inline;
+            var fixSpan = /<span style="/;
             doc = doc.replace(fixPreSpanRegex, "<mms-transclude");
             doc = doc.replace(fixPostSpanRegex, "</mms-transclude-$1>");
-            element[0].innerHTML = doc;
+            if (preview) {
+                element[0].innerHTML = '<div class="panel panel-info">'+doc+'</div>';
+            } else {
+                scope.isEditing = false;
+                element[0].innerHTML = doc;
+            }
             MathJax.Hub.Queue(["Typeset", MathJax.Hub, element[0]]);
             scope.recompileScope = scope.$new();
             $compile(element.contents())(scope.recompileScope); 
             if (mmsViewCtrl) {
                 mmsViewCtrl.elementTranscluded(scope.element);
-            }
-        };
-
-        var recompileEdit = function() {
-            if (scope.recompileScope)
-                scope.recompileScope.$destroy();
-            element.empty();
-            var doc = scope.edit.documentation;
-            if (!doc)
-                doc = '<p class="no-print" ng-class="{placeholder: commitId!=\'latest\'}">(No ' + scope.panelType + ')</p>';
-            element[0].innerHTML = '<div class="panel panel-info">'+doc+'</div>';
-            //element.append('<div class="panel panel-info">'+doc+'</div>');
-            scope.recompileScope = scope.$new();
-            $compile(element.contents())(scope.recompileScope); 
-            if (mmsViewCtrl) {
-                mmsViewCtrl.elementTranscluded(scope.edit);
             }
         };
 
@@ -203,38 +195,6 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                         }
                     });
                 }
-                // TODO: below has issues when having edits.  For some reason this is
-                //       entered twice, once and the frame is added, and then again
-                //       and recompileEdit is ran! 
-                
-                // // We cant count on scope.edit or scope.isEditing in the case that the
-                // // view name is saved while the view documenation is being edited, so
-                // // no way to know if there should be a frame or not based on that, so
-                // // get the edit object from the cache and check the editable state
-                // // and if we have any edits: 
-                // ElementService.getElementForEdit(scope.mmsElementId, false, mmsRefId)
-                // .then(function(edit) {
-
-                //     // TODO: replace with Utils.hasEdits() after refactoring to not pass in scope
-                //     //if (_.isEqual(edit, data)) {
-                //     if (edit.documentation === data.documentation) {
-                //         recompile();
-                //     }
-                //     else {
-                //         if (mmsViewCtrl && mmsViewCtrl.isEditable()) {
-                //             Utils.addFrame(scope,mmsViewCtrl,element,template);
-                //         }
-                //         else {
-                //             scope.recompileEdit = true;
-                //             recompileEdit();
-                //         }
-                //     }
-
-                // }, function(reason) {
-                //     element.html('<span class="mms-error">doc cf ' + newVal + ' not found</span>');
-                //     growl.error('Cf Doc Error: ' + reason.message + ': ' + scope.mmsElementId);
-                // });
-
             }, function(reason) {
                 var status = ' not found';
                 if (reason.status === 410)
@@ -254,10 +214,6 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             scope.isDirectChildOfPresentationElement = Utils.isDirectChildOfPresentationElementFunc(element, mmsViewCtrl);
             var type = "documentation";
 
-            var callback = function() {
-                Utils.showEditCallBack(scope,mmsViewCtrl,element,template,recompile,recompileEdit,type);
-            };
-
             scope.save = function() {
                 Utils.saveAction(scope, recompile, scope.bbApi, null, type, element);
             };
@@ -275,7 +231,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             };
 
             scope.preview = function() {
-                Utils.previewAction(scope, recompileEdit, recompile, type, element);
+                Utils.previewAction(scope, recompile, type, element);
             };
         } 
 

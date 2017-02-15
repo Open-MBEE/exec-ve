@@ -78,8 +78,9 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
             if (scope.addFrame && !scope.nonEditable)
                 scope.addFrame();
 
-            if (mmsViewCtrl)
-                mmsViewCtrl.transcludeClicked(scope.mmsElementId, scope.projectId, scope.refId, scope.commitId);
+            if (mmsViewCtrl) {
+                mmsViewCtrl.transcludeClicked(scope.element);
+            }
             if (scope.nonEditable) {
                 growl.warning("Cross Reference is not editable.");
             }
@@ -89,23 +90,29 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
         scope.addHtml = function(value) {
             value.value = "<p>" + value.value + "</p>";
         };
-        var recompile = function() {
-            if (scope.recompileScope)
+
+        var recompile = function(preview) {
+            if (scope.recompileScope) {
                 scope.recompileScope.$destroy();
-            scope.isEditing = false;
+            }
             var toCompileList = [];
             var areStrings = false;
             var isExpression = false;
-
-            for (var i = 0; i < scope.values.length; i++) {
-                if (scope.values[i].type === 'LiteralString') {
+            var values = scope.values;
+            if (preview) {
+                values = scope.editValues
+            } else {
+                scope.isEditing = false;
+            }
+            for (var i = 0; i < values.length; i++) {
+                if (values[i].type === 'LiteralString') {
                     areStrings = true;
-                    var s = scope.values[i].value;
+                    var s = values[i].value;
                     if (s.indexOf('<p>') === -1) {
                         s = s.replace('<', '&lt;');
                     }
                     toCompileList.push(s);
-                } else if (scope.values[i].type === 'Expression') {
+                } else if (values[i].type === 'Expression') {
                     isExpression = true;
                     break;
                 } else {
@@ -114,79 +121,48 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
             } 
             element.empty();
             scope.recompileScope = scope.$new();
-            if (scope.values.length === 0 || Object.keys(scope.values[0]).length < 2)
+            if (values.length === 0 || Object.keys(values[0]).length < 2) {
                 element[0].innerHTML = '<span class="no-print">' + ((scope.commitId === 'latest') ? '(no value)' : '') + '</span>';
-            else if (areStrings) {
+            } else if (areStrings) {
                 var toCompile = toCompileList.join(' ');
                 if (toCompile === '' || emptyRegex.test(toCompile)) {
                     element[0].innerHTML = '<span class="no-print">' + ((scope.commitId === 'latest') ? '(no value)' : '') + '</span>';
                     return;
                 }
-                element[0].innerHTML = toCompile;
+                if (preview) {
+                    element[0].innerHTML = '<div class="panel panel-info">'+toCompile+'</div>';
+                } else {
+                    element[0].innerHTML = toCompile;
+                }
                 MathJax.Hub.Queue(["Typeset", MathJax.Hub, element[0]]);
-                $compile(element.contents())(scope.recompileScope); 
-            } else if (UtilsService.isRestrictedValue(scope.values)) {
-                ElementService.getElement(scope.values[0].operand[1].element, false, scope.refId, scope.commitId, 2)
+                $compile(element.contents())(scope.recompileScope);
+            } else if (UtilsService.isRestrictedValue(values)) {
+                var reqOb = {elementId: values[0].operand[1].elementId, projectId: scope.projectId, refId: scope.refId, commitId: scope.commitId};
+                ElementService.getElement(reqOb, 2)
                 .then(function(e) {
                     scope.isRestrictedVal = true;
                     element[0].innerHTML = "<span>" + e.name + "</span>";
                 });
-            } else if (isExpression) {
-                $http.get(URLService.getElementURL(scope.mmsElementId, scope.refId, scope.commitId) + '&evaluate')
-                .success(function(data,status,headers,config) {
-                    element[0].innerHTML = data.elements[0].evaluationResult;
-                }).error(function(data,status,headers,config){
-                    //URLService.handleHttpStatus(data, status, headers, config, deferred);
-                    //TODO: Needs case statement when .error is thrown
-                });
+            //TODO check if this is needed or working
+            // } else if (isExpression) {
+            //     var reqOb = {elementId: scope.mmsElementId, projectId: scope.projectId, refId: scope.refId, commitId: scope.commitId};
+            //     $http.get(URLService.getElementURL(reqOb) + '&evaluate')
+            //     .success(function(data,status,headers,config) {
+            //         element[0].innerHTML = data.elements[0].evaluationResult;
+            //     }).error(function(data,status,headers,config){
+            //         //URLService.handleHttpStatus(data, status, headers, config, deferred);
+            //         //TODO: Needs case statement when .error is thrown
+            //     });
             } else {
-                element[0].innerHTML = valTemplate;
-                //element.append(valTemplate);
+                if (preview) {
+                    element[0].innerHTML = editTemplate;
+                } else {
+                    element[0].innerHTML = valTemplate;
+                }
                 $compile(element.contents())(scope.recompileScope);
             }
             if (mmsViewCtrl) {
                 mmsViewCtrl.elementTranscluded(scope.element);
-            }
-        };
-
-        var recompileEdit = function() {
-            if (scope.recompileScope)
-                scope.recompileScope.$destroy();
-            var toCompileList = [];
-            var areStrings = false;
-            for (var i = 0; i < scope.editValues.length; i++) {
-                if (scope.editValues[i].type === 'LiteralString') {
-                    areStrings = true;
-                    var s = scope.editValues[i].value;
-                    if (s.indexOf('<p>') === -1) {
-                        s = s.replace('<', '&lt;');
-                    }
-                    toCompileList.push(s);
-                } else {
-                    break;
-                }
-            } 
-            element.empty();
-            scope.recompileScope = scope.$new();
-            if (scope.editValues.length === 0 || Object.keys(scope.editValues[0]).length < 2)
-                element[0].innerHTML = '<span' + ((scope.commitId === 'latest') ? '' : ' class="placeholder"') + '>(no value)</span>';
-            else if (areStrings) {
-                var toCompile = toCompileList.join(' ');
-                if (toCompile === '' || /^\s*$/.test(toCompile)) {
-                    element[0].innerHTML = '<span' + ((scope.commitId === 'latest') ? '' : ' class="placeholder"') + '>(no value)</span>';
-                    return;
-                }
-                element[0].innerHTML = '<div class="panel panel-info">'+toCompile+'</div>';
-                $compile(element.contents())(scope.recompileScope); 
-            } else if (UtilsService.isRestrictedValue(scope.editValues)) {
-                ElementService.getElement(scope.editValues[0].operand[1].element, false, scope.refId, scope.commitId, 2)
-                .then(function(e) {
-                    element[0].innerHTML = e.name;
-                });
-            } else {
-                element[0].innerHTML = editTemplate;
-                //element.append(editTemplate);
-                $compile(element.contents())(scope.recompileScope);
             }
         };
 
@@ -195,56 +171,68 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                 return;
             idwatch();
             if (UtilsService.hasCircularReference(scope, scope.mmsElementId, 'val')) {
-                //$log.log("prevent circular dereference!");
                 element.html('<span class="mms-error">Circular Reference!</span>');
                 return;
             }
             element.html('(loading...)');
             element.addClass("isLoading");
+
+            var projectId = scope.mmsProjectId;
             var refId = scope.mmsRefId;
-            var commitId = scope.mmsVersion;
+            var commitId = scope.mmsCommitId;
             if (mmsCfValCtrl) {
-                var cfvVersion = mmsCfValCtrl.getWsAndVersion();
+                var cfvVersion = mmsCfValCtrl.getElementOrigin();
+                if (!projectId)
+                    projectId = cfvVersion.projectId;
                 if (!refId)
-                    refId = cfvVersion.workspace;
+                    refId = cfvVersion.refId;
                 if (!commitId)
                     commitId = cfvVersion.commitId;
             }
             if (mmsCfDocCtrl) {
-                var cfdVersion = mmsCfDocCtrl.getWsAndVersion();
+                var cfdVersion = mmsCfDocCtrl.getElementOrigin();
+                if (!projectId)
+                    projectId = mmsCfDocCtrl.projectId;
                 if (!refId)
-                    refId = cfdVersion.workspace;
+                    refId = mmsCfDocCtrl.refId;
                 if (!commitId)
-                    commitId = cfdVersion.commitId;
+                    commitId = mmsCfDocCtrl.commitId;
             }
             if (mmsViewCtrl) {
-                var viewVersion = mmsViewCtrl.getWsAndVersion();
+                var viewVersion = mmsViewCtrl.getElementOrigin();
+                if (!projectId)
+                    projectId = viewVersion.projectId;
                 if (!refId)
-                    refId = viewVersion.workspace;
+                    refId = viewVersion.refId;
                 if (!commitId)
                     commitId = viewVersion.commitId;
             }
+            scope.projectId = projectId;
             scope.refId = refId ? refId : 'master';
             scope.commitId = commitId ? commitId : 'latest';
-            ElementService.getElement(scope.mmsElementId, false, refId, commitId, 1)
+            var reqOb = {elementId: scope.mmsElementId, projectId: scope.projectId, refId: scope.refId, commitId: scope.commitId};
+            ElementService.getElement(reqOb, 1)
             .then(function(data) {
                 scope.element = data;
                 if (scope.element.type === 'Property' || scope.element.type === 'Port') {
-                    if (scope.element.defaultValue)
+                    if (scope.element.defaultValue) {
                         scope.values = [scope.element.defaultValue];
-                    else
+                    } else {
                         scope.values = [];
+                    }
                 }
                 if (scope.element.type === 'Slot') {
                     scope.values = scope.element.value;
                 }
-                if (scope.element.type === 'Constraint' && scope.element.specification)
+                if (scope.element.type === 'Constraint' && scope.element.specification) {
                     scope.values = [scope.element.specification];
+                }
                 if (scope.element.type==='Expression') {
                     scope.values = scope.element.operand;
                 }
                 recompile();
-                //scope.$watch('values', recompile, true);
+
+                //TODO refactor once save function is complete
                 if (scope.commitId === 'latest') {
                     scope.$on('element.updated', function(event, eid, refId, type, continueEdit) {
                         if (eid === scope.mmsElementId && refId === scope.refId && (type === 'all' || type === 'value') && !continueEdit)
@@ -253,10 +241,10 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                     //actions for stomp 
                     scope.$on("stomp.element", function(event, deltaSource, deltaWorkspaceId, deltaElementId, deltaModifier, elemName){
                         if(deltaWorkspaceId === scope.refId && deltaElementId === scope.mmsElementId){
-                            if(scope.isEditing === false){
+                            if(scope.isEditing === false) {
                                 recompile();
                             }
-                            if(scope.isEditing === true){
+                            if(scope.isEditing === true) {
                                 growl.warning("This value has been changed: " + elemName +
                                             " modified by: " + deltaModifier, {ttl: -1});
                             }
@@ -268,7 +256,6 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                 if (reason.status === 410)
                     status = ' deleted';
                 element.html('<span class="mms-error">value cf ' + newVal + status + '</span>');
-                //growl.error('Cf Val Error: ' + reason.message + ': ' + scope.mmsElementId);
             }).finally(function() {
                 element.removeClass("isLoading");
             });
@@ -299,8 +286,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
             scope.editValues.splice(i, 1);
         };
 
-        if (mmsViewCtrl) { 
-            
+        if (mmsViewCtrl) {
             scope.isEditing = false;
             scope.elementSaving = false;
             scope.isDirectChildOfPresentationElement = Utils.isDirectChildOfPresentationElementFunc(element, mmsViewCtrl);
@@ -357,9 +343,10 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
             };
 
             scope.preview = function() {
-                Utils.previewAction(scope, recompileEdit, recompile, type, element);
+                Utils.previewAction(scope, recompile, type, element);
             };
-        } 
+        }
+
         if (mmsViewPresentationElemCtrl) {
             scope.delete = function() {
                 Utils.deleteAction(scope,scope.bbApi,mmsViewPresentationElemCtrl.getParentSection());

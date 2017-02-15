@@ -77,31 +77,23 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
             e.stopPropagation();
         });
 
-        var recompile = function() {
-            if (scope.recompileScope)
+        var recompile = function(preview) {
+            if (scope.recompileScope) {
                 scope.recompileScope.$destroy();
-            scope.isEditing = false;
+            }
             element.empty();
-            element[0].innerHTML = defaultTemplate;
+            if (preview) {
+                element[0].innerHTML = '<div class="panel panel-info">'+editTemplate+'</div>';
+            } else {
+                scope.isEditing = false;
+                element[0].innerHTML = defaultTemplate;
+            }
             scope.recompileScope = scope.$new();
             $compile(element.contents())(scope.recompileScope); 
             if (mmsViewCtrl) {
                 mmsViewCtrl.elementTranscluded(scope.element);
             }
         };
-
-        var recompileEdit = function() {
-            if (scope.recompileScope)
-                scope.recompileScope.$destroy();
-            element.empty();
-            element[0].innerHTML = '<div class="panel panel-info">'+editTemplate+'</div>';
-            scope.recompileScope = scope.$new();
-            $compile(element.contents())(scope.recompileScope); 
-            if (mmsViewCtrl) {
-                mmsViewCtrl.elementTranscluded(scope.edit);
-            }
-        };
-
 
         var idwatch = scope.$watch('mmsElementId', function(newVal, oldVal) {
             if (!newVal)
@@ -204,7 +196,7 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
             // TODO: will we ever want a delete?
 
             scope.preview = function() {
-                Utils.previewAction(scope, recompileEdit, recompile, type, element);
+                Utils.previewAction(scope, recompile, type, element);
             };
         }
     };

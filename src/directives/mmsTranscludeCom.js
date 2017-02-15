@@ -72,32 +72,25 @@ function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxSe
             e.stopPropagation();
         });
 
-        var recompile = function() {
-            if (scope.recompileScope)
+        var recompile = function(preview) {
+            if (scope.recompileScope) {
                 scope.recompileScope.$destroy();
+            }
             scope.isEditing = false;
             element.empty();
-            var doc = scope.element.documentation || '(No comment)';
+            var doc = (preview ? scope.edit.documentation : scope.element.documentation) || '(No comment)';
             doc += ' - ' + scope.element._creator;
-            element[0].innerHTML = doc;
+            if (preview) {
+                element[0].innerHTML = '<div class="panel panel-info">'+doc+'</div>';
+            } else {
+                element[0].innerHTML = doc;
+            }
             MathJax.Hub.Queue(["Typeset", MathJax.Hub, element[0]]);
             scope.recompileScope = scope.$new();
             $compile(element.contents())(scope.recompileScope); 
             if (mmsViewCtrl) {
                 mmsViewCtrl.elementTranscluded(scope.element, 'Comment');
             }
-        };
-
-        var recompileEdit = function() {
-            if (scope.recompileScope)
-                scope.recompileScope.$destroy();
-            element.empty();
-            var doc = scope.edit.documentation;
-            if (!doc)
-                doc = '<p class="no-print" ng-class="{placeholder: commitId!=\'latest\'}">(No Comment)</p>';
-            element[0].innerHTML = '<div class="panel panel-info">'+doc+'</div>';
-            scope.recompileScope = scope.$new();
-            $compile(element.contents())(scope.recompileScope); 
         };
 
         var idwatch = scope.$watch('mmsElementId', function(newVal, oldVal) {
@@ -153,23 +146,23 @@ function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxSe
             var type = "documentation";
 
             scope.save = function() {
-                Utils.saveAction(scope,recompile,scope.bbApi,null,type,element);
+                Utils.saveAction(scope, recompile, scope.bbApi, null, type, element);
             };
 
             scope.saveC = function() {
-                Utils.saveAction(scope,recompile,scope.bbApi,null,type,element,true);
+                Utils.saveAction(scope, recompile, scope.bbApi, null, type, element, true);
             };
 
             scope.cancel = function() {
-                Utils.cancelAction(scope,recompile,scope.bbApi,type,element);
+                Utils.cancelAction(scope, recompile, scope.bbApi, type, element);
             };
 
             scope.addFrame = function() {
-                Utils.addFrame(scope,mmsViewCtrl,element,template);
+                Utils.addFrame(scope, mmsViewCtrl, element, template);
             };
 
             scope.preview = function() {
-                Utils.previewAction(scope, recompileEdit, recompile, type,element);
+                Utils.previewAction(scope, recompile, type, element);
             };
         } 
 
