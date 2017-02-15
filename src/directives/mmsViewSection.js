@@ -45,7 +45,7 @@ function mmsViewSection($compile, $templateCache, $rootScope, ViewService, UxSer
 
         var recompile = function() {
             scope.isEditing = false;
-            scope.recompileEdit = false;
+            scope.inPreviewMode = false;
         };
 
         var recompileEdit = function() {
@@ -75,7 +75,7 @@ function mmsViewSection($compile, $templateCache, $rootScope, ViewService, UxSer
         if (mmsViewCtrl && mmsViewPresentationElemCtrl) {
             
             scope.isEditing = false;
-            scope.recompileEdit = false;
+            scope.inPreviewMode = false;
             scope.elementSaving = false;
             scope.cleanUp = false;
             scope.instanceSpec = mmsViewPresentationElemCtrl.getInstanceSpec();

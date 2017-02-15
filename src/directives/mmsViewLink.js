@@ -59,9 +59,9 @@ function mmsViewLink(ElementService, UtilsService, ConfigService, $compile, grow
                 scope.element = data;
                 scope.name = data.name;
 
-                if (scope.mmsPeid && scope.mmsPeid !== '') {
-                    scope.hash = '#' + scope.mmsPeid;
-                    var reqPEOb = {elementId: scope.mmsPeid, projectId: projectId, refId: refId, commitId: commitId};
+                if (scope.mmsPeId && scope.mmsPeId !== '') {
+                    scope.hash = '#' + scope.mmsPeId;
+                    var reqPEOb = {elementId: scope.mmsPeId, projectId: projectId, refId: refId, commitId: commitId};
                     ElementService.getElement(reqPEOb)
                     .then(function(pe) {
                         scope.name = pe.name;
@@ -94,7 +94,7 @@ function mmsViewLink(ElementService, UtilsService, ConfigService, $compile, grow
             mmsRefId: '@',
             mmsCommitId: '@',
             mmsDocId: '@',
-            mmsPeid: '@'
+            mmsPeId: '@'
         },
         require: '?^mmsView',
         template: '<a href="mms.html#/{{projectId}}/{{refId}}/documents/{{docid}}/views/{{vid}}{{hash}}">{{name || "Unnamed View"}}</a>',

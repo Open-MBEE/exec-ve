@@ -70,6 +70,7 @@ function mmsValueLink(ElementService, $compile, growl) {
         restrict: 'E',
         scope: {
             mmsElementId: '@',
+            mmsProjectId: '@',
             mmsRefId: '@',
             mmsCommitId: '@',
             mmsErrorText: '@',

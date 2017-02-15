@@ -7,7 +7,7 @@ function mmsViewListT() {
 
     return {
         restrict: 'E',
-        template: '<mms-transclude-doc data-mms-eid="{{para.source}}"></mms-transclude-doc>',
+        template: '<mms-transclude-doc data-mms-element-id="{{para.source}}"></mms-transclude-doc>',
         scope: {
             para: '<mmsPara'
         }
