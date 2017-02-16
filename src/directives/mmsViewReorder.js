@@ -15,9 +15,10 @@ angular.module('mms.directives')
  * @description
  * Visualize and edit the structure of a view 
  *
- * @param {string} mmsVid The id of the view
- * @param {string=master} mmsWs Workspace to use, defaults to master
- * @param {string=latest} mmsVersion Version can be alfresco version number or timestamp, default is latest
+ * @param {string} mmsElementId The id of the view
+ * @param {string} mmsProjectId The project id for the view
+ * @param {string=master} mmsRefId Reference to use, defaults to master
+ * @param {string=latest} mmsCommitId Commit ID, default is latest
  */
 function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, _) {
     var template = $templateCache.get('mms/templates/mmsViewReorder.html');
@@ -42,21 +43,22 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
     var mmsViewReorderLink = function(scope, element, attrs) {
         var ran = false;
         var lastid = null; //race condition if view id changes fast and getting data for old id returns later than last id
-        scope.$watch('mmsVid', function(newVal, oldVal) {
+        scope.$watch('mmsElementId', function(newVal, oldVal) {
             if (!newVal || newVal == oldVal && ran)
                 return;
             ran = true;
             lastid = newVal;
-            ViewService.getView(scope.mmsVid, false, scope.mmsWs, scope.mmsVersion)
+            var reqOb = {elementId: scope.mmsElementId.instanceId, projectId: scope.mmsProjectId, refId: scope.mmsRefId, commitId: scope.mmsCommitId};
+            ElementService.getElement(reqOb)
             .then(function(data) {
                 if (newVal !== lastid)
                     return;
                 scope.view = data;
-                scope.editable = scope.view._editable && scope.mmsVersion === 'latest';
+                scope.editable = scope.view._editable && scope.mmsCommitId === 'latest';
 
                 var contents = data._contents || data.specification;
                 if (contents) {
-                    ViewService.getElementReferenceTree(contents, scope.mmsWs, scope.mmsVersion)
+                    ViewService.getElementReferenceTree(contents, scope.mmsRefId, scope.mmsCommitId)
                     .then(function(elementReferenceTree) {
                         if (newVal !== lastid)
                             return;
@@ -118,7 +120,7 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
                         updateSectionElementOrder(elementReference.sectionElements[i]);
                 }
                 if (!angular.equals(operand, origOperand))
-                    promises.push(ElementService.updateElement(sectionEdit, scope.mmsWs));
+                    promises.push(ElementService.updateElement(sectionEdit, scope.mmsRefId));
             };
 
             var deferred = $q.defer();
@@ -130,7 +132,7 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
                 deferred.reject({type: 'error', message: 'View contents were not initialized properly or is empty.'});
                 return deferred.promise;
             }
-            var viewEdit = { 
+            var viewEdit = {
                 sysmlId: scope.view.sysmlId,
                 _read: scope.view._read,
                 _modified: scope.view._modified,
@@ -153,7 +155,7 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
             if (viewEdit.view2view)
                 delete viewEdit.view2view;
             if (contents && !angular.equals(contents.operand, origContents.operand))
-                promises.push(ViewService.updateView(viewEdit, scope.mmsWs));
+                promises.push(ViewService.updateView(viewEdit, scope.mmsRefId));
             for (var j = 0; j < scope.elementReferenceTree.length; j++) {
                 if (scope.elementReferenceTree[j].sectionElements.length > 0)
                     updateSectionElementOrder(scope.elementReferenceTree[j]);
@@ -172,7 +174,7 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
         scope.refresh = function() {
             var contents = scope.view._contents || scope.view.specification;
             if (contents) {
-                ViewService.getElementReferenceTree(contents, scope.mmsWs, scope.mmsVersion)
+                ViewService.getElementReferenceTree(contents, scope.mmsRefId, scope.mmsCommitId)
                 .then(function(elementReferenceTree) {
                     scope.elementReferenceTree = elementReferenceTree;
                     scope.originalElementReferenceTree = _.cloneDeep(elementReferenceTree, function(value, key, object) {
@@ -208,9 +210,10 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
         restrict: 'E',
         template: template,
         scope: {
-            mmsVid: '@',
-            mmsWs: '@',
-            mmsVersion: '@',
+            mmsElementId: '@',
+            mmsProjectId: '@',
+            mmsRefId: '@',
+            mmsCommitId: '@',
             mmsViewReorderApi: '<'
         },
         controller: ['$scope', 'ViewService', mmsViewReorderCtrl],

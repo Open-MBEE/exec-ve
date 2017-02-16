@@ -59,9 +59,6 @@ function mmsView(ViewService, ElementService, $templateCache, $rootScope, growl)
     var mmsViewCtrl = function($scope) {
         $scope.presentationElemCleanUpFncs = [];
 
-        // Build request object
-        reqOb = {elementId: $scope.mmsElementId, projectId: $scope.mmsProjectId, refId: $scope.mmsRefId, commitId: $scope.mmsCommitId};
-
         this.isTranscludedElement = function(elementName) {
             if (elementName === 'MMS-TRANSCLUDE-COM' ||
                 elementName === 'MMS-TRANSCLUDE-DOC' ||
@@ -130,6 +127,9 @@ function mmsView(ViewService, ElementService, $templateCache, $rootScope, growl)
     };
 
     var mmsViewLink = function(scope, element, attrs) {
+        // Build request object
+        var reqOb = {elementId: scope.mmsElementId, projectId: scope.mmsProjectId, refId: scope.mmsRefId, commitId: scope.mmsCommitId};
+
         var processed = false;
         scope.isSection = false;
         var changeView = function(newVal, oldVal) {
