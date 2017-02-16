@@ -66,7 +66,7 @@ function mmsViewPresentationElem(ViewService, ElementService, $templateCache, $r
             }
             // Parse the element reference tree for the presentation element:
             element.addClass("isLoading");
-            scope.reqOb = {elementId: scope.mmsInstanceVal.instanceId, projectId: projectId, refId: refId, commitId: commitId};
+            var reqOb = {elementId: scope.mmsInstanceVal.instanceId, projectId: projectId, refId: refId, commitId: commitId};
             ElementService.getElement(reqOb, 1)
             .then(function(instanceSpec) {
                 scope.presentationElem = ViewService.getPresentationElementSpec(instanceSpec);

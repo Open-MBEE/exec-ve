@@ -22,7 +22,7 @@ angular.module('mms.directives')
  * @param {string} mmsDocId Document context of view
  * @param {string} mmsPeId Document context of view
  */
-function mmsViewLink(ElementService, UtilsService, ConfigService, $compile, growl) {
+function mmsViewLink(ElementService, UtilsService, $compile, growl) {
 
     var mmsViewLinkLink = function(scope, element, attrs, mmsViewCtrl) {
         var processed = false;

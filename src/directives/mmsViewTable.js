@@ -101,7 +101,6 @@ function mmsViewTable($compile, $timeout, $document, UtilsService) {
         scope: {
             table: '<mmsTable'
         },
-        controller: ['$scope', '$rootScope', mmsViewTableCtrl],
         link: mmsViewTableLink
     };
 }

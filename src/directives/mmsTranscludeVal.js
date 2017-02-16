@@ -75,9 +75,9 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
         var processed = false;
         scope.cfType = 'val';
         element.click(function(e) {
-            if (scope.addFrame && !scope.nonEditable)
+            if (scope.addFrame && !scope.nonEditable) {
                 scope.addFrame();
-
+            }
             if (mmsViewCtrl) {
                 mmsViewCtrl.transcludeClicked(scope.element);
             }
@@ -85,8 +85,8 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                 growl.warning("Cross Reference is not editable.");
             }
             e.stopPropagation();
-        
         });
+
         scope.addHtml = function(value) {
             value.value = "<p>" + value.value + "</p>";
         };
@@ -100,7 +100,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
             var isExpression = false;
             var values = scope.values;
             if (preview) {
-                values = scope.editValues
+                values = scope.editValues;
             } else {
                 scope.isEditing = false;
             }
@@ -311,7 +311,9 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                     scope.values[0].operand[2].operand.forEach(function(o) {
                         options.push(o.element);
                     });
-                    ElementService.getElements(options, false, scope.refId, scope.commitId)
+                    var reqOb = {elementIds: options, projectId: scope.projectId, refId: scope.refId, commitId: scope.commitId, extended: true};
+
+                    ElementService.getElements(reqOb)
                     .then(function(elements) {
                         scope.options = elements;
                         Utils.addFrame(scope, mmsViewCtrl, element, frameTemplate);
@@ -327,13 +329,11 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                         Utils.addFrame(scope, mmsViewCtrl, element, frameTemplate);
                         return;
                     }
-                    // otherwise get property spec 
-                    Utils.getPropertySpec(scope.element,scope.refId,scope.commitId)
+                    Utils.getPropertySpec(scope.element)
                     .then( function(value) {
                         scope.isEnumeration = value.isEnumeration;
                         scope.isSlot = value.isSlot;
                         scope.options = value.options;
-                      //if ( !scope.isSlot || !scope.isEnumeration)
                         Utils.addFrame(scope, mmsViewCtrl, element, frameTemplate);
                     }, function(reason) {
                         Utils.addFrame(scope, mmsViewCtrl, element, frameTemplate);

@@ -14,6 +14,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
         projectId: projectOb.id,
         id: null
     };
+    //TODO change isTag
     $scope.editable = documentOb && documentOb._editable && !refOb.isTag;
     $scope.documentOb = documentOb;
     $scope.refOb = refOb;
@@ -34,8 +35,6 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
         element: true,
         history: false,
         reorder: false,
-        snapshots: false,
-        tags: false,
         jobs: false
     };
     $scope.tracker = {};
@@ -46,10 +45,6 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
     // Set edit count for tracker view 
     $scope.veEditsLength = function() {
         return Object.keys($rootScope.ve_edits).length;
-    };
-
-    $scope.snapshotClicked = function() {
-        $scope.snapshotLoading = 'fa fa-spinner fa-spin';
     };
 
     $scope.etrackerChange = function() {
@@ -84,14 +79,6 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
             $rootScope.ve_tbApi.setIcon('element-editor', 'fa-edit');
         }
     };
-
-    $scope.$on('document-snapshot', function() {
-        showPane('snapshots');
-    });
-
-    $scope.$on('tags', function() {
-        showPane('tags');
-    });
 
     $scope.$on('jobs', function() {
         showPane('jobs');

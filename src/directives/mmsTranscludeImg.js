@@ -1,13 +1,14 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsTranscludeImg', ['VizService', 'growl', mmsTranscludeImg]);
+.directive('mmsTranscludeImg', ['VizService','ElementService','growl', mmsTranscludeImg]);
 
 /**
  * @ngdoc directive
  * @name mms.directives.directive:mmsTranscludeImg
  *
  * @requires mms.VizService
+ * @requires mms.ElementService
  *
  * @restrict E
  *
@@ -19,7 +20,7 @@ angular.module('mms.directives')
  * @param {string=master} mmsRefId Reference to use, defaults to master
  * @param {string=latest} mmsCommitId Commit ID, default is latest
  */
-function mmsTranscludeImg(VizService, growl) {
+function mmsTranscludeImg(VizService, ElementService, growl) {
 
     var mmsTranscludeImgLink = function(scope, element, attrs, controllers) {
         var mmsViewCtrl = controllers[0];
@@ -84,7 +85,7 @@ function mmsTranscludeImg(VizService, growl) {
             }).finally(function() {
                 element.removeClass('isLoading');
             });
-            VizService.getImageURL(scope.mmsElementId, 'png', false, ws, version)
+            VizService.getImageURL(reqOb, 'png')
             .then(function(data) {
                 scope.pngImgUrl = data;
             }, function(reason) {

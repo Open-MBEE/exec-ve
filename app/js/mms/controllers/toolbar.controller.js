@@ -27,31 +27,17 @@ function($scope, $rootScope, $state, UxService, refOb, documentOb) {
         if ($state.includes('project.ref.document')) {
             tbApi.addButton(UxService.getToolbarButton("jobs"));
         }
-        /*if ($state.includes('workspace.diff'))
-        {
-            tbApi.addButton(UxService.getToolbarButton("diff-perspective-detail"));
-            tbApi.addButton(UxService.getToolbarButton("diff-perspective-tree"));
-            
-            tbApi.setOptions('element-viewer', {
-                active: false
-            });
-            tbApi.setPermission('element-history', false);
-        }
-        else*/ if ($state.includes('project.ref') && !$state.includes('project.ref.document')) {
+        if ($state.includes('project.ref') && !$state.includes('project.ref.document')) {
             editable = documentOb && !refOb.isTag;
             tbApi.setPermission('element-editor', editable);
-            tbApi.addButton(UxService.getToolbarButton("tags"));
-            tbApi.setPermission('tags', true);
             if ($state.includes('project.ref.preview')) {
                 tbApi.addButton(UxService.getToolbarButton("view-reorder"));
                 tbApi.setPermission("view-reorder", editable);
             }
         } else if ($state.includes('project.ref.document')) {
             editable = documentOb._editable && !refOb.isTag;
-            tbApi.addButton(UxService.getToolbarButton("document-snapshot"));
             tbApi.addButton(UxService.getToolbarButton("view-reorder"));
             tbApi.setPermission('element-editor', editable);
-            tbApi.setPermission('document-snapshot-create', editable);
             tbApi.setPermission("view-reorder", editable);
         }
     };

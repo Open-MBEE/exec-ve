@@ -3,13 +3,12 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('ViewCtrl', ['$scope', '$rootScope', '$state', '$stateParams', '$timeout', '$window', 
-    '$element', 'hotkeys', 'MmsAppUtils', 'UxService', 'growl', 
+    .controller('ViewCtrl', ['$scope', '$rootScope', '$state', '$stateParams', '$timeout',
+    '$element', 'hotkeys', 'MmsAppUtils', 'UxService', 'growl',
     'search', 'projectOb', 'documentOb', 'viewOb', 'refOb',
-function($scope, $rootScope, $state, $stateParams, $stateParams, $timeout, $window, 
-    $element, hotkeys, MmsAppUtils, UxService, growl, 
-    search, projectOb, documentOb, viewOb, refOb) {
-    
+    function($scope, $rootScope, $state, $stateParams, $timeout, $element, hotkeys, MmsAppUtils, UxService, growl,
+             search, projectOb, documentOb, viewOb, refOb) {
+
     function isPageLoading() {
         if ($element.find('.isLoading').length > 0) {
             growl.warning("Still loading!");
@@ -17,7 +16,7 @@ function($scope, $rootScope, $state, $stateParams, $stateParams, $timeout, $wind
         }
         return false;
     }
-    
+
     $scope.vidLink = false; //whether to have go to document link
     if ($state.includes('project.ref.preview') && viewOb && viewOb.sysmlId.indexOf('_cover') < 0) {
         $scope.vidLink = true;
@@ -58,8 +57,8 @@ function($scope, $rootScope, $state, $stateParams, $stateParams, $timeout, $wind
         }
     };
     $scope.comments = {
-        count: 0, 
-        lastCommented: '', 
+        count: 0,
+        lastCommented: '',
         lastCommentedBy: '',
         map: {}
     };
@@ -83,14 +82,14 @@ function($scope, $rootScope, $state, $stateParams, $stateParams, $timeout, $wind
                     $scope.bbApi.addButton(UxService.getButtonBarButton('view-add-dropdown'));
                 } else {
                     var fakeDropdown = {
-                        id: 'view-add-dropdown-fake', 
-                        icon: 'fa-plus', 
-                        selected: true, 
-                        active: true, 
-                        permission: true, 
-                        tooltip: 'Add New Element Disabled', 
-                        spinner: false, 
-                        togglable: false, 
+                        id: 'view-add-dropdown-fake',
+                        icon: 'fa-plus',
+                        selected: true,
+                        active: true,
+                        permission: true,
+                        tooltip: 'Add New Element Disabled',
+                        spinner: false,
+                        togglable: false,
                         action: function() {
                             growl.warning("This view hasn't been converted to support adding new elements.");
                         }
@@ -117,7 +116,7 @@ function($scope, $rootScope, $state, $stateParams, $stateParams, $timeout, $wind
                 description: 'toggle show elements',
                 callback: function() {$scope.$broadcast('show-elements');}
             });
-          
+
             if ($state.includes('project.ref.document')) {
                 $scope.bbApi.addButton(UxService.getButtonBarButton('refresh-numbering'));
                 $scope.bbApi.addButton(UxService.getButtonBarButton('center-previous'));
@@ -276,7 +275,7 @@ function($scope, $rootScope, $state, $stateParams, $stateParams, $timeout, $wind
             return;
         MmsAppUtils.printModal(viewOb, refOb, false, 3);
     });
-    
+
     $scope.$on('print', function() {
         if (isPageLoading())
             return;
@@ -301,5 +300,5 @@ function($scope, $rootScope, $state, $stateParams, $stateParams, $timeout, $wind
         var printElementCopy = angular.element("#print-div");
         MmsAppUtils.refreshNumbering($rootScope.ve_treeApi.get_rows(), printElementCopy);
     });
-    
+
 }]);

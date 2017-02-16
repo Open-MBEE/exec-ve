@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.factory('Utils', ['$q','$uibModal','$timeout', '$templateCache','$rootScope','$compile','WorkspaceService','ConfigService','ElementService','ViewService', 'UtilsService', 'growl','_', Utils]);
+.factory('Utils', ['$q','$uibModal','$timeout', '$templateCache','$rootScope','$compile','ElementService','ViewService','UtilsService','growl','_',Utils]);
 
 /**
  * @ngdoc service
@@ -19,7 +19,7 @@ angular.module('mms.directives')
  * WARNING These are intended to be internal utility functions and not designed to be used as api
  *
  */
-function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, WorkspaceService, ConfigService, ElementService, ViewService, UtilsService, growl, _) {
+function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, ElementService, ViewService, UtilsService, growl, _) {
   
     var ENUM_ID = '_9_0_62a020a_1105704885400_895774_7947';
     var ENUM_LITERAL = '_9_0_62a020a_1105704885423_380971_7955';
@@ -70,20 +70,21 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Wo
 
         if (editorApi && editorApi.save)
             editorApi.save();
-        if (mmsType === 'workspace') {
-            WorkspaceService.update(edit)
-            .then(function(data) {
-                deferred.resolve(data);
-            }, function(reason) {
-                deferred.reject({type: 'error', message: reason.message});
-            });
-        } else if (mmsType === 'tag') {
-            ConfigService.update(edit, mmsWs)
-            .then(function(data) {
-                deferred.resolve(data);
-            }, function(reason) {
-                deferred.reject({type: 'error', message: reason.message});
-            });
+        // if (mmsType === 'workspace') {
+        //     WorkspaceService.update(edit)
+        //     .then(function(data) {
+        //         deferred.resolve(data);
+        //     }, function(reason) {
+        //         deferred.reject({type: 'error', message: reason.message});
+        //     });
+        // } else
+            if (mmsType === 'tag') {
+            // ConfigService.update(edit, mmsWs)
+            // .then(function(data) {
+            //     deferred.resolve(data);
+            // }, function(reason) {
+            //     deferred.reject({type: 'error', message: reason.message});
+            // });
         } else {
             ElementService.updateElement(edit, mmsWs)
             .then(function(data) {
@@ -277,30 +278,30 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Wo
         return deferred.promise;
     };
 
-    var getPropertySpec = function(elt, ws, version) {
+    var getPropertySpec = function(elementOb) {
         var deferred = $q.defer();
-        var id = elt.typeId;
+        var id = elementOb.typeId;
         var isSlot = false;
         var isEnum = false;
         var options = [];
-        if (elt.type === 'Slot') {
+        if (elementOb.type === 'Slot') {
             isSlot = true;
-            id = elt.definingFeatureId;
+            id = elementOb.definingFeatureId;
         }
         if (!id) { //no property type, will not be enum
             deferred.resolve({options: options, isEnumeration: isEnum, isSlot: isSlot});
             return deferred.promise;
         }
         // Get element specialization propertyType info 
-        ElementService.getElement(id,false,ws,version)
-        .then(function(value){
+        ElementService.getElement(elementOb)
+        .then(function(value) {
             if (isSlot) {
                 if (!value.typeId) {
                     deferred.resolve({options: options, isEnumeration: isEnum, isSlot: isSlot});
                     return;
                 }
                 //if specialization is a slot  
-                ElementService.getElement(value.typeId,false,ws,version)
+                ElementService.getElement(value)
                 .then(function(val) {
                     isEnumeration(val)
                     .then(function(enumValue) {
@@ -333,13 +334,13 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Wo
     
     var addFrame = function(scope, mmsViewCtrl, element, template, editObj, doNotScroll) {
 
-        if (mmsViewCtrl.isEditable() && !scope.isEditing && scope.element._editable && scope.version === 'latest') { 
+        if (mmsViewCtrl.isEditable() && !scope.isEditing && scope.element._editable && scope.commit === 'latest') {
 
             var id = editObj ? editObj.sysmlId : scope.mmsEid;
             ElementService.getElementForEdit(id, false, scope.ws)
             .then(function(data) {
                 scope.isEditing = true;
-                scope.recompileEdit = false;
+                scope.inPreviewMode = false;
                 scope.edit = data;
 
                 if (data.type === 'Property' || data.type === 'Port') {
@@ -573,15 +574,17 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Wo
         }
     };
 
-    var leaveEditModeOrFrame = function(scope, recompile, recompileEdit, type) {
-
-        if (scope.edit && hasEdits(scope, type) && !scope.recompileEdit) {
-            scope.skipBroadcast = true;
-            scope.recompileEdit = true;
-            recompileEdit();
+    var previewAction = function(scope, recompile, type, element) {
+        if (scope.elementSaving) {
+            growl.info('Please Wait...');
+            return;
         }
-        else {
-            if (scope.edit && scope.ws && scope.isEditing) {
+        if (scope.edit && hasEdits(scope, type) && !scope.inPreviewMode) {
+            scope.skipBroadcast = true;
+            scope.inPreviewMode = true;
+            recompile(true);
+        } else {
+            if (scope.edit && scope.isEditing) {
                 // Broadcast message for the ToolCtrl to clear out the tracker window:
                 $rootScope.$broadcast('presentationElem.cancel',scope);
                 if (scope.element)
@@ -590,29 +593,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Wo
         }
         scope.isEditing = false;
         scope.elementSaving = false;
-    };
-
-    var previewAction = function(scope, recompileEdit, recompile, type, element) {
-        if (scope.elementSaving) {
-            growl.info('Please Wait...');
-            return;
-        }
-        leaveEditModeOrFrame(scope, recompile, recompileEdit, type);
         scrollToElement(element);
-    };
-
-    var showEditCallBack = function(scope, mmsViewCtrl, element, template, recompile, recompileEdit, type, editObj) {
-
-        // Going into edit mode, so add a frame if had a previous edit in progress:
-        if (mmsViewCtrl.isEditable()) {
-            if (scope.edit && hasEdits(scope, type) && !scope.isEditing) {
-                addFrame(scope,mmsViewCtrl,element,template,editObj,true);
-            }
-        }
-        // Leaving edit mode, so highlight the unsaved edit if needed:
-        else {
-            leaveEditModeOrFrame(scope, recompile, recompileEdit, type);
-        }
     };
 
     var isDirectChildOfPresentationElementFunc = function(element, mmsViewCtrl) {
@@ -625,27 +606,10 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Wo
                 return false;
             parent = parent.parentElement;
         }
-        if (parent && parent.nodeName !== 'MMS-VIEW')
+        if (parent && parent.nodeName !== 'MMS-VIEW'){
             return true;
-        return false;
-/*
-        var currentElement = (element[0]) ? element[0] : element;
-        var viewElementCount = 0;
-        while (currentElement.parentElement) {
-            var parent = (currentElement.parentElement[0]) ? currentElement.parentElement[0] : currentElement.parentElement;
-            if (mmsViewCtrl.isTranscludedElement(parent.nodeName))
-                return false;
-            if (mmsViewCtrl.isViewElement(parent.nodeName)) {
-                viewElementCount++;
-                if (viewElementCount > 1)
-                    return false;
-            }
-            if (mmsViewCtrl.isPresentationElement(parent.nodeName))
-                return true;
-            currentElement = parent;
         }
         return false;
-        */
     };
 
     var hasHtml = function(s) {
@@ -672,11 +636,10 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Wo
         cancelAction: cancelAction,
         deleteAction: deleteAction,
         previewAction: previewAction,
-        showEditCallBack: showEditCallBack,
         isDirectChildOfPresentationElementFunc: isDirectChildOfPresentationElementFunc,
         hasHtml: hasHtml,
         isEnumeration: isEnumeration,
-        getPropertySpec: getPropertySpec,
+        getPropertySpec: getPropertySpec
     };
 
 }

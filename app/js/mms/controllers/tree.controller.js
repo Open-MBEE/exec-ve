@@ -191,40 +191,6 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         }
     }
 
-    //TODO fix tag creation
-    var creatingSnapshot = false;
-    $scope.$on('document-snapshot-create', function() {
-        if (creatingSnapshot) {
-            growl.info('Please Wait...');
-            return;
-        }
-        creatingSnapshot = true;
-        $rootScope.ve_tbApi.toggleButtonSpinner('document-snapshot-create');
-
-        $scope.itemType = 'Tag';
-        $scope.createConfigParentId = refOb.id;
-        $scope.configuration = {};
-        $scope.configuration.now = true;
-        var templateUrlStr = 'partials/mms/new-tag.html';
-        var branchType = 'configuration';
-
-        var instance = $uibModal.open({
-            templateUrl: templateUrlStr,
-            scope: $scope,
-            controller: ['$scope', '$uibModalInstance', '$filter', addItemCtrl]
-        });
-        instance.result.then(function(data) {
-
-        }, function(reason) {
-            growl.error("Snapshot Creation failed: " + reason.message);
-        }).finally(function() {
-            creatingSnapshot = false;
-            $rootScope.ve_tbApi.toggleButtonSpinner('document-snapshot-create');
-        });
-
-        $rootScope.ve_tbApi.select('document-snapshot');
-    });
-
     $scope.$on('tree-full-document', function() {
         $scope.fullDocMode();
     });

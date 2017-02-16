@@ -26,7 +26,7 @@ angular.module('mms.directives')
  * for specific view.
  *
  */
-function mmsMenu(SiteService, WorkspaceService, ConfigService, $state, $templateCache, growl) {
+function mmsMenu(SiteService, $state, $templateCache, growl) {
     var template = $templateCache.get('mms/templates/mmsMenu.html');
 
     var mmsMenuLink = function(scope, element, attrs) {
@@ -51,10 +51,10 @@ function mmsMenu(SiteService, WorkspaceService, ConfigService, $state, $template
             $state.go($state.current.name, {tag: undefined, search: undefined}, {reload:true});
         };
 
-        WorkspaceService.getWorkspace(scope.ws)
-        .then(function(data) {
-            scope.wsName = data.name;
-        });
+        // WorkspaceService.getWorkspace(scope.ws)
+        // .then(function(data) {
+        //     scope.wsName = data.name;
+        // });
 
         /*if (scope.config && scope.config !== '' && scope.config !== 'latest') {
             ConfigService.getConfig(scope.config, scope.ws, false)

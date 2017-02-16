@@ -60,7 +60,7 @@ function mmsView(ViewService, ElementService, $templateCache, $rootScope, growl)
         $scope.presentationElemCleanUpFncs = [];
 
         // Build request object
-        $scope.reqOb = {elementId: $scope.mmsElementId, projectId: $scope.mmsProjectId, refId: $scope.mmsRefId, commitId: $scope.mmsCommitId};
+        reqOb = {elementId: $scope.mmsElementId, projectId: $scope.mmsProjectId, refId: $scope.mmsRefId, commitId: $scope.mmsCommitId};
 
         this.isTranscludedElement = function(elementName) {
             if (elementName === 'MMS-TRANSCLUDE-COM' ||
@@ -137,7 +137,7 @@ function mmsView(ViewService, ElementService, $templateCache, $rootScope, growl)
                 return;
             processed = true;
             element.addClass('isLoading');
-            ElementService.getElement(scope.reqOb, 1)
+            ElementService.getElement(reqOb, 1)
             .then(function(data) {
                 //view accepts a section element
                 if (data.type === 'InstanceSpecification') {
@@ -156,7 +156,7 @@ function mmsView(ViewService, ElementService, $templateCache, $rootScope, growl)
                     scope.modifier = data._modifier;
                     return;
                 }
-                ViewService.getViewElements(scope.reqOb, 1)
+                ViewService.getViewElements(reqOb, 1)
                 .then(function(data2) {
                     scope.view = data;
                     scope.modified = data._modified;
