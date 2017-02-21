@@ -67,13 +67,13 @@ function($scope, $rootScope, $state, $stateParams, $window, $element, hotkeys, g
         }, number: curSec, topLevel: (curSec ? (curSec.toString().indexOf('.') === -1 && curSec !== 1) : false)};
     };
     var addToArray = function(viewId, curSection) {
-        views.push( buildViewElt(viewId, curSection) );
+        views.push(buildViewElt(viewId, curSection));
         if (view2children[viewId]) {
             var num = 1;
-            view2children[viewId].forEach(function(cid) {
-                addToArray(cid, curSection + '.' + num);
+            for (var i = 0; i < view2children[viewId].length; i++) {
+                addToArray(view2children[viewId][i], curSection + '.' + num);
                 num = num + 1;
-            });
+            }
         }
     };
     var num = 1;
@@ -81,15 +81,17 @@ function($scope, $rootScope, $state, $stateParams, $window, $element, hotkeys, g
     var seenViewIds = {};
     function handleSingleView(v, aggr) {
         var childIds = view2children[v.sysmlId];
-        if (!childIds)
+        if (!childIds) {
             childIds = [];
+        }
         view2children[v.sysmlId] = childIds;
         if (!v._childViews || v._childViews.length === 0 || aggr === 'none') {
             return childIds;
         }
         for (var i = 0; i < v._childViews.length; i++) {
-            if (seenViewIds[v._childViews[i].id])
+            if (seenViewIds[v._childViews[i].id]) {
                 continue;
+            }
             seenViewIds[v._childViews[i].id] = true;
             childIds.push(v._childViews[i].id);
         }
@@ -101,8 +103,9 @@ function($scope, $rootScope, $state, $stateParams, $window, $element, hotkeys, g
     }
 
     view2children[documentOb.sysmlId] = [];
-    if (!documentOb._childViews)
+    if (!documentOb._childViews) {
         documentOb._childViews = [];
+    }
     MmsAppUtils.handleChildViews(documentOb, 'composite', projectOb.id, refOb.id, handleSingleView, handleChildren)
     .then(function(childIds) {
         for (var i = 0; i < childIds.length; i++) {
@@ -181,26 +184,26 @@ function($scope, $rootScope, $state, $stateParams, $window, $element, hotkeys, g
     });
 
     $scope.$on('show-comments', function() {
-        $scope.views.forEach(function(view) {
-            view.api.toggleShowComments();
-        });
+        for (var i = 0; i < $scope.views.length; i++) {
+            $scope.views[i].api.toggleShowComments();
+        }
         $scope.bbApi.toggleButtonState('show-comments');
         $rootScope.veCommentsOn = !$rootScope.veCommentsOn;
     });
 
     $scope.$on('show-elements', function() {
-        $scope.views.forEach(function(view) {
-            view.api.toggleShowElements();
-        });
+        for (var i = 0; i < $scope.views.length; i++) {
+            $scope.views[i].api.toggleShowElements();
+        }
         $scope.bbApi.toggleButtonState('show-elements');
         $rootScope.veElementsOn = !$rootScope.veElementsOn;
     });
 
     $scope.$on('show-edits', function() {
-        if( ($rootScope.veElementsOn && $rootScope.ve_editmode) || (!$rootScope.veElementsOn && !$rootScope.ve_editmode) ){
-            $scope.views.forEach(function(view) {
-                view.api.toggleShowElements();
-            });
+        if (($rootScope.veElementsOn && $rootScope.ve_editmode) || (!$rootScope.veElementsOn && !$rootScope.ve_editmode) ){
+            for (var i = 0; i < $scope.views.length; i++) {
+                $scope.views[i].api.toggleShowElements();
+            }
             $scope.bbApi.toggleButtonState('show-elements');
             $rootScope.veElementsOn = !$rootScope.veElementsOn;
         }

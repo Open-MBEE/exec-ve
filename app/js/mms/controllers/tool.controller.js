@@ -270,7 +270,8 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
         $q.all(promises).then(function(results) {
             var somefail = false;
             var failed = null;
-            results.forEach(function(ob) {
+            for (var i = 0; i < results.length; i++) {
+                var ob = results[i];
                 if (ob.status === 200) {
                     delete $rootScope.ve_edits[ob.ob.sysmlId + '|' + ob.ob._projectId + '|' + ob.ob._refId];
                     $rootScope.$broadcast('element.updated', ob.ob, 'all');
@@ -278,7 +279,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
                     somefail = true;
                     failed = ob.ob;
                 }
-            });
+            }
             if (!somefail) {
                 growl.success("Save All Successful");
                 $rootScope.ve_tbApi.select('element-viewer');

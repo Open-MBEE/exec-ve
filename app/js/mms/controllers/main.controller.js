@@ -42,7 +42,8 @@ function($scope, $location, $rootScope, $state, _, $window, $uibModal, growl, $h
         $rootScope.ve_viewContentLoading = false;
         //check if error is ticket error
         if (!error || error.status === 401 || 
-                (error.status === 404 && error.config && error.config.url && error.config.url.indexOf('/login/ticket') !== -1)) { //check if 404 if checking valid ticket
+                (error.status === 404 && error.config && error.config.url && 
+                error.config.url.indexOf('/login/ticket') !== -1)) { //check if 404 if checking valid ticket
             event.preventDefault();
             $rootScope.ve_redirect = {toState: toState, toParams: toParams};
             $state.go('login', {notify: false});
@@ -75,8 +76,8 @@ function($scope, $location, $rootScope, $state, _, $window, $uibModal, growl, $h
                 backdrop: 'static',
                 controller: ['$scope', '$uibModalInstance', function ($scope, $uibModalInstance) {
                     $scope.credentials = {
-                      username: '',
-                      password: ''
+                        username: '',
+                        password: ''
                     };
                     $scope.spin = false;
                     $scope.login = function (credentials) {
