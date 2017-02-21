@@ -86,9 +86,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         var deferred = $q.defer();
         var cached = CacheService.get(requestCacheKey);
         if (cached && !update && (!reqOb.extended || (reqOb.extended && cached._qualifiedId))) {
-            if (UtilsService.isView(cached) &&
-                //!cached.hasOwnProperty('contains') &&
-                !cached.hasOwnProperty('_contents')) {
+            if (UtilsService.isView(cached) && !cached.hasOwnProperty('_contents')) {
             } else {
                 deferred.resolve(cached);
                 return deferred.promise;
@@ -184,14 +182,15 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
             var resultCommitCopy = JSON.parse(JSON.stringify(result));
             result._commitId = 'latest'; //so realCacheKey is right later
             var commitCacheKey = UtilsService.makeElementKey(resultCommitCopy); //save historic element
-            if (!edit)
+            if (!edit) {
                 CacheService.put(commitCacheKey, resultCommitCopy, true);
+            }
         }
         var realCacheKey = UtilsService.makeElementKey(result, result.sysmlId, edit);
         result._commitId = origResultCommit; //restore actual commitId
-        if (realCacheKey === requestCacheKey)
+        if (realCacheKey === requestCacheKey) {
             result = CacheService.put(requestCacheKey, result, true);
-        else {
+        } else {
             CacheService.put(requestCacheKey, realCacheKey);
             result = CacheService.put(realCacheKey, result, true);
         }
@@ -241,9 +240,9 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         UtilsService.normalize(reqOb);
         var requestCacheKey = getElementKey(reqOb, reqOb.elementId, true);
         var key = URLService.getElementURL(reqOb) + 'edit';
-        if (inProgress.hasOwnProperty(key))
+        if (inProgress.hasOwnProperty(key)) {
             return inProgress[key];
-
+        }
         var deferred = $q.defer();
         var cached = CacheService.get(requestCacheKey);
         if (cached && !update) {
@@ -279,8 +278,9 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
      */
     var getOwnedElements = function(reqOb, weight, update) {
         UtilsService.normalize(reqOb);
-        if (!reqOb.depth)
+        if (!reqOb.depth) {
             reqOb.depth = -1;
+        }
         return getGenericElements(URLService.getOwnedElementURL(reqOb), reqOb, 'elements', weight, update);
     };
 
@@ -301,12 +301,10 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
      */
     var getGenericElements = function(url, reqOb, jsonKey, weight, update) {
         UtilsService.normalize(reqOb);
-
         if (inProgress.hasOwnProperty(url)) {
             HttpService.ping(url, weight);
             return inProgress[url];
         }
-
         var deferred = $q.defer();
         inProgress[url] = deferred.promise;
         
@@ -316,8 +314,9 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                 var elements = data[jsonKey];
                 for (var i = 0; i < elements.length; i++) {
                     var element = elements[i];
-                    if (!element) //check for possible null
+                    if (!element) {//check for possible null
                         continue;
+                    }
                     results.push(cacheElement(reqOb, element));
                 }
                 delete inProgress[url];
@@ -332,6 +331,8 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         return deferred.promise;
     };
 
+    //called by updateElement, fills in all keys for element to be updated
+    //will also send any cached edited field for the element to be updated
     var fillInElement = function(elementOb) {
         var deferred = $q.defer();
         getElement({
@@ -341,16 +342,28 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
             refId: elementOb._refId
         }, 2)
         .then(function(data) {
-            var ob = JSON.parse(JSON.stringify(data));
+            var ob = JSON.parse(JSON.stringify(data)); //make a copy
+            ob._commitId = 'latest';
+            var editOb = CacheService.get(UtilsService.makeElementKey(ob, true));
             for (var key in elementOb) {
                 ob[key] = elementOb[key];
             }
-            if (ob._displayedElements)
+            if (editOb) {
+                for (key in editOb) {
+                    if (!elementOb.hasOwnProperty(key)) {
+                        ob[key] = editOb[key];
+                    }
+                }
+            }
+            if (ob._displayedElements) {
                 delete ob._displayedElements;
-            if (ob._allowedElements)
+            }
+            if (ob._allowedElements) {
                 delete ob._allowedElements;
-            if (ob._childViews && !elementOb._childViews)
+            }
+            if (ob._childViews && !elementOb._childViews) {
                 delete ob._childViews;
+            }
             deferred.resolve(ob);
         }, function() {
             deferred.resolve(elementOb);
@@ -376,18 +389,20 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
     var updateElement = function(elementOb) { //elementOb should have the keys needed to make url
 
         var deferred = $q.defer();
-
         var handleSuccess = function(data) {
             var e = null;
             if (data.elements.length > 1 && elementOb.sysmlId) {
                 for (var i = 0; i < data.elements.length; i++) {
-                    if (data.elements[i].sysmlId === elementOb.sysmlId)
+                    if (data.elements[i].sysmlId === elementOb.sysmlId) {
                         e = data.elements[i];
+                    }
                 }
-                if (!e) //TODO shouldn't happen
+                if (!e) {//TODO shouldn't happen
                     e = data.elements[0];
-            } else
+                }
+            } else {
                 e = data.elements[0];
+            }
             var metaOb = {
                 projectId: e._projectId, 
                 refId: e._refId, 
@@ -399,7 +414,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
             cacheElement(metaOb, editCopy, true);
             var history = CacheService.get(['history', metaOb.projectId, metaOb.refId, metaOb.elementId]);
             if (history) {
-                history.unshift({_creator: e._modifier, _timestamp: e._modified, commitId: e._commitId});
+                history.unshift({_creator: e._modifier, _timestamp: e._modified, id: e._commitId});
             }
             deferred.resolve(resp);
         };
@@ -425,20 +440,19 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                 handleSuccess(response.data);
             }, function(response) {
                 if (response.status === 409) {
-                    var server = response.data.elements[0];
-                    UtilsService.cleanElement(server);
+                    var serverOb = response.data.elements[0];
+                    UtilsService.cleanElement(serverOb);
                     var origCommit = elementOb._commitId;
                     elementOb._commitId = 'latest';
-                    var orig = CacheService.get(UtilsService.makeElementKey(elementOb));
+                    var origOb = CacheService.get(UtilsService.makeElementKey(elementOb));
                     elementOb._commitId = origCommit;
-                    if (!orig) {
+                    if (!origOb) {
                         URLService.handleHttpStatus(response.data, response.status, response.headers, response.config, deferred);
                         return;
                     } 
-                    UtilsService.cleanElement(orig);
-                    if (!UtilsService.hasConflict(postElem, orig, server)) {
-                        elementOb._read = server._read;
-                        elementOb._modified = server._modified;
+                    if (!UtilsService.hasConflict(postElem, origOb, serverOb)) {
+                        elementOb._read = serverOb._read;
+                        elementOb._modified = serverOb._modified;
                         updateElement(elementOb)
                         .then(function(good){
                             deferred.resolve(good);
@@ -469,9 +483,9 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
      */
     var updateElements = function(elementObs) { //do individual updates for now since post need to be given canonical project and ref
         var promises = [];
-        elementObs.forEach(function(e) {
-            promises.push(updateElement(e));
-        });
+        for (var i = 0; i < elementObs.length; i++) {
+            promises.push(updateElement(elementObs[i]));
+        }
         return $q.all(promises);
     };
 
@@ -502,13 +516,16 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
             var resp = null;
             if (response.data.elements.length > 1 && reqOb.element.sysmlId) {
                 for (var i = 0; i < response.data.elements.length; i++) {
-                    if (response.data.elements[i].sysmlId === reqOb.element.sysmlId)
+                    if (response.data.elements[i].sysmlId === reqOb.element.sysmlId) {
                         resp = response.data.elements[i];
+                    }
                 }
-                if (!resp) //shouldn't happen!
+                if (!resp) {//shouldn't happen!
                     resp = response.data.elements[0];
-            } else
+                }
+            } else {
                 resp = response.data.elements[0];
+            }
             deferred.resolve(cacheElement(reqOb, resp));
         }, function(response) {
             URLService.handleHttpStatus(response.data, response.status, response.headers, response.config, deferred);
@@ -540,9 +557,9 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                 return;
             }
             var results = [];
-            response.data.elements.forEach(function(e) {
-                results.push(cacheElement(reqOb, e));
-            });
+            for (var i = 0; i < response.data.elements.length; i++) {
+                results.push(cacheElement(reqOb, response.data.elements[i]));
+            }
             deferred.resolve(results);
         }, function(response) {
             URLService.handleHttpStatus(response.data, response.status, response.headers, response.config, deferred);
@@ -559,12 +576,11 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
      * Checks if the current cached element has been updated on the server, does not update the cache. 
      * If the element doesn't exist in the cache, it's considered not outdated
      *
-     * @param {string} id Element id
-     * @param {string} [workspace=master] workspace
+     * @param {object} reqOb see description of getElement
      * @returns {Promise} Resolved with {status: false} if cache is up to date, 
      *      Resolved with {status: true, server: server element, cache: cache element} if cache is outdated
      */
-    var isCacheOutdated = function(id, workspace) {//TODO
+    var isCacheOutdated = function(reqOb) {//TODO
         var deferred = $q.defer();
         deferred.resolve({status: false});
         /*var ws = !workspace ? 'master' : workspace;
@@ -634,8 +650,9 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                 for (var i = 0; i < data.elements.length; i++) {
                     var element = data.elements[i];
                     var properties = element._properties;
-                    if (properties)
+                    if (properties) {
                         delete element._properties;
+                    }
                     var cacheE = cacheElement(reqOb, element);
                     if (properties) {
                         for (var j = 0; j < properties.length; j++) {

@@ -54,8 +54,9 @@ function ProjectService($q, $http, URLService, CacheService, ApplicationService)
      */
     var getOrgs = function() {
         var key = 'orgs';
-        if (inProgress.hasOwnProperty(key))
+        if (inProgress.hasOwnProperty(key)) {
             return inProgress[key];
+        }
         var deferred = $q.defer();
         if (CacheService.exists(key)) {
             deferred.resolve(CacheService.get(key));
@@ -80,8 +81,9 @@ function ProjectService($q, $http, URLService, CacheService, ApplicationService)
     var getProjects = function(orgId) {
         var deferred = $q.defer();
         var url = URLService.getProjectsURL(orgId);
-        if (inProgress.hasOwnProperty(url))
+        if (inProgress.hasOwnProperty(url)) {
             return inProgress[url];
+        }
         var cacheKey = orgId ? 'projects' : ['projects', orgId];
         if (CacheService.exists(cacheKey)) {
             deferred.resolve(CacheService.get(cacheKey));
@@ -111,8 +113,9 @@ function ProjectService($q, $http, URLService, CacheService, ApplicationService)
     var getProject = function(projectId) {
         var deferred = $q.defer();
         var url = URLService.getProjectURL(projectId);
-        if (inProgress.hasOwnProperty(url))
+        if (inProgress.hasOwnProperty(url)) {
             return inProgress[url];
+        }
         var cacheKey = ['project', projectId];
         if (CacheService.exists(cacheKey))
             deferred.resolve(CacheService.get(cacheKey));
@@ -136,8 +139,9 @@ function ProjectService($q, $http, URLService, CacheService, ApplicationService)
     var getRefs = function(projectId) {
         var cacheKey = ['refs', projectId];
         var url = URLService.getRefsURL(projectId);
-        if (inProgress.hasOwnProperty(url))
+        if (inProgress.hasOwnProperty(url)) {
             return inProgress[url];
+        }
         var deferred = $q.defer();
         if (CacheService.exists(cacheKey)) {
             deferred.resolve(CacheService.get(cacheKey));
@@ -168,10 +172,11 @@ function ProjectService($q, $http, URLService, CacheService, ApplicationService)
         var deferred = $q.defer();
         getRefs(projectId).then(function(data) {
             var result = CacheService.get(['ref', projectId, refId]);
-            if (result)
+            if (result) {
                 deferred.resolve(result);
-            else
+            } else {
                 deferred.reject({status: 404, data: '', message: "Ref not found"});
+            }
         }, function(reason) {
             deferred.reject(reason);
         });
@@ -190,8 +195,9 @@ function ProjectService($q, $http, URLService, CacheService, ApplicationService)
             }
             var resp = response.data.refs[0];
             var list = CacheService.get(['refs', projectId]);
-            if (list)
+            if (list) {
                 list.push(resp);
+            }
             deferred.resolve(CacheService.put(['ref', projectId, resp.id], resp));
         }, function(response) {
             URLService.handleHttpStatus(response.data, response.status, response.headers, response.config, deferred);
@@ -246,8 +252,9 @@ function ProjectService($q, $http, URLService, CacheService, ApplicationService)
         refId = refId ? refId : 'master';
         var cacheKey = ['groups', projectId, refId];
         var url = URLService.getGroupsURL(projectId, refId);
-        if (inProgress.hasOwnProperty(url))
+        if (inProgress.hasOwnProperty(url)) {
             return inProgress[url];
+        }
         var deferred = $q.defer();
         if (CacheService.exists(cacheKey)) {
             deferred.resolve(CacheService.get(cacheKey));
@@ -260,8 +267,8 @@ function ProjectService($q, $http, URLService, CacheService, ApplicationService)
                 }
                 var groups = [];
                 for (var group in response.data.groups) {
-                    CacheService.put(['group', projectId, refId, group.sysmlId], group, true);
-                    groups.push(CacheService.get(['group', projectId, refId, group.sysmlId]));
+                    CacheService.put(['group', projectId, refId, group._id], group, true);
+                    groups.push(CacheService.get(['group', projectId, refId, group._id]));
                 }
                 CacheService.put(cacheKey, groups, false);
                 deferred.resolve(CacheService.get(cacheKey));
@@ -274,14 +281,15 @@ function ProjectService($q, $http, URLService, CacheService, ApplicationService)
         return deferred.promise;
     };
 
-    var getGroup = function(sysmlId, projectId, refId) {
+    var getGroup = function(id, projectId, refId) {
         var deferred = $q.defer();
         getGroups(projectId, refId).then(function(data) {
-            var result = CacheService.get(['group', projectId, refId, sysmlId]);
-            if (result)
+            var result = CacheService.get(['group', projectId, refId, id]);
+            if (result) {
                 deferred.resolve(result);
-            else
+            } else {
                 deferred.reject({status: 404, data: '', message: "Group not found"});
+            }
         }, function(reason) {
             deferred.reject(reason);
         });

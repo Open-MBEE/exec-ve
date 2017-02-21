@@ -206,8 +206,9 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                             break;
                         }
                     }
-                    if (index >= 0)
+                    if (index >= 0) {
                         projectDocs.splice(index, 1);
+                    }
                 }
                 return data;
             }, function(reason) {
@@ -235,8 +236,9 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         UtilsService.normalize(reqOb);
         var deferred = $q.defer();
         var key = 'viewElements' + reqOb.projectId + reqOb.refId + reqOb.elementId + reqOb.commitId;
-        if (inProgress[key])
+        if (inProgress[key]) {
             return inProgress[key];
+        }
         var requestCacheKey = ['elements', reqOb.projectId, reqOb.refId, reqOb.elementId, reqOb.commitId];
         var cached = CacheService.get(requestCacheKey);
         if (cached && !update) {
@@ -290,9 +292,9 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         var deferred = $q.defer();
         var url = URLService.getDocumentViewsURL(reqOb);
         var cacheKey = ['views', reqOb.projectId, reqOb.refId, reqOb.elementId];
-        if (CacheService.exists(cacheKey) && !update) 
+        if (CacheService.exists(cacheKey) && !update) {
             deferred.resolve(CacheService.get(cacheKey));
-        else {
+        } else {
             ElementService.getGenericElements(url, reqOb, 'views', weight, update).
             then(function(data) {
                 deferred.resolve(CacheService.put(cacheKey, data, false));
@@ -319,16 +321,24 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
     var addViewToParentView = function(reqOb) {
         UtilsService.normalize(reqOb);
         var deferred = $q.defer();
-        //var docViewsCacheKey = ['products', ws, 'latest', 'views'];
         ElementService.getElement({
             projectId: reqOb.projectId,
             refId: reqOb.refId,
             elementId: reqOb.parentViewId,
             extended: true
         }, 2).then(function(data) {  
-            var clone = JSON.parse(JSON.stringify(data));
-            if (!clone._childViews)
+            var clone = {
+                _projectId: data._projectId,
+                _refId: data._refId,
+                _modified: data._modified,
+                _read: data._read,
+                id: data.id
+            };
+            if (data._childViews) {
+                clone._childViews = JSON.parse(JSON.stringify(data._childViews));
+            } else {
                 clone._childViews = [];
+            }
             clone._childViews.push({id: reqOb.viewId, aggregation: reqOb.aggr});
             ElementService.updateElement(clone)
             .then(function(data2) {
@@ -363,7 +373,14 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             extended: true
         }, 2).then(function(data) {  
             if (data._childViews) {
-                var clone = JSON.parse(JSON.stringify(data));
+                var clone = {
+                    _projectId: data._projectId,
+                    _refId: data._refId,
+                    _modified: data._modified,
+                    _read: data._read,
+                    id: data.id,
+                    _childViews: JSON.parse(JSON.stringify(data._childViews))
+                };
                 for (var i = 0; i < clone._childViews.length; i++) {
                     if (clone._childViews[i].id === reqOb.viewId) {
                         clone._childViews.splice(i,1);
@@ -404,18 +421,26 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         var deferred = $q.defer();
         ElementService.getElement(reqOb, 2)
         .then(function(data) {  
-            var clone = JSON.parse(JSON.stringify(data));
+            var clone = {
+                _projectId: data._projectId,
+                _refId: data._refId,
+                _modified: data._modified,
+                _read: data._read,
+                id: data.id,
+            };
             var key = '_contents';
-            if (isSection(clone)) 
+            if (isSection(data)) {
                 key = "specification";
-            if (!clone[key]) {
+            }
+            if (data[key]) {
+                clone[key] = JSON.parse(JSON.stringify(data[key]));
+            } else {
                 clone[key] = {
                     operand: [],
                     type: "Expression",
                 };
             }
             clone[key].operand.push(elementOb);
-
             ElementService.updateElement(clone)
             .then(function(data2) {
                 deferred.resolve(data2);
@@ -447,10 +472,25 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         if (instanceVal) {
             ElementService.getElement(reqOb, 2)
             .then(function(data) {  
-                var clone = JSON.parse(JSON.stringify(data));
+                var clone = {
+                    _projectId: data._projectId,
+                    _refId: data._refId,
+                    _modified: data._modified,
+                    _read: data._read,
+                    id: data.id,
+                };
                 var key = '_contents';
-                if (isSection(data)) 
+                if (isSection(data)) {
                     key = "specification";
+                }
+                if (data[key]) {
+                    clone[key] = JSON.parse(JSON.stringify(data[key]));
+                } else {
+                    clone[key] = {
+                        operand: [],
+                        type: "Expression",
+                    };
+                }
                 if (clone[key] && clone[key].operand) {
                     var operands = data[key].operand;
                     for (var i = 0; i < operands.length; i++) {
@@ -511,17 +551,26 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             },
             _appliedStereotypeIds: [],
         };
-        if (type === 'Section')
+        if (type === 'Section') {
             instanceSpec.specification = {
                 operand: [],  
                 type: "Expression"
             };
-
-        var clone = JSON.parse(JSON.stringify(viewOrSectionOb));
+        }
+        var clone = {
+            _projectId: viewOrSectionOb._projectId,
+            _refId: viewOrSectionOb._refId,
+            _modified: viewOrSectionOb._modified,
+            _read: viewOrSectionOb._read,
+            id: viewOrSectionOb.id,
+        };
         var key = '_contents';
-        if (isSection(clone)) 
+        if (isSection(viewOrSectionOb)) {
             key = "specification";
-        if (!clone[key]) {
+        }
+        if (viewOrSectionOb[key]) {
+            clone[key] = JSON.parse(JSON.stringify(viewOrSectionOb[key]));
+        } else {
             clone[key] = {
                 operand: [],
                 type: "Expression",
@@ -539,8 +588,9 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             for (var i = 0; i < data.length; i++) {
                 var elem = data[i];
                 if (elem.sysmlId === newInstanceId) {
-                    if (type === "Section") 
+                    if (type === "Section") {
                         $rootScope.$broadcast('viewctrl.add.section', elem, viewOrSectionOb);
+                    }
                     deferred.resolve(elem);
                     return;
                 }
@@ -599,7 +649,14 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         };
         var parentView = null;
         if (ownerOb && ownerOb._childViews) {
-            parentView = JSON.parse(JSON.stringify(ownerOb));
+            parentView = {
+                _projectId: ownerOb._projectId,
+                _refId: ownerOb._refId,
+                _modified: ownerOb._modified,
+                _read: ownerOb._read,
+                id: ownerOb.id,
+                _childViews: JSON.parse(JSON.stringify(ownerOb._childViews))
+            };
             parentView._childViews.push({id: newViewId, aggregation: "composite"});
         } 
         var instanceSpecDoc = '<p>&nbsp;</p><p><mms-transclude-doc data-mms-eid="' + newViewId + '">[cf:' + view.name + '.doc]</mms-transclude-doc></p><p>&nbsp;</p>';
@@ -702,9 +759,9 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         var deferred = $q.defer();
         var url = URLService.getProjectDocumentsURL(reqOb);
         var cacheKey = ['documents', reqOb.projectId, reqOb.refId];
-        if (CacheService.exists(cacheKey) && !update) 
+        if (CacheService.exists(cacheKey) && !update) {
             deferred.resolve(CacheService.get(cacheKey));
-        else {
+        } else {
             ElementService.getGenericElements(url, reqOb, 'documents', weight, update).
             then(function(data) {              
                 deferred.resolve(CacheService.put(cacheKey, data, false));
@@ -772,9 +829,9 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      */
     var getElementReferenceTree = function(reqOb, contents, weight) {
         var promises = [];
-        angular.forEach(contents.operand, function(instanceVal) {
-            promises.push(getElementReference(reqOb, instanceVal, weight) );
-        });
+        for (var i = 0; i < contents.operand.length; i++) {
+            promises.push(getElementReference(reqOb, contents.operand[i], weight));
+        }
         return $q.all(promises);
     };
 
@@ -794,10 +851,11 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             elementObject.instanceSpecification = instanceSpecification;
             if (instanceSpecification.classifierIds &&
                     instanceSpecification.classifierIds.length > 0 && 
-                    opaqueClassifiers.indexOf(instanceSpecification.classifierIds[0]) >= 0)
+                    opaqueClassifiers.indexOf(instanceSpecification.classifierIds[0]) >= 0) {
                 elementObject.isOpaque = true;
-            else
+            } else {
                 elementObject.isOpaque = false;
+            }
             var presentationElement = getPresentationElementSpec(instanceSpecification);
             elementObject.presentationElement = presentationElement;
             if (isSection(presentationElement)) {
@@ -889,13 +947,15 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             if (data.length === 0) {
                 return;
             }
-            data.forEach(function(prop) {
+            for (var i = 0; i < data.length; i++) {
+                var prop = data[i];
                 var feature = prop.definingFeatureId ? prop.definingFeatureId : null;
                 var value = prop.value ? prop.value : null;
-                if (!feature || !docMetadataTypes[feature] || !value || value.length === 0)
-                    return;
+                if (!feature || !docMetadataTypes[feature] || !value || value.length === 0) {
+                    continue;
+                }
                 metadata[docMetadataTypes[feature].name] = docMetadataTypes[feature].process(value);
-            });
+            }
         }, function(reason) {
         }).finally(function() {
             deferred.resolve(metadata);
@@ -906,8 +966,9 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
     var isPresentationElement = function(e) {
         if (e.type === 'InstanceSpecification') {
             var classifierIdss = e.classifierIds;
-            if (classifierIdss.length > 0 && classifierIdsIds.indexOf(classifierIdss[0]) >= 0)
+            if (classifierIdss.length > 0 && classifierIdsIds.indexOf(classifierIdss[0]) >= 0) {
                 return true;
+            }
         }
         return false;
     };

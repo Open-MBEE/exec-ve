@@ -21,7 +21,7 @@ function UtilsService($q, $http, CacheService, URLService, _) {
         var curscope = scope;
         while (curscope.$parent) {
             var parent = curscope.$parent;
-            if (parent.mmsEid === curId && parent.cfType === curType)
+            if (parent.mmsElementId === curId && parent.cfType === curType)
                 return true;
             curscope = parent;
         }
@@ -32,8 +32,9 @@ function UtilsService($q, $http, CacheService, URLService, _) {
         if (vs.hasOwnProperty('valueExpression'))
             delete vs.valueExpression;
         if (vs.operand) {
-            for (var i = 0; i < vs.operand.length; i++)
+            for (var i = 0; i < vs.operand.length; i++) {
                 cleanValueSpec(vs.operand[i]);
+            }
         }
     };
     
@@ -50,113 +51,105 @@ function UtilsService($q, $http, CacheService, URLService, _) {
      * @returns {Object} clean elem
      */
     var cleanElement = function(elem, forEdit) {
-        // hack - should fix on MMS, if name is null should include name
-        if (! elem.name) {
+        if (!elem.name) {
             elem.name = '';
         }
         var i = 0;
-        //if (elem.hasOwnProperty('specialization')) {
-            if (elem.type === 'Property' || elem.type === 'Port') {
-                if (!elem.defaultValue)
-                    elem.defaultValue = null;
+        if (elem.type === 'Property' || elem.type === 'Port') {
+            if (!elem.defaultValue) {
+                elem.defaultValue = null;
             }
-            if (elem.type === 'Slot') {
-                if (!_.isArray(elem.value))
-                    elem.value = [];
-                elem.value.forEach(function(val) {
-                    if (val.hasOwnProperty('specialization'))
-                        delete val.specialization;
-                });
+        }
+        if (elem.type === 'Slot') {
+            if (!_.isArray(elem.value))
+                elem.value = [];
+        }
+        if (elem.value) {
+            for (i = 0; i < elem.value.length; i++) {
+                cleanValueSpec(elem.value[i]);
             }
-            if (elem.value) {
-                for (i = 0; i < elem.value.length; i++)
-                    cleanValueSpec(elem.value[i]);
+        }
+        if (elem._contents) {
+            cleanValueSpec(elem._contents);
+        }
+        if (elem.specification) {
+            cleanValueSpec(elem.specification);
+        }
+        if (elem.type === 'Class') {
+            if (elem._contents && elem.contains) {
+                delete elem.contains;
             }
-            if (elem._contents) {
-                cleanValueSpec(elem._contents);
+            if (Array.isArray(elem._displayedElements)) {
+                elem._displayedElements = JSON.stringify(elem._displayedElements);
             }
-            if (elem.specification) {
-                cleanValueSpec(elem.specification);
+            if (elem._allowedElements) {
+                delete elem._allowedElements;
             }
-            if (elem.type === 'Class') {
-                //delete elem.specialization.displayedElements;
-                //delete elem.specialization.allowedElements;
-                if (elem._contents && elem.contains)
-                    delete elem.contains;
-                if (Array.isArray(elem._displayedElements)) {
-                    //elem._numElements = elem._displayedElements.length;
-                    //if (elem._numElements <= 5000)
-                     //   delete elem._displayedElements;
-                    //else
-                    elem._displayedElements = JSON.stringify(elem._displayedElements);
-                }
-                if (elem._allowedElements)
-                    delete elem._allowedElements;
-            }
-            if (elem.hasOwnProperty('specialization')) {
-                delete elem.specialization;
-            }
-            if (forEdit) {
-                for (i = 0; i < nonEditKeys.length; i++) {
-                    if (elem.hasOwnProperty(nonEditKeys[i])) {
-                        delete elem[nonEditKeys[i]];
-                    }
+        }
+        if (elem.hasOwnProperty('specialization')) {
+            delete elem.specialization;
+        }
+        if (forEdit) {
+            for (i = 0; i < nonEditKeys.length; i++) {
+                if (elem.hasOwnProperty(nonEditKeys[i])) {
+                    delete elem[nonEditKeys[i]];
                 }
             }
-        //}
+        }
         return elem;
     };
 
     var buildTreeHierarchy = function (array, id, type, parent, level2_Func) {
         var rootNodes = [];
         var data2Node = {};
-
+        var i = 0;
+        var data = null;
         // make first pass to create all nodes
-        array.forEach(function(data) {
+        for (i = 0; i < array.length; i++) {
+            data = array[i];
             data2Node[data[id]] = { 
                 label : data.name || data._name, 
                 type : type,
                 data : data, 
                 children : [] 
             };
-        });
-
+        }
         // make second pass to associate data to parent nodes
-        array.forEach(function(data) {
+        for (i = 0; i < array.length; i++) {
+            data = array[i];
             // If theres an element in data2Node whose key matches the 'parent' value in the array element
             // add the array element to the children array of the matched data2Node element
-            if (data[parent] && data2Node[data[parent]]) //bad data!
+            if (data[parent] && data2Node[data[parent]]) {//bad data!
                 data2Node[data[parent]].children.push(data2Node[data[id]]);
+            } else {
             // If theres not an element in data2Node whose key matches the 'parent' value in the array element
             // it's a "root node" and so it should be pushed to the root nodes array along with its children
-            else
                 rootNodes.push(data2Node[data[id]]);
-        });
-        
-        // Recursive function which sets the level of all nodes passed
-        var determineLevelOfNodes = function(nodes, initialLevel) {
-            nodes.forEach(function(node) {
-                node.level = initialLevel;
-                if (node.children && node.children.length > 0) {
-                    determineLevelOfNodes(node.children, initialLevel + 1);
-                }
-            });
-        };
-        determineLevelOfNodes(rootNodes, 1);
+            }
+        }
 
-        // Get documents and apply them to the tree structure
+        //apply level2 function if available
         if (level2_Func) {
-            array.forEach(function(data) {
+            for (i = 0; i < array.length; i++) {
+                data = array[i];
                 var level1_parentNode = data2Node[data[id]];
                 level2_Func(data, level1_parentNode);
-            });
+            }
         }
 
         var sortFunction = function(a, b) {
-            if (a.children.length > 1) a.children.sort(sortFunction);
-            if (b.children.length > 1) b.children.sort(sortFunction);
-            if(a.label.toLowerCase() < b.label.toLowerCase()) return -1;
-            if(a.label.toLowerCase() > b.label.toLowerCase()) return 1;
+            if (a.children.length > 1) {
+                a.children.sort(sortFunction);
+            }
+            if (b.children.length > 1) {
+                b.children.sort(sortFunction);
+            }
+            if (a.label.toLowerCase() < b.label.toLowerCase()) {
+                return -1;
+            }
+            if (a.label.toLowerCase() > b.label.toLowerCase()) {
+                return 1;
+            }
             return 0;
         };
         rootNodes.sort(sortFunction);
@@ -204,6 +197,7 @@ function UtilsService($q, $http, CacheService, URLService, _) {
             key.push('edit');
         return key;
     };
+
     /**
      * @ngdoc method
      * @name mms.UtilsService#mergeElement
@@ -213,43 +207,11 @@ function UtilsService($q, $http, CacheService, URLService, _) {
      * Make key for element for use in CacheService
      *
      * @param {object} source the element object to merge in 
-     * @param {string} eid id of element
-     * @param {string} [workspace=master] workspace
      * @param {boolean} [updateEdit=false] updateEdit
-     * @param {string} property type of property, ie transclusion or not
      * @returns {void} nothing 
      */
-
-    var mergeElement = function(source, eid, workspace, updateEdit, property) {
-        var ws = workspace ? workspace : 'master';
-        var key = makeElementKey(eid, ws, 'latest', false);
-        var keyEdit = makeElementKey(eid, ws, 'latest', true);
-        var clean = cleanElement(source);
-        CacheService.put(key, clean, true);
-        var edit = CacheService.get(keyEdit);
-        if (updateEdit && edit) {
-            edit._read = clean._read;
-            edit._modified = clean._modified;
-            if (property === 'all')
-                CacheService.put(keyEdit, clean, true);
-            else if (property === 'name')
-                edit.name = clean.name;
-            else if (property === 'documentation')
-                edit.documentation = clean.documentation;
-            else if (property === 'value') {
-                _.merge(edit, clean, function(a,b,id) {
-                    //if ((id === 'contents' || id === 'contains') && a)
-                    //    return a; //handle contains and contents updates manually at higher level
-                    if (angular.isArray(a) && angular.isArray(b) && b.length < a.length) {
-                        a.length = 0;
-                        Array.prototype.push.apply(a, b);
-                        return a; 
-                    }
-                    return undefined;
-                });
-            }
-            cleanElement(edit, true);
-        }
+    var mergeElement = function(source, updateEdit) {
+        //TODO remove calls to this, shoudl use ElementService.cacheElement
     };
     /**
      * @ngdoc method
@@ -274,6 +236,7 @@ function UtilsService($q, $http, CacheService, URLService, _) {
         }
         return res;
     };
+
     /**
      * @ngdoc method
      * @name mms.UtilsService#hasConflict
@@ -288,20 +251,21 @@ function UtilsService($q, $http, CacheService, URLService, _) {
      *	if key is in edit object and value in orig object is different 
      *  from value in server object. 
      *
-     * @param {Object} elem An object that contains element id and any property changes to be saved.
+     * @param {Object} edit An object that contains element id and any property changes to be saved.
      * @param {Object} orig version of elem object in cache.
      * @param {Object} server version of elem object from server.
      * @returns {Boolean} true if conflict, false if not
      */
-
     var hasConflict = function(edit, orig, server) {
         for (var i in edit) {
             if (i === '_read' || i === '_modified' || i === '_modifier' || 
-                    i === '_creator' || i === '_created')
+                    i === '_creator' || i === '_created' || '_commitId') {
                 continue;
+            }
             if (edit.hasOwnProperty(i) && orig.hasOwnProperty(i) && server.hasOwnProperty(i)) {
-                if (!angular.equals(orig[i], server[i]))
+                if (!angular.equals(orig[i], server[i])) {
                     return true;
+                }
             }
         }
         return false;
@@ -309,23 +273,25 @@ function UtilsService($q, $http, CacheService, URLService, _) {
 
     function isRestrictedValue(values) {
         if (values.length > 0 && values[0].type === 'Expression' &&
-            values[0].operand.length === 3 && values[0].operand[0].value === 'RestrictedValue' &&
-            values[0].operand[2].type === 'Expression' && values[0].operand[2].operand.length > 0 &&
-            values[0].operand[1].type === 'ElementValue')
-                    return true;
+                values[0].operand.length === 3 && values[0].operand[0].value === 'RestrictedValue' &&
+                values[0].operand[2].type === 'Expression' && values[0].operand[2].operand.length > 0 &&
+                values[0].operand[1].type === 'ElementValue') {
+            return true;
+        }
         return false;
     }
 
     var makeHtmlTable = function(table) {
         var result = ['<table class="table table-bordered table-condensed">'];
-        if (table.title)
+        if (table.title) {
             result.push('<caption>' + table.title + '</caption>');
+        }
         if (table.colwidths && table.colwidths.length > 0) {
             result.push('<colgroup>');
             for (var i = 0; i < table.colwidths.length; i++) {
-                if (table.colwidths[i])
+                if (table.colwidths[i]) {
                     result.push('<col style="width: ' + table.colwidths[i] + '">');
-                else {
+                } else {
                     result.push('<col>');
                 }
             }
@@ -363,7 +329,7 @@ function UtilsService($q, $http, CacheService, URLService, _) {
                     } else if (thing.type === 'List') {
                         result.push(makeHtmlList(thing));
                     } else if (thing.type === 'Image') {
-                        result.push('<mms-transclude-img mms-eid="' + thing.sysmlId + '"></mms-transclude-img>');
+                        result.push('<mms-transclude-img mms-element-id="' + thing.sysmlId + '"></mms-transclude-img>');
                     }
                     result.push('</div>');
                 }
@@ -393,7 +359,7 @@ function UtilsService($q, $http, CacheService, URLService, _) {
                 } else if (thing.type === 'List') {
                     result.push(makeHtmlList(thing));
                 } else if (thing.type === 'Image') {
-                    result.push('<mms-transclude-img mms-eid="' + thing.sysmlId + '"></mms-transclude-img>');
+                    result.push('<mms-transclude-img mms-element-id="' + thing.sysmlId + '"></mms-transclude-img>');
                 }
                 result.push('</div>');
             }
@@ -411,27 +377,26 @@ function UtilsService($q, $http, CacheService, URLService, _) {
             return para.text;
         var t = 'doc';
         var attr = '';
-        if (para.sourceProperty === 'name')
+        if (para.sourceProperty === 'name') {
             t = 'name';
-        if (para.sourceProperty === 'value')
+        }
+        if (para.sourceProperty === 'value') {
             t = 'val';
+        }
         if (para.nonEditable) {
             attr = ' data-non-editable="' + para.nonEditable + '"';
         }
-        return '<mms-transclude-' + t + ' data-mms-eid="' + para.source + '"' + attr + '></mms-transclude-' + t + '>';
+        return '<mms-transclude-' + t + ' mms-element-id="' + para.source + '"' + attr + '></mms-transclude-' + t + '>';
     };
 
     var makeHtmlTOC = function (tree) {
         var result = '<div class="toc"><div class="header">Table of Contents</div>';
-
         var root_branch = tree[0].branch;
-
-        root_branch.children.forEach(function (child) {
-            result += makeHtmlTOCChild(child);
-        });
-
+        var i = 0;
+        for (i = 0; i < root_branch.children.length; i++) {
+            result += makeHtmlTOCChild(root_branch.children[i]);
+        }
         result += '</div>'; 
-
         return result;
     };
 
@@ -439,16 +404,13 @@ function UtilsService($q, $http, CacheService, URLService, _) {
         if (child.type !== 'view' && child.type !== 'section')
             return '';
         var result = '<ul>';
-
         var anchor = '<a href=#' + child.data.sysmlId + '>';
         result += '  <li>' + anchor + child.section + ' ' + child.label + '</a></li>';
-
-        child.children.forEach(function (child2) {
-            result += makeHtmlTOCChild(child2);
-        });
-
+        var i = 0;
+        for (i = 0; i < child.children.length; i++) {
+            result += makeHtmlTOCChild(child.children[i]);
+        }
         result += '</ul>'; 
-
         return result;
     };
 
@@ -461,13 +423,14 @@ function UtilsService($q, $http, CacheService, URLService, _) {
             figureCount: 0,
             equationCount: 0
         };
-        if (html)
+        if (html) {
             return ob; //let server handle it for now
+        }
         var root_branch = tree[0].branch;
-        root_branch.children.forEach(function (child) {
-            makeTablesAndFiguresTOCChild(child, printElement, ob, live, false);
-        });
-
+        var i = 0;
+        for (i = 0; i < root_branch.children.length; i++) {
+            makeTablesAndFiguresTOCChild(root_branch.children[i], printElement, ob, live, false);
+        }
         ob.tables += '</ul></div>';
         ob.figures += '</ul></div>';
         ob.equations += '</ul></div>';
@@ -477,7 +440,7 @@ function UtilsService($q, $http, CacheService, URLService, _) {
     var makeTablesAndFiguresTOCChild = function(child, printElement, ob, live, showRefName) {
         var sysmlId = child.data.sysmlId;
         var el = printElement.find('#' + sysmlId);
-        var refs = printElement.find('mms-view-link[data-mms-peid="' + sysmlId + '"]');
+        var refs = printElement.find('mms-view-link[data-mms-pe-id="' + sysmlId + '"]');
         var cap = '';
         if (child.type === 'table') {
             ob.tableCount++;
@@ -491,11 +454,14 @@ function UtilsService($q, $http, CacheService, URLService, _) {
             // Change cap value based on showRefName true/false
             if (showRefName) {
                 cap = ob.tableCount + '. ' + child.data.name;
-            } else cap = ob.tableCount;
-            if (live)
+            } else {
+                cap = ob.tableCount;
+            }
+            if (live) {
                 refs.find('a').html('Table ' + cap);
-            else
+            } else {
                 refs.html('<a href="#' + sysmlId + '">Table ' + cap + '</a>');
+            }
         }
         if (child.type === 'figure') {
             ob.figureCount++;
@@ -509,11 +475,14 @@ function UtilsService($q, $http, CacheService, URLService, _) {
             // Change cap value based on showRefName true/false
             if (showRefName) {
                 cap = ob.figureCount + '. ' + child.data.name;
-            } else cap = ob.figureCount;
-            if (live)
+            } else {
+                cap = ob.figureCount;
+            }
+            if (live) {
                 refs.find('a').html('Fig. ' + cap);
-            else
+            } else {
                 refs.html('<a href="#' + sysmlId + '">Fig. ' + cap + '</a>');
+            }
         }
         if (child.type === 'equation') {
             ob.equationCount++;
@@ -528,15 +497,18 @@ function UtilsService($q, $http, CacheService, URLService, _) {
             // Change cap value based on showRefName true/false
             if (showRefName) {
                 cap = ob.equationCount + '. ' + child.data.name;
-            } else cap = ob.equationCount;
-            if (live)
+            } else {
+                cap = ob.equationCount;
+            }
+            if (live) {
                 refs.find('a').html('Eq. ' + equationCap);
-            else
+            } else {
                 refs.html('<a href="#' + sysmlId + '">Eq. ' + equationCap + '</a>');
+            }
         }
-        child.children.forEach(function(child2) {
-            makeTablesAndFiguresTOCChild(child2, printElement, ob, live, showRefName);
-        });
+        for (var i = 0; i < child.children.length; i++) {
+            makeTablesAndFiguresTOCChild(child.children[i], printElement, ob, live, showRefName);
+        }
     };
 
     var createMmsId = function() {
@@ -591,43 +563,32 @@ function UtilsService($q, $http, CacheService, URLService, _) {
         Object.keys(meta).forEach(function(key) {
             var content = '""';
             if (meta[key]) {
-                if (meta[key] === 'counter(page)')
+                if (meta[key] === 'counter(page)') {
                     content = meta[key];
-                else
+                } else {
                     content = '"' + meta[key] + '"';
+                }
                 ret += '@page {@' + key + ' {font-size: 10px; content: ' + content + ';}}\n';
             }
         });
-        //ret += "@page { @bottom-right { content: counter(page); }}\n";
-
-        /*if (header && header !== '') {
-            ret += '@page { @top { font-size: 10px; content: "' + header + '";}}\n';
-        }
-        if (footer && footer !== '') {
-            ret += '@page { @bottom { font-size: 10px; content: "' + footer + '";}}\n';
-        }
-        ret += "@page { @bottom-right { content: counter(page); }}\n";
-        if (tag && tag !== 'latest' && tag !== '') {
-            ret += "@page { @top-right { font-size: 10px; content: '" + tag + "';}}\n";
-        } else {
-            ret += "@page { @top-right { font-size: 10px; content: '" + displayTime + "';}}\n";
-        }*/
-        if (landscape)
+        if (landscape) {
             ret += "@page {size: 11in 8.5in;}";
-                //"@page{prince-shrink-to-fit:auto;size: A4 portrait;margin-left:8mm;margin-right:8mm;}";
+        }
         return ret;
     };
 
     var isView = function(e) {
         if (e._appliedStereotypeIds && (e._appliedStereotypeIds.indexOf(VIEW_SID) >= 0 || 
-            e._appliedStereotypeIds.indexOf(DOCUMENT_SID) >= 0))
+                e._appliedStereotypeIds.indexOf(DOCUMENT_SID) >= 0)) {
             return true;
+        }
         return false;
     };
 
     var isDocument = function(e) {
-        if (e._appliedStereotypeIds && e._appliedStereotypeIds.indexOf(DOCUMENT_SID) >= 0)
+        if (e._appliedStereotypeIds && e._appliedStereotypeIds.indexOf(DOCUMENT_SID) >= 0) {
             return true;
+        }
         return false;
     };
 
@@ -644,7 +605,7 @@ function UtilsService($q, $http, CacheService, URLService, _) {
      * @param {string} [workspace=master] Workspace name
      * @returns {Promise} Promise would be resolved with 'ok', the server will send an email to user when done
      */
-    var convertHtmlToPdf = function(doc, site, workspace){
+    var convertHtmlToPdf = function(doc, site, workspace){ //TODO fix
         var n = UtilsService.normalize(null, workspace);
         var deferred = $q.defer();
         $http.post(URLService.getHtmlToPdfURL(doc.docId, site, n.ws), {'documents': [doc]})

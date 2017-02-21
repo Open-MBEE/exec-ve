@@ -28,12 +28,14 @@ function CacheService(_) {
      */
     var get = function(key) {
         var realkey = key;
-        if (angular.isArray(key))
+        if (angular.isArray(key)) {
             realkey = makeKey(key);
+        }
         if (cache.hasOwnProperty(realkey)) {
             var realval = cache[realkey];
-            if (angular.isString(realval))
+            if (angular.isString(realval)) {
                 return get(realval);
+            }
             return realval;
         }
         return null;
@@ -55,13 +57,15 @@ function CacheService(_) {
         var latestElements = [];
 
         for (var key in cache) {
-            if (!cache.hasOwnProperty(key)) 
+            if (!cache.hasOwnProperty(key)) {
                 continue;
+            }
             if (key.indexOf('|latest') >= 0 && key.indexOf('element|') >= 0 && 
                     key.indexOf(refId) >= 0 && key.indexOf(projectId) >= 0) {
                 var val = get(key);
-                if (val)
+                if (val) {
                     latestElements.push(val);
+                }
             }
         }
         return latestElements;
@@ -83,29 +87,33 @@ function CacheService(_) {
     var put = function(key, value, merge) {
         var m = !merge ? false : merge;
         var realkey = key;
-        if (angular.isArray(key))
+        if (angular.isArray(key)) {
             realkey = makeKey(key);
+        }
         var val = get(realkey);
         if (val && m && angular.isObject(value)) {
             _.merge(val, value, function(a,b,id) {
-                if ((id === '_contents' || id === 'contains' || id === 'specification') && b && b.type === 'Expression')
-                    return b; 
+                if ((id === '_contents' || id === 'contains' || id === 'specification') && b && b.type === 'Expression') {
+                    return b;
+                }
                 if (angular.isArray(a) && angular.isArray(b) && b.length < a.length) {
                     a.length = 0;
                     Array.prototype.push.apply(a, b);
                     return a; 
                 }
-                if (id === '_displayedElements' && b)
+                if (id === '_displayedElements' && b) {
                     return b;
+                }
                 return undefined;
             });
         } else {
-            if (!angular.isString(val) || angular.isString(value))
+            if (!angular.isString(val) || angular.isString(value)) {
                 cache[realkey] = value;
-            else {
+            } else {
                 realkey = val;
-                while (angular.isString(cache[realkey]))
+                while (angular.isString(cache[realkey])) {
                     realkey = cache[realkey];
+                }
                 cache[realkey] = value;
             }
             val = value;
@@ -126,14 +134,17 @@ function CacheService(_) {
      */
     var remove = function(key) {
         var realkey = key;
-        if (angular.isArray(key))
+        if (angular.isArray(key)) {
             realkey = makeKey(key);
-        if (!cache.hasOwnProperty(realkey)) 
+        }
+        if (!cache.hasOwnProperty(realkey)) {
             return null;
+        }
         var result = cache[realkey];
         delete cache[realkey];
-        if (angular.isString(result))
+        if (angular.isString(result)) {
             return remove(result);
+        }
         return result;
     };
 
@@ -150,15 +161,19 @@ function CacheService(_) {
      */
     var exists = function(key) {
         var realkey = key;
-        if (angular.isArray(key))
+        if (angular.isArray(key)) {
             realkey = makeKey(key);
-        if (!cache.hasOwnProperty(realkey))
+        }
+        if (!cache.hasOwnProperty(realkey)) {
             return false;
+        }
         var val = cache[realkey];
-        if (angular.isObject(val))
+        if (angular.isObject(val)) {
             return true;
-        if (angular.isString(val))
+        }
+        if (angular.isString(val)) {
             return exists(val);
+        }
         return false;
     };
 
@@ -171,9 +186,10 @@ function CacheService(_) {
     };
 
     var reset = function() {
-        Object.keys(cache).forEach(function(key) {
-            delete cache[key];
-        });
+        var keys = Object.keys(cache);
+        for (var i = 0; i < keys.length; i++) {
+            delete cache[keys[i]];
+        }
     };
 
     return {
