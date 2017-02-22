@@ -1,4 +1,20 @@
 
+  <script type="text/javascript">
+
+    function toggleVisibilityPrototype(id1, button) {
+      var e = document.getElementById(id1);
+      if (e.style.display == 'block' || e.style.display==''){
+          e.style.display = "none";
+          button.style.backgroundColor = "#242424";
+      }
+      else{
+          e.style.display = "block";
+          button.style.backgroundColor = "#181818";
+      }
+    }
+  </script> 
+
+
     <style>
 
       @import url('https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700');
@@ -8,46 +24,56 @@
         color: white;
         font-family:"Open Sans", sans-serif;
       }
+
+      .growl-container{
+        display:none;
+      }
+
       .account-wall{
         padding:40px;
         width:400px;
         margin:100px auto;
       }
-      form {
+      form,{
           width: 80%;
           margin: auto;
       }
 
-     .form-control {
-          margin: 0 auto 16px;
+     .form-control,
+     .dropdown-menu-new > button {
           border: 1px solid #3d3d3d !important;
           overflow: hidden;
           background-color:#292929;
           border-radius: 1px !important;
           padding:6px 10px;
           color:white;
+          width:100%;
+     }
+
+     .form-control{
+      margin: 0 auto 16px;
      }
      .form-control:focus{
          box-shadow:none;
      }
-    input {
+    input, {
       background-color: rgba(56,56,56,1);,
       font-weight: 200;
       outline: none !important;
       border: none !important;
     }
-    button{
+    button.btn-block{
       background-color: #2F889A;
       font-weight: 600 !important;
       letter-spacing: .14em;
       font-size: 12px !important;
-      -webkit-transition: background-color .6s ease-out!important;
-      -moz-transition: background-color .6s ease-out!important;
-      -o-transition: background-color .6s ease-out!important;
-      transition: background-color .6s ease-out!important;
+      -webkit-transition: background-color .2s ease-out!important;
+      -moz-transition: background-color .2s ease-out!important;
+      -o-transition: background-color .2s ease-out!important;
+      transition: background-color .2s ease-out!important;
     }
 
-    button:hover{
+    button.btn-block:hover{
       background-color:#296f83;
     }
     /*.fa-pane-toggle{
@@ -79,6 +105,40 @@
       color:rgba(255,255,255,0.8);
     }
 
+    .dropdown-menu-new button > .fa-caret-down{
+      float:right;
+      padding:4px 0;
+    }
+
+    .dropdown-menu-new{
+      position:relative;
+      margin-bottom:16px;
+    }
+
+    .dropdown-menu-new > ul{
+      list-style: none;
+      background-color:#3d3d3d;
+      padding: 10px 0;
+      border-radius:0 0 4px 4px;
+      position:absolute;
+      z-index:1000;
+      min-width: 100%;
+      box-shadow: 2px 4px 6px 0 rgba(0,0,0,0.2);
+    }
+
+    .dropdown-menu-new li{
+      padding: 8px 14px;
+      white-space: nowrap;
+      -webkit-transition: background-color .2s ease-out!important;
+      -moz-transition: background-color .2s ease-out!important;
+      -o-transition: background-color .2s ease-out!important;
+      transition: background-color .2s ease-out!important;
+    }
+    .dropdown-menu-new li:hover{
+      background-color:#535353;
+    }
+
+
 
     </style>
     <div>
@@ -90,11 +150,26 @@
                       </div>
                       <div>
                           <form name="loginForm" ng-submit="login(credentials)">
-                              <label>Username</label>
-                              <input type="text" class="form-control" ng-model="credentials.username"autofocus>
-                              <label>Password</label>
-                              <input type="password" class="form-control" ng-model="credentials.password">
-                              <button class="btn btn-block" type="submit" style = "margin-top: 40px;">LOG IN <span ng-if="spin" ><i class="fa fa-spin fa-spinner"></i>
+                              <label>Project</label>
+                              <div class = "dropdown-menu-new">
+                                <button onclick = "toggleVisibilityPrototype('project-list', this);" id = "project-button"><i class="fa fa-caret-down" aria-hidden="true"></i></button>
+                                <ul id = "project-list" style = "display:none;">
+                                  <li>Europa</li>
+                                  <li>CAE</li>
+                                </ul>
+                              </div>
+                              <label>Module</label>
+                              <div class = "dropdown-menu-new">
+                                <button onclick = "toggleVisibilityPrototype('module-list', this);" id = "module-button"><i class="fa fa-caret-down" aria-hidden="true"></i></button>
+                                <ul id = "module-list" style = "display:none;">
+                                  <li>Europa Architecture</li>
+                                  <li>Design Capture</li>
+                                  <li>Flight</li>
+                                  <li>Ground Design</li>
+                                  <li>Really really really really really really really really long module name</li>
+                                </ul>
+                              </div>
+                              <button class="btn btn-block" type="submit" style = "margin-top: 40px;">CONTINUE <span ng-if="spin" ><i class="fa fa-spin fa-spinner"></i>
                               </span></button>
                           </form>
                     </div>
