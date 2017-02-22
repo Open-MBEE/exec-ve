@@ -1,4 +1,5 @@
 <div ng-if="mmsType=='element' && !noEdit && editing" class="editing">
+
     <h1 class="prop"><input class="form-control" type="text" ng-model="edit.name"></input></h1>
 
     <h2 class="prop-title">LAST MODIFICATION</h2>
@@ -81,6 +82,10 @@
 </div>
 
 <div ng-if="mmsType=='element'" ng-hide="editing" class="reading">
+    <hr/>
+    <p class="text-center" ng-show="gettingSpec"><i class="fa fa-3x fa-spin fa-spinner"></i></p>
+
+    <div ng-hide="gettingSpec">
     <h1 class="prop element-title">{{element.name}}</h1>
 
     <h2 class="prop-title">LAST MODIFICATION</h2>
@@ -103,8 +108,7 @@
         </div>
         <div ng-if="isRestrictedVal">
             <h3 class="prop"><mms-transclude-name mms-watch-id="true" mms-eid="{{values[0].operand[1].elementId}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></h3>
-        </select>
-    </div>
+        </div>
         <h2 class="prop-title spec-view-value-heading">PROPERTY TYPE</h2>
         <h3 class="prop"><mms-transclude-name mms-watch-id="true" mms-eid="{{element.typeId}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}" click-handler="propertyTypeClicked()"></mms-transclude-name></h3>
     </div>
@@ -165,6 +169,7 @@
     <h3 class="prop">{{element._modified}}</h3>
     <h2 class="prop-title">COMMIT</h2>
     <h3 class="prop">{{element._commitId}}</h3>
+    </div>
 </div>
 
 <div ng-if="mmsType=='workspace'" ng-show="editing" class="editing">

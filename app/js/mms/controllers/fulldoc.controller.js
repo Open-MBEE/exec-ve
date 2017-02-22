@@ -3,7 +3,6 @@
 /* Controllers */
 
 angular.module('mmsApp')
-
 .controller('FullDocCtrl', ['$scope', '$rootScope', '$state', '$stateParams', '$window', '$element', 'hotkeys', 'growl',
     'MmsAppUtils', 'UxService', 'search', '_', 'documentOb', 'projectOb', 'refOb', 'viewObs',
 function($scope, $rootScope, $state, $stateParams, $window, $element, hotkeys, growl,
@@ -66,8 +65,17 @@ function($scope, $rootScope, $state, $stateParams, $window, $element, hotkeys, g
             elementClicked: elementClicked
         }, number: curSec, topLevel: (curSec ? (curSec.toString().indexOf('.') === -1 && curSec !== 1) : false)};
     };
+
+    $scope.findLatestElement = function(elem) {
+        if (elem) {
+            if (elem.modified > $scope.latestElement)
+                $scope.latestElement = elem.modified;
+        }
+    };
+
     var addToArray = function(viewId, curSection) {
         views.push(buildViewElt(viewId, curSection));
+
         if (view2children[viewId]) {
             var num = 1;
             for (var i = 0; i < view2children[viewId].length; i++) {
@@ -271,3 +279,4 @@ function($scope, $rootScope, $state, $stateParams, $window, $element, hotkeys, g
         MmsAppUtils.refreshNumbering($rootScope.ve_treeApi.get_rows(), printElementCopy);
     });
 }]);
+

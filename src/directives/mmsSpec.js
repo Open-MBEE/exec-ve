@@ -80,6 +80,7 @@ function mmsSpec(Utils, ElementService, UtilsService, $compile, $templateCache, 
         var keepMode = false;
         scope.editing = false;
         scope.editable = true;
+        scope.gettingSpec = false;
         scope.isRestrictedVal = false;
         scope.isEnumeration = false;
         //TODO pass proper args
@@ -126,6 +127,7 @@ function mmsSpec(Utils, ElementService, UtilsService, $compile, $templateCache, 
             }
             scope.isEnumeration = false;
             scope.isSlot = false;
+            scope.gettingSpec = true;
             var reqOb = {elementId: scope.mmsElementId, projectId: scope.mmsProjectId, refId: scope.mmsRefId, commitId: scope.mmsCommitId, extended: true};
             ElementService.getElement(reqOb, 2)
             .then(function(data) {
@@ -206,7 +208,9 @@ function mmsSpec(Utils, ElementService, UtilsService, $compile, $templateCache, 
                         }
                     });
                 }
+                scope.gettingSpec = false;
             }, function(reason) {
+                scope.gettingSpec = false;
                 //growl.error("Getting Element Error: " + reason.message);
             });
         };
