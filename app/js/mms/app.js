@@ -81,7 +81,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
         url: '/login',
         resolve: { },
         views: {
-            'pane-center': {
+            'login': {
                 templateUrl: 'partials/mms/login.html',
                 controller: function ($scope, $rootScope, $state, AuthService, growl) {
                     $scope.credentials = {

@@ -121,6 +121,9 @@ function($scope, $location, $rootScope, $state, _, $window, $uibModal, growl, $h
     $rootScope.$on('$stateChangeSuccess', 
         function(event, toState, toParams, fromState, fromParams) {
             $rootScope.mms_stateChanging = false;
+            if ($state.current.name === 'login') {
+                $rootScope.hideCenterPane = true;
+            }
             // set the initial tree selection
             if ($state.includes('workspaces') && !$state.includes('workspace.sites')) {
                 if (toParams.tag !== undefined && toParams.tag !== 'latest')
