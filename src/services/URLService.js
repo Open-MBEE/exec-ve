@@ -126,6 +126,10 @@ function urlService(baseUrl) {
         return root + '/projects/' + projectId + '/refs';
     };
 
+    var getGroupsURL = function(projectId, refId) {
+        return root + '/projects/' + projectId + '/refs/' + refId + '/groups';
+    };
+
     /**
      * @ngdoc method
      * @name mms.URLService#getSiteProductsURL
@@ -483,6 +487,7 @@ function urlService(baseUrl) {
         getProjectsURL: getProjectsURL,
         getProjectURL: getProjectURL,
         getRefsURL: getRefsURL,
+        getGroupsURL: getGroupsURL,
         getElementURL: getElementURL,
         getPutElementsURL: getPutElementsURL,
         getPostElementsURL: getPostElementsURL,
