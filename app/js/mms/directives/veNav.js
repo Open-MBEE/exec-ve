@@ -1,11 +1,11 @@
 'use strict';
 
-angular.module('mms.directives')
-.directive('mmsNav', ['$templateCache', '$state', 'hotkeys', 'growl', '$location', '$uibModal', '$http', 'URLService', 'ApplicationService', 'ElementService','AuthService', mmsNav]);
+angular.module('mmsApp')
+.directive('veNav', ['$templateCache', '$state', 'hotkeys', 'growl', '$location', '$uibModal', 'ApplicationService','AuthService', veNav]);
 
 /**
  * @ngdoc directive
- * @name mms.directives.directive:mmsNav
+ * @name mms.directives.directive:veNav
  *
  * @requires $templateCache
  *
@@ -30,10 +30,10 @@ angular.module('mms.directives')
     </pre>
  * @param {string} mmsTitle Title to display
  */
-function mmsNav($templateCache, $state, hotkeys, growl, $location, $uibModal, $http, URLService, ApplicationService, ElementService, AuthService) {
-    var template = $templateCache.get('mms/templates/mmsNav.html');
+function veNav($templateCache, $state, hotkeys, growl, $location, $uibModal, ApplicationService, AuthService) {
+    var template = $templateCache.get('partials/mms/veNav.html');
 
-    var mmsNavLink = function(scope, element, attrs) {
+    var veNavLink = function(scope, element, attrs) {
         scope.obj = {
             catOpen : false,
             bgColor : {'background-color': 'none'}
@@ -48,9 +48,9 @@ function mmsNav($templateCache, $state, hotkeys, growl, $location, $uibModal, $h
             scope.mmsV = 'Loading...';
             ApplicationService.getMmsVersion().then(function(data) {
                 scope.mmsV = data;
-              }, function(reason) {
+            }, function(reason) {
                 scope.mmsV = "Could not retrieve due to failure: " + reason.message;
-          	});
+            });
             var instance = $uibModal.open({
                 templateUrl: 'partials/mms/about.html',
                 scope: scope,
@@ -62,16 +62,16 @@ function mmsNav($templateCache, $state, hotkeys, growl, $location, $uibModal, $h
             });
         };
         //Resets catagory and sites accordions
-        scope.reset = function(){
-            for(var i = 0; i < catNames.length; i++){
+        scope.reset = function() {
+            for(var i = 0; i < catNames.length; i++) {
                 var str = catNames[i];
                 scope.categories[str].open = false;
-                for(var k = 0; k < scope.categories[str].length; k++){
+                for(var k = 0; k < scope.categories[str].length; k++) {
                     scope.categories[str][k].isOpen = false;
                 }
             }
         };
-        scope.logout = function(){
+        scope.logout = function() {
             AuthService.logout().then(function() {
                 $state.go('login');
             }, function(failure) {
@@ -231,6 +231,6 @@ function mmsNav($templateCache, $state, hotkeys, growl, $location, $uibModal, $h
             title: '@mmsTitle', //page title - used in mobile view only
             site: '<mmsSite'
         },
-        link: mmsNavLink
+        link: veNavLink
     };
 }

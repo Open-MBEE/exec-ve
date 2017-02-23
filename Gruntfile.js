@@ -144,6 +144,10 @@ module.exports = function(grunt) {
       mmsapp: {
         src: ['app/js/mms/controllers/*.js'],
         dest: 'build/js/mms/controllers.js'
+      },
+      mmsappdir: {
+          src: ['app/js/mms/directives/*.js'],
+          dest: 'build/js/mms/directives.js'
       }
     },
 
