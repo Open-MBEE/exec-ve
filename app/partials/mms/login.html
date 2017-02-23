@@ -1,15 +1,13 @@
 
 <script type="text/javascript">
 
-  function toggleVisibilityPrototype(id1, button) {
+  function toggleVisibilityPrototype(id1) {
     var obj = document.getElementById(id1);
     if (obj.style.display == 'block' || obj.style.display==''){
         obj.style.display = "none";
-        button.style.backgroundColor = "#292929";
     }
     else{
         obj.style.display = "block";
-        button.style.backgroundColor = "#222222";
     }
   };
 
@@ -24,6 +22,12 @@
     background-color:#313131;
     color: white;
     font-family:"Roboto", sans-serif;
+  }
+
+  a,
+  a:hover{
+    color:white;
+    text-decoration: none;
   }
 
 /*******Hide error messages for testing purposes. Remove*******/
@@ -110,15 +114,17 @@
     list-style: none;
     background-color:#3d3d3d;
     padding: 10px 0;
-    border-radius:0 0 4px 4px;
+    border-radius:4px;
     position:absolute;
     z-index:1000;
-    min-width: 100%;
+    min-width: calc(100% + 20px);
     box-shadow: 2px 4px 6px 0 rgba(0,0,0,0.2);
+    top:-10px;
+    left:-10px;
   }
 
   .dropdown-menu-new li{
-    padding: 8px 14px;
+    padding: 6px 20px;
     white-space: nowrap;
     -webkit-transition: background-color .2s ease-out!important;
     -moz-transition: background-color .2s ease-out!important;
@@ -132,15 +138,7 @@
     background-color:#535353;
   }
 
-  .dropdown-menu-new .fa-check{
-    padding-right:10px;
-    color:#35bc84;
-    font-size: 14px;
-  }
 
-  .dropdown-menu-new li.unselected{
-    padding-left:38px;
-  }
 </style>
 
     <div>
@@ -152,7 +150,7 @@
                     </div>
                       <div>
 
-                        <form name="loginForm" ng-submit="login(credentials)">
+                        <form name="loginForm" ng-submit="login(credentials)" style = "display:none">
                             <label>Username</label>
                             <input type="text" class="form-control" ng-model="credentials.username"autofocus>
                             <label>Password</label>
@@ -161,20 +159,20 @@
                             </span></button>
                         </form>
 
-                        <form name="loginForm" ng-submit="login(credentials)" style = "display:none">
+                        <form name="loginForm" ng-submit="login(credentials)">
                           <label>Project:</label>
                           <div class = "dropdown-menu-new">
-                            <button onclick = "toggleVisibilityPrototype('project-list', this);" id = "project-button"><i class="fa fa-caret-down" aria-hidden="true"></i></button>
+                            <button onclick = "toggleVisibilityPrototype('project-list');" id = "project-button"><i class="fa fa-caret-down" aria-hidden="true"></i></button>
                             <ul id = "project-list" style = "display:none;">
-                              <li><i class="fa fa-check" aria-hidden="true"></i>Europa</li>
+                              <li><a onclick = "toggleVisibilityPrototype('project-list');">Europa</a></li>
                               <li class = "unselected">CAE</li>
                             </ul>
                           </div>
                           <label class = "module-disabled">Module:</label>
                           <div class = "dropdown-menu-new">
-                            <button onclick = "toggleVisibilityPrototype('module-list', this);" id = "module-button"><i class="fa fa-caret-down module-disabled" aria-hidden="true"></i></button>
+                            <button onclick = "toggleVisibilityPrototype('module-list');" id = "module-button"><i class="fa fa-caret-down module-disabled" aria-hidden="true"></i></button>
                             <ul id = "module-list" style = "display:none;">
-                              <li class = "unselected">Europa Architecture</li>
+                              <li class = "unselected"><a onclick = "toggleVisibilityPrototype('module-list');">Europa Architecture</a></li>
                               <li class = "unselected">Design Capture</li>
                               <li class = "unselected">Flight</li>
                               <li class = "unselected">Ground Design</li>
