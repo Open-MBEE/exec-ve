@@ -53,8 +53,17 @@
     opacity:.3;
   }
 
+  .bookmark{
+    text-align: right;
+  }
+
+  .bookmark a{
+    text-decoration: underline;
+  }
+
 /*******Inputs (forms and buttons)*******/
-  .account-wall label{
+  .account-wall label,
+  .bookmark a{
     font-weight:300;
     font-size: 16px;
     color:rgba(255,255,255,0.8);
@@ -87,7 +96,7 @@
     background-color: #2F889A;
     font-weight: 600 !important;
     letter-spacing: .16em;
-    font-size: 12px !important;
+    font-size: 14px !important;
     -webkit-transition: background-color .2s ease-out!important;
     -moz-transition: background-color .2s ease-out!important;
     -o-transition: background-color .2s ease-out!important;
@@ -178,6 +187,9 @@
                               <li class = "unselected">Ground Design</li>
                               <li class = "unselected">Really really really really really really really really long module name</li>
                             </ul>
+                          </div>
+                          <div class = "bookmark">
+                            <a>Bookmark Module</a>
                           </div>
                           <button class="btn btn-block " type="submit">CONTINUE <span ng-if="spin" ><i class="fa fa-spin fa-spinner"></i>
                           </span></button>
