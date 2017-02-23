@@ -1,10 +1,12 @@
 
 <script type="text/javascript">
 
-  function toggleVisibilityPrototype(id1) {
+  function toggleVisibilityPrototype(id1, buttonid) {
     var obj = document.getElementById(id1);
+    var button = document.getElementById(buttonid);
     if (obj.style.display == 'block' || obj.style.display==''){
         obj.style.display = "none";
+        button.innerHTML = button.name + button.innerHTML;
     }
     else{
         obj.style.display = "block";
@@ -37,9 +39,10 @@
 
 /*******Layout*******/
   .account-wall{
-    padding:40px;
-    width:400px;
-    margin:100px auto;
+    width:320px;
+    margin:140px auto;
+    height: 360px;
+    position: relative;
   }
 
 /*******Typograpphy*******/
@@ -80,6 +83,7 @@
     width:100%;
     font-weight:300;
     font-size: 18px;
+    text-align:left;
   }
 
   .form-control{
@@ -102,6 +106,9 @@
     -o-transition: background-color .2s ease-out!important;
     transition: background-color .2s ease-out!important;
     margin-top: 48px;
+    position: absolute;
+    width: 100%;
+    bottom: 0;
   }
 
   .account-wall .btn-block:hover{
@@ -171,17 +178,17 @@
                         <form name="loginForm" ng-submit="login(credentials)">
                           <label>Project:</label>
                           <div class = "dropdown-menu-new">
-                            <button onclick = "toggleVisibilityPrototype('project-list');" id = "project-button"><i class="fa fa-caret-down" aria-hidden="true"></i></button>
+                            <button onclick = "toggleVisibilityPrototype('project-list', 'project-button');" id = "project-button" name = "Europa"><i class="fa fa-caret-down" aria-hidden="true"></i></button>
                             <ul id = "project-list" style = "display:none;">
-                              <li><a onclick = "toggleVisibilityPrototype('project-list');">Europa</a></li>
+                              <li><a onclick = "toggleVisibilityPrototype('project-list', 'project-button');">Europa</a></li>
                               <li class = "unselected">CAE</li>
                             </ul>
                           </div>
                           <label class = "module-disabled">Module:</label>
                           <div class = "dropdown-menu-new">
-                            <button onclick = "toggleVisibilityPrototype('module-list');" id = "module-button"><i class="fa fa-caret-down module-disabled" aria-hidden="true"></i></button>
+                            <button onclick = "toggleVisibilityPrototype('module-list', 'module-button');" id = "module-button" name = "Europa Architecture"><i class="fa fa-caret-down module-disabled" aria-hidden="true"></i></button>
                             <ul id = "module-list" style = "display:none;">
-                              <li class = "unselected"><a onclick = "toggleVisibilityPrototype('module-list');">Europa Architecture</a></li>
+                              <li class = "unselected"><a onclick = "toggleVisibilityPrototype('module-list', 'module-button');">Europa Architecture</a></li>
                               <li class = "unselected">Design Capture</li>
                               <li class = "unselected">Flight</li>
                               <li class = "unselected">Ground Design</li>
