@@ -107,7 +107,6 @@ function urlService(baseUrl) {
         return root + "/checklogin";
     };
 
-
     var getOrgsURL = function() {
         return root + "/orgs";
     };
@@ -412,9 +411,11 @@ function urlService(baseUrl) {
     var getJobs = function(id) {
         return addTicket(root + '/workspaces/master/jobs/' + id + '?recurse=1');
     };
+
     var getJob = function(jobSyml){
         return addTicket(root + '/workspaces/master/jobs/' + jobSyml);
     };
+
     var getJenkinsRun = function(jobSyml) {
         return addTicket(root + '/workspaces/master/jobs/'+ jobSyml + '/execute');
     };
@@ -511,7 +512,7 @@ function urlService(baseUrl) {
         isTimestamp: isTimestamp,
         getRoot: getRoot,
         setTicket: setTicket,
-        getJMSHostname: getJMSHostname,
+        getJMSHostname: getJMSHostname
     };
 
 }

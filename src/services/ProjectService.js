@@ -10,7 +10,7 @@ angular.module('mms')
  * @requires $http
  * @requires mms.URLService
  * @requires mms.CacheService
- * 
+ *
  * @description
  * This is a utility service for getting project, ref, commit information
  */
@@ -21,7 +21,7 @@ function ProjectService($q, $http, URLService, CacheService, ApplicationService)
      * @ngdoc method
      * @name mms.ProjectService#getOrg
      * @methodOf mms.ProjectService
-     * 
+     *
      * @description
      * Gets org information from mms
      *
@@ -32,10 +32,11 @@ function ProjectService($q, $http, URLService, CacheService, ApplicationService)
         var deferred = $q.defer();
         getOrgs().then(function(data) {
             var result = CacheService.get(['org', orgId]);
-            if (result)
+            if (result) {
                 deferred.resolve(result);
-            else
+            } else {
                 deferred.reject({status: 404, data: '', message: "Org not found"});
+            }
         }, function(reason) {
             deferred.reject(reason);
         });
@@ -65,7 +66,8 @@ function ProjectService($q, $http, URLService, CacheService, ApplicationService)
             $http.get(URLService.getOrgsURL())
             .then(function(response) {
                 CacheService.put(key, response.data.orgs, false);
-                for (var org in response.data.orgs) {
+                for (var i = 0; i < response.data.orgs.length; i++) {
+                    var org = response.data.orgs[i];
                     CacheService.put(['org', org.id], org);
                 }
                 deferred.resolve(CacheService.get(key));
@@ -90,12 +92,14 @@ function ProjectService($q, $http, URLService, CacheService, ApplicationService)
         } else {
             inProgress[url] = deferred.promise;
             $http.get(url).then(function(response) {
+                //TODO change project to projects**** must be changed on server
                 if (!angular.isArray(response.data.projects)) {
                     deferred.reject({status: 500, data: '', message: "Server Error: empty response"});
                     return;
                 }
                 var projects = [];
-                for (var project in response.data.projects) {
+                for (var i = 0; i < response.data.projects.length; i++) {
+                    var project = response.data.projects[i];
                     CacheService.put(['project', project.id], project, true);
                     projects.push(CacheService.get(['project', project.id]));
                 }
@@ -122,11 +126,12 @@ function ProjectService($q, $http, URLService, CacheService, ApplicationService)
         else {
             inProgress[url] = deferred.promise;
             $http.get(url).then(function(response) {
-                if (!angular.isArray(response.data.projects) || response.data.projects.length === 0) {
+                //TODO change project to projects**** must be changed on server
+                if (!angular.isArray(response.data.project) || response.data.project.length === 0) {
                     deferred.reject({status: 500, data: '', message: "Server Error: empty response"});
                     return;
                 }
-                CacheService.put(cacheKey, response.data.projects[0], true);
+                CacheService.put(cacheKey, response.data.project[0], true);
                 deferred.resolve(CacheService.get(cacheKey));
             }, function(response) {
                 URLService.handleHttpStatus(response.data, response.status, response.headers, response.config, deferred);
@@ -134,6 +139,7 @@ function ProjectService($q, $http, URLService, CacheService, ApplicationService)
                 delete inProgress[url];
             });
         }
+        return deferred.promise;
     };
 
     var getRefs = function(projectId) {
@@ -153,7 +159,8 @@ function ProjectService($q, $http, URLService, CacheService, ApplicationService)
                     return;
                 }
                 var refs = [];
-                for (var ref in response.data.refs) {
+                for (var index = 0; index < response.data.refs.length; index++) {
+                    var ref = response.data.refs[index];
                     CacheService.put(['ref', projectId, ref.id], ref, true);
                     refs.push(CacheService.get(['ref', projectId, ref.id]));
                 }
@@ -185,7 +192,6 @@ function ProjectService($q, $http, URLService, CacheService, ApplicationService)
 
     var createRef = function(refOb, projectId) {
         var deferred = $q.defer();
-
         var url = URLService.getRefsURL(projectId);
         $http.post(url, {'refs': [refOb], 'source': ApplicationService.getSource()})
         .then(function(response) {
@@ -207,7 +213,6 @@ function ProjectService($q, $http, URLService, CacheService, ApplicationService)
 
     var updateRef = function(refOb, projectId) {
         var deferred = $q.defer();
-
         var url = URLService.getRefsURL(projectId);
         $http.post(url, {'refs': [refOb], 'source': ApplicationService.getSource()})
         .then(function(response) {
@@ -320,8 +325,9 @@ function ProjectService($q, $http, URLService, CacheService, ApplicationService)
         var w1time = !ws1time ? 'latest' : ws1time;
         var w2time = !ws2time ? 'latest' : ws2time;
         var key = 'diff' + ws1 + ws2 + w1time + w2time;
-        if (inProgress.hasOwnProperty(key))
+        if (inProgress.hasOwnProperty(key)) {
             return inProgress[key];
+        }
         var deferred = $q.defer();
         inProgress[key] = deferred.promise;
         

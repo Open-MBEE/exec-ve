@@ -3,6 +3,20 @@
 angular.module('mms')
 .factory('AuthService', ['$q', '$http', 'URLService','HttpService', 'ElementService', 'ViewService', 'ProjectService', '$window', AuthService]);
 
+/**
+ * @ngdoc service
+ * @name mms.ApplicationService
+ * @requires $q
+ * @requires $http
+ * @requires URLService
+ * @requires HttpService
+ * @requires ElementService
+ * @requires ViewService
+ * @requires ProjectService
+ *
+ * @description
+ * Provide general authorization functions. I.e. login, logout, etc...
+ */
 function AuthService($q, $http, URLService, HttpService, ElementService, ViewService, ProjectService, $window) {
     
     var ticket= $window.localStorage.getItem('ticket');
@@ -34,14 +48,14 @@ function AuthService($q, $http, URLService, HttpService, ElementService, ViewSer
     var getTicket = function(){
         return ticket;
     };
-    
+
     var checkLogin = function(){
         var deferred = $q.defer();
         if (!ticket) {
             deferred.reject(false);
             return deferred.promise;
         }
-        
+
         $http.get(URLService.getCheckTicketURL(ticket)).then(function (success) {
             deferred.resolve(success.data.username);
         }, function(fail){
@@ -50,7 +64,7 @@ function AuthService($q, $http, URLService, HttpService, ElementService, ViewSer
         });  
         return deferred.promise;  
     };
-    
+
     var logout = function() {
         var deferred = $q.defer();
         checkLogin().then(function() {
@@ -67,7 +81,7 @@ function AuthService($q, $http, URLService, HttpService, ElementService, ViewSer
         });
         return deferred.promise;
     };
-    
+
     return {
         getAuthorized: getAuthorized,    
         getTicket: getTicket,
