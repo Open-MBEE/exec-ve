@@ -230,7 +230,7 @@ function mmsSpec(Utils, ElementService, UtilsService, $compile, $templateCache, 
          *
          */
         scope.revertEdits = function() {
-            Utils.revertEdits(scope, null, true);
+            Utils.revertEdits(scope, null);
         };
 
         var conflictCtrl = function($scope, $uibModalInstance) {

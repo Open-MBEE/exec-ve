@@ -48,96 +48,53 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, El
      * save edited element
      * 
      * @param {object} edit the edit object to save
-     * @param {string} mmsWs workspace
-     * @param {string} mmsType workspace/tag/element
-     * @param {string} mmsEid id of element
      * @param {object} [editorApi=null] optional editor api
      * @param {object} scope angular scope that has common functions
-     * @param {string} type name/documentation/value/all
      * @return {Promise} promise would be resolved with updated element if save is successful.
      *      For unsuccessful saves, it will be rejected with an object with type and message.
      *      Type can be error or info. In case of conflict, there is an option to discard, merge,
      *      or force save. If the user decides to discord or merge, type will be info even though 
      *      the original save failed. Error means an actual error occured. 
      */
-    var save = function(edit, mmsWs, mmsType, mmsEid, editorApi, scope, type, continueEdit) {
+    var save = function(edit, editorApi, scope, continueEdit) {
         var deferred = $q.defer();
-        // TODO: put this back when removed scope.editing from view documentation edit
-        /* if (!scope.editable || !scope.editing) {
-            deferred.reject({type: 'error', message: "Element isn't editable and can't be saved."});
-            return deferred.promise;
-        } */
-
-        if (editorApi && editorApi.save)
+        if (editorApi && editorApi.save) {
             editorApi.save();
-        // if (mmsType === 'workspace') {
-        //     WorkspaceService.update(edit)
-        //     .then(function(data) {
-        //         deferred.resolve(data);
-        //     }, function(reason) {
-        //         deferred.reject({type: 'error', message: reason.message});
-        //     });
-        // } else
-            if (mmsType === 'tag') {
-            // ConfigService.update(edit, mmsWs)
-            // .then(function(data) {
-            //     deferred.resolve(data);
-            // }, function(reason) {
-            //     deferred.reject({type: 'error', message: reason.message});
-            // });
-        } else {
-            ElementService.updateElement(edit, mmsWs)
-            .then(function(data) {
-                deferred.resolve(data);
-                $rootScope.$broadcast('element.updated', edit.sysmlId, (mmsWs ? mmsWs : 'master'), type, continueEdit);
-                //growl.success("Save successful");
-                //scope.editing = false;
-            }, function(reason) {
-                if (reason.status === 409) {
-                    scope.latest = reason.data.elements[0];
-                    var instance = $uibModal.open({
-                        template: $templateCache.get('mms/templates/saveConflict.html'),
-                        controller: ['$scope', '$uibModalInstance', conflictCtrl],
-                        scope: scope,
-                        size: 'lg'
-                    });
-                    instance.result.then(function(choice) {
-                        if (choice === 'ok') {
-                            UtilsService.mergeElement(scope.latest, mmsEid, mmsWs, true, type);
-                            deferred.reject({type: 'info', message: 'Element Updated to Latest'});
-                        } else if (choice === 'merge') { 
-                            UtilsService.mergeElement(scope.latest, mmsEid, mmsWs, false, type);
-                            var currentEdit = scope.edit;
-                            if (scope.latest.name !== currentEdit.name && (type === 'name' || type === 'all'))
-                                currentEdit.name = scope.latest.name + ' MERGE ' + currentEdit.name;
-                            if (scope.latest.documentation !== currentEdit.documentation && (type === 'documentation' || type === 'all'))
-                                currentEdit.documentation = scope.latest.documentation + '<p>MERGE</p>' + currentEdit.documentation;
-                            currentEdit._read = scope.latest._read;
-                            currentEdit._modified = scope.latest._modified;
-                                //growl.info("Element name and doc merged");
-                            var message = 'Element name and doc merged';
-                            if (type === 'name')
-                                message = 'Element name merged';
-                            else if (type === 'documentation')
-                                message = 'Element documentation merged';
-                            deferred.reject({type: 'info', message: message});
-                        } else if (choice === 'force') {
-                            edit._read = scope.latest._read;
-                            edit._modified = scope.latest._modified;
-                            save(edit, mmsWs, mmsType, mmsEid, editorApi, scope, type).then(function(resolved) {
-                                deferred.resolve(resolved);
-                            }, function(error) {
-                                deferred.reject(error);
-                            });
-                        } else
-                            deferred.reject({type: 'cancel'});
-                    });
-                } else {
-                    deferred.reject({type: 'error', message: reason.message});
-                    //growl.error("Save Error: Status " + reason.status);
-                }
-            });
         }
+        ElementService.updateElement(edit)
+        .then(function(data) {
+            deferred.resolve(data);
+            $rootScope.$broadcast('element.updated', data, continueEdit);
+        }, function(reason) {
+            if (reason.status === 409) {
+                scope.latest = reason.data.elements[0];
+                var instance = $uibModal.open({
+                    template: $templateCache.get('mms/templates/saveConflict.html'),
+                    controller: ['$scope', '$uibModalInstance', conflictCtrl],
+                    scope: scope,
+                    size: 'lg'
+                });
+                instance.result.then(function(choice) {
+                    if (choice === 'ok') {
+                        var reqOb = {elementId: scope.latest.sysmlId, projectId: scope.latest._projectId, refId: scope.latest._refId, commitId: 'latest'};
+                        ElementService.cacheElement(reqOb, scope.latest, true);
+                        ElementService.cacheElement(reqOb, scope.latest, false);
+                    } else if (choice === 'force') {
+                        edit._read = scope.latest._read;
+                        edit._modified = scope.latest._modified;
+                        save(edit, editorApi, scope).then(function(resolved) {
+                            deferred.resolve(resolved);
+                        }, function(error) {
+                            deferred.reject(error);
+                        });
+                    } else {
+                        deferred.reject({type: 'cancel'});
+                    }
+                });
+            } else {
+                deferred.reject({type: 'error', message: reason.message});
+            }
+        });
 
         return deferred.promise;
     };
@@ -152,31 +109,27 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, El
      * currently compares name, doc, property values, if element is not 
      * editable, returns false
      * 
-     * @param {object} scope scope with common properties
-     * @param {string} type name/documentation/value
-     * @param {boolena} checkAll check everything
+     * @param {object} editOb edit object
      * @return {boolean} has changes or not
      */
-     var hasEdits = function(scope, type, checkAll) {
-        if (!scope.edit)
-            return false;
-        if (type === 'name' || checkAll) {
-            if (scope.edit.name !== scope.element.name)
-                return true;
+    var hasEdits = function (editOb) {
+        editOb._commitId = 'latest';
+        var cachedKey = UtilsService.makeElementKey(editOb);
+        var elementOb = CacheService.get(cachedKey);
+        if (editOb.name !== elementOb.name) {
+            return true;
         }
-        if (type === 'documentation' || checkAll) {
-            if (scope.edit.documentation !== scope.element.documentation)
-                return true;
+        if (editOb.documentation !== elementOb.documentation) {
+            return true;
         }
-        if (type === 'value' || checkAll) {
-            if ((scope.edit.type === 'Property' || scope.edit.type === 'Port') && 
-                    !angular.equals(scope.edit.defaultValue, scope.element.defaultValue))
-                return true;
-            if (scope.edit.type === 'Slot' && !angular.equals(scope.edit.value, scope.element.value))
-                return true; 
-            if (scope.edit.type === 'Constraint' && 
-                    !angular.equals(scope.edit.specification, scope.element.specification))
-                return true;
+        if ((editOb.type === 'Property' || editOb.type === 'Port') && !angular.equals(editOb.defaultValue, elementOb.defaultValue)) {
+            return true;
+        }
+        if (editOb.type === 'Slot' && !angular.equals(editOb.value, elementOb.value)) {
+            return true;
+        }
+        if (editOb.type === 'Constraint' && !angular.equals(editOb.specification, elementOb.specification)) {
+            return true;
         }
         return false;
     };
@@ -189,46 +142,33 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, El
      * @description 
      * reset editing object back to base element values for name, doc, values
      * 
-     * @param {object} scope scope with common properties
-     * @param {string} type name/documentation/value
-     * @param {boolean} revertAll revert all properties
+     * @param {object} editOb scope with common properties
+     * @param {object} editorApi editor api to kill editor if reverting changes
      */
-    var revertEdits = function(scope, type, revertAll, editorApi) {
-        if (editorApi && editorApi.destroy)
+    var revertEdits = function(scope, editOb, editorApi) {
+        if (editorApi && editorApi.destroy) {
             editorApi.destroy();
-        if (scope.mmsType === 'workspace') {
-            scope.edit.name = scope.element.name;
-        } 
-        else if (scope.mmsType === 'tag') {
-            scope.edit.name = scope.element.name;
-            scope.edit.description = scope.element.description;
-        } 
-        else {
-            if (type === 'name' || revertAll) {
-                scope.edit.name = scope.element.name;
-            }
-            if (type === 'documentation' || revertAll) {
-                scope.edit.documentation = scope.element.documentation;
-            }
-            if (type === 'value' || revertAll) {
-                if (scope.edit.type === 'Property' || scope.edit.type === 'Port') { //&& angular.isArray(scope.edit.value)) {
-                    scope.edit.defaultValue = _.cloneDeep(scope.element.defaultValue);
-                    if (scope.edit.defaultValue)
-                        scope.editValues = [scope.edit.defaultValue];
-                    else
-                        scope.editValues = [];
-                }
-                if (scope.edit.type === 'Slot' && angular.isArray(scope.edit.value)) {
-                    scope.edit.value = _.cloneDeep(scope.element.value);
-                    scope.editValues = scope.edit.value;
-                }
-                if (scope.edit.type === 'Constraint' && scope.edit.specification) {
-                    scope.edit.specification = _.cloneDeep(scope.element.specification);
-                    scope.editValues = [scope.edit.specification];
-                    scope.editValue = scope.edit.specification;
-                }
-            }
         }
+        editOb._commitId = 'latest';
+        var cachedKey = UtilsService.makeElementKey(editOb);
+        var elementOb = CacheService.get(cachedKey);
+
+        editOb.name = elementOb.name;
+        editOb.documentation = elementOb.documentation;
+        if (editOb.type === 'Property' || editOb.type === 'Port') {
+            editOb.defaultValue = _.cloneDeep(elementOb.defaultValue);
+            if (editOb.defaultValue)
+                scope.editValues = [editOb.defaultValue];
+            else
+                scope.editValues = [];
+        } else if (editOb.type === 'Slot') {
+            editOb.value = _.cloneDeep(elementOb.value);
+            scope.editValues = editOb.value;
+        } else if (editOb.type === 'Constraint' && editOb.specification) {
+            editOb.specification = _.cloneDeep(elementOb.specification);
+            scope.editValues = [editOb.specification];
+        }
+
     };
 
     var handleError = function(reason) {
@@ -478,7 +418,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, El
         }
         var cancelCleanUp = function() {
             scope.isEditing = false;
-            revertEdits(scope, type);
+            revertEdits(scope, scope.edit);
              // Broadcast message for the ToolCtrl:
             $rootScope.$broadcast('presentationElem.cancel', scope);
             recompile();

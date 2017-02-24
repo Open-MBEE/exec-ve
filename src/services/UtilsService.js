@@ -183,9 +183,7 @@ function UtilsService($q, $http, CacheService, URLService, _) {
      * @description
      * Make key for element for use in CacheService
      *
-     * @param {string} id id of element
-     * @param {string} [workspace=master] workspace
-     * @param {string} [version=latest] version or timestamp
+     * @param {string} elementOb element object
      * @param {boolean} [edited=false] element is to be edited
      * @returns {Array} key to be used in CacheService
      */
