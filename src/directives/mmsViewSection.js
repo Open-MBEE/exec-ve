@@ -29,15 +29,15 @@ function mmsViewSection($compile, $templateCache, $rootScope, ViewService, UxSer
 
     };
 
-    var mmsViewSectionLink = function(scope, element, attrs, controllers) {
+    var mmsViewSectionLink = function(scope, domElement, attrs, controllers) {
 
         var mmsViewCtrl = controllers[0];
         var mmsViewPresentationElemCtrl = controllers[1];
 
-        element.click(function(e) {
+        domElement.click(function(e) {
             //should not do anything if section is not an instancespec
-            if (scope.addFrame)
-                scope.addFrame();
+            if (scope.startEdit)
+                scope.startEdit();
             if (mmsViewCtrl && mmsViewPresentationElemCtrl)
                 mmsViewCtrl.transcludeClicked(scope.section.sysmlId); //show instance spec if clicked
             e.stopPropagation();
@@ -52,25 +52,25 @@ function mmsViewSection($compile, $templateCache, $rootScope, ViewService, UxSer
             // do nothing
         };
 
-        element.append(defaultTemplate);
-        $compile(element.contents())(scope); 
+        domElement.append(defaultTemplate);
+        $compile(domElement.contents())(scope); 
 
-        scope.structEditable = function() {
-            if (mmsViewCtrl) {
-                return mmsViewCtrl.getStructEditable();
-            } else
-                return false;
-        };
+        var projectId = scope.mmsProjectId;
+        var refId = scope.mmsRefId;
+        var commitId = scope.mmsCommitId;
 
         if (mmsViewCtrl) {
-            var viewVersion = mmsViewCtrl.getWsAndVersion();
-            if (viewVersion) {
-                scope.ws = viewVersion.workspace;
-                scope.version = viewVersion.version;
-            }
-            if (!scope.version)
-                scope.version = 'latest';
+            var viewVersion = mmsViewCtrl.getElementOrigin();
+            if (!projectId)
+                projectId = viewVersion.projectId;
+            if (!refId)
+                refId = viewVersion.refId;
+            if (!commitId)
+                commitId = viewVersion.commitId;
         }
+        scope.projectId = projectId;
+        scope.refId = refId ? refId : 'master';
+        scope.commitId = commitId ? commitId : 'latest';
 
         if (mmsViewCtrl && mmsViewPresentationElemCtrl) {
             
@@ -87,27 +87,29 @@ function mmsViewSection($compile, $templateCache, $rootScope, ViewService, UxSer
                 scope.isDirectChildOfPresentationElement = false;
             var type = "name";
 
-            if (scope.version === 'latest') {
-                scope.$on('element.updated', function(event, eid, ws, type, continueEdit) {
-                    if (eid === scope.section.sysmlId && ws === scope.ws && (type === 'all' || type === 'name') && !continueEdit)
+            if (scope.commitId === 'latest') {
+                scope.$on('element.updated', function(event, elementOb, continueEdit) {
+                    if (elementOb.sysmlId === scope.element.sysmlId && elementOb._projectId === scope.element._projectId
+                            && elementOb._refId === scope.element._refId && !continueEdit) {
                         recompile();
+                    }
                 });
             }
 
             scope.save = function() {
-                Utils.saveAction(scope,recompile,scope.bbApi,scope.section,type);
+                Utils.saveAction(scope, domElement, false);
             };
 
             scope.cancel = function() {
-                Utils.cancelAction(scope,recompile,scope.bbApi,type);
+                Utils.cancelAction(scope, recompile, domElement);
             };
 
             scope.delete = function() {
                 Utils.deleteAction(scope,scope.bbApi,mmsViewPresentationElemCtrl.getParentSection());
             };
 
-            scope.addFrame = function() {
-                Utils.addFrame(scope,mmsViewCtrl,element,null,scope.section);
+            scope.startEdit = function() {
+                Utils.startEdit(scope,mmsViewCtrl,domElement,null,scope.section);
             };
 
             scope.preview = function() {

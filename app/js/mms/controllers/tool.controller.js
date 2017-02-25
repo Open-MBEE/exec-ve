@@ -88,14 +88,14 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
         showPane('history');
     });
 
-    var cleanUpEdit = function(editOb) {
+    var cleanUpEdit = function(editOb, cleanAll) {
         var key = editOb.sysmlId + '|' + editOb._projectId + '|' + editOb._refId;
         var currentCnt = 0;
 
         if ($scope.presentElemEditCnts.hasOwnProperty(key)) {
             currentCnt = $scope.presentElemEditCnts[key];
         }
-        if (currentCnt <= 1 && !Utils.hasEdits(editOb)) {//TODO Utils.hasEdits
+        if ((currentCnt <= 1 && !Utils.hasEdits(editOb)) || cleanAll) {//TODO Utils.hasEdits
             delete $rootScope.ve_edits[key];
             delete $scope.presentElemEditCnts[key];
             cleanUpSaveAll();
@@ -116,7 +116,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
     });
 
     $scope.$on('presentationElem.save', function(event, editOb) {
-        cleanUpEdit(editOb);
+        cleanUpEdit(editOb, true);
     });
 
     $scope.$on('presentationElem.cancel', function(event, editOb) {

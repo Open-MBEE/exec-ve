@@ -53,16 +53,16 @@ function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxSe
         };
     };
 
-    var mmsTranscludeComLink = function(scope, element, attrs, controllers) {
+    var mmsTranscludeComLink = function(scope, domElement, attrs, controllers) {
         var mmsViewCtrl = controllers[0];
         var mmsViewPresentationElemCtrl = controllers[1];
         scope.recompileScope = null;
         var processed = false;
         scope.cfType = 'doc';
 
-        element.click(function(e) {
-            if (scope.addFrame && !scope.nonEditable)
-                scope.addFrame();
+        domElement.click(function(e) {
+            if (scope.startEdit && !scope.nonEditable)
+                scope.startEdit();
 
             if (mmsViewCtrl)
                 mmsViewCtrl.transcludeClicked(scope.element);
@@ -77,17 +77,17 @@ function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxSe
                 scope.recompileScope.$destroy();
             }
             scope.isEditing = false;
-            element.empty();
+            domElement.empty();
             var doc = (preview ? scope.edit.documentation : scope.element.documentation) || '(No comment)';
             doc += ' - ' + scope.element._creator;
             if (preview) {
-                element[0].innerHTML = '<div class="panel panel-info">'+doc+'</div>';
+                domElement[0].innerHTML = '<div class="panel panel-info">'+doc+'</div>';
             } else {
-                element[0].innerHTML = doc;
+                domElement[0].innerHTML = doc;
             }
-            MathJax.Hub.Queue(["Typeset", MathJax.Hub, element[0]]);
+            MathJax.Hub.Queue(["Typeset", MathJax.Hub, domElement[0]]);
             scope.recompileScope = scope.$new();
-            $compile(element.contents())(scope.recompileScope); 
+            $compile(domElement.contents())(scope.recompileScope); 
             if (mmsViewCtrl) {
                 mmsViewCtrl.elementTranscluded(scope.element, 'Comment');
             }
@@ -98,7 +98,7 @@ function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxSe
                 return;
             idwatch();
             if (UtilsService.hasCircularReference(scope, scope.mmsElementId, 'doc')) {
-                element.html('<span class="mms-error">Circular Reference!</span>');
+                domElement.html('<span class="mms-error">Circular Reference!</span>');
                 return;
             }
             var projectId = scope.mmsProjectId;
@@ -123,17 +123,18 @@ function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxSe
                 recompile();
                 scope.panelType = "Comment";
                 if (scope.commitId === 'latest') {
-                    scope.$on('element.updated', function(event, eid, refId, type, continueEdit) {
-                        //TODO check projectId ===scope.projectId or commit?
-                        if (eid === scope.mmsElementId && refId === scope.refId && (type === 'all' || type === 'documentation') && !continueEdit)
+                    scope.$on('element.updated', function(event, elementOb, continueEdit) {
+                        if (elementOb.sysmlId === scope.element.sysmlId && elementOb._projectId === scope.element._projectId
+                                && elementOb._refId === scope.element._refId && !continueEdit) {
                             recompile();
+                        }
                     });
                 }
             }, function(reason) {
                 var status = ' not found';
                 if (reason.status === 410)
                     status = ' deleted';
-                element.html('<span class="mms-error">comment ' + newVal + status + '</span>');
+                domElement.html('<span class="mms-error">comment ' + newVal + status + '</span>');
             });
         });
 
@@ -142,27 +143,27 @@ function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxSe
             scope.isEditing = false;
             scope.elementSaving = false;
             scope.view = mmsViewCtrl.getView();
-            scope.isDirectChildOfPresentationElement = Utils.isDirectChildOfPresentationElementFunc(element, mmsViewCtrl);
+            scope.isDirectChildOfPresentationElement = Utils.isDirectChildOfPresentationElementFunc(domElement, mmsViewCtrl);
             var type = "documentation";
 
             scope.save = function() {
-                Utils.saveAction(scope, recompile, scope.bbApi, null, type, element);
+                Utils.saveAction(scope, domElement, false);
             };
 
             scope.saveC = function() {
-                Utils.saveAction(scope, recompile, scope.bbApi, null, type, element, true);
+                Utils.saveAction(scope, domElement, true);
             };
 
             scope.cancel = function() {
-                Utils.cancelAction(scope, recompile, scope.bbApi, type, element);
+                Utils.cancelAction(scope, recompile, domElement);
             };
 
-            scope.addFrame = function() {
-                Utils.addFrame(scope, mmsViewCtrl, element, template);
+            scope.startEdit = function() {
+                Utils.startEdit(scope, mmsViewCtrl, domElement, template, false);
             };
 
             scope.preview = function() {
-                Utils.previewAction(scope, recompile, type, element);
+                Utils.previewAction(scope, recompile, domElement);
             };
         } 
 

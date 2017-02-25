@@ -50,13 +50,13 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
 
     };
 
-    var mmsTranscludeNameLink = function(scope, element, attrs, controllers) {
+    var mmsTranscludeNameLink = function(scope, domElement, attrs, controllers) {
         var mmsViewCtrl = controllers[0];
         var mmsCfDocCtrl = controllers[1];
         var mmsCfValCtrl = controllers[2];
         var processed = false;
         scope.recompileScope = null;
-        element.click(function(e) {
+        domElement.click(function(e) {
             if (scope.noClick)
                 return;
 
@@ -64,8 +64,8 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
                 scope.clickHandler();
                 return;
             }
-            if (scope.addFrame && !scope.nonEditable)
-                scope.addFrame();
+            if (scope.startEdit && !scope.nonEditable)
+                scope.startEdit();
 
             if (!mmsViewCtrl)
                 return false;
@@ -83,10 +83,10 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
             }
             element.empty();
             if (preview) {
-                element[0].innerHTML = '<div class="panel panel-info">'+editTemplate+'</div>';
+                domElement[0].innerHTML = '<div class="panel panel-info">'+editTemplate+'</div>';
             } else {
                 scope.isEditing = false;
-                element[0].innerHTML = defaultTemplate;
+                domElement[0].innerHTML = defaultTemplate;
             }
             scope.recompileScope = scope.$new();
             $compile(element.contents())(scope.recompileScope); 
@@ -144,11 +144,12 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
                 if (mmsViewCtrl) {
                     mmsViewCtrl.elementTranscluded(scope.element);
                 }
-                if (scope.version === 'latest') {
-                    scope.$on('element.updated', function(event, eid, refId, type, continueEdit) {
-                        //TODO check projectId ===scope.projectId or commit?
-                        if (eid === scope.mmsElementId && refId === scope.refId && (type === 'all' || type === 'name') && !continueEdit)
+                if (scope.commitId === 'latest') {
+                    scope.$on('element.updated', function(event, elementOb, continueEdit) {
+                        if (elementOb.sysmlId === scope.element.sysmlId && elementOb._projectId === scope.element._projectId
+                                && elementOb._refId === scope.element._refId && !continueEdit) {
                             recompile();
+                        }
                     });
                     //actions for stomp using growl messages
                     scope.$on("stomp.element", function(event, deltaSource, deltaWorkspaceId, deltaElementID, deltaModifier, deltaName){
@@ -162,9 +163,9 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
                 var status = ' not found';
                 if (reason.status === 410)
                     status = ' deleted';
-                element.html('<span class="mms-error">name cf ' + newVal + status + '</span>');
+                domElement.html('<span class="mms-error">name cf ' + newVal + status + '</span>');
             }).finally(function() {
-                element.removeClass("isLoading");
+                domElement.removeClass("isLoading");
             });
         });
 
@@ -178,25 +179,23 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
             var type = "name";
 
             scope.save = function() {
-                Utils.saveAction(scope, recompile, scope.bbApi, null, type, element);
+                Utils.saveAction(scope, domElement, false);
             };
 
             scope.saveC = function() {
-                Utils.saveAction(scope, recompile, scope.bbApi, null, type, element, true);
+                Utils.saveAction(scope, domElement, true);
             };
 
             scope.cancel = function() {
-                Utils.cancelAction(scope, recompile, scope.bbApi, type, element);
+                Utils.cancelAction(scope, recompile, domElement);
             };
 
-            scope.addFrame = function() {
-                Utils.addFrame(scope, mmsViewCtrl, element, template);
+            scope.startEdit = function() {
+                Utils.startEdit(scope, mmsViewCtrl, domElement, template, false);
             };
-
-            // TODO: will we ever want a delete?
 
             scope.preview = function() {
-                Utils.previewAction(scope, recompile, type, element);
+                Utils.previewAction(scope, recompile, domElement);
             };
         }
     };

@@ -74,7 +74,7 @@ angular.module('mms.directives')
 function mmsSpec(Utils, ElementService, UtilsService, $compile, $templateCache, $uibModal, growl, _) {
     var template = $templateCache.get('mms/templates/mmsSpec.html');
 
-    var mmsSpecLink = function(scope, element, attrs) {
+    var mmsSpecLink = function(scope, domElement, attrs) {
         var ran = false;
         var lastid = null; //race condition check
         var keepMode = false;
@@ -91,14 +91,13 @@ function mmsSpec(Utils, ElementService, UtilsService, $compile, $templateCache, 
             scope.element = scope.mmsElement;
             if(scope.element.type === 'Expression'){
                 scope.values = null;
-                scope.value = null;
             }
             if (scope.element.type === 'Property' || scope.element.type === 'Port')
                 scope.values = [scope.element.defaultValue];
             if (scope.element.type === 'Slot')
                 scope.values = scope.element.value;
             if (scope.element.type === 'Constraint')
-                scope.value = scope.element.specification;
+                scope.values = [scope.element.specification];
             scope.editable = false;
             return;
         }
@@ -131,33 +130,32 @@ function mmsSpec(Utils, ElementService, UtilsService, $compile, $templateCache, 
             var reqOb = {elementId: scope.mmsElementId, projectId: scope.mmsProjectId, refId: scope.mmsRefId, commitId: scope.mmsCommitId, extended: true};
             ElementService.getElement(reqOb, 2)
             .then(function(data) {
-                if (newVal !== lastid)
+                if (newVal !== lastid) {
                     return;
+                }
                 scope.element = data;
                 if (scope.element.type === 'Property' || scope.element.type === 'Port') {
                     if (scope.element.defaultValue) {
                         scope.values = [scope.element.defaultValue];
-                    } else
+                    } else {
                         scope.values = [];
+                    }
                     if (UtilsService.isRestrictedValue(scope.values)) {
                         scope.isRestrictedVal = true;
                     } else {
                         scope.isRestrictedVal = false;
                     }
-                }
-                if (scope.element.type === 'Slot') {
+                } else if (scope.element.type === 'Slot') {
                     scope.values = scope.element.value;
                     if (UtilsService.isRestrictedValue(scope.values)) {
                         scope.isRestrictedVal = true;
                     } else {
                         scope.isRestrictedVal = false;
                     }
-                }
-                if (scope.element.type === 'Constraint') {
+                } else if (scope.element.type === 'Constraint') {
                     scope.values = [scope.element.specification];
                 }
-                if (scope.mmsEditField === 'none' ||
-                        !scope.element._editable ||
+                if (!scope.element._editable ||
                         (scope.mmsCommitId !== 'latest' && scope.mmsCommitId)) {
                     scope.editable = false;
                     scope.edit = null;
@@ -192,7 +190,6 @@ function mmsSpec(Utils, ElementService, UtilsService, $compile, $templateCache, 
                                     scope.options = elements;
                                 });
                             } else {
-                                //The editor check occurs here; should get "not supported for now" from here
                                 Utils.getPropertySpec(scope.element)
                                 .then( function(value) {
                                     scope.isEnumeration = value.isEnumeration;
@@ -230,22 +227,7 @@ function mmsSpec(Utils, ElementService, UtilsService, $compile, $templateCache, 
          *
          */
         scope.revertEdits = function() {
-            Utils.revertEdits(scope, null);
-        };
-
-        var conflictCtrl = function($scope, $uibModalInstance) {
-            $scope.ok = function() {
-                $uibModalInstance.close('ok');
-            };
-            $scope.cancel = function() {
-                $uibModalInstance.close('cancel');
-            };
-            $scope.force = function() {
-                $uibModalInstance.close('force');
-            };
-            $scope.merge = function() {
-                $uibModalInstance.close('merge');
-            };
+            Utils.revertEdits(scope, scope.edit, scope.editorApi);
         };
 
         /**
@@ -263,7 +245,7 @@ function mmsSpec(Utils, ElementService, UtilsService, $compile, $templateCache, 
          *      the original save failed. Error means an actual error occured.
          */
         scope.save = function() {
-            return Utils.save(scope.edit, scope.mmsRefId, scope.mmsType, scope.mmsElementId, scope.editorApi, scope, 'all');
+            return Utils.save(scope.edit, scope.editorApi, scope, false);
         };
 
         scope.hasHtml = function(s) {
@@ -283,7 +265,7 @@ function mmsSpec(Utils, ElementService, UtilsService, $compile, $templateCache, 
          * @return {boolean} has changes or not
          */
         scope.hasEdits = function() {
-            return Utils.hasEdits(scope, null, true);
+            return Utils.hasEdits(scope.edit);
         };
 
         scope.addValueTypes = {string: 'LiteralString', boolean: 'LiteralBoolean', integer: 'LiteralInteger', real: 'LiteralReal'};
@@ -406,10 +388,8 @@ function mmsSpec(Utils, ElementService, UtilsService, $compile, $templateCache, 
             mmsProjectId: '@',
             mmsRefId: '@',
             mmsCommitId: '@',
-            mmsEditField: '@', //all or none or individual field
             mmsElement: '<?',
             mmsSpecApi: '<?',
-            mmsType: '@',
             noEdit: '@'
         },
         link: mmsSpecLink
