@@ -82,15 +82,15 @@ function mmsViewSection($compile, $templateCache, $rootScope, ViewService, UxSer
             scope.instanceVal = mmsViewPresentationElemCtrl.getInstanceVal();
             scope.presentationElem = mmsViewPresentationElemCtrl.getPresentationElement();
             scope.view = mmsViewCtrl.getView();
-            scope.isDirectChildOfPresentationElement = Utils.isDirectChildOfPresentationElementFunc(element, mmsViewCtrl);
+            scope.isDirectChildOfPresentationElement = Utils.isDirectChildOfPresentationElementFunc(domElement, mmsViewCtrl);
             if (scope.instanceSpec.classifierIds[0] === ViewService.TYPE_TO_CLASSIFIER_ID.Section)
                 scope.isDirectChildOfPresentationElement = false;
             var type = "name";
 
             if (scope.commitId === 'latest') {
                 scope.$on('element.updated', function(event, elementOb, continueEdit) {
-                    if (elementOb.sysmlId === scope.element.sysmlId && elementOb._projectId === scope.element._projectId
-                            && elementOb._refId === scope.element._refId && !continueEdit) {
+                    if (elementOb.sysmlId === scope.element.sysmlId && elementOb._projectId === scope.element._projectId &&
+                        elementOb._refId === scope.element._refId && !continueEdit) {
                         recompile();
                     }
                 });

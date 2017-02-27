@@ -235,8 +235,8 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                 //TODO refactor once save function is complete
                 if (scope.commitId === 'latest') {
                     scope.$on('element.updated', function(event, elementOb, continueEdit) {
-                        if (elementOb.sysmlId === scope.element.sysmlId && elementOb._projectId === scope.element._projectId
-                                && elementOb._refId === scope.element._refId && !continueEdit) {
+                        if (elementOb.sysmlId === scope.element.sysmlId && elementOb._projectId === scope.element._projectId &&
+                            elementOb._refId === scope.element._refId && !continueEdit) {
                             recompile();
                         }
                     });

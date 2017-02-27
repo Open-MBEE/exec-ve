@@ -111,10 +111,10 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             doc = doc.replace(fixPreSpanRegex, "<mms-transclude");
             doc = doc.replace(fixPostSpanRegex, "</mms-transclude-$1>");
             if (preview) {
-                element[0].innerHTML = '<div class="panel panel-info">'+doc+'</div>';
+                domElement[0].innerHTML = '<div class="panel panel-info">'+doc+'</div>';
             } else {
                 scope.isEditing = false;
-                element[0].innerHTML = doc;
+                domElement[0].innerHTML = doc;
             }
             MathJax.Hub.Queue(["Typeset", MathJax.Hub, domElement[0]]);
             scope.recompileScope = scope.$new();
@@ -178,8 +178,8 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                 recompile();
                 if (scope.commitId === 'latest') {
                     scope.$on('element.updated', function(event, elementOb, continueEdit) {
-                        if (elementOb.sysmlId === scope.element.sysmlId && elementOb._projectId === scope.element._projectId
-                                && elementOb._refId === scope.element._refId && !continueEdit) {
+                        if (elementOb.sysmlId === scope.element.sysmlId && elementOb._projectId === scope.element._projectId &&
+                            elementOb._refId === scope.element._refId && !continueEdit) {
                             recompile();
                         }
                     });

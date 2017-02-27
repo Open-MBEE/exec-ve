@@ -81,7 +81,7 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
             if (scope.recompileScope) {
                 scope.recompileScope.$destroy();
             }
-            element.empty();
+            domElement.empty();
             if (preview) {
                 domElement[0].innerHTML = '<div class="panel panel-info">'+editTemplate+'</div>';
             } else {
@@ -89,7 +89,7 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
                 domElement[0].innerHTML = defaultTemplate;
             }
             scope.recompileScope = scope.$new();
-            $compile(element.contents())(scope.recompileScope); 
+            $compile(domElement.contents())(scope.recompileScope);
             if (mmsViewCtrl) {
                 mmsViewCtrl.elementTranscluded(scope.element);
             }
@@ -130,8 +130,8 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
                 if (!commitId)
                     commitId = viewVersion.commitId;
             }
-            element.html('(loading...)');
-            element.addClass("isLoading");
+            domElement.html('(loading...)');
+            domElement.addClass("isLoading");
 
             scope.projectId = projectId;
             scope.refId = refId ? refId : 'master';
@@ -146,8 +146,8 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
                 }
                 if (scope.commitId === 'latest') {
                     scope.$on('element.updated', function(event, elementOb, continueEdit) {
-                        if (elementOb.sysmlId === scope.element.sysmlId && elementOb._projectId === scope.element._projectId
-                                && elementOb._refId === scope.element._refId && !continueEdit) {
+                        if (elementOb.sysmlId === scope.element.sysmlId && elementOb._projectId === scope.element._projectId &&
+                            elementOb._refId === scope.element._refId && !continueEdit) {
                             recompile();
                         }
                     });
