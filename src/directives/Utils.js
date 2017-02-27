@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.factory('Utils', ['$q','$uibModal','$timeout', '$templateCache','$rootScope','$compile','ElementService','ViewService','UtilsService','growl','_',Utils]);
+.factory('Utils', ['$q','$uibModal','$timeout', '$templateCache','$rootScope','$compile', 'CacheService', 'ElementService','ViewService','UtilsService','growl','_',Utils]);
 
 /**
  * @ngdoc service
@@ -19,7 +19,7 @@ angular.module('mms.directives')
  * WARNING These are intended to be internal utility functions and not designed to be used as api
  *
  */
-function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, ElementService, ViewService, UtilsService, growl, _) {
+function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, CacheService, ElementService, ViewService, UtilsService, growl, _) {
   
     var ENUM_ID = '_9_0_62a020a_1105704885400_895774_7947';
     var ENUM_LITERAL = '_9_0_62a020a_1105704885423_380971_7955';
@@ -345,7 +345,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, El
                     scope.skipBroadcast = false;
                 }
                 if (!doNotScroll) {
-                    scrollToElement(element);
+                    scrollToElement(domElement);
                 }
             }, handleError);
 
@@ -475,25 +475,24 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, El
             growl.info('Please Wait...');
             return;
         }
-        var id = section ? section.sysmlId : scope.view.sysmlId;
-        ElementService.isCacheOutdated(id, scope.ws)
-        .then(function(status) {
-            if (status.status) {
-                if (section && section.specification && !angular.equals(section.specification, status.server.specification)) {
-                    growl.error('The view section contents is outdated, refresh the page first!');
-                    return;
-                } else if (!section && scope.view._contents && !angular.equals(scope.view._contents, status.server._contents)) {
-                    growl.error('The view contents is outdated, refresh the page first!');
-                    return;
-                }
-            } 
-            realDelete();
-        }, function(reason) {
-            growl.error('Checking if view contents is up to date failed: ' + reason.message);
-        });
+        // var id = section ? section.sysmlId : scope.view.sysmlId;
+        // ElementService.isCacheOutdated(id, scope.ws)
+        // .then(function(status) {
+        //     if (status.status) {
+        //         if (section && section.specification && !angular.equals(section.specification, status.server.specification)) {
+        //             growl.error('The view section contents is outdated, refresh the page first!');
+        //             return;
+        //         } else if (!section && scope.view._contents && !angular.equals(scope.view._contents, status.server._contents)) {
+        //             growl.error('The view contents is outdated, refresh the page first!');
+        //             return;
+        //         }
+        //     }
+        //     realDelete();
+        // }, function(reason) {
+        //     growl.error('Checking if view contents is up to date failed: ' + reason.message);
+        // });
         function realDelete() {
         bbApi.toggleButtonSpinner('presentation-element-delete');
-
         scope.name = scope.edit.name;
 
         var instance = $uibModal.open({
@@ -509,9 +508,10 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, El
             }]
         });
         instance.result.then(function() {
-
-            var viewOrSecId = section ? section.sysmlId : scope.view.sysmlId;
-            ViewService.deleteElementFromViewOrSection(viewOrSecId, scope.ws, scope.instanceVal).then(function(data) {
+            var viewOrSec = section ? section : scope.view;
+            var reqOb = {elementId: viewOrSec.sysmlId, projectId: viewOrSec._projectId, refId: viewOrSec._refId, commitId: 'latest'};
+            ViewService.removeElementFromViewOrSection(reqOb, scope.instanceVal)
+            .then(function(data) {
                 if (ViewService.isSection(scope.instanceSpec) || ViewService.isTable(scope.instanceSpec) || ViewService.isFigure(scope.instanceSpec) || ViewService.isEquation(scope.instanceSpec)) {
                     // Broadcast message to TreeCtrl:
                     $rootScope.$broadcast('viewctrl.delete.element', scope.instanceSpec);
@@ -526,7 +526,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, El
             }, handleError);
 
         }).finally(function() {
-            bbApi.toggleButtonSpinner('presentation-element-delete');
+            scope.bbApi.toggleButtonSpinner('presentation-element-delete');
         });
         }
     };
