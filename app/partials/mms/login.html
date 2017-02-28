@@ -1,15 +1,15 @@
 
 <script type="text/javascript">
 
-  function toggleVisibilityPrototype(id1, button) {
+  function toggleVisibilityPrototype(id1, buttonid) {
     var obj = document.getElementById(id1);
+    var button = document.getElementById(buttonid);
     if (obj.style.display == 'block' || obj.style.display==''){
         obj.style.display = "none";
-        button.style.backgroundColor = "#292929";
+        button.innerHTML = button.name + button.innerHTML;
     }
     else{
         obj.style.display = "block";
-        button.style.backgroundColor = "#222222";
     }
   };
 
@@ -25,6 +25,12 @@
     font-weight:300;
   }
 
+  a,
+  a:hover{
+    color:white;
+    text-decoration: none;
+  }
+
 /*******Hide error messages for testing purposes. Remove*******/
   .growl-container{
     display:none;
@@ -32,9 +38,10 @@
 
 /*******Layout*******/
   .account-wall{
-    padding:40px;
-    width:400px;
-    margin:100px auto;
+    width:320px;
+    margin:140px auto;
+    height: 360px;
+    position: relative;
   }
 
 /*******Typograpphy*******/
@@ -49,8 +56,17 @@
     opacity:.3;
   }
 
+  .bookmark{
+    text-align: right;
+  }
+
+  .bookmark a{
+    text-decoration: underline;
+  }
+
 /*******Inputs (forms and buttons)*******/
-  .account-wall label{
+  .account-wall label,
+  .bookmark a{
     font-weight:300;
     font-size: 16px;
     color:rgba(255,255,255,0.8);
@@ -58,19 +74,20 @@
 
   .form-control,
   .dropdown-menu-new > button {
-    border: 1px solid #3d3d3d;
+    border: none;
     overflow: hidden;
-    background-color:#292929;
+    background-color:#3d3d3d;
     border-radius: 1px !important;
     padding:6px 10px;
     color:white;
     width:100%;
     font-weight:300;
     font-size: 18px;
+    text-align:left;
   }
 
   .form-control{
-    margin: 0 auto 16px;
+    margin: 0 auto 20px;
   }
 
   .form-control:focus{
@@ -83,12 +100,15 @@
     background-color: #2F889A;
     font-weight: 600 !important;
     letter-spacing: .16em;
-    font-size: 12px !important;
+    font-size: 14px !important;
     -webkit-transition: background-color .2s ease-out!important;
     -moz-transition: background-color .2s ease-out!important;
     -o-transition: background-color .2s ease-out!important;
     transition: background-color .2s ease-out!important;
     margin-top: 48px;
+    position: absolute;
+    width: 100%;
+    bottom: 0;
   }
 
   .account-wall .btn-block:hover{
@@ -110,15 +130,17 @@
     list-style: none;
     background-color:#3d3d3d;
     padding: 10px 0;
-    border-radius:0 0 4px 4px;
+    border-radius:4px;
     position:absolute;
     z-index:1000;
-    min-width: 100%;
+    min-width: calc(100% + 20px);
     box-shadow: 2px 4px 6px 0 rgba(0,0,0,0.2);
+    top:-10px;
+    left:-10px;
   }
 
   .dropdown-menu-new li{
-    padding: 8px 14px;
+    padding: 6px 20px;
     white-space: nowrap;
     -webkit-transition: background-color .2s ease-out!important;
     -moz-transition: background-color .2s ease-out!important;
@@ -132,15 +154,7 @@
     background-color:#535353;
   }
 
-  .dropdown-menu-new .fa-check{
-    padding-right:10px;
-    color:#35bc84;
-    font-size: 14px;
-  }
 
-  .dropdown-menu-new li.unselected{
-    padding-left:38px;
-  }
 </style>
 
     <div>
@@ -152,7 +166,7 @@
                     </div>
                       <div>
 
-                        <form name="loginForm" ng-submit="login(credentials)">
+                        <form name="loginForm" ng-submit="login(credentials)" style = "display:none">
                             <label>Username</label>
                             <input type="text" class="form-control" ng-model="credentials.username"autofocus>
                             <label>Password</label>
@@ -161,25 +175,28 @@
                             </span></button>
                         </form>
 
-                        <form name="loginForm" ng-submit="login(credentials)" style = "display:none">
+                        <form name="loginForm" ng-submit="login(credentials)">
                           <label>Project:</label>
                           <div class = "dropdown-menu-new">
-                            <button onclick = "toggleVisibilityPrototype('project-list', this);" id = "project-button"><i class="fa fa-caret-down" aria-hidden="true"></i></button>
+                            <button onclick = "toggleVisibilityPrototype('project-list', 'project-button');" id = "project-button" name = "Europa"><i class="fa fa-caret-down" aria-hidden="true"></i></button>
                             <ul id = "project-list" style = "display:none;">
-                              <li><i class="fa fa-check" aria-hidden="true"></i>Europa</li>
+                              <li><a onclick = "toggleVisibilityPrototype('project-list', 'project-button');">Europa</a></li>
                               <li class = "unselected">CAE</li>
                             </ul>
                           </div>
                           <label class = "module-disabled">Module:</label>
                           <div class = "dropdown-menu-new">
-                            <button onclick = "toggleVisibilityPrototype('module-list', this);" id = "module-button"><i class="fa fa-caret-down module-disabled" aria-hidden="true"></i></button>
+                            <button onclick = "toggleVisibilityPrototype('module-list', 'module-button');" id = "module-button" name = "Europa Architecture"><i class="fa fa-caret-down module-disabled" aria-hidden="true"></i></button>
                             <ul id = "module-list" style = "display:none;">
-                              <li class = "unselected">Europa Architecture</li>
+                              <li class = "unselected"><a onclick = "toggleVisibilityPrototype('module-list', 'module-button');">Europa Architecture</a></li>
                               <li class = "unselected">Design Capture</li>
                               <li class = "unselected">Flight</li>
                               <li class = "unselected">Ground Design</li>
                               <li class = "unselected">Really really really really really really really really long module name</li>
                             </ul>
+                          </div>
+                          <div class = "bookmark" style = "display:none;">
+                            <a>Bookmark Module</a>
                           </div>
                           <button class="btn btn-block " type="submit">CONTINUE <span ng-if="spin" ><i class="fa fa-spin fa-spinner"></i>
                           </span></button>
