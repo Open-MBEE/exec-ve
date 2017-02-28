@@ -38,7 +38,7 @@ function($scope, $rootScope, $state, $stateParams, $window, $element, hotkeys, g
     };
 
     var views = [];
-    views.push({id: documentOb.sysmlId, api: {
+    views.push({id: documentOb.id, api: {
         init: function(dis) {
             if ($rootScope.veCommentsOn) {
                 dis.toggleShowComments();
@@ -88,11 +88,11 @@ function($scope, $rootScope, $state, $stateParams, $window, $element, hotkeys, g
 
     var seenViewIds = {};
     function handleSingleView(v, aggr) {
-        var childIds = view2children[v.sysmlId];
+        var childIds = view2children[v.id];
         if (!childIds) {
             childIds = [];
         }
-        view2children[v.sysmlId] = childIds;
+        view2children[v.id] = childIds;
         if (!v._childViews || v._childViews.length === 0 || aggr === 'none') {
             return childIds;
         }
@@ -110,7 +110,7 @@ function($scope, $rootScope, $state, $stateParams, $window, $element, hotkeys, g
         return childIds;
     }
 
-    view2children[documentOb.sysmlId] = [];
+    view2children[documentOb.id] = [];
     if (!documentOb._childViews) {
         documentOb._childViews = [];
     }
@@ -229,7 +229,7 @@ function($scope, $rootScope, $state, $stateParams, $window, $element, hotkeys, g
         searchInput: $stateParams.search,
         searchResult: search,
         relatedCallback: function (doc, view, elem) {//siteId, documentId, viewId) {
-            $state.go('project.ref.document.view', {projectId: doc._projectId, documentId: doc.sysmlId, viewId: view.sysmlId, refId: doc._refId, search: undefined});
+            $state.go('project.ref.document.view', {projectId: doc._projectId, documentId: doc.id, viewId: view.id, refId: doc._refId, search: undefined});
         }
     };
 

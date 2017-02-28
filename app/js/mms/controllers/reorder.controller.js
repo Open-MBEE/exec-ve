@@ -9,9 +9,9 @@ function($scope, $rootScope, documentOb, ElementService, ViewService, MmsAppUtil
 
     var viewIds2node = {};
     var origViews = {};
-    viewIds2node[documentOb.sysmlId] = {
+    viewIds2node[documentOb.id] = {
         name: documentOb.name,
-        id: documentOb.sysmlId,
+        id: documentOb.id,
         aggr: 'composite',
         children: []
     };
@@ -48,17 +48,17 @@ function($scope, $rootScope, documentOb, ElementService, ViewService, MmsAppUtil
 
     var seenViewIds = {};
     function handleSingleView(v, aggr) {
-        var curNode = viewIds2node[v.sysmlId];
+        var curNode = viewIds2node[v.id];
         if (!curNode) {
             curNode = {
                 name: v.name,
-                id: v.sysmlId,
+                id: v.id,
                 aggr: aggr,
                 children: []
             };
-            viewIds2node[v.sysmlId] = curNode;
+            viewIds2node[v.id] = curNode;
         }
-        origViews[v.sysmlId] = JSON.parse(JSON.stringify(v));
+        origViews[v.id] = JSON.parse(JSON.stringify(v));
         return curNode;
     }
 
@@ -94,7 +94,7 @@ function($scope, $rootScope, documentOb, ElementService, ViewService, MmsAppUtil
             growl.info("please wait");
             return;
         }
-        if ($scope.tree.length > 1 || $scope.tree[0].id !== documentOb.sysmlId) {
+        if ($scope.tree.length > 1 || $scope.tree[0].id !== documentOb.id) {
             growl.error('Views cannot be re-ordered outside the context of the current document.');
             return;
         }
@@ -116,7 +116,7 @@ function($scope, $rootScope, documentOb, ElementService, ViewService, MmsAppUtil
             if (((!orig._childViews || orig._childViews.length === 0) && childViews.length > 0) ||
                 (orig._childViews && !angular.equals(orig._childViews, childViews))) {
                 toSave.push({
-                    sysmlId: id,
+                    id: id,
                     //name: orig.name,
                     _read: orig._read,
                     _modified: orig._modified,
@@ -148,7 +148,7 @@ function($scope, $rootScope, documentOb, ElementService, ViewService, MmsAppUtil
         if (!curBranch) {
             $state.go('project.ref.document', {}, {reload:true});
         } else {
-            var goToId = curBranch.data.sysmlId;
+            var goToId = curBranch.data.id;
             if (curBranch.type === 'section') {
                 goToId = curBranch.viewId;
             }

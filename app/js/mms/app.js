@@ -186,7 +186,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                                 ViewService.createView({
                                         _projectId: $stateParams.projectId, 
                                         _refId: $stateParams.refId,
-                                        sysmlId: groupId
+                                        id: groupId
                                     },{
                                         viewName: 'Need to get package name Cover Page', 
                                         viewId: eid
@@ -370,7 +370,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             viewElements: function(ViewService, workspace, document, commit, ticket) {
                 if (document === null) 
                     return null;
-                return ViewService.getViewElements(document.sysmlId, false, workspace, commit, 2);
+                return ViewService.getViewElements(document.id, false, workspace, commit, 2);
             },   
             commit: function(tag, ticket) {
                 return tag.commitId;
@@ -477,12 +477,12 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             viewElements: function(ViewService, workspace, document, commit, ticket) {
                 if (document === null) 
                     return [];
-                return ViewService.getViewElements(document.sysmlId, false, workspace, commit, 2);
+                return ViewService.getViewElements(document.id, false, workspace, commit, 2);
             },    
             view: function(ViewService, workspace, document, commit, ticket) {
                 if (document === null) 
                     return null;
-                return ViewService.getView(document.sysmlId, false, workspace, commit, 2, true);
+                return ViewService.getView(document.id, false, workspace, commit, 2, true);
             },
             tags: function(ConfigService, workspace, ticket) {
                 return ConfigService.getConfigs(workspace, false, 2);
@@ -565,7 +565,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                     return null;
                     //siteCoverDocId = 'master_cover';
                 else
-                    siteCoverDocId = site.sysmlId + '_cover';
+                    siteCoverDocId = site.id + '_cover';
                 var deferred = $q.defer();
                 ElementService.getElement(siteCoverDocId, false, workspace, commit, 2, true)
                 .then(function(data) {
@@ -582,9 +582,9 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                     }
 
                     var viewName = site.name + ' Cover Page';
-                    var viewDoc = '<mms-site-docs data-mms-site="' + site.sysmlId + '">[cf:site docs]</mms-site-docs>';
+                    var viewDoc = '<mms-site-docs data-mms-site="' + site.id + '">[cf:site docs]</mms-site-docs>';
 
-                    ViewService.createView(undefined, viewName, undefined, workspace, siteCoverDocId, viewDoc, site.sysmlId)
+                    ViewService.createView(undefined, viewName, undefined, workspace, siteCoverDocId, viewDoc, site.id)
                     .then(function(data) {
                         deferred.resolve(data);
                     }, function(reason) {
@@ -599,12 +599,12 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             viewElements: function(ViewService, workspace, document, commit, ticket) {
                 if (document === null) 
                     return null;
-                return ViewService.getViewElements(document.sysmlId, false, workspace, commit, 2);
+                return ViewService.getViewElements(document.id, false, workspace, commit, 2);
             },    
             view: function(ViewService, workspace, document, commit, ticket) {
                 if (document === null) 
                     return null;
-                return ViewService.getView(document.sysmlId, false, workspace, commit, 2, true);
+                return ViewService.getView(document.id, false, workspace, commit, 2, true);
             }
         },
         views: {
@@ -649,12 +649,12 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             viewElements: function(ViewService, workspace, document, commit, ticket) {
                 if (document === null) 
                     return null;
-                return ViewService.getViewElements(document.sysmlId, false, workspace, commit, 2);
+                return ViewService.getViewElements(document.id, false, workspace, commit, 2);
             },    
             view: function(ViewService, workspace, document, commit, ticket) {
                 if (document === null) 
                     return null;
-                return ViewService.getView(document.sysmlId, false, workspace, commit, 2, true);
+                return ViewService.getView(document.id, false, workspace, commit, 2, true);
             }
         },
         views: {

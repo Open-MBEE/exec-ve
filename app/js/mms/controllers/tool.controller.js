@@ -20,11 +20,11 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
     $scope.refOb = refOb;
 
     if (viewOb) {
-        $scope.specInfo.id = $scope.viewOb.sysmlId;
-        $scope.viewId = viewOb.sysmlId;
+        $scope.specInfo.id = $scope.viewOb.id;
+        $scope.viewId = viewOb.id;
     } else if (documentOb) {
-        $scope.specInfo.id = documentOb.sysmlId;
-        $scope.viewId = documentOb.sysmlId;
+        $scope.specInfo.id = documentOb.id;
+        $scope.viewId = documentOb.id;
     }
 
     $scope.specApi = {};
@@ -89,7 +89,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
     });
 
     var cleanUpEdit = function(editOb, cleanAll) {
-        var key = editOb.sysmlId + '|' + editOb._projectId + '|' + editOb._refId;
+        var key = editOb.id + '|' + editOb._projectId + '|' + editOb._refId;
         var currentCnt = 0;
 
         if ($scope.presentElemEditCnts.hasOwnProperty(key)) {
@@ -105,7 +105,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
     };
 
     $scope.$on('presentationElem.edit', function(event, editOb) {
-        var key = editOb.sysmlId + '|' + editOb._projectId + '|' + editOb._refId;
+        var key = editOb.id + '|' + editOb._projectId + '|' + editOb._refId;
         var currentCnt = 1;
         $rootScope.ve_edits[key] = editOb;
         if ($scope.presentElemEditCnts.hasOwnProperty(key)) {
@@ -124,7 +124,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
     });
 
     var elementSelected = function(event, elementOb, commitId) {
-        $scope.specInfo.id = elementOb.sysmlId;
+        $scope.specInfo.id = elementOb.id;
         $scope.specInfo.projectId = elementOb._projectId;
         $scope.specInfo.refId = elementOb._refId;
         $scope.specInfo.commitId = commitId ? commitId : elementOb._commitId;
@@ -150,7 +150,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
         showPane('element');
         var editOb = $scope.specApi.getEdits();
         if (editOb) {
-            var key = editOb.sysmlId + '|' + editOb._projectId + '|' + editOb._refId;
+            var key = editOb.id + '|' + editOb._projectId + '|' + editOb._refId;
             $scope.tracker.etrackerSelected = key;
             $rootScope.ve_edits[key] = editOb;
             cleanUpSaveAll();
@@ -202,7 +202,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
             if (continueEdit) 
                 return;
             var edit = $scope.specApi.getEdits();
-            var key = edit.sysmlId + '|' + edit._projectId + '|' + edit._refId;
+            var key = edit.id + '|' + edit._projectId + '|' + edit._refId;
             delete $rootScope.ve_edits[key];
             if (Object.keys($rootScope.ve_edits).length > 0) {
                 var next = Object.keys($rootScope.ve_edits)[0];
@@ -273,7 +273,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
             for (var i = 0; i < results.length; i++) {
                 var ob = results[i];
                 if (ob.status === 200) {
-                    delete $rootScope.ve_edits[ob.ob.sysmlId + '|' + ob.ob._projectId + '|' + ob.ob._refId];
+                    delete $rootScope.ve_edits[ob.ob.id + '|' + ob.ob._projectId + '|' + ob.ob._refId];
                     $rootScope.$broadcast('element.updated', ob.ob, 'all');
                 } else {
                     somefail = true;
@@ -285,9 +285,9 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
                 $rootScope.ve_tbApi.select('element-viewer');
                 $scope.specApi.setEditing(false);
             } else {
-                $scope.tracker.etrackerSelected = failed.sysmlId + '|' + failed._projectId + '|' + failed._refId;
+                $scope.tracker.etrackerSelected = failed.id + '|' + failed._projectId + '|' + failed._refId;
                 $scope.specApi.keepMode();
-                $scope.specInfo.id = failed.sysmlId;
+                $scope.specInfo.id = failed.id;
                 $scope.specInfo.projectId = failed._projectId;
                 $scope.specInfo.refId = failed._refId;
                 $scope.specInfo.commitId = 'latest';
@@ -305,7 +305,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
     $scope.$on('element-editor-cancel', function() {
         var go = function() {
             var edit = $scope.specApi.getEdits();
-            delete $rootScope.ve_edits[edit.sysmlId + '|' + edit._projectId + '|' + edit._refId];
+            delete $rootScope.ve_edits[edit.id + '|' + edit._projectId + '|' + edit._refId];
             $scope.specApi.revertEdits();
             if (Object.keys($rootScope.ve_edits).length > 0) {
                 var next = Object.keys($rootScope.ve_edits)[0];

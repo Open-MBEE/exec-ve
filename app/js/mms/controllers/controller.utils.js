@@ -27,7 +27,7 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
                 }
                 $scope.oking = true;  
                 var instanceVal = {
-                    instanceId: elementOb.sysmlId,
+                    instanceId: elementOb.id,
                     type: "InstanceValue",
                 };
                 ViewService.addElementToViewOrSection($scope.viewOrSectionOb, instanceVal).
@@ -233,7 +233,7 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
                 };
                 if (isDoc) {
                     ViewService.getDocMetadata({
-                        elementId: viewOrDocOb.sysmlId,
+                        elementId: viewOrDocOb.id,
                         projectId: viewOrDocOb._projectId,
                         refId: viewOrDocOb._refId
                     }, 2).then(function(metadata) {
@@ -305,7 +305,7 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
                         }
                     } else {//TODO server changes for doc object
                         var doc = {
-                            docId: viewOrDocOb.sysmlId,
+                            docId: viewOrDocOb.id,
                             header: result.header,
                             footer: result.footer,
                             html: result.contents,
@@ -319,7 +319,7 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
                             workspace: refOb.id,
                             customCss: css,
                             version: result.version,
-                            name: viewOrDocOb.sysmlId + '_' + refOb.id + '_' + new Date().getTime(),
+                            name: viewOrDocOb.id + '_' + refOb.id + '_' + new Date().getTime(),
                             disabledCoverPage: isDoc ? false : true
                         };
                         if (!choice[2]) {
@@ -441,7 +441,7 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
         var coverTemplateElement = angular.element(coverTemplateString);
         var cover = '';
         if (!genCover && isDoc) {
-            cover = printElementCopy.find("mms-view[mms-vid='" + viewOrDocOb.sysmlId + "']");
+            cover = printElementCopy.find("mms-view[mms-vid='" + viewOrDocOb.id + "']");
             cover.remove();
             cover = cover[0].outerHTML;
         }
@@ -461,7 +461,7 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
             return deferred.promise;
         }
         ViewService.getDocMetadata({
-            elementId: viewOrDocOb.sysmlId,
+            elementId: viewOrDocOb.id,
             projectId: viewOrDocOb._projectId,
             refId: viewOrDocOb._refId
         }, 2).then(function(metadata) {
@@ -495,7 +495,7 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
             seenViews = {};
         var deferred = $q.defer();
         var curItem = curItemFunc(v, aggr);
-        seenViews[v.sysmlId] = v;
+        seenViews[v.id] = v;
         var childIds = [];
         var childAggrs = [];
         if (!v._childViews || v._childViews.length === 0 || aggr === 'none') {
@@ -516,7 +516,7 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
         }, 2).then(function(childViews) {
             var mapping = {};
             for (var i = 0; i < childViews.length; i++) {
-                mapping[childViews[i].sysmlId] = childViews[i];
+                mapping[childViews[i].id] = childViews[i];
             }
             var childPromises = [];
             for (i = 0; i < childIds.length; i++) {

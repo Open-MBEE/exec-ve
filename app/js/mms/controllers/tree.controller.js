@@ -100,14 +100,14 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     $scope.$on('tree-show-pe', function() {
         toggle('showTree');
         $rootScope.veTreeShowPe = true;
-        setPeVisibility(viewId2node[documentOb.sysmlId]);
+        setPeVisibility(viewId2node[documentOb.id]);
         $scope.treeApi.refresh();
     });
 
     $scope.$on('tree-show-views', function() {
         toggle('showTree');
         $rootScope.veTreeShowPe = false;
-        setPeVisibility(viewId2node[documentOb.sysmlId]);
+        setPeVisibility(viewId2node[documentOb.id]);
         $scope.treeApi.refresh();
     });
 
@@ -161,15 +161,15 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     function resetPeTreeList(elemType) {
         if (elemType == 'table' || elemType == 'all') {
             $scope.tableList.length = 0;
-            getPeTreeList(viewId2node[documentOb.sysmlId], 'table', $scope.tableList);
+            getPeTreeList(viewId2node[documentOb.id], 'table', $scope.tableList);
         }
         if (elemType == 'figure' || elemType == 'image' || elemType == 'all') {
             $scope.figureList.length = 0;
-            getPeTreeList(viewId2node[documentOb.sysmlId], 'figure', $scope.figureList);
+            getPeTreeList(viewId2node[documentOb.id], 'figure', $scope.figureList);
         }
         if (elemType == 'equation' || elemType == 'all') {
             $scope.equationList.length = 0;
-            getPeTreeList(viewId2node[documentOb.sysmlId], 'equation', $scope.equationList);
+            getPeTreeList(viewId2node[documentOb.id], 'equation', $scope.equationList);
         }
     }
 
@@ -208,7 +208,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     var viewId2node = {};
     var seenViewIds = {};
     var handleSingleView = function(v, aggr) {
-        var curNode = viewId2node[v.sysmlId];
+        var curNode = viewId2node[v.id];
         if (!curNode) {
             curNode = {
                 label: v.name,
@@ -218,7 +218,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 loading: false,
                 aggr: aggr
             };
-            viewId2node[v.sysmlId] = curNode;
+            viewId2node[v.id] = curNode;
         }
         return curNode;
     };
@@ -227,22 +227,22 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         var node;
         for (var i = 0; i < childNodes.length; i++) {
             node = childNodes[i];
-            if (seenViewIds[node.data.sysmlId]) {
+            if (seenViewIds[node.data.id]) {
                 growl.error("Warning: View " + node.data.name + " have multiple parents! Duplicates not shown.");
                 continue;
             }
-            seenViewIds[node.data.sysmlId] = node;
+            seenViewIds[node.data.id] = node;
             newChildNodes.push(node);
         }
         curNode.children.push.apply(curNode.children, newChildNodes);
     };
     var processDeletedViewBranch = function(branch) {
-        var sysmlId = branch.data.sysmlId;
-        if (seenViewIds[sysmlId]) {
-            delete seenViewIds[sysmlId];
+        var id = branch.data.id;
+        if (seenViewIds[id]) {
+            delete seenViewIds[id];
         }
-        if (viewId2node[sysmlId]) {
-            delete viewId2node[sysmlId];
+        if (viewId2node[id]) {
+            delete viewId2node[id];
         }
         for (var i = 0; i < branch.children.length; i++) {
             processDeletedViewBranch(branch.children[i]);
@@ -274,7 +274,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         }, function(reason) {
             console.log(reason);
         });
-        $scope.treeData = [viewId2node[documentOb.sysmlId]];
+        $scope.treeData = [viewId2node[documentOb.id]];
     }
 
     function addSectionElements(element, viewNode, parentNode) {
@@ -308,10 +308,10 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                             {
                                 _parentViews: [{
                                     name: viewNode.data.name,
-                                    sysmlId: viewNode.data.sysmlId
+                                    id: viewNode.data.id
                                 }],
                                 name: documentOb.name,
-                                sysmlId: documentOb.sysmlId,
+                                id: documentOb.id,
                                 projectId: projectOb.id,
                                 refId: refOb.id
                             }
@@ -320,18 +320,18 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                             var sectionTreeNode = {
                                 label : instance.name,
                                 type : "section",
-                                viewId : viewNode.data.sysmlId,
+                                viewId : viewNode.data.id,
                                 data : instance,
                                 children: []
                             };
-                            viewId2node[instance.sysmlId] = sectionTreeNode;
+                            viewId2node[instance.id] = sectionTreeNode;
                             parentNode.children.unshift(sectionTreeNode);
                             addSectionElements(instance, viewNode, sectionTreeNode);
                         } else if (ViewService.getTreeType(instance)) {
                             var otherTreeNode = {
                                 label : instance.name,
                                 type : ViewService.getTreeType(instance),
-                                viewId : viewNode.data.sysmlId,
+                                viewId : viewNode.data.id,
                                 data : instance,
                                 hide: hide,
                                 children: []
@@ -365,17 +365,17 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             if (branch.type === 'group') {
                 $state.go('project.ref.preview', {documentId: branch.data._id + '_cover', search: undefined});
             } else if (branch.type === 'view' || branch.type === 'snapshot') {
-                $state.go('project.ref.preview', {documentId: branch.data.sysmlId, search: undefined});
+                $state.go('project.ref.preview', {documentId: branch.data.id, search: undefined});
             }
         } else if ($state.includes('project.ref.document')) {
-            var viewId = (branch.type !== 'view') ? branch.viewId : branch.data.sysmlId;
-            var sectionId = branch.type === 'section' ? branch.data.sysmlId : null;
-            var hash = branch.data.sysmlId;
+            var viewId = (branch.type !== 'view') ? branch.viewId : branch.data.id;
+            var sectionId = branch.type === 'section' ? branch.data.id : null;
+            var hash = branch.data.id;
             if ($rootScope.ve_fullDocMode) {
                 $location.hash(hash);
                 $anchorScroll();
             } else if (branch.type === 'view' || branch.type === 'section') {
-                $state.go('project.ref.document.view', {viewId: branch.data.sysmlId, search: undefined});
+                $state.go('project.ref.document.view', {viewId: branch.data.id, search: undefined});
             } else {
                 $state.go('project.ref.document.view', {viewId: viewId, search: undefined});
                 $timeout(function() {
@@ -392,7 +392,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             if (branch.type === 'group')
                 $rootScope.ve_treeApi.expand_branch(branch);
             else if (branch.type === 'view' || branch.type === 'snapshot') {
-                $state.go('project.ref.document', {documentId: branch.data.sysmlId, search: undefined});
+                $state.go('project.ref.document', {documentId: branch.data.id, search: undefined});
             }
         } else if ($state.includes('project.ref.document')) {
             $rootScope.ve_treeApi.expand_branch(branch);
@@ -456,12 +456,12 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 var viewId;
                 if (curBranch.type !== 'view') {
                     if (curBranch.type == 'section' && curBranch.data.type === 'InstanceSpecification') {
-                        viewId = curBranch.data.sysmlId;
+                        viewId = curBranch.data.id;
                     } else {
                         viewId = curBranch.viewId;
                     }
                 } else {
-                    viewId = curBranch.data.sysmlId;
+                    viewId = curBranch.data.id;
                 }
                 $state.go('project.ref.document.view', {viewId: viewId, search: undefined});
             }
@@ -530,8 +530,8 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                     var num = 1;
                     for (var i = 0; i < node.children.length; i++) {
                         var cNode = node.children[i];
-                        $rootScope.$broadcast('newViewAdded', cNode.data.sysmlId, curSection + '.' + num, lastChild);
-                        lastChild = addToFullDocView(cNode, curSection + '.' + num, cNode.data.sysmlId);
+                        $rootScope.$broadcast('newViewAdded', cNode.data.id, curSection + '.' + num, lastChild);
+                        lastChild = addToFullDocView(cNode, curSection + '.' + num, cNode.data.id);
                         num = num + 1;
                     }
                 }
@@ -539,8 +539,8 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             };
 
             if (itemType === 'View') {
-                viewId2node[data.sysmlId] = newbranch;
-                seenViewIds[data.sysmlId] = newbranch;
+                viewId2node[data.id] = newbranch;
+                seenViewIds[data.id] = newbranch;
                 newbranch.aggr = $scope.newViewAggr.type;
                 var curNum = branch.children[branch.children.length-1].section;
                 var prevBranch = $scope.treeApi.get_prev_branch(newbranch);
@@ -551,17 +551,17 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                   .then(function(node) {
                       // handle full doc mode
                       if ($rootScope.ve_fullDocMode) {
-                          addToFullDocView(node, curNum, newbranch.data.sysmlId);
+                          addToFullDocView(node, curNum, newbranch.data.id);
                       }
                       addViewSectionsRecursivelyForNode(node);
                 });
                 if (!$rootScope.ve_fullDocMode) {
-                    $state.go('project.ref.document.view', {viewId: data.sysmlId, search: undefined});
+                    $state.go('project.ref.document.view', {viewId: data.id, search: undefined});
                 } else {
                     if (prevBranch) {
-                        $rootScope.$broadcast('newViewAdded', data.sysmlId, curNum, prevBranch.data.sysmlId);
+                        $rootScope.$broadcast('newViewAdded', data.id, curNum, prevBranch.data.id);
                     } else {
-                        $rootScope.$broadcast('newViewAdded', data.sysmlId, curNum, branch.data.sysmlId);
+                        $rootScope.$broadcast('newViewAdded', data.id, curNum, branch.data.id);
                     }
                 }
             }
@@ -585,7 +585,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         }
        
         var addExistingView = function(view) {
-            var viewId = view.sysmlId;
+            var viewId = view.id;
             if (seenViewIds[viewId]) {
                 growl.error("Error: View " + view.name + " is already in this document.");
                 return;
@@ -596,7 +596,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             }
             $scope.oking = true;  
             ViewService.addViewToParentView({
-                parentViewId: $scope.parentBranchData.sysmlId,
+                parentViewId: $scope.parentBranchData.id,
                 viewId: viewId,
                 projectId: $scope.parentBranchData._projectId,
                 refId: $scope.parentBranchData._refId
@@ -641,7 +641,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 promise = ViewService.createDocument({
                     _projectId: projectOb.id,
                     _refId: refOb.id,
-                    sysmlId: $scope.parentBranchData._id
+                    id: $scope.parentBranchData._id
                 },{
                     viewName: $scope.newDoc.name,
                     isDoc: true
@@ -742,8 +742,8 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                     promise = ViewService.removeViewFromParentView({
                         projectId: parentBranch.data._projectId,
                         refId: parentBranch.data._refId,
-                        parentViewId: parentBranch.data.sysmlId,
-                        viewId: branch.data.sysmlId
+                        parentViewId: parentBranch.data.id,
+                        viewId: branch.data.id
                     });
                 }
             }
@@ -762,7 +762,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     };
 
     function addViewSections(view) {
-        var node = viewId2node[view.sysmlId];
+        var node = viewId2node[view.id];
         addSectionElements(view, node, node);
     }
 
@@ -793,16 +793,16 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         if (branch.type === 'section') {
             viewId = branch.viewId;
         } else {
-            viewId = branch.data.sysmlId;
+            viewId = branch.data.id;
         }
         var viewNode = viewId2node[viewId];
         instanceSpec._relatedDocuments = [{
                 _parentViews: [{
                     name: viewNode.data.name,
-                    sysmlId: viewNode.data.sysmlId
+                    id: viewNode.data.id
                 }],
                 name: documentOb.name,
-                sysmlId: documentOb.sysmlId,
+                id: documentOb.id,
                 projectId: documentOb._projectId
             }
         ];

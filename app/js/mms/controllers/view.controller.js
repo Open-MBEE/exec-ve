@@ -18,7 +18,7 @@ angular.module('mmsApp')
     }
 
     $scope.vidLink = false; //whether to have go to document link
-    if ($state.includes('project.ref.preview') && viewOb && viewOb.sysmlId.indexOf('_cover') < 0) {
+    if ($state.includes('project.ref.preview') && viewOb && viewOb.id.indexOf('_cover') < 0) {
         $scope.vidLink = true;
     }
 
@@ -43,8 +43,8 @@ angular.module('mmsApp')
             }
         },
         elementTranscluded: function(elementOb, type) {
-            if (type === 'Comment' && !$scope.comments.map.hasOwnProperty(elementOb.sysmlId)) {
-                $scope.comments.map[elementOb.sysmlId] = elementOb;
+            if (type === 'Comment' && !$scope.comments.map.hasOwnProperty(elementOb.id)) {
+                $scope.comments.map[elementOb.id] = elementOb;
                 $scope.comments.count++;
                 if (elementOb._modified > $scope.comments.lastCommented) {
                     $scope.comments.lastCommented = elementOb._modified;
@@ -266,7 +266,7 @@ angular.module('mmsApp')
         searchInput: $stateParams.search,
         searchResult: search,
         relatedCallback: function (doc, view, elem) {//siteId, documentId, viewId) {
-            $state.go('project.ref.document.view', {projectId: doc._projectId, documentId: doc.sysmlId, viewId: view.sysmlId, refId: doc._refId, search: undefined});
+            $state.go('project.ref.document.view', {projectId: doc._projectId, documentId: doc.id, viewId: view.id, refId: doc._refId, search: undefined});
         }
     };
 
