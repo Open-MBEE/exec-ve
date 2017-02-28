@@ -69,7 +69,7 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
                             url: jobs[i].url,
                             command: jobs[i].command,
                             create: jobs[i].created,
-                            sysmlId: jobs[i].sysmlId
+                            id: jobs[i].id
                         };
                     }
                 }
@@ -115,8 +115,8 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
         scope.$watch('mmsDocId', changeDocument);
 
         var jenkinsRun = function() {
-            var link = URLService.getJenkinsRun(scope.job.sysmlId);
-            //http://localhost:8080/alfresco/service/workspaces/master/jobs/scope.jobs[0].sysmlId/execute
+            var link = URLService.getJenkinsRun(scope.job.id);
+            //http://localhost:8080/alfresco/service/workspaces/master/jobs/scope.jobs[0].id/execute
             scope.runCleared = false;
             $http.post(link, ' ').then(function(){
                 growl.success('Your job is running!');
@@ -171,7 +171,7 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
                 var job_size = data.data.elements.length;
                 for (var i = 0; i < job_size; i++) {
                     if(job[i].type === 'Element'){
-                        scope.job.sysmlId = job[i].sysmlId;
+                        scope.job.id = job[i].id;
                     }
                 }
                 deferred.resolve();
@@ -187,7 +187,7 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
             var id = scope.mmsDocId;
             var updatePost = {
                 jobs: [{
-                    sysmlId: scope.job.sysmlId,
+                    id: scope.job.id,
                     name: scope.jobInput.jobName+'_job'
                 }]
             };
@@ -201,10 +201,10 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
         scope.deleteJob = function(){
             var jobDelete = {
                 jobs: [{
-                    sysmlId: scope.job.sysmlId
+                    id: scope.job.id
                 }]
             };
-            var link = URLService.getJob(scope.job.sysmlId);
+            var link = URLService.getJob(scope.job.id);
             scope.deleteCleared = false;
             $http.delete(link, jobDelete).then(function(){
                 growl.success('Your job has been deleted');
@@ -245,7 +245,7 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
                         status: newJob[i].status,
                         create: newJob[i].created,
                         url: newJob[i].url,
-                        sysmlId: newJob[i].sysmlId,
+                        id: newJob[i].id,
                     };
                     scope.$apply();
                 }

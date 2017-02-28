@@ -68,15 +68,15 @@ function mmsViewLink(ElementService, UtilsService, $compile, growl) {
                     });
                 }
                 if (UtilsService.isDocument(data)) {
-                    docid = data.sysmlId;
+                    docid = data.id;
                     scope.docid = docid;
-                    scope.vid = data.sysmlId;
+                    scope.vid = data.id;
                 } else if (UtilsService.isView(data) || data.type === 'InstanceSpecification') {
                     if (!docid || docid === '') {
-                        docid = data.sysmlId;
-                    } 
+                        docid = data.id;
+                    }
                     scope.docid = docid;
-                    scope.vid = data.sysmlId;
+                    scope.vid = data.id;
                 } else {
                     element.html("<span class=\"mms-error\">view link doesn't refer to a view</span>");
                 }

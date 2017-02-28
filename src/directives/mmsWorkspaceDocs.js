@@ -41,11 +41,11 @@ function mmsWorkspaceDocs(ElementService, SiteService, ViewService, growl, $q, $
             sites.forEach(function(site) {
                 var siteDeferred = $q.defer();
                 filterPromises.push(siteDeferred.promise);
-                ViewService.getSiteDocuments(site.sysmlId, false, ws, version, 1)
+                ViewService.getSiteDocuments(site.id, false, ws, version, 1)
                 .then(function(sitedocs) {
                     sitedocs.forEach(function(doc) {
-                        if (!docsKey[doc.sysmlId]) {
-                            docsKey[doc.sysmlId] = doc;
+                        if (!docsKey[doc.id]) {
+                            docsKey[doc.id] = doc;
                             docs.push(doc);
                         }
                     });

@@ -73,7 +73,7 @@ function mmsViewPresentationElem(ViewService, ElementService, $templateCache, $r
                 scope.instanceSpec = instanceSpec;
                 scope.presentationElemLoading = false;
                 var hash = $location.hash();
-                if (hash === instanceSpec.sysmlId) {
+                if (hash === instanceSpec.id) {
                     $timeout(function() {
                         $anchorScroll();
                     }, 1000, false);

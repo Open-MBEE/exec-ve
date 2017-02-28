@@ -39,7 +39,7 @@ function mmsViewSection($compile, $templateCache, $rootScope, ViewService, UxSer
             if (scope.startEdit)
                 scope.startEdit();
             if (mmsViewCtrl && mmsViewPresentationElemCtrl)
-                mmsViewCtrl.transcludeClicked(scope.section.sysmlId); //show instance spec if clicked
+                mmsViewCtrl.transcludeClicked(scope.section.id); //show instance spec if clicked
             e.stopPropagation();
         });
 
@@ -89,7 +89,7 @@ function mmsViewSection($compile, $templateCache, $rootScope, ViewService, UxSer
 
             if (scope.commitId === 'latest') {
                 scope.$on('element.updated', function(event, elementOb, continueEdit) {
-                    if (elementOb.sysmlId === scope.element.sysmlId && elementOb._projectId === scope.element._projectId &&
+                    if (elementOb.id === scope.element.id && elementOb._projectId === scope.element._projectId &&
                         elementOb._refId === scope.element._refId && !continueEdit) {
                         recompile();
                     }

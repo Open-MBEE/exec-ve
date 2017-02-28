@@ -76,7 +76,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Ca
                 });
                 instance.result.then(function(choice) {
                     if (choice === 'ok') {
-                        var reqOb = {elementId: scope.latest.sysmlId, projectId: scope.latest._projectId, refId: scope.latest._refId, commitId: 'latest'};
+                        var reqOb = {elementId: scope.latest.id, projectId: scope.latest._projectId, refId: scope.latest._refId, commitId: 'latest'};
                         ElementService.cacheElement(reqOb, scope.latest, true);
                         ElementService.cacheElement(reqOb, scope.latest, false);
                     } else if (choice === 'force') {
@@ -194,7 +194,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Ca
         if (elementOb.type === 'Enumeration') {
             var isEnumeration = true;
             var reqOb = {
-                elementId: elementOb.sysmlId, 
+                elementId: elementOb.id,
                 projectId: elementOb._projectId, 
                 refId: elementOb._refId, 
                 commitId: elementOb._commitId,
@@ -305,7 +305,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Ca
     var startEdit = function(scope, mmsViewCtrl, domElement, template, doNotScroll) {
         if (mmsViewCtrl.isEditable() && !scope.isEditing && scope.element._editable && scope.commitId === 'latest') {
             var elementOb = scope.element;
-            var reqOb = {elementId: elementOb.sysmlId, projectId: elementOb._projectId, refId: elementOb._refId};
+            var reqOb = {elementId: elementOb.id, projectId: elementOb._projectId, refId: elementOb._refId};
             ElementService.getElementForEdit(reqOb)
             .then(function(data) {
                 scope.isEditing = true;
@@ -475,7 +475,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Ca
             growl.info('Please Wait...');
             return;
         }
-        // var id = section ? section.sysmlId : scope.view.sysmlId;
+        // var id = section ? section.id : scope.view.id;
         // ElementService.isCacheOutdated(id, scope.ws)
         // .then(function(status) {
         //     if (status.status) {
@@ -509,7 +509,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Ca
         });
         instance.result.then(function() {
             var viewOrSec = section ? section : scope.view;
-            var reqOb = {elementId: viewOrSec.sysmlId, projectId: viewOrSec._projectId, refId: viewOrSec._refId, commitId: 'latest'};
+            var reqOb = {elementId: viewOrSec.id, projectId: viewOrSec._projectId, refId: viewOrSec._refId, commitId: 'latest'};
             ViewService.removeElementFromViewOrSection(reqOb, scope.instanceVal)
             .then(function(data) {
                 if (ViewService.isSection(scope.instanceSpec) || ViewService.isTable(scope.instanceSpec) || ViewService.isFigure(scope.instanceSpec) || ViewService.isEquation(scope.instanceSpec)) {

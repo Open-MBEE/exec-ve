@@ -32,11 +32,11 @@
             </div>
         </div>
         <div ng-if="isRestrictedVal">
-            <select ng-model="editValues[0].operand[1].elementId" ng-options="el.sysmlId as el.name for el in options"></select>
+            <select ng-model="editValues[0].operand[1].elementId" ng-options="el.id as el.name for el in options"></select>
         </div>
         <!-- if enum and isslot repeat values in element -->
         <div ng-if="isEnumeration" ng-repeat="val in editValues">
-            <select ng-model="val.instanceId" ng-options="el.sysmlId as el.name for el in options"></select>
+            <select ng-model="val.instanceId" ng-options="el.id as el.name for el in options"></select>
             <a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a>
         </div>
         <div ng-if="isSlot && isEnumeration">

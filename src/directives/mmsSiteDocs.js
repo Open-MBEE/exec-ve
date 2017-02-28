@@ -25,10 +25,10 @@ function mmsSiteDocs(ElementService, SiteService, ViewService, growl, $q, $templ
             var filteredDocs = [];
             var seen = {};
             scope.siteDocs.forEach(function(doc) {
-                if (seen[doc.sysmlId])
+                if (seen[doc.id])
                     return;
                 filteredDocs.push(doc);
-                seen[doc.sysmlId] = 'seen';
+                seen[doc.id] = 'seen';
             });
             scope.docs = filteredDocs;
         };

@@ -178,7 +178,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                 recompile();
                 if (scope.commitId === 'latest') {
                     scope.$on('element.updated', function(event, elementOb, continueEdit) {
-                        if (elementOb.sysmlId === scope.element.sysmlId && elementOb._projectId === scope.element._projectId &&
+                        if (elementOb.id === scope.element.id && elementOb._projectId === scope.element._projectId &&
                             elementOb._refId === scope.element._refId && !continueEdit) {
                             recompile();
                         }

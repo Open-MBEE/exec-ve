@@ -67,7 +67,7 @@ function veMenu(ProjectService, $state, $templateCache, growl) {
         var currSiteParentId = scope.site.parent;
         var isCharacterization = scope.site.isCharacterization;
         var breadcrumbs = [];
-        breadcrumbs.push({name: scope.site.name, sysmlId: scope.site.sysmlId});
+        breadcrumbs.push({name: scope.site.name, id: scope.site.id});
         var eltWidth = element.parent().width();
 
         // SiteService.getSites()
@@ -76,8 +76,8 @@ function veMenu(ProjectService, $state, $templateCache, growl) {
         //         var site = data[i];
         //         var siteParent = site.parent;
         //         var siteIsChara = site.isCharacterization;
-        //         if (site.sysmlId == currSiteParentId && isCharacterization === siteIsChara) {
-        //           breadcrumbs.push({name: site.name, sysmlId: site.sysmlId});
+        //         if (site.id == currSiteParentId && isCharacterization === siteIsChara) {
+        //           breadcrumbs.push({name: site.name, id: site.id});
         //           if (site.parent) {
         //             currSiteParentId = site.parent;
         //           }

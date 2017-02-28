@@ -103,7 +103,7 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
             var promises = [];
             var updateSectionElementOrder = function(elementReference) {
                 var sectionEdit = { 
-                    sysmlId: elementReference.instanceId,
+                    id: elementReference.instanceId,
                     _read: elementReference.instanceSpecification._read,
                     _modified: elementReference.instanceSpecification._modified,
                     type: elementReference.instanceSpecification.type,
@@ -133,7 +133,7 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
                 return deferred.promise;
             }
             var viewEdit = {
-                sysmlId: scope.view.sysmlId,
+                id: scope.view.id,
                 _read: scope.view._read,
                 _modified: scope.view._modified,
                 type: scope.view.type
