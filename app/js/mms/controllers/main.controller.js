@@ -123,6 +123,8 @@ function($scope, $location, $rootScope, $state, _, $window, $uibModal, growl, $h
             $rootScope.mms_stateChanging = false;
             if ($state.current.name === 'login') {
                 $rootScope.hideCenterPane = true;
+            } else {
+                $rootScope.hideCenterPane = false;
             }
             // set the initial tree selection
             if ($state.includes('workspaces') && !$state.includes('workspace.sites')) {
