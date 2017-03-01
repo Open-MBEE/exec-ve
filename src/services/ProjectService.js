@@ -92,7 +92,6 @@ function ProjectService($q, $http, URLService, CacheService, ApplicationService)
         } else {
             inProgress[url] = deferred.promise;
             $http.get(url).then(function(response) {
-                //TODO change project to projects**** must be changed on server
                 if (!angular.isArray(response.data.projects)) {
                     deferred.reject({status: 500, data: '', message: "Server Error: empty response"});
                     return;
@@ -126,12 +125,11 @@ function ProjectService($q, $http, URLService, CacheService, ApplicationService)
         else {
             inProgress[url] = deferred.promise;
             $http.get(url).then(function(response) {
-                //TODO change project to projects**** must be changed on server
-                if (!angular.isArray(response.data.project) || response.data.project.length === 0) {
+                if (!angular.isArray(response.data.projects) || response.data.projects.length === 0) {
                     deferred.reject({status: 500, data: '', message: "Server Error: empty response"});
                     return;
                 }
-                CacheService.put(cacheKey, response.data.project[0], true);
+                CacheService.put(cacheKey, response.data.projects[0], true);
                 deferred.resolve(CacheService.get(cacheKey));
             }, function(response) {
                 URLService.handleHttpStatus(response.data, response.status, response.headers, response.config, deferred);

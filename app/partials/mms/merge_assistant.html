@@ -9,10 +9,10 @@
     <!-- Type Chooser -->
     <div ng-if="!pane || pane == 'typeChooser'" class="modal-body text-center">
         <div>
-	        <button type="button" class="btn btn-big" ng-click="mergeAssistFromTo('quick')">Quick Merge</button>
+            <button type="button" class="btn btn-big" ng-click="mergeAssistFromTo('quick')">Quick Merge</button>
         </div>
         <div>
-	        <button type="button" class="btn btn-big" ng-click="mergeAssistFromTo('custom')">Custom Merge</button>
+            <button type="button" class="btn btn-big" ng-click="mergeAssistFromTo('custom')">Custom Merge</button>
         </div>
     </div>
     
@@ -34,10 +34,10 @@
     <div ng-if="pane == 'beginMerge'" class="modal-body">
         <h4>BEGIN MERGE</h4>
         <div ng-if="mergeInfo.type == 'quick'">
-	       Because this comparison may take a while, we'll email you a direct link to the differences to resolve as soon as we've prepared them for you.
+            Because this comparison may take a while, we'll email you a direct link to the differences to resolve as soon as we've prepared them for you.
         </div>
         <div ng-if="mergeInfo.type == 'custom'">
-	        Because this comparison may take a while, we'll email you a direct link to the differences once it's finished.
+            Because this comparison may take a while, we'll email you a direct link to the differences once it's finished.
         </div>
     </div>
     <div ng-if="pane == 'beginMerge'" class="modal-footer">
