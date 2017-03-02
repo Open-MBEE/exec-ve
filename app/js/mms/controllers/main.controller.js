@@ -141,5 +141,23 @@ function($scope, $location, $rootScope, $state, _, $window, $uibModal, growl, $h
             $rootScope.mms_viewContentLoading = false;
         }
     );
-    
+    var workingModalOpen = false;
+    $rootScope.$on('mms.working', function(event, response) {
+        $rootScope.mms_viewContentLoading = false;
+        if (workingModalOpen) {
+            return;
+        }
+        $scope.mmsWorkingTime = response.data;
+        workingModalOpen = true;
+        var instance = $uibModal.open({
+            template: "<div class=\"modal-header\">Please come back later</div><div class=\"modal-body\">The document you're requesting has been requested already at {{mmsWorkingTime.startTime | date:'M/d/yy h:mm a'}} and is currently being cached, please try again later.</div>",
+            scope: $scope,
+            backdrop: true,
+            controller: ['$scope', '$uibModalInstance', function ($scope, $uibModalInstance) {
+                }],
+            size: 'md'
+        }).result.finally(function(){
+            workingModalOpen = false;
+        });
+    });
 }]);
