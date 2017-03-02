@@ -142,6 +142,7 @@ should maybe have its of class***/
   padding: 5px 8px;
   height: 34px;
   line-height: 18px;
+  margin-top:6px;
 }
 
  .dropdown-toggle .fa-caret-down{
@@ -152,7 +153,6 @@ should maybe have its of class***/
 .label-dropdown{
   color: #d6d6d6;
   font-size:14px; 
-  padding:6px 0;
 }
 
  .dropdown-menu{
@@ -176,7 +176,7 @@ should maybe have its of class***/
   background-color:#262626;
 }
 
- .btn-group.open .dropdown-toggle{
+.btn-group.open .dropdown-toggle{
   background-color:#262626;
 }
 
@@ -220,30 +220,27 @@ should maybe have its of class***/
 
 
 </style>
+<div class="row">
+        <div>
+            <div class = "account-wall">
+                <div>
+                     <h2>View Editor</h2>
+                </div>
+                <div>
+                    <form name="loginForm" ng-submit="login(credentials)" style = "display:none">
+                        <span class = label-text>Username:</span>
+                        <input type="text" class="form-control" ng-model="credentials.username"autofocus>
+                        <span class = label-text>Password:</span>
+                        <input type="password" class="form-control" ng-model="credentials.password">
+                        <button class="btn btn-block" type="submit">LOG IN <span ng-if="spin" ><i class="fa fa-spin fa-spinner"></i>
+                        </span></button>
+                    </form>
 
-    <div>
-        <div class="row">
-            <div>
-                <div class = "account-wall">
-                    <div>
-                        <h2>View Editor</h2>
-                    </div>
-                      <div>
-
-                        <form name="loginForm" ng-submit="login(credentials)" style = "display:none">
-                            <span class = label-text>Username:</span>
-                            <input type="text" class="form-control" ng-model="credentials.username"autofocus>
-                            <span class = label-text>Password:</span>
-                            <input type="password" class="form-control" ng-model="credentials.password">
-                            <button class="btn btn-block" type="submit">LOG IN <span ng-if="spin" ><i class="fa fa-spin fa-spinner"></i>
-                            </span></button>
-                        </form>
-
-                        <form name="loginForm" ng-submit="login(credentials)">
+                    <form name="loginForm" ng-submit="login(credentials)">
                         <div class="btn-group" uib-dropdown keyboard-nav>
                           <span class = "label-dropdown">Project:</span> 
                           <button id="simple-btn-keyboard-nav" type="button" class = "dropdown-toggle" uib-dropdown-toggle>
-                            <span><i class="fa fa-caret-down" aria-hidden="true"></i></span>
+                          <span><i class="fa fa-caret-down" aria-hidden="true"></i></span>
                           </button>
                           <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="simple-btn-keyboard-nav">
                               <li>CAE</li>
@@ -251,26 +248,25 @@ should maybe have its of class***/
                           </ul>
                         </div>
                         <div class="btn-group" uib-dropdown keyboard-nav>
-                          <span class = "label-dropdown">Module:</span> 
-                          <button id="simple-btn-keyboard-nav" type="button" class = "dropdown-toggle" uib-dropdown-toggle>
+                            <span class = "label-dropdown">Module:</span> 
+                            <button id="simple-btn-keyboard-nav" type="button" class = "dropdown-toggle" uib-dropdown-toggle>
                             <span>Europa Architecture<i class="fa fa-caret-down" aria-hidden="true"></i></span>
-                          </button>
-                          <ul class="dropdown-menu list-with-selected-item" uib-dropdown-menu role="menu" aria-labelledby="simple-btn-keyboard-nav">
-                              <li>Design Capture</li>
-                              <li>Flight</li>
-                              <li class = "checked-list-item">Europa Architecture</li>
-                              <li>Ground Design</li>
-                              <li>Really really really really really really really really long module name</li>
-                          </ul>
+                            </button>
+                            <ul class="dropdown-menu list-with-selected-item" uib-dropdown-menu  role="menu" aria-labelledby="simple-btn-keyboard-nav">
+                                <li>Design Capture</li>
+                                <li>Flight</li>
+                                <li class = "checked-list-item">Europa Architecture</li>
+                                <li>Ground Design</li>
+                                <li>Really really really really really really really really long module name</li>
+                            </ul>
                         </div>
-                          <div class = "bookmark">
+                        <div class = "bookmark">
                             <a>Bookmark Module</a>
-                          </div>
-                          <button class="btn btn-block " type="submit">CONTINUE <span ng-if="spin" ><i class="fa fa-spin fa-spinner"></i>
-                          </span></button>
-                        </form>
-                    </div>
+                        </div>
+                        <button class="btn btn-block " type="submit">CONTINUE <span ng-if="spin" ><i class="fa fa-spin fa-spinner"></i>
+                        </span></button>
+                    </form>
+                  </div>
                 </div>
             </div>
         </div>
-    </div>
