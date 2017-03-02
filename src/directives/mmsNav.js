@@ -44,13 +44,13 @@ function mmsNav($templateCache, $state, hotkeys, growl, $location, $uibModal, $h
             hotkeys.toggleCheatSheet();
         };
         scope.toggleAbout = function() {
-            scope.veV = '2.5.0';
+            scope.veV = '2.5.1';
             scope.mmsV = 'Loading...';
             ApplicationService.getMmsVersion().then(function(data) {
                 scope.mmsV = data;
               }, function(reason) {
                 scope.mmsV = "Could not retrieve due to failure: " + reason.message;
-          	});
+            });
             var instance = $uibModal.open({
                 templateUrl: 'partials/mms/about.html',
                 scope: scope,
