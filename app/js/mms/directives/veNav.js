@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mmsApp')
-.directive('veNav', ['$templateCache', '$state', 'hotkeys', 'growl', '$location', '$uibModal', 'ApplicationService','AuthService', veNav]);
+.directive('veNav', ['$templateCache', '$rootScope', '$state', 'hotkeys', 'growl', '$location', '$uibModal', 'ApplicationService','AuthService', 'ProjectService', veNav]);
 
 /**
  * @ngdoc directive
@@ -30,16 +30,47 @@ angular.module('mmsApp')
     </pre>
  * @param {string} mmsTitle Title to display
  */
-function veNav($templateCache, $state, hotkeys, growl, $location, $uibModal, ApplicationService, AuthService) {
+function veNav($templateCache, $rootScope, $state, hotkeys, growl, $location, $uibModal, ApplicationService, AuthService, ProjectService) {
     var template = $templateCache.get('partials/mms/veNav.html');
 
     var veNavLink = function(scope, element, attrs) {
-        scope.obj = {
-            catOpen : false,
-            bgColor : {'background-color': 'none'}
+
+        scope.switchOrg = function() {
+            var instance = $uibModal.open({
+                templateUrl: 'partials/mms/selectModal.html',
+                scope: scope,
+                controller: ['$scope','$uibModalInstance', function($scope, $uibModalInstance) {
+
+                    if(scope.org.name === $scope.org.name)
+                        $scope.orgChecked = true;
+
+                    var orgId, projectId;
+                    $scope.orgClicked = function(org) { 
+                        if(org) {
+                            orgId = org.id;
+                            $scope.selectedOrg = org.name;
+                            $scope.projects = ProjectService.getProjects(orgId);
+                        }
+                    }; 
+
+                    if(scope.project.name === $scope.project.name)
+                        $scope.projectChecked = true;
+
+                    $scope.projectClicked = function(project) {
+                        if(project)
+                            projectId = project.id;
+                            $scope.selectedProject = project.name;
+                    };
+                    $scope.continue = function() {
+                        if(orgId && projectId)
+                            $state.go('project.ref', {orgId: orgId, projectId: projectId, refId: 'master'});
+                    };
+                    $scope.cancel = function() {
+                        $uibModalInstance.dismiss();
+                    };
+                }]
+            });
         };
-        var catNames = [];
-        var sites = {};
         scope.toggleHelp = function() {
             hotkeys.toggleCheatSheet();
         };
@@ -61,16 +92,6 @@ function veNav($templateCache, $state, hotkeys, growl, $location, $uibModal, App
                 }]
             });
         };
-        //Resets catagory and sites accordions
-        scope.reset = function() {
-            for(var i = 0; i < catNames.length; i++) {
-                var str = catNames[i];
-                scope.categories[str].open = false;
-                for(var k = 0; k < scope.categories[str].length; k++) {
-                    scope.categories[str][k].isOpen = false;
-                }
-            }
-        };
         scope.logout = function() {
             AuthService.logout().then(function() {
                 $state.go('login');
@@ -78,134 +99,13 @@ function veNav($templateCache, $state, hotkeys, growl, $location, $uibModal, App
                 growl.error('You were not logged out');
             });
         };
-        // Define a few helper functions
-        var Helper = {
-            trim: function(str) {
-                return str.trim ? str.trim() : str.replace(/^\s+|\s+$/g,'');
-            },
-            hasClass: function(el, cn) {
-                return (' ' + el.className + ' ').indexOf(' ' + cn + ' ') !== -1;
-            },
-            addClass: function(el, cn) {
-                if (!this.hasClass(el, cn)) {
-                    el.className = (el.className === '') ? cn : el.className + ' ' + cn;
-                }
-            },
-            removeClass: function(el, cn) {
-                el.className = this.trim((' ' + el.className + ' ').replace(' ' + cn + ' ', ' '));
-            },
-            hasParent: function(el, id) {
-                if (el) {
-                    do {
-                        if (el.id === id) {
-                            return true;
-                        }
-                        if (el.nodeType === 9) {
-                            break;
-                        }
-                    }
-                    while((el = el.parentNode));
-                }
-                return false;
-            }
-        };
-
-        // Normalize vendor prefixes
-        var doc = window.document.documentElement;
-        var Modernizr = window.Modernizr;
-        var transform_prop = Modernizr.prefixed('transform');
-        var transition_prop = Modernizr.prefixed('transition');
-        var transition_end = (function() {
-                var props = {
-                    'WebkitTransition' : 'webkitTransitionEnd',
-                    'MozTransition'    : 'transitionend',
-                    'OTransition'      : 'oTransitionEnd otransitionend',
-                    'msTransition'     : 'MSTransitionEnd',
-                    'transition'       : 'transitionend'
-                };
-                return props.hasOwnProperty(transition_prop) ? props[transition_prop] : false;
-            })();
-
-        function Nav() {
-            this._init = false;
-            this.inner = angular.element('#inner-wrap');
-            this.nav_open = false;
-            this.nav_class = 'js-nav';
-
-            this.closeNavEnd = function(e) {
-                if (e && e.target === this.inner) {
-                    window.document.removeEventListener(transition_end, this.closeNavEnd, false);
-                }
-                this.nav_open = false;
-            };
-
-            this.closeNav = function() {
-                if (this.nav_open) {
-                    // close navigation after transition or immediately
-                    var duration = 0;
-
-                    if (transition_end && transition_prop) {
-                        duration = 0.5;
-                    }
-
-                    this.closeNavEnd(null);
-
-                    // if (duration > 0) {
-                    //     window.document.addEventListener(transition_end, this.closeNavEnd, false);
-                    // } else {
-                    //     this.closeNavEnd(null);
-                    // }
-                }
-                Helper.removeClass(doc, this.nav_class);
-            };
-
-            this.openNav = function() {
-                if (this.nav_open) {
-                    return;
-                }
-                Helper.addClass(doc, this.nav_class); // push the left sidebar right
-                this.nav_open = true;
-            };
-
-            this.toggleNav = function(e) {
-                if (this.nav_open && Helper.hasClass(doc, this.nav_class)) {
-                    this.closeNav();
-                } else {
-                    this.openNav();
-                }
-                if (e) {
-                    e.preventDefault();
-                }
-            };
-
-            this.init = function() {
-                if (this._init) {
-                    return;
-                }
-                this._init = true;
-
-                // close nav by touching the partial off-screen content
-                window.document.addEventListener('click', function(e) {
-                    if (this.nav_open && !Helper.hasParent(e.target, 'nav')) {
-                        e.preventDefault();
-                        this.closeNav();
-                    }
-                },
-                true);
-
-                Helper.addClass(doc, 'js-ready');
-            };
-        }
-
-        scope.nav = new Nav();
-        scope.nav.init();
 
         scope.searchClass = "";
         scope.search = function(searchText) {
-            if ($state.includes('workspace.site.document.order')) {
+            if ($state.includes('project.ref.document.order')) {
                 growl.warning("Please finish reorder action first.");
                 return;
-            } else if ($state.includes('workspace.diff')) {
+            } else if ($state.includes('project.diff')) {
                 growl.warning("Please finish diff action first.");
                 return;
             } else {
@@ -229,7 +129,15 @@ function veNav($templateCache, $state, hotkeys, growl, $location, $uibModal, App
         template: template,
         scope: {
             title: '@mmsTitle', //page title - used in mobile view only
-            site: '<mmsSite'
+            org: '<mmsOrg',
+            orgs: '<mmsOrgs',
+            project: '<mmsProject',
+            projects: '<mmsProjects',
+            ref: '<mmsRef',
+            branch: '<mmsBranch',
+            branches: '<mmsBranches',
+            tag: '<mmsTag',
+            tags: '<mmsTags'
         },
         link: veNavLink
     };

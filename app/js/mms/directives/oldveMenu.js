@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mmsApp')
-.directive('veMenu', ['ProjectService', '$state', '$rootScope', '$templateCache', 'growl', veMenu]);
+.directive('veMenu', ['ProjectService', '$state', '$templateCache', 'growl', veMenu]);
 
 /**
  * @ngdoc directive
@@ -24,50 +24,35 @@ angular.module('mmsApp')
  * for specific view.
  *
  */
-function veMenu(ProjectService, $state, $rootScope, $templateCache, growl) {
+function veMenu(ProjectService, $state, $templateCache, growl) {
     var template = $templateCache.get('partials/mms/veMenu.html');
 
     var veMenuLink = function(scope, element, attrs) {
 
-
-        scope.currentProject = scope.project.name;
-        scope.currentBranch = scope.branch.name;
-        scope.currentTag = scope.tag.name;
-
-        var projectId, branchId, tagId;
-        scope.projectClicked = function(project) {
-            if(project) {
-                projectId = project.Id;
-                $state.go('project.ref', {projectId: projectId, refId: 'master'});
-            }
+        scope.isTasksAndTagsView = function(){
+             if ($state.includes('workspaces') &&
+                ! ($state.includes('workspace.site') || $state.includes('workspace.sites') ))
+                return true;
+            else
+                return false;
         };
-        scope.isRefsView = function(){
-            //  if ($state.includes('workspaces') &&
-            //     ! ($state.includes('workspace.site') || $state.includes('workspace.sites') ))
-            //     return true;
-            // else
-            //     return false;
+        scope.tasksAndTagsView = function(){
+            // $state.go('workspaces', {search: undefined});
         };
-        scope.refsView = function(){
-            // $state.go('project', {search: undefined});
+        scope.updateWorkspace = function(wsId) {
+            // $state.go($state.current.name, {workspace: wsId, tag: undefined, search: undefined}, {reload:true});
         };
-        scope.updateBranch = function(branch) {
-            $state.go($state.current.name, {projectId: scope.project.Id, refId: branch.Id});
-        };
-        scope.masterBranch = function() {
-            $state.go($state.current.name, {projectId: scope.project.Id, refId: 'master'});
-        };
-        scope.updateTag = function(tag) {
-            $state.go($state.current.name, {projectId: scope.project.Id, refId: tag.id});
+        scope.updateTag = function() {
+            // $state.go($state.current.name, {tag: scope.config.id, search: undefined}, {reload:true});
         };
         scope.latestTag = function() {
-            $state.go($state.current.name, {projectId: scope.project.Id, refId: 'latest'});
+            // $state.go($state.current.name, {tag: undefined, search: undefined}, {reload:true});
         };
 
-        // ProjectService.getRef(scope.ws)
-        // .then(function(data) {
-        //     scope.wsName = data.name;
-        // });
+        ProjectService.getRef(scope.ws)
+        .then(function(data) {
+            scope.wsName = data.name;
+        });
 
         /*if (scope.config && scope.config !== '' && scope.config !== 'latest') {
             ConfigService.getConfig(scope.config, scope.ws, false)
@@ -77,13 +62,13 @@ function veMenu(ProjectService, $state, $rootScope, $templateCache, growl) {
         } else {
             scope.config = 'latest';
         } */
-        // if (!scope.site)
-        //     return;
-        // var currSiteParentId = scope.site.parent;
-        // var isCharacterization = scope.site.isCharacterization;
-        // var breadcrumbs = [];
-        // breadcrumbs.push({name: scope.site.name, id: scope.site.id});
-        // var eltWidth = element.parent().width();
+        if (!scope.site)
+            return;
+        var currSiteParentId = scope.site.parent;
+        var isCharacterization = scope.site.isCharacterization;
+        var breadcrumbs = [];
+        breadcrumbs.push({name: scope.site.name, id: scope.site.id});
+        var eltWidth = element.parent().width();
 
         // SiteService.getSites()
         // .then(function(data) {
@@ -115,15 +100,14 @@ function veMenu(ProjectService, $state, $rootScope, $templateCache, growl) {
         template: template,
         scope: {
             title: '@mmsTitle', //page title - used in mobile view only
-            org: '<mmsOrg',
-            project: '<mmsProject',
-            projects: '<mmsProjects',
-            ref: '<mmsRef',
-            refs: '<mmsRefs',
-            branch: '<mmsBranch',
-            branches: '<mmsBranches',
-            tag: '<mmsTag',
-            tags: '<mmsTags'
+            ws: '@mmsWs',
+            site: '<mmsSite', //site object
+            product: '<mmsDoc', //document object
+            config: '<mmsConfig', //config object
+            snapshot: '@mmsSnapshotTag', // snapshot titles (before tags - need to be backward compatible), if any
+            showTag: '@mmsShowTag',
+            tags: '<mmsTags',
+            workspaces: '<mmsWorkspaces'
         },
         link: veMenuLink
     };

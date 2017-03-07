@@ -96,7 +96,7 @@
   }
 
   #main-pane > div {
-    z-index: 1000;
+    z-index: 0; //TODO was 1000
   }
 }
 
