@@ -5,7 +5,7 @@
           <span>{{ currentProject }}<i class="fa fa-caret-down" aria-hidden="true"></i></span>
         </button>
         <ul class="dropdown-menu list-with-selected-item" uib-dropdown-menu role="menu" aria-labelledby="simple-btn-keyboard-nav">
-            <li><a ng-repeat="project in projects" ng-click="projectClicked(project)" ng-class="{'checked-list-item': projectChecked }">{{ project.name }}</a></li>
+            <li><a ng-repeat="project in projects" ng-click="updateProject(project)" ng-class="{'checked-list-item': isCurrentProject }">{{ project.name }}</a></li>   
         </ul>
       </div>
       <div class="breadcrumbs">
@@ -23,8 +23,7 @@
                 <li class="button-item">
                   <button class="btn btn-large btn-block btn-primary" ng-click="refsView()">Manage Branches</button>
                 </li>
-                <li ng-click="masterBranch()">MASTER</li>
-                <li ng-repeat="branch in branches | orderBy:'name'" ng-click="updateBranch(branch)" ng-class="{ 'checked-list-item': branchSelected }">{{ branch.name }}</li>
+                <li ng-repeat="branch in branches | orderBy:'name'" ng-click="updateBranch(branch)" ng-class="{ 'checked-list-item': isCurrentBranch }">{{ branch.name }}</li>
             </ul>
           </div>
         </li>
@@ -35,8 +34,8 @@
              <li class="button-item">
                 <button class="btn btn-large btn-block btn-primary" ng-click="refsView()">Manage Tags</button>
               </li>
-              <li ng-click="latestTag()">LATEST</li>
-              <li><a ng-repeat="tag in tags | orderBy:'name'" ng-click="updateTag(tag)" ng-class="{ 'checked-list-item': tagSelected }">{{ tag.name }}</a></li>
+              <li ng-click="latestTag()" ng-class="{ 'checked-list-item': isCurrentTag }">latest</li>
+              <li><a ng-repeat="tag in tags | orderBy:'name'" ng-click="updateTag(tag)" ng-class="{ 'checked-list-item': isCurrentTag }">{{ tag.name }}</a></li>
             </ul>
           </div>
           </li>

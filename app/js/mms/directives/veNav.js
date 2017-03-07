@@ -35,7 +35,7 @@ function veNav($templateCache, $rootScope, $state, hotkeys, growl, $location, $u
 
     var veNavLink = function(scope, element, attrs) {
 
-        scope.switchOrg = function() {
+        scope.updateOrg = function() {
             var instance = $uibModal.open({
                 templateUrl: 'partials/mms/selectModal.html',
                 scope: scope,
@@ -45,7 +45,7 @@ function veNav($templateCache, $rootScope, $state, hotkeys, growl, $location, $u
                         $scope.orgChecked = true;
 
                     var orgId, projectId;
-                    $scope.orgClicked = function(org) { 
+                    $scope.selectOrg = function(org) { 
                         if(org) {
                             orgId = org.id;
                             $scope.selectedOrg = org.name;
@@ -56,7 +56,7 @@ function veNav($templateCache, $rootScope, $state, hotkeys, growl, $location, $u
                     if(scope.project.name === $scope.project.name)
                         $scope.projectChecked = true;
 
-                    $scope.projectClicked = function(project) {
+                    $scope.selectProject = function(project) {
                         if(project)
                             projectId = project.id;
                             $scope.selectedProject = project.name;
@@ -115,7 +115,7 @@ function veNav($templateCache, $rootScope, $state, hotkeys, growl, $location, $u
                 $state.go($state.current.name, {search: searchText});
             }
         };
-        scope.stagingView = function(){
+        scope.stagingView = function(){ //changing to something "opencae"?
             var hostName = $location.host();
             var address = "https://cae-ems-uat.jpl.nasa.gov";
             if (hostName !== 'localhost' && hostName.split('.')[0].substr(-3) !== 'uat')

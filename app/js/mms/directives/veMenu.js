@@ -29,34 +29,38 @@ function veMenu(ProjectService, $state, $rootScope, $templateCache, growl) {
 
     var veMenuLink = function(scope, element, attrs) {
 
-
         scope.currentProject = scope.project.name;
         scope.currentBranch = scope.branch.name;
         scope.currentTag = scope.tag.name;
 
         var projectId, branchId, tagId;
-        scope.projectClicked = function(project) {
+
+        if(scope.project.name === scope.currentProject)
+            scope.isCurrentProject = true;
+
+        scope.updateProject = function(project) {
             if(project) {
                 projectId = project.Id;
                 $state.go('project.ref', {projectId: projectId, refId: 'master'});
             }
         };
-        scope.isRefsView = function(){
-            //  if ($state.includes('workspaces') &&
-            //     ! ($state.includes('workspace.site') || $state.includes('workspace.sites') ))
-            //     return true;
-            // else
-            //     return false;
+        scope.isRefsView = function(){ 
+
         };
-        scope.refsView = function(){
-            // $state.go('project', {search: undefined});
+        scope.refsView = function(){ //the "project" state?
+            $state.go('project', {search: undefined});
         };
+
+        if(scope.branch.name === scope.currentBranch)
+            scope.isCurrentBranch = true;
+
         scope.updateBranch = function(branch) {
             $state.go($state.current.name, {projectId: scope.project.Id, refId: branch.Id});
         };
-        scope.masterBranch = function() {
-            $state.go($state.current.name, {projectId: scope.project.Id, refId: 'master'});
-        };
+
+        if(scope.tag.name === scope.currentTag)
+            scope.isCurrentTag = true;
+
         scope.updateTag = function(tag) {
             $state.go($state.current.name, {projectId: scope.project.Id, refId: tag.id});
         };
@@ -82,7 +86,7 @@ function veMenu(ProjectService, $state, $rootScope, $templateCache, growl) {
         // var currSiteParentId = scope.site.parent;
         // var isCharacterization = scope.site.isCharacterization;
         // var breadcrumbs = [];
-        // breadcrumbs.push({name: scope.site.name, id: scope.site.id});
+        // breadcrumbs.push({name: scope.project.name, id: scope.project.Id});
         // var eltWidth = element.parent().width();
 
         // SiteService.getSites()
@@ -118,8 +122,6 @@ function veMenu(ProjectService, $state, $rootScope, $templateCache, growl) {
             org: '<mmsOrg',
             project: '<mmsProject',
             projects: '<mmsProjects',
-            ref: '<mmsRef',
-            refs: '<mmsRefs',
             branch: '<mmsBranch',
             branches: '<mmsBranches',
             tag: '<mmsTag',

@@ -1,10 +1,10 @@
 <nav class="global-header">
       <a class="logotype" ui-sref="project.ref({projectId: project.Id, refId: ref.Id})">VE</a>
       <span class="org-title">{{ org.name }}</span>
-      <a class="switch-org" ng-click="switchOrg()">Switch Project</a> <!-- display modal -->
+      <a class="switch-org" ng-click="updateOrg()">Switch Project</a>
       <div id="global-navigation">
-        <form id="global-search">
-            <input placeholder="Search for an element" ng-model="searchText" ng-enter="search(searchText)">
+        <form id="global-search" ng-submit="search(searchText)">
+            <input placeholder="Search for an element" ng-model="searchText">
             </input>
         </form>
             <i class="fa fa-bars global-menu-hamburger" aria-hidden="true"></i>

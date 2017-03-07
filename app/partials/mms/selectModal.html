@@ -9,7 +9,7 @@
                   <span>{{ selectedOrg }}<i class="fa fa-caret-down" aria-hidden="true"></i></span>
                 </button>
                 <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="simple-btn-keyboard-nav">
-                    <li><a ng-repeat="org in orgs" ng-click="orgClicked(org)" ng-class="{'checked-list-item': orgChecked }">{{ org.name }}</a></li>
+                    <li><a ng-repeat="org in orgs" ng-click="selectOrg(org)" ng-class="{'checked-list-item': orgChecked}">{{ org.name }}</a></li>
                 </ul>
               </div>
               <div class="btn-group" uib-dropdown keyboard-nav>
@@ -18,7 +18,7 @@
                   <span>{{ selectedProject }}<i class="fa fa-caret-down" aria-hidden="true"></i></span>
                 </button>
                 <ul class="dropdown-menu list-with-selected-item" uib-dropdown-menu role="menu" aria-labelledby="simple-btn-keyboard-nav">
-                    <li><a ng-repeat="project in projects" ng-click="projectClicked(project)" ng-class="{'checked-list-item': projectChecked }">{{ project.name }}</a></li>
+                    <li><a ng-repeat="project in projects" ng-click="selectProject(project)" ng-class="{'checked-list-item': projectChecked }">{{ project.name }}</a></li>
                 </ul>
               </div>
           </div>
