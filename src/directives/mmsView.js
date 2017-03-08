@@ -53,6 +53,7 @@ angular.module('mms.directives')
  * @param {expression=} mmsCfClicked The expression to handle transcluded elements in the
  *              view being clicked, this should be a function whose argument is 'elementId'
  */
+
 function mmsView(ViewService, ElementService, $templateCache, $rootScope, growl) {
     var template = $templateCache.get('mms/templates/mmsView.html');
 
@@ -131,6 +132,7 @@ function mmsView(ViewService, ElementService, $templateCache, $rootScope, growl)
         var reqOb = {elementId: scope.mmsElementId, projectId: scope.mmsProjectId, refId: scope.mmsRefId, commitId: scope.mmsCommitId};
 
         var processed = false;
+        
         scope.isSection = false;
         var changeView = function(newVal, oldVal) {
             if (!newVal || (newVal === oldVal && processed))
@@ -179,6 +181,20 @@ function mmsView(ViewService, ElementService, $templateCache, $rootScope, growl)
         scope.showElements = false;
         scope.showComments = false;
         scope.showEdits = false;
+
+        /**
+         * @ngdoc function
+         * @name mms.directives.directive:mmsView#addEltAction
+         * @methodOf mms.directives.directive:mmsView
+         * 
+         * @description 
+         * Add specified element at the defined 'index' 
+         */
+        scope.addEltAction = function (index, type) {
+             scope.ws = scope.mmsWs;
+             scope.addPeIndex = index + 1;
+             MmsAppUtils.addPresentationElement(scope, type, scope.view);
+        };
 
         /**
          * @ngdoc function
