@@ -361,8 +361,9 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
         //template: template,
         scope: {
             mmsElementId: '@',
+            mmsProjectId: '@',
             mmsRefId: '@',
-            mmsVersion: '@',
+            mmsCommitId: '@',
             nonEditable: '<'
         },
         require: ['?^^mmsView','?^^mmsViewPresentationElem', '?^^mmsTranscludeDoc', '?^^mmsTranscludeVal'],
