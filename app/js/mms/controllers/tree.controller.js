@@ -194,7 +194,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             docOb = docs[i];
             groupNode.children.unshift({
                 label: docOb.name,
-                type: refOb.isTag ? 'view' : 'snapshot',
+                type: refOb.isTag || refOb.name === 'master' ? 'view' : 'snapshot',
                 data: docOb,
                 group: groupOb,
                 children: []

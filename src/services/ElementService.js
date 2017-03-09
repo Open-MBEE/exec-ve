@@ -176,7 +176,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
      */
     var cacheElement = function(reqOb, elementOb, edit) {
         var result = UtilsService.cleanElement(elementOb, edit);
-        var requestCacheKey = getElementKey(reqOb, result.sysmlId, edit);
+        var requestCacheKey = getElementKey(reqOb, result.id, edit);
         var origResultCommit = result._commitId;
         if (reqOb.commitId === 'latest') { 
             var resultCommitCopy = JSON.parse(JSON.stringify(result));
@@ -186,7 +186,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                 CacheService.put(commitCacheKey, resultCommitCopy, true);
             }
         }
-        var realCacheKey = UtilsService.makeElementKey(result, result.sysmlId, edit);
+        var realCacheKey = UtilsService.makeElementKey(result, result.id, edit);
         result._commitId = origResultCommit; //restore actual commitId
         if (realCacheKey === requestCacheKey) {
             result = CacheService.put(requestCacheKey, result, true);
@@ -337,7 +337,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         var deferred = $q.defer();
         getElement({
             projectId: elementOb._projectId, 
-            elementId: elementOb.sysmlId, 
+            elementId: elementOb.id, 
             commitId: 'latest',
             refId: elementOb._refId
         }, 2)
@@ -391,9 +391,9 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         var deferred = $q.defer();
         var handleSuccess = function(data) {
             var e = null;
-            if (data.elements.length > 1 && elementOb.sysmlId) {
+            if (data.elements.length > 1 && elementOb.id) {
                 for (var i = 0; i < data.elements.length; i++) {
-                    if (data.elements[i].sysmlId === elementOb.sysmlId) {
+                    if (data.elements[i].id === elementOb.id) {
                         e = data.elements[i];
                     }
                 }
@@ -407,7 +407,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                 projectId: e._projectId, 
                 refId: e._refId, 
                 commitId: 'latest', 
-                elementId: e.sysmlId
+                elementId: e.id
             };
             var resp = cacheElement(metaOb, e);
             var editCopy = JSON.parse(JSON.stringify(e));
@@ -514,9 +514,9 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                 return;
             }
             var resp = null;
-            if (response.data.elements.length > 1 && reqOb.element.sysmlId) {
+            if (response.data.elements.length > 1 && reqOb.element.id) {
                 for (var i = 0; i < response.data.elements.length; i++) {
-                    if (response.data.elements[i].sysmlId === reqOb.element.sysmlId) {
+                    if (response.data.elements[i].id === reqOb.element.id) {
                         resp = response.data.elements[i];
                     }
                 }
@@ -716,7 +716,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
     var getElementKey = function(reqOb, id, edit) {
         var cacheKey = UtilsService.makeElementKey({
             _projectId: reqOb.projectId, 
-            sysmlId: reqOb.elementId ? reqOb.elementId : id, 
+            id: reqOb.elementId ? reqOb.elementId : id, 
             _commitId: reqOb.commitId, 
             _refId: reqOb.refId
         }, edit);

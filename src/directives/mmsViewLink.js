@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsViewLink', ['ElementService', 'UtilsService', 'ConfigService', '$compile', 'growl', mmsViewLink]);
+.directive('mmsViewLink', ['ElementService', 'UtilsService', '$compile', 'growl', mmsViewLink]);
 
 /**
  * @ngdoc directive

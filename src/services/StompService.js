@@ -36,22 +36,22 @@ function StompService($rootScope, UtilsService, $window, $location, ApplicationS
                     angular.forEach( updateWebpage.workspace2.addedElements, function(value, key) {
                         // check if element is in the cache, if not ignore
                         //var ws = !workspace ? 'master' : workspace;
-                        var inCache = CacheService.exists( UtilsService.makeElementKey(value.sysmlId, workspaceId, 'latest', false) );
+                        var inCache = CacheService.exists( UtilsService.makeElementKey(value.id, workspaceId, 'latest', false) );
                         if(inCache === true)
-                            UtilsService.mergeElement(value, value.sysmlId, workspaceId, false, "all" );
-                        $rootScope.$broadcast("stomp.element", value, workspaceId, value.sysmlId , value._modifier, value.name);
+                            UtilsService.mergeElement(value, value.id, workspaceId, false, "all" );
+                        $rootScope.$broadcast("stomp.element", value, workspaceId, value.id , value._modifier, value.name);
                     });
                 }
                 if(updateWebpage.workspace2.updatedElements && updateWebpage.workspace2.updatedElements.length > 0){
                     angular.forEach( updateWebpage.workspace2.updatedElements, function(value, key) {
                         //var affectedIds = value.affectedIds;
-                        var inCache = CacheService.exists( UtilsService.makeElementKey(value.sysmlId, workspaceId, 'latest', false) );
-                        if(inCache === true && $rootScope.veEdits && $rootScope.veEdits['element|' + value.sysmlId + '|' + workspaceId] === undefined)
-                            UtilsService.mergeElement(value, value.sysmlId, workspaceId, false, "all" );
-                        var history = CacheService.get(UtilsService.makeElementKey(value.sysmlId, workspaceId, 'versions'));
+                        var inCache = CacheService.exists( UtilsService.makeElementKey(value.id, workspaceId, 'latest', false) );
+                        if(inCache === true && $rootScope.veEdits && $rootScope.veEdits['element|' + value.id + '|' + workspaceId] === undefined)
+                            UtilsService.mergeElement(value, value.id, workspaceId, false, "all" );
+                        var history = CacheService.get(UtilsService.makeElementKey(value.id, workspaceId, 'versions'));
                         if (history)
                             history.unshift({modifier: value._modifier, timestamp: value._modified});
-                        $rootScope.$broadcast("stomp.element", value, workspaceId, value.sysmlId , value._modifier, value.name);
+                        $rootScope.$broadcast("stomp.element", value, workspaceId, value.id , value._modifier, value.name);
                     });
                 }
             });
