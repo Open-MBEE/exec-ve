@@ -140,7 +140,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                 existing.push(exist);
                 continue;
             }
-            request.elements.push({sysmlId: id});
+            request.elements.push({id: id});
         }
         if (request.elements.length === 0) {
             deferred.resolve(existing);

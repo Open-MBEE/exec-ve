@@ -242,12 +242,13 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 }, 2);
             },
             viewObs: function($stateParams, ViewService, ticket) {
-                return ViewService.getDocumentViews({
+                return [];
+                /*return ViewService.getDocumentViews({
                     projectId: $stateParams.projectId,
                     refId: $stateParams.refId,
                     extended: true,
                     elementId: $stateParams.documentId
-                }, 2);
+                }, 2);*/
             },
             viewOb: function(documentOb) {
                 return documentOb;
