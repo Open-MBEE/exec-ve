@@ -21,7 +21,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
         url: '/login',
         resolve: { },
         views: {
-            'login': {
+            'login@': {
                 templateUrl: 'partials/mms/login.html',
                 controller: function ($scope, $rootScope, $state, AuthService, growl) {
                     $scope.credentials = {
@@ -39,8 +39,8 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                                 var toState = $rootScope.ve_redirect.toState;
                                 var toParams = $rootScope.ve_redirect.toParams;
                                 $state.go(toState, toParams);
-                            } else { //TODO user needs to provide org and project
-                                $state.go('select');
+                            } else {
+                                $state.go('login.select');
                             }
                         }, function (reason) {
                             $scope.spin = false;
@@ -51,7 +51,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             }
         }
     })
-    .state('select', {
+    .state('login.select', {
         url: '/select',
         resolve: {
             ticket: function($window, URLService, AuthService, $q, ApplicationService) {
@@ -71,7 +71,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             }
         },
         views: {
-            'select': {
+            'login@': {
                 templateUrl: 'partials/mms/select.html',
                 controller: function($scope, $rootScope, $state, orgObs, ProjectService) {
                     //display list of orgs first
@@ -94,9 +94,10 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                         }
                     };
                     $scope.continue = function() { 
-                        // if (orgId && projectId) 
-                        // $state.go('project.ref', {orgId: orgId, projectId: projectId, refId: 'master'});
-                        $state.go('project.ref', {projectId:'PROJECT-3f4ce222-86b4-47c6-ad70-3533490b0ed0', refId: 'master'});
+                        if (orgId && projectId) {
+                            $state.go('project.ref', {orgId: orgId, projectId: projectId, refId: 'master'});
+                        }
+                        // $state.go('project.ref', {projectId:'PROJECT-3f4ce222-86b4-47c6-ad70-3533490b0ed0', refId: 'master'});
                     };
                 }
             }
