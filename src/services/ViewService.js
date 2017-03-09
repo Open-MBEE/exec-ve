@@ -540,7 +540,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             'sourceProperty': 'documentation'
         };
         var instanceSpec = {
-            sysmlId: newInstanceId,
+            id: newInstanceId,
             ownerId: 'holding_bin_' + viewOrSectionOb._projectId,
             name: name ? name : "Untitled " + type,
             documentation: '',
@@ -627,7 +627,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         var newInstanceId = '_hidden_' + UtilsService.createMmsId() + '_pei';
 
         var view = {
-            sysmlId: newViewId,
+            id: newViewId,
             type: 'Class',
             ownedAttributeIds: [],
             ownerId: ownerOb.id,
@@ -668,7 +668,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             'sourceProperty': 'documentation'
         };
         var instanceSpec = {
-            sysmlId: newInstanceId,
+            id: newInstanceId,
             ownerId: 'holding_bin_' + ownerOb._projectId,
             name: "View Documentation",
             documentation: instanceSpecDoc,
@@ -681,7 +681,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             _appliedStereotypeIds: [],
         };
         var asi = { //create applied stereotype instance
-            sysmlId: newViewId + '_asi',
+            id: newViewId + '_asi',
             ownerId: newViewId,
             documentation: '',
             name: '',

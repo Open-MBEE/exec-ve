@@ -419,7 +419,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
             deferred.resolve(resp);
         };
 
-        if (!elementOb.hasOwnProperty('sysmlId')) {
+        if (!elementOb.hasOwnProperty('id')) {
             deferred.reject({status: 400, data: '', message: 'Element id not found, create element first!'});
             return deferred.promise;
         }
