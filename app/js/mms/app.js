@@ -40,7 +40,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                                 var toParams = $rootScope.ve_redirect.toParams;
                                 $state.go(toState, toParams);
                             } else { //TODO user needs to provide org and project
-                                $state.go('project.ref', {projectId:'0aab9075-c86d-47b1-822a-1a9430070401', refId: 'master'});
+                                $state.go('select');
                             }
                         }, function (reason) {
                             $scope.spin = false;
@@ -48,6 +48,55 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                         });
                     };
                 }   
+            }
+        }
+    })
+    .state('select', {
+        url: '/select',
+        resolve: {
+            ticket: function($window, URLService, AuthService, $q, ApplicationService) {
+                var deferred = $q.defer();
+                AuthService.checkLogin().then(function(data) {
+                    ApplicationService.setUserName(data);
+                    URLService.setTicket($window.localStorage.getItem('ticket'));
+                    deferred.resolve($window.localStorage.getItem('ticket'));
+                }, function(rejection) {
+                    deferred.reject(rejection);
+                });
+                return deferred.promise;
+            },
+            //get the list of organizations that the user is a part of and then pass to controller
+            orgObs: function($stateParams, ProjectService, ticket) {
+                // return ProjectService.getOrgs();
+                return [];
+            }
+        },
+        views: {
+            'select': {
+                templateUrl: 'partials/mms/select.html',
+                controller: function($scope, $rootScope, $state, orgObs, ProjectService) {
+                    //display list of orgs first
+                    $scope.orgs = orgObs; 
+                    var orgId, projectId;
+                    $scope.selectOrg = function(org) { 
+                        if (org) {
+                            orgId = org.Id;
+                            $scope.selectedOrg = org.name;
+                            $scope.projects = ProjectService.getProjects(orgId);
+                        } 
+                    };
+                    $scope.selectProject = function(project) { 
+                        if (project) {
+                            $scope.selectedProject = project.name;
+                            projectId = project.Id;
+                        }
+                    };
+                    $scope.continue = function() { 
+                        // if (orgId && projectId) 
+                        // $state.go('project.ref', {orgId: orgId, projectId: projectId, refId: 'master'});
+                        $state.go('project.ref', {projectId:'PROJECT-3f4ce222-86b4-47c6-ad70-3533490b0ed0', refId: 'master'});
+                    };
+                }
             }
         }
     })

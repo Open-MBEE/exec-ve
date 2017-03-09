@@ -182,19 +182,6 @@ function mmsView(ViewService, ElementService, $templateCache, $rootScope, growl)
         scope.showComments = false;
         scope.showEdits = false;
 
-        /**
-         * @ngdoc function
-         * @name mms.directives.directive:mmsView#addEltAction
-         * @methodOf mms.directives.directive:mmsView
-         * 
-         * @description 
-         * Add specified element at the defined 'index' 
-         */
-        scope.addEltAction = function (index, type) {
-             scope.ws = scope.mmsWs;
-             scope.addPeIndex = index + 1;
-             MmsAppUtils.addPresentationElement(scope, type, scope.view);
-        };
 
         /**
          * @ngdoc function
