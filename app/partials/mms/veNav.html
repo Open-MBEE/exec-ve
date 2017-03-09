@@ -1,21 +1,22 @@
-<nav class="global-header">
-      <a class="logotype" ui-sref="project.ref({projectId: project.Id, refId: ref.Id})">VE</a>
-      <span class="org-title">{{ org.name }}</span>
-      <a class="switch-org" ng-click="updateOrg()">Switch Project</a>
-      <div id="global-navigation">
+<nav class="navbar navbar-default navbar-inverse navbar-fixed-top" role="navigation">
+    <div class="block">
+    <a class="logotype" ui-sref="project.ref({projectId: project.Id, refId: ref.Id})">VE</a>
+    <span class="org-title">{{ org.name }}</span>
+    <a class="switch-org" ng-click="updateOrg()">Switch Project</a>
+    <div id="global-navigation">
         <form id="global-search" ng-submit="search(searchText)">
-            <input placeholder="Search for an element" ng-model="searchText">
-            </input>
+            <input placeholder="Search for an element" ng-model="searchText"></input>
         </form>
-            <i class="fa fa-bars global-menu-hamburger" aria-hidden="true"></i>
-            <ul class="global-menu">
-                  <li>Dashboard</li> <!-- Need new site variable for Alfresco, tbd -->
-                  <li><a ng-click="toggleHelp()">Shortcuts</a></li>
-                  <li>Support</li> <!-- Need new link with donbot changes, tbd -->
-                  <li><a href="https://cae-jira.jpl.nasa.gov/browse/SSCAES">Feedback</a></li>
-                  <li><a ng-click="stagingView()">UAT</a></li>
-                  <li><a ng-click="toggleAbout()">About</a></li>
-                  <li><a ng-click="logout()">Logout</a></li>
-            </ul>
-      </div>                      
+        <i class="fa fa-bars global-menu-hamburger" aria-hidden="true"></i>
+        <ul class="global-menu">
+            <li>Dashboard</li> <!-- Need new site variable for Alfresco, tbd -->
+            <li><a ng-click="toggleHelp()">Shortcuts</a></li>
+            <li>Support</li> <!-- Need new link with donbot changes, tbd -->
+            <li><a href="https://cae-jira.jpl.nasa.gov/browse/SSCAES">Feedback</a></li>
+            <li><a ng-click="stagingView()">UAT</a></li>
+            <li><a ng-click="toggleAbout()">About</a></li>
+            <li><a ng-click="logout()">Logout</a></li>
+        </ul>
+    </div>
+    </div>
 </nav>

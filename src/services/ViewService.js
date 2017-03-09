@@ -201,7 +201,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 var projectDocs = CacheService.get(cacheKey);
                 if (projectDocs) {
                     for (var i = 0; i < projectDocs.length; i++) {
-                        if (projectDocs[i].sysmlId === elementOb.sysmlId) {
+                        if (projectDocs[i].id === elementOb.id) {
                             index = i;
                             break;
                         }
@@ -270,6 +270,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             deferred.reject(reason);
             delete inProgress[key];
         });
+        return deferred.promise;
     };
 
     /**
@@ -588,7 +589,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         .then(function(data) {
             for (var i = 0; i < data.length; i++) {
                 var elem = data[i];
-                if (elem.sysmlId === newInstanceId) {
+                if (elem.id === newInstanceId) {
                     if (type === "Section") {
                         $rootScope.$broadcast('viewctrl.add.section', elem, viewOrSectionOb);
                     }
@@ -630,7 +631,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             sysmlId: newViewId,
             type: 'Class',
             ownedAttributeIds: [],
-            ownerId: ownerOb.sysmlId,
+            ownerId: ownerOb.id,
             _allowedElements: [],
             _displayedElements: [newViewId],
             _childViews: [],
@@ -701,7 +702,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         ElementService.createElements(reqOb)
         .then(function(data) {
             data.forEach(function(elem) {
-                if (elem.sysmlId === newViewId) {
+                if (elem.id === newViewId) {
                     deferred.resolve(elem);
                 }
             });

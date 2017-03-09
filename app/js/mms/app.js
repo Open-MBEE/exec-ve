@@ -40,7 +40,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                                 var toParams = $rootScope.ve_redirect.toParams;
                                 $state.go(toState, toParams);
                             } else { //TODO user needs to provide org and project
-                                $state.go('project.ref', {projectId:'PROJECT-3f4ce222-86b4-47c6-ad70-3533490b0ed0', refId: 'master'});
+                                $state.go('project.ref', {projectId:'0aab9075-c86d-47b1-822a-1a9430070401', refId: 'master'});
                             }
                         }, function (reason) {
                             $scope.spin = false;

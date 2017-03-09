@@ -269,7 +269,8 @@ function ProjectService($q, $http, URLService, CacheService, ApplicationService)
                     return;
                 }
                 var groups = [];
-                for (var group in response.data.groups) {
+                for (var i = 0; i < response.data.groups.length; i++) {
+                    var group = response.data.groups[i];
                     CacheService.put(['group', projectId, refId, group._id], group, true);
                     groups.push(CacheService.get(['group', projectId, refId, group._id]));
                 }
