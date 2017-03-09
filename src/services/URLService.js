@@ -108,25 +108,25 @@ function urlService(baseUrl) {
     };
 
     var getOrgsURL = function() {
-        return root + "/orgs";
+        return addTicket(root + "/orgs");
     };
 
     var getProjectsURL = function(orgId) {
         if (orgId)
-            return root + "/orgs/" + orgId + '/projects';
-        return root + '/projects';
+            return addTicket(root + "/orgs/" + orgId + '/projects');
+        return addTicket(root + '/projects');
     };
 
     var getProjectURL = function(projectId) {
-        return root + "/projects/" + projectId;
+        return addTicket(root + "/projects/" + projectId);
     };
 
     var getRefsURL = function(projectId) {
-        return root + '/projects/' + projectId + '/refs';
+        return addTicket(root + '/projects/' + projectId + '/refs');
     };
 
     var getGroupsURL = function(projectId, refId) {
-        return root + '/projects/' + projectId + '/refs/' + refId + '/groups';
+        return addTicket(root + '/projects/' + projectId + '/refs/' + refId + '/groups');
     };
 
     /**
@@ -211,7 +211,7 @@ function urlService(baseUrl) {
             r += '&' + recurseString;
         else
             r += '?' + recurseString;
-        return addExtended(r, reqOb.extended);        
+        return addTicket(addExtended(r, reqOb.extended));        
     };
 
     /**
@@ -248,7 +248,7 @@ function urlService(baseUrl) {
      * @returns {string} The url.
      */
     var getElementHistoryURL = function(reqOb) {
-        return root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId + '/history';
+        return addTicket(root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId + '/history');
     };
 
     /**
@@ -333,23 +333,6 @@ function urlService(baseUrl) {
 
     /**
      * @ngdoc method
-     * @name mms.URLService#getSitesURL
-     * @methodOf mms.URLService
-     * 
-     * @description
-     * Gets the url to query sites.
-     * 
-     * @param {string} workspace the workspace
-     * @param {string} version timestamp
-     * @returns {string} The url.
-     */
-    var getSitesURL = function(workspace, version) {
-        var r = root + '/workspaces/' + workspace + '/sites';
-        return addTicket(addVersion(r, version));
-    };
-
-    /**
-     * @ngdoc method
      * @name mms.URLService#getElementSearchURL
      * @methodOf mms.URLService
      * 
@@ -379,14 +362,6 @@ function urlService(baseUrl) {
                 r += '&skipCount=' + page;
         }
         return addExtended(addTicket(r), true);
-    };
-
-    var getWorkspacesURL = function() {
-        return addTicket(root + '/workspaces');
-    };
-
-    var getWorkspaceURL = function(ws) {
-        return addTicket(root + '/workspaces/' + ws);
     };
 
     var getWsDiffURL = function(ws1, ws2, ws1time, ws2time, recalc) {

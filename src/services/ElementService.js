@@ -86,11 +86,11 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         var deferred = $q.defer();
         var cached = CacheService.get(requestCacheKey);
         if (cached && !update && (!reqOb.extended || (reqOb.extended && cached._qualifiedId))) {
-            if (UtilsService.isView(cached) && !cached.hasOwnProperty('_contents')) {
-            } else {
+            //if (UtilsService.isView(cached) && !cached.hasOwnProperty('_contents')) {
+            //} else {
                 deferred.resolve(cached);
                 return deferred.promise;
-            }
+            //}
         }
         inProgress[key] = deferred.promise;
         HttpService.get(key,
