@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsHistory', ['Utils','ElementService', '$templateCache', '$uibModal', '$q', '_', mmsHistory]);
+.directive('mmsHistory', ['Utils','ElementService', '$templateCache', '$q', '_', mmsHistory]);
 
 /**
  * @ngdoc directive
@@ -28,7 +28,7 @@ angular.module('mms.directives')
  * @param {string} mmsProjectId The project id for the view
  * @param {string=master} mmsRefId Reference to use, defaults to master
  */
-function mmsHistory(Utils, ElementService, $compile, $templateCache, $q, _) {
+function mmsHistory(Utils, ElementService, $templateCache, $q, _) {
     var template = $templateCache.get('mms/templates/mmsHistory.html');
 
     var mmsHistoryLink = function(scope, element, attrs) {

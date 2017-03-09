@@ -31,9 +31,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         $rootScope.ve_fullDocMode = true;
     }
     $scope.treeFilter = {search: ''};
-    var docEditable = documentOb && documentOb._editable && refOb && !refOb.isTag && UtilsService.isView(documentOb);
-
-    var wsPerms = refOb.workspaceOperationsPermission; //TODO still needed?
+    var docEditable = documentOb && documentOb._editable && refOb && refOb.type === 'Branch' && UtilsService.isView(documentOb);
 
     $scope.bbApi.init = function() {
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree-expand"));
@@ -41,8 +39,8 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         if ($state.includes('project.ref') && !$state.includes('project.ref.document')) {
             $scope.bbApi.addButton(UxService.getButtonBarButton("tree-add-document"));
             $scope.bbApi.addButton(UxService.getButtonBarButton("tree-delete-document"));
-            $scope.bbApi.setPermission("tree-add-document", refOb.isTag ? true : false);
-            $scope.bbApi.setPermission("tree-delete-document", refOb.isTag ? true : false);
+            $scope.bbApi.setPermission("tree-add-document", refOb.type === 'Tag' ? false : true);
+            $scope.bbApi.setPermission("tree-delete-document", refOb.type === 'Tag' ? false : true);
         } else if ($state.includes('project.ref.document')) {
             $scope.bbApi.addButton(UxService.getButtonBarButton("view-mode-dropdown"));
             $scope.bbApi.setToggleState('tree-show-pe', $rootScope.veTreeShowPe);
@@ -194,7 +192,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             docOb = docs[i];
             groupNode.children.unshift({
                 label: docOb.name,
-                type: refOb.isTag || refOb.name === 'master' ? 'view' : 'snapshot',
+                type: refOb.type === 'Branch' ? 'view' : 'snapshot',
                 data: docOb,
                 group: groupOb,
                 children: []

@@ -179,8 +179,8 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                     }, 2).then(function(data) {
                         deferred.resolve(data);
                     }, function(reason) {
-                        if (reason.status === '404') {
-                            if (refOb.isTag) {
+                        if (reason.status === 404) {
+                            if (refOb.type === 'Tag') {
                                 deferred.resolve(null);
                             } else {
                                 ViewService.createView({
@@ -223,6 +223,10 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             'pane-center@': {
                 templateUrl: 'partials/mms/pane-center.html',
                 controller: 'ViewCtrl'
+            },
+            'pane-right@': {
+                templateUrl: 'partials/mms/pane-right.html',
+                controller: 'ToolCtrl'
             }
         }
     })

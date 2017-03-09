@@ -1,5 +1,5 @@
 <div class="pane-right">
-    <div ng-if="documentOb !== null">
+    <div ng-if="documentOb">
         <div class="container-fluid" ng-show="show.element">
             <br>
             <form class="form-horizontal">
@@ -11,11 +11,11 @@
                     </div>
                 </div>
             </form>
-            <mms-spec mms-element-id="{{specInfo.id}}" mms-edit-field="all" mms-commit-id="{{specInfo.commitId}}" mms-ref-id="{{specInfo.refId}}" mms-project-id="{{specInfo.projectId}}" mms-spec-api="specApi"></mms-spec>
+            <mms-spec mms-element-id="{{specInfo.id}}" mms-commit-id="{{specInfo.commitId}}" mms-ref-id="{{specInfo.refId}}" mms-project-id="{{specInfo.projectId}}" mms-spec-api="specApi"></mms-spec>
         </div>
     </div>
 
-    <div ng-if="documentOb !== null">
+    <div ng-if="documentOb">
         <div class="container-fluid" ng-if="show.history">
           <mms-history mms-element-id="{{specInfo.id}}" mms-ref-id="{{specInfo.refId}}" mms-project-id="{{specInfo.projectId}}"></mms-history>
         </div>

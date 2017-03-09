@@ -14,13 +14,12 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
         projectId: projectOb.id,
         id: null
     };
-    //TODO change isTag
-    $scope.editable = documentOb && documentOb._editable && !refOb.isTag;
+    $scope.editable = documentOb && documentOb._editable && refOb.type === 'Branch';
     $scope.documentOb = documentOb;
     $scope.refOb = refOb;
 
     if (viewOb) {
-        $scope.specInfo.id = $scope.viewOb.id;
+        $scope.specInfo.id = viewOb.id;
         $scope.viewId = viewOb.id;
     } else if (documentOb) {
         $scope.specInfo.id = documentOb.id;

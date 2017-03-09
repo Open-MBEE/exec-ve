@@ -159,6 +159,9 @@ function ProjectService($q, $http, URLService, CacheService, ApplicationService)
                 var refs = [];
                 for (var index = 0; index < response.data.refs.length; index++) {
                     var ref = response.data.refs[index];
+                    if (ref.id === 'master') {
+                        ref.type = 'Branch';
+                    }
                     CacheService.put(['ref', projectId, ref.id], ref, true);
                     refs.push(CacheService.get(['ref', projectId, ref.id]));
                 }
