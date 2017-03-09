@@ -188,10 +188,10 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         }
         var realCacheKey = UtilsService.makeElementKey(result, result.id, edit);
         result._commitId = origResultCommit; //restore actual commitId
-        if (realCacheKey === requestCacheKey) {
+        if (angular.equals(realCacheKey, requestCacheKey)) {
             result = CacheService.put(requestCacheKey, result, true);
         } else {
-            CacheService.put(requestCacheKey, realCacheKey);
+            CacheService.put(requestCacheKey, realCacheKey.join('|'));
             result = CacheService.put(realCacheKey, result, true);
         }
         return result;
