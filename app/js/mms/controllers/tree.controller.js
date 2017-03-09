@@ -251,14 +251,14 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     if ($state.includes('project.ref') && !$state.includes('project.ref.document')) {
         $scope.treeData = UtilsService.buildTreeHierarchy(groupObs, "_id", "group", "_parentId", groupLevel2Func);
         for (var i = 0; i < documentObs.length; i++) {
-            //if (!documentObs[i]._groupId) {
+            if (!documentObs[i]._groupId) {
                 $scope.treeData.push({
                     label: documentObs[i].name,
                     type: 'view',
                     data: documentObs[i],
                     children: []
                 });
-            //}
+            }
         }
     } else {
         var seenChild = {};        

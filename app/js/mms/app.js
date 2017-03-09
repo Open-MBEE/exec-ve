@@ -119,8 +119,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 }
             },
             groupObs: function($stateParams, ProjectService, ticket) {
-                // return ProjectService.getGroups($stateParams.projectId, $stateParams.refId);
-                return [];
+                return ProjectService.getGroups($stateParams.projectId, $stateParams.refId);
             },
             documentObs: function($stateParams, ViewService, ticket) {
                 return ViewService.getProjectDocuments({
