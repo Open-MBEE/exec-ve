@@ -190,7 +190,7 @@ function UtilsService($q, $http, CacheService, URLService, _) {
     var makeElementKey = function(elementOb, edit) {
         var refId = !elementOb._refId ? 'master' : elementOb._refId;
         var commitId = !elementOb._commitId ? 'latest' : elementOb._commitId;
-        var key = ['element', elementOb._projectId, elementOb._refId, elementOb.sysmlId, elementOb._commitId];
+        var key = ['element', elementOb._projectId, elementOb._refId, elementOb.id, elementOb._commitId];
         if (edit)
             key.push('edit');
         return key;
@@ -327,7 +327,7 @@ function UtilsService($q, $http, CacheService, URLService, _) {
                     } else if (thing.type === 'List') {
                         result.push(makeHtmlList(thing));
                     } else if (thing.type === 'Image') {
-                        result.push('<mms-transclude-img mms-element-id="' + thing.sysmlId + '"></mms-transclude-img>');
+                        result.push('<mms-transclude-img mms-element-id="' + thing.id + '"></mms-transclude-img>');
                     }
                     result.push('</div>');
                 }
@@ -357,7 +357,7 @@ function UtilsService($q, $http, CacheService, URLService, _) {
                 } else if (thing.type === 'List') {
                     result.push(makeHtmlList(thing));
                 } else if (thing.type === 'Image') {
-                    result.push('<mms-transclude-img mms-element-id="' + thing.sysmlId + '"></mms-transclude-img>');
+                    result.push('<mms-transclude-img mms-element-id="' + thing.id + '"></mms-transclude-img>');
                 }
                 result.push('</div>');
             }
@@ -402,7 +402,7 @@ function UtilsService($q, $http, CacheService, URLService, _) {
         if (child.type !== 'view' && child.type !== 'section')
             return '';
         var result = '<ul>';
-        var anchor = '<a href=#' + child.data.sysmlId + '>';
+        var anchor = '<a href=#' + child.data.id + '>';
         result += '  <li>' + anchor + child.section + ' ' + child.label + '</a></li>';
         var i = 0;
         for (i = 0; i < child.children.length; i++) {
@@ -436,7 +436,7 @@ function UtilsService($q, $http, CacheService, URLService, _) {
     };
 
     var makeTablesAndFiguresTOCChild = function(child, printElement, ob, live, showRefName) {
-        var sysmlId = child.data.sysmlId;
+        var sysmlId = child.data.id;
         var el = printElement.find('#' + sysmlId);
         var refs = printElement.find('mms-view-link[data-mms-pe-id="' + sysmlId + '"]');
         var cap = '';
