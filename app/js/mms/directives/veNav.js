@@ -49,10 +49,11 @@ function veNav($templateCache, $rootScope, $state, hotkeys, growl, $location, $u
                         if(org) {
                             orgId = org.id;
                             $scope.selectedOrg = org.name;
-                            $scope.projects = ProjectService.getProjects(orgId);
+                            ProjectService.getProjects(orgId).then(function(data) {
+                                $scope.projects = data;
+                            });
                         }
                     }; 
-
                     if(scope.project.name === $scope.project.name)
                         $scope.projectChecked = true;
 

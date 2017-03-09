@@ -65,8 +65,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 });
                 return deferred.promise;
             },
-            //get the list of organizations that the user is a part of and then pass to controller
-            orgObs: function($stateParams, ProjectService, ticket) {
+            orgObs: function($stateParams, ProjectService, ticket) { 
                 return ProjectService.getOrgs();
             }
         },
@@ -74,7 +73,6 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             'login@': {
                 templateUrl: 'partials/mms/select.html',
                 controller: function($scope, $rootScope, $state, orgObs, ProjectService) {
-                    //display list of orgs first
                     $rootScope.ve_title = 'View Editor'; //what to name this?
                     $scope.orgs = orgObs; 
                     var orgId, projectId;
@@ -97,7 +95,6 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                         if (orgId && projectId) {
                             $state.go('project.ref', {orgId: orgId, projectId: projectId, refId: 'master'});
                         }
-                        // $state.go('project.ref', {projectId:'PROJECT-3f4ce222-86b4-47c6-ad70-3533490b0ed0', refId: 'master'});
                     };
                 }
             }
