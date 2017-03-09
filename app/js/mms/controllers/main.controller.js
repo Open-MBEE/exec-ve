@@ -112,6 +112,9 @@ function($scope, $location, $rootScope, $state, _, $window, $uibModal, growl, $h
     $rootScope.$on('$stateChangeSuccess', 
         function(event, toState, toParams, fromState, fromParams) {
             $rootScope.ve_stateChanging = false;
+            if($state.current.name === 'login' || $state.current.name === 'select') {
+                $rootScope.hideCenterPane = true;
+            }
             if ($state.current.name === 'project.ref') {
                 //$rootScope.mms_treeInitial = toParams.site;
             } else if ($state.current.name === 'project.ref.preview') {

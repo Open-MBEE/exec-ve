@@ -520,6 +520,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @param {object} viewOrSection The View or Section element object to add to
      * @param {string} type The type of element that is to be created, ie 'Paragraph'
      * @param {string} [name=Untitled <elementType>] (optional) InstanceSpecification name to use
+     * @param {number} addPeIndex the index of where to add view or section (instance spec) object
      * @returns {Promise} The promise would be resolved with updated View object if addToView is true
      *                    otherwise the created InstanceSpecification
     */
