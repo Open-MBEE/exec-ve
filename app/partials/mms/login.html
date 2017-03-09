@@ -2,10 +2,10 @@
     <div>
         <div class="account-wall">
             <div>
-                 <h2>View Editor</h2>
+                 <h2>{{ ve_title }}</h2>
             </div>
             <div>
-                <form name="loginForm" ng-submit="login(credentials)" style="display:none">
+                <form name="loginForm" ng-submit="login(credentials)">
                     <span class="label-text">Username:</span>
                     <input type="text" class="form-control" ng-model="credentials.username" autofocus>
                     <span class="label-text">Password:</span>

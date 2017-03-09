@@ -116,7 +116,8 @@ function($scope, $location, $rootScope, $state, _, $window, $uibModal, growl, $h
                 $rootScope.hideCenterPane = true;
             }
             if ($state.current.name === 'project.ref') {
-                //$rootScope.mms_treeInitial = toParams.site;
+                // $rootScope.hideCenterPane = false;
+                $rootScope.ve_treeInitial = toParams.refId;
             } else if ($state.current.name === 'project.ref.preview') {
                 var index = toParams.documentId.indexOf('_cover');
                 if (index > 0)

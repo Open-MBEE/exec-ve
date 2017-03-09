@@ -67,8 +67,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             },
             //get the list of organizations that the user is a part of and then pass to controller
             orgObs: function($stateParams, ProjectService, ticket) {
-                // return ProjectService.getOrgs();
-                return [];
+                return ProjectService.getOrgs();
             }
         },
         views: {
@@ -76,6 +75,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 templateUrl: 'partials/mms/select.html',
                 controller: function($scope, $rootScope, $state, orgObs, ProjectService) {
                     //display list of orgs first
+                    $rootScope.ve_title = 'View Editor'; //what to name this?
                     $scope.orgs = orgObs; 
                     var orgId, projectId;
                     $scope.selectOrg = function(org) { 
