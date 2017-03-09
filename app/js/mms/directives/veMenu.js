@@ -35,58 +35,41 @@ function veMenu(ProjectService, $state, $rootScope, $templateCache, growl) {
 
         var projectId, branchId, tagId;
 
-        if(scope.project.name === scope.currentProject)
-            scope.isCurrentProject = true;
-
         scope.updateProject = function(project) {
             if(project) {
-                projectId = project.Id;
+                projectId = project.id;
                 $state.go('project.ref', {projectId: projectId, refId: 'master'});
             }
         };
-        scope.isRefsView = function(){ 
-
-        };
-        scope.refsView = function(){ //the "project" state?
-            $state.go('project', {search: undefined});
-        };
-
-        if(scope.branch.name === scope.currentBranch)
-            scope.isCurrentBranch = true;
-
         scope.updateBranch = function(branch) {
-            $state.go($state.current.name, {projectId: scope.project.Id, refId: branch.Id});
+            $state.go($state.current.name, {projectId: scope.project.id, refId: branch.id});
         };
-
-        if(scope.tag.name === scope.currentTag)
-            scope.isCurrentTag = true;
-
         scope.updateTag = function(tag) {
-            $state.go($state.current.name, {projectId: scope.project.Id, refId: tag.id});
+            $state.go($state.current.name, {projectId: scope.project.id, refId: tag.id});
         };
         scope.latestTag = function() {
-            $state.go($state.current.name, {projectId: scope.project.Id, refId: 'latest'});
+            $state.go($state.current.name, {projectId: scope.project.id, refId: 'latest'});
         };
 
-        // ProjectService.getRef(scope.ws)
-        // .then(function(data) {
-        //     scope.wsName = data.name;
-        // });
+        scope.isRefsView = function(){
+            if ( $state.is('project') ) {
+                return true;
+            } else {
+                return false;
+            }
+        };
+        scope.refsView = function(){
+            $state.go('project', {projectId: scope.project.id});
+        };
 
-        /*if (scope.config && scope.config !== '' && scope.config !== 'latest') {
-            ConfigService.getConfig(scope.config, scope.ws, false)
-            .then(function(data) {
-                scope.configName = data.name;
-            });
-        } else {
-            scope.config = 'latest';
-        } */
+
+
         // if (!scope.site)
         //     return;
         // var currSiteParentId = scope.site.parent;
         // var isCharacterization = scope.site.isCharacterization;
         // var breadcrumbs = [];
-        // breadcrumbs.push({name: scope.project.name, id: scope.project.Id});
+        // breadcrumbs.push({name: scope.project.name, id: scope.project.id});
         // var eltWidth = element.parent().width();
 
         // SiteService.getSites()

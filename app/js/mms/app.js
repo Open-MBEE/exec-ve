@@ -80,15 +80,17 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                     var orgId, projectId;
                     $scope.selectOrg = function(org) { 
                         if (org) {
-                            orgId = org.Id;
+                            orgId = org.id;
                             $scope.selectedOrg = org.name;
-                            $scope.projects = ProjectService.getProjects(orgId);
+                            ProjectService.getProjects(orgId).then(function(data){
+                                $scope.projects = data;
+                            });
                         } 
                     };
                     $scope.selectProject = function(project) { 
                         if (project) {
                             $scope.selectedProject = project.name;
-                            projectId = project.Id;
+                            projectId = project.id;
                         }
                     };
                     $scope.continue = function() { 
