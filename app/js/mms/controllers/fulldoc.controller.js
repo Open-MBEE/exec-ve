@@ -130,7 +130,7 @@ function($scope, $rootScope, $state, $stateParams, $window, $element, hotkeys, g
     
     $scope.bbApi = {
         init: function() {
-            if (documentOb && documentOb._editable && !refOb.isTag) {
+            if (documentOb && documentOb._editable && refOb.type === 'Branch') {
                 $scope.bbApi.addButton(UxService.getButtonBarButton('show-edits'));
                 $scope.bbApi.setToggleState('show-edits', $rootScope.ve_editmode);
                 hotkeys.bindTo($scope)

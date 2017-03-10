@@ -86,11 +86,11 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         var deferred = $q.defer();
         var cached = CacheService.get(requestCacheKey);
         if (cached && !update && (!reqOb.extended || (reqOb.extended && cached._qualifiedId))) {
-            if (UtilsService.isView(cached) && !cached.hasOwnProperty('_contents')) {
-            } else {
+            //if (UtilsService.isView(cached) && !cached.hasOwnProperty('_contents')) {
+            //} else {
                 deferred.resolve(cached);
                 return deferred.promise;
-            }
+            //}
         }
         inProgress[key] = deferred.promise;
         HttpService.get(key,
@@ -140,7 +140,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                 existing.push(exist);
                 continue;
             }
-            request.elements.push({sysmlId: id});
+            request.elements.push({id: id});
         }
         if (request.elements.length === 0) {
             deferred.resolve(existing);
@@ -419,7 +419,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
             deferred.resolve(resp);
         };
 
-        if (!elementOb.hasOwnProperty('sysmlId')) {
+        if (!elementOb.hasOwnProperty('id')) {
             deferred.reject({status: 400, data: '', message: 'Element id not found, create element first!'});
             return deferred.promise;
         }

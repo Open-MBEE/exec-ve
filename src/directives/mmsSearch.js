@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsSearch', ['ElementService', 'growl', '$rootScope','$templateCache', 'mmsRootSites', mmsSearch]);
+.directive('mmsSearch', ['ElementService', 'growl', '$rootScope','$templateCache', mmsSearch]);
 
 /**
  * @ngdoc directive
@@ -13,7 +13,7 @@ angular.module('mms.directives')
  * TBA
  *
  */
-function mmsSearch(ElementService, growl, $rootScope, $templateCache, mmsRootSites) {
+function mmsSearch(ElementService, growl, $rootScope, $templateCache) {
     var template = $templateCache.get('mms/templates/mmsSearch.html');
 
     var mmsSearchLink = function(scope, element, attrs) {
@@ -87,23 +87,6 @@ function mmsSearch(ElementService, growl, $rootScope, $templateCache, mmsRootSit
             angular.element('.search-filter-type button').removeClass('active');
             angular.element('.btn-filter-facet-' + filterFacet).addClass('active');
         };
-        function filterBySites(data) {
-            var data1 = [];
-            var qualified, i;
-            if (mmsRootSites && mmsRootSites.length > 0) {
-                for (i = 0; i < data.length; i++) {
-                    if (data[i]._qualifiedId) {
-                        qualified = data[i]._qualifiedId.split('/');
-                        if (qualified.length > 1 && mmsRootSites.indexOf(qualified[1]) >= 0) {
-                            data1.push(data[i]);
-                        }
-                    }
-                }
-            } else {
-                data1 = data;
-            }
-            return data1;
-        }
         scope.search = function(searchText, page, numItems) {
             scope.searchClass = "fa fa-spin fa-spinner";
             if (scope.searchType === 'all')
@@ -112,11 +95,10 @@ function mmsSearch(ElementService, growl, $rootScope, $templateCache, mmsRootSit
                 scope.searchType = 'defaultValue.value,value.value,specification.value';
             ElementService.search(searchText, scope.searchType.split(','), null, page, numItems, false, scope.mmsWs, 2)
             .then(function(data) {
-                var data1 = filterBySites(data);
                 if (scope.mmsOptions.filterCallback) {
-                  scope.searchResults = scope.mmsOptions.filterCallback(data1);
+                  scope.searchResults = scope.mmsOptions.filterCallback(data);
                 } else {
-                  scope.searchResults = data1;
+                  scope.searchResults = data;
                 }
                 scope.searchClass = "";
                 scope.currentPage = page;
@@ -129,7 +111,7 @@ function mmsSearch(ElementService, growl, $rootScope, $templateCache, mmsRootSit
 
         // Set options 
         if (scope.mmsOptions.searchResult) {
-            var data1 = filterBySites(scope.mmsOptions.searchResult);
+            var data1 = scope.mmsOptions.searchResult;
             scope.searchResults = data1;
             scope.paginationCache.push(data1);
         }

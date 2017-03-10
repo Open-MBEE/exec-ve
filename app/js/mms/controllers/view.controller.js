@@ -65,7 +65,7 @@ angular.module('mmsApp')
 
     $scope.bbApi = {
         init: function() {
-            if (viewOb && viewOb._editable && !refOb.isTag) {
+            if (viewOb && viewOb._editable && refOb.type === 'Branch') {
                 $scope.bbApi.addButton(UxService.getButtonBarButton('show-edits'));
                 $scope.bbApi.setToggleState('show-edits', $rootScope.ve_editmode);
                 hotkeys.bindTo($scope)
@@ -77,7 +77,7 @@ angular.module('mmsApp')
             }
             $scope.bbApi.addButton(UxService.getButtonBarButton('show-comments'));
             $scope.bbApi.setToggleState('show-comments', $rootScope.veCommentsOn);
-            if (viewOb && viewOb._editable && !refOb.isTag) {
+            if (viewOb && viewOb._editable && refOb.type === 'Branch') {
                 if (viewOb._contents || viewOb.type === 'InstanceSpecification') {
                     $scope.bbApi.addButton(UxService.getButtonBarButton('view-add-dropdown'));
                 } else {
