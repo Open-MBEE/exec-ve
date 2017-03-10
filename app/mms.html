@@ -17,10 +17,12 @@
 </head>
 
 <body ng-controller="MainCtrl">
-<div ui-view="login" ng-show="hideCenterPane"></div>
+
 <div growl></div>
 
 <div id="outer-wrap">
+    <div ui-view="login" ng-show="hideCenterPane" style="height: 100vh"></div>
+
     <div id="inner-wrap">
         <div ui-view="nav"></div>
         <div ui-view="menu"></div>

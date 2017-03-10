@@ -1,9 +1,12 @@
-body {
+#ve-origin-select,
+#ve-login {
+  //body {
     background-color:#313131;
     color: white;
     font-weight:300;
+    height: 100%;
     letter-spacing: .02em;
-  }
+  //}
 /*******Hide error messages for testing purposes. Remove*******/
   .growl-container{
     display:none;
@@ -35,7 +38,7 @@ body {
     font-weight:300;
   }
 /*******Inputs (forms and buttons)*******/
-  
+
   .form-control{
     margin: 0 auto 16px;
   }
@@ -118,7 +121,7 @@ ul.dropdown-menu{
   background-color:#5f5f5f;
 }/****UI Elements > Dropdown > Wider Dropdown****/
 
-/** for less dense UIs. Just using modal right now, but 
+/** for less dense UIs. Just using modal right now, but
 should maybe have its of class***/
 
  .btn-group{
@@ -149,7 +152,7 @@ should maybe have its of class***/
 .label-text,
 .label-dropdown{
   color: #d6d6d6;
-  font-size:14px; 
+  font-size:14px;
 }
 
  .dropdown-menu{
@@ -207,11 +210,13 @@ should maybe have its of class***/
   left: 10px;
   top: 6px;
   width: 16px;
-  color: #45cb93; 
+  color: #45cb93;
 }
 
 .dropdown-menu .fa-check {
     padding-right: 6px;
     color: #35bc84;
     font-size: 14px;
+}
+
 }
