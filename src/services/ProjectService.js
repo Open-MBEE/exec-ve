@@ -86,7 +86,7 @@ function ProjectService($q, $http, URLService, CacheService, ApplicationService)
         if (inProgress.hasOwnProperty(url)) {
             return inProgress[url];
         }
-        var cacheKey = orgId ? 'projects' : ['projects', orgId];
+        var cacheKey = !orgId ? 'projects' : ['projects', orgId];
         if (CacheService.exists(cacheKey)) {
             deferred.resolve(CacheService.get(cacheKey));
         } else {
