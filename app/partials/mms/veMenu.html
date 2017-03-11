@@ -1,14 +1,14 @@
 <nav class="project-level-header navbar navbar-default navbar-inverse navbar-fixed-top" role="navigation">
     <div class="block">
         <div class="btn-group" uib-dropdown keyboard-nav>
-            <button id="simple-btn-keyboard-nav" type="button" class="dropdown-toggle" uib-dropdown-toggle>
+            <button id="simple-btn-keyboard-nav" type="button" class="dropdown-toggle" ng-click="updateProjectChecked()" uib-dropdown-toggle>
                 <span class="label-dropdown">Module:</span>
                 <span>{{ currentProject }}<i class="fa fa-caret-down" aria-hidden="true"></i></span>
             </button>
             <ul class="dropdown-menu list-with-selected-item" uib-dropdown-menu role="menu"
                 aria-labelledby="simple-btn-keyboard-nav">
                 <li><a ng-repeat="project in projects" ng-click="updateProject(project)"
-                       ng-class="{'checked-list-item': isCurrentProject }">{{ project.name }}</a></li>
+                       ng-class="{'checked-list-item': project.checked }">{{ project.name }}</a></li>
             </ul>
         </div>
         <div class="breadcrumbs">
@@ -22,7 +22,7 @@
         <ul class="nav navbar-nav navbar-right">
             <li>
             <div class="btn-group" uib-dropdown keyboard-nav>
-                <button id="task-selection-button" type="button" class="dropdown-toggle" uib-dropdown-toggle>
+                <button id="task-selection-button" type="button" class="dropdown-toggle" uib-dropdown-toggle ng-click="updateBranchChecked()">
                     <span class="label-dropdown">Branch:</span>{{ currentBranch }}
                     <i class="fa fa-caret-down" aria-hidden="true"></i>
                 </button>
@@ -33,7 +33,7 @@
                         </button>
                     </li>
                     <li ng-repeat="branch in branches | orderBy:'name'" ng-click="updateBranch(branch)"
-                        ng-class="{ 'checked-list-item': isCurrentBranch }">{{ branch.name }}
+                        ng-class="{ 'checked-list-item': branch.checked }">{{ branch.name }}
                     </li>
                 </ul>
             </div>
@@ -41,7 +41,7 @@
 
             <li>
             <div class="btn-group" uib-dropdown keyboard-nav>
-                <button id="tag-selection-button" type="button" class="dropdown-toggle" uib-dropdown-toggle>
+                <button id="tag-selection-button" type="button" class="dropdown-toggle" uib-dropdown-toggle ng-click="updateTagChecked()">
                     <span class="label-dropdown">Tag:</span>{{ currentTag }}
                     <i class="fa fa-caret-down" aria-hidden="true"></i>
                 </button>
@@ -50,9 +50,9 @@
                     <li class="button-item">
                         <button class="btn btn-large btn-block btn-primary" ng-click="refsView()">Manage Tags</button>
                     </li>
-                    <li ng-click="latestTag()" ng-class="{ 'checked-list-item': isCurrentTag }">latest</li>
+                    <li ng-click="latestTag()" ng-class="{ 'checked-list-item': tag.checked }">latest</li>
                     <li><a ng-repeat="tag in tags | orderBy:'name'" ng-click="updateTag(tag)"
-                           ng-class="{ 'checked-list-item': isCurrentTag }">{{ tag.name }}</a></li>
+                           ng-class="{ 'checked-list-item': tag.checked }">{{ tag.name }}</a></li>
                 </ul>
             </div>
             </li>

@@ -80,6 +80,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                         if (org) {
                             orgId = org.id;
                             $scope.selectedOrg = org.name;
+                            $scope.selectedProject = "";
                             ProjectService.getProjects(orgId).then(function(data){
                                 $scope.projects = data;
                             });
@@ -114,7 +115,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 });
                 return deferred.promise;
             },
-            orgObs: function($stateParams, ProjectService, ticket) { //to move to 'select' state later
+            orgObs: function($stateParams, ProjectService, ticket) { 
                 return ProjectService.getOrgs();
             },
             projectObs: function($stateParams, ProjectService, ticket, projectOb) {

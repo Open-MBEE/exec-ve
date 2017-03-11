@@ -5,20 +5,20 @@
   <div class="modal-body" id="modal-body">
               <div class="btn-group" uib-dropdown keyboard-nav>
                 <span class="label-dropdown">Project:</span> 
-                <button id="simple-btn-keyboard-nav" type="button" class="dropdown-toggle" uib-dropdown-toggle>
+                <button id="simple-btn-keyboard-nav" type="button" class="dropdown-toggle" ng-click="updateOrgChecked()" uib-dropdown-toggle>
                   <span>{{ selectedOrg }}<i class="fa fa-caret-down" aria-hidden="true"></i></span>
                 </button>
                 <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="simple-btn-keyboard-nav">
-                    <li><a ng-repeat="org in orgs" ng-click="selectOrg(org)" ng-class="{'checked-list-item': orgChecked}">{{ org.name }}</a></li>
+                    <li><a ng-repeat="org in orgs" ng-click="selectOrg(org)" ng-class="{'checked-list-item': org.checked }">{{ org.name }}</a></li> 
                 </ul>
               </div>
               <div class="btn-group" uib-dropdown keyboard-nav>
                 <span class="label-dropdown">Module:</span> 
-                <button id="simple-btn-keyboard-nav" type="button" class="dropdown-toggle" uib-dropdown-toggle>
+                <button id="simple-btn-keyboard-nav" type="button" class="dropdown-toggle" ng-click="updateProjChecked()" uib-dropdown-toggle ng-disabled="!selectedOrg">
                   <span>{{ selectedProject }}<i class="fa fa-caret-down" aria-hidden="true"></i></span>
                 </button>
                 <ul class="dropdown-menu list-with-selected-item" uib-dropdown-menu role="menu" aria-labelledby="simple-btn-keyboard-nav">
-                    <li><a ng-repeat="project in projects" ng-click="selectProject(project)" ng-class="{'checked-list-item': projectChecked }">{{ project.name }}</a></li>
+                    <li><a ng-repeat="project in projects" ng-click="selectProject(project)" ng-class="{'checked-list-item': project.checked }">{{ project.name }}</a></li>
                 </ul>
               </div>
           </div>

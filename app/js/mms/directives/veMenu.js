@@ -33,6 +33,29 @@ function veMenu(ProjectService, $state, $rootScope, $templateCache, growl) {
         scope.currentBranch = scope.branch.name;
         scope.currentTag = scope.tag.name;
 
+        var projList = scope.projects;
+        var branchList = scope.branches;
+        var tagList = scope.tags;
+
+        scope.updateProjectChecked = function() {
+            for(var i=0; i<projList; i++) {
+                if(scope.currentProject === projList[i].name)
+                    scope.project.checked = true;
+            }
+        };
+        scope.updateBranchChecked = function() {
+            for(var i=0; i<branchList; i++) {
+                if(scope.currentBranch === branchList[i].name)
+                    scope.branch.checked = true;
+            }
+        };
+        scope.updateTagChecked = function() {
+            for(var i=0; i<tagList; i++) {
+                if(scope.currentTag === tagList[i].name)
+                    scope.tag.checked = true;
+            }
+        };
+
         var projectId, branchId, tagId;
 
         scope.updateProject = function(project) {

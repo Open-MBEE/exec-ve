@@ -39,24 +39,38 @@ function veNav($templateCache, $rootScope, $state, hotkeys, growl, $location, $u
             var instance = $uibModal.open({
                 templateUrl: 'partials/mms/selectModal.html',
                 scope: scope,
-                controller: ['$scope','$uibModalInstance', function($scope, $uibModalInstance) {
+                controller: ['$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
 
-                    if(scope.org.name === $scope.org.name)
-                        $scope.orgChecked = true;
+                    var currentOrg = scope.org.name;
+                    var currentProject = scope.project.name;
+                    var orgList = scope.orgs;
+                    var projList = scope.projects;
+
+                    $scope.updateOrgChecked = function() {
+                        for(var i=0; i<orgList.length; i++) {
+                            if(currentOrg === orgList[i].name) 
+                                $scope.org.checked = true;
+                        }   
+                    };
+                    $scope.updateProjChecked = function() {
+                        for(var j=0; j<projList.length; j++) {
+                            if(currentProject === projList[j].name)
+                                $scope.project.checked = true;
+                        }  
+                    };
 
                     var orgId, projectId;
+
                     $scope.selectOrg = function(org) { 
                         if(org) {
                             orgId = org.id;
                             $scope.selectedOrg = org.name;
+                            $scope.selectedProject = "";
                             ProjectService.getProjects(orgId).then(function(data) {
                                 $scope.projects = data;
                             });
                         }
                     }; 
-                    if(scope.project.name === $scope.project.name)
-                        $scope.projectChecked = true;
-
                     $scope.selectProject = function(project) {
                         if(project)
                             projectId = project.id;
