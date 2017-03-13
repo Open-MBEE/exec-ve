@@ -76,7 +76,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                     $rootScope.ve_title = 'View Editor'; //what to name this?
                     $scope.orgs = orgObs; 
                     var orgId, projectId;
-                    $scope.selectOrg = function(org) { 
+                    $scope.selectOrg = function(org) {
                         if (org) {
                             orgId = org.id;
                             $scope.selectedOrg = org.name;
@@ -84,7 +84,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                             ProjectService.getProjects(orgId).then(function(data){
                                 $scope.projects = data;
                             });
-                        } 
+                        }
                     };
                     $scope.selectProject = function(project) { 
                         if (project) {
