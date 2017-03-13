@@ -5,11 +5,11 @@
   <div class="modal-body" id="modal-body">
     <div class="btn-group" uib-dropdown keyboard-nav>
       <span class="label-dropdown">Project:</span> 
-      <button id="simple-btn-keyboard-nav" type="button" class="dropdown-toggle" uib-dropdown-toggle ng-click="updateOrgChecked()">
+      <button id="simple-btn-keyboard-nav" type="button" class="dropdown-toggle" uib-dropdown-toggle>
         <span>{{ selectedOrg }}<i class="fa fa-caret-down" aria-hidden="true"></i></span>
       </button>
       <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="simple-btn-keyboard-nav">
-        <li class="checked-list-item" ng-if="org.checked" ng-repeat="org in orgs" ng-click="selectOrg(org)">{{ org.name }}</li> 
+        <li ng-repeat="org in orgs" ng-click="selectOrg(org)" ng-class="{'checked-list-item': org.name === selectedOrg}">{{ org.name }}</li> 
       </ul>
     </div>
     <div class="btn-group" uib-dropdown keyboard-nav>
