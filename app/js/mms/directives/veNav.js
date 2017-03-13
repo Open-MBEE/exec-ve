@@ -41,21 +41,31 @@ function veNav($templateCache, $rootScope, $state, hotkeys, growl, $location, $u
                 scope: scope,
                 controller: ['$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
 
-                    var currentOrg = scope.org.name;
-                    var currentProject = scope.project.name;
-                    var orgList = scope.orgs;
+                    // var orgList = scope.orgs;
                     var projList = scope.projects;
+                    // $scope.orgList = scope.orgs;
+                    var orgList = [];
+
+                    $scope.selectedOrg = $scope.org.name;
+                    $scope.selectedProject = $scope.project.name;
 
                     $scope.updateOrgChecked = function() {
-                        for(var i=0; i<orgList.length; i++) {
-                            if(currentOrg === orgList[i].name) 
-                                $scope.org.checked = true;
-                        }   
+                        for(var i=0; i<scope.orgs.length; i++) {
+                            if($scope.selectedOrg === scope.orgs[i].name) {
+                                $scope.orgs[i].checked = true;
+                            }
+                            else {
+                                $scope.orgs[i].checked = false;
+                            }
+                        }  
                     };
                     $scope.updateProjChecked = function() {
                         for(var j=0; j<projList.length; j++) {
-                            if(currentProject === projList[j].name)
+                            if(scope.project.name === projList[j].name)
                                 $scope.project.checked = true;
+                            else {
+                                $scope.project.checked = false;
+                            }
                         }  
                     };
 
