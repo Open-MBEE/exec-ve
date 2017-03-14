@@ -41,33 +41,8 @@ function veNav($templateCache, $rootScope, $state, hotkeys, growl, $location, $u
                 scope: scope,
                 controller: ['$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
 
-                    // var orgList = scope.orgs;
-                    var projList = scope.projects;
-                    // $scope.orgList = scope.orgs;
-                    var orgList = [];
-
                     $scope.selectedOrg = $scope.org.name;
                     $scope.selectedProject = $scope.project.name;
-
-                    $scope.updateOrgChecked = function() {
-                        for(var i=0; i<scope.orgs.length; i++) {
-                            if($scope.selectedOrg === scope.orgs[i].name) {
-                                $scope.orgs[i].checked = true;
-                            }
-                            else {
-                                $scope.orgs[i].checked = false;
-                            }
-                        }  
-                    };
-                    $scope.updateProjChecked = function() {
-                        for(var j=0; j<projList.length; j++) {
-                            if(scope.project.name === projList[j].name)
-                                $scope.project.checked = true;
-                            else {
-                                $scope.project.checked = false;
-                            }
-                        }  
-                    };
 
                     var orgId, projectId;
 
