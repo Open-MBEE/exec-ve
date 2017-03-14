@@ -62,6 +62,7 @@ function veNav($templateCache, $rootScope, $state, hotkeys, growl, $location, $u
                             $scope.selectedProject = project.name;
                     };
                     $scope.continue = function() {
+                        $scope.spin = true;
                         if(orgId && projectId)
                             $state.go('project.ref', {orgId: orgId, projectId: projectId, refId: 'master'});
                     };

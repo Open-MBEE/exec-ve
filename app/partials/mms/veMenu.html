@@ -7,8 +7,8 @@
             </button>
             <ul class="dropdown-menu list-with-selected-item" uib-dropdown-menu role="menu"
                 aria-labelledby="simple-btn-keyboard-nav">
-                <li><a ng-repeat="project in projects" ng-click="updateProject(project)"
-                       ng-class="{'checked-list-item': project.checked }">{{ project.name }}</a></li>
+                <li ng-repeat="project in projects" ng-click="updateProject(project)"
+                       ng-class="{'checked-list-item': project.checked }">{{ project.name }}</li>
             </ul>
         </div>
         <div class="breadcrumbs">
@@ -51,8 +51,8 @@
                         <button class="btn btn-large btn-block btn-primary" ng-click="refsView()">Manage Tags</button>
                     </li>
                     <li ng-click="latestTag()" ng-class="{ 'checked-list-item': tag.checked }">latest</li>
-                    <li><a ng-repeat="tag in tags | orderBy:'name'" ng-click="updateTag(tag)"
-                           ng-class="{ 'checked-list-item': tag.checked }">{{ tag.name }}</a></li>
+                    <li ng-repeat="tag in tags | orderBy:'name'" ng-click="updateTag(tag)"
+                           ng-class="{ 'checked-list-item': tag.checked }">{{ tag.name }}</li>
                 </ul>
             </div>
             </li>

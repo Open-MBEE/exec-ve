@@ -12,8 +12,7 @@
                     </button>
                     <ul class="dropdown-menu" uib-dropdown-menu role="menu"
                         aria-labelledby="simple-btn-keyboard-nav">
-                        <li><a ng-model="selectedOrg" ng-repeat="org in orgs" ng-click="selectOrg(org)">
-                            {{ org.name }}</a></li>
+                        <li ng-model="selectedOrg" ng-repeat="org in orgs" ng-click="selectOrg(org)">{{ org.name }}</li>
                     </ul>
                 </div>
                 <div class="btn-group" uib-dropdown keyboard-nav>
@@ -23,14 +22,13 @@
                     </button>
                     <ul class="dropdown-menu list-with-selected-item" uib-dropdown-menu role="menu"
                         aria-labelledby="simple-btn-keyboard-nav">
-                        <li><a ng-model="selectedProject" ng-repeat="project in projects"
-                               ng-click="selectProject(project)">{{ project.name }}</a></li>
+                        <li ng-model="selectedProject" ng-repeat="project in projects" ng-click="selectProject(project)">{{ project.name }}</li>
                     </ul>
                 </div>
-                <div class="bookmark" style="display:none">
+                <div class="bookmark"> <!-- style="display:none" -->
                     <a>Bookmark Module</a>
                 </div>
-                <button class="btn btn-block " type="submit">CONTINUE
+                <button class="btn btn-block" type="submit">CONTINUE
                     <span ng-if="spin"><i class="fa fa-spin fa-spinner"></i></span>
                 </button>
             </form>

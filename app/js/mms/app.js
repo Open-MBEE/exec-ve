@@ -92,7 +92,9 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                             projectId = project.id;
                         }
                     };
+                    $scope.spin = false;
                     $scope.continue = function() { 
+                        $scope.spin = true;
                         if (orgId && projectId) {
                             $state.go('project.ref', {orgId: orgId, projectId: projectId, refId: 'master'});
                         }
@@ -116,6 +118,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 return deferred.promise;
             },
             orgObs: function($stateParams, ProjectService, ticket) { 
+                console.log("State Params: " + $stateParams.projectId);
                 return ProjectService.getOrgs();
             },
             projectObs: function($stateParams, ProjectService, ticket, projectOb) {
