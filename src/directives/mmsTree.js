@@ -58,7 +58,7 @@ angular.module('mms.directives')
                 type: 'Package',
                 data: {
                     name: 'Root',
-                    sysmlid: 'id',
+                    sysmlId: 'id',
                     //any other stuff
                 },
                 children: [
@@ -67,7 +67,7 @@ angular.module('mms.directives')
                         type: 'Class',
                         data: {
                             name: 'Child',
-                            sysmlid: 'blah',
+                            sysmlId: 'blah',
                             //other stuff
                         },
                         children: []
@@ -223,9 +223,9 @@ function mmsTree($timeout, $log, $templateCache) {
                         });
                     }
                 }
-                if (branch.data.sysmlid) {
+                if (branch.data.id) {
                     $timeout(function() {
-                        var el = angular.element('#tree-branch-' + branch.data.sysmlid);
+                        var el = angular.element('#tree-branch-' + branch.data.id);
                         if (!el.isOnScreen()) {
                             el.get(0).scrollIntoView();
                         }
@@ -237,7 +237,7 @@ function mmsTree($timeout, $log, $templateCache) {
         var on_initialSelection_change = function() {
             if (scope.initialSelection) {
                 for_each_branch(function(b) {
-                    if (b.data.sysmlid === scope.initialSelection || b.data.id === scope.initialSelection) {
+                    if (b.data.id === scope.initialSelection || b.data.id === scope.initialSelection) {
                         select_branch(b, true);
                     }
                 });
@@ -355,7 +355,7 @@ function mmsTree($timeout, $log, $templateCache) {
         
         scope.expandCallback = function(obj, e){
             if(!obj.branch.expanded && scope.options.expandCallback) {
-               scope.options.expandCallback(obj.branch.data.sysmlid, obj.branch, false);
+               scope.options.expandCallback(obj.branch.data.id, obj.branch, false);
             }
             obj.branch.expanded = !obj.branch.expanded;
             if (e) {
@@ -371,7 +371,7 @@ function mmsTree($timeout, $log, $templateCache) {
 
         if (attrs.initialSelection) {
             for_each_branch(function(b) {
-                if (b.data.sysmlid === attrs.initialSelection || b.data.id === attrs.initialSelection) {
+                if (b.data.id === attrs.initialSelection || b.data.id === attrs.initialSelection) {
                     $timeout(function() {
                         select_branch(b);
                     });
@@ -707,7 +707,7 @@ function mmsTree($timeout, $log, $templateCache) {
                     // if (angular.equals(b.data,data)) {
                     //     branch = b;
                     // }
-                    if (b.data.sysmlid === data.sysmlid) {
+                    if (b.data.id === data.id) {
                         branch = b;
                     }
                 });

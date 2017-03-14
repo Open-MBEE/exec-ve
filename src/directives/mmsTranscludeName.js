@@ -1,27 +1,32 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsTranscludeName', ['ElementService', 'UxService', '$compile', 'growl', '$templateCache', '$rootScope', '$uibModal', 'Utils', mmsTranscludeName]);
+.directive('mmsTranscludeName', ['ElementService', 'UxService', '$compile', 'growl', '$templateCache', 'Utils', mmsTranscludeName]);
 
 /**
  * @ngdoc directive
  * @name mms.directives.directive:mmsTranscludeName
  *
  * @requires mms.ElementService
+ * @requires mms.UxService
+ * @requires mms.Utils
  * @requires $compile
+ * @requires $templateCache
+ * @requires growl
  *
  * @restrict E
  *
  * @description
- * Given an element id, puts in the element's name binding, if there's a parent
+ * Given an element id, puts in the element's name binding, if there's a parent 
  * mmsView directive, will notify parent view of transclusion on init and name change,
  * and on click
  *
- * @param {string} mmsEid The id of the element whose name to transclude
- * @param {string=master} mmsWs Workspace to use, defaults to master
- * @param {string=latest} mmsVersion Version can be alfresco version number or timestamp, default is latest
+ * @param {string} mmsElementId The id of the view
+ * @param {string} mmsProjectId The project id for the view
+ * @param {string=master} mmsRefId Reference to use, defaults to master
+ * @param {string=latest} mmsCommitId Commit ID, default is latest
  */
-function mmsTranscludeName(ElementService, UxService, $compile, growl, $templateCache, $rootScope, $uibModal, Utils) {
+function mmsTranscludeName(ElementService, UxService, $compile, growl, $templateCache, Utils) {
 
     var template = $templateCache.get('mms/templates/mmsTranscludeName.html');
     var defaultTemplate = '<span ng-if="element.name">{{element.name}}</span><span ng-if="!element.name" class="no-print" ng-class="{placeholder: version!=\'latest\'}">(no name)</span>';
@@ -45,107 +50,110 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
 
     };
 
-    var mmsTranscludeNameLink = function(scope, element, attrs, controllers) {
+    var mmsTranscludeNameLink = function(scope, domElement, attrs, controllers) {
         var mmsViewCtrl = controllers[0];
         var mmsCfDocCtrl = controllers[1];
         var mmsCfValCtrl = controllers[2];
         var processed = false;
         scope.recompileScope = null;
-        element.click(function(e) {
+        domElement.click(function(e) {
             if (scope.noClick)
                 return;
+
             if (scope.clickHandler) {
                 scope.clickHandler();
                 return;
             }
-            if (scope.addFrame && !scope.nonEditable)
-                scope.addFrame();
+            if (scope.startEdit && !scope.nonEditable)
+                scope.startEdit();
 
             if (!mmsViewCtrl)
                 return false;
+
             if (scope.nonEditable) {
                 growl.warning("Cross Reference is not editable.");
             }
-            mmsViewCtrl.transcludeClicked(scope.mmsEid, scope.ws, scope.version);
-            //return false;
+            mmsViewCtrl.transcludeClicked(scope.element);
             e.stopPropagation();
         });
 
-        var recompile = function() {
-            if (scope.recompileScope)
+        var recompile = function(preview) {
+            if (scope.recompileScope) {
                 scope.recompileScope.$destroy();
-            scope.isEditing = false;
-            element.empty();
-            element[0].innerHTML = defaultTemplate;
-            //element.append(defaultTemplate);
+            }
+            domElement.empty();
+            if (preview) {
+                domElement[0].innerHTML = '<div class="panel panel-info">'+editTemplate+'</div>';
+            } else {
+                scope.isEditing = false;
+                domElement[0].innerHTML = defaultTemplate;
+            }
             scope.recompileScope = scope.$new();
-            $compile(element.contents())(scope.recompileScope);
+            $compile(domElement.contents())(scope.recompileScope);
             if (mmsViewCtrl) {
                 mmsViewCtrl.elementTranscluded(scope.element);
             }
         };
 
-        var recompileEdit = function() {
-            if (scope.recompileScope)
-                scope.recompileScope.$destroy();
-            element.empty();
-            element[0].innerHTML = '<div class="panel panel-info">'+editTemplate+'</div>';
-            //element.append('<div class="panel panel-info">'+editTemplate+'</div>');
-            scope.recompileScope = scope.$new();
-            $compile(element.contents())(scope.recompileScope);
-            if (mmsViewCtrl) {
-                mmsViewCtrl.elementTranscluded(scope.edit);
-            }
-        };
-
-
-        var idwatch = scope.$watch('mmsEid', function(newVal, oldVal) {
+        var idwatch = scope.$watch('mmsElementId', function(newVal, oldVal) {
             if (!newVal)
                 return;
             if (!scope.mmsWatchId)
                 idwatch();
-            var ws = scope.mmsWs;
-            var version = scope.mmsVersion;
+            var projectId = scope.mmsProjectId;
+            var refId = scope.mmsRefId;
+            var commitId = scope.mmsCommitId;
             if (mmsCfValCtrl) {
-                var cfvVersion = mmsCfValCtrl.getWsAndVersion();
-                if (!ws)
-                    ws = cfvVersion.workspace;
-                if (!version)
-                    version = cfvVersion.version;
+                var cfvVersion = mmsCfValCtrl.getElementOrigin();
+                if (!projectId)
+                    projectId = cfvVersion.projectId;
+                if (!refId)
+                    refId = cfvVersion.refId;
+                if (!commitId)
+                    commitId = cfvVersion.commitId;
             }
             if (mmsCfDocCtrl) {
-                var cfdVersion = mmsCfDocCtrl.getWsAndVersion();
-                if (!ws)
-                    ws = cfdVersion.workspace;
-                if (!version)
-                    version = cfdVersion.version;
+                var cfdVersion = mmsCfDocCtrl.getElementOrigin();
+                if (!projectId)
+                    projectId = mmsCfDocCtrl.projectId;
+                if (!refId)
+                    refId = mmsCfDocCtrl.refId;
+                if (!commitId)
+                    commitId = mmsCfDocCtrl.commitId;
             }
             if (mmsViewCtrl) {
-                var viewVersion = mmsViewCtrl.getWsAndVersion();
-                if (!ws)
-                    ws = viewVersion.workspace;
-                if (!version)
-                    version = viewVersion.version;
+                var viewVersion = mmsViewCtrl.getElementOrigin();
+                if (!projectId)
+                    projectId = viewVersion.projectId;
+                if (!refId)
+                    refId = viewVersion.refId;
+                if (!commitId)
+                    commitId = viewVersion.commitId;
             }
-            element.html('(loading...)');
-            element.addClass("isLoading");
-            scope.ws = ws;
-            scope.version = version ? version : 'latest';
-            ElementService.getElement(scope.mmsEid, false, ws, version, 1)
+            domElement.html('(loading...)');
+            domElement.addClass("isLoading");
+
+            scope.projectId = projectId;
+            scope.refId = refId ? refId : 'master';
+            scope.commitId = commitId ? commitId : 'latest';
+            var reqOb = {elementId: scope.mmsElementId, projectId: scope.projectId, refId: scope.refId, commitId: scope.commitId};
+            ElementService.getElement(reqOb, 1, false)
             .then(function(data) {
                 scope.element = data;
                 recompile();
                 if (mmsViewCtrl) {
                     mmsViewCtrl.elementTranscluded(scope.element);
                 }
-                if (scope.version === 'latest') {
-                    scope.$on('element.updated', function(event, eid, ws, type, continueEdit) {
-                        if (eid === scope.mmsEid && ws === scope.ws && (type === 'all' || type === 'name') && !continueEdit)
+                if (scope.commitId === 'latest') {
+                    scope.$on('element.updated', function(event, elementOb, continueEdit) {
+                        if (elementOb.id === scope.element.id && elementOb._projectId === scope.element._projectId &&
+                            elementOb._refId === scope.element._refId && !continueEdit) {
                             recompile();
+                        }
                     });
                     //actions for stomp using growl messages
                     scope.$on("stomp.element", function(event, deltaSource, deltaWorkspaceId, deltaElementID, deltaModifier, deltaName){
-                        if(deltaWorkspaceId === scope.ws && deltaElementID === scope.mmsEid){
+                        if(deltaWorkspaceId === scope.refId && deltaElementID === scope.mmsElementId){
                             if (scope.isEditing)
                                 growl.warning(" This value has been changed to: "+deltaName+" by: "+ deltaModifier, {ttl: -1});
                         }
@@ -155,18 +163,12 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
                 var status = ' not found';
                 if (reason.status === 410)
                     status = ' deleted';
-                element.html('<span class="mms-error">name cf ' + newVal + status + '</span>');
-                //growl.error('Cf Name Error: ' + reason.message + ': ' + scope.mmsEid);
+                domElement.html('<span class="mms-error">name cf ' + newVal + status + '</span>');
             }).finally(function() {
-                element.removeClass("isLoading");
+                domElement.removeClass("isLoading");
             });
         });
 
-        /*scope.$watch('element.name', function(newVal) {
-            if (mmsViewCtrl && newVal) {
-                mmsViewCtrl.elementTranscluded(scope.element);
-            }
-        });*/
 
 
         if (mmsViewCtrl) {
@@ -176,47 +178,35 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
             scope.view = mmsViewCtrl.getView();
             var type = "name";
 
-            var callback = function() {
-                Utils.showEditCallBack(scope,mmsViewCtrl,element,template,recompile,recompileEdit,type);
-            };
-
-            mmsViewCtrl.registerPresenElemCallBack(callback);
-
-            scope.$on('$destroy', function() {
-                mmsViewCtrl.unRegisterPresenElemCallBack(callback);
-            });
-
             scope.save = function() {
-                Utils.saveAction(scope,recompile,scope.bbApi,null,type,element);
+                Utils.saveAction(scope, domElement, false);
             };
 
             scope.saveC = function() {
-                Utils.saveAction(scope,recompile,scope.bbApi,null,type,element,true);
+                Utils.saveAction(scope, domElement, true);
             };
 
             scope.cancel = function() {
-                Utils.cancelAction(scope,recompile,scope.bbApi,type,element);
+                Utils.cancelAction(scope, recompile, domElement);
             };
 
-            scope.addFrame = function() {
-                Utils.addFrame(scope,mmsViewCtrl,element,template);
+            scope.startEdit = function() {
+                Utils.startEdit(scope, mmsViewCtrl, domElement, template, false);
             };
-
-            // TODO: will we ever want a delete?
 
             scope.preview = function() {
-                Utils.previewAction(scope, recompileEdit, recompile, type, element);
+                Utils.previewAction(scope, recompile, domElement);
             };
         }
     };
 
     return {
         restrict: 'E',
-        //template: '<span ng-if="element.name">{{element.name}}</span><span ng-if="!element.name" ng-class="{placeholder: version!=\'latest\'}">(no name)</span>',
         scope: {
-            mmsEid: '@',
-            mmsWs: '@',
-            mmsVersion: '@',
+            mmsElementId: '@',
+            mmsProjectId: '@',
+            mmsRefId: '@',
+            mmsCommitId: '@',
             mmsWatchId: '@',
             noClick: '@',
             nonEditable: '<',

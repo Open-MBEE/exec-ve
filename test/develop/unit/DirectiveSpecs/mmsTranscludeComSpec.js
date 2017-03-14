@@ -16,7 +16,7 @@ describe('mmsTranscludeCom directive', function () {
             scope.version    = "latest";
             scope.editValues = [43, 42, 55, 2532];
             scope.view       = {
-                sysmlid: '_hidden_MMS_1472586299682_1122c2aa-9cab-41a9-b0b4-4a1fd9a9882f_pei',
+                sysmlId: '_hidden_MMS_1472586299682_1122c2aa-9cab-41a9-b0b4-4a1fd9a9882f_pei',
                 name   : 'merpity'
             };
             scope.panelType  = "Comment";
@@ -25,17 +25,17 @@ describe('mmsTranscludeCom directive', function () {
 
     it('mmsTranscludeCom should translude a comment within the element', inject(function () {
         var testElement = {
-            sysmlid      : "_hidden_MMS_1472586299682_1122c2aa-9cab-41a9-b0b4-4a1fd9a9882f_pei",
-            editable     : true,
-            creator      : "mmsadmin",
+            sysmlId      : "_hidden_MMS_1472586299682_1122c2aa-9cab-41a9-b0b4-4a1fd9a9882f_pei",
+            _editable     : true,
+            _creator      : "mmsadmin",
             name         : "merp",
             documentation: "<p>Putting some text in here!!!<\/p>\n"
         };
 
-        var cacheKey = UtilsService.makeElementKey(testElement.sysmlid, 'master', 'latest', false);
+        var cacheKey = UtilsService.makeElementKey(testElement.sysmlId, 'master', 'latest', false);
         CacheService.put(cacheKey, testElement);
 
-        element = angular.element('<mms-transclude-com data-mms-eid="{{view.sysmlid}}"></mms-transclude-com>');
+        element = angular.element('<mms-transclude-com data-mms-eid="{{view.sysmlId}}"></mms-transclude-com>');
         $compile(element)(scope);
         scope.$digest();
 

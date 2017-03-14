@@ -31,7 +31,7 @@ function VizService($q, $http, URLService, CacheService, UtilsService, AuthServi
      * @param {string} [version=latest] timestamp or version
      * @returns {Promise} The promise will be resolved with the latest image url
      */
-    var getImageURL = function(id, ext, update, workspace, version) {
+    var getImageURL = function(id, ext, update, workspace, version) { //TODO update to donbot
         var n = normalize(id, update, workspace, version);
         var deferred = $q.defer();
         if (CacheService.exists(n.cacheKey + '|' + ext) && !n.update) {

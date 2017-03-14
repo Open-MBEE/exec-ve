@@ -25,12 +25,10 @@ function mmsSiteDocs(ElementService, SiteService, ViewService, growl, $q, $templ
             var filteredDocs = [];
             var seen = {};
             scope.siteDocs.forEach(function(doc) {
-                if (!scope.filtered[doc.sysmlid]) {
-                    if (seen[doc.sysmlid])
-                        return;
-                    filteredDocs.push(doc);
-                    seen[doc.sysmlid] = 'seen';
-                }
+                if (seen[doc.id])
+                    return;
+                filteredDocs.push(doc);
+                seen[doc.id] = 'seen';
             });
             scope.docs = filteredDocs;
         };
@@ -50,20 +48,9 @@ function mmsSiteDocs(ElementService, SiteService, ViewService, growl, $q, $templ
         ViewService.getSiteDocuments(scope.mmsSite, false, scope.ws, scope.version, 1)
         .then(function(docs) {
             scope.siteDocs = docs;
-            scope.filtered = {};
-            ElementService.getElement("master_filter", false, scope.ws, scope.version, 2)
-            .then(function(filter) {
-                scope.filter = filter;
-                scope.filtered = JSON.parse(scope.filter.documentation);
-            }).finally(function() {
+            update();
+            scope.$watchCollection("siteDocs", function(newVal, oldVal) {
                 update();
-                scope.$watch("filter.documentation", function(newVal, oldVal) {
-                    scope.filtered = JSON.parse(newVal);
-                    update();
-                });
-                scope.$watchCollection("siteDocs", function(newVal, oldVal) {
-                    update();
-                });
             });
         });
     };

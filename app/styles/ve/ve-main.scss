@@ -11,6 +11,11 @@
 @import "layout/_pane-center.scss";
 @import "layout/_pane-right.scss";
 @import "layout/_panes.scss";
+@import "layout/_login-select.scss";
+
+/* Layout directive customizations */
+@import "layout/_ve-nav.scss";
+@import "layout/_ve-footer.scss";
 
 .cke_button__mmscf_label, .cke_button__mmscomment_label,
 .cke_button__mmsvlink_label, .cke_button__mmsreset_label {

@@ -69,7 +69,7 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
                             url: jobs[i].url,
                             command: jobs[i].command,
                             create: jobs[i].created,
-                            sysmlid: jobs[i].sysmlid
+                            id: jobs[i].id
                         };
                     }
                 }
@@ -97,7 +97,7 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
             .then(function(document) {
                 if (newVal !== lastid)
                     return;
-                if(!document.specialization || document.specialization.type !== 'Product')
+                if(!UtilsService.isDocument(document))
                     return;
                 scope.doc = document;
                 documentName = document.name;
@@ -115,8 +115,8 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
         scope.$watch('mmsDocId', changeDocument);
 
         var jenkinsRun = function() {
-            var link = URLService.getJenkinsRun(scope.job.sysmlid);
-            //http://localhost:8080/alfresco/service/workspaces/master/jobs/scope.jobs[0].sysmlid/execute
+            var link = URLService.getJenkinsRun(scope.job.id);
+            //http://localhost:8080/alfresco/service/workspaces/master/jobs/scope.jobs[0].id/execute
             scope.runCleared = false;
             $http.post(link, ' ').then(function(){
                 growl.success('Your job is running!');
@@ -157,12 +157,9 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
                     schedule: thisSchedule,
                     status: 'in queue',
                     url: 'sample_initial_url',
-                    owner: id,
-                    isMetatype: false,
+                    ownerId: id,
                     documentation: '',
-                    specialization: {
-                      type: 'Element'
-                    }
+                    type: 'Element'
                 }]
             };
 
@@ -173,8 +170,8 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
                 var job = data.data.elements;
                 var job_size = data.data.elements.length;
                 for (var i = 0; i < job_size; i++) {
-                    if(job[i].specialization.type === 'Element'){
-                        scope.job.sysmlid = job[i].sysmlid;
+                    if(job[i].type === 'Element'){
+                        scope.job.id = job[i].id;
                     }
                 }
                 deferred.resolve();
@@ -190,7 +187,7 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
             var id = scope.mmsDocId;
             var updatePost = {
                 jobs: [{
-                    sysmlid: scope.job.sysmlid,
+                    id: scope.job.id,
                     name: scope.jobInput.jobName+'_job'
                 }]
             };
@@ -204,10 +201,10 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
         scope.deleteJob = function(){
             var jobDelete = {
                 jobs: [{
-                    sysmlid: scope.job.sysmlid
+                    id: scope.job.id
                 }]
             };
-            var link = URLService.getJob(scope.job.sysmlid);
+            var link = URLService.getJob(scope.job.id);
             scope.deleteCleared = false;
             $http.delete(link, jobDelete).then(function(){
                 growl.success('Your job has been deleted');
@@ -236,7 +233,7 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
         //actions for stomp
         scope.$on("stomp.job", function(event, newJob){
             for (var i = 0; i < newJob.length; i++) {
-                if(newJob[i].owner === scope.mmsDocId){
+                if(newJob[i].ownerId === scope.mmsDocId){
                     scope.hasJobs = true;
                     if(newJob[i].status === 'completed' || newJob[i].status === 'failed'){
                         scope.buttonEnabled = true;
@@ -248,7 +245,7 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
                         status: newJob[i].status,
                         create: newJob[i].created,
                         url: newJob[i].url,
-                        sysmlid: newJob[i].sysmlid,
+                        id: newJob[i].id,
                     };
                     scope.$apply();
                 }
@@ -256,7 +253,7 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
         });
         scope.$on("stomp.updateJob", function(event, updateJob){
             for (var i = 0; i < updateJob.length; i++) {
-                if(updateJob[i].owner === scope.mmsDocId){
+                if(updateJob[i].ownerId === scope.mmsDocId){
                     if(updateJob[i].status === 'completed' || updateJob[i].status === 'failed'){
                             scope.buttonEnabled = true;
                     }else{
@@ -271,7 +268,7 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
         });
         scope.$on("stomp.deleteJob", function(event, deleteJob){
             for (var i = 0; i < deleteJob.length; i++) {
-                if(deleteJob[i].owner === scope.mmsDocId){
+                if(deleteJob[i].ownerId === scope.mmsDocId){
                     scope.buttonEnabled = false;
                     scope.hasJobs = false;
                     scope.job = ' ';

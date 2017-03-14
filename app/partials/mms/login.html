@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 <script type="text/javascript">
 
@@ -13,7 +14,7 @@
     }
   };
 
-</script> 
+</script>
 
 
 <style>
@@ -157,52 +158,22 @@
 
 </style>
 
+<div id="ve-login" class="row">
     <div>
-        <div class="row">
+        <div class="account-wall">
             <div>
-                <div class = "account-wall">
-                    <div>
-                        <h2>View Editor</h2>
-                    </div>
-                      <div>
-
-                        <form name="loginForm" ng-submit="login(credentials)" style = "display:none">
-                            <label>Username</label>
-                            <input type="text" class="form-control" ng-model="credentials.username"autofocus>
-                            <label>Password</label>
-                            <input type="password" class="form-control" ng-model="credentials.password">
-                            <button class="btn btn-block" type="submit">LOG IN <span ng-if="spin" ><i class="fa fa-spin fa-spinner"></i>
-                            </span></button>
-                        </form>
-
-                        <form name="loginForm" ng-submit="login(credentials)">
-                          <label>Project:</label>
-                          <div class = "dropdown-menu-new">
-                            <button onclick = "toggleVisibilityPrototype('project-list', 'project-button');" id = "project-button" name = "Europa"><i class="fa fa-caret-down" aria-hidden="true"></i></button>
-                            <ul id = "project-list" style = "display:none;">
-                              <li><a onclick = "toggleVisibilityPrototype('project-list', 'project-button');">Europa</a></li>
-                              <li class = "unselected">CAE</li>
-                            </ul>
-                          </div>
-                          <label class = "module-disabled">Module:</label>
-                          <div class = "dropdown-menu-new">
-                            <button onclick = "toggleVisibilityPrototype('module-list', 'module-button');" id = "module-button" name = "Europa Architecture"><i class="fa fa-caret-down module-disabled" aria-hidden="true"></i></button>
-                            <ul id = "module-list" style = "display:none;">
-                              <li class = "unselected"><a onclick = "toggleVisibilityPrototype('module-list', 'module-button');">Europa Architecture</a></li>
-                              <li class = "unselected">Design Capture</li>
-                              <li class = "unselected">Flight</li>
-                              <li class = "unselected">Ground Design</li>
-                              <li class = "unselected">Really really really really really really really really long module name</li>
-                            </ul>
-                          </div>
-                          <div class = "bookmark" style = "display:none;">
-                            <a>Bookmark Module</a>
-                          </div>
-                          <button class="btn btn-block " type="submit">CONTINUE <span ng-if="spin" ><i class="fa fa-spin fa-spinner"></i>
-                          </span></button>
-                        </form>
-                    </div>
-                </div>
+                 <h2>{{ ve_title }}</h2>
+            </div>
+            <div>
+                <form name="loginForm" ng-submit="login(credentials)">
+                    <span class="label-text">Username:</span>
+                    <input type="text" class="form-control" ng-model="credentials.username" autofocus>
+                    <span class="label-text">Password:</span>
+                    <input type="password" class="form-control" ng-model="credentials.password">
+                    <button class="btn btn-block" type="submit">LOG IN <span ng-if="spin" ><i class="fa fa-spin fa-spinner"></i>
+                    </span></button>
+                </form>
             </div>
         </div>
     </div>
+</div>

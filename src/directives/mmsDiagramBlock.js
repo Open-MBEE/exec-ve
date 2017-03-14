@@ -16,7 +16,7 @@ function mmsDiagramBlock(go, growl, ElementService) {
         var ownedElementsMap = {};
 
         for (var i = 0; i < data.length; i++) {
-          ownedElementsMap[data[i].sysmlid] = data[i];
+          ownedElementsMap[data[i].id] = data[i];
         }
 
         // create a list of all the nodes
@@ -27,15 +27,14 @@ function mmsDiagramBlock(go, growl, ElementService) {
         for (i = 0; i < data.length; i++) {
           elem = data[i];
 
-          if (elem.hasOwnProperty('specialization') && 
-              elem.specialization.type === 'Element') {
+          if (elem.type === 'Element') {
 
-            var node = { key: elem.sysmlid ,iskey: true, figure: "Decision", label: elem.name, children: [] };
+            var node = { key: elem.id ,iskey: true, figure: "Decision", label: elem.name, children: [] };
             
             // does it have an owner and is the owner a member of this model?
-            if (elem.hasOwnProperty('owner') && 
-                ownedElementsMap[elem.owner]) {
-              node.parent = elem.owner;
+            if (elem.hasOwnProperty('ownerId') && 
+                ownedElementsMap[elem.ownerId]) {
+              node.parent = elem.ownerId;
             }
 
             nodesMap[node.key] = node;
@@ -45,8 +44,8 @@ function mmsDiagramBlock(go, growl, ElementService) {
         // associate children nodes with all the nodes and
         var nodes = [];
  
-        for (var elem_sysmlid in nodesMap) {
-          var elem_node = nodesMap[elem_sysmlid];
+        for (var elem_id in nodesMap) {
+          var elem_node = nodesMap[elem_id];
           nodes.push(elem_node);
           if (elem_node.parent) {
             nodesMap[elem_node.parent].children.push(elem_node);
@@ -59,10 +58,9 @@ function mmsDiagramBlock(go, growl, ElementService) {
         for (i = 0; i < data.length; i++) {
           elem = data[i];
 
-          if (elem.hasOwnProperty('specialization') && 
-              elem.specialization.type === 'Dependency') {
+          if (elem.type === 'Dependency') {
 
-            var edge = { from: elem.specialization.source, to: elem.specialization.target};
+            var edge = { from: elem._sourceIds[0], to: elem._targetIds[0]};
 
             edges.push(edge);
           }
