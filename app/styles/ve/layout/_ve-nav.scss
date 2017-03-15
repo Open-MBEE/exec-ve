@@ -1,9 +1,16 @@
-body{
+.navbar {
 	font-family:"Helvetica Neue", sans-serif;
 	color: white;
 	margin:0;
 	font-weight:300;
-	letter-spacing: .02em;
+	letter-spacing: .03em;
+
+	a,
+	a:hover,
+	a:visited{
+		color:white;
+		text-decoration:none;
+	}
 }
 .navbar {
 	font-size: 14px;
@@ -18,12 +25,6 @@ body{
 }
 	/****Typography****/
 
-a,
-a:hover,
-a:visited{
-	color:white;
-	text-decoration:none;
-}
 
 
 /****Nav****/
@@ -118,9 +119,10 @@ ul.tags-tasks{
 	position: relative;
 }
 
-.switch-org{
+a.switch-org,
+a.switch-org:hover,{
 	font-size: 11px;
-	text-decoration: underline;
+	text-decoration: underline !important;
 }
 
 .logotype{
@@ -150,10 +152,10 @@ ul.tags-tasks{
 	font-weight:300;
 	font-family:"Helvetica Neue", sans-serif;
 	border-radius:2px !important;
-	-webkit-transition: background-color .2s ease-out !important;
-	-moz-transition: background-color .2s ease-out !important;
-	-o-transition: background-color .2s ease-out !important;
-	transition: background-color .2s ease-out !important;
+	-webkit-transition: background-color .1s ease-out !important;
+	-moz-transition: background-color .1s ease-out !important;
+	-o-transition: background-color .1s ease-out !important;
+	transition: background-color .1s ease-out !important;
 }
 
 .dropdown-toggle .fa-caret-down{
@@ -174,12 +176,13 @@ ul.dropdown-menu{
 
 .dropdown-menu li{
 	padding:6px 8px;
+	font-size: 13px;
     white-space: nowrap;
     width:100%;
-    -webkit-transition: background-color .2s ease-out !important;
-    -moz-transition: background-color .2s ease-out !important;
-    -o-transition: background-color .2s ease-out !important;
-    transition: background-color .2s ease-out !important;
+    -webkit-transition: background-color .1s ease-out !important;
+    -moz-transition: background-color .1s ease-out !important;
+    -o-transition: background-color .1s ease-out !important;
+    transition: background-color .1s ease-out !important;
 }
 
 .dropdown-menu li:hover{
@@ -200,7 +203,7 @@ ul.dropdown-menu{
 }
 
 .project-level-header .label-dropdown{
-	color: #a3a3a3;
+	color: #b3b3b3;
 	font-size:13px;	
 	font-weight:300;
 	padding: 0 4px;
@@ -384,10 +387,10 @@ should maybe have its of class***/
 	font-weight: 500;
 	letter-spacing: .14em;
 	font-size: 12px;
-	-webkit-transition: background-color .2s ease-out;
-	-moz-transition: background-color .2s ease-out;
-	-o-transition: background-color .2s ease-out;
-	transition: background-color .2s ease-out;
+	-webkit-transition: background-color .1s ease-out;
+	-moz-transition: background-color .1s ease-out;
+	-o-transition: background-color .1s ease-out;
+	transition: background-color .1s ease-out;
 	border:none;
 	text-transform: uppercase;
 	border-radius:2px;

@@ -5,16 +5,12 @@
     color: white;
     font-weight:300;
     height: 100%;
-    letter-spacing: .02em;
+    letter-spacing: .03em;
   //}
-/*******Hide error messages for testing purposes. Remove*******/
-  .growl-container{
-    display:none;
-  }
 /*******Layout*******/
   .account-wall{
     width:320px;
-    margin:140px auto;
+    margin:120px auto;
     height: 360px;
     position: relative;
   }
@@ -52,10 +48,10 @@
     font-weight: 600 !important;
     letter-spacing: .16em;
     font-size: 12px !important;
-    -webkit-transition: background-color .2s ease-out!important;
-    -moz-transition: background-color .2s ease-out!important;
-    -o-transition: background-color .2s ease-out!important;
-    transition: background-color .2s ease-out!important;
+    -webkit-transition: background-color .1s ease-out!important;
+    -moz-transition: background-color .1s ease-out!important;
+    -o-transition: background-color .1s ease-out!important;
+    transition: background-color .1s ease-out!important;
     margin-top: 48px;
     position: absolute;
     width: 100%;
@@ -80,15 +76,21 @@ ul.dropdown-menu{
   color:white;
   border:none;
   font-size:13px;
+  letter-spacing:.03em;
   padding:4px;
   font-weight:300;
   font-family:"Helvetica Neue", sans-serif;
   border-radius:2px !important;
-  -webkit-transition: background-color .2s ease-out !important;
-  -moz-transition: background-color .2s ease-out !important;
-  -o-transition: background-color .2s ease-out !important;
-  transition: background-color .2s ease-out !important;
+  -webkit-transition: background-color .1s ease-out !important;
+  -moz-transition: background-color .1s ease-out !important;
+  -o-transition: background-color .1s ease-out !important;
+  transition: background-color .1s ease-out !important;
   background-color:#3d3d3d;
+}
+
+.form-control{
+  border:1px solid #3d3d3d;
+  box-shadow:none;
 }
 
 .dropdown-toggle .fa-caret-down{
@@ -111,10 +113,10 @@ ul.dropdown-menu{
   padding:6px 8px;
     white-space: nowrap;
     width:100%;
-    -webkit-transition: background-color .2s ease-out !important;
-    -moz-transition: background-color .2s ease-out !important;
-    -o-transition: background-color .2s ease-out !important;
-    transition: background-color .2s ease-out !important;
+    -webkit-transition: background-color .1s ease-out !important;
+    -moz-transition: background-color .1s ease-out !important;
+    -o-transition: background-color .1s ease-out !important;
+    transition: background-color .1s ease-out !important;
 }
 
 .dropdown-menu li:hover{
