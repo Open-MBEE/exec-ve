@@ -104,7 +104,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
         }
     })
     .state('project', { //TODO this will be the ui to diff and merge and manage refs
-        url: '/:projectId',
+        url: '/projects/:projectId',
         resolve: {
             ticket: function($window, URLService, AuthService, $q, ApplicationService) {
                 var deferred = $q.defer();
@@ -120,11 +120,11 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             orgObs: function($stateParams, ProjectService, ticket) { 
                 return ProjectService.getOrgs();
             },
-            projectObs: function($stateParams, ProjectService, ticket, projectOb) {
-                return ProjectService.getProjects(projectOb.orgId);
-            },
             projectOb: function($stateParams, ProjectService, ticket) {
                 return ProjectService.getProject($stateParams.projectId);
+            },
+            projectObs: function($stateParams, ProjectService, ticket, projectOb) {
+                return ProjectService.getProjects(projectOb.orgId);
             },
             orgOb: function(ProjectService, projectOb, ticket) {
                 return ProjectService.getOrg(projectOb.orgId);
