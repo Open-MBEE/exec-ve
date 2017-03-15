@@ -92,7 +92,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                             projectId = project.id;
                         }
                     };
-                    $scope.spin = false;
+                    $scope.spin = false; 
                     $scope.continue = function() { 
                         $scope.spin = true;
                         if (orgId && projectId) {
@@ -197,10 +197,11 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 });
             }
         },
-        views: { //TODO nav and menu updates
+        views: { 
             'nav@': {
-                template: '<ve-nav mms-title="Model Manager" mms-org="org" mms-orgs="orgs" mms-project="project" mms-projects="projects" mms-ref="ref" mms-branch="branch" mms-branches="branches" mms-tag="tag" mms-tags="tags"></ve-nav>', 
+                template: '<ve-nav mms-title="ve_title" mms-org="org" mms-orgs="orgs" mms-project="project" mms-projects="projects" mms-ref="ref" mms-branch="branch" mms-branches="branches" mms-tag="tag" mms-tags="tags" mms-search="search"></ve-nav>', 
                 controller: function ($scope, $rootScope, orgOb, orgObs, projectOb, projectObs, refOb, branchOb, branchObs, tagOb, tagObs, search) {
+                    $rootScope.ve_title = orgOb.name;
                     $scope.org = orgOb;
                     $scope.orgs = orgObs;
                     $scope.project = projectOb;
@@ -210,10 +211,11 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                     $scope.branches = branchObs;
                     $scope.tag = tagOb;
                     $scope.tags = tagObs;
+                    $scope.search = search;
                 }
             },
             'menu@': {
-                template: '<ve-menu mms-title="Model Manager" mms-org="org" mms-project="project" mms-projects="projects" mms-branch="branch" mms-branches="branches" mms-tag="tag" mms-tags="tags"></ve-menu>',
+                template: '<ve-menu mms-title="ve_title" mms-org="org" mms-project="project" mms-projects="projects" mms-branch="branch" mms-branches="branches" mms-tag="tag" mms-tags="tags"></ve-menu>',
                 controller: function ($scope, $rootScope, orgOb, projectOb, projectObs, refOb, refObs, branchOb, branchObs, tagOb, tagObs) {
                     $rootScope.ve_title = orgOb.name;
                     $scope.org = orgOb;
@@ -342,7 +344,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
         },
         views: {
             'menu@': {
-                template: '<ve-menu mms-title="Model Manager" mms-org="org" mms-project="project" mms-projects="projects" mms-branch="branch" mms-branches="branches" mms-tag="tag" mms-tags="tags"></ve-menu>',
+                template: '<ve-menu mms-title="ve_title" mms-org="org" mms-project="project" mms-projects="projects" mms-branch="branch" mms-branches="branches" mms-tag="tag" mms-tags="tags"></ve-menu>',
                 controller: function ($scope, $rootScope, orgOb, projectOb, projectObs, refOb, refObs, branchOb, branchObs, tagOb, tagObs) {
                     $rootScope.ve_title = orgOb.name;
                     $scope.org = orgOb;

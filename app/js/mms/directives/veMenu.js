@@ -124,7 +124,6 @@ function veMenu(ProjectService, $state, $rootScope, $templateCache, growl) {
         restrict: 'E',
         template: template,
         scope: {
-            title: '@mmsTitle', //page title - used in mobile view only
             org: '<mmsOrg',
             project: '<mmsProject',
             projects: '<mmsProjects',
