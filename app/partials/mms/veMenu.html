@@ -8,7 +8,7 @@
             <ul class="dropdown-menu list-with-selected-item" uib-dropdown-menu role="menu"
                 aria-labelledby="simple-btn-keyboard-nav">
                 <li ng-repeat="project in projects" ng-click="updateProject(project)"
-                       ng-class="{'select-highlight': project.name === currentProject}">{{ project.name }}</li>
+                       ng-class="{'checked-list-item': project.name === currentProject}">{{ project.name }}</li>
             </ul>
         </div>
         <div class="breadcrumbs">
@@ -33,7 +33,7 @@
                         </button>
                     </li>
                     <li ng-repeat="branch in branches | orderBy:'name'" ng-click="updateBranch(branch)"
-                        ng-class="{'select-highlight': branch.name === currentBranch}">{{ branch.name }}
+                        ng-class="{'checked-list-item': branch.name === currentBranch}">{{ branch.name }}
                     </li>
                 </ul>
             </div>
@@ -50,9 +50,9 @@
                     <li class="button-item">
                         <button class="btn btn-large btn-block btn-primary" ng-click="refsView()">Manage Tags</button>
                     </li>
-                    <li ng-click="latestTag()" ng-class="{'select-highlight': tag.name === currentTag}">latest</li>
+                    <li ng-click="latestTag()" ng-class="{'checked-list-item': tag.name === currentTag}">latest</li>
                     <li ng-repeat="tag in tags | orderBy:'name'" ng-click="updateTag(tag)"
-                           ng-class="{'select-highlight': tag.name === currentTag}">{{ tag.name }}</li>
+                           ng-class="{'checked-list-item': tag.name === currentTag}">{{ tag.name }}</li>
                 </ul>
             </div>
             </li>
