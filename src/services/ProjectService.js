@@ -99,6 +99,7 @@ function ProjectService($q, $http, URLService, CacheService, ApplicationService)
                 var projects = [];
                 for (var i = 0; i < response.data.projects.length; i++) {
                     var project = response.data.projects[i];
+                    if(orgId) project.orgId = orgId; //To remove after Jason fixes service
                     CacheService.put(['project', project.id], project, true);
                     projects.push(CacheService.get(['project', project.id]));
                 }
