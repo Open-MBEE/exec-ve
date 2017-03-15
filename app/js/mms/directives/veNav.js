@@ -63,7 +63,7 @@ function veNav($templateCache, $rootScope, $state, hotkeys, growl, $location, $u
                     };
                     $scope.spin = false;
                     $scope.continue = function() {
-                        $scope.spin = true;
+                        $scope.spin = true; //the continue button on the modal needs to be wider to show the spiral
                         if(orgId && projectId)
                             $state.go('project.ref', {orgId: orgId, projectId: projectId, refId: 'master'});
                     };
@@ -130,7 +130,7 @@ function veNav($templateCache, $rootScope, $state, hotkeys, growl, $location, $u
         restrict: 'E',
         template: template,
         scope: {
-            title: '@mmsTitle', //page title - used in mobile view only
+            title: '<mmsTitle', //page title - used in mobile view only
             org: '<mmsOrg',
             orgs: '<mmsOrgs',
             project: '<mmsProject',
@@ -139,7 +139,8 @@ function veNav($templateCache, $rootScope, $state, hotkeys, growl, $location, $u
             branch: '<mmsBranch',
             branches: '<mmsBranches',
             tag: '<mmsTag',
-            tags: '<mmsTags'
+            tags: '<mmsTags',
+            search: '<mmsSearch'
         },
         link: veNavLink
     };
