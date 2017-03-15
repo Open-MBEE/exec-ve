@@ -52,7 +52,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
         }
     })
     .state('project', { //TODO this will be the ui to diff and merge and manage refs
-        url: '/:projectId',
+        url: '/projects/:projectId',
         resolve: {
             ticket: function($window, URLService, AuthService, $q, ApplicationService) {
                 var deferred = $q.defer();
