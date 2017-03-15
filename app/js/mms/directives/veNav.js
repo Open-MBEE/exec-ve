@@ -61,6 +61,7 @@ function veNav($templateCache, $rootScope, $state, hotkeys, growl, $location, $u
                             projectId = project.id;
                             $scope.selectedProject = project.name;
                     };
+                    $scope.spin = false;
                     $scope.continue = function() {
                         $scope.spin = true;
                         if(orgId && projectId)
