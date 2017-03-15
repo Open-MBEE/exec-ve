@@ -91,8 +91,8 @@ function mmsDiffAttr(ElementService, WorkspaceService, ConfigService, URLService
 
 
         WorkspaceService.getWorkspace(wsTwo).then(function(data) {
-            tagOrTimestamp(scope.mmsVersionTwo, scope.mmsWsTwo).then(function(versionOrTs){
-                getComparsionText(versionOrTs, scope.mmsWsTwo).then(function(data){
+            tagOrTimestamp(scope.mmsVersionTwo, wsTwo).then(function(versionOrTs){
+                getComparsionText(versionOrTs, wsTwo).then(function(data){
                     scope.compElem = angular.element(data).text();
                     var promise2 = $interval(
                         function(){
@@ -157,24 +157,34 @@ function mmsDiffAttr(ElementService, WorkspaceService, ConfigService, URLService
             }
         };
 
+        var createTransclude = function(elt, type, ts, ws){
+            var transcludeElm = angular.element('<mms-transclude-'+ type +'>');
+            transcludeElm.attr("mms-eid", elt.sysmlid);
+            transcludeElm.attr("mms-version", ts);
+            transcludeElm.attr("mms-ws", ws);
+        };
+
         // Get the text to compare for diff
         var getComparsionText = function(ts, ws){
             var deferred = $q.defer();
             ElementService.getElement(scope.mmsEid, false, ws, ts).then(function(data){
-                var htmlData = angular.element(findElemType(data));
-
+                // var htmlData =  findElemType(data);
+                // if (scope.mmsAttr == 'doc') {
+                var htmlData = createTransclude(data, scope.mmsAttr, ts, ws);
+                // }
+            
                 // inject workspace and timestamp - check for data-mms-* and mms-*
-                htmlData.find("mms-transclude-doc").each(function() {
-                    setVersionWs(this, ts);
-                });
+                // htmlData.find("mms-transclude-doc").each(function() {
+                //     setVersionWs(this, ts);
+                // });
 
-                htmlData.find("mms-transclude-name").each(function() {
-                    setVersionWs(this, ts);
-                });
+                // htmlData.find("mms-transclude-name").each(function() {
+                //     setVersionWs(this, ts);
+                // });
 
-                htmlData.find("mms-transclude-val").each(function() {
-                    setVersionWs(this, ts);
-                });
+                // htmlData.find("mms-transclude-val").each(function() {
+                //     setVersionWs(this, ts);
+                // });
                 $compile(htmlData)($rootScope.$new());
                 deferred.resolve(htmlData);
             }, function(reason) {
@@ -257,7 +267,7 @@ function mmsDiffAttr(ElementService, WorkspaceService, ConfigService, URLService
             mmsVersionOne: '@',
             mmsVersionTwo: '@'
         },
-        template: '<style>del{color: black;background: #ffbbbb;} ins{color: black;background: #bbffbb;} .match,.textdiff span {color: gray;}</style><div class="textdiff"  processing-diff left-obj="origElem" right-obj="compElem" ></div>',
+        template: '<style>del{color: black;background: #ffbbbb;} ins{color: black;background: #bbffbb;} .match,.textdiff span {color: gray;}</style><div class="textdiff"  semantic-diff left-obj="origElem" right-obj="compElem" ></div>',
         require: '?^^mmsView',
         link: mmsDiffAttrLink
     };
