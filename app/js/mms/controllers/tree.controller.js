@@ -5,10 +5,10 @@
 angular.module('mmsApp')
 .controller('TreeCtrl', ['$anchorScroll' , '$q', '$filter', '$location', '$uibModal', '$scope', '$rootScope', '$state','$timeout', 'growl', 
                           'UxService', 'ElementService', 'UtilsService', 'ViewService', 'ProjectService', 'MmsAppUtils', 'documentOb', 'viewOb',
-                          'orgOb', 'projectOb', 'refOb', 'refObs', 'groupObs', 'documentObs',
+                          'orgOb', 'projectOb', 'refOb', 'refObs', 'groupObs',
 function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $timeout, growl, 
     UxService, ElementService, UtilsService, ViewService, ProjectService, MmsAppUtils, documentOb, viewOb,
-    orgOb, projectOb, refOb, refObs, groupObs, documentObs) {
+    orgOb, projectOb, refOb, refObs, groupObs) {
 
     $rootScope.mms_refOb = refOb;
     $rootScope.mms_bbApi = $scope.bbApi = {};
@@ -180,27 +180,33 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     };
 
     var groupLevel2Func = function(groupOb, groupNode) {
-        var docs = [];
-        var docOb, i;
-        for (i = 0; i < documentObs.length; i++) {
-            docOb = documentObs[i];
-            if (docOb._groupId === groupOb._id) {
-                docs.push(docOb);
+        ViewService.getProjectDocuments({
+                    projectId: projectOb.id,
+                    refId: refOb.id,
+                    extended: true
+        }, 2).then(function(documentObs) {
+            var docs = [];
+            var docOb, i;
+            for (i = 0; i < documentObs.length; i++) {
+                docOb = documentObs[i];
+                if (docOb._groupId === groupOb._id) {
+                    docs.push(docOb);
+                }
             }
-        }
-        for (i = 0; i < docs.length; i++) {
-            docOb = docs[i];
-            groupNode.children.unshift({
-                label: docOb.name,
-                type: refOb.type === 'Branch' ? 'view' : 'snapshot',
-                data: docOb,
-                group: groupOb,
-                children: []
-            });
-        }
-        if ($scope.treeApi.refresh) {
-            $scope.treeApi.refresh();
-        }
+            for (i = 0; i < docs.length; i++) {
+                docOb = docs[i];
+                groupNode.children.unshift({
+                    label: docOb.name,
+                    type: refOb.type === 'Branch' ? 'view' : 'snapshot',
+                    data: docOb,
+                    group: groupOb,
+                    children: []
+                });
+            }
+            if ($scope.treeApi.refresh) {
+                $scope.treeApi.refresh();
+            }
+        });
     };
     
     var viewId2node = {};
@@ -248,16 +254,22 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     };
     if ($state.includes('project.ref') && !$state.includes('project.ref.document')) {
         $scope.treeData = UtilsService.buildTreeHierarchy(groupObs, "_id", "group", "_parentId", groupLevel2Func);
-        for (var i = 0; i < documentObs.length; i++) {
-            if (!documentObs[i]._groupId) {
-                $scope.treeData.push({
-                    label: documentObs[i].name,
-                    type: 'view',
-                    data: documentObs[i],
-                    children: []
-                });
+        ViewService.getProjectDocuments({
+                    projectId: projectOb.id,
+                    refId: refOb.id,
+                    extended: true
+        }, 2).then(function(documentObs) {
+            for (var i = 0; i < documentObs.length; i++) {
+                if (!documentObs[i]._groupId) {
+                    $scope.treeData.push({
+                        label: documentObs[i].name,
+                        type: 'view',
+                        data: documentObs[i],
+                        children: []
+                    });
+                }
             }
-        }
+        });
     } else {
         var seenChild = {};        
         if (!documentOb._childViews) {

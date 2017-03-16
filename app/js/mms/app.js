@@ -104,13 +104,13 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             groupObs: function($stateParams, ProjectService, ticket) {
                 return ProjectService.getGroups($stateParams.projectId, $stateParams.refId);
             },
-            documentObs: function($stateParams, ViewService, ticket) {
-                return ViewService.getProjectDocuments({
-                    projectId: $stateParams.projectId,
-                    refId: $stateParams.refId,
-                    extended: true
-                }, 2);
-            },
+            // documentObs: function($stateParams, ViewService, ticket) {
+            //     return ViewService.getProjectDocuments({
+            //         projectId: $stateParams.projectId,
+            //         refId: $stateParams.refId,
+            //         extended: true
+            //     }, 2);
+            // },
             documentOb: function(){ return null;},
             viewOb: function(){ return null;},
             search: function($stateParams, ElementService, ticket) {
@@ -165,7 +165,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
     .state('project.ref.preview', {
         url: '/document/:documentId',
         resolve: {
-            documentOb: function($stateParams, $q, ElementService, ViewService, documentObs, refOb, ticket) {
+            documentOb: function($stateParams, $q, ElementService, ViewService, refOb, ticket) {
                 var deferred = $q.defer();
                 var eid = $stateParams.documentId;
                 var coverIndex = eid.indexOf('_cover');
@@ -233,7 +233,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
     .state('project.ref.document', {
         url: '/documents/:documentId', 
         resolve: {
-            documentOb: function($stateParams, ElementService, documentObs, ticket) {
+            documentOb: function($stateParams, ElementService, ticket) {
                 return ElementService.getElement({
                     projectId: $stateParams.projectId,
                     refId: $stateParams.refId,
