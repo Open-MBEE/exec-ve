@@ -42,7 +42,7 @@ function mmsValueLink(ElementService, $compile, growl) {
         .then(function(data) {
             if (data.specialization && data.specialization.type === 'Property') {
                 var value = data.specialization.value;
-                if (angular.isArray(value) && value.length !== 0 && value[0].string.length !== 0) {
+                if (angular.isArray(value) && value.length !== 0 && value[0].string && value[0].string.length !== 0) {
                     scope.url = value[0].string;
                 } else {
                     if (scope.mmsErrorText){
