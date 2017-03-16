@@ -50,7 +50,7 @@ function mmsNav($templateCache, $state, hotkeys, growl, $location, $uibModal, $h
                 scope.mmsV = data;
               }, function(reason) {
                 scope.mmsV = "Could not retrieve due to failure: " + reason.message;
-          	});
+            });
             var instance = $uibModal.open({
                 templateUrl: 'partials/mms/about.html',
                 scope: scope,
