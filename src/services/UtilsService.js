@@ -384,7 +384,7 @@ function UtilsService($q, $http, CacheService, URLService, _) {
         if (para.nonEditable) {
             attr = ' data-non-editable="' + para.nonEditable + '"';
         }
-        return '<mms-transclude-' + t + ' mms-element-id="' + para.source + '"' + attr + '></mms-transclude-' + t + '>';
+        return '<mms-transclude-' + t + ' mms-eid="' + para.source + '"' + attr + '></mms-transclude-' + t + '>';
     };
 
     var makeHtmlTOC = function (tree) {
