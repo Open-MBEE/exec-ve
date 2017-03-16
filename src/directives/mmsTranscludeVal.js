@@ -360,7 +360,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
         restrict: 'E',
         //template: template,
         scope: {
-            mmsElementId: '@',
+            mmsElementId: '@mmsEid',
             mmsProjectId: '@',
             mmsRefId: '@',
             mmsCommitId: '@',

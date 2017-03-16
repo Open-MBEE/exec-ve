@@ -270,7 +270,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
     return {
         restrict: 'E',
         scope: {
-            mmsElementId: '@',
+            mmsElementId: '@mmsEid',
             mmsProjectId: '@',
             mmsRefId: '@',
             mmsCommitId: '@',

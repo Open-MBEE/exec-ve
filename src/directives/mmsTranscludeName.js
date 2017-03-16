@@ -203,7 +203,7 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
     return {
         restrict: 'E',
         scope: {
-            mmsElementId: '@',
+            mmsElementId: '@mmsEid',
             mmsProjectId: '@',
             mmsRefId: '@',
             mmsCommitId: '@',
