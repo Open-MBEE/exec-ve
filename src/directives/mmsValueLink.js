@@ -42,15 +42,13 @@ function mmsValueLink(ElementService, $compile, growl) {
         .then(function(data) {
             if (data.specialization && data.specialization.type === 'Property') {
                 var value = data.specialization.value;
-                if (angular.isArray(value) && value.length !== 0 && value[0].string.length !== 0) {
-
+                if (angular.isArray(value) && value.length !== 0 && value[0].string && value[0].string.length !== 0) {
                     scope.url = value[0].string;
-                }
-                else {
+                } else {
                     if (scope.mmsErrorText){
                         element.html('<span>'+ scope.mmsErrorText +'</span>');
                     } else {
-                        element.html('<span>Element does not provide link value.</span>');
+                        element.html('<span class="mms-error">Element does not provide link value.</span>');
                     }
                 }
             }
