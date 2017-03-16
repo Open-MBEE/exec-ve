@@ -271,7 +271,7 @@ function UxService($rootScope) {
     }
   };
 
-  var MetaTypes = ['configuration', 'connector', 'dependency', 'directedrelationship', 'element', 'property', 'generalization', 'package', 'section', 'site', 'snapshot', 'view', 'workspace', 'table', 'figure', 'equation', 'view-composite', 'view-shared', 'view-none' ];
+  var MetaTypes = ['tag', 'connector', 'dependency', 'directedrelationship', 'element', 'property', 'generalization', 'package', 'section', 'group', 'snapshot', 'view', 'branch', 'table', 'figure', 'equation', 'view-composite', 'view-shared', 'view-none' ];
 
   var getTreeTypes = function() {
     var treeTypes = {};
