@@ -66,7 +66,9 @@ div.tooltip-inner {
 
 /******* UI Elements > Buttons*******/
 
-.ve-dark-modal{
+.ve-dark-modal,
+.ve-dark-dropdown-nav,
+.ve-dark-dropdown-menu{
   .btn{
     font-weight: 500;
     letter-spacing: .14em;

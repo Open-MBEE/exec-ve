@@ -129,7 +129,7 @@ a.switch-org:hover,{
 	font-weight: 200;
 	font-size: 14px;
 	line-height:40px;
-	padding: 0 8px 0 13px;
+	padding: 0 5px 0 13px;
 	color:#b3b3b3;
 }
 
@@ -152,13 +152,17 @@ a.switch-org:hover,{
 	border: none;
 	border-radius: 3px;
 	font-size: 13px;
-	width:300px;
+	width:330px;
 	padding: 4px 28px 4px 8px;
 	height:	28px;
 	margin:6px 0;
 	color:white;
 	font-weight:300;
-	letter-spacing: .02em;
+	letter-spacing: .03em;
+}
+
+#global-search input:focus{
+	background-color:#212121;
 }
 
 #global-search::after {
@@ -172,93 +176,6 @@ a.switch-org:hover,{
 	color:#939393;
 }
 
-
-
-/*******Modal Window*******/
-
-.modal-content{
-	background-color:#404040;
-	border:none;
-	border-radius:3px;
-}
-
-.modal-body{
-	padding: 16px 15px 30px;
-}
-
-.modal-title{
-	margin: 0;
-	line-height: 1.42857143;
-	font-weight: 300;
-	font-size: 13px;
-	text-transform: uppercase;
-	letter-spacing: .08em;
-}
-
-.modal-header{
-	border-bottom: 1px solid #313131;
-}
-
-.modal-footer{
-	border-top: 1px solid #313131;
-}
-
-.modal-sm{
-	width:320px;
-}
-
-/*******Buttons*******/
-
-.btn{
-	font-weight: 500;
-	letter-spacing: .14em;
-	font-size: 12px;
-	-webkit-transition: background-color .1s ease-out;
-	-moz-transition: background-color .1s ease-out;
-	-o-transition: background-color .1s ease-out;
-	transition: background-color .1s ease-out;
-	border:none;
-	text-transform: uppercase;
-	border-radius:2px;
-}
-
-
-/*******Buttons > Primary button*******/
-
-.btn-primary{
-	background-color: #2F889A;
-	padding:7px 16px;
-}
-
-.btn-primary:hover{
-	background-color: #296f83;
-	border:none;
-}
-
-/*******Buttons > WARNING button*******/
-
-.btn-warning{
-	background-color: rgba(255,255,255,0);
-	border:none;
-}
-
-.btn-warning:hover{
-	background-color: rgba(255,255,255,0);
-}
-
-#modal-window{
-	display:block;
-}
-
-@media (max-width: 1000px) {
-  .global-menu {
-    display: none;
-  }
-  .global-menu-hamburger {
-    display: block;
-  }
-
-}
 
 
 
