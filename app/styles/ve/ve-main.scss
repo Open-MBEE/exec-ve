@@ -51,7 +51,7 @@ div.tooltip-inner {
 
 /****Turn global menu into hamburger when mobile****/
 
-@media (max-width: 1000px) {
+@media (max-width: 1100px) {
   .global-menu {
     display: none;
   }
@@ -227,7 +227,8 @@ div.tooltip-inner {
   /*Clearing bootstrap*/
   ul.dropdown-menu{
     min-height:0;
-    overflow: auto
+    overflow-y: scroll;
+    max-height: 300px;
   }
 
   .dropdown-toggle{
@@ -243,6 +244,7 @@ div.tooltip-inner {
     -o-transition: background-color .1s ease-out !important;
     transition: background-color .1s ease-out !important;
     background-color:#3d3d3d;
+    line-height:18px;
   }
 
   .dropdown-toggle .fa-caret-down{
