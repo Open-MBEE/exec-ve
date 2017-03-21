@@ -1,13 +1,13 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsViewEquation', ['$templateCache', '$compile', '$rootScope', mmsViewEquation]);
+.directive('mmsViewEquation', [mmsViewEquation]);
 
-function mmsViewEquation($templateCache, $compile, $rootScope) {
+function mmsViewEquation() {
 
     return {
         restrict: 'E',
-        template: '<mms-transclude-doc data-mms-eid="{{para.source}}"></mms-transclude-doc>',
+        template: '<mms-transclude-doc data-mms-element-id="{{para.source}}"></mms-transclude-doc>',
         scope: {
             para: '<mmsPara'
         }

@@ -1,26 +1,32 @@
 'use strict';
 
 angular.module('mms')
-.factory('AuthService', ['$q', '$http', 'URLService','HttpService', 'ElementService', 'ViewService', 'ConfigService', 'WorkspaceService', 'SiteService', '$window', '$cookies', AuthService]);
+.factory('AuthService', ['$q', '$http', 'URLService','HttpService', 'ElementService', 'ViewService', 'ProjectService', '$window', '$cookies', AuthService]);
 
-function AuthService($q, $http, URLService, HttpService, ElementService, ViewService, ConfigService, WorkspaceService, SiteService, $window, $cookies) {
+/**
+ * @ngdoc service
+ * @name mms.ApplicationService
+ * @requires $q
+ * @requires $http
+ * @requires URLService
+ * @requires HttpService
+ * @requires ElementService
+ * @requires ViewService
+ * @requires ProjectService
+ *
+ * @description
+ * Provide general authorization functions. I.e. login, logout, etc...
+ */
+function AuthService($q, $http, URLService, HttpService, ElementService, ViewService, ProjectService, $window, $cookies) {
     
     var ticket= $window.localStorage.getItem('ticket');
     var getAuthorized = function (credentials) {
         var deferred = $q.defer();
         var loginURL = '/alfresco/service/api/login';
-        //var encode = $window.btoa(credentials.username + ' ' + credentials.password);
-        //$http.defaults.headers.common.Authorization = 'Basic ' + $window.btoa(credentials.username + ':' + credentials.password);
         $http.post(loginURL, credentials).then(function (success) {
             URLService.setTicket(success.data.data.ticket);
             ticket = success.data.data.ticket;
             $window.localStorage.setItem('ticket', ticket);
-            // $http.get(URLService.getCheckLoginURL(), {
-            //     headers: {
-            //         'Authorization': 'Basic ' + $window.btoa(credentials.username + ':' + credentials.password),
-            //         'withCredentials' : 'true'
-            //     }
-            // });
             deferred.resolve(ticket);
         }, function(fail){
             URLService.handleHttpStatus(fail.data, fail.status, fail.header, fail.config, deferred);
@@ -35,34 +41,30 @@ function AuthService($q, $http, URLService, HttpService, ElementService, ViewSer
         URLService.setTicket(null);
         HttpService.dropAll();
         ElementService.reset();
+        ProjectService.reset();
         ViewService.reset();
-        WorkspaceService.reset();
-        SiteService.reset();
-        ConfigService.reset();
     };
 
     var getTicket = function(){
         return ticket;
     };
+
     var checkLogin = function(){
-        var deferred = $q.defer();//:TODO
+        var deferred = $q.defer();
         if (!ticket) {
             deferred.reject(false);
             return deferred.promise;
         }
-        //var checkLogin = '/alfresco/service/api/login/ticket/'+ticket+'?alf_ticket='+ticket;
-        
+
         $http.get(URLService.getCheckTicketURL(ticket)).then(function (success) {
             deferred.resolve(success.data.username);
         }, function(fail){
-            //if(fail.status === 401) {
-                deferred.reject(fail);
-                removeTicket();
-            //}
+            deferred.reject(fail);
+            removeTicket();
         });  
         return deferred.promise;  
     };
-    
+
     var logout = function() {
         var deferred = $q.defer();
         checkLogin().then(function() {
@@ -78,10 +80,8 @@ function AuthService($q, $http, URLService, HttpService, ElementService, ViewSer
             );
             $http.delete(logouturl).then(function(success) {
                 deferred.resolve(true);
-                //$state.go('login');
             }, function(failure) {
                 URLService.handleHttpStatus(failure.data, failure.status, failure.headers, failure.config, deferred);
-                //growl.error('You were not logged out');
             });
         }, function() {
             removeTicket();
@@ -89,7 +89,7 @@ function AuthService($q, $http, URLService, HttpService, ElementService, ViewSer
         });
         return deferred.promise;
     };
-    
+
     return {
         getAuthorized: getAuthorized,    
         getTicket: getTicket,

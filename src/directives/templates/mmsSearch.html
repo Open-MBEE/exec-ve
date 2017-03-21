@@ -15,7 +15,7 @@
                     <button ng-click="setSearchType('name')" type="button" class="btn-search-name btn-search-type btn btn-default">NAME</button>
                     <button ng-click="setSearchType('documentation')" type="button" class="btn-search-documentation btn btn-search-type btn-default">DOCUMENTATION</button>
                     <button ng-click="setSearchType('value')" type="button" class="btn-search-value btn-search-type btn btn-default">VALUE</button>
-                    <button ng-click="setSearchType('sysmlId')" type="button" class="btn-search-sysmlId btn-search-type btn btn-default">MDID</button>
+                    <button ng-click="setSearchType('id')" type="button" class="btn-search-id btn-search-type btn btn-default">MDID</button>
                 </div>
             </div>
         </form>
@@ -24,13 +24,21 @@
                 <input class="form-control" type="text" ng-model="filterQuery.query" ng-model-options="{debounce: 1000}" placeholder="Filter results" />
             </div>
             <div class="container-search-type">
-	            <div class="btn-group btn-group-xs search-filter-type">
-	                <button ng-click="setFilterFacet('all')" type="button" class="btn-filter-facet-all btn-search-type btn btn-default active">ALL</button>
-	                <button ng-click="setFilterFacet('name')" type="button" class="btn-filter-facet-name btn-search-type btn btn-default">NAME</button>
-	                <button ng-click="setFilterFacet('documentation')" type="button" class="btn-filter-facet-documentation btn btn-search-type btn-default">DOCUMENTATION</button>
-	                <!-- <button ng-click="setFilterFacet('properties')" type="button" class="btn-filter-facet-value btn-search-type btn btn-default">VALUE</button> -->
-	                <button ng-click="setFilterFacet('sysmlId')" type="button" class="btn-filter-facet-sysmlId btn-search-type btn btn-default">MDID</button>
-	            </div>
+                <div class="btn-group btn-group-xs search-filter-type">
+                    <button ng-click="setFilterFacet('all')" type="button"
+                            class="btn-filter-facet-all btn-search-type btn btn-default active">ALL
+                    </button>
+                    <button ng-click="setFilterFacet('name')" type="button"
+                            class="btn-filter-facet-name btn-search-type btn btn-default">NAME
+                    </button>
+                    <button ng-click="setFilterFacet('documentation')" type="button"
+                            class="btn-filter-facet-documentation btn btn-search-type btn-default">DOCUMENTATION
+                    </button>
+                    <!-- <button ng-click="setFilterFacet('properties')" type="button" class="btn-filter-facet-value btn-search-type btn btn-default">VALUE</button> -->
+                    <button ng-click="setFilterFacet('id')" type="button"
+                            class="btn-filter-facet-id btn-search-type btn btn-default">MDID
+                    </button>
+                </div>
             </div>
             <div>Showing {{filteredElms.length}} <!--of {{searchResults.length}} -->search results. (Page {{currentPage + 1}}) <span class="mms-error" ng-if="ws !== 'master'">WARNING: Results shown are from master branch.</span></div>
         </div>
@@ -113,7 +121,7 @@
             <div ng-if="elem._relatedDocuments.length > 0" class="elem-documentation-wrapper">
                 <label>RELATED DOCUMENTS</label>
                 <div ng-repeat="relatedDocument in elem._relatedDocuments" class="elem-documentation">
-                    <a ng-repeat="relatedView in relatedDocument._parentViews" ui-sref="workspace.site.document.view({document: relatedDocument.sysmlId, view: relatedView.sysmlId, site: relatedDocument._siteCharacterizationId, search: undefined})" ng-click="userRelatedClick($event, relatedDocument, relatedView, elem)">
+                    <a ng-repeat="relatedView in relatedDocument._parentViews" ui-sref="workspace.site.document.view({document: relatedDocument.id, view: relatedView.id, site: relatedDocument._siteCharacterizationId, search: undefined})" ng-click="userRelatedClick($event, relatedDocument, relatedView, elem)">
                         {{relatedDocument.name}} > {{relatedView.name}}<br/>
                     </a>
                 </div>

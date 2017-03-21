@@ -1,80 +1,31 @@
 <div class="pane-right">
-    <div ng-if="document !== null">
+    <div ng-if="documentOb">
         <div class="container-fluid" ng-show="show.element">
-            <div ng-show="showTracker()">
-                <br>
-                <form class="form-horizontal">
-                    <div class="form-group">
-                        <label class="col-sm-3 control-label">Edits ({{veEditsLength()}}):</label>
-                        <div class="col-sm-9">
-                            <select class="form-control" ng-options="eid as edit.type + ': ' + edit.name for (eid, edit) in veEdits" ng-model="tracker.etrackerSelected" ng-change="etrackerChange()">
-                            <!-- <option value="">--- Choose Open Edits ---</option> -->
-                            </select>
-                        </div>
+            <br>
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">Edits ({{veEditsLength()}}):</label>
+                    <div class="col-sm-9">
+                        <select class="form-control" ng-options="eid as edit.type + ': ' + edit.name for (eid, edit) in veEdits" ng-model="tracker.etrackerSelected" ng-change="etrackerChange()">
+                        </select>
                     </div>
-                </form>
-            </div>
-            <mms-spec mms-eid="{{eid}}" mms-edit-field="all" mms-version="{{specVersion}}" mms-ws="{{specWs}}" mms-site="{{site.sysmlId}}" mms-spec-api="specApi" mms-type="{{elementType}}"></mms-spec>
+                </div>
+            </form>
+            <mms-spec mms-element-id="{{specInfo.id}}" mms-commit-id="{{specInfo.commitId}}" mms-ref-id="{{specInfo.refId}}" mms-project-id="{{specInfo.projectId}}" mms-spec-api="specApi"></mms-spec>
         </div>
     </div>
-    
-    <div ng-if="document !== null">
+
+    <div ng-if="documentOb">
         <div class="container-fluid" ng-if="show.history">
-          <mms-history mms-eid="{{eid}}" mms-ws="{{specWs}}" mms-type="{{elementType}}"></mms-history>
+          <mms-history mms-element-id="{{specInfo.id}}" mms-ref-id="{{specInfo.refId}}" mms-project-id="{{specInfo.projectId}}"></mms-history>
         </div>
     </div>
-    
+
     <div class="container-fluid" ng-show="show.reorder">
-        <mms-view-reorder mms-vid="{{vid}}" mms-version="{{version}}" mms-order="true" mms-ws="{{ws}}" mms-view-reorder-api="viewOrderApi"></mms-view-reorder>
+        <mms-view-reorder mms-vid="{{viewOb.id}}" mms-project-id="{{viewOb._projectId}}" mms-commit-id="{{viewCommitId}}" mms-order="true" mms-ref-id="{{viewOb._refId}}" mms-view-reorder-api="viewContentsOrderApi"></mms-view-reorder>
     </div>
 
-    <div class="container-fluid container-snapshots" ng-show="show.snapshots">
-        <h1>Snapshots <i class="{{snapshotLoading}}"></i></h1>
-        <input class="form-control" ng-model="snapshotsFilter" type="text" placeholder="Type here to filter snapshots">
-        <table class="snapshot-table table table-condensed">
-            <tr><th>Time</th><th>Created By</th><th>Tag</th></tr>
-            <tr>
-                <td>
-                    <a ui-sref="workspace.site.document({tag: undefined, search: undefined})" ui-sref-opts="{reload: true}" ng-click="snapshotClicked()">Latest</a>
-                </td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr ng-repeat="tag in tags | filter:snapshotsFilter | orderBy:'-_timestamp'">
-                <td>
-                    <a ui-sref="workspace.site.document({tag: tag.id, search: undefined})" ui-sref-opts="{reload: true}" ng-click="snapshotClicked()">{{tag._timestamp | date:'M/d/yy h:mm a'}}</a>
-                </td>
-                <td>{{tag._creator}}
-                </td>
-                <td>
-                    <a ui-sref="workspace.site({tag: tag.id, search: undefined})" ui-sref-opts="{reload: true}">{{tag.name}}</a>
-                </td>
-            </tr>
-        </table>
-    </div>
-
-    <div class="container-fluid container-snapshots" ng-show="show.tags">
-        <h1>Tags <i class="{{snapshotLoading}}"></i></h1>
-
-        <table class="snapshot-table table table-condensed">
-            <tr><th>Name</th><th>Time</th><th>Commit</th></tr>
-            <tr>
-                <td>
-                    <a ui-sref="workspace.sites({tag: undefined, search: undefined})" ui-sref-opts="{reload: true}">Latest</a>
-                </td>
-                <td></td><td></td>
-            </tr>
-            <tr ng-repeat="tag in tags | orderBy:'-_timestamp'">
-                <td>
-                    <a ui-sref="workspace.sites({tag: tag.id, search: undefined})" ui-sref-opts="{reload: true}">{{tag.name}}</a>
-                </td>
-                <td>{{tag._timestamp | date:'M/d/yy h:mm a'}}
-                </td>
-                <td>{{tag.commitId}}</td>
-            </tr>
-        </table>
-    </div>
     <div class="container-fluid" ng-show="show.jobs">
-        <mms-jobs mms-doc-id="{{docId}}" mms-ws="{{ws}}"></mms-jobs>
+        <mms-jobs mms-doc-id="{{documentOb.sysmlId}}" mms-project-id="{{projectOb.id}}" mms-ref-id="{{refOb.id}}"></mms-jobs>
     </div>
 </div>

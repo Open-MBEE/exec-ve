@@ -1,0 +1,98 @@
+#ve-origin-select,
+#ve-login {
+  //body {
+    background-color:#313131;
+    color: white;
+    font-weight:300;
+    height: 100%;
+    letter-spacing: .03em;
+  //}
+/*******Layout*******/
+  .account-wall{
+    width:320px;
+    margin:120px auto;
+    height: 360px;
+    position: relative;
+  }
+
+
+/****UI Elements > Input****/
+
+.form-control{
+  display:inline;
+  color:white;
+  border:none;
+  font-size:16px;
+  letter-spacing:.03em;
+  padding:6px 10px;
+  font-weight:300;
+  font-family:"Helvetica Neue", sans-serif;
+  border-radius:2px !important;
+  -webkit-transition: background-color .1s ease-out !important;
+  -moz-transition: background-color .1s ease-out !important;
+  -o-transition: background-color .1s ease-out !important;
+  transition: background-color .1s ease-out !important;
+  background-color:#3d3d3d;
+  width:100%;
+  text-align: left;
+  font-size:16px;
+  padding: 5px 8px;
+  height: 34px;
+  line-height: 18px;
+  margin:6px 0 18px;;
+}
+
+/*******Typograpphy*******/
+  .account-wall h2{
+    margin-bottom:32px;
+    font-size:44px;
+    text-align: center;
+    font-weight:100;
+    letter-spacing:.03em;
+  }
+  .module-disabled{
+    opacity:.3;
+  }
+  .bookmark{
+    text-align: right;
+  }
+  .bookmark a{
+    color:white;
+    text-decoration: underline;
+    font-weight:300;
+  }
+/*******Inputs (forms and buttons)*******/
+  .form-control:focus{
+     box-shadow:none;
+     border:1px solid #2F889A;
+  }
+
+  .form-control{
+    border:1px solid #3d3d3d;
+    box-shadow:none;
+  }
+
+  .label-text{
+    color: #d6d6d6;
+    font-size:14px;
+  }
+
+  /*Submit button*/
+  .account-wall .btn-block{
+    background-color: #2F889A;
+    font-weight: 600 !important;
+    letter-spacing: .16em;
+    font-size: 12px !important;
+    -webkit-transition: background-color .1s ease-out!important;
+    -moz-transition: background-color .1s ease-out!important;
+    -o-transition: background-color .1s ease-out!important;
+    transition: background-color .1s ease-out!important;
+    margin-top: 48px;
+    position: absolute;
+    width: 100%;
+    bottom: 0;
+  }
+  .account-wall .btn-block:hover{
+    background-color:#296f83;
+  }
+}

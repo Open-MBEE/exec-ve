@@ -2,66 +2,10 @@
 
 angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.borderLayout', 'ui.bootstrap', 'ui.router', 'ui.tree', 'angular-growl', 'cfp.hotkeys', 'angulartics', 'angulartics.piwik', 'diff-match-patch', 'ngCookies'])
 .config(function($stateProvider, $urlRouterProvider, $httpProvider) {
-    // Change the DEFAULT state to workspace.sites on entry
-    //$urlRouterProvider.when('', '/workspaces/master/sites');
-    //$urlRouterProvider.when('', '/login');
+
     
     $urlRouterProvider.rule(function ($injector, $location) {
-    // determine if the url is older 2.0 format (will not have a workspace)
-         // generate some random client id
          var locationPath = $location.url();
-         /*
-         if (locationPath.indexOf('/workspaces') === -1 && locationPath.indexOf('/login') === -1 && locationPath !== '' && locationPath !== '/')
-         {
-             locationPath = 'workspaces/master' + locationPath;
- 
-             var queryParams = '';
-             var pathArr = locationPath.split('/');
-             // var diff = '';
- 
-             // determine if this came from docweb.html or ve.html, is there a product?
-             if (locationPath.indexOf('/products/') !== -1) {
- 
-                 // replace products with documents
-                 locationPath = locationPath.replace('/products/', '/documents/');
-                 locationPath = locationPath.replace('/view/', '/views/');
-                 locationPath = locationPath.replace('/all', '/full');
- 
-                 // if there is a view, there should be a time in the url prior
-                 pathArr = locationPath.split('/');
- 
-                 // get the time param and remove it from the array
-                 var time = pathArr[6]; 
-                 pathArr.splice(6,1);
- 
-                 // add time as query param if it is not latest
-                 if (time && time !== 'latest') {
-                     queryParams += 'time=' + time;
-                 }
- 
-             }
- 
-             // if there is a config, remove it and add it as a tag query param
-             var idxOfTag = pathArr.indexOf('config');    
-             if (idxOfTag !== -1) {
-                 var tag = pathArr[idxOfTag+1];
-                 queryParams += 'tag=' + tag;
-                 pathArr.splice(idxOfTag, 2);
-                 var idxOfSite = pathArr.indexOf('sites'); //redirect old config page to tag landing page
-                 if (idxOfSite !== -1)
-                     pathArr.splice(idxOfSite, 2);
-             }
- 
-             locationPath = pathArr.join('/');
- 
- 
-             if (queryParams !== '') {
-                 locationPath += '?' + queryParams;
-             }
- 
-             //$location.url(locationPath);
-         }
-         */
          if (locationPath.indexOf('full%23') > 0)
              locationPath = locationPath.replace('full%23', 'full#');
          if (locationPath[0] !== '/')
@@ -69,52 +13,409 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
          if (locationPath !== $location.url())
              $location.url(locationPath);
      });
-        /*var $window = $injector.get('$window');
-        var loggedIn = $window.localStorage.getItem('ticket');
-        var path = $location.path(), normalized = path.toLowerCase();
-        if (!loggedIn && path.indexOf('login') === -1) {
-            $location.path('/login');
-        }
-    });*/
-    $urlRouterProvider.otherwise('/workspaces/master/sites');// when the url isn't mapped go here
+
     $httpProvider.defaults.withCredentials = true;
+    $urlRouterProvider.otherwise('/login');// when the url isn't mapped go here
+
     $stateProvider
     .state('login', {
         url: '/login',
         resolve: { },
         views: {
-            'pane-center': {
+            'login@': {
                 templateUrl: 'partials/mms/login.html',
-                controller: function ($scope, $rootScope, $state, $http, AuthService, growl) {
+                controller: function ($scope, $rootScope, $state, AuthService, growl) {
                     $scope.credentials = {
                       username: '',
                       password: ''
                     };
-                    $rootScope.mms_title = 'View Editor: Login';
+                    $rootScope.ve_title = 'View Editor: Login';
                     $scope.spin = false;
                     $scope.login = function (credentials) {
-                      $scope.spin = true;
-                      var credentialsJSON = {"username":credentials.username, "password":credentials.password};
-                          AuthService.getAuthorized(credentialsJSON).then(function (user) {
-                            if ($rootScope.mmsRedirect) {
-                                var toState = $rootScope.mmsRedirect.toState;
-                                var toParams = $rootScope.mmsRedirect.toParams;
+                        $scope.spin = true;
+                        var credentialsJSON = {"username":credentials.username, "password":credentials.password};
+                        AuthService.getAuthorized(credentialsJSON)
+                        .then(function(user) {
+                            if ($rootScope.ve_redirect) {
+                                var toState = $rootScope.ve_redirect.toState;
+                                var toParams = $rootScope.ve_redirect.toParams;
                                 $state.go(toState, toParams);
                             } else {
-                              $state.go('workspace.sites', {workspace: 'master'});
+                                $state.go('login.select');
                             }
-                          }, function (reason) {
+                        }, function (reason) {
                             $scope.spin = false;
-                                growl.error(reason.message);
-                          });
+                            growl.error(reason.message);
+                        });
                     };
                 }   
-            },
-            //'menu':{
-             //   template: '<p class="pull-left" style="font-weight: 200; line-height: 1.28571em; padding-left:10px;">View Editor</p>'
-            //}
+            }
         }
     })
+    .state('login.select', {
+        url: '/select',
+        resolve: {
+            ticket: function($window, URLService, AuthService, $q, ApplicationService) {
+                var deferred = $q.defer();
+                AuthService.checkLogin().then(function(data) {
+                    ApplicationService.setUserName(data);
+                    URLService.setTicket($window.localStorage.getItem('ticket'));
+                    deferred.resolve($window.localStorage.getItem('ticket'));
+                }, function(rejection) {
+                    deferred.reject(rejection);
+                });
+                return deferred.promise;
+            },
+            orgObs: function($stateParams, ProjectService, ticket) { 
+                return ProjectService.getOrgs();
+            }
+        },
+        views: {
+            'login@': {
+                templateUrl: 'partials/mms/select.html',
+                controller: function($scope, $rootScope, $state, orgObs, ProjectService) {
+                    $rootScope.ve_title = 'View Editor'; //what to name this?
+                    $scope.orgs = orgObs; 
+                    var orgId, projectId;
+                    $scope.selectOrg = function(org) {
+                        if (org) {
+                            orgId = org.id;
+                            $scope.selectedOrg = org.name;
+                            $scope.selectedProject = "";
+                            ProjectService.getProjects(orgId).then(function(data){
+                                $scope.projects = data;
+                            });
+                        }
+                    };
+                    $scope.selectProject = function(project) { 
+                        if (project) {
+                            $scope.selectedProject = project.name;
+                            projectId = project.id;
+                        }
+                    };
+                    $scope.spin = false; 
+                    $scope.continue = function() { 
+                        $scope.spin = true;
+                        if (orgId && projectId) {
+                            $state.go('project.ref', {orgId: orgId, projectId: projectId, refId: 'master'});
+                        }
+                    };
+                }
+            }
+        }
+    })
+    .state('project', { //TODO this will be the ui to diff and merge and manage refs
+        url: '/projects/:projectId',
+        resolve: {
+            ticket: function($window, URLService, AuthService, $q, ApplicationService) {
+                var deferred = $q.defer();
+                AuthService.checkLogin().then(function(data) {
+                    ApplicationService.setUserName(data);
+                    URLService.setTicket($window.localStorage.getItem('ticket'));
+                    deferred.resolve($window.localStorage.getItem('ticket'));
+                }, function(rejection) {
+                    deferred.reject(rejection);
+                });
+                return deferred.promise;
+            },
+            orgObs: function($stateParams, ProjectService, ticket) { 
+                return ProjectService.getOrgs();
+            },
+            projectOb: function($stateParams, ProjectService, ticket) {
+                return ProjectService.getProject($stateParams.projectId);
+            },
+            projectObs: function($stateParams, ProjectService, ticket, projectOb) {
+                return ProjectService.getProjects(projectOb.orgId);
+            },
+            orgOb: function(ProjectService, projectOb, ticket) {
+                return ProjectService.getOrg(projectOb.orgId);
+            },
+            refObs: function($stateParams, ProjectService, ticket) {
+                return ProjectService.getRefs($stateParams.projectId);
+            },
+            tagObs: function(refObs) {
+                var ret = [];
+                for (var i = 0; i < refObs.length; i++) {
+                    if (refObs[i].type === "Tag")
+                        ret.push(refObs[i]);
+                }
+                return ret;
+            },
+            branchObs: function(refObs) {
+                var ret = [];
+                for (var i = 0; i < refObs.length; i++) {
+                    if (refObs[i].type === "Branch")
+                        ret.push(refObs[i]);
+                }
+                return ret;
+            }
+        }
+    })
+    .state('project.ref', { //equivalent to old sites and documents page
+        url: '/:refId?search',
+        resolve: {
+            refOb: function($stateParams, ProjectService, ticket) {
+                return ProjectService.getRef($stateParams.refId, $stateParams.projectId);
+            },
+            tagOb: function(refOb) {
+                if(refOb.type === "Tag")
+                    return refOb;
+                else {
+                    return {name: "latest"};
+                }
+            },
+            branchOb: function(refOb) {
+                if(refOb.type === "Branch")
+                    return refOb;
+                else {
+                    return {name: "master"};
+                }
+            },
+            groupObs: function($stateParams, ProjectService, ticket) {
+                return ProjectService.getGroups($stateParams.projectId, $stateParams.refId);
+            },
+            // documentObs: function($stateParams, ViewService, ticket) {
+            //     return ViewService.getProjectDocuments({
+            //         projectId: $stateParams.projectId,
+            //         refId: $stateParams.refId,
+            //         extended: true
+            //     }, 2);
+            // },
+            documentOb: function(){ return null;},
+            viewOb: function(){ return null;},
+            search: function($stateParams, ElementService, ticket) {
+                if ($stateParams.search === undefined) {
+                    return null;
+                }
+                return ElementService.search({
+                        projectId: $stateParams.projectId,
+                        refId: $stateParams.refId
+                    }, $stateParams.search, ['*'], null, 0, 50, 2)
+                .then(function(data) {
+                    return data;
+                }, function(reason) {
+                    return null;
+                });
+            }
+        },
+        views: { 
+            'nav@': {
+                template: '<ve-nav mms-title="ve_title" mms-org="org" mms-orgs="orgs" mms-project="project" mms-projects="projects" mms-ref="ref" mms-branch="branch" mms-branches="branches" mms-tag="tag" mms-tags="tags" mms-search="search"></ve-nav>', 
+                controller: function ($scope, $rootScope, orgOb, orgObs, projectOb, projectObs, refOb, branchOb, branchObs, tagOb, tagObs, search) {
+                    $rootScope.ve_title = orgOb.name;
+                    $scope.org = orgOb;
+                    $scope.orgs = orgObs;
+                    $scope.project = projectOb;
+                    $scope.projects = projectObs;
+                    $scope.ref = refOb;
+                    $scope.branch = branchOb;
+                    $scope.branches = branchObs;
+                    $scope.tag = tagOb;
+                    $scope.tags = tagObs;
+                    $scope.search = search;
+                }
+            },
+            'menu@': {
+                template: '<ve-menu mms-title="ve_title" mms-org="org" mms-project="project" mms-projects="projects" mms-branch="branch" mms-branches="branches" mms-tag="tag" mms-tags="tags"></ve-menu>',
+                controller: function ($scope, $rootScope, orgOb, projectOb, projectObs, refOb, refObs, branchOb, branchObs, tagOb, tagObs) {
+                    $rootScope.ve_title = orgOb.name;
+                    $scope.org = orgOb;
+                    $scope.project = projectOb;
+                    $scope.projects = projectObs;
+                    $scope.ref = refOb;
+                    $scope.refs = refObs;
+                    $scope.branch = branchOb;
+                    $scope.branches = branchObs;
+                    $scope.tag = tagOb;
+                    $scope.tags = tagObs;
+                }
+            },
+            'pane-left@': {
+                templateUrl: 'partials/mms/pane-left.html',
+                controller: 'TreeCtrl'
+            },
+            'pane-center@': {
+                templateUrl: 'partials/mms/pane-center.html',
+                controller: 'ViewCtrl'
+            },
+            'pane-right@': {
+                templateUrl: 'partials/mms/pane-right.html',
+                controller: 'ToolCtrl'
+            },
+            'toolbar-right@': {
+                template: '<mms-toolbar buttons="buttons" on-click="onClick(button)" mms-tb-api="tbApi"></mms-toolbar>',
+                controller: 'ToolbarCtrl'
+            } 
+        }
+    })
+    .state('project.ref.manage', { //not needed right now, for managing mounts
+        url: '/manage'
+    })
+    .state('project.ref.preview', {
+        url: '/document/:documentId',
+        resolve: {
+            documentOb: function($stateParams, $q, ElementService, ViewService, refOb, ticket) {
+                var deferred = $q.defer();
+                var eid = $stateParams.documentId;
+                var coverIndex = eid.indexOf('_cover');
+                if (coverIndex > 0) {
+                    var groupId = eid.substring(0, coverIndex);
+                    ElementService.getElement({
+                        projectId: $stateParams.projectId,
+                        refId: $stateParams.refId,
+                        extended: true,
+                        elementId: eid
+                    }, 2).then(function(data) {
+                        deferred.resolve(data);
+                    }, function(reason) {
+                        if (reason.status === 404) {
+                            if (refOb.type === 'Tag') {
+                                deferred.resolve(null);
+                            } else {
+                                ViewService.createView({
+                                        _projectId: $stateParams.projectId, 
+                                        _refId: $stateParams.refId,
+                                        id: groupId
+                                    },{
+                                        viewName: 'Need to get package name Cover Page', 
+                                        viewId: eid
+                                    }, 2)
+                                .then(function(data) {
+                                    deferred.resolve(data);
+                                }, function(reason2) {
+                                    deferred.reject(reason2);
+                                });
+                            }
+                        } else {
+                            deferred.reject(reason);
+                        }
+                    });
+                } else {
+                    ElementService.getElement({
+                        projectId: $stateParams.projectId,
+                        refId: $stateParams.refId,
+                        extended: true,
+                        elementId: $stateParams.documentId
+                    }, 2).then(function(data){
+                        deferred.resolve(data);
+                    }, function(reason) {
+                        deferred.reject(reason);
+                    });
+                }
+                return deferred.promise;
+            },
+            viewOb: function(documentOb) {
+                return documentOb;
+            }
+        },
+        views: {
+            'pane-center@': {
+                templateUrl: 'partials/mms/pane-center.html',
+                controller: 'ViewCtrl'
+            },
+            'pane-right@': {
+                templateUrl: 'partials/mms/pane-right.html',
+                controller: 'ToolCtrl'
+            }
+        }
+    })
+    .state('project.ref.document', {
+        url: '/documents/:documentId', 
+        resolve: {
+            documentOb: function($stateParams, ElementService, ticket) {
+                return ElementService.getElement({
+                    projectId: $stateParams.projectId,
+                    refId: $stateParams.refId,
+                    extended: true,
+                    elementId: $stateParams.documentId
+                }, 2);
+            },
+            viewObs: function($stateParams, ViewService, ticket) {
+                return [];
+                /*return ViewService.getDocumentViews({
+                    projectId: $stateParams.projectId,
+                    refId: $stateParams.refId,
+                    extended: true,
+                    elementId: $stateParams.documentId
+                }, 2);*/
+            },
+            viewOb: function(documentOb) {
+                return documentOb;
+            }
+        },
+        views: {
+            'menu@': {
+                template: '<ve-menu mms-title="ve_title" mms-org="org" mms-project="project" mms-projects="projects" mms-branch="branch" mms-branches="branches" mms-tag="tag" mms-tags="tags"></ve-menu>',
+                controller: function ($scope, $rootScope, orgOb, projectOb, projectObs, refOb, refObs, branchOb, branchObs, tagOb, tagObs) {
+                    $rootScope.ve_title = orgOb.name;
+                    $scope.org = orgOb;
+                    $scope.project = projectOb;
+                    $scope.projects = projectObs;
+                    $scope.ref = refOb;
+                    $scope.refs = refObs;
+                    $scope.branch = branchOb;
+                    $scope.branches = branchObs;
+                    $scope.tag = tagOb;
+                    $scope.tags = tagObs;
+                }
+            },
+            'pane-left@': {
+                templateUrl: 'partials/mms/pane-left.html',
+                controller: 'TreeCtrl'
+            },          
+            'pane-center@': {
+                templateUrl: 'partials/mms/pane-center.html',
+                controller: 'ViewCtrl'
+            },
+            'pane-right@': {
+                templateUrl: 'partials/mms/pane-right.html',
+                controller: 'ToolCtrl'
+            },
+            'toolbar-right@': {
+                template: '<mms-toolbar buttons="buttons" on-click="onClick(button)" mms-tb-api="tbApi"></mms-toolbar>',
+                controller: 'ToolbarCtrl'
+            }
+        }
+    })
+    .state('project.ref.document.view', {
+        url: '/views/:viewId',
+        resolve: {
+            viewOb: function($stateParams, ElementService, viewObs, ticket) {
+                return ElementService.getElement({
+                    projectId: $stateParams.projectId,
+                    refId: $stateParams.refId,
+                    extended: true,
+                    elementId: $stateParams.viewId
+                }, 2);
+            }
+        },
+        views: {
+            'pane-center@': {
+                templateUrl: 'partials/mms/pane-center.html',
+                controller: 'ViewCtrl'
+            }
+        }
+    })
+    .state('project.ref.document.order', {
+        url: '/order',
+        views: {      
+            'pane-center@': {
+                templateUrl: 'partials/mms/reorder-views.html',
+                controller: 'ReorderCtrl'
+            }
+        }
+    })
+    .state('project.ref.document.full', {
+        url: '/full',
+        views: {      
+            'pane-center@': {
+                templateUrl: 'partials/mms/full-doc.html',
+                controller: 'FullDocCtrl'
+            }
+        }
+    });
+
+/*
     .state('workspaces', {
         url: '/workspaces?search',
         //parent: login, remove ticket to parent
@@ -179,7 +480,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             viewElements: function(ViewService, workspace, document, commit, ticket) {
                 if (document === null) 
                     return null;
-                return ViewService.getViewElements(document.sysmlId, false, workspace, commit, 2);
+                return ViewService.getViewElements(document.id, false, workspace, commit, 2);
             },   
             commit: function(tag, ticket) {
                 return tag.commitId;
@@ -198,14 +499,14 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
         },
         views: {
             'nav': {
-                template: '<mms-nav mms-title="Model Manager" mms-ws="{{workspace}}" mms-config="tag"></mms-nav>',
+                template: '<ve-nav mms-title="Model Manager" mms-ws="{{workspace}}" mms-config="tag"></ve-nav>',
                 controller: function ($scope, $rootScope, workspace, tag) {
                     $scope.workspace = workspace;
                     $scope.tag = tag;
                 }
             },
             'menu': {
-                template: '<mms-menu mms-title="Model Manager" mms-ws="{{workspace}}" mms-workspaces="workspaces" mms-config="tag" mms-tags="tags"></mms-menu>',
+                template: '<ve-menu mms-title="Model Manager" mms-ws="{{workspace}}" mms-workspaces="workspaces" mms-config="tag" mms-tags="tags"></ve-menu>',
                 controller: function ($scope, $rootScope, workspaces, workspace, tags, tag) {
                     $scope.workspaces = workspaces;
                     $scope.workspace = workspace;
@@ -286,12 +587,12 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             viewElements: function(ViewService, workspace, document, commit, ticket) {
                 if (document === null) 
                     return [];
-                return ViewService.getViewElements(document.sysmlId, false, workspace, commit, 2);
+                return ViewService.getViewElements(document.id, false, workspace, commit, 2);
             },    
             view: function(ViewService, workspace, document, commit, ticket) {
                 if (document === null) 
                     return null;
-                return ViewService.getView(document.sysmlId, false, workspace, commit, 2, true);
+                return ViewService.getView(document.id, false, workspace, commit, 2, true);
             },
             tags: function(ConfigService, workspace, ticket) {
                 return ConfigService.getConfigs(workspace, false, 2);
@@ -307,7 +608,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
         },
         views: {
             'menu@': {
-                template: '<mms-menu mms-title="Model Manager" mms-ws="{{workspace}}" mms-workspaces="workspaces" mms-config="tag" mms-tags="tags"></mms-menu>',
+                template: '<ve-menu mms-title="Model Manager" mms-ws="{{workspace}}" mms-workspaces="workspaces" mms-config="tag" mms-tags="tags"></ve-menu>',
                 controller: function ($scope, $rootScope, workspaces, workspace, tag, tags, workspaceObj) {
                     $scope.workspaces = workspaces;
                     $scope.workspace = workspace;
@@ -337,7 +638,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
         parent: 'workspace',
         views: {
             'menu@': {
-                template: '<mms-menu mms-title="Portal" mms-ws="{{workspace}}" mms-site="site" mms-workspaces="workspaces" mms-config="tag" mms-tags="tags"></mms-menu>',
+                template: '<ve-menu mms-title="Portal" mms-ws="{{workspace}}" mms-site="site" mms-workspaces="workspaces" mms-config="tag" mms-tags="tags"></ve-menu>',
                 controller: function ($scope, $rootScope, workspaces, workspace, site, tag, tags, workspaceObj) {
                     $scope.workspaces = workspaces;
                     $scope.workspace = workspace;
@@ -374,7 +675,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                     return null;
                     //siteCoverDocId = 'master_cover';
                 else
-                    siteCoverDocId = site.sysmlId + '_cover';
+                    siteCoverDocId = site.id + '_cover';
                 var deferred = $q.defer();
                 ElementService.getElement(siteCoverDocId, false, workspace, commit, 2, true)
                 .then(function(data) {
@@ -391,9 +692,9 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                     }
 
                     var viewName = site.name + ' Cover Page';
-                    var viewDoc = '<mms-site-docs data-mms-site="' + site.sysmlId + '">[cf:site docs]</mms-site-docs>';
+                    var viewDoc = '<mms-site-docs data-mms-site="' + site.id + '">[cf:site docs]</mms-site-docs>';
 
-                    ViewService.createView(undefined, viewName, undefined, workspace, siteCoverDocId, viewDoc, site.sysmlId)
+                    ViewService.createView(undefined, viewName, undefined, workspace, siteCoverDocId, viewDoc, site.id)
                     .then(function(data) {
                         deferred.resolve(data);
                     }, function(reason) {
@@ -408,17 +709,17 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             viewElements: function(ViewService, workspace, document, commit, ticket) {
                 if (document === null) 
                     return null;
-                return ViewService.getViewElements(document.sysmlId, false, workspace, commit, 2);
+                return ViewService.getViewElements(document.id, false, workspace, commit, 2);
             },    
             view: function(ViewService, workspace, document, commit, ticket) {
                 if (document === null) 
                     return null;
-                return ViewService.getView(document.sysmlId, false, workspace, commit, 2, true);
+                return ViewService.getView(document.id, false, workspace, commit, 2, true);
             }
         },
         views: {
             'nav@': {
-                template: '<mms-nav mms-title="Model Manager" mms-ws="{{workspace}}" mms-config="tag" mms-site="site"></mms-nav>',
+                template: '<ve-nav mms-title="Model Manager" mms-ws="{{workspace}}" mms-config="tag" mms-site="site"></ve-nav>',
                 controller: function ($scope, $rootScope, workspace, tag, site) {
                     $scope.workspace = workspace;
                     $scope.tag = tag;
@@ -426,7 +727,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 }
             },
             'menu@': {
-                template: '<mms-menu mms-title="Portal" mms-ws="{{workspace}}" mms-site="site" mms-workspaces="workspaces" mms-config="tag" mms-tags="tags"></mms-menu>',
+                template: '<ve-menu mms-title="Portal" mms-ws="{{workspace}}" mms-site="site" mms-workspaces="workspaces" mms-config="tag" mms-tags="tags"></ve-menu>',
                 controller: function ($scope, $rootScope, workspaces, workspace, site, tag, tags, workspaceObj) {
                     $scope.workspaces = workspaces;
                     $scope.workspace = workspace;
@@ -458,12 +759,12 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             viewElements: function(ViewService, workspace, document, commit, ticket) {
                 if (document === null) 
                     return null;
-                return ViewService.getViewElements(document.sysmlId, false, workspace, commit, 2);
+                return ViewService.getViewElements(document.id, false, workspace, commit, 2);
             },    
             view: function(ViewService, workspace, document, commit, ticket) {
                 if (document === null) 
                     return null;
-                return ViewService.getView(document.sysmlId, false, workspace, commit, 2, true);
+                return ViewService.getView(document.id, false, workspace, commit, 2, true);
             }
         },
         views: {
@@ -496,7 +797,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
         },
         views: {
             'menu@': {
-                template: '<mms-menu mms-title="View Editor" mms-ws="{{workspace}}" mms-site="site" mms-doc="document" mms-workspaces="workspaces" mms-config="tag" mms-tags="tags" mms-snapshot-tag="{{snapshotTag}}" mms-show-tag="{{showTag}}"></mms-menu>',
+                template: '<ve-menu mms-title="View Editor" mms-ws="{{workspace}}" mms-site="site" mms-doc="document" mms-workspaces="workspaces" mms-config="tag" mms-tags="tags" mms-snapshot-tag="{{snapshotTag}}" mms-show-tag="{{showTag}}"></ve-menu>',
                 controller: function ($scope, $filter, $rootScope, workspaces, workspace, site, document, tag, tags) {
                     $scope.workspaces = workspaces;
                     $scope.workspace = workspace;
@@ -663,23 +964,16 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 controller: 'ToolbarCtrl'
             }
         }
-    });
+    });*/
     // anonymous factory intercepts requests
     $httpProvider.interceptors.push(function($q, $location, $rootScope, $injector) {
         return {
             'responseError': function(rejection) {
                 if(rejection.status === 401){ //rejection.config.url
-                    $rootScope.$broadcast("mms.unauthorized", rejection);
-                    // var AuthService = $injector.get('AuthService');
-                    // var isExpired = AuthService.checkLogin();
-                    // isExpired.then(function(){
-                    // }, function() {
-                    //     $state.go("login", {notify: false});
-                    // });//:TODO   
+                    $rootScope.$broadcast("mms.unauthorized", rejection); 
                 }
                 return $q.reject(rejection);
             }
         };
     });
-})
-.constant('mmsRootSites', []);
+});

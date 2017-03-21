@@ -3,32 +3,42 @@
 /* Controllers */
 
 angular.module('mmsApp')
-
-.controller('FullDocCtrl', ['$scope', '$templateCache', '$compile', '$timeout', '$rootScope', '$state', '$stateParams', '$window', 'MmsAppUtils', 'document', 'workspace', 'site', 'commit', 'tag', 'ConfigService', 'UxService', 'ViewService', 'UtilsService', 'ElementService', '$q', 'growl', 'hotkeys', 'search', '_', '$element',
-function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateParams, $window, MmsAppUtils, document, workspace, site, commit, tag, ConfigService, UxService, ViewService, UtilsService, ElementService, $q, growl, hotkeys, search, _, $element) {
-
-    $scope.ws = $stateParams.workspace;
-    $scope.site = site;
-    $scope.search = search;
+.controller('FullDocCtrl', ['$scope', '$rootScope', '$state', '$stateParams', '$window', '$element', 'hotkeys', 'growl',
+    'MmsAppUtils', 'UxService', 'search', '_', 'documentOb', 'projectOb', 'refOb', 'viewObs',
+function($scope, $rootScope, $state, $stateParams, $window, $element, hotkeys, growl,
+    MmsAppUtils, UxService, search, _, documentOb, projectOb, refOb, viewObs) {
     
-    function searchLoading(){
-        // or from center pane
+    $rootScope.ve_fullDocMode = true;
+
+    function isPageLoading() {
         if ($element.find('.isLoading').length > 0) {
             growl.warning("Still loading!");
             return true;
         }
         return false;
     }
-
-    var views = [];
     if (!$rootScope.veCommentsOn)
         $rootScope.veCommentsOn = false;
     if (!$rootScope.veElementsOn)
         $rootScope.veElementsOn = false;
-    if (!$rootScope.mms_ShowEdits)
-        $rootScope.mms_ShowEdits = false;
+    if (!$rootScope.ve_editmode)
+        $rootScope.ve_editmode = false;
+
+    $scope.search = search;
     $scope.buttons = [];
-    views.push({id: document.sysmlId, api: {
+
+    $scope.refOb = refOb;
+    $scope.projectOb = projectOb;
+    //build array of views in doc
+    var elementTranscluded = function(elementOb, type) {
+        
+    };
+    var elementClicked = function(elementOb) {
+        $rootScope.$broadcast('elementSelected', elementOb, 'latest');
+    };
+
+    var views = [];
+    views.push({id: documentOb.id, api: {
         init: function(dis) {
             if ($rootScope.veCommentsOn) {
                 dis.toggleShowComments();
@@ -36,14 +46,11 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
             if ($rootScope.veElementsOn) {
                 dis.toggleShowElements();
             }
-            if ($rootScope.mms_ShowEdits && commit === 'latest') {
-                dis.toggleShowEdits();
-            }
-        }
+        },
+        elementTranscluded: elementTranscluded,
+        elementClicked: elementClicked
     }});
-    var view2view = document.view2view;
     var view2children = {};
-    ViewService.setCurrentView(document);
     var buildViewElt = function(vId, curSec) {
       return {id: vId, api: {
             init: function(dis) {
@@ -53,36 +60,46 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
                 if ($rootScope.veElementsOn) {
                     dis.toggleShowElements();
                 }
-                if ($rootScope.mms_ShowEdits && commit === 'latest') {
-                    dis.toggleShowEdits();
-                }
-            }
+            },
+            elementTranscluded: elementTranscluded,
+            elementClicked: elementClicked
         }, number: curSec, topLevel: (curSec ? (curSec.toString().indexOf('.') === -1 && curSec !== 1) : false)};
     };
+
+    $scope.findLatestElement = function(elem) {
+        if (elem) {
+            if (elem.modified > $scope.latestElement)
+                $scope.latestElement = elem.modified;
+        }
+    };
+
     var addToArray = function(viewId, curSection) {
-        views.push( buildViewElt(viewId, curSection) );
+        views.push(buildViewElt(viewId, curSection));
+
         if (view2children[viewId]) {
             var num = 1;
-            view2children[viewId].forEach(function(cid) {
-                addToArray(cid, curSection + '.' + num);
+            for (var i = 0; i < view2children[viewId].length; i++) {
+                addToArray(view2children[viewId][i], curSection + '.' + num);
                 num = num + 1;
-            });
+            }
         }
     };
     var num = 1;
 
     var seenViewIds = {};
     function handleSingleView(v, aggr) {
-        var childIds = view2children[v.sysmlId];
-        if (!childIds)
+        var childIds = view2children[v.id];
+        if (!childIds) {
             childIds = [];
-        view2children[v.sysmlId] = childIds;
+        }
+        view2children[v.id] = childIds;
         if (!v._childViews || v._childViews.length === 0 || aggr === 'none') {
             return childIds;
         }
         for (var i = 0; i < v._childViews.length; i++) {
-            if (seenViewIds[v._childViews[i].id])
+            if (seenViewIds[v._childViews[i].id]) {
                 continue;
+            }
             seenViewIds[v._childViews[i].id] = true;
             childIds.push(v._childViews[i].id);
         }
@@ -93,76 +110,132 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
         return childIds;
     }
 
-  if (view2view && view2view.length > 0) {
-    view2view.forEach(function(view) {
-        view2children[view.id] = view.childrenViews;
-    });
-  
-    view2children[document.sysmlId].forEach(function(cid) {
-        addToArray(cid, num);
-        num = num + 1;
-    });
-  } else {
-    view2children[document.sysmlId] = [];
-    if (!document._childViews)
-        document._childViews = [];
-    MmsAppUtils.handleChildViews(document, 'composite', $scope.ws, commit, handleSingleView, handleChildren)
+    view2children[documentOb.id] = [];
+    if (!documentOb._childViews) {
+        documentOb._childViews = [];
+    }
+    MmsAppUtils.handleChildViews(documentOb, 'composite', projectOb.id, refOb.id, handleSingleView, handleChildren)
     .then(function(childIds) {
         for (var i = 0; i < childIds.length; i++) {
             addToArray(childIds[i], num);
             num = num + 1;
         }
     });
-  }
-    $scope.version = commit;
     $scope.views = views;
-    $scope.tscClicked = function(elementId, ws, version) {
-        $rootScope.$broadcast('elementSelected', elementId, 'element', ws, version);
-    };
 
     $scope.$on('newViewAdded', function(event, vId, curSec, prevSibId) {
         var sibIndex = _.findIndex(views, {id: prevSibId});
         views.splice(sibIndex+1, 0, buildViewElt(vId, curSec) );
     });
     
-    $scope.bbApi = {};
-    $scope.bbApi.init = function() {
+    $scope.bbApi = {
+        init: function() {
+            if (documentOb && documentOb._editable && refOb.type === 'Branch') {
+                $scope.bbApi.addButton(UxService.getButtonBarButton('show-edits'));
+                $scope.bbApi.setToggleState('show-edits', $rootScope.ve_editmode);
+                hotkeys.bindTo($scope)
+                .add({
+                    combo: 'alt+d',
+                    description: 'toggle edit mode',
+                    callback: function() {$scope.$broadcast('show-edits');}
+                });
+            }
 
-        if (document && document._editable && commit === 'latest') {
-            $scope.bbApi.addButton(UxService.getButtonBarButton('show-edits'));
-            $scope.bbApi.setToggleState('show-edits', $rootScope.mms_ShowEdits);
+            $scope.bbApi.addButton(UxService.getButtonBarButton('show-comments'));
+            $scope.bbApi.setToggleState('show-comments', $rootScope.veCommentsOn);
+            $scope.bbApi.addButton(UxService.getButtonBarButton('print'));
+            $scope.bbApi.addButton(UxService.getButtonBarButton('convert-pdf'));
+            $scope.bbApi.addButton(UxService.getButtonBarButton('word'));
+            $scope.bbApi.addButton(UxService.getButtonBarButton('tabletocsv'));
+            $scope.bbApi.addButton(UxService.getButtonBarButton('show-elements'));
+            $scope.bbApi.addButton(UxService.getButtonBarButton('refresh-numbering'));
+            $scope.bbApi.setToggleState('show-elements', $rootScope.veElementsOn);
             hotkeys.bindTo($scope)
             .add({
-                combo: 'alt+d',
-                description: 'toggle edit mode',
-                callback: function() {$scope.$broadcast('show-edits');}
+                combo: 'alt+c',
+                description: 'toggle show comments',
+                callback: function() {$scope.$broadcast('show-comments');}
+            }).add({
+                combo: 'alt+e',
+                description: 'toggle show elements',
+                callback: function() {$scope.$broadcast('show-elements');}
             });
         }
+    };
 
-        $scope.bbApi.addButton(UxService.getButtonBarButton('show-comments'));
-        $scope.bbApi.setToggleState('show-comments', $rootScope.veCommentsOn);
-        $scope.bbApi.addButton(UxService.getButtonBarButton('print'));
-        $scope.bbApi.addButton(UxService.getButtonBarButton('convert-pdf'));
-        $scope.bbApi.addButton(UxService.getButtonBarButton('word'));
-        $scope.bbApi.addButton(UxService.getButtonBarButton('tabletocsv'));
-        $scope.bbApi.addButton(UxService.getButtonBarButton('show-elements'));
-        $scope.bbApi.addButton(UxService.getButtonBarButton('refresh-numbering'));
-        $scope.bbApi.setToggleState('show-elements', $rootScope.veElementsOn);
-        hotkeys.bindTo($scope)
-        .add({
-            combo: 'alt+c',
-            description: 'toggle show comments',
-            callback: function() {$scope.$broadcast('show-comments');}
-        }).add({
-            combo: 'alt+e',
-            description: 'toggle show elements',
-            callback: function() {$scope.$broadcast('show-elements');}
-        });
+    $scope.$on('section-add-paragraph', function(event, sectionOb) {
+        MmsAppUtils.addPresentationElement($scope, 'Paragraph', sectionOb);
+    });
+
+    $scope.$on('section-add-list', function(event, sectionOb) {
+        MmsAppUtils.addPresentationElement($scope, 'List', sectionOb);
+    });
+
+    $scope.$on('section-add-table', function(event, sectionOb) {
+        MmsAppUtils.addPresentationElement($scope, 'Table', sectionOb);
+    });
+
+    $scope.$on('section-add-equation', function(event, sectionOb) {
+        MmsAppUtils.addPresentationElement($scope, 'Equation', sectionOb);
+    });
+
+    $scope.$on('section-add-section', function(event, sectionOb) {
+        MmsAppUtils.addPresentationElement($scope, 'Section', sectionOb);
+    });
+
+    $scope.$on('section-add-comment', function(event, sectionOb) {
+        MmsAppUtils.addPresentationElement($scope, 'Comment', sectionOb);
+    });
+
+    $scope.$on('section-add-image', function(event, sectionOb) {
+        MmsAppUtils.addPresentationElement($scope, 'Image', sectionOb);
+    });
+
+    $scope.$on('show-comments', function() {
+        for (var i = 0; i < $scope.views.length; i++) {
+            $scope.views[i].api.toggleShowComments();
+        }
+        $scope.bbApi.toggleButtonState('show-comments');
+        $rootScope.veCommentsOn = !$rootScope.veCommentsOn;
+    });
+
+    $scope.$on('show-elements', function() {
+        for (var i = 0; i < $scope.views.length; i++) {
+            $scope.views[i].api.toggleShowElements();
+        }
+        $scope.bbApi.toggleButtonState('show-elements');
+        $rootScope.veElementsOn = !$rootScope.veElementsOn;
+    });
+
+    $scope.$on('show-edits', function() {
+        if (($rootScope.veElementsOn && $rootScope.ve_editmode) || (!$rootScope.veElementsOn && !$rootScope.ve_editmode) ){
+            for (var i = 0; i < $scope.views.length; i++) {
+                $scope.views[i].api.toggleShowElements();
+            }
+            $scope.bbApi.toggleButtonState('show-elements');
+            $rootScope.veElementsOn = !$rootScope.veElementsOn;
+        }
+        $scope.bbApi.toggleButtonState('show-edits');
+        $rootScope.ve_editmode = !$rootScope.ve_editmode;
+    });
+
+    $scope.searchOptions = {
+        callback: function(elementOb) {
+            $rootScope.$broadcast('elementSelected', elementOb, 'latest');
+            if ($rootScope.ve_togglePane && $rootScope.ve_togglePane.closed)
+                $rootScope.ve_togglePane.toggle();
+        },
+        emptyDocTxt: 'This field is empty.',
+        searchInput: $stateParams.search,
+        searchResult: search,
+        relatedCallback: function (doc, view, elem) {//siteId, documentId, viewId) {
+            $state.go('project.ref.document.view', {projectId: doc._projectId, documentId: doc.id, viewId: view.id, refId: doc._refId, search: undefined});
+        }
     };
 
     var converting = false;
     $scope.$on('convert-pdf', function() {
-        if (searchLoading())
+        if (isPageLoading())
             return;
         if (converting) {
             growl.info("Please wait...");
@@ -170,7 +243,7 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
         }
         converting = true;
         $scope.bbApi.toggleButtonSpinner('convert-pdf');
-        MmsAppUtils.printModal(document, $scope.ws, site, commit, tag, true, 3)
+        MmsAppUtils.printModal(documentOb, refOb, true, 3)
         .then(function(ob) {
             growl.info('Converting HTML to PDF...Please wait for a completion email.',{ttl: -1});
         }, function(reason){
@@ -181,74 +254,29 @@ function($scope, $templateCache, $compile, $timeout, $rootScope, $state, $stateP
         });
     });
 
-    $scope.$on('show-comments', function() {
-        $scope.views.forEach(function(view) {
-            view.api.toggleShowComments();
-        });
-        $scope.bbApi.toggleButtonState('show-comments');
-        $rootScope.veCommentsOn = !$rootScope.veCommentsOn;
-    });
-
-    $scope.$on('show-elements', function() {
-        $scope.views.forEach(function(view) {
-            view.api.toggleShowElements();
-        });
-        $scope.bbApi.toggleButtonState('show-elements');
-        $rootScope.veElementsOn = !$rootScope.veElementsOn;
-    });
-
-    $scope.$on('show-edits', function() {
-        if( ($rootScope.veElementsOn && $rootScope.mms_ShowEdits) || (!$rootScope.veElementsOn && !$rootScope.mms_ShowEdits) ){
-            $scope.views.forEach(function(view) {
-                view.api.toggleShowElements();
-            });
-            $scope.bbApi.toggleButtonState('show-elements');
-            $rootScope.veElementsOn = !$rootScope.veElementsOn;
-        }
-        $scope.views.forEach(function(view) {
-            view.api.toggleShowEdits();
-        });
-        $scope.bbApi.toggleButtonState('show-edits');
-        $rootScope.mms_ShowEdits = !$rootScope.mms_ShowEdits;
-    });
-    $rootScope.mms_fullDocMode = true;
-
-    $scope.$on('section-add-paragraph', function(event, section) {
-        MmsAppUtils.addPresentationElement($scope, 'Paragraph', section);
-    });
-
-    $scope.$on('section-add-section', function(event, section) {
-        MmsAppUtils.addPresentationElement($scope, 'Section', section);
-    });
-
     $scope.$on('print', function() {
-        if (searchLoading())
+        if (isPageLoading())
             return;
-        MmsAppUtils.printModal(document, $scope.ws, site, commit, tag, true, 1);
+        MmsAppUtils.printModal(documentOb, refOb, true, 1);
     });
+
     $scope.$on('word', function() {
-        if (searchLoading())
+        if (isPageLoading())
             return;
-        MmsAppUtils.printModal(document, $scope.ws, site, commit, tag, true, 2);
+        MmsAppUtils.printModal(documentOb, refOb, true, 2);
     });
+
     $scope.$on('tabletocsv', function() {
-        MmsAppUtils.tableToCsv(document, $scope.ws, commit, true);
+        if (isPageLoading())
+            return;
+        MmsAppUtils.tableToCsv(true);
     });
+
     $scope.$on('refresh-numbering', function() {
+        if (isPageLoading())
+            return;
         var printElementCopy = angular.element("#print-div");
-        MmsAppUtils.refreshNumbering($rootScope.mms_treeApi.get_rows(),printElementCopy);
+        MmsAppUtils.refreshNumbering($rootScope.ve_treeApi.get_rows(), printElementCopy);
     });
-
-    $scope.searchOptions= {};
-    $scope.searchOptions.callback = function(elem) {
-        $scope.tscClicked(elem.sysmlId);
-    };
-    $scope.searchOptions.emptyDocTxt = 'This field is empty.';
-    $scope.searchOptions.searchInput = $stateParams.search;
-    $scope.searchOptions.searchResult = $scope.search;    
-
-    $scope.searchGoToDocument = function (doc, view, elem) {//siteId, documentId, viewId) {
-        $state.go('workspace.site.document.view', {site: doc._siteCharacterizationId, document: doc.sysmlId, view: view.sysmlId, tag: undefined, search: undefined});
-    };
-    $scope.searchOptions.relatedCallback = $scope.searchGoToDocument;
 }]);
+

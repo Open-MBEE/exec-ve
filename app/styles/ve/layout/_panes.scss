@@ -96,13 +96,13 @@
   }
 
   #main-pane > div {
-    z-index: 1000;
+    z-index: 0; //TODO was 1000
   }
 }
 
 @media screen and (min-width: 45.0625em) {
   #main-pane {
-    top: 60px;
+    top: 76px;
   }
 }
 

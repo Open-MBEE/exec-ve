@@ -149,6 +149,10 @@ module.exports = function(grunt) {
       mmsapp: {
         src: ['app/js/mms/controllers/*.js'],
         dest: 'build/js/mms/controllers.js'
+      },
+      mmsappdir: {
+          src: ['app/js/mms/directives/*.js'],
+          dest: 'build/js/mms/directives.js'
       }
     },
 
@@ -207,6 +211,7 @@ module.exports = function(grunt) {
       beforeconcat: jsFiles,
       afterconcat: ['dist/mms.js', 'dist/mms.directives.js'],
       options: {
+        reporterOutput: '',
         evil: true, //allow eval for timely integration
         globalstrict: true,
         globals: {

@@ -28,7 +28,7 @@ function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigSe
     var deferreds = {};
     var projectId2Peid = {};
     function getElementsArrayString(elements) {
-        return '[{"sysmlId": "' + elements.join('"}, {"sysmlId": "') + '"}]';
+        return '[{"id": "' + elements.join('"}, {"id": "') + '"}]';
     }
     $window.onPerspectivesCommandSuccess = function(successfulCommand) {
         console.log("Perspectives command: " +
@@ -94,7 +94,7 @@ function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigSe
 
     function tspAddElementCtrl($scope, $uibModalInstance) {
         $scope.choose = function(elem, property) {
-            $uibModalInstance.close(elem.sysmlId);
+            $uibModalInstance.close(elem.id);
         };
         $scope.cancel = function() {
             $uibModalInstance.dismiss();
@@ -182,7 +182,9 @@ function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigSe
             invokePerspectivesCommand(saveCommand);*/
 
             ElementService.updateElement({
-                "sysmlId": scope.mmsPeid, 
+                "id": scope.mmsPeid,
+                _projectId: scope.mmsProjectId,
+                _refId: scope.mmsRefId,
                 "type": "InstanceSpecification",
                 "specification": {
                     "type": "LiteralString",
@@ -485,8 +487,8 @@ function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigSe
         restrict: 'E',
         template: template,
         scope: {
-            mmsWs: '@',
-            mmsVersion: '@',
+            mmsProjectId: '@',
+            mmsRefId: '@',
             mmsTspSpec: '<',
             mmsPeid: '@'
         },

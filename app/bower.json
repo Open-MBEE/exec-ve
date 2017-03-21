@@ -38,7 +38,6 @@
     "stompjs": "https://github.com/jmesnil/stomp-websocket.git#2.3.4",
     "d3": "~3.5.6",
     "c3": "~0.4.10",
-    "timely": "git@github.jpl.nasa.gov:SEQR/timely.git#master",
     "angulartics": "~1.1.0",
     "angulartics-piwik": "~1.0.4",
     "angular-diff-match-patch": "~0.4.0"

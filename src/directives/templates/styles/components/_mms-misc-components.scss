@@ -71,9 +71,9 @@ thead td, table caption {
 }
 
 // Workaround for tables with no borders
-table[border='0']{
- 
- border: 0;
+.table[border='0']{
+
+  border: 0;
   // Cells
   > thead,
   > tbody,
@@ -102,6 +102,7 @@ table[border='0']{
     border-top: none;
   }
 }
+
 
 .tooltip {
   .tooltip-inner {
