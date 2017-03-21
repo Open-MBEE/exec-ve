@@ -115,6 +115,8 @@ function($scope, $location, $rootScope, $state, _, $window, $uibModal, growl, $h
             $rootScope.hideCenterPane = false;
             if($state.current.name === 'login' || $state.current.name === 'login.select') {
                 $rootScope.hideCenterPane = true;
+            } else {
+                $rootScope.hideCenterPane = false;
             }
             if ($state.current.name === 'project.ref') {
                 // $rootScope.hideCenterPane = false;

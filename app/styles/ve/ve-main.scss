@@ -48,3 +48,293 @@ div.tooltip-inner {
     display: table-header-group;
   }
 }
+
+/****Turn global menu into hamburger when mobile****/
+
+@media (max-width: 1100px) {
+  .global-menu {
+    display: none;
+  }
+  .global-menu-hamburger {
+    display: block;
+  }
+
+}
+
+
+/****UI Elements****/
+
+/******* UI Elements > Buttons*******/
+
+.ve-dark-modal,
+.ve-dark-dropdown-nav,
+.ve-dark-dropdown-menu{
+  .btn{
+    font-weight: 500;
+    letter-spacing: .14em;
+    font-size: 12px;
+    -webkit-transition: background-color .1s ease-out;
+    -moz-transition: background-color .1s ease-out;
+    -o-transition: background-color .1s ease-out;
+    transition: background-color .1s ease-out;
+    border:none;
+    text-transform: uppercase;
+    border-radius:2px;
+  }
+
+
+  /*******Buttons > Primary button*******/
+
+  .btn-primary{
+    background-color: #2F889A;
+    padding:7px 16px;
+  }
+
+  .btn-primary:hover{
+    background-color: #296f83;
+    border:none;
+  }
+
+  /*******Buttons > WARNING button*******/
+
+  .btn-warning{
+    background-color: rgba(255,255,255,0);
+    border:none;
+  }
+
+  .btn-warning:hover{
+    background-color: rgba(255,255,255,0);
+  }
+}
+
+/****UI Elements > Modal ****/
+
+.ve-dark-modal{
+  color:white;
+  font-weight:300;
+  letter-spacing:.03em;
+  background-color:#313131;
+
+  .modal-content{
+    background-color:#404040;
+    border:none;
+    border-radius:3px;
+  }
+
+  .modal-body{
+    padding: 16px 15px 30px;
+  }
+
+  .modal-title{
+    margin: 0;
+    line-height: 1.42857143;
+    font-weight: 300;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+  }
+
+  .modal-header{
+    border-bottom: 1px solid #313131;
+  }
+
+  .modal-footer{
+    border-top: 1px solid #313131;
+  }
+
+  .modal-sm{
+    width:320px;
+  }
+}
+
+/****UI Elements > Dropdown****/
+
+/****UI Elements > Dropdown > wide dropdown****/
+
+.ve-dark-dropdown-wide.btn-group{
+  display: block;
+  width:100%;
+  margin: 0 0 18px;
+}
+
+.ve-dark-dropdown-wide{
+
+   .label-dropdown{
+    display:block;
+  }
+
+  .dropdown-toggle{
+    width:100%;
+    text-align: left;
+    font-size:16px;
+    padding: 5px 8px;
+    height: 34px;
+    line-height: 18px;
+    margin-top:6px;
+  }
+
+  .dropdown-menu{
+    min-width:100%;
+    font-size:15px;
+  }
+
+  .label-dropdown{
+    color: #d6d6d6;
+    font-size:14px;
+  }
+}
+
+/****UI Elements > Dropdown > Dense dropdown****/
+
+.btn-group.ve-dark-dropdown-nav {
+  margin: 6px 0 6px 6px;
+}
+
+.ve-dark-dropdown-nav {
+
+  .dropdown-toggle{
+    height:26px;
+    background-color:#212121;
+    background-color:#404040;
+    font-size:13px;
+    padding:4px;
+  }
+
+  .dropdown-toggle:hover{
+    background-color:#181818;
+  }
+
+  .label-dropdown{
+    color: #b3b3b3;
+    font-size:13px; 
+    font-weight:300;
+    padding: 0 4px;
+  }
+
+  .btn-group.open .dropdown-toggle{
+    background-color:#121212;
+  }
+
+  li{
+    font-size:13px;
+  }
+}
+
+
+.ve-dark-dropdown-wide,
+.ve-dark-dropdown-nav{
+
+  /*Clearing bootstrap*/
+  ul.dropdown-menu{
+    min-height:0;
+    overflow-y: scroll;
+    max-height: 300px;
+  }
+
+  .dropdown-toggle{
+    display:inline;
+    color:white;
+    border:none;
+    letter-spacing:.03em;
+    font-weight:300;
+    font-family:"Helvetica Neue", sans-serif;
+    border-radius:2px !important;
+    -webkit-transition: background-color .1s ease-out !important;
+    -moz-transition: background-color .1s ease-out !important;
+    -o-transition: background-color .1s ease-out !important;
+    transition: background-color .1s ease-out !important;
+    background-color:#3d3d3d;
+    line-height:18px;
+  }
+
+  .dropdown-toggle .fa-caret-down{
+    padding: 2px 4px 2px 10px;
+    color: #a3a3a3;
+  }
+
+  .dropdown-menu{
+    background-color: #505050;
+    border:none;
+    min-width:100%;
+  }
+
+  ul.dropdown-menu{
+    margin-top: 0;
+    border-radius: 2px;
+  }
+
+  .dropdown-menu li{
+    padding:6px 8px;
+    white-space: nowrap;
+    width:100%;
+    -webkit-transition: background-color .1s ease-out !important;
+    -moz-transition: background-color .1s ease-out !important;
+    -o-transition: background-color .1s ease-out !important;
+    transition: background-color .1s ease-out !important;
+  }
+
+  .dropdown-menu li:hover{
+    background-color:#5f5f5f;
+
+  }
+
+  .dropdown-toggle .fa-caret-down{
+    float:right;
+  }
+
+   ul.dropdown-menu{
+    background-color:#4d4d4d;
+  }
+
+   .dropdown-menu li:hover {
+      background-color: #5c5c5c;
+  }
+
+   .dropdown-toggle:hover{
+    background-color:#262626;
+    background-color:#383838;
+  }
+
+  .btn-group.open .dropdown-toggle{
+    background-color:#262626;
+  }
+
+  /*When a list item is selected, include a check mark before it. Add additional padding to these lists*/
+  .dropdown-menu.list-with-selected-item li{
+    padding-left:30px;
+    position:relative;
+  }
+
+  /*Clear hover on list items with buttons in them */
+  .dropdown-menu li.button-item:hover{
+    background-color:#505050;
+  }
+
+  /*Clear padding for check mark list items with buttons in them */
+  .dropdown-menu.list-with-selected-item li.button-item{
+    padding-left:8px;
+  }
+
+  /*set min width to override a 100% width*/
+  .dropdown-menu li.button-item{
+    min-width: 240px;
+  }
+
+
+  .checked-list-item::before{
+      content: "\f00c";
+    font-family: FontAwesome;
+    height: 16px;
+    position: absolute;
+    left: 10px;
+    top: 6px;
+    width: 16px;
+    color: #45cb93;
+  }
+
+  .dropdown-menu .fa-check {
+      padding-right: 6px;
+      color: #35bc84;
+      font-size: 14px;
+  }
+}
