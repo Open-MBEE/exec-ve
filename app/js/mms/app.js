@@ -55,12 +55,19 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
     .state('login.select', {
         url: '/select',
         resolve: {
-            ticket: function($window, URLService, AuthService, $q, ApplicationService) {
+            ticket: function($window, URLService, AuthService, $q, $http, $cookies, growl, ApplicationService) {
                 var deferred = $q.defer();
                 AuthService.checkLogin().then(function(data) {
                     ApplicationService.setUserName(data);
                     URLService.setTicket($window.localStorage.getItem('ticket'));
                     deferred.resolve($window.localStorage.getItem('ticket'));
+                    $http.post('/Basic/mms/cookieAuth?op=Sign In&username='+data).then(
+                        function(data2){
+                            $cookies.put('com.tomsawyer.web.license.user', data);
+                        }, function(reason) {
+                            growl.error("TSP license can not be activated: " + reason.message);
+                        }
+                    );
                 }, function(rejection) {
                     deferred.reject(rejection);
                 });
