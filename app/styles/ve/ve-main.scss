@@ -284,6 +284,7 @@ div.tooltip-inner {
 
    ul.dropdown-menu{
     background-color:#4d4d4d;
+    max-width: 250px;
   }
 
    .dropdown-menu li:hover {
@@ -315,14 +316,20 @@ div.tooltip-inner {
     padding-left:8px;
   }
 
+  /*Clear padding for check mark list items with tabs in them */
+  .dropdown-menu.list-with-selected-item li.tab-item{
+    padding:5px 0px;
+    // min-width: 100px;
+  }
+
   /*set min width to override a 100% width*/
   .dropdown-menu li.button-item{
-    min-width: 240px;
+    min-width: 100px;
   }
 
 
   .checked-list-item::before{
-      content: "\f00c";
+    content: "\f00c";
     font-family: FontAwesome;
     height: 16px;
     position: absolute;
