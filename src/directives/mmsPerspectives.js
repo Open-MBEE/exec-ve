@@ -1,18 +1,20 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsPerspectives', ['SiteService', 'ElementService', 'WorkspaceService', 'ConfigService', '$state', '$templateCache', '$window', 'growl', 'ApplicationService', 'AuthService', '$uibModal', '$q', mmsPerspectives]);
+.directive('mmsPerspectives', ['ElementService', '$templateCache', '$window', 'growl', 'ApplicationService', 'AuthService', '$uibModal', '$q', mmsPerspectives]);
 
 /**
  * @ngdoc directive
  * @name mms.directives.directive:mmsPerspectives
  *
- * @requires mms.SiteService
- * @requires mms.WorkspaceService
- * @requires mms.ConfigService
- * @requires $state
+ * @requires mms.ElementService
  * @requires $templateCache
+ * @requires $window
  * @requires growl
+ * @requires ApplicationService
+ * @requires AuthService
+ * @requires $uibModal
+ * @requires $q
  *
  * @restrict E
  *
@@ -22,7 +24,7 @@ angular.module('mms.directives')
  * Tom Saywer Persectives JS library.
  *
  */
-function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigService, $state, $templateCache, $window, growl, ApplicationService, AuthService, $uibModal, $q) {
+function mmsPerspectives(ElementService, $templateCache, $window, growl, ApplicationService, AuthService, $uibModal, $q) {
     var template = $templateCache.get('mms/templates/mmsPerspectives.html');
     var mapping = {};
     var deferreds = {};
@@ -39,26 +41,6 @@ function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigSe
         console.log("Perspectives command: " +
            successfulCommand.command +
            " completed successfully");
-    };
-    $window.onPerspectivesSaveElementSuccess = function(successfulCommand, result) {
-        
-        console.log("Perspectives command: " +
-           successfulCommand.command +
-           " completed successfully");
-        /*var projectId = successfulCommand.data.project;
-        var eid = projectId2Peid[projectId];
-        var elementsList = JSON.parse(result);
-        var tstypeName = successfulCommand.data.args[0];
-        ElementService.updateElement({
-            "sysmlId": eid, 
-            "type": "InstanceSpecification",
-            "specification": {
-                "type": "LiteralString",
-                "value": JSON.stringify({elements: elementsList, type: "Tsp", tstype: tstypeName})
-            }
-        }).then(function() {
-            deferreds[projectId].resolve("ok");
-        });*/
     };
     $window.onPerspectivesCommandFailure = function(failedCommand, message, callstack) {
         console.log("Perspectives command " + failedCommand.commmand +
@@ -149,38 +131,6 @@ function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigSe
             scope.context = scope.mmsTspSpec.context;
 
         scope.saveElement = function() {
-            /*var deferred = $q.defer();
-            // var saveCommand = {
-            //     "command":"Update",
-            //     "onsuccess":"onPerspectivesAddElementSuccess",
-            //     "onfailure":"onPerspectivesCommandFailure",
-            //     "data": {
-            //         "project": id,
-            //         "module": "SysML",
-            //         "integratorIDs":["int-save-" + id]
-            //     }
-            // };
-            deferreds[id] = deferred;
-            deferred.promise.then(function() {
-                growl.info("saved!");
-            });
-            var saveCommand = {
-                    "command": "Custom",
-                    "data": {
-                        "serverClassName": "gov.nasa.jpl.mbee.ems.action.GetElementIdsCommandImpl",
-                        "args": [scope.mmsTspSpec.tstype],
-                        "modelID": 'model-' + id,
-                        "module": "SysML",
-                        "project": id,
-                        "viewID": "view-" + id,
-                        "viewName": viewName
-                    },
-                    "onsuccess": "onPerspectivesSaveElementSuccess",
-                    "onfailure":"onPerspectivesCommandFailure",
-                };
-                    
-            invokePerspectivesCommand(saveCommand);*/
-
             ElementService.updateElement({
                 "id": scope.mmsPeid,
                 _projectId: scope.mmsProjectId,
@@ -420,6 +370,32 @@ function mmsPerspectives(SiteService, ElementService, WorkspaceService, ConfigSe
                     "data": {
                         "attributeName": "Ticket",
                         "attributeValue": AuthService.getTicket(),
+                        "modelID": 'model-' + id,
+                        "module": "SysML",
+                        "project": id,
+                        "viewID": "view-" + id,
+                        "viewName": viewName
+                    },
+                    "onfailure":"onPerspectivesCommandFailure",
+                },
+                {
+                    "command": "SetModelAttribute",
+                    "data": {
+                        "attributeName": "MMSRefId",
+                        "attributeValue": scope.mmsRefId,
+                        "modelID": 'model-' + id,
+                        "module": "SysML",
+                        "project": id,
+                        "viewID": "view-" + id,
+                        "viewName": viewName
+                    },
+                    "onfailure":"onPerspectivesCommandFailure",
+                },
+                {
+                    "command": "SetModelAttribute",
+                    "data": {
+                        "attributeName": "MMSProjectId",
+                        "attributeValue": scope.mmsProjectId,
                         "modelID": 'model-' + id,
                         "module": "SysML",
                         "project": id,
