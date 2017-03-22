@@ -118,7 +118,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             }
             MathJax.Hub.Queue(["Typeset", MathJax.Hub, domElement[0]]);
             scope.recompileScope = scope.$new();
-            $compile(domElement.contents())(scope.recompileScope); 
+            $compile(domElement.contents())(scope.recompileScope);
             if (mmsViewCtrl) {
                 mmsViewCtrl.elementTranscluded(scope.element);
             }

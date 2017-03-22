@@ -327,6 +327,7 @@ function UtilsService($q, $http, CacheService, URLService, _) {
                     } else if (thing.type === 'List') {
                         result.push(makeHtmlList(thing));
                     } else if (thing.type === 'Image') {
+                        //todo use mmsCf
                         result.push('<mms-transclude-img mms-element-id="' + thing.id + '"></mms-transclude-img>');
                     }
                     result.push('</div>');
@@ -384,7 +385,8 @@ function UtilsService($q, $http, CacheService, URLService, _) {
         if (para.nonEditable) {
             attr = ' data-non-editable="' + para.nonEditable + '"';
         }
-        return '<mms-transclude-' + t + ' mms-eid="' + para.source + '"' + attr + '></mms-transclude-' + t + '>';
+        //TODO update these to match mmsCF
+        return '<mms-cf mms-cf-type="' + t + '" mms-eid="' + para.source + '"' + attr + '></mms-transclude-' + t + '>';
     };
 
     var makeHtmlTOC = function (tree) {
