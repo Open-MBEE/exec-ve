@@ -5,27 +5,25 @@
         </div>
         <div>
             <form name="loginForm" ng-submit="continue()">
-                <div class="btn-group ve-dark-dropdown-wide" uib-dropdown keyboard-nav>
+                <div class="btn-group ve-dark-dropdown-wide" uib-dropdown>
                     <span class="label-dropdown">Project:</span>
-                    <button id="simple-btn-keyboard-nav" type="button" class="dropdown-toggle" uib-dropdown-toggle>
+                    <button type="button" class="dropdown-toggle" uib-dropdown-toggle>
                         <span>{{ selectedOrg }}<i class="fa fa-caret-down" aria-hidden="true"></i></span>
                     </button>
-                    <ul class="dropdown-menu" uib-dropdown-menu role="menu"
-                        aria-labelledby="simple-btn-keyboard-nav">
+                    <ul class="dropdown-menu list-with-selected-item" uib-dropdown-menu role="menu">
                         <li ng-model="selectedOrg" ng-repeat="org in orgs" ng-click="selectOrg(org)">{{ org.name }}</li>
                     </ul>
                 </div>
-                <div class="btn-group ve-dark-dropdown-wide" uib-dropdown keyboard-nav>
+                <div class="btn-group ve-dark-dropdown-wide" uib-dropdown>
                     <span class="label-dropdown">Module:</span>
-                    <button id="simple-btn-keyboard-nav" type="button" class="dropdown-toggle" uib-dropdown-toggle ng-disabled="!selectedOrg">
+                    <button type="button" class="dropdown-toggle" uib-dropdown-toggle ng-disabled="!selectedOrg">
                         <span>{{ selectedProject }}<i class="fa fa-caret-down" aria-hidden="true"></i></span>
                     </button>
-                    <ul class="dropdown-menu list-with-selected-item" uib-dropdown-menu role="menu"
-                        aria-labelledby="simple-btn-keyboard-nav">
+                    <ul class="dropdown-menu list-with-selected-item" uib-dropdown-menu role="menu">
                         <li ng-model="selectedProject" ng-repeat="project in projects" ng-click="selectProject(project)">{{ project.name }}</li>
                     </ul>
                 </div>
-                <div class="bookmark"> <!-- style="display:none" -->
+                <div class="bookmark" style="display:none">
                     <a>Bookmark Module</a>
                 </div>
                 <button class="btn btn-block" type="submit">CONTINUE

@@ -36,7 +36,7 @@ angular.module('mms.directives')
 function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $uibModal, $templateCache, $window, $timeout, growl, CKEDITOR, _) { //depends on angular bootstrap
     var generatedIds = 0;
 
-    var mmsCkeditorLink = function(scope, element, attrs, ngModelCtrl, mmsViewCtrl) {
+    var mmsCkeditorLink = function(scope, element, attrs, ngModelCtrl) {
         if (!attrs.id)
             attrs.$set('id', 'mmsCkEditor' + generatedIds++);
         
@@ -494,7 +494,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
     return {
         priority: 10,
         restrict: 'A',
-        require: ['ngModel','?^^mmsView'],
+        require: 'ngModel',
         scope: {
             mmsProjectId: '@',
             mmsRefId: '@',
