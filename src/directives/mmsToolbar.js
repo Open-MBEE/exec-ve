@@ -172,12 +172,12 @@ function mmsToolbar($templateCache, $rootScope)
 				if (!button.active) return;
 
 				var toggleDecativeFlag = false;
-				if (this.$root.mms_togglePane && $rootScope.mms_pane_toggleable !== false)
+				if (this.$root.ve_togglePane && $rootScope.mms_pane_toggleable !== false)
 				{
-					if (button.selected || this.$root.mms_togglePane.closed)
+					if (button.selected || this.$root.ve_togglePane.closed)
 					{
-						if (button.selected && !this.$root.mms_togglePane.closed) toggleDecativeFlag = true;
-						this.$root.mms_togglePane.toggle();
+						if (button.selected && !this.$root.ve_togglePane.closed) toggleDecativeFlag = true;
+						this.$root.ve_togglePane.toggle();
 					}
 				}
 
