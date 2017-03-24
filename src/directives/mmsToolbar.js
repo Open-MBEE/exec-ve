@@ -181,7 +181,7 @@ function mmsToolbar($templateCache, $rootScope)
 					}
 				}
 
-				if (this.$root.mms_tbApi) this.$root.mms_tbApi.select(button.id);
+				if (this.$root.ve_tbApi) this.$root.ve_tbApi.select(button.id);
 
 				if (button.onClick) button.onClick();
 				else if (scope.onClick) scope.onClick(
@@ -189,7 +189,7 @@ function mmsToolbar($templateCache, $rootScope)
 					button: button
 				});
 
-				if (toggleDecativeFlag) this.$root.mms_tbApi.deactivate(button.id);
+				if (toggleDecativeFlag) this.$root.ve_tbApi.deactivate(button.id);
 
 /*if (! button.dynamic)
             {
