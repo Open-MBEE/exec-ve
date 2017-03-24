@@ -25,13 +25,13 @@
                     <span class="label-dropdown">Branch:</span>{{ currentBranch }}
                     <i class="fa fa-caret-down" aria-hidden="true"></i>
                 </button>
-                <ul class="dropdown-menu right-screen list-with-selected-item" uib-dropdown-menu role="menu"
+                <ul class="dropdown-menu right-screen list-with-selected-item list-with-button list-with-tabs" uib-dropdown-menu role="menu"
                     aria-labelledby="task-selection-button">
                     <li class="button-item">
                         <button class="btn btn-large btn-block btn-primary" ng-click="refsView()">Manage Branches
                         </button>
                     </li>
-                    <uib-tabset active="active" type="tabs" justified="true">
+                    <uib-tabset active="active" type="tabs" justified="false">
                         <uib-tab index="0" classes="tab-item" heading="Branches">
                             <li ng-repeat="branch in branches | orderBy:'name'" ng-click="updateBranch(branch)"
                                 ng-class="{'checked-list-item': branch.name === currentBranch}">{{ branch.name }}
