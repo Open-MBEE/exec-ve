@@ -76,17 +76,12 @@ function veMenu(ProjectService, ViewService, ElementService, $state, $rootScope,
             scope.base = {name: base.name, id: base.id};
             groupId = base._groupId;
             var groups = scope.groups;
-            var flag = true;
 
-            while(flag) {
+            while(groupId !== null) {
                 for(var i = 0; i < groups.length; i++) {
                     if(groups[i]._id == groupId) {
                         breadcrumbs.push({name: groups[i]._name, id: groups[i]._id});
                         groupId = groups[i]._parentId;
-
-                        if(groupId === null)
-                            flag = false;
-
                         break;
                     }
                 }
