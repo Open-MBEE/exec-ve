@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mmsApp')
-.directive('veMenu', ['ProjectService', '$state', '$rootScope', '$templateCache', 'growl', veMenu]);
+.directive('veMenu', ['ProjectService', 'ViewService', 'ElementService', '$state', '$rootScope', '$templateCache', 'growl', veMenu]);
 
 /**
  * @ngdoc directive
@@ -24,7 +24,7 @@ angular.module('mmsApp')
  * for specific view.
  *
  */
-function veMenu(ProjectService, $state, $rootScope, $templateCache, growl) {
+function veMenu(ProjectService, ViewService, ElementService, $state, $rootScope, $templateCache, growl) {
     var template = $templateCache.get('partials/mms/veMenu.html');
 
     var veMenuLink = function(scope, element, attrs) {
@@ -62,39 +62,37 @@ function veMenu(ProjectService, $state, $rootScope, $templateCache, growl) {
             $state.go('project', {projectId: scope.project.id});
         };
 
+        var breadcrumbs = [];
+        var base, groupId;
 
+        if($state.current.name === 'project.ref.document') {
+            base = scope.document;
+        }
+        else if($state.current.name === 'project.ref.document.view') {
+            base = scope.view;
+        }
 
-        // if (!scope.site)
-        //     return;
-        // var currSiteParentId = scope.site.parent;
-        // var isCharacterization = scope.site.isCharacterization;
-        // var breadcrumbs = [];
-        // breadcrumbs.push({name: scope.project.name, id: scope.project.id});
-        // var eltWidth = element.parent().width();
+        if(base) {
+            scope.base = {name: base.name, id: base.id};
+            groupId = base._groupId;
+            var groups = scope.groups;
 
-        // SiteService.getSites()
-        // .then(function(data) {
-        //     for (var i = data.length -1 ; i >= 0; i--) {
-        //         var site = data[i];
-        //         var siteParent = site.parent;
-        //         var siteIsChara = site.isCharacterization;
-        //         if (site.id == currSiteParentId && isCharacterization === siteIsChara) {
-        //           breadcrumbs.push({name: site.name, id: site.id});
-        //           if (site.parent) {
-        //             currSiteParentId = site.parent;
-        //           }
-        //         }
-        //     }
-        //     scope.breadcrumbs = breadcrumbs.reverse();
-        //     var Bcount = scope.breadcrumbs.length;
-        //     if (scope.product) {
-        //       Bcount++;
-        //     }
-        //     var liWidth = (eltWidth*0.75)/Bcount;
-        //     scope.truncateStyle={'max-width':liWidth};
-        // }, function(reason) {
-        //     growl.error("Sites Error: " + reason.message);
-        // });
+            while(groupId !== null) {
+                for(var i = 0; i < groups.length; i++) {
+                    if(groups[i]._id == groupId) {
+                        breadcrumbs.push({name: groups[i]._name, id: groups[i]._id});
+                        groupId = groups[i]._parentId;
+                        break;
+                    }
+                    else {
+                        groupId = null;
+                    }
+                }
+            }
+        }
+
+        scope.breadcrumbs = breadcrumbs;
+
     };
 
     return {
@@ -104,10 +102,16 @@ function veMenu(ProjectService, $state, $rootScope, $templateCache, growl) {
             org: '<mmsOrg',
             project: '<mmsProject',
             projects: '<mmsProjects',
+            groups: '<mmsGroups',
             branch: '<mmsBranch',
+            ref: '<mmsRef',
+            refs: '<mmsRefs',
             branches: '<mmsBranches',
             tag: '<mmsTag',
-            tags: '<mmsTags'
+            tags: '<mmsTags',
+            document: '<mmsDocument',
+            view: '<mmsView',
+            views: '<mmsViews'
         },
         link: veMenuLink
     };

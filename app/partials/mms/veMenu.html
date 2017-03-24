@@ -12,9 +12,9 @@
         </div>
         <div class="breadcrumbs">
             <ul>
-                <li><i class="fa fa-folder" aria-hidden="true"></i>(hardcoded)Europa Architecture</li>
+                <li ng-repeat="breadcrumb in breadcrumbs"><i class="fa fa-folder" aria-hidden="true"></i>{{ breadcrumb.name }}</li>
                 <li>&#8250;</li>
-                <li><i class="fa fa-file" aria-hidden="true"></i>Briefcase Architecture + Design Framework</li>
+                <li><i class="fa fa-file" aria-hidden="true"></i>{{ base.name }}</li>
             </ul>
         </div>
 

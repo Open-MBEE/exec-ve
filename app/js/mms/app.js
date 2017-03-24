@@ -171,6 +171,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 }
             },
             groupObs: function($stateParams, ProjectService, ticket) {
+                // console.log(ProjectService.getGroups($stateParams.projectId, $stateParams.refId));
                 return ProjectService.getGroups($stateParams.projectId, $stateParams.refId);
             },
             // documentObs: function($stateParams, ViewService, ticket) {
@@ -215,10 +216,11 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 }
             },
             'menu@': {
-                template: '<ve-menu mms-title="ve_title" mms-org="org" mms-project="project" mms-projects="projects" mms-branch="branch" mms-branches="branches" mms-tag="tag" mms-tags="tags"></ve-menu>',
-                controller: function ($scope, $rootScope, orgOb, projectOb, projectObs, refOb, refObs, branchOb, branchObs, tagOb, tagObs) {
+                template: '<ve-menu mms-title="ve_title" mms-org="org" mms-groups="groups" mms-project="project" mms-projects="projects" mms-branch="branch" mms-branches="branches" mms-tag="tag" mms-tags="tags"></ve-menu>',
+                controller: function ($scope, $rootScope, orgOb, groupObs, projectOb, projectObs, refOb, refObs, branchOb, branchObs, tagOb, tagObs) {
                     $rootScope.ve_title = orgOb.name;
                     $scope.org = orgOb;
+                    $scope.groups = groupObs;
                     $scope.project = projectOb;
                     $scope.projects = projectObs;
                     $scope.ref = refOb;
@@ -344,10 +346,11 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
         },
         views: {
             'menu@': {
-                template: '<ve-menu mms-title="ve_title" mms-org="org" mms-project="project" mms-projects="projects" mms-branch="branch" mms-branches="branches" mms-tag="tag" mms-tags="tags"></ve-menu>',
-                controller: function ($scope, $rootScope, orgOb, projectOb, projectObs, refOb, refObs, branchOb, branchObs, tagOb, tagObs) {
+                template: '<ve-menu mms-title="ve_title" mms-org="org" mms-groups="groups" mms-project="project" mms-projects="projects" mms-branch="branch" mms-branches="branches" mms-tag="tag" mms-tags="tags" mms-document="document" mms-views="views"></ve-menu>',
+                controller: function ($scope, $rootScope, orgOb, groupObs, projectOb, projectObs, refOb, refObs, branchOb, branchObs, tagOb, tagObs, documentOb, viewObs) {
                     $rootScope.ve_title = orgOb.name;
                     $scope.org = orgOb;
+                    $scope.groups = groupObs;
                     $scope.project = projectOb;
                     $scope.projects = projectObs;
                     $scope.ref = refOb;
@@ -356,6 +359,8 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                     $scope.branches = branchObs;
                     $scope.tag = tagOb;
                     $scope.tags = tagObs;
+                    $scope.document = documentOb;
+                    $scope.views = viewObs;
                 }
             },
             'pane-left@': {
@@ -389,6 +394,24 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             }
         },
         views: {
+            'menu@': {
+                template: '<ve-menu mms-title="ve_title" mms-org="org" mms-groups="groups" mms-project="project" mms-projects="projects" mms-ref="ref" mms-refs="refs" mms-branch="branch" mms-branches="branches" mms-tag="tag" mms-tags="tags" mms-document="document" mms-view="view"></ve-menu>',
+                controller: function ($scope, $rootScope, orgOb, groupObs, projectOb, projectObs, refOb, refObs, branchOb, branchObs, tagOb, tagObs, documentOb, viewOb) {
+                    $rootScope.ve_title = orgOb.name;
+                    $scope.org = orgOb;
+                    $scope.groups = groupObs;
+                    $scope.project = projectOb;
+                    $scope.projects = projectObs;
+                    $scope.ref = refOb;
+                    $scope.refs = refObs;
+                    $scope.branch = branchOb;
+                    $scope.branches = branchObs;
+                    $scope.tag = tagOb;
+                    $scope.tags = tagObs;
+                    $scope.document = documentOb;
+                    $scope.view = viewOb;
+                }
+            },
             'pane-center@': {
                 templateUrl: 'partials/mms/pane-center.html',
                 controller: 'ViewCtrl'
