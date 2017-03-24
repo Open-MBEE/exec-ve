@@ -48,17 +48,19 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
                 return;
             ran = true;
             lastid = newVal;
-            var reqOb = {elementId: scope.mmsElementId.instanceId, projectId: scope.mmsProjectId, refId: scope.mmsRefId, commitId: scope.mmsCommitId};
+            var commitId = scope.mmsCommitId;
+            commitId = commitId ? commitId : 'latest';
+            var reqOb = {elementId: scope.mmsElementId, projectId: scope.mmsProjectId, refId: scope.mmsRefId, commitId: commitId};
             ElementService.getElement(reqOb)
             .then(function(data) {
                 if (newVal !== lastid)
                     return;
                 scope.view = data;
-                scope.editable = scope.view._editable && scope.mmsCommitId === 'latest';
+                scope.editable = scope.view._editable && commitId === 'latest';
 
                 var contents = data._contents || data.specification;
                 if (contents) {
-                    ViewService.getElementReferenceTree(contents, scope.mmsRefId, scope.mmsCommitId)
+                    ViewService.getElementReferenceTree(reqOb, contents)
                     .then(function(elementReferenceTree) {
                         if (newVal !== lastid)
                             return;
@@ -102,10 +104,12 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
         scope.save = function() {
             var promises = [];
             var updateSectionElementOrder = function(elementReference) {
-                var sectionEdit = { 
+                var sectionEdit = {
                     id: elementReference.instanceId,
                     _read: elementReference.instanceSpecification._read,
                     _modified: elementReference.instanceSpecification._modified,
+                    _projectId: elementReference.instanceSpecification._projectId,
+                    _refId: elementReference.instanceSpecification._refId,
                     type: elementReference.instanceSpecification.type,
                     specification: {
                         type: "Expression"
@@ -136,13 +140,15 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
                 id: scope.view.id,
                 _read: scope.view._read,
                 _modified: scope.view._modified,
+                _projectId: scope.view._projectId,
+                _refId: scope.view._refId,
                 type: scope.view.type
             };
             //viewEdit.specialization = _.cloneDeep(scope.view.specialization);
             if (scope.view._contents)
-                viewEdit._contents = _.cloneDeep(scope.view._contents);
+                viewEdit._contents = JSON.parse(JSON.stringify(scope.view._contents));
             if (scope.view.specification)
-                viewEdit.specification = _.cloneDeep(scope.view.specification);
+                viewEdit.specification = JSON.parse(JSON.stringify(scope.view.specification));
             var contents = viewEdit._contents || viewEdit.specification;
             var origContents = scope.view._contents || scope.view.specification;
             // Update the View edit object on Save
@@ -155,7 +161,8 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
             if (viewEdit.view2view)
                 delete viewEdit.view2view;
             if (contents && !angular.equals(contents.operand, origContents.operand))
-                promises.push(ViewService.updateView(viewEdit, scope.mmsRefId));
+                promises.push(ElementService.updateElement(viewEdit));
+                // promises.push(ViewService.updateView(viewEdit, scope.mmsRefId));
             for (var j = 0; j < scope.elementReferenceTree.length; j++) {
                 if (scope.elementReferenceTree[j].sectionElements.length > 0)
                     updateSectionElementOrder(scope.elementReferenceTree[j]);
@@ -173,8 +180,9 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
 
         scope.refresh = function() {
             var contents = scope.view._contents || scope.view.specification;
+            var reqOb = {elementId: scope.mmsElementId, projectId: scope.mmsProjectId, refId: scope.mmsRefId, commitId: scope.mmsCommitId};
             if (contents) {
-                ViewService.getElementReferenceTree(contents, scope.mmsRefId, scope.mmsCommitId)
+                ViewService.getElementReferenceTree(reqOb, contents)
                 .then(function(elementReferenceTree) {
                     scope.elementReferenceTree = elementReferenceTree;
                     scope.originalElementReferenceTree = _.cloneDeep(elementReferenceTree, function(value, key, object) {
