@@ -20,7 +20,7 @@
 
         <ul class="nav navbar-nav navbar-right" style="padding-right: 25px">
             <li>
-            <div class="btn-group ve-dark-dropdown-nav" uib-dropdown keyboard-nav>
+            <div class="btn-group ve-dark-dropdown-nav" uib-dropdown keyboard-nav auto-close="disabled">
                 <button id="task-selection-button" type="button" class="dropdown-toggle" uib-dropdown-toggle ng-click="updateBranchChecked()">
                     <span class="label-dropdown">Branch:</span>{{ currentBranch }}
                     <i class="fa fa-caret-down" aria-hidden="true"></i>
@@ -34,12 +34,12 @@
                     <uib-tabset active="active" type="tabs" justified="false">
                         <uib-tab index="0" classes="tab-item" heading="Branches">
                             <li ng-repeat="branch in branches | orderBy:'name'" ng-click="updateBranch(branch)"
-                                ng-class="{'checked-list-item': branch.name === currentBranch}">{{ branch.name }}
+                                ng-class="{'checked-list-item': branch.name === currentBranch}" is-open="false">{{ branch.name }}
                             </li>
                         </uib-tab>
                         <uib-tab index="1" classes="tab-item" heading="Tags">
                             <li ng-repeat="tag in tags | orderBy:'name'" ng-click="updateTag(tag)"
-                           ng-class="{'checked-list-item': tag.name === currentTag}">{{ tag.name }}</li>
+                           ng-class="{'checked-list-item': tag.name === currentTag}" is-open="false">{{ tag.name }}</li>
                         </uib-tab>
                     </uib-tabset>
                     
