@@ -328,7 +328,7 @@ function UtilsService($q, $http, CacheService, URLService, _) {
                         result.push(makeHtmlList(thing));
                     } else if (thing.type === 'Image') {
                         //todo use mmsCf
-                        result.push('<mms-transclude-img mms-element-id="' + thing.id + '"></mms-transclude-img>');
+                        result.push('<mms-cf mms-cf-type="img" mms-element-id="' + thing.id + '"></mms-cf>');
                     }
                     result.push('</div>');
                 }
@@ -358,7 +358,7 @@ function UtilsService($q, $http, CacheService, URLService, _) {
                 } else if (thing.type === 'List') {
                     result.push(makeHtmlList(thing));
                 } else if (thing.type === 'Image') {
-                    result.push('<mms-transclude-img mms-element-id="' + thing.id + '"></mms-transclude-img>');
+                    result.push('<mms-cf mms-cf-type="img" mms-element-id="' + thing.id + '"></mms-cf>');
                 }
                 result.push('</div>');
             }
@@ -383,10 +383,10 @@ function UtilsService($q, $http, CacheService, URLService, _) {
             t = 'val';
         }
         if (para.nonEditable) {
-            attr = ' data-non-editable="' + para.nonEditable + '"';
+            attr = ' non-editable="' + para.nonEditable + '"';
         }
         //TODO update these to match mmsCF
-        return '<mms-cf mms-cf-type="' + t + '" mms-eid="' + para.source + '"' + attr + '></mms-transclude-' + t + '>';
+        return '<mms-cf mms-cf-type="' + t + '" mms-element-id="' + para.source + '"' + attr + '></mms-cf>';
     };
 
     var makeHtmlTOC = function (tree) {

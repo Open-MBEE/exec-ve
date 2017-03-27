@@ -47,13 +47,10 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
                 $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-cancel", $scope));
             }
         };
-
     };
 
     var mmsTranscludeNameLink = function(scope, domElement, attrs, controllers) {
         var mmsViewCtrl = controllers[0];
-        var mmsCfDocCtrl = controllers[1];
-        var mmsCfValCtrl = controllers[2];
         var processed = false;
         scope.recompileScope = null;
         domElement.click(function(e) {
@@ -100,42 +97,12 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
                 return;
             if (!scope.mmsWatchId)
                 idwatch();
-            var projectId = scope.mmsProjectId;
-            var refId = scope.mmsRefId;
-            var commitId = scope.mmsCommitId;
-            if (mmsCfValCtrl) {
-                var cfvVersion = mmsCfValCtrl.getElementOrigin();
-                if (!projectId)
-                    projectId = cfvVersion.projectId;
-                if (!refId)
-                    refId = cfvVersion.refId;
-                if (!commitId)
-                    commitId = cfvVersion.commitId;
-            }
-            if (mmsCfDocCtrl) {
-                var cfdVersion = mmsCfDocCtrl.getElementOrigin();
-                if (!projectId)
-                    projectId = mmsCfDocCtrl.projectId;
-                if (!refId)
-                    refId = mmsCfDocCtrl.refId;
-                if (!commitId)
-                    commitId = mmsCfDocCtrl.commitId;
-            }
-            if (mmsViewCtrl) {
-                var viewVersion = mmsViewCtrl.getElementOrigin();
-                if (!projectId)
-                    projectId = viewVersion.projectId;
-                if (!refId)
-                    refId = viewVersion.refId;
-                if (!commitId)
-                    commitId = viewVersion.commitId;
-            }
+            scope.projectId = scope.mmsProjectId;
+            scope.refId = scope.mmsRefId ? scope.mmsRefId : 'master';
+            scope.commitId = scope.mmsCommitId ? scope.mmsCommitId : 'latest';
+            
             domElement.html('(loading...)');
             domElement.addClass("isLoading");
-
-            scope.projectId = projectId;
-            scope.refId = refId ? refId : 'master';
-            scope.commitId = commitId ? commitId : 'latest';
             var reqOb = {elementId: scope.mmsElementId, projectId: scope.projectId, refId: scope.refId, commitId: scope.commitId};
             ElementService.getElement(reqOb, 1, false)
             .then(function(data) {
@@ -203,7 +170,7 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
     return {
         restrict: 'E',
         scope: {
-            mmsElementId: '@mmsEid',
+            mmsElementId: '@',
             mmsProjectId: '@',
             mmsRefId: '@',
             mmsCommitId: '@',
@@ -212,7 +179,7 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
             nonEditable: '<',
             clickHandler: '&?'
         },
-        require: ['?^^mmsView', '?^^mmsTranscludeDoc', '?^^mmsTranscludeVal'],
+        require: ['?^^mmsView'],
         controller: ['$scope', mmsTranscludeNameCtrl],
         link: mmsTranscludeNameLink
     };

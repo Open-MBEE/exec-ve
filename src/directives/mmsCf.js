@@ -1,18 +1,13 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsTranscludeName', ['ElementService', 'UxService', '$compile', 'growl', '$templateCache', 'Utils', mmsTranscludeName]);
+.directive('mmsCf', ['$compile', mmsCf]);
 
 /**
  * @ngdoc directive
- * @name mms.directives.directive:mmsTranscludeName
+ * @name mms.directives.directive:mmsCf
  *
- * @requires mms.ElementService
- * @requires mms.UxService
- * @requires mms.Utils
  * @requires $compile
- * @requires $templateCache
- * @requires growl
  *
  * @restrict E
  *
@@ -23,12 +18,14 @@ angular.module('mms.directives')
  *
  * @param {string} mmsElementId The id of the view
  * @param {string} mmsProjectId The project id for the view
+ * @param {string} mmsCfType one of doc, val, name, com, img
  * @param {string=master} mmsRefId Reference to use, defaults to master
  * @param {string=latest} mmsCommitId Commit ID, default is latest
+ * @param {boolean=false} nonEditable can edit inline or not
  */
-function mmsTranscludeName(ElementService, UxService, $compile, growl, $templateCache, Utils) {
+function mmsCf($compile) {
 
-    var mmsTranscludeNameCtrl = function ($scope) {
+    var mmsCfCtrl = function($scope) {
         //INFO this was this.getWsAndVersion
         this.getElementOrigin = function() {
             return {
@@ -39,7 +36,7 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
         };
     };
 
-    var mmsTranscludeNameLink = function(scope, domElement, attrs, controllers) {
+    var mmsCfLink = function(scope, domElement, attrs, controllers) {
         var mmsCfCtrl = controllers[0];
         var mmsViewCtrl = controllers[1];
 
@@ -72,13 +69,11 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
             scope.projectId = projectId;
             scope.refId = refId ? refId : 'master';
             scope.commitId = commitId ? commitId : 'latest';
+            if (scope.mmsCfType) {
+                domElement[0].innerHTML = '<mms-transclude-'+scope.mmsCfType+' mms-element-id="{{mmsElementId}}" mms-project-id="{{projectId}}" mms-ref-id="{{refId}}" mms-commit-id="{{commitId}}" non-editable="nonEditable"></<mms-transclude-'+scope.mmsCfType+'>';
+                $compile(domElement.contents())(scope);
+            }
         });
-
-        if (scope.mmsCfType) {
-            domElement[0].innerHTML = '<mms-transclude-'+scope.mmsCfType+' mms-eid="mmsElementId" mms-project-id="projectId" mms-ref-id="refId" mms-commit-id="commitId" non-editable="nonEditable"></<mms-transclude-'+scope.mmsCfType+'>';
-            $compile(domElement.contents())(scope);
-        }
-
     };
 
     return {
@@ -92,7 +87,7 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
             nonEditable: '<',
         },
         require: ['?^^mmsCf', '?^^mmsView'],
-        controller: ['$scope', mmsTranscludeNameCtrl],
-        link: mmsTranscludeNameLink
+        controller: ['$scope', mmsCfCtrl],
+        link: mmsCfLink
     };
 }

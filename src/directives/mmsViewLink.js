@@ -44,11 +44,6 @@ function mmsViewLink(ElementService, UtilsService, $compile, growl) {
                 if (!commitId)
                     commitId = viewVersion.commitId;
             }
-            if (!refId)
-                refId = 'master';
-            if (!commitId)
-                commitId = 'latest';
-
             scope.projectId = projectId;
             scope.refId = refId ? refId : 'master';
             scope.commitId = commitId ? commitId : 'latest';
@@ -96,7 +91,7 @@ function mmsViewLink(ElementService, UtilsService, $compile, growl) {
             mmsDocId: '@',
             mmsPeId: '@'
         },
-        require: '?^mmsView',
+        require: '?^^mmsView',
         template: '<a href="mms.html#/projects/{{projectId}}/{{refId}}/documents/{{docid}}/views/{{vid}}{{hash}}">{{name || "Unnamed View"}}</a>',
         link: mmsViewLinkLink
     };

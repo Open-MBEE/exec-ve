@@ -109,10 +109,10 @@
         </div>
         </div>
         <div ng-if="isRestrictedVal">
-            <h3 class="prop"><mms-transclude-name mms-watch-id="true" mms-eid="{{values[0].operand[1].elementId}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></h3>
+            <h3 class="prop"><mms-transclude-name mms-watch-id="true" mms-element-id="{{values[0].operand[1].elementId}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}"></mms-transclude-name></h3>
         </div>
         <h2 class="prop-title spec-view-value-heading">PROPERTY TYPE</h2>
-        <h3 class="prop"><mms-transclude-name mms-watch-id="true" mms-eid="{{element.typeId}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}" click-handler="propertyTypeClicked()"></mms-transclude-name></h3>
+        <h3 class="prop"><mms-transclude-name mms-watch-id="true" mms-element-id="{{element.typeId}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" click-handler="propertyTypeClicked()"></mms-transclude-name></h3>
     </div>
 
     <div ng-if="element.type === 'Generalization' || element.type === 'Dependency'">
