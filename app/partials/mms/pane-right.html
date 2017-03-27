@@ -16,13 +16,13 @@
     </div>
 
     <div ng-if="documentOb">
-        <div class="container-fluid" ng-if="show.history">
+        <div class="container-fluid" ng-show="show.history">
           <mms-history mms-element-id="{{specInfo.id}}" mms-ref-id="{{specInfo.refId}}" mms-project-id="{{specInfo.projectId}}"></mms-history>
         </div>
     </div>
 
     <div class="container-fluid" ng-show="show.reorder">
-        <mms-view-reorder mms-vid="{{viewOb.id}}" mms-project-id="{{viewOb._projectId}}" mms-commit-id="{{viewCommitId}}" mms-order="true" mms-ref-id="{{viewOb._refId}}" mms-view-reorder-api="viewContentsOrderApi"></mms-view-reorder>
+        <mms-view-reorder mms-element-id="{{viewOb.id}}" mms-project-id="{{viewOb._projectId}}" mms-commit-id="{{viewCommitId}}" mms-order="true" mms-ref-id="{{viewOb._refId}}" mms-view-reorder-api="viewContentsOrderApi"></mms-view-reorder>
     </div>
 
     <div class="container-fluid" ng-show="show.jobs">

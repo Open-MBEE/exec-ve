@@ -592,8 +592,8 @@ function UtilsService($q, $http, CacheService, URLService, _) {
 
     /**
      * @ngdoc method
-     * @name mms.ConfigService#convertHtmlToPdf
-     * @methodOf mms.ConfigService
+     * @name mms.UtilsService#convertHtmlToPdf
+     * @methodOf mms.UtilsService
      *
      * @description
      * Converts HTML to PDF

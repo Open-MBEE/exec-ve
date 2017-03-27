@@ -307,18 +307,6 @@ function ProjectService($q, $http, URLService, CacheService, ApplicationService)
     };
 
     /** TODO not supported
-     * @ngdoc method
-     * @name mms.ProjectService#diff
-     * @methodOf mms.ProjectService
-     *
-     * @description
-     * Get workspace diff
-     *
-     * @param {string} ws1 target workspace
-     * @param {string} ws2 source workspace
-     * @param {string} ws1time timestamp of ws1
-     * @param {string} ws2time timestamp of ws2
-     * @returns {Promise} Promise would be resolved with diff object
      */
     var diff = function(ws1, ws2, ws1time, ws2time, recalc) {
         /*var deferred = $q.defer();
