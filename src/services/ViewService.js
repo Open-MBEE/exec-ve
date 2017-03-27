@@ -642,7 +642,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 }],
                 type: 'Expression'
             },
-            name: viewOb.name ? viewOb.name : 'Untitled View',
+            name: viewOb.viewName ? viewOb.viewName : 'Untitled View',
             documentation: viewOb.viewDoc ? viewOb.viewDoc : '',
             _appliedStereotypeIds: [
                 (viewOb.isDoc ? "_17_0_2_3_87b0275_1371477871400_792964_43374" : "_17_0_1_232f03dc_1325612611695_581988_21583")
@@ -650,16 +650,15 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             appliedStereotypeInstanceId: newViewId + '_asi'
         };
         var parentView = null;
-        if (ownerOb && ownerOb._childViews) {
-            parentView = {
-                _projectId: ownerOb._projectId,
-                _refId: ownerOb._refId,
-                _modified: ownerOb._modified,
-                _read: ownerOb._read,
-                id: ownerOb.id,
-                _childViews: JSON.parse(JSON.stringify(ownerOb._childViews))
-            };
+        if (ownerOb && (ownerOb._childViews || UtilsService.isView(ownerOb))) {
+            parentView = JSON.parse(JSON.stringify(ownerOb));
+            if (!parentView._childViews) {
+                parentView._childViews = [];
+            }
             parentView._childViews.push({id: newViewId, aggregation: "composite"});
+            if (angular.isString(parentView.displayedElements)) {
+                parentView.displayedElements = JSON.parse(parentView.displayedElements);
+            }
         } 
         var instanceSpecDoc = '<p>&nbsp;</p><p><mms-transclude-doc data-mms-eid="' + newViewId + '">[cf:' + view.name + '.doc]</mms-transclude-doc></p><p>&nbsp;</p>';
         var instanceSpecSpec = {
