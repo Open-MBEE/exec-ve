@@ -63,30 +63,69 @@ function veMenu(ProjectService, ViewService, ElementService, $state, $rootScope,
         };
 
         var breadcrumbs = [];
-        var base, groupId;
+        var base, child;
+        var groups = scope.groups;
 
-        if($state.current.name === 'project.ref.document') {
-            base = scope.document;
+        if(scope.group !== undefined) {
+            scope.base = {name: scope.group._name, id: scope.group._id};
+            child = {type: 'group', obj: scope.group}; 
+        }   
+        if(scope.document !== undefined) { 
+            scope.base = {name: scope.document.name, id: scope.document.id};
+            child = {type: 'docview', obj: scope.document}; 
         }
-        else if($state.current.name === 'project.ref.document.view') {
-            base = scope.view;
+        if(scope.view !== undefined) {
+            scope.base = {name: scope.view.name, id: scope.view.id};
+            child = {type: 'docview', obj: scope.view};
         }
 
-        if(base) {
-            scope.base = {name: base.name, id: base.id};
-            groupId = base._groupId;
-            var groups = scope.groups;
+        if(child) {
+            var searchParent = function(child) {
+                if(child === undefined)
+                    return breadcrumbs;
+                else {
+                    if(child.type === 'group' && child.obj._parentId !== null) {
+                        for(var i = 0; i < groups.length; i++) {
+                            if(groups[i]._id == child.obj._parentId) {
+                                breadcrumbs.push({name: groups[i]._name, id: groups[i]._id});
 
-            while(groupId !== null) {
-                for(var i = 0; i < groups.length; i++) {
-                    if(groups[i]._id == groupId) {
-                        breadcrumbs.push({name: groups[i]._name, id: groups[i]._id});
-                        groupId = groups[i]._parentId;
-                        break;
+                                if(groups[i]._parentId) {
+                                    var groupParent = ProjectService.getGroup(groups[i]._parentId, scope.project.id, scope.ref.id);
+                                    child = {type: 'group', obj: groupParent};
+                                } else {
+                                    child = undefined;
+                                }
+                                break;
+                            }
+                        }
                     }
+                    else if(child.type === 'docview') {
+                        if(child.obj._groupId) {
+                            var docParent = ProjectService.getGroup(child.obj._groupId, scope.project.id, scope.ref.id);
+                            breadcrumbs.push({name: docParent._name, id: docParent._id});
+                            child = {type: 'group', obj: docParent};
+                        } else if(child.obj.ownerId) {
+                            var viewParent = ElementService.getElement({
+                                projectId: scope.project.id,
+                                refId: scope.ref.id,
+                                extended: true,
+                                elementId: child.obj.id
+                            }, 2);
+                            breadcrumbs.push({name: viewParent.name, id: viewParent.id});
+                            child = {type: 'docview', obj: viewParent};
+                        } else {
+                            child = undefined;
+                        }
+                    } 
                 }
-            }
+                    return searchParent(child);
+            };
+
+            breadcrumbs = searchParent(child);
+            scope.breadcrumbs = breadcrumbs.reverse();
+            console.log("bread: " + scope.breadcrumbs);
         }
+
         breadcrumbs = breadcrumbs.reverse();
         scope.breadcrumbs = breadcrumbs;
 
@@ -99,6 +138,7 @@ function veMenu(ProjectService, ViewService, ElementService, $state, $rootScope,
             org: '<mmsOrg',
             project: '<mmsProject',
             projects: '<mmsProjects',
+            group: '<mmsGroup',
             groups: '<mmsGroups',
             branch: '<mmsBranch',
             ref: '<mmsRef',
