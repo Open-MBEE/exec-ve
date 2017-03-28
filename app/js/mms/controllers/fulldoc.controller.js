@@ -46,6 +46,9 @@ function($scope, $rootScope, $state, $stateParams, $window, $element, hotkeys, g
             if ($rootScope.veElementsOn) {
                 dis.toggleShowElements();
             }
+            if ($rootScope.ve_editmode) {
+                dis.toggleShowEdits();
+            }
         },
         elementTranscluded: elementTranscluded,
         elementClicked: elementClicked

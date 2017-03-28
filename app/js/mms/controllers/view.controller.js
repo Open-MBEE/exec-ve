@@ -41,6 +41,9 @@ angular.module('mmsApp')
             if ($rootScope.veElementsOn) {
                 $scope.viewApi.toggleShowElements();
             }
+            if ($rootScope.ve_editmode) {
+                $scope.viewApi.toggleShowEdits();
+            }
         },
         elementTranscluded: function(elementOb, type) {
             if (type === 'Comment' && !$scope.comments.map.hasOwnProperty(elementOb.id)) {

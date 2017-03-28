@@ -186,7 +186,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                 CacheService.put(commitCacheKey, resultCommitCopy, true);
             }
         }
-        var realCacheKey = UtilsService.makeElementKey(result, result.id, edit);
+        var realCacheKey = UtilsService.makeElementKey(result, edit);
         result._commitId = origResultCommit; //restore actual commitId
         if (angular.equals(realCacheKey, requestCacheKey)) {
             result = CacheService.put(requestCacheKey, result, true);
@@ -253,7 +253,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         getElement(reqOb, weight, update)
         .then(function(result) {
             var copy = JSON.parse(JSON.stringify(result));
-            deferred.resolve(cacheElement(reqOb, result, true));
+            deferred.resolve(cacheElement(reqOb, copy, true));
         }, function(reason) {
             deferred.reject(reason);
         }).finally(function() {
