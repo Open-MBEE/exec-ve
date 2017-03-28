@@ -58,7 +58,7 @@ function veMenu(ProjectService, $state, $rootScope, $templateCache, growl) {
         };
 
         scope.isRefsView = function(){
-            if ( $state.is('project') ) {
+            if ( $state.includes('project') && !($state.includes('project.ref')) ) {
                 return true;
             } else {
                 return false;

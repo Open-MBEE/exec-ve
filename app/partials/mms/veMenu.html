@@ -12,9 +12,12 @@
         </div>
         <div class="breadcrumbs">
             <ul>
-                <li><i class="fa fa-folder" aria-hidden="true"></i>(hardcoded)Europa Architecture</li>
+                <li ng-show="isRefsView()">
+                    <a ui-sref="project.ref({refId: 'master', search: undefined})"><i class="fa fa-arrow-left"></i> back to sites &amp; documents</a>
+                </li>
+                <li ng-show="!isRefsView()"><i class="fa fa-folder" aria-hidden="true"></i>(hardcoded)Europa Architecture</li>
                 <li>&#8250;</li>
-                <li><i class="fa fa-file" aria-hidden="true"></i>Briefcase Architecture + Design Framework</li>
+                <li ng-show="!isRefsView()"><i class="fa fa-file" aria-hidden="true"></i>Briefcase Architecture + Design Framework</li>
             </ul>
         </div>
 
