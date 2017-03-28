@@ -160,14 +160,14 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 if(refOb.type === "Tag")
                     return refOb;
                 else {
-                    return {name: "latest"};
+                    return [];
                 }
             },
             branchOb: function(refOb) {
                 if(refOb.type === "Branch")
                     return refOb;
                 else {
-                    return {name: "master"};
+                    return [];
                 }
             },
             groupObs: function($stateParams, ProjectService, ticket) {
@@ -197,7 +197,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 });
             }
         },
-        views: { 
+        views: {
             'nav@': {
                 template: '<ve-nav mms-title="ve_title" mms-org="org" mms-orgs="orgs" mms-project="project" mms-projects="projects" mms-ref="ref" mms-branch="branch" mms-branches="branches" mms-tag="tag" mms-tags="tags" mms-search="search"></ve-nav>', 
                 controller: function ($scope, $rootScope, orgOb, orgObs, projectOb, projectObs, refOb, branchOb, branchObs, tagOb, tagObs, search) {
@@ -215,7 +215,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 }
             },
             'menu@': {
-                template: '<ve-menu mms-title="ve_title" mms-org="org" mms-project="project" mms-projects="projects" mms-branch="branch" mms-branches="branches" mms-tag="tag" mms-tags="tags"></ve-menu>',
+                template: '<ve-menu mms-title="ve_title" mms-org="org" mms-project="project" mms-projects="projects" mms-ref="ref" mms-branch="branch" mms-branches="branches" mms-tag="tag" mms-tags="tags"></ve-menu>',
                 controller: function ($scope, $rootScope, orgOb, projectOb, projectObs, refOb, refObs, branchOb, branchObs, tagOb, tagObs) {
                     $rootScope.ve_title = orgOb.name;
                     $scope.org = orgOb;
