@@ -12,33 +12,43 @@
         </div>
         <div class="breadcrumbs">
             <ul>
-                <li ng-repeat="breadcrumb in breadcrumbs"><i class="fa fa-folder" aria-hidden="true"></i>{{ breadcrumb.name }} &#8250;</li>
-                <!-- <li>&#8250;</li> -->
-                <li><i class="fa fa-file" aria-hidden="true"></i>{{ base.name }}</li>
+                <li ng-show="isRefsView()">
+                    <a ui-sref="project.ref({refId: 'master', search: undefined})"><i class="fa fa-arrow-left"></i> back to sites &amp; documents</a>
+                </li>
+                <li ng-show="!isRefsView()" ng-repeat="breadcrumb in breadcrumbs track by $index"><i ng-class="{'fa fa-folder': breadcrumb.type === 'group', 'fa fa-file': $last && breadcrumb.type === 'doc'}" aria-hidden="true"></i>{{ breadcrumb.name }}<span ng-show="!$last"> &#8250;</span></li>
             </ul>
         </div>
 
         <ul class="nav navbar-nav navbar-right" style="padding-right: 25px">
             <li>
-            <div class="btn-group ve-dark-dropdown-nav" uib-dropdown keyboard-nav>
-                <button id="task-selection-button" type="button" class="dropdown-toggle" uib-dropdown-toggle ng-click="updateBranchChecked()">
-                    <span class="label-dropdown">Branch:</span>{{ currentBranch }}
+            <div class="btn-group ve-dark-dropdown-nav" uib-dropdown keyboard-nav auto-close="disabled">
+                <button id="task-selection-button" type="button" class="dropdown-toggle" uib-dropdown-toggle>
+                    <span class="label-dropdown">{{ currentRef.type }}:</span>{{ currentRef.name }}
                     <i class="fa fa-caret-down" aria-hidden="true"></i>
                 </button>
-                <ul class="dropdown-menu right-screen list-with-selected-item" uib-dropdown-menu role="menu"
+                <ul class="dropdown-menu right-screen list-with-selected-item list-with-button list-with-tabs" uib-dropdown-menu role="menu"
                     aria-labelledby="task-selection-button">
                     <li class="button-item">
-                        <button class="btn btn-large btn-block btn-primary" ng-click="refsView()">Manage Branches
+                        <button class="btn btn-large btn-block btn-primary" ng-click="refsView()">Manage Branches and Tags
                         </button>
                     </li>
-                    <li ng-repeat="branch in branches | orderBy:'name'" ng-click="updateBranch(branch)"
-                        ng-class="{'checked-list-item': branch.name === currentBranch}">{{ branch.name }}
-                    </li>
+                    <uib-tabset active="active" type="tabs" justified="false">
+                        <uib-tab index="0" classes="tab-item" heading="Branches">
+                            <li ng-repeat="branch in branches | orderBy:'name'" ng-click="updateBranch(branch)"
+                                ng-class="{'checked-list-item': branch.name === currentBranch}" is-open="false">{{ branch.name }}
+                            </li>
+                        </uib-tab>
+                        <uib-tab index="1" classes="tab-item" heading="Tags">
+                            <li ng-repeat="tag in tags | orderBy:'name'" ng-click="updateTag(tag)"
+                           ng-class="{'checked-list-item': tag.name === currentTag}" is-open="false">{{ tag.name }}</li>
+                        </uib-tab>
+                    </uib-tabset>
+                    
                 </ul>
             </div>
             </li>
 
-            <li>
+            <!--<li>
             <div class="btn-group ve-dark-dropdown-nav" uib-dropdown keyboard-nav>
                 <button id="tag-selection-button" type="button" class="dropdown-toggle" uib-dropdown-toggle ng-click="updateTagChecked()">
                     <span class="label-dropdown">Tag:</span>{{ currentTag }}
@@ -54,7 +64,7 @@
                            ng-class="{'checked-list-item': tag.name === currentTag}">{{ tag.name }}</li>
                 </ul>
             </div>
-            </li>
+            </li>-->
         </ul>
 
     </div>

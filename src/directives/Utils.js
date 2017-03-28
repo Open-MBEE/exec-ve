@@ -340,7 +340,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Ca
                 }
                 if (!scope.skipBroadcast) {
                     // Broadcast message for the toolCtrl:
-                    $rootScope.$broadcast('presentationElem.edit',scope);
+                    $rootScope.$broadcast('presentationElem.edit',scope.edit);
                 } else {
                     scope.skipBroadcast = false;
                 }
@@ -394,7 +394,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Ca
                 scope.elementSaving = false;
                 if (!continueEdit) {
                     scope.isEditing = false;
-                    $rootScope.$broadcast('presentationElem.save', scope); //TODO check
+                    $rootScope.$broadcast('presentationElem.save', scope.edit);
                 }
                 growl.success('Save Successful');
                 scrollToElement(domElement);
@@ -440,7 +440,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Ca
             scope.isEditing = false;
             revertEdits(scope, scope.edit);
              // Broadcast message for the ToolCtrl:
-            $rootScope.$broadcast('presentationElem.cancel', scope); //TODO check
+            $rootScope.$broadcast('presentationElem.cancel', scope.edit);
             recompile();
             scrollToElement(domElement);
         };
@@ -520,7 +520,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Ca
                 $rootScope.$broadcast('view-reorder.refresh');
 
                  // Broadcast message for the ToolCtrl:
-                $rootScope.$broadcast('presentationElem.cancel',scope);
+                $rootScope.$broadcast('presentationElem.cancel',scope.edit);
 
                 growl.success('Delete Successful');
             }, handleError);
@@ -566,7 +566,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Ca
         } else { //nothing has changed, cancel instead of preview
             if (scope.edit && scope.isEditing) {
                 // Broadcast message for the ToolCtrl to clear out the tracker window:
-                $rootScope.$broadcast('presentationElem.cancel', scope);
+                $rootScope.$broadcast('presentationElem.cancel', scope.edit);
                 if (scope.element) {
                     recompile();
                 }

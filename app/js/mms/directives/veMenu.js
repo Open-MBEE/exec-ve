@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mmsApp')
-.directive('veMenu', ['ProjectService', 'ViewService', 'ElementService', '$state', '$rootScope', '$templateCache', 'growl', veMenu]);
+.directive('veMenu', ['ProjectService','$state','$rootScope', '$templateCache', 'growl', veMenu]);
 
 /**
  * @ngdoc directive
@@ -24,14 +24,20 @@ angular.module('mmsApp')
  * for specific view.
  *
  */
-function veMenu(ProjectService, ViewService, ElementService, $state, $rootScope, $templateCache, growl) {
+function veMenu(ProjectService, $state, $rootScope, $templateCache, growl) {
     var template = $templateCache.get('partials/mms/veMenu.html');
 
     var veMenuLink = function(scope, element, attrs) {
 
         scope.currentProject = scope.project.name;
-        scope.currentBranch = scope.branch.name;
-        scope.currentTag = scope.tag.name;
+        if (scope.ref) {
+            scope.currentRef = scope.ref;
+            if (scope.ref.type === 'Branch') {
+                scope.currentBranch = scope.branch.name;
+            } else if (scope.ref.type === 'Tag') {
+                scope.currentTag = scope.tag.name;
+            }
+        } 
 
         var projectId, branchId, tagId;
 
@@ -52,7 +58,7 @@ function veMenu(ProjectService, ViewService, ElementService, $state, $rootScope,
         };
 
         scope.isRefsView = function(){
-            if ( $state.is('project') ) {
+            if ( $state.includes('project') && !($state.includes('project.ref')) ) {
                 return true;
             } else {
                 return false;
@@ -62,72 +68,43 @@ function veMenu(ProjectService, ViewService, ElementService, $state, $rootScope,
             $state.go('project', {projectId: scope.project.id});
         };
 
-        var breadcrumbs = [];
-        var base, child;
+        var bcrumbs = [];
+        var child, parentId;
         var groups = scope.groups;
+        
+        var searchParent = function(kidId) {
+            while(kidId) {
+                for(var i = 0; i < groups.length; i++) {
+                    if(groups[i]._id == kidId) {
+                        bcrumbs.push({name: groups[i]._name, id: groups[i]._id, type: "group"});
+                        kidId = groups[i]._parentId;
+                        break;
+                    } 
+                }        
+            }  
+        };
 
         if(scope.group !== undefined) {
-            scope.base = {name: scope.group._name, id: scope.group._id};
-            child = {type: 'group', obj: scope.group}; 
-        }   
-        if(scope.document !== undefined) { 
-            scope.base = {name: scope.document.name, id: scope.document.id};
-            child = {type: 'docview', obj: scope.document}; 
+            child = scope.group; 
         }
-        if(scope.view !== undefined) {
-            scope.base = {name: scope.view.name, id: scope.view.id};
-            child = {type: 'docview', obj: scope.view};
+        if(scope.document !== undefined) {
+            child = scope.document; 
         }
 
         if(child) {
-            var searchParent = function(child) {
-                if(child === undefined)
-                    return breadcrumbs;
-                else {
-                    if(child.type === 'group' && child.obj._parentId !== null) {
-                        for(var i = 0; i < groups.length; i++) {
-                            if(groups[i]._id == child.obj._parentId) {
-                                breadcrumbs.push({name: groups[i]._name, id: groups[i]._id});
+            if(child.hasOwnProperty('_id')) {
+                bcrumbs.push({name: child._name, id: child._id, type: "group"});
+                if(child._parentId)
+                    parentId = child._parentId;
+            } else {
+                bcrumbs.push({name: child.name, id: child.id, type: "doc"});
+                if(child._groupId)
+                    parentId = child._groupId;
+            }
 
-                                if(groups[i]._parentId) {
-                                    var groupParent = ProjectService.getGroup(groups[i]._parentId, scope.project.id, scope.ref.id);
-                                    child = {type: 'group', obj: groupParent};
-                                } else {
-                                    child = undefined;
-                                }
-                                break;
-                            }
-                        }
-                    }
-                    else if(child.type === 'docview') {
-                        if(child.obj._groupId) {
-                            var docParent = ProjectService.getGroup(child.obj._groupId, scope.project.id, scope.ref.id);
-                            breadcrumbs.push({name: docParent._name, id: docParent._id});
-                            child = {type: 'group', obj: docParent};
-                        } else if(child.obj.ownerId) {
-                            var viewParent = ElementService.getElement({
-                                projectId: scope.project.id,
-                                refId: scope.ref.id,
-                                extended: true,
-                                elementId: child.obj.id
-                            }, 2);
-                            breadcrumbs.push({name: viewParent.name, id: viewParent.id});
-                            child = {type: 'docview', obj: viewParent};
-                        } else {
-                            child = undefined;
-                        }
-                    } 
-                }
-                    return searchParent(child);
-            };
-
-            breadcrumbs = searchParent(child);
-            scope.breadcrumbs = breadcrumbs.reverse();
-            console.log("bread: " + scope.breadcrumbs);
+            searchParent(parentId);
+            scope.breadcrumbs = bcrumbs.reverse();
         }
-
-        breadcrumbs = breadcrumbs.reverse();
-        scope.breadcrumbs = breadcrumbs;
 
     };
 
@@ -146,9 +123,8 @@ function veMenu(ProjectService, ViewService, ElementService, $state, $rootScope,
             branches: '<mmsBranches',
             tag: '<mmsTag',
             tags: '<mmsTags',
-            document: '<mmsDocument',
-            view: '<mmsView',
-            views: '<mmsViews'
+            document: '<mmsDocument'
+
         },
         link: veMenuLink
     };

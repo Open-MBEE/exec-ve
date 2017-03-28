@@ -259,8 +259,8 @@ div.tooltip-inner {
   }
 
   ul.dropdown-menu{
-    margin-top: 0;
-    border-radius: 2px;
+    border-radius: 3px;
+    margin-top:4px;
   }
 
   .dropdown-menu li{
@@ -284,6 +284,7 @@ div.tooltip-inner {
 
    ul.dropdown-menu{
     background-color:#4d4d4d;
+    max-width: 300px;
   }
 
    .dropdown-menu li:hover {
@@ -310,31 +311,90 @@ div.tooltip-inner {
     background-color:#505050;
   }
 
+  /*Clear padding on top for lists with buttons*/
+  ul.list-with-button{
+    padding-top:0;
+  }
+
+  /* set min width for button in a list*/
+  .btn-primary{
+    min-width:200px;
+  }
+
   /*Clear padding for check mark list items with buttons in them */
   .dropdown-menu.list-with-selected-item li.button-item{
     padding-left:8px;
   }
 
+  /*Clear padding for check mark list items with tabs in them */
+  .dropdown-menu.list-with-selected-item li.tab-item{
+    padding:0px;
+    // min-width: 100px;
+  }
+
   /*set min width to override a 100% width*/
   .dropdown-menu li.button-item{
-    min-width: 240px;
+    min-width: 100px;
   }
 
 
   .checked-list-item::before{
-      content: "\f00c";
+    content: "\f00c";
     font-family: FontAwesome;
     height: 16px;
     position: absolute;
     left: 10px;
     top: 6px;
     width: 16px;
-    color: #45cb93;
+    color: #45c29d;
   }
 
   .dropdown-menu .fa-check {
       padding-right: 6px;
       color: #35bc84;
       font-size: 14px;
+  }
+
+  /*Tab system*/
+
+  .nav-tabs{
+    background-color:#404040;
+  }
+
+  .list-with-tabs .button-item{
+    background-color:#404040;
+  }
+
+  .nav-tabs > li.uib-tab{
+    width:50%;
+    text-align:center;
+  }
+
+  .nav-tabs > li.uib-tab:hover,
+  .list-with-tabs li.button-item:hover{
+    background-color:#404040;
+  }
+
+  .nav-tabs > li.active.uib-tab > a{
+    background-color:#404040;
+    border:none;
+    border-bottom: 3px solid #407f91;
+    color:white;
+    margin:0;
+    font-weight:400;
+  }
+
+  .nav-tabs > li.uib-tab > a{
+    background-color:#404040;
+    border:none;
+    border-bottom: 3px solid #404040;
+    color:#b3b3b3;
+    margin:0;
+  }
+
+  uib-tab:hover{
+    background-color:#404040;
+    border:none;
+    border-bottom: 4px solid #4e88c2;    
   }
 }

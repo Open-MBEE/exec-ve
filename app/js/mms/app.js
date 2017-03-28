@@ -160,14 +160,14 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 if(refOb.type === "Tag")
                     return refOb;
                 else {
-                    return {name: "latest"};
+                    return [];
                 }
             },
             branchOb: function(refOb) {
                 if(refOb.type === "Branch")
                     return refOb;
                 else {
-                    return {name: "master"};
+                    return [];
                 }
             },
             groupObs: function($stateParams, ProjectService, ticket) {
@@ -180,8 +180,43 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             //         extended: true
             //     }, 2);
             // },
-            documentOb: function(){ return null;},
-            viewOb: function(){ return null;},
+            documentOb: function($stateParams, $q, ElementService, ViewService, refOb, projectOb, ticket) {
+                var deferred = $q.defer();
+                var eid = $stateParams.projectId + '_cover';
+                ElementService.getElement({
+                    projectId: $stateParams.projectId,
+                    refId: $stateParams.refId,
+                    extended: true,
+                    elementId: eid
+                }, 2).then(function(data) {
+                    deferred.resolve(data);
+                }, function(reason) {
+                    if (reason.status === 404) {
+                        if (refOb.type === 'Tag') {
+                            deferred.resolve(null);
+                        } else {
+                            ViewService.createView({
+                                _projectId: $stateParams.projectId, 
+                                _refId: $stateParams.refId,
+                                id: 'holding_bin_' + $stateParams.projectId
+                            },{
+                                viewName: projectOb.name + ' Cover Page', 
+                                viewId: eid
+                            }, 2).then(function(data) {
+                                deferred.resolve(data);
+                            }, function(reason2) {
+                                deferred.reject(reason2);
+                            });
+                        }
+                    } else {
+                        deferred.reject(reason);
+                    }
+                });
+                return deferred.promise;
+            },
+            viewOb: function(documentOb) { 
+                return documentOb;
+            },
             search: function($stateParams, ElementService, ticket) {
                 if ($stateParams.search === undefined) {
                     return null;
@@ -197,7 +232,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 });
             }
         },
-        views: { 
+        views: {
             'nav@': {
                 template: '<ve-nav mms-title="ve_title" mms-org="org" mms-orgs="orgs" mms-project="project" mms-projects="projects" mms-ref="ref" mms-branch="branch" mms-branches="branches" mms-tag="tag" mms-tags="tags" mms-search="search"></ve-nav>', 
                 controller: function ($scope, $rootScope, orgOb, orgObs, projectOb, projectObs, refOb, branchOb, branchObs, tagOb, tagObs, search) {
@@ -259,7 +294,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 var eid = $stateParams.documentId;
                 var coverIndex = eid.indexOf('_cover');
                 if (coverIndex > 0) {
-                    var groupId = eid.substring(0, coverIndex);
+                    var groupId = eid.substring(5, coverIndex);
                     ElementService.getElement({
                         projectId: $stateParams.projectId,
                         refId: $stateParams.refId,
@@ -371,12 +406,24 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             },
             viewOb: function(documentOb) {
                 return documentOb;
+            },
+            groupOb: function(groupObs, documentOb, ProjectService, ticket) {
+            var group = null;
+            if(documentOb) {
+                for(var i = 0; i < groupObs.length; i++) {
+                    if(groupObs[i]._id == documentOb._groupId) {
+                        group = groupObs[i];
+                        break;
+                    }
+                }
+            }
+            return group;
             }
         },
         views: {
             'menu@': {
-                template: '<ve-menu mms-title="ve_title" mms-org="org" mms-ref="ref" mms-refs="refs" mms-group="group" mms-groups="groups" mms-project="project" mms-projects="projects" mms-branch="branch" mms-branches="branches" mms-tag="tag" mms-tags="tags" mms-document="document" mms-views="views"></ve-menu>',
-                controller: function ($scope, $rootScope, orgOb, groupOb, groupObs, projectOb, projectObs, refOb, refObs, branchOb, branchObs, tagOb, tagObs, documentOb, viewObs) {
+                template: '<ve-menu mms-title="ve_title" mms-org="org" mms-ref="ref" mms-refs="refs" mms-group="group" mms-groups="groups" mms-project="project" mms-projects="projects" mms-branch="branch" mms-branches="branches" mms-tag="tag" mms-tags="tags" mms-document="document"></ve-menu>',
+                controller: function ($scope, $rootScope, orgOb, groupOb, groupObs, projectOb, projectObs, refOb, refObs, branchOb, branchObs, tagOb, tagObs, documentOb) {
                     $rootScope.ve_title = orgOb.name;
                     $scope.org = orgOb;
                     $scope.group = groupOb;
@@ -390,7 +437,6 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                     $scope.tag = tagOb;
                     $scope.tags = tagObs;
                     $scope.document = documentOb;
-                    $scope.views = viewObs;
                 }
             },
             'pane-left@': {
@@ -421,12 +467,24 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                     extended: true,
                     elementId: $stateParams.viewId
                 }, 2);
+            },
+            groupOb: function(groupObs, documentOb, ProjectService, ticket) {
+                var group = null;
+                if(documentOb) {
+                    for(var i = 0; i < groupObs.length; i++) {
+                        if(groupObs[i]._id == documentOb._groupId) {
+                            group = groupObs[i];
+                            break;
+                        }
+                    }
+                }
+                return group;
             }
         },
         views: {
             'menu@': {
-                template: '<ve-menu mms-title="ve_title" mms-org="org" mms-group="group" mms-groups="groups" mms-project="project" mms-projects="projects" mms-ref="ref" mms-refs="refs" mms-branch="branch" mms-branches="branches" mms-tag="tag" mms-tags="tags" mms-document="document" mms-view="view"></ve-menu>',
-                controller: function ($scope, $rootScope, orgOb, groupOb, groupObs, projectOb, projectObs, refOb, refObs, branchOb, branchObs, tagOb, tagObs, documentOb, viewOb) {
+                template: '<ve-menu mms-title="ve_title" mms-org="org" mms-group="group" mms-groups="groups" mms-project="project" mms-projects="projects" mms-ref="ref" mms-refs="refs" mms-branch="branch" mms-branches="branches" mms-tag="tag" mms-tags="tags" mms-document="document"></ve-menu>',
+                controller: function ($scope, $rootScope, orgOb, groupOb, groupObs, projectOb, projectObs, refOb, refObs, branchOb, branchObs, tagOb, tagObs, documentOb) {
                     $rootScope.ve_title = orgOb.name;
                     $scope.org = orgOb;
                     $scope.group = groupOb;
@@ -440,7 +498,6 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                     $scope.tag = tagOb;
                     $scope.tags = tagObs;
                     $scope.document = documentOb;
-                    $scope.view = viewOb;
                 }
             },
             'pane-center@': {
