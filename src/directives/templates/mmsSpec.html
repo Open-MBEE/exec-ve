@@ -65,7 +65,9 @@
     <textarea ng-model="edit.documentation" mms-ckeditor mms-editor-api="editorApi" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}"></textarea>
 
     <div>
-        <h2 class="prop-title spec-view-type-heading">METATYPE</h2>
+        <h2 class="prop-title">TYPE</h2>
+        <h3 class="prop">{{element.type}}</h3>
+        <h2 class="prop-title spec-view-type-heading">METATYPES</h2>
         <h3 ng-repeat="type in element._appliedStereotypeIds" class="prop"><mms-transclude-name mms-element-id="{{type}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" no-click="true"></mms-transclude-name></h3>
         <h2 class="prop-title">LOCATION <i class="fa fa-folder"></i></h2>
         <h3 class="prop">{{element._qualifiedName}}</h3>
@@ -159,8 +161,10 @@
     <p ng-show="!showDocHTML" ng-bind-html="element.documentation" class="doc-text"></p>
     <div ng-show="showDocHTML">{{element.documentation}}</div>
 
-    <h2 class="prop-title spec-view-type-heading">METATYPE</h2>
-    <h3 ng-repeat="type in element._appliedStereotypeIds" class="prop"><mms-transclude-name mms-elemenet-id="{{type}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" no-click="true"></mms-transclude-name></h3>
+    <h2 class="prop-title">TYPE</h2>
+    <h3 class="prop">{{element.type}}</h3>
+    <h2 class="prop-title spec-view-type-heading">METATYPES</h2>
+    <h3 ng-repeat="type in element._appliedStereotypeIds" class="prop"><mms-transclude-name mms-element-id="{{type}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" no-click="true"></mms-transclude-name></h3>
     <h2 class="prop-title">LOCATION <i class="fa fa-folder"></i></h2>
     <h3 class="prop">{{element._qualifiedName}}</h3>
     <h2 class="prop-title">ID</h2>
