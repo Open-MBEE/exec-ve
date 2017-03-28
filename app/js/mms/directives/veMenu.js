@@ -30,8 +30,14 @@ function veMenu(ProjectService, $state, $rootScope, $templateCache, growl) {
     var veMenuLink = function(scope, element, attrs) {
 
         scope.currentProject = scope.project.name;
-        scope.currentBranch = scope.branch.name;
-        scope.currentTag = scope.tag.name;
+        if (scope.ref) {
+            scope.currentRef = scope.ref;
+            if (scope.ref.type === 'Branch') {
+                scope.currentBranch = scope.branch.name;
+            } else if (scope.ref.type === 'Tag') {
+                scope.currentTag = scope.tag.name;
+            }
+        } 
 
         var projectId, branchId, tagId;
 
@@ -107,7 +113,8 @@ function veMenu(ProjectService, $state, $rootScope, $templateCache, growl) {
             branch: '<mmsBranch',
             branches: '<mmsBranches',
             tag: '<mmsTag',
-            tags: '<mmsTags'
+            tags: '<mmsTags',
+            ref: '<mmsRef'
         },
         link: veMenuLink
     };

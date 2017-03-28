@@ -542,7 +542,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         };
         var instanceSpec = {
             id: newInstanceId,
-            ownerId: 'holding_bin_' + viewOrSectionOb._projectId,
+            ownerId: 'view_instances_bin_' + viewOrSectionOb._projectId,
             name: name ? name : "Untitled " + type,
             documentation: '',
             type: "InstanceSpecification",
@@ -660,7 +660,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 parentView.displayedElements = JSON.parse(parentView.displayedElements);
             }
         } 
-        var instanceSpecDoc = '<p>&nbsp;</p><p><mms-transclude-doc data-mms-eid="' + newViewId + '">[cf:' + view.name + '.doc]</mms-transclude-doc></p><p>&nbsp;</p>';
+        var instanceSpecDoc = '';
         var instanceSpecSpec = {
             'type': 'Paragraph', 
             'sourceType': 'reference', 
@@ -669,7 +669,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         };
         var instanceSpec = {
             id: newInstanceId,
-            ownerId: 'holding_bin_' + ownerOb._projectId,
+            ownerId: 'view_instances_bin_' + ownerOb._projectId,
             name: "View Documentation",
             documentation: instanceSpecDoc,
             type: "InstanceSpecification",

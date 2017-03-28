@@ -373,7 +373,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     $scope.treeClickHandler = function(branch) {
         if ($state.includes('project.ref') && !$state.includes('project.ref.document')) {
             if (branch.type === 'group') {
-                $state.go('project.ref.preview', {documentId: branch.data._id + '_cover', search: undefined});
+                $state.go('project.ref.preview', {documentId: 'site_' + branch.data._id + '_cover', search: undefined});
             } else if (branch.type === 'view' || branch.type === 'snapshot') {
                 $state.go('project.ref.preview', {documentId: branch.data.id, search: undefined});
             }
