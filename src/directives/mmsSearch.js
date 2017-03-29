@@ -27,7 +27,7 @@ function mmsSearch(ElementService, growl, $rootScope, $templateCache) {
         scope.filterQuery = {query: ""};
         scope.currentPage = 0;
         scope.itemsPerPage = 50;
-        scope.ws = scope.mmsWs ? scope.mmsWs : 'master';
+        scope.refId = scope.mmsRefId ? scope.mmsRefId : 'master';
 
         scope.$watchGroup(['filterQuery.query', 'facet'], function(newVal, oldVal) {
             scope.resultFilter = {};
@@ -93,7 +93,8 @@ function mmsSearch(ElementService, growl, $rootScope, $templateCache) {
               scope.searchType = '*';
             if (scope.searchType === 'value')
                 scope.searchType = 'defaultValue.value,value.value,specification.value';
-            ElementService.search(searchText, scope.searchType.split(','), null, page, numItems, false, scope.mmsWs, 2)
+            var reqOb = {projectId: scope.mmsProjectId, refId: scope.refId};
+            ElementService.search(reqOb, searchText, scope.searchType.split(','), null, page, numItems, 2)
             .then(function(data) {
                 if (scope.mmsOptions.filterCallback) {
                   scope.searchResults = scope.mmsOptions.filterCallback(data);
@@ -146,7 +147,8 @@ function mmsSearch(ElementService, growl, $rootScope, $templateCache) {
         link: mmsSearchLink,
         scope: {
             mmsOptions: '<',
-            mmsWs: '@',
+            mmsProjectId: '@',
+            mmsRefId: '@'
         },
     };
 }

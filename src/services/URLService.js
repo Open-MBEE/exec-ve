@@ -351,7 +351,7 @@ function urlService(baseUrl) {
      * @returns {string} The post elements url.
      */
     var getElementSearchURL = function(reqOb, query, filters, propertyName, page, items) {
-        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + 'search?keyword=' + query;
+        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/search?keyword=' + query;
         if (filters) {
             var l = filters.join();
             r += '&filters=' + l;
