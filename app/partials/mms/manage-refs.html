@@ -1,0 +1,50 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-4 col-md-offset-1">
+        <div ng-show="refManageView">
+            <div class="toolbar pane-left-btn-group">
+                
+            </div>
+            <div class="panel panel-default" style="min-height: 300px; margin-top: 30px;">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Manage branches/tags</h3>
+                </div>
+                <div class="panel-body">
+                <uib-tabset active="active" type="tabs" justified="false">
+                    <uib-tab index="0" classes="tab-item" heading="Branches">
+                        <div class="list-group">
+                        <a class="list-group-item" ng-repeat="branch in branches | orderBy:'name'" ng-click="refClickHandler(branch)">
+                            <span>{{ branch.name }}</span>
+                        </a>
+                        </div>
+                    </uib-tab>
+                    <uib-tab index="1" classes="tab-item" heading="Tags">
+                        <li ng-repeat="tag in tags | orderBy:'name'" ng-click="updateTag(tag)"
+                        ng-class="{'checked-list-item': tag.name === currentTag}" is-open="false">{{ tag.name }}</li>
+                    </uib-tab>
+                </uib-tabset>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-md-offset-1" style="min-height: 300px; margin-top: 30px;" ng-show="refSelected">
+        <h3>{{refSelected.name}} <i class="{{snapshotLoading}}"></i>
+        <mms-button-bar buttons="buttons" mms-bb-api="bbApi"></mms-button-bar></h3>
+        <dl class="dl-horizontal">
+            <dt>Name</dt>
+            <dd>{{refSelected.name}}</dd>
+            <dt>Id</dt>
+            <dd>{{refSelected.id}}</dd>
+            <dt>Type</dt>
+            <dd>{{refSelected.type}}</dd>
+            <dt>Time Created</dt>
+            <dd>{{refSelected.type}}</dd>
+            <dt>Creator</dt>
+            <dd>{{refSelected.type}}</dd>
+            <dt>Last Modified</dt>
+            <dd>{{refSelected.type}}</dd>
+        </dl>
+        
+    </div>
+  </div>
+</div>
