@@ -527,13 +527,14 @@ function UtilsService($q, $http, CacheService, URLService, _) {
     displayTime = tag time or generation time as mm/dd/yy hh:mm am/pm
     */
     var getPrintCss = function(header, footer, dnum, tag, displayTime, landscape, meta) {
-        var ret = "img {max-width: 100%; page-break-inside: avoid; page-break-before: auto; page-break-after: auto; display: block;}\n" + 
+        var ret = "img {max-width: 100%; page-break-inside: avoid; page-break-before: auto; page-break-after: auto; display: block; margin-left: auto; margin-right: auto;}\n" + 
                 " tr, td, th { page-break-inside: avoid; } thead {display: table-header-group;}\n" + 
                 ".pull-right {float: right;}\n" + 
                 ".view-title {margin-top: 10pt}\n" +
                 ".chapter {page-break-before: always}\n" + 
                 "table {width: 100%; border-collapse: collapse;}\n" + 
-                "table :not(table[border='0']), th, td {border: 1px solid black; padding: 4px;}\n" +
+                "table, th, td {border: 1px solid black; padding: 4px;}\n" +
+                "table[border='0'], table[border='0'] th, table[border='0'] td {border: 0px;}\n" +
                 "table, th > p, td > p {margin: 0px; padding: 0px;}\n" +
                 "table, th > div > p, td > div > p {margin: 0px; padding: 0px;}\n" +
                 //"table p {word-break: break-all;}\n" + 

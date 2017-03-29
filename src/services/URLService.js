@@ -327,7 +327,9 @@ function urlService(baseUrl) {
             result.message = "Deleted";
         else if (status === 408)
             result.message = "Timed Out";
-        else
+        else if (status === 501) {
+            result.message = "Cacheing";
+        } else
             result.message = "Timed Out (Please check network)";
         deferred.reject(result);
     };
