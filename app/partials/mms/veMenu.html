@@ -21,7 +21,7 @@
             </ul>
         </div>
 
-        <ul class="nav navbar-nav navbar-right" style="padding-right: 25px">
+        <ul ng-show="!isRefsView()" class="nav navbar-nav navbar-right" style="padding-right: 25px">
             <li>
             <div class="btn-group ve-dark-dropdown-nav" uib-dropdown keyboard-nav auto-close="disabled">
                 <button id="task-selection-button" type="button" class="dropdown-toggle" uib-dropdown-toggle>
@@ -49,24 +49,6 @@
                 </ul>
             </div>
             </li>
-
-            <!--<li>
-            <div class="btn-group ve-dark-dropdown-nav" uib-dropdown keyboard-nav>
-                <button id="tag-selection-button" type="button" class="dropdown-toggle" uib-dropdown-toggle ng-click="updateTagChecked()">
-                    <span class="label-dropdown">Tag:</span>{{ currentTag }}
-                    <i class="fa fa-caret-down" aria-hidden="true"></i>
-                </button>
-                <ul class="dropdown-menu right-screen list-with-selected-item" uib-dropdown-menu role="menu"
-                    aria-labelledby="tag-selection-button">
-                    <li class="button-item">
-                        <button class="btn btn-large btn-block btn-primary" ng-click="refsView()">Manage Tags</button>
-                    </li>
-                    <li ng-click="latestTag()" ng-class="{'checked-list-item': tag.name === currentTag}">latest</li>
-                    <li ng-repeat="tag in tags | orderBy:'name'" ng-click="updateTag(tag)"
-                           ng-class="{'checked-list-item': tag.name === currentTag}">{{ tag.name }}</li>
-                </ul>
-            </div>
-            </li>-->
         </ul>
 
     </div>
