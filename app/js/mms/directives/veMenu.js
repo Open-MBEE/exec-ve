@@ -129,7 +129,6 @@ function veMenu(ProjectService, $state, $rootScope, $templateCache, growl) {
             tag: '<mmsTag',
             tags: '<mmsTags',
             document: '<mmsDocument'
-
         },
         link: veMenuLink
     };
