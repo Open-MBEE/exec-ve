@@ -104,6 +104,11 @@ function veMenu(ProjectService, $state, $rootScope, $templateCache, growl) {
 
             searchParent(parentId);
             scope.breadcrumbs = bcrumbs.reverse();
+
+            var eltWidth = element.parent().width();
+            var crumbcount = scope.breadcrumbs.length;
+            var liWidth = (eltWidth * 0.75)/crumbcount;
+            scope.truncateStyle={'max-width': liWidth};
         }
 
     };
