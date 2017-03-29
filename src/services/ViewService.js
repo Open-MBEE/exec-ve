@@ -559,23 +559,15 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 type: "Expression"
             };
         }
-        var clone = {
-            _projectId: viewOrSectionOb._projectId,
-            _refId: viewOrSectionOb._refId,
-            _modified: viewOrSectionOb._modified,
-            _read: viewOrSectionOb._read,
-            id: viewOrSectionOb.id,
-        };
+        var clone = JSON.parse(JSON.stringify(viewOrSectionOb));
         var key = '_contents';
-        if (isSection(viewOrSectionOb)) {
+        if (isSection(clone)) {
             key = "specification";
         }
-        if (viewOrSectionOb[key]) {
-            clone[key] = JSON.parse(JSON.stringify(viewOrSectionOb[key]));
-        } else {
+        if (!clone[key]) {
             clone[key] = {
                 operand: [],
-                type: "Expression",
+                type: "Expression"
             };
         }
         clone[key].operand.push({instanceId: newInstanceId, type: "InstanceValue"});
@@ -659,7 +651,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             if (angular.isString(parentView.displayedElements)) {
                 parentView.displayedElements = JSON.parse(parentView.displayedElements);
             }
-        } 
+        }
         var instanceSpecDoc = '';
         var instanceSpecSpec = {
             'type': 'Paragraph', 
