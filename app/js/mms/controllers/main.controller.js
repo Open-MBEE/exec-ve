@@ -114,6 +114,7 @@ function($scope, $location, $rootScope, $state, _, $window, $uibModal, growl, $h
             $rootScope.ve_stateChanging = false;
             $rootScope.hidePanes = false;
             $rootScope.showManageRefs = false;
+            $rootScope.showLogin = false;
             if ($state.current.name === 'login' || $state.current.name === 'login.select') {
                 $rootScope.hidePanes = true;
                 $rootScope.showLogin = true;
