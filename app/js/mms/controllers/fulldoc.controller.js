@@ -63,6 +63,9 @@ function($scope, $rootScope, $state, $stateParams, $window, $element, hotkeys, g
                 if ($rootScope.veElementsOn) {
                     dis.toggleShowElements();
                 }
+                if ($rootScope.ve_editmode) {
+                    dis.toggleShowEdits();
+                }
             },
             elementTranscluded: elementTranscluded,
             elementClicked: elementClicked
@@ -211,8 +214,9 @@ function($scope, $rootScope, $state, $stateParams, $window, $element, hotkeys, g
     });
 
     $scope.$on('show-edits', function() {
+        var i = 0;
         if (($rootScope.veElementsOn && $rootScope.ve_editmode) || (!$rootScope.veElementsOn && !$rootScope.ve_editmode) ){
-            for (var i = 0; i < $scope.views.length; i++) {
+            for (i = 0; i < $scope.views.length; i++) {
                 $scope.views[i].api.toggleShowElements();
             }
             $scope.bbApi.toggleButtonState('show-elements');
@@ -220,6 +224,9 @@ function($scope, $rootScope, $state, $stateParams, $window, $element, hotkeys, g
         }
         $scope.bbApi.toggleButtonState('show-edits');
         $rootScope.ve_editmode = !$rootScope.ve_editmode;
+        for (i = 0; i < $scope.views.length; i++) {
+            $scope.views[i].api.toggleShowEdits();
+        }
     });
 
     $scope.searchOptions = {

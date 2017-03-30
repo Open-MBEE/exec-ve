@@ -125,6 +125,10 @@ function urlService(baseUrl) {
         return addTicket(root + '/projects/' + projectId + '/refs');
     };
 
+    var getRefURL = function(projectId, refId) {
+        return addTicket(root + '/projects/' + projectId + '/refs/' + refId);
+    };
+
     var getGroupsURL = function(projectId, refId) {
         return addTicket(root + '/projects/' + projectId + '/refs/' + refId + '/groups');
     };
@@ -327,7 +331,9 @@ function urlService(baseUrl) {
             result.message = "Deleted";
         else if (status === 408)
             result.message = "Timed Out";
-        else
+        else if (status === 501) {
+            result.message = "Cacheing";
+        } else
             result.message = "Timed Out (Please check network)";
         deferred.reject(result);
     };
@@ -349,7 +355,7 @@ function urlService(baseUrl) {
      * @returns {string} The post elements url.
      */
     var getElementSearchURL = function(reqOb, query, filters, propertyName, page, items) {
-        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + 'search?keyword=' + query;
+        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/search?keyword=' + query;
         if (filters) {
             var l = filters.join();
             r += '&filters=' + l;
@@ -464,6 +470,7 @@ function urlService(baseUrl) {
         getProjectsURL: getProjectsURL,
         getProjectURL: getProjectURL,
         getRefsURL: getRefsURL,
+        getRefURL: getRefURL,
         getGroupsURL: getGroupsURL,
         getElementURL: getElementURL,
         getPutElementsURL: getPutElementsURL,
