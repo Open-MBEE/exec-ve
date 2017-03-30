@@ -125,6 +125,10 @@ function urlService(baseUrl) {
         return addTicket(root + '/projects/' + projectId + '/refs');
     };
 
+    var getRefURL = function(projectId, refId) {
+        return addTicket(root + '/projects/' + projectId + '/refs/' + refId);
+    };
+
     var getGroupsURL = function(projectId, refId) {
         return addTicket(root + '/projects/' + projectId + '/refs/' + refId + '/groups');
     };
@@ -466,6 +470,7 @@ function urlService(baseUrl) {
         getProjectsURL: getProjectsURL,
         getProjectURL: getProjectURL,
         getRefsURL: getRefsURL,
+        getRefURL: getRefURL,
         getGroupsURL: getGroupsURL,
         getElementURL: getElementURL,
         getPutElementsURL: getPutElementsURL,
