@@ -414,7 +414,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         else {
             var n = normalize(elem.sysmlid, null, workspace, null);
 
-            $http.post(URLService.getPostElementsURL(n.ws), {'elements': [elem],'source': ApplicationService.getSource()}, {timeout: 60000})
+            $http.post(URLService.getPostElementsURL(n.ws), {'elements': [elem],'source': ApplicationService.getSource()}, {timeout: 120000})
             .success(function(data, status, headers, config) {
                 handleSuccess(n, data);
             }).error(function(data, status, headers, config) {
