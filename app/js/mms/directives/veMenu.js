@@ -69,14 +69,14 @@ function veMenu(ProjectService, $state, $rootScope, $templateCache, growl) {
         };
 
         var bcrumbs = [];
-        var child, parentId;
+        var child, parentId, display;
         var groups = scope.groups;
         
         var searchParent = function(kidId) {
             while(kidId) {
                 for(var i = 0; i < groups.length; i++) {
                     if(groups[i]._id == kidId) {
-                        bcrumbs.push({name: groups[i]._name, id: groups[i]._id, type: "group"});
+                        bcrumbs.push({name: groups[i]._name, id: groups[i]._id, type: "group", link: "project.ref.preview({documentId: 'site_' + breadcrumb.id + '_cover', search: undefined})"});
                         kidId = groups[i]._parentId;
                         break;
                     } 
@@ -93,11 +93,11 @@ function veMenu(ProjectService, $state, $rootScope, $templateCache, growl) {
 
         if(child) {
             if(child.hasOwnProperty('_id')) {
-                bcrumbs.push({name: child._name, id: child._id, type: "group"});
+                bcrumbs.push({name: child._name, id: child._id, type: "group", link: "project.ref.preview({documentId: 'site_' + breadcrumb.id + '_cover', search: undefined})"});
                 if(child._parentId)
                     parentId = child._parentId;
             } else {
-                bcrumbs.push({name: child.name, id: child.id, type: "doc"});
+                bcrumbs.push({name: child.name, id: child.id, type: "doc", link: "project.ref.document({documentId: breadcrumb.id, search: undefined})"});
                 if(child._groupId)
                     parentId = child._groupId;
             }
@@ -110,7 +110,6 @@ function veMenu(ProjectService, $state, $rootScope, $templateCache, growl) {
             var liWidth = (eltWidth * 0.75)/crumbcount;
             scope.truncateStyle={'max-width': liWidth};
         }
-
     };
 
     return {
