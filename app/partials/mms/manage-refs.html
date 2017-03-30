@@ -10,26 +10,32 @@
                     <h3 class="panel-title">Manage branches/tags</h3>
                 </div>
                 <div class="panel-body">
-                <uib-tabset active="active" type="tabs" justified="false">
+                <uib-tabset active="activeTab" type="tabs" justified="false">
                     <uib-tab index="0" classes="tab-item" heading="Branches">
                         <div class="list-group">
                         <a class="list-group-item" ng-repeat="branch in branches | orderBy:'name'" ng-click="refClickHandler(branch)">
-                            <span>{{ branch.name }}</span>
+                        {{ branch.name }}
                         </a>
                         </div>
                     </uib-tab>
                     <uib-tab index="1" classes="tab-item" heading="Tags">
-                        <li ng-repeat="tag in tags | orderBy:'name'" ng-click="updateTag(tag)"
-                        ng-class="{'checked-list-item': tag.name === currentTag}" is-open="false">{{ tag.name }}</li>
+                        <div class="list-group">
+                            <a class="list-group-item" ng-repeat="tag in tags | orderBy:'name'" ng-click="refClickHandler(tag)">
+                            {{ tag.name }}
+                            </a>
+                        </div>
                     </uib-tab>
                 </uib-tabset>
                 </div>
             </div>
         </div>
     </div>
-    <div class="col-md-4 col-md-offset-1" style="min-height: 300px; margin-top: 30px;" ng-show="refSelected">
-        <h3>{{refSelected.name}} <i class="{{snapshotLoading}}"></i>
-        <mms-button-bar buttons="buttons" mms-bb-api="bbApi"></mms-button-bar></h3>
+    <div class="col-md-4 col-md-offset-1" style="min-height: 300px; margin-top: 60px;" ng-show="refSelected">
+        <!--<div class="center-blcok">-->
+        <div class="col-md-6 col-md-offset-4">
+        <mms-button-bar buttons="buttons" mms-bb-api="bbApi"></mms-button-bar>
+        </div>
+        <br><br>
         <dl class="dl-horizontal">
             <dt>Name</dt>
             <dd>{{refSelected.name}}</dd>
@@ -37,12 +43,18 @@
             <dd>{{refSelected.id}}</dd>
             <dt>Type</dt>
             <dd>{{refSelected.type}}</dd>
+            <dt>Description</dt>
+            <dd>{{refSelected.description}}</dd>
             <dt>Time Created</dt>
-            <dd>{{refSelected.type}}</dd>
+            <dd>{{refSelected._created}}</dd>
             <dt>Creator</dt>
-            <dd>{{refSelected.type}}</dd>
+            <dd>{{refSelected._creator}}</dd>
             <dt>Last Modified</dt>
-            <dd>{{refSelected.type}}</dd>
+            <dd>{{refSelected._modified}}</dd>
+            <dt>Modifier</dt>
+            <dd>{{refSelected._modifier}}</dd>
+            <dt>Parent Ref</dt>
+            <dd>{{refSelected.parentRefId}}</dd>
         </dl>
         
     </div>
