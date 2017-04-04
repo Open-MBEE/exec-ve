@@ -544,15 +544,14 @@ ul.ve-light-list{
   .view-tools{
     border:none !important;
     width:auto;
-    margin: 0 0 0 16px;
-    font-size: 14px;
+    margin: 0 0 0 4px;
+    font-size: 12px;
     margin-top:4px;
     text-transform:uppercase;
     font-weight:500;
-  }
-
-  .view-tools:hover{
-    background-color:#fff;
+    color: white;
+    border-radius: 2px;
+    padding: 4px 10px 3px 4px;
   }
 
   .view-tools .fa:before{
@@ -575,16 +574,24 @@ ul.ve-light-list{
   .tree-delete:after{
     content: "delete";  
   }
-  /*
+
   .tree-add-tag,
   .tree-add-task{
-    color:#7FD2B9;
+    background-color:#4bae90;
+  }
+
+  .tree-add-tag:hover,
+  .tree-add-task:hover{
+    background-color:#2e9274;
   }
 
   .tree-delete{
-    color:#b32027;
-  }*/
+    background-color: #296f83;
+  }
 
+  .tree-delete:hover{
+    background-color: #1a5e71;
+  }
 }
 
 /****HIDE BREADCRUMBS IN THIS VIEW FOR PROTOTYPING ------ REMOVE THIS CSS
