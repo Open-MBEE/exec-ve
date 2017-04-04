@@ -3,6 +3,9 @@
   View Editor stylesheets
 *************************/
 
+/*font*/
+@import url('https://fonts.googleapis.com/css?family=Roboto:100,100i,300,300i,400,400i,500,500i,700,700i,900,900i');
+
 /* Variables & mixins */
 @import "base/_globals.scss";
 
@@ -193,11 +196,11 @@ div.tooltip-inner {
 .ve-dark-dropdown-nav {
 
   .dropdown-toggle{
-    height:26px;
+    height:24px;
     background-color:#212121;
     background-color:#404040;
     font-size:13px;
-    padding:4px;
+    padding:3px 4px;
   }
 
   .dropdown-toggle:hover{
@@ -237,7 +240,7 @@ div.tooltip-inner {
     border:none;
     letter-spacing:.03em;
     font-weight:300;
-    font-family:"Helvetica Neue", sans-serif;
+    font-family:"Roboto", sans-serif;
     border-radius:2px !important;
     -webkit-transition: background-color .1s ease-out !important;
     -moz-transition: background-color .1s ease-out !important;
@@ -318,7 +321,7 @@ div.tooltip-inner {
 
   /* set min width for button in a list*/
   .btn-primary{
-    min-width:200px;
+    min-width:260px;
   }
 
   /*Clear padding for check mark list items with buttons in them */
@@ -355,7 +358,7 @@ div.tooltip-inner {
       font-size: 14px;
   }
 
-  /*Tab system*/
+  /*Dark nav tab system*/
 
   .nav-tabs{
     background-color:#404040;
@@ -398,3 +401,106 @@ div.tooltip-inner {
     border-bottom: 4px solid #4e88c2;    
   }
 }
+
+/*Light tab system (needs to be refactored)*/
+
+.ve-light-tabs{
+
+  .nav-tabs > li.uib-tab{
+    text-align:center;
+  }
+
+  .nav-tabs > li{
+    margin-bottom: 0;
+  }  
+
+  ul.nav-tabs{
+    border:none;
+  } 
+
+  /*
+  .nav-tabs > li.uib-tab:hover,
+  .list-with-tabs li.button-item:hover{
+    background-color:#404040;
+  }
+  */
+
+  .nav-tabs > li.active.uib-tab > a{
+    border:none;
+    border-bottom: 3px solid #407f91;
+    color:white;
+    margin:0;
+    font-weight:400;
+    color:#333;
+  }
+
+  .nav-tabs > li.uib-tab > a{
+    border:none;
+    border-bottom: 3px solid white;
+    color:#333;
+    margin:0;
+  }
+
+  uib-tab:hover{
+    background-color:#404040;
+    border:none;
+    border-bottom: 4px solid #4e88c2;    
+  } 
+
+  .nav > li > a:focus, .nav > li > a:hover{
+    background-color:white;
+  }
+}
+
+
+/****Manage Branches/tags styling****/
+
+.ve-no-panes{
+  font-family: "Roboto",sans-serif;
+
+  a{
+    color:#333;
+  }
+  h3{
+    font-size: 24px;
+    font-weight: 500;
+  }
+
+  h1{
+    font-size:36px;
+    font-weight:100;
+  }
+}
+
+ul.ve-light-list{
+  padding-left:0;
+  background-color: #F8F8F8;
+  list-style:none;
+
+  li{
+    padding:8px 18px;
+  }
+
+  li a,
+  li a:hover,
+  li a:visited{
+    color:#333;
+  }
+
+  li.selected{
+    background-color:#e9e9e9;
+    border-left: 5px solid #7FD2B9;
+  }
+
+  li.selected a{
+    margin-left: -5px;
+    font-weight:600;
+  }
+}
+
+.ve-light-list-panels{
+  padding:0;
+}
+
+
+

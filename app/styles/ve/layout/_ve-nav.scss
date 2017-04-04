@@ -1,5 +1,5 @@
 .navbar {
-	font-family:"Helvetica Neue", sans-serif;
+	font-family:"Roboto", sans-serif;
 	color: white;
 	margin:0;
 	font-weight:300;
@@ -17,7 +17,7 @@
 	z-index: 200;
 	position: relative;
 	width: 100%;
-	height: 38px;
+	height: 36px;
 	min-height: 30px;
 	border: 0;
 	margin-bottom: 0;
@@ -43,22 +43,22 @@ ul.global-menu{
 	float:right;
 	margin:0;
 	font-size:13px;
-	padding: 0 10px 0 30px;
+	padding: 0 10px 0 20px;
 }
 
 .global-menu li{
 	display:inline;
 	padding:0 8px;
-	height: 38px;
-	line-height: 38px;
+	height: 36px;
+	line-height: 36px;
 }
 
 .global-menu-hamburger{
 	display:none;
 	float:right;
 	padding: 0 20px;
-	height: 38px;
-	line-height: 38px;
+	height: 36px;
+	line-height: 36px;
 }
 
 
@@ -98,7 +98,7 @@ ul.tags-tasks{
 	margin:0;
 	font-size:13px;
 	padding-left: 10px;
-	top:2px;
+	top:1px;
 	position:relative;
 }
 
@@ -127,7 +127,7 @@ a.switch-org:hover,{
 .logotype{
 	font-weight: 200;
 	font-size: 14px;
-	line-height:38px;
+	line-height:36px;
 	padding: 0 5px 0 13px;
 	color:#b3b3b3;
 }
@@ -154,7 +154,7 @@ a.switch-org:hover,{
 	width:330px;
 	padding: 3px 28px 3px 8px;
 	height:	26px;
-	margin:6px 0;
+	margin:5px 0;
 	color:white;
 	font-weight:300;
 	letter-spacing: .03em;

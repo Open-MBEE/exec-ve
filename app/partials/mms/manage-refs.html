@@ -1,44 +1,58 @@
-<div class="container-fluid">
+<div class="container-fluid ve-no-panes">
   <div class="row">
-    <div class="col-md-4 col-md-offset-1">
-        <div ng-show="refManageView">
-            <div class="toolbar pane-left-btn-group">
-                
-            </div>
-            <div class="panel panel-default" style="min-height: 300px; margin-top: 30px;">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Manage branches/tags</h3>
-                </div>
-                <div class="panel-body">
-                <uib-tabset active="activeTab" type="tabs" justified="false">
-                    <uib-tab index="0" classes="tab-item" heading="Branches">
-                        <div class="list-group">
-                        <a class="list-group-item" ng-repeat="branch in branches | orderBy:'name'" ng-click="refClickHandler(branch)">
+    <div style = "margin-top:40px;">
+      <div class="col-md-10 col-md-offset-1">
+        <a href="#/projects/PROJECT-ID_10_15_15_1_41_52_PM_5b84f7be_1506a83819c__6bce_cae_tw_jpl_nasa_gov_128_149_19_85/master" ui-sref="project.ref({refId: 'master', search: undefined})">
+          <i class="fa fa-arrow-left"></i> back to sites &amp; documents
+        </a>
+        <h1 class="panel-title">Manage branches/tags</h3>
+      </div>
+      <div class="col-md-10 col-md-offset-1">
+        <div ng-show="refManageView" class="col-md-4 ve-light-list-panels">
+          <div class="toolbar pane-left-btn-group">
+          </div>
+          <div style="min-height: 300px; margin-top: 30px;">
+            <div class="panel-body">
+              <uib-tabset active="activeTab" type="tabs" justified="false" class = "ve-light-tabs">
+                <uib-tab index="0" classes="tab-item" heading="Branches">
+                  <ul class = "ve-light-list">
+                    <li class = "selected">
+                      <a>
+                        This is hard coded
+                      </a>
+                    </li>
+                    <li ng-repeat="branch in branches | orderBy:'name'" ng-click="refClickHandler(branch)">
+                      <a>
                         {{ branch.name }}
-                        </a>
-                        </div>
-                    </uib-tab>
-                    <uib-tab index="1" classes="tab-item" heading="Tags">
-                        <div class="list-group">
-                            <a class="list-group-item" ng-repeat="tag in tags | orderBy:'name'" ng-click="refClickHandler(tag)">
-                            {{ tag.name }}
-                            </a>
-                        </div>
-                    </uib-tab>
-                </uib-tabset>
-                </div>
+                      </a>
+                    </li>
+                  </ul>
+                </uib-tab>
+                <uib-tab index="1" classes="tab-item" heading="Tags">
+                  <ul class = "ve-light-list">
+                    <li class = "selected">
+                      <a>
+                        This is hard coded
+                      </a>
+                    </li>
+                    <li ng-repeat="tag in tags | orderBy:'name'" ng-click="refClickHandler(tag)">
+                      <a>
+                      {{ tag.name }}
+                      </a>
+                    </li>
+                  </li>
+                </uib-tab>
+              </uib-tabset>
             </div>
+          </div>
         </div>
-    </div>
-    <div class="col-md-4 col-md-offset-1" style="min-height: 300px; margin-top: 60px;" ng-show="refSelected">
-        <!--<div class="center-blcok">-->
-        <div class="col-md-6 col-md-offset-4">
-        <mms-button-bar buttons="buttons" mms-bb-api="bbApi"></mms-button-bar>
-        </div>
-        <br><br>
-        <dl class="dl-horizontal">
-            <dt>Name</dt>
-            <dd>{{refSelected.name}}</dd>
+        <div class="col-md-8" style="min-height: 300px; margin-top: 60px;" ng-show="refSelected">
+          <!--<div class="center-blcok">-->
+          <h3>{{refSelected.name}}</h3>
+          <div style = "float:right;">
+            <mms-button-bar buttons="buttons" mms-bb-api="bbApi"></mms-button-bar>
+          </div>
+          <dl class="dl-horizontal">
             <dt>Id</dt>
             <dd>{{refSelected.id}}</dd>
             <dt>Type</dt>
@@ -55,8 +69,9 @@
             <dd>{{refSelected._modifier}}</dd>
             <dt>Parent Ref</dt>
             <dd>{{refSelected.parentRefId}}</dd>
-        </dl>
-        
+          </dl>
+        </div>
+      </div>
     </div>
   </div>
 </div>
