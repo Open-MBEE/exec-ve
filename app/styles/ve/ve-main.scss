@@ -489,6 +489,8 @@ ul.ve-light-list{
   padding-left:0;
   background-color: #F8F8F8;
   list-style:none;
+  height: 300px;
+  overflow-y: scroll;
 
   li{
     padding:8px 18px;
@@ -502,7 +504,7 @@ ul.ve-light-list{
 
   li.selected{
     background-color:#eeeeee;
-    border-right: 5px solid #7FD2B9;
+    border-right: 7px solid #7FD2B9;
   }
 
   li.selected a{
@@ -551,7 +553,7 @@ ul.ve-light-list{
     font-weight:500;
     color: white;
     border-radius: 2px;
-    padding: 4px 10px 3px 4px;
+    padding: 4px 10px 4px 4px;
   }
 
   .view-tools .fa:before{
