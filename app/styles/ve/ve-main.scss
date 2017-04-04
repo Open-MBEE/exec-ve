@@ -117,6 +117,7 @@ div.tooltip-inner {
   font-weight:300;
   letter-spacing:.03em;
   background-color:#313131;
+  font-family: "Roboto", sans-serif;
 
   .modal-content{
     background-color:#404040;
@@ -411,7 +412,7 @@ div.tooltip-inner {
   }
 
   .nav-tabs > li{
-    margin-bottom: 0;
+    margin: 0 8px;
   }  
 
   ul.nav-tabs{
@@ -427,16 +428,16 @@ div.tooltip-inner {
 
   .nav-tabs > li.active.uib-tab > a{
     border:none;
-    border-bottom: 3px solid #407f91;
+    border-bottom: 4px solid #53a5bc;
     color:white;
     margin:0;
-    font-weight:400;
+    font-weight:600;
     color:#333;
   }
 
   .nav-tabs > li.uib-tab > a{
     border:none;
-    border-bottom: 3px solid white;
+    border-bottom: 4px solid white;
     color:#333;
     margin:0;
   }
@@ -453,24 +454,36 @@ div.tooltip-inner {
 }
 
 
-/****Manage Branches/tags styling****/
+/****Manage Branches/tags styling. Calling it "no panes"****/
 
 .ve-no-panes{
+
+  /*Typography*/
   font-family: "Roboto",sans-serif;
+  color:#4A4A4A;
 
   a{
-    color:#333;
-  }
-  h3{
-    font-size: 24px;
-    font-weight: 500;
+    color:#4A4A4A;
   }
 
   h1{
     font-size:36px;
     font-weight:100;
+    margin:6px 0;
+  }
+
+  h3{
+    font-size: 24px;
+    font-weight: 500;
+    margin: 0;
+  }
+
+  .sites-docs-link{
+    margin-bottom:6px;
   }
 }
+
+/*Light grey list for white pages*/
 
 ul.ve-light-list{
   padding-left:0;
@@ -488,19 +501,95 @@ ul.ve-light-list{
   }
 
   li.selected{
-    background-color:#e9e9e9;
-    border-left: 5px solid #7FD2B9;
+    background-color:#eeeeee;
+    border-right: 5px solid #7FD2B9;
   }
 
   li.selected a{
-    margin-left: -5px;
     font-weight:600;
   }
 }
 
+/* Panel system where the left is a list and the right is the detail of the selected item*/
 .ve-light-list-panels{
   padding:0;
 }
 
+/* Detail pane for light panel system */
+.ve-light-panels-detail{
+  min-height: 300px; 
+  margin-top: 43px;
+  padding:10px 26px;
 
+  dd,
+  dt{
+    padding: 2px 0;
+  }
 
+  .panels-detail-title{
+    border-bottom: 3px solid #F8F8F8;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+
+    h3{
+      display:inline-block;
+    }
+
+    mms-button-bar{
+      float:right;
+    }
+  }
+
+  /* Clearing icon row styling and adding labels for usability */
+  .view-tools{
+    border:none !important;
+    width:auto;
+    margin: 0 0 0 16px;
+    font-size: 14px;
+    margin-top:4px;
+    text-transform:uppercase;
+    font-weight:500;
+  }
+
+  .view-tools:hover{
+    background-color:#fff;
+  }
+
+  .view-tools .fa:before{
+    padding:4px;
+  }
+
+  /* Add labels to icons*/
+  .tree-add-task:after{
+    content: "branch";
+  }
+
+  .tree-add-tag:after{
+    content: "tag";
+  }
+
+  .tree-add-tag .fa:before{
+    content: "\f067";
+  }
+
+  .tree-delete:after{
+    content: "delete";  
+  }
+  /*
+  .tree-add-tag,
+  .tree-add-task{
+    color:#7FD2B9;
+  }
+
+  .tree-delete{
+    color:#b32027;
+  }*/
+
+}
+
+/****HIDE BREADCRUMBS IN THIS VIEW FOR PROTOTYPING ------ REMOVE THIS CSS
+Breadcrumbs need to be taken out of the nav for production since they're in the main pane now****/
+
+.breadcrumbs{
+  display:none !important;
+}
