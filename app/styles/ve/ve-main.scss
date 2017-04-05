@@ -346,7 +346,6 @@ div.tooltip-inner {
     min-width: 100px;
   }
 
-
   .checked-list-item::before{
     content: "\f00c";
     font-family: FontAwesome;
@@ -459,6 +458,7 @@ div.tooltip-inner {
 }
 
 
+
 /****Manage Branches/tags styling. Calling it "no panes"****/
 
 .ve-no-panes{
@@ -493,11 +493,16 @@ ul.ve-light-list{
   padding-left:0;
   background-color: #F8F8F8;
   list-style:none;
-  height: 300px;
+  max-height: 300px;
   overflow-y: scroll;
 
   li{
     padding:8px 18px;
+    font-size:12px;
+  }
+
+  li:hover {
+    background: #efefef;
   }
 
   li a,
@@ -513,6 +518,13 @@ ul.ve-light-list{
 
   li.selected a{
     font-weight:600;
+  }
+}
+
+@media (min-height:580px) and (min-width:990px){
+  ul.ve-light-list{
+    height: calc(100vh - 300px);
+    max-height:none;
   }
 }
 
@@ -605,8 +617,8 @@ ul.ve-light-list{
 }
 
 /****HIDE BREADCRUMBS IN THIS VIEW FOR PROTOTYPING ------ REMOVE THIS CSS
-Breadcrumbs need to be taken out of the nav for production since they're in the main pane now****/
+Breadcrumbs need to be taken out of the nav for production since they're in the main pane now
 
 .breadcrumbs{
   display:none !important;
-}
+}****/
