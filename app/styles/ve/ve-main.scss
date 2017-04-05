@@ -70,7 +70,7 @@ div.tooltip-inner {
 .ve-dark-dropdown-nav,
 .ve-dark-dropdown-menu{
 
-  font-family: "Roboto",sans-serif;
+  font-family: "Helvetica Neue",sans-serif;
 
   .btn{
     font-weight: 500;
@@ -117,7 +117,7 @@ div.tooltip-inner {
   font-weight:300;
   letter-spacing:.03em;
   background-color:#313131;
-  font-family: "Roboto", sans-serif;
+  font-family: "Helvetica Neue", sans-serif;
 
   .modal-content{
     background-color:#404040;
@@ -156,7 +156,7 @@ div.tooltip-inner {
 /****UI Elements > Dropdown > wide dropdown****/
 
 .ve-dark-dropdown-wide.btn-group{
-  font-family: "Roboto",sans-serif;
+  font-family: "Helvetica Neue",sans-serif;
   display: block;
   width:100%;
   margin: 0 0 18px;
@@ -164,9 +164,10 @@ div.tooltip-inner {
 
 .ve-dark-dropdown-wide{
 
-  font-family: "Roboto",sans-serif;
+  font-family: "Helvetica Neue",sans-serif;
+  font-weight: 300;
 
-   .label-dropdown{
+  .label-dropdown{
     display:block;
   }
 
@@ -205,6 +206,7 @@ div.tooltip-inner {
     background-color:#404040;
     font-size:13px;
     padding:3px 4px;
+    font-weight:400;
   }
 
   .dropdown-toggle:hover{
@@ -214,7 +216,7 @@ div.tooltip-inner {
   .label-dropdown{
     color: #b3b3b3;
     font-size:13px; 
-    font-weight:300;
+    font-weight:400;
     padding: 0 4px;
   }
 
@@ -224,6 +226,7 @@ div.tooltip-inner {
 
   li{
     font-size:13px;
+    font-weight:400;
   }
 }
 
@@ -231,7 +234,7 @@ div.tooltip-inner {
 .ve-dark-dropdown-wide,
 .ve-dark-dropdown-nav{
   
-  font-family: "Roboto",sans-serif;
+  font-family: "Helvetica Neue",sans-serif;
 
   /*Clearing bootstrap*/
   ul.dropdown-menu{
@@ -245,8 +248,7 @@ div.tooltip-inner {
     color:white;
     border:none;
     letter-spacing:.03em;
-    font-weight:300;
-    font-family:"Roboto", sans-serif;
+    font-family:"Helvetica Neue", sans-serif;
     border-radius:2px !important;
     -webkit-transition: background-color .1s ease-out !important;
     -moz-transition: background-color .1s ease-out !important;
@@ -464,7 +466,7 @@ div.tooltip-inner {
 .ve-no-panes{
 
   /*Typography*/
-  font-family: "Roboto",sans-serif;
+  font-family: "Helvetica Neue",sans-serif;
   color:#4A4A4A;
 
   a{
