@@ -8,6 +8,9 @@
     letter-spacing: .03em;
   //}
 /*******Layout*******/
+
+  font-family: "Roboto", sans-serif;
+
   .account-wall{
     width:320px;
     margin:120px auto;
@@ -26,7 +29,6 @@
   letter-spacing:.03em;
   padding:6px 10px;
   font-weight:300;
-  font-family:"Helvetica Neue", sans-serif;
   border-radius:2px !important;
   -webkit-transition: background-color .1s ease-out !important;
   -moz-transition: background-color .1s ease-out !important;
