@@ -414,7 +414,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
             cacheElement(metaOb, editCopy, true);
             var history = CacheService.get(['history', metaOb.projectId, metaOb.refId, metaOb.elementId]);
             if (history) {
-                history.unshift({_creator: e._modifier, _timestamp: e._modified, id: e._commitId});
+                history.unshift({_creator: e._modifier, _created: e._modified, id: e._commitId});
             }
             deferred.resolve(resp);
         };
@@ -704,7 +704,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         inProgress[key] = deferred.promise;
         $http.get(URLService.getElementHistoryURL(reqOb))
         .then(function(response){
-            deferred.resolve(CacheService.put(requestCacheKey, response.data.history, true));
+            deferred.resolve(CacheService.put(requestCacheKey, response.data.commits, true));
             delete inProgress[key];
         }, function(response) {
             URLService.handleHttpStatus(response.data, response.status, response.headers, response.config, deferred);
