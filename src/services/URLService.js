@@ -252,8 +252,7 @@ function urlService(baseUrl) {
      * @returns {string} The url.
      */
     var getElementHistoryURL = function(reqOb) {
-        // return addTicket(root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId + '/history');
-        return addTicket(root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/history/' + reqOb.elementId);
+        return addTicket(root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId + '/history');
     };
 
     /**
