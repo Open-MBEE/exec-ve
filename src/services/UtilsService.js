@@ -537,6 +537,7 @@ function UtilsService($q, $http, CacheService, URLService, _) {
                 "table[border='0'], table[border='0'] th, table[border='0'] td {border: 0px;}\n" +
                 "table, th > p, td > p {margin: 0px; padding: 0px;}\n" +
                 "table, th > div > p, td > div > p {margin: 0px; padding: 0px;}\n" +
+                "table mms-transclude-doc p {margin: 0 0 5px;}\n" +
                 //"table p {word-break: break-all;}\n" + 
                 "th {background-color: #f2f3f2;}\n" + 
                 "h1 {font-size: 20px; padding: 0px; margin: 4px;}\n" +
