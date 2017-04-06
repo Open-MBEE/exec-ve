@@ -466,6 +466,11 @@ function MmsAppUtils($q, $state, $uibModal, $timeout, $location, $window, $templ
             this.style.removeProperty('width');
             this.style.removeProperty('min-width');
         });
+        printElementCopy.find('mms-transclude-doc').each(function() {
+            var transParent = $(this).parent();
+            if (transParent[0].localName != 'td')
+                transParent.css( "display", "inline" );
+        });
         printElementCopy.find('.math').remove(); //this won't work in chrome for popups since chrome can't display mathml
         printElementCopy.find('script').remove();
         //printElementCopy.find('.MJX_Assistive_MathML').remove(); //pdf generation need mathml version
