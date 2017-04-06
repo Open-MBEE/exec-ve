@@ -16,11 +16,6 @@
               <uib-tabset active="activeTab" type="tabs" justified="false" class = "ve-light-tabs">
                 <uib-tab index="0" classes="tab-item" heading="Branches">
                   <ul class = "ve-light-list">
-                    <li class = "selected">
-                      <a>
-                        This is hard coded
-                      </a>
-                    </li>
                     <li ng-repeat="branch in branches | orderBy:'name'" ng-click="refClickHandler(branch)">
                       <a>
                         {{ branch.name }}
@@ -30,11 +25,6 @@
                 </uib-tab>
                 <uib-tab index="1" classes="tab-item" heading="Tags">
                   <ul class = "ve-light-list">
-                    <li class = "selected">
-                      <a>
-                        This is hard coded
-                      </a>
-                    </li>
                     <li ng-repeat="tag in tags | orderBy:'name'" ng-click="refClickHandler(tag)">
                       <a>
                       {{ tag.name }}
