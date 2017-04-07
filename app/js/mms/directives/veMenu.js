@@ -73,7 +73,7 @@ function veMenu(ProjectService, $state, $rootScope, $templateCache, growl) {
         var groups = scope.groups;
         
         var searchParent = function(kidId) {
-            while(kidId) {
+            while(kidId !== scope.org.id) {
                 for(var i = 0; i < groups.length; i++) {
                     if(groups[i]._id == kidId) {
                         bcrumbs.push({name: groups[i]._name, id: groups[i]._id, type: "group", link: "project.ref.preview({documentId: 'site_' + breadcrumb.id + '_cover', search: undefined})"});
