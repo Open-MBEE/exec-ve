@@ -239,9 +239,10 @@ div.tooltip-inner {
     background-color:#3d3d3d;
   }
 
-  .dropdown-toggle .fa-caret-down{
+  button.dropdown-toggle .fa-caret-down{
     padding: 2px 4px 2px 10px;
     color: #a3a3a3;
+    float:right;
   }
 
   .dropdown-menu{
@@ -269,10 +270,6 @@ div.tooltip-inner {
   .dropdown-menu li:hover{
     background-color:#5f5f5f;
 
-  }
-
-  .dropdown-toggle .fa-caret-down{
-    float:right;
   }
 
   ul.dropdown-menu{
@@ -501,7 +498,7 @@ ul.ve-light-list{
 
   li{
     padding:8px 18px;
-    font-size:12px;
+    font-size:14px;
   }
 
   li:hover {

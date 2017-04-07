@@ -107,6 +107,10 @@ ul.tags-tasks{
 	color:white;
 }
 
+.fixed-content-dropdown .fa-caret-down{
+	float:none;
+}
+
 
 /****Typography****/
 
@@ -127,6 +131,10 @@ ul.tags-tasks{
 
 .breadcrumbs li{
 	display:inline;
+}
+
+.breadcrumbs a{
+	color:white;
 }
 
 .breadcrumbs .fa-folder,
@@ -198,7 +206,7 @@ a.switch-org:hover,{
 	height: 16px;
 	position: absolute;
 	right: 8px;
-	top: -1px;
+	top: -2px;
 	width: 16px;
 	color:#939393;
 }
