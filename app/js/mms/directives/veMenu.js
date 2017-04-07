@@ -94,15 +94,17 @@ function veMenu(ProjectService, $state, $rootScope, $templateCache, growl) {
         if(child) {
             if(child.hasOwnProperty('_id')) {
                 bcrumbs.push({name: child._name, id: child._id, type: "group", link: "project.ref.preview({documentId: 'site_' + breadcrumb.id + '_cover', search: undefined})"});
-                if(child._parentId)
-                    parentId = child._parentId;
+                if(child._parentId) 
+                    parentId = child._parentId;   
             } else {
                 bcrumbs.push({name: child.name, id: child.id, type: "doc", link: "project.ref.document({documentId: breadcrumb.id, search: undefined})"});
-                if(child._groupId)
+                if(child._groupId) 
                     parentId = child._groupId;
             }
 
-            searchParent(parentId);
+            if(parentId)
+                searchParent(parentId);
+
             scope.breadcrumbs = bcrumbs.reverse();
 
             var eltWidth = element.parent().width();
