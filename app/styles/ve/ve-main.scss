@@ -102,7 +102,7 @@ div.tooltip-inner {
 .ve-dark-modal{
   color:white;
   font-weight:300;
-  letter-spacing:.03em;
+  letter-spacing:.05em;
   background-color:#313131;
 
   .modal-content{
@@ -161,7 +161,7 @@ div.tooltip-inner {
     font-size:16px;
     padding: 5px 8px;
     height: 34px;
-    line-height: 19px;
+    line-height: 18px;
     margin-top:6px;
   }
 
@@ -188,9 +188,9 @@ div.tooltip-inner {
     height:24px;
     background-color:#212121;
     background-color:#404040;
-    font-size:13px;
+    font-size:14px;
     padding:3px 4px;
-    font-weight:400;
+    font-weight:300;
     line-height:17px;
   }
 
@@ -200,8 +200,8 @@ div.tooltip-inner {
 
   .label-dropdown{
     color: #d0d0d0;
-    font-size:13px; 
-    font-weight:400;
+    font-size:14px; 
+    font-weight:300;
     padding: 0 4px;
   }
 
@@ -210,8 +210,8 @@ div.tooltip-inner {
   }
 
   li{
-    font-size:13px;
-    font-weight:400;
+    font-size:14px;
+    font-weight:300;
   }
 }
 
@@ -230,7 +230,7 @@ div.tooltip-inner {
     display:inline;
     color:white;
     border:none;
-    letter-spacing:.03em;
+    letter-spacing:.05em;
     border-radius:2px !important;
     -webkit-transition: background-color .1s ease-out !important;
     -moz-transition: background-color .1s ease-out !important;
@@ -281,12 +281,11 @@ div.tooltip-inner {
     background-color: #5c5c5c;
   }
 
-  .dropdown-menu li.list-section-top{
-    margin-bottom:10px;
-  }
-
-  .dropdown-menu li.list-section-bottom{
-    margin-top:10px;
+  .dropdown-menu li.divider{
+    height: 1px;
+    margin: 6px 0;
+    background-color: #696969;
+    padding:0;
   }
 
   /*Clearing bootstrap styling*/
@@ -389,7 +388,7 @@ div.tooltip-inner {
     border-bottom: 3px solid #407f91;
     color:white;
     margin:0;
-    font-weight:400;
+    font-weight:300;
   }
 
   .nav-tabs > li.uib-tab > a{
@@ -499,6 +498,7 @@ ul.ve-light-list{
   li{
     padding:8px 18px;
     font-size:14px;
+    cursor:pointer;
   }
 
   li:hover {
@@ -579,11 +579,11 @@ ul.ve-light-list{
 
   /* Add labels to icons*/
   .tree-add-task:after{
-    content: "branch";
+    content: "Branch";
   }
 
   .tree-add-tag:after{
-    content: "tag";
+    content: "Tag";
   }
 
   .tree-add-tag .fa:before{
@@ -591,12 +591,13 @@ ul.ve-light-list{
   }
 
   .tree-delete:after{
-    content: "delete";  
+    content: "Delete";  
   }
 
   .tree-add-tag,
   .tree-add-task{
     background-color:#439886;
+    float:right;
   }
 
   .tree-add-tag:hover,
@@ -606,12 +607,13 @@ ul.ve-light-list{
   }
 
   .tree-delete{
-    background-color: #296f83;
-    margin-left:10px;
+    color: #296f83;
+    float:left;
   }
 
   .tree-delete:hover{
-    background-color: #1a5e71;
+    color: #1a5e71;
+    background-color:white;
     text-decoration:none;
   }
 }

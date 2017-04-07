@@ -2,7 +2,7 @@
 	color: white;
 	margin:0;
 	font-weight:300;
-	letter-spacing: .03em;
+	letter-spacing: .05em;
 
 	a,
 	a:hover,
@@ -45,7 +45,7 @@ ul.global-menu{
 	list-style: none;
 	float:right;
 	margin:0;
-	font-size:13px;
+	font-size:14px;
 	padding: 0 10px 0 20px;
 }
 
@@ -105,6 +105,8 @@ ul.tags-tasks{
 
 .fixed-content-dropdown.open>a{
 	color:white;
+	/*background-color: #333;
+	padding:14px 0;*/
 }
 
 .fixed-content-dropdown .fa-caret-down{
@@ -123,7 +125,7 @@ ul.tags-tasks{
 	list-style:none;
 	display: inline;
 	margin:0;
-	font-size:13px;
+	font-size:14px;
 	padding-left: 10px;
 	top:1px;
 	position:relative;
@@ -186,14 +188,14 @@ a.switch-org:hover,{
 	background-color: #313131;
 	border: none;
 	border-radius: 3px;
-	font-size: 13px;
+	font-size: 14px;
 	width:330px;
 	padding: 3px 28px 3px 8px;
 	height:	26px;
 	margin:5px 0;
 	color:white;
 	font-weight:300;
-	letter-spacing: .03em;
+	letter-spacing: .05em;
 }
 
 #global-search input:focus{
