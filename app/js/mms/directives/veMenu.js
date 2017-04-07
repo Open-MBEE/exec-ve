@@ -95,10 +95,10 @@ function veMenu(ProjectService, $state, $rootScope, $templateCache, growl) {
                 }
             }
             if(parentId) {
-                while(parentId !== scope.org.id) {
+                while(groupsMap[parentId] !== undefined) {
                     var id = groupsMap[parentId].id;
                     bcrumbs.push({name: groupsMap[id].name, id: id, type: "group", link: "project.ref.preview({documentId: 'site_' + breadcrumb.id + '_cover', search: undefined})"});
-                    parentId = groupsMap[id].parentId;       
+                    parentId = groupsMap[id].parentId;   
                 } 
             }
             scope.breadcrumbs = bcrumbs.reverse();
