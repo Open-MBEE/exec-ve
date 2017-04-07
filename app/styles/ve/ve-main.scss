@@ -49,17 +49,6 @@ div.tooltip-inner {
   }
 }
 
-/****Turn global menu into hamburger when mobile****/
-
-@media (max-width: 1100px) {
-  .global-menu {
-    display: none;
-  }
-  .global-menu-hamburger {
-    display: block;
-  }
-
-}
 
 
 /****UI Elements****/
@@ -166,24 +155,24 @@ div.tooltip-inner {
     display:block;
   }
 
-  .dropdown-toggle{
+  button.dropdown-toggle{
     width:100%;
     text-align: left;
     font-size:16px;
     padding: 5px 8px;
     height: 34px;
-    line-height: 18px;
+    line-height: 19px;
     margin-top:6px;
   }
 
   .dropdown-menu{
     min-width:100%;
-    font-size:15px;
+    font-size:16px;
   }
 
   .label-dropdown{
     color: #d6d6d6;
-    font-size:14px;
+    font-size:15px;
   }
 }
 
@@ -195,27 +184,28 @@ div.tooltip-inner {
 
 .ve-dark-dropdown-nav {
 
-  .dropdown-toggle{
+  button.dropdown-toggle{
     height:24px;
     background-color:#212121;
     background-color:#404040;
     font-size:13px;
     padding:3px 4px;
     font-weight:400;
+    line-height:17px;
   }
 
-  .dropdown-toggle:hover{
+  button.dropdown-toggle:hover{
     background-color:#181818;
   }
 
   .label-dropdown{
-    color: #b3b3b3;
+    color: #d0d0d0;
     font-size:13px; 
     font-weight:400;
     padding: 0 4px;
   }
 
-  .btn-group.open .dropdown-toggle{
+  .btn-group.open button.dropdown-toggle{
     background-color:#121212;
   }
 
@@ -236,7 +226,7 @@ div.tooltip-inner {
     max-height: 300px;
   }
 
-  .dropdown-toggle{
+  button.dropdown-toggle{
     display:inline;
     color:white;
     border:none;
@@ -247,7 +237,6 @@ div.tooltip-inner {
     -o-transition: background-color .1s ease-out !important;
     transition: background-color .1s ease-out !important;
     background-color:#3d3d3d;
-    line-height:18px;
   }
 
   .dropdown-toggle .fa-caret-down{
@@ -274,6 +263,7 @@ div.tooltip-inner {
     -moz-transition: background-color .1s ease-out !important;
     -o-transition: background-color .1s ease-out !important;
     transition: background-color .1s ease-out !important;
+    cursor: pointer;
   }
 
   .dropdown-menu li:hover{
@@ -285,21 +275,40 @@ div.tooltip-inner {
     float:right;
   }
 
-   ul.dropdown-menu{
+  ul.dropdown-menu{
     background-color:#4d4d4d;
     max-width: 300px;
   }
 
-   .dropdown-menu li:hover {
-      background-color: #5c5c5c;
+  .dropdown-menu li:hover {
+    background-color: #5c5c5c;
   }
 
-   .dropdown-toggle:hover{
+  .dropdown-menu li.list-section-top{
+    margin-bottom:10px;
+  }
+
+  .dropdown-menu li.list-section-bottom{
+    margin-top:10px;
+  }
+
+  /*Clearing bootstrap styling*/
+  .dropdown-menu > li > a:hover {
+    background-color: rgba(0,0,0,0);
+    color: white;
+  }
+
+  .dropdown-menu > li > a{
+    padding: 1px 10px;
+    color:white;
+  }
+
+  button.dropdown-toggle:hover{
     background-color:#262626;
     background-color:#383838;
   }
 
-  .btn-group.open .dropdown-toggle{
+  .btn-group.open button.dropdown-toggle{
     background-color:#262626;
   }
 
@@ -390,7 +399,7 @@ div.tooltip-inner {
     background-color:#404040;
     border:none;
     border-bottom: 3px solid #404040;
-    color:#b3b3b3;
+    color:#d0d0d0;
     margin:0;
   }
 

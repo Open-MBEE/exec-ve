@@ -7,7 +7,6 @@
 	a,
 	a:hover,
 	a:visited{
-		color:white;
 		text-decoration:none;
 	}
 }
@@ -21,6 +20,11 @@
 	border: 0;
 	margin-bottom: 0;
 	background-color: $base_grey;
+}
+
+.project-level-header{
+	z-index:100;
+	position:relative;
 }
 
 /****Typography****/
@@ -45,11 +49,21 @@ ul.global-menu{
 	padding: 0 10px 0 20px;
 }
 
-.global-menu li{
+.global-menu>li{
 	display:inline;
 	padding:0 8px;
 	height: 36px;
 	line-height: 36px;
+}
+
+.global-menu>li>a,
+.global-menu>li>span>a{
+	color:#d0d0d0;
+}
+
+.global-menu>li>a:hover,
+.global-menu>li>span>a:hover{
+	color:white;
 }
 
 .global-menu-hamburger{
@@ -84,12 +98,22 @@ ul.tags-tasks{
 	float:right;
 }
 
+/****Global-nav menu****/
+.fixed-content-dropdown ul.dropdown-menu{
+	overflow-y: auto !important;
+}
+
+.fixed-content-dropdown.open>a{
+	color:white;
+}
+
 
 /****Typography****/
 
 .breadcrumbs{
 	display:inline;
 }
+
 
 .breadcrumbs ul{
 	list-style:none;
@@ -121,6 +145,7 @@ a.switch-org,
 a.switch-org:hover,{
 	font-size: 11px;
 	text-decoration: underline !important;
+	color:white;
 }
 
 .logotype{
@@ -128,11 +153,15 @@ a.switch-org:hover,{
 	font-size: 14px;
 	line-height:36px;
 	padding: 0 5px 0 13px;
-	color:#b3b3b3;
+	color:white;
+}
+
+.logotype:hover{
+	color:white;
 }
 
 .org-title{
-	font-weight:500;
+	font-weight:600;
 	font-size: 14px;
 	padding-right: 4px;
 }
