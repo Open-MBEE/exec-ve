@@ -402,13 +402,15 @@ div.tooltip-inner {
   uib-tab:hover{
     background-color:#404040;
     border:none;
-    border-bottom: 4px solid #4e88c2;    
+    border-bottom: 3px solid #4e88c2;    
   }
 }
 
 /*Light tab system (needs to be refactored)*/
 
 .ve-light-tabs{
+
+  background-color:#f8f8f8;
 
   .nav-tabs > li.uib-tab{
     text-align:center;
@@ -419,7 +421,7 @@ div.tooltip-inner {
   }  
 
   ul.nav-tabs{
-    border:none;
+    height:44px;
   } 
 
   /*
@@ -432,7 +434,7 @@ div.tooltip-inner {
   .nav-tabs > li.active.uib-tab > a{
     border:none;
     border-bottom: 4px solid #53a5bc;
-    color:white;
+    color:#F8F8F8;
     margin:0;
     font-weight:600;
     color:#333;
@@ -440,9 +442,10 @@ div.tooltip-inner {
 
   .nav-tabs > li.uib-tab > a{
     border:none;
-    border-bottom: 4px solid white;
+    border-bottom: 4px solid #f8f8f8;
     color:#333;
     margin:0;
+    background-color:#F8F8F8;
   }
 
   uib-tab:hover{
@@ -452,7 +455,7 @@ div.tooltip-inner {
   } 
 
   .nav > li > a:focus, .nav > li > a:hover{
-    background-color:white;
+    background-color:#F8F8F8;
   }
 }
 
@@ -494,6 +497,7 @@ ul.ve-light-list{
   list-style:none;
   max-height: 300px;
   overflow-y: scroll;
+  width:100%;
 
   li{
     padding:8px 18px;
@@ -525,6 +529,28 @@ ul.ve-light-list{
   ul.ve-light-list{
     height: calc(100vh - 300px);
     max-height:none;
+    border: 1px solid #eaeaea;
+    border-right:none;
+    border-top:none;
+  }
+
+  .ve-light-panels-detail{
+    height: calc(100vh - 300px);
+    border: 1px solid #eaeaea;
+    border-top:none;
+    border-left:none;
+  }
+
+  .ve-light-panels-detail-header{
+    background-color: #F8F8F8;
+    height:44px;
+    border: 1px solid #eaeaea;
+    border-left:none;
+  }
+
+  .ve-light-tabs ul.nav-tabs{
+    border: 1px solid #eaeaea;
+    border-right:none;    
   }
 }
 
@@ -536,7 +562,6 @@ ul.ve-light-list{
 /* Detail pane for light panel system */
 .ve-light-panels-detail{
   min-height: 300px; 
-  margin-top: 43px;
   padding:10px 26px;
 
   dd,
@@ -545,8 +570,8 @@ ul.ve-light-list{
   }
 
   .panels-detail-title{
-    border-bottom: 3px solid #F8F8F8;
-    margin-bottom: 20px;
+    border-bottom: 1px solid #eaeaea;
+    margin: 8px 0 20px;
     padding-bottom: 16px;
 
     h3{
