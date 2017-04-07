@@ -269,6 +269,9 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                     });
                 }
             }
+            if ($scope.treeApi.refresh) {
+                $scope.treeApi.refresh();
+            }
         });
     } else {
         var seenChild = {};        
@@ -490,9 +493,13 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         var newBranchType = "";
         
         if (itemType === 'Document') {
-            if (!branch || branch.type !== 'group') {
+            if (!branch) {
+                $scope.parentBranchData = {_id: "holding_bin_" + projectOb.id};
+            } else if (branch.type !== 'group') {
                 growl.warning("Select a group to add document under");
                 return;
+            } else {
+                $scope.parentBranchData = branch.data;
             }
             templateUrlStr = 'partials/mms/new-doc.html';
             newBranchType = 'view';
@@ -507,13 +514,13 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 growl.warning("Add View Error: Cannot add a child view to a non-owned and non-shared view.");
                 return;
             }
+            $scope.parentBranchData = branch.data;
             templateUrlStr = 'partials/mms/new-view.html';
             newBranchType = 'view';
         } else {
             growl.error("Add Item of Type " + itemType + " is not supported");
             return;
         }
-        $scope.parentBranchData = branch.data;
         // Adds the branch:
         var instance = $uibModal.open({
             templateUrl: templateUrlStr,
@@ -527,12 +534,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 data: data,
                 children: []
             };
-            
-            var top = false; //TODO fix tags and branch
-            if (itemType === 'Document') {
-                newbranch.groupId = branch.data._id;
-            }
-            $scope.treeApi.add_branch(branch, newbranch, top);
+            $scope.treeApi.add_branch(branch, newbranch, false);
 
             var addToFullDocView = function(node, curSection, prevSysml) {
                 var lastChild = prevSysml;
