@@ -237,7 +237,7 @@ function mmsTree($timeout, $log, $templateCache) {
         var on_initialSelection_change = function() {
             if (scope.initialSelection) {
                 for_each_branch(function(b) {
-                    if (b.data.id === scope.initialSelection || b.data.id === scope.initialSelection) {
+                    if (b.data.id === scope.initialSelection || b.data._id === scope.initialSelection) {
                         select_branch(b, true);
                     }
                 });
@@ -371,7 +371,7 @@ function mmsTree($timeout, $log, $templateCache) {
 
         if (attrs.initialSelection) {
             for_each_branch(function(b) {
-                if (b.data.id === attrs.initialSelection || b.data.id === attrs.initialSelection) {
+                if (b.data.id === attrs.initialSelection || b.data._id === attrs.initialSelection) {
                     $timeout(function() {
                         select_branch(b);
                     });
