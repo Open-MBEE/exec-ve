@@ -421,8 +421,8 @@ div.tooltip-inner {
   }  
 
   ul.nav-tabs{
-    height:44px;
-  } 
+    border: 1px solid #eaeaea;
+  }
 
   /*
   .nav-tabs > li.uib-tab:hover,
@@ -493,20 +493,31 @@ div.tooltip-inner {
 
 ul.ve-light-list{
   padding-left:0;
-  background-color: #F8F8F8;
   list-style:none;
   max-height: 300px;
   overflow-y: scroll;
   width:100%;
+  background-color:white;
+  border: 1px solid #eaeaea;
+  border-top:none;
 
   li{
     padding:8px 18px;
     font-size:14px;
     cursor:pointer;
+    border-bottom: 1px solid #eaeaea;
+  }
+
+  li:last-child{
+    border-bottom: none;  
+  }
+
+  li:first-child{
+    border-bottom: 1px solid #eaeaea; 
   }
 
   li:hover {
-    background: #efefef;
+    background: #F8F8F8;
   }
 
   li a,
@@ -516,7 +527,7 @@ ul.ve-light-list{
   }
 
   li.selected{
-    background-color:#eeeeee;
+    background-color:#F8F8F8;
     border-right: 7px solid #7FD2B9;
   }
 
@@ -525,13 +536,11 @@ ul.ve-light-list{
   }
 }
 
-@media (min-height:580px) and (min-width:990px){
+@media (min-width:990px){
   ul.ve-light-list{
     height: calc(100vh - 300px);
     max-height:none;
-    border: 1px solid #eaeaea;
     border-right:none;
-    border-top:none;
   }
 
   .ve-light-panels-detail{
@@ -539,11 +548,12 @@ ul.ve-light-list{
     border: 1px solid #eaeaea;
     border-top:none;
     border-left:none;
+    overflow-y:scroll;
   }
 
   .ve-light-panels-detail-header{
     background-color: #F8F8F8;
-    height:44px;
+    height:46px;
     border: 1px solid #eaeaea;
     border-left:none;
   }
@@ -554,6 +564,16 @@ ul.ve-light-list{
   }
 }
 
+@media (max-height:500px){
+  ul.ve-light-list{
+    height:300px;
+  } 
+
+  .ve-light-panels-detail{
+    height:300px;
+  }
+}
+
 /* Panel system where the left is a list and the right is the detail of the selected item*/
 .ve-light-list-panels{
   padding:0;
@@ -561,7 +581,6 @@ ul.ve-light-list{
 
 /* Detail pane for light panel system */
 .ve-light-panels-detail{
-  min-height: 300px; 
   padding:10px 26px;
 
   dd,

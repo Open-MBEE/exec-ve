@@ -11,7 +11,7 @@
         <div ng-show="refManageView" class="col-md-4 ve-light-list-panels">
           <div class="toolbar pane-left-btn-group">
           </div>
-          <div style="min-height: 300px;">
+          <div>
             <div class="panel-body">
               <uib-tabset active="activeTab" type="tabs" justified="false" class = "ve-light-tabs">
                 <uib-tab index="0" classes="tab-item" heading="Branches">
@@ -40,6 +40,7 @@
         <div class="col-md-8 ve-light-panels-detail" ng-show="refSelected">
           <div class = "panels-detail-title">
             <h3>{{refSelected.name}}</h3>
+            <a style="color: rgb(72, 133, 189); text-decoration: underline; padding-left: 10px;">Documents</a>
             <mms-button-bar buttons="buttons" mms-bb-api="bbApi"></mms-button-bar>
           </div>
           <dl class="dl-horizontal">
