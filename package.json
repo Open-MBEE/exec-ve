@@ -3,7 +3,6 @@
   "description": "mms module",
   "repository": "https://mbse.jpl.nasa.gov/stash/projects/MBEE/repos/angular-mms",
   "devDependencies": {
-    "angular-mocks": "^1.5.0",
     "grunt": "^0.4.5",
     "grunt-artifactory-artifact": "~0.6.2",
     "grunt-bower-install-simple": "1.0.3",
