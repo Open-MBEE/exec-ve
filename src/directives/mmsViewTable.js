@@ -11,9 +11,9 @@ function mmsViewTable($compile, $timeout, $document, UtilsService) {
         scope.searchTerm = '';
         scope.showFilter = false;
         var html = UtilsService.makeHtmlTable(scope.table);
-        html = '<div class="tableSearch">' +
-                '<button class="btn btn-sm btn-primary" ng-click="doClick()">Export CSV</button> ' +
-                '<button class="btn btn-sm btn-primary" ng-click="showFilter = !showFilter">Filter Table</button> ' +
+        html = '<div class="tableSearch ve-table-buttons">' +
+                '<button class="btn btn-sm btn-primary export-csv-button" ng-click="doClick()">Export CSV</button> ' +
+                '<button class="btn btn-sm btn-primary filter-table-button" ng-click="showFilter = !showFilter">Filter Table</button> ' +
                 '<span ng-show="showFilter"><span>Showing {{numFiltered}} of {{numTotal}} Rows </span>' + 
                     '<form style="display: inline" ng-submit="search()"><input type="text" size="75" placeholder="regex filter" ng-model="searchTerm"></input></form>' +
                 '<button class="btn btn-sm btn-primary" ng-click="search()">Apply</button>' + 
