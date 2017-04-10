@@ -114,6 +114,7 @@ function($scope, $location, $rootScope, $state, _, $window, $uibModal, growl, $h
             $rootScope.ve_stateChanging = false;
             $rootScope.hidePanes = false;
             $rootScope.showManageRefs = false;
+            $rootScope.showLogin = false;
             if ($state.current.name === 'login' || $state.current.name === 'login.select') {
                 $rootScope.hidePanes = true;
                 $rootScope.showLogin = true;
@@ -126,7 +127,7 @@ function($scope, $location, $rootScope, $state, _, $window, $uibModal, growl, $h
             } else if ($state.current.name === 'project.ref.preview') {
                 var index = toParams.documentId.indexOf('_cover');
                 if (index > 0)
-                    $rootScope.ve_treeInitial = toParams.documentId.substring(0, index);
+                    $rootScope.ve_treeInitial = toParams.documentId.substring(5, index);
                 else
                     $rootScope.ve_treeInitial = toParams.documentId;
             } else if ($state.includes('project.ref.document') && ($state.current.name !== 'project.ref.document.order')) {
