@@ -112,7 +112,7 @@ div.tooltip-inner {
 
   .export-csv-button:hover,
   .filter-table-button:hover{
-    background-color:#d3d3d3;
+    background-color:#f0f0f0;
     color:#535353;
   }
 
@@ -125,11 +125,11 @@ div.tooltip-inner {
   .filter-table-button::before{
     content: "\f0b0";
     font-family: FontAwesome;
-    padding:4px;
+    padding:2px 4px;
   }
 }
 
-.ve-table-buttons .btn-sm{
+.ve-filter-table-form .btn-sm{
   margin:0 4px;
 }
 
