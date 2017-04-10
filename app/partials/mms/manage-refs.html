@@ -40,10 +40,13 @@
         <div class="col-md-8 ve-light-panels-detail" ng-show="refSelected">
           <div class = "panels-detail-title">
             <h3>{{refSelected.name}}</h3>
-            <a style="color: rgb(72, 133, 189); text-decoration: underline; padding-left: 10px;">Documents</a>
             <mms-button-bar buttons="buttons" mms-bb-api="bbApi"></mms-button-bar>
           </div>
           <dl class="dl-horizontal">
+            <dt></dt>
+            <dd class = "link-section"> 
+              <a>Sites and Documents</a>
+            </dd>
             <dt>Id</dt>
             <dd>{{refSelected.id}}</dd>
             <dt>Type</dt>

@@ -297,6 +297,7 @@ div.tooltip-inner {
   .dropdown-menu > li > a{
     padding: 1px 10px;
     color:white;
+    font-weight: 300;
   }
 
   button.dropdown-toggle:hover{
@@ -586,6 +587,16 @@ ul.ve-light-list{
   dd,
   dt{
     padding: 2px 0;
+    font-size:16px;
+  }
+
+  dd.link-section{
+    padding-bottom:16px;
+  }
+
+  dd.link-section > a{
+    color: #4885bd; 
+    text-decoration: underline;
   }
 
   .panels-detail-title{
