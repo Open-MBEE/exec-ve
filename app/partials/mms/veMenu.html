@@ -15,7 +15,7 @@
                 <li ng-show="isRefsView()">
                     <a ui-sref="project.ref({refId: 'master', search: undefined})"><i class="fa fa-arrow-left"></i> back to sites &amp; documents</a>
                 </li>
-                <li ng-style="truncateStyle" ng-show="!isRefsView()" ng-repeat="breadcrumb in breadcrumbs track by $index">
+                <li ng-show="!isRefsView()" ng-repeat="breadcrumb in breadcrumbs track by $index" ng-style="truncateStyle">
                     <a ui-sref="{{ breadcrumb.link }}">
                         <i ng-class="{'fa fa-folder': breadcrumb.type === 'group', 'fa fa-file': $last && breadcrumb.type === 'doc'}" aria-hidden="true" uib-tooltip="{{ breadcrumb.name }}" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom"></i>{{ breadcrumb.name }}
                     </a>
