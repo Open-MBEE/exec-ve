@@ -69,42 +69,39 @@ function veMenu(ProjectService, $state, $rootScope, $templateCache, growl) {
         };
 
         var bcrumbs = [];
-        var child, parentId, display;
+        var child, parentId;
         var groups = scope.groups;
-        
-        var searchParent = function(kidId) {
-            while(kidId) {
-                for(var i = 0; i < groups.length; i++) {
-                    if(groups[i]._id == kidId) {
-                        bcrumbs.push({name: groups[i]._name, id: groups[i]._id, type: "group", link: "project.ref.preview({documentId: 'site_' + breadcrumb.id + '_cover', search: undefined})"});
-                        kidId = groups[i]._parentId;
-                        break;
-                    } 
-                }        
-            }  
-        };
+        var groupsMap = {};
 
+        for(var i = 0; i < groups.length; i++) {
+            groupsMap[groups[i]._id] = {id: groups[i]._id, name: groups[i]._name, parentId: groups[i]._parentId};
+        }
         if(scope.group !== undefined) {
             child = scope.group; 
         }
         if(scope.document !== undefined) {
             child = scope.document; 
         }
-
         if(child) {
             if(child.hasOwnProperty('_id')) {
                 bcrumbs.push({name: child._name, id: child._id, type: "group", link: "project.ref.preview({documentId: 'site_' + breadcrumb.id + '_cover', search: undefined})"});
-                if(child._parentId)
-                    parentId = child._parentId;
+                if(child._parentId) {
+                    parentId = child._parentId;   
+                }
             } else {
                 bcrumbs.push({name: child.name, id: child.id, type: "doc", link: "project.ref.document({documentId: breadcrumb.id, search: undefined})"});
-                if(child._groupId)
+                if(child._groupId) {
                     parentId = child._groupId;
+                }
             }
-
-            searchParent(parentId);
+            if(parentId) {
+                while(groupsMap[parentId] !== undefined) {
+                    var id = groupsMap[parentId].id;
+                    bcrumbs.push({name: groupsMap[id].name, id: id, type: "group", link: "project.ref.preview({documentId: 'site_' + breadcrumb.id + '_cover', search: undefined})"});
+                    parentId = groupsMap[id].parentId;   
+                } 
+            }
             scope.breadcrumbs = bcrumbs.reverse();
-
             var eltWidth = element.parent().width();
             var crumbcount = scope.breadcrumbs.length;
             var liWidth = (eltWidth * 0.75)/crumbcount;
