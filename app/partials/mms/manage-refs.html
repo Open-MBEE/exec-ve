@@ -1,21 +1,18 @@
 <div class="container-fluid ve-no-panes">
   <div class="row">
-    <div style = "margin-top:40px;">
+    <div>
       <div class="col-md-10 col-md-offset-1">
-        <a class = "sites-docs-link" href="#/projects/PROJECT-ID_10_15_15_1_41_52_PM_5b84f7be_1506a83819c__6bce_cae_tw_jpl_nasa_gov_128_149_19_85/master" ui-sref="project.ref({refId: 'master', search: undefined})">
-          <i class="fa fa-arrow-left"></i> Back to sites/documents
-        </a>
         <h1 class="panel-title">Manage branches/tags</h3>
       </div>
-      <div class="col-md-10 col-md-offset-1" style = "margin-top:40px;">
+      <div class="col-md-10 col-md-offset-1">
         <div ng-show="refManageView" class="col-md-4 ve-light-list-panels">
           <div class="toolbar pane-left-btn-group">
           </div>
           <div>
             <div class="panel-body">
-              <uib-tabset active="activeTab" type="tabs" justified="false" class = "ve-light-tabs">
+              <uib-tabset active="activeTab" type="tabs" justified="false" class="ve-light-tabs">
                 <uib-tab index="0" classes="tab-item" heading="Branches">
-                  <ul class = "ve-light-list">
+                  <ul class="ve-light-list">
                     <li ng-repeat="branch in branches | orderBy:'name'" ng-click="refClickHandler(branch)">
                       <a>
                         {{ branch.name }}
@@ -24,7 +21,7 @@
                   </ul>
                 </uib-tab>
                 <uib-tab index="1" classes="tab-item" heading="Tags">
-                  <ul class = "ve-light-list">
+                  <ul class="ve-light-list">
                     <li ng-repeat="tag in tags | orderBy:'name'" ng-click="refClickHandler(tag)">
                       <a>
                       {{ tag.name }}
@@ -38,13 +35,13 @@
         </div>
         <div class="col-md-8 ve-light-panels-detail-header"></div>
         <div class="col-md-8 ve-light-panels-detail" ng-show="refSelected">
-          <div class = "panels-detail-title">
+          <div class="panels-detail-title">
             <h3>{{refSelected.name}}</h3>
             <mms-button-bar buttons="buttons" mms-bb-api="bbApi"></mms-button-bar>
           </div>
           <dl class="dl-horizontal">
             <dt></dt>
-            <dd class = "link-section"> 
+            <dd class="link-section"> 
               <a>Sites and Documents</a>
             </dd>
             <dt>Id</dt>
