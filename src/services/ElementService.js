@@ -559,6 +559,8 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
             var results = [];
             for (var i = 0; i < response.data.elements.length; i++) {
                 results.push(cacheElement(reqOb, response.data.elements[i]));
+                var editCopy = JSON.parse(JSON.stringify(response.data.elements[i]));
+                cacheElement(reqOb, editCopy, true);
             }
             deferred.resolve(results);
         }, function(response) {
