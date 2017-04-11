@@ -11,7 +11,7 @@
   .account-wall {
     width: 320px;
     margin: 120px auto;
-    height: 360px;
+    height: 320px;
     position: relative;
   }
 
@@ -77,20 +77,9 @@
 
   /*Submit button*/
   .account-wall .btn-block {
-    background-color: #2F889A;
-    font-weight: 600 !important;
-    letter-spacing: .16em;
-    font-size: 12px !important;
-    -webkit-transition: background-color .1s ease-out !important;
-    -moz-transition: background-color .1s ease-out !important;
-    -o-transition: background-color .1s ease-out !important;
-    transition: background-color .1s ease-out !important;
-    margin-top: 48px;
+    margin-top: 34px;
     position: absolute;
-    width: 100%;
     bottom: 0;
-  }
-  .account-wall .btn-block:hover {
-    background-color: #296f83;
+    padding: 10px;
   }
 }
