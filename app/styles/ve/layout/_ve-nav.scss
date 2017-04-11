@@ -1,214 +1,211 @@
 .navbar {
-	color: white;
-	margin:0;
-	font-weight:300;
-	letter-spacing: .05em;
+  color: white;
+  margin: 0;
+  font-weight: 300;
+  letter-spacing: .05em;
 
-	a,
-	a:hover,
-	a:visited{
-		text-decoration:none;
-	}
+  a,
+  a:hover,
+  a:visited {
+    text-decoration: none;
+  }
 }
+
 .navbar {
-	font-size: 14px;
-	z-index: 200;
-	position: relative;
-	width: 100%;
-	height: 36px;
-	min-height: 30px;
-	border: 0;
-	margin-bottom: 0;
-	background-color: $base_grey;
+  font-size: 14px;
+  z-index: 200;
+  position: relative;
+  width: 100%;
+  height: 36px;
+  min-height: 30px;
+  border: 0;
+  margin-bottom: 0;
+  background-color: $base_grey;
 }
 
-.project-level-header{
-	z-index:100;
-	position:relative;
+.project-level-header {
+  z-index: 100;
+  position: relative;
 }
 
 /****Typography****/
-
-
 
 /****Nav****/
 
-nav.project-level-header{
-	background-color: #313131;
+nav.project-level-header {
+  background-color: #313131;
 }
 
-nav.global-header{
-	background-color: #404040;
+nav.global-header {
+  background-color: #404040;
 }
 
-ul.global-menu{
-	list-style: none;
-	float:right;
-	margin:0;
-	font-size:14px;
-	padding: 0 10px 0 20px;
+ul.global-menu {
+  list-style: none;
+  float: right;
+  margin: 0;
+  font-size: 14px;
+  padding: 0 10px 0 20px;
 }
 
-.global-menu>li{
-	display:inline;
-	padding:0 8px;
-	height: 36px;
-	line-height: 36px;
+.global-menu > li {
+  display: inline;
+  padding: 0 8px;
+  height: 36px;
+  line-height: 36px;
 }
 
-.global-menu>li>a,
-.global-menu>li>span>a{
-	color:#d0d0d0;
+.global-menu > li > a,
+.global-menu > li > span > a {
+  color: #d0d0d0;
 }
 
-.global-menu>li>a:hover,
-.global-menu>li>span>a:hover{
-	color:white;
+.global-menu > li > a:hover,
+.global-menu > li > span > a:hover {
+  color: white;
 }
 
-.global-menu-hamburger{
-	display:none;
-	float:right;
-	padding: 0 20px;
-	height: 36px;
-	line-height: 36px;
+.global-menu-hamburger {
+  display: none;
+  float: right;
+  padding: 0 20px;
+  height: 36px;
+  line-height: 36px;
 }
-
 
 /****Nav > Layout****/
 
-ul.tags-tasks{
-	float:right;
-	margin-right: 10px;
-	list-style: none;
-	margin:0;
-	padding:0;
-	margin: 0 10px;
+ul.tags-tasks {
+  float: right;
+  margin-right: 10px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  margin: 0 10px;
 }
 
-.tags-tasks li{
-	display:inline;
-	list-style: none;
-	padding:0;
-	margin:0;
-	float:left;
+.tags-tasks li {
+  display: inline;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  float: left;
 }
 
-#global-navigation{
-	float:right;
+#global-navigation {
+  float: right;
 }
 
 /****Global-nav menu****/
-.fixed-content-dropdown ul.dropdown-menu{
-	overflow-y: auto !important;
+.fixed-content-dropdown ul.dropdown-menu {
+  overflow-y: auto !important;
 }
 
-.fixed-content-dropdown.open>a{
-	color:white;
-	/*background-color: #333;
-	padding:14px 0;*/
+.fixed-content-dropdown.open > a {
+  color: white;
+  /*background-color: #333;
+  padding:14px 0;*/
 }
 
-.fixed-content-dropdown .fa-caret-down{
-	float:none;
+.fixed-content-dropdown .fa-caret-down {
+  float: none;
 }
-
 
 /****Typography****/
 
-.breadcrumbs{
-	display:inline;
+.breadcrumbs {
+  display: inline;
 }
 
-
-.breadcrumbs ul{
-	list-style:none;
-	display: inline;
-	margin:0;
-	font-size:14px;
-	padding-left: 10px;
-	top:2px;
-	position:relative;
+.breadcrumbs ul {
+  list-style: none;
+  display: inline;
+  margin: 0;
+  font-size: 14px;
+  padding-left: 10px;
+  top: 2px;
+  position: relative;
 }
 
-.breadcrumbs li{
-	display:inline;
+.breadcrumbs li {
+  display: inline;
 }
 
-.breadcrumbs a{
-	color:white;
+.breadcrumbs a {
+  color: white;
 }
 
 .breadcrumbs .fa-folder,
-.breadcrumbs .fa-file{
-	font-size:12px;
-	padding: 6px 4px 6px 6px;
+.breadcrumbs .fa-file {
+  font-size: 12px;
+  padding: 6px 4px 6px 6px;
 }
 
-.breadcrumbs .fa-file{
-	font-size: 11px;
-	top: -.1em;
-	position: relative;
+.breadcrumbs .fa-file {
+  font-size: 11px;
+  top: -.1em;
+  position: relative;
 }
 
 a.switch-org,
-a.switch-org:hover,{
-	font-size: 11px;
-	text-decoration: underline !important;
-	color:white;
+a.switch-org:hover {
+  font-size: 11px;
+  text-decoration: underline !important;
+  color: white;
 }
 
-.logotype{
-	font-weight: 200;
-	font-size: 14px;
-	line-height:36px;
-	padding: 0 5px 0 13px;
-	color:white;
+.logotype {
+  font-weight: 200;
+  font-size: 14px;
+  line-height: 36px;
+  padding: 0 5px 0 13px;
+  color: white;
 }
 
-.logotype:hover{
-	color:white;
+.logotype:hover {
+  color: white;
 }
 
-.org-title{
-	font-weight:600;
-	font-size: 14px;
-	padding-right: 4px;
+.org-title {
+  font-weight: 600;
+  font-size: 14px;
+  padding-right: 4px;
 }
 
 /****UI Elements****/
 
 /****UI Elements > Search****/
 
-#global-search{
-	display:inline;
-	position:relative;
-}
-#global-search input{
-	background-color: #313131;
-	border: none;
-	border-radius: 3px;
-	font-size: 14px;
-	width:330px;
-	padding: 3px 28px 3px 8px;
-	height:	26px;
-	margin:5px 0;
-	color:white;
-	font-weight:300;
-	letter-spacing: .05em;
+#global-search {
+  display: inline;
+  position: relative;
 }
 
-#global-search input:focus{
-	background-color:#212121;
+#global-search input {
+  background-color: #313131;
+  border: none;
+  border-radius: 3px;
+  font-size: 14px;
+  width: 330px;
+  padding: 3px 28px 3px 8px;
+  height: 26px;
+  margin: 5px 0;
+  color: white;
+  font-weight: 300;
+  letter-spacing: .05em;
+}
+
+#global-search input:focus {
+  background-color: #212121;
 }
 
 #global-search::after {
-    content: "\f002";
-	font-family: FontAwesome;
-	height: 16px;
-	position: absolute;
-	right: 8px;
-	top: -2px;
-	width: 16px;
-	color:#939393;
+  content: "\f002";
+  font-family: FontAwesome;
+  height: 16px;
+  position: absolute;
+  right: 8px;
+  top: -2px;
+  width: 16px;
+  color: #939393;
 }

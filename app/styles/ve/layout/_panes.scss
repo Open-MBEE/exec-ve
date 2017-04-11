@@ -4,7 +4,7 @@
 *************************/
 
 .no-display {
-  display: none  
+  display: none
 }
 
 .pane-center,
@@ -63,7 +63,7 @@
       cursor: pointer;
       background-color: $white;
       z-index: 10;
-    
+
       &::before {
         font-family: "FontAwesome";
         font-size: 8px;
@@ -113,11 +113,11 @@
   h3 {
     white-space: nowrap;
   }
-  
+
   h3 {
     font-size: 20px;
     padding-left: 20px;
-  } 
+  }
 }
 
 .content-container {
