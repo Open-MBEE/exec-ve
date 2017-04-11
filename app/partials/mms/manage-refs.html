@@ -17,7 +17,8 @@
                             </uib-tab>
                             <uib-tab index="1" classes="tab-item" heading="Tags">
                                 <ul class="ve-light-list">
-                                    <li ng-repeat="tag in tags | orderBy:'name'" ng-click="refClickHandler(tag)">
+                                    <li ng-repeat="tag in tags | orderBy:'name'" ng-click="refClickHandler(tag)"
+                                        ng-class="{'selected': tag.id === refSelected.id}">
                                         <a>{{ tag.name }}</a>
                                     </li>
                                 </ul>
