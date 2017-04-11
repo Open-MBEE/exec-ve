@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms')
-.factory('StompService', ['$rootScope', 'ApplicationService', 'ElementService', 'UtilsService', 'CacheService', 'URLService','$http', StompService]);
+.factory('StompService', ['$rootScope', 'ApplicationService', 'ElementService', 'URLService','$http', StompService]);
 
 /**
  * @ngdoc service
@@ -11,7 +11,7 @@ angular.module('mms')
  * @description
  * Provides messages from the activemq JMS bus
  */
-function StompService($rootScope, ApplicationService, ElementService, UtilsService,  CacheService, URLService, $http) {
+function StompService($rootScope, ApplicationService, ElementService, URLService, $http) {
      var stompClient = {};
      var host;
 
