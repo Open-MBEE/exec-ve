@@ -73,10 +73,10 @@ function veMenu(ProjectService, $state, $rootScope, $templateCache, growl) {
         var groups = scope.groups;
         var groupsMap = {};
 
-        for(var i = 0; i < groups.length; i++) {
-            groupsMap[groups[i]._id] = {id: groups[i]._id, name: groups[i]._name, parentId: groups[i]._parentId};
-        }
         if(scope.group !== undefined) {
+            for (var i = 0; i < groups.length; i++) {
+                groupsMap[groups[i]._id] = {id: groups[i]._id, name: groups[i]._name, parentId: groups[i]._parentId};
+            }
             child = scope.group; 
         }
         if(scope.document !== undefined) {

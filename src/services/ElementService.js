@@ -74,7 +74,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
      *      multiple calls to this method with the same parameters would give the
      *      same object
      */
-    var getElement = function(reqOb, weight, update) { 
+    var getElement = function(reqOb, weight, update) {
         UtilsService.normalize(reqOb);
         var requestCacheKey = getElementKey(reqOb);
         var key = URLService.getElementURL(reqOb);
