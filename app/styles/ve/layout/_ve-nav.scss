@@ -97,8 +97,9 @@ ul.tags-tasks {
 }
 
 /****Global-nav menu****/
-.fixed-content-dropdown ul.dropdown-menu {
-  overflow-y: auto !important;
+.fixed-content-dropdown ul.dropdown-menu{
+	overflow-y: auto !important;
+	border: 1px solid rgb(90, 90, 90);
 }
 
 .fixed-content-dropdown.open > a {

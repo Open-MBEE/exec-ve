@@ -71,9 +71,9 @@ div.tooltip-inner {
     transition: background-color .1s ease-out;
     border: none;
     text-transform: uppercase;
-    border-radius: 2px;
-    box-shadow: none;
-    padding: 7px 16px;
+    border-radius:3px;
+    box-shadow:none;
+    padding: 7px 12px;
   }
 
   /*******Buttons > Primary button*******/
@@ -101,17 +101,16 @@ div.tooltip-inner {
   /*******Buttons > Table buttons*******/
 
   .export-csv-button,
-  .filter-table-button {
-    color: #898989;
-    background-color: white;
-    padding: 4px;
-    margin: 24px 24px 0 0;
+  .filter-table-button{
+    color: #757575;
+    margin: 24px 6px 0 0;
+    background-color:#f0f0f0;
   }
 
   .export-csv-button:hover,
-  .filter-table-button:hover {
-    background-color: #f0f0f0;
-    color: #535353;
+  .filter-table-button:hover{
+    background-color:#d8d8d8;
+    color:#535353;
   }
 
   .export-csv-button::before {
@@ -578,9 +577,9 @@ ul.ve-light-list {
   .ve-light-panels-detail {
     height: calc(100vh - 300px);
     border: 1px solid #eaeaea;
-    border-top: none;
-    border-left: none;
-    overflow-y: scroll;
+    border-top:none;
+    border-left:none;
+    overflow-y:auto;
   }
 
   .ve-light-panels-detail-header {
@@ -711,6 +710,6 @@ ul.ve-light-list {
 table caption {
   font-size: 20px;
   text-align: left;
-  padding: 6px 0 10px;
+  padding: 8px 0 14px;
 }
 
