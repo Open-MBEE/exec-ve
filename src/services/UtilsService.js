@@ -16,7 +16,60 @@ function UtilsService($q, $http, CacheService, URLService, _) {
     var DOCUMENT_SID = '_17_0_2_3_87b0275_1371477871400_792964_43374';
     var nonEditKeys = ['contains', 'view2view', 'childrenViews', '_displayedElements',
         '_allowedElements', '_contents', '_relatedDocuments', '_childViews'];
-
+    var CLASS_ELEMENT_TEMPLATE = {
+        _appliedStereotypeIds: [],
+        appliedStereotypeInstanceId: null,
+        classifierBehaviorId: null,
+        clientDependencyIds: [],
+        collaborationUseIds: [],
+        documentation: "",
+        elementImportIds: [],
+        generalizationIds: [],
+        interfaceRealizationIds: [],
+        isAbstract: false,
+        isActive: false,
+        isFinalSpecialization: false,
+        isLeaf: false,
+        mdExtensionsIds: [],
+        name: "",
+        nameExpression: null,
+        nestedClassifierIds: [],
+        ownedAttributeIds: [],
+        ownedOperationIds: [],
+        ownerId: null,
+        packageImportIds: [],
+        powertypeExtentIds: [],
+        redefinedClassifierIds: [],
+        representationId: null,
+        substitutionIds: [],
+        supplierDependencyIds: [],
+        syncElementId: null,
+        templateBindingIds: [],
+        templateParameterId: null,
+        type: "Class",
+        useCaseIds: [],
+        visibility: null
+    };
+    var INSTANCE_ELEMENT_TEMPLATE = {
+        ownerId: null,
+        name: '',
+        documentation: '',
+        type: "InstanceSpecification",
+        classifierIds: [],
+        specification: null,
+        _appliedStereotypeIds: [],
+        appliedStereotypeInstanceId: null,
+        mdExtensionsIds: [],
+        syncElementId: null,
+        clientDependencyIds: [],
+        supplierDependencyIds: [],
+        nameExpression: null,
+        visibility: "public",
+        templateParameterId: null,
+        deploymentIds: [],
+        slotIds: [],
+        stereotypedElementId: null
+    };
     var hasCircularReference = function(scope, curId, curType) {
         var curscope = scope;
         while (curscope.$parent) {
@@ -617,7 +670,30 @@ function UtilsService($q, $http, CacheService, URLService, _) {
         return deferred.promise;
     };
 
+    /**
+     * @ngdoc method
+     * @name mms.UtilsService#createClassElement
+     * @methodOf mms.UtilsService
+     * 
+     * @description
+     * returns a class json object with all emf fields set to default, with
+     * fields from passed in object substituted
+     * 
+     */
+    var createClassElement = function(obj) {
+        var o = JSON.parse(JSON.stringify(CLASS_ELEMENT_TEMPLATE));
+        Object.assign(o, obj);
+        return o;
+    };
+
+    var createInstanceElement = function(obj) {
+        var o = JSON.parse(JSON.stringify(INSTANCE_ELEMENT_TEMPLATE));
+        Object.assign(o, obj);
+        return o;
+    };
     return {
+        createClassElement: createClassElement,
+        createInstanceElement: createInstanceElement,
         hasCircularReference: hasCircularReference,
         cleanElement: cleanElement,
         normalize: normalize,
