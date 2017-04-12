@@ -103,12 +103,6 @@ function($scope, $location, $rootScope, $state, _, $window, $uibModal, growl, $h
         $rootScope.$broadcast("mms.unauthorized");
     }, 60000, 0, false);
 
-    //TODO stomp
-    $scope.$on("stomp.element", function(event, deltaSource, deltaProjectId, deltaRefId, deltaElementID, deltaModifier, deltaName){
-        if($rootScope.ve_edits && $rootScope.ve_edits[deltaElementID + '|' + deltaProjectId + '|' + deltaRefId] === undefined) {
-            UtilsService.mergeElement( deltaSource, deltaElementID , true , "all" );
-        }
-    });
     $rootScope.$on('$stateChangeSuccess', 
         function(event, toState, toParams, fromState, fromParams) {
             $rootScope.ve_stateChanging = false;
