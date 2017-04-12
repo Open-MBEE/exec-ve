@@ -31,39 +31,35 @@ function StompService($rootScope, ApplicationService, ElementService, URLService
         var updateWebpage = angular.fromJson(message.body);
         var projectId = message.headers.projectId;
         var refId = message.headers.refId;
-        if(updateWebpage.source !== ApplicationService.getSource()){
-            $rootScope.$apply( function(){
-                if(updateWebpage.refs.addedElements && updateWebpage.refs.addedElements.length > 0){
-                    angular.forEach( updateWebpage.refs.addedElements, function(eltId) {
-                        refId = !refId ? 'master' : refId;
+        if (updateWebpage.source !== ApplicationService.getSource()) {
+            // $rootScope.$apply(function () {
+                if (updateWebpage.refs.addedElements && updateWebpage.refs.addedElements.length > 0) {
+                    refId = !refId ? 'master' : refId;
+                    angular.forEach(updateWebpage.refs.addedElements, function (eltId) {
                         ElementService.getElement({
                             projectId: projectId,
                             refId: refId,
                             extended: true,
                             elementId: eltId
-                        }, 1, true).then(function(data){
-                            $rootScope.$broadcast("stomp.element", data);
-                        }, function(reason) {
-                            // growl.error("Getting Element Error: " + reason.message);
-                        });
-                    });
-                }
-                if(updateWebpage.refs.updatedElements && updateWebpage.refs.updatedElements.length > 0){
-                    angular.forEach( updateWebpage.refs.updatedElements, function(eltId) {
-                        // TODO fix - only sends back id.. do we need to make a call to get obj?
-                        ElementService.getElement({
-                            projectId: projectId,
-                            refId: refId,
-                            extended: true,
-                            elementId: eltId
-                        }, 1, true).then(function(data){
+                        }, 1, true).then(function (data) {
                             $rootScope.$broadcast("element.updated", data, null, true);
-                        }, function(reason) {
-                            // growl.error("Getting Element Error: " + reason.message);
                         });
                     });
                 }
-            });
+                if (updateWebpage.refs.updatedElements && updateWebpage.refs.updatedElements.length > 0) {
+                    refId = !refId ? 'master' : refId;
+                    angular.forEach(updateWebpage.refs.updatedElements, function (eltId) {
+                        ElementService.getElement({
+                            projectId: projectId,
+                            refId: refId,
+                            extended: true,
+                            elementId: eltId
+                        }, 1, true).then(function (data) {
+                            $rootScope.$broadcast("element.updated", data, null, true);
+                        });
+                    });
+                }
+            // });
         }
         if(updateWebpage.refs.addedJobs  && updateWebpage.refs.addedJobs.length > 0 ){//check length of added jobs > 0
             var newJob = updateWebpage.refs.addedJobs;
