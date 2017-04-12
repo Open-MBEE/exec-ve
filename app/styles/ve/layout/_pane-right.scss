@@ -9,12 +9,12 @@
 
   &.fa-pane-orientation-horizontal {
     .fa-pane-handle > .fa-pane-toggle {
-      @include box-shadow(-2px 0 2px 0px rgba(100,100,100,0.4));
+      @include box-shadow(-2px 0 2px 0px rgba(100, 100, 100, 0.4));
       margin-left: 1px;
     }
   }
 
-  .container-snapshots { 
+  .container-snapshots {
     h1 {
       font-family: $light-font-family-sans-serif;
       font-weight: 200;
@@ -52,7 +52,7 @@
 
   &.fa-pane-orientation-horizontal {
     .fa-pane-handle > .fa-pane-toggle {
-      @include box-shadow(-2px 0 2px 0px rgba(100,100,100,0.4));
+      @include box-shadow(-2px 0 2px 0px rgba(100, 100, 100, 0.4));
       margin-left: 1px;
     }
   }
