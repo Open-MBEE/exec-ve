@@ -22,9 +22,11 @@
 .ve-no-panes {
 
   margin-top: 40px;
+  font-weight: 300;
+  letter-spacing: .05em;
 
   a {
-    color: #4A4A4A;
+    color: #333;
   }
 
   .back-to-docs:before{
@@ -36,7 +38,6 @@
   h1 {
     font-size: 36px;
     margin: 6px 0 40px;
-    font-weight: 300;
   }
 
   h3 {
@@ -86,7 +87,7 @@ ul.ve-light-list {
   }
 
   li:hover {
-    background: $ve-silver-lighter-1;
+    background: $ve-silver-lighter-2;
   }
 
   li a,

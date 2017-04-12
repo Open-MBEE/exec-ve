@@ -1,12 +1,23 @@
+/*------------------------------------------------------------------
+[Login Table of contents]
+
+1. Layout
+2. Typography
+3. UI Elements
+  3.1 Text Input
+
+-------------------------------------------------------------------*/
+
+
+/*------------------------------------------------------------------
+1. Layout
+-------------------------------------------------------------------*/
+
 #ve-origin-select,
 #ve-login {
-  background-color: #313131;
-  color: white;
-  font-weight: 300;
-  height: 100%;
-  letter-spacing: .03em;
 
-  /*******Layout*******/
+  background-color: $ve-slate-darker-2;
+  height:100%;
 
   .account-wall {
     width: 320px;
@@ -15,22 +26,49 @@
     position: relative;
   }
 
-  /****UI Elements > Input****/
+  .account-wall .btn-block {
+    margin-top: 34px;
+    position: absolute;
+    bottom: 0;
+    padding: 10px;
+  }
+
+  @media (max-height:500px){
+    .account-wall{
+      margin: 40px auto;    
+    }
+  }
+
+/*------------------------------------------------------------------
+2. Typography
+-------------------------------------------------------------------*/
+
+  .account-wall h2 {
+    margin-bottom: 32px;
+    font-size: 44px;
+    text-align: center;
+    font-weight: 100;
+  }
+
+  .module-disabled {
+    opacity: .3;
+  }
+
+/*------------------------------------------------------------------
+3. Input
+-------------------------------------------------------------------*/
 
   .form-control {
     display: inline;
-    color: white;
     border: none;
     font-size: 16px;
-    letter-spacing: .03em;
     padding: 6px 10px;
-    font-weight: 300;
     border-radius: 2px !important;
     -webkit-transition: background-color .1s ease-out !important;
     -moz-transition: background-color .1s ease-out !important;
     -o-transition: background-color .1s ease-out !important;
     transition: background-color .1s ease-out !important;
-    background-color: #3d3d3d;
+    background-color: $ve-slate-base;
     width: 100%;
     text-align: left;
     font-size: 16px;
@@ -38,48 +76,22 @@
     height: 34px;
     line-height: 18px;
     margin: 6px 0 18px;
+    color:white;
   }
 
-  /*******Typograpphy*******/
-  .account-wall h2 {
-    margin-bottom: 32px;
-    font-size: 44px;
-    text-align: center;
-    font-weight: 100;
-    letter-spacing: .03em;
-  }
-  .module-disabled {
-    opacity: .3;
-  }
-  .bookmark {
-    text-align: right;
-  }
-  .bookmark a {
-    color: white;
-    text-decoration: underline;
-    font-weight: 300;
-  }
-  /*******Inputs (forms and buttons)*******/
   .form-control:focus {
     box-shadow: none;
-    border: 1px solid #2F889A;
+    border: 1px solid $ve-teal-base;
   }
 
   .form-control {
-    border: 1px solid #3d3d3d;
+    border: 1px solid $ve-slate-base;
     box-shadow: none;
   }
 
   .label-text {
-    color: #d6d6d6;
+    color: $ve-white-text-lighter-2;
     font-size: 14px;
   }
 
-  /*Submit button*/
-  .account-wall .btn-block {
-    margin-top: 34px;
-    position: absolute;
-    bottom: 0;
-    padding: 10px;
-  }
 }
