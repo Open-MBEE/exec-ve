@@ -3,8 +3,8 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('MainCtrl', ['$scope', '$location', '$rootScope', '$state', '_', '$window', '$uibModal', 'growl', '$http', 'URLService', 'hotkeys', 'growlMessages', 'StompService', 'UtilsService', 'HttpService', 'AuthService', '$interval',
-function($scope, $location, $rootScope, $state, _, $window, $uibModal, growl, $http, URLService, hotkeys, growlMessages, StompService, UtilsService, HttpService, AuthService, $interval) {
+.controller('MainCtrl', ['$scope', '$timeout', '$location', '$rootScope', '$state', '_', '$window', '$uibModal', 'growl', '$http', 'URLService', 'hotkeys', 'growlMessages', 'StompService', 'UtilsService', 'HttpService', 'AuthService', '$interval',
+function($scope, $timeout, $location, $rootScope, $state, _, $window, $uibModal, growl, $http, URLService, hotkeys, growlMessages, StompService, UtilsService, HttpService, AuthService, $interval) {
     $rootScope.ve_viewContentLoading = false;
     $rootScope.ve_treeInitial = '';
     $rootScope.ve_title = '';
@@ -103,12 +103,6 @@ function($scope, $location, $rootScope, $state, _, $window, $uibModal, growl, $h
         $rootScope.$broadcast("mms.unauthorized");
     }, 60000, 0, false);
 
-    //TODO stomp
-    $scope.$on("stomp.element", function(event, deltaSource, deltaProjectId, deltaRefId, deltaElementID, deltaModifier, deltaName){
-        if($rootScope.ve_edits && $rootScope.ve_edits[deltaElementID + '|' + deltaProjectId + '|' + deltaRefId] === undefined) {
-            UtilsService.mergeElement( deltaSource, deltaElementID , true , "all" );
-        }
-    });
     $rootScope.$on('$stateChangeSuccess', 
         function(event, toState, toParams, fromState, fromParams) {
             $rootScope.ve_stateChanging = false;
@@ -137,6 +131,12 @@ function($scope, $location, $rootScope, $state, _, $window, $uibModal, growl, $h
                     $rootScope.ve_treeInitial = toParams.documentId;
             }
             $rootScope.ve_viewContentLoading = false;
+            if ($state.includes('project.ref') && (fromState.name === 'login' || fromState.name === 'login.select' || fromState.name === 'project')) {
+                $timeout(function() {
+                    $rootScope.ve_tree_pane.toggle();
+                    $rootScope.ve_tree_pane.toggle();
+                }, 0, false);
+            }
         }
     );
 
