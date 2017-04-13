@@ -104,11 +104,13 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
                 var id = UtilsService.createMmsId();
                 var toCreate = {
                     id: id,
+                    ownerId: "holding_bin_" + scope.mmsProjectId,
                     name: $scope.newE.name,
                     documentation: $scope.newE.documentation,
                     type: 'Class',
                     _appliedStereotypeIds: []
                 };
+                toCreate = UtilsService.createClassElement(toCreate);
                 var reqOb = {element: toCreate, projectId: scope.mmsProjectId, refId: scope.mmsRefId};
 
                 ElementService.createElement(reqOb)

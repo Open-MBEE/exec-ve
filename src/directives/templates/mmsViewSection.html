@@ -4,7 +4,7 @@
         <h4 ng-hide="inPreviewMode">{{section.name}}</h4>
         <div ng-show="inPreviewMode" class="panel panel-info"><h4>{{edit.name}}</h4></div>
     </div>
-    <div ng-class="{'panel panel-danger' : isEditing}">
+    <div ng-class="{'panel panel-default' : isEditing}">
         <div ng-class="{'no-display' : ! isEditing}" class="panel-heading clearfix no-print">
             <h3 class="panel-title pull-left">
                 <div ng-class="{prop: isEditing}"><input class="form-control" type="text" ng-model="edit.name"></input></div>

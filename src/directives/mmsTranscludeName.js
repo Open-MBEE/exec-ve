@@ -112,17 +112,16 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
                     mmsViewCtrl.elementTranscluded(scope.element);
                 }
                 if (scope.commitId === 'latest') {
-                    scope.$on('element.updated', function(event, elementOb, continueEdit) {
+                    scope.$on('element.updated', function (event, elementOb, continueEdit, stompUpdate) {
                         if (elementOb.id === scope.element.id && elementOb._projectId === scope.element._projectId &&
                             elementOb._refId === scope.element._refId && !continueEdit) {
-                            recompile();
-                        }
-                    });
-                    //actions for stomp using growl messages
-                    scope.$on("stomp.element", function(event, deltaSource, deltaWorkspaceId, deltaElementID, deltaModifier, deltaName){
-                        if(deltaWorkspaceId === scope.refId && deltaElementID === scope.mmsElementId){
-                            if (scope.isEditing)
-                                growl.warning(" This value has been changed to: "+deltaName+" by: "+ deltaModifier, {ttl: -1});
+                            //actions for stomp
+                            if(stompUpdate && scope.isEditing === true) {
+                                growl.warning("This value has been changed: " + elementOb.name +
+                                    " modified by: " + elementOb._modifier, {ttl: -1});
+                            } else {
+                                recompile();
+                            }
                         }
                     });
                 }

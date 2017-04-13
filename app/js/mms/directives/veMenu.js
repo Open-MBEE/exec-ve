@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mmsApp')
-.directive('veMenu', ['ProjectService', '$state', '$rootScope', '$templateCache', 'growl', veMenu]);
+.directive('veMenu', ['ProjectService','$state','$rootScope', '$templateCache', 'growl', veMenu]);
 
 /**
  * @ngdoc directive
@@ -58,7 +58,7 @@ function veMenu(ProjectService, $state, $rootScope, $templateCache, growl) {
         };
 
         scope.isRefsView = function(){
-            if ( $state.is('project') ) {
+            if ( $state.includes('project') && !($state.includes('project.ref')) ) {
                 return true;
             } else {
                 return false;
@@ -68,39 +68,45 @@ function veMenu(ProjectService, $state, $rootScope, $templateCache, growl) {
             $state.go('project', {projectId: scope.project.id});
         };
 
+        var bcrumbs = [];
+        var child, parentId;
+        var groups = scope.groups;
+        var groupsMap = {};
 
-
-        // if (!scope.site)
-        //     return;
-        // var currSiteParentId = scope.site.parent;
-        // var isCharacterization = scope.site.isCharacterization;
-        // var breadcrumbs = [];
-        // breadcrumbs.push({name: scope.project.name, id: scope.project.id});
-        // var eltWidth = element.parent().width();
-
-        // SiteService.getSites()
-        // .then(function(data) {
-        //     for (var i = data.length -1 ; i >= 0; i--) {
-        //         var site = data[i];
-        //         var siteParent = site.parent;
-        //         var siteIsChara = site.isCharacterization;
-        //         if (site.id == currSiteParentId && isCharacterization === siteIsChara) {
-        //           breadcrumbs.push({name: site.name, id: site.id});
-        //           if (site.parent) {
-        //             currSiteParentId = site.parent;
-        //           }
-        //         }
-        //     }
-        //     scope.breadcrumbs = breadcrumbs.reverse();
-        //     var Bcount = scope.breadcrumbs.length;
-        //     if (scope.product) {
-        //       Bcount++;
-        //     }
-        //     var liWidth = (eltWidth*0.75)/Bcount;
-        //     scope.truncateStyle={'max-width':liWidth};
-        // }, function(reason) {
-        //     growl.error("Sites Error: " + reason.message);
-        // });
+        if(scope.group !== undefined) {
+            for (var i = 0; i < groups.length; i++) {
+                groupsMap[groups[i]._id] = {id: groups[i]._id, name: groups[i]._name, parentId: groups[i]._parentId};
+            }
+            child = scope.group; 
+        }
+        if(scope.document !== undefined) {
+            child = scope.document; 
+        }
+        if(child) {
+            if(child.hasOwnProperty('_id')) {
+                bcrumbs.push({name: child._name, id: child._id, type: "group", link: "project.ref.preview({documentId: 'site_' + breadcrumb.id + '_cover', search: undefined})"});
+                if(child._parentId) {
+                    parentId = child._parentId;   
+                }
+            } else {
+                bcrumbs.push({name: child.name, id: child.id, type: "doc", link: "project.ref.document({documentId: breadcrumb.id, search: undefined})"});
+                if(child._groupId) {
+                    parentId = child._groupId;
+                }
+            }
+            if(parentId) {
+                while(groupsMap[parentId] !== undefined) {
+                    var id = groupsMap[parentId].id;
+                    bcrumbs.push({name: groupsMap[id].name, id: id, type: "group", link: "project.ref.preview({documentId: 'site_' + breadcrumb.id + '_cover', search: undefined})"});
+                    parentId = groupsMap[id].parentId;   
+                } 
+            }
+            scope.breadcrumbs = bcrumbs.reverse();
+            var eltWidth = element.parent().width();
+            var crumbcount = scope.breadcrumbs.length;
+            var liWidth = (eltWidth * 0.75)/crumbcount;
+            scope.truncateStyle={'max-width': liWidth, 'white-space': 'nowrap', 'overflow': 'hidden', 'text-overflow': 'ellipsis', 'display': 'inline-block'};
+        }
     };
 
     return {
@@ -110,11 +116,15 @@ function veMenu(ProjectService, $state, $rootScope, $templateCache, growl) {
             org: '<mmsOrg',
             project: '<mmsProject',
             projects: '<mmsProjects',
+            group: '<mmsGroup',
+            groups: '<mmsGroups',
             branch: '<mmsBranch',
+            ref: '<mmsRef',
+            refs: '<mmsRefs',
             branches: '<mmsBranches',
             tag: '<mmsTag',
             tags: '<mmsTags',
-            ref: '<mmsRef'
+            document: '<mmsDocument'
         },
         link: veMenuLink
     };

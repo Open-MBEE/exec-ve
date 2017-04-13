@@ -553,29 +553,22 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             },
             _appliedStereotypeIds: [],
         };
+        instanceSpec = UtilsService.createInstanceElement(instanceSpec);
         if (type === 'Section') {
             instanceSpec.specification = {
                 operand: [],  
                 type: "Expression"
             };
         }
-        var clone = {
-            _projectId: viewOrSectionOb._projectId,
-            _refId: viewOrSectionOb._refId,
-            _modified: viewOrSectionOb._modified,
-            _read: viewOrSectionOb._read,
-            id: viewOrSectionOb.id,
-        };
+        var clone = JSON.parse(JSON.stringify(viewOrSectionOb));
         var key = '_contents';
-        if (isSection(viewOrSectionOb)) {
+        if (isSection(clone)) {
             key = "specification";
         }
-        if (viewOrSectionOb[key]) {
-            clone[key] = JSON.parse(JSON.stringify(viewOrSectionOb[key]));
-        } else {
+        if (!clone[key]) {
             clone[key] = {
                 operand: [],
-                type: "Expression",
+                type: "Expression"
             };
         }
         clone[key].operand.push({instanceId: newInstanceId, type: "InstanceValue"});
@@ -630,7 +623,6 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         var view = {
             id: newViewId,
             type: 'Class',
-            ownedAttributeIds: [],
             ownerId: ownerOb.id,
             _allowedElements: [],
             _displayedElements: [newViewId],
@@ -649,6 +641,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             ],
             appliedStereotypeInstanceId: newViewId + '_asi'
         };
+        view = UtilsService.createClassElement(view);
         var parentView = null;
         if (ownerOb && (ownerOb._childViews || UtilsService.isView(ownerOb))) {
             parentView = JSON.parse(JSON.stringify(ownerOb));
@@ -659,7 +652,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             if (angular.isString(parentView.displayedElements)) {
                 parentView.displayedElements = JSON.parse(parentView.displayedElements);
             }
-        } 
+        }
         var instanceSpecDoc = '';
         var instanceSpecSpec = {
             'type': 'Paragraph', 
@@ -680,6 +673,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             },
             _appliedStereotypeIds: [],
         };
+        instanceSpec = UtilsService.createInstanceElement(instanceSpec);
         var asi = { //create applied stereotype instance
             id: newViewId + '_asi',
             ownerId: newViewId,
@@ -690,6 +684,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             _appliedStereotypeIds: [],
             stereotypedElementId: newViewId
         };
+        asi = UtilsService.createInstanceElement(asi);
         var toCreate = [instanceSpec, view, asi];
         if (parentView)
             toCreate.push(parentView);

@@ -16,7 +16,60 @@ function UtilsService($q, $http, CacheService, URLService, _) {
     var DOCUMENT_SID = '_17_0_2_3_87b0275_1371477871400_792964_43374';
     var nonEditKeys = ['contains', 'view2view', 'childrenViews', '_displayedElements',
         '_allowedElements', '_contents', '_relatedDocuments', '_childViews'];
-
+    var CLASS_ELEMENT_TEMPLATE = {
+        _appliedStereotypeIds: [],
+        appliedStereotypeInstanceId: null,
+        classifierBehaviorId: null,
+        clientDependencyIds: [],
+        collaborationUseIds: [],
+        documentation: "",
+        elementImportIds: [],
+        generalizationIds: [],
+        interfaceRealizationIds: [],
+        isAbstract: false,
+        isActive: false,
+        isFinalSpecialization: false,
+        isLeaf: false,
+        mdExtensionsIds: [],
+        name: "",
+        nameExpression: null,
+        nestedClassifierIds: [],
+        ownedAttributeIds: [],
+        ownedOperationIds: [],
+        ownerId: null,
+        packageImportIds: [],
+        powertypeExtentIds: [],
+        redefinedClassifierIds: [],
+        representationId: null,
+        substitutionIds: [],
+        supplierDependencyIds: [],
+        syncElementId: null,
+        templateBindingIds: [],
+        templateParameterId: null,
+        type: "Class",
+        useCaseIds: [],
+        visibility: null
+    };
+    var INSTANCE_ELEMENT_TEMPLATE = {
+        ownerId: null,
+        name: '',
+        documentation: '',
+        type: "InstanceSpecification",
+        classifierIds: [],
+        specification: null,
+        _appliedStereotypeIds: [],
+        appliedStereotypeInstanceId: null,
+        mdExtensionsIds: [],
+        syncElementId: null,
+        clientDependencyIds: [],
+        supplierDependencyIds: [],
+        nameExpression: null,
+        visibility: "public",
+        templateParameterId: null,
+        deploymentIds: [],
+        slotIds: [],
+        stereotypedElementId: null
+    };
     var hasCircularReference = function(scope, curId, curType) {
         var curscope = scope;
         while (curscope.$parent) {
@@ -492,7 +545,7 @@ function UtilsService($q, $http, CacheService, URLService, _) {
             var cap2 = el.find('.mms-equation-caption');
             cap2.html(equationCap);
             if (cap2.length === 0) {
-                el.find('mms-view-equation > mms-transclude-doc > p').last().append('<div class="mms-equation-caption pull-right">' + equationCap + '</div>');
+                el.find('mms-view-equation > mms-transclude-doc > p').last().append('<span class="mms-equation-caption pull-right">' + equationCap + '</span>');
             }
             // Change cap value based on showRefName true/false
             if (showRefName) {
@@ -529,15 +582,17 @@ function UtilsService($q, $http, CacheService, URLService, _) {
     displayTime = tag time or generation time as mm/dd/yy hh:mm am/pm
     */
     var getPrintCss = function(header, footer, dnum, tag, displayTime, landscape, meta) {
-        var ret = "img {max-width: 100%; page-break-inside: avoid; page-break-before: auto; page-break-after: auto; display: block;}\n" + 
+        var ret = "img {max-width: 100%; page-break-inside: avoid; page-break-before: auto; page-break-after: auto; display: block; margin-left: auto; margin-right: auto;}\n" + 
                 " tr, td, th { page-break-inside: avoid; } thead {display: table-header-group;}\n" + 
                 ".pull-right {float: right;}\n" + 
                 ".view-title {margin-top: 10pt}\n" +
                 ".chapter {page-break-before: always}\n" + 
                 "table {width: 100%; border-collapse: collapse;}\n" + 
-                "table :not(table[border='0']), th, td {border: 1px solid black; padding: 4px;}\n" +
+                "table, th, td {border: 1px solid black; padding: 4px;}\n" +
+                "table[border='0'], table[border='0'] th, table[border='0'] td {border: 0px;}\n" +
                 "table, th > p, td > p {margin: 0px; padding: 0px;}\n" +
                 "table, th > div > p, td > div > p {margin: 0px; padding: 0px;}\n" +
+                "table mms-transclude-doc p {margin: 0 0 5px;}\n" +
                 //"table p {word-break: break-all;}\n" + 
                 "th {background-color: #f2f3f2;}\n" + 
                 "h1 {font-size: 20px; padding: 0px; margin: 4px;}\n" +
@@ -617,7 +672,30 @@ function UtilsService($q, $http, CacheService, URLService, _) {
         return deferred.promise;
     };
 
+    /**
+     * @ngdoc method
+     * @name mms.UtilsService#createClassElement
+     * @methodOf mms.UtilsService
+     * 
+     * @description
+     * returns a class json object with all emf fields set to default, with
+     * fields from passed in object substituted
+     * 
+     */
+    var createClassElement = function(obj) {
+        var o = JSON.parse(JSON.stringify(CLASS_ELEMENT_TEMPLATE));
+        Object.assign(o, obj);
+        return o;
+    };
+
+    var createInstanceElement = function(obj) {
+        var o = JSON.parse(JSON.stringify(INSTANCE_ELEMENT_TEMPLATE));
+        Object.assign(o, obj);
+        return o;
+    };
     return {
+        createClassElement: createClassElement,
+        createInstanceElement: createInstanceElement,
         hasCircularReference: hasCircularReference,
         cleanElement: cleanElement,
         normalize: normalize,

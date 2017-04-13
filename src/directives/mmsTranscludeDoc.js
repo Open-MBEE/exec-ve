@@ -136,21 +136,15 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                 }
                 recompile();
                 if (scope.commitId === 'latest') {
-                    scope.$on('element.updated', function(event, elementOb, continueEdit) {
+                    scope.$on('element.updated', function (event, elementOb, continueEdit, stompUpdate) {
                         if (elementOb.id === scope.element.id && elementOb._projectId === scope.element._projectId &&
                             elementOb._refId === scope.element._refId && !continueEdit) {
-                            recompile();
-                        }
-                    });
-                    //actions for stomp 
-                    scope.$on("stomp.element", function(event, deltaSource, deltaWorkspaceId, deltaElementId, deltaModifier, elemName){
-                        if(deltaWorkspaceId === scope.refId && deltaElementId === scope.mmsElementId){
-                            if(scope.isEditing === false){
+                            //actions for stomp
+                            if(stompUpdate && scope.isEditing === true) {
+                                growl.warning("This value has been changed: " + elementOb.name +
+                                    " modified by: " + elementOb._modifier, {ttl: -1});
+                            } else {
                                 recompile();
-                            }
-                            if(scope.isEditing === true){
-                                growl.warning("This documentation has been changed: " + elemName +
-                                            " modified by: " + deltaModifier, {ttl: -1});
                             }
                         }
                     });

@@ -52,12 +52,20 @@ mms-view.editing {
     margin-bottom: 5px;
     // padding: 2px 0;
   }
-  
+
+  //mms-transclude-name:has(> div.panel) {
+  //  border: none;
+  //}
+
   mms-transclude-doc {
     display: block;
 
     > div > div.panel-heading {
-      padding: 0;
+      padding: 2px 15px;
+    }
+
+    .panel {
+      margin: 0px;
     }
 
     .transclude-doc-bb {
@@ -68,7 +76,7 @@ mms-view.editing {
 }
 
 /* comments */
-mms-view mms-transclude-com, 
+mms-view mms-transclude-com,
 mms-view mms-transclude-com *,
 mms-view.editing mms-transclude-com,
 mms-view.editing mms-transclude-com * {

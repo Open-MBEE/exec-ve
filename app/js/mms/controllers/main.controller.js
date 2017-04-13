@@ -3,8 +3,8 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('MainCtrl', ['$scope', '$location', '$rootScope', '$state', '_', '$window', '$uibModal', 'growl', '$http', 'URLService', 'hotkeys', 'growlMessages', 'StompService', 'UtilsService', 'HttpService', 'AuthService', '$interval',
-function($scope, $location, $rootScope, $state, _, $window, $uibModal, growl, $http, URLService, hotkeys, growlMessages, StompService, UtilsService, HttpService, AuthService, $interval) {
+.controller('MainCtrl', ['$scope', '$timeout', '$location', '$rootScope', '$state', '_', '$window', '$uibModal', 'growl', '$http', 'URLService', 'hotkeys', 'growlMessages', 'StompService', 'UtilsService', 'HttpService', 'AuthService', '$interval',
+function($scope, $timeout, $location, $rootScope, $state, _, $window, $uibModal, growl, $http, URLService, hotkeys, growlMessages, StompService, UtilsService, HttpService, AuthService, $interval) {
     $rootScope.ve_viewContentLoading = false;
     $rootScope.ve_treeInitial = '';
     $rootScope.ve_title = '';
@@ -103,28 +103,25 @@ function($scope, $location, $rootScope, $state, _, $window, $uibModal, growl, $h
         $rootScope.$broadcast("mms.unauthorized");
     }, 60000, 0, false);
 
-    //TODO stomp
-    $scope.$on("stomp.element", function(event, deltaSource, deltaProjectId, deltaRefId, deltaElementID, deltaModifier, deltaName){
-        if($rootScope.ve_edits && $rootScope.ve_edits[deltaElementID + '|' + deltaProjectId + '|' + deltaRefId] === undefined) {
-            UtilsService.mergeElement( deltaSource, deltaElementID , true , "all" );
-        }
-    });
     $rootScope.$on('$stateChangeSuccess', 
         function(event, toState, toParams, fromState, fromParams) {
             $rootScope.ve_stateChanging = false;
-            $rootScope.hideCenterPane = false;
-            if($state.current.name === 'login' || $state.current.name === 'login.select') {
-                $rootScope.hideCenterPane = true;
-            } else {
-                $rootScope.hideCenterPane = false;
+            $rootScope.hidePanes = false;
+            $rootScope.showManageRefs = false;
+            $rootScope.showLogin = false;
+            if ($state.current.name === 'login' || $state.current.name === 'login.select') {
+                $rootScope.hidePanes = true;
+                $rootScope.showLogin = true;
+            } else if ( $state.includes('project') && !($state.includes('project.ref')) ) {
+                $rootScope.hidePanes = true;
+                $rootScope.showManageRefs = true;
             }
             if ($state.current.name === 'project.ref') {
-                // $rootScope.hideCenterPane = false;
                 $rootScope.ve_treeInitial = toParams.refId;
             } else if ($state.current.name === 'project.ref.preview') {
                 var index = toParams.documentId.indexOf('_cover');
                 if (index > 0)
-                    $rootScope.ve_treeInitial = toParams.documentId.substring(0, index);
+                    $rootScope.ve_treeInitial = toParams.documentId.substring(5, index);
                 else
                     $rootScope.ve_treeInitial = toParams.documentId;
             } else if ($state.includes('project.ref.document') && ($state.current.name !== 'project.ref.document.order')) {
@@ -134,6 +131,32 @@ function($scope, $location, $rootScope, $state, _, $window, $uibModal, growl, $h
                     $rootScope.ve_treeInitial = toParams.documentId;
             }
             $rootScope.ve_viewContentLoading = false;
+            if ($state.includes('project.ref') && (fromState.name === 'login' || fromState.name === 'login.select' || fromState.name === 'project')) {
+                $timeout(function() {
+                    $rootScope.ve_tree_pane.toggle();
+                    $rootScope.ve_tree_pane.toggle();
+                }, 0, false);
+            }
         }
     );
+
+    var workingModalOpen = false;
+    $rootScope.$on('mms.working', function(event, response) {
+        $rootScope.ve_viewContentLoading = false;
+        if (workingModalOpen) {
+            return;
+        }
+        $scope.mmsWorkingTime = response.data;
+        workingModalOpen = true;
+        var instance = $uibModal.open({
+            template: "<div class=\"modal-header\">Please come back later</div><div class=\"modal-body\">The document you're requesting has been requested already at {{mmsWorkingTime.startTime | date:'M/d/yy h:mm a'}} and is currently being cached, please try again later.</div>",
+            scope: $scope,
+            backdrop: true,
+            controller: ['$scope', '$uibModalInstance', function ($scope, $uibModalInstance) {
+                }],
+            size: 'md'
+        }).result.finally(function(){
+            workingModalOpen = false;
+        });
+    });
 }]);

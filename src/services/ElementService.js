@@ -74,7 +74,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
      *      multiple calls to this method with the same parameters would give the
      *      same object
      */
-    var getElement = function(reqOb, weight, update) { 
+    var getElement = function(reqOb, weight, update) {
         UtilsService.normalize(reqOb);
         var requestCacheKey = getElementKey(reqOb);
         var key = URLService.getElementURL(reqOb);
@@ -186,7 +186,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                 CacheService.put(commitCacheKey, resultCommitCopy, true);
             }
         }
-        var realCacheKey = UtilsService.makeElementKey(result, result.id, edit);
+        var realCacheKey = UtilsService.makeElementKey(result, edit);
         result._commitId = origResultCommit; //restore actual commitId
         if (angular.equals(realCacheKey, requestCacheKey)) {
             result = CacheService.put(requestCacheKey, result, true);
@@ -253,7 +253,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         getElement(reqOb, weight, update)
         .then(function(result) {
             var copy = JSON.parse(JSON.stringify(result));
-            deferred.resolve(cacheElement(reqOb, result, true));
+            deferred.resolve(cacheElement(reqOb, copy, true));
         }, function(reason) {
             deferred.reject(reason);
         }).finally(function() {
@@ -414,7 +414,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
             cacheElement(metaOb, editCopy, true);
             var history = CacheService.get(['history', metaOb.projectId, metaOb.refId, metaOb.elementId]);
             if (history) {
-                history.unshift({_creator: e._modifier, _timestamp: e._modified, id: e._commitId});
+                history.unshift({_creator: e._modifier, _created: e._modified, id: e._commitId});
             }
             deferred.resolve(resp);
         };
@@ -559,6 +559,8 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
             var results = [];
             for (var i = 0; i < response.data.elements.length; i++) {
                 results.push(cacheElement(reqOb, response.data.elements[i]));
+                var editCopy = JSON.parse(JSON.stringify(response.data.elements[i]));
+                cacheElement(reqOb, editCopy, true);
             }
             deferred.resolve(results);
         }, function(response) {
@@ -704,7 +706,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         inProgress[key] = deferred.promise;
         $http.get(URLService.getElementHistoryURL(reqOb))
         .then(function(response){
-            deferred.resolve(CacheService.put(requestCacheKey, response.data.history, true));
+            deferred.resolve(CacheService.put(requestCacheKey, response.data.commits, true));
             delete inProgress[key];
         }, function(response) {
             URLService.handleHttpStatus(response.data, response.status, response.headers, response.config, deferred);
