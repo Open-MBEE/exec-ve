@@ -308,8 +308,9 @@ div.tooltip-inner {
     position: relative;
   }
 
-  /*Clear hover on list items with buttons in them */
-  .dropdown-menu li.button-item:hover {
+  /*Clear hover on list items with buttons in them and disabled branches*/
+  .dropdown-menu li.button-item:hover,
+  .dropdown-menu li.branch-disabled:hover,{
     background-color: $ve-slate-lighter-1;
   }
 
@@ -343,6 +344,24 @@ div.tooltip-inner {
     width: 16px;
     color:$ve-green-lighter-1;
   }
+
+  /*Styling for Branch that is being created. */
+
+  .branch-disabled{
+    color:$ve-white-text-darker-1;
+  }
+
+  .branch-disabled::before{
+    font-family:FontAwesome;
+    content: "\f071";
+    height: 16px;
+    position: absolute;
+    left: 10px;
+    top: 6px;
+    width: 16px;
+    color:$ve-yellow-base;
+  }
+
 }
 
 /*------------------------------------------------------------------
