@@ -256,14 +256,13 @@ ul.ve-light-list {
 
   a.branch-disabled::before{
     font-family:FontAwesome;
-    content: "\f071";
-    height: 16px;
-    left: 10px;
-    top: 8px;
-    width: 16px;
-    color:$ve-yellow-base;
-    padding-right:4px;
-    text-decoration:none;
+    content: "\2026";
+    top: -4px;
+    color: #d8d8d8;
+    padding-right: 4px;
+    text-decoration: none;
+    font-size: 24px;
+    position: relative;
   }
 
   dd.link-section > a.branch-disabled{

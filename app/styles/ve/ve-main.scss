@@ -353,13 +353,11 @@ div.tooltip-inner {
 
   .branch-disabled::before{
     font-family:FontAwesome;
-    content: "\f071";
-    height: 16px;
+    content: "\2026";
     position: absolute;
     left: 10px;
-    top: 6px;
-    width: 16px;
-    color:$ve-yellow-base;
+    top: 3px;
+    color:$ve-silver-base;
   }
 
 }
