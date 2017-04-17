@@ -22,6 +22,8 @@ function($q, $filter, $location, $uibModal, $scope, $rootScope, $state, $timeout
     $scope.refSelected = null;
     $scope.search = null;
     $scope.view = null;
+    $scope.fromParams = null;
+
     // var docEditable = documentOb && documentOb._editable && refOb && refOb.type === 'Branch' && UtilsService.isView(documentOb);
 
     $scope.bbApi.init = function() {
@@ -42,6 +44,9 @@ function($q, $filter, $location, $uibModal, $scope, $rootScope, $state, $timeout
     });
     $scope.$on('tree-delete', function(e) {
         deleteItem();
+    });
+    $scope.$on('fromParamChange', function(event, fromParams) {
+        $scope.fromParams = fromParams;
     });
 
     $scope.refClickHandler = function(ref) {
