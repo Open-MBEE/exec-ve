@@ -89,7 +89,7 @@ div.tooltip-inner {
 .ve-dark-dropdown-menu,
 .ve-table-buttons
 #ve-origin-select,
-#ve-login {
+#ve-login{
 
   color: white;
   font-weight: 300;
@@ -101,6 +101,7 @@ div.tooltip-inner {
     text-decoration: none;
     color:white;
   }
+}
 
 
 /*------------------------------------------------------------------
@@ -110,6 +111,17 @@ div.tooltip-inner {
 /*------------------------------------------------------------------
   2.1 Buttons
 -------------------------------------------------------------------*/
+
+
+#ve-login,
+#ve-origin-select,
+.ve-dark-modal,
+.ve-dark-dropdown-nav,
+.ve-dark-dropdown-menu,
+.ve-table-buttons
+#ve-origin-select,
+#ve-login,
+.tableSearch{
 
   .btn {
     font-weight: 500;
@@ -171,7 +183,7 @@ div.tooltip-inner {
 
   .btn-tertiary{
     color: $ve-light-text;
-    margin: 24px 6px 10px 0;
+    margin: 24px 0 6px;
     background-color:$ve-silver-base;
   }
 
