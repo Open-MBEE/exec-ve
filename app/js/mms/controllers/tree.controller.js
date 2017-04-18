@@ -584,6 +584,8 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     var addItemCtrl = function($scope, $uibModalInstance, $filter) {
         $scope.createForm = true;
         $scope.oking = false;
+        $scope.projectOb = projectOb;
+        $scope.refOb = refOb;
         var displayName = "";
 
         if ($scope.itemType === 'Document') {
@@ -635,10 +637,17 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             }
             return views;
         };
+        var queryFilter = function() {
+            var obj = {};
+            obj.term = {'_appliedStereotypeIds': UtilsService.VIEW_SID};
+            return obj;
+        };
         $scope.searchOptions = {
             callback: addExistingView,
             itemsPerPage: 200,
-            filterCallback: searchFilter
+            filterQueryList: [queryFilter]
+            //filterCallback: searchFilter
+
         };
 
         $scope.ok = function() {

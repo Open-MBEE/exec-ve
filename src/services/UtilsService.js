@@ -692,6 +692,8 @@ function UtilsService($q, $http, CacheService, URLService, _) {
         return o;
     };
     return {
+        VIEW_SID: VIEW_SID,
+        DOCUMENT_SID: DOCUMENT_SID,
         createClassElement: createClassElement,
         createInstanceElement: createInstanceElement,
         hasCircularReference: hasCircularReference,
