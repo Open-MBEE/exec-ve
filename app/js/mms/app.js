@@ -264,15 +264,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 if ($stateParams.search === undefined) {
                     return null;
                 }
-                return ElementService.search({
-                        projectId: $stateParams.projectId,
-                        refId: $stateParams.refId
-                    }, $stateParams.search, ['*'], null, 0, 50, 2)
-                .then(function(data) {
-                    return data;
-                }, function(reason) {
-                    return null;
-                });
+                return $stateParams.search;
             }
         },
         views: {

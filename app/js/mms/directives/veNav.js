@@ -84,7 +84,7 @@ function veNav($templateCache, $rootScope, $state, hotkeys, growl, $location, $u
             }, function(reason) {
                 scope.mmsV = "Could not retrieve due to failure: " + reason.message;
             });
-            var instance = $uibModal.open({
+            $uibModal.open({
                 templateUrl: 'partials/mms/about.html',
                 scope: scope,
                 controller: ['$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
@@ -97,7 +97,7 @@ function veNav($templateCache, $rootScope, $state, hotkeys, growl, $location, $u
         scope.logout = function() {
             AuthService.logout().then(function() {
                 $state.go('login');
-            }, function(failure) {
+            }, function() {
                 growl.error('You were not logged out');
             });
         };

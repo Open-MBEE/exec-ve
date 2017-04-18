@@ -175,6 +175,12 @@ function mmsSearch(CacheService, ElementService, URLService, growl, $http, $q, $
             });
         };
 
+        scope.newSearch = function(searchText, page, numItems){
+            scope.paginationCache = [];
+            console.log(scope.paginationCache.length);
+            scope.search(searchText, page, numItems);
+        };
+
         /**
          * @ngdoc function
          * @name mms.directives.directive:mmsSearch#getProjectIdsQuery
@@ -317,7 +323,7 @@ function mmsSearch(CacheService, ElementService, URLService, growl, $http, $q, $
         };
 
 
-        // Set options 
+        // Set options
         if (scope.mmsOptions.searchResult) {
             var data1 = scope.mmsOptions.searchResult;
             scope.searchResults = data1;
@@ -325,6 +331,7 @@ function mmsSearch(CacheService, ElementService, URLService, growl, $http, $q, $
         }
         if (scope.mmsOptions.searchInput) {
             scope.searchText = scope.mmsOptions.searchInput;
+            scope.newSearch(scope.searchText, 0, 50 , 2);
         }
         if (scope.mmsOptions.itemsPerPage) {
             scope.itemsPerPage = scope.mmsOptions.itemsPerPage;
@@ -340,11 +347,6 @@ function mmsSearch(CacheService, ElementService, URLService, growl, $http, $q, $
             event.stopPropagation();
             if (scope.mmsOptions.relatedCallback)
                 scope.mmsOptions.relatedCallback(doc, view, elem);
-        };
-        scope.newSearch = function(searchText, page, numItems){
-            scope.paginationCache = [];
-            console.log(scope.paginationCache.length);
-            scope.search(searchText, page, numItems);
         };
     };
 

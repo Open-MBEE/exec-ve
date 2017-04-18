@@ -232,9 +232,8 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
 
     /*
         ob = document or view object
-        ws = workspace
-        time = timestamp
-        tag = tag object
+        refOb = reference object
+        refOb = reference object
         isDoc = if ob is view or doc
         mode: 1 = browser print, 2 = word, 3 = pdf
     */

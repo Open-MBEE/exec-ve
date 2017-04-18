@@ -249,8 +249,7 @@ angular.module('mmsApp')
                 $rootScope.ve_togglePane.toggle();
         },
         emptyDocTxt: 'This field is empty.',
-        searchInput: $stateParams.search,
-        searchResult: search,
+        searchInput: search,
         relatedCallback: function (doc, view, elem) {//siteId, documentId, viewId) {
             $state.go('project.ref.document.view', {projectId: doc._projectId, documentId: doc.id, viewId: view.id, refId: doc._refId, search: undefined});
         }
