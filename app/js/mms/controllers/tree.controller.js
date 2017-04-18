@@ -625,28 +625,17 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             }); 
         };
 
-        var searchFilter = function(results) {
-            var views = [];
-            for (var i = 0; i < results.length; i++) {
-                if (UtilsService.isView(results[i])) {
-                    views.push(results[i]);
-                    if (results[i].properties) {
-                        delete results[i].properties;
-                    }
-                }
-            }
-            return views;
-        };
+
         var queryFilter = function() {
             var obj = {};
-            obj.term = {'_appliedStereotypeIds': UtilsService.VIEW_SID};
+            obj.terms = {'_appliedStereotypeIds': [UtilsService.VIEW_SID, UtilsService.DOCUMENT_SID]};
             return obj;
         };
+
         $scope.searchOptions = {
             callback: addExistingView,
             itemsPerPage: 200,
             filterQueryList: [queryFilter]
-            //filterCallback: searchFilter
 
         };
 
