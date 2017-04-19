@@ -171,7 +171,7 @@ function($q, $filter, $location, $uibModal, $scope, $rootScope, $state, $timeout
 
             promise.then(function(data) {
                 growl.success(displayName+" Created");
-                growl.info('Please wait for a completion email prior to viewing of the tag.');
+                growl.info('Please wait for a completion email prior to viewing of the tag.', {ttl: -1});
                 $uibModalInstance.close(data);
             }, function(reason) {
                 growl.error("Create "+displayName+" Error: " + reason.message);

@@ -89,11 +89,11 @@ function mmsViewLink(ElementService, UtilsService, $compile, growl) {
     return {
         restrict: 'E',
         scope: {
-            mmsElementId: '@',
+            mmsElementId: '@mmsVid',
             mmsProjectId: '@',
             mmsRefId: '@',
             mmsCommitId: '@',
-            mmsDocId: '@',
+            mmsDocId: '@mmsDid',
             mmsPeId: '@'
         },
         require: '?^mmsView',

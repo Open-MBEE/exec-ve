@@ -13,6 +13,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     $rootScope.mms_refOb = refOb;
     $rootScope.mms_bbApi = $scope.bbApi = {};
     $rootScope.ve_treeApi = $scope.treeApi = {};
+    $rootScope.ve_tree_pane = $scope.$pane;
     if (!$rootScope.veTreeShowPe) {
         $rootScope.veTreeShowPe = false;
     }

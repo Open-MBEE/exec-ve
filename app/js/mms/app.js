@@ -28,7 +28,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                       username: '',
                       password: ''
                     };
-                    $rootScope.ve_title = 'View Editor: Login';
+                    $rootScope.ve_title = 'View Editor';
                     $scope.spin = false;
                     $scope.login = function (credentials) {
                         $scope.spin = true;

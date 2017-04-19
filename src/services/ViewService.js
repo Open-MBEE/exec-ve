@@ -553,6 +553,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             },
             _appliedStereotypeIds: [],
         };
+        instanceSpec = UtilsService.createInstanceElement(instanceSpec);
         if (type === 'Section') {
             instanceSpec.specification = {
                 operand: [],  
@@ -622,7 +623,6 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         var view = {
             id: newViewId,
             type: 'Class',
-            ownedAttributeIds: [],
             ownerId: ownerOb.id,
             _allowedElements: [],
             _displayedElements: [newViewId],
@@ -641,6 +641,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             ],
             appliedStereotypeInstanceId: newViewId + '_asi'
         };
+        view = UtilsService.createClassElement(view);
         var parentView = null;
         if (ownerOb && (ownerOb._childViews || UtilsService.isView(ownerOb))) {
             parentView = JSON.parse(JSON.stringify(ownerOb));
@@ -672,6 +673,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             },
             _appliedStereotypeIds: [],
         };
+        instanceSpec = UtilsService.createInstanceElement(instanceSpec);
         var asi = { //create applied stereotype instance
             id: newViewId + '_asi',
             ownerId: newViewId,
@@ -682,6 +684,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             _appliedStereotypeIds: [],
             stereotypedElementId: newViewId
         };
+        asi = UtilsService.createInstanceElement(asi);
         var toCreate = [instanceSpec, view, asi];
         if (parentView)
             toCreate.push(parentView);

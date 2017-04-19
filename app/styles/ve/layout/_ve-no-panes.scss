@@ -1,0 +1,244 @@
+
+/*------------------------------------------------------------------
+[VE No Panes Tabls of Contents]
+
+1. General
+  1.1 Typography/Layout
+2. Panels
+  2.1 Tabs
+  2.2 List
+  2.3 Detail View
+    2.3.1 Info table
+    2.3.1 Header
+    2.3.2.1 Buttons
+
+-------------------------------------------------------------------*/
+
+
+/*------------------------------------------------------------------
+  1.1 General Typography/Layout
+-------------------------------------------------------------------*/
+
+.ve-no-panes {
+
+  margin-top: 40px;
+
+  a {
+    color: #4A4A4A;
+  }
+
+  .back-to-docs:before{
+    content:"\f060";
+    font-family: "FontAwesome";
+    padding-right:4px;
+  }
+
+  h1 {
+    font-size: 36px;
+    margin: 6px 0 40px;
+    font-weight: 300;
+  }
+
+  h3 {
+    font-size: 24px;
+    font-weight: 500;
+    margin: 0;
+  }
+
+  .panel-default {
+    border-color: $ve-silver-darker-1;
+  }
+
+  .nav-tabs{
+    border-color: $ve-silver-darker-1;
+  }
+}
+
+
+/*------------------------------------------------------------------
+2. Panels
+-------------------------------------------------------------------*/
+
+
+.ve-light-list-panels {
+  padding: 0;
+}
+
+/*------------------------------------------------------------------
+  2.2 List
+-------------------------------------------------------------------*/
+
+ul.ve-light-list {
+  padding-left: 0;
+  list-style: none;
+  max-height: 300px;
+  overflow-y: auto;
+  width: 100%;
+  background-color: white;
+  border-right: 1px solid $ve-silver-darker-1;
+  margin-bottom: 0;
+
+  li {
+    padding: 8px 18px;
+    font-size: 14px;
+    cursor: pointer;
+    border-bottom: 1px solid $ve-silver-darker-1;
+  }
+
+  li:hover {
+    background: $ve-silver-lighter-1;
+  }
+
+  li a,
+  li a:hover,
+  li a:visited {
+    color: #333;
+  }
+
+  li.selected {
+    background-color: $ve-silver-lighter-1;
+    box-shadow: 20px 0 0 0 $ve-green-lighter-1;
+    width: calc(100% - 3px);
+
+    a {
+      font-weight: 600;
+    }
+  }
+}
+
+@media (min-width: 990px) {
+  ul.ve-light-list {
+    height: calc(100vh - 300px);
+    max-height: none;
+  }
+
+  .ve-light-panels-detail {
+    height: calc(100vh - 300px);
+    overflow-y:auto;
+  }
+
+  .ve-light-panels-detail-header {
+    background-color: $ve-silver-lighter-1;
+    height: 45px;
+    border-bottom: 1px solid $ve-silver-darker-1;
+  }
+
+}
+
+@media (max-height: 500px) {
+  ul.ve-light-list {
+    height: 300px;
+  }
+
+  .ve-light-panels-detail {
+    height: 300px;
+  }
+}
+
+/*------------------------------------------------------------------
+  2.3 Detail View
+-------------------------------------------------------------------*/
+
+.ve-light-panels-detail {
+  padding: 10px 26px;
+
+
+/*------------------------------------------------------------------
+    2.3.1 Info Table
+-------------------------------------------------------------------*/
+  dd,
+  dt {
+    padding: 2px 0;
+    font-size: 16px;
+  }
+
+  dd.link-section {
+    padding-bottom: 16px;
+  }
+
+  dd.link-section > a {
+    color: #4885bd;
+    text-decoration: underline;
+  }
+
+/*------------------------------------------------------------------
+    2.3.2 Header
+-------------------------------------------------------------------*/
+  .panels-detail-title {
+    border-bottom: 1px solid $ve-silver-darker-1;
+    margin: 8px 0 20px;
+    padding-bottom: 16px;
+
+    h3 {
+      display: inline-block;
+    }
+
+    mms-button-bar {
+      float: right;
+    }
+  }
+
+/*------------------------------------------------------------------
+      2.3.2.1 Buttons
+-------------------------------------------------------------------*/
+
+  /* Clearing icon row styling and adding labels for usability.*/
+  .view-tools {
+    border: none !important;
+    width: auto;
+    margin: 0 0 0 4px !important;
+    font-size: 12px;
+    margin-top: 4px;
+    text-transform: uppercase;
+    font-weight: 500;
+    color: white;
+    border-radius: 2px;
+    padding: 4px 10px 4px 4px;
+    letter-spacing: .05em;
+    box-shadow: none;
+  }
+
+  .view-tools .fa:before {
+    padding: 4px;
+  }
+
+  /* Add labels to icons*/
+  .tree-add-task:after {
+    content: "Branch";
+  }
+
+  .tree-add-tag:after {
+    content: "Tag";
+  }
+
+  .tree-add-tag .fa:before {
+    content: "\f067";
+  }
+
+  .tree-delete:after {
+    content: "Delete";
+  }
+
+  .tree-add-tag,
+  .tree-add-task {
+    background-color: $ve-green-base;
+    float: right;
+  }
+
+  .tree-add-tag:hover,
+  .tree-add-task:hover {
+    background-color: $ve-green-darker-1;
+    text-decoration: none;
+  }
+
+  .tree-delete {
+    color: $ve-teal-darker-1;
+    float: left;
+  }
+
+  .tree-delete:hover {
+    color: $ve-teal-darker-2;
+    background-color: white;
+    text-decoration: none;
+  }
+}

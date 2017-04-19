@@ -364,6 +364,6 @@ function ProjectService($q, $http, URLService, CacheService, ApplicationService)
         createRef: createRef,
         updateRef: updateRef,
         deleteRef: deleteRef,
-        reset: reset,
+        reset: reset
     };
 }
