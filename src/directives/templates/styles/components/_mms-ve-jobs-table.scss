@@ -1,0 +1,66 @@
+#ve-jobs-table{
+	h3{
+		font-size: 12px;
+		font-weight: 600;
+		color: #8d8d8d;
+		text-transform: uppercase;
+		letter-spacing: .1em;
+	}
+
+	.fa-circle{
+		padding-right:4px;
+		color: rgb(255, 107, 107);
+	}
+
+	td{
+		padding:10px;
+	}
+
+	table{
+		margin-bottom:44px;
+	}
+
+	table > thead > tr > td,
+	.table > tbody > tr > td{
+		border-top:none;
+	}
+
+
+  .btn {
+    font-weight: 500;
+    letter-spacing: .14em;
+    font-size: 12px;
+    -webkit-transition: background-color .1s ease-out;
+    -moz-transition: background-color .1s ease-out;
+    -o-transition: background-color .1s ease-out;
+    transition: background-color .1s ease-out;
+    border: none;
+    text-transform: uppercase;
+    border-radius:3px;
+    box-shadow:none;
+    padding: 7px 12px;
+  }
+
+/*------------------------------------------------------------------
+    2.1.1 Primary Button
+-------------------------------------------------------------------*/
+
+  .btn-primary {
+    background-color: #2F889A;
+    color:white;
+  }
+
+  .btn-primary:hover {
+    background-color: #296f83;
+    border: none;
+  }
+
+/*------------------------------------------------------------------
+    2.1.2 Small Button
+-------------------------------------------------------------------*/
+
+  .btn-sm{
+    padding: 5px 10px;
+    font-size:11px;
+  }
+}

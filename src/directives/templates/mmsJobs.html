@@ -38,11 +38,112 @@
     </tr>
     </tbody>
 </table>
-<h3 ng-if="!hasJobs && !loading"> No Current Jobs</h3>
-<hr>
-<div class="row" style="margin-right:0px;">
-<button type="submit"  class="btn-link pull-right" ng-if="!hasJobs && !loading && docEditable" ng-click="runNow()" style="text-transform: uppercase;"><strong><span ng-show="responseCleared">RUN JOB FOR {{docName}}</span></stong><i ng-show="!responseCleared" class="fa fa-spin fa-spinner"></i></button>
-</div>
-<div class="pull-right" ng-if="docEditable">
-    <a href="/share/page/document-details?nodeRef={{doc.nodeRefId}}" target="_blank">Edit Permissions</a>
+
+<h3 ng-if="!hasJobs && !loading" style = "display:none;"> No Current Jobs</h3>
+<div id = "ve-jobs-table">
+    <h3>View Editor Jobs</h3>
+    <table class="snapshot-table table table-condensed ng-scope" >
+        <thead>
+            <tr>
+                <td>Name</td>
+                <td>Status</td>
+                <td>Created</td>
+                <td></td>
+                <td></td>
+            </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>
+                <div ng-hide="editorEnabled">
+                    <a class="ng-binding" ng-click="enableEditor()">PMA Smoke Test_job</a>
+                </div>
+                <div class="ng-hide" ng-show="editorEnabled">
+                    <input class="ng-pristine ng-untouched ng-valid ng-empty ng-hide" ng-model="jobInput.jobName" ng-show="editorEnabled">
+                    <a ng-click="save()">Save</a>
+                    or
+                    <a ng-click="disableEditor()">Cancel</a>
+                </div>
+            </td>
+            <td>
+                <div class="ng-binding"><i class="fa fa-circle" aria-hidden="true"></i>failed <a href="https://cae-jenkins.jpl.nasa.gov/job/MMS_1490133988355_3914676e-c0b0-4e54-b902-bd446afab02c/lastBuild/artifact/MDNotificationWindowText.html" ng-attr-href="{{job.url}}" target="_blank" ng-show="buttonEnabled">log</a></div> 
+            </td>
+            <td class="ng-binding">Tue Mar 21 15:06:32 PDT 2017</td>
+            <td><!-- ngIf: docEditable --><button class="btn-link ng-scope btn-sm btn"  ng-click="deleteJob()"><span ng-show="deleteCleared">DELETE</span></button><!-- end ngIf: docEditable --><i ng-show="!deleteCleared" class="fa fa-spin fa-spinner ng-hide"></i></td>
+            <td>
+                <!-- ngIf: buttonEnabled && deleteCleared && docEditable --><div class="ng-scope" >
+                    <button type="submit" class="btn-link btn-sm btn-primary btn" ng-click="runNow()"><span ng-show="runCleared">RUN</span></button><i ng-show="!runCleared" class="fa fa-spin fa-spinner ng-hide"></i></div><!-- end ngIf: buttonEnabled && deleteCleared && docEditable -->
+            </td>
+            
+        </tr>
+        </tbody>
+    </table>
+    <h3>PMA Jobs</h3>
+    <table class="snapshot-table table table-condensed ng-scope" >
+        <thead>
+            <tr>
+                <td>Name</td>
+                <td>Status</td>
+                <td>Created</td>
+                <td></td>
+                <td></td>
+            </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>
+                <div ng-hide="editorEnabled">
+                    <a class="ng-binding" ng-click="enableEditor()">PMA Smoke Test_job</a>
+                </div>
+                <div class="ng-hide" ng-show="editorEnabled">
+                    <input class="ng-pristine ng-untouched ng-valid ng-empty ng-hide" ng-model="jobInput.jobName" ng-show="editorEnabled">
+                    <a ng-click="save()">Save</a>
+                    or
+                    <a ng-click="disableEditor()">Cancel</a>
+                </div>
+            </td>
+            <td>
+                <div class="ng-binding"><i class="fa fa-circle" aria-hidden="true"></i>failed <a href="https://cae-jenkins.jpl.nasa.gov/job/MMS_1490133988355_3914676e-c0b0-4e54-b902-bd446afab02c/lastBuild/artifact/MDNotificationWindowText.html" ng-attr-href="{{job.url}}" target="_blank" ng-show="buttonEnabled">log</a></div> 
+            </td>
+            <td class="ng-binding">Tue Mar 21 15:06:32 PDT 2017</td>
+            <td><!-- ngIf: docEditable --><!-- end ngIf: docEditable --><strong><i ng-show="!deleteCleared" class="fa fa-spin fa-spinner ng-hide"></i></strong></td>
+            <td>
+                <!-- ngIf: buttonEnabled && deleteCleared && docEditable --><div class="ng-scope" >
+                    <strong><i ng-show="!runCleared" class="fa fa-spin fa-spinner ng-hide"></i>
+                </strong></div><!-- end ngIf: buttonEnabled && deleteCleared && docEditable --><strong>
+            </strong></td>
+            
+        </tr>
+        <tr>
+            <td>
+                <div ng-hide="editorEnabled">
+                    <a class="ng-binding" ng-click="enableEditor()">PMA Smoke Test_job</a>
+                </div>
+                <div class="ng-hide" ng-show="editorEnabled">
+                    <input class="ng-pristine ng-untouched ng-valid ng-empty ng-hide" ng-model="jobInput.jobName" ng-show="editorEnabled">
+                    <a ng-click="save()">Save</a>
+                    or
+                    <a ng-click="disableEditor()">Cancel</a>
+                </div>
+            </td>
+            <td>
+                <div class="ng-binding"><i class="fa fa-circle" aria-hidden="true"></i>failed <a href="https://cae-jenkins.jpl.nasa.gov/job/MMS_1490133988355_3914676e-c0b0-4e54-b902-bd446afab02c/lastBuild/artifact/MDNotificationWindowText.html" ng-attr-href="{{job.url}}" target="_blank" ng-show="buttonEnabled">log</a></div> 
+            </td>
+            <td class="ng-binding">Tue Mar 21 15:06:32 PDT 2017</td>
+            <td><!-- ngIf: docEditable --><!-- end ngIf: docEditable --><strong><i ng-show="!deleteCleared" class="fa fa-spin fa-spinner ng-hide"></i></strong></td>
+            <td>
+                <!-- ngIf: buttonEnabled && deleteCleared && docEditable --><div class="ng-scope" >
+                    <strong><i ng-show="!runCleared" class="fa fa-spin fa-spinner ng-hide"></i>
+                </strong></div><!-- end ngIf: buttonEnabled && deleteCleared && docEditable --><strong>
+            </strong></td>
+            
+        </tr>
+        </tbody>
+    </table>
+    <div class="row" style="margin-right:0px;">
+    <button type="submit"  class="btn-link pull-right" ng-click="runNow()" style="text-transform: uppercase; display:none;"><strong><span ng-show="responseCleared">RUN JOB FOR {{docName}}</span></stong><i ng-show="!responseCleared" class="fa fa-spin fa-spinner"></i></button>
+    </div>
+    <div class="pull-right" ng-if="docEditable">
+        <a href="/share/page/document-details?nodeRef={{doc.nodeRefId}}" target="_blank">Edit Permissions</a>
+    </div>
 </div>
