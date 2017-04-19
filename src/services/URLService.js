@@ -337,17 +337,10 @@ function urlService(baseUrl) {
      * Gets the url for element keyword search.
      *
      * @param {object} reqOb object with keys as described in ElementService.
-     * @param {integer} page page to get
-     * @param {integer} items items per page
      * @returns {string} The post elements url.
      */
-    var getElementSearchURL = function(reqOb, page, items) {
+    var getElementSearchURL = function(reqOb) {
         var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/search?';
-        if (items && items > 0) {
-            r += "&maxItems=" + items;
-            if (page >= 0)
-                r += '&skipCount=' + page;
-        }
         return addExtended(addTicket(r), true);
     };
 

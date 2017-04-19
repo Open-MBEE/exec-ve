@@ -632,7 +632,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
      */
     var search = function(reqOb, query, page, items, weight) {
         UtilsService.normalize(reqOb);
-        var url = URLService.getElementSearchURL(reqOb, page, items);
+        var url = URLService.getElementSearchURL(reqOb);
         if (inProgress.hasOwnProperty(url)) {
             HttpService.ping(url, weight);
             return inProgress[url];

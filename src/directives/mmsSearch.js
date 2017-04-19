@@ -158,6 +158,8 @@ function mmsSearch(CacheService, ElementService, URLService, growl, $http, $q, $
         scope.search = function(searchText, page, numItems) {
             scope.searchClass = "fa fa-spin fa-spinner";
             var queryOb = buildQuery(searchText);
+            queryOb.from = page;
+            queryOb.size = numItems;
             var reqOb = {projectId: scope.mmsProjectId, refId: scope.refId};
             ElementService.search(reqOb, queryOb, page, numItems, 2)
             .then(function(data) {
