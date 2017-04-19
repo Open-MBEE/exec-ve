@@ -243,13 +243,14 @@ angular.module('mmsApp')
     }
 
     $scope.searchOptions = {
+        emptyDocTxt: 'This field is empty.',
+        searchInput: search,
+        getProperties: true,
         callback: function(elementOb) {
             $rootScope.$broadcast('elementSelected', elementOb, 'latest');
             if ($rootScope.ve_togglePane && $rootScope.ve_togglePane.closed)
                 $rootScope.ve_togglePane.toggle();
         },
-        emptyDocTxt: 'This field is empty.',
-        searchInput: search,
         relatedCallback: function (doc, view, elem) {//siteId, documentId, viewId) {
             $state.go('project.ref.document.view', {projectId: doc._projectId, documentId: doc.id, viewId: view.id, refId: doc._refId, search: undefined});
         }
