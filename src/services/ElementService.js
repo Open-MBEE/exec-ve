@@ -633,28 +633,21 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
     var search = function(reqOb, query, page, items, weight) {
         UtilsService.normalize(reqOb);
         var url = URLService.getElementSearchURL(reqOb);
-        if (inProgress.hasOwnProperty(url)) {
-            HttpService.ping(url, weight);
-            return inProgress[url];
-        }
-
         var deferred = $q.defer();
-        inProgress[url] = deferred.promise;
         $http.post(url, query)
             .then(function(data) {
-                var result = [];
-                for (var i = 0; i < data.data.elements.length; i++) {
-                    var element = data.data.elements[i];
-                    var cacheE = cacheElement(reqOb, element);
-                    var toAdd = JSON.parse(JSON.stringify(element)); //make clone
-                    toAdd._relatedDocuments = cacheE._relatedDocuments;
-                    result.push(toAdd);
-                }
-                delete inProgress[url];
-                deferred.resolve(result);
-            }, function(data, status, headers, config) {
-                URLService.handleHttpStatus(data, status, headers, config, deferred);
-                delete inProgress[url];
+                //var result = [];
+                //for (var i = 0; i < data.data.elements.length; i++) {
+                //    var element = data.data.elements[i];
+                //    var cacheE = cacheElement(reqOb, element);
+                //    var toAdd = JSON.parse(JSON.stringify(element)); //make clone
+                //    toAdd._relatedDocuments = cacheE._relatedDocuments;
+                //    result.push(toAdd);
+                //}
+                //deferred.resolve(result);
+                deferred.resolve(data.data.elements);
+            }, function(data) {
+                URLService.handleHttpStatus(data, data.status, data.headers, data.config, deferred);
             });
         return deferred.promise;
     };

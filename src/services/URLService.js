@@ -157,17 +157,15 @@ function urlService(baseUrl) {
      * @methodOf mms.URLService
      * 
      * @description
-     * Gets the url for querying an image url 
+     * Gets the url for querying an image url
      * (this is not the actual image path)
      * 
-     * @param {string} id The id of the image
-     * @param {string} workspace Workspace name
-     * @param {string} version Timestamp or version number
      * @returns {string} The path for image url queries.
      */
-    var getImageURL = function(id, ext, workspace, version) {
-        var r = root + '/workspaces/' + workspace + '/artifacts/' + id + '?extension=' + ext;
-        return addTicket(addVersion(r, version));
+    var getImageURL = function(reqOb) {
+        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/artifacts/' +
+                       reqOb.elementId + '?accept=' + reqOb.accept;
+        return addTicket(addVersion(r, reqOb.commitId));
     };
 
     /**
