@@ -26,9 +26,9 @@ function($scope, $rootScope, $state, $stateParams, $window, $element, hotkeys, g
 
     $scope.search = search;
     $scope.buttons = [];
-
     $scope.refOb = refOb;
     $scope.projectOb = projectOb;
+
     //build array of views in doc
     var elementTranscluded = function(elementOb, type) {
         

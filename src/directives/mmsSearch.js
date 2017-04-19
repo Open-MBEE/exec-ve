@@ -62,17 +62,18 @@ function mmsSearch(CacheService, ElementService, URLService, growl, $http, $q, $
                                 });
                                 elem._properties = properties;
                             });
-                    }
-                    // OLD CODE - splits into 3cols
-                    if (elem._properties && elem._properties[0]) {
-                        var properties = [];
-                        for (var i = 0; i < elem._properties.length; i++) {
-                            if (i % 3 === 0) {
-                                properties.push([]);
+
+                        // OLD CODE - splits into 3cols
+                        if (elem._properties && elem._properties[0]) {
+                            var properties = [];
+                            for (var i = 0; i < elem._properties.length; i++) {
+                                if (i % 3 === 0) {
+                                    properties.push([]);
+                                }
+                                properties[properties.length - 1].push(elem._properties[i]);
                             }
-                            properties[properties.length - 1].push(elem._properties[i]);
+                            elem._properties2 = properties;
                         }
-                        elem._properties2 = properties;
                     }
                 }
             });
@@ -116,7 +117,7 @@ function mmsSearch(CacheService, ElementService, URLService, growl, $http, $q, $
             angular.element('.btn-search-name').removeClass('active');
             angular.element('.btn-search-documentation').removeClass('active');
             angular.element('.btn-search-value').removeClass('active');
-            angular.element('.btn-search-sysmlId').removeClass('active');
+            angular.element('.btn-search-id').removeClass('active');
             angular.element('.btn-search-' + searchType).addClass('active');
         };
 
@@ -158,7 +159,7 @@ function mmsSearch(CacheService, ElementService, URLService, growl, $http, $q, $
         scope.search = function(searchText, page, numItems) {
             scope.searchClass = "fa fa-spin fa-spinner";
             var queryOb = buildQuery(searchText);
-            queryOb.from = page;
+            queryOb.from = page*numItems + page;
             queryOb.size = numItems;
             var reqOb = {projectId: scope.mmsProjectId, refId: scope.refId};
             ElementService.search(reqOb, queryOb, page, numItems, 2)
@@ -220,13 +221,12 @@ function mmsSearch(CacheService, ElementService, URLService, growl, $http, $q, $
         var getAllMounts = function(project, projectsList) {
             projectsList.push(project.id);
             var mounts = project._mounts;
-            if(angular.isArray(mounts) && mounts !==0 ) {
-                angular.forEach(mounts, function(m){
-                    // projectsList.push(m.id);
-                    if (m._mounts) {
-                        getAllMounts(m, projectsList);
+            if ( angular.isArray(mounts) && mounts.length !== 0 ) {
+                for (var i = 0; mounts.length; i++) {
+                    if (mounts[i]._mounts) {
+                        getAllMounts(mounts[i], projectsList);
                     }
-                });
+                }
             }
         };
 

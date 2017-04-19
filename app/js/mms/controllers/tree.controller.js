@@ -18,6 +18,8 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         $rootScope.veTreeShowPe = false;
     }
     $scope.buttons = [];
+    $scope.projectOb = projectOb;
+    $scope.refOb = refOb;
     $scope.treeExpandLevel = 1;
     if ($state.includes('project.ref') && !$state.includes('project.ref.document')) {
         $scope.treeExpandLevel = 0;

@@ -31,6 +31,8 @@ angular.module('mmsApp')
 
     $scope.search = search;
     $scope.viewOb = viewOb;
+    $scope.projectOb = projectOb;
+    $scope.refOb = refOb;
 
     $scope.buttons = [];
     $scope.viewApi = {
