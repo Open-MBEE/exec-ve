@@ -3,10 +3,10 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('RefsCtrl', ['$q', '$filter', '$location', '$uibModal', '$scope', '$rootScope', '$state','$timeout', 'growl', 
+.controller('RefsCtrl', ['$q', '$filter', '$location', '$uibModal', '$scope', '$window', '$rootScope', '$state','$timeout', 'growl', 
                          'UxService', 'ElementService', 'UtilsService', 'ProjectService', 'MmsAppUtils', 
                          'orgOb', 'projectOb', 'refOb', 'refObs', 'tagObs', 'branchObs',
-function($q, $filter, $location, $uibModal, $scope, $rootScope, $state, $timeout, growl, 
+function($q, $filter, $location, $uibModal, $scope, $window, $rootScope, $state, $timeout, growl, 
     UxService, ElementService, UtilsService, ProjectService, MmsAppUtils, 
     orgOb, projectOb, refOb, refObs, tagObs, branchObs) {
 
@@ -127,13 +127,14 @@ function($q, $filter, $location, $uibModal, $scope, $rootScope, $state, $timeout
         $scope.createForm = true;
         $scope.oking = false;
         var displayName = "";
+        var json = {};
 
         // Item specific setup:
         if ($scope.itemType === 'Branch') {
-            $scope.workspace = {};
-            $scope.workspace.name = "";
-            $scope.workspace.description = "";
-            $scope.workspace.permission = "read";
+            $scope.branch = {};
+            $scope.branch.name = "";
+            $scope.branch.description = "";
+            $scope.branch.permission = "read";
             displayName = "Branch";
         }
         else if ($scope.itemType === 'Tag') {
@@ -150,19 +151,32 @@ function($q, $filter, $location, $uibModal, $scope, $rootScope, $state, $timeout
             }
             $scope.oking = true;
             var promise;
+            var date = new Date();
 
             // Item specific promise:
             if ($scope.itemType === 'Branch') {
-                var branchObj = {"name": $scope.workspace.name, "type": "Branch", 
-                                "description": $scope.workspace.description};
+                var branchObj = {"name": $scope.branch.name, "type": "Branch", 
+                                "description": $scope.branch.description};
                 branchObj.parentRefId = $scope.createParentRefId;
                 promise = ProjectService.createRef( branchObj, projectOb.id );
+                json = {
+                    name: $scope.branch.name,
+                    type: "branch",
+                    status: 'in progress',
+                    start_time: date.getMonth() + "/" + date.getDate() + "/" +  date.getFullYear() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds()
+                };
             }
             else if ($scope.itemType === 'Tag') {
                 var tagObj = {"name": $scope.configuration.name, "type": "Tag",
                                 "description": $scope.configuration.description};
                 tagObj.parentRefId =  $scope.createParentRefId;
                 promise = ProjectService.createRef( tagObj, projectOb.id );
+                json = {
+                    name: $scope.tag.name,
+                    type: "tag",
+                    status: 'in progress',
+                    start_time: date.getMonth() + "/" + date.getDate() + "/" +  date.getFullYear() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds()
+                };
             } else {
                 growl.error("Add Item of Type " + $scope.itemType + " is not supported");
                 $scope.oking = false;
@@ -170,9 +184,11 @@ function($q, $filter, $location, $uibModal, $scope, $rootScope, $state, $timeout
             }
 
             promise.then(function(data) {
-                growl.success(displayName+" Created");
-                growl.info('Please wait for a completion email prior to viewing of the tag.', {ttl: -1});
-                $uibModalInstance.close(data);
+                growl.success(displayName+" is being created."); 
+                growl.info('Please wait for a completion email prior to viewing of the branch/tag.', {ttl: -1});
+                $window.localStorage.setItem('ref', json);
+                $scope.createdRef = json;
+                $uibModalInstance.close(data); //need to figure out a way to cache this stuff 
             }, function(reason) {
                 growl.error("Create "+displayName+" Error: " + reason.message);
             }).finally(function() {

@@ -38,6 +38,26 @@
     </tr>
     </tbody>
 </table>
+<table class="snapshot-table table table-condensed" ng-if="oking">
+    <thead>
+        <tr>
+            <td>Name</td>
+            <td>Type</td>
+            <td>Status</td>
+            <td>Start Time</td>
+            <td></td>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>{{createdRef.name}}</td> <!-- Name of Job -->
+            <td>{{createdRef.type}}</td>
+            <td>{{createdRef.status}}</td> <!-- Status of Job -->
+            <td>{{createdRef.start_time}}</td> <!-- Start Time of Job -->
+            <td></td> <!-- Delete Job -->
+        </tr>
+    </tbody>
+</table>
 <h3 ng-if="!hasJobs && !loading"> No Current Jobs</h3>
 <hr>
 <div class="row" style="margin-right:0px;">
