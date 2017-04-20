@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mmsApp')
-.directive('veMenu', ['ProjectService','$state','$rootScope', '$templateCache', 'growl', veMenu]);
+.directive('veMenu', ['ProjectService','$state','$rootScope', '$templateCache', '$sce', 'growl', veMenu]);
 
 /**
  * @ngdoc directive
@@ -24,11 +24,12 @@ angular.module('mmsApp')
  * for specific view.
  *
  */
-function veMenu(ProjectService, $state, $rootScope, $templateCache, growl) {
+function veMenu(ProjectService, $state, $rootScope, $templateCache, $sce, growl) {
     var template = $templateCache.get('partials/mms/veMenu.html');
 
     var veMenuLink = function(scope, element, attrs) {
 
+        scope.htmlTooltip = $sce.trustAsHtml('Branch temporarily unavailable during duplication.<br><br>Branch author will be notified by email upon completion.');
         scope.currentProject = scope.project.name;
         if (scope.ref) {
             scope.currentRef = scope.ref;

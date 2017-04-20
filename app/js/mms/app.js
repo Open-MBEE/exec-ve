@@ -72,7 +72,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
         views: {
             'login@': {
                 templateUrl: 'partials/mms/select.html',
-                controller: function($scope, $rootScope, $state, orgObs, ProjectService) {
+                controller: function($scope, $rootScope, $state, orgObs, ProjectService, AuthService, growl) {
                     $rootScope.ve_title = 'View Editor'; //what to name this?
                     $scope.orgs = orgObs; 
                     var orgId, projectId;
@@ -93,11 +93,18 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                         }
                     };
                     $scope.spin = false; 
-                    $scope.continue = function() { 
+                    $scope.continue = function() {
                         $scope.spin = true;
                         if (orgId && projectId) {
                             $state.go('project.ref', {orgId: orgId, projectId: projectId, refId: 'master'});
                         }
+                    };
+                    $scope.logout = function() {
+                        AuthService.logout().then(function() {
+                            $state.go('login');
+                        }, function() {
+                            growl.error('You were not logged out');
+                        });
                     };
                 }
             }
