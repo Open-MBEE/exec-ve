@@ -1,6 +1,6 @@
 <h2>Jobs</h2>
 <i class="pane-center-spinner fa fa-5x fa-spinner fa-spin" style="margin-left: 50%;" ng-if="loading"></i>
-<div ng-if="mmsWs != 'master'">Job runs are currently only available on master workspace.</div>
+<div ng-if="mmsBranch != 'master'">Job runs are currently only available on master branch.</div>
 <table class="snapshot-table table table-condensed" ng-if="!loading && hasJobs">
     <thead>
         <tr>
@@ -38,7 +38,7 @@
     </tr>
     </tbody>
 </table>
-<table class="snapshot-table table table-condensed" ng-if="oking">
+<table class="snapshot-table table table-condensed">
     <thead>
         <tr>
             <td>Name</td>

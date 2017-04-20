@@ -78,19 +78,19 @@ function($q, $filter, $location, $uibModal, $scope, $window, $rootScope, $state,
         // Item specific setup:
         if (itemType === 'Branch') {
             if (!branch) {
-                growl.warning("Add Task Error: Select a task or tag first");
+                growl.warning("Add Branch Error: Select a branch or tag first");
                 return;
             }
             if (branch.type === 'Tag') {
                 $scope.from = 'Tag ' + branch.name;
             } else {
-                $scope.from = 'Task ' + branch.name;
+                $scope.from = 'Branch ' + branch.name;
             }
             $scope.createParentRefId = branch.id;
-            templateUrlStr = 'partials/mms/new-task.html';
+            templateUrlStr = 'partials/mms/new-branch.html';
         } else if (itemType === 'Tag') {
             if (!branch) {
-                growl.warning("Add Tag Error: Select parent task first");
+                growl.warning("Add Tag Error: Select parent branch first");
                 return;
             } 
             // else if (branch.type != "workspace") {
@@ -127,7 +127,7 @@ function($q, $filter, $location, $uibModal, $scope, $window, $rootScope, $state,
         $scope.createForm = true;
         $scope.oking = false;
         var displayName = "";
-        var json = {};
+        var refJson = {};
 
         // Item specific setup:
         if ($scope.itemType === 'Branch') {
@@ -159,7 +159,7 @@ function($q, $filter, $location, $uibModal, $scope, $window, $rootScope, $state,
                                 "description": $scope.branch.description};
                 branchObj.parentRefId = $scope.createParentRefId;
                 promise = ProjectService.createRef( branchObj, projectOb.id );
-                json = {
+                refJson = {
                     name: $scope.branch.name,
                     type: "branch",
                     status: 'in progress',
@@ -171,7 +171,7 @@ function($q, $filter, $location, $uibModal, $scope, $window, $rootScope, $state,
                                 "description": $scope.configuration.description};
                 tagObj.parentRefId =  $scope.createParentRefId;
                 promise = ProjectService.createRef( tagObj, projectOb.id );
-                json = {
+                refJson = {
                     name: $scope.tag.name,
                     type: "tag",
                     status: 'in progress',
@@ -186,8 +186,8 @@ function($q, $filter, $location, $uibModal, $scope, $window, $rootScope, $state,
             promise.then(function(data) {
                 growl.success(displayName+" is being created."); 
                 growl.info('Please wait for a completion email prior to viewing of the branch/tag.', {ttl: -1});
-                $window.localStorage.setItem('ref', json);
-                $scope.createdRef = json;
+                $window.localStorage.setItem('ref', refJson);
+                $scope.createdRef = refJson;
                 $uibModalInstance.close(data); //need to figure out a way to cache this stuff 
             }, function(reason) {
                 growl.error("Create "+displayName+" Error: " + reason.message);

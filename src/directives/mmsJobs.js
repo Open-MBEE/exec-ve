@@ -23,7 +23,7 @@ angular.module('mms.directives')
  *   <mms-jobs></mms-jobs>
  * </pre>
  *
- * @param {string=master} mmsWs Workspace to use, defaults to master
+ * @param {string=master} mmsBranch Branch to use, defaults to master
  * @param {string=null} mmsDocId the id of the current document under which the job is being run
  */
 function mmsJobs($templateCache, $http, $location, ElementService, UtilsService, growl, _ , $q, URLService) {
@@ -101,7 +101,7 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
                     return;
                 scope.doc = document;
                 documentName = document.name;
-                scope.docEditable = document.editable && scope.mmsWs === 'master';
+                scope.docEditable = document.editable && scope.mmsBranch === 'master';
                 ElementService.getIdInfo(document, null)
                 .then(function(data) {
                     project = data;
@@ -281,7 +281,7 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
         restrict: 'E',
         template: template,
         scope: {
-            mmsWs: '@',
+            mmsBranch: '@',
             mmsDocId:'@'
         },
         link: mmsJobsLink
