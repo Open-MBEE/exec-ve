@@ -37,7 +37,8 @@
                     <uib-tabset active="active" type="tabs" justified="false">
                         <uib-tab index="0" classes="tab-item" heading="Branches">
                             <li ng-repeat="branch in branches | orderBy:'name'" ng-click="updateBranch(branch)"
-                                ng-class="{'checked-list-item': branch.name === currentBranch}" is-open="false" tooltip-placement="left" uib-tooltip-html="Branch temporarily unavailable during duplication.<br><br>Branch author will be notified by email upon completion.">{{ branch.name }}
+                                ng-class="{'checked-list-item': branch.name === currentBranch}" is-open="false" tooltip-placement="left" 
+                                uib-tooltip-html="htmlTooltip" tooltip-append-to-body="branch.status == 'loading'" tooltip-enable="branch.status == 'loading'">{{ branch.name }}
                             </li>
                         </uib-tab>
                         <uib-tab index="1" classes="tab-item" heading="Tags">
