@@ -32,7 +32,11 @@ function StompService($rootScope, ApplicationService, ElementService, URLService
         var projectId = message.headers.projectId;
         var refId = message.headers.refId;
         if (updateWebpage.source !== ApplicationService.getSource()) {
-            // $rootScope.$apply(function () {
+            if (updateWebpage.createdWorkspace) {
+                var updateRef = updateWebpage.createdWorkspace;
+                $rootScope.$broadcast("stomp.branchCreated", updateRef);
+            }
+            if (updateWebpage.refs) {
                 if (updateWebpage.refs.addedElements && updateWebpage.refs.addedElements.length > 0) {
                     refId = !refId ? 'master' : refId;
                     angular.forEach(updateWebpage.refs.addedElements, function (eltId) {
@@ -59,7 +63,7 @@ function StompService($rootScope, ApplicationService, ElementService, URLService
                         });
                     });
                 }
-            // });
+            }
         }
         if(updateWebpage.refs.addedJobs  && updateWebpage.refs.addedJobs.length > 0 ){//check length of added jobs > 0
             var newJob = updateWebpage.refs.addedJobs;
