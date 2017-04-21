@@ -127,6 +127,7 @@ function($q, $filter, $location, $uibModal, $scope, $window, $rootScope, $state,
         $scope.createForm = true;
         $scope.oking = false;
         var displayName = "";
+        // var refArr = [];
         var refJson = {};
 
         // Item specific setup:
@@ -161,8 +162,9 @@ function($q, $filter, $location, $uibModal, $scope, $window, $rootScope, $state,
                 promise = ProjectService.createRef( branchObj, projectOb.id );
                 refJson = {
                     name: $scope.branch.name,
-                    type: "branch",
-                    status: 'in progress',
+                    id: $scope.branch.id,
+                    type: $scope.branch.type,
+                    status: 'in progress', //will get status from JMS?
                     start_time: date.getMonth() + "/" + date.getDate() + "/" +  date.getFullYear() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds()
                 };
             }
@@ -173,8 +175,9 @@ function($q, $filter, $location, $uibModal, $scope, $window, $rootScope, $state,
                 promise = ProjectService.createRef( tagObj, projectOb.id );
                 refJson = {
                     name: $scope.tag.name,
-                    type: "tag",
-                    status: 'in progress',
+                    id: $scope.tag.id,
+                    type: $scope.tag.type, 
+                    status: 'in progress', //will get status from JMS?
                     start_time: date.getMonth() + "/" + date.getDate() + "/" +  date.getFullYear() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds()
                 };
             } else {
@@ -182,12 +185,13 @@ function($q, $filter, $location, $uibModal, $scope, $window, $rootScope, $state,
                 $scope.oking = false;
                 return;
             }
-
+            $window.localStorage.setItem('ref', JSON.stringify(refJson)); 
             promise.then(function(data) {
                 growl.success(displayName+" is being created."); 
                 growl.info('Please wait for a completion email prior to viewing of the branch/tag.', {ttl: -1});
-                $window.localStorage.setItem('ref', refJson);
-                $scope.createdRef = refJson;
+
+                // $window.localStorage.setItem('ref', JSON.stringify(refJson)); 
+                // $window.localStorage.setItem('yo', 'hello');
                 $uibModalInstance.close(data); //need to figure out a way to cache this stuff 
             }, function(reason) {
                 growl.error("Create "+displayName+" Error: " + reason.message);

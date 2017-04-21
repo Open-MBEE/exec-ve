@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsJobs', ['$templateCache','$http', '$location', 'ElementService','UtilsService','growl','_','$q','URLService', mmsJobs]);
+.directive('mmsJobs', ['$templateCache','$http', '$location', '$window', 'ElementService','UtilsService','growl','_','$q','URLService', mmsJobs]);
 /**
  * @ngdoc directive
  * @name mms.directives.directive:mmsJobs
@@ -26,8 +26,11 @@ angular.module('mms.directives')
  * @param {string=master} mmsBranch Branch to use, defaults to master
  * @param {string=null} mmsDocId the id of the current document under which the job is being run
  */
-function mmsJobs($templateCache, $http, $location, ElementService, UtilsService, growl, _ , $q, URLService) {
+function mmsJobs($templateCache, $http, $location, $window, ElementService, UtilsService, growl, _ , $q, URLService) {
     var template = $templateCache.get('mms/templates/mmsJobs.html');
+    
+
+    // var greet = $window.localStorage.getItem('yo');
     //:TODO have cases for each null; "running"; "failed"; "completed"; "aborted";"unstable"; "disabled"; "waiting";
     var mmsJobsLink = function(scope, element, attrs) {
         var documentName;
@@ -40,7 +43,15 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
         scope.runCleared = true;
         scope.deleteCleared = true;
         scope.jobInput = { jobName:''};
+        
+        // scope.greet = greet;
 
+        var refJson = $window.localStorage.getItem('ref');
+        var ref; 
+        if (refJson) {
+            ref = JSON.parse(refJson);
+        }
+        scope.createdRef = ref; 
         // get all the jobs for current document
         var getJobs = function(){
             var id = scope.mmsDocId;
