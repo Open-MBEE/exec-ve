@@ -41,10 +41,12 @@ function mmsJobs($templateCache, $http, $location, $window, ElementService, Util
         scope.runCleared = true;
         scope.deleteCleared = true;
         scope.jobInput = { jobName:''};
+        scope.hasRefArr = false;
 
         var refArrString = $window.localStorage.getItem('refArr');
         var refArr = JSON.parse(refArrString); 
         if (refArr) {
+            scope.hasRefArr = true;
             scope.createdRefs = refArr; 
         }
 
