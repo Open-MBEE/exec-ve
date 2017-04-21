@@ -157,9 +157,8 @@ function($sce, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $t
         $scope.createForm = true;
         $scope.oking = false;
         var displayName = "";
-        // var refArr = [];
+        var refArr = [];
         var refJson = {};
-
         // Item specific setup:
         if ($scope.itemType === 'Branch') {
             $scope.branch = {};
@@ -182,7 +181,6 @@ function($sce, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $t
             $scope.oking = true;
             var promise;
             var date = new Date();
-
             // Item specific promise:
             if ($scope.itemType === 'Branch') {
                 var branchObj = {"name": $scope.branch.name, "type": "Branch", 
@@ -192,9 +190,9 @@ function($sce, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $t
                 refJson = {
                     name: $scope.branch.name,
                     id: $scope.branch.id,
-                    type: $scope.branch.type,
+                    type: $scope.itemType,
                     status: 'in progress', //will get status from JMS?
-                    start_time: date.getMonth() + "/" + date.getDate() + "/" +  date.getFullYear() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds()
+                    start_time: (date.getMonth() + 1) + "/" + date.getDate() + "/" +  date.getFullYear() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds()
                 };
             } else if ($scope.itemType === 'Tag') {
                 var tagObj = {"name": $scope.configuration.name, "type": "Tag",
@@ -204,22 +202,21 @@ function($sce, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $t
                 refJson = {
                     name: $scope.tag.name,
                     id: $scope.tag.id,
-                    type: $scope.tag.type, 
+                    type: $scope.itemType, 
                     status: 'in progress', //will get status from JMS?
-                    start_time: date.getMonth() + "/" + date.getDate() + "/" +  date.getFullYear() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds()
+                    start_time: (date.getMonth() + 1) + "/" + date.getDate() + "/" +  date.getFullYear() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds()
                 };
             } else {
                 growl.error("Add Item of Type " + $scope.itemType + " is not supported");
                 $scope.oking = false;
                 return;
             }
-            $window.localStorage.setItem('ref', JSON.stringify(refJson)); 
             promise.then(function(data) {
                 growl.success(displayName+" is being created."); 
                 growl.info('Please wait for a completion email prior to viewing of the branch/tag.', {ttl: -1});
-
-                // $window.localStorage.setItem('ref', JSON.stringify(refJson)); 
-                // $window.localStorage.setItem('yo', 'hello');
+                refArr.push(refJson);
+                var storeArr = refArr.toString();
+                $window.localStorage.setItem('refArr', storeArr); 
                 $uibModalInstance.close(data); //need to figure out a way to cache this stuff 
             }, function(reason) {
                 growl.error("Create "+displayName+" Error: " + reason.message);

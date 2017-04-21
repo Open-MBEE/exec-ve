@@ -28,8 +28,6 @@ angular.module('mms.directives')
  */
 function mmsJobs($templateCache, $http, $location, $window, ElementService, UtilsService, growl, _ , $q, URLService) {
     var template = $templateCache.get('mms/templates/mmsJobs.html');
-    
-
     // var greet = $window.localStorage.getItem('yo');
     //:TODO have cases for each null; "running"; "failed"; "completed"; "aborted";"unstable"; "disabled"; "waiting";
     var mmsJobsLink = function(scope, element, attrs) {
@@ -43,15 +41,13 @@ function mmsJobs($templateCache, $http, $location, $window, ElementService, Util
         scope.runCleared = true;
         scope.deleteCleared = true;
         scope.jobInput = { jobName:''};
-        
-        // scope.greet = greet;
 
-        var refJson = $window.localStorage.getItem('ref');
-        var ref; 
-        if (refJson) {
-            ref = JSON.parse(refJson);
+        var refArrString = $window.localStorage.getItem('refArr');
+        var refArr = JSON.parse(refArrString); 
+        if (refArr) {
+            scope.createdRefs = refArr; 
         }
-        scope.createdRef = ref; 
+
         // get all the jobs for current document
         var getJobs = function(){
             var id = scope.mmsDocId;
