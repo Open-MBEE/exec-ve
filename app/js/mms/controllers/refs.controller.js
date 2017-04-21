@@ -3,10 +3,10 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('RefsCtrl', ['$q', '$filter', '$location', '$uibModal', '$scope', '$rootScope', '$state','$timeout', 'growl', 
+.controller('RefsCtrl', ['$sce', '$q', '$filter', '$location', '$uibModal', '$scope', '$rootScope', '$state','$timeout', 'growl', '_',
                          'UxService', 'ElementService', 'UtilsService', 'ProjectService', 'MmsAppUtils', 
                          'orgOb', 'projectOb', 'refOb', 'refObs', 'tagObs', 'branchObs',
-function($q, $filter, $location, $uibModal, $scope, $rootScope, $state, $timeout, growl, 
+function($sce, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $timeout, growl, _,
     UxService, ElementService, UtilsService, ProjectService, MmsAppUtils, 
     orgOb, projectOb, refOb, refObs, tagObs, branchObs) {
 
@@ -22,6 +22,14 @@ function($q, $filter, $location, $uibModal, $scope, $rootScope, $state, $timeout
     $scope.refSelected = null;
     $scope.search = null;
     $scope.view = null;
+    $scope.fromParams = {};
+    if (_.isEmpty(refOb)) {
+        $scope.fromParams.id = 'master';
+        $scope.fromParams.name = 'master';
+    } else {
+        $scope.fromParams = refOb;
+    }
+    $scope.htmlTooltip = $sce.trustAsHtml('Branch temporarily unavailable during duplication.<br>Branch author will be notified by email upon completion.');
     // var docEditable = documentOb && documentOb._editable && refOb && refOb.type === 'Branch' && UtilsService.isView(documentOb);
 
     $scope.bbApi.init = function() {
@@ -42,6 +50,28 @@ function($q, $filter, $location, $uibModal, $scope, $rootScope, $state, $timeout
     });
     $scope.$on('tree-delete', function(e) {
         deleteItem();
+    });
+    $scope.$on('fromParamChange', function(event, fromParams) {
+        var index = _.findIndex(refObs, {name: fromParams.refId});
+        if ( index > -1 ) {
+            $scope.fromParams = refObs[index];
+        }
+    });
+    $scope.$on("stomp.branchCreated", function(event, updateRef) {
+        var index = -1;
+        if (updateRef.type === 'Branch') {
+            index = _.findIndex($scope.branches, {name: updateRef.id});
+            if ( index > -1 ) {
+                $scope.branches[index].loading = false;
+                // $scope.branches[index] = updateRef;
+            }
+        } else if (updateRef.type === 'Tag') {
+            index = _.findIndex($scope.tags, {name: updateRef.id});
+            if ( index > -1 ) {
+                $scope.tags[index].loading = false;
+                // $scope.tags[index] = updateRef;
+            }
+        }
     });
 
     $scope.refClickHandler = function(ref) {
@@ -67,8 +97,6 @@ function($q, $filter, $location, $uibModal, $scope, $rootScope, $state, $timeout
     //         $rootScope.ve_treeApi.expand_branch(branch);
     //     }
     // };
-
-
 
     var addItem = function(itemType) {
         $scope.itemType = itemType;
@@ -112,10 +140,12 @@ function($q, $filter, $location, $uibModal, $scope, $rootScope, $state, $timeout
         instance.result.then(function(data) {
             //TODO add to correct ref list
             if (data.type === 'Branch') {
+                data.loading = true;
                 $scope.branches.push(data);
                 $scope.refSelected = data;
                 $scope.activeTab = 0;
             } else {
+                data.loading = true;
                 $scope.tags.push(data);
                 $scope.refSelected = data;
                 $scope.activeTab = 1;
@@ -135,8 +165,7 @@ function($q, $filter, $location, $uibModal, $scope, $rootScope, $state, $timeout
             $scope.workspace.description = "";
             $scope.workspace.permission = "read";
             displayName = "Branch";
-        }
-        else if ($scope.itemType === 'Tag') {
+        } else if ($scope.itemType === 'Tag') {
             $scope.configuration = {};
             $scope.configuration.name = "";
             $scope.configuration.description = "";
@@ -157,8 +186,7 @@ function($q, $filter, $location, $uibModal, $scope, $rootScope, $state, $timeout
                                 "description": $scope.workspace.description};
                 branchObj.parentRefId = $scope.createParentRefId;
                 promise = ProjectService.createRef( branchObj, projectOb.id );
-            }
-            else if ($scope.itemType === 'Tag') {
+            } else if ($scope.itemType === 'Tag') {
                 var tagObj = {"name": $scope.configuration.name, "type": "Tag",
                                 "description": $scope.configuration.description};
                 tagObj.parentRefId =  $scope.createParentRefId;
@@ -200,10 +228,10 @@ function($q, $filter, $location, $uibModal, $scope, $rootScope, $state, $timeout
         instance.result.then(function(data) {
             //TODO $state project with no selected ref
             var index;
-            if (data.type === 'Branch') {
+            if ($scope.refSelected.type === 'Branch') {
                 index = $scope.branches.indexOf($scope.refSelected);
                 $scope.branches.splice(index, 1);  
-            } else if (data.type === 'Tag') {
+            } else if ($scope.refSelected.type === 'Tag') {
                 index = $scope.tags.indexOf($scope.refSelected);
                 $scope.tags.splice(index, 1);  
             }
