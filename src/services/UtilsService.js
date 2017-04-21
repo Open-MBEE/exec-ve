@@ -33,7 +33,6 @@ function UtilsService($q, $http, CacheService, URLService, _) {
         mdExtensionsIds: [],
         name: "",
         nameExpression: null,
-        nestedClassifierIds: [],
         ownedAttributeIds: [],
         ownedOperationIds: [],
         ownerId: null,
