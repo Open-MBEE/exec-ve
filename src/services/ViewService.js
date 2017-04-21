@@ -953,7 +953,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 return;
             }
             for (var i = 0; i < data.length; i++) {
-                var prop = data[i]; 
+                var prop = data[i];
                 var feature = prop.definingFeatureId ? prop.definingFeatureId : null;
                 var value = prop.value ? prop.value : null;
                 if (!feature || !docMetadataTypes[feature] || !value || value.length === 0) {
