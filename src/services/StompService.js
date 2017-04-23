@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms')
-.factory('StompService', ['$rootScope', 'ApplicationService', 'ElementService', 'URLService','$http', StompService]);
+.factory('StompService', ['$rootScope', 'ApplicationService', 'ElementService', 'URLService','$http', 'UtilsService', 'CacheService', StompService]);
 
 /**
  * @ngdoc service
@@ -11,7 +11,7 @@ angular.module('mms')
  * @description
  * Provides messages from the activemq JMS bus
  */
-function StompService($rootScope, ApplicationService, ElementService, URLService, $http) {
+function StompService($rootScope, ApplicationService, ElementService, URLService, $http, UtilsService, CacheService) {
      var stompClient = {};
      var host;
 
@@ -31,28 +31,19 @@ function StompService($rootScope, ApplicationService, ElementService, URLService
         var updateWebpage = angular.fromJson(message.body);
         var projectId = message.headers.projectId;
         var refId = message.headers.refId;
+        refId = !refId ? 'master' : refId;
         if (updateWebpage.source !== ApplicationService.getSource()) {
             if (updateWebpage.createdWorkspace) {
                 var updateRef = updateWebpage.createdWorkspace;
                 $rootScope.$broadcast("stomp.branchCreated", updateRef);
             }
             if (updateWebpage.refs) {
-                if (updateWebpage.refs.addedElements && updateWebpage.refs.addedElements.length > 0) {
-                    refId = !refId ? 'master' : refId;
-                    angular.forEach(updateWebpage.refs.addedElements, function (eltId) {
-                        ElementService.getElement({
-                            projectId: projectId,
-                            refId: refId,
-                            extended: true,
-                            elementId: eltId
-                        }, 1, true).then(function (data) {
-                            $rootScope.$broadcast("element.updated", data, null, true);
-                        });
-                    });
-                }
                 if (updateWebpage.refs.updatedElements && updateWebpage.refs.updatedElements.length > 0) {
-                    refId = !refId ? 'master' : refId;
                     angular.forEach(updateWebpage.refs.updatedElements, function (eltId) {
+                        var key = UtilsService.makeElementKey({_projectId: projectId, _refId: refId, id: eltId});
+                        if (!CacheService.exists(key)) {
+                            return;
+                        }
                         ElementService.getElement({
                             projectId: projectId,
                             refId: refId,
