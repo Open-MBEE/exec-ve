@@ -357,18 +357,23 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                             if (refOb.type === 'Tag') {
                                 deferred.resolve(null);
                             } else {
-                                ViewService.createView({
+                                ElementService.getElement({projectId: $stateParams.projectId, refId: $stateParams.refId, elementId: groupId})
+                                .then(function(groupElement) {
+                                    ViewService.createView({
                                         _projectId: $stateParams.projectId, 
                                         _refId: $stateParams.refId,
                                         id: groupId
                                     },{
-                                        viewName: 'Need to get package name Cover Page', 
+                                        viewName: groupElement.name + 'Cover Page', 
                                         viewId: eid
                                     }, 2)
-                                .then(function(data) {
-                                    deferred.resolve(data);
+                                    .then(function(data) {
+                                        deferred.resolve(data);
+                                    }, function(reason3) {
+                                        deferred.resolve(null);
+                                    });
                                 }, function(reason2) {
-                                    deferred.reject(reason2);
+                                    deferred.resolve(null);
                                 });
                             }
                         } else {
