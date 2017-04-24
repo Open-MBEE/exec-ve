@@ -242,7 +242,7 @@ function UtilsService($q, $http, CacheService, URLService, _) {
     var makeElementKey = function(elementOb, edit) {
         var refId = !elementOb._refId ? 'master' : elementOb._refId;
         var commitId = !elementOb._commitId ? 'latest' : elementOb._commitId;
-        var key = ['element', elementOb._projectId, elementOb._refId, elementOb.id, elementOb._commitId];
+        var key = ['element', elementOb._projectId, refId, elementOb.id, commitId];
         if (edit)
             key.push('edit');
         return key;
