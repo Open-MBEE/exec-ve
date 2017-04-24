@@ -148,15 +148,28 @@ function($sce, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $t
             controller: ['$scope', '$uibModalInstance', '$filter', addItemCtrl]
         });
         instance.result.then(function(data) {
-            //TODO add to correct ref list
+            //TODO add load handling once mms returns status
+            var tag = [];
+            for (var i = 0; i < refObs.length; i++) {
+                if (refObs[i].type === "Tag")
+                    tag.push(refObs[i]);
+            }
+            $scope.tags = tag;
+
+            var branches = [];
+            for (var j = 0; j < refObs.length; j++) {
+                if (refObs[j].type === "Branch")
+                    branches.push(refObs[j]);
+            }
+            $scope.branches = branches;
             if (data.type === 'Branch') {
-                data.loading = true;
-                $scope.branches.push(data);
+                //data.loading = true;
+                //$scope.branches.push(data);
                 $scope.refSelected = data;
                 $scope.activeTab = 0;
             } else {
-                data.loading = true;
-                $scope.tags.push(data);
+                //data.loading = true;
+                //$scope.tags.push(data);
                 $scope.refSelected = data;
                 $scope.activeTab = 1;
             }
@@ -195,6 +208,7 @@ function($sce, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $t
                 var branchObj = {"name": $scope.workspace.name, "type": "Branch", 
                                 "description": $scope.workspace.description};
                 branchObj.parentRefId = $scope.createParentRefId;
+                branchObj.permission = $scope.workspace.permission;
                 promise = ProjectService.createRef( branchObj, projectOb.id );
             } else if ($scope.itemType === 'Tag') {
                 var tagObj = {"name": $scope.configuration.name, "type": "Tag",
