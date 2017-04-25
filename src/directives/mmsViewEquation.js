@@ -1,9 +1,9 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsViewEquation', ['$templateCache', '$compile', '$rootScope', mmsViewEquation]);
+.directive('mmsViewEquation', [mmsViewEquation]);
 
-function mmsViewEquation($templateCache, $compile, $rootScope) {
+function mmsViewEquation() {
 
     return {
         restrict: 'E',

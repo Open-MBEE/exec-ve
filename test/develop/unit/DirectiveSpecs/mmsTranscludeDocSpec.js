@@ -10,17 +10,15 @@ describe('mmsTranscludeDoc directive', function() {
         //CacheService = $injector.get('CacheService');
         scope = $rootScope.$new();
         var testElement = {
-            sysmlid: 'viewId',
+            sysmlId: 'viewId',
             name: 'blah',
             documentation: 'documentation and <mms-transclude-name mms-eid="viewId"></mms-transclude-name>',
-            specialization: {
-                type: 'Element'
-            }
+            type: 'Class'
         };
-        var cacheKey = UtilsService.makeElementKey(testElement.sysmlid, 'master', 'latest', false);
+        var cacheKey = UtilsService.makeElementKey(testElement.sysmlId, 'master', 'latest', false);
         CacheService.put(cacheKey, testElement);
         scope.view = testElement;
-        element = angular.element('<mms-transclude-doc data-mms-eid="{{view.sysmlid}}"></mms-transclude-doc>');
+        element = angular.element('<mms-transclude-doc data-mms-eid="{{view.sysmlId}}"></mms-transclude-doc>');
         $compile(element)(scope);
         scope.$digest();
     }));

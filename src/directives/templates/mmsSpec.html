@@ -1,202 +1,181 @@
-<div ng-if="mmsType=='element' && !noEdit && editing" class="editing">
+<div ng-if="!noEdit && editing" class="editing">
+
     <h1 class="prop"><input class="form-control" type="text" ng-model="edit.name"></input></h1>
 
     <h2 class="prop-title">LAST MODIFICATION</h2>
-    <h3 class="prop">{{element.modified | date:'M/d/yy h:mm a'}} by {{element.modifier}}</h3>
+    <h3 class="prop">{{element._modified | date:'M/d/yy h:mm a'}} by {{element._modifier}}</h3>
 
-    <div ng-if="edit.specialization.type === 'Property'">
+    <div ng-if="edit.type === 'Property' || edit.type === 'Port' || edit.type === 'Slot'">
         <h2 class="prop-title spec-view-value-heading">PROPERTY VALUE</h2>
         <div ng-if="!isRestrictedVal && !isEnumeration">
-          <div ng-if="editValues.length == 0">
+            <div ng-if="editValues.length == 0">
               <select ng-model="addValueType" ng-options="key for (key, value) in addValueTypes"></select>
               <button class="btn btn-sm" ng-click="addValue(addValueType)">Add</button>
-          </div>
-          <div ng-repeat="value in editValues" ng-switch on="value.type">
-              <div ng-switch-when="LiteralInteger"><input type="number" ng-model="value.integer"></input><a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a></div>
-              <div ng-switch-when="LiteralUnlimitedNatural"><input type="number" ng-model="value.naturalValue"></input> <a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a></div>
-              <div ng-switch-when="LiteralBoolean"><input type="checkbox" ng-model="value.boolean"></input> {{value.boolean}} <a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a></div>
-              <div ng-switch-when="LiteralReal"><input type="number" ng-model="value.double" step="any"></input><a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a></div>
+            </div>
+            <div ng-repeat="value in editValues" ng-switch on="value.type">
+              <div ng-switch-when="LiteralInteger"><input type="number" ng-model="value.value"></input><a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a></div>
+              <div ng-switch-when="LiteralUnlimitedNatural"><input type="number" ng-model="value.value"></input> <a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a></div>
+              <div ng-switch-when="LiteralBoolean"><input type="checkbox" ng-model="value.value"></input> {{value.value}} <a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a></div>
+              <div ng-switch-when="LiteralReal"><input type="number" ng-model="value.value" step="any"></input><a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a></div>
               <div ng-switch-when="LiteralString">
-                  <textarea ng-if="hasHtml(value.string)" mms-ckeditor mms-ws="{{mmsWs}}" mms-site="{{mmsSite}}" ng-model="value.string" mms-eid="{{element.sysmlid}}"></textarea>
-                  <div ng-if="!hasHtml(value.string)"><textarea ng-model="value.string"></textarea><a ng-click="addHtml(value)"><i class="fa fa-html5"></i></a></div>
+                  <textarea ng-if="hasHtml(value.value)" mms-ckeditor mms-ref-id="{{mmsRef}}" mms-project-id="{{mmsProject}}" ng-model="value.value" mms-eid="{{element.id}}"></textarea>
+                  <div ng-if="!hasHtml(value.value)"><textarea ng-model="value.value"></textarea><a ng-click="addHtml(value)"><i class="fa fa-html5"></i></a></div>
                   <a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a>
               </div>
               <div ng-switch-when="OpaqueExpression">
-                  <textarea ng-model="value.expressionBody[0]"></textarea><a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a>
+                  <textarea ng-model="value.body[0]"></textarea><a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a>
               </div>
               <div ng-switch-default>Editing not supported for now</div>
-          </div>
-          <div ng-if="editValues.length != 0 && isSlot">
+            </div>
+            <div ng-if="editValues.length != 0 && isSlot">
             <button class="btn btn-sm" ng-click="addValue(editValues[0].type)">Add</button>
-          </div>
+            </div>
         </div>
         <div ng-if="isRestrictedVal">
-            <select ng-model="editValues[0].operand[1].element" ng-options="el.sysmlid as el.name for el in options">
+            <select ng-model="editValues[0].operand[1].elementId" ng-options="el.id as el.name for el in options">
             </select>
         </div>
         <div ng-if="isEnumeration" ng-repeat="val in editValues">
-            <select ng-model="val.instance" ng-options="el.sysmlid as el.name for el in options">
+            <select ng-model="val.instanceId" ng-options="el.id as el.name for el in options">
             </select><a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a>
         </div>
         <div ng-if="isSlot && isEnumeration">
-          <button class="btn btn-sm" ng-click="addEnumerationValue()">Add</button>
+            <button class="btn btn-sm" ng-click="addEnumerationValue()">Add</button>
         </div>
     </div>
 
-    <div ng-if="edit.specialization.type === 'Constraint'">
+    <div ng-if="edit.type === 'Constraint'">
         <h2 class="prop-title spec-view-value-heading">CONSTRAINT SPECIFICATION</h2>
-        <div ng-switch on="editValue.type">
-            <div ng-switch-when="LiteralInteger"><input type="number" ng-model="editValue.integer"></input></div>
-            <div ng-switch-when="LiteralUnlimitedNatural"><input type="number" ng-model="editValue.naturalValue"></input></div>
-            <div ng-switch-when="LiteralBoolean"><input type="checkbox" ng-model="editValue.boolean"></input></div>
-            <div ng-switch-when="LiteralReal"><input type="number" ng-model="editValue.double" step="any"></input></div>
+        <div ng-switch on="editValues[0].type">
+            <div ng-switch-when="LiteralInteger"><input type="number" ng-model="editValues[0].value"/></div>
+            <div ng-switch-when="LiteralUnlimitedNatural"><input type="number" ng-model="editValues[0].value"/></div>
+            <div ng-switch-when="LiteralBoolean"><input type="checkbox" ng-model="editValues[0].value"/></div>
+            <div ng-switch-when="LiteralReal"><input type="number" ng-model="editValues[0].value" step="any"/></div>
             <div ng-switch-when="LiteralString">
-                <textarea ng-model="editValue.string"></textarea>
+                <textarea ng-model="editValues[0].value"></textarea>
             </div>
             <div ng-switch-when="OpaqueExpression">
-                <textarea ng-model="editValue.expressionBody[0]"></textarea>
+                <textarea ng-model="editValues[0].body[0]"></textarea>
             </div>
             <div ng-switch-default>Editing not supported for now</div>
         </div>
     </div>
 
     <h2 class="prop-title spec-view-doc-heading">DOCUMENTATION</h2>
-    <textarea ng-model="edit.documentation" mms-ckeditor mms-editor-api="editorApi" mms-ws="{{mmsWs}}" mms-site="{{mmsSite}}" mms-eid="{{element.sysmlid}}"></textarea>
+    <textarea ng-model="edit.documentation" mms-ckeditor mms-editor-api="editorApi" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}"></textarea>
 
     <div>
-        <h2 class="prop-title spec-view-type-heading">METATYPE</h2>
-        <h3 ng-repeat="type in element.appliedMetatypes" class="prop"><mms-transclude-name mms-eid="{{type}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}" no-click="true"></mms-transclude-name></h3>
+        <h2 class="prop-title">TYPE</h2>
+        <h3 class="prop">{{element.type}}</h3>
+        <h2 class="prop-title spec-view-type-heading">METATYPES</h2>
+        <h3 ng-repeat="type in element._appliedStereotypeIds" class="prop"><mms-transclude-name mms-element-id="{{type}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" no-click="true"></mms-transclude-name></h3>
         <h2 class="prop-title">LOCATION <i class="fa fa-folder"></i></h2>
-        <h3 class="prop">{{element.qualifiedName}}</h3>
+        <h3 class="prop">{{element._qualifiedName}}</h3>
         <h2 class="prop-title">ID</h2>
-        <h3 class="prop sysmlid">{{element.sysmlid}}</h3>
-        <h2 class="prop-title">WORKSPACE</h2>
-        <h3 class="prop">{{workspace.name}}</h3>
+        <h3 class="prop id">{{element.id}}</h3>
+        <h2 class="prop-title">BRANCH/TAG</h2>
+        <h3 class="prop">{{element._refId}}</h3>
+        <h2 class="prop-title">PROJECT</h2>
+        <h3 class="prop">{{element._projectId}}</h3>
+        <h2 class="prop-title">FORMATTED MODIFIED TIME</h2>
+        <h3 class="prop">{{element._modified}}</h3>
+        <h2 class="prop-title">COMMIT</h2>
+        <h3 class="prop">{{element._commitId}}</h3>
     </div>
 
 </div>
 
-<div ng-if="mmsType=='element'" ng-hide="editing" class="reading">
+<div ng-hide="editing" class="reading">
+    <hr/>
+    <p class="text-center" ng-show="gettingSpec"><i class="fa fa-3x fa-spin fa-spinner"></i></p>
+
+    <div ng-hide="gettingSpec">
     <h1 class="prop element-title">{{element.name}}</h1>
 
     <h2 class="prop-title">LAST MODIFICATION</h2>
-    <h3 class="prop">{{element.modified | date:'M/d/yy h:mm a'}} by {{element.modifier}}</h3>
+    <h3 class="prop">{{element._modified | date:'M/d/yy h:mm a'}} by {{element._modifier}}</h3>
 
-    <div ng-if="element.specialization.type === 'Property'">
+    <div ng-if="element.type === 'Property' || element.type === 'Port' || element.type === 'Slot'">
         <h2 class="prop-title spec-view-value-heading">PROPERTY VALUE</h2>
         <div ng-if="!isRestrictedVal">
         <div ng-repeat="value in values" ng-switch on="value.type">
-            <h3 class="prop" ng-switch-when="LiteralInteger">{{value.integer}}</h3>
-            <h3 class="prop" ng-switch-when="LiteralBoolean">{{value.boolean}}</h3>
-            <h3 class="prop" ng-switch-when="LiteralReal">{{value.double}}</h3>
-            <h3 class="prop" ng-switch-when="LiteralUnlimitedNatural">{{value.naturalValue}}</h3>
-            <h3 class="prop" ng-switch-when="LiteralString" ng-bind-html="value.string"></h3>
-            <h3 class="prop" ng-switch-when="ElementValue"><mms-transclude-name mms-watch-id="true" mms-eid="{{value.element}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></h3>
-            <h3 class="prop" ng-switch-when="InstanceValue"><mms-transclude-name mms-watch-id="true" mms-eid="{{value.instance}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></h3>
-            <h3 class="prop" ng-switch-when="OpaqueExpression">{{value.expressionBody[0]}}</h3>
+            <h3 class="prop" ng-switch-when="LiteralInteger">{{value.value}}</h3>
+            <h3 class="prop" ng-switch-when="LiteralBoolean">{{value.value}}</h3>
+            <h3 class="prop" ng-switch-when="LiteralReal">{{value.value}}</h3>
+            <h3 class="prop" ng-switch-when="LiteralUnlimitedNatural">{{value.value}}</h3>
+            <h3 class="prop" ng-switch-when="LiteralString" ng-bind-html="value.value"></h3>
+            <h3 class="prop" ng-switch-when="ElementValue"><mms-transclude-name mms-watch-id="true" mms-element-id="{{value.elementId}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}"></mms-transclude-name></h3>
+            <h3 class="prop" ng-switch-when="InstanceValue"><mms-transclude-name mms-watch-id="true" mms-element-id="{{value.instanceId}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}"></mms-transclude-name></h3>
+            <h3 class="prop" ng-switch-when="OpaqueExpression">{{value.body[0]}}</h3>
             <h3 class="prop" ng-switch-default>{{value}}</h3>
         </div>
         </div>
         <div ng-if="isRestrictedVal">
-            <h3 class="prop"><mms-transclude-name mms-watch-id="true" mms-eid="{{values[0].operand[1].element}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></h3>
-        </select>
-    </div>
-        <h2 class="prop-title spec-view-value-heading">PROPERTY TYPE</h2>
-        <h3 class="prop"><mms-transclude-name mms-watch-id="true" mms-eid="{{element.specialization.propertyType}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}" click-handler="propertyTypeClicked()"></mms-transclude-name></h3>
-    </div>
-
-    <div ng-if="element.specialization.type === 'Generalization' || element.specialization.type === 'Expose' || element.specialization.type === 'Dependency' || element.specialization.type === 'Conform'">
-        <h2 class="prop-title">SOURCE</h2>
-        <h3 class="prop"><mms-transclude-name mms-watch-id="true" mms-eid="{{element.specialization.source}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></h3>
-        <h2 class="prop-title">TARGET</h2>
-        <h3 class="prop"><mms-transclude-name mms-watch-id="true" mms-eid="{{element.specialization.target}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></h3>
-    </div>
-
-    <div ng-if="element.specialization.type === 'Connector'">
-        <h2 class="prop-title">PATH 1</h2>
-        <h3 class="prop" ng-repeat="path in element.specialization.sourcePath"><mms-transclude-name mms-watch-id="true" mms-eid="{{path}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></h3>
-        <h2 class="prop-title">PATH 2</h2>
-        <h3 class="prop" ng-repeat="path in element.specialization.targetPath"><mms-transclude-name mms-watch-id="true" mms-eid="{{path}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></h3>
-    </div>
-
-    <div ng-if="element.specialization.type === 'Association'">
-        <h2 class="prop-title">ROLE 1</h2>
-        <h3 class="prop"><mms-transclude-name mms-watch-id="true" mms-eid="{{element.specialization.source}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></h3>
-        <h2 class="prop-title">ROLE 2</h2>
-        <h3 class="prop"><mms-transclude-name mms-watch-id="true" mms-eid="{{element.specialization.target}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></h3>
-    </div>
-
-    <div ng-if="element.specialization.type === 'Constraint'">
-        <h2 class="prop-title">CONSTRAINT SPECIFICATION</h2>
-        <div ng-switch on="value.type">
-            <h3 class="prop" ng-switch-when="LiteralInteger">{{value.integer}}</h3>
-            <h3 class="prop" ng-switch-when="LiteralBoolean">{{value.boolean}}</h3>
-            <h3 class="prop" ng-switch-when="LiteralReal">{{value.double}}</h3>
-            <h3 class="prop" ng-switch-when="LiteralUnlimitedNatural">{{value.naturalValue}}</h3>
-            <h3 class="prop" ng-switch-when="LiteralString" ng-bind-html="value.string"></h3>
-            <h3 class="prop" ng-switch-when="ElementValue"><mms-transclude-name mms-watch-id="true" mms-eid="{{value.element}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></h3>
-            <h3 class="prop" ng-switch-when="OpaqueExpression">{{value.expressionBody[0]}}</h3>
-            <h3 class="prop" ng-switch-default>{{value}}</h3>
+            <h3 class="prop"><mms-transclude-name mms-watch-id="true" mms-eid="{{values[0].operand[1].elementId}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></h3>
         </div>
+        <h2 class="prop-title spec-view-value-heading">PROPERTY TYPE</h2>
+        <h3 class="prop"><mms-transclude-name mms-watch-id="true" mms-eid="{{element.typeId}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}" click-handler="propertyTypeClicked()"></mms-transclude-name></h3>
+    </div>
+
+    <div ng-if="element.type === 'Generalization' || element.type === 'Dependency'">
+        <h2 class="prop-title">SOURCE</h2>
+        <h3 class="prop"><mms-transclude-name mms-watch-id="true" mms-element-id="{{element._sourceIds[0]}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}"></mms-transclude-name></h3>
+        <h2 class="prop-title">TARGET</h2>
+        <h3 class="prop"><mms-transclude-name mms-watch-id="true" mms-element-id="{{element._targetIds[0]}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}"></mms-transclude-name></h3>
+    </div>
+
+    <div ng-if="element.type === 'Connector'">
+        <h2 class="prop-title">PATH 1</h2>
+        <h3 class="prop" ng-repeat="path in element._propertyPathIds[0]"><mms-transclude-name mms-watch-id="true" mms-element-id="{{path}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}"></mms-transclude-name></h3>
+        <h2 class="prop-title">PATH 2</h2>
+        <h3 class="prop" ng-repeat="path in element._propertyPathIds[1]"><mms-transclude-name mms-watch-id="true" mms-element-id="{{path}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}"></mms-transclude-name></h3>
+    </div>
+
+    <div ng-if="element.type === 'Association'">
+        <h2 class="prop-title">ROLE 1</h2>
+        <h3 class="prop"><mms-transclude-name mms-watch-id="true" mms-element-id="{{element.memberEndIds[0]}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}"></mms-transclude-name></h3>
+        <h2 class="prop-title">ROLE 2</h2>
+        <h3 class="prop"><mms-transclude-name mms-watch-id="true" mms-element-id="{{element.memberEndIds[1]}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}"></mms-transclude-name></h3>
+    </div>
+
+    <div ng-if="element.type === 'Constraint'">
+        <h2 class="prop-title">CONSTRAINT SPECIFICATION</h2>
+        <div ng-switch on="values[0].type">
+            <h3 class="prop" ng-switch-when="LiteralInteger">{{values[0].value}}</h3>
+            <h3 class="prop" ng-switch-when="LiteralBoolean">{{values[0].value}}</h3>
+            <h3 class="prop" ng-switch-when="LiteralReal">{{values[0].value}}</h3>
+            <h3 class="prop" ng-switch-when="LiteralUnlimitedNatural">{{values[0].value}}</h3>
+            <h3 class="prop" ng-switch-when="LiteralString" ng-bind-html="values[0].value"></h3>
+            <h3 class="prop" ng-switch-when="ElementValue"><mms-transclude-name mms-watch-id="true" mms-element-id="{{value.elementId}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}"></mms-transclude-name></h3>
+            <h3 class="prop" ng-switch-when="OpaqueExpression">{{values[0].body[0]}}</h3>
+            <h3 class="prop" ng-switch-default>{{values}}</h3>
+        </div>
+    </div>
+
+    <div ng-if="element.type === 'InstanceSpecification'">
+        <h2 class="prop-title">CLASSIFIERS</h2>
+        <h3 class="prop" ng-repeat="path in element.classifierIds"><mms-transclude-name mms-watch-id="true" mms-element-id="{{path}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}"></mms-transclude-name></h3>
     </div>
 
     <h2 class="prop-title spec-view-doc-heading">DOCUMENTATION <a ng-click="showDocHTML = !showDocHTML"><i class="fa fa-code"></i></a></h2>
     <p ng-show="!showDocHTML" ng-bind-html="element.documentation" class="doc-text"></p>
     <div ng-show="showDocHTML">{{element.documentation}}</div>
 
-    <h2 class="prop-title spec-view-type-heading">METATYPE</h2>
-    <h3 ng-repeat="type in element.appliedMetatypes" class="prop"><mms-transclude-name mms-eid="{{type}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}" no-click="true"></mms-transclude-name></h3>
+    <h2 class="prop-title">TYPE</h2>
+    <h3 class="prop">{{element.type}}</h3>
+    <h2 class="prop-title spec-view-type-heading">METATYPES</h2>
+    <h3 ng-repeat="type in element._appliedStereotypeIds" class="prop"><mms-transclude-name mms-element-id="{{type}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" no-click="true"></mms-transclude-name></h3>
     <h2 class="prop-title">LOCATION <i class="fa fa-folder"></i></h2>
-    <h3 class="prop">{{element.qualifiedName}}</h3>
+    <h3 class="prop">{{element._qualifiedName}}</h3>
     <h2 class="prop-title">ID</h2>
-    <h3 class="prop sysmlid">{{element.sysmlid}}</h3>
-    <h2 class="prop-title">WORKSPACE</h2>
-    <h3 class="prop">{{workspace.name}}</h3>
+    <h3 class="prop id">{{element.id}}</h3>
+    <h2 class="prop-title">BRANCH/TAG</h2>
+    <h3 class="prop">{{element._refId}}</h3>
+    <h2 class="prop-title">PROJECT</h2>
+    <h3 class="prop">{{element._projectId}}</h3>
     <h2 class="prop-title">FORMATTED MODIFIED TIME</h2>
-    <h3 class="prop">{{element.modified}}</h3>
-</div>
-
-<div ng-if="mmsType=='workspace'" ng-show="editing" class="editing">
-    <h1 class="prop"><input class="form-control" type="text" ng-model="edit.name"></input></h1>
-    <h2 class="prop-title">DESCRIPTION</h2>
-    <textarea mms-ckeditor mms-ws="{{mmsWs}}" ng-model="edit.description"></textarea>
-    <h2 class="prop-title">TASK AUTHOR</h2>
-    <h3 class="prop">{{element.creator}}</h3>
-    <h2 class="prop-title">DATE CREATED</h2>
-    <h3 class="prop">{{element.created | date:'M/d/yy h:mm a'}}</h3>
-    <h2 class="prop-title">PERMISSION</h2>
-    <h3 class="prop"><input ng-model="edit.permission" value="read" type="radio"> Read</input>
-                     <input ng-model="edit.permission" value="write" type="radio"> Write</input></h3>
-</div>
-
-<div ng-if="mmsType=='workspace'" ng-hide="editing" class="reading">
-    <h1 class="prop element-title">{{element.name}}</h1>
-    <h2 class="prop-title">DESCRIPTION</h2>
-    <p class="doc-text" ng-bind-html="element.description"></p>
-    <h2 class="prop-title">TASK AUTHOR</h2>
-    <h3 class="prop">{{element.creator}}</h3>
-    <h2 class="prop-title">DATE CREATED</h2>
-    <h3 class="prop">{{element.created | date:'M/d/yy h:mm a'}}</h3>
-    <h2 class="prop-title">PERMISSION</h2>
-    <h3 class="prop">{{element.permission}}</h3>
-</div>
-
-<div ng-if="mmsType=='tag'" ng-show="editing" class="editing">
-    <h1 class="prop"><input class="form-control" type="text" ng-model="edit.name"></input></h1>
-    <h2 class="prop-title">DESCRIPTION</h2>
-    <textarea mms-ckeditor mms-ws="{{mmsWs}}" ng-model="edit.description"></textarea>
-    <h2 class="prop-title">TIMESTAMP</h2>
-    <h3 class="prop">{{element.timestamp | date:'M/d/yy h:mm a'}}</h3>
-    <h2 class="prop-title">WORKSPACE</h2>
-    <h3 class="prop">{{workspace.name}}</h3>
-</div>
-
-<div ng-if="mmsType=='tag'" ng-hide="editing" class="reading">
-    <h1 class="prop element-title">{{element.name}}</h1>
-    <h2 class="prop-title">DESCRIPTION</h2>
-    <p class="doc-text" ng-bind-html="element.description"></p>
-    <h2 class="prop-title">TIMESTAMP</h2>
-    <h3 class="prop">{{element.timestamp | date:'M/d/yy h:mm a'}}</h3>
-    <h2 class="prop-title">WORKSPACE</h2>
-    <h3 class="prop">{{workspace.name}}</h3>
+    <h3 class="prop">{{element._modified}}</h3>
+    <h2 class="prop-title">COMMIT</h2>
+    <h3 class="prop">{{element._commitId}}</h3>
+    </div>
 </div>

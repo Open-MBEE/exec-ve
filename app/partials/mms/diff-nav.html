@@ -17,8 +17,8 @@
 
       <!-- Dashboard, Support, Feedback, and Logout buttons -->
       <!-- <ul class="nav-btns-main pull-right">
-        <li ng-show="site && site.sysmlid !== 'no-site'">
-          <a class="nav-btn" tooltip="Dashboard" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" href="/share/page/site/{{site.sysmlid}}/dashboard" target="_blank"><i class="fa fa-dashboard"></i></a>
+        <li ng-show="site && site.sysmlId !== 'no-site'">
+          <a class="nav-btn" tooltip="Dashboard" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom" href="/share/page/site/{{site.sysmlId}}/dashboard" target="_blank"><i class="fa fa-dashboard"></i></a>
         </li>
 
         <li>
@@ -36,8 +36,8 @@
       </ul> -->
 
       <ul class="nav-btns-flyover pull-right">
-        <li ng-show="site && site.sysmlid !== 'no-site' && ws" class="out-link">
-          <a ui-sref="workspace.site({site: site.sysmlid})">DocWeb</a>
+        <li ng-show="site && site.sysmlId !== 'no-site' && ws" class="out-link">
+          <a ui-sref="workspace.site({site: site.sysmlId})">DocWeb</a>
         </li>
         
         <li ng-show="ws" class="out-link">
@@ -48,8 +48,8 @@
           <a ui-sref="workspace({workspace:'master'})">Model Manager</a>
         </li>
 
-        <li ng-show="site && site.sysmlid !== 'no-site'" class="out-link">
-          <a href="/share/page/site/{{site.sysmlid}}/dashboard">Dashboard</a>
+        <li ng-show="site && site.sysmlId !== 'no-site'" class="out-link">
+          <a href="/share/page/site/{{site.sysmlId}}/dashboard">Dashboard</a>
         </li>
 
         <li class="out-link">

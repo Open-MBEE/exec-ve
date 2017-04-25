@@ -1,7 +1,7 @@
 <!-- Nested node template -->
 <script type="text/ng-template" id="nodes_renderer.html">
     <div ui-tree-handle>
-        {{node.old}} &rarr; {{node.new}}   {{node.name}} ({{node.aggr}})
+        {{node.old}} &rarr; {{node.new}} {{node.name}} ({{node.aggr}})
     </div>
     <ol ui-tree-nodes="" ng-model="node.children">
         <li ng-repeat="node in node.children" ui-tree-node ng-include="'nodes_renderer.html'">
@@ -10,10 +10,11 @@
 </script>
 
 <div class="container-tree-reorder container-fluid">
-
     <button class="btn-tree-reorder-save btn btn-primary" ng-click="save()">SAVE <i class="{{saveClass}}"></i></button>
     <button class="btn-tree-reorder-save btn btn-danger" ng-click="cancel()">CANCEL</button>
-    <div>Note: you cannot reorder views under a view that's labeled (NONE) - these views may have children but are not shown and is not part of this document</div>
+    <div>Note: you cannot reorder views under a view that's labeled (none) - these views may have children but are not
+        shown and is not part of this document
+    </div>
     <div class="tree-reorder" ui-tree="treeOptions">
         <ol ui-tree-nodes="" class="root" ng-model="tree">
             <li ng-repeat="node in tree" ui-tree-node ng-include="'nodes_renderer.html'"></li>

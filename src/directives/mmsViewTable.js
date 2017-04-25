@@ -1,13 +1,9 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsViewTable', ['$compile', '$timeout', '$document', '$templateCache', 'UtilsService', mmsViewTable]);
+.directive('mmsViewTable', ['$compile', '$timeout', '$document', 'UtilsService', mmsViewTable]);
 
-function mmsViewTable($compile, $timeout, $document, $templateCache, UtilsService) {
-    var template = $templateCache.get('mms/templates/mmsViewTable.html');
-    
-    var mmsViewTableCtrl = function ($scope, $rootScope) {
-    };
+function mmsViewTable($compile, $timeout, $document, UtilsService) {
 
     var mmsViewTableLink = function(scope, element, attrs) {
         if (!scope.table.showIfEmpty && scope.table.body.length === 0)
@@ -15,11 +11,11 @@ function mmsViewTable($compile, $timeout, $document, $templateCache, UtilsServic
         scope.searchTerm = '';
         scope.showFilter = false;
         var html = UtilsService.makeHtmlTable(scope.table);
-        html = '<div class="tableSearch">' +
-                '<button class="btn btn-sm btn-primary" ng-click="doClick()">Export CSV</button> ' +
-                '<button class="btn btn-sm btn-primary" ng-click="showFilter = !showFilter">Filter Table</button> ' +
+        html = '<div class="tableSearch ve-table-buttons">' +
+                '<button class="btn btn-sm export-csv-button btn-tertiary" ng-click="doClick()">Export CSV</button> ' +
+                '<button class="btn btn-sm filter-table-button btn-tertiary" ng-click="showFilter = !showFilter">Filter Table</button> ' +
                 '<span ng-show="showFilter"><span>Showing {{numFiltered}} of {{numTotal}} Rows </span>' + 
-                    '<form style="display: inline" ng-submit="search()"><input type="text" size="75" placeholder="regex filter" ng-model="searchTerm"></input></form>' +
+                    '<form style="display: inline" ng-submit="search()" class="ve-filter-table-form"><input type="text" size="75" placeholder="regex filter" ng-model="searchTerm"></input></form>' +
                 '<button class="btn btn-sm btn-primary" ng-click="search()">Apply</button>' + 
                 '<button class="btn btn-sm btn-danger" ng-click="resetSearch()">Reset</button></span></div>' + html;
 
@@ -98,31 +94,13 @@ function mmsViewTable($compile, $timeout, $document, $templateCache, UtilsServic
         };
 
         return;
-
-        /*scope.tableLimit = 20;
-
-        var addLimit = function() {
-            if (scope.tableLimit < scope.table.body.length) {
-                scope.tableLimit += 25;
-                $timeout(addLimit, 100);
-            }
-        };
-
-        element.append(template);
-        $timeout(function() {
-            $compile(element.contents())(scope);
-            addLimit();
-            }, 100);
-*/
     };
 
     return {
         restrict: 'E',
-        //template: template,
         scope: {
             table: '<mmsTable'
         },
-        controller: ['$scope', '$rootScope', mmsViewTableCtrl],
         link: mmsViewTableLink
     };
 }

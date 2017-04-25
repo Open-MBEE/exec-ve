@@ -1,27 +1,33 @@
 <div class="modal-header">
-  <h4>CREATE NEW VIEW</h4>
+    <h4>CREATE NEW VIEW</h4>
 </div>
 
 <div class="modal-body transclude-modal" ng-show="createForm">
-  <div class="comment-modal-input">
-    <div class="form-group">
-      <label>Name:</label>
-      <input class="form-control" ng-model="newView.name" type="text" placeholder="Type a name for your view here" autofocus></input>
+    <div class="comment-modal-input">
+        <div class="form-group">
+            <label>Name:</label>
+            <input class="form-control" ng-model="newView.name" type="text" placeholder="Type a name for your view here"
+                   autofocus></input>
+        </div>
     </div>
-  </div>
 </div>
 
 <div ng-show="!createForm">
     <div class="radio" style="text-align:center;">
-        <label><input type="radio" ng-model="newViewAggr.type" value="SHARED">SHARED - Add view and its children</label>
-        <label><input type="radio" ng-model="newViewAggr.type" value="NONE">NONE - Add view only</label>
+        <label><input type="radio" ng-model="newViewAggr.type" value="shared">SHARED - Add view and its children</label>
+        <label><input type="radio" ng-model="newViewAggr.type" value="none">NONE - Add view only</label>
     </div>
-    <mms-search mms-options="searchOptions"></mms-search>
+    <mms-search mms-options="searchOptions" mms-project-id="{{projectOb.id}}" mms-ref-id="{{refOb.id}}"></mms-search>
 </div>
 
 <div class="modal-footer">
-    <div><a ng-click="createForm = false" class="create-element-link pull-left" ng-show="createForm">Search for existing views</a></div>
+    <div>
+        <a ng-click="createForm = false" class="create-element-link pull-left" ng-show="createForm">
+            Search for existing views</a>
+    </div>
     <div class="pull-left" ng-show="!createForm"><a ng-click="createForm = true">Return to Create View</a></div>
-    <button class="btn btn-success" ng-show="createForm" ng-click="ok()">CREATE <i ng-show="oking" class="fa fa-spin fa-spinner"></i></button>
+    <button class="btn btn-success" ng-show="createForm" ng-click="ok()">CREATE
+        <i ng-show="oking" class="fa fa-spin fa-spinner"></i>
+    </button>
     <button class="btn btn-danger" ng-click="cancel()">CANCEL</button>
 </div>

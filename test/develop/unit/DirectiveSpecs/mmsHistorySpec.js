@@ -99,7 +99,7 @@ describe('mmsHistory', function () {
                 }
             );
 
-            var cacheKey = UtilsService.makeElementKey(someElement.elements[0].sysmlid, 'master', 'latest', false);
+            var cacheKey = UtilsService.makeElementKey(someElement.elements[0].sysmlId, 'master', 'latest', false);
             CacheService.put(cacheKey, someElement.elements[0]);
         });
     });

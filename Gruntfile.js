@@ -144,6 +144,10 @@ module.exports = function(grunt) {
       mmsapp: {
         src: ['app/js/mms/controllers/*.js'],
         dest: 'build/js/mms/controllers.js'
+      },
+      mmsappdir: {
+          src: ['app/js/mms/directives/*.js'],
+          dest: 'build/js/mms/directives.js'
       }
     },
 
@@ -202,6 +206,7 @@ module.exports = function(grunt) {
       beforeconcat: jsFiles,
       afterconcat: ['dist/mms.js', 'dist/mms.directives.js'],
       options: {
+        reporterOutput: '',
         evil: true, //allow eval for timely integration
         globalstrict: true,
         globals: {
@@ -266,7 +271,7 @@ module.exports = function(grunt) {
     artifactory: {
       options: {
         url: artifactory.url,
-        repository: 'libs-release-local',
+        repository: 'libs-snapshot-local',
         username: artifactory.username,
         password: artifactory.password
       },
@@ -277,7 +282,7 @@ module.exports = function(grunt) {
         options: {
           publish: [{
             id: 'gov.nasa.jpl:evm:zip',
-            version: '2.4.3',
+            version: '3.0-SNAPSHOT',
             path: 'deploy/'
           }]
         }

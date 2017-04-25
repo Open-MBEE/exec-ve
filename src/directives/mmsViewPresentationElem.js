@@ -8,7 +8,15 @@ angular.module('mms.directives')
  * @name mms.directives.directive:mmsViewPresentationElem
  *
  * @requires mms.ViewService
+ * @requires mms.ElementService
  * @requires $templateCache
+ * @requires $location
+ * @requires $timeout
+ * @requires $rootScope
+ * @requires $anchorScroll
+ * @requires growl
+ *
+ *
  * @restrict E
  *
  * @description
@@ -43,54 +51,50 @@ function mmsViewPresentationElem(ViewService, ElementService, $templateCache, $r
 
     var mmsViewPresentationElemLink = function(scope, element, attrs, mmsViewCtrl) {
         if (scope.mmsInstanceVal) {
-            if (!scope.mmsInstanceVal.instance) {
+            if (!scope.mmsInstanceVal.instanceId) {
                 element.html('<span class="mms-error">Reference is null</span>');
-                //growl.error("A presentation element reference is null.");
                 return;
             }
-            var ws = null;
-            var version = null;
+            var projectId = null;
+            var refId = null;
+            var commitId = null;
             if (mmsViewCtrl) {
-                var viewVersion = mmsViewCtrl.getWsAndVersion();
-                ws = viewVersion.workspace;
-                version = viewVersion.version;
+                var viewVersion = mmsViewCtrl.getElementOrigin();
+                projectId = viewVersion.projectId;
+                refId = viewVersion.refId;
+                commitId = viewVersion.commitId;
             }
             // Parse the element reference tree for the presentation element:
             element.addClass("isLoading");
-            ViewService.parseExprRefTree(scope.mmsInstanceVal, ws, version, 1)
-            .then(function(elem) {
-                scope.presentationElem = elem;
-                // This is a kludge to get the template switch statement to work
-                // for Sections:
-                if (ViewService.isSection(elem)) {
-                    scope.presentationElem.type = 'Section';
+            var reqOb = {elementId: scope.mmsInstanceVal.instanceId, projectId: projectId, refId: refId, commitId: commitId};
+            ElementService.getElement(reqOb, 1)
+            .then(function(instanceSpec) {
+                scope.presentationElem = ViewService.getPresentationElementSpec(instanceSpec);
+                scope.instanceSpec = instanceSpec;
+                scope.presentationElemLoading = false;
+                var hash = $location.hash();
+                if (hash === instanceSpec.id) {
+                    $timeout(function() {
+                        $anchorScroll();
+                    }, 1000, false);
                 }
-
-                ElementService.getElement(scope.mmsInstanceVal.instance, false, ws, version, 1).
-                then(function(instanceSpec) {
-                    scope.instanceSpec = instanceSpec;
-                    scope.presentationElemLoading = false;
-                    var hash = $location.hash();
-                    if (hash === instanceSpec.sysmlid) {
-                        $timeout(function() {
-                            $anchorScroll();
-                        }, 1000, false);
-                    }
-                    element.click(function(e) {
-                        if (mmsViewCtrl)
-                            mmsViewCtrl.transcludeClicked(instanceSpec.sysmlid, ws, version);
-                        e.stopPropagation();
-                    });
+                if (mmsViewCtrl) {
+                    mmsViewCtrl.elementTranscluded(instanceSpec);
+                }
+                element.click(function(e) {
+                    if (mmsViewCtrl)
+                        mmsViewCtrl.transcludeClicked(instanceSpec);
+                    e.stopPropagation();
                 });
             }, function(reason) {
                 if (reason.status === 500) {
-                    element.html('<span class="mms-error">View element reference error: ' + scope.mmsInstanceVal.instance + ' invalid specification</span>');
+                    element.html('<span class="mms-error">View element reference error: ' + scope.mmsInstanceVal.instanceId + ' invalid specification</span>');
                 } else {
                     var status = ' not found';
                     if (reason.status === 410)
                         status = ' deleted';
-                    element.html('<span class="mms-error">View element reference error: ' + scope.mmsInstanceVal.instance + ' ' + status + '</span>');
-                }//growl.error('View Element Ref Error: ' + scope.mmsInstanceVal.instance + ' ' + reason.message);
+                    element.html('<span class="mms-error">View element reference error: ' + scope.mmsInstanceVal.instanceId + ' ' + status + '</span>');
+                }
             }).finally(function() {
                 element.removeClass("isLoading");
             }); 

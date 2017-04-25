@@ -4,7 +4,7 @@
     }
 </style>
 <div class="modal-header">
-  <h4>{{action | uppercase}} {{type}}</h4>
+    <h4>{{action | uppercase}} {{type}}</h4>
 </div>
 
 <div class="modal-body">
@@ -34,8 +34,8 @@
     <div ng-if="model.genTotf">Use HTML for List of Tables and Figures (will not include equations and may differ from web numbering): <input type="checkbox" ng-model="model.htmlTotf"></div>
     <div ng-if="genpdf">Landscape: <input type="checkbox" ng-model="model.landscape"></div>
     <form ng-if="type == 'DOCUMENT' && genpdf" role="form">
-      <h6>Header and Footer</h6>
-      <div>Use 'counter(page)' for page number.</div>
+        <h6>Header and Footer</h6>
+        <div>Use 'counter(page)' for page number.</div>
         <div class="form-group">
             <div style="text-align:center;">Header:</div>
             <input type="text" ng-model="meta['top-left']" size="11" placeholder="Left">

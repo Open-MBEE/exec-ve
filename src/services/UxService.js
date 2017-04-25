@@ -106,11 +106,11 @@ function UxService($rootScope) {
       case "tree-add-view":
         return {id: button, icon: 'fa-plus', selected: true, active: true, permission: false, tooltip: 'Add View', 
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
-      case "tree-add-configuration":
+      case "tree-add-tag":
         return {id: button, icon: 'fa-tag', selected: true, active: true, permission: true, tooltip: 'Add Tag', 
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
-      case "tree-add-task":
-        return {id: button, icon: 'fa-plus', selected: true, active: true, permission: true, tooltip: 'Add Task', 
+      case "tree-add-branch":
+        return {id: button, icon: 'fa-plus', selected: true, active: true, permission: true, tooltip: 'Add Branch',
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
       case "tree-delete":
         return {id: button, icon: 'fa-trash', selected: true, active: true, permission: true, tooltip: 'Delete', 
@@ -271,7 +271,7 @@ function UxService($rootScope) {
     }
   };
 
-  var MetaTypes = ['configuration', 'connector', 'dependency', 'directedrelationship', 'element', 'property', 'generalization', 'package', 'section', 'site', 'snapshot', 'view', 'workspace', 'table', 'figure', 'equation', 'view-composite', 'view-shared', 'view-none' ];
+  var MetaTypes = ['tag', 'connector', 'dependency', 'directedrelationship', 'element', 'property', 'generalization', 'package', 'section', 'group', 'snapshot', 'view', 'branch', 'table', 'figure', 'equation', 'view-composite', 'view-shared', 'view-none' ];
 
   var getTreeTypes = function() {
     var treeTypes = {};
@@ -289,7 +289,7 @@ function UxService($rootScope) {
       t = "unknown";
     t = t.toLowerCase();
     switch (t) {
-      case "configuration":
+      case "tag":
         return "fa-tag";
       case "connector":
         return "fa-expand";
@@ -307,7 +307,7 @@ function UxService($rootScope) {
         return "fa-folder";
       case "section":
         return "fa-square-o";//"fa-file-o";
-      case "site":
+      case "group":
         return "fa-folder";
       case "snapshot":
         return "fa-camera";
@@ -319,7 +319,7 @@ function UxService($rootScope) {
         return "fa-file-o";
       case "view-none":
         return "fa-file-o";
-      case "workspace":
+      case "branch":
         return "fa-tasks";
       case "table":
         return "fa-table";

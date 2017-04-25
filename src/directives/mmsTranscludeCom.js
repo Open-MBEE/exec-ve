@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsTranscludeCom', ['Utils', 'ElementService', 'UtilsService', 'ViewService', 'UxService', '$log', '$templateCache', '$compile', 'growl', 'MathJax', mmsTranscludeCom]);
+.directive('mmsTranscludeCom', ['Utils', 'ElementService', 'UtilsService', 'ViewService', 'UxService', '$templateCache', '$compile', 'growl', 'MathJax', mmsTranscludeCom]);
 
 /**
  * @ngdoc directive
@@ -9,7 +9,13 @@ angular.module('mms.directives')
  *
  * @requires mms.ElementService
  * @requires mms.UtilsService
+ * @requires mms.ViewService
+ * @requires mms.UxService
+ * @requires mms.Utils
  * @requires $compile
+ * @requires $templateCache
+ * @requires growl
+ * @requires MathJax
  *
  * @restrict E
  *
@@ -19,11 +25,12 @@ angular.module('mms.directives')
  * and on click. Nested transclusions inside the documentation will also be registered.
  * (This is different from mmsTranscludeDoc because of special styles applied to comments)
  *
- * @param {string} mmsEid The id of the element whose doc to transclude
- * @param {string=master} mmsWs Workspace to use, defaults to master
- * @param {string=latest} mmsVersion Version can be alfresco version number or timestamp, default is latest
+ * @param {string} mmsElementId The id of the view
+ * @param {string} mmsProjectId The project id for the view
+ * @param {string=master} mmsRefId Reference to use, defaults to master
+ * @param {string=latest} mmsCommitId Commit ID, default is latest
  */
-function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxService, $log, $templateCache, $compile, growl, MathJax) {
+function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxService, $templateCache, $compile, growl, MathJax) {
 
     var template = $templateCache.get('mms/templates/mmsTranscludeDoc.html');
     
@@ -46,94 +53,88 @@ function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxSe
         };
     };
 
-    var mmsTranscludeComLink = function(scope, element, attrs, controllers) {
+    var mmsTranscludeComLink = function(scope, domElement, attrs, controllers) {
         var mmsViewCtrl = controllers[0];
         var mmsViewPresentationElemCtrl = controllers[1];
         scope.recompileScope = null;
         var processed = false;
         scope.cfType = 'doc';
 
-        element.click(function(e) {
-            if (scope.addFrame && !scope.nonEditable)
-                scope.addFrame();
+        domElement.click(function(e) {
+            if (scope.startEdit && !scope.nonEditable)
+                scope.startEdit();
 
             if (mmsViewCtrl)
-                mmsViewCtrl.transcludeClicked(scope.mmsEid, scope.ws, scope.version);
+                mmsViewCtrl.transcludeClicked(scope.element);
             if (scope.nonEditable) {
                 growl.warning("Cross Reference is not editable.");
             }
-
-            //if (e.target.tagName !== 'A')
-              //  return false;
-              e.stopPropagation();
+            e.stopPropagation();
         });
 
-        var recompile = function() {
-            if (scope.recompileScope)
+        var recompile = function(preview) {
+            if (scope.recompileScope) {
                 scope.recompileScope.$destroy();
+            }
             scope.isEditing = false;
-            element.empty();
-            var doc = scope.element.documentation || '(No comment)';
-            doc += ' - ' + scope.element.creator;
-            element[0].innerHTML = doc;
-            MathJax.Hub.Queue(["Typeset", MathJax.Hub, element[0]]);
+            domElement.empty();
+            var doc = (preview ? scope.edit.documentation : scope.element.documentation) || '(No comment)';
+            doc += ' - ' + scope.element._creator;
+            if (preview) {
+                domElement[0].innerHTML = '<div class="panel panel-info">'+doc+'</div>';
+            } else {
+                domElement[0].innerHTML = doc;
+            }
+            MathJax.Hub.Queue(["Typeset", MathJax.Hub, domElement[0]]);
             scope.recompileScope = scope.$new();
-            $compile(element.contents())(scope.recompileScope); 
+            $compile(domElement.contents())(scope.recompileScope); 
             if (mmsViewCtrl) {
                 mmsViewCtrl.elementTranscluded(scope.element, 'Comment');
             }
         };
 
-        var recompileEdit = function() {
-            if (scope.recompileScope)
-                scope.recompileScope.$destroy();
-            element.empty();
-            var doc = scope.edit.documentation;
-            if (!doc)
-                doc = '<p class="no-print" ng-class="{placeholder: version!=\'latest\'}">(No Comment)</p>';
-            element[0].innerHTML = '<div class="panel panel-info">'+doc+'</div>';
-            scope.recompileScope = scope.$new();
-            $compile(element.contents())(scope.recompileScope); 
-        };
-
-        var idwatch = scope.$watch('mmsEid', function(newVal, oldVal) {
+        var idwatch = scope.$watch('mmsElementId', function(newVal, oldVal) {
             if (!newVal)
                 return;
             idwatch();
-            if (UtilsService.hasCircularReference(scope, scope.mmsEid, 'doc')) {
-                //$log.log("prevent circular dereference!");
-                element.html('<span class="mms-error">Circular Reference!</span>');
+            if (UtilsService.hasCircularReference(scope, scope.mmsElementId, 'doc')) {
+                domElement.html('<span class="mms-error">Circular Reference!</span>');
                 return;
             }
-            var ws = scope.mmsWs;
-            var version = scope.mmsVersion;
+            var projectId = scope.mmsProjectId;
+            var refId = scope.mmsRefId;
+            var commitId = scope.mmsCommitId;
             if (mmsViewCtrl) {
-                var viewVersion = mmsViewCtrl.getWsAndVersion();
-                if (!ws)
-                    ws = viewVersion.workspace;
-                if (!version)
-                    version = viewVersion.version;
+                var viewVersion = mmsViewCtrl.getElementOrigin();
+                if (!projectId)
+                    projectId = viewVersion.projectId;
+                if (!refId)
+                    refId = viewVersion.refId;
+                if (!commitId)
+                    commitId = viewVersion.commitId;
             }
-            scope.ws = ws;
-            scope.version = version ? version : 'latest';
-            ElementService.getElement(scope.mmsEid, false, ws, version, 1)
+            scope.projectId = projectId;
+            scope.refId = refId ? refId : 'master';
+            scope.commitId = commitId ? commitId : 'latest';
+            var reqOb = {elementId: scope.mmsElementId, projectId: scope.projectId, refId: scope.refId, commitId: scope.commitId};
+            ElementService.getElement(reqOb, 1, false)
             .then(function(data) {
                 scope.element = data;
                 recompile();
                 scope.panelType = "Comment";
-                if (scope.version === 'latest') {
-                    scope.$on('element.updated', function(event, eid, ws, type, continueEdit) {
-                        if (eid === scope.mmsEid && ws === scope.ws && (type === 'all' || type === 'documentation') && !continueEdit)
+                if (scope.commitId === 'latest') {
+                    scope.$on('element.updated', function (event, elementOb, continueEdit) {
+                        if (elementOb.id === scope.element.id && elementOb._projectId === scope.element._projectId &&
+                            elementOb._refId === scope.element._refId && !continueEdit) {
                             recompile();
+                        }
                     });
                 }
-                //scope.$watch('element.documentation', recompile);
             }, function(reason) {
                 var status = ' not found';
                 if (reason.status === 410)
                     status = ' deleted';
-                element.html('<span class="mms-error">comment ' + newVal + status + '</span>');
-                //growl.error('Cf Comment Error: ' + reason.message + ': ' + scope.mmsEid);
+                domElement.html('<span class="mms-error">comment ' + newVal + status + '</span>');
             });
         });
 
@@ -142,37 +143,27 @@ function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxSe
             scope.isEditing = false;
             scope.elementSaving = false;
             scope.view = mmsViewCtrl.getView();
-            scope.isDirectChildOfPresentationElement = Utils.isDirectChildOfPresentationElementFunc(element, mmsViewCtrl);
+            scope.isDirectChildOfPresentationElement = Utils.isDirectChildOfPresentationElementFunc(domElement, mmsViewCtrl);
             var type = "documentation";
 
-            var callback = function() {
-                Utils.showEditCallBack(scope,mmsViewCtrl,element,template,recompile,recompileEdit,type);
-            };
-
-            mmsViewCtrl.registerPresenElemCallBack(callback);
-
-            scope.$on('$destroy', function() {
-                mmsViewCtrl.unRegisterPresenElemCallBack(callback);
-            });
-
             scope.save = function() {
-                Utils.saveAction(scope,recompile,scope.bbApi,null,type,element);
+                Utils.saveAction(scope, domElement, false);
             };
 
             scope.saveC = function() {
-                Utils.saveAction(scope,recompile,scope.bbApi,null,type,element,true);
+                Utils.saveAction(scope, domElement, true);
             };
 
             scope.cancel = function() {
-                Utils.cancelAction(scope,recompile,scope.bbApi,type,element);
+                Utils.cancelAction(scope, recompile, domElement);
             };
 
-            scope.addFrame = function() {
-                Utils.addFrame(scope,mmsViewCtrl,element,template);
+            scope.startEdit = function() {
+                Utils.startEdit(scope, mmsViewCtrl, domElement, template, false);
             };
 
             scope.preview = function() {
-                Utils.previewAction(scope, recompileEdit, recompile, type,element);
+                Utils.previewAction(scope, recompile, domElement);
             };
         } 
 
@@ -188,7 +179,7 @@ function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxSe
             var auto = [ViewService.TYPE_TO_CLASSIFIER_ID.Image, ViewService.TYPE_TO_CLASSIFIER_ID.Paragraph,
                 ViewService.TYPE_TO_CLASSIFIER_ID.List, ViewService.TYPE_TO_CLASSIFIER_ID.Table];
 
-            if (auto.indexOf(scope.instanceSpec.specialization.classifier[0]) >= 0)
+            if (auto.indexOf(scope.instanceSpec.classifierIds[0]) >= 0)
             //do not allow model generated to be deleted
                 scope.isDirectChildOfPresentationElement = false;
             if (scope.isDirectChildOfPresentationElement)
@@ -200,9 +191,10 @@ function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxSe
     return {
         restrict: 'E',
         scope: {
-            mmsEid: '@',
-            mmsWs: '@',
-            mmsVersion: '@',
+            mmsElementId: '@mmsEid',
+            mmsProjectId: '@',
+            mmsRefId: '@',
+            mmsCommitId: '@',
             nonEditable: '<'
         },
         require: ['?^mmsView', '?^mmsViewPresentationElem'],

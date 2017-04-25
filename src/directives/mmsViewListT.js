@@ -1,9 +1,9 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsViewListT', ['$templateCache', '$compile', '$rootScope', mmsViewListT]);
+.directive('mmsViewListT', [mmsViewListT]);
 
-function mmsViewListT($templateCache, $compile, $rootScope) {
+function mmsViewListT() {
 
     return {
         restrict: 'E',

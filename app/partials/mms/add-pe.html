@@ -8,13 +8,13 @@
   <div class="comment-modal-input">
     <div class="form-group">
       <label>Name:</label>
-      <input class="form-control" ng-model="newItem.name" type="text" placeholder="Type a name for your {{presentationElemType}} here" autofocus></input>
+      <input class="form-control" ng-model="newPe.name" type="text" placeholder="Type a name for your {{presentationElemType}} here" autofocus></input>
     </div>
   </div>
 </div>
 
 <div ng-show="!createForm">
-    <mms-search mms-options="searchOptions"></mms-search>
+    <mms-search mms-options="searchOptions" mms-project-id="{{viewOrSectionOb._projectId}}" mms-ref-id="{{viewOrSectionOb._refId}}"></mms-search>
 </div>
 
 <div class="modal-footer">

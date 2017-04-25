@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsHistory', ['Utils','ElementService', 'WorkspaceService', '$compile', '$templateCache', '$uibModal', '$q', '_', mmsHistory]);
+.directive('mmsHistory', ['Utils','ElementService', '$templateCache', '$q', '_', mmsHistory]);
 
 /**
  * @ngdoc directive
@@ -24,18 +24,19 @@ angular.module('mms.directives')
     <mms-history mms-eid="element_id" mms-version="2014-07-01T08:57:36.915-0700"></mms-history>
     </pre>
  *
- * @param {string} mmsEid The id of the element
- * @param {string=master} mmsWs Workspace to use, defaults to master
- * @param {string=latest} mmsVersion Version can be alfresco version number or timestamp, default is latest
+ * @param {string} mmsElementId The id of the view
+ * @param {string} mmsProjectId The project id for the view
+ * @param {string=master} mmsRefId Reference to use, defaults to master
  */
-function mmsHistory(Utils, ElementService, WorkspaceService, $compile, $templateCache, $uibModal, $q, _) {
+function mmsHistory(Utils, ElementService, $templateCache, $q, _) {
     var template = $templateCache.get('mms/templates/mmsHistory.html');
 
     var mmsHistoryLink = function(scope, element, attrs) {
         var ran = false;
         var lastid = null;
-        scope.selects = {timestampSelected: null};
+        scope.selects = {commitSelected: null};
         scope.historyVer = 'latest';
+
         /**
          * @ngdoc function
          * @name mms.directives.directive:mmsHistory#changeElement
@@ -43,7 +44,6 @@ function mmsHistory(Utils, ElementService, WorkspaceService, $compile, $template
          *
          * @description
          * Change scope history when another element is selected
-         *
          */
         var changeElement = function(newVal, oldVal) {
             if (!newVal || (newVal == oldVal && ran))
@@ -51,39 +51,38 @@ function mmsHistory(Utils, ElementService, WorkspaceService, $compile, $template
             ran = true;
             lastid = newVal;
             scope.gettingHistory = true;
-            ElementService.getElementVersions(scope.mmsEid, false, scope.mmsWs)
+            var reqOb = {elementId: scope.mmsElementId, projectId: scope.mmsProjectId, refId: scope.mmsRefId};
+            ElementService.getElementHistory(reqOb, 2)
             .then(function(data) {
                 if (newVal !== lastid) 
                     return;
                 scope.history = data;
                 scope.historyVer = 'latest';
-                scope.selects.timestampSelected = null;
+                scope.selects.commitSelected = null;
             }).finally(function() {
                 scope.gettingHistory = false;
             });
         };
-        scope.timestampClicked = function() {
-            var time = scope.selects.timestampSelected;
-            console.log('value changed, new value is: ' + time);
-            if (!time) {
+        scope.commitClicked = function() {
+            var commit = scope.selects.commitSelected;
+            if (!commit) {
                 scope.historyVer = 'latest';
                 return;
             }
-            var hack = time.substring(0, 20) + '999' + time.substring(23);
-            scope.historyVer = hack;
+            scope.historyVer = commit;
         };
         scope.changeElement = changeElement;
-        scope.$watch('mmsEid', changeElement);
-        scope.$watch('mmsWs', changeElement);
+        scope.$watch('mmsElementId', changeElement);
+        scope.$watch('mmsRefId', changeElement);
     };
 
     return {
         restrict: 'E',
         template: template,
         scope: {
-            mmsEid: '@',
-            mmsWs: '@',
-            mmsType: '@'
+            mmsElementId: '@',
+            mmsProjectId: '@',
+            mmsRefId: '@'
         },
         link: mmsHistoryLink
     };

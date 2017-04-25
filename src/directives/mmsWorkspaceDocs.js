@@ -23,7 +23,6 @@ function mmsWorkspaceDocs(ElementService, SiteService, ViewService, growl, $q, $
         var docs = [];
         //scope.docs = docs;
         var docsKey = {};
-        var filtered = {};
         var ws = scope.mmsWs;
         var version = scope.mmsVersion;
         if (mmsViewCtrl) {
@@ -36,43 +35,28 @@ function mmsWorkspaceDocs(ElementService, SiteService, ViewService, growl, $q, $
         scope.version = version ? version : 'latest';
         scope.ws = ws ? ws : 'master';
 
-        var deferred = $q.defer();
-        var filterPromises = [deferred.promise];
-        var gotfilter = false;
+        var filterPromises = [];
         SiteService.getSites(version)
         .then(function(sites) {
             sites.forEach(function(site) {
                 var siteDeferred = $q.defer();
                 filterPromises.push(siteDeferred.promise);
-                ViewService.getSiteDocuments(site.sysmlid, false, ws, version, 1)
+                ViewService.getSiteDocuments(site.id, false, ws, version, 1)
                 .then(function(sitedocs) {
-                    ElementService.getElement("master_filter", false, ws, version, 2)
-                    .then(function(filter) {
-                        if (gotfilter)
-                            return;
-                        filtered = JSON.parse(filter.documentation);
-                        gotfilter = true;
-                    }, function(reason) {
-                    }).finally(function() {
-                        sitedocs.forEach(function(doc) {
-                            if (!filtered[doc.sysmlid]) {
-                                if (!docsKey[doc.sysmlid]) {
-                                    docsKey[doc.sysmlid] = doc;
-                                    docs.push(doc);
-                                }
-                            }
-                        });
-                        siteDeferred.resolve('ok');
+                    sitedocs.forEach(function(doc) {
+                        if (!docsKey[doc.id]) {
+                            docsKey[doc.id] = doc;
+                            docs.push(doc);
+                        }
                     });
+                    siteDeferred.resolve('ok');
                 }, function(reason) {
                     siteDeferred.resolve('ok');
                 });
             });
-            
         }, function(reason) {
 
         }).finally(function() {
-            deferred.resolve('ok');
             $q.all(filterPromises).then(function(data) {
                 scope.docs = docs;
             }, function(bad) {
