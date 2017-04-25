@@ -14,36 +14,46 @@ angular.module('mms.directives')
  * @description
  * Given an element id, generates a hyperlink with a cross-reference value
  *
- * @param {string} mmsEid The id of the element
- * @param {string=master} mmsWs Workspace to use, defaults to master
- * @param {string=latest} mmsVersion Version can be alfresco version number or timestamp, default is latest
+ * @param {string} mmsElementId The id of the view
+ * @param {string} mmsProjectId The project id for the view
+ * @param {string=master} mmsRefId Reference to use, defaults to master
+ * @param {string=latest} mmsCommitId Commit ID, default is latest
  * @param {string} mmsErrorText Text to display when element is not found
  * @param {string} mmsLinkText Text to display for hyperlink
  */
 function mmsValueLink(ElementService, $compile, growl) {
 
     var mmsValueLinkLink = function(scope, element, attrs, mmsViewCtrl) {
-        var ws = scope.mmsWs;
-        var version = scope.mmsVersion;
+        var projectId = scope.mmsProjectId;
+        var refId = scope.mmsRefId;
+        var commitId = scope.mmsCommitId;
         if (mmsViewCtrl) {
-            var viewVersion = mmsViewCtrl.getWsAndVersion();
-            if (!ws)
-                ws = viewVersion.workspace;
-            if (!version)
-                version = viewVersion.version;
+            var viewVersion = mmsViewCtrl.getElementOrigin();
+            if (!projectId)
+                projectId = viewVersion.projectId;
+            if (!refId)
+                refId = viewVersion.refId;
+            if (!commitId)
+                commitId = viewVersion.commitId;
         }
-        if (!ws)
-            ws = 'master';
-        if (!version)
-            version = 'latest';
-        scope.ws = ws;
+        scope.projectId = projectId;
+        scope.refId = refId ? refId : 'master';
+        scope.commitId = commitId ? commitId : 'latest';
+        var reqOb = {elementId: scope.mmsElementId, projectId: scope.projectId, refId: scope.refId, commitId: scope.commitId};
 
-        ElementService.getElement(scope.mmsEid, false, ws, version)
+        ElementService.getElement(reqOb)
         .then(function(data) {
-            if (data.specialization && data.specialization.type === 'Property') {
-                var value = data.specialization.value;
-                if (angular.isArray(value) && value.length !== 0 && value[0].string && value[0].string.length !== 0) {
-                    scope.url = value[0].string;
+            if (data.type === 'Property') {
+                var value = data.defaultValue;
+                if (value && value.type === 'LiteralString')
+                    scope.url = value.value;
+            } else if (data.type === 'Slot') {
+                if (angular.isArray(data.value) && data.value.length > 0 && data.value[0].type === 'LiteralString') {
+                    scope.url = data.value[0].value;
+                }
+            } else {
+                if (scope.mmsErrorText){
+                    element.html('<span class="mms-error">'+ scope.mmsErrorText +'</span>');
                 } else {
                     if (scope.mmsErrorText){
                         element.html('<span>'+ scope.mmsErrorText +'</span>');
@@ -60,9 +70,10 @@ function mmsValueLink(ElementService, $compile, growl) {
     return {
         restrict: 'E',
         scope: {
-            mmsWs: '@',
-            mmsVersion: '@',
-            mmsEid: '@',
+            mmsElementId: '@',
+            mmsProjectId: '@',
+            mmsRefId: '@',
+            mmsCommitId: '@',
             mmsErrorText: '@',
             mmsLinkText: '@',
         },

@@ -24,15 +24,23 @@
                 <input class="form-control" type="text" ng-model="filterQuery.query" ng-model-options="{debounce: 1000}" placeholder="Filter results" />
             </div>
             <div class="container-search-type">
-	            <div class="btn-group btn-group-xs search-filter-type">
-	                <button ng-click="setFilterFacet('all')" type="button" class="btn-filter-facet-all btn-search-type btn btn-default active">ALL</button>
-	                <button ng-click="setFilterFacet('name')" type="button" class="btn-filter-facet-name btn-search-type btn btn-default">NAME</button>
-	                <button ng-click="setFilterFacet('documentation')" type="button" class="btn-filter-facet-documentation btn btn-search-type btn-default">DOCUMENTATION</button>
-	                <!-- <button ng-click="setFilterFacet('properties')" type="button" class="btn-filter-facet-value btn-search-type btn btn-default">VALUE</button> -->
-	                <button ng-click="setFilterFacet('sysmlid')" type="button" class="btn-filter-facet-sysmlid btn-search-type btn btn-default">MDID</button>
-	            </div>
+                <div class="btn-group btn-group-xs search-filter-type">
+                    <button ng-click="setFilterFacet('all')" type="button"
+                            class="btn-filter-facet-all btn-search-type btn btn-default active">ALL
+                    </button>
+                    <button ng-click="setFilterFacet('name')" type="button"
+                            class="btn-filter-facet-name btn-search-type btn btn-default">NAME
+                    </button>
+                    <button ng-click="setFilterFacet('documentation')" type="button"
+                            class="btn-filter-facet-documentation btn btn-search-type btn-default">DOCUMENTATION
+                    </button>
+                    <!-- <button ng-click="setFilterFacet('properties')" type="button" class="btn-filter-facet-value btn-search-type btn btn-default">VALUE</button> -->
+                    <button ng-click="setFilterFacet('id')" type="button"
+                            class="btn-filter-facet-id btn-search-type btn btn-default">MDID
+                    </button>
+                </div>
             </div>
-            <div>Showing {{filteredElms.length}} <!--of {{searchResults.length}} -->search results. (Page {{currentPage + 1}}) <span class="mms-error" ng-if="ws !== 'master'">WARNING: Results shown are from master branch.</span></div>
+            <div>Showing {{filteredElms.length}} <!--of {{searchResults.length}} -->search results. (Page {{currentPage + 1}})</div>
         </div>
     </div>
     <div class="container-fluid">
@@ -44,11 +52,15 @@
             <hr>
             <div class="elem-name-wrapper">
                 <a class="elem-name" ng-click="userResultClick(elem, 'name')">{{elem.name}}</a>
-                <a class="elem-name" ng-show="elem.specialization.isSlot" ng-click="userResultClick(elem, 'name')"><mms-transclude-name mms-eid="{{elem.specialization.propertyType}}"></mms-transclude-name></a>
+                <a class="elem-name" ng-show="elem.type == 'Slot'" ng-click="userResultClick(elem, 'name')"><mms-transclude-name mms-eid="{{elem.definingFeatureId}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}"></mms-transclude-name></a>
+            </div>
+            <div class="elem-type-wrapper">
+                <label>LAST MODIFIED</label>
+                <div>{{elem._modified | date:'M/d/yy h:mm a'}} by {{elem._modifier}}</div>
             </div>
             <div class="elem-qualified-name-wrapper">
                 <div class="elem-qualified-name">
-                        {{elem.qualifiedName}}
+                        {{elem._qualifiedName}}
                 </div>
             </div>
             <div class="elem-documentation-wrapper">
@@ -61,53 +73,63 @@
                 </div>
             </div>
             <div class="elem-type-wrapper">
-                <label>METATYPE</label>
-                <div ng-repeat="type in elem.appliedMetatypes" class="elem-type">
-                    <mms-transclude-name mms-eid="{{type}}" no-click="true"></mms-transclude-name>
+                <label>TYPE</label>
+                <div>{{elem.type}}</div>
+            </div>
+            <div class="elem-type-wrapper">
+                <label>STEREOTYPES</label>
+                <div ng-repeat="type in elem._appliedStereotypeIds" class="elem-type">
+                    <mms-transclude-name mms-eid="{{type}}" no-click="true" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}"></mms-transclude-name>
                 </div>
             </div>
-            <div ng-if="elem.specialization.type === 'Property' && elem.specialization.value[0]">
+            <div ng-if="(elem.type === 'Property' || elem.type === 'Port') && elem.defaultValue">
                 <label>VALUE</label>
                 <div class="elem-properties">
                     <a ng-click="userResultClick(elem, 'val')">
-                        <span ng-repeat="val in elem.specialization.value">
-                            {{val.string || val.boolean + '' || val.naturalValue || val.integer || val.double || val.expressionBody[0] || 'Default Value'}}<span class="ellipses">{{(val.expressionBody[0] && val.expressionBody.length > 1) ? ' ...' : '' }}</span>{{$last ? '' : ', '}}
+                            {{elem.defaultValue.value + '' || elem.defaultValue.body[0] || 'Default Value'}}<span class="ellipses">{{(elem.defaultValue.body[0] && elem.defaultValue.body.length > 1) ? ' ...' : '' }}</span>
+                    </a>
+                </div>
+            </div>
+            <div ng-if="elem.type === 'Slot' && elem.value">
+                <label>VALUE</label>
+                <div class="elem-properties">
+                    <a ng-click="userResultClick(elem, 'val')">
+                        <span ng-repeat="val in elem.value">
+                            {{val.value + '' || val.body[0] || 'Default Value'}}<span class="ellipses">{{(val.body[0] && val.body.length > 1) ? ' ...' : '' }}</span>{{$last ? '' : ', '}}
                         </span>
                     </a>
                 </div>
             </div>
-            <div ng-if="elem.specialization.type === 'Constraint'">
+            <div ng-if="elem.type === 'Constraint'">
                 <label>SPECIFICATION</label>
                 <div class="elem-specification">
                     <a ng-click="userResultClick(elem, 'val')">
-                        {{elem.specialization.specification.string || elem.specialization.specification.boolean ||
-                          elem.specialization.specification.naturalValue || elem.specialization.specification.integer ||
-                          elem.specialization.specification.double || 'Constraint Specification'}}
+                        {{elem.specification.value + '' || 'Constraint Specification'}}
                     </a>
                 </div>
                 <a ng-click="userResultClick(elem, 'val')">
-                    <div ng-repeat="str in elem.specialization.specification.expressionBody">
+                    <div ng-repeat="str in elem.specification.body">
                         <div class="elem-specification">{{str}}</div>
                     </div>
                 </a>
             </div>
-            <div ng-if="elem.properties[0]" class="elem-properties-wrapper">
+            <div ng-if="elem._properties[0]" class="elem-properties-wrapper">
                 <label>PROPERTIES</label>
                 <table>
                     <tbody>
-                        <tr ng-repeat="row in elem.properties2">
+                        <tr ng-repeat="row in elem._properties2">
                             <td ng-repeat="property in row">
-                                {{property.name}}<span ng-show="property.specialization.isSlot"><mms-transclude-name mms-eid="{{property.specialization.propertyType}}"></mms-transclude-name></span>: 
-                                <a ng-click="userResultClick(property, 'val')"><span ng-repeat="val in property.specialization.value">{{val.string || val.boolean + '' || val.naturalValue || val.integer || val.double || val.expressionBody[0] || 'Default Value'}}<span class="ellipses">{{(val.expressionBody[0] && val.expressionBody.length > 1) ? ' ...' : '' }}</span>{{$last ? '' : ', '}}</span></a>
+                                {{property.name}}<span ng-show="property.type === 'Slot'"><mms-transclude-name mms-eid="{{property.definingFeatureId}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}"></mms-transclude-name></span>: 
+                                <a ng-click="userResultClick(property, 'val')"><span ng-repeat="val in property.value">{{val.value + '' || val.body[0] || 'Default Value'}}<span class="ellipses">{{(val.body[0] && val.body.length > 1) ? ' ...' : '' }}</span>{{$last ? '' : ', '}}</span></a>
                             </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
-            <div ng-if="elem.relatedDocuments.length > 0" class="elem-documentation-wrapper">
+            <div ng-if="elem._relatedDocuments.length > 0" class="elem-documentation-wrapper">
                 <label>RELATED DOCUMENTS</label>
-                <div ng-repeat="relatedDocument in elem.relatedDocuments" class="elem-documentation">
-                    <a ng-repeat="relatedView in relatedDocument.parentViews" ui-sref="workspace.site.document.view({document: relatedDocument.sysmlid, view: relatedView.sysmlid, site: relatedDocument.siteCharacterizationId, search: undefined})" ng-click="userRelatedClick($event, relatedDocument, relatedView, elem)">
+                <div ng-repeat="relatedDocument in elem._relatedDocuments" class="elem-documentation">
+                    <a ng-repeat="relatedView in relatedDocument._parentViews" ui-sref="project.ref.document.view({documentId: relatedDocument.id, viewId: relatedView.id, projectId: relatedDocument._projectId, refId: relatedDocument._refId, search: undefined})" ng-click="userRelatedClick($event, relatedDocument, relatedView, elem)">
                         {{relatedDocument.name}} > {{relatedView.name}}<br/>
                     </a>
                 </div>

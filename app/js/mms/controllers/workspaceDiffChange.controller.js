@@ -48,7 +48,7 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
   $scope.orderValues = [
     { name: 'Name', value: 'name' },
     { name: 'Type of Change', value: 'type' },
-    { name: 'Type of Element', value: 'delta.specialization.type' },
+    { name: 'Type of Element', value: 'delta.type' },
     { name: 'Username', value: 'delta.modifier' }
   ];
 
@@ -97,7 +97,7 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 
 			if (change.type === "added")
 			{
-				treeNode = $scope.id2node[change.delta.sysmlid];
+				treeNode = $scope.id2node[change.delta.id];
 
 				if (change.staged)
 				{
@@ -110,7 +110,7 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 			}
 			else if (change.type === "removed")
 			{
-				treeNode = $scope.id2node[change.original.sysmlid];
+				treeNode = $scope.id2node[change.original.id];
 
 				if (change.staged)
 				{
@@ -123,7 +123,7 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 			}
 			else if (change.type === "updated")
 			{
-				treeNode = $scope.id2node[change.original.sysmlid];
+				treeNode = $scope.id2node[change.original.id];
 
 				// handle if the name of element has changed on update
 				if (change.staged)
@@ -140,17 +140,17 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 			}
 			else if (change.type === "moved")
 			{
-				treeNode = $scope.id2node[change.original.sysmlid];
+				treeNode = $scope.id2node[change.original.id];
 
-				var currentParentNode = $scope.id2node[change.original.owner];
-				var newParentNode = $scope.id2node[change.delta.owner];
+				var currentParentNode = $scope.id2node[change.original.ownerId];
+				var newParentNode = $scope.id2node[change.delta.ownerId];
 
 				if (change.staged)
 				{
 // 					treeNode.status = "moved";
 
 					// remove from current parent node
-					index = findIndexBySysMLID(currentParentNode.children, change.original.sysmlid);
+					index = findIndexByID(currentParentNode.children, change.original.id);
 					currentParentNode.children.splice(index, 1);
 
 					// add to new parent node
@@ -165,7 +165,7 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 					currentParentNode.children.push(treeNode);
 
 					// add back to current parent node
-					index = findIndexBySysMLID(newParentNode.children, change.original.sysmlid);
+					index = findIndexByID(newParentNode.children, change.original.id);
 					newParentNode.children.splice(index, 1);
 
 				}
@@ -201,9 +201,9 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 		var index;
 		
 		if (change.type === "added")
-			nodeId = change.delta.sysmlid;
+			nodeId = change.delta.id;
 		else
-			nodeId = change.original.sysmlid;
+			nodeId = change.original.id;
 		
 		treeNode = $scope.id2node[nodeId];
 		$rootScope.treeApi.select_branch(treeNode);
@@ -258,8 +258,8 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 				else if (change.type === 'updated')
 				{
 					object.workspace2.updatedElements.push(change.ws2object);
-					delete change.ws2object.read;
-					delete change.ws2object.modified;
+					delete change.ws2object._read;
+					delete change.ws2object._modified;
 					//delete change.delta.read;
 					//changedElements.push(change.delta);
 				}
@@ -328,11 +328,11 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 			});
 		};
 
-	var findIndexBySysMLID = function(array, sysmlid)
+	var findIndexByID = function(array, id)
 	{
 			for (var i = 0; i < array.length; i++)
 			{
-				if (array[i].data.sysmlid === sysmlid)
+				if (array[i].data.id === id)
 				{
 					return i;
 				}
@@ -346,8 +346,8 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 	{
 		var elementId;
 		
-		if (change.type === "added") elementId = change.delta.sysmlid;
-		else elementId = change.original.sysmlid;
+		if (change.type === "added") elementId = change.delta.id;
+		else elementId = change.original.id;
 		
 		if( ! $rootScope.diffPerspective)
 			$rootScope.diffPerspective = 'detail';
@@ -377,7 +377,7 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 	var setupChangesList = function(ws1, ws2)
 	{
 
-			// var emptyElement = { name: "", owner: "", documentation: "", specialization : { type: "", value_type: "", values: ""} };
+			// var emptyElement = { name: "", ownerId: "", documentation: "", specialization : { type: "", value_type: "", values: ""} };
 			
 			var createChange = function(name, element, deltaElement, changeType, changeIcon, ws2object)
 				{
@@ -390,8 +390,8 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 					change.icon = changeIcon;
 					// @test var
 					change.changeTypeName = UxService.getChangeTypeName(change.type);
-					if (change.delta.specialization)
-						change.typeIcon = UxService.getTypeIcon(change.delta.specialization.type);
+					if (change.delta)
+						change.typeIcon = UxService.getTypeIcon(change.delta.type);
 					else
 						change.typeIcon = UxService.getTypeIcon('Element');
 
@@ -400,16 +400,16 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 
 					change.properties = {};
 					change.properties.name = {};
-					change.properties.owner = {};
+					change.properties.ownerId = {};
 					change.properties.documentation = {};
 					change.properties.qualifiedName = {};
-					change.properties.sysmlid = {};
+					change.properties.id = {};
 
 					updateChangeProperty(change.properties.name, "clean");
-					updateChangeProperty(change.properties.owner, "clean");
+					updateChangeProperty(change.properties.ownerId, "clean");
 					updateChangeProperty(change.properties.documentation, "clean");
 					updateChangeProperty(change.properties.qualifiedName, "clean");
-					updateChangeProperty(change.properties.sysmlid, "clean");
+					updateChangeProperty(change.properties.id, "clean");
 
 					change.properties.specialization = {};
 					if (element.hasOwnProperty('specialization'))
@@ -454,8 +454,8 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 
 					node.data = element;
 					node.label = element.name;
-					if (element.specialization)
-						node.type = element.specialization.type;
+					if (element)
+						node.type = element.type;
 					else
 						node.type = 'Element';
 					node.children = [];
@@ -471,18 +471,18 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 
 			ws1.elements.forEach(function(e)
 			{
-				id2data[e.sysmlid] = e;
+				id2data[e.id] = e;
 
 				var node = createTreeNode(e, "clean", 'something');
 
-				id2node[e.sysmlid] = node;
+				id2node[e.id] = node;
 
 			});
 
 			ws1.elements.forEach(function(e)
 			{
-				if (!id2node.hasOwnProperty(e.owner)) $rootScope.treeData.push(id2node[e.sysmlid]);
-				else id2node[e.owner].children.push(id2node[e.sysmlid]);
+				if (!id2node.hasOwnProperty(e.ownerId)) $rootScope.treeData.push(id2node[e.id]);
+				else id2node[e.ownerId].children.push(id2node[e.id]);
 			});
 
 			// $scope.treeApi.refresh();
@@ -490,20 +490,20 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 			ws2.addedElements.forEach(function(e)
 			{
 				var emptyElement = {
-					sysmlid: e.sysmlid,
+					id: e.id,
 					name: "",
-					owner: "",
+					ownerId: "",
 					documentation: "",
 					specialization: {}
 				};
 
-				id2data[e.sysmlid] = e;
+				id2data[e.id] = e;
 
 				var node = createTreeNode(e, "clean", "addition");
 
-				id2node[e.sysmlid] = node;
+				id2node[e.id] = node;
 
-				id2node[e.sysmlid].detail = {
+				id2node[e.id].detail = {
 					type: 'addition',
 					stageStatus: 'ignore',
 					icon: 'plus',
@@ -513,10 +513,10 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 				var change = createChange(e.name, emptyElement, e, "added", "fa-plus", e);
 
 				updateChangeProperty(change.properties.name, "added");
-				updateChangeProperty(change.properties.owner, "added");
+				updateChangeProperty(change.properties.ownerId, "added");
 				updateChangeProperty(change.properties.documentation, "added");
 				updateChangeProperty(change.properties.qualifiedName, "added");
-				updateChangeProperty(change.properties.sysmlid, "added");
+				updateChangeProperty(change.properties.id, "added");
 
 				if (e.hasOwnProperty('specialization'))
 				{
@@ -529,25 +529,25 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 
 				$scope.changes.push(change);
 				$scope.unstagedChanges.push(change);
-				$scope.id2change[e.sysmlid] = change;
+				$scope.id2change[e.id] = change;
 
 			});
 
 			ws2.deletedElements.forEach(function(e)
 			{
 				var emptyElement = {
-					sysmlid: e.sysmlid,
+					id: e.id,
 					name: "",
-					owner: "",
+					ownerId: "",
 					documentation: "",
 					specialization: {}
 				};
 
-				var deletedElement = id2data[e.sysmlid];
+				var deletedElement = id2data[e.id];
 
 				var change = createChange(deletedElement.name, deletedElement, emptyElement, "removed", "fa-times", e);
 
-				id2node[e.sysmlid].detail = {
+				id2node[e.id].detail = {
 					type: 'deletion',
 					stageStatus: 'ignore',
 					icon: 'times',
@@ -555,10 +555,10 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 				};
 
 				updateChangeProperty(change.properties.name, "removed");
-				updateChangeProperty(change.properties.owner, "removed");
+				updateChangeProperty(change.properties.ownerId, "removed");
 				updateChangeProperty(change.properties.documentation, "removed");
 				updateChangeProperty(change.properties.qualifiedName, "removed");
-				updateChangeProperty(change.properties.sysmlid, "removed");
+				updateChangeProperty(change.properties.id, "removed");
 
 				if (deletedElement.hasOwnProperty('specialization'))
 				{
@@ -571,20 +571,20 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 
 				$scope.changes.push(change);
 				$scope.unstagedChanges.push(change);
-				$scope.id2change[e.sysmlid] = change;
+				$scope.id2change[e.id] = change;
 
 			});
 
 			ws2.updatedElements.forEach(function(e)
 			{
 
-				var updatedElement = id2data[e.sysmlid];
+				var updatedElement = id2data[e.id];
 
 				var deltaElement = _.cloneDeep(updatedElement);
 
 				var change = createChange(updatedElement.name, updatedElement, deltaElement, "updated", "fa-pencil", e);
 
-				id2node[e.sysmlid].detail = {
+				id2node[e.id].detail = {
 					type: 'modification',
 					stageStatus: 'ignore',
 					icon: 'pencil',
@@ -597,10 +597,10 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 					deltaElement.name = e.name;
 					updateChangeProperty(change.properties.name, "updated");
 				}
-				if (e.hasOwnProperty('owner'))
+				if (e.hasOwnProperty('ownerId'))
 				{
-					deltaElement.owner = e.owner;
-					updateChangeProperty(change.properties.owner, "updated");
+					deltaElement.ownerId = e.ownerId;
+					updateChangeProperty(change.properties.ownerId, "updated");
 				}
 				if (e.hasOwnProperty('documentation'))
 				{
@@ -612,10 +612,10 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 					deltaElement.qualifiedName = e.qualifiedName;
 					updateChangeProperty(change.properties.qualifiedName, "updated");
 				}
-				if (e.hasOwnProperty('sysmlid'))
+				if (e.hasOwnProperty('id'))
 				{
-					deltaElement.sysmlid = e.sysmlid;
-					updateChangeProperty(change.properties.sysmlid, "updated");
+					deltaElement.id = e.id;
+					updateChangeProperty(change.properties.id, "updated");
 				}
 				if (e.hasOwnProperty('specialization'))
 				{
@@ -639,15 +639,15 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
 
 				$scope.changes.push(change);
 				$scope.unstagedChanges.push(change);
-				$scope.id2change[e.sysmlid] = change;
+				$scope.id2change[e.id] = change;
 			});
 
 			// Added second pass to populate additions
 			ws2.addedElements.forEach(function(e)
 			{
 
-				var treeNode = id2node[e.sysmlid];
-				var parentNode = id2node[e.owner];
+				var treeNode = id2node[e.id];
+				var parentNode = id2node[e.ownerId];
 
 				if (!parentNode)
 				{
@@ -665,19 +665,19 @@ angular.module('mmsApp').controller('WorkspaceDiffChangeController', ["_", "$tim
            
           ws2.movedElements.forEach(function(e) {
 
-          var movedElement = id2data[e.sysmlid];
+          var movedElement = id2data[e.id];
 
           var deltaElement = _.cloneDeep(movedElement);
 
           var change = createChange(movedElement.name, movedElement, deltaElement, "moved", "fa-arrows", e);
 
-          if (e.hasOwnProperty('owner')) {
-            deltaElement.owner = e.owner;
-            updateChangeProperty(change.properties.owner, "moved");
+          if (e.hasOwnProperty('ownerId')) {
+            deltaElement.ownerId = e.ownerId;
+            updateChangeProperty(change.properties.ownerId, "moved");
           }
 
           $scope.changes.push(change);
-          $scope.id2change[e.sysmlid] = change;
+          $scope.id2change[e.id] = change;
 
         }); */
 

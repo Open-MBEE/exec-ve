@@ -17,7 +17,7 @@ describe('ViewService', function() {
 					//console.log(JSON.stringify(data));
 					expect(data.name).toEqual('Untitled View');
 					expect(data.documentation).toEqual('');
-					expect(data.specialization.type).toEqual('View');
+					expect(data.type).toEqual('Class');
 				}, function(reason){
 					console.log("this happened" + reason);
 				}); 
@@ -25,7 +25,7 @@ describe('ViewService', function() {
 			}));
 			it('create a view similar to the workspace state in the tree controller', inject(function() {
 				ViewService.createView(ownerId, 'create view for tree', 'idMatchDocId', 'master').then(function(data){
-					expect(data.owner).toEqual('MMS_1442345799882_df10c451-ab83-4b99-8e40-0a8e04b38b9d');
+					expect(data.ownerId).toEqual('MMS_1442345799882_df10c451-ab83-4b99-8e40-0a8e04b38b9d');
 				},
 				function(reason){
 					console.log("this happened" + reason);
@@ -38,8 +38,8 @@ describe('ViewService', function() {
 			ViewService.createDocument('newDocument','siteId' ,'master').then(function(data){
 				//console.log("The long object " + JSON.stringify(data, null, " "));
 				expect(data.name).toEqual('newDocument');
-				expect(data.specialization.view2view).toBeUndefined();
-				expect(data.specialization.contents.operand).toBeDefined();
+				expect(data._view2view).toBeUndefined();
+				expect(data._contents.operand).toBeDefined();
 			},
 			function(reason){
 				console.log("this happened" + reason);
@@ -61,7 +61,7 @@ describe('ViewService', function() {
 		it('should update View object called like controller.utils without a name', inject(function() {
 			ViewService.createInstanceSpecification(ownerId,'master', 'Paragraph').then(function(data){
 				//console.log("The long object " + JSON.stringify(data, null, " "));
-				expect(data.specialization.type).toEqual('InstanceSpecification');
+				expect(data.type).toEqual('InstanceSpecification');
 				expect(data.name).toEqual('Untitled Paragraph');
 			},
 			function(reason){
@@ -72,7 +72,7 @@ describe('ViewService', function() {
 		it('should update view object without a site name, but with a name', inject(function() {
 			ViewService.createInstanceSpecification(ownerId,'master', 'Paragraph', null, 'named').then(function(data){
 				//console.log("The long object " + JSON.stringify(data, null, " "));
-				expect(data.specialization.type).toEqual('InstanceSpecification');
+				expect(data.type).toEqual('InstanceSpecification');
 				expect(data.name).toEqual('named');
 			},
 			function(reason){
@@ -83,7 +83,7 @@ describe('ViewService', function() {
 		it('should update view object with a site name and with a name', inject(function() {
 			ViewService.createInstanceSpecification(ownerId,'master', 'Paragraph', 'siteId', 'named').then(function(data){
 				//console.log("The long object " + JSON.stringify(data, null, " "));
-				expect(data.specialization.type).toEqual('InstanceSpecification');
+				expect(data.type).toEqual('InstanceSpecification');
 				expect(data.name).toEqual('named');
 			},
 			function(reason){
@@ -95,13 +95,13 @@ describe('ViewService', function() {
 	describe('Method getViewElements', function() {
 		// getViewElements = function(id, update, workspace, version, weight, eidss) 
 		it('should return the latest element in the cache', function() {
-			var elem = {sysmlid:"elemId",specialization:{type:"View",childrenViews:[],name:"elemId",
-			           documentation:"",appliedMetatypes:["7929"],isMetatype:false}};
+			var elem = {sysmlId:"elemId",type:"Class",name:"elemId",
+			           documentation:"",_appliedStereotypeIds:["7929"]};
 			CacheService.put('views|master|elemId|latest|elements', elem );
 			//console.log(CacheService.get('views|master|elemId|latest|elements'));
 			ViewService.getViewElements('elemId', false, 'master','latest').then(function(data) {
 				//console.log("The long object " + JSON.stringify(data, null, " "));
-				expect(data.sysmlid).toEqual('elemId');
+				expect(data.sysmlId).toEqual('elemId');
 			}, function(){
 				console.log('fail');
 			});
@@ -180,22 +180,22 @@ describe('ViewService', function() {
 
 			ownerId = getOwner();
 			$httpBackend.whenGET(root + '/elements/idMatchDocId').respond(
-				{elements: [{name:'doc with matching id', sysmlid:'idMatchDocId', specialization:{type:'Product',
-				view2view:[{id:'nonMatchId', childrenViews:[]}, {id:'parentViewId', childrenViews:[]}]}}]});
+				{elements: [{name:'doc with matching id', sysmlId:'idMatchDocId', type:'Class',
+				_view2view:[{id:'nonMatchId', childrenViews:[]}, {id:'parentViewId', childrenViews:[]}]}]});
 			$httpBackend.whenGET(root + '/elements/MMS_1442345799882_df10c451-ab83-4b99-8e40-0a8e04b38b9d').respond(
-					{elements: [{author:'muschek', name:'doc with empty view2view', sysmlid:'emptyView2ViewDocId',
-					specialization: {type:'Product', view2view:[], noSections:[]}
+					{elements: [{_creator:'muschek', name:'doc with empty view2view', sysmlId:'emptyView2ViewDocId',
+					type:'Class', _view2view:[]
 			}]});
 			$httpBackend.whenGET(root + '/views/elemId/elements').respond(
-				{elements: [{author:'muschek', name:'view\'s element', sysmlid:12346, owner:12345, lastModified:'01-01-2014'}, 
-				{author:'muschek', name:'view\'s 2nd element', sysmlid:12347, owner:12345, lastModified:'01-01-2014'}]});
+				{elements: [{_creator:'muschek', name:'view\'s element', sysmlId:12346, ownerId:12345, _modified:'01-01-2014'}, 
+				{_creator:'muschek', name:'view\'s 2nd element', sysmlId:12347, ownerId:12345, _modified:'01-01-2014'}]});
 				
 			$httpBackend.when('POST', root + '/elements').respond(function(method, url, data) {
 
 				var json = JSON.parse(data);
 
-				if (!json.elements[0].sysmlid) {
-					json.elements[0].sysmlid = json.elements[0].name + 'Id';
+				if (!json.elements[0].sysmlId) {
+					json.elements[0].sysmlId = json.elements[0].name + 'Id';
 				}
 				return [200, json];
 			});
@@ -203,8 +203,8 @@ describe('ViewService', function() {
 
 				var json = JSON.parse(data);
 
-				if (!json.elements[0].sysmlid) {
-					json.elements[0].sysmlid = json.elements[0].name + 'Id';
+				if (!json.elements[0].sysmlId) {
+					json.elements[0].sysmlId = json.elements[0].name + 'Id';
 				}
 				return [200, json];
 			});
@@ -212,8 +212,8 @@ describe('ViewService', function() {
 
 				var json = JSON.parse(data);
 
-				if (!json.elements[0].sysmlid) {
-					json.elements[0].sysmlid = json.elements[0].name + 'Id';
+				if (!json.elements[0].sysmlId) {
+					json.elements[0].sysmlId = json.elements[0].name + 'Id';
 				}
 				return [200, json];
 			});

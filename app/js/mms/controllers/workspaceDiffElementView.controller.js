@@ -45,7 +45,7 @@ function(_, $timeout, $scope, $rootScope, $state, $stateParams, $uibModal, growl
     $scope.treeHandler = function(branch) {
         var previousActiveElement = angular.element('.diff-row-selected');
         previousActiveElement.removeClass("diff-row-selected");
-        var activeElement = angular.element('#'+branch.data.sysmlid);
+        var activeElement = angular.element('#'+branch.data.id);
         if(activeElement){
             if(!activeElement.isOnScreen()){
                 activeElement.get(0).scrollIntoView();

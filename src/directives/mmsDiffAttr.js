@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsDiffAttr', ['ElementService', 'WorkspaceService','ConfigService', 'URLService','$q', '$compile', '$rootScope', '$interval', mmsDiffAttr]);
+.directive('mmsDiffAttr', ['ElementService', 'URLService','$q', '$compile', '$rootScope', '$interval', mmsDiffAttr]);
 
 /**
  * @ngdoc directive
@@ -24,7 +24,7 @@ angular.module('mms.directives')
  * @param {string=latest} mmsVersionOne  can be 'latest', timestamp or tag id, default is latest
  * @param {string=latest} mmsVersionTwo  can be 'latest', timestamp or tag id, default is latest
  */
-function mmsDiffAttr(ElementService, WorkspaceService, ConfigService, URLService, $q, $compile, $rootScope, $interval) {
+function mmsDiffAttr(ElementService, URLService, $q, $compile, $rootScope, $interval) {
 
     var mmsDiffAttrLink = function(scope, element, attrs, mmsViewCtrl) {
         // TODO: error checking for missing elements -- util function for http error??
@@ -57,7 +57,7 @@ function mmsDiffAttr(ElementService, WorkspaceService, ConfigService, URLService
             wsTwo = 'master';
         }
 
-        WorkspaceService.getWorkspace(wsOne).then(function(data) {
+        /*WorkspaceService.getWorkspace(wsOne).then(function(data) {
             tagOrTimestamp(scope.mmsVersionOne, wsOne).then(function(versionOrTs){
                 getComparsionText(versionOrTs, wsOne).then(function(data){
                     scope.origElem = angular.element(data).text();
@@ -95,13 +95,6 @@ function mmsDiffAttr(ElementService, WorkspaceService, ConfigService, URLService
                     scope.compElem = angular.element(data).text();
                     var promise2 = $interval(
                         function(){
-                            // if (scope.compElem == angular.element(data).text() && data2CheckForBreak) {
-                            //     // console.log("data2 did not change again cancel out of interval : " +scope.compElem);
-                            //     $interval.cancel(promise2);
-                            // } else if ( scope.compElem == angular.element(data).text() && !data2CheckForBreak ) {
-                            //     data2CheckForBreak = true;
-                            //     // console.log("data2 did not change make data change true : " +data2CheckForBreak);
-                            // }
                             scope.compElem = angular.element(data).text();
                         }, 5000);
                         checkElement(origNotFound, compNotFound, deletedFlag);
@@ -127,17 +120,17 @@ function mmsDiffAttr(ElementService, WorkspaceService, ConfigService, URLService
             else {
                 element.html('<span class="mms-error">Workspace Two does not exist.</span>');
             }
-        });
+        });*/
 
         // Check if input is a tag, timestamp or neither
         var tagOrTimestamp = function(version, ws){
             var deferred = $q.defer();
             if (!URLService.isTimestamp(version) && version !== 'latest'){
-                ConfigService.getConfig(version, ws, false).then(function(data){
-                        deferred.resolve(data.timestamp);
-                }, function(reason) {
-                    deferred.reject(null);
-                });
+                // ConfigService.getConfig(version, ws, false).then(function(data){
+                //         deferred.resolve(data.timestamp);
+                // }, function(reason) {
+                //     deferred.reject(null);
+                // });
             }else{
                 deferred.resolve(version);
             }

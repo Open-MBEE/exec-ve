@@ -1,0 +1,65 @@
+<div class="container-fluid ve-no-panes">
+    <div class="row">
+        <div class="col-md-10 col-md-offset-1">
+            <a class="back-to-docs" ui-sref="project.ref({refId: fromParams.id, search: undefined})"
+               ui-sref-opts="{reload:true}">Back to Project Documents ({{fromParams.name}})</a>
+            <h1 class="panel-title">Manage branches/tags</h1>
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div ng-show="refManageView" class="col-md-4 ve-light-list-panels">
+                        <uib-tabset active="activeTab" type="tabs" justified="false" class="ve-light-tabs">
+                            <uib-tab index="0" classes="tab-item" heading="Branches">
+                                <ul class="ve-light-list">
+                                    <li ng-repeat="branch in branches | orderBy:'name'" ng-click="refClickHandler(branch)"
+                                        ng-class="{'selected': branch.id === refSelected.id}">
+                                        <a>{{ branch.name }}</a>
+                                    </li>
+                                </ul>
+                            </uib-tab>
+                            <uib-tab index="1" classes="tab-item" heading="Tags">
+                                <ul class="ve-light-list">
+                                    <li ng-repeat="tag in tags | orderBy:'name'" ng-click="refClickHandler(tag)"
+                                        ng-class="{'selected': tag.id === refSelected.id}">
+                                        <a>{{ tag.name }}</a>
+                                    </li>
+                                </ul>
+                            </uib-tab>
+                        </uib-tabset>
+                    </div>
+                    <div class="col-md-8 ve-light-panels-detail-header"></div>
+                    <div class="col-md-8 ve-light-panels-detail" ng-show="refSelected">
+                        <div class="panels-detail-title">
+                            <h3>{{refSelected.name}}</h3>
+                            <mms-button-bar buttons="buttons" mms-bb-api="bbApi"></mms-button-bar>
+                        </div>
+                        <dl class="dl-horizontal">
+                            <dt></dt>
+                            <dd class="link-section">
+                                <a ui-sref="project.ref({refId: refSelected.id, search: undefined})" ui-sref-opts="{reload:true}"
+                                    uib-tooltip-html="htmlTooltip" tooltip-placement="top" tooltip-trigger="mouseenter"
+                                    tooltip-append-to-body="refSelected.loading" tooltip-enable="refSelected.loading" 
+                                    ng-class="{'branch-disabled': refSelected.loading}" >Project Documents</a>
+                            </dd>
+                            <dt>Id</dt>
+                            <dd>{{refSelected.id}}</dd>
+                            <dt>Type</dt>
+                            <dd>{{refSelected.type}}</dd>
+                            <dt>Description</dt>
+                            <dd>{{refSelected.description}}</dd>
+                            <dt>Time Created</dt>
+                            <dd>{{refSelected._created}}</dd>
+                            <dt>Creator</dt>
+                            <dd>{{refSelected._creator}}</dd>
+                            <dt>Last Modified</dt>
+                            <dd>{{refSelected._modified}}</dd>
+                            <dt>Modifier</dt>
+                            <dd>{{refSelected._modifier}}</dd>
+                            <dt>Parent Ref</dt>
+                            <dd>{{refSelected.parentRefId}}</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

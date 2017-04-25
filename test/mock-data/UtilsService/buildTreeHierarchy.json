@@ -4,7 +4,7 @@
         "type": "site",
         "data": {
             "name": "CharacterizationTest",
-            "sysmlid": "site__18_0_5_83a025f_1456506201488_656065_12275",
+            "sysmlId": "site__18_0_5_83a025f_1456506201488_656065_12275",
             "isCharacterization": true
         },
         "children": [],
@@ -15,7 +15,7 @@
         "type": "site",
         "data": {
             "name": "nri-characterization",
-            "sysmlid": "nri-characterization",
+            "sysmlId": "nri-characterization",
             "isCharacterization": false
         },
         "children": [
@@ -24,7 +24,7 @@
                 "type": "site",
                 "data": {
                     "name": "sub-nri-characterization",
-                    "sysmlid": "sub-nri-characterization",
+                    "sysmlId": "sub-nri-characterization",
                     "parent": "nri-characterization",
                     "isCharacterization": false
                 },

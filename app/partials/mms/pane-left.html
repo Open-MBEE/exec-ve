@@ -1,4 +1,3 @@
-
 <div fa-pane pane-anchor="north" pane-size="76px" pane-no-toggle="true" pane-no-scroll="true">
     <div class="pane-left">
         <div class="pane-left-toolbar-wrap">
@@ -7,7 +6,9 @@
             </div>
         </div>
         <div>
-            <input class="input-filter-tree form-control" ng-model-optoins="{debounce: 1000}" ng-model="treeFilter.search" type="text" placeholder="Type here to filter items in the tree" ng-change="treeApi.expand_all()">
+            <input class="input-filter-tree form-control" ng-model-optoins="{debounce: 1000}"
+                   ng-model="treeFilter.search" type="text" placeholder="Type here to filter items in the tree"
+                   ng-change="treeApi.expand_all()">
         </div>
     </div>
 </div>
@@ -30,15 +31,22 @@
              <a class="btn btn-success btn-xs" ng-click="compare()">COMPARE <i ng-show="comparing" class="fa fa-spin fa-spinner"></i></a>
           </div>
         -->
-        <mms-tree ng-show="'showTree'==(activeMenu)" search="treeFilter.search" tree-data="my_data" section-numbering="treeSectionNumbering" tree-control="treeApi" on-select="my_tree_handler(branch)" on-dblclick="dblclick_tree_handler(branch)" expand-level="{{treeExpandLevel}}" initial-selection="{{mms_treeInitial}}" options="tree_options"></mms-tree>
+        <mms-tree ng-show="'showTree'==(activeMenu)" search="treeFilter.search" tree-data="treeData"
+                  section-numbering="treeSectionNumbering" tree-control="treeApi" on-select="treeClickHandler(branch)"
+                  on-dblclick="treeDblclickHandler(branch)" expand-level="{{treeExpandLevel}}"
+                  initial-selection="{{ve_treeInitial}}" options="treeOptions"></mms-tree>
 
         <div data-ng-repeat="view in ::treeViewModes" ng-show="view.id==(activeMenu)">
             <h5 style="margin: 3px 0px 3px 10px;">List of {{view.title}}</h5>
             <ul class="nav nav-list nav-pills nav-stacked abn-tree">
-                <li ng-repeat=" row in view.branchList | filter:treeFilter.search track by $index  " class="abn-tree-row">
-                    <div class="arrow" ng-click="user_clicks_branch(row)" ng-class="{'active-text': row.branch.selected}" id="tree-branch-{{view.id}}-{{row.data.sysmlid}}">
-                        <a class="tree-item" style="padding-left: 20px; position:relative;" ng-click="my_tree_handler(row)">
-                            <i ng-class="{'active-text': row.branch.selected}" class="indented tree-icon fa {{view.icon}}" ></i> 
+                <li ng-repeat=" row in view.branchList | filter:treeFilter.search track by $index  "
+                    class="abn-tree-row">
+                    <div class="arrow" ng-click="user_clicks_branch(row)"
+                         ng-class="{'active-text': row.branch.selected}" id="tree-branch-{{view.id}}-{{row.data.id}}">
+                        <a class="tree-item" style="padding-left: 20px; position:relative;"
+                           ng-click="my_tree_handler(row)">
+                            <i ng-class="{'active-text': row.branch.selected}"
+                               class="indented tree-icon fa {{view.icon}}"></i>
                             <!-- TODO active branch -->
                             <span class="indented tree-label" ng-class="{'active-text': row.branch.selected}">{{row.data.name}}</span>
                         </a>

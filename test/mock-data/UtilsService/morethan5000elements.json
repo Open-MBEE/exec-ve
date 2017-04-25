@@ -1,13 +1,12 @@
 {
   "name": "Cat Wellington",
-  "sysmlid": "dilmsys sdrawkcab",
+  "sysmlId": "dilmsys sdrawkcab",
   "documentation": "",
-  "owner": "Nyan Cat",
-  "appliedMetatypes": [
+  "ownerId": "Nyan Cat",
+  "_appliedStereotypeIds": [
     "Superman powers"
   ],
-  "specialization": {
-    "displayedElements": [
+    "_displayedElements": [
       "SomeRandomDisplayElement_1",
       "SomeRandomDisplayElement_2",
       "SomeRandomDisplayElement_3",
@@ -6129,21 +6128,20 @@
       "SomeRandomDisplayElement_49",
       "SomeRandomDisplayElement_50"
     ],
-    "contents": {
+    "_contents": {
       "valueExpression": null,
       "operand": [
         {
           "valueExpression": null,
           "type": "InstanceValue",
-          "instance": "_18_0_5_407019f_1468188892970_158569_14563"
+          "instanceId": "_18_0_5_407019f_1468188892970_158569_14563"
         }
       ],
       "type": "Expression"
     },
-    "allowedElements": [
+    "_allowedElements": [
     ],
-    "contains": [
+    "_contains": [
     ],
-    "type": "View"
-  }
+    "type": "Class"
 }

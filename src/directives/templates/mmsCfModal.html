@@ -1,5 +1,4 @@
 <div class="modal-header">
-
     <h4>{{title}}</h4>
 
     <div class="transclude-modal-instructions">
@@ -13,8 +12,8 @@
     </label>
 </div>
 
-<mms-search mms-options="searchOptions" mms-ws="{{mmsWs}}"></mms-search>
+<mms-search mms-options="searchOptions" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}"></mms-search>
 
 <div class="modal-footer">
-    </span><button class="btn btn-danger" ng-click="cancel()">CANCEL</button>
+    <button class="btn btn-danger" ng-click="cancel()">CANCEL</button>
 </div>

@@ -1,0 +1,48 @@
+<nav class="navbar navbar-default navbar-inverse navbar-fixed-top" role="navigation">
+    <div class="block">
+        <a class="logotype" ui-sref="project.ref({projectId: project.id, refId: ref.id})">VE</a>
+        <span class="org-title">{{ title }}</span>
+        <a class="switch-org" ng-click="updateOrg()">Switch Org</a>
+        <div id="global-navigation">
+            <form id="global-search" ng-submit="search(searchText)">
+                <input placeholder="Search for an element" ng-model="searchText"/>
+            </form>
+            <ul class="global-menu">
+                <li>
+                    <a ng-click="stagingView()">UAT</a>
+                </li>
+                <!--Alfresco link should go in body
+                <li>
+                    <a class="ng-binding" href="">Dashboard</a> <!-- Need new site variable for Alfresco, tbd 
+                </li>-->
+                <li>
+                    <span style="" class="dropdown ve-dark-dropdown-nav fixed-content-dropdown" uib-dropdown="" on-toggle="toggled(open)">
+                        <a aria-expanded="false" aria-haspopup="true" class="dropdown-toggle" href="" uib-dropdown-toggle="">
+                        Help <i class="fa fa-caret-down" aria-hidden="true"></i>
+                        </a>
+                        <ul class="dropdown-menu pull-right" uib-dropdown-menu="" aria-labelledby="simple-dropdown">
+
+                            <li>
+                                <a class="ng-binding" href="" ng-click="toggleHelp()">Keyboard Shortcuts</a>
+                            </li>
+                            <li class = "divider"></li>
+                            <li>
+                                <a class="ng-binding" href="">View Editor Help</a> <!-- Need new link with donbot changes, tbd -->
+                            </li>
+                            <li>
+                                <a href="https://cae-jira.jpl.nasa.gov/browse/SSCAES" class="ng-binding" href="">Report Issue</a> <!-- Need new link with donbot changes, tbd -->
+                            </li>
+                            <li class = "divider"></li>
+                            <li class = "list-section-bottom">
+                                <a class="ng-binding" ng-click="toggleAbout()" href="">About View Editor</a> <!-- Need new link with donbot changes, tbd -->
+                            </li>
+                         </ul>
+                    </span>
+                </li>
+                <li>
+                    <a ng-click="logout()">Log Out</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>

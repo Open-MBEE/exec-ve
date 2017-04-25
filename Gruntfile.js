@@ -144,6 +144,10 @@ module.exports = function(grunt) {
       mmsapp: {
         src: ['app/js/mms/controllers/*.js'],
         dest: 'build/js/mms/controllers.js'
+      },
+      mmsappdir: {
+          src: ['app/js/mms/directives/*.js'],
+          dest: 'build/js/mms/directives.js'
       }
     },
 
@@ -278,7 +282,7 @@ module.exports = function(grunt) {
         options: {
           publish: [{
             id: 'gov.nasa.jpl:evm:zip',
-            version: '2.5.4',
+            version: '3.0.0-rc1',
             path: 'deploy/'
           }]
         }
