@@ -1,24 +1,22 @@
 'use strict';
 
-xdescribe('mmsTranscludeDoc directive', function() {
+describe('mmsTranscludeDoc Directive', function() {
     var scope; //scope when directive is called
     var element; //dom element mms-transclude-name
 
     beforeEach(module('mms.directives'));
-
     beforeEach(inject(function($rootScope, $compile, $injector, UtilsService, CacheService) {
-        //CacheService = $injector.get('CacheService');
         scope = $rootScope.$new();
         var testElement = {
-            sysmlId: 'viewId',
+            id: 'viewId',
             name: 'blah',
             documentation: 'documentation and <mms-transclude-name mms-eid="viewId"></mms-transclude-name>',
             type: 'Class'
         };
-        var cacheKey = UtilsService.makeElementKey(testElement.sysmlId, 'master', 'latest', false);
+        var cacheKey = UtilsService.makeElementKey(testElement);
         CacheService.put(cacheKey, testElement);
         scope.view = testElement;
-        element = angular.element('<mms-transclude-doc data-mms-eid="{{view.sysmlId}}"></mms-transclude-doc>');
+        element = angular.element('<mms-transclude-doc data-mms-eid="{{view.id}}"></mms-transclude-doc>');
         $compile(element)(scope);
         scope.$digest();
     }));

@@ -13,7 +13,7 @@
  *   from server in the put request but include all elements in resolve
  */
 
-describe('ElementService', function() {
+xdescribe('ElementService', function() {
 	beforeEach(module('mms'));
 
 	var ElementService, $httpBackend, $rootScope;

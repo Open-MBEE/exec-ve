@@ -4,7 +4,7 @@
 
 
 
-describe('ApplicationService', function () {
+xdescribe('ApplicationService', function () {
     beforeEach(module('mms'));
 
     var ApplicationService, URLService, $httpBackend, $rootScope, $http;

@@ -3,7 +3,7 @@
  */
 "use strict";
 
-describe("URLService", function () {
+xdescribe("URLService", function () {
     beforeEach(module('mms'));
 
     var ApplicationService, URLService, $httpBackend, $rootScope, $http, $q, root;

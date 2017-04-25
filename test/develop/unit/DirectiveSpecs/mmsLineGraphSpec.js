@@ -1,7 +1,7 @@
 (function(){
   'use strict';
 
-  describe('mmsLineGraph directive', function() {
+  xdescribe('mmsLineGraph directive', function() {
     var scope;
     var element;
     var $rootScope, $compile, CacheService, UtilsService, $httpBackend, requestHandler;

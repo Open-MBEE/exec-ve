@@ -4,7 +4,7 @@
  *
  *
  */
-describe('UtilsService', function () {
+xdescribe('UtilsService', function () {
     beforeEach(module('mms'));
     var UtilsService, CacheService;
     jasmine.getFixtures().fixturesPath     = 'base/test/mock-data';

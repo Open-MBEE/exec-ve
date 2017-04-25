@@ -6,7 +6,7 @@
  *       as per Doris, this can be complex b/c some views are not attached to 
  *       a site URL.
 */
-describe('ViewService', function() {
+xdescribe('ViewService', function() {
 	beforeEach(module('mms', function($provide) {}));
     var root = '/alfresco/service/workspaces/master';
     var forceFail;

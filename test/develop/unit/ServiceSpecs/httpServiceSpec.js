@@ -4,7 +4,7 @@
  *  when queue is empty and full, changing request priority
  */
 
-describe('HttpService', function() {
+xdescribe('HttpService', function() {
 	beforeEach(module('mms'));
 	
 	var HttpService, $httpBackend, $q, httpMock, queue;

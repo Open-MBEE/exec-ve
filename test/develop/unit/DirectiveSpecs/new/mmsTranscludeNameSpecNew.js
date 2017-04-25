@@ -1,6 +1,6 @@
 'use strict';
 
-xdescribe('mmsTranscludeName directive', function () {
+describe('mmsTranscludeName Directive', function () {
     var scope; //scope when directive is called
     var element; //dom element mms-transclude-name
     var $rootScope, $compile, CacheService, UtilsService;

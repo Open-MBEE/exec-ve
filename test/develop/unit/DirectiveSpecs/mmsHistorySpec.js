@@ -3,7 +3,7 @@
  */
 'use strict';
 
-describe('mmsHistory', function () {
+xdescribe('mmsHistory', function () {
     var scope; //scope when directive is called
     var element; //dom element mms-transclude-name
     var $rootScope,

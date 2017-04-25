@@ -1,6 +1,6 @@
 'use strict';
 
-describe('mmsTranscludeVal directive', function () {
+xdescribe('mmsTranscludeVal directive', function () {
     var scope; //scope when directive is called
     jasmine.getFixtures().fixturesPath = 'base/test/mock-data/UtilsService';
     jasmine.getJSONFixtures().fixturesPath = 'base/test/mock-data/UtilsService';
