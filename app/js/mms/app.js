@@ -72,7 +72,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
         views: {
             'login@': {
                 templateUrl: 'partials/mms/select.html',
-                controller: function($scope, $rootScope, $state, orgObs, ProjectService) {
+                controller: function($scope, $rootScope, $state, orgObs, ProjectService, AuthService, growl) {
                     $rootScope.ve_title = 'View Editor'; //what to name this?
                     $scope.orgs = orgObs; 
                     var orgId, projectId;
@@ -93,11 +93,18 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                         }
                     };
                     $scope.spin = false; 
-                    $scope.continue = function() { 
+                    $scope.continue = function() {
                         $scope.spin = true;
                         if (orgId && projectId) {
                             $state.go('project.ref', {orgId: orgId, projectId: projectId, refId: 'master'});
                         }
+                    };
+                    $scope.logout = function() {
+                        AuthService.logout().then(function() {
+                            $state.go('login');
+                        }, function() {
+                            growl.error('You were not logged out');
+                        });
                     };
                 }
             }
@@ -173,7 +180,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 }
             },
             'menu@': {
-                template: '<ve-menu mms-title="ve_title" mms-org="org" mms-project="project" mms-projects="projects" mms-branch="branch" mms-branches="branches" mms-tag="tag" mms-tags="tags"></ve-menu>',
+                template: '<ve-menu mms-title="ve_title" mms-org="org" mms-project="project" mms-projects="projects" mms-ref="ref" mms-refs="refs" mms-branch="branch" mms-branches="branches" mms-tag="tag" mms-tags="tags"></ve-menu>',
                 controller: function ($scope, $rootScope, orgOb, projectOb, projectObs, refOb, refObs, branchOb, branchObs, tagOb, tagObs) {
                     $rootScope.ve_title = orgOb.name;
                     $scope.org = orgOb;
@@ -342,18 +349,23 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                             if (refOb.type === 'Tag') {
                                 deferred.resolve(null);
                             } else {
-                                ViewService.createView({
+                                ElementService.getElement({projectId: $stateParams.projectId, refId: $stateParams.refId, elementId: groupId})
+                                .then(function(groupElement) {
+                                    ViewService.createView({
                                         _projectId: $stateParams.projectId, 
                                         _refId: $stateParams.refId,
                                         id: groupId
                                     },{
-                                        viewName: 'Need to get package name Cover Page', 
+                                        viewName: groupElement.name + 'Cover Page', 
                                         viewId: eid
                                     }, 2)
-                                .then(function(data) {
-                                    deferred.resolve(data);
+                                    .then(function(data) {
+                                        deferred.resolve(data);
+                                    }, function(reason3) {
+                                        deferred.resolve(null);
+                                    });
                                 }, function(reason2) {
-                                    deferred.reject(reason2);
+                                    deferred.resolve(null);
                                 });
                             }
                         } else {

@@ -3,10 +3,10 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('RefsCtrl', ['$q', '$filter', '$location', '$uibModal', '$scope', '$rootScope', '$state','$timeout', 'growl', 
+.controller('RefsCtrl', ['$sce', '$q', '$filter', '$location', '$uibModal', '$scope', '$rootScope', '$state','$timeout', 'growl', '_',
                          'UxService', 'ElementService', 'UtilsService', 'ProjectService', 'MmsAppUtils', 
                          'orgOb', 'projectOb', 'refOb', 'refObs', 'tagObs', 'branchObs',
-function($q, $filter, $location, $uibModal, $scope, $rootScope, $state, $timeout, growl, 
+function($sce, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $timeout, growl, _,
     UxService, ElementService, UtilsService, ProjectService, MmsAppUtils, 
     orgOb, projectOb, refOb, refObs, tagObs, branchObs) {
 
@@ -22,19 +22,37 @@ function($q, $filter, $location, $uibModal, $scope, $rootScope, $state, $timeout
     $scope.refSelected = null;
     $scope.search = null;
     $scope.view = null;
+    $scope.fromParams = {};
+
+
+    var selectMasterDefault = function() {
+        var masterIndex = _.findIndex(refObs, {name: 'master'});
+        if (masterIndex > -1) {
+            $scope.fromParams = refObs[masterIndex];
+            $scope.refSelected = refObs[masterIndex];
+        }
+    };
+
+    if (_.isEmpty(refOb)) {
+        selectMasterDefault();
+    } else {
+        $scope.fromParams = refOb;
+        $scope.refSelected = refOb;
+    }
+    $scope.htmlTooltip = $sce.trustAsHtml('Branch temporarily unavailable during duplication.<br>Branch author will be notified by email upon completion.');
     // var docEditable = documentOb && documentOb._editable && refOb && refOb.type === 'Branch' && UtilsService.isView(documentOb);
 
     $scope.bbApi.init = function() {
-        $scope.bbApi.addButton(UxService.getButtonBarButton("tree-add-task"));
+        $scope.bbApi.addButton(UxService.getButtonBarButton("tree-add-branch"));
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree-add-tag"));
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree-delete"));
         // $scope.bbApi.addButton(UxService.getButtonBarButton("tree-merge"));
-        // $scope.bbApi.setPermission("tree-add-task", $scope.wsPerms);
+        // $scope.bbApi.setPermission("tree-add-branch", $scope.wsPerms);
         // $scope.bbApi.setPermission("tree-add-tag", $scope.wsPerms);
         // $scope.bbApi.setPermission("tree-delete", $scope.wsPerms);
         // $scope.bbApi.setPermission("tree-merge", $scope.wsPerms);
     };
-    $scope.$on('tree-add-task', function(e) {
+    $scope.$on('tree-add-branch', function(e) {
         addItem('Branch');
     });
     $scope.$on('tree-add-tag', function(e) {
@@ -42,6 +60,28 @@ function($q, $filter, $location, $uibModal, $scope, $rootScope, $state, $timeout
     });
     $scope.$on('tree-delete', function(e) {
         deleteItem();
+    });
+    $scope.$on('fromParamChange', function(event, fromParams) {
+        var index = _.findIndex(refObs, {name: fromParams.refId});
+        if ( index > -1 ) {
+            $scope.fromParams = refObs[index];
+        }
+    });
+    $scope.$on("stomp.branchCreated", function(event, updateRef) {
+        var index = -1;
+        if (updateRef.type === 'Branch') {
+            index = _.findIndex($scope.branches, {name: updateRef.id});
+            if ( index > -1 ) {
+                $scope.branches[index].loading = false;
+                // $scope.branches[index] = updateRef;
+            }
+        } else if (updateRef.type === 'Tag') {
+            index = _.findIndex($scope.tags, {name: updateRef.id});
+            if ( index > -1 ) {
+                $scope.tags[index].loading = false;
+                // $scope.tags[index] = updateRef;
+            }
+        }
     });
 
     $scope.refClickHandler = function(ref) {
@@ -68,8 +108,6 @@ function($q, $filter, $location, $uibModal, $scope, $rootScope, $state, $timeout
     //     }
     // };
 
-
-
     var addItem = function(itemType) {
         $scope.itemType = itemType;
         var branch = $scope.refSelected;
@@ -78,23 +116,23 @@ function($q, $filter, $location, $uibModal, $scope, $rootScope, $state, $timeout
         // Item specific setup:
         if (itemType === 'Branch') {
             if (!branch) {
-                growl.warning("Add Task Error: Select a task or tag first");
+                growl.warning("Add Branch Error: Select a branch or tag first");
                 return;
             }
             if (branch.type === 'Tag') {
                 $scope.from = 'Tag ' + branch.name;
             } else {
-                $scope.from = 'Task ' + branch.name;
+                $scope.from = 'Branch ' + branch.name;
             }
             $scope.createParentRefId = branch.id;
             templateUrlStr = 'partials/mms/new-task.html';
         } else if (itemType === 'Tag') {
             if (!branch) {
-                growl.warning("Add Tag Error: Select parent task first");
+                growl.warning("Add Tag Error: Select a branch or tag first");
                 return;
             } 
             // else if (branch.type != "workspace") {
-            //     growl.warning("Add Tag Error: Selection must be a task");
+            //     growl.warning("Add Tag Error: Selection must be a branch");
             //     return;
             // }
             $scope.createParentRefId = branch.id;
@@ -110,13 +148,28 @@ function($q, $filter, $location, $uibModal, $scope, $rootScope, $state, $timeout
             controller: ['$scope', '$uibModalInstance', '$filter', addItemCtrl]
         });
         instance.result.then(function(data) {
-            //TODO add to correct ref list
+            //TODO add load handling once mms returns status
+            var tag = [];
+            for (var i = 0; i < refObs.length; i++) {
+                if (refObs[i].type === "Tag")
+                    tag.push(refObs[i]);
+            }
+            $scope.tags = tag;
+
+            var branches = [];
+            for (var j = 0; j < refObs.length; j++) {
+                if (refObs[j].type === "Branch")
+                    branches.push(refObs[j]);
+            }
+            $scope.branches = branches;
             if (data.type === 'Branch') {
-                $scope.branches.push(data);
+                //data.loading = true;
+                //$scope.branches.push(data);
                 $scope.refSelected = data;
                 $scope.activeTab = 0;
             } else {
-                $scope.tags.push(data);
+                //data.loading = true;
+                //$scope.tags.push(data);
                 $scope.refSelected = data;
                 $scope.activeTab = 1;
             }
@@ -135,8 +188,7 @@ function($q, $filter, $location, $uibModal, $scope, $rootScope, $state, $timeout
             $scope.workspace.description = "";
             $scope.workspace.permission = "read";
             displayName = "Branch";
-        }
-        else if ($scope.itemType === 'Tag') {
+        } else if ($scope.itemType === 'Tag') {
             $scope.configuration = {};
             $scope.configuration.name = "";
             $scope.configuration.description = "";
@@ -156,9 +208,9 @@ function($q, $filter, $location, $uibModal, $scope, $rootScope, $state, $timeout
                 var branchObj = {"name": $scope.workspace.name, "type": "Branch", 
                                 "description": $scope.workspace.description};
                 branchObj.parentRefId = $scope.createParentRefId;
+                branchObj.permission = $scope.workspace.permission;
                 promise = ProjectService.createRef( branchObj, projectOb.id );
-            }
-            else if ($scope.itemType === 'Tag') {
+            } else if ($scope.itemType === 'Tag') {
                 var tagObj = {"name": $scope.configuration.name, "type": "Tag",
                                 "description": $scope.configuration.description};
                 tagObj.parentRefId =  $scope.createParentRefId;
@@ -171,7 +223,7 @@ function($q, $filter, $location, $uibModal, $scope, $rootScope, $state, $timeout
 
             promise.then(function(data) {
                 growl.success(displayName+" Created");
-                growl.info('Please wait for a completion email prior to viewing of the tag.', {ttl: -1});
+                growl.info('Please wait for a completion email prior to viewing of the '+$scope.itemType+'.', {ttl: -1});
                 $uibModalInstance.close(data);
             }, function(reason) {
                 growl.error("Create "+displayName+" Error: " + reason.message);
@@ -200,10 +252,11 @@ function($q, $filter, $location, $uibModal, $scope, $rootScope, $state, $timeout
         instance.result.then(function(data) {
             //TODO $state project with no selected ref
             var index;
-            if (data.type === 'Branch') {
+            if ($scope.refSelected.type === 'Branch') {
                 index = $scope.branches.indexOf($scope.refSelected);
-                $scope.branches.splice(index, 1);  
-            } else if (data.type === 'Tag') {
+                $scope.branches.splice(index, 1);
+                selectMasterDefault();
+            } else if ($scope.refSelected.type === 'Tag') {
                 index = $scope.tags.indexOf($scope.refSelected);
                 $scope.tags.splice(index, 1);  
             }

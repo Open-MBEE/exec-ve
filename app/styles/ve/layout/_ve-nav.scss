@@ -10,7 +10,8 @@
 		2.2.1 Menu
 		2.2.2 Search
 3. Project Level Header
-	3.1 Breadcrumbs
+	3.1 Select Project Dropdown
+	3.2 Breadcrumbs
 
 -------------------------------------------------------------------*/
 
@@ -101,6 +102,11 @@ ul.global-menu {
   color: $ve-white-text-lighter-2;
 }
 
+.global-menu > li > a:hover,
+.global-menu > li > span > a.dropdown-toggle:hover {
+  color: white;
+}
+
 /*------------------------------------------------------------------
 		2.2.2 Search
 -------------------------------------------------------------------*/
@@ -111,7 +117,7 @@ ul.global-menu {
 }
 
 #global-search input {
-  background-color: $ve-slate-darker-1;
+  background-color: $ve-slate-darker-2;
   border: none;
   border-radius: 3px;
   width: 330px;
@@ -123,7 +129,7 @@ ul.global-menu {
 }
 
 #global-search input:focus {
-  background-color: $ve-slate-darker-2;
+  background-color: $ve-slate-darker-3;
 }
 
 #global-search::after {
@@ -147,11 +153,19 @@ ul.global-menu {
 }
 
 nav.project-level-header {
-  background-color: $ve-slate-darker-1;
+  background-color: $ve-slate-darker-2;
 }
 
 /*------------------------------------------------------------------
-	3.1 Breadcrumbs
+	3.1 Select Project Dropdown
+-------------------------------------------------------------------*/
+
+.select-project-dropdown {
+	float:left;
+}
+
+/*------------------------------------------------------------------
+	3.2 Breadcrumbs
 -------------------------------------------------------------------*/
 
 .breadcrumbs {
@@ -163,12 +177,13 @@ nav.project-level-header {
   display: inline;
   margin: 0;
   padding-left: 10px;
-  top: 8px;
   position: relative;
 }
 
 .breadcrumbs li {
   display: inline;
+  height: 36px;
+	line-height: 36px;
 }
 
 .breadcrumbs .fa-folder,
