@@ -242,7 +242,7 @@ function mmsSearch(CacheService, ElementService, URLService, growl, $http, $q, $
          * Build JSON object for Elastic query.
          *
          *
-         * @return {{query: {bool: {must: *[]}}}} JSON object from post data.
+         * @return {object} {{query: {bool: {must: *[]}}}} JSON object from post data.
          */
         var buildQuery = function (searchTxt) {
             var mainQuery = {};
