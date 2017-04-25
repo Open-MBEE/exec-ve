@@ -433,7 +433,7 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
         var coverTemplateElement = angular.element(coverTemplateString);
         var cover = '';
         if (!genCover && isDoc) {
-            cover = printElementCopy.find("mms-view[mms-vid='" + viewOrDocOb.id + "']");
+            cover = printElementCopy.find("mms-view[mms-element-id='" + viewOrDocOb.id + "']");
             cover.remove();
             cover = cover[0].outerHTML;
         }
