@@ -255,7 +255,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                             }, 2).then(function(data) {
                                 deferred.resolve(data);
                             }, function(reason2) {
-                                deferred.reject(reason2);
+                                deferred.resolve(null);
                             });
                         }
                     } else {
