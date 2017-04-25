@@ -59,7 +59,7 @@ function VizService($q, $http, URLService, CacheService, UtilsService, AuthServi
     };
 
     return {
-        getImageURL: getImageURL,
+        getImageURL: getImageURL
     };
 
 }

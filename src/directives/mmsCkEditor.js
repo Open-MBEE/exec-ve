@@ -89,6 +89,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
 
              // Set search result options
             $scope.searchOptions= {};
+            $scope.searchOptions.getProperties = true;
             $scope.searchOptions.callback = $scope.choose;
             $scope.searchOptions.emptyDocTxt = 'This field is empty, but you can still click here to cross-reference a placeholder.';
 
@@ -268,23 +269,36 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
             $scope.cancel = function() {
                 $uibModalInstance.dismiss();
             };
-            $scope.mainSearchFilter = function(data) {
-                var views = [];
-                data.forEach(function(v) {
-                    if (UtilsService.isView(v) || 
-                            (ViewService.isPresentationElement(v) && v._relatedDocuments)) {
-                        if (v._properties)
-                            delete v._properties;
-                        views.push(v);
+
+            var mainSearchFilter = function() {
+                var stereoQuery = {};
+                stereoQuery.terms = {"_appliedStereotypeIds": [UtilsService.VIEW_SID, UtilsService.DOCUMENT_SID]};
+
+                var classifierList = [];
+                var allClassifierIds = ViewService.TYPE_TO_CLASSIFIER_ID;
+                for (var k in allClassifierIds) {
+                    if (allClassifierIds.hasOwnProperty(k)) {
+                        classifierList.push(allClassifierIds[k]);
                     }
-                });
-                return views;
+                }
+                var classifierIdQuery = {};
+                classifierIdQuery.terms = {"classifierIds": classifierList};
+                return {
+                    "bool": {
+                        "should": [
+                            stereoQuery,
+                            classifierIdQuery
+                        ]
+                    }
+                };
             };
-            $scope.searchOptions= {};
-            $scope.searchOptions.callback = $scope.choose;
-            $scope.searchOptions.relatedCallback = $scope.chooseDoc;
-            $scope.searchOptions.filterCallback = $scope.mainSearchFilter;
-            $scope.searchOptions.itemsPerPage = 200;
+
+            $scope.searchOptions = {
+                callback: $scope.choose,
+                relatedCallback: $scope.chooseDoc,
+                filterQueryList: [mainSearchFilter],
+                itemsPerPage: 200
+            };
         };
 
         var viewLinkCallback = function(ed) {
