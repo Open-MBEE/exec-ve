@@ -230,6 +230,7 @@ function mmsSearch(CacheService, ElementService, URLService, growl, $http, $q, $
                     }
                 }
             }
+            return;
         };
 
         /**
