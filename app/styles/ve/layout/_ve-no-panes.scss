@@ -22,9 +22,11 @@
 .ve-no-panes {
 
   margin-top: 40px;
+  font-weight: 300;
+  letter-spacing: .05em;
 
   a {
-    color: #4A4A4A;
+    color: #333;
   }
 
   .back-to-docs:before{
@@ -33,10 +35,14 @@
     padding-right:4px;
   }
 
+  .back-to-docs{
+    color:$ve-link;
+    font-weight: 700;
+  }
+
   h1 {
     font-size: 36px;
     margin: 6px 0 40px;
-    font-weight: 300;
   }
 
   h3 {
@@ -86,7 +92,7 @@ ul.ve-light-list {
   }
 
   li:hover {
-    background: $ve-silver-lighter-1;
+    background: $ve-silver-lighter-2;
   }
 
   li a,
@@ -157,8 +163,14 @@ ul.ve-light-list {
   }
 
   dd.link-section > a {
-    color: #4885bd;
-    text-decoration: underline;
+    color: $ve-link;
+    font-weight: 700;
+  }
+
+  dd.link-section > a::after {
+    content:"\f061";
+    font-family: FontAwesome;
+    padding-left:4px;
   }
 
 /*------------------------------------------------------------------
@@ -203,7 +215,7 @@ ul.ve-light-list {
   }
 
   /* Add labels to icons*/
-  .tree-add-task:after {
+  .tree-add-branch:after {
     content: "Branch";
   }
 
@@ -220,13 +232,13 @@ ul.ve-light-list {
   }
 
   .tree-add-tag,
-  .tree-add-task {
+  .tree-add-branch {
     background-color: $ve-green-base;
     float: right;
   }
 
   .tree-add-tag:hover,
-  .tree-add-task:hover {
+  .tree-add-branch:hover {
     background-color: $ve-green-darker-1;
     text-decoration: none;
   }
@@ -240,5 +252,24 @@ ul.ve-light-list {
     color: $ve-teal-darker-2;
     background-color: white;
     text-decoration: none;
+  }
+
+  a.branch-disabled::before{
+    font-family:FontAwesome;
+    content: "\2026";
+    top: -4px;
+    color: #d8d8d8;
+    padding-right: 4px;
+    text-decoration: none;
+    font-size: 24px;
+    position: relative;
+  }
+
+  dd.link-section > a.branch-disabled{
+    color:$ve-light-text;
+  }
+
+  dd.link-section > a.branch-disabled:hover{
+    text-decoration:none;
   }
 }

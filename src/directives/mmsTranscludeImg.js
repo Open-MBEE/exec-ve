@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsTranscludeImg', ['VizService','ElementService','growl', mmsTranscludeImg]);
+.directive('mmsTranscludeImg', ['VizService','ElementService','URLService','growl', mmsTranscludeImg]);
 
 /**
  * @ngdoc directive
@@ -20,7 +20,7 @@ angular.module('mms.directives')
  * @param {string=master} mmsRefId Reference to use, defaults to master
  * @param {string=latest} mmsCommitId Commit ID, default is latest
  */
-function mmsTranscludeImg(VizService, ElementService, growl) {
+function mmsTranscludeImg(VizService, ElementService, URLService, growl) {
 
     var mmsTranscludeImgLink = function(scope, element, attrs, controllers) {
         var mmsViewCtrl = controllers[0];
@@ -41,22 +41,26 @@ function mmsTranscludeImg(VizService, ElementService, growl) {
             scope.projectId = scope.mmsProjectId;
             scope.refId = scope.mmsRefId ? scope.mmsRefId : 'master';
             scope.commitId = scope.mmsCommitId ? scope.mmsCommitId : 'latest';
-            var reqOb = {elementId: scope.mmsElementId, projectId: scope.projectId, refId: scope.refId, commitId: scope.commitId};
+            var reqOb = {elementId: scope.mmsElementId, projectId: scope.projectId, refId: scope.refId, commitId: scope.commitId, accept: 'image/svg'};
             element.addClass('isLoading');
             //TODO change when VizService is updated to use correct params
-            VizService.getImageURL(reqOb, 'svg')
+            VizService.getImageURL(reqOb)
             .then(function(data) {
                 scope.svgImgUrl = data;
+            //scope.svgImgUrl = URLService.getImageURL(reqOb);
+            //reqOb.accept = 'image/png';
+            //scope.pngImgUrl = URLService.getImageURL(reqOb);
             }, function(reason) {
                 growl.error('Cf Image Error: ' + reason.message + ': ' + scope.mmsElementId);
             }).finally(function() {
                 element.removeClass('isLoading');
             });
-            VizService.getImageURL(reqOb, 'png')
+            var reqOb2 = {elementId: scope.mmsElementId, projectId: scope.projectId, refId: scope.refId, commitId: scope.commitId, accept: 'image/png'};
+            VizService.getImageURL(reqOb2)
             .then(function(data) {
                 scope.pngImgUrl = data;
             }, function(reason) {
-                //growl.error('Cf Image Error: ' + reason.message + ': ' + scope.mmsElementId);
+                growl.error('Cf Image Error: ' + reason.message + ': ' + scope.mmsElementId);
             });
             ElementService.getElement(reqOb, 1, false)
             .then(function(data) {

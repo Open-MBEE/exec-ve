@@ -623,57 +623,32 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
      * Search for elements based on some query
      * 
      * @param {object} reqOb see description of getElement
-     * @param {string} query A keyword
-     * @param {Array.<string>} [filters=null] An array of string of what to search in,
-     *                                        can be name, documentation, id, value
-     * @param {string} [propertyName=null] if filter is value, propertyName is used to further filter
+     * @param {object} query JSON object with Elastic query format
      * @param {integer} [page=null] page
      * @param {integer} [items=null] items per page
      * @param {integer} [weight=1] priority
      * @returns {Promise} The promise will be resolved with an array of element objects.
-     *                  the server will return each element's properties as another array of element objects
-     *                  in each object's 'properties' key, the array isn't stored in the cache with the element
-     *                  but elements in the properties array will be stored in the cache
      *                  The element results returned will be a clone of the original server response and not cache references
      */
-    var search = function(reqOb, query, filters, propertyName, page, items, weight) {
+    var search = function(reqOb, query, page, items, weight) {
         UtilsService.normalize(reqOb);
-        var url = URLService.getElementSearchURL(reqOb, query, filters, propertyName, page, items);
-        if (inProgress.hasOwnProperty(url)) {
-            HttpService.ping(url, weight);
-            return inProgress[url];
-        }
-
+        var url = URLService.getElementSearchURL(reqOb);
         var deferred = $q.defer();
-        inProgress[url] = deferred.promise;
-        HttpService.get(url, 
-            function(data, status, headers, config) {
-                var result = [];
-                for (var i = 0; i < data.elements.length; i++) {
-                    var element = data.elements[i];
-                    var properties = element._properties;
-                    if (properties) {
-                        delete element._properties;
-                    }
-                    var cacheE = cacheElement(reqOb, element);
-                    if (properties) {
-                        for (var j = 0; j < properties.length; j++) {
-                            var property = properties[j];
-                            cacheElement(reqOb, property);
-                        }
-                    }
-                    var toAdd = JSON.parse(JSON.stringify(element)); //make clone
-                    toAdd._properties = properties;
-                    toAdd._relatedDocuments = cacheE._relatedDocuments;
-                    result.push(toAdd);
-                }
-                delete inProgress[url];
-                deferred.resolve(result); 
-            }, function(data, status, headers, config) {
-                URLService.handleHttpStatus(data, status, headers, config, deferred);
-                delete inProgress[url];
-            }, weight
-        );
+        $http.post(url, query)
+            .then(function(data) {
+                //var result = [];
+                //for (var i = 0; i < data.data.elements.length; i++) {
+                //    var element = data.data.elements[i];
+                //    var cacheE = cacheElement(reqOb, element);
+                //    var toAdd = JSON.parse(JSON.stringify(element)); //make clone
+                //    toAdd._relatedDocuments = cacheE._relatedDocuments;
+                //    result.push(toAdd);
+                //}
+                //deferred.resolve(result);
+                deferred.resolve(data.data.elements);
+            }, function(data) {
+                URLService.handleHttpStatus(data, data.status, data.headers, data.config, deferred);
+            });
         return deferred.promise;
     };
 

@@ -487,47 +487,47 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Ca
         //             return;
         //         }
         //     }
-        //     realDelete();
+             realDelete();
         // }, function(reason) {
         //     growl.error('Checking if view contents is up to date failed: ' + reason.message);
         // });
         function realDelete() {
-        bbApi.toggleButtonSpinner('presentation-element-delete');
-        scope.name = scope.edit.name;
+            bbApi.toggleButtonSpinner('presentation-element-delete');
+            scope.name = scope.edit.name;
 
-        var instance = $uibModal.open({
-            templateUrl: 'partials/mms/delete.html',
-            scope: scope,
-            controller: ['$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
-                $scope.ok = function() {
-                    $uibModalInstance.close('ok');
-                };
-                $scope.cancel = function() {
-                    $uibModalInstance.dismiss();
-                };
-            }]
-        });
-        instance.result.then(function() {
-            var viewOrSec = section ? section : scope.view;
-            var reqOb = {elementId: viewOrSec.id, projectId: viewOrSec._projectId, refId: viewOrSec._refId, commitId: 'latest'};
-            ViewService.removeElementFromViewOrSection(reqOb, scope.instanceVal)
-            .then(function(data) {
-                if (ViewService.isSection(scope.instanceSpec) || ViewService.isTable(scope.instanceSpec) || ViewService.isFigure(scope.instanceSpec) || ViewService.isEquation(scope.instanceSpec)) {
-                    // Broadcast message to TreeCtrl:
-                    $rootScope.$broadcast('viewctrl.delete.element', scope.instanceSpec);
-                }
+            var instance = $uibModal.open({
+                templateUrl: 'partials/mms/delete.html',
+                scope: scope,
+                controller: ['$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
+                    $scope.ok = function() {
+                        $uibModalInstance.close('ok');
+                    };
+                    $scope.cancel = function() {
+                        $uibModalInstance.dismiss();
+                    };
+                }]
+            });
+            instance.result.then(function() {
+                var viewOrSec = section ? section : scope.view;
+                var reqOb = {elementId: viewOrSec.id, projectId: viewOrSec._projectId, refId: viewOrSec._refId, commitId: 'latest'};
+                ViewService.removeElementFromViewOrSection(reqOb, scope.instanceVal)
+                .then(function(data) {
+                    if (ViewService.isSection(scope.instanceSpec) || ViewService.isTable(scope.instanceSpec) || ViewService.isFigure(scope.instanceSpec) || ViewService.isEquation(scope.instanceSpec)) {
+                        // Broadcast message to TreeCtrl:
+                        $rootScope.$broadcast('viewctrl.delete.element', scope.instanceSpec);
+                    }
 
-                $rootScope.$broadcast('view-reorder.refresh');
+                    $rootScope.$broadcast('view-reorder.refresh');
 
-                 // Broadcast message for the ToolCtrl:
-                $rootScope.$broadcast('presentationElem.cancel',scope.edit);
+                     // Broadcast message for the ToolCtrl:
+                    $rootScope.$broadcast('presentationElem.cancel',scope.edit);
 
-                growl.success('Delete Successful');
-            }, handleError);
+                    growl.success('Delete Successful');
+                }, handleError);
 
-        }).finally(function() {
-            scope.bbApi.toggleButtonSpinner('presentation-element-delete');
-        });
+            }).finally(function() {
+                scope.bbApi.toggleButtonSpinner('presentation-element-delete');
+            });
         }
     };
 

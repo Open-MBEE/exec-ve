@@ -115,6 +115,7 @@ function($scope, $timeout, $location, $rootScope, $state, _, $window, $uibModal,
             } else if ( $state.includes('project') && !($state.includes('project.ref')) ) {
                 $rootScope.hidePanes = true;
                 $rootScope.showManageRefs = true;
+                $rootScope.$broadcast('fromParamChange', fromParams);
             }
             if ($state.current.name === 'project.ref') {
                 $rootScope.ve_treeInitial = toParams.refId;

@@ -33,7 +33,6 @@ function UtilsService($q, $http, CacheService, URLService, _) {
         mdExtensionsIds: [],
         name: "",
         nameExpression: null,
-        nestedClassifierIds: [],
         ownedAttributeIds: [],
         ownedOperationIds: [],
         ownerId: null,
@@ -243,7 +242,7 @@ function UtilsService($q, $http, CacheService, URLService, _) {
     var makeElementKey = function(elementOb, edit) {
         var refId = !elementOb._refId ? 'master' : elementOb._refId;
         var commitId = !elementOb._commitId ? 'latest' : elementOb._commitId;
-        var key = ['element', elementOb._projectId, elementOb._refId, elementOb.id, elementOb._commitId];
+        var key = ['element', elementOb._projectId, refId, elementOb.id, commitId];
         if (edit)
             key.push('edit');
         return key;
@@ -694,6 +693,8 @@ function UtilsService($q, $http, CacheService, URLService, _) {
         return o;
     };
     return {
+        VIEW_SID: VIEW_SID,
+        DOCUMENT_SID: DOCUMENT_SID,
         createClassElement: createClassElement,
         createInstanceElement: createInstanceElement,
         hasCircularReference: hasCircularReference,

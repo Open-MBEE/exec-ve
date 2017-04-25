@@ -54,6 +54,10 @@
                 <a class="elem-name" ng-click="userResultClick(elem, 'name')">{{elem.name}}</a>
                 <a class="elem-name" ng-show="elem.type == 'Slot'" ng-click="userResultClick(elem, 'name')"><mms-transclude-name mms-element-id="{{elem.definingFeatureId}}" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" no-click="true"></mms-transclude-name></a>
             </div>
+            <div class="elem-type-wrapper">
+                <label>LAST MODIFIED</label>
+                <div>{{elem._modified | date:'M/d/yy h:mm a'}} by {{elem._modifier}}</div>
+            </div>
             <div class="elem-qualified-name-wrapper">
                 <div class="elem-qualified-name">
                         {{elem._qualifiedName}}
@@ -69,7 +73,11 @@
                 </div>
             </div>
             <div class="elem-type-wrapper">
-                <label>METATYPE</label>
+                <label>TYPE</label>
+                <div>{{elem.type}}</div>
+            </div>
+            <div class="elem-type-wrapper">
+                <label>STEREOTYPES</label>
                 <div ng-repeat="type in elem._appliedStereotypeIds" class="elem-type">
                     <mms-transclude-name mms-element-id="{{type}}" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" no-click="true"></mms-transclude-name>
                 </div>
@@ -121,7 +129,7 @@
             <div ng-if="elem._relatedDocuments.length > 0" class="elem-documentation-wrapper">
                 <label>RELATED DOCUMENTS</label>
                 <div ng-repeat="relatedDocument in elem._relatedDocuments" class="elem-documentation">
-                    <a ng-repeat="relatedView in relatedDocument._parentViews" ui-sref="workspace.site.document.view({document: relatedDocument.id, view: relatedView.id, site: relatedDocument._siteCharacterizationId, search: undefined})" ng-click="userRelatedClick($event, relatedDocument, relatedView, elem)">
+                    <a ng-repeat="relatedView in relatedDocument._parentViews" ui-sref="project.ref.document.view({documentId: relatedDocument.id, viewId: relatedView.id, projectId: relatedDocument._projectId, refId: relatedDocument._refId, search: undefined})" ng-click="userRelatedClick($event, relatedDocument, relatedView, elem)">
                         {{relatedDocument.name}} > {{relatedView.name}}<br/>
                     </a>
                 </div>
