@@ -37,47 +37,49 @@ function mmsSearch(CacheService, ElementService, URLService, growl, $http, $q, $
         scope.$watch('searchResults', function(newVal) {
             if (!newVal)
                 return;
+            if (!scope.mmsOptions.getProperties) {
+                return;
+            }
             newVal.forEach(function(elem) {
-
+                if (elem._properties) {
+                    return;
+                }
                 // Create a flag for getting properties - only want them when global and general cf
-                if (scope.mmsOptions.getProperties) {
+                
                     //Design - have ellen come up with design for list of properties in columns
 
                     // mms does not return properties will need to make a call for the results whose type is Class
                     // Call ElementService.getOwnedElements with depth of 2
                     // filter out results that have type = to Property and Slot
                     // for Property check that ownerId is same as the class id
-                    if (elem.type === 'Class') {
-                        var reqOb = {elementId: elem.id, projectId: elem._projectId, refId: elem._refId, depth: 2};
-                        ElementService.getOwnedElements(reqOb, 2)
-                            .then(function (data) {
-                                var properties = [];
-                                //TODO might not be elements
-                                angular.forEach(data.elements, function (elt) {
-                                    if (elt.type === 'Property' && elt.ownerId == elem.classId) {
-                                        properties.push(elt);
-                                    } else if (elt.type === 'Slot') {
-                                        properties.push(elt);
-                                    }
-                                });
-                                elem._properties = properties;
-                            });
-
-                        // OLD CODE - splits into 3cols
-                        if (elem._properties && elem._properties[0]) {
+                if (elem.type === 'Class') {
+                    var reqOb = {elementId: elem.id, projectId: elem._projectId, refId: elem._refId, depth: 2};
+                    ElementService.getOwnedElements(reqOb, 2)
+                        .then(function (data) {
                             var properties = [];
-                            for (var i = 0; i < elem._properties.length; i++) {
-                                if (i % 3 === 0) {
-                                    properties.push([]);
+                            //TODO might not be elements
+                            angular.forEach(data, function (elt) {
+                                if (elt.type === 'Property' && elt.ownerId == elem.classId) {
+                                    properties.push(elt);
+                                } else if (elt.type === 'Slot') {
+                                    properties.push(elt);
                                 }
-                                properties[properties.length - 1].push(elem._properties[i]);
+                            });
+                            elem._properties = properties;
+                            // OLD CODE - splits into 3cols
+                            if (elem._properties && elem._properties[0]) {
+                                var properties2 = [];
+                                for (var i = 0; i < elem._properties.length; i++) {
+                                    if (i % 3 === 0) {
+                                        properties2.push([]);
+                                    }
+                                    properties2[properties2.length - 1].push(elem._properties[i]);
+                                }
+                                elem._properties2 = properties2;
                             }
-                            elem._properties2 = properties;
-                        }
-                    }
+                        });
                 }
             });
-
         });
 
         scope.next = function() {
@@ -299,6 +301,10 @@ function mmsSearch(CacheService, ElementService, URLService, growl, $http, $q, $
             }
 
             var jsonQueryOb = {
+                "sort" : [
+                    "_score",
+                    { "_modified" : {"order" : "desc"}}
+                ],
                 "query": {
                     "bool": {
                         "must": mainBoolQuery
