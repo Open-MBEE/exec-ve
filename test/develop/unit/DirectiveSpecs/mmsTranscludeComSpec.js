@@ -1,4 +1,4 @@
-describe('mmsTranscludeCom directive', function () {
+xdescribe('mmsTranscludeCom directive', function () {
     var scope; //scope when directive is called
     var element; //dom element mms-transclude-name
     var $rootScope, $compile, CacheService, UtilsService, $httpBackend, requestHandler;

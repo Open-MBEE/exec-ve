@@ -28,7 +28,7 @@ xdescribe('ApplicationService', function () {
         $httpBackend.verifyNoOutstandingRequest();
     });
 
-    describe('Method CreateUniqueId', function () {
+    xdescribe('Method CreateUniqueId', function () {
         it('should create a unique id by retrieving the source object from ApplicationService', function () {
             var source = ApplicationService.getSource();
             expect(source).toBeDefined();

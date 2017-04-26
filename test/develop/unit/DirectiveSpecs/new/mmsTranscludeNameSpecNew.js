@@ -14,21 +14,20 @@ describe('mmsTranscludeName Directive', function () {
             UtilsService = $injector.get('UtilsService');
             scope        = $rootScope.$new();
 
-            var testElement = {
-                sysmlId       : 'viewId',
+            scope.element = {
+                id       : 'viewId',
                 name          : 'blah',
                 type: 'Class'
             };
 
-            var cacheKey = UtilsService.makeElementKey(testElement.sysmlId, 'master', 'latest', false);
-            CacheService.put(cacheKey, testElement);
-            scope.view = {sysmlId: 'viewId', name: 'blah'};
+            var cacheKey = UtilsService.makeElementKey(scope.element);
+            CacheService.put(cacheKey, scope.element);
         })
     });
 
     // TODO: Why is testing 'nominal()' I don't see a nominal method inside of mmsTranscludeName
     it('mmsTranscludeName', inject(function () {
-        element = angular.element('<mms-transclude-name data-mms-eid="{{view.sysmlId}}"></mms-transclude-name>');
+        element = angular.element('<mms-transclude-name data-mms-eid="{{element.id}}"></mms-transclude-name>');
         $compile(element)(scope);
         scope.$digest();
         expect(element.html()).toContain('blah');
