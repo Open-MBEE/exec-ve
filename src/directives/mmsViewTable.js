@@ -61,9 +61,9 @@ function mmsViewTable($compile, $timeout, $document, UtilsService) {
                 var first = nextIndex;
                 if (first > lastIndex)
                     return;
-                var now = trs.slice(first, first + 100);
+                var now = trs.slice(first, first + 500);
                 $compile(now)(scope);
-                nextIndex = first + 100;
+                nextIndex = first + 500;
                 if (nextIndex < lastIndex)
                     compile();
             }, 100, false);
