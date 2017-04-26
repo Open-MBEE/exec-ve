@@ -6,6 +6,7 @@
     </div>
     <div fa-pane pane-anchor="center">
         <i class="pane-center-spinner fa fa-5x fa-spinner fa-spin" ng-show="ve_viewContentLoading"></i>
+        <div> Document Last Modified {{ latestElement | date:'M/d/yy h:mm a' }}</div>
         <div class="pane-center container-fluid" id="print-div">
             <div ng-repeat="view in views" ng-class="{chapter: view.topLevel}">
                 <mms-view mms-element-id="{{view.id}}" mms-commit-id="latest" mms-project-id="{{projectOb.id}}" mms-ref-id="{{refOb.id}}" mms-number="{{view.number}}" mms-view-api="view.api"></mms-view>
