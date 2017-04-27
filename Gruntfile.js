@@ -3,7 +3,6 @@ var proxySnippet = require('grunt-connect-proxy/lib/utils').proxyRequest;
 module.exports = function(grunt) {
 
   var jsFiles = ['app/js/**/*.js', 'src/**/*.js'];
-
   var servers = grunt.file.readJSON('ems-config/angular-mms-grunt-servers.json');
   var artifactory = grunt.file.readJSON('ems-config/artifactory.json');
   var connectObject = {
@@ -21,6 +20,8 @@ module.exports = function(grunt) {
           base: './build/docs',
         }
     }};
+
+  // Set proxie info for server list
   for (var key in servers) {
     var serverPort = 443;
     var serverHttps = true;
@@ -32,6 +33,8 @@ module.exports = function(grunt) {
         options: {
           hostname: '*',
           port: 9000,
+          // open: true,
+          // base: 'mms.html',
           middleware: function(connect) {
             return [proxySnippet];
           }
@@ -80,7 +83,6 @@ module.exports = function(grunt) {
     },
 
     wiredep: {
-
       target: {
         src: [
           'build/*.html'
@@ -129,7 +131,7 @@ module.exports = function(grunt) {
         //separator: ';',
         banner: "'use strict';\n",
         process: function(src, filepath) {
-          return '// Source: ' + filepath + '\n' +
+          return '\n // Source: ' + filepath + '\n' +
             src.replace(/(^|\n)[ \t]*('use strict'|"use strict");?\s*/g, '$1');
         }
       },
@@ -178,7 +180,6 @@ module.exports = function(grunt) {
       dist : {
         files: {
           'dist/css/partials/mms.css': 'src/directives/templates/styles/mms-main.scss',
-          //'dist/css/partials/mm-main.css': 'app/styles/mm/mm-main.scss',
           'dist/css/partials/ve-main.css': 'app/styles/ve/ve-main.scss'
         }
       }
@@ -194,8 +195,6 @@ module.exports = function(grunt) {
       },
       combine: {
         files: {
-          //'dist/css/mm-mms.styles.min.css':
-            //['dist/css/partials/mms.min.css', 'dist/css/partials/mm-main.min.css'],
           'dist/css/ve-mms.styles.min.css':
             ['dist/css/partials/mms.min.css', 'dist/css/partials/ve-main.min.css']
         }
@@ -207,7 +206,7 @@ module.exports = function(grunt) {
       afterconcat: ['dist/mms.js', 'dist/mms.directives.js'],
       options: {
         reporterOutput: '',
-        evil: true, //allow eval for timely integration
+        // evil: true, //allow eval for timely integration
         globalstrict: true,
         globals: {
           angular: true,
@@ -219,7 +218,8 @@ module.exports = function(grunt) {
           $: true,
           //__timely: true,
           Blob: true,
-          navigator: true
+          navigator: true,
+          eval: false
         }
       }
     },
@@ -259,10 +259,7 @@ module.exports = function(grunt) {
     copy: {
       main: {
         files:[
-          //{src: ['pages/**/*.html'], dest: 'build/', expand: true, flatten:true},
           {expand: true, src: '**', cwd: 'dist', dest: 'build/'},
-          //{src: ['vendor/**'], dest: 'build/'},
-          //{src: ['qtest/**'], dest: 'build/'},
           {expand: true, src: '**', cwd: 'app', dest: 'build/'},
         ]
       }
@@ -353,17 +350,17 @@ module.exports = function(grunt) {
       },
     },
 
-   plato: {
-      options: {
-        // Task-specific options go here.
-      },
-      your_target: {
-        // Target-specific file lists and/or options go here.
-        files: {
-          'reports/plato': [ 'app/js/**/*.js', 'src/directives/**/*.js', 'src/directives/**/*.js','src/services/**/*.js' ],
-        }
-      }
-    }
+  //  plato: {
+  //     options: {
+  //       // Task-specific options go here.
+  //     },
+  //     your_target: {
+  //       // Target-specific file lists and/or options go here.
+  //       files: {
+  //         'reports/plato': [ 'app/js/**/*.js', 'src/directives/**/*.js', 'src/directives/**/*.js','src/services/**/*.js' ],
+  //       }
+  //     }
+  //   }
 
   });
 
@@ -385,7 +382,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-protractor-runner');
   grunt.loadNpmTasks('grunt-artifactory-artifact');
   grunt.loadNpmTasks('grunt-sloc');
-  grunt.loadNpmTasks('grunt-plato');
+  // grunt.loadNpmTasks('grunt-plato');
   grunt.loadNpmTasks('grunt-cache-bust');
 
   // grunt.registerTask('install', ['npm-install', 'bower']);
@@ -410,8 +407,7 @@ module.exports = function(grunt) {
         grunt.task.run('launch:dev:' + arg1);
       else
         grunt.task.run('launch:dev');
-    }
-  );
+  });
 
   grunt.registerTask('release', function(arg1) {
       grunt.task.run('release-build', 'connect:static');
@@ -419,23 +415,20 @@ module.exports = function(grunt) {
         grunt.task.run('launch:release:' + arg1);
       else
         grunt.task.run('launch:release');
-    }
-  );
+  });
 
   grunt.registerTask('server', function(arg1) {
       if (arguments.length !== 0)
         grunt.task.run('dev:' + arg1);
       else
         grunt.task.run('dev');
-    }
-  );
+  });
 
   grunt.registerTask('docs', function() {
       grunt.task.run('ngdocs');
       grunt.task.run('connect:docs');
       grunt.task.run('watch:docs');
-    }
-  );
+  });
 
   grunt.registerTask('launch', function(build, arg1) {
       if (arg1) {
@@ -447,8 +440,7 @@ module.exports = function(grunt) {
         grunt.task.run('configureProxies:emsstg', 'connect:emsstg');
       }
       grunt.task.run('watch:' + build);
-    }
-  );
+  });
 
   grunt.registerTask('debug', function () {
       grunt.log.writeln("Launching Karma");
