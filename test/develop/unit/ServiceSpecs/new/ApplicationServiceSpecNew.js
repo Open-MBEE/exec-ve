@@ -1,6 +1,6 @@
 'use strict';
 
-describe('ApplicationService', function () {
+xdescribe('ApplicationService', function () {
     beforeEach(module('mms'));
 
     var ApplicationServiceObj;
@@ -50,7 +50,7 @@ describe('ApplicationService', function () {
         });
     });
 
-    xdescribe('Method getMmsVersion', function () {
+    describe('Method getMmsVersion', function () {
         it('should retrieve the mmsVersion from the application', inject(function () {
             ApplicationServiceObj.getMmsVersion().then(function (data) {
                 mmsV = data;

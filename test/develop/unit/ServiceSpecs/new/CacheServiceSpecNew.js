@@ -1,6 +1,6 @@
 'use strict';
 
-describe('CacheService', function () {
+xdescribe('CacheService', function () {
 	beforeEach(module('mms'));
 
 	var CacheServiceObj;
