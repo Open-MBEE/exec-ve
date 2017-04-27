@@ -136,6 +136,15 @@ function mmsTree($timeout, $log, $templateCache) {
 
         var remove_branch_impl = function (branch, singleBranch) {
             var parent_branch = get_parent(branch);
+            if (!parent_branch) {
+                for (var j = 0; j < scope.treeData.length; j++) {
+                    if (scope.treeData[j].uid === branch.uid) {
+                        scope.treeData.splice(j,1);
+                        break;
+                    }
+                }
+                return;
+            }
             for (var i = 0; i < parent_branch.children.length; i++) {
                 if (parent_branch.children[i].uid === branch.uid) {
                     parent_branch.children.splice(i,1);

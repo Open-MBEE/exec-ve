@@ -14,7 +14,7 @@ angular.module('mms')
 function UtilsService($q, $http, CacheService, URLService, _) {
     var VIEW_SID = '_17_0_1_232f03dc_1325612611695_581988_21583';
     var DOCUMENT_SID = '_17_0_2_3_87b0275_1371477871400_792964_43374';
-    var nonEditKeys = ['contains', 'view2view', 'childrenViews', '_displayedElements',
+    var nonEditKeys = ['contains', 'view2view', 'childrenViews', '_displayedElementIds',
         '_allowedElements', '_contents', '_relatedDocuments', '_childViews'];
     var CLASS_ELEMENT_TEMPLATE = {
         _appliedStereotypeIds: [],
@@ -33,7 +33,6 @@ function UtilsService($q, $http, CacheService, URLService, _) {
         mdExtensionsIds: [],
         name: "",
         nameExpression: null,
-        nestedClassifierIds: [],
         ownedAttributeIds: [],
         ownedOperationIds: [],
         ownerId: null,
@@ -132,8 +131,8 @@ function UtilsService($q, $http, CacheService, URLService, _) {
             if (elem._contents && elem.contains) {
                 delete elem.contains;
             }
-            if (Array.isArray(elem._displayedElements)) {
-                elem._displayedElements = JSON.stringify(elem._displayedElements);
+            if (Array.isArray(elem._displayedElementIds)) {
+                elem._displayedElementIds = JSON.stringify(elem._displayedElementIds);
             }
             if (elem._allowedElements) {
                 delete elem._allowedElements;
@@ -243,7 +242,7 @@ function UtilsService($q, $http, CacheService, URLService, _) {
     var makeElementKey = function(elementOb, edit) {
         var refId = !elementOb._refId ? 'master' : elementOb._refId;
         var commitId = !elementOb._commitId ? 'latest' : elementOb._commitId;
-        var key = ['element', elementOb._projectId, elementOb._refId, elementOb.id, elementOb._commitId];
+        var key = ['element', elementOb._projectId, refId, elementOb.id, commitId];
         if (edit)
             key.push('edit');
         return key;
@@ -692,6 +691,8 @@ function UtilsService($q, $http, CacheService, URLService, _) {
         return o;
     };
     return {
+        VIEW_SID: VIEW_SID,
+        DOCUMENT_SID: DOCUMENT_SID,
         createClassElement: createClassElement,
         createInstanceElement: createInstanceElement,
         hasCircularReference: hasCircularReference,

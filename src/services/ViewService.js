@@ -250,8 +250,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         .then(function(view) {
             var toGet = [];
             var results = [];
-            if (view._displayedElements) {
-                var displayed = JSON.parse(view._displayedElements);
+            if (view._displayedElementIds) {
+                var displayed = JSON.parse(view._displayedElementIds);
                 if (angular.isArray(displayed) && displayed.length > 0) {
                     toGet = displayed;
                 }
@@ -560,16 +560,22 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 type: "Expression"
             };
         }
-        var clone = JSON.parse(JSON.stringify(viewOrSectionOb));
+        var clone = {
+            _projectId: viewOrSectionOb._projectId,
+            id: viewOrSectionOb.id,
+            _refId: viewOrSectionOb._refId,
+        };
         var key = '_contents';
-        if (isSection(clone)) {
+        if (isSection(viewOrSectionOb)) {
             key = "specification";
         }
-        if (!clone[key]) {
+        if (!viewOrSectionOb[key]) {
             clone[key] = {
                 operand: [],
                 type: "Expression"
             };
+        } else {
+            clone[key] = JSON.parse(JSON.stringify(viewOrSectionOb[key]));
         }
         clone[key].operand.push({instanceId: newInstanceId, type: "InstanceValue"});
         var toCreate = [instanceSpec, clone];
@@ -625,7 +631,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             type: 'Class',
             ownerId: ownerOb.id,
             _allowedElements: [],
-            _displayedElements: [newViewId],
+            _displayedElementIds: [newViewId],
             _childViews: [],
             _contents: {
                 operand: [{
@@ -644,14 +650,17 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         view = UtilsService.createClassElement(view);
         var parentView = null;
         if (ownerOb && (ownerOb._childViews || UtilsService.isView(ownerOb))) {
-            parentView = JSON.parse(JSON.stringify(ownerOb));
-            if (!parentView._childViews) {
+            parentView = {
+                _projectId: ownerOb._projectId,
+                _refId: ownerOb._refId,
+                id: ownerOb.id
+            };
+            if (!ownerOb._childViews) {
                 parentView._childViews = [];
+            } else {
+                parentView._childViews = JSON.parse(JSON.stringify(ownerOb._childViews));
             }
             parentView._childViews.push({id: newViewId, aggregation: "composite"});
-            if (angular.isString(parentView.displayedElements)) {
-                parentView.displayedElements = JSON.parse(parentView.displayedElements);
-            }
         }
         var instanceSpecDoc = '';
         var instanceSpecSpec = {

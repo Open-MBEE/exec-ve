@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mmsApp')
-.directive('veMenu', ['ProjectService','$state','$rootScope', '$templateCache', 'growl', veMenu]);
+.directive('veMenu', ['CacheService','$state','$templateCache','$sce',veMenu]);
 
 /**
  * @ngdoc directive
@@ -24,11 +24,12 @@ angular.module('mmsApp')
  * for specific view.
  *
  */
-function veMenu(ProjectService, $state, $rootScope, $templateCache, growl) {
+function veMenu(CacheService, $state, $templateCache, $sce) {
     var template = $templateCache.get('partials/mms/veMenu.html');
 
     var veMenuLink = function(scope, element, attrs) {
 
+        scope.htmlTooltip = $sce.trustAsHtml('Branch temporarily unavailable during duplication.<br><br>Branch author will be notified by email upon completion.');
         scope.currentProject = scope.project.name;
         if (scope.ref) {
             scope.currentRef = scope.ref;
@@ -39,34 +40,62 @@ function veMenu(ProjectService, $state, $rootScope, $templateCache, growl) {
             }
         } 
 
-        var projectId, branchId, tagId;
-
         scope.updateProject = function(project) {
-            if(project) {
-                projectId = project.id;
-                $state.go('project.ref', {projectId: projectId, refId: 'master'});
+            if (project) {
+                $state.go('project.ref', {projectId: project.id, refId: 'master'}, {reload: true});
             }
         };
         scope.updateBranch = function(branch) {
-            $state.go($state.current.name, {projectId: scope.project.id, refId: branch.id});
+            $state.go($state.current.name, {projectId: scope.project.id, refId: branch.id}, {reload: true});
         };
         scope.updateTag = function(tag) {
-            $state.go($state.current.name, {projectId: scope.project.id, refId: tag.id});
+            $state.go($state.current.name, {projectId: scope.project.id, refId: tag.id}, {reload: true});
         };
-        scope.latestTag = function() {
-            $state.go($state.current.name, {projectId: scope.project.id, refId: 'latest'});
+        scope.refsView = function() {
+            $state.go('project', {projectId: scope.project.id}, {reload: true});
         };
-
-        scope.isRefsView = function(){
+        scope.isRefsView = function() {
             if ( $state.includes('project') && !($state.includes('project.ref')) ) {
                 return true;
             } else {
                 return false;
             }
         };
-        scope.refsView = function(){
-            $state.go('project', {projectId: scope.project.id});
-        };
+        scope.$on("stomp.branchCreated", function(event, createdRef, projectId) {
+            var cacheKey = ['refs', scope.project.id];
+            if (CacheService.exists(cacheKey) && scope.project.id === projectId) {
+                var refObs = CacheService.get(cacheKey);
+                var tag = [];
+                for (var i = 0; i < refObs.length; i++) {
+                    if (refObs[i].type === "Tag")
+                        tag.push(refObs[i]);
+                }
+                scope.tags = tag;
+
+                var branches = [];
+                for (var j = 0; j < refObs.length; j++) {
+                    if (refObs[j].type === "Branch")
+                        branches.push(refObs[j]);
+                }
+                scope.branches = branches;
+
+            }
+
+            //var index = -1;
+            //if (createdRef.type === 'Branch') {
+            //    index = _.findIndex(scope.branches, {name: createdRef.id});
+            //    if ( index > -1 ) {
+            //        scope.branches[index].loading = false;
+            //        // scope.branches[index] = createdRef;
+            //    }
+            //} else if (createdRef.type === 'Tag') {
+            //    index = _.findIndex(scope.tags, {name: createdRef.id});
+            //    if ( index > -1 ) {
+            //        scope.tags[index].loading = false;
+            //        // scope.tags[index] = createdRef;
+            //    }
+            //}
+        });
 
         var bcrumbs = [];
         var child, parentId;
