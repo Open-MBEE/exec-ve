@@ -19,19 +19,19 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
         $scope.oking = false;
         $scope.newPe = {name:''};
         $scope.createForm = true;
-        $scope.searchOptions = {
-            callback: function(elementOb) {
-                if ($scope.oking) {
-                    growl.info("Please wait...");
-                    return;
-                }
-                $scope.oking = true;  
-                var instanceVal = {
-                    instanceId: elementOb.id,
-                    type: "InstanceValue",
-                };
-                ViewService.addElementToViewOrSection($scope.viewOrSectionOb, instanceVal).
-                then(function(data) {
+
+        var addPECallback = function(elementOb) {
+            if ($scope.oking) {
+                growl.info("Please wait...");
+                return;
+            }
+            $scope.oking = true;
+            var instanceVal = {
+                instanceId: elementOb.id,
+                type: "InstanceValue"
+            };
+            ViewService.addElementToViewOrSection($scope.viewOrSectionOb, instanceVal)
+                .then(function(data) {
                     // Broadcast message to TreeCtrl:
                     $rootScope.$broadcast('viewctrl.add.element', elementOb, $scope.presentationElemType.toLowerCase(), $scope.viewOrSectionOb);
                     growl.success("Adding "+$scope.presentationElemType+"  Successful");
@@ -39,43 +39,36 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
                 }, function(reason) {
                     growl.error($scope.presentationElemType+" Add Error: " + reason.message);
                 }).finally(function() {
-                    $scope.oking = false;
-                });
-            },
-            filterCallback: function(data) {
-                var validClassifierIds = [];
-                if ($scope.presentationElemType === 'Table') {
-                    validClassifierIds.push(ViewService.TYPE_TO_CLASSIFIER_ID.TableT);
-                } else if ($scope.presentationElemType === 'List') {
-                    validClassifierIds.push(ViewService.TYPE_TO_CLASSIFIER_ID.ListT);
-                } else if ($scope.presentationElemType === 'Image') {
-                    validClassifierIds.push(ViewService.TYPE_TO_CLASSIFIER_ID.Figure);
-                } else if ($scope.presentationElemType === 'Paragraph') {
-                    validClassifierIds.push(ViewService.TYPE_TO_CLASSIFIER_ID.ParagraphT);
-                } else if ($scope.presentationElemType === 'Section') {
-                    validClassifierIds.push(ViewService.TYPE_TO_CLASSIFIER_ID.SectionT);
-                } else {
-                    validClassifierIds.push(ViewService.TYPE_TO_CLASSIFIER_ID[$scope.presentationElemType]);
-                }
-                // Filter out anything that is not a InstanceSpecification or not of the correct type:
-                for (var i = 0; i < data.length; i++) {
-                    if (data[i].type != 'InstanceSpecification') {
-                        data.splice(i, 1);
-                        i--;
-                    }
-                    else if (validClassifierIds.indexOf(data[i].classifierIds[0]) < 0) {
-                        data.splice(i, 1);
-                        i--;
-                    } else {
-                        if (data[i].properties)
-                            delete data[i].properties;
-                    }
-                }
-                return data;
-            },
-            itemsPerPage: 200
+                $scope.oking = false;
+            });
         };
-        
+
+        var peFilterQuery = function () {
+            var classIdOb = {};
+            if ($scope.presentationElemType === 'Table') {
+                classIdOb.classifierIds = ViewService.TYPE_TO_CLASSIFIER_ID.TableT;
+            } else if ($scope.presentationElemType === 'List') {
+                classIdOb.classifierIds  = ViewService.TYPE_TO_CLASSIFIER_ID.ListT;
+            } else if ($scope.presentationElemType === 'Image') {
+                classIdOb.classifierIds = ViewService.TYPE_TO_CLASSIFIER_ID.Figure;
+            } else if ($scope.presentationElemType === 'Paragraph') {
+                classIdOb.classifierIds = ViewService.TYPE_TO_CLASSIFIER_ID.ParagraphT;
+            } else if ($scope.presentationElemType === 'Section') {
+                classIdOb.classifierIds = ViewService.TYPE_TO_CLASSIFIER_ID.SectionT;
+            } else {
+                classIdOb.classifierIds = ViewService.TYPE_TO_CLASSIFIER_ID[$scope.presentationElemType];
+            }
+            var obj = {};
+            obj.term = classIdOb;
+            return obj;
+        };
+
+        $scope.searchOptions = {
+            callback: addPECallback,
+            itemsPerPage: 200,
+            filterQueryList: [peFilterQuery]
+        };
+
         $scope.ok = function() {
             if ($scope.oking) {
                 growl.info("Please wait...");
@@ -83,9 +76,8 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
             }
             $scope.oking = true;
 
-            ViewService.createInstanceSpecification($scope.viewOrSectionOb, $scope.presentationElemType, $scope.newPe.name).
-
-            then(function(data) {
+            ViewService.createInstanceSpecification($scope.viewOrSectionOb, $scope.presentationElemType, $scope.newPe.name)
+            .then(function(data) {
                 var elemType = $scope.presentationElemType.toLowerCase();
                 $rootScope.$broadcast('viewctrl.add.element', data, elemType, $scope.viewOrSectionOb);
                 $rootScope.$broadcast('view-reorder.refresh');
@@ -214,9 +206,8 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
 
     /*
         ob = document or view object
-        ws = workspace
-        time = timestamp
-        tag = tag object
+        refOb = reference object
+        refOb = reference object
         isDoc = if ob is view or doc
         mode: 1 = browser print, 2 = word, 3 = pdf
     */
@@ -442,7 +433,7 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
         var coverTemplateElement = angular.element(coverTemplateString);
         var cover = '';
         if (!genCover && isDoc) {
-            cover = printElementCopy.find("mms-view[mms-vid='" + viewOrDocOb.id + "']");
+            cover = printElementCopy.find("mms-view[mms-element-id='" + viewOrDocOb.id + "']");
             cover.remove();
             cover = cover[0].outerHTML;
         }
