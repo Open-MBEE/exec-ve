@@ -18,6 +18,8 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         $rootScope.veTreeShowPe = false;
     }
     $scope.buttons = [];
+    $scope.projectOb = projectOb;
+    $scope.refOb = refOb;
     $scope.treeExpandLevel = 1;
     if ($state.includes('project.ref') && !$state.includes('project.ref.document')) {
         $scope.treeExpandLevel = 0;
@@ -584,6 +586,8 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     var addItemCtrl = function($scope, $uibModalInstance, $filter) {
         $scope.createForm = true;
         $scope.oking = false;
+        $scope.projectOb = projectOb;
+        $scope.refOb = refOb;
         var displayName = "";
 
         if ($scope.itemType === 'Document') {
@@ -623,22 +627,18 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             }); 
         };
 
-        var searchFilter = function(results) {
-            var views = [];
-            for (var i = 0; i < results.length; i++) {
-                if (UtilsService.isView(results[i])) {
-                    views.push(results[i]);
-                    if (results[i].properties) {
-                        delete results[i].properties;
-                    }
-                }
-            }
-            return views;
+
+        var queryFilter = function() {
+            var obj = {};
+            obj.terms = {'_appliedStereotypeIds': [UtilsService.VIEW_SID, UtilsService.DOCUMENT_SID]};
+            return obj;
         };
+
         $scope.searchOptions = {
             callback: addExistingView,
             itemsPerPage: 200,
-            filterCallback: searchFilter
+            filterQueryList: [queryFilter]
+
         };
 
         $scope.ok = function() {
