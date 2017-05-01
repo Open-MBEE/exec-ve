@@ -92,7 +92,7 @@ module.exports = function (config) {
         logLevel: config.LOG_INFO,
 
         proxies:{
-            '/alfresco':'http://opencae-test.jpl.nasa.gov'
+            '/alfresco':'http://opencae-int.jpl.nasa.gov'
         },
         'changeOrigin':true,
 

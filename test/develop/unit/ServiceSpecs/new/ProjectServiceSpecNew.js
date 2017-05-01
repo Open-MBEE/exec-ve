@@ -8,8 +8,10 @@ describe('ProjectService', function () {
 	var $httpBackend, $window;
 	var org = {}; 
 	var orgs = {};
+	var ref = {};
 	var refs = {};
 	var projects = {};
+	var groups = {};
 	var requestHandler;
 
 	var root = '/alfresco/service';
@@ -23,12 +25,8 @@ describe('ProjectService', function () {
 		mockApplicationService	= $injector.get('ApplicationService');
 
 		org = {
-			orgs: [
-				{
-					id 	: "firstorg",
-					name: "firstorg"
-				}
-			]
+			id 	: "firstorg",
+			name: "firstorg"
 		}
 		orgs = {
 			orgs: [
@@ -80,6 +78,11 @@ describe('ProjectService', function () {
 			    }
 			]
 		}
+		ref = [{
+			_elasticId: "refelastic3",
+			id: "thirdref",
+			name: "thirdref"
+		}]
 		refs = {
 			refs: [
 				{
@@ -94,12 +97,50 @@ describe('ProjectService', function () {
 				}
 			]
 		}
+		groups = {
+			groups: [
+				{
+					_name: "group1",
+					_parentId: "groupparent1",
+					_id: "groups1id"
+				},
+				{
+					_name: "groups2",
+					_parentId: "groupsparent2",
+					_id: "group2id"
+				}
+			]
+		}
 
 	}));
 
 	afterEach(function () {
 		$httpBackend.verifyNoOutstandingExpectation();
 		$httpBackend.verifyNoOutstandingRequest();
+	});
+
+	describe('Method getOrgs', function () {
+		it('should return the orgs', function() {
+			var orgsOb;
+			var testOrgs = [
+				{
+					id 	: "firstorg",
+					name: "firstorg"
+				},
+				{
+					id 	: "secondorg",
+					name: "secondorg"
+				}
+			];
+			$httpBackend.when('GET', root + '/orgs').respond(orgs);
+			ProjectServiceObj.getOrgs().then(function (data) {
+				orgsOb = data;
+			}, function (reason) {
+				orgsOb = reason.message;
+			});
+			$httpBackend.flush();
+			expect(orgsOb).toEqual(testOrgs);
+		});
 	});
 
 	describe('Method getOrg', function () {
@@ -115,10 +156,6 @@ describe('ProjectService', function () {
 			$httpBackend.flush();
 			expect(orgOb).toEqual(testOrg);
 		});
-	});
-
-	xdescribe('Method getOrgs', function () {
-
 	});
 
 	xdescribe('Method getProjects', function () { //why is ProjectService changing the orgId in the json??
@@ -241,8 +278,26 @@ describe('ProjectService', function () {
 		});
 	});
 
-	xdescribe('Method createRef', function () {
-
+	describe('Method createRef', function () {
+		it('should create a ref', function() {
+			var refOb;
+			var testRef = {
+				_elasticId: "refelastic3",
+				id: "thirdref",
+				name: "thirdref"
+			};
+			$httpBackend.when('POST', root + '/projects/hereisanid/refs').respond(
+				function (method, url, data) {
+					return [201, ref];
+				});
+			ProjectServiceObj.createRef(testRef, 'hereisanid').then(function (data) {
+				refOb = data;
+			}, function (reason) {
+				refOb = reason.message;
+			});
+			$httpBackend.flush();
+			expect(refOb).toEqual(testRef);
+		});
 	});
 
 	xdescribe('Method updateRef', function () {
@@ -253,12 +308,51 @@ describe('ProjectService', function () {
 
 	});
 
-	xdescribe('Method getGroups', function () {
-
+	describe('Method getGroups', function () {
+		it('should return all groups from a project', function () {
+			var groupsOb;
+			var testGroups = [
+				{
+					_name: "group1",
+					_parentId: "groupparent1",
+					_id: "groups1id"
+				},
+				{
+					_name: "groups2",
+					_parentId: "groupsparent2",
+					_id: "group2id"
+				}
+			];
+			$httpBackend.when('GET', root + '/projects/hereisanid/refs/master/groups').respond(
+				function (method, url, data) {
+					return [200, groups];
+			});
+			ProjectServiceObj.getGroups('hereisanid', 'master').then(function (data) {
+				groupsOb = data;
+			}, function (reason) {
+				groupsOb = reason.message;
+			});
+			$httpBackend.flush();
+			expect(groupsOb).toEqual(testGroups);
+		});
 	});
 
-	xdescribe('Method getGroup', function () {
-
+	describe('Method getGroup', function () {
+		it('should return a group from a project', function () {
+			var groupOb;
+			var testGroup = groups.groups[1];
+			$httpBackend.when('GET', root + '/projects/hereisanid/refs/master/groups').respond(
+				function (method, url, data) {
+					return [200, groups];
+			});
+			ProjectServiceObj.getGroup('group2id','hereisanid','master').then(function (data) {
+				groupOb = data;
+			}, function (reason) {
+				groupOb = reason.message;
+			});
+			$httpBackend.flush();
+			expect(groupOb).toEqual(testGroup);
+		});
 	});
 
 	xdescribe('Method diff', function () { //not implemented
@@ -270,6 +364,8 @@ describe('ProjectService', function () {
 	});
 
 	xdescribe('Method reset', function () {
+		it('should reset the inProgress list(?)', function() {
 
+		});
 	});
 });
