@@ -7,7 +7,7 @@ module.exports = function(grunt) {
   var artifactoryUrl = grunt.option('ARTIFACTORY_URL');
   var artifactoryUser = grunt.option('ARTIFACTORY_USER');
   var artifactoryPassword = grunt.option('ARTIFACTORY_PASSWORD');
-  var servers = grunt.file.readJSON('ems-config/angular-mms-grunt-servers.json');
+  var servers = grunt.file.readJSON('angular-mms-grunt-servers.json');
   var connectObject = {
     'static': {
       options: {
