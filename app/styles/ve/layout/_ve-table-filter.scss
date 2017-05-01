@@ -4,6 +4,7 @@
 
 	.ve-show-filter{
 		margin: 12px 0 4px;
+		min-width:730px;
 	}
 
 /*------------------------------------------------------------------
@@ -41,12 +42,12 @@
 
   .ve-filter-table-form{
   	input{
-		border-radius:3px;
-		border:1px solid $ve-silver-darker-2;
-		height: 36px;
-		padding: 0px 6px;
-		display: inline;
-		box-sizing: border-box;
+			border-radius:3px;
+			border:1px solid $ve-silver-darker-2;
+			height: 36px;
+			padding: 0px 6px;
+			display: inline;
+			box-sizing: border-box;
   	}
   }
 
