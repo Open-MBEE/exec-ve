@@ -250,8 +250,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         .then(function(view) {
             var toGet = [];
             var results = [];
-            if (view._displayedElements) {
-                var displayed = JSON.parse(view._displayedElements);
+            if (view._displayedElementIds) {
+                var displayed = JSON.parse(view._displayedElementIds);
                 if (angular.isArray(displayed) && displayed.length > 0) {
                     toGet = displayed;
                 }
@@ -631,7 +631,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             type: 'Class',
             ownerId: ownerOb.id,
             _allowedElements: [],
-            _displayedElements: [newViewId],
+            _displayedElementIds: [newViewId],
             _childViews: [],
             _contents: {
                 operand: [{

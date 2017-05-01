@@ -101,7 +101,7 @@ function CacheService(_) {
                     Array.prototype.push.apply(a, b);
                     return a; 
                 }
-                if (id === '_displayedElements' && b) {
+                if (id === '_displayedElementIds' && b) {
                     return b;
                 }
                 return undefined;

@@ -355,8 +355,8 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                     }
                 }
             }
-            if (ob._displayedElements) {
-                delete ob._displayedElements;
+            if (ob._displayedElementIds) {
+                delete ob._displayedElementIds;
             }
             if (ob._allowedElements) {
                 delete ob._allowedElements;
@@ -693,7 +693,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
     var getElementKey = function(reqOb, id, edit) {
         var cacheKey = UtilsService.makeElementKey({
             _projectId: reqOb.projectId, 
-            id: reqOb.elementId ? reqOb.elementId : id, 
+            id: id ? id : reqOb.elementId, 
             _commitId: reqOb.commitId, 
             _refId: reqOb.refId
         }, edit);
