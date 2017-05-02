@@ -4,9 +4,9 @@
 
 angular.module('mmsApp')
 .controller('FullDocCtrl', ['$scope', '$rootScope', '$state', '$stateParams', '$window', '$element', 'hotkeys', 'growl',
-    'MmsAppUtils', 'UxService', 'search', '_', 'documentOb', 'projectOb', 'refOb', 'viewObs',
+    'MmsAppUtils', 'UxService', 'search', '_', 'documentOb', 'projectOb', 'refOb',
 function($scope, $rootScope, $state, $stateParams, $window, $element, hotkeys, growl,
-    MmsAppUtils, UxService, search, _, documentOb, projectOb, refOb, viewObs) {
+    MmsAppUtils, UxService, search, _, documentOb, projectOb, refOb) {
     
     $rootScope.ve_fullDocMode = true;
 

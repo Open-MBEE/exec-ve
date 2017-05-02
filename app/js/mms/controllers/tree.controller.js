@@ -185,8 +185,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     var groupLevel2Func = function(groupOb, groupNode) {
         ViewService.getProjectDocuments({
                     projectId: projectOb.id,
-                    refId: refOb.id,
-                    extended: true
+                    refId: refOb.id
         }, 2).then(function(documentObs) {
             var docs = [];
             var docOb, i;
@@ -242,6 +241,9 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             newChildNodes.push(node);
         }
         curNode.children.push.apply(curNode.children, newChildNodes);
+        if ($scope.treeApi.refresh) {
+            $scope.treeApi.refresh();
+        }
     };
     var processDeletedViewBranch = function(branch) {
         var id = branch.data.id;
@@ -259,8 +261,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         $scope.treeData = UtilsService.buildTreeHierarchy(groupObs, "_id", "group", "_parentId", groupLevel2Func);
         ViewService.getProjectDocuments({
                     projectId: projectOb.id,
-                    refId: refOb.id,
-                    extended: true
+                    refId: refOb.id
         }, 2).then(function(documentObs) {
             for (var i = 0; i < documentObs.length; i++) {
                 if (!documentObs[i]._groupId) {

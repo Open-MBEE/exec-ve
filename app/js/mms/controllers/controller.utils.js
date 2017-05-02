@@ -501,8 +501,7 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
             childAggrs.push(v._childViews[i].aggregation);
         }
         ElementService.getElements({
-            elementIds: childIds, 
-            extended: true,
+            elementIds: childIds,
             projectId: projectId,
             refId: refId
         }, 2).then(function(childViews) {
@@ -511,14 +510,16 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
                 mapping[childViews[i].id] = childViews[i];
             }
             var childPromises = [];
+            var childNodes = [];
             for (i = 0; i < childIds.length; i++) {
                 var child = mapping[childIds[i]];
-                if (child) //what if not found??
+                if (child) { //what if not found??
                     childPromises.push(handleChildViews(child, childAggrs[i], projectId, refId, curItemFunc, childrenFunc, seenViews));
+                    childNodes.push(curItemFunc(child, childAggrs[i]));
+                }
             }
+            childrenFunc(curItem, childNodes);
             $q.all(childPromises).then(function(childNodes) {
-                childrenFunc(curItem, childNodes);
-                //curNode.children.push.apply(curNode.children, childNodes);
                 deferred.resolve(curItem);
             }, function(reason) {
                 deferred.reject(reason);
