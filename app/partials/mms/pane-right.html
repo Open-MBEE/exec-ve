@@ -32,8 +32,8 @@
                           mms-view-reorder-api="viewContentsOrderApi"></mms-view-reorder>
     </div>
 
-    <div class="container-fluid" ng-show="show.jobs">
-        <mms-jobs mms-branch="{{refOb.name}}" mms-doc-id="{{documentOb.sysmlId}}" mms-project-id="{{projectOb.id}}"
+    <div class="container-fluid">  <!--ng-show="show.jobs">-->
+        <mms-jobs mms-doc-id="{{documentOb.sysmlId}}" mms-project-id="{{projectOb.id}}"
                   mms-ref-id="{{refOb.id}}"></mms-jobs>
     </div>
 </div>
