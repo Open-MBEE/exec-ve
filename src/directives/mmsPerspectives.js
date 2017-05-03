@@ -147,7 +147,7 @@ function mmsPerspectives(ElementService, $templateCache, $window, growl, Applica
 
         scope.useContext = function() {
             var instance = $uibModal.open({
-                template: '<mms-search mms-options="searchOptions"></mms-search><div class="modal-footer"></span><button class="btn btn-danger" ng-click="cancel()">CANCEL</button></div>',
+                template: '<mms-search mms-options="searchOptions" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}"></mms-search><div class="modal-footer"></span><button class="btn btn-danger" ng-click="cancel()">CANCEL</button></div>',
                 scope: scope,
                 controller: ['$scope', '$uibModalInstance', tspAddElementCtrl],
                 size: 'lg'
@@ -203,7 +203,7 @@ function mmsPerspectives(ElementService, $templateCache, $window, growl, Applica
 
         scope.addElement = function() {
             var instance = $uibModal.open({
-                template: '<mms-search mms-options="searchOptions"></mms-search><div class="modal-footer"></span><button class="btn btn-danger" ng-click="cancel()">CANCEL</button></div>',
+                template: '<mms-search mms-options="searchOptions" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}"></mms-search><div class="modal-footer"></span><button class="btn btn-danger" ng-click="cancel()">CANCEL</button></div>',
                 scope: scope,
                 controller: ['$scope', '$uibModalInstance', tspAddElementCtrl],
                 size: 'lg'
@@ -301,7 +301,7 @@ function mmsPerspectives(ElementService, $templateCache, $window, growl, Applica
                     }
                 },
                 //temporary until new json format is implemented 
-                {
+                /*{
                     "command":"NewIntegrator",
                     "data": {
                         "project": id,
@@ -310,7 +310,7 @@ function mmsPerspectives(ElementService, $templateCache, $window, growl, Applica
                         "integratorName":"System Model Data",
                         "integratorID":"int-smd-" + id
                     }
-                },
+                },*/
                 {
                     "command":"NewIntegrator",
                     "data": {
