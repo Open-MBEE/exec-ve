@@ -5,7 +5,10 @@
         <a class="switch-org" ng-click="updateOrg()">Switch Org</a>
         <div id="global-navigation">
             <form id="global-search" ng-submit="search(searchText)">
-                <input placeholder="Search for an element" ng-model="searchText"/>
+                <input placeholder="Search {{ title }}" ng-model="searchText"/>
+                <button ng-click="search(searchText)">
+                    <i class="fa fa-search" aria-hidden="true"></i>
+                </button>
             </form>
             <ul class="global-menu">
                 <li>
@@ -30,7 +33,7 @@
                                 <a class="ng-binding" href="">View Editor Help</a> <!-- Need new link with donbot changes, tbd -->
                             </li>
                             <li>
-                                <a href="https://cae-jira.jpl.nasa.gov/browse/SSCAES" class="ng-binding" href="">Report Issue</a> <!-- Need new link with donbot changes, tbd -->
+                                <a href="https://cae-jira.jpl.nasa.gov/browse/SSCAES" class="ng-binding" href="">Report Issue</a> <!-- Need new link with   donbot changes, tbd -->
                             </li>
                             <li class = "divider"></li>
                             <li class = "list-section-bottom">

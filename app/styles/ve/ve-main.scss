@@ -15,6 +15,7 @@
 @import "layout/_ve-nav.scss";
 @import "layout/_ve-footer.scss";
 @import "layout/_ve-no-panes.scss";
+@import "layout/_ve-table-filter.scss";
 
 .cke_button__mmscf_label, .cke_button__mmscomment_label,
 .cke_button__mmsvlink_label, .cke_button__mmsreset_label {
@@ -87,7 +88,6 @@ div.tooltip-inner {
 .ve-dark-modal,
 .ve-dark-dropdown-nav,
 .ve-dark-dropdown-menu,
-.ve-table-buttons
 #ve-origin-select,
 #ve-login{
 
@@ -121,7 +121,7 @@ div.tooltip-inner {
 .ve-table-buttons
 #ve-origin-select,
 #ve-login,
-.tableSearch{
+.ve-table-filter{
 
   .btn {
     font-weight: 500;
@@ -183,7 +183,6 @@ div.tooltip-inner {
 
   .btn-tertiary{
     color: $ve-light-text;
-    margin: 24px 0 6px;
     background-color:$ve-silver-base;
   }
 
@@ -251,6 +250,7 @@ div.tooltip-inner {
     -moz-transition: background-color .1s ease-out !important;
     -o-transition: background-color .1s ease-out !important;
     transition: background-color .1s ease-out !important;
+    letter-spacing: .05em; /*overwriting user agent stylesheet */
   }
 
   button.dropdown-toggle .fa-caret-down {
@@ -386,10 +386,6 @@ div.tooltip-inner {
 
 .ve-dark-dropdown-wide {
 
-  .label-dropdown {
-    display: block;
-  }
-
   button.dropdown-toggle {
     width: 100%;
     text-align: left;
@@ -409,7 +405,9 @@ div.tooltip-inner {
   .label-dropdown {
     color: $ve-white-text-lighter-2;
     font-size: 15px;
+    display: block; 
   }
+
 }
 
 /*------------------------------------------------------------------
@@ -437,7 +435,7 @@ div.tooltip-inner {
   .label-dropdown {
     color: $ve-white-text-lighter-2;
     font-size: 14px;
-    padding: 0 4px;
+    padding: 0 0 0 4px;
   }
 
   .btn-group.open button.dropdown-toggle {
@@ -447,6 +445,10 @@ div.tooltip-inner {
   /* over write bootstrap*/
   li {
     font-size: 14px;
+  }
+
+  .selected-dropdown{
+    font-weight: 500;
   }
 }
 
@@ -574,7 +576,6 @@ div.tooltip-inner {
 
 .tableSearch > span {
   display: block;
-  margin: 20px 0;
 }
 
 table caption {
