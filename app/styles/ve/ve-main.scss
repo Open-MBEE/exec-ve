@@ -386,10 +386,6 @@ div.tooltip-inner {
 
 .ve-dark-dropdown-wide {
 
-  .label-dropdown {
-    display: block;
-  }
-
   button.dropdown-toggle {
     width: 100%;
     text-align: left;
@@ -409,7 +405,9 @@ div.tooltip-inner {
   .label-dropdown {
     color: $ve-white-text-lighter-2;
     font-size: 15px;
+    display: block; 
   }
+
 }
 
 /*------------------------------------------------------------------
@@ -437,7 +435,7 @@ div.tooltip-inner {
   .label-dropdown {
     color: $ve-white-text-lighter-2;
     font-size: 14px;
-    padding: 0 4px;
+    padding: 0 0 0 4px;
   }
 
   .btn-group.open button.dropdown-toggle {
@@ -447,6 +445,10 @@ div.tooltip-inner {
   /* over write bootstrap*/
   li {
     font-size: 14px;
+  }
+
+  .selected-dropdown{
+    font-weight: 500;
   }
 }
 
@@ -574,7 +576,6 @@ div.tooltip-inner {
 
 .tableSearch > span {
   display: block;
-  margin: 20px 0;
 }
 
 table caption {
