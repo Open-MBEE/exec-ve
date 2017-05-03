@@ -183,6 +183,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     };
 
     var groupLevel2Func = function(groupOb, groupNode) {
+        groupNode.loading = true;
         ViewService.getProjectDocuments({
                     projectId: projectOb.id,
                     refId: refOb.id
@@ -205,6 +206,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                     children: []
                 });
             }
+            groupNode.loading = false;
             if ($scope.treeApi.refresh) {
                 $scope.treeApi.refresh();
             }
@@ -221,7 +223,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 type: 'view',
                 data: v,
                 children: [],
-                loading: false,
+                loading: true,
                 aggr: aggr
             };
             viewId2node[v.id] = curNode;
