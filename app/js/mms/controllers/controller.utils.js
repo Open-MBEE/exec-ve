@@ -491,7 +491,9 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
         var childIds = [];
         var childAggrs = [];
         if (!v._childViews || v._childViews.length === 0 || aggr === 'none') {
-            curItem.loading = false;
+            if (angular.isObject(curItem) && curItem.loading) {
+                curItem.loading = false;
+            }
             deferred.resolve(curItem);
             return deferred.promise;
         }
@@ -519,7 +521,6 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
                     childNodes.push(curItemFunc(child, childAggrs[i]));
                 }
             }
-            curItem.loading = false;
             childrenFunc(curItem, childNodes);
             $q.all(childPromises).then(function(childNodes) {
                 deferred.resolve(curItem);

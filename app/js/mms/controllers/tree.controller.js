@@ -243,6 +243,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             newChildNodes.push(node);
         }
         curNode.children.push.apply(curNode.children, newChildNodes);
+        curNode.loading = false;
         if ($scope.treeApi.refresh) {
             $scope.treeApi.refresh();
         }
