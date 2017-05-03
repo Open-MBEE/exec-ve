@@ -144,6 +144,17 @@ ul.global-menu {
   border:none;
   margin: 5px 0 5px -10px;
   vertical-align: bottom;
+  -webkit-transition: background-color .1s ease-out;
+  -moz-transition: background-color .1s ease-out;
+  -o-transition: background-color .1s ease-out;
+  transition: background-color .1s ease-out;
+}
+
+#global-search button .fa-search{
+  position: relative;
+  color: white;
+  font-size:14px;
+  top:-1px;
 }
 
 #global-search button:hover{

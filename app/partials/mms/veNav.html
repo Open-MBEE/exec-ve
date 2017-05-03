@@ -5,9 +5,9 @@
         <a class="switch-org" ng-click="updateOrg()">Switch Org</a>
         <div id="global-navigation">
             <form id="global-search" ng-submit="search(searchText)">
-                <input placeholder="Search for an element" ng-model="searchText"/>
+                <input placeholder="Search {{ title }}" ng-model="searchText"/>
                 <button>
-                    <i style="position: relative; top: -1px; color: white;" class="fa fa-search" aria-hidden="true"></i>
+                    <i class="fa fa-search" aria-hidden="true"></i>
                 </button>
             </form>
             <ul class="global-menu">
