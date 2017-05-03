@@ -1,8 +1,8 @@
 <nav class="project-level-header navbar navbar-default navbar-inverse navbar-fixed-top" role="navigation">
     <div class="block">
-        <div class="btn-group ve-dark-dropdown-nav" uib-dropdown keyboard-nav>
+        <div class="btn-group ve-dark-dropdown-nav select-project-dropdown" uib-dropdown keyboard-nav>
             <button id="simple-btn-keyboard-nav" type="button" class="dropdown-toggle" ng-click="updateProjectChecked()" uib-dropdown-toggle>
-                <span class="label-dropdown">Module:</span>
+                <span class="label-dropdown">Project:</span>
                 <span>{{ currentProject }}<i class="fa fa-caret-down" aria-hidden="true"></i></span>
             </button>
             <ul class="dropdown-menu list-with-selected-item" uib-dropdown-menu role="menu">
@@ -12,50 +12,43 @@
         </div>
         <div class="breadcrumbs">
             <ul>
-                <li><i class="fa fa-folder" aria-hidden="true"></i>(hardcoded)Europa Architecture</li>
-                <li>&#8250;</li>
-                <li><i class="fa fa-file" aria-hidden="true"></i>Briefcase Architecture + Design Framework</li>
+                <li ng-style="truncateStyle" ng-show="!isRefsView()" ng-repeat="breadcrumb in breadcrumbs track by $index">
+                    <a ui-sref="{{ breadcrumb.link }}">
+                        <i ng-class="{'fa fa-folder': breadcrumb.type === 'group', 'fa fa-file': $last && breadcrumb.type === 'doc'}" aria-hidden="true" uib-tooltip="{{ breadcrumb.name }}" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom"></i>{{ breadcrumb.name }}
+                    </a>
+                    <span ng-show="!$last"> &#8250;</span>
+                </li>
             </ul>
         </div>
 
-        <ul class="nav navbar-nav navbar-right" style="padding-right: 25px">
+        <ul ng-show="!isRefsView()" class="nav navbar-nav navbar-right" style="padding-right: 25px">
             <li>
-            <div class="btn-group ve-dark-dropdown-nav" uib-dropdown keyboard-nav>
-                <button id="task-selection-button" type="button" class="dropdown-toggle" uib-dropdown-toggle ng-click="updateBranchChecked()">
-                    <span class="label-dropdown">Branch:</span>{{ currentBranch }}
+            <div class="btn-group ve-dark-dropdown-nav" uib-dropdown keyboard-nav auto-close="disabled">
+                <button id="task-selection-button" type="button" class="dropdown-toggle" uib-dropdown-toggle>
+                    <span class="label-dropdown">{{ currentRef.type }}:</span>{{ currentRef.name }}
                     <i class="fa fa-caret-down" aria-hidden="true"></i>
                 </button>
-                <ul class="dropdown-menu right-screen list-with-selected-item" uib-dropdown-menu role="menu"
+                <ul class="dropdown-menu pull-right list-with-selected-item list-with-button list-with-tabs" uib-dropdown-menu role="menu"
                     aria-labelledby="task-selection-button">
                     <li class="button-item">
-                        <button class="btn btn-large btn-block btn-primary" ng-click="refsView()">Manage Branches
+                        <button class="btn btn-large btn-block btn-primary" ng-click="refsView()">Manage Branches/Tags
                         </button>
                     </li>
-                    <li ng-repeat="branch in branches | orderBy:'name'" ng-click="updateBranch(branch)"
-                        ng-class="{'checked-list-item': branch.name === currentBranch}">{{ branch.name }}
-                    </li>
-                </ul>
-            </div>
-            </li>
-
-            <li>
-            <div class="btn-group ve-dark-dropdown-nav" uib-dropdown keyboard-nav>
-                <button id="tag-selection-button" type="button" class="dropdown-toggle" uib-dropdown-toggle ng-click="updateTagChecked()">
-                    <span class="label-dropdown">Tag:</span>{{ currentTag }}
-                    <i class="fa fa-caret-down" aria-hidden="true"></i>
-                </button>
-                <ul class="dropdown-menu right-screen list-with-selected-item" uib-dropdown-menu role="menu"
-                    aria-labelledby="tag-selection-button">
-                    <li class="button-item">
-                        <button class="btn btn-large btn-block btn-primary" ng-click="refsView()">Manage Tags</button>
-                    </li>
-                    <li ng-click="latestTag()" ng-class="{'checked-list-item': tag.name === currentTag}">latest</li>
-                    <li ng-repeat="tag in tags | orderBy:'name'" ng-click="updateTag(tag)"
-                           ng-class="{'checked-list-item': tag.name === currentTag}">{{ tag.name }}</li>
+                    <uib-tabset active="active" type="tabs" justified="false">
+                        <uib-tab index="0" classes="tab-item" heading="Branches">
+                            <li ng-repeat="branch in branches | orderBy:'name'" ng-click="updateBranch(branch)"
+                                ng-class="{'checked-list-item': branch.name === currentBranch}" is-open="false" tooltip-placement="left" 
+                                uib-tooltip-html="htmlTooltip" tooltip-append-to-body="branch.status == 'loading'" tooltip-enable="branch.status == 'loading'">{{ branch.name }}
+                            </li>
+                        </uib-tab>
+                        <uib-tab index="1" classes="tab-item" heading="Tags">
+                            <li ng-repeat="tag in tags | orderBy:'name'" ng-click="updateTag(tag)"
+                           ng-class="{'checked-list-item': tag.name === currentTag}" is-open="false">{{ tag.name }}</li>
+                        </uib-tab>
+                    </uib-tabset>
                 </ul>
             </div>
             </li>
         </ul>
-
     </div>
 </nav>

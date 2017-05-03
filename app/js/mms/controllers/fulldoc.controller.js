@@ -4,9 +4,9 @@
 
 angular.module('mmsApp')
 .controller('FullDocCtrl', ['$scope', '$rootScope', '$state', '$stateParams', '$window', '$element', 'hotkeys', 'growl',
-    'MmsAppUtils', 'UxService', 'search', '_', 'documentOb', 'projectOb', 'refOb', 'viewObs',
+    'MmsAppUtils', 'UxService', 'search', '_', 'documentOb', 'projectOb', 'refOb',
 function($scope, $rootScope, $state, $stateParams, $window, $element, hotkeys, growl,
-    MmsAppUtils, UxService, search, _, documentOb, projectOb, refOb, viewObs) {
+    MmsAppUtils, UxService, search, _, documentOb, projectOb, refOb) {
     
     $rootScope.ve_fullDocMode = true;
 
@@ -26,12 +26,15 @@ function($scope, $rootScope, $state, $stateParams, $window, $element, hotkeys, g
 
     $scope.search = search;
     $scope.buttons = [];
-
     $scope.refOb = refOb;
     $scope.projectOb = projectOb;
+    $scope.latestElement = '';
     //build array of views in doc
     var elementTranscluded = function(elementOb, type) {
-        
+        if (elementOb && type !== 'Comment') {
+            if (elementOb._modified > $scope.latestElement)
+                $scope.latestElement = elementOb._modified;
+        }
     };
     var elementClicked = function(elementOb) {
         $rootScope.$broadcast('elementSelected', elementOb, 'latest');
@@ -45,6 +48,9 @@ function($scope, $rootScope, $state, $stateParams, $window, $element, hotkeys, g
             }
             if ($rootScope.veElementsOn) {
                 dis.toggleShowElements();
+            }
+            if ($rootScope.ve_editmode) {
+                dis.toggleShowEdits();
             }
         },
         elementTranscluded: elementTranscluded,
@@ -60,17 +66,13 @@ function($scope, $rootScope, $state, $stateParams, $window, $element, hotkeys, g
                 if ($rootScope.veElementsOn) {
                     dis.toggleShowElements();
                 }
+                if ($rootScope.ve_editmode) {
+                    dis.toggleShowEdits();
+                }
             },
             elementTranscluded: elementTranscluded,
             elementClicked: elementClicked
         }, number: curSec, topLevel: (curSec ? (curSec.toString().indexOf('.') === -1 && curSec !== 1) : false)};
-    };
-
-    $scope.findLatestElement = function(elem) {
-        if (elem) {
-            if (elem.modified > $scope.latestElement)
-                $scope.latestElement = elem.modified;
-        }
     };
 
     var addToArray = function(viewId, curSection) {
@@ -208,8 +210,9 @@ function($scope, $rootScope, $state, $stateParams, $window, $element, hotkeys, g
     });
 
     $scope.$on('show-edits', function() {
+        var i = 0;
         if (($rootScope.veElementsOn && $rootScope.ve_editmode) || (!$rootScope.veElementsOn && !$rootScope.ve_editmode) ){
-            for (var i = 0; i < $scope.views.length; i++) {
+            for (i = 0; i < $scope.views.length; i++) {
                 $scope.views[i].api.toggleShowElements();
             }
             $scope.bbApi.toggleButtonState('show-elements');
@@ -217,17 +220,20 @@ function($scope, $rootScope, $state, $stateParams, $window, $element, hotkeys, g
         }
         $scope.bbApi.toggleButtonState('show-edits');
         $rootScope.ve_editmode = !$rootScope.ve_editmode;
+        for (i = 0; i < $scope.views.length; i++) {
+            $scope.views[i].api.toggleShowEdits();
+        }
     });
 
     $scope.searchOptions = {
+        emptyDocTxt: 'This field is empty.',
+        searchInput: search,
+        getProperties: true,
         callback: function(elementOb) {
             $rootScope.$broadcast('elementSelected', elementOb, 'latest');
             if ($rootScope.ve_togglePane && $rootScope.ve_togglePane.closed)
                 $rootScope.ve_togglePane.toggle();
         },
-        emptyDocTxt: 'This field is empty.',
-        searchInput: $stateParams.search,
-        searchResult: search,
         relatedCallback: function (doc, view, elem) {//siteId, documentId, viewId) {
             $state.go('project.ref.document.view', {projectId: doc._projectId, documentId: doc.id, viewId: view.id, refId: doc._refId, search: undefined});
         }

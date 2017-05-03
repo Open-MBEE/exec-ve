@@ -11,11 +11,11 @@ function mmsViewTable($compile, $timeout, $document, UtilsService) {
         scope.searchTerm = '';
         scope.showFilter = false;
         var html = UtilsService.makeHtmlTable(scope.table);
-        html = '<div class="tableSearch">' +
-                '<button class="btn btn-sm btn-primary" ng-click="doClick()">Export CSV</button> ' +
-                '<button class="btn btn-sm btn-primary" ng-click="showFilter = !showFilter">Filter Table</button> ' +
+        html = '<div class="tableSearch ve-table-buttons">' +
+                '<button class="btn btn-sm export-csv-button btn-tertiary" ng-click="doClick()">Export CSV</button> ' +
+                '<button class="btn btn-sm filter-table-button btn-tertiary" ng-click="showFilter = !showFilter">Filter Table</button> ' +
                 '<span ng-show="showFilter"><span>Showing {{numFiltered}} of {{numTotal}} Rows </span>' + 
-                    '<form style="display: inline" ng-submit="search()"><input type="text" size="75" placeholder="regex filter" ng-model="searchTerm"></input></form>' +
+                    '<form style="display: inline" ng-submit="search()" class="ve-filter-table-form"><input type="text" size="75" placeholder="regex filter" ng-model="searchTerm"></input></form>' +
                 '<button class="btn btn-sm btn-primary" ng-click="search()">Apply</button>' + 
                 '<button class="btn btn-sm btn-danger" ng-click="resetSearch()">Reset</button></span></div>' + html;
 
@@ -61,9 +61,9 @@ function mmsViewTable($compile, $timeout, $document, UtilsService) {
                 var first = nextIndex;
                 if (first > lastIndex)
                     return;
-                var now = trs.slice(first, first + 100);
+                var now = trs.slice(first, first + 500);
                 $compile(now)(scope);
-                nextIndex = first + 100;
+                nextIndex = first + 500;
                 if (nextIndex < lastIndex)
                     compile();
             }, 100, false);

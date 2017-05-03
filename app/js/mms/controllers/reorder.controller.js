@@ -31,7 +31,7 @@ function($scope, $rootScope, documentOb, ElementService, ViewService, MmsAppUtil
                 var root = $scope.tree[i];
                 root.new = '';
                 var num = 1;
-                for (var j = 0; j < root.children.length; i++) {
+                for (var j = 0; j < root.children.length; j++) {
                     updateNumber(root.children[j], num + '', 'new');
                     num++;
                 }

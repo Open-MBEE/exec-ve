@@ -106,11 +106,11 @@ function UxService($rootScope) {
       case "tree-add-view":
         return {id: button, icon: 'fa-plus', selected: true, active: true, permission: false, tooltip: 'Add View', 
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
-      case "tree-add-configuration":
+      case "tree-add-tag":
         return {id: button, icon: 'fa-tag', selected: true, active: true, permission: true, tooltip: 'Add Tag', 
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
-      case "tree-add-task":
-        return {id: button, icon: 'fa-plus', selected: true, active: true, permission: true, tooltip: 'Add Task', 
+      case "tree-add-branch":
+        return {id: button, icon: 'fa-plus', selected: true, active: true, permission: true, tooltip: 'Add Branch',
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
       case "tree-delete":
         return {id: button, icon: 'fa-trash', selected: true, active: true, permission: true, tooltip: 'Delete', 

@@ -13,10 +13,13 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     $rootScope.mms_refOb = refOb;
     $rootScope.mms_bbApi = $scope.bbApi = {};
     $rootScope.ve_treeApi = $scope.treeApi = {};
+    $rootScope.ve_tree_pane = $scope.$pane;
     if (!$rootScope.veTreeShowPe) {
         $rootScope.veTreeShowPe = false;
     }
     $scope.buttons = [];
+    $scope.projectOb = projectOb;
+    $scope.refOb = refOb;
     $scope.treeExpandLevel = 1;
     if ($state.includes('project.ref') && !$state.includes('project.ref.document')) {
         $scope.treeExpandLevel = 0;
@@ -182,8 +185,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     var groupLevel2Func = function(groupOb, groupNode) {
         ViewService.getProjectDocuments({
                     projectId: projectOb.id,
-                    refId: refOb.id,
-                    extended: true
+                    refId: refOb.id
         }, 2).then(function(documentObs) {
             var docs = [];
             var docOb, i;
@@ -239,6 +241,9 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             newChildNodes.push(node);
         }
         curNode.children.push.apply(curNode.children, newChildNodes);
+        if ($scope.treeApi.refresh) {
+            $scope.treeApi.refresh();
+        }
     };
     var processDeletedViewBranch = function(branch) {
         var id = branch.data.id;
@@ -256,8 +261,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         $scope.treeData = UtilsService.buildTreeHierarchy(groupObs, "_id", "group", "_parentId", groupLevel2Func);
         ViewService.getProjectDocuments({
                     projectId: projectOb.id,
-                    refId: refOb.id,
-                    extended: true
+                    refId: refOb.id
         }, 2).then(function(documentObs) {
             for (var i = 0; i < documentObs.length; i++) {
                 if (!documentObs[i]._groupId) {
@@ -268,6 +272,9 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                         children: []
                     });
                 }
+            }
+            if ($scope.treeApi.refresh) {
+                $scope.treeApi.refresh();
             }
         });
     } else {
@@ -373,7 +380,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     $scope.treeClickHandler = function(branch) {
         if ($state.includes('project.ref') && !$state.includes('project.ref.document')) {
             if (branch.type === 'group') {
-                $state.go('project.ref.preview', {documentId: branch.data._id + '_cover', search: undefined});
+                $state.go('project.ref.preview', {documentId: 'site_' + branch.data._id + '_cover', search: undefined});
             } else if (branch.type === 'view' || branch.type === 'snapshot') {
                 $state.go('project.ref.preview', {documentId: branch.data.id, search: undefined});
             }
@@ -490,9 +497,13 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         var newBranchType = "";
         
         if (itemType === 'Document') {
-            if (!branch || branch.type !== 'group') {
+            if (!branch) {
+                $scope.parentBranchData = {_id: "holding_bin_" + projectOb.id};
+            } else if (branch.type !== 'group') {
                 growl.warning("Select a group to add document under");
                 return;
+            } else {
+                $scope.parentBranchData = branch.data;
             }
             templateUrlStr = 'partials/mms/new-doc.html';
             newBranchType = 'view';
@@ -507,13 +518,13 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 growl.warning("Add View Error: Cannot add a child view to a non-owned and non-shared view.");
                 return;
             }
+            $scope.parentBranchData = branch.data;
             templateUrlStr = 'partials/mms/new-view.html';
             newBranchType = 'view';
         } else {
             growl.error("Add Item of Type " + itemType + " is not supported");
             return;
         }
-        $scope.parentBranchData = branch.data;
         // Adds the branch:
         var instance = $uibModal.open({
             templateUrl: templateUrlStr,
@@ -527,12 +538,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 data: data,
                 children: []
             };
-            
-            var top = false; //TODO fix tags and branch
-            if (itemType === 'Document') {
-                newbranch.groupId = branch.data._id;
-            }
-            $scope.treeApi.add_branch(branch, newbranch, top);
+            $scope.treeApi.add_branch(branch, newbranch, false);
 
             var addToFullDocView = function(node, curSection, prevSysml) {
                 var lastChild = prevSysml;
@@ -581,6 +587,8 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     var addItemCtrl = function($scope, $uibModalInstance, $filter) {
         $scope.createForm = true;
         $scope.oking = false;
+        $scope.projectOb = projectOb;
+        $scope.refOb = refOb;
         var displayName = "";
 
         if ($scope.itemType === 'Document') {
@@ -620,22 +628,18 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             }); 
         };
 
-        var searchFilter = function(results) {
-            var views = [];
-            for (var i = 0; i < results.length; i++) {
-                if (UtilsService.isView(results[i])) {
-                    views.push(results[i]);
-                    if (results[i].properties) {
-                        delete results[i].properties;
-                    }
-                }
-            }
-            return views;
+
+        var queryFilter = function() {
+            var obj = {};
+            obj.terms = {'_appliedStereotypeIds': [UtilsService.VIEW_SID, UtilsService.DOCUMENT_SID]};
+            return obj;
         };
+
         $scope.searchOptions = {
             callback: addExistingView,
             itemsPerPage: 200,
-            filterCallback: searchFilter
+            filterQueryList: [queryFilter]
+
         };
 
         $scope.ok = function() {

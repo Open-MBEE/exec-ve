@@ -55,14 +55,15 @@ function mmsValueLink(ElementService, $compile, growl) {
                 if (scope.mmsErrorText){
                     element.html('<span class="mms-error">'+ scope.mmsErrorText +'</span>');
                 } else {
-                    element.html('<span class="mms-error">Element does not provide link value.</span>');
+                    if (scope.mmsErrorText){
+                        element.html('<span>'+ scope.mmsErrorText +'</span>');
+                    } else {
+                        element.html('<span class="mms-error">Element does not provide link value.</span>');
+                    }
                 }
             }
         }, function(reason) {
-            if (scope.mmsErrorText){
-                element.html('<span class="mms-error">'+ scope.mmsErrorText +'</span>');
-            } else
-                element.html('<span class="mms-error">Element was not found.</span>');
+            element.html('<span class="mms-error">Element was not found.</span>');
         });
     };
 

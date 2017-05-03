@@ -15,6 +15,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
         id: null
     };
     $scope.editable = documentOb && documentOb._editable && refOb.type === 'Branch';
+    $scope.viewOb = viewOb;
     $scope.documentOb = documentOb;
     $scope.refOb = refOb;
 
@@ -169,11 +170,11 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
     });
 
     $scope.$on('view-reorder.refresh', function() {
-        $scope.viewOrderApi.refresh();
+        $scope.viewContentsOrderApi.refresh();
     });
 
     $scope.$on('view-reorder', function() {
-        $scope.viewOrderApi.setEditing(true);
+        $scope.viewContentsOrderApi.setEditing(true);
         showPane('reorder');
     });
     
@@ -349,14 +350,14 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
         }
         viewSaving = true;
         $rootScope.ve_tbApi.toggleButtonSpinner('view-reorder-save');
-        $scope.viewOrderApi.save().then(function(data) {
+        $scope.viewContentsOrderApi.save().then(function(data) {
             viewSaving = false;
-            $scope.viewOrderApi.refresh();
+            $scope.viewContentsOrderApi.refresh();
             growl.success('Save Succesful');
             $rootScope.ve_tbApi.toggleButtonSpinner('view-reorder-save');
             $rootScope.$broadcast('view.reorder.saved', $scope.viewId);
         }, function(reason) {
-            $scope.viewOrderApi.refresh();
+            $scope.viewContentsOrderApi.refresh();
             viewSaving = false;
             if (reason.type === 'info')
                 growl.info(reason.message);
@@ -370,7 +371,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
     });
     $scope.$on('view-reorder-cancel', function() {
         $scope.specApi.setEditing(false);
-        $scope.viewOrderApi.refresh();
+        $scope.viewContentsOrderApi.refresh();
         $rootScope.ve_tbApi.select('element-viewer');
         showPane('element');
     });

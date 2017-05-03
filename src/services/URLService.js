@@ -125,6 +125,10 @@ function urlService(baseUrl) {
         return addTicket(root + '/projects/' + projectId + '/refs');
     };
 
+    var getRefURL = function(projectId, refId) {
+        return addTicket(root + '/projects/' + projectId + '/refs/' + refId);
+    };
+
     var getGroupsURL = function(projectId, refId) {
         return addTicket(root + '/projects/' + projectId + '/refs/' + refId + '/groups');
     };
@@ -137,9 +141,7 @@ function urlService(baseUrl) {
      * @description
      * Gets url that gets products in a site
      *
-     * @param {string} site Site name
-     * @param {string} workspace Workspace name
-     * @param {string} version timestamp
+     * @param {object} reqOb object with keys as described in ElementService.
      * @returns {string} The url
      */
     var getProjectDocumentsURL = function(reqOb) {
@@ -155,17 +157,15 @@ function urlService(baseUrl) {
      * @methodOf mms.URLService
      * 
      * @description
-     * Gets the url for querying an image url 
+     * Gets the url for querying an image url
      * (this is not the actual image path)
      * 
-     * @param {string} id The id of the image
-     * @param {string} workspace Workspace name
-     * @param {string} version Timestamp or version number
      * @returns {string} The path for image url queries.
      */
-    var getImageURL = function(id, ext, workspace, version) {
-        var r = root + '/workspaces/' + workspace + '/artifacts/' + id + '?extension=' + ext;
-        return addTicket(addVersion(r, version));
+    var getImageURL = function(reqOb) {
+        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/artifacts/' +
+                       reqOb.elementId + '?accept=' + reqOb.accept;
+        return addTicket(addVersion(r, reqOb.commitId));
     };
 
     /**
@@ -190,10 +190,8 @@ function urlService(baseUrl) {
      * 
      * @description
      * Gets the path for an element
-     * 
-     * @param {string} id The element id.
-     * @param {string} workspace Workspace name
-     * @param {string} version Timestamp or version number
+     *
+     * @param {object} reqOb object with keys as described in ElementService.
      * @returns {string} The url.
      */
     var getElementURL = function(reqOb) {        
@@ -221,11 +219,8 @@ function urlService(baseUrl) {
      * 
      * @description
      * Gets the url to get all views in a document
-     * 
-     * @param {string} id The document id.
-     * @param {string} workspace Workspace name
-     * @param {string} version Timestamp or version number
-     * @param {boolean} simple Whether to get simple views (without specialization, for performance reasons)
+     *
+     * @param {object} reqOb object with keys as described in ElementService.
      * @returns {string} The url.
      */
     var getDocumentViewsURL = function(reqOb) {
@@ -242,9 +237,8 @@ function urlService(baseUrl) {
      * 
      * @description
      * Gets the url to query for element history
-     * 
-     * @param {string} id The element id.
-     * @param {string} workspace Workspace name
+     *
+     * @param {object} reqOb object with keys as described in ElementService.
      * @returns {string} The url.
      */
     var getElementHistoryURL = function(reqOb) {
@@ -258,8 +252,8 @@ function urlService(baseUrl) {
      * 
      * @description
      * Gets the path for posting element changes.
-     * 
-     * @param {string} workspace Workspace name
+     *
+     * @param {object} reqOb object with keys as described in ElementService.
      * @returns {string} The post elements url.
      */
     var getPostElementsURL = function(reqOb) {
@@ -273,9 +267,8 @@ function urlService(baseUrl) {
      * 
      * @description
      * Gets the path for getting multiple elements (using put with body).
-     * 
-     * @param {string} workspace Workspace name
-     * @param {string} version timestamp
+     *
+     * @param {object} reqOb object with keys as described in ElementService.
      * @returns {string} The post elements url.
      */
     var getPutElementsURL = function(reqOb) {
@@ -326,7 +319,9 @@ function urlService(baseUrl) {
             result.message = "Deleted";
         else if (status === 408)
             result.message = "Timed Out";
-        else
+        else if (status === 501) {
+            result.message = "Cacheing";
+        } else
             result.message = "Timed Out (Please check network)";
         deferred.reject(result);
     };
@@ -338,29 +333,12 @@ function urlService(baseUrl) {
      * 
      * @description
      * Gets the url for element keyword search.
-     * 
-     * @param {string} query Keyword query
-     * @param {Array.<string>} filters if not null, put in filters
-     * @param {string} propertyName if not null put in propertyName
-     * @param {integer} page page to get
-     * @param {integer} items items per page
-     * @param {string} workspace Workspace name to search under
+     *
+     * @param {object} reqOb object with keys as described in ElementService.
      * @returns {string} The post elements url.
      */
-    var getElementSearchURL = function(reqOb, query, filters, propertyName, page, items) {
-        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + 'search?keyword=' + query;
-        if (filters) {
-            var l = filters.join();
-            r += '&filters=' + l;
-        }
-        if (propertyName) {
-            r += '&propertyName=' + propertyName;
-        }
-        if (items && items > 0) {
-            r += "&maxItems=" + items;
-            if (page >= 0)
-                r += '&skipCount=' + page;
-        }
+    var getElementSearchURL = function(reqOb) {
+        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/search?';
         return addExtended(addTicket(r), true);
     };
 
@@ -463,6 +441,7 @@ function urlService(baseUrl) {
         getProjectsURL: getProjectsURL,
         getProjectURL: getProjectURL,
         getRefsURL: getRefsURL,
+        getRefURL: getRefURL,
         getGroupsURL: getGroupsURL,
         getElementURL: getElementURL,
         getPutElementsURL: getPutElementsURL,

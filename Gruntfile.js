@@ -4,8 +4,10 @@ module.exports = function(grunt) {
 
   var jsFiles = ['app/js/**/*.js', 'src/**/*.js'];
 
-  var servers = grunt.file.readJSON('ems-config/angular-mms-grunt-servers.json');
-  var artifactory = grunt.file.readJSON('ems-config/artifactory.json');
+  var artifactoryUrl = grunt.option('ARTIFACTORY_URL');
+  var artifactoryUser = grunt.option('ARTIFACTORY_USER');
+  var artifactoryPassword = grunt.option('ARTIFACTORY_PASSWORD');
+  var servers = grunt.file.readJSON('angular-mms-grunt-servers.json');
   var connectObject = {
     'static': {
       options: {
@@ -276,10 +278,10 @@ module.exports = function(grunt) {
 
     artifactory: {
       options: {
-        url: artifactory.url,
+        url: artifactoryUrl,
         repository: 'libs-snapshot-local',
-        username: artifactory.username,
-        password: artifactory.password
+        username: artifactoryUser,
+        password: artifactoryPassword
       },
       client: {
         files: [{

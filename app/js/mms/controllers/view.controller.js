@@ -31,6 +31,8 @@ angular.module('mmsApp')
 
     $scope.search = search;
     $scope.viewOb = viewOb;
+    $scope.projectOb = projectOb;
+    $scope.refOb = refOb;
 
     $scope.buttons = [];
     $scope.viewApi = {
@@ -40,6 +42,9 @@ angular.module('mmsApp')
             }
             if ($rootScope.veElementsOn) {
                 $scope.viewApi.toggleShowElements();
+            }
+            if ($rootScope.ve_editmode) {
+                $scope.viewApi.toggleShowEdits();
             }
         },
         elementTranscluded: function(elementOb, type) {
@@ -78,24 +83,7 @@ angular.module('mmsApp')
             $scope.bbApi.addButton(UxService.getButtonBarButton('show-comments'));
             $scope.bbApi.setToggleState('show-comments', $rootScope.veCommentsOn);
             if (viewOb && viewOb._editable && refOb.type === 'Branch') {
-                if (viewOb._contents || viewOb.type === 'InstanceSpecification') {
-                    $scope.bbApi.addButton(UxService.getButtonBarButton('view-add-dropdown'));
-                } else {
-                    var fakeDropdown = {
-                        id: 'view-add-dropdown-fake',
-                        icon: 'fa-plus',
-                        selected: true,
-                        active: true,
-                        permission: true,
-                        tooltip: 'Add New Element Disabled',
-                        spinner: false,
-                        togglable: false,
-                        action: function() {
-                            growl.warning("This view hasn't been converted to support adding new elements.");
-                        }
-                    };
-                    $scope.bbApi.addButton(fakeDropdown);
-                }
+                $scope.bbApi.addButton(UxService.getButtonBarButton('view-add-dropdown'));
             }
             if ($state.includes('project.ref.preview')) {
                 $scope.bbApi.addButton(UxService.getButtonBarButton('print'));
@@ -261,14 +249,14 @@ angular.module('mmsApp')
     }
 
     $scope.searchOptions = {
+        emptyDocTxt: 'This field is empty.',
+        searchInput: search,
+        getProperties: true,
         callback: function(elementOb) {
             $rootScope.$broadcast('elementSelected', elementOb, 'latest');
             if ($rootScope.ve_togglePane && $rootScope.ve_togglePane.closed)
                 $rootScope.ve_togglePane.toggle();
         },
-        emptyDocTxt: 'This field is empty.',
-        searchInput: $stateParams.search,
-        searchResult: search,
         relatedCallback: function (doc, view, elem) {//siteId, documentId, viewId) {
             $state.go('project.ref.document.view', {projectId: doc._projectId, documentId: doc.id, viewId: view.id, refId: doc._refId, search: undefined});
         }

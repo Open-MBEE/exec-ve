@@ -252,8 +252,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         .then(function(view) {
             var toGet = [];
             var results = [];
-            if (view._displayedElements) {
-                var displayed = JSON.parse(view._displayedElements);
+            if (view._displayedElementIds) {
+                var displayed = JSON.parse(view._displayedElementIds);
                 if (angular.isArray(displayed) && displayed.length > 0) {
                     toGet = displayed;
                 }
@@ -327,8 +327,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         ElementService.getElement({
             projectId: reqOb.projectId,
             refId: reqOb.refId,
-            elementId: reqOb.parentViewId,
-            extended: true
+            elementId: reqOb.parentViewId
         }, 2).then(function(data) {  
             var clone = {
                 _projectId: data._projectId,
@@ -372,8 +371,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         ElementService.getElement({
             projectId: reqOb.projectId,
             refId: reqOb.refId,
-            elementId: reqOb.parentViewId,
-            extended: true
+            elementId: reqOb.parentViewId
         }, 2).then(function(data) {  
             if (data._childViews) {
                 var clone = {
@@ -552,7 +550,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
 
         var instanceSpec = {
             id: newInstanceId,
-            ownerId: 'holding_bin_' + viewOrSectionOb._projectId,
+            ownerId: 'view_instances_bin_' + viewOrSectionOb._projectId,
             name: name ? name : "Untitled " + type,
             documentation: '',
             type: "InstanceSpecification",
@@ -563,6 +561,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             },
             _appliedStereotypeIds: [],
         };
+        instanceSpec = UtilsService.createInstanceElement(instanceSpec);
         if (type === 'Section') {
             instanceSpec.specification = {
                 operand: [],  
@@ -571,22 +570,20 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         }
         var clone = {
             _projectId: viewOrSectionOb._projectId,
-            _refId: viewOrSectionOb._refId,
-            _modified: viewOrSectionOb._modified,
-            _read: viewOrSectionOb._read,
             id: viewOrSectionOb.id,
+            _refId: viewOrSectionOb._refId,
         };
         var key = '_contents';
         if (isSection(viewOrSectionOb)) {
             key = "specification";
         }
-        if (viewOrSectionOb[key]) {
-            clone[key] = JSON.parse(JSON.stringify(viewOrSectionOb[key]));
-        } else {
+        if (!viewOrSectionOb[key]) {
             clone[key] = {
                 operand: [],
-                type: "Expression",
+                type: "Expression"
             };
+        } else {
+            clone[key] = JSON.parse(JSON.stringify(viewOrSectionOb[key]));
         }
         clone[key].operand.push({instanceId: newInstanceId, type: "InstanceValue"});
         var toCreate = [instanceSpec, clone];
@@ -640,10 +637,9 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         var view = {
             id: newViewId,
             type: 'Class',
-            ownedAttributeIds: [],
             ownerId: ownerOb.id,
             _allowedElements: [],
-            _displayedElements: [newViewId],
+            _displayedElementIds: [newViewId],
             _childViews: [],
             _contents: {
                 operand: [{
@@ -652,26 +648,29 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 }],
                 type: 'Expression'
             },
-            name: viewOb.name ? viewOb.name : 'Untitled View',
+            name: viewOb.viewName ? viewOb.viewName : 'Untitled View',
             documentation: viewOb.viewDoc ? viewOb.viewDoc : '',
             _appliedStereotypeIds: [
                 (viewOb.isDoc ? "_17_0_2_3_87b0275_1371477871400_792964_43374" : "_17_0_1_232f03dc_1325612611695_581988_21583")
             ],
             appliedStereotypeInstanceId: newViewId + '_asi'
         };
+        view = UtilsService.createClassElement(view);
         var parentView = null;
-        if (ownerOb && ownerOb._childViews) {
+        if (ownerOb && (ownerOb._childViews || UtilsService.isView(ownerOb))) {
             parentView = {
                 _projectId: ownerOb._projectId,
                 _refId: ownerOb._refId,
-                _modified: ownerOb._modified,
-                _read: ownerOb._read,
-                id: ownerOb.id,
-                _childViews: JSON.parse(JSON.stringify(ownerOb._childViews))
+                id: ownerOb.id
             };
+            if (!ownerOb._childViews) {
+                parentView._childViews = [];
+            } else {
+                parentView._childViews = JSON.parse(JSON.stringify(ownerOb._childViews));
+            }
             parentView._childViews.push({id: newViewId, aggregation: "composite"});
-        } 
-        var instanceSpecDoc = '<p>&nbsp;</p><p><mms-transclude-doc data-mms-eid="' + newViewId + '">[cf:' + view.name + '.doc]</mms-transclude-doc></p><p>&nbsp;</p>';
+        }
+        var instanceSpecDoc = '';
         var instanceSpecSpec = {
             'type': 'Paragraph', 
             'sourceType': 'reference', 
@@ -680,7 +679,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         };
         var instanceSpec = {
             id: newInstanceId,
-            ownerId: 'holding_bin_' + ownerOb._projectId,
+            ownerId: 'view_instances_bin_' + ownerOb._projectId,
             name: "View Documentation",
             documentation: instanceSpecDoc,
             type: "InstanceSpecification",
@@ -691,6 +690,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             },
             _appliedStereotypeIds: [],
         };
+        instanceSpec = UtilsService.createInstanceElement(instanceSpec);
         var asi = { //create applied stereotype instance
             id: newViewId + '_asi',
             ownerId: newViewId,
@@ -701,6 +701,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             _appliedStereotypeIds: [],
             stereotypedElementId: newViewId
         };
+        asi = UtilsService.createInstanceElement(asi);
         var toCreate = [instanceSpec, view, asi];
         if (parentView)
             toCreate.push(parentView);

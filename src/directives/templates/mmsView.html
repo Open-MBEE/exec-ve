@@ -1,7 +1,7 @@
 <div id="{{mmsElementId}}">
 
     <h1 ng-if="mmsLink" class="view-title">
-      {{mmsNumber}} <mms-view-link mms-element-id="{{view.id}}" mms-doc-id="{{view.id}}"></mms-view-link>
+      {{mmsNumber}} <mms-view-link mms-vid="{{view.id}}" mms-did="{{view.id}}"></mms-view-link>
     </h1>
 
     <h1 ng-if="!mmsLink" class="view-title">
@@ -16,13 +16,13 @@
 
     <div ng-if="view._contents">
         <!-- Cant use track by instanceVal.instance b/c of possible duplicate entries -->
-        <div ng-repeat="instanceVal in view._contents.operand"> 
+        <div ng-repeat="instanceVal in view._contents.operand track by instanceVal.instanceId"> 
             <mms-view-presentation-elem data-mms-instance-val="::instanceVal"></mms-view-presentation-elem>
         </div>
     </div>
     <div ng-if="view.specification">
         <!-- Cant use track by instanceVal.instance b/c of possible duplicate entries -->
-        <div ng-repeat="instanceVal in view.specification.operand"> 
+        <div ng-repeat="instanceVal in view.specification.operand track by instanceVal.instanceId"> 
             <mms-view-presentation-elem data-mms-instance-val="::instanceVal"></mms-view-presentation-elem>
         </div>
     </div>

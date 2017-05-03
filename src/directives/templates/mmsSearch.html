@@ -40,7 +40,7 @@
                     </button>
                 </div>
             </div>
-            <div>Showing {{filteredElms.length}} <!--of {{searchResults.length}} -->search results. (Page {{currentPage + 1}}) <span class="mms-error" ng-if="ws !== 'master'">WARNING: Results shown are from master branch.</span></div>
+            <div>Showing {{filteredElms.length}} <!--of {{searchResults.length}} -->search results. (Page {{currentPage + 1}})</div>
         </div>
     </div>
     <div class="container-fluid">
@@ -52,7 +52,11 @@
             <hr>
             <div class="elem-name-wrapper">
                 <a class="elem-name" ng-click="userResultClick(elem, 'name')">{{elem.name}}</a>
-                <a class="elem-name" ng-show="elem.type == 'Slot'" ng-click="userResultClick(elem, 'name')"><mms-transclude-name mms-eid="{{elem.definingFeatureId}}"></mms-transclude-name></a>
+                <a class="elem-name" ng-show="elem.type == 'Slot'" ng-click="userResultClick(elem, 'name')"><mms-transclude-name mms-eid="{{elem.definingFeatureId}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}"></mms-transclude-name></a>
+            </div>
+            <div class="elem-type-wrapper">
+                <label>LAST MODIFIED</label>
+                <div>{{elem._modified | date:'M/d/yy h:mm a'}} by {{elem._modifier}}</div>
             </div>
             <div class="elem-qualified-name-wrapper">
                 <div class="elem-qualified-name">
@@ -69,9 +73,13 @@
                 </div>
             </div>
             <div class="elem-type-wrapper">
-                <label>METATYPE</label>
+                <label>TYPE</label>
+                <div>{{elem.type}}</div>
+            </div>
+            <div class="elem-type-wrapper">
+                <label>STEREOTYPES</label>
                 <div ng-repeat="type in elem._appliedStereotypeIds" class="elem-type">
-                    <mms-transclude-name mms-eid="{{type}}" no-click="true"></mms-transclude-name>
+                    <mms-transclude-name mms-eid="{{type}}" no-click="true" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}"></mms-transclude-name>
                 </div>
             </div>
             <div ng-if="(elem.type === 'Property' || elem.type === 'Port') && elem.defaultValue">
@@ -111,7 +119,7 @@
                     <tbody>
                         <tr ng-repeat="row in elem._properties2">
                             <td ng-repeat="property in row">
-                                {{property.name}}<span ng-show="property.type === 'Slot'"><mms-transclude-name mms-eid="{{property.definingFeatureId}}"></mms-transclude-name></span>: 
+                                {{property.name}}<span ng-show="property.type === 'Slot'"><mms-transclude-name mms-eid="{{property.definingFeatureId}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}"></mms-transclude-name></span>: 
                                 <a ng-click="userResultClick(property, 'val')"><span ng-repeat="val in property.value">{{val.value + '' || val.body[0] || 'Default Value'}}<span class="ellipses">{{(val.body[0] && val.body.length > 1) ? ' ...' : '' }}</span>{{$last ? '' : ', '}}</span></a>
                             </td>
                         </tr>
@@ -121,7 +129,7 @@
             <div ng-if="elem._relatedDocuments.length > 0" class="elem-documentation-wrapper">
                 <label>RELATED DOCUMENTS</label>
                 <div ng-repeat="relatedDocument in elem._relatedDocuments" class="elem-documentation">
-                    <a ng-repeat="relatedView in relatedDocument._parentViews" ui-sref="workspace.site.document.view({document: relatedDocument.id, view: relatedView.id, site: relatedDocument._siteCharacterizationId, search: undefined})" ng-click="userRelatedClick($event, relatedDocument, relatedView, elem)">
+                    <a ng-repeat="relatedView in relatedDocument._parentViews" ui-sref="project.ref.document.view({documentId: relatedDocument.id, viewId: relatedView.id, projectId: relatedDocument._projectId, refId: relatedDocument._refId, search: undefined})" ng-click="userRelatedClick($event, relatedDocument, relatedView, elem)">
                         {{relatedDocument.name}} > {{relatedView.name}}<br/>
                     </a>
                 </div>

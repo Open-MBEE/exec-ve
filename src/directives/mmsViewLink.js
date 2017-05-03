@@ -89,12 +89,12 @@ function mmsViewLink(ElementService, UtilsService, $compile, growl) {
     return {
         restrict: 'E',
         scope: {
-            mmsElementId: '@',
+            mmsElementId: '@mmsVid',
             mmsProjectId: '@',
             mmsRefId: '@',
             mmsCommitId: '@',
-            mmsDocId: '@',
-            mmsPeId: '@'
+            mmsDocId: '@mmsDid',
+            mmsPeId: '@mmsPeid'
         },
         require: '?^mmsView',
         template: '<a href="mms.html#/projects/{{projectId}}/{{refId}}/documents/{{docid}}/views/{{vid}}{{hash}}">{{name || "Unnamed View"}}</a>',
