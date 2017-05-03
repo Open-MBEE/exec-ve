@@ -121,14 +121,16 @@ ul.global-menu {
   border: 1px solid $ve-slate-darker-2;
   border-radius: 3px 0 0 3px;
   width: 330px;
-  padding: 2px 28px 3px 8px;
+  padding: 0 8px;
   height: 26px;
   margin: 5px 0 5px 10px;
   font-weight: 300;
   letter-spacing: .05em;
+  line-height: 1;
 }
 
 #global-search input:focus {
+  outline:none;
   background-color: $ve-slate-darker-3;
   border: 1px solid $ve-teal-base;
 }
