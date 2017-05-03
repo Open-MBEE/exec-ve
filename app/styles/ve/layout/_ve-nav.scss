@@ -118,7 +118,7 @@ ul.global-menu {
 
 #global-search input {
   background-color: $ve-slate-darker-2;
-  border: none;
+  border: 1px solid $ve-slate-darker-2;
   border-radius: 3px 0 0 3px;
   width: 330px;
   padding: 2px 28px 3px 8px;
@@ -130,6 +130,7 @@ ul.global-menu {
 
 #global-search input:focus {
   background-color: $ve-slate-darker-3;
+  border: 1px solid $ve-teal-base;
 }
 
 #global-search button{
@@ -154,7 +155,7 @@ ul.global-menu {
   position: relative;
   color: white;
   font-size:14px;
-  top:-1px;
+  top:-1px; 
 }
 
 #global-search button:hover{
