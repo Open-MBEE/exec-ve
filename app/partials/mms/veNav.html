@@ -6,7 +6,7 @@
         <div id="global-navigation">
             <form id="global-search" ng-submit="search(searchText)">
                 <input placeholder="Search {{ title }}" ng-model="searchText"/>
-                <button>
+                <button ng-click="search(searchText)">
                     <i class="fa fa-search" aria-hidden="true"></i>
                 </button>
             </form>
