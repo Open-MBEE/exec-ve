@@ -11,6 +11,7 @@ describe('Element Service', function() {
 	var ref = {};
 	var refs = {};
 	var elements = {};
+	var result = {};
 
 	beforeEach(inject(function($injector) {
 		$httpBackend 			= $injector.get('$httpBackend');
@@ -159,6 +160,82 @@ describe('Element Service', function() {
 				}
 			]
 		}
+		result = {
+			_modifier					: "admin",
+			powertypeExtentIds			: [],
+			representationId			: null,
+			mdExtensionsIds				: [],
+			templateBindingIds			: [],
+			appliedStereotypeInstanceId	: "applid",
+			templateParameterId			: null,
+			isActive					: false,
+			ownerId 					: "ownerid",
+			type 						: "Class",
+			isLeaf 						: false,
+			clientDependencyIds 		: [],
+			_displayedElements 			: ["diselements"],
+			useCaseIds 					: [],
+			syncElementId 				: null,
+			classifierBehaviorId 		: null,
+			interfaceRealizationIds 	: [],
+			id 							: "heyanelement",
+			_elasticId 					: "elasticid",
+			_refId 						: "master",
+			supplierDependencyIds 		: [],
+			_modified 					: "2017-05-03T10:51:50.270-0700",
+			_appliedStereotypeIds 		: ["stereotypeids"],
+			nameExpression 				: null,
+			ownedAttributeIds 			: ["ownedattr1","ownedattr2","ownedattr3","ownedattr4","ownedattr5"],
+			packageImportIds 			: [],
+			visibility 					: null,
+			substitutionIds 			: [],
+			documentation 				: "",
+			redefinedClassifierIds 		: [],
+			_editable 					: true,
+			isAbstract 					: false,
+			_contents:
+				{
+					type: "Expression",
+					operand: [
+						{
+							instanceId: "instanceid",
+							type: "InstanceValue"
+						}
+					]
+				},
+			_commitId 					: "commitid",
+			_childViews: [
+				{
+					aggregation: "composite",
+					id: "child1"
+				},
+				{
+					aggregation: "composite",
+					id: "child2"
+				},
+				{
+					aggregation: "composite",
+					id: "child3"
+				},
+				{
+					aggregation: "composite",
+					id: "child4"
+				},
+				{
+					aggregation: "composite",
+					id: "child5"
+				}
+			],
+			generalizationIds 			: [],
+			_creator 					: "admin",
+			ownedOperationIds 			: [],
+			_created 					: "2017-05-01T13:43:19.571-0700",
+			name 						: "Krabby Patties",
+			elementImportIds 			: [],
+			collaborationUseIds 		: [],
+			isFinalSpecialization 		: false,
+			_projectId 					: "heyaproject"
+		}
 
 	}));
 
@@ -270,82 +347,7 @@ describe('Element Service', function() {
 				refId: 'master',
 				commitId: 'latest'
 			};
-			var result = {
-					_modifier					: "admin",
-					powertypeExtentIds			: [],
-					representationId			: null,
-					mdExtensionsIds				: [],
-					templateBindingIds			: [],
-					appliedStereotypeInstanceId	: "applid",
-					templateParameterId			: null,
-					isActive					: false,
-					ownerId 					: "ownerid",
-					type 						: "Class",
-					isLeaf 						: false,
-					clientDependencyIds 		: [],
-					_displayedElements 			: ["diselements"],
-					useCaseIds 					: [],
-					syncElementId 				: null,
-					classifierBehaviorId 		: null,
-					interfaceRealizationIds 	: [],
-					id 							: "heyanelement",
-					_elasticId 					: "elasticid",
-					_refId 						: "master",
-					supplierDependencyIds 		: [],
-					_modified 					: "2017-05-03T10:51:50.270-0700",
-					_appliedStereotypeIds 		: ["stereotypeids"],
-					nameExpression 				: null,
-					ownedAttributeIds 			: ["ownedattr1","ownedattr2","ownedattr3","ownedattr4","ownedattr5"],
-					packageImportIds 			: [],
-					visibility 					: null,
-					substitutionIds 			: [],
-					documentation 				: "",
-					redefinedClassifierIds 		: [],
-					_editable 					: true,
-					isAbstract 					: false,
-					_contents:
-						{
-							type: "Expression",
-							operand: [
-								{
-									instanceId: "instanceid",
-									type: "InstanceValue"
-								}
-							]
-						},
-					_commitId 					: "commitid",
-					_childViews: [
-						{
-							aggregation: "composite",
-							id: "child1"
-						},
-						{
-							aggregation: "composite",
-							id: "child2"
-						},
-						{
-							aggregation: "composite",
-							id: "child3"
-						},
-						{
-							aggregation: "composite",
-							id: "child4"
-						},
-						{
-							aggregation: "composite",
-							id: "child5"
-						}
-					],
-					generalizationIds 			: [],
-					_creator 					: "admin",
-					ownedOperationIds 			: [],
-					_created 					: "2017-05-01T13:43:19.571-0700",
-					name 						: "Krabby Patties",
-					elementImportIds 			: [],
-					collaborationUseIds 		: [],
-					isFinalSpecialization 		: false,
-					_projectId 					: "heyaproject"
-			};
+			
 			$httpBackend.when('GET', root + '/projects/heyaproject/refs/master/elements/heyanelement').respond(
 				function(method, url, data) {
 					return [200, elements];
@@ -379,9 +381,27 @@ describe('Element Service', function() {
 		// });
 	});
 
-	xdescribe('getElementForEdit', function() {
+	describe('getElementForEdit', function() {
 		it('should get an element', function() {
-
+			var elemOb;
+			var testElem = {
+				projectId: "heyaproject",
+				elementId: "heyanelement",
+				refId: 'master',
+				commitId: 'latest'
+			};
+			$httpBackend.when('GET', root + '/projects/heyaproject/refs/master/elements').response(
+				function(method, url, data) {
+					return [200, elements];
+				}
+			);
+			ElementServiceObj.getElementForEdit(testElem).then(function(data) {
+				elemOb = data;
+			}, function(reason) {
+				elemOb = reason.message;
+			});
+			$httpBackend.flush();
+			expect(elemOb).toEqual(result);
 		});
 	});
 
