@@ -657,10 +657,10 @@ function UtilsService($q, $http, CacheService, URLService, _) {
      * @param {string} [workspace=master] Workspace name
      * @returns {Promise} Promise would be resolved with 'ok', the server will send an email to user when done
      */
-    var convertHtmlToPdf = function(doc, site, workspace){ //TODO fix
-        var n = UtilsService.normalize(null, workspace);
+    var convertHtmlToPdf = function(doc, projectId, refOb){ //TODO fix
+        var n = normalize(refOb);
         var deferred = $q.defer();
-        $http.post(URLService.getHtmlToPdfURL(doc.docId, site, n.ws), {'documents': [doc]})
+        $http.post(URLService.getHtmlToPdfURL(doc.docId, projectId, n.refId), {'documents': [doc]})
         .success(function(data, status, headers, config){
             deferred.resolve('ok');
         }).error(function(data, status, headers, config){

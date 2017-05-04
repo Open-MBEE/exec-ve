@@ -86,9 +86,9 @@ function urlService(baseUrl) {
      * @param {string} workspace Workspace name
      * @returns {string} The url
      */
-    var getHtmlToPdfURL = function(docId, site, workspace) {
-        return addTicket(root + "/workspaces/" + workspace +
-                      "/sites/" + site +
+    var getHtmlToPdfURL = function(docId, projectId, refId) {
+        return addTicket(root + "/projects/" + projectId +
+                      "/refs/" + refId +
                       "/documents/" + docId +
                       "/htmlToPdf/123456789");  
     };

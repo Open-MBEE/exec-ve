@@ -233,9 +233,9 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
                         $scope.meta.bottom = metadata.footer ? metadata.footer : '';
                         $scope.meta['top-left'] = metadata.dnumber ? metadata.dnumber : '';
                         $scope.meta['top-right'] = metadata.version ? metadata.version : '';
-                        if (refOb && refOb.isTag)
+                        if (refOb && refOb.type === 'Tag')
                             $scope.meta['top-right'] = $scope.meta['top-right'] + ' ' + refOb.name;
-                        var displayTime = refOb.isTag ? refOb._timestamp : 'latest';
+                        var displayTime = refOb.type === 'Tag' ? refOb._timestamp : 'latest';
                         if (displayTime === 'latest') {
                             displayTime = new Date();
                             displayTime = $filter('date')(displayTime, 'M/d/yy h:mm a');
@@ -321,11 +321,12 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
                             doc.tof = '';
                             doc.tot = '';
                         }
-                        if (!refOb.isTag)
+                        //TODO this might need to be updated
+                        if (refOb.type != 'Tag')
                             doc.tagId = 'Latest';
                         else
                             doc.tagId = refOb.name;
-                        UtilsService.convertHtmlToPdf(doc)
+                        UtilsService.convertHtmlToPdf(doc, viewOrDocOb._projectId, refOb)
                         .then(function(reuslt) {
                             deferred.resolve(result);
                         }, function(reason){
@@ -460,7 +461,7 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
             //useCover = true;
             newScope.meta = metadata;
             newScope.tag = refOb;
-            newScope.time = !refOb.isTag ? new Date() : refOb._timestamp;
+            newScope.time = refOb.type != 'Tag' ? new Date() : refOb._timestamp;
             displayTime = $filter('date')(newScope.time, 'M/d/yy h:mm a');
             newScope.meta.title = viewOrDocOb.name;
             header = metadata.header ? metadata.header : header;
