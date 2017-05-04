@@ -326,7 +326,7 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
                             doc.tagId = 'Latest';
                         else
                             doc.tagId = refOb.name;
-                        UtilsService.convertHtmlToPdf(doc, viewOrDocOb._projectId, refOb)
+                        UtilsService.convertHtmlToPdf(doc, viewOrDocOb._projectId, viewOrDocOb._refId)
                         .then(function(reuslt) {
                             deferred.resolve(result);
                         }, function(reason){
