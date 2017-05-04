@@ -183,10 +183,10 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     };
 
     var groupLevel2Func = function(groupOb, groupNode) {
+        groupNode.loading = true;
         ViewService.getProjectDocuments({
                     projectId: projectOb.id,
-                    refId: refOb.id,
-                    extended: true
+                    refId: refOb.id
         }, 2).then(function(documentObs) {
             var docs = [];
             var docOb, i;
@@ -206,6 +206,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                     children: []
                 });
             }
+            groupNode.loading = false;
             if ($scope.treeApi.refresh) {
                 $scope.treeApi.refresh();
             }
@@ -222,7 +223,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 type: 'view',
                 data: v,
                 children: [],
-                loading: false,
+                loading: true,
                 aggr: aggr
             };
             viewId2node[v.id] = curNode;
@@ -242,6 +243,10 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             newChildNodes.push(node);
         }
         curNode.children.push.apply(curNode.children, newChildNodes);
+        curNode.loading = false;
+        if ($scope.treeApi.refresh) {
+            $scope.treeApi.refresh();
+        }
     };
     var processDeletedViewBranch = function(branch) {
         var id = branch.data.id;
@@ -259,8 +264,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         $scope.treeData = UtilsService.buildTreeHierarchy(groupObs, "_id", "group", "_parentId", groupLevel2Func);
         ViewService.getProjectDocuments({
                     projectId: projectOb.id,
-                    refId: refOb.id,
-                    extended: true
+                    refId: refOb.id
         }, 2).then(function(documentObs) {
             for (var i = 0; i < documentObs.length; i++) {
                 if (!documentObs[i]._groupId) {

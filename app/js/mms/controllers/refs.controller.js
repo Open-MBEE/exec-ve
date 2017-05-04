@@ -68,20 +68,49 @@ function($sce, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $t
         }
     });
     $scope.$on("stomp.branchCreated", function(event, updateRef) {
-        var index = -1;
-        if (updateRef.type === 'Branch') {
-            index = _.findIndex($scope.branches, {name: updateRef.id});
-            if ( index > -1 ) {
-                $scope.branches[index].loading = false;
-                // $scope.branches[index] = updateRef;
-            }
-        } else if (updateRef.type === 'Tag') {
-            index = _.findIndex($scope.tags, {name: updateRef.id});
-            if ( index > -1 ) {
-                $scope.tags[index].loading = false;
-                // $scope.tags[index] = updateRef;
-            }
+        // var index = -1;
+        // if (updateRef.type === 'Branch') {
+        //     index = _.findIndex($scope.branches, {name: updateRef.id});
+        //     if ( index > -1 ) {
+        //         $scope.branches[index].loading = false;
+        //         // $scope.branches[index] = updateRef;
+        //     }
+        // } else if (updateRef.type === 'Tag') {
+        //     index = _.findIndex($scope.tags, {name: updateRef.id});
+        //     if ( index > -1 ) {
+        //         $scope.tags[index].loading = false;
+        //         // $scope.tags[index] = updateRef;
+        //     }
+        // }
+
+        // Update tags list with latest from refOb
+        var tag = [];
+        for (var i = 0; i < $scope.refList.length; i++) {
+            if ($scope.refList[i].type === "Tag")
+                tag.push($scope.refList[i]);
         }
+        $scope.tags = tag;
+
+        // Update branches list with latest from refOb
+        var branches = [];
+        for (var j = 0; j < $scope.refList.length; j++) {
+            if ($scope.refList[j].type === "Branch")
+                branches.push($scope.refList[j]);
+        }
+        $scope.branches = branches;
+        // Set selected Ref to newly created Ref...//TODO might not need
+        // if (updateRef.type === 'Branch') {
+        //     //data.loading = true;
+        //     //$scope.branches.push(data);
+        //     $scope.refSelected = updateRef;
+        //     $scope.activeTab = 0;
+        // } else {
+        //     //data.loading = true;
+        //     //$scope.tags.push(data);
+        //     $scope.refSelected = updateRef;
+        //     $scope.activeTab = 1;
+        // }
+        growl.success(updateRef.name + " Created");
     });
 
     $scope.refClickHandler = function(ref) {
@@ -149,30 +178,30 @@ function($sce, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $t
         });
         instance.result.then(function(data) {
             //TODO add load handling once mms returns status
-            var tag = [];
-            for (var i = 0; i < refObs.length; i++) {
-                if (refObs[i].type === "Tag")
-                    tag.push(refObs[i]);
-            }
-            $scope.tags = tag;
+            // var tag = [];
+            // for (var i = 0; i < refObs.length; i++) {
+            //     if (refObs[i].type === "Tag")
+            //         tag.push(refObs[i]);
+            // }
+            // $scope.tags = tag;
 
-            var branches = [];
-            for (var j = 0; j < refObs.length; j++) {
-                if (refObs[j].type === "Branch")
-                    branches.push(refObs[j]);
-            }
-            $scope.branches = branches;
-            if (data.type === 'Branch') {
-                //data.loading = true;
-                //$scope.branches.push(data);
-                $scope.refSelected = data;
-                $scope.activeTab = 0;
-            } else {
-                //data.loading = true;
-                //$scope.tags.push(data);
-                $scope.refSelected = data;
-                $scope.activeTab = 1;
-            }
+            // var branches = [];
+            // for (var j = 0; j < refObs.length; j++) {
+            //     if (refObs[j].type === "Branch")
+            //         branches.push(refObs[j]);
+            // }
+            // $scope.branches = branches;
+            // if (data.type === 'Branch') {
+            //     //data.loading = true;
+            //     //$scope.branches.push(data);
+            //     $scope.refSelected = data;
+            //     $scope.activeTab = 0;
+            // } else {
+            //     //data.loading = true;
+            //     //$scope.tags.push(data);
+            //     $scope.refSelected = data;
+            //     $scope.activeTab = 1;
+            // }
         });
     };
 
