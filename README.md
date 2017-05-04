@@ -159,7 +159,6 @@ Put test pages under /app. The current build will look through bower dependencie
         //declare module dependencies
 
 ## Links
-* [EMS Web Apps Alfresco Site](https://ems.jpl.nasa.gov/share/page/site/ems-web-apps/dashboard)
 * [node.js](http://nodejs.org/)
 * [grunt](http://gruntjs.com/)
 * [sass](http://sass-lang.com/)
@@ -167,4 +166,3 @@ Put test pages under /app. The current build will look through bower dependencie
 * [grunt-ngdocs](https://github.com/m7r/grunt-ngdocs)
 * [jasmine](http://jasmine.github.io/)
 * [karma](http://karma-runner.github.io/0.12/index.html)# angularLessons
-# angularLessons
