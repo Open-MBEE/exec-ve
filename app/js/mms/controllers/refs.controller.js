@@ -98,19 +98,7 @@ function($sce, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $t
                 branches.push($scope.refList[j]);
         }
         $scope.branches = branches;
-        // Set selected Ref to newly created Ref...//TODO might not need
-        // if (updateRef.type === 'Branch') {
-        //     //data.loading = true;
-        //     //$scope.branches.push(data);
-        //     $scope.refSelected = updateRef;
-        //     $scope.activeTab = 0;
-        // } else {
-        //     //data.loading = true;
-        //     //$scope.tags.push(data);
-        //     $scope.refSelected = updateRef;
-        //     $scope.activeTab = 1;
-        // }
-        growl.success(updateRef.name + " Created");
+        growl.success(updateRef.name + " " + updateRef.type + " Created");
     });
 
     $scope.refClickHandler = function(ref) {
@@ -159,11 +147,7 @@ function($sce, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $t
             if (!branch) {
                 growl.warning("Add Tag Error: Select a branch or tag first");
                 return;
-            } 
-            // else if (branch.type != "workspace") {
-            //     growl.warning("Add Tag Error: Selection must be a branch");
-            //     return;
-            // }
+            }
             $scope.createParentRefId = branch.id;
             templateUrlStr = 'partials/mms/new-tag.html';
         } else {
@@ -251,7 +235,6 @@ function($sce, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $t
             }
 
             promise.then(function(data) {
-                growl.success(displayName+" Created");
                 growl.info('Please wait for a completion email prior to viewing of the '+$scope.itemType+'.', {ttl: -1});
                 $uibModalInstance.close(data);
             }, function(reason) {
