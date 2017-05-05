@@ -136,7 +136,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
         if ($scope.specApi.setEditing) {
             $scope.specApi.setEditing(false);
         }
-        var editable = elementOb._editable && commitId === 'latest';
+        var editable = elementOb._editable && $scope.refOb.type === 'Branch' && commitId === 'latest' ;
         $rootScope.ve_tbApi.setPermission('element-editor', editable);
     };
     $scope.$on('elementSelected', elementSelected);
