@@ -24,7 +24,7 @@
 
 	td{
 		padding:10px;
-    border: 1px solid rgb(204, 204, 204);
+    border: 1px solid $tertiary_grey;
 	}
 
 	table{
@@ -35,11 +35,22 @@
 
   thead td{
     font-weight:400;
-    background-color: rgb(243, 243, 243);
+    background-color: $quaternary_grey;
+  }
+
+  .empty-state{
+    background-color: $quaternary_grey-darker;
+    border: 1px solid $tertiary_grey;
+    border-radius: 3px;
+    padding: 20px 10px 30px;
+    margin: 10px 0;
   }
 
 
 
+/*------------------------------------------------------------------
+Buttons
+-------------------------------------------------------------------*/
 
   .btn {
     font-weight: 500;

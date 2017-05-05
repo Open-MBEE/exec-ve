@@ -3,63 +3,83 @@
 
 <div id = "ve-jobs-table">
 
-    <h3>View Editor Jobs</h3>
+    <h3>View Editor</h3>
     <table class="snapshot-table table table-condensed ng-scope" >
         <thead>
             <tr>
                 <td>Name</td>
-                <td>Status</td>
                 <td>Created</td>
+                <td>Status</td>
             </tr>
         </thead>
         <tbody>
-        <tr>
-            <td>
-                <div ng-hide="editorEnabled">
-                    PMA Smoke Test_job
-                    <a class="ng-binding" ng-click="enableEditor()">
-                        <i class="fa fa-pencil" aria-hidden="true"></i>
-                    </a>
-                </div>
-                <div class="ng-hide" ng-show="editorEnabled">
-                    <input class="ng-pristine ng-untouched ng-valid ng-empty ng-hide" ng-model="jobInput.jobName" ng-show="editorEnabled">
-                    <a ng-click="save()">Save</a>
-                    or
-                    <a ng-click="disableEditor()">Cancel</a>
-                </div>
-            </td>
-            <td>
-                <div class="ng-binding"><i class="fa fa-circle failed-marker" aria-hidden="true"></i>failed <a href="https://cae-jenkins.jpl.nasa.gov/job/MMS_1490133988355_3914676e-c0b0-4e54-b902-bd446afab02c/lastBuild/artifact/MDNotificationWindowText.html" ng-attr-href="{{job.url}}" target="_blank" ng-show="buttonEnabled">log</a></div> 
-            </td>
-            <td class="ng-binding">Tue Mar 21 15:06:32 PDT 2017</td>
-        </tr>
-        <tr>
-            <td>
-                <div ng-hide="editorEnabled">
-                    PMA Smoke Test_job
-                    <a class="ng-binding" ng-click="enableEditor()">
-                        <i class="fa fa-pencil" aria-hidden="true"></i>
-                    </a>
-                </div>
-                <div class="ng-hide" ng-show="editorEnabled">
-                    <input class="ng-pristine ng-untouched ng-valid ng-empty ng-hide" ng-model="jobInput.jobName" ng-show="editorEnabled">
-                    <a ng-click="save()">Save</a>
-                    or
-                    <a ng-click="disableEditor()">Cancel</a>
-                </div>
-            </td>
-            <td>
-                <div class="ng-binding"><i class="fa fa-circle failed-marker" aria-hidden="true"></i>failed <a href="https://cae-jenkins.jpl.nasa.gov/job/MMS_1490133988355_3914676e-c0b0-4e54-b902-bd446afab02c/lastBuild/artifact/MDNotificationWindowText.html" ng-attr-href="{{job.url}}" target="_blank" ng-show="buttonEnabled">log</a></div> 
-            </td>
-            <td class="ng-binding">Tue Mar 21 15:06:32 PDT 2017</td>
-        </tr>
+            <tr>
+                <td>
+                    <div ng-hide="editorEnabled">
+                        PMA Smoke Test_job
+                        <a class="ng-binding" ng-click="enableEditor()">
+                            <i class="fa fa-pencil" aria-hidden="true"></i>
+                        </a>
+                    </div>
+                    <div class="ng-hide" ng-show="editorEnabled">
+                        <input class="ng-pristine ng-untouched ng-valid ng-empty ng-hide" ng-model="jobInput.jobName" ng-show="editorEnabled">
+                        <a ng-click="save()">Save</a>
+                        or
+                        <a ng-click="disableEditor()">Cancel</a>
+                    </div>
+                </td>
+                <td class="ng-binding">
+                    <select class = "form-control">
+                        <option><strong>Latest: </strong>Tue Mar 21 15:06:32 PDT 2017</option>
+                        <option>Tue Mar 21 15:06:32 PDT 2017</option>
+                        <option>Tue Mar 21 15:06:32 PDT 2017</option>
+                        <option>Tue Mar 21 15:06:32 PDT 2017</option>
+                        <option>Tue Mar 21 15:06:32 PDT 2017</option>
+                        <option>Tue Mar 21 15:06:32 PDT 2017</option>
+                        <option>Tue Mar 21 15:06:32 PDT 2017</option>
+                    </select>
+                </td>
+                <td>
+                    <div class="ng-binding"><i class="fa fa-circle failed-marker" aria-hidden="true"></i>failed <a href="https://cae-jenkins.jpl.nasa.gov/job/MMS_1490133988355_3914676e-c0b0-4e54-b902-bd446afab02c/lastBuild/artifact/MDNotificationWindowText.html" ng-attr-href="{{job.url}}" target="_blank" ng-show="buttonEnabled">log</a></div> 
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div ng-hide="editorEnabled">
+                        PMA Smoke Test_job
+                        <a class="ng-binding" ng-click="enableEditor()">
+                            <i class="fa fa-pencil" aria-hidden="true"></i>
+                        </a>
+                    </div>
+                    <div class="ng-hide" ng-show="editorEnabled">
+                        <input class="ng-pristine ng-untouched ng-valid ng-empty ng-hide" ng-model="jobInput.jobName" ng-show="editorEnabled">
+                        <a ng-click="save()">Save</a>
+                        or
+                        <a ng-click="disableEditor()">Cancel</a>
+                    </div>
+                </td>
+                <td class="ng-binding">
+                    <select class = "form-control">
+                        <option><strong>Latest: </strong>Tue Mar 21 15:06:32 PDT 2017</option>
+                        <option>Tue Mar 21 15:06:32 PDT 2017</option>
+                        <option>Tue Mar 21 15:06:32 PDT 2017</option>
+                        <option>Tue Mar 21 15:06:32 PDT 2017</option>
+                        <option>Tue Mar 21 15:06:32 PDT 2017</option>
+                        <option>Tue Mar 21 15:06:32 PDT 2017</option>
+                        <option>Tue Mar 21 15:06:32 PDT 2017</option>
+                    </select>
+                </td>
+                <td>
+                    <div class="ng-binding"><i class="fa fa-circle failed-marker" aria-hidden="true"></i>failed <a href="https://cae-jenkins.jpl.nasa.gov/job/MMS_1490133988355_3914676e-c0b0-4e54-b902-bd446afab02c/lastBuild/artifact/MDNotificationWindowText.html" ng-attr-href="{{job.url}}" target="_blank" ng-show="buttonEnabled">log</a></div> 
+                </td>
+            </tr>
         </tbody>
     </table>
 
 
 
-    <h3>PMA Jobs</h3>
-    <div ng-if="mmsRefId != 'master'">Job runs are currently only available on master workspace.</div>
+    <h3>PMA</h3>
+    <div ng-if="mmsRefId != 'master'" style = "display:none;">PMA is currently only available on <strong>master</strong> workspace.</div>
     <table class="snapshot-table table table-condensed" ng-if="!loading && hasJobs">
         <thead>
             <tr>
@@ -109,7 +129,12 @@
             </tr>
         </tbody>
     </table>
-    <h3 ng-if="!hasJobs && !loading"> No Current Jobs</h3>
+    <div class = "text-center empty-state">
+        <p ng-if="!hasJobs && !loading"> <strong>No Current PMA Jobs</strong></p>
+        <p>PMA regenerates Magicdraw views for the current document. <a href = "https://cae-ems.jpl.nasa.gov/alfresco/mmsapp/mms.html#/workspaces/master/sites/site__18_0_2_bec02f9_1446154915939_541002_41021/documents/_18_0_2_8630260_1446850132083_177552_51111/views/MMS_1474586905881_1cf20cf0-711f-4cca-8a61-de8a354e3d43">More</a></p>
+        <p ng-if="mmsRefId != 'master'">PMA is currently only available on <strong>master</strong> workspace.</p>
+        <button class = "btn btn-primary">Run DocGen</button>
+    </div>
 
     <div class="row" style="margin-right:0px;">
     <button type="submit"  class="btn-link pull-right" ng-click="runNow()" style="text-transform: uppercase; display:none;">
