@@ -349,7 +349,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                                         _refId: $stateParams.refId,
                                         id: groupId
                                     },{
-                                        viewName: groupElement.name + 'Cover Page', 
+                                        viewName: groupElement.name + ' Cover Page', 
                                         viewId: eid
                                     }, 2)
                                     .then(function(data) {
