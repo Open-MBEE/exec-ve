@@ -340,7 +340,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 clone._childViews = [];
             }
             clone._childViews.push({id: reqOb.viewId, aggregation: reqOb.aggr});
-            ElementService.updateElement(clone)
+            ElementService.updateElement(clone, true)
             .then(function(data2) {
                 deferred.resolve(data2);
             }, function(reason) {
@@ -386,7 +386,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                         break; 
                     }
                 }
-                ElementService.updateElement(clone)
+                ElementService.updateElement(clone, true)
                 .then(function(data2) {
                     deferred.resolve(data2);
                 }, function(reason) {
@@ -699,6 +699,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             projectId: ownerOb._projectId,
             refId: ownerOb._refId,
             elements: toCreate,
+            returnChildViews: true
         };
         ElementService.createElements(reqOb)
         .then(function(data) {

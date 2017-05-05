@@ -257,7 +257,7 @@ function urlService(baseUrl) {
      * @returns {string} The post elements url.
      */
     var getPostElementsURL = function(reqOb) {
-        return addExtended(addTicket(root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements'), reqOb.extended);
+        return addExtended(addChildViews(addTicket(root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements'), reqOb.returnChildViews), reqOb.extended);
     };
 
     /**
@@ -419,6 +419,17 @@ function urlService(baseUrl) {
             r += '&extended=true';
         else
             r += '?extended=true';
+        return r;
+    };
+
+    var addChildViews = function(url, add) {
+        var r = url;
+        if (!add)
+            return r;
+        if (r.indexOf('?') > 0)
+            r += '&childviews=true';
+        else
+            r += '?childviews=true';
         return r;
     };
 
