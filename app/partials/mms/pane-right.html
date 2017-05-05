@@ -33,7 +33,7 @@
             <tr ng-repeat="tag in tagObs | orderBy:'-_created'">
                 <div ng-if="!tagObs">No Tags</div>
                 <td>
-                    <a ui-sref="project.ref({ref: tag.id, search: undefined})" ui-sref-opts="{reload: true}">{{tag.name}}</a>
+                    <a ui-sref="project.ref({refId: tag.id, search: undefined})">{{tag.name}}</a>
                 </td>
                 <td>{{tag._created | date:'M/d/yy h:mm a'}}
                 </td>
