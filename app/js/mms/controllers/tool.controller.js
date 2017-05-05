@@ -35,7 +35,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
     $scope.show = {
         element: true,
         history: false,
-        tags: true,
+        tags: false,
         reorder: false,
         jobs: false
     };
