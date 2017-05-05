@@ -338,7 +338,7 @@ function urlService(baseUrl) {
      * @returns {string} The post elements url.
      */
     var getElementSearchURL = function(reqOb) {
-        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/search?';
+        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/search';
         return addExtended(addTicket(r), true);
     };
 
