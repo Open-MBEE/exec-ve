@@ -164,7 +164,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
     $scope.$on('viewSelected', function(event, elementOb, commitId) {
         elementSelected(event, elementOb, commitId);
         $scope.viewOb = elementOb;
-        var editable = elementOb._editable && commitId === 'latest';
+        var editable = elementOb._editable && $scope.refOb.type === 'Branch' && commitId === 'latest';
         $scope.viewCommitId = commitId ? commitId : elementOb._commitId;
         $rootScope.ve_tbApi.setPermission('view-reorder', editable);
     });

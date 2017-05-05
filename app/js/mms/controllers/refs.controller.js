@@ -40,17 +40,17 @@ function($sce, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $t
         $scope.refSelected = refOb;
     }
     $scope.htmlTooltip = $sce.trustAsHtml('Branch temporarily unavailable during duplication.<br>Branch author will be notified by email upon completion.');
-    // var docEditable = documentOb && documentOb._editable && refOb && refOb.type === 'Branch' && UtilsService.isView(documentOb);
+    // var refPerm = projectOb && projectOb._editable;
 
     $scope.bbApi.init = function() {
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree-add-branch"));
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree-add-tag"));
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree-delete"));
         // $scope.bbApi.addButton(UxService.getButtonBarButton("tree-merge"));
-        // $scope.bbApi.setPermission("tree-add-branch", $scope.wsPerms);
-        // $scope.bbApi.setPermission("tree-add-tag", $scope.wsPerms);
-        // $scope.bbApi.setPermission("tree-delete", $scope.wsPerms);
-        // $scope.bbApi.setPermission("tree-merge", $scope.wsPerms);
+        // $scope.bbApi.setPermission("tree-add-branch", $scope.refPerm);
+        // $scope.bbApi.setPermission("tree-add-tag", $scope.refPerm);
+        // $scope.bbApi.setPermission("tree-delete", $scope.refPerm);
+        // $scope.bbApi.setPermission("tree-merge", $scope.refPerm);
     };
     $scope.$on('tree-add-branch', function(e) {
         addItem('Branch');

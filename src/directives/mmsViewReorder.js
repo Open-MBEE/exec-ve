@@ -56,7 +56,7 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
                 if (newVal !== lastid)
                     return;
                 scope.view = data;
-                scope.editable = scope.view._editable && commitId === 'latest';
+                scope.editable = scope.view._editable && scope.mmsRefId.type === 'Branch' && commitId === 'latest';
 
                 var contents = data._contents || data.specification;
                 if (contents) {
