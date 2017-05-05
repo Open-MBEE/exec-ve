@@ -74,6 +74,7 @@ div.tooltip-inner {
   2.4 Tab System
     2.4.1 Light tab system
     2.4.2 Dark Tab system
+  2.5 Banners
 3. Table filtering stuff
 
 -------------------------------------------------------------------*/
@@ -568,6 +569,19 @@ div.tooltip-inner {
     background-color: $ve-silver-lighter-1;
     border-bottom: 3px solid $ve-teal-lighter-1;
   }
+}
+
+/*------------------------------------------------------------------
+  2.5 Banners
+-------------------------------------------------------------------*/
+
+.ve-notify-banner{
+  background-color: $ve-teal-lighter-4;
+  padding: 6px 10px;
+  border: 1px solid $ve-teal-lighter-3;
+  border-radius: 3px;
+  color: $ve-teal-base;
+  margin: 4px 10px 14px;
 }
 
 /*------------------------------------------------------------------
