@@ -4,9 +4,9 @@
 
 angular.module('mmsApp')
 .controller('ToolCtrl', ['$scope', '$rootScope', '$state', '$uibModal', '$q', '$timeout', 'hotkeys',
-            'ElementService', 'ProjectService', 'growl', 'projectOb', 'refOb', 'documentOb', 'viewOb', 'Utils',
+            'ElementService', 'ProjectService', 'growl', 'projectOb', 'refOb', 'tagObs', 'documentOb', 'viewOb', 'Utils',
 function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
-    ElementService, ProjectService, growl, projectOb, refOb, documentOb, viewOb, Utils) {
+    ElementService, ProjectService, growl, projectOb, refOb, tagObs, documentOb, viewOb, Utils) {
 
     $scope.specInfo = {
         refId: refOb.id,
@@ -18,6 +18,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
     $scope.viewOb = viewOb;
     $scope.documentOb = documentOb;
     $scope.refOb = refOb;
+    $scope.tagObs = tagObs;
 
     if (viewOb) {
         $scope.specInfo.id = viewOb.id;
@@ -34,6 +35,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
     $scope.show = {
         element: true,
         history: false,
+        tags: true,
         reorder: false,
         jobs: false
     };
@@ -86,6 +88,10 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
 
     $scope.$on('element-history', function() {
         showPane('history');
+    });
+
+    $scope.$on('tags', function() {
+        showPane('tags');
     });
 
     var cleanUpEdit = function(editOb, cleanAll) {

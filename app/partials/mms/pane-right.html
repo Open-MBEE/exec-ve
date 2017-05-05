@@ -26,6 +26,21 @@
         </div>
     </div>
 
+    <div class="container-fluid" ng-show="show.tags">
+        <h1>Tags</h1>
+        <table class="snapshot-table table table-condensed">
+            <tr><th>Name</th><th>Time</th></tr>
+            <tr ng-repeat="tag in tagObs | orderBy:'-_created'">
+                <div ng-if="!tagObs">No Tags</div>
+                <td>
+                    <a ui-sref="project.ref({ref: tag.id, search: undefined})" ui-sref-opts="{reload: true}">{{tag.name}}</a>
+                </td>
+                <td>{{tag._created | date:'M/d/yy h:mm a'}}
+                </td>
+            </tr>
+        </table>
+    </div>
+
     <div class="container-fluid" ng-show="show.reorder">
         <mms-view-reorder mms-element-id="{{viewOb.id}}" mms-project-id="{{viewOb._projectId}}"
                           mms-commit-id="{{viewCommitId}}" mms-order="true" mms-ref-id="{{viewOb._refId}}"
