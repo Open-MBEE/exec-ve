@@ -127,7 +127,7 @@ function($scope, $rootScope, documentOb, ElementService, ViewService, MmsAppUtil
                 });
             }
         });
-        ElementService.updateElements(toSave)
+        ElementService.updateElements(toSave, true)
         .then(function() {
             growl.success('Reorder Successful');
             $state.go('project.ref.document', {}, {reload:true});

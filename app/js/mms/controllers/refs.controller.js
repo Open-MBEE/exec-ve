@@ -40,17 +40,17 @@ function($sce, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $t
         $scope.refSelected = refOb;
     }
     $scope.htmlTooltip = $sce.trustAsHtml('Branch temporarily unavailable during duplication.<br>Branch author will be notified by email upon completion.');
-    // var docEditable = documentOb && documentOb._editable && refOb && refOb.type === 'Branch' && UtilsService.isView(documentOb);
+    // var refPerm = projectOb && projectOb._editable;
 
     $scope.bbApi.init = function() {
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree-add-branch"));
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree-add-tag"));
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree-delete"));
         // $scope.bbApi.addButton(UxService.getButtonBarButton("tree-merge"));
-        // $scope.bbApi.setPermission("tree-add-branch", $scope.wsPerms);
-        // $scope.bbApi.setPermission("tree-add-tag", $scope.wsPerms);
-        // $scope.bbApi.setPermission("tree-delete", $scope.wsPerms);
-        // $scope.bbApi.setPermission("tree-merge", $scope.wsPerms);
+        // $scope.bbApi.setPermission("tree-add-branch", $scope.refPerm);
+        // $scope.bbApi.setPermission("tree-add-tag", $scope.refPerm);
+        // $scope.bbApi.setPermission("tree-delete", $scope.refPerm);
+        // $scope.bbApi.setPermission("tree-merge", $scope.refPerm);
     };
     $scope.$on('tree-add-branch', function(e) {
         addItem('Branch');
@@ -68,20 +68,37 @@ function($sce, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $t
         }
     });
     $scope.$on("stomp.branchCreated", function(event, updateRef) {
-        var index = -1;
-        if (updateRef.type === 'Branch') {
-            index = _.findIndex($scope.branches, {name: updateRef.id});
-            if ( index > -1 ) {
-                $scope.branches[index].loading = false;
-                // $scope.branches[index] = updateRef;
-            }
-        } else if (updateRef.type === 'Tag') {
-            index = _.findIndex($scope.tags, {name: updateRef.id});
-            if ( index > -1 ) {
-                $scope.tags[index].loading = false;
-                // $scope.tags[index] = updateRef;
-            }
+        // var index = -1;
+        // if (updateRef.type === 'Branch') {
+        //     index = _.findIndex($scope.branches, {name: updateRef.id});
+        //     if ( index > -1 ) {
+        //         $scope.branches[index].loading = false;
+        //         // $scope.branches[index] = updateRef;
+        //     }
+        // } else if (updateRef.type === 'Tag') {
+        //     index = _.findIndex($scope.tags, {name: updateRef.id});
+        //     if ( index > -1 ) {
+        //         $scope.tags[index].loading = false;
+        //         // $scope.tags[index] = updateRef;
+        //     }
+        // }
+
+        // Update tags list with latest from refOb
+        var tag = [];
+        for (var i = 0; i < $scope.refList.length; i++) {
+            if ($scope.refList[i].type === "Tag")
+                tag.push($scope.refList[i]);
         }
+        $scope.tags = tag;
+
+        // Update branches list with latest from refOb
+        var branches = [];
+        for (var j = 0; j < $scope.refList.length; j++) {
+            if ($scope.refList[j].type === "Branch")
+                branches.push($scope.refList[j]);
+        }
+        $scope.branches = branches;
+        growl.success(updateRef.name + " " + updateRef.type + " Created");
     });
 
     $scope.refClickHandler = function(ref) {
@@ -130,11 +147,7 @@ function($sce, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $t
             if (!branch) {
                 growl.warning("Add Tag Error: Select a branch or tag first");
                 return;
-            } 
-            // else if (branch.type != "workspace") {
-            //     growl.warning("Add Tag Error: Selection must be a branch");
-            //     return;
-            // }
+            }
             $scope.createParentRefId = branch.id;
             templateUrlStr = 'partials/mms/new-tag.html';
         } else {
@@ -149,30 +162,30 @@ function($sce, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $t
         });
         instance.result.then(function(data) {
             //TODO add load handling once mms returns status
-            var tag = [];
-            for (var i = 0; i < refObs.length; i++) {
-                if (refObs[i].type === "Tag")
-                    tag.push(refObs[i]);
-            }
-            $scope.tags = tag;
+            // var tag = [];
+            // for (var i = 0; i < refObs.length; i++) {
+            //     if (refObs[i].type === "Tag")
+            //         tag.push(refObs[i]);
+            // }
+            // $scope.tags = tag;
 
-            var branches = [];
-            for (var j = 0; j < refObs.length; j++) {
-                if (refObs[j].type === "Branch")
-                    branches.push(refObs[j]);
-            }
-            $scope.branches = branches;
-            if (data.type === 'Branch') {
-                //data.loading = true;
-                //$scope.branches.push(data);
-                $scope.refSelected = data;
-                $scope.activeTab = 0;
-            } else {
-                //data.loading = true;
-                //$scope.tags.push(data);
-                $scope.refSelected = data;
-                $scope.activeTab = 1;
-            }
+            // var branches = [];
+            // for (var j = 0; j < refObs.length; j++) {
+            //     if (refObs[j].type === "Branch")
+            //         branches.push(refObs[j]);
+            // }
+            // $scope.branches = branches;
+            // if (data.type === 'Branch') {
+            //     //data.loading = true;
+            //     //$scope.branches.push(data);
+            //     $scope.refSelected = data;
+            //     $scope.activeTab = 0;
+            // } else {
+            //     //data.loading = true;
+            //     //$scope.tags.push(data);
+            //     $scope.refSelected = data;
+            //     $scope.activeTab = 1;
+            // }
         });
     };
 
@@ -222,7 +235,6 @@ function($sce, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $t
             }
 
             promise.then(function(data) {
-                growl.success(displayName+" Created");
                 growl.info('Please wait for a completion email prior to viewing of the '+$scope.itemType+'.', {ttl: -1});
                 $uibModalInstance.close(data);
             }, function(reason) {
