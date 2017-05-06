@@ -18,13 +18,13 @@ function($scope, $rootScope, $state, UxService, refOb, documentOb) {
     {
         tbApi.addButton(UxService.getToolbarButton("element-viewer"));
         tbApi.addButton(UxService.getToolbarButton("element-editor"));
-        tbApi.addButton(UxService.getToolbarButton("tags"));
         if ($rootScope.ve_edits && Object.keys($rootScope.ve_edits).length > 0) {
             tbApi.setIcon('element-editor', 'fa-edit-asterisk');
             tbApi.setPermission('element-editor-saveall', true);
         }
         var editable = false;
         tbApi.addButton(UxService.getToolbarButton("element-history"));
+        tbApi.addButton(UxService.getToolbarButton("tags"));
         if ($state.includes('project.ref.document')) {
             tbApi.addButton(UxService.getToolbarButton("jobs"));
         }

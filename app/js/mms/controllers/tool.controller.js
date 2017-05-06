@@ -19,6 +19,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
     $scope.documentOb = documentOb;
     $scope.refOb = refOb;
     $scope.tagObs = tagObs;
+    $scope.noTags = false;
 
     if (viewOb) {
         $scope.specInfo.id = viewOb.id;
@@ -26,6 +27,10 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
     } else if (documentOb) {
         $scope.specInfo.id = documentOb.id;
         $scope.viewId = documentOb.id;
+    }
+
+    if (angular.isArray(tagObs) && tagObs.length === 0) {
+        $scope.noTags = true;
     }
 
     $scope.specApi = {};
