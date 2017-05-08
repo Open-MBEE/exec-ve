@@ -455,6 +455,7 @@ function urlService(baseUrl) {
         getOrgsURL: getOrgsURL,
         getProjectsURL: getProjectsURL,
         getProjectURL: getProjectURL,
+        getProjectMountsURL: getProjectMountsURL,
         getRefsURL: getRefsURL,
         getRefURL: getRefURL,
         getGroupsURL: getGroupsURL,

@@ -382,6 +382,7 @@ function ProjectService($q, $http, URLService, CacheService, ApplicationService)
     return {
         getProjects: getProjects,
         getProject: getProject,
+        getProjectMounts: getProjectMounts,
         getOrgs: getOrgs,
         getOrg: getOrg,
         getRefs: getRefs,
