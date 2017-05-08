@@ -407,7 +407,7 @@ describe('Element Service', function() {
 
 	xdescribe('getOwnedElements', function() {
 		it('should get an element', function() {
-
+			
 		});
 	});
 
