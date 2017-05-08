@@ -303,7 +303,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Ca
     * @param {boolean} doNotScroll whether to scroll to element
     */
     var startEdit = function(scope, mmsViewCtrl, domElement, template, doNotScroll) {
-        if (mmsViewCtrl.isEditable() && !scope.isEditing && scope.element._editable && scope.mmsRefId.type === 'Branch' && scope.commitId === 'latest') {
+        if (mmsViewCtrl.isEditable() && !scope.isEditing && scope.element._editable && scope.commitId === 'latest') {
             var elementOb = scope.element;
             var reqOb = {elementId: elementOb.id, projectId: elementOb._projectId, refId: elementOb._refId};
             ElementService.getElementForEdit(reqOb)
