@@ -121,6 +121,10 @@ function urlService(baseUrl) {
         return addTicket(root + "/projects/" + projectId);
     };
 
+    var getProjectMountsURL = function(projectId, refId) {
+        return addTicket(root + '/projects/' + projectId + '/refs/' + refId + '/mounts');
+    };
+
     var getRefsURL = function(projectId) {
         return addTicket(root + '/projects/' + projectId + '/refs');
     };

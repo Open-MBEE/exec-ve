@@ -143,6 +143,33 @@ function ProjectService($q, $http, URLService, CacheService, ApplicationService)
         return deferred.promise;
     };
 
+    var getProjectMounts = function(projectId, refId) {
+        var deferred = $q.defer();
+        var url = URLService.getProjectMountsURL(projectId, refId);
+        if (inProgress.hasOwnProperty(url)) {
+            return inProgress[url];
+        }
+        var cacheKey = ['project', projectId, refId];
+        if (CacheService.exists(cacheKey)) {
+            deferred.resolve(CacheService.get(cacheKey));
+        } else {
+            inProgress[url] = deferred.promise;
+            $http.get(url).then(function(response) {
+                if (!angular.isArray(response.data.projects) || response.data.projects.length === 0) {
+                    deferred.reject({status: 500, data: '', message: "Server Error: empty response"});
+                    return;
+                }
+                CacheService.put(cacheKey, response.data.projects[0], true);
+                deferred.resolve(CacheService.get(cacheKey));
+            }, function(response) {
+                URLService.handleHttpStatus(response.data, response.status, response.headers, response.config, deferred);
+            }).finally(function() {
+                delete inProgress[url];
+            });
+        }
+        return deferred.promise;
+    };
+
     var getRefs = function(projectId) {
         var cacheKey = ['refs', projectId];
         var url = URLService.getRefsURL(projectId);
