@@ -19,6 +19,11 @@
 * _grunt_ - default task - this will create a dist and build directory, the dist contains concatenated and minified versions of our module js code and css, build directory contains all necessary files to run the application from a server
 * _grunt server:ems_ - does the default, plus runs a webserver at localhost:9000 out of /build and a proxy server that proxies to ems for any path starting with /alfresco. This allows us to test with real service endpoint (there are other options like server:a, server:b that proxies to europaems-dev-staging-a and europaems-dev-staging-b)
 * _grunt clean_ - deletes dist and build folders
+* add file named `angular-mms-grunt-servers.json`. This is where you will add server mappings.
+
+        {
+            "ems": "hostnameurl"
+        }
 
 ## Problems?
 If you see some error after updating, try cleaning out the bower_components and bower_components_target folders under /app and do a _grunt clean_
