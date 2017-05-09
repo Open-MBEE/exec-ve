@@ -94,9 +94,12 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                     };
                     $scope.spin = false; 
                     $scope.continue = function() {
-                        $scope.spin = true;
                         if (orgId && projectId) {
-                            $state.go('project.ref', {orgId: orgId, projectId: projectId, refId: 'master'});
+                            $scope.spin = true;
+                            $state.go('project.ref', {orgId: orgId, projectId: projectId, refId: 'master'}).then(function(data) {
+                            }, function(reject) {
+                                $scope.spin = false;
+                            });
                         }
                     };
                     $scope.logout = function() {
