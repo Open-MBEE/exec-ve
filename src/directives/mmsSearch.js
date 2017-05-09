@@ -192,10 +192,10 @@ function mmsSearch(CacheService, ElementService, growl, $templateCache) {
          * @methodOf mms.directives.directive:mmsSearch
          *
          * @description
-         * Create a JSON object that  return a list of mounted project ids
-         * mounted project ids of the current project.
+         * Create a JSON object that returns a term key with a list of all mounted
+         * project ids within the current project. Elastic format
          *
-         * @return {object} JSON object with list of project mounts
+         * @return {object} Elastic query JSON object with list of project mounts
          */
         var getProjectMountsQuery = function () {
             var projList = [];
@@ -203,13 +203,26 @@ function mmsSearch(CacheService, ElementService, growl, $templateCache) {
             var cacheKey = ['project', scope.mmsProjectId, scope.mmsRefId];
             var cachedProj = CacheService.get(cacheKey);
             if (cachedProj) {
-                var q = getAllMounts(cachedProj, projList);
+                getAllMountsAsArray(cachedProj, projList);
+                var q = {};
+                q._projectId = projList;
                 projectTermsOb.terms = q;
             }
             return projectTermsOb;
         };
 
-        var getAllMounts = function(project, projectsList) {
+        /**
+         * @ngdoc function
+         * @name mms.directives.directive:mmsSearch#getAllMountsAsArray
+         * @methodOf mms.directives.directive:mmsSearch
+         *
+         * @description
+         * Use projectsList to populate list with all the mounted project ids for
+         * specified project.
+         *
+         * @return 
+         */
+        var getAllMountsAsArray = function(project, projectsList) {
             projectsList.push(project.id);
             var mounts = project._mounts;
             if ( angular.isArray(mounts) && mounts.length !== 0 ) {
@@ -219,9 +232,7 @@ function mmsSearch(CacheService, ElementService, growl, $templateCache) {
                     }
                 }
             }
-            var q = {};
-            q._projectId = projectsList;
-            return q;
+            return;
         };
 
         /**
