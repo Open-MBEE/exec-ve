@@ -121,7 +121,8 @@ div.tooltip-inner {
 .ve-table-buttons
 #ve-origin-select,
 #ve-login,
-.ve-table-filter{
+.ve-table-filter,
+#ve-jobs-table{
 
   .btn {
     font-weight: 500;
@@ -144,6 +145,7 @@ div.tooltip-inner {
 
   .btn-primary {
     background-color: $ve-teal-base;
+    color:white;
   }
 
   .btn-primary:hover {
