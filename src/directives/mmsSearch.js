@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsSearch', ['CacheService', 'ElementService', 'URLService', 'growl', '$http', '$q','$templateCache', mmsSearch]);
+.directive('mmsSearch', ['CacheService', 'ElementService', 'growl', '$templateCache', mmsSearch]);
 
 /**
  * @ngdoc directive
@@ -13,7 +13,7 @@ angular.module('mms.directives')
  * TBA
  *
  */
-function mmsSearch(CacheService, ElementService, URLService, growl, $http, $q, $templateCache) {
+function mmsSearch(CacheService, ElementService, growl, $templateCache) {
     var template = $templateCache.get('mms/templates/mmsSearch.html');
 
     var mmsSearchLink = function(scope, element, attrs) {
@@ -182,49 +182,54 @@ function mmsSearch(CacheService, ElementService, URLService, growl, $http, $q, $
 
         scope.newSearch = function(searchText, page, numItems){
             scope.paginationCache = [];
-            console.log(scope.paginationCache.length);
+            // console.log(scope.paginationCache.length);
             scope.search(searchText, page, numItems);
         };
 
         /**
          * @ngdoc function
-         * @name mms.directives.directive:mmsSearch#getProjectIdsQuery
+         * @name mms.directives.directive:mmsSearch#getProjectMountsQuery
          * @methodOf mms.directives.directive:mmsSearch
          *
          * @description
-         * Create a JSON object that  return a list of mounted project ids
-         * mounted project ids of the current project.
+         * Create a JSON object that returns a term key with a list of all mounted
+         * project ids within the current project. Elastic format
          *
-         * @return {object} JSON object with list of project mounts
+         * @return {object} Elastic query JSON object with list of project mounts
          */
-        var getProjectIdsQuery = function () {
-            var projOb = {};
+        var getProjectMountsQuery = function () {
             var projList = [];
             var projectTermsOb = {};
-            var cacheKey = ['project', scope.mmsProjectId];
+            var cacheKey = ['project', scope.mmsProjectId, scope.mmsRefId];
             var cachedProj = CacheService.get(cacheKey);
             if (cachedProj) {
-                projOb = cachedProj;
-            } else {
-                var url = URLService.getProjectURL(scope.mmsProjectId);
-                $http.get(url).then(function (response) {
-                    if (angular.isArray(response.data.projects) || response.data.projects.length !== 0) {
-                        projOb = response.data.projects;
-                    }
-                });
+                getAllMountsAsArray(cachedProj, projList);
             }
-            getAllMounts(projOb, projList);
             var q = {};
+            if ( projList.length === 0 ) {
+                projList.push(scope.mmsProjectId);
+            }
             q._projectId = projList;
             projectTermsOb.terms = q;
             return projectTermsOb;
         };
 
-        var getAllMounts = function(project, projectsList) {
+        /**
+         * @ngdoc function
+         * @name mms.directives.directive:mmsSearch#getAllMountsAsArray
+         * @methodOf mms.directives.directive:mmsSearch
+         *
+         * @description
+         * Use projectsList to populate list with all the mounted project ids for
+         * specified project.
+         *
+         * @return 
+         */
+        var getAllMountsAsArray = function(project, projectsList) {
             projectsList.push(project.id);
             var mounts = project._mounts;
             if ( angular.isArray(mounts) && mounts.length !== 0 ) {
-                for (var i = 0; mounts.length; i++) {
+                for (var i = 0; i < mounts.length; i++) {
                     if (mounts[i]._mounts) {
                         getAllMounts(mounts[i], projectsList);
                     }
@@ -292,7 +297,7 @@ function mmsSearch(CacheService, ElementService, URLService, growl, $http, $q, $
                 mainQuery.multi_match = q;
             }
 
-            var projectTermsOb = getProjectIdsQuery();
+            var projectTermsOb = getProjectMountsQuery();
             var mainBoolQuery = [];
             mainBoolQuery.push(mainQuery,projectTermsOb);
             if (scope.mmsOptions.filterQueryList) {
@@ -309,22 +314,6 @@ function mmsSearch(CacheService, ElementService, URLService, growl, $http, $q, $
                 "query": {
                     "bool": {
                         "must": mainBoolQuery
-                            //[
-                            //mainQuery,
-                            //projectTermsOb,
-                            //
-                            ////no validation needed
-                            //{ //this can be any additional filters for different types of search, for example, when searching for existing views to add (can be part of the options passed in)
-                            //    "terms": {
-                            //        "_appliedStereotypeIds": ["viewSid", "docSid"]
-                            //    }
-                            //},
-                            //{ //this example is for searching specific types of presentation element
-                            //    "terms": {
-                            //        "classifierIds": ["list id", "table id"]
-                            //    }
-                            //}
-                        //]
                     }
                 }
             };
