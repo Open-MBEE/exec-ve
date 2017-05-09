@@ -204,10 +204,13 @@ function mmsSearch(CacheService, ElementService, growl, $templateCache) {
             var cachedProj = CacheService.get(cacheKey);
             if (cachedProj) {
                 getAllMountsAsArray(cachedProj, projList);
-                var q = {};
-                q._projectId = projList;
-                projectTermsOb.terms = q;
             }
+            var q = {};
+            if ( projList.length === 0 ) {
+                projList.push(scope.mmsProjectId);
+            }
+            q._projectId = projList;
+            projectTermsOb.terms = q;
             return projectTermsOb;
         };
 
