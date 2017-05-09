@@ -1,3 +1,0 @@
-[submodule "ems-config"]
-	path = ems-config
-	url = https://github.com/Open-MBEE/ems-config.git

@@ -65,7 +65,7 @@ function veNav($templateCache, $rootScope, $state, hotkeys, growl, $location, $u
                     $scope.continue = function() {
                         $scope.spin = true; //the continue button on the modal needs to be wider to show the spiral
                         if(orgId && projectId)
-                            $state.go('project.ref', {orgId: orgId, projectId: projectId, refId: 'master'});
+                            $state.go('project.ref', {orgId: orgId, projectId: projectId, refId: 'master', search: undefined});
                     };
                     $scope.cancel = function() {
                         $uibModalInstance.dismiss();
@@ -77,7 +77,7 @@ function veNav($templateCache, $rootScope, $state, hotkeys, growl, $location, $u
             hotkeys.toggleCheatSheet();
         };
         scope.toggleAbout = function() {
-            scope.veV = '3.0.0-rc1';
+            scope.veV = '3.0.0-rc2';
             scope.mmsV = 'Loading...';
             ApplicationService.getMmsVersion().then(function(data) {
                 scope.mmsV = data;

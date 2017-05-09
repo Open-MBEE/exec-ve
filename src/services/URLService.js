@@ -86,9 +86,9 @@ function urlService(baseUrl) {
      * @param {string} workspace Workspace name
      * @returns {string} The url
      */
-    var getHtmlToPdfURL = function(docId, site, workspace) {
-        return addTicket(root + "/workspaces/" + workspace +
-                      "/sites/" + site +
+    var getHtmlToPdfURL = function(docId, projectId, refId) {
+        return addTicket(root + "/projects/" + projectId +
+                      "/refs/" + refId +
                       "/documents/" + docId +
                       "/htmlToPdf/123456789");  
     };
@@ -257,7 +257,7 @@ function urlService(baseUrl) {
      * @returns {string} The post elements url.
      */
     var getPostElementsURL = function(reqOb) {
-        return addExtended(addTicket(root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements'), reqOb.extended);
+        return addExtended(addChildViews(addTicket(root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements'), reqOb.returnChildViews), reqOb.extended);
     };
 
     /**
@@ -338,7 +338,7 @@ function urlService(baseUrl) {
      * @returns {string} The post elements url.
      */
     var getElementSearchURL = function(reqOb) {
-        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/search?';
+        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/search';
         return addExtended(addTicket(r), true);
     };
 
@@ -419,6 +419,17 @@ function urlService(baseUrl) {
             r += '&extended=true';
         else
             r += '?extended=true';
+        return r;
+    };
+
+    var addChildViews = function(url, add) {
+        var r = url;
+        if (!add)
+            return r;
+        if (r.indexOf('?') > 0)
+            r += '&childviews=true';
+        else
+            r += '?childviews=true';
         return r;
     };
 

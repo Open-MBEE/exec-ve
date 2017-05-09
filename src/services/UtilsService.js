@@ -14,7 +14,7 @@ angular.module('mms')
 function UtilsService($q, $http, CacheService, URLService, _) {
     var VIEW_SID = '_17_0_1_232f03dc_1325612611695_581988_21583';
     var DOCUMENT_SID = '_17_0_2_3_87b0275_1371477871400_792964_43374';
-    var nonEditKeys = ['contains', 'view2view', 'childrenViews', '_displayedElements',
+    var nonEditKeys = ['contains', 'view2view', 'childrenViews', '_displayedElementIds',
         '_allowedElements', '_contents', '_relatedDocuments', '_childViews'];
     var CLASS_ELEMENT_TEMPLATE = {
         _appliedStereotypeIds: [],
@@ -131,8 +131,8 @@ function UtilsService($q, $http, CacheService, URLService, _) {
             if (elem._contents && elem.contains) {
                 delete elem.contains;
             }
-            if (Array.isArray(elem._displayedElements)) {
-                elem._displayedElements = JSON.stringify(elem._displayedElements);
+            if (Array.isArray(elem._displayedElementIds)) {
+                elem._displayedElementIds = JSON.stringify(elem._displayedElementIds);
             }
             if (elem._allowedElements) {
                 delete elem._allowedElements;
@@ -657,10 +657,9 @@ function UtilsService($q, $http, CacheService, URLService, _) {
      * @param {string} [workspace=master] Workspace name
      * @returns {Promise} Promise would be resolved with 'ok', the server will send an email to user when done
      */
-    var convertHtmlToPdf = function(doc, site, workspace){ //TODO fix
-        var n = UtilsService.normalize(null, workspace);
+    var convertHtmlToPdf = function(doc, projectId, refId){ //TODO fix
         var deferred = $q.defer();
-        $http.post(URLService.getHtmlToPdfURL(doc.docId, site, n.ws), {'documents': [doc]})
+        $http.post(URLService.getHtmlToPdfURL(doc.docId, projectId, refId), {'documents': [doc]})
         .success(function(data, status, headers, config){
             deferred.resolve('ok');
         }).error(function(data, status, headers, config){
