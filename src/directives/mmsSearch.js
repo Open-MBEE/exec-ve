@@ -231,7 +231,7 @@ function mmsSearch(CacheService, ElementService, growl, $templateCache) {
             if ( angular.isArray(mounts) && mounts.length !== 0 ) {
                 for (var i = 0; i < mounts.length; i++) {
                     if (mounts[i]._mounts) {
-                        getAllMounts(mounts[i], projectsList);
+                        getAllMountsAsArray(mounts[i], projectsList);
                     }
                 }
             }
