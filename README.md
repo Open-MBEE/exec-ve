@@ -1,4 +1,8 @@
 # angular-mms
+
+## Usage
+https://github.com/Open-MBEE/EMS-Webapp/blob/opensource/Documents/ViewEditorUserGuide-OpenMBEE.pdf
+
 ## File Structure
 * /package.json - node module dependencies for building
 * /Gruntfile.js - buildfile
