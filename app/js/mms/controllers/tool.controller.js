@@ -140,15 +140,14 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
         $scope.specInfo.refId = elementOb._refId;
         $scope.specInfo.commitId = commitId ? commitId : elementOb._commitId;
         $rootScope.ve_tbApi.select('element-viewer');
-        if ($rootScope.togglePane && $rootScope.togglePane.closed)
-            $rootScope.togglePane.toggle();
-
+        
         showPane('element');
         if ($scope.specApi.setEditing) {
             $scope.specApi.setEditing(false);
         }
         var editable = elementOb._editable && $scope.refOb.type === 'Branch' && commitId === 'latest' ;
         $rootScope.ve_tbApi.setPermission('element-editor', editable);
+        $rootScope.$digest();
     };
     $scope.$on('elementSelected', elementSelected);
     $scope.$on('element-viewer', function() {
