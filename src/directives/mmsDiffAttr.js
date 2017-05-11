@@ -32,18 +32,14 @@ function mmsDiffAttr(ProjectService, ElementService, URLService, $q, $compile, $
         var projectTwoId = scope.mmsProjectTwoId;
         var refOneId = scope.mmsRefOneId;
         var refTwoId = scope.mmsRefTwoId;
-        var refOneFlag = false;
-        var refTwoFlag = false;
         var viewOrigin = null;
 
-        var comOneInvalidFlag = false;
-        var comTwoInvalidFlag = false;
         var origNotFound = false;
         var compNotFound = false;
         var deletedFlag = false;
 
         if (mmsViewCtrl) {
-            viewOrigin = mmsViewCtrl.getElementOrigin(); //????
+            viewOrigin = mmsViewCtrl.getElementOrigin(); 
         } 
         if(!projectOneId) {
             projectOneId = viewOrigin.projectId;
@@ -62,70 +58,70 @@ function mmsDiffAttr(ProjectService, ElementService, URLService, $q, $compile, $
             refTwoId = 'master';
         }
 
-        
-        ProjectService.getRef(scope.mmsRefOneId, projectOneId).then(function(data) {
-            ElementService.getElement({
-                projectId:  projectOneId, 
-                elementId:  scope.mmsEid, 
-                refId:      scope.mmsRefOneId, 
-                commitId:   scope.mmsCommitOneId
-            }).then(function(data) { 
-                getComparsionText(data._projectId, data._commitId, data._refId).then(function(data) {
-                    scope.origElem = angular.element(data).text();
-                    var promise1 = $interval(
-                        function() {
-                            scope.origElem = angular.element(data).text();
-                        }, 5000);
+        ProjectService.getProject(projectOneId).then(function(data) {
+            ProjectService.getRef(scope.mmsRefOneId, projectOneId).then(function(data) {
+                ElementService.getElement({
+                    projectId:  projectOneId, 
+                    elementId:  scope.mmsEid, 
+                    refId:      scope.mmsRefOneId, 
+                    commitId:   scope.mmsCommitOneId
+                }).then(function(data) { 
+                    getComparsionText(data._projectId, data._commitId, data._refId).then(function(data) {
+                        scope.origElem = angular.element(data).text();
+                        var promise1 = $interval(
+                            function() {
+                                scope.origElem = angular.element(data).text();
+                            }, 5000);
+                    }, function(reject) {
+                        scope.origElem = reject;
+                        if(reject.toLowerCase() == "not found") {
+                            origNotFound = true;
+                            scope.origElem = '';
+                        }
+                    });
                 }, function(reject) {
-                    scope.origElem = reject;
-                    if(reject.toLowerCase() == "not found") {
-                        origNotFound = true;
-                        scope.origElem = '';
-                    }
+                    element.html('<span class="mms-error"> Invalid Project, Branch/Tag, Commit, or Element IDs. </span>');
                 });
             }, function(reject) {
-                comOneInvalidFlag = true;
+                element.html('<span class="mms-error"> Invalid Project, Branch/Tag, Commit, or Element IDs. </span>');
             });
-        }, function(reason) {
-            refOneFlag = true;
-            element.html('<span class="mms-error">Branch/Tag One does not exist.</span>');
+        }, function(reject) {
+            element.html('<span class="mms-error"> Invalid Project, Branch/Tag, Commit, or Element IDs. </span>');
         });
 
-        ProjectService.getRef(scope.mmsRefTwoId, projectTwoId).then(function(data) {
-            ElementService.getElement({
-                projectId:  projectTwoId, 
-                elementId:  scope.mmsEid, 
-                refId:      scope.mmsRefTwoId, 
-                commitId:   scope.mmsCommitTwoId
-            }).then(function(data) { 
-                getComparsionText(data._projectId, data._commitId, data._refId).then(function(data) {
-                    scope.compElem = angular.element(data).text();
-                    var promise2 = $interval(
-                        function() {
-                            scope.compElem = angular.element(data).text();
-                        }, 5000);
+        ProjectService.getProject(projectTwoId).then(function(data) {
+            ProjectService.getRef(scope.mmsRefTwoId, projectTwoId).then(function(data) {
+                ElementService.getElement({
+                    projectId:  projectTwoId, 
+                    elementId:  scope.mmsEid, 
+                    refId:      scope.mmsRefTwoId, 
+                    commitId:   scope.mmsCommitTwoId
+                }).then(function(data) { 
+                    getComparsionText(data._projectId, data._commitId, data._refId).then(function(data) {
+                        scope.compElem = angular.element(data).text();
+                        var promise2 = $interval(
+                            function() {
+                                scope.compElem = angular.element(data).text();
+                            }, 5000);
+                            checkElement(origNotFound, compNotFound, deletedFlag);
+                    }, function(reject) {
+                        scope.compElem = reject;
+                        scope.compElem = '';
+                        if(reject.toLowerCase() == "not found") {
+                            compNotFound = true;
+                        } else if (reject.toLowerCase() == "deleted") {
+                            deletedFlag = true;
+                        }
                         checkElement(origNotFound, compNotFound, deletedFlag);
+                    });
                 }, function(reject) {
-                    scope.compElem = reject;
-                    scope.compElem = '';
-                    if(reject.toLowerCase() == "not found") {
-                        compNotFound = true;
-                    } else if (reject.toLowerCase() == "deleted") {
-                        deletedFlag = true;
-                    }
-                    checkElement(origNotFound, compNotFound, deletedFlag);
+                    element.html('<span class="mms-error"> Invalid Project, Branch/Tag, Commit, or Element IDs. </span>');
                 });
             }, function(reject) {
-                comTwoInvalidFlag = true;
-                checkCommit(comOneInvalidFlag, comTwoInvalidFlag);
-            });
-        }, function(reason) {
-            refTwoFlag = true;
-            if(refOneFlag & refTwoFlag) {
-                element.html('<span class="mms-error">Branch/Tag One & Branch/Tag Two do not exist.</span>');
-            } else {
-                element.html('<span class="mms-error">Branch/Tag Two does not exist.</span>');
-            }
+                element.html('<span class="mms-error"> Invalid Project, Branch/Tag, Commit, or Element IDs. </span>');
+            });           
+        }, function(reject) {
+            element.html('<span class="mms-error"> Invalid Project, Branch/Tag, Commit, or Element IDs. </span>');
         });
 
         var createTransclude = function(elementId, type, projectId, commitId, refId) {
@@ -174,28 +170,9 @@ function mmsDiffAttr(ProjectService, ElementService, URLService, $q, $compile, $
                         } else {
                             element.prepend('<span class="mms-error"> This element is a new element: </span>');
                         }
-                    } else if (compNotFound === true) {
-                        element.html('<span class="mms-error"> This element does not exist at either point in time. </span>');
                     }
             }
         };
-
-        var checkCommit = function(comOneInvalidFlag, comTwoInvalidFlag) {
-            switch(comOneInvalidFlag) {
-                case false:
-                    if (comTwoInvalidFlag === true) {
-                        element.html('<span class="mms-error"> Commit Two not a valid commit id. </span>');
-                    }
-                    break;
-                default:
-                    if (comTwoInvalidFlag === false) {
-                        element.html('<span class="mms-error"> Commit One not a valid commit id. </span>');
-                    } else if (comTwoInvalidFlag === true) {
-                        element.html('<span class="mms-error"> Commit One and Commit Two not valid commit ids. </span>');
-                    }
-            }
-        };
-
     };
 
     return {
