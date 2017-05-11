@@ -42,14 +42,14 @@ function veMenu(CacheService, $state, $templateCache, $sce) {
 
         scope.updateProject = function(project) {
             if (project) {
-                $state.go('project.ref', {projectId: project.id, refId: 'master'}, {reload: true});
+                $state.go('project.ref', {projectId: project.id, refId: 'master', search: undefined}, {reload: true});
             }
         };
         scope.updateBranch = function(branch) {
-            $state.go($state.current.name, {projectId: scope.project.id, refId: branch.id}, {reload: true});
+            $state.go($state.current.name, {projectId: scope.project.id, refId: branch.id, search: undefined}, {reload: true});
         };
         scope.updateTag = function(tag) {
-            $state.go($state.current.name, {projectId: scope.project.id, refId: tag.id}, {reload: true});
+            $state.go($state.current.name, {projectId: scope.project.id, refId: tag.id, search: undefined}, {reload: true});
         };
         scope.refsView = function() {
             $state.go('project', {projectId: scope.project.id}, {reload: true});

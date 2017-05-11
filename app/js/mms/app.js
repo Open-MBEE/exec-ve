@@ -94,9 +94,12 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                     };
                     $scope.spin = false; 
                     $scope.continue = function() {
-                        $scope.spin = true;
                         if (orgId && projectId) {
-                            $state.go('project.ref', {orgId: orgId, projectId: projectId, refId: 'master'});
+                            $scope.spin = true;
+                            $state.go('project.ref', {orgId: orgId, projectId: projectId, refId: 'master'}).then(function(data) {
+                            }, function(reject) {
+                                $scope.spin = false;
+                            });
                         }
                     };
                     $scope.logout = function() {
@@ -203,6 +206,9 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
     .state('project.ref', { //equivalent to old sites and documents page
         url: '/:refId?search',
         resolve: {
+            projectOb: function($stateParams, ProjectService, ticket) {
+                return ProjectService.getProjectMounts($stateParams.projectId, $stateParams.refId);
+            },
             refOb: function($stateParams, ProjectService, ticket) {
                 return ProjectService.getRef($stateParams.refId, $stateParams.projectId);
             },
@@ -257,7 +263,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 });
                 return deferred.promise;
             },
-            viewOb: function(documentOb) { 
+            viewOb: function(documentOb) {
                 return documentOb;
             },
             search: function($stateParams, ElementService, ticket) {
@@ -349,7 +355,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                                         _refId: $stateParams.refId,
                                         id: groupId
                                     },{
-                                        viewName: groupElement.name + 'Cover Page', 
+                                        viewName: groupElement.name + ' Cover Page', 
                                         viewId: eid
                                     }, 2)
                                     .then(function(data) {
