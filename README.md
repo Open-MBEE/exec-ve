@@ -179,6 +179,10 @@ Put test pages under /app. The current build will look through bower dependencie
         angular.module('myApp', ['mms', 'mms.directives']);
         //declare module dependencies
 
+### customize pdf css
+see src/services/UtilsService.getPrintCss
+[princexml](https://www.princexml.com/)
+
 ## Links
 * [node.js](http://nodejs.org/)
 * [grunt](http://gruntjs.com/)
