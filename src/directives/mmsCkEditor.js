@@ -402,21 +402,20 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
             { name: 'basicstyles', items : [ 'Bold','Italic','Underline','Strike','-','Subscript','Superscript','Blockquote','-','RemoveFormat' ] },
             { name: 'paragraph',   items : [ 'JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock' ] },
             { name: 'clipboard',   items : [ 'Undo','Redo' ] },
-            { name: 'editing',     items : [ 'Find','Replace','-','SelectAll' ] },
-            { name: 'tools',       items : [ 'Maximize', 'ShowBlocks' ] },
-            { name: 'document',    items : [ 'Source' ] },
+            { name: 'links',       items : [ 'Link','Unlink','-','CodeSnippet' ] },
+            { name: 'editing',     items : [ 'Find','Replace' ] },
+            { name: 'document',    items : [ 'Maximize', 'Source' ] },
             '/',
             { name: 'styles',      items : [ 'Format','FontSize','TextColor','BGColor' ] },
-            { name: 'links',       items : [ 'Link','Unlink' ] },
-            { name: 'insert',      items : [ 'PageBreak','HorizontalRule','CodeSnippet' ] },
+            // { name: 'insert',      items : [ 'PageBreak','HorizontalRule','CodeSnippet' ] },
         ];
         var justifyToolbar =  { name: 'paragraph',   items : [ 'JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock' ] };
         var listToolbar =     { name: 'list',     items: [ 'NumberedList','BulletedList','Outdent','Indent' ] };
         var tableToolbar =    { name: 'table',    items: [ 'Table' ] };
         var imageToolbar =    { name: 'image',    items: [ 'Image','Iframe' ] };
         var equationToolbar = { name: 'equation', items: [ 'Mathjax','SpecialChar' ]};
-        var customToolbar =   { name: 'custom',   items: [ 'Mmscf', 'mmsreset', 'Mmscomment', 'Mmsvlink' ] };
-        var sourceToolbar =   { name: 'source',   items: ['Source']};
+        var customToolbar =   { name: 'custom',   items: [ 'Mmscf','Mmsreset','Mmscomment','Mmsvlink' ] };
+        var sourceToolbar =   { name: 'source',   items: [ 'Maximize','Source' ] };
 
         //Set toolbar based on editor type
         var thisToolbar = defaultToolbar.slice();
@@ -428,18 +427,20 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
         if (scope.mmsEditorType === 'TableT') {
           thisToolbar = defaultToolbar.slice();
           thisToolbar.push(tableToolbar);
+          thisToolbar.push(equationToolbar);
           thisToolbar.push(customToolbar);
         }
         if (scope.mmsEditorType === 'ListT') {
           thisToolbar = defaultToolbar.slice();
           thisToolbar.push(listToolbar);
+          thisToolbar.push(equationToolbar);
           thisToolbar.push(customToolbar);
         }
         if (scope.mmsEditorType === 'Figure') {
-          thisToolbar = [sourceToolbar, imageToolbar];
+          thisToolbar = [sourceToolbar, justifyToolbar, imageToolbar];
         }
         if (scope.mmsEditorType === 'Equation') {
-            thisToolbar = [sourceToolbar, equationToolbar, justifyToolbar];
+            thisToolbar = [sourceToolbar, justifyToolbar, equationToolbar];
         }
 
         $timeout(function() {
@@ -454,7 +455,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
             autoGrow_minHeight: 200,
             autoGrow_maxHeight: $window.innerHeight*0.65,
             autoGrow_bottomSpace: 50, 
-            contentsCss: CKEDITOR.basePath+'/contents.css',
+            contentsCss: CKEDITOR.basePath+'contents.css',
             toolbar: thisToolbar,
           });
           // CKEDITOR.plugins.addExternal('mmscf','/lib/ckeditor/plugins/mmscf/');
