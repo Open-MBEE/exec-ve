@@ -4,10 +4,10 @@
 
 angular.module('mmsApp')
 .controller('RefsCtrl', ['$sce', '$q', '$filter', '$location', '$uibModal', '$scope', '$rootScope', '$state','$timeout', 'growl', '_',
-                         'UxService', 'ElementService', 'UtilsService', 'ProjectService', 'MmsAppUtils', 
+                         'UxService', 'ElementService', 'UtilsService', 'ProjectService', 'MmsAppUtils', 'ApplicationService',
                          'orgOb', 'projectOb', 'refOb', 'refObs', 'tagObs', 'branchObs',
 function($sce, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $timeout, growl, _,
-    UxService, ElementService, UtilsService, ProjectService, MmsAppUtils, 
+    UxService, ElementService, UtilsService, ProjectService, MmsAppUtils, ApplicationService,
     orgOb, projectOb, refOb, refObs, tagObs, branchObs) {
 
     $rootScope.mms_refOb = refOb;
@@ -162,30 +162,30 @@ function($sce, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $t
         });
         instance.result.then(function(data) {
             //TODO add load handling once mms returns status
-            // var tag = [];
-            // for (var i = 0; i < refObs.length; i++) {
-            //     if (refObs[i].type === "Tag")
-            //         tag.push(refObs[i]);
-            // }
-            // $scope.tags = tag;
+            var tag = [];
+            for (var i = 0; i < refObs.length; i++) {
+                if (refObs[i].type === "Tag")
+                    tag.push(refObs[i]);
+            }
+            $scope.tags = tag;
 
-            // var branches = [];
-            // for (var j = 0; j < refObs.length; j++) {
-            //     if (refObs[j].type === "Branch")
-            //         branches.push(refObs[j]);
-            // }
-            // $scope.branches = branches;
-            // if (data.type === 'Branch') {
-            //     //data.loading = true;
-            //     //$scope.branches.push(data);
-            //     $scope.refSelected = data;
-            //     $scope.activeTab = 0;
-            // } else {
-            //     //data.loading = true;
-            //     //$scope.tags.push(data);
-            //     $scope.refSelected = data;
-            //     $scope.activeTab = 1;
-            // }
+            var branches = [];
+            for (var j = 0; j < refObs.length; j++) {
+                if (refObs[j].type === "Branch")
+                    branches.push(refObs[j]);
+            }
+            $scope.branches = branches;
+            if (data.type === 'Branch') {
+                //data.loading = true;
+                //$scope.branches.push(data);
+                $scope.refSelected = data;
+                $scope.activeTab = 0;
+            } else {
+                //data.loading = true;
+                //$scope.tags.push(data);
+                $scope.refSelected = data;
+                $scope.activeTab = 1;
+            }
         });
     };
 
@@ -222,11 +222,13 @@ function($sce, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $t
                                 "description": $scope.workspace.description};
                 branchObj.parentRefId = $scope.createParentRefId;
                 branchObj.permission = $scope.workspace.permission;
+                branchObj.id = ApplicationService.createUniqueId();
                 promise = ProjectService.createRef( branchObj, projectOb.id );
             } else if ($scope.itemType === 'Tag') {
                 var tagObj = {"name": $scope.configuration.name, "type": "Tag",
                                 "description": $scope.configuration.description};
                 tagObj.parentRefId =  $scope.createParentRefId;
+                tagObj.id = ApplicationService.createUniqueId();
                 promise = ProjectService.createRef( tagObj, projectOb.id );
             } else {
                 growl.error("Add Item of Type " + $scope.itemType + " is not supported");
