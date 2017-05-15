@@ -127,20 +127,20 @@ function mmsDiffAttr(ProjectService, ElementService, URLService, $q, $compile, $
             switch (origNotFound) {
                 case false:
                     if (compNotFound === true) {
-                        element.html('<span class="mms-error"> This element has been removed from the View. </span>');
+                        element.html('<span class="text-info"><i class="fa fa-info-circle"></i> This element has been removed from the View. </span>');
                     } else if (deletedFlag === true) {
-                        element.prepend('<span class="mms-error"> This element has been deleted: </span>');
+                        element.prepend('<span class="text-info"><i class="fa fa-info-circle"></i> This element has been deleted: </span>');
                     }
                     break;
                 default:
                     if (compNotFound === false) {
                         if (scope.compElem === "") {
-                            element.html('<span class="mms-error"> This element is a new element with no content. </span>');
+                            element.html('<span class="text-info"><i class="fa fa-info-circle"></i> This element is a new element with no content. </span>');
                         } else {
-                            element.prepend('<span class="mms-error"> This element is a new element: </span>');
+                            element.prepend('<span class="text-info"><i class="fa fa-info-circle"></i> This element is a new element: </span>');
                         }
                     } else if (compNotFound === true) {
-                        element.html('<span class="mms-error"> Invalid Project, Branch/Tag, Commit, or Element IDs. Check entries.</span>');
+                        element.html('<span class="mms-error"><i class="fa fa-info-circle"></i> Invalid Project, Branch/Tag, Commit, or Element IDs. Check entries.</span>');
                     }
             }
         };
