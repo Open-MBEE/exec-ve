@@ -113,6 +113,12 @@ function($scope, $timeout, $location, $rootScope, $state, _, $window, $uibModal,
             $rootScope.hidePanes = false;
             $rootScope.showManageRefs = false;
             $rootScope.showLogin = false;
+            if (toState.name === 'login') {
+                var check = AuthService.checkLogin();
+                if (check) {
+                    $state.go('login.select');
+                }
+            }
             if ($state.current.name === 'login' || $state.current.name === 'login.select') {
                 $rootScope.hidePanes = true;
                 $rootScope.showLogin = true;
