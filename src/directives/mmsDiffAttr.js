@@ -72,6 +72,7 @@ function mmsDiffAttr(ElementService, $compile, $rootScope, $interval) {
             refId:      refOneId, 
             commitId:   commitOneId
         }).then(function(data) {
+            // element.prepend('<span class="text-info"> <br><b> Original data: </b> '+ data._projectId + '<br> -- refId: ' +  data._refId+ ' <br>-- commitId: ' +data._commitId+'</span>');
             var htmlData = createTransclude(data.id, scope.mmsAttr, data._projectId, data._commitId, data._refId);
             $compile(htmlData)($rootScope.$new());
             scope.origElem = angular.element(htmlData).text();
@@ -80,7 +81,7 @@ function mmsDiffAttr(ElementService, $compile, $rootScope, $interval) {
                     scope.origElem = angular.element(htmlData).text();
                 }, 5000);
         }, function(reason) {
-            // scope.origElem = '';
+            // element.prepend('<span class="text-info"> <br>Error: <b> Original data: </b> '+ projectOneId + '<br> -- refId: ' +  refOneId+ ' <br>-- commitId: ' +commitOneId+'</span>');
             origNotFound = true;
             if (reason.message.toLowerCase() == "not found") {
                 scope.origElem = '';
@@ -88,12 +89,13 @@ function mmsDiffAttr(ElementService, $compile, $rootScope, $interval) {
                 invalidOrig = true;
             }
         }).then(function() {
-                ElementService.getElement({
+            ElementService.getElement({
                 projectId:  projectTwoId, 
                 elementId:  scope.mmsEid, 
                 refId:      refTwoId, 
                 commitId:   commitTwoId
-            }).then(function(data) { 
+            }).then(function(data) {
+                // element.prepend('<span class="text-info"> <b> Comparison data: </b> '+ data._projectId + '<br> -- refId: ' +  data._refId+ ' <br>-- commitId: ' +data._commitId+'</span>');
                 var htmlData = createTransclude(data.id, scope.mmsAttr, data._projectId, data._commitId, data._refId);
                 $compile(htmlData)($rootScope.$new());
                 scope.compElem = angular.element(htmlData).text();
@@ -101,8 +103,9 @@ function mmsDiffAttr(ElementService, $compile, $rootScope, $interval) {
                     function() {
                         scope.compElem = angular.element(htmlData).text();
                     }, 5000);
-                    checkElement(origNotFound, compNotFound, deletedFlag);
+                checkElement(origNotFound, compNotFound, deletedFlag);
             }, function(reason) {
+                // element.prepend('<span class="text-info"> <br>Error: <b> Comparison data: </b> '+ projectTwoId + '<br> -- refId: ' +  refTwoId+ ' <br>-- commitId: ' +commitTwoId+'</span>');
                 // scope.compElem = '';
                 if (reason.message.toLowerCase() == "not found") {
                     compNotFound = true;
@@ -131,18 +134,18 @@ function mmsDiffAttr(ElementService, $compile, $rootScope, $interval) {
             switch (origNotFound) {
                 case false:
                     if (compNotFound === true) {
-                        element.html('<span class="text-info"><i class="fa fa-info-circle"></i> This element has been removed from the View. </span>');
+                        element.html('<span class="text-info"><i class="fa fa-info-circle"></i> Comparison element not found. Might be due to invalid input. </span>');
                     } else if (deletedFlag === true) {
-                        element.prepend('<span class="text-info"><i class="fa fa-info-circle"></i> This element has been deleted: </span>');
+                        element.prepend('<span class="text-info"><i class="fa fa-info-circle"></i> This element has been deleted. </span>');
                     }
                     break;
                 default:
                     if (compNotFound === false) {
-                        if (scope.compElem === "") {
-                            element.html('<span class="text-info"><i class="fa fa-info-circle"></i> This element is a new element with no content. </span>');
-                        } else {
-                            element.prepend('<span class="text-info"><i class="fa fa-info-circle"></i> This element is a new element: </span>');
-                        }
+                        // if (scope.compElem === "") {
+                        //     element.prepend('<span class="text-info"><i class="fa fa-info-circle"></i> This element is a new element with no content. </span>');
+                        // } else {
+                            element.prepend('<span class="text-info"><i class="fa fa-info-circle"></i> This element is a new element. </span>');
+                        // }
                     } else if (compNotFound === true) {
                         element.html('<span class="mms-error"><i class="fa fa-info-circle"></i> Invalid Project, Branch/Tag, Commit, or Element IDs. Check entries.</span>');
                     }
