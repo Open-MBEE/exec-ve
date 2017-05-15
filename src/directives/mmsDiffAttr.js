@@ -36,6 +36,8 @@ function mmsDiffAttr(ProjectService, ElementService, URLService, $q, $compile, $
         var commitTwoId = scope.mmsCommitTwoId;
         var viewOrigin = null;
 
+        var invalidOrig = false;
+        var invalidComp = false;
         var origNotFound = false;
         var compNotFound = false;
         var deletedFlag = false;
@@ -43,10 +45,10 @@ function mmsDiffAttr(ProjectService, ElementService, URLService, $q, $compile, $
         if (mmsViewCtrl) {
             viewOrigin = mmsViewCtrl.getElementOrigin(); 
         } 
-        if(!projectOneId) {
+        if (!projectOneId && viewOrigin) {
             projectOneId = viewOrigin.projectId;
         }
-        if(!projectTwoId) {
+        if (!projectTwoId && viewOrigin) {
             projectTwoId = viewOrigin.projectId;
         }
         if (!refOneId && viewOrigin) {
@@ -66,7 +68,7 @@ function mmsDiffAttr(ProjectService, ElementService, URLService, $q, $compile, $
             refId:      refOneId, 
             commitId:   commitOneId
         }).then(function(data) {
-            var htmlData = createTransclude(data.id, scope.mmsAttr, data._projectId, commitOneId, refOneId);
+            var htmlData = createTransclude(data.id, scope.mmsAttr, data._projectId, data._commitId, data._refId);
             $compile(htmlData)($rootScope.$new());
             scope.origElem = angular.element(htmlData).text();
             var promise1 = $interval(
@@ -74,34 +76,42 @@ function mmsDiffAttr(ProjectService, ElementService, URLService, $q, $compile, $
                     scope.origElem = angular.element(htmlData).text();
                 }, 5000);
         }, function(reason) {
-            if(reason.message.toLowerCase() == "not found") {
-                origNotFound = true;
+            // scope.origElem = '';
+            origNotFound = true;
+            if (reason.message.toLowerCase() == "not found") {
                 scope.origElem = '';
-            } 
-        });
-
-        ElementService.getElement({
-            projectId:  projectTwoId, 
-            elementId:  scope.mmsEid, 
-            refId:      refTwoId, 
-            commitId:   commitTwoId
-        }).then(function(data) { 
-            var htmlData = createTransclude(data.id, scope.mmsAttr, data._projectId, commitTwoId, refTwoId);
-            $compile(htmlData)($rootScope.$new());
-            scope.compElem = angular.element(htmlData).text();
-            var promise2 = $interval(
-                function() {
-                    scope.compElem = angular.element(htmlData).text();
-                }, 5000);
+            } else {
+                invalidOrig = true;
+            }
+        }).then(function() {
+                ElementService.getElement({
+                projectId:  projectTwoId, 
+                elementId:  scope.mmsEid, 
+                refId:      refTwoId, 
+                commitId:   commitTwoId
+            }).then(function(data) { 
+                var htmlData = createTransclude(data.id, scope.mmsAttr, data._projectId, data._commitId, data._refId);
+                $compile(htmlData)($rootScope.$new());
+                scope.compElem = angular.element(htmlData).text();
+                var promise2 = $interval(
+                    function() {
+                        scope.compElem = angular.element(htmlData).text();
+                    }, 5000);
+                    checkElement(origNotFound, compNotFound, deletedFlag);
+            }, function(reason) {
+                // scope.compElem = '';
+                if (reason.message.toLowerCase() == "not found") {
+                    compNotFound = true;
+                    scope.compElem = '';
+                } else if (reason.message.toLowerCase() == "deleted") {
+                    deletedFlag = true;
+                } else {
+                    compNotFound = true;
+                    invalidComp = true;
+                }
                 checkElement(origNotFound, compNotFound, deletedFlag);
-        }, function(reason) {
-            scope.compElem = '';
-            if(reason.message.toLowerCase() == "not found") {
-                compNotFound = true;
-            } else if (reason.message.toLowerCase() == "deleted") {
-                deletedFlag = true;
-            } 
-            checkElement(origNotFound, compNotFound, deletedFlag);
+                checkValidity(invalidOrig, invalidComp);
+            });
         });
 
         var createTransclude = function(elementId, type, projectId, commitId, refId) {
@@ -113,29 +123,8 @@ function mmsDiffAttr(ProjectService, ElementService, URLService, $q, $compile, $
             return transcludeElm;
         };
 
-        // Get the text to compare for diff
-        // var getComparsionText = function(projectId, commitId, refId) {
-        //     var deferred = $q.defer();
-        //     ElementService.getElement({
-        //         projectId:  projectId,
-        //         elementId:  scope.mmsEid, 
-        //         refId:      refId, 
-        //         commitId:   commitId
-        //     }).then(function(data){
-        //         var htmlData = createTransclude(data.id, scope.mmsAttr, data._projectId, commitId, refId);
-        //         $compile(htmlData)($rootScope.$new());
-        //         deferred.resolve(htmlData);
-        //     }, function(reason) {
-        //         if (reason.message) {
-        //           deferred.reject(reason.message);
-        //         }
-        //         deferred.reject(null);
-        //     });
-        //     return deferred.promise;
-        // };
-
         var checkElement = function(origNotFound, compNotFound, deletedFlag) {
-            switch(origNotFound) {
+            switch (origNotFound) {
                 case false:
                     if (compNotFound === true) {
                         element.html('<span class="mms-error"> This element has been removed from the View. </span>');
@@ -153,6 +142,12 @@ function mmsDiffAttr(ProjectService, ElementService, URLService, $q, $compile, $
                     } else if (compNotFound === true) {
                         element.html('<span class="mms-error"> Invalid Project, Branch/Tag, Commit, or Element IDs. Check entries.</span>');
                     }
+            }
+        };
+
+        var checkValidity = function(invalidOrig, invalidComp) {
+            if (invalidOrig && invalidComp) {
+                element.html('<span class="mms-error"> Invalid Project, Branch/Tag, Commit, or Element IDs. Check entries.</span>');
             }
         };
     };
