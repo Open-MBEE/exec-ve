@@ -147,7 +147,7 @@ function mmsDiffAttr(ProjectService, ElementService, URLService, $q, $compile, $
 
         var checkValidity = function(invalidOrig, invalidComp) {
             if (invalidOrig && invalidComp) {
-                element.html('<span class="mms-error"> Invalid Project, Branch/Tag, Commit, or Element IDs. Check entries.</span>');
+                element.html('<span class="mms-error"><i class="fa fa-info-circle"></i> Invalid Project, Branch/Tag, Commit, or Element IDs. Check entries.</span>');
             }
         };
     };
@@ -156,15 +156,15 @@ function mmsDiffAttr(ProjectService, ElementService, URLService, $q, $compile, $
         restrict: 'E',
         scope: {
             mmsEid: '@',
+            mmsAttr: '@',
             mmsProjectOneId: '@',
             mmsProjectTwoId: '@',
             mmsRefOneId: '@',
             mmsRefTwoId: '@',
-            mmsAttr: '@',
             mmsCommitOneId: '@',
             mmsCommitTwoId: '@'
         },
-        template: '<style>del{color: black;background: #ffbbbb;} ins{color: black;background: #bbffbb;} .match,.textdiff span {color: gray;}</style><div class="textdiff"  semantic-diff left-obj="origElem" right-obj="compElem" ></div>',
+        template: '<style>del{color: black;background: #ffbbbb;} ins{color: black;background: #bbffbb;} .match,.textdiff span {color: gray;}</style><div class="textdiff" semantic-diff left-obj="origElem" right-obj="compElem" ></div>',
         require: '?^^mmsView',
         link: mmsDiffAttrLink
     };
