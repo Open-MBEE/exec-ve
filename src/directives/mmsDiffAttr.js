@@ -1,33 +1,37 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsDiffAttr', ['ProjectService', 'ElementService', 'URLService','$q', '$compile', '$rootScope', '$interval', mmsDiffAttr]);
+.directive('mmsDiffAttr', ['ElementService', '$compile', '$rootScope', '$interval', mmsDiffAttr]);
 
 /**
  * @ngdoc directive
  * @name mms.directives.directive:mmsDiffAttr
  *
  * @requires mms.ElementService
+ * @requires $compile
+ * @requires $rootScope
+ * @requires $interval
  *
  * @restrict E
  *
  * @description
- *  Compares a element at two different times and generates a pretty diff.
+ *  Compares a element at two different refs/commits and generates a pretty diff.
  * ## Example
  *
- * <mms-diff-attr mms-eid="element-id" mms-attr="name/doc/val" mms-version-one="timestamp/latest/tag?" mms-version-two="timestamp/latest/tag?"></mms-diff-attr>
+ * <mms-diff-attr mms-eid="element-id" mms-attr="name/doc/val" mms-ref-one="branch/tag" mms-ref-two="branch/tag"></mms-diff-attr>
  *
  * @param {string} mmsEid The id of the element whose doc to transclude
- * @param {string=master} mmsAttr Attribute to use, ie name, doc, value
- * @param {string=master} mmsWsOne Workspace to use, defaults to current ws or master
- * @param {string=master} mmsWsTwo Workspace to use, defaults to current ws or master
- * @param {string=latest} mmsVersionOne  can be 'latest', timestamp or tag id, default is latest
- * @param {string=latest} mmsVersionTwo  can be 'latest', timestamp or tag id, default is latest
+ * @param {string} mmsAttr Attribute to use -  ie `name`, `doc` or `value`
+ * @param {string} mmsProjectOneId Project for original data
+ * @param {string} mmsProjectTwoId Project for comparisson data
+ * @param {string=master} mmsRefOneId Ref to use, defaults to current ref or master
+ * @param {string=master} mmsRefTwoId Ref to use, defaults to current ref or master
+ * @param {string=latest} mmsCommitOneId  can be 'latest' or commit id, default is latest
+ * @param {string=latest} mmsCommitTwoId  can be 'latest' or commit id, default is latest
  */
-function mmsDiffAttr(ProjectService, ElementService, URLService, $q, $compile, $rootScope, $interval) {
+function mmsDiffAttr(ElementService, $compile, $rootScope, $interval) {
 
     var mmsDiffAttrLink = function(scope, element, attrs, mmsViewCtrl) {
-        // TODO: error checking for missing elements -- util function for http error??
         var projectOneId = scope.mmsProjectOneId;
         var projectTwoId = scope.mmsProjectTwoId;
         var refOneId = scope.mmsRefOneId;
