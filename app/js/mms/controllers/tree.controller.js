@@ -620,7 +620,8 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 parentViewId: $scope.parentBranchData.id,
                 viewId: viewId,
                 projectId: $scope.parentBranchData._projectId,
-                refId: $scope.parentBranchData._refId
+                refId: $scope.parentBranchData._refId,
+                aggr: $scope.newViewAggr.type
             }).then(function(data) {
                 growl.success("View Added");
                 $uibModalInstance.close('');
