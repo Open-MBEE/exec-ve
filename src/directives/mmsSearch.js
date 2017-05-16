@@ -223,7 +223,6 @@ function mmsSearch(CacheService, ElementService, growl, $templateCache) {
          * Use projectsList to populate list with all the mounted project ids for
          * specified project.
          *
-         * @return 
          */
         var getAllMountsAsArray = function(project, projectsList) {
             projectsList.push(project.id);
