@@ -88,7 +88,7 @@ function mmsDiffAttr(ElementService, $compile, $rootScope, $interval) {
             } else {
                 invalidOrig = true;
             }
-        }).then(function() {
+        }).finally(function() {
             ElementService.getElement({
                 projectId:  projectTwoId, 
                 elementId:  scope.mmsEid, 
