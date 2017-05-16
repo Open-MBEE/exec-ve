@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsJobs', ['$templateCache','$http', '$location', 'ElementService','UtilsService','growl','_','$q','URLService', mmsJobs]);
+.directive('mmsJobs', ['$templateCache','$http', '$location', '$window', 'ElementService','UtilsService','growl','_','$q','URLService', mmsJobs]);
 /**
  * @ngdoc directive
  * @name mms.directives.directive:mmsJobs
@@ -23,11 +23,12 @@ angular.module('mms.directives')
  *   <mms-jobs></mms-jobs>
  * </pre>
  *
- * @param {string=master} mmsWs Workspace to use, defaults to master
+ * @param {string=master} mmsBranch Branch to use, defaults to master
  * @param {string=null} mmsDocId the id of the current document under which the job is being run
  */
-function mmsJobs($templateCache, $http, $location, ElementService, UtilsService, growl, _ , $q, URLService) {
+function mmsJobs($templateCache, $http, $location, $window, ElementService, UtilsService, growl, _ , $q, URLService) {
     var template = $templateCache.get('mms/templates/mmsJobs.html');
+    // var greet = $window.localStorage.getItem('yo');
     //:TODO have cases for each null; "running"; "failed"; "completed"; "aborted";"unstable"; "disabled"; "waiting";
     var mmsJobsLink = function(scope, element, attrs) {
         var documentName;
@@ -40,6 +41,14 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
         scope.runCleared = true;
         scope.deleteCleared = true;
         scope.jobInput = { jobName:''};
+        scope.hasRefArr = false;
+
+        var refArrString = $window.localStorage.getItem('refArr');
+        var refArr = JSON.parse(refArrString); 
+        if (refArr) {
+            scope.hasRefArr = true;
+            scope.createdRefs = refArr; 
+        }
 
         // get all the jobs for current document
         var getJobs = function(){
@@ -101,7 +110,7 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
                     return;
                 scope.doc = document;
                 documentName = document.name;
-                scope.docEditable = document.editable && scope.mmsWs === 'master';
+                scope.docEditable = document.editable && scope.mmsBranch === 'master';
                 ElementService.getIdInfo(document, null)
                 .then(function(data) {
                     project = data;
@@ -281,7 +290,7 @@ function mmsJobs($templateCache, $http, $location, ElementService, UtilsService,
         restrict: 'E',
         template: template,
         scope: {
-            mmsWs: '@',
+            mmsBranch: '@',
             mmsDocId:'@'
         },
         link: mmsJobsLink
