@@ -239,7 +239,7 @@ describe('Element Service', function() {
 
 	}));
 
-	describe('getElement', function() {
+	describe('getElement', function() { //problem with MMS with this, MMS-741
 		it('should get an element that is not in the cache', function() {
 			var elemOb;
 			var testElem = {
@@ -381,7 +381,7 @@ describe('Element Service', function() {
 		// });
 	});
 
-	describe('getElementForEdit', function() {
+	xdescribe('getElementForEdit', function() {
 		it('should get an element', function() {
 			var elemOb;
 			var testElem = {
@@ -406,8 +406,8 @@ describe('Element Service', function() {
 	});
 
 	xdescribe('getOwnedElements', function() {
-		it('should get an element', function() {
-			
+		it('should get an elements owned element objects', function() {
+
 		});
 	});
 
@@ -423,9 +423,27 @@ describe('Element Service', function() {
 		});
 	});
 
-	xdescribe('updateElement', function() {
-		it('should get an element', function() {
-
+	describe('updateElement', function() {
+		it('it should save an element to MMS and update the cache if successful', function() {
+			var elemOb;
+			var testElem = {
+				projectId: "heyaproject",
+				elementId: "heyanelement",
+				refId: 'master',
+				commitId: 'latest',
+				returnChildViews: true
+			};
+			$httpBackend.when('POST', root + '/projects/refs/master/elements/heyanelement').response(
+				function(method, url, data) {
+					return [201, ''];
+				});
+			ElementServiceObj.updateElement(testElem).then(function(data) {
+				elemOb = data;
+			}, function(reason) {
+				elemOb = reason.message;
+			});
+			$httpBackend.flush();
+			expect(elemOb).toEqual(testElem);
 		});
 	});
 
