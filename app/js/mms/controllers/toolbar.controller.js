@@ -24,11 +24,12 @@ function($scope, $rootScope, $state, UxService, refOb, documentOb) {
         }
         var editable = false;
         tbApi.addButton(UxService.getToolbarButton("element-history"));
+        tbApi.addButton(UxService.getToolbarButton("tags"));
         if ($state.includes('project.ref.document')) {
             tbApi.addButton(UxService.getToolbarButton("jobs"));
         }
         if ($state.includes('project.ref') && !$state.includes('project.ref.document')) {
-            editable = documentOb && refOb.type === 'Branch';
+            editable = documentOb._editable && refOb.type === 'Branch';
             tbApi.setPermission('element-editor', editable);
             if ($state.includes('project.ref.preview')) {
                 tbApi.addButton(UxService.getToolbarButton("view-reorder"));

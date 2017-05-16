@@ -331,7 +331,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 _projectId: data._projectId,
                 _refId: data._refId,
                 _modified: data._modified,
-                _read: data._read,
+                // _read: data._read,
                 id: data.id
             };
             if (data._childViews) {
@@ -340,7 +340,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 clone._childViews = [];
             }
             clone._childViews.push({id: reqOb.viewId, aggregation: reqOb.aggr});
-            ElementService.updateElement(clone)
+            ElementService.updateElement(clone, true)
             .then(function(data2) {
                 deferred.resolve(data2);
             }, function(reason) {
@@ -386,7 +386,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                         break; 
                     }
                 }
-                ElementService.updateElement(clone)
+                ElementService.updateElement(clone, true)
                 .then(function(data2) {
                     deferred.resolve(data2);
                 }, function(reason) {
@@ -418,7 +418,11 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
     var addElementToViewOrSection = function(reqOb, elementOb) {
         UtilsService.normalize(reqOb);
         var deferred = $q.defer();
-        ElementService.getElement(reqOb, 2)
+        ElementService.getElement({
+            projectId: reqOb._projectId,
+            refId: reqOb._refId,
+            elementId: reqOb.id
+        }, 2)
         .then(function(data) {  
             var clone = {
                 _projectId: data._projectId,
@@ -699,6 +703,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             projectId: ownerOb._projectId,
             refId: ownerOb._refId,
             elements: toCreate,
+            returnChildViews: true
         };
         ElementService.createElements(reqOb)
         .then(function(data) {
