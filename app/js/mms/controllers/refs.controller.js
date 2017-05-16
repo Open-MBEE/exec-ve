@@ -3,10 +3,10 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('RefsCtrl', ['$sce', '$q', '$filter', '$location', '$uibModal', '$scope', '$rootScope', '$state','$timeout', 'growl', '_',
+.controller('RefsCtrl', ['$sce', '$q', '$filter', '$location', '$uibModal', '$scope', '$rootScope', '$state', '$timeout', '$window', 'growl', '_',
                          'UxService', 'ElementService', 'UtilsService', 'ProjectService', 'MmsAppUtils', 'ApplicationService',
                          'orgOb', 'projectOb', 'refOb', 'refObs', 'tagObs', 'branchObs',
-function($sce, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $timeout, growl, _,
+function($sce, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $timeout, $window, growl, _,
     UxService, ElementService, UtilsService, ProjectService, MmsAppUtils, ApplicationService,
     orgOb, projectOb, refOb, refObs, tagObs, branchObs) {
 
