@@ -3,13 +3,18 @@
 angular.module('mms')
 .provider('URLService', function URLServiceProvider() {
     var baseUrl = '/alfresco/service';
-    
+    var jobsUrl = 'http://cae-pma-int:8080/';
+
     this.setBaseUrl = function(base) {
         baseUrl = base;
     };
+
+    this.setJobsUrl = function(jobs) {
+        jobsUrl = jobs;
+    };
     
     this.$get = [function URLServiceFactory() {
-        return urlService(baseUrl);
+        return urlService(baseUrl, jobsUrl);
     }];
 });
 
@@ -35,8 +40,9 @@ angular.module('mms')
  * (You may run into problems like cross origin security policy that prevents it from
  *  actually getting the resources from a different server, solution TBD)
  */
-function urlService(baseUrl) {
+function urlService(baseUrl, jobsUrl) {
     var root = baseUrl;
+    var jobsRoot = jobsUrl;
     var ticket;
     /**
      * @ngdoc method
@@ -365,8 +371,8 @@ function urlService(baseUrl) {
         return addTicket(r);
     };
     
-    var getJobs = function(id) {
-        return addTicket(root + '/workspaces/master/jobs/' + id + '?recurse=1');
+    var getJobs = function(projectId, refId, machine) {
+        return addTicket( addServer(jobsRoot + 'projects/'+ projectId + '/refs/master/jobs', machine) );
     };
 
     var getJob = function(jobSyml){
@@ -377,9 +383,9 @@ function urlService(baseUrl) {
         return addTicket(root + '/workspaces/master/jobs/'+ jobSyml + '/execute');
     };
     
-    var getCreateJob = function() {
-        var link = '/alfresco/service/workspaces/master/jobs';
-        return addTicket(root + '/workspaces/master/jobs');
+    var getCreateJobURL = function(projectId, refId) {
+        // var link = '/alfresco/service/workspaces/master/jobs';
+        return jobsRoot + 'projects/'+ projectId + '/refs/master/jobs';
     };
 
     var getLogoutURL = function() {
@@ -388,6 +394,14 @@ function urlService(baseUrl) {
     
     var getCheckTicketURL = function(t) {
         return root + '/mms/login/ticket/' + t;//+ '?alf_ticket=' + t; //TODO remove when server returns 404
+    };
+
+    var addServer = function(url, server) {
+        var r = url;
+        if (url.indexOf('?') > 0)
+            return url + '&mmsServer=' + server;
+        else
+            return url + '?mmsServer=' + server;
     };
     
     var addVersion = function(url, version) {
@@ -475,7 +489,7 @@ function urlService(baseUrl) {
         getJobs: getJobs,
         getJob: getJob,
         getJenkinsRun: getJenkinsRun,
-        getCreateJob: getCreateJob,
+        getCreateJobURL: getCreateJobURL,
         getCheckLoginURL: getCheckLoginURL,
         getCheckTicketURL: getCheckTicketURL,
         getLogoutURL: getLogoutURL,

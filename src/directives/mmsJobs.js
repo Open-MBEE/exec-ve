@@ -51,14 +51,19 @@ function mmsJobs($templateCache, $http, $location, $window, ElementService, Util
         }
 
         // get all the jobs for current document
-        var getJobs = function(){
+        var getJobs = function() {
             var id = scope.mmsDocId;
-            var link = URLService.getJobs(id);
+            var projectId = scope.mmsProjectId;
+            var refId = scope.mmsRefId;
+            // var link = URLService.getJobs(projectId, refId, $location.host());
+            var link = URLService.getJobs(projectId, refId, 'opencae-int.jpl.nasa.gov');
+            // link = "http://cae-pma-int:8080/projects/PROJECT-cea59ec3-7f4a-4619-8577-17bbeb9f1b1c/refs/master/jobs/absx?alf_ticket=TICKET_eb2f518ec6b061050d0ec516a4c467f164da2b5c&mmsServer=opencae-int.jpl.nasa.gov";
+            // link = "http://cae-pma-int:8080/projects/PROJECT-921084a3-e465-465f-944b-61194213043e/refs/master/jobs?alf_ticket=TICKET_bffc1105504a29f9987baa85f739a2485dad9d39&mmsServer=opencae-int.jpl.nasa.gov";
             scope.loading = true;
             scope.hasJobs = false;
             scope.responseCleared = false;
             //scope.runCleared = false;
-            $http.get(link).then(function(data){
+            $http.get(link).then(function(data)  {
                 var jobs = data.data.jobs; // get jobs json
                 var jobs_size = data.data.jobs.length; // get length of jobs array
                 var newJobs = {};
@@ -86,23 +91,24 @@ function mmsJobs($templateCache, $http, $location, $window, ElementService, Util
                     scope.hasJobs = true;
                 scope.loading = false;
                 scope.job = newJobs;
-            }, function(error){
+            }, function(error) {
                 // display some error?
-                growl.error('There was a error in retrieving your job: ' + error.status);
+                // growl.error('There was a error in retrieving your job: ' + error.status);
                 scope.loading = false;
-            }).finally(function(){
+            }).finally(function() {
                 scope.responseCleared = true;
                 //scope.runCleared = true;
             });
         };
 
         //Callback function for document change
-        var changeDocument = function(newVal, oldVal) {// check if the right pane is reloaded everytime
+        var changeDocument = function(newVal, oldVal) { // check if the right pane is reloaded everytime
             if (!newVal || (newVal == oldVal && ran))
                 return;
             ran = true;
             lastid = newVal;
-            ElementService.getElement(scope.mmsDocId, false, 'master', 'latest', 2, true)
+            var reqOb = {elementId: scope.mmsDocId, projectId: scope.mmsProjectId, refId: scope.mmsRefId, depth: 2};
+            ElementService.getElement(reqOb, 2, false)
             .then(function(document) {
                 if (newVal !== lastid)
                     return;
@@ -110,11 +116,11 @@ function mmsJobs($templateCache, $http, $location, $window, ElementService, Util
                     return;
                 scope.doc = document;
                 documentName = document.name;
-                scope.docEditable = document.editable && scope.mmsBranch === 'master';
-                ElementService.getIdInfo(document, null)
-                .then(function(data) {
-                    project = data;
-                });
+                scope.docEditable = document.editable && scope.mmsRefId === 'master';
+                // ElementService.getIdInfo(document, null)
+                // .then(function(data) {
+                //     project = data;
+                // });
                 scope.docName = documentName;
                 getJobs();
             });
@@ -207,6 +213,7 @@ function mmsJobs($templateCache, $http, $location, $window, ElementService, Util
                     growl.error('Your job failed to update: ' + fail.status);
                 });
         };
+
         scope.deleteJob = function(){
             var jobDelete = {
                 jobs: [{
@@ -290,7 +297,8 @@ function mmsJobs($templateCache, $http, $location, $window, ElementService, Util
         restrict: 'E',
         template: template,
         scope: {
-            mmsBranch: '@',
+            mmsProjectId: '@',
+            mmsRefId: '@',
             mmsDocId:'@'
         },
         link: mmsJobsLink

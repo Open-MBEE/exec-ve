@@ -151,15 +151,16 @@ in progress <a href="https://cae-jenkins.jpl.nasa.gov/job/MMS_1490133988355_3914
             </tr>
         </tbody>
     </table>
-    <div ng-if="!hasJobs && !loading" class = "text-center empty-state">
+    <div ng-if="!hasJobs && !loading" class="text-center empty-state">
         <h4 ng-if="!hasJobs && !loading">No Current PMA Jobs</h4>
-        <p><i>What's PMA?</i> PMA regenerates Magicdraw views for the current document. <a href = "https://cae-ems.jpl.nasa.gov/alfresco/mmsapp/mms.html#/workspaces/master/sites/site__18_0_2_bec02f9_1446154915939_541002_41021/documents/_18_0_2_8630260_1446850132083_177552_51111/views/MMS_1474586905881_1cf20cf0-711f-4cca-8a61-de8a354e3d43">More</a></p>
+        <p><i>What's PMA?</i> PMA regenerates Magicdraw views for the current document. 
+        <a target="_blank" href="https://cae-ems.jpl.nasa.gov/alfresco/mmsapp/mms.html#/workspaces/master/sites/site__18_0_2_bec02f9_1446154915939_541002_41021/documents/_18_0_2_8630260_1446850132083_177552_51111/views/MMS_1474586905881_1cf20cf0-711f-4cca-8a61-de8a354e3d43">More</a></p>
         <p ng-if="mmsRefId != 'master'">PMA is currently only available on the <strong>master</strong> branch.</p>
-        <button class = "btn btn-primary">Run DocGen</button>
+        <button class="btn btn-primary" ng-if="mmsRefId === 'master'" ng-click="createJob()">Run DocGen</button>
     </div>
 
     <div class="row" style="margin-right:0px;">
-    <button type="submit"  class="btn-link pull-right" ng-click="runNow()" style="text-transform: uppercase; display:none;">
+    <button type="submit" class="btn-link pull-right" ng-click="runNow()" style="text-transform: uppercase; display:none;">
         <strong><span ng-show="responseCleared">RUN JOB FOR {{docName}}</span></strong>
         <i ng-show="!responseCleared" class="fa fa-spin fa-spinner"></i>
     </button>
