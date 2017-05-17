@@ -31,7 +31,7 @@
   overflow: hidden;
   white-space: nowrap;
 }
-
+  
 div.tooltip-inner {
   white-space: normal;
 }
@@ -125,7 +125,8 @@ div.tooltip-inner {
 .ve-table-buttons
 #ve-origin-select,
 #ve-login,
-.ve-table-filter{
+.ve-table-filter,
+#ve-jobs-table{
 
   .btn {
     font-weight: 500;
@@ -148,6 +149,7 @@ div.tooltip-inner {
 
   .btn-primary {
     background-color: $ve-teal-base;
+    color:white;
   }
 
   .btn-primary:hover {
@@ -217,7 +219,9 @@ div.tooltip-inner {
     margin: 0;
     font-size: 13px;
     text-transform: uppercase;
-    letter-spacing: .08em;
+    letter-spacing: 0.16em;
+    font-weight: 400;
+    color:$ve-white-text-lighter-2;
   }
 
   /*Clearing bootstrap*/
