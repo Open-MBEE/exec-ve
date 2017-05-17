@@ -1,25 +1,24 @@
 'use strict';
 
-xdescribe('ApplicationService', function () {
+describe('Service: ApplicationService', function () {
     beforeEach(module('mms'));
 
     var ApplicationServiceObj;
     var mockURLService, mockQ, mockHttp;
     var $httpBackend, $rootScope;
-    var requestHandler, mmsV;
 
     var root = '/alfresco/service';
 
-    beforeEach(function () {
-        module(function ($provide) {
-            $provide.service('URLService', function () {
-                this.getMmsVersionURL = jasmine.createSpy('getMmsVersionURL');
-            });
-            $provide.service('$q', function () {
-                this.defer = jasmine.createSpy('defer');
-            });
-        });
-    });
+    // beforeEach(function () {
+    //     module(function ($provide) {
+    //         $provide.service('URLService', function () {
+    //             this.getMmsVersionURL = jasmine.createSpy('getMmsVersionURL');
+    //         });
+    //         $provide.service('$q', function () {
+    //             this.defer = jasmine.createSpy('defer');
+    //         });
+    //     });
+    // });
 
     beforeEach(inject(function ($injector) {
         ApplicationServiceObj = $injector.get('ApplicationService');
@@ -28,16 +27,14 @@ xdescribe('ApplicationService', function () {
         $httpBackend          = $injector.get('$httpBackend');
         $rootScope            = $injector.get('$rootScope');
 
-        requestHandler = $httpBackend.when('GET', root + '/mmsversion').respond(
-            {"mmsVersion": "3.0.0-rc1"}
-        );
+        var mmsV = {mmsVersion: "3.0.0-rc4"};
     }));
 
     afterEach(function () {
         $httpBackend.verifyNoOutstandingRequest();
     });
 
-    describe('Method CreateUniqueId', function () {
+    describe('Method: createUniqueId', function () {
         it('should create a unique id by retrieving the source object from ApplicationService', function () {
             var source = ApplicationServiceObj.getSource();
             expect(source).toBeDefined();
@@ -50,15 +47,21 @@ xdescribe('ApplicationService', function () {
         });
     });
 
-    describe('Method getMmsVersion', function () {
+    describe('Method: getMmsVersion', function () {
+        var mmsVersion;
+        var mmsVersionData = "3.0.0-rc4"; 
+        $httpBackend.when('GET', root + '/mmsversion').respond(
+            function(method, url, data) {
+                return [200, mmsV];
+            });
         it('should retrieve the mmsVersion from the application', inject(function () {
             ApplicationServiceObj.getMmsVersion().then(function (data) {
-                mmsV = data;
+                mmsVersion = data.mmsVersion;
             }, function (reason) {
-                mmsV = "Could not retrieve due to failure: " + reason.message;
+                mmsVersion = "Could not retrieve due to failure: " + reason.message;
             });
-            expect(mockURLService.getMmsVersionURL()).toContain(requestHandler);
-            expect(mmsV).not.toContain("Could not retrieve due to failure: ");
+            $httpBackend.flush();
+            expect(mmsVersion).toEqual(mmsVersionData);
         }));
     });
 });
