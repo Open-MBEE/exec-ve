@@ -20,6 +20,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
     $scope.refOb = refOb;
     $scope.tagObs = tagObs;
     $scope.noTags = false;
+    $scope.chosenTag = 'latest';
 
     if (viewOb) {
         $scope.specInfo.id = viewOb.id;
@@ -65,6 +66,15 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
         $scope.specInfo.refId = info[2];
         $scope.specInfo.commitId = 'latest';
         $rootScope.ve_tbApi.setPermission('element-editor', true);
+    };
+
+    $scope.tagClicked = function() {
+        var tag = $scope.selects.tagSelected;
+        if(!tag) {
+            $scope.chosenTag = 'latest';
+            return;
+        }
+        $scope.chosenTag = tag;
     };
 
     var showPane = function(pane) {
