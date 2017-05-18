@@ -4,7 +4,6 @@ xdescribe('Service: ApplicationService', function () {
     beforeEach(module('mms'));
 
     var ApplicationServiceObj;
-    var mockURLService, mockQ, mockHttp;
     var $httpBackend, $rootScope;
     var root = '/alfresco/service';
 
@@ -23,9 +22,7 @@ xdescribe('Service: ApplicationService', function () {
     describe('Method: getMmsVersion', function () {
         beforeEach(inject(function ($injector) {
             ApplicationServiceObj = $injector.get('ApplicationService');
-            mockURLService        = $injector.get('URLService');
             $httpBackend          = $injector.get('$httpBackend');
-            $rootScope            = $injector.get('$rootScope');
             var mmsV = { mmsVersion: "3.0.0-rc4" };
 
             $httpBackend.whenGET(root + '/mmsversion').respond(

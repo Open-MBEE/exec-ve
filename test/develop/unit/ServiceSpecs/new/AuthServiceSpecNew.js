@@ -4,52 +4,52 @@ xdescribe('Service: Authorization Service', function() {
 	beforeEach(module('mms'));
 
 	var AuthServiceObj;
-	var mockCacheService, mockURLService, mockElementService, mockViewService, mockProjectService, mockHttpService;
-	var $httpBackend, $window;
-	var credentialsJSON;
-	var ticket;
+	var $httpBackend, authRequestHandler;
+	var credentialsJSON, ticket;
 	var root = '/alfresco/service';
 
 	beforeEach(inject(function($injector) {
 		AuthServiceObj 		= $injector.get('AuthService');
-		mockCacheService	= $injector.get('CacheService');
-		mockURLService		= $injector.get('URLService');
-		mockElementService	= $injector.get('ElementService');
-		mockViewService		= $injector.get('ViewService');
-		mockProjectService	= $injector.get('ProjectService');
-		mockHttpService		= $injector.get('HttpService');
 		$httpBackend		= $injector.get('$httpBackend');
-		$window				= $injector.get('$window');
-
 		credentialsJSON = {
 			"username": "someone",
 			"password": "jksdlfkl3923432"
-		}
+		};
+		var mockTicket = {data:{ticket: "TICKET_123456789"}};
+		// backend definition common for all tests
+		authRequestHandler = $httpBackend.whenPOST(root + '/api/login', credentialsJSON)
+			.respond(function(method, url, data) {
+					return [201, mockTicket];
+			});
 	}));
 
     afterEach(function () {
-        $httpBackend.verifyNoOutstandingRequest();
+        $httpBackend.verifyNoOutstandingExpectation();
+     	$httpBackend.verifyNoOutstandingRequest();
     });
 
-	xdescribe('Method: getAuthorized', function() {
+	describe('Method: getAuthorized', function() {
 		it('should get credentials', function() {
-			// var ticketStored;
-			// ticket = $window.localStorage.getItem('ticket');
-			// $httpBackend.when('POST', root + '/api/login').respond(
-			// 	function(method, url, data) {
-			// 		return [201, credentialsJSON];
-			// });
-			// AuthServiceObj.getAuthorized(credentialsJSON).then(function(data) {
-			// 	ticketStored = data;
-			// }, function(reason) {
-			// 	ticketStored = reason.message;
-			// });
-			// $httpBackend.flush();
-			// expect(ticketStored).toEqual(credentialsJSON);
+			AuthServiceObj.getAuthorized(credentialsJSON).then(function(data) {
+				ticket = data;
+			}, function(reason) {
+				ticket = reason.message;
+			});
+			$httpBackend.flush();
+			expect(ticket).toEqual(AuthServiceObj.getTicket());
+		});
 
-			var requestHandler = $httpBackend.when('POST', root + '/api/login', credentialsJSON).respond(credentialsJSON);
-			var ticket = requestHandler;
-			expect(ticket).toEqual(credentialsJSON);
+
+		it('should fail authentication', function() {
+			// Notice how you can change the response even after it was set
+			authRequestHandler.respond(401, '');
+			AuthServiceObj.getAuthorized(credentialsJSON).then(function(data) {
+				ticket = data;
+			}, function(reason) {
+				ticket = reason.message;
+			});
+			$httpBackend.flush();
+			expect(ticket).toBe('Permission Error');
 		});
 	});
 
