@@ -26,10 +26,6 @@ function($scope, $timeout, $location, $rootScope, $state, _, $window, $uibModal,
         }
     });
 
-    $window.addEventListener('beforeload', function() {
-        AuthService.checkLogin();
-    });
-
     hotkeys.bindTo($scope)
         .add({
             combo: 'alt+m',
