@@ -20,6 +20,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
     $scope.refOb = refOb;
     $scope.tagObs = tagObs;
     $scope.noTags = false;
+    $scope.resultsPresent = true;
 
     if (viewOb) {
         $scope.specInfo.id = viewOb.id;
@@ -49,6 +50,9 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
         $rootScope.ve_edits = {};
     $scope.presentElemEditCnts = {};
 
+    // if($scope.results.length === 0) {
+    //     $scope.resultsPresent = false;
+    // }
     // Set edit count for tracker view 
     $scope.veEditsLength = function() {
         return Object.keys($rootScope.ve_edits).length;
