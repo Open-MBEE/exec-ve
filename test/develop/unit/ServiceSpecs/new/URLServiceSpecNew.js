@@ -1,6 +1,4 @@
-/**
- * Created by dank on 8/25/16.
- */
+
 "use strict";
 
 describe("URLService", function () {

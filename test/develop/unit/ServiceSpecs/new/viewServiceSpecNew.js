@@ -3,7 +3,7 @@
 describe('Service: ViewService', function() {
 	beforeEach(module('mms'));
 
-    var root = '/alfresco/service/projects/heyaproject/refs/master/';
+    var root = '/alfresco/service/projects/heyaproject/refs/master';
 
     var ViewServiceObj;
     var mockCacheService, mockURLService, mockElementService, mockUtilsService;
@@ -79,11 +79,11 @@ describe('Service: ViewService', function() {
 						}
 					]
 				},
-			_commitId 					: "commitid",
+			_commitId 					: "latest",
 			_childViews: [
 				{
 					aggregation: "composite",
-					id: "child1"
+					id: "heyanelement"
 				},
 				{
 					aggregation: "composite",
@@ -119,32 +119,32 @@ describe('Service: ViewService', function() {
  	    $httpBackend.verifyNoOutstandingRequest();
     });
 
-    xdescribe('Method: processString', function() {
-    	it('it should process string', function() {
+    // xdescribe('Method: processString', function() {
+    // 	it('it should process string', function() {
  
-    	});
-    });
-    xdescribe('Method: processStrings', function() {
-    	it('it should process strings', function() {
+    // 	});
+    // });
+    // xdescribe('Method: processStrings', function() {
+    // 	it('it should process strings', function() {
  
-    	});
-    });
-    xdescribe('Method: processPeople', function() {
-    	it('it should process people', function() {
+    // 	});
+    // });
+    // xdescribe('Method: processPeople', function() {
+    // 	it('it should process people', function() {
  
-    	});
-    });
-    xdescribe('Method: processRevisions', function() {
-    	it('it should process strings', function() {
+    // 	});
+    // });
+    // xdescribe('Method: processRevisions', function() {
+    // 	it('it should process strings', function() {
  
-    	});
-    });
+    // 	});
+    // });
     xdescribe('Method: downgradeDocument', function() {
     	it('it should demote an object to a view', function() {
     		var result;
     		var newElemOb = elemOb;
     		newElemOb._appliedStereotypeIds = ['_17_0_1_232f03dc_1325612611695_581988_21583'];
-    		console.log("hey: " + ViewServiceObj.downgradeDocument(elemOb));
+    		$httpBackend.whenPOST(root + '/elements/heyanelement').respond(newElemOb);
  			ViewServiceObj.downgradeDocument(elemOb).then(function(data) {
  				result = data;
  			}, function(reason) {
@@ -153,18 +153,19 @@ describe('Service: ViewService', function() {
  			expect(result).toEqual(newElemOb);
     	});
     });
+
     describe('Method: getViewElements', function() {
     	it('it should get the element objects for elements allowed in the view', function() {
-    		var result;
- 			var testElem = {
+			var result;
+			var testElem = {
 				projectId: "heyaproject",
 				elementId: "heyanelement",
 				refId: 'master',
 				commitId: 'latest'
 			};
-			$httpBackend.when('GET', root + '/elements').respond(
+			$httpBackend.whenGET(root + '/elements/heyanelement').respond(
 				function(method, url, data) {
-					return [200, elemOb];
+					return [200, testElem];
 				});
 			ViewServiceObj.getViewElements(testElem).then(function(data) {
 				result = data;
@@ -176,7 +177,7 @@ describe('Service: ViewService', function() {
     	});
     });
 
-    describe('Method: getDocumentViews', function() {
+    xdescribe('Method: getDocumentViews', function() {
     	it('it should get the view objects for a document', function() {
     		var result;
  			var testElem = {
@@ -185,7 +186,27 @@ describe('Service: ViewService', function() {
 				refId: 'master',
 				commitId: 'latest'
 			};
+			$httpBackend.when('GET', root + '/elements/heyanelement').respond(testElem);
 			ViewServiceObj.getDocumentViews(testElem).then(function(data) {
+				result = data;
+			}, function(reason) {
+				result = reason.message;
+			});
+			expect(result).toEqual(testElem);
+    	});
+    });
+
+    xdescribe('Method: addViewtToParentView', function() {
+    	it('it should get the view objects for a document', function() {
+    		var result;
+ 			var testElem = {
+				projectId: "heyaproject",
+				elementId: "heyanelement",
+				refId: 'master',
+				commitId: 'latest'
+			};
+			$httpBackend.when('GET', root + '/elements/heyanelement').respond(testElem);
+			ViewServiceObj.addViewToParentView(testElem).then(function(data) {
 				result = data;
 			}, function(reason) {
 				result = reason.message;
@@ -315,99 +336,60 @@ describe('Service: ViewService', function() {
 			$httpBackend.flush();
 		});	
 	});	
-			// getViewElements = function(id, update, workspace, version, weight, eidss) 
-			// (!viewElements.hasOwnProperty(ver) && * && *), fail
-			// ViewService.getViewElements('badId', false, 'master', '01-01-2014').then(function(response) {
-			// 	console.log('This should not be displayed');
-			// }, function(failMes) {
-			// 	expect(failMes.status).toEqual(200);
-			// });
-		// 	
-		// 	// (!viewElements.hasOwnProperty(ver) && * && *), success, !viewElements.hasOwnProperty(ver)
-		// 	ViewService.getViewElements('12345', false, 'master', '01-01-2014').then(function(response) {
-		// 		expect(response.length).toEqual(2);
-		// 		expect(response[0]).toEqual({author:'muschek', name:'view\'s element', sysmlid:12346, owner:12345, lastModified:'01-01-2014'});
-		// 		expect(response[1]).toEqual({author:'muschek', name:'view\'s 2nd element', sysmlid:12347, owner:12345, lastModified:'01-01-2014'});
-		// 	}); $httpBackend.flush();
-		// 	// viewElements['01-01-2014']['12345'] now exists
-		// 	
-		// 	// (viewElements.hasOwnProperty(ver) && !viewElements[ver].hasOwnProperty(id) && *), success, 
-		// 	// viewElements.hasOwnProperty(ver)
-		// 	ViewService.getViewElements('12345', false, 'master', 'latest').then(function(response) {
-		// 		expect(response.length).toEqual(2);
-		// 		expect(response[0]).toEqual({author:'muschek', name:'view\'s element', sysmlid:12346, owner:12345, lastModified:'07-28-2014'});
-		// 		expect(response[1]).toEqual({author:'muschek', name:'view\'s 2nd element', sysmlid:12347, owner:12345, lastModified:'07-28-2014'});
-		// 	}); $httpBackend.flush();
-		// 	// viewElements['latest']['12345'] now exists
-		// 	
-		// 	// (viewElements.hasOwnProperty(ver) && viewElements[ver].hasOwnProperty(id) && !update)
-		// 	ViewService.getViewElements('12345', false, 'master', '01-01-2014').then(function(response) {
-		// 		expect(response.length).toEqual(2);
-		// 		expect(response[0]).toEqual({author:'muschek', name:'view\'s element', sysmlid:12346, owner:12345, lastModified:'01-01-2014'});
-		// 		expect(response[1]).toEqual({author:'muschek', name:'view\'s 2nd element', sysmlid:12347, owner:12345, lastModified:'01-01-2014'});
-		// 	}); $rootScope.$apply();
-		// 	
-		// 	// (viewElements.hasOwnProperty(ver) && viewElements[ver].hasOwnProperty(id) && update),
-		// 	// success, viewElements.hasOwnProperty(ver)
-		// 	ViewService.getViewElements('12345', true, 'master', 'latest').then(function(response) {
-		// 		expect(response.length).toEqual(2);
-		// 		expect(response[0]).toEqual({author:'muschek', name:'view\'s element', sysmlid:12346, owner:12345, lastModified:'07-28-2014'});
-		// 		expect(response[1]).toEqual({author:'muschek', name:'view\'s 2nd element', sysmlid:12347, owner:12345, lastModified:'07-28-2014'});
-		// 	});
-		// });
-		beforeEach(inject(function($injector) {
-			ViewService = $injector.get('ViewService');
-			CacheService = $injector.get('CacheService');
-			$httpBackend = $injector.get('$httpBackend');
-			$rootScope = $injector.get('$rootScope');
 
-			ownerId = getOwner();
-			$httpBackend.whenGET(root + '/elements/idMatchDocId').respond(
-				{elements: [{name:'doc with matching id', sysmlId:'idMatchDocId', type:'Class',
-				_view2view:[{id:'nonMatchId', childrenViews:[]}, {id:'parentViewId', childrenViews:[]}]}]});
-			$httpBackend.whenGET(root + '/elements/MMS_1442345799882_df10c451-ab83-4b99-8e40-0a8e04b38b9d').respond(
-					{elements: [{_creator:'muschek', name:'doc with empty view2view', sysmlId:'emptyView2ViewDocId',
-					type:'Class', _view2view:[]
-			}]});
-			$httpBackend.whenGET(root + '/views/elemId/elements').respond(
-				{elements: [{_creator:'muschek', name:'view\'s element', sysmlId:12346, ownerId:12345, _modified:'01-01-2014'}, 
-				{_creator:'muschek', name:'view\'s 2nd element', sysmlId:12347, ownerId:12345, _modified:'01-01-2014'}]});
+		// beforeEach(inject(function($injector) {
+		// 	ViewService = $injector.get('ViewService');
+		// 	CacheService = $injector.get('CacheService');
+		// 	$httpBackend = $injector.get('$httpBackend');
+		// 	$rootScope = $injector.get('$rootScope');
+
+		// 	ownerId = getOwner();
+		// 	$httpBackend.whenGET(root + '/elements/idMatchDocId').respond(
+		// 		{elements: [{name:'doc with matching id', sysmlId:'idMatchDocId', type:'Class',
+		// 		_view2view:[{id:'nonMatchId', childrenViews:[]}, {id:'parentViewId', childrenViews:[]}]}]});
+		// 	$httpBackend.whenGET(root + '/elements/MMS_1442345799882_df10c451-ab83-4b99-8e40-0a8e04b38b9d').respond(
+		// 			{elements: [{_creator:'muschek', name:'doc with empty view2view', sysmlId:'emptyView2ViewDocId',
+		// 			type:'Class', _view2view:[]
+		// 	}]});
+		// 	$httpBackend.whenGET(root + '/views/elemId/elements').respond(
+		// 		{elements: [{_creator:'muschek', name:'view\'s element', sysmlId:12346, ownerId:12345, _modified:'01-01-2014'}, 
+		// 		{_creator:'muschek', name:'view\'s 2nd element', sysmlId:12347, ownerId:12345, _modified:'01-01-2014'}]});
 				
-			$httpBackend.when('POST', root + '/elements').respond(function(method, url, data) {
+		// 	$httpBackend.when('POST', root + '/elements').respond(function(method, url, data) {
 
-				var json = JSON.parse(data);
+		// 		var json = JSON.parse(data);
 
-				if (!json.elements[0].sysmlId) {
-					json.elements[0].sysmlId = json.elements[0].name + 'Id';
-				}
-				return [200, json];
-			});
-			$httpBackend.when('POST', root + '/sites/siteId/elements').respond(function(method, url, data) {
+		// 		if (!json.elements[0].sysmlId) {
+		// 			json.elements[0].sysmlId = json.elements[0].name + 'Id';
+		// 		}
+		// 		return [200, json];
+		// 	});
+		// 	$httpBackend.when('POST', root + '/sites/siteId/elements').respond(function(method, url, data) {
 
-				var json = JSON.parse(data);
+		// 		var json = JSON.parse(data);
 
-				if (!json.elements[0].sysmlId) {
-					json.elements[0].sysmlId = json.elements[0].name + 'Id';
-				}
-				return [200, json];
-			});
-			$httpBackend.when('POST', root + '/sites/vetest/elements').respond(function(method, url, data) {
+		// 		if (!json.elements[0].sysmlId) {
+		// 			json.elements[0].sysmlId = json.elements[0].name + 'Id';
+		// 		}
+		// 		return [200, json];
+		// 	});
+		// 	$httpBackend.when('POST', root + '/sites/vetest/elements').respond(function(method, url, data) {
 
-				var json = JSON.parse(data);
+		// 		var json = JSON.parse(data);
 
-				if (!json.elements[0].sysmlId) {
-					json.elements[0].sysmlId = json.elements[0].name + 'Id';
-				}
-				return [200, json];
-			});
+		// 		if (!json.elements[0].sysmlId) {
+		// 			json.elements[0].sysmlId = json.elements[0].name + 'Id';
+		// 		}
+		// 		return [200, json];
+		// 	});
 
-			$httpBackend.whenGET(root + '/sites/ems/products').respond(function(method, url, data) {
-				if (forceFail) { return [500, 'Internal Server Error']; }
-				else {
-					var products = { products: [ { id: 'productId', name: 'Product Name', snapshots: [ { created: '01-01-2014', creator: 'muschek',
-					id: 'snapshotId' } ] } ] };
-					return [200, products];
-				}
-			});
-		}));
+		// 	$httpBackend.whenGET(root + '/sites/ems/products').respond(function(method, url, data) {
+		// 		if (forceFail) { return [500, 'Internal Server Error']; }
+		// 		else {
+		// 			var products = { products: [ { id: 'productId', name: 'Product Name', snapshots: [ { created: '01-01-2014', creator: 'muschek',
+		// 			id: 'snapshotId' } ] } ] };
+		// 			return [200, products];
+		// 		}
+		// 	});
+		// }));
 });
