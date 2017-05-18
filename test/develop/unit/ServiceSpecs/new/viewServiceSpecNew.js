@@ -3,11 +3,13 @@
 describe('Service: ViewService', function() {
 	beforeEach(module('mms'));
 
-    var root = '/alfresco/service/projects/someproject/refs/master';
+    var root = '/alfresco/service/projects/heyaproject/refs/master/';
 
     var ViewServiceObj;
     var mockCacheService, mockURLService, mockElementService, mockUtilsService;
-    var $httpBackend, $rootScope, ownerId;
+    var $httpBackend;
+    var $rootScope;
+    var ownerId;
     var TYPE_TO_CLASSIFIER_ID;
     var elemOb;
 
@@ -112,6 +114,11 @@ describe('Service: ViewService', function() {
 		}
     }));
 
+    afterEach(function () {
+        $httpBackend.verifyNoOutstandingExpectation();
+ 	    $httpBackend.verifyNoOutstandingRequest();
+    });
+
     xdescribe('Method: processString', function() {
     	it('it should process string', function() {
  
@@ -132,7 +139,7 @@ describe('Service: ViewService', function() {
  
     	});
     });
-    describe('Method: downgradeDocument', function() {
+    xdescribe('Method: downgradeDocument', function() {
     	it('it should demote an object to a view', function() {
     		var result;
     		var newElemOb = elemOb;
@@ -148,19 +155,45 @@ describe('Service: ViewService', function() {
     });
     describe('Method: getViewElements', function() {
     	it('it should get the element objects for elements allowed in the view', function() {
+    		var result;
  			var testElem = {
 				projectId: "heyaproject",
 				elementId: "heyanelement",
 				refId: 'master',
 				commitId: 'latest'
 			};
+			$httpBackend.when('GET', root + '/elements').respond(
+				function(method, url, data) {
+					return [200, elemOb];
+				});
 			ViewServiceObj.getViewElements(testElem).then(function(data) {
-
+				result = data;
 			}, function(reason) {
-				reason.message;
-			})
+				result = reason.message;
+			});
+			$httpBackend.flush();
+			expect(result).toEqual(testElem);
     	});
     });
+
+    describe('Method: getDocumentViews', function() {
+    	it('it should get the view objects for a document', function() {
+    		var result;
+ 			var testElem = {
+				projectId: "heyaproject",
+				elementId: "heyanelement",
+				refId: 'master',
+				commitId: 'latest'
+			};
+			ViewServiceObj.getDocumentViews(testElem).then(function(data) {
+				result = data;
+			}, function(reason) {
+				result = reason.message;
+			});
+			expect(result).toEqual(testElem);
+    	});
+    });
+
 	xdescribe('Method CreateView', function() {
 			it('create a view similar to the workspace state in app.js', inject(function() {
 				ViewService.createView(undefined, 'Untitled View', undefined, 'master', 'viewDoc').then(function(data) {
