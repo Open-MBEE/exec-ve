@@ -1,6 +1,6 @@
 'use strict';
 
-describe('Service: ViewService', function() {
+xdescribe('Service: ViewService', function() {
 	beforeEach(module('mms'));
 
     var root = '/alfresco/service/projects/heyaproject/refs/master';
@@ -139,12 +139,15 @@ describe('Service: ViewService', function() {
  
     // 	});
     // });
-    xdescribe('Method: downgradeDocument', function() {
+    describe('Method: downgradeDocument', function() {
     	it('it should demote an object to a view', function() {
     		var result;
     		var newElemOb = elemOb;
     		newElemOb._appliedStereotypeIds = ['_17_0_1_232f03dc_1325612611695_581988_21583'];
-    		$httpBackend.whenPOST(root + '/elements/heyanelement').respond(newElemOb);
+    		$httpBackend.when('POST', root + '/elements/heyanelement', newElemOb).respond(
+    			function(method, url, data) {
+    				return [201, ''];
+    			});
  			ViewServiceObj.downgradeDocument(elemOb).then(function(data) {
  				result = data;
  			}, function(reason) {
@@ -154,7 +157,7 @@ describe('Service: ViewService', function() {
     	});
     });
 
-    describe('Method: getViewElements', function() {
+    xdescribe('Method: getViewElements', function() {
     	it('it should get the element objects for elements allowed in the view', function() {
 			var result;
 			var testElem = {
@@ -163,7 +166,7 @@ describe('Service: ViewService', function() {
 				refId: 'master',
 				commitId: 'latest'
 			};
-			$httpBackend.whenGET(root + '/elements/heyanelement').respond(
+			$httpBackend.when('GET', root + '/elements/heyanelement').respond(
 				function(method, url, data) {
 					return [200, testElem];
 				});
