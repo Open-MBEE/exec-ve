@@ -34,6 +34,8 @@ function mmsDiffAttr(ElementService, $compile, $rootScope, $interval) {
     var mmsDiffAttrLink = function(scope, element, attrs, mmsViewCtrl) {
         var projectOneId = scope.mmsProjectOneId;
         var projectTwoId = scope.mmsProjectTwoId;
+        var elemOneId = scope.mmsEidOne;
+        var elemTwoId = scope.mmsEidTwo;
         var refOneId = scope.mmsRefOneId;
         var refTwoId = scope.mmsRefTwoId;
         var commitOneId = scope.mmsCommitOneId;
@@ -49,11 +51,14 @@ function mmsDiffAttr(ElementService, $compile, $rootScope, $interval) {
         if (mmsViewCtrl) {
             viewOrigin = mmsViewCtrl.getElementOrigin(); 
         } 
+        if (!elemTwoId) {
+            elemTwoId = elemOneId;
+        }
         if (!projectOneId && viewOrigin) {
             projectOneId = viewOrigin.projectId;
         }
-        if (!projectTwoId && viewOrigin) {
-            projectTwoId = viewOrigin.projectId;
+        if (!projectTwoId) {
+            projectTwoId = projectOneId;
         }
         if (!refOneId && viewOrigin) {
             refOneId = viewOrigin.refId;
@@ -68,7 +73,7 @@ function mmsDiffAttr(ElementService, $compile, $rootScope, $interval) {
 
         ElementService.getElement({
             projectId:  projectOneId,
-            elementId:  scope.mmsEid, 
+            elementId:  elemOneId, 
             refId:      refOneId, 
             commitId:   commitOneId
         }).then(function(data) {
@@ -91,7 +96,7 @@ function mmsDiffAttr(ElementService, $compile, $rootScope, $interval) {
         }).finally(function() {
             ElementService.getElement({
                 projectId:  projectTwoId, 
-                elementId:  scope.mmsEid, 
+                elementId:  elemTwoId, 
                 refId:      refTwoId, 
                 commitId:   commitTwoId
             }).then(function(data) {
@@ -162,7 +167,8 @@ function mmsDiffAttr(ElementService, $compile, $rootScope, $interval) {
     return {
         restrict: 'E',
         scope: {
-            mmsEid: '@',
+            mmsEidOne: '@',
+            mmsEidTwo: '@',
             mmsAttr: '@',
             mmsProjectOneId: '@',
             mmsProjectTwoId: '@',

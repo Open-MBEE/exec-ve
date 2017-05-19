@@ -14,7 +14,16 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
              $location.url(locationPath);
      });
 
-    $urlRouterProvider.otherwise('/login');// when the url isn't mapped go here
+// Check if user is logged in, if so redirect to select page otherwise go to login if the url isn't mapped
+    $urlRouterProvider.otherwise(function($injector, $location) {
+        var $state = $injector.get('$state');
+        var checkLogin = $injector.get('AuthService').checkLogin();
+        if (checkLogin) {
+            $state.go('login.select');
+        } else {
+            $state.go('login');
+        }
+    });
 
     $stateProvider
     .state('login', {
