@@ -371,20 +371,19 @@ function urlService(baseUrl, jobsUrl) {
         return addTicket(r);
     };
     
-    var getJobs = function(projectId, refId, machine) {
+    var getJobsURL = function(projectId, refId, machine) {
         return addTicket( addServer(jobsRoot + 'projects/'+ projectId + '/refs/master/jobs', machine) );
     };
 
-    var getJob = function(jobSyml){
-        return addTicket(root + '/workspaces/master/jobs/' + jobSyml);
+    var getJobURL = function(projectId, refId, jobId, machine){
+        return addTicket( addServer(jobsRoot + 'projects/'+ projectId + '/refs/master/jobs/' + jobId , machine) );
     };
 
-    var getJenkinsRun = function(jobSyml) {
-        return addTicket(root + '/workspaces/master/jobs/'+ jobSyml + '/execute');
+    var getRunJobURL = function(projectId, refId, jobId) {
+        return jobsRoot + 'projects/'+ projectId + '/refs/master/jobs' + jobId + '/instances';
     };
     
     var getCreateJobURL = function(projectId, refId) {
-        // var link = '/alfresco/service/workspaces/master/jobs';
         return jobsRoot + 'projects/'+ projectId + '/refs/master/jobs';
     };
 
@@ -486,9 +485,9 @@ function urlService(baseUrl, jobsUrl) {
         getHtmlToPdfURL: getHtmlToPdfURL,
         getWsDiffURL: getWsDiffURL,
         getPostWsDiffURL: getPostWsDiffURL,
-        getJobs: getJobs,
-        getJob: getJob,
-        getJenkinsRun: getJenkinsRun,
+        getJobsURL: getJobsURL,
+        getJobURL: getJobURL,
+        getRunJobURL: getRunJobURL,
         getCreateJobURL: getCreateJobURL,
         getCheckLoginURL: getCheckLoginURL,
         getCheckTicketURL: getCheckTicketURL,
