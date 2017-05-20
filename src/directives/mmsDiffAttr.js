@@ -1,213 +1,183 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsDiffAttr', ['ElementService', 'URLService','$q', '$compile', '$rootScope', '$interval', mmsDiffAttr]);
+.directive('mmsDiffAttr', ['ElementService', '$compile', '$rootScope', '$interval', mmsDiffAttr]);
 
 /**
  * @ngdoc directive
  * @name mms.directives.directive:mmsDiffAttr
  *
  * @requires mms.ElementService
+ * @requires $compile
+ * @requires $rootScope
+ * @requires $interval
  *
  * @restrict E
  *
  * @description
- *  Compares a element at two different times and generates a pretty diff.
+ *  Compares a element at two different refs/commits and generates a pretty diff.
  * ## Example
  *
- * <mms-diff-attr mms-eid="element-id" mms-attr="name/doc/val" mms-version-one="timestamp/latest/tag?" mms-version-two="timestamp/latest/tag?"></mms-diff-attr>
+ * <mms-diff-attr mms-eid="element-id" mms-attr="name/doc/val" mms-ref-one="branch/tag" mms-ref-two="branch/tag"></mms-diff-attr>
  *
  * @param {string} mmsEid The id of the element whose doc to transclude
- * @param {string=master} mmsAttr Attribute to use, ie name, doc, value
- * @param {string=master} mmsWsOne Workspace to use, defaults to current ws or master
- * @param {string=master} mmsWsTwo Workspace to use, defaults to current ws or master
- * @param {string=latest} mmsVersionOne  can be 'latest', timestamp or tag id, default is latest
- * @param {string=latest} mmsVersionTwo  can be 'latest', timestamp or tag id, default is latest
+ * @param {string} mmsAttr Attribute to use -  ie `name`, `doc` or `value`
+ * @param {string} mmsProjectOneId Project for original data
+ * @param {string} mmsProjectTwoId Project for comparisson data
+ * @param {string=master} mmsRefOneId Ref to use, defaults to current ref or master
+ * @param {string=master} mmsRefTwoId Ref to use, defaults to current ref or master
+ * @param {string=latest} mmsCommitOneId  can be 'latest' or commit id, default is latest
+ * @param {string=latest} mmsCommitTwoId  can be 'latest' or commit id, default is latest
  */
-function mmsDiffAttr(ElementService, URLService, $q, $compile, $rootScope, $interval) {
+function mmsDiffAttr(ElementService, $compile, $rootScope, $interval) {
 
     var mmsDiffAttrLink = function(scope, element, attrs, mmsViewCtrl) {
-        // TODO: error checking for missing elements -- util function for http error??
-        var wsOne = scope.mmsWsOne;
-        var wsTwo = scope.mmsWsTwo;
-        var wsOneFlag = false;
-        var wsTwoFlag = false;
-        var viewVersion = null;
+        var projectOneId = scope.mmsProjectOneId;
+        var projectTwoId = scope.mmsProjectTwoId;
+        var elemOneId = scope.mmsEidOne;
+        var elemTwoId = scope.mmsEidTwo;
+        var refOneId = scope.mmsRefOneId;
+        var refTwoId = scope.mmsRefTwoId;
+        var commitOneId = scope.mmsCommitOneId;
+        var commitTwoId = scope.mmsCommitTwoId;
+        var viewOrigin = null;
 
-        var data1CheckForBreak = false;
-        var data2CheckForBreak = false;
-        var vrOneInvalidFlag = false;
-        var vrTwoInvalidFlag = false;
+        var invalidOrig = false;
+        var invalidComp = false;
         var origNotFound = false;
         var compNotFound = false;
         var deletedFlag = false;
 
-        if (mmsViewCtrl)
-            viewVersion = mmsViewCtrl.getWsAndVersion();
-
-        if (!wsOne && viewVersion) {
-            wsOne = viewVersion.workspace;
-        } else if (!wsOne && !viewVersion) {
-            wsOne = 'master';
+        if (mmsViewCtrl) {
+            viewOrigin = mmsViewCtrl.getElementOrigin(); 
+        } 
+        if (!elemTwoId) {
+            elemTwoId = elemOneId;
+        }
+        if (!projectOneId && viewOrigin) {
+            projectOneId = viewOrigin.projectId;
+        }
+        if (!projectTwoId) {
+            projectTwoId = projectOneId;
+        }
+        if (!refOneId && viewOrigin) {
+            refOneId = viewOrigin.refId;
+        } else if (!refOneId && !viewOrigin) {
+            refOneId = 'master';
+        }
+        if (!refTwoId && viewOrigin) {
+            refTwoId = viewOrigin.refId;
+        } else if (!refTwoId && !viewOrigin) {
+            refTwoId = 'master';
         }
 
-        if (!wsTwo && viewVersion) {
-            wsTwo = viewVersion.workspace;
-        } else if (!wsTwo && viewVersion) {
-            wsTwo = 'master';
-        }
-
-        /*WorkspaceService.getWorkspace(wsOne).then(function(data) {
-            tagOrTimestamp(scope.mmsVersionOne, wsOne).then(function(versionOrTs){
-                getComparsionText(versionOrTs, wsOne).then(function(data){
-                    scope.origElem = angular.element(data).text();
-                    // run on interval to check when data gets changed. once it changes set to origElem and break out of interval
-                    var promise1 = $interval(
-                        function(){
-                            // if (scope.origElem == angular.element(data).text() && data1CheckForBreak) {
-                            //     // console.log("data1 did not change again cancel out of interval : " +scope.origElem);
-                            //     $interval.cancel(promise1);
-                            // } else if ( scope.origElem == angular.element(data).text() && !data1CheckForBreak ) {
-                            //     data1CheckForBreak = true;
-                            //     // console.log("data1 did not change make data change true : " +data1CheckForBreak);
-                            // }
-                            scope.origElem = angular.element(data).text();
-                        }, 5000);
-                }, function(reject){
-                    scope.origElem = reject;
-                    if (reject.toLowerCase() == "not found") {
-                        origNotFound = true;
-                        scope.origElem = '';
-                    }
-                });
-            }, function(reject){
-                vrOneInvalidFlag = true;
-            });
+        ElementService.getElement({
+            projectId:  projectOneId,
+            elementId:  elemOneId, 
+            refId:      refOneId, 
+            commitId:   commitOneId
+        }).then(function(data) {
+            // element.prepend('<span class="text-info"> <br><b> Original data: </b> '+ data._projectId + '<br> -- refId: ' +  data._refId+ ' <br>-- commitId: ' +data._commitId+'</span>');
+            var htmlData = createTransclude(data.id, scope.mmsAttr, data._projectId, data._commitId, data._refId);
+            $compile(htmlData)($rootScope.$new());
+            scope.origElem = angular.element(htmlData).text();
+            var promise1 = $interval(
+                function() {
+                    scope.origElem = angular.element(htmlData).text();
+                }, 5000);
         }, function(reason) {
-            wsOneFlag = true;
-            element.html('<span class="mms-error">Workspace One does not exist.</span>');
+            // element.prepend('<span class="text-info"> <br>Error: <b> Original data: </b> '+ projectOneId + '<br> -- refId: ' +  refOneId+ ' <br>-- commitId: ' +commitOneId+'</span>');
+            origNotFound = true;
+            if (reason.message.toLowerCase() == "not found") {
+                scope.origElem = '';
+            } else {
+                invalidOrig = true;
+            }
+        }).finally(function() {
+            ElementService.getElement({
+                projectId:  projectTwoId, 
+                elementId:  elemTwoId, 
+                refId:      refTwoId, 
+                commitId:   commitTwoId
+            }).then(function(data) {
+                // element.prepend('<span class="text-info"> <b> Comparison data: </b> '+ data._projectId + '<br> -- refId: ' +  data._refId+ ' <br>-- commitId: ' +data._commitId+'</span>');
+                var htmlData = createTransclude(data.id, scope.mmsAttr, data._projectId, data._commitId, data._refId);
+                $compile(htmlData)($rootScope.$new());
+                scope.compElem = angular.element(htmlData).text();
+                var promise2 = $interval(
+                    function() {
+                        scope.compElem = angular.element(htmlData).text();
+                    }, 5000);
+                checkElement(origNotFound, compNotFound, deletedFlag);
+            }, function(reason) {
+                // element.prepend('<span class="text-info"> <br>Error: <b> Comparison data: </b> '+ projectTwoId + '<br> -- refId: ' +  refTwoId+ ' <br>-- commitId: ' +commitTwoId+'</span>');
+                // scope.compElem = '';
+                if (reason.message.toLowerCase() == "not found") {
+                    compNotFound = true;
+                    scope.compElem = '';
+                } else if (reason.message.toLowerCase() == "deleted") {
+                    deletedFlag = true;
+                } else {
+                    compNotFound = true;
+                    invalidComp = true;
+                }
+                checkElement(origNotFound, compNotFound, deletedFlag);
+                checkValidity(invalidOrig, invalidComp);
+            });
         });
 
-
-        WorkspaceService.getWorkspace(wsTwo).then(function(data) {
-            tagOrTimestamp(scope.mmsVersionTwo, wsTwo).then(function(versionOrTs){
-                getComparsionText(versionOrTs, wsTwo).then(function(data){
-                    scope.compElem = angular.element(data).text();
-                    var promise2 = $interval(
-                        function(){
-                            scope.compElem = angular.element(data).text();
-                        }, 5000);
-                        checkElement(origNotFound, compNotFound, deletedFlag);
-                }, function(reject){
-                    scope.compElem = reject;
-                    scope.compElem = '';
-                    if (reject.toLowerCase() == "not found") {
-                        compNotFound = true;
-                    } else if (reject.toLowerCase() == "deleted")
-                        deletedFlag = true;
-
-                    checkElement(origNotFound, compNotFound, deletedFlag);
-                });
-            }, function(reject){
-                vrTwoInvalidFlag = true;
-                checkVersion(vrOneInvalidFlag, vrTwoInvalidFlag);
-            });
-        }, function(reason) {
-            wsTwoFlag = true;
-
-            if (wsOneFlag && wsTwoFlag)
-                element.html('<span class="mms-error">Workspace One & Two do not exist.</span>');
-            else {
-                element.html('<span class="mms-error">Workspace Two does not exist.</span>');
-            }
-        });*/
-
-        // Check if input is a tag, timestamp or neither
-        var tagOrTimestamp = function(version, ws){
-            var deferred = $q.defer();
-            if (!URLService.isTimestamp(version) && version !== 'latest'){
-                // ConfigService.getConfig(version, ws, false).then(function(data){
-                //         deferred.resolve(data.timestamp);
-                // }, function(reason) {
-                //     deferred.reject(null);
-                // });
-            }else{
-                deferred.resolve(version);
-            }
-            return deferred.promise;
-        };
-
-        var createTransclude = function(elt, type, ts, ws){
+        var createTransclude = function(elementId, type, projectId, commitId, refId) {
             var transcludeElm = angular.element('<mms-transclude-'+ type +'>');
-            transcludeElm.attr("mms-eid", elt.sysmlid);
-            transcludeElm.attr("mms-version", ts);
-            transcludeElm.attr("mms-ws", ws);
+            transcludeElm.attr("mms-eid", elementId);
+            transcludeElm.attr("mms-project-id", projectId);
+            transcludeElm.attr("mms-commit-id", commitId);
+            transcludeElm.attr("mms-ref-id", refId);
             return transcludeElm;
         };
 
-        // Get the text to compare for diff
-        var getComparsionText = function(ts, ws){
-            var deferred = $q.defer();
-            ElementService.getElement(scope.mmsEid, false, ws, ts).then(function(data){
-                var htmlData = createTransclude(data, scope.mmsAttr, ts, ws);
-                $compile(htmlData)($rootScope.$new());
-                deferred.resolve(htmlData);
-            }, function(reason) {
-                if (reason.message)
-                  deferred.reject(reason.message);
-
-                deferred.reject(null);
-            });
-            return deferred.promise;
+        var checkElement = function(origNotFound, compNotFound, deletedFlag) {
+            switch (origNotFound) {
+                case false:
+                    if (compNotFound === true) {
+                        element.html('<span class="text-info"><i class="fa fa-info-circle"></i> Comparison element not found. Might be due to invalid input. </span>');
+                    } else if (deletedFlag === true) {
+                        element.prepend('<span class="text-info"><i class="fa fa-info-circle"></i> This element has been deleted. </span>');
+                    }
+                    break;
+                default:
+                    if (compNotFound === false) {
+                        // if (scope.compElem === "") {
+                        //     element.prepend('<span class="text-info"><i class="fa fa-info-circle"></i> This element is a new element with no content. </span>');
+                        // } else {
+                            element.prepend('<span class="text-info"><i class="fa fa-info-circle"></i> This element is a new element. </span>');
+                        // }
+                    } else if (compNotFound === true) {
+                        element.html('<span class="mms-error"><i class="fa fa-info-circle"></i> Invalid Project, Branch/Tag, Commit, or Element IDs. Check entries.</span>');
+                    }
+            }
         };
 
-        var checkElement = function(origNotFound, compNotFound, deletedFlag){
-          switch(origNotFound){
-            case false:
-              if (compNotFound === true)
-                element.html('<span class="mms-error"> This element has been removed from the View. </span>');
-              else if (deletedFlag === true)
-                element.prepend('<span class="mms-error"> This element has been deleted: </span>');
-              break;
-            default:
-              if (compNotFound === false){
-                if (scope.compElem === "")
-                  element.html('<span class="mms-error"> This element is a new element with no content. </span>');
-                else
-                  element.prepend('<span class="mms-error"> This element is a new element: </span>');
-              }
-              else if (compNotFound === true)
-                element.html('<span class="mms-error"> This element does not exist at either point in time. </span>');
-          }
+        var checkValidity = function(invalidOrig, invalidComp) {
+            if (invalidOrig && invalidComp) {
+                element.html('<span class="mms-error"><i class="fa fa-info-circle"></i> Invalid Project, Branch/Tag, Commit, or Element IDs. Check entries.</span>');
+            }
         };
-
-        var checkVersion = function(vrOneInvalidFlag, vrTwoInvalidFlag){
-          switch(vrOneInvalidFlag){
-            case false:
-              if (vrTwoInvalidFlag === true)
-                element.html('<span class="mms-error"> Version Two not a valid tag/timestamp. </span>');
-              break;
-            default:
-              if (vrTwoInvalidFlag === false)
-                element.html('<span class="mms-error"> Version One not a valid tag/timestamp. </span>');
-              else if (vrTwoInvalidFlag === true)
-                element.html('<span class="mms-error"> Version One and Version Two not valid tags/timestamps. ');
-          }
-        };
-
     };
 
     return {
         restrict: 'E',
         scope: {
-            mmsEid: '@',
-            mmsWsOne: '@',
-            mmsWsTwo: '@',
+            mmsEidOne: '@',
+            mmsEidTwo: '@',
             mmsAttr: '@',
-            mmsVersionOne: '@',
-            mmsVersionTwo: '@'
+            mmsProjectOneId: '@',
+            mmsProjectTwoId: '@',
+            mmsRefOneId: '@',
+            mmsRefTwoId: '@',
+            mmsCommitOneId: '@',
+            mmsCommitTwoId: '@'
         },
-        template: '<style>del{color: black;background: #ffbbbb;} ins{color: black;background: #bbffbb;} .match,.textdiff span {color: gray;}</style><div class="textdiff"  semantic-diff left-obj="origElem" right-obj="compElem" ></div>',
+        template: '<style>del{color: black;background: #ffbbbb;} ins{color: black;background: #bbffbb;} .match,.textdiff span {color: gray;}</style><div class="textdiff" semantic-diff left-obj="origElem" right-obj="compElem" ></div>',
         require: '?^^mmsView',
         link: mmsDiffAttrLink
     };
