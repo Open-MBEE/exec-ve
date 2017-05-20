@@ -1,10 +1,9 @@
 <h2>Jobs</h2>
 <i class="pane-center-spinner fa fa-5x fa-spinner fa-spin" style="margin-left: 50%;" ng-if="loading"></i>
 
-<div id = "ve-jobs-table">
-
+<div id="ve-jobs-table">
     <h3>View Editor</h3>
-    <table class="snapshot-table table table-condensed ng-scope" >
+    <table class="table table-condensed">
         <thead>
             <tr>
                 <td>Name</td>
@@ -100,7 +99,7 @@ in progress <a href="https://cae-jenkins.jpl.nasa.gov/job/MMS_1490133988355_3914
 
 
     <h3>PMA</h3>
-    <table class="snapshot-table table table-condensed" ng-if="!loading && hasJobs">
+    <table class="table table-condensed" ng-if="!loading && jobs.length">
         <thead>
             <tr>
                 <td>Name</td>
@@ -114,9 +113,9 @@ in progress <a href="https://cae-jenkins.jpl.nasa.gov/job/MMS_1490133988355_3914
                 <td>
                     <div ng-hide="editorEnabled">
                         {{job.name}}
-                        <a class="ng-binding" ng-click="enableEditor()">
-                            <i class="fa fa-pencil" aria-hidden="true"></i>
-                        </a>
+                        <!--<a class="ng-binding" ng-click="enableEditor()">-->
+                            <!--<i class="fa fa-pencil" aria-hidden="true"></i>-->
+                        <!--</a>-->
                     </div>
                     <div ng-show="editorEnabled">
                         <input ng-model="jobInput.jobName" ng-show="editorEnabled">
@@ -132,17 +131,17 @@ in progress <a href="https://cae-jenkins.jpl.nasa.gov/job/MMS_1490133988355_3914
                 </td>
                 <td>
                     <div><i class="fa fa-circle completed-marker" aria-hidden="true"></i>{{job.status}}
-                        <a ng-attr-href="{{job.url}}" target="_blank" ng-show="buttonEnabled">log</a>
+                        <a ng-attr-href="{{job.url}}" target="_blank" ng-show="job.url">log</a>
                     </div> 
                 </td>
                 <td>
-                    <button class="ng-scope btn-sm btn btn-tertiary" ng-class="{'disabled': !docEditable}" ng-click="deleteJob()">
-                        <span ng-show="deleteCleared">DELETE</span>
-                    </button>
-                    <i ng-show="!deleteCleared" class="fa fa-spin fa-spinner"></i>
+                    <!--<button class="ng-scope btn-sm btn btn-tertiary" ng-class="{'disabled': !docEditable}" ng-click="deleteJob()">-->
+                        <!--<span ng-show="deleteCleared">DELETE</span>-->
+                    <!--</button>-->
+                    <!--<i ng-show="!deleteCleared" class="fa fa-spin fa-spinner"></i>-->
 
                     <!--<div ng-if="buttonEnabled && deleteCleared && docEditable">-->
-                        <button type="submit" class="btn-link btn-sm btn-primary btn" ng-class="{'disabled': !docEditable}" ng-click="runNow()">
+                        <button type="submit" class="btn-link btn-sm btn-primary btn" ng-class="{'disabled': !docEditable}" ng-click="runNow(job.id)">
                             <span ng-show="runCleared">RUN NOW</span>
                         </button>
                         <i ng-show="!runCleared" class="fa fa-spin fa-spinner"></i>
@@ -151,12 +150,12 @@ in progress <a href="https://cae-jenkins.jpl.nasa.gov/job/MMS_1490133988355_3914
             </tr>
         </tbody>
     </table>
-    <div ng-if="!hasJobs && !loading" class="text-center empty-state">
-        <h4 ng-if="!hasJobs && !loading">No Current PMA Jobs</h4>
+    <div ng-if="!jobs.length && !loading" class="text-center empty-state">
+        <h4 ng-if="!jobs.length && !loading">No Current PMA Jobs</h4>
         <p><i>What's PMA?</i> PMA regenerates Magicdraw views for the current document. 
         <a target="_blank" href="https://cae-ems.jpl.nasa.gov/alfresco/mmsapp/mms.html#/workspaces/master/sites/site__18_0_2_bec02f9_1446154915939_541002_41021/documents/_18_0_2_8630260_1446850132083_177552_51111/views/MMS_1474586905881_1cf20cf0-711f-4cca-8a61-de8a354e3d43">More</a></p>
         <p ng-if="mmsRefId != 'master'">PMA is currently only available on the <strong>master</strong> branch.</p>
-        <button class="btn btn-primary" ng-if="mmsRefId === 'master'" ng-click="createJob()">Run DocGen</button>
+        <button class="btn btn-primary" ng-if="mmsRefId === 'master'" ng-click="runNow()">Run DocGen</button>
     </div>
 
     <div class="row" style="margin-right:0px;">

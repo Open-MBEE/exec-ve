@@ -380,7 +380,7 @@ function urlService(baseUrl, jobsUrl) {
     };
 
     var getRunJobURL = function(projectId, refId, jobId) {
-        return jobsRoot + 'projects/'+ projectId + '/refs/master/jobs' + jobId + '/instances';
+        return jobsRoot + 'projects/'+ projectId + '/refs/master/jobs/' + jobId + '/instances';
     };
     
     var getCreateJobURL = function(projectId, refId) {

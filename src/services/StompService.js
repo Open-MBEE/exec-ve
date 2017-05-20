@@ -36,6 +36,9 @@ function StompService($rootScope, ApplicationService, ElementService, URLService
             if (updateWebpage.refs) {
                 if (updateWebpage.refs.updatedElements && updateWebpage.refs.updatedElements.length > 0) {
                     angular.forEach(updateWebpage.refs.updatedElements, function (eltId) {
+                        if (eltId.startsWith("PMA")) {
+                            $rootScope.$broadcast("stomp.job", eltId);
+                        }
                         var key = UtilsService.makeElementKey({_projectId: projectId, _refId: refId, id: eltId});
                         if (!CacheService.exists(key)) {
                             return;

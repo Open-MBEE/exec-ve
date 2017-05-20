@@ -1,7 +1,8 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsJobs', ['$templateCache','$http', '$location', '$window', 'ElementService','UtilsService','growl','_','$q','URLService', mmsJobs]);
+.directive('mmsJobs', ['$templateCache', '$http', '$location', '$window', 'growl', '_', '$q',
+        'AuthService', 'ElementService', 'UtilsService', 'URLService', mmsJobs]);
 /**
  * @ngdoc directive
  * @name mms.directives.directive:mmsJobs
@@ -26,11 +27,12 @@ angular.module('mms.directives')
  * @param {string=master} mmsBranch Branch to use, defaults to master
  * @param {string=null} mmsDocId the id of the current document under which the job is being run
  */
-function mmsJobs($templateCache, $http, $location, $window, ElementService, UtilsService, growl, _ , $q, URLService) {
+function mmsJobs($templateCache, $http, $location, $window, growl, _ , $q, 
+        AuthService, ElementService, UtilsService, URLService) {
+
     var template = $templateCache.get('mms/templates/mmsJobs.html');
-    // var greet = $window.localStorage.getItem('yo');
     //:TODO have cases for each null; "running"; "failed"; "completed"; "aborted";"unstable"; "disabled"; "waiting";
-    var mmsJobsLink = function(scope, element, attrs) {
+    var mmsJobsLink = function (scope, element, attrs) {
         var documentName;
         var project;
         var ran = false;
@@ -40,258 +42,253 @@ function mmsJobs($templateCache, $http, $location, $window, ElementService, Util
         scope.responseCleared = true;
         scope.runCleared = true;
         scope.deleteCleared = true;
-        scope.jobInput = { jobName:''};
+        scope.jobInput = {jobName: ''};
         scope.hasRefArr = false;
 
+
         var refArrString = $window.localStorage.getItem('refArr');
-        var refArr = JSON.parse(refArrString); 
+        var refArr = JSON.parse(refArrString);
         if (refArr) {
             scope.hasRefArr = true;
-            scope.createdRefs = refArr; 
+            scope.createdRefs = refArr;
         }
 
         // get all the jobs for current document
-        var getJobs = function() {
-            var id = scope.mmsDocId;
-            var projectId = scope.mmsProjectId;
-            var refId = scope.mmsRefId;
-            // var link = URLService.getJobs(projectId, refId, $location.host());
-            var link = URLService.getJobs(projectId, refId, 'opencae-int.jpl.nasa.gov');
-            // link = "http://cae-pma-int:8080/projects/PROJECT-cea59ec3-7f4a-4619-8577-17bbeb9f1b1c/refs/master/jobs/absx?alf_ticket=TICKET_eb2f518ec6b061050d0ec516a4c467f164da2b5c&mmsServer=opencae-int.jpl.nasa.gov";
-            // link = "http://cae-pma-int:8080/projects/PROJECT-921084a3-e465-465f-944b-61194213043e/refs/master/jobs?alf_ticket=TICKET_bffc1105504a29f9987baa85f739a2485dad9d39&mmsServer=opencae-int.jpl.nasa.gov";
+        var getJobs = function () {
+            // var link = URLService.getJobsURL(projectId, refId, $location.host()); // TODO create porxy in gruntfile for PMA
+            var link = URLService.getJobsURL(scope.mmsProjectId, scope.mmsRefId, 'opencae-int.jpl.nasa.gov');
+            scope.jobs = [];
             scope.loading = true;
-            scope.hasJobs = false;
             scope.responseCleared = false;
-            //scope.runCleared = false;
-            $http.get(link).then(function(data)  {
+            $http.get(link).then(function (data) {
                 var jobs = data.data.jobs; // get jobs json
-                var jobs_size = data.data.jobs.length; // get length of jobs array
-                var newJobs = {};
-
-                for (var i = 0; i < jobs_size; i++) {
-                    var test = jobs[i].status === 'completed';
-                    if(jobs[i].name.endsWith('_job')){
-                        if(jobs[i].status === 'completed' || jobs[i].status === 'failed'){
-                            scope.buttonEnabled = true;
-                        }else{
-                            scope.buttonEnabled = false;
-                        }
-                        newJobs = {
+                var job = {};
+                for (var i = 0; i < jobs.length; i++) {
+                    if (jobs[i].associatedElementID === scope.mmsDocId) {
+                        job = {
                             name: jobs[i].name,
                             status: jobs[i].status,
                             schedule: jobs[i].schedule,
-                            url: jobs[i].url,
+                            //url: jobs[i].url,
                             command: jobs[i].command,
-                            create: jobs[i].created,
+                            //create: jobs[i].created,
                             id: jobs[i].id
                         };
+                        scope.jobs.push(job);
                     }
                 }
-                if(!_.isEmpty(newJobs))
-                    scope.hasJobs = true;
-                scope.loading = false;
-                scope.job = newJobs;
-            }, function(error) {
+            }, function (error) {
                 // display some error?
-                // growl.error('There was a error in retrieving your job: ' + error.status);
+                growl.error('There was a error in retrieving your job: ' + error.status);
+            }).finally(function () {
                 scope.loading = false;
-            }).finally(function() {
                 scope.responseCleared = true;
                 //scope.runCleared = true;
             });
         };
 
         //Callback function for document change
-        var changeDocument = function(newVal, oldVal) { // check if the right pane is reloaded everytime
+        var changeDocument = function (newVal, oldVal) { // check if the right pane is reloaded everytime
             if (!newVal || (newVal == oldVal && ran))
                 return;
             ran = true;
             lastid = newVal;
             var reqOb = {elementId: scope.mmsDocId, projectId: scope.mmsProjectId, refId: scope.mmsRefId, depth: 2};
             ElementService.getElement(reqOb, 2, false)
-            .then(function(document) {
+            .then(function (document) {
                 if (newVal !== lastid)
                     return;
-                if(!UtilsService.isDocument(document))
+                if (!UtilsService.isDocument(document))
                     return;
                 scope.doc = document;
-                documentName = document.name;
-                scope.docEditable = document.editable && scope.mmsRefId === 'master';
+                scope.docName = document.name;
+                scope.docEditable = document._editable && scope.mmsRefId === 'master';
                 // ElementService.getIdInfo(document, null)
                 // .then(function(data) {
                 //     project = data;
                 // });
-                scope.docName = documentName;
                 getJobs();
             });
         };
 
-        // watch for the docuement to change
+        // watch for the document to change
         scope.$watch('mmsDocId', changeDocument);
 
-        var jenkinsRun = function() {
-            var link = URLService.getJenkinsRun(scope.job.id);
-            //http://localhost:8080/alfresco/service/workspaces/master/jobs/scope.jobs[0].id/execute
+        var jenkinsRun = function (id) {
             scope.runCleared = false;
-            $http.post(link, ' ').then(function(){
+            var link = URLService.getRunJobURL(scope.mmsProjectId, scope.mmsRefId, id);
+            var post = {
+                "mmsServer" : "opencae-int.jpl.nasa.gov", //TODO add
+                "alfrescoToken" : AuthService.getTicket()
+            };
+
+            $http.post(link, post).then(function(data) {
                 growl.success('Your job is running!');
-            }, function(fail){
-                growl.error('Your job failed run: ' + fail.status);
-            }).finally(function(){
+            }, function(fail) {
+                growl.error('Your job failed to run: ' + fail.data.message);
+            }).finally(function() {
                 scope.runCleared = true;
             });
         };
 
         // logic for running a job immediately
-        scope.runNow = function(){
-            if(!scope.job.name){
-                scope.createJob().then(function(){
-                    jenkinsRun();
+        scope.runNow = function (id) {
+            if (!id) {
+                scope.createJob().then(function (data) {
+                    jenkinsRun(data.id);
                 });
-            }else{
-                jenkinsRun();
+            } else {
+                jenkinsRun(id);
             }
         };
+
         // logic for adding a new job
         scope.createJob = function() {
             var deferred = $q.defer();
             var id = scope.mmsDocId;
             var defaultName = scope.jobInput.jobName;
             scope.responseCleared = false;
-            if(!scope.jobInput.jobName){
+            if(!scope.jobInput.jobName) {
                 defaultName = scope.docName + "_job";
             }
-            var thisSchedule = ' ';
+            var thisSchedule = 'H/6 * * * *';
+            // Do we allow users to input schedule??
             //console.log(scope.myOutput);
-            if(scope.myOutput !== '* * * * *' && scope.myOutput)
-                    thisSchedule = scope.myOutput;
+            // if(scope.myOutput !== '* * * * *' && scope.myOutput)
+            //     thisSchedule = scope.myOutput;
             var post = {
-                jobs: [{
-                    name: defaultName,
-                    command: 'Jenkins,DocWeb,' + id + ',' + project.projectId,
-                    schedule: thisSchedule,
-                    status: 'in queue',
-                    url: 'sample_initial_url',
-                    ownerId: id,
-                    documentation: '',
-                    type: 'Element'
-                }]
+                "jobName" : defaultName,
+                //"command": 'Jenkins,DocWeb,' + id + ',' + project.projectId,
+                "command" : "docweb",
+                // "arguments" : ["arg1","arg2"],
+                "schedule" : thisSchedule,
+                "associatedElementID" : id,
+                "mmsServer" : "opencae-int.jpl.nasa.gov", //TODO add
+                "alfrescoToken" : AuthService.getTicket()
             };
 
-            var link = URLService.getCreateJob();
-            $http.post(link, post).then(function(data){
+            var link = URLService.getCreateJobURL(scope.mmsProjectId, scope.mmsRefId);
+            $http.post(link, post).then(function(data) {
                 scope.jobInput = { jobName:''};
                 growl.success('Your job has posted');
-                var job = data.data.elements;
-                var job_size = data.data.elements.length;
+                var job = data.data.jobs;
+                var job_size = job.length;
                 for (var i = 0; i < job_size; i++) {
-                    if(job[i].type === 'Element'){
+                    //if(job[i].type === 'Element'){
                         scope.job.id = job[i].id;
-                    }
+                    //}
                 }
                 deferred.resolve();
-            }, function(fail){
-                growl.error('Your job failed to post: ' + fail.status);
-            }).finally(function(){
+            }, function(fail) {
+                growl.error('Your job failed to post: ' + fail.data.message);
+            }).finally(function() {
                 scope.responseCleared = true;
             });
             return deferred.promise;
         };
 
-        var updateJob = function() {
-            var id = scope.mmsDocId;
-            var updatePost = {
-                jobs: [{
-                    id: scope.job.id,
-                    name: scope.jobInput.jobName+'_job'
-                }]
-            };
-            var link = URLService.getCreateJob();
-            $http.post(link, updatePost).then(function(){
-                growl.success('Your job has been updated');
-                }, function(fail){
-                    growl.error('Your job failed to update: ' + fail.status);
-                });
-        };
+        //var updateJob = function() {
+        //    var id = scope.mmsDocId;
+        //    var updatePost = {
+        //        jobs: [{
+        //            id: scope.job.id,
+        //            name: scope.jobInput.jobName+'_job'
+        //        }]
+        //    };
+        //    var link = URLService.getCreateJob();
+        //    $http.post(link, updatePost).then(function() {
+        //        growl.success('Your job has been updated');
+        //        }, function(fail) {
+        //            growl.error('Your job failed to update: ' + fail.status);
+        //        });
+        //};
+        //
+        //scope.deleteJob = function() {
+        //    var jobDelete = {
+        //        jobs: [{
+        //            id: scope.job.id
+        //        }]
+        //    };
+        //    var link = URLService.getJob(scope.job.id);
+        //    scope.deleteCleared = false;
+        //    $http.delete(link, jobDelete).then(function(){
+        //        growl.success('Your job has been deleted');
+        //        }, function(fail){
+        //            growl.error('Your job failed to be deleted: ' + fail.status);
+        //        }).finally(function(){
+        //            scope.deleteCleared = true;
+        //        });
+        //};
 
-        scope.deleteJob = function(){
-            var jobDelete = {
-                jobs: [{
-                    id: scope.job.id
-                }]
-            };
-            var link = URLService.getJob(scope.job.id);
-            scope.deleteCleared = false;
-            $http.delete(link, jobDelete).then(function(){
-                growl.success('Your job has been deleted');
-                }, function(fail){
-                    growl.error('Your job failed to be deleted: ' + fail.status);
-                }).finally(function(){
-                    scope.deleteCleared = true;
-                });
-        };
-
-        scope.enableEditor = function() {
-            if (!scope.docEditable)
-                return;
-            scope.editorEnabled = true;
-            scope.jobInput.jobName = scope.job.name.replace('_job','');
-        };
-        scope.disableEditor = function() {
-            scope.editorEnabled = false;
-        };
-        scope.save = function() {
-            scope.job.name = scope.jobInput.jobName+'_job';
-            updateJob();
-            scope.disableEditor();
-        };
+        //scope.enableEditor = function() {
+        //    if (!scope.docEditable)
+        //        return;
+        //    scope.editorEnabled = true;
+        //    scope.jobInput.jobName = scope.job.name.replace('_job','');
+        //};
+        //scope.disableEditor = function() {
+        //    scope.editorEnabled = false;
+        //};
+        //scope.save = function() {
+        //    scope.job.name = scope.jobInput.jobName+'_job';
+        //    updateJob();
+        //    scope.disableEditor();
+        //};
 
         //actions for stomp
-        scope.$on("stomp.job", function(event, newJob){
-            for (var i = 0; i < newJob.length; i++) {
-                if(newJob[i].ownerId === scope.mmsDocId){
-                    scope.hasJobs = true;
-                    if(newJob[i].status === 'completed' || newJob[i].status === 'failed'){
-                        scope.buttonEnabled = true;
-                    }else{
-                        scope.buttonEnabled = false;
+        scope.$on("stomp.job", function (event, newJobId) {
+            // var link = URLService.getJobURL(projectId, refId, newJobId, $location.host()); // TODO create porxy in gruntfile for PMA
+            var link = URLService.getJobURL(scope.mmsProjectId, scope.mmsRefId, newJobId, 'opencae-int.jpl.nasa.gov');
+            $http.get(link).then( function (data) {
+                var jobs = data.data.jobs; // get jobs json
+                var job = {};
+                for (var i = 0; i < jobs.length; i++) {
+                    if (jobs[i].associatedElementID === scope.mmsDocId) {
+                        job = {
+                            name: jobs[i].name,
+                            status: jobs[i].status,
+                            schedule: jobs[i].schedule,
+                            url: jobs[i].url,
+                            command: jobs[i].command,
+                            //create: jobs[i].created,
+                            id: jobs[i].id
+                        };
+                        scope.jobs.push(job);
                     }
-                    scope.job = {
-                        name: newJob[i].name,
-                        status: newJob[i].status,
-                        create: newJob[i].created,
-                        url: newJob[i].url,
-                        id: newJob[i].id,
-                    };
-                    scope.$apply();
                 }
-            }
+            }, function (error) {
+                // display some error?
+                //growl.error('There was a error in retrieving your job: ' + error.status);
+            });
+            scope.$apply();
         });
-        scope.$on("stomp.updateJob", function(event, updateJob){
-            for (var i = 0; i < updateJob.length; i++) {
-                if(updateJob[i].ownerId === scope.mmsDocId){
-                    if(updateJob[i].status === 'completed' || updateJob[i].status === 'failed'){
-                            scope.buttonEnabled = true;
-                    }else{
-                        scope.buttonEnabled = false;
-                    }
-                    scope.job.name = updateJob[i].name;
-                    scope.job.status = updateJob[i].status;
-                    scope.job.url = updateJob[i].url;
-                    scope.$apply();
-                }
-            }
-        });
-        scope.$on("stomp.deleteJob", function(event, deleteJob){
-            for (var i = 0; i < deleteJob.length; i++) {
-                if(deleteJob[i].ownerId === scope.mmsDocId){
-                    scope.buttonEnabled = false;
-                    scope.hasJobs = false;
-                    scope.job = ' ';
-                    scope.$apply();
-                }
-            }
-        });
+
+
+        //scope.$on("stomp.updateJob", function(event, updateJob){
+        //    for (var i = 0; i < updateJob.length; i++) {
+        //        if(updateJob[i].ownerId === scope.mmsDocId){
+        //            if(updateJob[i].status === 'completed' || updateJob[i].status === 'failed'){
+        //                    scope.buttonEnabled = true;
+        //            }else{
+        //                scope.buttonEnabled = false;
+        //            }
+        //            scope.job.name = updateJob[i].name;
+        //            scope.job.status = updateJob[i].status;
+        //            scope.job.url = updateJob[i].url;
+        //            scope.$apply();
+        //        }
+        //    }
+        //});
+        //scope.$on("stomp.deleteJob", function(event, deleteJob){
+        //    for (var i = 0; i < deleteJob.length; i++) {
+        //        if(deleteJob[i].ownerId === scope.mmsDocId){
+        //            scope.buttonEnabled = false;
+        //            scope.hasJobs = false;
+        //            scope.job = ' ';
+        //            scope.$apply();
+        //        }
+        //    }
+        //});
     };
     return {
         restrict: 'E',
