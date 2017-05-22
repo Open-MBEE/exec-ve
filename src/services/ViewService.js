@@ -438,12 +438,12 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             if (data[key]) {
                 clone[key] = JSON.parse(JSON.stringify(data[key]));
             } else {
-                clone[key] = {
+                clone[key] = UtilsService.createValueSpecElement({
                     operand: [],
                     type: "Expression",
-                };
+                });
             }
-            clone[key].operand.push(elementOb);
+            clone[key].operand.push(UtilsService.createValueSpecElement(elementOb));
             ElementService.updateElement(clone)
             .then(function(data2) {
                 deferred.resolve(data2);
@@ -549,18 +549,20 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             documentation: '',
             type: "InstanceSpecification",
             classifierIds: [TYPE_TO_CLASSIFIER_ID[realType]],
-            specification: {
+            specification: UtilsService.createValueSpecElement({
                 value: JSON.stringify(instanceSpecSpec),
-                type: "LiteralString"
-            },
+                type: "LiteralString",
+                ownerId: newInstanceId
+            }),
             _appliedStereotypeIds: [],
         };
         instanceSpec = UtilsService.createInstanceElement(instanceSpec);
         if (type === 'Section') {
-            instanceSpec.specification = {
+            instanceSpec.specification = UtilsService.createValueSpecElement({
                 operand: [],  
-                type: "Expression"
-            };
+                type: "Expression",
+                ownerId: newInstanceId
+            });
         }
         var clone = {
             _projectId: viewOrSectionOb._projectId,
@@ -572,14 +574,14 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             key = "specification";
         }
         if (!viewOrSectionOb[key]) {
-            clone[key] = {
+            clone[key] = UtilsService.createValueSpecElement({
                 operand: [],
                 type: "Expression"
-            };
+            });
         } else {
             clone[key] = JSON.parse(JSON.stringify(viewOrSectionOb[key]));
         }
-        clone[key].operand.push({instanceId: newInstanceId, type: "InstanceValue"});
+        clone[key].operand.push(UtilsService.createValueSpecElement({instanceId: newInstanceId, type: "InstanceValue"}));
         var toCreate = [instanceSpec, clone];
         var reqOb = {
             projectId: viewOrSectionOb._projectId,
@@ -635,13 +637,15 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             _allowedElements: [],
             _displayedElementIds: [newViewId],
             _childViews: [],
-            _contents: {
-                operand: [{
+            _contents: UtilsService.createValueSpecElement({
+                operand: [UtilsService.createValueSpecElement({
                     instanceId: newInstanceId,
                     type:"InstanceValue",
-                }],
-                type: 'Expression'
-            },
+                    ownerId: newViewId + "_vc_expression"
+                })],
+                type: 'Expression',
+                id: newViewId + "_vc_expression"
+            }),
             name: viewOb.viewName ? viewOb.viewName : 'Untitled View',
             documentation: viewOb.viewDoc ? viewOb.viewDoc : '',
             _appliedStereotypeIds: [
