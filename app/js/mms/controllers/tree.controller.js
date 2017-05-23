@@ -324,18 +324,6 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                     for (; k >= 0; k--) {
                         var instance = results[k];
                         var hide = !$rootScope.veTreeShowPe;
-                        instance._relatedDocuments = [
-                            {
-                                _parentViews: [{
-                                    name: viewNode.data.name,
-                                    id: viewNode.data.id
-                                }],
-                                name: documentOb.name,
-                                id: documentOb.id,
-                                projectId: projectOb.id,
-                                refId: refOb.id
-                            }
-                        ];
                         if (ViewService.isSection(instance)) {
                             var sectionTreeNode = {
                                 label : instance.name,
@@ -624,7 +612,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 aggr: $scope.newViewAggr.type
             }).then(function(data) {
                 growl.success("View Added");
-                $uibModalInstance.close('');
+                $uibModalInstance.close(view);
             }, function(reason) {
                 growl.error("View Add Error: " + reason.message);
             }).finally(function() {
@@ -814,16 +802,6 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             viewId = branch.data.id;
         }
         var viewNode = viewId2node[viewId];
-        instanceSpec._relatedDocuments = [{
-                _parentViews: [{
-                    name: viewNode.data.name,
-                    id: viewNode.data.id
-                }],
-                name: documentOb.name,
-                id: documentOb.id,
-                projectId: documentOb._projectId
-            }
-        ];
         var newbranch = {
             label: instanceSpec.name,
             type: (elemType === 'image' ? 'figure' : elemType),
