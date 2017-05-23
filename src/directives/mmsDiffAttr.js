@@ -112,10 +112,11 @@ function mmsDiffAttr(ElementService, $compile, $rootScope, $interval) {
             }, function(reason) {
                 // element.prepend('<span class="text-info"> <br>Error: <b> Comparison data: </b> '+ projectTwoId + '<br> -- refId: ' +  refTwoId+ ' <br>-- commitId: ' +commitTwoId+'</span>');
                 // scope.compElem = '';
+                console.log(reason.message);
                 if (reason.message.toLowerCase() == "not found") {
                     compNotFound = true;
                     scope.compElem = '';
-                } else if (reason.message.toLowerCase() == "deleted") {
+                } else if (reason.message.toLowerCase().includes("deleted") === true) {
                     deletedFlag = true;
                 } else {
                     compNotFound = true;
@@ -141,6 +142,7 @@ function mmsDiffAttr(ElementService, $compile, $rootScope, $interval) {
                     if (compNotFound === true) {
                         element.html('<span class="text-info"><i class="fa fa-info-circle"></i> Comparison element not found. Might be due to invalid input. </span>');
                     } else if (deletedFlag === true) {
+                        console.log("hey again");
                         element.prepend('<span class="text-info"><i class="fa fa-info-circle"></i> This element has been deleted. </span>');
                     }
                     break;
