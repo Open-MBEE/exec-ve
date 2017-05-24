@@ -1,44 +1,64 @@
 'use strict';
 
-describe('mmsTranscludeCom directive', function () {
-    var scope; //scope when directive is called
-    var element; //dom element mms-transclude-name
-    var $rootScope, $compile, CacheService, UtilsService, $httpBackend, requestHandler;
+describe('Directive: mmsTranscludeCom', function () {
+    var scope,
+        element; 
+    var $httpBackend;
+    var $rootScope, 
+        $compile;
+    var mockCacheService, 
+        mockUtilsService;
 
+    beforeEach(module('mms'));
+    beforeEach(module('mms.directives'));
     beforeEach(function () {
-        module('mms.directives');
         inject(function ($injector) {
             $rootScope   = $injector.get('$rootScope');
             $compile     = $injector.get('$compile');
             $httpBackend = $injector.get('$httpBackend');
-            CacheService = $injector.get('CacheService');
-            UtilsService = $injector.get('UtilsService');
+            mockCacheService = $injector.get('CacheService');
+            mockUtilsService = $injector.get('UtilsService');
             scope        = $rootScope.$new();
-
-            scope.element       = {
-                id      : "_hidden_MMS_1472586299682_1122c2aa-9cab-41a9-b0b4-4a1fd9a9882f_pei",
-                _editable     : true,
-                _creator      : "mmsadmin",
-                name         : "merp",
-                documentation: "<p>Putting some text in here!!!<\/p>\n",
-                _projectId : "projectId",
-                _refId: "master"
-            };
-            scope.panelType  = "Comment";
         });
+
+        var testElement       = {
+            id              : "fifthelementid",
+            _editable       : true,
+            _creator        : "theonetrueadmin",
+            name            : "merp",
+            documentation   : "<p>The rain in Spain falls mainly on the plain.<\/p>\n",
+            _projectId      : "yetanotherprojectid",
+            _refId          : "branchfive",
+            _commitId       : "latest"
+        };
+        testElement.panelType  = "Comment";
+
+        $httpBackend.when('GET', '/alfresco/service/projects/' + testElement._projectId + '/refs/' + testElement._refId + '/elements/' + testElement.id).respond(200, testElement);
     });
 
-    it('mmsTranscludeCom should translude a comment within the element', inject(function () {
-        var cacheKey = UtilsService.makeElementKey(scope.element);
-        CacheService.put(cacheKey, scope.element);
+    afterEach(function() {
+        $httpBackend.verifyNoOutstandingExpectation();
+        $httpBackend.verifyNoOutstandingRequest();
+    });
 
-        element = angular.element('<mms-transclude-com data-mms-eid="{{element.id}}" mms-project-id="{{element._projectId}}"></mms-transclude-com>');
+    it('mmsTranscludeCom should translude a comment within the element', function () {
+        scope.element = {
+            mmsEid: "fifthelementid",
+            mmsRefId: "branchfive",
+            mmsCommitId: "latest",
+            mmsProjectId: "yetanotherprojectid",
+            editable: true     
+        };
+        element = angular.element('<mms-transclude-com mms-element-id="fifthelementid" mms-project-id="yetanotherprojectid" mms-ref-id="branchfive" mms-commit-id="latest"></mms-transclude-com>');
+        console.log("elem: " + element.text());
         $compile(element)(scope);
-        scope.$digest();
+        scope.$apply();
+        expect(element.html()).toContain("The rain in Spain falls mainly on the plain.");
 
-        expect(element.html()).toContain("Putting some text in here!!!");
-        expect(element.html()).toContain("- mmsadmin");
-    }));
+        console.log("text: " + element.html());
+        expect(element.html()).toContain("- theonetrueadmin");
+        $httpBackend.flush();
+    });
 });
 
 //DONE
