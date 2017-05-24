@@ -29,9 +29,9 @@ describe('Directive: mmsTranscludeCom', function () {
             documentation   : "<p>The rain in Spain falls mainly on the plain.<\/p>\n",
             _projectId      : "yetanotherprojectid",
             _refId          : "branchfive",
-            _commitId       : "latest"
+            _commitId       : "latest",
+            panelType       : "Comment"
         };
-        testElement.panelType  = "Comment";
 
         $httpBackend.when('GET', '/alfresco/service/projects/' + testElement._projectId + '/refs/' + testElement._refId + '/elements/' + testElement.id).respond(200, testElement);
     });
@@ -49,7 +49,7 @@ describe('Directive: mmsTranscludeCom', function () {
             mmsProjectId: "yetanotherprojectid",
             editable: true     
         };
-        element = angular.element('<mms-transclude-com mms-element-id="fifthelementid" mms-project-id="yetanotherprojectid" mms-ref-id="branchfive" mms-commit-id="latest"></mms-transclude-com>');
+        element = angular.element('<mms-transclude-com mms-element-id="{{element.mmsEid}}" mms-project-id="{{element.mmsProjectId}}" mms-ref-id="{{element.mmsRefId}}" mms-commit-id="{{element.mmsCommitId}}"></mms-transclude-com>');
         console.log("elem: " + element.text());
         $compile(element)(scope);
         scope.$apply();
