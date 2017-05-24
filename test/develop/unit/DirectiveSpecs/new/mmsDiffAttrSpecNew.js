@@ -195,8 +195,6 @@ describe('Directive: mmsDiffAttr', function() {
 		$httpBackend.when('GET', '/alfresco/service/projects/'+ testElements.elements[10]._projectId +'/refs/' + testElements.elements[10]._refId + '/elements/' + testElements.elements[10].id).respond(200, testElements.elements[10]);
 		$httpBackend.when('GET', '/alfresco/service/projects/'+ testElements.elements[11]._projectId +'/refs/' + testElements.elements[11]._refId + '/elements/' + testElements.elements[11].id + '?commitId=' + testElements.elements[11]._commitId).respond(200, testElements.elements[11]);
 		$httpBackend.when('GET', '/alfresco/service/projects/'+ testElements.elements[12]._projectId +'/refs/' + testElements.elements[12]._refId + '/elements/' + testElements.elements[12].id + '?commitId=' + testElements.elements[12]._commitId).respond(200, testElements.elements[12]);
-		// $httpBackend.when('GET', '/alfresco/service/projects/'+ testElements.elements[13]._projectId +'/refs/' + testElements.elements[13]._refId + '/elements/' + testElements.elements[13].id + '?commitId=' + testElements.elements[13]._commitId).respond({status: 500, message: 'deleted'});
-
 	});
 
 	afterEach(function() {
@@ -258,7 +256,7 @@ describe('Directive: mmsDiffAttr', function() {
 			mmsCommitTwoId: "latest",
 			mmsProjectTwoId: "yetanotherprojectid"
 		};
-
+		$httpBackend.expect('GET', '/alfresco/service/projects/' + scope.elementTwo.mmsProjectTwoId + '/refs/' + scope.elementTwo.mmsRefTwoId + '/elements/' + scope.elementTwo.mmsEidTwo).respond({status: 404, message: "" });
 		element = angular.element('<mms-diff-attr mms-project-one-id="{{elementOne.mmsProjectOneId}}" mms-project-two-id="{{elementTwo.mmsProjectTwoId}}" mms-eid-one="{{elementOne.mmsEidOne}}" mms-eid-two="{{elementTwo.mmsEidTwo}}" mms-ref-one-id="{{elementOne.mmsRefOneId}}" mms-ref-two-id="{{elementTwo.mmsRefTwoId}}" mms-commit-one-id="{{elementOne.mmsCommitOneId}}" mms-commit-two-id="{{elementTwo.mmsCommitTwoId}}"></mms-diff-attr>');
 		$compile(element)(scope);
 		scope.$apply();
@@ -278,7 +276,7 @@ describe('Directive: mmsDiffAttr', function() {
 			mmsCommitTwoId: "latest",
 			mmsProjectTwoId: "yetanotherprojectid"		 
 		};
-
+		$httpBackend.expect('GET', '/alfresco/service/projects/' + scope.elementOne.mmsProjectOneId + '/refs/' + scope.elementOne.mmsRefOneId + '/elements/' + scope.elementOne.mmsEidOne).respond({status: 404, message: "" });
 		element = angular.element('<mms-diff-attr mms-project-one-id="{{elementOne.mmsProjectOneId}}" mms-project-two-id="{{elementTwo.mmsProjectTwoId}}" mms-eid-one="{{elementOne.mmsEidOne}}" mms-eid-two="{{elementTwo.mmsEidTwo}}" mms-ref-one-id="{{elementOne.mmsRefOneId}}" mms-ref-two-id="{{elementTwo.mmsRefTwoId}}" mms-commit-one-id="{{elementOne.mmsCommitOneId}}" mms-commit-two-id="{{elementTwo.mmsCommitTwoId}}"></mms-diff-attr>');
 		$compile(element)(scope);
 		scope.$apply();
@@ -318,7 +316,7 @@ describe('Directive: mmsDiffAttr', function() {
 			mmsCommitTwoId: "6895048690",
 			mmsProjectTwoId: "someprojectid"
 		};
-
+		$httpBackend.expect('GET', '/alfresco/service/projects/' + scope.elementOne.mmsProjectOneId + '/refs/' + scope.elementOne.mmsRefOneId + '/elements/' + scope.elementOne.mmsEidOne + '?commitId=' + scope.elementOne.mmsCommitOneId).respond({status: 404, message: "" });
 		element = angular.element('<mms-diff-attr mms-project-one-id="{{elementOne.mmsProjectOneId}}" mms-project-two-id="{{elementTwo.mmsProjectTwoId}}" mms-eid-one="{{elementOne.mmsEidOne}}" mms-eid-two="{{elementTwo.mmsEidTwo}}" mms-ref-one-id="{{elementOne.mmsRefOneId}}" mms-ref-two-id="{{elementTwo.mmsRefTwoId}}" mms-commit-one-id="{{elementOne.mmsCommitOneId}}" mms-commit-two-id="{{elementTwo.mmsCommitTwoId}}"></mms-diff-attr>');
 		$compile(element)(scope);
 		scope.$apply();
@@ -338,7 +336,8 @@ describe('Directive: mmsDiffAttr', function() {
 			mmsCommitTwoId: "thiscommitdoesntexisteither",
 			mmsProjectTwoId: "someprojectid"
 		};
-
+		$httpBackend.expect('GET', '/alfresco/service/projects/' + scope.elementOne.mmsProjectOneId + '/refs/' + scope.elementOne.mmsRefOneId + '/elements/' + scope.elementOne.mmsEidOne + '?commitId=' + scope.elementOne.mmsCommitOneId).respond({status: 404, message: "" });
+		$httpBackend.expect('GET', '/alfresco/service/projects/' + scope.elementTwo.mmsProjectTwoId + '/refs/' + scope.elementTwo.mmsRefTwoId + '/elements/' + scope.elementTwo.mmsEidTwo + '?commitId=' + scope.elementTwo.mmsCommitTwoId).respond({status: 404, message: "" });
 		element = angular.element('<mms-diff-attr mms-project-one-id="{{elementOne.mmsProjectOneId}}" mms-project-two-id="{{elementTwo.mmsProjectTwoId}}" mms-eid-one="{{elementOne.mmsEidOne}}" mms-eid-two="{{elementTwo.mmsEidTwo}}" mms-ref-one-id="{{elementOne.mmsRefOneId}}" mms-ref-two-id="{{elementTwo.mmsRefTwoId}}" mms-commit-one-id="{{elementOne.mmsCommitOneId}}" mms-commit-two-id="{{elementTwo.mmsCommitTwoId}}"></mms-diff-attr>');
 		$compile(element)(scope);
 		scope.$apply();
@@ -378,7 +377,7 @@ describe('Directive: mmsDiffAttr', function() {
 			mmsCommitTwoId: "latest",
 			mmsProjectTwoId: "nthprojectid"
 		};
-
+		$httpBackend.expect('GET', '/alfresco/service/projects/' + scope.elementOne.mmsProjectOneId + '/refs/' + scope.elementOne.mmsRefOneId + '/elements/' + scope.elementOne.mmsEidOne).respond({status: 404, message: "" });
 		element = angular.element('<mms-diff-attr mms-project-one-id="{{elementOne.mmsProjectOneId}}" mms-project-two-id="{{elementTwo.mmsProjectTwoId}}" mms-eid-one="{{elementOne.mmsEidOne}}" mms-eid-two="{{elementTwo.mmsEidTwo}}" mms-ref-one-id="{{elementOne.mmsRefOneId}}" mms-ref-two-id="{{elementTwo.mmsRefTwoId}}" mms-commit-one-id="{{elementOne.mmsCommitOneId}}" mms-commit-two-id="{{elementTwo.mmsCommitTwoId}}"></mms-diff-attr>');
 		$compile(element)(scope);
 		scope.$apply();
@@ -398,7 +397,7 @@ describe('Directive: mmsDiffAttr', function() {
 			mmsCommitTwoId: "latest",
 			mmsProjectTwoId: "thisprojectdoesntexist"
 		};
-
+		$httpBackend.expect('GET', '/alfresco/service/projects/' + scope.elementTwo.mmsProjectTwoId + '/refs/' + scope.elementTwo.mmsRefTwoId + '/elements/' + scope.elementTwo.mmsEidTwo).respond({status: 404, message: "" });
 		element = angular.element('<mms-diff-attr mms-project-one-id="{{elementOne.mmsProjectOneId}}" mms-project-two-id="{{elementTwo.mmsProjectTwoId}}" mms-eid-one="{{elementOne.mmsEidOne}}" mms-eid-two="{{elementTwo.mmsEidTwo}}" mms-ref-one-id="{{elementOne.mmsRefOneId}}" mms-ref-two-id="{{elementTwo.mmsRefTwoId}}" mms-commit-one-id="{{elementOne.mmsCommitOneId}}" mms-commit-two-id="{{elementTwo.mmsCommitTwoId}}"></mms-diff-attr>');
 		$compile(element)(scope);
 		scope.$apply();
@@ -418,7 +417,8 @@ describe('Directive: mmsDiffAttr', function() {
 			mmsCommitTwoId: "latest",
 			mmsProjectTwoId: "thisprojectdoesntexisteither"
 		};
-
+		$httpBackend.expect('GET', '/alfresco/service/projects/' + scope.elementOne.mmsProjectOneId + '/refs/' + scope.elementOne.mmsRefOneId + '/elements/' + scope.elementOne.mmsEidOne).respond({status: 404, message: "" });
+		$httpBackend.expect('GET', '/alfresco/service/projects/' + scope.elementTwo.mmsProjectTwoId + '/refs/' + scope.elementTwo.mmsRefTwoId + '/elements/' + scope.elementTwo.mmsEidTwo).respond({status: 404, message: "" });
 		element = angular.element('<mms-diff-attr mms-project-one-id="{{elementOne.mmsProjectOneId}}" mms-project-two-id="{{elementTwo.mmsProjectTwoId}}" mms-eid-one="{{elementOne.mmsEidOne}}" mms-eid-two="{{elementTwo.mmsEidTwo}}" mms-ref-one-id="{{elementOne.mmsRefOneId}}" mms-ref-two-id="{{elementTwo.mmsRefTwoId}}" mms-commit-one-id="{{elementOne.mmsCommitOneId}}" mms-commit-two-id="{{elementTwo.mmsCommitTwoId}}"></mms-diff-attr>');
 		$compile(element)(scope);
 		scope.$apply();
@@ -438,7 +438,7 @@ describe('Directive: mmsDiffAttr', function() {
 			mmsCommitTwoId: "latest",
 			mmsProjectTwoId: "someprojectid"
 		};
-
+		$httpBackend.expect('GET', '/alfresco/service/projects/' + scope.elementOne.mmsProjectOneId + '/refs/' + scope.elementOne.mmsRefOneId + '/elements/' + scope.elementOne.mmsEidOne + '?commitId=' + scope.elementOne.mmsCommitOneId).respond({status: 404, message: "" });
 		element = angular.element('<mms-diff-attr mms-project-one-id="{{elementOne.mmsProjectOneId}}" mms-project-two-id="{{elementTwo.mmsProjectTwoId}}" mms-eid-one="{{elementOne.mmsEidOne}}" mms-eid-two="{{elementTwo.mmsEidTwo}}" mms-ref-one-id="{{elementOne.mmsRefOneId}}" mms-ref-two-id="{{elementTwo.mmsRefTwoId}}" mms-commit-one-id="{{elementOne.mmsCommitOneId}}" mms-commit-two-id="{{elementTwo.mmsCommitTwoId}}"></mms-diff-attr>');
 		$compile(element)(scope);
 		scope.$apply();
@@ -458,7 +458,7 @@ describe('Directive: mmsDiffAttr', function() {
 			mmsCommitTwoId: "latest",
 			mmsProjectTwoId: "nthprojectid"
 		};
-
+		$httpBackend.expect('GET', '/alfresco/service/projects/' + scope.elementTwo.mmsProjectTwoId + '/refs/' + scope.elementTwo.mmsRefTwoId + '/elements/' + scope.elementTwo.mmsEidTwo).respond({status: 200, message: "[ERROR]: Element MMS_1493917957356_969a3e36-f1e0-461d-9a24-c6b6f815cc84 is deleted"});
 		element = angular.element('<mms-diff-attr mms-project-one-id="{{elementOne.mmsProjectOneId}}" mms-project-two-id="{{elementTwo.mmsProjectTwoId}}" mms-eid-one="{{elementOne.mmsEidOne}}" mms-eid-two="{{elementTwo.mmsEidTwo}}" mms-ref-one-id="{{elementOne.mmsRefOneId}}" mms-ref-two-id="{{elementTwo.mmsRefTwoId}}" mms-commit-one-id="{{elementOne.mmsCommitOneId}}" mms-commit-two-id="{{elementTwo.mmsCommitTwoId}}"></mms-diff-attr>');
 		$compile(element)(scope);
 		scope.$apply();
@@ -478,7 +478,7 @@ describe('Directive: mmsDiffAttr', function() {
 			mmsCommitTwoId: "320940234",
 			mmsProjectTwoId: "someprojectid"
 		};
-
+		$httpBackend.expect('GET', '/alfresco/service/projects/' + scope.elementTwo.mmsProjectTwoId + '/refs/' + scope.elementTwo.mmsRefTwoId + '/elements/' + scope.elementTwo.mmsEidTwo + '?commitId=' + scope.elementTwo.mmsCommitTwoId).respond({status: 404, message: "" });
 		element = angular.element('<mms-diff-attr mms-project-one-id="{{elementOne.mmsProjectOneId}}" mms-project-two-id="{{elementTwo.mmsProjectTwoId}}" mms-eid-one="{{elementOne.mmsEidOne}}" mms-eid-two="{{elementTwo.mmsEidTwo}}" mms-ref-one-id="{{elementOne.mmsRefOneId}}" mms-ref-two-id="{{elementTwo.mmsRefTwoId}}" mms-commit-one-id="{{elementOne.mmsCommitOneId}}" mms-commit-two-id="{{elementTwo.mmsCommitTwoId}}"></mms-diff-attr>');
 		$compile(element)(scope);
 		scope.$apply();
