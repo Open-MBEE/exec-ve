@@ -387,6 +387,10 @@ function urlService(baseUrl, jobsUrl) {
         return jobsRoot + 'projects/'+ projectId + '/refs/master/jobs';
     };
 
+    var getJobInstancesURL = function(projectId, refId, jobId, machine) {
+        return addTicket( addServer(jobsRoot + 'projects/'+ projectId + '/refs/master/jobs/' + jobId + '/instances', machine) );
+    };
+
     var getLogoutURL = function() {
         return addTicket(root + '/api/login/ticket/' + ticket);
     };
@@ -489,6 +493,7 @@ function urlService(baseUrl, jobsUrl) {
         getJobURL: getJobURL,
         getRunJobURL: getRunJobURL,
         getCreateJobURL: getCreateJobURL,
+        getJobInstancesURL: getJobInstancesURL,
         getCheckLoginURL: getCheckLoginURL,
         getCheckTicketURL: getCheckTicketURL,
         getLogoutURL: getLogoutURL,
