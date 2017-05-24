@@ -113,11 +113,11 @@ function mmsDiffAttr(ElementService, $compile, $rootScope, $interval) {
                 // element.prepend('<span class="text-info"> <br>Error: <b> Comparison data: </b> '+ projectTwoId + '<br> -- refId: ' +  refTwoId+ ' <br>-- commitId: ' +commitTwoId+'</span>');
                 // scope.compElem = '';
                 console.log(reason.message);
-                if (reason.message.toLowerCase() == "not found") {
+                if (reason.data.message.toLowerCase().includes("deleted") === true) {
+                    deletedFlag = true;
+                } else if (reason.message.toLowerCase() == "not found") {
                     compNotFound = true;
                     scope.compElem = '';
-                } else if (reason.message.toLowerCase().includes("deleted") === true) {
-                    deletedFlag = true;
                 } else {
                     compNotFound = true;
                     invalidComp = true;
