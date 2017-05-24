@@ -1,28 +1,50 @@
 'use strict';
 
 describe('mmsTranscludeDoc Directive', function() {
-    var scope; //scope when directive is called
-    var element; //dom element mms-transclude-name
+    var scope,
+        element; 
+    var $httpBackend;
+    var $rootScope,
+        $compile;
+    // var mockUtilsService,
+    //     mockCacheService;
 
+    beforeEach(module('mms'));
     beforeEach(module('mms.directives'));
-    beforeEach(inject(function($rootScope, $compile, $injector, UtilsService, CacheService) {
-        scope = $rootScope.$new();
-        var testElement = {
-            id: 'viewId',
-            name: 'blah',
-            documentation: 'documentation and <mms-transclude-name mms-eid="viewId"></mms-transclude-name>',
-            type: 'Class'
-        };
-        var cacheKey = UtilsService.makeElementKey(testElement);
-        CacheService.put(cacheKey, testElement);
-        scope.view = testElement;
-        element = angular.element('<mms-transclude-doc data-mms-eid="{{view.id}}"></mms-transclude-doc>');
-        $compile(element)(scope);
-        scope.$digest();
-    }));
+    beforeEach(function() {
+        inject(function($injector) {
+            $httpBackend = $injector.get('$httpBackend');
+            $rootScope = $injector.get('$rootScope');
+            $compile = $injector.get('$compile');
+            // mockCacheService = $injector.get('CacheService');
+            // mockUtilsService = $injector.get('UtilsService');
+            scope = $rootScope.$new();
 
-    it('mmsTranscludeDoc.nominal()', inject(function() {
-        expect(element.html()).toContain('documentation');
-        expect(element.html()).toContain('blah'); //test recursive compilation
-    }));
+            var testElement = {
+                id: 'viewId',
+                name: 'blah',
+                documentation: 'documentation and <mms-transclude-name mms-eid="viewId"></mms-transclude-name>',
+                type: 'Class'
+            };
+            // var cacheKey = mockUtilsService.makeElementKey(testElement);
+            // mockCacheService.put(cacheKey, testElement);
+        });
+    });
+
+    it('should, given an element id, put in the element\'s documentation binding', function() {
+        scope.view = {
+            mmsEid: "fifthelementid",
+            mmsRefId: "branchfive",
+            mmsCommitId: "latest",
+            mmsProjectId: "yetanotherprojectid"       
+        };
+        element = angular.element('<mms-transclude-doc data-mms-eid="{{view.mmsEid}}" mms-project-id="{{view.mmsProjectId}}" mms-ref-id="{{view.mmsRefId}} mms-commit-id="{{view.mmsCommitId}}"></mms-transclude-doc>');
+        $compile(element)(scope);
+        scope.$apply();
+    });
+
+    // it('mmsTranscludeDoc.nominal()', inject(function() {
+    //     expect(element.html()).toContain('documentation');
+    //     expect(element.html()).toContain('blah'); //test recursive compilation
+    // }));
 });
