@@ -135,6 +135,6 @@ describe('Directive: mmsHistory', function () {
 
         scope.$apply();
         $httpBackend.flush();
-        console.log(element.html());
+        // console.log(element.html());
     });
 });

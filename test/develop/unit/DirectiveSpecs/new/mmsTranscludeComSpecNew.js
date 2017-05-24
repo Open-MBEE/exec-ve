@@ -1,6 +1,6 @@
 'use strict';
 
-describe('Directive: mmsTranscludeCom', function () {
+xdescribe('Directive: mmsTranscludeCom', function () {
     var scope,
         element; 
     var $httpBackend;
@@ -49,7 +49,7 @@ describe('Directive: mmsTranscludeCom', function () {
             mmsProjectId: "yetanotherprojectid",
             editable: true     
         };
-        element = angular.element('<mms-transclude-com mms-element-id="{{element.mmsEid}}" mms-project-id="{{element.mmsProjectId}}" mms-ref-id="{{element.mmsRefId}}" mms-commit-id="{{element.mmsCommitId}}"></mms-transclude-com>');
+        element = angular.element('<mms-transclude-com mms-eid="{{element.mmsEid}}" mms-project-id="{{element.mmsProjectId}}" mms-ref-id="{{element.mmsRefId}}" mms-commit-id="{{element.mmsCommitId}}"></mms-transclude-com>');
         console.log("elem: " + element.text());
         $compile(element)(scope);
         scope.$apply();
