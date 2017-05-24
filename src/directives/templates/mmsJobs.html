@@ -1,5 +1,5 @@
 <h2>Jobs</h2>
-<i class="pane-center-spinner fa fa-5x fa-spinner fa-spin" style="margin-left: 50%;" ng-if="loading"></i>
+<i class="pane-center-spinner fa fa-3x fa-spinner fa-spin" style="margin-left: 50%;" ng-if="loading"></i>
 
 <div id="ve-jobs-table">
     <h3>View Editor</h3>
@@ -134,15 +134,19 @@ in progress <a href="https://cae-jenkins.jpl.nasa.gov/job/MMS_1490133988355_3914
                     <!--<div ng-show="job.latestStatus || jobInstances[job.id]">-->
                     <div ng-switch="jobInstances[job.id][0].jobStatus">
                             <span ng-switch-when="pending|loading" ng-switch-when-separator="|">
-                                <i class="fa fa-ellipsis-h in-progress-marker" aria-hidden="true"></i>&nbsp;in progress
+                                Created {{jobInstances[job.id][0].created}}
+                                <i class="fa fa-ellipsis-h in-progress-marker" aria-hidden="true"></i>in progress
                             </span>
                             <span ng-switch-when="failed">
-                                <i class="fa fa-circle failed-marker" aria-hidden="true"></i>&nbsp;failed 
+                                Created {{jobInstances[job.id][0].created}}
+                                <i class="fa fa-circle failed-marker" aria-hidden="true"></i>failed 
                             </span>
                             <span ng-switch-when="completed">
-                                <i class="fa fa-circle completed-marker" aria-hidden="true"></i>&nbsp;success
+                                Completed {{jobInstances[job.id][0].completed}}
+                                <i class="fa fa-circle completed-marker" aria-hidden="true"></i>success
                             </span>
                             <span class="animate-switch" ng-switch-default>No runs</span>
+                            
                         <!--<a ng-attr-href="{{job.url}}" target="_blank" ng-show="job.url">log</a>-->
                     </div>
                     <!--<div ng-if="!job.latestStatus">

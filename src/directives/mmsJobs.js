@@ -155,7 +155,7 @@ function mmsJobs($templateCache, $http, $location, $window, growl, _ , $q,
                 scope.runCleared = false;
                 scope.createJob().then(function (jobs) {
                     for (var i = 0; i < jobs.length; i++) {
-                        scope.jobs.push(jobs[i]);
+                        // scope.jobs.push(jobs[i]);
                         jenkinsRun(jobs[i].id);
                     }
                 }).finally(function() {
@@ -167,7 +167,6 @@ function mmsJobs($templateCache, $http, $location, $window, growl, _ , $q,
         };
 
 
-// {"jobs":[{"id":"PMA_1495430835993_393f6f37-8912-4e52-8708-8c5728907705","name":"undefined_job","command":"docweb","associatedElementID":"site__18_0_2_bec02f9_1447356738150_347103_113056_cover","schedule":"H/6 * * * *","arguments":"null"}]}
         // logic for adding a new job
         scope.createJob = function() {
             var deferred = $q.defer();
@@ -225,7 +224,9 @@ function mmsJobs($templateCache, $http, $location, $window, growl, _ , $q,
            var link = URLService.getJobURL(scope.mmsProjectId, scope.mmsRefId, jobId, 'opencae-int.jpl.nasa.gov');
            scope.deleteCleared = false;
            $http.delete(link).then(function() {
-               //TODO remove from jobs list 
+               //TODO remove from jobs list
+               var indexOfJob = _.findLastIndex(scope.jobs, {id: jobId});
+               scope.jobs.splice(indexOfJob, 1);
                growl.success('Your job has been deleted');
             }, function(fail){
                 growl.error('Your job failed to be deleted: ' + fail.status);
@@ -275,8 +276,8 @@ function mmsJobs($templateCache, $http, $location, $window, growl, _ , $q,
             //     // display some error?
             //     //growl.error('There was a error in retrieving your job: ' + error.status);
             // });
-            getJobs();
-            scope.$apply();
+            // getJobs();
+            // scope.$apply();
         });
 
 
