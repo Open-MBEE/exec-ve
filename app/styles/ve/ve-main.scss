@@ -275,7 +275,7 @@ div.tooltip-inner {
   ul.dropdown-menu {
     border-radius: 3px;
     margin-top: 4px;
-    width: 300px;
+    max-width: 300px;
   }
 
   .dropdown-menu li {
