@@ -10,7 +10,7 @@
             </button>
             <ul class="dropdown-menu list-with-selected-item" uib-dropdown-menu role="menu"
                 aria-labelledby="project-btn-keyboard-nav">
-                <li ng-repeat="org in orgs" ng-click="selectOrg(org)"
+                <li ng-repeat="org in orgs | orderBy: 'name'" ng-click="selectOrg(org)"
                     ng-class="{'checked-list-item': org.name === selectedOrg}">{{ org.name }}
                 </li>
             </ul>
@@ -23,7 +23,7 @@
             </button>
             <ul class="dropdown-menu list-with-selected-item" uib-dropdown-menu role="menu"
                 aria-labelledby="module-btn-keyboard-nav">
-                <li ng-repeat="project in projects" ng-click="selectProject(project)"
+                <li ng-repeat="project in projects | orderBy: 'name'" ng-click="selectProject(project)"
                     ng-class="{'checked-list-item': project.name === selectedProject}">{{ project.name }}
                 </li>
             </ul>
