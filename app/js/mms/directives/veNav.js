@@ -70,11 +70,12 @@ function veNav($templateCache, $rootScope, $state, hotkeys, growl, $location, $u
                     };
                     $scope.spin = false;
                     $scope.continue = function() {
-                        $scope.spin = true; //the continue button on the modal needs to be wider to show the spiral
                         if(orgId && projectId) {
-                            $state.go('project.ref', {orgId: orgId, projectId: projectId, refId: 'master', search: undefined});
-                        } else {
-                            $scope.spin = false;
+                            $scope.spin = true;
+                            $state.go('project.ref', {orgId: orgId, projectId: projectId, refId: 'master', search: undefined}).then(function(data) {
+                            }, function(reject) {
+                                $scope.spin = false;
+                            });
                         }
                     };
                     $scope.cancel = function() {
