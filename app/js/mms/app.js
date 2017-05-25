@@ -92,6 +92,11 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                             $scope.selectedProject = "";
                             ProjectService.getProjects(orgId).then(function(data){
                                 $scope.projects = data;
+                                if (data.length > 0) {
+                                    $scope.selectProject(data[0]);
+                                } else {
+                                    //no projects
+                                }
                             });
                         }
                     };
