@@ -2,7 +2,7 @@
 <div class="modal-body transclude-modal">
     <div class="transclude-modal-input">
         <form ng-submit="newSearch(searchText, 0, itemsPerPage)">
-            <div class="form-search input-group">
+            <div class="form-search input-group ve-search">
                 <input class="form-control" type="text" ng-model="searchText" placeholder="Search for an element" autofocus/>
                 <span class="input-group-btn">                
                     <button class="btn btn-primary" type="button" ng-click="newSearch(searchText, 0, itemsPerPage)">
@@ -113,7 +113,7 @@
                     </div>
                 </a>
             </div>
-            <div ng-if="elem._properties[0]" class="elem-properties-wrapper">
+            <div ng-if="elem._properties[0]" class="elem-properties-wrapper ve-search">
                 <label>PROPERTIES</label>
                 <table>
                     <tbody>
