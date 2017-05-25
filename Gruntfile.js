@@ -36,8 +36,9 @@ module.exports = function(grunt) {
         options: {
           hostname: '*',
           port: 9000,
-          // open: true,
-          // base: 'mms.html',
+          open: true,
+          base: '/mms.html',
+          livereload: true,
           middleware: function(connect) {
             return [proxySnippet];
           }
