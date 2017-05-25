@@ -78,7 +78,9 @@ function mmsToolbar($templateCache, $rootScope)
 				{
 					$scope.buttons.forEach(function(button)
 					{
-						if (button.id === id) button.permission = permission;
+						if (button.id === id) {
+							button.permission = permission;
+						}
 					});
 				};
 
@@ -86,7 +88,9 @@ function mmsToolbar($templateCache, $rootScope)
 				{
 					$scope.buttons.forEach(function(button)
 					{
-						if (button.id === id) button.selected = selected;
+						if (button.id === id) {
+							button.selected = selected;
+						}
 					});
 				};
 
@@ -94,7 +98,9 @@ function mmsToolbar($templateCache, $rootScope)
 				{
 					$scope.buttons.forEach(function(button)
 					{
-						if (button.id === id) button.icon = icon;
+						if (button.id === id) {
+							button.icon = icon;
+						}
 					});
 				};
 
@@ -169,7 +175,12 @@ function mmsToolbar($templateCache, $rootScope)
 			scope.clicked = function(button)
 			{
 
-				if (!button.active) return;
+				if (!button.permission) {
+					return;
+				}
+				if (!button.active) {
+					return;
+				}
 
 				var toggleDecativeFlag = false;
 				if (this.$root.ve_togglePane && $rootScope.mms_pane_toggleable !== false)
@@ -183,13 +194,15 @@ function mmsToolbar($templateCache, $rootScope)
 
 				if (this.$root.ve_tbApi) this.$root.ve_tbApi.select(button.id);
 
-				if (button.onClick) button.onClick();
-				else if (scope.onClick) scope.onClick(
-				{
-					button: button
-				});
+				if (button.onClick) {
+					button.onClick();
+				} else if (scope.onClick) {
+					scope.onClick({ button: button });
+				}
 
-				if (toggleDecativeFlag) this.$root.ve_tbApi.deactivate(button.id);
+				if (toggleDecativeFlag) {
+					this.$root.ve_tbApi.deactivate(button.id);
+				}
 
 /*if (! button.dynamic)
             {

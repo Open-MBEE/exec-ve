@@ -128,7 +128,7 @@ function mmsSpec(Utils, ElementService, UtilsService, $compile, $templateCache, 
             scope.isSlot = false;
             scope.gettingSpec = true;
             var reqOb = {elementId: scope.mmsElementId, projectId: scope.mmsProjectId, refId: scope.mmsRefId, commitId: scope.mmsCommitId, extended: true};
-            ElementService.getElement(reqOb, 2)
+            ElementService.getElement(reqOb, 2, false)
             .then(function(data) {
                 if (newVal !== lastid) {
                     return;
