@@ -1,6 +1,6 @@
 'use strict';
 
-xdescribe('Directive: mmsSearch', function() {
+describe('Directive: mmsSearch', function() {
 	var scope,
 		element;
 	var $rootScope,
@@ -75,10 +75,30 @@ xdescribe('Directive: mmsSearch', function() {
 		$httpBackend.when('GET', '/alfresco/service/projects/'+ testElements.elements[1]._projectId +'/refs/' + testElements.elements[1]._refId + '/elements/' + testElements.elements[1].id + '?commitId=' + testElements.elements[1]._commitId).respond(200, testElements.elements[1]);
 		$httpBackend.when('GET', '/alfresco/service/projects/'+ testElements.elements[2]._projectId +'/refs/' + testElements.elements[2]._refId + '/elements/' + testElements.elements[2].id + '?commitId=' + testElements.elements[2]._commitId).respond(200, testElements.elements[2]);
 		$httpBackend.when('GET', '/alfresco/service/projects/'+ testElements.elements[3]._projectId +'/refs/' + testElements.elements[3]._refId + '/elements/' + testElements.elements[3].id).respond(200, testElements.elements[3]);
+		$httpBackend.when('GET', '/alfresco/service/projects/'+ testElements.elements[3]._projectId +'/refs/' + testElements.elements[3]._refId + '/elements/' + testElements.elements[3].id).respond(200, testElements.elements[3]);
+		$httpBackend.when('GET', '/alfresco/service/projects/'+ testElements.elements[3]._projectId +'/refs/' + testElements.elements[3]._refId + '/elements/' + testElements.elements[3].id).respond(200, testElements.elements[3]);
 
 	});
 
 	it('should search for an element', function() {
+
+		scope.ve_title = 'Some Title';
+		scope.org = 'someorgid';
+		scope.orgs = ['someorgid', 'anotherorgid', 'yetanotherorgid'];
+		scope.project = 'someprojectid';
+		scope.projects = ['someprojectid', 'anotherprojectid', 'yetanotherprojectid'];
+		scope.ref = 'master';
+		scope.branch = 'master';
+		scope.branches = ['master', 'branchfour', 'branchfive', 'branchthree'];
+		scope.tag = 'latest';
+		scope.tags = ['latest', '9304823', '23943'];
+		scope.search = $rootScope.search; 
+
+		var elementOne = angular.element('<ve-nav mms-title="ve_title" mms-org="org" mms-orgs="orgs" mms-project="project" mms-projects="projects" mms-ref="ref" mms-branch="branch" mms-branches="branches" mms-tag="tag" mms-tags="tags" mms-search="search"></ve-nav>');
+		$compile(elementOne)(scope);
+		scope.$apply();
+
+		$rootScope.searchText = 'first element';
 		scope.element = {
 			mmsProjectId: 'someprojectid',
 			mmsRefId: 'master',
@@ -86,10 +106,12 @@ xdescribe('Directive: mmsSearch', function() {
 			mmsEid: 'firstelementid'
 		};
 		scope.searchOptions = {};
+
 		element = angular.element('<mms-search mms-options="searchOptions" mms-project-id="{{element.mmsProjectId}}" mms-ref-id="{{element.mmsRefId}}"></mms-search>');
 		$compile(element)(scope);
 		scope.$apply();
-		$httpBackend.flush();
+		// console.log(element.html());
+		// $httpBackend.flush();
 	});
 
 	// it('should search for an element', function() {
