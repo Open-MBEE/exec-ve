@@ -1,9 +1,11 @@
 'use strict';
 
 xdescribe('mmsTranscludeVal Directive', function () {
-    var scope; //scope when directive is called
-    var element; //dom element mms-transclude-name
-    var $rootScope, $compile, CacheService, UtilsService, $httpBackend, requestHandler;
+    var scope,
+        element; 
+    var $rootScope, 
+        $compile;
+    var $httpBackend;
 
     beforeEach(function () {
         module('mms.directives');
@@ -11,18 +13,13 @@ xdescribe('mmsTranscludeVal Directive', function () {
             $rootScope   = $injector.get('$rootScope');
             $compile     = $injector.get('$compile');
             $httpBackend = $injector.get('$httpBackend');
-            CacheService = $injector.get('CacheService');
-            UtilsService = $injector.get('UtilsService');
             scope        = $rootScope.$new();
 
-            scope.element = {
+            var element = {
                 name   : "responseTestElement",
                 id: "_18_0_5_407019f_1468188892970_158569_14563"
             };
 
-            var cacheKey = UtilsService.makeElementKey(scope.element);
-            CacheService.put(cacheKey, scope.element);
-//TODO these values are very messed up
             scope.values = [{
                 type   : 'LiteralString',
                 value : '431413',
@@ -48,7 +45,7 @@ xdescribe('mmsTranscludeVal Directive', function () {
         $httpBackend.verifyNoOutstandingRequest();
     });
 
-    it('mmsTranscludeVal should transclude a LiteralInteger', inject(function () {
+    it('mmsTranscludeVal should transclude a LiteralInteger', function () {
         var testElement = {
             sysmlId       : 'valueViewId',
             name          : 'merpity',
@@ -65,9 +62,9 @@ xdescribe('mmsTranscludeVal Directive', function () {
 
         expect(element.html()).toContain(34314);
         expect(element.html()).toContain('ng-switch-when="LiteralInteger"');
-    }));
+    });
 
-    it('mmsTranscludeVal should transclude a LiteralBoolean', inject(function () {
+    it('mmsTranscludeVal should transclude a LiteralBoolean', function () {
         var testElement = {
             sysmlId       : 'valueViewId',
             name          : 'merpity',
@@ -84,9 +81,9 @@ xdescribe('mmsTranscludeVal Directive', function () {
 
         expect(element.html()).toContain(true);
         expect(element.html()).toContain('ng-switch-when="LiteralBoolean"');
-    }));
+    });
 
-    it('mmsTranscludeVal should transclude a LiteralReal', inject(function () {
+    it('mmsTranscludeVal should transclude a LiteralReal', function () {
         var testElement = {
             sysmlId       : 'valueViewId',
             name          : 'merpity',
@@ -103,9 +100,9 @@ xdescribe('mmsTranscludeVal Directive', function () {
 
         expect(element.html()).toContain(433);
         expect(element.html()).toContain('ng-switch-when="LiteralReal"');
-    }));
+    });
 
-    it('mmsTranscludeVal should transclude a LiteralUnlimitedNatural', inject(function () {
+    it('mmsTranscludeVal should transclude a LiteralUnlimitedNatural', function () {
         var testElement = {
             sysmlId       : 'valueViewId',
             name          : 'merpity',
@@ -122,9 +119,9 @@ xdescribe('mmsTranscludeVal Directive', function () {
 
         expect(element.html()).toContain(433);
         expect(element.html()).toContain('ng-switch-when="LiteralUnlimitedNatural"');
-    }));
+    });
 
-    it('mmsTranscludeVal should transclude an ElementValue', inject(function () {
+    it('mmsTranscludeVal should transclude an ElementValue', function () {
         // ElementValue will check to see if there is another element nested within itself. If it finds one, it will
         //  perform a transclude name on the sysmlid
         var testElement = {
@@ -156,9 +153,9 @@ xdescribe('mmsTranscludeVal Directive', function () {
         expect(element.html()).toContain("otherElement");
         expect(element.html()).toContain('ng-switch-when="ElementValue"');
         expect(element.html()).toContain('mms-transclude-name');
-    }));
+    });
 
-    it('mmsTranscludeVal should transclude an InstanceValue', inject(function () {
+    it('mmsTranscludeVal should transclude an InstanceValue', function () {
         var testElement = {
             sysmlid       : 'valueViewId',
             name          : 'merpity',
@@ -176,9 +173,9 @@ xdescribe('mmsTranscludeVal Directive', function () {
         expect(element.html()).toContain("_18_0_5_407019f_1468188892970_158569_14563");
         expect(element.html()).toContain('ng-switch-when="InstanceValue"');
         expect(element.html()).toContain('responseTestElement');
-    }));
+    });
 
-    it('mmsTranscludeVal should transclude an OpaqueExpression', inject(function () {
+    it('mmsTranscludeVal should transclude an OpaqueExpression', function () {
         scope.testElement = {
             documentation : "",
             sysmlId       : "notInThePast",
@@ -200,5 +197,5 @@ xdescribe('mmsTranscludeVal Directive', function () {
 
         expect(element.html()).toContain("foo8");
         expect(element.html()).toContain('ng-switch-when="OpaqueExpression"');
-    }));
+    });
 });

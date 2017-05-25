@@ -28,16 +28,13 @@ describe('Directive: mmsTranscludeDoc', function() {
             var testElement = {
                 id: 'fifthelementid',
                 name: 'blah',
-                projectId: 'aprojectid',
-                commitId: 'latest',
-                refId: 'master',
-                documentation: 'documentation and <mms-transclude-name mms-eid="{{mock.id}}" mms-project-id="{{mock.projectId}}" mms-ref-id="{{mock.refId}}" mms-commit-id="{{mock.commitId}}" mms-watch-id="true" no-click="true" non-editable="true"></mms-transclude-name>',
+                _projectId: 'aprojectid',
+                _commitId: 'latest',
+                _refId: 'master',
+                documentation: 'documentation',// and <mms-transclude-name mms-eid="{{mock.id}}" mms-project-id="{{mock.projectId}}" mms-ref-id="{{mock.refId}}" mms-commit-id="{{mock.commitId}}" mms-watch-id="true" no-click="true" non-editable="true"></mms-transclude-name>',
                 type: 'Class'
             };
-
-            $httpBackend.when('GET', 'alfresco/service/projects/' + testElement.projectId + '/refs/' + testElement.refId + '/elements/' + testElement.id).respond(200, testElement);
-
-
+            $httpBackend.when('GET', '/alfresco/service/projects/' + testElement._projectId + '/refs/' + testElement._refId + '/elements/' + testElement.id).respond(200, testElement);
         });
     });
 
@@ -46,10 +43,12 @@ describe('Directive: mmsTranscludeDoc', function() {
             mmsEid: "fifthelementid",
             mmsRefId: "master",
             mmsCommitId: "latest",
-            mmsProjectId: "aprojectid"       
+            mmsProjectId: "aprojectid"
         };
-        element = angular.element('<mms-transclude-doc data-mms-eid="{{view.mmsEid}}" mms-project-id="{{view.mmsProjectId}}" mms-ref-id="{{view.mmsRefId}} mms-commit-id="{{view.mmsCommitId}}"></mms-transclude-doc>');
+        element = angular.element('<mms-transclude-doc data-mms-eid="{{view.mmsEid}}" mms-project-id="{{view.mmsProjectId}}" mms-ref-id="{{view.mmsRefId}}"></mms-transclude-doc>');
+
         $compile(element)(scope);
         scope.$apply();
+        console.log(element.html());
     });
 });

@@ -1,35 +1,52 @@
 'use strict';
 
 describe('mmsTranscludeName Directive', function () {
-    var scope; //scope when directive is called
-    var element; //dom element mms-transclude-name
-    var $rootScope, $compile, CacheService, UtilsService;
+    var scope,
+        element; 
+    var $httpBackend;
+    var $rootScope, 
+        $compile;
 
     beforeEach(function () {
         module('mms.directives');
         inject(function ($injector) {
             $rootScope   = $injector.get('$rootScope');
             $compile     = $injector.get('$compile');
-            CacheService = $injector.get('CacheService');
-            UtilsService = $injector.get('UtilsService');
+            $httpBackend = $injector.get('$httpBackend');
             scope        = $rootScope.$new();
 
-            scope.element = {
-                id       : 'viewId',
-                name          : 'blah',
-                type: 'Class'
+            var element = {
+                id          : 'viewId',
+                _projectId  : 'someprojectid',
+                _refId      : 'master',
+                _commitId   : 'latest',
+                name        : 'blah',
+                type        : 'Class'
             };
-
-            var cacheKey = UtilsService.makeElementKey(scope.element);
-            CacheService.put(cacheKey, scope.element);
-        })
+        });
+        
+        $httpBackend.when('GET', '/alfresco/service/projects/' + element._projectId + '/refs/' + element._refId + '/elements/' + element.id).respond(200, element);     
     });
 
-    // TODO: Why is testing 'nominal()' I don't see a nominal method inside of mmsTranscludeName
-    it('mmsTranscludeName', inject(function () {
-        element = angular.element('<mms-transclude-name data-mms-eid="{{element.id}}"></mms-transclude-name>');
+    afterEach(function() {
+        $httpBackend.verifyNoOutstandingExpectation();
+        $httpBackend.verifyNoOutstandingRequest();
+    });
+
+    it('should put in the element\'s name binding', function () {
+        var testElement = {
+            mmsEid        : 'viewId',
+            mmsProjectId  : 'someprojectid',
+            mmsRefId      : 'master',
+            mmsCommitId   : 'latest',
+            mmsWatchId    : true,
+            noClick       : true,
+            nonEditable   : true
+        };
+        element = angular.element('<mms-transclude-name data-mms-eid="{{testElement.mmsEid}}" mms-project-id="{{testElement.mmsProjectId}}" mms-ref-id="{{testElement.mmsRefId}}" mms-commit-id="{{testElement.mmsCommitId}}" mms-watch-id="{{testElement.mmsWatchId}}" no-click="{{testElement.noClick}}"></mms-transclude-name>');
         $compile(element)(scope);
         scope.$digest();
         expect(element.html()).toContain('blah');
-    }));
+        $httpBackend.flush();
+    });
 });
