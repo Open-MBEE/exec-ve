@@ -6,7 +6,7 @@
                 <span class = "selected-dropdown">{{ currentProject }}<i class="fa fa-caret-down" aria-hidden="true"></i></span>
             </button>
             <ul class="dropdown-menu list-with-selected-item" uib-dropdown-menu role="menu">
-                <li ng-repeat="project in projects" ng-click="updateProject(project)"
+                <li ng-repeat="project in projects | orderBy: 'name'" ng-click="updateProject(project)"
                        ng-class="{'checked-list-item': project.name === currentProject}">{{ project.name }}</li>
             </ul>
         </div>
