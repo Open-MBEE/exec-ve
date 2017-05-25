@@ -53,7 +53,7 @@ mms-view.editing {
 
   /* Level 1 transclusions */
   mms-transclude-doc,
-  mms-transclude-name,
+  mms-transclude-name > span,
   mms-transclude-val {
     @include transition(border, .3s, linear);
     border: 2px solid $tertiary_grey;
