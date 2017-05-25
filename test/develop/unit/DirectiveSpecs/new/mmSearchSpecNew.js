@@ -5,8 +5,6 @@ xdescribe('Directive: mmsSearch', function() {
 		element;
 	var $rootScope,
 		$compile;
-	var mockCacheService,
-		mockElementService;
 	var $httpBackend;
 
 	beforeEach(module('mms'));
@@ -16,8 +14,6 @@ xdescribe('Directive: mmsSearch', function() {
 		inject(function($injector) {
 			$rootScope = $injector.get('$rootScope');
 			$compile = $injector.get('$compile');
-			mockCacheService = $injector.get('CacheService');
-			mockElementService = $injector.get('ElementService');
 			$httpBackend = $injector.get('$httpBackend');
 			scope = $rootScope.$new();
 		});
