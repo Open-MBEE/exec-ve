@@ -81,34 +81,17 @@ describe('Directive: mmsSearch', function() {
 		// $httpBackend.when('GET', '/alfresco/service/projects/'+ testElements.elements[3]._projectId +'/refs/' + testElements.elements[3]._refId + '/elements/' + testElements.elements[3].id).respond(200, testElements.elements[3]);
 		// $httpBackend.when('GET', '/alfresco/service/projects/'+ testElements.elements[3]._projectId +'/refs/' + testElements.elements[3]._refId + '/elements/' + testElements.elements[3].id).respond(200, testElements.elements[3]);
 
+		scope.searchText = "First Element";
+		scope.itemsPerPage = 20;
+		var searchElement = angular.element('<button class="btn btn-primary" type="button" ng-click="newSearch(searchText, 0, itemsPerPage)"></button>');
+		search = $compile(searchElement)(scope);
+		scope.$apply();
+		console.log(search);
+		
 	});
 
 	it('should search for an element', function() {
-
-		// scope.ve_title = 'Some Title';
-		// scope.org = 'someorgid';
-		// scope.orgs = ['someorgid', 'anotherorgid', 'yetanotherorgid'];
-		// scope.project = 'someprojectid';
-		// scope.projects = ['someprojectid', 'anotherprojectid', 'yetanotherprojectid'];
-		// scope.ref = 'master';
-		// scope.branch = 'master';
-		// scope.branches = ['master', 'branchfour', 'branchfive', 'branchthree'];
-		// scope.tag = 'latest';
-		// scope.tags = ['latest', '9304823', '23943'];
-		// scope.search = $rootScope.search; 
-
-		// var elementOne = angular.element('<ve-nav mms-title="ve_title" mms-org="org" mms-orgs="orgs" mms-project="project" mms-projects="projects" mms-ref="ref" mms-branch="branch" mms-branches="branches" mms-tag="tag" mms-tags="tags" mms-search="search"></ve-nav>');
-		// $compile(elementOne)(scope);
-		// scope.$apply();
-
-		scope.searchText = 'first element';
-		scope.itemsPerPage = 20;
-		search = $compile(angular.element('<button class="btn btn-primary" type="button" ng-click="newSearch(searchText, 0, itemsPerPage)"><span class="btn-text">SEARCH</span> <i class="{{searchClass}}"></i></button>'))(scope);
-		scope.$apply();
-
-		var searchButton = search.find('button').click();
-		// searchButton.triggerHandler('click');
-
+		search.find('button').click();
 		scope.element = {
 			mmsProjectId: 'someprojectid',
 			mmsRefId: 'master',
@@ -120,7 +103,7 @@ describe('Directive: mmsSearch', function() {
 		element = angular.element('<mms-search mms-options="searchOptions" mms-project-id="{{element.mmsProjectId}}" mms-ref-id="{{element.mmsRefId}}"></mms-search>');
 		$compile(element)(scope);
 		scope.$apply();
-		console.log(element.html());
+		// console.log(element.html());
 		expect(element.html()).toContain('first element');
 		// $httpBackend.flush();
 	});
