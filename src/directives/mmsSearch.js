@@ -207,10 +207,24 @@ function mmsSearch(CacheService, ElementService, growl, $templateCache) {
             }
             var q = {};
             if ( projList.length === 0 ) {
-                projList.push(scope.mmsProjectId);
+                projList.push({
+                    bool: {
+                        must: [
+                            {
+                                term: {
+                                    _projectId: scope.mmsProjectId
+                                }
+                            }, {
+                                term:{
+                                    _inRefIds: scope.mmsRefId
+                                }
+                            }
+                        ]
+                    }
+                });
             }
             q._projectId = projList;
-            projectTermsOb.terms = q;
+            projectTermsOb.bool = {should: projList};
             return projectTermsOb;
         };
 
@@ -224,7 +238,21 @@ function mmsSearch(CacheService, ElementService, growl, $templateCache) {
          * specified project.
          */
         var getAllMountsAsArray = function(project, projectsList) {
-            projectsList.push(project.id);
+            projectsList.push({
+                    bool: {
+                        must: [
+                            {
+                                term: {
+                                    _projectId: project.id
+                                }
+                            }, {
+                                term:{
+                                    _inRefIds: project._refId
+                                }
+                            }
+                        ]
+                    }
+                });
             var mounts = project._mounts;
             if ( angular.isArray(mounts) && mounts.length !== 0 ) {
                 for (var i = 0; i < mounts.length; i++) {
@@ -296,11 +324,11 @@ function mmsSearch(CacheService, ElementService, growl, $templateCache) {
             }
 
             var projectTermsOb = getProjectMountsQuery();
-            var mainBoolQuery = [];
-            mainBoolQuery.push(mainQuery,projectTermsOb);
+            var mainBoolQuery = [mainQuery];
+            var filterList = [projectTermsOb];
             if (scope.mmsOptions.filterQueryList) {
                 angular.forEach(scope.mmsOptions.filterQueryList, function(filterOb){
-                    mainBoolQuery.push(filterOb());
+                    filterList.push(filterOb());
                 });
             }
 
@@ -311,7 +339,8 @@ function mmsSearch(CacheService, ElementService, growl, $templateCache) {
                 ],
                 "query": {
                     "bool": {
-                        "must": mainBoolQuery
+                        "must": mainBoolQuery,
+                        "filter": filterList
                     }
                 }
             };
