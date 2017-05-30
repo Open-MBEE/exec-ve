@@ -1,21 +1,21 @@
 'use strict';
 
-describe('mmsTranscludeName Directive', function () {
+xdescribe('mmsTranscludeName Directive', function () {
     var scope,
         element; 
     var $httpBackend;
     var $rootScope, 
         $compile;
 
+    beforeEach(module('mms.directives'));
     beforeEach(function () {
-        module('mms.directives');
         inject(function ($injector) {
             $rootScope   = $injector.get('$rootScope');
             $compile     = $injector.get('$compile');
             $httpBackend = $injector.get('$httpBackend');
             scope        = $rootScope.$new();
 
-            var element = {
+            var mock = {
                 id          : 'viewId',
                 _projectId  : 'someprojectid',
                 _refId      : 'master',
@@ -25,7 +25,7 @@ describe('mmsTranscludeName Directive', function () {
             };
         });
         
-        $httpBackend.when('GET', '/alfresco/service/projects/' + element._projectId + '/refs/' + element._refId + '/elements/' + element.id).respond(200, element);     
+        $httpBackend.when('GET', '/alfresco/service/projects/' + mock._projectId + '/refs/' + mock._refId + '/elements/' + mock.id).respond(200, mock);     
     });
 
     afterEach(function() {
@@ -43,10 +43,12 @@ describe('mmsTranscludeName Directive', function () {
             noClick       : true,
             nonEditable   : true
         };
-        element = angular.element('<mms-transclude-name data-mms-eid="{{testElement.mmsEid}}" mms-project-id="{{testElement.mmsProjectId}}" mms-ref-id="{{testElement.mmsRefId}}" mms-commit-id="{{testElement.mmsCommitId}}" mms-watch-id="{{testElement.mmsWatchId}}" no-click="{{testElement.noClick}}"></mms-transclude-name>');
+        element = angular.element('<mms-transclude-name mms-eid="{{testElement.mmsEid}}" mms-project-id="{{testElement.mmsProjectId}}" mms-ref-id="{{testElement.mmsRefId}}" mms-commit-id="{{testElement.mmsCommitId}}" mms-watch-id="{{testElement.mmsWatchId}}" no-click="{{testElement.noClick}}"></mms-transclude-name>');
         $compile(element)(scope);
-        scope.$digest();
+        scope.$apply();
+        console.log(element.html());
         expect(element.html()).toContain('blah');
         $httpBackend.flush();
+
     });
 });

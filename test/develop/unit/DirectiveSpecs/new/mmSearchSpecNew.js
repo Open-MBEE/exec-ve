@@ -68,11 +68,11 @@ describe('Directive: mmsSearch', function() {
 					_created: "2017-03-01T17:12:17.165-0700",
 					name: "Fifth Element",
 					_projectId: "someprojectid"		
-				},
+				}
 			]
 		};
 
-		$httpBackend.when('POST', '/alfresco/service/projects/someprojectid/refs/master/search').respond(200, testElements);
+		$httpBackend.when('POST', '/alfresco/service/projects/someprojectid/refs/master/search').respond(200, testElements.elements[0]);
 
 		// $httpBackend.when('GET', '/alfresco/service/projects/'+ testElements.elements[0]._projectId +'/refs/' + testElements.elements[0]._refId + '/elements/' + testElements.elements[0].id + '?commitId=' + testElements.elements[0]._commitId).respond(200, testElements.elements[0]);
 		// $httpBackend.when('GET', '/alfresco/service/projects/'+ testElements.elements[1]._projectId +'/refs/' + testElements.elements[1]._refId + '/elements/' + testElements.elements[1].id + '?commitId=' + testElements.elements[1]._commitId).respond(200, testElements.elements[1]);
@@ -81,16 +81,26 @@ describe('Directive: mmsSearch', function() {
 		// $httpBackend.when('GET', '/alfresco/service/projects/'+ testElements.elements[3]._projectId +'/refs/' + testElements.elements[3]._refId + '/elements/' + testElements.elements[3].id).respond(200, testElements.elements[3]);
 		// $httpBackend.when('GET', '/alfresco/service/projects/'+ testElements.elements[3]._projectId +'/refs/' + testElements.elements[3]._refId + '/elements/' + testElements.elements[3].id).respond(200, testElements.elements[3]);
 
+		// scope.searchText = "First Element";
+		// scope.itemsPerPage = 20;
+		// var searchElement = angular.element('<button class="btn btn-primary" type="button" ng-click="newSearch(searchText, 0, itemsPerPage)"></button>');
+		// search = $compile(searchElement)(scope);
+		// scope.$apply();
+		// console.log(search);
+		
+	});
+
+	it('should search for an element', function() {
+
 		scope.searchText = "First Element";
 		scope.itemsPerPage = 20;
 		var searchElement = angular.element('<button class="btn btn-primary" type="button" ng-click="newSearch(searchText, 0, itemsPerPage)"></button>');
 		search = $compile(searchElement)(scope);
 		scope.$apply();
-		console.log(search);
-		
-	});
-
-	it('should search for an element', function() {
+		var data = null;
+		scope.$on('event.action', function($event, eventData) {
+			data = eventData;
+		});
 		search.find('button').click();
 		scope.element = {
 			mmsProjectId: 'someprojectid',
@@ -104,7 +114,7 @@ describe('Directive: mmsSearch', function() {
 		$compile(element)(scope);
 		scope.$apply();
 		// console.log(element.html());
-		expect(element.html()).toContain('first element');
+		expect(data).toContain('First Element');
 		// $httpBackend.flush();
 	});
 

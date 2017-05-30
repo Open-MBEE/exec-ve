@@ -49,6 +49,6 @@ describe('Directive: mmsTranscludeDoc', function() {
 
         $compile(element)(scope);
         scope.$apply();
-        console.log(element.html());
+        // console.log(element.html());
     });
 });

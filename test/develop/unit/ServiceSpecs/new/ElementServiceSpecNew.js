@@ -1,11 +1,11 @@
 'use strict';
 
-xdescribe('Element Service', function() {
+describe('Service: ElementService', function() {
 	beforeEach(module('mms'));
 
 	var root = '/alfresco/service';
 	var $httpBackend;
-	var mockQ, mockURLService, mockUtilsService, mockCacheService, mockHttpService, mockApplicationService;
+	var mockURLService, mockUtilsService, mockCacheService, mockHttpService, mockApplicationService;
 	var ElementServiceObj;
 	var projects = {};
 	var ref = {};
@@ -15,7 +15,6 @@ xdescribe('Element Service', function() {
 
 	beforeEach(inject(function($injector) {
 		$httpBackend 			= $injector.get('$httpBackend');
-		mockQ		 			= $injector.get('$q');
 		mockURLService			= $injector.get('URLService');
 		mockCacheService		= $injector.get('CacheService');
 		mockHttpService			= $injector.get('HttpService');
@@ -60,11 +59,16 @@ xdescribe('Element Service', function() {
 			    }
 			]
 		}
+
+		$httpBackend.when('GET', '/alfresco/service/projects').respond(200, projects);
+
 		ref = [{
 			_elasticId: "refelastic3",
 			id: "thirdref",
 			name: "thirdref"
 		}]
+
+
 		refs = {
 			refs: [
 				{
@@ -79,6 +83,9 @@ xdescribe('Element Service', function() {
 				}
 			]
 		}
+
+		$httpBackend.when('GET', '/alfresco/service/projects/projectId/refs').respond(200, refs);
+
 		elements = {
 			elements: [
 				{
@@ -160,6 +167,9 @@ xdescribe('Element Service', function() {
 				}
 			]
 		}
+
+		$httpBackend.when('GET', '/alfresco/service/projects/projectId/refs/master/elements').respond(200, elements);
+
 		result = {
 			_modifier					: "admin",
 			powertypeExtentIds			: [],
@@ -390,7 +400,7 @@ xdescribe('Element Service', function() {
 				refId: 'master',
 				commitId: 'latest'
 			};
-			$httpBackend.when('GET', root + '/projects/heyaproject/refs/master/elements').response(
+			$httpBackend.when('GET', root + '/projects/heyaproject/refs/master/elements').respond(
 				function(method, url, data) {
 					return [200, elements];
 				}
@@ -423,27 +433,32 @@ xdescribe('Element Service', function() {
 		});
 	});
 
-	describe('updateElement', function() {
+	xdescribe('updateElement', function() {
 		it('it should save an element to MMS and update the cache if successful', function() {
-			var elemOb;
+			var elemOb = null;
 			var testElem = {
-				projectId: "heyaproject",
-				elementId: "heyanelement",
-				refId: 'master',
-				commitId: 'latest',
-				returnChildViews: true
+				_projectId: "heyaproject",
+				id: "heyanelement",
+				_refId: 'master',
+				_commitId: 'latest'
 			};
-			$httpBackend.when('POST', root + '/projects/refs/master/elements/heyanelement').response(
-				function(method, url, data) {
-					return [201, ''];
-				});
-			ElementServiceObj.updateElement(testElem).then(function(data) {
-				elemOb = data;
+			$httpBackend.when('POST', '/alfresco/service/projects/heyaproject/refs/master/elements', testElem).respond(201, '');
+			var testElem = {
+				_projectId: "heyaproject",
+				id: "heyanelement",
+				_refId: 'master',
+				_commitId: 'latest'
+			};
+			ElementServiceObj.updateElement(testElem, false).then(function(data) {
+				console.log("hi");
+				elemOb = 'hey';
 			}, function(reason) {
+				console.log("hi you failed");
 				elemOb = reason.message;
 			});
-			$httpBackend.flush();
+			console.log("hi after" + elemOb);
 			expect(elemOb).toEqual(testElem);
+			$httpBackend.flush();
 		});
 	});
 
@@ -471,9 +486,71 @@ xdescribe('Element Service', function() {
 		});
 	});
 
-	xdescribe('search', function() {
+	describe('search', function() {
 		it('should get an element', function() {
+			var searchText = 'krabby patties';
 
+			var q = {
+				id: searchText
+			};
+			var q2 = {
+				query: searchText,
+				fields: ["defaultValue.value", "value.value", "specification.value", "name", "documentation"]
+			};
+			var allQuery = {
+				multi_match: q2
+			};
+			var idQuery = {
+				term: q
+			};
+			var mainQuery = {
+               "bool": {
+                    "should": [
+                        idQuery,
+                        allQuery
+                    ]
+                }				
+			};
+			var mainBoolQuery =[];
+			mainBoolQuery.push(mainQuery, {});
+			var queryOb = { //assuming searchType is 'all'
+                "sort" : [
+                    "_score",
+                    { "_modified" : {"order" : "desc"}}
+                ],
+                "query": {
+                    "bool": {
+                        "must": mainBoolQuery
+                    }
+                },
+                "from": 21,
+                "size": 20
+			};
+			var testElem = {
+				_projectId: "heyaproject",
+				_refId: 'master'
+			};
+			var resultElem = {
+				_projectId: "heyaproject",
+				id: "heyanelement",
+				_refId: 'master',
+				_commitId: 'latest'
+			};
+			$httpBackend.when('POST', '/alfresco/service/projects/heyaproject/refs/master?search=' + searchText).respond(201, resultElem);
+			var reqOb = {
+				projectId: "heyaproject",
+				elementId: "heyanelement",
+				refId: 'master',
+				commitId: 'latest'
+			};
+			var elemOb = null;
+			ElementServiceObj.search(reqOb, queryOb, 1, 20, 1).then(function(data) {
+				elemOb = data;
+			}, function(reason) {
+				elemOb = reason.message;
+			});
+			expect(elemOb).toEqual(resultElem);
+			$httpBackend.flush();
 		});
 	});
 
