@@ -340,9 +340,7 @@ function mmsSearch(CacheService, ElementService, growl, $templateCache) {
                 "query": {
                     "bool": {
                         "must": mainBoolQuery,
-                        "filter": {
-                            "bool": {"must": filterList}
-                        }
+                        "filter": filterList
                     }
                 }
             };
