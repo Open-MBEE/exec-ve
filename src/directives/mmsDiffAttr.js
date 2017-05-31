@@ -127,8 +127,9 @@ function mmsDiffAttr(ElementService, $compile, $rootScope, $interval) {
         });
 
         var createTransclude = function(elementId, type, projectId, commitId, refId) {
-            var transcludeElm = angular.element('<mms-transclude-'+ type +'>');
-            transcludeElm.attr("mms-eid", elementId);
+            var transcludeElm = angular.element('<mms-cf>');
+            transcludeElm.attr("mms-cf-type", type);
+            transcludeElm.attr("mms-element-id", elementId);
             transcludeElm.attr("mms-project-id", projectId);
             transcludeElm.attr("mms-commit-id", commitId);
             transcludeElm.attr("mms-ref-id", refId);
