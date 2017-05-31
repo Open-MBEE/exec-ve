@@ -69,6 +69,20 @@ function UtilsService($q, $http, CacheService, URLService, _) {
         slotIds: [],
         stereotypedElementId: null
     };
+    var VALUESPEC_ELEMENT_TEMPLATE = {
+        visibility: "public",
+        documentation: "",
+        mdExtensionsIds: [ ],
+        appliedStereotypeInstanceId: null,
+        templateParameterId: null,
+        clientDependencyIds: [ ],
+        syncElementId: null,
+        name: "",
+        typeId: null,
+        supplierDependencyIds: [ ],
+        _appliedStereotypeIds: [ ],
+        nameExpression: null
+    };
     var hasCircularReference = function(scope, curId, curType) {
         var curscope = scope;
         while (curscope.$parent) {
@@ -659,10 +673,9 @@ function UtilsService($q, $http, CacheService, URLService, _) {
      * @param {string} [workspace=master] Workspace name
      * @returns {Promise} Promise would be resolved with 'ok', the server will send an email to user when done
      */
-    var convertHtmlToPdf = function(doc, site, workspace){ //TODO fix
-        var n = UtilsService.normalize(null, workspace);
+    var convertHtmlToPdf = function(doc, projectId, refId){ //TODO fix
         var deferred = $q.defer();
-        $http.post(URLService.getHtmlToPdfURL(doc.docId, site, n.ws), {'documents': [doc]})
+        $http.post(URLService.getHtmlToPdfURL(doc.docId, projectId, refId), {'documents': [doc]})
         .success(function(data, status, headers, config){
             deferred.resolve('ok');
         }).error(function(data, status, headers, config){
@@ -692,11 +705,18 @@ function UtilsService($q, $http, CacheService, URLService, _) {
         Object.assign(o, obj);
         return o;
     };
+
+    var createValueSpecElement = function(obj) {
+        var o = JSON.parse(JSON.stringify(VALUESPEC_ELEMENT_TEMPLATE));
+        Object.assign(o, obj);
+        return o;
+    };
     return {
         VIEW_SID: VIEW_SID,
         DOCUMENT_SID: DOCUMENT_SID,
         createClassElement: createClassElement,
         createInstanceElement: createInstanceElement,
+        createValueSpecElement: createValueSpecElement,
         hasCircularReference: hasCircularReference,
         cleanElement: cleanElement,
         normalize: normalize,

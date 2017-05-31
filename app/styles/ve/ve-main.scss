@@ -15,6 +15,7 @@
 @import "layout/_ve-nav.scss";
 @import "layout/_ve-footer.scss";
 @import "layout/_ve-no-panes.scss";
+@import "layout/_ve-table-filter.scss";
 
 .cke_button__mmscf_label, .cke_button__mmscomment_label,
 .cke_button__mmsvlink_label, .cke_button__mmsreset_label {
@@ -73,7 +74,9 @@ div.tooltip-inner {
   2.4 Tab System
     2.4.1 Light tab system
     2.4.2 Dark Tab system
+  2.5 Banners
 3. Table filtering stuff
+4. Search
 
 -------------------------------------------------------------------*/
 
@@ -87,7 +90,6 @@ div.tooltip-inner {
 .ve-dark-modal,
 .ve-dark-dropdown-nav,
 .ve-dark-dropdown-menu,
-.ve-table-buttons
 #ve-origin-select,
 #ve-login{
 
@@ -103,6 +105,9 @@ div.tooltip-inner {
   }
 }
 
+.ve-secondary-text{
+  color:$ve-light-text;
+}
 
 /*------------------------------------------------------------------
 2. Global UI Elements
@@ -121,7 +126,9 @@ div.tooltip-inner {
 .ve-table-buttons
 #ve-origin-select,
 #ve-login,
-.tableSearch{
+.ve-table-filter,
+.ve-search
+{
 
   .btn {
     font-weight: 500;
@@ -183,7 +190,6 @@ div.tooltip-inner {
 
   .btn-tertiary{
     color: $ve-light-text;
-    margin: 24px 0 6px;
     background-color:$ve-silver-base;
   }
 
@@ -251,6 +257,7 @@ div.tooltip-inner {
     -moz-transition: background-color .1s ease-out !important;
     -o-transition: background-color .1s ease-out !important;
     transition: background-color .1s ease-out !important;
+    letter-spacing: .05em; /*overwriting user agent stylesheet */
   }
 
   button.dropdown-toggle .fa-caret-down {
@@ -273,7 +280,7 @@ div.tooltip-inner {
 
   .dropdown-menu li {
     padding: 6px 8px;
-    white-space: nowrap;
+    word-wrap: break-word;
     width: 100%;
     -webkit-transition: background-color .1s ease-out !important;
     -moz-transition: background-color .1s ease-out !important;
@@ -386,10 +393,6 @@ div.tooltip-inner {
 
 .ve-dark-dropdown-wide {
 
-  .label-dropdown {
-    display: block;
-  }
-
   button.dropdown-toggle {
     width: 100%;
     text-align: left;
@@ -409,7 +412,9 @@ div.tooltip-inner {
   .label-dropdown {
     color: $ve-white-text-lighter-2;
     font-size: 15px;
+    display: block; 
   }
+
 }
 
 /*------------------------------------------------------------------
@@ -437,7 +442,7 @@ div.tooltip-inner {
   .label-dropdown {
     color: $ve-white-text-lighter-2;
     font-size: 14px;
-    padding: 0 4px;
+    padding: 0 0 0 4px;
   }
 
   .btn-group.open button.dropdown-toggle {
@@ -447,6 +452,10 @@ div.tooltip-inner {
   /* over write bootstrap*/
   li {
     font-size: 14px;
+  }
+
+  .selected-dropdown{
+    font-weight: 500;
   }
 }
 
@@ -569,12 +578,24 @@ div.tooltip-inner {
 }
 
 /*------------------------------------------------------------------
+  2.5 Banners
+-------------------------------------------------------------------*/
+
+.ve-notify-banner{
+  background-color: $ve-teal-lighter-4;
+  padding: 6px 10px;
+  border: 1px solid $ve-teal-lighter-3;
+  border-radius: 3px;
+  color: $ve-teal-base;
+  margin: 4px 10px 14px;
+}
+
+/*------------------------------------------------------------------
 3. Table Filtering
 -------------------------------------------------------------------*/
 
 .tableSearch > span {
   display: block;
-  margin: 20px 0;
 }
 
 table caption {
@@ -597,4 +618,30 @@ table caption {
 
 .ve-filter-table-form .btn-sm {
   margin: 0 4px;
+}
+
+
+/*------------------------------------------------------------------
+4. Table Filtering
+-------------------------------------------------------------------*/
+
+.ve-search{
+  table{
+    width:100%;
+    table-layout:fixed;
+  }
+
+  td{
+    padding-bottom:10px !important;
+  }
+
+  mms-transclude-name{
+    color:$ve-light-text;
+  }
+
+  .btn-primary{
+    border:none !important;
+    padding:7px 12px 7px !important;
+    font-weight:700 !important;
+  }
 }

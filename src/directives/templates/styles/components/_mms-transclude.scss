@@ -1,18 +1,26 @@
 /* Stylesheet for transclusion-related elements */
 
-mms-cf {
+
+mms-transclude-doc,
+mms-transclude-val,
+mms-transclude-name > span,
+mms-transclude-com,
+mms-transclude-img {
   cursor: pointer;
+  border: 2px solid transparent;
 }
 
-span > mms-cf, span > mms-cf > mms-transclude-doc, span > mms-cf > mms-transclude-val {
-  background-color: inherit;
-  color: inherit;
 
-  > p, > h1, > h2, > h3, > h4, > h5, > h6, > ol, > ul, > pre {
-    background-color: inherit;
-    color: inherit;
-  }
-}
+//span > mms-cf, span > mms-cf > mms-transclude-doc, span > mms-cf > mms-transclude-val {
+//  background-color: inherit;
+//  color: inherit;
+
+
+//   > p, > h1, > h2, > h3, > h4, > h5, > h6, > ol, > ul, > pre {
+//     background-color: inherit;
+//     color: inherit;
+//   }
+// }
 
 mms-view {
   mms-transclude-doc {
@@ -41,21 +49,52 @@ mms-view.editing {
     color: #000;
   }
 
-  /* Level 1 transclusions */
+  /* Transclusions borders when editing mode */
   mms-transclude-doc,
-  mms-transclude-name,
+  mms-transclude-name > span,
   mms-transclude-val {
-    @include transition(border, .3s, linear);
+    // @include transition(border, .5s);
+    @include transition-property(border-color);
+    @include transition-duration(1s);
     border: 2px solid $tertiary_grey;
     border-radius: 5px;
     cursor: pointer;
     margin-bottom: 5px;
     // padding: 2px 0;
-  }
+  
+  // &:hover {
+  //   border: $purple;
+  // }
 
-  //mms-transclude-name:has(> div.panel) {
-  //  border: none;
-  //}
+  // // Set up base styles, we're going to scale instead of animating width/height
+  // &::before,
+  // &::after {
+  //   top: 0;
+  //   left: 0;
+  //   height: 100%;
+  //   width: 100%;
+  //   transform-origin: center; // Ensure scaling is done from the center (expands outwards)
+  // }
+
+  // // scale3d(<scale-horizontal>, <scale-vertical>, <scale-depth>);
+  // &::before {
+  //   border-top: 2px solid $purple;
+  //   border-bottom: 2px solid $purple;
+  //   transform: scale3d(0,1,1); // Shrink only width
+  // }
+
+  // &::after {
+  //   border-left: 2px solid $purple;
+  //   border-right: 2px solid $purple;
+  //   transform: scale3d(1,0,1); // Shrink only height
+  // }
+
+  // &:hover::before,
+  // &:hover::after {
+  //   transform: scale3d(1,1,1); // Show full-size
+  //   transition: transform 0.5s;
+  // }
+}
 
   mms-transclude-doc {
     display: block;

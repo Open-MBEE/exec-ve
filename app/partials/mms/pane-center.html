@@ -6,13 +6,16 @@
     </div>
     <div fa-pane pane-anchor="center">
         <i class="pane-center-spinner fa fa-5x fa-spinner fa-spin" ng-show="ve_viewContentLoading"></i>
+        <div class="ve-notify-banner" ng-show="refOb.type === 'Tag'">
+            <span><strong>Tags are read only:</strong> Switch to a branch to edit</span>
+        </div>
         <div ng-hide="ve_viewContentLoading" class="pane-center container-fluid">
             <div class="pane-center-inner">
                 <div>{{comments.count}} Comment<span ng-if="comments.count !== 1">s</span>
                     <span ng-if="comments.count > 0">
                         , Last Commented {{comments.lastCommented | date:'M/d/yy h:mm a'}} by {{comments.lastCommentedBy}}</span>
                 </div>
-                <div id="print-div">
+                <div id="print-div" ng-if="viewOb">
                     <mms-view mms-element-id="{{viewOb.id}}" mms-number="{{sectionNumber}}" mms-commit-id="latest"
                               mms-project-id="{{viewOb._projectId}}" mms-ref-id="{{viewOb._refId}}"
                               mms-view-api="viewApi" mms-link="vidLink"></mms-view>

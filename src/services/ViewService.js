@@ -325,14 +325,13 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         ElementService.getElement({
             projectId: reqOb.projectId,
             refId: reqOb.refId,
-            elementId: reqOb.parentViewId,
-            extended: true
+            elementId: reqOb.parentViewId
         }, 2).then(function(data) {  
             var clone = {
                 _projectId: data._projectId,
                 _refId: data._refId,
                 _modified: data._modified,
-                _read: data._read,
+                // _read: data._read,
                 id: data.id
             };
             if (data._childViews) {
@@ -341,7 +340,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 clone._childViews = [];
             }
             clone._childViews.push({id: reqOb.viewId, aggregation: reqOb.aggr});
-            ElementService.updateElement(clone)
+            ElementService.updateElement(clone, true)
             .then(function(data2) {
                 deferred.resolve(data2);
             }, function(reason) {
@@ -370,8 +369,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         ElementService.getElement({
             projectId: reqOb.projectId,
             refId: reqOb.refId,
-            elementId: reqOb.parentViewId,
-            extended: true
+            elementId: reqOb.parentViewId
         }, 2).then(function(data) {  
             if (data._childViews) {
                 var clone = {
@@ -388,7 +386,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                         break; 
                     }
                 }
-                ElementService.updateElement(clone)
+                ElementService.updateElement(clone, true)
                 .then(function(data2) {
                     deferred.resolve(data2);
                 }, function(reason) {
@@ -420,7 +418,11 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
     var addElementToViewOrSection = function(reqOb, elementOb) {
         UtilsService.normalize(reqOb);
         var deferred = $q.defer();
-        ElementService.getElement(reqOb, 2)
+        ElementService.getElement({
+            projectId: reqOb._projectId,
+            refId: reqOb._refId,
+            elementId: reqOb.id
+        }, 2)
         .then(function(data) {  
             var clone = {
                 _projectId: data._projectId,
@@ -435,13 +437,23 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             }
             if (data[key]) {
                 clone[key] = JSON.parse(JSON.stringify(data[key]));
+                if (!clone[key].id || !clone[key].ownerId) {
+                    clone[key].id = isSection(data) ? UtilsService.createMmsId() : data.id + "_vc_expression";
+                    clone[key].ownerId = isSection(data) ? data.id : data.id + "_vc";
+                }
             } else {
-                clone[key] = {
+                clone[key] = UtilsService.createValueSpecElement({
                     operand: [],
                     type: "Expression",
-                };
+                    id: isSection(data) ? UtilsService.createMmsId() : data.id + "_vc_expression",
+                    ownerId: isSection(data) ? data.id : data.id + "_vc"
+                });
             }
-            clone[key].operand.push(elementOb);
+            elementOb.ownerId = clone[key].id;
+            if (!elementOb.id) {
+                elementOb.id = UtilsService.createMmsId();
+            }
+            clone[key].operand.push(UtilsService.createValueSpecElement(elementOb));
             ElementService.updateElement(clone)
             .then(function(data2) {
                 deferred.resolve(data2);
@@ -486,11 +498,17 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 }
                 if (data[key]) {
                     clone[key] = JSON.parse(JSON.stringify(data[key]));
+                    if (!clone[key].id || !clone[key].ownerId) {
+                        clone[key].id = isSection(data) ? UtilsService.createMmsId() : data.id + "_vc_expression";
+                        clone[key].ownerId = isSection(data) ? data.id : data.id + "_vc";
+                    }
                 } else {
-                    clone[key] = {
+                    clone[key] = UtilsService.createValueSpecElement({
                         operand: [],
                         type: "Expression",
-                    };
+                        id: isSection(data) ? UtilsService.createMmsId() : data.id + "_vc_expression",
+                        ownerId: isSection(data) ? data.id : data.id + "_vc"
+                    });
                 }
                 if (clone[key] && clone[key].operand) {
                     var operands = data[key].operand;
@@ -547,18 +565,22 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             documentation: '',
             type: "InstanceSpecification",
             classifierIds: [TYPE_TO_CLASSIFIER_ID[realType]],
-            specification: {
+            specification: UtilsService.createValueSpecElement({
                 value: JSON.stringify(instanceSpecSpec),
-                type: "LiteralString"
-            },
+                type: "LiteralString",
+                ownerId: newInstanceId,
+                id: UtilsService.createMmsId()
+            }),
             _appliedStereotypeIds: [],
         };
         instanceSpec = UtilsService.createInstanceElement(instanceSpec);
         if (type === 'Section') {
-            instanceSpec.specification = {
+            instanceSpec.specification = UtilsService.createValueSpecElement({
                 operand: [],  
-                type: "Expression"
-            };
+                type: "Expression",
+                ownerId: newInstanceId,
+                id: UtilsService.createMmsId()
+            });
         }
         var clone = {
             _projectId: viewOrSectionOb._projectId,
@@ -570,14 +592,20 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             key = "specification";
         }
         if (!viewOrSectionOb[key]) {
-            clone[key] = {
+            clone[key] = UtilsService.createValueSpecElement({
                 operand: [],
-                type: "Expression"
-            };
+                type: "Expression",
+                id: isSection(viewOrSectionOb) ? UtilsService.createMmsId() : viewOrSectionOb.id + "_vc_expression",
+                ownerId: isSection(viewOrSectionOb) ? viewOrSectionOb.id : viewOrSectionOb.id + "_vc"
+            });
         } else {
             clone[key] = JSON.parse(JSON.stringify(viewOrSectionOb[key]));
+            if (!clone[key].id || !clone[key].ownerId) {
+                clone[key].id = isSection(viewOrSectionOb) ? UtilsService.createMmsId() : viewOrSectionOb.id + "_vc_expression";
+                clone[key].ownerId = isSection(viewOrSectionOb) ? viewOrSectionOb.id : viewOrSectionOb.id + "_vc";
+            }
         }
-        clone[key].operand.push({instanceId: newInstanceId, type: "InstanceValue"});
+        clone[key].operand.push(UtilsService.createValueSpecElement({instanceId: newInstanceId, type: "InstanceValue", id: UtilsService.createMmsId(), ownerId: clone[key].id}));
         var toCreate = [instanceSpec, clone];
         var reqOb = {
             projectId: viewOrSectionOb._projectId,
@@ -626,28 +654,31 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         var newViewId = viewOb.viewId ? viewOb.viewId : UtilsService.createMmsId();
         var newInstanceId = '_hidden_' + UtilsService.createMmsId() + '_pei';
 
-        var view = {
+        var view = UtilsService.createClassElement({
             id: newViewId,
             type: 'Class',
             ownerId: ownerOb.id,
             _allowedElements: [],
             _displayedElementIds: [newViewId],
             _childViews: [],
-            _contents: {
-                operand: [{
+            _contents: UtilsService.createValueSpecElement({
+                operand: [UtilsService.createValueSpecElement({
                     instanceId: newInstanceId,
                     type:"InstanceValue",
-                }],
-                type: 'Expression'
-            },
+                    ownerId: newViewId + "_vc_expression",
+                    id: UtilsService.createMmsId()
+                })],
+                type: 'Expression',
+                id: newViewId + "_vc_expression",
+                ownerId: newViewId + "_vc"
+            }),
             name: viewOb.viewName ? viewOb.viewName : 'Untitled View',
             documentation: viewOb.viewDoc ? viewOb.viewDoc : '',
             _appliedStereotypeIds: [
                 (viewOb.isDoc ? "_17_0_2_3_87b0275_1371477871400_792964_43374" : "_17_0_1_232f03dc_1325612611695_581988_21583")
             ],
             appliedStereotypeInstanceId: newViewId + '_asi'
-        };
-        view = UtilsService.createClassElement(view);
+        });
         var parentView = null;
         if (ownerOb && (ownerOb._childViews || UtilsService.isView(ownerOb))) {
             parentView = {
@@ -669,21 +700,22 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             'source': newInstanceId, 
             'sourceProperty': 'documentation'
         };
-        var instanceSpec = {
+        var instanceSpec = UtilsService.createInstanceElement({
             id: newInstanceId,
             ownerId: 'view_instances_bin_' + ownerOb._projectId,
             name: "View Documentation",
             documentation: instanceSpecDoc,
             type: "InstanceSpecification",
             classifierIds:[TYPE_TO_CLASSIFIER_ID.ParagraphT],
-            specification: {
+            specification: UtilsService.createValueSpecElement({
                 value: JSON.stringify(instanceSpecSpec),
-                type: "LiteralString"
-            },
+                type: "LiteralString",
+                id: UtilsService.createMmsId(),
+                ownerId: newInstanceId
+            }),
             _appliedStereotypeIds: [],
-        };
-        instanceSpec = UtilsService.createInstanceElement(instanceSpec);
-        var asi = { //create applied stereotype instance
+        });
+        var asi = UtilsService.createInstanceElement({ //create applied stereotype instance
             id: newViewId + '_asi',
             ownerId: newViewId,
             documentation: '',
@@ -692,8 +724,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             classifierIds: [(viewOb.isDoc ? "_17_0_2_3_87b0275_1371477871400_792964_43374" : "_17_0_1_232f03dc_1325612611695_581988_21583")],
             _appliedStereotypeIds: [],
             stereotypedElementId: newViewId
-        };
-        asi = UtilsService.createInstanceElement(asi);
+        });
         var toCreate = [instanceSpec, view, asi];
         if (parentView)
             toCreate.push(parentView);
@@ -701,6 +732,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             projectId: ownerOb._projectId,
             refId: ownerOb._refId,
             elements: toCreate,
+            returnChildViews: true
         };
         ElementService.createElements(reqOb)
         .then(function(data) {

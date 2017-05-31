@@ -4,9 +4,9 @@
 
 angular.module('mmsApp')
 .controller('ToolCtrl', ['$scope', '$rootScope', '$state', '$uibModal', '$q', '$timeout', 'hotkeys',
-            'ElementService', 'ProjectService', 'growl', 'projectOb', 'refOb', 'documentOb', 'viewOb', 'Utils',
+            'ElementService', 'ProjectService', 'growl', 'projectOb', 'refOb', 'tagObs', 'documentOb', 'viewOb', 'Utils',
 function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
-    ElementService, ProjectService, growl, projectOb, refOb, documentOb, viewOb, Utils) {
+    ElementService, ProjectService, growl, projectOb, refOb, tagObs, documentOb, viewOb, Utils) {
 
     $scope.specInfo = {
         refId: refOb.id,
@@ -18,6 +18,8 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
     $scope.viewOb = viewOb;
     $scope.documentOb = documentOb;
     $scope.refOb = refOb;
+    $scope.tagObs = tagObs;
+    $scope.noTags = false;
 
     if (viewOb) {
         $scope.specInfo.id = viewOb.id;
@@ -27,6 +29,10 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
         $scope.viewId = documentOb.id;
     }
 
+    if (angular.isArray(tagObs) && tagObs.length === 0) {
+        $scope.noTags = true;
+    }
+
     $scope.specApi = {};
     $scope.viewContentsOrderApi = {};
     $rootScope.ve_togglePane = $scope.$pane;
@@ -34,6 +40,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
     $scope.show = {
         element: true,
         history: false,
+        tags: false,
         reorder: false,
         jobs: false
     };
@@ -88,6 +95,10 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
         showPane('history');
     });
 
+    $scope.$on('tags', function() {
+        showPane('tags');
+    });
+
     var cleanUpEdit = function(editOb, cleanAll) {
         var key = editOb.id + '|' + editOb._projectId + '|' + editOb._refId;
         var currentCnt = 0;
@@ -129,15 +140,14 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
         $scope.specInfo.refId = elementOb._refId;
         $scope.specInfo.commitId = commitId ? commitId : elementOb._commitId;
         $rootScope.ve_tbApi.select('element-viewer');
-        if ($rootScope.togglePane && $rootScope.togglePane.closed)
-            $rootScope.togglePane.toggle();
-
+        
         showPane('element');
         if ($scope.specApi.setEditing) {
             $scope.specApi.setEditing(false);
         }
-        var editable = elementOb._editable && commitId === 'latest';
+        var editable = elementOb._editable && $scope.refOb.type === 'Branch' && commitId === 'latest' ;
         $rootScope.ve_tbApi.setPermission('element-editor', editable);
+        $rootScope.$digest();
     };
     $scope.$on('elementSelected', elementSelected);
     $scope.$on('element-viewer', function() {
@@ -164,7 +174,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
     $scope.$on('viewSelected', function(event, elementOb, commitId) {
         elementSelected(event, elementOb, commitId);
         $scope.viewOb = elementOb;
-        var editable = elementOb._editable && commitId === 'latest';
+        var editable = elementOb._editable && $scope.refOb.type === 'Branch' && commitId === 'latest';
         $scope.viewCommitId = commitId ? commitId : elementOb._commitId;
         $rootScope.ve_tbApi.setPermission('view-reorder', editable);
     });
