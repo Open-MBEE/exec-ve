@@ -256,6 +256,9 @@ module.exports = function(grunt) {
         files: ['app/**/*', '!app/bower_components/**', 'src/**/*'],
         tasks: ['docs-build']
       },
+      options: {
+        livereload: true,
+      },
     },
 
     clean: ["app/bower_components", "build", "dist", "docs"],
