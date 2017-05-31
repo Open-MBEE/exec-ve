@@ -69,6 +69,20 @@ function UtilsService($q, $http, CacheService, URLService, _) {
         slotIds: [],
         stereotypedElementId: null
     };
+    var VALUESPEC_ELEMENT_TEMPLATE = {
+        visibility: "public",
+        documentation: "",
+        mdExtensionsIds: [ ],
+        appliedStereotypeInstanceId: null,
+        templateParameterId: null,
+        clientDependencyIds: [ ],
+        syncElementId: null,
+        name: "",
+        typeId: null,
+        supplierDependencyIds: [ ],
+        _appliedStereotypeIds: [ ],
+        nameExpression: null
+    };
     var hasCircularReference = function(scope, curId, curType) {
         var curscope = scope;
         while (curscope.$parent) {
@@ -689,11 +703,18 @@ function UtilsService($q, $http, CacheService, URLService, _) {
         Object.assign(o, obj);
         return o;
     };
+
+    var createValueSpecElement = function(obj) {
+        var o = JSON.parse(JSON.stringify(VALUESPEC_ELEMENT_TEMPLATE));
+        Object.assign(o, obj);
+        return o;
+    };
     return {
         VIEW_SID: VIEW_SID,
         DOCUMENT_SID: DOCUMENT_SID,
         createClassElement: createClassElement,
         createInstanceElement: createInstanceElement,
+        createValueSpecElement: createValueSpecElement,
         hasCircularReference: hasCircularReference,
         cleanElement: cleanElement,
         normalize: normalize,
