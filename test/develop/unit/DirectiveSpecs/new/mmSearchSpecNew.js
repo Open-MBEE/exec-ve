@@ -72,36 +72,16 @@ xdescribe('Directive: mmsSearch', function() {
 			]
 		};
 
-		$httpBackend.when('POST', '/alfresco/service/projects/someprojectid/refs/master/search').respond(200, testElements.elements[0]);
-
-		// $httpBackend.when('GET', '/alfresco/service/projects/'+ testElements.elements[0]._projectId +'/refs/' + testElements.elements[0]._refId + '/elements/' + testElements.elements[0].id + '?commitId=' + testElements.elements[0]._commitId).respond(200, testElements.elements[0]);
-		// $httpBackend.when('GET', '/alfresco/service/projects/'+ testElements.elements[1]._projectId +'/refs/' + testElements.elements[1]._refId + '/elements/' + testElements.elements[1].id + '?commitId=' + testElements.elements[1]._commitId).respond(200, testElements.elements[1]);
-		// $httpBackend.when('GET', '/alfresco/service/projects/'+ testElements.elements[2]._projectId +'/refs/' + testElements.elements[2]._refId + '/elements/' + testElements.elements[2].id + '?commitId=' + testElements.elements[2]._commitId).respond(200, testElements.elements[2]);
-		// $httpBackend.when('GET', '/alfresco/service/projects/'+ testElements.elements[3]._projectId +'/refs/' + testElements.elements[3]._refId + '/elements/' + testElements.elements[3].id).respond(200, testElements.elements[3]);
-		// $httpBackend.when('GET', '/alfresco/service/projects/'+ testElements.elements[3]._projectId +'/refs/' + testElements.elements[3]._refId + '/elements/' + testElements.elements[3].id).respond(200, testElements.elements[3]);
-		// $httpBackend.when('GET', '/alfresco/service/projects/'+ testElements.elements[3]._projectId +'/refs/' + testElements.elements[3]._refId + '/elements/' + testElements.elements[3].id).respond(200, testElements.elements[3]);
-
-		// scope.searchText = "First Element";
-		// scope.itemsPerPage = 20;
-		// var searchElement = angular.element('<button class="btn btn-primary" type="button" ng-click="newSearch(searchText, 0, itemsPerPage)"></button>');
-		// search = $compile(searchElement)(scope);
-		// scope.$apply();
-		// console.log(search);
-		
-	});
-
-	it('should search for an element', function() {
+		$httpBackend.when('POST', '/alfresco/service/projects/someprojectid/refs/master/search').respond(200, testElements);
 
 		scope.searchText = "First Element";
 		scope.itemsPerPage = 20;
 		var searchElement = angular.element('<button class="btn btn-primary" type="button" ng-click="newSearch(searchText, 0, itemsPerPage)"></button>');
 		search = $compile(searchElement)(scope);
-		scope.$apply();
-		var data = null;
-		scope.$on('event.action', function($event, eventData) {
-			data = eventData;
-		});
-		search.find('button').click();
+		scope = search.isolateScope().newSearch(scope.searchText, 1, scope.itemsPerPage);
+	});
+
+	it('should search for an element', function() {
 		scope.element = {
 			mmsProjectId: 'someprojectid',
 			mmsRefId: 'master',
@@ -112,9 +92,10 @@ xdescribe('Directive: mmsSearch', function() {
 
 		element = angular.element('<mms-search mms-options="searchOptions" mms-project-id="{{element.mmsProjectId}}" mms-ref-id="{{element.mmsRefId}}"></mms-search>');
 		$compile(element)(scope);
-		scope.$apply();
-		// console.log(element.html());
-		expect(data).toContain('First Element');
+		$rootScope.$digest();
+
+		console.log(element.html());
+		// expect(element.html()).toContain('First Element');
 		// $httpBackend.flush();
 	});
 

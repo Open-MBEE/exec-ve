@@ -1,6 +1,6 @@
 'use strict';
 
-describe('Service: ElementService', function() {
+xdescribe('Service: ElementService', function() {
 	beforeEach(module('mms'));
 
 	var root = '/alfresco/service';
