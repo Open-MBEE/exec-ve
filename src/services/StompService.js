@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms')
-.factory('StompService', ['$rootScope', 'ApplicationService', 'ElementService', 'URLService','$http', 'UtilsService', 'CacheService', StompService]);
+.factory('StompService', ['$rootScope', 'ApplicationService', 'ElementService', 'URLService','$http', 'UtilsService', 'CacheService', '_', StompService]);
 
 /**
  * @ngdoc service
@@ -11,7 +11,7 @@ angular.module('mms')
  * @description
  * Provides messages from the activemq JMS bus
  */
-function StompService($rootScope, ApplicationService, ElementService, URLService, $http, UtilsService, CacheService) {
+function StompService($rootScope, ApplicationService, ElementService, URLService, $http, UtilsService, CacheService, _) {
      var stompClient = {};
      var host;
 
@@ -54,14 +54,18 @@ function StompService($rootScope, ApplicationService, ElementService, URLService
         }
         if (updateWebpage.createdRef) {
             var createdRef = updateWebpage.createdRef;
-            if (updateWebpage.source !== ApplicationService.getSource()) {
-                var list = CacheService.get(['refs', projectId]);
+            var list = CacheService.get(['refs', projectId]);
+            // if (updateWebpage.source !== ApplicationService.getSource()) {
+                var index = -1;
                 if (list) {
-                    list.push(createdRef);
+                    index = _.findIndex(list, {id: createdRef.id});
+                    if ( index > -1 ) {
+                        Object.assign(list[index], createdRef);
+                    }
                 }
                 CacheService.put(['ref', projectId, createdRef.id], createdRef);
-            }
-            $rootScope.$broadcast("stomp.branchCreated", createdRef, projectId);
+            // }
+            $rootScope.$broadcast("stomp.branchCreated", list, createdRef);
         }
         if (updateWebpage.refs) {
             if (updateWebpage.refs.addedJobs && updateWebpage.refs.addedJobs.length > 0) {//check length of added jobs > 0

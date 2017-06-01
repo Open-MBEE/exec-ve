@@ -15,7 +15,6 @@ function($sce, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $t
     $scope.refData = [];
     $scope.bbApi = {};
     $scope.buttons = [];
-    $scope.refList = refObs;
     $scope.branches = branchObs;
     $scope.tags = tagObs;
     $scope.activeTab = 0;
@@ -67,37 +66,22 @@ function($sce, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $t
             $scope.fromParams = refObs[index];
         }
     });
-    $scope.$on("stomp.branchCreated", function(event, updateRef) {
+    $scope.$on("stomp.branchCreated", function(event, refList, updateRef) {
         // var index = -1;
         // if (updateRef.type === 'Branch') {
-        //     index = _.findIndex($scope.branches, {name: updateRef.id});
+        //     index = _.findIndex($scope.branches, {id: updateRef.id});
         //     if ( index > -1 ) {
-        //         $scope.branches[index].loading = false;
-        //         // $scope.branches[index] = updateRef;
+        //         // $scope.branches[index].loading = false;
+        //         $scope.branches[index] = updateRef;
         //     }
         // } else if (updateRef.type === 'Tag') {
-        //     index = _.findIndex($scope.tags, {name: updateRef.id});
+        //     index = _.findIndex($scope.tags, {id: updateRef.id});
         //     if ( index > -1 ) {
-        //         $scope.tags[index].loading = false;
-        //         // $scope.tags[index] = updateRef;
+        //         // $scope.tags[index].loading = false;
+        //         $scope.tags[index] = updateRef;
         //     }
         // }
 
-        // Update tags list with latest from refOb
-        var tag = [];
-        for (var i = 0; i < $scope.refList.length; i++) {
-            if ($scope.refList[i].type === "Tag")
-                tag.push($scope.refList[i]);
-        }
-        $scope.tags = tag;
-
-        // Update branches list with latest from refOb
-        var branches = [];
-        for (var j = 0; j < $scope.refList.length; j++) {
-            if ($scope.refList[j].type === "Branch")
-                branches.push($scope.refList[j]);
-        }
-        $scope.branches = branches;
         growl.success(updateRef.name + " " + updateRef.type + " Created");
     });
 

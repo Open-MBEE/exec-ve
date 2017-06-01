@@ -230,12 +230,12 @@ function ProjectService($q, $http, URLService, CacheService, ApplicationService)
                 deferred.reject({status: 500, data: '', message: "Server Error: empty response"});
                 return;
             }
-            var resp = response.data.refs[0];
+            var createdRef = response.data.refs[0];
             var list = CacheService.get(['refs', projectId]);
             if (list) {
-                list.push(resp);
+                list.push(createdRef);
             }
-            deferred.resolve(CacheService.put(['ref', projectId, resp.id], resp));
+            deferred.resolve(CacheService.put(['ref', projectId, createdRef.id], createdRef));
         }, function(response) {
             URLService.handleHttpStatus(response.data, response.status, response.headers, response.config, deferred);
         });
