@@ -1,19 +1,42 @@
 'use strict';
 
-describe('Service: CacheService', function () {
-	beforeEach(module('mms'));
-
+xdescribe('Service: CacheService', function () {
+	
 	var CacheServiceObj;
 	var $rootScope, $scope;
 
-	beforeEach(inject(function ($injector) {
-		CacheServiceObj = $injector.get('CacheService');
-		$rootScope 		= $injector.get('$rootScope');
-		$scope 			= $rootScope.$new();
-	}));
+	beforeEach(module('mms'));
+	beforeEach(function() {
+		inject(function ($injector) {
+			CacheServiceObj = $injector.get('CacheService');
+			$rootScope 		= $injector.get('$rootScope');
+			$scope 			= $rootScope.$new();
+		});
+	});
 
-	xdescribe('Method: put', function () {
-		it('should put in an element', function () {
+	describe('Method: get', function () {
+		it('should get an element', function () {
+			var val;
+			var key = 'key123';
+			var inputVal = 'One ring to rule them all';
+			CacheServiceObj.put(key, inputVal);
+			CacheServiceObj.get(key).then(function(data) {
+				val = data;
+			}, function(reason) {
+				val = reason.message;
+			});
+			expect(val).toEqual(inputVal);
+			// CacheServiceObj.put(key, inputVal).then(function(data) {
+			// 	val = CacheServiceObj.get(key);
+			// }, function(reason) {
+			// 	val = reason.message;
+			// });
+			// expect(val).toEqual(inputVal);
+		});
+	});
+
+	describe('Method: put', function () {
+		it('should put an element in the cache', function () {
 			var val;
 			var key = 'key';
 			var value = 'One ring to rule them all';
@@ -24,17 +47,6 @@ describe('Service: CacheService', function () {
 			});
 			expect(val).toEqual(value);
 		});
-	});
-
-	xdescribe('Method: get', function () {
-		// var val;
-		// it('should get an element', function () {
-		// 	CacheServiceObj.put('key', 'One ring to rule them all', true).then(function(data) {
-		// 		expect(CacheServiceObj.get('key')).toEqual(data);
-		// 	}, function(reason) {
-		// 		expect()
-		// 	});
-		// });
 	});
 
 	xdescribe('Method getLatestElements', function () {

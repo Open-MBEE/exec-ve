@@ -1,6 +1,6 @@
 'use strict';
 
-xdescribe('Service: ElementService', function() {
+describe('Service: ElementService', function() {
 	beforeEach(module('mms'));
 
 	var root = '/alfresco/service';
@@ -12,6 +12,7 @@ xdescribe('Service: ElementService', function() {
 	var refs = {};
 	var elements = {};
 	var result = {};
+	var elementHistory;
 
 	beforeEach(inject(function($injector) {
 		$httpBackend 			= $injector.get('$httpBackend');
@@ -247,6 +248,29 @@ xdescribe('Service: ElementService', function() {
 			_projectId 					: "heyaproject"
 		}
 
+		//GETELEMENTHISTORY:
+		elementHistory = {
+			commits: [
+			    {
+			        _created: "2017-04-27T16:23:44.357-0700",
+			        _creator: "admin",
+			        id: "someid1"
+			    },
+			    {
+			        _created: "2017-04-27T16:23:26.081-0700",
+			        _creator: "admin",
+			        id: "someid2"
+			    },
+			    {
+			        _created: "2017-04-27T16:23:06.540-0700",
+			        _creator: "admin",
+			        id: "someid3"
+			    }
+			]
+		}
+
+		$httpBackend.when('GET', 'alfresco/service/projects/someprojectid/refs/master/elements/getelementhistory/history').respond(200, elementHistory);
+				
 	}));
 
 	describe('getElement', function() { //problem with MMS with this, MMS-741
@@ -486,7 +510,7 @@ xdescribe('Service: ElementService', function() {
 		});
 	});
 
-	describe('search', function() {
+	xdescribe('search', function() {
 		it('should get an element', function() {
 			var searchText = 'krabby patties';
 
@@ -560,9 +584,42 @@ xdescribe('Service: ElementService', function() {
 		});
 	});
 
-	xdescribe('getElementHistory', function() {
+	describe('getElementHistory', function() {
 		it('should get an element', function() {
+			var elemHistory;
+			var commitHistory = {
+				commits: [
+				    {
+				        _created: "2017-04-27T16:23:44.357-0700",
+				        _creator: "admin",
+				        id: "someid1"
+				    },
+				    {
+				        _created: "2017-04-27T16:23:26.081-0700",
+				        _creator: "admin",
+				        id: "someid2"
+				    },
+				    {
+				        _created: "2017-04-27T16:23:06.540-0700",
+				        _creator: "admin",
+				        id: "someid3"
+				    }
+				]				
+			};
 
+			var elemOb = {
+				projectId: "someprojectid",
+				elementId: "getelementhistory",
+				refId: "master",
+				commitId: "latest"
+			};
+
+			ElementServiceObj.getElementHistory(elemOb).then(function(data) {
+				elemHistory = data;
+			}, function(reason) {
+				elemHistory = reason.message;
+			});
+			expect(elemHistory).toEqual(commitHistory);
 		});
 	});
 
