@@ -68,7 +68,7 @@ function mmsJobs($templateCache, $http, $location, $window, growl, _ , $q,
 
         // get all the jobs for current document
         var getJobs = function () {
-            var link = URLService.getJobsURL(projectId, refId, $location.host()); // TODO create porxy in gruntfile for PMA
+            var link = URLService.getJobsURL(scope.mmsProjectId, scope.mmsRefId, $location.host()); // TODO create porxy in gruntfile for PMA
             // var link = URLService.getJobsURL(scope.mmsProjectId, scope.mmsRefId, 'opencae-int.jpl.nasa.gov');
             scope.jobs = [];
             scope.loading = true;
