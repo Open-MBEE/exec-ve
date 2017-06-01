@@ -1,6 +1,6 @@
 'use strict';
 
-xdescribe('Service: ApplicationService', function () {
+describe('Service: ApplicationService', function () {
     beforeEach(module('mms'));
 
     var ApplicationServiceObj;

@@ -1,6 +1,6 @@
 'use strict';
 
-xdescribe('Service: Authorization Service', function() {
+describe('Service: Authorization Service', function() {
 	beforeEach(module('mms'));
 
 	var AuthServiceObj;
