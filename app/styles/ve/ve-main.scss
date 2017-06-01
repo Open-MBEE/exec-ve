@@ -76,6 +76,7 @@ div.tooltip-inner {
     2.4.2 Dark Tab system
   2.5 Banners
 3. Table filtering stuff
+4. Search
 
 -------------------------------------------------------------------*/
 
@@ -125,7 +126,9 @@ div.tooltip-inner {
 .ve-table-buttons
 #ve-origin-select,
 #ve-login,
-.ve-table-filter{
+.ve-table-filter,
+.ve-search
+{
 
   .btn {
     font-weight: 500;
@@ -277,7 +280,7 @@ div.tooltip-inner {
 
   .dropdown-menu li {
     padding: 6px 8px;
-    white-space: nowrap;
+    word-wrap: break-word;
     width: 100%;
     -webkit-transition: background-color .1s ease-out !important;
     -moz-transition: background-color .1s ease-out !important;
@@ -615,4 +618,30 @@ table caption {
 
 .ve-filter-table-form .btn-sm {
   margin: 0 4px;
+}
+
+
+/*------------------------------------------------------------------
+4. Table Filtering
+-------------------------------------------------------------------*/
+
+.ve-search{
+  table{
+    width:100%;
+    table-layout:fixed;
+  }
+
+  td{
+    padding-bottom:10px !important;
+  }
+
+  mms-transclude-name{
+    color:$ve-light-text;
+  }
+
+  .btn-primary{
+    border:none !important;
+    padding:7px 12px 7px !important;
+    font-weight:700 !important;
+  }
 }

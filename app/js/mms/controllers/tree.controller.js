@@ -42,8 +42,8 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         if ($state.includes('project.ref') && !$state.includes('project.ref.document')) {
             $scope.bbApi.addButton(UxService.getButtonBarButton("tree-add-document"));
             $scope.bbApi.addButton(UxService.getButtonBarButton("tree-delete-document"));
-            $scope.bbApi.setPermission("tree-add-document", refOb.type === 'Tag' ? false : true);
-            $scope.bbApi.setPermission("tree-delete-document", refOb.type === 'Tag' ? false : true);
+            $scope.bbApi.setPermission( "tree-add-document", documentOb._editable && (refOb.type === 'Tag' ? false : true) );
+            $scope.bbApi.setPermission( "tree-delete-document", documentOb._editable &&  (refOb.type === 'Tag' ? false : true) );
         } else if ($state.includes('project.ref.document')) {
             $scope.bbApi.addButton(UxService.getButtonBarButton("view-mode-dropdown"));
             $scope.bbApi.setToggleState('tree-show-pe', $rootScope.veTreeShowPe);
